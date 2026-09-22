@@ -1,0 +1,30 @@
+[project]
+name = "orchard"
+version = "0.0.1"
+description = "Isaac Sim / Isaac Lab parity robotics simulation, native on Apple Silicon (Metal)"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Apache-2.0" }
+dependencies = [
+    "numpy",
+    "mujoco>=3.14",
+    "warp-lang",
+    "torch>=2.14",
+    "pyobjc-framework-Metal",
+    "pyobjc-framework-MetalFX",
+    "pyobjc-framework-Cocoa",
+]
+
+[project.optional-dependencies]
+test = ["pytest", "pytest-xdist", "pillow", "imageio", "scipy"]
+learn = ["gymnasium", "stable-baselines3"]
+
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["orchard*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
