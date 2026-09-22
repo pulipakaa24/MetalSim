@@ -44,6 +44,8 @@ def _core():
         core.wp_metal_signal_event.argtypes = [ctypes.c_int, ctypes.c_void_p, ctypes.c_uint64]
         core.wp_metal_wait_event.restype = ctypes.c_int
         core.wp_metal_wait_event.argtypes = [ctypes.c_int, ctypes.c_void_p, ctypes.c_uint64]
+        core.wp_metal_counters.restype = ctypes.c_int
+        core.wp_metal_counters.argtypes = [ctypes.c_int, ctypes.POINTER(ctypes.c_uint64), ctypes.c_int]
         core._orchard_interop_bound = True
     return core
 
@@ -154,3 +156,22 @@ def chain_event(device="metal:0"):
     core = _core()
     o = _ordinal(device)
     return to_objc(core.wp_metal_event_handle(o)), int(core.wp_metal_event_value(o))
+
+
+@dataclass(frozen=True)
+class Counters:
+    """Cumulative Warp Metal runtime counters: the no-host-sync conformance instrument."""
+    syncs: int        # times the host waited for the GPU (waitUntilCompleted)
+    flushes: int      # command buffers committed
+    host_ops: int     # host operations run during graph replay (each preceded by a wait)
+    dispatches: int   # kernel dispatches encoded
+
+    def __sub__(self, other: "Counters") -> "Counters":
+        return Counters(self.syncs - other.syncs, self.flushes - other.flushes,
+                        self.host_ops - other.host_ops, self.dispatches - other.dispatches)
+
+
+def counters(device="metal:0") -> Counters:
+    out = (ctypes.c_uint64 * 4)()
+    _check(_core().wp_metal_counters(_ordinal(device), out, 4), "wp_metal_counters")
+    return Counters(int(out[0]), int(out[1]), int(out[2]), int(out[3]))
