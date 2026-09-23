@@ -115,6 +115,13 @@ class BatchSim:
             mjw.reset_data(self.m, self.d, reset=self._reset_mask)
         self._graphs["reset"] = cap.graph
 
+    def launch_step(self) -> None:
+        """Launch the substeps directly (no graph replay), for capturing into a larger graph that
+        also holds the policy and the rollout bookkeeping."""
+        with wp.ScopedDevice(self.device):
+            for _ in range(self.opt.substeps):
+                mjw.step(self.m, self.d)
+
     def _run(self, name: str):
         with wp.ScopedDevice(self.device):
             g = self._graphs.get(name)

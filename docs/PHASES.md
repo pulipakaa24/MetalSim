@@ -231,3 +231,31 @@ absolute numbers are pessimistic; the ratios hold):
 
 The plan's estimate for tier 1 was 5–20× tier 0 before upscaling; measured 2–5×. Not yet:
 MetalFX temporal denoise/upscale, area lights, one-bounce diffuse GI, motion vectors.
+
+### Rollout policy in Warp (WS7), measured
+
+`orchard.learn.warp_policy.WarpMLPPolicy`: rsl_rl-style actor-critic MLP evaluated by Warp
+kernels on the simulator's queue; torch parameters are re-homed onto Warp memory (zero-copy both
+ways), so the optimizer updates weights in place. Actions, log-probs and values are stored in
+Warp rollout buffers at a device-side step index, which lets one captured graph (observation
+gather + policy + store + physics substeps) be replayed T times per rollout. Parity with the torch
+module: 1e-5.
+
+Cartpole (state observations, MJCF equivalent of Isaac's asset, 10 Newton iterations), N=1024,
+T=64, measured while a PPO training run shared the GPU:
+
+| quantity | value |
+|---|---|
+| env-steps/s (physics + policy + storage) | 257,696 |
+| host time per step | 0.048 ms |
+| dispatches per step | 374 |
+| torch launches per step | 0 |
+| per TFLOPS FP32 (M4 Max 18.4) | ~14,000 |
+
+Isaac Lab Cartpole-Direct step+inference on an RTX 4090, 4096 envs (published): 910K steps/s,
+~11,000 per TFLOPS. Uncontended and at N=4096 numbers to follow from `orchard.bench.suite`.
+
+Lesson: without GPU-side loop conditions, MuJoCo Warp on Metal runs a model's full `iterations`
+budget (MuJoCo's default 100 Newton iterations turned a 2-DOF cartpole substep into 1,081
+dispatches); `BatchSimOptions.solver_iterations` should be set per model, as Isaac Lab sets PhysX
+iteration counts.
