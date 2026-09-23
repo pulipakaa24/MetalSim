@@ -76,13 +76,16 @@ class SimParams:
     wheel_softness: float = 0.02         # MuJoCo solref time constant of the tyre contact [est]
     # Tyre width: LimX trains on a 5 cm wide wheel cylinder (tron1-rl-isaacgym WF_TRON1A URDF);
     # their MuJoCo file has a 1 cm disc, on which the robot has almost no roll stiffness.
-    tyre_half_width: float = 0.025
+    tyre_half_width: float = 0.025      # only for tyre="cylinder"
+    # "ellipsoid": smooth fit to the real rounded 50 mm tread of LimX's wheel mesh (default);
+    # "mesh": the mesh's convex hull (faceted, jitters); "cylinder": LimX's collision cylinder.
+    tyre: str = "ellipsoid"
 
     @staticmethod
     def ideal() -> "SimParams":
         """LimX's tron1-mujoco-sim: exact state, zero delay, ideal torque source, 1 cm tyre disc."""
         return SimParams(speed_knee=np.full(N_MOTORS, 1e6), speed_no_load=np.full(N_MOTORS, 2e6),
-                         current_lag=0.0, wheel_softness=0.02, tyre_half_width=0.005)
+                         current_lag=0.0, wheel_softness=0.02, tyre="cylinder", tyre_half_width=0.005)
 
     @staticmethod
     def nominal() -> "SimParams":
@@ -137,5 +140,4 @@ class SimParams:
         p.inertia_scale = u(0.8, 1.2)                # [limx-dr]
         p.ground_friction = u(0.3, 1.2)              # LimX trains 0.2-1.6; rubber on indoor floors
         p.wheel_softness = u(0.01, 0.03)
-        p.tyre_half_width = u(0.015, 0.025)
         return p

@@ -6,3 +6,6 @@ __pycache__/
 *.egg-info/
 build/
 docs/measurements/*.raw
+
+# NVIDIA Isaac assets are fetched, not committed (scripts/fetch_isaac_assets.sh)
+assets/isaac/**/*.usd

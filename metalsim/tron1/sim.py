@@ -33,7 +33,10 @@ from .sdk import N_MOTORS, WF_MOTOR_NAMES, WHEEL, ImuData, RobotCmd, RobotState
 
 ROOT = Path(__file__).resolve().parents[2]
 WF_XML = ROOT / "assets/tron1/WF_TRON1A/xml/robot.xml"
-WHEEL_RADIUS = 0.127
+# Tyre crown radius of the real wheel, measured from LimX's wheel mesh (wheel_L_Link.STL): 129.8 mm.
+# LimX's collision models (MJCF and training URDF) use a 127 mm cylinder.
+WHEEL_RADIUS = 0.1298
+LIMX_CYLINDER_RADIUS = 0.127
 PHYS_DT_US = 500
 SDK_DT_US = 1000
 
@@ -87,7 +90,24 @@ def build_model(params: SimParams, terrain=None) -> mujoco.MjModel:
         g.friction = [params.ground_friction, 0.005, 0.0001]
         g.solref = [params.wheel_softness, 1.0]
         g.condim = 4                     # torsional friction for turning in place
-        g.size = [WHEEL_RADIUS, params.tyre_half_width, 0.0]
+        g.rgba = [0.0, 0.0, 0.0, 0.0]    # collision shape hidden; the wheel mesh is drawn
+        if params.tyre == "ellipsoid":
+            # Smooth fit to the real tread (wheel_L_Link.STL): crown radius 129.8 mm at y = +-7.7 mm,
+            # lateral semi-axis 55 mm reproduces the rounded profile within ~2 mm out to the
+            # tread edge (115 mm radius at 25 mm off-centre).
+            g.type = mujoco.mjtGeom.mjGEOM_ELLIPSOID
+            g.size = [WHEEL_RADIUS, 0.055, WHEEL_RADIUS]
+            g.pos = [0.0, 0.0077 if side == "L" else -0.0077, 0.0]
+            g.quat = [1.0, 0.0, 0.0, 0.0]
+        elif params.tyre == "mesh":
+            # The wheel mesh's convex hull. Faceted: 54 points around the crown, up to 6.7 deg
+            # apart, so the wheel rolls as a polygon and jitters; kept for comparison.
+            g.type = mujoco.mjtGeom.mjGEOM_MESH
+            g.meshname = f"wheel_{side}_Link"
+            g.pos = [0.0, 0.0, 0.0]
+            g.quat = [1.0, 0.0, 0.0, 0.0]
+        else:
+            g.size = [LIMX_CYLINDER_RADIUS, params.tyre_half_width, 0.0]
     if terrain is not None:
         terrain.attach(spec)
     return spec.compile()
@@ -134,7 +154,7 @@ class Tron1Sim:
         d.qpos[0:2] = xy
         d.qpos[2] = 1.0
         mujoco.mj_kinematics(m, d)
-        low = min(d.xpos[w][2] for w in self.wheel_ids) - WHEEL_RADIUS
+        low = min(d.xpos[w][2] for w in self.wheel_ids) - (LIMX_CYLINDER_RADIUS if self.p.tyre == "cylinder" else WHEEL_RADIUS)
         ground = 0.0 if self.terrain is None else self.terrain.height_at(*d.qpos[:2])
         d.qpos[2] += ground - low + 0.002
         mujoco.mj_forward(m, d)
