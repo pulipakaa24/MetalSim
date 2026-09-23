@@ -18,6 +18,7 @@
   figcaption b { color: var(--ink); }
   code { font-size: 13px; }
   .muted { color: var(--muted); font-size: 13px; }
+  h2 { font-size: 17px; margin: 32px 0 12px; padding-top: 12px; border-top: 1px solid var(--rule); }
 </style>
 </head>
 <body>
@@ -57,7 +58,37 @@
     <figcaption><b>throughput.png</b> (1840×704). Left: render-only env-frames/s on the primitives scene, orchard tier-0 (measured on this machine) vs mjbatch-metal's published sync / pipelined numbers; log y axis, n/a where mjbatch-metal published no pipelined figure. Right: GPU physics steps/s vs batch size for the SO-101 lift scene, from <code>mjwarp-testspeed</code> (1 substep per step) and orchard <code>BatchSim</code> with indirect-command-buffer graph replay (4 substeps per step); both measured on this machine. All values are transcribed from <code>docs/PHASES.md</code>.</figcaption>
   </figure>
 
-  <p class="muted">Machine: Apple M4 Max, 40-core GPU, 64 GB, macOS 26.7. Scripts: <code>scratch/gallery_scripts/01_so101_atlas_and_channels.py</code>, <code>03_primitives_grid.py</code>, <code>04_reference_vs_orchard.py</code>, <code>05_rollout.py</code>, <code>06_throughput.py</code>.</p>
+
+  <h2>Tier 1 ray tracing</h2>
+  <figure>
+    <img src="tier1_vs_tier0_vs_reference.png" alt="mujoco.Renderer reference, orchard tier 0 and orchard tier 1 renders of the SO-101 scene" width="768" height="256">
+    <figcaption><b>tier1_vs_tier0_vs_reference.png</b> (768×256). Same SO-101 state (<code>qpos[:6]</code> = 0.4, −0.3, 0.5, 0.2, 0.3, 0.5; camera <code>base_cam</code>, 256 px): <code>mujoco.Renderer</code> reference | tier 0 (raster + tiled shadow map) | tier 1 (same raster G-buffer, with hardware ray queries against the sensor layer's acceleration structure for cone-sampled soft shadows, ambient occlusion and one mirror reflection ray, <code>rt_samples=4</code>, 9 rays/pixel). Tier 1 recovers MuJoCo's planar floor reflection that tier 0 lacks. All three rendered on this machine; fidelity numbers in <code>docs/PHASES.md</code> (tier 1 vs reference PSNR 19.7 dB, FLIP 0.305; tier 0: 19.1 / 0.318) are measured on this machine.</figcaption>
+  </figure>
+
+  <h2>Sensors</h2>
+  <figure>
+    <img src="lidar_pointcloud.png" alt="3D scatter and top-down view of lidar hit points on a primitives scene" width="1840" height="800">
+    <figcaption><b>lidar_pointcloud.png</b> (1840×800). Rotary lidar traced by <code>orchard.sensors.raytrace.RayTracer</code> (Metal ray queries, one instance acceleration structure rebuilt per frame) on the primitives <code>LIDAR_SCENE</code> from <code>tests/test_sensors_rt.py</code>: 360 azimuths × 5 elevations (−15° to +5°) = 1,800 beams from a site 0.35 m above the floor, N=1, max range 10 m; 884 hits, colored by reflectance intensity. Rings are floor hits of the three downward elevations; the −5° ring at 4 m survives only where the 3 m half-extent floor quad reaches (its corners); 0° and +5° miss everything but the objects. Traced on this machine. Lidar parity vs MuJoCo C <code>mj_ray</code> (median |Δrange| &lt; 2 mm) is measured in <code>tests/test_sensors_rt.py</code>.</figcaption>
+  </figure>
+
+  <h2>Learning</h2>
+  <figure>
+    <img src="cartpole_rgb_tiles.png" alt="Eight 100 by 100 cartpole camera tiles" width="800" height="100">
+    <figcaption><b>cartpole_rgb_tiles.png</b> (800×100). 8 envs of <code>orchard.learn.cartpole_rgb.CartpoleRGBEnv</code> (Isaac Lab's Cartpole-RGB task shape: 100×100 tiled camera, <code>obs["image"]</code> uint8 on MPS) after <code>reset()</code> and 20 uniform random actions; the tiles are the learner's observation tensor read back to the host only for this image. Rendered on this machine. The throughput of this env (48,056 steps/s at N=1024, physics + tiled render + reward/reset) is measured on this machine in <code>docs/PHASES.md</code>.</figcaption>
+  </figure>
+
+  <figure>
+    <img src="cartpole_learning_curve.png" alt="Two learning curves: cartpole PPO in Warp and SO-101 lift from pixels" width="1840" height="704">
+    <figcaption><b>cartpole_learning_curve.png</b> (1840×704). Left: <code>orchard.learn.ppo_warp</code> (rollout of T steps as replays of one captured Warp graph, torch update) on the MJCF cartpole with rsl_rl's Cartpole config, N=1024, 60 iterations of 16 steps (~1M env-steps); mean episode return vs env-steps, dashed line at the 300 cap. Trained by the gallery script on this machine in about 11 s of wall time while another training run shared the GPU. Right: the SO-101 lift-from-pixels PPO run with SB3's baseline config (N=64, 3M steps), parsed from <code>runs/lift_baselinecfg_seed0.log</code>, recorded on this machine at 1,707 env-steps/s; the return is a saturating reach reward and the success rate stays 0 at 3M steps. Both curves are measured on this machine; no Isaac numbers appear here.</figcaption>
+  </figure>
+
+  <h2>Isaac Lab comparison</h2>
+  <figure>
+    <img src="isaac_comparison.png" alt="Grouped bar chart of raw steps per second, this stack versus Isaac Lab published" width="1600" height="800">
+    <figcaption><b>isaac_comparison.png</b> (1600×800). Raw env-steps/s for the three rows of the "Headline comparisons against Isaac Lab" table in <code>docs/PHASES.md</code> that have both numbers: Cartpole-RGB 100×100 at 1024 envs, cartpole state rollout at 4096 envs, and the full cartpole PPO training loop at 4096 envs. Blue bars are <b>measured on this machine</b> (Apple M4 Max, 18.4 TFLOPS FP32, <code>orchard.bench.suite</code>, uncontended). Orange bars are <b>NVIDIA's published Isaac Lab figures</b> for an RTX 4090 (82.6 TFLOPS FP32), not re-measured here, and each is annotated with what it covers (step only / step + inference / step + inference + train). The tasks are MJCF equivalents with the same reward, reset and camera spec, not the same USD asset. Per-TFLOPS ratios from <code>docs/PHASES.md</code>: 4.3×, 6.1×, 4.8×.</figcaption>
+  </figure>
+
+  <p class="muted">Machine: Apple M4 Max, 40-core GPU, 64 GB, macOS 26.7. Scripts: <code>scratch/gallery_scripts/01_so101_atlas_and_channels.py</code>, <code>03_primitives_grid.py</code>, <code>04_reference_vs_orchard.py</code>, <code>05_rollout.py</code>, <code>06_throughput.py</code>, <code>07_tier1_vs_tier0_vs_reference.py</code>, <code>08_lidar_pointcloud.py</code>, <code>09_cartpole_learning_curve.py</code>, <code>10_isaac_comparison.py</code>, <code>11_cartpole_rgb_tiles.py</code>.</p>
 </main>
 </body>
 </html>
