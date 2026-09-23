@@ -97,3 +97,13 @@ Consolidated from five research passes run at project start. Facts are labelled
   attribute lists recorded in the agent report.
 - RL configs: Isaac Lab rsl_rl PPO (Cartpole 16 steps/env, 150 iters, MLP 32×32; Anymal rough
   24 steps/env, 1500 iters, MLP 512/256/128); Playground brax PPO configs per task.
+
+## Addendum (2026-09-22, evening)
+
+- NVIDIA's `mujoco-usd-converter` / `urdf-usd-converter` (the basis of Isaac Sim 6.x importers)
+  cannot be installed here: their dependency `usd-exchange` has no macOS wheels (verified:
+  only manylinux and win_amd64 for 3.0.0). `orchard.scene.mjcf_to_usd` / `usd_to_mjcf` are the
+  in-house equivalents, following the documented Isaac field mapping.
+- MuJoCo Warp `put_data` defaults `njmax=64` constraint rows per world; contact-rich scenes
+  overflow silently (NEFC flag) and the elliptic Newton solver then yields NaN. Verified with the
+  cross-world consistency tool; `njmax=512` fixes it. Worth an upstream issue.

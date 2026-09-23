@@ -58,12 +58,18 @@ class ActorCritic(nn.Module):
         self.v = nn.Sequential(nn.Linear(feat + 64, 256), nn.ReLU(), nn.Linear(256, 1))
         self.log_std = nn.Parameter(torch.zeros(act_dim))
 
-    def features(self, image_u8, qpos):
-        x = image_u8.permute(0, 3, 1, 2).float() * (1.0 / 255.0)
+    def features(self, image_u8, qpos, nchw=False):
+        """image_u8: (N,H,W,3) uint8 (renderer layout) or, with nchw=True, (N,3,H,W) uint8.
+
+        The conv input must be contiguous NCHW: a permuted view makes MPS's conv backward ~5x
+        slower (measured 145 vs 28 ms per 1024 samples), so the rollout buffer is stored NCHW.
+        """
+        x = image_u8 if nchw else image_u8.permute(0, 3, 1, 2).contiguous()
+        x = x.float() * (1.0 / 255.0)
         return torch.cat([self.cnn(x), self.qpos(qpos)], dim=1)
 
-    def forward(self, image_u8, qpos):
-        h = self.features(image_u8, qpos)
+    def forward(self, image_u8, qpos, nchw=False):
+        h = self.features(image_u8, qpos, nchw)
         return self.pi(h), self.v(h).squeeze(-1)
 
     def dist(self, mean):
@@ -90,7 +96,7 @@ class PPO:
         self.opt = torch.optim.Adam(self.net.parameters(), lr=self.cfg.lr, eps=1e-5)
         n, T = env.n, self.cfg.rollout
         H, W, C = env.obs_space["image"]
-        self.buf_img = torch.zeros((T, n, H, W, C), dtype=torch.uint8, device=self.dev)
+        self.buf_img = torch.zeros((T, n, C, H, W), dtype=torch.uint8, device=self.dev)   # NCHW, contiguous
         self.buf_q = torch.zeros((T, n, 6), device=self.dev)
         self.buf_a = torch.zeros((T, n, env.act_dim), device=self.dev)
         self.buf_logp = torch.zeros((T, n), device=self.dev)
@@ -108,7 +114,7 @@ class PPO:
             t0 = time.perf_counter()
             with torch.no_grad():
                 img, q = obs["image"], obs["qpos"]
-                self.buf_img[t].copy_(img)
+                self.buf_img[t].copy_(img.permute(0, 3, 1, 2))
                 self.buf_q[t].copy_(q)
                 mean, v = self.net(img, q)
                 d = self.net.dist(mean)
@@ -164,7 +170,7 @@ class PPO:
             perm = torch.randperm(N, device=self.dev)
             for i in range(cfg.minibatches):
                 idx = perm[i * mb:(i + 1) * mb]
-                mean, v = self.net(img[idx], q[idx])
+                mean, v = self.net(img[idx], q[idx], nchw=True)
                 d = self.net.dist(mean)
                 logp = d.log_prob(a[idx]).sum(-1)
                 ratio = (logp - logp_old[idx]).exp()

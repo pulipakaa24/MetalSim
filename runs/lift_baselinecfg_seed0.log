@@ -1,0 +1,10 @@
+config: {"steps": 3000000, "envs": 64, "rollout": 64, "epochs": 8, "minibatches": 8, "gamma": 0.9, "ent": 0.005, "lr": 0.0003, "seed": 0, "log": "runs/lift_baselinecfg_seed0.log", "decimate": 2000}
+it    5 steps     20480 sps   1,823 | ret   15.67 len 300.0 succ  0.00 (n=64) | pg -0.020 vf 0.112 kl 0.0130 | env 25.4%  policy 13.5%  update 61.1%
+it   10 steps     40960 sps   1,799 | ret   37.75 len 300.0 succ  0.00 (n=100) | pg -0.026 vf 0.294 kl 0.0212 | env 26.7%  policy 13.6%  update 59.7%
+it   15 steps     61440 sps   1,776 | ret   67.99 len 300.0 succ  0.00 (n=100) | pg -0.027 vf 0.332 kl 0.0232 | env 27.5%  policy 13.7%  update 58.8%
+it   20 steps     81920 sps   1,765 | ret   82.13 len 300.0 succ  0.00 (n=100) | pg -0.024 vf 0.312 kl 0.0372 | env 27.9%  policy 13.7%  update 58.4%
+it   25 steps    102400 sps   1,757 | ret   81.91 len 300.0 succ  0.00 (n=100) | pg -0.027 vf 0.308 kl 0.0397 | env 28.2%  policy 13.7%  update 58.1%
+it   30 steps    122880 sps   1,752 | ret   90.09 len 300.0 succ  0.00 (n=100) | pg -0.026 vf 0.401 kl 0.0318 | env 28.4%  policy 13.7%  update 57.9%
+it   35 steps    143360 sps   1,747 | ret   97.40 len 300.0 succ  0.00 (n=100) | pg -0.033 vf 0.200 kl 0.0324 | env 28.5%  policy 13.7%  update 57.7%
+it   40 steps    163840 sps   1,744 | ret  103.32 len 300.0 succ  0.00 (n=100) | pg -0.036 vf 0.173 kl 0.0502 | env 28.6%  policy 13.8%  update 57.6%
+it   45 steps    184320 sps   1,741 | ret  101.80 len 300.0 succ  0.00 (n=100) | pg -0.036 vf 0.182 kl 0.0459 | env 28.7%  policy 13.8%  update 57.5%

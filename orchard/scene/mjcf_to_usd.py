@@ -61,12 +61,18 @@ class ImportResult:
 def import_mjcf(mjcf_path: str, usd_path: str, *, write_textures: bool = True) -> ImportResult:
     spec = mujoco.MjSpec.from_file(mjcf_path)
     m = spec.compile()
+    # lossless round trip: the flattened model (includes resolved) with absolute asset directories
+    mjcf_dir = os.path.dirname(os.path.abspath(mjcf_path))
+    spec.meshdir = os.path.join(mjcf_dir, spec.meshdir) if not os.path.isabs(spec.meshdir or "") else spec.meshdir
+    spec.texturedir = os.path.join(mjcf_dir, spec.texturedir) if not os.path.isabs(spec.texturedir or "") else spec.texturedir
+    flattened_xml = spec.to_xml()
     stage = Usd.Stage.CreateNew(usd_path)
     UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
     UsdGeom.SetStageMetersPerUnit(stage, 1.0)
     root = UsdGeom.Xform.Define(stage, "/World")
     stage.SetDefaultPrim(root.GetPrim())
-    root.GetPrim().SetCustomDataByKey("mjc:source", open(mjcf_path).read())
+    root.GetPrim().SetCustomDataByKey("mjc:source", flattened_xml)
+    root.GetPrim().SetCustomDataByKey("mjc:source_path", os.path.abspath(mjcf_path))
     root.GetPrim().SetCustomDataByKey("mjc:timestep", float(m.opt.timestep))
 
     scene = UsdPhysics.Scene.Define(stage, "/World/physicsScene")

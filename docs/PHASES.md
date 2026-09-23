@@ -143,3 +143,32 @@ worlds get different partial contacts, and the elliptic-cone Newton path turns a
 into NaN. `njmax=512`: 0 bad worlds in 256 trials. Not a Metal defect. Fixes: `BatchSim`
 defaults `njmax=512` and exposes `overflow_flags()`; tests assert no buffer overflow.
 Upstream note: MuJoCo Warp should saturate rather than NaN on NEFC overflow (to file).
+
+### Learner path status (measured)
+
+`orchard.learn.so101_lift.SO101LiftEnv` (GPU task: MuJoCo Warp physics, tier-0 render at
+128 px, reward/termination/reset/visual DR in torch on MPS; no tensor leaves the GPU) and
+`orchard.learn.ppo.PPO` (pixels + proprioception, NatureCNN). N=64:
+
+| quantity | value |
+|---|---|
+| env only (physics 4 substeps + render + torch reward/reset) | ~7,000 env-steps/s |
+| PPO training loop (rollout 64, 4 epochs × 4 minibatches of 1024) | ~1,190 env-steps/s |
+| time split | env 23%, policy 3.5%, update 73% |
+| mjbatch-metal SB3 baseline (published): CPU physics + WebGPU render + SB3 PPO on MPS | ~1,700 env-steps/s |
+
+The baseline used SB3's config (n_steps 64, batch 512, 8 epochs, gamma 0.9, ent 0.005). The
+update phase dominates as the plan predicted (Section 3); per-sample update cost is the item to
+fix next (WS7: launch count, precision, minibatch size), then the rollout policy in Warp.
+
+Physics DR (box mass/friction per world) is not yet applied: MuJoCo Warp model fields are
+shared across worlds unless expanded (`expand_model_fields` in mjlab); logged as a gap.
+
+### Scene layer (WS1) started
+
+`orchard.scene.mjcf_to_usd`: MJCF → USD with UsdPhysics (rigid bodies, mass, revolute/prismatic/
+spherical joints with limits and drives from actuators, articulation roots, collision APIs with
+convex-hull mesh approximation), UsdPreviewSurface materials with textures written as PNG,
+UsdSemantics labels, cameras with physical intrinsics, lights, and `mjc:` attributes for lossless
+round trip. `tests/test_scene_usd.py` checks the SO-101 scene. Not yet: USD → MuJoCo Warp load
+path, URDF import, MaterialX graphs.
