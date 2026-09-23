@@ -232,10 +232,18 @@ class ClassicalGains:
     heading_kp: float = 3.0        # N m per rad of heading error (heading from wheel encoders)
     heading_kd: float = 5.0        # N m per rad/s of yaw-rate error (gyro)
     heading_err_limit: float = 0.5 # rad; beyond this the reference is dragged (after a shove)
-    trim_rate: float = 0.03        # balance-point estimator gain [rad / (m s)]
+    trim_rate: float = 0.0         # balance-point estimator gain [rad / (m s)]
     trim_limit: float = 0.15       # rad
     accel_limit: float = 1.5       # m/s^2 on the velocity reference
-    x_err_limit: float = 0.3       # m, position-hold error clamp (anti-windup after pushes)
+    x_err_limit: float = 1.0       # m; beyond this the spot is re-anchored (a large shove)
+    wheel_friction_comp: float = 0.0   # N m, Coulomb friction fed forward along the wheel speed
+    wheel_friction_eps: float = 0.5    # rad/s, smoothing of the sign() near zero speed
+    # Deadband on the position error: inside it no position correction at all (the robot only
+    # balances, so a tiny offset cannot restart a hunting oscillation); outside it the hold
+    # ramps in from zero, which bounds the drift to about the band.
+    hold_deadband: float = 0.0     # m
+    hold_kp: float = 1.0           # 1/s, outer position loop: speed correction per metre of error
+    hold_speed_limit: float = 0.15 # m/s, cap on that correction
     latency_comp: float = 0.005    # s, predict the balance state this far ahead
     wheel_torque_limit: float = 40.0
     Q: tuple = (4.0, 60.0, 3.0, 4.0)
@@ -310,7 +318,12 @@ class ClassicalController:
         # error into a pitch trim moves the set-point to the true balance angle instead.
         self.phi_trim = float(np.clip(self.phi_trim - g.trim_rate * (self.x - self.x_ref) * dt,
                                       -g.trim_limit, g.trim_limit))
-        s4 = np.array([self.x - self.x_ref, phi - self.phi_trim, v - self.v_ref, phi_rate])
+        # Outer position loop (cascade): the encoder position error shifts the speed target of
+        # the balance LQR, capped, so holding the spot never overrides balancing.
+        e_x = self.x - self.x_ref
+        e_x = float(np.sign(e_x) * max(abs(e_x) - g.hold_deadband, 0.0))
+        v_hold = float(np.clip(-g.hold_kp * e_x, -g.hold_speed_limit, g.hold_speed_limit))
+        s4 = np.array([e_x, phi - self.phi_trim, v - self.v_ref - v_hold, phi_rate])
         if g.latency_comp > 0:
             s4 = s4 + g.latency_comp * (self.A @ s4 + self.B[:, 0] * self.tau_bal)
         self.tau_bal = float(np.clip(-(self.K @ s4)[0], -2 * g.wheel_torque_limit, 2 * g.wheel_torque_limit))
@@ -358,5 +371,6 @@ class ClassicalController:
         q_tilt = quat_from_rpy(roll, pitch, 0.0)
         tau_legs = self.model.gravity_ff(q, q_tilt) + self.wheel_ff @ np.array([-tau_yaw / 2, tau_yaw / 2])
         cmd.tau[LEG] = tau_legs[LEG] + self.leg_int[LEG]
-        cmd.tau[WHEEL] = [tau_l, tau_r]
+        dq_w = np.asarray(st.dq)[WHEEL]
+        cmd.tau[WHEEL] = np.array([tau_l, tau_r]) + g.wheel_friction_comp * np.tanh(dq_w / g.wheel_friction_eps)
         return cmd
