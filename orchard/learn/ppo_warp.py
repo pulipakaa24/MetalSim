@@ -156,11 +156,27 @@ class PPOWarp:
         self.graph = None
         self.learner_event = wm.SharedEvent(dev, "orchard.ppo_warp")
 
+    def _obs(self):
+        # tasks whose observation kernels draw noise / commands keyed by the rollout step index
+        if getattr(self.task, "needs_step_idx", False):
+            self.task.launch_obs(self.pol.step_idx)
+        else:
+            self.task.launch_obs()
+
+    def _act(self):
+        task, pol = self.task, self.pol
+        if hasattr(task, "launch_apply_action"):
+            # the raw Gaussian sample is the action (stored for the update); the task maps it to ctrl
+            pol.act(task.obs, task.action_scratch)
+            task.launch_apply_action(pol.action)
+        else:
+            pol.act(task.obs, task.sim.d.ctrl)
+
     def _capture(self):
         task, pol, bufs = self.task, self.pol, self.bufs
         with wp.ScopedCapture(device="metal:0") as cap:
-            task.launch_obs()
-            pol.act(task.obs, task.sim.d.ctrl)
+            self._obs()
+            self._act()
             pol.store(task.obs, bufs)
             task.sim.launch_step()
             task.launch_reward_done_reset(pol, bufs)
@@ -173,8 +189,8 @@ class PPOWarp:
         for _ in range(self.cfg.rollout):
             wp.capture_launch(self.graph)
         # bootstrap value of the final state on the Warp queue, then hand over to torch
-        self.task.launch_obs()
-        self.pol.act(self.task.obs, self.task.sim.d.ctrl)
+        self._obs()
+        self._act()
         v = self.task.sim._signal()
         self.task.sim.after(v)
 

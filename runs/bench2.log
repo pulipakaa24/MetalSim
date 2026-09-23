@@ -1,0 +1,34 @@
+=== build: BUILD EXIT 0
+=== eager benchmark probe 2048 (was failing)
+N=2048 bench ok 28,395
+counters Counters(syncs=10, flushes=325, host_ops=0, dispatches=34282)
+=== tests
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_g1_task_terms.py::test_reward_terms_match_isaac_formulas - ...
+1 failed, 26 passed, 3 warnings in 22.64s
+=== G1 flat step-only 4096
+G1 (flat): nbody 45 nv 43 nu 37 ngeom 4 obs_dim 123
+N=4096: Isaac-style mean step 124.82 ms -> 32,815 env-steps/s; synchronized 110 steps: 32,718 env-steps/s
+=== G1 flat step-only 2048
+G1 (flat): nbody 45 nv 43 nu 37 ngeom 4 obs_dim 123
+N=2048: Isaac-style mean step 78.33 ms -> 26,146 env-steps/s; synchronized 110 steps: 26,030 env-steps/s
+=== G1 flat step-only 1024
+G1 (flat): nbody 45 nv 43 nu 37 ngeom 4 obs_dim 123
+N=1024: Isaac-style mean step 49.78 ms -> 20,569 env-steps/s; synchronized 110 steps: 20,491 env-steps/s
+=== G1 rough step-only 4096
+G1 (rough): nbody 45 nv 43 nu 37 ngeom 4 obs_dim 310
+N=4096: Isaac-style mean step 509.55 ms -> 8,038 env-steps/s; synchronized 110 steps: 8,017 env-steps/s
+=== G1 flat PPO 4096, 15 iterations
+it   11 steps   1081344 sps   43,569 | ep_ret -202.76 ep_len   38.0 (n=2592) | pg -0.004 vf 184.521 kl 0.0014 lr 1.0e-02
+it   12 steps   1179648 sps   43,488 | ep_ret -202.75 ep_len   38.0 (n=2561) | pg -0.003 vf 121.339 kl 0.0010 lr 1.0e-02
+it   13 steps   1277952 sps   43,412 | ep_ret -202.77 ep_len   38.1 (n=2625) | pg -0.003 vf 90.251 kl 0.0009 lr 1.0e-02
+it   14 steps   1376256 sps   43,352 | ep_ret -202.79 ep_len   38.5 (n=2507) | pg -0.004 vf 101.585 kl 0.0025 lr 1.0e-02
+it   15 steps   1474560 sps   43,302 | ep_ret -202.78 ep_len   38.4 (n=2597) | pg -0.004 vf 69.696 kl 0.0018 lr 1.0e-02
+=== G1 rough PPO 4096, 15 iterations
+  File "/Users/aditya/robosim/orchard/learn/terrain.py", line 166, in launch
+  File "/Users/aditya/robosim/orchard/physics/batch.py", line 151, in _signal
+  File "/Users/aditya/robosim/orchard/interop/warp_metal.py", line 139, in signal
+  File "/Users/aditya/robosim/orchard/interop/warp_metal.py", line 64, in _check
+RuntimeError: wp_metal_signal_event failed: Signaling an event during graph capture is not supported on Metal
+=== DONE

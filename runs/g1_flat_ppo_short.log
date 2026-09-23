@@ -1,0 +1,16 @@
+G1 flat PPO: N=4096 obs_dim 123 act_dim 37 rollout 24 x 15 iterations
+it    1 steps     98304 sps   36,493 | ep_ret    0.00 ep_len    0.0 (n=0) | pg 0.006 vf 0.310 kl 0.0440 lr 1.0e-05
+it    2 steps    196608 sps   41,494 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.002 vf 0.601 kl 0.0067 lr 2.6e-04
+it    3 steps    294912 sps   43,466 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.008 vf 0.683 kl 0.0117 lr 5.8e-04
+it    4 steps    393216 sps   44,514 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.009 vf 0.595 kl 0.0128 lr 8.6e-04
+it    5 steps    491520 sps   44,872 | ep_ret -212.96 ep_len  115.4 (n=2530) | pg 0.056 vf 7647.254 kl 0.0650 lr 1.0e-05
+it    6 steps    589824 sps   44,331 | ep_ret -211.98 ep_len  106.0 (n=1905) | pg -0.001 vf 4999.986 kl 0.0005 lr 1.0e-02
+it    7 steps    688128 sps   44,108 | ep_ret -202.80 ep_len   37.2 (n=3236) | pg -0.000 vf 2605.796 kl 0.0022 lr 1.0e-02
+it    8 steps    786432 sps   43,911 | ep_ret -202.78 ep_len   37.7 (n=2369) | pg -0.001 vf 526.352 kl -0.0000 lr 1.0e-02
+it    9 steps    884736 sps   43,754 | ep_ret -202.82 ep_len   38.8 (n=2583) | pg -0.001 vf 584.376 kl 0.0002 lr 1.0e-02
+it   10 steps    983040 sps   43,646 | ep_ret -202.77 ep_len   37.9 (n=2573) | pg -0.002 vf 212.109 kl 0.0004 lr 1.0e-02
+it   11 steps   1081344 sps   43,569 | ep_ret -202.76 ep_len   38.0 (n=2592) | pg -0.004 vf 184.521 kl 0.0014 lr 1.0e-02
+it   12 steps   1179648 sps   43,488 | ep_ret -202.75 ep_len   38.0 (n=2561) | pg -0.003 vf 121.339 kl 0.0010 lr 1.0e-02
+it   13 steps   1277952 sps   43,412 | ep_ret -202.77 ep_len   38.1 (n=2625) | pg -0.003 vf 90.251 kl 0.0009 lr 1.0e-02
+it   14 steps   1376256 sps   43,352 | ep_ret -202.79 ep_len   38.5 (n=2507) | pg -0.004 vf 101.585 kl 0.0025 lr 1.0e-02
+it   15 steps   1474560 sps   43,302 | ep_ret -202.78 ep_len   38.4 (n=2597) | pg -0.004 vf 69.696 kl 0.0018 lr 1.0e-02

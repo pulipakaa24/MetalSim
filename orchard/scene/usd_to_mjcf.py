@@ -29,7 +29,7 @@ import numpy as np
 from pxr import Gf, Usd, UsdGeom, UsdLux, UsdPhysics, UsdShade, UsdSemantics
 
 
-def load_usd(path: str, *, lossless: bool = True) -> mujoco.MjSpec:
+def load_usd(path: str, *, lossless: bool = True, drives: bool = True) -> mujoco.MjSpec:
     stage = Usd.Stage.Open(path)
     root = stage.GetDefaultPrim() or stage.GetPrimAtPath("/World")
     if lossless and root and root.HasCustomDataKey("mjc:source"):
@@ -37,7 +37,7 @@ def load_usd(path: str, *, lossless: bool = True) -> mujoco.MjSpec:
         base = os.path.dirname(os.path.abspath(path))
         # mesh assets resolve relative to the original MJCF; the importer keeps absolute meshdir
         return spec
-    return convert_stage(stage, base_dir=os.path.dirname(os.path.abspath(path)))
+    return convert_stage(stage, base_dir=os.path.dirname(os.path.abspath(path)), drives=drives)
 
 
 def _q_from_gf(q) -> np.ndarray:
@@ -68,12 +68,12 @@ def _body_of(prim):
     return None
 
 
-def _accumulate_xform_to(prim, ancestor, scale_units):
-    """Transform of ``prim`` relative to ``ancestor`` (position, quaternion, scale product)."""
+def _world_xform(prim, scale_units):
+    """World position, wxyz quaternion and scale of a prim (composes the full USD hierarchy)."""
     pos = np.zeros(3); quat = np.array([1.0, 0, 0, 0]); scale = np.ones(3)
     chain = []
     p = prim
-    while p and p.IsValid() and p != ancestor and not p.IsPseudoRoot():
+    while p and p.IsValid() and not p.IsPseudoRoot():
         chain.append(p)
         p = p.GetParent()
     for p in reversed(chain):
@@ -85,19 +85,45 @@ def _accumulate_xform_to(prim, ancestor, scale_units):
     return pos, quat, scale
 
 
-def convert_stage(stage: Usd.Stage, base_dir: str = ".") -> mujoco.MjSpec:
+def _accumulate_xform_to(prim, ancestor, scale_units):
+    """Transform of ``prim`` relative to ``ancestor`` (position, quaternion, scale). ``ancestor`` need
+    not be a USD ancestor: articulations exported from URDF (Isaac's assets) keep all links as
+    siblings with world-space transforms, so the relative pose is inv(parent_world) * child_world."""
+    pw, qw, sw = _world_xform(prim, scale_units)
+    if ancestor is None:
+        return pw, qw, sw
+    pa, qa, sa = _world_xform(ancestor, scale_units)
+    qinv = np.array([qa[0], -qa[1], -qa[2], -qa[3]])
+    Ri = np.zeros(9); mujoco.mju_quat2Mat(Ri, qinv); Ri = Ri.reshape(3, 3)
+    pos = Ri @ (pw - pa)
+    quat = np.zeros(4); mujoco.mju_mulQuat(quat, qinv, qw)
+    return pos, quat, sw / np.where(sa == 0, 1, sa)
+
+
+def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True) -> mujoco.MjSpec:
+    """``drives=False`` skips turning UsdPhysics drives into actuators (callers that apply their own
+    actuator model, as Isaac Lab's ImplicitActuatorCfg does, add them afterwards)."""
     units = float(UsdGeom.GetStageMetersPerUnit(stage) or 1.0)
     spec = mujoco.MjSpec()
     spec.modelname = "usd_import"
     spec.compiler.degree = False
+    spec.compiler.boundmass = 1e-6      # floor for bodies without MassAPI; Isaac's assets author 1e-6 for helper links
+    spec.compiler.boundinertia = 1e-8
+    spec.compiler.balanceinertia = True
     scene = next((p for p in stage.Traverse() if p.IsA(UsdPhysics.Scene)), None)
     if scene is not None:
         ps = UsdPhysics.Scene(scene)
         d = ps.GetGravityDirectionAttr().Get(); mag = ps.GetGravityMagnitudeAttr().Get()
-        if d is not None and mag is not None and mag >= 0:
-            dv = np.array(d, float)
-            if np.linalg.norm(dv) > 0:
-                spec.option.gravity = (dv / np.linalg.norm(dv) * mag).tolist()
+        # UsdPhysics: a zero direction means "use the stage up axis", a negative magnitude means
+        # "earth gravity"; PhysX also treats a magnitude of exactly 0 as unauthored (Isaac assets author
+        # 0 and rely on the simulator default 9.81), so only a positive magnitude sets the value.
+        dv = np.array(d, float) if d is not None else np.zeros(3)
+        if np.linalg.norm(dv) == 0:
+            dv = np.array([0.0, 0.0, -1.0])
+        if mag is not None and mag > 0:
+            spec.option.gravity = (dv / np.linalg.norm(dv) * mag * units).tolist()
+        else:
+            spec.option.gravity = (dv / np.linalg.norm(dv) * 9.81).tolist()
     rp = stage.GetDefaultPrim() or stage.GetPrimAtPath("/World")
     if rp and rp.HasCustomDataKey("mjc:timestep"):
         spec.option.timestep = float(rp.GetCustomDataByKey("mjc:timestep"))
@@ -185,7 +211,20 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".") -> mujoco.MjSpec:
             if par in bodies:
                 prim = stage.GetPrimAtPath(path)
                 parent_prim = stage.GetPrimAtPath(par) if par is not None else None
-                pos, quat, _ = _accumulate_xform_to(prim, parent_prim, units) if parent_prim is not None else _accumulate_xform_to(prim, None, units)
+                pos, quat, _ = _accumulate_xform_to(prim, parent_prim, units)
+                js_here = joints_by_child.get(path, [])
+                if js_here and par is not None:
+                    # child pose at the joint's zero configuration: T0 (in parent) * inverse(T1 (in child))
+                    j = UsdPhysics.Joint(js_here[0])
+                    p0 = np.array(j.GetLocalPos0Attr().Get() or (0, 0, 0), float) * units
+                    q0 = _q_from_gf(j.GetLocalRot0Attr().Get() or Gf.Quatf(1, 0, 0, 0))
+                    p1 = np.array(j.GetLocalPos1Attr().Get() or (0, 0, 0), float) * units
+                    q1 = _q_from_gf(j.GetLocalRot1Attr().Get() or Gf.Quatf(1, 0, 0, 0))
+                    q1i = np.array([q1[0], -q1[1], -q1[2], -q1[3]])
+                    R0 = np.zeros(9); mujoco.mju_quat2Mat(R0, q0); R0 = R0.reshape(3, 3)
+                    R1i = np.zeros(9); mujoco.mju_quat2Mat(R1i, q1i); R1i = R1i.reshape(3, 3)
+                    quat = np.zeros(4); mujoco.mju_mulQuat(quat, q0, q1i)
+                    pos = p0 - R0 @ (R1i @ p1)
                 body = bodies[par].add_body()
                 body.name = path.name
                 body.pos = pos.tolist(); body.quat = quat.tolist()
@@ -195,10 +234,14 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".") -> mujoco.MjSpec:
                     com = ma.GetCenterOfMassAttr().Get(); di = ma.GetDiagonalInertiaAttr().Get(); pa = ma.GetPrincipalAxesAttr().Get()
                     if mass is not None and mass > 0 and di is not None and max(di) > 0:
                         body.mass = float(mass)
-                        body.ipos = [float(c) * units for c in com] if com is not None else [0, 0, 0]
+                        # USD's sentinel for "not authored" is (-inf, -inf, -inf): PhysX then uses the body origin
+                        com_ok = com is not None and all(np.isfinite(float(c)) for c in com)
+                        body.ipos = [float(c) * units for c in com] if com_ok else [0, 0, 0]
                         body.inertia = [float(x) * units * units for x in di]
                         if pa is not None:
-                            body.iquat = _q_from_gf(pa).tolist()
+                            qa = _q_from_gf(pa)
+                            if np.linalg.norm(qa) > 0.5:      # some exporters write (0,0,0,0)
+                                body.iquat = (qa / np.linalg.norm(qa)).tolist()
                         body.explicitinertial = True
                 bodies[path] = body
                 order.append(path)
@@ -262,7 +305,7 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".") -> mujoco.MjSpec:
                         setattr(jt, field, val)
             # drives -> position actuators
             for inst in ("angular", "linear", "rotX", "rotY", "rotZ", "transX", "transY", "transZ"):
-                if not jp.HasAPI(UsdPhysics.DriveAPI, inst):
+                if not drives or not jp.HasAPI(UsdPhysics.DriveAPI, inst):
                     continue
                 drv = UsdPhysics.DriveAPI(jp, inst)
                 kp = float(drv.GetStiffnessAttr().Get() or 0.0); kv = float(drv.GetDampingAttr().Get() or 0.0)
@@ -286,6 +329,7 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".") -> mujoco.MjSpec:
 
     # -- geoms, cameras, lights ---------------------------------------------------------------------
     mesh_names = {}
+    used_geom_names = set()
     for prim in stage.Traverse():
         purpose = UsdGeom.Imageable(prim).GetPurposeAttr().Get() if prim.IsA(UsdGeom.Imageable) else None
         is_gprim = prim.IsA(UsdGeom.Gprim)
@@ -321,8 +365,16 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".") -> mujoco.MjSpec:
             if prim.HasAttribute("mjc:castshadow"):
                 lt.castshadow = bool(prim.GetAttribute("mjc:castshadow").Get())
             continue
-        # gprim
-        g = body.add_geom(); g.name = prim.GetPath().name; g.pos = pos.tolist(); g.quat = quat.tolist()
+        # gprim (names are unique in MuJoCo; USD may reuse leaf names like "Cube" under different bodies)
+        g = body.add_geom()
+        gname = prim.GetPath().name
+        if gname in used_geom_names:
+            gname = f"{prim.GetParent().GetPath().name}_{gname}"
+            k = 2
+            while gname in used_geom_names:
+                gname = f"{prim.GetParent().GetPath().name}_{prim.GetPath().name}_{k}"; k += 1
+        used_geom_names.add(gname)
+        g.name = gname; g.pos = pos.tolist(); g.quat = quat.tolist()
         collides = prim.HasAPI(UsdPhysics.CollisionAPI) and (UsdPhysics.CollisionAPI(prim).GetCollisionEnabledAttr().Get() is not False)
         if prim.IsA(UsdGeom.Cube):
             g.type = mujoco.mjtGeom.mjGEOM_BOX; sz = float(UsdGeom.Cube(prim).GetSizeAttr().Get() or 2.0) / 2

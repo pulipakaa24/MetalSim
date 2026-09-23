@@ -1,0 +1,11 @@
+N=2048 capture=True: built
+step 0 ok
+step 1 ok
+step 2 ok
+N=2048 capture=True: 61,365 env-steps/s (33.4 ms/step, 4 substeps)
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/solver.py", line 2093, in _update_constraint
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12298, in launch
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11365, in invoke_metal
+RuntimeError: Failed to launch kernel '_update_constraint_efc__locals__kernel' on device 'metal:0': Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory) (arguments: opt_impratio_invsqrt=array_t, ne_in=array_t, nf_in=array_t, nefc_in=array_t, contact_friction_in=array_t, contact_dim_in=array_t, contact_efc_address_in=array_t, efc_type_in=array_t, efc_id_in=array_t, efc_D_in=array_t, efc_frictionloss_in=array_t, nacon_in=array_t, ctx_Jaref_in=array_t, ctx_ls_exhausted_in=array_t, ctx_done_in=array_t, efc_force_out=array_t, efc_state_out=array_t, quad_changed_ids_out=array_t, quad_changed_count_out=array_t, state_changed_count_out=array_t)
+FAILED: Failed to launch kernel '_update_constraint_efc__locals__kernel' on device 'metal:0': Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory) (arguments: opt_impratio_invsqrt=array_t, ne_in=array_t, nf_in=array_t, nefc_in=array_t, contact_friction_in=array_t, contact_dim_in=array_t, contact_efc_address_in=array_t, efc_type_in=array_t, efc_id_in=array_t, efc_D_in=array_t, efc_frictionloss_in=array_t, nacon_in=array_t, ctx_Jaref_in=array_t, ctx_ls_exhausted_in=array_t, ctx_done_in=array_t, efc_force_out=array_t, efc_state_out=array_t, quad_changed_ids_out=array_t, quad_changed_count_out=array_t, state_changed_count_out=array_t)
+Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)

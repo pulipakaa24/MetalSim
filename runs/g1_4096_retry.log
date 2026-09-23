@@ -1,0 +1,25 @@
+N=4096 njmax=256: MjData device arrays 0.17 GB; top: [('30MB', 'qLD', (4096, 1849)), ('14MB', 'qLU', (4096, 825)), ('7MB', 'crb', (4096, 45)), ('7MB', 'cinert', (4096, 45)), ('7MB', 'M', (4096, 434)), ('7MB', 'xmat', (4096, 45)), ('7MB', 'ximat', (4096, 45)), ('4MB', 'xfrc_applied', (4096, 45))]
+njmax 256
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-aditya/7ceab845-25d9-459e-a466-a4b793f72f5c/scratchpad/g1_mem.py", line 27, in <module>
+  File "/Users/aditya/robosim/orchard/learn/g1_velocity.py", line 482, in benchmark_step
+  File "/Users/aditya/robosim/orchard/learn/g1_velocity.py", line 476, in step
+  File "/Users/aditya/robosim/orchard/physics/batch.py", line 128, in launch_step
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/forward.py", line 1825, in step
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/forward.py", line 1816, in forward
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/solver.py", line 3641, in solve
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/solver.py", line 3687, in _solve
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/solver.py", line 3497, in _solver_iteration
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/solver.py", line 1535, in _linesearch
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/solver.py", line 3790, in _mul_m_compact_aware
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/support.py", line 251, in mul_m
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12298, in launch
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11365, in invoke_metal
+RuntimeError: Failed to launch kernel 'mul_m_kernel__locals___mul_m' on device 'metal:0': Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory) (arguments: M_mulm_rowadr=array_t, M_mulm_col=array_t, M_mulm_madr=array_t, M_in=array_t, vec=array_t, skip=array_t, res=array_t)
+Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)

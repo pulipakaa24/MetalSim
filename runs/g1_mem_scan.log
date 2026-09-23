@@ -1,0 +1,12 @@
+N=512 njmax=512: MjData device arrays 0.02 GB; top: [('4MB', 'qLD', (512, 1849)), ('2MB', 'qLU', (512, 825)), ('1MB', 'map_iefc2efc', (512, 512)), ('1MB', 'map_efc2iefc', (512, 512)), ('1MB', 'efc_islandid', (512, 512)), ('1MB', 'crb', (512, 45)), ('1MB', 'cinert', (512, 45)), ('1MB', 'M', (512, 434))]
+    print("nconmax", task.sim.d.nconmax, "njmax", task.sim.d.njmax)
+AttributeError: 'Data' object has no attribute 'nconmax'. Did you mean: 'naconmax'?
+N=1024 njmax=512: MjData device arrays 0.04 GB; top: [('8MB', 'qLD', (1024, 1849)), ('3MB', 'qLU', (1024, 825)), ('2MB', 'map_iefc2efc', (1024, 512)), ('2MB', 'map_efc2iefc', (1024, 512)), ('2MB', 'efc_islandid', (1024, 512)), ('2MB', 'crb', (1024, 45)), ('2MB', 'cinert', (1024, 45)), ('2MB', 'M', (1024, 434))]
+    print("nconmax", task.sim.d.nconmax, "njmax", task.sim.d.njmax)
+AttributeError: 'Data' object has no attribute 'nconmax'. Did you mean: 'naconmax'?
+N=2048 njmax=512: MjData device arrays 0.09 GB; top: [('15MB', 'qLD', (2048, 1849)), ('7MB', 'qLU', (2048, 825)), ('4MB', 'map_iefc2efc', (2048, 512)), ('4MB', 'map_efc2iefc', (2048, 512)), ('4MB', 'efc_islandid', (2048, 512)), ('4MB', 'crb', (2048, 45)), ('4MB', 'cinert', (2048, 45)), ('4MB', 'M', (2048, 434))]
+    print("nconmax", task.sim.d.nconmax, "njmax", task.sim.d.njmax)
+AttributeError: 'Data' object has no attribute 'nconmax'. Did you mean: 'naconmax'?
+N=4096 njmax=256: MjData device arrays 0.17 GB; top: [('30MB', 'qLD', (4096, 1849)), ('14MB', 'qLU', (4096, 825)), ('7MB', 'crb', (4096, 45)), ('7MB', 'cinert', (4096, 45)), ('7MB', 'M', (4096, 434)), ('7MB', 'xmat', (4096, 45)), ('7MB', 'ximat', (4096, 45)), ('4MB', 'xfrc_applied', (4096, 45))]
+    print("nconmax", task.sim.d.nconmax, "njmax", task.sim.d.njmax)
+AttributeError: 'Data' object has no attribute 'nconmax'. Did you mean: 'naconmax'?

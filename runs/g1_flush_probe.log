@@ -1,0 +1,4 @@
+N=4096 eager, flush every 50 launches, 8 steps in flight: ok
+N=4096 graph of 1 substep with a sync after each: ok
+N=4096 graph of 1 substep, 8 launches in flight: ok
+N=4096 graph1: 77,452 env-steps/s at decimation 4 (52.9 ms per control step)

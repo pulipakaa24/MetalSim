@@ -1,0 +1,15 @@
+=== G1 rough step-only (graph) 4096, WP_METAL_INFLIGHT=2
+Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
+=== G1 rough step-only (graph) 4096, WP_METAL_INFLIGHT=1 WP_METAL_ICB_BATCH=64
+Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
+=== G1 rough PPO 4096, 15 iterations, WP_METAL_INFLIGHT=2
+RuntimeError: Metal graph launch failed: Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
+Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
+Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
+=== G1 rough PPO 2048, 15 iterations
+ValueError: Expected parameter loc (Tensor of shape (12288, 37)) of distribution Normal(loc: torch.Size([12288, 37]), scale: torch.Size([12288, 37])) to satisfy the constraint Real(), but found invalid values:
+tensor([[-0.0238, -0.0988, -0.3788,  ...,  0.1595,  0.3038, -0.0232],
+=== G1 flat PPO 4096, 300 iterations (learning signal)
+ValueError: Expected parameter loc (Tensor of shape (24576, 37)) of distribution Normal(loc: torch.Size([24576, 37]), scale: torch.Size([24576, 37])) to satisfy the constraint Real(), but found invalid values:
+tensor([[-2.0942,  0.8534,  0.0222,  ...,  0.8503,  1.0985, -0.7865],
+=== DONE5

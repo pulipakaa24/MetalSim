@@ -1,0 +1,86 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth b0265e0 load on device 'metal:0' took 26.53 ms  (cached)
+Module _nxn_broadphase__locals__kernel_5779d1c3 5779d1c load on device 'metal:0' took 17.55 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_831c971f 831c971 load on device 'metal:0' took 25.49 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_09db2b3b 09db2b3 load on device 'metal:0' took 18.87 ms  (cached)
+Module mujoco_warp._src.constraint 0906c30 load on device 'metal:0' took 16.30 ms  (cached)
+Module _friction_dof__locals__kernel_a405224e a405224 load on device 'metal:0' took 16.46 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_408660c5 408660c load on device 'metal:0' took 16.63 ms  (cached)
+Module _efc_contact_init__locals__kernel_db746078 db74607 load on device 'metal:0' took 16.41 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_be98091c 8054500 load on device 'metal:0' took 16.77 ms  (cached)
+Module _efc_contact_update__locals__kernel_1875ddb9 1875ddb load on device 'metal:0' took 16.82 ms  (cached)
+Module mujoco_warp._src.forward c637ca1 load on device 'metal:0' took 22.59 ms  (cached)
+Module mujoco_warp._src.passive 3a9b5a9 load on device 'metal:0' took 21.62 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_2c1a9107 2c1a910 load on device 'metal:0' took 16.44 ms  (cached)
+Module mujoco_warp._src.forward 81888f6 load on device 'metal:0' took 22.51 ms  (cached)
+Module _qfrc_smooth__locals__kernel_44db645a 44db645 load on device 'metal:0' took 16.27 ms  (cached)
+Module mujoco_warp._src.support 4ab5275 load on device 'metal:0' took 16.52 ms  (cached)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_693a8c02 a3c81dc load on device 'metal:0' took 16.08 ms  (cached)
+Module _solve_init_dof__locals__kernel_095963fd 095963f load on device 'metal:0' took 16.21 ms  (cached)
+Module mujoco_warp._src.solver dcb061a load on device 'metal:0' took 17.58 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_4c7d77a5 4c7d77a load on device 'metal:0' took 16.58 ms  (cached)
+Module mul_m_kernel__locals___mul_m_fdbb785a fdbb785 load on device 'metal:0' took 16.78 ms  (cached)
+Module _update_constraint_efc__locals__kernel_b592f41a b592f41 load on device 'metal:0' took 16.85 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_4ba1b6ad 4ba1b6a load on device 'metal:0' took 16.52 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_c292bc65 c292bc6 load on device 'metal:0' took 16.28 ms  (cached)
+Module _update_gradient_grad__locals__kernel_da6e0168 da6e016 load on device 'metal:0' took 16.18 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_f5dbff08 66391f8 load on device 'metal:0' took 16.48 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_46ee5031 1615b98 load on device 'metal:0' took 16.34 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_7a11ae08 9539acc load on device 'metal:0' took 17.45 ms  (cached)
+Module _update_constraint_efc__locals__kernel_a2b5538a a2b5538 load on device 'metal:0' took 16.27 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_ac48d2c2 ac48d2c load on device 'metal:0' took 15.97 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_ebfb6c3e ebfb6c3 load on device 'metal:0' took 16.32 ms  (cached)
+Module _update_gradient_grad__locals__kernel_6984a1ac 6984a1a load on device 'metal:0' took 17.13 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_8c517879 2bf23d8 load on device 'metal:0' took 16.36 ms  (cached)
+Module _solve_done__locals__kernel_a81134f5 a81134f load on device 'metal:0' took 16.07 ms  (cached)
+Module mujoco_warp._src.sensor 3284bd3 load on device 'metal:0' took 26.03 ms  (cached)
+Module mujoco_warp._src.derivative 00a2ef6 load on device 'metal:0' took 18.49 ms  (cached)
+Module _next_time_builder__locals___next_time_3c13281d 3c13281 load on device 'metal:0' took 16.05 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_9bae3e0c 9bae3e0 load on device 'metal:0' took 15.90 ms  (cached)
+Module reset_data__locals__reset_M_6a889326 6a88932 load on device 'metal:0' took 15.94 ms  (cached)
+Module reset_data__locals__reset_mocap_20e3bb14 20e3bb1 load on device 'metal:0' took 15.86 ms  (cached)
+Module reset_data__locals__reset_contact_ed330077 ed33007 load on device 'metal:0' took 16.12 ms  (cached)
+Module reset_data__locals__reset_sleep_eeccf1c6 eeccf1c load on device 'metal:0' took 15.79 ms  (cached)
+Module reset_data__locals__reset_nworld_bc401cf8 bc401cf load on device 'metal:0' took 15.79 ms  (cached)
+G1 flat PPO: N=4096 obs_dim 123 act_dim 37 rollout 24 x 300 iterations
+Module __main__ b6e8615 load on device 'metal:0' took 20.39 ms  (cached)
+Module orchard.learn.warp_policy e33445d load on device 'metal:0' took 16.65 ms  (cached)
+it    1 steps     98304 sps   42,023 | ep_ret    0.00 ep_len    0.0 (n=0) | pg 0.006 vf 0.310 kl 0.0440 lr 1.0e-05
+it    2 steps    196608 sps   44,768 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.002 vf 0.601 kl 0.0067 lr 2.6e-04
+it    3 steps    294912 sps   45,798 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.008 vf 0.683 kl 0.0116 lr 5.8e-04
+it    4 steps    393216 sps   46,351 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.009 vf 0.595 kl 0.0128 lr 8.6e-04
+it    5 steps    491520 sps   46,343 | ep_ret -212.96 ep_len  115.4 (n=2528) | pg 0.057 vf 7640.423 kl 0.0676 lr 1.0e-05
+it    6 steps    589824 sps   45,513 | ep_ret -211.94 ep_len  105.6 (n=1921) | pg -0.001 vf 5055.190 kl 0.0006 lr 1.0e-02
+it    7 steps    688128 sps   45,142 | ep_ret -202.77 ep_len   37.0 (n=3275) | pg -0.000 vf 2677.502 kl 0.0023 lr 1.0e-02
+it    8 steps    786432 sps   44,813 | ep_ret -202.82 ep_len   37.6 (n=2322) | pg -0.001 vf 495.748 kl -0.0000 lr 1.0e-02
+it    9 steps    884736 sps   44,546 | ep_ret -202.79 ep_len   38.2 (n=2671) | pg -0.002 vf 311.352 kl 0.0004 lr 1.0e-02
+it   10 steps    983040 sps   44,344 | ep_ret -202.74 ep_len   37.6 (n=2557) | pg -0.003 vf 174.791 kl 0.0012 lr 1.0e-02
+it   11 steps   1081344 sps   44,194 | ep_ret -202.78 ep_len   38.1 (n=2600) | pg -0.002 vf 237.673 kl 0.0005 lr 1.0e-02
+it   12 steps   1179648 sps   44,052 | ep_ret -202.76 ep_len   37.9 (n=2576) | pg -0.002 vf 157.416 kl 0.0006 lr 1.0e-02
+it   13 steps   1277952 sps   43,936 | ep_ret -202.78 ep_len   38.0 (n=2621) | pg -0.003 vf 227.111 kl 0.0010 lr 1.0e-02
+it   14 steps   1376256 sps   43,832 | ep_ret -202.77 ep_len   37.9 (n=2526) | pg -0.002 vf 135.881 kl 0.0008 lr 1.0e-02
+it   15 steps   1474560 sps   43,738 | ep_ret -202.79 ep_len   38.5 (n=2566) | pg -0.006 vf 90.433 kl 0.0046 lr 1.0e-02
+it   16 steps   1572864 sps   43,655 | ep_ret -202.77 ep_len   38.4 (n=2551) | pg -0.003 vf 96.085 kl 0.0017 lr 1.0e-02
+it   17 steps   1671168 sps   43,580 | ep_ret -202.82 ep_len   39.1 (n=2465) | pg -0.005 vf 63.437 kl 0.0041 lr 1.0e-02
+it   18 steps   1769472 sps   43,520 | ep_ret -202.83 ep_len   39.2 (n=2514) | pg -0.004 vf 108.875 kl 0.0035 lr 1.0e-02
+it   19 steps   1867776 sps   43,466 | ep_ret -202.86 ep_len   39.6 (n=2485) | pg -0.007 vf 67.187 kl 0.0052 lr 1.0e-02
+it   20 steps   1966080 sps   43,415 | ep_ret -202.87 ep_len   39.8 (n=2412) | pg -0.004 vf 70.464 kl 0.0028 lr 1.0e-02
+it   21 steps   2064384 sps   43,369 | ep_ret -202.90 ep_len   40.3 (n=2436) | pg -0.005 vf 54.623 kl 0.0039 lr 1.0e-02
+it   22 steps   2162688 sps   43,325 | ep_ret -202.92 ep_len   40.8 (n=2360) | pg -0.006 vf 52.860 kl 0.0059 lr 1.0e-02
+it   23 steps   2260992 sps   43,282 | ep_ret -202.95 ep_len   41.2 (n=2431) | pg -0.007 vf 44.259 kl 0.0063 lr 1.0e-02
+it   24 steps   2359296 sps   43,238 | ep_ret -202.99 ep_len   41.4 (n=2290) | pg -0.008 vf 41.122 kl 0.0087 lr 1.0e-02
+it   25 steps   2457600 sps   43,201 | ep_ret -203.03 ep_len   42.0 (n=2333) | pg -0.006 vf 45.734 kl 0.0067 lr 1.0e-02
+it   26 steps   2555904 sps   43,169 | ep_ret -203.05 ep_len   42.6 (n=2334) | pg -0.007 vf 41.264 kl 0.0068 lr 1.0e-02
+it   27 steps   2654208 sps   43,146 | ep_ret -203.07 ep_len   42.3 (n=2248) | pg -0.007 vf 39.449 kl 0.0093 lr 1.0e-02
+it   28 steps   2752512 sps   43,120 | ep_ret -203.10 ep_len   43.1 (n=2271) | pg -0.008 vf 34.472 kl 0.0066 lr 1.0e-02
+it   29 steps   2850816 sps   43,096 | ep_ret -203.11 ep_len   43.5 (n=2303) | pg -0.007 vf 34.201 kl 0.0052 lr 1.0e-02
+it   30 steps   2949120 sps   43,067 | ep_ret -203.11 ep_len   43.1 (n=2220) | pg -0.008 vf 34.501 kl 0.0055 lr 1.0e-02
+it   31 steps   3047424 sps   43,039 | ep_ret -203.12 ep_len   43.8 (n=2269) | pg -0.008 vf 34.997 kl 0.0055 lr 1.0e-02
+it   32 steps   3145728 sps   43,017 | ep_ret -203.14 ep_len   43.9 (n=2213) | pg -0.007 vf 37.727 kl 0.0062 lr 1.0e-02
+it   33 steps   3244032 sps   42,996 | ep_ret -203.13 ep_len   44.0 (n=2227) | pg -0.008 vf 40.287 kl 0.0060 lr 1.0e-02

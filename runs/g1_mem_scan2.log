@@ -1,0 +1,9 @@
+N=1024 njmax=256: MjData device arrays 0.04 GB; top: [('8MB', 'qLD', (1024, 1849)), ('3MB', 'qLU', (1024, 825)), ('2MB', 'crb', (1024, 45)), ('2MB', 'cinert', (1024, 45)), ('2MB', 'M', (1024, 434)), ('2MB', 'xmat', (1024, 45)), ('2MB', 'ximat', (1024, 45)), ('1MB', 'xfrc_applied', (1024, 45))]
+njmax 256
+N=1024: 23,038 env-steps/s, 44.45 ms/step; overflow {'LS_ITERATIONS': 1013}; maxrss 1.0 GB
+Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
+N=2048 njmax=256: MjData device arrays 0.08 GB; top: [('15MB', 'qLD', (2048, 1849)), ('7MB', 'qLU', (2048, 825)), ('4MB', 'crb', (2048, 45)), ('4MB', 'cinert', (2048, 45)), ('4MB', 'M', (2048, 434)), ('3MB', 'xmat', (2048, 45)), ('3MB', 'ximat', (2048, 45)), ('2MB', 'xfrc_applied', (2048, 45))]
+njmax 256
+    raise RuntimeError(f"{what} failed: {wp._src.context.runtime.get_error_string()}")
+RuntimeError: wp_metal_wait_event failed: Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
+Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)

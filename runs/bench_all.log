@@ -1,0 +1,36 @@
+=== build: BUILD EXIT 0
+=== sanity tests (physics + G1 warp)
+=========================== short test summary info ============================
+FAILED tests/test_physics.py::test_step_does_not_block_host - AssertionError:...
+1 failed, 13 passed, 1 warning in 17.35s
+=== G1 flat step-only 4096
+RuntimeError: Metal error on device metal:0: Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
+G1 (flat): nbody 45 nv 43 nu 37 ngeom 4 obs_dim 123
+Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
+=== G1 rough step-only 4096
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11365, in invoke_metal
+RuntimeError: Failed to launch kernel '_update_gradient_grad__locals__kernel' on device 'metal:0': Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory) (arguments: qfrc_smooth_in=array_t, qfrc_constraint_in=array_t, efc_Ma_in=array_t, state_changed_count_in=array_t, ctx_done_in=array_t, ctx_grad_out=array_t, ctx_grad_dot_out=array_t)
+G1 (rough): nbody 45 nv 43 nu 37 ngeom 4 obs_dim 310
+=== G1 flat step-only 2048 / 1024
+Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
+N=1024: Isaac-style mean step 47.50 ms -> 21,560 env-steps/s; synchronized 110 steps: 21,468 env-steps/s
+=== cartpole tiers 1024
+Cartpole (state only), N=1024: 57,893 env-steps/s
+Cartpole-RGB 100x100 tier 0, N=1024: 47,135 env-steps/s  (Isaac Lab, RTX 4090, published: 50,000 step-only)
+Cartpole-RGB 100x100 tier 1, N=1024: 42,634 env-steps/s
+Cartpole-RGB 100x100 tier 2 (spp 1, bounces 1), N=1024: 36,401 env-steps/s
+Cartpole-RGB 100x100 tier 2 (spp 1, bounces 2), N=1024: 34,762 env-steps/s
+Cartpole-RGB 100x100 tier 2 (spp 4, bounces 2), N=1024: 19,782 env-steps/s
+=== G1 flat PPO 4096, 15 iterations (throughput)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/aditya/robosim/orchard/learn/g1_velocity.py", line 501, in <module>
+NameError: name 'train_g1' is not defined
+=== G1 rough PPO 4096, 15 iterations (throughput)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/aditya/robosim/orchard/learn/g1_velocity.py", line 501, in <module>
+NameError: name 'train_g1' is not defined
+=== DONE

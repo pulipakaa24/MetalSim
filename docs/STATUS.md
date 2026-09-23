@@ -1,45 +1,69 @@
-# Status against the plan (2026-09-22, end of day 1)
+# Status against the plan (2026-09-23)
 
 Machine: Apple M4 Max (40-core GPU, 18.4 TFLOPS FP32 vendor peak), 64 GB, macOS 26.7, Command Line
-Tools only. Every figure below is **measured** here unless marked reported. Details, tables and
-the incident log are in `PHASES.md`; sources in `RESEARCH.md`; tests in `tests/` (all pass).
+Tools only. Every figure below is **measured** here unless marked reported. The per-row evidence
+(test file::function, assertion, result, verdict) is in `PARITY.md`; the work log with numbers and
+incidents is in `PHASES.md`; sources in `RESEARCH.md`; tests in `tests/` (all pass).
+
+## What the parity claim rests on now
+
+The direct comparison is **Isaac-Velocity-{Flat,Rough}-G1** on Isaac Lab's own `g1_minimal.usd`
+(the asset Isaac loads), with Isaac's actuator table, initial state, observation/reward/termination
+terms, terrain layout, height scanner and PPO configuration. Tests pose our converted model at the
+USD's authored configuration and match every joint frame to 1e-6 m, every link's mass properties
+to the USD, and every actuator gain to Isaac's source; the batched Metal physics matches MuJoCo C
+on the same asset. What is *not* claimed: PhysX contact-level equality (MuJoCo's solver is used by
+design) and any image comparison against Isaac's RTX renderer (Isaac cannot run here).
+
+The earlier cartpole and SO-101 numbers remain in `PHASES.md` as **pipeline** measurements: the
+cartpole tasks are MJCF equivalents without contacts, the lift scene is a reconstruction with no
+published benchmark. Neither is cited as physics parity evidence.
 
 ## Workstreams
 
 | WS | plan item | state |
 |---|---|---|
-| WS1 scene layer | USD with UsdPhysics/UsdShade/UsdSemantics; MJCF and URDF importers; compile to device tables; round-trip export | MJCF→USD and URDF→USD importers with Isaac's field mapping; USD→MuJoCo loader (lossless and generic UsdPhysics); compiled scene tables (unique meshes, instances, PBR materials, atlas, lights, semantics, intrinsics, LOD). Not yet: MaterialX graphs, Hydra/usdview (needs a self-built OpenUSD). |
-| WS2 GPU physics | MuJoCo Warp on Metal, graph capture, collision audit, deformables later | Running on the innate-inc Warp fork (built from source, branch `orchard-interop`). Test suite on Metal: 1447 pass / 3 fail (flex deformables + 1 known). Graph replay through indirect command buffers (host cost 0.02–0.08 ms/step). Per-world model fields for physics DR. Parity vs MuJoCo C on SO-101, Panda, Go1, G1 at MJWarp tolerances. |
-| WS3 interop | zero-copy MPS tensors, event ordering, conformance test | Done: DLPack `kDLMetal` and `from_blob` paths, MTLSharedEvent ordering across Warp/render/torch queues, runtime counters as the no-host-sync conformance instrument (Instruments not available without Xcode). |
-| WS4 renderer | tier 0 raster + PBR + shadow maps; tier 1 hybrid RT + denoise + MetalFX; tier 2 path tracer; MaterialX | Tier 0: native Metal, reads physics buffers directly, PBR, model lights + headlight, shadow maps, LOD; parity vs `mujoco.Renderer` (IoU 0.99, depth 0.1 mm, texture corr 0.996), brightness matched (PSNR 19.1). Tier 1: RT soft shadows, AO, mirror reflections from the fragment stage (PSNR 19.7). Not yet: MetalFX denoise/upscale, GI, tier 2, MaterialX compiler. |
-| WS5 sensors | lidar/radar/cameras/IMU/contact on shared BVH | Metal RT acceleration structures refit from physics; lidar (vs `mj_ray`: median < 2 mm) and ray-cast depth (= raster depth to 0.1 mm); Isaac-style lidar spec loader; IMU/contact/joint sensors as tensors via MuJoCo sensors. Not yet: beam divergence, multi-return, radar-lite, Isaac USD lidar prims. |
-| WS6 data generation | randomizers, annotators, COCO/KITTI writers | Done (GPU randomizers for colours/camera/intrinsics/light/ambient/backgrounds; materials per batch; annotators incl. 2-D/3-D boxes and semantic seg; COCO/KITTI/basic writers). |
-| WS7 learner | zero-copy obs/actions, rollout policy in Warp, PPO tuning, profiler | Pixel PPO on MPS (contiguous NCHW buffers: 2.3× faster updates); Warp MLP rollout policy with whole-rollout graph replay and one sync per rollout; rsl_rl KL schedule; time split reported. Not yet: CNN policy in Warp, torch.compile path (measured no gain), physics-only obs for the lift task. |
-| WS8 tooling | viewer, debugging, profiling, benchmark suite | Benchmark suite with compute-normalized figures (`orchard.bench.suite`), fidelity benchmark (PSNR/FLIP), race finder (cross-world consistency), gallery (`docs/gallery/index.html`). Not yet: usdview/Storm viewer, powermetrics (needs sudo). |
-| WS9 ROS 2 / HIL | network bridge | Not started (out of the hot path; plan says platform-limited). |
+| WS1 scene layer | USD with UsdPhysics/UsdShade/UsdSemantics; MJCF and URDF importers; compile to device tables; round-trip export | MJCF/URDF→USD and USD→MuJoCo (lossless and generic UsdPhysics) importers; proven on a real Isaac asset (G1: joint frames, masses, colliders, gravity/COM sentinels). Not yet: MaterialX graphs, Hydra/usdview. |
+| WS2 GPU physics | MuJoCo Warp on Metal, graph capture, collision audit, deformables later | innate-inc Warp fork (branch `orchard-interop`) with ICB graph replay; MuJoCo Warp suite 1447/1450 on Metal; per-world model fields; parity vs MuJoCo C on SO-101, Panda, Go1, G1. Backend fix this round: frees released per completed command buffer (eager loops at 4096 worlds exhausted GPU memory). |
+| WS3 interop | zero-copy MPS tensors, event ordering, conformance test | Done: DLPack `kDLMetal` / `from_blob` paths, MTLSharedEvent ordering across Warp/render/torch queues, runtime counters as the no-host-sync instrument. |
+| WS4 renderer | tier 0 raster; tier 1 hybrid RT + denoise + MetalFX; tier 2 path tracer; MaterialX | Tier 0 (parity vs `mujoco.Renderer`: IoU 0.99, depth 0.1 mm, texture corr 0.996); tier 1 (RT soft shadows, AO, reflections); **tier 2 path tracer done**: analytic Lambertian 0.4000 exact, furnace 0.498/0.5, 1/√spp convergence, 43 dB vs tier 0 direct light, full Cartpole-RGB rollouts at tiers 1 and 2. Not yet: denoiser, MetalFX upscale, MaterialX. |
+| WS5 sensors | lidar/radar/cameras/IMU/contact on shared BVH | Metal RT acceleration structures refit from physics; lidar vs `mj_ray` < 2 mm; ray depth == raster depth; Isaac-style height scanner on terrain (Warp heightfield kernel, exact vs `mj_ray`); IMU/contact/joint sensors as tensors. Not yet: beam divergence, multi-return, radar-lite. |
+| WS6 data generation | randomizers, annotators, COCO/KITTI writers | Done. |
+| WS7 learner | zero-copy obs/actions, rollout policy in Warp, PPO tuning, profiler | Warp MLP rollout policy with whole-rollout graph replay; rsl_rl KL schedule; Isaac's G1 PPO config wired (`g1_ppo_config`); pixel PPO on MPS. Not yet: clipped value loss, CNN policy in Warp. |
+| WS8 tooling | viewer, debugging, profiling, benchmark suite | Benchmark suite, fidelity benchmark, race finder, gallery, Isaac-protocol G1 benchmark (`orchard.learn.g1_velocity`). Not yet: usdview/Storm viewer, powermetrics. |
+| WS9 ROS 2 / HIL | network bridge | Not started. |
 
 ## Acceptance tests (plan §2.3)
 
 | test | result |
 |---|---|
-| Physics: MuJoCo Warp suite green on Metal; trajectory parity vs CPU MuJoCo | 1447/1450 (3 flex deformable failures logged); one-step parity on 4 robots; SO-101 arm trajectory 4.5e-7 over 200 steps |
+| Physics: MuJoCo Warp suite green on Metal; trajectory parity vs CPU MuJoCo | 1447/1450 (3 flex deformable failures); one-step parity on 4 robots; G1 (Isaac's asset) 0.5 s incl. landing: max joint diff 1.2e-2 rad, median 3.6e-5 |
 | Rendering tier 0: silhouette IoU > 0.95, texture corr > 0.99 | 0.994–0.997; 0.996 |
-| Rendering tier 1/2 vs Isaac RTX on a shared USD scene | not possible here (no Isaac); vs MuJoCo reference: PSNR 19.7 / FLIP 0.30 |
-| Sensors: lidar vs Isaac RTX lidar | vs MuJoCo `mj_ray` instead: median < 2 mm, hit pattern > 97% |
-| Pipeline: zero host copies per step, one sync per rollout | verified with runtime counters on physics, render and Warp-rollout loops |
-| Training: identical PPO config, identical success rate on SO-101 lift | GPU stack 3M steps: success 0.0 (return 16→127); SB3 baseline on the same reconstructed scene running now (`runs/sb3_baseline/progress.txt`) for the equal-budget comparison |
+| Rendering tier 1/2 vs Isaac RTX on a shared USD scene | not testable here (no Isaac); tier 2 validated radiometrically (analytic + furnace) and against tier 0 (43 dB direct light); tier 1 vs MuJoCo PSNR 19.7 |
+| Sensors: lidar vs Isaac RTX lidar | vs MuJoCo `mj_ray`: median < 2 mm; height scan exact on the heightfield |
+| Pipeline: zero host copies per step, one sync per rollout | runtime counters on physics, render, sensor and Warp-rollout loops: 0 syncs, 0 host ops |
+| Training: identical PPO config, identical result | G1 flat: Isaac's PPO config on Isaac's asset learns (episode length rises from ~40 to 343 steps over 300 iterations, `PARITY.md` §1.5; no published Isaac curve to match); cartpole (rsl_rl config) reaches 295/300; SO-101 lift demoted to a pipeline demo (success 0 at 3M steps, no published reference) |
 
 ## Headline throughput (uncontended)
 
-- Isaac Cartpole-RGB equivalent, 1024 envs, 100×100: **48,056 steps/s** (Isaac Lab RTX 4090 published: 50,000).
-- Cartpole state, 4096 envs, full PPO loop with the rollout in Warp: **544K steps/s** (Isaac Lab 4090: 510K); rollout only 1.24M.
-- SO-101 physics: 541K steps/s at 4096 envs; tier-0 render 705K env-frames/s at 1024×64 px (mjbatch-metal: 72.7K).
+- **G1 (Isaac's asset), flat, 4096 envs, synchronized**: step only 45.7K env-steps/s (Isaac Lab
+  RTX 4090 published 94K); step + Warp-policy inference 46.0K (88K); full PPO loop 41–43K (82K).
+  Raw 0.5× on a chip with 4.5× less peak FP32; 2.2–2.3× per TFLOPS. Physics alone 67K.
+- **G1 rough**: not claimed. MuJoCo Warp's heightfield-mesh contacts return inverted normals and
+  launch worlds (xfail test, `PARITY.md` §1.6); 4096 envs also exhaust GPU memory in the CCD kernels.
+
+- Cartpole-RGB 100×100, 1024 envs, full env step: tier 0 47,135, tier 1 42,634, tier 2 (1 spp)
+  36,401 env-steps/s (Isaac Lab RTX 4090 published 50,000, rasterized; pipeline comparison only).
+- Cartpole state, 4096 envs, full PPO loop with the rollout in Warp: 544K steps/s (Isaac 510K).
 
 ## Judgement calls made (to confirm)
 
 1. Product/package name `orchard`; workspace `~/robosim`.
-2. The SO-101 lift scene was reconstructed (`assets/so101/scene_box_rl.xml`) because the original lives on another machine; the camera is a 3/4 view I chose. If the original scene and the baseline's `progress.txt` exist, they should replace this.
-3. Constraint budget default `njmax=512` per world (MuJoCo Warp's 64 overflowed and produced NaN).
-4. Solver iterations are set per model (Metal cannot exit the Newton loop early); cartpole uses 10.
-5. MuJoCo/OpenGL light intensities are treated as π× radiance so tier 0 matches MuJoCo's brightness.
-6. Tier-1 reflections use MuJoCo's constant reflectance blend rather than Fresnel, to match the reference.
+2. MuJoCo Warp solver budget on the G1 taken from MuJoCo Warp's own G1 benchmark (10/20,
+   `implicitfast`, eulerdamp off), `njmax` 256; Metal cannot exit the Newton loop early.
+3. Rough terrain re-implemented from Isaac's config (same layout/mix/ranges, not the same random
+   heights); terrain curriculum not applied (all rows sampled).
+4. Contact terms use MuJoCo touch sensors on sites enclosing the colliders (1 N threshold) instead
+   of PhysX contact reporting with a 3-step history.
+5. MuJoCo/OpenGL light intensities treated as π× radiance so tiers 0–2 match MuJoCo's brightness.
+6. Tier 2 ships without a denoiser; 1 spp rollouts are noisy by design (documented in `PARITY.md`).

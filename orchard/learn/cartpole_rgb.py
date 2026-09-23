@@ -58,6 +58,9 @@ class CartpoleRGBConfig:
     episode_seconds: float = 5.0
     seed: int = 0
     render: bool = True
+    tier: int = 0          # 0 raster, 1 hybrid RT (fragment-stage rays), 2 path tracer
+    spp: int = 1           # tier 2: paths per pixel per step
+    max_bounces: int = 2   # tier 2
 
 
 class CartpoleRGBEnv:
@@ -68,8 +71,15 @@ class CartpoleRGBEnv:
         self.n = self.cfg.num_envs
         self.model = mujoco.MjModel.from_xml_string(CARTPOLE_XML)
         self.sim = BatchSim(self.model, self.n, options=BatchSimOptions(substeps=self.cfg.decimation, njmax=32))
-        self.rend = Tier0Renderer(self.model, self.n, width=self.cfg.width, height=self.cfg.height, camera="cam",
-                                  outputs=("rgb",)) if self.cfg.render else None
+        if not self.cfg.render:
+            self.rend = None
+        elif self.cfg.tier == 2:
+            from orchard.render.tier2 import Tier2Renderer
+            self.rend = Tier2Renderer(self.model, self.n, width=self.cfg.width, height=self.cfg.height, camera="cam",
+                                      spp=self.cfg.spp, max_bounces=self.cfg.max_bounces, seed=self.cfg.seed)
+        else:
+            self.rend = Tier0Renderer(self.model, self.n, width=self.cfg.width, height=self.cfg.height, camera="cam",
+                                      outputs=("rgb",), tier=self.cfg.tier)
         self.dev = torch.device("mps")
         self.gen = torch.Generator(device="mps").manual_seed(self.cfg.seed)
         self.learner_event = wm.SharedEvent("metal:0", "orchard.cartpole")
@@ -135,10 +145,10 @@ class CartpoleRGBEnv:
         torch.mps.synchronize()
 
 
-def benchmark(n=1024, steps=200, render=True):
+def benchmark(n=1024, steps=200, render=True, tier=0, spp=1, max_bounces=2):
     """Isaac Lab's benchmark_non_rl methodology: env-steps/s of step (physics + render + reward/reset)."""
     import time
-    env = CartpoleRGBEnv(CartpoleRGBConfig(num_envs=n, render=render))
+    env = CartpoleRGBEnv(CartpoleRGBConfig(num_envs=n, render=render, tier=tier, spp=spp, max_bounces=max_bounces))
     env.reset()
     a = torch.zeros(n, 1, device="mps")
     for _ in range(5):
@@ -156,4 +166,7 @@ if __name__ == "__main__":
     wp.config.quiet = True
     n = int(sys.argv[1]) if len(sys.argv) > 1 else 1024
     print(f"Cartpole (state only), N={n}: {benchmark(n, render=False):,.0f} env-steps/s")
-    print(f"Cartpole-RGB 100x100, N={n}: {benchmark(n, render=True):,.0f} env-steps/s  (Isaac Lab, RTX 4090, published: 50,000 step-only)")
+    print(f"Cartpole-RGB 100x100 tier 0, N={n}: {benchmark(n, render=True):,.0f} env-steps/s  (Isaac Lab, RTX 4090, published: 50,000 step-only)")
+    print(f"Cartpole-RGB 100x100 tier 1, N={n}: {benchmark(n, render=True, tier=1):,.0f} env-steps/s")
+    for spp, nb in ((1, 1), (1, 2), (4, 2)):
+        print(f"Cartpole-RGB 100x100 tier 2 (spp {spp}, bounces {nb}), N={n}: {benchmark(n, steps=50, render=True, tier=2, spp=spp, max_bounces=nb):,.0f} env-steps/s")

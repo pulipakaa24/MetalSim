@@ -1,0 +1,11 @@
+=== G1 flat step-only (graph) 4096
+N=4096: Isaac-style mean step 43.00 ms -> 95,250 env-steps/s; synchronized 110 steps: 44,991 env-steps/s
+=== G1 flat step-only (graph) 2048
+N=2048: Isaac-style mean step 25.11 ms -> 81,571 env-steps/s; synchronized 110 steps: 38,375 env-steps/s
+=== G1 flat step-only (graph) 1024
+N=1024: Isaac-style mean step 16.49 ms -> 62,089 env-steps/s; synchronized 110 steps: 29,119 env-steps/s
+=== G1 rough step-only (graph) 4096
+Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
+=== G1 rough step-only (graph) 2048
+N=2048: Isaac-style mean step 31.23 ms -> 65,580 env-steps/s; synchronized 110 steps: 29,358 env-steps/s
+=== DONE3

@@ -331,3 +331,87 @@ steps on the GPU stack: 29.3 min at 1,707 env-steps/s; episode return 15.7 → 1
 saturating), success rate 0.0 at 3M steps. The published baseline mentions a 25M-step, ~4 h run
 and does not report a success rate; an SB3 run of the original pipeline on the reconstructed
 scene (`runs/sb3_baseline/`) is queued for an equal-budget comparison.
+
+
+## Parity on Isaac's own asset: Unitree G1 velocity task (2026-09-23, measured)
+
+Per the user's direction ("run a direct comparison to something that's been actually benchmarked"),
+the reference task is now Isaac-Velocity-{Flat,Rough}-G1-v0 on Isaac Lab's `g1_minimal.usd`, with
+Isaac's actuator table, initial state, observation/reward/termination terms and PPO config. The
+evidence per row (tests, tolerances, results) is in `PARITY.md`; this section records the work.
+
+### Incidents while bringing Isaac's USD up (all resolved, each now a test)
+
+1. **USD gravity 0**: the asset's `physicsScene` authors `gravityMagnitude = 0`, which PhysX treats
+   as "use the default"; the loader copied 0 and the robot floated. Fixed in `usd_to_mjcf.py`
+   (positive magnitude only; otherwise 9.81 along the stage down axis).
+2. **Centre of mass (-inf, -inf, -inf)**: USD's sentinel for "not authored" on the massless helper
+   links (IMU, pelvis contour, logo); produced NaN in `mj_comPos`. Fixed (sentinel → link origin).
+3. **`qpos0` overwritten with the init pose**: MuJoCo measures hinge angles from `qpos0`, so this
+   silently moved every joint's zero; the model then disagreed with the USD joint frames by up to
+   0.38 m at the fingers. Fixed (init pose is a keyframe only). The joint-frame test now shows
+   anchor errors of 5.6e-7 m over all 37 joints, at the USD's authored (posed) configuration.
+4. **Heightfield spacing**: MuJoCo spans `2·radius` over `n` samples, so the radius must be
+   `(n−1)·res/2` for the collision surface to coincide with the scanner's mesh; the height-scan vs
+   `mj_ray` test caught a 6.5 mm median error, now 1.9e-6 m.
+5. **Metal "Insufficient Memory" at 2048–4096 worlds** (`kIOGPUCommandBufferCallbackErrorOutOfMemory`):
+   MuJoCo Warp allocates temporaries every eager step (collision driver `wp.empty`, `qacc`), and the
+   Metal backend deferred every free until the next host synchronize, so a benchmark loop with no
+   sync accumulated thousands of buffers. Graph replays were unaffected (no allocations). Fixed in
+   the backend: frees are attached to the next committed command buffer and released when it
+   completes (`pending_frees`). Two knobs were added while diagnosing and left at neutral defaults:
+   `WP_METAL_INFLIGHT` (command buffers in flight, default 64 = Metal's queue depth) and
+   `WP_METAL_ICB_BATCH` (chunked graph replay, default off).
+
+### Solver settings and honesty notes
+
+MuJoCo Warp's own G1 benchmark settings are used (`benchmarks/unitree_g1/unitree_g1_mjlab.xml`:
+10 Newton iterations, 20 line-search iterations, `implicitfast`, eulerdamp off), pyramidal cone,
+dense Jacobian, `njmax` 256. On Metal the Newton loop cannot exit early, so the budget is spent
+every step; the line-search cap is reached in most worlds most steps (`LS_ITERATIONS` overflow
+flag), which is a cost cap, not a failure. Under a PD hold at Isaac's default pose the robot pitches
+forward onto its torso within 1.5 s in both MuJoCo C and on Metal (Isaac's 20 Nm/rad ankle gains
+cannot hold the COM offset); that is the physics of the configuration, not a bug.
+
+### G1 throughput (Isaac's `benchmark_non_rl` protocol; uncontended; 4096 envs)
+
+| measurement (synchronized) | 4096 | 2048 | 1024 | Isaac (4090, reported) |
+|---|---|---|---|---|
+| flat, physics only (4 substeps) | 67,222 | 59,419 | – | – |
+| flat, step only | 45,677 | 38,903 | 29,119 | 94,000 |
+| flat, step + inference | 45,954 | 39,142 | – | 88,000 |
+| flat, full PPO loop | 41,340 (log: 43,300) | 32,418 | – | 82,000 |
+| rough, step only | OOM | 29,358 (physics defective, see below) | – | 94,000 |
+
+Eager per-kernel launching instead of one graph per step: 32,815 at 4096. The per-call "Isaac-style"
+mean is not used (queue-absorbed, reads ~2× high). Rough terrain: MuJoCo Warp's HFIELD-MESH contacts
+return inverted normals (z = −1) with 5 cm penetrations and launch worlds, while MuJoCo C on the same
+model is stable (`tests/test_terrain.py::test_hfield_mesh_contacts_match_mujoco_c`, xfail); the
+height scanner moved to a Warp heightfield-interpolation kernel (exact vs `mj_ray`) so it captures
+into rollout graphs (a cross-queue event signal cannot be captured on Metal).
+
+### G1 flat learning run (measured)
+
+`runs/g1_flat_ppo_300b.log`: Isaac's PPO config, 4096 envs, 300 iterations, 42.4K env-steps/s
+end to end. Episode length 41 → 343 control steps; return −203 → −233 (penalties still exceed
+tracking; termination still paid). One transient blow-up at iteration 296 (return −1e26 for one
+rollout, recovered). A non-finite state now terminates and resets the episode and is counted.
+
+### Tier 2 path tracer (measured)
+
+`orchard.render.tier2` over `shaders/pathtrace.metal`: progressive accumulation, next-event
+estimation for MuJoCo lights and the DR light, MuJoCo headlight on the primary hit, Lambert + GGX
+with mixture-pdf sampling, Russian roulette after 3 bounces, sky/clear-colour misses, rgb/depth/seg/
+normal outputs, GPU path ordered against `BatchSim` by events. `tests/test_render_tier2.py`:
+
+| test | result |
+|---|---|
+| Lambertian plane, directional light, analytic radiance 0.4 | 0.4000 (pixel std 0.0000), 0 and 3 bounces |
+| white furnace under a uniform sky of 0.5 | 0.4979 |
+| noise vs spp (4 → 64) | rms ratio 4.05 (ideal 4.0) |
+| direct light vs tier 0 (bounces 0) | PSNR 43.7–45.1 dB; depth median 0.9 mm; seg IoU 1.0 |
+| GPU path from BatchSim == host path | mean abs diff < 1 |
+| Cartpole-RGB rollout at tier 2 | runs (32 envs, 30 steps, finite rewards) |
+
+Cartpole-RGB 100×100 full env step at 1024 envs, one run each: tier 0 47,135; tier 1 42,634;
+tier 2 36,401 (1 spp, 1 bounce), 34,762 (1 spp, 2 bounces), 19,782 (4 spp, 2 bounces) env-steps/s.

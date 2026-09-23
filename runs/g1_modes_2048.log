@@ -1,0 +1,4 @@
+N=2048 simloop ok
+counters Counters(syncs=8, flushes=218, host_ops=0, dispatches=25632)
+N=2048 bench_notorch FAILED: Failed to launch kernel 'mul_m_kernel__locals___mul_m' on device 'metal:0': Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallba
+N=2048 bench FAILED: Failed to launch kernel 'ccd_kernel_builder__locals__ccd_kernel' on device 'metal:0': Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBu

@@ -1,0 +1,228 @@
+<mujoco model="usd_import">
+  <compiler angle="radian"/>
+
+  <option timestep="0.005" gravity="0 0 0"/>
+
+  <asset>
+    <mesh name="mesh_0" vertex="-0.101555 -0.0327346 0.00925394 0.101555 -0.0327346 0.00925394 -0.101555 0.0327346 0.00925394 0.101555 0.0327346 0.00925394 -0.101555 -0.0327346 -0.00925394 0.101555 -0.0327346 -0.00925394 -0.101555 0.0327346 -0.00925394 0.101555 0.0327346 -0.00925394" face="0 1 3 0 3 2 4 6 7 4 7 5 6 2 3 6 3 7 4 5 1 4 1 0 4 0 2 4 2 6 5 7 3 5 3 1"/>
+    <mesh name="mesh_1" vertex="-0.101555 -0.0327346 0.00925394 0.101555 -0.0327346 0.00925394 -0.101555 0.0327346 0.00925394 0.101555 0.0327346 0.00925394 -0.101555 -0.0327346 -0.00925394 0.101555 -0.0327346 -0.00925394 -0.101555 0.0327346 -0.00925394 0.101555 0.0327346 -0.00925394" face="0 1 3 0 3 2 4 6 7 4 7 5 6 2 3 6 3 7 4 5 1 4 1 0 4 0 2 4 2 6 5 7 3 5 3 1"/>
+    <mesh name="mesh_2" vertex="-0.06 -0.110109 0.144879 0.06 -0.110109 0.144879 -0.06 0.110109 0.144879 0.06 0.110109 0.144879 -0.06 -0.110109 -0.144879 0.06 -0.110109 -0.144879 -0.06 0.110109 -0.144879 0.06 0.110109 -0.144879" face="0 1 3 0 3 2 4 6 7 4 7 5 6 2 3 6 3 7 4 5 1 4 1 0 4 0 2 4 2 6 5 7 3 5 3 1"/>
+  </asset>
+
+  <worldbody>
+    <geom name="ground" size="0 0 0.05" type="plane"/>
+    <body name="pelvis">
+      <inertial pos="0 0 -0.07605" quat="1 0 -0.000405289 0" mass="2.86" diaginertia="0.0079143 0.0069837 0.0059404"/>
+      <joint name="pelvis_free" type="free"/>
+      <body name="left_hip_pitch_link" pos="0 0.06445 -0.1027" quat="0.984807 0 -0.17365 0">
+        <inertial pos="0.001962 0.049392 -0.000941" quat="0.938868 0.343859 -0.00626571 -0.0157501" mass="1.299" diaginertia="0.00138785 0.00086947 0.000955478"/>
+        <joint name="left_hip_pitch_joint" range="-2.35 3.05" armature="0.1" axis="0 1 0" limited="true"/>
+        <body name="left_hip_roll_link" pos="0 0.11675 -0.1027" quat="0.984807 0 -0.17365 0">
+          <inertial pos="0.024757 -0.001036 -0.086323" quat="0.977498 -0.00692636 0.210181 0.0165269" mass="1.446" diaginertia="0.00244106 0.00230425 0.00142899"/>
+          <joint name="left_hip_roll_joint" range="-0.26 2.53" armature="0.1" axis="1 0 0" limited="true"/>
+          <body name="left_hip_yaw_link" pos="0.0609195 0.115536 -0.212591" quat="0.984807 0 -0.17365 0">
+            <inertial pos="-0.053554 -0.011477 -0.14067" quat="0.964959 -0.0305889 0.255236 0.0526523" mass="2.052" diaginertia="0.0107868 0.0114475 0.00214501"/>
+            <joint name="left_hip_yaw_joint" range="-2.75 2.75" armature="0.1" limited="true"/>
+            <body name="left_knee_link" pos="0.0479644 0.113803 -0.405906" quat="0.99678 0 0.0801793 0">
+              <inertial pos="0.005505 0.006534 -0.116629" quat="0.989292 -0.0341654 0.0159371 -0.140995" mass="2.252" diaginertia="0.0124382 0.0127418 0.00192524"/>
+              <joint name="left_knee_joint" range="-0.33489 2.5449" armature="0.1" axis="0 1 0" limited="true"/>
+              <body name="left_ankle_pitch_link" pos="8.27014e-07 0.117871 -0.702118">
+                <inertial pos="-0.007269 0 0.011137" quat="0.972278 0 -0.233828 0" mass="0.074" diaginertia="6.9195e-06 1.89e-05 1.40805e-05"/>
+                <joint name="left_ankle_pitch_joint" range="-0.68 0.73" armature="0.1" axis="0 1 0" limited="true"/>
+                <body name="left_ankle_roll_link" pos="8.27276e-07 0.117871 -0.719676">
+                  <inertial pos="0.024762 2e-05 -0.012526" quat="0.999219 -0.00119687 0.0394858 0.000106036" mass="0.391" diaginertia="0.000149255 0.0010657 0.00110394"/>
+                  <joint name="left_ankle_roll_joint" range="-0.2618 0.2618" armature="0.1" axis="1 0 0" limited="true"/>
+                  <geom name="Cube" pos="0.035917 0 -0.0251701" quat="1 0 0 0" type="mesh" mesh="mesh_0"/>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="pelvis_contour_link">
+        <inertial pos="-inf -inf -inf" quat="0 0 0 0" mass="1e-06" diaginertia="1e-05 1e-05 1e-05"/>
+      </body>
+      <body name="right_hip_pitch_link" pos="0 -0.06445 -0.1027" quat="0.984807 0 -0.17365 0">
+        <inertial pos="0.001962 -0.049392 -0.000941" quat="0.938868 -0.343859 -0.00626571 0.0157501" mass="1.299" diaginertia="0.00138785 0.00086947 0.000955478"/>
+        <joint name="right_hip_pitch_joint" range="-2.35 3.05" armature="0.1" axis="0 1 0" limited="true"/>
+        <body name="right_hip_roll_link" pos="0 -0.11675 -0.1027" quat="0.984807 0 -0.17365 0">
+          <inertial pos="0.024757 0.001036 -0.086323" quat="0.977498 0.00692636 0.210181 -0.0165269" mass="1.446" diaginertia="0.00244106 0.00230425 0.00142899"/>
+          <joint name="right_hip_roll_joint" range="-2.53 0.26" armature="0.1" axis="1 0 0" limited="true"/>
+          <body name="right_hip_yaw_link" pos="0.0609195 -0.115536 -0.212591" quat="0.984807 0 -0.17365 0">
+            <inertial pos="-0.053554 0.011477 -0.14067" quat="0.964959 0.0305889 0.255236 -0.0526523" mass="2.052" diaginertia="0.0107868 0.0114475 0.00214501"/>
+            <joint name="right_hip_yaw_joint" range="-2.75 2.75" armature="0.1" limited="true"/>
+            <body name="right_knee_link" pos="0.0479644 -0.113803 -0.405906" quat="0.99678 0 0.0801793 0">
+              <inertial pos="0.005505 -0.006534 -0.116629" quat="0.989292 0.0341654 0.0159371 0.140995" mass="2.252" diaginertia="0.0124382 0.0127418 0.00192524"/>
+              <joint name="right_knee_joint" range="-0.33489 2.5449" armature="0.1" axis="0 1 0" limited="true"/>
+              <body name="right_ankle_pitch_link" pos="8.27014e-07 -0.117871 -0.702118">
+                <inertial pos="-0.007269 0 0.011137" quat="0.972278 0 -0.233828 0" mass="0.074" diaginertia="6.9195e-06 1.89e-05 1.40805e-05"/>
+                <joint name="right_ankle_pitch_joint" range="-0.68 0.73" armature="0.1" axis="0 1 0" limited="true"/>
+                <body name="right_ankle_roll_link" pos="8.27276e-07 -0.117871 -0.719676">
+                  <inertial pos="0.024762 -2e-05 -0.012526" quat="0.999219 0.00119687 0.0394858 -0.000106036" mass="0.391" diaginertia="0.000149255 0.0010657 0.00110394"/>
+                  <joint name="right_ankle_roll_joint" range="-0.2618 0.2618" armature="0.1" axis="1 0 0" limited="true"/>
+                  <geom name="right_ankle_roll_link_Cube" pos="0.035917 0 -0.0251701" quat="1 0 0 0" type="mesh" mesh="mesh_1"/>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="torso_link">
+        <inertial pos="0.00197122 0.00266902 0.169365" quat="0.999768 0.0170278 -0.0129458 -0.00253532" mass="6.3396" diaginertia="0.0603894 0.0435628 0.03337"/>
+        <joint name="torso_joint" range="-2.618 2.618" armature="0.1" limited="true"/>
+        <geom name="torso_link_Cube" pos="-0.00620253 0 0.164763" type="mesh" mesh="mesh_2"/>
+        <body name="head_link">
+          <inertial pos="0.00138067 0.000284309 0.420342" quat="0.998756 0.00284651 -0.0451579 -0.0209396" mass="1.17977" diaginertia="0.00546358 0.00552903 0.00162238"/>
+        </body>
+        <body name="imu_link" pos="-0.0423387 0.00166 0.152067">
+          <inertial pos="-inf -inf -inf" quat="0 0 0 0" mass="1e-06" diaginertia="1e-05 1e-05 1e-05"/>
+        </body>
+        <body name="left_shoulder_pitch_link" pos="-0.0025 0.10396 0.25928" quat="0.990268 0.139172 0 0">
+          <inertial pos="-0.001431 0.048811 0.001304" quat="0.97214 -0.140022 -0.16469 -0.0906368" mass="0.713" diaginertia="0.000466421 0.000410999 0.000440181"/>
+          <joint name="left_shoulder_pitch_joint" range="-2.9671 2.7925" armature="0.1" axis="0 1 0" limited="true"/>
+          <body name="left_shoulder_roll_link" pos="-0.0025 0.153946 0.273613">
+            <inertial pos="-0.003415 0.006955 -0.064598" quat="0.999928 0.00338303 0.011517 0.000319462" mass="0.642" diaginertia="0.000616029 0.000683514 0.000372857"/>
+            <joint name="left_shoulder_roll_joint" range="-1.5882 2.2515" armature="0.1" axis="1 0 0" limited="true"/>
+            <body name="left_shoulder_yaw_link" pos="-0.00604 0.160188 0.170413">
+              <inertial pos="0.000375 -0.00444 -0.072374" quat="0.940427 -0.0334272 -0.0194902 -0.337786" mass="0.713" diaginertia="0.000964661 0.000977873 0.000379065"/>
+              <joint name="left_shoulder_yaw_joint" range="-2.618 2.618" armature="0.1" limited="true"/>
+              <body name="left_elbow_pitch_link" pos="-0.00604 0.162078 0.084913">
+                <inertial pos="0.064497 0.002873 0" quat="0.983402 0.000162328 -1.44667e-05 -0.18144" mass="0.601" diaginertia="0.00025371 0.00049549 0.0004712"/>
+                <joint name="left_elbow_pitch_joint" range="-0.2268 3.4208" armature="0.1" axis="0 1 0" limited="true"/>
+                <body name="left_elbow_roll_link" pos="0.09396 0.162078 0.084913">
+                  <inertial pos="0.081811 0.001454 0.001" quat="0.996277 0.0840638 -0.0160999 0.0102844" mass="0.227" diaginertia="0.00010804 0.000977534 0.000968326"/>
+                  <joint name="left_elbow_roll_joint" range="-2.0943 2.0943" armature="0.1" axis="1 0 0" limited="true"/>
+                  <body name="left_palm_link" pos="0.21396 0.162078 0.084913">
+                    <inertial pos="0.0557842 0.00148509 -0.000326701" quat="0.999676 -0.000206426 0.00798934 0.0241723" mass="0.28126" diaginertia="0.000176062 0.000311158 0.000189397"/>
+                    <body name="left_five_link" pos="0.29896 0.166078 0.060963">
+                      <inertial pos="0.0362561 -0.0015725 0.000269899" quat="0.996487 -0.0836561 0.00228414 -0.00302742" mass="0.0488469" diaginertia="3.8319e-06 8.91742e-06 8.64873e-06"/>
+                      <joint name="left_five_joint" range="-1.84 0.3" armature="0.1" limited="true"/>
+                      <body name="left_six_link" pos="0.34606 0.162478 0.060963">
+                        <inertial pos="0.0237591 0.00135257 0.000119669" quat="0.999361 -0.00591275 0.0160366 0.0313859" mass="0.0138583" diaginertia="9.3995e-07 2.55338e-06 2.04399e-06"/>
+                        <joint name="left_six_joint" range="-1.84 0" armature="0.1" limited="true"/>
+                      </body>
+                    </body>
+                    <body name="left_three_link" pos="0.29896 0.166078 0.108863">
+                      <inertial pos="0.0362561 -0.0015725 0.000269899" quat="0.996487 -0.0836561 0.00228414 -0.00302742" mass="0.0488469" diaginertia="3.8319e-06 8.91742e-06 8.64873e-06"/>
+                      <joint name="left_three_joint" range="-1.84 0.3" armature="0.1" limited="true"/>
+                      <body name="left_four_link" pos="0.34606 0.162478 0.108863">
+                        <inertial pos="0.0237591 0.00135257 0.000119669" quat="0.999361 -0.00591275 0.0160366 0.0313859" mass="0.0138583" diaginertia="9.3995e-07 2.55338e-06 2.04399e-06"/>
+                        <joint name="left_four_joint" range="-1.84 0" armature="0.1" limited="true"/>
+                      </body>
+                    </body>
+                    <body name="left_zero_link" pos="0.26396 0.162078 0.084913">
+                      <inertial pos="-0.0260466 -0.00877511 1.08605e-05" quat="0.978311 -0.00398189 -0.00452538 -0.207051" mass="0.0509893" diaginertia="7.23365e-06 4.58058e-06 8.68048e-06"/>
+                      <joint name="left_zero_joint" range="-0.523598 0.523598" armature="0.1" axis="0 1 0" limited="true"/>
+                      <body name="left_one_link" pos="0.237435 0.143278 0.084863">
+                        <inertial pos="-0.00181538 -0.0327057 -0.000185871" quat="0.98984 -0.00243739 0.140057 -0.0243994" mass="0.047762" diaginertia="8.03051e-06 3.65282e-06 7.8455e-06"/>
+                        <joint name="left_one_joint" range="-1 1.2" armature="0.1" limited="true"/>
+                        <body name="left_two_link" pos="0.237435 0.100178 0.084863">
+                          <inertial pos="-0.00135257 -0.0237591 -0.000119669" quat="0.999361 -0.0160366 0.00591276 -0.0313859" mass="0.0138583" diaginertia="2.55338e-06 9.3995e-07 2.04399e-06"/>
+                          <joint name="left_two_joint" range="0 1.84" armature="0.1" limited="true"/>
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+        <body name="logo_link">
+          <inertial pos="-0.00306556 5.62503e-05 0.245265" quat="0.999977 -0.000722056 0.00228719 -0.00632623" mass="0.001" diaginertia="8.95487e-07 6.44935e-06 6.88624e-06"/>
+        </body>
+        <body name="right_shoulder_pitch_link" pos="-0.0025 -0.10396 0.25928" quat="0.990268 -0.139172 0 0">
+          <inertial pos="-0.001431 -0.048811 0.001304" quat="0.97214 0.140022 -0.16469 0.0906368" mass="0.713" diaginertia="0.000466421 0.000410999 0.000440181"/>
+          <joint name="right_shoulder_pitch_joint" range="-2.9671 2.7925" armature="0.1" axis="0 1 0" limited="true"/>
+          <body name="right_shoulder_roll_link" pos="-0.0025 -0.153946 0.273613">
+            <inertial pos="-0.003415 -0.006955 -0.064598" quat="0.999928 -0.00338303 0.011517 -0.000319462" mass="0.642" diaginertia="0.000616029 0.000683514 0.000372857"/>
+            <joint name="right_shoulder_roll_joint" range="-2.2515 1.5882" armature="0.1" axis="1 0 0" limited="true"/>
+            <body name="right_shoulder_yaw_link" pos="-0.00604 -0.160188 0.170413">
+              <inertial pos="0.000375 0.00444 -0.072374" quat="0.940427 0.0334272 -0.0194902 0.337786" mass="0.713" diaginertia="0.000964661 0.000977873 0.000379065"/>
+              <joint name="right_shoulder_yaw_joint" range="-2.618 2.618" armature="0.1" limited="true"/>
+              <body name="right_elbow_pitch_link" pos="-0.00604 -0.162078 0.084913">
+                <inertial pos="0.064497 -0.002873 0" quat="0.983402 -0.000162328 -1.44667e-05 0.18144" mass="0.601" diaginertia="0.00025371 0.00049549 0.0004712"/>
+                <joint name="right_elbow_pitch_joint" range="-0.2268 3.4208" armature="0.1" axis="0 1 0" limited="true"/>
+                <body name="right_elbow_roll_link" pos="0.09396 -0.162078 0.084913">
+                  <inertial pos="0.081811 -0.001454 0.001" quat="0.996277 -0.0840638 -0.0160999 -0.0102844" mass="0.227" diaginertia="0.00010804 0.000977534 0.000968326"/>
+                  <joint name="right_elbow_roll_joint" range="-2.0943 2.0943" armature="0.1" axis="1 0 0" limited="true"/>
+                  <body name="right_palm_link" pos="0.21396 -0.162078 0.084913">
+                    <inertial pos="0.0557842 -0.00148509 -0.000326701" quat="0.999676 0.000206426 0.00798934 -0.0241723" mass="0.28126" diaginertia="0.000176062 0.000311158 0.000189397"/>
+                    <body name="right_five_link" pos="0.29896 -0.166078 0.060963">
+                      <inertial pos="0.0362561 0.0015725 0.000269899" quat="0.996487 0.0836561 0.00228414 0.00302742" mass="0.0488469" diaginertia="3.8319e-06 8.91742e-06 8.64873e-06"/>
+                      <joint name="right_five_joint" range="-0.3 1.84" armature="0.1" limited="true"/>
+                      <body name="right_six_link" pos="0.34606 -0.162478 0.060963">
+                        <inertial pos="0.0237591 -0.00135257 0.000119669" quat="0.999361 0.00591275 0.0160366 -0.0313859" mass="0.0138583" diaginertia="9.3995e-07 2.55338e-06 2.04399e-06"/>
+                        <joint name="right_six_joint" range="0 1.84" armature="0.1" limited="true"/>
+                      </body>
+                    </body>
+                    <body name="right_three_link" pos="0.29896 -0.166078 0.108863">
+                      <inertial pos="0.0362561 0.0015725 0.000269899" quat="0.996487 0.0836561 0.00228414 0.00302742" mass="0.0488469" diaginertia="3.8319e-06 8.91742e-06 8.64873e-06"/>
+                      <joint name="right_three_joint" range="-0.3 1.84" armature="0.1" limited="true"/>
+                      <body name="right_four_link" pos="0.34606 -0.162478 0.108863">
+                        <inertial pos="0.0237591 -0.00135257 0.000119669" quat="0.999361 0.00591275 0.0160366 -0.0313859" mass="0.0138583" diaginertia="9.3995e-07 2.55338e-06 2.04399e-06"/>
+                        <joint name="right_four_joint" range="0 1.84" armature="0.1" limited="true"/>
+                      </body>
+                    </body>
+                    <body name="right_zero_link" pos="0.26396 -0.162078 0.084913">
+                      <inertial pos="-0.0260466 0.00877511 1.08605e-05" quat="0.978311 0.00398189 -0.00452538 0.207051" mass="0.0509893" diaginertia="7.23365e-06 4.58058e-06 8.68048e-06"/>
+                      <joint name="right_zero_joint" range="-0.523598 0.523598" armature="0.1" axis="0 1 0" limited="true"/>
+                      <body name="right_one_link" pos="0.237435 -0.143278 0.084863">
+                        <inertial pos="-0.00181538 0.0327057 -0.000185871" quat="0.98984 0.00243739 0.140057 0.0243994" mass="0.047762" diaginertia="8.03051e-06 3.65282e-06 7.8455e-06"/>
+                        <joint name="right_one_joint" range="-1.2 1" armature="0.1" limited="true"/>
+                        <body name="right_two_link" pos="0.237435 -0.100178 0.084863">
+                          <inertial pos="-0.00135257 0.0237591 -0.000119669" quat="0.999361 0.0160366 0.00591276 0.0313859" mass="0.0138583" diaginertia="2.55338e-06 9.3995e-07 2.04399e-06"/>
+                          <joint name="right_two_joint" range="-1.84 0" armature="0.1" limited="true"/>
+                        </body>
+                      </body>
+                    </body>
+                  </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <general name="left_hip_pitch_joint" joint="left_hip_pitch_joint" ctrlrange="-2.35 3.05" ctrllimited="true" forcelimited="true" forcerange="-88 88" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="left_hip_roll_joint" joint="left_hip_roll_joint" ctrlrange="-0.26 2.53" ctrllimited="true" forcelimited="true" forcerange="-88 88" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="left_hip_yaw_joint" joint="left_hip_yaw_joint" ctrlrange="-2.75 2.75" ctrllimited="true" forcelimited="true" forcerange="-88 88" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="left_knee_joint" joint="left_knee_joint" ctrlrange="-0.33489 2.5449" ctrllimited="true" forcelimited="true" forcerange="-139 139" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="left_ankle_pitch_joint" joint="left_ankle_pitch_joint" ctrlrange="-0.68 0.73" ctrllimited="true" forcelimited="true" forcerange="-40 40" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="left_ankle_roll_joint" joint="left_ankle_roll_joint" ctrlrange="-0.2618 0.2618" ctrllimited="true" forcelimited="true" forcerange="-40 40" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="right_hip_pitch_joint" joint="right_hip_pitch_joint" ctrlrange="-2.35 3.05" ctrllimited="true" forcelimited="true" forcerange="-88 88" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="right_hip_roll_joint" joint="right_hip_roll_joint" ctrlrange="-2.53 0.26" ctrllimited="true" forcelimited="true" forcerange="-88 88" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="right_hip_yaw_joint" joint="right_hip_yaw_joint" ctrlrange="-2.75 2.75" ctrllimited="true" forcelimited="true" forcerange="-88 88" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="right_knee_joint" joint="right_knee_joint" ctrlrange="-0.33489 2.5449" ctrllimited="true" forcelimited="true" forcerange="-139 139" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="right_ankle_pitch_joint" joint="right_ankle_pitch_joint" ctrlrange="-0.68 0.73" ctrllimited="true" forcelimited="true" forcerange="-40 40" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="right_ankle_roll_joint" joint="right_ankle_roll_joint" ctrlrange="-0.2618 0.2618" ctrllimited="true" forcelimited="true" forcerange="-40 40" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="torso_joint" joint="torso_joint" ctrlrange="-2.618 2.618" ctrllimited="true" forcelimited="true" forcerange="-88 88" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="left_shoulder_pitch_joint" joint="left_shoulder_pitch_joint" ctrlrange="-2.9671 2.7925" ctrllimited="true" forcelimited="true" forcerange="-21 21" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="left_shoulder_roll_joint" joint="left_shoulder_roll_joint" ctrlrange="-1.5882 2.2515" ctrllimited="true" forcelimited="true" forcerange="-21 21" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="left_shoulder_yaw_joint" joint="left_shoulder_yaw_joint" ctrlrange="-2.618 2.618" ctrllimited="true" forcelimited="true" forcerange="-21 21" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="left_elbow_pitch_joint" joint="left_elbow_pitch_joint" ctrlrange="-0.2268 3.4208" ctrllimited="true" forcelimited="true" forcerange="-21 21" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="left_elbow_roll_joint" joint="left_elbow_roll_joint" ctrlrange="-2.0943 2.0943" ctrllimited="true" forcelimited="true" forcerange="-21 21" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="left_five_joint" joint="left_five_joint" ctrlrange="-1.84 0.3" ctrllimited="true" forcelimited="true" forcerange="-0.7 0.7" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="left_six_joint" joint="left_six_joint" ctrlrange="-1.84 0" ctrllimited="true" forcelimited="true" forcerange="-0.7 0.7" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="left_three_joint" joint="left_three_joint" ctrlrange="-1.84 0.3" ctrllimited="true" forcelimited="true" forcerange="-0.7 0.7" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="left_four_joint" joint="left_four_joint" ctrlrange="-1.84 0" ctrllimited="true" forcelimited="true" forcerange="-0.7 0.7" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="left_zero_joint" joint="left_zero_joint" ctrlrange="-0.523598 0.523598" ctrllimited="true" forcelimited="true" forcerange="-0.7 0.7" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="left_one_joint" joint="left_one_joint" ctrlrange="-1 1.2" ctrllimited="true" forcelimited="true" forcerange="-0.7 0.7" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="left_two_joint" joint="left_two_joint" ctrlrange="0 1.84" ctrllimited="true" forcelimited="true" forcerange="-0.7 0.7" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="right_shoulder_pitch_joint" joint="right_shoulder_pitch_joint" ctrlrange="-2.9671 2.7925" ctrllimited="true" forcelimited="true" forcerange="-21 21" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="right_shoulder_roll_joint" joint="right_shoulder_roll_joint" ctrlrange="-2.2515 1.5882" ctrllimited="true" forcelimited="true" forcerange="-21 21" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="right_shoulder_yaw_joint" joint="right_shoulder_yaw_joint" ctrlrange="-2.618 2.618" ctrllimited="true" forcelimited="true" forcerange="-21 21" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="right_elbow_pitch_joint" joint="right_elbow_pitch_joint" ctrlrange="-0.2268 3.4208" ctrllimited="true" forcelimited="true" forcerange="-21 21" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="right_elbow_roll_joint" joint="right_elbow_roll_joint" ctrlrange="-2.0943 2.0943" ctrllimited="true" forcelimited="true" forcerange="-21 21" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="right_five_joint" joint="right_five_joint" ctrlrange="-0.3 1.84" ctrllimited="true" forcelimited="true" forcerange="-0.7 0.7" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="right_six_joint" joint="right_six_joint" ctrlrange="0 1.84" ctrllimited="true" forcelimited="true" forcerange="-0.7 0.7" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="right_three_joint" joint="right_three_joint" ctrlrange="-0.3 1.84" ctrllimited="true" forcelimited="true" forcerange="-0.7 0.7" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="right_four_joint" joint="right_four_joint" ctrlrange="0 1.84" ctrllimited="true" forcelimited="true" forcerange="-0.7 0.7" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="right_zero_joint" joint="right_zero_joint" ctrlrange="-0.523598 0.523598" ctrllimited="true" forcelimited="true" forcerange="-0.7 0.7" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="right_one_joint" joint="right_one_joint" ctrlrange="-1.2 1" ctrllimited="true" forcelimited="true" forcerange="-0.7 0.7" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+    <general name="right_two_joint" joint="right_two_joint" ctrlrange="-1.84 0" ctrllimited="true" forcelimited="true" forcerange="-0.7 0.7" biastype="affine" gainprm="5729.58" biasprm="0 -5729.58"/>
+  </actuator>
+</mujoco>

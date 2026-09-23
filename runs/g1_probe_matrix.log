@@ -1,0 +1,12 @@
+a: graph1 chunked128 cap8
+N=4096 graph of 1 substep, 8 launches in flight: ok
+N=4096 graph1: 77,239 env-steps/s at decimation 4 (53.0 ms per control step)
+b: graph1 nochunk cap8
+N=4096 graph of 1 substep, 8 launches in flight: ok
+N=4096 graph1: 77,377 env-steps/s at decimation 4 (52.9 ms per control step)
+c: simloop nochunk nocap
+N=4096 simloop ok
+d: simloop nochunk cap2
+N=4096 simloop ok
+e: simloop chunk200 cap64
+N=4096 simloop ok

@@ -1,0 +1,111 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth b0265e0 load on device 'metal:0' took 24.58 ms  (cached)
+Module _nxn_broadphase__locals__kernel_5779d1c3 5779d1c load on device 'metal:0' took 16.74 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_831c971f 831c971 load on device 'metal:0' took 24.02 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_09db2b3b 09db2b3 load on device 'metal:0' took 17.67 ms  (cached)
+Module mujoco_warp._src.constraint 0906c30 load on device 'metal:0' took 15.56 ms  (cached)
+Module _friction_dof__locals__kernel_a405224e a405224 load on device 'metal:0' took 15.65 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_408660c5 408660c load on device 'metal:0' took 15.62 ms  (cached)
+Module _efc_contact_init__locals__kernel_db746078 db74607 load on device 'metal:0' took 15.46 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_be98091c 8054500 load on device 'metal:0' took 15.90 ms  (cached)
+Module _efc_contact_update__locals__kernel_1875ddb9 1875ddb load on device 'metal:0' took 16.12 ms  (cached)
+Module mujoco_warp._src.forward c637ca1 load on device 'metal:0' took 21.41 ms  (cached)
+Module mujoco_warp._src.passive 3a9b5a9 load on device 'metal:0' took 20.37 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_2c1a9107 2c1a910 load on device 'metal:0' took 15.57 ms  (cached)
+Module mujoco_warp._src.forward 81888f6 load on device 'metal:0' took 21.17 ms  (cached)
+Module _qfrc_smooth__locals__kernel_44db645a 44db645 load on device 'metal:0' took 15.39 ms  (cached)
+Module mujoco_warp._src.support 4ab5275 load on device 'metal:0' took 15.73 ms  (cached)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_693a8c02 a3c81dc load on device 'metal:0' took 15.36 ms  (cached)
+Module _solve_init_dof__locals__kernel_095963fd 095963f load on device 'metal:0' took 15.36 ms  (cached)
+Module mujoco_warp._src.solver dcb061a load on device 'metal:0' took 16.36 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_4c7d77a5 4c7d77a load on device 'metal:0' took 15.48 ms  (cached)
+Module mul_m_kernel__locals___mul_m_fdbb785a fdbb785 load on device 'metal:0' took 15.44 ms  (cached)
+Module _update_constraint_efc__locals__kernel_b592f41a b592f41 load on device 'metal:0' took 15.39 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_4ba1b6ad 4ba1b6a load on device 'metal:0' took 15.30 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_c292bc65 c292bc6 load on device 'metal:0' took 15.07 ms  (cached)
+Module _update_gradient_grad__locals__kernel_da6e0168 da6e016 load on device 'metal:0' took 15.27 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_f5dbff08 66391f8 load on device 'metal:0' took 15.41 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_46ee5031 1615b98 load on device 'metal:0' took 15.36 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_0b26450c 79a9319 load on device 'metal:0' took 16.57 ms  (cached)
+Module _update_constraint_efc__locals__kernel_a2b5538a a2b5538 load on device 'metal:0' took 15.41 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_ac48d2c2 ac48d2c load on device 'metal:0' took 15.08 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_ebfb6c3e ebfb6c3 load on device 'metal:0' took 15.22 ms  (cached)
+Module _update_gradient_grad__locals__kernel_6984a1ac 6984a1a load on device 'metal:0' took 15.30 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_8c517879 2bf23d8 load on device 'metal:0' took 15.36 ms  (cached)
+Module _solve_done__locals__kernel_a81134f5 a81134f load on device 'metal:0' took 15.36 ms  (cached)
+Module mujoco_warp._src.sensor 3284bd3 load on device 'metal:0' took 24.82 ms  (cached)
+Module mujoco_warp._src.derivative 00a2ef6 load on device 'metal:0' took 18.06 ms  (cached)
+Module _next_time_builder__locals___next_time_3c13281d 3c13281 load on device 'metal:0' took 15.55 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_9bae3e0c 9bae3e0 load on device 'metal:0' took 15.37 ms  (cached)
+Module reset_data__locals__reset_M_6a889326 6a88932 load on device 'metal:0' took 15.19 ms  (cached)
+Module reset_data__locals__reset_mocap_20e3bb14 20e3bb1 load on device 'metal:0' took 15.33 ms  (cached)
+Module reset_data__locals__reset_contact_ed330077 ed33007 load on device 'metal:0' took 15.24 ms  (cached)
+Module reset_data__locals__reset_sleep_eeccf1c6 eeccf1c load on device 'metal:0' took 15.51 ms  (cached)
+Module reset_data__locals__reset_nworld_bc401cf8 bc401cf load on device 'metal:0' took 15.32 ms  (cached)
+Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
+Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
+Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
+Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
+Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
+Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/aditya/robosim/orchard/learn/g1_velocity.py", line 496, in <module>
+    r = benchmark_step(task, num_frames=100)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/orchard/learn/g1_velocity.py", line 478, in benchmark_step
+    step()
+  File "/Users/aditya/robosim/orchard/learn/g1_velocity.py", line 472, in step
+    task.sim.launch_step()
+  File "/Users/aditya/robosim/orchard/physics/batch.py", line 128, in launch_step
+    mjw.step(self.m, self.d)
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/forward.py", line 1825, in step
+    forward(m, d)
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/forward.py", line 1816, in forward
+    solver.solve(m, d)
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/solver.py", line 3641, in solve
+    _solve(m, d, ctx)
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/solver.py", line 3687, in _solve
+    _solver_iteration(m, d, ctx, nsolving, compact=compact)
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/solver.py", line 3497, in _solver_iteration
+    _linesearch(m, d, ctx)
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/solver.py", line 1535, in _linesearch
+    _mul_m_compact_aware(m, d, ctx, ctx.mv, ctx.search, skip)
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/solver.py", line 3790, in _mul_m_compact_aware
+    support.mul_m(m, d, res, vec, skip=skip)
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/support.py", line 251, in mul_m
+    wp.launch(
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12298, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11365, in invoke_metal
+    raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
+RuntimeError: Failed to launch kernel 'mul_m_kernel__locals___mul_m' on device 'metal:0': Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory) (arguments: M_mulm_rowadr=array_t, M_mulm_col=array_t, M_mulm_madr=array_t, M_in=array_t, vec=array_t, skip=array_t, res=array_t)
+G1 (flat): nbody 45 nv 43 nu 37 ngeom 4 obs_dim 123
+Module __main__ 2730aa8 load on device 'metal:0' took 101.01 ms  (compiled)
+Module orchard.learn.warp_policy e33445d load on device 'metal:0' took 16.45 ms  (cached)
+Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)

@@ -1,0 +1,11 @@
+N=4096 flat: physics only (4 substeps, graph) 60.9 ms/step -> 67,222 env-steps/s
+N=4096 flat: full env step (graph, synchronized) 89.7 ms -> 45,677 env-steps/s
+N=4096 flat: rollout with Warp policy inference ((256, 128, 128)), 24 steps: 2139 ms -> 45,954 env-steps/s (step + inference)
+N=4096 flat: PPO update (5 epochs x 4 minibatches) 239 ms -> full loop 41,340 env-steps/s
+N=2048 flat: physics only (4 substeps, graph) 34.5 ms/step -> 59,419 env-steps/s
+N=2048 flat: full env step (graph, synchronized) 52.6 ms -> 38,903 env-steps/s
+N=2048 flat: rollout with Warp policy inference ((256, 128, 128)), 24 steps: 1256 ms -> 39,142 env-steps/s (step + inference)
+N=2048 flat: PPO update (5 epochs x 4 minibatches) 260 ms -> full loop 32,418 env-steps/s
+warp._src.codegen.WarpCodegenError: Error while parsing function "g1_reward_done" at /Users/aditya/robosim/orchard/learn/g1_velocity.py:298:
+;Error mutating a constant blown inside a dynamic loop, use the following syntax: pi = float(3.141) to declare a dynamic variable
+=== DONE6
