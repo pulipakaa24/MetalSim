@@ -1,0 +1,91 @@
+{
+ "machine": "Apple M4 Max (40-core GPU)",
+ "hardware": {
+  "fp32_tflops": 18.4,
+  "bandwidth_gbs": 546
+ },
+ "rows": [
+  {
+   "workload": "physics SO-101 lift",
+   "N": 64,
+   "value": 45750.572779296424,
+   "unit": "steps/s",
+   "bound": "fp32",
+   "normalized": 2486.4441727878493
+  },
+  {
+   "workload": "physics SO-101 lift",
+   "N": 256,
+   "value": 155879.78076100443,
+   "unit": "steps/s",
+   "bound": "fp32",
+   "normalized": 8471.72721527198
+  },
+  {
+   "workload": "physics SO-101 lift",
+   "N": 1024,
+   "value": 372168.6429968974,
+   "unit": "steps/s",
+   "bound": "fp32",
+   "normalized": 20226.556684613992
+  },
+  {
+   "workload": "physics SO-101 lift",
+   "N": 4096,
+   "value": 541292.7621824107,
+   "unit": "steps/s",
+   "bound": "fp32",
+   "normalized": 29418.084901217975
+  },
+  {
+   "workload": "render tier-0 primitives 64px",
+   "N": 64,
+   "value": 405673.08486206364,
+   "unit": "env-frames/s",
+   "bound": "fp32",
+   "normalized": 22047.45026424259
+  },
+  {
+   "workload": "render tier-0 primitives 64px",
+   "N": 1024,
+   "value": 705256.0167760303,
+   "unit": "env-frames/s",
+   "bound": "fp32",
+   "normalized": 38329.13134652339
+  },
+  {
+   "workload": "render tier-0 primitives 128px",
+   "N": 64,
+   "value": 336757.91565489647,
+   "unit": "env-frames/s",
+   "bound": "fp32",
+   "normalized": 18302.06063341829
+  },
+  {
+   "workload": "render tier-0 primitives 128px",
+   "N": 1024,
+   "value": 451156.47396245657,
+   "unit": "env-frames/s",
+   "bound": "fp32",
+   "normalized": 24519.37358491612
+  },
+  {
+   "workload": "render tier-0 SO-101 (2000 faces/mesh LOD) 128px",
+   "N": 64,
+   "value": 64922.000184493445,
+   "unit": "env-frames/s",
+   "bound": "fp32",
+   "normalized": 3528.369575244209
+  },
+  {
+   "workload": "render tier-0 SO-101 (2000 faces/mesh LOD) 64px",
+   "N": 1024,
+   "value": 89963.30739268185,
+   "unit": "env-frames/s",
+   "bound": "fp32",
+   "normalized": 4889.3101843848835
+  }
+ ],
+ "torch": "2.14.0",
+ "warp": "1.18.0.dev20260917"
+}

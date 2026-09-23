@@ -281,3 +281,53 @@ Two lessons recorded: (1) the initial "no learning" was my MJCF (rail capsule ov
 box, so contact forces pinned the cart: 100 N moved it 2 mm in MuJoCo C as well) — Isaac's
 cartpole has no collisions; (2) rsl_rl's adaptive-KL learning-rate schedule is part of the config
 and is needed for the published iteration counts.
+
+## Benchmark suite (uncontended, measured 2026-09-22, `orchard.bench.suite`)
+
+Raw throughput and the plan's compute-normalized figure (per TFLOPS FP32; M4 Max 40-core = 18.4
+TFLOPS vendor peak). Tier-0 rendering here includes the shadow-map pass and full light loop.
+
+| workload | N | raw | per TFLOPS |
+|---|---|---|---|
+| physics SO-101 lift (BatchSim, ICB replay, njmax 512) | 64 | 45,751 steps/s | 2,486 |
+| | 256 | 155,880 | 8,472 |
+| | 1024 | 372,169 | 20,227 |
+| | 4096 | 541,293 | 29,418 |
+| render tier-0 primitives 64 px | 64 | 405,673 env-frames/s | 22,047 |
+| | 1024 | 705,256 | 38,329 |
+| render tier-0 primitives 128 px | 64 | 336,758 | 18,302 |
+| | 1024 | 451,156 | 24,519 |
+| render tier-0 SO-101 (2000-face LOD) 128 px | 64 | 64,922 | 3,528 |
+| render tier-0 SO-101 (2000-face LOD) 64 px | 1024 | 89,963 | 4,889 |
+
+Reference points (reported, other hardware): MuJoCo Playground CartpoleBalance on an A100
+(19.5 TFLOPS) 718,626 steps/s = 36,853 per TFLOPS; MuJoCo Warp render benchmark on an RTX 4090
+(82.6 TFLOPS) 522,101 steps/s = 6,321 per TFLOPS; Isaac Lab Cartpole-RGB 1024 envs on a 4090
+50K steps/s = 605 per TFLOPS (physics + tiled RTX render).
+
+## Headline comparisons against Isaac Lab's published numbers (measured, uncontended)
+
+| task | this stack (M4 Max, 18.4 TFLOPS) | Isaac Lab (RTX 4090, 82.6 TFLOPS), published | per-TFLOPS ratio |
+|---|---|---|---|
+| Cartpole-RGB 100×100, 1024 envs, physics + tiled render + reward/reset | 48,056 steps/s | 50,000 (step only) | 4.3× |
+| Cartpole state, 4096 envs, rollout only (physics + policy in Warp + reward/reset) | 1,236,013 steps/s | 910,000 (step + inference) | 6.1× |
+| Cartpole state, 4096 envs, full PPO training loop | 544,402 steps/s | 510,000 (step + inference + train) | 4.8× |
+| Cartpole state, 1024 envs, full PPO training loop | 113,089 steps/s | – | – |
+
+Reading under the plan's principle: at matched task, resolution and batch size the stack delivers
+Isaac Lab's throughput class on a laptop chip with 4.5× less peak FP32; the normalized figures
+exceed Isaac's, which is the expected consequence of a purpose-built batched renderer and a
+rollout with no per-step host or framework launches. The Isaac numbers are NVIDIA's published
+figures, not re-measured here; the tasks are equivalents (MJCF cartpole, same reward/reset/camera
+spec), not the same USD asset.
+
+Torch-driven per-step envs (`SO101LiftEnv`, `CartpoleRGBEnv`) are bounded by the per-step launch
+floor (~60K steps/s at N=1024 for the state-only cartpole); the Warp-rollout path removes it.
+
+## SO-101 lift acceptance run (measured)
+
+Baseline PPO config (SB3's: 64 envs, 64 steps, batch 512, 8 epochs, gamma 0.9, ent 0.005), 3M
+steps on the GPU stack: 29.3 min at 1,707 env-steps/s; episode return 15.7 → 127 (reach reward
+saturating), success rate 0.0 at 3M steps. The published baseline mentions a 25M-step, ~4 h run
+and does not report a success rate; an SB3 run of the original pipeline on the reconstructed
+scene (`runs/sb3_baseline/`) is queued for an equal-budget comparison.
