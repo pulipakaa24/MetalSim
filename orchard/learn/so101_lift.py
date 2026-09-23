@@ -148,6 +148,7 @@ class SO101LiftEnv:
             cs[:, 4:7] = mf * pos_delta + (1 - mf) * cs[:, 4:7]
             cs[:, 8:12] = mf * rot + (1 - mf) * cs[:, 8:12]
             cs[:, 12:15] = mf * light + (1 - mf) * cs[:, 12:15]
+            cs[:, 15] = 1.0                       # the DR light is on (adds to the model lights, casts the shadow)
         # bookkeeping
         self.t = torch.where(mask, torch.zeros_like(self.t), self.t)
         self.held = torch.where(mask, torch.zeros_like(self.held), self.held)

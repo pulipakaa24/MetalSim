@@ -40,8 +40,9 @@ class RenderOutputs:
 class Tier0Renderer:
     def __init__(self, model: mujoco.MjModel, n_envs: int, *, width=128, height=128, camera: str | int | None = None,
                  max_group=3, include_planes=True, backgrounds=False, outputs=("rgb",), seg_mode=SEG_SLOT,
-                 decimate_faces: int = 0, ctx: MetalContext | None = None, device="metal:0"):
+                 decimate_faces: int = 0, shadows: bool = True, ctx: MetalContext | None = None, device="metal:0"):
         self.m = model
+        self.shadows = shadows
         self.n = n_envs
         self.tw, self.th = width, height
         self.tpr = int(np.ceil(np.sqrt(n_envs)))
@@ -82,7 +83,7 @@ class Tier0Renderer:
         self.slot_geom = c.buffer(4 * self.G, np.asarray(t.geoms, np.int32), "slot_geom")
         self.mat_buf = c.buffer(t.materials.nbytes, t.materials, "materials")
         self.sem_buf = c.buffer(t.semantic.nbytes, t.semantic, "semantic")
-        self.env_buf = c.buffer(self.n * 7 * 16 + self.n * 64, label="env_params")
+        self.env_buf = c.buffer(self.n * (2 * 64 + 8 * 16), label="env_params")
         # per-env camera spec (host-written); defaults: model camera, no delta, white light from above
         # CameraSpec layout (28 floats = 112 bytes): intrinsics 0:4, pos_delta 4:8, rot_delta 8:12,
         # light 12:16 (w intensity), ambient 16:20 (w background mode), clear_color 20:24, cam_id 24 (int)
@@ -90,8 +91,8 @@ class Tier0Renderer:
         self.cam_spec_i = self.cam_spec.view(np.int32)
         self.cam_spec[:, 0:4] = (self.intrinsics.fx, self.intrinsics.fy, self.intrinsics.cx, self.intrinsics.cy)
         self.cam_spec[:, 8:12] = (1, 0, 0, 0)
-        self.cam_spec[:, 12:16] = (0.3, 0.3, -0.9, 1.0)
-        self.cam_spec[:, 16:20] = (0.35, 0.35, 0.35, 1.0 if self.use_bg else 0.0)
+        self.cam_spec[:, 12:16] = (0.0, 0.0, 0.0, 0.0)   # DR light off: light the scene with the model's lights
+        self.cam_spec[:, 16:20] = (1.0, 1.0, 1.0, 1.0 if self.use_bg else 0.0)   # ambient scale
         self.cam_spec[:, 20:24] = (0.0, 0.0, 0.0, 1.0)
         self.cam_spec_i[:, 24] = self.cam_id
         self._cam_spec_wp = wp.array(self.cam_spec, dtype=wp.float32, device=self.device)
@@ -103,9 +104,20 @@ class Tier0Renderer:
         self.t_colors = tb.mps_tensor(self._colors_wp)          # (N, G, 4) float32, GPU-writable
         self.color_buf = wm.buffer_of(self._colors_wp).buffer
         wp.synchronize_device(self.device)
+        # lights and scene params (headlight, bounds)
+        self.n_light = self.m.nlight
+        self.light_buf = c.buffer(t.lights.nbytes, t.lights, "lights")
+        self.params_buf = c.buffer(t.params.nbytes, t.params, "scene_params")
+        # shadow atlas: one tile per env, twice the render tile, atlas capped at 4096
+        st = min(2 * max(self.tw, self.th), max(16, 4096 // self.tpr))
+        self.sw = self.sh = int(st)
+        self.saw = self.tpr * self.sw
+        self.sah = int(np.ceil(self.n / self.tpr)) * self.sh
         # consts
+        flags = (1 if self.use_bg else 0) | (2 if self.shadows else 0)
         self.consts = np.array([self.n, self.m.ngeom, self.G, self.tpr, self.tw, self.th, self.aw, self.ah,
-                                max(self.m.ncam, 1), self.bg_layers, 1 if self.use_bg else 0, 0], np.uint32)
+                                max(self.m.ncam, 1), self.bg_layers, flags, max(self.n_light, 1),
+                                self.sw, self.sh, self.saw, self.sah], np.uint32)
         self.consts_buf = c.buffer(self.consts.nbytes, self.consts, "consts")
         # textures
         ai = t.atlas.image
@@ -119,13 +131,27 @@ class Tier0Renderer:
         self.seg_tex = c.texture2d(self.aw, self.ah, Metal.MTLPixelFormatR32Uint, rt, label="seg")
         self.normal_tex = c.texture2d(self.aw, self.ah, Metal.MTLPixelFormatRGBA16Float, rt, label="normal")
         self.depth_tex = c.texture2d(self.aw, self.ah, Metal.MTLPixelFormatDepth32Float, rt, label="depth")
+        self.shadow_tex = c.texture2d(self.saw, self.sah, Metal.MTLPixelFormatDepth32Float, rt, label="shadow")
         self.samp = c.sampler(linear=True, repeat=True)
         self.samp_bg = c.sampler(linear=True, repeat=False)
+        sd = Metal.MTLSamplerDescriptor.new()
+        sd.setMinFilter_(Metal.MTLSamplerMinMagFilterLinear); sd.setMagFilter_(Metal.MTLSamplerMinMagFilterLinear)
+        sd.setCompareFunction_(Metal.MTLCompareFunctionLessEqual)
+        sd.setSAddressMode_(Metal.MTLSamplerAddressModeClampToEdge); sd.setTAddressMode_(Metal.MTLSamplerAddressModeClampToEdge)
+        self.samp_shadow = c.device.newSamplerStateWithDescriptor_(sd)
         # host-path camera buffers (cam_xpos/cam_xmat) and geom buffers are bound from the sim in the GPU path
         self._host_cam_xpos = c.buffer(self.n * max(self.m.ncam, 1) * 12, label="host_cam_xpos")
         self._host_cam_xmat = c.buffer(self.n * max(self.m.ncam, 1) * 36, label="host_cam_xmat")
         self._host_geom_xpos = c.buffer(self.n * self.m.ngeom * 12, label="host_geom_xpos")
         self._host_geom_xmat = c.buffer(self.n * self.m.ngeom * 36, label="host_geom_xmat")
+        nl = max(self.n_light, 1)
+        self._host_light_xpos = c.buffer(self.n * nl * 12, label="host_light_xpos")
+        self._host_light_xdir = c.buffer(self.n * nl * 12, label="host_light_xdir")
+        # default light state for the host path: model light positions/directions
+        lp = np.zeros((self.n, nl, 3), np.float32); ld = np.zeros((self.n, nl, 3), np.float32); ld[:, :, 2] = -1
+        for i in range(self.m.nlight):
+            lp[:, i] = self.m.light_pos[i]; ld[:, i] = self.m.light_dir[i]
+        c.write_buffer(self._host_light_xpos, lp); c.write_buffer(self._host_light_xdir, ld)
 
     def _build_pipelines(self):
         c = self.ctx
@@ -159,6 +185,12 @@ class Tier0Renderer:
 
         self.geo_pipe, self.geo_ds = make("geom_vs", "geom_fs", True, Metal.MTLCompareFunctionLess, True)
         self.bg_pipe, self.bg_ds = make("bg_vs", "bg_fs", False, Metal.MTLCompareFunctionAlways, False)
+        d = Metal.MTLRenderPipelineDescriptor.new()
+        d.setVertexFunction_(lib.newFunctionWithName_("shadow_vs"))
+        d.setVertexDescriptor_(vd)
+        d.setDepthAttachmentPixelFormat_(Metal.MTLPixelFormatDepth32Float)
+        self.shadow_pipe = c.render_pipeline(d)
+        self.shadow_ds = self.geo_ds
 
     def _alloc_outputs(self, outputs):
         """Output tensors live in Warp arrays on metal:0 so that they are simultaneously Warp arrays,
@@ -192,11 +224,14 @@ class Tier0Renderer:
         wp.synchronize_device(self.device)
 
     def set_lights(self, dirs: np.ndarray, intensity=1.0):
+        """Per-env domain-randomization directional light (adds to the model lights and becomes the
+        shadow caster). intensity 0 disables it."""
         self.cam_spec[:, 12:15] = np.asarray(dirs, np.float32)
         self.cam_spec[:, 15] = intensity
         self._sync_cam_spec()
 
     def set_ambient(self, rgb: np.ndarray):
+        """Per-env scale on the model's ambient light (1 = as authored)."""
         self.cam_spec[:, 16:19] = np.asarray(rgb, np.float32)
         self._sync_cam_spec()
 
@@ -232,9 +267,12 @@ class Tier0Renderer:
 
     # -- rendering ----------------------------------------------------------------------------------
 
-    def _encode(self, cb, geom_xpos, geom_xpos_off, geom_xmat, geom_xmat_off, cam_xpos, cam_xpos_off, cam_xmat, cam_xmat_off):
+    def _encode(self, cb, geom_xpos, geom_xpos_off, geom_xmat, geom_xmat_off, cam_xpos, cam_xpos_off, cam_xmat, cam_xmat_off,
+                light_xpos=None, light_xpos_off=0, light_xdir=None, light_xdir_off=0):
         c = self.ctx
-        # 1. per-env params from the camera state
+        if light_xpos is None:
+            light_xpos, light_xpos_off, light_xdir, light_xdir_off = self._host_light_xpos, 0, self._host_light_xdir, 0
+        # 1. per-env params from the camera and light state
         ce = cb.computeCommandEncoder()
         ce.setComputePipelineState_(self.p_env)
         ce.setBuffer_offset_atIndex_(self.env_buf, 0, 0)
@@ -242,8 +280,34 @@ class Tier0Renderer:
         ce.setBuffer_offset_atIndex_(cam_xpos, cam_xpos_off, 2)
         ce.setBuffer_offset_atIndex_(cam_xmat, cam_xmat_off, 3)
         ce.setBuffer_offset_atIndex_(self.consts_buf, 0, 4)
+        ce.setBuffer_offset_atIndex_(self.light_buf, 0, 5)
+        ce.setBuffer_offset_atIndex_(light_xdir, light_xdir_off, 6)
+        ce.setBuffer_offset_atIndex_(self.params_buf, 0, 7)
         ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n, 1, 1), Metal.MTLSize(min(self.n, 64), 1, 1))
         ce.endEncoding()
+        # 1b. shadow pass: depth from the caster light into the shadow atlas
+        if self.shadows:
+            sp = Metal.MTLRenderPassDescriptor.new()
+            da = sp.depthAttachment()
+            da.setTexture_(self.shadow_tex); da.setLoadAction_(Metal.MTLLoadActionClear)
+            da.setStoreAction_(Metal.MTLStoreActionStore); da.setClearDepth_(1.0)
+            se = cb.renderCommandEncoderWithDescriptor_(sp)
+            se.setRenderPipelineState_(self.shadow_pipe)
+            se.setDepthStencilState_(self.shadow_ds)
+            se.setCullMode_(Metal.MTLCullModeNone)
+            se.setDepthBias_slopeScale_clamp_(2.0, 2.0, 0.02)
+            se.setVertexBuffer_offset_atIndex_(self.vbuf, 0, 0)
+            se.setVertexBuffer_offset_atIndex_(self.env_buf, 0, 1)
+            se.setVertexBuffer_offset_atIndex_(self.inst_buf, 0, 2)
+            se.setVertexBuffer_offset_atIndex_(self.slot_geom, 0, 3)
+            se.setVertexBuffer_offset_atIndex_(geom_xpos, geom_xpos_off, 4)
+            se.setVertexBuffer_offset_atIndex_(geom_xmat, geom_xmat_off, 5)
+            se.setVertexBuffer_offset_atIndex_(self.color_buf, 0, 6)
+            se.setVertexBuffer_offset_atIndex_(self.consts_buf, 0, 7)
+            for i_off, i_count, first, count in self.tables.draws:
+                se.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_instanceCount_baseVertex_baseInstance_(
+                    Metal.MTLPrimitiveTypeTriangle, i_count, Metal.MTLIndexTypeUInt32, self.ibuf, i_off * 4, count, 0, first)
+            se.endEncoding()
         # 2. render pass
         rp = Metal.MTLRenderPassDescriptor.new()
         for i, (tex, clear) in enumerate(((self.color_tex, (0, 0, 0, 1)), (self.seg_tex, (0, 0, 0, 0)),
@@ -285,8 +349,14 @@ class Tier0Renderer:
         re.setFragmentBuffer_offset_atIndex_(self.sem_buf, 0, 3)
         re.setFragmentBuffer_offset_atIndex_(self.color_buf, 0, 4)
         re.setFragmentBuffer_offset_atIndex_(self.consts_buf, 0, 5)
+        re.setFragmentBuffer_offset_atIndex_(self.light_buf, 0, 6)
+        re.setFragmentBuffer_offset_atIndex_(light_xpos, light_xpos_off, 7)
+        re.setFragmentBuffer_offset_atIndex_(light_xdir, light_xdir_off, 8)
+        re.setFragmentBuffer_offset_atIndex_(self.params_buf, 0, 9)
         re.setFragmentTexture_atIndex_(self.atlas_tex, 0)
+        re.setFragmentTexture_atIndex_(self.shadow_tex, 2)
         re.setFragmentSamplerState_atIndex_(self.samp, 0)
+        re.setFragmentSamplerState_atIndex_(self.samp_shadow, 1)
         for i_off, i_count, first, count in self.tables.draws:
             re.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_instanceCount_baseVertex_baseInstance_(
                 Metal.MTLPrimitiveTypeTriangle, i_count, Metal.MTLIndexTypeUInt32, self.ibuf, i_off * 4, count, 0, first)
@@ -315,12 +385,15 @@ class Tier0Renderer:
         returns that value. Nothing synchronizes the host."""
         if after_value is None:
             after_value = sim.event.value
-        views = {name: wm.buffer_of(getattr(sim.d, name)) for name in ("geom_xpos", "geom_xmat", "cam_xpos", "cam_xmat")}
+        names = ["geom_xpos", "geom_xmat", "cam_xpos", "cam_xmat"] + (["light_xpos", "light_xdir"] if self.n_light else [])
+        views = {name: wm.buffer_of(getattr(sim.d, name)) for name in names}
         cb = self.ctx.command_buffer()
         self.ctx.wait_for(cb, sim.event, after_value)
+        lx = views.get("light_xpos"); ld = views.get("light_xdir")
         self._encode(cb, views["geom_xpos"].buffer, views["geom_xpos"].offset, views["geom_xmat"].buffer,
                      views["geom_xmat"].offset, views["cam_xpos"].buffer, views["cam_xpos"].offset,
-                     views["cam_xmat"].buffer, views["cam_xmat"].offset)
+                     views["cam_xmat"].buffer, views["cam_xmat"].offset,
+                     lx.buffer if lx else None, lx.offset if lx else 0, ld.buffer if ld else None, ld.offset if ld else 0)
         v = self.ctx.signal(cb)
         self.ctx.commit(cb)
         return v
@@ -352,6 +425,9 @@ class Tier0Renderer:
         c = self.ctx
         c.write_buffer(self._host_geom_xpos, gx); c.write_buffer(self._host_geom_xmat, gm)
         c.write_buffer(self._host_cam_xpos, cx); c.write_buffer(self._host_cam_xmat, cm)
+        if self.m.nlight:
+            c.write_buffer(self._host_light_xpos, np.stack([d.light_xpos for d in datas]).astype(np.float32).reshape(n, -1, 3))
+            c.write_buffer(self._host_light_xdir, np.stack([d.light_xdir for d in datas]).astype(np.float32).reshape(n, -1, 3))
         cb = c.command_buffer()
         self._encode(cb, self._host_geom_xpos, 0, self._host_geom_xmat, 0, self._host_cam_xpos, 0, self._host_cam_xmat, 0)
         c.commit(cb)

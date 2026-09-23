@@ -172,3 +172,18 @@ convex-hull mesh approximation), UsdPreviewSurface materials with textures writt
 UsdSemantics labels, cameras with physical intrinsics, lights, and `mjc:` attributes for lossless
 round trip. `tests/test_scene_usd.py` checks the SO-101 scene. Not yet: USD → MuJoCo Warp load
 path, URDF import, MaterialX graphs.
+
+### Tier-0 lighting: model lights, headlight, shadow maps (measured)
+
+The renderer now lights with the model's light list (directional/point/spot, positions and
+directions read per env from MuJoCo Warp `light_xpos/light_xdir`, so body-mounted lights move),
+MuJoCo's headlight and ambient, an optional per-env DR directional light, and a tiled shadow
+map (orthographic, one caster per env, 2×2 PCF). MuJoCo/OpenGL light intensities are converted
+to radiance (×π) so the energy-conserving BRDF reproduces MuJoCo's brightness.
+
+Image-level comparison with `mujoco.Renderer` on the SO-101 scene at 256 px
+(`orchard.bench.render_fidelity`): PSNR 19.1 dB, FLIP 0.318, mean intensity 88.6 vs 88.6
+(before the calibration: 13.4 dB, 0.62, 43 vs 89). The residual is shading-model difference by
+design (GGX vs Phong, and MuJoCo's planar floor reflection, which tier 1 provides through ray
+tracing); Isaac's own image thresholds (PSNR ≥ 25 / SSIM ≥ 0.9) apply to tier 1 vs Isaac RTX,
+not to tier 0 vs MuJoCo. Parity tests (silhouette, depth, segmentation, texture) unchanged.

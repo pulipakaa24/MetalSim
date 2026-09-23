@@ -183,6 +183,32 @@ class CameraIntrinsics:
         return P
 
 
+def build_lights(m: mujoco.MjModel) -> np.ndarray:
+    """(nlight, 20) float32 per model light: type (0 dir, 1 point, 2 spot), castshadow, cutoff(deg),
+    exponent | diffuse rgb, _ | specular rgb, _ | ambient rgb, _ | attenuation xyz, bodyid."""
+    L = np.zeros((max(m.nlight, 1), 20), np.float32)
+    for i in range(m.nlight):
+        lt = int(m.light_type[i]) if hasattr(m, "light_type") else (0 if m.light_directional[i] else 2)
+        # mjLIGHT_SPOT=0, DIRECTIONAL=1, POINT=2, IMAGE=3 in MuJoCo >= 3.3
+        kind = {1: 0, 2: 1, 0: 2}.get(lt, 0)
+        L[i, 0:4] = (kind, float(m.light_castshadow[i]), float(m.light_cutoff[i]), float(m.light_exponent[i]))
+        L[i, 4:7] = m.light_diffuse[i]
+        L[i, 8:11] = m.light_specular[i]
+        L[i, 12:15] = m.light_ambient[i]
+        L[i, 16:19] = m.light_attenuation[i]
+        L[i, 19] = float(m.light_bodyid[i])
+    return L
+
+
+def scene_params(m: mujoco.MjModel) -> np.ndarray:
+    """(4, 4) float32: bounds center+radius | headlight ambient | headlight diffuse | headlight specular + active."""
+    hl = m.vis.headlight
+    P = np.zeros((4, 4), np.float32)
+    P[0, :3] = m.stat.center; P[0, 3] = max(float(m.stat.extent), 0.1)
+    P[1, :3] = hl.ambient; P[2, :3] = hl.diffuse; P[3, :3] = hl.specular; P[3, 3] = float(hl.active)
+    return P
+
+
 @dataclass
 class SceneTables:
     # geometry
@@ -200,6 +226,8 @@ class SceneTables:
     semantic: np.ndarray        # (G, 4) int32: model geom id, body id, root body id, geom group
     # static (world-frame) flags: geoms whose pose never changes (bodyid 0)
     static_geom: np.ndarray     # (G,) bool
+    lights: np.ndarray          # (max(nlight,1), 20) float32, see build_lights
+    params: np.ndarray          # (4, 4) float32, see scene_params
     n_envs: int
     G: int
 
@@ -416,7 +444,7 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
         static[slot] = body == 0
     return SceneTables(vertices=inter, indices=indices, meshes=meshes, geoms=geoms, geom_mesh=geom_mesh,
                        draws=draws, inst_table=inst_table, materials=mats, atlas=atlas, semantic=semantic,
-                       static_geom=static, n_envs=n_envs, G=G)
+                       static_geom=static, lights=build_lights(m), params=scene_params(m), n_envs=n_envs, G=G)
 
 
 def quats_to_mats(q: np.ndarray) -> np.ndarray:
