@@ -175,3 +175,33 @@ def test_reset_and_forward_ordering():
     assert np.allclose(qn[::2, 0], 0.5) and not np.allclose(qn[1::2, 0], 0.5)
     assert np.allclose(qn[::2, 1:6], model.qpos0[1:6], atol=1e-6)     # reset to qpos0
     assert not np.allclose(xpos[0], xpos[1], atol=1e-4)                # forward ran: kinematics differ
+
+
+def test_per_world_model_fields():
+    """Physics DR: per-world body_mass and geom_friction as writable tensors that change dynamics."""
+    from orchard.physics.batch import BatchSim, BatchSimOptions
+    model = mujoco.MjModel.from_xml_string("""
+    <mujoco><option timestep="0.002"/><worldbody>
+      <geom type="plane" size="2 2 0.1"/>
+      <body name="b" pos="0 0 0.5"><freejoint/><geom name="g" type="box" size="0.05 0.05 0.05" mass="1"/></body>
+    </worldbody><actuator/></mujoco>""")
+    n = 8
+    sim = BatchSim(model, n, options=BatchSimOptions(per_world_fields=("body_mass", "geom_friction"), njmax=64))
+    sim.synchronize()
+    assert tuple(sim.tm.body_mass.shape) == (n, model.nbody)
+    b = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, "b")
+    # push every body sideways with an external force via a torch write to xfrc_applied; heavier worlds move less
+    masses = torch.linspace(0.5, 4.0, n, device="mps")
+    sim.tm.body_mass[:, b] = masses
+    torch.mps.synchronize()
+    sim.recompute_constants()
+    sim.synchronize()
+    f = sim.t.xfrc_applied
+    f[:, b, 0] = 2.0   # 2 N along +x
+    torch.mps.synchronize()
+    for _ in range(50):
+        sim.step()
+    sim.synchronize()
+    v = sim.d.qvel.numpy()[:, 0]
+    # a = F/m before friction dominates: velocity should decrease monotonically with mass
+    assert np.all(np.diff(v) < 0) and v[0] > 3 * v[-1], v

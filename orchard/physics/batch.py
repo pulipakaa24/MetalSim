@@ -64,6 +64,10 @@ class BatchSimOptions:
     solver_iterations: int | None = None
     ls_iterations: int | None = None
     warn_overflow: bool = False       # MuJoCo Warp prints on solver overflow; off for RL loops
+    # Model fields given a per-world leading dimension (physics domain randomization): e.g.
+    # ("body_mass", "geom_friction", "dof_damping", "actuator_gainprm"). They become (N, ...) tensors
+    # in ``sim.tm`` that torch can write per env; call ``sim.recompute_constants()`` after mass changes.
+    per_world_fields: tuple = ()
     extra: dict = field(default_factory=dict)
 
 
@@ -78,7 +82,8 @@ class BatchSim:
         mjd = mujoco.MjData(model)
         mujoco.mj_forward(model, mjd)
         with wp.ScopedDevice(self.device):
-            self.m = mjw.put_model(model)
+            batch_sizes = {f: num_envs for f in self.opt.per_world_fields} or None
+            self.m = mjw.put_model(model, batch_sizes=batch_sizes)
             if self.is_metal:
                 # conditional graph nodes read the loop condition back on the host per iteration on Metal
                 self.m.opt.graph_conditional = False
@@ -152,6 +157,13 @@ class BatchSim:
 
     def synchronize(self) -> None:
         wp.synchronize_device(self.device)
+
+    def recompute_constants(self, level: str = "set_const") -> int:
+        """After per-world changes to masses/inertias (``set_const``), qpos0/armature (``set_const_0``)
+        or gravcomp (``set_const_fixed``); launched on the Warp queue, returns the completion value."""
+        with wp.ScopedDevice(self.device):
+            getattr(mjw, level)(self.m, self.d)
+        return self._signal()
 
     def overflow_flags(self) -> dict[str, int]:
         """Per-flag count of worlds whose overflow bit is set (synchronizes). Use in tests and at

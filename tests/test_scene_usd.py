@@ -86,3 +86,35 @@ def test_usd_round_trip_to_mujoco(tmp_path):
     a0 = mujoco.mj_name2id(m0, mujoco.mjtObj.mjOBJ_ACTUATOR, "shoulder_pan"); a1 = mujoco.mj_name2id(m1, mujoco.mjtObj.mjOBJ_ACTUATOR, "shoulder_pan")
     np.testing.assert_allclose(m1.actuator_biasprm[a1][:3], m0.actuator_biasprm[a0][:3], rtol=1e-4)
     np.testing.assert_allclose(m1.actuator_forcerange[a1], m0.actuator_forcerange[a0], rtol=1e-5)
+
+
+def test_urdf_import_to_usd(tmp_path):
+    """URDF -> USD through MuJoCo's URDF loader (MjSpec handles URDF), same physics mapping."""
+    urdf = tmp_path / "arm.urdf"
+    urdf.write_text("""<?xml version="1.0"?>
+<robot name="arm2">
+  <link name="base"><inertial><mass value="1.0"/><inertia ixx="0.01" iyy="0.01" izz="0.01" ixy="0" ixz="0" iyz="0"/></inertial>
+    <visual><geometry><box size="0.1 0.1 0.1"/></geometry></visual><collision><geometry><box size="0.1 0.1 0.1"/></geometry></collision></link>
+  <link name="link1"><inertial><origin xyz="0 0 0.15"/><mass value="0.5"/><inertia ixx="0.005" iyy="0.005" izz="0.001" ixy="0" ixz="0" iyz="0"/></inertial>
+    <visual><origin xyz="0 0 0.15"/><geometry><cylinder radius="0.02" length="0.3"/></geometry></visual></link>
+  <link name="link2"><inertial><origin xyz="0 0 0.1"/><mass value="0.3"/><inertia ixx="0.002" iyy="0.002" izz="0.0005" ixy="0" ixz="0" iyz="0"/></inertial>
+    <visual><origin xyz="0 0 0.1"/><geometry><cylinder radius="0.015" length="0.2"/></geometry></visual></link>
+  <joint name="j1" type="revolute"><parent link="base"/><child link="link1"/><origin xyz="0 0 0.05"/><axis xyz="0 1 0"/>
+    <limit lower="-1.57" upper="1.57" effort="10" velocity="2"/><dynamics damping="0.1" friction="0.05"/></joint>
+  <joint name="j2" type="revolute"><parent link="link1"/><child link="link2"/><origin xyz="0 0 0.3"/><axis xyz="0 1 0"/>
+    <limit lower="-2.0" upper="2.0" effort="5" velocity="2"/></joint>
+</robot>""")
+    from pxr import Usd, UsdPhysics
+    from orchard.scene.usd_to_mjcf import load_usd
+    out = str(tmp_path / "arm.usda")
+    r = import_mjcf(str(urdf), out)
+    st = Usd.Stage.Open(out)
+    joints = [p for p in st.Traverse() if p.IsA(UsdPhysics.RevoluteJoint)]
+    assert len(joints) == 2 and len(r.body_paths) - 1 == 2   # MuJoCo attaches the URDF root link to the world
+    j1 = next(p for p in joints if p.GetPath().name == "j1")
+    assert abs(UsdPhysics.RevoluteJoint(j1).GetUpperLimitAttr().Get() - np.rad2deg(1.57)) < 1e-3
+    assert abs(j1.GetAttribute("mjc:damping").Get() - 0.1) < 1e-6 and abs(j1.GetAttribute("mjc:frictionloss").Get() - 0.05) < 1e-6
+    m1 = load_usd(out, lossless=False).compile()
+    m0 = mujoco.MjModel.from_xml_path(str(urdf))
+    assert (m1.nbody, m1.njnt) == (m0.nbody, m0.njnt)
+    np.testing.assert_allclose(sorted(m1.body_mass), sorted(m0.body_mass), atol=1e-6)

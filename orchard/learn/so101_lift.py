@@ -46,6 +46,7 @@ class LiftConfig:
     njmax: int = 512                 # constraint rows per world; see BatchSimOptions.njmax
     nconmax: int | None = None
     warn_overflow: bool = False
+    physics_dr: bool = True          # per-world box mass (0.7-1.4x) and friction (0.7-1.3x), as the baseline
 
 
 class SO101LiftEnv:
@@ -61,7 +62,9 @@ class SO101LiftEnv:
         self.model = mujoco.MjModel.from_xml_path(SCENE)
         m = self.model
         substeps = max(1, int(round(self.cfg.ctrl_dt / m.opt.timestep)))
-        self.sim = BatchSim(m, self.n, options=BatchSimOptions(substeps=substeps, njmax=self.cfg.njmax, nconmax=self.cfg.nconmax, warn_overflow=self.cfg.warn_overflow))
+        self.sim = BatchSim(m, self.n, options=BatchSimOptions(
+            substeps=substeps, njmax=self.cfg.njmax, nconmax=self.cfg.nconmax, warn_overflow=self.cfg.warn_overflow,
+            per_world_fields=("body_mass", "geom_friction") if self.cfg.physics_dr else ()))
         self.rend = None
         if self.cfg.render:
             self.rend = Tier0Renderer(m, self.n, width=self.cfg.tile, height=self.cfg.tile, camera="base_cam",
@@ -85,6 +88,9 @@ class SO101LiftEnv:
         self.tcp_local = _TCP_LOCAL.to(self.dev)
         if self.rend is not None:
             self.box_slot = self.rend.tables.geoms.index(mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_GEOM, "box"))
+        self.box_geom = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_GEOM, "box")
+        self.mass0 = float(m.body_mass[self.box_body])
+        self.fric0 = torch.as_tensor(m.geom_friction[self.box_geom], dtype=torch.float32, device=self.dev)
         # episode state on the GPU
         z = lambda *s, dtype=torch.float32: torch.zeros(*s, dtype=dtype, device=self.dev)
         self.t = z(self.n, dtype=torch.int32)
@@ -134,6 +140,10 @@ class SO101LiftEnv:
         q[:, a:a + 3] = mf * box + (1 - mf) * q[:, a:a + 3]
         q[:, a + 3:a + 7] = mf * quat + (1 - mf) * q[:, a + 3:a + 7]
         q[:, self.arm_qadr[:5]] = mf * arm + (1 - mf) * q[:, self.arm_qadr[:5]]
+        if self.cfg.physics_dr:   # per-world model fields (physics DR), then mass-derived constants
+            bm = self.sim.tm.body_mass; gf = self.sim.tm.geom_friction
+            bm[:, self.box_body] = mask.float() * self.mass0 * u(0.7, 1.4, n) + (1 - mask.float()) * bm[:, self.box_body]
+            gf[:, self.box_geom] = mf * self.fric0 * u(0.7, 1.3, n, 1) + (1 - mf) * gf[:, self.box_geom]
         if self.rend is not None:
             c = self.rend.t_colors
             base = u(0.1, 0.95, n, 1, 3)
@@ -188,6 +198,8 @@ class SO101LiftEnv:
         self.sim.after(v)
         self._randomize(mask)
         self._learner_done()
+        if self.cfg.physics_dr:
+            self.sim.recompute_constants()
         v = self.sim.forward()
         self._render(v)
         self.sim.after(v)
@@ -226,6 +238,8 @@ class SO101LiftEnv:
         self.sim.after(vres)
         self._randomize(done)
         self._learner_done()
+        if self.cfg.physics_dr:
+            self.sim.recompute_constants()
         vf = self.sim.forward()
         self._render(vf)
         self.sim.after(vf)
