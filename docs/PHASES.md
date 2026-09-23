@@ -44,9 +44,9 @@ follow-up (deformables are a later workstream).
 
 ### Interop (WS3), measured
 
-- Added to the Warp Metal runtime (fork branch `orchard-interop`): device/queue/buffer
+- Added to the Warp Metal runtime (fork branch `metalsim`): device/queue/buffer
   handles, foreign event wait and signal.
-- `orchard.interop`: zero-copy MPS tensors over Warp arrays (DLPack `kDLMetal` and
+- `metalsim.interop`: zero-copy MPS tensors over Warp arrays (DLPack `kDLMetal` and
   `at::from_blob`), event wait/signal on torch's command buffer.
 - `tests/test_interop.py`: 11 tests pass, including proofs that waits hold the GPU and
   double-buffered producer/consumer ordering in both directions with no host sync in the loop.
@@ -58,7 +58,7 @@ aliased buffer must be ordered after them (event or sync), otherwise the memset 
 ### Remaining for Phase 1
 
 - Batched environment on MuJoCo Warp with graph-captured substeps, obs/action tensors aliased
-  to MPS, event-ordered handoff (`orchard.physics`).
+  to MPS, event-ordered handoff (`metalsim.physics`).
 - Trajectory parity test vs CPU MuJoCo on SO-101 and Menagerie robots at MJWarp tolerances.
 - "Zero host copies per step" conformance: without Instruments, verify by host-time scaling
   (host time per step must not grow with GPU work).
@@ -83,7 +83,7 @@ kernels in MuJoCo Warp itself (upstream work), not this stack.
 
 ## Phase 3 (started early): tier-0 renderer on native Metal — in progress
 
-`orchard.render.tier0`: PyObjC + MSL, one command buffer per batch (env-params kernel, background
+`metalsim.render.tier0`: PyObjC + MSL, one command buffer per batch (env-params kernel, background
 quads, one instanced indexed draw per unique mesh, untile kernel into learner buffers). Instance
 transforms and cameras are read from MuJoCo Warp's `geom_xpos/geom_xmat/cam_xpos/cam_xmat` (no
 host pack step; body-mounted cameras work). Geometry is clipped to its tile with vertex clip
@@ -96,7 +96,7 @@ Parity vs `mujoco.Renderer` (`tests/test_render_tier0.py`, measured): silhouette
 
 Render-only throughput, primitives scene (mjbatch-metal's `bench.py` scene and grid), measured:
 
-| N | res | orchard tier-0 (env-frames/s) | mjbatch-metal sync / pipelined (published) |
+| N | res | metalsim tier-0 (env-frames/s) | mjbatch-metal sync / pipelined (published) |
 |---|---|---|---|
 | 64 | 64 | 582,830 | 21,438 / – |
 | 1024 | 64 | 782,976 | 44,259 / 72,731 |
@@ -114,7 +114,7 @@ published 8.4K sync / 19K pipelined for the same scene. Physics+render at N=64/1
 steps/s (render-bound). Mesh decimation levels of detail are the remedy; see below.
 
 Levels of detail (measured): welded quadric decimation with a vertex-clustering fallback
-(`decimate_faces`). SO-101 arm scene, `orchard.bench.render_bench assets/so101/scene_box_rl.xml 2000`:
+(`decimate_faces`). SO-101 arm scene, `metalsim.bench.render_bench assets/so101/scene_box_rl.xml 2000`:
 
 | triangles / env | N | res | render-only env-frames/s | physics (1 substep) + render steps/s |
 |---|---|---|---|---|
@@ -135,7 +135,7 @@ Symptom: the GPU SO-101 lift env produced NaN rewards after ~100 steps; pure MuJ
 Metal (no torch) diverged too, Warp CPU did not; 64 identical worlds diverged in a different
 subset each run. Diagnosis path: solver-variant sweep (Newton+elliptic NaN; CG or pyramidal
 clean), block-size sweep (barrier type irrelevant), atomic-add micro-test (correct), then a
-cross-world consistency tool (`orchard.tools.race_finder`: every launch followed by a check
+cross-world consistency tool (`metalsim.tools.race_finder`: every launch followed by a check
 that identical worlds stay identical) which flagged `d.overflow` and `d.efc.id` right after
 collision. Overflow flags: **NEFC** — MuJoCo Warp's default of 64 constraint rows per world
 overflows with the SO-101 gripper's condim-6 contacts; rows are dropped in atomic order, so
@@ -146,9 +146,9 @@ Upstream note: MuJoCo Warp should saturate rather than NaN on NEFC overflow (to 
 
 ### Learner path status (measured)
 
-`orchard.learn.so101_lift.SO101LiftEnv` (GPU task: MuJoCo Warp physics, tier-0 render at
+`metalsim.learn.so101_lift.SO101LiftEnv` (GPU task: MuJoCo Warp physics, tier-0 render at
 128 px, reward/termination/reset/visual DR in torch on MPS; no tensor leaves the GPU) and
-`orchard.learn.ppo.PPO` (pixels + proprioception, NatureCNN). N=64:
+`metalsim.learn.ppo.PPO` (pixels + proprioception, NatureCNN). N=64:
 
 | quantity | value |
 |---|---|
@@ -166,7 +166,7 @@ shared across worlds unless expanded (`expand_model_fields` in mjlab); logged as
 
 ### Scene layer (WS1) started
 
-`orchard.scene.mjcf_to_usd`: MJCF → USD with UsdPhysics (rigid bodies, mass, revolute/prismatic/
+`metalsim.scene.mjcf_to_usd`: MJCF → USD with UsdPhysics (rigid bodies, mass, revolute/prismatic/
 spherical joints with limits and drives from actuators, articulation roots, collision APIs with
 convex-hull mesh approximation), UsdPreviewSurface materials with textures written as PNG,
 UsdSemantics labels, cameras with physical intrinsics, lights, and `mjc:` attributes for lossless
@@ -182,7 +182,7 @@ map (orthographic, one caster per env, 2×2 PCF). MuJoCo/OpenGL light intensitie
 to radiance (×π) so the energy-conserving BRDF reproduces MuJoCo's brightness.
 
 Image-level comparison with `mujoco.Renderer` on the SO-101 scene at 256 px
-(`orchard.bench.render_fidelity`): PSNR 19.1 dB, FLIP 0.318, mean intensity 88.6 vs 88.6
+(`metalsim.bench.render_fidelity`): PSNR 19.1 dB, FLIP 0.318, mean intensity 88.6 vs 88.6
 (before the calibration: 13.4 dB, 0.62, 43 vs 89). The residual is shading-model difference by
 design (GGX vs Phong, and MuJoCo's planar floor reflection, which tier 1 provides through ray
 tracing); Isaac's own image thresholds (PSNR ≥ 25 / SSIM ≥ 0.9) apply to tier 1 vs Isaac RTX,
@@ -190,7 +190,7 @@ not to tier 0 vs MuJoCo. Parity tests (silhouette, depth, segmentation, texture)
 
 ## WS5 sensors on Metal ray tracing — started (measured)
 
-`orchard.sensors.raytrace.RayTracer`: one `MTLPrimitiveAccelerationStructure` per unique mesh
+`metalsim.sensors.raytrace.RayTracer`: one `MTLPrimitiveAccelerationStructure` per unique mesh
 (shared vertex/index buffers with the rasterizer), an instance descriptor buffer refit each frame
 by a compute kernel from `geom_xpos/geom_xmat`, and one instance acceleration structure rebuilt
 per frame for all envs, spatially separated by a grid offset larger than scene extent + max range
@@ -234,7 +234,7 @@ MetalFX temporal denoise/upscale, area lights, one-bounce diffuse GI, motion vec
 
 ### Rollout policy in Warp (WS7), measured
 
-`orchard.learn.warp_policy.WarpMLPPolicy`: rsl_rl-style actor-critic MLP evaluated by Warp
+`metalsim.learn.warp_policy.WarpMLPPolicy`: rsl_rl-style actor-critic MLP evaluated by Warp
 kernels on the simulator's queue; torch parameters are re-homed onto Warp memory (zero-copy both
 ways), so the optimizer updates weights in place. Actions, log-probs and values are stored in
 Warp rollout buffers at a device-side step index, which lets one captured graph (observation
@@ -253,7 +253,7 @@ T=64, measured while a PPO training run shared the GPU:
 | per TFLOPS FP32 (M4 Max 18.4) | ~14,000 |
 
 Isaac Lab Cartpole-Direct step+inference on an RTX 4090, 4096 envs (published): 910K steps/s,
-~11,000 per TFLOPS. Uncontended and at N=4096 numbers to follow from `orchard.bench.suite`.
+~11,000 per TFLOPS. Uncontended and at N=4096 numbers to follow from `metalsim.bench.suite`.
 
 Lesson: without GPU-side loop conditions, MuJoCo Warp on Metal runs a model's full `iterations`
 budget (MuJoCo's default 100 Newton iterations turned a 2-DOF cartpole substep into 1,081
@@ -262,7 +262,7 @@ iteration counts.
 
 ### RL reproducibility: Isaac Lab Cartpole config on the Warp rollout path (measured)
 
-`orchard.learn.ppo_warp` with rsl_rl's Cartpole config (4096 envs, 16 steps/env, 5 epochs × 4
+`metalsim.learn.ppo_warp` with rsl_rl's Cartpole config (4096 envs, 16 steps/env, 5 epochs × 4
 minibatches, MLP 32×32 ELU, lr 1e-3 with the adaptive-KL schedule at desired_kl 0.01, gamma
 0.99, lambda 0.95, entropy 0.005) on the MJCF cartpole with Isaac's reward and reset terms:
 
@@ -282,7 +282,7 @@ box, so contact forces pinned the cart: 100 N moved it 2 mm in MuJoCo C as well)
 cartpole has no collisions; (2) rsl_rl's adaptive-KL learning-rate schedule is part of the config
 and is needed for the published iteration counts.
 
-## Benchmark suite (uncontended, measured 2026-09-22, `orchard.bench.suite`)
+## Benchmark suite (uncontended, measured 2026-09-22, `metalsim.bench.suite`)
 
 Raw throughput and the plan's compute-normalized figure (per TFLOPS FP32; M4 Max 40-core = 18.4
 TFLOPS vendor peak). Tier-0 rendering here includes the shadow-map pass and full light loop.
@@ -399,7 +399,7 @@ rollout, recovered). A non-finite state now terminates and resets the episode an
 
 ### Tier 2 path tracer (measured)
 
-`orchard.render.tier2` over `shaders/pathtrace.metal`: progressive accumulation, next-event
+`metalsim.render.tier2` over `shaders/pathtrace.metal`: progressive accumulation, next-event
 estimation for MuJoCo lights and the DR light, MuJoCo headlight on the primary hit, Lambert + GGX
 with mixture-pdf sampling, Russian roulette after 3 bounces, sky/clear-colour misses, rgb/depth/seg/
 normal outputs, GPU path ordered against `BatchSim` by events. `tests/test_render_tier2.py`:

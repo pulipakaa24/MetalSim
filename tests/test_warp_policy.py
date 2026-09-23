@@ -7,8 +7,8 @@ import pytest
 import torch
 import warp as wp
 
-from orchard.interop import warp_metal as wm
-from orchard.learn.warp_policy import ActorCriticMLP, WarpMLPPolicy
+from metalsim.interop import warp_metal as wm
+from metalsim.learn.warp_policy import ActorCriticMLP, WarpMLPPolicy
 
 pytestmark = pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal")
 
@@ -55,9 +55,9 @@ def test_parity_with_torch_and_shared_weights():
 def test_rollout_without_torch_launches():
     """Cartpole (state obs): one captured graph per step (obs gather, Warp policy, buffer store,
     physics), replayed T times; torch touches nothing until the rollout boundary."""
-    from orchard.learn.cartpole_rgb import CARTPOLE_XML
-    from orchard.learn.warp_policy import RolloutBuffers
-    from orchard.physics.batch import BatchSim, BatchSimOptions
+    from metalsim.learn.cartpole_rgb import CARTPOLE_XML
+    from metalsim.learn.warp_policy import RolloutBuffers
+    from metalsim.physics.batch import BatchSim, BatchSimOptions
     import mujoco
     torch.manual_seed(0)
     n, T = 1024, 64

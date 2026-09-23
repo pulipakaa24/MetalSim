@@ -6,8 +6,8 @@ import pytest
 import torch
 import warp as wp
 
-from orchard.learn.terrain import HeightScanner, isaac_rough_terrain
-from orchard.physics.batch import BatchSim
+from metalsim.learn.terrain import HeightScanner, isaac_rough_terrain
+from metalsim.physics.batch import BatchSim
 
 pytestmark = pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal")
 
@@ -68,7 +68,7 @@ def test_height_scan_matches_mj_ray():
 
 
 def test_g1_rough_task_runs():
-    from orchard.learn.g1_velocity import G1VelocityTask, benchmark_step
+    from metalsim.learn.g1_velocity import G1VelocityTask, benchmark_step
     task = G1VelocityTask(16, terrain="rough")
     assert task.obs_dim == 12 + 3 * 37 + 187
     r = benchmark_step(task, num_frames=10, warmup=2)
@@ -87,7 +87,7 @@ def test_hfield_mesh_contacts_match_mujoco_c():
     must point up (z > 0), penetrations must stay below 1 cm, and the batched physics must not launch
     the robot (pelvis within 5 cm of MuJoCo C after 0.5 s)."""
     import mujoco
-    from orchard.learn.g1_velocity import G1VelocityTask
+    from metalsim.learn.g1_velocity import G1VelocityTask
     task = G1VelocityTask(4, terrain="rough", seed=0); m = task.model
     task.reset_all()
     org = task.origins.numpy()

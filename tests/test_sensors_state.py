@@ -6,7 +6,7 @@ import pytest
 import torch
 import warp as wp
 
-from orchard.physics.batch import BatchSim, BatchSimOptions
+from metalsim.physics.batch import BatchSim, BatchSimOptions
 
 pytestmark = pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal")
 

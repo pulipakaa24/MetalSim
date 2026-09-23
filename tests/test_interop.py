@@ -6,8 +6,8 @@ import pytest
 import torch
 import warp as wp
 
-from orchard.interop import torch_bridge as tb
-from orchard.interop import warp_metal as wm
+from metalsim.interop import torch_bridge as tb
+from metalsim.interop import warp_metal as wm
 
 pytestmark = pytest.mark.skipif(not wp.is_metal_available() or not torch.backends.mps.is_available(),
                                 reason="needs Metal Warp and torch MPS")

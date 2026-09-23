@@ -9,7 +9,7 @@ import pytest
 import torch
 import warp as wp
 
-from orchard.render.tier0 import Tier0Renderer, SEG_GEOM
+from metalsim.render.tier0 import Tier0Renderer, SEG_GEOM
 
 pytestmark = pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal")
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -155,8 +155,8 @@ def test_batch_and_so101_visual():
 
 def test_gpu_path_with_batchsim_no_host_sync():
     """Physics -> render -> torch read, ordered by events; outputs are zero-copy MPS tensors."""
-    from orchard.physics.batch import BatchSim, BatchSimOptions
-    from orchard.interop import warp_metal as wm
+    from metalsim.physics.batch import BatchSim, BatchSimOptions
+    from metalsim.interop import warp_metal as wm
     model = mujoco.MjModel.from_xml_path(SO101)
     n = 64
     sim = BatchSim(model, n, options=BatchSimOptions(substeps=4))
