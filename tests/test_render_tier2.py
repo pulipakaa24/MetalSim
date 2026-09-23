@@ -9,8 +9,8 @@ import pytest
 import torch
 import warp as wp
 
-from orchard.render.tier0 import Tier0Renderer
-from orchard.render.tier2 import Tier2Renderer
+from metalsim.render.tier0 import Tier0Renderer
+from metalsim.render.tier2 import Tier2Renderer
 
 pytestmark = pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal")
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -143,7 +143,7 @@ def test_direct_light_matches_tier0():
 
 
 def test_gpu_path_from_batchsim_matches_host():
-    from orchard.physics.batch import BatchSim
+    from metalsim.physics.batch import BatchSim
     model = mujoco.MjModel.from_xml_string(PRIMS)
     n = 4
     sim = BatchSim(model, n)
@@ -165,7 +165,7 @@ def test_gpu_path_from_batchsim_matches_host():
 
 def test_cartpole_rgb_rollout_tier2():
     """A full env rollout (physics + path-traced 100x100 observations + reward/reset) at tier 2."""
-    from orchard.learn.cartpole_rgb import CartpoleRGBEnv, CartpoleRGBConfig
+    from metalsim.learn.cartpole_rgb import CartpoleRGBEnv, CartpoleRGBConfig
     env = CartpoleRGBEnv(CartpoleRGBConfig(num_envs=32, tier=2, spp=2, max_bounces=2))
     obs = env.reset()
     a = torch.zeros(32, 1, device="mps")

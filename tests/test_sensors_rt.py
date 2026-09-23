@@ -8,7 +8,7 @@ import pytest
 import torch
 import warp as wp
 
-from orchard.sensors.raytrace import RayTracer
+from metalsim.sensors.raytrace import RayTracer
 
 pytestmark = pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal")
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -81,7 +81,7 @@ def test_lidar_vs_mujoco_ray():
 
 
 def test_raycast_depth_vs_raster_depth():
-    from orchard.render.tier0 import Tier0Renderer
+    from metalsim.render.tier0 import Tier0Renderer
     model = mujoco.MjModel.from_xml_path(SO101)
     n = 8
     rt = RayTracer(model, n, decimate_faces=0)
@@ -106,8 +106,8 @@ def test_raycast_depth_vs_raster_depth():
 
 
 def test_gpu_path_ordering_with_sim():
-    from orchard.physics.batch import BatchSim, BatchSimOptions
-    from orchard.interop import warp_metal as wm
+    from metalsim.physics.batch import BatchSim, BatchSimOptions
+    from metalsim.interop import warp_metal as wm
     model = mujoco.MjModel.from_xml_string(LIDAR_SCENE)
     n = 16
     sim = BatchSim(model, n, options=BatchSimOptions(substeps=2))
@@ -120,7 +120,7 @@ def test_gpu_path_ordering_with_sim():
         vs = sim.step()
         vr = rt.trace(sim, [lidar], vs)
         sim.wait(rt.event, vr)
-        import orchard.interop.torch_bridge as tb
+        import metalsim.interop.torch_bridge as tb
         tb.wait_event(rt.event, vr)
         ranges.append(lidar.out["range"].clone())
     torch.mps.synchronize()

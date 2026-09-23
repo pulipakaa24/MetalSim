@@ -8,9 +8,9 @@ import pytest
 import torch
 import warp as wp
 
-from orchard.physics.batch import BatchSim, BatchSimOptions
-from orchard.render.tier0 import Tier0Renderer, SEG_SLOT
-from orchard.replicator import Annotators, BasicWriter, CocoWriter, KittiWriter, Randomizer
+from metalsim.physics.batch import BatchSim, BatchSimOptions
+from metalsim.render.tier0 import Tier0Renderer, SEG_SLOT
+from metalsim.replicator import Annotators, BasicWriter, CocoWriter, KittiWriter, Randomizer
 
 pytestmark = pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal")
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -29,8 +29,8 @@ def test_randomize_annotate_write(tmp_path):
     sim.synchronize()
     v = sim.forward()
     # randomization is torch work: order the render after it, then annotate
-    import orchard.interop.torch_bridge as tb
-    from orchard.interop import warp_metal as wm
+    import metalsim.interop.torch_bridge as tb
+    from metalsim.interop import warp_metal as wm
     ev = wm.SharedEvent("metal:0", "rep-test"); tb.signal_event(ev, 1); sim.wait(ev, 1)
     v = sim.forward()
     vr = rend.render(sim, v); rend.after(vr)

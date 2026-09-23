@@ -12,7 +12,7 @@ import numpy as np
 import pytest
 import warp as wp
 
-from orchard.learn.g1_velocity import ACTUATORS, INIT_JOINTS, INIT_POS, PHYSICS_DT, build_g1_model
+from metalsim.learn.g1_velocity import ACTUATORS, INIT_JOINTS, INIT_POS, PHYSICS_DT, build_g1_model
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 USD = os.path.join(ROOT, "assets", "isaac", "G1", "g1_minimal.usd")
@@ -188,7 +188,7 @@ def test_warp_matches_mujoco_c_under_pd_hold():
     """The batched Metal simulation reproduces MuJoCo C step by step on this asset (same solver
     budget): pelvis height and joint angles agree to MuJoCo Warp's tolerance over 100 steps of a
     PD hold at the initial pose (the robot pitches forward under Isaac's 20 Nm/rad ankle gains)."""
-    from orchard.learn.g1_velocity import G1VelocityTask
+    from metalsim.learn.g1_velocity import G1VelocityTask
     task = G1VelocityTask(4, terrain="flat")
     m = task.model
     import torch

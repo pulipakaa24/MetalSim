@@ -8,7 +8,7 @@ import pytest
 import torch
 import warp as wp
 
-from orchard.physics.batch import BatchSim, BatchSimOptions
+from metalsim.physics.batch import BatchSim, BatchSimOptions
 
 pytestmark = pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal")
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -121,7 +121,7 @@ def test_trajectory_parity_so101_arm_joints():
 def test_step_does_not_block_host():
     """The rollout loop never waits for the GPU: runtime counters show zero host syncs and host ops,
     and host time per step does not scale with the GPU work."""
-    from orchard.interop import warp_metal as wm
+    from metalsim.interop import warp_metal as wm
     model = mujoco.MjModel.from_xml_path(SO101)
     times = {}
     for n in (64, 2048):
@@ -163,8 +163,8 @@ def test_reset_and_forward_ordering():
     sim.after(v)
     q = sim.t.qpos
     q[::2, 0] = 0.5                      # randomize one joint on the reset worlds (torch, ordered after reset)
-    import orchard.interop.torch_bridge as tb
-    from orchard.interop import warp_metal as wm
+    import metalsim.interop.torch_bridge as tb
+    from metalsim.interop import warp_metal as wm
     ev = wm.SharedEvent("metal:0", "test-reset")
     tb.signal_event(ev, 1)
     sim.wait(ev, 1)
@@ -179,7 +179,7 @@ def test_reset_and_forward_ordering():
 
 def test_per_world_model_fields():
     """Physics DR: per-world body_mass and geom_friction as writable tensors that change dynamics."""
-    from orchard.physics.batch import BatchSim, BatchSimOptions
+    from metalsim.physics.batch import BatchSim, BatchSimOptions
     model = mujoco.MjModel.from_xml_string("""
     <mujoco><option timestep="0.002"/><worldbody>
       <geom type="plane" size="2 2 0.1"/>

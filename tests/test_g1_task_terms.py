@@ -6,7 +6,7 @@ import pytest
 import torch
 import warp as wp
 
-from orchard.learn.g1_velocity import G1VelocityTask, ACTION_SCALE, CONTROL_DT, benchmark_step
+from metalsim.learn.g1_velocity import G1VelocityTask, ACTION_SCALE, CONTROL_DT, benchmark_step
 
 pytestmark = pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal")
 
@@ -23,7 +23,7 @@ def test_reward_terms_match_isaac_formulas():
     task = G1VelocityTask(n, terrain="flat", seed=1)
     benchmark_step(task, num_frames=6, warmup=0)     # random actions
     # one more control step by hand, stopping before the command update so cmd is what the reward saw
-    from orchard.learn.warp_policy import RolloutBuffers, bump
+    from metalsim.learn.warp_policy import RolloutBuffers, bump
     class _Pol:
         step_idx = wp.zeros(1, dtype=int, device="metal:0")
     pol = _Pol(); wp.launch(bump, dim=1, inputs=[pol.step_idx], device="metal:0")

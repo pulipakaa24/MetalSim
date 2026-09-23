@@ -24,13 +24,13 @@ published benchmark. Neither is cited as physics parity evidence.
 | WS | plan item | state |
 |---|---|---|
 | WS1 scene layer | USD with UsdPhysics/UsdShade/UsdSemantics; MJCF and URDF importers; compile to device tables; round-trip export | MJCF/URDF→USD and USD→MuJoCo (lossless and generic UsdPhysics) importers; proven on a real Isaac asset (G1: joint frames, masses, colliders, gravity/COM sentinels). Not yet: MaterialX graphs, Hydra/usdview. |
-| WS2 GPU physics | MuJoCo Warp on Metal, graph capture, collision audit, deformables later | innate-inc Warp fork (branch `orchard-interop`) with ICB graph replay; MuJoCo Warp suite 1447/1450 on Metal; per-world model fields; parity vs MuJoCo C on SO-101, Panda, Go1, G1. Backend fix this round: frees released per completed command buffer (eager loops at 4096 worlds exhausted GPU memory). |
+| WS2 GPU physics | MuJoCo Warp on Metal, graph capture, collision audit, deformables later | innate-inc Warp fork (branch `metalsim`) with ICB graph replay; MuJoCo Warp suite 1447/1450 on Metal; per-world model fields; parity vs MuJoCo C on SO-101, Panda, Go1, G1. Backend fix this round: frees released per completed command buffer (eager loops at 4096 worlds exhausted GPU memory). |
 | WS3 interop | zero-copy MPS tensors, event ordering, conformance test | Done: DLPack `kDLMetal` / `from_blob` paths, MTLSharedEvent ordering across Warp/render/torch queues, runtime counters as the no-host-sync instrument. |
 | WS4 renderer | tier 0 raster; tier 1 hybrid RT + denoise + MetalFX; tier 2 path tracer; MaterialX | Tier 0 (parity vs `mujoco.Renderer`: IoU 0.99, depth 0.1 mm, texture corr 0.996); tier 1 (RT soft shadows, AO, reflections); **tier 2 path tracer done**: analytic Lambertian 0.4000 exact, furnace 0.498/0.5, 1/√spp convergence, 43 dB vs tier 0 direct light, full Cartpole-RGB rollouts at tiers 1 and 2. Not yet: denoiser, MetalFX upscale, MaterialX. |
 | WS5 sensors | lidar/radar/cameras/IMU/contact on shared BVH | Metal RT acceleration structures refit from physics; lidar vs `mj_ray` < 2 mm; ray depth == raster depth; Isaac-style height scanner on terrain (Warp heightfield kernel, exact vs `mj_ray`); IMU/contact/joint sensors as tensors. Not yet: beam divergence, multi-return, radar-lite. |
 | WS6 data generation | randomizers, annotators, COCO/KITTI writers | Done. |
 | WS7 learner | zero-copy obs/actions, rollout policy in Warp, PPO tuning, profiler | Warp MLP rollout policy with whole-rollout graph replay; rsl_rl KL schedule; Isaac's G1 PPO config wired (`g1_ppo_config`); pixel PPO on MPS. Not yet: clipped value loss, CNN policy in Warp. |
-| WS8 tooling | viewer, debugging, profiling, benchmark suite | Benchmark suite, fidelity benchmark, race finder, gallery, Isaac-protocol G1 benchmark (`orchard.learn.g1_velocity`). Not yet: usdview/Storm viewer, powermetrics. |
+| WS8 tooling | viewer, debugging, profiling, benchmark suite | Benchmark suite, fidelity benchmark, race finder, gallery, Isaac-protocol G1 benchmark (`metalsim.learn.g1_velocity`). Not yet: usdview/Storm viewer, powermetrics. |
 | WS9 ROS 2 / HIL | network bridge | Not started. |
 
 ## Acceptance tests (plan §2.3)
@@ -58,7 +58,7 @@ published benchmark. Neither is cited as physics parity evidence.
 
 ## Judgement calls made (to confirm)
 
-1. Product/package name `orchard`; workspace `~/robosim`.
+1. Product/package name `metalsim`; workspace `~/robosim`.
 2. MuJoCo Warp solver budget on the G1 taken from MuJoCo Warp's own G1 benchmark (10/20,
    `implicitfast`, eulerdamp off), `njmax` 256; Metal cannot exit the Newton loop early.
 3. Rough terrain re-implemented from Isaac's config (same layout/mix/ranges, not the same random

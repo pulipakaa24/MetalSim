@@ -17,9 +17,9 @@ comparison was not on the same asset, or a setting favours us, the row says so.
 
 Isaac Lab publishes step / step+inference / step+train throughput for this task at 4096 envs
 (`benchmark_non_rl.py` protocol: uniform random actions in [-1, 1], 100 frames, wall time per
-`env.step`). Our task is `orchard.learn.g1_velocity` built from `assets/isaac/G1/g1_minimal.usd`,
+`env.step`). Our task is `metalsim.learn.g1_velocity` built from `assets/isaac/G1/g1_minimal.usd`,
 the file Isaac Lab loads for the task (44 rigid bodies, 37 revolute joints, three convex colliders),
-loaded through `orchard.scene.usd_to_mjcf`.
+loaded through `metalsim.scene.usd_to_mjcf`.
 
 ### 1.1 Asset and physics model
 
@@ -46,13 +46,13 @@ loaded through `orchard.scene.usd_to_mjcf`.
 | Terminations: time out; `illegal_contact` torso force > 1 N | same | `tests/test_g1_parity.py::test_warp_matches_mujoco_c_under_pd_hold` (torso contact ends the episode) | pass | confirmed |
 | Commands: lin x ∈ [0, 1], lin y ∈ [−1, 1], heading command (stiffness 0.5), resample 10 s, 2 % standing | same | `g1_commands` kernel (not unit-tested separately; the term test reads its output) | – | equivalent by construction |
 | Reset: base xy ±0.5 m, yaw ±π, joint pos scale (1, 1), zero velocities | same | `tests/test_g1_parity.py` (the Warp-vs-C test has to override this randomization to compare) | – | equivalent by construction |
-| Rough terrain: `ROUGH_TERRAINS_CFG` 10 rows × 20 cols of 8 m cells, curriculum by row, sub-terrain mix (stairs up/down, boxes, random rough, slopes) | re-implemented from the config on a 0.1 m heightfield (`orchard.learn.terrain`) | `tests/test_terrain.py::test_terrain_layout`; physics on it: `::test_hfield_mesh_contacts_match_mujoco_c` (xfail) | layout pass; **contacts fail** (§1.6) | partial for the layout; **disproved** for the physics on the current MuJoCo Warp branch |
+| Rough terrain: `ROUGH_TERRAINS_CFG` 10 rows × 20 cols of 8 m cells, curriculum by row, sub-terrain mix (stairs up/down, boxes, random rough, slopes) | re-implemented from the config on a 0.1 m heightfield (`metalsim.learn.terrain`) | `tests/test_terrain.py::test_terrain_layout`; physics on it: `::test_hfield_mesh_contacts_match_mujoco_c` (xfail) | layout pass; **contacts fail** (§1.6) | partial for the layout; **disproved** for the physics on the current MuJoCo Warp branch |
 | Height scanner: `RayCaster` 1.6 × 1.0 m grid at 0.1 m (187 rays), yaw-aligned, `body_z − hit_z − 0.5` | Warp kernel interpolating the heightfield triangles on the sim queue (capturable; a heightfield needs no ray tracing; `heightscan.metal` remains for arbitrary meshes) | `tests/test_terrain.py::test_height_scan_matches_mj_ray` (vs MuJoCo `mj_ray` on the same heightfield, 1496 rays) | median 0.0 m, 99th pct 0.0 m, max 0.85 m on cell diagonals where MuJoCo's triangulation differs | confirmed |
 | Events not reproduced | startup friction randomization (fixed 0.8/0.6), external force/torque event (zero range in the G1 config) | – | – | partial (documented) |
 
 ### 1.3 Learner (rsl_rl PPO, `g1_rsl_rl_ppo_cfg.py`)
 
-| Isaac | ours (`orchard.learn.ppo_warp` with `g1_ppo_config`) | test | verdict |
+| Isaac | ours (`metalsim.learn.ppo_warp` with `g1_ppo_config`) | test | verdict |
 |---|---|---|---|
 | 24 steps/env, 5 epochs, 4 minibatches, lr 1e-3 adaptive (desired KL 0.01, ×/÷1.5), γ 0.99, λ 0.95, clip 0.2, entropy 0.008, grad norm 1.0, ELU MLP 512-256-128 (rough) / 256-128-128 (flat), init std 1.0 | same values; rollout policy evaluated in Warp with shared weights | `tests/test_warp_policy.py::test_parity_with_torch_and_shared_weights` (Warp MLP == torch to 1e-5; log-probs to 1e-4) | confirmed |
 | Clipped value loss | not implemented (plain MSE) | – | partial |
@@ -129,6 +129,21 @@ terms explode (observed in the rough PPO run, iteration 3: return −8.7e25). Ro
 throughput and learning are therefore **not claimed**; the flat task is the comparison. The height
 scanner and terrain generator themselves pass their tests (§1.2).
 
+Localization (scratch probes, 2026-09-23): the same defect reproduces on Warp's **CPU device**
+(world 2 launched to 2.57 m, normal z −1, penetration 2.047 m), so it is MuJoCo Warp's heightfield
+algorithm, not the Metal backend. At that world's initial state MuJoCo C reports seven contacts for
+the right foot (all within 2.5 cm, sane normals); MuJoCo Warp reports one, with penetration
+−2.047 m and a witness point 1.1 m from the foot. Raising `ccd_iterations` to 500 and tightening
+`ccd_tolerance` to 1e-8 changes nothing. Spheres on a heightfield match C exactly (block terrain,
+five placements), so the grid layout and prism construction are right; a box *mesh* pressed 3 cm
+into a *flat* heightfield already yields one sideways normal (0.43, −0.90, 0.09). The hfield kernel
+tests each terrain prism (a triangular column reaching down to the heightfield base, here 1.9 m)
+against the convex geom with single-witness-point GJK/EPA and keeps the minimum-distance result;
+MuJoCo C's `mjc_ConvexHField` produces face-contact manifolds through its multi-contact CCD, which
+MuJoCo Warp does not support for HFIELD–MESH pairs on this branch (its own warning). The fix belongs
+upstream (multi-contact for heightfield pairs, or clipping the prism to its top slab); the practical
+workaround for MetalSim is a terrain built from box geoms, which take the primitive collision path.
+
 ## 2. Platform capabilities (the workstreams), with the tests behind them
 
 | capability | Isaac | ours | test (assertion) | result | verdict |
@@ -139,15 +154,15 @@ scanner and terrain generator themselves pass their tests (§1.2).
 | Per-world physics randomization | PhysX per-env mass/friction | per-world model fields + `recompute_constants` | `tests/test_physics.py::test_per_world_model_fields` | pass | confirmed |
 | USD scene layer | USD + UsdPhysics/UsdShade/UsdSemantics; URDF/MJCF importers | MJCF/URDF→USD, USD→MjSpec (lossless + generic UsdPhysics) | `tests/test_scene_usd.py` (3 tests: import fields, round trip to MuJoCo, URDF), the G1 rows above (a real Isaac asset) | pass | confirmed for the subset used; MaterialX graphs, Hydra viewing not implemented |
 | Renderer tier 0 (raster + PBR + shadows) vs a reference rasterizer | Isaac RTX rasterizer | native Metal raster reading physics buffers | `tests/test_render_tier0.py::test_silhouette_and_depth_and_seg_parity_primitives` (vs `mujoco.Renderer`: IoU > 0.95, depth median < 1 cm, seg IoU > 0.85), `::test_texture_pattern_parity` (corr > 0.97) | IoU 0.994–0.997, depth 0.1 mm, corr 0.996 | confirmed vs MuJoCo; **not testable vs Isaac RTX** here |
-| Renderer tier 1 (hybrid RT: soft shadows, AO, reflections) | RTX real-time | fragment-stage Metal ray queries | fidelity benchmark (`orchard.bench.render_fidelity`): PSNR 19.7 / FLIP 0.30 vs MuJoCo; rollout: `tests/test_render_tier2.py` sibling path (`CartpoleRGBEnv(tier=1)`) | measured | partial (no denoiser / MetalFX upscale yet) |
+| Renderer tier 1 (hybrid RT: soft shadows, AO, reflections) | RTX real-time | fragment-stage Metal ray queries | fidelity benchmark (`metalsim.bench.render_fidelity`): PSNR 19.7 / FLIP 0.30 vs MuJoCo; rollout: `tests/test_render_tier2.py` sibling path (`CartpoleRGBEnv(tier=1)`) | measured | partial (no denoiser / MetalFX upscale yet) |
 | Renderer tier 2 (path tracer) | RTX path tracer (Isaac "PathTracing" mode) | progressive Metal RT path tracer, NEE, GGX+Lambert, Russian roulette | `tests/test_render_tier2.py::test_lambertian_plane_analytic` (radiance 0.4000 exact), `::test_white_furnace_uniform_sky` (0.498 vs 0.5), `::test_monte_carlo_convergence` (noise ratio 4.05 for 16× spp; ideal 4.0), `::test_direct_light_matches_tier0` (PSNR 43.7–45.1 dB, depth 1 mm, seg IoU 1.0), `::test_gpu_path_from_batchsim_matches_host`, `::test_cartpole_rgb_rollout_tier2` (full env rollout at tier 2) | pass | confirmed radiometrically; not compared to Isaac's path tracer (not testable here); no denoiser |
-| Tier 1 / tier 2 full rollouts (throughput) | Isaac Cartpole-RGB: 50K steps/s at 1024 envs on a 4090 (rasterized RTX, reported) | Cartpole-RGB 100×100, 1024 envs, physics + render + reward/reset, one run each, uncontended | `orchard.learn.cartpole_rgb` (`python -m orchard.learn.cartpole_rgb 1024`) | tier 0 47,135; tier 1 42,634; tier 2 (1 spp, 1 bounce) 36,401; tier 2 (1 spp, 2 bounces) 34,762; tier 2 (4 spp, 2 bounces) 19,782 env-steps/s | measured; the tier-2 rollout is a full path-traced observation stream at 70 % of the raster rate (1 spp, noisy) |
+| Tier 1 / tier 2 full rollouts (throughput) | Isaac Cartpole-RGB: 50K steps/s at 1024 envs on a 4090 (rasterized RTX, reported) | Cartpole-RGB 100×100, 1024 envs, physics + render + reward/reset, one run each, uncontended | `metalsim.learn.cartpole_rgb` (`python -m metalsim.learn.cartpole_rgb 1024`) | tier 0 47,135; tier 1 42,634; tier 2 (1 spp, 1 bounce) 36,401; tier 2 (1 spp, 2 bounces) 34,762; tier 2 (4 spp, 2 bounces) 19,782 env-steps/s | measured; the tier-2 rollout is a full path-traced observation stream at 70 % of the raster rate (1 spp, noisy) |
 | Ray-traced sensors (lidar, depth) | RTX lidar | Metal RT acceleration structures refit from physics | `tests/test_sensors_rt.py::test_lidar_vs_mujoco_ray` (median < 2 mm, 95th < 2 cm, hit pattern within 3 %), `::test_raycast_depth_vs_raster_depth` (99.5 % agree, median < 1 mm) | pass | confirmed vs MuJoCo `mj_ray`; **not testable vs Isaac RTX lidar** |
 | IMU / contact / joint sensors as tensors | Isaac sensors | MuJoCo sensors evaluated per step | `tests/test_sensors_state.py::test_imu_and_contact_sensors_as_tensors` (accelerometer 9.81 at rest, ~0 in free fall; touch ≈ m g) | pass | confirmed |
 | Height scan on terrain | `RayCaster` | Metal ray queries | `tests/test_terrain.py::test_height_scan_matches_mj_ray` | pass | confirmed |
 | Replicator: randomizers, annotators, writers | Omniverse Replicator | GPU randomizers, 2-D/3-D boxes, semantic seg, COCO/KITTI/basic writers | `tests/test_replicator.py::test_randomize_annotate_write` (boxes equal the segmentation's extents, files written) | pass | confirmed for the implemented subset |
 | Warp rollout policy | – | MLP policy in Warp with shared torch weights | `tests/test_warp_policy.py` (2 tests) | pass | confirmed |
-| RL reproduces a published Isaac Lab result | Cartpole-Direct with rsl_rl config learns | same config on the Warp path reaches 295/300 in 45 iterations | `orchard.learn.ppo_warp` run (docs/PHASES.md) | measured | confirmed (equivalent MJCF cartpole, not Isaac's USD) |
+| RL reproduces a published Isaac Lab result | Cartpole-Direct with rsl_rl config learns | same config on the Warp path reaches 295/300 in 45 iterations | `metalsim.learn.ppo_warp` run (docs/PHASES.md) | measured | confirmed (equivalent MJCF cartpole, not Isaac's USD) |
 
 ## 3. What is disproved, missing, or cannot be tested here
 

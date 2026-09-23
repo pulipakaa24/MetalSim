@@ -6,8 +6,8 @@ import pytest
 import torch
 import warp as wp
 
-from orchard.interop import warp_metal as wm
-from orchard.learn.so101_lift import LiftConfig, SO101LiftEnv
+from metalsim.interop import warp_metal as wm
+from metalsim.learn.so101_lift import LiftConfig, SO101LiftEnv
 
 pytestmark = pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal")
 

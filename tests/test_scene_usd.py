@@ -5,7 +5,7 @@ import mujoco
 import numpy as np
 import pytest
 
-from orchard.scene.mjcf_to_usd import import_mjcf
+from metalsim.scene.mjcf_to_usd import import_mjcf
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SO101 = os.path.join(ROOT, "assets", "so101", "scene_box_rl.xml")
@@ -57,7 +57,7 @@ def test_so101_import(tmp_path):
 
 def test_usd_round_trip_to_mujoco(tmp_path):
     """USD -> MjSpec, both the lossless path and the generic UsdPhysics conversion."""
-    from orchard.scene.usd_to_mjcf import load_usd
+    from metalsim.scene.usd_to_mjcf import load_usd
     out = str(tmp_path / "so101.usda")
     import_mjcf(SO101, out)
     m0 = mujoco.MjModel.from_xml_path(SO101)
@@ -105,7 +105,7 @@ def test_urdf_import_to_usd(tmp_path):
     <limit lower="-2.0" upper="2.0" effort="5" velocity="2"/></joint>
 </robot>""")
     from pxr import Usd, UsdPhysics
-    from orchard.scene.usd_to_mjcf import load_usd
+    from metalsim.scene.usd_to_mjcf import load_usd
     out = str(tmp_path / "arm.usda")
     r = import_mjcf(str(urdf), out)
     st = Usd.Stage.Open(out)
