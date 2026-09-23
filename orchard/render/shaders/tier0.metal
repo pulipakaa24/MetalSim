@@ -165,6 +165,15 @@ vertex VSOut geom_vs(
     return o;
 }
 
+struct FSIn {                 // VSOut without the clip distances (consumed by the rasterizer)
+    float4 clip [[position]];
+    float3 world_pos;
+    float3 normal_w;
+    float2 uv;
+    uint   env  [[flat]];
+    uint   slot [[flat]];
+};
+
 struct FSOut {
     float4 color  [[color(0)]];
     uint   seg    [[color(1)]];
@@ -187,7 +196,7 @@ inline float3 F_schlick(float3 f0, float VdotH) {
 }
 
 fragment FSOut geom_fs(
-    VSOut in [[stage_in]],
+    FSIn in [[stage_in]],
     device const EnvParams* envs     [[buffer(1)]],
     device const Material*  mats     [[buffer(2)]],
     device const Semantic*  sem      [[buffer(3)]],

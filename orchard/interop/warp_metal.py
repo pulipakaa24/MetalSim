@@ -28,6 +28,8 @@ except ImportError as e:  # pragma: no cover
 
 
 def _core():
+    if wp._src.context.runtime is None:
+        wp.init()
     core = wp._src.context.runtime.core
     if not getattr(core, "_orchard_interop_bound", False):
         core.wp_metal_device_handle.restype = ctypes.c_void_p

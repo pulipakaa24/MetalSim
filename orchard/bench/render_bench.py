@@ -28,12 +28,12 @@ PRIMS = """
 """
 
 
-def render_only(model, cam, grid):
+def render_only(model, cam, grid, decimate=0):
     print("| N envs | res | env-frames/s (render only, GPU path) |")
     print("|---|---|---|")
     for n, res in grid:
         sim = BatchSim(model, n)
-        rend = Tier0Renderer(model, n, width=res, height=res, camera=cam, outputs=("rgb",))
+        rend = Tier0Renderer(model, n, width=res, height=res, camera=cam, outputs=("rgb",), decimate_faces=decimate)
         sim.forward(); sim.synchronize()
         v = sim.event.value
         for _ in range(3):
@@ -49,9 +49,9 @@ def render_only(model, cam, grid):
         del rend, sim
 
 
-def end_to_end(model, cam, n, res, substeps=1, steps=200):
+def end_to_end(model, cam, n, res, substeps=1, steps=200, decimate=0):
     sim = BatchSim(model, n, options=BatchSimOptions(substeps=substeps))
-    rend = Tier0Renderer(model, n, width=res, height=res, camera=cam, outputs=("rgb",))
+    rend = Tier0Renderer(model, n, width=res, height=res, camera=cam, outputs=("rgb",), decimate_faces=decimate)
     sim.synchronize()
     rng = np.random.default_rng(0)
     if model.nu:
@@ -78,9 +78,11 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         model = mujoco.MjModel.from_xml_path(sys.argv[1])
         cam = mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_CAMERA, 0)
-        render_only(model, cam, [(64, 128), (256, 128), (1024, 64)])
-        print(f"| physics+render | N=64 @128px | {end_to_end(model, cam, 64, 128):,.0f} steps/s |")
-        print(f"| physics+render | N=1024 @64px | {end_to_end(model, cam, 1024, 64):,.0f} steps/s |")
+        dec = int(sys.argv[2]) if len(sys.argv) > 2 else 0
+        print(f"decimate_faces = {dec}")
+        render_only(model, cam, [(64, 128), (256, 128), (1024, 64)], decimate=dec)
+        print(f"| physics+render | N=64 @128px | {end_to_end(model, cam, 64, 128, decimate=dec):,.0f} steps/s |")
+        print(f"| physics+render | N=1024 @64px | {end_to_end(model, cam, 1024, 64, decimate=dec):,.0f} steps/s |")
     else:
         model = mujoco.MjModel.from_xml_string(PRIMS)
         render_only(model, "cam", [(16, 64), (64, 64), (256, 64), (1024, 64), (16, 128), (64, 128), (256, 128),

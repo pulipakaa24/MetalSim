@@ -40,7 +40,7 @@ class RenderOutputs:
 class Tier0Renderer:
     def __init__(self, model: mujoco.MjModel, n_envs: int, *, width=128, height=128, camera: str | int | None = None,
                  max_group=3, include_planes=True, backgrounds=False, outputs=("rgb",), seg_mode=SEG_SLOT,
-                 ctx: MetalContext | None = None, device="metal:0"):
+                 decimate_faces: int = 0, ctx: MetalContext | None = None, device="metal:0"):
         self.m = model
         self.n = n_envs
         self.tw, self.th = width, height
@@ -49,7 +49,8 @@ class Tier0Renderer:
         self.ah = int(np.ceil(n_envs / self.tpr)) * height
         self.ctx = ctx or MetalContext(device)
         self.device = device
-        self.tables: SceneTables = build_scene_tables(model, n_envs, max_group=max_group, include_planes=include_planes)
+        self.tables: SceneTables = build_scene_tables(model, n_envs, max_group=max_group, include_planes=include_planes,
+                                                      decimate_faces=decimate_faces)
         self.G = self.tables.G
         self.seg_mode = seg_mode
         self.use_bg = backgrounds
@@ -93,10 +94,15 @@ class Tier0Renderer:
         self.cam_spec[:, 16:20] = (0.35, 0.35, 0.35, 1.0 if self.use_bg else 0.0)
         self.cam_spec[:, 20:24] = (0.0, 0.0, 0.0, 1.0)
         self.cam_spec_i[:, 24] = self.cam_id
-        self.cam_buf = c.buffer(self.cam_spec.nbytes, self.cam_spec, "camera_spec")
+        self._cam_spec_wp = wp.array(self.cam_spec, dtype=wp.float32, device=self.device)
+        self.t_cam_spec = tb.mps_tensor(self._cam_spec_wp)      # (N, 28) float32, GPU-writable
+        self.cam_buf = wm.buffer_of(self._cam_spec_wp).buffer
         # per-instance color modulation (domain randomization), default 1
         self.colors = np.ones((self.n, self.G, 4), np.float32)
-        self.color_buf = c.buffer(self.colors.nbytes, self.colors, "instance_colors")
+        self._colors_wp = wp.array(self.colors, dtype=wp.float32, device=self.device)
+        self.t_colors = tb.mps_tensor(self._colors_wp)          # (N, G, 4) float32, GPU-writable
+        self.color_buf = wm.buffer_of(self._colors_wp).buffer
+        wp.synchronize_device(self.device)
         # consts
         self.consts = np.array([self.n, self.m.ngeom, self.G, self.tpr, self.tw, self.th, self.aw, self.ah,
                                 max(self.m.ncam, 1), self.bg_layers, 1 if self.use_bg else 0, 0], np.uint32)
@@ -179,7 +185,11 @@ class Tier0Renderer:
     # -- per-env parameters (host-written; cheap, done at reset time) ---------------------------------
 
     def _sync_cam_spec(self):
-        self.ctx.write_buffer(self.cam_buf, self.cam_spec)
+        """Host write of the whole camera spec (synchronizes the GPU first; use ``t_cam_spec`` in loops)."""
+        wp.synchronize_device(self.device)
+        torch.mps.synchronize()
+        self._cam_spec_wp.assign(self.cam_spec)
+        wp.synchronize_device(self.device)
 
     def set_lights(self, dirs: np.ndarray, intensity=1.0):
         self.cam_spec[:, 12:15] = np.asarray(dirs, np.float32)
@@ -203,9 +213,12 @@ class Tier0Renderer:
         self._sync_cam_spec()
 
     def set_colors(self, colors: np.ndarray):
-        """(N, G, 4) per-env per-slot color modulation."""
+        """(N, G, 4) per-env per-slot color modulation (host write; use ``t_colors`` in loops)."""
         self.colors[:] = colors
-        self.ctx.write_buffer(self.color_buf, self.colors)
+        wp.synchronize_device(self.device)
+        torch.mps.synchronize()
+        self._colors_wp.assign(self.colors)
+        wp.synchronize_device(self.device)
 
     def set_backgrounds(self, env_ids, images):
         self.use_bg = True

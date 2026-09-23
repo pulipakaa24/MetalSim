@@ -80,3 +80,49 @@ Remaining floor at small N: ~6 µs of GPU time per kernel dispatch (Metal's per-
 with barriers), i.e. ~1.2 ms per physics substep regardless of batch size. That is a per-kernel
 launch floor, the Metal analogue of CUDA kernel launch latency; reducing it needs fewer, fused
 kernels in MuJoCo Warp itself (upstream work), not this stack.
+
+## Phase 3 (started early): tier-0 renderer on native Metal — in progress
+
+`orchard.render.tier0`: PyObjC + MSL, one command buffer per batch (env-params kernel, background
+quads, one instanced indexed draw per unique mesh, untile kernel into learner buffers). Instance
+transforms and cameras are read from MuJoCo Warp's `geom_xpos/geom_xmat/cam_xpos/cam_xmat` (no
+host pack step; body-mounted cameras work). Geometry is clipped to its tile with vertex clip
+distances (without it, off-tile geometry such as floor planes was rasterized over the whole
+atlas and discarded per fragment, which scaled quadratically with N).
+
+Parity vs `mujoco.Renderer` (`tests/test_render_tier0.py`, measured): silhouette IoU 0.994–0.997
+(plan threshold 0.95), depth median error ≤ 0.14 mm (threshold 1 cm), per-geom segmentation IoU
+≥ 0.987, texture pattern correlation 0.996 (threshold 0.99), SO-101 silhouette IoU 1.0.
+
+Render-only throughput, primitives scene (mjbatch-metal's `bench.py` scene and grid), measured:
+
+| N | res | orchard tier-0 (env-frames/s) | mjbatch-metal sync / pipelined (published) |
+|---|---|---|---|
+| 64 | 64 | 582,830 | 21,438 / – |
+| 1024 | 64 | 782,976 | 44,259 / 72,731 |
+| 64 | 128 | 435,063 | 12,142 / 20,253 |
+| 1024 | 128 | 501,248 | 12,109 / – |
+| 256 | 256 | 211,188 | 3,936 / – |
+
+For scale (reported): MuJoCo Warp's own Warp-kernel renderer, primitives, N=512, on an RTX 4090:
+522,101 steps/s; Isaac Lab Cartpole-RGB tiled camera 100×100, 1024 envs, RTX 4090: 50K env
+steps/s including physics.
+
+SO-101 arm scene (348k triangles per env, undecimated): 13.6K env-frames/s at N=64/128 px and
+flat across N, i.e. bound by primitive throughput (~5 G triangles/s on this GPU). mjbatch-metal
+published 8.4K sync / 19K pipelined for the same scene. Physics+render at N=64/128 px: 10.1K
+steps/s (render-bound). Mesh decimation levels of detail are the remedy; see below.
+
+Levels of detail (measured): welded quadric decimation with a vertex-clustering fallback
+(`decimate_faces`). SO-101 arm scene, `orchard.bench.render_bench assets/so101/scene_box_rl.xml 2000`:
+
+| triangles / env | N | res | render-only env-frames/s | physics (1 substep) + render steps/s |
+|---|---|---|---|---|
+| 325,034 (undecimated) | 64 | 128 | 13,643 | 10,102 |
+| 27,172 (2000 faces/mesh) | 64 | 128 | 90,693 | 22,986 |
+| 27,172 | 256 | 128 | 106,179 | – |
+| 27,172 | 1024 | 64 | 136,807 | 86,359 |
+
+mjbatch-metal published for this scene: 19,000 env-frames/s pipelined, 16,957 steps/s (N=64,
+128 px, CPU physics). MuJoCo Playground PandaPickCubeCartesian with Madrona on datacenter
+hardware: ~37,000 steps/s (reported).

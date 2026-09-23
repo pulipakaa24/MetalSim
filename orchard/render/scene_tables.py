@@ -209,8 +209,72 @@ class SceneTables:
     MATERIAL_LAYOUT = ("rgba", "metallic_roughness_specular_emission", "atlas_rect", "texrepeat_flag_reflectance")
 
 
+def _weld(v, f, decimals=6):
+    """Merge coincident vertices (CAD/STL meshes are unwelded triangle soups, which no edge-collapse
+    simplifier can reduce)."""
+    key = np.round(v, decimals)
+    _, first, inverse = np.unique(key, axis=0, return_index=True, return_inverse=True)
+    f2 = inverse.reshape(-1)[f]
+    keep = (f2[:, 0] != f2[:, 1]) & (f2[:, 1] != f2[:, 2]) & (f2[:, 0] != f2[:, 2])
+    return v[first], f2[keep]
+
+
+def _cluster(v, f, cell):
+    """Vertex-clustering decimation: merge vertices per grid cell, drop degenerate/duplicate faces."""
+    key = np.floor(v / cell).astype(np.int64)
+    _, inv = np.unique(key, axis=0, return_inverse=True)
+    inv = inv.reshape(-1)
+    nv = inv.max() + 1
+    newv = np.zeros((nv, 3)); cnt = np.zeros(nv)
+    np.add.at(newv, inv, v); np.add.at(cnt, inv, 1)
+    newv /= cnt[:, None]
+    f2 = inv[f]
+    keep = (f2[:, 0] != f2[:, 1]) & (f2[:, 1] != f2[:, 2]) & (f2[:, 0] != f2[:, 2])
+    f2 = f2[keep]
+    if len(f2):
+        # drop duplicate faces (same vertex set) but keep original winding of the first occurrence
+        _, first = np.unique(np.sort(f2, axis=1), axis=0, return_index=True)
+        f2 = f2[np.sort(first)]
+    return newv, f2
+
+
+def _decimate(v, f, target_faces):
+    """Level-of-detail decimation of a welded mesh; UVs are dropped (returns None).
+
+    Quadric edge collapse (fast_simplification) first; CAD meshes with dense small features often
+    stall well above the target, in which case vertex clustering with a bisected cell size is used.
+    """
+    v, f = _weld(v, f)
+    if len(f) <= target_faces:
+        return v, f
+    try:
+        import fast_simplification
+        v_d, f_d = fast_simplification.simplify(np.ascontiguousarray(v, np.float64), np.ascontiguousarray(f, np.int64),
+                                                target_count=int(target_faces), agg=8)
+        v_d, f_d = np.asarray(v_d), np.asarray(f_d)
+        if len(f_d) <= 1.5 * target_faces:
+            return v_d, f_d
+    except ImportError:
+        pass
+    ext = float((v.max(0) - v.min(0)).max())
+    lo, hi = ext / 512, ext / 4          # cell sizes: small -> many faces, large -> few
+    best = None
+    for _ in range(14):
+        cell = np.sqrt(lo * hi)
+        v_c, f_c = _cluster(v, f, cell)
+        if len(f_c) > target_faces:
+            lo = cell
+        else:
+            hi = cell
+            best = (v_c, f_c)
+    if best is None:
+        best = _cluster(v, f, hi)
+    return best
+
+
 def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, include_planes: bool = True,
-                       plane_extent: float = 5.0, smooth: bool = True) -> SceneTables:
+                       plane_extent: float = 5.0, smooth: bool = True, decimate_faces: int = 0) -> SceneTables:
+    """``decimate_faces``: per-mesh triangle budget for a level of detail (0 = undecimated)."""
     mesh_cache = {}
     meshes, geoms, geom_mesh = [], [], []
     all_v, all_n, all_uv, all_i = [], [], [], []
@@ -231,6 +295,9 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
             if tca >= 0:
                 ftc = m.mesh_facetexcoord[fa:fa + fn].astype(np.int64)
                 uv = m.mesh_texcoord[tca + ftc]
+            if decimate_faces and len(f_full) > decimate_faces:
+                v_d, f_d = _decimate(v_full, f_full, decimate_faces)
+                return v_d[f_d], None
             return v_full[f_full], uv
         if t == mujoco.mjtGeom.mjGEOM_BOX:
             tri = _BOX_FACES * size

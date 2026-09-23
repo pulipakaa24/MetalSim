@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orchard gallery</title>
+<style>
+  :root { color-scheme: light dark; --ink: #0b0b0b; --ink2: #52514e; --muted: #898781; --bg: #f9f9f7; --card: #fcfcfb; --rule: #e1e0d9; }
+  @media (prefers-color-scheme: dark) { :root { --ink: #fff; --ink2: #c3c2b7; --muted: #898781; --bg: #0d0d0d; --card: #1a1a19; --rule: #2c2c2a; } }
+  body { margin: 0; padding: 24px 16px 48px; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--ink2); margin: 0 0 28px; }
+  figure { margin: 0 0 36px; padding: 12px; background: var(--card); border: 1px solid var(--rule); border-radius: 8px; }
+  figure img, figure video { display: block; max-width: 100%; height: auto; image-rendering: auto; }
+  figure.pixel img { image-rendering: pixelated; }
+  figcaption { margin-top: 10px; color: var(--ink2); font-size: 14px; }
+  figcaption b { color: var(--ink); }
+  code { font-size: 13px; }
+  .muted { color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Orchard gallery</h1>
+  <p class="sub">What the runs look like right now: MuJoCo Warp physics on Metal + the native Metal tier-0 batched renderer, Apple M4 Max.
+  Images were produced by <code>scratch/gallery_scripts/</code> on this machine; the throughput numbers are copied from <code>docs/PHASES.md</code>, not re-measured.</p>
+
+  <figure>
+    <img src="so101_atlas_64.png" alt="8 by 8 atlas of SO-101 lift scene tiles" width="1024" height="1024">
+    <figcaption><b>so101_atlas_64.png</b> (1024×1024). 64 envs of the SO-101 lift scene (<code>assets/so101/scene_box_rl.xml</code>, camera <code>base_cam</code>) as an 8×8 grid of 128 px tiles, one tier-0 render call, undecimated meshes. Arm joints <code>qpos[:6]</code> uniform in [−0.6, 0.6]; per-env per-geom color randomization via <code>set_colors</code> (multipliers in [0.3, 1], which is why tiles are darker than the unrandomized reference below). Rendered on this machine.</figcaption>
+  </figure>
+
+  <figure>
+    <img src="so101_channels.png" alt="RGB, depth, segmentation and normal channels for one env" width="1024" height="256">
+    <figcaption><b>so101_channels.png</b> (1024×256). One env (tile 0 of the atlas) at 256 px: RGB | metric depth (1–99th percentile normalized, viridis) | segmentation (random color per id, floor plane included) | surface normal (xyz mapped to 0–255). All four are written by the renderer in the same pass into learner-owned buffers.</figcaption>
+  </figure>
+
+  <figure class="pixel">
+    <img src="primitives_grid.png" alt="4 by 4 grid of primitives scene tiles" width="512" height="512">
+    <figcaption><b>primitives_grid.png</b> (512×512). The primitives benchmark scene from <code>tests/test_render_tier0.py</code> (box, sphere, cylinder, capsule on a plane; mjbatch-metal's <code>bench.py</code> scene) as a 4×4 grid of 16 envs, 128 px, random free-body poses. This is the scene the render-throughput numbers below are measured on.</figcaption>
+  </figure>
+
+  <figure>
+    <img src="reference_vs_orchard.png" alt="mujoco.Renderer versus orchard tier-0, same state" width="512" height="512">
+    <figcaption><b>reference_vs_orchard.png</b> (512×512). Same state rendered by <code>mujoco.Renderer</code> (left) and orchard tier-0 (right) at 256 px; SO-101 on top, primitives below. Tier-0 has no shadows, reflections or skybox, so shading differs; geometry agrees (measured in <code>tests/test_render_tier0.py</code>: silhouette IoU 0.994–1.0, depth median error ≤ 0.14 mm, per-geom segmentation IoU ≥ 0.987).</figcaption>
+  </figure>
+
+  <figure>
+    <video src="rollout.mp4" controls loop muted playsinline width="512" height="512" poster=""></video>
+    <img src="rollout.gif" alt="Animated 4 by 4 grid of SO-101 arms following sinusoidal targets" width="512" height="512" style="margin-top:8px">
+    <figcaption><b>rollout.mp4 / rollout.gif</b> (512×512, 150 frames at 25 fps). The full GPU pipeline: <code>BatchSim</code> (MuJoCo Warp, N=16, 4 substeps per control step, dt 0.02 s) → <code>Tier0Renderer</code> (128 px, undecimated) with event-ordered handoff and zero-copy MPS outputs; actuator targets are slowly varying sinusoids with a per-env phase offset, so the 16 tiles diverge from an identical first frame. Frames were read back to the host for encoding only. Recorded on this machine.</figcaption>
+  </figure>
+
+  <figure>
+    <img src="throughput.png" alt="Bar chart of render throughput and line chart of physics steps per second" width="1840" height="704">
+    <figcaption><b>throughput.png</b> (1840×704). Left: render-only env-frames/s on the primitives scene, orchard tier-0 (measured on this machine) vs mjbatch-metal's published sync / pipelined numbers; log y axis, n/a where mjbatch-metal published no pipelined figure. Right: GPU physics steps/s vs batch size for the SO-101 lift scene, from <code>mjwarp-testspeed</code> (1 substep per step) and orchard <code>BatchSim</code> with indirect-command-buffer graph replay (4 substeps per step); both measured on this machine. All values are transcribed from <code>docs/PHASES.md</code>.</figcaption>
+  </figure>
+
+  <p class="muted">Machine: Apple M4 Max, 40-core GPU, 64 GB, macOS 26.7. Scripts: <code>scratch/gallery_scripts/01_so101_atlas_and_channels.py</code>, <code>03_primitives_grid.py</code>, <code>04_reference_vs_orchard.py</code>, <code>05_rollout.py</code>, <code>06_throughput.py</code>.</p>
+</main>
+</body>
+</html>
