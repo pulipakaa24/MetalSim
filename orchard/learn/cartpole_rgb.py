@@ -34,13 +34,13 @@ CARTPOLE_XML = """
     <light directional="true" pos="0 0 3" dir="0.3 0.3 -0.9" diffuse="0.8 0.8 0.8"/>
     <geom name="floor" type="plane" size="4 4 0.1" material="grid"/>
     <camera name="cam" pos="0 -4.5 1.6" xyaxes="1 0 0 0 0.2 0.98" fovy="45"/>
-    <geom name="rail" type="capsule" fromto="-3.5 0 1 3.5 0 1" size="0.02" rgba="0.6 0.6 0.6 1"/>
+    <geom name="rail" type="capsule" fromto="-3.5 0 1 3.5 0 1" size="0.02" rgba="0.6 0.6 0.6 1" contype="0" conaffinity="0"/>
     <body name="cart" pos="0 0 1">
       <joint name="slider" type="slide" axis="1 0 0" range="-3 3" damping="0.02"/>
-      <geom name="cart" type="box" size="0.2 0.1 0.1" rgba="0.2 0.4 0.9 1" mass="1.0"/>
+      <geom name="cart" type="box" size="0.2 0.1 0.1" rgba="0.2 0.4 0.9 1" mass="1.0" contype="0" conaffinity="0"/>
       <body name="pole" pos="0 0 0">
         <joint name="hinge" type="hinge" axis="0 1 0" damping="0.005"/>
-        <geom name="pole" type="capsule" fromto="0 0 0 0 0 1.0" size="0.03" rgba="0.9 0.4 0.2 1" mass="0.1"/>
+        <geom name="pole" type="capsule" fromto="0 0 0 0 0 1.0" size="0.03" rgba="0.9 0.4 0.2 1" mass="0.1" contype="0" conaffinity="0"/>
       </body>
     </body>
   </worldbody>

@@ -259,3 +259,25 @@ Lesson: without GPU-side loop conditions, MuJoCo Warp on Metal runs a model's fu
 budget (MuJoCo's default 100 Newton iterations turned a 2-DOF cartpole substep into 1,081
 dispatches); `BatchSimOptions.solver_iterations` should be set per model, as Isaac Lab sets PhysX
 iteration counts.
+
+### RL reproducibility: Isaac Lab Cartpole config on the Warp rollout path (measured)
+
+`orchard.learn.ppo_warp` with rsl_rl's Cartpole config (4096 envs, 16 steps/env, 5 epochs × 4
+minibatches, MLP 32×32 ELU, lr 1e-3 with the adaptive-KL schedule at desired_kl 0.01, gamma
+0.99, lambda 0.95, entropy 0.005) on the MJCF cartpole with Isaac's reward and reset terms:
+
+| iteration | steps | episode return (max 300) | episode length |
+|---|---|---|---|
+| 15 | 0.98M | 25.0 | 45 |
+| 30 | 1.97M | 197.7 | 208 |
+| 45 | 2.95M | 293.6 | 298.5 |
+| 150 | 9.8M | 295.2 | 299.9 |
+
+Training-loop throughput (rollout in Warp + torch update): **~320K env-steps/s at N=4096**, measured
+while a pixel PPO run shared the GPU. Isaac Lab's published Cartpole-Direct step+inference+train
+figure on an RTX 4090 is 510K steps/s; per TFLOPS FP32 that is ~6,200 (4090) vs ~17,400 here.
+
+Two lessons recorded: (1) the initial "no learning" was my MJCF (rail capsule overlapping the cart
+box, so contact forces pinned the cart: 100 N moved it 2 mm in MuJoCo C as well) — Isaac's
+cartpole has no collisions; (2) rsl_rl's adaptive-KL learning-rate schedule is part of the config
+and is needed for the published iteration counts.
