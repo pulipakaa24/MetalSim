@@ -4,7 +4,7 @@
 # (Command Line Tools only). Usage: scripts/setup_warp.sh [dir]   (default: upstream/warp-metalsim)
 set -e
 DIR=${1:-upstream/warp-metalsim}
-REPO=${METALSIM_WARP_REPO:-https://github.com/adipu/warp}     # fork of innate-inc/warp, branch metalsim
+REPO=${METALSIM_WARP_REPO:-https://github.com/pulipakaa24/warp}     # fork of innate-inc/warp, branch metalsim
 REF=${METALSIM_WARP_REF:-metalsim}
 if [ ! -d "$DIR" ]; then
   git clone --branch "$REF" "$REPO" "$DIR" || {

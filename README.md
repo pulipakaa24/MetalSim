@@ -15,8 +15,8 @@ Phase logs and measurements live in `docs/`.
 
 ## Install
 
-MetalSim runs on the MetalSim fork of Warp (Metal backend; https://github.com/innate-inc/warp plus the
-patches in `patches/`, branch `metalsim`) and on MuJoCo Warp's `metal` branch. Neither is on PyPI.
+MetalSim runs on its fork of Warp, https://github.com/pulipakaa24/warp branch `metalsim` (innate-inc's Metal
+backend plus the changes in `patches/`), and on MuJoCo Warp's `metal` branch. Neither is on PyPI.
 
 ```
 python -m venv .venv && source .venv/bin/activate
