@@ -187,3 +187,47 @@ Image-level comparison with `mujoco.Renderer` on the SO-101 scene at 256 px
 design (GGX vs Phong, and MuJoCo's planar floor reflection, which tier 1 provides through ray
 tracing); Isaac's own image thresholds (PSNR ≥ 25 / SSIM ≥ 0.9) apply to tier 1 vs Isaac RTX,
 not to tier 0 vs MuJoCo. Parity tests (silhouette, depth, segmentation, texture) unchanged.
+
+## WS5 sensors on Metal ray tracing — started (measured)
+
+`orchard.sensors.raytrace.RayTracer`: one `MTLPrimitiveAccelerationStructure` per unique mesh
+(shared vertex/index buffers with the rasterizer), an instance descriptor buffer refit each frame
+by a compute kernel from `geom_xpos/geom_xmat`, and one instance acceleration structure rebuilt
+per frame for all envs, spatially separated by a grid offset larger than scene extent + max range
+(so rays never cross worlds and no per-env masking is needed). Sensors are `intersector` compute
+kernels writing Warp/MPS tensors; ordering by events like the renderer.
+
+- Lidar (beam table of azimuth/elevation in a site frame; range, point, normal, hit slot,
+  reflectance intensity) vs MuJoCo C `mj_ray` on a primitives scene, 1,625 beams: median
+  |Δrange| < 2 mm, 95th percentile < 2 cm (tessellation of curved primitives), hit/miss pattern
+  agreement > 97%.
+- Ray-cast pinhole depth vs the rasterizer's depth on the SO-101 scene (8 envs, 128 px):
+  coverage agreement 100%, median |Δz| 0, 99th percentile 0.1 mm. This cross-validates the
+  acceleration structures and the raster pipeline against each other.
+- GPU path with `BatchSim`: zero host syncs over a 10-step loop.
+
+Not yet: beam divergence (sub-rays), multi-return, rotation across substeps, range noise
+(planned on the torch side), radar-lite, Isaac RTX lidar JSON/USD config import, IMU/contact
+sensors (available from MuJoCo Warp sensordata; to be exposed as tensors).
+
+## Phase 4 started: tier 1 hybrid ray tracing (measured)
+
+`Tier0Renderer(..., tier=1)`: the same raster G-buffer pass, but the fragment stage issues
+hardware ray queries against the sensor layer's instance acceleration structure (refit each
+frame from the physics buffers): soft shadows (cone-sampled, `rt_samples` rays), cosine-weighted
+ambient occlusion (0.5 m horizon) and one mirror reflection ray for reflective materials (MuJoCo
+`reflectance`, metals), shaded at the hit with the same light list; misses see the model's
+skybox colour. Fidelity vs `mujoco.Renderer`, SO-101 at 256 px: PSNR 19.7 dB, FLIP 0.305
+(tier 0: 19.1 / 0.318) with the floor reflection now present.
+
+Cost at N=64, 128 px, 2000-face LOD, measured while a training run shared the GPU (so
+absolute numbers are pessimistic; the ratios hold):
+
+| tier | rays / pixel | env-frames/s | ms / frame |
+|---|---|---|---|
+| 0 (shadow map) | 0 | 59,190 | 1.08 |
+| 1, rt_samples=1 | 3 | 28,827 | 2.22 |
+| 1, rt_samples=4 | 9 | 11,948 | 5.36 |
+
+The plan's estimate for tier 1 was 5–20× tier 0 before upscaling; measured 2–5×. Not yet:
+MetalFX temporal denoise/upscale, area lights, one-bounce diffuse GI, motion vectors.

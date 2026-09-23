@@ -40,9 +40,15 @@ class RenderOutputs:
 class Tier0Renderer:
     def __init__(self, model: mujoco.MjModel, n_envs: int, *, width=128, height=128, camera: str | int | None = None,
                  max_group=3, include_planes=True, backgrounds=False, outputs=("rgb",), seg_mode=SEG_SLOT,
-                 decimate_faces: int = 0, shadows: bool = True, ctx: MetalContext | None = None, device="metal:0"):
+                 decimate_faces: int = 0, shadows: bool = True, tier: int = 0, rt_samples: int = 4,
+                 ctx: MetalContext | None = None, device="metal:0"):
+        """tier 0: raster + shadow maps. tier 1: raster G-buffer with ray-traced shadows, ambient
+        occlusion and mirror reflections from the fragment stage (Metal hardware ray tracing)."""
         self.m = model
-        self.shadows = shadows
+        self.tier = tier
+        self.rt_samples = rt_samples
+        self.shadows = shadows and tier == 0
+        self.rt = None
         self.n = n_envs
         self.tw, self.th = width, height
         self.tpr = int(np.ceil(np.sqrt(n_envs)))
@@ -72,6 +78,12 @@ class Tier0Renderer:
         self._build_pipelines()
         self._alloc_outputs(outputs)
         self._host_sim = None
+        if tier >= 1:
+            from orchard.sensors.raytrace import RayTracer
+            self.rt = RayTracer(model, n_envs, max_range=50.0, max_group=max_group, include_planes=include_planes,
+                                decimate_faces=decimate_faces, ctx=self.ctx, device=device)
+            ro = np.zeros(4, np.uint32); ro[0] = self.rt.tpr; ro.view(np.float32)[1] = self.rt.stride; ro[2] = rt_samples
+            self.rt_offset_buf = self.ctx.buffer(16, ro, "rt_offset")
 
     # -- resources --------------------------------------------------------------------------------
 
@@ -93,7 +105,8 @@ class Tier0Renderer:
         self.cam_spec[:, 8:12] = (1, 0, 0, 0)
         self.cam_spec[:, 12:16] = (0.0, 0.0, 0.0, 0.0)   # DR light off: light the scene with the model's lights
         self.cam_spec[:, 16:20] = (1.0, 1.0, 1.0, 1.0 if self.use_bg else 0.0)   # ambient scale
-        self.cam_spec[:, 20:24] = (0.0, 0.0, 0.0, 1.0)
+        sky = t.params[4]
+        self.cam_spec[:, 20:24] = (sky[0], sky[1], sky[2], 1.0) if sky[3] > 0 else (0.0, 0.0, 0.0, 1.0)   # default background: sky
         self.cam_spec_i[:, 24] = self.cam_id
         self._cam_spec_wp = wp.array(self.cam_spec, dtype=wp.float32, device=self.device)
         self.t_cam_spec = tb.mps_tensor(self._cam_spec_wp)      # (N, 28) float32, GPU-writable
@@ -183,7 +196,7 @@ class Tier0Renderer:
             ds.setDepthCompareFunction_(depth_cmp)
             return p, c.device.newDepthStencilStateWithDescriptor_(ds)
 
-        self.geo_pipe, self.geo_ds = make("geom_vs", "geom_fs", True, Metal.MTLCompareFunctionLess, True)
+        self.geo_pipe, self.geo_ds = make("geom_vs", "geom_fs_rt" if self.tier >= 1 else "geom_fs", True, Metal.MTLCompareFunctionLess, True)
         self.bg_pipe, self.bg_ds = make("bg_vs", "bg_fs", False, Metal.MTLCompareFunctionAlways, False)
         d = Metal.MTLRenderPipelineDescriptor.new()
         d.setVertexFunction_(lib.newFunctionWithName_("shadow_vs"))
@@ -308,6 +321,9 @@ class Tier0Renderer:
                 se.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_instanceCount_baseVertex_baseInstance_(
                     Metal.MTLPrimitiveTypeTriangle, i_count, Metal.MTLIndexTypeUInt32, self.ibuf, i_off * 4, count, 0, first)
             se.endEncoding()
+        # 1c. tier 1: refit instance descriptors from the same physics buffers and rebuild the instance AS
+        if self.rt is not None:
+            self.rt._encode_refit_and_build(cb, geom_xpos, geom_xpos_off, geom_xmat, geom_xmat_off)
         # 2. render pass
         rp = Metal.MTLRenderPassDescriptor.new()
         for i, (tex, clear) in enumerate(((self.color_tex, (0, 0, 0, 1)), (self.seg_tex, (0, 0, 0, 0)),
@@ -357,6 +373,19 @@ class Tier0Renderer:
         re.setFragmentTexture_atIndex_(self.shadow_tex, 2)
         re.setFragmentSamplerState_atIndex_(self.samp, 0)
         re.setFragmentSamplerState_atIndex_(self.samp_shadow, 1)
+        if self.rt is not None:
+            rt = self.rt
+            re.useResource_usage_stages_(rt.inst_as, Metal.MTLResourceUsageRead, Metal.MTLRenderStageFragment)
+            for a in rt.prim_as:
+                re.useResource_usage_stages_(a, Metal.MTLResourceUsageRead, Metal.MTLRenderStageFragment)
+            re.setFragmentAccelerationStructure_atBufferIndex_(rt.inst_as, 10)
+            re.setFragmentBuffer_offset_atIndex_(self.rt_offset_buf, 0, 11)
+            re.setFragmentBuffer_offset_atIndex_(rt.inst_tab, 0, 12)
+            re.setFragmentBuffer_offset_atIndex_(rt.slot_mesh, 0, 13)
+            re.setFragmentBuffer_offset_atIndex_(rt.mesh_info, 0, 14)
+            re.setFragmentBuffer_offset_atIndex_(rt.vbuf, 0, 15)
+            re.setFragmentBuffer_offset_atIndex_(rt.ibuf, 0, 16)
+            re.setFragmentBuffer_offset_atIndex_(rt.inst_desc, 0, 17)
         for i_off, i_count, first, count in self.tables.draws:
             re.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_instanceCount_baseVertex_baseInstance_(
                 Metal.MTLPrimitiveTypeTriangle, i_count, Metal.MTLIndexTypeUInt32, self.ibuf, i_off * 4, count, 0, first)

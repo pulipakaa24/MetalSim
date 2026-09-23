@@ -201,11 +201,19 @@ def build_lights(m: mujoco.MjModel) -> np.ndarray:
 
 
 def scene_params(m: mujoco.MjModel) -> np.ndarray:
-    """(4, 4) float32: bounds center+radius | headlight ambient | headlight diffuse | headlight specular + active."""
+    """(5, 4) float32: bounds center+radius | headlight ambient | headlight diffuse | headlight specular + active | sky colour + present."""
     hl = m.vis.headlight
-    P = np.zeros((4, 4), np.float32)
+    P = np.zeros((5, 4), np.float32)
     P[0, :3] = m.stat.center; P[0, 3] = max(float(m.stat.extent), 0.1)
     P[1, :3] = hl.ambient; P[2, :3] = hl.diffuse; P[3, :3] = hl.specular; P[3, 3] = float(hl.active)
+    # sky: mean colour of the skybox texture (reflection misses and default background), w = present
+    for t in range(m.ntex):
+        if int(m.tex_type[t]) == int(mujoco.mjtTexture.mjTEXTURE_SKYBOX):
+            w, h, nc = int(m.tex_width[t]), int(m.tex_height[t]), int(m.tex_nchannel[t])
+            adr = int(m.tex_adr[t])
+            img = m.tex_data[adr:adr + w * h * nc].reshape(h, w, nc)[:, :, :3].astype(np.float32) / 255.0
+            P[4, :3] = img.mean(axis=(0, 1)); P[4, 3] = 1.0
+            break
     return P
 
 

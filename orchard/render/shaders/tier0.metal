@@ -43,11 +43,12 @@ struct Light {                // per model light (static part), 20 floats
     float4 atten;             // attenuation constant, linear, quadratic; w = body id
 };
 
-struct SceneParams {          // 4 x float4
+struct SceneParams {          // 5 x float4
     float4 bounds;            // scene center xyz, radius (from mjModel.stat)
     float4 hl_ambient;
     float4 hl_diffuse;
     float4 hl_specular;       // w = headlight active
+    float4 sky;               // mean skybox colour, w = skybox present
 };
 
 struct Material {
@@ -455,4 +456,175 @@ kernel void untile(
         float4 nv = normal.read(uint2(ax, ay));
         out_normal[pix * 3 + 0] = nv.x; out_normal[pix * 3 + 1] = nv.y; out_normal[pix * 3 + 2] = nv.z;
     }
+}
+
+// =================================================================================================
+// Tier 1: hybrid ray tracing from the fragment stage (shadows, ambient occlusion, mirror reflections)
+// against the sensor layer's instance acceleration structure (envs spatially separated by RTOffset).
+#include <metal_raytracing>
+using namespace metal::raytracing;
+
+struct RTOffset { uint tiles_per_row; float stride; uint n_samples; uint _pad; };
+struct MeshInfoT { uint i_off, i_count, _p0, _p1; };
+struct InstanceDescT { packed_float3 col0, col1, col2, col3; uint options, mask, if_table_offset, as_index; };
+
+inline float3 rt_env_offset(uint e, constant RTOffset& ro) {
+    return float3(float(e % ro.tiles_per_row) * ro.stride, float(e / ro.tiles_per_row) * ro.stride, 0.0);
+}
+
+inline uint hash_u(uint x) { x ^= x >> 16; x *= 0x7feb352du; x ^= x >> 15; x *= 0x846ca68bu; x ^= x >> 16; return x; }
+inline float hash_f(uint x) { return float(hash_u(x) & 0xFFFFFFu) / 16777216.0; }
+
+inline float3 ortho_basis_x(float3 n) {
+    float3 a = fabs(n.z) < 0.99 ? float3(0, 0, 1) : float3(1, 0, 0);
+    return normalize(cross(a, n));
+}
+
+inline bool occluded(instance_acceleration_structure accel, float3 origin, float3 dir, float tmax) {
+    ray r(origin, dir, 0.0005, tmax);
+    intersector<triangle_data, instancing> i;
+    i.accept_any_intersection(true);
+    return i.intersect(r, accel).type != intersection_type::none;
+}
+
+fragment FSOut geom_fs_rt(
+    FSIn in [[stage_in]],
+    device const EnvParams* envs       [[buffer(1)]],
+    device const Material*  mats       [[buffer(2)]],
+    device const Semantic*  sem        [[buffer(3)]],
+    device const float4*    per_inst   [[buffer(4)]],
+    constant Consts&        c          [[buffer(5)]],
+    device const Light*     lights     [[buffer(6)]],
+    device const float*     light_xpos [[buffer(7)]],
+    device const float*     light_xdir [[buffer(8)]],
+    constant SceneParams&   sp         [[buffer(9)]],
+    instance_acceleration_structure accel [[buffer(10)]],
+    constant RTOffset&      ro         [[buffer(11)]],
+    device const uint2*     inst_tab   [[buffer(12)]],
+    device const int*       slot_mesh  [[buffer(13)]],
+    device const MeshInfoT* meshes     [[buffer(14)]],
+    device const float*     verts      [[buffer(15)]],
+    device const uint*      indices    [[buffer(16)]],
+    device const InstanceDescT* inst   [[buffer(17)]],
+    texture2d<float>        atlas      [[texture(0)]],
+    sampler                 samp       [[sampler(0)]])
+{
+    EnvParams e = envs[in.env];
+    Material m = mats[in.slot];
+    float4 mod = per_inst[in.env * c.n_slots + in.slot];
+    float3 base = m.rgba.rgb * mod.rgb;
+    if (m.par.z > 0.5) {
+        float2 tuv = fract(in.uv * m.par.xy);
+        base *= atlas.sample(samp, m.rect.xy + tuv * m.rect.zw).rgb;
+    }
+    float metallic = m.mrse.x, rough = max(m.mrse.y, 0.03), specw = m.mrse.z, emission = m.mrse.w;
+    float3 N = normalize(in.normal_w);
+    float3 V = normalize(e.cam_pos.xyz - in.world_pos);
+    if (dot(N, V) < 0.0) N = -N;
+    float NdotV = max(dot(N, V), 1e-4);
+    float a2 = rough * rough * rough * rough;
+    float3 f0 = mix(float3(0.08 * specw), base, metallic);
+    float3 P = in.world_pos + rt_env_offset(in.env, ro) + N * 0.002;
+    uint seed = hash_u(uint(in.clip.x) * 1973u + uint(in.clip.y) * 9277u + in.env * 26699u);
+    uint ns = max(ro.n_samples, 1u);
+    float3 tx = ortho_basis_x(N), ty = cross(N, tx);
+
+    // direct lighting with ray-traced shadows (soft: cone of half-angle ~0.7 deg for the caster)
+    float3 direct = float3(0.0);
+    uint nl = uint(e.misc.y);
+    int caster = int(e.misc.x);
+    auto shadow_term = [&](float3 L, bool is_caster) -> float {
+        if (!is_caster) return 1.0;
+        float3 lx = ortho_basis_x(L), ly = cross(L, lx);
+        float occ = 0.0;
+        for (uint s = 0; s < ns; ++s) {
+            float u = hash_f(seed + s * 7919u), v = hash_f(seed + s * 104729u + 17u);
+            float rr = 0.012 * sqrt(u), ph = 6.2831853 * v;   // ~0.7 deg angular radius
+            float3 d = normalize(L + lx * (rr * cos(ph)) + ly * (rr * sin(ph)));
+            occ += occluded(accel, P, d, 100.0) ? 1.0 : 0.0;
+        }
+        return 1.0 - occ / float(ns);
+    };
+    for (uint i = 0; i < nl; ++i) {
+        Light l = lights[i];
+        device const float* lp = light_xpos + (in.env * c.n_light + i) * 3;
+        device const float* ld = light_xdir + (in.env * c.n_light + i) * 3;
+        float3 Lpos = float3(lp[0], lp[1], lp[2]);
+        float3 Ldir = normalize(float3(ld[0], ld[1], ld[2]));
+        float3 L; float att = 1.0;
+        if (l.kind.x == 0.0) { L = -Ldir; }
+        else {
+            float3 dv = Lpos - in.world_pos; float dist = length(dv); L = dv / max(dist, 1e-6);
+            att = 1.0 / max(l.atten.x + l.atten.y * dist + l.atten.z * dist * dist, 1e-4);
+            if (l.kind.x == 2.0) {
+                float cosang = dot(-L, Ldir);
+                att *= cosang > cos(l.kind.z * PI / 180.0) ? pow(max(cosang, 0.0), l.kind.w) : 0.0;
+            }
+        }
+        float s = shadow_term(L, int(i) == caster);
+        direct += shade_light(N, V, L, l.diffuse.xyz * (PI * att), base, f0, metallic, a2, NdotV) * s;
+    }
+    if (e.dr_light.w > 0.0) {
+        float s = shadow_term(-e.dr_light.xyz, caster == MAX_LIGHTS);
+        direct += shade_light(N, V, -e.dr_light.xyz, float3(PI * e.dr_light.w), base, f0, metallic, a2, NdotV) * s;
+    }
+    if (e.misc.z > 0.5)
+        direct += shade_light(N, V, V, sp.hl_diffuse.xyz * PI, base, f0, metallic, a2, NdotV);
+
+    // ambient occlusion: cosine-weighted hemisphere rays, 0.5 m horizon
+    float ao_occ = 0.0;
+    for (uint s = 0; s < ns; ++s) {
+        float u = hash_f(seed + s * 6151u + 3u), v = hash_f(seed + s * 12289u + 5u);
+        float rr = sqrt(u), ph = 6.2831853 * v;
+        float3 d = tx * (rr * cos(ph)) + ty * (rr * sin(ph)) + N * sqrt(max(1.0 - u, 0.0));
+        ao_occ += occluded(accel, P, d, 0.5) ? 1.0 : 0.0;
+    }
+    float ao = 1.0 - 0.5 * ao_occ / float(ns);
+    float3 color = direct + e.ambient.rgb * base * ao + emission * base;
+
+    // mirror reflection for reflective materials (MuJoCo `reflectance`) and metals: one ray
+    float refl = max(m.par.w, metallic * (1.0 - rough));
+    if (refl > 0.01) {
+        float3 Rd = reflect(-V, N);
+        ray r(P, Rd, 0.001, 50.0);
+        intersector<triangle_data, instancing> isect;
+        intersection_result<triangle_data, instancing> res = isect.intersect(r, accel);
+        float3 rc = sp.sky.w > 0.5 ? sp.sky.xyz : e.clear_color.rgb;
+        if (res.type != intersection_type::none) {
+            uint slot2 = inst_tab[res.instance_id].y;
+            uint mesh2 = uint(slot_mesh[slot2]);
+            uint b = meshes[mesh2].i_off + res.primitive_id * 3;
+            uint i0 = indices[b], i1 = indices[b + 1], i2 = indices[b + 2];
+            float2 bc = res.triangle_barycentric_coord;
+            float w0 = 1.0 - bc.x - bc.y;
+            float2 uv2 = float2(verts[i0*8+6], verts[i0*8+7]) * w0 + float2(verts[i1*8+6], verts[i1*8+7]) * bc.x + float2(verts[i2*8+6], verts[i2*8+7]) * bc.y;
+            float3 n2 = normalize(float3(verts[i0*8+3], verts[i0*8+4], verts[i0*8+5]) * w0 + float3(verts[i1*8+3], verts[i1*8+4], verts[i1*8+5]) * bc.x + float3(verts[i2*8+3], verts[i2*8+4], verts[i2*8+5]) * bc.y);
+            InstanceDescT id2 = inst[res.instance_id];       // rigid instance: rotation columns
+            float3x3 R2 = float3x3(float3(id2.col0), float3(id2.col1), float3(id2.col2));
+            n2 = normalize(R2 * n2);
+            if (dot(n2, Rd) > 0.0) n2 = -n2;
+            Material m2 = mats[slot2];
+            float4 mod2 = per_inst[in.env * c.n_slots + slot2];
+            float3 base2 = m2.rgba.rgb * mod2.rgb;
+            if (m2.par.z > 0.5) base2 *= atlas.sample(samp, m2.rect.xy + fract(uv2 * m2.par.xy) * m2.rect.zw).rgb;
+            float3 V2 = -Rd;
+            float3 d2 = float3(0.0);
+            for (uint i = 0; i < nl; ++i) {
+                Light l = lights[i];
+                device const float* ld = light_xdir + (in.env * c.n_light + i) * 3;
+                if (l.kind.x != 0.0) continue;
+                float3 L = -normalize(float3(ld[0], ld[1], ld[2]));
+                d2 += base2 / PI * max(dot(n2, L), 0.0) * l.diffuse.xyz * PI;
+            }
+            if (e.dr_light.w > 0.0) d2 += base2 / PI * max(dot(n2, -e.dr_light.xyz), 0.0) * PI * e.dr_light.w;
+            if (e.misc.z > 0.5) d2 += base2 / PI * max(dot(n2, V2), 0.0) * sp.hl_diffuse.xyz * PI;
+            rc = d2 + e.ambient.rgb * base2 + m2.mrse.w * base2;
+        }
+        color = mix(color, rc, refl);   // MuJoCo blends a constant reflectance
+    }
+    FSOut o;
+    o.color = float4(color, 1.0);
+    o.seg = in.slot + 1u;
+    o.normal = float4(N, 1.0);
+    return o;
 }
