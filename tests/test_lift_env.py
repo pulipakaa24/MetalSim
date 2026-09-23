@@ -35,6 +35,8 @@ def test_lift_env_runs_and_resets():
     d = wm.counters() - c0
     env.synchronize()
     assert d.syncs == 0, "the step loop waited for the GPU"
+    flags = env.sim.overflow_flags()
+    assert not any(k in flags for k in ("NEFC", "NARROWPHASE", "CCD", "BROADPHASE")), f"buffer overflow: {flags}"
     R = torch.stack(rewards).cpu().numpy()
     D = torch.stack(dones).cpu().numpy()
     assert np.isfinite(R).all() and R.min() >= 0

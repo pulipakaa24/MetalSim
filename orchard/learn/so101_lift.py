@@ -43,7 +43,7 @@ class LiftConfig:
     reward_mode: str = "vanilla"     # or "grasped" (grasp-conditioned lift bonus; needs contact sensing)
     render: bool = True
     backgrounds: bool = True
-    njmax: int | None = None
+    njmax: int = 512                 # constraint rows per world; see BatchSimOptions.njmax
     nconmax: int | None = None
     warn_overflow: bool = False
 

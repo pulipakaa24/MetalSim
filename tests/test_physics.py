@@ -112,6 +112,7 @@ def test_trajectory_parity_so101_arm_joints():
     err = np.abs(got[:, arm] - ref[:, arm])
     print(f"SO-101 arm joints over {steps} steps: max |dq| = {err.max():.2e}, final = {err[-1].max():.2e}")
     assert err.max() < 2e-2
+    assert "NEFC" not in sim.overflow_flags()
     # all four worlds identical (determinism across worlds)
     q_all = sim.d.qpos.numpy()
     assert np.allclose(q_all[0], q_all[1:], atol=1e-6)

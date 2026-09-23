@@ -126,3 +126,20 @@ Levels of detail (measured): welded quadric decimation with a vertex-clustering 
 mjbatch-metal published for this scene: 19,000 env-frames/s pipelined, 16,957 steps/s (N=64,
 128 px, CPU physics). MuJoCo Playground PandaPickCubeCartesian with Madrona on datacenter
 hardware: ~37,000 steps/s (reported).
+
+## Phase 2: learner path — in progress
+
+### Incident: NaN in batched physics under random control (resolved)
+
+Symptom: the GPU SO-101 lift env produced NaN rewards after ~100 steps; pure MuJoCo Warp on
+Metal (no torch) diverged too, Warp CPU did not; 64 identical worlds diverged in a different
+subset each run. Diagnosis path: solver-variant sweep (Newton+elliptic NaN; CG or pyramidal
+clean), block-size sweep (barrier type irrelevant), atomic-add micro-test (correct), then a
+cross-world consistency tool (`orchard.tools.race_finder`: every launch followed by a check
+that identical worlds stay identical) which flagged `d.overflow` and `d.efc.id` right after
+collision. Overflow flags: **NEFC** — MuJoCo Warp's default of 64 constraint rows per world
+overflows with the SO-101 gripper's condim-6 contacts; rows are dropped in atomic order, so
+worlds get different partial contacts, and the elliptic-cone Newton path turns a half-contact
+into NaN. `njmax=512`: 0 bad worlds in 256 trials. Not a Metal defect. Fixes: `BatchSim`
+defaults `njmax=512` and exposes `overflow_flags()`; tests assert no buffer overflow.
+Upstream note: MuJoCo Warp should saturate rather than NaN on NEFC overflow (to file).

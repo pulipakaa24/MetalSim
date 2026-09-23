@@ -57,7 +57,10 @@ class BatchSimOptions:
     substeps: int = 1                 # physics steps per call to step()
     capture: bool = True              # replay a recorded graph
     nconmax: int | None = None
-    njmax: int | None = None
+    # Constraint rows per world. MuJoCo Warp's default (64) overflows on contact-rich scenes
+    # (condim-6 gripper contacts), and an overflow drops rows nondeterministically, which makes
+    # the elliptic-cone Newton solver produce NaN. 512 covers every scene in the test corpus.
+    njmax: int | None = 512
     solver_iterations: int | None = None
     ls_iterations: int | None = None
     warn_overflow: bool = False       # MuJoCo Warp prints on solver overflow; off for RL loops
@@ -142,6 +145,16 @@ class BatchSim:
 
     def synchronize(self) -> None:
         wp.synchronize_device(self.device)
+
+    def overflow_flags(self) -> dict[str, int]:
+        """Per-flag count of worlds whose overflow bit is set (synchronizes). Use in tests and at
+        rollout boundaries: NEFC / NARROWPHASE / CCD overflows mean dropped constraints or contacts
+        and must be fixed by raising ``njmax`` / ``nconmax``; LS_ITERATIONS and ITERATIONS are
+        solver-convergence warnings (same as MuJoCo C's)."""
+        self.synchronize()
+        ov = self.d.overflow.numpy()
+        return {f.name: int(((ov & int(f)) != 0).sum()) for f in mjw.OverflowType if int(f) not in (0, int(mjw.OverflowType.ALL))
+                and ((ov & int(f)) != 0).any()}
 
     # -- simulation ---------------------------------------------------------------------------------
 
