@@ -46,7 +46,10 @@ cmd = cfg.commands.base_velocity
 cmd.heading_command = False; cmd.rel_standing_envs = 0.0; cmd.rel_heading_envs = 0.0
 cmd.ranges.lin_vel_x = (0.5, 0.5); cmd.ranges.lin_vel_y = (0.0, 0.0); cmd.ranges.ang_vel_z = (0.0, 0.0)
 cfg.observations.policy.enable_corruption = False
-cfg.scene.env_spacing = 6.0
+cfg.scene.env_spacing = 20.0
+cmd.debug_vis = False                                     # no command arrow in the frames
+if hasattr(cfg.scene, "height_scanner") and cfg.scene.height_scanner is not None: cfg.scene.height_scanner.debug_vis = False
+cfg.scene.terrain.visual_material = sim_utils.PreviewSurfaceCfg(diffuse_color=(0.5, 0.5, 0.5), roughness=0.7)   # same plain grey ground as MetalSim's replay
 # lighting that MetalSim can reproduce: one sun + a uniform sky (the default is an HDR dome)
 cfg.scene.sky_light = AssetBaseCfg(prim_path="/World/skyLight", spawn=sim_utils.DomeLightCfg(intensity=400.0, color=(0.75, 0.8, 0.9)))
 cfg.scene.sun = AssetBaseCfg(prim_path="/World/sun", spawn=sim_utils.DistantLightCfg(intensity=3000.0, color=(1.0, 0.98, 0.95), angle=0.53),
