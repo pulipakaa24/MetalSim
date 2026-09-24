@@ -86,8 +86,8 @@ class AnomalyMonitor:
         """Return-vs-length direction over the last 10 log points once episodes are lengthening."""
         self.hist.append({"it": it, "ep": (ep_ret, ep_len, count)})
         flags = []
-        pts = [h["ep"] for h in self.hist[-10:] if h["ep"][2]]
-        if len(pts) >= 6:
+        pts = [h["ep"] for h in self.hist[-100:] if h["ep"][2]]      # long window: the trend, not the noise
+        if len(pts) >= 30:
             lens = np.array([p[1] for p in pts]); rets = np.array([p[0] for p in pts])
             if lens[-1] > lens[0] * 1.3 and np.corrcoef(lens, rets)[0, 1] < -0.6:
                 flags.append(f"returns fall as episodes lengthen (corr {np.corrcoef(lens, rets)[0, 1]:.2f}): the reward punishes survival")
