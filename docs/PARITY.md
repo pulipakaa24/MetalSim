@@ -117,9 +117,19 @@ steps to 301 (it 500) and **597 (it 750, 12 s of the 20 s horizon)**, then degra
 ended by a physics blow-up rose from 0 to 190 per logging window. So the identical configuration
 learns to stay up for half an episode but does not converge to Isaac's walking behaviour, and the
 late-run collapse coincides with the policy driving the contacts into the regime where MuJoCo (C and
-Warp alike, §1.6) injects energy. Candidate causes, none confirmed yet: MuJoCo's soft contacts under
-aggressive position targets, the adaptive learning rate pinned at 1e-5 to 1e-4 by KL estimates above
-the 0.01 target, and no value normalization. This is the clearest open fidelity gap in the matrix and
+Warp alike, §1.6) injects energy. **Cause found (MuJoCo C, `scripts/diagnostics/g1_drive_stability.py`)**: with Isaac's drives (kp 200 Nm/rad, effort 300 Nm)
+and 3σ position targets, 8 of 8 worlds blow up at MuJoCo's 5 ms step, **0 of 8 at 2.5 ms, 2 ms or
+1 ms** (joint speeds stay below 150 rad/s), and 1 of 8 with the full `implicit` integrator at 5 ms.
+MuJoCo's `implicitfast`/`implicit` integrators are implicit in velocity only: actuator *damping* is
+integrated implicitly, actuator *stiffness* explicitly, so a 200 Nm/rad drive on a 0.01 kg·m²
+armature (natural frequency 22 Hz) sits at the explicit stability boundary at 5 ms (ω·dt ≈ 0.7).
+PhysX solves its joint drives implicitly and is unconditionally stable at the same gains. The
+projects that train the G1 on MuJoCo avoid this by construction: MuJoCo Playground runs the G1 at a
+**2 ms** physics step (kp 75, Euler, 3 solver iterations), mjlab derives its gains from the motors'
+reflected inertia at a **10 Hz** natural frequency (kp ≈ 40 Nm/rad on the hips, effort 88–139 Nm)
+at 5 ms. The faithful fix for an Isaac-configured task is therefore the smaller step with the same
+gains (2.5 ms, decimation 8), which costs about 2× physics time per control step; it is now an
+option of the task (`physics_dt`) and the re-run is reported below. This is the clearest open fidelity gap in the matrix and
 is **disproved** as parity until a run reproduces Isaac's curve. A rendered rollout of the final
 policy is `docs/gallery/g1_tier2_policy.mp4` (robots stumble and fall, as the numbers say).
 

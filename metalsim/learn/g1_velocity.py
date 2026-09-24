@@ -67,11 +67,11 @@ PHYSICS_DT = 0.005
 EPISODE_S = 20.0
 
 
-def build_g1_model(terrain: str = "flat", hfield=None, visuals: bool = False):
+def build_g1_model(terrain: str = "flat", hfield=None, visuals: bool = False, physics_dt: float = PHYSICS_DT):
     """MjModel of Isaac's G1 (from its USD) on a plane or a heightfield, with Isaac's actuators,
     initial pose, and touch sensors for contact terms. Returns (model, info)."""
     spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
-    spec.option.timestep = PHYSICS_DT
+    spec.option.timestep = physics_dt      # 0.005 = Isaac; 0.0025 keeps Isaac's kp 200 drives stable in MuJoCo (explicit stiffness)
     spec.option.integrator = mujoco.mjtIntegrator.mjINT_IMPLICITFAST
     spec.option.cone = mujoco.mjtCone.mjCONE_PYRAMIDAL   # mjlab's G1 training setting; elliptic is costlier
     # solver budget as in MuJoCo Warp's own G1 benchmark (benchmarks/unitree_g1/unitree_g1_mjlab.xml):
@@ -378,7 +378,8 @@ def g1_reset(reset_mask: wp.array(dtype=wp.bool), default_q: wp.array(dtype=floa
 class G1VelocityTask:
     """Isaac Lab velocity task shape for `metalsim.learn.ppo_warp.PPOWarp`."""
 
-    def __init__(self, n, terrain: str = "flat", seed: int = 0, height_scan: bool | None = None, device="metal:0"):
+    def __init__(self, n, terrain: str = "flat", seed: int = 0, height_scan: bool | None = None, device="metal:0",
+                 physics_dt: float = PHYSICS_DT):
         self.n, self.seed, self.device = n, seed, device
         self.terrain_kind = terrain
         self.hfield = None
@@ -386,10 +387,11 @@ class G1VelocityTask:
         if terrain != "flat":
             from metalsim.learn.terrain import isaac_rough_terrain
             self.hfield = isaac_rough_terrain(seed=seed)
-        self.model, self.info = build_g1_model(terrain, self.hfield)
+        self.model, self.info = build_g1_model(terrain, self.hfield, physics_dt=physics_dt)
+        self.physics_dt = physics_dt
         m = self.model
         self.nj = m.nu
-        self.decimation = int(round(CONTROL_DT / PHYSICS_DT))
+        self.decimation = int(round(CONTROL_DT / physics_dt))
         # contact capacity: 3 colliders x <= 4 kept contacts per pair; MuJoCo Warp's heightfield default
         # (256 per world) sizes GPU scratch by naconmax and exhausts memory at 4096 worlds
         self.sim = BatchSim(m, n, options=BatchSimOptions(substeps=self.decimation, njmax=256, nconmax=32,
@@ -569,20 +571,20 @@ def g1_ppo_config(terrain: str, iterations: int, seed: int = 0):
                          hidden=(512, 256, 128) if terrain != "flat" else (256, 128, 128), log_every=1)
 
 
-def train_g1(n=4096, terrain="flat", iterations=1500, seed=0, log_path=None, checkpoint=None):
+def train_g1(n=4096, terrain="flat", iterations=1500, seed=0, log_path=None, checkpoint=None, physics_dt=PHYSICS_DT):
     from metalsim.learn.ppo_warp import PPOWarp
-    task = G1VelocityTask(n, terrain=terrain, seed=seed)
+    task = G1VelocityTask(n, terrain=terrain, seed=seed, physics_dt=physics_dt)
     algo = PPOWarp(task, g1_ppo_config(terrain, iterations, seed))
     f = open(log_path, "a") if log_path else None
     def log(msg):
         print(msg, flush=True)
         if f:
             f.write(msg + "\n"); f.flush()
-    log(f"G1 {terrain} PPO: N={n} obs_dim {task.obs_dim} act_dim {task.act_dim} rollout 24 x {iterations} iterations")
+    log(f"G1 {terrain} PPO: N={n} obs_dim {task.obs_dim} act_dim {task.act_dim} rollout 24 x {iterations} iterations, physics dt {physics_dt} (decimation {task.decimation})")
     def save(path, it):
         torch.save({"net": algo.net.state_dict(), "terrain": terrain, "n": n, "iterations": it, "obs_dim": task.obs_dim,
                     "act_dim": task.act_dim, "hidden": algo.cfg.hidden}, path)
-    cb = (lambda it, a: save(checkpoint.replace(".pt", "_ckpt.pt"), it) if it % 100 == 0 else None) if checkpoint else None
+    cb = (lambda it, a: save(checkpoint.replace(".pt", f"_it{it}.pt"), it) if it % 100 == 0 else None) if checkpoint else None
     algo.train(log=log, callback=cb)
     if checkpoint:
         save(checkpoint, iterations)
@@ -597,7 +599,7 @@ if __name__ == "__main__":
     terrain = sys.argv[2] if len(sys.argv) > 2 else "flat"
     if len(sys.argv) > 3 and sys.argv[3] == "train":
         train_g1(n, terrain, int(sys.argv[4]) if len(sys.argv) > 4 else 1500, log_path=sys.argv[5] if len(sys.argv) > 5 else None,
-                 checkpoint=sys.argv[6] if len(sys.argv) > 6 else None)
+                 checkpoint=sys.argv[6] if len(sys.argv) > 6 else None, physics_dt=float(sys.argv[7]) if len(sys.argv) > 7 else PHYSICS_DT)
         sys.exit(0)
     task = G1VelocityTask(n, terrain=terrain)
     print(f"G1 ({terrain}): nbody {task.model.nbody} nv {task.model.nv} nu {task.model.nu} ngeom {task.model.ngeom} obs_dim {task.obs_dim}")
