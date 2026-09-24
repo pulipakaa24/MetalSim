@@ -86,6 +86,8 @@ class CartpoleRGBEnv:
         self.max_steps = int(self.cfg.episode_seconds / (self.model.opt.timestep * self.cfg.decimation))
         self.t = torch.zeros(self.n, dtype=torch.int32, device=self.dev)
         self.act_dim = 1
+        self.obs_space = {"image": (self.cfg.height, self.cfg.width, 3), "qpos": (4,)}
+        self.ep_ret = torch.zeros(self.n, device=self.dev)
         self.sim.synchronize()
 
     def _learner_done(self):
@@ -111,8 +113,8 @@ class CartpoleRGBEnv:
         self.rend.after(vr)
 
     def _obs(self):
-        return {"image": self.rend.out.rgb if self.rend is not None else None,
-                "state": torch.cat([self.sim.t.qpos[:, :2], self.sim.t.qvel[:, :2]], 1)}
+        st = torch.cat([self.sim.t.qpos[:, :2], self.sim.t.qvel[:, :2]], 1)
+        return {"image": self.rend.out.rgb if self.rend is not None else None, "state": st, "qpos": st}
 
     def reset(self):
         mask = torch.ones(self.n, dtype=torch.bool, device=self.dev)
@@ -133,10 +135,14 @@ class CartpoleRGBEnv:
         trunc = self.t >= self.max_steps
         done = oob | trunc
         reward = 1.0 - 2.0 * oob.float() - 1.0 * th * th - 0.01 * xd.abs() - 0.005 * thd.abs()
+        self.ep_ret += reward
+        info = {"truncated": trunc & ~oob, "episode_reward": self.ep_ret.clone(), "episode_length": self.t.float(),
+                "is_success": trunc & ~oob}
+        self.ep_ret = torch.where(done, torch.zeros_like(self.ep_ret), self.ep_ret)
         vres = self.sim.reset(done); self.sim.after(vres)
         self._randomize(done); self._learner_done()
         vf = self.sim.forward(); self._render(vf); self.sim.after(vf)
-        return self._obs(), reward, done, {"truncated": trunc & ~oob}
+        return self._obs(), reward, done, info
 
     def synchronize(self):
         self.sim.synchronize()

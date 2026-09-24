@@ -8,6 +8,7 @@ Warp (WS7) is a later step; this is the torch path with an instrumented time spl
 """
 from __future__ import annotations
 
+import math
 import time
 from dataclasses import dataclass, field
 
@@ -32,30 +33,46 @@ class PPOConfig:
     max_grad_norm: float = 0.5
     log_every: int = 1
     seed: int = 0
+    # Isaac Lab / skrl camera-cartpole options
+    desired_kl: float | None = None     # KLAdaptiveLR: lr /1.5 when KL > 2x, x1.5 when KL < 0.5x (bounds 1e-6..1e-2)
+    clip_value: bool = False            # clip_predicted_values (value_clip = clip)
+    feat: int = 256                     # CNN feature width (Isaac: 512)
+    activation: str = "relu"            # trunk activation after the CNN (Isaac: elu)
+    qpos_dim: int | None = None         # None: from env.obs_space["qpos"]; 0: image-only policy (Isaac's camera cartpole)
 
 
 class NatureCNN(nn.Module):
-    def __init__(self, in_ch=3, feat=256):
+    """Isaac Lab / skrl camera-cartpole feature extractor: conv 32x8s4, 64x4s2, 64x3s1 (ReLU), flatten, fc."""
+
+    def __init__(self, in_ch=3, feat=256, image_hw=(128, 128), activation="relu"):
         super().__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(in_ch, 32, 8, stride=4), nn.ReLU(),
             nn.Conv2d(32, 64, 4, stride=2), nn.ReLU(),
             nn.Conv2d(64, 64, 3, stride=1), nn.ReLU(), nn.Flatten())
         with torch.no_grad():
-            n = self.conv(torch.zeros(1, in_ch, 128, 128)).shape[1]
-        self.fc = nn.Sequential(nn.Linear(n, feat), nn.ReLU())
+            n = self.conv(torch.zeros(1, in_ch, *image_hw)).shape[1]
+        act = nn.ELU() if activation == "elu" else nn.ReLU()
+        self.fc = nn.Sequential(nn.Linear(n, feat), act)
 
     def forward(self, x):
         return self.fc(self.conv(x))
 
 
 class ActorCritic(nn.Module):
-    def __init__(self, act_dim, qpos_dim=6, feat=256):
+    def __init__(self, act_dim, qpos_dim=6, feat=256, image_hw=(128, 128), activation="relu"):
         super().__init__()
-        self.cnn = NatureCNN(3, feat)
-        self.qpos = nn.Sequential(nn.Linear(qpos_dim, 64), nn.ReLU())
-        self.pi = nn.Sequential(nn.Linear(feat + 64, 256), nn.ReLU(), nn.Linear(256, act_dim))
-        self.v = nn.Sequential(nn.Linear(feat + 64, 256), nn.ReLU(), nn.Linear(256, 1))
+        self.cnn = NatureCNN(3, feat, image_hw, activation)
+        self.qpos_dim = qpos_dim
+        act = nn.ELU() if activation == "elu" else nn.ReLU()
+        if qpos_dim > 0:
+            self.qpos = nn.Sequential(nn.Linear(qpos_dim, 64), nn.ReLU())
+            h = feat + 64
+            self.pi = nn.Sequential(nn.Linear(h, 256), act, nn.Linear(256, act_dim))
+            self.v = nn.Sequential(nn.Linear(h, 256), act, nn.Linear(256, 1))
+        else:                       # image-only, shared trunk, linear heads (skrl "separate: False", layers [512])
+            self.pi = nn.Linear(feat, act_dim)
+            self.v = nn.Linear(feat, 1)
         self.log_std = nn.Parameter(torch.zeros(act_dim))
 
     def features(self, image_u8, qpos, nchw=False):
@@ -66,14 +83,17 @@ class ActorCritic(nn.Module):
         """
         x = image_u8 if nchw else image_u8.permute(0, 3, 1, 2).contiguous()
         x = x.float() * (1.0 / 255.0)
-        return torch.cat([self.cnn(x), self.qpos(qpos)], dim=1)
+        f = self.cnn(x)
+        if self.qpos_dim > 0:
+            f = torch.cat([f, self.qpos(qpos)], dim=1)
+        return f
 
     def forward(self, image_u8, qpos, nchw=False):
         h = self.features(image_u8, qpos, nchw)
         return self.pi(h), self.v(h).squeeze(-1)
 
     def dist(self, mean):
-        return torch.distributions.Normal(mean, self.log_std.exp())
+        return torch.distributions.Normal(mean, self.log_std.exp().clamp(math.exp(-20.0), math.exp(2.0)))
 
 
 @dataclass
@@ -92,12 +112,15 @@ class PPO:
     def __init__(self, env, cfg: PPOConfig | None = None, device="mps"):
         self.env, self.cfg, self.dev = env, cfg or PPOConfig(), torch.device(device)
         torch.manual_seed(self.cfg.seed)
-        self.net = ActorCritic(env.act_dim).to(self.dev)
-        self.opt = torch.optim.Adam(self.net.parameters(), lr=self.cfg.lr, eps=1e-5)
-        n, T = env.n, self.cfg.rollout
         H, W, C = env.obs_space["image"]
+        qdim = self.cfg.qpos_dim if self.cfg.qpos_dim is not None else int(env.obs_space.get("qpos", (0,))[0])
+        self.qdim = qdim
+        self.net = ActorCritic(env.act_dim, qpos_dim=qdim, feat=self.cfg.feat, image_hw=(H, W), activation=self.cfg.activation).to(self.dev)
+        self.opt = torch.optim.Adam(self.net.parameters(), lr=self.cfg.lr, eps=1e-5)
+        self.lr = self.cfg.lr
+        n, T = env.n, self.cfg.rollout
         self.buf_img = torch.zeros((T, n, C, H, W), dtype=torch.uint8, device=self.dev)   # NCHW, contiguous
-        self.buf_q = torch.zeros((T, n, 6), device=self.dev)
+        self.buf_q = torch.zeros((T, n, max(qdim, 1)), device=self.dev)
         self.buf_a = torch.zeros((T, n, env.act_dim), device=self.dev)
         self.buf_logp = torch.zeros((T, n), device=self.dev)
         self.buf_v = torch.zeros((T, n), device=self.dev)
@@ -113,9 +136,10 @@ class PPO:
         for t in range(cfg.rollout):
             t0 = time.perf_counter()
             with torch.no_grad():
-                img, q = obs["image"], obs["qpos"]
+                img = obs["image"]; q = obs["qpos"] if self.qdim > 0 else self.buf_q[t]
                 self.buf_img[t].copy_(img.permute(0, 3, 1, 2))
-                self.buf_q[t].copy_(q)
+                if self.qdim > 0:
+                    self.buf_q[t].copy_(q)
                 mean, v = self.net(img, q)
                 d = self.net.dist(mean)
                 a = d.sample()
@@ -134,7 +158,7 @@ class PPO:
             self.timers.env += time.perf_counter() - t1
             self.global_step += n
         with torch.no_grad():
-            _, last_v = self.net(obs["image"], obs["qpos"])
+            _, last_v = self.net(obs["image"], obs["qpos"] if self.qdim > 0 else self.buf_q[0])
         self.env.synchronize()
         done_mask = torch.stack([torch.as_tensor(d > 0) for d in self.buf_done]).cpu().numpy()
         rets = torch.stack(ep_ret).cpu().numpy(); lens = torch.stack(ep_len).cpu().numpy()
@@ -162,7 +186,7 @@ class PPO:
         N = T * n
         img = self.buf_img.reshape(N, *self.buf_img.shape[2:])
         q = self.buf_q.reshape(N, -1); a = self.buf_a.reshape(N, -1)
-        logp_old = self.buf_logp.reshape(N); adv = adv.reshape(N); ret = ret.reshape(N)
+        logp_old = self.buf_logp.reshape(N); adv = adv.reshape(N); ret = ret.reshape(N); v_buf = self.buf_v.reshape(N).clone()
         adv = (adv - adv.mean()) / (adv.std() + 1e-8)
         mb = N // cfg.minibatches
         stats = {"pg": 0.0, "vf": 0.0, "kl": 0.0}
@@ -175,9 +199,22 @@ class PPO:
                 logp = d.log_prob(a[idx]).sum(-1)
                 ratio = (logp - logp_old[idx]).exp()
                 pg = -torch.min(ratio * adv[idx], ratio.clamp(1 - cfg.clip, 1 + cfg.clip) * adv[idx]).mean()
-                vf = F.mse_loss(v, ret[idx])
+                if cfg.clip_value:
+                    v_old = v_buf[idx]; v_c = v_old + (v - v_old).clamp(-cfg.clip, cfg.clip)
+                    vf = torch.max((v - ret[idx]) ** 2, (v_c - ret[idx]) ** 2).mean()
+                else:
+                    vf = F.mse_loss(v, ret[idx])
                 ent = d.entropy().sum(-1).mean()
                 loss = pg + cfg.vf_coef * vf - cfg.ent_coef * ent
+                if cfg.desired_kl is not None:
+                    with torch.no_grad():
+                        kl_now = (logp_old[idx] - logp).mean().item()
+                    if kl_now > 2.0 * cfg.desired_kl:
+                        self.lr = max(1e-6, self.lr / 1.5)
+                    elif 0.0 < kl_now < 0.5 * cfg.desired_kl:
+                        self.lr = min(1e-2, self.lr * 1.5)
+                    for g in self.opt.param_groups:
+                        g["lr"] = self.lr
                 self.opt.zero_grad(set_to_none=True)
                 loss.backward()
                 nn.utils.clip_grad_norm_(self.net.parameters(), cfg.max_grad_norm)
@@ -208,6 +245,6 @@ class PPO:
                        f"ret {np.mean([e[0] for e in recent]) if recent else 0:7.2f} "
                        f"len {np.mean([e[1] for e in recent]) if recent else 0:5.1f} "
                        f"succ {np.mean([e[2] for e in recent]) if recent else 0:5.2f} (n={len(recent)}) | "
-                       f"pg {stats['pg']:.3f} vf {stats['vf']:.3f} kl {stats['kl']:.4f} | {self.timers.report()}")
+                       f"pg {stats['pg']:.3f} vf {stats['vf']:.3f} kl {stats['kl']:.4f} lr {self.lr:.1e} | {self.timers.report()}")
                 log(msg)
         return self

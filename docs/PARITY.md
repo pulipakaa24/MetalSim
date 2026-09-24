@@ -110,25 +110,22 @@ Notes that bear on reading these numbers honestly:
 
 ### 1.5 Learning on the G1 task
 
-Flat, 4096 envs, Isaac's PPO config unchanged (`runs/g1_flat_ppo_300b.log`): 300 iterations (29.5M env-steps, 11.6 min at 42.4K env-steps/s including
-updates). Mean episode length rose from 41 control steps (0.8 s) at iteration 25 to 47 (it 50), 59 (100), 77 (150),
-135 (200), 209 (250) and 343 (it 300, 6.9 s of the 20 s horizon); mean return went from −203 to −233
-because the penalty terms (joint deviation, action rate, torques, flat orientation) still outweigh the
-tracking terms while the robot learns to stay up, and the −200 termination is still paid by most
-episodes. So the identical config learns to survive on this stack within 300 iterations but has not
-learned to track velocity commands; Isaac Lab's G1 flat runner is configured for 1,500 iterations.
-One transient blow-up was recorded at iteration 296 (a world's acceleration/torque terms produced a
-return of −1e26 for one rollout; the run recovered at the next iteration), which points at the same
-contact-impulse spikes seen on flat ground (peak touch forces of 6–7 kN under random actions).
+**Flat, 4096 envs, Isaac's config for Isaac's full 1,500 iterations** (`runs/g1_flat_ppo_1500.log`,
+147M env-steps, 51 min at 48–51K env-steps/s end to end): mean episode length rose from 41 control
+steps to 301 (it 500) and **597 (it 750, 12 s of the 20 s horizon)**, then degraded to 425 (it 1000),
+239 (it 1250) and 153 (it 1500) while the return fell from −223 to −292 and the number of episodes
+ended by a physics blow-up rose from 0 to 190 per logging window. So the identical configuration
+learns to stay up for half an episode but does not converge to Isaac's walking behaviour, and the
+late-run collapse coincides with the policy driving the contacts into the regime where MuJoCo (C and
+Warp alike, §1.6) injects energy. Candidate causes, none confirmed yet: MuJoCo's soft contacts under
+aggressive position targets, the adaptive learning rate pinned at 1e-5 to 1e-4 by KL estimates above
+the 0.01 target, and no value normalization. This is the clearest open fidelity gap in the matrix and
+is **disproved** as parity until a run reproduces Isaac's curve. A rendered rollout of the final
+policy is `docs/gallery/g1_tier2_policy.mp4` (robots stumble and fall, as the numbers say).
 
-The reward is dominated by the −200 termination penalty at the start (the robot falls onto its
-torso within ~40 control steps under a random policy, as the physics rows predict). NVIDIA
-publishes no G1 learning curve in the benchmark, so this row shows that the identical config
-learns on this stack (episode length and tracking reward rise), not a curve match.
-
-An earlier run without the non-finite guard crashed at iteration 168 (a world's state became NaN
-inside the rollout and reached the actor); the task now ends and resets such episodes and counts
-them (`blown_up_episodes`), which is reported alongside the curve.
+An earlier 300-iteration run had ended at episode length 343 with no blow-ups; a first 1,500-iteration
+attempt crashed at iteration 38 when a blown-up world reached the actor, which led to the magnitude
+guard and the non-finite-row drop in the update.
 
 Rough, 2048 envs, Isaac's rough PPO config (512-256-128), 150 iterations on the patched kernel
 (`runs/g1_rough_ppo_150.log`): no blow-ups (the guard counted none), episode length 40 → 50.5 control
