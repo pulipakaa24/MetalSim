@@ -136,7 +136,14 @@ Notes that bear on reading these numbers honestly:
 
 Runs on record: 5 ms + unscaled penalty `runs/g1_flat_ppo_1500.log` (peak 597 steps at it 750, 190 blow-ups);
 2.5 ms + unscaled penalty `runs/g1_flat_ppo_1500_dt25.log` (peak 383 at it 750, 1 blow-up, same collapse);
-2.5 ms + corrected penalty `runs/g1_flat_ppo_1500_dt25_fixed.log`: ⟨G1_FIXED_RESULT⟩. Isaac's own training of the
+2.5 ms + corrected penalty `runs/g1_flat_ppo_1500_dt25_fixed.log`: **no blow-ups; episode length 41 → 62 (it 250)
+→ 115 (500) → 599 (750) → 764 (it 1000) → 732 → 558 (it 1500)**, so the identical config now keeps the robot
+up for 11–15 s of the 20 s horizon through the second half of training instead of collapsing. The
+return is still negative and falls as episodes lengthen (−5 → −18 → −28 → −26): the per-step penalties
+(joint deviation, action rate, torques, orientation) outweigh the tracking terms, i.e. the policy learns
+to stay up, not to walk on command. Whether that is a remaining reward-term mismatch or a physics
+effect is exactly what Isaac's own rsl_rl log of the same task (per-term reward means, recorded on
+the L4) will show; that comparison is pending. Isaac's own training of the
 same task on the L4 (rsl_rl, same config) is recorded on the VM for the side-by-side comparison.
 
 Rough, 2048 envs, Isaac's rough PPO config (512-256-128), 150 iterations on the patched kernel
