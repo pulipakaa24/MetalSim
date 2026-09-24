@@ -1,0 +1,51 @@
+{
+ "machine": "Apple M4 Max (40-core GPU)",
+ "hardware": {
+  "fp32_tflops": 18.4,
+  "bandwidth_gbs": 546
+ },
+ "rows": [
+  {
+   "workload": "physics SO-101 lift",
+   "N": 64,
+   "value": 46581.84495618407,
+   "unit": "steps/s",
+   "bound": "fp32",
+   "normalized": 2531.622008488265
+  },
+  {
+   "workload": "physics SO-101 lift",
+   "N": 1024,
+   "value": 376504.15521924285,
+   "unit": "steps/s",
+   "bound": "fp32",
+   "normalized": 20462.182348871895
+  },
+  {
+   "workload": "render tier-0 primitives 64px",
+   "N": 1024,
+   "value": 714156.1940075263,
+   "unit": "env-frames/s",
+   "bound": "fp32",
+   "normalized": 38812.83663084382
+  },
+  {
+   "workload": "render tier-0 SO-101 (2000 faces/mesh LOD) 128px",
+   "N": 64,
+   "value": 64890.02117466181,
+   "unit": "env-frames/s",
+   "bound": "fp32",
+   "normalized": 3526.6315855794464
+  },
+  {
+   "workload": "render tier-0 SO-101 (2000 faces/mesh LOD) 64px",
+   "N": 1024,
+   "value": 90002.65882148554,
+   "unit": "env-frames/s",
+   "bound": "fp32",
+   "normalized": 4891.44884899378
+  }
+ ],
+ "torch": "2.14.0",
+ "warp": "1.18.0.dev20260917"
+}

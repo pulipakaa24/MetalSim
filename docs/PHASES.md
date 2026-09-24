@@ -375,13 +375,16 @@ cannot hold the COM offset); that is the physics of the configuration, not a bug
 
 ### G1 throughput (Isaac's `benchmark_non_rl` protocol; uncontended; 4096 envs)
 
-| measurement (synchronized) | 4096 | 2048 | 1024 | Isaac (4090, reported) |
+| measurement (synchronized, uncontended 2026-09-24) | 4096 | 2048 | 1024 | Isaac (4090, reported) |
 |---|---|---|---|---|
-| flat, physics only (4 substeps) | 67,222 | 59,419 | – | – |
-| flat, step only | 45,677 | 38,903 | 29,119 | 94,000 |
-| flat, step + inference | 45,954 | 39,142 | – | 88,000 |
-| flat, full PPO loop | 41,340 (log: 43,300) | 32,418 | – | 82,000 |
-| rough, step only | OOM | 29,358 (physics defective, see below) | – | 94,000 |
+| flat, physics only (4 substeps) | 68,660 | 60,682 | – | – |
+| flat, step only | 45,958 | 38,722 | 29,617 | 94,000 |
+| flat, step + inference | 46,917 | 39,815 | – | 88,000 |
+| flat, full PPO loop | 41,740 (log: 44,328) | 34,321 | – | 82,000 |
+| rough (patched kernel), physics only | 61,679 | – | – | – |
+| rough, step only | 46,408 | 38,848 | – | 94,000 |
+| rough, step + inference | 41,159 | – | – | 88,000 |
+| rough, full PPO loop | 35,071 (log: 37,217) | – | – | 82,000 |
 
 Eager per-kernel launching instead of one graph per step: 32,815 at 4096. The per-call "Isaac-style"
 mean is not used (queue-absorbed, reads ~2× high). Rough terrain: MuJoCo Warp's HFIELD-MESH contacts
@@ -413,5 +416,8 @@ normal outputs, GPU path ordered against `BatchSim` by events. `tests/test_rende
 | GPU path from BatchSim == host path | mean abs diff < 1 |
 | Cartpole-RGB rollout at tier 2 | runs (32 envs, 30 steps, finite rewards) |
 
-Cartpole-RGB 100×100 full env step at 1024 envs, one run each: tier 0 47,135; tier 1 42,634;
-tier 2 36,401 (1 spp, 1 bounce), 34,762 (1 spp, 2 bounces), 19,782 (4 spp, 2 bounces) env-steps/s.
+Cartpole-RGB 100×100 full env step at 1024 envs, uncontended pass 2026-09-24: tier 0 47,911; tier 1
+43,368; tier 2 36,896 (1 spp, 1 bounce), 35,160 (1 spp, 2 bounces), 19,894 (4 spp, 2 bounces)
+env-steps/s. Cartpole state PPO at 4096 envs (Warp rollout): 595K env-steps/s, return 295/300 by
+iteration 150. Bench suite: SO-101 physics 376,504 steps/s at 1024; tier-0 primitives 714,156
+env-frames/s at 1024×64 px (`runs/clean_suite.json`).

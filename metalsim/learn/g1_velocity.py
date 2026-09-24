@@ -368,7 +368,9 @@ class G1VelocityTask:
         m = self.model
         self.nj = m.nu
         self.decimation = int(round(CONTROL_DT / PHYSICS_DT))
-        self.sim = BatchSim(m, n, options=BatchSimOptions(substeps=self.decimation, njmax=512, nconmax=None,
+        # contact capacity: 3 colliders x <= 4 kept contacts per pair; MuJoCo Warp's heightfield default
+        # (256 per world) sizes GPU scratch by naconmax and exhausts memory at 4096 worlds
+        self.sim = BatchSim(m, n, options=BatchSimOptions(substeps=self.decimation, njmax=256, nconmax=32,
                                                           solver_iterations=10, ls_iterations=20))
         self.max_t = int(EPISODE_S / CONTROL_DT)
         self.n_scan = 187 if self.use_scan else 0

@@ -1,0 +1,52 @@
+=== start Thu Sep 24 10:42:24 PDT 2026
+0
+=== G1 flat step-only 4096
+N=4096: 45,958 env-steps/s (110 steps, synchronized); per-call mean 42.22 ms -> 97,008 env-steps/s is queue-absorbed and not comparable
+=== G1 flat step-only 2048
+N=2048: 38,722 env-steps/s (110 steps, synchronized); per-call mean 24.91 ms -> 82,210 env-steps/s is queue-absorbed and not comparable
+=== G1 flat step-only 1024
+N=1024: 29,617 env-steps/s (110 steps, synchronized); per-call mean 16.29 ms -> 62,860 env-steps/s is queue-absorbed and not comparable
+=== G1 rough step-only 4096
+N=4096: 46,408 env-steps/s (110 steps, synchronized); per-call mean 41.96 ms -> 97,606 env-steps/s is queue-absorbed and not comparable
+=== G1 rough step-only 2048
+N=2048: 38,848 env-steps/s (110 steps, synchronized); per-call mean 24.97 ms -> 82,011 env-steps/s is queue-absorbed and not comparable
+=== cost split 4096 flat
+N=4096 flat: physics only (4 substeps, graph) 59.7 ms/step -> 68,660 env-steps/s
+N=4096 flat: full env step (graph, synchronized) 87.6 ms -> 46,775 env-steps/s
+N=4096 flat: rollout with Warp policy inference ((256, 128, 128)), 24 steps: 2095 ms -> 46,917 env-steps/s (step + inference)
+N=4096 flat: PPO update (5 epochs x 4 minibatches) 260 ms -> full loop 41,740 env-steps/s
+=== cost split 4096 rough
+N=4096 rough: physics only (4 substeps, graph) 66.4 ms/step -> 61,679 env-steps/s
+N=4096 rough: full env step (graph, synchronized) 85.6 ms -> 47,854 env-steps/s
+N=4096 rough: rollout with Warp policy inference ((512, 256, 128)), 24 steps: 2388 ms -> 41,159 env-steps/s (step + inference)
+N=4096 rough: PPO update (5 epochs x 4 minibatches) 415 ms -> full loop 35,071 env-steps/s
+=== cost split 2048 flat
+N=2048 flat: physics only (4 substeps, graph) 33.7 ms/step -> 60,682 env-steps/s
+N=2048 flat: full env step (graph, synchronized) 51.3 ms -> 39,888 env-steps/s
+N=2048 flat: rollout with Warp policy inference ((256, 128, 128)), 24 steps: 1235 ms -> 39,815 env-steps/s (step + inference)
+N=2048 flat: PPO update (5 epochs x 4 minibatches) 198 ms -> full loop 34,321 env-steps/s
+=== G1 flat PPO 4096, 20 iterations
+it   20 steps   1966080 sps   44,328 | ep_ret -202.88 ep_len   40.1 (n=2426) | pg -0.007 vf 51.249 kl 0.0055 lr 1.0e-02
+=== G1 rough PPO 4096, 20 iterations
+it   20 steps   1966080 sps   37,217 | ep_ret -202.94 ep_len   40.5 (n=2407) | pg -0.004 vf 106.026 kl 0.0049 lr 1.0e-02
+=== cartpole tiers 1024
+Cartpole (state only), N=1024: 60,628 env-steps/s
+Cartpole-RGB 100x100 tier 0, N=1024: 47,911 env-steps/s  (Isaac Lab, RTX 4090, published: 50,000 step-only)
+Cartpole-RGB 100x100 tier 1, N=1024: 43,368 env-steps/s
+Cartpole-RGB 100x100 tier 2 (spp 1, bounces 1), N=1024: 36,896 env-steps/s
+Cartpole-RGB 100x100 tier 2 (spp 1, bounces 2), N=1024: 35,160 env-steps/s
+Cartpole-RGB 100x100 tier 2 (spp 4, bounces 2), N=1024: 19,894 env-steps/s
+=== cartpole state PPO 4096 (ppo_warp default config)
+it  140 steps   9175040 sps  594,037 | ep_ret  294.41 ep_len  300.0 (n=2042) | pg 0.005 vf 70.381 kl 0.0181 lr 3.9e-04
+it  150 steps   9830400 sps  594,954 | ep_ret  295.17 ep_len  299.8 (n=2327) | pg -0.000 vf 86.082 kl 0.0079 lr 1.0e-02
+=== bench suite --quick
+machine: Apple M4 Max (40-core GPU); normalization: {'fp32_tflops': 18.4, 'bandwidth_gbs': 546}
+| workload | N | raw | per TFLOPS FP32 |
+|---|---|---|---|
+| physics SO-101 lift | 64 | 46,582 steps/s | 2,532 |
+| physics SO-101 lift | 1024 | 376,504 steps/s | 20,462 |
+| render tier-0 primitives 64px | 1024 | 714,156 env-frames/s | 38,813 |
+| render tier-0 SO-101 (2000 faces/mesh LOD) 128px | 64 | 64,890 env-frames/s | 3,527 |
+| render tier-0 SO-101 (2000 faces/mesh LOD) 64px | 1024 | 90,003 env-frames/s | 4,891 |
+=== end Thu Sep 24 10:47:51 PDT 2026
+=== DONE_CLEAN
