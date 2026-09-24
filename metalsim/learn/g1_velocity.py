@@ -310,7 +310,8 @@ def g1_reward_done(qpos: wp.array2d(dtype=float), qvel: wp.array2d(dtype=float),
     r_term = float(0.0)
     if fell:
         r_term = -200.0
-    r = (r_lin + r_ang + r_air + r_slide + r_lim + r_dev + r_tau + r_acc + r_rate + r_orient + r_wxy) * dt + r_term
+    # Isaac's RewardManager multiplies every term by dt, the termination penalty included (-200 * 0.02 = -4)
+    r = (r_lin + r_ang + r_air + r_slide + r_lim + r_dev + r_tau + r_acc + r_rate + r_orient + r_wxy + r_term) * dt
     s = step_idx[0] - 1
     buf_rew[s, e] = r
     buf_done[s, e] = 1.0 if done else 0.0

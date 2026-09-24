@@ -59,7 +59,7 @@ def test_reward_terms_match_isaac_formulas():
         np.testing.assert_allclose(got[5], r_orient, rtol=1e-4, atol=1e-5)
         np.testing.assert_allclose(got[4], r_dev, rtol=1e-4, atol=1e-4)
         np.testing.assert_allclose(got[6], r_rate, rtol=1e-4, atol=1e-5)
-        assert got[7] in (0.0, -200.0)                      # termination penalty (is_terminated, -200)
+        assert got[7] in (0.0, -200.0)                      # termination penalty term (is_terminated, weight -200; x dt in the sum like every term)
     # the summed reward is the dt-weighted sum of the terms (Isaac multiplies each term by step dt)
     # plus the termination penalty; check the sign/scale on the tracking-dominated terms
     assert np.all(np.abs(terms[:, 0]) <= 1.0) and np.all(np.abs(terms[:, 1]) <= 2.0)
