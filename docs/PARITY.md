@@ -110,32 +110,23 @@ Notes that bear on reading these numbers honestly:
 
 ### 1.5 Learning on the G1 task
 
-**Flat, 4096 envs, Isaac's config for Isaac's full 1,500 iterations** (`runs/g1_flat_ppo_1500.log`,
-147M env-steps, 51 min at 48–51K env-steps/s end to end): mean episode length rose from 41 control
-steps to 301 (it 500) and **597 (it 750, 12 s of the 20 s horizon)**, then degraded to 425 (it 1000),
-239 (it 1250) and 153 (it 1500) while the return fell from −223 to −292 and the number of episodes
-ended by a physics blow-up rose from 0 to 190 per logging window. So the identical configuration
-learns to stay up for half an episode but does not converge to Isaac's walking behaviour, and the
-late-run collapse coincides with the policy driving the contacts into the regime where MuJoCo (C and
-Warp alike, §1.6) injects energy. **Cause found (MuJoCo C, `scripts/diagnostics/g1_drive_stability.py`)**: with Isaac's drives (kp 200 Nm/rad, effort 300 Nm)
-and 3σ position targets, 8 of 8 worlds blow up at MuJoCo's 5 ms step, **0 of 8 at 2.5 ms, 2 ms or
-1 ms** (joint speeds stay below 150 rad/s), and 1 of 8 with the full `implicit` integrator at 5 ms.
-MuJoCo's `implicitfast`/`implicit` integrators are implicit in velocity only: actuator *damping* is
-integrated implicitly, actuator *stiffness* explicitly, so a 200 Nm/rad drive on a 0.01 kg·m²
-armature (natural frequency 22 Hz) sits at the explicit stability boundary at 5 ms (ω·dt ≈ 0.7).
-PhysX solves its joint drives implicitly and is unconditionally stable at the same gains. The
-projects that train the G1 on MuJoCo avoid this by construction: MuJoCo Playground runs the G1 at a
-**2 ms** physics step (kp 75, Euler, 3 solver iterations), mjlab derives its gains from the motors'
-reflected inertia at a **10 Hz** natural frequency (kp ≈ 40 Nm/rad on the hips, effort 88–139 Nm)
-at 5 ms. The faithful fix for an Isaac-configured task is therefore the smaller step with the same
-gains (2.5 ms, decimation 8), which costs about 2× physics time per control step; it is now an
-option of the task (`physics_dt`) and the re-run is reported below. This is the clearest open fidelity gap in the matrix and
-is **disproved** as parity until a run reproduces Isaac's curve. A rendered rollout of the final
-policy is `docs/gallery/g1_tier2_policy.mp4` (robots stumble and fall, as the numbers say).
+**Two defects found by running Isaac's full 1,500 iterations, both now fixed.**
 
-An earlier 300-iteration run had ended at episode length 343 with no blow-ups; a first 1,500-iteration
-attempt crashed at iteration 38 when a blown-up world reached the actor, which led to the magnitude
-guard and the non-finite-row drop in the update.
+1. *Physics* (§1.6 below and `scripts/diagnostics/g1_drive_stability.py`): Isaac's kp 200 drives are explicit
+   stiffness in MuJoCo and blow up at the 5 ms step; the 5 ms run logged 190 blown-up episodes per window by the
+   end, the same run at **2.5 ms** logged 1 in 1,500 iterations. `physics_dt=0.0025` is now the default for
+   training on this asset (2× physics cost per control step).
+2. *Reward port bug*: Isaac Lab's `RewardManager` multiplies every term by the step dt, **including the
+   termination penalty** (−200 × 0.02 = −4 per fall). Our kernel added −200 unscaled, so an episode that
+   survived 400 steps of small penalties scored below one that fell at once, and PPO learned to fall: both the
+   5 ms and the 2.5 ms runs peaked at 600 / 383 steps around iteration 750 and then collapsed to ~130–150
+   while the return fell to −290 / −309. Fixed in `g1_reward_done` (verified against
+   `isaaclab/managers/reward_manager.py` line 150 at v2.3.2).
+
+Runs on record: 5 ms + unscaled penalty `runs/g1_flat_ppo_1500.log` (peak 597 steps at it 750, 190 blow-ups);
+2.5 ms + unscaled penalty `runs/g1_flat_ppo_1500_dt25.log` (peak 383 at it 750, 1 blow-up, same collapse);
+2.5 ms + corrected penalty `runs/g1_flat_ppo_1500_dt25_fixed.log`: ⟨G1_FIXED_RESULT⟩. Isaac's own training of the
+same task on the L4 (rsl_rl, same config) is recorded on the VM for the side-by-side comparison.
 
 Rough, 2048 envs, Isaac's rough PPO config (512-256-128), 150 iterations on the patched kernel
 (`runs/g1_rough_ppo_150.log`): no blow-ups (the guard counted none), episode length 40 → 50.5 control
