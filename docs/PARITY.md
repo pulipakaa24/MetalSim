@@ -210,6 +210,37 @@ Rough-terrain numbers below are therefore **measured on the patched kernel** and
 | Training anomaly monitor (task-agnostic) | rsl_rl logs KL, value loss, entropy, per-term rewards | `metalsim.learn.monitor.AnomalyMonitor` on every log point: KL vs target band, value explained variance, action-std collapse/explosion, LR pinned at bounds, terminal-reward dominance and return-vs-length direction (survival penalties), non-finite rows; physics invariants from the sim buffers (joint speed vs actuator limits, joint-limit violation, contact penetration, contact force vs weight, energy jumps, capacity overflows) | first probe on the corrected G1 config flagged two real items on its own: joints pushed 0.17 rad past their limits and contacts penetrating 5–7 cm during falls (MuJoCo's soft limits and soft contacts vs PhysX's hard ones) | in use; findings feed §3 |
 | RL reproduces a published Isaac Lab result | Cartpole-Direct with rsl_rl config learns | same config on the Warp path reaches 295/300 in 45 iterations | `metalsim.learn.ppo_warp` run (docs/PHASES.md) | measured | confirmed (equivalent MJCF cartpole, not Isaac's USD) |
 
+## 2.1 Contact model: what MuJoCo can do, and Newton XPBD on Metal (measured 2026-09-24)
+
+MuJoCo's contacts are soft by construction (regularized convex constraints with a time constant
+`solref[0]`, penetration is the state of that spring-damper), not because of missed collisions; `margin`/
+`gap` already give speculative pre-impact contacts. G1 drop test at 2.5 ms (`scripts/diagnostics/
+g1_contact_stiffness.py`): default τ 20 ms → 2.97 cm impact penetration, 0.06 cm at rest, 4.8× weight
+peak; τ 5 ms (the 2·dt floor) + impedance 0.99 → 0.85 cm / 0.00 cm / 14×; + speculative contact
+(margin = gap = 1 cm) → 0.00 cm / 0.00 cm / 21×. PhysX on Apple Silicon is not an option (GPU PhysX is
+CUDA; the CPU SDK has no supported Apple build).
+
+NVIDIA's Newton engine (Warp-based; Isaac Lab 3.0's physics layer) runs on the MetalSim Warp fork
+unmodified: its **XPBD** solver (same substepped position-based family as PhysX TGS), Featherstone and
+Semi-Implicit run on Metal; VBD fails to compile; the GJK/MPR narrow phase needs Warp fixed-size arrays
+the Metal codegen lacks (so mesh colliders must take the primitive path for now). Newton's UsdPhysics
+importer loads `g1_minimal.usd` directly (44 bodies, 44 joints, 43 DoF, drives included). A box rests
+with 0.3 mm penetration under XPBD.
+
+Physics-only throughput on the same G1 asset at the same 2.5 ms step, idle GPU
+(`scripts/diagnostics/newton_vs_mjwarp_throughput.py`):
+
+| envs | MuJoCo Warp (10 Newton it., 20 LS, graph) | Newton XPBD 4 it., eager | Newton XPBD 4 it., graph |
+|---|---|---|---|
+| 256 | 121,682 physics-steps/s | 392,548 | 741,251 |
+| 1024 | 220,665 | 1,491,266 | 1,743,429 |
+| 4096 | 313,209 | 2,563,876 | 2,446,173 |
+
+At 4096 envs that is 7.8× MuJoCo Warp's rate, **but the 4-iteration XPBD setting does not yet hold the G1
+under Isaac's drives** (it collapses within a second), so the fair comparison is at whatever iteration /
+substep setting stands the robot; that sweep is `scripts/diagnostics/newton_xpbd_sweep.py` and its result
+is recorded below when available. ⟨NEWTON_SWEEP⟩
+
 ## 3. What is disproved, missing, or cannot be tested here
 
 - **Physics engine**: PhysX is not reproduced; MuJoCo's soft-contact Newton solver is used, as the
