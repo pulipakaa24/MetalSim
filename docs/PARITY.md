@@ -189,6 +189,7 @@ Rough-terrain numbers below are therefore **measured on the patched kernel** and
 | Height scan on terrain | `RayCaster` | Metal ray queries | `tests/test_terrain.py::test_height_scan_matches_mj_ray` | pass | confirmed |
 | Replicator: randomizers, annotators, writers | Omniverse Replicator | GPU randomizers, 2-D/3-D boxes, semantic seg, COCO/KITTI/basic writers | `tests/test_replicator.py::test_randomize_annotate_write` (boxes equal the segmentation's extents, files written) | pass | confirmed for the implemented subset |
 | Warp rollout policy | – | MLP policy in Warp with shared torch weights | `tests/test_warp_policy.py` (2 tests) | pass | confirmed |
+| Training anomaly monitor (task-agnostic) | rsl_rl logs KL, value loss, entropy, per-term rewards | `metalsim.learn.monitor.AnomalyMonitor` on every log point: KL vs target band, value explained variance, action-std collapse/explosion, LR pinned at bounds, terminal-reward dominance and return-vs-length direction (survival penalties), non-finite rows; physics invariants from the sim buffers (joint speed vs actuator limits, joint-limit violation, contact penetration, contact force vs weight, energy jumps, capacity overflows) | first probe on the corrected G1 config flagged two real items on its own: joints pushed 0.17 rad past their limits and contacts penetrating 5–7 cm during falls (MuJoCo's soft limits and soft contacts vs PhysX's hard ones) | in use; findings feed §3 |
 | RL reproduces a published Isaac Lab result | Cartpole-Direct with rsl_rl config learns | same config on the Warp path reaches 295/300 in 45 iterations | `metalsim.learn.ppo_warp` run (docs/PHASES.md) | measured | confirmed (equivalent MJCF cartpole, not Isaac's USD) |
 
 ## 3. What is disproved, missing, or cannot be tested here
@@ -206,3 +207,4 @@ Rough-terrain numbers below are therefore **measured on the patched kernel** and
 - **MaterialX, Hydra/usdview, ROS 2 bridge, deformables** (3 MuJoCo Warp flex tests fail on Metal):
   not implemented.
 - **Exact terrain heights** (re-implemented generator) and **contact force history**: documented differences.
+- **Soft joint limits and soft contacts**: the anomaly monitor measures joint ranges exceeded by up to 0.17 rad and contact penetrations of 5–7 cm in falls under MuJoCo's default limit/contact stiffness (solref 0.02); PhysX keeps both near zero. Stiffer `solref` on limits and contacts is possible at the 2.5 ms step (minimum 2·dt = 5 ms time constant) and is quantified by the drop test of the fidelity protocol (§1.7 once recorded).

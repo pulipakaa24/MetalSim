@@ -263,8 +263,9 @@ class PPOWarp:
         k = cfg.epochs * cfg.minibatches
         return {key: float(val_) / k for key, val_ in stats.items()}
 
-    def train(self, log=print, callback=None):
-        """``callback(it, algo)`` runs after every iteration (checkpoints, curves)."""
+    def train(self, log=print, callback=None, monitor=None):
+        """``callback(it, algo)`` runs after every iteration (checkpoints, curves); ``monitor(it, algo,
+        stats, (ep_ret, ep_len, count))`` runs at every log point (metalsim.learn.monitor.AnomalyMonitor)."""
         cfg = self.cfg
         t0 = time.perf_counter(); steps = 0
         hist = []
@@ -282,6 +283,8 @@ class PPOWarp:
                     extra = f" | blown {getattr(self.task, 'blown_up_episodes', 0)} dropped {getattr(self, 'dropped_rows', 0)}"
                 log(f"it {it:4d} steps {steps:9d} sps {sps:8,.0f} | ep_ret {ret:7.2f} ep_len {length:6.1f} (n={count}) | "
                     f"pg {stats['pg']:.3f} vf {stats['vf']:.3f} kl {stats['kl']:.4f} lr {self.lr:.1e}{extra}")
+                if monitor is not None:
+                    monitor(it, self, stats, (ret, length, count))
             if callback is not None:
                 callback(it, self)
         return hist

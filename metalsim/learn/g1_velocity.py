@@ -586,7 +586,9 @@ def train_g1(n=4096, terrain="flat", iterations=1500, seed=0, log_path=None, che
         torch.save({"net": algo.net.state_dict(), "terrain": terrain, "n": n, "iterations": it, "obs_dim": task.obs_dim,
                     "act_dim": task.act_dim, "hidden": algo.cfg.hidden}, path)
     cb = (lambda it, a: save(checkpoint.replace(".pt", f"_it{it}.pt"), it) if it % 100 == 0 else None) if checkpoint else None
-    algo.train(log=log, callback=cb)
+    from metalsim.learn.monitor import AnomalyMonitor
+    mon = AnomalyMonitor(task, algo.cfg, log=log, path=(log_path + ".anomalies.jsonl") if log_path else None)
+    algo.train(log=log, callback=cb, monitor=mon)
     if checkpoint:
         save(checkpoint, iterations)
         log(f"saved policy to {checkpoint}")
