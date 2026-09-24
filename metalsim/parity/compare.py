@@ -1,0 +1,108 @@
+"""Fidelity metrics between an Isaac Lab recording and the MetalSim replay of the same protocol.
+
+Physics (same asset, same initial state, same open-loop actions):
+  per-joint RMSE over time, root height / orientation error, time to divergence (first step where
+  the max joint error exceeds 0.1 rad), foot contact-force statistics, peak joint speed.
+Rendering (same camera, same lights, same state per frame; Isaac RTX vs MetalSim tier 2 / tier 0):
+  PSNR, SSIM, LPIPS (AlexNet), FLIP (from metalsim.bench.render_fidelity), on raw images and after
+  matching the mean brightness (the two engines' light units differ), silhouette IoU from depth,
+  depth RMSE on the common silhouette.
+Writes a JSON report and side-by-side composites (Isaac | MetalSim tier 2 | MetalSim tier 0).
+
+    python -m metalsim.parity.compare --isaac runs/parity/isaac/rt --metalsim runs/parity/metalsim --out runs/parity/report
+"""
+import argparse, glob, json, os
+import numpy as np
+import imageio.v2 as iio
+
+
+def quat_angle(q1, q2):
+    d = np.abs(np.sum(q1 * q2, axis=-1)).clip(0, 1)
+    return 2 * np.arccos(d)
+
+
+def physics_metrics(isaac, ours, tag):
+    A = np.load(os.path.join(isaac, f"{tag}.npz")); B = np.load(os.path.join(ours, f"{tag}.npz"))
+    T = min(len(A["joint_pos"]), len(B["joint_pos"]))
+    jp_a, jp_b = A["joint_pos"][:T, 0], B["joint_pos"][:T, 0]          # env 0 (identical protocol in every env)
+    err = np.abs(jp_a - jp_b)
+    rmse_t = np.sqrt((err ** 2).mean(1))
+    div = int(np.argmax(err.max(1) > 0.1)) if (err.max(1) > 0.1).any() else T
+    zr_a, zr_b = A["root_pos"][:T, 0, 2], B["root_pos"][:T, 0, 2]
+    ang = quat_angle(A["root_quat"][:T, 0], B["root_quat"][:T, 0])
+    cf_a = np.linalg.norm(A["contact"][:T, 0], axis=-1); cf_b = np.linalg.norm(B["contact"][:T, 0], axis=-1)
+    return {"steps": T,
+            "joint_rmse_rad": {"t0.5s": float(rmse_t[min(24, T - 1)]), "t1s": float(rmse_t[min(49, T - 1)]), "t2s": float(rmse_t[min(99, T - 1)]), "end": float(rmse_t[-1]), "max": float(rmse_t.max())},
+            "divergence_step_0.1rad": div, "divergence_time_s": div * 0.02,
+            "root_height": {"isaac_end": float(zr_a[-1]), "metalsim_end": float(zr_b[-1]), "rmse": float(np.sqrt(((zr_a - zr_b) ** 2).mean()))},
+            "root_orientation_err_rad": {"mean": float(ang.mean()), "max": float(ang.max())},
+            "peak_joint_speed_rad_s": {"isaac": float(np.abs(A["joint_vel"][:T, 0]).max()), "metalsim": float(np.abs(B["joint_vel"][:T, 0]).max())},
+            "contact_force_N": {"isaac_mean_total": float(cf_a.sum(1).mean()), "metalsim_mean_total": float(cf_b.sum(1).mean()),
+                                 "isaac_peak": float(cf_a.max()), "metalsim_peak": float(cf_b.max())},
+            "torque_rms_Nm": {"isaac": float(np.sqrt((A["torque"][:T, 0] ** 2).mean())), "metalsim": float(np.sqrt((B["torque"][:T, 0] ** 2).mean()))}}
+
+
+def image_metrics(a, b, da, db, lp=None):
+    from skimage.metrics import structural_similarity
+    from metalsim.bench.render_fidelity import flip
+    a = a.astype(np.float32) / 255; b = b.astype(np.float32) / 255
+    def stats(x, y):
+        mse = float(((x - y) ** 2).mean()); psnr = 10 * np.log10(1.0 / max(mse, 1e-10))
+        ssim = float(structural_similarity(x, y, channel_axis=2, data_range=1.0))
+        f = float(np.mean(flip((x * 255).astype(np.uint8), (y * 255).astype(np.uint8))))
+        out = {"psnr_db": psnr, "ssim": ssim, "flip": f}
+        if lp is not None:
+            import torch
+            t = lambda z: torch.from_numpy(z.transpose(2, 0, 1)[None] * 2 - 1).float()
+            out["lpips_alex"] = float(lp(t(x), t(y)).item())
+        return out
+    raw = stats(a, b)
+    gain = a.mean() / max(b.mean(), 1e-6)
+    norm = stats(a, np.clip(b * gain, 0, 1))
+    sil_a = da < 50.0; sil_b = db < 50.0           # depth: robot + ground < far plane; use the robot region: depth < ground-plane depth is not separable, so compare full depth
+    both = sil_a & sil_b
+    return {"raw": raw, "brightness_matched": norm, "brightness_gain_applied": float(gain),
+            "depth_rmse_m": float(np.sqrt(((da - db)[both] ** 2).mean())) if both.any() else None,
+            "depth_agree_1cm": float((np.abs(da - db)[both] < 0.01).mean()) if both.any() else None}
+
+
+def main():
+    ap = argparse.ArgumentParser(); ap.add_argument("--isaac", required=True); ap.add_argument("--metalsim", required=True); ap.add_argument("--out", required=True)
+    a = ap.parse_args(); os.makedirs(a.out, exist_ok=True)
+    report = {"physics": {}, "render": {}}
+    for tag in ("A_hold", "B_random", "C_drop"):
+        if os.path.exists(os.path.join(a.isaac, f"{tag}.npz")) and os.path.exists(os.path.join(a.metalsim, f"{tag}.npz")):
+            report["physics"][tag] = physics_metrics(a.isaac, a.metalsim, tag)
+    try:
+        import lpips, torch
+        lp = lpips.LPIPS(net="alex", verbose=False)
+    except Exception:
+        lp = None
+    frames = sorted(glob.glob(os.path.join(a.isaac, "*_rgb.png")))
+    per_frame = {"tier2": [], "tier0": []}
+    for f in frames:
+        base = os.path.basename(f).replace("_rgb.png", "")
+        g2 = os.path.join(a.metalsim, base + "_rgb.png"); g0 = os.path.join(a.metalsim, base + "_rgb_tier0.png")
+        if not os.path.exists(g2): continue
+        ia = iio.imread(f)[..., :3]; i2 = iio.imread(g2)[..., :3]; da = np.load(f.replace("_rgb.png", "_depth.npy")); d2 = np.load(g2.replace("_rgb.png", "_depth.npy"))
+        if ia.shape != i2.shape: continue
+        per_frame["tier2"].append({"frame": base, **image_metrics(ia, i2, da, d2, lp)})
+        if os.path.exists(g0):
+            per_frame["tier0"].append({"frame": base, **image_metrics(ia, iio.imread(g0)[..., :3], da, d2, lp)})
+        strip = np.concatenate([ia, i2] + ([iio.imread(g0)[..., :3]] if os.path.exists(g0) else []), axis=1)
+        iio.imwrite(os.path.join(a.out, base + "_side_by_side.png"), strip)
+    for tier, rows in per_frame.items():
+        if rows:
+            keys = ["psnr_db", "ssim", "flip"] + (["lpips_alex"] if lp else [])
+            report["render"][tier] = {"frames": len(rows),
+                                      "raw_mean": {k: float(np.mean([r["raw"][k] for r in rows])) for k in keys},
+                                      "brightness_matched_mean": {k: float(np.mean([r["brightness_matched"][k] for r in rows])) for k in keys},
+                                      "depth_rmse_m_mean": float(np.mean([r["depth_rmse_m"] for r in rows if r["depth_rmse_m"] is not None])),
+                                      "depth_agree_1cm_mean": float(np.mean([r["depth_agree_1cm"] for r in rows if r["depth_agree_1cm"] is not None])),
+                                      "per_frame": rows}
+    json.dump(report, open(os.path.join(a.out, "report.json"), "w"), indent=1)
+    print(json.dumps({k: (v if k == "physics" else {t: {kk: vv for kk, vv in r.items() if kk != "per_frame"} for t, r in v.items()}) for k, v in report.items()}, indent=1))
+
+
+if __name__ == "__main__":
+    main()
