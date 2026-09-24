@@ -1,0 +1,46 @@
+# Gap ledger (2026-09-24, evening)
+
+Status of every gap against Isaac Sim / Isaac Lab found so far: closed, still open, and newly opened by
+the Newton-engine evaluation. Evidence for each row is in `PARITY.md`.
+
+## Closed
+
+| gap | how it was closed | evidence |
+|---|---|---|
+| Heightfield contacts (MuJoCo Warp returned inverted normals, launched worlds) | per-triangle plane-contact patch in the MetalSim MuJoCo Warp fork | `test_hfield_mesh_contacts_match_mujoco_c` passes; rough runs at 4096 envs |
+| Drive blow-ups (Isaac's kp 200 explicit at 5 ms) | 2.5 ms physics step (`physics_dt`) | 0/8 blow-ups in C at 2.5 ms; 1 in 1,500 iterations on Metal vs 190 |
+| Termination penalty 50× too large (reward port bug) | scaled by dt like every Isaac term | pre-flight checks −4 per fall; G1 now stands 11–15 s by it 1000 |
+| 4096-env rough out-of-memory | 32 contact slots per world (kernel launched per slot) | rough 55.4K env-steps/s at 4096 |
+| Eager-loop GPU memory exhaustion | frees released per completed command buffer (Warp fork) | 2048/4096 runs pass |
+| USD loader defects (gravity 0, COM −inf, qpos0, instanced visual meshes, MDL materials) | loader fixes | joint frames 5.6e-7 m, masses exact, G1 renders with its materials |
+| Task fidelity: terrain curriculum, clipped value loss, event randomizations | implemented / verified equivalent | rows in PARITY §1.2–1.3 |
+| No measured Isaac reference on rentable hardware | Isaac Sim 5.1 + Isaac Lab 2.3.2 on an L4 | Cartpole-Direct 400.7K, G1 rough 39.1K env-steps/s (M4 Max G1 rough: 55.4K) |
+| Install path | public forks of Warp and MuJoCo Warp with setup scripts | fresh clone builds |
+| Silent RL failures | task-agnostic anomaly monitor + pre-flight | first probe flagged joint-limit and penetration issues on its own |
+
+## Still open (MuJoCo Warp path)
+
+| gap | status | next step |
+|---|---|---|
+| Contact model: soft contacts and soft joint limits (5–7 cm impact penetration, 0.17 rad past limits) | tunable to 0.85 cm / 0.00 cm at rest with τ 5 ms + impedance 0.99, 0.00 cm with speculative contact, at higher impact peaks | apply and quantify with the drop-test row of the fidelity protocol against the L4 recordings |
+| Learning parity on G1 | stands but does not track; return still negative | compare per-term rewards with Isaac's own rsl_rl log (recording on the VM) |
+| Rendering vs Isaac RTX; denoiser; MetalFX; MaterialX | fidelity recordings in progress on the VM; no denoiser/MetalFX/MaterialX | run `metalsim.parity.compare` when the recordings land |
+| Contact sensing (touch sites, no force history) | open | contact-force reduction per body from the contact buffer |
+| Sensors: beam divergence, multi-return, radar | open | – |
+| Exact terrain heights | re-implemented generator | port Isaac's generator functions |
+| Throughput | 0.59× a 4090 raw (2.6× per TFLOPS); 1.4× the L4 on G1 rough | reset/obs overhead 23 % of the step |
+| Camera-RL throughput | 7.5K env-steps/s incl. training vs Isaac's 32K (4090); learns | CNN update on MPS is 76 % of the time |
+| Deformables on Metal; upstreaming the forks | open | – |
+
+## Newly opened by the Newton XPBD evaluation
+
+| issue | severity | note |
+|---|---|---|
+| Joint position drives not engaging under XPBD in our usage (pendulum ignores its target; G1 falls) | blocking | XPBD drives = compliance 1/ke, no kd, no target mode; wiring under investigation |
+| XPBD does not support effort limits, armature, joint friction, velocity limits (its docstring) | high | Isaac's 300 / 20 Nm effort caps and 0.01 armature cannot be represented; needs emulation or a solver change |
+| GJK/MPR narrow phase needs Warp fixed-size arrays; Metal codegen lacks them | high for meshes | primitive colliders only until ported (G1's colliders are boxes, so fine there) |
+| VBD solver fails to compile on Metal | medium | not needed for rigid robots |
+| Stability/cost of stiff drives under XPBD unknown | medium | expect more iterations/substeps than 4; throughput gain then 2–8× |
+| State layout change: maximal coordinates (`body_q`), `joint_q` via `eval_ik`, no MuJoCo sensors, no `qacc`/`qfrc_actuator` | integration cost | task kernels, renderer input, height scan and reward terms (torque, acceleration, contact) need new sources |
+| Newton API churn (alpha; renamed fields between 1.5 and 1.7) | low | pin the version |
+| Newton's importer copies the USD's gravity 0 (same PhysX quirk) | low | set gravity explicitly |
