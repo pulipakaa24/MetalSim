@@ -22,7 +22,7 @@ def main():
     env = CartpoleRGBEnv(CartpoleRGBConfig(num_envs=a.envs, tier=a.tier, spp=a.spp, max_bounces=a.bounces, seed=a.seed))
     cfg = PPOConfig(total_steps=a.steps, rollout=64, epochs=4, minibatches=32, lr=1e-4, gamma=0.99, lam=0.95, clip=0.2,
                     ent_coef=0.0, vf_coef=1.0, max_grad_norm=1.0, desired_kl=0.008, clip_value=True, feat=512,
-                    activation="elu", qpos_dim=0, seed=a.seed, log_every=1)
+                    activation="elu", qpos_dim=0, center_images=True, value_norm=True, seed=a.seed, log_every=1)
     f = open(a.log, "a") if a.log else None
     def log(msg):
         print(msg, flush=True)

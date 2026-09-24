@@ -39,6 +39,8 @@ class PPOConfig:
     feat: int = 256                     # CNN feature width (Isaac: 512)
     activation: str = "relu"            # trunk activation after the CNN (Isaac: elu)
     qpos_dim: int | None = None         # None: from env.obs_space["qpos"]; 0: image-only policy (Isaac's camera cartpole)
+    center_images: bool = False         # subtract the per-image mean (Isaac's camera cartpole observation)
+    value_norm: bool = False            # skrl RunningStandardScaler on value targets
 
 
 class NatureCNN(nn.Module):
@@ -60,10 +62,11 @@ class NatureCNN(nn.Module):
 
 
 class ActorCritic(nn.Module):
-    def __init__(self, act_dim, qpos_dim=6, feat=256, image_hw=(128, 128), activation="relu"):
+    def __init__(self, act_dim, qpos_dim=6, feat=256, image_hw=(128, 128), activation="relu", center_images=False):
         super().__init__()
         self.cnn = NatureCNN(3, feat, image_hw, activation)
         self.qpos_dim = qpos_dim
+        self.center_images = center_images
         act = nn.ELU() if activation == "elu" else nn.ReLU()
         if qpos_dim > 0:
             self.qpos = nn.Sequential(nn.Linear(qpos_dim, 64), nn.ReLU())
@@ -83,6 +86,8 @@ class ActorCritic(nn.Module):
         """
         x = image_u8 if nchw else image_u8.permute(0, 3, 1, 2).contiguous()
         x = x.float() * (1.0 / 255.0)
+        if self.center_images:      # Isaac Lab's camera cartpole: subtract each image's mean (per channel)
+            x = x - x.mean(dim=(2, 3), keepdim=True)
         f = self.cnn(x)
         if self.qpos_dim > 0:
             f = torch.cat([f, self.qpos(qpos)], dim=1)
@@ -115,7 +120,9 @@ class PPO:
         H, W, C = env.obs_space["image"]
         qdim = self.cfg.qpos_dim if self.cfg.qpos_dim is not None else int(env.obs_space.get("qpos", (0,))[0])
         self.qdim = qdim
-        self.net = ActorCritic(env.act_dim, qpos_dim=qdim, feat=self.cfg.feat, image_hw=(H, W), activation=self.cfg.activation).to(self.dev)
+        self.net = ActorCritic(env.act_dim, qpos_dim=qdim, feat=self.cfg.feat, image_hw=(H, W), activation=self.cfg.activation,
+                               center_images=self.cfg.center_images).to(self.dev)
+        self.ret_mean, self.ret_var, self.ret_count = 0.0, 1.0, 1e-4      # running scaler for value targets
         self.opt = torch.optim.Adam(self.net.parameters(), lr=self.cfg.lr, eps=1e-5)
         self.lr = self.cfg.lr
         n, T = env.n, self.cfg.rollout
@@ -146,6 +153,9 @@ class PPO:
                 self.buf_a[t] = a
                 self.buf_logp[t] = d.log_prob(a).sum(-1)
                 self.buf_v[t] = v
+                if cfg.value_norm:
+                    v = v * math.sqrt(self.ret_var) + self.ret_mean
+                    self.buf_v[t] = v
             t1 = time.perf_counter()
             obs, r, done, info = self.env.step(a)
             self.buf_r[t] = r
@@ -159,6 +169,8 @@ class PPO:
             self.global_step += n
         with torch.no_grad():
             _, last_v = self.net(obs["image"], obs["qpos"] if self.qdim > 0 else self.buf_q[0])
+            if cfg.value_norm:
+                last_v = last_v * math.sqrt(self.ret_var) + self.ret_mean
         self.env.synchronize()
         done_mask = torch.stack([torch.as_tensor(d > 0) for d in self.buf_done]).cpu().numpy()
         rets = torch.stack(ep_ret).cpu().numpy(); lens = torch.stack(ep_len).cpu().numpy()
@@ -188,6 +200,13 @@ class PPO:
         q = self.buf_q.reshape(N, -1); a = self.buf_a.reshape(N, -1)
         logp_old = self.buf_logp.reshape(N); adv = adv.reshape(N); ret = ret.reshape(N); v_buf = self.buf_v.reshape(N).clone()
         adv = (adv - adv.mean()) / (adv.std() + 1e-8)
+        if cfg.value_norm:       # update the running scaler with this batch of returns, then train on normalized targets
+            bm, bv, bc = float(ret.mean()), float(ret.var()), float(N)
+            delta = bm - self.ret_mean; tot = self.ret_count + bc
+            self.ret_var = (self.ret_var * self.ret_count + bv * bc + delta ** 2 * self.ret_count * bc / tot) / tot
+            self.ret_mean += delta * bc / tot; self.ret_count = tot
+            sd = math.sqrt(self.ret_var) + 1e-8
+            ret = (ret - self.ret_mean) / sd; v_buf = (v_buf - self.ret_mean) / sd
         mb = N // cfg.minibatches
         stats = {"pg": 0.0, "vf": 0.0, "kl": 0.0}
         for _ in range(cfg.epochs):
