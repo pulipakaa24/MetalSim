@@ -83,6 +83,17 @@ observation does not read), PPO update 282 ms per 24-step rollout (12 % of the l
 All rows above were measured on 2026-09-24 with nothing else on the GPU (`runs/bench12.log`; the
 clean pass before the reset change is `runs/bench_clean.log`).
 
+**Measured Isaac Lab reference on the same class of hardware we can rent** (GCP g2-standard-16, NVIDIA L4
+24 GB, driver 580.178, Isaac Sim 5.1.0 + Isaac Lab v2.3.2, `benchmark_non_rl.py`, 100 frames, headless;
+`runs/parity/isaac_bench/`): Cartpole-Direct 4096 envs **400,717** mean effective env-steps/s (NVIDIA
+publishes 620K on an L40, 1.10M on a 4090); G1 rough 4096 envs **39,135** (L40 72K, 4090 94K). The L4's
+FP32 peak is 30.3 TFLOPS, so per TFLOPS the L4 runs G1 rough at 1,292 env-steps/s versus this stack's
+3,012 on the M4 Max (55,423 / 18.4); raw, the M4 Max is 1.4× the L4 on G1 rough and 0.15× on the
+contact-free cartpole. The G1 flat and camera-cartpole reference runs are being re-run (the first
+attempts died on a Kit single-instance lock). Scene setup on the VM: with Isaac Lab's debug
+visualization on, building 4096 G1 envs did not finish in 65 minutes on the 2.2 GHz Xeon (USD marker
+spawning); with it off, setup plus the benchmark took about a minute.
+
 Notes that bear on reading these numbers honestly:
 - Same asset, same actuator table, same task terms; **different physics engine** (MuJoCo Warp Newton
   solver vs PhysX TGS). MuJoCo Warp on Metal runs its full iteration budget every step (no early
