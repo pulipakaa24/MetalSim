@@ -8,7 +8,9 @@ wp.config.quiet = True
 # (not in the Metal codegen), so the three box-shaped mesh colliders are replaced by box primitives and
 # self-collision is off. A box rests with 0.3 mm penetration under XPBD. With Isaac's drive gains the
 # G1 does not yet stand under XPBD (collapses within 1 s at 4 XPBD iterations, 2.5 ms): drive/joint
-# compliance tuning is the open item. Speed at 256 envs, eager launches: 283K physics-steps/s.
+# compliance tuning is the open item.
+# UPDATE (later 2026-09-24): the collapse was a target-indexing bug here (targets written by DOF index,
+# shifted one joint), plus biased XPBD drives; see newton_xpbd_drives.py and metalsim/physics/newton_backend.py. Speed at 256 envs, eager launches: 283K physics-steps/s.
 POS = newton.JointTargetMode.POSITION
 GAINS = [(r".*_hip_yaw_joint", 150, 5), (r".*_hip_roll_joint", 150, 5), (r".*_hip_pitch_joint", 200, 5), (r".*_knee_joint", 200, 5), (r"torso_joint", 200, 5),
          (r".*_ankle_.*", 20, 2), (r".*_shoulder_.*", 40, 10), (r".*_elbow_.*", 40, 10), (r".*_(five|three|six|four|zero|one|two)_joint", 40, 10)]
@@ -35,8 +37,8 @@ def robot_builder():
         for pat, kp, kv in GAINS:
             if re.fullmatch(pat, name):
                 val = next((v for ip, v in INIT if re.fullmatch(ip, name)), 0.0)     # Isaac: unlisted joints default to 0 (the USD's own drive targets are ignored)
-                for d in range(qd_start[j], qd_start[j + 1]): ke[d] = kp; kd[d] = kv; mode[d] = POS; tq[d] = val
-                for c in range(q_start[j], q_start[j + 1]): q[c] = val
+                for d in range(qd_start[j], qd_start[j + 1]): ke[d] = kp; kd[d] = kv; mode[d] = POS
+                for c in range(q_start[j], q_start[j + 1]): q[c] = val; tq[c] = val   # builder targets use the COORDINATE layout (fixed 2026-09-24)
     b.joint_target_ke, b.joint_target_kd, b.joint_target_q, b.joint_target_mode, b.joint_q = ke, kd, tq, mode, q
     return b
 
