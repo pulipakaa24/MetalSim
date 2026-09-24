@@ -297,10 +297,10 @@ def g1_reward_done(qpos: wp.array2d(dtype=float), qvel: wp.array2d(dtype=float),
     trunc = t[e] >= max_t
     blown = int(0)
     for i in range(7 + nj):
-        if not wp.isfinite(qpos[e, i]):
+        if not wp.isfinite(qpos[e, i]) or wp.abs(qpos[e, i]) > 1000.0:
             blown = 1
     for i in range(6 + nj):
-        if not wp.isfinite(qvel[e, i]):
+        if not wp.isfinite(qvel[e, i]) or wp.abs(qvel[e, i]) > 1000.0:     # 1000 rad/s (m/s) is not a robot any more
             blown = 1
     if blown == 1:
         r_lin = 0.0; r_ang = 0.0; r_air = 0.0; r_slide = 0.0; r_lim = 0.0; r_dev = 0.0; r_tau = 0.0; r_acc = 0.0
@@ -579,10 +579,13 @@ def train_g1(n=4096, terrain="flat", iterations=1500, seed=0, log_path=None, che
         if f:
             f.write(msg + "\n"); f.flush()
     log(f"G1 {terrain} PPO: N={n} obs_dim {task.obs_dim} act_dim {task.act_dim} rollout 24 x {iterations} iterations")
-    algo.train(log=log)
+    def save(path, it):
+        torch.save({"net": algo.net.state_dict(), "terrain": terrain, "n": n, "iterations": it, "obs_dim": task.obs_dim,
+                    "act_dim": task.act_dim, "hidden": algo.cfg.hidden}, path)
+    cb = (lambda it, a: save(checkpoint.replace(".pt", "_ckpt.pt"), it) if it % 100 == 0 else None) if checkpoint else None
+    algo.train(log=log, callback=cb)
     if checkpoint:
-        torch.save({"net": algo.net.state_dict(), "terrain": terrain, "n": n, "iterations": iterations, "obs_dim": task.obs_dim,
-                    "act_dim": task.act_dim, "hidden": algo.cfg.hidden}, checkpoint)
+        save(checkpoint, iterations)
         log(f"saved policy to {checkpoint}")
     return algo
 

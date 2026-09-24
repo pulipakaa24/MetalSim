@@ -215,6 +215,13 @@ class PPOWarp:
         o = obs.reshape(N, -1).clone(); a = act.reshape(N, -1).clone(); lp0 = logp_old.reshape(N).clone()
         with torch.no_grad():   # rollout policy's mean/std for the KL schedule
             self._mean0 = self.net.actor_mean(o); self._std0 = self.net.log_std.exp().clone()
+        # rows whose observation, action, log-prob or return is not finite (a world that blew up inside the
+        # rollout before the task's guard reset it) are dropped from the update instead of crashing it
+        ok = torch.isfinite(o).all(-1) & torch.isfinite(a).all(-1) & torch.isfinite(lp0) & torch.isfinite(ret.reshape(N)) & torch.isfinite(adv.reshape(N))
+        self.dropped_rows = int((~ok).sum().item())
+        if self.dropped_rows:
+            keep = ok.nonzero().squeeze(-1); o = o[keep]; a = a[keep]; lp0 = lp0[keep]; adv = adv.reshape(N)[keep]; ret = ret.reshape(N)[keep]; val = val.reshape(N)[keep]; N = int(keep.numel())
+            self._mean0 = self._mean0[keep]
         advn = ((adv - adv.mean()) / (adv.std() + 1e-8)).reshape(N); retf = ret.reshape(N); valf = val.reshape(N).clone()
         mb = N // cfg.minibatches
         stats = {"pg": 0.0, "vf": 0.0, "kl": 0.0}
@@ -256,7 +263,8 @@ class PPOWarp:
         k = cfg.epochs * cfg.minibatches
         return {key: float(val_) / k for key, val_ in stats.items()}
 
-    def train(self, log=print):
+    def train(self, log=print, callback=None):
+        """``callback(it, algo)`` runs after every iteration (checkpoints, curves)."""
         cfg = self.cfg
         t0 = time.perf_counter(); steps = 0
         hist = []
@@ -269,8 +277,13 @@ class PPOWarp:
                 ret, length, count = self.task.episode_stats()
                 sps = steps / (time.perf_counter() - t0)
                 hist.append((it, steps, ret, length))
+                extra = ""
+                if getattr(self.task, "blown_up_episodes", 0) or getattr(self, "dropped_rows", 0):
+                    extra = f" | blown {getattr(self.task, 'blown_up_episodes', 0)} dropped {getattr(self, 'dropped_rows', 0)}"
                 log(f"it {it:4d} steps {steps:9d} sps {sps:8,.0f} | ep_ret {ret:7.2f} ep_len {length:6.1f} (n={count}) | "
-                    f"pg {stats['pg']:.3f} vf {stats['vf']:.3f} kl {stats['kl']:.4f} lr {self.lr:.1e}")
+                    f"pg {stats['pg']:.3f} vf {stats['vf']:.3f} kl {stats['kl']:.4f} lr {self.lr:.1e}{extra}")
+            if callback is not None:
+                callback(it, self)
         return hist
 
 
