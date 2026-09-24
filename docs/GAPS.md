@@ -44,3 +44,33 @@ the Newton-engine evaluation. Evidence for each row is in `PARITY.md`.
 | State layout change: maximal coordinates (`body_q`), `joint_q` via `eval_ik`, no MuJoCo sensors, no `qacc`/`qfrc_actuator` | integration cost | task kernels, renderer input, height scan and reward terms (torque, acceleration, contact) need new sources |
 | Newton API churn (alpha; renamed fields between 1.5 and 1.7) | low | pin the version |
 | Newton's importer copies the USD's gravity 0 (same PhysX quirk) | low | set gravity explicitly |
+
+## What a Newton XPBD replacement would and would not change
+
+Subsumed (would not need to be carried over): the MuJoCo Warp heightfield patch (Newton has native
+heightfields, subject to the narrow-phase port), the 2.5 ms step chosen for MuJoCo's explicit drive
+stiffness (XPBD drives are constraint-based; their stable settings are their own question), the
+per-world contact-slot cap (MuJoCo Warp launch geometry), MuJoCo's soft contact / soft limit tuning
+(XPBD contacts and limits are hard), and any further optimization of the MuJoCo Warp step (the 23 %
+reset/obs overhead is mostly task kernels and stays, but the physics share changes).
+
+Unchanged by the engine (worth doing regardless): the USD scene layer (visual meshes, materials,
+cameras, lights), all three renderer tiers and the rendering-fidelity comparison against Isaac RTX,
+ray-traced sensors (lidar, depth, height scan) and the lidar RL task, the replicator, the learner
+(Warp rollout policy, PPO, clipped value loss, anomaly monitor, pre-flight), the reward/termination
+term logic (needs new state sources under Newton but not new logic), the terrain generator and
+curriculum, the camera-RL pipeline and its MPS update bottleneck, the Isaac reference measurements
+and the fidelity protocol, documentation and videos. The Warp-backend memory fix applies to any Warp
+engine.
+
+Engine-coupled and would need redoing: every kernel that reads MuJoCo state (qpos/qvel/xpos/xmat,
+sensordata touch, qacc, qfrc_actuator, cvel) in the G1 task, the height scanner's body-pose input,
+the renderer's geom-pose input (from body poses + shape transforms), the reset path
+(reset_data/kinematics), the parity tests that assert MuJoCo model fields, and the benchmark harness.
+
+Camera-RL throughput, measured 2026-09-24 on the M4 Max: the skrl update (4 epochs × 32 minibatches
+over 65,536 100×100 images) takes 5.9 s on MPS versus 1.4 s for the 64-step rollout, so the pipeline
+is update-bound at ~8K env-steps/s; minibatch size makes no difference (compute-bound conv
+backward), fp16 autocast gains 10 %, channels-last is 4× slower (5.99 s, avoid). This is a PyTorch-MPS convolution limit,
+independent of the physics engine; the options are a Warp/Metal implementation of the encoder's
+backward pass or a smaller encoder than Isaac's.
