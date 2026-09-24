@@ -60,20 +60,27 @@ loaded through `metalsim.scene.usd_to_mjcf`.
 
 ### 1.4 Throughput on the G1 task (Isaac's protocol, 4096 envs)
 
-| measurement (4096 envs unless stated) | this stack (M4 Max, 18.4 TFLOPS), synchronized | Isaac Lab (RTX 4090, 82.6 TFLOPS), reported | raw ratio | per-TFLOPS ratio |
+| measurement (4096 envs unless stated; uncontended pass 2026-09-24, synchronized) | this stack (M4 Max, 18.4 TFLOPS) | Isaac Lab (RTX 4090, 82.6 TFLOPS), reported | raw ratio | per-TFLOPS ratio |
 |---|---|---|---|---|
-| G1 flat, physics only (4 substeps of MuJoCo Warp, graph replay) | 67,222 env-steps/s | – | – | – |
-| G1 flat, step only (physics + reset/forward + obs + reward, one graph per step) | 45,677 env-steps/s (second run 44,991) | 94,000 (rough; flat not published separately) | 0.49× | 2.2× |
-| G1 flat, step + inference (Warp MLP 256-128-128 inside the rollout graph) | 45,954 env-steps/s | 88,000 | 0.52× | 2.3× |
-| G1 flat, full PPO loop (24-step rollout + 5 epochs × 4 minibatches on MPS) | 41,340 env-steps/s (training log over 15 iterations: 43,300) | 82,000 | 0.50× | 2.3× |
-| G1 flat, 2048 envs: step only / + inference / full loop | 38,903 / 39,142 / 32,418 env-steps/s | – | – | – |
-| G1 flat, 1024 envs: step only | 29,119 env-steps/s | – | – | – |
-| G1 rough, 2048 envs: step only (+ height scan) | 29,358 env-steps/s, **but see the rough-terrain row below: the physics is defective, so this is a cost figure only** | 94,000 | – | – |
-| G1 rough, 4096 envs | fails (`kIOGPUCommandBufferCallbackErrorOutOfMemory` in the heightfield CCD kernels, any queue setting) | 94,000 | – | – |
+| G1 flat, physics only (4 substeps of MuJoCo Warp, graph replay) | 68,660 env-steps/s | – | – | – |
+| G1 flat, step only (physics + reset/forward + obs + reward, one graph per step) | 45,958 env-steps/s (cost-split run 46,775) | 94,000 | 0.49× | 2.2× |
+| G1 flat, step + inference (Warp MLP 256-128-128 inside the rollout graph) | 46,917 env-steps/s | 88,000 | 0.53× | 2.4× |
+| G1 flat, full PPO loop (24-step rollout + 5 epochs × 4 minibatches on MPS) | 41,740 env-steps/s (training log over 20 iterations: 44,328) | 82,000 | 0.51× | 2.3× |
+| G1 rough (patched heightfield kernel, 187-ray height scan), physics only | 61,679 env-steps/s | – | – | – |
+| G1 rough, step only | 46,408 env-steps/s (cost-split run 47,854) | 94,000 | 0.49× | 2.2× |
+| G1 rough, step + inference (512-256-128) | 41,159 env-steps/s | 88,000 | 0.47× | 2.1× |
+| G1 rough, full PPO loop | 35,071 env-steps/s (training log over 20 iterations: 37,217) | 82,000 | 0.43× | 1.9× |
+| G1 flat, 2048 envs: step only / + inference / full loop | 38,722 / 39,815 / 34,321 env-steps/s | – | – | – |
+| G1 flat, 1024 envs: step only | 29,617 env-steps/s | – | – | – |
+| G1 rough, 2048 envs: step only | 38,848 env-steps/s | – | – | – |
 
-Per-step cost split at 4096 (flat): physics 60.9 ms, full env step 89.7 ms (the per-step
-`reset_data` + `forward` for resets and the obs/reward kernels add 47 %), PPO update 239 ms per
-24-step rollout (10 % of the loop).
+Per-step cost split at 4096 (flat): physics 59.7 ms, full env step 87.6 ms (the per-step
+`reset_data` + `forward` for resets and the obs/reward kernels add 47 %), PPO update 260 ms per
+24-step rollout (11 % of the loop). Rough: physics 66.4 ms, step 85.6 ms, update 415 ms (the
+bigger network and 310-dim observations).
+
+All rows above were re-measured on 2026-09-24 with nothing else on the GPU (an unrelated Tron1
+simulation had been sharing the GPU during the 2026-09-23 runs; the differences were within 3 %).
 
 Notes that bear on reading these numbers honestly:
 - Same asset, same actuator table, same task terms; **different physics engine** (MuJoCo Warp Newton
@@ -94,6 +101,11 @@ Notes that bear on reading these numbers honestly:
   absorbed by the Metal queue for the first ~64 calls and would read ~2× higher (95K), so it is not
   used.
 - One graph replay per env step; the eager (per-kernel launch) path measures 32.8K at 4096.
+- The earlier rough-terrain failure at 4096 envs (`kIOGPUCommandBufferCallbackErrorOutOfMemory`) was
+  MuJoCo Warp launching its heightfield kernel with one thread per contact slot (`dim=naconmax`,
+  1,048,576 at 4096 worlds with its heightfield default of 256 per world) and the kernel's large
+  per-thread state; the task now sets 32 contact slots per world (3 colliders × ≤ 4 kept contacts),
+  which is also the flat setting.
 
 ### 1.5 Learning on the G1 task
 
@@ -117,32 +129,47 @@ An earlier run without the non-finite guard crashed at iteration 168 (a world's 
 inside the rollout and reached the actor); the task now ends and resets such episodes and counts
 them (`blown_up_episodes`), which is reported alongside the curve.
 
-### 1.6 Rough terrain: disproved on the current MuJoCo Warp branch
+Rough, 2048 envs, Isaac's rough PPO config (512-256-128), 150 iterations on the patched kernel
+(`runs/g1_rough_ppo_150.log`): no blow-ups (the guard counted none), episode length 40 → 50.5 control
+steps, return −203 → −204, 25.7K env-steps/s end to end while another job shared the GPU. Slower
+than flat: the adaptive schedule keeps the learning rate at 1e-5 to 4e-4 because the 310-dim
+observation (187 height-scan values) makes the KL estimate exceed 0.02 in most updates; Isaac's
+rough runner is configured for 3,000 iterations, so 150 is a smoke test of stability, not a result.
 
-`tests/test_terrain.py::test_hfield_mesh_contacts_match_mujoco_c` (marked `xfail(strict)` so the
-defect is tracked): G1 on Isaac's rough-terrain layout under a PD hold, MuJoCo Warp vs MuJoCo C on
-the same model. Result: heightfield-mesh contacts return an inverted normal (z = −1.000) and a
-5.1 cm penetration on the first step; one of four worlds is launched (pelvis 2.31 m vs 0.74 m in
-C). MuJoCo Warp also warns that HFIELD-MESH pairs get at most one contact (no multi-contact CCD
-support). Under random actions joint velocities reach 1e13 rad/s and the acceleration/torque reward
-terms explode (observed in the rough PPO run, iteration 3: return −8.7e25). Rough-terrain
-throughput and learning are therefore **not claimed**; the flat task is the comparison. The height
-scanner and terrain generator themselves pass their tests (§1.2).
+### 1.6 Rough terrain: MuJoCo Warp's heightfield contacts, found defective and patched
 
-Localization (scratch probes, 2026-09-23): the same defect reproduces on Warp's **CPU device**
-(world 2 launched to 2.57 m, normal z −1, penetration 2.047 m), so it is MuJoCo Warp's heightfield
-algorithm, not the Metal backend. At that world's initial state MuJoCo C reports seven contacts for
-the right foot (all within 2.5 cm, sane normals); MuJoCo Warp reports one, with penetration
-−2.047 m and a witness point 1.1 m from the foot. Raising `ccd_iterations` to 500 and tightening
-`ccd_tolerance` to 1e-8 changes nothing. Spheres on a heightfield match C exactly (block terrain,
-five placements), so the grid layout and prism construction are right; a box *mesh* pressed 3 cm
-into a *flat* heightfield already yields one sideways normal (0.43, −0.90, 0.09). The hfield kernel
-tests each terrain prism (a triangular column reaching down to the heightfield base, here 1.9 m)
-against the convex geom with single-witness-point GJK/EPA and keeps the minimum-distance result;
-MuJoCo C's `mjc_ConvexHField` produces face-contact manifolds through its multi-contact CCD, which
-MuJoCo Warp does not support for HFIELD–MESH pairs on this branch (its own warning). The fix belongs
-upstream (multi-contact for heightfield pairs, or clipping the prism to its top slab); the practical
-workaround for MetalSim is a terrain built from box geoms, which take the primitive collision path.
+`tests/test_terrain.py::test_hfield_mesh_contacts_match_mujoco_c`: G1 on Isaac's rough-terrain
+layout under a PD hold, MuJoCo Warp vs MuJoCo C on the same model. **Before the patch** (xfail at
+commit `066db94`): heightfield-mesh contacts returned an inverted normal (z = −1.000) with a 2.05 m
+penetration and a witness point 1.1 m from the foot; one of four worlds was launched (pelvis 2.31 m
+vs 0.74 m in C); under random actions joint velocities reached 1e13 rad/s and the acceleration and
+torque reward terms exploded (rough PPO run, iteration 3: return −8.7e25).
+
+Localization: the defect reproduced on Warp's CPU device (so MuJoCo Warp's algorithm, not the Metal
+backend), was independent of `ccd_iterations`/`ccd_tolerance` (50→500, 1e-6→1e-8), did not occur
+for spheres (five placements on a block terrain match C exactly), and had a minimal repro: a box
+mesh pressed 3 cm into a flat heightfield yields a sideways normal (0.43, −0.90, 0.09). The kernel
+tests each terrain prism (a triangular column down to the heightfield base, 1.9 m here) against the
+convex geom with single-witness-point GJK/EPA and keeps the minimum-distance result; MuJoCo C's
+`mjc_ConvexHField` produces face-contact manifolds through its multi-contact CCD, which MuJoCo Warp
+does not support for HFIELD–MESH pairs (its own warning).
+
+**Patch** (`patches/mujoco_warp-hfield-plane-contacts.patch`, branch `metalsim` of
+https://github.com/pulipakaa24/mujoco_warp, gated by `HFIELD_PLANE_CONTACTS`): per prism, the
+contact is the deepest vertex of the convex geom below the prism's top-triangle plane whose
+footprint lies in that triangle's column; the normal is the triangle normal. **After**: the test
+passes (min normal z 0.41, max penetration 3.8 cm against C's own 4.4 cm for the same initial
+placement, pelvis heights within 3 cm of C over 0.5 s), and 400 control steps of Isaac-scale random
+actions (unit-std Gaussian × 0.5) at 1024 envs stay bounded exactly like flat ground (|q̇| ≤ 56
+rad/s, no non-finite states). At 3× that amplitude MuJoCo C itself
+blows up on both flat and rough ground (|q̇| 8.8e6 rad/s flat, 1.3e5 rough; touch forces of 1e8 N),
+so that regime is a MuJoCo-vs-PhysX robustness difference under violent position targets with
+Isaac's gains, not a MetalSim defect; it is listed in §3.
+
+Difference that remains: one contact per (triangle, geom) with MuJoCo Warp's 4-contact selection
+per pair versus C's full manifold, and the plane contact measures depth to the top plane of a steep
+triangle rather than to the prism's nearest face, so contacts at step risers are stiffer than C's.
+Rough-terrain numbers below are therefore **measured on the patched kernel** and labelled as such.
 
 ## 2. Platform capabilities (the workstreams), with the tests behind them
 
@@ -156,7 +183,7 @@ workaround for MetalSim is a terrain built from box geoms, which take the primit
 | Renderer tier 0 (raster + PBR + shadows) vs a reference rasterizer | Isaac RTX rasterizer | native Metal raster reading physics buffers | `tests/test_render_tier0.py::test_silhouette_and_depth_and_seg_parity_primitives` (vs `mujoco.Renderer`: IoU > 0.95, depth median < 1 cm, seg IoU > 0.85), `::test_texture_pattern_parity` (corr > 0.97) | IoU 0.994–0.997, depth 0.1 mm, corr 0.996 | confirmed vs MuJoCo; **not testable vs Isaac RTX** here |
 | Renderer tier 1 (hybrid RT: soft shadows, AO, reflections) | RTX real-time | fragment-stage Metal ray queries | fidelity benchmark (`metalsim.bench.render_fidelity`): PSNR 19.7 / FLIP 0.30 vs MuJoCo; rollout: `tests/test_render_tier2.py` sibling path (`CartpoleRGBEnv(tier=1)`) | measured | partial (no denoiser / MetalFX upscale yet) |
 | Renderer tier 2 (path tracer) | RTX path tracer (Isaac "PathTracing" mode) | progressive Metal RT path tracer, NEE, GGX+Lambert, Russian roulette | `tests/test_render_tier2.py::test_lambertian_plane_analytic` (radiance 0.4000 exact), `::test_white_furnace_uniform_sky` (0.498 vs 0.5), `::test_monte_carlo_convergence` (noise ratio 4.05 for 16× spp; ideal 4.0), `::test_direct_light_matches_tier0` (PSNR 43.7–45.1 dB, depth 1 mm, seg IoU 1.0), `::test_gpu_path_from_batchsim_matches_host`, `::test_cartpole_rgb_rollout_tier2` (full env rollout at tier 2) | pass | confirmed radiometrically; not compared to Isaac's path tracer (not testable here); no denoiser |
-| Tier 1 / tier 2 full rollouts (throughput) | Isaac Cartpole-RGB: 50K steps/s at 1024 envs on a 4090 (rasterized RTX, reported) | Cartpole-RGB 100×100, 1024 envs, physics + render + reward/reset, one run each, uncontended | `metalsim.learn.cartpole_rgb` (`python -m metalsim.learn.cartpole_rgb 1024`) | tier 0 47,135; tier 1 42,634; tier 2 (1 spp, 1 bounce) 36,401; tier 2 (1 spp, 2 bounces) 34,762; tier 2 (4 spp, 2 bounces) 19,782 env-steps/s | measured; the tier-2 rollout is a full path-traced observation stream at 70 % of the raster rate (1 spp, noisy) |
+| Tier 1 / tier 2 full rollouts (throughput) | Isaac Cartpole-RGB: 50K steps/s at 1024 envs on a 4090 (rasterized RTX, reported) | Cartpole-RGB 100×100, 1024 envs, physics + render + reward/reset, one run each, uncontended | `metalsim.learn.cartpole_rgb` (`python -m metalsim.learn.cartpole_rgb 1024`) | tier 0 47,911; tier 1 43,368; tier 2 (1 spp, 1 bounce) 36,896; tier 2 (1 spp, 2 bounces) 35,160; tier 2 (4 spp, 2 bounces) 19,894 env-steps/s (uncontended pass 2026-09-24) | measured; the tier-2 rollout is a full path-traced observation stream at 70 % of the raster rate (1 spp, noisy) |
 | Ray-traced sensors (lidar, depth) | RTX lidar | Metal RT acceleration structures refit from physics | `tests/test_sensors_rt.py::test_lidar_vs_mujoco_ray` (median < 2 mm, 95th < 2 cm, hit pattern within 3 %), `::test_raycast_depth_vs_raster_depth` (99.5 % agree, median < 1 mm) | pass | confirmed vs MuJoCo `mj_ray`; **not testable vs Isaac RTX lidar** |
 | IMU / contact / joint sensors as tensors | Isaac sensors | MuJoCo sensors evaluated per step | `tests/test_sensors_state.py::test_imu_and_contact_sensors_as_tensors` (accelerometer 9.81 at rest, ~0 in free fall; touch ≈ m g) | pass | confirmed |
 | Height scan on terrain | `RayCaster` | Metal ray queries | `tests/test_terrain.py::test_height_scan_matches_mj_ray` | pass | confirmed |

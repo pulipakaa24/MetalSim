@@ -46,15 +46,18 @@ published benchmark. Neither is cited as physics parity evidence.
 
 ## Headline throughput (uncontended)
 
-- **G1 (Isaac's asset), flat, 4096 envs, synchronized**: step only 45.7K env-steps/s (Isaac Lab
-  RTX 4090 published 94K); step + Warp-policy inference 46.0K (88K); full PPO loop 41–43K (82K).
-  Raw 0.5× on a chip with 4.5× less peak FP32; 2.2–2.3× per TFLOPS. Physics alone 67K.
-- **G1 rough**: not claimed. MuJoCo Warp's heightfield-mesh contacts return inverted normals and
-  launch worlds (xfail test, `PARITY.md` §1.6); 4096 envs also exhaust GPU memory in the CCD kernels.
+- **G1 (Isaac's asset), 4096 envs, synchronized, uncontended (2026-09-24)**: flat step only 46.0K
+  env-steps/s (Isaac Lab RTX 4090 published 94K); step + Warp-policy inference 46.9K (88K); full PPO
+  loop 41.7–44.3K (82K). Rough (patched heightfield kernel): 46.4K / 41.2K / 35.1–37.2K. Raw 0.43–0.53×
+  on a chip with 4.5× less peak FP32; 1.9–2.4× per TFLOPS. Physics alone 68.7K flat, 61.7K rough.
+- **Rough terrain** runs on the MetalSim fork of MuJoCo Warp: its heightfield-mesh contacts were
+  defective (inverted normals, worlds launched; `PARITY.md` §1.6) and its heightfield kernel launched
+  one thread per contact slot, which exhausted memory at 4096 envs until the per-world capacity was
+  set to 32.
 
-- Cartpole-RGB 100×100, 1024 envs, full env step: tier 0 47,135, tier 1 42,634, tier 2 (1 spp)
-  36,401 env-steps/s (Isaac Lab RTX 4090 published 50,000, rasterized; pipeline comparison only).
-- Cartpole state, 4096 envs, full PPO loop with the rollout in Warp: 544K steps/s (Isaac 510K).
+- Cartpole-RGB 100×100, 1024 envs, full env step: tier 0 47,911, tier 1 43,368, tier 2 (1 spp)
+  36,896 env-steps/s (Isaac Lab RTX 4090 published 50,000, rasterized; pipeline comparison only).
+- Cartpole state, 4096 envs, full PPO loop with the rollout in Warp: 595K steps/s (Isaac 510K).
 
 ## Judgement calls made (to confirm)
 
