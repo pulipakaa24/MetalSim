@@ -34,11 +34,9 @@ def robot_builder():
         name = lab.split("/")[-1]
         for pat, kp, kv in GAINS:
             if re.fullmatch(pat, name):
-                for d in range(qd_start[j], qd_start[j + 1]): ke[d] = kp; kd[d] = kv; mode[d] = POS
-                for ip, val in INIT:
-                    if re.fullmatch(ip, name):
-                        for d in range(qd_start[j], qd_start[j + 1]): tq[d] = val
-                        for c in range(q_start[j], q_start[j + 1]): q[c] = val
+                val = next((v for ip, v in INIT if re.fullmatch(ip, name)), 0.0)     # Isaac: unlisted joints default to 0 (the USD's own drive targets are ignored)
+                for d in range(qd_start[j], qd_start[j + 1]): ke[d] = kp; kd[d] = kv; mode[d] = POS; tq[d] = val
+                for c in range(q_start[j], q_start[j + 1]): q[c] = val
     b.joint_target_ke, b.joint_target_kd, b.joint_target_q, b.joint_target_mode, b.joint_q = ke, kd, tq, mode, q
     return b
 

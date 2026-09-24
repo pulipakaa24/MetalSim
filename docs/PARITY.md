@@ -238,8 +238,14 @@ Physics-only throughput on the same G1 asset at the same 2.5 ms step, idle GPU
 
 At 4096 envs that is 7.8× MuJoCo Warp's rate, **but the 4-iteration XPBD setting does not yet hold the G1
 under Isaac's drives** (it collapses within a second), so the fair comparison is at whatever iteration /
-substep setting stands the robot; that sweep is `scripts/diagnostics/newton_xpbd_sweep.py` and its result
-is recorded below when available. ⟨NEWTON_SWEEP⟩
+substep setting stands the robot; that sweep is `scripts/diagnostics/newton_xpbd_sweep.py`. Result so far: the G1 falls under every
+XPBD setting tried (4–16 iterations, 2.5 / 1.25 / 0.625 ms), calmly at fine substeps, and a one-joint
+pendulum with `joint_target_ke` 200 does not move towards its target either, so the joint position
+drives are not engaging in our use of the API: Newton's XPBD applies drives as compliance 1/ke on the
+angular constraint, ignores `joint_target_kd` and `joint_target_mode` (its own docstring), and reads
+targets from `Control.joint_target_q`; the remaining discrepancy is being taken up with Newton's
+examples/tracker. Until the drives hold the robot, the 7.8× figure is "XPBD contacts + joints, drives
+inactive", an upper bound on the gain, not the number.
 
 ## 3. What is disproved, missing, or cannot be tested here
 
