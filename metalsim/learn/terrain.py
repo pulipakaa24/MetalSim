@@ -114,7 +114,18 @@ def isaac_rough_terrain(size=8.0, res=0.1, num_rows=10, num_cols=20, seed=0, bor
         F = np.concatenate([np.stack([i, i + 1, i + ncol + 1], 1), np.stack([i, i + ncol + 1, i + ncol], 1)]).astype(np.uint32)
         return V, F
 
-    hf["origins"] = origins; hf["mesh"] = mesh
+    def origin_table():
+        """(num_rows, num_cols, 3) sub-terrain centre origins: rows are difficulty levels (Isaac's
+        terrain curriculum moves envs between rows), columns are terrain types."""
+        t = np.zeros((num_rows, num_cols, 3), np.float32)
+        for r in range(num_rows):
+            for c in range(num_cols):
+                x = (c + 0.5) * n_cell_m - size_x + border; y = (r + 0.5) * n_cell_m - size_y + border
+                t[r, c] = (x, y, Hb[int(round((y + size_y) / res)), int(round((x + size_x) / res))])
+        return t
+
+    hf["origins"] = origins; hf["mesh"] = mesh; hf["origin_table"] = origin_table
+    hf["num_rows"] = num_rows; hf["num_cols"] = num_cols; hf["cell_size"] = size
     return hf
 
 

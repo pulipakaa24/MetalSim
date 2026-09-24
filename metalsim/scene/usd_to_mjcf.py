@@ -29,7 +29,7 @@ import numpy as np
 from pxr import Gf, Usd, UsdGeom, UsdLux, UsdPhysics, UsdShade, UsdSemantics
 
 
-def load_usd(path: str, *, lossless: bool = True, drives: bool = True) -> mujoco.MjSpec:
+def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True) -> mujoco.MjSpec:
     stage = Usd.Stage.Open(path)
     root = stage.GetDefaultPrim() or stage.GetPrimAtPath("/World")
     if lossless and root and root.HasCustomDataKey("mjc:source"):
@@ -37,7 +37,7 @@ def load_usd(path: str, *, lossless: bool = True, drives: bool = True) -> mujoco
         base = os.path.dirname(os.path.abspath(path))
         # mesh assets resolve relative to the original MJCF; the importer keeps absolute meshdir
         return spec
-    return convert_stage(stage, base_dir=os.path.dirname(os.path.abspath(path)), drives=drives)
+    return convert_stage(stage, base_dir=os.path.dirname(os.path.abspath(path)), drives=drives, visuals=visuals)
 
 
 def _q_from_gf(q) -> np.ndarray:
@@ -100,7 +100,7 @@ def _accumulate_xform_to(prim, ancestor, scale_units):
     return pos, quat, sw / np.where(sa == 0, 1, sa)
 
 
-def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True) -> mujoco.MjSpec:
+def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True, visuals: bool = True) -> mujoco.MjSpec:
     """``drives=False`` skips turning UsdPhysics drives into actuators (callers that apply their own
     actuator model, as Isaac Lab's ImplicitActuatorCfg does, add them afterwards)."""
     units = float(UsdGeom.GetStageMetersPerUnit(stage) or 1.0)
@@ -130,16 +130,38 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True) ->
 
     # -- materials ----------------------------------------------------------------------------
     mat_by_path = {}
-    for prim in stage.Traverse():
+    for prim in Usd.PrimRange(stage.GetPseudoRoot(), Usd.TraverseInstanceProxies()):   # materials may live under instanced prims
         if prim.IsA(UsdShade.Material):
             mat = UsdShade.Material(prim)
             shader = None
             out = mat.GetSurfaceOutput()
             src = out.GetConnectedSource() if out else None
+            if not src:   # NVIDIA assets: an MDL surface output (OmniPBR / OmniGlass) instead of UsdPreviewSurface
+                out = mat.GetSurfaceOutput("mdl"); src = out.GetConnectedSource() if out else None
             if src:
                 shader = UsdShade.Shader(src[0].GetPrim())
             rgba = [0.8, 0.8, 0.8, 1.0]; rough = 0.5; metal = 0.0; tex = None
-            if shader:
+            mdl = shader.GetPrim().GetAttribute("info:mdl:sourceAsset").Get() if shader else None
+            if shader and mdl:
+                # OmniPBR parameters (the subset MuJoCo materials can carry): constant colour or diffuse
+                # texture, roughness, metallic, opacity
+                def _in(name):
+                    i = shader.GetInput(name); return i.Get() if i else None
+                dc = _in("diffuse_color_constant")
+                if dc is not None: rgba[:3] = [float(c) for c in dc]
+                tint = _in("diffuse_tint")
+                if tint is not None: rgba[:3] = [rgba[k] * float(tint[k]) for k in range(3)]
+                dt = _in("diffuse_texture")
+                if dt is not None and str(getattr(dt, "path", "")):
+                    tex = dt.resolvedPath or os.path.join(base_dir, str(dt.path))
+                rr = _in("reflection_roughness_constant"); mt = _in("metallic_constant"); op = _in("opacity_constant")
+                if rr is not None: rough = float(rr)
+                if mt is not None: metal = float(mt)
+                if op is not None: rgba[3] = float(op)
+                ec = _in("emissive_color"); ei = _in("emissive_intensity"); ee = _in("enable_emission")
+                emission = float(ei) if (ee and ei is not None) else 0.0
+            elif shader:
+                emission = 0.0
                 inp = shader.GetInput("diffuseColor")
                 if inp:
                     csrc = inp.GetConnectedSource()
@@ -159,9 +181,16 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True) ->
                 r = shader.GetInput("roughness"); mt = shader.GetInput("metallic")
                 if r and r.Get() is not None: rough = float(r.Get())
                 if mt and mt.Get() is not None: metal = float(mt.Get())
+            else:
+                emission = 0.0
             mm = spec.add_material()
-            mm.name = prim.GetPath().name
+            used_mat = set(mat_by_path.values()); base = prim.GetPath().name; name = base; k = 2
+            while name in used_mat:                      # instanced assets repeat material names per link
+                name = f"{base}_{k}"; k += 1
+            mm.name = name                               # MjSpec rejects a repeated name at assignment
             mm.rgba = rgba
+            if emission > 0.0:
+                mm.emission = min(emission, 10.0)
             mm.roughness = rough
             mm.metallic = metal
             mm.shininess = max(0.0, 1.0 - rough)
@@ -330,7 +359,11 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True) ->
     # -- geoms, cameras, lights ---------------------------------------------------------------------
     mesh_names = {}
     used_geom_names = set()
-    for prim in stage.Traverse():
+    # instance proxies included: Isaac's assets reference their visual meshes as instanceable prims
+    # (g1_minimal.usd: 43 visual meshes, 343K faces, materials bound), which stage.Traverse() skips
+    for prim in Usd.PrimRange(stage.GetPseudoRoot(), Usd.TraverseInstanceProxies()):
+        if not visuals and prim.IsA(UsdGeom.Gprim) and not prim.HasAPI(UsdPhysics.CollisionAPI):
+            continue
         purpose = UsdGeom.Imageable(prim).GetPurposeAttr().Get() if prim.IsA(UsdGeom.Imageable) else None
         is_gprim = prim.IsA(UsdGeom.Gprim)
         if not (is_gprim or prim.IsA(UsdGeom.Camera) or prim.IsA(UsdLux.BoundableLightBase) or prim.IsA(UsdLux.NonboundableLightBase)):
@@ -434,7 +467,7 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True) ->
             g.group = 2
         elif purpose == "guide":
             g.group = 3
-        mb = UsdShade.MaterialBindingAPI(prim).ComputeBoundMaterial()[0] if prim.HasAPI(UsdShade.MaterialBindingAPI) else None
+        mb = UsdShade.MaterialBindingAPI(prim).ComputeBoundMaterial()[0]   # bindings resolve on instance proxies too
         if mb and mb.GetPath() in mat_by_path:
             g.material = mat_by_path[mb.GetPath()]
         else:

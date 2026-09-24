@@ -67,10 +67,10 @@ PHYSICS_DT = 0.005
 EPISODE_S = 20.0
 
 
-def build_g1_model(terrain: str = "flat", hfield=None):
+def build_g1_model(terrain: str = "flat", hfield=None, visuals: bool = False):
     """MjModel of Isaac's G1 (from its USD) on a plane or a heightfield, with Isaac's actuators,
     initial pose, and touch sensors for contact terms. Returns (model, info)."""
-    spec = load_usd(G1_USD, lossless=False, drives=False)
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
     spec.option.timestep = PHYSICS_DT
     spec.option.integrator = mujoco.mjtIntegrator.mjINT_IMPLICITFAST
     spec.option.cone = mujoco.mjtCone.mjCONE_PYRAMIDAL   # mjlab's G1 training setting; elliptic is costlier
@@ -211,7 +211,10 @@ def g1_reward_done(qpos: wp.array2d(dtype=float), qvel: wp.array2d(dtype=float),
                    buf_rew: wp.array2d(dtype=float), buf_done: wp.array2d(dtype=float), reset_mask: wp.array(dtype=wp.bool),
                    resample: wp.array(dtype=wp.bool), resample_every: int,
                    ep_ret: wp.array(dtype=float), ep_len: wp.array(dtype=int), stats: wp.array(dtype=float), stats_i: wp.array(dtype=int),
-                   terms: wp.array2d(dtype=float)):
+                   terms: wp.array2d(dtype=float),
+                   curriculum: int, level: wp.array(dtype=int), col: wp.array(dtype=int), origin_table: wp.array2d(dtype=float),
+                   n_levels: int, n_cols: int, cell_size: float, episode_s: float, origins: wp.array2d(dtype=float),
+                   seed: int):
     e = wp.tid()
     nj = last_action.shape[1]
     q = wp.vec4(qpos[e, 3], qpos[e, 4], qpos[e, 5], qpos[e, 6])
@@ -317,6 +320,25 @@ def g1_reward_done(qpos: wp.array2d(dtype=float), qvel: wp.array2d(dtype=float),
     ep_len[e] = ep_len[e] + 1
     reset_mask[e] = done
     resample[e] = resample[e] or (t[e] % resample_every == 0)
+    if done and curriculum == 1:
+        # Isaac terrain_levels_vel: up a level after walking more than half a cell, down a level
+        # after walking less than half the commanded distance; at the top, a random level
+        dx = qpos[e, 0] - origins[e, 0]; dy = qpos[e, 1] - origins[e, 1]
+        walked = wp.sqrt(dx * dx + dy * dy)
+        cmd_dist = wp.sqrt(cmd[e, 0] * cmd[e, 0] + cmd[e, 1] * cmd[e, 1]) * episode_s
+        lv = level[e]
+        if walked > 0.5 * cell_size:
+            lv += 1
+        elif walked < 0.5 * cmd_dist:
+            lv -= 1
+        if lv >= n_levels:
+            rng2 = wp.rand_init(seed + 29, step_idx[0] * 9973 + e)
+            lv = wp.randi(rng2, 0, n_levels)
+        if lv < 0:
+            lv = 0
+        level[e] = lv
+        k = lv * n_cols + col[e]
+        origins[e, 0] = origin_table[k, 0]; origins[e, 1] = origin_table[k, 1]; origins[e, 2] = origin_table[k, 2]
     if done:
         wp.atomic_add(stats, 0, ep_ret[e])
         wp.atomic_add(stats_i, 0, ep_len[e])
@@ -410,7 +432,19 @@ class G1VelocityTask:
             o = np.array([[(i % side) * 2.5, (i // side) * 2.5, 0.0] for i in range(n)], np.float32)
             o[:, :2] -= o[:, :2].mean(0)
         else:
-            o = self.hfield["origins"](n, seed)
+            # Isaac: envs start at random levels up to max_init_terrain_level (5) of the 10 rows and
+            # a random terrain type (column); the curriculum then moves them between rows
+            rr = np.random.default_rng(seed + 7)
+            lv = rr.integers(0, min(5, self.hfield["num_rows"] - 1) + 1, n); cc = rr.integers(0, self.hfield["num_cols"], n)
+            tab = self.hfield["origin_table"]()
+            o = tab[lv, cc]
+            self.origin_table = wp.array(tab.reshape(-1, 3), dtype=float, device=device)
+            self.level = wp.array(lv.astype(np.int32), dtype=int, device=device); self.col = wp.array(cc.astype(np.int32), dtype=int, device=device)
+        self.curriculum = 1 if terrain != "flat" else 0
+        if terrain == "flat":
+            self.origin_table = wp.zeros((1, 3), dtype=float, device=device); self.level = wp.zeros(n, dtype=int, device=device); self.col = wp.zeros(n, dtype=int, device=device)
+        self.n_levels = self.hfield["num_rows"] if self.hfield else 1; self.n_cols = self.hfield["num_cols"] if self.hfield else 1
+        self.cell_size = float(self.hfield["cell_size"]) if self.hfield else 8.0
         self.origins = wp.array(o, dtype=float, device=device)
         self.scanner = None
         if self.use_scan:
@@ -440,12 +474,17 @@ class G1VelocityTask:
             d.qpos, d.qvel, d.qacc, d.qfrc_actuator, d.sensordata, d.site_xpos, d.cvel, self.cmd, self.last_action, self.prev_action,
             self.default_q, self.jnt_range, self.group, self.touch_adr, self.foot_site, self.foot_body, self.air_time,
             self.contact_time, CONTROL_DT, self.t, self.max_t, pol.step_idx, bufs.rew, bufs.done, self.sim._reset_mask,
-            self.resample, int(10.0 / CONTROL_DT), self.ep_ret, self.ep_len, self.stats, self.stats_i, self.terms], device=self.device)
+            self.resample, int(10.0 / CONTROL_DT), self.ep_ret, self.ep_len, self.stats, self.stats_i, self.terms,
+            self.curriculum, self.level, self.col, self.origin_table, self.n_levels, self.n_cols, self.cell_size, EPISODE_S,
+            self.origins, self.seed], device=self.device)
         import mujoco_warp as mjw
         mjw.reset_data(self.sim.m, d, reset=self.sim._reset_mask)
         wp.launch(g1_reset, dim=self.n, inputs=[self.sim._reset_mask, self.default_q, self.origins, self.seed, pol.step_idx,
                                                 d.qpos, d.qvel, self.last_action, self.prev_action], device=self.device)
-        mjw.forward(self.sim.m, d)
+        # After a reset only the kinematics are needed before the next observation (body poses for
+        # the height scan); everything else (sensors, accelerations, contact forces) is produced by
+        # the next step itself. A full forward pass here cost ~20 ms per step at 4096 envs.
+        mjw.kinematics(self.sim.m, d)
 
     def reset_all(self):
         """Host-driven initial reset (once)."""
@@ -530,7 +569,7 @@ def g1_ppo_config(terrain: str, iterations: int, seed: int = 0):
                          hidden=(512, 256, 128) if terrain != "flat" else (256, 128, 128), log_every=1)
 
 
-def train_g1(n=4096, terrain="flat", iterations=1500, seed=0, log_path=None):
+def train_g1(n=4096, terrain="flat", iterations=1500, seed=0, log_path=None, checkpoint=None):
     from metalsim.learn.ppo_warp import PPOWarp
     task = G1VelocityTask(n, terrain=terrain, seed=seed)
     algo = PPOWarp(task, g1_ppo_config(terrain, iterations, seed))
@@ -541,6 +580,10 @@ def train_g1(n=4096, terrain="flat", iterations=1500, seed=0, log_path=None):
             f.write(msg + "\n"); f.flush()
     log(f"G1 {terrain} PPO: N={n} obs_dim {task.obs_dim} act_dim {task.act_dim} rollout 24 x {iterations} iterations")
     algo.train(log=log)
+    if checkpoint:
+        torch.save({"net": algo.net.state_dict(), "terrain": terrain, "n": n, "iterations": iterations, "obs_dim": task.obs_dim,
+                    "act_dim": task.act_dim, "hidden": algo.cfg.hidden}, checkpoint)
+        log(f"saved policy to {checkpoint}")
     return algo
 
 
@@ -550,7 +593,8 @@ if __name__ == "__main__":
     n = int(sys.argv[1]) if len(sys.argv) > 1 else 4096
     terrain = sys.argv[2] if len(sys.argv) > 2 else "flat"
     if len(sys.argv) > 3 and sys.argv[3] == "train":
-        train_g1(n, terrain, int(sys.argv[4]) if len(sys.argv) > 4 else 1500, log_path=sys.argv[5] if len(sys.argv) > 5 else None)
+        train_g1(n, terrain, int(sys.argv[4]) if len(sys.argv) > 4 else 1500, log_path=sys.argv[5] if len(sys.argv) > 5 else None,
+                 checkpoint=sys.argv[6] if len(sys.argv) > 6 else None)
         sys.exit(0)
     task = G1VelocityTask(n, terrain=terrain)
     print(f"G1 ({terrain}): nbody {task.model.nbody} nv {task.model.nv} nu {task.model.nu} ngeom {task.model.ngeom} obs_dim {task.obs_dim}")

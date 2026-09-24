@@ -107,13 +107,15 @@ def test_hfield_mesh_contacts_match_mujoco_c():
             worst_normal = min(worst_normal, float(fr[:, 0, 2].min()) if fr.ndim == 3 else float(fr[:, 2].min()))
             worst_pen = max(worst_pen, float(-dist.min()))
     ours = d.qpos.numpy()[:, 2] - org[:, 2]
-    ref = []
+    ref = []; c_pen = 0.0
     for e in range(4):
         dc = mujoco.MjData(m); mujoco.mj_resetDataKeyframe(m, dc, 0); dc.qpos[:] = q[e]; dc.ctrl[:] = m.key_qpos[0][7:]
-        for _ in range(100):
+        for t in range(100):
             mujoco.mj_step(m, dc)
+            if t % 4 == 0 and dc.ncon:
+                c_pen = max(c_pen, float(-min(c.dist for c in dc.contact[:dc.ncon])))
         ref.append(dc.qpos[2] - org[e, 2])
-    print(f"hfield contacts over 0.5 s: min normal z {worst_normal:.3f}, max penetration {worst_pen:.4f} m; "
+    print(f"hfield contacts over 0.5 s: min normal z {worst_normal:.3f}, max penetration {worst_pen:.4f} m (MuJoCo C: {c_pen:.4f}); "
           f"pelvis z ours {ours.round(3)} vs C {np.round(ref, 3)}")
-    assert worst_normal > 0.0 and worst_pen < 0.05
+    assert worst_normal > 0.0 and worst_pen < max(0.02, 1.5 * c_pen)   # the initial placement intersects terrain boxes
     assert np.all(np.abs(ours - np.array(ref)) < 0.05)

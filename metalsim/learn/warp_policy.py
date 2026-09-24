@@ -33,7 +33,7 @@ def mlp_layer(x: wp.array2d(dtype=float), W: wp.array2d(dtype=float), b: wp.arra
               act: int, y: wp.array2d(dtype=float)):
     """y[e, j] = act(sum_i x[e, i] W[j, i] + b[j]); one thread per (env, output)."""
     e, j = wp.tid()
-    n_in = x.shape[1]
+    n_in = W.shape[1]          # may be < x.shape[1]: an actor reads the leading columns of a wider row
     s = b[j]
     for i in range(n_in):
         s += x[e, i] * W[j, i]
@@ -184,15 +184,22 @@ class RolloutBuffers:
 class ActorCriticMLP(nn.Module):
     """rsl_rl-style actor-critic MLP (ELU)."""
 
-    def __init__(self, obs_dim, act_dim, hidden=(512, 256, 128)):
+    def __init__(self, obs_dim, act_dim, hidden=(512, 256, 128), actor_in=None):
+        """Asymmetric when ``actor_in`` < ``obs_dim``: the actor reads the first ``actor_in`` columns of
+        each observation row (what the real robot has), the critic the whole row (plus privileged
+        simulator state)."""
         super().__init__()
-        def mlp(out):
-            layers, d = [], obs_dim
+        self.actor_in = actor_in or obs_dim
+        def mlp(out, d_in):
+            layers, d = [], d_in
             for h in hidden:
                 layers += [nn.Linear(d, h), nn.ELU()]
                 d = h
             layers.append(nn.Linear(d, out))
             return nn.Sequential(*layers)
-        self.actor = mlp(act_dim)
-        self.critic = mlp(1)
+        self.actor = mlp(act_dim, self.actor_in)
+        self.critic = mlp(1, obs_dim)
         self.log_std = nn.Parameter(torch.zeros(act_dim))
+
+    def actor_mean(self, obs):
+        return self.actor(obs[..., :self.actor_in])

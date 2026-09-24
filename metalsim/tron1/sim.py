@@ -14,7 +14,8 @@ official model), all parameterized by `metalsim.tron1.realism.SimParams`:
    `qvel_alpha: 1`, i.e. no master-side filtering), torque *estimate* with a torque-constant error
    and noise, IMU with white noise, bias and bias random walk, fixed mounting misalignment, and an
    AHRS orientation with wandering tilt error and yaw drift.
-5. body and ground: payload (sensor pack), base COM offset, link mass and inertia scaling, ground
+5. body and ground: sensor pack (a box enclosure with a MID-360 on top; mass and COM adjustable,
+   also live via `set_pack`), base COM offset, link mass and inertia scaling, ground
    friction and tyre softness; optional terrain height field (`metalsim.tron1.scene`).
 
 Physics runs at 0.5 ms (LimX's model file uses 1 ms). Time is kept in integer microseconds.
@@ -38,6 +39,20 @@ WF_XML = ROOT / "assets/tron1/WF_TRON1A/xml/robot.xml"
 WHEEL_RADIUS = 0.1298
 LIMX_CYLINDER_RADIUS = 0.127
 PHYS_DT_US = 500
+
+# Generic sensor pack (Jetson Orin NX + enclosure, Livox MID-360 on top), sitting on the base's top
+# face (z = +0.023 m in base_Link, from LimX's base collision box). Geometry is an estimate: the
+# enclosure box and its placement are not published; the MID-360 is 65 x 65 x 60 mm (Livox spec).
+PACK_BOX_HALF = (0.10, 0.08, 0.04)
+PACK_BOX_POS = (0.0, 0.0, 0.063)
+LIDAR_RADIUS, LIDAR_HALF_H = 0.0325, 0.030
+LIDAR_POS = (0.0, 0.0, 0.133)
+
+
+def pack_inertia(mass):
+    """Uniform box of the enclosure's size (the diagonal inertia about the pack's COM)."""
+    a, b, c = (2 * h for h in PACK_BOX_HALF)
+    return [mass / 12 * (b * b + c * c), mass / 12 * (a * a + c * c), mass / 12 * (a * a + b * b)]
 SDK_DT_US = 1000
 
 
@@ -71,11 +86,17 @@ def build_model(params: SimParams, terrain=None) -> mujoco.MjModel:
         b.mass *= params.link_mass_scale
         b.inertia = np.asarray(b.inertia) * params.inertia_scale
     base.ipos = np.asarray(base.ipos) + params.base_com_offset
-    if params.payload_mass > 0:
-        pay = base.add_body(name="payload", pos=params.payload_pos)
-        pay.mass = params.payload_mass
-        pay.inertia = [params.payload_mass * 0.01] * 3
-        pay.explicitinertial = True
+    # Sensor pack: body at the base origin so its geometry is placed in base coordinates; its
+    # mass and COM (`payload_mass`, `payload_pos`) are independent of the geometry.
+    pack = base.add_body(name="sensor_pack", pos=[0.0, 0.0, 0.0])
+    pack.mass = max(params.payload_mass, 1e-3)
+    pack.ipos = list(params.payload_pos)
+    pack.inertia = pack_inertia(pack.mass)
+    pack.explicitinertial = True
+    pack.add_geom(name="pack_box", type=mujoco.mjtGeom.mjGEOM_BOX, size=list(PACK_BOX_HALF), pos=list(PACK_BOX_POS),
+                  rgba=[0.18, 0.19, 0.21, 1.0], mass=0.0)
+    pack.add_geom(name="pack_lidar", type=mujoco.mjtGeom.mjGEOM_CYLINDER, size=[LIDAR_RADIUS, LIDAR_HALF_H, 0.0],
+                  pos=list(LIDAR_POS), rgba=[0.12, 0.12, 0.13, 1.0], mass=0.0)
     for i, name in enumerate(WF_MOTOR_NAMES):
         j = spec.joint(name)
         j.frictionloss = float(params.coulomb[i])
@@ -134,7 +155,8 @@ class Tron1Sim:
         self.wheel_ids = [self.m.body(f"wheel_{s}_Link").id for s in "LR"]
         self._sens = {n: self.m.sensor_adr[self.m.sensor(n).id] for n in ("quat", "gyro", "acc")}
         self.total_mass = float(self.m.body_subtreemass[self.base_id])
-        self._fall_geoms = {self.m.geom(g).id for g in ("base_collision", "abad_L_collision", "abad_R_collision",
+        self.pack_id = self.m.body("sensor_pack").id
+        self._fall_geoms = {self.m.geom(g).id for g in ("base_collision", "pack_box", "pack_lidar", "abad_L_collision", "abad_R_collision",
                                                          "hip_L_collision", "hip_R_collision", "knee_L_collision",
                                                          "knee_R_collision")}
         self._ground_geoms = {self.m.geom("floor").id}
@@ -142,6 +164,18 @@ class Tron1Sim:
             self._ground_geoms |= set(terrain.geom_ids(self.m))
         self.mount_q = quat_from_rpy(*self.p.imu_mount_rpy)
         self.mount_R = quat_to_mat(self.mount_q)
+
+    def set_pack(self, mass=None, com=None):
+        """Change the sensor pack's mass [kg] and/or COM (base frame) on the running sim."""
+        m = self.m
+        if mass is not None:
+            m.body_mass[self.pack_id] = max(float(mass), 1e-3)
+            m.body_inertia[self.pack_id] = pack_inertia(m.body_mass[self.pack_id])
+            self.p.payload_mass = float(mass)
+        if com is not None:
+            m.body_ipos[self.pack_id] = com
+            self.p.payload_pos = np.asarray(com, dtype=float)
+        self.total_mass = float(m.body_mass[self.base_id:].sum())
 
     # ------------------------------------------------------------------ reset
     def reset(self, q_legs: np.ndarray, xy=(0.0, 0.0), yaw=0.0, pitch=0.0):
@@ -175,6 +209,7 @@ class Tron1Sim:
         self.ahrs_err = np.zeros(3)           # roll, pitch, yaw error of the onboard AHRS
         self.push_force = np.zeros(3)
         self.push_until_us = -1
+        self.hoist_z = None
         self.fallen = False
         self._publish()                       # a first state so controllers have something
         _, _, self.latest_state, self.latest_imu = heapq.heappop(self._state_queue)
@@ -240,6 +275,24 @@ class Tron1Sim:
         self._seq += 1
         heapq.heappush(self._cmd_queue, (self.t_us + self._delay_us(self.p.cmd_delay), self._seq, cmd.copy()))
 
+    def set_hoist(self, bottom_z=None):
+        """Safety rope from above to the top of the base: pulls up only while taut.
+
+        `bottom_z` is the height the attachment point hangs at when the rope carries the robot;
+        None removes the rope. Lowering it below the standing height lets the rope go slack.
+        """
+        self.hoist_z = bottom_z
+
+    def _hoist_force(self):
+        d = self.d
+        attach = d.xpos[self.base_id] + quat_to_mat(d.xquat[self.base_id]) @ np.array([0.0, 0.0, 0.03])
+        stretch = self.hoist_z - attach[2]
+        if stretch <= 0:
+            return np.zeros(3), attach
+        vel = d.qvel[0:3]
+        f = np.array([-20.0 * vel[0], -20.0 * vel[1], 8000.0 * stretch - 300.0 * min(vel[2], 0.0)])
+        return f, attach
+
     def push(self, dv_xy, duration=0.1):
         """Horizontal shove on the base that changes the robot's momentum by total_mass * dv."""
         f = self.total_mass * np.asarray(dv_xy, dtype=float) / duration
@@ -270,7 +323,13 @@ class Tron1Sim:
             if self.p.encoder_bits <= 0:        # ideal sensing: exact velocity, as LimX's simulator
                 self.dq_enc = d.qvel[self.jv].copy()
             self._drive()
+            d.xfrc_applied[self.base_id, :] = 0.0
             d.xfrc_applied[self.base_id, :3] = self.push_force if self.t_us < self.push_until_us else 0.0
+            if self.hoist_z is not None:
+                f, at = self._hoist_force()
+                if f.any():
+                    d.xfrc_applied[self.base_id, :3] += f
+                    d.xfrc_applied[self.base_id, 3:] += np.cross(at - d.xipos[self.base_id], f)
             mujoco.mj_step(self.m, d)
             self.t_us += PHYS_DT_US
         q_now = self._quantize(d.qpos[self.jq])
