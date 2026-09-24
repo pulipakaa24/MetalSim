@@ -43,6 +43,10 @@ def episode(args):
         from .classical import ClassicalController
         c = ClassicalController()
         q0 = c.q_stance
+    elif controller.startswith("trained"):
+        from .trained_policy import TrainedPolicyController
+        c = TrainedPolicyController(controller.split(":", 1)[1] if ":" in controller else None)
+        q0 = c.initial_q()
     else:
         from .limx_policy import LimxPolicyController
         c = LimxPolicyController()
@@ -71,7 +75,7 @@ def episode(args):
 
 def summarize(rows):
     out = {}
-    for c in CONTROLLERS:
+    for c in dict.fromkeys(x["controller"] for x in rows):
         for k in CONDITIONS:
             r = [x for x in rows if x["controller"] == c and x["condition"] == k]
             if not r:

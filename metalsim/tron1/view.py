@@ -3,6 +3,9 @@
     .venv/bin/mjpython -m metalsim.tron1.view [--controller classical|limx] [--params ideal|nominal|random]
                                              [--seed N] [--scene PATH.npz]
 
+A gain-tuning panel for the classical controller opens in the browser (http://127.0.0.1:8777;
+`--no-tune` to skip, `--gains runs/tron1_gains.json` to start from saved gains).
+
 Keys: arrows drive (up/down = forward speed, left/right = turn), space = stop, P = shove the
 robot sideways, O = shove it forward, R = reset (new random robot with --params random) and reload the controller code from disk.
 The robot restarts automatically when it falls. The terminal prints speed, pitch and roll.
@@ -29,9 +32,16 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_SPACE = 265, 264, 263, 262, 32
 
 
+def reload_all():
+    """R: pick up edits to the realism model, the simulator and the controllers."""
+    from . import classical, limx_policy, realism, sim
+    for mod in (realism, sim, classical, limx_policy):
+        importlib.reload(mod)
+    return realism, sim
+
+
 def make_controller(name):
     from . import classical, limx_policy
-    importlib.reload(classical)
     if name == "limx":
         importlib.reload(limx_policy)
         return limx_policy.LimxPolicyController()
@@ -44,7 +54,18 @@ def main():
     ap.add_argument("--params", default="nominal", choices=["ideal", "nominal", "random"])
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--scene", default=None)
+    ap.add_argument("--no-tune", action="store_true", help="do not start the gain-tuning web panel")
+    ap.add_argument("--gains", default=None, help="JSON of gain overrides saved from the panel")
     a = ap.parse_args()
+
+    tuner = None
+    if a.controller == "classical" and not a.no_tune:
+        from .classical import ClassicalGains, Tron1Model
+        from .tuner import Tuner, gains_to_flat, pack_defaults
+        tuner = Tuner({**gains_to_flat(ClassicalGains()), **pack_defaults(SimParams.nominal(), Tron1Model())},
+                      gains_file=a.gains)
+        print(f"gain tuner: http://127.0.0.1:{tuner.port}/", flush=True)
+        tuner.open()
 
     terrain = None
     if a.scene:
@@ -74,24 +95,27 @@ def main():
     state["key"] = key
 
     def build():
+        realism_mod, sim_mod = reload_all()
         if a.params == "random":
-            p = SimParams.nominal().sample(np.random.default_rng(state["seed"]))
+            p = realism_mod.SimParams.nominal().sample(np.random.default_rng(state["seed"]))
             state["seed"] += 1
         else:
-            p = getattr(SimParams, a.params)()
+            p = getattr(realism_mod.SimParams, a.params)()
         ctrl = make_controller(a.controller)
-        sim = Tron1Sim(p, seed=state["seed"], terrain=terrain)
+        sim = sim_mod.Tron1Sim(p, seed=state["seed"], terrain=terrain)
         start = ctrl.initial_q() if hasattr(ctrl, "initial_q") else ctrl.q_stance
         sim.reset(start, xy=terrain.spawn_xy if terrain is not None else (0.0, 0.0))
         return sim, ctrl
 
     while True:
         sim, ctrl = build()
-        if not run_window(sim, ctrl, state):
+        if tuner is not None:
+            tuner.attach(ctrl, sim)
+        if not run_window(sim, ctrl, state, tuner):
             break
 
 
-def run_window(sim, ctrl, state):
+def run_window(sim, ctrl, state, tuner=None):
     """Run one robot until the window closes (False) or R / a fall asks for a new robot (True)."""
     with mujoco.viewer.launch_passive(sim.m, sim.d, key_callback=state["key"]) as v:
         v.cam.type = mujoco.mjtCamera.mjCAMERA_TRACKING
@@ -110,6 +134,16 @@ def run_window(sim, ctrl, state):
                 sim.push(state["push"])
                 state["push"] = None
             vel = (state["vx"], 0.0, state["wz"])
+            if tuner is not None:
+                for act in tuner.update(ctrl, sim, vel):
+                    if act == "push_fwd":
+                        sim.push((0.5, 0.0))
+                    elif act == "push_side":
+                        sim.push((0.0, 0.4))
+                    elif act == "stop":
+                        state["vx"] = state["wz"] = 0.0
+                    elif act == "reset":
+                        state["reset"] = True
             with v.lock():
                 for _ in range(16):             # 16 ms of sim per frame
                     if k % 2 == 0:              # controller at 500 Hz

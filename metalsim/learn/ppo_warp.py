@@ -131,6 +131,7 @@ class PPOWarpConfig:
     clip: float = 0.2
     ent_coef: float = 0.005
     vf_coef: float = 1.0
+    clip_value: bool = True             # rsl_rl use_clipped_value_loss: max of clipped/unclipped value error
     max_grad_norm: float = 1.0
     hidden: tuple = (32, 32)
     desired_kl: float | None = 0.01     # rsl_rl adaptive schedule: lr x1.5 when KL < desired/2, /1.5 when > 2x desired
@@ -143,7 +144,8 @@ class PPOWarp:
         self.task, self.cfg = task, cfg or PPOWarpConfig()
         torch.manual_seed(self.cfg.seed)
         n, T = task.n, self.cfg.rollout
-        self.net = ActorCriticMLP(task.obs_dim, task.act_dim, hidden=self.cfg.hidden).to("mps")
+        self.net = ActorCriticMLP(task.obs_dim, task.act_dim, hidden=self.cfg.hidden,
+                                 actor_in=getattr(task, "actor_dim", None)).to("mps")
         self.pol = WarpMLPPolicy(self.net, n, task.obs_dim, task.act_dim, task.ctrl_lo, task.ctrl_hi, seed=self.cfg.seed)
         self.bufs = RolloutBuffers(T, n, task.obs_dim, task.act_dim)
         dev = "metal:0"
@@ -178,7 +180,10 @@ class PPOWarp:
             self._obs()
             self._act()
             pol.store(task.obs, bufs)
-            task.sim.launch_step()
+            if hasattr(task, "launch_physics"):      # tasks that interleave their own work between substeps
+                task.launch_physics(pol.step_idx)
+            else:
+                task.sim.launch_step()
             task.launch_reward_done_reset(pol, bufs)
         self.graph = cap.graph
 
@@ -209,20 +214,25 @@ class PPOWarp:
         N = T * n
         o = obs.reshape(N, -1).clone(); a = act.reshape(N, -1).clone(); lp0 = logp_old.reshape(N).clone()
         with torch.no_grad():   # rollout policy's mean/std for the KL schedule
-            self._mean0 = self.net.actor(o); self._std0 = self.net.log_std.exp().clone()
-        advn = ((adv - adv.mean()) / (adv.std() + 1e-8)).reshape(N); retf = ret.reshape(N)
+            self._mean0 = self.net.actor_mean(o); self._std0 = self.net.log_std.exp().clone()
+        advn = ((adv - adv.mean()) / (adv.std() + 1e-8)).reshape(N); retf = ret.reshape(N); valf = val.reshape(N).clone()
         mb = N // cfg.minibatches
         stats = {"pg": 0.0, "vf": 0.0, "kl": 0.0}
         for _ in range(cfg.epochs):
             perm = torch.randperm(N, device="mps")
             for i in range(cfg.minibatches):
                 idx = perm[i * mb:(i + 1) * mb]
-                mean = self.net.actor(o[idx]); v = self.net.critic(o[idx]).squeeze(-1)
+                mean = self.net.actor_mean(o[idx]); v = self.net.critic(o[idx]).squeeze(-1)
                 d = torch.distributions.Normal(mean, self.net.log_std.exp())
                 lp = d.log_prob(a[idx]).sum(-1)
                 ratio = (lp - lp0[idx]).exp()
                 pg = -torch.min(ratio * advn[idx], ratio.clamp(1 - cfg.clip, 1 + cfg.clip) * advn[idx]).mean()
-                vf = F.mse_loss(v, retf[idx])
+                if cfg.clip_value:      # rsl_rl: value_clipped = old + clamp(v - old, -clip, clip); loss = max of the two errors
+                    v_old = valf[idx]
+                    v_clipped = v_old + (v - v_old).clamp(-cfg.clip, cfg.clip)
+                    vf = torch.max((v - retf[idx]) ** 2, (v_clipped - retf[idx]) ** 2).mean()
+                else:
+                    vf = F.mse_loss(v, retf[idx])
                 ent = d.entropy().sum(-1).mean()
                 loss = pg + cfg.vf_coef * vf - cfg.ent_coef * ent
                 if cfg.desired_kl is not None:

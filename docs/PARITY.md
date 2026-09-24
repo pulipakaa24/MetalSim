@@ -46,16 +46,17 @@ loaded through `metalsim.scene.usd_to_mjcf`.
 | Terminations: time out; `illegal_contact` torso force > 1 N | same | `tests/test_g1_parity.py::test_warp_matches_mujoco_c_under_pd_hold` (torso contact ends the episode) | pass | confirmed |
 | Commands: lin x ∈ [0, 1], lin y ∈ [−1, 1], heading command (stiffness 0.5), resample 10 s, 2 % standing | same | `g1_commands` kernel (not unit-tested separately; the term test reads its output) | – | equivalent by construction |
 | Reset: base xy ±0.5 m, yaw ±π, joint pos scale (1, 1), zero velocities | same | `tests/test_g1_parity.py` (the Warp-vs-C test has to override this randomization to compare) | – | equivalent by construction |
-| Rough terrain: `ROUGH_TERRAINS_CFG` 10 rows × 20 cols of 8 m cells, curriculum by row, sub-terrain mix (stairs up/down, boxes, random rough, slopes) | re-implemented from the config on a 0.1 m heightfield (`metalsim.learn.terrain`) | `tests/test_terrain.py::test_terrain_layout`; physics on it: `::test_hfield_mesh_contacts_match_mujoco_c` (xfail) | layout pass; **contacts fail** (§1.6) | partial for the layout; **disproved** for the physics on the current MuJoCo Warp branch |
+| Rough terrain: `ROUGH_TERRAINS_CFG` 10 rows × 20 cols of 8 m cells, curriculum by row, sub-terrain mix (stairs up/down, boxes, random rough, slopes) | re-implemented from the config on a 0.1 m heightfield (`metalsim.learn.terrain`) | `tests/test_terrain.py::test_terrain_layout`; physics on it: `::test_hfield_mesh_contacts_match_mujoco_c` (xfail) | layout pass; contacts pass on the patched kernel (§1.6) | partial for the layout (same mix/ranges, not the same random heights); curriculum implemented (below) |
+| Terrain curriculum `terrain_levels_vel`: envs start at random levels ≤ 5, move up a level after walking more than half a cell (4 m), down after walking less than half the commanded distance, random level at the top | same rule in the reward/termination kernel at episode end, origins re-drawn from the (rows × types) table; `max_init_terrain_level` 5 | rough smoke test: levels move in 55 of 64 envs over 122 random-action steps (down, as a falling policy should) | – | equivalent by construction |
 | Height scanner: `RayCaster` 1.6 × 1.0 m grid at 0.1 m (187 rays), yaw-aligned, `body_z − hit_z − 0.5` | Warp kernel interpolating the heightfield triangles on the sim queue (capturable; a heightfield needs no ray tracing; `heightscan.metal` remains for arbitrary meshes) | `tests/test_terrain.py::test_height_scan_matches_mj_ray` (vs MuJoCo `mj_ray` on the same heightfield, 1496 rays) | median 0.0 m, 99th pct 0.0 m, max 0.85 m on cell diagonals where MuJoCo's triangulation differs | confirmed |
-| Events not reproduced | startup friction randomization (fixed 0.8/0.6), external force/torque event (zero range in the G1 config) | – | – | partial (documented) |
+| Events (`EventCfg` as the G1 config leaves it): `physics_material` with degenerate ranges (static 0.8, dynamic 0.6, no randomization), `add_base_mass`, `base_com` and `push_robot` removed for the G1, `base_external_force_torque` with zero ranges, `reset_robot_joints` scale (1, 1), `reset_base` xy ±0.5 m / yaw ±π | friction 0.8/0.6 fixed; reset_base as Isaac; the removed/zero-range events have no effect to reproduce | read from `assets/isaac/g1_velocity_env_cfg.py` + `g1_rough_env_cfg.py` (`test_scene_settings_match_isaac` checks the init table) | – | equivalent (the earlier "partial" was over-cautious: none of Isaac's G1 events randomizes anything) |
 
 ### 1.3 Learner (rsl_rl PPO, `g1_rsl_rl_ppo_cfg.py`)
 
 | Isaac | ours (`metalsim.learn.ppo_warp` with `g1_ppo_config`) | test | verdict |
 |---|---|---|---|
 | 24 steps/env, 5 epochs, 4 minibatches, lr 1e-3 adaptive (desired KL 0.01, ×/÷1.5), γ 0.99, λ 0.95, clip 0.2, entropy 0.008, grad norm 1.0, ELU MLP 512-256-128 (rough) / 256-128-128 (flat), init std 1.0 | same values; rollout policy evaluated in Warp with shared weights | `tests/test_warp_policy.py::test_parity_with_torch_and_shared_weights` (Warp MLP == torch to 1e-5; log-probs to 1e-4) | confirmed |
-| Clipped value loss | not implemented (plain MSE) | – | partial |
+| Clipped value loss (`use_clipped_value_loss`) | implemented: max of clipped and unclipped value error, clip 0.2 (`PPOWarpConfig.clip_value`) | cartpole run with it on reaches the same 295/300 (`runs/bench12.log`) | confirmed |
 | Rollout with no per-step host launches | whole rollout as replays of one captured graph | `tests/test_warp_policy.py::test_rollout_without_torch_launches` (runtime counters: 0 host syncs, 0 host ops) | confirmed |
 
 ### 1.4 Throughput on the G1 task (Isaac's protocol, 4096 envs)
@@ -63,24 +64,24 @@ loaded through `metalsim.scene.usd_to_mjcf`.
 | measurement (4096 envs unless stated; uncontended pass 2026-09-24, synchronized) | this stack (M4 Max, 18.4 TFLOPS) | Isaac Lab (RTX 4090, 82.6 TFLOPS), reported | raw ratio | per-TFLOPS ratio |
 |---|---|---|---|---|
 | G1 flat, physics only (4 substeps of MuJoCo Warp, graph replay) | 68,660 env-steps/s | – | – | – |
-| G1 flat, step only (physics + reset/forward + obs + reward, one graph per step) | 45,958 env-steps/s (cost-split run 46,775) | 94,000 | 0.49× | 2.2× |
-| G1 flat, step + inference (Warp MLP 256-128-128 inside the rollout graph) | 46,917 env-steps/s | 88,000 | 0.53× | 2.4× |
-| G1 flat, full PPO loop (24-step rollout + 5 epochs × 4 minibatches on MPS) | 41,740 env-steps/s (training log over 20 iterations: 44,328) | 82,000 | 0.51× | 2.3× |
+| G1 flat, step only (physics + reset/kinematics + obs + reward, one graph per step) | 55,176 env-steps/s (cost-split run 55,960; 45,958 before the post-reset forward pass was replaced by kinematics only) | 94,000 | 0.59× | 2.6× |
+| G1 flat, step + inference (Warp MLP 256-128-128 inside the rollout graph) | 55,397 env-steps/s | 88,000 | 0.63× | 2.8× |
+| G1 flat, full PPO loop (24-step rollout + 5 epochs × 4 minibatches on MPS, clipped value loss) | 47,809 env-steps/s (training log over 20 iterations: 51,742) | 82,000 | 0.58× | 2.6× |
 | G1 rough (patched heightfield kernel, 187-ray height scan), physics only | 61,679 env-steps/s | – | – | – |
-| G1 rough, step only | 46,408 env-steps/s (cost-split run 47,854) | 94,000 | 0.49× | 2.2× |
-| G1 rough, step + inference (512-256-128) | 41,159 env-steps/s | 88,000 | 0.47× | 2.1× |
-| G1 rough, full PPO loop | 35,071 env-steps/s (training log over 20 iterations: 37,217) | 82,000 | 0.43× | 1.9× |
-| G1 flat, 2048 envs: step only / + inference / full loop | 38,722 / 39,815 / 34,321 env-steps/s | – | – | – |
-| G1 flat, 1024 envs: step only | 29,617 env-steps/s | – | – | – |
-| G1 rough, 2048 envs: step only | 38,848 env-steps/s | – | – | – |
+| G1 rough, step only | 55,423 env-steps/s (cost-split run 56,911) | 94,000 | 0.59× | 2.6× |
+| G1 rough, step + inference (512-256-128) | 47,821 env-steps/s | 88,000 | 0.54× | 2.4× |
+| G1 rough, full PPO loop | 39,764 env-steps/s (training log over 20 iterations: 42,173) | 82,000 | 0.48× | 2.2× |
+| G1 flat, 2048 / 1024 envs: step only | 46,793 / 35,369 env-steps/s | – | – | – |
+| G1 rough, 2048 envs: step only | 46,292 env-steps/s | – | – | – |
 
-Per-step cost split at 4096 (flat): physics 59.7 ms, full env step 87.6 ms (the per-step
-`reset_data` + `forward` for resets and the obs/reward kernels add 47 %), PPO update 260 ms per
-24-step rollout (11 % of the loop). Rough: physics 66.4 ms, step 85.6 ms, update 415 ms (the
-bigger network and 310-dim observations).
+Per-step cost split at 4096 (flat): physics 59.7 ms, full env step 73.2 ms (the per-step
+`reset_data` + kinematics for resets and the obs/reward kernels add 23 %; a full forward pass after
+reset had cost another 14 ms and was unnecessary, since the next step recomputes everything the
+observation does not read), PPO update 282 ms per 24-step rollout (12 % of the loop). Rough: physics
+66.8 ms, step 72.0 ms, update 416 ms (the bigger network and 310-dim observations).
 
-All rows above were re-measured on 2026-09-24 with nothing else on the GPU (an unrelated Tron1
-simulation had been sharing the GPU during the 2026-09-23 runs; the differences were within 3 %).
+All rows above were measured on 2026-09-24 with nothing else on the GPU (`runs/bench12.log`; the
+clean pass before the reset change is `runs/bench_clean.log`).
 
 Notes that bear on reading these numbers honestly:
 - Same asset, same actuator table, same task terms; **different physics engine** (MuJoCo Warp Newton
@@ -205,5 +206,4 @@ Rough-terrain numbers below are therefore **measured on the patched kernel** and
   run's success rate was 0. It is a pipeline demonstration, not a parity claim.
 - **MaterialX, Hydra/usdview, ROS 2 bridge, deformables** (3 MuJoCo Warp flex tests fail on Metal):
   not implemented.
-- **Terrain curriculum and exact terrain heights**, **contact force history**, **clipped value loss**,
-  **event randomizations** listed in §1.2: documented differences.
+- **Exact terrain heights** (re-implemented generator) and **contact force history**: documented differences.

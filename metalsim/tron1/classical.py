@@ -44,10 +44,13 @@ class Tron1Model:
 
     def __init__(self, payload_mass=1.5, payload_pos=(0.0, 0.0, 0.08), wheel_armature=0.008):
         spec = mujoco.MjSpec.from_file(str(WF_XML))
+        from .sim import pack_inertia
+        self.payload_mass, self.payload_pos = float(payload_mass), tuple(float(v) for v in payload_pos)
         if payload_mass > 0:
-            b = spec.body("base_Link").add_body(name="payload", pos=list(payload_pos))
+            b = spec.body("base_Link").add_body(name="payload", pos=[0.0, 0.0, 0.0])
             b.mass = payload_mass
-            b.inertia = [payload_mass * 0.01] * 3
+            b.ipos = list(payload_pos)
+            b.inertia = pack_inertia(payload_mass)
             b.explicitinertial = True
         self.m = spec.compile()
         self.d = mujoco.MjData(self.m)
@@ -241,13 +244,28 @@ class ClassicalGains:
     # Deadband on the position error: inside it no position correction at all (the robot only
     # balances, so a tiny offset cannot restart a hunting oscillation); outside it the hold
     # ramps in from zero, which bounds the drift to about the band.
-    hold_deadband: float = 0.0     # m
+    hold_deadband: float = 0.02    # m
+    # Parking: position/heading are only held once the robot has stopped. While driving (or
+    # still slowing down) the anchor follows the robot, so it never "catches up" to a moving
+    # target; it parks after |v| < park_speed for park_time.
+    park_speed: float = 0.05       # m/s
+    park_yaw_rate: float = 0.05    # rad/s
+    park_time: float = 0.3         # s
+    park_timeout: float = 1.0      # s after the command reaches zero, park regardless of speed
     hold_kp: float = 1.0           # 1/s, outer position loop: speed correction per metre of error
     hold_speed_limit: float = 0.15 # m/s, cap on that correction
     latency_comp: float = 0.005    # s, predict the balance state this far ahead
     wheel_torque_limit: float = 40.0
     Q: tuple = (4.0, 60.0, 3.0, 4.0)
     R: float = 0.2
+    # Manual balance gains (manual_K = 1 bypasses the LQR). Wheel torque =
+    # -(K_pos e_x + K_lean phi + K_vel e_v + K_lean_rate phidot): K_pos / K_vel are the position
+    # P / D terms, K_lean / K_lean_rate the lean P / D terms. Defaults = LQR result at h = 0.70.
+    manual_K: float = 0.0
+    K_pos: float = 4.47
+    K_lean: float = 73.5
+    K_vel: float = 8.67
+    K_lean_rate: float = 13.9
 
 
 class ClassicalController:
@@ -262,12 +280,22 @@ class ClassicalController:
         self.set_height(self.g.height)
         self.reset()
 
+    def set_pack_belief(self, mass=None, com=None):
+        """What the controller assumes about the sensor pack; rebuilds the model and stance table."""
+        mass = self.model.payload_mass if mass is None else float(mass)
+        com = self.model.payload_pos if com is None else tuple(com)
+        self.model = Tron1Model(payload_mass=mass, payload_pos=com)
+        self._stances = np.array([self.model.stance(h) for h in self._h_table])
+        self.set_height(self.g.height)
+
     def set_height(self, h):
         self.g.height = h
         hip, knee = [np.interp(h, self._h_table, self._stances[:, k]) for k in range(2)]
         self.q_stance = self.model.mirror(hip, knee)
         self.pend = self.model.pendulum(self.q_stance)
         self.K, self.A, self.B = wip_lqr(self.pend, self.g.Q, self.g.R)
+        if self.g.manual_K >= 0.5:
+            self.K = -np.array([[self.g.K_pos, self.g.K_lean, self.g.K_vel, self.g.K_lean_rate]])
         self.tau_ff = self.model.gravity_ff(self.q_stance)
         self.wheel_ff = self.model.wheel_reaction_ff(self.q_stance)
         self.wheels_nom = self.model.wheel_centers(self.q_stance)
@@ -279,13 +307,21 @@ class ClassicalController:
         self.leg_int = np.zeros(N_MOTORS)
         self.phi_trim = 0.0
         self.psi_ref = None
+        self.parked = False
+        self.still_time = 0.0
+        self.idle_time = 0.0
+        self.t_last = None
         self.tau_bal = 0.0
         self.prev_alpha = None
         self.q_des = self.q_stance.copy()
 
     # --------------------------------------------------------------------------------------------
     def step(self, st: RobotState, imu: ImuData, cmd_vel, t) -> RobotCmd:
-        g, dt = self.g, self.dt
+        g = self.g
+        # Use the measured time since the last call (the real loop does not tick at exactly
+        # control_hz); fall back to the nominal period on the first call or a bad clock.
+        dt = self.dt if self.t_last is None else float(np.clip(t - self.t_last, 0.2 * self.dt, 0.05))
+        self.t_last = t
         R = quat_to_mat(imu.quat)
         pitch = float(np.arcsin(np.clip(-R[2, 0], -1, 1)))
         roll = float(np.arctan2(R[2, 1], R[2, 2]))
@@ -308,8 +344,21 @@ class ClassicalController:
         vx_cmd, _, wz_cmd = cmd_vel
         dv = np.clip(vx_cmd - self.v_ref, -g.accel_limit * dt, g.accel_limit * dt)
         self.v_ref += dv
-        self.x_ref += self.v_ref * dt
-        if abs(self.x - self.x_ref) > g.x_err_limit:
+        commanded = abs(vx_cmd) > 1e-3 or abs(wz_cmd) > 1e-3 or abs(self.v_ref) > 1e-3
+        if commanded:
+            self.parked = False
+            self.still_time = 0.0
+            self.idle_time = 0.0
+        elif not self.parked:
+            # Park once it has settled, or after park_timeout regardless: a robot whose balance
+            # point is off creeps on its own and would otherwise never count as settled.
+            slow = abs(v) < g.park_speed and abs(yaw_rate) < g.park_yaw_rate
+            self.still_time = self.still_time + dt if slow else 0.0
+            self.idle_time += dt
+            self.parked = self.still_time >= g.park_time or self.idle_time >= g.park_timeout
+        if not self.parked:
+            self.x_ref = self.x                       # track speed only; anchor follows
+        elif abs(self.x - self.x_ref) > g.x_err_limit:
             self.x_ref = self.x - np.sign(self.x - self.x_ref) * g.x_err_limit
 
         # Balance-point estimator: a COM offset, payload or IMU mounting error moves the true
@@ -335,7 +384,8 @@ class ClassicalController:
         psi = WHEEL_RADIUS * (qw[1] - qw[0]) / self.pend["track"]
         if self.psi_ref is None:
             self.psi_ref = psi
-        self.psi_ref += wz_cmd * dt
+        if not self.parked:
+            self.psi_ref = psi                        # yaw-rate control only; heading follows
         e_psi = self.psi_ref - psi
         if abs(e_psi) > g.heading_err_limit:
             self.psi_ref = psi + np.sign(e_psi) * g.heading_err_limit

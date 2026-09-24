@@ -72,7 +72,15 @@
   </figure>
 
   <h2>Learning</h2>
-      <figure>
+          <figure>
+    <img src="g1_tier2_still.png" alt="Path-traced Unitree G1 standing on a checkered floor" width="1024" height="768">
+    <figcaption><b>g1_tier2_still.png</b> (1024×768). Isaac Lab's G1 asset (<code>g1_minimal.usd</code>) rendered by the tier-2 path tracer at 512 samples per pixel, 4 bounces: the 43 visual meshes (343K faces) and their OmniPBR materials are read from the USD's instanced prims by <code>metalsim.scene.usd_to_mjcf</code>; the physics model underneath is the same one the G1 benchmark uses (three convex colliders, Isaac's actuators). Camera, key light, floor material and sky were added for the picture. Rendered on this machine.</figcaption>
+    </figure>
+    <figure>
+    <video src="cartpole_tier2_policy.mp4" controls loop muted playsinline width="1024" height="1024"></video>
+    <figcaption><b>cartpole_tier2_policy.mp4</b> (1024×1024, 5 s at 60 fps). The Cartpole benchmark, driven by the policy trained with Isaac Lab's cartpole PPO config on the Warp rollout path (150 iterations, mean return 288/300): 4 envs path-traced at 512×512, 512 samples per pixel, 3 bounces, so no Monte Carlo grain remains. Materials, camera distance and lighting were set for the video; the benchmark scene keeps Isaac's camera spec. Rendered on this machine.</figcaption>
+    </figure>
+<figure>
     <img src="tier2_vs_tier0.png" alt="Tier 0 raster, tier 2 direct light only, and tier 2 full path traced render of the primitives scene" width="576" height="192">
     <figcaption><b>tier2_vs_tier0.png</b> (576×192). The primitives test scene rendered three ways at 192 px: left, tier 0 raster with shadow maps; middle, the tier 2 path tracer with bounces disabled (direct light + headlight + shadow rays only; PSNR 43.7–45.1 dB against the left image over three poses, depth median 0.9 mm, segmentation IoU 1.0); right, tier 2 with 64 samples per pixel and 4 bounces (indirect light and colour bleeding from the floor, no denoiser). Produced by <code>tests/test_render_tier2.py</code> on this machine; the same test suite checks the tracer's radiometry analytically (Lambertian plane 0.4000 exact, white furnace 0.498 for 0.5) and its 1/√spp convergence.</figcaption>
     </figure>
