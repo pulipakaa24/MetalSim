@@ -1,0 +1,217 @@
+holder: {"name": "rtx_parity_steps", "kind": "render", "minutes": 50.0, "pid": 38796, "start": 1790342126.006743}
+  waiting [train] g1_rough_transfer_isaacckpts est 6.0 min, queued 7611 s ago
+  waiting [train] g1_terms_tuning_elliptic_imp10_hardlimits est 8.0 min, queued 6363 s ago
+  waiting [train] g1_terms_tuning_tau10_impact_hardlimits est 8.0 min, queued 6358 s ago
+  waiting [train] g1_terms_noise_default_s3 est 8.0 min, queued 6352 s ago
+  waiting [low] flex_tests_metal est 15.0 min, queued 12000 s ago
+  waiting [low] mjw_tp_profile est 15.0 min, queued 11964 s ago
+  waiting [low] rough_cmp_tests est 15.0 min, queued 11770 s ago
+  waiting [low] mjw_tp_variants1 est 20.0 min, queued 11634 s ago
+  waiting [low] mjw_tp_checks1 est 25.0 min, queued 11510 s ago
+  waiting [low] g1_rough_step_profile est 10.0 min, queued 11024 s ago
+atrous: mean 319.3 -> 322.1, std 26.4 -> 0.5
+        """RTX display transform: 8-bit output = sRGB(ACES(exposure * radiance)); both denoisers keep the mean of a
+        err = lib().oidnGetDeviceError(self.dev, ctypes.byref(msg))
+>           raise RuntimeError(f"OIDN error {err}: {msg.value.decode() if msg.value else ''}")
+E           RuntimeError: OIDN error 3: unsupported input image format
+metalsim/render/denoise.py:110: RuntimeError
+1 failed, 7 deselected in 0.81s
+    self._oidn = OIDNDenoiser(c.queue, n, width, height, (av["hdr"].buffer, av["hdr"].offset), (av["hdr_out"].buffer, av["hdr_out"].offset),
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/metalsim/render/denoise.py", line 103, in __init__
+    L.oidnCommitFilter(f); self._check()
+                           ^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/metalsim/render/denoise.py", line 110, in _check
+    raise RuntimeError(f"OIDN error {err}: {msg.value.decode() if msg.value else ''}")
+RuntimeError: OIDN error 3: unsupported input image format
+holder: {"name": "rtx_parity_steps", "kind": "render", "minutes": 50.0, "pid": 38796, "start": 1790342126.006743}
+  waiting [train] g1_rough_transfer_isaacckpts est 6.0 min, queued 7616 s ago
+  waiting [train] g1_terms_tuning_elliptic_imp10_hardlimits est 8.0 min, queued 6368 s ago
+  waiting [train] g1_terms_tuning_tau10_impact_hardlimits est 8.0 min, queued 6363 s ago
+  waiting [train] g1_terms_noise_default_s3 est 8.0 min, queued 6358 s ago
+  waiting [low] flex_tests_metal est 15.0 min, queued 12005 s ago
+  waiting [low] mjw_tp_profile est 15.0 min, queued 11969 s ago
+  waiting [low] rough_cmp_tests est 15.0 min, queued 11775 s ago
+  waiting [low] mjw_tp_variants1 est 20.0 min, queued 11639 s ago
+  waiting [low] mjw_tp_checks1 est 25.0 min, queued 11515 s ago
+  waiting [low] g1_rough_step_profile est 10.0 min, queued 11030 s ago
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+[rtx_parity] 4/110 79 ms/frame
+[rtx_parity] 8/110 77 ms/frame
+[rtx_parity] 12/110 80 ms/frame
+[rtx_parity] 16/110 67 ms/frame
+[rtx_parity] 20/110 61 ms/frame
+[rtx_parity] 24/110 62 ms/frame
+[rtx_parity] 28/110 62 ms/frame
+[rtx_parity] 32/110 69 ms/frame
+[rtx_parity] 36/110 78 ms/frame
+[rtx_parity] 40/110 63 ms/frame
+[rtx_parity] 44/110 63 ms/frame
+[rtx_parity] 48/110 68 ms/frame
+[rtx_parity] 52/110 67 ms/frame
+[rtx_parity] 56/110 68 ms/frame
+[rtx_parity] 60/110 75 ms/frame
+[rtx_parity] 64/110 69 ms/frame
+[rtx_parity] 68/110 68 ms/frame
+[rtx_parity] 72/110 67 ms/frame
+[rtx_parity] 76/110 69 ms/frame
+[rtx_parity] 80/110 66 ms/frame
+[rtx_parity] 84/110 75 ms/frame
+[rtx_parity] 88/110 77 ms/frame
+[rtx_parity] 92/110 82 ms/frame
+[rtx_parity] 96/110 69 ms/frame
+[rtx_parity] 100/110 61 ms/frame
+[rtx_parity] 104/110 63 ms/frame
+[rtx_parity] 108/110 61 ms/frame
+[rtx_parity] 110/110 62 ms/frame
+  warnings.warn(
+  warnings.warn(msg)
+{
+ "preset": "legacy",
+ "kwargs": {},
+ "spp": 16,
+ "passes": 8,
+ "bounces": 3,
+ "frames": 110,
+ "render_ms_per_frame_host_path": 67.5810727479984,
+ "whole_frame_raw": {
+  "psnr_db": 18.096995103219374,
+  "ssim": 0.8325824558734893,
+  "flip": 0.4278614561666142,
+  "lpips_alex": 0.45000535981221634
+ },
+ "robot_raw": {
+  "psnr_db": 13.64667419510263,
+  "ssim": 0.5684612989425659,
+  "flip": 0.0192178413271904,
+  "lpips_alex_crop": 0.03512885421514511
+ },
+ "robot_brightness_matched": {
+  "psnr_db": 14.54514009690137,
+  "ssim": 0.6152071356773376,
+  "flip": 0.018317250534892082,
+  "lpips_alex_crop": 0.035814616829156876
+ },
+ "robot_gain_mean": 1.1089729070663452,
+ "whole_frame_gain_mean": 1.0579981738870794,
+ "robot_frames": 1,
+ "silhouette_iou_mean": 0.2526548427285532,
+ "robot_depth_rmse_m": 0.09014797729694031,
+ "sky_isaac": [
+  168.0,
+  173.0,
+  180.0
+ ],
+ "sky_ours": [
+  190.3,
+  202.8,
+  226.9
+ ]
+}
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+[rtx_parity] 4/22 76 ms/frame
+[rtx_parity] 8/22 70 ms/frame
+[rtx_parity] 12/22 68 ms/frame
+[rtx_parity] 16/22 68 ms/frame
+[rtx_parity] 20/22 71 ms/frame
+[rtx_parity] 22/22 62 ms/frame
+  warnings.warn(
+  warnings.warn(msg)
+{
+ "preset": "legacy",
+ "kwargs": {},
+ "spp": 16,
+ "passes": 8,
+ "bounces": 3,
+ "frames": 22,
+ "render_ms_per_frame_host_path": 68.10698949993821,
+ "whole_frame_raw": {
+  "psnr_db": 18.279664513943978,
+  "ssim": 0.823612782088193,
+  "flip": 0.4228164404630661,
+  "lpips_alex": 0.45959533751010895
+ },
+ "robot_raw": {
+  "psnr_db": null,
+  "ssim": null,
+  "flip": null,
+  "lpips_alex_crop": null
+ },
+ "robot_brightness_matched": {
+  "psnr_db": null,
+  "ssim": null,
+  "flip": null,
+  "lpips_alex_crop": null
+ },
+ "robot_gain_mean": null,
+ "whole_frame_gain_mean": 1.029956264929338,
+ "robot_frames": 0,
+ "silhouette_iou_mean": 0.2632220696962166,
+ "robot_depth_rmse_m": 0.12482962173155764,
+ "sky_isaac": [
+  167.7,
+  172.7,
+  179.7
+ ],
+ "sky_ours": [
+  190.3,
+  202.8,
+  226.9
+ ]
+}
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+[rtx_parity] 4/110 80 ms/frame
+[rtx_parity] 8/110 79 ms/frame
+[rtx_parity] 12/110 84 ms/frame
+[rtx_parity] 16/110 67 ms/frame
+[rtx_parity] 20/110 63 ms/frame
+[rtx_parity] 24/110 63 ms/frame
+[rtx_parity] 28/110 62 ms/frame
+[rtx_parity] 32/110 70 ms/frame
+[rtx_parity] 36/110 80 ms/frame
+[rtx_parity] 40/110 65 ms/frame
+[rtx_parity] 44/110 64 ms/frame
+[rtx_parity] 48/110 70 ms/frame
+[rtx_parity] 52/110 69 ms/frame
+[rtx_parity] 56/110 71 ms/frame
+[rtx_parity] 60/110 74 ms/frame
+[rtx_parity] 64/110 67 ms/frame
+[rtx_parity] 68/110 68 ms/frame
+[rtx_parity] 72/110 69 ms/frame
+[rtx_parity] 76/110 68 ms/frame
+[rtx_parity] 80/110 67 ms/frame
+[rtx_parity] 84/110 77 ms/frame
+[rtx_parity] 88/110 76 ms/frame
+[rtx_parity] 92/110 82 ms/frame
+[rtx_parity] 96/110 70 ms/frame
+[rtx_parity] 100/110 63 ms/frame
+[rtx_parity] 104/110 63 ms/frame
+[rtx_parity] 108/110 63 ms/frame
+[rtx_parity] 110/110 63 ms/frame
+  warnings.warn(
+  warnings.warn(msg)
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917

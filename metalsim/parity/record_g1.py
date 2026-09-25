@@ -55,10 +55,20 @@ def hero_spec(spec, meta):
     l.diffuse = [c * 0.9 for c in meta["lights"]["sun"]["color"]]; l.specular = [0.3, 0.3, 0.3]
     sky = spec.add_texture(); sky.name = "sky"; sky.type = mujoco.mjtTexture.mjTEXTURE_SKYBOX; sky.builtin = mujoco.mjtBuiltin.mjBUILTIN_FLAT
     dc = meta["lights"]["dome"]["color"]; sky.rgb1 = dc; sky.rgb2 = dc; sky.width = 8; sky.height = 48
+    # the recording's ground: UsdPreviewSurface diffuseColor 0.5, roughness 0.7, metallic 0, ior 1.5 (F0 0.04 = 0.08 * specular 0.5)
+    gm = spec.add_material(); gm.name = "ground_preview"; gm.rgba = [0.5, 0.5, 0.5, 1]; gm.roughness = 0.7; gm.metallic = 0.0
+    gm.specular = 0.5; gm.shininess = 0.3
     for g in spec.geoms:
-        if g.name == "ground": g.rgba = [0.5, 0.5, 0.5, 1]; g.size = [500.0, 500.0, 0.05]
+        if g.name == "ground": g.rgba = [0.5, 0.5, 0.5, 1]; g.size = [500.0, 500.0, 0.05]; g.material = "ground_preview"
         elif g.contype != 0 or g.conaffinity != 0: g.group = 4   # collision geometry (Isaac never draws it; the renderer draws groups <= 3); the visual meshes are group 2   # render extent only (a MuJoCo plane is infinite for physics); the ray tracer tessellates size-0 planes to 5 m, which ended before the horizon in the first replay
     return spec
+
+
+def tier2_parity_kwargs(meta, mode="rtx"):
+    """Tier-2 options for the parity scene: USD light units, OmniPBR / UsdPreviewSurface BRDFs, RTX display
+    transform and denoiser (docs/research/rendering_vs_rtx_2026-09-25.md); 'legacy' = the renderer as it was."""
+    from metalsim.render.rtx_parity import preset_kwargs, RTX_DEFAULT_PRESET
+    return preset_kwargs(RTX_DEFAULT_PRESET if mode == "rtx" else mode, meta)
 
 
 def main():
@@ -69,6 +79,8 @@ def main():
     ap.add_argument("--contact_tuning", default="default", choices=sorted(contact_tuning.PRESETS),
                     help="metalsim.physics.contact_tuning preset applied to the model")
     ap.add_argument("--no_render", action="store_true", help="physics only (no tier 2 / tier 0 frames)")
+    ap.add_argument("--tier2_mode", default="rtx", help="tier-2 preset of metalsim.render.rtx_parity: rtx (the RTX-parity default), "
+                    "legacy (MuJoCo-unit lights, linear clamp: the renderer before 2026-09-25), or any preset name")
     a = ap.parse_args(); wp.config.quiet = True
     os.makedirs(a.out, exist_ok=True)
     meta = json.load(open(os.path.join(a.isaac, "meta.json")))
@@ -88,7 +100,7 @@ def main():
     sim = BatchSim(m, n, options=BatchSimOptions(substeps=dec, njmax=256, nconmax=32, solver_iterations=10, ls_iterations=20)); sim.synchronize()
     cam = meta["camera"]
     if not a.no_render:
-        rend2 = Tier2Renderer(m, n, width=cam["width"], height=cam["height"], camera="hero", spp=16, max_bounces=3)
+        rend2 = Tier2Renderer(m, n, width=cam["width"], height=cam["height"], camera="hero", spp=16, max_bounces=3, **tier2_parity_kwargs(meta, a.tier2_mode))
         rend0 = Tier0Renderer(m, n, width=cam["width"], height=cam["height"], camera="hero", outputs=("rgb", "depth"))
     # Isaac's contact quantity: net normal force per contact body (bodies without colliders read 0)
     body_names = [mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_BODY, b) for b in range(m.nbody)]

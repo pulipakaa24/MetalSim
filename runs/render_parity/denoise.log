@@ -1,0 +1,410 @@
+holder: {"name": "rtx_parity_denoise", "kind": "render", "minutes": 60.0, "pid": 39483, "start": 1790342297.859541}
+  waiting [train] g1_rough_transfer_isaacckpts est 6.0 min, queued 7782 s ago
+  waiting [train] g1_terms_tuning_elliptic_imp10_hardlimits est 8.0 min, queued 6535 s ago
+  waiting [train] g1_terms_tuning_tau10_impact_hardlimits est 8.0 min, queued 6530 s ago
+  waiting [train] g1_terms_noise_default_s3 est 8.0 min, queued 6524 s ago
+  waiting [train] g1_rough_terms_it1000 est 12.0 min, queued 134 s ago
+  waiting [train] g1_rough_transfer_ours est 6.0 min, queued 134 s ago
+  waiting [low] flex_tests_metal est 15.0 min, queued 12171 s ago
+  waiting [low] mjw_tp_profile est 15.0 min, queued 12135 s ago
+  waiting [low] rough_cmp_tests est 15.0 min, queued 11941 s ago
+  waiting [low] mjw_tp_variants1 est 20.0 min, queued 11805 s ago
+  waiting [low] mjw_tp_checks1 est 25.0 min, queued 11682 s ago
+  waiting [low] g1_rough_step_profile est 10.0 min, queued 11196 s ago
+atrous: mean 319.3 -> 322.1, std 26.4 -> 0.5
+oidn: mean 319.3 -> 318.8, std 26.4 -> 3.5
+1 passed, 7 deselected in 1.93s
+ },
+ "spp": 16,
+ "passes": 16,
+ "bounces": 3,
+ "frames": 55,
+ "render_ms_per_frame_host_path": 132.86305200017523,
+ "whole_frame_raw": {
+  "psnr_db": 23.07160419028574,
+  "ssim": 0.9727667104114186,
+  "flip": 0.13199197460304607,
+  "lpips_alex": 0.09007985212586143
+ },
+ "robot_raw": {
+  "psnr_db": 23.91904475173546,
+  "ssim": 0.854157234321941,
+  "flip": 0.03935422660274939,
+  "lpips_alex_crop": 0.05971381203694777
+ },
+ "robot_brightness_matched": {
+  "psnr_db": 23.95834001296888,
+  "ssim": 0.8538397323001515,
+  "flip": 0.04112667840990153,
+  "lpips_alex_crop": 0.05920516367663037
+ },
+ "robot_gain_mean": 1.0028641614046965,
+ "whole_frame_gain_mean": 0.9640485395084728,
+ "robot_frames": 55,
+ "silhouette_iou_mean": 0.9987886337345373,
+ "robot_depth_rmse_m": 0.0015577029236200444,
+ "sky_isaac": [
+  168.0,
+  173.0,
+  180.0
+ ],
+ "sky_ours": [
+  172.3,
+  176.0,
+  183.5
+ ]
+}
+ },
+ "spp": 16,
+ "passes": 4,
+ "bounces": 3,
+ "frames": 55,
+ "render_ms_per_frame_host_path": 37.85884375247406,
+ "whole_frame_raw": {
+  "psnr_db": 23.07699496039664,
+  "ssim": 0.9717350157824429,
+  "flip": 0.13053537444634872,
+  "lpips_alex": 0.09125556309114803
+ },
+ "robot_raw": {
+  "psnr_db": 23.703639893699396,
+  "ssim": 0.8461705056103793,
+  "flip": 0.03945213647728617,
+  "lpips_alex_crop": 0.06451512758027424
+ },
+ "robot_brightness_matched": {
+  "psnr_db": 23.736700255305877,
+  "ssim": 0.8458137468858199,
+  "flip": 0.04117171320725571,
+  "lpips_alex_crop": 0.06398363770409064
+ },
+ "robot_gain_mean": 1.0034356117248535,
+ "whole_frame_gain_mean": 0.9640159032561563,
+ "robot_frames": 55,
+ "silhouette_iou_mean": 0.9987886337345373,
+ "robot_depth_rmse_m": 0.0015577029236200444,
+ "sky_isaac": [
+  168.0,
+  173.0,
+  180.0
+ ],
+ "sky_ours": [
+  172.3,
+  176.0,
+  183.4
+ ]
+}
+ },
+ "spp": 16,
+ "passes": 4,
+ "bounces": 3,
+ "frames": 55,
+ "render_ms_per_frame_host_path": 36.46402074809885,
+ "whole_frame_raw": {
+  "psnr_db": 23.118235714586536,
+  "ssim": 0.9742289510640231,
+  "flip": 0.13362337134101174,
+  "lpips_alex": 0.08955565040761775
+ },
+ "robot_raw": {
+  "psnr_db": 23.91948431738444,
+  "ssim": 0.8572687300768765,
+  "flip": 0.03908742039718411,
+  "lpips_alex_crop": 0.05965577004985376
+ },
+ "robot_brightness_matched": {
+  "psnr_db": 23.965450465286366,
+  "ssim": 0.8570184360850941,
+  "flip": 0.04087614772672003,
+  "lpips_alex_crop": 0.05919773341579871
+ },
+ "robot_gain_mean": 1.0018346017057245,
+ "whole_frame_gain_mean": 0.963794405893846,
+ "robot_frames": 55,
+ "silhouette_iou_mean": 0.9987886337345373,
+ "robot_depth_rmse_m": 0.0015577029236200444,
+ "sky_isaac": [
+  168.0,
+  173.0,
+  180.0
+ ],
+ "sky_ours": [
+  172.3,
+  176.0,
+  183.4
+ ]
+}
+ },
+ "spp": 16,
+ "passes": 4,
+ "bounces": 3,
+ "frames": 55,
+ "render_ms_per_frame_host_path": 60.181447755894624,
+ "whole_frame_raw": {
+  "psnr_db": 23.073386011760096,
+  "ssim": 0.9734671863642606,
+  "flip": 0.13397459631616418,
+  "lpips_alex": 0.09012516940181906
+ },
+ "robot_raw": {
+  "psnr_db": 24.004186883720422,
+  "ssim": 0.8569501421668313,
+  "flip": 0.03947591937401078,
+  "lpips_alex_crop": 0.05845630558376962
+ },
+ "robot_brightness_matched": {
+  "psnr_db": 24.043675493960443,
+  "ssim": 0.8566321383823048,
+  "flip": 0.041258075934919446,
+  "lpips_alex_crop": 0.05793429030613466
+ },
+ "robot_gain_mean": 1.0029905503446406,
+ "whole_frame_gain_mean": 0.9642657984386791,
+ "robot_frames": 55,
+ "silhouette_iou_mean": 0.9987886337345373,
+ "robot_depth_rmse_m": 0.0015577029236200444,
+ "sky_isaac": [
+  168.0,
+  173.0,
+  180.0
+ ],
+ "sky_ours": [
+  172.1,
+  176.0,
+  183.4
+ ]
+}
+ },
+ "spp": 16,
+ "passes": 16,
+ "bounces": 3,
+ "frames": 22,
+ "render_ms_per_frame_host_path": 128.63033324538264,
+ "whole_frame_raw": {
+  "psnr_db": 19.688727290446288,
+  "ssim": 0.9573171003298326,
+  "flip": 0.17000121555545114,
+  "lpips_alex": 0.08854984322732146
+ },
+ "robot_raw": {
+  "psnr_db": 28.09769219578875,
+  "ssim": 0.932191174138676,
+  "flip": 0.024572567802599886,
+  "lpips_alex_crop": 0.029020713472908192
+ },
+ "robot_brightness_matched": {
+  "psnr_db": 28.26139899940322,
+  "ssim": 0.932413946498524,
+  "flip": 0.026619457809085197,
+  "lpips_alex_crop": 0.028958926316012035
+ },
+ "robot_gain_mean": 0.9949857646768744,
+ "whole_frame_gain_mean": 0.9385677169669758,
+ "robot_frames": 22,
+ "silhouette_iou_mean": 0.9990012765332211,
+ "robot_depth_rmse_m": 0.0016410468872720685,
+ "sky_isaac": [
+  167.7,
+  172.7,
+  179.7
+ ],
+ "sky_ours": [
+  172.3,
+  176.0,
+  183.5
+ ]
+}
+ },
+ "spp": 16,
+ "passes": 4,
+ "bounces": 3,
+ "frames": 22,
+ "render_ms_per_frame_host_path": 37.02090624574339,
+ "whole_frame_raw": {
+  "psnr_db": 19.693306363488784,
+  "ssim": 0.9562821957198057,
+  "flip": 0.16961087015542117,
+  "lpips_alex": 0.08989901637489145
+ },
+ "robot_raw": {
+  "psnr_db": 27.635773915971303,
+  "ssim": 0.9229216575622559,
+  "flip": 0.024508497593077747,
+  "lpips_alex_crop": 0.03357156662439758
+ },
+ "robot_brightness_matched": {
+  "psnr_db": 27.772011864308293,
+  "ssim": 0.9231747470118783,
+  "flip": 0.026270981031385334,
+  "lpips_alex_crop": 0.033524612726813015
+ },
+ "robot_gain_mean": 0.9955714778466658,
+ "whole_frame_gain_mean": 0.9385367225516926,
+ "robot_frames": 22,
+ "silhouette_iou_mean": 0.9990012765332211,
+ "robot_depth_rmse_m": 0.0016410468872720685,
+ "sky_isaac": [
+  167.7,
+  172.7,
+  179.7
+ ],
+ "sky_ours": [
+  172.3,
+  176.0,
+  183.4
+ ]
+}
+ },
+ "spp": 16,
+ "passes": 4,
+ "bounces": 3,
+ "frames": 22,
+ "render_ms_per_frame_host_path": 36.87247899506474,
+ "whole_frame_raw": {
+  "psnr_db": 19.66609322542066,
+  "ssim": 0.9576285020871595,
+  "flip": 0.17182510142976587,
+  "lpips_alex": 0.08988730507818135
+ },
+ "robot_raw": {
+  "psnr_db": 27.780392113779882,
+  "ssim": 0.9312075159766457,
+  "flip": 0.025150024628436022,
+  "lpips_alex_crop": 0.03003671346232295
+ },
+ "robot_brightness_matched": {
+  "psnr_db": 27.96164713177887,
+  "ssim": 0.9314164898612283,
+  "flip": 0.027583807918497107,
+  "lpips_alex_crop": 0.02997741780497811
+ },
+ "robot_gain_mean": 0.9939994270151312,
+ "whole_frame_gain_mean": 0.9383145868778229,
+ "robot_frames": 22,
+ "silhouette_iou_mean": 0.9990012765332211,
+ "robot_depth_rmse_m": 0.0016410468872720685,
+ "sky_isaac": [
+  167.7,
+  172.7,
+  179.7
+ ],
+ "sky_ours": [
+  172.3,
+  176.0,
+  183.4
+ ]
+}
+ },
+ "spp": 16,
+ "passes": 4,
+ "bounces": 3,
+ "frames": 22,
+ "render_ms_per_frame_host_path": 60.03471875010291,
+ "whole_frame_raw": {
+  "psnr_db": 19.689723347153606,
+  "ssim": 0.9579594216563485,
+  "flip": 0.17095503888346933,
+  "lpips_alex": 0.08816338161175902
+ },
+ "robot_raw": {
+  "psnr_db": 28.21480837419898,
+  "ssim": 0.933973407203501,
+  "flip": 0.02472021405331113,
+  "lpips_alex_crop": 0.027638938235626978
+ },
+ "robot_brightness_matched": {
+  "psnr_db": 28.376618254802302,
+  "ssim": 0.934163814241236,
+  "flip": 0.02658586800945076,
+  "lpips_alex_crop": 0.027566471899097614
+ },
+ "robot_gain_mean": 0.9951359331607819,
+ "whole_frame_gain_mean": 0.9387709254568274,
+ "robot_frames": 22,
+ "silhouette_iou_mean": 0.9990012765332211,
+ "robot_depth_rmse_m": 0.0016410468872720685,
+ "sky_isaac": [
+  167.7,
+  172.7,
+  179.7
+ ],
+ "sky_ours": [
+  172.1,
+  176.0,
+  183.3
+ ]
+}
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth 0cc2fb1 load on device 'metal:0' took 26.63 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_fb20836b fb20836 load on device 'metal:0' took 17.90 ms  (cached)
+Module mujoco_warp._src.constraint 6b6848e load on device 'metal:0' took 16.62 ms  (cached)
+Module _friction_dof__locals__kernel_646d9a17 646d9a1 load on device 'metal:0' took 16.97 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_2af29aef 2af29ae load on device 'metal:0' took 16.92 ms  (cached)
+Module _efc_contact_init__locals__kernel_41c302bb 41c302b load on device 'metal:0' took 16.69 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_1a4b2876 66f5008 load on device 'metal:0' took 16.92 ms  (cached)
+Module _efc_contact_update__locals__kernel_63b3d93a 63b3d93 load on device 'metal:0' took 17.09 ms  (cached)
+Module mujoco_warp._src.forward c9fb78c load on device 'metal:0' took 23.24 ms  (cached)
+Module mujoco_warp._src.passive 01837ed load on device 'metal:0' took 22.35 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_15bb4c69 15bb4c6 load on device 'metal:0' took 16.60 ms  (cached)
+Module mujoco_warp._src.forward d62b5a2 load on device 'metal:0' took 22.72 ms  (cached)
+Module _qfrc_smooth__locals__kernel_879019a1 879019a load on device 'metal:0' took 16.51 ms  (cached)
+Module mujoco_warp._src.support 8f02f5a load on device 'metal:0' took 17.66 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_d33c2200 4fce1ed load on device 'metal:0' took 16.68 ms  (cached)
+Module _solve_init_dof__locals__kernel_d2b89306 d2b8930 load on device 'metal:0' took 16.27 ms  (cached)
+Module mujoco_warp._src.solver 4615040 load on device 'metal:0' took 17.73 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_81c263f4 81c263f load on device 'metal:0' took 16.46 ms  (cached)
+Module mul_m_kernel__locals___mul_m_1dc6ad98 1dc6ad9 load on device 'metal:0' took 16.52 ms  (cached)
+Module _update_constraint_efc__locals__kernel_19ee8eff 19ee8ef load on device 'metal:0' took 16.85 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_f4d269f2 f4d269f load on device 'metal:0' took 16.39 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_1b7ae334 1b7ae33 load on device 'metal:0' took 17.10 ms  (cached)
+Module _update_gradient_grad__locals__kernel_d8d45da1 d8d45da load on device 'metal:0' took 16.50 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_ed4bb829 ed52281 load on device 'metal:0' took 462.31 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_c98ce076 a35d259 load on device 'metal:0' took 16.25 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_a8538597 583483d load on device 'metal:0' took 17.92 ms  (cached)
+Module _update_constraint_efc__locals__kernel_2d3da595 2d3da59 load on device 'metal:0' took 17.00 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_747e54a4 747e54a load on device 'metal:0' took 16.77 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_5bb67707 5bb6770 load on device 'metal:0' took 16.66 ms  (cached)
+Module _update_gradient_grad__locals__kernel_c6377c8b c6377c8 load on device 'metal:0' took 16.55 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_2fe4f227 85ed816 load on device 'metal:0' took 16.61 ms  (cached)
+Module _solve_done__locals__kernel_e377d69b e377d69 load on device 'metal:0' took 16.57 ms  (cached)
+Module mujoco_warp._src.derivative 1793cac load on device 'metal:0' took 19.42 ms  (cached)
+Module _next_time_builder__locals___next_time_77f65a33 77f65a3 load on device 'metal:0' took 16.52 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_7fdbdb61 7fdbdb6 load on device 'metal:0' took 16.72 ms  (cached)
+Module reset_data__locals__reset_M_232d5062 232d506 load on device 'metal:0' took 16.73 ms  (cached)
+Module reset_data__locals__reset_mocap_29da3eb8 29da3eb load on device 'metal:0' took 16.46 ms  (cached)
+Module reset_data__locals__reset_contact_818d93f9 818d93f load on device 'metal:0' took 16.47 ms  (cached)
+Module reset_data__locals__reset_sleep_ae682850 ae68285 load on device 'metal:0' took 16.88 ms  (cached)
+Module reset_data__locals__reset_nworld_532a08b2 532a08b load on device 'metal:0' took 16.60 ms  (cached)
+[bench] RL 1024x100x100 spp 1 bounces 2 legacy: 10.83 ms/batch
+[bench] RL 1024x100x100 spp 1 bounces 2 sun_disk+tonemap: 11.07 ms/batch
+[bench] RL 1024x100x100 spp 1 bounces 2 sun_disk+tonemap+atrous: 24.33 ms/batch
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/aditya/robosim/metalsim/render/bench_cost.py", line 71, in <module>
+    res = {"rl_1spp_2b": bench_rl(), "rl_4spp_2b": bench_rl(spp=4)}
+                         ^^^^^^^^^^
+  File "/Users/aditya/robosim/metalsim/render/bench_cost.py", line 38, in bench_rl
+    r = Tier2Renderer(m, n, width=100, height=100, camera="cam", spp=spp, max_bounces=bounces, **RL_CONFIGS[name])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/metalsim/render/tier2.py", line 157, in __init__
+    self._oidn = OIDNDenoiser(c.queue, n, width, height, (av["hdr"].buffer, av["hdr"].offset), (av["hdr_out"].buffer, av["hdr_out"].offset),
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/metalsim/render/denoise.py", line 95, in __init__
+    img(b"color", color, color_ch); img(b"output", output, color_ch)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/metalsim/render/denoise.py", line 94, in img
+    L.oidnSetFilterImage(f, name, shared(name, mb), FLOAT3, w, h, off + e * w * h * ch * 4, ch * 4, w * ch * 4)   # RT takes float3; a float4 image is float3 with a 16-byte pixel stride
+                                  ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/metalsim/render/denoise.py", line 82, in shared
+    self._bufs[k] = L.oidnNewSharedBufferFromMetal(self.dev, _id(mb)); self._check()
+                                                                       ^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/metalsim/render/denoise.py", line 110, in _check
+    raise RuntimeError(f"OIDN error {err}: {msg.value.decode() if msg.value else ''}")
+RuntimeError: OIDN error 2: image size is too large

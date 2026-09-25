@@ -1,0 +1,190 @@
+holder: {"name": "rtx_parity_steps2", "kind": "render", "minutes": 40.0, "pid": 40199, "start": 1790342501.557188}
+  waiting [train] g1_rough_transfer_isaacckpts est 6.0 min, queued 7986 s ago
+  waiting [train] g1_terms_tuning_elliptic_imp10_hardlimits est 8.0 min, queued 6738 s ago
+  waiting [train] g1_terms_tuning_tau10_impact_hardlimits est 8.0 min, queued 6733 s ago
+  waiting [train] g1_terms_noise_default_s3 est 8.0 min, queued 6728 s ago
+  waiting [train] g1_rough_terms_it1000 est 12.0 min, queued 338 s ago
+  waiting [train] g1_rough_transfer_ours est 6.0 min, queued 338 s ago
+  waiting [low] flex_tests_metal est 15.0 min, queued 12375 s ago
+  waiting [low] mjw_tp_profile est 15.0 min, queued 12339 s ago
+  waiting [low] rough_cmp_tests est 15.0 min, queued 12145 s ago
+  waiting [low] mjw_tp_variants1 est 20.0 min, queued 12009 s ago
+  waiting [low] mjw_tp_checks1 est 25.0 min, queued 11885 s ago
+  waiting [low] g1_rough_step_profile est 10.0 min, queued 11400 s ago
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+[rtx_parity] 4/110 79 ms/frame
+[rtx_parity] 8/110 77 ms/frame
+[rtx_parity] 12/110 81 ms/frame
+[rtx_parity] 16/110 67 ms/frame
+[rtx_parity] 20/110 62 ms/frame
+[rtx_parity] 24/110 62 ms/frame
+[rtx_parity] 28/110 62 ms/frame
+[rtx_parity] 32/110 69 ms/frame
+[rtx_parity] 36/110 78 ms/frame
+[rtx_parity] 40/110 63 ms/frame
+[rtx_parity] 44/110 63 ms/frame
+[rtx_parity] 48/110 68 ms/frame
+[rtx_parity] 52/110 67 ms/frame
+[rtx_parity] 56/110 70 ms/frame
+[rtx_parity] 60/110 74 ms/frame
+[rtx_parity] 64/110 68 ms/frame
+[rtx_parity] 68/110 66 ms/frame
+[rtx_parity] 72/110 68 ms/frame
+[rtx_parity] 76/110 68 ms/frame
+[rtx_parity] 80/110 65 ms/frame
+[rtx_parity] 84/110 74 ms/frame
+[rtx_parity] 88/110 76 ms/frame
+[rtx_parity] 92/110 79 ms/frame
+[rtx_parity] 96/110 69 ms/frame
+[rtx_parity] 100/110 62 ms/frame
+[rtx_parity] 104/110 61 ms/frame
+[rtx_parity] 108/110 61 ms/frame
+[rtx_parity] 110/110 62 ms/frame
+  warnings.warn(
+  warnings.warn(msg)
+{
+ "preset": "legacy",
+ "kwargs": {
+  "center_sample": true
+ },
+ "spp": 16,
+ "passes": 8,
+ "bounces": 3,
+ "frames": 110,
+ "render_ms_per_frame_host_path": 67.53846874926239,
+ "whole_frame_raw": {
+  "psnr_db": 18.0968903291468,
+  "ssim": 0.8325760619206862,
+  "flip": 0.42786096686666664,
+  "lpips_alex": 0.45000299702991137
+ },
+ "robot_raw": {
+  "psnr_db": 13.42564075230305,
+  "ssim": 0.577817594463175,
+  "flip": 0.13022609982978214,
+  "lpips_alex_crop": 0.18771010556004264
+ },
+ "robot_brightness_matched": {
+  "psnr_db": 14.547831494074234,
+  "ssim": 0.6287022568962791,
+  "flip": 0.12069982412186536,
+  "lpips_alex_crop": 0.17112269421870058
+ },
+ "robot_gain_mean": 1.136255914514715,
+ "whole_frame_gain_mean": 1.0579986702312123,
+ "robot_frames": 110,
+ "silhouette_iou_mean": 0.9988805666141433,
+ "robot_depth_rmse_m": 0.0015163975587437438,
+ "sky_isaac": [
+  168.0,
+  173.0,
+  180.0
+ ],
+ "sky_ours": [
+  190.3,
+  202.8,
+  226.9
+ ]
+}
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+[rtx_parity] 4/22 77 ms/frame
+[rtx_parity] 8/22 71 ms/frame
+[rtx_parity] 12/22 67 ms/frame
+[rtx_parity] 16/22 68 ms/frame
+[rtx_parity] 20/22 72 ms/frame
+[rtx_parity] 22/22 61 ms/frame
+  warnings.warn(
+  warnings.warn(msg)
+{
+ "preset": "legacy",
+ "kwargs": {
+  "center_sample": true
+ },
+ "spp": 16,
+ "passes": 8,
+ "bounces": 3,
+ "frames": 22,
+ "render_ms_per_frame_host_path": 67.66556249931455,
+ "whole_frame_raw": {
+  "psnr_db": 18.279560288125726,
+  "ssim": 0.8236083063212308,
+  "flip": 0.42281569269570435,
+  "lpips_alex": 0.45958267694169824
+ },
+ "robot_raw": {
+  "psnr_db": 13.857778156118114,
+  "ssim": 0.6106170984831724,
+  "flip": 0.1277859519151124,
+  "lpips_alex_crop": 0.17577446523037824
+ },
+ "robot_brightness_matched": {
+  "psnr_db": 14.934870468713264,
+  "ssim": 0.6564831869168715,
+  "flip": 0.11947082016955722,
+  "lpips_alex_crop": 0.15999225052920255
+ },
+ "robot_gain_mean": 1.1253454847769304,
+ "whole_frame_gain_mean": 1.0299568934874102,
+ "robot_frames": 22,
+ "silhouette_iou_mean": 0.9990012765332211,
+ "robot_depth_rmse_m": 0.0016410468872720685,
+ "sky_isaac": [
+  167.7,
+  172.7,
+  179.7
+ ],
+ "sky_ours": [
+  190.3,
+  202.8,
+  226.9
+ ]
+}
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+[rtx_parity] 4/110 79 ms/frame
+[rtx_parity] 8/110 77 ms/frame
+[rtx_parity] 12/110 83 ms/frame
+[rtx_parity] 16/110 67 ms/frame
+[rtx_parity] 20/110 61 ms/frame
+[rtx_parity] 24/110 62 ms/frame
+[rtx_parity] 28/110 62 ms/frame
+[rtx_parity] 32/110 70 ms/frame
+[rtx_parity] 36/110 78 ms/frame
+[rtx_parity] 40/110 64 ms/frame
+[rtx_parity] 44/110 63 ms/frame
+[rtx_parity] 48/110 70 ms/frame
+[rtx_parity] 52/110 67 ms/frame
+[rtx_parity] 56/110 70 ms/frame
+[rtx_parity] 60/110 73 ms/frame
+[rtx_parity] 64/110 68 ms/frame
+[rtx_parity] 68/110 69 ms/frame
+[rtx_parity] 72/110 68 ms/frame
+[rtx_parity] 76/110 68 ms/frame
+[rtx_parity] 80/110 66 ms/frame
+[rtx_parity] 84/110 76 ms/frame
+[rtx_parity] 88/110 77 ms/frame
+[rtx_parity] 92/110 82 ms/frame
+[rtx_parity] 96/110 70 ms/frame
+[rtx_parity] 100/110 61 ms/frame
+[rtx_parity] 104/110 63 ms/frame
+[rtx_parity] 108/110 62 ms/frame
+[rtx_parity] 110/110 62 ms/frame
+  warnings.warn(
+  warnings.warn(msg)

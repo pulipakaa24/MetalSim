@@ -1,0 +1,2151 @@
+{
+ "physics": {
+  "A_hold": {
+   "steps": 150,
+   "joint_rmse_rad": {
+    "t0.5s": 0.004756932612508535,
+    "t1s": 0.005708485841751099,
+    "t2s": 0.007154378108680248,
+    "end": 0.025344446301460266,
+    "max": 0.03441091999411583
+   },
+   "divergence_step_0.1rad": 67,
+   "divergence_time_s": 1.34,
+   "root_height": {
+    "isaac_end": 0.05380211025476456,
+    "metalsim_end": 0.05376584827899933,
+    "rmse": 0.008185756392776966
+   },
+   "root_orientation_err_rad": {
+    "mean": 0.009718187153339386,
+    "max": 0.09117145091295242
+   },
+   "peak_joint_speed_rad_s": {
+    "isaac": 6.861039161682129,
+    "metalsim": 6.224482536315918
+   },
+   "contact_force_N": {
+    "isaac_mean_total": 302.4049377441406,
+    "metalsim_mean_total": 315.8680725097656,
+    "isaac_peak": 712.2770385742188,
+    "metalsim_peak": 3714.508544921875
+   },
+   "torque_rms_Nm": {
+    "isaac": 5.288428783416748,
+    "metalsim": 5.034797191619873
+   },
+   "penetration_m": {
+    "metalsim_max": 0.028456469997763634,
+    "metalsim_mean_when_in_contact": 0.001338243018835783,
+    "isaac": null
+   },
+   "limit_excursion_rad": {
+    "isaac_max_ctrl": 0.004741529049704041,
+    "metalsim_max_ctrl": 0.030167261185476746,
+    "isaac_steps_over_0.01": 0,
+    "metalsim_steps_over_0.01": 8,
+    "metalsim_max_substep": 0.03016728162765503
+   }
+  },
+  "B_random": {
+   "steps": 250,
+   "joint_rmse_rad": {
+    "t0.5s": 0.09688001871109009,
+    "t1s": 0.10138595104217529,
+    "t2s": 0.12433808296918869,
+    "end": 0.10575824230909348,
+    "max": 0.19010025262832642
+   },
+   "divergence_step_0.1rad": 0,
+   "divergence_time_s": 0.0,
+   "root_height": {
+    "isaac_end": 0.14033684134483337,
+    "metalsim_end": 0.14272649586200714,
+    "rmse": 0.12316484749317169
+   },
+   "root_orientation_err_rad": {
+    "mean": 2.6407909393310547,
+    "max": 3.140900135040283
+   },
+   "peak_joint_speed_rad_s": {
+    "isaac": 32.00001525878906,
+    "metalsim": 46.066925048828125
+   },
+   "contact_force_N": {
+    "isaac_mean_total": 329.4166564941406,
+    "metalsim_mean_total": 353.6612548828125,
+    "isaac_peak": 2847.163330078125,
+    "metalsim_peak": 4282.28173828125
+   },
+   "torque_rms_Nm": {
+    "isaac": 29.949527740478516,
+    "metalsim": 28.271408081054688
+   },
+   "penetration_m": {
+    "metalsim_max": 0.06054319813847542,
+    "metalsim_mean_when_in_contact": 0.014296231791377068,
+    "isaac": null
+   },
+   "limit_excursion_rad": {
+    "isaac_max_ctrl": 0.001549847513316993,
+    "metalsim_max_ctrl": 0.1818202446929969,
+    "isaac_steps_over_0.01": 0,
+    "metalsim_steps_over_0.01": 219,
+    "metalsim_max_substep": 0.18182024359703064
+   }
+  },
+  "C_drop": {
+   "steps": 150,
+   "joint_rmse_rad": {
+    "t0.5s": 0.009381425566971302,
+    "t1s": 0.01498511340469122,
+    "t2s": 0.005038971547037363,
+    "end": 0.023288942873477936,
+    "max": 0.06289265304803848
+   },
+   "divergence_step_0.1rad": 0,
+   "divergence_time_s": 0.0,
+   "root_height": {
+    "isaac_end": 0.05380271375179291,
+    "metalsim_end": 0.05376790091395378,
+    "rmse": 0.03098452277481556
+   },
+   "root_orientation_err_rad": {
+    "mean": 0.049532122910022736,
+    "max": 0.2140216827392578
+   },
+   "peak_joint_speed_rad_s": {
+    "isaac": 10.601576805114746,
+    "metalsim": 10.157681465148926
+   },
+   "contact_force_N": {
+    "isaac_mean_total": 288.4056701660156,
+    "metalsim_mean_total": 317.8645324707031,
+    "isaac_peak": 1029.7064208984375,
+    "metalsim_peak": 3745.71044921875
+   },
+   "torque_rms_Nm": {
+    "isaac": 6.169229030609131,
+    "metalsim": 5.88047456741333
+   },
+   "penetration_m": {
+    "metalsim_max": 0.02973557449877262,
+    "metalsim_mean_when_in_contact": 0.0017240367596969008,
+    "isaac": null
+   },
+   "limit_excursion_rad": {
+    "isaac_max_ctrl": 0.003954390110800232,
+    "metalsim_max_ctrl": 0.03001395803911444,
+    "isaac_steps_over_0.01": 0,
+    "metalsim_steps_over_0.01": 8,
+    "metalsim_max_substep": 0.030037343502044678
+   }
+  }
+ },
+ "render": {
+  "tier2": {
+   "frames": 22,
+   "raw_mean": {
+    "psnr_db": 34.625028039080085,
+    "ssim": 0.9843550486998125,
+    "flip": 0.03352611647410826,
+    "lpips_alex": 0.029045500729063697
+   },
+   "brightness_matched_mean": {
+    "psnr_db": 34.64518536506655,
+    "ssim": 0.9843497493050315,
+    "flip": 0.03352611647410826,
+    "lpips_alex": 0.029043712399222633
+   },
+   "silhouette_iou_mean": 0.5629646091660483,
+   "robot_depth_rmse_m_mean": 0.08858578573424547,
+   "robot_depth_agree_1cm_mean": 0.43451585051417235,
+   "ground_depth_rmse_m_mean": 0.0005441733407926883,
+   "robot_crop_raw_mean": {
+    "psnr_db": 19.84145946069865,
+    "ssim": 0.6626316051591526,
+    "flip": 0.07370548322796822,
+    "lpips_alex_crop": 0.09162317732857032
+   },
+   "robot_crop_brightness_matched_mean": {
+    "psnr_db": 19.959572592939246,
+    "ssim": 0.6628396362066269,
+    "flip": 0.07381972281092947,
+    "lpips_alex_crop": 0.09235353031280366
+   },
+   "robot_fraction_of_crop_mean": 0.2650711387146503,
+   "per_frame": [
+    {
+     "frame": "A_hold_0000",
+     "raw": {
+      "psnr_db": 46.024363840327,
+      "ssim": 0.9969033598899841,
+      "flip": 0.026641476899385452,
+      "lpips_alex": 0.00441093510016799
+     },
+     "brightness_matched": {
+      "psnr_db": 46.15289608552797,
+      "ssim": 0.9968993663787842,
+      "flip": 0.026641476899385452,
+      "lpips_alex": 0.0044084531255066395
+     },
+     "brightness_gain_applied": 1.0012365579605103,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 30.801223397878815,
+       "ssim": 0.9567235708236694,
+       "flip": 0.025233587250113487,
+       "lpips_alex_crop": 0.01700728014111519
+      },
+      "brightness_matched": {
+       "psnr_db": 31.01021792857866,
+       "ssim": 0.9569261074066162,
+       "flip": 0.02713293395936489,
+       "lpips_alex_crop": 0.01714630424976349
+      },
+      "gain": 0.9926653504371643,
+      "crop_hw": [
+       266,
+       124
+      ],
+      "robot_fraction_of_crop": 0.31193912199854473
+     },
+     "silhouette_iou": 0.9909612207211586,
+     "silhouette_px": {
+      "isaac": 10243,
+      "metalsim": 10242
+     },
+     "robot_depth_rmse_m": 0.0020177008118480444,
+     "robot_depth_agree_1cm": 0.9966653589642998,
+     "ground_depth_rmse_m": 2.2727777832187712e-05
+    },
+    {
+     "frame": "A_hold_0025",
+     "raw": {
+      "psnr_db": 43.83501731246753,
+      "ssim": 0.9953829646110535,
+      "flip": 0.027789583429694176,
+      "lpips_alex": 0.005128164775669575
+     },
+     "brightness_matched": {
+      "psnr_db": 43.907880075499094,
+      "ssim": 0.9953820705413818,
+      "flip": 0.027789583429694176,
+      "lpips_alex": 0.0051252394914627075
+     },
+     "brightness_gain_applied": 1.0012192726135254,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 27.830930536612154,
+       "ssim": 0.9147838354110718,
+       "flip": 0.037685755640268326,
+       "lpips_alex_crop": 0.02931319735944271
+      },
+      "brightness_matched": {
+       "psnr_db": 27.989993528572437,
+       "ssim": 0.9148970246315002,
+       "flip": 0.040715716779232025,
+       "lpips_alex_crop": 0.029539303854107857
+      },
+      "gain": 0.9916973114013672,
+      "crop_hw": [
+       259,
+       120
+      ],
+      "robot_fraction_of_crop": 0.331048906048906
+     },
+     "silhouette_iou": 0.9570415006317426,
+     "silhouette_px": {
+      "isaac": 10075,
+      "metalsim": 10061
+     },
+     "robot_depth_rmse_m": 0.009357331320643425,
+     "robot_depth_agree_1cm": 0.9702447445922616,
+     "ground_depth_rmse_m": 3.0246521419030614e-05
+    },
+    {
+     "frame": "A_hold_0050",
+     "raw": {
+      "psnr_db": 35.2330602797364,
+      "ssim": 0.9850465655326843,
+      "flip": 0.03134080767631531,
+      "lpips_alex": 0.009962717071175575
+     },
+     "brightness_matched": {
+      "psnr_db": 35.23836262586415,
+      "ssim": 0.9850413799285889,
+      "flip": 0.03134080767631531,
+      "lpips_alex": 0.0099603570997715
+     },
+     "brightness_gain_applied": 1.0012048482894897,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 18.57077927549598,
+       "ssim": 0.5284340977668762,
+       "flip": 0.08333570510149002,
+       "lpips_alex_crop": 0.09351621568202972
+      },
+      "brightness_matched": {
+       "psnr_db": 18.673654483001172,
+       "ssim": 0.5284786224365234,
+       "flip": 0.08152666687965393,
+       "lpips_alex_crop": 0.09487771987915039
+      },
+      "gain": 0.9855149984359741,
+      "crop_hw": [
+       218,
+       163
+      ],
+      "robot_fraction_of_crop": 0.28921596217706985
+     },
+     "silhouette_iou": 0.8028607570302617,
+     "silhouette_px": {
+      "isaac": 9215,
+      "metalsim": 9313
+     },
+     "robot_depth_rmse_m": 0.04780462384223938,
+     "robot_depth_agree_1cm": 0.4007999030420555,
+     "ground_depth_rmse_m": 0.00013966755068395287
+    },
+    {
+     "frame": "A_hold_0075",
+     "raw": {
+      "psnr_db": 40.40560806976937,
+      "ssim": 0.9948013424873352,
+      "flip": 0.02827267535030842,
+      "lpips_alex": 0.004952262155711651
+     },
+     "brightness_matched": {
+      "psnr_db": 40.44212372326569,
+      "ssim": 0.9947957396507263,
+      "flip": 0.02827267535030842,
+      "lpips_alex": 0.004949506372213364
+     },
+     "brightness_gain_applied": 1.0013102293014526,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 22.893300207342353,
+       "ssim": 0.8313139081001282,
+       "flip": 0.03067668341100216,
+       "lpips_alex_crop": 0.04511073976755142
+      },
+      "brightness_matched": {
+       "psnr_db": 22.91098809813997,
+       "ssim": 0.8314440846443176,
+       "flip": 0.030999721959233284,
+       "lpips_alex_crop": 0.045173920691013336
+      },
+      "gain": 0.9971989989280701,
+      "crop_hw": [
+       145,
+       241
+      ],
+      "robot_fraction_of_crop": 0.2169695235369867
+     },
+     "silhouette_iou": 0.9377472962279082,
+     "silhouette_px": {
+      "isaac": 7367,
+      "metalsim": 7325
+     },
+     "robot_depth_rmse_m": 0.012657886371016502,
+     "robot_depth_agree_1cm": 0.919831223628692,
+     "ground_depth_rmse_m": 0.0004207624006085098
+    },
+    {
+     "frame": "A_hold_0100",
+     "raw": {
+      "psnr_db": 40.29342868507527,
+      "ssim": 0.994526207447052,
+      "flip": 0.028145097196102142,
+      "lpips_alex": 0.005298644304275513
+     },
+     "brightness_matched": {
+      "psnr_db": 40.33026188084996,
+      "ssim": 0.9945217967033386,
+      "flip": 0.028145097196102142,
+      "lpips_alex": 0.005295049399137497
+     },
+     "brightness_gain_applied": 1.0013277530670166,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 22.558835702269167,
+       "ssim": 0.8166996836662292,
+       "flip": 0.031319815665483475,
+       "lpips_alex_crop": 0.04036058485507965
+      },
+      "brightness_matched": {
+       "psnr_db": 22.56914126582652,
+       "ssim": 0.8167866468429565,
+       "flip": 0.03163227066397667,
+       "lpips_alex_crop": 0.040415212512016296
+      },
+      "gain": 0.9982507228851318,
+      "crop_hw": [
+       145,
+       241
+      ],
+      "robot_fraction_of_crop": 0.21147517527543283
+     },
+     "silhouette_iou": 0.9381596752368065,
+     "silhouette_px": {
+      "isaac": 7156,
+      "metalsim": 7167
+     },
+     "robot_depth_rmse_m": 0.013949637301266193,
+     "robot_depth_agree_1cm": 0.9035049762007789,
+     "ground_depth_rmse_m": 0.00042932596988976
+    },
+    {
+     "frame": "A_hold_0125",
+     "raw": {
+      "psnr_db": 40.0159042586354,
+      "ssim": 0.9942758083343506,
+      "flip": 0.02823360078036785,
+      "lpips_alex": 0.004899974446743727
+     },
+     "brightness_matched": {
+      "psnr_db": 40.049551323722085,
+      "ssim": 0.9942731261253357,
+      "flip": 0.02823360078036785,
+      "lpips_alex": 0.004895687103271484
+     },
+     "brightness_gain_applied": 1.0013211965560913,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 22.3128649001466,
+       "ssim": 0.8075091242790222,
+       "flip": 0.03202017396688461,
+       "lpips_alex_crop": 0.04098115861415863
+      },
+      "brightness_matched": {
+       "psnr_db": 22.32736335447563,
+       "ssim": 0.8076279759407043,
+       "flip": 0.03228447958827019,
+       "lpips_alex_crop": 0.04106815159320831
+      },
+      "gain": 0.9976105093955994,
+      "crop_hw": [
+       145,
+       241
+      ],
+      "robot_fraction_of_crop": 0.21144655887823724
+     },
+     "silhouette_iou": 0.9358505887129517,
+     "silhouette_px": {
+      "isaac": 7158,
+      "metalsim": 7146
+     },
+     "robot_depth_rmse_m": 0.014840382151305676,
+     "robot_depth_agree_1cm": 0.8809833694866233,
+     "ground_depth_rmse_m": 0.00044357782462611794
+    },
+    {
+     "frame": "B_random_0000",
+     "raw": {
+      "psnr_db": 42.617104937306,
+      "ssim": 0.9958646893501282,
+      "flip": 0.02737285941839218,
+      "lpips_alex": 0.00622160779312253
+     },
+     "brightness_matched": {
+      "psnr_db": 42.680049804935614,
+      "ssim": 0.9958581924438477,
+      "flip": 0.02737285941839218,
+      "lpips_alex": 0.006218690425157547
+     },
+     "brightness_gain_applied": 1.0013266801834106,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 27.40344195172608,
+       "ssim": 0.9297593235969543,
+       "flip": 0.030437972396612167,
+       "lpips_alex_crop": 0.030535608530044556
+      },
+      "brightness_matched": {
+       "psnr_db": 27.47349134946272,
+       "ssim": 0.9298533797264099,
+       "flip": 0.032069217413663864,
+       "lpips_alex_crop": 0.030735354870557785
+      },
+      "gain": 0.9948234558105469,
+      "crop_hw": [
+       271,
+       123
+      ],
+      "robot_fraction_of_crop": 0.3080730807308073
+     },
+     "silhouette_iou": 0.9616320966014218,
+     "silhouette_px": {
+      "isaac": 10065,
+      "metalsim": 10079
+     },
+     "robot_depth_rmse_m": 0.005836086347699165,
+     "robot_depth_agree_1cm": 0.9639493670886076,
+     "ground_depth_rmse_m": 0.00016962738300208002
+    },
+    {
+     "frame": "B_random_0025",
+     "raw": {
+      "psnr_db": 28.299986774700834,
+      "ssim": 0.9724602103233337,
+      "flip": 0.040121838450431824,
+      "lpips_alex": 0.06532642245292664
+     },
+     "brightness_matched": {
+      "psnr_db": 28.29553723564179,
+      "ssim": 0.9724521636962891,
+      "flip": 0.040121838450431824,
+      "lpips_alex": 0.06533083319664001
+     },
+     "brightness_gain_applied": 1.0014336109161377,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 15.79974097639518,
+       "ssim": 0.5630196928977966,
+       "flip": 0.08133545517921448,
+       "lpips_alex_crop": 0.11134416610002518
+      },
+      "brightness_matched": {
+       "psnr_db": 16.212555723947624,
+       "ssim": 0.5635986328125,
+       "flip": 0.07598816603422165,
+       "lpips_alex_crop": 0.11268377304077148
+      },
+      "gain": 0.9590489864349365,
+      "crop_hw": [
+       271,
+       253
+      ],
+      "robot_fraction_of_crop": 0.18575616586205387
+     },
+     "silhouette_iou": 0.0938285175879397,
+     "silhouette_px": {
+      "isaac": 5742,
+      "metalsim": 8189
+     },
+     "robot_depth_rmse_m": 0.21582135558128357,
+     "robot_depth_agree_1cm": 0.049372384937238493,
+     "ground_depth_rmse_m": 7.28723025531508e-05
+    },
+    {
+     "frame": "B_random_0050",
+     "raw": {
+      "psnr_db": 28.845696629374164,
+      "ssim": 0.9782838225364685,
+      "flip": 0.037279292941093445,
+      "lpips_alex": 0.0423719584941864
+     },
+     "brightness_matched": {
+      "psnr_db": 28.844357738372572,
+      "ssim": 0.9782777428627014,
+      "flip": 0.037279292941093445,
+      "lpips_alex": 0.04237162694334984
+     },
+     "brightness_gain_applied": 1.0003271102905273,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 14.162658401767128,
+       "ssim": 0.4457579553127289,
+       "flip": 0.13229264318943024,
+       "lpips_alex_crop": 0.18902191519737244
+      },
+      "brightness_matched": {
+       "psnr_db": 14.603015493477011,
+       "ssim": 0.44720765948295593,
+       "flip": 0.12516939640045166,
+       "lpips_alex_crop": 0.19274258613586426
+      },
+      "gain": 0.9472384452819824,
+      "crop_hw": [
+       119,
+       312
+      ],
+      "robot_fraction_of_crop": 0.2970534367593191
+     },
+     "silhouette_iou": 0.23873424607852026,
+     "silhouette_px": {
+      "isaac": 6172,
+      "metalsim": 7490
+     },
+     "robot_depth_rmse_m": 0.13506123423576355,
+     "robot_depth_agree_1cm": 0.0660843144701861,
+     "ground_depth_rmse_m": 0.0007721600122749805
+    },
+    {
+     "frame": "B_random_0075",
+     "raw": {
+      "psnr_db": 29.402646191536025,
+      "ssim": 0.9777124524116516,
+      "flip": 0.03715737536549568,
+      "lpips_alex": 0.05340695381164551
+     },
+     "brightness_matched": {
+      "psnr_db": 29.4003238913608,
+      "ssim": 0.9777092337608337,
+      "flip": 0.03715737536549568,
+      "lpips_alex": 0.05340585112571716
+     },
+     "brightness_gain_applied": 1.000706434249878,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 16.69731690112392,
+       "ssim": 0.5885074138641357,
+       "flip": 0.12710611522197723,
+       "lpips_alex_crop": 0.17638736963272095
+      },
+      "brightness_matched": {
+       "psnr_db": 16.807440714005594,
+       "ssim": 0.5886174440383911,
+       "flip": 0.12363163381814957,
+       "lpips_alex_crop": 0.17751991748809814
+      },
+      "gain": 0.9851191639900208,
+      "crop_hw": [
+       116,
+       334
+      ],
+      "robot_fraction_of_crop": 0.3179330993186042
+     },
+     "silhouette_iou": 0.13825296314336744,
+     "silhouette_px": {
+      "isaac": 6094,
+      "metalsim": 7927
+     },
+     "robot_depth_rmse_m": 0.12819461524486542,
+     "robot_depth_agree_1cm": 0.03229594832648268,
+     "ground_depth_rmse_m": 0.0007017419557087123
+    },
+    {
+     "frame": "B_random_0100",
+     "raw": {
+      "psnr_db": 30.045590265820984,
+      "ssim": 0.9774759411811829,
+      "flip": 0.03736888989806175,
+      "lpips_alex": 0.05703563988208771
+     },
+     "brightness_matched": {
+      "psnr_db": 30.043493442698725,
+      "ssim": 0.9774718880653381,
+      "flip": 0.03736888989806175,
+      "lpips_alex": 0.057036321610212326
+     },
+     "brightness_gain_applied": 1.00069260597229,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 15.800970043134663,
+       "ssim": 0.5914760231971741,
+       "flip": 0.10819809138774872,
+       "lpips_alex_crop": 0.11181218922138214
+      },
+      "brightness_matched": {
+       "psnr_db": 15.932678825084219,
+       "ssim": 0.590991199016571,
+       "flip": 0.10583465546369553,
+       "lpips_alex_crop": 0.11272935569286346
+      },
+      "gain": 0.9795451760292053,
+      "crop_hw": [
+       143,
+       354
+      ],
+      "robot_fraction_of_crop": 0.2676504286673778
+     },
+     "silhouette_iou": 0.0911506384234999,
+     "silhouette_px": {
+      "isaac": 7437,
+      "metalsim": 7347
+     },
+     "robot_depth_rmse_m": 0.1946784406900406,
+     "robot_depth_agree_1cm": 0.019433198380566803,
+     "ground_depth_rmse_m": 0.001217900775372982
+    },
+    {
+     "frame": "B_random_0125",
+     "raw": {
+      "psnr_db": 28.5789923648508,
+      "ssim": 0.9742660522460938,
+      "flip": 0.040501922369003296,
+      "lpips_alex": 0.06169959157705307
+     },
+     "brightness_matched": {
+      "psnr_db": 28.576506843727145,
+      "ssim": 0.9742622971534729,
+      "flip": 0.040501922369003296,
+      "lpips_alex": 0.061700016260147095
+     },
+     "brightness_gain_applied": 1.0010552406311035,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 16.53930145254441,
+       "ssim": 0.6161746978759766,
+       "flip": 0.11854537576436996,
+       "lpips_alex_crop": 0.1590786725282669
+      },
+      "brightness_matched": {
+       "psnr_db": 16.557813036918517,
+       "ssim": 0.6162546277046204,
+       "flip": 0.11820979416370392,
+       "lpips_alex_crop": 0.15940159559249878
+      },
+      "gain": 0.9959233403205872,
+      "crop_hw": [
+       124,
+       384
+      ],
+      "robot_fraction_of_crop": 0.31159694220430106
+     },
+     "silhouette_iou": 0.12893442070499428,
+     "silhouette_px": {
+      "isaac": 7843,
+      "metalsim": 8907
+     },
+     "robot_depth_rmse_m": 0.19985738396644592,
+     "robot_depth_agree_1cm": 0.020909566126502875,
+     "ground_depth_rmse_m": 0.0009690095903351903
+    },
+    {
+     "frame": "B_random_0150",
+     "raw": {
+      "psnr_db": 28.872606736440396,
+      "ssim": 0.9755749106407166,
+      "flip": 0.03969390317797661,
+      "lpips_alex": 0.05478888005018234
+     },
+     "brightness_matched": {
+      "psnr_db": 28.87194302164704,
+      "ssim": 0.9755638241767883,
+      "flip": 0.03969390317797661,
+      "lpips_alex": 0.05478915572166443
+     },
+     "brightness_gain_applied": 1.0018864870071411,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 15.38333322821507,
+       "ssim": 0.545804500579834,
+       "flip": 0.116564080119133,
+       "lpips_alex_crop": 0.15458974242210388
+      },
+      "brightness_matched": {
+       "psnr_db": 15.387926144346034,
+       "ssim": 0.5457833409309387,
+       "flip": 0.11711901426315308,
+       "lpips_alex_crop": 0.15469753742218018
+      },
+      "gain": 0.9985111951828003,
+      "crop_hw": [
+       127,
+       367
+      ],
+      "robot_fraction_of_crop": 0.29292625887704093
+     },
+     "silhouette_iou": 0.15256720134768914,
+     "silhouette_px": {
+      "isaac": 8156,
+      "metalsim": 7580
+     },
+     "robot_depth_rmse_m": 0.20772185921669006,
+     "robot_depth_agree_1cm": 0.02928468554968795,
+     "ground_depth_rmse_m": 0.0011369350831955671
+    },
+    {
+     "frame": "B_random_0175",
+     "raw": {
+      "psnr_db": 28.054606101234203,
+      "ssim": 0.9744038581848145,
+      "flip": 0.04033619910478592,
+      "lpips_alex": 0.06432313472032547
+     },
+     "brightness_matched": {
+      "psnr_db": 28.05382312508914,
+      "ssim": 0.9743953347206116,
+      "flip": 0.04033619910478592,
+      "lpips_alex": 0.06432094424962997
+     },
+     "brightness_gain_applied": 1.0025526285171509,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 15.467007131271956,
+       "ssim": 0.5523362755775452,
+       "flip": 0.0992642194032669,
+       "lpips_alex_crop": 0.13987189531326294
+      },
+      "brightness_matched": {
+       "psnr_db": 15.466766725120314,
+       "ssim": 0.5523414015769958,
+       "flip": 0.0992642194032669,
+       "lpips_alex_crop": 0.1398681402206421
+      },
+      "gain": 1.0000736713409424,
+      "crop_hw": [
+       149,
+       360
+      ],
+      "robot_fraction_of_crop": 0.233668903803132
+     },
+     "silhouette_iou": 0.0549704802936014,
+     "silhouette_px": {
+      "isaac": 6741,
+      "metalsim": 6482
+     },
+     "robot_depth_rmse_m": 0.2795986235141754,
+     "robot_depth_agree_1cm": 0.01741654571843251,
+     "ground_depth_rmse_m": 0.0010262542637065053
+    },
+    {
+     "frame": "B_random_0200",
+     "raw": {
+      "psnr_db": 28.42826797302303,
+      "ssim": 0.971278727054596,
+      "flip": 0.04136557877063751,
+      "lpips_alex": 0.06962674111127853
+     },
+     "brightness_matched": {
+      "psnr_db": 28.42757305487488,
+      "ssim": 0.9712658524513245,
+      "flip": 0.04136557877063751,
+      "lpips_alex": 0.06962601840496063
+     },
+     "brightness_gain_applied": 1.0025824308395386,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 16.17150248849963,
+       "ssim": 0.5571011304855347,
+       "flip": 0.08218590170145035,
+       "lpips_alex_crop": 0.12841515243053436
+      },
+      "brightness_matched": {
+       "psnr_db": 16.147753312597732,
+       "ssim": 0.5570951700210571,
+       "flip": 0.08217980712652206,
+       "lpips_alex_crop": 0.12811002135276794
+      },
+      "gain": 1.0068960189819336,
+      "crop_hw": [
+       173,
+       388
+      ],
+      "robot_fraction_of_crop": 0.198036469817055
+     },
+     "silhouette_iou": 0.0649213871962687,
+     "silhouette_px": {
+      "isaac": 6223,
+      "metalsim": 7933
+     },
+     "robot_depth_rmse_m": 0.1842993199825287,
+     "robot_depth_agree_1cm": 0.0,
+     "ground_depth_rmse_m": 0.0008018487133085728
+    },
+    {
+     "frame": "B_random_0225",
+     "raw": {
+      "psnr_db": 28.37603884343909,
+      "ssim": 0.9733025431632996,
+      "flip": 0.040405694395303726,
+      "lpips_alex": 0.07235803455114365
+     },
+     "brightness_matched": {
+      "psnr_db": 28.375027050907562,
+      "ssim": 0.9732866883277893,
+      "flip": 0.040405694395303726,
+      "lpips_alex": 0.07235804945230484
+     },
+     "brightness_gain_applied": 1.002549648284912,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 17.451489942246017,
+       "ssim": 0.586411714553833,
+       "flip": 0.07828366756439209,
+       "lpips_alex_crop": 0.11868534237146378
+      },
+      "brightness_matched": {
+       "psnr_db": 17.417105272429545,
+       "ssim": 0.5861420631408691,
+       "flip": 0.07900635898113251,
+       "lpips_alex_crop": 0.1182912141084671
+      },
+      "gain": 1.0131422281265259,
+      "crop_hw": [
+       162,
+       384
+      ],
+      "robot_fraction_of_crop": 0.19167952674897118
+     },
+     "silhouette_iou": 0.0,
+     "silhouette_px": {
+      "isaac": 5938,
+      "metalsim": 5986
+     },
+     "robot_depth_rmse_m": null,
+     "robot_depth_agree_1cm": null,
+     "ground_depth_rmse_m": 0.0006843836163170636
+    },
+    {
+     "frame": "C_drop_0000",
+     "raw": {
+      "psnr_db": 41.786336069357006,
+      "ssim": 0.9948434829711914,
+      "flip": 0.028652625158429146,
+      "lpips_alex": 0.005224402528256178
+     },
+     "brightness_matched": {
+      "psnr_db": 41.83502820539876,
+      "ssim": 0.994840145111084,
+      "flip": 0.028652625158429146,
+      "lpips_alex": 0.005220870021730661
+     },
+     "brightness_gain_applied": 1.0012705326080322,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 26.59371668548209,
+       "ssim": 0.912165105342865,
+       "flip": 0.034818556159734726,
+       "lpips_alex_crop": 0.04007549211382866
+      },
+      "brightness_matched": {
+       "psnr_db": 26.686975903972325,
+       "ssim": 0.9122385382652283,
+       "flip": 0.036684807389974594,
+       "lpips_alex_crop": 0.04004373028874397
+      },
+      "gain": 0.9929981231689453,
+      "crop_hw": [
+       271,
+       126
+      ],
+      "robot_fraction_of_crop": 0.3154981549815498
+     },
+     "silhouette_iou": 0.9625916643460503,
+     "silhouette_px": {
+      "isaac": 10556,
+      "metalsim": 10587
+     },
+     "robot_depth_rmse_m": 0.006788148079067469,
+     "robot_depth_agree_1cm": 0.9395371263259402,
+     "ground_depth_rmse_m": 2.2675325453747064e-05
+    },
+    {
+     "frame": "C_drop_0025",
+     "raw": {
+      "psnr_db": 39.46055089333951,
+      "ssim": 0.9903145432472229,
+      "flip": 0.02876392938196659,
+      "lpips_alex": 0.006909788120537996
+     },
+     "brightness_matched": {
+      "psnr_db": 39.48251780562552,
+      "ssim": 0.990313708782196,
+      "flip": 0.02876392938196659,
+      "lpips_alex": 0.006905678194016218
+     },
+     "brightness_gain_applied": 1.001197338104248,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 23.333230126293675,
+       "ssim": 0.7776035666465759,
+       "flip": 0.06343397498130798,
+       "lpips_alex_crop": 0.06621789932250977
+      },
+      "brightness_matched": {
+       "psnr_db": 23.423070765323413,
+       "ssim": 0.7774910926818848,
+       "flip": 0.06508202850818634,
+       "lpips_alex_crop": 0.0670010894536972
+      },
+      "gain": 0.990838885307312,
+      "crop_hw": [
+       261,
+       119
+      ],
+      "robot_fraction_of_crop": 0.34089957822209344
+     },
+     "silhouette_iou": 0.8857196826596146,
+     "silhouette_px": {
+      "isaac": 9992,
+      "metalsim": 9974
+     },
+     "robot_depth_rmse_m": 0.018882544711232185,
+     "robot_depth_agree_1cm": 0.6284922158242696,
+     "ground_depth_rmse_m": 0.0001275397080462426
+    },
+    {
+     "frame": "C_drop_0050",
+     "raw": {
+      "psnr_db": 31.420688964452307,
+      "ssim": 0.9766133427619934,
+      "flip": 0.03530612960457802,
+      "lpips_alex": 0.02192980982363224
+     },
+     "brightness_matched": {
+      "psnr_db": 31.419475997958884,
+      "ssim": 0.9766097068786621,
+      "flip": 0.03530612960457802,
+      "lpips_alex": 0.021929126232862473
+     },
+     "brightness_gain_applied": 1.001158356666565,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 16.631212673876572,
+       "ssim": 0.3832281827926636,
+       "flip": 0.12751615047454834,
+       "lpips_alex_crop": 0.1264428049325943
+      },
+      "brightness_matched": {
+       "psnr_db": 16.772804987178414,
+       "ssim": 0.3835870027542114,
+       "flip": 0.12787148356437683,
+       "lpips_alex_crop": 0.12786588072776794
+      },
+      "gain": 0.9795145988464355,
+      "crop_hw": [
+       234,
+       157
+      ],
+      "robot_fraction_of_crop": 0.3423430780118678
+     },
+     "silhouette_iou": 0.5324004134531287,
+     "silhouette_px": {
+      "isaac": 9547,
+      "metalsim": 9726
+     },
+     "robot_depth_rmse_m": 0.08995354920625687,
+     "robot_depth_agree_1cm": 0.15830346475507767,
+     "ground_depth_rmse_m": 0.0003348625323269516
+    },
+    {
+     "frame": "C_drop_0075",
+     "raw": {
+      "psnr_db": 33.65487077467317,
+      "ssim": 0.986560046672821,
+      "flip": 0.031482625752687454,
+      "lpips_alex": 0.007743216119706631
+     },
+     "brightness_matched": {
+      "psnr_db": 33.65814660831034,
+      "ssim": 0.9865586757659912,
+      "flip": 0.031482625752687454,
+      "lpips_alex": 0.007739956025034189
+     },
+     "brightness_gain_applied": 1.0013171434402466,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 17.532400099772094,
+       "ssim": 0.5158395767211914,
+       "flip": 0.06660138070583344,
+       "lpips_alex_crop": 0.0748508870601654
+      },
+      "brightness_matched": {
+       "psnr_db": 17.757154390161183,
+       "ssim": 0.5166759490966797,
+       "flip": 0.06989555060863495,
+       "lpips_alex_crop": 0.0766289085149765
+      },
+      "gain": 0.9703189730644226,
+      "crop_hw": [
+       145,
+       245
+      ],
+      "robot_fraction_of_crop": 0.22291344123856438
+     },
+     "silhouette_iou": 0.8155070084606643,
+     "silhouette_px": {
+      "isaac": 7274,
+      "metalsim": 7103
+     },
+     "robot_depth_rmse_m": 0.03234438970685005,
+     "robot_depth_agree_1cm": 0.3499535459894704,
+     "ground_depth_rmse_m": 0.0008630944066680968
+    },
+    {
+     "frame": "C_drop_0100",
+     "raw": {
+      "psnr_db": 34.027778575152226,
+      "ssim": 0.9879989624023438,
+      "flip": 0.030660497024655342,
+      "lpips_alex": 0.0077733309008181095
+     },
+     "brightness_matched": {
+      "psnr_db": 34.03274084193475,
+      "ssim": 0.9879953265190125,
+      "flip": 0.030660497024655342,
+      "lpips_alex": 0.007769772782921791
+     },
+     "brightness_gain_applied": 1.001395583152771,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 18.244245651333184,
+       "ssim": 0.5784139633178711,
+       "flip": 0.05730535835027695,
+       "lpips_alex_crop": 0.05903402343392372
+      },
+      "brightness_matched": {
+       "psnr_db": 18.442315688843124,
+       "ssim": 0.579012930393219,
+       "flip": 0.06100583076477051,
+       "lpips_alex_crop": 0.06046009808778763
+      },
+      "gain": 0.9739553928375244,
+      "crop_hw": [
+       145,
+       245
+      ],
+      "robot_fraction_of_crop": 0.21683321604503872
+     },
+     "silhouette_iou": 0.8508373361028171,
+     "silhouette_px": {
+      "isaac": 7094,
+      "metalsim": 7163
+     },
+     "robot_depth_rmse_m": 0.030395416542887688,
+     "robot_depth_agree_1cm": 0.38770216661580714,
+     "ground_depth_rmse_m": 0.0007953491294756532
+    },
+    {
+     "frame": "C_drop_0125",
+     "raw": {
+      "psnr_db": 34.07147231905115,
+      "ssim": 0.9879212379455566,
+      "flip": 0.03068196028470993,
+      "lpips_alex": 0.007608806248754263
+     },
+     "brightness_matched": {
+      "psnr_db": 34.07645764825173,
+      "ssim": 0.9879202246665955,
+      "flip": 0.03068196028470993,
+      "lpips_alex": 0.007604469545185566
+     },
+     "brightness_gain_applied": 1.0013867616653442,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 18.332606361943597,
+       "ssim": 0.5788319706916809,
+       "flip": 0.0573599673807621,
+       "lpips_alex_crop": 0.0630575641989708
+      },
+      "brightness_matched": {
+       "psnr_db": 18.540370053201254,
+       "ssim": 0.5794211030006409,
+       "flip": 0.06073014810681343,
+       "lpips_alex_crop": 0.06477785110473633
+      },
+      "gain": 0.9732733964920044,
+      "crop_hw": [
+       145,
+       245
+      ],
+      "robot_fraction_of_crop": 0.21660802251935257
+     },
+     "silhouette_iou": 0.8505523066926576,
+     "silhouette_px": {
+      "isaac": 7097,
+      "metalsim": 7143
+     },
+     "robot_depth_rmse_m": 0.030240971595048904,
+     "robot_depth_agree_1cm": 0.39006875477463715,
+     "ground_depth_rmse_m": 0.0007892506546340883
+    }
+   ]
+  },
+  "tier0": {
+   "frames": 22,
+   "raw_mean": {
+    "psnr_db": 8.277819530953307,
+    "ssim": 0.7938320121981881,
+    "flip": 0.7126681371168657,
+    "lpips_alex": 0.4504747864874927
+   },
+   "brightness_matched_mean": {
+    "psnr_db": 9.783499799919023,
+    "ssim": 0.8625668476928364,
+    "flip": 0.6573569666255604,
+    "lpips_alex": 0.41648406061259186
+   },
+   "silhouette_iou_mean": 0.5629646091660483,
+   "robot_depth_rmse_m_mean": 0.08858578573424547,
+   "robot_depth_agree_1cm_mean": 0.43451585051417235,
+   "ground_depth_rmse_m_mean": 0.0005441733407926883,
+   "robot_crop_raw_mean": {
+    "psnr_db": 7.04002215943486,
+    "ssim": 0.12990862253884022,
+    "flip": 0.2310305650938641,
+    "lpips_alex_crop": 0.2994793768633496
+   },
+   "robot_crop_brightness_matched_mean": {
+    "psnr_db": 11.071254573016546,
+    "ssim": 0.34358593821525574,
+    "flip": 0.16135174205357378,
+    "lpips_alex_crop": 0.24532996659929102
+   },
+   "robot_fraction_of_crop_mean": 0.2650711387146503,
+   "per_frame": [
+    {
+     "frame": "A_hold_0000",
+     "raw": {
+      "psnr_db": 8.267571308288726,
+      "ssim": 0.7933419346809387,
+      "flip": 0.7138899564743042,
+      "lpips_alex": 0.4345701336860657
+     },
+     "brightness_matched": {
+      "psnr_db": 9.810426021659174,
+      "ssim": 0.8632619976997375,
+      "flip": 0.6555593013763428,
+      "lpips_alex": 0.39801692962646484
+     },
+     "brightness_gain_applied": 1.413150429725647,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 7.84522553980832,
+       "ssim": 0.23863470554351807,
+       "flip": 0.2638680934906006,
+       "lpips_alex_crop": 0.3235912322998047
+      },
+      "brightness_matched": {
+       "psnr_db": 11.555200091736456,
+       "ssim": 0.42715680599212646,
+       "flip": 0.17190593481063843,
+       "lpips_alex_crop": 0.2685026526451111
+      },
+      "gain": 1.7005491256713867,
+      "crop_hw": [
+       266,
+       124
+      ],
+      "robot_fraction_of_crop": 0.31193912199854473
+     },
+     "silhouette_iou": 0.9909612207211586,
+     "silhouette_px": {
+      "isaac": 10243,
+      "metalsim": 10242
+     },
+     "robot_depth_rmse_m": 0.0020177008118480444,
+     "robot_depth_agree_1cm": 0.9966653589642998,
+     "ground_depth_rmse_m": 2.2727777832187712e-05
+    },
+    {
+     "frame": "A_hold_0025",
+     "raw": {
+      "psnr_db": 8.268423433007055,
+      "ssim": 0.7941861152648926,
+      "flip": 0.7139782309532166,
+      "lpips_alex": 0.4345705509185791
+     },
+     "brightness_matched": {
+      "psnr_db": 9.808840679932299,
+      "ssim": 0.8640096187591553,
+      "flip": 0.6557515859603882,
+      "lpips_alex": 0.398311585187912
+     },
+     "brightness_gain_applied": 1.4129109382629395,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 7.7115530886940045,
+       "ssim": 0.21309636533260345,
+       "flip": 0.28108957409858704,
+       "lpips_alex_crop": 0.3289177417755127
+      },
+      "brightness_matched": {
+       "psnr_db": 11.524385121941512,
+       "ssim": 0.39437615871429443,
+       "flip": 0.18376275897026062,
+       "lpips_alex_crop": 0.3064691424369812
+      },
+      "gain": 1.7258497476577759,
+      "crop_hw": [
+       259,
+       120
+      ],
+      "robot_fraction_of_crop": 0.331048906048906
+     },
+     "silhouette_iou": 0.9570415006317426,
+     "silhouette_px": {
+      "isaac": 10075,
+      "metalsim": 10061
+     },
+     "robot_depth_rmse_m": 0.009357331320643425,
+     "robot_depth_agree_1cm": 0.9702447445922616,
+     "ground_depth_rmse_m": 3.0246521419030614e-05
+    },
+    {
+     "frame": "A_hold_0050",
+     "raw": {
+      "psnr_db": 8.266121082885146,
+      "ssim": 0.7947441935539246,
+      "flip": 0.7130895256996155,
+      "lpips_alex": 0.4321274757385254
+     },
+     "brightness_matched": {
+      "psnr_db": 9.782445815387767,
+      "ssim": 0.8635231852531433,
+      "flip": 0.656927764415741,
+      "lpips_alex": 0.39572539925575256
+     },
+     "brightness_gain_applied": 1.4112598896026611,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 6.550421742696658,
+       "ssim": 0.05611325055360794,
+       "flip": 0.2542821168899536,
+       "lpips_alex_crop": 0.26268038153648376
+      },
+      "brightness_matched": {
+       "psnr_db": 11.176722657054608,
+       "ssim": 0.19462914764881134,
+       "flip": 0.175474613904953,
+       "lpips_alex_crop": 0.2262834757566452
+      },
+      "gain": 2.083688259124756,
+      "crop_hw": [
+       218,
+       163
+      ],
+      "robot_fraction_of_crop": 0.28921596217706985
+     },
+     "silhouette_iou": 0.8028607570302617,
+     "silhouette_px": {
+      "isaac": 9215,
+      "metalsim": 9313
+     },
+     "robot_depth_rmse_m": 0.04780462384223938,
+     "robot_depth_agree_1cm": 0.4007999030420555,
+     "ground_depth_rmse_m": 0.00013966755068395287
+    },
+    {
+     "frame": "A_hold_0075",
+     "raw": {
+      "psnr_db": 8.289821665641323,
+      "ssim": 0.79974365234375,
+      "flip": 0.7122862339019775,
+      "lpips_alex": 0.43872499465942383
+     },
+     "brightness_matched": {
+      "psnr_db": 9.792155562914571,
+      "ssim": 0.868807315826416,
+      "flip": 0.6566973328590393,
+      "lpips_alex": 0.4056444764137268
+     },
+     "brightness_gain_applied": 1.408712387084961,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 7.069142029457423,
+       "ssim": 0.21700529754161835,
+       "flip": 0.193625807762146,
+       "lpips_alex_crop": 0.24425429105758667
+      },
+      "brightness_matched": {
+       "psnr_db": 11.425783686320658,
+       "ssim": 0.4042438864707947,
+       "flip": 0.12161161005496979,
+       "lpips_alex_crop": 0.2049121856689453
+      },
+      "gain": 1.9556602239608765,
+      "crop_hw": [
+       145,
+       241
+      ],
+      "robot_fraction_of_crop": 0.2169695235369867
+     },
+     "silhouette_iou": 0.9377472962279082,
+     "silhouette_px": {
+      "isaac": 7367,
+      "metalsim": 7325
+     },
+     "robot_depth_rmse_m": 0.012657886371016502,
+     "robot_depth_agree_1cm": 0.919831223628692,
+     "ground_depth_rmse_m": 0.0004207624006085098
+    },
+    {
+     "frame": "A_hold_0100",
+     "raw": {
+      "psnr_db": 8.288675125313176,
+      "ssim": 0.7995688319206238,
+      "flip": 0.7123302221298218,
+      "lpips_alex": 0.43915149569511414
+     },
+     "brightness_matched": {
+      "psnr_db": 9.791539932964664,
+      "ssim": 0.8686389327049255,
+      "flip": 0.6567608118057251,
+      "lpips_alex": 0.40615659952163696
+     },
+     "brightness_gain_applied": 1.4087929725646973,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 7.029504187385922,
+       "ssim": 0.21542519330978394,
+       "flip": 0.18876293301582336,
+       "lpips_alex_crop": 0.24737417697906494
+      },
+      "brightness_matched": {
+       "psnr_db": 11.370312723582739,
+       "ssim": 0.4020446538925171,
+       "flip": 0.11922948062419891,
+       "lpips_alex_crop": 0.19806960225105286
+      },
+      "gain": 1.9657557010650635,
+      "crop_hw": [
+       145,
+       241
+      ],
+      "robot_fraction_of_crop": 0.21147517527543283
+     },
+     "silhouette_iou": 0.9381596752368065,
+     "silhouette_px": {
+      "isaac": 7156,
+      "metalsim": 7167
+     },
+     "robot_depth_rmse_m": 0.013949637301266193,
+     "robot_depth_agree_1cm": 0.9035049762007789,
+     "ground_depth_rmse_m": 0.00042932596988976
+    },
+    {
+     "frame": "A_hold_0125",
+     "raw": {
+      "psnr_db": 8.28869170805588,
+      "ssim": 0.7994797229766846,
+      "flip": 0.7123388648033142,
+      "lpips_alex": 0.43897661566734314
+     },
+     "brightness_matched": {
+      "psnr_db": 9.791746880991147,
+      "ssim": 0.8685558438301086,
+      "flip": 0.6567764282226562,
+      "lpips_alex": 0.40598171949386597
+     },
+     "brightness_gain_applied": 1.408807396888733,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 7.021387769071977,
+       "ssim": 0.21026456356048584,
+       "flip": 0.18879878520965576,
+       "lpips_alex_crop": 0.24131397902965546
+      },
+      "brightness_matched": {
+       "psnr_db": 11.384562347577646,
+       "ssim": 0.39992401003837585,
+       "flip": 0.11893818527460098,
+       "lpips_alex_crop": 0.19583585858345032
+      },
+      "gain": 1.9704586267471313,
+      "crop_hw": [
+       145,
+       241
+      ],
+      "robot_fraction_of_crop": 0.21144655887823724
+     },
+     "silhouette_iou": 0.9358505887129517,
+     "silhouette_px": {
+      "isaac": 7158,
+      "metalsim": 7146
+     },
+     "robot_depth_rmse_m": 0.014840382151305676,
+     "robot_depth_agree_1cm": 0.8809833694866233,
+     "ground_depth_rmse_m": 0.00044357782462611794
+    },
+    {
+     "frame": "B_random_0000",
+     "raw": {
+      "psnr_db": 8.26837044178337,
+      "ssim": 0.7933741211891174,
+      "flip": 0.7139114141464233,
+      "lpips_alex": 0.43486908078193665
+     },
+     "brightness_matched": {
+      "psnr_db": 9.81279287788717,
+      "ssim": 0.8632498383522034,
+      "flip": 0.6555542945861816,
+      "lpips_alex": 0.3987577557563782
+     },
+     "brightness_gain_applied": 1.4131335020065308,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 7.859858749390235,
+       "ssim": 0.24071089923381805,
+       "flip": 0.2615145742893219,
+       "lpips_alex_crop": 0.30990836024284363
+      },
+      "brightness_matched": {
+       "psnr_db": 11.572394072597703,
+       "ssim": 0.43113547563552856,
+       "flip": 0.1690865457057953,
+       "lpips_alex_crop": 0.271715372800827
+      },
+      "gain": 1.6925575733184814,
+      "crop_hw": [
+       271,
+       123
+      ],
+      "robot_fraction_of_crop": 0.3080730807308073
+     },
+     "silhouette_iou": 0.9616320966014218,
+     "silhouette_px": {
+      "isaac": 10065,
+      "metalsim": 10079
+     },
+     "robot_depth_rmse_m": 0.005836086347699165,
+     "robot_depth_agree_1cm": 0.9639493670886076,
+     "ground_depth_rmse_m": 0.00016962738300208002
+    },
+    {
+     "frame": "B_random_0025",
+     "raw": {
+      "psnr_db": 8.25951999557912,
+      "ssim": 0.7874867916107178,
+      "flip": 0.7126891613006592,
+      "lpips_alex": 0.461458295583725
+     },
+     "brightness_matched": {
+      "psnr_db": 9.747212782422714,
+      "ssim": 0.8552908897399902,
+      "flip": 0.6583610773086548,
+      "lpips_alex": 0.42843493819236755
+     },
+     "brightness_gain_applied": 1.409532070159912,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 7.201891946386434,
+       "ssim": 0.03826688230037689,
+       "flip": 0.15785092115402222,
+       "lpips_alex_crop": 0.2539055049419403
+      },
+      "brightness_matched": {
+       "psnr_db": 10.153787009860828,
+       "ssim": 0.26018422842025757,
+       "flip": 0.13339070975780487,
+       "lpips_alex_crop": 0.22824279963970184
+      },
+      "gain": 1.699976921081543,
+      "crop_hw": [
+       271,
+       253
+      ],
+      "robot_fraction_of_crop": 0.18575616586205387
+     },
+     "silhouette_iou": 0.0938285175879397,
+     "silhouette_px": {
+      "isaac": 5742,
+      "metalsim": 8189
+     },
+     "robot_depth_rmse_m": 0.21582135558128357,
+     "robot_depth_agree_1cm": 0.049372384937238493,
+     "ground_depth_rmse_m": 7.28723025531508e-05
+    },
+    {
+     "frame": "B_random_0050",
+     "raw": {
+      "psnr_db": 8.310071001419963,
+      "ssim": 0.7938593029975891,
+      "flip": 0.7105178236961365,
+      "lpips_alex": 0.4588432013988495
+     },
+     "brightness_matched": {
+      "psnr_db": 9.749008494355111,
+      "ssim": 0.8613183498382568,
+      "flip": 0.6598267555236816,
+      "lpips_alex": 0.4265517294406891
+     },
+     "brightness_gain_applied": 1.4014171361923218,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 7.616498608476574,
+       "ssim": 0.08475302904844284,
+       "flip": 0.23703476786613464,
+       "lpips_alex_crop": 0.3688644468784332
+      },
+      "brightness_matched": {
+       "psnr_db": 9.469850236977686,
+       "ssim": 0.2324630469083786,
+       "flip": 0.21609170734882355,
+       "lpips_alex_crop": 0.36634570360183716
+      },
+      "gain": 1.4800188541412354,
+      "crop_hw": [
+       119,
+       312
+      ],
+      "robot_fraction_of_crop": 0.2970534367593191
+     },
+     "silhouette_iou": 0.23873424607852026,
+     "silhouette_px": {
+      "isaac": 6172,
+      "metalsim": 7490
+     },
+     "robot_depth_rmse_m": 0.13506123423576355,
+     "robot_depth_agree_1cm": 0.0660843144701861,
+     "ground_depth_rmse_m": 0.0007721600122749805
+    },
+    {
+     "frame": "B_random_0075",
+     "raw": {
+      "psnr_db": 8.30987453889787,
+      "ssim": 0.7923820614814758,
+      "flip": 0.710420548915863,
+      "lpips_alex": 0.4681667685508728
+     },
+     "brightness_matched": {
+      "psnr_db": 9.75167824375639,
+      "ssim": 0.8599908947944641,
+      "flip": 0.6599708795547485,
+      "lpips_alex": 0.4356955289840698
+     },
+     "brightness_gain_applied": 1.4019502401351929,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 7.312083108142897,
+       "ssim": 0.13077816367149353,
+       "flip": 0.2566407322883606,
+       "lpips_alex_crop": 0.3583582043647766
+      },
+      "brightness_matched": {
+       "psnr_db": 9.99099739630532,
+       "ssim": 0.3449237048625946,
+       "flip": 0.2193298041820526,
+       "lpips_alex_crop": 0.31652259826660156
+      },
+      "gain": 1.5865205526351929,
+      "crop_hw": [
+       116,
+       334
+      ],
+      "robot_fraction_of_crop": 0.3179330993186042
+     },
+     "silhouette_iou": 0.13825296314336744,
+     "silhouette_px": {
+      "isaac": 6094,
+      "metalsim": 7927
+     },
+     "robot_depth_rmse_m": 0.12819461524486542,
+     "robot_depth_agree_1cm": 0.03229594832648268,
+     "ground_depth_rmse_m": 0.0007017419557087123
+    },
+    {
+     "frame": "B_random_0100",
+     "raw": {
+      "psnr_db": 8.30317995464836,
+      "ssim": 0.7911894917488098,
+      "flip": 0.7110194563865662,
+      "lpips_alex": 0.4691602885723114
+     },
+     "brightness_matched": {
+      "psnr_db": 9.769796346235905,
+      "ssim": 0.8587059378623962,
+      "flip": 0.6587602496147156,
+      "lpips_alex": 0.43689411878585815
+     },
+     "brightness_gain_applied": 1.404618501663208,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 7.078794002128605,
+       "ssim": 0.11219299584627151,
+       "flip": 0.23258733749389648,
+       "lpips_alex_crop": 0.29514777660369873
+      },
+      "brightness_matched": {
+       "psnr_db": 11.089268442301151,
+       "ssim": 0.41699808835983276,
+       "flip": 0.17281056940555573,
+       "lpips_alex_crop": 0.21605060994625092
+      },
+      "gain": 1.7615461349487305,
+      "crop_hw": [
+       143,
+       354
+      ],
+      "robot_fraction_of_crop": 0.2676504286673778
+     },
+     "silhouette_iou": 0.0911506384234999,
+     "silhouette_px": {
+      "isaac": 7437,
+      "metalsim": 7347
+     },
+     "robot_depth_rmse_m": 0.1946784406900406,
+     "robot_depth_agree_1cm": 0.019433198380566803,
+     "ground_depth_rmse_m": 0.001217900775372982
+    },
+    {
+     "frame": "B_random_0125",
+     "raw": {
+      "psnr_db": 8.30373649389618,
+      "ssim": 0.7892942428588867,
+      "flip": 0.7113879323005676,
+      "lpips_alex": 0.4746963381767273
+     },
+     "brightness_matched": {
+      "psnr_db": 9.764860697221101,
+      "ssim": 0.8562426567077637,
+      "flip": 0.6594385504722595,
+      "lpips_alex": 0.44268175959587097
+     },
+     "brightness_gain_applied": 1.4043513536453247,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 6.792503824627656,
+       "ssim": 0.11130230128765106,
+       "flip": 0.27808770537376404,
+       "lpips_alex_crop": 0.3842985928058624
+      },
+      "brightness_matched": {
+       "psnr_db": 11.266698808465463,
+       "ssim": 0.41907215118408203,
+       "flip": 0.2001941055059433,
+       "lpips_alex_crop": 0.28659236431121826
+      },
+      "gain": 1.8276180028915405,
+      "crop_hw": [
+       124,
+       384
+      ],
+      "robot_fraction_of_crop": 0.31159694220430106
+     },
+     "silhouette_iou": 0.12893442070499428,
+     "silhouette_px": {
+      "isaac": 7843,
+      "metalsim": 8907
+     },
+     "robot_depth_rmse_m": 0.19985738396644592,
+     "robot_depth_agree_1cm": 0.020909566126502875,
+     "ground_depth_rmse_m": 0.0009690095903351903
+    },
+    {
+     "frame": "B_random_0150",
+     "raw": {
+      "psnr_db": 8.269940472378618,
+      "ssim": 0.7919992804527283,
+      "flip": 0.7125310897827148,
+      "lpips_alex": 0.4683842360973358
+     },
+     "brightness_matched": {
+      "psnr_db": 9.76240156105719,
+      "ssim": 0.8596155047416687,
+      "flip": 0.6585056781768799,
+      "lpips_alex": 0.43516263365745544
+     },
+     "brightness_gain_applied": 1.4086790084838867,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 6.146654263408458,
+       "ssim": 0.11727873235940933,
+       "flip": 0.2700663208961487,
+       "lpips_alex_crop": 0.34956657886505127
+      },
+      "brightness_matched": {
+       "psnr_db": 11.19315743055282,
+       "ssim": 0.3890114426612854,
+       "flip": 0.1796393096446991,
+       "lpips_alex_crop": 0.21719667315483093
+      },
+      "gain": 2.0495636463165283,
+      "crop_hw": [
+       127,
+       367
+      ],
+      "robot_fraction_of_crop": 0.29292625887704093
+     },
+     "silhouette_iou": 0.15256720134768914,
+     "silhouette_px": {
+      "isaac": 8156,
+      "metalsim": 7580
+     },
+     "robot_depth_rmse_m": 0.20772185921669006,
+     "robot_depth_agree_1cm": 0.02928468554968795,
+     "ground_depth_rmse_m": 0.0011369350831955671
+    },
+    {
+     "frame": "B_random_0175",
+     "raw": {
+      "psnr_db": 8.263134449878308,
+      "ssim": 0.7928517460823059,
+      "flip": 0.712853729724884,
+      "lpips_alex": 0.47426000237464905
+     },
+     "brightness_matched": {
+      "psnr_db": 9.761044959119968,
+      "ssim": 0.8609673976898193,
+      "flip": 0.6585731506347656,
+      "lpips_alex": 0.44092434644699097
+     },
+     "brightness_gain_applied": 1.40945303440094,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 5.8944304119323725,
+       "ssim": 0.059307198971509933,
+       "flip": 0.2257079780101776,
+       "lpips_alex_crop": 0.3290286660194397
+      },
+      "brightness_matched": {
+       "psnr_db": 11.00214692961643,
+       "ssim": 0.3919227719306946,
+       "flip": 0.1467960625886917,
+       "lpips_alex_crop": 0.21199826896190643
+      },
+      "gain": 2.132946491241455,
+      "crop_hw": [
+       149,
+       360
+      ],
+      "robot_fraction_of_crop": 0.233668903803132
+     },
+     "silhouette_iou": 0.0549704802936014,
+     "silhouette_px": {
+      "isaac": 6741,
+      "metalsim": 6482
+     },
+     "robot_depth_rmse_m": 0.2795986235141754,
+     "robot_depth_agree_1cm": 0.01741654571843251,
+     "ground_depth_rmse_m": 0.0010262542637065053
+    },
+    {
+     "frame": "B_random_0200",
+     "raw": {
+      "psnr_db": 8.273326179987164,
+      "ssim": 0.790571391582489,
+      "flip": 0.7123533487319946,
+      "lpips_alex": 0.47685959935188293
+     },
+     "brightness_matched": {
+      "psnr_db": 9.756446264782245,
+      "ssim": 0.8579449653625488,
+      "flip": 0.6591187119483948,
+      "lpips_alex": 0.4451296329498291
+     },
+     "brightness_gain_applied": 1.4079670906066895,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 6.141080082118906,
+       "ssim": 0.047689829021692276,
+       "flip": 0.18400618433952332,
+       "lpips_alex_crop": 0.2941950857639313
+      },
+      "brightness_matched": {
+       "psnr_db": 10.672360041321589,
+       "ssim": 0.35533300042152405,
+       "flip": 0.12980203330516815,
+       "lpips_alex_crop": 0.2160816788673401
+      },
+      "gain": 2.0045671463012695,
+      "crop_hw": [
+       173,
+       388
+      ],
+      "robot_fraction_of_crop": 0.198036469817055
+     },
+     "silhouette_iou": 0.0649213871962687,
+     "silhouette_px": {
+      "isaac": 6223,
+      "metalsim": 7933
+     },
+     "robot_depth_rmse_m": 0.1842993199825287,
+     "robot_depth_agree_1cm": 0.0,
+     "ground_depth_rmse_m": 0.0008018487133085728
+    },
+    {
+     "frame": "B_random_0225",
+     "raw": {
+      "psnr_db": 8.27234092717304,
+      "ssim": 0.792351245880127,
+      "flip": 0.7128767371177673,
+      "lpips_alex": 0.48169949650764465
+     },
+     "brightness_matched": {
+      "psnr_db": 9.775667969906367,
+      "ssim": 0.860231339931488,
+      "flip": 0.6583847403526306,
+      "lpips_alex": 0.44834795594215393
+     },
+     "brightness_gain_applied": 1.409250020980835,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 6.041998632279984,
+       "ssim": 0.0392148531973362,
+       "flip": 0.18489894270896912,
+       "lpips_alex_crop": 0.27717655897140503
+      },
+      "brightness_matched": {
+       "psnr_db": 11.707346091273452,
+       "ssim": 0.4116739332675934,
+       "flip": 0.11544390022754669,
+       "lpips_alex_crop": 0.16439229249954224
+      },
+      "gain": 2.1316471099853516,
+      "crop_hw": [
+       162,
+       384
+      ],
+      "robot_fraction_of_crop": 0.19167952674897118
+     },
+     "silhouette_iou": 0.0,
+     "silhouette_px": {
+      "isaac": 5938,
+      "metalsim": 5986
+     },
+     "robot_depth_rmse_m": null,
+     "robot_depth_agree_1cm": null,
+     "ground_depth_rmse_m": 0.0006843836163170636
+    },
+    {
+     "frame": "C_drop_0000",
+     "raw": {
+      "psnr_db": 8.231167316709193,
+      "ssim": 0.790665864944458,
+      "flip": 0.7155320048332214,
+      "lpips_alex": 0.4355875253677368
+     },
+     "brightness_matched": {
+      "psnr_db": 9.863529601893461,
+      "ssim": 0.8632340431213379,
+      "flip": 0.6532464623451233,
+      "lpips_alex": 0.39685648679733276
+     },
+     "brightness_gain_applied": 1.4217963218688965,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 7.814883274934172,
+       "ssim": 0.23337426781654358,
+       "flip": 0.26633089780807495,
+       "lpips_alex_crop": 0.33603793382644653
+      },
+      "brightness_matched": {
+       "psnr_db": 11.566440137036322,
+       "ssim": 0.4197078347206116,
+       "flip": 0.17342907190322876,
+       "lpips_alex_crop": 0.28997957706451416
+      },
+      "gain": 1.7069002389907837,
+      "crop_hw": [
+       271,
+       126
+      ],
+      "robot_fraction_of_crop": 0.3154981549815498
+     },
+     "silhouette_iou": 0.9625916643460503,
+     "silhouette_px": {
+      "isaac": 10556,
+      "metalsim": 10587
+     },
+     "robot_depth_rmse_m": 0.006788148079067469,
+     "robot_depth_agree_1cm": 0.9395371263259402,
+     "ground_depth_rmse_m": 2.2675325453747064e-05
+    },
+    {
+     "frame": "C_drop_0025",
+     "raw": {
+      "psnr_db": 8.264467808874711,
+      "ssim": 0.7930313944816589,
+      "flip": 0.7141558527946472,
+      "lpips_alex": 0.4333689510822296
+     },
+     "brightness_matched": {
+      "psnr_db": 9.808349926636375,
+      "ssim": 0.8628893494606018,
+      "flip": 0.6558689475059509,
+      "lpips_alex": 0.3973010778427124
+     },
+     "brightness_gain_applied": 1.4133623838424683,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 7.641921500816137,
+       "ssim": 0.1738014668226242,
+       "flip": 0.28935685753822327,
+       "lpips_alex_crop": 0.3181455433368683
+      },
+      "brightness_matched": {
+       "psnr_db": 11.395830608956834,
+       "ssim": 0.33236703276634216,
+       "flip": 0.19414584338665009,
+       "lpips_alex_crop": 0.299190878868103
+      },
+      "gain": 1.7268109321594238,
+      "crop_hw": [
+       261,
+       119
+      ],
+      "robot_fraction_of_crop": 0.34089957822209344
+     },
+     "silhouette_iou": 0.8857196826596146,
+     "silhouette_px": {
+      "isaac": 9992,
+      "metalsim": 9974
+     },
+     "robot_depth_rmse_m": 0.018882544711232185,
+     "robot_depth_agree_1cm": 0.6284922158242696,
+     "ground_depth_rmse_m": 0.0001275397080462426
+    },
+    {
+     "frame": "C_drop_0050",
+     "raw": {
+      "psnr_db": 8.251779967779996,
+      "ssim": 0.7902005314826965,
+      "flip": 0.7137331366539001,
+      "lpips_alex": 0.43792206048965454
+     },
+     "brightness_matched": {
+      "psnr_db": 9.768359819728957,
+      "ssim": 0.8589820861816406,
+      "flip": 0.6575853824615479,
+      "lpips_alex": 0.40197908878326416
+     },
+     "brightness_gain_applied": 1.4121860265731812,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 6.594185048802629,
+       "ssim": -0.009528576396405697,
+       "flip": 0.29397282004356384,
+       "lpips_alex_crop": 0.30682411789894104
+      },
+      "brightness_matched": {
+       "psnr_db": 10.51477886926239,
+       "ssim": 0.12634120881557465,
+       "flip": 0.22253906726837158,
+       "lpips_alex_crop": 0.2810133993625641
+      },
+      "gain": 1.9371899366378784,
+      "crop_hw": [
+       234,
+       157
+      ],
+      "robot_fraction_of_crop": 0.3423430780118678
+     },
+     "silhouette_iou": 0.5324004134531287,
+     "silhouette_px": {
+      "isaac": 9547,
+      "metalsim": 9726
+     },
+     "robot_depth_rmse_m": 0.08995354920625687,
+     "robot_depth_agree_1cm": 0.15830346475507767,
+     "ground_depth_rmse_m": 0.0003348625323269516
+    },
+    {
+     "frame": "C_drop_0075",
+     "raw": {
+      "psnr_db": 8.286995795962467,
+      "ssim": 0.7976040840148926,
+      "flip": 0.7122358083724976,
+      "lpips_alex": 0.43883150815963745
+     },
+     "brightness_matched": {
+      "psnr_db": 9.788751876646094,
+      "ssim": 0.8665795922279358,
+      "flip": 0.6567270755767822,
+      "lpips_alex": 0.4058181643486023
+     },
+     "brightness_gain_applied": 1.4088146686553955,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 7.15465778988994,
+       "ssim": 0.08812335133552551,
+       "flip": 0.1946907639503479,
+       "lpips_alex_crop": 0.2629697620868683
+      },
+      "brightness_matched": {
+       "psnr_db": 11.13541677872644,
+       "ssim": 0.24859918653964996,
+       "flip": 0.13318029046058655,
+       "lpips_alex_crop": 0.21536338329315186
+      },
+      "gain": 1.9272027015686035,
+      "crop_hw": [
+       145,
+       245
+      ],
+      "robot_fraction_of_crop": 0.22291344123856438
+     },
+     "silhouette_iou": 0.8155070084606643,
+     "silhouette_px": {
+      "isaac": 7274,
+      "metalsim": 7103
+     },
+     "robot_depth_rmse_m": 0.03234438970685005,
+     "robot_depth_agree_1cm": 0.3499535459894704,
+     "ground_depth_rmse_m": 0.0008630944066680968
+    },
+    {
+     "frame": "C_drop_0100",
+     "raw": {
+      "psnr_db": 8.287303777089313,
+      "ssim": 0.7982270121574402,
+      "flip": 0.7122836112976074,
+      "lpips_alex": 0.43899857997894287
+     },
+     "brightness_matched": {
+      "psnr_db": 9.789828594802415,
+      "ssim": 0.8672552704811096,
+      "flip": 0.6567202806472778,
+      "lpips_alex": 0.40596988797187805
+     },
+     "brightness_gain_applied": 1.4088540077209473,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 7.1792252346477206,
+       "ssim": 0.11985715478658676,
+       "flip": 0.189797505736351,
+       "lpips_alex_crop": 0.24373099207878113
+      },
+      "brightness_matched": {
+       "psnr_db": 11.185420923210037,
+       "ssim": 0.275909960269928,
+       "flip": 0.12616707384586334,
+       "lpips_alex_crop": 0.20875835418701172
+      },
+      "gain": 1.9312180280685425,
+      "crop_hw": [
+       145,
+       245
+      ],
+      "robot_fraction_of_crop": 0.21683321604503872
+     },
+     "silhouette_iou": 0.8508373361028171,
+     "silhouette_px": {
+      "isaac": 7094,
+      "metalsim": 7163
+     },
+     "robot_depth_rmse_m": 0.030395416542887688,
+     "robot_depth_agree_1cm": 0.38770216661580714,
+     "ground_depth_rmse_m": 0.0007953491294756532
+    },
+    {
+     "frame": "C_drop_0125",
+     "raw": {
+      "psnr_db": 8.287516235723798,
+      "ssim": 0.7981512546539307,
+      "flip": 0.7122843265533447,
+      "lpips_alex": 0.43921810388565063
+     },
+     "brightness_matched": {
+      "psnr_db": 9.790110687917394,
+      "ssim": 0.8671756386756897,
+      "flip": 0.6567378044128418,
+      "lpips_alex": 0.40630751848220825
+     },
+     "brightness_gain_applied": 1.4088371992111206,
+     "robot_crop": {
+      "raw": {
+       "psnr_db": 7.1825866724698875,
+       "ssim": 0.12032777070999146,
+       "flip": 0.18970081210136414,
+       "lpips_alex_crop": 0.2522563636302948
+      },
+      "brightness_matched": {
+       "psnr_db": 11.214740201685903,
+       "ssim": 0.2808729112148285,
+       "flip": 0.12676964700222015,
+       "lpips_alex_crop": 0.20774239301681519
+      },
+      "gain": 1.9317200183868408,
+      "crop_hw": [
+       145,
+       245
+      ],
+      "robot_fraction_of_crop": 0.21660802251935257
+     },
+     "silhouette_iou": 0.8505523066926576,
+     "silhouette_px": {
+      "isaac": 7097,
+      "metalsim": 7143
+     },
+     "robot_depth_rmse_m": 0.030240971595048904,
+     "robot_depth_agree_1cm": 0.39006875477463715,
+     "ground_depth_rmse_m": 0.0007892506546340883
+    }
+   ]
+  }
+ }
+}
