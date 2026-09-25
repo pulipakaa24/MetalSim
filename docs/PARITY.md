@@ -780,8 +780,11 @@ flat Newton/MuJoCo-Warp 72,025 (67,130), PhysX 45,114 (44,768); rough Newton/MuJ
 **Flat training, 1500 iterations, seed 0** (3.0 task with its extra events): Newton/MuJoCo-Warp +27.4
 return, tracking 0.94, 41.3 min at 59.6 K env-steps/s; PhysX +28.7, 0.94, 52.2 min at 47.0 K; both at
 episode length ~997. MetalSim (2.3.2 task, no push / mass events): +28.4 / 26.3 / 26.0 over three seeds
-at iteration 1000. Rough training on Newton was running at the time of writing (fetch pending on a
-credential refresh).
+at iteration 1000. Rough training on Newton/MuJoCo-Warp, 1500 iterations, seed 0 (`runs/parity3/isaac/train/train_rough_newton_mjwarp_terms.txt`,
+the 3.0 task with its extra events): return +3.0 / level 1.7 at 300, +8.9 / 4.2 at 500, +8.9 / 5.5 at
+1000, **+14.5 / level 5.80 / tracking 0.81 at 1499** (Isaac Lab 2.3.2 + PhysX: +14.1 / 5.90; MetalSim on
+the 2.3.2 rough task: +16.4 and +22.6 over two seeds, levels 6.1). Not like for like until 3.0's push and
+mass-randomization events are ported to our task.
 
 ## 2. Platform capabilities (the workstreams), with the tests behind them
 
