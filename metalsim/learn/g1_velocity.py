@@ -800,7 +800,7 @@ if __name__ == "__main__":
     import sys
     wp.config.quiet = True
     # optional flags (any position): --engine mjwarp|newton, --newton_it N, --newton_dt S
-    opts = {"--engine": "mjwarp", "--newton_it": "4", "--newton_dt": "0.00125", "--newton_limit_margin": "0.15", "--newton_kw": ""}
+    opts = {"--engine": "mjwarp", "--newton_it": "4", "--newton_dt": "0.00125", "--newton_limit_margin": "0.15", "--newton_kw": "", "--seed": "0"}
     for k in list(opts):
         if k in sys.argv:
             i = sys.argv.index(k); opts[k] = sys.argv[i + 1]; del sys.argv[i:i + 2]
@@ -814,7 +814,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 3 and sys.argv[3] == "train":
         train_g1(n, terrain, int(sys.argv[4]) if len(sys.argv) > 4 else 1500, log_path=sys.argv[5] if len(sys.argv) > 5 else None,
                  checkpoint=sys.argv[6] if len(sys.argv) > 6 and sys.argv[6] != "-" else None,
-                 physics_dt=float(sys.argv[7]) if len(sys.argv) > 7 else PHYSICS_DT, **ekw)
+                 physics_dt=float(sys.argv[7]) if len(sys.argv) > 7 else PHYSICS_DT, seed=int(opts["--seed"]), **ekw)
         sys.exit(0)
     task = G1VelocityTask(n, terrain=terrain, physics_dt=float(sys.argv[3]) if len(sys.argv) > 3 else PHYSICS_DT, **ekw)
     print(f"G1 ({terrain}, {task.engine}, physics dt {task.physics_dt}): nbody {task.model.nbody} nv {task.model.nv} nu {task.model.nu} ngeom {task.model.ngeom} obs_dim {task.obs_dim}")
