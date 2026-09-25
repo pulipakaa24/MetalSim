@@ -569,7 +569,7 @@ class NewtonSim:
                  device: str = "metal:0", mesh_to_box: bool = True, touch_bodies=("left_ankle_roll_link", "right_ankle_roll_link", "torso_link"),
                  hfield: dict | None = None, pose_bodies=("torso_link",), relaxation: float = 0.4,
                  actuator_kw: dict | None = None, solver_kw: dict | None = None, solver: str = "xpbd", project: bool = False,
-                 recenter: bool = False):
+                 recenter: bool = False, limit_margin: float | None = 0.15):
         import mujoco
         from metalsim.interop import warp_metal as wm
         self.mj_model = mj = mj_model
@@ -582,7 +582,7 @@ class NewtonSim:
         z0 = float(mj.key_qpos[0][2]) if mj.nkey else 0.74
         with wp.ScopedDevice(self.device):
             builder, act = scene(n, spacing=0.0, z0=z0, armature_inertia=False if solver == "featherstone" else "iso",
-                                 mesh_to_box=mesh_to_box, hfield=hfield, recenter=recenter)
+                                 mesh_to_box=mesh_to_box, hfield=hfield, recenter=recenter, limit_margin=limit_margin)
             builder.joint_target_ke = [0.0] * builder.joint_dof_count; builder.joint_target_kd = [0.0] * builder.joint_dof_count
             self.model = m = builder.finalize()
             m.request_contact_attributes("force")

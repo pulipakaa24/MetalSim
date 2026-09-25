@@ -769,10 +769,10 @@ def g1_ppo_config(terrain: str, iterations: int, seed: int = 0):
 
 
 def train_g1(n=4096, terrain="flat", iterations=1500, seed=None, log_path=None, checkpoint=None, physics_dt=PHYSICS_DT,
-             engine="mjwarp", newton_iterations=4, newton_dt=0.00125):
+             engine="mjwarp", newton_iterations=4, newton_dt=0.00125, newton_kw=None):
     from metalsim.learn.ppo_warp import PPOWarp
     task = G1VelocityTask(n, terrain=terrain, seed=seed, physics_dt=physics_dt, engine=engine,
-                          newton_iterations=newton_iterations, newton_dt=newton_dt)
+                          newton_iterations=newton_iterations, newton_dt=newton_dt, newton_kw=newton_kw)
     seed = task.seed                     # None -> the task's default (42 rough, Isaac's; 0 flat)
     algo = PPOWarp(task, g1_ppo_config(terrain, iterations, seed))
     f = open(log_path, "a") if log_path else None
@@ -780,7 +780,7 @@ def train_g1(n=4096, terrain="flat", iterations=1500, seed=None, log_path=None, 
         print(msg, flush=True)
         if f:
             f.write(msg + "\n"); f.flush()
-    eng = f"newton XPBD {newton_iterations} it" if engine == "newton" else "mjwarp"
+    eng = f"newton XPBD {newton_iterations} it {newton_kw or ''}" if engine == "newton" else "mjwarp"
     log(f"G1 {terrain} PPO: N={n} obs_dim {task.obs_dim} act_dim {task.act_dim} rollout 24 x {iterations} iterations, engine {eng}, "
         f"physics dt {task.physics_dt} (decimation {task.decimation}), seed {seed}")
     def save(path, it):
@@ -800,11 +800,13 @@ if __name__ == "__main__":
     import sys
     wp.config.quiet = True
     # optional flags (any position): --engine mjwarp|newton, --newton_it N, --newton_dt S
-    opts = {"--engine": "mjwarp", "--newton_it": "4", "--newton_dt": "0.00125"}
+    opts = {"--engine": "mjwarp", "--newton_it": "4", "--newton_dt": "0.00125", "--newton_limit_margin": "0.15"}
     for k in list(opts):
         if k in sys.argv:
             i = sys.argv.index(k); opts[k] = sys.argv[i + 1]; del sys.argv[i:i + 2]
     ekw = dict(engine=opts["--engine"], newton_iterations=int(opts["--newton_it"]), newton_dt=float(opts["--newton_dt"]))
+    if ekw["engine"] == "newton":         # "none": keep the USD's revolute limits (for a Newton build that unwraps angles)
+        lm = opts["--newton_limit_margin"]; ekw["newton_kw"] = {"limit_margin": None if lm.lower() == "none" else float(lm)}
     n = int(sys.argv[1]) if len(sys.argv) > 1 else 4096
     terrain = sys.argv[2] if len(sys.argv) > 2 else "flat"
     if len(sys.argv) > 3 and sys.argv[3] == "train":
