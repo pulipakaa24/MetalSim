@@ -6,7 +6,8 @@ under the PD hold (impact penetration, finite state), and a passive energy check
 floating, random initial joint velocities: kinetic energy after 2 s / initial; > 1 would mean energy injection).
 
 usage: python scripts/diagnostics/newton_drift_remedies.py [device] [setting ...]
-       setting = IT:DT_MS[:project] | fs:DT_MS"""
+       setting = IT:DT_MS[:project][:rc] | fs:DT_MS
+Revolute limits are kept inside +-(pi - 0.15) (NewtonSim default), rc = recentred joint zeros."""
 import sys, numpy as np, warp as wp, newton
 wp.config.quiet = True
 from metalsim.learn.g1_velocity import build_g1_model
@@ -27,7 +28,7 @@ def make(setting, n):
     p = setting.split(":")
     if p[0] == "fs":
         return nb.NewtonSim(M_MJ, n, dt=float(p[1]) * 1e-3, device=DEV, solver="featherstone")
-    return nb.NewtonSim(M_MJ, n, iterations=int(p[0]), dt=float(p[1]) * 1e-3, device=DEV, project="project" in p)
+    return nb.NewtonSim(M_MJ, n, iterations=int(p[0]), dt=float(p[1]) * 1e-3, device=DEV, project="project" in p, recenter="rc" in p)
 
 
 def place(sim, n, z=None, qvel=None):
