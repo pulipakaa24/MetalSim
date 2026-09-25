@@ -1,0 +1,44 @@
+# item 1 (revolute angle wrap), Thu Sep 24 21:58:59 PDT 2026, CPU device
+holder: {"name": "g1_flat_newton_ppo_fixed", "kind": "train", "minutes": 35.0, "pid": 58262, "start": 1790311689.588266}
+  waiting [timing] camera_update_3a est 8.0 min, queued 498 s ago
+  waiting [timing] g1_contact_sensor_cost est 10.0 min, queued 337 s ago
+  waiting [render] stage_videos est 10.0 min, queued 650 s ago
+  waiting [train] g1_flat_rslrl_isaacflatcfg est 30.0 min, queued 321 s ago
+fork commit f844a4e6
+$ .venv/bin/python scripts/diagnostics/newton_upstream/repro_angle_wrap.py
+revolute link, zero gravity, spun at 3 rad/s towards the upper limit (lower limit -0.5 rad), 1.5 s, dt 1.25 ms
+  upper limit 3.0 rad,  4 iterations: peak |qd|      3.0 rad/s, final energy / initial      0.024, final q +2.767
+  upper limit 3.0 rad, 16 iterations: peak |qd|      3.0 rad/s, final energy / initial      0.023, final q +2.771
+  upper limit 3.1 rad,  4 iterations: peak |qd|     11.3 rad/s, final energy / initial      0.396, final q -0.344
+  upper limit 3.1 rad, 16 iterations: peak |qd|     14.6 rad/s, final energy / initial      0.009, final q -0.438
+  upper limit 3.4 rad,  4 iterations: peak |qd| 746531.5 rad/s, final energy / initial 61923253388.028, final q +5.721
+  upper limit 3.4 rad, 16 iterations: peak |qd| 491629.7 rad/s, final energy / initial 26855527736.816, final q +5.792
+$ .venv/bin/python scripts/diagnostics/newton_fork/g1_checks.py energy --noclamp
+newton 1.7.0.dev0 at /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton {'commit_id': '45458023f24629c1feffb1f336594808f537db14', 'requested_revision': '45458023f24629c1feffb1f336594808f537db14', 'vcs': 'git'}
+| energy | 4 it / 1.25 ms, relax 0.4/0.4, limits USD (elbow 3.421) | KE(2 s)/KE0 924.902 | max KE/KE0 2492.707 | peak |qd| 2410.7 rad/s |
+$ .venv/bin/python scripts/diagnostics/newton_fork/g1_checks.py energy 
+newton 1.7.0.dev0 at /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton {'commit_id': '45458023f24629c1feffb1f336594808f537db14', 'requested_revision': '45458023f24629c1feffb1f336594808f537db14', 'vcs': 'git'}
+| energy | 4 it / 1.25 ms, relax 0.4/0.4, limits clamped pi-0.15 | KE(2 s)/KE0 0.595 | max KE/KE0 0.999 | peak |qd| 10.2 rad/s |
+$ .venv-newtonfork/bin/python scripts/diagnostics/newton_upstream/repro_angle_wrap.py
+revolute link, zero gravity, spun at 3 rad/s towards the upper limit (lower limit -0.5 rad), 1.5 s, dt 1.25 ms
+  upper limit 3.0 rad,  4 iterations: peak |qd|      3.0 rad/s, final energy / initial      0.029, final q +2.747
+  upper limit 3.0 rad, 16 iterations: peak |qd|      3.0 rad/s, final energy / initial      0.000, final q +2.975
+  upper limit 3.1 rad,  4 iterations: peak |qd|      3.0 rad/s, final energy / initial      0.027, final q +2.874
+  upper limit 3.1 rad, 16 iterations: peak |qd|      3.0 rad/s, final energy / initial      0.000, final q +3.083
+  upper limit 3.4 rad,  4 iterations: peak |qd|      3.0 rad/s, final energy / initial      0.027, final q +3.224
+  upper limit 3.4 rad, 16 iterations: peak |qd|      3.0 rad/s, final energy / initial      0.000, final q +3.383
+$ .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/g1_checks.py energy --noclamp
+newton 1.7.0.dev0 at /Users/aditya/robosim/upstream/newton/newton {'editable': True}
+| energy | 4 it / 1.25 ms, relax 0.4/0.4, limits USD (elbow 3.421) | KE(2 s)/KE0 0.598 | max KE/KE0 0.999 | peak |qd| 8.0 rad/s |
+$ .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/g1_checks.py energy 
+newton 1.7.0.dev0 at /Users/aditya/robosim/upstream/newton/newton {'editable': True}
+| energy | 4 it / 1.25 ms, relax 0.4/0.4, limits clamped pi-0.15 | KE(2 s)/KE0 0.595 | max KE/KE0 0.999 | peak |qd| 8.0 rad/s |
+$ <venv>/bin/python scripts/diagnostics/newton_fork/g1_checks.py sigma3 [--noclamp] --n 1024 --steps 400
+newton 1.7.0.dev0 at /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton {'commit_id': '45458023f24629c1feffb1f336594808f537db14', 'requested_revision': '45458023f24629c1feffb1f336594808f537db14', 'vcs': 'git'}
+| sigma3 | 4 it / 1.25 ms, relax 0.4, limits clamped pi-0.15 | 1024 envs x 400 steps | blown 36 | falls 12091 | peak |qd| 989 rad/s | 297 s |
+newton 1.7.0.dev0 at /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton {'commit_id': '45458023f24629c1feffb1f336594808f537db14', 'requested_revision': '45458023f24629c1feffb1f336594808f537db14', 'vcs': 'git'}
+| sigma3 | 4 it / 1.25 ms, relax 0.4, limits USD (elbow 3.421) | 1024 envs x 400 steps | blown 39 | falls 12097 | peak |qd| 989 rad/s | 297 s |
+newton 1.7.0.dev0 at /Users/aditya/robosim/upstream/newton/newton {'editable': True}
+| sigma3 | 4 it / 1.25 ms, relax 0.4, limits clamped pi-0.15 | 1024 envs x 400 steps | blown 11 | falls 12127 | peak |qd| 895 rad/s | 311 s |
+newton 1.7.0.dev0 at /Users/aditya/robosim/upstream/newton/newton {'editable': True}
+| sigma3 | 4 it / 1.25 ms, relax 0.4, limits USD (elbow 3.421) | 1024 envs x 400 steps | blown 17 | falls 12121 | peak |qd| 987 rad/s | 311 s |
