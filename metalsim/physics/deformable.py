@@ -428,6 +428,33 @@ def _xpbd_distance(x: wp.array2d(dtype=wp.vec3), xp: wp.array2d(dtype=wp.vec3), 
     x[w, j] = x[w, j] - n * (dl * wj)
 
 
+@wp.kernel
+def _xpbd_bend_mid(x: wp.array2d(dtype=wp.vec3), xp: wp.array2d(dtype=wp.vec3), inv_mass: wp.array(dtype=float),
+                   bi: wp.array(dtype=int), bj: wp.array(dtype=int), bk: wp.array(dtype=int), rest: wp.array(dtype=wp.vec3),
+                   compliance: wp.array(dtype=float), damping: wp.array(dtype=float), start: int, h: float):
+    # rod bending as the vector constraint C = x_j - (x_i + x_k)/2 - C0 (linear in the bend angle: for segment l and
+    # angle theta |C| = l theta / 2, so an angular stiffness EI/l maps to k = 4 EI / l^3), XPBD with damping as above
+    w, t0 = wp.tid()
+    t = start + t0
+    i = bi[t]
+    j = bj[t]
+    k = bk[t]
+    wi = inv_mass[i]
+    wj = inv_mass[j]
+    wk = inv_mass[k]
+    wsum = wj + 0.25 * (wi + wk)
+    if wsum == 0.0:
+        return
+    C = x[w, j] - 0.5 * (x[w, i] + x[w, k]) - rest[t]
+    dC = (x[w, j] - xp[w, j]) - 0.5 * ((x[w, i] - xp[w, i]) + (x[w, k] - xp[w, k]))
+    alpha = compliance[t] / (h * h)
+    gamma = compliance[t] * damping[t] / h
+    dl = -(C + gamma * dC) / ((1.0 + gamma) * wsum + alpha)
+    x[w, j] = x[w, j] + dl * wj
+    x[w, i] = x[w, i] - dl * (0.5 * wi)
+    x[w, k] = x[w, k] - dl * (0.5 * wk)
+
+
 @wp.func
 def _geom_sdf(gtype: int, size: wp.vec3, p: wp.vec3):
     """Signed distance and outward normal of a geom in its local frame."""
@@ -561,6 +588,8 @@ class XPBDCfg:
     friction: float = 0.8
     two_way: bool = False              # add contact reactions to MuJoCo Warp bodies' xfrc_applied
     bending: bool = True
+    rope_bending: str = "distance"     # 1D flexes: "distance" (i, i+2 distance constraints) or "midpoint" (rod bending,
+                                       # linear in the bend angle, k = 4 EI / l^3)
 
 
 class XPBDSim:
@@ -591,6 +620,7 @@ class XPBDSim:
         x0 = fd.flexvert_xpos.astype(np.float32).copy()
         # constraints: all edges (+ cross-edge bending pairs for 2D flexes, i/i+2 pairs for 1D)
         ci, cj, rest, comp, damp = [], [], [], [], []
+        trip_i, trip_j, trip_k, trip_rest, trip_comp, trip_damp = [], [], [], [], [], []
         for f in range(fm.nflex):
             va, ea, en = fm.flex_vertadr[f], fm.flex_edgeadr[f], fm.flex_edgenum[f]
             e = fm.flex_edge[ea:ea + en] + va
@@ -603,6 +633,13 @@ class XPBDSim:
                 flap = fm.flex_edgeflap[ea:ea + en]
                 ok = flap[:, 1] >= 0
                 bi, bj = flap[ok, 0] + va, flap[ok, 1] + va
+            elif fm.flex_dim[f] == 1 and cfg.rope_bending == "midpoint":
+                nb = fm.flex_vertnum[f]
+                ti = np.arange(nb - 2) + va
+                trip_i += list(ti); trip_j += list(ti + 1); trip_k += list(ti + 2)
+                trip_rest += list(x0[ti + 1] - 0.5 * (x0[ti] + x0[ti + 2]))
+                trip_comp += [cfg.bend_compliance] * len(ti); trip_damp += [cfg.bend_damping] * len(ti)
+                continue
             elif fm.flex_dim[f] == 1:
                 nb = fm.flex_vertnum[f]
                 bi, bj = np.arange(nb - 2) + va, np.arange(2, nb) + va
@@ -624,6 +661,25 @@ class XPBDSim:
             self.rest = wp.array(np.asarray(rest, np.float32)[order], dtype=float)
             self.comp = wp.array(np.asarray(comp, np.float32)[order], dtype=float)
             self.damp = wp.array(np.asarray(damp, np.float32)[order], dtype=float)
+            # rod-bending triplets, coloured so no two in a colour share a vertex
+            self.ntrip = len(trip_i)
+            if self.ntrip:
+                tcol = np.full(self.ntrip, -1)
+                used = [set() for _ in range(nvert)]
+                for t, (a, b_, c) in enumerate(zip(trip_i, trip_j, trip_k)):
+                    col = 0
+                    while col in used[a] or col in used[b_] or col in used[c]:
+                        col += 1
+                    tcol[t] = col
+                    used[a].add(col); used[b_].add(col); used[c].add(col)
+                to = np.argsort(tcol, kind="stable")
+                self.trip_bounds = [0] + list(np.cumsum(np.bincount(tcol)))
+                self.ti = wp.array(np.asarray(trip_i, np.int32)[to], dtype=int)
+                self.tj = wp.array(np.asarray(trip_j, np.int32)[to], dtype=int)
+                self.tk = wp.array(np.asarray(trip_k, np.int32)[to], dtype=int)
+                self.trest = wp.array(np.asarray(trip_rest, np.float32)[to], dtype=wp.vec3)
+                self.tcomp = wp.array(np.asarray(trip_comp, np.float32)[to], dtype=float)
+                self.tdamp = wp.array(np.asarray(trip_damp, np.float32)[to], dtype=float)
             self.x0 = x0
             self.x = wp.array(np.tile(x0, (num_envs, 1, 1)), dtype=wp.vec3)
             self.xp = wp.zeros_like(self.x)
@@ -683,6 +739,12 @@ class XPBDSim:
                 a, b = self.color_bounds[c], self.color_bounds[c + 1]
                 wp.launch(_xpbd_distance, dim=(n, b - a),
                           inputs=[self.x, self.xp, self.inv_mass, self.ci, self.cj, self.rest, self.comp, self.damp, a, h])
+            if self.ntrip:
+                for c in range(len(self.trip_bounds) - 1):
+                    a, b = self.trip_bounds[c], self.trip_bounds[c + 1]
+                    wp.launch(_xpbd_bend_mid, dim=(n, b - a),
+                              inputs=[self.x, self.xp, self.inv_mass, self.ti, self.tj, self.tk, self.trest, self.tcomp,
+                                      self.tdamp, a, h])
             wp.launch(_xpbd_collide, dim=(n, nv),
                       inputs=[self.x, self.xp, self.inv_mass, self.mass, self.radius, self.mu, self.geom_ids, self.geom_type_x,
                               self.geom_size3, self.geom_off, self.geom_friction3, self.m.geom_bodyid, self.d.geom_xpos, self.d.geom_xmat,
