@@ -1,0 +1,7 @@
+{
+ "xpbd/cloth": {"stretch_compliance": 1e-4, "bend_compliance": 5e-3, "stretch_damping": 0.2, "bend_damping": 0.2, "damping": 0.5, "substeps": 16},
+ "flex/cloth": {"edge_solref": null, "contact_solref": "0.01 1", "dt": 0.001},
+ "flex/rope": {"elastic_damping": 3e-5, "dt": 0.0005},
+ "xpbd/rope": {"stretch_compliance": 1e-7, "bend_compliance": 1e-2, "stretch_damping": 0.0, "bend_damping": 0.0, "damping": 0.0, "substeps": 16},
+ "flex/cube": {"elastic_damping": 1e-3, "contact_solref": "0.005 1", "dt": 0.0005}
+}

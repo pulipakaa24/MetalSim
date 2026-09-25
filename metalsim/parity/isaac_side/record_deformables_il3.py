@@ -16,7 +16,14 @@ PhysxSurfaceDeformableBodyMaterialCfg; NewtonDeformableBodyMaterialCfg / NewtonS
 CableMaterialCfg), except where --override says otherwise; every value actually used goes to meta.json.
 Newton solver settings follow scripts/demos/deformables.py (VBD 20 iterations, 4 substeps, soft contact ke 1e5 kd 1),
 with the soft-contact friction set to the ground/box friction (the demo's 0.01 would make every drape frictionless).
-Every scene is wrapped: a failure is recorded in meta.json ("errors") and the other scenes still run.
+Every scene is wrapped: a failure is recorded in meta.json ("errors") and the other scenes still run. After sim.reset()
+the prims under each scene (applied schemas and all attributes, including what the PhysX cooker wrote: simulation and
+collision tet meshes, springs, rest shapes) go to cooked_prims.json / cooked.npz.
+
+Comparison plan on the Mac (scripts/diagnostics/deformable/physx_protocol.py): the Newton-backend recording first
+against the same solver on Metal (Newton 1.5.2 VBD / SolverCoupledProxy in .venv-newton152), then MuJoCo Warp flex,
+MetalSim XPBDSim and the physx_cloth prototype as alternatives; the PhysX-backend recording against XPBD (PBD cloth)
+and flex (FEM volumes).
 """
 import argparse, json, os, time, traceback
 from isaaclab.app import add_launcher_args, launch_simulation
@@ -136,6 +143,47 @@ with launch_simulation(cfg=PhysicsCfg(), launcher_args=args) as physics_cfg:
             meta["errors"]["cube_setup"] = traceback.format_exc()
 
     sim.reset()
+
+    # the cooked deformable data Isaac/PhysX writes onto the prims (simulation/collision tet meshes, springs, rest
+    # shapes, applied schemas and every attribute): the cooker is closed source, so the inputs are dumped as written
+    def dump_prims(root_paths):
+        import omni.usd
+        from pxr import Usd
+        stage = omni.usd.get_context().get_stage()
+        attrs, arrays = {}, {}
+        for root in root_paths:
+            prim = stage.GetPrimAtPath(root)
+            if not prim or not prim.IsValid():
+                continue
+            for p in Usd.PrimRange(prim):
+                entry = {"type": str(p.GetTypeName()), "schemas": [str(x) for x in p.GetAppliedSchemas()], "attrs": {}}
+                for a in p.GetAttributes():
+                    try:
+                        v = a.Get()
+                    except Exception:  # noqa: BLE001
+                        continue
+                    if v is None:
+                        continue
+                    try:
+                        arr = np.asarray(v)
+                    except Exception:  # noqa: BLE001
+                        arr = None
+                    if arr is not None and arr.dtype != object and arr.size > 16:
+                        key = (str(p.GetPath()) + ":" + a.GetName()).replace("/", "|")
+                        arrays[key] = arr
+                        entry["attrs"][a.GetName()] = f"<array {arr.shape} {arr.dtype} in cooked.npz[{key}]>"
+                    else:
+                        entry["attrs"][a.GetName()] = str(v)
+                attrs[str(p.GetPath())] = entry
+        return attrs, arrays
+
+    try:
+        cooked, cooked_arrays = dump_prims(["/World/cloth_scene", "/World/rope_scene", "/World/cube_scene"])
+        json.dump(cooked, open(os.path.join(args.out, "cooked_prims.json"), "w"), indent=1)
+        np.savez_compressed(os.path.join(args.out, "cooked.npz"), **cooked_arrays)
+        meta["cooked_prims"] = len(cooked)
+    except Exception:  # noqa: BLE001
+        meta["errors"]["cooked_dump"] = traceback.format_exc()
 
     def T(a):
         return (a.torch if hasattr(a, "torch") else a).detach().cpu().numpy().copy()

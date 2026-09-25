@@ -400,9 +400,12 @@ def _xpbd_predict(x: wp.array2d(dtype=wp.vec3), xp: wp.array2d(dtype=wp.vec3), v
 
 
 @wp.kernel
-def _xpbd_distance(x: wp.array2d(dtype=wp.vec3), inv_mass: wp.array(dtype=float), ci: wp.array(dtype=int),
-                   cj: wp.array(dtype=int), rest: wp.array(dtype=float), compliance: wp.array(dtype=float),
-                   start: int, h: float):
+def _xpbd_distance(x: wp.array2d(dtype=wp.vec3), xp: wp.array2d(dtype=wp.vec3), inv_mass: wp.array(dtype=float),
+                   ci: wp.array(dtype=int), cj: wp.array(dtype=int), rest: wp.array(dtype=float),
+                   compliance: wp.array(dtype=float), damping: wp.array(dtype=float), start: int, h: float):
+    # XPBD distance constraint with compliance alpha = 1/k and Rayleigh-style damping beta = d (Macklin et al. 2016,
+    # eq. 26): gamma = alpha * d / h. With k, d per spring this is PhysX's particle-cloth spring (implicit spring
+    # k, d solved per TGS substep, PhysX 5.6.1 particlesystem.cu ps_solveSpringsLaunch).
     w, k0 = wp.tid()
     k = start + k0
     i = ci[k]
@@ -418,7 +421,9 @@ def _xpbd_distance(x: wp.array2d(dtype=wp.vec3), inv_mass: wp.array(dtype=float)
         return
     n = d / l
     alpha = compliance[k] / (h * h)
-    dl = -(l - rest[k]) / (wsum + alpha)
+    gamma = compliance[k] * damping[k] / h
+    rel = wp.dot(n, (x[w, i] - xp[w, i]) - (x[w, j] - xp[w, j]))
+    dl = -((l - rest[k]) + gamma * rel) / ((1.0 + gamma) * wsum + alpha)
     x[w, i] = x[w, i] + n * (dl * wi)
     x[w, j] = x[w, j] - n * (dl * wj)
 
@@ -550,6 +555,8 @@ class XPBDCfg:
     substeps: int = 10                 # per rigid (MuJoCo) step
     stretch_compliance: float = 1e-7   # m/N  (inverse stiffness of an edge)
     bend_compliance: float = 1e-3      # m/N  (cross-edge distance; 0 disables bending constraints if None)
+    stretch_damping: float = 0.0       # N s/m per edge constraint (XPBD damping; PhysX spring_damping)
+    bend_damping: float = 0.0          # N s/m per bending constraint
     damping: float = 0.5               # 1/s, velocity damping
     friction: float = 0.8
     two_way: bool = False              # add contact reactions to MuJoCo Warp bodies' xfrc_applied
@@ -583,12 +590,13 @@ class XPBDSim:
         mu = np.maximum(mu, cfg.friction)
         x0 = fd.flexvert_xpos.astype(np.float32).copy()
         # constraints: all edges (+ cross-edge bending pairs for 2D flexes, i/i+2 pairs for 1D)
-        ci, cj, rest, comp = [], [], [], []
+        ci, cj, rest, comp, damp = [], [], [], [], []
         for f in range(fm.nflex):
             va, ea, en = fm.flex_vertadr[f], fm.flex_edgeadr[f], fm.flex_edgenum[f]
             e = fm.flex_edge[ea:ea + en] + va
             ci += list(e[:, 0]); cj += list(e[:, 1])
             rest += list(np.linalg.norm(x0[e[:, 0]] - x0[e[:, 1]], axis=1)); comp += [cfg.stretch_compliance] * en
+            damp += [cfg.stretch_damping] * en
             if not cfg.bending:
                 continue
             if fm.flex_dim[f] == 2:
@@ -602,6 +610,7 @@ class XPBDSim:
                 continue
             ci += list(bi); cj += list(bj)
             rest += list(np.linalg.norm(x0[bi] - x0[bj], axis=1)); comp += [cfg.bend_compliance] * len(bi)
+            damp += [cfg.bend_damping] * len(bi)
         edges = np.stack([ci, cj], 1).astype(np.int32)
         order, self.color_bounds = _color_edges(edges, nvert)
         self.ncons = len(edges)
@@ -614,6 +623,7 @@ class XPBDSim:
             self.cj = wp.array(edges[order, 1], dtype=int)
             self.rest = wp.array(np.asarray(rest, np.float32)[order], dtype=float)
             self.comp = wp.array(np.asarray(comp, np.float32)[order], dtype=float)
+            self.damp = wp.array(np.asarray(damp, np.float32)[order], dtype=float)
             self.x0 = x0
             self.x = wp.array(np.tile(x0, (num_envs, 1, 1)), dtype=wp.vec3)
             self.xp = wp.zeros_like(self.x)
@@ -671,7 +681,8 @@ class XPBDSim:
             wp.launch(_xpbd_predict, dim=(n, nv), inputs=[self.x, self.xp, self.v, self.inv_mass, self.gravity, h, cfg.damping])
             for c in range(len(self.color_bounds) - 1):
                 a, b = self.color_bounds[c], self.color_bounds[c + 1]
-                wp.launch(_xpbd_distance, dim=(n, b - a), inputs=[self.x, self.inv_mass, self.ci, self.cj, self.rest, self.comp, a, h])
+                wp.launch(_xpbd_distance, dim=(n, b - a),
+                          inputs=[self.x, self.xp, self.inv_mass, self.ci, self.cj, self.rest, self.comp, self.damp, a, h])
             wp.launch(_xpbd_collide, dim=(n, nv),
                       inputs=[self.x, self.xp, self.inv_mass, self.mass, self.radius, self.mu, self.geom_ids, self.geom_type_x,
                               self.geom_size3, self.geom_off, self.geom_friction3, self.m.geom_bodyid, self.d.geom_xpos, self.d.geom_xmat,
