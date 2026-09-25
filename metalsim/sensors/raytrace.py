@@ -66,6 +66,7 @@ class RayTracer:
         lib = c.library("rt")
         self.p_refit = c.compute_pipeline(lib, "refit_instances")
         self.p_lidar = c.compute_pipeline(lib, "lidar")
+        self.p_lidar_ext = c.compute_pipeline(lib, "lidar_ext")
         self.p_depth = c.compute_pipeline(lib, "raycast_depth")
         self._build_primitive_structures()
         self._alloc_instance_structure()
@@ -145,8 +146,32 @@ class RayTracer:
 
     # -- sensors ------------------------------------------------------------------------------------
 
-    def make_lidar(self, site: str | int, azimuths: np.ndarray, elevations: np.ndarray):
-        return Lidar(self, site, azimuths, elevations)
+    def make_lidar(self, site: str | int, azimuths: np.ndarray, elevations: np.ndarray, **extras):
+        """``extras``: beam divergence / multi-return / reflectance options of ``Lidar``."""
+        return Lidar(self, site, azimuths, elevations, **extras)
+
+    def default_slot_reflectance(self) -> np.ndarray:
+        """Per-slot reflectance used by the default lidar kernel: MuJoCo material reflectance, 0.5 if unset."""
+        w = self.tables.materials.reshape(self.G, -1)[:, 15]
+        return np.where(w > 0, w, 0.5).astype(np.float32)
+
+    def slot_reflectance(self, reflectance=None) -> np.ndarray:
+        """Per-slot reflectance: the default, overridden by {geom name or regex: value} or an (ngeom,) array."""
+        import mujoco
+        import re
+        refl = self.default_slot_reflectance()
+        if reflectance is None:
+            return refl
+        geoms = np.asarray(self.tables.geoms)
+        if isinstance(reflectance, dict):
+            names = [mujoco.mj_id2name(self.m, mujoco.mjtObj.mjOBJ_GEOM, int(g)) or "" for g in geoms]
+            for key, val in reflectance.items():
+                hit = [k for k, nm in enumerate(names) if nm == key or re.fullmatch(key, nm)]
+                if not hit:
+                    raise ValueError(f"no traced geom matches {key!r}")
+                refl[hit] = val
+            return refl
+        return np.asarray(reflectance, np.float32)[geoms]
 
     def make_depth_camera(self, camera: str | int, width: int, height: int):
         return RayDepthCamera(self, camera, width, height)
@@ -191,9 +216,32 @@ class RayTracer:
 
 
 class Lidar:
-    """Beams given as (azimuth, elevation) pairs in the site frame (radians)."""
+    """Beams given as (azimuth, elevation) pairs in the site frame (radians).
 
-    def __init__(self, rt: RayTracer, site, azimuths, elevations, name="lidar"):
+    Default (no extras): one infinitesimal ray per beam, first hit; outputs (N, beams[, 3]),
+    identical to ``mj_ray`` up to tessellation.
+
+    Extras (Isaac Sim RTX lidar attributes in brackets; see ``lidar_ext`` in rt.metal for the model):
+
+    * ``divergence_deg=(hor, ver)`` full-angle beam divergence [``divergenceHorDeg``,
+      ``divergenceVerDeg``], sampled by ``spot_rays`` sub-rays (sunflower pattern over the elliptical
+      spot; ``beam_profile`` "uniform" [``UNIFORM_BEAM``] or "gaussian" (divergence = 1/e^2 full
+      width) [``GAUSSIAN_BEAM``]).
+    * ``max_returns`` [``maxReturns``]: echoes per beam; each sub-ray is re-cast past the object it
+      hit up to ``hits_per_ray`` times (default ``max_returns``), with power scaled by
+      ``transmission`` per pass; hits closer than ``min_echo_sep`` [``minDistBetweenEchosM``] merge
+      into one echo with the power-weighted mean range (mixed pixel).
+    * ``reflectance``: per-geom reflectance, {geom name or regex: value} or an (ngeom,) array;
+      unset geoms keep the default (MuJoCo material reflectance, else 0.5). intensity = sum over
+      the echo's hits of weight * reflectance * cos(incidence) / r^2.
+
+    With extras, outputs gain a trailing returns dimension when ``max_returns > 1``
+    ("range" (N, beams, R), "points" (N, beams, R, 3), ...) and "n_returns" (N, beams).
+    """
+
+    def __init__(self, rt: RayTracer, site, azimuths, elevations, name="lidar", *, divergence_deg=(0.0, 0.0),
+                 spot_rays: int = 1, beam_profile: str = "uniform", max_returns: int = 1, hits_per_ray: int | None = None,
+                 min_echo_sep: float = 0.4, transmission: float = 1.0, reflectance=None):
         import mujoco
         self.rt, self.name = rt, name
         m = rt.m
@@ -207,17 +255,62 @@ class Lidar:
         self.consts = rt.consts.copy()
         self.consts[6] = self.n_beams; self.consts[8] = self.site
         self.consts_buf = rt.ctx.buffer(self.consts.nbytes, self.consts, "lidar_consts")
+        hits_per_ray = int(hits_per_ray or max_returns)
+        self.extended = (spot_rays != 1 or max_returns != 1 or hits_per_ray != 1 or reflectance is not None
+                         or tuple(divergence_deg) != (0.0, 0.0))
+        self.max_returns = int(max_returns)
         n = rt.n
+        if not self.extended:
+            shp = (n, self.n_beams)
+        else:
+            if spot_rays * hits_per_ray > 32 or max_returns > 32 or spot_rays < 1 or max_returns < 1:
+                raise ValueError("spot_rays * hits_per_ray and max_returns must be <= 32 (LIDAR_MAX_CAND)")
+            self._setup_ext(divergence_deg, spot_rays, beam_profile, hits_per_ray, min_echo_sep, transmission, reflectance)
+            shp = (n, self.n_beams) if self.max_returns == 1 else (n, self.n_beams, self.max_returns)
         self._arrays = {
-            "range": wp.zeros((n, self.n_beams), dtype=wp.float32, device=rt.device),
-            "points": wp.zeros((n, self.n_beams, 3), dtype=wp.float32, device=rt.device),
-            "normals": wp.zeros((n, self.n_beams, 3), dtype=wp.float32, device=rt.device),
-            "slot": wp.zeros((n, self.n_beams), dtype=wp.int32, device=rt.device),
-            "intensity": wp.zeros((n, self.n_beams), dtype=wp.float32, device=rt.device),
+            "range": wp.zeros(shp, dtype=wp.float32, device=rt.device),
+            "points": wp.zeros(shp + (3,), dtype=wp.float32, device=rt.device),
+            "normals": wp.zeros(shp + (3,), dtype=wp.float32, device=rt.device),
+            "slot": wp.zeros(shp, dtype=wp.int32, device=rt.device),
+            "intensity": wp.zeros(shp, dtype=wp.float32, device=rt.device),
         }
+        if self.extended:
+            self._arrays["n_returns"] = wp.zeros((n, self.n_beams), dtype=wp.int32, device=rt.device)
         wp.synchronize_device(rt.device)
         self._views = {k: wm.buffer_of(a) for k, a in self._arrays.items()}
         self.out = {k: tb.mps_tensor(a) for k, a in self._arrays.items()}
+
+    @staticmethod
+    def spot_pattern(divergence_deg, spot_rays: int, beam_profile: str = "uniform") -> np.ndarray:
+        """(K, 4) sub-ray table: tangent-plane slopes along azimuth / elevation, power weight, 0.
+        Sunflower points over the unit disk scaled to the elliptical spot (half-angles = divergence/2);
+        K = 1 is the beam axis."""
+        K = int(spot_rays)
+        th, tv = np.tan(np.deg2rad(np.asarray(divergence_deg, np.float64) / 2.0))
+        i = np.arange(K)
+        rho = np.sqrt((i + 0.5) / K) if K > 1 else np.zeros(1)
+        phi = i * np.pi * (3.0 - np.sqrt(5.0))
+        x, y = rho * np.cos(phi), rho * np.sin(phi)
+        if beam_profile == "uniform":
+            w = np.ones(K)
+        elif beam_profile == "gaussian":
+            w = np.exp(-2.0 * rho ** 2)
+        else:
+            raise ValueError("beam_profile must be 'uniform' or 'gaussian'")
+        w = w / w.sum()
+        return np.stack([x * th, y * tv, w, np.zeros(K)], 1).astype(np.float32)
+
+    def _setup_ext(self, divergence_deg, spot_rays, beam_profile, hits_per_ray, min_echo_sep, transmission, reflectance):
+        rt = self.rt
+        self.sub = self.spot_pattern(divergence_deg, spot_rays, beam_profile)
+        self.sub_buf = rt.ctx.buffer(self.sub.nbytes, self.sub, "lidar_sub")
+        ext = np.zeros(8, np.uint32)
+        ext[0], ext[1], ext[2] = spot_rays, self.max_returns, hits_per_ray
+        ext.view(np.float32)[4] = min_echo_sep; ext.view(np.float32)[5] = transmission
+        self.ext_buf = rt.ctx.buffer(ext.nbytes, ext, "lidar_ext")
+        refl = rt.slot_reflectance(reflectance)
+        self.slot_reflectance = refl.astype(np.float32)
+        self.refl_buf = rt.ctx.buffer(self.slot_reflectance.nbytes, self.slot_reflectance, "lidar_refl")
 
     def encode(self, cb, sim=None):
         rt = self.rt
@@ -227,7 +320,7 @@ class Lidar:
         else:
             sxb, sxo, smb, smo = rt._host_site_xpos, 0, rt._host_site_xmat, 0
         ce = cb.computeCommandEncoder()
-        ce.setComputePipelineState_(rt.p_lidar)
+        ce.setComputePipelineState_(rt.p_lidar_ext if self.extended else rt.p_lidar)
         rt._use_resources(ce)
         ce.setAccelerationStructure_atBufferIndex_(rt.inst_as, 0)
         ce.setBuffer_offset_atIndex_(self.beam_buf, 0, 1)
@@ -238,12 +331,18 @@ class Lidar:
         ce.setBuffer_offset_atIndex_(rt.mesh_info, 0, 6)
         ce.setBuffer_offset_atIndex_(rt.vbuf, 0, 7)
         ce.setBuffer_offset_atIndex_(rt.ibuf, 0, 8)
-        ce.setBuffer_offset_atIndex_(rt.mat_buf, 0, 9)
+        ce.setBuffer_offset_atIndex_(self.refl_buf if self.extended else rt.mat_buf, 0, 9)
         ce.setBuffer_offset_atIndex_(rt.inst_desc, 0, 10)
         ce.setBuffer_offset_atIndex_(self.consts_buf, 0, 11)
-        for i, k in enumerate(("range", "points", "normals", "slot", "intensity")):
+        if self.extended:
+            ce.setBuffer_offset_atIndex_(self.sub_buf, 0, 12)
+            ce.setBuffer_offset_atIndex_(self.ext_buf, 0, 13)
+            keys, base = ("range", "points", "normals", "slot", "intensity", "n_returns"), 14
+        else:
+            keys, base = ("range", "points", "normals", "slot", "intensity"), 12
+        for i, k in enumerate(keys):
             v = self._views[k]
-            ce.setBuffer_offset_atIndex_(v.buffer, v.offset, 12 + i)
+            ce.setBuffer_offset_atIndex_(v.buffer, v.offset, base + i)
         ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n_beams, rt.n, 1), Metal.MTLSize(64, 1, 1))
         ce.endEncoding()
 
