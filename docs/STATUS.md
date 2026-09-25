@@ -41,6 +41,7 @@ published benchmark. Neither is cited as physics parity evidence.
 | Rendering tier 0: silhouette IoU > 0.95, texture corr > 0.99 | 0.994–0.997; 0.996 |
 | Rendering tier 1/2 vs Isaac RTX on a shared USD scene | not testable here (no Isaac); tier 2 validated radiometrically (analytic + furnace) and against tier 0 (43 dB direct light); tier 1 vs MuJoCo PSNR 19.7 |
 | Sensors: lidar vs Isaac RTX lidar | vs MuJoCo `mj_ray`: median < 2 mm; height scan exact on the heightfield |
+| Lidar-based RL | `metalsim.learn.lidar_nav` learns goal navigation from a 64-beam scan: 1024 envs × 300 iterations at 21.2 K env-steps/s, time-to-goal 218 → 69 steps (measured) |
 | Pipeline: zero host copies per step, one sync per rollout | runtime counters on physics, render, sensor and Warp-rollout loops: 0 syncs, 0 host ops |
 | Training: identical PPO config, identical result | G1 flat: Isaac's PPO config on Isaac's asset learns (episode length rises from ~40 to 343 steps over 300 iterations, `PARITY.md` §1.5; no published Isaac curve to match); cartpole (rsl_rl config) reaches 295/300; SO-101 lift demoted to a pipeline demo (success 0 at 3M steps, no published reference) |
 

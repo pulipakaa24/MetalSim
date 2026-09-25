@@ -188,6 +188,68 @@ per pair versus C's full manifold, and the plane contact measures depth to the t
 triangle rather than to the prism's nearest face, so contacts at step risers are stiffer than C's.
 Rough-terrain numbers below are therefore **measured on the patched kernel** and labelled as such.
 
+### 1.7 Fidelity protocol against Isaac Sim 5.1 on an L4 (recorded 2026-09-24, PhysX + RTX)
+
+`metalsim/parity/isaac_side/record_g1.py` runs three open-loop protocols in Isaac-Velocity-Flat-G1-v0
+(no reset randomization, no terminations, command (0.5, 0, 0)) and records joint state, root pose,
+torques, contact forces and camera frames (1024×576, camera at (3.2, −2.4, 1.4) looking at
+(0.3, 0, 0.6), vertical FOV 42°, one sun DistantLight 3000 + uniform dome 400) under the RTX real-time
+renderer ("rt", every 5 control steps) and the RTX path tracer ("pt", 32 spp, every 25).
+`metalsim.parity.record_g1` replays the same protocols on the same asset at 2.5 ms (decimation 8) from
+Isaac's recorded initial state and action sequence and renders tier 2 (16 spp × 4 passes) and tier 0
+from the same camera and lights. `metalsim.parity.compare` writes `runs/parity/report_{rt,pt}/report.json`.
+All numbers below are **measured**; Isaac's side ran PhysX at its task default (5 ms, 4 substeps).
+
+**Physics** (env 0; joint RMSE over the 37 joints; divergence = first step with any joint > 0.1 rad off):
+
+| protocol | joint RMSE 0.5 s / 1 s / 2 s / end | max | divergence | root z end Isaac / MetalSim (RMSE) | orientation err mean / max | contact peak Isaac / MetalSim | torque RMS Isaac / MetalSim | peak joint speed |
+|---|---|---|---|---|---|---|---|---|
+| A_hold (zero action, 3 s) | 0.005 / 0.006 / 0.009 / 0.027 rad | 0.045 | 1.34 s | 0.054 / 0.054 m (0.013) | 0.015 / 0.109 rad | 681 / 3866 N | 5.30 / 5.25 Nm | 6.9 / 6.3 rad/s |
+| B_random (3σ random targets, 5 s) | 0.116 / 0.125 / 0.101 / 0.034 rad | 0.209 | step 0 | 0.143 / 0.150 m (0.067) | 2.216 / 2.974 rad | 2890 / 1753 N | 30.1 / 28.5 Nm | 31.9 / 47.2 rad/s |
+| C_drop (zero action from 1.0 m, 3 s) | 0.014 / 0.015 / 0.006 / 0.024 rad | 0.064 | none | 0.054 / 0.054 m (0.035) | 0.058 / 0.237 rad | 1030 / 3499 N | 6.17 / 6.19 Nm | 10.6 / 7.2 rad/s |
+
+Reading: under Isaac's own gains the G1 cannot hold its default pose in either engine (both pitch
+forward and end on the torso at pelvis z 0.054 m, cf. §2.1); the hold and the drop agree to a few
+hundredths of a radian throughout, the same final resting state, and torque RMS within 1 %. The
+random-target protocol is chaotic and the two robots fall in different directions (mean orientation
+error 2.2 rad), so its per-joint numbers measure divergence of a chaotic trajectory, not a model
+difference; the peak joint speed (47 vs 32 rad/s) and the contact peaks are the informative rows.
+Two differences are systematic: (i) MetalSim's contact-force peaks in the falls are 3.4–5.7× Isaac's
+(3866 vs 681 N, 3499 vs 1030 N) with equal mean totals (319 vs 304 N, 332 vs 289 N): MuJoCo's soft
+contact at τ 20 ms resolves the impact into a shorter, higher spike; (ii) Isaac's finger joints move
+at t = 0 (±0.085 rad, 0.34 rad/s, decaying within 0.5 s; hip yaw −0.10 rad in the drop) while ours stay
+at their targets — a start-up transient on the PhysX side (hypothesis: finger self-collision at the
+default pose; not verified). The 0.1 rad divergence step of A_hold (1.34 s) is at the moment of the
+torso impact, where these transients and the contact model meet.
+
+**Rendering** (Isaac RTX vs MetalSim, same state per frame; brightness-matched = MetalSim scaled to
+Isaac's mean, because the engines' light units differ):
+
+| Isaac renderer | MetalSim tier | frames | whole frame, raw PSNR / SSIM / LPIPS / FLIP | whole frame, brightness-matched | robot pixels only (states agree, IoU > 0.7), brightness-matched PSNR / SSIM / FLIP, LPIPS on the crop | silhouette IoU | robot depth RMSE |
+|---|---|---|---|---|---|---|---|
+| RTX real-time | tier 2 (16 spp × 4) | 110 | 12.7 dB / 0.62 / 0.69 / 0.60 | 17.6 dB / 0.67 / 0.65 / 0.41 | 13.7 dB / 0.48 / 0.024 / 0.041 (n = 51) | 0.83 | 2.6 cm |
+| RTX real-time | tier 0 (raster) | 110 | 12.6 / 0.68 / 0.67 / 0.63 | 12.4 / 0.68 / 0.67 / 0.64 | 11.5 dB / 0.35 / 0.028 / 0.061 | 0.83 | 2.6 cm |
+| RTX path tracer, 32 spp | tier 2 | 22 | 12.0 / 0.61 / 0.70 / 0.62 | 17.3 / 0.67 / 0.66 / 0.42 | 13.8 dB / 0.49 / 0.026 / 0.040 (n = 12) | 0.84 | 2.9 cm |
+| RTX path tracer, 32 spp | tier 0 | 22 | 12.7 / 0.68 / 0.68 / 0.62 | 12.6 / 0.68 / 0.68 / 0.62 | 11.8 dB / 0.38 / 0.029 / 0.058 | 0.84 | 2.9 cm |
+
+How to read these. The **whole-frame** numbers are dominated by a scene mismatch, not by the
+renderers: Isaac Lab's plane terrain ignores `visual_material`, so Isaac's frames show its default
+blue grid ground and the neighbouring envs on the horizon, while MetalSim renders the grey plane the
+script asked both for (see the gallery composites). Brightness matching helps tier 2 by 5 dB because
+the engines' light units differ (MetalSim tier 2 is 1.3× brighter on the frame, 1.08× on the robot).
+The **robot-only** columns mask everything outside the union silhouette and average over the robot's
+pixels on frames where the physics states agree, so they compare the shading of the same asset with
+the same materials, sun and dome: tier 2 is 2 dB / +0.13 SSIM closer to RTX than tier 0, and Isaac's
+real-time and path-traced frames are equally far from ours (they are within 0.2 dB of each other),
+i.e. the gap is in the material and light model (MetalSim's plates render darker, its sun shadow is
+hard-edged; no denoiser, no area lights), not in noise. 13.7 dB / 0.48 SSIM on the robot is a **large**
+remaining gap and is reported as such; it is measured, not estimated. Silhouettes agree (IoU 0.83 on
+agreeing states; 0.48–0.52 over all frames because B_random diverges) and the robot's z-depth agrees to
+2.6–2.9 cm RMSE; the ground plane depth agrees to 7 mm, of which ~4 mm is tier 2's own depth noise.
+Depth conventions: both engines write z-depth; Isaac writes inf for the sky and clips at the 100 m far
+plane, MetalSim writes 0 on a miss (`compare.robot_mask`). A re-recording with the grey ground bound
+on the Isaac side (`stage6.sh`, one env, no horizon robots) is queued to replace the whole-frame rows.
+
 ## 2. Platform capabilities (the workstreams), with the tests behind them
 
 | capability | Isaac | ours | test (assertion) | result | verdict |
@@ -203,6 +265,7 @@ Rough-terrain numbers below are therefore **measured on the patched kernel** and
 | Camera-based RL: Isaac-Cartpole-RGB-Camera-Direct-v0 with the skrl agent Isaac Lab ships (image-only 100×100, NatureCNN + 512 ELU, 64-step rollouts, 4 epochs, 32 minibatches, lr 1e-4 KL-adaptive 0.008, value clip, per-image mean subtraction, running value scaler) | same config on `metalsim.learn.ppo` over the tier-0 renderer, 1024 envs (`metalsim.learn.train_cartpole_rgb`) | `runs/camera_cartpole_tier0.log`: 8M steps, return 8 → 85 (episode length 27 → 133 of 300), still rising; 7.5K env-steps/s incl. training, 76 % of it the CNN update on MPS | learns from pixels; Isaac publishes throughput only (32K on a 4090, 21K on an L40), no curve to match; tier 1 and tier 2 runs pending | confirmed (learning), partial (throughput) |
 | Tier 1 / tier 2 full rollouts (throughput) | Isaac Cartpole-RGB: 50K steps/s at 1024 envs on a 4090 (rasterized RTX, reported) | Cartpole-RGB 100×100, 1024 envs, physics + render + reward/reset, one run each, uncontended | `metalsim.learn.cartpole_rgb` (`python -m metalsim.learn.cartpole_rgb 1024`) | tier 0 47,911; tier 1 43,368; tier 2 (1 spp, 1 bounce) 36,896; tier 2 (1 spp, 2 bounces) 35,160; tier 2 (4 spp, 2 bounces) 19,894 env-steps/s (uncontended pass 2026-09-24) | measured; the tier-2 rollout is a full path-traced observation stream at 70 % of the raster rate (1 spp, noisy) |
 | Ray-traced sensors (lidar, depth) | RTX lidar | Metal RT acceleration structures refit from physics | `tests/test_sensors_rt.py::test_lidar_vs_mujoco_ray` (median < 2 mm, 95th < 2 cm, hit pattern within 3 %), `::test_raycast_depth_vs_raster_depth` (99.5 % agree, median < 1 mm) | pass | confirmed vs MuJoCo `mj_ray`; **not testable vs Isaac RTX lidar** |
+| Lidar-based RL (no Isaac Lab benchmark task exists; MetalSim task) | – | `metalsim.learn.lidar_nav`: 64-beam planar Metal RT lidar, goal navigation among 12 random boxes, vectorized PPO | `tests/test_lidar_nav.py` (scan == `mj_ray`, obs/reward invariants); run `runs/lidar_nav_ppo_300.log`: 1024 envs, 300 iterations, 7.37 M env-steps, 21.2 K env-steps/s including the update; success 1.00 → 0.99 while time-to-goal falls 218 → 69 control steps and contacts/step 0.012 → 0.014 | measured 2026-09-24 | confirmed (learns; no Isaac reference to compare against) |
 | IMU / contact / joint sensors as tensors | Isaac sensors | MuJoCo sensors evaluated per step | `tests/test_sensors_state.py::test_imu_and_contact_sensors_as_tensors` (accelerometer 9.81 at rest, ~0 in free fall; touch ≈ m g) | pass | confirmed |
 | Height scan on terrain | `RayCaster` | Metal ray queries | `tests/test_terrain.py::test_height_scan_matches_mj_ray` | pass | confirmed |
 | Replicator: randomizers, annotators, writers | Omniverse Replicator | GPU randomizers, 2-D/3-D boxes, semantic seg, COCO/KITTI/basic writers | `tests/test_replicator.py::test_randomize_annotate_write` (boxes equal the segmentation's extents, files written) | pass | confirmed for the implemented subset |

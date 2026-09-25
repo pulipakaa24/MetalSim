@@ -100,6 +100,20 @@
     <figcaption><b>isaac_comparison.png</b> (1600×800). Raw env-steps/s for the three rows of the "Headline comparisons against Isaac Lab" table in <code>docs/PHASES.md</code> that have both numbers: Cartpole-RGB 100×100 at 1024 envs, cartpole state rollout at 4096 envs, and the full cartpole PPO training loop at 4096 envs. Blue bars are <b>measured on this machine</b> (Apple M4 Max, 18.4 TFLOPS FP32, <code>metalsim.bench.suite</code>, uncontended). Orange bars are <b>NVIDIA's published Isaac Lab figures</b> for an RTX 4090 (82.6 TFLOPS FP32), not re-measured here, and each is annotated with what it covers (step only / step + inference / step + inference + train). <b>Caveat (read before quoting):</b> these cartpole tasks are MJCF equivalents with the same reward, reset and camera spec, not Isaac's USD asset, and the cartpole has no contacts, so the comparison exercises the pipeline (tiled render, zero-copy observations, graph replay) rather than the physics. The comparison on Isaac's own asset is the Unitree G1 velocity task loaded from Isaac Lab's <code>g1_minimal.usd</code> with Isaac's actuator table, initial state and solver budget; its numbers and the tests behind each row are in <code>docs/PARITY.md</code>. Per-TFLOPS ratios from <code>docs/PHASES.md</code>: 4.3×, 6.1×, 4.8×.</figcaption>
   </figure>
 
+  <h2>Fidelity protocol against Isaac Sim 5.1 (PhysX + RTX, NVIDIA L4)</h2>
+  <figure>
+    <img src="fidelity_A_hold_0025.png" alt="Isaac RTX, MetalSim tier 2 and MetalSim tier 0 renders of the G1 half a second into the hold protocol" width="3072" height="576">
+    <figcaption><b>fidelity_A_hold_0025.png</b> (3 × 1024×576). Left: Isaac Sim 5.1's RTX real-time renderer on an L4 (<code>metalsim/parity/isaac_side/record_g1.py</code>, protocol A_hold, 0.5 s). Middle: MetalSim tier 2 (16 spp × 4 passes) on the M4 Max from the same asset, state, camera and lights (<code>metalsim.parity.record_g1</code>). Right: MetalSim tier 0. The first Isaac recording kept Isaac Lab's default grid ground and the neighbouring envs on the horizon (the plane terrain ignores <code>visual_material</code>), so whole-frame metrics are scene-dominated; the robot-only metrics in <code>docs/PARITY.md</code> §1.7 mask the ground and sky. A re-recording with a grey ground is queued.</figcaption>
+  </figure>
+  <figure>
+    <img src="fidelity_crop_A_hold_0025.png" alt="Crops of the G1 from Isaac RTX, Isaac path tracer, MetalSim tier 2 and MetalSim tier 0" width="1120" height="250">
+    <figcaption><b>fidelity_crop_A_hold_0025.png</b>. The same instant, cropped: Isaac RTX real-time, Isaac RTX path tracer (32 spp), MetalSim tier 2, MetalSim tier 0. The robot's OmniPBR materials come from the same USD in both engines; MetalSim's plates render darker and its sun shadows harder (no area light, no denoiser), which is what the robot-only SSIM/PSNR in §1.7 measure.</figcaption>
+  </figure>
+  <figure>
+    <img src="fidelity_C_drop_0050.png" alt="Isaac RTX, MetalSim tier 2 and tier 0 one second into the 1 m drop protocol" width="3072" height="576">
+    <figcaption><b>fidelity_C_drop_0050.png</b>. Protocol C_drop (released from 1.0 m, zero action) at 1.0 s: PhysX (left) and MuJoCo Warp at 2.5 ms (middle, right) from the same initial state. Joint RMSE at this instant 0.015 rad, root height RMSE over the protocol 0.035 m; the contact-force peak is 3.4× higher in MetalSim (soft contact resolving the impact into a shorter spike). Numbers in §1.7.</figcaption>
+  </figure>
+
   <p class="muted">Machine: Apple M4 Max, 40-core GPU, 64 GB, macOS 26.7. Scripts: <code>scratch/gallery_scripts/01_so101_atlas_and_channels.py</code>, <code>03_primitives_grid.py</code>, <code>04_reference_vs_metalsim.py</code>, <code>05_rollout.py</code>, <code>06_throughput.py</code>, <code>07_tier1_vs_tier0_vs_reference.py</code>, <code>08_lidar_pointcloud.py</code>, <code>09_cartpole_learning_curve.py</code>, <code>10_isaac_comparison.py</code>, <code>11_cartpole_rgb_tiles.py</code>.</p>
 </main>
 </body>
