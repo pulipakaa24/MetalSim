@@ -1,0 +1,45 @@
+From a883b8b62906bf94325edce3f839802fd3b42822 Mon Sep 17 00:00:00 2001
+From: Aditya Pulipaka <adipu@utexas.edu>
+Date: Fri, 25 Sep 2026 04:14:45 -0700
+Subject: [PATCH 12/16] Mesh-flex contact normal: MuJoCo C's EPA direction at
+ edges and corners
+
+Upstream snapped the normal to the nearest mesh face whenever the witness lay within 5 mm of it, so cloth draped
+over a mesh box's edge pushed straight up where MuJoCo C pushes along the penetration direction (0.1-0.9 rad apart,
+measured). Now the face normal is kept only when it agrees with the EPA direction to 0.01 rad (float32 EPA error on
+face contacts, which the upstream 3D mesh parity test relies on); MESH_FLEX_FACE_NORMAL=True restores upstream.
+
+Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>
+---
+ mujoco_warp/_src/collision_flex.py | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/mujoco_warp/_src/collision_flex.py b/mujoco_warp/_src/collision_flex.py
+index 2982558..1f03811 100644
+--- a/mujoco_warp/_src/collision_flex.py
++++ b/mujoco_warp/_src/collision_flex.py
+@@ -65,6 +65,9 @@ FPS_COINCIDENT_D2: float = 1.0e-12
+ FLEX_RADIUS_CONTACT_POS: bool = True
+ # volume flexes: only active-layer elements collide with geoms (MuJoCo C's flex BVH holds only those)
+ FLEX_ACTIVE_LAYERS_ONLY: bool = True
++# mesh-flex contact normal snapped to the nearest mesh face (upstream) instead of MuJoCo C's EPA direction
++MESH_FLEX_FACE_NORMAL: bool = False
++MESH_FLEX_FACE_NORMAL_COS: float = 0.99995  # ~0.01 rad
+ # depth (m) and relative squared-distance differences treated as ties in the selection (float32 vs MuJoCo C's float64)
+ FPS_DEPTH_TIE: float = 1.0e-8
+ FPS_DIST_REL_TIE: float = 1.0e-6
+@@ -789,6 +792,11 @@ def _collide_mesh_convex(
+             best_normal = wp.normalize(geom_rot @ best_normal_local)
+ 
+       normal = wp.where(wp.dot(best_normal, gjk_normal) >= 0.0, best_normal, -best_normal)
++      if not wp.static(MESH_FLEX_FACE_NORMAL):
++        # MuJoCo C uses the penetration (EPA) direction. Keep the face normal only where it is that direction up to
++        # float32 EPA error (face contacts); at edges and corners use the EPA direction.
++        if wp.abs(wp.dot(normal, gjk_normal)) < wp.static(MESH_FLEX_FACE_NORMAL_COS):
++          normal = gjk_normal
+       contact_pos = 0.5 * (w1 + w2)
+       if wp.static(FLEX_RADIUS_CONTACT_POS):
+         # MuJoCo C inflates the element by its radius inside the CCD object: the contact point is the midpoint of
+-- 
+2.54.0 (Apple Git-157)
+

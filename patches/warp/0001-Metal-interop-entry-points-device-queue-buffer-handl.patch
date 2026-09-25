@@ -1,7 +1,7 @@
 From b39fee16e29a94690eeb38366cf26b7e657b0858 Mon Sep 17 00:00:00 2001
 From: Aditya Pulipaka <adipu@utexas.edu>
 Date: Tue, 22 Sep 2026 16:32:43 -0700
-Subject: [PATCH 1/5] Metal: interop entry points (device/queue/buffer handles,
+Subject: [PATCH 1/7] Metal: interop entry points (device/queue/buffer handles,
  foreign event wait and signal)
 
 Lets other users of the same Metal device (a renderer, PyTorch MPS) alias Warp
@@ -13,7 +13,7 @@ MTLEvent/MTLSharedEvent values instead of host synchronization.
  2 files changed, 125 insertions(+)
 
 diff --git a/warp/native/metal.h b/warp/native/metal.h
-index 116ee24..97d4944 100644
+index 116ee24c..97d4944a 100644
 --- a/warp/native/metal.h
 +++ b/warp/native/metal.h
 @@ -121,3 +121,21 @@ bool wp_metal_capture_host_op(int ordinal, std::function<bool()> op);
@@ -39,7 +39,7 @@ index 116ee24..97d4944 100644
 +WP_API int wp_metal_wait_event(int ordinal, void* event, uint64_t value);
 +}
 diff --git a/warp/native/metal.mm b/warp/native/metal.mm
-index 73535fd..90ef74f 100644
+index 73535fd9..90ef74f1 100644
 --- a/warp/native/metal.mm
 +++ b/warp/native/metal.mm
 @@ -1564,3 +1564,110 @@ int wp_metal_flush(int ordinal)

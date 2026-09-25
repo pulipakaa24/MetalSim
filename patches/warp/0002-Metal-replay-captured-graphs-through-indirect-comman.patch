@@ -1,7 +1,7 @@
 From b1ec949e925f0cf62a94fcc7f900b2ce176ec9e0 Mon Sep 17 00:00:00 2001
 From: Aditya Pulipaka <adipu@utexas.edu>
 Date: Tue, 22 Sep 2026 16:50:19 -0700
-Subject: [PATCH 2/5] Metal: replay captured graphs through indirect command
+Subject: [PATCH 2/7] Metal: replay captured graphs through indirect command
  buffers; runtime counters
 
 Graph replay re-encoded every recorded dispatch on the CPU (~4 us each; a MuJoCo
@@ -17,7 +17,7 @@ callers can assert a loop never synchronizes.
  2 files changed, 103 insertions(+)
 
 diff --git a/warp/native/metal.h b/warp/native/metal.h
-index 97d4944..09ac288 100644
+index 97d4944a..09ac288a 100644
 --- a/warp/native/metal.h
 +++ b/warp/native/metal.h
 @@ -138,4 +138,7 @@ WP_API uint64_t wp_metal_event_value(int ordinal);
@@ -29,7 +29,7 @@ index 97d4944..09ac288 100644
 +WP_API int wp_metal_counters(int ordinal, uint64_t* out, int n);
  }
 diff --git a/warp/native/metal.mm b/warp/native/metal.mm
-index 90ef74f..79b9014 100644
+index 90ef74f1..79b90141 100644
 --- a/warp/native/metal.mm
 +++ b/warp/native/metal.mm
 @@ -42,6 +42,16 @@

@@ -1,7 +1,7 @@
 From f2716b4e7873ed40b8405c0840238610349c7e7e Mon Sep 17 00:00:00 2001
 From: Aditya Pulipaka <adipu@utexas.edu>
 Date: Wed, 23 Sep 2026 15:10:08 -0700
-Subject: [PATCH 2/7] Heightfield collision: contact against the prism top
+Subject: [PATCH 02/16] Heightfield collision: contact against the prism top
  plane per triangle (MetalSim)
 
 Single-witness GJK/EPA against the whole prism column returned wrong normals and depths for thin

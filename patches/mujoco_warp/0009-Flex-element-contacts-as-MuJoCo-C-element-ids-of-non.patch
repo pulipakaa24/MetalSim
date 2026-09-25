@@ -1,0 +1,373 @@
+From fc07e836cd772bd694ed6fadbdc6831113c281d8 Mon Sep 17 00:00:00 2001
+From: Aditya Pulipaka <adipu@utexas.edu>
+Date: Fri, 25 Sep 2026 03:44:46 -0700
+Subject: [PATCH 09/16] Flex element contacts as MuJoCo C: element ids of
+ non-first flexes, cable capsule elements, radius-inflated contact points,
+ float32 ties
+
+- Element-geom contacts wrote the global element index where the contact Jacobian reads the flex-local one:
+  any 2D/3D flex after the first got the wrong element's vertices (a cloth that is the second flex fell
+  through a box: 0.76 m error vs MuJoCo C). Now local ids (MuJoCo C's convention).
+- 1D flexes (cables) against sphere/capsule/box collide their capsule elements with the raw primitives and
+  against mesh/ellipsoid/cylinder through CCD with the segment as a zero-radius capsule inflated by the flex
+  radius, as mj_collideGeomElem; element contacts get inverse-distance vertex weights in the Jacobian (they had
+  none: zero rows). CABLE_CAPSULE_ELEMENTS=False restores upstream's vertex-sphere contacts.
+- Mesh-element contact point at the midpoint of the radius-inflated penetration (as MuJoCo C and as the
+  convex CCD path already did for triangles); FLEX_RADIUS_CONTACT_POS=False restores the old point.
+- Contact selection: depth and distance differences at float32 rounding level count as ties (FPS_DEPTH_TIE,
+  FPS_DIST_REL_TIE, FPS_COINCIDENT_D2), since MuJoCo C's float64 values are exactly equal there.
+- Tests follow MuJoCo C (sphere-rope: C's 2 capsule contacts; FPS reference with the tie tolerances).
+
+Against MuJoCo C 3.14 from synchronized states, 400 steps: cable on box one-step qvel error 2.6e-5 (was 0.38),
+contact sets 84/84; second-flex cloth on box 3.8e-5 (was 0.76), 88/88; sphere/capsule/cylinder obstacles median
+3.1e-5 (max 0.06 where two triangles give the same point); cloth on a convex mesh median 0.027 (EPA witness
+points on face contacts differ).
+
+Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>
+---
+ mujoco_warp/_src/collision_flex.py | 120 ++++++++++++++++++++++++++---
+ mujoco_warp/_src/constraint.py     |  18 +++++
+ mujoco_warp/_src/flex_test.py      |  45 +++++++----
+ 3 files changed, 155 insertions(+), 28 deletions(-)
+
+diff --git a/mujoco_warp/_src/collision_flex.py b/mujoco_warp/_src/collision_flex.py
+index 073fa18..1f75d1c 100644
+--- a/mujoco_warp/_src/collision_flex.py
++++ b/mujoco_warp/_src/collision_flex.py
+@@ -56,6 +56,16 @@ ENABLE_GEOM_FLEX_FPS: bool = True
+ FLEX_FPS_MODE: str = "c314" if tuple(int(x) for x in mujoco.__version__.split(".")[:3]) <= (3, 14, 0) else "main"
+ # box-triangle contacts as MuJoCo C (all vertices and corners, up to 11 per element); False: upstream's first 2
+ BOX_TRIANGLE_ALL_CONTACTS: bool = True
++# 1D flex (cable) against sphere/capsule/box: capsule-element contacts as MuJoCo C (mj_collideGeomElem ->
++# mjraw_SphereCapsule / CapsuleCapsule / CapsuleBox); False: upstream's vertex-sphere contacts
++CABLE_CAPSULE_ELEMENTS: bool = True
++# squared distance (m^2) below which two candidates count as the same point in the contact selection
++FPS_COINCIDENT_D2: float = 1.0e-12
++# mesh-element contact point at the midpoint of the radius-inflated penetration (MuJoCo C); False: upstream's midpoint
++FLEX_RADIUS_CONTACT_POS: bool = True
++# depth (m) and relative squared-distance differences treated as ties in the selection (float32 vs MuJoCo C's float64)
++FPS_DEPTH_TIE: float = 1.0e-7
++FPS_DIST_REL_TIE: float = 1.0e-5
+ 
+ 
+ @wp.func
+@@ -778,6 +788,10 @@ def _collide_mesh_convex(
+ 
+       normal = wp.where(wp.dot(best_normal, gjk_normal) >= 0.0, best_normal, -best_normal)
+       contact_pos = 0.5 * (w1 + w2)
++      if wp.static(FLEX_RADIUS_CONTACT_POS):
++        # MuJoCo C inflates the element by its radius inside the CCD object: the contact point is the midpoint of
++        # the inflated penetration, half a radius deeper toward the geom
++        contact_pos = contact_pos - normal * (0.5 * geom2_radius)
+ 
+       _write_candidate(
+         max_candidates,
+@@ -1004,6 +1018,8 @@ def _flex_geom_vertex_narrowphase_detect(warn_overflow: int):
+         and gtype != int(GeomType.MESH)
+       ):
+         continue
++      if wp.static(CABLE_CAPSULE_ELEMENTS):
++        continue  # capsule-element contacts (elem narrowphase: raw primitives or CCD), as MuJoCo C
+ 
+       g_contype = geom_contype[geomid]
+       g_conaffinity = geom_conaffinity[geomid]
+@@ -1932,7 +1948,8 @@ def _flex_narrowphase_elem_detect(warn_overflow: int):
+ 
+     flexid = flex_elemflexid[elemid]
+     if flex_dim[flexid] < 2:
+-      return
++      if not wp.static(CABLE_CAPSULE_ELEMENTS) or flex_dim[flexid] != 1:
++        return
+ 
+     f_dim = flex_dim[flexid]
+     vert_adr = flex_vertadr[flexid]
+@@ -1979,6 +1996,29 @@ def _flex_narrowphase_elem_detect(warn_overflow: int):
+ 
+       elem_min = wp.min(t1, wp.min(t2, t3)) - wp.vec3(elem_radius, elem_radius, elem_radius)
+       elem_max = wp.max(t1, wp.max(t2, t3)) + wp.vec3(elem_radius, elem_radius, elem_radius)
++    elif f_dim == 1:
++      edata_idx = flex_elemdataadr[flexid] + local_elemid * 2
++      v0 = flex_elem[edata_idx]
++      v1 = flex_elem[edata_idx + 1]
++      t1 = flexvert_xpos_in[worldid, vert_adr + v0]
++      t2 = flexvert_xpos_in[worldid, vert_adr + v1]
++      centroid = 0.5 * (t1 + t2)
++      r_elem = 0.5 * wp.length(t2 - t1)
++      elem_min = wp.min(t1, t2) - wp.vec3(elem_radius, elem_radius, elem_radius)
++      elem_max = wp.max(t1, t2) + wp.vec3(elem_radius, elem_radius, elem_radius)
++      # segment as a zero-radius capsule for the convex (CCD) path; the flex radius inflates it there
++      seg_axis = wp.vec3(0.0, 0.0, 1.0)
++      if wp.length(t2 - t1) > 0.0:
++        seg_axis = wp.normalize(t2 - t1)
++      seg_ref = wp.vec3(1.0, 0.0, 0.0)
++      if wp.abs(seg_axis[0]) > 0.9:
++        seg_ref = wp.vec3(0.0, 1.0, 0.0)
++      seg_x = wp.normalize(wp.cross(seg_ref, seg_axis))
++      seg_y = wp.cross(seg_axis, seg_x)
++      geom2.pos = centroid
++      geom2.rot = wp.mat33(seg_x[0], seg_y[0], seg_axis[0], seg_x[1], seg_y[1], seg_axis[1], seg_x[2], seg_y[2], seg_axis[2])
++      geom2.size = wp.vec3(0.0, r_elem, 0.0)
++      geom2_type = int(GeomType.CAPSULE)
+     elif f_dim == 3:
+       edata_idx = flex_elemdataadr[flexid] + local_elemid * 4
+       v0 = flex_elem[edata_idx]
+@@ -2049,13 +2089,15 @@ def _flex_narrowphase_elem_detect(warn_overflow: int):
+       if not ((g_contype & f_conaffinity) or (f_contype & g_conaffinity)):
+         continue
+ 
++
+       # skip if element has vertices on the same body as geom
+       b = geom_bodyid[geomid]
+       if b >= 0:
+         b0 = flex_vertbodyid[vert_adr + v0]
+         b1 = flex_vertbodyid[vert_adr + v1]
+-        b2 = flex_vertbodyid[vert_adr + v2]
+-        if b == b0 or b == b1 or b == b2:
++        if b == b0 or b == b1:
++          continue
++        if f_dim >= 2 and b == flex_vertbodyid[vert_adr + v2]:
+           continue
+         if f_dim == 3 and b == flex_vertbodyid[vert_adr + v3]:
+           continue
+@@ -2094,6 +2136,59 @@ def _flex_narrowphase_elem_detect(warn_overflow: int):
+       if _flex_element_aabb_filter(geom_box_min, geom_box_max, elem_min, elem_max):
+         continue
+ 
++      if f_dim == 1 and (gtype == int(GeomType.SPHERE) or gtype == int(GeomType.CAPSULE) or gtype == int(GeomType.BOX)):
++        # MuJoCo C mj_collideGeomElem: capsule from the two vertices (makeCapsule), raw primitive, normal geom -> flex
++        seg = t2 - t1
++        seg_len = wp.length(seg)
++        cap_axis = wp.vec3(0.0, 0.0, 1.0)
++        if seg_len > 0.0:
++          cap_axis = seg / seg_len
++        cap_half = 0.5 * seg_len
++        cdists = wp.vec2(MJ_MAXVAL, MJ_MAXVAL)
++        cposs = collision_primitive_core.mat23f(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
++        cnrms = collision_primitive_core.mat23f(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
++        if gtype == int(GeomType.SPHERE):
++          sd, sp, sn = collision_primitive_core.sphere_capsule(geom_pos, geom_size_val[0], centroid, cap_axis, elem_radius, cap_half)
++          cdists = wp.vec2(sd, MJ_MAXVAL)
++          cposs = collision_primitive_core.mat23f(sp[0], sp[1], sp[2], 0.0, 0.0, 0.0)
++          cnrms = collision_primitive_core.mat23f(sn[0], sn[1], sn[2], 0.0, 0.0, 0.0)
++        elif gtype == int(GeomType.CAPSULE):
++          g_axis = wp.vec3(geom_rot[0, 2], geom_rot[1, 2], geom_rot[2, 2])
++          cdists, cposs, cnrms = collision_primitive_core.capsule_capsule(
++            geom_pos, g_axis, geom_size_val[0], geom_size_val[1], centroid, cap_axis, elem_radius, cap_half, margin
++          )
++        else:
++          cdists, cposs, cnrms = collision_primitive_core.capsule_box(
++            centroid, cap_axis, elem_radius, cap_half, geom_pos, geom_rot, geom_size_val
++          )
++          cnrms = -cnrms  # capsule -> box in the primitive; geom -> flex here (as MuJoCo C)
++        for ci in range(2):
++          if cdists[ci] < margin:
++            _write_candidate(
++              max_candidates,
++              cdists[ci],
++              wp.vec3(cposs[ci, 0], cposs[ci, 1], cposs[ci, 2]),
++              wp.vec3(cnrms[ci, 0], cnrms[ci, 1], cnrms[ci, 2]),
++              geomid,
++              -1,
++              flexid,
++              local_elemid,
++              -1,
++              worldid,
++              wp.static(bool(warn_overflow & OverflowType.NARROWPHASE)),
++              overflow_out,
++              cand_dist_out,
++              cand_pos_out,
++              cand_nrm_out,
++              cand_geom_out,
++              cand_flex_out,
++              cand_elem_out,
++              cand_vert_out,
++              cand_worldid_out,
++              ncand_out,
++            )
++        continue
++
+       if gtype == int(GeomType.MESH):
+         ccdid = wp.atomic_add(nccd, 0, 1)
+         if ccdid >= naccdmax_in:
+@@ -2136,7 +2231,7 @@ def _flex_narrowphase_elem_detect(warn_overflow: int):
+           margin,
+           geomid,
+           flexid,
+-          elemid,
++          local_elemid,
+           -1,
+           worldid,
+           epa_vert[ccdid],
+@@ -2179,7 +2274,7 @@ def _flex_narrowphase_elem_detect(warn_overflow: int):
+           margin,
+           geomid,
+           flexid,
+-          elemid,
++          local_elemid,
+           -1,
+           worldid,
+           wp.static(bool(warn_overflow & OverflowType.NARROWPHASE)),
+@@ -2249,7 +2344,7 @@ def _flex_narrowphase_elem_detect(warn_overflow: int):
+               normal = wp.normalize(centroid - geom_pos)
+ 
+             contact_pos = 0.5 * (w1 + w2)
+-            if f_dim == 2:
++            if f_dim <= 2:
+               contact_pos -= 0.5 * elem_radius * normal
+ 
+             _write_candidate(
+@@ -2260,7 +2355,7 @@ def _flex_narrowphase_elem_detect(warn_overflow: int):
+               geomid,
+               -1,
+               flexid,
+-              elemid,
++              local_elemid,
+               -1,
+               worldid,
+               wp.static(bool(warn_overflow & OverflowType.NARROWPHASE)),
+@@ -3147,7 +3242,8 @@ def _serial_fps(c314: bool):
+     bestdist = -cand_dist[slot_cand[g_start]]
+     for k in range(1, n):
+       dd = -cand_dist[slot_cand[g_start + k]]
+-      if dd > bestdist:
++      # ties within float32 rounding count as ties (MuJoCo C's float64 depths are equal there): first one wins
++      if dd > bestdist + wp.static(FPS_DEPTH_TIE):
+         bestdist = dd
+         best = k
+ 
+@@ -3162,9 +3258,11 @@ def _serial_fps(c314: bool):
+           continue
+         dp = cand_pos[slot_cand[g_start + k]] - bestpos
+         d2 = wp.dot(dp, dp)
++        if d2 < wp.static(FPS_COINCIDENT_D2):
++          d2 = 0.0  # coincident in MuJoCo C (same point from adjacent elements), apart only by float32 rounding
+         if d2 < slot_mind[g_start + k]:
+           slot_mind[g_start + k] = d2
+-        if slot_mind[g_start + k] > nextbestdist:
++        if slot_mind[g_start + k] > nextbestdist * wp.static(1.0 + FPS_DIST_REL_TIE) + wp.static(FPS_COINCIDENT_D2):
+           nextbestdist = slot_mind[g_start + k]
+           nextbest = k
+       if wp.static(c314):
+@@ -3612,8 +3710,8 @@ def _detect_elem_geom_candidates(
+   d: Data,
+   ws: FlexWorkspace,
+ ):
+-  """Detect candidates between 2D/3D flex elements and geoms."""
+-  if m.nflexelem == 0 or not (m.has_2d_flex or m.has_3d_flex):
++  """Detect candidates between flex elements and geoms (1D: sphere/capsule/box with CABLE_CAPSULE_ELEMENTS)."""
++  if m.nflexelem == 0 or not (m.has_2d_flex or m.has_3d_flex or (CABLE_CAPSULE_ELEMENTS and m.has_1d_flex)):
+     return
+ 
+   epa_iterations = m.opt.ccd_iterations
+diff --git a/mujoco_warp/_src/constraint.py b/mujoco_warp/_src/constraint.py
+index 9017e55..dfe15bd 100644
+--- a/mujoco_warp/_src/constraint.py
++++ b/mujoco_warp/_src/constraint.py
+@@ -2521,6 +2521,24 @@ def _get_contact_bodies_and_weights(
+   # Element contact: Retrieve local vertices
+   dim = flex_dim[flex_id]
+ 
++  if dim == 1:
++    # capsule element (cable) contact: inverse-distance weights over its two vertices, as for triangles
++    elem_data_start = flex_elemdataadr[flex_id] + elem_id * 2
++    v0 = flex_elem[elem_data_start + 0]
++    v1 = flex_elem[elem_data_start + 1]
++
++    x0 = flexvert_xpos_in[worldid, flex_vert_start + v0]
++    x1 = flexvert_xpos_in[worldid, flex_vert_start + v1]
++
++    w0 = 1.0 / wp.max(types.MJ_MINVAL, wp.length(con_pos - x0))
++    w1 = 1.0 / wp.max(types.MJ_MINVAL, wp.length(con_pos - x1))
++    w_sum = w0 + w1
++
++    b0 = flex_vertbodyid[flex_vert_start + v0]
++    b1 = flex_vertbodyid[flex_vert_start + v1]
++
++    return wp.vec4i(b0, b1, -1, -1), wp.vec4(w0 / w_sum, w1 / w_sum, 0.0, 0.0)
++
+   if dim == 2:
+     elem_data_start = flex_elemdataadr[flex_id] + elem_id * 3
+     v0 = flex_elem[elem_data_start + 0]
+diff --git a/mujoco_warp/_src/flex_test.py b/mujoco_warp/_src/flex_test.py
+index 9466ddd..3093026 100644
+--- a/mujoco_warp/_src/flex_test.py
++++ b/mujoco_warp/_src/flex_test.py
+@@ -1083,23 +1083,23 @@ class FlexCollisionTest(parameterized.TestCase):
+     mujoco.mj_flex(mjm, mjd)
+     mujoco.mj_collision(mjm, mjd)
+ 
+-    # Warp only detects vertex collision (1 contact per world)
+-    self.assertEqual(d.nacon.numpy()[0], nworld * 1)
+-    # MuJoCo detects edge collisions (2 contacts)
++    # MuJoCo C collides the rope's capsule elements (mj_collideGeomElem -> mjraw_SphereCapsule): 2 contacts;
++    # so does Warp with collision_flex.CABLE_CAPSULE_ELEMENTS (upstream: 1 vertex contact, vertex 3)
+     self.assertEqual(mjd.ncon, 2)
+-
++    self.assertEqual(d.nacon.numpy()[0], nworld * mjd.ncon)
++    ref = sorted((int(c.elem[1]), tuple(np.round(c.pos, 5)), round(float(c.dist), 6)) for c in mjd.contact[: mjd.ncon])
++    n = d.nacon.numpy()[0]
++    wid = d.contact.worldid.numpy()[:n]
+     for w in range(nworld):
+-      contacts_worldid = d.contact.worldid.numpy()[: d.nacon.numpy()[0]]
+-      w_indices = np.where(contacts_worldid == w)[0]
+-      self.assertEqual(len(w_indices), 1)
+-      idx = w_indices[0]
+-      # Verify it is vertex 3 contact
+-      self.assertEqual(int(d.contact.geom.numpy()[idx, 0]), 0)
+-      self.assertEqual(int(d.contact.geom.numpy()[idx, 1]), -1)
+-      self.assertEqual(int(d.contact.flex.numpy()[idx, 0]), -1)
+-      self.assertEqual(int(d.contact.flex.numpy()[idx, 1]), 0)
+-      self.assertEqual(int(d.contact.elem.numpy()[idx, 1]), -1)
+-      self.assertEqual(int(d.contact.vert.numpy()[idx, 1]), 3)
++      idx = np.where(wid == w)[0]
++      got = sorted(
++        (int(d.contact.elem.numpy()[i, 1]), tuple(np.round(d.contact.pos.numpy()[i], 5)), round(float(d.contact.dist.numpy()[i]), 6))
++        for i in idx
++      )
++      self.assertEqual([g[0] for g in got], [r[0] for r in ref])
++      np.testing.assert_allclose([g[1] for g in got], [r[1] for r in ref], atol=1e-5)
++      np.testing.assert_allclose([g[2] for g in got], [r[2] for r in ref], atol=1e-5)
++      self.assertTrue(np.all(d.contact.vert.numpy()[idx, 1] == -1))
+ 
+   @parameterized.parameters(1, 2)
+   def test_mesh_rope_collision(self, nworld):
+@@ -1875,6 +1875,12 @@ class FlexCollisionTest(parameterized.TestCase):
+ 
+     self.assertGreater(num_groups, 0)
+     checked = 0
++    # the serial modes treat float32-level differences as ties; the parallel mode compares exactly
++    tie_depth, tie_rel, tie_d2 = (
++      (0.0, 0.0, 0.0)
++      if mode == "parallel"
++      else (collision_flex.FPS_DEPTH_TIE, collision_flex.FPS_DIST_REL_TIE, collision_flex.FPS_COINCIDENT_D2)
++    )
+     for g in range(num_groups):
+       g_start = group_starts[g]
+       g_end = group_starts[g + 1] if g + 1 < num_groups else ncand
+@@ -1886,7 +1892,10 @@ class FlexCollisionTest(parameterized.TestCase):
+       slot = list(cands)
+       sel = [False] * n
+       mind = [np.inf] * n
+-      best = int(np.argmax([-cand_dist[c] for c in slot]))  # first maximum
++      best = 0  # first maximum (depth ties within FPS_DEPTH_TIE)
++      for k in range(1, n):
++        if -cand_dist[slot[k]] > -cand_dist[slot[best]] + tie_depth:
++          best = k
+       nsel = 0
+       chosen = []
+       while nsel < types.MJ_MAXCONPAIR and best >= 0:
+@@ -1898,8 +1907,10 @@ class FlexCollisionTest(parameterized.TestCase):
+           if sel[k]:
+             continue
+           d2 = float(np.sum((cand_pos[slot[k]] - bp) ** 2))
++          if d2 < tie_d2:
++            d2 = 0.0
+           mind[k] = min(mind[k], d2)
+-          if mind[k] > nbd:
++          if mind[k] > nbd * (1.0 + tie_rel) + tie_d2:
+             nbd, nb = mind[k], k
+         if mode == "c314" and nsel < types.MJ_MAXCONPAIR - 1:
+           slot[nsel], slot[best] = slot[best], slot[nsel]
+-- 
+2.54.0 (Apple Git-157)
+

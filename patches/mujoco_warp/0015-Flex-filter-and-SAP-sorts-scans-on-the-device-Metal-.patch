@@ -1,0 +1,328 @@
+From 73edca8266b3458cfe7f0c39eb90a09d6992229f Mon Sep 17 00:00:00 2001
+From: Aditya Pulipaka <adipu@utexas.edu>
+Date: Fri, 25 Sep 2026 08:49:34 -0700
+Subject: [PATCH 15/16] Flex filter and SAP sorts/scans on the device (Metal):
+ bitonic per world, two-level scan
+
+Warp's radix/segmented sort and scan run on the host on Metal (recorded host calls in the graph). Measured on
+the CPU at the sizes of 4096 worlds of a 10x10 cloth + cable: segmented sort of the SAP projections 172 ms,
+radix sort of 2.8 M filter keys 25 ms, per step. Now: candidates bucketed by world, each world's segment sorted by
+a bitonic network on (key, candidate index) (equal keys keep candidate order, which within an element is
+MuJoCo C's generation order), gathered world-major (= the global sort's result); the SAP's per-world rows sorted
+the same way; scans in two device levels. FLEX_DEVICE_SORT (None = all but CUDA) selects the path; contact
+selections are identical to the host sorts (fidelity harness: same sets and errors).
+
+Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>
+---
+ mujoco_warp/_src/collision_flex.py | 260 +++++++++++++++++++++++++++--
+ 1 file changed, 247 insertions(+), 13 deletions(-)
+
+diff --git a/mujoco_warp/_src/collision_flex.py b/mujoco_warp/_src/collision_flex.py
+index b8becf5..a943885 100644
+--- a/mujoco_warp/_src/collision_flex.py
++++ b/mujoco_warp/_src/collision_flex.py
+@@ -67,6 +67,15 @@ FLEX_RADIUS_CONTACT_POS: bool = True
+ FLEX_ACTIVE_LAYERS_ONLY: bool = True
+ # mesh-flex contact normal snapped to the nearest mesh face (upstream) instead of MuJoCo C's EPA direction
+ MESH_FLEX_FACE_NORMAL: bool = False
++# filter / SAP sorts and scans on the device (bitonic per world, two-level scan) instead of Warp's utilities, which
++# run on the host on Metal. None: on everywhere except CUDA (whose utilities are device sorts already)
++FLEX_DEVICE_SORT: bool | None = None
++
++
++def _device_sort() -> bool:
++  if FLEX_DEVICE_SORT is not None:
++    return bool(FLEX_DEVICE_SORT)
++  return not wp.get_device().is_cuda
+ MESH_FLEX_FACE_NORMAL_COS: float = 0.99995  # ~0.01 rad
+ # depth (m) and relative squared-distance differences treated as ties in the selection (float32 vs MuJoCo C's float64)
+ FPS_DEPTH_TIE: float = 1.0e-8
+@@ -3308,6 +3317,219 @@ def _serial_fps(c314: bool):
+   return kernel
+ 
+ 
++# --------------------------------------------------------------------------------------------------
++# Device-side sort and scan for the flex filter and SAP (FLEX_DEVICE_SORT)
++#
++# Warp's radix/segmented sort and scan run on the host on Metal (recorded host calls inside a graph): a
++# segmented sort of 4096 worlds x 173 elements took 172 ms and a radix sort of 2.8 M candidates 25 ms per step
++# (CPU, measured). These replacements stay on the device: per-world segments sorted by a bitonic network
++# (lexicographic on (key, value), so equal keys keep their candidate order), and a two-level scan.
++# --------------------------------------------------------------------------------------------------
++
++
++@wp.kernel
++def _bitonic_step_f32(keys: wp.array2d[float], vals: wp.array2d[int], j: int, k: int):
++  w, i = wp.tid()
++  l = i ^ j
++  if l > i:
++    a = keys[w, i]
++    b = keys[w, l]
++    va = vals[w, i]
++    vb = vals[w, l]
++    a_gt_b = a > b or (a == b and va > vb)
++    if a_gt_b == ((i & k) == 0):
++      keys[w, i] = b
++      keys[w, l] = a
++      vals[w, i] = vb
++      vals[w, l] = va
++
++
++@wp.kernel
++def _bitonic_step_i64(keys: wp.array2d[wp.int64], vals: wp.array2d[int], j: int, k: int):
++  w, i = wp.tid()
++  l = i ^ j
++  if l > i:
++    a = keys[w, i]
++    b = keys[w, l]
++    va = vals[w, i]
++    vb = vals[w, l]
++    a_gt_b = a > b or (a == b and va > vb)
++    if a_gt_b == ((i & k) == 0):
++      keys[w, i] = b
++      keys[w, l] = a
++      vals[w, i] = vb
++      vals[w, l] = va
++
++
++def _bitonic_sort_rows(keys: wp.array, vals: wp.array):
++  """Sort every row of (nrow, P) keys/values ascending by (key, value); P a power of two."""
++  n = keys.shape[1]
++  assert n & (n - 1) == 0
++  kern = _bitonic_step_i64 if keys.dtype == wp.int64 else _bitonic_step_f32
++  k = 2
++  while k <= n:
++    j = k // 2
++    while j >= 1:
++      wp.launch(kern, dim=keys.shape, inputs=[keys, vals, j, k])
++      j //= 2
++    k *= 2
++
++
++_SCAN_BLOCK = 256
++
++
++@wp.kernel
++def _scan_block_sums(src: wp.array[int], n: int, sums: wp.array[int]):
++  b = wp.tid()
++  s = int(0)
++  for t in range(_SCAN_BLOCK):
++    i = b * _SCAN_BLOCK + t
++    if i < n:
++      s += src[i]
++  sums[b] = s
++
++
++@wp.kernel
++def _scan_sums_serial(sums: wp.array[int], nblock: int, offs: wp.array[int]):
++  acc = int(0)
++  for b in range(nblock):
++    offs[b] = acc
++    acc += sums[b]
++
++
++@wp.kernel
++def _scan_apply(src: wp.array[int], n: int, offs: wp.array[int], inclusive: int, dst: wp.array[int]):
++  b = wp.tid()
++  acc = offs[b]
++  for t in range(_SCAN_BLOCK):
++    i = b * _SCAN_BLOCK + t
++    if i < n:
++      v = src[i]
++      if inclusive != 0:
++        acc += v
++        dst[i] = acc
++      else:
++        dst[i] = acc
++        acc += v
++
++
++def _device_scan(src: wp.array, dst: wp.array, inclusive: bool = True):
++  """Prefix sum of an int array on the device (two levels: block sums, a serial pass over them, apply)."""
++  n = src.size
++  nblock = (n + _SCAN_BLOCK - 1) // _SCAN_BLOCK
++  sums = wp.empty(nblock, dtype=int)
++  offs = wp.empty(nblock, dtype=int)
++  wp.launch(_scan_block_sums, dim=nblock, inputs=[src.reshape(-1), n, sums])
++  wp.launch(_scan_sums_serial, dim=1, inputs=[sums, nblock, offs])
++  wp.launch(_scan_apply, dim=nblock, inputs=[src.reshape(-1), n, offs, int(inclusive), dst.reshape(-1)])
++
++
++@wp.kernel
++def _filter_world_scatter(
++  ncand: wp.array[int],
++  cand_worldid: wp.array[int],
++  key_in: wp.array[wp.int64],
++  seg_cap: int,
++  # Out:
++  wcount: wp.array[int],
++  seg_key: wp.array2d[wp.int64],
++  seg_val: wp.array2d[int],
++  overflow_out: wp.array[int],
++):
++  i = wp.tid()
++  if i >= ncand[0]:
++    return
++  w = cand_worldid[i]
++  j = wp.atomic_add(wcount, w, 1)
++  if j < seg_cap:
++    seg_key[w, j] = key_in[i]
++    seg_val[w, j] = i
++  else:
++    wp.atomic_or(overflow_out, w, wp.static(OverflowType.NARROWPHASE))
++
++
++@wp.kernel
++def _filter_world_offsets(wcount: wp.array[int], seg_cap: int, woff: wp.array[int]):
++  acc = int(0)
++  for w in range(wcount.shape[0]):
++    woff[w] = acc
++    acc += wp.min(wcount[w], seg_cap)
++
++
++@wp.kernel
++def _filter_world_gather(
++  wcount: wp.array[int],
++  woff: wp.array[int],
++  seg_key: wp.array2d[wp.int64],
++  seg_val: wp.array2d[int],
++  seg_cap: int,
++  # Out:
++  key_out: wp.array[wp.int64],
++  val_out: wp.array[int],
++):
++  w, j = wp.tid()
++  if j < wp.min(wcount[w], seg_cap):
++    key_out[woff[w] + j] = seg_key[w, j]
++    val_out[woff[w] + j] = seg_val[w, j]
++
++
++def _device_filter_sort(m: Model, d: Data, ws):
++  """Sort the candidates' filter keys like radix_sort_pairs(filter_key, filter_val, naconmax), on the device:
++  bucket by world, bitonic-sort each world's segment by (key, candidate index), gather world-major."""
++  seg_cap = 1
++  while seg_cap < max(1, d.naconmax // d.nworld):
++    seg_cap *= 2
++  seg_key = wp.full((d.nworld, seg_cap), wp.int64(9223372036854775807), dtype=wp.int64)
++  seg_val = wp.full((d.nworld, seg_cap), 2147483647, dtype=int)
++  wcount = wp.zeros(d.nworld, dtype=int)
++  woff = wp.empty(d.nworld, dtype=int)
++  wp.launch(
++    _filter_world_scatter,
++    dim=d.naconmax,
++    inputs=[ws.ncand, ws.worldid, ws.filter_key, seg_cap],
++    outputs=[wcount, seg_key, seg_val, d.overflow],
++  )
++  _bitonic_sort_rows(seg_key, seg_val)
++  wp.launch(_filter_world_offsets, dim=1, inputs=[wcount, seg_cap], outputs=[woff])
++  # the gathered prefix replaces the first ncand keys; the rest keep the "unused" key from _compute_filter_key
++  wp.launch(
++    _filter_world_gather,
++    dim=(d.nworld, seg_cap),
++    inputs=[wcount, woff, seg_key, seg_val, seg_cap],
++    outputs=[ws.filter_key, ws.filter_val],
++  )
++
++
++@wp.kernel
++def _rows_pad_in(keys: wp.array2d[float], vals: wp.array2d[int], n: int, pk: wp.array2d[float], pv: wp.array2d[int]):
++  w, j = wp.tid()
++  if j < n:
++    pk[w, j] = keys[w, j]
++    pv[w, j] = vals[w, j]
++  else:
++    pk[w, j] = MJ_MAXVAL
++    pv[w, j] = 2147483647
++
++
++@wp.kernel
++def _rows_pad_out(pk: wp.array2d[float], pv: wp.array2d[int], keys: wp.array2d[float], vals: wp.array2d[int]):
++  w, j = wp.tid()
++  keys[w, j] = pk[w, j]
++  vals[w, j] = pv[w, j]
++
++
++def _device_rows_sort_f32(keys: wp.array, vals: wp.array, nrow: int, n: int):
++  """Sort the first nrow rows (n entries each) of keys/values on the device (the SAP's per-world segments)."""
++  p = 1
++  while p < n:
++    p *= 2
++  pk = wp.empty((nrow, p), dtype=float)
++  pv = wp.empty((nrow, p), dtype=int)
++  wp.launch(_rows_pad_in, dim=(nrow, p), inputs=[keys, vals, n, pk, pv])
++  _bitonic_sort_rows(pk, pv)
++  wp.launch(_rows_pad_out, dim=(nrow, n), inputs=[pk, pv, keys, vals])
++
++
+ def _run_filter_flex_fps(
+   m: Model,
+   d: Data,
+@@ -3485,7 +3707,10 @@ def _filter_and_write_contacts(
+       ],
+     )
+ 
+-    wp.utils.radix_sort_pairs(ws.filter_key, ws.filter_val, d.naconmax)
++    if _device_sort():
++      _device_filter_sort(m, d, ws)
++    else:
++      wp.utils.radix_sort_pairs(ws.filter_key, ws.filter_val, d.naconmax)
+ 
+     wp.launch(
+       _populate_active_sorted,
+@@ -3504,7 +3729,10 @@ def _filter_and_write_contacts(
+       outputs=[ws.flex_group_temp],
+     )
+ 
+-    wp.utils.array_scan(ws.flex_group_temp, ws.flex_group_ids, True)
++    if _device_sort():
++      _device_scan(ws.flex_group_temp, ws.flex_group_ids, True)
++    else:
++      wp.utils.array_scan(ws.flex_group_temp, ws.flex_group_ids, True)
+ 
+     world_stride = m.nbody * m.nflex + m.nflex * m.nflex
+     nmax_groups = d.nworld * world_stride
+@@ -3854,12 +4082,15 @@ def _run_flex_sap_sort(
+     ],
+   )
+ 
+-  wp.utils.segmented_sort_pairs(
+-    sap_lower.reshape((-1, nelem)),
+-    sap_sort_index.reshape((-1, nelem)),
+-    nworldelem,
+-    sap_seg_index,
+-  )
++  if _device_sort():
++    _device_rows_sort_f32(sap_lower.reshape((-1, nelem)), sap_sort_index.reshape((-1, nelem)), d.nworld, nelem)
++  else:
++    wp.utils.segmented_sort_pairs(
++      sap_lower.reshape((-1, nelem)),
++      sap_sort_index.reshape((-1, nelem)),
++      nworldelem,
++      sap_seg_index,
++    )
+ 
+   wp.launch(
+     sap_range,
+@@ -3875,11 +4106,14 @@ def _run_flex_sap_sort(
+     ],
+   )
+ 
+-  wp.utils.array_scan(
+-    sap_range_arr.reshape(-1),
+-    sap_cumsum.reshape(-1),
+-    True,
+-  )
++  if _device_sort():
++    _device_scan(sap_range_arr.reshape(-1), sap_cumsum.reshape(-1), True)
++  else:
++    wp.utils.array_scan(
++      sap_range_arr.reshape(-1),
++      sap_cumsum.reshape(-1),
++      True,
++    )
+ 
+   return (
+     sap_sort_index.reshape((-1, nelem)),
+-- 
+2.54.0 (Apple Git-157)
+

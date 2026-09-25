@@ -1,7 +1,7 @@
 From b9557cb987a51b51aae947f5345b61aeb6e28b32 Mon Sep 17 00:00:00 2001
 From: Aditya Pulipaka <adipu@utexas.edu>
 Date: Fri, 25 Sep 2026 09:22:55 -0700
-Subject: [PATCH 5/5] Metal: configurable register-Cholesky bound
+Subject: [PATCH 6/7] Metal: configurable register-Cholesky bound
  (warp.config.metal_register_cholesky_max, default 40)
 
 tile_cholesky factors matrices up to the bound in registers (one SIMD group, no barriers) and larger
@@ -22,7 +22,7 @@ Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>
  5 files changed, 46 insertions(+), 2 deletions(-)
 
 diff --git a/warp/_src/codegen.py b/warp/_src/codegen.py
-index fe2e7ef..4e782aa 100644
+index fe2e7ef6..4e782aa9 100644
 --- a/warp/_src/codegen.py
 +++ b/warp/_src/codegen.py
 @@ -1919,7 +1919,7 @@ def metal_tile_scratch_bytes(key: str, args: Mapping[str, Any], block_dim: int)
@@ -35,7 +35,7 @@ index fe2e7ef..4e782aa 100644
          return 2 * n * n * elem  # W1, W2 workspaces
      if key in ("tile_cholesky_solve", "tile_lower_solve", "tile_upper_solve"):
 diff --git a/warp/_src/context.py b/warp/_src/context.py
-index db7510e..3eecb6c 100644
+index db7510eb..3eecb6c2 100644
 --- a/warp/_src/context.py
 +++ b/warp/_src/context.py
 @@ -3088,6 +3088,11 @@ class ModuleHasher:
@@ -60,7 +60,7 @@ index db7510e..3eecb6c 100644
          # add headers
          #
 diff --git a/warp/config.py b/warp/config.py
-index b2e7592..810aa43 100644
+index b2e7592f..810aa435 100644
 --- a/warp/config.py
 +++ b/warp/config.py
 @@ -348,6 +348,12 @@ directly as a context manager.
@@ -77,7 +77,7 @@ index b2e7592..810aa43 100644
  """Maximum unroll factor for loops.
  
 diff --git a/warp/native/tile_cholesky.h b/warp/native/tile_cholesky.h
-index 29a1f0d..b588dad 100644
+index 29a1f0dc..b588dad6 100644
 --- a/warp/native/tile_cholesky.h
 +++ b/warp/native/tile_cholesky.h
 @@ -80,6 +80,12 @@ namespace partitioned_gemm {
@@ -103,7 +103,7 @@ index 29a1f0d..b588dad 100644
          return;
      }
 diff --git a/warp/tests/test_metal.py b/warp/tests/test_metal.py
-index 5c4590d..1435d43 100644
+index 5c4590d7..1435d432 100644
 --- a/warp/tests/test_metal.py
 +++ b/warp/tests/test_metal.py
 @@ -341,6 +341,31 @@ class TestMetal(unittest.TestCase):

@@ -1,0 +1,878 @@
+From 0d10604c32e79563b9ffaf0b0a9da0ba813388de Mon Sep 17 00:00:00 2001
+From: Aditya Pulipaka <adipu@utexas.edu>
+Date: Fri, 25 Sep 2026 03:34:21 -0700
+Subject: [PATCH 08/16] Flex contacts as MuJoCo C: per-pair MJ_MAXCONPAIR cap,
+ C's selection, all box-triangle contacts
+
+- Geom-flex contacts are filtered like MuJoCo C's filterFlexContacts / filterPreContacts: one group per
+  (world, body, flex), MJ_MAXCONPAIR contacts kept by deepest-first farthest-point sampling over the group's
+  candidates in C's canonical order (plane-vertex contacts in vertex order, then geom-element contacts in
+  element order; for MuJoCo 3.14 the flex BVH leaf order its midphase visits), coincident candidates allowed.
+  ENABLE_GEOM_FLEX_FPS=False restores upstream's uncapped geom-flex contacts.
+- FLEX_FPS_MODE: 'c314' reproduces MuJoCo C 3.14 exactly (it swaps chosen contacts to the front without
+  swapping its bookkeeping), 'main' reproduces MuJoCo C after 2026-09-23 (plain FPS), 'parallel' is upstream's
+  block-parallel FPS. Default follows the installed mujoco version. The serial modes run one thread per group
+  in one launch (the parallel mode needs 3 launches per selected contact without conditional graphs).
+- Box-triangle: all vertex and corner contacts in C's order and with C's margin tests (up to 11 per element);
+  upstream kept the first 2 (BOX_TRIANGLE_ALL_CONTACTS=False restores that).
+- Model.flex_elemorder: rank of each element in MuJoCo C 3.14's midphase order.
+- Tests: the plane-cloth cap, trilinear trajectory counts and the FPS NumPy reference follow MuJoCo C.
+
+Measured against MuJoCo C from synchronized states (cloth + cable on a box and on a plane, 400 steps):
+contact sets equal 78/78 and 83/83, one-step qvel error <= 4.9e-5 (was 0.43-0.57 m/s with upstream's contacts).
+
+Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>
+---
+ mujoco_warp/_src/collision_flex.py | 297 ++++++++++++++++++++++++-----
+ mujoco_warp/_src/flex_test.py      | 144 +++++++-------
+ mujoco_warp/_src/io.py             |  34 ++++
+ mujoco_warp/_src/types.py          |   2 +
+ 4 files changed, 359 insertions(+), 118 deletions(-)
+
+diff --git a/mujoco_warp/_src/collision_flex.py b/mujoco_warp/_src/collision_flex.py
+index f1ccb4c..073fa18 100644
+--- a/mujoco_warp/_src/collision_flex.py
++++ b/mujoco_warp/_src/collision_flex.py
+@@ -16,6 +16,8 @@
+ import dataclasses
+ import math
+ 
++import mujoco
++
+ import warp as wp
+ 
+ from mujoco_warp._src import collision_primitive_core
+@@ -43,6 +45,17 @@ wp.set_module_options({"enable_backward": False, "default_grid_stride": False})
+ 
+ _FPS_BLOCK_SIZE: int = 64
+ ENABLE_SAT_PREFILTER: bool = True
++# MuJoCo C caps each geom-flex pair at MJ_MAXCONPAIR contacts (deepest-first furthest-point sampling)
++ENABLE_GEOM_FLEX_FPS: bool = True
++# How the MJ_MAXCONPAIR contacts of a group are selected:
++#   "c314"     exactly MuJoCo C 3.14's filterFlexContacts (serial per group, in the canonical candidate order;
++#              it swaps selected contacts to the front of the array but not its selected/min-distance
++#              bookkeeping, so its choice is not a plain farthest-point sampling)
++#   "main"     MuJoCo C after 2026-09-23 (filterPreContacts: plain farthest-point sampling, serial per group)
++#   "parallel" upstream MuJoCo Warp's block-parallel farthest-point sampling (3 launches per selected contact)
++FLEX_FPS_MODE: str = "c314" if tuple(int(x) for x in mujoco.__version__.split(".")[:3]) <= (3, 14, 0) else "main"
++# box-triangle contacts as MuJoCo C (all vertices and corners, up to 11 per element); False: upstream's first 2
++BOX_TRIANGLE_ALL_CONTACTS: bool = True
+ 
+ 
+ @wp.func
+@@ -481,6 +494,61 @@ def _collide_geom_triangle_detect(
+       )
+     return
+ 
++  if gtype == int(GeomType.BOX) and wp.static(BOX_TRIANGLE_ALL_CONTACTS):
++    # mjraw_BoxTriangle (MuJoCo C): every triangle vertex within the box (plus radius and margin), then every
++    # box corner touching the triangle, in that order; C keeps up to mjMAXCONPAIR per element (at most 11)
++    box_rotT = wp.transpose(rot)
++    for vi in range(3):
++      vert = t1
++      if vi == 1:
++        vert = t2
++      elif vi == 2:
++        vert = t3
++      local = box_rotT @ (vert - pos)
++      maxaxis = int(0)
++      maxval = wp.abs(local[0]) - size_val[0]
++      for j in range(1, 3):
++        val = wp.abs(local[j]) - size_val[j]
++        if val > maxval:
++          maxval = val
++          maxaxis = j
++      if maxval - tri_radius > margin:
++        continue
++      if wp.abs(local[0]) > size_val[0] + margin + tri_radius:
++        continue
++      if wp.abs(local[1]) > size_val[1] + margin + tri_radius:
++        continue
++      if wp.abs(local[2]) > size_val[2] + margin + tri_radius:
++        continue
++      nrm_local = wp.vec3(0.0)
++      if local[maxaxis] > 0.0:
++        nrm_local[maxaxis] = 1.0
++      else:
++        nrm_local[maxaxis] = -1.0
++      nrm_v = rot @ nrm_local
++      dist_v = maxval - tri_radius
++      pos_v = vert - nrm_v * (tri_radius + dist_v * 0.5)
++      _write_candidate(
++        max_candidates, dist_v, pos_v, nrm_v, geomid, -1, flexid, elemid, vertex_id, worldid, warn_overflow,
++        overflow_out, cand_dist_out, cand_pos_out, cand_nrm_out, cand_geom_out, cand_flex_out, cand_elem_out,
++        cand_vert_out, cand_worldid_out, ncand_out,
++      )
++    for ci in range(8):
++      vec = wp.vec3(
++        wp.where(ci & 1, size_val[0], -size_val[0]),
++        wp.where(ci & 2, size_val[1], -size_val[1]),
++        wp.where(ci & 4, size_val[2], -size_val[2]),
++      )
++      corner = rot @ vec + pos
++      dist_c, pos_c, nrm_c = collision_primitive_core.sphere_triangle(corner, 0.0, t1, t2, t3, tri_radius)
++      if dist_c <= margin:
++        _write_candidate(
++          max_candidates, dist_c, pos_c, nrm_c, geomid, -1, flexid, elemid, vertex_id, worldid, warn_overflow,
++          overflow_out, cand_dist_out, cand_pos_out, cand_nrm_out, cand_geom_out, cand_flex_out, cand_elem_out,
++          cand_vert_out, cand_worldid_out, ncand_out,
++        )
++    return
++
+   # Capsule, box, cylinder all return up to 2 contacts - compute then share writing code
+   dists = wp.vec2(collision_primitive_core.MJ_MAXVAL, collision_primitive_core.MJ_MAXVAL)
+   poss = collision_primitive_core.mat23f(0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+@@ -2214,12 +2282,19 @@ def _flex_narrowphase_elem_detect(warn_overflow: int):
+ @wp.kernel
+ def _compute_filter_key(
+   # Model:
+-  ngeom: int,
++  nbody: int,
+   nflex: int,
++  geom_type: wp.array[int],
++  geom_bodyid: wp.array[int],
++  flex_elemadr: wp.array[int],
++  flex_elemorder: wp.array[int],
++  use_elemorder: int,
+   # In:
+   ncand: wp.array[int],
+   cand_geom: wp.array[wp.vec2i],
+   cand_flex: wp.array[wp.vec2i],
++  cand_elem: wp.array[wp.vec2i],
++  cand_vert: wp.array[wp.vec2i],
+   cand_pos: wp.array[wp.vec3],
+   cand_worldid: wp.array[int],
+   # Out:
+@@ -2228,7 +2303,11 @@ def _compute_filter_key(
+ ):
+   """Compute sort key for candidate grouping.
+ 
+-  Groups candidates by (worldid, flex_id, geom_id) in high bits and spatial projection in low bits.
++  Groups candidates by (worldid, body of the geom, flex) or (worldid, flex pair) in the high bits, like MuJoCo C
++  (one filter group per body-flex pair of the midphase). The low bits order a geom-flex group canonically, as
++  MuJoCo C sorts its collision pairs before filtering (pairCompare: type, geom, element): plane-vertex contacts
++  (vertex order) before geom-element contacts (geom, then element order); the farthest-point sampling breaks
++  ties in this order. Flex-flex and self groups keep a spatial projection.
+   """
+   i = wp.tid()
+   if i >= ncand[0]:
+@@ -2242,24 +2321,35 @@ def _compute_filter_key(
+   flex1 = cand_flex[i][0]
+ 
+   if geom_id >= 0:
+-    group = geom_id * nflex + flex_id
++    group = geom_bodyid[geom_id] * nflex + flex_id
+   else:
+     f1 = wp.min(flex1, flex_id)
+     f2 = wp.max(flex1, flex_id)
+-    group = ngeom * nflex + f1 * nflex + f2
++    group = nbody * nflex + f1 * nflex + f2
+ 
+-  group_id = worldid * (ngeom * nflex + nflex * nflex) + group
++  group_id = worldid * (nbody * nflex + nflex * nflex) + group
+   is_self = int(flex1 == flex_id) if geom_id < 0 else 0
+ 
+   group_key = (wp.int64(group_id) << wp.int64(1)) | wp.int64(is_self)
+ 
+-  # Spatial projection key: project position onto diagonal vector u = (1, 1, 1) / sqrt(3).
+-  # Clamped monotonic 1D integer mapping with 1 um resolution.
+-  p = cand_pos[i]
+-  s = (p[0] + p[1] + p[2]) * wp.static(1.0 / math.sqrt(3.0))
+-  spatial_key = wp.clamp(wp.int64(s * 1000000.0) + wp.int64(100000000), wp.int64(0), wp.int64(2147483647))
++  if geom_id >= 0:
++    # type (plane-vertex 0, geom-element 1) | geom (11 bits) | vertex or element (20 bits)
++    obj = cand_elem[i][1]
++    typ = wp.int64(1)
++    if obj >= 0 and use_elemorder != 0:
++      obj = flex_elemorder[flex_elemadr[flex_id] + obj]
++    if geom_type[geom_id] == int(GeomType.PLANE.value) or cand_elem[i][1] < 0:
++      obj = cand_vert[i][1]
++      typ = wp.int64(0)
++    low_key = (typ << wp.int64(31)) | (wp.int64(wp.min(geom_id, 2047)) << wp.int64(20)) | wp.int64(wp.clamp(obj, 0, 1048575))
++  else:
++    # Spatial projection key: project position onto diagonal vector u = (1, 1, 1) / sqrt(3).
++    # Clamped monotonic 1D integer mapping with 1 um resolution.
++    p = cand_pos[i]
++    s = (p[0] + p[1] + p[2]) * wp.static(1.0 / math.sqrt(3.0))
++    low_key = wp.clamp(wp.int64(s * 1000000.0) + wp.int64(100000000), wp.int64(0), wp.int64(2147483647))
+ 
+-  key_out[i] = (group_key << wp.int64(32)) | spatial_key
++  key_out[i] = (group_key << wp.int64(32)) | low_key
+   val_out[i] = i
+ 
+ 
+@@ -2456,11 +2546,13 @@ def _populate_active_sorted(
+   cand_active: wp.array[int],
+   # Out:
+   cand_active_sorted_out: wp.array[int],
++  cand_order_out: wp.array[int],
+ ):
+   si = wp.tid()
+   ncand_limit = wp.min(ncand[0], cand_active_sorted_out.shape[0])
+   if si < ncand_limit:
+     cand_active_sorted_out[si] = cand_active[sort_val[si]]
++    cand_order_out[sort_val[si]] = si
+   else:
+     if si < cand_active_sorted_out.shape[0]:
+       cand_active_sorted_out[si] = 0
+@@ -2539,21 +2631,13 @@ def _tie_break_fps(
+   curr_idx: int,
+   sel_idx: int,
+   cand_elem: wp.array[wp.vec2i],
++  cand_order: wp.array[int],
+ ):
++  # equal distances: keep the candidate that comes first in the group's canonical order (the sort order), as
++  # MuJoCo C's strict-inequality scan over its sorted pairs does
+   if sel_idx < 0:
+     return True
+-
+-  elem1_curr = cand_elem[curr_idx][0]
+-  elem2_curr = cand_elem[curr_idx][1]
+-
+-  elem1_sel = cand_elem[sel_idx][0]
+-  elem2_sel = cand_elem[sel_idx][1]
+-
+-  if elem1_curr != elem1_sel:
+-    return elem1_curr < elem1_sel
+-  if elem2_curr != elem2_sel:
+-    return elem2_curr < elem2_sel
+-  return curr_idx < sel_idx
++  return cand_order[curr_idx] < cand_order[sel_idx]
+ 
+ 
+ @wp.kernel
+@@ -2566,6 +2650,7 @@ def _parallel_fps_find_seed(
+   sort_val: wp.array[int],
+   cand_dist: wp.array[float],
+   cand_elem: wp.array[wp.vec2i],
++  cand_order: wp.array[int],
+   cand_geom: wp.array[wp.vec2i],
+   # Out:
+   scratch_dist_out: wp.array2d[float],
+@@ -2583,11 +2668,7 @@ def _parallel_fps_find_seed(
+     scratch_cidx_out[g, tid] = -1
+     return
+ 
+-  first_cand_idx = sort_val[g_start]
+-  if cand_geom[first_cand_idx][0] >= 0:
+-    scratch_count_out[g, tid] = 0
+-    scratch_cidx_out[g, tid] = -1
+-    return
++  # geom-flex groups are filtered too (MuJoCo C: filterFlexContacts after each geom-flex pair)
+ 
+   g_end = ncand_limit
+   if g < flex_num_groups_in[0] - 1:
+@@ -2606,7 +2687,7 @@ def _parallel_fps_find_seed(
+         min_d = d_val
+         sel_cidx = c_idx
+       elif d_val == min_d:
+-        if _tie_break_fps(c_idx, sel_cidx, cand_elem):
++        if _tie_break_fps(c_idx, sel_cidx, cand_elem, cand_order):
+           sel_cidx = c_idx
+ 
+   scratch_dist_out[g, tid] = min_d
+@@ -2663,6 +2744,7 @@ def _parallel_fps_resolve_seed(
+   ncand: wp.array[int],
+   cand_pos: wp.array[wp.vec3],
+   cand_elem: wp.array[wp.vec2i],
++  cand_order: wp.array[int],
+   scratch_dist_in: wp.array2d[float],
+   scratch_cidx_in: wp.array2d[int],
+   scratch_count_in: wp.array2d[int],
+@@ -2696,7 +2778,7 @@ def _parallel_fps_resolve_seed(
+         min_d = d_val
+         sel_cidx = c_idx
+       elif d_val == min_d:
+-        if _tie_break_fps(c_idx, sel_cidx, cand_elem):
++        if _tie_break_fps(c_idx, sel_cidx, cand_elem, cand_order):
+           sel_cidx = c_idx
+ 
+   selected_cidx_out[g] = sel_cidx
+@@ -2714,6 +2796,7 @@ def _parallel_fps_init_dist_and_find_max(
+   sort_val: wp.array[int],
+   cand_pos: wp.array[wp.vec3],
+   cand_elem: wp.array[wp.vec2i],
++  cand_order: wp.array[int],
+   selected_cidx: wp.array[int],
+   selected_pos: wp.array[wp.vec3],
+   # Out:
+@@ -2756,7 +2839,7 @@ def _parallel_fps_init_dist_and_find_max(
+           max_d = d
+           sel_cidx = c_idx
+         elif d == max_d:
+-          if _tie_break_fps(c_idx, sel_cidx, cand_elem):
++          if _tie_break_fps(c_idx, sel_cidx, cand_elem, cand_order):
+             sel_cidx = c_idx
+ 
+   scratch_dist_out[g, tid] = max_d
+@@ -2769,6 +2852,7 @@ def _parallel_fps_resolve_max(
+   flex_num_groups_in: wp.array[int],
+   cand_pos: wp.array[wp.vec3],
+   cand_elem: wp.array[wp.vec2i],
++  cand_order: wp.array[int],
+   scratch_dist_in: wp.array2d[float],
+   scratch_cidx_in: wp.array2d[int],
+   # Out:
+@@ -2795,10 +2879,11 @@ def _parallel_fps_resolve_max(
+         max_d = md
+         sel_cidx = c_idx
+       elif md == max_d:
+-        if _tie_break_fps(c_idx, sel_cidx, cand_elem):
++        if _tie_break_fps(c_idx, sel_cidx, cand_elem, cand_order):
+           sel_cidx = c_idx
+ 
+-  if sel_cidx >= 0 and max_d > 0.0:
++  # MuJoCo C (filterFlexContacts) keeps selecting coincident candidates (min distance 0) until MJ_MAXCONPAIR
++  if sel_cidx >= 0 and max_d >= 0.0:
+     selected_cidx_out[g] = sel_cidx
+     selected_pos_out[g] = cand_pos[sel_cidx]
+     cand_active_out[sel_cidx] = 1
+@@ -2818,6 +2903,7 @@ def _parallel_fps_update_and_find_max(
+   sort_val: wp.array[int],
+   cand_pos: wp.array[wp.vec3],
+   cand_elem: wp.array[wp.vec2i],
++  cand_order: wp.array[int],
+   selected_cidx: wp.array[int],
+   selected_pos: wp.array[wp.vec3],
+   # Out:
+@@ -2850,7 +2936,7 @@ def _parallel_fps_update_and_find_max(
+     if cand_active_sorted[si] == 1:
+       c_idx = sort_val[si]
+       md = fps_min_dist_out[c_idx]
+-      if md > 0.0:
++      if md >= 0.0:  # unselected (selected ones hold -1e10); coincident candidates stay eligible, as in MuJoCo C
+         d_new = wp.length(cand_pos[c_idx] - new_p)
+         md = wp.min(md, d_new)
+         fps_min_dist_out[c_idx] = md
+@@ -2859,7 +2945,7 @@ def _parallel_fps_update_and_find_max(
+           max_d = md
+           sel_cidx = c_idx
+         elif md == max_d:
+-          if _tie_break_fps(c_idx, sel_cidx, cand_elem):
++          if _tie_break_fps(c_idx, sel_cidx, cand_elem, cand_order):
+             sel_cidx = c_idx
+ 
+   scratch_dist_out[g, tid] = max_d
+@@ -2916,6 +3002,7 @@ class FlexWorkspace:
+ 
+   # Optional FPS & CCD buffers
+   cand_active_sorted: wp.array | None = None
++  cand_order: wp.array | None = None  # position of each candidate in the sorted (canonical) order
+   flex_group_temp: wp.array | None = None
+   flex_group_ids: wp.array | None = None
+   flex_group_start_indices: wp.array | None = None
+@@ -2940,11 +3027,14 @@ def _allocate_flex_workspace(m: Model, d: Data) -> FlexWorkspace:
+   needs_nccd = m.nmesh > 0 or m.has_ellipsoid_geom or m.has_3d_flex
+   nccd = wp.zeros(1, dtype=int) if needs_nccd else None
+ 
+-  has_fps = m.has_flex_selfcollide or m.nflex > 1
++  # MuJoCo C filters every geom-flex, flex-flex and self pair down to MJ_MAXCONPAIR contacts (filterFlexContacts):
++  # the FPS workspace is needed whenever there is a flex
++  has_fps = m.nflex > 0
+   if has_fps:
+-    world_stride = m.ngeom * m.nflex + m.nflex * m.nflex
++    world_stride = m.nbody * m.nflex + m.nflex * m.nflex
+     nmax_groups = d.nworld * world_stride
+     cand_active_sorted = wp.empty(d.naconmax, dtype=int)
++    cand_order = wp.empty(d.naconmax, dtype=int)
+     flex_group_temp = wp.empty(d.naconmax, dtype=int)
+     flex_group_ids = wp.empty(d.naconmax, dtype=int)
+     flex_group_start_indices = wp.full(nmax_groups, -1, dtype=int)
+@@ -2960,6 +3050,7 @@ def _allocate_flex_workspace(m: Model, d: Data) -> FlexWorkspace:
+     fps_iter = wp.zeros(1, dtype=int)
+   else:
+     cand_active_sorted = None
++    cand_order = None
+     flex_group_temp = None
+     flex_group_ids = None
+     flex_group_start_indices = None
+@@ -2988,6 +3079,7 @@ def _allocate_flex_workspace(m: Model, d: Data) -> FlexWorkspace:
+     filter_val=wp.empty(d.naconmax * 2, dtype=int),
+     cand_active=wp.empty(d.naconmax, dtype=int),
+     cand_active_sorted=cand_active_sorted,
++    cand_order=cand_order,
+     flex_group_temp=flex_group_temp,
+     flex_group_ids=flex_group_ids,
+     flex_group_start_indices=flex_group_start_indices,
+@@ -3011,6 +3103,94 @@ def _allocate_flex_workspace(m: Model, d: Data) -> FlexWorkspace:
+   )
+ 
+ 
++@cache_kernel
++def _serial_fps(c314: bool):
++  @wp.kernel(module="unique", enable_backward=False)
++  def kernel(
++    # In:
++    flex_group_start_indices_in: wp.array[int],
++    flex_num_groups_in: wp.array[int],
++    ncand: wp.array[int],
++    sort_val: wp.array[int],
++    cand_dist: wp.array[float],
++    cand_pos: wp.array[wp.vec3],
++    # Scratch (indexed by sorted slot):
++    slot_cand: wp.array[int],
++    slot_sel: wp.array[int],
++    slot_mind: wp.array[float],
++    # Out:
++    cand_active_out: wp.array[int],
++  ):
++    """One thread per group: MuJoCo C's selection of MJ_MAXCONPAIR contacts, over the group's candidates in
++    their canonical (sorted) order, exactly as filterFlexContacts (3.14, c314=True) or filterPreContacts (main)."""
++    g = wp.tid()
++    if g >= flex_num_groups_in[0]:
++      return
++    ncand_limit = wp.min(ncand[0], sort_val.shape[0])
++    g_start = flex_group_start_indices_in[g]
++    if g_start < 0 or g_start >= ncand_limit:
++      return
++    g_end = ncand_limit
++    if g < flex_num_groups_in[0] - 1:
++      g_end = wp.min(ncand_limit, flex_group_start_indices_in[g + 1])
++    n = g_end - g_start
++    if n <= MJ_MAXCONPAIR:
++      return  # all stay active
++
++    for k in range(n):
++      slot_cand[g_start + k] = sort_val[g_start + k]
++      slot_sel[g_start + k] = 0
++      slot_mind[g_start + k] = MJ_MAXVAL
++
++    # start with the deepest penetrating contact (first one on ties)
++    best = int(0)
++    bestdist = -cand_dist[slot_cand[g_start]]
++    for k in range(1, n):
++      dd = -cand_dist[slot_cand[g_start + k]]
++      if dd > bestdist:
++        bestdist = dd
++        best = k
++
++    nselected = int(0)
++    while nselected < MJ_MAXCONPAIR and best >= 0:
++      slot_sel[g_start + best] = 1
++      bestpos = cand_pos[slot_cand[g_start + best]]
++      nextbest = int(-1)
++      nextbestdist = float(-1.0)
++      for k in range(n):
++        if slot_sel[g_start + k] != 0:
++          continue
++        dp = cand_pos[slot_cand[g_start + k]] - bestpos
++        d2 = wp.dot(dp, dp)
++        if d2 < slot_mind[g_start + k]:
++          slot_mind[g_start + k] = d2
++        if slot_mind[g_start + k] > nextbestdist:
++          nextbestdist = slot_mind[g_start + k]
++          nextbest = k
++      if wp.static(c314):
++        # MuJoCo C 3.14 moves the chosen contact to the front (contacts only, not selected/min_dist)
++        if nselected < MJ_MAXCONPAIR - 1:
++          tmp = slot_cand[g_start + nselected]
++          slot_cand[g_start + nselected] = slot_cand[g_start + best]
++          slot_cand[g_start + best] = tmp
++          if nextbest == nselected:
++            nextbest = best
++      nselected += 1
++      best = nextbest
++
++    for k in range(n):
++      cand_active_out[slot_cand[g_start + k]] = 0
++    if wp.static(c314):
++      for k in range(nselected):
++        cand_active_out[slot_cand[g_start + k]] = 1
++    else:
++      for k in range(n):
++        if slot_sel[g_start + k] != 0:
++          cand_active_out[slot_cand[g_start + k]] = 1
++
++  return kernel
++
++
+ def _run_filter_flex_fps(
+   m: Model,
+   d: Data,
+@@ -3039,6 +3219,7 @@ def _run_filter_flex_fps(
+       ws.filter_val,
+       ws.dist,
+       ws.elem,
++      ws.cand_order,
+       ws.geom,
+       ws.fps_scratch_dist,
+       ws.fps_scratch_cidx,
+@@ -3053,6 +3234,7 @@ def _run_filter_flex_fps(
+       ws.ncand,
+       ws.pos,
+       ws.elem,
++      ws.cand_order,
+       ws.fps_scratch_dist,
+       ws.fps_scratch_cidx,
+       ws.fps_scratch_count,
+@@ -3080,6 +3262,7 @@ def _run_filter_flex_fps(
+       ws.filter_val,
+       ws.pos,
+       ws.elem,
++      ws.cand_order,
+       ws.fps_selected_cidx,
+       ws.fps_selected_pos,
+       ws.flex_fps_min_dist,
+@@ -3097,6 +3280,7 @@ def _run_filter_flex_fps(
+         ws.flex_num_groups,
+         ws.pos,
+         ws.elem,
++        ws.cand_order,
+         ws.fps_scratch_dist,
+         ws.fps_scratch_cidx,
+       ],
+@@ -3119,6 +3303,7 @@ def _run_filter_flex_fps(
+         ws.filter_val,
+         ws.pos,
+         ws.elem,
++        ws.cand_order,
+         ws.fps_selected_cidx,
+         ws.fps_selected_pos,
+         ws.flex_fps_min_dist,
+@@ -3162,11 +3347,18 @@ def _filter_and_write_contacts(
+       _compute_filter_key,
+       dim=d.naconmax,
+       inputs=[
+-        m.ngeom,
++        m.nbody,
+         m.nflex,
++        m.geom_type,
++        m.geom_bodyid,
++        m.flex_elemadr,
++        m.flex_elemorder,
++        int(FLEX_FPS_MODE == "c314"),
+         ws.ncand,
+         ws.geom,
+         ws.flex,
++        ws.elem,
++        ws.vert,
+         ws.pos,
+         ws.worldid,
+       ],
+@@ -3182,7 +3374,7 @@ def _filter_and_write_contacts(
+       _populate_active_sorted,
+       dim=d.naconmax,
+       inputs=[ws.ncand, ws.filter_val, ws.cand_active],
+-      outputs=[ws.cand_active_sorted],
++      outputs=[ws.cand_active_sorted, ws.cand_order],
+     )
+ 
+     wp.launch(
+@@ -3197,7 +3389,7 @@ def _filter_and_write_contacts(
+ 
+     wp.utils.array_scan(ws.flex_group_temp, ws.flex_group_ids, True)
+ 
+-    world_stride = m.ngeom * m.nflex + m.nflex * m.nflex
++    world_stride = m.nbody * m.nflex + m.nflex * m.nflex
+     nmax_groups = d.nworld * world_stride
+ 
+     wp.launch(
+@@ -3217,7 +3409,25 @@ def _filter_and_write_contacts(
+       ],
+     )
+ 
+-    _run_filter_flex_fps(m, d, ws, nmax_groups)
++    if FLEX_FPS_MODE == "parallel":
++      _run_filter_flex_fps(m, d, ws, nmax_groups)
++    else:
++      wp.launch(
++        _serial_fps(FLEX_FPS_MODE == "c314"),
++        dim=nmax_groups,
++        inputs=[
++          ws.flex_group_start_indices,
++          ws.flex_num_groups,
++          ws.ncand,
++          ws.filter_val,
++          ws.dist,
++          ws.pos,
++          ws.flex_group_temp,
++          ws.flex_group_ids,
++          ws.flex_fps_min_dist,
++        ],
++        outputs=[ws.cand_active],
++      )
+ 
+   wp.launch(
+     _write_filtered_contacts(int(m.opt.warn_overflow)),
+@@ -3638,8 +3848,9 @@ def _flex_geom_collision(
+   # 3. 2D cloth and 3D softbody element collisions (elements vs rigid geoms)
+   _detect_elem_geom_candidates(m, d, ws)
+ 
+-  # 4. Contact writing pass
+-  _filter_and_write_contacts(m, d, ws, enable_fps=False)
++  # 4. Contact writing pass: like MuJoCo C (filterFlexContacts after every geom-flex pair), keep at most
++  # MJ_MAXCONPAIR contacts per (world, geom, flex) by deepest-first furthest-point sampling
++  _filter_and_write_contacts(m, d, ws, enable_fps=ENABLE_GEOM_FLEX_FPS)
+ 
+ 
+ def _flex_sap_collision(
+diff --git a/mujoco_warp/_src/flex_test.py b/mujoco_warp/_src/flex_test.py
+index c4619f7..9466ddd 100644
+--- a/mujoco_warp/_src/flex_test.py
++++ b/mujoco_warp/_src/flex_test.py
+@@ -1717,14 +1717,22 @@ class FlexCollisionTest(parameterized.TestCase):
+       </worldbody>
+     </mujoco>
+     """
+-    _, _, m, d = test_data.fixture(xml=xml, nworld=nworld)
+-
+-    mjw.kinematics(m, d)
+-    mjw.collision(m, d)
++    mjm, mjd, m, d = test_data.fixture(xml=xml, nworld=nworld)
+ 
+-    nacon = int(d.nacon.numpy()[0])
+-    expected_contacts = 100 * nworld
+-    self.assertEqual(nacon, expected_contacts, f"Expected {expected_contacts} contacts, got {nacon}")
++    # MuJoCo C caps every geom-flex pair at MJ_MAXCONPAIR (50 here, of 100 vertex contacts); with
++    # collision_flex.ENABLE_GEOM_FLEX_FPS (default) MuJoCo Warp does the same, without it all 100 are kept.
++    mujoco.mj_forward(mjm, mjd)
++    for fps, per_world in ((True, mjd.ncon), (False, 100)):
++      collision_flex.ENABLE_GEOM_FLEX_FPS = fps
++      try:
++        mjw.kinematics(m, d)
++        mjw.collision(m, d)
++      finally:
++        collision_flex.ENABLE_GEOM_FLEX_FPS = True
++      nacon = int(d.nacon.numpy()[0])
++      expected_contacts = per_world * nworld
++      self.assertEqual(nacon, expected_contacts, f"fps={fps}: expected {expected_contacts} contacts, got {nacon}")
++    self.assertEqual(mjd.ncon, 50)
+ 
+   @parameterized.parameters(1, 2)
+   def test_flex_fps_capping(self, nworld):
+@@ -1818,8 +1826,11 @@ class FlexCollisionTest(parameterized.TestCase):
+     np.testing.assert_allclose(pos_sat[idx_sat], pos_nosat[idx_nosat], atol=1e-5)
+     np.testing.assert_allclose(dist_sat[idx_sat], dist_nosat[idx_nosat], atol=1e-5)
+ 
+-  def test_parallel_fps_numpy_parity(self):
+-    """Test that parallel FPS selects candidates matching a serial NumPy reference."""
++  @parameterized.parameters("parallel", "main", "c314")
++  def test_parallel_fps_numpy_parity(self, mode):
++    """Contact selection (FLEX_FPS_MODE) matches a serial NumPy reference of MuJoCo C's filter: deepest first,
++    then farthest from the selected set, ties to the first candidate in the group's sorted order, coincident
++    candidates allowed; "c314" adds MuJoCo C 3.14's swap of chosen contacts to the front."""
+     _, _, m, d = test_data.fixture(
+       xml="""
+       <mujoco>
+@@ -1844,82 +1855,62 @@ class FlexCollisionTest(parameterized.TestCase):
+ 
+     mjw.kinematics(m, d)
+ 
+-    ws = collision_flex._allocate_flex_workspace(m, d)
+-    sap_data = collision_flex._run_flex_sap_sort(m, d)
+-    ctx = collision_core.create_collision_context(d.naconmax)
+-    collision_flex._flex_sap_collision(m, d, ctx, ws, is_self=False, sap_data=sap_data)
++    prev_mode = collision_flex.FLEX_FPS_MODE
++    collision_flex.FLEX_FPS_MODE = mode
++    try:
++      ws = collision_flex._allocate_flex_workspace(m, d)
++      sap_data = collision_flex._run_flex_sap_sort(m, d)
++      ctx = collision_core.create_collision_context(d.naconmax)
++      collision_flex._flex_sap_collision(m, d, ctx, ws, is_self=False, sap_data=sap_data)
++    finally:
++      collision_flex.FLEX_FPS_MODE = prev_mode
+ 
+     ncand = int(ws.ncand.numpy()[0])
+     cand_active = ws.cand_active.numpy()[:ncand]
+     sort_val = ws.filter_val.numpy()[:ncand]
+-    cand_active_sorted = ws.cand_active_sorted.numpy()[:ncand]
+-    cand_pos = ws.pos.numpy()[:ncand]
+-    cand_dist = ws.dist.numpy()[:ncand]
+-    cand_elem = ws.elem.numpy()[:ncand]
++    cand_pos = ws.pos.numpy()[:ncand].astype(np.float64)
++    cand_dist = ws.dist.numpy()[:ncand].astype(np.float64)
+     num_groups = int(ws.flex_num_groups.numpy()[0])
+     group_starts = ws.flex_group_start_indices.numpy()[:num_groups]
+ 
+-    def _tie_break(curr, sel):
+-      if sel < 0:
+-        return True
+-      e1_c, e2_c = cand_elem[curr]
+-      e1_s, e2_s = cand_elem[sel]
+-      if e1_c != e1_s:
+-        return e1_c < e1_s
+-      if e2_c != e2_s:
+-        return e2_c < e2_s
+-      return curr < sel
+-
+     self.assertGreater(num_groups, 0)
++    checked = 0
+     for g in range(num_groups):
+       g_start = group_starts[g]
+       g_end = group_starts[g + 1] if g + 1 < num_groups else ncand
+-      group_cands = [sort_val[si] for si in range(g_start, g_end) if cand_active_sorted[si] == 1]
+-      if len(group_cands) <= types.MJ_MAXCONPAIR:
++      cands = [int(sort_val[si]) for si in range(g_start, g_end)]  # canonical order
++      n = len(cands)
++      if n <= types.MJ_MAXCONPAIR:
+         continue
+-
+-      best_seed = -1
+-      min_d = 1e10
+-      for c_idx in group_cands:
+-        d_val = cand_dist[c_idx]
+-        if d_val < min_d:
+-          min_d = d_val
+-          best_seed = c_idx
+-        elif d_val == min_d and _tie_break(c_idx, best_seed):
+-          min_d = d_val
+-          best_seed = c_idx
+-
+-      selected = [best_seed]
+-      seed_pos = cand_pos[best_seed]
+-      min_dist = {c_idx: np.float32(np.linalg.norm(cand_pos[c_idx] - seed_pos)) for c_idx in group_cands}
+-
+-      for _ in range(1, types.MJ_MAXCONPAIR):
+-        max_d = np.float32(-1e10)
+-        best_cand = -1
+-        for c_idx in group_cands:
+-          if c_idx in selected:
++      checked += 1
++      slot = list(cands)
++      sel = [False] * n
++      mind = [np.inf] * n
++      best = int(np.argmax([-cand_dist[c] for c in slot]))  # first maximum
++      nsel = 0
++      chosen = []
++      while nsel < types.MJ_MAXCONPAIR and best >= 0:
++        sel[best] = True
++        chosen.append(slot[best])
++        bp = cand_pos[slot[best]]
++        nb, nbd = -1, -1.0
++        for k in range(n):
++          if sel[k]:
+             continue
+-          md = min_dist[c_idx]
+-          if md > max_d:
+-            max_d = md
+-            best_cand = c_idx
+-          elif md == max_d and _tie_break(c_idx, best_cand):
+-            max_d = md
+-            best_cand = c_idx
+-
+-        if best_cand < 0 or max_d <= 0.0:
+-          break
+-
+-        selected.append(best_cand)
+-        new_pos = cand_pos[best_cand]
+-        for c_idx in group_cands:
+-          d_new = np.float32(np.linalg.norm(cand_pos[c_idx] - new_pos))
+-          if d_new < min_dist[c_idx]:
+-            min_dist[c_idx] = d_new
+-
+-      warp_selected = sorted([c_idx for c_idx in group_cands if cand_active[c_idx] == 1])
+-      np_selected = sorted(selected)
++          d2 = float(np.sum((cand_pos[slot[k]] - bp) ** 2))
++          mind[k] = min(mind[k], d2)
++          if mind[k] > nbd:
++            nbd, nb = mind[k], k
++        if mode == "c314" and nsel < types.MJ_MAXCONPAIR - 1:
++          slot[nsel], slot[best] = slot[best], slot[nsel]
++          if nb == nsel:
++            nb = best
++        nsel += 1
++        best = nb
++      np_selected = sorted(slot[:nsel]) if mode == "c314" else sorted(chosen)
++      warp_selected = sorted([c for c in cands if cand_active[c] == 1])
+       self.assertEqual(warp_selected, np_selected)
++    self.assertGreater(checked, 0)
+ 
+   @parameterized.parameters(1, 2)
+   def test_mixed_flex_broadphase_and_narrowphase(self, nworld):
+@@ -2701,14 +2692,17 @@ class FlexContactParityTest(parameterized.TestCase):
+           c for c in self._get_sorted_contacts(d, d.nacon.numpy()[0], world_idx=w, is_warp=True) if c["geom"][0] >= 0
+         ]
+         m_geom_contacts = [c for c in self._get_sorted_contacts(mjd, mjd.ncon, is_warp=False) if c["geom"][0] >= 0]
+-        if len(w_geom_contacts) == len(m_geom_contacts) and len(m_geom_contacts) > 0:
++        self.assertEqual(len(w_geom_contacts), len(m_geom_contacts), f"geom contact count at step {curr_step}")
++        # a capped group (MJ_MAXCONPAIR of a flat grid's equally deep vertices) is ill-conditioned: its selection
++        # follows float64 rounding of depths and grid distances in MuJoCo C, so only the count is compared
++        if 0 < len(m_geom_contacts) < types.MJ_MAXCONPAIR:
+           self._assert_contact_parity(w_geom_contacts, m_geom_contacts, atol=1e-4)
+ 
+       # Flex-flex contact count parity and constraint parity
+       if curr_step in (0, 250, 500, 1000):
+-        if curr_step == 250:
+-          # MuJoCo caps contact pairs at mjMAXCONPAIR=50 (50 plane + 50 flex-flex = 100),
+-          # whereas Warp detects all 64 vertices on the ground plane (64 + 50 = 114).
++        if curr_step == 250 and not collision_flex.ENABLE_GEOM_FLEX_FPS:
++          # MuJoCo caps contact pairs at mjMAXCONPAIR=50 (50 plane + 50 flex-flex = 100); without the geom-flex
++          # cap (ENABLE_GEOM_FLEX_FPS=False) Warp keeps all 64 vertices on the ground plane (64 + 50 = 114).
+           self.assertEqual(d.nacon.numpy()[0], nworld * 114, f"nacon mismatch at step {curr_step}")
+           for w in range(nworld):
+             self.assertEqual(d.nefc.numpy()[w], 456, f"nefc mismatch at step {curr_step} (world {w})")
+diff --git a/mujoco_warp/_src/io.py b/mujoco_warp/_src/io.py
+index 254a26d..64424d1 100644
+--- a/mujoco_warp/_src/io.py
++++ b/mujoco_warp/_src/io.py
+@@ -212,6 +212,39 @@ def m_block_layout(mjm: mujoco.MjModel) -> dict:
+   }
+ 
+ 
++
++def _flex_elemorder(mjm: mujoco.MjModel) -> np.ndarray:
++  """Rank of every flex element in the order MuJoCo C 3.14's midphase (mj_collideTree) visits the leaves of the
++  flex's BVH against a rigid geom leaf: a stack, children pushed in order, popped last-in-first-out. Used to
++  order a geom-flex contact group canonically before selecting MJ_MAXCONPAIR contacts (FLEX_FPS_MODE="c314")."""
++  order = np.zeros(mjm.nflexelem, dtype=np.int32)
++  for f in range(mjm.nflex):
++    adr, num = mjm.flex_bvhadr[f], mjm.flex_bvhnum[f]
++    elemadr, nelem = mjm.flex_elemadr[f], mjm.flex_elemnum[f]
++    if adr < 0 or num == 0:
++      order[elemadr : elemadr + nelem] = np.arange(nelem)
++      continue
++    child = mjm.bvh_child[adr : adr + num]
++    nodeid = mjm.bvh_nodeid[adr : adr + num]
++    rank, stack = 0, [0]
++    seen = np.zeros(nelem, bool)
++    while stack:
++      node = stack.pop()
++      c0, c1 = child[node]
++      if c0 < 0 and c1 < 0:
++        e = nodeid[node]
++        if 0 <= e < nelem and not seen[e]:
++          order[elemadr + e] = rank
++          seen[e] = True
++          rank += 1
++        continue
++      for c in (c0, c1):
++        if c != -1:
++          stack.append(c)
++    rest = np.where(~seen)[0]
++    order[elemadr + rest] = rank + np.arange(len(rest))
++  return order
++
+ def put_model(mjm: mujoco.MjModel, batch_sizes: dict[str, int] | None = None) -> types.Model:
+   """Creates a model on device.
+ 
+@@ -432,6 +465,7 @@ def put_model(mjm: mujoco.MjModel, batch_sizes: dict[str, int] | None = None) ->
+   m.has_fluid = bool(mjm.opt.wind.any() or mjm.opt.density > 0 or mjm.opt.viscosity > 0)
+   m.has_gravcomp = bool(mjm.ngravcomp > 0 or "body_gravcomp" in batch_sizes)
+   m.nflexintcell = _get_nflexintcell(mjm)
++  m.flex_elemorder = _flex_elemorder(mjm)
+ 
+   # Precompute flex_cell_map
+   flex_cell_map = []
+diff --git a/mujoco_warp/_src/types.py b/mujoco_warp/_src/types.py
+index 94adb4f..5aeca8c 100644
+--- a/mujoco_warp/_src/types.py
++++ b/mujoco_warp/_src/types.py
+@@ -1561,6 +1561,7 @@ class Model:
+     nflexface: number of interpolated flex shell faces
+     flex_face_map: mapping of face index to flex and local element face indices
+     flex_face: global node indices of each face                             (nflexface, 9)
++    flex_elemorder: element rank in MuJoCo C 3.14's midphase (nflexelem,)
+   """
+ 
+   nq: int
+@@ -2055,6 +2056,7 @@ class Model:
+   nflexface: int
+   flex_face_map: array("nflexface", wp.vec2i)
+   flex_face: array("nflexface", 9, int)
++  flex_elemorder: array("nflexelem", int)  # element rank in MuJoCo C 3.14's midphase order (contact filter)
+ 
+ 
+ class ContactType(enum.IntFlag):
+-- 
+2.54.0 (Apple Git-157)
+

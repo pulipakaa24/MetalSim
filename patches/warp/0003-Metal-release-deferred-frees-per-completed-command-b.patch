@@ -1,7 +1,7 @@
 From 7b5c828afaaf99126e5ea10d3f3ea4db82be2cbf Mon Sep 17 00:00:00 2001
 From: Aditya Pulipaka <adipu@utexas.edu>
 Date: Wed, 23 Sep 2026 14:13:39 -0700
-Subject: [PATCH 3/5] Metal: release deferred frees per completed command
+Subject: [PATCH 3/7] Metal: release deferred frees per completed command
  buffer; WP_METAL_INFLIGHT and WP_METAL_ICB_BATCH knobs
 
 Long eager loops that allocate temporaries every step (MuJoCo Warp) deferred every free until the next
@@ -14,7 +14,7 @@ Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
  1 file changed, 74 insertions(+), 9 deletions(-)
 
 diff --git a/warp/native/metal.mm b/warp/native/metal.mm
-index 79b9014..fd28f62 100644
+index 79b90141..fd28f62f 100644
 --- a/warp/native/metal.mm
 +++ b/warp/native/metal.mm
 @@ -61,6 +61,26 @@ int max_dispatches_per_command_buffer()

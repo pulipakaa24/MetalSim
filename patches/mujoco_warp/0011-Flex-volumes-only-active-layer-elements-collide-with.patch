@@ -1,0 +1,62 @@
+From dae69c0cb7626e7c8f2abdf650b2ed6f632c6f41 Mon Sep 17 00:00:00 2001
+From: Aditya Pulipaka <adipu@utexas.edu>
+Date: Fri, 25 Sep 2026 04:10:49 -0700
+Subject: [PATCH 11/16] Flex volumes: only active-layer elements collide with
+ geoms, as MuJoCo C
+
+MuJoCo C builds each flex's BVH from its active elements (flex_elemlayer < flex_activelayers: the surface layer of
+a tetrahedral volume by default), so interior tetrahedra never touch geoms; MuJoCo Warp tested every element.
+A 4x4x4 trilinear soft cube on a box: raw box contacts 54 -> 34 (= C), contact sets 0/73 -> 45/73 (48/67 at 1 ms),
+one-step qvel error median 3.1e-4 -> 6.5e-5 m/s, trajectory within MuJoCo C's own sensitivity (5e-4 m @ 0.4 s).
+FLEX_ACTIVE_LAYERS_ONLY=False restores the old behaviour.
+
+Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>
+---
+ mujoco_warp/_src/collision_flex.py | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/mujoco_warp/_src/collision_flex.py b/mujoco_warp/_src/collision_flex.py
+index a7f225e..2982558 100644
+--- a/mujoco_warp/_src/collision_flex.py
++++ b/mujoco_warp/_src/collision_flex.py
+@@ -63,6 +63,8 @@ CABLE_CAPSULE_ELEMENTS: bool = True
+ FPS_COINCIDENT_D2: float = 1.0e-12
+ # mesh-element contact point at the midpoint of the radius-inflated penetration (MuJoCo C); False: upstream's midpoint
+ FLEX_RADIUS_CONTACT_POS: bool = True
++# volume flexes: only active-layer elements collide with geoms (MuJoCo C's flex BVH holds only those)
++FLEX_ACTIVE_LAYERS_ONLY: bool = True
+ # depth (m) and relative squared-distance differences treated as ties in the selection (float32 vs MuJoCo C's float64)
+ FPS_DEPTH_TIE: float = 1.0e-8
+ FPS_DIST_REL_TIE: float = 1.0e-6
+@@ -1897,6 +1899,8 @@ def _flex_narrowphase_elem_detect(warn_overflow: int):
+     flex_dim: wp.array[int],
+     flex_vertadr: wp.array[int],
+     flex_elemadr: wp.array[int],
++    flex_activelayers: wp.array[int],
++    flex_elemlayer: wp.array[int],
+     flex_elemdataadr: wp.array[int],
+     flex_vertbodyid: wp.array[int],
+     flex_elem: wp.array[int],
+@@ -1956,6 +1960,10 @@ def _flex_narrowphase_elem_detect(warn_overflow: int):
+     elem_radius = flex_radius[flexid]
+     elem_margin = flex_margin[flexid]
+     local_elemid = elemid - flex_elemadr[flexid]
++    # MuJoCo C builds a flex's BVH from its active elements only (surface layers of a volume, flex_activelayers),
++    # so geom contacts involve only those
++    if wp.static(FLEX_ACTIVE_LAYERS_ONLY) and not _elem_active(flex_activelayers, flex_dim, flex_elemadr, flex_elemlayer, flexid, local_elemid):
++      return
+ 
+     geom2 = Geom()
+     geom2.pos = wp.vec3(0.0, 0.0, 0.0)
+@@ -3735,6 +3743,8 @@ def _detect_elem_geom_candidates(
+       m.flex_dim,
+       m.flex_vertadr,
+       m.flex_elemadr,
++      m.flex_activelayers,
++      m.flex_elemlayer,
+       m.flex_elemdataadr,
+       m.flex_vertbodyid,
+       m.flex_elem,
+-- 
+2.54.0 (Apple Git-157)
+
