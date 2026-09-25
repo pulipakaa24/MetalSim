@@ -11,7 +11,11 @@ import warp as wp
 
 from metalsim.physics.batch import BatchSim, BatchSimOptions
 
-pytestmark = pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal")
+import os
+
+pytestmark = [pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal"),
+              pytest.mark.skipif(os.environ.get("MJW_PLANE_CONVEX", "").lower() == "legacy",
+                                 reason="MJW_PLANE_CONVEX=legacy pins the pre-fix heuristic")]
 
 CUBE = " ".join(f"{x} {y} {z}" for x in (-0.1, 0.1) for y in (-0.05, 0.05) for z in (-0.02, 0.02))
 NGON = " ".join(f"{0.08 * np.cos(a):.6f} {0.08 * np.sin(a):.6f} {z}" for a in np.linspace(0, 2 * np.pi, 12, endpoint=False) for z in (-0.03, 0.03))
