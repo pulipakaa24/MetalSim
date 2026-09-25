@@ -1,0 +1,35 @@
+[gpu_run] terrain_render_cost start: device utilisation 0% (16:09:47)
+holder: {"name": "terrain_render_cost", "kind": "timing", "minutes": 12.0, "pid": 31014, "start": 1790377787.884712}
+  waiting [timing] fastfact_thr_tp est 15.0 min, queued 222 s ago
+  waiting [render] gallery_rough_boxes est 6.0 min, queued 901 s ago
+  waiting [render] fastfact_thr_check est 15.0 min, queued 222 s ago
+  waiting [train] g1_flat_flatcfg_tau10 est 80.0 min, queued 4623 s ago
+  waiting [train] il3_train_flat est 70.0 min, queued 4239 s ago
+  waiting [low] newton_vbd_replay est 40.0 min, queued 6879 s ago
+  waiting [low] il3_physx_ours est 40.0 min, queued 5450 s ago
+  waiting [low] kamino_tests_fork est 40.0 min, queued 4259 s ago
+  waiting [low] kamino_tests_152 est 30.0 min, queued 3430 s ago
+  waiting [low] cl_kamino est 45.0 min, queued 2099 s ago
+  waiting [low] cl_mjw est 40.0 min, queued 2075 s ago
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+busy processes (cpu > 40 %):
+29864 100.0 .venv-flex/bin/python scratch/deformable/membrane_3p0.py
+  warnings.warn(
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+G1 rough (boxes_local), 1024 envs, 128x128 head camera; box window overflow 0, most boxes in a window 50
+{"tier": 0, "config": "before", "n": 1024, "size": 128, "ms_best": 1.6421041043940932, "ms_median": 1.6492458991706371, "fps_envs": 623590.1836307982, "drawn_slots": 99, "tris_per_env": 1188, "build_s": 0.032009457994718105, "depth_valid": 0.0}
+{"tier": 0, "config": "slots", "n": 1024, "size": 128, "ms_best": 2.7482167002744973, "ms_median": 2.751145901856944, "fps_envs": 372605.2606760307, "drawn_slots": 99, "tris_per_env": 1188, "build_s": 0.02823437500046566, "depth_valid": 0.24608230590820312}
+{"tier": 0, "config": "hfield", "n": 1024, "size": 128, "ms_best": 2904.2466624989174, "ms_median": 2907.8086958965287, "fps_envs": 352.58713153479664, "drawn_slots": 100, "tris_per_env": 4801188, "build_s": 0.16060895804548636, "depth_valid": 0.9766731262207031}
+{"tier": 0, "config": "after", "n": 1024, "size": 128, "ms_best": 2904.1511999967042, "ms_median": 2905.708749999758, "fps_envs": 352.59872144438003, "drawn_slots": 100, "tris_per_env": 4801188, "build_s": 0.141387790965382, "depth_valid": 0.9766731262207031}
+{"tier": 2, "config": "before", "n": 1024, "size": 128, "ms_best": 17.53734169760719, "ms_median": 17.69841670175083, "fps_envs": 58389.69312776266, "drawn_slots": 99, "tris_per_env": 1188, "build_s": 0.04078158299671486, "depth_valid": 0.0}
+{"tier": 2, "config": "slots", "n": 1024, "size": 128, "ms_best": 59.94531250325963, "ms_median": 59.951899998122826, "fps_envs": 17082.236412468752, "drawn_slots": 99, "tris_per_env": 1188, "build_s": 0.03828224999597296, "depth_valid": 0.246612548828125}
+{"tier": 2, "config": "hfield", "n": 1024, "size": 128, "ms_best": 158.2393000018783, "ms_median": 158.24794999789447, "fps_envs": 6471.21163950956, "drawn_slots": 100, "tris_per_env": 4801188, "build_s": 0.20888949994696304, "depth_valid": 1.0}
+{"tier": 2, "config": "after", "n": 1024, "size": 128, "ms_best": 187.70664590410888, "ms_median": 188.0975667038001, "fps_envs": 5455.3209614278485, "drawn_slots": 100, "tris_per_env": 4801188, "build_s": 0.2105873329564929, "depth_valid": 1.0}
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[gpu_run] terrain_render_cost end: device utilisation 0% (16:13:56), exit 0
