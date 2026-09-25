@@ -183,7 +183,7 @@ def _implicit_pd_torque(body_q: wp.array[wp.transform], body_inv_I: wp.array[wp.
                         joint_q: wp.array[float], joint_qd: wp.array[float], q_start: wp.array[int], qd_start: wp.array[int],
                         target: wp.array[float], kp: wp.array[float], kd: wp.array[float], effort: wp.array[float],
                         armature: wp.array[float], dt: float, ext_filter: float, use_ext: int,
-                        grav_flag: wp.array[int], tau_g: wp.array[float],
+                        grav_flag: wp.array[int], tau_g: wp.array[float], stiff_implicit: int,
                         qd_prev: wp.array[float], tau_prev: wp.array[float], tau_ext_f: wp.array[float], joint_f: wp.array[float]):
     """Isaac's actuator (PD + effort clip + armature) for a maximal-coordinate solver, per revolute DOF.
 
@@ -232,6 +232,11 @@ def _implicit_pd_torque(body_q: wp.array[wp.transform], body_inv_I: wp.array[wp.
         qd_next = (qd + dt * (tau_g[d] + kp[d] * e) / I_tot) / (1.0 + kd[d] * dt / I_tot)
         tau = wp.clamp(kp[d] * e - kd[d] * qd_next, -effort[d], effort[d])
         tau_app = tau
+    elif stiff_implicit != 0:
+        # contacts below this joint, stiffness implicit too (Tan et al. stable PD without the external term):
+        # tau = (kp (e - dt qd) - kd qd) / (1 + (kp dt^2 + kd dt) / I); static bias 1 / (1 + kp dt^2 / I)
+        tau = wp.clamp((kp[d] * (e - dt * qd) - kd[d] * qd) / (1.0 + (kp[d] * dt * dt + kd[d] * dt) / I_tot), -effort[d], effort[d])
+        tau_app = tau
     else:
         # contacts below this joint (legs): backward Euler on the damper's own effect only,
         # tau_d = -kd (qd + dt tau_d / I) (exact at rest whatever the contact load)
@@ -274,8 +279,9 @@ class ActuatorPD:
     Arrays are per DOF (``model.joint_dof_count``); the solver's own drives should be off (ke = kd = 0)."""
 
     def __init__(self, model, kp, kd, effort, target, armature=None, dt=0.0025, mode="ipd", ext_filter=1.0, use_ext=False,
-                 gravity_implicit=True):
+                 gravity_implicit=True, stiff_implicit=False):
         self.model, self.dt, self.mode, self.ext_filter, self.use_ext = model, dt, mode, ext_filter, int(use_ext)
+        self.stiff_implicit = int(stiff_implicit)
         self._init_subtrees(gravity_implicit)
         f = lambda a: wp.array(np.asarray(a, np.float32), dtype=float, device=model.device)
         self.kp, self.kd, self.effort, self.target = f(kp), f(kd), f(effort), f(target)
@@ -297,7 +303,8 @@ class ActuatorPD:
                           outputs=[self.tau_g], device=m.device)
             wp.launch(_implicit_pd_torque, dim=m.joint_count, inputs=[state.body_q, m.body_inv_inertia, m.joint_parent, m.joint_child,
                       m.joint_X_p, m.joint_axis, self.joint_q, self.joint_qd, m.joint_q_start, m.joint_qd_start, self.target, self.kp,
-                      self.kd, self.effort, self.armature, self.dt, self.ext_filter, self.use_ext, self.grav_flag, self.tau_g],
+                      self.kd, self.effort, self.armature, self.dt, self.ext_filter, self.use_ext, self.grav_flag, self.tau_g,
+                      self.stiff_implicit],
                       outputs=[self.qd_prev, self.tau_prev, self.tau_ext_f, control.joint_f], device=m.device)
 
     def _init_subtrees(self, enabled):
@@ -532,7 +539,8 @@ class NewtonSim:
 
     def __init__(self, mj_model, num_envs: int, iterations: int = 4, dt: float = 0.00125, control_dt: float = 0.02,
                  device: str = "metal:0", mesh_to_box: bool = True, touch_bodies=("left_ankle_roll_link", "right_ankle_roll_link", "torso_link"),
-                 hfield: dict | None = None, pose_bodies=("torso_link",)):
+                 hfield: dict | None = None, pose_bodies=("torso_link",), relaxation: float = 0.4,
+                 actuator_kw: dict | None = None, solver_kw: dict | None = None):
         import mujoco
         from metalsim.interop import warp_metal as wm
         self.mj_model = mj = mj_model
@@ -548,7 +556,8 @@ class NewtonSim:
             builder.joint_target_ke = [0.0] * builder.joint_dof_count; builder.joint_target_kd = [0.0] * builder.joint_dof_count
             self.model = m = builder.finalize()
             m.request_contact_attributes("force")
-            self.solver = newton.solvers.SolverXPBD(m, iterations=iterations, joint_linear_relaxation=0.4, joint_angular_relaxation=0.4)
+            self.solver = newton.solvers.SolverXPBD(m, iterations=iterations, joint_linear_relaxation=relaxation,
+                                                    joint_angular_relaxation=relaxation, **(solver_kw or {}))
             self.s0, self.s1 = m.state(), m.state(); self.control = m.control()
             newton.eval_fk(m, m.joint_q, m.joint_qd, self.s0)
             self.pipeline = newton.CollisionPipeline(m, broad_phase="explicit")    # what Model.collide() builds
@@ -576,7 +585,7 @@ class NewtonSim:
             sadr = lambda nm: int(mj.sensor_adr[mujoco.mj_name2id(mj, mujoco.mjtObj.mjOBJ_SENSOR, nm + "_touch")])
             self.touch_adr = wp.vec3i(*[sadr(b) for b in touch_bodies])
             # actuator: per-DOF gains from the same builder (Isaac's groups), target written from ctrl
-            self.actuator = ActuatorPD(m, act["kp"], act["kd"], act["effort"], act["target"], None, dt, "ipd")
+            self.actuator = ActuatorPD(m, act["kp"], act["kd"], act["effort"], act["target"], None, dt, "ipd", **(actuator_kw or {}))
             self.joint_qd_prev = wp.zeros(m.joint_dof_count, dtype=float)
             self.joint_q = wp.clone(m.joint_q); self.joint_qd = wp.clone(m.joint_qd)
             # MuJoCo-layout data

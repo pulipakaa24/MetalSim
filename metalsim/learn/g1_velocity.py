@@ -459,6 +459,7 @@ class G1VelocityTask:
 
     def __init__(self, n, terrain: str = "flat", seed: int = 0, height_scan: bool | None = None, device="metal:0",
                  physics_dt: float = PHYSICS_DT, engine: str = "mjwarp", newton_iterations: int = 4, newton_dt: float = 0.00125,
+                 newton_kw: dict | None = None,
                  reward_cfg: str | None = None):
         """``reward_cfg``: "flat" = Isaac's G1FlatEnvCfg (default on flat terrain): track_ang_vel_z 1.0,
         lin_vel_y in +-0.5, feet_air_time 0.75 x min over feet (xy command norm), lin_vel_z_l2 -0.2 and
@@ -485,7 +486,7 @@ class G1VelocityTask:
             from metalsim.physics.newton_backend import NewtonSim
             self.physics_dt = newton_dt
             self.sim = NewtonSim(m, n, iterations=newton_iterations, dt=newton_dt, control_dt=CONTROL_DT, device=device,
-                                 hfield=self.hfield)
+                                 hfield=self.hfield, **(newton_kw or {}))
             self.decimation = self.sim.substeps
         else:
             self.physics_dt = physics_dt
