@@ -618,6 +618,35 @@ Isaac Lab's own MuJoCo Warp settings (ke 160000, kd 1100) read as direct MuJoCo 
 make the robot never fall in the drop, so that is not Newton's mapping; unverified. Preflight at
 2.5 ms passes for τ 5 ms with hard limits and for default; pending for the provisional pick.
 
+**Correction to the contact-peak rows above (2026-09-25, `docs/research/contact_discrepancies_2026-09-25.md`):
+the 3–5× "impact peak" gap is a reporting artefact, not a physics difference.** Isaac Lab's ContactSensor
+holds, at each 20 ms control step, the normal contact impulse of the *last 5 ms PhysX step* divided by
+5 ms (`get_net_contact_forces(dt)`, PhysX 5.6.1 `CudaKernels.cu:1526–1541`); the first 15 ms of every
+control step are never reported. Our recorder keeps the force of the last 2.5 ms substep. Because the
+two engines deliver the impulse at different moments inside the step, the sampled number swings from
+203 to 3715 N for the same impulse depending on that timing, and applying Isaac's 5 ms window to our
+physics does not close it (default: 4080 N). The like-for-like measure is the impulse: computed from
+the momentum change of the recorded states (independent of either sensor; matches both sensors in
+steady contact to 1 N), the hold torso impact is 154.2 N·s in Isaac vs 151.6 N·s in ours, the drop
+landing 143.0 vs 142.7, the drop torso impact 143.1 vs 133.3; across all seven recorded settings the
+impulse per event matches Isaac's within 1–4 %, and the largest 20 ms mean force is 18–21 % higher in
+ours (a slightly faster torso impact, −3.05 vs −2.67 m/s). Isaac's own sensor missed 42–45 % of the
+impulse its bodies received at the torso impacts. Two more corrections: the tables' "drop peak" was the
+torso impact at ~1.42 s after the robot tipped over, not the landing (the 1 m landing reads 917 N per
+foot in ours vs Isaac's 1030); and the stiff settings (τ 5 ms; Isaac Lab 3.0's own mapping) exceed
+PhysX's bounded 5 ms force (2.2–8.0 kN by event) because they stop the torso within one substep, and
+they double foot-contact chatter (212 vs 104 on/off switches), which resets the air-time timers. So
+the "hold / drop peak" columns must not be used to rank settings; the impulse and the 20 ms mean force
+are. Newton's actual mapping of Isaac's ke / kd (Isaac Lab 3.0, `newton/_src/solvers/mujoco/kernels.py:189`):
+`solref = (2 / kd, kd / (2·√ke))`, i.e. (1.82 ms, 1.375) for ke 160000 / kd 1100, floored by MuJoCo to
+(5 ms, 1.375); the earlier attempt fed ke / kd in directly, which is why that robot never fell. Air time:
+Isaac Lab 3.0's own MuJoCo-Warp training of this task reaches 0.042 at iteration 1000 and 0.049 at
+1499 (PhysX 0.045 / 0.046) and ~0.02 at iteration 400, which is where our table's 0.016–0.022 sits, so
+that gap is policy stage plus chatter, not the contact model; the controlled check (Isaac's own
+checkpoints played in our sim) is queued. Hardware bound from the literature: a 1 m drop of this robot
+plausibly gives 1.5–3.5 kN averaged over 20 ms; both engines' momentum-derived landing forces fall in
+that range, and Isaac's reported 1030 N understates its own physics.
+
 **The same protocol on Newton XPBD** (`scripts/diagnostics/newton_record_g1.py`, CPU device which
 matches Metal to ~1e-6, `runs/parity/report_newton_{it4_1p25ms,it4_0p625ms}`, measured 2026-09-24,
 Newton commit 45458023 with the angle-wrap clamp; MuJoCo Warp rows repeated for reference):
