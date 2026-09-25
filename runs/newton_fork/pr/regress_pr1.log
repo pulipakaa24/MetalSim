@@ -1,0 +1,2673 @@
+..................................E....................EEEEEEEEEEEEEEEEEE........................EEEEEEEEEEEEEEEEEEEEEEEE................................EEEEEEEE............................................EEEEEEEEEEEEEEEEEEEEEEEE.........................EE..EE.........EE../Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_ik.py:58: UserWarning: Inertia validation corrected 2 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  model = builder.finalize(device=device, requires_grad=True)
+./Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_ik.py:204: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  return builder.finalize(device=device, requires_grad=True)
+./Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_ik.py:163: UserWarning: Inertia validation corrected 2 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  return builder.finalize(device=device, requires_grad=True), child
+../Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_ik.py:100: UserWarning: Inertia validation corrected 2 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  model = builder.finalize(device=device, requires_grad=True)
+..s....s.......s..........E..E.EEE..E...E..E...E...E.E..E.E/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_kinematic_links.py:24: UserWarning: Inertia validation corrected 2 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  model = builder.finalize()
+./Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_kinematic_links.py:60: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  model = builder.finalize()
+......../Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_kinematic_links.py:77: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  model = builder.finalize()
+..E....E....E....E...E..Es...E......
+======================================================================
+ERROR: test_xpbd_parent_f_consistent_across_solvers_cpu (newton.tests.test_solver_xpbd.TestSolverXPBD.test_xpbd_parent_f_consistent_across_solvers_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 601, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_solver_xpbd.py", line 2175, in test_xpbd_parent_f_consistent_across_solvers
+    solver = make_solver(model)
+             ^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_solver_xpbd.py", line 2171, in <lambda>
+    ("mujoco", lambda m: newton.solvers.SolverMuJoCo(m, use_mujoco_cpu=False)),
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_joint_drive_prismatic_upX_motionX (newton.tests.test_joint_drive.TestJointDrive.test_joint_drive_prismatic_upX_motionX)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 299, in test_joint_drive_prismatic_upX_motionX
+    self.run_test_joint_drive_no_limits(True, 0, 0)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 152, in run_test_joint_drive_no_limits
+    solver = SolverMuJoCo(
+             ^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_joint_drive_prismatic_upX_motionY (newton.tests.test_joint_drive.TestJointDrive.test_joint_drive_prismatic_upX_motionY)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 302, in test_joint_drive_prismatic_upX_motionY
+    self.run_test_joint_drive_no_limits(True, 0, 1)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 152, in run_test_joint_drive_no_limits
+    solver = SolverMuJoCo(
+             ^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_joint_drive_prismatic_upX_motionZ (newton.tests.test_joint_drive.TestJointDrive.test_joint_drive_prismatic_upX_motionZ)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 305, in test_joint_drive_prismatic_upX_motionZ
+    self.run_test_joint_drive_no_limits(True, 0, 2)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 152, in run_test_joint_drive_no_limits
+    solver = SolverMuJoCo(
+             ^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_joint_drive_prismatic_upY_motionX (newton.tests.test_joint_drive.TestJointDrive.test_joint_drive_prismatic_upY_motionX)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 308, in test_joint_drive_prismatic_upY_motionX
+    self.run_test_joint_drive_no_limits(True, 1, 0)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 152, in run_test_joint_drive_no_limits
+    solver = SolverMuJoCo(
+             ^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_joint_drive_prismatic_upY_motionY (newton.tests.test_joint_drive.TestJointDrive.test_joint_drive_prismatic_upY_motionY)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 311, in test_joint_drive_prismatic_upY_motionY
+    self.run_test_joint_drive_no_limits(True, 1, 1)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 152, in run_test_joint_drive_no_limits
+    solver = SolverMuJoCo(
+             ^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_joint_drive_prismatic_upY_motionZ (newton.tests.test_joint_drive.TestJointDrive.test_joint_drive_prismatic_upY_motionZ)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 314, in test_joint_drive_prismatic_upY_motionZ
+    self.run_test_joint_drive_no_limits(True, 1, 2)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 152, in run_test_joint_drive_no_limits
+    solver = SolverMuJoCo(
+             ^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_joint_drive_prismatic_upZ_motionX (newton.tests.test_joint_drive.TestJointDrive.test_joint_drive_prismatic_upZ_motionX)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 317, in test_joint_drive_prismatic_upZ_motionX
+    self.run_test_joint_drive_no_limits(True, 2, 0)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 152, in run_test_joint_drive_no_limits
+    solver = SolverMuJoCo(
+             ^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_joint_drive_prismatic_upZ_motionY (newton.tests.test_joint_drive.TestJointDrive.test_joint_drive_prismatic_upZ_motionY)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 320, in test_joint_drive_prismatic_upZ_motionY
+    self.run_test_joint_drive_no_limits(True, 2, 1)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 152, in run_test_joint_drive_no_limits
+    solver = SolverMuJoCo(
+             ^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_joint_drive_prismatic_upZ_motionZ (newton.tests.test_joint_drive.TestJointDrive.test_joint_drive_prismatic_upZ_motionZ)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 323, in test_joint_drive_prismatic_upZ_motionZ
+    self.run_test_joint_drive_no_limits(True, 2, 2)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 152, in run_test_joint_drive_no_limits
+    solver = SolverMuJoCo(
+             ^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_joint_drive_revolute_upX_motionX (newton.tests.test_joint_drive.TestJointDrive.test_joint_drive_revolute_upX_motionX)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 326, in test_joint_drive_revolute_upX_motionX
+    self.run_test_joint_drive_no_limits(False, 0, 0)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 152, in run_test_joint_drive_no_limits
+    solver = SolverMuJoCo(
+             ^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_joint_drive_revolute_upX_motionY (newton.tests.test_joint_drive.TestJointDrive.test_joint_drive_revolute_upX_motionY)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 329, in test_joint_drive_revolute_upX_motionY
+    self.run_test_joint_drive_no_limits(False, 0, 1)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 152, in run_test_joint_drive_no_limits
+    solver = SolverMuJoCo(
+             ^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_joint_drive_revolute_upX_motionZ (newton.tests.test_joint_drive.TestJointDrive.test_joint_drive_revolute_upX_motionZ)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 332, in test_joint_drive_revolute_upX_motionZ
+    self.run_test_joint_drive_no_limits(False, 0, 2)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 152, in run_test_joint_drive_no_limits
+    solver = SolverMuJoCo(
+             ^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_joint_drive_revolute_upY_motionX (newton.tests.test_joint_drive.TestJointDrive.test_joint_drive_revolute_upY_motionX)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 335, in test_joint_drive_revolute_upY_motionX
+    self.run_test_joint_drive_no_limits(False, 1, 0)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 152, in run_test_joint_drive_no_limits
+    solver = SolverMuJoCo(
+             ^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_joint_drive_revolute_upY_motionY (newton.tests.test_joint_drive.TestJointDrive.test_joint_drive_revolute_upY_motionY)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 338, in test_joint_drive_revolute_upY_motionY
+    self.run_test_joint_drive_no_limits(False, 1, 1)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 152, in run_test_joint_drive_no_limits
+    solver = SolverMuJoCo(
+             ^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_joint_drive_revolute_upY_motionZ (newton.tests.test_joint_drive.TestJointDrive.test_joint_drive_revolute_upY_motionZ)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 341, in test_joint_drive_revolute_upY_motionZ
+    self.run_test_joint_drive_no_limits(False, 1, 2)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 152, in run_test_joint_drive_no_limits
+    solver = SolverMuJoCo(
+             ^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_joint_drive_revolute_upZ_motionX (newton.tests.test_joint_drive.TestJointDrive.test_joint_drive_revolute_upZ_motionX)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 344, in test_joint_drive_revolute_upZ_motionX
+    self.run_test_joint_drive_no_limits(False, 2, 0)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 152, in run_test_joint_drive_no_limits
+    solver = SolverMuJoCo(
+             ^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_joint_drive_revolute_upZ_motionY (newton.tests.test_joint_drive.TestJointDrive.test_joint_drive_revolute_upZ_motionY)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 347, in test_joint_drive_revolute_upZ_motionY
+    self.run_test_joint_drive_no_limits(False, 2, 1)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 152, in run_test_joint_drive_no_limits
+    solver = SolverMuJoCo(
+             ^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_joint_drive_revolute_upZ_motionZ (newton.tests.test_joint_drive.TestJointDrive.test_joint_drive_revolute_upZ_motionZ)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 350, in test_joint_drive_revolute_upZ_motionZ
+    self.run_test_joint_drive_no_limits(False, 2, 2)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_joint_drive.py", line 152, in run_test_joint_drive_no_limits
+    solver = SolverMuJoCo(
+             ^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_angular_com_stationary_mujoco_cpu_com0_ang0_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_angular_com_stationary_mujoco_cpu_com0_ang0_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 157, in test_angular_velocity_com_stationary
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_angular_com_stationary_mujoco_cpu_com0_ang1_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_angular_com_stationary_mujoco_cpu_com0_ang1_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 157, in test_angular_velocity_com_stationary
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_angular_com_stationary_mujoco_cpu_com0_ang2_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_angular_com_stationary_mujoco_cpu_com0_ang2_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 157, in test_angular_velocity_com_stationary
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_angular_com_stationary_mujoco_cpu_com1_ang0_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_angular_com_stationary_mujoco_cpu_com1_ang0_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 157, in test_angular_velocity_com_stationary
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_angular_com_stationary_mujoco_cpu_com1_ang1_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_angular_com_stationary_mujoco_cpu_com1_ang1_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 157, in test_angular_velocity_com_stationary
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_angular_com_stationary_mujoco_cpu_com1_ang2_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_angular_com_stationary_mujoco_cpu_com1_ang2_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 157, in test_angular_velocity_com_stationary
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_angular_com_stationary_mujoco_cpu_com2_ang0_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_angular_com_stationary_mujoco_cpu_com2_ang0_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 157, in test_angular_velocity_com_stationary
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_angular_com_stationary_mujoco_cpu_com2_ang1_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_angular_com_stationary_mujoco_cpu_com2_ang1_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 157, in test_angular_velocity_com_stationary
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_angular_com_stationary_mujoco_cpu_com2_ang2_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_angular_com_stationary_mujoco_cpu_com2_ang2_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 157, in test_angular_velocity_com_stationary
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_angular_com_stationary_mujoco_cpu_com3_ang0_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_angular_com_stationary_mujoco_cpu_com3_ang0_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 157, in test_angular_velocity_com_stationary
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_angular_com_stationary_mujoco_cpu_com3_ang1_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_angular_com_stationary_mujoco_cpu_com3_ang1_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 157, in test_angular_velocity_com_stationary
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_angular_com_stationary_mujoco_cpu_com3_ang2_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_angular_com_stationary_mujoco_cpu_com3_ang2_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 157, in test_angular_velocity_com_stationary
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_angular_com_stationary_mujoco_warp_com0_ang0_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_angular_com_stationary_mujoco_warp_com0_ang0_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 157, in test_angular_velocity_com_stationary
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_angular_com_stationary_mujoco_warp_com0_ang1_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_angular_com_stationary_mujoco_warp_com0_ang1_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 157, in test_angular_velocity_com_stationary
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_angular_com_stationary_mujoco_warp_com0_ang2_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_angular_com_stationary_mujoco_warp_com0_ang2_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 157, in test_angular_velocity_com_stationary
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_angular_com_stationary_mujoco_warp_com1_ang0_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_angular_com_stationary_mujoco_warp_com1_ang0_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 157, in test_angular_velocity_com_stationary
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_angular_com_stationary_mujoco_warp_com1_ang1_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_angular_com_stationary_mujoco_warp_com1_ang1_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 157, in test_angular_velocity_com_stationary
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_angular_com_stationary_mujoco_warp_com1_ang2_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_angular_com_stationary_mujoco_warp_com1_ang2_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 157, in test_angular_velocity_com_stationary
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_angular_com_stationary_mujoco_warp_com2_ang0_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_angular_com_stationary_mujoco_warp_com2_ang0_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 157, in test_angular_velocity_com_stationary
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_angular_com_stationary_mujoco_warp_com2_ang1_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_angular_com_stationary_mujoco_warp_com2_ang1_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 157, in test_angular_velocity_com_stationary
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_angular_com_stationary_mujoco_warp_com2_ang2_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_angular_com_stationary_mujoco_warp_com2_ang2_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 157, in test_angular_velocity_com_stationary
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_angular_com_stationary_mujoco_warp_com3_ang0_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_angular_com_stationary_mujoco_warp_com3_ang0_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 157, in test_angular_velocity_com_stationary
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_angular_com_stationary_mujoco_warp_com3_ang1_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_angular_com_stationary_mujoco_warp_com3_ang1_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 157, in test_angular_velocity_com_stationary
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_angular_com_stationary_mujoco_warp_com3_ang2_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_angular_com_stationary_mujoco_warp_com3_ang2_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 157, in test_angular_velocity_com_stationary
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_combined_velocity_mujoco_cpu_com0_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_combined_velocity_mujoco_cpu_com0_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 319, in test_combined_velocity
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_combined_velocity_mujoco_cpu_com1_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_combined_velocity_mujoco_cpu_com1_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 319, in test_combined_velocity
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_combined_velocity_mujoco_cpu_com2_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_combined_velocity_mujoco_cpu_com2_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 319, in test_combined_velocity
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_combined_velocity_mujoco_cpu_com3_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_combined_velocity_mujoco_cpu_com3_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 319, in test_combined_velocity
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_combined_velocity_mujoco_warp_com0_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_combined_velocity_mujoco_warp_com0_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 319, in test_combined_velocity
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_combined_velocity_mujoco_warp_com1_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_combined_velocity_mujoco_warp_com1_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 319, in test_combined_velocity
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_combined_velocity_mujoco_warp_com2_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_combined_velocity_mujoco_warp_com2_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 319, in test_combined_velocity
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_combined_velocity_mujoco_warp_com3_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_combined_velocity_mujoco_warp_com3_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 319, in test_combined_velocity
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_linear_com_moves_mujoco_cpu_com0_lin0_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_linear_com_moves_mujoco_cpu_com0_lin0_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 245, in test_linear_velocity_com_moves
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_linear_com_moves_mujoco_cpu_com0_lin1_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_linear_com_moves_mujoco_cpu_com0_lin1_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 245, in test_linear_velocity_com_moves
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_linear_com_moves_mujoco_cpu_com0_lin2_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_linear_com_moves_mujoco_cpu_com0_lin2_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 245, in test_linear_velocity_com_moves
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_linear_com_moves_mujoco_cpu_com1_lin0_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_linear_com_moves_mujoco_cpu_com1_lin0_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 245, in test_linear_velocity_com_moves
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_linear_com_moves_mujoco_cpu_com1_lin1_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_linear_com_moves_mujoco_cpu_com1_lin1_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 245, in test_linear_velocity_com_moves
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_linear_com_moves_mujoco_cpu_com1_lin2_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_linear_com_moves_mujoco_cpu_com1_lin2_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 245, in test_linear_velocity_com_moves
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_linear_com_moves_mujoco_cpu_com2_lin0_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_linear_com_moves_mujoco_cpu_com2_lin0_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 245, in test_linear_velocity_com_moves
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_linear_com_moves_mujoco_cpu_com2_lin1_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_linear_com_moves_mujoco_cpu_com2_lin1_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 245, in test_linear_velocity_com_moves
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_linear_com_moves_mujoco_cpu_com2_lin2_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_linear_com_moves_mujoco_cpu_com2_lin2_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 245, in test_linear_velocity_com_moves
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_linear_com_moves_mujoco_cpu_com3_lin0_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_linear_com_moves_mujoco_cpu_com3_lin0_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 245, in test_linear_velocity_com_moves
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_linear_com_moves_mujoco_cpu_com3_lin1_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_linear_com_moves_mujoco_cpu_com3_lin1_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 245, in test_linear_velocity_com_moves
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_linear_com_moves_mujoco_cpu_com3_lin2_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_linear_com_moves_mujoco_cpu_com3_lin2_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 245, in test_linear_velocity_com_moves
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_linear_com_moves_mujoco_warp_com0_lin0_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_linear_com_moves_mujoco_warp_com0_lin0_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 245, in test_linear_velocity_com_moves
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_linear_com_moves_mujoco_warp_com0_lin1_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_linear_com_moves_mujoco_warp_com0_lin1_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 245, in test_linear_velocity_com_moves
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_linear_com_moves_mujoco_warp_com0_lin2_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_linear_com_moves_mujoco_warp_com0_lin2_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 245, in test_linear_velocity_com_moves
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_linear_com_moves_mujoco_warp_com1_lin0_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_linear_com_moves_mujoco_warp_com1_lin0_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 245, in test_linear_velocity_com_moves
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_linear_com_moves_mujoco_warp_com1_lin1_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_linear_com_moves_mujoco_warp_com1_lin1_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 245, in test_linear_velocity_com_moves
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_linear_com_moves_mujoco_warp_com1_lin2_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_linear_com_moves_mujoco_warp_com1_lin2_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 245, in test_linear_velocity_com_moves
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_linear_com_moves_mujoco_warp_com2_lin0_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_linear_com_moves_mujoco_warp_com2_lin0_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 245, in test_linear_velocity_com_moves
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_linear_com_moves_mujoco_warp_com2_lin1_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_linear_com_moves_mujoco_warp_com2_lin1_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 245, in test_linear_velocity_com_moves
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_linear_com_moves_mujoco_warp_com2_lin2_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_linear_com_moves_mujoco_warp_com2_lin2_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 245, in test_linear_velocity_com_moves
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_linear_com_moves_mujoco_warp_com3_lin0_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_linear_com_moves_mujoco_warp_com3_lin0_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 245, in test_linear_velocity_com_moves
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_linear_com_moves_mujoco_warp_com3_lin1_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_linear_com_moves_mujoco_warp_com3_lin1_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 245, in test_linear_velocity_com_moves
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_linear_com_moves_mujoco_warp_com3_lin2_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_linear_com_moves_mujoco_warp_com3_lin2_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 245, in test_linear_velocity_com_moves
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_root_free_joint_under_rotated_parent_xform_uses_parent_frame_qd_mujoco_cpu_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_root_free_joint_under_rotated_parent_xform_uses_parent_frame_qd_mujoco_cpu_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 391, in test_root_free_joint_under_rotated_parent_xform_uses_parent_frame_qd
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 857, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_root_free_joint_under_rotated_parent_xform_uses_parent_frame_qd_mujoco_warp_cpu (newton.tests.test_body_velocity.TestBodyVelocity.test_root_free_joint_under_rotated_parent_xform_uses_parent_frame_qd_mujoco_warp_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 391, in test_root_free_joint_under_rotated_parent_xform_uses_parent_frame_qd
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_body_velocity.py", line 862, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=False, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_3d_articulation_mujoco_cpu_cpu (newton.tests.test_control_force.TestControlForce.test_3d_articulation_mujoco_cpu_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_control_force.py", line 114, in test_3d_articulation
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_control_force.py", line 317, in <lambda>
+    "mujoco_cpu": lambda model: newton.solvers.SolverMuJoCo(
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_3d_articulation_mujoco_warp_cpu (newton.tests.test_control_force.TestControlForce.test_3d_articulation_mujoco_warp_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_control_force.py", line 114, in test_3d_articulation
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_control_force.py", line 320, in <lambda>
+    "mujoco_warp": lambda model: newton.solvers.SolverMuJoCo(
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_floating_body_angular_mujoco_cpu_cpu (newton.tests.test_control_force.TestControlForce.test_floating_body_angular_mujoco_cpu_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_control_force.py", line 59, in test_floating_body
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_control_force.py", line 317, in <lambda>
+    "mujoco_cpu": lambda model: newton.solvers.SolverMuJoCo(
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_floating_body_angular_mujoco_warp_cpu (newton.tests.test_control_force.TestControlForce.test_floating_body_angular_mujoco_warp_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_control_force.py", line 59, in test_floating_body
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_control_force.py", line 320, in <lambda>
+    "mujoco_warp": lambda model: newton.solvers.SolverMuJoCo(
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_ball_loop_joint_mujoco_cpu_cpu (newton.tests.test_physics_verification.TestPhysicsVerification.test_ball_loop_joint_mujoco_cpu_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 1357, in test_ball_loop_joint
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 1795, in <lambda>
+    "mujoco_cpu": lambda model: newton.solvers.SolverMuJoCo(
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_energy_conservation_mujoco_cpu_cpu (newton.tests.test_physics_verification.TestPhysicsVerification.test_energy_conservation_mujoco_cpu_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 271, in test_energy_conservation
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 1639, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_fixed_loop_joint_mujoco_cpu_cpu (newton.tests.test_physics_verification.TestPhysicsVerification.test_fixed_loop_joint_mujoco_cpu_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 1500, in test_fixed_loop_joint
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 1795, in <lambda>
+    "mujoco_cpu": lambda model: newton.solvers.SolverMuJoCo(
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_fourbar_linkage_loop_joint_mujoco_cpu_cpu (newton.tests.test_physics_verification.TestPhysicsVerification.test_fourbar_linkage_loop_joint_mujoco_cpu_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 1019, in test_fourbar_linkage
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 1795, in <lambda>
+    "mujoco_cpu": lambda model: newton.solvers.SolverMuJoCo(
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_fourbar_linkage_mujoco_cpu_cpu (newton.tests.test_physics_verification.TestPhysicsVerification.test_fourbar_linkage_mujoco_cpu_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 1019, in test_fourbar_linkage
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 1795, in <lambda>
+    "mujoco_cpu": lambda model: newton.solvers.SolverMuJoCo(
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_free_fall_mujoco_cpu_cpu (newton.tests.test_physics_verification.TestPhysicsVerification.test_free_fall_mujoco_cpu_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 98, in test_free_fall
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 1580, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_joint_actuation_mujoco_cpu_cpu (newton.tests.test_physics_verification.TestPhysicsVerification.test_joint_actuation_mujoco_cpu_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 442, in test_joint_actuation
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 1639, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_momentum_conservation_mujoco_cpu_cpu (newton.tests.test_physics_verification.TestPhysicsVerification.test_momentum_conservation_mujoco_cpu_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 543, in test_momentum_conservation
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 1580, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_pendulum_period_mujoco_cpu_cpu (newton.tests.test_physics_verification.TestPhysicsVerification.test_pendulum_period_mujoco_cpu_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 184, in test_pendulum_period
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 1639, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_projectile_motion_mujoco_cpu_cpu (newton.tests.test_physics_verification.TestPhysicsVerification.test_projectile_motion_mujoco_cpu_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 350, in test_projectile_motion
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 1580, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_restitution_mujoco_cpu_cpu (newton.tests.test_physics_verification.TestPhysicsVerification.test_restitution_mujoco_cpu_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 824, in test_restitution_mujoco
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 1780, in <lambda>
+    solver_fn=lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True),
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_revolute_loop_joint_mujoco_cpu_cpu (newton.tests.test_physics_verification.TestPhysicsVerification.test_revolute_loop_joint_mujoco_cpu_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 1236, in test_revolute_loop_joint
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 1795, in <lambda>
+    "mujoco_cpu": lambda model: newton.solvers.SolverMuJoCo(
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_torque_free_precession_mujoco_cpu_cpu (newton.tests.test_physics_verification.TestPhysicsVerification.test_torque_free_precession_mujoco_cpu_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 613, in test_torque_free_precession
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_physics_verification.py", line 1639, in <lambda>
+    lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True, disable_contacts=True),
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_kinematic_fixed_root_static_force_immune_mujoco_cpu_cpu (newton.tests.test_kinematic_links.TestKinematicLinksCanonical.test_kinematic_fixed_root_static_force_immune_mujoco_cpu_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_kinematic_links.py", line 624, in test_kinematic_fixed_root_static_force_immune
+    no_force = run_once(apply_force=False)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_kinematic_links.py", line 590, in run_once
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_kinematic_links.py", line 722, in <lambda>
+    "mujoco_cpu": lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True),
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_kinematic_free_base_prescribed_motion_mujoco_cpu_cpu (newton.tests.test_kinematic_links.TestKinematicLinksCanonical.test_kinematic_free_base_prescribed_motion_mujoco_cpu_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_kinematic_links.py", line 461, in test_kinematic_free_base_prescribed_motion
+    no_force = run_once(apply_force=False)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_kinematic_links.py", line 413, in run_once
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_kinematic_links.py", line 722, in <lambda>
+    "mujoco_cpu": lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True),
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_kinematic_revolute_root_pendulum_prescribed_motion_mujoco_cpu_cpu (newton.tests.test_kinematic_links.TestKinematicLinksCanonical.test_kinematic_revolute_root_pendulum_prescribed_motion_mujoco_cpu_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_kinematic_links.py", line 556, in test_kinematic_revolute_root_pendulum_prescribed_motion
+    no_force = run_once(apply_force=False)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_kinematic_links.py", line 497, in run_once
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_kinematic_links.py", line 722, in <lambda>
+    "mujoco_cpu": lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True),
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_kinematic_runtime_toggle_mujoco_cpu_cpu (newton.tests.test_kinematic_links.TestKinematicLinksCanonical.test_kinematic_runtime_toggle_mujoco_cpu_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_kinematic_links.py", line 661, in test_kinematic_runtime_toggle
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_kinematic_links.py", line 722, in <lambda>
+    "mujoco_cpu": lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True),
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_box_drop_mujoco_cpu_cpu (newton.tests.test_rigid_contact.TestRigidContact.test_box_drop_mujoco_cpu_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_rigid_contact.py", line 789, in test_box_drop
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_rigid_contact.py", line 846, in <lambda>
+    "mujoco_cpu": lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True),
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_mujoco_convex_on_convex_mujoco_cpu_cpu (newton.tests.test_rigid_contact.TestRigidContact.test_mujoco_convex_on_convex_mujoco_cpu_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_rigid_contact.py", line 746, in test_mujoco_convex_on_convex
+    solver = solver_fn(model)
+             ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_rigid_contact.py", line 846, in <lambda>
+    "mujoco_cpu": lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True),
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+======================================================================
+ERROR: test_shapes_on_plane_mujoco_cpu_cpu (newton.tests.test_rigid_contact.TestRigidContact.test_shapes_on_plane_mujoco_cpu_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 528, in import_mujoco
+    import mujoco
+ModuleNotFoundError: No module named 'mujoco'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_rigid_contact.py", line 153, in test_shapes_on_plane
+    temp_solver = solver_fn(model)
+                  ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/tests/test_rigid_contact.py", line 846, in <lambda>
+    "mujoco_cpu": lambda model: newton.solvers.SolverMuJoCo(model, use_mujoco_cpu=True),
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 3813, in __init__
+    mujoco, _ = self.import_mujoco()
+                ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-pr1/newton/_src/solvers/mujoco/solver_mujoco.py", line 534, in import_mujoco
+    raise ImportError(
+ImportError: MuJoCo backend not installed. Please refer to https://github.com/google-deepmind/mujoco_warp for installation instructions.
+
+----------------------------------------------------------------------
+Ran 381 tests in 131.342s
+
+FAILED (errors=101, skipped=4)
+Warp 1.17.0 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.17.0
+Module validate_and_correct_inertia_kernel_1ff2ac62 6ad45b8 load on device 'cpu' took 0.76 ms  (cached)
+Module newton._src.geometry.bvh 4a1c07f load on device 'cpu' took 0.25 ms  (cached)
+Module newton._src.solvers.solver 5e8bff5 load on device 'cpu' took 0.24 ms  (cached)
+Module newton._src.solvers.xpbd.kernels 6b5d5a2 load on device 'cpu' took 0.37 ms  (cached)
+Module newton._src.sim.articulation db62aa7 load on device 'cpu' took 0.38 ms  (cached)
+Module newton._src.sim.collide 65832b3 load on device 'cpu' took 0.29 ms  (cached)
+Module newton._src.geometry.broad_phase_nxn fb0ade4 load on device 'cpu' took 0.23 ms  (cached)
+Module narrow_phase_primitive_write_contact_False_False_False b8baf6c load on device 'cpu' took 0.39 ms  (cached)
+Module narrow_phase_gjk_mpr_True_False_write_contact_support_map_default 73a7fe5 load on device 'cpu' took 0.36 ms  (cached)
+Module newton._src.geometry.narrow_phase 81632d4 load on device 'cpu' took 0.26 ms  (cached)
+Module newton._src.geometry.kernels aa03545 load on device 'cpu' took 0.48 ms  (cached)
+Module newton._src.solvers.xpbd.restitution_kernels 2acf577 load on device 'cpu' took 0.32 ms  (cached)
+Module newton._src.geometry.differentiable_contacts bbe90ee load on device 'cpu' took 0.42 ms  (cached)
+Module newton.tests.test_solver_xpbd 95a61bf load on device 'cpu' took 0.41 ms  (cached)
+Module map_add 0da7256 load on device 'cpu' took 0.27 ms  (cached)
+Module narrow_phase_gjk_mpr_True_False_write_contact_support_map_lean_post_process_minkowski_only 7220dde load on device 'cpu' took 0.37 ms  (cached)
+Module newton._src.solvers.featherstone.kernels 13b74e5 load on device 'cpu' took 0.41 ms  (cached)
+Module newton._src.viewer.kernels 902c7e8 load on device 'cpu' took 0.35 ms  (cached)
+Module newton._src.solvers.kamino._src.core.conversions b9bda9f load on device 'cpu' took 0.30 ms  (cached)
+Module newton._src.solvers.kamino._src.core.bodies e83a87a load on device 'cpu' took 0.24 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.constraints 60abbd4 load on device 'cpu' took 0.33 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.jacobians 0699ad1 load on device 'cpu' took 0.31 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.joints 8384a11 load on device 'cpu' took 0.28 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.wrenches e7bf119 load on device 'cpu' took 0.26 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus bbe513b load on device 'cpu' took 0.23 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.dual 2a2a399 load on device 'cpu' took 0.23 ms  (cached)
+Module newton._src.solvers.kamino._src.geometry.keying 3044dc2 load on device 'cpu' took 0.28 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.warmstart 92cf25c load on device 'cpu' took 0.23 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.common 00884db load on device 'cpu' took 0.22 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels 6af942a load on device 'cpu' took 0.26 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked 8c970fb load on device 'cpu' took 0.22 ms  (cached)
+Module make_desaxce_correction_and_velocity_bias_kernel__locals___compute_desaxce_correction_and_velocity_bias_79564be9 78727e6 load on device 'cpu' took 0.22 ms  (cached)
+Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_71790f5b 78fea3d load on device 'cpu' took 0.23 ms  (cached)
+Module newton._src.solvers.kamino._src.integrators.euler cc771ef load on device 'cpu' took 0.21 ms  (cached)
+Module newton._src.solvers.kamino._src.core.time ebc5e68 load on device 'cpu' took 0.20 ms  (cached)
+Module newton._src.solvers.semi_implicit.kernels_body bcf4136 load on device 'cpu' took 0.35 ms  (cached)
+Module newton._src.solvers.semi_implicit.kernels_contact cff5f17 load on device 'cpu' took 0.55 ms  (cached)
+Module newton._src.sim.ik.ik_common 3bf4b2f load on device 'cpu' took 0.37 ms  (cached)
+Module newton._src.sim.ik.ik_solver 9ae4091 load on device 'cpu' took 0.25 ms  (cached)
+Module IKOptimizerLM___build_specialized__locals___fk_local_9430eeda 9d4700b load on device 'cpu' took 0.24 ms  (cached)
+Module newton._src.sim.ik.ik_objectives e76812b load on device 'cpu' took 0.27 ms  (cached)
+Module IKOptimizerLM___build_specialized__locals___compute_motion_subspace_2d_f73d68e9 f5a18a0 load on device 'cpu' took 0.29 ms  (cached)
+Module _lm_solve_tiled_2_3_85b92587 9d43f59 load on device 'cpu' took 0.26 ms  (cached)
+Module newton._src.sim.ik.ik_lm_optimizer 43dab9e load on device 'cpu' took 0.25 ms  (cached)
+Module _lm_solve_tiled_6_6_afd77548 62b878b load on device 'cpu' took 0.28 ms  (cached)
+Module _lm_solve_tiled_7_6_205e85f1 13b7a9f load on device 'cpu' took 0.33 ms  (cached)
+Module _lm_solve_tiled_7_3_addbe131 d3f6517 load on device 'cpu' took 0.29 ms  (cached)
+Module newton._src.sim.ik.ik_lbfgs_optimizer 48d8bac load on device 'cpu' took 0.30 ms  (cached)
+Module IKOptimizerLBFGS___build_specialized__locals___fk_local_3ae8ad99 457453e load on device 'cpu' took 0.24 ms  (cached)
+Module IKOptimizerLBFGS___build_specialized__locals___compute_motion_subspace_2d_7ae2c60a 535ae1e load on device 'cpu' took 0.23 ms  (cached)
+Module _compute_gradient_jtr_tiled_6_3_1015c991 e1a1668 load on device 'cpu' took 0.21 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.limits c5f7a9e load on device 'cpu' took 0.30 ms  (cached)
+Module newton.tests.test_physics_verification 5bb96a6 load on device 'cpu' took 0.36 ms  (cached)
+Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_28fe359a b16d134 load on device 'cpu' took 0.39 ms  (cached)
+Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_c41b1dd3 4866292 load on device 'cpu' took 0.42 ms  (cached)
+Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_3435a4a2 43147cc load on device 'cpu' took 0.39 ms  (cached)
+Module newton._src.geometry.broad_phase_sap 487d783 load on device 'cpu' took 0.52 ms  (cached)
+Module newton._src.solvers.vbd.rigid_vbd_kernels bd3495c load on device 'cpu' took 0.46 ms  (cached)
+Module warp._src.coloring 811e0ea load on device 'cpu' took 0.39 ms  (cached)
+Module newton._src.geometry.inertia f6b4bd8 load on device 'cpu' took 0.42 ms  (cached)
+Module newton._src.geometry.contact_reduction_global cb59557 load on device 'cpu' took 0.44 ms  (cached)
+Module newton._src.geometry.sdf_contact df766d2 load on device 'cpu' took 0.28 ms  (cached)
+Module narrow_phase_mesh_plane_write_contact_to_reducer_True ee1e23c load on device 'cpu' took 0.27 ms  (cached)
+Module mesh_triangle_contacts_to_reducer_kernel_d568a18a b9680a7 load on device 'cpu' took 0.34 ms  (cached)
+Module export_reduced_contacts_write_contact 2049828 load on device 'cpu' took 0.28 ms  (cached)
+Module sdf_contact_write_contact_to_reducer_False_True_False_True_False_False_False 7ac51e3 load on device 'cpu' took 0.50 ms  (cached)
+Module make_convert_contacts_newton_to_kamino__locals___convert_contacts_newton_to_kamino_083930f1 e105cc1 load on device 'cpu' took 0.45 ms  (cached)
