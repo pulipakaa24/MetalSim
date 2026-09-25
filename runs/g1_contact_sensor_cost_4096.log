@@ -1,0 +1,9 @@
+gpu_lock status at start Thu Sep 24 22:05:28 PDT 2026:
+holder: {"name": "g1_contact_sensor_cost", "kind": "timing", "minutes": 10.0, "pid": 61280, "start": 1790312728.42556}
+  waiting [timing] newton_transfer est 12.0 min, queued 102 s ago
+  waiting [render] stage_videos est 10.0 min, queued 1039 s ago
+  waiting [train] g1_flat_rslrl_isaacflatcfg est 30.0 min, queued 709 s ago
+commit 5482890
+sensor: 29,479 env-steps/s (median of 5: 29,479, 29,495, 29,478, 29,458, 29,507); 138.95 ms per control step
+touch : 29,611 env-steps/s (median of 5: 29,589, 29,611, 29,633, 29,586, 29,631); 138.33 ms per control step
+N=4096, physics dt 0.0025 (decimation 8), history 6 substeps: sensor costs +0.62 ms per control step (+0.4 %)
