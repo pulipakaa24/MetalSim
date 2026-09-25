@@ -52,26 +52,31 @@ MetalSim depends on three forked projects, none of them on PyPI in this form. Th
 what the current results were produced with.
 
 **Warp** ([pulipakaa24/warp](https://github.com/pulipakaa24/warp), branch `metalsim`, commit
-`b9557cb`). NVIDIA Warp with innate-inc's Metal backend, plus five MetalSim commits: interop entry
+`f194006`). NVIDIA Warp with innate-inc's Metal backend, plus seven MetalSim commits: interop entry
 points (Metal device, queue and buffer handles, cross-queue events, used for zero-copy PyTorch MPS
 tensors), graph replay through Metal indirect command buffers, release of deferred frees per completed
 command buffer (without it, long loops at 4096 envs ran out of GPU memory) and fixed-size arrays
-(`wp.zeros` inside kernels) in the Metal code generator, and a configurable size bound for the register
-tile Cholesky (`wp.config.metal_register_cholesky_max`). `scripts/setup_warp.sh [dir]` clones it
+(`wp.zeros` inside kernels) in the Metal code generator, a configurable size bound for the register
+tile Cholesky (`wp.config.metal_register_cholesky_max`), `segmented_sort_pairs` inside a captured Metal graph
+(MuJoCo Warp's flex collision in graphs), and `nextafterf` in the Metal kernel runtime (Newton VBD). `scripts/setup_warp.sh [dir]` clones it
 (default `upstream/warp-metalsim`), builds the native library with `build_lib.py --no-cuda` and
 installs it editable. `METALSIM_WARP_REPO` and `METALSIM_WARP_REF` (branch, tag or commit) point it
 elsewhere. If the fork cannot be cloned, the script clones innate-inc/warp at `ce15f6b` and applies
-`patches/warp/0001-0005`, which gives the same source tree as `b9557cb`.
+`patches/warp/0001-0007`, which gives the same source tree as `f194006`.
 
 **MuJoCo Warp** ([pulipakaa24/mujoco_warp](https://github.com/pulipakaa24/mujoco_warp), branch
-`metalsim`, commit `1791414`). Google DeepMind's MuJoCo Warp v3.14.0 (`88af9cc`) with seven commits:
+`metalsim`, commit `8fbf965`). Google DeepMind's MuJoCo Warp v3.14.0 (`88af9cc`) with sixteen commits:
 the Metal device patch, heightfield contacts computed against each prism's top plane (upstream
 produced inverted normals and launched worlds on rough terrain), and the plane-to-convex contact set of
 MuJoCo C (upstream kept 2 contacts where MuJoCo C keeps 4 on a tilted foot), with an environment switch
 `MJW_PLANE_CONVEX=legacy` that restores the old behaviour for A/B comparisons, plus three Metal throughput
 commits (sparse L'DL one world per thread, the Hessian update fused into its Cholesky, no-op launches
-skipped; `MJW_METAL_FUSE_H_CHOLESKY=0` and `MJW_METAL_DENSE_CHOL_MAX` for A/B). The same seven commits
-are in `patches/mujoco_warp/`; to build without the fork, clone google-deepmind/mujoco_warp at
+skipped; `MJW_METAL_FUSE_H_CHOLESKY=0` and `MJW_METAL_DENSE_CHOL_MAX` for A/B), plus nine flex (deformable) commits that make MuJoCo Warp's flex contacts
+match MuJoCo C (per-pair contact cap and selection, box-triangle and cable-capsule contacts, correct element ids for
+every flex, active-layer volume contacts, mesh normals), order flex equality rows deterministically (the Metal
+`FlexConstraintTest` failures) and sort on the device on Metal; each behind a `collision_flex` flag
+(`scripts/diagnostics/deformable/UPSTREAM.md`). The same sixteen commits (flex ones rebased linearly after the
+throughput ones; identical tree to the merge `8fbf965`) are in `patches/mujoco_warp/`; to build without the fork, clone google-deepmind/mujoco_warp at
 `88af9cc`, `git am` those patches and `pip install -e` the checkout.
 
 **Newton** ([pulipakaa24/newton](https://github.com/pulipakaa24/newton), branch `metalsim`, commit

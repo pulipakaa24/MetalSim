@@ -1,7 +1,7 @@
 From 786cdae38050b04cc3e3a00e71546ce949b9e50a Mon Sep 17 00:00:00 2001
 From: Aditya Pulipaka <adipu@utexas.edu>
 Date: Thu, 24 Sep 2026 16:57:36 -0700
-Subject: [PATCH 4/5] Metal: fixed-size arrays (wp.zeros in kernels);
+Subject: [PATCH 4/7] Metal: fixed-size arrays (wp.zeros in kernels);
  thread-qualify reference casts in native snippets
 
 MSL has no derived classes and its address spaces are disjoint, so the CPU/CUDA
@@ -44,7 +44,7 @@ Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>
  4 files changed, 224 insertions(+), 21 deletions(-)
 
 diff --git a/warp/_src/codegen.py b/warp/_src/codegen.py
-index 8e5caa6..fe2e7ef 100644
+index 8e5caa69..fe2e7ef6 100644
 --- a/warp/_src/codegen.py
 +++ b/warp/_src/codegen.py
 @@ -1959,14 +1959,17 @@ def replay_arena_arg(func, has_args: bool) -> str:
@@ -338,7 +338,7 @@ index 8e5caa6..fe2e7ef 100644
          # a Metal forward-only rebuild (see Module.load) drops every adjoint, including per-kernel opt-ins
          if (options | kernel.options)["enable_backward"] and not options.get("metal_forward_only"):
 diff --git a/warp/_src/context.py b/warp/_src/context.py
-index a4dc608..db7510e 100644
+index a4dc6085..db7510eb 100644
 --- a/warp/_src/context.py
 +++ b/warp/_src/context.py
 @@ -1093,9 +1093,12 @@ class KernelHooks:
@@ -426,7 +426,7 @@ index a4dc608..db7510e 100644
  
      if runtime.core.wp_metal_launch_kernel(
 diff --git a/warp/native/array.h b/warp/native/array.h
-index 82a7516..b1f3f9e 100644
+index 82a7516b..b1f3f9e5 100644
 --- a/warp/native/array.h
 +++ b/warp/native/array.h
 @@ -384,6 +384,62 @@ add(const fixedarray_t<Size, T> WP_THREAD& a, const fixedarray_t<Size, T> WP_THR
@@ -493,7 +493,7 @@ index 82a7516..b1f3f9e 100644
  
  
 diff --git a/warp/native/tile.h b/warp/native/tile.h
-index 59608b5..ff902f2 100644
+index 59608b50..ff902f21 100644
 --- a/warp/native/tile.h
 +++ b/warp/native/tile.h
 @@ -89,6 +89,14 @@ template <int BlockDim> inline void tile_sync()

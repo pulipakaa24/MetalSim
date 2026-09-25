@@ -1,0 +1,44 @@
+From d1a33084d2959fddea70aca5cbc41c6b260e0636 Mon Sep 17 00:00:00 2001
+From: Aditya Pulipaka <adipu@utexas.edu>
+Date: Fri, 25 Sep 2026 09:13:49 -0700
+Subject: [PATCH 16/16] Mesh-flex normal: keep the face normal for touching
+ contacts (witness separation < 0.1 mm)
+
+On Metal the GJK witness difference of a touching tetrahedron apex (distance 1e-6 m) pointed 0.127 rad off the
+face normal (CPU: 1.7e-3): the direction of a near-zero vector is float32 noise. The EPA/GJK direction is now used
+only when the witnesses are more than MESH_FLEX_NORMAL_MIN_SEP (1e-4 m) apart, i.e. for real penetrations at
+edges and corners, which is where MuJoCo C's direction differs from the face normal.
+
+Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>
+---
+ mujoco_warp/_src/collision_flex.py | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/mujoco_warp/_src/collision_flex.py b/mujoco_warp/_src/collision_flex.py
+index a943885..3f1e936 100644
+--- a/mujoco_warp/_src/collision_flex.py
++++ b/mujoco_warp/_src/collision_flex.py
+@@ -77,6 +77,7 @@ def _device_sort() -> bool:
+     return bool(FLEX_DEVICE_SORT)
+   return not wp.get_device().is_cuda
+ MESH_FLEX_FACE_NORMAL_COS: float = 0.99995  # ~0.01 rad
++MESH_FLEX_NORMAL_MIN_SEP: float = 1.0e-4  # m, witness separation below which the direction is unreliable in float32
+ # depth (m) and relative squared-distance differences treated as ties in the selection (float32 vs MuJoCo C's float64)
+ FPS_DEPTH_TIE: float = 1.0e-8
+ FPS_DIST_REL_TIE: float = 1.0e-6
+@@ -804,7 +805,11 @@ def _collide_mesh_convex(
+       if not wp.static(MESH_FLEX_FACE_NORMAL):
+         # MuJoCo C uses the penetration (EPA) direction. Keep the face normal only where it is that direction up to
+         # float32 EPA error (face contacts); at edges and corners use the EPA direction.
+-        if wp.abs(wp.dot(normal, gjk_normal)) < wp.static(MESH_FLEX_FACE_NORMAL_COS):
++        # (the EPA/GJK direction is noise when the witness points nearly coincide: a touching contact, |w1-w2|
++        # below 1e-4 m; there the face normal stays, as upstream)
++        if wp.abs(wp.dot(normal, gjk_normal)) < wp.static(MESH_FLEX_FACE_NORMAL_COS) and wp.length(diff) > wp.static(
++          MESH_FLEX_NORMAL_MIN_SEP
++        ):
+           normal = gjk_normal
+       contact_pos = 0.5 * (w1 + w2)
+       if wp.static(FLEX_RADIUS_CONTACT_POS):
+-- 
+2.54.0 (Apple Git-157)
+

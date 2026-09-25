@@ -1,8 +1,8 @@
 From ad2212000943ac4285afcf6e942754329bf2cf44 Mon Sep 17 00:00:00 2001
 From: Aditya Pulipaka <adipu@utexas.edu>
 Date: Fri, 25 Sep 2026 09:22:55 -0700
-Subject: [PATCH 5/7] Metal: one-world-per-thread sparse L'DL factor and solve;
- skip no-op gravcomp / tendon-damping launches
+Subject: [PATCH 05/16] Metal: one-world-per-thread sparse L'DL factor and
+ solve; skip no-op gravcomp / tendon-damping launches
 
 - _factor_i_sparse on Metal: the whole L'DL factorization of a world in one thread (one launch instead of a
   copy, one launch per tree level and the diagonal); same updates in the same level order, updates of a

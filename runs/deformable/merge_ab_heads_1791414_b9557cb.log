@@ -1,0 +1,19 @@
+== Fri Sep 25 10:26:09 PDT 2026 power: Now drawing from 'AC Power'
+holder: {"name": "flex_merge_ab2", "kind": "low", "minutes": 35.0, "pid": 73555, "start": 1790357168.964687}
+== flexbase: /Users/aditya/robosim/upstream/warp-innate-base/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-base/mujoco_warp/__init__.py
+1791414 Solver: MJW_METAL_DENSE_CHOL_MAX knob (off-CUDA dense vs blocked Hessian Cholesky threshold, default 64 unchanged)
+b9557cb9 Metal: configurable register-Cholesky bound (warp.config.metal_register_cholesky_max, default 40)
+45 passed, 4 skipped, 7 warnings in 113.35s (0:01:53)
+== flexmerge: /Users/aditya/robosim/upstream/warp-innate-merge/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-merge/mujoco_warp/__init__.py
+a8f10c0 Merge branch 'metalsim-flex' into HEAD
+0a4e4bc9 Merge branch 'metalsim-flex' into HEAD
+45 passed, 4 skipped, 7 warnings in 96.10s (0:01:36)
+[flexbase flat r1] SUMMARY physics 81,063 | step 67,849 | rollout 61,640 | loop 56,119  (ms: physics 50.5, step 60.4, rollout/step 66.5, update 157)
+[flexbase rough r1] SUMMARY physics 65,195 | step 54,402 | rollout 48,479 | loop 42,244  (ms: physics 62.8, step 75.3, rollout/step 84.5, update 299)
+[flexmerge flat r1] SUMMARY physics 81,032 | step 67,686 | rollout 60,966 | loop 55,698  (ms: physics 50.5, step 60.5, rollout/step 67.2, update 153)
+[flexmerge rough r1] SUMMARY physics 65,053 | step 54,783 | rollout 48,340 | loop 42,080  (ms: physics 63.0, step 74.8, rollout/step 84.7, update 303)
+[flexbase flat r2] SUMMARY physics 80,496 | step 67,459 | rollout 61,521 | loop 56,193  (ms: physics 50.9, step 60.7, rollout/step 66.6, update 151)
+[flexbase rough r2] SUMMARY physics 65,099 | step 54,582 | rollout 48,444 | loop 42,004  (ms: physics 62.9, step 75.0, rollout/step 84.6, update 311)
+[flexmerge flat r2] SUMMARY physics 80,890 | step 67,178 | rollout 61,539 | loop 56,301  (ms: physics 50.6, step 61.0, rollout/step 66.6, update 149)
+[flexmerge rough r2] SUMMARY physics 65,057 | step 54,768 | rollout 48,419 | loop 42,140  (ms: physics 63.0, step 74.8, rollout/step 84.6, update 303)
+== done Fri Sep 25 10:34:40 PDT 2026

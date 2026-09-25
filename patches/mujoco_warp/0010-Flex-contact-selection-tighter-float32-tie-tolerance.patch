@@ -1,0 +1,32 @@
+From af4684b6a2f25ad59dfaa0a57e48e47ec9d7b387 Mon Sep 17 00:00:00 2001
+From: Aditya Pulipaka <adipu@utexas.edu>
+Date: Fri, 25 Sep 2026 03:54:42 -0700
+Subject: [PATCH 10/16] Flex contact selection: tighter float32 tie tolerances
+ (depth 1e-8 m, distance 1e-6 relative)
+
+1e-7 / 1e-5 merged distances MuJoCo C tells apart: capped plane contact sets 83/83 -> 77/83. With 1e-8 / 1e-6:
+83/83 plane, 78/78 box, still resolving the float32 depth ties at shared triangle edges.
+
+Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>
+---
+ mujoco_warp/_src/collision_flex.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/mujoco_warp/_src/collision_flex.py b/mujoco_warp/_src/collision_flex.py
+index 1f75d1c..a7f225e 100644
+--- a/mujoco_warp/_src/collision_flex.py
++++ b/mujoco_warp/_src/collision_flex.py
+@@ -64,8 +64,8 @@ FPS_COINCIDENT_D2: float = 1.0e-12
+ # mesh-element contact point at the midpoint of the radius-inflated penetration (MuJoCo C); False: upstream's midpoint
+ FLEX_RADIUS_CONTACT_POS: bool = True
+ # depth (m) and relative squared-distance differences treated as ties in the selection (float32 vs MuJoCo C's float64)
+-FPS_DEPTH_TIE: float = 1.0e-7
+-FPS_DIST_REL_TIE: float = 1.0e-5
++FPS_DEPTH_TIE: float = 1.0e-8
++FPS_DIST_REL_TIE: float = 1.0e-6
+ 
+ 
+ @wp.func
+-- 
+2.54.0 (Apple Git-157)
+

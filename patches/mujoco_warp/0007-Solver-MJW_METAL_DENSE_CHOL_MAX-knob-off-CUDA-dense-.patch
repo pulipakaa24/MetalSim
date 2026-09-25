@@ -1,8 +1,8 @@
 From 17914144d132dec4c0aa3bccfe743816faec72c9 Mon Sep 17 00:00:00 2001
 From: Aditya Pulipaka <adipu@utexas.edu>
 Date: Fri, 25 Sep 2026 09:56:34 -0700
-Subject: [PATCH 7/7] Solver: MJW_METAL_DENSE_CHOL_MAX knob (off-CUDA dense vs
- blocked Hessian Cholesky threshold, default 64 unchanged)
+Subject: [PATCH 07/16] Solver: MJW_METAL_DENSE_CHOL_MAX knob (off-CUDA dense
+ vs blocked Hessian Cholesky threshold, default 64 unchanged)
 
 A/B on MetalSim's G1 (43 dofs, 4096 worlds): the blocked 16-wide factorization at threshold 32 runs the
 training loop at 46.3K vs 56.2K env-steps/s for the single register tile (-18 %); kept for measurements.

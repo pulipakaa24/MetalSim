@@ -1,7 +1,7 @@
 From ccfaffb38d9e4ff765214d24c2eebbbdb4358b1d Mon Sep 17 00:00:00 2001
 From: Aditya Pulipaka <adipu@utexas.edu>
 Date: Fri, 25 Sep 2026 09:42:16 -0700
-Subject: [PATCH 6/7] Metal: incremental Newton-Hessian update fused into the
+Subject: [PATCH 06/16] Metal: incremental Newton-Hessian update fused into the
  register Cholesky launch
 
 On Metal every launch drains the GPU; the incremental H update ran as its own (nworld, nv(nv+1)/2) grid
