@@ -531,7 +531,37 @@ force only; mean totals are within ~30 % of Isaac on every engine and torque RMS
 setting that matches PhysX best costs half of Newton's throughput (74 K physics-only vs 149 K), still
 2.1× MuJoCo Warp.
 
-**Rendering** (Isaac RTX vs MetalSim, same state per frame; brightness-matched = MetalSim scaled to
+**Rendering, after the material / light / tone-map / denoiser work** (commit b0cf9b1, measured
+2026-09-25; `docs/research/rendering_vs_rtx_2026-09-25.md`; `metalsim/render/rtx_parity.py` re-renders
+every Isaac frame from Isaac's own recorded pose so that shading is measured without physics
+differences, silhouette IoU 0.999; PSNR in dB, robot pixels only unless stated):
+
+| step | robot vs RTX real-time | robot vs RTX path tracer | whole frame vs path tracer | sky pixel (RTX 168/173/180) |
+|---|---|---|---|---|
+| before | 13.4 / SSIM 0.58 | 13.9 / 0.61 | 18.3 | 190/203/227 |
+| OmniPBR / UsdPreviewSurface BRDFs as MDL defines them | 13.3 | 13.7 | 18.2 | – |
+| USD light units (irradiance π·I, which is what Kit's frames fit), 0.53° sun disk, MuJoCo headlight off | 16.4 | 16.8 | – | – |
+| ACES + sRGB tone map, one global exposure fitted once to RTX's sky and lit ground | 24.0 / 0.86 | 27.5 | 19.7 | 168/172/180 |
+| ground darkening at grazing angles + Isaac's 100 m far clip | 23.9 | 28.5 | 44.9 | 168/172/180 |
+| + Open Image Denoise 2.5 on Metal (`pyoidn`, on the renderer's own buffers) | **24.0 / 0.86** | **28.8 / 0.94** | **45.6 / 0.997** | 168/172/180 |
+
+For scale, RTX's own real-time and path-traced frames are 25.9 dB apart on the robot, so tier 2 is
+now closer to RTX's path tracer than RTX's real-time mode is. On the physics-replayed protocol frames
+(`report_rt4` / `report_pt4`, states differing by a few centimetres): whole frame vs real-time 18.0 →
+26.8 dB (SSIM 0.876 → 0.971), vs path tracer 17.6 → 34.6; robot on agreeing states 13.4 → 21.5 vs
+real-time, 13.7 → 23.2 vs path tracer. Cost per 1024×576 frame (4 per batch): 68 ms at 128 spp before
+and after without the denoiser, 90 ms with OIDN; the sun disk and tone map add 0.2 ms to a 1024-env
+100×100 camera-RL batch, where extra samples beat any denoiser (4 spp at 38.6 ms is 5.6 dB closer to
+converged than 1 spp with the best denoiser; the RL default is unchanged). What cannot be matched and
+why: RTX real-time's shortcuts (no indirect light or reflections, one direct-light sample per pixel;
+its shadows ~40 levels brighter than its own path tracer), NVIDIA's OptiX / DLSS denoisers (no Metal
+build; OIDN is a different network), Kit's exact ACES curve and exposure formula (undocumented: the
+exposure is a 9 % fit over the documented camera formula, both kept), how MDL weights the diffuse base
+(inferred from the frames), and the sun unit (USD documents I, Kit's frames fit π·I; the frames were
+followed). The old renderer remains the default and reproduces its images bit for bit; the parity
+presets select the new path.
+
+**Rendering, first comparison** (Isaac RTX vs MetalSim, same state per frame; brightness-matched = MetalSim scaled to
 Isaac's mean, because the engines' light units differ):
 
 | Isaac renderer | MetalSim tier | frames | whole frame: PSNR / SSIM / LPIPS / FLIP (raw; brightness gain ≈ 1.0) | robot pixels only, states agreeing (IoU > 0.7): PSNR / SSIM / FLIP, LPIPS on the crop | silhouette IoU (agreeing) | robot depth RMSE (agreeing) |
