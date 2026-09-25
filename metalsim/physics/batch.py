@@ -96,6 +96,8 @@ class BatchSim:
             self.d = mjw.put_data(model, mjd, nworld=num_envs, nconmax=self.opt.nconmax, njmax=self.opt.njmax)
             self._reset_mask = wp.zeros(num_envs, dtype=wp.bool)
             self._graphs = {}
+            self._substep_hooks = []    # launched after every physics substep (inside the step graph)
+            self._reset_hooks = []      # launched after reset_data with the reset mask (inside the reset graph)
             self._capture()
         self.t = _TensorViews(self.d, num_envs)         # data views
         self.tm = _TensorViews(self.m, num_envs)        # model views (per-world fields have leading dim)
@@ -110,22 +112,41 @@ class BatchSim:
         if not self.opt.capture:
             return
         with wp.ScopedCapture(device=self.device) as cap:
-            for _ in range(self.opt.substeps):
-                mjw.step(self.m, self.d)
+            self._launch_substeps()
         self._graphs["step"] = cap.graph
         with wp.ScopedCapture(device=self.device) as cap:
             mjw.forward(self.m, self.d)
         self._graphs["forward"] = cap.graph
         with wp.ScopedCapture(device=self.device) as cap:
-            mjw.reset_data(self.m, self.d, reset=self._reset_mask)
+            self._launch_reset()
         self._graphs["reset"] = cap.graph
+
+    def _launch_substeps(self) -> None:
+        for _ in range(self.opt.substeps):
+            mjw.step(self.m, self.d)
+            for h in self._substep_hooks:
+                h()
+
+    def _launch_reset(self) -> None:
+        mjw.reset_data(self.m, self.d, reset=self._reset_mask)
+        for h in self._reset_hooks:
+            h(self._reset_mask)
+
+    def add_substep_hook(self, fn, reset_fn=None) -> None:
+        """Register Warp launches to run after every physics substep (e.g. a contact sensor's
+        reduction and history update) and optionally after resets (``reset_fn(mask)``, mask a
+        (N,) bool Warp array). The step/reset graphs are re-captured to include them."""
+        self._substep_hooks.append(fn)
+        if reset_fn is not None:
+            self._reset_hooks.append(reset_fn)
+        with wp.ScopedDevice(self.device):
+            self._capture()
 
     def launch_step(self) -> None:
         """Launch the substeps directly (no graph replay), for capturing into a larger graph that
         also holds the policy and the rollout bookkeeping."""
         with wp.ScopedDevice(self.device):
-            for _ in range(self.opt.substeps):
-                mjw.step(self.m, self.d)
+            self._launch_substeps()
 
     def _run(self, name: str):
         with wp.ScopedDevice(self.device):
@@ -133,12 +154,11 @@ class BatchSim:
             if g is not None:
                 wp.capture_launch(g)
             elif name == "step":
-                for _ in range(self.opt.substeps):
-                    mjw.step(self.m, self.d)
+                self._launch_substeps()
             elif name == "forward":
                 mjw.forward(self.m, self.d)
             elif name == "reset":
-                mjw.reset_data(self.m, self.d, reset=self._reset_mask)
+                self._launch_reset()
 
     # -- ordering ---------------------------------------------------------------------------------
 
