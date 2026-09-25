@@ -323,3 +323,16 @@ def usd_scene_kwargs(meta, material_model=None, tonemap=True):
     if tonemap:
         kw.update(tonemap="rtx", exposure=rtx_exposure())
     return kw
+
+
+def mujoco_scene_kwargs(model, sun_angle_deg=0.53, exposure=1.0, material_model="omnipbr"):
+    """The physical tier-2 path for a MuJoCo-authored scene (no USD intensities): the model's lights keep their
+    MuJoCo radiometry (irradiance = pi * diffuse), directional lights become 0.53-degree sun disks, materials use
+    the MDL-layered OmniPBR BRDF (F0 = 0.08 * specular), and the output goes through RTX's display transform
+    (exposure, ACES, sRGB). The headlight and skybox stay as authored."""
+    import mujoco
+    lights = []
+    for i in range(model.nlight):
+        directional = int(model.light_type[i]) == int(mujoco.mjtLightType.mjLIGHT_DIRECTIONAL) if hasattr(model, "light_type") else bool(model.light_directional[i])
+        lights.append({"intensity": 1.0, "color": tuple(float(c) for c in model.light_diffuse[i]), "angle_deg": sun_angle_deg if directional else 0.0})
+    return dict(material_model=material_model, usd_lights=lights, tonemap="rtx", exposure=exposure)

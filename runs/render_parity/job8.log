@@ -1,0 +1,36 @@
+holder: {"name": "rtx_cartpole_videos", "kind": "render", "minutes": 40.0, "pid": 45971, "start": 1790345204.293071}
+  waiting [train] g1_rough_transfer_all est 8.0 min, queued 35 s ago
+  waiting [train] g1_terms_oldcollider_elliptic_hardlimits est 8.0 min, queued 1 s ago
+  waiting [low] flex_tests_metal est 15.0 min, queued 15078 s ago
+  waiting [low] mjw_tp_profile est 15.0 min, queued 15042 s ago
+  waiting [low] rough_cmp_tests est 15.0 min, queued 14848 s ago
+  waiting [low] mjw_tp_variants1 est 20.0 min, queued 14712 s ago
+  waiting [low] mjw_tp_checks1 est 25.0 min, queued 14588 s ago
+  waiting [low] g1_rough_step_profile est 10.0 min, queued 14102 s ago
+FAILED tests/test_render_tier2.py::test_cartpole_rgb_rollout_tier2 - NameErro...
+1 failed, 11 passed, 1 warning in 8.48s
+== batch cost (1024 envs, step incl. physics+render+reward)
+    env = CartpoleRGBEnv(CartpoleRGBConfig(num_envs=n, render=render, tier=tier, spp=spp, max_bounces=max_bounces, render_mode=render_mode))
+  File "/Users/aditya/robosim/metalsim/render/tier2.py", line 335, in mujoco_scene_kwargs
+tier 2 legacy spp 1: 33,538 env-steps/s = 30.5 ms per 1024-env step
+tier 2 legacy spp 4: 18,009 env-steps/s = 56.9 ms per 1024-env step
+== smoke training, same seed, legacy then physical
+-- legacy
+tail: runs/render_parity/cartpole_smoke_legacy.log: No such file or directory
+-- physical
+tail: runs/render_parity/cartpole_smoke_physical.log: No such file or directory
+== gallery videos (tier2_mode rtx)
+wrote docs/gallery/g1_stage_isaac_it100.mp4: 200 frames; final root z Isaac 0.699 MetalSim 0.700; x travelled Isaac -0.01 MetalSim 0.05
+wrote docs/gallery/g1_stage_isaac_it500.mp4: 200 frames; final root z Isaac 0.624 MetalSim 0.630; x travelled Isaac 3.19 MetalSim 2.77
+wrote docs/gallery/g1_stage_isaac_it1000.mp4: 200 frames; final root z Isaac 0.633 MetalSim 0.626; x travelled Isaac 3.02 MetalSim 2.66
+wrote docs/gallery/g1_stage_isaac_it1499.mp4: 200 frames; final root z Isaac 0.635 MetalSim 0.637; x travelled Isaac 3.11 MetalSim 2.89
+wrote docs/gallery/g1_stage_metalsim_it100.mp4: 200 frames; final root z Isaac 0.026 MetalSim 0.033; x travelled Isaac 0.94 MetalSim 0.93
+wrote docs/gallery/g1_stage_metalsim_it500.mp4: 200 frames; final root z Isaac 0.560 MetalSim -0.014; x travelled Isaac 0.16 MetalSim 0.28
+wrote docs/gallery/g1_stage_metalsim_it1000.mp4: 200 frames; final root z Isaac 0.059 MetalSim 0.531; x travelled Isaac -0.60 MetalSim 0.12
+wrote docs/gallery/g1_stage_metalsim_it1500.mp4: 200 frames; final root z Isaac 0.040 MetalSim 0.469; x travelled Isaac -0.01 MetalSim 0.14
+VIDEOS_DONE
+wrote docs/gallery/g1_stage_metalsim_fixed_it100.mp4: 200 frames; final root z Isaac 0.002 MetalSim 0.005; x travelled Isaac 0.68 MetalSim 0.76
+wrote docs/gallery/g1_stage_metalsim_fixed_it300.mp4: 200 frames; final root z Isaac 0.628 MetalSim 0.658; x travelled Isaac 0.05 MetalSim 3.52
+wrote docs/gallery/g1_stage_metalsim_fixed_it500.mp4: 200 frames; final root z Isaac 0.689 MetalSim 0.682; x travelled Isaac 3.27 MetalSim 4.16
+wrote docs/gallery/g1_stage_metalsim_fixed_it1000.mp4: 200 frames; final root z Isaac 0.674 MetalSim 0.689; x travelled Isaac 3.90 MetalSim 4.07
+ROUND2_DONE

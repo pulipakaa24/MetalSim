@@ -1,0 +1,34 @@
+holder: {"name": "rtx_cartpole_smoke2", "kind": "render", "minutes": 6.0, "pid": 47190, "start": 1790345887.396339}
+  waiting [train] g1_terms_oldcollider_hardlimits est 8.0 min, queued 3 s ago
+  waiting [low] flex_tests_metal est 15.0 min, queued 15761 s ago
+  waiting [low] mjw_tp_profile est 15.0 min, queued 15725 s ago
+  waiting [low] rough_cmp_tests est 15.0 min, queued 15531 s ago
+  waiting [low] mjw_tp_variants1 est 20.0 min, queued 15395 s ago
+  waiting [low] mjw_tp_checks1 est 25.0 min, queued 15271 s ago
+  waiting [low] g1_rough_step_profile est 10.0 min, queued 14786 s ago
+-- legacy
+Cartpole-RGB camera PPO: 1024 envs, tier 2 (legacy spp 1, bounces 2), image-only 100x100, Isaac skrl config
+it    1 steps     65536 sps   9,642 | ret    7.04 len  25.2 succ  0.00 (n=100) | pg -0.000 vf 0.841 kl 0.0057 lr 6.7e-03 | env  0.5%  policy 35.6%  update 63.9%
+it    2 steps    131072 sps  10,512 | ret   13.52 len  33.3 succ  0.00 (n=100) | pg -0.008 vf 0.759 kl 0.0108 lr 2.0e-03 | env  0.5%  policy 38.5%  update 61.0%
+it    3 steps    196608 sps  10,838 | ret   16.29 len  38.6 succ  0.00 (n=100) | pg -0.006 vf 0.757 kl 0.0093 lr 1.0e-02 | env  0.5%  policy 39.6%  update 59.9%
+it    4 steps    262144 sps  11,007 | ret   21.09 len  43.1 succ  0.00 (n=100) | pg -0.009 vf 0.747 kl 0.0092 lr 2.0e-03 | env  0.5%  policy 40.1%  update 59.4%
+it    5 steps    327680 sps  11,109 | ret   24.80 len  47.3 succ  0.00 (n=100) | pg -0.006 vf 0.746 kl 0.0086 lr 6.7e-03 | env  0.5%  policy 40.4%  update 59.0%
+it    6 steps    393216 sps  11,173 | ret   32.00 len  55.7 succ  0.00 (n=100) | pg -0.003 vf 0.732 kl 0.0094 lr 6.7e-03 | env  0.5%  policy 40.7%  update 58.8%
+it    7 steps    458752 sps  11,222 | ret   37.62 len  61.2 succ  0.00 (n=100) | pg -0.003 vf 0.681 kl 0.0096 lr 4.4e-03 | env  0.5%  policy 40.8%  update 58.7%
+it    8 steps    524288 sps  11,259 | ret   42.48 len  69.7 succ  0.00 (n=100) | pg -0.002 vf 0.623 kl 0.0094 lr 6.7e-03 | env  0.5%  policy 40.9%  update 58.6%
+it    9 steps    589824 sps  11,285 | ret   35.14 len  61.2 succ  0.00 (n=100) | pg -0.003 vf 0.589 kl 0.0097 lr 3.0e-03 | env  0.5%  policy 41.0%  update 58.5%
+it   10 steps    655360 sps  11,305 | ret   45.74 len  73.0 succ  0.00 (n=100) | pg -0.004 vf 0.549 kl 0.0092 lr 1.3e-03 | env  0.5%  policy 41.1%  update 58.4%
+done: 655360 steps in 58 s -> 11,301 env-steps/s incl. training; env  0.5%  policy 41.1%  update 58.4%
+-- physical
+Cartpole-RGB camera PPO: 1024 envs, tier 2 (physical spp 4, bounces 2), image-only 100x100, Isaac skrl config
+it    1 steps     65536 sps   7,703 | ret    7.81 len  26.7 succ  0.00 (n=100) | pg -0.000 vf 1.034 kl 0.0027 lr 1.0e-02 | env  0.4%  policy 48.5%  update 51.0%
+it    2 steps    131072 sps   7,877 | ret    7.88 len  27.1 succ  0.00 (n=100) | pg -0.000 vf 1.039 kl 0.0021 lr 1.0e-02 | env  0.4%  policy 51.0%  update 48.5%
+it    3 steps    196608 sps   7,855 | ret    7.77 len  27.2 succ  0.00 (n=100) | pg -0.001 vf 1.050 kl 0.0025 lr 1.0e-02 | env  0.4%  policy 51.6%  update 48.0%
+it    4 steps    262144 sps   7,792 | ret    8.02 len  26.1 succ  0.00 (n=100) | pg -0.001 vf 1.076 kl 0.0021 lr 1.0e-02 | env  0.4%  policy 51.9%  update 47.7%
+it    5 steps    327680 sps   7,720 | ret    9.29 len  28.9 succ  0.00 (n=100) | pg -0.000 vf 1.067 kl 0.0022 lr 1.0e-02 | env  0.4%  policy 52.0%  update 47.6%
+it    6 steps    393216 sps   7,655 | ret    9.86 len  29.1 succ  0.00 (n=100) | pg -0.001 vf 1.050 kl 0.0033 lr 1.0e-02 | env  0.4%  policy 52.1%  update 47.5%
+it    7 steps    458752 sps   7,606 | ret    7.04 len  26.4 succ  0.00 (n=100) | pg -0.000 vf 1.042 kl 0.0016 lr 1.0e-02 | env  0.4%  policy 52.1%  update 47.5%
+it    8 steps    524288 sps   7,573 | ret   10.03 len  30.1 succ  0.00 (n=100) | pg -0.000 vf 1.058 kl 0.0015 lr 1.0e-02 | env  0.4%  policy 52.2%  update 47.4%
+it    9 steps    589824 sps   7,559 | ret    9.07 len  27.3 succ  0.00 (n=100) | pg -0.000 vf 1.067 kl 0.0013 lr 1.0e-02 | env  0.4%  policy 52.3%  update 47.3%
+it   10 steps    655360 sps   7,563 | ret    6.70 len  26.1 succ  0.00 (n=100) | pg -0.001 vf 1.064 kl 0.0026 lr 1.0e-02 | env  0.4%  policy 52.4%  update 47.2%
+done: 655360 steps in 87 s -> 7,561 env-steps/s incl. training; env  0.4%  policy 52.4%  update 47.2%

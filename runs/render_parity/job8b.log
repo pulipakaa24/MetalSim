@@ -1,0 +1,19 @@
+holder: {"name": "rtx_cartpole_smoke", "kind": "render", "minutes": 12.0, "pid": 46769, "start": 1790345638.477149}
+  waiting [train] g1_terms_oldcollider_elliptic_hardlimits est 8.0 min, queued 435 s ago
+  waiting [low] flex_tests_metal est 15.0 min, queued 15512 s ago
+  waiting [low] mjw_tp_profile est 15.0 min, queued 15476 s ago
+  waiting [low] rough_cmp_tests est 15.0 min, queued 15282 s ago
+  waiting [low] mjw_tp_variants1 est 20.0 min, queued 15146 s ago
+  waiting [low] mjw_tp_checks1 est 25.0 min, queued 15022 s ago
+  waiting [low] g1_rough_step_profile est 10.0 min, queued 14537 s ago
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+12 passed, 1 warning in 4.99s
+== batch cost (1024 envs, step incl. physics+render+reward)
+tier 2 legacy spp 1: 33,615 env-steps/s = 30.5 ms per 1024-env step
+tier 2 legacy spp 4: 17,990 env-steps/s = 56.9 ms per 1024-env step
+tier 2 physical spp 4: 17,996 env-steps/s = 56.9 ms per 1024-env step
+== smoke training, same seed, legacy then physical
+-- legacy
+tail: runs/render_parity/cartpole_smoke_legacy.log: No such file or directory
+-- physical
+tail: runs/render_parity/cartpole_smoke_physical.log: No such file or directory
