@@ -216,7 +216,10 @@ recorded 2026-09-25; MetalSim side on the corrected collider 284dcd1): iteration
 Isaac's PhysX and 4.06 m in MetalSim, upright in both (pelvis 0.67 / 0.69 m); iteration 500 3.27 vs
 4.16 m; iteration 300 stands in PhysX (0.05 m) but walks here (3.46 m); iteration 100 falls in both.
 So the transfer holds in both directions once a policy tracks the command, with an early-gait
-exception at iteration 300. The same test on
+exception at iteration 300. MuJoCo Warp collider A/B on the same test (`runs/mjwarp_transfer_collider.log`, fork f2716b4 → a8e6485
+with the C-exact plane-convex contact set): 3.01 / 2.94 / 3.18 → 2.74 / 2.65 / 2.91 m, i.e. the corrected
+contact set moves MuJoCo Warp from within 5 % of Isaac to 9–12 % short; matching MuJoCo C more exactly is
+not the same as matching PhysX (decision pending the contact-tuning comparison). The same test on
 Newton XPBD (`runs/newton_transfer.log`, pinned upstream build, mean of 4 envs): Isaac's 500 / 1000 /
 1499 checkpoints travel 4.48 / 4.35 / 4.14 m at 4 it. / 1.25 ms and 4.02 / 3.95 / 3.83 m at 0.625 ms,
 against Isaac's 3.19 / 3.02 / 3.11 m and MuJoCo Warp's 3.02 / 2.93 / 3.19 m; all engines keep the
@@ -333,6 +336,48 @@ episodes at the same iteration as Isaac, the same final return (+28.4 vs +27.3),
 iterations 200 and 500 (the remaining contact-model differences: feet slide and air time, §1.7 and
 the contact-tuning work). Both runs are one seed. This is the acceptance test "identical PPO config,
 identical result" of the plan, met on one task.
+
+**Fixed PPO, demonstrated** (`runs/g1_flat_ppowarp_fixed.log`, MuJoCo Warp, 4096 envs, 1000 iterations,
+same config and seed, measured 2026-09-24, 25.3 K env-steps/s including the monitor):
+
+| iteration | our PPO before the fixes: length / return | our PPO after the fixes | rsl_rl on the same physics | Isaac (PhysX, its own weights) |
+|---|---|---|---|---|
+| 100 | 50 / −5.2 | 79 / −4.7 | 81 / −4.8 | 200 / −6.6 |
+| 150 | 56 / −5.2 | 237 / −6.4 | 197 / −6.3 | 954 / −4.3 |
+| 200 | 59 / −5.1 | 924 / −7.6 | 976 / −9.8 | 981 / +6.6 |
+| 300 | 65 / −5.1 | 960 / +1.1 | 938 / +0.5 | 1000 / +19.2 |
+| 500 | 115 / −6.3 | 987 / +15.0 | 991 / +18.2 | 996 / +25.3 |
+| 750 | 634 / −18.6 | 993 / +26.2 | – | – |
+| 1000 | 773 / −24.3 | 995 / +32.8 | 1000 / +35.5 | 991 / +27.3 |
+
+**The fixed learner on Newton, all settings** (Isaac's flat weights in every column; 4096 envs, seed 0,
+1000 iterations; return / length averaged over ±5 iterations; measured 2026-09-24/25;
+`runs/g1_flat_newton_ppo_fixed.log`, `runs/g1_flat_newton0625_ppo_fixed.log` on the pinned upstream
+Newton 45458023 with the limit clamp, `runs/g1_flat_newton_forksolver0625_ppo_fixed.log` on the fork
+90e23324 with its in-solver drive, no clamp):
+
+| iteration | Isaac (PhysX) | MuJoCo Warp | Newton 4 it. / 1.25 ms | Newton 4 it. / 0.625 ms | Newton fork drive, 0.625 ms |
+|---|---|---|---|---|---|
+| 200 | +6.6 / 981 | +0.7 / 996 | −10.9 / 936 | −10.2 / 902 | −7.6 / 878 |
+| 300 | +19.2 / 1000 | +11.7 / 982 | −7.2 / 824 | −7.6 / 907 | +1.2 / 958 |
+| 500 | +25.3 / 996 | +20.9 / 996 | −7.1 / 870 | +1.7 / 972 | +13.7 / 995 |
+| 750 | +26.8 / 988 | +26.3 / 999 | −1.1 / 938 | +14.3 / 989 | +22.3 / 999 |
+| 1000 | +27.3 / 991 | **+28.5 / 1000** | +7.8 / 979 | +20.5 / 993 | **+24.4 / 1000** |
+| training loop, env-steps/s | – | 25,721 | 106,189 | 61,544 | 42,227 |
+
+The fork's in-solver drive at 0.625 ms is the best Newton variant: 4.1 return behind MuJoCo Warp at
+iteration 1000 (7–10 behind at 300–750), at 1.6× its training-loop rate, and it passes the 3σ stress
+check at both step sizes (0 blown of 1024, peak joint speed 85–89 rad/s vs 19 blown / 386 rad/s with
+ActuatorPD; `runs/newton_fork_solver_sigma3.log`). Per-term at iteration 1000 (mean action, flat set):
+the fork policy's return equals the MuJoCo Warp policy's (31.05 vs 31.03), with higher yaw tracking
+(0.875 vs 0.838) and higher joint-deviation and orientation costs (−0.199 vs −0.141, −0.035 vs
+−0.007); at iteration 300 the Newton shortfall is tracking and falls, not costs. Transfer of Isaac's
+checkpoints on the fork drive at 0.625 ms: 3.63 / 3.70 / 3.63 m vs Isaac's 3.19 / 3.02 / 3.11 (14–23 %
+over; ActuatorPD 20–35 %); every env upright. Push-off diagnostic (`runs/g1_pushoff.log`, Isaac's
+checkpoint 1000): at 0.625 ms Newton's propulsive impulse equals MuJoCo Warp's (1.82 N·s) yet its
+stride is 72 % longer (0.136 vs 0.079 m at 3.8 vs 4.3 touch-downs/s); drift, leg damping, friction and
+push-off are ruled out, swing-leg behaviour untested. **MuJoCo Warp stays the default**; Newton with
+the fork drive at 0.625 ms is a validated 1.6× option with a stated fidelity cost.
 
 **Fixed PPO, demonstrated** (`runs/g1_flat_ppowarp_fixed.log`, MuJoCo Warp, 4096 envs, 1000 iterations,
 same config and seed, measured 2026-09-24, 25.3 K env-steps/s including the monitor):
