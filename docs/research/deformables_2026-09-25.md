@@ -303,3 +303,65 @@ protocols); not run (the 3.0 environment is being built by another agent).
 Newton VBD (Isaac Lab 3.0) is a block-descent implicit solver on the same kinds of energies (Neo-Hookean membranes and
 volumes, dihedral bending): closer to flex's energy-based FEM than to PBD springs; the 3.0 recordings will say whether
 XPBD (for PhysX PBD cloth) or flex (for FEM/VBD) is the closer default per object type.
+
+## 10. PhysX (Isaac Sim 5.1) deformable protocol: residuals, fits, throughput (measured)
+
+Reference recording (`runs/deformable/isaac51/`, recorded before the plan moved to Isaac Lab 3.0; Isaac Sim 5.1 /
+Isaac Lab 2.3.2, L4, `metalsim/parity/isaac_side/record_deformables.py`, parameters in `meta.json`): (a) 1 m cloth,
+21×21 PhysX particle cloth, ParticleClothDemo parameters (stretch 1e4, shear 100, bend 200, spring damping 0.2,
+0.02 kg/particle = 8.82 kg, rest offset 0.025 m, 16 iterations, friction 0.6, self-collision on, no drag/lift),
+released at z = 0.5 m over a 0.4 m box; (b) 0.5 × 0.02 × 0.02 m FEM rod (E 1e5, ν 0.4, density 1000, elasticity
+damping 0.005, 44 nodes, 4 pinned) released from horizontal; (c) 0.2 m FEM cube (same material, 8 kg, 1331 nodes)
+dropped from z = 0.5 m. 200 Hz, 5 s. Bulk metrics and fits: `scripts/diagnostics/deformable/physx_protocol.py`
+(fit logs `runs/deformable/physx_fit51/`); per-vertex comparison is meaningless across these discretisations
+(441 particles vs a 21×21 flex grid; 44/1331 hex-grid nodes vs 44/125 flex vertices or an 11-node chain), so only
+bulk quantities are compared.
+
+| object / metric | PhysX | XPBD, physical mapping | XPBD fitted | flex, physical mapping | flex fitted |
+|---|---|---|---|---|---|
+| cloth: rest height on box (m) | 0.427 | 0.425 | 0.425 | 0.429 (1 ms; diverges at 5 ms) | same |
+| cloth: rest mean height (m) | 0.267 | 0.270 | 0.272 | 0.291 | same |
+| cloth: xy extent (m) | 0.791 | 0.771 | 0.775 | 0.766 | same |
+| cloth: settling time (s) | 1.07 | 1.23 | 1.14 | 2.62 | same |
+| cloth: KE peak time (s) | 0.260 | 0.270 | 0.275 | 0.245 | same |
+| cloth: height-map RMSE vs PhysX (m) / silhouette IoU | – | 0.039 / 0.72 | 0.033 / 0.73 | 0.038 / 0.71 | same |
+| rope: time to vertical (s) | 0.37 | 0.34 | 0.34 | 0.39 | 0.39 |
+| rope: swing period (s) | 1.026 | 1.323 | 1.323 | – (NaN: PhysX damping 0.005 is unstable) | 1.006 |
+| rope: log decrement | 0.59 | 0.003 | 0.003 | – | 0.09 |
+| rope: first back-swing x (m) | −0.305 | −0.472 | −0.472 | – | −0.456 |
+| rope: rest tip drop (m) | 0.477 | 0.456 | 0.456 | – | 0.429 |
+| cube: impact centroid minimum (m) | 0.079 | not implemented | – | – (unstable) | 0.067 |
+| cube: bounce peak (m) | 0.135 | – | – | – | 0.262 |
+| cube: rest centroid (m) | 0.098 | – | – | – | 0.100 |
+| cube: settling time (s) | 0.55 | – | – | – | 1.97 |
+
+Fitted parameters: XPBD cloth: velocity damping 0.5 1/s on top of the physical mapping (bend compliance 5e-3 vs 5e-2
+made no difference to these metrics); XPBD rope: none helped (grid over bending compliance 1e-3..1e-1 and damping 0/0.2:
+best is the default); flex cloth: the physical solref (−2k/m, −2d/m) at 1 ms beat positive solrefs (loss 61 vs 118–456);
+flex rope: elastic damping 3e-5 (≤ 1e-4 is stable at 0.5 ms); flex cube: elastic damping 1e-3, contact solref
+0.005 1 at 0.5 ms. The explicit flex elasticity cannot reach PhysX's damping (rope log decrement 0.09 vs 0.59, cube
+bounce 0.26 vs 0.135 m): damping above 1e-4 (rod) / 1e-3 (cube) diverges at 0.5 ms.
+
+Throughput of the fitted settings on Metal (graph replay, one 5 ms frame per env-step, `bench_protocol.py`,
+`runs/deformable/physx_fit51/bench_fitted.log`):
+
+| scene | 256 | 1024 | 4096 envs |
+|---|---|---|---|
+| cloth, XPBD (441 vertices, 16 substeps) | 144K | 316K | 312K env-steps/s |
+| cloth, flex (441 vertices, 1 ms × 5) | 1.8K | 1.9K | 1.9K |
+| rope, flex (44-vertex FEM rod, 0.5 ms × 10) | 4.9K | 9.2K | 11.7K |
+| rope, XPBD (11-node chain, 16 substeps) | 147K | 731K | 2.62M |
+| cube, flex (125-vertex FEM, 0.5 ms × 10) | 2.7K | 3.6K | 3.9K |
+
+**Recommendation (fidelity first, against this PhysX 5.1 reference):** cloth → **XPBD** (PhysX's own formulation;
+closest on every cloth metric, 160× flex's throughput); cable/rope → **flex FEM rod** (period within 2 %; XPBD's
+chain is 29 % slow because it has no bending stiffness to speak of; neither reaches PhysX's damping); soft volume →
+**flex** (only candidate; bounce and settling too lively). The Isaac Lab 3.0 recordings (PhysX FEM cloth, Newton VBD)
+will replace this reference; for the Newton backend the primary comparison is the same Newton VBD solver on Metal.
+
+| decision | options (numbers) | chosen, why | how to switch |
+|---|---|---|---|
+| cloth backend | XPBD: height-map RMSE 3.3 cm, settle 1.14 vs 1.07 s, 312K env-steps/s / flex: 3.8 cm, 2.62 s, 1.9K | XPBD (same formulation as PhysX particle cloth; closer and faster) | `XPBDSim` default for cloth; `DeformableSim` (flex) behind the backend switch |
+| cable backend | flex rod: period 1.006 vs 1.026 s, 11.7K / XPBD chain: 1.323 s, 2.6M | flex (fidelity first) | XPBD chain via `XPBDSim` |
+| soft-volume backend | flex only (XPBD volume not implemented) | flex | – |
+| flex cloth stretch | physical solref (−2k/m, −2d/m) at 1 ms / positive solref at 5 ms | physical at 1 ms (loss 61 vs 118–456) | `edge_solref` |
