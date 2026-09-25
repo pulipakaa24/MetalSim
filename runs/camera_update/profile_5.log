@@ -1,0 +1,35 @@
+holder: {"name": "camera_update_5", "kind": "timing", "minutes": 12.0, "pid": 93816, "start": 1790326706.0611148}
+..................                                                       [100%]
+18 passed in 6.74s
+gather_in_graph = True
+PPO.update fast_update + Metal kernels (3b)          median    3.215 s  min    3.210 s  (implied 14,201 env-steps/s)  all: 3.21 3.21 3.21 3.22 3.22 3.22
+gather_in_graph = True
+torch 2.14.0
+==== mlx2
+MLX2 float32 one minibatch (gather..Adam, compiled)  median    32.44 ms  min    32.37 ms  -> x128 =   4.15 s/update  (implied  11,804 env-steps/s)
+MLX2 float32 full update                             median    4.172 s  min    4.160 s  (implied 11,761 env-steps/s)
+MLX2 float16 one minibatch (gather..Adam, compiled)  median    25.49 ms  min    25.42 ms  -> x128 =   3.26 s/update  (implied  14,056 env-steps/s)
+MLX2 float16 full update                             median    3.353 s  min    3.319 s  (implied 13,788 env-steps/s)
+==== mlxlayers
+-- MLX per-layer, float32
+MLX conv1 fwd [ 5.65 TF/s]                           median     2.56 ms  min     2.54 ms
+MLX conv1 dgrad [ 0.54 TF/s]                         median    26.98 ms  min    26.81 ms
+MLX conv1 wgrad [ 1.84 TF/s]                         median     7.89 ms  min     7.38 ms
+MLX conv2 fwd [ 9.90 TF/s]                           median     1.64 ms  min     1.52 ms
+MLX conv2 dgrad [ 5.20 TF/s]                         median     3.12 ms  min     3.06 ms
+MLX conv2 wgrad [ 3.49 TF/s]                         median     4.65 ms  min     4.37 ms
+MLX conv3 fwd [ 9.40 TF/s]                           median     1.30 ms  min     1.23 ms
+MLX conv3 dgrad [ 6.75 TF/s]                         median     1.81 ms  min     1.76 ms
+MLX conv3 wgrad [ 3.94 TF/s]                         median     3.10 ms  min     2.95 ms
+-- MLX per-layer, float16
+MLX conv1 fwd [ 5.78 TF/s]                           median     2.51 ms  min     2.36 ms
+MLX conv1 dgrad [ 0.57 TF/s]                         median    25.37 ms  min    25.18 ms
+MLX conv1 wgrad [ 2.71 TF/s]                         median     5.35 ms  min     5.20 ms
+MLX conv2 fwd [11.42 TF/s]                           median     1.42 ms  min     1.35 ms
+MLX conv2 dgrad [ 5.61 TF/s]                         median     2.90 ms  min     2.76 ms
+MLX conv2 wgrad [ 4.41 TF/s]                         median     3.68 ms  min     3.55 ms
+MLX conv3 fwd [10.57 TF/s]                           median     1.16 ms  min     1.11 ms
+MLX conv3 dgrad [ 7.71 TF/s]                         median     1.59 ms  min     1.50 ms
+MLX conv3 wgrad [ 4.47 TF/s]                         median     2.74 ms  min     2.62 ms
+gather_in_graph = True
+PPO.update fast_update + Metal kernels (3b)          median    3.218 s  min    3.201 s  (implied 14,192 env-steps/s)  all: 3.20 3.21 3.21 3.22 3.22 3.24

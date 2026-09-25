@@ -1,0 +1,23 @@
+holder: {"name": "camera_update_4b", "kind": "timing", "minutes": 10.0, "pid": 92590, "start": 1790326078.034366}
+gather_in_graph = True
+torch 2.14.0
+gpu_lock status: holder: {"name": "camera_update_4b", "kind": "timing", "minutes": 10.0, "pid": 92590, "start": 1790326078.034366}
+==== c2parts
+conv2 wgrad: s2d copy                                median     2.40 ms  min     2.34 ms
+conv2 wgrad: pad gy                                  median     0.86 ms  min     0.81 ms
+conv2 wgrad: kernel + reduce SPT=2                   median     2.07 ms  min     2.02 ms
+conv2 wgrad: kernel + reduce SPT=4                   median     1.99 ms  min     1.92 ms
+conv2 wgrad: kernel + reduce SPT=8                   median     1.97 ms  min     1.94 ms
+conv2 wgrad: kernel + reduce SPT=16                  median     1.93 ms  min     1.84 ms
+conv3 wgrad: kernel + reduce SPT=2                   median     1.89 ms  min     1.84 ms
+conv3 wgrad: kernel + reduce SPT=4                   median     1.74 ms  min     1.69 ms
+conv3 wgrad: kernel + reduce SPT=8                   median     1.76 ms  min     1.74 ms
+conv3 wgrad: kernel + reduce SPT=16                  median     1.74 ms  min     1.70 ms
+gpu_lock status: holder: {"name": "camera_update_4b", "kind": "timing", "minutes": 10.0, "pid": 92590, "start": 1790326078.034366}
+==== interleave
+3b: c1_wgrad,c2_dgrad                                median    4.351 s  min    4.017 s  (implied 11,395 env-steps/s)
++ c2_wgrad                                           median    4.338 s  min    3.665 s  (implied 11,421 env-steps/s)
++ c3_wgrad                                           median    4.283 s  min    3.686 s  (implied 11,531 env-steps/s)
++ c1_fwd                                             median    4.286 s  min    3.701 s  (implied 11,525 env-steps/s)
++ c1_fwd + gather_in_graph                           median    3.875 s  min    3.453 s  (implied 12,423 env-steps/s)
++ c1_fwd + c3_wgrad + gather_in_graph                median    3.873 s  min    3.510 s  (implied 12,430 env-steps/s)

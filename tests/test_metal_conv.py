@@ -54,3 +54,47 @@ def test_functions_all_grads_match():
         got = torch.autograd.grad(fn(mc.conv1, mc.conv2), [x1, w1, b1, w2, b2])
         for r, o in zip(ref, got):
             assert _rel(o, r) <= 1e-4
+
+
+@pytest.mark.parametrize("n", [2048, 37])
+def test_conv2_weight_grad(n):
+    from metalsim.learn.metal_conv import conv2_weight_grad
+    g = torch.Generator().manual_seed(n + 1)
+    x = torch.randn(n, 32, 24, 24, generator=g).to("mps")
+    w = (torch.randn(64, 32, 4, 4, generator=g) * 0.05).to("mps")
+    gy = torch.randn(n, 64, 11, 11, generator=g).to("mps")
+    assert _rel(conv2_weight_grad(x, gy), _ref(gy, x, w, 2, [False, True, False])[1]) <= 1e-4
+
+
+@pytest.mark.parametrize("n", [2048, 37])
+def test_conv3_weight_grad(n):
+    from metalsim.learn.metal_conv import conv3_weight_grad
+    g = torch.Generator().manual_seed(n + 2)
+    x = torch.randn(n, 64, 11, 11, generator=g).to("mps")
+    w = (torch.randn(64, 64, 3, 3, generator=g) * 0.05).to("mps")
+    gy = torch.randn(n, 64, 9, 9, generator=g).to("mps")
+    assert _rel(conv3_weight_grad(x, gy), _ref(gy, x, w, 1, [False, True, False])[1]) <= 1e-4
+
+
+def test_conv3_function_all_grads_match():
+    from metalsim.learn import metal_conv as mc
+    g = torch.Generator().manual_seed(5)
+    x = torch.randn(300, 64, 11, 11, generator=g).to("mps").requires_grad_(True)
+    w = (torch.randn(64, 64, 3, 3, generator=g) * 0.05).to("mps").requires_grad_(True)
+    b = torch.randn(64, generator=g).to("mps").requires_grad_(True)
+    t = torch.randn(300, 64, 9, 9, generator=g).to("mps")
+    ref = torch.autograd.grad((F.conv2d(x, w, b) * t).sum(), [x, w, b])
+    for fn in (lambda: (mc.conv3(x, w, b, 1) * t).sum(), torch.compile(lambda: (mc.conv3(x, w, b, 1) * t).sum())):
+        got = torch.autograd.grad(fn(), [x, w, b])
+        for r, o in zip(ref, got):
+            assert _rel(o, r) <= 1e-4
+
+
+@pytest.mark.parametrize("n,u8", [(2048, True), (37, False)])
+def test_conv1_forward(n, u8):
+    from metalsim.learn.metal_conv import conv1_forward
+    g = torch.Generator().manual_seed(n + 3)
+    x = (torch.randint(0, 256, (n, 3, 100, 100), generator=g).float() / 255 - 0.5 if u8 else torch.randn(n, 3, 100, 100, generator=g)).to("mps")
+    w = (torch.randn(32, 3, 8, 8, generator=g) * 0.05).to("mps")
+    b = torch.randn(32, generator=g).to("mps")
+    assert _rel(conv1_forward(x, w, b), F.conv2d(x, w, b, stride=4)) <= 1e-4

@@ -83,6 +83,16 @@ def test_fast_update_matches_plain(qdim, center, hw, kernels):
     g_mps = torch.autograd.grad(l_mps, params, allow_unused=True)
     loss, *_ = ppo._mb_loss_c(img, q, ppo.net.image_mean(img), a, lo, adv, ret, vo)
     g_fast = torch.autograd.grad(loss, params, allow_unused=True)
+    # the in-graph gather variant (PPOConfig.gather_in_graph): whole buffers + a permutation index
+    perm = torch.randperm(n, generator=g).to("mps")
+    inv = torch.empty_like(perm); inv[perm] = torch.arange(n, device="mps")
+    img_buf, q_buf = img[inv], q[inv]                       # buf[perm] == original order
+    loss_g, *_ = ppo._mb_loss_c(img_buf, q_buf, ppo.net.image_mean(img_buf), a, lo, adv, ret, vo, perm)
+    g_gather = torch.autograd.grad(loss_g, params, allow_unused=True)
+    assert abs(loss_g.item() - loss.item()) <= 1e-6 * max(1.0, abs(loss.item()))
+    for gf, gg in zip(g_fast, g_gather):
+        if gf is not None:
+            assert _rel(gg, gf) <= 1e-5
 
     assert abs(loss.item() - l_mps.item()) <= 1e-4 * max(1.0, abs(l_mps.item())), (loss.item(), l_mps.item())
     report = []

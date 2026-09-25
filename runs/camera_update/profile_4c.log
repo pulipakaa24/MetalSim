@@ -1,0 +1,25 @@
+holder: {"name": "camera_update_4c", "kind": "timing", "minutes": 12.0, "pid": 93132, "start": 1790326355.687825}
+gather_in_graph = False
+metal_conv.ENABLED = {'c1_wgrad': True, 'c2_dgrad': True, 'c2_wgrad': False, 'c3_wgrad': False, 'c1_fwd': False}
+PPO.update fast_update + Metal kernels (3b)          median    3.684 s  min    3.678 s  (implied 12,890 env-steps/s)  all: 3.68 3.68 3.68 3.69 3.69 3.69
+gather_in_graph = False
+metal_conv.ENABLED = {'c1_wgrad': True, 'c2_dgrad': True, 'c2_wgrad': False, 'c3_wgrad': False, 'c1_fwd': True}
+PPO.update fast_update + Metal kernels (3b)          median    3.578 s  min    3.574 s  (implied 13,164 env-steps/s)  all: 3.57 3.57 3.58 3.58 3.58 3.59
+gather_in_graph = True
+metal_conv.ENABLED = {'c1_wgrad': True, 'c2_dgrad': True, 'c2_wgrad': False, 'c3_wgrad': False, 'c1_fwd': True}
+PPO.update fast_update + Metal kernels (3b)          median    3.199 s  min    3.186 s  (implied 14,249 env-steps/s)  all: 3.19 3.20 3.20 3.20 3.20 3.20
+gather_in_graph = True
+metal_conv.ENABLED = {'c1_wgrad': True, 'c2_dgrad': True, 'c2_wgrad': False, 'c3_wgrad': True, 'c1_fwd': True}
+PPO.update fast_update + Metal kernels (3b)          median    3.149 s  min    3.140 s  (implied 14,406 env-steps/s)  all: 3.14 3.15 3.15 3.15 3.16 3.15
+gather_in_graph = False
+metal_conv.ENABLED = {'c1_wgrad': True, 'c2_dgrad': True, 'c2_wgrad': False, 'c3_wgrad': False, 'c1_fwd': False}
+PPO.update fast_update + Metal kernels (3b)          median    3.892 s  min    3.691 s  (implied 12,385 env-steps/s)  all: 3.69 3.82 3.88 3.91 3.94 3.97
+gather_in_graph = False
+metal_conv.ENABLED = {'c1_wgrad': True, 'c2_dgrad': True, 'c2_wgrad': False, 'c3_wgrad': False, 'c1_fwd': True}
+PPO.update fast_update + Metal kernels (3b)          median    3.846 s  min    3.573 s  (implied 12,493 env-steps/s)  all: 3.57 3.65 3.84 3.85 3.85 3.85
+gather_in_graph = True
+metal_conv.ENABLED = {'c1_wgrad': True, 'c2_dgrad': True, 'c2_wgrad': False, 'c3_wgrad': False, 'c1_fwd': True}
+PPO.update fast_update + Metal kernels (3b)          median    3.358 s  min    3.183 s  (implied 13,773 env-steps/s)  all: 3.18 3.23 3.34 3.40 3.37 3.46
+gather_in_graph = True
+metal_conv.ENABLED = {'c1_wgrad': True, 'c2_dgrad': True, 'c2_wgrad': False, 'c3_wgrad': True, 'c1_fwd': True}
+PPO.update fast_update + Metal kernels (3b)          median    3.319 s  min    3.167 s  (implied 13,888 env-steps/s)  all: 3.17 3.19 3.30 3.34 3.35 3.34
