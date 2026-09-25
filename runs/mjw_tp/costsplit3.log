@@ -1,0 +1,38 @@
+=== start Fri Sep 25 07:52:04 PDT 2026 power: Now drawing from 'AC Power'
+holder: {"name": "mjw_tp_round3", "kind": "low", "minutes": 45.0, "pid": 51827, "start": 1790347924.769053}
+[base] N=4096 njmax 256 naconmax 131072 is_sparse False
+[base] physics only 113.1 ms/step -> 36,202 env-steps/s
+[base] full env step 130.1 ms -> 31,494 env-steps/s
+[base] after random-action steps: nefc max 39 mean 15.2; nacon 11868 (2.90/world); overflow {'LS_ITERATIONS': 3847}
+[base] rollout + inference 140.6 ms/step -> 29,134 env-steps/s
+[base] PPO update 145 ms -> full loop 27,937 env-steps/s
+[base] SUMMARY physics 36,202 | step 31,494 | rollout 29,134 | loop 27,937  (ms: physics 113.1, step 130.1, rollout/step 140.6, update 145)
+[step1 reg-chol] N=4096 njmax 256 naconmax 131072 is_sparse False
+[step1 reg-chol] physics only 80.8 ms/step -> 50,663 env-steps/s
+[step1 reg-chol] full env step 90.5 ms -> 45,272 env-steps/s
+[step1 reg-chol] after random-action steps: nefc max 41 mean 15.2; nacon 11902 (2.91/world); overflow {'LS_ITERATIONS': 3821}
+[step1 reg-chol] rollout + inference 95.4 ms/step -> 42,955 env-steps/s
+[step1 reg-chol] PPO update 151 ms -> full loop 40,297 env-steps/s
+[step1 reg-chol] SUMMARY physics 50,663 | step 45,272 | rollout 42,955 | loop 40,297  (ms: physics 80.8, step 90.5, rollout/step 95.4, update 151)
+[step2 +sparse LDL of M] N=4096 njmax 256 naconmax 131072 is_sparse False
+[step2 +sparse LDL of M] physics only 66.6 ms/step -> 61,470 env-steps/s
+[step2 +sparse LDL of M] full env step 76.6 ms -> 53,486 env-steps/s
+[step2 +sparse LDL of M] after random-action steps: nefc max 41 mean 14.9; nacon 11719 (2.86/world); overflow {'LS_ITERATIONS': 3803}
+[step2 +sparse LDL of M] rollout + inference 81.2 ms/step -> 50,471 env-steps/s
+[step2 +sparse LDL of M] PPO update 154 ms -> full loop 46,764 env-steps/s
+[step2 +sparse LDL of M] SUMMARY physics 61,470 | step 53,486 | rollout 50,471 | loop 46,764  (ms: physics 66.6, step 76.6, rollout/step 81.2, update 154)
+[step3 +sparse Jacobian] N=4096 njmax 256 naconmax 131072 is_sparse True
+[step3 +sparse Jacobian] physics only 63.2 ms/step -> 64,790 env-steps/s
+[step3 +sparse Jacobian] full env step 73.9 ms -> 55,426 env-steps/s
+[step3 +sparse Jacobian] after random-action steps: nefc max 43 mean 15.1; nacon 11800 (2.88/world); overflow {'LS_ITERATIONS': 3823}
+[step3 +sparse Jacobian] rollout + inference 79.4 ms/step -> 51,568 env-steps/s
+[step3 +sparse Jacobian] PPO update 151 ms -> full loop 47,784 env-steps/s
+[step3 +sparse Jacobian] SUMMARY physics 64,790 | step 55,426 | rollout 51,568 | loop 47,784  (ms: physics 63.2, step 73.9, rollout/step 79.4, update 151)
+[base repeat] N=4096 njmax 256 naconmax 131072 is_sparse False
+[base repeat] physics only 113.1 ms/step -> 36,208 env-steps/s
+[base repeat] full env step 131.1 ms -> 31,240 env-steps/s
+[base repeat] after random-action steps: nefc max 40 mean 15.1; nacon 11749 (2.87/world); overflow {'LS_ITERATIONS': 3846}
+[base repeat] rollout + inference 141.1 ms/step -> 29,035 env-steps/s
+[base repeat] PPO update 146 ms -> full loop 27,835 env-steps/s
+[base repeat] SUMMARY physics 36,208 | step 31,240 | rollout 29,035 | loop 27,835  (ms: physics 113.1, step 131.1, rollout/step 141.1, update 146)
+=== end Fri Sep 25 07:55:05 PDT 2026

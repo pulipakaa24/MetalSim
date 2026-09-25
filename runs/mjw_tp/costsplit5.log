@@ -1,0 +1,39 @@
+=== start Fri Sep 25 09:17:39 PDT 2026 power: Now drawing from 'AC Power'
+holder: {"name": "mjw_tp_round5", "kind": "low", "minutes": 30.0, "pid": 60987, "start": 1790353059.514096}
+  waiting [low] mjw_tp_tests6 est 40.0 min, queued 139 s ago
+[step3 (fork: serial LDL + no-op skips)] N=4096 njmax 256 naconmax 131072 is_sparse False
+[step3 (fork: serial LDL + no-op skips)] physics only 57.3 ms/step -> 71,463 env-steps/s
+[step3 (fork: serial LDL + no-op skips)] full env step 66.8 ms -> 61,324 env-steps/s
+[step3 (fork: serial LDL + no-op skips)] after random-action steps: nefc max 39 mean 15.0; nacon 11782 (2.88/world); overflow {'LS_ITERATIONS': 3818}
+[step3 (fork: serial LDL + no-op skips)] rollout + inference 71.9 ms/step -> 56,981 env-steps/s
+[step3 (fork: serial LDL + no-op skips)] PPO update 149 ms -> full loop 52,464 env-steps/s
+[step3 (fork: serial LDL + no-op skips)] SUMMARY physics 71,463 | step 61,324 | rollout 56,981 | loop 52,464  (ms: physics 57.3, step 66.8, rollout/step 71.9, update 149)
+[step3 with the gravcomp launch restored] N=4096 njmax 256 naconmax 131072 is_sparse False
+[step3 with the gravcomp launch restored] physics only 58.9 ms/step -> 69,488 env-steps/s
+[step3 with the gravcomp launch restored] full env step 68.5 ms -> 59,834 env-steps/s
+[step3 with the gravcomp launch restored] after random-action steps: nefc max 45 mean 15.1; nacon 11797 (2.88/world); overflow {'LS_ITERATIONS': 3827}
+[step3 with the gravcomp launch restored] rollout + inference 73.5 ms/step -> 55,763 env-steps/s
+[step3 with the gravcomp launch restored] PPO update 157 ms -> full loop 51,209 env-steps/s
+[step3 with the gravcomp launch restored] SUMMARY physics 69,488 | step 59,834 | rollout 55,763 | loop 51,209  (ms: physics 58.9, step 68.5, rollout/step 73.5, update 157)
+[step3 ldl block 64] N=4096 njmax 256 naconmax 131072 is_sparse False
+[step3 ldl block 64] physics only 57.4 ms/step -> 71,313 env-steps/s
+[step3 ldl block 64] full env step 66.9 ms -> 61,250 env-steps/s
+[step3 ldl block 64] after random-action steps: nefc max 46 mean 14.9; nacon 11581 (2.83/world); overflow {'LS_ITERATIONS': 3834}
+[step3 ldl block 64] rollout + inference 72.0 ms/step -> 56,897 env-steps/s
+[step3 ldl block 64] PPO update 150 ms -> full loop 52,350 env-steps/s
+[step3 ldl block 64] SUMMARY physics 71,313 | step 61,250 | rollout 56,897 | loop 52,350  (ms: physics 57.4, step 66.9, rollout/step 72.0, update 150)
+[step3 ldl block 16] N=4096 njmax 256 naconmax 131072 is_sparse False
+[step3 ldl block 16] physics only 56.3 ms/step -> 72,781 env-steps/s
+[step3 ldl block 16] full env step 65.7 ms -> 62,339 env-steps/s
+[step3 ldl block 16] after random-action steps: nefc max 42 mean 15.0; nacon 11691 (2.85/world); overflow {'LS_ITERATIONS': 3838}
+[step3 ldl block 16] rollout + inference 70.7 ms/step -> 57,904 env-steps/s
+[step3 ldl block 16] PPO update 150 ms -> full loop 53,209 env-steps/s
+[step3 ldl block 16] SUMMARY physics 72,781 | step 62,339 | rollout 57,904 | loop 53,209  (ms: physics 56.3, step 65.7, rollout/step 70.7, update 150)
+[base (fork as now)] N=4096 njmax 256 naconmax 131072 is_sparse False
+[base (fork as now)] physics only 57.3 ms/step -> 71,498 env-steps/s
+[base (fork as now)] full env step 66.8 ms -> 61,287 env-steps/s
+[base (fork as now)] after random-action steps: nefc max 38 mean 15.2; nacon 11927 (2.91/world); overflow {'LS_ITERATIONS': 3853}
+[base (fork as now)] rollout + inference 71.8 ms/step -> 57,013 env-steps/s
+[base (fork as now)] PPO update 149 ms -> full loop 52,465 env-steps/s
+[base (fork as now)] SUMMARY physics 71,498 | step 61,287 | rollout 57,013 | loop 52,465  (ms: physics 57.3, step 66.8, rollout/step 71.8, update 149)
+=== end Fri Sep 25 09:19:57 PDT 2026

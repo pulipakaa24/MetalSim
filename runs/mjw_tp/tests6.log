@@ -1,0 +1,22 @@
+=== start Fri Sep 25 09:20:20 PDT 2026
+holder: {"name": "mjw_tp_tests6", "kind": "low", "minutes": 40.0, "pid": 61274, "start": 1790353220.622138}
+  waiting [low] flex_metal_run4 est 15.0 min, queued 131 s ago
+=== G1 parity / task terms / physics / fast factorization
+............................                                             [100%]
+=============================== warnings summary ===============================
+tests/test_g1_task_terms.py::test_rough_terrain_seed_and_isaac_env_assignment
+  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+tests/test_physics.py::test_one_step_parity_vs_mujoco_c[go1]
+  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+28 passed, 2 warnings in 83.22s (0:01:23)
+=== Warp fork: Metal tile Cholesky tests
+..                                                                       [100%]
+2 passed, 13 deselected in 24.06s
+=== MuJoCo Warp fork: smooth / passive / derivative / forward tests (Metal default device)
+runs/mjw_tp/job_tests6.sh: line 10: timeout: command not found
+=== end Fri Sep 25 09:22:09 PDT 2026

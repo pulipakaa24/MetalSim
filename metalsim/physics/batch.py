@@ -13,6 +13,7 @@ Rollout step contract (GPU timeline, no host waits):
 """
 from __future__ import annotations
 
+import contextlib
 from dataclasses import dataclass, field
 
 import mujoco
@@ -68,7 +69,36 @@ class BatchSimOptions:
     # ("body_mass", "geom_friction", "dof_damping", "actuator_gainprm"). They become (N, ...) tensors
     # in ``sim.tm`` that torch can write per env; call ``sim.recompute_constants()`` after mass changes.
     per_world_fields: tuple = ()
+    # Warp-side overrides that leave the MjModel (and MuJoCo C references built from it) untouched:
+    # ``jacobian`` "dense" / "sparse" / "auto" selects MuJoCo Warp's constraint-Jacobian layout (the
+    # same equations; MuJoCo Warp's own default for nv > 32 is sparse); ``block_dim`` overrides
+    # MuJoCo Warp's per-kernel threadgroup widths (``mjw.types.BlockDim`` field -> int).
+    jacobian: str | None = None
+    block_dim: dict = field(default_factory=dict)
+    # Largest diagonal block of M (and of the implicit integrator's M - dt*D) that MuJoCo Warp factors
+    # with a dense tile Cholesky; larger blocks use its tree-sparse L'DL (MuJoCo C's mj_factorI
+    # algorithm). None keeps MuJoCo Warp's M_BLOCK_DENSE_MAX (64); 0 sends every block of more than
+    # six dofs to the sparse path. Same matrix, different arithmetic (float noise).
+    m_dense_max: int | None = None
+    # Warp Metal: largest matrix that tile_cholesky factors in registers (Warp fork default 40; the G1's
+    # nv = 43 falls just above it onto the barrier-per-column path). Process-wide (warp.config), read
+    # when a module is built; set it before the first launch.
+    metal_register_cholesky_max: int | None = None
     extra: dict = field(default_factory=dict)
+
+
+@contextlib.contextmanager
+def _m_layout(dense_max):
+    """MuJoCo Warp reads M_BLOCK_DENSE_MAX when it lays out M's factor (put_model, put_data,
+    get_data_into); hold the override across those calls only."""
+    from mujoco_warp._src import types as mjw_types
+    old = mjw_types.M_BLOCK_DENSE_MAX
+    if dense_max is not None:
+        mjw_types.M_BLOCK_DENSE_MAX = int(dense_max)
+    try:
+        yield
+    finally:
+        mjw_types.M_BLOCK_DENSE_MAX = old
 
 
 class BatchSim:
@@ -81,9 +111,23 @@ class BatchSim:
         self.is_metal = getattr(self.device, "is_metal", False)
         mjd = mujoco.MjData(model)
         mujoco.mj_forward(model, mjd)
+        if self.opt.metal_register_cholesky_max is not None:
+            wp.config.metal_register_cholesky_max = int(self.opt.metal_register_cholesky_max)
         with wp.ScopedDevice(self.device):
             batch_sizes = {f: num_envs for f in self.opt.per_world_fields} or None
-            self.m = mjw.put_model(model, batch_sizes=batch_sizes)
+            wmodel = model
+            if self.opt.jacobian is not None:     # (efc layout: put_data and get_data_into take this copy too)
+                import copy
+                wmodel = copy.deepcopy(model)
+                wmodel.opt.jacobian = {"dense": mujoco.mjtJacobian.mjJAC_DENSE, "sparse": mujoco.mjtJacobian.mjJAC_SPARSE,
+                                       "auto": mujoco.mjtJacobian.mjJAC_AUTO}[self.opt.jacobian]
+            self._wmodel = wmodel
+            with _m_layout(self.opt.m_dense_max):
+                self.m = mjw.put_model(wmodel, batch_sizes=batch_sizes)
+            for k, v in self.opt.block_dim.items():
+                if not hasattr(self.m.block_dim, k):
+                    raise ValueError(f"unknown MuJoCo Warp block_dim field {k!r}")
+                setattr(self.m.block_dim, k, int(v))
             if self.is_metal:
                 # conditional graph nodes read the loop condition back on the host per iteration on Metal
                 self.m.opt.graph_conditional = False
@@ -93,7 +137,8 @@ class BatchSim:
                 self.m.opt.iterations = self.opt.solver_iterations
             if self.opt.ls_iterations is not None:
                 self.m.opt.ls_iterations = self.opt.ls_iterations
-            self.d = mjw.put_data(model, mjd, nworld=num_envs, nconmax=self.opt.nconmax, njmax=self.opt.njmax)
+            with _m_layout(self.opt.m_dense_max):
+                self.d = mjw.put_data(wmodel, mjd, nworld=num_envs, nconmax=self.opt.nconmax, njmax=self.opt.njmax)
             self._reset_mask = wp.zeros(num_envs, dtype=wp.bool)
             self._graphs = {}
             self._substep_hooks = []    # launched after every physics substep (inside the step graph)
@@ -232,8 +277,8 @@ class BatchSim:
     def get_world(self, world: int, mjd: mujoco.MjData | None = None) -> mujoco.MjData:
         self.synchronize()
         mjd = mjd or mujoco.MjData(self.mj_model)
-        with wp.ScopedDevice(self.device):
-            mjw.get_data_into(mjd, self.mj_model, self.d, world_id=world)
+        with wp.ScopedDevice(self.device), _m_layout(self.opt.m_dense_max):
+            mjw.get_data_into(mjd, self._wmodel, self.d, world_id=world)
         return mjd
 
     def set_state(self, qpos: np.ndarray, qvel: np.ndarray | None = None, worlds=None) -> None:

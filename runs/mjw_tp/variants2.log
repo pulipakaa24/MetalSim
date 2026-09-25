@@ -1,0 +1,32 @@
+=== start Fri Sep 25 07:42:39 PDT 2026 power: Now drawing from 'AC Power'
+holder: {"name": "mjw_tp_round2", "kind": "low", "minutes": 40.0, "pid": 50660, "start": 1790347359.0519922}
+  waiting [low] flex_tests_metal est 30.0 min, queued 73 s ago
+[{}] N=4096 njmax 256 naconmax 131072 is_sparse False
+[{}] physics only 113.0 ms/step -> 36,232 env-steps/s
+[{}] full env step 129.7 ms -> 31,584 env-steps/s
+[{}] after random-action steps: nefc max 41 mean 14.9; nacon 11543 (2.82/world); overflow {'LS_ITERATIONS': 3836}
+[{"metal_register_cholesky_max": 48}] N=4096 njmax 256 naconmax 131072 is_sparse False
+[{"metal_register_cholesky_max": 48}] physics only 80.9 ms/step -> 50,649 env-steps/s
+[{"metal_register_cholesky_max": 48}] full env step 90.6 ms -> 45,199 env-steps/s
+[{"metal_register_cholesky_max": 48}] after random-action steps: nefc max 45 mean 15.3; nacon 12064 (2.95/world); overflow {'LS_ITERATIONS': 3817}
+[{"m_dense_max": 0}] N=4096 njmax 256 naconmax 131072 is_sparse False
+[{"m_dense_max": 0}] physics only 79.8 ms/step -> 51,323 env-steps/s
+[{"m_dense_max": 0}] full env step 96.5 ms -> 42,426 env-steps/s
+[{"m_dense_max": 0}] after random-action steps: nefc max 48 mean 15.1; nacon 11781 (2.88/world); overflow {'LS_ITERATIONS': 3820}
+[{"m_dense_max": 0, "metal_register_cholesky_max": 48}] N=4096 njmax 256 naconmax 131072 is_sparse False
+[{"m_dense_max": 0, "metal_register_cholesky_max": 48}] physics only 66.6 ms/step -> 61,526 env-steps/s
+[{"m_dense_max": 0, "metal_register_cholesky_max": 48}] full env step 76.4 ms -> 53,621 env-steps/s
+[{"m_dense_max": 0, "metal_register_cholesky_max": 48}] after random-action steps: nefc max 43 mean 15.0; nacon 11790 (2.88/world); overflow {'LS_ITERATIONS': 3833}
+[{"jacobian": "sparse"}] N=4096 njmax 256 naconmax 131072 is_sparse True
+[{"jacobian": "sparse"}] physics only 108.8 ms/step -> 37,640 env-steps/s
+[{"jacobian": "sparse"}] full env step 126.4 ms -> 32,395 env-steps/s
+[{"jacobian": "sparse"}] after random-action steps: nefc max 45 mean 15.0; nacon 11682 (2.85/world); overflow {'LS_ITERATIONS': 3828}
+[{"jacobian": "sparse", "m_dense_max": 0, "metal_register_cholesky_max": 48}] N=4096 njmax 256 naconmax 131072 is_sparse True
+[{"jacobian": "sparse", "m_dense_max": 0, "metal_register_cholesky_max": 48}] physics only 63.2 ms/step -> 64,770 env-steps/s
+[{"jacobian": "sparse", "m_dense_max": 0, "metal_register_cholesky_max": 48}] full env step 74.0 ms -> 55,336 env-steps/s
+[{"jacobian": "sparse", "m_dense_max": 0, "metal_register_cholesky_max": 48}] after random-action steps: nefc max 40 mean 15.1; nacon 11810 (2.88/world); overflow {'LS_ITERATIONS': 3809}
+[baseline repeat] N=4096 njmax 256 naconmax 131072 is_sparse False
+[baseline repeat] physics only 113.1 ms/step -> 36,204 env-steps/s
+[baseline repeat] full env step 131.3 ms -> 31,192 env-steps/s
+[baseline repeat] after random-action steps: nefc max 50 mean 15.1; nacon 11840 (2.89/world); overflow {'LS_ITERATIONS': 3827}
+=== end Fri Sep 25 07:45:34 PDT 2026

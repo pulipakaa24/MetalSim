@@ -555,8 +555,12 @@ class G1VelocityTask:
                 from metalsim.learn.terrain import BoxWindow
                 pwf = BoxWindow.FIELDS
             njmax = 256 if terrain_collision in ("hfield", "boxes", "meshes", "boxes_local") else 512   # C's initial set on 0.025 m: 400 rows
+            # factorization settings (throughput only; float-noise-level arithmetic changes, checked against MuJoCo C in
+            # tests/test_g1_fast_factorization.py; docs/research/mjwarp_throughput_2026-09-25.md): the solver Hessian's
+            # Cholesky in registers for the 43 dofs, and M / M - dt*D by MuJoCo Warp's tree-sparse L'DL
             self.sim = BatchSim(m, n, options=BatchSimOptions(substeps=self.decimation, njmax=njmax, nconmax=nconmax,
-                                                              solver_iterations=10, ls_iterations=20, per_world_fields=pwf))
+                                                              solver_iterations=10, ls_iterations=20, per_world_fields=pwf,
+                                                              metal_register_cholesky_max=48, m_dense_max=0))
         self.max_t = int(EPISODE_S / CONTROL_DT)
         self.n_scan = 187 if self.use_scan else 0
         self.obs_dim = 12 + 3 * self.nj + self.n_scan
