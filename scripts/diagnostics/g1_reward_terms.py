@@ -29,13 +29,17 @@ def main():
     ap.add_argument("--reward_cfg", default=None, choices=(None, "flat", "rough"), help="default: the terrain's (flat -> Isaac G1FlatEnvCfg)")
     ap.add_argument("--engine", default="mjwarp", choices=("mjwarp", "newton")); ap.add_argument("--newton_it", type=int, default=4)
     ap.add_argument("--newton_dt", type=float, default=0.00125); ap.add_argument("--newton_limit_margin", default="0.15", help="'none' = USD limits")
+    ap.add_argument("--newton_kw", default="", help="NewtonSim options, e.g. drive=solver,joint_coloring=True,relaxation=0.8")
     a = ap.parse_args(); wp.config.quiet = True
     ck = torch.load(a.ckpt, map_location="mps", weights_only=False); sd = ck["net"]
     hidden = tuple(sd[k].shape[0] for k in sorted((k for k in sd if k.startswith("actor.") and k.endswith("weight")), key=lambda s: int(s.split(".")[1]))[:-1])
     ekw = {}
     if a.engine == "newton":
         lm = None if a.newton_limit_margin.lower() == "none" else float(a.newton_limit_margin)
-        ekw = dict(engine="newton", newton_iterations=a.newton_it, newton_dt=a.newton_dt, newton_kw={"limit_margin": lm})
+        nkw = {"limit_margin": lm}
+        for kv in filter(None, a.newton_kw.split(",")):
+            k, v = kv.split("="); nkw[k] = v if k == "drive" else eval(v)
+        ekw = dict(engine="newton", newton_iterations=a.newton_it, newton_dt=a.newton_dt, newton_kw=nkw)
     task = G1VelocityTask(a.envs, terrain=a.terrain, seed=1, physics_dt=a.physics_dt, reward_cfg=a.reward_cfg, **ekw)
     net = ActorCriticMLP(task.obs_dim, task.act_dim, hidden=hidden).to("mps"); net.load_state_dict(sd); net.eval()
     n = a.envs

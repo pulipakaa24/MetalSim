@@ -3,7 +3,7 @@ N(0, 3) actions; pass = at most 1 blown-up episode) vs physics throughput (task.
 env-steps/s at 50 Hz), for solver iterations x substep, joint relaxation, and the actuator's leg branch
 (stiff_implicit: stiffness integrated implicitly too, bias 1/(1 + kp dt^2 / I) at rest).
 
-usage: python scripts/diagnostics/newton_stability_sweep.py [config ...]   config = IT:DT_MS[:relax=R][:stiff][:rc][:nolim]"""
+usage: python scripts/diagnostics/newton_stability_sweep.py [config ...]   config = IT:DT_MS[:relax=R|:rlin=R:rang=R][:stiff][:rc][:nolim][:solver][:color]"""
 import sys, io, time, contextlib, subprocess, numpy as np, warp as wp
 wp.config.quiet = True
 from metalsim.learn.g1_velocity import G1VelocityTask
@@ -19,6 +19,10 @@ def parse(c):
         if x == "stiff": kw.setdefault("actuator_kw", {})["stiff_implicit"] = True
         elif x.startswith("relax="): kw["relaxation"] = float(x.split("=")[1])
         elif x == "nolim": kw["limit_margin"] = None        # USD limits as authored (no +-(pi - 0.15) clamp)
+        elif x == "solver": kw["drive"] = "solver"          # Newton fork: SolverXPBD(joint_drive_mode="pd") with Isaac's gains
+        elif x == "color": kw["joint_coloring"] = True       # Newton fork: Gauss-Seidel joint coloring
+        elif x.startswith("rlin="): kw["relaxation"] = float(x.split("=")[1])
+        elif x.startswith("rang="): kw["relaxation_angular"] = float(x.split("=")[1])
         elif x == "rc": kw["recenter"] = True          # revolute zeros at the middle of the limit range
     return it, dt, kw
 

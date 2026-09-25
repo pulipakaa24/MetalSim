@@ -456,6 +456,13 @@ def _ctrl_to_target(ctrl: wp.array2d[float], dof_of: wp.array[int], q_offset: wp
 
 
 @wp.kernel
+def _ctrl_to_solver_target(ctrl: wp.array2d[float], tq_of: wp.array[int], q_offset: wp.array[float], ntq: int,
+                           joint_target_q: wp.array[float]):
+    e, i = wp.tid()
+    joint_target_q[e * ntq + tq_of[i]] = ctrl[e, i] - q_offset[i]
+
+
+@wp.kernel
 def _copy_joint_qd(src: wp.array[float], dst: wp.array[float]):
     dst[wp.tid()] = src[wp.tid()]
 
@@ -569,7 +576,8 @@ class NewtonSim:
                  device: str = "metal:0", mesh_to_box: bool = True, touch_bodies=("left_ankle_roll_link", "right_ankle_roll_link", "torso_link"),
                  hfield: dict | None = None, pose_bodies=("torso_link",), relaxation: float = 0.4,
                  actuator_kw: dict | None = None, solver_kw: dict | None = None, solver: str = "xpbd", project: bool = False,
-                 recenter: bool = False, limit_margin: float | None = 0.15):
+                 recenter: bool = False, limit_margin: float | None = 0.15, drive: str = "actuator",
+                 joint_coloring: bool = False, relaxation_angular: float | None = None):
         import mujoco
         from metalsim.interop import warp_metal as wm
         self.mj_model = mj = mj_model
@@ -591,8 +599,17 @@ class NewtonSim:
                 # armature enters Featherstone's joint-space inertia natively (not as added body inertia)
                 self.solver = newton.solvers.SolverFeatherstone(m, **(solver_kw or {"angular_damping": 0.0}))
             else:
+                # drive="solver": the Newton fork's own PD drive (SolverXPBD(joint_drive_mode="pd")) with Isaac's gains
+                # in the model's joint_target_ke/kd; ActuatorPD's gains are zeroed below. The builder already adds the
+                # armature isotropically to the link inertia, so the solver must not add it again.
+                skw = dict(solver_kw or {})
+                if drive == "solver":
+                    skw.setdefault("joint_drive_mode", "pd"); skw.setdefault("joint_armature_inertia", "none")
+                if joint_coloring:
+                    skw["joint_coloring"] = True
                 self.solver = newton.solvers.SolverXPBD(m, iterations=iterations, joint_linear_relaxation=relaxation,
-                                                        joint_angular_relaxation=relaxation, **(solver_kw or {}))
+                                                        joint_angular_relaxation=relaxation if relaxation_angular is None else relaxation_angular,
+                                                        **skw)
             self.s0, self.s1 = m.state(), m.state(); self.control = m.control()
             newton.eval_fk(m, m.joint_q, m.joint_qd, self.s0)
             self.pipeline = newton.CollisionPipeline(m, broad_phase="explicit")    # what Model.collide() builds
@@ -623,6 +640,18 @@ class NewtonSim:
             self.touch_adr = wp.vec3i(*[sadr(b) for b in touch_bodies])
             # actuator: per-DOF gains from the same builder (Isaac's groups), target written from ctrl
             self.actuator = ActuatorPD(m, act["kp"], act["kd"], act["effort"], act["target"], None, dt, "ipd", **(actuator_kw or {}))
+            self.drive = drive
+            if drive == "solver":
+                if getattr(self.solver, "_joint_drive_f", None) is None:
+                    raise RuntimeError("drive='solver' needs a SolverXPBD with joint_drive_mode (the Newton fork)")
+                m.joint_target_ke.assign(act["kp"].astype(np.float32)); m.joint_target_kd.assign(act["kd"].astype(np.float32))
+                self.actuator.kp.zero_(); self.actuator.kd.zero_()        # ActuatorPD then only evaluates joint state (qacc)
+                tqs = m.joint_target_q_start.numpy()
+                self.tq_of = wp.array([int(tqs[lab.index(nm)]) for nm in names], dtype=int)
+                self.ntq = self.control.joint_target_q.shape[0] // n
+                self.tau_src = self.solver._joint_drive_f                  # the solver's drive force of the step (per DOF)
+            else:
+                self.tau_src = self.control.joint_f
             self.joint_qd_prev = wp.zeros(m.joint_dof_count, dtype=float)
             self.joint_q = wp.clone(m.joint_q); self.joint_qd = wp.clone(m.joint_qd)
             # MuJoCo-layout data
@@ -647,6 +676,9 @@ class NewtonSim:
         m = self.model
         with wp.ScopedDevice(self.device):
             wp.launch(_ctrl_to_target, dim=(self.n, self.mj_model.nu), inputs=[self.d.ctrl, self.dof_of, self.q_offset, self.nd, self.actuator.target])
+            if self.drive == "solver":
+                wp.launch(_ctrl_to_solver_target, dim=(self.n, self.mj_model.nu), inputs=[self.d.ctrl, self.tq_of, self.q_offset, self.ntq],
+                          outputs=[self.control.joint_target_q])
             for k in range(self.substeps):
                 self.actuator.apply(self.s0, self.control)          # eval_ik -> actuator.joint_q/qd, torques
                 if k == self.substeps - self.acc_window:
@@ -674,7 +706,7 @@ class NewtonSim:
         m, d = self.model, self.d
         newton.eval_ik(m, self.s0, self.joint_q, self.joint_qd)
         wp.launch(_to_mujoco, dim=self.n, inputs=[self.s0.body_q, self.s0.body_qd, m.body_com, self.joint_q, self.joint_qd,
-                  self.joint_qd_prev, self.control.joint_f, self.nb, self.nc, self.nd, self.coord_of, self.dof_of, self.q_offset,
+                  self.joint_qd_prev, self.tau_src, self.nb, self.nc, self.nd, self.coord_of, self.dof_of, self.q_offset,
                   self.foot_nb, 1.0 / (self.acc_window * self.dt_phys)], outputs=[d.qpos, d.qvel, d.qacc, d.qfrc_actuator, d.foot_vel])
         wp.launch(_body_pose, dim=(self.n, self.pose_nb.shape[0]), inputs=[self.s0.body_q, self.nb, self.pose_nb, self.pose_mj],
                   outputs=[d.xpos, d.xmat])
