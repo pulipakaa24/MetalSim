@@ -153,6 +153,37 @@ than flat: the adaptive schedule keeps the learning rate at 1e-5 to 4e-4 because
 observation (187 height-scan values) makes the KL estimate exceed 0.02 in most updates; Isaac's
 rough runner is configured for 3,000 iterations, so 150 is a smoke test of stability, not a result.
 
+**Per-term comparison with Isaac's own rsl_rl run** (Isaac Sim 5.1 / Isaac Lab 2.3.2 on the L4,
+`runs/parity/isaac_train_g1_flat_terms.txt`; ours from `scripts/diagnostics/g1_reward_terms.py`, mean
+action, 1024 envs × 1000 steps, in Isaac's units: per-second average of weight × term × dt over the
+episode; measured 2026-09-24):
+
+| | Isaac it 100 | Isaac it 200 | Isaac it 300 | MetalSim it 300 | MetalSim it 1000 | MetalSim it 1500 |
+|---|---|---|---|---|---|---|
+| mean episode length (steps) | 200 | 981 | 1000 | 61 | 412 | 279 |
+| mean return | −6.6 | +6.6 | +19.2 | −3.7 | −2.6 | −4.5 |
+| track_lin_vel_xy_exp | 0.060 | 0.782 | 0.897 | 0.018 | 0.112 | 0.090 |
+| track_ang_vel_z_exp | 0.019 | 0.208 | 0.504 | 0.033 | 0.196 | 0.120 |
+| feet_air_time | 0.003 | 0.021 | 0.028 | 0.002 | 0.013 | 0.011 |
+| feet_slide | −0.017 | −0.046 | −0.022 | −0.008 | −0.043 | −0.028 |
+| joint deviation (hip + arms + fingers + torso) | −0.047 | −0.197 | −0.162 | −0.025 | −0.224 | −0.203 |
+| flat_orientation_l2 | −0.013 | −0.010 | −0.009 | −0.004 | −0.021 | −0.016 |
+| action_rate_l2 | −0.083 | −0.321 | −0.230 | −0.001 | −0.026 | −0.019 |
+| termination_penalty | −0.200 | 0.000 | 0.000 | −0.200 | −0.140 | −0.177 |
+| time-outs (fraction of episodes) | 0.00 | 0.99 | 1.00 | 0.00 | 0.30 | 0.11 |
+
+Isaac's action_rate term is dominated by its exploration noise (std 0.72–1.0 on 37 joints under
+stochastic actions; ours above is the mean action), so it is not comparable; every other row is. The
+picture: Isaac's policy is tracking the command by iteration 200 (0.78 of the maximum 1.0) with no
+falls, and by iteration 300 it is at 0.90; ours never learns to track (0.11 at best) and keeps falling
+(termination −0.14 to −0.20 per second means 70–89 % of episodes end in a fall), while its joint
+deviation and slide costs at iteration 1000 are as large as Isaac's at 200 (it moves as much, to no
+effect). This is a factor-7 gap in tracking and a learning-speed gap of more than 5× (Isaac's
+iteration 100 ≈ ours at 300). Whether the learner or the simulation is responsible is being decided by
+a learner differential: the real rsl_rl library trained on our task through a VecEnv adapter, with
+Isaac's exact configuration (`metalsim/learn/train_g1_rslrl.py`, in progress), while the Newton
+backend answers the physics half (§2.1).
+
 ### 1.6 Rough terrain: MuJoCo Warp's heightfield contacts, found defective and patched
 
 `tests/test_terrain.py::test_hfield_mesh_contacts_match_mujoco_c`: G1 on Isaac's rough-terrain
