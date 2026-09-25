@@ -581,6 +581,43 @@ at their targets — a start-up transient on the PhysX side (hypothesis: finger 
 default pose; not verified). The 0.1 rad divergence step of A_hold (1.34 s) is at the moment of the
 torso impact, where these transients and the contact model meet.
 
+**Contact and joint-limit tuning of MuJoCo Warp against these recordings** (2026-09-25,
+`docs/research/mujoco_contact_vs_physx_2026-09-25.md`, presets in `metalsim/physics/contact_tuning.py`,
+logs `runs/parity/tuning*/`; hold = A_hold, drop = C_drop; peaks sampled at control steps like
+Isaac's; transfer error = mean absolute error of Isaac's checkpoints 500 / 1000 / 1499 against Isaac's
+3.19 / 3.02 / 3.11 m; cost = step time at 4096 envs relative to default; measured):
+
+| setting | hold peak / mean N | drop peak / mean N | drop penetration | drop limit excursion | feet_slide | feet_air_time | transfer error | cost |
+|---|---|---|---|---|---|---|---|---|
+| Isaac PhysX | 712 / 302 | 1030 / 288 | – | 0.004 rad | −0.017 | 0.035 | – | – |
+| old collider, default | 3866 / 319 | 3499 / 332 | 3.35 cm | 0.029 | −0.060 | 0.013 (234 falls) | 0.09 m | 1.00× |
+| C-exact collider, default | 3715 / 316 | 3746 / 318 | 2.97 | 0.030 | −0.048 | 0.022 (30 falls) | 0.35 | 1.00× |
+| + hard limits | 3710 / 314 | 3750 / 316 | 2.99 | 0.001 | −0.048 | 0.022 | 0.12 | 1.00× |
+| τ 5 ms, impedance 0.99, hard limits | 443 / 285 | 3074 / 311 | 0.85 | 0.003 | −0.025* | 0.016* | 0.14 | 1.22× |
+| + margin = gap 1 cm | 488 / 285 | 1400 / 277 | 0 (stands 1 cm high) | 0.020 | −0.027 | 0.016 | 0.14 | 1.22× |
+| τ 10 ms, impedance 0.99, hard limits | 1589 / 300 | 5595 / 328 | 1.63 | 0.002 | pending | pending | 0.047 | 1.19× |
+| **τ 10 ms, impact-only stiffening, hard limits** | **848 / 288** | 3255 / 315 | 1.64 | 0.001 | pending | pending | **0.033** | **1.02×** |
+| elliptic cone, hard limits (impratio 1 / 10) | 2376–3997 | 3026–4924 | 2.5–2.6 | 0.002–0.004 | pending | pending | 0.13 | 3.84× |
+| τ 5 ms + elliptic, hard limits | 628 / 279 | 6955 / 357 | 0.85 | 0.002 | −0.026 | 0.016 | 0.15 | 3.95× |
+
+\* measured without hard limits. Joint-angle error against Isaac on hold and drop is 0.002–0.015 rad
+for every setting and does not separate them. Reading: hard joint limits bring limit excursions to
+Isaac's level at no cost; stiffer contacts halve foot sliding (−0.048 → −0.025) but move air time
+further from Isaac's (no setting closes the air-time gap); the drop's impact peak stays ~3× Isaac's
+everywhere except the 1 cm margin, which only works by lifting the robot 1 cm (a pair's margin is the
+sum of the two geoms' margins, and margin = gap adds inactive contacts, not PhysX's speculative
+contacts: two corrections to §2.1); elliptic friction cones are ruled out on fidelity (no slide gain,
+higher peaks) before cost; stiffness applied only on impact (impedance 0.9 at touch-down rising to
+0.999 over 5 mm) removes the tenfold hold-peak overshoot at 1.02× cost, where the uniformly stiff
+τ 5 ms costs 1.22 % because up to 1,212 of 4,096 worlds fail to converge in 10 Newton iterations.
+Provisional pick: impact-only stiffening with hard limits, decided by its pending feet_slide /
+feet_air_time against a seed-noise band; τ 5 ms with hard limits is the alternative if it loses.
+The C-exact foot collider is kept: its earlier transfer loss came from pairing it with the soft
+default contacts (30 vs 234 falls, better slide and air time, landing forces = MuJoCo C to 1e-4).
+Isaac Lab's own MuJoCo Warp settings (ke 160000, kd 1100) read as direct MuJoCo stiffness/damping
+make the robot never fall in the drop, so that is not Newton's mapping; unverified. Preflight at
+2.5 ms passes for τ 5 ms with hard limits and for default; pending for the provisional pick.
+
 **The same protocol on Newton XPBD** (`scripts/diagnostics/newton_record_g1.py`, CPU device which
 matches Metal to ~1e-6, `runs/parity/report_newton_{it4_1p25ms,it4_0p625ms}`, measured 2026-09-24,
 Newton commit 45458023 with the angle-wrap clamp; MuJoCo Warp rows repeated for reference):
