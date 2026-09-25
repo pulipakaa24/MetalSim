@@ -1,0 +1,17 @@
+holder: {"name": "terrain_walls_tests", "kind": "render", "minutes": 20.0, "pid": 58689, "start": 1790352339.310836}
+  waiting [low] flex_metal_run2 est 30.0 min, queued 4327 s ago
+  waiting [low] mjw_tp_round4 est 30.0 min, queued 3919 s ago
+{"mode": "boxes_local", "geometry": {"x_riser": -10.8, "z_low": -0.7705768144138987, "z_high": -0.6604944123547702, "y": -44.0}, "C": {"stub_toe_x_max_minus_riser": 0.005023150120662123, "stub_sole_rise": 0.0029386875000000368, "stub_min_abs_normal_z": 0.0, "stub_final_x": -10.938304589127505, "stub_final_z": -0.7362099616174511, "edge_final_x": -10.815629027304269, "edge_final_z": -0.6261746757200266, "edge_final_quat": [1.0, -0.0, -0.0003, 0.0]}, "warp": {"stub_toe_x_max_minus_riser": 0.006998330904142591, "stub_sole_rise": 0.0029386701448126384, "stub_min_abs_normal_z": 0.0, "stub_final_x": -10.937747955322266, "stub_final_z": -0.736210286617279, "edge_final_x": -10.815620422363281, "edge_final_z": -0.6261749267578125, "edge_final_quat": [1.0, -0.0, -0.0003000000142492354, -0.0]}, "warp_vs_C_pos_max": 0.001975180783480468, "warp_vs_C_pos_final": [0.0005566339001172065, 8.608602056376781e-06]}
+.................................                                        [100%]
+=============================== warnings summary ===============================
+tests/test_terrain.py::test_g1_rough_task_runs
+tests/test_terrain.py::test_hfield_mesh_contacts_match_mujoco_c
+tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[boxes]
+tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[meshes]
+tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[boxes_local]
+tests/test_g1_task_terms.py::test_rough_terrain_seed_and_isaac_env_assignment
+  /private/tmp/claude-501/-Users-aditya/7ceab845-25d9-459e-a466-a4b793f72f5c/scratchpad/mjw_a8e6485/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+33 passed, 6 warnings in 70.03s (0:01:10)

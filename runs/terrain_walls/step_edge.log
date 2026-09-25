@@ -1,0 +1,63 @@
+holder: {"name": "terrain_step_edge", "kind": "render", "minutes": 10.0, "pid": 53435, "start": 1790348741.963704}
+  waiting [render] terrain_walls_transfer est 30.0 min, queued 744 s ago
+  waiting [render] terrain_walls_transfer2 est 40.0 min, queued 541 s ago
+  waiting [low] flex_metal_run2 est 30.0 min, queued 730 s ago
+  waiting [low] mjw_tp_round4 est 30.0 min, queued 321 s ago
+/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  warnings.warn(
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth eb51811 load on device 'metal:0' took 26.95 ms  (cached)
+Module _nxn_broadphase__locals__kernel_738cc90c 738cc90 load on device 'metal:0' took 17.76 ms  (cached)
+Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ed246d84 ed246d8 load on device 'metal:0' took 20.29 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_33fab0fb 33fab0f load on device 'metal:0' took 17.93 ms  (cached)
+Module mujoco_warp._src.constraint 66c49b2 load on device 'metal:0' took 16.72 ms  (cached)
+Module _friction_dof__locals__kernel_54fa40dd 54fa40d load on device 'metal:0' took 16.99 ms  (cached)
+Module _efc_contact_init__locals__kernel_a8725cf7 a8725cf load on device 'metal:0' took 16.79 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_a4bfbe83 7e0a034 load on device 'metal:0' took 17.14 ms  (cached)
+Module _efc_contact_update__locals__kernel_6d6c74b7 6d6c74b load on device 'metal:0' took 17.24 ms  (cached)
+Module mujoco_warp._src.passive 8c22ff6 load on device 'metal:0' took 22.76 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_c0cdbea2 c0cdbea load on device 'metal:0' took 17.15 ms  (cached)
+Module _qfrc_smooth__locals__kernel_71c358c9 71c358c load on device 'metal:0' took 16.57 ms  (cached)
+Module mujoco_warp._src.support 79a3259 load on device 'metal:0' took 17.88 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_02bfe2ab a03c384 load on device 'metal:0' took 640.48 ms  (compiled)
+Module _solve_init_dof__locals__kernel_38becb0e 38becb0 load on device 'metal:0' took 17.96 ms  (cached)
+Module mujoco_warp._src.solver 8ea9b47 load on device 'metal:0' took 18.00 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_e2542393 e254239 load on device 'metal:0' took 361.91 ms  (compiled)
+Module mul_m_kernel__locals___mul_m_3948abbd 3948abb load on device 'metal:0' took 16.78 ms  (cached)
+Module _update_constraint_efc__locals__kernel_de023f4a de023f4 load on device 'metal:0' took 17.15 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_03af8cad 03af8ca load on device 'metal:0' took 16.73 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_4ad7e281 4ad7e28 load on device 'metal:0' took 16.77 ms  (cached)
+Module _update_gradient_grad__locals__kernel_b8e8339f b8e8339 load on device 'metal:0' took 16.73 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_0861712d e73b5aa load on device 'metal:0' took 439.32 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_0d43a579 1188f40 load on device 'metal:0' took 424.67 ms  (compiled)
+Module _linesearch_iterative_kernel__locals__kernel_8e1be4fc eb3c630 load on device 'metal:0' took 18.12 ms  (cached)
+Module _update_constraint_efc__locals__kernel_16a8428f 16a8428 load on device 'metal:0' took 17.21 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_c637d2ef c637d2e load on device 'metal:0' took 16.74 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_8f8afe65 8f8afe6 load on device 'metal:0' took 16.69 ms  (cached)
+Module _update_gradient_grad__locals__kernel_fbe8274a fbe8274 load on device 'metal:0' took 17.39 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_b2aa39ef 64b8e28 load on device 'metal:0' took 428.28 ms  (compiled)
+Module _solve_done__locals__kernel_3dd7dbc5 3dd7dbc load on device 'metal:0' took 17.17 ms  (cached)
+Module mujoco_warp._src.derivative f67646f load on device 'metal:0' took 19.86 ms  (cached)
+Module mujoco_warp._src.forward 679d647 load on device 'metal:0' took 23.41 ms  (cached)
+Module _next_time_builder__locals___next_time_39b4ddcf 39b4ddc load on device 'metal:0' took 17.40 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_2fff171b 2fff171 load on device 'metal:0' took 16.66 ms  (cached)
+Module reset_data__locals__reset_M_4fcf5139 4fcf513 load on device 'metal:0' took 16.69 ms  (cached)
+Module reset_data__locals__reset_mocap_ad69c26a ad69c26 load on device 'metal:0' took 16.59 ms  (cached)
+Module reset_data__locals__reset_contact_53bb04fb 53bb04f load on device 'metal:0' took 16.96 ms  (cached)
+Module reset_data__locals__reset_sleep_b049b8fb b049b8f load on device 'metal:0' took 17.53 ms  (cached)
+Module reset_data__locals__reset_nworld_4a90e5af 4a90e5a load on device 'metal:0' took 16.40 ms  (cached)
+{"mode": "hfield", "geometry": {"x_riser": -10.8, "z_low": -0.7705768144138987, "z_high": -0.6604944123547702, "y": -44.0}, "C": {"stub_toe_x_max_minus_riser": 0.03648083503147603, "stub_sole_rise": 0.023302973921862535, "stub_min_abs_normal_z": 0.0, "stub_final_x": -10.92667380215807, "stub_final_z": -0.7379160114597447, "edge_final_x": -10.816196911811929, "edge_final_z": -0.6261133673392002, "edge_final_quat": [1.0, 0.0, -0.0002, 0.007]}, "warp": {"stub_toe_x_max_minus_riser": -0.009008138822419909, "stub_sole_rise": 0.024881643281714494, "stub_min_abs_normal_z": 0.6723912358283997, "stub_final_x": -11.088827133178711, "stub_final_z": -0.7362263798713684, "edge_final_x": -10.82891845703125, "edge_final_z": -0.6849312782287598, "edge_final_quat": [0.9782000184059143, 0.0, -0.20759999752044678, 0.0]}, "warp_vs_C_pos_max": 0.1698656174990809, "warp_vs_C_pos_final": [0.21476121164149345, 0.060183028507481626]}
+/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  warnings.warn(
+Module ccd_kernel_builder__locals__ccd_kernel_8a6f4697 8a6f469 load on device 'metal:0' took 26.61 ms  (cached)
+{"mode": "boxes", "geometry": {"x_riser": -10.8, "z_low": -0.7705768144138987, "z_high": -0.6604944123547702, "y": -44.0}, "C": {"stub_toe_x_max_minus_riser": 0.005023150120662123, "stub_sole_rise": 0.0029386875000000368, "stub_min_abs_normal_z": 0.0, "stub_final_x": -10.938304589127505, "stub_final_z": -0.7362099616174511, "edge_final_x": -10.815629027304269, "edge_final_z": -0.6261746757200266, "edge_final_quat": [1.0, -0.0, -0.0003, 0.0]}, "warp": {"stub_toe_x_max_minus_riser": 0.006998330904142591, "stub_sole_rise": 0.0029386701448126384, "stub_min_abs_normal_z": 0.0, "stub_final_x": -10.937747955322266, "stub_final_z": -0.736210286617279, "edge_final_x": -10.815620422363281, "edge_final_z": -0.6261749267578125, "edge_final_quat": [1.0, -0.0, -0.0003000000142492354, -0.0]}, "warp_vs_C_pos_max": 0.001975180783480468, "warp_vs_C_pos_final": [0.0005566339001172065, 8.608602056376781e-06]}
+Module ccd_kernel_builder__locals__ccd_kernel_15d29ea5 15d29ea load on device 'metal:0' took 26.89 ms  (cached)
+{"mode": "meshes", "geometry": {"x_riser": -10.8, "z_low": -0.7705768144138987, "z_high": -0.6604944123547702, "y": -44.0}, "C": {"stub_toe_x_max_minus_riser": 0.005023148603653382, "stub_sole_rise": 0.0029386875000000368, "stub_min_abs_normal_z": 0.0, "stub_final_x": -10.938304596018812, "stub_final_z": -0.7362099612342896, "edge_final_x": -10.81562902730022, "edge_final_z": -0.6261746753270472, "edge_final_quat": [1.0, 0.0, -0.0003, 0.0]}, "warp": {"stub_toe_x_max_minus_riser": 0.006998330904142591, "stub_sole_rise": 0.0029386701448126384, "stub_min_abs_normal_z": 0.0, "stub_final_x": -10.937747955322266, "stub_final_z": -0.736210286617279, "edge_final_x": -10.815620422363281, "edge_final_z": -0.6261749267578125, "edge_final_quat": [1.0, 0.0, -0.0003000000142492354, 0.0]}, "warp_vs_C_pos_max": 0.001975182300489209, "warp_vs_C_pos_final": [0.0005566407916469567, 8.608609478528593e-06]}
+{"mode": "hfield_fine:0.05", "geometry": {"x_riser": -10.8, "z_low": -0.7705768144138987, "z_high": -0.6604944123547702, "y": -44.0}, "C": {"stub_toe_x_max_minus_riser": 0.016471624911531535, "stub_sole_rise": 0.018934703658701868, "stub_min_abs_normal_z": 0.0, "stub_final_x": -10.953857830700139, "stub_final_z": -0.7274234612935265, "edge_final_x": -10.813538515542593, "edge_final_z": -0.6261126575240762, "edge_final_quat": [0.9997, -0.0, -0.0002, 0.0255]}, "warp": {"stub_toe_x_max_minus_riser": -0.008377760099275378, "stub_sole_rise": 0.005777102933661515, "stub_min_abs_normal_z": 0.41354086995124817, "stub_final_x": -11.007620811462402, "stub_final_z": -0.736210286617279, "edge_final_x": -10.814440727233887, "edge_final_z": -0.7061346769332886, "edge_final_quat": [0.9592999815940857, 0.0, -0.2824999988079071, -0.0]}, "warp_vs_C_pos_max": 0.1143486734193715, "warp_vs_C_pos_final": [0.09381311852789535, 0.08009810683490934]}
+{"mode": "hfield_fine:0.025", "geometry": {"x_riser": -10.8, "z_low": -0.7705768144138987, "z_high": -0.6604944123547702, "y": -44.0}, "C": {"stub_toe_x_max_minus_riser": -0.005405355510749388, "stub_sole_rise": 0.004670845131737211, "stub_min_abs_normal_z": 0.0, "stub_final_x": -10.968984063167255, "stub_final_z": -0.736167756331091, "edge_final_x": -10.815625247123293, "edge_final_z": -0.6260824647977703, "edge_final_quat": [0.9999, -0.0, -0.0001, 0.0117]}, "warp": {"stub_toe_x_max_minus_riser": -0.007010191129548815, "stub_sole_rise": 0.003012281881110246, "stub_min_abs_normal_z": 0.22147610783576965, "stub_final_x": -10.966341018676758, "stub_final_z": -0.7362102270126343, "edge_final_x": -10.814440727233887, "edge_final_z": -0.7061346769332886, "edge_final_quat": [0.9592999815940857, 0.0, -0.2824999988079071, -0.0]}, "warp_vs_C_pos_max": 0.08781359329130012, "warp_vs_C_pos_final": [0.04904648239895595, 0.08006250618221535]}

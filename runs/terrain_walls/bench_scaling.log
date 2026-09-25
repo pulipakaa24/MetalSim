@@ -1,0 +1,17 @@
+holder: {"name": "terrain_walls_scaling", "kind": "timing", "minutes": 8.0, "pid": 53251, "start": 1790348620.8836071}
+  waiting [render] terrain_step_edge est 10.0 min, queued 626 s ago
+  waiting [render] terrain_walls_transfer est 30.0 min, queued 624 s ago
+  waiting [render] terrain_walls_transfer2 est 40.0 min, queued 421 s ago
+  waiting [low] flex_metal_run2 est 30.0 min, queued 609 s ago
+  waiting [low] mjw_tp_round4 est 30.0 min, queued 201 s ago
+/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/scripts/diagnostics/terrain_walls_bench.py", line 53, in <module>
+  File "/Users/aditya/robosim/scripts/diagnostics/terrain_walls_bench.py", line 33, in one
+AttributeError: 'fixedarray' object has no attribute 'device'
+/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+live Warp arrays on metal:0: 2.43 GB; largest [(793379888, (99172486,), 'vec2i'), (793379888, (99172486,), 'vec2i'), (519192576, (1024, 14084), 'mat33f'), (173064192, (1024, 14084), 'vec3f'), (50331648, (1024, 256, 48), 'float32'), (9612804, (2403201,), 'float32')]
+{"mode": "boxes", "n": 1024, "physics_dt": 0.0025, "ngeom": 14084, "hfield_samples": 2403201, "setup_s": 9.8, "env_steps_per_s": [14230, 14225, 14196], "best": 14230, "nacon_end": 2901, "naconmax": 131072}
+/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+live Warp arrays on metal:0: 3.26 GB; largest [(1038385152, (2048, 14084), 'mat33f'), (793379888, (99172486,), 'vec2i'), (793379888, (99172486,), 'vec2i'), (346128384, (2048, 14084), 'vec3f'), (100663296, (2048, 256, 48), 'float32'), (15147008, (2048, 1849), 'float32')]
+{"mode": "boxes", "n": 2048, "physics_dt": 0.0025, "ngeom": 14084, "hfield_samples": 2403201, "setup_s": 10.3, "env_steps_per_s": [18050, 18104, 18105], "best": 18105, "nacon_end": 5738, "naconmax": 262144}

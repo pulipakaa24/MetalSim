@@ -1,0 +1,67 @@
+holder: {"name": "terrain_walls_transfer_reps", "kind": "render", "minutes": 45.0, "pid": 57129, "start": 1790351126.8186822}
+  waiting [render] terrain_walls_tests est 20.0 min, queued 280 s ago
+  waiting [low] flex_metal_run2 est 30.0 min, queued 3115 s ago
+  waiting [low] mjw_tp_round4 est 30.0 min, queued 2707 s ago
+=== terrain_collision hfield scan_surface grid reps 8
+falls (pelvis above ground < 0.3 m at the end) per cell type, terrain_collision=hfield, scan_surface=grid, reps=8:
+  pyramid stairs: 0 / 96 falls, mean x 3.57 m
+  inverted stairs: 34 / 96 falls, mean x 1.59 m
+  boxes: 14 / 96 falls, mean x 2.69 m
+  random rough: 0 / 96 falls, mean x 3.17 m
+  total: 48 / 384
+=== terrain_collision boxes_local scan_surface grid reps 8
+falls (pelvis above ground < 0.3 m at the end) per cell type, terrain_collision=boxes_local, scan_surface=grid, reps=8:
+  pyramid stairs: 2 / 96 falls, mean x 2.55 m
+  inverted stairs: 17 / 96 falls, mean x 2.45 m
+  boxes: 4 / 96 falls, mean x 3.12 m
+  random rough: 0 / 96 falls, mean x 3.18 m
+  total: 23 / 384
+=== terrain_collision boxes_local scan_surface exact reps 8
+falls (pelvis above ground < 0.3 m at the end) per cell type, terrain_collision=boxes_local, scan_surface=exact, reps=8:
+  pyramid stairs: 1 / 96 falls, mean x 2.33 m
+  inverted stairs: 14 / 96 falls, mean x 2.80 m
+  boxes: 4 / 96 falls, mean x 3.23 m
+  random rough: 0 / 96 falls, mean x 3.17 m
+  total: 19 / 384
+=== terrain_collision hfield scan_surface exact reps 8
+falls (pelvis above ground < 0.3 m at the end) per cell type, terrain_collision=hfield, scan_surface=exact, reps=8:
+  pyramid stairs: 0 / 96 falls, mean x 3.25 m
+  inverted stairs: 37 / 96 falls, mean x 1.68 m
+  boxes: 17 / 96 falls, mean x 2.49 m
+  random rough: 0 / 96 falls, mean x 3.18 m
+  total: 54 / 384
+=== terrain_collision hfield_fine:0.025 scan_surface grid reps 8
+falls (pelvis above ground < 0.3 m at the end) per cell type, terrain_collision=hfield_fine:0.025, scan_surface=grid, reps=8:
+  pyramid stairs: 1 / 96 falls, mean x 3.81 m
+  inverted stairs: 40 / 96 falls, mean x 1.50 m
+  boxes: 25 / 96 falls, mean x 2.47 m
+  random rough: 0 / 96 falls, mean x 3.17 m
+  total: 66 / 384
+=== terrain_collision hfield_fine:0.05 scan_surface grid reps 8
+falls (pelvis above ground < 0.3 m at the end) per cell type, terrain_collision=hfield_fine:0.05, scan_surface=grid, reps=8:
+  pyramid stairs: 3 / 96 falls, mean x 3.68 m
+  inverted stairs: 39 / 96 falls, mean x 1.50 m
+  boxes: 21 / 96 falls, mean x 2.70 m
+  random rough: 0 / 96 falls, mean x 3.20 m
+  total: 63 / 384
+=== terrain_collision boxes scan_surface grid reps 8
+falls (pelvis above ground < 0.3 m at the end) per cell type, terrain_collision=boxes, scan_surface=grid, reps=8:
+  pyramid stairs: 1 / 96 falls, mean x 2.63 m
+  inverted stairs: 23 / 96 falls, mean x 2.29 m
+  boxes: 6 / 96 falls, mean x 3.19 m
+  random rough: 0 / 96 falls, mean x 3.17 m
+  total: 30 / 384
+=== terrain_collision boxes_fine:0.025 scan_surface exact reps 8
+falls (pelvis above ground < 0.3 m at the end) per cell type, terrain_collision=boxes_fine:0.025, scan_surface=exact, reps=8:
+  pyramid stairs: 2 / 96 falls, mean x 2.30 m
+  inverted stairs: 14 / 96 falls, mean x 2.87 m
+  boxes: 3 / 96 falls, mean x 3.13 m
+  random rough: 0 / 96 falls, mean x 3.15 m
+  total: 19 / 384
+=== terrain_collision meshes scan_surface grid reps 8
+falls (pelvis above ground < 0.3 m at the end) per cell type, terrain_collision=meshes, scan_surface=grid, reps=8:
+  pyramid stairs: 1 / 96 falls, mean x 2.56 m
+  inverted stairs: 20 / 96 falls, mean x 2.30 m
+  boxes: 7 / 96 falls, mean x 3.13 m
+  random rough: 0 / 96 falls, mean x 3.17 m
+  total: 28 / 384
