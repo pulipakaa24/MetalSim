@@ -1,0 +1,65 @@
+install: newton {'path': '/Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton', 'url': 'https://github.com/newton-physics/newton', 'commit': '45458023f24629c1feffb1f336594808f537db14', 'editable': False} | warp {'path': '/Users/aditya/robosim/upstream/warp-innate/warp', 'git_head': '786cdae', 'git_dirty': False}; mujoco_warp a8e6485 plane_convex: MJW_PLANE_CONVEX=legacy environment switch pins the previous heuristic (A/B comparisons)
+=== mjwarp fixed PPO flat cfg it 300
+{
+ "ckpt": "runs/policies/g1_flat_ppowarp_fixed_flatcfg_it300.pt",
+ "iterations": 300,
+ "episodes": 1228,
+ "mean_episode_length": 815.8672638436482,
+ "mean_return": 23.55447114594287,
+ "terminations": {
+  "fell": 285,
+  "timeout": 943
+ },
+ "Episode_Reward": {
+  "track_lin_vel_xy_exp": 0.7521,
+  "track_ang_vel_z_exp": 0.6231,
+  "feet_air_time": 0.0161,
+  "feet_slide": -0.0338,
+  "joint_deviation_all": -0.0945,
+  "flat_orientation_l2": -0.0076,
+  "action_rate_l2": -0.0088,
+  "termination_penalty": -0.0464,
+  "lin_vel_z_l2": -0.0027,
+  "ang_vel_xy_l2": -0.0067,
+  "dof_torques_l2": -0.005,
+  "dof_acc_l2": -0.0072,
+  "dof_pos_limits": -0.0009
+ },
+ "note": "per-second average over the episode like Isaac's RewardManager; joint_deviation_all = hip+arms+fingers+torso",
+ "reward_cfg": "flat",
+ "engine": "mjwarp",
+ "physics_dt": 0.0025,
+ "contact_tuning": null
+}
+=== mjwarp fixed PPO flat cfg it 1000
+{
+ "ckpt": "runs/policies/g1_flat_ppowarp_fixed_flatcfg_it1000.pt",
+ "iterations": 1000,
+ "episodes": 1061,
+ "mean_episode_length": 958.8256361922714,
+ "mean_return": 33.318720633396985,
+ "terminations": {
+  "fell": 55,
+  "timeout": 1006
+ },
+ "Episode_Reward": {
+  "track_lin_vel_xy_exp": 0.8925,
+  "track_ang_vel_z_exp": 0.8877,
+  "feet_air_time": 0.0484,
+  "feet_slide": -0.0214,
+  "joint_deviation_all": -0.0964,
+  "flat_orientation_l2": -0.0067,
+  "action_rate_l2": -0.0066,
+  "termination_penalty": -0.0104,
+  "lin_vel_z_l2": -0.004,
+  "ang_vel_xy_l2": -0.0041,
+  "dof_torques_l2": -0.0069,
+  "dof_acc_l2": -0.0057,
+  "dof_pos_limits": -0.0005
+ },
+ "note": "per-second average over the episode like Isaac's RewardManager; joint_deviation_all = hip+arms+fingers+torso",
+ "reward_cfg": "flat",
+ "engine": "mjwarp",
+ "physics_dt": 0.0025,
+ "contact_tuning": null
+}
