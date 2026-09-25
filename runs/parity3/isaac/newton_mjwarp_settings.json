@@ -1,0 +1,654 @@
+{
+ "source": "Isaac Lab v3.0.0-EA (ae37b028), Isaac-Velocity-Flat-G1, physics=newton_mjwarp, recorded live on the L4 2026-09-25 by metalsim/parity/isaac_side/isaaclab3/record_g1.py (meta.json + newton_generated.xml)",
+ "versions": {
+  "newton": "1.5.2",
+  "mujoco": "3.11.0",
+  "mujoco_warp": "3.11.0",
+  "warp": "1.16.0"
+ },
+ "timestep": {
+  "sim_dt_s": 0.005,
+  "num_substeps": 2,
+  "mujoco_warp_dt_s": 0.0025,
+  "decimation": 4,
+  "control_dt_s": 0.02,
+  "note": "Newton's SolverMuJoCo.step fills mjw_model.opt.timestep with dt on every call (newton 1.5.2 solver_mujoco.py:3845); the 0.002 in the MJCF/opt dump is the pre-step default"
+ },
+ "solver": {
+  "solver": "newton (opt.solver=2)",
+  "iterations": 100,
+  "ls_iterations": 50,
+  "tolerance": 1e-06,
+  "ls_tolerance": 0.01,
+  "graph_conditional_early_exit": true,
+  "integrator": "implicitfast (opt.integrator=3)",
+  "cone": "pyramidal",
+  "impratio": 1.0,
+  "disableflags": "mjDSBL_MULTICCD (524288)",
+  "ccd_iterations": 35,
+  "ccd_tolerance": 1e-06,
+  "measured_solver_niter_per_substep": {
+   "A_hold": "mean 1.46, max 4",
+   "B_random": "mean 1.52, max 5",
+   "C_drop": "mean 1.47, max 6",
+   "note": "mjw_data.solver_niter read after every control step (last substep), 1 env"
+  }
+ },
+ "capacity": {
+  "flat": {
+   "njmax": 95,
+   "nconmax": 10
+  },
+  "rough (from rough_env_cfg.py, not recorded live)": {
+   "njmax": 300,
+   "nconmax": 300,
+   "max_triangle_pairs": 2500000
+  }
+ },
+ "contacts": {
+  "pipeline": "Newton CollisionPipeline (use_mujoco_contacts=False, opt.run_collision_detection=False), broad_phase explicit, reduce_contacts True",
+  "collision_decimation": "0 = collide once per 5 ms physics tick; both 2.5 ms substeps reuse the contact set",
+  "shape_defaults": {
+   "margin": 0.0,
+   "gap": 0.01,
+   "ke": 160000.0,
+   "kd": 1100.0
+  },
+  "geom_solref": [
+   0.0018182,
+   1.375
+  ],
+  "geom_solimp": [
+   0.9,
+   0.95,
+   0.001,
+   0.5,
+   2.0
+  ],
+  "geom_condim": 3,
+  "friction": "Newton shape_material_mu: robot 0.8 (physics_material event static 0.8), ground 1.0; the MJCF geom_friction row (1.0, 0.005, 1e-4) is not what the contacts use when Newton converts its own contacts",
+  "newton_model_contact": {
+   "shape_material_ke": [
+    2500.0,
+    160000.0
+   ],
+   "shape_material_kd": [
+    100.0,
+    1100.0
+   ],
+   "shape_material_mu": [
+    0.800000011920929,
+    1.0
+   ],
+   "shape_margin": [
+    0.0
+   ],
+   "shape_gap": [
+    0.009999999776482582,
+    0.10000000149011612
+   ],
+   "rigid_contact_max": 1000
+  }
+ },
+ "actuators": "two MuJoCo <general> actuators per joint (nu=74): position gainprm=kp biasprm=(0,-kp) and velocity gainprm=kd biasprm=(0,0,-kd); effort limit as joint actuatorfrcrange (legs/torso/arms 300, ankles 20); armature 0.01 / 0.001",
+ "joint_limits": {
+  "note": "per-joint limit solref as read from mjw_model.jnt_solref after env creation (before the first step); set by Newton from joint_limit_ke/kd (default solreflimit_mode SOLREF_MODE_FORCE_SPACE), not present in the MJCF (which carries the 0.02/1 default). As read: time constants 4 ms to 0.46 s, damping ratios 0.03 to 0.35, i.e. much softer limits than MuJoCo's default on most joints",
+  "joints": {
+   "left_hip_pitch_joint": {
+    "range": [
+     -2.35,
+     3.05
+    ],
+    "solreflimit_live": [
+     0.45597,
+     0.03311
+    ],
+    "armature": 0.01,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "left_hip_roll_joint": {
+    "range": [
+     -0.26,
+     2.53
+    ],
+    "solreflimit_live": [
+     0.45886,
+     0.03301
+    ],
+    "armature": 0.01,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "left_hip_yaw_joint": {
+    "range": [
+     -2.75,
+     2.75
+    ],
+    "solreflimit_live": [
+     0.08178,
+     0.07819
+    ],
+    "armature": 0.01,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "left_knee_joint": {
+    "range": [
+     -0.33489,
+     2.5449
+    ],
+    "solreflimit_live": [
+     0.15738,
+     0.05636
+    ],
+    "armature": 0.01,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "left_ankle_pitch_joint": {
+    "range": [
+     -0.68,
+     0.73
+    ],
+    "solreflimit_live": [
+     0.04592,
+     0.10434
+    ],
+    "armature": 0.01,
+    "actuatorfrcrange": [
+     -20.0,
+     20.0
+    ]
+   },
+   "left_ankle_roll_joint": {
+    "range": [
+     -0.2618,
+     0.2618
+    ],
+    "solreflimit_live": [
+     0.04081,
+     0.11069
+    ],
+    "armature": 0.01,
+    "actuatorfrcrange": [
+     -20.0,
+     20.0
+    ]
+   },
+   "right_hip_pitch_joint": {
+    "range": [
+     -2.35,
+     3.05
+    ],
+    "solreflimit_live": [
+     0.45587,
+     0.03312
+    ],
+    "armature": 0.01,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "right_hip_roll_joint": {
+    "range": [
+     -2.53,
+     0.26
+    ],
+    "solreflimit_live": [
+     0.45888,
+     0.03301
+    ],
+    "armature": 0.01,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "right_hip_yaw_joint": {
+    "range": [
+     -2.75,
+     2.75
+    ],
+    "solreflimit_live": [
+     0.08178,
+     0.07819
+    ],
+    "armature": 0.01,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "right_knee_joint": {
+    "range": [
+     -0.33489,
+     2.5449
+    ],
+    "solreflimit_live": [
+     0.15735,
+     0.05637
+    ],
+    "armature": 0.01,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "right_ankle_pitch_joint": {
+    "range": [
+     -0.68,
+     0.73
+    ],
+    "solreflimit_live": [
+     0.04592,
+     0.10434
+    ],
+    "armature": 0.01,
+    "actuatorfrcrange": [
+     -20.0,
+     20.0
+    ]
+   },
+   "right_ankle_roll_joint": {
+    "range": [
+     -0.2618,
+     0.2618
+    ],
+    "solreflimit_live": [
+     0.04081,
+     0.11069
+    ],
+    "armature": 0.01,
+    "actuatorfrcrange": [
+     -20.0,
+     20.0
+    ]
+   },
+   "torso_joint": {
+    "range": [
+     -2.618,
+     2.618
+    ],
+    "solreflimit_live": [
+     0.24928,
+     0.04479
+    ],
+    "armature": 0.01,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "left_shoulder_pitch_joint": {
+    "range": [
+     -2.9671,
+     2.7925
+    ],
+    "solreflimit_live": [
+     0.23597,
+     0.04603
+    ],
+    "armature": 0.01,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "left_shoulder_roll_joint": {
+    "range": [
+     -1.5882,
+     2.2515
+    ],
+    "solreflimit_live": [
+     0.21109,
+     0.04867
+    ],
+    "armature": 0.01,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "left_shoulder_yaw_joint": {
+    "range": [
+     -2.618,
+     2.618
+    ],
+    "solreflimit_live": [
+     0.1497,
+     0.05779
+    ],
+    "armature": 0.01,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "left_elbow_pitch_joint": {
+    "range": [
+     -0.2268,
+     3.4208
+    ],
+    "solreflimit_live": [
+     0.1432,
+     0.05909
+    ],
+    "armature": 0.01,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "left_elbow_roll_joint": {
+    "range": [
+     -2.0943,
+     2.0943
+    ],
+    "solreflimit_live": [
+     0.04234,
+     0.10867
+    ],
+    "armature": 0.01,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "left_five_joint": {
+    "range": [
+     -1.84,
+     0.3
+    ],
+    "solreflimit_live": [
+     0.00451,
+     0.33281
+    ],
+    "armature": 0.001,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "left_six_joint": {
+    "range": [
+     -1.84,
+     0.0
+    ],
+    "solreflimit_live": [
+     0.00404,
+     0.35195
+    ],
+    "armature": 0.001,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "left_three_joint": {
+    "range": [
+     -1.84,
+     0.3
+    ],
+    "solreflimit_live": [
+     0.00451,
+     0.33289
+    ],
+    "armature": 0.001,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "left_four_joint": {
+    "range": [
+     -1.84,
+     0.0
+    ],
+    "solreflimit_live": [
+     0.00404,
+     0.35195
+    ],
+    "armature": 0.001,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "left_zero_joint": {
+    "range": [
+     -0.5236,
+     0.5236
+    ],
+    "solreflimit_live": [
+     0.00433,
+     0.33965
+    ],
+    "armature": 0.001,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "left_one_joint": {
+    "range": [
+     -1.0,
+     1.2
+    ],
+    "solreflimit_live": [
+     0.00448,
+     0.33411
+    ],
+    "armature": 0.001,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "left_two_joint": {
+    "range": [
+     0.0,
+     1.84
+    ],
+    "solreflimit_live": [
+     0.00404,
+     0.35192
+    ],
+    "armature": 0.001,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "right_shoulder_pitch_joint": {
+    "range": [
+     -2.9671,
+     2.7925
+    ],
+    "solreflimit_live": [
+     0.23457,
+     0.04617
+    ],
+    "armature": 0.01,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "right_shoulder_roll_joint": {
+    "range": [
+     -2.2515,
+     1.5882
+    ],
+    "solreflimit_live": [
+     0.2111,
+     0.04867
+    ],
+    "armature": 0.01,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "right_shoulder_yaw_joint": {
+    "range": [
+     -2.618,
+     2.618
+    ],
+    "solreflimit_live": [
+     0.14979,
+     0.05777
+    ],
+    "armature": 0.01,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "right_elbow_pitch_joint": {
+    "range": [
+     -0.2268,
+     3.4208
+    ],
+    "solreflimit_live": [
+     0.1427,
+     0.05919
+    ],
+    "armature": 0.01,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "right_elbow_roll_joint": {
+    "range": [
+     -2.0943,
+     2.0943
+    ],
+    "solreflimit_live": [
+     0.04234,
+     0.10867
+    ],
+    "armature": 0.01,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "right_five_joint": {
+    "range": [
+     -0.3,
+     1.84
+    ],
+    "solreflimit_live": [
+     0.00451,
+     0.33281
+    ],
+    "armature": 0.001,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "right_six_joint": {
+    "range": [
+     0.0,
+     1.84
+    ],
+    "solreflimit_live": [
+     0.00404,
+     0.35195
+    ],
+    "armature": 0.001,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "right_three_joint": {
+    "range": [
+     -0.3,
+     1.84
+    ],
+    "solreflimit_live": [
+     0.00451,
+     0.33289
+    ],
+    "armature": 0.001,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "right_four_joint": {
+    "range": [
+     0.0,
+     1.84
+    ],
+    "solreflimit_live": [
+     0.00404,
+     0.35195
+    ],
+    "armature": 0.001,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "right_zero_joint": {
+    "range": [
+     -0.5236,
+     0.5236
+    ],
+    "solreflimit_live": [
+     0.00433,
+     0.33965
+    ],
+    "armature": 0.001,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "right_one_joint": {
+    "range": [
+     -1.2,
+     1.0
+    ],
+    "solreflimit_live": [
+     0.00448,
+     0.33411
+    ],
+    "armature": 0.001,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   },
+   "right_two_joint": {
+    "range": [
+     -1.84,
+     0.0
+    ],
+    "solreflimit_live": [
+     0.00404,
+     0.35192
+    ],
+    "armature": 0.001,
+    "actuatorfrcrange": [
+     -300.0,
+     300.0
+    ]
+   }
+  }
+ }
+}
