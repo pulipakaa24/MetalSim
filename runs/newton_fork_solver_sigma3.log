@@ -1,0 +1,9 @@
+=== start Fri Sep 25 01:46:06 PDT 2026 power: Now drawing from 'AC Power'; install newton {'path': '/Users/aditya/robosim/upstream/newton/newton', 'git_head': '90e23324', 'git_dirty': False} | warp {'path': '/Users/aditya/robosim/upstream/warp-innate/warp', 'git_head': '786cdae', 'git_dirty': False}
+install: newton {'path': '/Users/aditya/robosim/upstream/newton/newton', 'git_head': '90e23324', 'git_dirty': False} | warp {'path': '/Users/aditya/robosim/upstream/warp-innate/warp', 'git_head': '786cdae', 'git_dirty': False}
+| setting | blown of 1024 (3 sigma, 400 steps) | peak joint speed [rad/s] | preflight | physics env-steps/s (4096) |
+|---|---|---|---|---|
+| 4:1.25:solver:rlin=0.5:rang=0.4:nolim | 0 | 89 | PASS | 98,313 |
+| 4:0.625:solver:rlin=0.5:rang=0.4:nolim | 0 | 85 | PASS | 49,342 |
+| 4:1.25:nolim | 19 | 386 | FAIL | 139,542 |
+| 4:1.25:rc:solver:rlin=0.5:rang=0.4:nolim | 0 | 88 | PASS | 98,907 |
+=== end Fri Sep 25 01:52:31 PDT 2026 power: Now drawing from 'AC Power'; install newton {'path': '/Users/aditya/robosim/upstream/newton/newton', 'git_head': '90e23324', 'git_dirty': False} | warp {'path': '/Users/aditya/robosim/upstream/warp-innate/warp', 'git_head': '786cdae', 'git_dirty': False}
