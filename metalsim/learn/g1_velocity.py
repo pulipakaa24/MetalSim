@@ -13,12 +13,13 @@ damping, effort limit and armature) and Isaac's initial state. Task terms follow
 * commands: uniform lin_vel_x in [0, 1], lin_vel_y in [-1, 1], heading command with stiffness 0.5
   (ang_vel_z = 0.5 * wrapped heading error, clipped to [-1, 1]), resampled every 10 s,
   2 % of envs standing
-* rewards (G1 rough weights): track_lin_vel_xy_yaw_frame_exp 1.0 (std 0.5), track_ang_vel_z_world_exp
+* rewards on flat terrain: Isaac's G1FlatEnvCfg set (``reward_cfg="flat"``, see G1VelocityTask.__init__);
+  on rough terrain the G1 rough weights: track_lin_vel_xy_yaw_frame_exp 1.0 (std 0.5), track_ang_vel_z_world_exp
   2.0 (std 0.5), feet_air_time_positive_biped 0.25 (threshold 0.4), feet_slide -0.1,
   dof_pos_limits (ankles) -1.0, joint_deviation_l1 hips(yaw/roll) -0.1, arms -0.1, fingers -0.05,
   torso -0.1, termination -200, flat_orientation_l2 -1.0, action_rate_l2 -0.005,
   dof_acc_l2 (hips, knees) -1.25e-7, dof_torques_l2 (hips, knees, ankles) -1.5e-7, ang_vel_xy_l2 -0.05
-* terminations: time out; torso_link contact force > 1 N
+* terminations: time out; torso_link contact force > 1 N (flat set: max over the 15 ms contact-history window)
 * resets: base xy in +-0.5 m, yaw in +-pi, default joint pose, zero velocities
 * events not reproduced: startup friction randomization (0.8/0.6 applied deterministically),
   base mass / COM randomization (disabled in the G1 config anyway), pushes (disabled in G1 config)
@@ -186,14 +187,16 @@ def g1_apply_action(action: wp.array2d(dtype=float), default_q: wp.array(dtype=f
 
 @wp.kernel
 def g1_commands(qpos: wp.array2d(dtype=float), cmd: wp.array2d(dtype=float), heading: wp.array(dtype=float),
-                standing: wp.array(dtype=wp.bool), resample: wp.array(dtype=wp.bool), seed: int, step_idx: wp.array(dtype=int)):
-    """Isaac UniformVelocityCommand with heading_command=True: lin_vel_x in [0,1], lin_vel_y in [-1,1],
+                standing: wp.array(dtype=wp.bool), resample: wp.array(dtype=wp.bool), seed: int, step_idx: wp.array(dtype=int),
+                lin_y: float):
+    """Isaac UniformVelocityCommand with heading_command=True: lin_vel_x in [0,1], lin_vel_y in [-lin_y, lin_y]
+    (G1FlatEnvCfg 0.5; the rough task here keeps its historical 1.0),
     target heading in [-pi, pi]; ang_vel_z = clip(0.5 * wrap(heading - yaw), -1, 1); 2% standing envs."""
     e = wp.tid()
     if resample[e]:
         rng = wp.rand_init(seed + 3, step_idx[0] * 104729 + e)
         cmd[e, 0] = wp.randf(rng, 0.0, 1.0)
-        cmd[e, 1] = wp.randf(rng, -1.0, 1.0)
+        cmd[e, 1] = wp.randf(rng, -lin_y, lin_y)
         heading[e] = wp.randf(rng, -3.14159265, 3.14159265)
         standing[e] = wp.randf(rng, 0.0, 1.0) < 0.02
         resample[e] = False
@@ -222,7 +225,11 @@ def g1_reward_done(qpos: wp.array2d(dtype=float), qvel: wp.array2d(dtype=float),
                    terms: wp.array2d(dtype=float),
                    curriculum: int, level: wp.array(dtype=int), col: wp.array(dtype=int), origin_table: wp.array2d(dtype=float),
                    n_levels: int, n_cols: int, cell_size: float, episode_s: float, origins: wp.array2d(dtype=float),
-                   seed: int):
+                   seed: int, isaac_flat: int, torso_hist: wp.array(dtype=float)):
+    """Reward, termination and episode bookkeeping. ``isaac_flat`` = 1 selects Isaac's G1FlatEnvCfg reward set
+    (see G1VelocityTask), 0 the G1RoughEnvCfg set as ported first. ``jnt_range`` holds the limits the
+    dof_pos_limits term uses (soft limits for the flat set). ``torso_hist`` is the max torso touch force over
+    the contact-history window of this control step (0 when the physics hook did not run)."""
     e = wp.tid()
     nj = last_action.shape[1]
     q = wp.vec4(qpos[e, 3], qpos[e, 4], qpos[e, 5], qpos[e, 6])
@@ -241,11 +248,16 @@ def g1_reward_done(qpos: wp.array2d(dtype=float), qvel: wp.array2d(dtype=float),
     lin_err = (cmd[e, 0] - vx) * (cmd[e, 0] - vx) + (cmd[e, 1] - vy) * (cmd[e, 1] - vy)
     r_lin = 1.0 * wp.exp(-lin_err / 0.25)
     ang_err = (cmd[e, 2] - w_w[2]) * (cmd[e, 2] - w_w[2])
-    r_ang = 2.0 * wp.exp(-ang_err / 0.25)
+    w_ang = 2.0
+    if isaac_flat == 1:
+        w_ang = 1.0                                    # G1FlatEnvCfg: track_ang_vel_z_exp.weight = 1.0
+    r_ang = w_ang * wp.exp(-ang_err / 0.25)
     # 2. feet air time (positive biped): reward = sum over feet of clamp(min(air,contact) of the other..., simplified per Isaac:
     #    feet_air_time_positive_biped: in_mode_time = where(in_contact, contact_time, air_time); single_stance = sum(in_contact)==1;
     #    reward = min(where(single_stance, in_mode_time, 0), threshold); zero when |cmd| < 0.1
     cmd_norm = wp.sqrt(cmd[e, 0] * cmd[e, 0] + cmd[e, 1] * cmd[e, 1] + cmd[e, 2] * cmd[e, 2])
+    if isaac_flat == 1:
+        cmd_norm = wp.sqrt(cmd[e, 0] * cmd[e, 0] + cmd[e, 1] * cmd[e, 1])   # Isaac: norm of command[:, :2]
     in_contact0 = sensordata[e, touch_adr[0]] > 1.0
     in_contact1 = sensordata[e, touch_adr[1]] > 1.0
     if in_contact0:
@@ -265,7 +277,11 @@ def g1_reward_done(qpos: wp.array2d(dtype=float), qvel: wp.array2d(dtype=float),
     if n_contact == 1 and cmd_norm > 0.1:
         m0 = contact_time[e, 0] if in_contact0 else air_time[e, 0]
         m1 = contact_time[e, 1] if in_contact1 else air_time[e, 1]
-        r_air = 0.25 * (wp.min(m0, 0.4) + wp.min(m1, 0.4))
+        if isaac_flat == 1:
+            # feet_air_time_positive_biped: min over feet of the in-mode time, clamped at 0.4; flat weight 0.75
+            r_air = 0.75 * wp.min(wp.min(m0, m1), 0.4)
+        else:
+            r_air = 0.25 * (wp.min(m0, 0.4) + wp.min(m1, 0.4))
     # 3. feet slide (Isaac mdp.feet_slide): |body_lin_vel_w[foot].xy| while the foot is in contact; the foot
     #    body's own world linear velocity (at its frame origin), filled per engine before this kernel
     r_slide = float(0.0)
@@ -289,20 +305,33 @@ def g1_reward_done(qpos: wp.array2d(dtype=float), qvel: wp.array2d(dtype=float),
         if gi == 5:
             r_dev += -0.05 * wp.abs(dq)
         tau = qfrc_actuator[e, 6 + i]
-        if gi <= 2:
-            r_tau += -1.5e-7 * tau * tau
-        if gi <= 1:
-            a = qacc[e, 6 + i]
-            r_acc += -1.25e-7 * a * a
+        a = qacc[e, 6 + i]
+        if isaac_flat == 1:
+            if gi <= 1:                                # G1FlatEnvCfg: dof_torques_l2 -2e-6 on hips + knees, dof_acc_l2 -1e-7
+                r_tau += -2.0e-6 * tau * tau
+                r_acc += -1.0e-7 * a * a
+        else:
+            if gi <= 2:
+                r_tau += -1.5e-7 * tau * tau
+            if gi <= 1:
+                r_acc += -1.25e-7 * a * a
         da = last_action[e, i] - prev_action[e, i]
         r_rate += -0.005 * da * da
     # 5. orientation, angular velocity xy
     r_orient = -1.0 * (g_b[0] * g_b[0] + g_b[1] * g_b[1])
     r_wxy = -0.05 * (w_w[0] * w_w[0] + w_w[1] * w_w[1])
+    r_vz = float(0.0)
+    if isaac_flat == 1:
+        r_wxy = -0.05 * (w_b[0] * w_b[0] + w_b[1] * w_b[1])   # Isaac ang_vel_xy_l2: root_ang_vel_b
+        v_b = Rt * v_w
+        r_vz = -0.2 * v_b[2] * v_b[2]                      # G1FlatEnvCfg: lin_vel_z_l2 -0.2 on root_lin_vel_b
     # terminations: torso contact, time out; a non-finite state (solver blow-up) also ends the
     # episode and is counted separately (stats_i[3]) so it is reported, not hidden
     t[e] = t[e] + 1
     fell = sensordata[e, touch_adr[2]] > 1.0
+    if isaac_flat == 1:
+        # illegal_contact: max over the contact sensor's history (3 physics steps of 5 ms in Isaac)
+        fell = wp.max(sensordata[e, touch_adr[2]], torso_hist[e]) > 1.0
     trunc = t[e] >= max_t
     blown = int(0)
     for i in range(7 + nj):
@@ -313,14 +342,14 @@ def g1_reward_done(qpos: wp.array2d(dtype=float), qvel: wp.array2d(dtype=float),
             blown = 1
     if blown == 1:
         r_lin = 0.0; r_ang = 0.0; r_air = 0.0; r_slide = 0.0; r_lim = 0.0; r_dev = 0.0; r_tau = 0.0; r_acc = 0.0
-        r_rate = 0.0; r_orient = 0.0; r_wxy = 0.0
+        r_rate = 0.0; r_orient = 0.0; r_wxy = 0.0; r_vz = 0.0
         fell = True
     done = fell or trunc
     r_term = float(0.0)
     if fell:
         r_term = -200.0
     # Isaac's RewardManager multiplies every term by dt, the termination penalty included (-200 * 0.02 = -4)
-    r = (r_lin + r_ang + r_air + r_slide + r_lim + r_dev + r_tau + r_acc + r_rate + r_orient + r_wxy + r_term) * dt
+    r = (r_lin + r_ang + r_air + r_slide + r_lim + r_dev + r_tau + r_acc + r_rate + r_orient + r_wxy + r_vz + r_term) * dt
     # row of the rollout buffer; the modulo lets a caller keep a free-running step counter (fresh RNG
     # streams every step) with a one-row buffer (metalsim.learn.rslrl_adapter); PPOWarp's s < T is unchanged
     s = (step_idx[0] - 1) % buf_rew.shape[0]
@@ -328,6 +357,7 @@ def g1_reward_done(qpos: wp.array2d(dtype=float), qvel: wp.array2d(dtype=float),
     buf_done[s, e] = 1.0 if done else 0.0
     terms[e, 0] = r_lin; terms[e, 1] = r_ang; terms[e, 2] = r_air; terms[e, 3] = r_slide; terms[e, 4] = r_dev
     terms[e, 5] = r_orient; terms[e, 6] = r_rate; terms[e, 7] = r_term
+    terms[e, 8] = r_vz; terms[e, 9] = r_wxy; terms[e, 10] = r_tau; terms[e, 11] = r_acc; terms[e, 12] = r_lim
     ep_ret[e] = ep_ret[e] + r
     ep_len[e] = ep_len[e] + 1
     reset_mask[e] = done
@@ -400,6 +430,17 @@ def g1_reset(reset_mask: wp.array(dtype=wp.bool), default_q: wp.array(dtype=floa
 
 
 @wp.kernel
+def g1_torso_hist(sensordata: wp.array2d(dtype=float), adr: int, zero_first: int, hist: wp.array(dtype=float)):
+    """Running max of the torso touch force over the substeps of the contact-history window."""
+    e = wp.tid()
+    f = sensordata[e, adr]
+    if zero_first == 1:
+        hist[e] = f
+    else:
+        hist[e] = wp.max(hist[e], f)
+
+
+@wp.kernel
 def g1_record_timeout(step_idx: wp.array(dtype=int), buf_done: wp.array2d(dtype=float), terms: wp.array2d(dtype=float),
                       buf_timeout: wp.array2d(dtype=float)):
     """1 where this step ended the episode by the time limit (done and not a fall / blow-up)."""
@@ -417,7 +458,16 @@ class G1VelocityTask:
     """Isaac Lab velocity task shape for `metalsim.learn.ppo_warp.PPOWarp`."""
 
     def __init__(self, n, terrain: str = "flat", seed: int = 0, height_scan: bool | None = None, device="metal:0",
-                 physics_dt: float = PHYSICS_DT, engine: str = "mjwarp", newton_iterations: int = 4, newton_dt: float = 0.00125):
+                 physics_dt: float = PHYSICS_DT, engine: str = "mjwarp", newton_iterations: int = 4, newton_dt: float = 0.00125,
+                 reward_cfg: str | None = None):
+        """``reward_cfg``: "flat" = Isaac's G1FlatEnvCfg (default on flat terrain): track_ang_vel_z 1.0,
+        lin_vel_y in +-0.5, feet_air_time 0.75 x min over feet (xy command norm), lin_vel_z_l2 -0.2 and
+        ang_vel_xy_l2 -0.05 in the body frame, dof_torques_l2 -2e-6 and dof_acc_l2 -1e-7 on hips + knees,
+        dof_pos_limits on the soft limits (G1_CFG soft_joint_pos_limit_factor 0.9), torso-contact
+        termination on the max force over the contact-history window (Isaac: 3 physics steps of 5 ms =
+        the last 15 ms of the control step; here round(15 ms / physics_dt) substeps on MuJoCo Warp, the
+        final substep only on Newton). "rough" = the G1RoughEnvCfg set as first ported (default on
+        rough terrain, unchanged; runs before this port used it on flat terrain too)."""
         self.n, self.seed, self.device = n, seed, device
         self.terrain_kind = terrain
         self.hfield = None
@@ -459,7 +509,16 @@ class G1VelocityTask:
         self.last_action = z((n, self.nj)); self.prev_action = z((n, self.nj)); self.height_scan = z((n, max(self.n_scan, 1)))
         self.air_time = z((n, 2)); self.contact_time = z((n, 2)); self.t = z(n, dtype=int)
         self.ep_ret = z(n); self.ep_len = z(n, dtype=int); self.stats = z(4); self.stats_i = z(4, dtype=int)
-        self.terms = z((n, 8))
+        # per-term values of the last step (weights applied, before x dt): 0 track_lin, 1 track_ang, 2 feet_air_time,
+        # 3 feet_slide, 4 joint_deviation (all groups), 5 flat_orientation, 6 action_rate, 7 termination,
+        # 8 lin_vel_z, 9 ang_vel_xy, 10 dof_torques, 11 dof_acc, 12 dof_pos_limits
+        self.terms = z((n, 13))
+        self.reward_cfg = reward_cfg or ("flat" if terrain == "flat" else "rough")
+        if self.reward_cfg not in ("flat", "rough"):
+            raise ValueError(f"reward_cfg must be 'flat' or 'rough', not {self.reward_cfg!r}")
+        self.isaac_flat = 1 if self.reward_cfg == "flat" else 0
+        self.lin_vel_y = 0.5 if self.isaac_flat else 1.0
+        self.torso_hist = z(n)
         # joint groups for reward terms
         names = [mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_ACTUATOR, i) for i in range(m.nu)]
         def grp(nm):
@@ -471,6 +530,9 @@ class G1VelocityTask:
             return 5
         self.group = wp.array(np.array([grp(nm) for nm in names], np.int32), dtype=int, device=device)
         jr = np.array([m.jnt_range[m.actuator_trnid[i][0]] for i in range(m.nu)], np.float32)
+        if self.isaac_flat:     # Isaac joint_pos_limits reads soft_joint_pos_limits: mid +- 0.9 * half range
+            mid = 0.5 * (jr[:, 0] + jr[:, 1]); half = 0.5 * (jr[:, 1] - jr[:, 0])
+            jr = np.stack([mid - 0.9 * half, mid + 0.9 * half], 1).astype(np.float32)
         self.jnt_range = wp.array(jr, dtype=float, device=device)
         sadr = lambda nm: int(m.sensor_adr[mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_SENSOR, nm)])
         self.touch_adr = wp.vec3i(sadr("left_ankle_roll_link_touch"), sadr("right_ankle_roll_link_touch"), sadr("torso_link_touch"))
@@ -503,9 +565,26 @@ class G1VelocityTask:
         if self.use_scan:
             from metalsim.learn.terrain import HeightScanner
             self.scanner = HeightScanner(self, self.hfield)
+        # contact history for the torso termination (flat set, MuJoCo Warp): every caller steps through
+        # sim.launch_step, so the per-substep max is recorded by wrapping it
+        self.hist_substeps = max(1, min(self.decimation, int(round(0.015 / self.physics_dt))))
+        if self.isaac_flat and engine == "mjwarp":
+            self._plain_launch_step = self.sim.launch_step
+            self.sim.launch_step = self._launch_step_with_contact_history
         self.sim.synchronize()
         # start from the initial pose everywhere
         self.pol_step = None
+
+    def _launch_step_with_contact_history(self) -> None:
+        import mujoco_warp as mjw
+        sim = self.sim
+        with wp.ScopedDevice(sim.device):
+            for k in range(sim.opt.substeps):
+                mjw.step(sim.m, sim.d)
+                j = k - (sim.opt.substeps - self.hist_substeps)
+                if j >= 0:
+                    wp.launch(g1_torso_hist, dim=self.n, inputs=[sim.d.sensordata, int(self.touch_adr[2]), 1 if j == 0 else 0,
+                                                                 self.torso_hist], device=self.device)
 
     # -- graph pieces (called inside PPOWarp's capture) ----------------------------------------------
 
@@ -513,7 +592,7 @@ class G1VelocityTask:
         if self.scanner is not None:
             self.scanner.launch(step_idx)
         wp.launch(g1_commands, dim=self.n, inputs=[self.sim.d.qpos, self.cmd, self.heading, self.standing, self.resample,
-                                                   self.seed, step_idx], device=self.device)
+                                                   self.seed, step_idx, self.lin_vel_y], device=self.device)
         wp.launch(g1_obs, dim=self.n, inputs=[self.sim.d.qpos, self.sim.d.qvel, self.default_q, self.cmd, self.last_action,
                                               self.height_scan, self.n_scan, self.seed, step_idx, self.obs], device=self.device)
 
@@ -535,7 +614,7 @@ class G1VelocityTask:
             self.contact_time, CONTROL_DT, self.t, self.max_t, pol.step_idx, bufs.rew, bufs.done, self.sim._reset_mask,
             self.resample, int(10.0 / CONTROL_DT), self.ep_ret, self.ep_len, self.stats, self.stats_i, self.terms,
             self.curriculum, self.level, self.col, self.origin_table, self.n_levels, self.n_cols, self.cell_size, EPISODE_S,
-            self.origins, self.seed], device=self.device)
+            self.origins, self.seed, self.isaac_flat, self.torso_hist], device=self.device)
         if self.engine == "newton":
             wp.launch(g1_reset, dim=self.n, inputs=[self.sim._reset_mask, self.default_q, self.origins, self.seed, pol.step_idx,
                                                     d.qpos, d.qvel, self.last_action, self.prev_action], device=self.device)
