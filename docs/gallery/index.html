@@ -162,6 +162,33 @@
     <figcaption><b>g1_stage_metalsim_it1500.mp4</b>. MetalSim-trained policy (pre-fix PPO), iteration 1500: Isaac Sim (left) | MetalSim (right).</figcaption>
   </figure>
 
+  <h2>Round two: MetalSim-trained policies with the fixed learner, in both simulators</h2>
+  <p>Same protocol as above (8 s, command 0.5 m/s forward, Isaac Sim RTX on the left, MetalSim tier 2 on the right), for the checkpoints of the fixed-PPO run on the MuJoCo Warp G1 task (<code>runs/g1_flat_ppowarp_fixed.log</code>, rough reward weights, recorded 2026-09-25). The MetalSim side here runs the MuJoCo Warp fork at the corrected plane-vs-convex contact set (fork 284dcd1), which was not the collider these policies trained on; the Isaac side is PhysX. Measured from each simulator's own state:</p>
+  <table>
+    <tr><th>policy (MetalSim-trained, fixed PPO)</th><th>Isaac: x travelled / final pelvis z</th><th>MetalSim: x travelled / final pelvis z</th></tr>
+    <tr><td>iteration 100</td><td>0.68 m / 0.00 m (falls)</td><td>0.76 m / 0.01 m (falls)</td></tr>
+    <tr><td>iteration 300</td><td>0.05 m / 0.63 m (stands, does not walk)</td><td>3.46 m / 0.66 m (walks)</td></tr>
+    <tr><td>iteration 500</td><td>3.27 m / 0.69 m (walks)</td><td>4.16 m / 0.68 m (walks)</td></tr>
+    <tr><td>iteration 1000</td><td>3.90 m / 0.67 m (walks)</td><td>4.06 m / 0.69 m (walks)</td></tr>
+  </table>
+  <p>Reading: with the learner fixed, our policies now transfer to PhysX in the same way Isaac's transfer to us: by iteration 1000 the same policy walks 3.90 m in Isaac and 4.06 m here (4 % apart), upright in both. The iteration-300 policy, which had only just begun to track the command, stands in PhysX but walks here, so an early gait that exploits our contact model does not yet carry over; by 500 it does. The earlier round's pre-fix policies (above) fell in one simulator or the other at every stage.</p>
+  <figure>
+    <video src="g1_stage_metalsim_fixed_it100.mp4" controls loop muted playsinline width="1024"></video>
+    <figcaption><b>g1_stage_metalsim_fixed_it100.mp4</b>. MetalSim-trained policy (fixed PPO), iteration 100: Isaac Sim (left) | MetalSim (right).</figcaption>
+  </figure>
+  <figure>
+    <video src="g1_stage_metalsim_fixed_it300.mp4" controls loop muted playsinline width="1024"></video>
+    <figcaption><b>g1_stage_metalsim_fixed_it300.mp4</b>. MetalSim-trained policy (fixed PPO), iteration 300: Isaac Sim (left) | MetalSim (right).</figcaption>
+  </figure>
+  <figure>
+    <video src="g1_stage_metalsim_fixed_it500.mp4" controls loop muted playsinline width="1024"></video>
+    <figcaption><b>g1_stage_metalsim_fixed_it500.mp4</b>. MetalSim-trained policy (fixed PPO), iteration 500: Isaac Sim (left) | MetalSim (right).</figcaption>
+  </figure>
+  <figure>
+    <video src="g1_stage_metalsim_fixed_it1000.mp4" controls loop muted playsinline width="1024"></video>
+    <figcaption><b>g1_stage_metalsim_fixed_it1000.mp4</b>. MetalSim-trained policy (fixed PPO), iteration 1000: Isaac Sim (left) | MetalSim (right).</figcaption>
+  </figure>
+
   <p class="muted">Machine: Apple M4 Max, 40-core GPU, 64 GB, macOS 26.7. Scripts: <code>scratch/gallery_scripts/01_so101_atlas_and_channels.py</code>, <code>03_primitives_grid.py</code>, <code>04_reference_vs_metalsim.py</code>, <code>05_rollout.py</code>, <code>06_throughput.py</code>, <code>07_tier1_vs_tier0_vs_reference.py</code>, <code>08_lidar_pointcloud.py</code>, <code>09_cartpole_learning_curve.py</code>, <code>10_isaac_comparison.py</code>, <code>11_cartpole_rgb_tiles.py</code>.</p>
 </main>
 </body>
