@@ -250,7 +250,8 @@ def _foot_vel_now(task):
         return sim.d.foot_vel.numpy()
     d = task.sim.d
     task.sim.forward(); task.sim.synchronize()             # MuJoCo Warp: cvel/xpos/subtree_com of the current qpos/qvel
-    wp.launch(g1_foot_vel_mjwarp, dim=task.n, inputs=[d.cvel, d.xpos, d.subtree_com, task.foot_body, task.foot_root],
+    wp.launch(g1_foot_vel_mjwarp, dim=task.n, inputs=[d.cvel, d.xipos if task.feet_slide_velocity == "com" else d.xpos,
+                                                      d.subtree_com, task.foot_body, task.foot_root],
               outputs=[task.foot_vel], device="metal:0")
     task.sim.synchronize()
     return task.foot_vel.numpy()
@@ -258,22 +259,27 @@ def _foot_vel_now(task):
 
 @pytest.mark.parametrize("engine", ENGINES)
 def test_feet_slide_velocity_is_the_foot_body_world_velocity(engine):
-    """Isaac's feet_slide reads body_lin_vel_w of the feet: the foot body frame origin's linear velocity in
-    the world frame. On a moving G1 (random actions), the velocity handed to the reward kernel equals MuJoCo
-    C's mj_objectVelocity(mjOBJ_XBODY, flg_local=0) for the same qpos/qvel."""
+    """Isaac's feet_slide reads body_lin_vel_w of the feet, which in Isaac Lab 2.3.2 is the body's centre-of-mass
+    linear velocity in the world frame (body_com_lin_vel_w). On a moving G1 (random actions), the velocity handed
+    to the reward kernel equals MuJoCo C's mj_objectVelocity(mjOBJ_BODY, flg_local=0) (the COM's) for the same
+    qpos/qvel; with feet_slide_velocity="origin" (MuJoCo Warp only) it is the frame origin's (mjOBJ_XBODY).
+    The archived Newton path reports the frame origin."""
     n = 4
-    task = G1VelocityTask(n, terrain="flat", seed=6, **engine)
-    benchmark_step(task, num_frames=8, warmup=0)            # random actions in [-1, 1]: robots moving
-    qpos = task.sim.d.qpos.numpy().astype(np.float64); qvel = task.sim.d.qvel.numpy().astype(np.float64)
-    fv = _foot_vel_now(task)
-    m = task.model; d = mujoco.MjData(m)
-    assert np.abs(fv).max() > 0.05                          # feet actually moving
-    for e in range(n):
-        d.qpos[:] = qpos[e]; d.qvel[:] = qvel[e]; mujoco.mj_forward(m, d)
-        for f in range(2):
-            v6 = np.zeros(6)
-            mujoco.mj_objectVelocity(m, d, mujoco.mjtObj.mjOBJ_XBODY, int(task.foot_body[f]), v6, 0)
-            np.testing.assert_allclose(fv[e, f], v6[3:], atol=2e-3)
+    variants = [("com", mujoco.mjtObj.mjOBJ_BODY), ("origin", mujoco.mjtObj.mjOBJ_XBODY)] if not engine else [(None, mujoco.mjtObj.mjOBJ_XBODY)]
+    for conv, obj in variants:
+        kw = dict(engine) if engine else {"feet_slide_velocity": conv}
+        task = G1VelocityTask(n, terrain="flat", seed=6, **kw)
+        benchmark_step(task, num_frames=8, warmup=0)            # random actions in [-1, 1]: robots moving
+        qpos = task.sim.d.qpos.numpy().astype(np.float64); qvel = task.sim.d.qvel.numpy().astype(np.float64)
+        fv = _foot_vel_now(task)
+        m = task.model; d = mujoco.MjData(m)
+        assert np.abs(fv).max() > 0.05                          # feet actually moving
+        for e in range(n):
+            d.qpos[:] = qpos[e]; d.qvel[:] = qvel[e]; mujoco.mj_forward(m, d)
+            for f in range(2):
+                v6 = np.zeros(6)
+                mujoco.mj_objectVelocity(m, d, obj, int(task.foot_body[f]), v6, 0)
+                np.testing.assert_allclose(fv[e, f], v6[3:], atol=2e-3, err_msg=f"{conv}")
 
 
 def test_contact_sensor_flags_match_touch_sites():
