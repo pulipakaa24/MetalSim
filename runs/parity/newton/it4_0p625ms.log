@@ -1,0 +1,21 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module newton._src.geometry.inertia de4de8f load on device 'cpu' took 1.34 ms  (cached)
+Module validate_and_correct_inertia_kernel_52e71336 56c4819 load on device 'cpu' took 0.48 ms  (cached)
+Module newton._src.geometry.bvh df808ba load on device 'cpu' took 0.24 ms  (cached)
+Module newton._src.solvers.solver 043a06c load on device 'cpu' took 0.27 ms  (cached)
+Module newton._src.sim.articulation 9c790ad load on device 'cpu' took 0.24 ms  (cached)
+Module newton._src.sim.collide d7c9eb0 load on device 'cpu' took 0.26 ms  (cached)
+Module newton._src.geometry.broad_phase_nxn 551ad5e load on device 'cpu' took 0.20 ms  (cached)
+Module narrow_phase_primitive_write_contact_False_False_False 89c00fd load on device 'cpu' took 0.24 ms  (cached)
+Module newton._src.geometry.narrow_phase 5de13a6 load on device 'cpu' took 0.24 ms  (cached)
+Module metalsim.physics.newton_backend 07a105e load on device 'cpu' took 0.29 ms  (cached)
+Module newton._src.solvers.xpbd.kernels ab5da39 load on device 'cpu' took 0.31 ms  (cached)
+[newton 4 it 0.625 ms] A_hold: 150 steps, final root z [0.05380272 0.05380272 0.05380272 0.05380272]
+[newton 4 it 0.625 ms] B_random: 250 steps, final root z [0.12595986 0.12595986 0.12595986 0.12595986]
+[newton 4 it 0.625 ms] C_drop: 150 steps, final root z [0.05380282 0.05380282 0.05380282 0.05380282]
