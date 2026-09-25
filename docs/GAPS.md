@@ -43,7 +43,7 @@ the Newton-engine evaluation. Evidence for each row is in `PARITY.md`.
 | No effort limits, armature, joint friction, velocity limits in XPBD | **closed for the G1** | `ActuatorPD` clips to the effort limit (only the 20 Nm ankles saturate, 0.5–1.5 % of landing steps) and adds armature isotropically to the child inertia (required: NaN without it; axis-only armature invalidates 32 links). Joint friction / velocity limits not needed by the G1 task |
 | GJK/MPR narrow phase needs fixed-size arrays; Metal codegen lacked them | **closed** | Warp fork 786cdae: 20/20 fixed-array tests on Metal incl. graph capture; mesh = primitive contacts to 0.001 mm; G1 on its own convex meshes, < 3 % throughput cost |
 | Stability / cost of stiff drives under XPBD | **closed** | tracks MuJoCo C within 0.022 rad (4 it., 1.25 ms) or 0.044 rad (8 it., 2.5 ms) at 4.0–4.5× MuJoCo Warp's physics rate at 4096 envs |
-| Newton's default relaxation and biased drive | open, upstream | to be reported to newton-physics/newton |
+| Newton's default relaxation and biased drive | **drafted for upstream** (9e33cfe) | `scripts/diagnostics/newton_upstream/`: two issues with CPU-only reproducers (pendulum responds to torque at 1.43× and to gravity at 0.815× under the 0.7/0.4 defaults; the compliance drive's stiffness is 72–1240 Nm/rad for `ke` 200 over 1–16 it.); ready to file |
 | Newton rests the G1 ~1 cm lower than MuJoCo (0.69–0.70 vs 0.71 m) | open | cause not found |
 | VBD solver fails to compile on Metal | open, low | not needed for rigid robots |
 | Featherstone on the G1: NaN at 2.5 ms, no result at 1.25 ms in 400 s | open, low | XPBD is the path |
@@ -52,8 +52,8 @@ the Newton-engine evaluation. Evidence for each row is in `PARITY.md`.
 | `ActuatorPD` is MetalSim code, not Newton's; damping capped at one step's removal on very light links | open, low | document; revisit if hand joints misbehave |
 | 3σ stress check fails at the fast Newton settings (37 of 1024 worlds in 400 steps at 4 it./1.25 ms; 8 it./0.625 ms passes at MuJoCo-Warp-like cost) | open, medium | validated for the 1σ training regime only; 36 blow-ups in 838,589 episodes during training, all caught by the guard |
 | Newton monitor coverage: penetration / energy / overflow checks have no source fields | open, low | derive from contact depth and body energy |
-| Newton rough terrain | open | needs a heightfield collider on the Newton path |
-| Newton's raw state is not an exact joint-space state: at 4 iterations under random actions the joint constraints do not fully converge (foot position up to 1.6 cm, foot velocity up to ~0.4 m/s off the joint-rate reconstruction) | open, medium | observations use the joint-space reconstruction (carries the drift); rewards use body velocities; MuJoCo C cannot serve as an exact per-state reference for Newton in motion |
+| Newton rough terrain | **closed** (c65aa09) | Isaac's generated terrain as a Newton heightfield with MuJoCo's geometry; 60 dropped spheres rest on MuJoCo's surface to 0.1 mm median; scanner torso pose matches MuJoCo; throughput in the queued benchmark |
+| Newton's joint constraints do not fully converge at the fast settings (feet vs joint-angle kinematics at the 4 it./1.25 ms training setting: 15 mm median / 55 mm p99; off-axis joint rotation 2.9 mrad median / 31 mrad p99, i.e. below the ±10 mrad observation noise at the median but not at the tail) | open, medium; quantified (9842062) | observations already come from body state so the policy never sees the anchor gap; the cheapest remedy is a shorter step, not more iterations: 4 it. at 0.625 ms drifts half as much as 8 it. at 1.25 ms at equal solver work (3.4 vs 6.1 mm median) |
 | Newton API churn (alpha) | low | pin the version (1.7.0.dev) |
 | Importer copies the USD's gravity 0 | low | set gravity explicitly (done in `g1_builder`) |
 
