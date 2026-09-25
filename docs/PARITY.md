@@ -434,6 +434,41 @@ configuration only and are being re-checked against the flat one. Also, at itera
 run's feet-slide cost was 10× Isaac's (−0.13 vs −0.013; the old `cvel` term, fixed since) and its
 action-rate and joint-deviation costs 1.7× Isaac's.
 
+**Rough terrain, like for like** (0b45075; Isaac's own rsl_rl run of Isaac-Velocity-Rough-G1-v0 on the
+L4, 1500 iterations in 67.3 min at 36.5 K env-steps/s, `runs/parity/isaac/rough/`; ours:
+`reward_cfg="rough_isaac"`, an exact port of G1RoughEnvCfg (the earlier "rough" set had ±1 sideways
+commands and four old formulas; kept), terrain seed 0 = Isaac's env seed (origin table exact to 0.0 m),
+Isaac's env→column assignment, 4096 envs, seed 0, 1500 iterations at 23.3 K env-steps/s,
+`runs/g1_rough_ppowarp_fixed.log`; measured 2026-09-25):
+
+| iteration | Isaac: length / return / terrain level | MetalSim: length / return / terrain level |
+|---|---|---|
+| 100 | 144 / −5.8 / 0.04 | 80 / −4.8 / 0.00 |
+| 150 | 762 / −9.3 / 0.55 | 510 / −10.0 / 0.01 |
+| 200 | 935 / −4.6 / 1.08 | 949 / −7.2 / 0.11 |
+| 300 | 919 / +2.1 / 2.19 | 984 / +4.0 / 1.61 |
+| 500 | 917 / +5.8 / 4.83 | 977 / +8.4 / 4.41 |
+| 1000 | 882 / +5.4 / 5.96 | 991 / +11.3 / 6.01 |
+| 1500 | 966 / +14.1 / 5.90 | 992 / +16.4 / 6.10 |
+
+Ours climbs the curriculum 50–100 iterations later, then matches Isaac's terrain level (~6.0 from
+iteration 750) with longer episodes and a higher return; no blow-ups. Per-term at iteration 1000
+(stochastic actions; ours evaluated on levels 0–5 with the curriculum running, Isaac's on its
+training mix at level 5.96, which favours ours): forward tracking 0.778 vs 0.664, turning 0.706 vs
+0.569, feet slide −0.065 vs −0.038, falls 0.9 % vs 17.6 % of episode endings. A defect was found and
+fixed on the way: our 187 height-scan rays were in a different order from Isaac's (101–113 of 187
+rays off, up to 8 cm); Isaac's order is now the default, old checkpoints are permuted on load, and
+the first-step observation is now identical between the two simulators, including the box cells,
+which also confirms the CUDA box heights on NVIDIA hardware. **Transfer on rough terrain** (levels 3
+and 6, columns for pyramid stairs, inverted stairs, boxes, random rough; 400 steps, 4 envs;
+`runs/g1_rough_transfer.jsonl`): Isaac's checkpoints fall 0 / 24 in Isaac and 7 / 24 in MetalSim (5 in
+the inverted-stairs pit); ours 0 / 24 in MetalSim and 12 / 24 in Isaac (inverted stairs and boxes).
+Both directions work on pyramid stairs and random rough and fail on vertical-wall terrain, where our
+0.1 m heightfield turns Isaac's walls into ramps (§1.2 terrain row); that is the open rough-terrain
+gap. Remaining setup differences: PhysX 5 ms × 4 vs MuJoCo Warp 2.5 ms × 8; soft contacts; rsl_rl vs
+our PPO; Isaac's last-100-episode logging vs ours per iteration; different random generators;
+contact history 6 × 2.5 ms vs 3 × 5 ms; our training run used the old scan order.
+
 ### 1.6 Rough terrain: MuJoCo Warp's heightfield contacts, found defective and patched
 
 `tests/test_terrain.py::test_hfield_mesh_contacts_match_mujoco_c`: G1 on Isaac's rough-terrain
