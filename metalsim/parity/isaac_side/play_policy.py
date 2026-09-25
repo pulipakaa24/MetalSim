@@ -60,7 +60,7 @@ joint_names = list(robot.joint_names); nj = len(joint_names)
 # policy: rsl_rl checkpoint (actor.* keys, Isaac joint order) or MetalSim export (actor state dict + its joint order)
 ck = torch.load(args.ckpt, map_location="cuda:0", weights_only=False)
 def build_actor(sd, prefix):
-    keys = sorted({k.split(".")[1] for k in sd if k.startswith(prefix)}, key=int)
+    keys = sorted({k[len(prefix):].split(".")[0] for k in sd if k.startswith(prefix)}, key=int)   # "actor.0.weight" or "0.weight"
     layers = []
     for i, k in enumerate(keys):
         w = sd[f"{prefix}{k}.weight"]; layers.append(nn.Linear(w.shape[1], w.shape[0]))

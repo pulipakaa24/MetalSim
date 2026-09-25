@@ -32,18 +32,24 @@ the Newton-engine evaluation. Evidence for each row is in `PARITY.md`.
 | Camera-RL throughput | 7.5K env-steps/s incl. training vs Isaac's 32K (4090); learns | CNN update on MPS is 76 % of the time |
 | Deformables on Metal; upstreaming the forks | open | – |
 
-## Newly opened by the Newton XPBD evaluation
+## Opened by the Newton XPBD evaluation (status 2026-09-24, measured unless noted)
 
-| issue | severity | note |
+| issue | status | evidence / next step |
 |---|---|---|
-| Joint position drives not engaging under XPBD in our usage (pendulum ignores its target; G1 falls) | blocking | XPBD drives = compliance 1/ke, no kd, no target mode; wiring under investigation |
-| XPBD does not support effort limits, armature, joint friction, velocity limits (its docstring) | high | Isaac's 300 / 20 Nm effort caps and 0.01 armature cannot be represented; needs emulation or a solver change |
-| GJK/MPR narrow phase needs Warp fixed-size arrays; Metal codegen lacks them | high for meshes | primitive colliders only until ported (G1's colliders are boxes, so fine there) |
-| VBD solver fails to compile on Metal | medium | not needed for rigid robots |
-| Stability/cost of stiff drives under XPBD unknown | medium | expect more iterations/substeps than 4; throughput gain then 2–8× |
-| State layout change: maximal coordinates (`body_q`), `joint_q` via `eval_ik`, no MuJoCo sensors, no `qacc`/`qfrc_actuator` | integration cost | task kernels, renderer input, height scan and reward terms (torque, acceleration, contact) need new sources |
-| Newton API churn (alpha; renamed fields between 1.5 and 1.7) | low | pin the version |
-| Newton's importer copies the USD's gravity 0 (same PhysX quirk) | low | set gravity explicitly |
+| Joint drives not engaging under XPBD | **closed** | three causes: `State.joint_q` never written by XPBD (use `eval_ik`), targets indexed by DOF instead of coordinate layout (shifted every G1 target by one joint), and Newton's default joint relaxation 0.7/0.4 transmitting torque wrongly (+43 % / −18 % on a pendulum; 0.4/0.4 exact). `scripts/diagnostics/newton_xpbd_drives.py` |
+| XPBD's compliance drive is not a PD with stiffness `ke` (72–1240 Nm/rad for `ke` 200 over 1–16 it.) | **closed by replacement** | Isaac's PD law computed each substep and applied through `Control.joint_f` (`ActuatorPD`); ≤ 0.001 rad from the exact static equilibrium at 4 it. Upstream issue to raise |
+| No effort limits, armature, joint friction, velocity limits in XPBD | **closed for the G1** | `ActuatorPD` clips to the effort limit (only the 20 Nm ankles saturate, 0.5–1.5 % of landing steps) and adds armature isotropically to the child inertia (required: NaN without it; axis-only armature invalidates 32 links). Joint friction / velocity limits not needed by the G1 task |
+| GJK/MPR narrow phase needs fixed-size arrays; Metal codegen lacked them | **closed** | Warp fork 786cdae: 20/20 fixed-array tests on Metal incl. graph capture; mesh = primitive contacts to 0.001 mm; G1 on its own convex meshes, < 3 % throughput cost |
+| Stability / cost of stiff drives under XPBD | **closed** | tracks MuJoCo C within 0.022 rad (4 it., 1.25 ms) or 0.044 rad (8 it., 2.5 ms) at 4.0–4.5× MuJoCo Warp's physics rate at 4096 envs |
+| Newton's default relaxation and biased drive | open, upstream | to be reported to newton-physics/newton |
+| Newton rests the G1 ~1 cm lower than MuJoCo (0.69–0.70 vs 0.71 m) | open | cause not found |
+| VBD solver fails to compile on Metal | open, low | not needed for rigid robots |
+| Featherstone on the G1: NaN at 2.5 ms, no result at 1.25 ms in 400 s | open, low | XPBD is the path |
+| State layout: maximal coordinates, no MuJoCo sensors, approximate contact forces | **in progress** | engine switch in the G1 task (obs/reward/termination from body state + `eval_ik`), then a PPO run against `runs/g1_flat_ppo_1500_dt25_fixed.log` |
+| Learning parity on Newton | open | no policy trained on Newton yet (run in progress) |
+| `ActuatorPD` is MetalSim code, not Newton's; damping capped at one step's removal on very light links | open, low | document; revisit if hand joints misbehave |
+| Newton API churn (alpha) | low | pin the version (1.7.0.dev) |
+| Importer copies the USD's gravity 0 | low | set gravity explicitly (done in `g1_builder`) |
 
 ## What a Newton XPBD replacement would and would not change
 

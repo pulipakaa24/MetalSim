@@ -222,30 +222,67 @@ CUDA; the CPU SDK has no supported Apple build).
 
 NVIDIA's Newton engine (Warp-based; Isaac Lab 3.0's physics layer) runs on the MetalSim Warp fork
 unmodified: its **XPBD** solver (same substepped position-based family as PhysX TGS), Featherstone and
-Semi-Implicit run on Metal; VBD fails to compile; the GJK/MPR narrow phase needs Warp fixed-size arrays
-the Metal codegen lacks (so mesh colliders must take the primitive path for now). Newton's UsdPhysics
+Semi-Implicit run on Metal; VBD fails to compile; the GJK/MPR narrow phase needed Warp fixed-size arrays,
+added to the Metal codegen in fork commit 786cdae (see below). Newton's UsdPhysics
 importer loads `g1_minimal.usd` directly (44 bodies, 44 joints, 43 DoF, drives included). A box rests
 with 0.3 mm penetration under XPBD.
 
-Physics-only throughput on the same G1 asset at the same 2.5 ms step, idle GPU
-(`scripts/diagnostics/newton_vs_mjwarp_throughput.py`):
+Newton XPBD on Metal, after the roadblocks were worked (2026-09-24, all numbers measured on the M4
+Max, `metalsim/physics/newton_backend.py`, `scripts/diagnostics/newton_xpbd_*.py`,
+`newton_mesh_narrowphase.py`):
 
-| envs | MuJoCo Warp (10 Newton it., 20 LS, graph) | Newton XPBD 4 it., eager | Newton XPBD 4 it., graph |
-|---|---|---|---|
-| 256 | 121,682 physics-steps/s | 392,548 | 741,251 |
-| 1024 | 220,665 | 1,491,266 | 1,743,429 |
-| 4096 | 313,209 | 2,563,876 | 2,446,173 |
+* **Drives.** Three causes, none Metal-specific (Metal and CPU agree to 1e-6): XPBD never writes
+  `State.joint_q` (read joints with `newton.eval_ik`); `ModelBuilder.joint_target_q` is in the coordinate
+  layout (7 root slots) while the gains are in the DOF layout (6), so DOF-indexed targets shift every G1
+  target by one joint; and Newton's default joint relaxation (linear 0.7, angular 0.4) transmits joint
+  torque wrongly (one-joint pendulum: +43 % response to a joint torque, −18 % to gravity, at any
+  iteration count; equal factors 0.4/0.4 are exact, angular > 0.4 diverges on the G1). XPBD's own
+  compliance drive also has an effective stiffness that is not `ke` (72–1240 Nm/rad for `ke` 200 over
+  1–16 iterations), so Isaac's PD law is applied every substep through `Control.joint_f`
+  (`ActuatorPD`: implicit damping, effort clip, armature added isotropically to the child inertia).
+  Error against the exact static PD equilibrium with the pelvis fixed: XPBD drive 16 it. 0.03 rad legs /
+  0.14 ankles / 0.17 arms and hands; `ActuatorPD` 1 it. 0.006 / 0.002 / 0.001; 4 it. ≤ 0.001 rad.
+* **Standing.** Under Isaac's gains MuJoCo C itself pitches forward and lands on its torso at ~1.4 s
+  (the 20 Nm/rad ankles cannot hold the default pose), so the criterion is "tracks MuJoCo C". Pelvis
+  height at 0.25 / 0.5 / 0.75 / 1.0 / 1.25 s: MuJoCo C 0.710 / 0.708 / 0.692 / 0.619 / 0.329 m; XPBD
+  4 it. at 1.25 ms 0.704 / 0.701 / 0.683 / 0.604 / 0.250 (worst joint difference at 0.5 s ≤ 0.022 rad);
+  8 it. at 2.5 ms 0.697 / 0.689 / 0.677 / 0.591 / 0.214 (≤ 0.044 rad). Newton rests about 1 cm lower
+  than MuJoCo (0.69–0.70 vs 0.71 m); cause not found.
+* **Mesh colliders on Metal.** Warp fork commit 786cdae adds fixed-size arrays to the Metal codegen
+  (a per-thread slice of GPU scratch), so the GJK/MPR narrow phase compiles: Warp's fixed-array tests
+  pass 20/20 on CPU and Metal including graph capture; a box as convex hull or triangle mesh gives the
+  same 4 contacts as the box primitive (−1.000 mm, 0.043 mm resting penetration, Metal = CPU to
+  0.001 mm); the G1 runs on its own convex-mesh colliders with the same trajectory as the box stand-ins.
+* **Effort limits and armature.** Peak leg torque is 61–63 Nm in the hold and 173–188 Nm on a drop
+  against the 300 Nm cap; only the 20 Nm ankles saturate (0.5–1.5 % of steps during landing). Armature is
+  essential (every setting goes NaN without it) and must be added on all three axes of the link inertia
+  (axis-only makes 32 links' inertia invalid and Newton inflates them up to 7×). Featherstone: NaN at
+  2.5 ms, no result at 1.25 ms within 400 s.
 
-At 4096 envs that is 7.8× MuJoCo Warp's rate, **but the 4-iteration XPBD setting does not yet hold the G1
-under Isaac's drives** (it collapses within a second), so the fair comparison is at whatever iteration /
-substep setting stands the robot; that sweep is `scripts/diagnostics/newton_xpbd_sweep.py`. Result so far: the G1 falls under every
-XPBD setting tried (4–16 iterations, 2.5 / 1.25 / 0.625 ms), calmly at fine substeps, and a one-joint
-pendulum with `joint_target_ke` 200 does not move towards its target either, so the joint position
-drives are not engaging in our use of the API: Newton's XPBD applies drives as compliance 1/ke on the
-angular constraint, ignores `joint_target_kd` and `joint_target_mode` (its own docstring), and reads
-targets from `Control.joint_target_q`; the remaining discrepancy is being taken up with Newton's
-examples/tracker. Until the drives hold the robot, the 7.8× figure is "XPBD contacts + joints, drives
-inactive", an upper bound on the gain, not the number.
+Physics-only throughput, graph-captured, idle GPU, in 2.5 ms-equivalent steps/s
+(`scripts/diagnostics/newton_xpbd_throughput.py`):
+
+| envs | MuJoCo Warp | XPBD 4 it., 1.25 ms | XPBD 8 it., 2.5 ms | XPBD 4 it., 2.5 ms | same, mesh colliders |
+|---|---|---|---|---|---|
+| 256 | 119,448 | 399,828 (3.3×) | 466,555 (3.9×) | 795,504 (6.7×) | 579,442 |
+| 1024 | 224,309 | 903,596 (4.0×) | 1,055,494 (4.7×) | 1,833,701 (8.2×) | 1,564,338 |
+| 4096 | 313,780 | 1,269,644 (4.0×) | 1,425,129 (4.5×) | 2,543,061 (8.1×) | 2,372,911 |
+
+At 4096 envs the settings that track MuJoCo C give 4.0–4.5× MuJoCo Warp's physics rate (about
+159K–178K physics-limited env-steps/s at 50 Hz control against MuJoCo Warp's 39K); the 4 it. / 2.5 ms
+setting is the minimal stable one and lands softer, falling 0.1–0.2 s earlier. Graph replay matches
+eager stepping to 4e-7 m. These exclude observation, reward, reset and PPO (23 % of the MuJoCo step);
+the full-step comparison and a PPO run on the Newton path are in progress.
+
+G1 drop test from 1.0 m, same protocol as `g1_contact_stiffness.py` (impact / resting penetration):
+XPBD 2 it. 2.5 ms 1.09 / 0.07 cm; 4 it. 0.69 / 0.03; 8 it. 0.36 / 0.01; 4 it. 1.25 ms 0.24 / 0.01;
+8 it. 1.25 ms 0.16 / 0.00; MuJoCo C default 2.97 / 0.06. Isaac's PhysX recording of the same drop
+(§1.7) is the reference.
+
+Still open on the Newton path: integration into the task code (maximal coordinates, no MuJoCo
+sensors, approximate contact forces), learning parity (no policy trained on Newton yet), `ActuatorPD`
+is MetalSim code rather than Newton's (its damping is capped at what one step can remove on very light
+links), and two upstream issues to raise (relaxation defaults, biased compliance drive).
 
 ## 3. What is disproved, missing, or cannot be tested here
 
