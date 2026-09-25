@@ -92,6 +92,16 @@ duplicate surface ones, so the one-step dynamics are unchanged but the contacts 
 over a 0.4 s drop of the same cube the capped contact sets went from 0/73 to 45/73 equal and the one-step error
 median from 3.1e-4 to 6.5e-5 m/s (`docs/research/deformables_2026-09-25.md` §2).
 
+## 7. Per-pair contact cap too small for large cloths (issue, not a bug fix)
+
+A 1 m, 33 × 33 continuum cloth (E 1e6, ν 0.45, thickness 0.01: Isaac Lab 3.0's PhysX surface defaults) dropped on a
+0.4 m box sinks through the box and falls to the floor in MuJoCo C 3.14 itself: the 50 contacts kept per (body, flex)
+pair cannot hold it. With mjMAXCONPAIR raised to 4000 (MuJoCo C built locally) the raw set is ~290 contacts at impact
+and ~80 at rest and the cloth rests on the box at 0.422 m. MuJoCo Warp (with fixes 3–4) reproduces C in both cases;
+the fork adds `collision_flex.FLEX_MAXCONPAIR` (default 50 = C parity; 400 → 0.420 m on the box). Upstream-worthy as
+an issue for both MuJoCo and MuJoCo Warp (make the flex cap a model option, e.g. per flex); commit 64a1ea5, test
+`FlexMaxConPairTest`.
+
 ## Also on the branch, lower priority for upstream
 
 * Mesh-flex contact normal: upstream snaps to the nearest mesh face within 5 mm; C uses the penetration direction.
