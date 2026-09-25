@@ -103,7 +103,17 @@ port in float32 lands elsewhere on the face; the contact point on a flat face co
 contacts shallower than ~10 µm (float32 CCD at the activation boundary), (c) coincident candidates from adjacent
 triangles whose float32 positions differ by rounding.
 
-Why the three MuJoCo Warp flex tests failed on Metal: _to be filled from the Metal run (§6)_.
+Why MuJoCo Warp's flex tests failed on Metal (measured, `runs/deformable/metal_run1.log`): the two flex failures
+(`FlexConstraintTest.test_constraint_parity2/3`, the 3×3 cloth with edge equality, 1 and 2 worlds; the third of
+the "3 failures" is the upstream `io_test::test_put_data_nefc_zero_dense`, which also fails on CPU) are neither a
+compile error, a missing atomic nor precision: the 16 `efc_pos` values equal MuJoCo C's to 1.2e-8 **after sorting**,
+but rows 4–7 and 8–11 come out swapped. `_equality_flex` takes each edge's row from an atomic counter, so the row
+order is the device's thread order (on CUDA it happens to be edge order; Metal dispatches the 3D launch's threads in
+another order), and the test compares rows in order. The rope (4 rows) and the trilinear volume (strain rows) pass.
+Fix (fork commit 9c6e09f): a reserve kernel takes one block of rows per world and every edge writes at its
+(equality, edge) offset, which is MuJoCo C's order on every device (and makes the Newton solver's block order
+deterministic). Everything else in the flex suite passed on Metal (233 of 237 in that run; the other two failures
+were the mesh-normal change of fix 11 on Metal, §6).
 
 ## 3. What Isaac Lab exposes for deformables
 
