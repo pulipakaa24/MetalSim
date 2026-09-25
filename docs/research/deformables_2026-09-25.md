@@ -365,3 +365,68 @@ will replace this reference; for the Newton backend the primary comparison is th
 | cable backend | flex rod: period 1.006 vs 1.026 s, 11.7K / XPBD chain: 1.323 s, 2.6M | flex (fidelity first) | XPBD chain via `XPBDSim` |
 | soft-volume backend | flex only (XPBD volume not implemented) | flex | – |
 | flex cloth stretch | physical solref (−2k/m, −2d/m) at 1 ms / positive solref at 5 ms | physical at 1 ms (loss 61 vs 118–456) | `edge_solref` |
+
+## 11. Rope period and damping, and implicit flex damping (measured)
+
+**Rope geometry.** The XPBD chain now follows PhysX's rod: node at the attachment plus a held ghost node 5 cm behind
+it (PhysX holds the whole end face, which fixes the direction as well as the position), 5 cm segments (PhysX's
+10-cell hexahedral resolution), trapezoid lumped masses, stretch k = EA/l, rod bending as the midpoint vector
+constraint C = x_j − (x_i + x_k)/2 (linear in the bend angle, k = 4 EI/l³; the old i/i+2 distance constraint has no
+linear stiffness around straight), damping d = β k per constraint in PhysX's XPBD form. With the continuum
+EI = E t⁴/12 = 1.33e-3 N m² the period stays 1.30 s: that is the physics of a thin uniform rod (small-amplitude
+hanging-chain/rigid-rod estimates 1.16–1.18 s, plus the large first swing). PhysX's rod is not a thin rod: it is an
+11×2×2 hexahedral FEM mesh with one cell across, which locks in bending. The same 11×2×2 mesh in flex (static
+cantilever under reduced gravity, heavily damped) has EI_eff = 1.65e-2 N m², 12.4× the continuum value; with that
+bending stiffness the XPBD period is 1.12 s (β 0.005) / 1.077 s (β 0.1), first back-swing −0.331 / −0.312 m vs
+PhysX −0.305. PhysX's stated damping (elasticity damping 0.005, soft-body linear damping default 0.05 1/s, applied
+per step in `softBodyGM.cu` L171) is far too small for its observed decay (log decrement 0.59): its dissipation is
+largely numerical (XPBD with 16 iterations on stiff tetrahedra). Matching it needs β = 0.1 (fitted, 20× nominal).
+
+| rope | PhysX 5.1 | XPBD, continuum EI, β 0.005 (all physical) | XPBD, FEM-mesh EI, β 0.005 | XPBD, FEM-mesh EI, β 0.1 (fitted) | flex FEM rod, explicit 3e-5 (old best) | flex, **implicit 5e-3 (PhysX value)** | flex, implicit 2e-2 |
+|---|---|---|---|---|---|---|---|
+| time to vertical (s) | 0.370 | 0.350 | 0.375 | 0.390 | 0.390 | 0.395 | 0.395 |
+| swing period (s) | 1.026 | 1.304 | 1.120 | 1.077 | 1.006 | 1.018 | 1.109 |
+| log decrement | 0.59 | 0.02 | 0.08 | 0.63 | 0.09 | 0.24 | 0.15 |
+| first back-swing x (m) | −0.305 | −0.485 | −0.331 | −0.312 | −0.456 | −0.402 | −0.437 |
+| rest tip drop (m) | 0.477 | 0.434 | 0.494 | 0.494 | 0.429 | 0.419 | 0.453 |
+| swing peaks (m, half-cycles) | 0.305, 0.36, 0.30, 0.11, 0.11, 0.10 | 0.49, 0.48, 0.46, 0.44 | 0.33, 0.49, 0.26, 0.47 | 0.31, 0.42, 0.16, 0.32, 0.07 | 0.46, 0.23, 0.34, 0.12 | 0.40, 0.21, 0.37, 0.15 | 0.44, 0.26, 0.40, 0.23 |
+| Metal env-steps/s at 4096 | – | – | – | 2.57M | 11.7K | 9.4K | – |
+
+(PhysX swing peaks from its trace: `rope_metrics` on `runs/deformable/isaac51`; all rows in
+`runs/deformable/physx_fit51/rope_cube_implicit.json`.)
+
+**Implicit flex damping** (MuJoCo Warp fork `metalsim-flex` c013067, `mujoco_warp/_src/flex_damping.py`, opt-in
+`flex_damping.ENABLE`): MuJoCo's flex elasticity damping is stiffness-proportional (the strain includes
+(d² − d_prev²)·damping/dt) and explicit, stable only for damping·dt·ω²max < 2. The explicit term is dropped and,
+after `forward()`, the flex vertex velocities solve (M + dt D) v′ = M(qvel + dt qacc) per world with
+Jacobi-preconditioned CG (30 fixed iterations, graph-capturable; D is the same damping operator, SPSD); qacc/efc.Ma
+of those DOFs are replaced before `euler()`. Verification: MuJoCo C has no implicit flex damping (3.14 rejects flex
+elasticity under the implicit integrators), so (a) at damping 3e-5 / 1e-4, where explicit is stable, implicit stays
+within 1.8e-5 / 5.1e-5 m of explicit and of MuJoCo C after 0.5 s (explicit Warp vs C: 2.5e-7 / 6.9e-7 m); (b) at
+5e-3 and 2e-2 the rod and the cube run 2 s without blow-up where explicit diverges within 15–30 ms, and the cube's
+gravity+kinetic energy settles to its rest value (7.84 J) by 0.9 s at 2e-2 vs still 8.7 J at 2 s with 1e-3 (flex
+elastic strain energy is not in MuJoCo's energy, so the trace is not monotone during swings). Tests
+`FlexImplicitDampingTest` (2), full MuJoCo Warp suite 1452 passed (2 pre-existing failures). Cost at 4096 envs on
+Metal: rod 11.7K → 9.4K, cube 3.9K → 2.9K env-steps/s.
+
+| cube | PhysX 5.1 | flex explicit 1e-3 (old best) | implicit 5e-3 (PhysX value) | implicit 5e-2 | **implicit 0.2, contact solref 0.001** (fitted) |
+|---|---|---|---|---|---|
+| impact centroid minimum (m) | 0.079 | 0.067 | 0.062 | 0.058 | 0.063 |
+| bounce peak (m) | 0.135 | 0.262 | 0.259 | 0.171 | 0.132 |
+| rest centroid (m) | 0.098 | 0.100 | 0.100 | 0.100 | 0.100 |
+| settling time (s) | 0.55 | 1.97 | 1.52 | 0.80 | 0.55 |
+| lowest node (penetration, m) | −0.0016 | −0.010 | −0.022 | −0.039 | −0.036 |
+| Metal env-steps/s at 4096 | – | 3.9K | – | – | 2.9K |
+
+What remains on the cube: the damping that matches PhysX's bounce and settling is 40× PhysX's nominal value (the
+same numerical-dissipation gap as the rope), the impact compresses 1.6 cm more, and MuJoCo's soft vertex contacts
+let the bottom face sink 3.6 cm (PhysX 0.16 cm): solimp/contact softness is the next lever. The volume formulation
+choice (PhysX-style co-rotational FEM port, Newton VBD on Metal, or flex) waits for the Isaac Lab 3.0 recordings.
+
+| decision | options (numbers vs PhysX 5.1) | chosen, why | how to switch |
+|---|---|---|---|
+| XPBD rope bending | i/i+2 distance (period 1.21–1.32 s) / midpoint rod constraint, continuum EI (1.30 s) / midpoint, FEM-mesh EI 1.65e-2 (1.077 s, back-swing −0.312 vs −0.305) | midpoint + FEM-mesh EI: the recorded rod is a one-cell hexahedral mesh, not a thin rod | `XPBDCfg(rope_bending=...)`, `bend_EI` in the protocol |
+| rope damping | β 0.005 (PhysX nominal; decrement 0.08) / β 0.1 (0.63) / velocity damping 0.6 1/s (0.62, period 1.04) | β 0.1 in PhysX's per-constraint form (the coordinator's requirement; fitted, 20× nominal) | `beta` |
+| rope backend | XPBD β 0.1: period 1.077, decrement 0.63, back-swing −0.312, drop 0.494, 2.57M/s / flex implicit 5e-3: 1.018, 0.24, −0.402, 0.419, 9.4K/s | XPBD (closer on 4 of 5 metrics, 270× faster); flex kept | `DeformableSim` |
+| flex elasticity damping | explicit (≤1e-4 rod, ≤1e-3 cube at 0.5 ms) / implicit CG | implicit when damping > explicit limit (opt-in: default off keeps MuJoCo C parity) | `mujoco_warp._src.flex_damping.ENABLE` |
+| cube settings | explicit 1e-3 (bounce 0.262, settle 1.97 s) / implicit 0.2 + solref 0.001 (0.132, 0.55 s) | implicit 0.2 (fitted; penetration still 3.6 cm) | `physx_fit_5p1.json` |

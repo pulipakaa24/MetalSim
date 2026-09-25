@@ -64,6 +64,7 @@ def rope_metrics(pos, pinned_mask):
     peaks = [np.abs(xr[a:b]).max() for a, b in zip(zc[:-1], zc[1:])] if len(zc) > 2 else []
     decr = float(np.mean(np.log(np.array(peaks[:-1]) / np.array(peaks[1:])))) if len(peaks) > 2 else float("nan")
     return {"length0": float(L), "t_first_vertical": t_bottom, "swing_period": period, "log_decrement": decr,
+            "swing_peaks": [round(float(v), 3) for v in peaks[:8]],
             "first_backswing_x": float(xr[zc[0]:zc[1]].min()) if len(zc) > 1 else float("nan"),
             "rest_tip_drop": float(-rel[-1, 2]), "rest_length_ratio": float(np.linalg.norm(rel[-1]) / L),
             "_angle": ang}
@@ -76,7 +77,8 @@ def cube_metrics(pos, vel, mass_per_node, size=0.2):
     kmin = int(np.argmin(cz[: int(1.0 / dt)]))
     after = cz[kmin:]
     peak = kmin + int(np.argmax(after[: int(0.5 / dt)]))
-    return {"t_impact_min": float(kmin * dt), "min_centroid_z": float(cz[kmin]), "bounce_peak_z": float(cz[peak]),
+    return {"cz_every_0.1s": [round(float(v), 3) for v in cz[::20][:21]],
+            "t_impact_min": float(kmin * dt), "min_centroid_z": float(cz[kmin]), "bounce_peak_z": float(cz[peak]),
             "bounce_peak_t": float(peak * dt), "rest_centroid_z": float(cz[-1]), "rest_height": float(np.ptp(pos[-1, :, 2])),
             "max_compression": float(1 - np.ptp(pos[kmin, :, 2]) / size), "settle_time": _settle_time(ke, dt),
             "min_node_z": float(pos[:, :, 2].min()), "_cz": cz}
@@ -161,8 +163,7 @@ XPBD_DEFAULTS = {
     # PHYS: identical formulation to PhysX particle cloth: compliance 1/k per spring, damping d per spring, 16 substeps
     "cloth": {"stretch_compliance": 1e-4, "bend_compliance": 5e-3, "stretch_damping": 0.2, "bend_damping": 0.2, "damping": 0.0,
               "substeps": 16},
-    "rope": {"stretch_compliance": 1e-7, "bend_compliance": 1e-2, "stretch_damping": 0.0, "bend_damping": 0.0, "damping": 0.0,
-             "substeps": 16},
+    "rope": {"damping": 0.0, "substeps": 16},             # stiffness/damping: physical mapping in run_xpbd
 }
 
 
@@ -181,6 +182,8 @@ def run_flex(obj, meta, params=None, device="cpu", nworld=1):
     from metalsim.physics import deformable as dfm
     p = _flex_params(obj, meta, params)
     dt = float(p["dt"])
+    from mujoco_warp._src import flex_damping
+    flex_damping.ENABLE = bool(p.get("implicit_damping", False))
     xml = {"cloth": cloth_xml, "rope": rope_xml, "cube": cube_xml}[obj](meta, p, dt)
     m = mujoco.MjModel.from_xml_string(xml)
     sim = dfm.DeformableSim(m, nworld, device=device, capture=device != "cpu")
@@ -211,7 +214,7 @@ def run_flex(obj, meta, params=None, device="cpu", nworld=1):
     return pos, vel, {"model_nv": int(m.nv), "nvert": int(m.nflexvert), "wall_s": wall, "params": p, "pinned": pinned}
 
 
-def run_xpbd(obj, meta, params=None, device="cpu", nworld=1):
+def make_xpbd(obj, meta, params=None, device="cpu", nworld=1, _info=None):
     import mujoco, warp as wp
     wp.config.quiet = True
     from metalsim.physics import deformable as dfm
@@ -219,17 +222,53 @@ def run_xpbd(obj, meta, params=None, device="cpu", nworld=1):
     # the same flex topology/masses as the flex scene; XPBD solves it with its own kernels at 200 Hz x substeps
     fp = _flex_params(obj, meta, {})
     xml = {"cloth": cloth_xml, "rope": rope_xml}[obj](meta, fp, 1.0 / HZ)
-    if obj == "rope":   # XPBD rope: a 1D chain of the rod's centre line (distance + i/i+2 bending constraints)
-        r = meta["scenes"]["rope"]
-        nx = 11
+    rope_phys = None
+    if obj == "rope":
+        # XPBD rod on the rod's centre line, physical mapping from PhysX's rod (PHYS):
+        #  - clamp: PhysX holds the whole end face (4 nodes), which fixes position and direction; here node 0 at
+        #    x = -l and node 1 at x = 0 are held (node 1 is the attachment point used by the metrics)
+        #  - segment l = 0.05 m (PhysX's hexahedral resolution: 10 cells over 0.5 m)
+        #  - lumped masses: rho A l per interior node, rho A l / 2 at the tip (trapezoid rule)
+        #  - stretch k = E A / l, rod bending k = 4 E I / l^3 (I = t^4 / 12), per-constraint damping d = beta k with
+        #    beta = PhysX elasticity damping (stiffness-proportional damping, PhysX's XPBD form)
+        r = meta["scenes"]["rope"]; mat = r["material"]
+        nseg = int(p.get("rope_segments", 10))
+        l = r["length"] / nseg
+        E, t, beta = mat["youngs_modulus"], r["thickness"], mat["elasticity_damping"]
+        A, I = t * t, t ** 4 / 12.0
+        # bending stiffness: "continuum" = E t^4/12, or the effective EI of the 11x2x2 hexahedral FEM rod that PhysX
+        # simulates (measured on the same mesh in flex, static cantilever: 1.65e-2 N m^2, 12.4x the continuum value:
+        # one-cell cross-sections lock in bending), p["bend_EI"]
+        EI = p.get("bend_EI", E * I)
+        ks, kb = E * A / l, 4.0 * EI / l ** 3
+        p.setdefault("stretch_compliance", 1.0 / ks); p.setdefault("bend_compliance", 1.0 / kb)
+        beta = p.get("beta", beta)
+        p.setdefault("stretch_damping", beta * ks); p.setdefault("bend_damping", beta * kb)
+        p.setdefault("rope_bending", "midpoint")
+        rope_phys = {"l": l, "rhoAl": mat["density"] * A * l, "k_stretch": ks, "k_bend": kb, "beta": beta}
         xml = f"""<mujoco><option timestep="{1.0/HZ}"/><worldbody><geom type="plane" size="3 3 0.1"/>
-          <flexcomp name="rope" type="grid" count="{nx} 1 1" spacing="{r['length']/(nx-1)} 0.02 0.02" pos="{r['length']/2} 0 {r['z0']}"
-            dim="1" radius="{r['thickness']/2}" mass="{r['mass']}"><pin id="0"/><edge equality="true"/></flexcomp></worldbody></mujoco>"""
+          <flexcomp name="rope" type="grid" count="{nseg + 2} 1 1" spacing="{l} 0.02 0.02" pos="{(r['length'] - l)/2} 0 {r['z0']}"
+            dim="1" radius="{t/2}" mass="{r['mass']}"><pin id="0 1"/><edge equality="true"/></flexcomp></worldbody></mujoco>"""
     m = mujoco.MjModel.from_xml_string(xml)
     cfg = dfm.XPBDCfg(substeps=int(p["substeps"]), stretch_compliance=p["stretch_compliance"], bend_compliance=p["bend_compliance"],
                       stretch_damping=p["stretch_damping"], bend_damping=p["bend_damping"], damping=p["damping"],
-                      friction=meta["scenes"]["cloth"]["pbd_friction"] if obj == "cloth" else 0.5)
+                      friction=meta["scenes"]["cloth"]["pbd_friction"] if obj == "cloth" else 0.5,
+                      rope_bending=p.get("rope_bending", "distance"))
     sim = dfm.XPBDSim(m, nworld, device=device, cfg=cfg, capture=device != "cpu")
+    if rope_phys is not None and p.get("lumped_mass", True):
+        nvx = sim.nvert
+        mass = np.full(nvx, rope_phys["rhoAl"], np.float32); mass[-1] *= 0.5
+        inv = 1.0 / mass; inv[:2] = 0.0
+        sim.mass.assign(mass); sim.inv_mass.assign(inv.astype(np.float32))
+    if _info is not None:
+        _info.update(p=p, rope_phys=rope_phys)
+    return sim
+
+
+def run_xpbd(obj, meta, params=None, device="cpu", nworld=1):
+    info = {}
+    sim = make_xpbd(obj, meta, params, device, nworld, info)
+    p, rope_phys = info["p"], info["rope_phys"]
     nframes = int(round(T_END * HZ))
     P, V = [sim.x.numpy()[0].copy()], [sim.v.numpy()[0].copy()]
     t0 = time.time()
@@ -238,6 +277,8 @@ def run_xpbd(obj, meta, params=None, device="cpu", nworld=1):
         P.append(sim.x.numpy()[0].copy()); V.append(sim.v.numpy()[0].copy())
     wall = time.time() - t0
     pinned = sim.inv_mass.numpy() == 0
+    if rope_phys is not None:           # attachment point = the pinned node at x = 0 (PhysX's pinned face)
+        pinned = np.zeros(sim.nvert, bool); pinned[1] = True
     return np.array(P), np.array(V), {"nvert": int(sim.nvert), "wall_s": wall, "params": p, "pinned": pinned}
 
 
