@@ -76,7 +76,8 @@ def _meshes_to_boxes(b: newton.ModelBuilder) -> None:
 
 
 def g1_builder(z0: float = 0.74, mesh_to_box: bool = True, collapse_fixed_joints: bool = True,
-               armature_inertia: bool | str = False, floating: bool = True) -> tuple[newton.ModelBuilder, dict]:
+               armature_inertia: bool | str = False, floating: bool = True,
+               limit_margin: float | None = 0.15) -> tuple[newton.ModelBuilder, dict]:
     """Isaac's G1 USD with Isaac Lab's actuator gains and default pose, targets correctly indexed.
 
     Returns the builder and per-DOF actuator arrays (``kp``, ``kd``, ``effort``, ``armature``,
@@ -107,6 +108,16 @@ def g1_builder(z0: float = 0.74, mesh_to_box: bool = True, collapse_fixed_joints
     b.joint_target_ke, b.joint_target_kd, b.joint_target_mode, b.joint_target_q, b.joint_q = ke, kd, mode, tq, q
     b.joint_effort_limit = [float(e) if e > 0 else old for e, old in zip(act["effort"], b.joint_effort_limit)]
     b.joint_armature = [float(a) for a in act["armature"]]
+    if limit_margin is not None:
+        # XPBD measures a revolute angle as 2 asin(twist) in (-pi, pi]: a joint crossing pi (G1 elbow pitch range
+        # up to 3.421 rad; hip pitch 3.05) wraps to -pi, reads as a ~2 pi limit violation and is "corrected" with a
+        # huge impulse (energy x300 in one substep, the 3-sigma blow-ups). Keep every revolute limit inside
+        # +-(pi - limit_margin): elbow pitch upper 3.421 -> 2.99, hip pitch upper 3.05 -> 2.99 (Newton model only).
+        lim = np.pi - limit_margin
+        for j in range(b.joint_count):
+            if b.joint_type[j] == newton.JointType.REVOLUTE:
+                d = qd_start[j]
+                b.joint_limit_lower[d] = max(b.joint_limit_lower[d], -lim); b.joint_limit_upper[d] = min(b.joint_limit_upper[d], lim)
     if armature_inertia:
         add_armature_inertia(b, act["armature"], isotropic=armature_inertia == "iso")
     return b, act
@@ -540,7 +551,7 @@ class NewtonSim:
     def __init__(self, mj_model, num_envs: int, iterations: int = 4, dt: float = 0.00125, control_dt: float = 0.02,
                  device: str = "metal:0", mesh_to_box: bool = True, touch_bodies=("left_ankle_roll_link", "right_ankle_roll_link", "torso_link"),
                  hfield: dict | None = None, pose_bodies=("torso_link",), relaxation: float = 0.4,
-                 actuator_kw: dict | None = None, solver_kw: dict | None = None):
+                 actuator_kw: dict | None = None, solver_kw: dict | None = None, solver: str = "xpbd", project: bool = False):
         import mujoco
         from metalsim.interop import warp_metal as wm
         self.mj_model = mj = mj_model
@@ -552,12 +563,18 @@ class NewtonSim:
         self.device = wp.get_device(device)
         z0 = float(mj.key_qpos[0][2]) if mj.nkey else 0.74
         with wp.ScopedDevice(self.device):
-            builder, act = scene(n, spacing=0.0, z0=z0, armature_inertia="iso", mesh_to_box=mesh_to_box, hfield=hfield)
+            builder, act = scene(n, spacing=0.0, z0=z0, armature_inertia=False if solver == "featherstone" else "iso",
+                                 mesh_to_box=mesh_to_box, hfield=hfield)
             builder.joint_target_ke = [0.0] * builder.joint_dof_count; builder.joint_target_kd = [0.0] * builder.joint_dof_count
             self.model = m = builder.finalize()
             m.request_contact_attributes("force")
-            self.solver = newton.solvers.SolverXPBD(m, iterations=iterations, joint_linear_relaxation=relaxation,
-                                                    joint_angular_relaxation=relaxation, **(solver_kw or {}))
+            self.solver_kind, self.project = solver, project
+            if solver == "featherstone":        # reduced coordinates: no joint drift by construction
+                # armature enters Featherstone's joint-space inertia natively (not as added body inertia)
+                self.solver = newton.solvers.SolverFeatherstone(m, **(solver_kw or {"angular_damping": 0.0}))
+            else:
+                self.solver = newton.solvers.SolverXPBD(m, iterations=iterations, joint_linear_relaxation=relaxation,
+                                                        joint_angular_relaxation=relaxation, **(solver_kw or {}))
             self.s0, self.s1 = m.state(), m.state(); self.control = m.control()
             newton.eval_fk(m, m.joint_q, m.joint_qd, self.s0)
             self.pipeline = newton.CollisionPipeline(m, broad_phase="explicit")    # what Model.collide() builds
@@ -618,15 +635,19 @@ class NewtonSim:
                 self.pipeline.collide(self.s0, self.contacts)
                 self.solver.step(self.s0, self.s1, self.control, self.contacts, self.dt_phys)
                 self.s0, self.s1 = self.s1, self.s0
+                if self.project:                 # rebuild body poses/twists from the joint state (removes constraint drift)
+                    newton.eval_ik(m, self.s0, self.joint_q, self.joint_qd)
+                    newton.eval_fk(m, self.joint_q, self.joint_qd, self.s0)
                 j = k - (self.substeps - self.hist_substeps)
-                if self.hist_out is not None and j >= 0:
+                if self.hist_out is not None and j >= 0 and self.solver_kind != "featherstone":
                     if j == 0:
                         self.hist_out.zero_()
                     self.solver.update_contacts(self.contacts)
                     wp.launch(_touch_hist_max, dim=self.contacts.rigid_contact_max, inputs=[self.contacts.rigid_contact_count,
                               self.contacts.rigid_contact_shape0, self.contacts.rigid_contact_shape1, self.contacts.force,
                               self.shape_slot, self.shape_env, self.hist_slot], outputs=[self.hist_out])
-            self.solver.update_contacts(self.contacts)
+            if self.solver_kind != "featherstone":     # SolverFeatherstone has no contact-force reporting
+                self.solver.update_contacts(self.contacts)
             self._sync_out()
 
     def _sync_out(self):
@@ -638,6 +659,8 @@ class NewtonSim:
         wp.launch(_body_pose, dim=(self.n, self.pose_nb.shape[0]), inputs=[self.s0.body_q, self.nb, self.pose_nb, self.pose_mj],
                   outputs=[d.xpos, d.xmat])
         d.sensordata.zero_()
+        if self.solver_kind == "featherstone":         # no contact forces: touch signals stay 0 (not usable for training)
+            return
         wp.launch(_touch, dim=self.contacts.rigid_contact_max, inputs=[self.contacts.rigid_contact_count, self.contacts.rigid_contact_shape0,
                   self.contacts.rigid_contact_shape1, self.contacts.force, self.shape_slot, self.shape_env, self.touch_adr],
                   outputs=[d.sensordata])
@@ -649,6 +672,8 @@ class NewtonSim:
             wp.launch(_from_mujoco, dim=self.n, inputs=[mask, self.d.qpos, self.d.qvel, m.body_com, self.nb, self.nc, self.nd,
                       self.coord_of, self.dof_of], outputs=[self.joint_q, self.joint_qd])
             newton.eval_fk(m, self.joint_q, self.joint_qd, self.s0, mask=mask)
+            if self.solver_kind == "featherstone":   # Featherstone integrates State.joint_q / joint_qd
+                wp.copy(self.s0.joint_q, self.joint_q); wp.copy(self.s0.joint_qd, self.joint_qd)
             wp.launch(_body_pose, dim=(self.n, self.pose_nb.shape[0]), inputs=[self.s0.body_q, self.nb, self.pose_nb, self.pose_mj],
                       outputs=[self.d.xpos, self.d.xmat])
 
