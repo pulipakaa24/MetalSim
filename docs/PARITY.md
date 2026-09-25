@@ -662,6 +662,22 @@ resets the timers; impact-only stiffening halves Isaac's policy's falls here and
 Isaac's. Ranked remedies and the archived non-remedies (a PhysX-style sensor window: no effect;
 MuJoCo's discrete integrator: not in MuJoCo Warp) are in the research note.
 
+**Final contact preset (2026-09-25, `runs/contact_research/final_ranking_2026-09-25.md`, ranked on the
+corrected criteria; feet_slide now in Isaac's centre-of-mass convention, commit 007477b):
+`tau10_impact_hardlimits`** = contact time constant 10 ms with impedance 0.9 at touch-down rising to
+0.999 over 5 mm of penetration (stiff only on impact) and joint limits at 5 ms / 0.99. Against Isaac
+(slide −0.017, air 0.035, 20 ms force 1996 / 2200 / 2190 N, limits 0.004 rad, transfer 3.19 / 3.02 /
+3.11 m): impulse within 1–4 % (every preset), 20 ms force 2707 / 3729 / 2689 N, penetration 1.64 cm
+(default 2.97), limit excursion 0.001 rad (default 0.030), slide −0.032 (default −0.044; τ 5 ms
+−0.022), air 0.020 (policy stage), transfer 3.29 / 3.02 / 3.11 m (error 3.3 cm; default 34.7 cm; τ 5 ms
+14.3 cm), chatter 112 vs default 104 (τ 5 ms 212), 5 ms torso peak 7862 N at PhysX's upper bound (7854;
+τ 5 ms 10.5 kN above it), cost 1.02× (117.5 vs 114.9 ms per control step at 4096 envs), preflight at
+2.5 ms passes. Seed noise: slide ±0.0006, air ±0.0005, so every difference between presets is real.
+Caveat: the checkpoint used for the ranking was trained on default contacts and falls more under the
+new preset (53–116 vs 30–33 per 1000 steps); a policy retrained on the preset is the check (queued).
+Rejected with numbers: τ 5 ms (exceeds PhysX's bounded force, doubles chatter), Isaac Lab 3.0's own
+mapping (same), elliptic cones (no slide gain, 3.8× cost), margin = gap (stands 1 cm high).
+
 **The same protocol on Newton XPBD** (`scripts/diagnostics/newton_record_g1.py`, CPU device which
 matches Metal to ~1e-6, `runs/parity/report_newton_{it4_1p25ms,it4_0p625ms}`, measured 2026-09-24,
 Newton commit 45458023 with the angle-wrap clamp; MuJoCo Warp rows repeated for reference):
