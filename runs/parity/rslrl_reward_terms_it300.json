@@ -1,0 +1,22 @@
+{
+ "ckpt": "runs/policies/g1_flat_rslrl/g1_flat_rslrl_it300.pt",
+ "iterations": 300,
+ "episodes": 1186,
+ "mean_episode_length": 774.1492411467117,
+ "mean_return": 4.065329166070504,
+ "terminations": {
+  "fell": 426,
+  "timeout": 760
+ },
+ "Episode_Reward": {
+  "track_lin_vel_xy_exp": 0.423,
+  "track_ang_vel_z_exp": 0.4152,
+  "feet_air_time": 0.0191,
+  "feet_slide": -0.0433,
+  "joint_deviation_all": -0.2034,
+  "flat_orientation_l2": -0.0122,
+  "action_rate_l2": -0.3234,
+  "termination_penalty": -0.0718
+ },
+ "note": "per-second average over the episode like Isaac's RewardManager; joint_deviation_all = hip+arms+fingers+torso; torques/acc/limits/lin_vel_z/ang_vel_xy terms are in the return but not exposed per term"
+}
