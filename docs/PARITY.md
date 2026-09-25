@@ -334,8 +334,12 @@ env-steps/s incl. the monitor):
 Same task, same reward weights, same learner configuration, same seed convention, our physics: full
 episodes at the same iteration as Isaac, the same final return (+28.4 vs +27.3), a slower rise between
 iterations 200 and 500 (the remaining contact-model differences: feet slide and air time, §1.7 and
-the contact-tuning work). Both runs are one seed. This is the acceptance test "identical PPO config,
-identical result" of the plan, met on one task.
+the contact-tuning work). Three seeds of our run (`runs/g1_flat_ppowarp_fixed_flatcfg{,_seed1,_seed2}.log`, measured
+2026-09-25), return / length: at iteration 300 12.1 / 1000, 9.8 / 1000, 10.8 / 986; at 500 21.0 / 997,
+18.4 / 993, 19.6 / 1000; at 1000 **28.4 / 1000, 26.3 / 996, 26.0 / 974** (mean 26.9 ± 1.3), all with full
+episodes by iteration 150; Isaac's single run: +27.3 / 991. So the like-for-like result holds across
+seeds: the same return as Isaac's within seed spread. This is the acceptance test "identical PPO
+config, identical result" of the plan, met on one task (three seeds ours, one seed Isaac's).
 
 **Fixed PPO, demonstrated** (`runs/g1_flat_ppowarp_fixed.log`, MuJoCo Warp, 4096 envs, 1000 iterations,
 same config and seed, measured 2026-09-24, 25.3 K env-steps/s including the monitor):
