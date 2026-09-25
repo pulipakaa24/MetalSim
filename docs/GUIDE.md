@@ -22,8 +22,11 @@ scripts/fetch_isaac_assets.sh
 pytest tests -q
 ```
 
-On a fresh clone this took about four minutes of installing plus about four and a half minutes of
-tests (M4 Max, fast network, Warp kernel cache empty). `pip install -e .` without `[test]` is enough
+On a fresh clone (2026-09-25, M4 Max, fast network, pip's download cache and Warp's kernel cache
+already filled) the install took one to one and a half minutes and the tests two and a half minutes;
+with empty caches expect several more minutes for the PyTorch download and the first Metal kernel
+compilations. The tests use the GPU; a few compare GPU results bit for bit and have failed
+intermittently while other GPU jobs were running, so run them on an otherwise idle GPU. `pip install -e .` without `[test]` is enough
 to run everything except the tests. Optional extras:
 
 | extra | for |
