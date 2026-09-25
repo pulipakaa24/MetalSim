@@ -1,0 +1,137 @@
+== Fri Sep 25 09:06:59 PDT 2026
+holder: {"name": "flex_metal_run2", "kind": "low", "minutes": 30.0, "pid": 58827, "start": 1790352419.448595}
+  waiting [low] mjw_tp_round4 est 30.0 min, queued 3999 s ago
+361f11f Flex filter and SAP sorts/scans on the device (Metal): bitonic per world, two-level scan
+9dcb140 Metal: segmented_sort_pairs inside a graph capture (no segment validation readback)
+== diag mesh EPA (MESH_FLEX_FACE_NORMAL=0)
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+face_normal=False tet cpu: n W 1 C 1
+   W pos [ 8.e-05 -2.e-05 -0.e+00] dist 0.000001 n [ 0.  0. -1.]
+   C pos [-0.  0. -0.] dist 0.000000 n [ 0. -0. -1.]
+face_normal=False tet metal:0: n W 1 C 1
+   W pos [ 7.e-05 -5.e-05 -0.e+00] dist 0.000001 n [-0.      0.1272 -0.9919]
+   C pos [-0.  0. -0.] dist 0.000000 n [ 0. -0. -1.]
+face_normal=False tri cpu: n W 1 C 1
+   W pos [ 0.03   -0.01   -0.0005] dist 0.001000 n [ 0.  0. -1.]
+   C pos [ 0.03   -0.01   -0.0005] dist 0.001000 n [ 0. -0. -1.]
+face_normal=False tri metal:0: n W 1 C 1
+   W pos [ 0.03   -0.01   -0.0005] dist 0.001000 n [ 0.  0. -1.]
+   C pos [ 0.03   -0.01   -0.0005] dist 0.001000 n [ 0. -0. -1.]
+== diag mesh EPA (MESH_FLEX_FACE_NORMAL=1)
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+face_normal=True tet cpu: n W 1 C 1
+   W pos [ 8.e-05 -2.e-05 -0.e+00] dist 0.000001 n [ 0.  0. -1.]
+   C pos [-0.  0. -0.] dist 0.000000 n [ 0. -0. -1.]
+face_normal=True tet metal:0: n W 1 C 1
+   W pos [ 7.e-05 -5.e-05 -0.e+00] dist 0.000001 n [-0.      0.1272 -0.9919]
+   C pos [-0.  0. -0.] dist 0.000000 n [ 0. -0. -1.]
+face_normal=True tri cpu: n W 1 C 1
+   W pos [ 0.03   -0.01   -0.0005] dist 0.001000 n [ 0.  0. -1.]
+   C pos [ 0.03   -0.01   -0.0005] dist 0.001000 n [ 0. -0. -1.]
+face_normal=True tri metal:0: n W 1 C 1
+   W pos [ 0.03   -0.01   -0.0005] dist 0.001000 n [ 0.  0. -1.]
+   C pos [ 0.03   -0.01   -0.0005] dist 0.001000 n [ 0. -0. -1.]
+== MuJoCo Warp flex tests on metal (metalsim-flex)
+
+___________ FlexContactParityTest.test_contact_mesh_flex_3d_parity1 ____________
+mujoco_warp/_src/flex_test.py:2760: in test_contact_mesh_flex_3d_parity
+    self._assert_contact_parity(w_contacts, m_contacts, atol=1e-4)
+mujoco_warp/_src/flex_test.py:2358: in _assert_contact_parity
+    np.testing.assert_allclose(
+E   AssertionError: 
+E   Not equal to tolerance rtol=1e-07, atol=0.0001
+E   Contact 0 frame mismatch
+E   Mismatched elements: 4 / 9 (44.4%)
+E   Mismatch at indices:
+E    [0, 1]: 0.1271643191576004 (ACTUAL), -1.2262438722244664e-08 (DESIRED)
+E    [0, 2]: -0.9918816685676575 (ACTUAL), -1.0 (DESIRED)
+E    [1, 1]: 0.9918816685676575 (ACTUAL), 1.0 (DESIRED)
+E    [1, 2]: 0.1271643191576004 (ACTUAL), -1.2262438722244667e-08 (DESIRED)
+E   Max absolute difference among violations: 0.12716433
+E   Max relative difference among violations: 10370231.75409283
+E    ACTUAL: array([[-5.951465e-19,  1.271643e-01, -9.918817e-01],
+E          [ 7.630084e-20,  9.918817e-01,  1.271643e-01],
+E          [ 1.000000e+00,  7.819661e-30, -6.000177e-19]], dtype=float32)
+E    DESIRED: array([[ 3.004892e-09, -1.226244e-08, -1.000000e+00],
+E          [ 3.684731e-17,  1.000000e+00, -1.226244e-08],
+E          [ 1.000000e+00,  0.000000e+00,  3.004892e-09]])
+----------------------------- Captured stderr call -----------------------------
+WARNING: flex 'tet' is not rigid and has no equality constraints or passive forces
+Element name 'tet', id 0
+
+=============================== warnings summary ===============================
+upstream/mujoco_warp-flex/mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp0
+upstream/mujoco_warp-flex/mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp1
+upstream/mujoco_warp-flex/mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp4
+upstream/mujoco_warp-flex/mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp5
+  /Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/io.py:334: UserWarning: Bending damping is not yet supported for interpolated flex shells.
+    warnings.warn("Bending damping is not yet supported for interpolated flex shells.")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED mujoco_warp/_src/flex_test.py::FlexContactParityTest::test_contact_mesh_flex_3d_parity0
+FAILED mujoco_warp/_src/flex_test.py::FlexContactParityTest::test_contact_mesh_flex_3d_parity1
+2 failed, 235 passed, 12 skipped, 4 warnings in 75.86s (0:01:15)
+== test_deformable (metal)
+....F.....                                                               [100%]
+=================================== FAILURES ===================================
+___________________ test_mjw_flex_graph_replay_equals_eager ____________________
+tests/test_deformable.py:134: in test_mjw_flex_graph_replay_equals_eager
+    assert diff < 1e-5, diff
+E   AssertionError: np.float32(0.035597797)
+E   assert np.float32(0.035597797) < 1e-05
+============================== slowest durations ===============================
+29.24s call     tests/test_deformable.py::test_mjw_flex_free_fall_matches_mujoco_c
+15.48s call     tests/test_deformable.py::test_g1_cloth_scenes_run
+12.36s call     tests/test_deformable.py::test_mjw_flex_energy_bounded_2s
+5.51s call     tests/test_deformable.py::test_xpbd_drape_agrees_with_mjw_flex
+1.99s call     tests/test_deformable.py::test_mjw_flex_graph_replay_equals_eager
+1.89s call     tests/test_deformable.py::test_xpbd_metal_equals_cpu
+1.39s call     tests/test_deformable.py::test_mjw_flex_contact_trajectory_matches_mujoco_c
+1.21s call     tests/test_deformable.py::test_mjw_flex_one_step_matches_mujoco_c_in_contact
+0.51s call     tests/test_deformable.py::test_xpbd_energy_strain_penetration_2s
+0.19s call     tests/test_deformable.py::test_xpbd_graph_replay_equals_eager
+
+(20 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/test_deformable.py::test_mjw_flex_graph_replay_equals_eager - As...
+1 failed, 9 passed in 70.23s (0:01:10)
+== throughput mjw (box: 10x10 cloth + 12 cable), device sorts
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+{"num_envs": 64, "steps": 210, "wall_s": 2.024193875025958, "env_steps_per_s": 6639.680203472431, "sim_s_per_wall_s": 0.20749000635851345, "finite": true, "energy_max": 0.573488175868988, "overflow": {"ITERATIONS": 64, "LS_ITERATIONS": 64}, "nv": 336, "nflexvert": 112, "nconmax": 688, "njmax": 3376, "njmax_nnz": 18496, "backend": "mjw", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": ""}
+{"num_envs": 256, "steps": 150, "wall_s": 2.032098958006827, "env_steps_per_s": 18896.717528788275, "sim_s_per_wall_s": 0.1476306056936584, "finite": true, "energy_max": 0.5797016024589539, "overflow": {"ITERATIONS": 256, "LS_ITERATIONS": 256}, "nv": 336, "nflexvert": 112, "nconmax": 688, "njmax": 3376, "njmax_nnz": 18496, "backend": "mjw", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": ""}
+{"num_envs": 1024, "steps": 90, "wall_s": 2.222963832988171, "env_steps_per_s": 41458.16438053152, "sim_s_per_wall_s": 0.08097297730572561, "finite": true, "energy_max": 0.8706444501876831, "overflow": {"ITERATIONS": 1024, "LS_ITERATIONS": 1024}, "nv": 336, "nflexvert": 112, "nconmax": 688, "njmax": 3376, "njmax_nnz": 18496, "backend": "mjw", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": ""}
+{"num_envs": 4096, "steps": 30, "wall_s": 2.273106208012905, "env_steps_per_s": 54058.1867960401, "sim_s_per_wall_s": 0.026395599021503954, "finite": true, "energy_max": 1.124783992767334, "overflow": {}, "nv": 336, "nflexvert": 112, "nconmax": 688, "njmax": 3376, "njmax_nnz": 18496, "backend": "mjw", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": ""}
+== throughput mjw, Warp host sorts (FLEX_DEVICE_SORT=0)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+{"num_envs": 256, "steps": 80, "wall_s": 2.2483659160207026, "env_steps_per_s": 9108.837602487221, "sim_s_per_wall_s": 0.07116279376943141, "finite": true, "energy_max": 0.9181246757507324, "overflow": {"ITERATIONS": 256, "LS_ITERATIONS": 256}, "nv": 336, "nflexvert": 112, "nconmax": 688, "njmax": 3376, "njmax_nnz": 18496, "backend": "mjw", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": "FLEX_DEVICE_SORT=0"}
+{"num_envs": 1024, "steps": 30, "wall_s": 2.7060863329970744, "env_steps_per_s": 11352.187705695498, "sim_s_per_wall_s": 0.02217224161268652, "finite": true, "energy_max": 1.1240472793579102, "overflow": {}, "nv": 336, "nflexvert": 112, "nconmax": 688, "njmax": 3376, "njmax_nnz": 18496, "backend": "mjw", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": "FLEX_DEVICE_SORT=0"}
+== throughput mjw, G1 scene (12x12 cloth + 16 cable), device sorts
+    wp.synchronize_device(self.device)
+  File "/Users/aditya/robosim/upstream/warp-innate-flex/warp/_src/context.py", line 12884, in synchronize_device
+    device.metal_synchronize()
+  File "/Users/aditya/robosim/upstream/warp-innate-flex/warp/_src/context.py", line 6059, in metal_synchronize
+    raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
+RuntimeError: Metal error on device metal:0: Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
+== throughput xpbd (box), 10 substeps
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+{"num_envs": 1024, "steps": 2670, "wall_s": 2.000981832999969, "env_steps_per_s": 1366369.226801492, "sim_s_per_wall_s": 2.668689896096664, "finite": true, "substeps": 10, "ncons": 282, "ncolors": 6, "nflexvert": 112, "backend": "xpbd", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": ""}
+{"num_envs": 4096, "steps": 1160, "wall_s": 2.017260291991988, "env_steps_per_s": 2355352.960082392, "sim_s_per_wall_s": 1.1500746875402303, "finite": true, "substeps": 10, "ncons": 282, "ncolors": 6, "nflexvert": 112, "backend": "xpbd", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": ""}
+== done Fri Sep 25 09:10:44 PDT 2026

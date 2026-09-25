@@ -1,0 +1,27 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/robosim/scratch/wpcache_flex_cpu/1.18.0.dev20260917
+......................ss..ssssss..s..........s..........s........s...... [ 22%]
+........................................................F
+=================================== FAILURES ===================================
+_______________ FlexCollisionTest.test_plane_cloth_no_fps_limit0 _______________
+mujoco_warp/_src/flex_test.py:1727: in test_plane_cloth_no_fps_limit
+    self.assertEqual(nacon, expected_contacts, f"Expected {expected_contacts} contacts, got {nacon}")
+E   AssertionError: 50 != 100 : Expected 100 contacts, got 50
+=============================== warnings summary ===============================
+upstream/mujoco_warp-flex/mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp0
+upstream/mujoco_warp-flex/mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp1
+upstream/mujoco_warp-flex/mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp4
+upstream/mujoco_warp-flex/mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp5
+  /Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/io.py:301: UserWarning: Bending damping is not yet supported for interpolated flex shells.
+    warnings.warn("Bending damping is not yet supported for interpolated flex shells.")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED mujoco_warp/_src/flex_test.py::FlexCollisionTest::test_plane_cloth_no_fps_limit0
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 116 passed, 12 skipped, 4 warnings in 2.85s
