@@ -151,6 +151,9 @@ def g1_scene_model(cloth: ClothCfg | None = None, cable: CableCfg | None = None,
         child = mujoco.MjSpec.from_string(f"<mujoco><worldbody>{_cloth_xml(cloth)}{_cable_xml(cable)}</worldbody></mujoco>")
         spec.attach(child, frame=spec.worldbody.add_frame(), prefix="d_")
         spec.option.jacobian = mujoco.mjtJacobian.mjJAC_SPARSE      # MuJoCo Warp: dense only up to nv 60
+        spec.option.solver = mujoco.mjtSolver.mjSOL_CG               # hundreds of flex DOFs: no Newton factorization
+        spec.option.iterations = 30
+        spec.option.ls_iterations = 10
     if energy:
         spec.option.enableflags |= mujoco.mjtEnableBit.mjENBL_ENERGY
     m = spec.compile()
@@ -760,8 +763,15 @@ def _main():
     ap.add_argument("--cable", type=int, default=12)
     ap.add_argument("--substeps", type=int, default=10, help="XPBD substeps per step")
     ap.add_argument("--seconds", type=float, default=2.0)
+    ap.add_argument("--flex-flags", default="", help="MuJoCo Warp collision_flex module flags, e.g. FLEX_DEVICE_SORT=0,FLEX_FPS_MODE=main")
     a = ap.parse_args()
     wp.config.quiet = True
+    if a.flex_flags:
+        from mujoco_warp._src import collision_flex as cf
+        for kv in a.flex_flags.split(","):
+            k, v = kv.split("=")
+            cur = getattr(cf, k)
+            setattr(cf, k, v if isinstance(cur, str) else bool(int(v)) if isinstance(cur, bool) or cur is None else type(cur)(v))
     if a.scene == "box":
         fm = scene_model("box", cloth=ClothCfg(count=a.cloth), cable=CableCfg(count=a.cable))
         rm = None
@@ -774,7 +784,8 @@ def _main():
             r = benchmark(fm, n, seconds=a.seconds)
         else:
             r = benchmark_xpbd(fm, n, seconds=a.seconds, cfg=XPBDCfg(substeps=a.substeps, two_way=rm is not None), rigid_model=rm)
-        r.update(backend=a.backend, scene=a.scene, cloth=a.cloth, cable=a.cable, dt=float(fm.opt.timestep if rm is None else rm.opt.timestep))
+        r.update(backend=a.backend, scene=a.scene, cloth=a.cloth, cable=a.cable, dt=float(fm.opt.timestep if rm is None else rm.opt.timestep),
+                 flex_flags=a.flex_flags)
         print(json.dumps(r), flush=True)
 
 
