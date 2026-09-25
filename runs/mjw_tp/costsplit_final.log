@@ -1,0 +1,38 @@
+=== start Fri Sep 25 09:58:52 PDT 2026 power: Now drawing from 'AC Power'
+holder: {"name": "mjw_tp_final", "kind": "low", "minutes": 30.0, "pid": 66073, "start": 1790355532.1993139}
+[final flat] N=4096 njmax 256 naconmax 131072 is_sparse False
+[final flat] physics only 50.9 ms/step -> 80,469 env-steps/s
+[final flat] full env step 60.6 ms -> 67,626 env-steps/s
+[final flat] after random-action steps: nefc max 51 mean 15.1; nacon 11782 (2.88/world); overflow {'LS_ITERATIONS': 3819}
+[final flat] rollout + inference 67.1 ms/step -> 61,059 env-steps/s
+[final flat] PPO update 153 ms -> full loop 55,769 env-steps/s
+[final flat] SUMMARY physics 80,469 | step 67,626 | rollout 61,059 | loop 55,769  (ms: physics 50.9, step 60.6, rollout/step 67.1, update 153)
+[original settings (fork fusion off)] N=4096 njmax 256 naconmax 131072 is_sparse False
+[original settings (fork fusion off)] physics only 111.3 ms/step -> 36,788 env-steps/s
+[original settings (fork fusion off)] full env step 128.0 ms -> 32,010 env-steps/s
+[original settings (fork fusion off)] after random-action steps: nefc max 51 mean 15.1; nacon 11739 (2.87/world); overflow {'LS_ITERATIONS': 3819}
+[original settings (fork fusion off)] rollout + inference 138.9 ms/step -> 29,494 env-steps/s
+[original settings (fork fusion off)] PPO update 153 ms -> full loop 28,200 env-steps/s
+[original settings (fork fusion off)] SUMMARY physics 36,788 | step 32,010 | rollout 29,494 | loop 28,200  (ms: physics 111.3, step 128.0, rollout/step 138.9, update 153)
+[final rough] N=4096 njmax 256 naconmax 524288 is_sparse False
+[final rough] physics only 63.2 ms/step -> 64,856 env-steps/s
+[final rough] full env step 75.0 ms -> 54,608 env-steps/s
+[final rough] after random-action steps: nefc max 40 mean 14.9; nacon 11555 (2.82/world); overflow {'LS_ITERATIONS': 3817}
+[final rough] rollout + inference 84.8 ms/step -> 48,299 env-steps/s
+[final rough] PPO update 310 ms -> full loop 41,910 env-steps/s
+[final rough] SUMMARY physics 64,856 | step 54,608 | rollout 48,299 | loop 41,910  (ms: physics 63.2, step 75.0, rollout/step 84.8, update 310)
+[original settings (fork fusion off)] N=4096 njmax 256 naconmax 524288 is_sparse False
+[original settings (fork fusion off)] physics only 126.5 ms/step -> 32,389 env-steps/s
+[original settings (fork fusion off)] full env step 143.0 ms -> 28,652 env-steps/s
+[original settings (fork fusion off)] after random-action steps: nefc max 46 mean 14.9; nacon 11549 (2.82/world); overflow {'LS_ITERATIONS': 3795}
+[original settings (fork fusion off)] rollout + inference 157.2 ms/step -> 26,059 env-steps/s
+[original settings (fork fusion off)] PPO update 381 ms -> full loop 23,671 env-steps/s
+[original settings (fork fusion off)] SUMMARY physics 32,389 | step 28,652 | rollout 26,059 | loop 23,671  (ms: physics 126.5, step 143.0, rollout/step 157.2, update 381)
+[final flat repeat] N=4096 njmax 256 naconmax 131072 is_sparse False
+[final flat repeat] physics only 50.6 ms/step -> 80,885 env-steps/s
+[final flat repeat] full env step 60.6 ms -> 67,606 env-steps/s
+[final flat repeat] after random-action steps: nefc max 43 mean 15.1; nacon 11822 (2.89/world); overflow {'LS_ITERATIONS': 3838}
+[final flat repeat] rollout + inference 66.6 ms/step -> 61,510 env-steps/s
+[final flat repeat] PPO update 149 ms -> full loop 56,250 env-steps/s
+[final flat repeat] SUMMARY physics 80,885 | step 67,606 | rollout 61,510 | loop 56,250  (ms: physics 50.6, step 60.6, rollout/step 66.6, update 149)
+=== end Fri Sep 25 10:01:52 PDT 2026

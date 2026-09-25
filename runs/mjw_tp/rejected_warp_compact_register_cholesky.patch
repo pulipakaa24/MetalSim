@@ -1,0 +1,95 @@
+diff --git a/warp/native/tile_cholesky.h b/warp/native/tile_cholesky.h
+index b588dad..5fc02ef 100644
+--- a/warp/native/tile_cholesky.h
++++ b/warp/native/tile_cholesky.h
+@@ -92,19 +92,27 @@ namespace partitioned_gemm {
+ // barriers during the factorization, so a world's latency no longer depends on how many
+ // threadgroups fit in a core. The column loop is unrolled by template recursion so that every
+ // register-array index is a compile-time constant (dynamic indexing would spill to thread memory).
+-template <int J, int N, int CPL, int BD, typename T>
+-inline WP_FORCE_INLINE void metal_register_cholesky_step(thread T (&col)[CPL][N], int lane)
++//
++// Storage: a lane's c-th column (jc = lane + c*BD >= c*BD) only ever holds rows i >= c*BD, so column
++// slot c keeps N - c*BD rows in one flat register array (slot offsets metal_rc_off). For 32 < N <= 64
++// this is N + (N - 32) registers per lane instead of 2N (54 instead of 86 for N = 43), which keeps the
++// factor out of spilled thread memory. The arithmetic and its order are unchanged.
++constexpr int metal_rc_off(int c, int n, int bd) { return c * n - bd * c * (c - 1) / 2; }
++constexpr int metal_rc_idx(int c, int i, int n, int bd) { return metal_rc_off(c, n, bd) + (i >= c * bd ? i - c * bd : 0); }
++
++template <int J, int N, int CPL, int BD, int TOT, typename T>
++inline WP_FORCE_INLINE void metal_register_cholesky_step(thread T (&col)[TOT], int lane)
+ {
+     if constexpr (J < N) {
+         constexpr int owner = J % BD;
+         constexpr int cj = J / BD;
+         if (lane == owner) {
+-            const T d = wp::sqrt(col[cj][J]);
++            const T d = wp::sqrt(col[metal_rc_idx(cj, J, N, BD)]);
+             const T inv = T(1) / d;
+-            col[cj][J] = d;
++            col[metal_rc_idx(cj, J, N, BD)] = d;
+ #pragma clang loop unroll(full)
+             for (int i = J + 1; i < N; ++i)
+-                col[cj][i] *= inv;
++                col[metal_rc_idx(cj, i, N, BD)] *= inv;
+         }
+         T ljc[CPL];
+ #pragma clang loop unroll(full)
+@@ -112,17 +120,19 @@ inline WP_FORCE_INLINE void metal_register_cholesky_step(thread T (&col)[CPL][N]
+             ljc[c] = T {};
+ #pragma clang loop unroll(full)
+         for (int i = J; i < N; ++i) {
+-            const T lij = metal::simd_shuffle(col[cj][i], ushort(owner));
++            const T lij = metal::simd_shuffle(col[metal_rc_idx(cj, i, N, BD)], ushort(owner));
+ #pragma clang loop unroll(full)
+             for (int c = 0; c < CPL; ++c) {
++                if (i < c * BD)
++                    continue;  // compile-time after unrolling: rows above the slot's first row do not exist
+                 const int jc = lane + c * BD;
+                 if (i == jc)
+                     ljc[c] = lij;  // L[jc, J], reached before any row i > jc of column jc
+                 if (jc > J && i >= jc)
+-                    col[c][i] -= lij * ljc[c];
++                    col[metal_rc_idx(c, i, N, BD)] -= lij * ljc[c];
+             }
+         }
+-        metal_register_cholesky_step<J + 1, N, CPL, BD, T>(col, lane);
++        metal_register_cholesky_step<J + 1, N, CPL, BD, TOT, T>(col, lane);
+     }
+ }
+ 
+@@ -133,20 +143,21 @@ inline WP_FORCE_INLINE void metal_register_cholesky(TileA WP_THREAD& A, TileOut
+     constexpr int n = TileA::Layout::Shape::dim(1);
+     constexpr int BD = WP_TILE_BLOCK_DIM;
+     constexpr int CPL = (n + BD - 1) / BD;  // columns per lane
++    constexpr int TOT = metal_rc_off(CPL, n, BD);
+     const int lane = WP_TILE_THREAD_IDX;
+ 
+     auto idx = [](int row, int col) { return Upper ? tile_coord(col, row) : tile_coord(row, col); };
+ 
+-    T col[CPL][n];
++    T col[TOT];
+ #pragma clang loop unroll(full)
+     for (int c = 0; c < CPL; ++c) {
+         const int jc = lane + c * BD;
+ #pragma clang loop unroll(full)
+-        for (int i = 0; i < n; ++i)
+-            col[c][i] = (jc < n && i >= jc) ? (Upper ? A.data(tile_coord(jc, i)) : A.data(tile_coord(i, jc))) : T {};
++        for (int i = c * BD; i < n; ++i)
++            col[metal_rc_idx(c, i, n, BD)] = (jc < n && i >= jc) ? (Upper ? A.data(tile_coord(jc, i)) : A.data(tile_coord(i, jc))) : T {};
+     }
+ 
+-    metal_register_cholesky_step<0, n, CPL, BD, T>(col, lane);
++    metal_register_cholesky_step<0, n, CPL, BD, TOT, T>(col, lane);
+ 
+     WP_TILE_SYNC();  // in-place callers alias A and Out: all reads are done before any write
+ #pragma clang loop unroll(full)
+@@ -158,7 +169,7 @@ inline WP_FORCE_INLINE void metal_register_cholesky(TileA WP_THREAD& A, TileOut
+             // above it. Zeroing the mirrored cell instead would hit a column owned by another lane, and
+             // with more than one column per lane that zero lands after the owner wrote its value.
+             for (int i = 0; i < n; ++i)
+-                Out.data(idx(i, jc)) = (i >= jc) ? col[c][i] : T {};
++                Out.data(idx(i, jc)) = (i >= c * BD && i >= jc) ? col[metal_rc_idx(c, i, n, BD)] : T {};
+         }
+     }
+     WP_TILE_SYNC();
