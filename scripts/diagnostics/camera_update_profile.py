@@ -41,8 +41,8 @@ class StubEnv:
     obs_space = {"image": (H, W, 3), "qpos": (4,)}
 
 
-def make_ppo(seed=0):
-    cfg = PPOConfig(total_steps=0, rollout=T, epochs=EPOCHS, minibatches=MINIBATCHES, lr=1e-4, gamma=0.99, lam=0.95,
+def make_ppo(seed=0, fast=False, kernels=False):
+    cfg = PPOConfig(fast_update=fast, metal_conv_kernels=kernels, total_steps=0, rollout=T, epochs=EPOCHS, minibatches=MINIBATCHES, lr=1e-4, gamma=0.99, lam=0.95,
                     clip=0.2, ent_coef=0.0, vf_coef=1.0, max_grad_norm=1.0, desired_kl=0.008, clip_value=True, feat=512,
                     activation="elu", qpos_dim=0, center_images=True, value_norm=True, seed=seed)
     ppo = PPO(StubEnv(), cfg)
@@ -53,6 +53,7 @@ def make_ppo(seed=0):
     ppo.buf_v.copy_(torch.randn(ppo.buf_v.shape, generator=g))
     ppo.buf_r.copy_(torch.rand(ppo.buf_r.shape, generator=g))
     ppo.buf_done.copy_((torch.rand(ppo.buf_done.shape, generator=g) < 0.01).float())
+    ppo.buf_mean.copy_(ppo.net.image_mean(ppo.buf_img.reshape(-1, 3, H, W)).reshape(ppo.buf_mean.shape))
     torch.mps.synchronize()
     return ppo
 
@@ -75,6 +76,43 @@ def row(name, med, mn, per_update=None):
 
 
 # ------------------------------------------------------------------------------------------------ torch
+def _time_update(name, ppo, args):
+    adv, ret = ppo.gae(torch.zeros(N_ENVS, device="mps"))
+    t0 = time.perf_counter(); ppo.update(adv, ret); torch.mps.synchronize()
+    print(f"first update incl. compile: {time.perf_counter() - t0:.1f} s", flush=True)
+    med, mn = timeit(lambda: ppo.update(adv, ret), reps=args.update_reps, warmup=1)
+    print(f"{name:52s} median {med:8.3f} s  min {mn:8.3f} s  (implied {sps(med):,.0f} env-steps/s)", flush=True)
+
+
+def part_fast(args):
+    """Step 3a: PPOConfig(fast_update=True, metal_conv_kernels=False)."""
+    _time_update("PPO.update fast_update (3a)", make_ppo(fast=True, kernels=False), args)
+
+
+def part_fastk(args):
+    """Step 3b: PPOConfig(fast_update=True, metal_conv_kernels=True) (the shipped default)."""
+    _time_update("PPO.update fast_update + Metal kernels (3b)", make_ppo(fast=True, kernels=True), args)
+
+
+def part_kernels(args):
+    """Custom Metal kernels vs MPSGraph (aten.convolution_backward) on the exact minibatch shapes."""
+    from metalsim.learn.metal_conv import conv1_weight_grad, conv2_input_grad
+    mb = 2048
+    x1 = torch.randint(0, 256, (mb, 3, 100, 100), device="mps").float(); w1 = torch.randn(32, 3, 8, 8, device="mps") * 0.05
+    g1 = torch.randn(mb, 32, 24, 24, device="mps")
+    x2 = torch.randn(mb, 32, 24, 24, device="mps"); w2 = torch.randn(64, 32, 4, 4, device="mps") * 0.05
+    g2 = torch.randn(mb, 64, 11, 11, device="mps")
+    f1 = 2 * g1.numel() * 3 * 64; f2 = 2 * g2.numel() * 32 * 16
+    cb = torch.ops.aten.convolution_backward
+    for name, fn, fl in (
+            ("conv1 wgrad  MPSGraph", lambda: cb(g1, x1, w1, [32], [4, 4], [0, 0], [1, 1], False, [0, 0], 1, [False, True, False]), f1),
+            ("conv1 wgrad  Metal kernel", lambda: conv1_weight_grad(x1, g1), f1),
+            ("conv2 dgrad  MPSGraph", lambda: cb(g2, x2, w2, [64], [2, 2], [0, 0], [1, 1], False, [0, 0], 1, [True, False, False]), f2),
+            ("conv2 dgrad  Metal kernel", lambda: conv2_input_grad(g2, w2), f2)):
+        m = timeit(fn, 20)
+        row(f"{name} [{fl / m[0] / 1e12:5.2f} TF/s]", *m)
+
+
 def part_update(args):
     ppo = make_ppo()
     adv, ret = ppo.gae(torch.zeros(N_ENVS, device="mps"))
@@ -326,6 +364,98 @@ def part_updvar(args):
         med, mn = timeit(lambda: ppo.update(adv, ret), reps=3, warmup=1)
         print(f"{'PPO.update compiled-net=' + str(comp) + ' fusedAdam=' + str(fused):52s} median {med:8.3f} s  "
               f"min {mn:8.3f} s  (implied {sps(med):,.0f} env-steps/s)", flush=True)
+
+
+def part_c1var(args):
+    """conv1 weight-gradient kernel variants (samples per threadgroup SPT, column tiles per simdgroup JT)."""
+    from metalsim.learn.metal_conv import _conv1_weight_grad
+    mb = 2048
+    x1 = torch.randint(0, 256, (mb, 3, 100, 100), device="mps").float(); g1 = torch.randn(mb, 32, 24, 24, device="mps")
+    fl = 2 * g1.numel() * 3 * 64
+    cb = torch.ops.aten.convolution_backward
+    w1 = torch.randn(32, 3, 8, 8, device="mps")
+    ref = cb(g1, x1, w1, [32], [4, 4], [0, 0], [1, 1], False, [0, 0], 1, [False, True, False])[1]
+    for var in ("direct", "pf"):
+        for jt in (1, 2, 3):
+            for spt in (2, 4, 8):
+                out = _conv1_weight_grad(x1, g1, spt, jt, var)
+                err = ((out - ref).abs().max() / ref.abs().max()).item()
+                m = timeit(lambda: _conv1_weight_grad(x1, g1, spt, jt, var), 20)
+                row(f"conv1 wgrad {var} JT={jt} SPT={spt} [{fl / m[0] / 1e12:5.2f} TF/s] err {err:.0e}", *m)
+
+
+def part_c1s2d(args):
+    """conv1 weight gradient as a space-to-depth stride-1 k2 conv (48 channels) through MPSGraph."""
+    mb = 2048
+    x1 = torch.randint(0, 256, (mb, 3, 100, 100), device="mps").float(); g1 = torch.randn(mb, 32, 24, 24, device="mps")
+    w1 = torch.randn(32, 3, 8, 8, device="mps"); fl = 2 * g1.numel() * 3 * 64
+    cb = torch.ops.aten.convolution_backward
+    xs = s2d(x1, 4).contiguous(); ws = torch.randn(32, 48, 2, 2, device="mps")
+    ref = cb(g1, x1, w1, [32], [4, 4], [0, 0], [1, 1], False, [0, 0], 1, [False, True, False])[1]
+    got = cb(g1, xs, ws, [32], [1, 1], [0, 0], [1, 1], False, [0, 0], 1, [False, True, False])[1]
+    back = got.view(32, 3, 4, 4, 2, 2).permute(0, 1, 4, 2, 5, 3).reshape(32, 3, 8, 8)
+    print(f"s2d wgrad err {((back - ref).abs().max() / ref.abs().max()).item():.1e}", flush=True)
+    m = timeit(lambda: s2d(x1, 4).contiguous(), 20); row("space-to-depth copy of x", *m)
+    m = timeit(lambda: cb(g1, xs, ws, [32], [1, 1], [0, 0], [1, 1], False, [0, 0], 1, [False, True, False]), 20)
+    row(f"conv1 wgrad as s2d k2 s1 C=48, MPSGraph [{fl / m[0] / 1e12:5.2f} TF/s]", *m)
+    xs_cl = xs.contiguous(memory_format=torch.channels_last); g_cl = g1.contiguous(memory_format=torch.channels_last)
+    m = timeit(lambda: cb(g_cl, xs_cl, ws, [32], [1, 1], [0, 0], [1, 1], False, [0, 0], 1, [False, True, False]), 20)
+    row(f"  same, channels_last inputs [{fl / m[0] / 1e12:5.2f} TF/s]", *m)
+    # as 4 GEMMs: dW'[:, :, ty, tx] = gy (32 x N*576) @ x'_shift (N*576 x 48)
+    gyt = g1.permute(1, 0, 2, 3).reshape(32, -1)
+
+    def gemm4():
+        xt = xs.permute(0, 2, 3, 1)
+        return [gyt @ xt[:, ty:ty + 24, tx:tx + 24, :].reshape(-1, 48) for ty in (0, 1) for tx in (0, 1)]
+    m = timeit(gemm4, 20); row(f"conv1 wgrad as 4 shifted GEMMs (incl. copies) [{fl / m[0] / 1e12:5.2f} TF/s]", *m)
+
+
+def part_fastsplit(args):
+    """Per-minibatch split of the fast path (with and without the Metal kernels)."""
+    from metalsim.learn.ppo import clip_grad_norm_fast
+    for kern in (False, True):
+        ppo = make_ppo(fast=True, kernels=kern)
+        N = T * N_ENVS
+        img = ppo.buf_img.reshape(N, 3, H, W); im = ppo.buf_mean.reshape(N, 3)
+        idx = torch.randperm(N, device="mps")[:2048]
+        g = torch.Generator().manual_seed(1)
+        a, lo, adv, ret, vo = (torch.randn(2048, *s_, generator=g).to("mps") for s_ in ((1,), (), (), (), ()))
+        q = ppo.buf_q.reshape(N, -1)
+        P = ppo._params
+        tag = "kernels" if kern else "no kernels"
+        m = timeit(lambda: ppo._mb_loss_c(img[idx], q[idx], im[idx], a, lo, adv, ret, vo), 20); row(f"[{tag}] gather + compiled fwd/loss", *m, 128 * m[0])
+
+        def fb():
+            ppo.opt.zero_grad(set_to_none=True)
+            ppo._mb_loss_c(img[idx], q[idx], im[idx], a, lo, adv, ret, vo)[0].backward()
+        m = timeit(fb, 20); row(f"[{tag}] + backward", *m, 128 * m[0])
+        m = timeit(lambda: clip_grad_norm_fast(P, 1.0), 20); row(f"[{tag}] clip (compiled)", *m, 128 * m[0])
+        m = timeit(ppo.opt.step, 20); row(f"[{tag}] Adam fused step", *m, 128 * m[0])
+
+        def full():
+            fb(); clip_grad_norm_fast(P, 1.0); ppo.opt.step()
+        m = timeit(full, 20); row(f"[{tag}] full minibatch", *m, 128 * m[0])
+
+        def full_sync():
+            ppo.opt.zero_grad(set_to_none=True)
+            loss, pg, vf, logp = ppo._mb_loss_c(img[idx], q[idx], im[idx], a, lo, adv, ret, vo)
+            (lo - logp).mean().item(); loss.backward(); clip_grad_norm_fast(P, 1.0); ppo.opt.step()
+        m = timeit(full_sync, 20); row(f"[{tag}] full minibatch with KL .item()", *m, 128 * m[0])
+
+
+def part_optvar(args):
+    """Optimizer-step variants: clip alone, Adam alone (foreach / fused), compiled clip+Adam."""
+    ppo = make_ppo()
+    img, idx, x, a, lo, adv, ret, vo = mb_data(ppo)
+    params = list(ppo.net.parameters())
+    ppo.opt.zero_grad(set_to_none=True); loss_fn(ppo, x, a, lo, adv, ret, vo).backward()
+    print("param count", sum(p.numel() for p in params), flush=True)
+    m = timeit(lambda: torch.nn.utils.clip_grad_norm_(params, 1.0), 20); row("clip_grad_norm_ alone", *m, 128 * m[0])
+    from metalsim.learn.ppo import clip_grad_norm_fast
+    m = timeit(lambda: clip_grad_norm_fast(params, 1.0), 20); row("clip_grad_norm_fast (compiled)", *m, 128 * m[0])
+    for kw in ({"foreach": False}, {"fused": True}):
+        opt = torch.optim.Adam(params, lr=1e-4, eps=1e-5, **kw)
+        m = timeit(opt.step, 20); row(f"Adam.step {kw}", *m, 128 * m[0])
 
 
 def part_compile(args):

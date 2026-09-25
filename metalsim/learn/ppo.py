@@ -18,6 +18,29 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+def _clip_grad_norm(grads, max_norm: float):
+    total = torch.sqrt(sum((g * g).sum() for g in grads))
+    coef = (max_norm / (total + 1e-6)).clamp(max=1.0)
+    for g in grads:
+        g.mul_(coef)
+    return total
+
+
+_clip_compiled = None
+
+
+def clip_grad_norm_fast(params, max_norm):
+    """nn.utils.clip_grad_norm_ (same formula) as one compiled graph: on MPS the stock version costs ~4 ms per call
+    for this 2.7M-parameter net (a per-tensor norm, stack, and per-tensor scale; foreach is unsupported on MPS)."""
+    global _clip_compiled
+    grads = [p.grad for p in params if p.grad is not None]
+    if grads[0].device.type != "mps":
+        return nn.utils.clip_grad_norm_(params, max_norm)
+    if _clip_compiled is None:
+        _clip_compiled = torch.compile(_clip_grad_norm, dynamic=False)
+    return _clip_compiled(grads, float(max_norm))
+
+
 @dataclass
 class PPOConfig:
     total_steps: int = 1_000_000
@@ -41,6 +64,15 @@ class PPOConfig:
     qpos_dim: int | None = None         # None: from env.obs_space["qpos"]; 0: image-only policy (Isaac's camera cartpole)
     center_images: bool = False         # subtract the per-image mean (Isaac's camera cartpole observation)
     value_norm: bool = False            # skrl RunningStandardScaler on value targets
+    # MPS update fast path (same math): per-image means computed once per rollout step (flattened-view reduction),
+    # uint8 -> centered float as one fused elementwise pass, minibatch loss under torch.compile, compiled grad-norm
+    # clip (the stock one costs 4 ms per call on MPS), fused Adam.
+    # Measured update (M4 Max, Isaac camera-cartpole config): 7.2 s plain -> 5.2 s fast_update -> 3.9 s with
+    # metal_conv_kernels; see docs/research/metal_cnn_update_2026-09-24.md.
+    fast_update: bool = True
+    # with fast_update: custom Metal kernels (metalsim/learn/metal_conv.py) for conv1's weight gradient and conv2's
+    # input gradient, the two ops MPSGraph runs at 1.6 / 2.5 TFLOP/s (Isaac camera-cartpole shapes only; else aten)
+    metal_conv_kernels: bool = True
 
 
 class NatureCNN(nn.Module):
@@ -56,9 +88,29 @@ class NatureCNN(nn.Module):
             n = self.conv(torch.zeros(1, in_ch, *image_hw)).shape[1]
         act = nn.ELU() if activation == "elu" else nn.ReLU()
         self.fc = nn.Sequential(nn.Linear(n, feat), act)
+        self.metal_kernels = False      # set by PPO (fast_update + metal_conv_kernels)
 
     def forward(self, x):
         return self.fc(self.conv(x))
+
+    def forward_u8(self, x_u8, mean=None):
+        """forward((x_u8/255) - mean[:, :, None, None]) from uint8 with a precomputed mean (None: no centering).
+
+        The conversion, centering and scale are one elementwise expression (one fused kernel under torch.compile).
+        Folding the centering into conv1 instead (conv(x, W/255) + b - m @ sum_hw W) is exact algebra but costs fp32
+        precision through cancellation: conv1 weight-gradient error vs fp64 3e-5 instead of 4e-6 (CPU, measured)."""
+        c1, c2 = self.conv[0], self.conv[2]
+        if self.metal_kernels:
+            from metalsim.learn import metal_conv as mc
+            conv1, conv2 = mc.conv1, mc.conv2
+        else:
+            conv1 = conv2 = lambda x, w, b, s: F.conv2d(x, w, b, stride=s)
+        if mean is not None:
+            x = (x_u8.float() - mean[:, :, None, None] * 255.0) * (1.0 / 255.0)
+        else:
+            x = x_u8.float() * (1.0 / 255.0)
+        y = conv2(F.relu(conv1(x, c1.weight, c1.bias, c1.stride[0])), c2.weight, c2.bias, c2.stride[0])
+        return self.fc(self.conv[3:](y))
 
 
 class ActorCritic(nn.Module):
@@ -77,6 +129,25 @@ class ActorCritic(nn.Module):
             self.pi = nn.Linear(feat, act_dim)
             self.v = nn.Linear(feat, 1)
         self.log_std = nn.Parameter(torch.zeros(act_dim))
+
+    @staticmethod
+    def image_mean(image_u8_nchw):
+        """Per-image, per-channel mean of an (N,3,H,W) uint8 image in [0,1] units, over a flattened HW view."""
+        n, c = image_u8_nchw.shape[:2]
+        return image_u8_nchw.reshape(n, c, -1).float().mean(-1) * (1.0 / 255.0)
+
+    def features_fast(self, image_u8_nchw, qpos, mean=None):
+        """Fast-path features from contiguous (N,3,H,W) uint8; mean = image_mean(image) (computed here if None)."""
+        if self.center_images and mean is None:
+            mean = self.image_mean(image_u8_nchw)
+        f = self.cnn.forward_u8(image_u8_nchw, mean if self.center_images else None)
+        if self.qpos_dim > 0:
+            f = torch.cat([f, self.qpos(qpos)], dim=1)
+        return f
+
+    def forward_fast(self, image_u8_nchw, qpos, mean=None):
+        h = self.features_fast(image_u8_nchw, qpos, mean)
+        return self.pi(h), self.v(h).squeeze(-1)
 
     def features(self, image_u8, qpos, nchw=False):
         """image_u8: (N,H,W,3) uint8 (renderer layout) or, with nchw=True, (N,3,H,W) uint8.
@@ -122,11 +193,17 @@ class PPO:
         self.qdim = qdim
         self.net = ActorCritic(env.act_dim, qpos_dim=qdim, feat=self.cfg.feat, image_hw=(H, W), activation=self.cfg.activation,
                                center_images=self.cfg.center_images).to(self.dev)
+        self._params = list(self.net.parameters())
+        self.net.cnn.metal_kernels = bool(self.cfg.fast_update and self.cfg.metal_conv_kernels and self.dev.type == "mps")
         self.ret_mean, self.ret_var, self.ret_count = 0.0, 1.0, 1e-4      # running scaler for value targets
-        self.opt = torch.optim.Adam(self.net.parameters(), lr=self.cfg.lr, eps=1e-5)
+        fused = self.cfg.fast_update and self.dev.type in ("mps", "cuda")
+        self.opt = torch.optim.Adam(self.net.parameters(), lr=self.cfg.lr, eps=1e-5, fused=fused)
         self.lr = self.cfg.lr
         n, T = env.n, self.cfg.rollout
         self.buf_img = torch.zeros((T, n, C, H, W), dtype=torch.uint8, device=self.dev)   # NCHW, contiguous
+        self.buf_mean = torch.zeros((T, n, C), device=self.dev)       # per-image channel means (fast_update)
+        self._mb_loss_c = torch.compile(self._mb_loss, dynamic=False) if (self.cfg.fast_update and self.dev.type == "mps") \
+            else self._mb_loss
         self.buf_q = torch.zeros((T, n, max(qdim, 1)), device=self.dev)
         self.buf_a = torch.zeros((T, n, env.act_dim), device=self.dev)
         self.buf_logp = torch.zeros((T, n), device=self.dev)
@@ -147,7 +224,11 @@ class PPO:
                 self.buf_img[t].copy_(img.permute(0, 3, 1, 2))
                 if self.qdim > 0:
                     self.buf_q[t].copy_(q)
-                mean, v = self.net(img, q)
+                if cfg.fast_update:
+                    self.buf_mean[t] = self.net.image_mean(self.buf_img[t])
+                    mean, v = self.net.forward_fast(self.buf_img[t], q, self.buf_mean[t])
+                else:
+                    mean, v = self.net(img, q)
                 d = self.net.dist(mean)
                 a = d.sample()
                 self.buf_a[t] = a
@@ -192,11 +273,30 @@ class PPO:
             adv[t] = gae
         return adv, adv + self.buf_v
 
+    def _mb_loss(self, img, q, img_mean, a, logp_old, adv, ret, v_old):
+        """PPO minibatch loss (fast path). Returns loss, pg, vf, logp."""
+        cfg = self.cfg
+        mean, v = self.net.forward_fast(img, q, img_mean)
+        d = self.net.dist(mean)
+        logp = d.log_prob(a).sum(-1)
+        ratio = (logp - logp_old).exp()
+        pg = -torch.min(ratio * adv, ratio.clamp(1 - cfg.clip, 1 + cfg.clip) * adv).mean()
+        if cfg.clip_value:
+            v_c = v_old + (v - v_old).clamp(-cfg.clip, cfg.clip)
+            vf = torch.max((v - ret) ** 2, (v_c - ret) ** 2).mean()
+        else:
+            vf = F.mse_loss(v, ret)
+        loss = pg + cfg.vf_coef * vf
+        if cfg.ent_coef != 0.0:
+            loss = loss - cfg.ent_coef * d.entropy().sum(-1).mean()
+        return loss, pg, vf, logp
+
     def update(self, adv, ret):
         cfg = self.cfg
         T, n = cfg.rollout, self.env.n
         N = T * n
         img = self.buf_img.reshape(N, *self.buf_img.shape[2:])
+        img_mean = self.buf_mean.reshape(N, -1)
         q = self.buf_q.reshape(N, -1); a = self.buf_a.reshape(N, -1)
         logp_old = self.buf_logp.reshape(N); adv = adv.reshape(N); ret = ret.reshape(N); v_buf = self.buf_v.reshape(N).clone()
         adv = (adv - adv.mean()) / (adv.std() + 1e-8)
@@ -213,18 +313,22 @@ class PPO:
             perm = torch.randperm(N, device=self.dev)
             for i in range(cfg.minibatches):
                 idx = perm[i * mb:(i + 1) * mb]
-                mean, v = self.net(img[idx], q[idx], nchw=True)
-                d = self.net.dist(mean)
-                logp = d.log_prob(a[idx]).sum(-1)
-                ratio = (logp - logp_old[idx]).exp()
-                pg = -torch.min(ratio * adv[idx], ratio.clamp(1 - cfg.clip, 1 + cfg.clip) * adv[idx]).mean()
-                if cfg.clip_value:
-                    v_old = v_buf[idx]; v_c = v_old + (v - v_old).clamp(-cfg.clip, cfg.clip)
-                    vf = torch.max((v - ret[idx]) ** 2, (v_c - ret[idx]) ** 2).mean()
+                if cfg.fast_update:
+                    loss, pg, vf, logp = self._mb_loss_c(img[idx], q[idx], img_mean[idx], a[idx], logp_old[idx],
+                                                         adv[idx], ret[idx], v_buf[idx])
                 else:
-                    vf = F.mse_loss(v, ret[idx])
-                ent = d.entropy().sum(-1).mean()
-                loss = pg + cfg.vf_coef * vf - cfg.ent_coef * ent
+                    mean, v = self.net(img[idx], q[idx], nchw=True)
+                    d = self.net.dist(mean)
+                    logp = d.log_prob(a[idx]).sum(-1)
+                    ratio = (logp - logp_old[idx]).exp()
+                    pg = -torch.min(ratio * adv[idx], ratio.clamp(1 - cfg.clip, 1 + cfg.clip) * adv[idx]).mean()
+                    if cfg.clip_value:
+                        v_old = v_buf[idx]; v_c = v_old + (v - v_old).clamp(-cfg.clip, cfg.clip)
+                        vf = torch.max((v - ret[idx]) ** 2, (v_c - ret[idx]) ** 2).mean()
+                    else:
+                        vf = F.mse_loss(v, ret[idx])
+                    ent = d.entropy().sum(-1).mean()
+                    loss = pg + cfg.vf_coef * vf - cfg.ent_coef * ent
                 if cfg.desired_kl is not None:
                     with torch.no_grad():
                         kl_now = (logp_old[idx] - logp).mean().item()
@@ -236,7 +340,10 @@ class PPO:
                         g["lr"] = self.lr
                 self.opt.zero_grad(set_to_none=True)
                 loss.backward()
-                nn.utils.clip_grad_norm_(self.net.parameters(), cfg.max_grad_norm)
+                if cfg.fast_update:
+                    clip_grad_norm_fast(self._params, cfg.max_grad_norm)
+                else:
+                    nn.utils.clip_grad_norm_(self.net.parameters(), cfg.max_grad_norm)
                 self.opt.step()
                 stats["pg"] += pg.detach(); stats["vf"] += vf.detach()
                 stats["kl"] += (logp_old[idx] - logp).mean().detach()

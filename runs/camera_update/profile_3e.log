@@ -1,0 +1,66 @@
+holder: {"name": "camera_update_3e", "kind": "timing", "minutes": 5.0, "pid": 69937, "start": 1790315321.517944}
+.....FFFFFF
+=================================== FAILURES ===================================
+E   TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.
+/Users/aditya/robosim/tests/test_camera_update_fast.py:55: TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.
+E   TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.
+/Users/aditya/robosim/tests/test_camera_update_fast.py:55: TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.
+E   TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.
+/Users/aditya/robosim/tests/test_camera_update_fast.py:55: TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.
+E   TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.
+/Users/aditya/robosim/tests/test_camera_update_fast.py:55: TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.
+E   TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.
+/Users/aditya/robosim/tests/test_camera_update_fast.py:55: TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.
+E   TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.
+/Users/aditya/robosim/tests/test_camera_update_fast.py:55: TypeError: Cannot convert a MPS Tensor to float64 dtype as the MPS framework doesn't support float64. Please use float32 instead.
+=========================== short test summary info ============================
+FAILED tests/test_camera_update_fast.py::test_fast_update_matches_plain[0-True-100-False]
+FAILED tests/test_camera_update_fast.py::test_fast_update_matches_plain[0-True-100-True]
+FAILED tests/test_camera_update_fast.py::test_fast_update_matches_plain[4-False-100-False]
+FAILED tests/test_camera_update_fast.py::test_fast_update_matches_plain[4-False-100-True]
+FAILED tests/test_camera_update_fast.py::test_fast_update_matches_plain[4-True-64-False]
+FAILED tests/test_camera_update_fast.py::test_fast_update_matches_plain[4-True-64-True]
+6 failed, 5 passed in 5.19s
+torch 2.14.0
+gpu_lock status: holder: {"name": "camera_update_3e", "kind": "timing", "minutes": 5.0, "pid": 69937, "start": 1790315321.517944}
+==== c1var
+conv1 wgrad direct JT=1 SPT=2 [ 8.04 TF/s] err 6e-06 median     1.80 ms  min     1.78 ms
+conv1 wgrad direct JT=1 SPT=4 [ 7.85 TF/s] err 6e-06 median     1.85 ms  min     1.80 ms
+conv1 wgrad direct JT=1 SPT=8 [ 6.54 TF/s] err 5e-06 median     2.22 ms  min     2.17 ms
+conv1 wgrad direct JT=2 SPT=2 [ 8.83 TF/s] err 6e-06 median     1.64 ms  min     1.63 ms
+conv1 wgrad direct JT=2 SPT=4 [ 9.33 TF/s] err 6e-06 median     1.55 ms  min     1.54 ms
+conv1 wgrad direct JT=2 SPT=8 [ 8.41 TF/s] err 5e-06 median     1.72 ms  min     1.70 ms
+conv1 wgrad direct JT=3 SPT=2 [ 2.18 TF/s] err 6e-06 median     6.66 ms  min     6.47 ms
+conv1 wgrad direct JT=3 SPT=4 [ 2.42 TF/s] err 6e-06 median     5.98 ms  min     5.78 ms
+conv1 wgrad direct JT=3 SPT=8 [ 2.27 TF/s] err 5e-06 median     6.40 ms  min     6.17 ms
+conv1 wgrad pf JT=1 SPT=2 [ 2.92 TF/s] err 6e-06     median     4.96 ms  min     4.92 ms
+conv1 wgrad pf JT=1 SPT=4 [ 3.02 TF/s] err 6e-06     median     4.80 ms  min     4.78 ms
+conv1 wgrad pf JT=1 SPT=8 [ 2.85 TF/s] err 5e-06     median     5.08 ms  min     5.07 ms
+conv1 wgrad pf JT=2 SPT=2 [ 4.55 TF/s] err 6e-06     median     3.19 ms  min     3.18 ms
+conv1 wgrad pf JT=2 SPT=4 [ 4.79 TF/s] err 6e-06     median     3.03 ms  min     3.01 ms
+conv1 wgrad pf JT=2 SPT=8 [ 4.56 TF/s] err 5e-06     median     3.18 ms  min     3.17 ms
+conv1 wgrad pf JT=3 SPT=2 [ 2.21 TF/s] err 6e-06     median     6.56 ms  min     6.35 ms
+conv1 wgrad pf JT=3 SPT=4 [ 2.42 TF/s] err 6e-06     median     6.00 ms  min     5.70 ms
+conv1 wgrad pf JT=3 SPT=8 [ 2.37 TF/s] err 5e-06     median     6.11 ms  min     5.58 ms
+gpu_lock status: holder: {"name": "camera_update_3e", "kind": "timing", "minutes": 5.0, "pid": 69937, "start": 1790315321.517944}
+==== fastsplit
+[no kernels] gather + compiled fwd/loss              median    12.19 ms  min    11.98 ms  -> x128 =   1.56 s/update  (implied  22,138 env-steps/s)
+[no kernels] + backward                              median    35.72 ms  min    35.22 ms  -> x128 =   4.57 s/update  (implied  10,974 env-steps/s)
+[no kernels] clip (compiled)                         median     0.26 ms  min     0.24 ms  -> x128 =   0.03 s/update  (implied  45,713 env-steps/s)
+[no kernels] Adam fused step                         median     0.71 ms  min     0.69 ms  -> x128 =   0.09 s/update  (implied  43,945 env-steps/s)
+[no kernels] full minibatch                          median    36.16 ms  min    35.77 ms  -> x128 =   4.63 s/update  (implied  10,872 env-steps/s)
+[no kernels] full minibatch with KL .item()          median    36.74 ms  min    36.28 ms  -> x128 =   4.70 s/update  (implied  10,739 env-steps/s)
+[kernels] gather + compiled fwd/loss                 median    12.18 ms  min    12.13 ms  -> x128 =   1.56 s/update  (implied  22,148 env-steps/s)
+[kernels] + backward                                 median    33.17 ms  min    32.74 ms  -> x128 =   4.25 s/update  (implied  11,608 env-steps/s)
+[kernels] clip (compiled)                            median     0.26 ms  min     0.25 ms  -> x128 =   0.03 s/update  (implied  45,732 env-steps/s)
+[kernels] Adam fused step                            median     0.73 ms  min     0.72 ms  -> x128 =   0.09 s/update  (implied  43,870 env-steps/s)
+[kernels] full minibatch                             median    33.81 ms  min    33.44 ms  -> x128 =   4.33 s/update  (implied  11,442 env-steps/s)
+[kernels] full minibatch with KL .item()             median    34.30 ms  min    33.75 ms  -> x128 =   4.39 s/update  (implied  11,319 env-steps/s)
+gpu_lock status: holder: {"name": "camera_update_3e", "kind": "timing", "minutes": 5.0, "pid": 69937, "start": 1790315321.517944}
+==== fast
+first update incl. compile: 4.7 s
+PPO.update fast_update (3a)                          median    4.709 s  min    4.687 s  (implied 10,728 env-steps/s)
+gpu_lock status: holder: {"name": "camera_update_3e", "kind": "timing", "minutes": 5.0, "pid": 69937, "start": 1790315321.517944}
+==== fastk
+first update incl. compile: 4.4 s
+PPO.update fast_update + Metal kernels (3b)          median    4.361 s  min    4.350 s  (implied 11,376 env-steps/s)

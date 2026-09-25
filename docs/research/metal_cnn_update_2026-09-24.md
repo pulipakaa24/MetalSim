@@ -209,3 +209,67 @@ Criterion from the brief: implement only if ≥ 1.5× on the update while PPO st
 
 Estimated best achievable within this design: update ≈ 4 s, i.e. ≈ 12K env-steps/s including training
 (vs 8.1K measured now, 32K Isaac/4090). Beyond that the floor is ≈ 1.7–2.0 s from the arithmetic in §0.
+
+## 6. Step 3: what was implemented, and the result [measured]
+
+Decision taken: option 2, then option 3 (no MLX wrapper). Code: `metalsim/learn/ppo.py`
+(`PPOConfig.fast_update`, `PPOConfig.metal_conv_kernels`, both default on; the plain path is unchanged
+behind `fast_update=False`), `metalsim/learn/metal_conv.py` (kernels). Tests: `tests/test_metal_conv.py`,
+`tests/test_camera_update_fast.py` (11 pass). Logs: runs/camera_update/profile_3*.log, profile_final.log.
+
+**3a — fast update path** (same math): per-image channel means computed once per rollout step over a
+flattened view (0.6 ms vs 3.8 ms for `mean(dim=(2,3))`) and stored with the rollout; uint8 → centered
+float in one expression (one fused kernel under compile); the minibatch loss (forward, distribution,
+clipped policy and value loss) under `torch.compile(dynamic=False)`; grad-norm clipping as one compiled
+graph; fused Adam. Two measured surprises: `nn.utils.clip_grad_norm_` costs 4.1–4.3 ms per call on MPS
+for this 2.7 M-parameter net (foreach is not supported on MPS) vs 0.26 ms compiled — worth more than the
+preprocessing fix; and folding the centering into conv1's bias (as first proposed) is exact algebra but
+loses fp32 precision through cancellation (conv1 weight-gradient error vs fp64 3e-5 instead of 4e-6,
+CPU), so the centering is an explicit fused pass instead.
+
+**3b — two Metal kernels** via `torch.mps.compile_shader`, each a `torch.autograd.Function` (forward
+= `F.conv2d`, backward swaps in the kernel for that one gradient) whose kernel entry is a
+`torch.library.custom_op`, so it sits inside the compiled region:
+
+| op (minibatch 2048, fp32) | MPSGraph | Metal kernel | speed-up |
+|---|---|---|---|
+| conv1 weight gradient (3→32, k8 s4) | 6.1–8.9 ms, 1.6–2.4 TFLOP/s | 1.55–1.69 ms, 8.6–9.3 TFLOP/s | 3.6–5.3× |
+| conv2 input gradient (32→64, k4 s2) | 6.5–6.9 ms, 2.4–2.5 TFLOP/s | 2.8–2.9 ms, 5.5–5.7 TFLOP/s | 2.3× |
+
+- conv1 wgrad: split-K GEMM (32 × 192 output, reduction over N·576 positions). For fixed
+  (n, c, kh, oh) the im2col block over 8 consecutive ow × 8 kw is an 8×8 matrix with row stride 4, read
+  directly with `simdgroup_load` (no im2col buffer, no threadgroup memory); 12 simdgroups per
+  threadgroup each own 2 column tiles × 4 row tiles, 4 samples per threadgroup, then a partial-sum
+  reduction. The sweep that picked this (runs/camera_update/profile_3e.log): 3 column tiles per
+  simdgroup runs at 2.4 TFLOP/s (register spill), 2 at 9.3; staging through threadgroup memory
+  (1.4–1.7) and software pipelining (3.0–4.8) were both slower than the direct loads.
+- conv2 dgrad: per input parity (py, px), a stride-1 2×2 correlation with a sub-kernel; with the output
+  gradient zero-padded to 13×13 the A tile (8 positions × 8 channels) is a transposed `simdgroup_load`
+  straight from memory; four (N·156 × 256)·(256 × 32) GEMMs, output scattered to the stride-2 pixels.
+- Accuracy: kernels vs PyTorch's MPS gradients ≤ 1e-4 (max-abs relative) on random data, including
+  a ragged batch (37). End-to-end, the exact reference is fp64 on the CPU: PyTorch's own fp32 MPS path
+  is 4e-4 off on conv1's weight/bias gradient (cancellation over zero-mean centered pixels) and 2e-4 on
+  conv2's weight gradient; the fast path is 4e-4 / 8e-7 — never less accurate than PyTorch's, and within
+  1e-4 of PyTorch's gradient everywhere PyTorch is within 1e-4 of exact (that is what the test asserts).
+
+**Update time** (same process, same random buffers, 5 reps each, median;
+`--parts update,fast,fastk,update --update-reps 5`):
+
+| variant | update (s) | vs plain | implied env-steps/s (1.4 s rollout) |
+|---|---|---|---|
+| plain (fast_update=False), bracketing runs | 7.18 / 7.13 | 1.00× | 7,636 / 7,686 |
+| 3a: fast_update, no kernels | 5.23 | 1.37× | 9,880 |
+| 3b: fast_update + Metal kernels (shipped default) | 3.86 | 1.86× | 12,460 |
+| hardware floor, §0 (estimated) | 1.7–2.0 | 3.6–4.2× | 19,000–20,000 |
+
+The plain update measured 6.67–6.71 s earlier in the day and 7.13–7.20 s in the later runs (the
+machine had been under continuous GPU load; the lock was held in every run). The ratios are therefore
+taken within one process. In the final run another agent's process
+(scripts/diagnostics/newton_transfer.py) was running outside the queue; the numbers match the
+clean run just before it (runs/camera_update/profile_3f.log: 7.20 / 5.20 / 3.86 s).
+
+Where the 3.9 s goes now (per minibatch, runs/camera_update/profile_3e.log with the earlier conv1
+kernel, adjusted): gather + compiled forward ≈ 12 ms, backward ≈ 17 ms (conv2 and conv3 weight
+gradients through MPSGraph at 3.3–3.8 TFLOP/s ≈ 8 ms are now the largest single items), clip + Adam
+≈ 1 ms. Remaining gap to the floor: those two MPSGraph weight gradients, conv1's forward at 4 TFLOP/s,
+and the uint8 gather (3 ms).

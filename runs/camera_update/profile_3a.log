@@ -1,0 +1,45 @@
+holder: {"name": "camera_update_3a", "kind": "timing", "minutes": 8.0, "pid": 60948, "start": 1790312627.856519}
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:graph.py:3137 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2402 
+DEBUG    torch.__trace:compile_fx.py:1272 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2022
+=========================== short test summary info ============================
+FAILED tests/test_camera_update_fast.py::test_fast_update_matches_plain[0-True-100-False]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 5 passed in 4.74s
+torch 2.14.0
+gpu_lock status: holder: {"name": "camera_update_3a", "kind": "timing", "minutes": 8.0, "pid": 60948, "start": 1790312627.856519}
+==== kernels
+conv1 wgrad  MPSGraph [ 2.23 TF/s]                   median     6.49 ms  min     5.87 ms
+conv1 wgrad  Metal kernel [ 1.53 TF/s]               median     9.50 ms  min     9.29 ms
+conv2 dgrad  MPSGraph [ 2.52 TF/s]                   median     6.46 ms  min     6.42 ms
+conv2 dgrad  Metal kernel [ 3.95 TF/s]               median     4.11 ms  min     4.09 ms
+gpu_lock status: holder: {"name": "camera_update_3a", "kind": "timing", "minutes": 8.0, "pid": 60948, "start": 1790312627.856519}
+==== update
+PPO.update (4 epochs x 32 mb of 2048), fp32          median    6.713 s  min    6.703 s  (implied 8,078 env-steps/s)
+gpu_lock status: holder: {"name": "camera_update_3a", "kind": "timing", "minutes": 8.0, "pid": 60948, "start": 1790312627.856519}
+==== fast
+W0924 22:04:29.550000 60976 torch/_inductor/utils.py:1806] [0/0] Not enough SMs to use max_autotune_gemm mode
+first update incl. compile: 6.8 s
+PPO.update fast_update (3a)                          median    5.237 s  min    5.208 s  (implied 9,874 env-steps/s)
+gpu_lock status: holder: {"name": "camera_update_3a", "kind": "timing", "minutes": 8.0, "pid": 60948, "start": 1790312627.856519}
+==== fastk
+first update incl. compile: 6.1 s
+PPO.update fast_update + Metal kernels (3b)          median    5.403 s  min    5.387 s  (implied 9,634 env-steps/s)
