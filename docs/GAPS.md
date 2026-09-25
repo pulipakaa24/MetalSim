@@ -80,6 +80,26 @@ agent time is spent on it unless MuJoCo Warp's contact work fails to close the i
 | Newton API churn (alpha) | low | pin the version (1.7.0.dev) |
 | Importer copies the USD's gravity 0 | low | set gravity explicitly (done in `g1_builder`) |
 
+## Reference version (corrected 2026-09-25)
+
+Isaac Lab 3.0 is **released** as Early Access (v3.0.0-EA, 2026-09-16; Isaac Sim 6.1, Python 3.12,
+PyTorch 2.11, Warp 1.16, Newton 1.5.2), after 3.0.0-beta (March) and beta2 (June) on Isaac Sim 6.0.
+Earlier text in these documents that described Isaac Lab 3.0 and its Newton backend as future was
+wrong. What the release provides (from its release notes and the Newton-integration docs): a
+multi-backend architecture selected per task (`physics=isaacsim_physx`, `physics=ovphysx`,
+`physics=newton_mjwarp`), Newton with MuJoCo-Warp as the primary solver plus VBD, MPM, Kamino and
+coupled rigid/deformable/MPM workflows, "expanded support for deformables, cables, and particle
+systems"; the Newton integration is marked under active development with a limited set of classic RL
+and flat-terrain locomotion examples and cross-backend policy transfer (Newton ↔ PhysX) used as its
+own validation. Isaac Sim 6.0 removed the old PhysX cloth API and introduced `DeformablePrim`
+(surface/mesh and volume/tet). Consequences: (1) every reference in PARITY.md so far is against
+Isaac Sim 5.1 + Isaac Lab 2.3.2 (PhysX) and is labelled as such; (2) an Isaac Sim 6.1 + Isaac Lab
+3.0-EA environment is being built on the VM to re-record the G1 references on both backends, so
+MetalSim's MuJoCo Warp is compared like for like against Isaac's own MuJoCo-Warp on NVIDIA hardware
+(same solver, different hardware) and against PhysX; (3) for deformables the current-release
+formulation under Newton is VBD with coupling, so making VBD run on the Metal Warp fork is the
+priority over porting PhysX's solvers; PhysX's `DeformablePrim` remains the PhysX-backend reference.
+
 ## Engine position (2026-09-24, after the measurements)
 
 MuJoCo Warp is the parity engine, not a stopgap. Measured: it matches the PhysX open-loop protocol

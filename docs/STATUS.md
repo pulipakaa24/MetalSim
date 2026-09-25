@@ -1,4 +1,6 @@
-# Status against the plan (2026-09-24)
+# Status against the plan (2026-09-25)
+
+**Reference note:** every Isaac number below was measured against Isaac Sim 5.1 + Isaac Lab 2.3.2 (PhysX). Isaac Lab 3.0-EA (2026-09-16, Isaac Sim 6.1, Newton with MuJoCo-Warp / VBD / coupled solvers alongside PhysX) is released and is being set up as the new reference on both backends (`GAPS.md`, "Reference version").
 
 Machine: Apple M4 Max (40-core GPU, 18.4 TFLOPS FP32 vendor peak), 64 GB, macOS 26.7, Command Line
 Tools only. Every figure below is **measured** here unless marked reported. The per-row evidence
