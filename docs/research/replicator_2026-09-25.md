@@ -159,3 +159,63 @@ The scene layer writes `UsdSemantics.LabelsAPI` "class" labels (body name) on bo
 | `rep.randomizer.scatter_2d/3d`, `instantiate` | none | pose sampling on surfaces / volumes; object instantiation needs a model rebuild | M (not done) |
 | Replicator graph / triggers (`on_frame`, `on_time`) | Python loop | not needed for batched data generation | n/a |
 | tier 2 (path tracer) id buffer | none | segmentation from the path tracer needs a renderer output; use tier 0 for labels (same geometry) | M (renderer) |
+
+## 6. What was built (2026-09-25) and how it is verified
+
+Code: `metalsim/replicator/{semantics,isaac,kernels,basic_writer,events,bench}.py`; tests:
+`tests/test_replicator_annotators.py` (24 tests with both implementations; ground truth is an
+analytic ray cast through every pixel centre of a scene of boxes at known poses, one rotated, one
+partly hidden, one two-box body). Pixels whose centre lies within 0.01 px of a silhouette edge are
+"ambiguous" (the rasterizer's fixed-point snapping decides them); all others must match exactly,
+and box extents / counts must lie between the sure-in and maybe-in masks. Costs: 1024 envs,
+128x128, SO-101 lift scene (9 labelled instances, 20 render slots), median of 5,
+`python -m metalsim.replicator.bench` -> `runs/replicator_bench_1024.log`. **The GPU was shared with
+a G1 training run** (the low-priority queue was hours deep; the benchmark is < 1 min), so costs are
+upper bounds; the tier-0 render itself measured 19-36 ms/frame across runs in the same conditions.
+
+| Isaac feature | MetalSim | cost @1024 envs (ms/frame) | test |
+|---|---|---|---|
+| Semantics (LabelsAPI / SemanticsAPI, inheritance, instance = labelled prim) | `Semantics.from_rules / from_body_names / from_usd` | init only | `test_semantics_from_usd`, all seg tests |
+| rgb (RGBA) | renderer output + alpha | 1.3 | writer test |
+| distance_to_image_plane (inf background) | renderer depth | 1.0-2.7 | `test_depth_normals_pointcloud`: < 3e-4 m vs ray cast |
+| distance_to_camera | fused kernel | 3.7 | same test, rtol 1e-4 |
+| normals (4 ch, world frame) | raster normal, renormalized (fp16 target) | 2.7 | < 1e-3 rad vs face normals |
+| normals from depth (fallback, **depth-derived**) | fused kernel | 5.9 | face interiors < 5e-3 rad; creases not exact (stated) |
+| semantic_segmentation + idToLabels (0 BACKGROUND, 1 UNLABELLED) | id buffer -> LUT | 1.3 | exact on every unambiguous pixel |
+| instance_segmentation + idToLabels/idToSemantics | id buffer -> LUT | 1.3 | exact |
+| instance_id_segmentation (per render prim) | id buffer -> geom + 1 | 1.4 | exact |
+| bounding_box_2d_tight (Isaac dtype, bboxIds/idToLabels/primPaths) | fused row-run + atomics kernel | 1.4 | within sure/maybe bounds, counts too |
+| bounding_box_2d_loose, occlusionRatio | exact: seg-only re-render per instance (private renderer) | 153 (9 instances) | loose = unoccluded silhouette extents, ratio within bounds; hidden box > 0.2 |
+| bounding_box_2d_loose, render-free | projected convex-hull vertices (a superset for curved meshes) | 55 | equals analytic corner projection |
+| bounding_box_3d (local extents + USD row-vector transform) | model geom AABBs in the body frame + body pose | 1.8 | extents 2e-6, transform 2e-6, contains all corners |
+| pointcloud (+rgb/normals/semantic/instance) | fused kernel + LUTs | 12.3 | points < 5e-4 m from surfaces |
+| motion_vectors (+x left, +y up) | state-derived fused kernel | 4.8 | < 2e-3 px vs analytic reprojection; static 0 |
+| camera_params | view / projection (row-vector), aperture, near/far | 1.3 | projection reproduces the renderer's pixels to 1e-3 px |
+| BasicWriter layout | `basic_writer.BasicWriter` (Isaac's `write(data)` + batched `write_batch`) | CPU, IO bound | exact file set, multi-rp folders, colour->label JSON round trip |
+| occlusion (per-pixel), skeleton_data | not implemented | | |
+| Isaac Lab events: material, mass (+inertia), COM, actuator gains, joint params, gravity, external wrench (body frame), push, reset root (COM velocity), reset joints (scale/offset), visual colour, EventManager (startup/reset/interval) | `events.py` | reset_joints 2.8, visual colour 0.5 | `test_event_*` (7 tests; COM velocity exact to 1e-5) |
+
+## 7. Decisions
+
+| decision | options measured (1024 envs, ms/frame) | chosen, why | re-enable the other |
+|---|---|---|---|
+| per-pixel annotators | torch ops on MPS: distance_to_camera 9.1, normals 48.5, normals_from_depth 231, pointcloud 209, motion_vectors 429; fused Warp kernels: 3.7, 2.7, 5.9, 12.3, 4.8 | Warp kernels: identical outputs (tests run both), 2-90x cheaper; torch materializes (N,H,W,3,3) gathers | `IsaacAnnotators(..., impl="torch")` |
+| 2-D extents | torch scatter-reduce + `bincount` counts 2374 (bincount is a CPU fallback on MPS); + `scatter_add` counts 19.9; Warp per-row runs + atomics 1.4 | Warp kernel | `impl="torch"` (scatter_add); `_torch_extents_from_ids(inst, counts="bincount")` |
+| loose box / occlusionRatio | (a) projected render-mesh vertices, all 232 / convex hull 55: exact for polyhedra, a superset of the silhouette for tessellated curved meshes, no occlusionRatio; (b) seg-only re-render per instance 153 (torch extents 347): exact silhouette and occlusionRatio | (b) as default (fidelity first); (a) available | `bounding_box_2d_loose(occlusion=False)`; `IsaacAnnotators(loose_hull=False)` for all vertices |
+| raster normals | raw fp16 target (norm 0.9996, 1-cos 3.8e-4) vs renormalized | renormalized: unit normals as Isaac, direction error < 1e-3 rad | not kept as a flag (the raw buffer is `renderer.out.normal`) |
+| BasicWriter name | keep the NPZ writer as `BasicWriter` vs Isaac's layout | Isaac's layout under `BasicWriter`; the NPZ writer is `NpzWriter`, and `BasicWriter.write` still accepts the old dict (legacy test unchanged) | `NpzWriter` |
+
+## 8. Conventions chosen where Isaac is silent or inconsistent
+
+- 2-D box `x_max`/`y_max` are **inclusive** pixel indices (not documented by Isaac; its CocoWriter
+  computes width as `x_max - x_min`, which would then be one pixel short).
+- Box records carry MetalSim's semantic ids (the `semantic_segmentation` ids, from 2) with
+  `idToLabels` keyed by them; Isaac numbers box semantic ids per annotator from 0. Consumers that go
+  through `idToLabels` (as Isaac's writers do) are unaffected.
+- `bounding_box_3d.transform` is local-to-world in USD's row-vector form (rotation transposed in
+  the upper 3x3, translation in the last row), matching the [API] example layout.
+- `instance_id_segmentation` ids are `geom id + 1` (stable across frames and renderers).
+- Normals are world-frame (the renderer's output; Isaac's frame is undocumented).
+- Motion vectors are in pixels (Isaac does not state units).
+- Uncolourized segmentation PNGs are 16-bit (Isaac's backend writes uint32; ids >= 2^16 raise).
+- Depth background is +inf (Isaac Lab's behaviour), not the docs' "0 = infinity".
