@@ -65,6 +65,7 @@ loaded through `metalsim.scene.usd_to_mjcf`.
 |---|---|---|---|---|
 | G1 flat, physics only (4 substeps of MuJoCo Warp, graph replay) | 68,660 env-steps/s | – | – | – |
 | G1 flat, step only (physics + reset/kinematics + obs + reward, one graph per step) | 55,176 env-steps/s (cost-split run 55,960; 45,958 before the post-reset forward pass was replaced by kinematics only) | 94,000 | 0.59× | 2.6× |
+| G1 flat, Isaac's `benchmark_non_rl.py` **measured on the L4** (Isaac Sim 5.1, 4096 envs, 100 frames, debug_vis off, 2026-09-24) | – | mean 46,548 env-steps/s (max 53,171); rough: mean 39,135 (max 46,177) | M4 Max / L4: flat 1.19× (5 ms setting), 0.66× at the 2.5 ms training setting; rough 1.42× | – |
 | G1 flat, step + inference (Warp MLP 256-128-128 inside the rollout graph) | 55,397 env-steps/s | 88,000 | 0.63× | 2.8× |
 | G1 flat, full PPO loop (24-step rollout + 5 epochs × 4 minibatches on MPS, clipped value loss) | 47,809 env-steps/s (training log over 20 iterations: 51,742) | 82,000 | 0.58× | 2.6× |
 | G1 rough (patched heightfield kernel, 187-ray height scan), physics only | 61,679 env-steps/s | – | – | – |
@@ -191,6 +192,16 @@ episode; measured 2026-09-24):
 | action_rate_l2 | −0.083 | −0.321 | −0.230 | −0.001 | −0.026 | −0.019 |
 | termination_penalty | −0.200 | 0.000 | 0.000 | −0.200 | −0.140 | −0.177 |
 | time-outs (fraction of episodes) | 0.00 | 0.99 | 1.00 | 0.00 | 0.30 | 0.11 |
+
+Isaac's run to the end (1500 iterations, 55.7 min on the L4 at 2.14 s per iteration = 45.9 K
+env-steps/s in the training loop, measured): return 25.3 / 27.3 / 27.2 at iterations 500 / 1000 /
+1499, tracking 0.93 / 0.92 / 0.93, feet air time 0.036 / 0.045 / 0.046, action std 0.66 / 0.60 /
+0.61, 99.6–99.8 % of episodes time out. Transfer of the checkpoints across simulators
+(`isaac_side/play_policy.py`, 400 steps, 4 envs, mean action, `runs/parity/isaac/parity_out/play`):
+Isaac's iteration-100 policy stands (pelvis 0.70 m) and its 500 / 1000 policies walk (0.62–0.63 m) in
+Isaac; MetalSim's iteration-500 policy also survives 400 steps in Isaac (0.56–0.59 m) while its
+iteration-100, 1000 and 1500 policies fall there (0.03–0.11 m); side-by-side videos of the same
+checkpoints in both simulators are in the gallery.
 
 Isaac's action_rate term is dominated by its exploration noise (std 0.72–1.0 on 37 joints under
 stochastic actions; ours above is the mean action), so it is not comparable; every other row is. The
