@@ -70,10 +70,13 @@ def acquire(name, kind, minutes, pid):
 
 
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument("cmd", choices=["acquire", "release", "status"]); ap.add_argument("name", nargs="?")
+    ap = argparse.ArgumentParser(); ap.add_argument("cmd", choices=["acquire", "release", "status", "setpid"]); ap.add_argument("name", nargs="?")
     ap.add_argument("--kind", default="train", choices=list(PRIO)); ap.add_argument("--minutes", type=float, default=30); ap.add_argument("--pid", type=int, default=os.getppid())
     a = ap.parse_args()
     if a.cmd == "acquire": acquire(a.name, a.kind, a.minutes, a.pid)
+    elif a.cmd == "setpid":                       # the wrapper registers the real job process once spawned
+        h = holder()
+        if h and h.get("name") == a.name: h["pid"] = a.pid; json.dump(h, open(LOCK, "w"))
     elif a.cmd == "release":
         h = holder()
         if h and a.name and h.get("name") not in (a.name, None): print(f"lock held by {h.get('name')}, not {a.name}; not released"); sys.exit(1)
