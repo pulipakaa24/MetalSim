@@ -299,3 +299,121 @@ including training** (ref 1077 s, 7,483/s: 1.53×); time split env 0.5 % / polic
 rendering) 32.9 % / update 66.6 %. Isaac Lab publishes 32K on an RTX 4090. With the update at the
 estimated hardware floor (1.7–2.0 s) and the rollout unchanged, the same pipeline would run at
 ≈ 16–17K env-steps/s (estimated); past that the rollout (~1.9 s per iteration here) is the next limit.
+
+## 7. Round two: remaining kernels, the gather, and the MLX compounding experiment (2026-09-25)
+
+### 7.1 Re-grounding in existing Metal conv work [source]
+
+- **PyTorch main / 2.14 conv kernels** (`aten/src/ATen/native/mps/kernels/Convolution.metal`, v2.14.0,
+  https://raw.githubusercontent.com/pytorch/pytorch/v2.14.0/aten/src/ATen/native/mps/kernels/Convolution.metal):
+  `conv3d_simd` is a classic threadgroup-staged implicit GEMM (BM×BN×BK tiles, WM×WN simdgroups, LDA = BK+8
+  padding, cooperative im2col gather into threadgroup memory, fp32 accumulation; PR #188802). `conv3d_mpp`
+  (L270ff) hands the tile to **Metal Performance Primitives `mpp::tensor_ops::convolution2d`** (NHWC/HWIO,
+  cooperative tensors, macOS 26.2+) — forward only. Both are forward kernels; none is a conv2d gradient.
+- **MLX 0.32.2 steel conv** (`mlx/backend/metal/kernels/steel/conv/kernels/steel_conv.h`,
+  https://raw.githubusercontent.com/ml-explore/mlx/v0.32.2/mlx/backend/metal/kernels/steel/conv/kernels/steel_conv.h):
+  same structure (BM/BN ∈ {32, 64}, BK 16, WM×WN = 2×2 or 4×2 simdgroups, tile sizes chosen by
+  `implicit_M`/`C` in `mlx/backend/metal/conv.cpp` L341–349, L544–545); its weight gradient is
+  im2col + GEMM (§2). MPSGraph / MPSCNN convolution-gradient algorithms are not documented by Apple.
+- What this means for our kernels: the threadgroup-staged implicit GEMM that PyTorch and MLX use was my
+  first conv1-wgrad attempt and measured 1.4–1.7 TFLOP/s on this shape (§6, "tg" variant); the kernels
+  that won read 8×8 tiles straight from device memory with strided / transposed `simdgroup_load` and use
+  8 accumulators per simdgroup (12 spills). For these small-channel layers (C = 3, K = 8, stride 4) the
+  per-element im2col gather into threadgroup memory is the bottleneck the staged design pays, so the
+  known-good tiling is not the right one here; the known-good *rule* that carried over is MLX's/PyTorch's
+  fp32 accumulation in `simdgroup_matrix<float,8,8>` with ≤ 8–12 fragments per simdgroup.
+- Not tried, and the most promising unexplored lever: MPP `convolution2d` (the op PyTorch uses for conv3d
+  on macOS 26.2+; this machine runs macOS 26.7) for conv1's forward and, as a stride-1 correlation with
+  flipped weights, for conv3's input gradient. Estimated only.
+
+### 7.2 Step (1): conv2 / conv3 weight gradients, conv1 forward [measured]
+
+Kernels (`metalsim/learn/metal_conv.py`): a generic stride-1 weight-gradient kernel (output gradient
+zero-padded to the input row width so the shifted input window is affine in the flattened position;
+B tiles are transposed `simdgroup_load`s; split-K over samples, split-N over column-tile pairs), used
+directly for conv3 and after space-to-depth for conv2; and a conv1 forward kernel (per (n, oh) a
+24 × 192 × 32 GEMM, A tiles row-stride-4 loads from x, B tiles transposed loads of W, bias as the
+accumulator's initial value, transposed store into NCHW). Tests: `tests/test_metal_conv.py` (all
+kernels vs PyTorch ≤ 1e-4, full and ragged batch; Functions eager and compiled), 18 tests pass.
+
+| op (minibatch 2048, fp32) | MPSGraph | Metal kernel |
+|---|---|---|
+| conv2 weight gradient | 3.21 ms (5.1 TFLOP/s) | 4.86 ms incl. space-to-depth copy 2.4 ms + padding 0.9 ms (kernel alone 1.9 ms, 8.4 TFLOP/s) |
+| conv3 weight gradient | 2.92 ms (4.2 TFLOP/s) | 2.52 ms incl. copy + padding (kernel alone 1.74 ms) |
+| conv1 forward | 3.57 ms (4.1 TFLOP/s) | 1.76 ms (8.2 TFLOP/s) |
+
+Whole update, one process per configuration, 6 reps after 2 warm-up updates
+(runs/camera_update/profile_4c.log round 1; round 2 drifted up 3–8 % within each run from heat, same ordering):
+
+| configuration | update (s) | step gain |
+|---|---|---|
+| 3b (conv1 wgrad + conv2 dgrad kernels) | 3.68 | – |
+| + conv1 forward kernel | 3.58 | 2.9 % |
+| + gather inside the compiled graph (step 2) | 3.20 | 10.6 % |
+| + conv3 wgrad kernel | 3.15 | 1.6 % |
+
+conv2 wgrad makes the update slower (its copies cost more than MPSGraph's whole op) and conv3 wgrad gains
+1.6 %: both are below the 5 % bar and ship disabled (`metal_conv.ENABLED`), still tested. conv1 forward
+(2.9 %) is kept on: it is tested, already written, and costs nothing to keep.
+
+### 7.3 Step (2): the image gather [measured]
+
+`PPOConfig.gather_in_graph` (default on): the minibatch gather `img[idx]` of the uint8 rollout buffer
+(and of the per-image means) moves inside the compiled loss, where Inductor fuses gather → float →
+centering into one generated Metal kernel. No custom kernel was needed. 3.58 → 3.20 s (10.6 %).
+Equivalence: `tests/test_camera_update_fast.py` checks the in-graph gather against the gathered-outside
+path (loss 1e-6, gradients 1e-5 relative).
+
+### 7.4 Step (3): the whole update in MLX [measured + estimated]
+
+`scripts/diagnostics/camera_update_profile.py --parts mlx2` (and `--mlx-bound`): the complete update in
+MLX 0.32.2 — gather from a uint8 NHWC buffer, centering from precomputed means, loss, backward,
+grad clip and Adam in one `mx.compile`d step per minibatch, the KL `.item()` per minibatch, fp32 master
+weights with per-layer casts for fp16. Bracketed by the torch update in the same job
+(runs/camera_update/profile_5c.log):
+
+| configuration | update (s) | vs torch 3.22 s |
+|---|---|---|
+| torch, shipped defaults (before / after) | 3.239 / 3.217 | – |
+| MLX fp32 | 4.216 | 0.76× |
+| MLX fp32, **lower bound**: conv1 weight gradient free (`stop_gradient`) | 3.295 | 0.98× |
+| MLX fp16 (mixed precision; not equivalent at 1e-4) | 3.283 | 0.98× |
+| MLX fp16, lower bound: conv1 weight gradient free | 2.629 | 1.22× |
+
+fp32: even with conv1's weight gradient costing nothing, MLX is 2 % slower than the current torch path;
+adding back our kernel's 1.6 ms and substituting MLX's slower conv1 forward / conv2 input gradient with
+ours gives an **estimated ≈ 3.37 s** — no gain, so the compounding step was stopped here (no MLX
+kernels were ported; they would also need NHWC rewrites). fp16, reported separately: with an fp16
+conv1-weight-gradient kernel the estimate is ≈ 2.8 s (1.15× over torch fp32) at the price of fp16
+numerics — a precision change, not an equivalent optimisation, and a torch fp16 path with the same
+kernels was not measured.
+
+### 7.5 Result, training check, and the gap to Isaac [measured, except where marked]
+
+    scripts/gpu_run.sh camera_cartpole_fast2 train 20 -- .venv/bin/python -m metalsim.learn.train_cartpole_rgb \
+        --envs 1024 --tier 0 --steps 8000000 --log runs/camera_cartpole_tier0_fast2.log
+
+| it | return ref / round 1 / round 2 | length ref / round 2 |
+|---|---|---|
+| 10 | 45.4 / 44.6 / 47.8 | 72.1 / 74.7 |
+| 40 | 82.0 / 78.1 / 75.1 | 124.3 / 116.8 |
+| 100 | 86.2 / 90.0 / 83.0 | 134.3 / 130.5 |
+| 123 | 84.9 / 91.4 / 88.5 | 132.4 / 138.6 |
+| last 20 its | 86.3 / 89.7 / 86.3 | 135.1 / 135.4 |
+
+**8.06 M steps in 635 s = 12,688 env-steps/s including training** (reference 7,483: 1.70×; round 1
+11,416). Split: update 64.3 %, rollout (policy + rendering) 35.0 %, env 0.7 % — per iteration ≈ 3.3 s
+update + 1.8 s rollout. Update now 3.22 s vs the estimated hardware floor 1.7–2.0 s (§0).
+
+Gap to Isaac Lab's published 32K env-steps/s (RTX 4090, incl. training): 2.5×. Hardware, [estimated /
+vendor spec]: the RTX 4090's fp32 non-tensor peak is 82.6 TFLOP/s (NVIDIA spec) and its tensor cores
+run TF32/fp16 several times faster, vs ≈ 16 TFLOP/s fp32 for the 40-core M4 Max (§0 arithmetic; Apple does
+not publish it); memory bandwidth 1,008 vs 546 GB/s. The update is compute-bound, so at equal efficiency
+the 4090 has ≥ 5× the headroom on it; this pipeline is at 2.5× from Isaac overall. With the update at the
+1.7–2.0 s floor and the rollout unchanged the estimate is ≈ 17–19K env-steps/s; the 1.8 s rollout alone
+caps the pipeline at ≈ 36K, so closing the rest of the gap needs both the remaining update kernels
+(conv2/conv3 weight gradients without copies, the MPP route) and a faster rollout.
+
+Queue note: one timing run in this round (profile_5b.log, first attempt) overlapped the start of a
+training run because a re-queued job reused the name of a job whose release trap fired late; it was
+discarded and re-measured clean (profile_5c.log). Unique job names avoid it.

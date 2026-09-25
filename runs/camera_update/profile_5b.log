@@ -1,0 +1,8 @@
+holder: {"name": "camera_update_5b", "kind": "timing", "minutes": 6.0, "pid": 94331, "start": 1790326962.545599}
+gather_in_graph = True
+torch 2.14.0
+==== mlx2
+MLX2 float32 [bound: conv1 wgrad free] one minibatch (gather..Adam, compiled) median    25.65 ms  min    25.49 ms  -> x128 =   3.28 s/update  (implied  13,993 env-steps/s)
+MLX2 float32 [bound: conv1 wgrad free] full update   median    3.307 s  min    3.274 s  (implied 13,924 env-steps/s)
+MLX2 float16 [bound: conv1 wgrad free] one minibatch (gather..Adam, compiled) median    20.52 ms  min    20.47 ms  -> x128 =   2.63 s/update  (implied  16,274 env-steps/s)
+MLX2 float16 [bound: conv1 wgrad free] full update   median    2.634 s  min    2.632 s  (implied 16,247 env-steps/s)

@@ -1,0 +1,17 @@
+holder: {"name": "camera_update_5c_mlxclean", "kind": "timing", "minutes": 10.0, "pid": 95882, "start": 1790327631.509016}
+PPO.update fast_update + Metal kernels (3b)          median    3.239 s  min    3.235 s  (implied 14,126 env-steps/s)  all: 3.24 3.24 3.24 3.24 3.23 3.25
+gather_in_graph = True
+torch 2.14.0
+==== mlx2
+MLX2 float32 one minibatch (gather..Adam, compiled)  median    32.64 ms  min    32.54 ms  -> x128 =   4.18 s/update  (implied  11,749 env-steps/s)
+MLX2 float32 full update                             median    4.216 s  min    4.211 s  (implied 11,670 env-steps/s)
+MLX2 float16 one minibatch (gather..Adam, compiled)  median    25.64 ms  min    25.51 ms  -> x128 =   3.28 s/update  (implied  13,996 env-steps/s)
+MLX2 float16 full update                             median    3.283 s  min    3.283 s  (implied 13,994 env-steps/s)
+gather_in_graph = True
+torch 2.14.0
+==== mlx2
+MLX2 float32 [bound: conv1 wgrad free] one minibatch (gather..Adam, compiled) median    25.62 ms  min    25.59 ms  -> x128 =   3.28 s/update  (implied  14,006 env-steps/s)
+MLX2 float32 [bound: conv1 wgrad free] full update   median    3.295 s  min    3.294 s  (implied 13,959 env-steps/s)
+MLX2 float16 [bound: conv1 wgrad free] one minibatch (gather..Adam, compiled) median    20.56 ms  min    20.48 ms  -> x128 =   2.63 s/update  (implied  16,253 env-steps/s)
+MLX2 float16 [bound: conv1 wgrad free] full update   median    2.629 s  min    2.626 s  (implied 16,264 env-steps/s)
+PPO.update fast_update + Metal kernels (3b)          median    3.217 s  min    3.212 s  (implied 14,196 env-steps/s)  all: 3.23 3.22 3.21 3.22 3.22 3.21
