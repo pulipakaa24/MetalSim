@@ -648,7 +648,19 @@ Isaac Lab 3.0's own MuJoCo-Warp training of this task reaches 0.042 at iteration
 that gap is policy stage plus chatter, not the contact model; the controlled check (Isaac's own
 checkpoints played in our sim) is queued. Hardware bound from the literature: a 1 m drop of this robot
 plausibly gives 1.5–3.5 kN averaged over 20 ms; both engines' momentum-derived landing forces fall in
-that range, and Isaac's reported 1030 N understates its own physics.
+that range, and Isaac's reported 1030 N understates its own physics. **Feet air time and slide:
+mainly a policy difference, verified** by playing Isaac's own checkpoint 1000 in our sim (1024 envs ×
+1000 steps, mean action; Isaac's log at 1000: air 0.0446, slide −0.0127): default contacts 0.029 /
+−0.020 with 310 falls per 1244 episodes; impact-only stiffening 0.037 / −0.014 with 142 falls; τ 5 ms
+0.034 / −0.011 with 125 falls; with the contact model fixed, five policies span 0.022–0.048 against a
+seed noise of ±0.0005, and our own iteration-1000 policy reaches 0.048 / −0.012, above Isaac's log.
+The tuning table's 0.016–0.022 was one early policy (iteration 400, median air phase 72 ms). Term
+semantics match Isaac Lab v2.3.2 except one convention: our feet_slide used the foot's frame-origin
+velocity where Isaac uses its centre of mass (5–15 % more slide on every run; one-line fix). Stiff
+contacts chatter (τ 5 ms: median air phase 10–12 ms, over half of contact phases under 20 ms), which
+resets the timers; impact-only stiffening halves Isaac's policy's falls here and brings its slide to
+Isaac's. Ranked remedies and the archived non-remedies (a PhysX-style sensor window: no effect;
+MuJoCo's discrete integrator: not in MuJoCo Warp) are in the research note.
 
 **The same protocol on Newton XPBD** (`scripts/diagnostics/newton_record_g1.py`, CPU device which
 matches Metal to ~1e-6, `runs/parity/report_newton_{it4_1p25ms,it4_0p625ms}`, measured 2026-09-24,
