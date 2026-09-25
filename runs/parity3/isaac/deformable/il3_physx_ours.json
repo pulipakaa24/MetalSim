@@ -155,6 +155,90 @@
    "xy_extent": 0.58043372631073,
    "settle_time": 0.945,
    "finite": true
+  },
+  "rope xpbd physical 10 seg": {
+   "length0": 0.5,
+   "rest_tip_drop": 0.45926666259765625,
+   "rest_tip_x": -0.13131533563137054,
+   "min_tip_z": -0.4977579712867737,
+   "osc_axis": "x",
+   "period": 1.1125,
+   "log_decrement": 0.15815041067460295,
+   "peaks": [
+    0.512,
+    0.3078,
+    0.4182,
+    0.2506,
+    0.3592,
+    0.2322
+   ],
+   "finite": true
+  },
+  "rope xpbd physical 20 seg": {
+   "length0": 0.5,
+   "rest_tip_drop": 0.45792120695114136,
+   "rest_tip_x": -0.10229382663965225,
+   "min_tip_z": -0.49572551250457764,
+   "osc_axis": "x",
+   "period": 1.115,
+   "log_decrement": 0.18168974083916717,
+   "peaks": [
+    0.5081,
+    0.2718,
+    0.3948,
+    0.2361,
+    0.3521,
+    0.2048
+   ],
+   "finite": true
+  },
+  "rope flex 11x2x2 implicit beta 0.005 dt 0.00025": {
+   "length0": 0.5,
+   "rest_tip_drop": 0.08339667320251465,
+   "rest_tip_x": 0.4928877055644989,
+   "min_tip_z": -0.19524455070495605,
+   "osc_axis": "z",
+   "period": 0.6335714285714286,
+   "log_decrement": 0.10542395774992433,
+   "peaks": [
+    0.0631,
+    0.0347,
+    0.0681,
+    0.0609,
+    0.0672,
+    0.0373
+   ],
+   "finite": true
+  },
+  "cube flex implicit 0.005": {
+   "t_impact_min": 0.28500000000000003,
+   "min_centroid_z": 0.11564227193593979,
+   "bounce_peak_z": 0.15181200206279755,
+   "rest_centroid_z": 0.11988639831542969,
+   "rest_height": 0.19983437657356262,
+   "settle_time": 0.485,
+   "min_node_z": 0.016758114099502563,
+   "finite": true
+  },
+  "cube flex implicit 0.02": {
+   "t_impact_min": 0.28,
+   "min_centroid_z": 0.11631382256746292,
+   "bounce_peak_z": 0.2613147795200348,
+   "rest_centroid_z": 0.11988658457994461,
+   "rest_height": 0.19983434677124023,
+   "settle_time": 0.93,
+   "min_node_z": 0.014086902141571045,
+   "finite": true
+  },
+  "cube flex implicit 0.05": {
+   "t_impact_min": 0.28,
+   "min_centroid_z": 0.11632029712200165,
+   "bounce_peak_z": 0.3132909834384918,
+   "rest_centroid_z": 0.11988571286201477,
+   "rest_height": 0.19983768463134766,
+   "settle_time": 1.235,
+   "min_node_z": 0.012767642736434937,
+   "finite": true
   }
  }
 }
