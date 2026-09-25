@@ -137,6 +137,7 @@ class PPOWarpConfig:
     desired_kl: float | None = 0.01     # rsl_rl adaptive schedule: lr x1.5 when KL < desired/2, /1.5 when > 2x desired
     seed: int = 0
     log_every: int = 10
+    bootstrap_timeouts: bool = True     # rsl_rl: r += gamma * V(s) on time-outs (tasks exposing launch_timeouts)
 
 
 class PPOWarp:
@@ -153,15 +154,21 @@ class PPOWarp:
         self.bufs.done = wp.zeros((T, n), dtype=float, device=dev)
         wp.synchronize_device(dev)
         self.bufs.t_rew, self.bufs.t_done = tb.mps_tensor(self.bufs.rew), tb.mps_tensor(self.bufs.done)
+        self.bufs.t_timeout = None
+        if self.cfg.bootstrap_timeouts and hasattr(task, "launch_timeouts"):
+            self.bufs.timeout = wp.zeros((T, n), dtype=float, device=dev)
+            wp.synchronize_device(dev)
+            self.bufs.t_timeout = tb.mps_tensor(self.bufs.timeout)
         self.opt = torch.optim.Adam(self.net.parameters(), lr=self.cfg.lr)
         self.lr = self.cfg.lr
         self.graph = None
         self.learner_event = wm.SharedEvent(dev, "metalsim.ppo_warp")
 
     def _obs(self):
-        # tasks whose observation kernels draw noise / commands keyed by the rollout step index
+        # tasks whose observation kernels draw noise / commands keyed by a device-side step counter: the
+        # free-running one (the rollout row index repeats every rollout, and so would the random numbers)
         if getattr(self.task, "needs_step_idx", False):
-            self.task.launch_obs(self.pol.step_idx)
+            self.task.launch_obs(self.pol.rng_step)
         else:
             self.task.launch_obs()
 
@@ -181,10 +188,12 @@ class PPOWarp:
             self._act()
             pol.store(task.obs, bufs)
             if hasattr(task, "launch_physics"):      # tasks that interleave their own work between substeps
-                task.launch_physics(pol.step_idx)
+                task.launch_physics(pol.rng_step)
             else:
                 task.sim.launch_step()
             task.launch_reward_done_reset(pol, bufs)
+            if bufs.t_timeout is not None:
+                task.launch_timeouts(pol, bufs)
         self.graph = cap.graph
 
     def rollout(self):
@@ -193,9 +202,12 @@ class PPOWarp:
         self.pol.rewind()
         for _ in range(self.cfg.rollout):
             wp.capture_launch(self.graph)
-        # bootstrap value of the final state on the Warp queue, then hand over to torch
+        # bootstrap value of the final state on the Warp queue, then hand over to torch. Only the policy runs:
+        # applying the sampled action here (as before) wrote a never-executed action into the task's
+        # last_action / prev_action, i.e. into the first observation and action-rate term of the next rollout
         self._obs()
-        self._act()
+        task = self.task
+        self.pol.act(task.obs, task.action_scratch if hasattr(task, "launch_apply_action") else task.sim.d.ctrl)
         v = self.task.sim._signal()
         self.task.sim.after(v)
 
@@ -203,6 +215,8 @@ class PPOWarp:
         cfg, bufs, n, T = self.cfg, self.bufs, self.task.n, self.cfg.rollout
         obs, act, logp_old, val, rew, done = bufs.t_obs, bufs.t_act, bufs.t_logp, bufs.t_value, bufs.t_rew, bufs.t_done
         last_v = self.pol.t_value[:, 0]
+        if bufs.t_timeout is not None:     # rsl_rl bootstrapping on time-outs: r_t += gamma * V(s_t) where the episode was truncated
+            rew = rew + cfg.gamma * val * bufs.t_timeout
         adv = torch.zeros_like(rew); gae = torch.zeros(n, device="mps")
         for t in reversed(range(T)):
             nv = last_v if t == T - 1 else val[t + 1]
