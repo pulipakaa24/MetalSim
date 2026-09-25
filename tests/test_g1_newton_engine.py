@@ -75,6 +75,10 @@ def test_state_conventions_match_mujoco():
             v_nw = bqd[e, i, :3] + np.cross(bqd[e, i, 3:], -(R @ com))
             np.testing.assert_allclose(v_nw, v_mj, atol=1e-4)
             np.testing.assert_allclose(bqd[e, i, 3:], w, atol=1e-4)
+        # the task reads feet velocities through MuJoCo's cvel (rigid motion at the robot COM); NewtonSim reproduces it
+        cv = sim.d.cvel.numpy()[e]
+        for f in (int(sim.foot_mj[0]), int(sim.foot_mj[1])):
+            np.testing.assert_allclose(cv[f], d.cvel[f], atol=2e-4)
 
 
 def test_touch_signals_are_contact_forces_and_fall_is_terminated():

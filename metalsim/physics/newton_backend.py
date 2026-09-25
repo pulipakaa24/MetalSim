@@ -167,6 +167,7 @@ def _implicit_pd_torque(body_q: wp.array[wp.transform], body_inv_I: wp.array[wp.
                         joint_q: wp.array[float], joint_qd: wp.array[float], q_start: wp.array[int], qd_start: wp.array[int],
                         target: wp.array[float], kp: wp.array[float], kd: wp.array[float], effort: wp.array[float],
                         armature: wp.array[float], dt: float, ext_filter: float, use_ext: int,
+                        grav_flag: wp.array[int], tau_g: wp.array[float],
                         qd_prev: wp.array[float], tau_prev: wp.array[float], tau_ext_f: wp.array[float], joint_f: wp.array[float]):
     """Isaac's actuator (PD + effort clip + armature) for a maximal-coordinate solver, per revolute DOF.
 
@@ -208,14 +209,45 @@ def _implicit_pd_torque(body_q: wp.array[wp.transform], body_inv_I: wp.array[wp.
         qd_next = (qd + dt * (tau_ext + kp[d] * e) / I_tot) / (1.0 + kd[d] * dt / I_tot)
         tau = wp.clamp(kp[d] * e - kd[d] * qd_next, -effort[d], effort[d])
         tau_app = (I_loc * tau - armature[d] * tau_ext) / I_tot
+    elif grav_flag[d] != 0:
+        # no collider below this joint: the external torque on its subtree is gravity, known exactly.
+        # Backward Euler on the joint: qd' = (qd + dt (tau_g + kp e) / I) / (1 + kd dt / I); exact at rest
+        # (tau = kp e = -tau_g) and creeps at (tau_g + kp e) / kd when damping dominates (Isaac's hands)
+        qd_next = (qd + dt * (tau_g[d] + kp[d] * e) / I_tot) / (1.0 + kd[d] * dt / I_tot)
+        tau = wp.clamp(kp[d] * e - kd[d] * qd_next, -effort[d], effort[d])
+        tau_app = tau
     else:
-        # backward Euler on the damper's own effect only: tau_d = -kd (qd + dt tau_d / I) (exact at rest)
+        # contacts below this joint (legs): backward Euler on the damper's own effect only,
+        # tau_d = -kd (qd + dt tau_d / I) (exact at rest whatever the contact load)
         tau = wp.clamp(kp[d] * e - kd[d] * qd / (1.0 + kd[d] * dt / I_tot), -effort[d], effort[d])
         tau_app = tau
     joint_f[d] = tau_app
     tau_prev[d] = tau_app
     tau_ext_f[d] = tau_ext
     qd_prev[d] = qd
+
+
+@wp.kernel
+def _subtree_gravity_torque(body_q: wp.array[wp.transform], body_com: wp.array[wp.vec3], body_mass: wp.array[float],
+                            gravity: wp.vec3, joint_parent: wp.array[int], joint_X_p: wp.array[wp.transform],
+                            joint_axis: wp.array[wp.vec3], qd_start: wp.array[int], grav_flag: wp.array[int],
+                            sub_start: wp.array[int], sub_body: wp.array[int], tau_g: wp.array[float]):
+    """Static gravity torque about each flagged revolute joint's axis: sum over its subtree of (c_b - p_j) x m_b g."""
+    j = wp.tid()
+    d = qd_start[j]
+    if qd_start[j + 1] - d != 1 or grav_flag[d] == 0:
+        return
+    X_wp = joint_X_p[j]
+    if joint_parent[j] >= 0:
+        X_wp = body_q[joint_parent[j]] * X_wp
+    p = wp.transform_get_translation(X_wp)
+    a = wp.transform_vector(X_wp, joint_axis[d])
+    t = wp.vec3(0.0)
+    for k in range(sub_start[j], sub_start[j + 1]):
+        b = sub_body[k]
+        c = wp.transform_point(body_q[b], body_com[b])
+        t += wp.cross(c - p, gravity * body_mass[b])
+    tau_g[d] = wp.dot(t, a)
 
 
 class ActuatorPD:
@@ -225,8 +257,10 @@ class ActuatorPD:
     ``mode="pd"``: plain explicit ``clip(kp e - kd qd)`` (unstable at 2.5 ms for Isaac's hand gains).
     Arrays are per DOF (``model.joint_dof_count``); the solver's own drives should be off (ke = kd = 0)."""
 
-    def __init__(self, model, kp, kd, effort, target, armature=None, dt=0.0025, mode="ipd", ext_filter=1.0, use_ext=False):
+    def __init__(self, model, kp, kd, effort, target, armature=None, dt=0.0025, mode="ipd", ext_filter=1.0, use_ext=False,
+                 gravity_implicit=True):
         self.model, self.dt, self.mode, self.ext_filter, self.use_ext = model, dt, mode, ext_filter, int(use_ext)
+        self._init_subtrees(gravity_implicit)
         f = lambda a: wp.array(np.asarray(a, np.float32), dtype=float, device=model.device)
         self.kp, self.kd, self.effort, self.target = f(kp), f(kd), f(effort), f(target)
         self.armature = f(armature if armature is not None else np.zeros(model.joint_dof_count))
@@ -241,10 +275,41 @@ class ActuatorPD:
             wp.launch(_pd_torque, dim=m.joint_count, inputs=[self.joint_q, self.joint_qd, m.joint_q_start, m.joint_qd_start,
                       self.target, self.kp, self.kd, self.effort], outputs=[control.joint_f], device=m.device)
         else:
+            if self.n_grav:
+                wp.launch(_subtree_gravity_torque, dim=m.joint_count, inputs=[state.body_q, m.body_com, m.body_mass, self.gravity,
+                          m.joint_parent, m.joint_X_p, m.joint_axis, m.joint_qd_start, self.grav_flag, self.sub_start, self.sub_body],
+                          outputs=[self.tau_g], device=m.device)
             wp.launch(_implicit_pd_torque, dim=m.joint_count, inputs=[state.body_q, m.body_inv_inertia, m.joint_parent, m.joint_child,
                       m.joint_X_p, m.joint_axis, self.joint_q, self.joint_qd, m.joint_q_start, m.joint_qd_start, self.target, self.kp,
-                      self.kd, self.effort, self.armature, self.dt, self.ext_filter, self.use_ext],
+                      self.kd, self.effort, self.armature, self.dt, self.ext_filter, self.use_ext, self.grav_flag, self.tau_g],
                       outputs=[self.qd_prev, self.tau_prev, self.tau_ext_f, control.joint_f], device=m.device)
+
+    def _init_subtrees(self, enabled):
+        """Per revolute DOF: flag = no collision shape anywhere below the joint; CSR list of the subtree's bodies."""
+        m = self.model
+        parent, child = m.joint_parent.numpy(), m.joint_child.numpy(); qds = m.joint_qd_start.numpy()
+        shape_body = m.shape_body.numpy()
+        has_shape = np.zeros(m.body_count, bool); has_shape[shape_body[shape_body >= 0]] = True
+        kids = [[] for _ in range(m.body_count)]
+        for j in range(m.joint_count):
+            if parent[j] >= 0:
+                kids[parent[j]].append(child[j])
+        flag = np.zeros(m.joint_dof_count, np.int32); start = [0]; bodies = []
+        for j in range(m.joint_count):
+            sub, stack = [], [child[j]]
+            while stack:
+                b = stack.pop(); sub.append(b); stack.extend(kids[b])
+            if enabled and qds[j + 1] - qds[j] == 1 and not has_shape[sub].any():
+                flag[qds[j]] = 1; bodies.extend(sub)
+            start.append(len(bodies))
+        dev = m.device
+        self.grav_flag = wp.array(flag, dtype=int, device=dev)
+        self.sub_start = wp.array(np.array(start, np.int32), dtype=int, device=dev)
+        self.sub_body = wp.array(np.array(bodies or [0], np.int32), dtype=int, device=dev)
+        self.tau_g = wp.zeros(m.joint_dof_count, dtype=float, device=dev)
+        g = np.asarray(m.gravity.numpy() if hasattr(m.gravity, "numpy") else m.gravity, float).reshape(-1, 3)[0]
+        self.gravity = wp.vec3(*g.tolist())
+        self.n_grav = int(flag.sum())
 
 
 @dataclass
@@ -347,7 +412,7 @@ def _copy_joint_qd(src: wp.array[float], dst: wp.array[float]):
 @wp.kernel
 def _to_mujoco(body_q: wp.array[wp.transform], body_qd: wp.array[wp.spatial_vector], body_com: wp.array[wp.vec3],
                joint_q: wp.array[float], joint_qd: wp.array[float], joint_qd_prev: wp.array[float], joint_f: wp.array[float],
-               nb: int, nc: int, nd: int, coord_of: wp.array[int], dof_of: wp.array[int],
+               body_mass: wp.array[float], nb: int, nc: int, nd: int, coord_of: wp.array[int], dof_of: wp.array[int],
                foot_nb: wp.vec2i, foot_mj: wp.vec2i, inv_dt: float,
                qpos: wp.array2d[float], qvel: wp.array2d[float], qacc: wp.array2d[float], qfrc: wp.array2d[float],
                cvel: wp.array2d[wp.spatial_vector]):
@@ -368,9 +433,19 @@ def _to_mujoco(body_q: wp.array[wp.transform], body_qd: wp.array[wp.spatial_vect
         qvel[e, 6 + i] = joint_qd[d]
         qacc[e, 6 + i] = (joint_qd[d] - joint_qd_prev[d]) * inv_dt
         qfrc[e, 6 + i] = joint_f[d]
-    for f in range(2):                                   # feet: [angular, linear COM velocity] (feet_slide)
-        cv = body_qd[e * nb + foot_nb[f]]
-        cvel[e, foot_mj[f]] = wp.spatial_vector(wp.spatial_bottom(cv), wp.spatial_top(cv))
+    # feet: MuJoCo's cvel semantics (what the task's feet_slide reads on MuJoCo Warp): [angular, linear] of the
+    # body's rigid motion evaluated at the robot's COM (subtree COM of the tree root), world orientation
+    mc = wp.vec3(0.0); mt = float(0.0)
+    for k in range(nb):
+        b = e * nb + k
+        mc += body_mass[b] * wp.transform_point(body_q[b], body_com[b]); mt += body_mass[b]
+    c_robot = mc / mt
+    for f in range(2):
+        b = e * nb + foot_nb[f]
+        cv = body_qd[b]
+        w = wp.spatial_bottom(cv)
+        v = wp.spatial_top(cv) + wp.cross(w, c_robot - wp.transform_point(body_q[b], body_com[b]))
+        cvel[e, foot_mj[f]] = wp.spatial_vector(w, v)
 
 
 @wp.kernel
@@ -428,6 +503,9 @@ class NewtonSim:
         self.mj_model = mj = mj_model
         self.n = n = num_envs; self.dt_phys = dt; self.iterations = iterations
         self.substeps = int(round(control_dt / dt))
+        # joint accelerations (dof_acc penalty) over the last 2.5 ms: the time resolution of the MuJoCo Warp
+        # path's physics step; a single 1.25 ms XPBD substep difference is dominated by projection jitter
+        self.acc_window = max(1, min(self.substeps, int(round(0.0025 / dt))))
         self.device = wp.get_device(device)
         z0 = float(mj.key_qpos[0][2]) if mj.nkey else 0.74
         with wp.ScopedDevice(self.device):
@@ -482,7 +560,7 @@ class NewtonSim:
             wp.launch(_ctrl_to_target, dim=(self.n, self.mj_model.nu), inputs=[self.d.ctrl, self.dof_of, self.nd, self.actuator.target])
             for k in range(self.substeps):
                 self.actuator.apply(self.s0, self.control)          # eval_ik -> actuator.joint_q/qd, torques
-                if k == self.substeps - 1:
+                if k == self.substeps - self.acc_window:
                     wp.launch(_copy_joint_qd, dim=m.joint_dof_count, inputs=[self.actuator.joint_qd, self.joint_qd_prev])
                 self.s0.clear_forces()
                 self.pipeline.collide(self.s0, self.contacts)
@@ -495,8 +573,8 @@ class NewtonSim:
         m, d = self.model, self.d
         newton.eval_ik(m, self.s0, self.joint_q, self.joint_qd)
         wp.launch(_to_mujoco, dim=self.n, inputs=[self.s0.body_q, self.s0.body_qd, m.body_com, self.joint_q, self.joint_qd,
-                  self.joint_qd_prev, self.control.joint_f, self.nb, self.nc, self.nd, self.coord_of, self.dof_of,
-                  self.foot_nb, self.foot_mj, 1.0 / self.dt_phys], outputs=[d.qpos, d.qvel, d.qacc, d.qfrc_actuator, d.cvel])
+                  self.joint_qd_prev, self.control.joint_f, m.body_mass, self.nb, self.nc, self.nd, self.coord_of, self.dof_of,
+                  self.foot_nb, self.foot_mj, 1.0 / (self.acc_window * self.dt_phys)], outputs=[d.qpos, d.qvel, d.qacc, d.qfrc_actuator, d.cvel])
         d.sensordata.zero_()
         wp.launch(_touch, dim=self.contacts.rigid_contact_max, inputs=[self.contacts.rigid_contact_count, self.contacts.rigid_contact_shape0,
                   self.contacts.rigid_contact_shape1, self.contacts.force, self.shape_slot, self.shape_env, self.touch_adr],
@@ -511,7 +589,14 @@ class NewtonSim:
             newton.eval_fk(m, self.joint_q, self.joint_qd, self.s0, mask=mask)
 
     def step(self) -> int:
-        self.launch_step()
+        """One control step from a captured graph (as BatchSim.step); returns the completion event value."""
+        assert self.substeps % 2 == 0, "state ping-pong must return to s0 for graph replay"
+        with wp.ScopedDevice(self.device):
+            if getattr(self, "_graph", None) is None:
+                with wp.ScopedCapture() as cap:
+                    self.launch_step()
+                self._graph = cap.graph
+            wp.capture_launch(self._graph)
         return self._signal()
 
     def wait(self, event, value: int) -> None:

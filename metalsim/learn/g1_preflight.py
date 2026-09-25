@@ -9,6 +9,7 @@ Expected picture under Isaac's config (every reward term x dt = 0.02, terminatio
   * over a short PPO probe, the return must not fall while the episode length rises
 
     python -m metalsim.learn.g1_preflight --envs 1024 --physics_dt 0.0025 --probe_iters 20
+    python -m metalsim.learn.g1_preflight --envs 1024 --engine newton --newton_it 4 --newton_dt 0.00125
 """
 import argparse, time
 import numpy as np, torch, warp as wp
@@ -89,8 +90,12 @@ def probe(task, iters):
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--envs", type=int, default=1024); ap.add_argument("--physics_dt", type=float, default=0.0025)
     ap.add_argument("--terrain", default="flat"); ap.add_argument("--probe_iters", type=int, default=20)
+    ap.add_argument("--engine", default="mjwarp", choices=("mjwarp", "newton"))
+    ap.add_argument("--newton_it", type=int, default=4); ap.add_argument("--newton_dt", type=float, default=0.00125)
     a = ap.parse_args(); wp.config.quiet = True
-    task = G1VelocityTask(a.envs, terrain=a.terrain, seed=0, physics_dt=a.physics_dt)
+    task = G1VelocityTask(a.envs, terrain=a.terrain, seed=0, physics_dt=a.physics_dt, engine=a.engine,
+                          newton_iterations=a.newton_it, newton_dt=a.newton_dt)
+    print(f"preflight: engine {a.engine}, physics dt {task.physics_dt}, decimation {task.decimation}, {a.envs} envs", flush=True)
     t0 = time.time(); ok = True
     ok &= reward_scale(task)
     ok &= stability(task)
