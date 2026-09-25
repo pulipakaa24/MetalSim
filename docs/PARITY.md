@@ -295,6 +295,18 @@ same config and seed, measured 2026-09-24, 25.3 K env-steps/s including the moni
 | 750 | 634 / −18.6 | 993 / +26.2 | – | – |
 | 1000 | 773 / −24.3 | 995 / +32.8 | 1000 / +35.5 | 991 / +27.3 |
 
+**The fixed learner on Newton** (`runs/g1_flat_newton_ppo_fixed.log`, 4 it. at 1.25 ms, pinned upstream
+Newton 45458023 with the limit clamp, same config/seed, 1000 iterations in 15.4 min at 106,189
+env-steps/s, zero blow-ups; measured 2026-09-24): return / length at 100 / 200 / 300 / 500 / 750 / 1000 =
+−5.1 / 78, −10.9 / 936, −7.2 / 824, −7.1 / 870, −1.1 / 938, **+7.8 / 979**, against MuJoCo Warp's
++32.6 / 993 at 1000. Survival is learned equally fast on both engines (length ~930 by iteration 200);
+velocity tracking is learned much more slowly on Newton, and 4.2× more iterations per minute does
+not make it up: at equal wall-clock Newton leads only for the first ~15 minutes. Likely cause, not
+yet checked: the off-axis joint drift (feet ~15 mm from their kinematic position at this setting) and
+the stiffer contacts; on the PhysX protocol 1.25 ms was the weaker Newton setting and 0.625 ms the
+closer one (§1.7). **MuJoCo Warp stays the default engine.** Queued: the same run at 4 it. / 0.625 ms,
+and the run on the Newton fork with the angle-wrap fix and no limit clamp.
+
 The fixed learner tracks rsl_rl's curve on the same physics within a few units at every point (the
 two differ in the feet-slide term: rsl_rl's run used the old one). The remaining offset against
 Isaac's curve (its takeoff ~50 iterations earlier) is the flat-vs-rough weighting and the physics,
