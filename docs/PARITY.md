@@ -225,7 +225,8 @@ while the per-iteration KL stays at 0.011–0.017 and never drops below rsl_rl's
 0.005; Isaac's action std falls 1.0 → 0.64 by iteration 600); the rsl_rl-on-our-task differential is
 running. Also found on the way: the reference path's feet-slide term used MuJoCo's `cvel` (spatial
 velocity at the subtree COM) as the foot velocity instead of the foot body's own linear velocity
-(Isaac's `body_lin_vel_w`); the fix on both engines is in progress. Newton preflight: termination −4
+(Isaac's `body_lin_vel_w`); fixed on both engines (commit af3cd6b, tested against `mj_objectVelocity` to
+2e-3 m/s; the old term overstated sliding ~2.5× under random actions). Every run in this section used the old term. Newton preflight: termination −4
 and the PPO probe pass; the random-policy return (−8.3, bound −8) and the 3σ stress check (37 of 1024
 worlds blow up in 400 steps at the fast settings; 8 it. at 0.625 ms passes but costs the speed gain)
 fail, so the fast Newton settings are validated for the 1σ training regime only.

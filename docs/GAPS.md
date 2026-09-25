@@ -22,7 +22,7 @@ the Newton-engine evaluation. Evidence for each row is in `PARITY.md`.
 
 | gap | status | next step |
 |---|---|---|
-| Feet-slide reward term uses MuJoCo `cvel` at the subtree COM instead of the foot body's own velocity (Isaac's `body_lin_vel_w`) | **new, open** (found by the Newton integration) | fix in the shared kernel on both engines, test against `mj_objectVelocity` |
+| Feet-slide reward term used MuJoCo `cvel` at the subtree COM instead of the foot body's own velocity (Isaac's `body_lin_vel_w`) | **closed** (commit af3cd6b) | per-foot velocity kernel on both engines, tested against `mj_objectVelocity` to 2e-3 m/s; the old term overstated sliding ~2.5× under random actions (−0.30 vs −0.12 per step) — every training run so far, including the reference, used the old term |
 | Contact model: soft contacts and soft joint limits (5–7 cm impact penetration, 0.17 rad past limits) | measured against PhysX on the L4 (PARITY §1.7): the 1 m drop lands in the same state (root z RMSE 3.5 cm, joints within 0.06 rad) but MetalSim's contact-force peaks are 3.4–5.7× Isaac's at equal mean force; Newton XPBD gives 0.16–0.69 cm impact penetration (§2.1) | subsumed by the Newton path; on MuJoCo, τ 5 ms + impedance 0.99 + speculative contact is the tunable |
 | Learning parity on G1 | per-term comparison done (PARITY §1.5): Isaac tracks 0.78 of max by it 200 with no falls; ours 0.11 at it 1000 with 70–89 % falls; learning-speed gap > 5× | learner differential in progress: the real rsl_rl on our task via a VecEnv adapter (engine-independent), and a PPO run on the Newton backend (engine half) |
 | Rendering vs Isaac RTX; denoiser; MetalFX; MaterialX | measured (PARITY §1.7): robot-only, states agreeing, tier 2 vs RTX 13.7 dB PSNR / 0.48 SSIM (tier 0: 11.5 / 0.35); silhouettes IoU 0.83, robot depth 2.6 cm RMSE; Isaac's RT and PT frames equally far from ours, so the gap is materials/lights (darker plates, hard sun shadow), not noise | re-record with a grey ground (stage 6, queued) for whole-frame rows; then material/light model work: area sun, OmniPBR parameter audit, denoiser |
@@ -52,6 +52,7 @@ the Newton-engine evaluation. Evidence for each row is in `PARITY.md`.
 | 3σ stress check fails at the fast Newton settings (37 of 1024 worlds in 400 steps at 4 it./1.25 ms; 8 it./0.625 ms passes at MuJoCo-Warp-like cost) | open, medium | validated for the 1σ training regime only; 36 blow-ups in 838,589 episodes during training, all caught by the guard |
 | Newton monitor coverage: penetration / energy / overflow checks have no source fields | open, low | derive from contact depth and body energy |
 | Newton rough terrain | open | needs a heightfield collider on the Newton path |
+| Newton's raw state is not an exact joint-space state: at 4 iterations under random actions the joint constraints do not fully converge (foot position up to 1.6 cm, foot velocity up to ~0.4 m/s off the joint-rate reconstruction) | open, medium | observations use the joint-space reconstruction (carries the drift); rewards use body velocities; MuJoCo C cannot serve as an exact per-state reference for Newton in motion |
 | Newton API churn (alpha) | low | pin the version (1.7.0.dev) |
 | Importer copies the USD's gravity 0 | low | set gravity explicitly (done in `g1_builder`) |
 
