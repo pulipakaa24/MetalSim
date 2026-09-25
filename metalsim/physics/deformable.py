@@ -170,7 +170,7 @@ def g1_scene_model(cloth: ClothCfg | None = None, cable: CableCfg | None = None,
 def default_sizes(model: mujoco.MjModel, contacts_per_vertex: float = 6.0) -> dict:
     """Per-world contact / constraint budgets for a flex scene.
 
-    Contacts: the contact buffer also holds the raw candidates before the per-pair MJ_MAXCONPAIR (50)
+    CCD slots: 128 per world (see below). Contacts: the contact buffer also holds the raw candidates before the per-pair MJ_MAXCONPAIR (50)
     selection, and a cloth draped on a box produces up to 3 per triangle vertex plus box corners (measured:
     384 raw candidates for a 10x10 cloth, 3.4 per vertex), so the default budget is 6 per vertex (plus the
     rigid scene's own);
@@ -185,7 +185,10 @@ def default_sizes(model: mujoco.MjModel, contacts_per_vertex: float = 6.0) -> di
     npyr = 2 * (condim - 1)
     njmax = nedge_eq + npyr * ncon + model.njnt + 16
     nnz = nedge_eq * 6 + npyr * ncon * max(6, rigid_nv + 3) + (model.njnt + 16) * max(1, rigid_nv)
-    return {"nconmax": ncon, "njmax": int(njmax), "njmax_nnz": int(nnz)}
+    # CCD (GJK/EPA) slots: each carries ~4.8 KB of EPA polytope workspace at ccd_iterations 35, and MuJoCo Warp
+    # defaults to one per contact slot (1.4 GB at 256 worlds of the G1 cloth scene: out of memory on Metal).
+    # 128 per world covered a cloth draped on the G1's mesh colliders with no CCD overflow (300 steps, measured).
+    return {"nconmax": ncon, "njmax": int(njmax), "njmax_nnz": int(nnz), "nccdmax": min(ncon, 128)}
 
 
 # --------------------------------------------------------------------------------------------------
