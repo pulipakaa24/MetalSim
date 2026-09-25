@@ -71,6 +71,34 @@ class CableCfg:
     eq_solref: str = "0.02 1"
 
 
+_SOFT = """
+    <flexcomp name="soft" type="grid" count="{n} {n} {n}" spacing="{sp} {sp} {sp}" pos="{x} {y} {z}" dim="3"
+              radius="{r}" mass="{mass}" dof="{dof}" rgba="0.3 0.8 0.4 1">
+      <elasticity young="{E}" poisson="{nu}" damping="{damp}"/>
+      <contact condim="3" solref="0.01 1" friction="{mu}" selfcollide="none"/>
+    </flexcomp>"""
+
+
+@dataclass
+class SoftCfg:
+    """A soft cube (tetrahedral FEM, MuJoCo's continuum elasticity), Isaac's DeformableObject analogue."""
+    count: int = 4
+    spacing: float = 0.05
+    pos: tuple = (0.02, 0.01, 0.45)
+    radius: float = 0.003
+    mass: float = 0.5
+    dof: str = "trilinear"     # 8 nodes (24 DOFs) drive all 64 vertices; "full": 3 DOFs per vertex
+    young: float = 5e3         # Pa
+    poisson: float = 0.3
+    damping: float = 0.01
+    friction: float = 0.8
+
+
+def _soft_xml(c: SoftCfg) -> str:
+    return _SOFT.format(n=c.count, sp=c.spacing, x=c.pos[0], y=c.pos[1], z=c.pos[2], r=c.radius, mass=c.mass, dof=c.dof,
+                        E=c.young, nu=c.poisson, damp=c.damping, mu=c.friction)
+
+
 def _cloth_xml(c: ClothCfg) -> str:
     return _CLOTH.format(n=c.count, sp=c.spacing, x=c.pos[0], y=c.pos[1], z=c.pos[2], r=c.radius, mass=c.mass,
                          mu=c.friction, eq_solref=c.eq_solref)
@@ -82,9 +110,10 @@ def _cable_xml(c: CableCfg) -> str:
 
 
 def box_scene_xml(cloth: ClothCfg | None = ClothCfg(), cable: CableCfg | None = CableCfg(), timestep: float = 0.002,
-                  iterations: int = 20, ls_iterations: int = 10, solver: str = "CG", energy: bool = True) -> str:
-    """A cloth and a cable dropping onto a 0.3 m box on a plane."""
-    flexes = (_cloth_xml(cloth) if cloth else "") + (_cable_xml(cable) if cable else "")
+                  iterations: int = 20, ls_iterations: int = 10, solver: str = "CG", energy: bool = True,
+                  soft: SoftCfg | None = None) -> str:
+    """A cloth and a cable (and optionally a soft cube) dropping onto a 0.3 m box on a plane."""
+    flexes = (_cloth_xml(cloth) if cloth else "") + (_cable_xml(cable) if cable else "") + (_soft_xml(soft) if soft else "")
     flag = '<flag energy="enable"/>' if energy else ""
     return f"""
 <mujoco model="metalsim_deformable_box">
@@ -227,12 +256,31 @@ class DeformableSim:
     def energy(self):
         return self.tensor("energy")
 
+    def nodal_vel(self, flex: int = 0):
+        """(N, nvert, 3) zero-copy view of a full-dof flex's vertex velocities (its slide-joint qvel; the vertex
+        bodies are axis-aligned, so these are world-frame velocities). Isaac's ``nodal_vel_w``."""
+        m = self.mj_model
+        if m.flex_interp[flex] != 0:
+            raise ValueError("interpolated flex: vertex velocities are not DOFs")
+        a, b = self.flex_qpos_slices()[flex]
+        dof = m.jnt_dofadr[np.searchsorted(m.jnt_qposadr, a)]
+        return self.tensor("qvel")[:, dof: dof + (b - a)].view(self.n, -1, 3)
+
+    def nodal_pos(self, flex: int = 0):
+        """(N, nvert, 3) world vertex positions of one flex (view into ``flexvert_xpos``). Isaac's ``nodal_pos_w``."""
+        m = self.mj_model
+        a = m.flex_vertadr[flex]
+        return self.vertices()[:, a: a + m.flex_vertnum[flex]]
+
     def flex_qpos_slices(self) -> list[tuple[int, int]]:
         """qpos range of each flex's vertex slide joints (flexcomp full dof: 3 per vertex, contiguous)."""
         m = self.mj_model
         out = []
         for f in range(m.nflex):
-            bodies = m.flex_vertbodyid[m.flex_vertadr[f]: m.flex_vertadr[f] + m.flex_vertnum[f]]
+            if m.flex_interp[f] != 0:   # interpolated: the DOFs are the nodes'
+                bodies = m.flex_nodebodyid[m.flex_nodeadr[f]: m.flex_nodeadr[f] + m.flex_nodenum[f]]
+            else:
+                bodies = m.flex_vertbodyid[m.flex_vertadr[f]: m.flex_vertadr[f] + m.flex_vertnum[f]]
             jnts = np.concatenate([np.arange(m.body_jntadr[b], m.body_jntadr[b] + m.body_jntnum[b]) for b in bodies if b > 0])
             q = m.jnt_qposadr[jnts]
             assert np.all(np.diff(q) == 1), "flex slide joints are not contiguous"
