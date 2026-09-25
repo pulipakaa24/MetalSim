@@ -1,0 +1,9 @@
+=== start Thu Sep 24 22:58:06 PDT 2026 power: Now drawing from 'AC Power'; mujoco_warp /Users/aditya/robosim/upstream/mujoco_warp a8e6485 plane_convex: MJW_PLANE_CONVEX=legacy environment switch pins the previous heuristic (A/B comparisons) clean
+install: newton {'path': '/Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton', 'url': 'https://github.com/newton-physics/newton', 'commit': '45458023f24629c1feffb1f336594808f537db14', 'editable': False} | warp {'path': '/Users/aditya/robosim/upstream/warp-innate/warp', 'git_head': '786cdae', 'git_dirty': False}
+Isaac checkpoint 1000, command (0.5, 0, 0), 4 envs, steps 100-400; impulses per foot touch-down
+| setting | propulsive [N s] | braking [N s] | vertical [N s] | peak foot force [N] | p95 stance force [N] | stride [m] | cadence [/s per foot] |
+|---|---|---|---|---|---|---|---|
+| mjwarp | 1.82 | -1.82 | 36.9 | 711 | 568 | 0.079 | 4.29 |
+| 4:1.25 | 2.95 | -2.94 | 38.8 | 1333 | 617 | 0.140 | 4.08 |
+| 4:0.625 | 1.82 | -1.83 | 41.9 | 2367 | 709 | 0.136 | 3.77 |
+=== end Thu Sep 24 22:58:29 PDT 2026
