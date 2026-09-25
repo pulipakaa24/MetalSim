@@ -279,6 +279,26 @@ defects, fixed in commit f0f2115 and covered by `tests/test_ppo_warp_rollout.py`
    executed (64 of 64 envs), and so did its action-rate penalty.
 3. **Time-outs treated as falls**: now bootstrapped like rsl_rl (`r += γ V(s)`).
 
+**Fixed PPO, demonstrated** (`runs/g1_flat_ppowarp_fixed.log`, MuJoCo Warp, 4096 envs, 1000 iterations,
+same config and seed, measured 2026-09-24, 25.3 K env-steps/s including the monitor):
+
+| iteration | our PPO before the fixes: length / return | our PPO after the fixes | rsl_rl on the same physics | Isaac (PhysX, its own weights) |
+|---|---|---|---|---|
+| 100 | 50 / −5.2 | 79 / −4.7 | 81 / −4.8 | 200 / −6.6 |
+| 150 | 56 / −5.2 | 237 / −6.4 | 197 / −6.3 | 954 / −4.3 |
+| 200 | 59 / −5.1 | 924 / −7.6 | 976 / −9.8 | 981 / +6.6 |
+| 300 | 65 / −5.1 | 960 / +1.1 | 938 / +0.5 | 1000 / +19.2 |
+| 500 | 115 / −6.3 | 987 / +15.0 | 991 / +18.2 | 996 / +25.3 |
+| 750 | 634 / −18.6 | 993 / +26.2 | – | – |
+| 1000 | 773 / −24.3 | 995 / +32.8 | 1000 / +35.5 | 991 / +27.3 |
+
+The fixed learner tracks rsl_rl's curve on the same physics within a few units at every point (the
+two differ in the feet-slide term: rsl_rl's run used the old one). The remaining offset against
+Isaac's curve (its takeoff ~50 iterations earlier) is the flat-vs-rough weighting and the physics,
+now separable with the flat-weights port. The anomaly monitor still flags soft-limit excursions of
+0.5 rad and 8 cm contact penetrations in falls at the end of the run: MuJoCo's soft limits and
+contacts, not a learner issue (§2.1).
+
 The KL estimator and adaptive rule were checked and are identical to rsl_rl's (the "kl" printed in
 our logs is a different quantity and does not drive the learning rate). Our action std grew (0.995 →
 1.41 by iteration 1500) where rsl_rl's fell (0.95 → 0.68) and Isaac's (1.02 → 0.61). The fixed PPO
