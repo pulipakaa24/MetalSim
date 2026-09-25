@@ -144,3 +144,52 @@ def test_graph_replay_matches_eager():
                 task.launch_apply_action(task.action_scratch); task.sim.launch_step()
         task.sim.synchronize(); out.append(task.sim.d.qpos.numpy())
     np.testing.assert_allclose(out[0], out[1], atol=1e-4)
+
+
+def test_newton_heightfield_surface_matches_mujoco():
+    """Isaac's rough terrain as a Newton heightfield: small spheres dropped on it rest on MuJoCo's hfield
+    surface (mj_ray at their final xy). Runs on the CPU device."""
+    from metalsim.learn.terrain import isaac_rough_terrain
+    from metalsim.physics.newton_backend import heightfield_from_mujoco
+    import newton
+    hf = isaac_rough_terrain(num_rows=2, num_cols=4, seed=3)
+    m, _ = build_g1_model("rough", hf); d = mujoco.MjData(m); mujoco.mj_forward(m, d)
+    only_ground = np.array([1, 0, 0, 0, 0, 0], np.uint8)
+    surf = lambda x, y: 10.0 - mujoco.mj_ray(m, d, np.array([x, y, 10.0]), np.array([0, 0, -1.0]), only_ground, 1, -1, np.zeros(1, np.int32))
+    rng = np.random.default_rng(0); sx, sy = hf["size"][0], hf["size"][1]
+    pts = np.c_[rng.uniform(-0.9 * sx, 0.9 * sx, 40), rng.uniform(-0.9 * sy, 0.9 * sy, 40)]
+    b = newton.ModelBuilder(); b.gravity = (0.0, 0.0, -9.81)
+    h, X = heightfield_from_mujoco(hf); b.add_shape_heightfield(xform=X, heightfield=h)
+    for x, y in pts:
+        body = b.add_body(xform=wp.transform((float(x), float(y), surf(x, y) + 0.05), wp.quat_identity()))
+        b.add_shape_sphere(body, radius=0.01)
+    M = b.finalize("cpu"); S = newton.solvers.SolverXPBD(M, iterations=8)
+    s0, s1, c = M.state(), M.state(), M.control(); pipe = newton.CollisionPipeline(M, broad_phase="explicit"); con = pipe.contacts()
+    for _ in range(400):
+        s0.clear_forces(); pipe.collide(s0, con); S.step(s0, s1, c, con, 0.0025); s0, s1 = s1, s0
+    bq = s0.body_q.numpy()
+    err = np.array([abs(bq[i, 2] - 0.01 - surf(bq[i, 0], bq[i, 1])) for i in range(len(pts))])
+    assert np.median(err) < 1e-3 and np.percentile(err, 80) < 2e-3, err
+
+
+def test_rough_task_runs_on_newton():
+    """The rough task (heightfield, height scan, curriculum) steps on Newton; the torso pose the height
+    scanner reads is MuJoCo's for the same state."""
+    from metalsim.learn.g1_velocity import benchmark_step
+    n = 8
+    task = G1VelocityTask(n, terrain="rough", seed=0, **NEWTON)
+    assert task.obs_dim == 12 + 3 * 37 + 187
+    benchmark_step(task, num_frames=10, warmup=2)
+    task.sim.synchronize()
+    obs = task.obs.numpy(); q = task.sim.d.qpos.numpy()
+    assert np.isfinite(obs).all() and np.isfinite(q).all()
+    scan = obs[:, -187:]
+    assert scan.std() > 0.0 and np.abs(scan).max() <= 1.0
+    # consistent state (FK of the reported qpos/qvel), then the scanner's torso pose vs MuJoCo C
+    sim = task.sim; sim._reset_mask.fill_(True); sim.launch_reset(); sim.synchronize()
+    m = task.model; d = mujoco.MjData(m); tb = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, "torso_link")
+    xp = sim.d.xpos.numpy(); xm = sim.d.xmat.numpy()
+    for e in range(n):
+        d.qpos[:] = q[e]; mujoco.mj_kinematics(m, d)
+        np.testing.assert_allclose(xp[e, tb], d.xpos[tb], atol=1e-4)
+        np.testing.assert_allclose(xm[e, tb].reshape(9), d.xmat[tb], atol=1e-4)

@@ -478,15 +478,14 @@ class G1VelocityTask:
         self.engine = engine
         if engine not in ("mjwarp", "newton"):
             raise ValueError(f"engine must be 'mjwarp' or 'newton', not {engine!r}")
-        if engine == "newton" and terrain != "flat":
-            raise NotImplementedError("the Newton engine path supports the flat task only (no heightfield)")
         self.model, self.info = build_g1_model(terrain, self.hfield, physics_dt=physics_dt)   # metadata source for both engines
         m = self.model
         self.nj = m.nu
         if engine == "newton":
             from metalsim.physics.newton_backend import NewtonSim
             self.physics_dt = newton_dt
-            self.sim = NewtonSim(m, n, iterations=newton_iterations, dt=newton_dt, control_dt=CONTROL_DT, device=device)
+            self.sim = NewtonSim(m, n, iterations=newton_iterations, dt=newton_dt, control_dt=CONTROL_DT, device=device,
+                                 hfield=self.hfield)
             self.decimation = self.sim.substeps
         else:
             self.physics_dt = physics_dt
