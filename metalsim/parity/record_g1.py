@@ -31,7 +31,8 @@ def hero_spec(spec, meta):
     sky = spec.add_texture(); sky.name = "sky"; sky.type = mujoco.mjtTexture.mjTEXTURE_SKYBOX; sky.builtin = mujoco.mjtBuiltin.mjBUILTIN_FLAT
     dc = meta["lights"]["dome"]["color"]; sky.rgb1 = dc; sky.rgb2 = dc; sky.width = 8; sky.height = 48
     for g in spec.geoms:
-        if g.name == "ground": g.rgba = [0.5, 0.5, 0.5, 1]; g.size = [500.0, 500.0, 0.05]   # render extent only (a MuJoCo plane is infinite for physics); the ray tracer tessellates size-0 planes to 5 m, which ended before the horizon in the first replay
+        if g.name == "ground": g.rgba = [0.5, 0.5, 0.5, 1]; g.size = [500.0, 500.0, 0.05]
+        elif g.contype != 0 or g.conaffinity != 0: g.group = 4   # collision geometry (Isaac never draws it; the renderer draws groups <= 3); the visual meshes are group 2   # render extent only (a MuJoCo plane is infinite for physics); the ray tracer tessellates size-0 planes to 5 m, which ended before the horizon in the first replay
     return spec
 
 
