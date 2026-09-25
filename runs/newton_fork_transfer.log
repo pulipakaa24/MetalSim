@@ -1,0 +1,8 @@
+=== start Thu Sep 24 23:34:10 PDT 2026 power: Now drawing from 'AC Power'
+install: newton {'path': '/Users/aditya/robosim/upstream/newton/newton', 'git_head': '90e23324', 'git_dirty': False} | warp {'path': '/Users/aditya/robosim/upstream/warp-innate/warp', 'git_head': '786cdae', 'git_dirty': False}
+| checkpoint | 4:1.25:solver:rlin=0.5:rang=0.4:nolim x [m] / pelvis z [m] | 4:0.625:solver:rlin=0.5:rang=0.4:nolim x [m] / pelvis z [m] | 4:1.25:nolim x [m] / pelvis z [m] | 4:0.625:nolim x [m] / pelvis z [m] |
+|---|---|---|---|---|
+| Isaac it 500 | 3.82 (3.70-3.99) / 0.613 (0.60-0.63) | 3.63 (3.57-3.69) / 0.616 (0.61-0.62) | 4.49 (4.38-4.57) / 0.614 (0.61-0.62) | 4.01 (3.94-4.11) / 0.624 (0.62-0.63) |
+| Isaac it 1000 | 4.17 (4.09-4.29) / 0.614 (0.61-0.62) | 3.70 (3.64-3.78) / 0.618 (0.62-0.62) | 4.31 (4.20-4.37) / 0.627 (0.62-0.63) | 3.93 (3.89-4.00) / 0.627 (0.62-0.64) |
+| Isaac it 1499 | 3.90 (3.79-3.95) / 0.624 (0.62-0.63) | 3.63 (3.61-3.65) / 0.630 (0.62-0.64) | 4.14 (4.10-4.19) / 0.631 (0.62-0.63) | 3.83 (3.80-3.85) / 0.640 (0.63-0.65) |
+=== end Fri Sep 25 00:38:44 PDT 2026 power: Now drawing from 'AC Power'; install newton {'path': '/Users/aditya/robosim/upstream/newton/newton', 'git_head': '90e23324', 'git_dirty': False} | warp {'path': '/Users/aditya/robosim/upstream/warp-innate/warp', 'git_head': '786cdae', 'git_dirty': False}
