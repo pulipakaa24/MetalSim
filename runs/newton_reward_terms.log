@@ -1,0 +1,193 @@
+install: newton {'path': '/Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton', 'url': 'https://github.com/newton-physics/newton', 'commit': '45458023f24629c1feffb1f336594808f537db14', 'editable': False} | warp {'path': '/Users/aditya/robosim/upstream/warp-innate/warp', 'git_head': '786cdae', 'git_dirty': False}
+=== mjwarp fixed PPO it 300
+{
+ "ckpt": "runs/policies/g1_flat_ppowarp_fixed_it300.pt",
+ "iterations": 300,
+ "episodes": 1228,
+ "mean_episode_length": 810.6498371335505,
+ "mean_return": 14.043326964368976,
+ "terminations": {
+  "fell": 292,
+  "timeout": 936
+ },
+ "Episode_Reward": {
+  "track_lin_vel_xy_exp": 0.5183,
+  "track_ang_vel_z_exp": 0.4643,
+  "feet_air_time": 0.0065,
+  "feet_slide": -0.0306,
+  "joint_deviation_all": -0.1475,
+  "flat_orientation_l2": -0.019,
+  "action_rate_l2": -0.0093,
+  "termination_penalty": -0.0476,
+  "lin_vel_z_l2": -0.0031,
+  "ang_vel_xy_l2": -0.0073,
+  "dof_torques_l2": -0.0036,
+  "dof_acc_l2": -0.0058,
+  "dof_pos_limits": -0.0133
+ },
+ "note": "per-second average over the episode like Isaac's RewardManager; joint_deviation_all = hip+arms+fingers+torso",
+ "reward_cfg": "flat",
+ "engine": "mjwarp",
+ "physics_dt": 0.0025,
+ "contact_tuning": null
+}
+=== newton 4 it 1.25 ms fixed PPO it 300
+{
+ "ckpt": "runs/policies/g1_flat_newton_fixed_it300.pt",
+ "iterations": 300,
+ "episodes": 1297,
+ "mean_episode_length": 778.5512721665382,
+ "mean_return": 6.4493405149665985,
+ "terminations": {
+  "fell": 343,
+  "timeout": 954
+ },
+ "Episode_Reward": {
+  "track_lin_vel_xy_exp": 0.2819,
+  "track_ang_vel_z_exp": 0.2484,
+  "feet_air_time": 0.002,
+  "feet_slide": -0.0013,
+  "joint_deviation_all": -0.1258,
+  "flat_orientation_l2": -0.0246,
+  "action_rate_l2": -0.0001,
+  "termination_penalty": -0.0529,
+  "lin_vel_z_l2": -0.0004,
+  "ang_vel_xy_l2": -0.0025,
+  "dof_torques_l2": -0.001,
+  "dof_acc_l2": -0.0001,
+  "dof_pos_limits": -0.0012
+ },
+ "note": "per-second average over the episode like Isaac's RewardManager; joint_deviation_all = hip+arms+fingers+torso",
+ "reward_cfg": "flat",
+ "engine": "newton",
+ "physics_dt": 0.00125,
+ "contact_tuning": null
+}
+=== newton 4 it 0.625 ms fixed PPO it 300
+{
+ "ckpt": "runs/policies/g1_flat_newton0625_fixed_it300.pt",
+ "iterations": 300,
+ "episodes": 1616,
+ "mean_episode_length": 607.4115099009902,
+ "mean_return": 3.8682772632087334,
+ "terminations": {
+  "fell": 778,
+  "timeout": 838
+ },
+ "Episode_Reward": {
+  "track_lin_vel_xy_exp": 0.2237,
+  "track_ang_vel_z_exp": 0.192,
+  "feet_air_time": 0.0027,
+  "feet_slide": -0.0023,
+  "joint_deviation_all": -0.0999,
+  "flat_orientation_l2": -0.016,
+  "action_rate_l2": -0.0009,
+  "termination_penalty": -0.0963,
+  "lin_vel_z_l2": -0.001,
+  "ang_vel_xy_l2": -0.004,
+  "dof_torques_l2": -0.0011,
+  "dof_acc_l2": -0.0015,
+  "dof_pos_limits": -0.002
+ },
+ "note": "per-second average over the episode like Isaac's RewardManager; joint_deviation_all = hip+arms+fingers+torso",
+ "reward_cfg": "flat",
+ "engine": "newton",
+ "physics_dt": 0.000625,
+ "contact_tuning": null
+}
+=== mjwarp fixed PPO it 1000
+{
+ "ckpt": "runs/policies/g1_flat_ppowarp_fixed_it1000.pt",
+ "iterations": 1000,
+ "episodes": 1034,
+ "mean_episode_length": 989.0647969052225,
+ "mean_return": 31.034250547992905,
+ "terminations": {
+  "fell": 15,
+  "timeout": 1019
+ },
+ "Episode_Reward": {
+  "track_lin_vel_xy_exp": 0.9115,
+  "track_ang_vel_z_exp": 0.838,
+  "feet_air_time": 0.0307,
+  "feet_slide": -0.0355,
+  "joint_deviation_all": -0.1406,
+  "flat_orientation_l2": -0.0072,
+  "action_rate_l2": -0.0098,
+  "termination_penalty": -0.0029,
+  "lin_vel_z_l2": -0.007,
+  "ang_vel_xy_l2": -0.0067,
+  "dof_torques_l2": -0.007,
+  "dof_acc_l2": -0.0114,
+  "dof_pos_limits": -0.0006
+ },
+ "note": "per-second average over the episode like Isaac's RewardManager; joint_deviation_all = hip+arms+fingers+torso",
+ "reward_cfg": "flat",
+ "engine": "mjwarp",
+ "physics_dt": 0.0025,
+ "contact_tuning": null
+}
+=== newton 4 it 1.25 ms fixed PPO it 1000
+{
+ "ckpt": "runs/policies/g1_flat_newton_fixed_it1000.pt",
+ "iterations": 1000,
+ "episodes": 1233,
+ "mean_episode_length": 820.9456609894567,
+ "mean_return": 19.60931519883724,
+ "terminations": {
+  "fell": 258,
+  "timeout": 975
+ },
+ "Episode_Reward": {
+  "track_lin_vel_xy_exp": 0.7529,
+  "track_ang_vel_z_exp": 0.4387,
+  "feet_air_time": 0.0281,
+  "feet_slide": -0.0157,
+  "joint_deviation_all": -0.1222,
+  "flat_orientation_l2": -0.0175,
+  "action_rate_l2": -0.0101,
+  "termination_penalty": -0.0418,
+  "lin_vel_z_l2": -0.0057,
+  "ang_vel_xy_l2": -0.0087,
+  "dof_torques_l2": -0.0039,
+  "dof_acc_l2": -0.0104,
+  "dof_pos_limits": -0.0031
+ },
+ "note": "per-second average over the episode like Isaac's RewardManager; joint_deviation_all = hip+arms+fingers+torso",
+ "reward_cfg": "flat",
+ "engine": "newton",
+ "physics_dt": 0.00125,
+ "contact_tuning": null
+}
+=== newton 4 it 0.625 ms fixed PPO it 1000
+{
+ "ckpt": "runs/policies/g1_flat_newton0625_fixed_it1000.pt",
+ "iterations": 1000,
+ "episodes": 1071,
+ "mean_episode_length": 950.4332399626518,
+ "mean_return": 31.432094543484542,
+ "terminations": {
+  "fell": 62,
+  "timeout": 1009
+ },
+ "Episode_Reward": {
+  "track_lin_vel_xy_exp": 0.8988,
+  "track_ang_vel_z_exp": 0.7863,
+  "feet_air_time": 0.0527,
+  "feet_slide": -0.0106,
+  "joint_deviation_all": -0.1044,
+  "flat_orientation_l2": -0.0056,
+  "action_rate_l2": -0.0078,
+  "termination_penalty": -0.0116,
+  "lin_vel_z_l2": -0.0035,
+  "ang_vel_xy_l2": -0.0064,
+  "dof_torques_l2": -0.0044,
+  "dof_acc_l2": -0.0116,
+  "dof_pos_limits": -0.0002
+ },
+ "note": "per-second average over the episode like Isaac's RewardManager; joint_deviation_all = hip+arms+fingers+torso",
+ "reward_cfg": "flat",
+ "engine": "newton",
+ "physics_dt": 0.000625,
+ "contact_tuning": null
+}
