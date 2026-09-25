@@ -4,7 +4,8 @@ Isaac's default state at the origin, command (0.5, 0, 0) held, mean action, 400 
 noise on, as in training). Reports x travelled and final pelvis z (mean over envs, and the range) per checkpoint
 and engine setting; MuJoCo Warp at 2.5 ms runs the same protocol as the in-script control.
 
-usage: python scripts/diagnostics/newton_transfer.py [--its 100,500,1000,1499] [--settings mjwarp,4:1.25,4:0.625]"""
+usage: python scripts/diagnostics/newton_transfer.py [--its 100,500,1000,1499] [--settings mjwarp,4:1.25,4:0.625]
+       Newton fork recipe: 4:1.25:solver:color:relax=0.8:nolim"""
 import sys, numpy as np, torch, warp as wp
 wp.config.quiet = True
 from metalsim.learn.g1_velocity import G1VelocityTask
@@ -24,8 +25,14 @@ N, STEPS = 4, 400
 def make(setting):
     if setting == "mjwarp":
         return G1VelocityTask(N, terrain="flat", seed=0, physics_dt=0.0025)
-    it, ms = setting.split(":")
-    return G1VelocityTask(N, terrain="flat", seed=0, engine="newton", newton_iterations=int(it), newton_dt=float(ms) * 1e-3)
+    p = setting.split(":"); it, ms = p[0], p[1]; kw = {}
+    for x in p[2:]:                        # Newton fork options: solver (PD drive), color, relax=R, nolim
+        if x == "solver": kw["drive"] = "solver"
+        elif x == "color": kw["joint_coloring"] = True
+        elif x.startswith("relax="): kw["relaxation"] = float(x.split("=")[1])
+        elif x == "nolim": kw["limit_margin"] = None
+        elif x == "crb": kw["actuator_kw"] = {"joint_inertia": "crb"}
+    return G1VelocityTask(N, terrain="flat", seed=0, engine="newton", newton_iterations=int(it), newton_dt=float(ms) * 1e-3, newton_kw=kw)
 
 
 def play(task, ckpt):
@@ -62,12 +69,19 @@ def play(task, ckpt):
     return q[:, 0], q[:, 2]
 
 
-print("| checkpoint | " + " | ".join(f"{s} x [m] / pelvis z [m]" for s in SETTINGS) + " |")
-print("|---|" + "---|" * len(SETTINGS), flush=True)
-tasks = {s: make(s) for s in SETTINGS}
-for it in ITS:
-    row = [f"Isaac it {it}"]
-    for s in SETTINGS:
-        x, z = play(tasks[s], f"runs/parity/isaac/ckpt_out/model_{it}.pt")
-        row.append(f"{x.mean():.2f} ({x.min():.2f}-{x.max():.2f}) / {z.mean():.3f} ({z.min():.2f}-{z.max():.2f})")
-    print("| " + " | ".join(row) + " |", flush=True)
+def main():
+    import subprocess
+    print("install:", subprocess.run([sys.executable, "scripts/diagnostics/newton_stamp.py"], capture_output=True, text=True).stdout.strip())
+    print("| checkpoint | " + " | ".join(f"{s} x [m] / pelvis z [m]" for s in SETTINGS) + " |")
+    print("|---|" + "---|" * len(SETTINGS), flush=True)
+    tasks = {s: make(s) for s in SETTINGS}
+    for it in ITS:
+        row = [f"Isaac it {it}"]
+        for s in SETTINGS:
+            x, z = play(tasks[s], f"runs/parity/isaac/ckpt_out/model_{it}.pt")
+            row.append(f"{x.mean():.2f} ({x.min():.2f}-{x.max():.2f}) / {z.mean():.3f} ({z.min():.2f}-{z.max():.2f})")
+        print("| " + " | ".join(row) + " |", flush=True)
+
+
+if __name__ == "__main__":
+    main()
