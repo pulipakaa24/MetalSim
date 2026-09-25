@@ -325,3 +325,24 @@ def test_rough_terrain_seed_and_isaac_env_assignment():
     tab = task.hfield["origin_table"]()
     np.testing.assert_allclose(task.origins.numpy(), tab[lv, task.col.numpy()], atol=1e-6)
     assert G1VelocityTask(4, terrain="flat").seed == 0
+
+
+def test_default_task_carries_the_recommended_contact_preset():
+    """G1VelocityTask applies contact_tuning's "recommended" preset (tau10_impact_hardlimits, the 2026-09-25 PhysX-parity
+    decision) by default; contact_cfg="default" keeps MuJoCo's defaults; a g1_model_tuning context wins over both."""
+    from metalsim.physics import contact_tuning as ct
+    t = ct.PRESETS["recommended"]
+    assert t is ct.PRESETS["tau10_impact_hardlimits"]
+    task = G1VelocityTask(2, terrain="flat", seed=0)
+    m = task.model
+    assert task.contact_cfg == "recommended"
+    np.testing.assert_allclose(m.geom_solref, np.tile(t.contact_solref, (m.ngeom, 1)))
+    np.testing.assert_allclose(m.geom_solimp, np.tile(t.contact_solimp, (m.ngeom, 1)))
+    lim = m.jnt_limited.astype(bool)
+    np.testing.assert_allclose(m.jnt_solref[lim], np.tile(t.limit_solref, (lim.sum(), 1)))
+    np.testing.assert_allclose(m.jnt_solimp[lim], np.tile(t.limit_solimp, (lim.sum(), 1)))
+    m0 = G1VelocityTask(2, terrain="flat", seed=0, contact_cfg="default").model
+    np.testing.assert_allclose(m0.geom_solref, np.tile(ct.MUJOCO_DEFAULT_SOLREF, (m0.ngeom, 1)))
+    with ct.g1_model_tuning("tau5_imp99_hardlimits"):
+        m5 = G1VelocityTask(2, terrain="flat", seed=0).model
+    np.testing.assert_allclose(m5.geom_solref, np.tile((0.005, 1.0), (m5.ngeom, 1)))

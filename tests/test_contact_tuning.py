@@ -17,9 +17,11 @@ def test_presets_on_model_and_spec():
     assert np.allclose(m.jnt_solref, [0.005, 1.0]) and np.allclose(m.geom_margin, 0)
     ct.apply(m, "tau5_imp99_margin_gap1cm")
     assert m.geom_margin.tolist() == [0.01, 0, 0] and m.geom_gap.tolist() == [0.01, 0, 0]   # ground only
-    s = mujoco.MjSpec.from_string(XML); ct.apply(s, "recommended"); m2 = s.compile()
+    s = mujoco.MjSpec.from_string(XML); ct.apply(s, "tau5_imp99_hardlimits"); m2 = s.compile()
     assert np.allclose(m2.geom_solref, m.geom_solref) and np.allclose(m2.jnt_solref, [0.005, 1.0])
-    m2.opt.timestep = 0.005; assert len(ct.check_timestep(m2, "recommended")) == 2   # 5 ms < 2 dt: MuJoCo would clamp to 10 ms
+    s = mujoco.MjSpec.from_string(XML); ct.apply(s, "recommended"); m3 = s.compile()     # tau10_impact_hardlimits
+    assert np.allclose(m3.geom_solref, [0.01, 1.0]) and np.allclose(m3.geom_solimp[:, :3], [0.9, 0.999, 0.005])
+    m2.opt.timestep = 0.005; assert len(ct.check_timestep(m2, "tau5_imp99_hardlimits")) == 2   # 5 ms < 2 dt: MuJoCo would clamp to 10 ms
 
 
 def test_g1_builder_context_restores():

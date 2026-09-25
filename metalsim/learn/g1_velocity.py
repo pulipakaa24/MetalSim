@@ -492,7 +492,7 @@ class G1VelocityTask:
                  physics_dt: float = PHYSICS_DT, engine: str = "mjwarp", newton_iterations: int = 4, newton_dt: float = 0.00125,
                  newton_kw: dict | None = None,
                  reward_cfg: str | None = None, scan_ordering: str = "xy", terrain_collision: str | None = None,
-                 scan_surface: str | None = None, feet_slide_velocity: str = "com"):
+                 scan_surface: str | None = None, feet_slide_velocity: str = "com", contact_cfg: str | None = "recommended"):
         """``feet_slide_velocity``: "com" (default) = the foot's centre-of-mass world velocity, Isaac Lab 2.3.2's
         ``body_lin_vel_w`` (= ``body_com_lin_vel_w``) used by ``mdp.feet_slide``; "origin" = the foot body frame
         origin's velocity (MetalSim before 2026-09-25). MuJoCo Warp engine only; the archived Newton path
@@ -541,6 +541,17 @@ class G1VelocityTask:
             raise ValueError(f"engine must be 'mjwarp' or 'newton', not {engine!r}")
         self.model, self.info = build_g1_model(terrain, self.hfield, physics_dt=physics_dt)   # metadata source for both engines
         m = self.model
+        # contact/limit stiffness (metalsim.physics.contact_tuning preset; "recommended" = tau10_impact_hardlimits, the
+        # 2026-09-25 PhysX-parity decision; "default" or None = MuJoCo's defaults). MuJoCo Warp only.
+        from metalsim.physics import contact_tuning
+        self.contact_cfg = contact_cfg if engine == "mjwarp" else None
+        if contact_tuning.active_override() is not None:        # a g1_model_tuning(...) context already tuned the model
+            ov = contact_tuning.active_override()
+            self.contact_cfg = ov if isinstance(ov, str) else repr(ov)
+        elif self.contact_cfg:
+            if self.contact_cfg not in contact_tuning.PRESETS:
+                raise ValueError(f"unknown contact_cfg {contact_cfg!r}; presets: {sorted(contact_tuning.PRESETS)}")
+            contact_tuning.apply(m, self.contact_cfg)
         self.nj = m.nu
         if engine == "newton":
             from metalsim.physics.newton_backend import NewtonSim
@@ -827,11 +838,12 @@ def g1_ppo_config(terrain: str, iterations: int, seed: int = 0):
 
 def train_g1(n=4096, terrain="flat", iterations=1500, seed=None, log_path=None, checkpoint=None, physics_dt=PHYSICS_DT,
              engine="mjwarp", newton_iterations=4, newton_dt=0.00125, newton_kw=None, reward_cfg=None, scan_ordering="xy",
-             terrain_collision=None, scan_surface=None):
+             terrain_collision=None, scan_surface=None, contact_cfg="recommended"):
     from metalsim.learn.ppo_warp import PPOWarp
     task = G1VelocityTask(n, terrain=terrain, seed=seed, physics_dt=physics_dt, engine=engine,
                           newton_iterations=newton_iterations, newton_dt=newton_dt, newton_kw=newton_kw, reward_cfg=reward_cfg,
-                          scan_ordering=scan_ordering, terrain_collision=terrain_collision, scan_surface=scan_surface)
+                          scan_ordering=scan_ordering, terrain_collision=terrain_collision, scan_surface=scan_surface,
+                          contact_cfg=contact_cfg)
     seed = task.seed                     # None -> the task's default (42 rough, Isaac's; 0 flat)
     algo = PPOWarp(task, g1_ppo_config(terrain, iterations, seed))
     f = open(log_path, "a") if log_path else None
@@ -868,7 +880,7 @@ if __name__ == "__main__":
     wp.config.quiet = True
     # optional flags (any position): --engine mjwarp|newton, --newton_it N, --newton_dt S
     opts = {"--engine": "mjwarp", "--newton_it": "4", "--newton_dt": "0.00125", "--newton_limit_margin": "0.15", "--newton_kw": "", "--seed": "0", "--reward_cfg": "", "--scan_ordering": "xy",
-            "--terrain_collision": "", "--scan_surface": ""}
+            "--terrain_collision": "", "--scan_surface": "", "--contact_cfg": "recommended"}
     for k in list(opts):
         if k in sys.argv:
             i = sys.argv.index(k); opts[k] = sys.argv[i + 1]; del sys.argv[i:i + 2]
@@ -884,9 +896,11 @@ if __name__ == "__main__":
                  checkpoint=sys.argv[6] if len(sys.argv) > 6 and sys.argv[6] != "-" else None,
                  physics_dt=float(sys.argv[7]) if len(sys.argv) > 7 else PHYSICS_DT, seed=int(opts["--seed"]),
                  reward_cfg=opts["--reward_cfg"] or None, scan_ordering=opts["--scan_ordering"],
-                 terrain_collision=opts["--terrain_collision"] or None, scan_surface=opts["--scan_surface"] or None, **ekw)
+                 terrain_collision=opts["--terrain_collision"] or None, scan_surface=opts["--scan_surface"] or None,
+                 contact_cfg=opts["--contact_cfg"], **ekw)
         sys.exit(0)
-    task = G1VelocityTask(n, terrain=terrain, physics_dt=float(sys.argv[3]) if len(sys.argv) > 3 else PHYSICS_DT, **ekw)
+    task = G1VelocityTask(n, terrain=terrain, physics_dt=float(sys.argv[3]) if len(sys.argv) > 3 else PHYSICS_DT,
+                          contact_cfg=opts["--contact_cfg"], **ekw)
     print(f"G1 ({terrain}, {task.engine}, physics dt {task.physics_dt}): nbody {task.model.nbody} nv {task.model.nv} nu {task.model.nu} ngeom {task.model.ngeom} obs_dim {task.obs_dim}")
     r = benchmark_step(task, num_frames=100)
     # synchronized measurement over the same protocol
