@@ -1,0 +1,25 @@
+holder: {"name": "camera_update_final", "kind": "timing", "minutes": 6.0, "pid": 71515, "start": 1790315690.831014}
+other python: 71184 python scripts/diagnostics/newton_transfer.py --its 500,1000,1499
+other python: 70923 /bin/bash scripts/gpu_run.sh g1_preflight_tuned_recommended train
+other python: 70885 /bin/bash scripts/gpu_run.sh camera_cartpole_fast train
+other python: 70869 /bin/bash scripts/gpu_run.sh g1_terms_oldcollider_default train
+other python: 68815 /bin/bash scripts/gpu_run.sh g1_terms_tuning_default train
+other python: 68813 /bin/zsh -c source /Users/aditya/.claude/shell-snapshots/snapshot-zsh-1790119045693-uc9dix.sh
+other python: 68554 /bin/bash scripts/gpu_run.sh g1_flat_ppowarp_fixed_flatcfg train
+other python: 62041 /bin/bash scripts/gpu_run.sh g1_flat_newton0625_ppo_fixed train
+other python: 71507 /bin/bash scripts/gpu_run.sh mjw_transfer_head timing
+torch 2.14.0
+gpu_lock status: holder: {"name": "camera_update_final", "kind": "timing", "minutes": 6.0, "pid": 71515, "start": 1790315690.831014}
+==== update
+PPO.update (4 epochs x 32 mb of 2048), fp32          median    7.183 s  min    7.181 s  (implied 7,636 env-steps/s)
+gpu_lock status: holder: {"name": "camera_update_final", "kind": "timing", "minutes": 6.0, "pid": 71515, "start": 1790315690.831014}
+==== fast
+first update incl. compile: 5.7 s
+PPO.update fast_update (3a)                          median    5.233 s  min    5.216 s  (implied 9,880 env-steps/s)
+gpu_lock status: holder: {"name": "camera_update_final", "kind": "timing", "minutes": 6.0, "pid": 71515, "start": 1790315690.831014}
+==== fastk
+first update incl. compile: 4.3 s
+PPO.update fast_update + Metal kernels (3b)          median    3.860 s  min    3.858 s  (implied 12,460 env-steps/s)
+gpu_lock status: holder: {"name": "camera_update_final", "kind": "timing", "minutes": 6.0, "pid": 71515, "start": 1790315690.831014}
+==== update
+PPO.update (4 epochs x 32 mb of 2048), fp32          median    7.127 s  min    7.121 s  (implied 7,686 env-steps/s)

@@ -1,0 +1,96 @@
+holder: {"name": "camera_update_3c", "kind": "timing", "minutes": 5.0, "pid": 62795, "start": 1790313212.9482749}
+Traceback (most recent call last):
+  File "/private/tmp/claude-501/-Users-aditya/7ceab845-25d9-459e-a466-a4b793f72f5c/scratchpad/equiv.py", line 14, in <module>
+    r = _plain_loss(cpu, *args64); g64 = torch.autograd.grad(r, list(cpu.net.parameters()), allow_unused=True)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/tests/test_camera_update_fast.py", line 24, in _plain_loss
+    mean, v = ppo.net(img, q, nchw=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1794, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/metalsim/learn/ppo.py", line 143, in forward
+    h = self.features(image_u8, qpos, nchw)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/metalsim/learn/ppo.py", line 137, in features
+    f = self.cnn(x)
+        ^^^^^^^^^^^
+  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1794, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/metalsim/learn/ppo.py", line 69, in forward
+    return self.fc(self.conv(x))
+                   ^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1794, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/modules/container.py", line 259, in forward
+    input = module(input)
+            ^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1794, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/modules/conv.py", line 565, in forward
+    return self._conv_forward(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/modules/conv.py", line 560, in _conv_forward
+    return F.conv2d(
+           ^^^^^^^^^
+RuntimeError: Input type (float) and bias type (double) should be the same
+torch 2.14.0
+gpu_lock status: holder: {"name": "camera_update_3c", "kind": "timing", "minutes": 5.0, "pid": 62795, "start": 1790313212.9482749}
+==== c1var
+conv1 wgrad kernel JT=3 SPT=2 [ 2.16 TF/s] err 1e-06 median     6.73 ms  min     6.51 ms
+conv1 wgrad kernel JT=3 SPT=4 [ 2.33 TF/s] err 0e+00 median     6.22 ms  min     5.91 ms
+conv1 wgrad kernel JT=3 SPT=8 [ 2.71 TF/s] err 1e-06 median     5.36 ms  min     5.14 ms
+conv1 wgrad kernel JT=3 SPT=16 [ 2.17 TF/s] err 2e-06 median     6.68 ms  min     6.23 ms
+conv1 wgrad kernel JT=3 SPT=32 [ 1.97 TF/s] err 3e-06 median     7.36 ms  min     6.97 ms
+conv1 wgrad kernel JT=6 SPT=2 [ 1.01 TF/s] err 1e-06 median    14.29 ms  min    14.13 ms
+conv1 wgrad kernel JT=6 SPT=4 [ 1.02 TF/s] err 0e+00 median    14.26 ms  min    13.77 ms
+conv1 wgrad kernel JT=6 SPT=8 [ 1.05 TF/s] err 1e-06 median    13.86 ms  min    13.12 ms
+conv1 wgrad kernel JT=6 SPT=16 [ 1.01 TF/s] err 2e-06 median    14.39 ms  min    13.53 ms
+conv1 wgrad kernel JT=6 SPT=32 [ 1.07 TF/s] err 3e-06 median    13.58 ms  min    12.74 ms
+conv1 wgrad kernel JT=12 SPT=2 [ 0.40 TF/s] err 1e-06 median    36.64 ms  min    35.91 ms
+conv1 wgrad kernel JT=12 SPT=4 [ 0.49 TF/s] err 0e+00 median    29.76 ms  min    26.38 ms
+conv1 wgrad kernel JT=12 SPT=8 [ 0.57 TF/s] err 1e-06 median    25.54 ms  min    22.48 ms
+conv1 wgrad kernel JT=12 SPT=16 [ 0.92 TF/s] err 2e-06 median    15.83 ms  min    15.45 ms
+conv1 wgrad kernel JT=12 SPT=32 [ 0.76 TF/s] err 3e-06 median    19.05 ms  min    18.88 ms
+gpu_lock status: holder: {"name": "camera_update_3c", "kind": "timing", "minutes": 5.0, "pid": 62795, "start": 1790313212.9482749}
+==== optvar
+param count 2731683
+clip_grad_norm_ alone                                median     4.13 ms  min     4.09 ms  -> x128 =   0.53 s/update  (implied  33,983 env-steps/s)
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/scripts/diagnostics/camera_update_profile.py", line 548, in main
+    globals()[f"part_{p}"](args)
+  File "/Users/aditya/robosim/scripts/diagnostics/camera_update_profile.py", line 392, in part_optvar
+    m = timeit(lambda: torch.nn.utils.clip_grad_norm_(params, 1.0, foreach=True), 20); row("clip_grad_norm_ foreach=True", *m, 128 * m[0])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/scripts/diagnostics/camera_update_profile.py", line 63, in timeit
+    fn()
+  File "/Users/aditya/robosim/scripts/diagnostics/camera_update_profile.py", line 392, in <lambda>
+    m = timeit(lambda: torch.nn.utils.clip_grad_norm_(params, 1.0, foreach=True), 20); row("clip_grad_norm_ foreach=True", *m, 128 * m[0])
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/utils/clip_grad.py", line 41, in _no_grad_wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/utils/clip_grad.py", line 230, in clip_grad_norm_
+    total_norm = _get_total_norm(grads, norm_type, error_if_nonfinite, foreach)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/utils/clip_grad.py", line 41, in _no_grad_wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/utils/clip_grad.py", line 97, in _get_total_norm
+    raise RuntimeError(
+RuntimeError: foreach=True was passed, but can't use the foreach API on mps tensors

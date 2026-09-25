@@ -1,0 +1,31 @@
+holder: {"name": "camera_update_3b", "kind": "timing", "minutes": 6.0, "pid": 62061, "start": 1790312964.312789}
+.....FF....                                                              [100%]
+=================================== FAILURES ===================================
+E   AssertionError: cnn.conv.2.weight: rel max err 1.68e-04
+    assert 0.00016790652072762722 <= 0.0001
+----------------------------- Captured stderr call -----------------------------
+W0924 22:09:28.008000 62065 .venv/lib/python3.12/site-packages/torch/_inductor/utils.py:1806] [1/0] Not enough SMs to use max_autotune_gemm mode
+/Users/aditya/robosim/tests/test_camera_update_fast.py:60: AssertionError: cnn.conv.2.weight: rel max err 1.68e-04
+E   AssertionError: cnn.conv.2.weight: rel max err 1.68e-04
+    assert 0.00016790652072762722 <= 0.0001
+/Users/aditya/robosim/tests/test_camera_update_fast.py:60: AssertionError: cnn.conv.2.weight: rel max err 1.68e-04
+=========================== short test summary info ============================
+FAILED tests/test_camera_update_fast.py::test_fast_update_matches_plain[0-True-100-False]
+FAILED tests/test_camera_update_fast.py::test_fast_update_matches_plain[0-True-100-True]
+2 failed, 9 passed in 6.82s
+torch 2.14.0
+gpu_lock status: holder: {"name": "camera_update_3b", "kind": "timing", "minutes": 6.0, "pid": 62061, "start": 1790312964.312789}
+==== kernels
+conv1 wgrad  MPSGraph [ 2.32 TF/s]                   median     6.25 ms  min     5.94 ms
+conv1 wgrad  Metal kernel [ 2.40 TF/s]               median     6.03 ms  min     5.86 ms
+conv2 dgrad  MPSGraph [ 2.50 TF/s]                   median     6.48 ms  min     6.43 ms
+conv2 dgrad  Metal kernel [ 5.74 TF/s]               median     2.83 ms  min     2.80 ms
+gpu_lock status: holder: {"name": "camera_update_3b", "kind": "timing", "minutes": 6.0, "pid": 62061, "start": 1790312964.312789}
+==== fast
+W0924 22:09:38.344000 62106 torch/_inductor/utils.py:1806] [0/0] Not enough SMs to use max_autotune_gemm mode
+first update incl. compile: 6.7 s
+PPO.update fast_update (3a)                          median    5.209 s  min    5.207 s  (implied 9,917 env-steps/s)
+gpu_lock status: holder: {"name": "camera_update_3b", "kind": "timing", "minutes": 6.0, "pid": 62061, "start": 1790312964.312789}
+==== fastk
+first update incl. compile: 5.5 s
+PPO.update fast_update + Metal kernels (3b)          median    4.854 s  min    4.841 s  (implied 10,479 env-steps/s)
