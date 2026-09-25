@@ -80,7 +80,8 @@ def seg_reward():
         task.contact_time, g.CONTROL_DT, task.t, task.max_t, pol.step_idx, bufs.rew, bufs.done, task.sim._reset_mask,
         task.resample, int(10.0 / g.CONTROL_DT), task.ep_ret, task.ep_len, task.stats, task.stats_i, task.terms,
         task.curriculum, task.level, task.col, task.origin_table, task.n_levels, task.n_cols, task.cell_size, g.EPISODE_S,
-        task.origins, task.seed, task.isaac_flat, task.torso_hist, task.use_sensor, sens_air, sens_con, task.foot_hist], device=dev)
+        task.origins, task.seed, task.isaac_flat, task.torso_hist, task.use_sensor, sens_air, sens_con, task.foot_hist,
+        task.root_com], device=dev)
 
 
 def seg_reset_data():

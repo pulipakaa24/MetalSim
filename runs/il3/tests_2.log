@@ -1,0 +1,23 @@
+== Fri Sep 25 15:36:58 PDT 2026
+holder: {"name": "il3_tests2", "kind": "timing", "minutes": 5.0, "pid": 24052, "start": 1790375818.0317252}
+  waiting [timing] fastfact_tp est 15.0 min, queued 5 s ago
+  waiting [render] terrain_slots_test est 6.0 min, queued 2079 s ago
+  waiting [train] camera_cartpole_physical_full2 est 25.0 min, queued 6887 s ago
+  waiting [train] g1_flat_flatcfg_tau10 est 80.0 min, queued 2653 s ago
+  waiting [train] il3_train_flat est 70.0 min, queued 2269 s ago
+  waiting [low] newton_vbd_replay est 40.0 min, queued 4909 s ago
+  waiting [low] il3_physx_ours est 40.0 min, queued 3480 s ago
+  waiting [low] kamino_tests_fork est 40.0 min, queued 2289 s ago
+  waiting [low] kamino_tests_152 est 30.0 min, queued 1460 s ago
+  waiting [low] cl_kamino est 45.0 min, queued 129 s ago
+  waiting [low] cl_mjw est 40.0 min, queued 105 s ago
+..........................                                               [100%]
+=============================== warnings summary ===============================
+tests/test_g1_task_terms.py::test_rough_terrain_seed_and_isaac_env_assignment
+tests/test_g1_task_terms.py::test_il3_rough_defaults
+  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+26 passed, 2 warnings in 25.89s
+exit 0 Fri Sep 25 15:37:25 PDT 2026

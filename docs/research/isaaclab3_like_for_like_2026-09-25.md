@@ -75,11 +75,123 @@ from the recording).
 
 ### 1.4 Tests (`tests/test_g1_task_terms.py`, `tests/test_solver_presets.py`)
 
-RESULTS_STEP1
+26 passed on Metal (`runs/il3/tests_2.log`, 2026-09-25 15:37; the first pass, `tests_1.log`, failed 4 on test mistakes:
+a float32 timer edge, the default 5 ms physics step in two tests, and a witness-matching assumption; fixed in the tests):
+
+| test | asserts |
+|---|---|
+| `test_il3_reward_terms_match_isaac_formulas[flat_il3, rough_il3]` | all 13 terms equal Isaac's formulas × weights on the live state, linear-velocity terms from MuJoCo C's `mj_objectVelocity` of the pelvis COM, contact terms from the 3.0 sensor semantics |
+| `test_il3_base_lin_vel_is_the_root_com_velocity` | observation 0:3 = pelvis-COM velocity in the pelvis frame (±0.1 noise), and differs from the frame-origin velocity on moving robots |
+| `test_il3_reset_root_state_distribution_and_application` | 4096 resets: x, y offsets U(±0.5) and yaw U(±3.14) (KS p > 1e-3, support), pure-yaw orientation, default joints, zero joint velocity; the COM linear and angular velocities read back by MuJoCo C are U(±0.5) on each of six axes and uncorrelated; push timers U(10, 15); `il3_events=False` zeroes the velocities |
+| `test_il3_push_robot_interval_and_velocity` | EventManager's rule: fire iff `time_left − 0.02 < 1e-6` (a timer at 0.020002 s counts down), fired envs' xy velocity += U(±0.5) (KS), z and angular unchanged, MuJoCo C's COM velocity changes by exactly that vector, new timers U(10, 15), non-fired timers −0.02 |
+| `test_il3_add_base_mass_distribution_and_constants[default, isaaclab3]` | torso mass ratio log-uniform on [log 0.8, log 1.25] (KS), inertia × the same ratio, other bodies unchanged, subtree mass, and `dof_invweight0` / `body_invweight0` per world equal to MuJoCo C's `mj_setConst` on the same masses (rtol 2e-3); with Isaac's preset the joint-limit solref re-scaled as Newton does (rtol 3e-3); nominal `meaninertia` kept |
+| `test_il3_contact_sensor_ticks` | sensor updated every 2nd 2.5 ms substep, times in whole 5 ms ticks, 3-tick history, in contact iff force > 0 N (Newton), 1 N for `il3_backend="physx"` |
+| `test_il3_rough_defaults` | rough_il3 = rough_isaac rewards / commands, heightfield collision, exact scan |
+| `tests/test_solver_presets.py` (4) | model fields equal the recording (options, geom solref / solimp / gap, all 37 joint-limit solrefs, ranges, armature); refreshed contact distance = fresh collision within 2e-6 m after a move; once-per-tick vs every-substep stand stable and within 5 mm; caps 100 and 20 agree to float noise |
+
+The 2.3.2 tests in the same files (reward sets, observation layout, contact history, feet slide, terrain) still pass:
+the kernels' new `root_com` argument is zero for them.
 
 ## 2. Isaac's own MuJoCo-Warp settings as a preset (`solver_cfg="isaaclab3"`)
 
-PENDING_STEP2
+Code: `metalsim/physics/solver_presets.py` (a new module; `contact_tuning.py` belongs to the contact-fidelity agent
+and is only read). `G1VelocityTask(solver_cfg=...)`, `metalsim.parity.record_g1 --solver_cfg ...` and
+`scripts/diagnostics/il3_transfer.py` take the preset. Tests: `tests/test_solver_presets.py`.
+
+### 2.1 What is honoured, and what is not
+
+| Isaac Lab 3.0 / Newton 1.5.2 setting (source) | honoured? | how / why not |
+|---|---|---|
+| 5 ms tick × 2 substeps = 2.5 ms solver step (`NewtonCfg.num_substeps=2`, `sim.dt` 0.005) | yes | the task's 2.5 ms substeps, 8 per control step |
+| Newton solver, caps 100 / 50 (`MJWarpSolverCfg`) | yes (`isaaclab3`); cap 20 in the training preset | caps copied; see the cost row |
+| early exit at tolerance 1e-6, ls_tolerance 0.01 | **numerically yes, cost no** | MuJoCo Warp marks every world done at the tolerance and skips it in later iterations whether or not a CUDA conditional graph node stops the loop (`mujoco_warp/_src/solver.py` `_solve_done`, `ctx.done`); Metal has no conditional node, so all 100 iterations still launch: 27.5 K vs 53.7 K env-steps/s (§2.3). A cap of 20 gives the same states to float noise (1.2e-7 after 0.2 s, `test_iteration_cap_only_changes_worlds_that_reach_it`) whenever no world needs more than 20 iterations (probe below) |
+| implicitfast, pyramidal cone, impratio 1 | yes | already the task's |
+| contact solref (1.82 ms, 1.375) from ke 1.6e5 / kd 1100 via `convert_solref(ke, kd, 1, 1)` (shape `solref_mode` default MJCF_DEFAULT, so no force-space override), solimp (0.9, 0.95, 0.001, 0.5, 2) | yes | geom solref / solimp; MuJoCo's refsafe raises 1.82 ms to 2 dt = 5 ms in both engines |
+| friction: max(robot 0.8, ground 1.0) = 1.0 | yes (already) | MuJoCo's max rule with robot geoms at 1.0 |
+| margin 0, gap 0.01 per shape (pair 0.02, `gap_sum`) | yes | geom gap 0.01; inactive contacts detected out to 2 cm |
+| per-joint limit solref, 4 ms – 0.46 s, damping ratio 0.03 – 0.35 (`update_jnt_solref_from_invweight0`, force-space `joint_limit_ke/kd`), solimp default | yes | the recorded live values per joint; refsafe floors the finger joints' 4 ms to 5 ms in both; after `add_base_mass` re-scaled per world as Newton does |
+| collision once per 5 ms tick, contacts reused by both substeps with dist/pos refreshed from body poses (`NewtonManager._simulate_*`, `convert_newton_contacts_to_mjwarp_kernel` fast path) | **yes, as an option** | `collision_every=2`: MuJoCo Warp's collision on the first substep; on the second the same contacts, normal and frame, dist/pos from body-local witness points (refreshed distance = a fresh collision pass to 2e-6 m, `test_once_per_tick_contacts_follow_the_bodies`). It matched the recording **worse** than colliding every substep (§2.2), so training uses every-substep collision; the emulation is kept (`isaaclab3`) |
+| Newton's own `CollisionPipeline` (`use_mujoco_contacts=False`: explicit broad phase, contact reduction, Newton's box/mesh-vs-plane narrow phase) | **no** | a different collision library; MetalSim runs MuJoCo Warp's (the C-exact plane-convex set). The contact *set* on the feet can differ (count, points), which is the likely reason the once-per-tick emulation does not help |
+| `njmax` 95 / `nconmax` 10 (flat), 300 / 300 (rough) | not copied | capacities, not physics: an overflow drops constraints nondeterministically. MetalSim keeps 256 / 32 (flat) |
+| contact sensor per tick, 0 N threshold | yes (task side, §1.2) | – |
+
+### 2.2 Fidelity protocol against Isaac's Newton/MuJoCo-Warp recording (measured 2026-09-25)
+
+`python -m metalsim.parity.record_g1 --isaac runs/parity3/isaac/fidelity/newton_mjwarp --out runs/il3/fidelity/<preset>
+--no_render [--contact_tuning P | --solver_cfg P]`, then `metalsim.parity.compare --no_render` (momentum-impulse
+columns from `metalsim.parity.momentum`, the contact agent's method); table by `runs/il3/fidelity_table.py`, logs
+`runs/il3/fidelity.log`, reports `runs/il3/fidelity/report_*/report.json`. "default" = the task's current MuJoCo
+defaults (10 / 20 iterations, contact and limit solref 0.02 / 1); "hardlimits" and "tau10_impact_hardlimits" = the
+contact agent's hard-limit presets (the latter its provisional pick).
+
+
+
+Solver iterations per substep (last substep of each control step, mean / max): Isaac hold 1.46 / 4, random 1.52 / 5,
+drop 1.47 / 6; `isaaclab3` 1.33 / 5, 1.60 / 5, 1.32 / 4; every-substep variant 1.47 / 4, 1.55 / 5, 1.34 / 4; default
+(tolerance 1e-8, cap 10) 1.24 / 5, 2.08 / 6, 1.23 / 5.
+
+Reading:
+* **Soft vs hard joint limits (the key row).** Isaac's own MuJoCo Warp lets joints pass their limits: on the random
+  protocol its largest excursion is 0.227 rad with 112 of 250 control steps over 0.01 rad. The isaaclab3 limits
+  reproduce that (0.216 rad, 118 steps; every-substep variant 0.219, 120); the hard-limit presets hold the limits
+  (0.068 – 0.075 rad) and MuJoCo's default is in between on excursion size but over the limit more often (0.184, 187
+  steps). On hold and drop Isaac stays within 0.01 rad, as do all presets except the default (0.030 rad, 8 steps).
+  So against Isaac Lab 3.0's Newton reference the hard-limit preset is the *wrong* direction; against PhysX (hard
+  limits, PARITY §1.7) it was right. The two Isaac backends disagree here, and MetalSim now has a preset for each.
+* End-state joint error: the isaaclab3 family is 10–60× closer on the hold (0.0001 – 0.0003 rad vs 0.017 – 0.018 for
+  default / hard limits) and 7–9× on the drop (0.0025 – 0.0033 vs 0.021). The contact and limit settings together
+  decide the settled pose; tau10_impact_hardlimits is in between (0.0095 / 0.0125).
+* Impulses per event match Isaac within 1 % on every preset (landing 193 vs 195 N s, torso 238 – 241 vs 241 N s):
+  momentum is not what separates them. The largest 20 ms mean landing force separates them: Isaac 2086 N; every-substep
+  2187 N (+5 %), default / hard limits 2430 N (+16 %), once-per-tick 2979 N (+43 %).
+* Once per tick vs every substep: every-substep is closer on 7 of 11 rows (random divergence 0.26 vs 0.12 s, drop root
+  height RMSE 2.2 vs 5.9 mm, landing 20 ms force, peak joint speed 15.8 vs 7.1 rad/s against Isaac's 14.9, hold end
+  error, penetration similar), once-per-tick on the drop end error (0.0025 vs 0.0032) and hold root height. Honouring
+  the reuse without Newton's own contact set does not buy fidelity, so it stays an option.
+
+**Transfer of Isaac Lab 3.0's own checkpoints into MetalSim** (`scripts/diagnostics/il3_transfer.py`, `runs/il3/step2b.log`,
+`runs/il3/transfer_*.json`; flat_il3 task with the events off, command (0.5, 0, 0) for 8 s = 4.0 m commanded, 4 envs, mean
+action; cells: x travelled mean (range) / final pelvis z / torso contacts / largest joint-limit excursion and its joint).
+No Isaac-side play of the 3.0 checkpoints was recorded, so the columns compare presets with each other and with the
+command, not with Isaac's own distance (the 2.3.2 PhysX checkpoints walked 3.0–3.2 m in Isaac, PARITY §1.5).
+
+
+Isaac Lab 3.0 newton_mjwarp checkpoints in MetalSim, command (0.5, 0, 0) for 8 s (commanded 4.0 m), 4 envs, mean action; x travelled [m] mean (min-max) / final pelvis z [m] / torso contacts / max limit excursion [rad]
+| checkpoint | default | hardlimits | isaaclab3 | isaaclab3_collide_every_substep | isaaclab3_hardlimits |
+|---|---|---|---|---|---|
+| it 500 | 3.38 (3.33-3.44) / 0.693 / 0 / 0.084 (left_six_joint) | 3.39 (3.33-3.44) / 0.695 / 0 / 0.084 (left_six_joint) | 3.44 (3.39-3.49) / 0.695 / 0 / 0.032 (left_six_joint) | 3.45 (3.42-3.50) / 0.695 / 0 / 0.032 (left_six_joint) | 3.39 (3.36-3.42) / 0.695 / 0 / 0.081 (left_six_joint) |
+| it 1000 | 3.64 (3.62-3.66) / 0.672 / 0 / 0.138 (left_six_joint) | 3.64 (3.63-3.66) / 0.672 / 0 / 0.138 (left_six_joint) | 3.72 (3.69-3.75) / 0.674 / 0 / 0.049 (left_six_joint) | 3.72 (3.69-3.74) / 0.673 / 0 / 0.047 (left_six_joint) | 3.69 (3.68-3.71) / 0.675 / 0 / 0.133 (left_six_joint) |
+| it 1499 | 3.66 (3.64-3.70) / 0.663 / 0 / 0.137 (left_six_joint) | 3.66 (3.64-3.70) / 0.663 / 0 / 0.137 (left_six_joint) | 3.78 (3.76-3.79) / 0.662 / 0 / 0.051 (left_four_joint) | 3.78 (3.75-3.80) / 0.664 / 0 / 0.051 (left_four_joint) | 3.69 (3.66-3.73) / 0.666 / 0 / 0.140 (left_six_joint) |
+
+Isaac Lab 3.0 isaacsim_physx checkpoints in MetalSim, command (0.5, 0, 0) for 8 s (commanded 4.0 m), 4 envs, mean action; x travelled [m] mean (min-max) / final pelvis z [m] / torso contacts / max limit excursion [rad]
+| checkpoint | default | hardlimits | isaaclab3 | isaaclab3_collide_every_substep | isaaclab3_hardlimits |
+|---|---|---|---|---|---|
+| it 500 | 3.19 (3.13-3.26) / 0.653 / 0 / 0.097 (left_six_joint) | 3.19 (3.14-3.26) / 0.654 / 0 / 0.097 (left_six_joint) | 3.27 (3.21-3.33) / 0.656 / 0 / 0.035 (left_six_joint) | 3.30 (3.21-3.35) / 0.657 / 0 / 0.035 (left_six_joint) | 3.23 (3.17-3.28) / 0.654 / 0 / 0.096 (left_six_joint) |
+| it 1000 | 3.35 (3.31-3.38) / 0.653 / 0 / 0.111 (right_six_joint) | 3.35 (3.31-3.38) / 0.653 / 0 / 0.112 (right_six_joint) | 3.42 (3.39-3.49) / 0.653 / 0 / 0.041 (right_six_joint) | 3.44 (3.40-3.51) / 0.654 / 0 / 0.040 (right_six_joint) | 3.39 (3.34-3.43) / 0.652 / 0 / 0.110 (right_six_joint) |
+| it 1499 | 3.52 (3.49-3.57) / 0.644 / 0 / 0.121 (left_six_joint) | 3.52 (3.49-3.57) / 0.644 / 0 / 0.121 (left_six_joint) | 3.51 (3.47-3.54) / 0.646 / 0 / 0.045 (left_six_joint) | 3.53 (3.51-3.59) / 0.646 / 0 / 0.046 (left_six_joint) | 3.56 (3.52-3.60) / 0.646 / 0 / 0.121 (left_six_joint) |
+
+Every checkpoint walks in every preset (no falls). Isaac's numerics add 2–3 % distance (3.72–3.78 vs 3.64–3.66 m for
+the Newton checkpoints at 1000 / 1499). The largest excursion is always a finger joint (`*_six_joint`, `left_four_joint`):
+the policy's finger targets lie past the limits; Isaac's finger-limit solref (5 ms after refsafe, ζ 0.33–0.35) is
+*stiffer* than the hard-limit preset (5 ms, ζ 1; stiffness ∝ 1/ζ²), so Isaac's settings hold the fingers 2.7× closer
+(0.047–0.051 vs 0.133–0.140 rad) while leaving the large leg joints soft (time constants 0.16–0.46 s).
+
+### 2.3 Cost (4096 envs, flat, full env step with rewards / resets / observations, synchronized, random actions; `runs/il3/bench.log`)
+
+| variant | env-steps/s |
+|---|---|
+| 2.3.2 flat task, MuJoCo defaults (10 / 20 iterations) | 53,509 |
+| flat_il3, MuJoCo defaults | 53,676 |
+| flat_il3 + isaaclab3 (cap 100, once per tick) | 27,520 |
+| flat_il3 + isaaclab3, collision every substep (cap 100) | 27,240 |
+| flat_il3 + isaaclab3, cap 20 (once per tick) | 50,440 |
+| flat_il3 + hardlimits | 53,782 |
+
+The 3.0 task terms cost nothing measurable (+0.3 %); the 100-iteration cap halves the rate on Metal (all iterations
+launch; per-world exit makes most of them no-ops); a cap of 20 recovers 94 %.
+
+**Does the cap of 20 bind?** `runs/il3/niter_probe.py` (flat_il3, 4096 envs, uniform random actions in [−1, 1], 300 control steps, robots falling and lying, every substep read): mean 2.14 iterations per substep, 99.99th percentile 8, maximum 12, and **0 of 9,830,400** substep-worlds above 20, for both collision variants. On this task the cap of 20 is therefore Isaac's cap of 100 to float noise.
+
 
 ## 3. Training like for like
 
@@ -87,8 +199,43 @@ PENDING_STEP3
 
 ## 4. Remaining setup differences
 
-PENDING_DIFFS
+Between MetalSim's `flat_il3` / `rough_il3` run and Isaac Lab 3.0's `Isaac-Velocity-{Flat,Rough}-G1` on
+`newton_mjwarp` after this port:
+
+1. **Collision library**: Newton's `CollisionPipeline` (explicit broad phase, contact reduction, its own narrow phase)
+   vs MuJoCo Warp's collision (C-exact plane-convex set; per-triangle heightfield patch on rough). Not portable without
+   porting Newton's pipeline.
+2. **Contact reuse within the 5 ms tick**: emulated (`collision_every=2`) but not used for training, because with MuJoCo
+   Warp's contact set it matched the recording worse than colliding every substep (§2.2).
+3. **Iteration cap 20 instead of 100** in the training preset (same tolerance and per-world exit; binds only when a world
+   needs more than 20 iterations: probe in §2.3). On Metal, the conditional graph node that makes the cap of 100 free on
+   CUDA does not exist.
+4. **Learner**: MetalSim's PPOWarp (checked against rsl_rl 3.1.2, PARITY §1.5) vs rsl_rl 5.4.1 with the same
+   hyper-parameters; different random generators and noise streams.
+5. **Randomness**: same distributions, different generators (torch CUDA Philox vs Warp's `rand_init`/numpy); the mass
+   draw per env, push timers and reset draws are therefore not the same values.
+6. **Logging statistic**: Isaac's "Mean reward" / "Mean episode length" = mean of the last 100 finished episodes;
+   Episode_Reward terms = per-step means over reset envs, averaged over the iteration's steps with resets. MetalSim: means
+   over the episodes finished in that iteration (≈100 per iteration once episodes are full), per-term episode sums /
+   20 s over those episodes. Isaac's iterations are 0-based, PPOWarp's 1-based.
+7. **Hardware and rate**: L4 (CUDA) vs M4 Max (Metal); throughput is reported, not matched.
+8. **Asset build**: Isaac Sim 6.1 USD through Newton's importer vs the 5.1 USD through `metalsim.scene.usd_to_mjcf`:
+   masses, inertias, COMs, ranges, armature and gains equal to 5e-6 relative (§1.3); the collision shapes (4 geoms: two
+   foot boxes, torso box, plane) the same.
+9. **`njmax` / `nconmax`**: Isaac's 95 / 10 (flat) could drop contacts on overflow; MetalSim's buffers do not overflow.
+10. **Joint-limit solref after mass randomization**: re-scaled per world with MetalSim's own `dof_invweight0` ratio;
+    Isaac's absolute `dof_invweight0` is not recorded (the nominal per-joint values are).
+11. **2.3.2 ports**: still read the frame-origin root velocity (§1.2); left as they were, flagged in the ledger.
+
 
 ## 5. Decisions (DECISIONS.md-style rows; options archived behind flags)
 
-PENDING_DECISIONS
+| date | decision | options considered (with numbers) | chosen and why | how to re-enable the others |
+|---|---|---|---|---|
+| 2026-09-25 | Isaac Lab 3.0 task port | (a) disable 3.0's events on the Isaac side; (b) port push_robot, add_base_mass, ±0.5 reset velocities, the Newton contact-sensor semantics (5 ms ticks, 3-tick history, 0 N air-time threshold), the COM root velocity and the rasterized rough heightfield | (b): the reference runs already exist with the events on | `reward_cfg="flat"/"rough_isaac"` (2.3.2), `il3_events=False`, `il3_backend="physx"` (1 N threshold) |
+| 2026-09-25 | Root linear velocity in the 2.3.2 ports | frame-origin velocity (as ported) vs the pelvis COM velocity (Isaac's `root_lin_vel_*` in 2.3.2 and 3.0; ω × 7.6 cm, up to ~4 cm/s) | COM for the il3 configs; the 2.3.2 configs left untouched (user rule), recorded here as a defect | kernel argument `root_com` (zero = origin) |
+| 2026-09-25 | Joint limits against Isaac Lab 3.0's Newton reference | hard limits (5 ms, 0.99–0.999): random-protocol max excursion 0.068 rad / 134 steps > 0.01; Isaac's live soft limits (4 ms–0.46 s, ζ 0.03–0.35): 0.216 / 118; Isaac Newton itself 0.227 / 112 | soft (Isaac's recorded values) when the reference is Newton; hard stays the PhysX-reference choice | `solver_cfg="isaaclab3_hardlimits"`, `contact_tuning` presets |
+| 2026-09-25 | Collision once per 5 ms tick | once per tick with witness-point refresh (Newton's fast path) vs every substep: every substep closer on 7 of 11 protocol rows (landing 20 ms force 2187 vs 2979 N, Isaac 2086; drop root-height RMSE 2.2 vs 5.9 mm; random divergence 0.26 vs 0.12 s), cost equal (27.2 K vs 27.5 K) | every substep (Newton's own contact set is not reproduced, so the reuse alone does not help) | `solver_cfg="isaaclab3"` (`collision_every=2`) |
+| 2026-09-25 | Iteration cap for Isaac's numerics on Metal | cap 100 (Isaac's): 27.5 K env-steps/s; cap 20: 50.4 K, states equal to 1.2e-7 when no world exceeds 20 | cap 20 for training, with the probe count of worlds above 20 reported | `solver_cfg="isaaclab3_collide_every_substep"` (cap 100) |
+| 2026-09-25 | Rough collision surface for the 3.0 Newton reference | exact boxes (2.3.2 rough port, matches PhysX's mesh) vs the 0.1 m heightfield (what Newton rasterizes in 3.0) | heightfield for `rough_il3` | `terrain_collision="boxes_local"` |
+
