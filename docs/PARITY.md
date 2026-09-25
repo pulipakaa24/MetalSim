@@ -314,6 +314,26 @@ deviation (−0.168 vs −0.153). The earlier ~50-iteration takeoff lag was the 
 Also ported: rough-terrain seed 42 (Isaac's), Isaac's env→column assignment (reproducing its float32
 arithmetic), initial levels from `torch.randint`.
 
+**Like-for-like training result** (`runs/g1_flat_ppowarp_fixed_flatcfg.log`: fixed PPO, Isaac's flat
+configuration, MuJoCo Warp at 2.5 ms, 4096 envs, seed 0, 1000 iterations, measured 2026-09-25, 25.7 K
+env-steps/s incl. the monitor):
+
+| iteration | Isaac (PhysX + rsl_rl, its own run): length / return | MetalSim (MuJoCo Warp + our PPO, Isaac's config) |
+|---|---|---|
+| 100 | 200 / −6.6 | 91 / −5.3 |
+| 150 | 954 / −4.3 | 984 / −10.5 |
+| 200 | 981 / +6.6 | 999 / +0.7 |
+| 300 | 1000 / +19.2 | 1000 / +12.1 |
+| 500 | 996 / +25.3 | 997 / +21.0 |
+| 750 | 988 / +26.8 | 1000 / +26.3 |
+| 1000 | 991 / +27.3 | **1000 / +28.4** |
+
+Same task, same reward weights, same learner configuration, same seed convention, our physics: full
+episodes at the same iteration as Isaac, the same final return (+28.4 vs +27.3), a slower rise between
+iterations 200 and 500 (the remaining contact-model differences: feet slide and air time, §1.7 and
+the contact-tuning work). Both runs are one seed. This is the acceptance test "identical PPO config,
+identical result" of the plan, met on one task.
+
 **Fixed PPO, demonstrated** (`runs/g1_flat_ppowarp_fixed.log`, MuJoCo Warp, 4096 envs, 1000 iterations,
 same config and seed, measured 2026-09-24, 25.3 K env-steps/s including the monitor):
 
