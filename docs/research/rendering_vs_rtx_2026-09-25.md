@@ -247,6 +247,15 @@ Exposure 1.0 washes out a scene authored for a linear-clamp display; 0.25 maps i
 and the learning signal matches the legacy run over the first 10 iterations (same seed). Cost: +26 ms per 1024-env
 step, all from 4 spp (the tone map and sun disk are free); −22 % end-to-end PPO throughput.
 
+**Full 8 M-step run** (`runs/camera_cartpole_physical_full.log`, train queue, 2026-09-25): physical tier 2, 4 spp, 1024
+envs: return 7.8 / 45.7 / 70.0 / 82.8 / 89.4 / 86.0 at iterations 1 / 10 / 20 / 40 / 80 / 123 (mean of the last 20
+iterations 85.3), vs tier 0 (`runs/camera_cartpole_tier0.log`) 7.0 / 47.1 / 67.8 / 83.9 / 86.9 / 85.4 (86.3);
+8,788 env-steps/s including training. An earlier attempt failed at iteration 1 with NaN losses: its PPO-update MPS
+command buffers ran out of GPU memory (`kIOGPUCommandBufferCallbackErrorOutOfMemory`) because the job ran without the
+GPU lock; the renderer's output was identical to the successful runs (`runs/camera_cartpole_physical_full_failed_oom.log`).
+The path tracer now also zeroes any non-finite path estimate before accumulation, and
+`test_physical_preset_batch_is_finite` checks 1024 frames.
+
 **Gallery videos** (`docs/gallery/g1_stage_*.mp4`, 12 files, via `scripts/gallery/g1_stage_videos.sh` + round 2):
 re-rendered with `metalsim.parity.side_by_side --tier2_mode rtx` (preset `oidn_cal_fvg`, 16 spp × 4 passes).
 
