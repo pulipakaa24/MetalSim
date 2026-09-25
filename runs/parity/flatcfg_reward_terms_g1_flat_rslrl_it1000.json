@@ -1,0 +1,28 @@
+{
+ "ckpt": "/Users/aditya/robosim/runs/policies/g1_flat_rslrl/g1_flat_rslrl_it1000.pt",
+ "iterations": 1000,
+ "episodes": 1052,
+ "mean_episode_length": 959.3507604562737,
+ "mean_return": 20.83376775579489,
+ "terminations": {
+  "fell": 65,
+  "timeout": 987
+ },
+ "Episode_Reward": {
+  "track_lin_vel_xy_exp": 0.8246,
+  "track_ang_vel_z_exp": 0.7274,
+  "feet_air_time": 0.0451,
+  "feet_slide": -0.0254,
+  "joint_deviation_all": -0.2149,
+  "flat_orientation_l2": -0.0094,
+  "action_rate_l2": -0.2461,
+  "termination_penalty": -0.0124,
+  "lin_vel_z_l2": -0.0097,
+  "ang_vel_xy_l2": -0.0108,
+  "dof_torques_l2": -0.0088,
+  "dof_acc_l2": -0.0098,
+  "dof_pos_limits": -0.0081
+ },
+ "note": "per-second average over the episode like Isaac's RewardManager; joint_deviation_all = hip+arms+fingers+torso",
+ "reward_cfg": "flat"
+}

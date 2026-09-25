@@ -21,7 +21,7 @@ so rsl_rl bootstraps them like Isaac's ``RslRlVecEnvWrapper``. ``episode_length_
 task's per-env step counter, so ``runner.learn(init_at_random_ep_len=True)`` (Isaac's train.py)
 staggers the time-outs as in Isaac.
 
-Per-term episode sums (the eight terms the reward kernel exposes, x dt, divided by the 20 s episode
+Per-term episode sums (the thirteen terms the reward kernel exposes, x dt, divided by the 20 s episode
 like Isaac's RewardManager) are accumulated on the device and read once per iteration with
 ``pop_term_stats()``; they are not passed to rsl_rl, so its console output stays per-term free.
 """
@@ -36,7 +36,8 @@ from metalsim.learn.g1_velocity import CONTROL_DT, EPISODE_S, G1VelocityTask
 from metalsim.learn.warp_policy import RolloutBuffers, bump
 
 TERM_NAMES = ["track_lin_vel_xy_exp", "track_ang_vel_z_exp", "feet_air_time", "feet_slide", "joint_deviation_all",
-              "flat_orientation_l2", "action_rate_l2", "termination_penalty"]
+              "flat_orientation_l2", "action_rate_l2", "termination_penalty", "lin_vel_z_l2", "ang_vel_xy_l2",
+              "dof_torques_l2", "dof_acc_l2", "dof_pos_limits"]
 
 
 class G1RslRlVecEnv:
@@ -66,8 +67,8 @@ class G1RslRlVecEnv:
         self.t_terms = tb.mps_tensor(task.terms)
         self._t_len = tb.mps_tensor(task.t)          # int32 per-env step counter (time-out clock)
         # per-term bookkeeping (device side, read once per iteration)
-        self.ep_terms = torch.zeros(n, 8, device="mps")
-        self.done_terms = torch.zeros(8, device="mps")
+        self.ep_terms = torch.zeros(n, len(TERM_NAMES), device="mps")
+        self.done_terms = torch.zeros(len(TERM_NAMES), device="mps")
         self.done_count = torch.zeros((), device="mps")
         self.done_falls = torch.zeros((), device="mps")
         self.nonfinite_obs = torch.zeros((), device="mps")
