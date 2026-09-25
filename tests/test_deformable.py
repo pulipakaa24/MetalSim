@@ -10,7 +10,27 @@ import warp as wp
 
 from metalsim.physics import deformable as dfm
 
-pytestmark = pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal")
+
+
+def _flex_support() -> str | None:
+    """Reason to skip, or None: these tests need the metalsim-flex branches of both forks (MuJoCo Warp: MuJoCo C's
+    flex contact model; Warp: segmented_sort_pairs inside a Metal graph capture)."""
+    try:
+        import inspect
+        from mujoco_warp._src import collision_flex
+        from warp._src import utils as wp_utils
+    except Exception as e:  # noqa: BLE001
+        return f"MuJoCo Warp / Warp not importable: {e!r}"
+    if not hasattr(collision_flex, "FLEX_FPS_MODE"):
+        return "installed MuJoCo Warp lacks the metalsim-flex fixes (pulipakaa24/mujoco_warp branch metalsim-flex)"
+    if "is_capturing" not in inspect.getsource(wp_utils.segmented_sort_pairs):
+        return "installed Warp lacks segmented_sort_pairs graph capture on Metal (pulipakaa24/warp 9dcb140, branch metalsim-flex)"
+    return None
+
+
+_SKIP = _flex_support()
+pytestmark = [pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal"),
+              pytest.mark.skipif(_SKIP is not None, reason=str(_SKIP))]
 DEV = os.environ.get("METALSIM_DEFORMABLE_DEVICE", "metal:0")   # "cpu" for a dry run of the logic
 
 
