@@ -1,0 +1,48 @@
+holder: {"name": "fastfact_tp", "kind": "timing", "minutes": 15.0, "pid": 24251, "start": 1790375848.516782}
+  waiting [render] terrain_slots_test est 6.0 min, queued 2110 s ago
+  waiting [train] camera_cartpole_physical_full2 est 25.0 min, queued 6918 s ago
+  waiting [train] g1_flat_flatcfg_tau10 est 80.0 min, queued 2684 s ago
+  waiting [train] il3_train_flat est 70.0 min, queued 2300 s ago
+  waiting [low] newton_vbd_replay est 40.0 min, queued 4940 s ago
+  waiting [low] il3_physx_ours est 40.0 min, queued 3511 s ago
+  waiting [low] kamino_tests_fork est 40.0 min, queued 2320 s ago
+  waiting [low] kamino_tests_152 est 30.0 min, queued 1490 s ago
+  waiting [low] cl_kamino est 45.0 min, queued 159 s ago
+  waiting [low] cl_mjw est 40.0 min, queued 136 s ago
+--- other busy processes (cpu > 20 %):
+  PID  %CPU     ELAPSED COMMAND
+24244  98.4       00:01 .venv/bin/python scripts/diagnostics/closed_loops/mjw_loops.py traj --engine c --mech fourbar --torque sigma3 --amp 3 --worlds 32 --T 8 
+tp old cartpole_rgb: 322,796 env-steps/s best of 3 (median 321,613) at 4096 envs x 2 substeps
+tp old cartpole_state: 1,881,063 env-steps/s best of 3 (median 1,875,973) at 4096 envs x 2 substeps
+tp old so101_lift: 124,013 env-steps/s best of 3 (median 122,465) at 4096 envs x 4 substeps
+tp old lidar_nav: 68,448 env-steps/s best of 3 (median 60,366) at 4096 envs x 5 substeps
+tp old tron1_wf: 1,040,802 env-steps/s best of 3 (median 852,531) at 4096 envs x 1 substeps
+tp old tron1_sim: 26,210 env-steps/s best of 3 (median 24,933) at 4096 envs x 10 substeps
+tp old go1: 3,693 env-steps/s best of 3 (median 3,688) at 4096 envs x 10 substeps
+tp old panda: 28,655 env-steps/s best of 3 (median 28,457) at 4096 envs x 10 substeps
+tp new cartpole_rgb: 331,093 env-steps/s best of 3 (median 329,924) at 4096 envs x 2 substeps
+tp new cartpole_state: 1,898,693 env-steps/s best of 3 (median 1,896,662) at 4096 envs x 2 substeps
+tp new so101_lift: 124,587 env-steps/s best of 3 (median 122,995) at 4096 envs x 4 substeps
+tp new lidar_nav: 68,740 env-steps/s best of 3 (median 60,558) at 4096 envs x 5 substeps
+tp new tron1_wf: 1,008,321 env-steps/s best of 3 (median 847,225) at 4096 envs x 1 substeps
+tp new tron1_sim: 26,073 env-steps/s best of 3 (median 24,909) at 4096 envs x 10 substeps
+tp new go1: 3,699 env-steps/s best of 3 (median 3,692) at 4096 envs x 10 substeps
+tp new panda: 28,623 env-steps/s best of 3 (median 28,445) at 4096 envs x 10 substeps
+tp old cartpole_rgb: 330,528 env-steps/s best of 3 (median 328,667) at 4096 envs x 2 substeps
+tp old cartpole_state: 1,899,618 env-steps/s best of 3 (median 1,898,999) at 4096 envs x 2 substeps
+tp old so101_lift: 124,535 env-steps/s best of 3 (median 123,085) at 4096 envs x 4 substeps
+tp old lidar_nav: 68,733 env-steps/s best of 3 (median 60,552) at 4096 envs x 5 substeps
+tp old tron1_wf: 1,027,559 env-steps/s best of 3 (median 856,212) at 4096 envs x 1 substeps
+tp old tron1_sim: 26,237 env-steps/s best of 3 (median 25,064) at 4096 envs x 10 substeps
+tp old panda: 28,695 env-steps/s best of 3 (median 28,463) at 4096 envs x 10 substeps
+tp new cartpole_rgb: 332,179 env-steps/s best of 3 (median 331,604) at 4096 envs x 2 substeps
+tp new cartpole_state: 1,899,996 env-steps/s best of 3 (median 1,897,317) at 4096 envs x 2 substeps
+tp new so101_lift: 124,584 env-steps/s best of 3 (median 122,983) at 4096 envs x 4 substeps
+tp new lidar_nav: 68,703 env-steps/s best of 3 (median 60,536) at 4096 envs x 5 substeps
+tp new tron1_wf: 1,018,901 env-steps/s best of 3 (median 846,155) at 4096 envs x 1 substeps
+tp new tron1_sim: 26,095 env-steps/s best of 3 (median 25,017) at 4096 envs x 10 substeps
+tp new panda: 28,638 env-steps/s best of 3 (median 28,422) at 4096 envs x 10 substeps
+--- other busy processes at the end:
+  PID  %CPU     ELAPSED COMMAND
+scripts/gpu_run.sh: line 19: syntax error near unexpected token `)'
+scripts/gpu_run.sh: line 19: `ripts/gpu_util.sh); [ "${u:-0}" -lt 10 ] && break; sleep 2; done'

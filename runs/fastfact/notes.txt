@@ -1,0 +1,6 @@
+Fast-factorization settings (metal_register_cholesky_max 48, m_dense_max 0) on every scene vs the previous defaults (40 / 64).
+check.log, check2.log: correctness (floor, replay vs eager, MuJoCo C) valid; their THROUGHPUT numbers are CONTAMINATED
+(a macOS TrialArchivingService used ~99 % of the GPU 14:35-15:40, and an out-of-queue process overlapped check2's first
+~7 min; coordinator notices 2026-09-25). check.log's tron1_sim new-vs-old comparison is invalid (protocol changed between
+the two processes); check2.log has the valid one. tp.log / tp.jsonl: clean throughput re-measurement (old, new, old, new).
+Decision: settings stay G1-only (Tron1-WF medians -0.6 % / -1.2 % with them; every other scene within +-0.5 %).
