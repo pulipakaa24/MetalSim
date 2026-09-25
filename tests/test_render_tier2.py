@@ -220,3 +220,18 @@ def test_rtx_tonemap_and_denoisers_on_furnace():
         assert abs(clean.mean() / noisy.mean() - 1) < 0.02 and clean.std() < 0.5 * noisy.std()
         assert abs(out["rgb"].mean() - tm(clean).mean()) < 1.5
     assert ran >= 1
+
+
+def test_physical_preset_batch_is_finite():
+    """1024 camera-RL frames under the physical tier-2 preset (the Cartpole-RGB default): every accumulated radiance
+    value is finite and the observation is not degenerate."""
+    from metalsim.learn.cartpole_rgb import CartpoleRGBEnv, CartpoleRGBConfig
+    env = CartpoleRGBEnv(CartpoleRGBConfig(num_envs=1024, tier=2, render_mode="physical"))
+    obs = env.reset()
+    for _ in range(10):
+        obs, r, done, info = env.step(torch.rand(1024, 1, device="mps") * 2 - 1)
+    env.synchronize()
+    acc = env.rend._accum.numpy()
+    assert np.isfinite(acc).all() and (acc[..., 3] > 0).all()
+    img = obs["image"].float()
+    assert torch.isfinite(img).all() and 40 < img.mean().item() < 200 and img.std().item() > 10

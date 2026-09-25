@@ -342,6 +342,9 @@ kernel void path_trace(
             }
             o = h.p + N * 0.001; d = Lnew;
         }
+        // never let a non-finite path estimate reach the accumulator (fast-math safe: test the exponent bits)
+        uint3 bits = as_type<uint3>(radiance);
+        if (any((bits & 0x7f800000u) == 0x7f800000u)) radiance = float3(0.0);
         sum += radiance;
     }
     // progressive accumulation
