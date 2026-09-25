@@ -101,19 +101,35 @@ def height_scan_grid(xpos: wp.array2d(dtype=wp.vec3), xmat: wp.array2d(dtype=wp.
     out[e, k] = bp[2] - z - offset_z
 
 
+def scan_grid(ordering="xy", size=(1.6, 1.0), res=0.1):
+    """(187, 2) ray offsets of Isaac's GridPatternCfg. ``ordering="xy"`` is Isaac's (GridPatternCfg default:
+    torch.meshgrid(x, y, indexing="xy") flattened, x varies fastest; verified against Isaac Sim's recorded
+    height scan, runs/parity/isaac/rough/play_rough). ``"ij"`` (y fastest) is the order MetalSim used before
+    2026-09-25; policies trained with it need ``scan_perm`` to run on Isaac-ordered scans."""
+    xs = np.arange(-size[0] / 2, size[0] / 2 + 1e-6, res); ys = np.arange(-size[1] / 2, size[1] / 2 + 1e-6, res)
+    gx, gy = np.meshgrid(xs, ys, indexing=ordering)
+    return np.stack([gx.ravel(), gy.ravel()], 1).astype(np.float32)
+
+
+def scan_perm(src="xy", dst="ij", size=(1.6, 1.0), res=0.1):
+    """Index array p with scan_dst = scan_src[..., p] (reorders a height scan between ray orderings)."""
+    a = np.round(scan_grid(src, size, res) / res).astype(int); b = np.round(scan_grid(dst, size, res) / res).astype(int)
+    idx = {tuple(v): i for i, v in enumerate(a)}
+    return np.array([idx[tuple(v)] for v in b])
+
+
 class HeightScanner:
     """Isaac's height scan (1.6 x 1.0 m grid, 0.1 m, 187 rays, yaw-aligned, ``body_z - hit_z - 0.5``)
     evaluated as a Warp kernel on the simulation queue (capturable into rollout graphs); the terrain is
     a heightfield, so the ray hit is the triangle interpolation of the grid. ``metalsim.sensors.raytrace``
     remains the path for scanning arbitrary meshes."""
 
-    def __init__(self, task, hfield, body="torso_link", size=(1.6, 1.0), res=0.1, offset_z=0.5, device="metal:0"):
+    def __init__(self, task, hfield, body="torso_link", size=(1.6, 1.0), res=0.1, offset_z=0.5, device="metal:0", ordering="xy"):
         import mujoco
         self.task, self.device = task, device
         self.body = mujoco.mj_name2id(task.model, mujoco.mjtObj.mjOBJ_BODY, body)
-        xs = np.arange(-size[0] / 2, size[0] / 2 + 1e-6, res); ys = np.arange(-size[1] / 2, size[1] / 2 + 1e-6, res)
-        gx, gy = np.meshgrid(xs, ys, indexing="ij")
-        self.grid = np.stack([gx.ravel(), gy.ravel()], 1).astype(np.float32)   # (187, 2)
+        self.ordering = ordering          # "xy" = Isaac's ray order; "ij" = MetalSim's order before 2026-09-25
+        self.grid = scan_grid(ordering, size, res)   # (187, 2)
         self.n_rays = len(self.grid)
         self.offset_z = offset_z
         self.grid_wp = wp.array(self.grid, dtype=float, device=device)

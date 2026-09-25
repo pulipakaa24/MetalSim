@@ -1,0 +1,40 @@
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/scripts/diagnostics/g1_reward_terms.py", line 90, in <module>
+    main()
+  File "/Users/aditya/robosim/scripts/diagnostics/g1_reward_terms.py", line 37, in main
+    ap.add_argument("--seed", type=int, default=1, help="task seed (on rough terrain also the terrain seed; the training run's for its terrain)")
+  File "/Users/aditya/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/argparse.py", line 1500, in add_argument
+    return self._add_action(action)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/argparse.py", line 1885, in _add_action
+    self._optionals._add_action(action)
+  File "/Users/aditya/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/argparse.py", line 1705, in _add_action
+    action = super(_ArgumentGroup, self)._add_action(action)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/argparse.py", line 1514, in _add_action
+    self._check_conflict(action)
+  File "/Users/aditya/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/argparse.py", line 1654, in _check_conflict
+    conflict_handler(action, confl_optionals)
+  File "/Users/aditya/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/argparse.py", line 1663, in _handle_conflict_error
+    raise ArgumentError(action, message % conflict_string)
+argparse.ArgumentError: argument --seed: conflicting option string: --seed
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/scripts/diagnostics/g1_reward_terms.py", line 90, in <module>
+    main()
+  File "/Users/aditya/robosim/scripts/diagnostics/g1_reward_terms.py", line 37, in main
+    ap.add_argument("--seed", type=int, default=1, help="task seed (on rough terrain also the terrain seed; the training run's for its terrain)")
+  File "/Users/aditya/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/argparse.py", line 1500, in add_argument
+    return self._add_action(action)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/argparse.py", line 1885, in _add_action
+    self._optionals._add_action(action)
+  File "/Users/aditya/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/argparse.py", line 1705, in _add_action
+    action = super(_ArgumentGroup, self)._add_action(action)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/argparse.py", line 1514, in _add_action
+    self._check_conflict(action)
+  File "/Users/aditya/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/argparse.py", line 1654, in _check_conflict
+    conflict_handler(action, confl_optionals)
+  File "/Users/aditya/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/argparse.py", line 1663, in _handle_conflict_error
+    raise ArgumentError(action, message % conflict_string)
+argparse.ArgumentError: argument --seed: conflicting option string: --seed

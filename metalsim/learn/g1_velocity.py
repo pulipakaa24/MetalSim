@@ -229,7 +229,9 @@ def g1_reward_done(qpos: wp.array2d(dtype=float), qvel: wp.array2d(dtype=float),
                    use_sensor: int, sens_air: wp.array2d(dtype=float), sens_con: wp.array2d(dtype=float),
                    foot_hist: wp.array2d(dtype=float)):
     """Reward, termination and episode bookkeeping. ``isaac_flat`` = 1 selects Isaac's G1FlatEnvCfg reward set
-    (see G1VelocityTask), 0 the G1RoughEnvCfg set as ported first. ``jnt_range`` holds the limits the
+    (see G1VelocityTask), 0 the G1RoughEnvCfg set as ported first, 2 Isaac's G1RoughEnvCfg exactly (the rough
+    weights with the formulas of the flat port: feet air time as min over feet with the xy command norm,
+    ang_vel_xy in the body frame, soft joint limits, contact-history termination / ContactSensor). ``jnt_range`` holds the limits the
     dof_pos_limits term uses (soft limits for the flat set). ``torso_hist`` is the max torso touch force over
     the contact-history window of this control step (0 when the physics hook did not run). ``use_sensor`` = 1
     (flat set on MuJoCo Warp): the feet contact flags and in-mode times come from the ContactSensor
@@ -262,7 +264,7 @@ def g1_reward_done(qpos: wp.array2d(dtype=float), qvel: wp.array2d(dtype=float),
     #    feet_air_time_positive_biped: in_mode_time = where(in_contact, contact_time, air_time); single_stance = sum(in_contact)==1;
     #    reward = min(where(single_stance, in_mode_time, 0), threshold); zero when |cmd| < 0.1
     cmd_norm = wp.sqrt(cmd[e, 0] * cmd[e, 0] + cmd[e, 1] * cmd[e, 1] + cmd[e, 2] * cmd[e, 2])
-    if isaac_flat == 1:
+    if isaac_flat >= 1:
         cmd_norm = wp.sqrt(cmd[e, 0] * cmd[e, 0] + cmd[e, 1] * cmd[e, 1])   # Isaac: norm of command[:, :2]
     in_contact0 = sensordata[e, touch_adr[0]] > 1.0
     in_contact1 = sensordata[e, touch_adr[1]] > 1.0
@@ -293,9 +295,12 @@ def g1_reward_done(qpos: wp.array2d(dtype=float), qvel: wp.array2d(dtype=float),
         n_contact += 1
     r_air = float(0.0)
     if n_contact == 1 and cmd_norm > 0.1:
-        if isaac_flat == 1:
-            # feet_air_time_positive_biped: min over feet of the in-mode time, clamped at 0.4; flat weight 0.75
-            r_air = 0.75 * wp.min(wp.min(m0, m1), 0.4)
+        if isaac_flat >= 1:
+            # feet_air_time_positive_biped: min over feet of the in-mode time, clamped at 0.4; flat weight 0.75, rough 0.25
+            w_air = 0.25
+            if isaac_flat == 1:
+                w_air = 0.75
+            r_air = w_air * wp.min(wp.min(m0, m1), 0.4)
         else:
             r_air = 0.25 * (wp.min(m0, 0.4) + wp.min(m1, 0.4))
     # 3. feet slide (Isaac mdp.feet_slide): |body_lin_vel_w[foot].xy| while the foot is in contact; the foot
@@ -337,15 +342,16 @@ def g1_reward_done(qpos: wp.array2d(dtype=float), qvel: wp.array2d(dtype=float),
     r_orient = -1.0 * (g_b[0] * g_b[0] + g_b[1] * g_b[1])
     r_wxy = -0.05 * (w_w[0] * w_w[0] + w_w[1] * w_w[1])
     r_vz = float(0.0)
-    if isaac_flat == 1:
+    if isaac_flat >= 1:
         r_wxy = -0.05 * (w_b[0] * w_b[0] + w_b[1] * w_b[1])   # Isaac ang_vel_xy_l2: root_ang_vel_b
+    if isaac_flat == 1:
         v_b = Rt * v_w
         r_vz = -0.2 * v_b[2] * v_b[2]                      # G1FlatEnvCfg: lin_vel_z_l2 -0.2 on root_lin_vel_b
     # terminations: torso contact, time out; a non-finite state (solver blow-up) also ends the
     # episode and is counted separately (stats_i[3]) so it is reported, not hidden
     t[e] = t[e] + 1
     fell = sensordata[e, touch_adr[2]] > 1.0
-    if isaac_flat == 1:
+    if isaac_flat >= 1:
         # illegal_contact: max over the contact sensor's history (3 physics steps of 5 ms in Isaac)
         fell = wp.max(sensordata[e, touch_adr[2]], torso_hist[e]) > 1.0
         if use_sensor == 1:
@@ -482,7 +488,7 @@ class G1VelocityTask:
     def __init__(self, n, terrain: str = "flat", seed: int | None = None, height_scan: bool | None = None, device="metal:0",
                  physics_dt: float = PHYSICS_DT, engine: str = "mjwarp", newton_iterations: int = 4, newton_dt: float = 0.00125,
                  newton_kw: dict | None = None,
-                 reward_cfg: str | None = None):
+                 reward_cfg: str | None = None, scan_ordering: str = "xy"):
         """``reward_cfg``: "flat" = Isaac's G1FlatEnvCfg (default on flat terrain): track_ang_vel_z 1.0,
         lin_vel_y in +-0.5, feet_air_time 0.75 x min over feet (xy command norm), lin_vel_z_l2 -0.2 and
         ang_vel_xy_l2 -0.05 in the body frame, dof_torques_l2 -2e-6 and dof_acc_l2 -1e-7 on hips + knees,
@@ -490,7 +496,11 @@ class G1VelocityTask:
         termination on the max force over the contact-history window (Isaac: 3 physics steps of 5 ms =
         the last 15 ms of the control step; here round(15 ms / physics_dt) substeps on MuJoCo Warp, the
         final substep only on Newton). "rough" = the G1RoughEnvCfg set as first ported (default on
-        rough terrain, unchanged; runs before this port used it on flat terrain too).
+        rough terrain, unchanged; runs before this port used it on flat terrain too). "rough_isaac" = Isaac's
+        G1RoughEnvCfg exactly: the rough weights (track_ang_vel_z 2.0, feet_air_time 0.25, lin_vel_z 0,
+        dof_torques -1.5e-7 on hips + knees + ankles, dof_acc -1.25e-7 on hips + knees) with lin_vel_y = 0 and
+        the flat port's formulas (feet air time min over feet with the xy command norm, ang_vel_xy in the body
+        frame, soft joint limits, ContactSensor air/contact times, contact-history termination and slide).
 
         ``seed`` (default: 42 on rough terrain, Isaac's rsl_rl default seed, from which Isaac generates the
         terrain; 0 on flat) seeds the task's random streams and, on rough terrain, the terrain generator.
@@ -544,10 +554,10 @@ class G1VelocityTask:
         # 8 lin_vel_z, 9 ang_vel_xy, 10 dof_torques, 11 dof_acc, 12 dof_pos_limits
         self.terms = z((n, 13))
         self.reward_cfg = reward_cfg or ("flat" if terrain == "flat" else "rough")
-        if self.reward_cfg not in ("flat", "rough"):
-            raise ValueError(f"reward_cfg must be 'flat' or 'rough', not {self.reward_cfg!r}")
-        self.isaac_flat = 1 if self.reward_cfg == "flat" else 0
-        self.lin_vel_y = 0.5 if self.isaac_flat else 1.0
+        if self.reward_cfg not in ("flat", "rough", "rough_isaac"):
+            raise ValueError(f"reward_cfg must be 'flat', 'rough' or 'rough_isaac', not {self.reward_cfg!r}")
+        self.isaac_flat = {"flat": 1, "rough": 0, "rough_isaac": 2}[self.reward_cfg]
+        self.lin_vel_y = {1: 0.5, 0: 1.0, 2: 0.0}[self.isaac_flat]     # G1RoughEnvCfg: lin_vel_y = (0, 0)
         self.torso_hist = z(n)
         # joint groups for reward terms
         names = [mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_ACTUATOR, i) for i in range(m.nu)]
@@ -596,7 +606,7 @@ class G1VelocityTask:
         self.scanner = None
         if self.use_scan:
             from metalsim.learn.terrain import HeightScanner
-            self.scanner = HeightScanner(self, self.hfield)
+            self.scanner = HeightScanner(self, self.hfield, ordering=scan_ordering)   # "xy" = Isaac's ray order
         # contact history window: Isaac's ContactSensor keeps 3 physics steps of 5 ms (15 ms); here the same
         # 15 ms, round(15 ms / dt) substeps (6 at 2.5 ms)
         self.hist_substeps = max(1, min(self.decimation, int(round(0.015 / self.physics_dt))))
@@ -769,10 +779,11 @@ def g1_ppo_config(terrain: str, iterations: int, seed: int = 0):
 
 
 def train_g1(n=4096, terrain="flat", iterations=1500, seed=None, log_path=None, checkpoint=None, physics_dt=PHYSICS_DT,
-             engine="mjwarp", newton_iterations=4, newton_dt=0.00125, newton_kw=None):
+             engine="mjwarp", newton_iterations=4, newton_dt=0.00125, newton_kw=None, reward_cfg=None, scan_ordering="xy"):
     from metalsim.learn.ppo_warp import PPOWarp
     task = G1VelocityTask(n, terrain=terrain, seed=seed, physics_dt=physics_dt, engine=engine,
-                          newton_iterations=newton_iterations, newton_dt=newton_dt, newton_kw=newton_kw)
+                          newton_iterations=newton_iterations, newton_dt=newton_dt, newton_kw=newton_kw, reward_cfg=reward_cfg,
+                          scan_ordering=scan_ordering)
     seed = task.seed                     # None -> the task's default (42 rough, Isaac's; 0 flat)
     algo = PPOWarp(task, g1_ppo_config(terrain, iterations, seed))
     f = open(log_path, "a") if log_path else None
@@ -782,11 +793,17 @@ def train_g1(n=4096, terrain="flat", iterations=1500, seed=None, log_path=None, 
             f.write(msg + "\n"); f.flush()
     eng = f"newton XPBD {newton_iterations} it {newton_kw or ''}" if engine == "newton" else "mjwarp"
     log(f"G1 {terrain} PPO: N={n} obs_dim {task.obs_dim} act_dim {task.act_dim} rollout 24 x {iterations} iterations, engine {eng}, "
-        f"physics dt {task.physics_dt} (decimation {task.decimation}), seed {seed}")
+        f"physics dt {task.physics_dt} (decimation {task.decimation}), seed {seed}, reward_cfg {task.reward_cfg}, "
+        f"height-scan ray order {task.scanner.ordering if task.scanner is not None else '-'}")
     def save(path, it):
         torch.save({"net": algo.net.state_dict(), "terrain": terrain, "n": n, "iterations": it, "obs_dim": task.obs_dim,
-                    "act_dim": task.act_dim, "hidden": algo.cfg.hidden, "engine": engine}, path)
-    cb = (lambda it, a: save(checkpoint.replace(".pt", f"_it{it}.pt"), it) if it % 100 == 0 else None) if checkpoint else None
+                    "act_dim": task.act_dim, "hidden": algo.cfg.hidden, "engine": engine, "reward_cfg": task.reward_cfg,
+                    "scan_ordering": task.scanner.ordering if task.scanner is not None else None}, path)
+    def cb(it, a):
+        if checkpoint and it % 100 == 0:
+            save(checkpoint.replace(".pt", f"_it{it}.pt"), it)
+        if task.curriculum == 1:          # Isaac's Curriculum/terrain_levels: mean terrain level over all envs
+            log(f"terrain it {it:4d} mean_level {float(task.level.numpy().mean()):.4f}")
     from metalsim.learn.monitor import AnomalyMonitor
     mon = AnomalyMonitor(task, algo.cfg, log=log, path=(log_path + ".anomalies.jsonl") if log_path else None)
     algo.train(log=log, callback=cb, monitor=mon)
@@ -800,7 +817,7 @@ if __name__ == "__main__":
     import sys
     wp.config.quiet = True
     # optional flags (any position): --engine mjwarp|newton, --newton_it N, --newton_dt S
-    opts = {"--engine": "mjwarp", "--newton_it": "4", "--newton_dt": "0.00125", "--newton_limit_margin": "0.15", "--newton_kw": "", "--seed": "0"}
+    opts = {"--engine": "mjwarp", "--newton_it": "4", "--newton_dt": "0.00125", "--newton_limit_margin": "0.15", "--newton_kw": "", "--seed": "0", "--reward_cfg": "", "--scan_ordering": "xy"}
     for k in list(opts):
         if k in sys.argv:
             i = sys.argv.index(k); opts[k] = sys.argv[i + 1]; del sys.argv[i:i + 2]
@@ -814,7 +831,8 @@ if __name__ == "__main__":
     if len(sys.argv) > 3 and sys.argv[3] == "train":
         train_g1(n, terrain, int(sys.argv[4]) if len(sys.argv) > 4 else 1500, log_path=sys.argv[5] if len(sys.argv) > 5 else None,
                  checkpoint=sys.argv[6] if len(sys.argv) > 6 and sys.argv[6] != "-" else None,
-                 physics_dt=float(sys.argv[7]) if len(sys.argv) > 7 else PHYSICS_DT, seed=int(opts["--seed"]), **ekw)
+                 physics_dt=float(sys.argv[7]) if len(sys.argv) > 7 else PHYSICS_DT, seed=int(opts["--seed"]),
+                 reward_cfg=opts["--reward_cfg"] or None, scan_ordering=opts["--scan_ordering"], **ekw)
         sys.exit(0)
     task = G1VelocityTask(n, terrain=terrain, physics_dt=float(sys.argv[3]) if len(sys.argv) > 3 else PHYSICS_DT, **ekw)
     print(f"G1 ({terrain}, {task.engine}, physics dt {task.physics_dt}): nbody {task.model.nbody} nv {task.model.nv} nu {task.model.nu} ngeom {task.model.ngeom} obs_dim {task.obs_dim}")
