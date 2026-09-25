@@ -288,6 +288,27 @@ defects, fixed in commit f0f2115 and covered by `tests/test_ppo_warp_rollout.py`
    executed (64 of 64 envs), and so did its action-rate penalty.
 3. **Time-outs treated as falls**: now bootstrapped like rsl_rl (`r += γ V(s)`).
 
+**Isaac's flat configuration ported and the like-for-like curve** (commit 5f208f0: `reward_cfg="flat"` =
+G1FlatEnvCfg's weights and ranges, Isaac's 0.9 soft joint limits, torso-contact termination over a 15 ms
+history via the new ContactSensor; all 13 terms asserted against Isaac's formulas in
+`tests/test_g1_task_terms.py` on both engines; rough set unchanged). rsl_rl on the ported task, 400
+iterations, 4096 envs, seed 0 (`runs/g1_flat_rslrl_ppo_isaacflatcfg.log`, measured 2026-09-24):
+
+| iteration | Isaac (PhysX + rsl_rl): length / return | rsl_rl on MetalSim, ported flat task | rsl_rl on MetalSim, rough-weight task |
+|---|---|---|---|
+| 100 | 200 / −6.6 | 105 / −5.4 | 81 / −4.8 |
+| 150 | 954 / −4.3 | 991 / −9.4 | 196 / −6.3 |
+| 200 | 981 / +6.6 | 1000 / +1.3 | 976 / −9.8 |
+| 300 | 1000 / +19.2 | 985 / +13.0 | 938 / +0.5 |
+| 399 | 1000 / +23.6 | 1000 / +20.5 | 977 / +8.9 |
+
+At iteration 399 linear tracking is 0.934 vs Isaac's 0.922, yaw tracking 0.556 vs 0.661, action std
+0.70 vs 0.69; the return is 3.2 below Isaac's. The remaining per-term differences are feet_slide
+(−0.059 vs −0.017, 3.4×) and feet_air_time (0.018 vs 0.035), both contact-model quantities, and joint
+deviation (−0.168 vs −0.153). The earlier ~50-iteration takeoff lag was the weighting, not the physics.
+Also ported: rough-terrain seed 42 (Isaac's), Isaac's env→column assignment (reproducing its float32
+arithmetic), initial levels from `torch.randint`.
+
 **Fixed PPO, demonstrated** (`runs/g1_flat_ppowarp_fixed.log`, MuJoCo Warp, 4096 envs, 1000 iterations,
 same config and seed, measured 2026-09-24, 25.3 K env-steps/s including the monitor):
 
