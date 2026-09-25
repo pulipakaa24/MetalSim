@@ -738,6 +738,39 @@ the sky and clips at the 100 m far plane, MetalSim writes 0 on a miss (`compare.
 visible scene difference remains on our side: MetalSim's ground plane is tessellated to a finite extent
 and ends before the horizon, where RTX's reaches it.
 
+### 1.8 Isaac Lab 3.0-EA reference (Isaac Sim 6.1, measured on the L4, 2026-09-25)
+
+`docs/research/isaaclab3_reference_2026-09-25.md`, scripts in `metalsim/parity/isaac_side/isaaclab3/`,
+artifacts in `runs/parity3/isaac/`. Facts that change the comparison: the G1 tasks are
+`Isaac-Velocity-Flat-G1` / `-Rough-G1` with the backend selected by `physics=` and **`newton_mjwarp` as
+their default**; reward, observation and event configs are shared across backends; the 3.0 task is
+harder than 2.3.2's (push events, torso mass ×0.8–1.25, ±0.5 reset velocities are on), so its training
+numbers are not like for like with MetalSim's task until those events are ported; quaternions are XYZW.
+
+**Isaac's own MuJoCo Warp settings for the G1** (`runs/parity3/isaac/newton_mjwarp_settings.json`):
+5 ms physics tick with 2 substeps (2.5 ms solver step, the same as ours); Newton solver with 100 / 50
+iteration caps and early exit at tolerance 1e-6 (1.5 iterations on average, at most 6); implicitfast
+integrator; pyramidal cone; impratio 1; njmax 95, nconmax 10 on flat; Newton's own collision pipeline
+once per 5 ms tick reused by both substeps; contact solref (1.82 ms, 1.375) from ke 160000 / kd 1100;
+robot friction 0.8; **per-joint, very soft joint limits (time constants 4 ms to 0.46 s)**, a material
+difference from our hard-limit preset.
+
+**Fidelity protocol on 3.0** (RTX frames, grey ground): 3.0 PhysX reproduces 5.1 PhysX (joint error at
+1 s 0.0008 rad on the hold, 0.0016 on the drop, same resting height 0.0538 m), so the 5.1 recordings
+remain valid PhysX references; 3.0 PhysX vs Isaac's own MuJoCo Warp: 0.002–0.005 rad on hold and drop,
+the random protocol diverges immediately as everywhere.
+
+**Runtime benchmark, 4096 envs** (`isaaclab benchmark runtime`, env-steps/s; synchronized in brackets):
+flat Newton/MuJoCo-Warp 72,025 (67,130), PhysX 45,114 (44,768); rough Newton/MuJoCo-Warp 51,181
+(47,879), PhysX 35,708 (35,357). MetalSim on the M4 Max, same solver family: flat full env step
+67,620 / full PPO loop 56,575; rough 41,900 (§1.4).
+
+**Flat training, 1500 iterations, seed 0** (3.0 task with its extra events): Newton/MuJoCo-Warp +27.4
+return, tracking 0.94, 41.3 min at 59.6 K env-steps/s; PhysX +28.7, 0.94, 52.2 min at 47.0 K; both at
+episode length ~997. MetalSim (2.3.2 task, no push / mass events): +28.4 / 26.3 / 26.0 over three seeds
+at iteration 1000. Rough training on Newton was running at the time of writing (fetch pending on a
+credential refresh).
+
 ## 2. Platform capabilities (the workstreams), with the tests behind them
 
 | capability | Isaac | ours | test (assertion) | result | verdict |
