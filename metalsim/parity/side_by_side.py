@@ -60,6 +60,7 @@ def main():
     # deterministic start: Isaac's default state at the origin, command (0.5, 0, 0)
     task.origins.assign(np.zeros((1, 3), np.float32)); task.reset_all()
     q0 = hero.key_qpos[0].astype(np.float32); task.sim.t.qpos.copy_(torch.as_tensor(q0)[None]); task.sim.t.qvel.zero_()
+    torch.mps.synchronize()      # the copies run on the MPS queue; forward kinematics (Warp queue) must see them
     v = task.sim.forward(); task.sim.after(v); task.sim.synchronize()
     task.cmd.assign(np.array([[0.5, 0.0, 0.0]], np.float32)); task.resample.assign(np.zeros(1, bool))
     from metalsim.interop import torch_bridge as tb
