@@ -1,0 +1,114 @@
+/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torchvision/models/_utils.py:207: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+  warnings.warn(
+/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torchvision/models/_utils.py:222: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=AlexNet_Weights.IMAGENET1K_V1`. You can also use `weights=AlexNet_Weights.DEFAULT` to get the most up-to-date weights.
+  warnings.warn(msg)
+{
+ "physics": {
+  "A_hold": {
+   "steps": 150,
+   "joint_rmse_rad": {
+    "t0.5s": 0.004453611560165882,
+    "t1s": 0.0046569001860916615,
+    "t2s": 0.04802314192056656,
+    "end": 0.050476402044296265,
+    "max": 0.050476402044296265
+   },
+   "divergence_step_0.1rad": 67,
+   "divergence_time_s": 1.34,
+   "root_height": {
+    "isaac_end": 0.05380211025476456,
+    "metalsim_end": 0.053802717477083206,
+    "rmse": 0.0019235991640016437
+   },
+   "root_orientation_err_rad": {
+    "mean": 0.006500684190541506,
+    "max": 0.0990891233086586
+   },
+   "peak_joint_speed_rad_s": {
+    "isaac": 6.861039161682129,
+    "metalsim": 10.104907989501953
+   },
+   "contact_force_N": {
+    "isaac_mean_total": 302.4049377441406,
+    "metalsim_mean_total": 282.6137390136719,
+    "isaac_peak": 712.2770385742188,
+    "metalsim_peak": 503.79473876953125
+   },
+   "torque_rms_Nm": {
+    "isaac": 5.288428783416748,
+    "metalsim": 4.998195171356201
+   }
+  },
+  "B_random": {
+   "steps": 250,
+   "joint_rmse_rad": {
+    "t0.5s": 0.07811373472213745,
+    "t1s": 0.06334765255451202,
+    "t2s": 0.05556650459766388,
+    "end": 0.12370409071445465,
+    "max": 0.18290169537067413
+   },
+   "divergence_step_0.1rad": 0,
+   "divergence_time_s": 0.0,
+   "root_height": {
+    "isaac_end": 0.14033684134483337,
+    "metalsim_end": 0.1259598582983017,
+    "rmse": 0.053619809448719025
+   },
+   "root_orientation_err_rad": {
+    "mean": 0.7127630114555359,
+    "max": 2.2443442344665527
+   },
+   "peak_joint_speed_rad_s": {
+    "isaac": 32.00001525878906,
+    "metalsim": 56.51859664916992
+   },
+   "contact_force_N": {
+    "isaac_mean_total": 329.4166564941406,
+    "metalsim_mean_total": 373.2693786621094,
+    "isaac_peak": 2847.163330078125,
+    "metalsim_peak": 11042.197265625
+   },
+   "torque_rms_Nm": {
+    "isaac": 29.949527740478516,
+    "metalsim": 31.584203720092773
+   }
+  },
+  "C_drop": {
+   "steps": 150,
+   "joint_rmse_rad": {
+    "t0.5s": 0.016662299633026123,
+    "t1s": 0.014694102108478546,
+    "t2s": 0.046545110642910004,
+    "end": 0.04929021745920181,
+    "max": 0.06989312916994095
+   },
+   "divergence_step_0.1rad": 0,
+   "divergence_time_s": 0.0,
+   "root_height": {
+    "isaac_end": 0.05380271375179291,
+    "metalsim_end": 0.05380282178521156,
+    "rmse": 0.027430618181824684
+   },
+   "root_orientation_err_rad": {
+    "mean": 0.04908829927444458,
+    "max": 0.18866537511348724
+   },
+   "peak_joint_speed_rad_s": {
+    "isaac": 10.601576805114746,
+    "metalsim": 15.07217788696289
+   },
+   "contact_force_N": {
+    "isaac_mean_total": 288.4056701660156,
+    "metalsim_mean_total": 444.0198059082031,
+    "isaac_peak": 1029.7064208984375,
+    "metalsim_peak": 19293.37109375
+   },
+   "torque_rms_Nm": {
+    "isaac": 6.169229030609131,
+    "metalsim": 5.926434516906738
+   }
+  }
+ },
+ "render": {}
+}
