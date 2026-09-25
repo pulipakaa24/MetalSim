@@ -1,0 +1,87 @@
+=== start Fri Sep 25 09:11:39 PDT 2026
+holder: {"name": "mjw_tp_round4", "kind": "low", "minutes": 30.0, "pid": 59339, "start": 1790352677.329466}
+[rough base] N=4096 njmax 256 naconmax 524288 is_sparse False
+[rough base] physics only 125.9 ms/step -> 32,532 env-steps/s
+[rough base] full env step 142.0 ms -> 28,852 env-steps/s
+[rough base] after random-action steps: nefc max 54 mean 15.0; nacon 11723 (2.86/world); overflow {'LS_ITERATIONS': 3800}
+[rough base] rollout + inference 156.7 ms/step -> 26,132 env-steps/s
+[rough base] PPO update 298 ms -> full loop 24,214 env-steps/s
+[rough base] SUMMARY physics 32,532 | step 28,852 | rollout 26,132 | loop 24,214  (ms: physics 125.9, step 142.0, rollout/step 156.7, update 298)
+[step2] N=4096 njmax 256 naconmax 524288 is_sparse False
+[step2] physics only 76.2 ms/step -> 53,732 env-steps/s
+[step2] full env step 88.5 ms -> 46,305 env-steps/s
+[step2] after random-action steps: nefc max 62 mean 14.7; nacon 11458 (2.80/world); overflow {'LS_ITERATIONS': 3797}
+[step2] rollout + inference 97.5 ms/step -> 42,014 env-steps/s
+[step2] PPO update 299 ms -> full loop 37,258 env-steps/s
+[step2] SUMMARY physics 53,732 | step 46,305 | rollout 42,014 | loop 37,258  (ms: physics 76.2, step 88.5, rollout/step 97.5, update 299)
+=== variant baseline; N=512, 50 control steps, deterministic actions
+/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  warnings.warn(
+/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  warnings.warn(
+njmax 256 naconmax 65536 sparse False
+--- floor: two graph-replay instances of this configuration
+   step    1: qpos max 1.19e-07 median 0.0e+00 | obs max 3.00e-05 | rew max 1.04e-07
+   step    2: qpos max 1.23e-06 median 0.0e+00 | obs max 2.30e-04 | rew max 1.46e-06
+   step    5: qpos max 3.43e-02 median 0.0e+00 | obs max 2.58e+00 | rew max 1.64e-03
+   step   10: qpos max 5.35e-02 median 3.0e-08 | obs max 4.19e+00 | rew max 4.02e-02
+   step   20: qpos max 3.64e-01 median 1.6e-07 | obs max 9.75e+00 | rew max 2.00e-02
+   step   30: qpos max 8.04e+00 median 4.4e-07 | obs max 1.66e+01 | rew max 3.99e+00
+   step   40: qpos max 9.18e+00 median 3.5e-07 | obs max 9.80e+00 | rew max 4.04e+00
+   step   50: qpos max 8.01e+00 median 1.2e-07 | obs max 1.16e+01 | rew max 4.05e+00
+--- graph replay vs eager launches (same configuration)
+   step    1: qpos max 1.34e-07 median 0.0e+00 | obs max 2.76e-05 | rew max 3.26e-07
+   step    2: qpos max 1.22e-06 median 0.0e+00 | obs max 2.30e-04 | rew max 8.23e-07
+   step    5: qpos max 3.40e-02 median 0.0e+00 | obs max 2.58e+00 | rew max 1.77e-03
+   step   10: qpos max 4.67e-02 median 3.4e-08 | obs max 6.20e+00 | rew max 4.02e-02
+   step   20: qpos max 1.07e-01 median 1.5e-07 | obs max 7.53e+00 | rew max 3.43e-02
+   step   30: qpos max 8.04e+00 median 4.3e-07 | obs max 1.40e+01 | rew max 3.99e+00
+   step   40: qpos max 8.80e+00 median 3.3e-07 | obs max 9.60e+00 | rew max 4.09e+00
+   step   50: qpos max 8.76e+00 median 1.0e-07 | obs max 1.16e+01 | rew max 4.02e+00
+capacity replay: nefc max 50 (njmax 256), nacon max 1544 (naconmax 65536); overflow {'LS_ITERATIONS': 464}
+capacity replay 2: nefc max 50 (njmax 256), nacon max 1547 (naconmax 65536); overflow {'LS_ITERATIONS': 463}
+capacity eager: nefc max 50 (njmax 256), nacon max 1544 (naconmax 65536); overflow {'LS_ITERATIONS': 467}
+--- physics protocol vs MuJoCo C (4 worlds: PD hold + fixed random targets; |dq| max / median)
+   t=0.02s 9.94e-01/2.7e-03  t=0.04s 7.12e-01/5.6e-03  t=0.08s 7.35e-01/1.5e-02  t=0.24s 1.07e+00/4.8e-02  t=0.50s 9.00e-01/6.9e-02  t=1.00s 9.63e-01/9.7e-02
+=== done
+=== variant {'metal_register_cholesky_max': 48, 'm_dense_max': 0, 'label': 'step2'}; N=512, 50 control steps, deterministic actions
+/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  warnings.warn(
+/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  warnings.warn(
+njmax 256 naconmax 65536 sparse False
+--- floor: two graph-replay instances of this configuration
+   step    1: qpos max 1.40e-07 median 0.0e+00 | obs max 2.77e-05 | rew max 8.75e-08
+   step    2: qpos max 1.24e-06 median 0.0e+00 | obs max 2.23e-04 | rew max 1.08e-06
+   step    5: qpos max 1.85e-02 median 7.5e-09 | obs max 2.58e+00 | rew max 2.38e-03
+   step   10: qpos max 7.46e-02 median 6.0e-08 | obs max 4.74e+00 | rew max 4.02e-02
+   step   20: qpos max 1.67e-01 median 1.8e-07 | obs max 7.53e+00 | rew max 3.88e-02
+   step   30: qpos max 4.00e-01 median 4.5e-07 | obs max 2.13e+01 | rew max 3.67e-02
+   step   40: qpos max 8.43e+00 median 3.1e-07 | obs max 1.81e+01 | rew max 4.06e+00
+   step   50: qpos max 8.42e+00 median 1.3e-07 | obs max 1.30e+01 | rew max 4.02e+00
+--- graph replay vs eager launches (same configuration)
+   step    1: qpos max 1.34e-07 median 0.0e+00 | obs max 2.80e-05 | rew max 6.66e-08
+   step    2: qpos max 1.26e-06 median 0.0e+00 | obs max 2.22e-04 | rew max 9.28e-07
+   step    5: qpos max 1.85e-02 median 7.5e-09 | obs max 2.58e+00 | rew max 2.38e-03
+   step   10: qpos max 4.67e-02 median 6.0e-08 | obs max 3.32e+00 | rew max 4.02e-02
+   step   20: qpos max 1.11e-01 median 1.8e-07 | obs max 5.44e+00 | rew max 3.88e-02
+   step   30: qpos max 3.18e-01 median 4.2e-07 | obs max 2.23e+01 | rew max 3.67e-02
+   step   40: qpos max 8.34e+00 median 3.4e-07 | obs max 1.81e+01 | rew max 4.05e+00
+   step   50: qpos max 7.96e+00 median 1.5e-07 | obs max 1.37e+01 | rew max 3.99e+00
+capacity replay: nefc max 50 (njmax 256), nacon max 1545 (naconmax 65536); overflow {'LS_ITERATIONS': 469}
+capacity replay 2: nefc max 50 (njmax 256), nacon max 1543 (naconmax 65536); overflow {'LS_ITERATIONS': 467}
+capacity eager: nefc max 50 (njmax 256), nacon max 1544 (naconmax 65536); overflow {'LS_ITERATIONS': 468}
+--- physics protocol vs MuJoCo C (4 worlds: PD hold + fixed random targets; |dq| max / median)
+   t=0.02s 9.94e-01/2.7e-03  t=0.04s 7.12e-01/5.6e-03  t=0.08s 7.35e-01/1.5e-02  t=0.24s 1.01e+00/4.2e-02  t=0.50s 9.49e-01/6.9e-02  t=1.00s 9.39e-01/9.8e-02
+--- this configuration vs reference {} (graph replay)
+   step    1: qpos max 2.94e-07 median 0.0e+00 | obs max 5.44e-05 | rew max 1.01e-07
+   step    2: qpos max 3.31e-06 median 9.3e-10 | obs max 3.48e-04 | rew max 3.03e-06
+   step    5: qpos max 3.40e-02 median 8.4e-09 | obs max 2.58e+00 | rew max 2.38e-03
+   step   10: qpos max 4.67e-02 median 6.0e-08 | obs max 6.22e+00 | rew max 4.02e-02
+   step   20: qpos max 3.64e-01 median 2.1e-07 | obs max 9.75e+00 | rew max 3.88e-02
+   step   30: qpos max 4.09e-01 median 4.8e-07 | obs max 2.17e+01 | rew max 4.09e-02
+   step   40: qpos max 9.18e+00 median 3.9e-07 | obs max 1.81e+01 | rew max 4.06e+00
+   step   50: qpos max 8.77e+00 median 1.6e-07 | obs max 1.16e+01 | rew max 4.11e+00
+   reference MuJoCo C protocol: t=0.02s 9.94e-01/2.7e-03  t=0.04s 7.12e-01/5.6e-03  t=0.08s 7.35e-01/1.5e-02  t=0.24s 1.07e+00/4.8e-02  t=0.50s 9.00e-01/6.9e-02  t=1.00s 9.63e-01/9.7e-02
+=== done
+=== end Fri Sep 25 09:13:51 PDT 2026

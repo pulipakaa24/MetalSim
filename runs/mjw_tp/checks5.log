@@ -1,0 +1,72 @@
+=== start Fri Sep 25 09:19:57 PDT 2026
+holder: {"name": "mjw_tp_round5", "kind": "low", "minutes": 30.0, "pid": 60987, "start": 1790353059.514096}
+  waiting [low] mjw_tp_tests6 est 40.0 min, queued 278 s ago
+  waiting [low] flex_metal_run4 est 15.0 min, queued 108 s ago
+=== variant {'metal_register_cholesky_max': 48, 'm_dense_max': 0}; N=512, 50 control steps, deterministic actions
+njmax 256 naconmax 16384 sparse False
+--- floor: two graph-replay instances of this configuration
+   step    1: qpos max 2.86e-06 median 0.0e+00 | obs max 2.94e-04 | rew max 1.57e-07
+   step    2: qpos max 3.75e-06 median 0.0e+00 | obs max 4.98e-04 | rew max 6.01e-07
+   step    5: qpos max 6.35e-03 median 7.5e-09 | obs max 2.80e-01 | rew max 1.06e-03
+   step   10: qpos max 3.28e-02 median 4.5e-08 | obs max 1.32e+00 | rew max 2.39e-03
+   step   20: qpos max 8.15e-02 median 7.5e-08 | obs max 2.96e+00 | rew max 9.59e-03
+   step   30: qpos max 2.05e-01 median 1.2e-07 | obs max 2.31e+00 | rew max 7.30e-03
+   step   40: qpos max 1.36e+00 median 6.0e-08 | obs max 9.20e+00 | rew max 4.00e+00
+   step   50: qpos max 1.93e+00 median 3.0e-08 | obs max 8.17e+00 | rew max 1.50e-02
+--- graph replay vs eager launches (same configuration)
+   step    1: qpos max 2.87e-06 median 0.0e+00 | obs max 2.97e-04 | rew max 1.22e-07
+   step    2: qpos max 3.61e-06 median 0.0e+00 | obs max 5.15e-04 | rew max 4.47e-07
+   step    5: qpos max 2.64e-02 median 7.5e-09 | obs max 6.50e-01 | rew max 1.06e-03
+   step   10: qpos max 3.28e-02 median 3.7e-08 | obs max 1.32e+00 | rew max 1.33e-03
+   step   20: qpos max 4.34e-02 median 7.5e-08 | obs max 2.96e+00 | rew max 9.59e-03
+   step   30: qpos max 1.68e-01 median 1.2e-07 | obs max 3.10e+00 | rew max 9.25e-03
+   step   40: qpos max 1.36e+00 median 6.0e-08 | obs max 1.09e+01 | rew max 4.02e+00
+   step   50: qpos max 1.62e+00 median 3.0e-08 | obs max 6.49e+00 | rew max 1.36e-02
+capacity replay: nefc max 39 (njmax 256), nacon max 1695 (naconmax 16384); overflow {'LS_ITERATIONS': 471}
+capacity replay 2: nefc max 39 (njmax 256), nacon max 1695 (naconmax 16384); overflow {'LS_ITERATIONS': 469}
+capacity eager: nefc max 39 (njmax 256), nacon max 1695 (naconmax 16384); overflow {'LS_ITERATIONS': 469}
+--- physics protocol vs MuJoCo C (4 worlds: PD hold + fixed random targets; |dq| max / median)
+   t=0.02s 4.08e-06/1.6e-08  t=0.04s 5.04e-06/3.7e-08  t=0.08s 1.51e-01/1.5e-02  t=0.24s 2.74e-01/4.8e-02  t=0.50s 1.98e-01/6.4e-02  t=1.00s 6.40e-01/1.1e-01
+--- this configuration vs reference {} (graph replay)
+   step    1: qpos max 2.85e-06 median 0.0e+00 | obs max 8.15e-04 | rew max 9.80e-07
+   step    2: qpos max 7.35e-06 median 1.9e-09 | obs max 6.34e-04 | rew max 9.27e-07
+   step    5: qpos max 2.64e-02 median 1.5e-08 | obs max 6.50e-01 | rew max 2.49e-04
+   step   10: qpos max 1.85e-02 median 5.2e-08 | obs max 1.46e+00 | rew max 2.14e-03
+   step   20: qpos max 4.28e-02 median 7.5e-08 | obs max 1.56e+00 | rew max 2.85e-03
+   step   30: qpos max 1.68e-01 median 1.2e-07 | obs max 3.10e+00 | rew max 9.25e-03
+   step   40: qpos max 6.19e-01 median 6.0e-08 | obs max 1.09e+01 | rew max 4.02e+00
+   step   50: qpos max 1.62e+00 median 4.5e-08 | obs max 6.49e+00 | rew max 1.25e-02
+   reference MuJoCo C protocol: t=0.02s 4.08e-06/1.6e-08  t=0.04s 5.04e-06/3.3e-08  t=0.08s 1.51e-01/1.5e-02  t=0.24s 2.74e-01/4.8e-02  t=0.50s 1.99e-01/6.5e-02  t=1.00s 6.23e-01/1.1e-01
+=== done
+=== top kernels overall (ms per control step; substep pieces are per substep, excluded)
+     16.154 ms  x 80  [physics (substeps + contact-sensor hooks] _update_gradient_cholesky__locals__kernel_f4bca835_metal_forward
+     15.589 ms  x 80  [physics (substeps + contact-sensor hooks] _update_gradient_h_incremental_9c0c45bc_metal_forward
+      9.903 ms  x  8  [physics (substeps + contact-sensor hooks] _update_gradient_cholesky__locals__kernel_cf59d677_metal_forward
+      8.073 ms  x 16  [physics (substeps + contact-sensor hooks] _factor_i_sparse_serial__locals__kernel_8c1557af_metal_forward
+      4.847 ms  x 80  [physics (substeps + contact-sensor hooks] _update_constraint_efc__locals__kernel_afa7fbbf_metal_forward
+      3.723 ms  x 16  [physics (substeps + contact-sensor hooks] _solve_LD_sparse_serial__locals__kernel_ae6d7fc3_metal_forward
+      3.321 ms  x 80  [physics (substeps + contact-sensor hooks] _linesearch_iterative_kernel__locals__kernel_8deb9b8b_metal_forward
+      2.809 ms  x  8  [physics (substeps + contact-sensor hooks] _update_gradient_JTDAJ_dense_tiled__locals__kernel_44bf422b_metal_forward
+      2.395 ms  x 88  [physics (substeps + contact-sensor hooks] mul_m_kernel__locals___mul_m_9c0838e9_metal_forward
+      2.263 ms  x  8  [physics (substeps + contact-sensor hooks] ccd_kernel_builder__locals__ccd_kernel_f71f2442_metal_forward
+      1.265 ms  x 80  [physics (substeps + contact-sensor hooks] _update_constraint_init_qfrc_constraint_dense__locals__kernel_935a1343_metal_forward
+      1.193 ms  x  8  [physics (substeps + contact-sensor hooks] _efc_contact_jac_dense__locals__kernel_4179614b_metal_forward
+      1.152 ms  x 96  [physics (substeps + contact-sensor hooks] _crb_accumulate_073a11b8_metal_forward
+      0.982 ms  x 80  [physics (substeps + contact-sensor hooks] _update_gradient_grad__locals__kernel_7f5e4a38_metal_forward
+      0.978 ms  x120  [physics (substeps + contact-sensor hooks] wp_memset
+      0.892 ms  x  8  [physics (substeps + contact-sensor hooks] _qderiv_actuator_passive_6cbfee2a_metal_forward
+      0.871 ms  x 96  [physics (substeps + contact-sensor hooks] _cfrc_backward_72237d38_metal_forward
+      0.650 ms  x  8  [physics (substeps + contact-sensor hooks] _solve_init_jaref_kernel__locals__kernel_1116a354_metal_forward
+      0.649 ms  x  8  [physics (substeps + contact-sensor hooks] _M_13671fca_metal_forward
+      0.637 ms  x 96  [physics (substeps + contact-sensor hooks] _subtree_com_acc_350f0560_metal_forward
+      0.573 ms  x  8  [physics (substeps + contact-sensor hooks] _kinematics_branch_95f8028e_metal_forward
+      0.528 ms  x  8  [physics (substeps + contact-sensor hooks] _update_constraint_efc__locals__kernel_d88e782a_metal_forward
+      0.473 ms  x 80  [physics (substeps + contact-sensor hooks] _solve_done__locals__kernel_318c149b_metal_forward
+      0.428 ms  x  8  [physics (substeps + contact-sensor hooks] _apply_ft_1667a928_metal_forward
+      0.368 ms  x  8  [physics (substeps + contact-sensor hooks] _cfrc_3922b605_metal_forward
+      0.343 ms  x  8  [physics (substeps + contact-sensor hooks] _comvel_branch_0f933c58_metal_forward
+      0.340 ms  x 80  [physics (substeps + contact-sensor hooks] _update_gradient_zero_grad_dot__locals__kernel_382f12e9_metal_forward
+      0.326 ms  x  8  [physics (substeps + contact-sensor hooks] _efc_contact_update__locals__kernel_6f39c81f_metal_forward
+      0.322 ms  x  8  [physics (substeps + contact-sensor hooks] _primitive_narrowphase__locals__primitive_narrowphase_3a12219b_metal_forward
+      0.304 ms  x  8  [physics (substeps + contact-sensor hooks] _limit_slide_hinge__locals__kernel_dc200dd6_metal_forward
+=== end Fri Sep 25 09:20:16 PDT 2026

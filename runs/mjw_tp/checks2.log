@@ -1,0 +1,117 @@
+=== start Fri Sep 25 07:45:34 PDT 2026
+holder: {"name": "mjw_tp_round2", "kind": "low", "minutes": 40.0, "pid": 50660, "start": 1790347359.0519922}
+  waiting [low] flex_tests_metal est 30.0 min, queued 249 s ago
+=== variant baseline; N=512, 50 control steps, deterministic actions
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+njmax 256 naconmax 16384 sparse False
+--- floor: two graph-replay instances of this configuration
+   step   10: qpos max 3.28e-02 median 3.8e-08 | obs max 8.16e-01 | rew max 2.15e-03
+   step   20: qpos max 4.28e-02 median 6.7e-08 | obs max 2.96e+00 | rew max 9.59e-03
+   step   30: qpos max 2.20e-01 median 1.2e-07 | obs max 3.10e+00 | rew max 1.09e-02
+   step   40: qpos max 1.36e+00 median 6.0e-08 | obs max 1.09e+01 | rew max 4.02e+00
+   step   50: qpos max 1.93e+00 median 3.0e-08 | obs max 6.66e+00 | rew max 4.08e+00
+--- graph replay vs eager launches (same configuration)
+   step   10: qpos max 3.28e-02 median 4.5e-08 | obs max 2.00e+00 | rew max 2.15e-03
+   step   20: qpos max 4.28e-02 median 6.7e-08 | obs max 2.96e+00 | rew max 9.59e-03
+   step   30: qpos max 1.49e-01 median 1.2e-07 | obs max 3.10e+00 | rew max 1.09e-02
+   step   40: qpos max 1.36e+00 median 6.0e-08 | obs max 1.09e+01 | rew max 4.02e+00
+   step   50: qpos max 1.62e+00 median 3.0e-08 | obs max 6.66e+00 | rew max 4.08e+00
+capacity replay: nefc max 39 (njmax 256), nacon max 1521 (naconmax 16384); overflow {'LS_ITERATIONS': 470}
+capacity replay 2: nefc max 39 (njmax 256), nacon max 1521 (naconmax 16384); overflow {'LS_ITERATIONS': 467}
+capacity eager: nefc max 39 (njmax 256), nacon max 1521 (naconmax 16384); overflow {'LS_ITERATIONS': 469}
+--- physics protocol vs MuJoCo C (4 worlds: PD hold + fixed random targets; |dq| max / median)
+   t=0.24s 3.07e-01/6.3e-02  t=0.50s 3.12e-01/7.0e-02  t=1.00s 6.49e-01/1.1e-01
+=== done
+=== variant {'metal_register_cholesky_max': 48}; N=512, 50 control steps, deterministic actions
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+njmax 256 naconmax 16384 sparse False
+--- floor: two graph-replay instances of this configuration
+   step   10: qpos max 3.28e-02 median 3.7e-08 | obs max 1.32e+00 | rew max 2.39e-03
+   step   20: qpos max 8.15e-02 median 7.1e-08 | obs max 2.96e+00 | rew max 9.59e-03
+   step   30: qpos max 2.05e-01 median 1.2e-07 | obs max 2.53e+00 | rew max 1.09e-02
+   step   40: qpos max 1.36e+00 median 6.0e-08 | obs max 9.81e+00 | rew max 4.00e+00
+   step   50: qpos max 1.93e+00 median 3.0e-08 | obs max 8.17e+00 | rew max 4.08e+00
+--- graph replay vs eager launches (same configuration)
+   step   10: qpos max 3.28e-02 median 3.7e-08 | obs max 1.32e+00 | rew max 2.15e-03
+   step   20: qpos max 4.79e-02 median 7.5e-08 | obs max 2.96e+00 | rew max 9.59e-03
+   step   30: qpos max 1.86e-01 median 1.2e-07 | obs max 3.66e+00 | rew max 1.09e-02
+   step   40: qpos max 1.36e+00 median 6.0e-08 | obs max 9.81e+00 | rew max 4.00e+00
+   step   50: qpos max 1.39e+00 median 3.0e-08 | obs max 6.66e+00 | rew max 4.08e+00
+capacity replay: nefc max 39 (njmax 256), nacon max 1519 (naconmax 16384); overflow {'LS_ITERATIONS': 468}
+capacity replay 2: nefc max 39 (njmax 256), nacon max 1520 (naconmax 16384); overflow {'LS_ITERATIONS': 470}
+capacity eager: nefc max 39 (njmax 256), nacon max 1519 (naconmax 16384); overflow {'LS_ITERATIONS': 466}
+--- physics protocol vs MuJoCo C (4 worlds: PD hold + fixed random targets; |dq| max / median)
+   t=0.24s 3.01e-01/6.6e-02  t=0.50s 3.02e-01/6.9e-02  t=1.00s 6.46e-01/1.2e-01
+--- this configuration vs reference {} (graph replay)
+   step   10: qpos max 1.51e-02 median 3.9e-08 | obs max 2.00e+00 | rew max 2.39e-03
+   step   20: qpos max 8.15e-02 median 6.7e-08 | obs max 2.20e+00 | rew max 4.45e-03
+   step   30: qpos max 2.05e-01 median 1.2e-07 | obs max 3.66e+00 | rew max 5.67e-03
+   step   40: qpos max 8.88e-01 median 6.0e-08 | obs max 5.22e+00 | rew max 9.93e-03
+   step   50: qpos max 1.93e+00 median 3.0e-08 | obs max 8.17e+00 | rew max 1.83e-02
+   reference MuJoCo C protocol: t=0.24s 3.07e-01/6.3e-02  t=0.50s 3.12e-01/7.0e-02  t=1.00s 6.49e-01/1.1e-01
+=== done
+=== variant {'m_dense_max': 0}; N=512, 50 control steps, deterministic actions
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+njmax 256 naconmax 16384 sparse False
+--- floor: two graph-replay instances of this configuration
+   step   10: qpos max 3.28e-02 median 4.5e-08 | obs max 2.00e+00 | rew max 3.25e-03
+   step   20: qpos max 8.15e-02 median 8.4e-08 | obs max 2.20e+00 | rew max 6.46e-03
+   step   30: qpos max 2.05e-01 median 1.2e-07 | obs max 5.41e+00 | rew max 1.09e-02
+   step   40: qpos max 1.99e-01 median 6.0e-08 | obs max 5.22e+00 | rew max 1.01e-02
+   step   50: qpos max 1.10e+00 median 3.4e-08 | obs max 8.17e+00 | rew max 4.08e+00
+--- graph replay vs eager launches (same configuration)
+   step   10: qpos max 3.28e-02 median 4.5e-08 | obs max 2.38e+00 | rew max 2.36e-03
+   step   20: qpos max 1.49e-01 median 7.5e-08 | obs max 2.81e+00 | rew max 6.46e-03
+   step   30: qpos max 2.10e-01 median 1.2e-07 | obs max 5.41e+00 | rew max 1.09e-02
+   step   40: qpos max 8.88e-01 median 6.0e-08 | obs max 1.09e+01 | rew max 4.02e+00
+   step   50: qpos max 1.62e+00 median 4.1e-08 | obs max 6.66e+00 | rew max 4.08e+00
+capacity replay: nefc max 39 (njmax 256), nacon max 1520 (naconmax 16384); overflow {'LS_ITERATIONS': 467}
+capacity replay 2: nefc max 39 (njmax 256), nacon max 1519 (naconmax 16384); overflow {'LS_ITERATIONS': 470}
+capacity eager: nefc max 39 (njmax 256), nacon max 1519 (naconmax 16384); overflow {'LS_ITERATIONS': 470}
+--- physics protocol vs MuJoCo C (4 worlds: PD hold + fixed random targets; |dq| max / median)
+   t=0.24s 3.13e-01/6.5e-02  t=0.50s 3.02e-01/6.9e-02  t=1.00s 6.50e-01/1.1e-01
+--- this configuration vs reference {} (graph replay)
+   step   10: qpos max 3.28e-02 median 4.5e-08 | obs max 2.00e+00 | rew max 1.06e-03
+   step   20: qpos max 2.99e-02 median 7.5e-08 | obs max 2.96e+00 | rew max 9.59e-03
+   step   30: qpos max 2.21e-01 median 1.2e-07 | obs max 5.41e+00 | rew max 4.13e-03
+   step   40: qpos max 1.36e+00 median 6.0e-08 | obs max 9.81e+00 | rew max 4.00e+00
+   step   50: qpos max 1.62e+00 median 4.5e-08 | obs max 4.39e+00 | rew max 1.36e-02
+   reference MuJoCo C protocol: t=0.24s 3.07e-01/6.3e-02  t=0.50s 3.12e-01/7.0e-02  t=1.00s 6.49e-01/1.1e-01
+=== done
+=== variant {'jacobian': 'sparse'}; N=512, 50 control steps, deterministic actions
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+njmax 256 naconmax 16384 sparse True
+--- floor: two graph-replay instances of this configuration
+   step   10: qpos max 3.28e-02 median 4.5e-08 | obs max 1.46e+00 | rew max 4.57e-03
+   step   20: qpos max 4.34e-02 median 7.5e-08 | obs max 2.13e+00 | rew max 6.46e-03
+   step   30: qpos max 1.49e-01 median 1.2e-07 | obs max 5.41e+00 | rew max 9.25e-03
+   step   40: qpos max 7.31e-01 median 6.0e-08 | obs max 1.09e+01 | rew max 4.02e+00
+   step   50: qpos max 1.62e+00 median 3.0e-08 | obs max 5.09e+00 | rew max 1.19e-02
+--- graph replay vs eager launches (same configuration)
+   step   10: qpos max 3.28e-02 median 4.5e-08 | obs max 1.46e+00 | rew max 4.57e-03
+   step   20: qpos max 4.78e-02 median 7.5e-08 | obs max 2.81e+00 | rew max 6.46e-03
+   step   30: qpos max 1.68e-01 median 1.2e-07 | obs max 3.66e+00 | rew max 9.25e-03
+   step   40: qpos max 7.31e-01 median 6.0e-08 | obs max 1.09e+01 | rew max 4.02e+00
+   step   50: qpos max 1.93e+00 median 3.0e-08 | obs max 6.49e+00 | rew max 3.95e-02
+capacity replay: nefc max 39 (njmax 256), nacon max 1519 (naconmax 16384); overflow {'LS_ITERATIONS': 473}
+capacity replay 2: nefc max 39 (njmax 256), nacon max 1518 (naconmax 16384); overflow {'LS_ITERATIONS': 472}
+capacity eager: nefc max 39 (njmax 256), nacon max 1519 (naconmax 16384); overflow {'LS_ITERATIONS': 472}
+--- physics protocol vs MuJoCo C (4 worlds: PD hold + fixed random targets; |dq| max / median)
+   t=0.24s 3.10e-01/6.4e-02  t=0.50s 2.97e-01/6.8e-02  t=1.00s 6.80e-01/1.2e-01
+--- this configuration vs reference {} (graph replay)
+   step   10: qpos max 3.28e-02 median 4.7e-08 | obs max 2.00e+00 | rew max 4.57e-03
+   step   20: qpos max 8.15e-02 median 7.5e-08 | obs max 2.96e+00 | rew max 9.59e-03
+   step   30: qpos max 2.05e-01 median 1.2e-07 | obs max 3.10e+00 | rew max 1.09e-02
+   step   40: qpos max 1.36e+00 median 6.0e-08 | obs max 9.81e+00 | rew max 4.00e+00
+   step   50: qpos max 1.62e+00 median 3.4e-08 | obs max 8.17e+00 | rew max 4.08e+00
+   reference MuJoCo C protocol: t=0.24s 3.07e-01/6.3e-02  t=0.50s 3.12e-01/7.0e-02  t=1.00s 6.49e-01/1.1e-01
+=== done
+=== end Fri Sep 25 07:46:23 PDT 2026
