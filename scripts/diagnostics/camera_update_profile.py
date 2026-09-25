@@ -673,7 +673,8 @@ def part_mlx2(args):
             if free_c1w:     # lower bound: conv1's weight gradient costs nothing (stop_gradient)
                 h = mx.maximum(mx.conv2d(x, mx.stop_gradient(p["c1w"]).astype(dt), stride=4) + p["c1b"].astype(dt), 0)
             else:
-                h = mx.maximum(c(x, "c1w", "c1b", 4), 0); h = mx.maximum(c(h, "c2w", "c2b", 2), 0); h = mx.maximum(c(h, "c3w", "c3b", 1), 0)
+                h = mx.maximum(c(x, "c1w", "c1b", 4), 0)
+            h = mx.maximum(c(h, "c2w", "c2b", 2), 0); h = mx.maximum(c(h, "c3w", "c3b", 1), 0)
             h = h.transpose(0, 3, 1, 2).reshape(h.shape[0], -1)
             f = h @ p["fw"].astype(dt).T + p["fb"].astype(dt)
             f = mx.where(f > 0, f, mx.exp(mx.minimum(f, 0)) - 1)
