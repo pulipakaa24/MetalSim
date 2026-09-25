@@ -31,7 +31,8 @@ Engines (``G1VelocityTask(engine=...)``): "mjwarp" (default; MuJoCo Warp, ``Batc
 relaxation 0.4/0.4, ``newton_iterations`` at ``newton_dt``). NewtonSim exposes the same MuJoCo-layout
 state arrays, so observation, reward, termination and reset kernels are shared verbatim; on Newton the
 touch "sensors" are contact force magnitudes on the foot / torso colliders (XPBD update_contacts), qacc
-is the last substep's joint velocity difference, and feet_slide reads the foot COM velocity.
+is the joint velocity difference over the last 2.5 ms, and feet_slide reads the foot body's own world velocity
+(on MuJoCo Warp derived from cvel at the foot's frame origin).
 """
 from __future__ import annotations
 
@@ -209,7 +210,7 @@ def g1_commands(qpos: wp.array2d(dtype=float), cmd: wp.array2d(dtype=float), hea
 @wp.kernel
 def g1_reward_done(qpos: wp.array2d(dtype=float), qvel: wp.array2d(dtype=float), qacc: wp.array2d(dtype=float),
                    qfrc_actuator: wp.array2d(dtype=float), sensordata: wp.array2d(dtype=float),
-                   site_xpos: wp.array2d(dtype=wp.vec3), cvel: wp.array2d(dtype=wp.spatial_vector),
+                   site_xpos: wp.array2d(dtype=wp.vec3), foot_vel: wp.array2d(dtype=wp.vec3),
                    cmd: wp.array2d(dtype=float), last_action: wp.array2d(dtype=float), prev_action: wp.array2d(dtype=float),
                    default_q: wp.array(dtype=float), jnt_range: wp.array2d(dtype=float),
                    group: wp.array(dtype=int), touch_adr: wp.vec3i, foot_site: wp.vec2i, foot_body: wp.vec2i,
@@ -265,11 +266,12 @@ def g1_reward_done(qpos: wp.array2d(dtype=float), qvel: wp.array2d(dtype=float),
         m0 = contact_time[e, 0] if in_contact0 else air_time[e, 0]
         m1 = contact_time[e, 1] if in_contact1 else air_time[e, 1]
         r_air = 0.25 * (wp.min(m0, 0.4) + wp.min(m1, 0.4))
-    # 3. feet slide: foot xy speed while in contact
+    # 3. feet slide (Isaac mdp.feet_slide): |body_lin_vel_w[foot].xy| while the foot is in contact; the foot
+    #    body's own world linear velocity (at its frame origin), filled per engine before this kernel
     r_slide = float(0.0)
     for f in range(2):
-        cv = cvel[e, foot_body[f]]
-        sp = wp.sqrt(cv[3] * cv[3] + cv[4] * cv[4])
+        fv = foot_vel[e, f]
+        sp = wp.sqrt(fv[0] * fv[0] + fv[1] * fv[1])
         inc = in_contact0 if f == 0 else in_contact1
         if inc:
             r_slide += -0.1 * sp
@@ -319,7 +321,9 @@ def g1_reward_done(qpos: wp.array2d(dtype=float), qvel: wp.array2d(dtype=float),
         r_term = -200.0
     # Isaac's RewardManager multiplies every term by dt, the termination penalty included (-200 * 0.02 = -4)
     r = (r_lin + r_ang + r_air + r_slide + r_lim + r_dev + r_tau + r_acc + r_rate + r_orient + r_wxy + r_term) * dt
-    s = step_idx[0] - 1
+    # row of the rollout buffer; the modulo lets a caller keep a free-running step counter (fresh RNG
+    # streams every step) with a one-row buffer (metalsim.learn.rslrl_adapter); PPOWarp's s < T is unchanged
+    s = (step_idx[0] - 1) % buf_rew.shape[0]
     buf_rew[s, e] = r
     buf_done[s, e] = 1.0 if done else 0.0
     terms[e, 0] = r_lin; terms[e, 1] = r_ang; terms[e, 2] = r_air; terms[e, 3] = r_slide; terms[e, 4] = r_dev
@@ -361,6 +365,20 @@ def g1_reward_done(qpos: wp.array2d(dtype=float), qvel: wp.array2d(dtype=float),
 
 
 @wp.kernel
+def g1_foot_vel_mjwarp(cvel: wp.array2d(dtype=wp.spatial_vector), xpos: wp.array2d(dtype=wp.vec3),
+                       subtree_com: wp.array2d(dtype=wp.vec3), foot_body: wp.vec2i, root_body: wp.vec2i,
+                       foot_vel: wp.array2d(dtype=wp.vec3)):
+    """World linear velocity of each foot body's frame origin from MuJoCo's cvel, which is the body's spatial
+    velocity [rot; lin] expressed at the subtree COM of its tree root: v = v_lin + w x (xpos - subtree_com[root])."""
+    e = wp.tid()
+    for f in range(2):
+        cv = cvel[e, foot_body[f]]
+        w = wp.vec3(cv[0], cv[1], cv[2])
+        v = wp.vec3(cv[3], cv[4], cv[5])
+        foot_vel[e, f] = v + wp.cross(w, xpos[e, foot_body[f]] - subtree_com[e, root_body[f]])
+
+
+@wp.kernel
 def g1_reset(reset_mask: wp.array(dtype=wp.bool), default_q: wp.array(dtype=float), origins: wp.array2d(dtype=float),
              seed: int, step_idx: wp.array(dtype=int), qpos: wp.array2d(dtype=float), qvel: wp.array2d(dtype=float),
              last_action: wp.array2d(dtype=float), prev_action: wp.array2d(dtype=float)):
@@ -379,6 +397,18 @@ def g1_reset(reset_mask: wp.array(dtype=wp.bool), default_q: wp.array(dtype=floa
     qpos[e, 3] = wp.cos(0.5 * yaw); qpos[e, 4] = 0.0; qpos[e, 5] = 0.0; qpos[e, 6] = wp.sin(0.5 * yaw)
     for i in range(last_action.shape[1]):
         last_action[e, i] = 0.0; prev_action[e, i] = 0.0
+
+
+@wp.kernel
+def g1_record_timeout(step_idx: wp.array(dtype=int), buf_done: wp.array2d(dtype=float), terms: wp.array2d(dtype=float),
+                      buf_timeout: wp.array2d(dtype=float)):
+    """1 where this step ended the episode by the time limit (done and not a fall / blow-up)."""
+    e = wp.tid()
+    s = (step_idx[0] - 1) % buf_done.shape[0]
+    to = float(0.0)
+    if buf_done[s, e] > 0.5 and terms[e, 7] >= 0.0:
+        to = 1.0
+    buf_timeout[s, e] = to
 
 
 # --------------------------------------------------------------------------------------------------
@@ -446,6 +476,8 @@ class G1VelocityTask:
         self.touch_adr = wp.vec3i(sadr("left_ankle_roll_link_touch"), sadr("right_ankle_roll_link_touch"), sadr("torso_link_touch"))
         bid = lambda nm: mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, nm)
         self.foot_body = wp.vec2i(bid("left_ankle_roll_link"), bid("right_ankle_roll_link"))
+        self.foot_root = wp.vec2i(int(m.body_rootid[self.foot_body[0]]), int(m.body_rootid[self.foot_body[1]]))
+        self.foot_vel = z((n, 2), dtype=wp.vec3)     # foot body origin world linear velocity (feet_slide), per engine
         self.foot_site = wp.vec2i(0, 0)
         # env origins: flat -> a grid with 2.5 m spacing (Isaac env_spacing); rough -> terrain cell centers
         if terrain == "flat":
@@ -491,8 +523,14 @@ class G1VelocityTask:
 
     def launch_reward_done_reset(self, pol, bufs):
         d = self.sim.d
+        if self.engine == "newton":
+            foot_vel = d.foot_vel                    # written by NewtonSim from the foot bodies' state
+        else:
+            wp.launch(g1_foot_vel_mjwarp, dim=self.n, inputs=[d.cvel, d.xpos, d.subtree_com, self.foot_body, self.foot_root],
+                      outputs=[self.foot_vel], device=self.device)
+            foot_vel = self.foot_vel
         wp.launch(g1_reward_done, dim=self.n, inputs=[
-            d.qpos, d.qvel, d.qacc, d.qfrc_actuator, d.sensordata, d.site_xpos, d.cvel, self.cmd, self.last_action, self.prev_action,
+            d.qpos, d.qvel, d.qacc, d.qfrc_actuator, d.sensordata, d.site_xpos, foot_vel, self.cmd, self.last_action, self.prev_action,
             self.default_q, self.jnt_range, self.group, self.touch_adr, self.foot_site, self.foot_body, self.air_time,
             self.contact_time, CONTROL_DT, self.t, self.max_t, pol.step_idx, bufs.rew, bufs.done, self.sim._reset_mask,
             self.resample, int(10.0 / CONTROL_DT), self.ep_ret, self.ep_len, self.stats, self.stats_i, self.terms,
@@ -505,12 +543,18 @@ class G1VelocityTask:
             return
         import mujoco_warp as mjw
         mjw.reset_data(self.sim.m, d, reset=self.sim._reset_mask)
-        wp.launch(g1_reset, dim=self.n, inputs=[self.sim._reset_mask, self.default_q, self.origins, self.seed, pol.step_idx,
+        # reset randomization keyed by the free-running counter when the caller has one (PPOWarp's rng_step)
+        wp.launch(g1_reset, dim=self.n, inputs=[self.sim._reset_mask, self.default_q, self.origins, self.seed,
+                                                getattr(pol, "rng_step", pol.step_idx),
                                                 d.qpos, d.qvel, self.last_action, self.prev_action], device=self.device)
         # After a reset only the kinematics are needed before the next observation (body poses for
         # the height scan); everything else (sensors, accelerations, contact forces) is produced by
         # the next step itself. A full forward pass here cost ~20 ms per step at 4096 envs.
         mjw.kinematics(self.sim.m, d)
+
+    def launch_timeouts(self, pol, bufs):
+        """Time-out flags of this step into ``bufs.timeout`` (for PPO's bootstrapping on truncation)."""
+        wp.launch(g1_record_timeout, dim=self.n, inputs=[pol.step_idx, bufs.done, self.terms, bufs.timeout], device=self.device)
 
     def reset_all(self):
         """Host-driven initial reset (once)."""
