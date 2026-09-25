@@ -76,6 +76,47 @@ image mean, recorded as an approximation), procedural nodes (noise, ramps, …; 
 to its default and is recorded), decomposed BSDF graphs (`surface`, `layer_bsdf`, … — the same graphs
 that fail in Isaac; the material keeps whatever the regular importer found).
 
+## Implementation and coverage (metalsim/scene/materialx.py)
+
+* Load-time only: MaterialX is flattened when the USD is converted to MjSpec. The renderer sees the
+  same per-geom material rows (rgba, metallic, roughness, specular, emission, atlas rect, texrepeat)
+  as any MJCF material, so it costs nothing at render time. Measured on the four-cube test scene,
+  1024 envs × 128², tier 0, interleaved repeats: MaterialX USD 2.76 ms/frame median (1.58 min) vs
+  the same materials hand-written in MJCF 2.68 ms (1.71 min), the difference being run-to-run noise;
+  the material tables agree to 6e-8. Load cost: 3 ms to check the G1 (`g1_minimal.usd`, no
+  MaterialX) out of a 310 ms `convert_stage`; 36 ms to load and compile the MaterialX test scene.
+* Loader hook: one additive block in `convert_stage` after the material loop
+  (`stage_has_materialx` → `import_materials`). It does nothing for stages without MaterialX. For
+  MaterialX materials it overwrites the material the regular loop created, or adds one for prims
+  that exist only through a `.mtlx` arc. As in RTX, `outputs:mtlx:surface` wins over a universal
+  UsdPreviewSurface terminal.
+* Handled: `.mtlx` referenced or payloaded from USD (whole document `</MaterialX>` or one
+  material), standalone `.mtlx` (`load_mtlx`), UsdShade-native MaterialX (`ND_*` ids). Surfaces:
+  standard_surface, open_pbr_surface, UsdPreviewSurface, gltf_pbr. Graph nodes: constant, dot,
+  convert, multiply/divide/add/subtract (constant and texture×constant), mix (constant weight),
+  extract, separateN/combineN, image, tiledimage, UsdUVTexture (+ scale/bias, channel outputs),
+  gltf_image/colorimage, texcoord, geompropvalue, UsdPrimvarReader, place2d (scale), UsdTransform2d
+  (scale). Nested node graphs and interface inputs go through UsdShade's value-producing-attribute
+  resolution.
+* Tests (`tests/test_materialx.py`, 4 tests, ~1 s): the three authored surfaces flatten to
+  hand-computed parameters; a USD scene with a whole-document reference, a single-material
+  reference and an inline network binds all four cubes; the tier-0 render of that scene equals a
+  render of the same parameters written by hand in MJCF (per-face mean within 0.1 of a level),
+  with the expected hue.
+* Coverage vs Isaac: Isaac RTX accepts any graph that MaterialXGenMdl can compile. We cover the four
+  surface models and the texture and arithmetic nodes above. For the models Isaac content actually
+  uses (SimReady open_pbr_surface, DCC standard_surface, preview surface), we map base colour and
+  texture, metalness, roughness, dielectric F0 and opacity exactly; emission is carried as a scalar
+  without its hue. The lobes our renderer does not have are not carried: coat, fuzz/sheen,
+  transmission, SSS, thin film, anisotropy, normal maps. Textures on inputs other than base colour
+  are reduced to their mean. Procedural nodes (noise, ramps, …) and decomposed BSDF graphs are not
+  flattened. Those same graphs fail in Isaac 5.1 too [6]. Where Isaac and we disagree, the
+  per-material `unmapped` / `approximations` lists say so.
+* Limits: the `.mtlx` arc still logs one USD warning at stage open, because the file format is
+  unknown to this pxr build. `.mtlx` arcs authored inside instance prototypes are not swapped.
+  Base-colour textures in formats other than PNG are converted once to PNG in a temp cache for
+  MuJoCo.
+
 ## Sources
 
 1. Omniverse Materials overview — https://docs.omniverse.nvidia.com/materials-and-rendering/latest/materials.html
