@@ -1,0 +1,9 @@
+holder: {"name": "rtx_cp_nan_repro", "kind": "render", "minutes": 8.0, "pid": 2740, "start": 1790368849.964193}
+  waiting [train] g1_rough_seed1 est 100.0 min, queued 841 s ago
+other python: 501 0.002096 GB RSS scripts/gpu_run.sh g1_rough_seed1
+other python: 2750 0.001168 GB RSS {print "other
+it    1 steps     65536 sps   7,782 | ret    7.78 len  26.7 succ  0.00 (n=100) | pg -0.002 vf 0.875 kl 0.0061  | mps alloc 2.03 GB driver 4.59 GB rec max 55.7 GB
+it    2 steps    131072 sps   8,329 | ret   15.28 len  37.0 succ  0.00 (n=100) | pg -0.010 vf 0.748 kl 0.0109  | mps alloc 2.03 GB driver 4.60 GB rec max 55.7 GB
+it    3 steps    196608 sps   8,529 | ret   20.17 len  41.9 succ  0.00 (n=100) | pg -0.009 vf 0.784 kl 0.0093  | mps alloc 2.03 GB driver 4.60 GB rec max 55.7 GB
+accum finite: True
+9 passed, 1 warning in 18.50s
