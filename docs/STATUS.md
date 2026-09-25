@@ -60,7 +60,7 @@ published benchmark. Neither is cited as physics parity evidence.
   env-steps/s (Isaac Lab RTX 4090 published 94K); step + Warp-policy inference 55.4K (88K); full PPO
   loop 47.8–51.7K (82K). Rough (patched heightfield kernel): 55.4K / 47.8K / 39.8–42.2K. Raw 0.48–0.63×
   on a chip with 4.5× less peak FP32; 2.2–2.8× per TFLOPS. Physics alone 68.6K flat, 61.3K rough.
-- **Newton XPBD backend, same task, 4096 envs (2026-09-24, clean re-run with a control row)**: full PPO loop 110.1K env-steps/s at the
+- **Newton XPBD backend (archived as experimental 2026-09-25; MuJoCo Warp is the parity engine)**, same task, 4096 envs (2026-09-24, clean re-run with a control row): full PPO loop 110.1K env-steps/s at the
   training setting (4 it. at 1.25 ms) vs MuJoCo Warp's 27.8K at its 2.5 ms training setting (rough terrain: 26.1K vs 24.8K, no advantage); Isaac's
   published 4090 PhysX number is 82K. Training on Newton gives the same learning curve shape as
   MuJoCo Warp, 4–6× sooner in wall-clock (`PARITY.md` §1.4–1.5).

@@ -582,7 +582,7 @@ and ends before the horizon, where RTX's reaches it.
 | Training anomaly monitor (task-agnostic) | rsl_rl logs KL, value loss, entropy, per-term rewards | `metalsim.learn.monitor.AnomalyMonitor` on every log point: KL vs target band, value explained variance, action-std collapse/explosion, LR pinned at bounds, terminal-reward dominance and return-vs-length direction (survival penalties), non-finite rows; physics invariants from the sim buffers (joint speed vs actuator limits, joint-limit violation, contact penetration, contact force vs weight, energy jumps, capacity overflows) | first probe on the corrected G1 config flagged two real items on its own: joints pushed 0.17 rad past their limits and contacts penetrating 5–7 cm during falls (MuJoCo's soft limits and soft contacts vs PhysX's hard ones) | in use; findings feed §3 |
 | RL reproduces a published Isaac Lab result | Cartpole-Direct with rsl_rl config learns | same config on the Warp path reaches 295/300 in 45 iterations | `metalsim.learn.ppo_warp` run (docs/PHASES.md) | measured | confirmed (equivalent MJCF cartpole, not Isaac's USD) |
 
-## 2.1 Contact model: what MuJoCo can do, and Newton XPBD on Metal (measured 2026-09-24)
+## 2.1 Contact model: what MuJoCo can do, and Newton XPBD on Metal (measured 2026-09-24; Newton XPBD archived as experimental on 2026-09-25, see GAPS.md)
 
 MuJoCo's contacts are soft by construction (regularized convex constraints with a time constant
 `solref[0]`, penetration is the state of that spring-damper), not because of missed collisions; `margin`/
