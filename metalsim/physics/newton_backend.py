@@ -77,7 +77,7 @@ def _meshes_to_boxes(b: newton.ModelBuilder) -> None:
 
 def g1_builder(z0: float = 0.74, mesh_to_box: bool = True, collapse_fixed_joints: bool = True,
                armature_inertia: bool | str = False, floating: bool = True,
-               limit_margin: float | None = 0.15) -> tuple[newton.ModelBuilder, dict]:
+               limit_margin: float | None = 0.15, recenter: bool = False) -> tuple[newton.ModelBuilder, dict]:
     """Isaac's G1 USD with Isaac Lab's actuator gains and default pose, targets correctly indexed.
 
     Returns the builder and per-DOF actuator arrays (``kp``, ``kd``, ``effort``, ``armature``,
@@ -89,7 +89,7 @@ def g1_builder(z0: float = 0.74, mesh_to_box: bool = True, collapse_fixed_joints
     if mesh_to_box:
         _meshes_to_boxes(b)
     nd = b.joint_dof_count
-    act = {k: np.zeros(nd) for k in ("kp", "kd", "effort", "armature", "target")}
+    act = {k: np.zeros(nd) for k in ("kp", "kd", "effort", "armature", "target", "offset")}
     ke = list(b.joint_target_ke); kd = list(b.joint_target_kd); mode = list(b.joint_target_mode)
     tq = list(b.joint_target_q); q = list(b.joint_q)
     qd_start = list(b.joint_qd_start) + [nd]; q_start = list(b.joint_q_start) + [b.joint_coord_count]
@@ -108,6 +108,23 @@ def g1_builder(z0: float = 0.74, mesh_to_box: bool = True, collapse_fixed_joints
     b.joint_target_ke, b.joint_target_kd, b.joint_target_mode, b.joint_target_q, b.joint_q = ke, kd, mode, tq, q
     b.joint_effort_limit = [float(e) if e > 0 else old for e, old in zip(act["effort"], b.joint_effort_limit)]
     b.joint_armature = [float(a) for a in act["armature"]]
+    if recenter:
+        # XPBD's angle wraps at +-pi from the joint zero; move each revolute joint's zero to the middle of its limit
+        # range (parent joint frame rotated by mid about the axis) so the wrap point is as far as possible from both
+        # limits. Newton angle = MuJoCo/Isaac angle - offset; NewtonSim converts coordinates and targets.
+        Xp = list(b.joint_X_p); lo_l = list(b.joint_limit_lower); hi_l = list(b.joint_limit_upper)
+        tq = list(b.joint_target_q); q = list(b.joint_q)
+        for j in range(b.joint_count):
+            if b.joint_type[j] != newton.JointType.REVOLUTE:
+                continue
+            d, c = qd_start[j], q_start[j]
+            mid = 0.5 * (lo_l[d] + hi_l[d])
+            ax = wp.vec3(*np.asarray(b.joint_axis[d], float).tolist())
+            X = Xp[j]
+            Xp[j] = wp.transform(wp.transform_get_translation(X), wp.transform_get_rotation(X) * wp.quat_from_axis_angle(wp.normalize(ax), float(mid)))
+            lo_l[d] -= mid; hi_l[d] -= mid; tq[c] -= mid; q[c] -= mid
+            act["offset"][d] = mid; act["target"][d] -= mid
+        b.joint_X_p, b.joint_limit_lower, b.joint_limit_upper, b.joint_target_q, b.joint_q = Xp, lo_l, hi_l, tq, q
     if limit_margin is not None:
         # XPBD measures a revolute angle as 2 asin(twist) in (-pi, pi]: a joint crossing pi (G1 elbow pitch range
         # up to 3.421 rad; hip pitch 3.05) wraps to -pi, reads as a ~2 pi limit violation and is "corrected" with a
@@ -433,9 +450,9 @@ class G1XPBD:
 # from the same USD is the metadata source; FK of both agrees to 5e-7 m).
 
 @wp.kernel
-def _ctrl_to_target(ctrl: wp.array2d[float], dof_of: wp.array[int], nd: int, target: wp.array[float]):
+def _ctrl_to_target(ctrl: wp.array2d[float], dof_of: wp.array[int], q_offset: wp.array[float], nd: int, target: wp.array[float]):
     e, i = wp.tid()
-    target[e * nd + dof_of[i]] = ctrl[e, i]
+    target[e * nd + dof_of[i]] = ctrl[e, i] - q_offset[i]
 
 
 @wp.kernel
@@ -446,7 +463,7 @@ def _copy_joint_qd(src: wp.array[float], dst: wp.array[float]):
 @wp.kernel
 def _to_mujoco(body_q: wp.array[wp.transform], body_qd: wp.array[wp.spatial_vector], body_com: wp.array[wp.vec3],
                joint_q: wp.array[float], joint_qd: wp.array[float], joint_qd_prev: wp.array[float], joint_f: wp.array[float],
-               nb: int, nc: int, nd: int, coord_of: wp.array[int], dof_of: wp.array[int],
+               nb: int, nc: int, nd: int, coord_of: wp.array[int], dof_of: wp.array[int], q_offset: wp.array[float],
                foot_nb: wp.vec2i, inv_dt: float,
                qpos: wp.array2d[float], qvel: wp.array2d[float], qacc: wp.array2d[float], qfrc: wp.array2d[float],
                foot_vel: wp.array2d[wp.vec3]):
@@ -463,7 +480,7 @@ def _to_mujoco(body_q: wp.array[wp.transform], body_qd: wp.array[wp.spatial_vect
     qvel[e, 3] = w_b[0]; qvel[e, 4] = w_b[1]; qvel[e, 5] = w_b[2]
     for i in range(coord_of.shape[0]):
         c = e * nc + coord_of[i]; d = e * nd + dof_of[i]
-        qpos[e, 7 + i] = joint_q[c]
+        qpos[e, 7 + i] = joint_q[c] + q_offset[i]
         qvel[e, 6 + i] = joint_qd[d]
         qacc[e, 6 + i] = (joint_qd[d] - joint_qd_prev[d]) * inv_dt
         qfrc[e, 6 + i] = joint_f[d]
@@ -476,7 +493,7 @@ def _to_mujoco(body_q: wp.array[wp.transform], body_qd: wp.array[wp.spatial_vect
 
 @wp.kernel
 def _from_mujoco(mask: wp.array[wp.bool], qpos: wp.array2d[float], qvel: wp.array2d[float], body_com: wp.array[wp.vec3],
-                 nb: int, nc: int, nd: int, coord_of: wp.array[int], dof_of: wp.array[int],
+                 nb: int, nc: int, nd: int, coord_of: wp.array[int], dof_of: wp.array[int], q_offset: wp.array[float],
                  joint_q: wp.array[float], joint_qd: wp.array[float]):
     e = wp.tid()
     if not mask[e]:
@@ -491,7 +508,7 @@ def _from_mujoco(mask: wp.array[wp.bool], qpos: wp.array2d[float], qvel: wp.arra
     joint_qd[d0 + 0] = v_com[0]; joint_qd[d0 + 1] = v_com[1]; joint_qd[d0 + 2] = v_com[2]
     joint_qd[d0 + 3] = w_w[0]; joint_qd[d0 + 4] = w_w[1]; joint_qd[d0 + 5] = w_w[2]
     for i in range(coord_of.shape[0]):
-        joint_q[c0 + coord_of[i]] = qpos[e, 7 + i]
+        joint_q[c0 + coord_of[i]] = qpos[e, 7 + i] - q_offset[i]
         joint_qd[d0 + dof_of[i]] = qvel[e, 6 + i]
 
 
@@ -551,7 +568,8 @@ class NewtonSim:
     def __init__(self, mj_model, num_envs: int, iterations: int = 4, dt: float = 0.00125, control_dt: float = 0.02,
                  device: str = "metal:0", mesh_to_box: bool = True, touch_bodies=("left_ankle_roll_link", "right_ankle_roll_link", "torso_link"),
                  hfield: dict | None = None, pose_bodies=("torso_link",), relaxation: float = 0.4,
-                 actuator_kw: dict | None = None, solver_kw: dict | None = None, solver: str = "xpbd", project: bool = False):
+                 actuator_kw: dict | None = None, solver_kw: dict | None = None, solver: str = "xpbd", project: bool = False,
+                 recenter: bool = False):
         import mujoco
         from metalsim.interop import warp_metal as wm
         self.mj_model = mj = mj_model
@@ -564,7 +582,7 @@ class NewtonSim:
         z0 = float(mj.key_qpos[0][2]) if mj.nkey else 0.74
         with wp.ScopedDevice(self.device):
             builder, act = scene(n, spacing=0.0, z0=z0, armature_inertia=False if solver == "featherstone" else "iso",
-                                 mesh_to_box=mesh_to_box, hfield=hfield)
+                                 mesh_to_box=mesh_to_box, hfield=hfield, recenter=recenter)
             builder.joint_target_ke = [0.0] * builder.joint_dof_count; builder.joint_target_kd = [0.0] * builder.joint_dof_count
             self.model = m = builder.finalize()
             m.request_contact_attributes("force")
@@ -588,6 +606,8 @@ class NewtonSim:
             assert all(mj.jnt_qposadr[mj.actuator_trnid[i, 0]] == 7 + i for i in range(mj.nu)), "MuJoCo qpos must follow actuator order"
             self.coord_of = wp.array([int(qs[lab.index(nm)]) for nm in names], dtype=int)
             self.dof_of = wp.array([int(qds[lab.index(nm)]) for nm in names], dtype=int)
+            # per MuJoCo actuator: Newton angle = MuJoCo angle - offset (recentred joint zeros; 0 otherwise)
+            self.q_offset = wp.array(np.array([act["offset"][int(qds[lab.index(nm)])] for nm in names], np.float32), dtype=float)
             blab = [l.split("/")[-1] for l in m.body_label[: self.nb]]
             assert blab[0] == "pelvis"
             mjb = lambda nm: mujoco.mj_name2id(mj, mujoco.mjtObj.mjOBJ_BODY, nm)
@@ -626,7 +646,7 @@ class NewtonSim:
     def launch_step(self) -> None:
         m = self.model
         with wp.ScopedDevice(self.device):
-            wp.launch(_ctrl_to_target, dim=(self.n, self.mj_model.nu), inputs=[self.d.ctrl, self.dof_of, self.nd, self.actuator.target])
+            wp.launch(_ctrl_to_target, dim=(self.n, self.mj_model.nu), inputs=[self.d.ctrl, self.dof_of, self.q_offset, self.nd, self.actuator.target])
             for k in range(self.substeps):
                 self.actuator.apply(self.s0, self.control)          # eval_ik -> actuator.joint_q/qd, torques
                 if k == self.substeps - self.acc_window:
@@ -654,7 +674,7 @@ class NewtonSim:
         m, d = self.model, self.d
         newton.eval_ik(m, self.s0, self.joint_q, self.joint_qd)
         wp.launch(_to_mujoco, dim=self.n, inputs=[self.s0.body_q, self.s0.body_qd, m.body_com, self.joint_q, self.joint_qd,
-                  self.joint_qd_prev, self.control.joint_f, self.nb, self.nc, self.nd, self.coord_of, self.dof_of,
+                  self.joint_qd_prev, self.control.joint_f, self.nb, self.nc, self.nd, self.coord_of, self.dof_of, self.q_offset,
                   self.foot_nb, 1.0 / (self.acc_window * self.dt_phys)], outputs=[d.qpos, d.qvel, d.qacc, d.qfrc_actuator, d.foot_vel])
         wp.launch(_body_pose, dim=(self.n, self.pose_nb.shape[0]), inputs=[self.s0.body_q, self.nb, self.pose_nb, self.pose_mj],
                   outputs=[d.xpos, d.xmat])
@@ -670,7 +690,7 @@ class NewtonSim:
         m = self.model; mask = self._reset_mask if mask is None else mask
         with wp.ScopedDevice(self.device):
             wp.launch(_from_mujoco, dim=self.n, inputs=[mask, self.d.qpos, self.d.qvel, m.body_com, self.nb, self.nc, self.nd,
-                      self.coord_of, self.dof_of], outputs=[self.joint_q, self.joint_qd])
+                      self.coord_of, self.dof_of, self.q_offset], outputs=[self.joint_q, self.joint_qd])
             newton.eval_fk(m, self.joint_q, self.joint_qd, self.s0, mask=mask)
             if self.solver_kind == "featherstone":   # Featherstone integrates State.joint_q / joint_qd
                 wp.copy(self.s0.joint_q, self.joint_q); wp.copy(self.s0.joint_qd, self.joint_qd)
