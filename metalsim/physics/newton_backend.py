@@ -141,9 +141,25 @@ def add_armature_inertia(b: newton.ModelBuilder, armature: np.ndarray, isotropic
     b.body_inv_inertia = [wp.mat33(*np.linalg.inv(I).flatten().tolist()) for I in inertia]
 
 
-def scene(n_envs: int, spacing: float = 2.5, **g1_kw) -> tuple[newton.ModelBuilder, dict]:
+def heightfield_from_mujoco(hf: dict) -> tuple[newton.Heightfield, wp.transform]:
+    """Newton heightfield with the same surface as the task's MuJoCo hfield dict (metalsim.learn.terrain):
+    MuJoCo puts the field at geom z = zmin, spans x in [-size_x, size_x] over the ncol samples and y over the
+    nrow rows, with surface z = zmin + data * elevation."""
+    sx, sy, elev = float(hf["size"][0]), float(hf["size"][1]), float(hf["size"][2])
+    zmin = float(hf["zmin"])
+    h = newton.Heightfield(data=np.asarray(hf["data"], np.float32).reshape(hf["nrow"], hf["ncol"]), nrow=int(hf["nrow"]),
+                           ncol=int(hf["ncol"]), hx=sx, hy=sy, min_z=zmin, max_z=zmin + elev)
+    return h, wp.transform_identity()
+
+
+def scene(n_envs: int, spacing: float = 2.5, hfield: dict | None = None, **g1_kw) -> tuple[newton.ModelBuilder, dict]:
     rb, act = g1_builder(**g1_kw)
-    s = newton.ModelBuilder(); s.gravity = (0.0, 0.0, -9.81); s.add_ground_plane()
+    s = newton.ModelBuilder(); s.gravity = (0.0, 0.0, -9.81)
+    if hfield is None:
+        s.add_ground_plane()
+    else:                                   # static, shared by all worlds (added before replicate, like the plane)
+        h, X = heightfield_from_mujoco(hfield)
+        s.add_shape_heightfield(xform=X, heightfield=h, label="terrain")     # default shape cfg, as the ground plane
     s.replicate(rb, n_envs, spacing=(spacing, spacing, 0.0)); s.gravity = (0.0, 0.0, -9.81)
     return s, {k: np.tile(v, n_envs) for k, v in act.items()}
 
@@ -495,6 +511,15 @@ def _touch_hist_max(count: wp.array[int], shape0: wp.array[int], shape1: wp.arra
                 wp.atomic_max(hist, shape_env[sh], f)
 
 
+@wp.kernel
+def _body_pose(body_q: wp.array[wp.transform], nb: int, pose_nb: wp.array[int], pose_mj: wp.array[int],
+               xpos: wp.array2d[wp.vec3], xmat: wp.array2d[wp.mat33]):
+    e, k = wp.tid()
+    X = body_q[e * nb + pose_nb[k]]
+    xpos[e, pose_mj[k]] = wp.transform_get_translation(X)
+    xmat[e, pose_mj[k]] = wp.quat_to_matrix(wp.transform_get_rotation(X))
+
+
 class _NewtonData:
     """MuJoCo-layout arrays the task kernels use (subset of mujoco_warp.Data)."""
 
@@ -506,7 +531,8 @@ class NewtonSim:
     ``sensordata`` holds contact normal+friction force magnitudes summed per touch slot (feet, torso)."""
 
     def __init__(self, mj_model, num_envs: int, iterations: int = 4, dt: float = 0.00125, control_dt: float = 0.02,
-                 device: str = "metal:0", mesh_to_box: bool = True, touch_bodies=("left_ankle_roll_link", "right_ankle_roll_link", "torso_link")):
+                 device: str = "metal:0", mesh_to_box: bool = True, touch_bodies=("left_ankle_roll_link", "right_ankle_roll_link", "torso_link"),
+                 hfield: dict | None = None, pose_bodies=("torso_link",)):
         import mujoco
         from metalsim.interop import warp_metal as wm
         self.mj_model = mj = mj_model
@@ -518,7 +544,7 @@ class NewtonSim:
         self.device = wp.get_device(device)
         z0 = float(mj.key_qpos[0][2]) if mj.nkey else 0.74
         with wp.ScopedDevice(self.device):
-            builder, act = scene(n, spacing=0.0, z0=z0, armature_inertia="iso", mesh_to_box=mesh_to_box)
+            builder, act = scene(n, spacing=0.0, z0=z0, armature_inertia="iso", mesh_to_box=mesh_to_box, hfield=hfield)
             builder.joint_target_ke = [0.0] * builder.joint_dof_count; builder.joint_target_kd = [0.0] * builder.joint_dof_count
             self.model = m = builder.finalize()
             m.request_contact_attributes("force")
@@ -544,6 +570,9 @@ class NewtonSim:
             sb = m.shape_body.numpy()
             self.shape_slot = wp.array([touch_bodies.index(blab[b % self.nb]) if b >= 0 and blab[b % self.nb] in touch_bodies else -1 for b in sb], dtype=int)
             self.shape_env = wp.array([b // self.nb if b >= 0 else 0 for b in sb], dtype=int)
+            # bodies whose MuJoCo-layout pose (xpos, xmat) the task reads (height scanner)
+            self.pose_nb = wp.array([blab.index(b) for b in pose_bodies], dtype=int)
+            self.pose_mj = wp.array([mjb(b) for b in pose_bodies], dtype=int)
             sadr = lambda nm: int(mj.sensor_adr[mujoco.mj_name2id(mj, mujoco.mjtObj.mjOBJ_SENSOR, nm + "_touch")])
             self.touch_adr = wp.vec3i(*[sadr(b) for b in touch_bodies])
             # actuator: per-DOF gains from the same builder (Isaac's groups), target written from ctrl
@@ -556,7 +585,8 @@ class NewtonSim:
             d.qpos = wp.array(np.tile(mj.key_qpos[0], (n, 1)).astype(np.float32), dtype=float)
             d.qvel = z((n, mj.nv)); d.qacc = z((n, mj.nv)); d.qfrc_actuator = z((n, mj.nv))
             d.sensordata = z((n, mj.nsensordata)); d.site_xpos = z((n, 1), dtype=wp.vec3)
-            d.foot_vel = z((n, 2), dtype=wp.vec3); d.ctrl = z((n, mj.nu))   # feet: world linear velocity of the body origin
+            d.foot_vel = z((n, 2), dtype=wp.vec3); d.ctrl = z((n, mj.nu))
+            d.xpos = z((n, mj.nbody), dtype=wp.vec3); d.xmat = z((n, mj.nbody), dtype=wp.mat33)   # filled for pose_bodies   # feet: world linear velocity of the body origin
             d.ctrl.assign(np.tile(mj.key_qpos[0][7:], (n, 1)).astype(np.float32))
             self._reset_mask = z(n, dtype=wp.bool)
         # optional contact history (Isaac's ContactSensor history): per-env max over the last ``hist_substeps``
@@ -596,6 +626,8 @@ class NewtonSim:
         wp.launch(_to_mujoco, dim=self.n, inputs=[self.s0.body_q, self.s0.body_qd, m.body_com, self.joint_q, self.joint_qd,
                   self.joint_qd_prev, self.control.joint_f, self.nb, self.nc, self.nd, self.coord_of, self.dof_of,
                   self.foot_nb, 1.0 / (self.acc_window * self.dt_phys)], outputs=[d.qpos, d.qvel, d.qacc, d.qfrc_actuator, d.foot_vel])
+        wp.launch(_body_pose, dim=(self.n, self.pose_nb.shape[0]), inputs=[self.s0.body_q, self.nb, self.pose_nb, self.pose_mj],
+                  outputs=[d.xpos, d.xmat])
         d.sensordata.zero_()
         wp.launch(_touch, dim=self.contacts.rigid_contact_max, inputs=[self.contacts.rigid_contact_count, self.contacts.rigid_contact_shape0,
                   self.contacts.rigid_contact_shape1, self.contacts.force, self.shape_slot, self.shape_env, self.touch_adr],
@@ -608,6 +640,8 @@ class NewtonSim:
             wp.launch(_from_mujoco, dim=self.n, inputs=[mask, self.d.qpos, self.d.qvel, m.body_com, self.nb, self.nc, self.nd,
                       self.coord_of, self.dof_of], outputs=[self.joint_q, self.joint_qd])
             newton.eval_fk(m, self.joint_q, self.joint_qd, self.s0, mask=mask)
+            wp.launch(_body_pose, dim=(self.n, self.pose_nb.shape[0]), inputs=[self.s0.body_q, self.nb, self.pose_nb, self.pose_mj],
+                      outputs=[self.d.xpos, self.d.xmat])
 
     def step(self) -> int:
         """One control step from a captured graph (as BatchSim.step); returns the completion event value."""
