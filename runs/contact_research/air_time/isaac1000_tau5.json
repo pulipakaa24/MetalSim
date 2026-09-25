@@ -1,0 +1,38 @@
+{
+ "ckpt": "runs/contact_research/isaac_model_1000_metalsim.pt",
+ "contact_tuning": "tau5_imp99_hardlimits",
+ "stochastic": false,
+ "seed": 1,
+ "episodes": 1103,
+ "falls": 125,
+ "timeouts": 978,
+ "Episode_Reward": {
+  "track_lin_vel_xy_exp": 0.807,
+  "track_ang_vel_z_exp": 0.8242,
+  "feet_air_time": 0.0339,
+  "feet_slide": -0.0131,
+  "joint_deviation_all": -0.094,
+  "flat_orientation_l2": -0.0119,
+  "action_rate_l2": -0.0076,
+  "termination_penalty": -0.0227,
+  "lin_vel_z_l2": -0.0038,
+  "ang_vel_xy_l2": -0.0083,
+  "dof_torques_l2": -0.0067,
+  "dof_acc_l2": -0.0289,
+  "dof_pos_limits": -0.0031
+ },
+ "feet_slide_com_velocity": -0.0113,
+ "gait": {
+  "air_phases": 299848,
+  "air_phase_mean_s": 0.06600866063168832,
+  "air_phase_median_s": 0.01249999925494194,
+  "air_phases_lt_20ms_frac": 0.5143706144446519,
+  "contact_phases": 251471,
+  "contact_phase_mean_s": 0.053404685178011085,
+  "contact_phase_median_s": 0.019999997690320015,
+  "contact_phases_lt_20ms_frac": 0.5745990591360435,
+  "single_stance_frac": 0.9138709392771763,
+  "double_stance_frac": 0.06483463987122935,
+  "flight_frac": 0.021294420851594265
+ }
+}

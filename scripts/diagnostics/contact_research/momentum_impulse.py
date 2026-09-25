@@ -59,4 +59,6 @@ for tag in ("A_hold", "C_drop"):
         print(f"  steps {lo+1}-{hi}: impulse isaac {Ji[lo:hi].sum():.1f} N s (sensor samples x 20 ms {res['isaac']['Fs'][lo:hi].sum()*0.02:.1f}); "
               f"ours {Jo[lo:hi].sum():.1f} N s (samples x 20 ms {res['ours']['Fs'][lo:hi].sum()*0.02:.1f}); max J/dt isaac {Ji[lo:hi].max()/0.02:.0f} ours {Jo[lo:hi].max()/0.02:.0f}")
     out[tag] = {k: {kk: vv.tolist() for kk, vv in v.items()} for k, v in res.items()}
-json.dump(out, open(os.path.join(ROOT, "runs/contact_research/momentum_impulse.json"), "w"))
+name = os.path.basename(os.path.normpath(ours_dir))
+# momentum_impulse.json (read by win5_bounds.py / summary_table.py for Isaac's side) is the default replay's; others get a suffix
+json.dump(out, open(os.path.join(ROOT, "runs/contact_research/" + ("momentum_impulse.json" if name == "default" else f"momentum_impulse_{name}.json")), "w"))

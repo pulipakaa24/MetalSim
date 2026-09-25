@@ -1,0 +1,92 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 27.35 ms  (cached)
+Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 17.69 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_78310433 7831043 load on device 'metal:0' took 25.94 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_a5bbb2cb a5bbb2c load on device 'metal:0' took 19.73 ms  (cached)
+Module mujoco_warp._src.constraint f5f4518 load on device 'metal:0' took 16.45 ms  (cached)
+Module _friction_dof__locals__kernel_0bb9a331 0bb9a33 load on device 'metal:0' took 17.05 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_914cb5e1 914cb5e load on device 'metal:0' took 17.21 ms  (cached)
+Module _efc_contact_init__locals__kernel_03ee81b4 03ee81b load on device 'metal:0' took 16.56 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_16824443 e86c3ac load on device 'metal:0' took 16.80 ms  (cached)
+Module _efc_contact_update__locals__kernel_89d497ae 89d497a load on device 'metal:0' took 16.99 ms  (cached)
+Module mujoco_warp._src.forward 4772766 load on device 'metal:0' took 22.66 ms  (cached)
+Module mujoco_warp._src.passive 9e93f67 load on device 'metal:0' took 21.72 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_8ed29e9b 8ed29e9 load on device 'metal:0' took 16.37 ms  (cached)
+Module mujoco_warp._src.forward d28e0c7 load on device 'metal:0' took 22.68 ms  (cached)
+Module _qfrc_smooth__locals__kernel_08dfc9ad 08dfc9a load on device 'metal:0' took 16.56 ms  (cached)
+Module mujoco_warp._src.support 040f2c5 load on device 'metal:0' took 16.84 ms  (cached)
+Module _factor_i_sparse_serial__locals__kernel_bbc34dce 0938022 load on device 'metal:0' took 17.26 ms  (cached)
+Module _solve_LD_sparse_serial__locals__kernel_da14e052 352f4b8 load on device 'metal:0' took 17.18 ms  (cached)
+Module _solve_init_dof__locals__kernel_8e985b01 8e985b0 load on device 'metal:0' took 16.48 ms  (cached)
+Module mujoco_warp._src.solver 571e089 load on device 'metal:0' took 18.10 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_7c1132c5 7c1132c load on device 'metal:0' took 16.47 ms  (cached)
+Module mul_m_kernel__locals___mul_m_505d9f1c 505d9f1 load on device 'metal:0' took 16.66 ms  (cached)
+Module _update_constraint_efc__locals__kernel_55fc5219 55fc521 load on device 'metal:0' took 16.81 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_6f502a20 6f502a2 load on device 'metal:0' took 16.48 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_86f1e084 86f1e08 load on device 'metal:0' took 16.34 ms  (cached)
+Module _update_gradient_grad__locals__kernel_e5baa4a1 e5baa4a load on device 'metal:0' took 16.38 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_712c31a5 8925ee6 load on device 'metal:0' took 16.49 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_ad48cc59 0434274 load on device 'metal:0' took 16.25 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_a2a614b4 7ad7e38 load on device 'metal:0' took 17.89 ms  (cached)
+Module _update_constraint_efc__locals__kernel_3649f6fe 3649f6f load on device 'metal:0' took 16.81 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_20171f2f 20171f2 load on device 'metal:0' took 16.38 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_67211e0e 67211e0 load on device 'metal:0' took 16.36 ms  (cached)
+Module _update_gradient_grad__locals__kernel_7aee5faa 7aee5fa load on device 'metal:0' took 16.40 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_ff0e6fb9 f5091d7 load on device 'metal:0' took 16.55 ms  (cached)
+Module _solve_done__locals__kernel_d351f953 d351f95 load on device 'metal:0' took 16.40 ms  (cached)
+Module mujoco_warp._src.sensor c2b0248 load on device 'metal:0' took 26.84 ms  (cached)
+Module mujoco_warp._src.derivative 356952f load on device 'metal:0' took 19.25 ms  (cached)
+Module _next_time_builder__locals___next_time_bd97507a bd97507 load on device 'metal:0' took 16.47 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_f05e0f72 f05e0f7 load on device 'metal:0' took 17.67 ms  (cached)
+Module reset_data__locals__reset_M_debb12fa debb12f load on device 'metal:0' took 16.37 ms  (cached)
+Module reset_data__locals__reset_mocap_d5f6a172 d5f6a17 load on device 'metal:0' took 16.54 ms  (cached)
+Module reset_data__locals__reset_contact_10be067b 10be067 load on device 'metal:0' took 16.52 ms  (cached)
+Module reset_data__locals__reset_sleep_4c0bb4a4 4c0bb4a load on device 'metal:0' took 16.49 ms  (cached)
+Module reset_data__locals__reset_nworld_f0ec89aa f0ec89a load on device 'metal:0' took 16.57 ms  (cached)
+Module metalsim.sensors.contact 8b280a6 load on device 'metal:0' took 19.34 ms  (cached)
+Module metalsim.learn.g1_velocity 775ff1f load on device 'metal:0' took 21.93 ms  (cached)
+Module metalsim.learn.warp_policy a9b40e0 load on device 'metal:0' took 17.23 ms  (cached)
+{
+ "ckpt": "runs/contact_research/isaac_model_1000_metalsim.pt",
+ "contact_tuning": "tau10_impact_hardlimits",
+ "stochastic": true,
+ "seed": 1,
+ "episodes": 1214,
+ "falls": 289,
+ "timeouts": 925,
+ "Episode_Reward": {
+  "track_lin_vel_xy_exp": 0.7116,
+  "track_ang_vel_z_exp": 0.6137,
+  "feet_air_time": 0.0302,
+  "feet_slide": -0.02,
+  "joint_deviation_all": -0.1226,
+  "flat_orientation_l2": -0.0145,
+  "action_rate_l2": -0.1296,
+  "termination_penalty": -0.0476,
+  "lin_vel_z_l2": -0.0053,
+  "ang_vel_xy_l2": -0.0127,
+  "dof_torques_l2": -0.0065,
+  "dof_acc_l2": -0.0132,
+  "dof_pos_limits": -0.0064
+ },
+ "feet_slide_com_velocity": -0.0176,
+ "gait": {
+  "air_phases": 242615,
+  "air_phase_mean_s": 0.07806297268342981,
+  "air_phase_median_s": 0.0924999788403511,
+  "air_phases_lt_20ms_frac": 0.3586134410485749,
+  "contact_phases": 228018,
+  "contact_phase_mean_s": 0.08352707902009482,
+  "contact_phase_median_s": 0.10249996930360794,
+  "contact_phases_lt_20ms_frac": 0.3761150435491935,
+  "single_stance_frac": 0.851920790713338,
+  "double_stance_frac": 0.12240273308961662,
+  "flight_frac": 0.025676476197045373
+ }
+}
