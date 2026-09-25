@@ -1,0 +1,200 @@
+From 284dcd12ff37d56ea0201ade4e7f941d772a0f28 Mon Sep 17 00:00:00 2001
+From: Aditya Pulipaka <adipu@utexas.edu>
+Date: Thu, 24 Sep 2026 22:15:11 -0700
+Subject: [PATCH] plane_convex: MuJoCo C's mjc_PlaneConvex contact set (support
+ vertex + max-area quad of the most anti-aligned adjacent face), margin-aware
+
+The previous heuristic kept only vertices within 1 mm of the deepest one, so a tilted mesh face (a
+landing foot) produced 2 contacts where MuJoCo C produces 4, and it returned no contacts when the
+deepest vertex was above the plane even inside the margin (no speculative contacts). Meshes with
+polygon data now follow engine_collision_convex.c (3.14): support point first, adjacent face with the
+most anti-aligned normal, hull4f pruning anchored at the support vertex, vertices within the margin
+and below the mesh centre. Geoms without polygon data keep the heuristic, now margin-aware.
+
+Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>
+---
+ mujoco_warp/_src/collision_primitive.py | 154 +++++++++++++++++++++++-
+ 1 file changed, 150 insertions(+), 4 deletions(-)
+
+diff --git a/mujoco_warp/_src/collision_primitive.py b/mujoco_warp/_src/collision_primitive.py
+index c2824c6..f79dd75 100644
+--- a/mujoco_warp/_src/collision_primitive.py
++++ b/mujoco_warp/_src/collision_primitive.py
+@@ -49,8 +49,154 @@ wp.set_module_options({"enable_backward": False})
+ 
+ 
+ @wp.func
+-def plane_convex(plane_normal: wp.vec3, plane_pos: wp.vec3, convex: Geom) -> Tuple[wp.vec4, mat43, wp.vec3]:
+-  """Core contact geometry calculation for plane-convex collision.
++def _plane_convex_area4(
++  vert: wp.array[wp.vec3], vertadr: int, polyvert: wp.array[int], fadr: int, a: int, b: int, c: int, d: int
++) -> float:
++  """Area of the quadrilateral (a, b, c, d) of face vertices (MuJoCo C area4f)."""
++  pa = vert[vertadr + polyvert[fadr + a]]
++  pb = vert[vertadr + polyvert[fadr + b]]
++  pc = vert[vertadr + polyvert[fadr + c]]
++  pd = vert[vertadr + polyvert[fadr + d]]
++  return 0.5 * wp.length(wp.cross(pa - pc, pb - pd))
++
++
++@wp.func
++def plane_convex(
++  plane_normal: wp.vec3, plane_pos: wp.vec3, convex: Geom, margin: float = 0.0
++) -> Tuple[wp.vec4, mat43, wp.vec3]:
++  """Plane-convex collision, MuJoCo C's mjc_PlaneConvex (engine_collision_convex.c, 3.14).
++
++  The deepest vertex (support point in -normal) is the first contact; then the mesh face adjacent to
++  it whose normal is most anti-aligned with the plane normal is taken, pruned to its maximum-area
++  quadrilateral anchored at the support vertex (hull4f), and each of its other vertices within
++  `margin` of the plane and below the mesh center is a contact. Contacts beyond the margin are
++  reported with their distance and dropped by write_contact. Meshes without polygon data fall back
++  to the 4-point heuristic (_plane_convex_heuristic).
++  """
++  if convex.mesh_polynum <= 0:
++    return _plane_convex_heuristic(plane_normal, plane_pos, convex, margin)
++
++  contact_dist = wp.vec4(MJ_MAXVAL)
++  contact_pos = mat43()
++
++  plane_pos_local = wp.transpose(convex.rot) @ (plane_pos - convex.pos)
++  n = wp.transpose(convex.rot) @ plane_normal
++
++  # support vertex (deepest)
++  isup = int(-1)
++  max_support = wp.float32(-1.0e6)
++  if convex.graphadr == -1 or convex.vertnum < 10:
++    for i in range(convex.vertnum):
++      support = wp.dot(plane_pos_local - convex.vert[convex.vertadr + i], n)
++      if support > max_support:
++        max_support = support
++        isup = i
++  else:
++    numvert = convex.graph[convex.graphadr]
++    vert_edgeadr = convex.graphadr + 2
++    vert_globalid = convex.graphadr + 2 + numvert
++    edge_localid = convex.graphadr + 2 + 2 * numvert
++    prev = int(-1)
++    imax = int(0)
++    while True:
++      prev = int(imax)
++      i = int(convex.graph[vert_edgeadr + imax])
++      while convex.graph[edge_localid + i] >= 0:
++        subidx = convex.graph[edge_localid + i]
++        idx = convex.graph[vert_globalid + subidx]
++        support = wp.dot(plane_pos_local - convex.vert[convex.vertadr + idx], n)
++        if support > max_support:
++          max_support = support
++          imax = int(subidx)
++        i += int(1)
++      if imax == prev:
++        break
++    isup = convex.graph[vert_globalid + imax]
++
++  # C: return if the deepest point is farther than the margin
++  if -max_support > margin or isup < 0:
++    return contact_dist, contact_pos, plane_normal
++
++  vsup = convex.vert[convex.vertadr + isup]
++  dist0 = -max_support
++  contact_dist[0] = dist0
++  contact_pos[0] = convex.pos + convex.rot @ vsup - 0.5 * dist0 * plane_normal
++
++  # face adjacent to the support vertex most anti-aligned with the plane normal
++  vglob = convex.vertadr + isup
++  pmadr = convex.mesh_polymapadr[vglob]
++  pmnum = convex.mesh_polymapnum[vglob]
++  best_poly = int(-1)
++  best_dot = float(1.0)
++  for i in range(pmnum):
++    pidx = convex.mesh_polymap[pmadr + i]
++    ndot = wp.dot(convex.mesh_polynormal[convex.mesh_polyadr + pidx], n)
++    if ndot < best_dot:
++      best_dot = ndot
++      best_poly = pidx
++  if best_poly < 0:
++    return contact_dist, contact_pos, plane_normal
++
++  fadr = convex.mesh_polyvertadr[convex.mesh_polyadr + best_poly]
++  nh = convex.mesh_polyvertnum[convex.mesh_polyadr + best_poly]
++
++  # anchor: position of the support vertex within the face
++  a = int(0)
++  for i in range(nh):
++    if convex.mesh_polyvert[fadr + i] == isup:
++      a = i
++      break
++
++  # prune to the maximum-area quadrilateral anchored at a (C hull4f)
++  b = (a + 1) % nh
++  c = (a + 2) % nh
++  d = (a + 3) % nh
++  nq = wp.min(nh, 4)
++  if nh > 4:
++    m = _plane_convex_area4(convex.vert, convex.vertadr, convex.mesh_polyvert, fadr, a, b, c, d)
++    while True:
++      d_next = (d + 1) % nh
++      m_next = _plane_convex_area4(convex.vert, convex.vertadr, convex.mesh_polyvert, fadr, a, b, c, d_next)
++      if m_next <= m:
++        break
++      d = d_next
++      m = m_next
++      while True:
++        c_next = (c + 1) % nh
++        m_next = _plane_convex_area4(convex.vert, convex.vertadr, convex.mesh_polyvert, fadr, a, b, c_next, d)
++        if m_next <= m:
++          break
++        c = c_next
++        m = m_next
++      while True:
++        b_next = (b + 1) % nh
++        m_next = _plane_convex_area4(convex.vert, convex.vertadr, convex.mesh_polyvert, fadr, a, b_next, c, d)
++        if m_next <= m:
++          break
++        b = b_next
++        m = m_next
++  quad = wp.vec3i(b, c, d)
++
++  count = int(1)
++  for k in range(3):
++    if k + 1 < nq:
++      v = convex.vert[convex.vertadr + convex.mesh_polyvert[fadr + quad[k]]]
++      vdist = wp.dot(v - plane_pos_local, n)
++      # skip if above the margin or above the mesh center (C)
++      if vdist <= margin and wp.dot(n, v) <= 0.0:
++        contact_dist[count] = vdist
++        contact_pos[count] = convex.pos + convex.rot @ v - 0.5 * vdist * plane_normal
++        count += 1
++
++  return contact_dist, contact_pos, plane_normal
++
++
++@wp.func
++def _plane_convex_heuristic(
++  plane_normal: wp.vec3, plane_pos: wp.vec3, convex: Geom, margin: float
++) -> Tuple[wp.vec4, mat43, wp.vec3]:
++  """Core contact geometry calculation for plane-convex collision (4-point heuristic, used for
++  convex geoms without mesh polygon data).
+ 
+   Args:
+     plane_normal: Normal vector of the plane.
+@@ -88,7 +234,7 @@ def plane_convex(plane_normal: wp.vec3, plane_pos: wp.vec3, convex: Geom) -> Tup
+         indices[0] = i
+         a = vert
+ 
+-    if max_support < 0:
++    if max_support < -margin:
+       return contact_dist, contact_pos, plane_normal
+ 
+     threshold = max_support - 1e-3
+@@ -871,7 +1017,7 @@ def plane_convex_wrapper(
+   nacon_out: wp.array[int],
+ ):
+   """Calculates contacts between a plane and a convex object."""
+-  dist, pos, normal = plane_convex(plane.normal, plane.pos, convex)
++  dist, pos, normal = plane_convex(plane.normal, plane.pos, convex, margin)
+ 
+   frame = make_frame(normal)
+   for i in range(4):
+-- 
+2.54.0 (Apple Git-157)
+
