@@ -61,7 +61,7 @@ the Newton-engine evaluation. Evidence for each row is in `PARITY.md`.
 | Intermittent `test_ppo_warp_rollout` noise test under GPU load | unverified (the contact-sensor one was a real race, fixed) | reproduce loaded vs idle |
 | Upstreaming the Warp and MuJoCo Warp forks | not proposed; flex commits and patches 0008–0016 carry a co-author trailer the MuJoCo Warp CLA rejects (rewrite on a fresh branch before filing); `UPSTREAM.md` lists the six flex fixes | after the 3.0 reference lands |
 | Newton upstream PRs | #4316–#4318 open, blocked on the EasyCLA signature | user |
-| Isaac features not covered | MPM / particles, Kamino, kinematic node targets and per-element stress for deformables, skeleton / occlusion annotators, texture-swap and scatter randomizers, ROS 2 bridge | not started |
+| Isaac features not covered | MPM / particles: deferred by the user until the current efforts land; Kamino (Newton's beta-1 maximal-coordinate Proximal-ADMM solver for closed kinematic loops: hard loop closure, contacts, friction, PD drives; MuJoCo's route is soft `connect`/`weld` equality constraints): a low-priority agent is checking whether Kamino runs on the Metal fork and whether MuJoCo Warp's soft closure is adequate at our step sizes (`docs/research/closed_loops_2026-09-25.md`); kinematic node targets and per-element stress for deformables, skeleton / occlusion annotators, texture-swap and scatter randomizers, ROS 2 bridge (no ROS 2 on the target): not started |
 
 ## Ledger of 2026-09-25 rows (kept for traceability)
 
