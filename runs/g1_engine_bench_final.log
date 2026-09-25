@@ -1,0 +1,33 @@
+=== start Thu Sep 24 21:19:16 PDT 2026 power: Now drawing from 'AC Power' | GPU util "Device Utilization %"=2
+=== cost split 4096 mjwarp 0.0025
+N=4096 flat mjwarp 2.5 ms: physics only (8 substeps, graph) 115.2 ms/step -> 35,545 env-steps/s
+N=4096 flat mjwarp 2.5 ms: full env step (graph, synchronized) 133.2 ms -> 30,756 env-steps/s
+N=4096 flat mjwarp 2.5 ms: rollout with Warp policy inference ((256, 128, 128)), 24 steps: 7489 ms -> 13,126 env-steps/s
+N=4096 flat mjwarp 2.5 ms: PPO update (5 epochs x 4 minibatches) 143 ms -> full loop 12,879 env-steps/s
+=== cost split 4096 newton 4 0.00125
+N=4096 flat newton 4 it 1.25 ms: physics only (16 substeps, graph) 75.5 ms/step -> 54,265 env-steps/s
+N=4096 flat newton 4 it 1.25 ms: full env step (graph, synchronized) 50.1 ms -> 81,797 env-steps/s
+N=4096 flat newton 4 it 1.25 ms: rollout with Warp policy inference ((256, 128, 128)), 24 steps: 822 ms -> 119,567 env-steps/s
+N=4096 flat newton 4 it 1.25 ms: PPO update (5 epochs x 4 minibatches) 525 ms -> full loop 72,982 env-steps/s
+=== cost split 4096 newton 8 0.0025
+N=4096 flat newton 8 it 2.5 ms: physics only (8 substeps, graph) 41.5 ms/step -> 98,665 env-steps/s
+N=4096 flat newton 8 it 2.5 ms: full env step (graph, synchronized) 29.9 ms -> 137,038 env-steps/s
+N=4096 flat newton 8 it 2.5 ms: rollout with Warp policy inference ((256, 128, 128)), 24 steps: 818 ms -> 120,119 env-steps/s
+N=4096 flat newton 8 it 2.5 ms: PPO update (5 epochs x 4 minibatches) 146 ms -> full loop 101,963 env-steps/s
+=== cost split 4096 mjwarp 0.0025 --rough
+N=4096 rough mjwarp 2.5 ms: physics only (8 substeps, graph) 238.4 ms/step -> 17,179 env-steps/s
+N=4096 rough mjwarp 2.5 ms: full env step (graph, synchronized) 214.9 ms -> 19,059 env-steps/s
+N=4096 rough mjwarp 2.5 ms: rollout with Warp policy inference ((512, 256, 128)), 24 steps: 4523 ms -> 21,734 env-steps/s
+N=4096 rough mjwarp 2.5 ms: PPO update (5 epochs x 4 minibatches) 599 ms -> full loop 19,194 env-steps/s
+=== cost split 4096 newton 4 0.00125 --rough
+N=4096 rough newton 4 it 1.25 ms: physics only (16 substeps, graph) 215.1 ms/step -> 19,040 env-steps/s
+N=4096 rough newton 4 it 1.25 ms: full env step (graph, synchronized) 179.5 ms -> 22,823 env-steps/s
+N=4096 rough newton 4 it 1.25 ms: rollout with Warp policy inference ((512, 256, 128)), 24 steps: 4727 ms -> 20,797 env-steps/s
+N=4096 rough newton 4 it 1.25 ms: PPO update (5 epochs x 4 minibatches) 517 ms -> full loop 18,745 env-steps/s
+=== drift remedies, physics only, 4096
+XPBD 4 it 1.25 ms: 79,060 env-steps/s physics only (N=4096)
+XPBD 4 it 0.625 ms: 40,815 env-steps/s physics only (N=4096)
+XPBD 4 it 1.25 ms + projection: 72,618 env-steps/s physics only (N=4096)
+XPBD 4 it 1.25 ms recentred: 86,518 env-steps/s physics only (N=4096)
+=== end Thu Sep 24 21:23:45 PDT 2026 power: Now drawing from 'AC Power'
+lock held by terrain_throughput, not newton_bench_final; not released
