@@ -1,0 +1,28 @@
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+{
+ "ckpt": "runs/policies/g1_flat_dt25_fixed_it1500.pt",
+ "iterations": 1500,
+ "episodes": 3127,
+ "mean_episode_length": 279.4429165334186,
+ "mean_return": -4.454210719894436,
+ "terminations": {
+  "fell": 2773,
+  "timeout": 354
+ },
+ "Episode_Reward": {
+  "track_lin_vel_xy_exp": 0.0899,
+  "track_ang_vel_z_exp": 0.1199,
+  "feet_air_time": 0.011,
+  "feet_slide": -0.0278,
+  "joint_deviation_all": -0.2031,
+  "flat_orientation_l2": -0.016,
+  "action_rate_l2": -0.0192,
+  "termination_penalty": -0.1774
+ },
+ "note": "per-second average over the episode like Isaac's RewardManager; joint_deviation_all = hip+arms+fingers+torso; torques/acc/limits/lin_vel_z/ang_vel_xy terms are in the return but not exposed per term"
+}
