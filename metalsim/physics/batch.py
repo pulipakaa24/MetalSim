@@ -77,13 +77,18 @@ class BatchSimOptions:
     block_dim: dict = field(default_factory=dict)
     # Largest diagonal block of M (and of the implicit integrator's M - dt*D) that MuJoCo Warp factors
     # with a dense tile Cholesky; larger blocks use its tree-sparse L'DL (MuJoCo C's mj_factorI
-    # algorithm). None keeps MuJoCo Warp's M_BLOCK_DENSE_MAX (64); 0 sends every block of more than
-    # six dofs to the sparse path. Same matrix, different arithmetic (float noise).
-    m_dense_max: int | None = None
-    # Warp Metal: largest matrix that tile_cholesky factors in registers (Warp fork default 40; the G1's
-    # nv = 43 falls just above it onto the barrier-per-column path). Process-wide (warp.config), read
-    # when a module is built; set it before the first launch.
-    metal_register_cholesky_max: int | None = None
+    # algorithm). Same matrix, different arithmetic (float noise). Default 32 (since 2026-09-25): the
+    # sparse path wins on the G1's 43-dof tree (+16 % PPO loop) and loses ~1 % on Tron1's 14; every other
+    # scene in the repo (trees of 2-18 dofs) keeps its dense tile (scripts/diagnostics/fast_factorization_scenes.py,
+    # runs/fastfact/). None or 64 = MuJoCo Warp's M_BLOCK_DENSE_MAX (the previous default); 0 = every
+    # block of more than six dofs sparse (G1-only setting before; ~1 % slower on Tron1).
+    m_dense_max: int | None = 32
+    # Warp Metal: largest matrix that tile_cholesky factors in registers. Default 48 (since 2026-09-25): the
+    # G1's nv = 43 in registers instead of the barrier-per-column path; matrices up to 40 take the same path
+    # as before. 40 = the Warp fork's own default (the previous behaviour); None leaves warp.config as is.
+    # Process-wide (warp.config), read when a module is built (part of the module hash): the last BatchSim
+    # constructed sets it.
+    metal_register_cholesky_max: int | None = 48
     extra: dict = field(default_factory=dict)
 
 

@@ -1,0 +1,47 @@
+[gpu_run] fastfact_thr_tp start: device utilisation 0% (16:13:56)
+holder: {"name": "fastfact_thr_tp", "kind": "timing", "minutes": 15.0, "pid": 31687, "start": 1790378036.2938828}
+  waiting [render] gallery_rough_boxes est 6.0 min, queued 1150 s ago
+  waiting [render] fastfact_thr_check est 15.0 min, queued 471 s ago
+  waiting [train] g1_flat_flatcfg_tau10 est 80.0 min, queued 4872 s ago
+  waiting [train] il3_train_flat est 70.0 min, queued 4488 s ago
+  waiting [low] newton_vbd_replay est 40.0 min, queued 7128 s ago
+  waiting [low] il3_physx_ours est 40.0 min, queued 5699 s ago
+  waiting [low] kamino_tests_fork est 40.0 min, queued 4508 s ago
+  waiting [low] kamino_tests_152 est 30.0 min, queued 3678 s ago
+  waiting [low] cl_kamino est 45.0 min, queued 2347 s ago
+  waiting [low] cl_mjw est 40.0 min, queued 2324 s ago
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+busy processes (cpu > 40 %):
+29864 100.0 .venv-flex/bin/python scratch/deformable/membrane_3p0.py
+tp old cartpole_rgb: 329,547 env-steps/s best of 3 (median 329,485) at 4096 envs x 2 substeps
+tp old cartpole_state: 1,912,476 env-steps/s best of 3 (median 1,911,585) at 4096 envs x 2 substeps
+tp old so101_lift: 124,876 env-steps/s best of 3 (median 123,246) at 4096 envs x 4 substeps
+tp old lidar_nav: 68,781 env-steps/s best of 3 (median 60,618) at 4096 envs x 5 substeps
+tp old tron1_wf: 1,023,293 env-steps/s best of 3 (median 857,034) at 4096 envs x 1 substeps
+tp old tron1_sim: 26,249 env-steps/s best of 3 (median 24,970) at 4096 envs x 10 substeps
+tp old go1: 3,707 env-steps/s best of 3 (median 3,695) at 4096 envs x 10 substeps
+tp old panda: 28,698 env-steps/s best of 3 (median 28,465) at 4096 envs x 10 substeps
+tp thr cartpole_rgb: 334,612 env-steps/s best of 3 (median 332,648) at 4096 envs x 2 substeps
+tp thr cartpole_state: 1,909,326 env-steps/s best of 3 (median 1,905,832) at 4096 envs x 2 substeps
+tp thr so101_lift: 124,506 env-steps/s best of 3 (median 123,021) at 4096 envs x 4 substeps
+tp thr lidar_nav: 68,651 env-steps/s best of 3 (median 60,474) at 4096 envs x 5 substeps
+tp thr tron1_wf: 1,015,998 env-steps/s best of 3 (median 854,657) at 4096 envs x 1 substeps
+tp thr tron1_sim: 26,095 env-steps/s best of 3 (median 24,990) at 4096 envs x 10 substeps
+tp thr go1: 3,703 env-steps/s best of 3 (median 3,691) at 4096 envs x 10 substeps
+tp thr panda: 28,621 env-steps/s best of 3 (median 28,438) at 4096 envs x 10 substeps
+tp old cartpole_rgb: 335,232 env-steps/s best of 3 (median 329,674) at 4096 envs x 2 substeps
+tp old cartpole_state: 1,915,923 env-steps/s best of 3 (median 1,913,931) at 4096 envs x 2 substeps
+tp old so101_lift: 124,390 env-steps/s best of 3 (median 122,908) at 4096 envs x 4 substeps
+tp old lidar_nav: 68,645 env-steps/s best of 3 (median 60,510) at 4096 envs x 5 substeps
+tp old tron1_wf: 1,017,065 env-steps/s best of 3 (median 855,069) at 4096 envs x 1 substeps
+tp old tron1_sim: 26,200 env-steps/s best of 3 (median 24,909) at 4096 envs x 10 substeps
+tp old panda: 28,599 env-steps/s best of 3 (median 28,369) at 4096 envs x 10 substeps
+tp thr cartpole_rgb: 331,911 env-steps/s best of 3 (median 326,920) at 4096 envs x 2 substeps
+tp thr cartpole_state: 1,914,618 env-steps/s best of 3 (median 1,913,850) at 4096 envs x 2 substeps
+tp thr so101_lift: 124,472 env-steps/s best of 3 (median 122,878) at 4096 envs x 4 substeps
+tp thr lidar_nav: 68,666 env-steps/s best of 3 (median 60,514) at 4096 envs x 5 substeps
+tp thr tron1_wf: 1,019,338 env-steps/s best of 3 (median 852,677) at 4096 envs x 1 substeps
+tp thr tron1_sim: 26,208 env-steps/s best of 3 (median 25,029) at 4096 envs x 10 substeps
+tp thr panda: 28,649 env-steps/s best of 3 (median 28,449) at 4096 envs x 10 substeps
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[gpu_run] fastfact_thr_tp end: device utilisation 0% (16:24:49), exit 0
