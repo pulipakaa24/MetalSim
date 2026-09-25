@@ -526,7 +526,7 @@ settle 0.29 / 0.29 / 0.59 s, rest 0.108 m (particle radius 8 mm).
 | rope | period / drop | 1.117 / 0.455 (n2), 1.261 / 0.506 (n4) | **XPBD `physical`: 1.113 / 0.459** | E t⁴/12, β 0.005 |
 | rope | same | 1.016 / 0.284 (n1) | flex 11×2×2: 0.63 (bounce) / 0.083 | locks more than PhysX's n1 |
 | cloth | height on box / mean height / extent / settle | 0.421 / 0.272 / 0.698 / 1.01 s | **XPBD, k = E t, no bending: 0.414 / 0.248 / 0.637 / 0.78 s** | radius 0.014 (flexcomp needs radius < half the 3.1 cm spacing; PhysX rests at 0.020) |
-| cloth | same | – | flex StVK membrane (E t, elastic2d stretch, implicit damping): fell through the box and floor | open: to debug |
+| cloth | same | – | flex StVK membrane, **per-pair contact cap 400**: 0.410 / 0.250 / 0.580 / 0.95 s (lowest vertex −2 mm; with MuJoCo's cap of 50: falls through box and floor) | E 1e6, ν 0.45, thickness 0.01, implicit damping 0.005 (PhysX's), dt 0.25 ms (0.5 ms is explicit-StVK unstable in MuJoCo C too) |
 
 **PhysX 5.1 PBD cloth: the MetalSim port** (`metalsim/physics/physx_cloth.py`, all ParticleClothDemo parameters, no
 self-collision yet) vs the 5.1 recording: height on box 0.427 (PhysX 0.427), mean height 0.253 (0.267), extent 0.729
@@ -554,5 +554,17 @@ VBD solver on Metal for the Newton backend):**
 | decision | options (numbers) | chosen, why | how to switch |
 |---|---|---|---|
 | volume default | flex implicit, PhysX's own parameters (cube within 3 mm / 10 ms of PhysX 3.0 n4) / Newton VBD on Metal (0.57K env-steps/s at 4096) / a PhysX co-rotational port (not built) | flex (closest with no fitted parameter; the FEM port is not needed for this protocol) | `mujoco_warp._src.flex_damping.ENABLE`, `DeformableSim` |
-| cloth default | XPBD / flex membrane (failed) / physx_cloth (5.1 PBD port) / Newton VBD | XPBD for PhysX 3.0 parity; physx_cloth for 5.1 PBD parity; Newton VBD for Newton parity | `XPBDSim`, `PhysXClothSim`, Newton |
+| cloth default | XPBD (vs PhysX 3.0: top −7 mm, mean −2.4 cm, extent −6.1 cm, settle −0.23 s; 0.3M env-steps/s) / flex membrane with cap 400 (−11 mm, −2.2 cm, −11.8 cm, −0.06 s; CPU 0.88 s wall per simulated second for one world) / physx_cloth (5.1 PBD port) / Newton VBD | XPBD for PhysX 3.0 parity; physx_cloth for 5.1 PBD parity; Newton VBD for Newton parity | `XPBDSim`, `PhysXClothSim`, Newton |
 | rope default | XPBD `physical` / `physx_ref` / flex rod | `physical`: PhysX's own sweep converges to it | `rope_xpbd_cfg(preset=...)` |
+
+**Why the flex membrane fell through (resolved).** Not a MuJoCo Warp contact bug: MuJoCo C 3.14 does the same. It keeps
+at most mjMAXCONPAIR = 50 contacts per (body, flex) pair; a 1 m, 33 × 33 cloth over a 0.4 m box needs ~290 at impact
+and ~80 at rest (MuJoCo C rebuilt with the cap at 4000: rests on the box at 0.422 m; with 50: sinks through the box and
+off it). The fork now exposes the cap (`collision_flex.FLEX_MAXCONPAIR`, default 50 for C parity; 400: rests at
+0.420 m, 64a1ea5, test `FlexMaxConPairTest`); UPSTREAM.md item 7 proposes it as an issue for MuJoCo and MuJoCo Warp.
+CPU-only runs now set `WP_DISABLE_METAL=1` (new in the flex Warp worktree, bf4c789, local) so no Metal device exists
+in the process.
+
+| decision | options (numbers) | chosen, why | how to switch |
+|---|---|---|---|
+| flex per-pair contact cap | 50 (MuJoCo C; large cloths fall through) / 400 (membrane cloth rests at 0.420 m, = uncapped C 0.422) | 50 by default (parity), 400 for cloths over ~20 × 20 vertices | `collision_flex.FLEX_MAXCONPAIR`, `maxconpair` in the protocol |

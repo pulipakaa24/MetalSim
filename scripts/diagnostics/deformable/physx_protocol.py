@@ -192,6 +192,8 @@ def run_flex(obj, meta, params=None, device="cpu", nworld=1):
     dt = float(p["dt"])
     from mujoco_warp._src import flex_damping
     flex_damping.ENABLE = bool(p.get("implicit_damping", False))
+    from mujoco_warp._src import collision_flex as _cfx
+    _cfx.FLEX_MAXCONPAIR = int(p.get("maxconpair", 50))
     xml = {"cloth": cloth_xml, "rope": rope_xml, "cube": cube_xml}[obj](meta, p, dt)
     m = mujoco.MjModel.from_xml_string(xml)
     sim = dfm.DeformableSim(m, nworld, device=device, capture=device != "cpu")

@@ -1,0 +1,160 @@
+{
+ "physx": {
+  "cloth": {
+   "rest_top_z": 0.4212145507335663,
+   "rest_mean_z": 0.27182823419570923,
+   "rest_min_z": 0.01999998465180397,
+   "xy_extent": 0.6980649828910828,
+   "settle_time": 1.01,
+   "finite": true
+  },
+  "rope": {
+   "n1": {
+    "length0": 0.5,
+    "rest_tip_drop": 0.28449690341949463,
+    "rest_tip_x": 0.3791694641113281,
+    "min_tip_z": -0.4449463486671448,
+    "osc_axis": "x",
+    "period": 1.01625,
+    "log_decrement": 0.09992731196579682,
+    "peaks": [
+     0.1853,
+     0.272,
+     0.159,
+     0.1797,
+     0.1027,
+     0.1124
+    ],
+    "finite": true
+   },
+   "n2": {
+    "length0": 0.5,
+    "rest_tip_drop": 0.4550855755805969,
+    "rest_tip_x": 0.006266593933105469,
+    "min_tip_z": -0.5042133331298828,
+    "osc_axis": "x",
+    "period": 1.1175,
+    "log_decrement": 0.30501268343791077,
+    "peaks": [
+     0.5307,
+     0.2201,
+     0.398,
+     0.2188,
+     0.3293,
+     0.1155
+    ],
+    "finite": true
+   },
+   "n4": {
+    "length0": 0.5,
+    "rest_tip_drop": 0.506295919418335,
+    "rest_tip_x": 0.18551921844482422,
+    "min_tip_z": -0.5740288496017456,
+    "osc_axis": "x",
+    "period": 1.2614285714285713,
+    "log_decrement": -0.07174151292351139,
+    "peaks": [
+     0.3437,
+     0.55,
+     0.2231,
+     0.4975,
+     0.1902,
+     0.492
+    ],
+    "finite": true
+   },
+   "n8": {
+    "length0": 0.5,
+    "rest_tip_drop": 0.5218615531921387,
+    "rest_tip_x": -0.23926162719726562,
+    "min_tip_z": -0.7204546928405762,
+    "osc_axis": "x",
+    "period": 1.4766666666666666,
+    "log_decrement": 0.22554391970102317,
+    "peaks": [
+     0.5651,
+     0.1912,
+     0.4987,
+     0.3025,
+     0.3471,
+     0.183
+    ],
+    "finite": true
+   }
+  },
+  "cube": {
+   "n2": {
+    "t_impact_min": 0.275,
+    "min_centroid_z": 0.11424970626831055,
+    "bounce_peak_z": 0.13945333659648895,
+    "rest_centroid_z": 0.1197241023182869,
+    "rest_height": 0.19976313412189484,
+    "settle_time": 0.445,
+    "min_node_z": 0.019996045157313347,
+    "finite": true
+   },
+   "n4": {
+    "t_impact_min": 0.28,
+    "min_centroid_z": 0.11038782447576523,
+    "bounce_peak_z": 0.1544959396123886,
+    "rest_centroid_z": 0.11953900009393692,
+    "rest_height": 0.1995713710784912,
+    "settle_time": 0.495,
+    "min_node_z": 0.01999598555266857,
+    "finite": true
+   },
+   "n8": {
+    "t_impact_min": 0.28,
+    "min_centroid_z": 0.10538814216852188,
+    "bounce_peak_z": 0.1726011484861374,
+    "rest_centroid_z": 0.11922185122966766,
+    "rest_height": 0.19928252696990967,
+    "settle_time": 0.7000000000000001,
+    "min_node_z": 0.019350510090589523,
+    "finite": true
+   }
+  }
+ },
+ "ours": {
+  "cloth xpbd k=Et {}": {
+   "rest_top_z": 0.4140673875808716,
+   "rest_mean_z": 0.24807921051979065,
+   "rest_min_z": 0.01406249962747097,
+   "xy_extent": 0.6367073059082031,
+   "settle_time": 0.775,
+   "finite": true
+  },
+  "cloth xpbd k=Et {'damping': 0.5}": {
+   "rest_top_z": 0.4140772521495819,
+   "rest_mean_z": 0.24812942743301392,
+   "rest_min_z": 0.01406249962747097,
+   "xy_extent": 0.6313066482543945,
+   "settle_time": 0.815,
+   "finite": true
+  },
+  "cloth flex StVK membrane implicit": {
+   "rest_top_z": -0.03817317262291908,
+   "rest_mean_z": -0.040809545665979385,
+   "rest_min_z": -0.1032227873802185,
+   "xy_extent": 0.4673069417476654,
+   "settle_time": 5.005,
+   "finite": true
+  },
+  "flex membrane cap 50": {
+   "rest_top_z": -0.04111772030591965,
+   "rest_mean_z": -0.045754287391901016,
+   "rest_min_z": -0.10812437534332275,
+   "xy_extent": 0.4539128541946411,
+   "settle_time": 5.005,
+   "finite": true
+  },
+  "flex membrane cap 400": {
+   "rest_top_z": 0.40968456864356995,
+   "rest_mean_z": 0.24988998472690582,
+   "rest_min_z": -0.0018091797828674316,
+   "xy_extent": 0.58043372631073,
+   "settle_time": 0.945,
+   "finite": true
+  }
+ }
+}
