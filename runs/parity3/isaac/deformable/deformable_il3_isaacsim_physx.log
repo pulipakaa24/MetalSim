@@ -1,0 +1,65 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1790370412.782969    3298 descriptor_database.cc:633] File already exists in database: grpc/health/v1/health.proto
+W0000 00:00:1790370412.783024    3298 message.cc:301] Protobuf GeneratedMessageFactory: File is already registered: grpc/health/v1/health.proto
+[ISAACLAB] AppLauncher initialization complete
+[ISAACLAB] Kit version: 110.3.0+feature.371399.00c488ae.gl
+[ISAACLAB] Kit kernel:  210.3.2+release.14366.2926fc80.gl
+[ISAACLAB] Kit hash:    00c488ae
+Warp 1.16.0 initialized:
+   CUDA Toolkit 12.9, Driver 13.0
+   Devices:
+     "cpu"      : "x86_64"
+     "cuda:0"   : "NVIDIA L4" (22 GiB, sm_89, mempool enabled)
+   Kernel cache:
+     /home/aditya_nianticspatial_com/.cache/warp/1.16.0
+[INFO]: Loading local copy of remote asset 'https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.1/Isaac/IsaacLab/Environments/Grid/default_ground_plane_checker_v1/default_ground_plane.usda' from '/tmp/https/omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.1/Isaac/IsaacLab/Environments/Grid/default_ground_plane_checker_v1/default_ground_plane.usda'.
+[INFO]: Loading local copy of remote asset 'https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.1/Isaac/IsaacLab/Environments/Grid/default_ground_plane_checker_v1/Materials/Textures/default_ground_plane_albedo.png' from '/tmp/https/omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.1/Isaac/IsaacLab/Environments/Grid/default_ground_plane_checker_v1/Materials/Textures/default_ground_plane_albedo.png'.
+[INFO]: Loading local copy of remote asset 'https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.1/Isaac/IsaacLab/Environments/Grid/default_ground_plane_checker_v1/Materials/Textures/default_ground_plane_roughness.png' from '/tmp/https/omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.1/Isaac/IsaacLab/Environments/Grid/default_ground_plane_checker_v1/Materials/Textures/default_ground_plane_roughness.png'.
+[INFO]: Registered backend 'physx' for factory DeformableObject.
+[INFO]: Deformable body initialized at: /World/cloth_scene/cloth
+[INFO]: Number of instances: 1
+[INFO]: Number of bodies: 1
+[INFO]: Deformable material initialized at: /World/cloth_scene/cloth/geometry/material
+[INFO]: Number of instances: 1
+[INFO]: Deformable body initialized at: /World/rope_scene/rod_n1
+[INFO]: Number of instances: 1
+[INFO]: Number of bodies: 1
+[INFO]: Deformable material initialized at: /World/rope_scene/rod_n1/material
+[INFO]: Number of instances: 1
+[INFO]: Deformable body initialized at: /World/rope_scene/rod_n2
+[INFO]: Number of instances: 1
+[INFO]: Number of bodies: 1
+[INFO]: Deformable material initialized at: /World/rope_scene/rod_n2/material
+[INFO]: Number of instances: 1
+[INFO]: Deformable body initialized at: /World/rope_scene/rod_n4
+[INFO]: Number of instances: 1
+[INFO]: Number of bodies: 1
+[INFO]: Deformable material initialized at: /World/rope_scene/rod_n4/material
+[INFO]: Number of instances: 1
+[INFO]: Deformable body initialized at: /World/rope_scene/rod_n8
+[INFO]: Number of instances: 1
+[INFO]: Number of bodies: 1
+[INFO]: Deformable material initialized at: /World/rope_scene/rod_n8/material
+[INFO]: Number of instances: 1
+[INFO]: Deformable body initialized at: /World/cube_scene/cube_n2
+[INFO]: Number of instances: 1
+[INFO]: Number of bodies: 1
+[INFO]: Deformable material initialized at: /World/cube_scene/cube_n2/material
+[INFO]: Number of instances: 1
+[INFO]: Deformable body initialized at: /World/cube_scene/cube_n4
+[INFO]: Number of instances: 1
+[INFO]: Number of bodies: 1
+[INFO]: Deformable material initialized at: /World/cube_scene/cube_n4/material
+[INFO]: Number of instances: 1
+[INFO]: Deformable body initialized at: /World/cube_scene/cube_n8
+[INFO]: Number of instances: 1
+[INFO]: Number of bodies: 1
+[INFO]: Deformable material initialized at: /World/cube_scene/cube_n8/material
+[INFO]: Number of instances: 1
+DEFORMABLE_IL3_DONE isaacsim_physx {"cloth_pos": [1089, 3], "cloth_vel": [1089, 3], "rod_n1_pos": [44, 3], "rod_n1_vel": [44, 3], "rod_n2_pos": [189, 3], "rod_n2_vel": [189, 3], "rod_n4_pos": [1025, 3], "rod_n4_vel": [1025, 3], "rod_n8_pos": [6561, 3], "rod_n8_vel": [6561, 3], "cube_n2_pos": [27, 3], "cube_n2_vel": [27, 3], "cube_n4_pos": [125, 3], "cube_n4_vel": [125, 3], "cube_n8_pos": [729, 3], "cube_n8_vel": [729, 3]} errors: []
+Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/isaacsim/kit/data/Kit/IsaacLab/3.0/user.config.json'
+2026-09-25T21:06:53Z [0ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
+2026-09-25T21:06:53Z [13ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
+2026-09-25T21:06:54Z [1,323ms] [Warning] [isaaclab.utils.assets] Serving remote assets from the local cache under '/tmp'. Each copy is checked against the server before use; delete the directory to force a full re-download.
+2026-09-25T21:06:58Z [5,305ms] [Warning] [usdrt.population.plugin] Last global time was not created. Did you call setEnableUsdNoticeHandling?
+2026-09-25T21:06:58Z [5,379ms] [Warning] [isaaclab_physx.assets.deformable_object.deformable_object] Deformable body view is not valid for: /World/cloth_scene/cloth. Please check PhysX logs.

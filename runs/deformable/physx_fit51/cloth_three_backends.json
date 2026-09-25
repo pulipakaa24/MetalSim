@@ -1,0 +1,122 @@
+{
+ "physx_cloth (port, all physical)": {
+  "rest_top_z": {
+   "physx": 0.42737728357315063,
+   "metalsim": 0.427221417427063,
+   "diff": -0.00015586614608764648,
+   "scale": 0.01
+  },
+  "rest_mean_z": {
+   "physx": 0.2671261727809906,
+   "metalsim": 0.2534242272377014,
+   "diff": -0.013701945543289185,
+   "scale": 0.01
+  },
+  "xy_extent": {
+   "physx": 0.7910922765731812,
+   "metalsim": 0.7286171913146973,
+   "diff": -0.06247508525848389,
+   "scale": 0.02
+  },
+  "settle_time": {
+   "physx": 1.065,
+   "metalsim": 0.865,
+   "diff": -0.19999999999999996,
+   "scale": 0.25
+  },
+  "ke_peak_t": {
+   "physx": 0.26,
+   "metalsim": 0.27,
+   "diff": 0.010000000000000009,
+   "scale": 0.02
+  },
+  "heightmap_rmse": {
+   "metalsim": 0.05497447427499794,
+   "scale": 0.01
+  },
+  "silhouette_iou": {
+   "metalsim": 1.0,
+   "scale": null
+  }
+ },
+ "xpbd (fitted: +0.5/s velocity damping)": {
+  "rest_top_z": {
+   "physx": 0.42737728357315063,
+   "metalsim": 0.4251590669155121,
+   "diff": -0.00221821665763855,
+   "scale": 0.01
+  },
+  "rest_mean_z": {
+   "physx": 0.2671261727809906,
+   "metalsim": 0.2716371715068817,
+   "diff": 0.004510998725891113,
+   "scale": 0.01
+  },
+  "xy_extent": {
+   "physx": 0.7910922765731812,
+   "metalsim": 0.7751338481903076,
+   "diff": -0.015958428382873535,
+   "scale": 0.02
+  },
+  "settle_time": {
+   "physx": 1.065,
+   "metalsim": 1.135,
+   "diff": 0.07000000000000006,
+   "scale": 0.25
+  },
+  "ke_peak_t": {
+   "physx": 0.26,
+   "metalsim": 0.275,
+   "diff": 0.015000000000000013,
+   "scale": 0.02
+  },
+  "heightmap_rmse": {
+   "metalsim": 0.033034771965792444,
+   "scale": 0.01
+  },
+  "silhouette_iou": {
+   "metalsim": 0.7333333333333333,
+   "scale": null
+  }
+ },
+ "xpbd (physical mapping)": {
+  "rest_top_z": {
+   "physx": 0.42737728357315063,
+   "metalsim": 0.42501920461654663,
+   "diff": -0.002358078956604004,
+   "scale": 0.01
+  },
+  "rest_mean_z": {
+   "physx": 0.2671261727809906,
+   "metalsim": 0.2696557641029358,
+   "diff": 0.0025295913219451904,
+   "scale": 0.01
+  },
+  "xy_extent": {
+   "physx": 0.7910922765731812,
+   "metalsim": 0.7707226276397705,
+   "diff": -0.020369648933410645,
+   "scale": 0.02
+  },
+  "settle_time": {
+   "physx": 1.065,
+   "metalsim": 1.23,
+   "diff": 0.16500000000000004,
+   "scale": 0.25
+  },
+  "ke_peak_t": {
+   "physx": 0.26,
+   "metalsim": 0.27,
+   "diff": 0.010000000000000009,
+   "scale": 0.02
+  },
+  "heightmap_rmse": {
+   "metalsim": 0.039141642437394444,
+   "scale": 0.01
+  },
+  "silhouette_iou": {
+   "metalsim": 0.7166666666666667,
+   "scale": null
+  }
+ }
+}

@@ -39,7 +39,10 @@ parser.add_argument("--seconds", type=float, default=5.0)
 parser.add_argument("--scenes", default="cloth,rope,cube")
 # mesh-resolution sweep (shear-locking test): cells across the rod's 2 cm cross-section / along the cube's 0.2 m edge.
 # "d" = Isaac Lab's default edge_refinement (4.0). edge_refinement = bounding-box diagonal / max edge length.
-parser.add_argument("--resolutions", default="d,2,4,8")
+parser.add_argument("--resolutions", default="1,2,4,8")
+# pre-tetrahedralized structured meshes (make_tetmeshes.py): rod_n{n}.usda, cube_n{n}.usda. Isaac Lab's automatic
+# tetrahedralization (pytetwild) aborts the Kit process on the parity VM ("double free or corruption").
+parser.add_argument("--tetdir", default=os.path.expanduser("~/tetmeshes"))
 add_launcher_args(parser)
 args = parser.parse_args()
 
@@ -114,16 +117,21 @@ with launch_simulation(cfg=PhysicsCfg(), launcher_args=args) as physics_cfg:
     if "rope" in scenes:
         for ri, res in enumerate(args.resolutions.split(",")):
             try:
-                refine = 4.0 if res == "d" else float(np.linalg.norm([0.5, 0.02, 0.02])) * int(res) / 0.02
-                name = "rod" if res == "d" else f"rod_n{res}"
+                name = f"rod_n{res}"
+                if res == "d":
+                    refine = 4.0
+                    spawn = sim_utils.MeshCuboidCfg(size=(0.5, 0.02, 0.02), deformable_props=PropsCfg(), physics_material=vol,
+                                                    edge_refinement=refine)
+                else:
+                    refine = None
+                    spawn = sim_utils.UsdFileCfg(usd_path=os.path.join(args.tetdir, f"rod_n{res}.usda"), deformable_props=PropsCfg(),
+                                                 physics_material=vol)
                 rod_cfg = DeformableObjectCfg(
-                    prim_path=f"/World/rope_scene/{name}",
-                    spawn=sim_utils.MeshCuboidCfg(size=(0.5, 0.02, 0.02), deformable_props=PropsCfg(), physics_material=vol,
-                                                  edge_refinement=refine),
+                    prim_path=f"/World/rope_scene/{name}", spawn=spawn,
                     init_state=DeformableObjectCfg.InitialStateCfg(pos=(10.25, -2.0 * ri, 1.0)))
                 objs[name] = rod_cfg.class_type(rod_cfg)
                 meta["scenes"][name] = {"size": [0.5, 0.02, 0.02], "z0": 1.0, "x0": 10.0, "y0": -2.0 * ri,
-                                        "cells_across": res, "edge_refinement": refine,
+                                        "cells_across": res, "edge_refinement": refine, "mesh": "structured hex->6 tets, cell aspect 2.5" if res != "d" else "pytetwild",
                                         "pinned": "-x end, nodes within 0.01 m", "material": cfg_dict(vol), "props": cfg_dict(PropsCfg())}
             except Exception:  # noqa: BLE001
                 meta["errors"][f"rod_{res}_setup"] = traceback.format_exc()
@@ -144,14 +152,18 @@ with launch_simulation(cfg=PhysicsCfg(), launcher_args=args) as physics_cfg:
                 meta["errors"]["cable_setup"] = traceback.format_exc()
     # (c) soft cube
     if "cube" in scenes:
-        for ci, res in enumerate(args.resolutions.split(",")):
+        for ci, res in enumerate([r for r in args.resolutions.split(",") if r != "1"]):
             try:
-                refine = 4.0 if res == "d" else float(np.sqrt(3.0)) * int(res)
-                name = "cube" if res == "d" else f"cube_n{res}"
+                name = f"cube_n{res}"
+                if res == "d":
+                    refine = 4.0
+                    spawn = sim_utils.MeshCuboidCfg(size=(0.2, 0.2, 0.2), deformable_props=PropsCfg(), physics_material=vol, edge_refinement=refine)
+                else:
+                    refine = None
+                    spawn = sim_utils.UsdFileCfg(usd_path=os.path.join(args.tetdir, f"cube_n{res}.usda"), deformable_props=PropsCfg(),
+                                                 physics_material=vol)
                 cube_cfg = DeformableObjectCfg(
-                    prim_path=f"/World/cube_scene/{name}",
-                    spawn=sim_utils.MeshCuboidCfg(size=(0.2, 0.2, 0.2), deformable_props=PropsCfg(), physics_material=vol,
-                                                  edge_refinement=max(refine, 1.0)),
+                    prim_path=f"/World/cube_scene/{name}", spawn=spawn,
                     init_state=DeformableObjectCfg.InitialStateCfg(pos=(20.0, -2.0 * ci, 0.5)))
                 objs[name] = cube_cfg.class_type(cube_cfg)
                 meta["scenes"][name] = {"size": 0.2, "z0": 0.5, "x0": 20.0, "y0": -2.0 * ci, "cells_per_edge": res,
@@ -164,9 +176,12 @@ with launch_simulation(cfg=PhysicsCfg(), launcher_args=args) as physics_cfg:
     # the cooked deformable data Isaac/PhysX writes onto the prims (simulation/collision tet meshes, springs, rest
     # shapes, applied schemas and every attribute): the cooker is closed source, so the inputs are dumped as written
     def dump_prims(root_paths):
-        import omni.usd
         from pxr import Usd
-        stage = omni.usd.get_context().get_stage()
+        try:
+            stage = sim_utils.get_current_stage()
+        except Exception:  # noqa: BLE001
+            import omni.usd
+            stage = omni.usd.get_context().get_stage()
         attrs, arrays = {}, {}
         for root in root_paths:
             prim = stage.GetPrimAtPath(root)
@@ -214,7 +229,7 @@ with launch_simulation(cfg=PhysicsCfg(), launcher_args=args) as physics_cfg:
             tgt = kt.torch.clone() if hasattr(kt, "torch") else kt.clone()
             tgt[..., :3] = torch.as_tensor(p0, device=tgt.device)
             tgt[..., 3] = 1.0
-            pinned = p0[0, :, 0] < p0[0, :, 0].min() + 0.01 * (1.0 if rname == "rod" else 0.1)
+            pinned = p0[0, :, 0] < p0[0, :, 0].min() + 1.0e-4          # the -x end face
             tgt[0, torch.as_tensor(pinned, device=tgt.device), 3] = 0.0
             rod.write_nodal_kinematic_target_to_sim_index(tgt)
             meta["scenes"][rname]["n_pinned"] = int(pinned.sum())
@@ -246,7 +261,7 @@ with launch_simulation(cfg=PhysicsCfg(), launcher_args=args) as physics_cfg:
                 c = objs["cable"]
                 pose = c.data.segment_pose_w.torch.clone(); vel = c.data.segment_velocity_w.torch.clone()
                 pose[:, 0] = torch.as_tensor(cable_pose0[:, 0], device=pose.device); vel[:, 0] = 0.0
-                c.write_segment_pose_to_sim_index(pose); c.write_segment_velocity_to_sim_index(vel)
+                c.write_segment_pose_to_sim_index(segment_pose=pose); c.write_segment_velocity_to_sim_index(segment_velocity=vel)
             except Exception:  # noqa: BLE001
                 meta["errors"].setdefault("cable_pin", traceback.format_exc()); cable_pose0 = None
         for o in objs.values():

@@ -1,0 +1,13 @@
+I: Initializing Version 2.72.3-release.7151+gl.5390bed9
+I: Client ID: R9CP1LH9
+I: Not using Hub: Hub not found
+I: Successfully created S3 provider for https://omniverse-content-production.s3-us-west-2.amazonaws.com
+I: Using CloudFront http://dcb18d6mfegct.cloudfront.net/, List = No
+Serving remote assets from the local cache under '/tmp'. Each copy is checked against the server before use; delete the directory to force a full re-download.
+Warning: in ~_DeferredDiagnostics at line 62 of /builds/omniverse/usd-ci/USD/pxr/usd/sdf/path.cpp -- Can only append a property 'newton:heightfield:resolution' to a prim path (/)
+/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py:1984: FutureWarning: Newton shape color replacement is enabled; this workaround will be deprecated in a future release.
+  replace_newton_builder_shape_colors(builder, stage)
+Finalize builder took: Last: 0.245659 s, Mean: 0.245659 s, Std: 0.000000 s, N: 1
+Initialize solver took: Last: 0.257603 s, Mean: 0.257603 s, Std: 0.000000 s, N: 1
+CUDA graph took: Last: 0.971749 s, Mean: 0.971749 s, Std: 0.000000 s, N: 1
+DEFORMABLE_IL3_DONE newton_vbd {"cloth_pos": [1089, 3], "cloth_vel": [1089, 3], "rod_n1_pos": [44, 3], "rod_n1_vel": [44, 3], "rod_n2_pos": [189, 3], "rod_n2_vel": [189, 3], "rod_n4_pos": [1025, 3], "rod_n4_vel": [1025, 3], "rod_n8_pos": [6561, 3], "rod_n8_vel": [6561, 3], "cable_pose": [20, 7], "cable_vel": [20, 6], "cube_n2_pos": [27, 3], "cube_n2_vel": [27, 3], "cube_n4_pos": [125, 3], "cube_n4_vel": [125, 3], "cube_n8_pos": [729, 3], "cube_n8_vel": [729, 3]} errors: []
