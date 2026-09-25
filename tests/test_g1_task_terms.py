@@ -10,6 +10,10 @@ from metalsim.learn.g1_velocity import G1VelocityTask, ACTION_SCALE, CONTROL_DT,
 
 pytestmark = pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal")
 
+# every invariant below must hold on both physics engines (same kernels, same MuJoCo-layout state)
+ENGINES = [pytest.param({}, id="mjwarp"),
+           pytest.param({"engine": "newton", "newton_iterations": 4, "newton_dt": 0.00125}, id="newton")]
+
 
 def _rot(q):
     w, x, y, z = q
@@ -18,9 +22,10 @@ def _rot(q):
                      [2 * (x * z - w * y), 2 * (y * z + w * x), 1 - 2 * (x * x + y * y)]])
 
 
-def test_reward_terms_match_isaac_formulas():
+@pytest.mark.parametrize("engine", ENGINES)
+def test_reward_terms_match_isaac_formulas(engine):
     n = 8
-    task = G1VelocityTask(n, terrain="flat", seed=1)
+    task = G1VelocityTask(n, terrain="flat", seed=1, **engine)
     benchmark_step(task, num_frames=6, warmup=0)     # random actions
     # one more control step by hand, stopping before the command update so cmd is what the reward saw
     from metalsim.learn.warp_policy import RolloutBuffers, bump
@@ -65,9 +70,10 @@ def test_reward_terms_match_isaac_formulas():
     assert np.all(np.abs(terms[:, 0]) <= 1.0) and np.all(np.abs(terms[:, 1]) <= 2.0)
 
 
-def test_observation_layout_and_action_mapping():
+@pytest.mark.parametrize("engine", ENGINES)
+def test_observation_layout_and_action_mapping(engine):
     n = 4
-    task = G1VelocityTask(n, terrain="flat", seed=2)
+    task = G1VelocityTask(n, terrain="flat", seed=2, **engine)
     task.reset_all()
     idx = wp.zeros(1, dtype=int, device="metal:0")
     task.launch_obs(idx); task.sim.synchronize()
@@ -85,5 +91,5 @@ def test_observation_layout_and_action_mapping():
     task.launch_apply_action(a); task.sim.synchronize()
     np.testing.assert_allclose(task.sim.d.ctrl.numpy(), default[7:] + ACTION_SCALE * a.numpy(), atol=1e-6)
     np.testing.assert_allclose(task.last_action.numpy(), a.numpy(), atol=1e-6)
-    assert task.decimation == 4 and abs(task.decimation * task.model.opt.timestep - CONTROL_DT) < 1e-9
+    assert abs(task.decimation * task.physics_dt - CONTROL_DT) < 1e-9     # 50 Hz control on either engine
     assert task.max_t == 1000                                 # 20 s episodes at 50 Hz
