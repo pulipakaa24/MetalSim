@@ -1,0 +1,93 @@
+torch 2.14.0
+gpu_lock status: holder: {"name": "camera_update_profile", "kind": "timing", "minutes": 12.0, "pid": 56979, "start": 1790311368.094058}
+==== update
+PPO.update (4 epochs x 32 mb of 2048), fp32          median    6.671 s  min    6.659 s  (implied 8,120 env-steps/s)
+gpu_lock status: holder: {"name": "camera_update_profile", "kind": "timing", "minutes": 12.0, "pid": 56979, "start": 1790311368.094058}
+==== split
+gather uint8 + float + center (2048)                 median    10.16 ms  min    10.12 ms  -> x128 =   1.30 s/update  (implied  24,256 env-steps/s)
+forward, no_grad                                     median    15.80 ms  min    15.74 ms  -> x128 =   2.02 s/update  (implied  19,152 env-steps/s)
+forward + loss (grad-enabled)                        median    16.57 ms  min    16.32 ms  -> x128 =   2.12 s/update  (implied  18,611 env-steps/s)
+forward + loss + backward                            median    44.67 ms  min    43.67 ms  -> x128 =   5.72 s/update  (implied   9,207 env-steps/s)
+clip_grad_norm + Adam.step                           median     5.15 ms  min     4.96 ms  -> x128 =   0.66 s/update  (implied  31,822 env-steps/s)
+KL .item() host sync (per minibatch)                 median     0.13 ms  min     0.13 ms  -> x128 =   0.02 s/update  (implied  46,247 env-steps/s)
+full minibatch step (gather+fwd+bwd+step)            median    51.67 ms  min    51.10 ms  -> x128 =   6.61 s/update  (implied   8,178 env-steps/s)
+gpu_lock status: holder: {"name": "camera_update_profile", "kind": "timing", "minutes": 12.0, "pid": 56979, "start": 1790311368.094058}
+==== layers
+-- per-layer, torch.float32
+conv1 3->32 k8 s4  (100->24) fwd  [ 4.05 TF/s]       median     3.58 ms  min     3.48 ms
+conv1 3->32 k8 s4  (100->24) dgrad (input)  [ 0.62 TF/s] median    23.34 ms  min    23.25 ms
+conv1 3->32 k8 s4  (100->24) wgrad+bgrad    [ 1.63 TF/s] median     8.87 ms  min     8.61 ms
+conv2 32->64 k4 s2 (24->11) fwd  [ 7.96 TF/s]        median     2.04 ms  min     1.98 ms
+conv2 32->64 k4 s2 (24->11) dgrad (input)  [ 2.52 TF/s] median     6.44 ms  min     6.38 ms
+conv2 32->64 k4 s2 (24->11) wgrad+bgrad    [ 3.80 TF/s] median     4.28 ms  min     4.24 ms
+conv3 64->64 k3 s1 (11->9) fwd  [ 9.58 TF/s]         median     1.28 ms  min     1.25 ms
+conv3 64->64 k3 s1 (11->9) dgrad (input)  [ 7.86 TF/s] median     1.56 ms  min     1.52 ms
+conv3 64->64 k3 s1 (11->9) wgrad+bgrad    [ 3.26 TF/s] median     3.75 ms  min     3.62 ms
+fc 5184->512 fwd  [ 8.91 TF/s]                       median     1.22 ms  min     1.18 ms
+fc dgrad  [10.83 TF/s]                               median     1.00 ms  min     0.95 ms
+fc wgrad  [10.33 TF/s]                               median     1.05 ms  min     1.01 ms
+sum of fp32 conv/fc fwd+needed grads per minibatch: 35.06 ms -> x128 = 4.49 s
+-- per-layer, torch.float16
+conv1 3->32 k8 s4  (100->24) fwd  [ 6.67 TF/s]       median     2.17 ms  min     2.11 ms
+conv1 3->32 k8 s4  (100->24) dgrad (input)  [ 0.69 TF/s] median    20.96 ms  min    20.92 ms
+conv1 3->32 k8 s4  (100->24) wgrad+bgrad    [ 1.99 TF/s] median     7.28 ms  min     7.23 ms
+conv2 32->64 k4 s2 (24->11) fwd  [ 9.52 TF/s]        median     1.71 ms  min     1.64 ms
+conv2 32->64 k4 s2 (24->11) dgrad (input)  [ 2.75 TF/s] median     5.91 ms  min     5.84 ms
+conv2 32->64 k4 s2 (24->11) wgrad+bgrad    [ 4.18 TF/s] median     3.89 ms  min     3.84 ms
+conv3 64->64 k3 s1 (11->9) fwd  [10.24 TF/s]         median     1.19 ms  min     1.14 ms
+conv3 64->64 k3 s1 (11->9) dgrad (input)  [ 8.31 TF/s] median     1.47 ms  min     1.43 ms
+conv3 64->64 k3 s1 (11->9) wgrad+bgrad    [ 3.49 TF/s] median     3.50 ms  min     3.44 ms
+fc 5184->512 fwd  [ 9.66 TF/s]                       median     1.13 ms  min     1.08 ms
+fc dgrad  [11.63 TF/s]                               median     0.94 ms  min     0.89 ms
+fc wgrad  [10.98 TF/s]                               median     0.99 ms  min     0.95 ms
+gpu_lock status: holder: {"name": "camera_update_profile", "kind": "timing", "minutes": 12.0, "pid": 56979, "start": 1790311368.094058}
+==== alt
+encoder fwd+bwd: MPSGraph conv (baseline) (maxerr 0.0e+00) median    35.91 ms  min    35.13 ms  -> x128 =   4.60 s/update  (implied  10,929 env-steps/s)
+encoder fwd+bwd: space-to-depth stride-1 convs (maxerr 1.2e-06) median    35.57 ms  min    35.40 ms  -> x128 =   4.55 s/update  (implied  11,009 env-steps/s)
+encoder fwd+bwd: unfold + matmul (maxerr 1.8e-06)    median    68.03 ms  min    67.28 ms  -> x128 =   8.71 s/update  (implied   6,484 env-steps/s)
+encoder fwd+bwd fp16 autocast: baseline              median    30.65 ms  min    30.43 ms  -> x128 =   3.92 s/update  (implied  12,312 env-steps/s)
+encoder fwd+bwd fp16 autocast: s2d                   median    33.79 ms  min    33.61 ms  -> x128 =   4.33 s/update  (implied  11,447 env-steps/s)
+gpu_lock status: holder: {"name": "camera_update_profile", "kind": "timing", "minutes": 12.0, "pid": 56979, "start": 1790311368.094058}
+==== fp16
+fp16 autocast fwd+bwd+step                           median    43.45 ms  min    42.97 ms  -> x128 =   5.56 s/update  (implied   9,414 env-steps/s)
+gpu_lock status: holder: {"name": "camera_update_profile", "kind": "timing", "minutes": 12.0, "pid": 56979, "start": 1790311368.094058}
+==== bf16
+bf16 autocast fwd+bwd+step                           median    43.70 ms  min    43.14 ms  -> x128 =   5.59 s/update  (implied   9,371 env-steps/s)
+gpu_lock status: holder: {"name": "camera_update_profile", "kind": "timing", "minutes": 12.0, "pid": 56979, "start": 1790311368.094058}
+==== fusedadam
+clip + Adam(fused=False) step                        median     5.05 ms  min     4.98 ms  -> x128 =   0.65 s/update  (implied  32,019 env-steps/s)
+clip + Adam(fused=True) step                         median     4.74 ms  min     4.67 ms  -> x128 =   0.61 s/update  (implied  32,652 env-steps/s)
+gpu_lock status: holder: {"name": "camera_update_profile", "kind": "timing", "minutes": 12.0, "pid": 56979, "start": 1790311368.094058}
+==== mlx
+MLX float32 eager fwd+bwd+clip+Adam                  median    37.12 ms  min    36.90 ms  -> x128 =   4.75 s/update  (implied  10,653 env-steps/s)
+MLX float32 mx.compile fwd+bwd+clip+Adam             median    34.25 ms  min    34.03 ms  -> x128 =   4.38 s/update  (implied  11,330 env-steps/s)
+MLX float32 full update (128 mb, compiled step)      median    4.442 s  min    4.431 s  (implied 11,218 env-steps/s)
+MLX float16 eager fwd+bwd+clip+Adam                  median    27.59 ms  min    27.39 ms  -> x128 =   3.53 s/update  (implied  13,289 env-steps/s)
+MLX float16 mx.compile fwd+bwd+clip+Adam             median    26.04 ms  min    25.85 ms  -> x128 =   3.33 s/update  (implied  13,846 env-steps/s)
+MLX float16 full update (128 mb, compiled step)      median    3.791 s  min    3.646 s  (implied 12,625 env-steps/s)
+gpu_lock status: holder: {"name": "camera_update_profile", "kind": "timing", "minutes": 12.0, "pid": 56979, "start": 1790311368.094058}
+==== mlxlayers
+-- MLX per-layer, float32
+MLX conv1 fwd [ 5.34 TF/s]                           median     2.72 ms  min     2.65 ms
+MLX conv1 dgrad [ 0.47 TF/s]                         median    31.11 ms  min    28.51 ms
+MLX conv1 wgrad [ 1.94 TF/s]                         median     7.46 ms  min     7.37 ms
+MLX conv2 fwd [ 8.65 TF/s]                           median     1.88 ms  min     1.80 ms
+MLX conv2 dgrad [ 4.46 TF/s]                         median     3.64 ms  min     3.45 ms
+MLX conv2 wgrad [ 3.47 TF/s]                         median     4.68 ms  min     4.61 ms
+MLX conv3 fwd [ 8.32 TF/s]                           median     1.47 ms  min     1.42 ms
+MLX conv3 dgrad [ 5.99 TF/s]                         median     2.04 ms  min     1.95 ms
+MLX conv3 wgrad [ 3.74 TF/s]                         median     3.27 ms  min     3.24 ms
+-- MLX per-layer, float16
+MLX conv1 fwd [ 4.98 TF/s]                           median     2.91 ms  min     2.82 ms
+MLX conv1 dgrad [ 0.48 TF/s]                         median    30.17 ms  min    29.83 ms
+MLX conv1 wgrad [ 2.43 TF/s]                         median     5.97 ms  min     5.82 ms
+MLX conv2 fwd [10.19 TF/s]                           median     1.59 ms  min     1.51 ms
+MLX conv2 dgrad [ 5.10 TF/s]                         median     3.18 ms  min     3.09 ms
+MLX conv2 wgrad [ 4.08 TF/s]                         median     3.98 ms  min     3.88 ms
+MLX conv3 fwd [ 9.94 TF/s]                           median     1.23 ms  min     1.16 ms
+MLX conv3 dgrad [ 7.21 TF/s]                         median     1.70 ms  min     1.68 ms
+MLX conv3 wgrad [ 4.20 TF/s]                         median     2.91 ms  min     2.86 ms
+gpu_lock status: holder: {"name": "camera_update_profile", "kind": "timing", "minutes": 12.0, "pid": 56979, "start": 1790311368.094058}
+==== compile
+torch.compile first call (compile time): 0.8 s
+torch.compile(inductor) fwd+bwd + eager step         median    37.22 ms  min    36.54 ms  -> x128 =   4.76 s/update  (implied  10,632 env-steps/s)

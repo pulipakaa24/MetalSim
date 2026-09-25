@@ -122,5 +122,90 @@ conv backward at 84 % of backward time (in the channels-last-penalty regime). #1
 (https://github.com/pytorch/pytorch/issues/112956) shows non-fused `optim.step()` dominating for small
 MLPs on MPS; irrelevant at our size unless measured otherwise. Our own measurement follows.
 
-## 4. Measurements
-(filled in below)
+## 4. Measurements [measured]
+
+M4 Max, macOS 26, torch 2.14.0, mlx 0.32.2, each run holding the GPU through the queue
+(`scripts/gpu_run.sh`, lock holder printed before every part; no other GPU job running). Logs:
+runs/camera_update/profile_1.log, profile_2.log. Commands:
+
+    scripts/gpu_run.sh camera_update_profile timing 12 -- .venv/bin/python scripts/diagnostics/camera_update_profile.py
+    .venv/bin/python scripts/diagnostics/camera_update_profile.py --parts prep,updvar
+    TORCHINDUCTOR_LAYOUT_OPTIMIZATION=0 .venv/bin/python scripts/diagnostics/camera_update_profile.py --parts updvar
+
+Implied env-steps/s = 1024 × 64 / (1.4 s rollout + update).
+
+### 4.1 Whole update (4 epochs × 32 minibatches of 2048)
+
+| variant | update (s) | vs baseline | implied env-steps/s |
+|---|---|---|---|
+| PPO.update as shipped, fp32 eager | 6.67 | 1.00× | 8,120 |
+| per-minibatch fp16 autocast, × 128 | 5.56 | 1.20× | 9,414 |
+| per-minibatch bf16 autocast, × 128 | 5.59 | 1.19× | 9,371 |
+| PPO.update, net.forward under torch.compile (inductor) | 5.38 | 1.24× | 9,665 |
+| same, + fused Adam, TORCHINDUCTOR_LAYOUT_OPTIMIZATION=0 | 5.29 | 1.26× | 9,793 |
+| MLX fp32, whole update in MLX (gather, loss, clip, Adam; mx.compile step) | 4.44 | 1.50× | 11,218 |
+| MLX fp16, whole update in MLX | 3.79 | 1.76× | 12,625 |
+
+(The isolated update measures 6.67 s, not the 5.9 s quoted in docs/GAPS.md; the training log
+runs/camera_cartpole_tier0.log implies 6.7 s/iteration of update at 76 % of 8.76 s, consistent with 6.67.)
+
+### 4.2 Split of one fp32 minibatch (51.7 ms total)
+
+| piece | ms | × 128 (s) |
+|---|---|---|
+| gather `img[idx]` uint8 (random rows, 61 MB) | 3.2 | 0.40 |
+| `float()*1/255` | 1.9 | 0.24 |
+| per-image mean over dims (2,3) | 3.8 | 0.48 (0.6 ms if taken over a flattened HW view) |
+| subtract mean | 2.3 | 0.29 |
+| conv/fc forward (sum of layers) | 8.1 | 1.04 |
+| backward (conv1 wgrad 8.9, conv2 dgrad 6.4 + wgrad 4.3, conv3 dgrad 1.6 + wgrad 3.8, fc 2.1) | 27.0 | 3.46 |
+| clip_grad_norm + Adam (fused: 4.7) | 5.1 | 0.65 |
+
+Forward+loss+backward alone: 44.7 ms (5.72 s/update). Conv backward = 25 ms of it, i.e. about 48 %
+of the update; preprocessing ≈ 11 ms (21 %); optimizer 10 %; the KL `.item()` sync is 0.13 ms (0.3 %).
+
+### 4.3 Per layer, fp32 (fwd / input grad / weight grad, ms, and achieved TFLOP/s)
+
+| layer | torch MPS (MPSGraph) | MLX 0.32.2 |
+|---|---|---|
+| conv1 k8 s4 | 3.6 (4.1) / [23.3, not needed] / **8.9 (1.6)** | 2.7 (5.3) / [31.1] / 7.5 (1.9) |
+| conv2 k4 s2 | 2.0 (8.0) / **6.4 (2.5)** / 4.3 (3.8) | 1.9 (8.7) / 3.6 (4.5) / 4.7 (3.5) |
+| conv3 k3 s1 | 1.3 (9.6) / 1.6 (7.9) / 3.8 (3.3) | 1.5 (8.3) / 2.0 (6.0) / 3.3 (3.7) |
+| fc 5184→512 | 1.2 / 1.0 / 1.1 (~10) | – |
+
+fp16 changes these by 0–20 % (same FMA rate). Formulation changes inside torch, fp32 encoder fwd+bwd:
+MPSGraph 35.9 ms, space-to-depth (stride-1 convs) 35.6 ms, unfold+matmul 68.0 ms — no gain.
+
+### 4.4 What the numbers say
+
+- The forward and the conv3 / fc gradients already run at 8–11 TFLOP/s. The losses are concentrated:
+  conv1 weight gradient (1.6 TFLOP/s, 8.9 ms), conv2 input gradient (2.5 TFLOP/s, 6.4 ms), and ~11 ms
+  of unfused preprocessing per minibatch (a pure PyTorch-eager cost, not a conv cost).
+- MLX's kernels are not uniformly faster (conv2 dgrad 1.8× faster, conv1 wgrad 1.2×, conv3 slower);
+  its whole-update 1.50× (fp32) comes as much from fusing preprocessing/optimizer under `mx.compile` as
+  from the convs.
+- torch.compile works on MPS for this net in 2.14 (0.8–6 s compile, no graph breaks, layout
+  optimisation on or off makes < 2 % difference here) and gives 1.24–1.26×.
+
+## 5. Recommendation
+
+Criterion from the brief: implement only if ≥ 1.5× on the update while PPO stays in PyTorch.
+
+1. **MLX encoder behind a torch.autograd.Function** — the only measured alternative at ≥ 1.5×, but that
+   1.50× is for the *whole* update in MLX. Keeping the heads, loss, and Adam in torch (fused Adam 4.7
+   ms, heads/loss ~1 ms) and adding two sync seams per minibatch gives an **estimated 5.0–5.3 s
+   (1.25–1.35×) in fp32** and ~4.1 s (1.6×) in fp16 — the fp16 variant cannot meet the 1e-4 fp32
+   gradient-equality test. Estimated, so it should be prototyped and measured before being adopted;
+   expect it to miss the bar in fp32.
+2. **torch.compile of the ActorCritic forward + fused Adam** — measured 1.26× (5.29 s), zero new
+   dependencies, bit-for-bit the same model. Adding per-image means precomputed once per rollout
+   (instead of 4 × per sample) and folding centering into conv1's bias is estimated to take another
+   0.2–0.4 s.
+3. **Targeted custom Metal kernels** (via `torch.mps.compile_shader`) for the two slow gradients only:
+   conv1 weight gradient (a 32 × 192 × 1.18 M reduction GEMM) and conv2 input gradient (a transposed
+   stride-2 conv). Bringing both to ~7 TFLOP/s saves ~10 ms per minibatch ≈ 1.3 s per update.
+   Combined with (2): **estimated ≈ 3.9–4.2 s (1.6–1.7×, ~12K env-steps/s)**. Highest effort, and the
+   only path estimated to clear 1.5× in fp32 with PPO in torch.
+
+Estimated best achievable within this design: update ≈ 4 s, i.e. ≈ 12K env-steps/s including training
+(vs 8.1K measured now, 32K Isaac/4090). Beyond that the floor is ≈ 1.7–2.0 s from the arithmetic in §0.
