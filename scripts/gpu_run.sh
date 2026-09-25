@@ -10,5 +10,5 @@ python3 scripts/gpu_lock.py acquire "$NAME" --kind "$KIND" --minutes "$MIN" --pi
 "$@" &
 CHILD=$!
 python3 scripts/gpu_lock.py setpid "$NAME" --pid $CHILD
-trap 'kill $CHILD 2>/dev/null; wait $CHILD 2>/dev/null; python3 scripts/gpu_lock.py release "$NAME"' EXIT INT TERM HUP
+trap 'kill $CHILD 2>/dev/null; wait $CHILD 2>/dev/null; python3 scripts/gpu_lock.py release "$NAME" --pid $CHILD' EXIT INT TERM HUP
 wait $CHILD
