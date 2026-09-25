@@ -1,6 +1,7 @@
 """Dataset writers: run on the CPU from a batch of annotator tensors after one synchronization.
 
-* ``BasicWriter``: per-frame PNG (rgb), NPZ (depth, normals, segmentation, boxes, camera params).
+* ``NpzWriter`` (the BasicWriter before 2026-09-25; Isaac's layout is ``basic_writer.BasicWriter``):
+  per-frame PNG (rgb), NPZ (depth, normals, segmentation, boxes, camera params).
 * ``CocoWriter``: COCO detection JSON (images, categories, bbox annotations from 2-D tight boxes,
   per-instance PNG masks) — Isaac Replicator's CocoWriter fields.
 * ``KittiWriter``: KITTI object format (``image_2/*.png``, ``label_2/*.txt`` with 2-D box and 3-D
@@ -32,7 +33,7 @@ class _Base:
         return x.cpu().numpy() if isinstance(x, torch.Tensor) else np.asarray(x)
 
 
-class BasicWriter(_Base):
+class NpzWriter(_Base):
     def write(self, ann, mask=None):
         """``ann``: dict of annotator outputs (tensors with leading env dim). ``mask``: which envs to save."""
         data = {k: self._cpu(v) for k, v in ann.items() if v is not None and not isinstance(v, dict)}
