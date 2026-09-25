@@ -368,10 +368,15 @@ Newton 45458023 with the limit clamp, `runs/g1_flat_newton_forksolver0625_ppo_fi
 The fork's in-solver drive at 0.625 ms is the best Newton variant: 4.1 return behind MuJoCo Warp at
 iteration 1000 (7–10 behind at 300–750), at 1.6× its training-loop rate, and it passes the 3σ stress
 check at both step sizes (0 blown of 1024, peak joint speed 85–89 rad/s vs 19 blown / 386 rad/s with
-ActuatorPD; `runs/newton_fork_solver_sigma3.log`). Per-term at iteration 1000 (mean action, flat set):
-the fork policy's return equals the MuJoCo Warp policy's (31.05 vs 31.03), with higher yaw tracking
-(0.875 vs 0.838) and higher joint-deviation and orientation costs (−0.199 vs −0.141, −0.035 vs
-−0.007); at iteration 300 the Newton shortfall is tracking and falls, not costs. Transfer of Isaac's
+ActuatorPD; `runs/newton_fork_solver_sigma3.log`). Per-term at iteration 1000 (mean action, flat set, like-for-like against the flat-config MuJoCo
+Warp checkpoint, `runs/mjwarp_flatcfg_reward_terms.log`): tracking is equal (linear 0.895 vs 0.892,
+yaw 0.875 vs 0.888); the fork policy's 2.3-return gap is twice the joint deviation (−0.199 vs −0.096)
+and five times the orientation cost (−0.035 vs −0.007); at iteration 300 the gap (6.7 vs 23.6) is
+angular tracking and falls. Swing-leg test on Isaac's checkpoint 1000 (`runs/g1_swing.log`): Newton
+swings the leg further and longer (hip-pitch travel 0.121 vs 0.061 rad, swing 0.123 vs 0.108 s, peak
+clearance 0.082 vs 0.056 m) and lands it twice as far ahead (0.065 vs 0.031 m), so the long stride is
+in the joint trajectories themselves (drive / dynamics), not in the joint-to-foot kinematics;
+closed-loop, so commanded targets were not separated from the response (not pursued: archived). Transfer of Isaac's
 checkpoints on the fork drive at 0.625 ms: 3.63 / 3.70 / 3.63 m vs Isaac's 3.19 / 3.02 / 3.11 (14–23 %
 over; ActuatorPD 20–35 %); every env upright. Push-off diagnostic (`runs/g1_pushoff.log`, Isaac's
 checkpoint 1000): at 0.625 ms Newton's propulsive impulse equals MuJoCo Warp's (1.82 N·s) yet its
