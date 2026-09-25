@@ -40,7 +40,32 @@ def physics_metrics(isaac, ours, tag):
             "peak_joint_speed_rad_s": {"isaac": float(np.abs(A["joint_vel"][:T, 0]).max()), "metalsim": float(np.abs(B["joint_vel"][:T, 0]).max())},
             "contact_force_N": {"isaac_mean_total": float(cf_a.sum(1).mean()), "metalsim_mean_total": float(cf_b.sum(1).mean()),
                                  "isaac_peak": float(cf_a.max()), "metalsim_peak": float(cf_b.max())},
-            "torque_rms_Nm": {"isaac": float(np.sqrt((A["torque"][:T, 0] ** 2).mean())), "metalsim": float(np.sqrt((B["torque"][:T, 0] ** 2).mean()))}}
+            "torque_rms_Nm": {"isaac": float(np.sqrt((A["torque"][:T, 0] ** 2).mean())), "metalsim": float(np.sqrt((B["torque"][:T, 0] ** 2).mean()))},
+            **_contact_limit_metrics(A, B, ours, T)}
+
+
+def _contact_limit_metrics(A, B, ours, T):
+    """Penetration (MetalSim only: max over substeps, recorded per control step; Isaac's PhysX recording has
+    no contact distances) and joint-limit excursion: both engines from joint_pos at control steps against
+    the asset's limits (MetalSim's meta.json), plus MetalSim's max over substeps when recorded."""
+    out = {}
+    if "penetration" in B.files:
+        p = B["penetration"][:T, 0]
+        out["penetration_m"] = {"metalsim_max": float(p.max()), "metalsim_mean_when_in_contact": float(p[p > 0].mean()) if (p > 0).any() else 0.0,
+                                "isaac": None}
+    mp = os.path.join(ours, "meta.json")
+    rng = json.load(open(mp)).get("joint_range_isaac_order") if os.path.exists(mp) else None
+    if rng is not None:
+        lim = np.array([r is not None for r in rng]); lo = np.array([r[0] if r else -np.inf for r in rng]); hi = np.array([r[1] if r else np.inf for r in rng])
+        def exc(jp):
+            e = np.maximum(lo - jp, jp - hi)[:, lim]
+            return np.maximum(e, 0)
+        ea, eb = exc(A["joint_pos"][:T, 0]), exc(B["joint_pos"][:T, 0])
+        out["limit_excursion_rad"] = {"isaac_max_ctrl": float(ea.max()), "metalsim_max_ctrl": float(eb.max()),
+                                      "isaac_steps_over_0.01": int((ea.max(1) > 0.01).sum()), "metalsim_steps_over_0.01": int((eb.max(1) > 0.01).sum())}
+        if "limit_excursion" in B.files:
+            out["limit_excursion_rad"]["metalsim_max_substep"] = float(B["limit_excursion"][:T, 0].max())
+    return out
 
 
 def robot_mask(d, thresh=0.05):
@@ -120,11 +145,16 @@ def image_metrics(a, b, da, db, lp=None):
 
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--isaac", required=True); ap.add_argument("--metalsim", required=True); ap.add_argument("--out", required=True)
+    ap.add_argument("--no_render", action="store_true", help="physics rows only")
     a = ap.parse_args(); os.makedirs(a.out, exist_ok=True)
     report = {"physics": {}, "render": {}}
     for tag in ("A_hold", "B_random", "C_drop"):
         if os.path.exists(os.path.join(a.isaac, f"{tag}.npz")) and os.path.exists(os.path.join(a.metalsim, f"{tag}.npz")):
             report["physics"][tag] = physics_metrics(a.isaac, a.metalsim, tag)
+    if a.no_render:
+        json.dump(report, open(os.path.join(a.out, "report.json"), "w"), indent=1)
+        print(json.dumps(report, indent=1))
+        return
     try:
         import lpips, torch
         lp = lpips.LPIPS(net="alex", verbose=False)
