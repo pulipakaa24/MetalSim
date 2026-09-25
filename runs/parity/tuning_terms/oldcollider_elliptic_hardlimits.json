@@ -1,0 +1,32 @@
+{
+ "ckpt": "runs/policies/g1_flat_rslrl_isaacflatcfg/g1_flat_rslrl_it400.pt",
+ "iterations": 400,
+ "episodes": 1233,
+ "mean_episode_length": 812.1257096512571,
+ "mean_return": 20.854386692313533,
+ "terminations": {
+  "fell": 311,
+  "timeout": 922
+ },
+ "Episode_Reward": {
+  "track_lin_vel_xy_exp": 0.7112,
+  "track_ang_vel_z_exp": 0.5686,
+  "feet_air_time": 0.0119,
+  "feet_slide": -0.0559,
+  "joint_deviation_all": -0.0918,
+  "flat_orientation_l2": -0.0076,
+  "action_rate_l2": -0.0137,
+  "termination_penalty": -0.0504,
+  "lin_vel_z_l2": -0.0031,
+  "ang_vel_xy_l2": -0.0052,
+  "dof_torques_l2": -0.0052,
+  "dof_acc_l2": -0.0156,
+  "dof_pos_limits": -0.0004
+ },
+ "note": "per-second average over the episode like Isaac's RewardManager; joint_deviation_all = hip+arms+fingers+torso",
+ "reward_cfg": "flat",
+ "engine": "mjwarp",
+ "physics_dt": 0.0025,
+ "contact_tuning": "elliptic_hardlimits",
+ "seed": 1
+}
