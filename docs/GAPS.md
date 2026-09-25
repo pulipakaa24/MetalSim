@@ -36,6 +36,7 @@ the Newton-engine evaluation. Evidence for each row is in `PARITY.md`.
 | Rendering vs RTX | MDL-defined BRDFs, USD light units, sun disk, ACES + sRGB, OIDN on Metal | robot vs RTX path tracer 13.9 → 28.8 dB (RTX's own modes 25.9 dB apart); whole frame 45.6 dB |
 | Throughput | 43-dof Cholesky fast path, sparse L'DL, fused Hessian update (forks) | G1 full PPO loop 27.9 → 56.6 K env-steps/s; above Isaac 2.3.2 + PhysX on the L4 (45.9 K) |
 | Camera-RL throughput | compiled update, Metal gradient kernels, fused gather | 7.5 → 12.7 K env-steps/s incl. training; the rest of the 2.5× to a 4090 is hardware |
+| Camera-RL physical render default | verified over 8 M steps (a NaN in a first attempt was an out-of-memory from a run that executed without the GPU lock, not the renderer); non-finite samples discarded in the path tracer, 1024-frame finiteness test | mean return over the last 20 iterations 85.3 vs 86.3 for tier 0; 8,788 env-steps/s incl. training |
 | Replicator | annotators, BasicWriter layout, event terms | 24 exact-match tests |
 | MaterialX | load-time flattening of four surface types | zero render cost; unmapped lobes listed |
 | Deformables (PhysX 5.1) | MuJoCo Warp flex 237/237 on Metal with five contact fixes; implicit damping; XPBD cloth/rope | cloth 2 mm / 3.3 cm, rope 1.077 vs 1.026 s, cube bounce 0.140 vs 0.135 m, penetration 2.6 vs 1.6 mm (fitted damping, stated) |
