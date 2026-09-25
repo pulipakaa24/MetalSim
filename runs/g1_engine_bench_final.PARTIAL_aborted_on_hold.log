@@ -1,0 +1,8 @@
+=== start Thu Sep 24 19:28:44 PDT 2026 power: Now drawing from 'AC Power' GPU util "Device Utilization %"=0
+=== cost split 4096 mjwarp 0.0025
+N=4096 mjwarp 2.5 ms: physics only (8 substeps, graph) 115.1 ms/step -> 35,589 env-steps/s
+N=4096 mjwarp 2.5 ms: full env step (graph, synchronized) 133.1 ms -> 30,776 env-steps/s
+N=4096 mjwarp 2.5 ms: rollout with Warp policy inference ((256, 128, 128)), 24 steps: 3390 ms -> 29,000 env-steps/s
+N=4096 mjwarp 2.5 ms: PPO update (5 epochs x 4 minibatches) 153 ms -> full loop 27,749 env-steps/s
+=== cost split 4096 newton 4 0.00125
+=== end Thu Sep 24 19:29:34 PDT 2026 power: Now drawing from 'AC Power'
