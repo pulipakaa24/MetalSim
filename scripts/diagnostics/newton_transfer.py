@@ -5,7 +5,9 @@ noise on, as in training). Reports x travelled and final pelvis z (mean over env
 and engine setting; MuJoCo Warp at 2.5 ms runs the same protocol as the in-script control.
 
 usage: python scripts/diagnostics/newton_transfer.py [--its 100,500,1000,1499] [--settings mjwarp,4:1.25,4:0.625]
-       Newton fork recipe: 4:1.25:solver:color:relax=0.8:nolim"""
+       Newton fork recipe: 4:1.25:solver:color:relax=0.8:nolim
+       MuJoCo Warp with a contact tuning: mjwarp:<metalsim.physics.contact_tuning preset>; the pre-fix
+       plane_convex collider: MJW_PLANE_CONVEX=legacy in the environment"""
 import sys, numpy as np, torch, warp as wp
 wp.config.quiet = True
 from metalsim.learn.g1_velocity import G1VelocityTask
@@ -25,6 +27,10 @@ N, STEPS = 4, 400
 def make(setting):
     if setting == "mjwarp":
         return G1VelocityTask(N, terrain="flat", seed=0, physics_dt=0.0025)
+    if setting.startswith("mjwarp:"):
+        from metalsim.physics import contact_tuning
+        with contact_tuning.g1_model_tuning(setting.split(":", 1)[1]):
+            return G1VelocityTask(N, terrain="flat", seed=0, physics_dt=0.0025)
     p = setting.split(":"); it, ms = p[0], p[1]; kw = {}
     for x in p[2:]:                        # Newton fork options: solver (PD drive), color, relax=R, nolim
         if x == "solver": kw["drive"] = "solver"

@@ -1,0 +1,59 @@
+install: newton {'path': '/Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton', 'url': 'https://github.com/newton-physics/newton', 'commit': '45458023f24629c1feffb1f336594808f537db14', 'editable': False} | warp {'path': '/Users/aditya/robosim/upstream/warp-innate/warp', 'git_head': '786cdae', 'git_dirty': False}
+| checkpoint | mjwarp x [m] / pelvis z [m] | mjwarp:tau5_imp99 x [m] / pelvis z [m] | mjwarp:tau5_imp99_margin_gap1cm x [m] / pelvis z [m] | mjwarp:hardlimits x [m] / pelvis z [m] | mjwarp:tau5_imp99_hardlimits x [m] / pelvis z [m] |
+|---|---|---|---|---|---|
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth 0cc2fb1 load on device 'metal:0' took 28.63 ms  (cached)
+Module _nxn_broadphase__locals__kernel_77109f20 77109f2 load on device 'metal:0' took 18.13 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_95433903 9543390 load on device 'metal:0' took 26.82 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_7f9cb860 7f9cb86 load on device 'metal:0' took 20.03 ms  (cached)
+Module mujoco_warp._src.constraint 6b6848e load on device 'metal:0' took 16.89 ms  (cached)
+Module _friction_dof__locals__kernel_646d9a17 646d9a1 load on device 'metal:0' took 17.42 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_2af29aef 2af29ae load on device 'metal:0' took 17.10 ms  (cached)
+Module _efc_contact_init__locals__kernel_41c302bb 41c302b load on device 'metal:0' took 16.97 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_1a4b2876 66f5008 load on device 'metal:0' took 17.30 ms  (cached)
+Module _efc_contact_update__locals__kernel_63b3d93a 63b3d93 load on device 'metal:0' took 17.53 ms  (cached)
+Module mujoco_warp._src.forward c9fb78c load on device 'metal:0' took 23.16 ms  (cached)
+Module mujoco_warp._src.passive 01837ed load on device 'metal:0' took 22.53 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_15bb4c69 15bb4c6 load on device 'metal:0' took 16.97 ms  (cached)
+Module mujoco_warp._src.forward d62b5a2 load on device 'metal:0' took 23.06 ms  (cached)
+Module _qfrc_smooth__locals__kernel_879019a1 879019a load on device 'metal:0' took 16.92 ms  (cached)
+Module mujoco_warp._src.support 8f02f5a load on device 'metal:0' took 17.19 ms  (cached)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_9171eb37 f438033 load on device 'metal:0' took 16.88 ms  (cached)
+Module _solve_init_dof__locals__kernel_d2b89306 d2b8930 load on device 'metal:0' took 16.82 ms  (cached)
+Module mujoco_warp._src.solver 4615040 load on device 'metal:0' took 18.58 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_61609ca9 61609ca load on device 'metal:0' took 16.82 ms  (cached)
+Module mul_m_kernel__locals___mul_m_1dc6ad98 1dc6ad9 load on device 'metal:0' took 17.21 ms  (cached)
+Module _update_constraint_efc__locals__kernel_19ee8eff 19ee8ef load on device 'metal:0' took 17.13 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_f4d269f2 f4d269f load on device 'metal:0' took 16.82 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_1b7ae334 1b7ae33 load on device 'metal:0' took 16.69 ms  (cached)
+Module _update_gradient_grad__locals__kernel_d8d45da1 d8d45da load on device 'metal:0' took 16.71 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_53d49923 4a8c7b0 load on device 'metal:0' took 16.97 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_c5a7f647 8641a45 load on device 'metal:0' took 17.01 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_3ec90fd4 72d6af5 load on device 'metal:0' took 18.12 ms  (cached)
+Module _update_constraint_efc__locals__kernel_2d3da595 2d3da59 load on device 'metal:0' took 17.80 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_747e54a4 747e54a load on device 'metal:0' took 17.22 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_5bb67707 5bb6770 load on device 'metal:0' took 16.92 ms  (cached)
+Module _update_gradient_grad__locals__kernel_c6377c8b c6377c8 load on device 'metal:0' took 16.79 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_8d1dce9c 2c8c4f6 load on device 'metal:0' took 16.92 ms  (cached)
+Module _solve_done__locals__kernel_e377d69b e377d69 load on device 'metal:0' took 16.78 ms  (cached)
+Module mujoco_warp._src.sensor 50c46e2 load on device 'metal:0' took 27.55 ms  (cached)
+Module mujoco_warp._src.derivative 1793cac load on device 'metal:0' took 19.73 ms  (cached)
+Module _next_time_builder__locals___next_time_77f65a33 77f65a3 load on device 'metal:0' took 16.89 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_7fdbdb61 7fdbdb6 load on device 'metal:0' took 16.76 ms  (cached)
+Module reset_data__locals__reset_M_232d5062 232d506 load on device 'metal:0' took 17.00 ms  (cached)
+Module reset_data__locals__reset_mocap_29da3eb8 29da3eb load on device 'metal:0' took 16.62 ms  (cached)
+Module reset_data__locals__reset_contact_818d93f9 818d93f load on device 'metal:0' took 17.08 ms  (cached)
+Module reset_data__locals__reset_sleep_ae682850 ae68285 load on device 'metal:0' took 16.94 ms  (cached)
+Module reset_data__locals__reset_nworld_532a08b2 532a08b load on device 'metal:0' took 17.06 ms  (cached)
+Module metalsim.sensors.contact bb11b98 load on device 'metal:0' took 20.92 ms  (cached)
+Module metalsim.learn.g1_velocity c9f3381 load on device 'metal:0' took 22.91 ms  (cached)
+Module metalsim.learn.warp_policy e25adaa load on device 'metal:0' took 18.87 ms  (cached)
+| Isaac it 500 | 2.72 (2.70-2.74) / 0.623 (0.62-0.63) | 2.91 (2.87-2.94) / 0.625 (0.62-0.63) | 2.93 (2.90-2.94) / 0.634 (0.63-0.64) | 3.17 (3.12-3.19) / 0.622 (0.62-0.63) | 3.37 (3.36-3.38) / 0.630 (0.62-0.64) |
+| Isaac it 1000 | 2.66 (2.64-2.67) / 0.625 (0.62-0.63) | 2.99 (2.94-3.06) / 0.633 (0.63-0.64) | 2.98 (2.89-3.05) / 0.643 (0.64-0.65) | 2.86 (2.86-2.87) / 0.623 (0.62-0.63) | 3.14 (3.03-3.22) / 0.632 (0.63-0.64) |
+| Isaac it 1499 | 2.90 (2.88-2.92) / 0.636 (0.64-0.64) | 3.23 (3.20-3.25) / 0.645 (0.64-0.65) | 3.23 (3.19-3.28) / 0.653 (0.65-0.66) | 2.92 (2.89-2.97) / 0.629 (0.63-0.63) | 3.24 (3.20-3.28) / 0.638 (0.63-0.64) |

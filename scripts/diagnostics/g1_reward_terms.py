@@ -11,6 +11,7 @@ return and episode length of the episodes that ended.
 
     python scripts/diagnostics/g1_reward_terms.py runs/policies/g1_flat_dt25_fixed_it300.pt --envs 1024 --steps 1000
     python scripts/diagnostics/g1_reward_terms.py runs/policies/g1_flat_newton_fixed_it300.pt --engine newton --newton_it 4 --newton_dt 0.00125
+    python scripts/diagnostics/g1_reward_terms.py <ckpt> --contact_tuning tau5_imp99_hardlimits   (metalsim.physics.contact_tuning preset)
 """
 import argparse, json
 import numpy as np, torch, warp as wp
@@ -30,6 +31,8 @@ def main():
     ap.add_argument("--engine", default="mjwarp", choices=("mjwarp", "newton")); ap.add_argument("--newton_it", type=int, default=4)
     ap.add_argument("--newton_dt", type=float, default=0.00125); ap.add_argument("--newton_limit_margin", default="0.15", help="'none' = USD limits")
     ap.add_argument("--newton_kw", default="", help="NewtonSim options, e.g. drive=solver,joint_coloring=True,relaxation=0.8")
+    ap.add_argument("--contact_tuning", default=None, help="metalsim.physics.contact_tuning preset applied to the G1 model (MuJoCo Warp)")
+    ap.add_argument("--out", default=None, help="write the JSON report here")
     a = ap.parse_args(); wp.config.quiet = True
     ck = torch.load(a.ckpt, map_location="mps", weights_only=False); sd = ck["net"]
     hidden = tuple(sd[k].shape[0] for k in sorted((k for k in sd if k.startswith("actor.") and k.endswith("weight")), key=lambda s: int(s.split(".")[1]))[:-1])
@@ -40,7 +43,10 @@ def main():
         for kv in filter(None, a.newton_kw.split(",")):
             k, v = kv.split("="); nkw[k] = v if k == "drive" else eval(v)
         ekw = dict(engine="newton", newton_iterations=a.newton_it, newton_dt=a.newton_dt, newton_kw=nkw)
-    task = G1VelocityTask(a.envs, terrain=a.terrain, seed=1, physics_dt=a.physics_dt, reward_cfg=a.reward_cfg, **ekw)
+    import contextlib
+    from metalsim.physics import contact_tuning
+    with (contact_tuning.g1_model_tuning(a.contact_tuning) if a.contact_tuning else contextlib.nullcontext()):
+        task = G1VelocityTask(a.envs, terrain=a.terrain, seed=1, physics_dt=a.physics_dt, reward_cfg=a.reward_cfg, **ekw)
     net = ActorCriticMLP(task.obs_dim, task.act_dim, hidden=hidden).to("mps"); net.load_state_dict(sd); net.eval()
     n = a.envs
     class _Pol: step_idx = wp.zeros(1, dtype=int, device=task.device)
@@ -69,10 +75,13 @@ def main():
         print("no episode ended; increase --steps"); return
     S = np.concatenate(done_sums); L = np.concatenate(done_lens); episode_s = 20.0
     per_term = S.mean(0) / episode_s
-    ret = S.sum(1); print(json.dumps({"ckpt": a.ckpt, "iterations": ck.get("iterations"), "episodes": int(len(L)), "mean_episode_length": float(L.mean()), "mean_return": float(ret.mean()),
+    ret = S.sum(1); rep = ({"ckpt": a.ckpt, "iterations": ck.get("iterations"), "episodes": int(len(L)), "mean_episode_length": float(L.mean()), "mean_return": float(ret.mean()),
                                       "terminations": term_counts, "Episode_Reward": {k: round(float(v), 4) for k, v in zip(TERM_NAMES, per_term)},
                                       "note": "per-second average over the episode like Isaac's RewardManager; joint_deviation_all = hip+arms+fingers+torso", "reward_cfg": task.reward_cfg,
-                                      "engine": task.engine, "physics_dt": task.physics_dt}, indent=1))
+                                      "engine": task.engine, "physics_dt": task.physics_dt, "contact_tuning": a.contact_tuning})
+    print(json.dumps(rep, indent=1))
+    if a.out:
+        json.dump(rep, open(a.out, "w"), indent=1)
 
 
 if __name__ == "__main__":
