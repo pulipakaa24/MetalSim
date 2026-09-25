@@ -192,7 +192,9 @@ class g1_model_tuning:
 
     def __enter__(self):
         import metalsim.learn.g1_velocity as g1
+        global _ACTIVE_OVERRIDE
         self._g1, self._orig = g1, g1.build_g1_model
+        self._prev_override, _ACTIVE_OVERRIDE = _ACTIVE_OVERRIDE, self.tuning
         tuning = self.tuning
 
         def tuned(*args, **kw):
@@ -202,8 +204,19 @@ class g1_model_tuning:
         return self
 
     def __exit__(self, *exc):
+        global _ACTIVE_OVERRIDE
         self._g1.build_g1_model = self._orig
+        _ACTIVE_OVERRIDE = self._prev_override
         return False
+
+
+_ACTIVE_OVERRIDE = None
+
+
+def active_override():
+    """The tuning of an enclosing ``g1_model_tuning`` context (G1VelocityTask then keeps it instead of its
+    ``contact_cfg``), or None."""
+    return _ACTIVE_OVERRIDE
 
 
 _HL = dict(limit_solref=(0.005, 1.0), limit_solimp=(0.99, 0.999, 0.001, 0.5, 2.0))
@@ -235,4 +248,7 @@ PRESETS.update({
 
 # Measured against Isaac's PhysX recordings (parity_out2, protocols A_hold / B_random / C_drop):
 # see scripts/diagnostics/bench_contact_tuning.py and runs/parity/tuning/report_*.
-PRESETS["recommended"] = PRESETS["tau5_imp99_hardlimits"]
+# 2026-09-25 decision (docs/DECISIONS.md): tau10_impact_hardlimits, the only preset reproducing Isaac's PhysX-trained
+# policy transfer within noise (3.3 cm), feet_slide 28 % closer, hard limits, 1.02x cost (runs/contact_research/
+# final_ranking_2026-09-25.md). G1VelocityTask applies it by default (contact_cfg="recommended").
+PRESETS["recommended"] = PRESETS["tau10_impact_hardlimits"]
