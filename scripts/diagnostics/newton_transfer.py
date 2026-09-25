@@ -38,6 +38,8 @@ def make(setting):
         elif x.startswith("relax="): kw["relaxation"] = float(x.split("=")[1])
         elif x == "nolim": kw["limit_margin"] = None
         elif x == "crb": kw["actuator_kw"] = {"joint_inertia": "crb"}
+        elif x == "rc": kw["recenter"] = True
+        elif x == "stiff": kw.setdefault("actuator_kw", {})["stiff_implicit"] = True
         elif x.startswith("rlin="): kw["relaxation"] = float(x.split("=")[1])
         elif x.startswith("rang="): kw["relaxation_angular"] = float(x.split("=")[1])
     return G1VelocityTask(N, terrain="flat", seed=0, engine="newton", newton_iterations=int(it), newton_dt=float(ms) * 1e-3, newton_kw=kw)
