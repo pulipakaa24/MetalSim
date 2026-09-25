@@ -443,7 +443,6 @@ class BoxWindow:
 
     def __init__(self, sim, hfield, device="metal:0", half_width=BOX_WINDOW_HALF):
         import mujoco
-        m = sim.model if hasattr(sim, "model") else None
         B = hfield["boxes"]; gen = hfield["generator"]; cfg = gen.cfg
         order = np.lexsort((B[:, 7], B[:, 6])); B = B[order]
         ci = (B[:, 6] * cfg.num_cols + B[:, 7]).astype(np.int64)
@@ -455,8 +454,7 @@ class BoxWindow:
         self.num_rows, self.num_cols, self.cell = cfg.num_rows, cfg.num_cols, float(cfg.size[0])
         self.x0c = -cfg.size[0] * cfg.num_rows * 0.5; self.y0c = -cfg.size[1] * cfg.num_cols * 0.5
         self.W = float(half_width)
-        model = sim._wmodel if hasattr(sim, "_wmodel") else m
-        self.slot0 = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_GEOM, "tslot0")
+        self.slot0 = mujoco.mj_name2id(sim.mj_model, mujoco.mjtObj.mjOBJ_GEOM, "tslot0")
         self.K = BOX_WINDOW_SLOTS
         self.overflow = wp.zeros(2, dtype=int, device=device)
         for f in self.FIELDS:
