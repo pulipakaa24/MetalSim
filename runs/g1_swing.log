@@ -1,0 +1,15 @@
+=== start Fri Sep 25 02:18:28 PDT 2026 power: Now drawing from 'AC Power'; mujoco_warp a8e6485 plane_convex: MJW_PLANE_CONVEX=legacy environment switch pins the previous heuristic (A/B comparisons)
+install: newton {'path': '/Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton', 'url': 'https://github.com/newton-physics/newton', 'commit': '45458023f24629c1feffb1f336594808f537db14', 'editable': False} | warp {'path': '/Users/aditya/robosim/upstream/warp-innate/warp', 'git_head': '786cdae', 'git_dirty': False}
+Isaac checkpoint 1000, command (0.5, 0, 0), 4 envs, steps 100-400; means over swing phases
+| setting | swings | swing duration [s] | peak clearance [m] | foot fwd velocity at touch-down [m/s] | step length vs stance foot [m] |
+|---|---|---|---|---|---|
+| mjwarp | 199 | 0.108 | 0.056 | 0.792 | 0.031 |
+| 4:0.625 | 177 | 0.123 | 0.082 | 0.531 | 0.065 |
+
+mean swing-leg joint trajectories over the normalized swing phase (0, 0.1, ..., 1) [rad]
+  mjwarp     hip pitch -0.528 -0.550 -0.569 -0.580 -0.585 -0.584 -0.579 -0.570 -0.556 -0.540 -0.524
+  mjwarp     knee      +1.155 +1.223 +1.283 +1.311 +1.318 +1.300 +1.262 +1.206 +1.138 +1.066 +0.996
+  4:0.625    hip pitch -0.557 -0.599 -0.634 -0.658 -0.672 -0.678 -0.675 -0.665 -0.646 -0.619 -0.591
+  4:0.625    knee      +1.235 +1.337 +1.418 +1.460 +1.464 +1.439 +1.383 +1.305 +1.204 +1.109 +1.025
+RMS difference vs mjwarp: 4:0.625: hip pitch 0.078 rad (range 0.061 vs 0.121), knee 0.109 rad (range 0.322 vs 0.439)
+=== end Fri Sep 25 02:18:46 PDT 2026
