@@ -78,7 +78,7 @@ one flag away):
 | 11 | mesh–flex normal snapped to the nearest mesh face within 5 mm | EPA penetration direction | face normal only within 0.01 rad of EPA (`MESH_FLEX_FACE_NORMAL`) | cloth over a mesh box edge: normals were 0.1–0.9 rad off |
 
 Fidelity now (CPU device, float32, against MuJoCo C float64 3.14.0 and main 3.14.1 built here; cloth 10×10 +
-cable 12, CG 100/50; `scratch/deformable/fidelity.py`; **measured**):
+cable 12, CG 100/50; `scripts/diagnostics/deformable/fidelity.py` (MuJoCo C main: a python built from mujoco main, `MUJOCO_MAIN_PYTHON`); **measured**):
 
 | scene (10×10 cloth, 12-vertex cable) | vs C 3.14 (`c314`): sets equal, one-step Δqvel median / max (m/s) | free-trajectory max vertex error @100 / @200 / @400 steps | C vs C′ @200 / @400 | vs C main (`main`): sets, Δqvel median / max |
 |---|---|---|---|---|
