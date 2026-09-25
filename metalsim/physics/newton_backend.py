@@ -84,7 +84,7 @@ def g1_builder(z0: float = 0.74, mesh_to_box: bool = True, collapse_fixed_joints
     b = newton.ModelBuilder()
     b.add_usd(G1_USD, floating=floating, xform=wp.transform((0, 0, z0), wp.quat_identity()),
               enable_self_collisions=False, load_visual_shapes=False, collapse_fixed_joints=collapse_fixed_joints)
-    b.gravity = -9.81                    # the USD authors gravityMagnitude 0 (PhysX default); the importer copies it
+    b.gravity = (0.0, 0.0, -9.81)                    # the USD authors gravityMagnitude 0 (PhysX default); the importer copies it
     if mesh_to_box:
         _meshes_to_boxes(b)
     nd = b.joint_dof_count
@@ -143,8 +143,8 @@ def add_armature_inertia(b: newton.ModelBuilder, armature: np.ndarray, isotropic
 
 def scene(n_envs: int, spacing: float = 2.5, **g1_kw) -> tuple[newton.ModelBuilder, dict]:
     rb, act = g1_builder(**g1_kw)
-    s = newton.ModelBuilder(); s.gravity = -9.81; s.add_ground_plane()
-    s.replicate(rb, n_envs, spacing=(spacing, spacing, 0.0)); s.gravity = -9.81
+    s = newton.ModelBuilder(); s.gravity = (0.0, 0.0, -9.81); s.add_ground_plane()
+    s.replicate(rb, n_envs, spacing=(spacing, spacing, 0.0)); s.gravity = (0.0, 0.0, -9.81)
     return s, {k: np.tile(v, n_envs) for k, v in act.items()}
 
 
@@ -280,7 +280,8 @@ class G1XPBD:
             self.solver = newton.solvers.SolverXPBD(m, iterations=self.iterations, **kw)
             self.s0, self.s1 = m.state(), m.state(); self.control = m.control()
             newton.eval_fk(m, m.joint_q, m.joint_qd, self.s0)
-            self.contacts = m.collide(self.s0)
+            self.pipeline = newton.CollisionPipeline(m, broad_phase="explicit")    # what Model.collide() builds
+            self.contacts = self.pipeline.contacts(); self.pipeline.collide(self.s0, self.contacts)
             self.joint_q = wp.clone(m.joint_q); self.joint_qd = wp.clone(m.joint_qd)
             self.act = act
             self.actuator = None
@@ -295,7 +296,7 @@ class G1XPBD:
         if self.actuator is not None:
             self.actuator.apply(self.s0, self.control)
         self.s0.clear_forces()
-        self.contacts = m.collide(self.s0, self.contacts)
+        self.pipeline.collide(self.s0, self.contacts)
         self.solver.step(self.s0, self.s1, self.control, self.contacts, self.dt)
         self.s0, self.s1 = self.s1, self.s0
 
@@ -437,7 +438,8 @@ class NewtonSim:
             self.solver = newton.solvers.SolverXPBD(m, iterations=iterations, joint_linear_relaxation=0.4, joint_angular_relaxation=0.4)
             self.s0, self.s1 = m.state(), m.state(); self.control = m.control()
             newton.eval_fk(m, m.joint_q, m.joint_qd, self.s0)
-            self.contacts = m.collide(self.s0)
+            self.pipeline = newton.CollisionPipeline(m, broad_phase="explicit")    # what Model.collide() builds
+            self.contacts = self.pipeline.contacts(); self.pipeline.collide(self.s0, self.contacts)
             assert m.articulation_count == n
             self.nb, self.nc, self.nd = m.body_count // n, m.joint_coord_count // n, m.joint_dof_count // n
             # per-env name maps: MuJoCo actuator i (joint i + 1) -> Newton coordinate / DOF offset in an env
@@ -483,7 +485,7 @@ class NewtonSim:
                 if k == self.substeps - 1:
                     wp.launch(_copy_joint_qd, dim=m.joint_dof_count, inputs=[self.actuator.joint_qd, self.joint_qd_prev])
                 self.s0.clear_forces()
-                self.contacts = m.collide(self.s0, self.contacts)
+                self.pipeline.collide(self.s0, self.contacts)
                 self.solver.step(self.s0, self.s1, self.control, self.contacts, self.dt_phys)
                 self.s0, self.s1 = self.s1, self.s0
             self.solver.update_contacts(self.contacts)
