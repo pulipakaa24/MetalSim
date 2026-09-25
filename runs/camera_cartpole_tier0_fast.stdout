@@ -1,0 +1,172 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth 0cc2fb1 load on device 'metal:0' took 27.48 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_fb20836b fb20836 load on device 'metal:0' took 19.42 ms  (cached)
+Module mujoco_warp._src.constraint 6b6848e load on device 'metal:0' took 16.78 ms  (cached)
+Module _friction_dof__locals__kernel_646d9a17 646d9a1 load on device 'metal:0' took 16.77 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_2af29aef 2af29ae load on device 'metal:0' took 16.86 ms  (cached)
+Module _efc_contact_init__locals__kernel_41c302bb 41c302b load on device 'metal:0' took 16.35 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_1a4b2876 66f5008 load on device 'metal:0' took 16.85 ms  (cached)
+Module _efc_contact_update__locals__kernel_63b3d93a 63b3d93 load on device 'metal:0' took 17.07 ms  (cached)
+Module mujoco_warp._src.forward c9fb78c load on device 'metal:0' took 22.62 ms  (cached)
+Module mujoco_warp._src.passive 01837ed load on device 'metal:0' took 21.84 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_15bb4c69 15bb4c6 load on device 'metal:0' took 16.45 ms  (cached)
+Module mujoco_warp._src.forward d62b5a2 load on device 'metal:0' took 23.29 ms  (cached)
+Module _qfrc_smooth__locals__kernel_879019a1 879019a load on device 'metal:0' took 16.97 ms  (cached)
+Module mujoco_warp._src.support 8f02f5a load on device 'metal:0' took 17.08 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_d33c2200 4fce1ed load on device 'metal:0' took 18.78 ms  (cached)
+Module _solve_init_dof__locals__kernel_d2b89306 d2b8930 load on device 'metal:0' took 16.57 ms  (cached)
+Module mujoco_warp._src.solver 4615040 load on device 'metal:0' took 17.77 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_81c263f4 81c263f load on device 'metal:0' took 332.69 ms  (cached)
+Module mul_m_kernel__locals___mul_m_1dc6ad98 1dc6ad9 load on device 'metal:0' took 17.01 ms  (cached)
+Module _update_constraint_efc__locals__kernel_19ee8eff 19ee8ef load on device 'metal:0' took 17.02 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_f4d269f2 f4d269f load on device 'metal:0' took 16.62 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_1b7ae334 1b7ae33 load on device 'metal:0' took 16.55 ms  (cached)
+Module _update_gradient_grad__locals__kernel_d8d45da1 d8d45da load on device 'metal:0' took 16.54 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_1244c383 1c90d0e load on device 'metal:0' took 378.58 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_c98ce076 a35d259 load on device 'metal:0' took 368.31 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_a8538597 583483d load on device 'metal:0' took 469.37 ms  (cached)
+Module _update_constraint_efc__locals__kernel_2d3da595 2d3da59 load on device 'metal:0' took 17.48 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_747e54a4 747e54a load on device 'metal:0' took 16.51 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_5bb67707 5bb6770 load on device 'metal:0' took 16.37 ms  (cached)
+Module _update_gradient_grad__locals__kernel_c6377c8b c6377c8 load on device 'metal:0' took 16.34 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_2fe4f227 85ed816 load on device 'metal:0' took 365.51 ms  (cached)
+Module _solve_done__locals__kernel_e377d69b e377d69 load on device 'metal:0' took 16.40 ms  (cached)
+Module mujoco_warp._src.derivative 1793cac load on device 'metal:0' took 19.27 ms  (cached)
+Module _next_time_builder__locals___next_time_77f65a33 77f65a3 load on device 'metal:0' took 16.48 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_7fdbdb61 7fdbdb6 load on device 'metal:0' took 16.83 ms  (cached)
+Module reset_data__locals__reset_M_232d5062 232d506 load on device 'metal:0' took 16.40 ms  (cached)
+Module reset_data__locals__reset_mocap_29da3eb8 29da3eb load on device 'metal:0' took 16.41 ms  (cached)
+Module reset_data__locals__reset_contact_818d93f9 818d93f load on device 'metal:0' took 16.74 ms  (cached)
+Module reset_data__locals__reset_sleep_ae682850 ae68285 load on device 'metal:0' took 16.40 ms  (cached)
+Module reset_data__locals__reset_nworld_532a08b2 532a08b load on device 'metal:0' took 16.56 ms  (cached)
+Cartpole-RGB camera PPO: 1024 envs, tier 0 (spp 1, bounces 2), image-only 100x100, Isaac skrl config
+it    1 steps     65536 sps  10,131 | ret    7.05 len  25.4 succ  0.00 (n=100) | pg -0.008 vf 0.837 kl 0.0101 lr 3.9e-04 | env  0.5%  policy 29.3%  update 70.2%
+it    2 steps    131072 sps  10,851 | ret   13.69 len  33.6 succ  0.00 (n=100) | pg -0.012 vf 0.765 kl 0.0096 lr 1.7e-04 | env  0.5%  policy 31.0%  update 68.4%
+it    3 steps    196608 sps  11,104 | ret   18.39 len  40.0 succ  0.00 (n=100) | pg -0.008 vf 0.775 kl 0.0095 lr 5.9e-04 | env  0.5%  policy 31.8%  update 67.7%
+it    4 steps    262144 sps  11,232 | ret   27.02 len  50.2 succ  0.00 (n=100) | pg -0.005 vf 0.769 kl 0.0097 lr 1.3e-03 | env  0.5%  policy 32.1%  update 67.3%
+it    5 steps    327680 sps  11,311 | ret   29.75 len  53.7 succ  0.00 (n=100) | pg -0.005 vf 0.752 kl 0.0099 lr 5.9e-04 | env  0.5%  policy 32.3%  update 67.1%
+it    6 steps    393216 sps  11,366 | ret   31.81 len  54.5 succ  0.00 (n=100) | pg -0.002 vf 0.708 kl 0.0087 lr 6.7e-03 | env  0.5%  policy 32.5%  update 67.0%
+it    7 steps    458752 sps  11,403 | ret   39.93 len  63.9 succ  0.00 (n=100) | pg -0.001 vf 0.663 kl 0.0098 lr 3.0e-03 | env  0.5%  policy 32.6%  update 66.9%
+it    8 steps    524288 sps  11,431 | ret   37.55 len  62.2 succ  0.00 (n=100) | pg -0.002 vf 0.612 kl 0.0090 lr 1.3e-03 | env  0.5%  policy 32.7%  update 66.8%
+it    9 steps    589824 sps  11,452 | ret   44.64 len  71.7 succ  0.00 (n=100) | pg -0.001 vf 0.567 kl 0.0089 lr 3.0e-03 | env  0.5%  policy 32.7%  update 66.7%
+it   10 steps    655360 sps  11,467 | ret   46.02 len  71.7 succ  0.00 (n=100) | pg -0.000 vf 0.535 kl 0.0094 lr 3.0e-03 | env  0.5%  policy 32.8%  update 66.7%
+it   11 steps    720896 sps  11,480 | ret   46.27 len  73.2 succ  0.00 (n=100) | pg -0.001 vf 0.510 kl 0.0089 lr 4.4e-03 | env  0.5%  policy 32.8%  update 66.6%
+it   12 steps    786432 sps  11,490 | ret   48.69 len  77.3 succ  0.00 (n=100) | pg 0.000 vf 0.498 kl 0.0097 lr 2.0e-03 | env  0.5%  policy 32.8%  update 66.6%
+it   13 steps    851968 sps  11,499 | ret   58.46 len  86.4 succ  0.00 (n=100) | pg -0.001 vf 0.465 kl 0.0092 lr 3.0e-03 | env  0.5%  policy 32.9%  update 66.6%
+it   14 steps    917504 sps  11,506 | ret   58.69 len  86.0 succ  0.00 (n=100) | pg -0.001 vf 0.467 kl 0.0093 lr 4.4e-03 | env  0.5%  policy 32.9%  update 66.6%
+it   15 steps    983040 sps  11,513 | ret   53.38 len  81.5 succ  0.00 (n=100) | pg 0.000 vf 0.448 kl 0.0100 lr 3.0e-03 | env  0.5%  policy 32.9%  update 66.5%
+it   16 steps   1048576 sps  11,512 | ret   62.59 len  92.8 succ  0.00 (n=100) | pg -0.001 vf 0.457 kl 0.0092 lr 1.3e-03 | env  0.5%  policy 32.9%  update 66.5%
+it   17 steps   1114112 sps  11,495 | ret   57.64 len  86.1 succ  0.00 (n=100) | pg -0.000 vf 0.467 kl 0.0091 lr 2.0e-03 | env  0.5%  policy 32.9%  update 66.6%
+it   18 steps   1179648 sps  11,467 | ret   61.20 len  91.5 succ  0.00 (n=100) | pg -0.001 vf 0.457 kl 0.0092 lr 2.0e-03 | env  0.5%  policy 32.8%  update 66.6%
+it   19 steps   1245184 sps  11,430 | ret   67.15 len  99.0 succ  0.00 (n=100) | pg -0.001 vf 0.435 kl 0.0096 lr 2.0e-03 | env  0.5%  policy 32.8%  update 66.7%
+it   20 steps   1310720 sps  11,387 | ret   71.61 len 103.9 succ  0.00 (n=100) | pg -0.001 vf 0.429 kl 0.0098 lr 3.0e-03 | env  0.5%  policy 32.7%  update 66.7%
+it   21 steps   1376256 sps  11,335 | ret   67.47 len  98.5 succ  0.01 (n=100) | pg -0.001 vf 0.405 kl 0.0106 lr 2.0e-03 | env  0.5%  policy 32.7%  update 66.8%
+it   22 steps   1441792 sps  11,282 | ret   68.31 len 100.5 succ  0.00 (n=100) | pg -0.002 vf 0.408 kl 0.0102 lr 3.0e-03 | env  0.5%  policy 32.6%  update 66.9%
+it   23 steps   1507328 sps  11,227 | ret   67.48 len 100.9 succ  0.00 (n=100) | pg -0.001 vf 0.405 kl 0.0093 lr 2.0e-03 | env  0.5%  policy 32.5%  update 67.0%
+it   24 steps   1572864 sps  11,170 | ret   76.22 len 112.3 succ  0.00 (n=100) | pg -0.001 vf 0.416 kl 0.0098 lr 1.3e-03 | env  0.5%  policy 32.4%  update 67.1%
+it   25 steps   1638400 sps  11,119 | ret   80.11 len 116.0 succ  0.01 (n=100) | pg -0.000 vf 0.424 kl 0.0100 lr 1.3e-03 | env  0.5%  policy 32.4%  update 67.1%
+it   26 steps   1703936 sps  11,071 | ret   74.55 len 109.0 succ  0.00 (n=100) | pg -0.001 vf 0.410 kl 0.0089 lr 2.0e-03 | env  0.5%  policy 32.3%  update 67.2%
+it   27 steps   1769472 sps  11,033 | ret   79.08 len 115.6 succ  0.01 (n=100) | pg -0.001 vf 0.392 kl 0.0105 lr 1.3e-03 | env  0.5%  policy 32.2%  update 67.3%
+it   28 steps   1835008 sps  11,001 | ret   77.49 len 113.1 succ  0.00 (n=100) | pg -0.003 vf 0.401 kl 0.0096 lr 1.3e-03 | env  0.5%  policy 32.2%  update 67.3%
+it   29 steps   1900544 sps  10,977 | ret   76.91 len 113.7 succ  0.01 (n=100) | pg -0.002 vf 0.396 kl 0.0096 lr 8.8e-04 | env  0.5%  policy 32.2%  update 67.3%
+it   30 steps   1966080 sps  10,959 | ret   72.95 len 109.8 succ  0.01 (n=100) | pg -0.001 vf 0.386 kl 0.0100 lr 2.0e-03 | env  0.5%  policy 32.1%  update 67.3%
+it   31 steps   2031616 sps  10,947 | ret   70.16 len 108.0 succ  0.00 (n=100) | pg -0.003 vf 0.372 kl 0.0092 lr 5.9e-04 | env  0.5%  policy 32.1%  update 67.4%
+it   32 steps   2097152 sps  10,940 | ret   77.42 len 116.7 succ  0.01 (n=100) | pg -0.002 vf 0.364 kl 0.0103 lr 8.8e-04 | env  0.5%  policy 32.1%  update 67.4%
+it   33 steps   2162688 sps  10,938 | ret   85.07 len 126.0 succ  0.01 (n=100) | pg -0.001 vf 0.374 kl 0.0098 lr 3.0e-03 | env  0.5%  policy 32.1%  update 67.4%
+it   34 steps   2228224 sps  10,939 | ret   80.47 len 117.4 succ  0.01 (n=100) | pg -0.001 vf 0.398 kl 0.0100 lr 2.0e-03 | env  0.5%  policy 32.1%  update 67.3%
+it   35 steps   2293760 sps  10,942 | ret   86.86 len 126.2 succ  0.01 (n=100) | pg -0.003 vf 0.390 kl 0.0088 lr 1.3e-03 | env  0.5%  policy 32.2%  update 67.3%
+it   36 steps   2359296 sps  10,947 | ret   88.74 len 128.9 succ  0.01 (n=100) | pg -0.002 vf 0.369 kl 0.0099 lr 8.8e-04 | env  0.5%  policy 32.2%  update 67.3%
+it   37 steps   2424832 sps  10,954 | ret   87.09 len 128.7 succ  0.01 (n=100) | pg -0.002 vf 0.372 kl 0.0099 lr 1.3e-03 | env  0.5%  policy 32.2%  update 67.3%
+it   38 steps   2490368 sps  10,964 | ret   72.43 len 109.5 succ  0.00 (n=100) | pg -0.001 vf 0.368 kl 0.0100 lr 3.0e-03 | env  0.5%  policy 32.2%  update 67.3%
+it   39 steps   2555904 sps  10,973 | ret   77.34 len 116.6 succ  0.00 (n=100) | pg -0.001 vf 0.349 kl 0.0107 lr 3.9e-04 | env  0.5%  policy 32.2%  update 67.3%
+it   40 steps   2621440 sps  10,983 | ret   76.24 len 115.8 succ  0.00 (n=100) | pg -0.002 vf 0.359 kl 0.0094 lr 5.9e-04 | env  0.5%  policy 32.3%  update 67.2%
+it   41 steps   2686976 sps  10,993 | ret   79.28 len 119.6 succ  0.00 (n=100) | pg -0.003 vf 0.356 kl 0.0101 lr 3.9e-04 | env  0.5%  policy 32.3%  update 67.2%
+it   42 steps   2752512 sps  11,004 | ret   85.04 len 127.1 succ  0.01 (n=100) | pg -0.003 vf 0.361 kl 0.0093 lr 1.3e-03 | env  0.5%  policy 32.3%  update 67.2%
+it   43 steps   2818048 sps  11,015 | ret   94.63 len 137.4 succ  0.01 (n=100) | pg -0.003 vf 0.367 kl 0.0091 lr 8.8e-04 | env  0.5%  policy 32.3%  update 67.2%
+it   44 steps   2883584 sps  11,027 | ret   87.82 len 130.7 succ  0.01 (n=100) | pg -0.003 vf 0.360 kl 0.0094 lr 1.3e-03 | env  0.5%  policy 32.3%  update 67.2%
+it   45 steps   2949120 sps  11,040 | ret   85.47 len 127.0 succ  0.01 (n=100) | pg -0.004 vf 0.360 kl 0.0095 lr 5.9e-04 | env  0.5%  policy 32.4%  update 67.1%
+it   46 steps   3014656 sps  11,052 | ret   86.92 len 129.2 succ  0.00 (n=100) | pg -0.003 vf 0.325 kl 0.0098 lr 5.9e-04 | env  0.5%  policy 32.4%  update 67.1%
+it   47 steps   3080192 sps  11,064 | ret   80.22 len 124.2 succ  0.00 (n=100) | pg -0.003 vf 0.350 kl 0.0097 lr 8.8e-04 | env  0.5%  policy 32.4%  update 67.1%
+it   48 steps   3145728 sps  11,076 | ret   77.99 len 119.7 succ  0.00 (n=100) | pg -0.003 vf 0.323 kl 0.0092 lr 8.8e-04 | env  0.5%  policy 32.4%  update 67.1%
+it   49 steps   3211264 sps  11,087 | ret   82.07 len 123.8 succ  0.02 (n=100) | pg -0.003 vf 0.340 kl 0.0092 lr 8.8e-04 | env  0.5%  policy 32.4%  update 67.1%
+it   50 steps   3276800 sps  11,098 | ret   83.15 len 125.8 succ  0.00 (n=100) | pg -0.003 vf 0.329 kl 0.0095 lr 8.8e-04 | env  0.5%  policy 32.4%  update 67.0%
+it   51 steps   3342336 sps  11,108 | ret   90.74 len 135.1 succ  0.01 (n=100) | pg -0.005 vf 0.354 kl 0.0091 lr 8.8e-04 | env  0.5%  policy 32.5%  update 67.0%
+it   52 steps   3407872 sps  11,118 | ret   81.07 len 123.8 succ  0.00 (n=100) | pg -0.002 vf 0.335 kl 0.0094 lr 5.9e-04 | env  0.5%  policy 32.5%  update 67.0%
+it   53 steps   3473408 sps  11,128 | ret   82.22 len 125.8 succ  0.01 (n=100) | pg -0.005 vf 0.323 kl 0.0096 lr 5.9e-04 | env  0.5%  policy 32.5%  update 67.0%
+it   54 steps   3538944 sps  11,137 | ret   85.79 len 130.4 succ  0.00 (n=100) | pg -0.003 vf 0.338 kl 0.0093 lr 5.9e-04 | env  0.5%  policy 32.5%  update 67.0%
+it   55 steps   3604480 sps  11,146 | ret   89.96 len 133.7 succ  0.00 (n=100) | pg -0.005 vf 0.342 kl 0.0091 lr 8.8e-04 | env  0.5%  policy 32.5%  update 67.0%
+it   56 steps   3670016 sps  11,155 | ret   83.16 len 129.8 succ  0.00 (n=100) | pg -0.005 vf 0.334 kl 0.0092 lr 8.8e-04 | env  0.5%  policy 32.5%  update 67.0%
+it   57 steps   3735552 sps  11,163 | ret   85.71 len 129.4 succ  0.00 (n=100) | pg -0.003 vf 0.328 kl 0.0099 lr 5.9e-04 | env  0.5%  policy 32.5%  update 66.9%
+it   58 steps   3801088 sps  11,171 | ret   85.03 len 129.9 succ  0.01 (n=100) | pg -0.005 vf 0.335 kl 0.0097 lr 3.9e-04 | env  0.5%  policy 32.6%  update 66.9%
+it   59 steps   3866624 sps  11,176 | ret   91.40 len 137.6 succ  0.00 (n=100) | pg -0.003 vf 0.336 kl 0.0089 lr 3.9e-04 | env  0.5%  policy 32.6%  update 66.9%
+it   60 steps   3932160 sps  11,183 | ret   86.24 len 131.8 succ  0.01 (n=100) | pg -0.005 vf 0.344 kl 0.0092 lr 8.8e-04 | env  0.5%  policy 32.6%  update 66.9%
+it   61 steps   3997696 sps  11,190 | ret   87.32 len 131.7 succ  0.00 (n=100) | pg -0.001 vf 0.340 kl 0.0091 lr 8.8e-04 | env  0.5%  policy 32.6%  update 66.9%
+it   62 steps   4063232 sps  11,198 | ret   88.25 len 134.1 succ  0.02 (n=100) | pg -0.004 vf 0.347 kl 0.0099 lr 3.9e-04 | env  0.5%  policy 32.6%  update 66.9%
+it   63 steps   4128768 sps  11,205 | ret   90.98 len 135.5 succ  0.01 (n=100) | pg -0.005 vf 0.335 kl 0.0095 lr 5.9e-04 | env  0.5%  policy 32.6%  update 66.9%
+it   64 steps   4194304 sps  11,211 | ret   88.42 len 133.8 succ  0.01 (n=100) | pg -0.005 vf 0.343 kl 0.0085 lr 5.9e-04 | env  0.5%  policy 32.6%  update 66.9%
+it   65 steps   4259840 sps  11,218 | ret   91.98 len 137.1 succ  0.01 (n=100) | pg -0.003 vf 0.333 kl 0.0094 lr 8.8e-04 | env  0.5%  policy 32.6%  update 66.9%
+it   66 steps   4325376 sps  11,224 | ret   90.83 len 134.1 succ  0.02 (n=100) | pg -0.004 vf 0.339 kl 0.0098 lr 3.9e-04 | env  0.5%  policy 32.6%  update 66.8%
+it   67 steps   4390912 sps  11,230 | ret   94.34 len 141.4 succ  0.00 (n=100) | pg -0.003 vf 0.320 kl 0.0099 lr 3.9e-04 | env  0.5%  policy 32.6%  update 66.8%
+it   68 steps   4456448 sps  11,236 | ret   88.38 len 135.2 succ  0.00 (n=100) | pg -0.003 vf 0.325 kl 0.0094 lr 8.8e-04 | env  0.5%  policy 32.7%  update 66.8%
+it   69 steps   4521984 sps  11,242 | ret   85.39 len 130.8 succ  0.00 (n=100) | pg -0.003 vf 0.333 kl 0.0102 lr 8.8e-04 | env  0.5%  policy 32.7%  update 66.8%
+it   70 steps   4587520 sps  11,248 | ret   86.34 len 130.7 succ  0.00 (n=100) | pg -0.004 vf 0.338 kl 0.0093 lr 5.9e-04 | env  0.5%  policy 32.7%  update 66.8%
+it   71 steps   4653056 sps  11,251 | ret   83.34 len 129.3 succ  0.00 (n=100) | pg -0.005 vf 0.345 kl 0.0106 lr 5.9e-04 | env  0.5%  policy 32.7%  update 66.8%
+it   72 steps   4718592 sps  11,256 | ret   89.85 len 135.4 succ  0.01 (n=100) | pg -0.004 vf 0.320 kl 0.0102 lr 5.9e-04 | env  0.5%  policy 32.7%  update 66.8%
+it   73 steps   4784128 sps  11,262 | ret   90.21 len 137.9 succ  0.00 (n=100) | pg -0.004 vf 0.335 kl 0.0093 lr 5.9e-04 | env  0.5%  policy 32.7%  update 66.8%
+it   74 steps   4849664 sps  11,267 | ret   91.55 len 140.7 succ  0.01 (n=100) | pg -0.005 vf 0.325 kl 0.0090 lr 5.9e-04 | env  0.5%  policy 32.7%  update 66.8%
+it   75 steps   4915200 sps  11,272 | ret   89.44 len 136.0 succ  0.01 (n=100) | pg -0.003 vf 0.330 kl 0.0095 lr 5.9e-04 | env  0.5%  policy 32.7%  update 66.8%
+it   76 steps   4980736 sps  11,277 | ret   85.31 len 131.9 succ  0.00 (n=100) | pg -0.005 vf 0.345 kl 0.0096 lr 5.9e-04 | env  0.5%  policy 32.7%  update 66.8%
+it   77 steps   5046272 sps  11,281 | ret   89.29 len 133.9 succ  0.00 (n=100) | pg -0.005 vf 0.342 kl 0.0100 lr 5.9e-04 | env  0.5%  policy 32.7%  update 66.8%
+it   78 steps   5111808 sps  11,286 | ret   97.88 len 146.0 succ  0.02 (n=100) | pg -0.005 vf 0.331 kl 0.0092 lr 5.9e-04 | env  0.5%  policy 32.7%  update 66.8%
+it   79 steps   5177344 sps  11,289 | ret   91.24 len 139.5 succ  0.00 (n=100) | pg -0.005 vf 0.347 kl 0.0097 lr 1.3e-03 | env  0.5%  policy 32.7%  update 66.8%
+it   80 steps   5242880 sps  11,294 | ret   86.24 len 131.6 succ  0.02 (n=100) | pg -0.003 vf 0.340 kl 0.0105 lr 3.9e-04 | env  0.5%  policy 32.7%  update 66.7%
+it   81 steps   5308416 sps  11,298 | ret   84.12 len 129.2 succ  0.00 (n=100) | pg -0.005 vf 0.343 kl 0.0103 lr 5.9e-04 | env  0.5%  policy 32.7%  update 66.7%
+it   82 steps   5373952 sps  11,302 | ret   90.95 len 137.3 succ  0.01 (n=100) | pg -0.005 vf 0.336 kl 0.0105 lr 5.9e-04 | env  0.5%  policy 32.8%  update 66.7%
+it   83 steps   5439488 sps  11,306 | ret   89.85 len 136.3 succ  0.01 (n=100) | pg -0.003 vf 0.348 kl 0.0097 lr 5.9e-04 | env  0.5%  policy 32.8%  update 66.7%
+it   84 steps   5505024 sps  11,310 | ret   73.40 len 116.3 succ  0.00 (n=100) | pg -0.003 vf 0.342 kl 0.0090 lr 8.8e-04 | env  0.5%  policy 32.8%  update 66.7%
+it   85 steps   5570560 sps  11,314 | ret   87.00 len 133.2 succ  0.01 (n=100) | pg -0.002 vf 0.340 kl 0.0096 lr 5.9e-04 | env  0.5%  policy 32.8%  update 66.7%
+it   86 steps   5636096 sps  11,318 | ret  100.24 len 148.7 succ  0.01 (n=100) | pg -0.005 vf 0.328 kl 0.0099 lr 5.9e-04 | env  0.5%  policy 32.8%  update 66.7%
+it   87 steps   5701632 sps  11,321 | ret   84.40 len 130.7 succ  0.00 (n=100) | pg -0.003 vf 0.340 kl 0.0092 lr 5.9e-04 | env  0.5%  policy 32.8%  update 66.7%
+it   88 steps   5767168 sps  11,325 | ret   94.20 len 141.8 succ  0.00 (n=100) | pg -0.005 vf 0.326 kl 0.0097 lr 5.9e-04 | env  0.5%  policy 32.8%  update 66.7%
+it   89 steps   5832704 sps  11,328 | ret   93.53 len 140.7 succ  0.00 (n=100) | pg -0.005 vf 0.342 kl 0.0092 lr 5.9e-04 | env  0.5%  policy 32.8%  update 66.7%
+it   90 steps   5898240 sps  11,332 | ret   87.59 len 134.0 succ  0.00 (n=100) | pg -0.005 vf 0.322 kl 0.0093 lr 5.9e-04 | env  0.5%  policy 32.8%  update 66.7%
+it   91 steps   5963776 sps  11,335 | ret   88.13 len 136.0 succ  0.00 (n=100) | pg -0.005 vf 0.347 kl 0.0105 lr 3.9e-04 | env  0.5%  policy 32.8%  update 66.7%
+it   92 steps   6029312 sps  11,338 | ret   86.59 len 132.9 succ  0.00 (n=100) | pg -0.006 vf 0.330 kl 0.0095 lr 5.9e-04 | env  0.5%  policy 32.8%  update 66.7%
+it   93 steps   6094848 sps  11,342 | ret   90.84 len 135.4 succ  0.00 (n=100) | pg -0.003 vf 0.332 kl 0.0091 lr 3.9e-04 | env  0.5%  policy 32.8%  update 66.7%
+it   94 steps   6160384 sps  11,345 | ret   89.18 len 136.6 succ  0.00 (n=100) | pg -0.005 vf 0.336 kl 0.0099 lr 1.7e-04 | env  0.5%  policy 32.8%  update 66.7%
+it   95 steps   6225920 sps  11,348 | ret   91.79 len 140.1 succ  0.00 (n=100) | pg -0.005 vf 0.342 kl 0.0087 lr 1.3e-03 | env  0.5%  policy 32.8%  update 66.7%
+it   96 steps   6291456 sps  11,351 | ret   88.06 len 136.1 succ  0.00 (n=100) | pg -0.005 vf 0.348 kl 0.0103 lr 2.6e-04 | env  0.5%  policy 32.8%  update 66.7%
+it   97 steps   6356992 sps  11,354 | ret   88.32 len 136.2 succ  0.00 (n=100) | pg -0.006 vf 0.340 kl 0.0094 lr 3.9e-04 | env  0.5%  policy 32.8%  update 66.6%
+it   98 steps   6422528 sps  11,357 | ret   86.31 len 131.4 succ  0.00 (n=100) | pg -0.005 vf 0.329 kl 0.0096 lr 5.9e-04 | env  0.5%  policy 32.8%  update 66.6%
+it   99 steps   6488064 sps  11,360 | ret   91.05 len 138.2 succ  0.00 (n=100) | pg -0.005 vf 0.344 kl 0.0091 lr 5.9e-04 | env  0.5%  policy 32.8%  update 66.6%
+it  100 steps   6553600 sps  11,363 | ret   96.83 len 145.6 succ  0.00 (n=100) | pg -0.005 vf 0.337 kl 0.0090 lr 5.9e-04 | env  0.5%  policy 32.8%  update 66.6%
+it  101 steps   6619136 sps  11,366 | ret   87.67 len 134.2 succ  0.01 (n=100) | pg -0.005 vf 0.346 kl 0.0106 lr 3.9e-04 | env  0.5%  policy 32.8%  update 66.6%
+it  102 steps   6684672 sps  11,369 | ret   87.99 len 135.5 succ  0.00 (n=100) | pg -0.003 vf 0.342 kl 0.0091 lr 8.8e-04 | env  0.5%  policy 32.9%  update 66.6%
+it  103 steps   6750208 sps  11,371 | ret   88.16 len 135.3 succ  0.00 (n=100) | pg -0.005 vf 0.345 kl 0.0098 lr 3.9e-04 | env  0.5%  policy 32.9%  update 66.6%
+it  104 steps   6815744 sps  11,374 | ret   88.90 len 136.6 succ  0.01 (n=100) | pg -0.004 vf 0.346 kl 0.0093 lr 5.9e-04 | env  0.5%  policy 32.9%  update 66.6%
+it  105 steps   6881280 sps  11,377 | ret   90.07 len 138.0 succ  0.00 (n=100) | pg -0.005 vf 0.348 kl 0.0097 lr 2.6e-04 | env  0.5%  policy 32.9%  update 66.6%
+it  106 steps   6946816 sps  11,379 | ret   89.49 len 137.6 succ  0.01 (n=100) | pg -0.005 vf 0.327 kl 0.0109 lr 5.1e-05 | env  0.5%  policy 32.9%  update 66.6%
+it  107 steps   7012352 sps  11,382 | ret   93.12 len 141.7 succ  0.01 (n=100) | pg -0.006 vf 0.335 kl 0.0089 lr 3.9e-04 | env  0.5%  policy 32.9%  update 66.6%
+it  108 steps   7077888 sps  11,384 | ret   85.34 len 134.8 succ  0.00 (n=100) | pg -0.006 vf 0.327 kl 0.0093 lr 8.8e-04 | env  0.5%  policy 32.9%  update 66.6%
+it  109 steps   7143424 sps  11,386 | ret   86.92 len 132.2 succ  0.00 (n=100) | pg -0.005 vf 0.338 kl 0.0098 lr 3.9e-04 | env  0.5%  policy 32.9%  update 66.6%
+it  110 steps   7208960 sps  11,389 | ret   88.89 len 136.6 succ  0.00 (n=100) | pg -0.005 vf 0.347 kl 0.0095 lr 3.9e-04 | env  0.5%  policy 32.9%  update 66.6%
+it  111 steps   7274496 sps  11,391 | ret   91.30 len 138.4 succ  0.00 (n=100) | pg -0.007 vf 0.336 kl 0.0101 lr 3.9e-04 | env  0.5%  policy 32.9%  update 66.6%
+it  112 steps   7340032 sps  11,393 | ret   90.20 len 139.3 succ  0.00 (n=100) | pg 0.001 vf 0.341 kl 0.0127 lr 1.0e-06 | env  0.5%  policy 32.9%  update 66.6%
+it  113 steps   7405568 sps  11,396 | ret   94.11 len 142.4 succ  0.00 (n=100) | pg -0.006 vf 0.325 kl 0.0076 lr 4.4e-04 | env  0.5%  policy 32.9%  update 66.6%
+it  114 steps   7471104 sps  11,398 | ret   86.51 len 134.4 succ  0.00 (n=100) | pg 0.003 vf 0.341 kl 0.0148 lr 1.0e-06 | env  0.5%  policy 32.9%  update 66.6%
+it  115 steps   7536640 sps  11,400 | ret   91.40 len 139.5 succ  0.01 (n=100) | pg -0.004 vf 0.334 kl 0.0107 lr 1.0e-06 | env  0.5%  policy 32.9%  update 66.6%
+it  116 steps   7602176 sps  11,402 | ret   90.27 len 138.0 succ  0.00 (n=100) | pg -0.005 vf 0.342 kl 0.0071 lr 6.6e-04 | env  0.5%  policy 32.9%  update 66.6%
+it  117 steps   7667712 sps  11,404 | ret   87.97 len 135.1 succ  0.00 (n=100) | pg -0.006 vf 0.320 kl 0.0099 lr 4.4e-04 | env  0.5%  policy 32.9%  update 66.6%
+it  118 steps   7733248 sps  11,406 | ret   85.93 len 133.2 succ  0.01 (n=100) | pg -0.005 vf 0.343 kl 0.0100 lr 2.9e-04 | env  0.5%  policy 32.9%  update 66.6%
+it  119 steps   7798784 sps  11,409 | ret   91.23 len 137.1 succ  0.00 (n=100) | pg -0.003 vf 0.338 kl 0.0092 lr 2.9e-04 | env  0.5%  policy 32.9%  update 66.6%
+it  120 steps   7864320 sps  11,410 | ret   87.31 len 134.3 succ  0.00 (n=100) | pg -0.005 vf 0.338 kl 0.0089 lr 6.6e-04 | env  0.5%  policy 32.9%  update 66.6%
+it  121 steps   7929856 sps  11,413 | ret   88.34 len 136.3 succ  0.00 (n=100) | pg -0.005 vf 0.349 kl 0.0107 lr 2.9e-04 | env  0.5%  policy 32.9%  update 66.6%
+it  122 steps   7995392 sps  11,414 | ret   93.19 len 141.8 succ  0.00 (n=100) | pg 0.003 vf 0.340 kl 0.0154 lr 1.0e-06 | env  0.5%  policy 32.9%  update 66.6%
+it  123 steps   8060928 sps  11,416 | ret   92.51 len 142.4 succ  0.00 (n=100) | pg -0.005 vf 0.331 kl 0.0079 lr 1.3e-04 | env  0.5%  policy 32.9%  update 66.6%
+done: 8060928 steps in 706 s -> 11,416 env-steps/s incl. training; env  0.5%  policy 32.9%  update 66.6%
