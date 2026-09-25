@@ -1,5 +1,6 @@
 """Physics-only throughput (graph replay of one 50 Hz control step, 4096 envs, env-steps/s) of the drift remedies next
-to the XPBD settings: XPBD 4 it 1.25 ms / 0.625 ms, XPBD + joint projection, Featherstone at 0.3125 ms.
+to the XPBD settings: XPBD 4 it 1.25 ms / 0.625 ms, XPBD + joint projection, recentred joints. (Featherstone at 0.3125 ms,
+its only finite setting, ran at 1 env-step/s with 16 envs on Metal, so it is not timed here.)
 
 usage: python scripts/diagnostics/newton_remedy_throughput.py [N]"""
 import sys, time, warp as wp
@@ -11,8 +12,7 @@ N = int(sys.argv[1]) if len(sys.argv) > 1 else 4096
 m = build_g1_model("flat", physics_dt=0.0025)[0]
 for tag, kw in (("XPBD 4 it 1.25 ms", dict(iterations=4, dt=0.00125)), ("XPBD 4 it 0.625 ms", dict(iterations=4, dt=0.000625)),
                 ("XPBD 4 it 1.25 ms + projection", dict(iterations=4, dt=0.00125, project=True)),
-                ("XPBD 4 it 1.25 ms recentred", dict(iterations=4, dt=0.00125, recenter=True)),
-                ("Featherstone 0.3125 ms", dict(dt=0.0003125, solver="featherstone"))):
+                ("XPBD 4 it 1.25 ms recentred", dict(iterations=4, dt=0.00125, recenter=True))):
     try:
         sim = NewtonSim(m, N, **kw)
         sim.step(); sim.synchronize(); t0 = time.perf_counter()
