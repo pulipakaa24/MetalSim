@@ -62,6 +62,19 @@ the Newton-engine evaluation. Evidence for each row is in `PARITY.md`.
 | Newton API churn (alpha) | low | pin the version (1.7.0.dev) |
 | Importer copies the USD's gravity 0 | low | set gravity explicitly (done in `g1_builder`) |
 
+## Engine position (2026-09-24, after the measurements)
+
+MuJoCo Warp is the parity engine, not a stopgap. Measured: it matches the PhysX open-loop protocol
+as closely as Newton XPBD on the hold and the drop (PARITY §1.7); Isaac's PhysX-trained policies
+walk the same distance on it within 0.1 m over 8 s at every training stage (§1.5); with the learner
+fixed it trains at least as well as Isaac's own run. Its remaining differences from PhysX (3–5×
+contact-impact peaks at equal mean force from MuJoCo's soft contacts; soft joint limits; the
+`plane_convex` contact-set defect) are tunable or fixable within MuJoCo Warp. Isaac Lab 3.0 itself
+moves to Newton with **MuJoCo Warp as the default solver**, so this is also the like-for-like
+reference engine going forward. Newton XPBD is a throughput option (4× on flat ground, none on
+rough) with fidelity costs measured above (joint drift, slower tracking-reward learning); it stays
+optional unless the fork's drift and drive fixes close those.
+
 ## What a Newton XPBD replacement would and would not change
 
 Subsumed (would not need to be carried over): the MuJoCo Warp heightfield patch (Newton has native
