@@ -1,0 +1,42 @@
+# throughput after the drive-row refactor, 4096 envs, Metal, physics-only graph replay of one 50 Hz step
+Thu Sep 24 23:16:25 PDT 2026
+holder: {"name": "g1_flat_newton0625_ppo_fixed", "kind": "train", "minutes": 45.0, "pid": 72270, "start": 1790315913.4936728}
+  waiting [train] g1_flat_ppowarp_fixed_flatcfg est 70.0 min, queued 2109 s ago
+  waiting [train] g1_terms_tuning_default est 8.0 min, queued 2049 s ago
+  waiting [train] g1_terms_oldcollider_default est 8.0 min, queued 1444 s ago
+  waiting [train] camera_cartpole_fast est 20.0 min, queued 1442 s ago
+  waiting [train] g1_preflight_tuned_recommended est 12.0 min, queued 1436 s ago
+holder: {"name": "newton_fork_throughput2", "kind": "timing", "minutes": 12.0, "pid": 76960, "start": 1790317515.882182}
+  waiting [timing] newton_reward_terms est 12.0 min, queued 0 s ago
+  waiting [render] stage_videos_round2 est 10.0 min, queued 396 s ago
+  waiting [train] g1_flat_ppowarp_fixed_flatcfg est 70.0 min, queued 2640 s ago
+  waiting [train] g1_terms_tuning_default est 8.0 min, queued 2580 s ago
+  waiting [train] g1_terms_oldcollider_default est 8.0 min, queued 1975 s ago
+  waiting [train] camera_cartpole_fast est 20.0 min, queued 1972 s ago
+  waiting [train] g1_preflight_tuned_recommended est 12.0 min, queued 1967 s ago
+Thu Sep 24 23:25:15 PDT 2026
+$ .venv/bin/python scripts/diagnostics/newton_fork/throughput.py 4:1.25 4:0.625  (pinned upstream)
+newton at /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/__init__.py, fork False, N 4096
+| 4:1.25 | 147,412 env-steps/s | blocks 147,545, 146,337, 147,412 |
+| 4:0.625 | 73,431 env-steps/s | blocks 73,516, 72,977, 73,431 |
+$ .venv-newtonfork/bin/python ... (fork 9b0901d3)
+newton at /Users/aditya/robosim/upstream/newton/newton/__init__.py, fork True, N 4096
+| 4:1.25 | 108,380 env-steps/s | blocks 108,501, 107,831, 108,380 |
+| 4:1.25:solverdrive | 98,956 env-steps/s | blocks 99,067, 98,956, 98,309 |
+$ PYTHONPATH=upstream/newton-dev .venv-newtonfork/bin/python ... (dev refactor)
+newton at /Users/aditya/robosim/upstream/newton-dev/newton/__init__.py, fork True, N 4096
+| 4:1.25 | 131,420 env-steps/s | blocks 131,696, 130,772, 131,420 |
+| 4:1.25:solverdrive | 84,346 env-steps/s | blocks 84,836, 84,346, 84,346 |
+| 4:0.625 | 65,548 env-steps/s | blocks 65,594, 65,151, 65,548 |
+| 4:0.625:solverdrive | 41,919 env-steps/s | blocks 42,319, 41,919, 41,832 |
+| 4:1.25 | 131,028 env-steps/s | blocks 131,028, 130,251, 131,030 |
+| 4:1.25 | 148,651 env-steps/s | blocks 148,778, 147,813, 148,651 |
+Thu Sep 24 23:26:30 PDT 2026
+holder: {"name": "newton_fork_throughput2", "kind": "timing", "minutes": 12.0, "pid": 76960, "start": 1790317515.882182}
+  waiting [timing] newton_reward_terms est 12.0 min, queued 75 s ago
+  waiting [render] stage_videos_round2 est 10.0 min, queued 471 s ago
+  waiting [train] g1_flat_ppowarp_fixed_flatcfg est 70.0 min, queued 2715 s ago
+  waiting [train] g1_terms_tuning_default est 8.0 min, queued 2655 s ago
+  waiting [train] g1_terms_oldcollider_default est 8.0 min, queued 2050 s ago
+  waiting [train] camera_cartpole_fast est 20.0 min, queued 2047 s ago
+  waiting [train] g1_preflight_tuned_recommended est 12.0 min, queued 2042 s ago

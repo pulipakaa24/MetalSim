@@ -9,6 +9,9 @@ Run with either environment: .venv (pinned upstream Newton 45458023 = "before") 
             steps, upright envs only: p50 / p99 / max [mm] (as newton_drift_remedies.py).
   drop    : 8 G1s dropped from 1 m under the PD hold, 1.5 s: max penetration of any box collider [cm], finite.
   all     : energy, drift, drop.
+  step    : zero-gravity step response, floating base 3 m up, every target default + --step (clipped to the limits):
+            joint travel at 10 / 20 / 50 ms vs MuJoCo C (same model, gains, armature, 2.5 ms); per group the median
+            and worst ratio Newton / MuJoCo at 50 ms, and hip pitch, elbow pitch, a finger joint.
   stand   : 4 G1s PD-holding Isaac's init pose on flat ground, 2 s: pelvis z every 0.25 s and max |q - q_MuJoCoC| per
             joint group at 0.5 s (MuJoCo C, same model and gains, 2.5 ms).
   sigma3  : CPU version of g1_preflight.stability: N envs, S control steps of targets default + 0.5 * N(0, 3);
@@ -27,7 +30,8 @@ from metalsim.physics import newton_backend as nb
 import metalsim.interop.warp_metal as wm
 
 ap = argparse.ArgumentParser()
-ap.add_argument("check", choices=("energy", "sigma3", "drift", "drop", "all", "stand"))
+ap.add_argument("check", choices=("energy", "sigma3", "drift", "drop", "all", "stand", "step"))
+ap.add_argument("--step", type=float, default=0.3, help="step: target offset [rad]")
 ap.add_argument("--drive", default="actuator", choices=("actuator", "solver"),
                 help="actuator: NewtonSim's ActuatorPD (joint_f); solver: the model's ke/kd solved by SolverXPBD (fork)")
 ap.add_argument("--noclamp", action="store_true"); ap.add_argument("--n", type=int, default=256)
@@ -85,6 +89,8 @@ def make(n):
         m, act = sim.model, sim.actuator
         m.joint_target_ke.assign(act.kp.numpy()); m.joint_target_kd.assign(act.kd.numpy())
         act.kp.zero_(); act.kd.zero_()
+        if hasattr(sim.solver, "notify_model_changed"):
+            sim.solver.notify_model_changed(newton.ModelFlags.JOINT_DOF_PROPERTIES)   # the fork reads its drive list here
         qs, qds, jt = m.joint_q_start.numpy(), m.joint_qd_start.numpy(), m.joint_type.numpy()
         rev = [j for j in range(m.joint_count) if qds[j + 1] - qds[j] == 1]
         dof = wp.array([int(qds[j]) for j in rev], dtype=int, device=DEV); coord = wp.array([int(qs[j]) for j in rev], dtype=int, device=DEV)
@@ -221,7 +227,70 @@ def stand(n=4, T=2.0):
     return zmj, zs, err
 
 
-if a.check == "stand":
+def step_response():
+    import mujoco
+    GROUPS = {"legs": ("hip", "knee", "torso"), "ankles": ("ankle",), "arms": ("shoulder", "elbow"),
+              "hands": ("zero", "one", "two", "three", "four", "five", "six")}
+    grp = lambda nm: next(g for g, keys in GROUPS.items() if any(k in nm for k in keys))
+    m = M_MJ; names = [mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_JOINT, m.actuator_trnid[i, 0]) for i in range(m.nu)]
+    jid = m.actuator_trnid[:, 0]; lo, hi = m.jnt_range[jid, 0], m.jnt_range[jid, 1]
+    q0 = m.key_qpos[0][7:].copy(); tgt = np.clip(q0 + a.step, lo, hi)
+    times = (0.01, 0.02, 0.05)
+    mg = m.opt.gravity.copy(); m.opt.gravity[:] = 0.0
+    d = mujoco.MjData(m); mujoco.mj_resetDataKeyframe(m, d, 0); d.qpos[2] = 3.0; d.ctrl[:] = tgt
+    mj = []
+    t = 0.0
+    for T in times:
+        while t < T - 1e-9: mujoco.mj_step(m, d); t += m.opt.timestep
+        mj.append(d.qpos[7:].copy() - q0)
+    m.opt.gravity[:] = mg
+    sim = make(1); M = sim.model
+    M.gravity.zero_(); sim.actuator.gravity = wp.vec3(0.0, 0.0, 0.0)
+    q = np.tile(M_MJ.key_qpos[0], (1, 1)).astype(np.float32); q[:, 2] = 3.0
+    sim.d.qpos.assign(q); sim.d.qvel.zero_(); sim._reset_mask.fill_(True); sim.launch_reset()
+    sim.d.ctrl.assign(tgt[None].astype(np.float32))
+    # finer than the 50 Hz control step: run substeps directly through launch_step's pieces is not exposed, so use a
+    # 10 ms control step (control_dt is fixed at construction: rebuild with control_dt 0.01)
+    return names, grp, mj, times, tgt - q0
+
+
+if a.check == "step":
+    import mujoco
+    names, grp, mj, times, dq_t = step_response()
+    kw = dict(skw)
+    if a.drive == "solver":
+        kw.setdefault("joint_drive_mode", "pd")
+    # 10 ms control steps so 10 / 20 / 50 ms are control-step boundaries
+    sim = nb.NewtonSim(M_MJ, 1, iterations=a.it, dt=a.dt_ms * 1e-3, control_dt=0.01, device=DEV, relaxation=a.relax, solver_kw=kw or None)
+    if a.drive == "solver":
+        m_, act = sim.model, sim.actuator
+        m_.joint_target_ke.assign(act.kp.numpy()); m_.joint_target_kd.assign(act.kd.numpy()); act.kp.zero_(); act.kd.zero_()
+        if hasattr(sim.solver, "notify_model_changed"):
+            sim.solver.notify_model_changed(newton.ModelFlags.JOINT_DOF_PROPERTIES)
+        qs, qds = m_.joint_q_start.numpy(), m_.joint_qd_start.numpy()
+        rev = [j for j in range(m_.joint_count) if qds[j + 1] - qds[j] == 1]
+        dof = wp.array([int(qds[j]) for j in rev], dtype=int, device=DEV); coord = wp.array([int(qs[j]) for j in rev], dtype=int, device=DEV)
+        _apply = act.apply
+        def apply(state, control):
+            _apply(state, control)
+            wp.launch(_target_to_coord, dim=len(rev), inputs=[act.target, dof, coord], outputs=[control.joint_target_q], device=DEV)
+        act.apply = apply
+    sim.model.gravity.zero_(); sim.actuator.gravity = wp.vec3(0.0, 0.0, 0.0)
+    q = M_MJ.key_qpos[0].astype(np.float32)[None].copy(); q[:, 2] = 3.0
+    sim.d.qpos.assign(q); sim.d.qvel.zero_(); sim._reset_mask.fill_(True); sim.launch_reset()
+    sim.d.ctrl.assign((M_MJ.key_qpos[0][7:] + dq_t)[None].astype(np.float32))
+    nw, t = [], 0.0
+    for T in times:
+        while t < T - 1e-9: sim.launch_step(); t += 0.01
+        nw.append(sim.d.qpos.numpy()[0, 7:] - M_MJ.key_qpos[0][7:])
+    r = nw[-1] / np.where(np.abs(mj[-1]) > 1e-4, mj[-1], np.nan)
+    pick = [n for n in names if n.startswith("left_") and grp(n) in ("arms", "hands")] + ["left_hip_pitch_joint", "left_knee_joint"]
+    print(f"| step {a.step} rad | {tag} | " + " ; ".join(f"{g}: ratio@50ms median {np.nanmedian(r[[i for i in range(len(names)) if grp(names[i]) == g]]):.2f} "
+          f"worst {np.nanmax(np.abs(np.log(np.abs(r[[i for i in range(len(names)) if grp(names[i]) == g]])))):.2f} (|ln|)" for g in ("legs", "ankles", "arms", "hands")) + " |")
+    for n in pick:
+        i = names.index(n)
+        print(f"|   {n} | MuJoCo C {' / '.join(f'{x[i]:.3f}' for x in mj)} | Newton {' / '.join(f'{x[i]:.3f}' for x in nw)} rad at 10/20/50 ms |")
+elif a.check == "stand":
     zmj, zs, err = stand()
     print(f"| stand | MuJoCo C | z {np.round(zmj, 3).tolist()} |")
     print(f"| stand | {tag}, drive {a.drive} | z {np.round(zs, 3).tolist()} | dq@0.5s " + ", ".join(f"{g} {v:.3f}" for g, v in err.items()) + " |")

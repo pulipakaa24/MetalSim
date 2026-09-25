@@ -1,0 +1,39 @@
+# item 3b: pd drive damping fix (fork 9b0901d3), Thu Sep 24 23:10:44 PDT 2026, CPU
+holder: {"name": "g1_flat_newton0625_ppo_fixed", "kind": "train", "minutes": 45.0, "pid": 72270, "start": 1790315913.4936728}
+  waiting [train] g1_flat_ppowarp_fixed_flatcfg est 70.0 min, queued 1768 s ago
+  waiting [train] g1_terms_tuning_default est 8.0 min, queued 1708 s ago
+  waiting [train] g1_terms_oldcollider_default est 8.0 min, queued 1103 s ago
+  waiting [train] camera_cartpole_fast est 20.0 min, queued 1101 s ago
+  waiting [train] g1_preflight_tuned_recommended est 12.0 min, queued 1095 s ago
+$ .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/g1_checks.py step --drive solver|actuator   (zero-g step 0.3 rad, floating, vs MuJoCo C)
+before (fork 9f626ce2, damper on own inertia):
+| step 0.3 rad | drive solver | legs 1.29 ; ankles 0.81 ; arms 2.04 ; hands 5.41 (medians) | left_one 0.198 vs 0.036, left_five 0.287 vs 0.054 rad at 50 ms |
+after:
+| step 0.3 rad | 4 it / 1.25 ms, drive solver, relax 0.4/0.4, limits clamped pi-0.15 | legs: ratio@50ms median 1.01 worst 0.13 (|ln|) ; ankles: ratio@50ms median 0.67 worst 0.98 (|ln|) ; arms: ratio@50ms median 1.07 worst 0.30 (|ln|) ; hands: ratio@50ms median 1.03 worst 0.10 (|ln|) |
+|   left_shoulder_pitch_joint | MuJoCo C 0.000 / 0.006 / 0.041 | Newton 0.001 / 0.008 / 0.056 rad at 10/20/50 ms |
+|   left_shoulder_roll_joint | MuJoCo C 0.005 / 0.015 / 0.053 | Newton 0.005 / 0.013 / 0.055 rad at 10/20/50 ms |
+|   left_shoulder_yaw_joint | MuJoCo C 0.007 / 0.018 / 0.052 | Newton 0.003 / 0.006 / 0.040 rad at 10/20/50 ms |
+|   left_elbow_pitch_joint | MuJoCo C 0.007 / 0.016 / 0.046 | Newton 0.007 / 0.016 / 0.050 rad at 10/20/50 ms |
+|   left_elbow_roll_joint | MuJoCo C 0.011 / 0.022 / 0.054 | Newton 0.012 / 0.026 / 0.059 rad at 10/20/50 ms |
+|   left_five_joint | MuJoCo C 0.012 / 0.023 / 0.054 | Newton 0.012 / 0.023 / 0.058 rad at 10/20/50 ms |
+|   left_six_joint | MuJoCo C -0.000 / -0.000 / -0.000 | Newton -0.000 / 0.000 / 0.000 rad at 10/20/50 ms |
+|   left_three_joint | MuJoCo C 0.012 / 0.023 / 0.054 | Newton 0.012 / 0.023 / 0.058 rad at 10/20/50 ms |
+|   left_four_joint | MuJoCo C -0.000 / -0.000 / -0.000 | Newton -0.000 / 0.000 / 0.000 rad at 10/20/50 ms |
+|   left_zero_joint | MuJoCo C 0.012 / 0.023 / 0.055 | Newton 0.011 / 0.024 / 0.056 rad at 10/20/50 ms |
+|   left_one_joint | MuJoCo C 0.008 / 0.015 / 0.036 | Newton 0.006 / 0.012 / 0.035 rad at 10/20/50 ms |
+|   left_two_joint | MuJoCo C 0.012 / 0.023 / 0.055 | Newton 0.011 / 0.023 / 0.056 rad at 10/20/50 ms |
+|   left_hip_pitch_joint | MuJoCo C 0.027 / 0.083 / 0.283 | Newton 0.038 / 0.089 / 0.299 rad at 10/20/50 ms |
+|   left_knee_joint | MuJoCo C 0.032 / 0.093 / 0.269 | Newton 0.027 / 0.074 / 0.236 rad at 10/20/50 ms |
+| step 0.3 rad | 4 it / 1.25 ms, drive actuator, relax 0.4/0.4, limits clamped pi-0.15 | legs: ratio@50ms median 1.25 worst 0.33 (|ln|) ; ankles: ratio@50ms median 0.83 worst 0.84 (|ln|) ; arms: ratio@50ms median 1.11 worst 0.64 (|ln|) ; hands: ratio@50ms median 0.94 worst 0.32 (|ln|) |
+$ drive_equilibrium.py --its 1,4,16 --kw joint_armature_inertia="isotropic"   (2.5 ms) and B --dt_ms 1.25 --its 1,4
+2.5ms:   solver it 1: 199.6  it 4: 199.7  it 16: 200.3
+2.5ms:   solver it  1: legs 0.0192, ankles 0.0123, arms 0.0650, hands 0.0117 | max |qd| 0.069
+2.5ms:   solver it  4: legs 0.0047, ankles 0.0015, arms 0.0166, hands 0.0020 | max |qd| 0.006
+2.5ms:   solver it 16: legs 0.0009, ankles 0.0005, arms 0.0041, hands 0.0006 | max |qd| 0.000
+1.25ms:   solver it  1: legs 0.0094, ankles 0.0065, arms 0.0336, hands 0.0061 | max |qd| 0.003
+1.25ms:   solver it  4: legs 0.0019, ankles 0.0010, arms 0.0083, hands 0.0010 | max |qd| 0.000
+$ g1_checks.py stand --drive solver ; all --noclamp --drive solver
+| stand | MuJoCo C | z [0.71, 0.708, 0.692, 0.619, 0.329, 0.057, 0.054, 0.054] |
+| stand | 4 it / 1.25 ms, drive solver, relax 0.4/0.4, limits clamped pi-0.15, drive solver | z [0.701, 0.702, 0.688, 0.623, 0.371, 0.06, 0.054, 0.054] | dq@0.5s legs 0.006, ankles 0.005, arms 0.009, hands 0.001 |
+| all | 4 it / 1.25 ms, drive solver, relax 0.4/0.4, limits USD (elbow 3.421) | drift p50/p99/max 12.68 / 39.9 / 63.8 mm | drop pen 0.23 cm, finite True | KE(2 s)/KE0 0.598, max 0.999 |
+| sigma3 | 4 it / 1.25 ms, drive solver, relax 0.4/0.4, limits USD (elbow 3.421) | 1024 envs x 400 steps | blown 0 | falls 12096 | peak |qd| 538 rad/s | 356 s |
