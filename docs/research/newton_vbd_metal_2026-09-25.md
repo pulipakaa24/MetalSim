@@ -23,7 +23,7 @@ Isaac Lab 3.0 EA pins; [NF] `upstream/newton` = MetalSim fork branch `metalsim` 
   standard library has no `nextafterf`, and clang lowers `__builtin_nextafterf` to a call to it. Newton's
   interval arithmetic for rigid–soft Divide-and-Truncate (`newton/_src/solvers/vbd/interval_arithmetic.py`,
   Newton e42568d9, after 1.5.2) calls it from the non-CUDA branch of a native snippet, and Metal takes that
-  branch. **Fixed in the Warp fork** (9050cb54, `patches/warp/0006-*`): `metal_crt.h` now has a bit-exact IEEE
+  branch. **Fixed in the Warp fork** (9050cb54; `patches/warp/0007-Metal-nextafterf-*`, and merged into the fork's `metalsim` as f194006 by c041d10): `metal_crt.h` now has a bit-exact IEEE
   `nextafterf`, computed on bit patterns because Apple GPUs flush float32 subnormals in comparisons, and maps
   `__builtin_nextafterf` onto it. The new test `test_metal.test_nextafterf` matches `numpy.nextafter` bit for bit
   on Metal and on the CPU. `warp.tests.test_metal` passes 16/16. No Newton change was needed.
