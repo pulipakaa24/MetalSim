@@ -65,6 +65,14 @@ class Tier0Renderer:
                                                       decimate_faces=decimate_faces, sized_geoms="auto" if terrain_slots else (),
                                                       draw_hfields=draw_hfields)
         self.G = self.tables.G
+        hf_tris = sum(self.tables.meshes[k]["i_count"] // 3 for g, k in zip(self.tables.geoms, self.tables.geom_mesh)
+                      if int(model.geom_type[g]) == int(mujoco.mjtGeom.mjGEOM_HFIELD))
+        if hf_tris * n_envs > 2e8:
+            # the raster draws every triangle once per env: Isaac's rough terrain (4.8 M) at 1024 envs is 2.9 s per frame
+            # (runs/terrain_render/cost.log); the ray tracer (tier 2) is unaffected (158 ms)
+            import warnings
+            warnings.warn(f"tier 0 draws the heightfield in full per env: {hf_tris * n_envs / 1e6:.0f} M triangles per frame "
+                          f"(~{hf_tris * n_envs / 1.7e9:.1f} s at 1024 envs on the M4 Max); draw_hfields=False skips it")
         self.seg_mode = seg_mode
         self.use_bg = backgrounds
         self.bg_layers = min(n_envs, 2048)
