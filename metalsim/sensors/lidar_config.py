@@ -29,6 +29,11 @@ class LidarSpec:
     range_accuracy_m: float = 0.02
     range_resolution_m: float = 0.004
     scan_rate_hz: float = 10.0
+    # RTX lidar beam/echo attributes (used only by make(..., extras=True))
+    divergence_hor_deg: float = 0.0
+    divergence_ver_deg: float = 0.0
+    max_returns: int = 1
+    min_dist_between_echos_m: float = 0.4
     name: str = "lidar"
     extra: dict = field(default_factory=dict)
 
@@ -59,11 +64,22 @@ class LidarSpec:
                    range_accuracy_m=float(prof.get("rangeAccuracyM", 0.02)),
                    range_resolution_m=float(prof.get("rangeResolutionM", 0.004)),
                    scan_rate_hz=float(prof.get("scanRateBaseHz", 10.0)),
+                   divergence_hor_deg=float(prof.get("divergenceHorDeg", 0.0)),
+                   divergence_ver_deg=float(prof.get("divergenceVerDeg", 0.0)),
+                   max_returns=int(prof.get("maxReturns", 1)),
+                   min_dist_between_echos_m=float(prof.get("minDistBetweenEchosM", 0.4)),
                    name=cfg.get("name", "lidar"), extra={k: v for k, v in prof.items() if k != "emitterStates"})
 
-    def make(self, rt, site: str | int):
+    def make(self, rt, site: str | int, extras: bool = False, spot_rays: int = 16, **kw):
+        """Default: one infinitesimal ray per beam, first return. ``extras=True`` applies the
+        profile's divergence (sampled by ``spot_rays`` sub-rays when nonzero), ``maxReturns`` and
+        ``minDistBetweenEchosM`` (see ``raytrace.Lidar``)."""
         az, el = self.beams_rad()
-        lidar = rt.make_lidar(site, az, el)
+        if extras:
+            div = (self.divergence_hor_deg, self.divergence_ver_deg)
+            kw = dict(divergence_deg=div, spot_rays=spot_rays if any(div) else 1, max_returns=self.max_returns,
+                      min_echo_sep=self.min_dist_between_echos_m) | kw
+        lidar = rt.make_lidar(site, az, el, **kw)
         lidar.spec = self
         return lidar
 

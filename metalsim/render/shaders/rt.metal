@@ -166,3 +166,135 @@ kernel void raycast_depth(
     float3 hit = dir * res.distance;
     out_depth[o] = -dot(hit, R[2]);   // depth along the camera's -Z axis
 }
+
+// Lidar extras (beam divergence, multi-return, per-slot reflectance). The default lidar() kernel
+// above is untouched; this kernel runs only when an extra is requested.
+//
+// Per beam: n_sub sub-rays spread over the beam's divergence cone (offsets given as tangent-plane
+// slopes along the beam's azimuth / elevation directions, with a per-sub-ray power weight). Each
+// sub-ray is cast up to hits_per_ray times: after a hit it continues past the hit object (further
+// hits on the same instance, i.e. its exit faces, are skipped) with its power scaled by
+// `transmission`. Every hit is a candidate with power p = P * reflectance * cos(incidence) / r^2.
+// Candidates are sorted by range and grouped into echoes: a new echo starts when a candidate lies
+// more than min_sep beyond the first candidate of the current echo (NVIDIA's minDistBetweenEchosM).
+// An echo's range and point are power-weighted means (a mixed pixel when a spot straddles an edge
+// closer than min_sep), its intensity is the summed power, normal and slot come from its strongest
+// candidate. The max_returns strongest echoes are reported in range order.
+struct LidarExt { uint n_sub; uint max_returns; uint hits_per_ray; uint _p0; float min_sep; float transmission; float _p1, _p2; };
+#define LIDAR_MAX_CAND 32
+
+kernel void lidar_ext(
+    instance_acceleration_structure accel [[buffer(0)]],
+    device const float2*    beams      [[buffer(1)]],
+    device const float*     site_xpos  [[buffer(2)]],
+    device const float*     site_xmat  [[buffer(3)]],
+    device const uint2*     inst_tab   [[buffer(4)]],
+    device const int*       slot_mesh  [[buffer(5)]],
+    device const MeshInfo*  meshes     [[buffer(6)]],
+    device const float*     verts      [[buffer(7)]],
+    device const uint*      indices    [[buffer(8)]],
+    device const float*     slot_refl  [[buffer(9)]],    // (n_slots) reflectance per slot
+    device const InstanceDesc* inst    [[buffer(10)]],
+    constant RTConsts&      c          [[buffer(11)]],
+    device const float4*    sub        [[buffer(12)]],   // (n_sub) slope u, slope v, weight, 0
+    constant LidarExt&      x          [[buffer(13)]],
+    device float*   out_dist   [[buffer(14)]],   // (n_envs, n_beams, R)
+    device float*   out_points [[buffer(15)]],   // (n_envs, n_beams, R, 3)
+    device float*   out_normal [[buffer(16)]],   // (n_envs, n_beams, R, 3)
+    device int*     out_slot   [[buffer(17)]],   // (n_envs, n_beams, R)
+    device float*   out_intensity [[buffer(18)]],// (n_envs, n_beams, R)
+    device int*     out_nret   [[buffer(19)]],   // (n_envs, n_beams)
+    uint2 tid [[thread_position_in_grid]])
+{
+    uint b = tid.x, e = tid.y;
+    if (b >= c.n_beams || e >= c.n_envs) return;
+    uint si = e * c.n_site + c.sensor_site;
+    float3 origin = float3(site_xpos[si * 3], site_xpos[si * 3 + 1], site_xpos[si * 3 + 2]);
+    float3 org = origin + env_offset(e, c);
+    float3x3 R = load_mat33(site_xmat + si * 9);
+    float2 ae = beams[b];
+    float3 d = R * float3(cos(ae.y) * cos(ae.x), cos(ae.y) * sin(ae.x), sin(ae.y));
+    float3 u = R * float3(-sin(ae.x), cos(ae.x), 0.0);
+    float3 v = R * float3(-sin(ae.y) * cos(ae.x), -sin(ae.y) * sin(ae.x), cos(ae.y));
+
+    float cr[LIDAR_MAX_CAND]; float cp[LIDAR_MAX_CAND]; float3 cpt[LIDAR_MAX_CAND]; float3 cn[LIDAR_MAX_CAND]; int cs[LIDAR_MAX_CAND];
+    uint nc = 0;
+    intersector<triangle_data, instancing> isect;
+    isect.accept_any_intersection(false);
+    for (uint k = 0; k < x.n_sub; ++k) {
+        float4 s = sub[k];
+        float3 dir = normalize(d + s.x * u + s.y * v);
+        float P = s.z;
+        float tmin = 0.001;
+        int last = -1;
+        uint hits = 0;
+        for (uint it = 0; it < x.hits_per_ray + 8 && hits < x.hits_per_ray; ++it) {
+            ray r(org, dir, tmin, c.max_range);
+            intersection_result<triangle_data, instancing> res = isect.intersect(r, accel);
+            if (res.type == intersection_type::none) break;
+            tmin = res.distance + 1e-4;
+            int ii = int(res.instance_id);
+            if (ii == last) continue;                 // exit / inner faces of the object just hit
+            last = ii;
+            uint slot = inst_tab[ii].y;
+            InstanceDesc di = inst[ii];
+            float3x3 Ri = float3x3(float3(di.col0), float3(di.col1), float3(di.col2));
+            float3 n = tri_normal(uint(slot_mesh[slot]), res.primitive_id, meshes, verts, indices, Ri);
+            if (dot(n, dir) > 0.0) n = -n;
+            float p = P * slot_refl[slot] * max(dot(n, -dir), 0.0) / max(res.distance * res.distance, 1e-4);
+            if (nc < LIDAR_MAX_CAND) {
+                // insertion by range
+                uint j = nc;
+                while (j > 0 && cr[j - 1] > res.distance) {
+                    cr[j] = cr[j - 1]; cp[j] = cp[j - 1]; cpt[j] = cpt[j - 1]; cn[j] = cn[j - 1]; cs[j] = cs[j - 1]; --j;
+                }
+                cr[j] = res.distance; cp[j] = max(p, 1e-12f * P); cpt[j] = origin + dir * res.distance; cn[j] = n; cs[j] = int(slot);
+                ++nc;
+            }
+            ++hits;
+            P *= x.transmission;
+        }
+    }
+    // group into echoes (in place: echo q summarised into index q)
+    uint ne = 0;
+    uint i = 0;
+    float er[LIDAR_MAX_CAND]; float ep[LIDAR_MAX_CAND];
+    while (i < nc) {
+        float r0 = cr[i];
+        float sp = 0.0, sr = 0.0; float3 spt = 0.0; float best = -1.0; float3 bn = 0.0; int bs = -1;
+        while (i < nc && cr[i] - r0 <= x.min_sep) {
+            sp += cp[i]; sr += cp[i] * cr[i]; spt += cp[i] * cpt[i];
+            if (cp[i] > best) { best = cp[i]; bn = cn[i]; bs = cs[i]; }
+            ++i;
+        }
+        er[ne] = sr / sp; ep[ne] = sp; cpt[ne] = spt / sp; cn[ne] = bn; cs[ne] = bs;
+        ++ne;
+    }
+    // keep the max_returns strongest echoes, in range order
+    uint R_ = x.max_returns;
+    uint keep_mask = 0;
+    uint nk = min(ne, R_);
+    for (uint q = 0; q < nk; ++q) {
+        int arg = -1; float mx = -1.0;
+        for (uint t = 0; t < ne; ++t)
+            if (!(keep_mask & (1u << t)) && ep[t] > mx) { mx = ep[t]; arg = int(t); }
+        keep_mask |= (1u << uint(arg));
+    }
+    uint o = (e * c.n_beams + b) * R_;
+    uint w = 0;
+    for (uint t = 0; t < ne; ++t) {
+        if (!(keep_mask & (1u << t))) continue;
+        uint oo = o + w;
+        out_dist[oo] = er[t]; out_intensity[oo] = ep[t]; out_slot[oo] = cs[t];
+        out_points[oo * 3] = cpt[t].x; out_points[oo * 3 + 1] = cpt[t].y; out_points[oo * 3 + 2] = cpt[t].z;
+        out_normal[oo * 3] = cn[t].x; out_normal[oo * 3 + 1] = cn[t].y; out_normal[oo * 3 + 2] = cn[t].z;
+        ++w;
+    }
+    out_nret[e * c.n_beams + b] = int(w);
+    for (; w < R_; ++w) {
+        uint oo = o + w;
+        out_dist[oo] = 0.0; out_intensity[oo] = 0.0; out_slot[oo] = -1;
+        out_points[oo * 3] = out_points[oo * 3 + 1] = out_points[oo * 3 + 2] = 0.0;
+        out_normal[oo * 3] = out_normal[oo * 3 + 1] = out_normal[oo * 3 + 2] = 0.0;
+    }
+}
