@@ -800,13 +800,15 @@ if __name__ == "__main__":
     import sys
     wp.config.quiet = True
     # optional flags (any position): --engine mjwarp|newton, --newton_it N, --newton_dt S
-    opts = {"--engine": "mjwarp", "--newton_it": "4", "--newton_dt": "0.00125", "--newton_limit_margin": "0.15"}
+    opts = {"--engine": "mjwarp", "--newton_it": "4", "--newton_dt": "0.00125", "--newton_limit_margin": "0.15", "--newton_kw": ""}
     for k in list(opts):
         if k in sys.argv:
             i = sys.argv.index(k); opts[k] = sys.argv[i + 1]; del sys.argv[i:i + 2]
     ekw = dict(engine=opts["--engine"], newton_iterations=int(opts["--newton_it"]), newton_dt=float(opts["--newton_dt"]))
     if ekw["engine"] == "newton":         # "none": keep the USD's revolute limits (for a Newton build that unwraps angles)
         lm = opts["--newton_limit_margin"]; ekw["newton_kw"] = {"limit_margin": None if lm.lower() == "none" else float(lm)}
+        for kv in filter(None, opts["--newton_kw"].split(",")):   # e.g. drive=solver,joint_coloring=True,relaxation=0.8
+            k, v = kv.split("="); ekw["newton_kw"][k] = v if k == "drive" else eval(v)
     n = int(sys.argv[1]) if len(sys.argv) > 1 else 4096
     terrain = sys.argv[2] if len(sys.argv) > 2 else "flat"
     if len(sys.argv) > 3 and sys.argv[3] == "train":
