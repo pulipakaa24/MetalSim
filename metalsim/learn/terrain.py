@@ -1,110 +1,60 @@
-"""Rough terrain and height scanning for locomotion tasks, after Isaac Lab's terrain generator.
+"""Rough terrain and height scanning for locomotion tasks: Isaac Lab's terrain, exactly.
 
-``isaac_rough_terrain`` builds a heightfield in the layout of Isaac Lab's ``ROUGH_TERRAINS_CFG``:
-a grid of ``num_rows x num_cols`` sub-terrains of ``size`` (8 x 8 m), difficulty increasing along
-rows (curriculum), with the same sub-terrain mix and proportions (pyramid stairs up/down 0.2 each,
-boxes 0.2, random rough 0.2, pyramid slopes up/down 0.1 each) at Isaac's parameters (stair step
-height 0.05-0.23 m, step width 0.3 m, box height 0.05-0.2 m, random rough noise 0.02-0.1 m at
-0.1 m grid, slopes 0-0.4). Isaac's generator is procedural on a 0.1 m grid as well; shapes are
-re-implemented here from the config, not copied, so terrain statistics match and exact heights do not.
+``isaac_rough_terrain`` is the terrain of Isaac-Velocity-Rough-G1-v0: Isaac Lab v2.3.2's
+``TerrainGenerator`` on ``ROUGH_TERRAINS_CFG`` with the curriculum on, ported in
+``metalsim.learn.isaac_terrain`` (same sub-terrain functions, proportions and column assignment,
+difficulty ``(row + U) / num_rows`` from the generator's ``default_rng(seed)``, the global numpy and
+torch random streams Isaac's sub-terrain functions draw from, 0.1 m horizontal / 5 mm vertical scale,
+slope threshold 0.75, the 20 m border, Isaac's centring and Isaac's own sub-terrain origins). It is
+returned as a MuJoCo heightfield: the top surface of Isaac's terrain mesh sampled on the 0.1 m grid, in
+Isaac's world frame (x along the 10 difficulty rows, y along the 20 type columns, centred at 0).
+``tests/test_terrain.py::test_isaac_rough_terrain_exact`` checks it against Isaac's generator code run
+here. Between grid points the heightfield interpolates, so Isaac's vertical walls (stair risers, box
+edges, slope-threshold walls) become 0.1 m ramps.
 
 ``HeightScanner`` is Isaac's ``RayCasterCfg`` height scan: a 1.6 x 1.0 m grid at 0.1 m resolution
 (17 x 11 = 187 rays) attached to a body, yaw-aligned, rays cast straight down from 20 m above,
-returning ``body_z - hit_z - 0.5`` per ray, evaluated by Metal ray queries against the terrain mesh.
+returning ``body_z - hit_z - 0.5`` per ray, evaluated by triangle interpolation of the heightfield
+with Isaac's diagonal.
 """
 from __future__ import annotations
 
 import numpy as np
 import warp as wp
 
-
-def _pyramid_stairs(h, res, step_w, step_h, up=True, platform=3.0):
-    n = h.shape[0]; c = n // 2
-    r = np.maximum(np.abs(np.arange(n) - c)[:, None], np.abs(np.arange(n) - c)[None, :]) * res
-    size_m = n * res / 2
-    levels = np.floor(np.clip(size_m - platform / 2 - r, 0, None) / step_w)
-    z = levels * step_h
-    return z if up else -z
+from metalsim.learn.isaac_terrain import isaac_rough_terrain_generator
 
 
-def _boxes(h, res, rng, box_h, n_boxes=40, box_size=(1.0, 3.0)):
-    n = h.shape[0]
-    z = np.zeros_like(h)
-    for _ in range(n_boxes):
-        w = int(rng.uniform(*box_size) / res); l = int(rng.uniform(*box_size) / res)
-        x = rng.integers(0, max(n - w, 1)); y = rng.integers(0, max(n - l, 1))
-        z[x:x + w, y:y + l] = rng.uniform(-box_h, box_h)
-    c = n // 2; p = int(1.0 / res)
-    z[c - p:c + p, c - p:c + p] = 0.0     # central platform
-    return z
-
-
-def _random_rough(h, res, rng, noise, step=0.02, downsample=0.1):
-    n = h.shape[0]
-    k = max(int(round(downsample / res)), 1)
-    coarse = rng.uniform(-noise, noise, (n // k + 1, n // k + 1))
-    coarse = np.round(coarse / step) * step
-    z = np.kron(coarse, np.ones((k, k)))[:n, :n]
-    return z
-
-
-def _pyramid_slope(h, res, slope, up=True, platform=2.0):
-    n = h.shape[0]; c = n // 2
-    r = np.maximum(np.abs(np.arange(n) - c)[:, None], np.abs(np.arange(n) - c)[None, :]) * res
-    size_m = n * res / 2
-    z = np.clip(size_m - platform / 2 - r, 0, None) * slope
-    return z if up else -z
-
-
-def isaac_rough_terrain(size=8.0, res=0.1, num_rows=10, num_cols=20, seed=0, border=2.0):
-    """Returns dict with MuJoCo hfield fields (nrow, ncol, size, data in [0,1]) and helpers:
-    ``mesh()`` -> (vertices, faces) and ``origins(n, seed)`` -> (n,3) env origins on sub-terrain
-    centres (rows sampled uniformly: Isaac's curriculum starts from the easiest rows; we start at
-    the full distribution as a benchmark-time choice)."""
-    rng = np.random.default_rng(seed)
-    n_cell = int(round(size / res))
-    H = np.zeros((num_rows * n_cell, num_cols * n_cell))
-    kinds = (["stairs_up"] * 2 + ["stairs_down"] * 2 + ["boxes"] * 2 + ["rough"] * 2 + ["slope_up"] + ["slope_down"])
-    for r in range(num_rows):
-        difficulty = (r + 1) / num_rows
-        for c in range(num_cols):
-            kind = kinds[c % len(kinds)]
-            cell = np.zeros((n_cell, n_cell))
-            if kind == "stairs_up":
-                z = _pyramid_stairs(cell, res, 0.3, 0.05 + difficulty * (0.23 - 0.05), True)
-            elif kind == "stairs_down":
-                z = _pyramid_stairs(cell, res, 0.3, 0.05 + difficulty * (0.23 - 0.05), False)
-            elif kind == "boxes":
-                z = _boxes(cell, res, rng, 0.05 + difficulty * (0.2 - 0.05))
-            elif kind == "rough":
-                z = _random_rough(cell, res, rng, 0.02 + difficulty * (0.1 - 0.02))
-            elif kind == "slope_up":
-                z = _pyramid_slope(cell, res, difficulty * 0.4, True)
-            else:
-                z = _pyramid_slope(cell, res, difficulty * 0.4, False)
-            H[r * n_cell:(r + 1) * n_cell, c * n_cell:(c + 1) * n_cell] = z
-    # border of flat ground
-    nb = int(round(border / res))
-    Hb = np.zeros((H.shape[0] + 2 * nb, H.shape[1] + 2 * nb))
-    Hb[nb:-nb, nb:-nb] = H
+def isaac_rough_terrain(size=8.0, res=0.1, num_rows=10, num_cols=20, seed=0, border=20.0, torch_device="cuda",
+                        curriculum=True):
+    """Isaac's rough terrain for env seed ``seed`` as a dict with the MuJoCo hfield fields (nrow, ncol,
+    size, data in [0, 1], zmin, zmax, res, ``H`` = heights [y index, x index]) and helpers ``mesh()`` ->
+    (vertices, faces), ``origin_table()`` -> (num_rows, num_cols, 3) Isaac's sub-terrain origins
+    (rows = difficulty levels, columns = terrain types) and ``origins(n, seed)`` -> (n, 3) random
+    sub-terrain origins. ``torch_device``: the device whose torch generator Isaac's random-grid boxes
+    are drawn from ("cuda" = what Isaac does on an NVIDIA GPU; "cpu" = Isaac's code on a CPU-only
+    machine). ``size``, ``res`` and ``border`` override ROUGH_TERRAINS_CFG's size, horizontal scale and
+    border width (defaults are Isaac's)."""
+    gen = isaac_rough_terrain_generator(seed=seed, num_rows=num_rows, num_cols=num_cols, torch_device=torch_device,
+                                        curriculum=curriculum, size=(size, size), horizontal_scale=res,
+                                        border_width=border)
+    Hb = np.ascontiguousarray(gen.surface.T).astype(np.float64)    # MuJoCo layout: rows along y, columns along x
     zmin, zmax = float(Hb.min()), float(Hb.max())
     data = (Hb - zmin) / max(zmax - zmin, 1e-6)     # MuJoCo hfield data in [0, 1]
     nrow, ncol = Hb.shape
-    # MuJoCo hfield: size = (radius_x, radius_y, elevation_z, base_z); rows along y, cols along x;
-    # the ncol samples span [-radius_x, radius_x] exactly, so radius = (n - 1) * res / 2 keeps the
-    # sample spacing at ``res`` (the mesh() triangulation and the collision surface then coincide)
+    # MuJoCo hfield: size = (radius_x, radius_y, elevation_z, base_z); the ncol samples span
+    # [-radius_x, radius_x] exactly, so radius = (n - 1) * res / 2 keeps the sample spacing at ``res``;
+    # Isaac centres its terrain at the origin, so the hfield centre is the world origin
     size_x = (ncol - 1) * res / 2; size_y = (nrow - 1) * res / 2
+    assert abs(size_x + gen.x0) < 1e-9 and abs(size_y + gen.y0) < 1e-9
     hf = {"nrow": nrow, "ncol": ncol, "size": [size_x, size_y, max(zmax - zmin, 1e-3), max(-zmin, 0.0) + 0.05],
-          "data": data.astype(np.float32), "zmin": zmin, "zmax": zmax, "res": res, "H": Hb}
-    n_cell_m = size
+          "data": data.astype(np.float32), "zmin": zmin, "zmax": zmax, "res": res, "H": Hb, "generator": gen}
+    table = gen.terrain_origins.astype(np.float32)     # Isaac: torch.float tensor of terrain_origins
 
     def origins(n, seed=0):
         rr = np.random.default_rng(seed + 1)
         rows = rr.integers(0, num_rows, n); cols = rr.integers(0, num_cols, n)
-        x = (cols + 0.5) * n_cell_m - size_x + border
-        y = (rows + 0.5) * n_cell_m - size_y + border
-        z = np.array([Hb[int(round((yy + size_y) / res)), int(round((xx + size_x) / res))] for xx, yy in zip(x, y)])
-        return np.stack([x, y, z], 1).astype(np.float32)
+        return table[rows, cols].copy()
 
     def mesh():
         ys, xs = np.mgrid[0:nrow, 0:ncol]
@@ -115,14 +65,9 @@ def isaac_rough_terrain(size=8.0, res=0.1, num_rows=10, num_cols=20, seed=0, bor
         return V, F
 
     def origin_table():
-        """(num_rows, num_cols, 3) sub-terrain centre origins: rows are difficulty levels (Isaac's
-        terrain curriculum moves envs between rows), columns are terrain types."""
-        t = np.zeros((num_rows, num_cols, 3), np.float32)
-        for r in range(num_rows):
-            for c in range(num_cols):
-                x = (c + 0.5) * n_cell_m - size_x + border; y = (r + 0.5) * n_cell_m - size_y + border
-                t[r, c] = (x, y, Hb[int(round((y + size_y) / res)), int(round((x + size_x) / res))])
-        return t
+        """(num_rows, num_cols, 3) sub-terrain origins, Isaac's ``terrain_origins``: rows are difficulty
+        levels (Isaac's terrain curriculum moves envs between rows), columns are terrain types."""
+        return table.copy()
 
     hf["origins"] = origins; hf["mesh"] = mesh; hf["origin_table"] = origin_table
     hf["num_rows"] = num_rows; hf["num_cols"] = num_cols; hf["cell_size"] = size
@@ -134,7 +79,8 @@ def height_scan_grid(xpos: wp.array2d(dtype=wp.vec3), xmat: wp.array2d(dtype=wp.
                      grid: wp.array2d(dtype=float), H: wp.array2d(dtype=float), res: float, size_x: float, size_y: float,
                      offset_z: float, out: wp.array2d(dtype=float)):
     """Isaac's RayCaster height scan on a heightfield terrain: the ray hit on the triangulated grid is
-    the triangle interpolation of the heights at the ray's (x, y), so no ray tracing is needed."""
+    the triangle interpolation of the heights at the ray's (x, y), so no ray tracing is needed. The
+    diagonal is Isaac's height-field mesh diagonal ((i, j) -> (i+1, j+1))."""
     e, k = wp.tid()
     bp = xpos[e, body]
     R = xmat[e, body]
