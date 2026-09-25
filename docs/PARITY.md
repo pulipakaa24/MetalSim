@@ -242,6 +242,54 @@ and the PPO probe pass; the random-policy return (−8.3, bound −8) and the 3�
 worlds blow up in 400 steps at the fast settings; 8 it. at 0.625 ms passes but costs the speed gain)
 fail, so the fast Newton settings are validated for the 1σ training regime only.
 
+**Learner differential, verdict (measured 2026-09-24, `metalsim/learn/train_g1_rslrl.py`,
+`runs/g1_flat_rslrl_ppo.log`, `scripts/diagnostics/g1_learning_curves.py`).** The real rsl_rl library
+(rsl-rl-lib 3.1.2 on MPS) trained on our MuJoCo Warp G1 task with Isaac's exact G1FlatPPORunnerCfg,
+seed 0, 4096 envs, 1500 iterations in 98 min (≈25 K env-steps/s):
+
+| iteration | Isaac (PhysX + rsl_rl): length / return / tracking | rsl_rl on MetalSim: length / return / tracking | our PPO before the fixes: length / return |
+|---|---|---|---|
+| 100 | 200 / −6.6 / 0.06 | 81 / −4.8 / 0.02 | 50 / −5.2 |
+| 150 | 954 / −4.3 / 0.52 | 197 / −6.3 / 0.05 | 56 / −5.2 |
+| 200 | 981 / +6.6 / 0.78 | 976 / −9.8 / 0.27 | 59 / −5.1 |
+| 300 | 1000 / +19.2 / 0.90 | 938 / +0.5 / 0.46 | 65 / −5.1 |
+| 500 | 996 / +25.3 / 0.93 | 991 / +18.2 / 0.84 | 115 / −6.3 |
+| 1000 | 991 / +27.3 / 0.92 | 1000 / +35.5 / 0.91 | 764 / −24.4 |
+| 1499 | 987 / +27.2 / 0.93 | 992 / +39.6 / – | 558 / −25.8 |
+
+**The simulation trains like Isaac's; our PPO was the gap.** rsl_rl on our physics reaches full
+episodes by iteration 200 and matches Isaac's linear-velocity tracking by iteration 1000 (0.913 vs
+0.921), with a takeoff about 50 iterations later than Isaac's (unexplained; see the task-config note
+below). Reading `ppo_warp.py` against rsl_rl and checking both on identical data found three rollout
+defects, fixed in commit f0f2115 and covered by `tests/test_ppo_warp_rollout.py`:
+
+1. **Exploration noise repeated every rollout**: noise (and observation noise, command resampling and
+   resets) was keyed on the rollout step index, which restarts every rollout, so every env drew the
+   same 24-step noise sequence in every iteration (measured correlation between rollouts 1.0; 0.003
+   after the fix, which keys on a never-resetting counter).
+2. **Phantom action at each rollout boundary**: the pass that computes the final value also applied
+   its sampled action, so the next rollout's first observation carried an action that was never
+   executed (64 of 64 envs), and so did its action-rate penalty.
+3. **Time-outs treated as falls**: now bootstrapped like rsl_rl (`r += γ V(s)`).
+
+The KL estimator and adaptive rule were checked and are identical to rsl_rl's (the "kl" printed in
+our logs is a different quantity and does not drive the learning rate). Our action std grew (0.995 →
+1.41 by iteration 1500) where rsl_rl's fell (0.95 → 0.68) and Isaac's (1.02 → 0.61). The fixed PPO
+has **not yet been demonstrated with a run** (queued; the machine was paused), and no ablation says
+which of the three defects dominated.
+
+**Task-configuration mismatch found by the same comparison (open):** our G1 task carries the *rough*
+task's reward weights and ranges while Isaac trained `G1FlatEnvCfg`: `track_ang_vel_z` weight 2.0 vs
+1.0, `lin_vel_y` command ±1 vs ±0.5, feet air time 0.25 × sum over feet with yaw in the command norm
+vs 0.75 × min over feet with xy only, `lin_vel_z_l2` 0 vs −0.2, `dof_torques_l2` −1.5e-7 incl. ankles
+vs −2e-6 on hips + knees, `dof_acc_l2` −1.25e-7 vs −1e-7, `ang_vel_xy_l2` in the world vs body frame;
+Isaac's torso-contact termination takes the max over the last 3 substeps, ours the last one. So the
+absolute returns in the table are not comparable across the two left columns, and the per-term table
+above compares different weightings; the row-by-row "confirmed" verdicts in §1.2 hold for the rough
+configuration only and are being re-checked against the flat one. Also, at iteration 1000 the rsl_rl
+run's feet-slide cost was 10× Isaac's (−0.13 vs −0.013; the old `cvel` term, fixed since) and its
+action-rate and joint-deviation costs 1.7× Isaac's.
+
 ### 1.6 Rough terrain: MuJoCo Warp's heightfield contacts, found defective and patched
 
 `tests/test_terrain.py::test_hfield_mesh_contacts_match_mujoco_c`: G1 on Isaac's rough-terrain
