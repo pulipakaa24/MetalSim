@@ -11,6 +11,10 @@ Protocols (200 Hz physics, 5 s, per-step node positions/velocities; the three sc
       - newton_vbd: Isaac Lab 3.0 CableObject (VBD rod, 20 segments), segment 0 re-posed every step (no kinematic
         API on cables); plus the same volume rod as physx (VBD volume, kinematic targets) for a like-for-like row
   (c) soft cube: 0.2 m volume deformable, centre at z = 0.5 m, dropped onto the ground
+  Mesh-resolution sweep (--resolutions, default "d,2,4,8"): rope and cube repeated side by side (2 m apart in y) at
+  Isaac Lab's default mesh and at 2, 4, 8 cells across the rod's cross-section / along the cube's edge, to test the
+  shear-locking explanation of the rope's short period (docs/research/deformables_2026-09-25.md section 11): the
+  period should approach the thin-rod value (~1.2-1.3 s at this amplitude) as the mesh refines.
 Materials: each backend's Isaac Lab 3.0 config defaults (PhysxDeformableBodyMaterialCfg /
 PhysxSurfaceDeformableBodyMaterialCfg; NewtonDeformableBodyMaterialCfg / NewtonSurfaceDeformableBodyMaterialCfg /
 CableMaterialCfg), except where --override says otherwise; every value actually used goes to meta.json.
@@ -33,6 +37,9 @@ parser.add_argument("--physics", default="isaacsim_physx", choices=["isaacsim_ph
 parser.add_argument("--out", required=True)
 parser.add_argument("--seconds", type=float, default=5.0)
 parser.add_argument("--scenes", default="cloth,rope,cube")
+# mesh-resolution sweep (shear-locking test): cells across the rod's 2 cm cross-section / along the cube's 0.2 m edge.
+# "d" = Isaac Lab's default edge_refinement (4.0). edge_refinement = bounding-box diagonal / max edge length.
+parser.add_argument("--resolutions", default="d,2,4,8")
 add_launcher_args(parser)
 args = parser.parse_args()
 
@@ -105,16 +112,21 @@ with launch_simulation(cfg=PhysicsCfg(), launcher_args=args) as physics_cfg:
         vol.dynamic_friction = vol.static_friction = FRICTION
     # (b) rope: volume rod (both backends) and, on Newton, the Isaac Lab cable
     if "rope" in scenes:
-        try:
-            rod_cfg = DeformableObjectCfg(
-                prim_path="/World/rope_scene/rod",
-                spawn=sim_utils.MeshCuboidCfg(size=(0.5, 0.02, 0.02), deformable_props=PropsCfg(), physics_material=vol),
-                init_state=DeformableObjectCfg.InitialStateCfg(pos=(10.25, 0.0, 1.0)))
-            objs["rod"] = rod_cfg.class_type(rod_cfg)
-            meta["scenes"]["rod"] = {"size": [0.5, 0.02, 0.02], "z0": 1.0, "x0": 10.0, "pinned": "-x end, nodes within 0.01 m",
-                                     "material": cfg_dict(vol), "props": cfg_dict(PropsCfg())}
-        except Exception:  # noqa: BLE001
-            meta["errors"]["rod_setup"] = traceback.format_exc()
+        for ri, res in enumerate(args.resolutions.split(",")):
+            try:
+                refine = 4.0 if res == "d" else float(np.linalg.norm([0.5, 0.02, 0.02])) * int(res) / 0.02
+                name = "rod" if res == "d" else f"rod_n{res}"
+                rod_cfg = DeformableObjectCfg(
+                    prim_path=f"/World/rope_scene/{name}",
+                    spawn=sim_utils.MeshCuboidCfg(size=(0.5, 0.02, 0.02), deformable_props=PropsCfg(), physics_material=vol,
+                                                  edge_refinement=refine),
+                    init_state=DeformableObjectCfg.InitialStateCfg(pos=(10.25, -2.0 * ri, 1.0)))
+                objs[name] = rod_cfg.class_type(rod_cfg)
+                meta["scenes"][name] = {"size": [0.5, 0.02, 0.02], "z0": 1.0, "x0": 10.0, "y0": -2.0 * ri,
+                                        "cells_across": res, "edge_refinement": refine,
+                                        "pinned": "-x end, nodes within 0.01 m", "material": cfg_dict(vol), "props": cfg_dict(PropsCfg())}
+            except Exception:  # noqa: BLE001
+                meta["errors"][f"rod_{res}_setup"] = traceback.format_exc()
         if NEWTON:
             try:
                 from isaaclab.assets import CableObjectCfg
@@ -132,15 +144,20 @@ with launch_simulation(cfg=PhysicsCfg(), launcher_args=args) as physics_cfg:
                 meta["errors"]["cable_setup"] = traceback.format_exc()
     # (c) soft cube
     if "cube" in scenes:
-        try:
-            cube_cfg = DeformableObjectCfg(
-                prim_path="/World/cube_scene/cube",
-                spawn=sim_utils.MeshCuboidCfg(size=(0.2, 0.2, 0.2), deformable_props=PropsCfg(), physics_material=vol),
-                init_state=DeformableObjectCfg.InitialStateCfg(pos=(20.0, 0.0, 0.5)))
-            objs["cube"] = cube_cfg.class_type(cube_cfg)
-            meta["scenes"]["cube"] = {"size": 0.2, "z0": 0.5, "x0": 20.0, "material": cfg_dict(vol), "props": cfg_dict(PropsCfg())}
-        except Exception:  # noqa: BLE001
-            meta["errors"]["cube_setup"] = traceback.format_exc()
+        for ci, res in enumerate(args.resolutions.split(",")):
+            try:
+                refine = 4.0 if res == "d" else float(np.sqrt(3.0)) * int(res)
+                name = "cube" if res == "d" else f"cube_n{res}"
+                cube_cfg = DeformableObjectCfg(
+                    prim_path=f"/World/cube_scene/{name}",
+                    spawn=sim_utils.MeshCuboidCfg(size=(0.2, 0.2, 0.2), deformable_props=PropsCfg(), physics_material=vol,
+                                                  edge_refinement=max(refine, 1.0)),
+                    init_state=DeformableObjectCfg.InitialStateCfg(pos=(20.0, -2.0 * ci, 0.5)))
+                objs[name] = cube_cfg.class_type(cube_cfg)
+                meta["scenes"][name] = {"size": 0.2, "z0": 0.5, "x0": 20.0, "y0": -2.0 * ci, "cells_per_edge": res,
+                                        "edge_refinement": refine, "material": cfg_dict(vol), "props": cfg_dict(PropsCfg())}
+            except Exception:  # noqa: BLE001
+                meta["errors"][f"cube_{res}_setup"] = traceback.format_exc()
 
     sim.reset()
 
@@ -188,20 +205,23 @@ with launch_simulation(cfg=PhysicsCfg(), launcher_args=args) as physics_cfg:
     def T(a):
         return (a.torch if hasattr(a, "torch") else a).detach().cpu().numpy().copy()
 
-    # pin the rod's -x end
-    if "rod" in objs:
+    # pin each rod's -x end
+    for rname in [k for k in objs if k.startswith("rod")]:
         try:
-            rod = objs["rod"]
+            rod = objs[rname]
             p0 = T(rod.data.default_nodal_state_w)[..., :3]
-            tgt = rod.data.nodal_kinematic_target.torch.clone() if hasattr(rod.data.nodal_kinematic_target, "torch") else rod.data.nodal_kinematic_target.clone()
+            kt = rod.data.nodal_kinematic_target
+            tgt = kt.torch.clone() if hasattr(kt, "torch") else kt.clone()
             tgt[..., :3] = torch.as_tensor(p0, device=tgt.device)
             tgt[..., 3] = 1.0
-            pinned = p0[0, :, 0] < p0[0, :, 0].min() + 0.01
+            pinned = p0[0, :, 0] < p0[0, :, 0].min() + 0.01 * (1.0 if rname == "rod" else 0.1)
             tgt[0, torch.as_tensor(pinned, device=tgt.device), 3] = 0.0
             rod.write_nodal_kinematic_target_to_sim_index(tgt)
-            meta["scenes"]["rod"]["n_pinned"] = int(pinned.sum())
+            meta["scenes"][rname]["n_pinned"] = int(pinned.sum())
+            meta["scenes"][rname]["pinned_mask_key"] = rname + "_pinned"
+            rec_static = globals().setdefault("_pinned", {}); rec_static[rname + "_pinned"] = pinned
         except Exception:  # noqa: BLE001
-            meta["errors"]["rod_pin"] = traceback.format_exc()
+            meta["errors"][rname + "_pin"] = traceback.format_exc()
     cable_pose0 = T(objs["cable"].data.segment_pose_w) if "cable" in objs else None
 
     rec = {}
@@ -237,6 +257,7 @@ with launch_simulation(cfg=PhysicsCfg(), launcher_args=args) as physics_cfg:
         grab()
     meta["wall_s_including_readback"] = time.time() - t0
     meta["counts"] = {k: list(np.array(v[0]).shape) for k, v in rec.items()}
-    np.savez_compressed(os.path.join(args.out, "record.npz"), **{k: np.array(v, np.float32) for k, v in rec.items()})
+    np.savez_compressed(os.path.join(args.out, "record.npz"), **{k: np.array(v, np.float32) for k, v in rec.items()},
+                        **globals().get("_pinned", {}))
     json.dump(meta, open(os.path.join(args.out, "meta.json"), "w"), indent=1, default=str)
     print("DEFORMABLE_IL3_DONE", args.physics, json.dumps(meta["counts"]), "errors:", list(meta["errors"]))

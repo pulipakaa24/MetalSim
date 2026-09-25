@@ -8,7 +8,7 @@ from metalsim.physics import deformable as dfm
 
 rec = sys.argv[1]; Ns = [int(x) for x in sys.argv[2:]] or [256, 1024, 4096]
 _, meta = pp.physx_metrics(rec)
-FIT = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "physx_fit_5p1.json")))
+FIT = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), os.environ.get("FIT_JSON", "physx_fit_5p1.json"))))
 DEV = "metal:0"
 
 def timed(step, sync, n=10):
