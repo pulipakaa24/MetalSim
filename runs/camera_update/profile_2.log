@@ -1,0 +1,25 @@
+torch 2.14.0
+gpu_lock status: holder: {"name": "camera_update_profile2", "kind": "timing", "minutes": 8.0, "pid": 57801, "start": 1790311558.005249}
+==== prep
+gather img[idx] uint8                                median     3.15 ms  min     2.95 ms  -> x128 =   0.40 s/update  (implied  36,342 env-steps/s)
+float * 1/255                                        median     1.90 ms  min     1.83 ms  -> x128 =   0.24 s/update  (implied  39,878 env-steps/s)
+mean over (2,3)                                      median     3.76 ms  min     3.60 ms  -> x128 =   0.48 s/update  (implied  34,842 env-steps/s)
+mean over flattened HW                               median     0.62 ms  min     0.61 ms  -> x128 =   0.08 s/update  (implied  44,287 env-steps/s)
+subtract mean                                        median     2.29 ms  min     2.16 ms  -> x128 =   0.29 s/update  (implied  38,714 env-steps/s)
+gpu_lock status: holder: {"name": "camera_update_profile2", "kind": "timing", "minutes": 8.0, "pid": 57801, "start": 1790311558.005249}
+==== updvar
+TORCHINDUCTOR_LAYOUT_OPTIMIZATION=<unset>
+W0924 21:46:06.090000 57803 torch/_inductor/utils.py:1806] [0/0] Not enough SMs to use max_autotune_gemm mode
+first update incl. compile: 6.5 s
+PPO.update compiled-net=True fusedAdam=False         median    5.381 s  min    5.375 s  (implied 9,665 env-steps/s)
+first update incl. compile: 5.5 s
+PPO.update compiled-net=True fusedAdam=True          median    5.531 s  min    5.308 s  (implied 9,455 env-steps/s)
+torch 2.14.0
+gpu_lock status: holder: {"name": "camera_update_profile2", "kind": "timing", "minutes": 8.0, "pid": 57801, "start": 1790311558.005249}
+==== updvar
+TORCHINDUCTOR_LAYOUT_OPTIMIZATION=0
+W0924 21:47:08.844000 57986 torch/_inductor/utils.py:1806] [0/0] Not enough SMs to use max_autotune_gemm mode
+first update incl. compile: 6.4 s
+PPO.update compiled-net=True fusedAdam=False         median    5.318 s  min    5.317 s  (implied 9,755 env-steps/s)
+first update incl. compile: 5.3 s
+PPO.update compiled-net=True fusedAdam=True          median    5.292 s  min    5.284 s  (implied 9,793 env-steps/s)
