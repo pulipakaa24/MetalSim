@@ -8,6 +8,8 @@ import numpy as np
 import pytest
 import warp as wp
 
+pytest.importorskip("newton", reason="Newton not installed (optional engine: pip install -e '.[newton]')")
+
 from metalsim.learn.g1_velocity import G1VelocityTask, build_g1_model
 from metalsim.learn.warp_policy import RolloutBuffers, bump, zero_int
 

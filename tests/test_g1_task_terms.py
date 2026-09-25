@@ -4,6 +4,8 @@ per-term outputs on the live simulation state."""
 import mujoco
 import numpy as np
 import pytest
+import importlib.util
+
 import torch
 import warp as wp
 
@@ -13,7 +15,9 @@ pytestmark = pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal
 
 # every invariant below must hold on both physics engines (same kernels, same MuJoCo-layout state)
 ENGINES = [pytest.param({}, id="mjwarp"),
-           pytest.param({"engine": "newton", "newton_iterations": 4, "newton_dt": 0.00125}, id="newton")]
+           pytest.param({"engine": "newton", "newton_iterations": 4, "newton_dt": 0.00125}, id="newton",
+                        marks=pytest.mark.skipif(importlib.util.find_spec("newton") is None,
+                                                 reason="Newton not installed (optional: pip install -e '.[newton]')"))]
 
 
 def _rot(q):

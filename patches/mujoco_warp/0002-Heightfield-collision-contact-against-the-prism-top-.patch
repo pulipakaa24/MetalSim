@@ -1,0 +1,179 @@
+From f2716b4e7873ed40b8405c0840238610349c7e7e Mon Sep 17 00:00:00 2001
+From: Aditya Pulipaka <adipu@utexas.edu>
+Date: Wed, 23 Sep 2026 15:10:08 -0700
+Subject: [PATCH 2/4] Heightfield collision: contact against the prism top
+ plane per triangle (MetalSim)
+
+Single-witness GJK/EPA against the whole prism column returned wrong normals and depths for thin
+convex meshes (G1 feet: inverted normal, 2 m penetration, worlds launched); per-triangle plane
+contacts with the deepest vertex in the triangle's column match MuJoCo C on the same scenes.
+Gated by HFIELD_PLANE_CONTACTS in collision_convex.py.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+---
+ mujoco_warp/_src/collision_convex.py | 142 ++++++++++++++++++---------
+ 1 file changed, 98 insertions(+), 44 deletions(-)
+
+diff --git a/mujoco_warp/_src/collision_convex.py b/mujoco_warp/_src/collision_convex.py
+index 4fa90f8..1a6b7e5 100644
+--- a/mujoco_warp/_src/collision_convex.py
++++ b/mujoco_warp/_src/collision_convex.py
+@@ -35,6 +35,9 @@ from mujoco_warp._src.collision_primitive import contact_params
+ from mujoco_warp._src.collision_primitive import geom_collision_pair
+ from mujoco_warp._src.collision_primitive import write_contact
+ from mujoco_warp._src.math import make_frame
++
++# MetalSim: heightfield contacts from the prism top plane (see ccd_hfield_kernel)
++HFIELD_PLANE_CONTACTS = True
+ from mujoco_warp._src.math import upper_trid_index
+ from mujoco_warp._src.types import MJ_MAX_EPAFACES
+ from mujoco_warp._src.types import MJ_MAX_EPAHORIZON
+@@ -465,50 +468,101 @@ def ccd_hfield_kernel_builder(
+ 
+           geom1.polyvert = prism
+ 
+-          # prism center
+-          x1 = geom1.pos + geom1.rot @ (prism[0] + prism[1] + prism[2] + prism[3] + prism[4] + prism[5]) * wp.static(1.0 / 6.0)
+-
+-          dist, ncontact, w1, w2, idx = ccd(
+-            opt_ccd_tolerance[worldid % opt_ccd_tolerance.shape[0]],
+-            0.0,
+-            gjk_iterations,
+-            epa_iterations,
+-            geom1,
+-            geom2,
+-            geomtype1,
+-            geomtype2,
+-            x1,
+-            geom2.pos,
+-            epa_vert,
+-            epa_vert_index,
+-            epa_face,
+-            epa_pr,
+-            epa_norm2,
+-            epa_horizon,
+-            wp.static(bool(warn_overflow & OverflowType.EPA_HORIZON)),
+-            worldid,
+-            overflow_out,
+-          )
+-
+-          if ncontact == 0:
+-            continue
+-
+-          # cache contact information
+-          hfield_contact_dist[count] = dist
+-
+-          # transform contact to global frame
+-          pos_local = 0.5 * (w1 + w2)
+-          pos = hf_mat @ pos_local + hf_pos
+-          hfield_contact_pos[count, 0] = pos[0]
+-          hfield_contact_pos[count, 1] = pos[1]
+-          hfield_contact_pos[count, 2] = pos[2]
+-
+-          frame_local = make_frame(w1 - w2)
+-          normal_local = wp.vec3(frame_local[0, 0], frame_local[0, 1], frame_local[0, 2])
+-          normal = hf_mat @ normal_local
+-          hfield_contact_normal[count, 0] = normal[0]
+-          hfield_contact_normal[count, 1] = normal[1]
+-          hfield_contact_normal[count, 2] = normal[2]
++          if wp.static(HFIELD_PLANE_CONTACTS):
++            # MetalSim: contact against the prism's top triangle plane instead of single-witness
++            # GJK/EPA against the whole prism column (which returns wrong normals/depths for thin
++            # convex meshes; MuJoCo C's multi-contact CCD does not have this problem). Per
++            # triangle: the deepest vertex of the convex geom below the plane whose footprint lies
++            # in the triangle's column is the contact; normal is the triangle normal.
++            v0 = prism[3]
++            v1 = prism[4]
++            v2 = prism[5]
++            tn = wp.cross(v1 - v0, v2 - v0)
++            if tn[2] < 0.0:
++              tn = -tn
++            tn_len = wp.length(tn)
++            if tn_len < 1.0e-12:
++              continue
++            tn = tn / tn_len
++            best_depth = float(0.0)
++            best_p = wp.vec3(0.0, 0.0, 0.0)
++            nvert = geom2.vertnum
++            if geomtype2 != int(GeomType.MESH) or nvert > 256:
++              nvert = 1
++            for k in range(nvert):
++              if geomtype2 == int(GeomType.MESH) and geom2.vertnum <= 256:
++                pv = geom2.rot @ geom2.vert[geom2.vertadr + k] + geom2.pos
++              else:
++                pv = support(geom2, geomtype2, -tn).point
++              depth = wp.dot(pv - v0, tn)
++              if depth >= best_depth:
++                continue
++              # footprint test: xy of pv inside the triangle's xy projection (small tolerance so
++              # shared edges never leave a gap)
++              e0 = (v1[0] - v0[0]) * (pv[1] - v0[1]) - (v1[1] - v0[1]) * (pv[0] - v0[0])
++              e1 = (v2[0] - v1[0]) * (pv[1] - v1[1]) - (v2[1] - v1[1]) * (pv[0] - v1[0])
++              e2 = (v0[0] - v2[0]) * (pv[1] - v2[1]) - (v0[1] - v2[1]) * (pv[0] - v2[0])
++              tol = 1.0e-4 * (wp.abs(v1[0] - v0[0]) + wp.abs(v2[1] - v0[1]) + 1.0e-6)
++              if (e0 >= -tol and e1 >= -tol and e2 >= -tol) or (e0 <= tol and e1 <= tol and e2 <= tol):
++                best_depth = depth
++                best_p = pv
++            if best_depth >= 0.0:
++              continue
++            dist = best_depth
++            hfield_contact_dist[count] = dist
++            pos = hf_mat @ (best_p - 0.5 * dist * tn) + hf_pos
++            hfield_contact_pos[count, 0] = pos[0]
++            hfield_contact_pos[count, 1] = pos[1]
++            hfield_contact_pos[count, 2] = pos[2]
++            normal = hf_mat @ tn
++            hfield_contact_normal[count, 0] = normal[0]
++            hfield_contact_normal[count, 1] = normal[1]
++            hfield_contact_normal[count, 2] = normal[2]
++          else:
++            # prism center
++            x1 = geom1.pos + geom1.rot @ (prism[0] + prism[1] + prism[2] + prism[3] + prism[4] + prism[5]) * wp.static(1.0 / 6.0)
++
++            dist, ncontact, w1, w2, idx = ccd(
++              opt_ccd_tolerance[worldid % opt_ccd_tolerance.shape[0]],
++              0.0,
++              gjk_iterations,
++              epa_iterations,
++              geom1,
++              geom2,
++              geomtype1,
++              geomtype2,
++              x1,
++              geom2.pos,
++              epa_vert,
++              epa_vert_index,
++              epa_face,
++              epa_pr,
++              epa_norm2,
++              epa_horizon,
++              wp.static(bool(warn_overflow & OverflowType.EPA_HORIZON)),
++              worldid,
++              overflow_out,
++            )
++
++            if ncontact == 0:
++              continue
++
++            # cache contact information
++            hfield_contact_dist[count] = dist
++
++            # transform contact to global frame
++            pos_local = 0.5 * (w1 + w2)
++            pos = hf_mat @ pos_local + hf_pos
++            hfield_contact_pos[count, 0] = pos[0]
++            hfield_contact_pos[count, 1] = pos[1]
++            hfield_contact_pos[count, 2] = pos[2]
++
++            frame_local = make_frame(w1 - w2)
++            normal_local = wp.vec3(frame_local[0, 0], frame_local[0, 1], frame_local[0, 2])
++            normal = hf_mat @ normal_local
++            hfield_contact_normal[count, 0] = normal[0]
++            hfield_contact_normal[count, 1] = normal[1]
++            hfield_contact_normal[count, 2] = normal[2]
+ 
+           # contact with minimum distance
+           if dist < min_dist:
+-- 
+2.54.0 (Apple Git-157)
+

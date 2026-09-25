@@ -5,7 +5,7 @@
 # call cannot leave a running job with an abandoned-looking lock.
 set -u
 NAME=$1; KIND=$2; MIN=$3; shift 3; [ "$1" = "--" ] && shift
-cd /Users/aditya/robosim
+cd "$(dirname "$0")/.."
 python3 scripts/gpu_lock.py acquire "$NAME" --kind "$KIND" --minutes "$MIN" --pid $$
 "$@" &
 CHILD=$!

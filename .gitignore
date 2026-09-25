@@ -10,3 +10,17 @@ docs/measurements/*.raw
 
 # NVIDIA Isaac assets are fetched, not committed (scripts/fetch_isaac_assets.sh)
 assets/isaac/**/*.usd
+.venv-flex/
+.venv-*/
+
+# macOS / MuJoCo droppings
+.DS_Store
+MUJOCO_LOG.TXT
+
+# run outputs: console captures, checkpoints and the GPU queue's state (logs under runs/ are committed)
+runs/*.stdout
+*.pt
+runs/policies/
+runs/.gpu_lock
+runs/.gpu_lock.d/
+runs/gpu_queue/

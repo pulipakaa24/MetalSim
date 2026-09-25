@@ -1,0 +1,118 @@
+From 8ce5bb0084e43158ff962b95b7ad6bae933c4564 Mon Sep 17 00:00:00 2001
+From: Aditya Pulipaka <adipu@utexas.edu>
+Date: Tue, 22 Sep 2026 16:24:30 -0700
+Subject: [PATCH 1/4] Apply DavidDobas Metal device patch (mujoco_warp PR #1 on
+ his fork)
+
+---
+ mujoco_warp/_src/collision_convex.py |  4 ++--
+ mujoco_warp/_src/io.py               |  1 +
+ mujoco_warp/_src/smooth.py           |  4 ++--
+ mujoco_warp/_src/solver.py           | 16 +++++++++++-----
+ 4 files changed, 16 insertions(+), 9 deletions(-)
+
+diff --git a/mujoco_warp/_src/collision_convex.py b/mujoco_warp/_src/collision_convex.py
+index 1715c57..4fa90f8 100644
+--- a/mujoco_warp/_src/collision_convex.py
++++ b/mujoco_warp/_src/collision_convex.py
+@@ -1208,8 +1208,8 @@ def _ccd_grid_size(kernel, naconmax: int, device) -> int:
+   # Grid-stride launch width for the CCD kernel: a few device waves, capped at the contact
+   # capacity. The kernel strides over the actual candidate count, so we avoid launching one
+   # (mostly idle) thread per naconmax slot.
+-  if device.is_cpu:
+-    # Warp forces CPU block_dim to 1 and has no CUDA occupancy information.
++  if not device.is_cuda:
++    # Warp forces block_dim to 1 on other backends, which have no CUDA occupancy information.
+     return naconmax
+ 
+   block_size, min_grid_size = wp.get_suggested_block_size(kernel, device)
+diff --git a/mujoco_warp/_src/io.py b/mujoco_warp/_src/io.py
+index b4062f5..db90f13 100644
+--- a/mujoco_warp/_src/io.py
++++ b/mujoco_warp/_src/io.py
+@@ -359,6 +359,7 @@ def put_model(mjm: mujoco.MjModel, batch_sizes: dict[str, int] | None = None) ->
+   # warp only fields
+   opt.broadphase = types.BroadphaseType.NXN
+   opt.broadphase_filter = types.BroadphaseFilter.PLANE | types.BroadphaseFilter.SPHERE | types.BroadphaseFilter.OBB
++  # Conditional graph nodes only exist on CUDA; elsewhere the loop condition would be read back per iteration.
+   opt.graph_conditional = True
+   opt.run_collision_detection = True
+   opt.warn_overflow = int(types.OverflowType.ALL)
+diff --git a/mujoco_warp/_src/smooth.py b/mujoco_warp/_src/smooth.py
+index d26df8c..90ff351 100644
+--- a/mujoco_warp/_src/smooth.py
++++ b/mujoco_warp/_src/smooth.py
+@@ -1302,7 +1302,7 @@ def _tile_cholesky_factorize_block(tile: TileSet):
+     worldid, blk = wp.tid()
+     start = block_dof[blk]
+ 
+-    idx = wp.tile_load(block_elemid, shape=(block_area,), offset=(blk * block_area,), storage="shared")
++    idx = wp.tile_load(block_elemid, shape=(block_area,), offset=(blk * block_area,))  # register: each lane owns its gather indices
+     block = wp.tile_load_indexed(M_in[worldid], idx, shape=(block_area,), storage="shared")
+ 
+     L = wp.tile_reshape(block, (block_size, block_size))
+@@ -3609,7 +3609,7 @@ def _tile_cholesky_factorize_solve_block(tile: TileSet):
+     start = block_dof[blk]
+ 
+     # Densify the block (see _tile_cholesky_factorize_block for the gather rationale).
+-    idx = wp.tile_load(block_elemid, shape=(block_area,), offset=(blk * block_area,), storage="shared")
++    idx = wp.tile_load(block_elemid, shape=(block_area,), offset=(blk * block_area,))  # register: each lane owns its gather indices
+     block = wp.tile_load_indexed(M_in[worldid], idx, shape=(block_area,), storage="shared")
+ 
+     L = wp.tile_reshape(block, (block_size, block_size))
+diff --git a/mujoco_warp/_src/solver.py b/mujoco_warp/_src/solver.py
+index ecad790..680354a 100644
+--- a/mujoco_warp/_src/solver.py
++++ b/mujoco_warp/_src/solver.py
+@@ -2363,7 +2363,8 @@ def _update_gradient_JTDAJ_dense_tiled_compact(nv_pad: int, tile_size: int, njma
+ 
+       J_ki = wp.tile_map(wp.mul, wp.tile_transpose(J_kj), wp.tile_broadcast(D_k, shape=(nv_pad, TILE_SIZE_K)))
+ 
+-      sum_val += wp.tile_matmul(J_ki, J_kj)
++      # accumulate in place: the returning form allocates a second (nv_pad, nv_pad) shared tile
++      wp.tile_matmul(J_ki, J_kj, sum_val)
+ 
+     wp.tile_store(ctx_h_out[worldid], sum_val, bounds_check=False)
+ 
+@@ -2441,7 +2442,8 @@ def _update_gradient_JTDAJ_dense_tiled(nv_pad: int, tile_size: int, njmax: int,
+ 
+       J_ki = wp.tile_map(wp.mul, wp.tile_transpose(J_kj), wp.tile_broadcast(D_k, shape=(nv_pad, TILE_SIZE_K)))
+ 
+-      sum_val += wp.tile_matmul(J_ki, J_kj)
++      # accumulate in place: the returning form allocates a second (nv_pad, nv_pad) shared tile
++      wp.tile_matmul(J_ki, J_kj, sum_val)
+ 
+     wp.tile_store(ctx_h_out[worldid], sum_val, bounds_check=False)
+ 
+@@ -2748,13 +2750,16 @@ def _cholesky_factorize_solve(
+   If skip_unchanged is True (blocked path only), worlds where no constraints
+   changed reuse the cached factorization in hfactor instead of refactorizing.
+   """
+-  if m.nv <= _BLOCK_CHOLESKY_DIM:
++  # Off CUDA the single dense tile beats the blocked factorization up to 64 DOFs (threadgroup memory,
++  # not FLOPs, limits occupancy there).
++  if m.nv <= (_BLOCK_CHOLESKY_DIM if wp.get_device().is_cuda else 64):
+     wp.launch_tiled(
+       _update_gradient_cholesky(m.nv, skip_noflip),
+       dim=d.nworld,
+       inputs=[ctx.grad, ctx.h, ctx.state_changed_count if skip_noflip else d.nefc, ctx.done],
+       outputs=[ctx.search, ctx.search_dot, ctx.newton_decrement],
+-      block_dim=m.block_dim.update_gradient_cholesky,
++      # one SIMD group per world keeps the factorization in registers off CUDA
++      block_dim=m.block_dim.update_gradient_cholesky if wp.get_device().is_cuda else 32,
+     )
+   else:
+     wp.launch(
+@@ -3130,7 +3135,8 @@ def _update_gradient(m: types.Model, d: types.Data, ctx: SolverContext, compact:
+         groups_per_world,
+       ]
+       elliptic = m.opt.cone == types.ConeType.ELLIPTIC
+-      threads_per_group = 1 if elliptic and wp.get_device().is_cpu else _JTDAJ_THREADS_PER_GROUP
++      # cooperative thread groups exist on CUDA only; other backends run one lane per block
++      threads_per_group = _JTDAJ_THREADS_PER_GROUP if not elliptic or wp.get_device().is_cuda else 1
+       block_dim = threads_per_group if elliptic else mj.block_dim.update_gradient_JTDAJ_sparse
+       wp.launch(
+         jtdaj_kernel,
+-- 
+2.54.0 (Apple Git-157)
+

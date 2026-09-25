@@ -10,7 +10,10 @@ DIR=${1:-upstream/newton}
 VENV=${2:-.venv-newtonfork}
 REPO=${METALSIM_NEWTON_REPO:-https://github.com/pulipakaa24/newton}     # fork of newton-physics/newton, branch metalsim
 REF=${METALSIM_NEWTON_REF:-metalsim}
-WARP=${METALSIM_WARP_DIR:-upstream/warp-innate}
+# the Warp fork checkout shared with .venv: upstream/warp-innate on the original machine, otherwise
+# setup_warp.sh's default (upstream/warp-metalsim)
+if [ -d upstream/warp-innate ]; then WARP_DEFAULT=upstream/warp-innate; else WARP_DEFAULT=upstream/warp-metalsim; fi
+WARP=${METALSIM_WARP_DIR:-$WARP_DEFAULT}
 if [ ! -d "$DIR" ]; then
   git clone --branch "$REF" "$REPO" "$DIR" || {
     echo "fork not reachable; using upstream newton at the validated commit (no MetalSim solver fixes)"

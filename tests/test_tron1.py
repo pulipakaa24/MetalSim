@@ -171,6 +171,7 @@ def test_bridge_procedure_and_safety():
 
 
 def test_stock_hold_stops_policy_drift_and_yields_to_operator():
+    pytest.importorskip("onnxruntime")                               # LimX policy (optional: pip install -e ".[tron1]")
     from metalsim.tron1.stock_hold import StockHold, simulate
     free = simulate(False, SimParams.nominal(), seed=1, seconds=20)
     held = simulate(True, SimParams.nominal(), seed=1, seconds=20, pushes=[(8.0, (0.4, 0.0))])
@@ -182,6 +183,7 @@ def test_stock_hold_stops_policy_drift_and_yields_to_operator():
 
 
 def test_bridge_runs_limx_policy_with_hold():
+    pytest.importorskip("onnxruntime")                               # LimX policy (optional: pip install -e ".[tron1]")
     from metalsim.tron1.limx_bridge import BridgeConfig, make_controller, simulate_procedure
     ctrl = make_controller(kind="limx")
     res = simulate_procedure(ctrl, BridgeConfig(wheel_torque=40.0))
@@ -189,6 +191,7 @@ def test_bridge_runs_limx_policy_with_hold():
 
 
 def test_controller_reset_is_fast_enough_for_the_control_loop():
+    pytest.importorskip("onnxruntime")                               # LimX policy (optional: pip install -e ".[tron1]")
     # The bridge resets the controller inside the 500 Hz loop when BALANCE starts; a slow reset
     # (building the MuJoCo model, 125 ms on the Jetson) tripped the 20 ms stall watchdog.
     import time

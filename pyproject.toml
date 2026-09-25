@@ -13,12 +13,21 @@ dependencies = [
     "pyobjc-framework-Metal",
     "pyobjc-framework-MetalFX",
     "pyobjc-framework-Cocoa",
+    "usd-core",    # pxr: the USD scene layer (metalsim.scene), imported by the G1 task
+    "scipy",       # Isaac's rough-terrain generator (metalsim.learn.isaac_terrain)
 ]
 
 [project.optional-dependencies]
-test = ["pytest", "pytest-xdist", "pillow", "imageio", "scipy"]
+test = ["pytest", "pytest-xdist", "pillow", "imageio", "scipy", "trimesh"]   # trimesh: Isaac's terrain reference code in tests/
 learn = ["gymnasium", "stable-baselines3"]
+# the reference learner on MetalSim physics (metalsim.learn.train_g1_rslrl)
+rslrl = ["rsl-rl-lib==3.1.2", "tensordict"]
 tron1 = ["scipy", "onnxruntime"]
+# fidelity protocol against an Isaac recording and the render-fidelity benchmark (metalsim.parity, metalsim.bench)
+parity = ["imageio", "imageio-ffmpeg", "pillow", "scikit-image", "lpips", "flip-evaluator"]
+# Newton XPBD engine (experimental, archived): the upstream commit the validation runs pinned. The
+# MetalSim fork with the solver fixes goes into a separate environment (scripts/setup_newton.sh).
+newton = ["newton @ git+https://github.com/newton-physics/newton@45458023f24629c1feffb1f336594808f537db14"]
 
 [build-system]
 requires = ["setuptools>=64"]
