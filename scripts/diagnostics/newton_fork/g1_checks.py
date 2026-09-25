@@ -9,6 +9,8 @@ Run with either environment: .venv (pinned upstream Newton 45458023 = "before") 
             steps, upright envs only: p50 / p99 / max [mm] (as newton_drift_remedies.py).
   drop    : 8 G1s dropped from 1 m under the PD hold, 1.5 s: max penetration of any box collider [cm], finite.
   all     : energy, drift, drop.
+  stand   : 4 G1s PD-holding Isaac's init pose on flat ground, 2 s: pelvis z every 0.25 s and max |q - q_MuJoCoC| per
+            joint group at 0.5 s (MuJoCo C, same model and gains, 2.5 ms).
   sigma3  : CPU version of g1_preflight.stability: N envs, S control steps of targets default + 0.5 * N(0, 3);
             an env whose torso touches (> 1 N) is reset (default pose, random yaw), one whose qpos/qvel is non-finite
             or > 1000 is counted as blown up and reset. Reports blown-up episodes, falls and peak |joint speed|.
@@ -25,7 +27,9 @@ from metalsim.physics import newton_backend as nb
 import metalsim.interop.warp_metal as wm
 
 ap = argparse.ArgumentParser()
-ap.add_argument("check", choices=("energy", "sigma3", "drift", "drop", "all"))
+ap.add_argument("check", choices=("energy", "sigma3", "drift", "drop", "all", "stand"))
+ap.add_argument("--drive", default="actuator", choices=("actuator", "solver"),
+                help="actuator: NewtonSim's ActuatorPD (joint_f); solver: the model's ke/kd solved by SolverXPBD (fork)")
 ap.add_argument("--noclamp", action="store_true"); ap.add_argument("--n", type=int, default=256)
 ap.add_argument("--steps", type=int, default=400); ap.add_argument("--it", type=int, default=4)
 ap.add_argument("--dt_ms", type=float, default=1.25); ap.add_argument("--relax", type=float, default=0.4)
@@ -50,6 +54,9 @@ if a.lin is not None or a.ang is not None:   # NewtonSim sets both factors to --
             super().__init__(m, **k)
     newton.solvers.SolverXPBD = _XR
 skw = {}
+import inspect as _insp
+if "joint_armature_inertia" in _insp.signature(newton.solvers.SolverXPBD.__init__).parameters:
+    skw["joint_armature_inertia"] = "none"     # NewtonSim's builder already adds the armature to the link inertia
 for kv in a.kw:
     k, v = kv.split("="); skw[k] = eval(v)
 import importlib.metadata as md, json, os
@@ -61,8 +68,32 @@ print(f"newton {md.version('newton')} at {os.path.dirname(newton.__file__)} {du.
 M_MJ = build_g1_model("flat", physics_dt=0.0025)[0]
 
 
+@wp.kernel
+def _target_to_coord(target: wp.array[float], dof: wp.array[int], coord: wp.array[int], out: wp.array[float]):
+    i = wp.tid()
+    out[coord[i]] = target[dof[i]]
+
+
 def make(n):
-    return nb.NewtonSim(M_MJ, n, iterations=a.it, dt=a.dt_ms * 1e-3, device=DEV, relaxation=a.relax, solver_kw=skw or None)
+    kw = dict(skw)
+    if a.drive == "solver":
+        kw.setdefault("joint_drive_mode", "pd")
+    sim = nb.NewtonSim(M_MJ, n, iterations=a.it, dt=a.dt_ms * 1e-3, device=DEV, relaxation=a.relax, solver_kw=kw or None)
+    if a.drive == "solver":
+        # the solver's own drive with Isaac's gains; ActuatorPD's gains zeroed (it then writes no joint_f), and its
+        # per-DOF targets (written from ctrl) copied into Control.joint_target_q (coordinate layout) every substep
+        m, act = sim.model, sim.actuator
+        m.joint_target_ke.assign(act.kp.numpy()); m.joint_target_kd.assign(act.kd.numpy())
+        act.kp.zero_(); act.kd.zero_()
+        qs, qds, jt = m.joint_q_start.numpy(), m.joint_qd_start.numpy(), m.joint_type.numpy()
+        rev = [j for j in range(m.joint_count) if qds[j + 1] - qds[j] == 1]
+        dof = wp.array([int(qds[j]) for j in rev], dtype=int, device=DEV); coord = wp.array([int(qs[j]) for j in rev], dtype=int, device=DEV)
+        _apply = act.apply
+        def apply(state, control):
+            _apply(state, control)                                  # eval_ik (joint_q/qd for qacc); no torque
+            wp.launch(_target_to_coord, dim=len(rev), inputs=[act.target, dof, coord], outputs=[control.joint_target_q], device=DEV)
+        act.apply = apply
+    return sim
 
 
 def place(sim, n, z=None, qvel=None, mask=None, rng=None):
@@ -95,7 +126,7 @@ def kinetic(sim):
 def energy(n=2, T=2.0):
     sim = make(n); M = sim.model
     M.gravity.zero_(); sim.actuator.gravity = wp.vec3(0.0, 0.0, 0.0)
-    sim.actuator.kp.zero_(); sim.actuator.kd.zero_()
+    sim.actuator.kp.zero_(); sim.actuator.kd.zero_(); M.joint_target_ke.zero_(); M.joint_target_kd.zero_()
     qv = np.zeros((n, M_MJ.nv)); qv[:, 6:] = np.random.default_rng(a.seed).normal(0, 2.0, (n, M_MJ.nu))
     place(sim, n, z=3.0, qvel=qv)
     e0 = kinetic(sim); peak = 0.0; ratios = []
@@ -167,8 +198,34 @@ def drop(n=8, T=1.5):
     return pen * 100, bool(np.isfinite(sim.s0.body_q.numpy()).all())
 
 
-tag = f"{a.it} it / {a.dt_ms} ms, relax {rl}, limits {'USD (elbow 3.421)' if a.noclamp else 'clamped pi-0.15'}{', ' + ' '.join(a.kw) if a.kw else ''}"
-if a.check == "all":
+tag = f"{a.it} it / {a.dt_ms} ms, drive {a.drive}, relax {rl}, limits {'USD (elbow 3.421)' if a.noclamp else 'clamped pi-0.15'}{', ' + ' '.join(a.kw) if a.kw else ''}"
+def stand(n=4, T=2.0):
+    import mujoco
+    GROUPS = {"legs": ("hip", "knee", "torso"), "ankles": ("ankle",), "arms": ("shoulder", "elbow"),
+              "hands": ("zero", "one", "two", "three", "four", "five", "six")}
+    grp = lambda nm: next(g for g, keys in GROUPS.items() if any(k in nm for k in keys))
+    m = M_MJ; d = mujoco.MjData(m); mujoco.mj_resetDataKeyframe(m, d, 0); d.ctrl[:] = m.key_qpos[0][7:]
+    zmj, qmj = [], None
+    for k in range(int(T / 0.25)):
+        for _ in range(int(round(0.25 / m.opt.timestep))): mujoco.mj_step(m, d)
+        zmj.append(d.qpos[2])
+        if k == 1: qmj = d.qpos[7:].copy()
+    sim = make(n); place(sim, n); zs, err = [], None
+    names = [mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_JOINT, m.actuator_trnid[i, 0]) for i in range(m.nu)]
+    for k in range(int(T / 0.25)):
+        for _ in range(int(round(0.25 / 0.02))): sim.launch_step()
+        qp = sim.d.qpos.numpy(); zs.append(float(qp[0, 2]))
+        if k == 1:
+            dq = np.abs(qp[:, 7:] - qmj).max(0)
+            err = {g: max(dq[i] for i in range(m.nu) if grp(names[i]) == g) for g in GROUPS}
+    return zmj, zs, err
+
+
+if a.check == "stand":
+    zmj, zs, err = stand()
+    print(f"| stand | MuJoCo C | z {np.round(zmj, 3).tolist()} |")
+    print(f"| stand | {tag}, drive {a.drive} | z {np.round(zs, 3).tolist()} | dq@0.5s " + ", ".join(f"{g} {v:.3f}" for g, v in err.items()) + " |")
+elif a.check == "all":
     fin, mx, pk = energy(); d = drift(); dp, ok = drop()
     ds = "non-finite" if d is None else f"{d[0]:.2f} / {d[1]:.1f} / {d[2]:.1f}"
     print(f"| all | {tag} | drift p50/p99/max {ds} mm | drop pen {'-' if dp is None else f'{dp:.2f}'} cm, finite {ok} | KE(2 s)/KE0 {fin:.3f}, max {mx:.3f} |")

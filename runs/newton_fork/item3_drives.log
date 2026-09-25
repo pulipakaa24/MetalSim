@@ -1,0 +1,67 @@
+# item 3 (joint drives), $(date), CPU device, fork fda6658a
+holder: {"name": "g1_flat_rslrl_isaacflatcfg", "kind": "train", "minutes": 30.0, "pid": 62863, "start": 1790313230.220779}
+  waiting [timing] camera_update_3d est 6.0 min, queued 594 s ago
+  waiting [timing] contact_tuning_bench est 15.0 min, queued 273 s ago
+  waiting [train] g1_flat_newton0625_ppo_fixed est 45.0 min, queued 917 s ago
+$ .venv/bin/python scripts/diagnostics/newton_upstream/repro_drive_bias.py
+static sag [rad] of a pendulum held by a PD drive, ke 200 N m/rad (exact: tau_gravity / ke)
+  xpbd       iterations  1: sag +0.1369 (exact +0.0493) -> effective stiffness     72 N m/rad
+  xpbd       iterations  2: sag +0.0714 (exact +0.0516) -> effective stiffness    145 N m/rad
+  xpbd       iterations  4: sag +0.0363 (exact +0.0527) -> effective stiffness    291 N m/rad
+  xpbd       iterations  8: sag +0.0180 (exact +0.0533) -> effective stiffness    593 N m/rad
+  xpbd       iterations 16: sag +0.0086 (exact +0.0536) -> effective stiffness   1240 N m/rad
+  joint_f PD iterations  1: sag +0.0522 (exact +0.0522) -> effective stiffness    200 N m/rad
+  joint_f PD iterations  4: sag +0.0522 (exact +0.0522) -> effective stiffness    200 N m/rad
+  joint_f PD iterations 16: sag +0.0522 (exact +0.0522) -> effective stiffness    200 N m/rad
+  xpbd with the default relaxation 0.7/0.4, iterations 4: sag +0.0207 (exact +0.0532) -> 513 N m/rad
+$ .venv-newtonfork/bin/python scripts/diagnostics/newton_upstream/repro_drive_bias.py
+static sag [rad] of a pendulum held by a PD drive, ke 200 N m/rad (exact: tau_gravity / ke)
+  xpbd       iterations  1: sag +0.0522 (exact +0.0522) -> effective stiffness    200 N m/rad
+  xpbd       iterations  2: sag +0.0522 (exact +0.0522) -> effective stiffness    200 N m/rad
+  xpbd       iterations  4: sag +0.0522 (exact +0.0522) -> effective stiffness    200 N m/rad
+  xpbd       iterations  8: sag +0.0522 (exact +0.0522) -> effective stiffness    200 N m/rad
+  xpbd       iterations 16: sag +0.0522 (exact +0.0522) -> effective stiffness    200 N m/rad
+  joint_f PD iterations  1: sag +0.0522 (exact +0.0522) -> effective stiffness    200 N m/rad
+  joint_f PD iterations  4: sag +0.0522 (exact +0.0522) -> effective stiffness    200 N m/rad
+  joint_f PD iterations 16: sag +0.0522 (exact +0.0522) -> effective stiffness    200 N m/rad
+  xpbd with the default relaxation 0.7/0.4, iterations 4: sag +0.0521 (exact +0.0522) -> 200 N m/rad
+$ .venv/bin/python scripts/diagnostics/newton_fork/drive_equilibrium.py --ipd --its 1,4,16   (upstream: solver = compliance drive)
+newton at /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/__init__.py; fork: False; solver kwargs {}; dt 2.5 ms; relaxation 0.4
+A. pendulum ke 200 kd 5: effective stiffness [N m/rad] (exact 200)
+  solver it 1: 72.0  it 4: 290.7  it 16: 1239.6
+  ipd    it 1: 200.1  it 4: 200.2  it 16: 200.1
+B. G1 fixed base: max |q - q_eq| per group [rad] after 2 s
+  solver it  1: legs 0.2186, ankles 0.8220, arms 0.5859, hands 0.5446 | max |qd| 150.793
+  solver it  4: legs 0.1201, ankles 0.2184, arms 0.3968, hands 0.2881 | max |qd| 0.382
+  solver it 16: legs 0.0297, ankles 0.1430, arms 0.1673, hands 0.1675 | max |qd| 0.072
+  ipd    it  1: legs 0.0056, ankles 0.0019, arms 0.0006, hands 0.0000 | max |qd| 0.013
+  ipd    it  4: legs 0.0006, ankles 0.0003, arms 0.0002, hands 0.0000 | max |qd| 0.024
+  ipd    it 16: legs 0.0010, ankles 0.0004, arms 0.0001, hands 0.0000 | max |qd| 0.005
+$ .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/drive_equilibrium.py --mode pd --its 1,4,16 --kw joint_armature_inertia="isotropic"
+A. pendulum ke 200 kd 5: effective stiffness [N m/rad] (exact 200)
+  solver it 1: 200.1  it 4: 200.2  it 16: 200.1
+B. G1 fixed base: max |q - q_eq| per group [rad] after 2 s
+  solver it  1: legs 0.0054, ankles 0.0018, arms 0.0006, hands 0.0001 | max |qd| 0.011
+  solver it  4: legs 0.0002, ankles 0.0004, arms 0.0001, hands 0.0001 | max |qd| 0.025
+  solver it 16: legs 0.0008, ankles 0.0003, arms 0.0001, hands 0.0001 | max |qd| 0.004
+$ .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/drive_equilibrium.py --mode pd --its 1,4,16 --kw joint_armature_inertia="none"
+A. pendulum ke 200 kd 5: effective stiffness [N m/rad] (exact 200)
+  solver it 1: 200.1  it 4: 200.2  it 16: 200.1
+B. G1 fixed base: max |q - q_eq| per group [rad] after 2 s
+  solver it  1: legs 0.0536, ankles 0.2018, arms 0.0144, hands 0.5389 | max |qd| 0.626
+  solver it  4: legs 0.0069, ankles 0.0857, arms 0.0227, hands 0.3341 | max |qd| 0.671
+  solver it 16: legs 0.0563, ankles 0.1948, arms 0.0349, hands 0.2627 | max |qd| 0.561
+$ .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/drive_equilibrium.py --mode implicit --its 1,4,16 --kw joint_armature_inertia="isotropic"
+A. pendulum ke 200 kd 5: effective stiffness [N m/rad] (exact 200)
+  solver it 1: 214.4  it 4: 198.7  it 16: 199.6
+B. G1 fixed base: max |q - q_eq| per group [rad] after 2 s
+  solver it  1: legs 0.0103, ankles 0.0069, arms 0.0119, hands 0.0003 | max |qd| 0.138
+  solver it  4: legs 0.0068, ankles 0.0044, arms 0.0128, hands 0.0008 | max |qd| 0.019
+  solver it 16: legs 0.0020, ankles 0.0014, arms 0.0077, hands 0.0011 | max |qd| 0.000
+$ .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/drive_equilibrium.py --mode compliance --its 1,4,16 --kw joint_armature_inertia="none"
+A. pendulum ke 200 kd 5: effective stiffness [N m/rad] (exact 200)
+  solver it 1: 72.3  it 4: 297.7  it 16: 533.0
+B. G1 fixed base: max |q - q_eq| per group [rad] after 2 s
+  solver it  1: legs 0.2146, ankles 0.5048, arms 0.5995, hands 0.5445 | max |qd| 201.293
+  solver it  4: legs 0.0729, ankles 0.2337, arms 0.4193, hands 0.2671 | max |qd| 0.387
+  solver it 16: legs 0.0293, ankles 0.1437, arms 0.1784, hands 0.1704 | max |qd| 0.069

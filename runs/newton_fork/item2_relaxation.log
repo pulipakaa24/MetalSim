@@ -1,0 +1,41 @@
+# item 2 (joint relaxation), Thu Sep 24 22:23:38 PDT 2026, CPU device, fork fda6658a
+holder: {"name": "g1_flat_rslrl_isaacflatcfg", "kind": "train", "minutes": 30.0, "pid": 62863, "start": 1790313230.220779}
+  waiting [timing] camera_update_3d est 6.0 min, queued 536 s ago
+  waiting [timing] contact_tuning_bench est 15.0 min, queued 214 s ago
+  waiting [train] g1_flat_newton0625_ppo_fixed est 45.0 min, queued 858 s ago
+$ .venv/bin/python scripts/diagnostics/newton_fork/relaxation.py
+newton at /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/__init__.py; legacy switch available: False
+| solver | torque response (1.000 = exact) | gravity response | PD hold ke 200: sag / exact |
+|---|---|---|---|
+| Featherstone | 1.000 | 1.000 | +0.0612 / +0.0612 rad (1.000) |
+| XPBD it 2 lin 0.7 / ang 0.4 (defaults) | 1.362 | 0.776 | +0.0350 / +0.0613 rad (0.571) |
+| XPBD it 2 lin 0.4 / ang 0.4 | 1.005 | 0.997 | +0.0612 / +0.0612 rad (1.001) |
+| XPBD it 2 lin 1.0 / ang 1.0 | 1.000 | 1.000 | +0.0613 / +0.0612 rad (1.001) |
+| XPBD it 8 lin 0.7 / ang 0.4 (defaults) | 1.363 | 0.778 | +0.0351 / +0.0613 rad (0.572) |
+| XPBD it 8 lin 0.4 / ang 0.4 | 1.002 | 1.000 | +0.0613 / +0.0612 rad (1.001) |
+| XPBD it 8 lin 1.0 / ang 1.0 | 1.000 | 1.000 | +0.0612 / +0.0612 rad (1.000) |
+$ .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/relaxation.py
+newton at /Users/aditya/robosim/upstream/newton/newton/__init__.py; legacy switch available: True
+| solver | torque response (1.000 = exact) | gravity response | PD hold ke 200: sag / exact |
+|---|---|---|---|
+| Featherstone | 1.000 | 1.000 | +0.0612 / +0.0612 rad (1.000) |
+| XPBD it 2 lin 0.7 / ang 0.4 (defaults) | 1.001 | 0.999 | +0.0612 / +0.0612 rad (1.001) |
+| XPBD it 2 lin 0.7 / ang 0.4 legacy | 1.362 | 0.776 | +0.0350 / +0.0613 rad (0.571) |
+| XPBD it 2 lin 0.4 / ang 0.4 | 1.005 | 0.997 | +0.0612 / +0.0612 rad (1.001) |
+| XPBD it 2 lin 1.0 / ang 1.0 | 1.000 | 1.000 | +0.0613 / +0.0612 rad (1.001) |
+| XPBD it 8 lin 0.7 / ang 0.4 (defaults) | 0.999 | 1.000 | +0.0613 / +0.0612 rad (1.002) |
+| XPBD it 8 lin 0.7 / ang 0.4 legacy | 1.363 | 0.778 | +0.0351 / +0.0613 rad (0.572) |
+| XPBD it 8 lin 0.4 / ang 0.4 | 1.002 | 1.000 | +0.0613 / +0.0612 rad (1.001) |
+| XPBD it 8 lin 1.0 / ang 1.0 | 1.000 | 1.000 | +0.0612 / +0.0612 rad (1.000) |
+$ .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/g1_checks.py all|energy --noclamp --lin L --ang A   (G1, 4 it / 1.25 ms)
+| all | 4 it / 1.25 ms, drive actuator, relax 0.4/0.4, limits USD (elbow 3.421) | drift p50/p99/max 14.78 / 51.8 / 82.7 mm | drop pen 0.23 cm, finite True | KE(2 s)/KE0 0.598, max 0.999 |
+| all | 4 it / 1.25 ms, drive actuator, relax 0.5/0.4, limits USD (elbow 3.421) | drift p50/p99/max 13.83 / 49.7 / 80.2 mm | drop pen 0.26 cm, finite True | KE(2 s)/KE0 0.598, max 0.999 |
+| all | 4 it / 1.25 ms, drive actuator, relax 0.6/0.4, limits USD (elbow 3.421) | drift p50/p99/max 12.98 / 46.5 / 77.0 mm | drop pen 0.27 cm, finite True | KE(2 s)/KE0 0.600, max 0.999 |
+| energy | 4 it / 1.25 ms, drive actuator, relax 0.7/0.4, limits USD (elbow 3.421) | KE(2 s)/KE0 0.690 | max KE/KE0 1.215 | peak |qd| 11.5 rad/s |
+| energy | 4 it / 1.25 ms, drive actuator, relax 0.7/0.7, limits USD (elbow 3.421) | KE(2 s)/KE0 984.690 | max KE/KE0 1139.220 | peak |qd| 103.4 rad/s |
+| energy | 4 it / 1.25 ms, drive actuator, relax 0.5/0.5, limits USD (elbow 3.421) | KE(2 s)/KE0 1.023 | max KE/KE0 1.482 | peak |qd| 17.8 rad/s |
+| energy | 4 it / 1.25 ms, drive actuator, relax 1.0/0.4, limits USD (elbow 3.421) | KE(2 s)/KE0 988.074 | max KE/KE0 992.293 | peak |qd| 132.7 rad/s |
+$ .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/g1_checks.py sigma3 --noclamp --n 1024 --steps 400 --lin L --ang 0.4
+| sigma3 | 4 it / 1.25 ms, relax 0.4/0.4, limits USD (elbow 3.421) | 1024 envs x 400 steps | blown 17 | falls 12121 | peak |qd| 987 rad/s | 288 s |
+| sigma3 | 4 it / 1.25 ms, relax 0.5/0.4, limits USD (elbow 3.421) | 1024 envs x 400 steps | blown 20 | falls 11870 | peak |qd| 926 rad/s | 288 s |
+| sigma3 | 4 it / 1.25 ms, relax 0.6/0.4, limits USD (elbow 3.421) | 1024 envs x 400 steps | blown 20 | falls 11532 | peak |qd| 968 rad/s | 288 s |

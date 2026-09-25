@@ -1,0 +1,21 @@
+newton 1.7.0.dev0 at /Users/aditya/robosim/upstream/newton/newton {'editable': True}
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module newton._src.geometry.inertia de4de8f load on device 'cpu' took 0.88 ms  (cached)
+Module validate_and_correct_inertia_kernel_52e71336 56c4819 load on device 'cpu' took 0.43 ms  (cached)
+Module newton._src.geometry.bvh df808ba load on device 'cpu' took 0.32 ms  (cached)
+Module newton._src.solvers.solver 043a06c load on device 'cpu' took 0.29 ms  (cached)
+Module newton._src.sim.articulation 22aee23 load on device 'cpu' took 0.32 ms  (cached)
+Module newton._src.sim.collide d7c9eb0 load on device 'cpu' took 0.31 ms  (cached)
+Module newton._src.geometry.broad_phase_nxn 551ad5e load on device 'cpu' took 0.25 ms  (cached)
+Module narrow_phase_primitive_write_contact_False_False_False 89c00fd load on device 'cpu' took 0.34 ms  (cached)
+Module newton._src.geometry.narrow_phase 5de13a6 load on device 'cpu' took 0.22 ms  (cached)
+Module metalsim.physics.newton_backend 07a105e load on device 'cpu' took 0.31 ms  (cached)
+Module newton._src.solvers.xpbd.kernels 69a5cba load on device 'cpu' took 0.43 ms  (cached)
+Module __main__ 434bd45 load on device 'cpu' took 0.48 ms  (cached)
+| all | 4 it / 1.25 ms, drive actuator, relax 0.4/0.4, limits USD (elbow 3.421) | drift p50/p99/max 14.78 / 51.8 / 82.7 mm | drop pen 0.23 cm, finite True | KE(2 s)/KE0 0.598, max 0.999 |
