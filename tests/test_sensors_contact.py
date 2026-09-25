@@ -126,11 +126,10 @@ def test_g1_landing_vs_mujoco_c():
     contact force on the feet and torso vs MuJoCo C.
     (a) the sensor's reduction equals MuJoCo C's mj_contactForce summed over the same contacts
         (MuJoCo Warp's contact set and efc_force decoded by C);
-    (b) against an independent MuJoCo C forward from the same state, the total is within 1 % on
-        every step where both engines find the same contact set. Steps where MuJoCo Warp finds fewer
-        contacts are counted and reported: its plane-convex collision keeps only vertices within
-        1 mm of the deepest (collision_primitive.plane_convex, threshold = max_support - 1e-3),
-        so a tilted landing foot loses its shallower heel corners; MuJoCo C keeps all four."""
+    (b) against an independent MuJoCo C forward from the same state (same solver budget), both
+        engines find the same contact set on every step and the total is within 1 %. Before the
+        fork's plane_convex fix (tests/test_plane_convex_contacts.py) 61 of 691 steps differed: MuJoCo
+        Warp kept only vertices within 1 mm of the deepest, so a tilted landing foot lost its heel."""
     import os
     from metalsim.learn.g1_velocity import build_g1_model
     if not os.path.exists(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "assets", "isaac", "G1", "g1_minimal.usd")):
@@ -173,7 +172,7 @@ def test_g1_landing_vs_mujoco_c():
           f"independent C forward, same contact set ({len(rel_same)}): total rel err median {np.median(rel_same):.1e} "
           f"max {rel_same.max():.1e}; different contact set: {n_diff}")
     assert agg_err < 1e-3
-    assert rel_same.max() < 0.01 and len(rel_same) > 0.8 * n_contact
+    assert n_diff == 0 and rel_same.max() < 0.01 and len(rel_same) == n_contact
     assert min(zsum) > 0                        # feet are pushed up (+z, world frame)
     # history of the last 3 substeps: latest equals net
     assert np.array_equal(ot["net_forces_w_history"][:, 0], ot["net_forces_w"])
