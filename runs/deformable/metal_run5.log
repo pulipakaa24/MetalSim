@@ -1,0 +1,19 @@
+== Fri Sep 25 09:25:48 PDT 2026
+holder: {"name": "flex_metal_run5", "kind": "low", "minutes": 10.0, "pid": 61854, "start": 1790353547.630904}
+dfa5d30 Mesh-flex normal: keep the face normal for touching contacts (witness separation < 0.1 mm)
+== flex collision stage profile 1024
+{"stage": "collision (all)", "num_envs": 1024, "ms": 23.634358402341604}
+{"stage": "rigid-only part: collision with flex skipped", "num_envs": 1024, "ms": 0.0005415990017354488}
+{"stage": "flex_broadphase_aabb", "num_envs": 1024, "ms": 0.06208340055309236}
+{"stage": "allocate workspace", "num_envs": 1024, "ms": 11.855499999364838}
+{"stage": "geom-flex detect (plane+1d+elem)", "num_envs": 1024, "ms": 15.875025000423193}
+{"stage": "geom-flex filter+write", "num_envs": 1024, "ms": 4.188074998091906}
+{"stage": "flex_geom_collision (detect+filter)", "num_envs": 1024, "ms": 15.555533400038257}
+{"stage": "sap sort", "num_envs": 1024, "ms": 1.2567583995405585}
+{"stage": "flex-flex sap collision (sweep+narrow+filter)", "num_envs": 1024, "ms": 15.825924999080598}
+{"stage": "flex_collision (all flex)", "num_envs": 1024, "ms": 20.69942499510944}
+== flex collision stage profile 4096
+Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
+    raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
+RuntimeError: Failed to launch kernel '_bitonic_step_i64' on device 'metal:0': Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory) (arguments: keys=array_t, vals=array_t, j=c_int, k=c_int)
+== done Fri Sep 25 09:26:04 PDT 2026

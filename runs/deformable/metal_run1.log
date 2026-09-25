@@ -1,0 +1,758 @@
+== Fri Sep 25 07:46:26 PDT 2026
+holder: {"name": "flex_tests_metal", "kind": "low", "minutes": 30.0, "pid": 51032, "start": 1790347586.272822}
+5da74f1 Flex workspace: no block-parallel FPS scratch in the serial selection modes
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+device metal:0
+..................FF..ss..ssssss..s..........s..........s........s...... [ 28%]
+........................................................................ [ 57%]
+....................................FF.................................. [ 86%]
+.................................                                        [100%]
+=================================== FAILURES ===================================
+__________________ FlexConstraintTest.test_constraint_parity2 __________________
+mujoco_warp/_src/flex_test.py:483: in test_constraint_parity
+    np.testing.assert_allclose(
+E   AssertionError: 
+E   Not equal to tolerance rtol=1e-07, atol=0.0005
+E   efc_pos mismatch for world 0
+E   Mismatched elements: 8 / 16 (50%)
+E   First 5 mismatches are at indices:
+E    [4]: 0.059565670788288116 (ACTUAL), -0.02394986650046245 (DESIRED)
+E    [5]: 0.005372576415538788 (ACTUAL), 0.022668291769580032 (DESIRED)
+E    [6]: 0.004807129502296448 (ACTUAL), -0.005236293057522795 (DESIRED)
+E    [7]: -0.009916678071022034 (ACTUAL), 0.018867973732884513 (DESIRED)
+E    [8]: -0.023949861526489258 (ACTUAL), 0.05956566454378237 (DESIRED)
+E   Max absolute difference among violations: 0.08351554
+E   Max relative difference among violations: 3.48709824
+E    ACTUAL: array([ 0.030683,  0.011614,  0.045437,  0.016642,  0.059566,  0.005373,
+E           0.004807, -0.009917, -0.02395 ,  0.022668, -0.005236,  0.018868,
+E          -0.04382 ,  0.037604,  0.019815,  0.027925], dtype=float32)
+E    DESIRED: array([ 0.030683,  0.011614,  0.045437,  0.016642, -0.02395 ,  0.022668,
+E          -0.005236,  0.018868,  0.059566,  0.005373,  0.004807, -0.009917,
+E          -0.04382 ,  0.037604,  0.019815,  0.027925])
+__________________ FlexConstraintTest.test_constraint_parity3 __________________
+mujoco_warp/_src/flex_test.py:483: in test_constraint_parity
+    np.testing.assert_allclose(
+E   AssertionError: 
+E   Not equal to tolerance rtol=1e-07, atol=0.0005
+E   efc_pos mismatch for world 0
+E   Mismatched elements: 8 / 16 (50%)
+E   First 5 mismatches are at indices:
+E    [4]: 0.059565670788288116 (ACTUAL), -0.02394986650046245 (DESIRED)
+E    [5]: 0.005372576415538788 (ACTUAL), 0.022668291769580032 (DESIRED)
+E    [6]: 0.004807129502296448 (ACTUAL), -0.005236293057522795 (DESIRED)
+E    [7]: -0.009916678071022034 (ACTUAL), 0.018867973732884513 (DESIRED)
+E    [8]: -0.023949861526489258 (ACTUAL), 0.05956566454378237 (DESIRED)
+E   Max absolute difference among violations: 0.08351554
+E   Max relative difference among violations: 3.48709824
+E    ACTUAL: array([ 0.030683,  0.011614,  0.045437,  0.016642,  0.059566,  0.005373,
+E           0.004807, -0.009917, -0.02395 ,  0.022668, -0.005236,  0.018868,
+E          -0.04382 ,  0.037604,  0.019815,  0.027925], dtype=float32)
+E    DESIRED: array([ 0.030683,  0.011614,  0.045437,  0.016642, -0.02395 ,  0.022668,
+E          -0.005236,  0.018868,  0.059566,  0.005373,  0.004807, -0.009917,
+E          -0.04382 ,  0.037604,  0.019815,  0.027925])
+___________ FlexContactParityTest.test_contact_mesh_flex_3d_parity0 ____________
+mujoco_warp/_src/flex_test.py:2760: in test_contact_mesh_flex_3d_parity
+    self._assert_contact_parity(w_contacts, m_contacts, atol=1e-4)
+mujoco_warp/_src/flex_test.py:2358: in _assert_contact_parity
+    np.testing.assert_allclose(
+E   AssertionError: 
+E   Not equal to tolerance rtol=1e-07, atol=0.0001
+E   Contact 0 frame mismatch
+E   Mismatched elements: 4 / 9 (44.4%)
+E   Mismatch at indices:
+E    [0, 1]: 0.1271643191576004 (ACTUAL), -1.2262438722244664e-08 (DESIRED)
+E    [0, 2]: -0.9918816685676575 (ACTUAL), -1.0 (DESIRED)
+E    [1, 1]: 0.9918816685676575 (ACTUAL), 1.0 (DESIRED)
+E    [1, 2]: 0.1271643191576004 (ACTUAL), -1.2262438722244667e-08 (DESIRED)
+E   Max absolute difference among violations: 0.12716433
+E   Max relative difference among violations: 10370231.75409283
+E    ACTUAL: array([[-5.951465e-19,  1.271643e-01, -9.918817e-01],
+E          [ 7.630084e-20,  9.918817e-01,  1.271643e-01],
+E          [ 1.000000e+00,  7.819661e-30, -6.000177e-19]], dtype=float32)
+E    DESIRED: array([[ 3.004892e-09, -1.226244e-08, -1.000000e+00],
+E          [ 3.684731e-17,  1.000000e+00, -1.226244e-08],
+E          [ 1.000000e+00,  0.000000e+00,  3.004892e-09]])
+----------------------------- Captured stderr call -----------------------------
+WARNING: flex 'tet' is not rigid and has no equality constraints or passive forces
+Element name 'tet', id 0
+
+___________ FlexContactParityTest.test_contact_mesh_flex_3d_parity1 ____________
+mujoco_warp/_src/flex_test.py:2760: in test_contact_mesh_flex_3d_parity
+    self._assert_contact_parity(w_contacts, m_contacts, atol=1e-4)
+mujoco_warp/_src/flex_test.py:2358: in _assert_contact_parity
+    np.testing.assert_allclose(
+E   AssertionError: 
+E   Not equal to tolerance rtol=1e-07, atol=0.0001
+E   Contact 0 frame mismatch
+E   Mismatched elements: 4 / 9 (44.4%)
+E   Mismatch at indices:
+E    [0, 1]: 0.1271643191576004 (ACTUAL), -1.2262438722244664e-08 (DESIRED)
+E    [0, 2]: -0.9918816685676575 (ACTUAL), -1.0 (DESIRED)
+E    [1, 1]: 0.9918816685676575 (ACTUAL), 1.0 (DESIRED)
+E    [1, 2]: 0.1271643191576004 (ACTUAL), -1.2262438722244667e-08 (DESIRED)
+E   Max absolute difference among violations: 0.12716433
+E   Max relative difference among violations: 10370231.75409283
+E    ACTUAL: array([[-5.951465e-19,  1.271643e-01, -9.918817e-01],
+E          [ 7.630084e-20,  9.918817e-01,  1.271643e-01],
+E          [ 1.000000e+00,  7.819661e-30, -6.000177e-19]], dtype=float32)
+E    DESIRED: array([[ 3.004892e-09, -1.226244e-08, -1.000000e+00],
+E          [ 3.684731e-17,  1.000000e+00, -1.226244e-08],
+E          [ 1.000000e+00,  0.000000e+00,  3.004892e-09]])
+----------------------------- Captured stderr call -----------------------------
+WARNING: flex 'tet' is not rigid and has no equality constraints or passive forces
+Element name 'tet', id 0
+
+=============================== warnings summary ===============================
+mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp0
+mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp1
+mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp4
+mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp5
+  /Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/io.py:334: UserWarning: Bending damping is not yet supported for interpolated flex shells.
+    warnings.warn("Bending damping is not yet supported for interpolated flex shells.")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED mujoco_warp/_src/flex_test.py::FlexConstraintTest::test_constraint_parity2
+FAILED mujoco_warp/_src/flex_test.py::FlexConstraintTest::test_constraint_parity3
+FAILED mujoco_warp/_src/flex_test.py::FlexContactParityTest::test_contact_mesh_flex_3d_parity0
+FAILED mujoco_warp/_src/flex_test.py::FlexContactParityTest::test_contact_mesh_flex_3d_parity1
+4 failed, 233 passed, 12 skipped, 4 warnings in 96.72s (0:01:36)
+exit 1
+== diag_parity
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+== rope nworld=1 is_sparse=False mj_isSparse=0 nefc C=4 warp=[4]
+  w0: max|pos-C| in order 5.81e-09, sorted 5.81e-09; efc_id order [0, 0, 0, 0]; C id [0, 0, 0, 0]
+       flexedge_length max err 4.32e-09
+       J max err in order 5.16e-08; after matching rows by pos 5.16e-08
+== rope nworld=2 is_sparse=False mj_isSparse=0 nefc C=4 warp=[4 4]
+  w0: max|pos-C| in order 5.81e-09, sorted 5.81e-09; efc_id order [0, 0, 0, 0]; C id [0, 0, 0, 0]
+       flexedge_length max err 4.32e-09
+       J max err in order 5.16e-08; after matching rows by pos 5.16e-08
+  w1: max|pos-C| in order 5.81e-09, sorted 5.81e-09; efc_id order [0, 0, 0, 0]; C id [0, 0, 0, 0]
+       flexedge_length max err 4.32e-09
+       J max err in order 5.16e-08; after matching rows by pos 5.16e-08
+== cloth nworld=1 is_sparse=False mj_isSparse=0 nefc C=16 warp=[16]
+  w0: max|pos-C| in order 8.35e-02, sorted 1.21e-08; efc_id order [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; C id [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+       flexedge_length max err 1.84e-08
+       J max err in order 1.38e+00; after matching rows by pos 9.49e-08
+== cloth nworld=2 is_sparse=False mj_isSparse=0 nefc C=16 warp=[16 16]
+  w0: max|pos-C| in order 8.35e-02, sorted 1.21e-08; efc_id order [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; C id [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+       flexedge_length max err 1.84e-08
+       J max err in order 1.38e+00; after matching rows by pos 9.49e-08
+  w1: max|pos-C| in order 8.35e-02, sorted 1.21e-08; efc_id order [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; C id [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+       flexedge_length max err 1.84e-08
+       J max err in order 1.38e+00; after matching rows by pos 9.49e-08
+== original metalsim branch (upstream/mujoco_warp, a8e6485): flex constraint parity tests on metal
+/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/__init__.py
+..FF..                                                                   [100%]
+=================================== FAILURES ===================================
+__________________ FlexConstraintTest.test_constraint_parity2 __________________
+mujoco_warp/_src/flex_test.py:483: in test_constraint_parity
+    np.testing.assert_allclose(
+E   AssertionError: 
+E   Not equal to tolerance rtol=1e-07, atol=0.0005
+E   efc_pos mismatch for world 0
+E   Mismatched elements: 8 / 16 (50%)
+E   First 5 mismatches are at indices:
+E    [4]: 0.059565670788288116 (ACTUAL), -0.02394986650046245 (DESIRED)
+E    [5]: 0.005372576415538788 (ACTUAL), 0.022668291769580032 (DESIRED)
+E    [6]: 0.004807129502296448 (ACTUAL), -0.005236293057522795 (DESIRED)
+E    [7]: -0.009916678071022034 (ACTUAL), 0.018867973732884513 (DESIRED)
+E    [8]: -0.023949861526489258 (ACTUAL), 0.05956566454378237 (DESIRED)
+E   Max absolute difference among violations: 0.08351554
+E   Max relative difference among violations: 3.48709824
+E    ACTUAL: array([ 0.030683,  0.011614,  0.045437,  0.016642,  0.059566,  0.005373,
+E           0.004807, -0.009917, -0.02395 ,  0.022668, -0.005236,  0.018868,
+E          -0.04382 ,  0.037604,  0.019815,  0.027925], dtype=float32)
+E    DESIRED: array([ 0.030683,  0.011614,  0.045437,  0.016642, -0.02395 ,  0.022668,
+E          -0.005236,  0.018868,  0.059566,  0.005373,  0.004807, -0.009917,
+E          -0.04382 ,  0.037604,  0.019815,  0.027925])
+----------------------------- Captured stdout call -----------------------------
+Module _flex_narrowphase_elem_detect__locals__kernel_27252b2c 27252b2 load on device 'metal:0' took 3289.29 ms  (compiled)
+__________________ FlexConstraintTest.test_constraint_parity3 __________________
+mujoco_warp/_src/flex_test.py:483: in test_constraint_parity
+    np.testing.assert_allclose(
+E   AssertionError: 
+E   Not equal to tolerance rtol=1e-07, atol=0.0005
+E   efc_pos mismatch for world 0
+E   Mismatched elements: 8 / 16 (50%)
+E   First 5 mismatches are at indices:
+E    [4]: 0.059565670788288116 (ACTUAL), -0.02394986650046245 (DESIRED)
+E    [5]: 0.005372576415538788 (ACTUAL), 0.022668291769580032 (DESIRED)
+E    [6]: 0.004807129502296448 (ACTUAL), -0.005236293057522795 (DESIRED)
+E    [7]: -0.009916678071022034 (ACTUAL), 0.018867973732884513 (DESIRED)
+E    [8]: -0.023949861526489258 (ACTUAL), 0.05956566454378237 (DESIRED)
+E   Max absolute difference among violations: 0.08351554
+E   Max relative difference among violations: 3.48709824
+E    ACTUAL: array([ 0.030683,  0.011614,  0.045437,  0.016642,  0.059566,  0.005373,
+E           0.004807, -0.009917, -0.02395 ,  0.022668, -0.005236,  0.018868,
+E          -0.04382 ,  0.037604,  0.019815,  0.027925], dtype=float32)
+E    DESIRED: array([ 0.030683,  0.011614,  0.045437,  0.016642, -0.02395 ,  0.022668,
+E          -0.005236,  0.018868,  0.059566,  0.005373,  0.004807, -0.009917,
+E          -0.04382 ,  0.037604,  0.019815,  0.027925])
+=========================== short test summary info ============================
+FAILED mujoco_warp/_src/flex_test.py::FlexConstraintTest::test_constraint_parity2
+FAILED mujoco_warp/_src/flex_test.py::FlexConstraintTest::test_constraint_parity3
+2 failed, 4 passed, 241 deselected in 31.24s
+== diag_parity on the original branch
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+== rope nworld=1 is_sparse=False mj_isSparse=0 nefc C=4 warp=[4]
+  w0: max|pos-C| in order 5.81e-09, sorted 5.81e-09; efc_id order [0, 0, 0, 0]; C id [0, 0, 0, 0]
+       flexedge_length max err 4.32e-09
+       J max err in order 5.16e-08; after matching rows by pos 5.16e-08
+== rope nworld=2 is_sparse=False mj_isSparse=0 nefc C=4 warp=[4 4]
+  w0: max|pos-C| in order 5.81e-09, sorted 5.81e-09; efc_id order [0, 0, 0, 0]; C id [0, 0, 0, 0]
+       flexedge_length max err 4.32e-09
+       J max err in order 5.16e-08; after matching rows by pos 5.16e-08
+  w1: max|pos-C| in order 5.81e-09, sorted 5.81e-09; efc_id order [0, 0, 0, 0]; C id [0, 0, 0, 0]
+       flexedge_length max err 4.32e-09
+       J max err in order 5.16e-08; after matching rows by pos 5.16e-08
+== cloth nworld=1 is_sparse=False mj_isSparse=0 nefc C=16 warp=[16]
+  w0: max|pos-C| in order 8.35e-02, sorted 1.21e-08; efc_id order [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; C id [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+       flexedge_length max err 1.84e-08
+       J max err in order 1.38e+00; after matching rows by pos 9.49e-08
+== cloth nworld=2 is_sparse=False mj_isSparse=0 nefc C=16 warp=[16 16]
+  w0: max|pos-C| in order 8.35e-02, sorted 1.21e-08; efc_id order [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; C id [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+       flexedge_length max err 1.84e-08
+       J max err in order 1.38e+00; after matching rows by pos 9.49e-08
+  w1: max|pos-C| in order 8.35e-02, sorted 1.21e-08; efc_id order [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; C id [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+       flexedge_length max err 1.84e-08
+       J max err in order 1.38e+00; after matching rows by pos 9.49e-08
+== test_deformable (metal)
+FFFFF...FF                                                               [100%]
+=================================== FAILURES ===================================
+___________________ test_mjw_flex_free_fall_matches_mujoco_c ___________________
+tests/test_deformable.py:29: in test_mjw_flex_free_fall_matches_mujoco_c
+    sim = dfm.DeformableSim(m, 4, device=DEV)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+metalsim/physics/deformable.py:218: in __init__
+    self.capture()
+metalsim/physics/deformable.py:230: in capture
+    self.launch()
+metalsim/physics/deformable.py:225: in launch
+    mjw.step(self.m, self.d)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py:1825: in step
+    forward(m, d)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py:1801: in forward
+    fwd_position(m, d, factorize=False)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py:1091: in fwd_position
+    collision_driver.collision(m, d)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/collision_driver.py:939: in collision
+    flex_collision(m, d, ctx)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/collision_flex.py:4068: in flex_collision
+    sap_data = _run_flex_sap_sort(m, d)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/collision_flex.py:3857: in _run_flex_sap_sort
+    wp.utils.segmented_sort_pairs(
+upstream/warp-innate/warp/_src/utils.py:510: in segmented_sort_pairs
+    starts = segment_start_indices.numpy().astype(np.int32, copy=False)[:num_segments]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/types.py:4570: in numpy
+    a = self.to("cpu", requires_grad=False)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/types.py:4669: in to
+    return warp.clone(self, device=device, requires_grad=requires_grad)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/context.py:10501: in clone
+    warp.copy(arr, src)
+upstream/warp-innate/warp/_src/context.py:15016: in copy
+    device.metal_synchronize()
+upstream/warp-innate/warp/_src/context.py:6066: in metal_synchronize
+    raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
+E   RuntimeError: Metal error on device metal:0: Cannot synchronize device "Apple M4 Max" during graph capture
+----------------------------- Captured stdout call -----------------------------
+----------------------------- Captured stderr call -----------------------------
+Cannot synchronize device "Apple M4 Max" during graph capture
+______________ test_mjw_flex_contact_trajectory_matches_mujoco_c _______________
+tests/test_deformable.py:54: in test_mjw_flex_contact_trajectory_matches_mujoco_c
+    sim = dfm.DeformableSim(m, 2, device=DEV)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+metalsim/physics/deformable.py:218: in __init__
+    self.capture()
+metalsim/physics/deformable.py:230: in capture
+    self.launch()
+metalsim/physics/deformable.py:225: in launch
+    mjw.step(self.m, self.d)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py:1825: in step
+    forward(m, d)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py:1801: in forward
+    fwd_position(m, d, factorize=False)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py:1091: in fwd_position
+    collision_driver.collision(m, d)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/collision_driver.py:939: in collision
+    flex_collision(m, d, ctx)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/collision_flex.py:4068: in flex_collision
+    sap_data = _run_flex_sap_sort(m, d)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/collision_flex.py:3857: in _run_flex_sap_sort
+    wp.utils.segmented_sort_pairs(
+upstream/warp-innate/warp/_src/utils.py:510: in segmented_sort_pairs
+    starts = segment_start_indices.numpy().astype(np.int32, copy=False)[:num_segments]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/types.py:4570: in numpy
+    a = self.to("cpu", requires_grad=False)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/types.py:4669: in to
+    return warp.clone(self, device=device, requires_grad=requires_grad)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/context.py:10501: in clone
+    warp.copy(arr, src)
+upstream/warp-innate/warp/_src/context.py:15016: in copy
+    device.metal_synchronize()
+upstream/warp-innate/warp/_src/context.py:6066: in metal_synchronize
+    raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
+E   RuntimeError: Metal error on device metal:0: Cannot synchronize device "Apple M4 Max" during graph capture
+----------------------------- Captured stderr call -----------------------------
+Cannot synchronize device "Apple M4 Max" during graph capture
+______________ test_mjw_flex_one_step_matches_mujoco_c_in_contact ______________
+tests/test_deformable.py:84: in test_mjw_flex_one_step_matches_mujoco_c_in_contact
+    sim.set_qpos(d.qpos[None], d.qvel[None])
+metalsim/physics/deformable.py:308: in set_qpos
+    mjw.forward(self.m, self.d)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py:1801: in forward
+    fwd_position(m, d, factorize=False)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py:1093: in fwd_position
+    constraint.make_constraint(m, d)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/constraint.py:5188: in make_constraint
+    m.eq_solimp,
+upstream/warp-innate/warp/_src/context.py:12216: in launch
+    module_exec = kernel.module.load(device, block_dim)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/context.py:5078: in load
+    raise e
+upstream/warp-innate/warp/_src/context.py:5075: in load
+    compiled = self._compile(device, module_dir, output_name, output_arch, options=options)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/context.py:4824: in _compile
+    source_str, source_code_ext, meta, ltoir_values, fatbin_values = self._run_codegen(options, target)
+                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/codegen.py:1836: in locked_call
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/context.py:4693: in _run_codegen
+    builder = ModuleBuilder(
+upstream/warp-innate/warp/_src/context.py:3344: in __init__
+    self.build_kernel(kernel)
+upstream/warp-innate/warp/_src/context.py:3463: in build_kernel
+    kernel.adj.build(self)
+upstream/warp-innate/warp/_src/codegen.py:1836: in locked_call
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/codegen.py:2398: in build
+    raise type(original_exc)(*new_args).with_traceback(original_exc.__traceback__) from None
+upstream/warp-innate/warp/_src/codegen.py:2379: in build
+    adj.eval(adj.tree.body[0])
+upstream/warp-innate/warp/_src/codegen.py:6706: in eval
+    return emit_node(adj, node)
+           ^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/codegen.py:3680: in emit_FunctionDef
+    adj.eval(f)
+upstream/warp-innate/warp/_src/codegen.py:6706: in eval
+    return emit_node(adj, node)
+           ^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/codegen.py:5743: in emit_Assign
+    target, indices = adj.eval_subscript(lhs, as_target=True)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/codegen.py:5412: in eval_subscript
+    target, indices = adj.recurse_subscript(node, [], as_target=as_target)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/codegen.py:5081: in recurse_subscript
+    target, indices = adj.recurse_subscript(node.value, indices, as_target=as_target)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/codegen.py:5067: in recurse_subscript
+    target = adj.eval(node)
+             ^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/codegen.py:6706: in eval
+    return emit_node(adj, node)
+           ^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/codegen.py:3870: in emit_Name
+    raise WarpCodegenKeyError("Referencing undefined symbol: " + str(node.id))
+E   warp._src.codegen.WarpCodegenKeyError: 'Error while parsing function "_equality_flex_reserve" at /Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/constraint.py:895:\n  efc_base_out[worldid] = wp.atomic_add(nefc_out, worldid, total)\n;Referencing undefined symbol: efc_base_out'
+----------------------------- Captured stdout call -----------------------------
+_______________________ test_mjw_flex_energy_bounded_2s ________________________
+tests/test_deformable.py:100: in test_mjw_flex_energy_bounded_2s
+    sim = dfm.DeformableSim(m, 64, device=DEV)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+metalsim/physics/deformable.py:218: in __init__
+    self.capture()
+metalsim/physics/deformable.py:230: in capture
+    self.launch()
+metalsim/physics/deformable.py:225: in launch
+    mjw.step(self.m, self.d)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py:1825: in step
+    forward(m, d)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py:1801: in forward
+    fwd_position(m, d, factorize=False)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py:1091: in fwd_position
+    collision_driver.collision(m, d)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/collision_driver.py:939: in collision
+    flex_collision(m, d, ctx)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/collision_flex.py:4068: in flex_collision
+    sap_data = _run_flex_sap_sort(m, d)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/collision_flex.py:3857: in _run_flex_sap_sort
+    wp.utils.segmented_sort_pairs(
+upstream/warp-innate/warp/_src/utils.py:510: in segmented_sort_pairs
+    starts = segment_start_indices.numpy().astype(np.int32, copy=False)[:num_segments]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/types.py:4570: in numpy
+    a = self.to("cpu", requires_grad=False)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/types.py:4669: in to
+    return warp.clone(self, device=device, requires_grad=requires_grad)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/context.py:10501: in clone
+    warp.copy(arr, src)
+upstream/warp-innate/warp/_src/context.py:15016: in copy
+    device.metal_synchronize()
+upstream/warp-innate/warp/_src/context.py:6066: in metal_synchronize
+    raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
+E   RuntimeError: Metal error on device metal:0: Cannot synchronize device "Apple M4 Max" during graph capture
+----------------------------- Captured stderr call -----------------------------
+Cannot synchronize device "Apple M4 Max" during graph capture
+___________________ test_mjw_flex_graph_replay_equals_eager ____________________
+tests/test_deformable.py:125: in test_mjw_flex_graph_replay_equals_eager
+    a = dfm.DeformableSim(m, 16, device=DEV, capture=True)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+metalsim/physics/deformable.py:218: in __init__
+    self.capture()
+metalsim/physics/deformable.py:230: in capture
+    self.launch()
+metalsim/physics/deformable.py:225: in launch
+    mjw.step(self.m, self.d)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py:1825: in step
+    forward(m, d)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py:1801: in forward
+    fwd_position(m, d, factorize=False)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py:1091: in fwd_position
+    collision_driver.collision(m, d)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/collision_driver.py:939: in collision
+    flex_collision(m, d, ctx)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/collision_flex.py:4068: in flex_collision
+    sap_data = _run_flex_sap_sort(m, d)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/collision_flex.py:3857: in _run_flex_sap_sort
+    wp.utils.segmented_sort_pairs(
+upstream/warp-innate/warp/_src/utils.py:510: in segmented_sort_pairs
+    starts = segment_start_indices.numpy().astype(np.int32, copy=False)[:num_segments]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/types.py:4570: in numpy
+    a = self.to("cpu", requires_grad=False)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/types.py:4669: in to
+    return warp.clone(self, device=device, requires_grad=requires_grad)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/context.py:10501: in clone
+    warp.copy(arr, src)
+upstream/warp-innate/warp/_src/context.py:15016: in copy
+    device.metal_synchronize()
+upstream/warp-innate/warp/_src/context.py:6066: in metal_synchronize
+    raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
+E   RuntimeError: Metal error on device metal:0: Cannot synchronize device "Apple M4 Max" during graph capture
+----------------------------- Captured stderr call -----------------------------
+Cannot synchronize device "Apple M4 Max" during graph capture
+_____________________ test_xpbd_drape_agrees_with_mjw_flex _____________________
+tests/test_deformable.py:191: in test_xpbd_drape_agrees_with_mjw_flex
+    a = dfm.DeformableSim(m, 1, device=DEV)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+metalsim/physics/deformable.py:218: in __init__
+    self.capture()
+metalsim/physics/deformable.py:230: in capture
+    self.launch()
+metalsim/physics/deformable.py:225: in launch
+    mjw.step(self.m, self.d)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py:1825: in step
+    forward(m, d)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py:1801: in forward
+    fwd_position(m, d, factorize=False)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py:1091: in fwd_position
+    collision_driver.collision(m, d)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/collision_driver.py:939: in collision
+    flex_collision(m, d, ctx)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/collision_flex.py:4068: in flex_collision
+    sap_data = _run_flex_sap_sort(m, d)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/collision_flex.py:3857: in _run_flex_sap_sort
+    wp.utils.segmented_sort_pairs(
+upstream/warp-innate/warp/_src/utils.py:510: in segmented_sort_pairs
+    starts = segment_start_indices.numpy().astype(np.int32, copy=False)[:num_segments]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/types.py:4570: in numpy
+    a = self.to("cpu", requires_grad=False)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/types.py:4669: in to
+    return warp.clone(self, device=device, requires_grad=requires_grad)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/context.py:10501: in clone
+    warp.copy(arr, src)
+upstream/warp-innate/warp/_src/context.py:15016: in copy
+    device.metal_synchronize()
+upstream/warp-innate/warp/_src/context.py:6066: in metal_synchronize
+    raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
+E   RuntimeError: Metal error on device metal:0: Cannot synchronize device "Apple M4 Max" during graph capture
+----------------------------- Captured stderr call -----------------------------
+Cannot synchronize device "Apple M4 Max" during graph capture
+___________________________ test_g1_cloth_scenes_run ___________________________
+tests/test_deformable.py:206: in test_g1_cloth_scenes_run
+    a = dfm.DeformableSim(fm, 4, device=DEV)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+metalsim/physics/deformable.py:218: in __init__
+    self.capture()
+metalsim/physics/deformable.py:230: in capture
+    self.launch()
+metalsim/physics/deformable.py:225: in launch
+    mjw.step(self.m, self.d)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py:1825: in step
+    forward(m, d)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py:1801: in forward
+    fwd_position(m, d, factorize=False)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py:1091: in fwd_position
+    collision_driver.collision(m, d)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/collision_driver.py:939: in collision
+    flex_collision(m, d, ctx)
+upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/collision_flex.py:4068: in flex_collision
+    sap_data = _run_flex_sap_sort(m, d)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp-flex/mujoco_warp/_src/collision_flex.py:3857: in _run_flex_sap_sort
+    wp.utils.segmented_sort_pairs(
+upstream/warp-innate/warp/_src/utils.py:510: in segmented_sort_pairs
+    starts = segment_start_indices.numpy().astype(np.int32, copy=False)[:num_segments]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/types.py:4570: in numpy
+    a = self.to("cpu", requires_grad=False)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/types.py:4669: in to
+    return warp.clone(self, device=device, requires_grad=requires_grad)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/context.py:10501: in clone
+    warp.copy(arr, src)
+upstream/warp-innate/warp/_src/context.py:15016: in copy
+    device.metal_synchronize()
+upstream/warp-innate/warp/_src/context.py:6066: in metal_synchronize
+    raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
+E   RuntimeError: Metal error on device metal:0: Cannot synchronize device "Apple M4 Max" during graph capture
+----------------------------- Captured stdout call -----------------------------
+----------------------------- Captured stderr call -----------------------------
+Cannot synchronize device "Apple M4 Max" during graph capture
+============================== slowest durations ===============================
+21.70s call     tests/test_deformable.py::test_mjw_flex_one_step_matches_mujoco_c_in_contact
+5.09s call     tests/test_deformable.py::test_g1_cloth_scenes_run
+2.18s call     tests/test_deformable.py::test_xpbd_metal_equals_cpu
+0.51s call     tests/test_deformable.py::test_xpbd_energy_strain_penetration_2s
+0.20s call     tests/test_deformable.py::test_xpbd_graph_replay_equals_eager
+0.17s call     tests/test_deformable.py::test_mjw_flex_free_fall_matches_mujoco_c
+0.05s call     tests/test_deformable.py::test_mjw_flex_energy_bounded_2s
+0.02s call     tests/test_deformable.py::test_mjw_flex_graph_replay_equals_eager
+0.02s call     tests/test_deformable.py::test_mjw_flex_contact_trajectory_matches_mujoco_c
+0.01s call     tests/test_deformable.py::test_xpbd_drape_agrees_with_mjw_flex
+
+(20 durations < 0.005s hidden.  Use -vv to show these durations.)
+=========================== short test summary info ============================
+FAILED tests/test_deformable.py::test_mjw_flex_free_fall_matches_mujoco_c - R...
+FAILED tests/test_deformable.py::test_mjw_flex_contact_trajectory_matches_mujoco_c
+FAILED tests/test_deformable.py::test_mjw_flex_one_step_matches_mujoco_c_in_contact
+FAILED tests/test_deformable.py::test_mjw_flex_energy_bounded_2s - RuntimeErr...
+FAILED tests/test_deformable.py::test_mjw_flex_graph_replay_equals_eager - Ru...
+FAILED tests/test_deformable.py::test_xpbd_drape_agrees_with_mjw_flex - Runti...
+FAILED tests/test_deformable.py::test_g1_cloth_scenes_run - RuntimeError: Met...
+7 failed, 3 passed in 32.99s
+== fidelity (metal:0)
+Warp 1.18.0.dev20260917 initialized: CUDA not enabled in this build Devices: "cpu" : "arm" "metal:0" : "Apple M4 Max" (Metal) Kernel cache: /Users/aditya/robosim/scratch/wpcache_flex_metal/1.18.0.dev20260917 floor { "c314": { "version": "3.14.0", "traj_err_m@50/100/200/400": [ 1.4234124635602308e-05, 0.011734102247444672, 0.005415687841672248, 0.006167185720146767 ], "C_vs_Cprime_m": [ 2.608264044190456e-07, 1.268705169810147e-07, 1.2760971396241771e-07, 1.2826232814733274e-07 ], "mean_z_diff_m@400": 0.00011386025435006436, "onestep_dqvel_max": 4.5213196007448664e-05, "onestep_dqvel_median": 1.929454165589331e-05, "contact_sets_equal": "83/83" }, "main": { "version": "3.14.1", "traj_err_m@50/100/200/400": [ 1.4234124635602308e-05, 0.014806405217218876, 0.016282149084514558, 0.007083483376115418 ], "C_vs_Cprime_m": [ 2.608264044190456e-07, 2.0294278781085584e-07, 1.4699623867853173e-06, 1.2826232814733274e-07 ], "mean_z_diff_m@400": 5.713754194382886e-05, "onestep_dqvel_max": 0.4595416236605565, "onestep_dqvel_median": 0.10478992798437932, "contact_sets_equal": "1/83" } } box { "c314": { "version": "3.14.0", "traj_err_m@50/100/200/400": [ 1.4240085100092337e-05, 5.0606979298040144e-05, 0.01133662045165268, 0.03662659155701797 ], "C_vs_Cprime_m": [ 2.608264044190456e-07, 2.3185659198121655e-07, 6.186919397910273e-07, 0.01652209657137682 ], "mean_z_diff_m@400": -0.0014272250919633023, "onestep_dqvel_max": 4.768339014310941e-05, "onestep_dqvel_median": 2.167281372702709e-05, "contact_sets_equal": "78/78" }, "main": { "version": "3.14.1", "traj_err_m@50/100/200/400": [ 1.4240085100092337e-05, 0.017596684507812876, 0.03454146502737254, 0.026572940387518396 ], "C_vs_Cprime_m": [ 2.608264044190456e-07, 6.424636804780448e-07, 9.68941800183476e-07, 1.2624466900756914e-06 ], "mean_z_diff_m@400": -0.0026193934694692667, "onestep_dqvel_max": 0.4145253528027826, "onestep_dqvel_median": 0.046403165306541136, "contact_sets_equal": "0/78" } } 
+== quick throughput (mjw, box 10x10 cloth + 12 cable)
+Cannot synchronize device "Apple M4 Max" during graph capture
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/aditya/robosim/metalsim/physics/deformable.py", line 782, in <module>
+    _main()
+  File "/Users/aditya/robosim/metalsim/physics/deformable.py", line 774, in _main
+    r = benchmark(fm, n, seconds=a.seconds)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/metalsim/physics/deformable.py", line 348, in benchmark
+    sim = DeformableSim(model, num_envs, device=device, substeps=substeps)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/metalsim/physics/deformable.py", line 218, in __init__
+    self.capture()
+  File "/Users/aditya/robosim/metalsim/physics/deformable.py", line 230, in capture
+    self.launch()
+  File "/Users/aditya/robosim/metalsim/physics/deformable.py", line 225, in launch
+    mjw.step(self.m, self.d)
+  File "/Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py", line 1825, in step
+    forward(m, d)
+  File "/Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py", line 1801, in forward
+    fwd_position(m, d, factorize=False)
+  File "/Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py", line 1091, in fwd_position
+    collision_driver.collision(m, d)
+  File "/Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/collision_driver.py", line 939, in collision
+    flex_collision(m, d, ctx)
+  File "/Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/collision_flex.py", line 4068, in flex_collision
+    sap_data = _run_flex_sap_sort(m, d)
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/collision_flex.py", line 3857, in _run_flex_sap_sort
+    wp.utils.segmented_sort_pairs(
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/utils.py", line 510, in segmented_sort_pairs
+    starts = segment_start_indices.numpy().astype(np.int32, copy=False)[:num_segments]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/types.py", line 4570, in numpy
+    a = self.to("cpu", requires_grad=False)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/types.py", line 4669, in to
+    return warp.clone(self, device=device, requires_grad=requires_grad)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 10501, in clone
+    warp.copy(arr, src)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 15016, in copy
+    device.metal_synchronize()
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 6066, in metal_synchronize
+    raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
+RuntimeError: Metal error on device metal:0: Cannot synchronize device "Apple M4 Max" during graph capture
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+== quick throughput (xpbd, same topology, 10 substeps)
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+{"num_envs": 256, "steps": 3850, "wall_s": 2.0043513330165297, "env_steps_per_s": 491730.1591616084, "sim_s_per_wall_s": 3.8416418684500653, "finite": true, "substeps": 10, "ncons": 282, "ncolors": 6, "nflexvert": 112, "backend": "xpbd", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002}
+{"num_envs": 1024, "steps": 2670, "wall_s": 2.004795083019417, "env_steps_per_s": 1363770.3040862456, "sim_s_per_wall_s": 2.663613875168448, "finite": true, "substeps": 10, "ncons": 282, "ncolors": 6, "nflexvert": 112, "backend": "xpbd", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002}
+{"num_envs": 4096, "steps": 1150, "wall_s": 2.0024247909896076, "env_steps_per_s": 2352348.0238536694, "sim_s_per_wall_s": 1.1486074335222995, "finite": true, "substeps": 10, "ncons": 282, "ncolors": 6, "nflexvert": 112, "backend": "xpbd", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002}

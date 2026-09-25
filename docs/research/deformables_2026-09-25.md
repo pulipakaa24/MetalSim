@@ -146,15 +146,16 @@ were the mesh-normal change of fix 11 on Metal, §6).
 | Newton XPBD particles / Warp's old `warp.sim` cloth | `warp.sim` removed from Warp (only `warp/examples/benchmarks/benchmark_cloth_*`, a spring cloth); Newton XPBD runs on Metal for rigid bodies | different model | not pursued (archived engine) |
 | MetalSim-native XPBD cloth/cable (`metalsim.physics.deformable.XPBDSim`) | runs: same flex topology, graph-coloured distance + cross-edge bending constraints, geom contacts with friction (plane/sphere/capsule/box; meshes as OBBs), two-way coupling via `xfrc_applied`, one captured graph | **not MuJoCo C's model** (measured, box scene, same start as §2): max vertex error 5.4 cm already at step 50 (it removes the initial 2 mm constraint violation at once where MuJoCo's soft edge constraints relax over solref's 20 ms), 5.5–15 cm at rest for 10–40 substeps, cloth mean height +0.9 to +2.0 cm; rejected on fidelity | measured §6 |
 
-## 5. Plan and effort (estimated)
+## 5. Plan and effort (estimated at the start; status in brackets)
 
 1. Done: research; isolated environment (`.venv-flex`, worktree `upstream/mujoco_warp-flex` on `metalsim-flex`);
-   flex contact fidelity fixes 1–9 (≈ 1 day).
+   flex contact fidelity fixes 1–11 (≈ 1 day) [done].
 2. Metal: run MuJoCo Warp's flex tests on `metal:0`, read the three failures, fix in the Metal codegen / Warp fork
-   (branch `metalsim-flex` of upstream/warp-innate) or MuJoCo Warp (0.5–2 days depending on cause).
+   (branch `metalsim-flex` of upstream/warp-innate) or MuJoCo Warp (0.5–2 days depending on cause) [done: row
+   order + capture + mesh normal; 237/237 on Metal].
 3. Demo + tests on Metal: `metalsim/physics/deformable.py`, `tests/test_deformable.py` — MuJoCo C parity (free fall,
    contact trajectory, in-contact one-step), energy over 2 s, graph replay = eager; throughput at 64–4096 envs
-   (0.5 day, done on CPU, Metal pending the GPU queue).
+   (0.5 day) [done, 10/10 on Metal].
 4. Cheaper faithful path (fidelity-first rule): profile the flex step on Metal; candidates: contact budget per
    world (raw candidates dominate), serial FPS vs parallel, sparse Jacobian row sizes, CG iterations (1–3 days).
 5. Isaac Lab parity items (later): `DeformableObject`-style API (nodal state tensors, kinematic targets = flex
@@ -162,9 +163,50 @@ were the mesh-normal change of fix 11 on Metal, §6).
    `elasticity`), surface cloth with bending (`elastic2d="both"`), quadratic dofs and flex–heightfield in MuJoCo Warp
    (2–5 days each).
 
-## 6. Metal results and throughput
+## 6. Metal results and throughput (measured, `runs/deformable/metal_run*.log`, `metal_final.log`)
 
-_To be filled from the queued Metal runs._
+Environment: `.venv-flex` (git-ignored) with the MuJoCo Warp worktree `upstream/mujoco_warp-flex` (branch
+`metalsim-flex`, fork commits b2e9ea5…dfa5d30) and the Warp worktree `upstream/warp-innate-flex` (branch
+`metalsim-flex`, 9dcb140), both pushed to the `fork` remotes. All GPU work ran through `scripts/gpu_run.sh` at kind `low`.
+
+Correctness on `metal:0`:
+
+* MuJoCo Warp flex tests: 237 passed, 0 failed (before: `test_constraint_parity2/3` failed, §2). Full MuJoCo Warp
+  suite: 1450 passed, 2 failed, 39 skipped — the two are not flex: `io_test::test_put_data_nefc_zero_dense`
+  (known upstream) and `collision_driver_test::test_hfield_maxconpair`, which fails identically on the CPU and on the
+  unmodified `metalsim` branch (the fork's heightfield patch).
+* Two Metal-only problems met on the way: (1) graph capture of a flex step failed because Warp's Metal
+  `segmented_sort_pairs` validated its segments with a synchronous `.numpy()` (Warp fork 9dcb140); (2) on Metal the
+  GJK direction of a touching tetrahedron apex (distance 1e-6 m) was 0.127 rad off the face normal (CPU 1.7e-3):
+  the EPA/GJK normal is now used only for witness separations above 0.1 mm (dfa5d30).
+* `tests/test_deformable.py`: 10/10 on Metal — free fall equals MuJoCo C (< 1e-5 m, 60 steps, 4 worlds), contact
+  trajectory equals MuJoCo C to 1 mm over 100 steps (landing on the box), one-step in-contact parity (contact sets
+  equal apart from < 10 µm flex-flex contacts; velocity error median < 1e-4 m/s, max < 0.05), energy never above
+  its initial value over 2 s in 64 randomized worlds with no contact/constraint overflow, graph replay = eager
+  (free fall < 1e-6 m; through contact graph-vs-eager 3.3e-2 m vs eager-vs-eager 3.1e-2 m after 150 steps, i.e.
+  the atomic contact order, not the graph), XPBD Metal = CPU, XPBD energy/strain/penetration, XPBD drape vs MuJoCo
+  Warp, G1 scenes finite.
+* Fidelity harness on Metal (c314 mode vs MuJoCo C 3.14): identical to the CPU table for plane, box, cable, second
+  flex, flex-flex, primitives and the soft cube (e.g. box 78/78 sets, one-step Δqvel median 2.2e-5 / max 4.8e-5 m/s);
+  **the convex-mesh scene is worse on Metal** (Δqvel median 3.7e-2, max 0.52 m/s; mean height −3 cm after 0.8 s),
+  because Metal's float32 GJK/EPA witness points on mesh face contacts differ from the CPU's (open item).
+
+Throughput (physics step only, graph replay, 10 steps per synchronization, `python -m metalsim.physics.deformable`):
+
+| scene | DOFs | 64 | 256 | 1024 | 2048 | 4096 envs |
+|---|---|---|---|---|---|---|
+| MuJoCo Warp flex: 10×10 cloth + 12-vertex cable onto a box (dt 2 ms, CG 20/10) | 336 | 6.0K | 17.5K | 36.5K | 49.2K | **54.1K** env-steps/s |
+| same, Warp's host sorts (`--flex-flags FLEX_DEVICE_SORT=0`) | 336 | – | 9.1K | 11.4K | – | – |
+| MuJoCo Warp flex: 20×20 cloth + 24 cable | 1272 | – | 8.6K | 10.0K | – | 9.6K |
+| MuJoCo Warp flex: Isaac's G1 + 12×12 cloth + 16 cable (dt 2.5 ms, CG 30/10) | 523 | – | 15.2K | 19.1K | 20.0K | (memory) |
+| MetalSim XPBD, same box scene topology, 10 substeps (**not** MuJoCo C's model) | – | 129K | 491K | 1.36M | 1.93M | 2.35M |
+
+Cost of the faithful path at 1024 worlds (graph replay, box scene): full step 26.7 ms; contacts off 9.7 ms;
+constraints off 9.4 ms; CG 5 iterations 20.7 ms. Eager stage timings: flex collision ~9 ms (element–geom detection
+~4 ms, contact filter ~4 ms, flex-flex SAP + CCD ~4 ms, excluding the per-call workspace allocation that the graph
+does once), contact solve the rest. The device-side sort/scan (fork 361f11f) was worth 2–3.6× (host sorts: a
+segmented sort of 4096×173 SAP keys took 172 ms on the CPU per step). For scale: the rigid G1 alone runs at 68.6K
+physics steps/s at 4096 envs (STATUS); Isaac Lab publishes no deformable throughput.
 
 ## 7. Decisions
 
@@ -174,5 +216,22 @@ _To be filled from the queued Metal runs._
 | Selection semantics | C 3.14 quirk / C main plain FPS / upstream parallel FPS | follow the installed mujoco (3.14 → `c314`) so the reference used by every test is matched exactly | `collision_flex.FLEX_FPS_MODE` |
 | Cable contacts | vertex spheres / capsule elements | capsule elements (MuJoCo C); vertex spheres gave 0.38 m/s one-step error on a box | `CABLE_CAPSULE_ELEMENTS=False` |
 | Box–triangle | first 2 / all (≤ 11) | all (C) | `BOX_TRIANGLE_ALL_CONTACTS=False` |
-| Deformable engine for the demo | MuJoCo Warp flex / MetalSim XPBD | MuJoCo Warp flex (MuJoCo C's model); XPBD kept as `XPBDSim` with its measured deviation and cost | `XPBDSim` / `--backend xpbd` |
+| Deformable engine | MuJoCo Warp flex (54.1K env-steps/s at 4096, per-step equal to MuJoCo C) / MetalSim XPBD (2.35M, 43× faster, but 5–15 cm vertex and +0.9–2 cm mean-height deviation from MuJoCo C) | MuJoCo Warp flex: fidelity first; XPBD kept in `metalsim.physics.deformable.XPBDSim` with its tests and numbers | `XPBDSim(...)`, `--backend xpbd` |
+| Sorts in the flex filter/SAP on Metal | Warp's host utilities (11.4K env-steps/s at 1024) / device bitonic + scan (36.5–41.5K) | device (same selections, verified by the fidelity harness) | `collision_flex.FLEX_DEVICE_SORT=False` |
+| Mesh–flex normal | face normal (upstream) / EPA direction / EPA only for separations > 0.1 mm | the last: C's direction at real penetrations, robust at touching contacts on Metal | `MESH_FLEX_FACE_NORMAL`, `MESH_FLEX_NORMAL_MIN_SEP` |
+| Flex equality row order | atomic counter (device-dependent) / reserved block in C's order | reserved block (deterministic; fixes the Metal test failures) | – (bug fix) |
 | Stretch model in the demo | edge equality / continuum `young` | edge equality: stable at 2 ms; continuum cloth needed `elastic2d` and went unstable at young 1e6 (NaN at 0.05 s) | `ClothCfg` / XML |
+
+## 8. What remains against Isaac Lab's deformable features
+
+| Isaac Lab | MetalSim now | gap / next step |
+|---|---|---|
+| `DeformableObject` (PhysX FEM volume, tetrahedral sim + collision meshes) | flex volumes through MuJoCo Warp: `SoftCfg` soft cube (`dof="trilinear"` or `"full"`, `<elasticity young poisson damping>`), per-step equal to MuJoCo C for the trilinear cube (§2) | arbitrary tetrahedral meshes (`flexcomp type="mesh"/"gmsh"`) untested; full-dof volumes at young 5e3 are unstable at 1–2 ms in MuJoCo C itself; `dof="quadratic"` unsupported in MuJoCo Warp |
+| `DeformableBodyMaterialCfg` (youngs_modulus 5e7, poissons_ratio 0.45, damping, friction, density) | `young`, `poisson`, `damping`, friction, mass per flex | per-world material randomization (MuJoCo Warp batches model fields; flex stiffness arrays not yet exposed per world) |
+| nodal state: `nodal_pos_w`, `nodal_vel_w`, `nodal_state_w`, `write_nodal_state_to_sim` | `DeformableSim.nodal_pos()`, `nodal_vel()` (zero-copy MPS views), `set_qpos`, `randomize` | batched on-device writes (no host round trip) |
+| `write_nodal_kinematic_target_to_sim` (partial kinematic control) | – | flex `pin`s or equality/mocap-driven vertex bodies |
+| `sim_element_deform_gradient_w`, `sim_element_stress_w`, element quaternions | – | from MuJoCo Warp's elasticity kernels (per-element F is computed there) |
+| cloth (Isaac Lab: not in the PhysX API; Newton VBD in 3.0) | 2D flex cloth (edge equality; or continuum with `elastic2d`), per-step equal to MuJoCo C | bending with `elastic2d="bend"` untested at scale; self-collision off in the demo (`selfcollide` supported by MuJoCo Warp, untested for fidelity) |
+| cables / ropes (Newton VBD cable) | 1D flex with capsule-element contacts (fixed here) | no bending/twist energy without the `cable` plugin (unsupported by MuJoCo Warp) |
+| coupling with articulations (PhysX two-way; Newton `CoupledSolver`) | one MuJoCo solve for robot + flex (two-way by construction); G1 + cloth + cable at 20.0K env-steps/s (2048 envs) | 4096 G1 worlds exceed memory with the default CCD workspace |
+| throughput | 54.1K env-steps/s at 4096 for a 112-vertex cloth+cable scene (faithful), 2.35M for XPBD (not faithful) | Isaac publishes none; next cuts in §5 item 4; Metal EPA precision on mesh face contacts (§6) |

@@ -1,0 +1,48 @@
+== Fri Sep 25 09:26:37 PDT 2026
+holder: {"name": "flex_metal_final", "kind": "low", "minutes": 20.0, "pid": 61959, "start": 1790353597.173776}
+dfa5d30 Mesh-flex normal: keep the face normal for touching contacts (witness separation < 0.1 mm)
+9dcb140 Metal: segmented_sort_pairs inside a graph capture (no segment validation readback)
+d867143 G1 MuJoCo Warp throughput: register Cholesky for 43 dofs, tree-sparse L'DL of M (training loop 27.9K -> 52.5K env-steps/s)
+== full MuJoCo Warp suite on metal:0 (metalsim-flex)
+FAILED mujoco_warp/_src/collision_driver_test.py::CollisionTest::test_hfield_maxconpair
+FAILED mujoco_warp/_src/io_test.py::IOTest::test_put_data_nefc_zero_dense - A...
+2 failed, 1450 passed, 39 skipped, 28 warnings, 8 subtests passed in 444.84s (0:07:24)
+== test_deformable (metal)
+...graph-vs-eager 3.30e-02, eager-vs-eager 3.14e-02 after 150 steps
+.
+============================== slowest durations ===============================
+12.26s call     tests/test_deformable.py::test_mjw_flex_energy_bounded_2s
+5.52s call     tests/test_deformable.py::test_xpbd_drape_agrees_with_mjw_flex
+3.71s call     tests/test_deformable.py::test_g1_cloth_scenes_run
+3.31s call     tests/test_deformable.py::test_mjw_flex_graph_replay_equals_eager
+1.21s call     tests/test_deformable.py::test_mjw_flex_one_step_matches_mujoco_c_in_contact
+1.12s call     tests/test_deformable.py::test_mjw_flex_free_fall_matches_mujoco_c
+0.87s call     tests/test_deformable.py::test_mjw_flex_contact_trajectory_matches_mujoco_c
+0.51s call     tests/test_deformable.py::test_xpbd_energy_strain_penetration_2s
+0.19s call     tests/test_deformable.py::test_xpbd_graph_replay_equals_eager
+0.14s call     tests/test_deformable.py::test_xpbd_metal_equals_cpu
+
+(20 durations < 0.005s hidden.  Use -vv to show these durations.)
+10 passed in 29.31s
+== fidelity on metal:0 (c314 mode vs MuJoCo C 3.14 / main)
+floor           vs c314: sets 83/83  dqvel med 1.9e-05 max 4.4e-05 | traj @100 1.2e-02 @200 5.4e-03 @400 7.4e-03 | C-C' @200 1.3e-07 @400 1.3e-07 | dz@400 1.9e-04
+box             vs c314: sets 78/78  dqvel med 2.2e-05 max 4.8e-05 | traj @100 5.1e-05 @200 1.1e-02 @400 3.7e-02 | C-C' @200 6.2e-07 @400 1.7e-02 | dz@400 -1.6e-03
+cable_box       vs c314: sets 84/84  dqvel med 5.6e-06 max 2.6e-05 | traj @100 3.7e-06 @200 9.9e-06 @400 4.9e-03 | C-C' @200 1.5e-07 @400 4.4e-04 | dz@400 -5.7e-04
+cloth2nd_box    vs c314: sets 88/88  dqvel med 2.1e-05 max 3.8e-05 | traj @100 1.3e-02 @200 3.0e-02 @400 2.6e-02 | C-C' @200 5.1e-04 @400 7.8e-03 | dz@400 -1.5e-03
+cable_on_cloth  vs c314: sets 82/88  dqvel med 2.3e-05 max 8.5e-03 | traj @100 4.7e-03 @200 1.4e-02 @400 1.2e-02 | C-C' @200 1.5e-06 @400 1.5e-06 | dz@400 9.1e-05
+prims           vs c314: sets 33/81  dqvel med 3.4e-05 max 6.0e-02 | traj @100 1.9e-04 @200 3.2e-02 @400 2.8e-02 | C-C' @200 1.6e-02 @400 1.7e-02 | dz@400 6.4e-05
+mesh            vs c314: sets 15/88  dqvel med 3.7e-02 max 5.2e-01 | traj @100 2.9e-02 @200 7.3e-02 @400 3.0e-01 | C-C' @200 2.5e-07 @400 1.5e-07 | dz@400 -3.0e-02
+soft_tri_box    vs c314: sets 48/67  dqvel med 5.0e-05 max 1.1e-02 | traj @100 8.2e-08 @200 5.4e-04 @400 3.6e-04 | C-C' @200 2.7e-04 @400 3.1e-04 | dz@400 -8.0e-05
+== throughput mjw box 10x10 + 12
+{"num_envs": 64, "steps": 290, "wall_s": 3.071774665993871, "env_steps_per_s": 6042.109860944152, "sim_s_per_wall_s": 0.18881593315450476, "finite": true, "energy_max": 0.5722284317016602, "overflow": {"ITERATIONS": 64, "LS_ITERATIONS": 64}, "nv": 336, "nflexvert": 112, "nconmax": 688, "njmax": 3376, "njmax_nnz": 18496, "nccdmax": 128, "backend": "mjw", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": ""}
+{"num_envs": 256, "steps": 210, "wall_s": 3.0781914579856675, "env_steps_per_s": 17464.80059274153, "sim_s_per_wall_s": 0.1364437546307932, "finite": true, "energy_max": 0.572472333908081, "overflow": {"ITERATIONS": 256, "LS_ITERATIONS": 256}, "nv": 336, "nflexvert": 112, "nconmax": 688, "njmax": 3376, "njmax_nnz": 18496, "nccdmax": 128, "backend": "mjw", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": ""}
+{"num_envs": 1024, "steps": 120, "wall_s": 3.3642377910146024, "env_steps_per_s": 36525.361057471884, "sim_s_per_wall_s": 0.07133859581537477, "finite": true, "energy_max": 0.7793161273002625, "overflow": {"ITERATIONS": 1024, "LS_ITERATIONS": 1024}, "nv": 336, "nflexvert": 112, "nconmax": 688, "njmax": 3376, "njmax_nnz": 18496, "nccdmax": 128, "backend": "mjw", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": ""}
+{"num_envs": 2048, "steps": 80, "wall_s": 3.3293748750002123, "env_steps_per_s": 49210.4392419882, "sim_s_per_wall_s": 0.0480570695722541, "finite": true, "energy_max": 0.9188365340232849, "overflow": {"ITERATIONS": 2048, "LS_ITERATIONS": 2048}, "nv": 336, "nflexvert": 112, "nconmax": 688, "njmax": 3376, "njmax_nnz": 18496, "nccdmax": 128, "backend": "mjw", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": ""}
+{"num_envs": 4096, "steps": 40, "wall_s": 3.0264058749889955, "env_steps_per_s": 54136.823270803274, "sim_s_per_wall_s": 0.026433995737696912, "finite": true, "energy_max": 1.1243047714233398, "overflow": {}, "nv": 336, "nflexvert": 112, "nconmax": 688, "njmax": 3376, "njmax_nnz": 18496, "nccdmax": 128, "backend": "mjw", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": ""}
+== throughput xpbd box 10x10 + 12 (10 substeps)
+{"num_envs": 64, "steps": 6050, "wall_s": 3.001760541985277, "env_steps_per_s": 128990.96866131673, "sim_s_per_wall_s": 4.030967770666147, "finite": true, "substeps": 10, "ncons": 282, "ncolors": 6, "nflexvert": 112, "backend": "xpbd", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": ""}
+{"num_envs": 256, "steps": 5760, "wall_s": 3.0049461250018794, "env_steps_per_s": 490710.96074944694, "sim_s_per_wall_s": 3.833679380855054, "finite": true, "substeps": 10, "ncons": 282, "ncolors": 6, "nflexvert": 112, "backend": "xpbd", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": ""}
+{"num_envs": 1024, "steps": 4000, "wall_s": 3.0048792499874253, "env_steps_per_s": 1363116.33820798, "sim_s_per_wall_s": 2.6623365980624607, "finite": true, "substeps": 10, "ncons": 282, "ncolors": 6, "nflexvert": 112, "backend": "xpbd", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": ""}
+{"num_envs": 2048, "steps": 2840, "wall_s": 3.0084069589793216, "env_steps_per_s": 1933355.4533371157, "sim_s_per_wall_s": 1.888042434899527, "finite": true, "substeps": 10, "ncons": 282, "ncolors": 6, "nflexvert": 112, "backend": "xpbd", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": ""}
+{"num_envs": 4096, "steps": 1730, "wall_s": 3.0154257499962114, "env_steps_per_s": 2349943.4532615845, "sim_s_per_wall_s": 1.147433326787883, "finite": true, "substeps": 10, "ncons": 282, "ncolors": 6, "nflexvert": 112, "backend": "xpbd", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": ""}
+== done Fri Sep 25 09:37:48 PDT 2026

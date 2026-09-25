@@ -1,0 +1,25 @@
+== Fri Sep 25 09:22:10 PDT 2026
+holder: {"name": "flex_metal_run4", "kind": "low", "minutes": 15.0, "pid": 61441, "start": 1790353330.025821}
+  waiting [low] mjw_tp_round6 est 30.0 min, queued 68 s ago
+dfa5d30 Mesh-flex normal: keep the face normal for touching contacts (witness separation < 0.1 mm)
+b20ec20 test_deformable: graph-vs-eager through contact compared to eager-vs-eager at the same scale
+== split benchmark (box 10x10 + 12, 4096)
+{"variant": "full", "num_envs": 4096, "ms_per_step": 84.428795799613, "env_steps_per_s": 48514.2534748645}
+{"variant": "no_contact", "num_envs": 4096, "ms_per_step": 34.8909292020835, "env_steps_per_s": 117394.40862341406}
+{"variant": "no_constraint", "num_envs": 4096, "ms_per_step": 33.83365829940885, "env_steps_per_s": 121062.87661099792}
+{"variant": "cg5", "num_envs": 4096, "ms_per_step": 64.66926670109387, "env_steps_per_s": 63337.65958615263}
+== split benchmark (box, 1024)
+{"variant": "full", "num_envs": 1024, "ms_per_step": 26.73747089866083, "env_steps_per_s": 38298.311903961265}
+{"variant": "no_contact", "num_envs": 1024, "ms_per_step": 9.74668339767959, "env_steps_per_s": 105061.37916040092}
+{"variant": "no_constraint", "num_envs": 1024, "ms_per_step": 9.448970798985101, "env_steps_per_s": 108371.59112715072}
+{"variant": "cg5", "num_envs": 1024, "ms_per_step": 20.73741250205785, "env_steps_per_s": 49379.35240948622}
+{"piece": "kinematics+flex", "num_envs": 1024, "ms": 0.299708399688825}
+{"piece": "fwd_position(kin+collision+constraints)", "num_envs": 1024, "ms": 21.859091601800174}
+{"piece": "collision", "num_envs": 1024, "ms": 21.784433402353898}
+{"piece": "fwd_velocity", "num_envs": 1024, "ms": 2.750608400674537}
+{"piece": "fwd_acceleration+solve", "num_envs": 1024, "ms": 14.212750003207475}
+== test_deformable graph test (metal)
+graph-vs-eager 2.97e-02, eager-vs-eager 3.21e-02 after 150 steps
+.
+2 passed, 8 deselected in 4.94s
+== done Fri Sep 25 09:23:18 PDT 2026
