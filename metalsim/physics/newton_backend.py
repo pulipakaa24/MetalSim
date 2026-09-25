@@ -54,7 +54,8 @@ G1_INIT = [
 
 
 def _meshes_to_boxes(b: newton.ModelBuilder) -> None:
-    """Replace mesh colliders by their bounding boxes (the G1's three mesh colliders are boxes)."""
+    """Replace mesh colliders by their bounding boxes (the G1's three mesh colliders are boxes). Needed on
+    Metal before Warp fork 786cdae (no fixed-size arrays for the GJK/MPR narrow phase); optional since."""
     types = list(b.shape_type); srcs = list(b.shape_source); scales = list(b.shape_scale); xf = list(b.shape_transform)
     for i, t in enumerate(types):
         if srcs[i] is not None and t in (newton.GeoType.MESH, getattr(newton.GeoType, "CONVEX_MESH", -1)):
@@ -255,13 +256,15 @@ class G1XPBD:
     device: str = "metal:0"
     z0: float = 0.74                  # Isaac Lab G1 init_state.pos
     floating: bool = True
+    mesh_to_box: bool = True          # False: the USD's convex-mesh colliders via GJK/MPR (needs Warp fork 786cdae on Metal)
     use_ext: bool = False             # "ipd": external-torque estimate (measured: unstable on the hands); default:
                                       # backward Euler on the damper's own effect
     ext_filter: float = 1.0           # "ipd": low-pass factor of the tau_ext estimate (1 = none; <1 lags and destabilizes, measured)
 
     def __post_init__(self):
         with wp.ScopedDevice(self.device):
-            builder, act = scene(self.n_envs, armature_inertia=self.armature_inertia, z0=self.z0, floating=self.floating)
+            builder, act = scene(self.n_envs, armature_inertia=self.armature_inertia, z0=self.z0, floating=self.floating,
+                                 mesh_to_box=self.mesh_to_box)
             if self.drive in ("pd", "ipd"):                 # XPBD's own drives off; torques via joint_f
                 builder.joint_target_ke = [0.0] * builder.joint_dof_count
                 builder.joint_target_kd = [0.0] * builder.joint_dof_count

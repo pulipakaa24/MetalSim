@@ -4,6 +4,7 @@ limits, armature; joint relaxation 0.4/0.4) at the settings that track MuJoCo C 
 at 256 / 1024 / 4096 envs. Rates are normalized to simulated time: "2.5 ms-steps/s" = N * simulated
 seconds per wall second / 2.5 ms (a 1.25 ms setting runs 2 substeps per 2.5 ms step); env-steps/s at
 Isaac's 50 Hz control = that / 8. Also checks that graph replay reproduces eager stepping.
+"ipd-mesh" uses the USD's convex-mesh colliders (GJK/MPR) instead of box substitutes.
 
 usage: python scripts/diagnostics/newton_xpbd_throughput.py [N ...]"""
 import sys, time, numpy as np, warp as wp
@@ -12,7 +13,7 @@ from metalsim.physics.newton_backend import G1XPBD
 
 H = 0.0025
 SIM_T = 0.5                         # simulated seconds per timing
-SETTINGS = [("ipd", 4, 0.00125), ("ipd", 8, 0.0025), ("ipd", 4, 0.0025), ("xpbd-drive", 4, 0.0025)]
+SETTINGS = [("ipd", 4, 0.00125), ("ipd", 8, 0.0025), ("ipd", 4, 0.0025), ("ipd-mesh", 4, 0.0025), ("xpbd-drive", 4, 0.0025)]
 NS = [int(a) for a in sys.argv[1:]] or [256, 1024, 4096]
 
 
@@ -31,9 +32,9 @@ def mjwarp_rate(N):
 
 
 def newton_rate(N, drive, it, dt):
-    sim = G1XPBD(N, iterations=it, dt=dt, drive="xpbd" if drive == "xpbd-drive" else drive,
-                 armature_inertia="iso" if drive == "ipd" else False,
-                 **({} if drive == "ipd" else {"solver_kw": {"joint_linear_relaxation": 0.7, "joint_angular_relaxation": 0.4}}))
+    sim = G1XPBD(N, iterations=it, dt=dt, drive="xpbd" if drive == "xpbd-drive" else "ipd",
+                 armature_inertia="iso" if drive != "xpbd-drive" else False, mesh_to_box=drive != "ipd-mesh",
+                 **({} if drive != "xpbd-drive" else {"solver_kw": {"joint_linear_relaxation": 0.7, "joint_angular_relaxation": 0.4}}))
     block = int(round(0.02 / dt))                     # one 50 Hz control step per graph launch
     sim.step(block, graph=True); wp.synchronize()
     calls = int(SIM_T / 0.02); t0 = time.perf_counter()
