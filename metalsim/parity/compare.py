@@ -41,7 +41,28 @@ def physics_metrics(isaac, ours, tag):
             "contact_force_N": {"isaac_mean_total": float(cf_a.sum(1).mean()), "metalsim_mean_total": float(cf_b.sum(1).mean()),
                                  "isaac_peak": float(cf_a.max()), "metalsim_peak": float(cf_b.max())},
             "torque_rms_Nm": {"isaac": float(np.sqrt((A["torque"][:T, 0] ** 2).mean())), "metalsim": float(np.sqrt((B["torque"][:T, 0] ** 2).mean()))},
-            **_contact_limit_metrics(A, B, ours, T)}
+            **_contact_limit_metrics(A, B, ours, T),
+            "contact_momentum": _momentum_metrics(A, B, ours, T, tag),
+            "_note_contact_force_N": "sampled peaks (isaac_peak / metalsim_peak) depend on each sensor's reporting window "
+                                     "(Isaac: last 5 ms PhysX step; ours: last 2.5 ms substep); rank on contact_momentum"}
+
+
+def _momentum_metrics(A, B, ours, T, tag):
+    """Impulse per event and largest 20 ms mean contact force from each engine's recorded states (momentum balance,
+    metalsim.parity.momentum), independent of the sensors' reporting windows."""
+    try:
+        from metalsim.parity import momentum
+        mp = os.path.join(ours, "meta.json")
+        joints = json.load(open(mp))["isaac_joints"] if os.path.exists(mp) else None
+        if joints is None:
+            return None
+        Ai = {k: A[k][:T] for k in ("joint_pos", "joint_vel", "root_pos", "root_quat", "root_lin_vel_b", "root_ang_vel_b")}
+        Bi = {k: B[k][:T] for k in Ai}
+        Ji = momentum.contact_impulse(Ai, joints, root_vel_is_com=True)      # Isaac Lab 2.3.2: root COM velocity
+        Jo = momentum.contact_impulse(Bi, joints, root_vel_is_com=False)     # MuJoCo free joint: frame origin
+        return momentum.event_metrics(Ji, Jo, tag)
+    except Exception as ex:                                                 # keep the rest of the report
+        return {"error": repr(ex)}
 
 
 def _contact_limit_metrics(A, B, ours, T):

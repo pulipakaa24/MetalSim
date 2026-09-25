@@ -45,7 +45,32 @@
     "isaac_steps_over_0.01": 0,
     "metalsim_steps_over_0.01": 9,
     "metalsim_max_substep": 0.02829742431640625
-   }
+   },
+   "contact_momentum": {
+    "whole_run": {
+     "max_20ms_mean_force_N": {
+      "isaac": 2190.356536745075,
+      "metalsim": 2685.8479512333624
+     }
+    },
+    "torso": {
+     "steps": [
+      56,
+      90
+     ],
+     "impulse_Ns": {
+      "isaac": 253.64531826700193,
+      "metalsim": 248.77973545106963,
+      "ratio": 0.9808173758176348
+     },
+     "max_20ms_mean_force_N": {
+      "isaac": 2190.356536745075,
+      "metalsim": 2685.8479512333624,
+      "ratio": 1.226214959152084
+     }
+    }
+   },
+   "_note_contact_force_N": "sampled peaks (isaac_peak / metalsim_peak) depend on each sensor's reporting window (Isaac: last 5 ms PhysX step; ours: last 2.5 ms substep); rank on contact_momentum"
   },
   "B_random": {
    "steps": 250,
@@ -92,7 +117,16 @@
     "isaac_steps_over_0.01": 0,
     "metalsim_steps_over_0.01": 218,
     "metalsim_max_substep": 0.166276216506958
-   }
+   },
+   "contact_momentum": {
+    "whole_run": {
+     "max_20ms_mean_force_N": {
+      "isaac": 2483.6350899636177,
+      "metalsim": 4042.7249102001497
+     }
+    }
+   },
+   "_note_contact_force_N": "sampled peaks (isaac_peak / metalsim_peak) depend on each sensor's reporting window (Isaac: last 5 ms PhysX step; ours: last 2.5 ms substep); rank on contact_momentum"
   },
   "C_drop": {
    "steps": 150,
@@ -139,7 +173,48 @@
     "isaac_steps_over_0.01": 0,
     "metalsim_steps_over_0.01": 4,
     "metalsim_max_substep": 0.021073877811431885
-   }
+   },
+   "contact_momentum": {
+    "whole_run": {
+     "max_20ms_mean_force_N": {
+      "isaac": 2199.736538351983,
+      "metalsim": 2648.9129747245333
+     }
+    },
+    "landing": {
+     "steps": [
+      6,
+      30
+     ],
+     "impulse_Ns": {
+      "isaac": 194.50607058346452,
+      "metalsim": 193.6718481517402,
+      "ratio": 0.9957110725170588
+     },
+     "max_20ms_mean_force_N": {
+      "isaac": 1996.4690885128043,
+      "metalsim": 2203.0972119694056,
+      "ratio": 1.1034967807142566
+     }
+    },
+    "torso": {
+     "steps": [
+      56,
+      90
+     ],
+     "impulse_Ns": {
+      "isaac": 245.8360484363796,
+      "metalsim": 239.26323950352696,
+      "ratio": 0.9732634453951792
+     },
+     "max_20ms_mean_force_N": {
+      "isaac": 2199.736538351983,
+      "metalsim": 2648.9129747245333,
+      "ratio": 1.2041955609416153
+     }
+    }
+   },
+   "_note_contact_force_N": "sampled peaks (isaac_peak / metalsim_peak) depend on each sensor's reporting window (Isaac: last 5 ms PhysX step; ours: last 2.5 ms substep); rank on contact_momentum"
   }
  },
  "render": {}

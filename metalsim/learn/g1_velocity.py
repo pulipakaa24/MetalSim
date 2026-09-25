@@ -424,8 +424,9 @@ def g1_reward_done(qpos: wp.array2d(dtype=float), qvel: wp.array2d(dtype=float),
 def g1_foot_vel_mjwarp(cvel: wp.array2d(dtype=wp.spatial_vector), xpos: wp.array2d(dtype=wp.vec3),
                        subtree_com: wp.array2d(dtype=wp.vec3), foot_body: wp.vec2i, root_body: wp.vec2i,
                        foot_vel: wp.array2d(dtype=wp.vec3)):
-    """World linear velocity of each foot body's frame origin from MuJoCo's cvel, which is the body's spatial
-    velocity [rot; lin] expressed at the subtree COM of its tree root: v = v_lin + w x (xpos - subtree_com[root])."""
+    """World linear velocity of a point of each foot body (``xpos``: its COM ``xipos`` or its frame origin) from
+    MuJoCo's cvel, the body's spatial velocity [rot; lin] at its tree root's subtree COM:
+    v = v_lin + w x (p - subtree_com[root])."""
     e = wp.tid()
     for f in range(2):
         cv = cvel[e, foot_body[f]]
@@ -491,8 +492,13 @@ class G1VelocityTask:
                  physics_dt: float = PHYSICS_DT, engine: str = "mjwarp", newton_iterations: int = 4, newton_dt: float = 0.00125,
                  newton_kw: dict | None = None,
                  reward_cfg: str | None = None, scan_ordering: str = "xy", terrain_collision: str | None = None,
-                 scan_surface: str | None = None):
-        """``reward_cfg``: "flat" = Isaac's G1FlatEnvCfg (default on flat terrain): track_ang_vel_z 1.0,
+                 scan_surface: str | None = None, feet_slide_velocity: str = "com"):
+        """``feet_slide_velocity``: "com" (default) = the foot's centre-of-mass world velocity, Isaac Lab 2.3.2's
+        ``body_lin_vel_w`` (= ``body_com_lin_vel_w``) used by ``mdp.feet_slide``; "origin" = the foot body frame
+        origin's velocity (MetalSim before 2026-09-25). MuJoCo Warp engine only; the archived Newton path
+        reports the frame origin.
+
+        ``reward_cfg``: "flat" = Isaac's G1FlatEnvCfg (default on flat terrain): track_ang_vel_z 1.0,
         lin_vel_y in +-0.5, feet_air_time 0.75 x min over feet (xy command norm), lin_vel_z_l2 -0.2 and
         ang_vel_xy_l2 -0.05 in the body frame, dof_torques_l2 -2e-6 and dof_acc_l2 -1e-7 on hips + knees,
         dof_pos_limits on the soft limits (G1_CFG soft_joint_pos_limit_factor 0.9), torso-contact
@@ -605,7 +611,10 @@ class G1VelocityTask:
         bid = lambda nm: mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, nm)
         self.foot_body = wp.vec2i(bid("left_ankle_roll_link"), bid("right_ankle_roll_link"))
         self.foot_root = wp.vec2i(int(m.body_rootid[self.foot_body[0]]), int(m.body_rootid[self.foot_body[1]]))
-        self.foot_vel = z((n, 2), dtype=wp.vec3)     # foot body origin world linear velocity (feet_slide), per engine
+        self.foot_vel = z((n, 2), dtype=wp.vec3)     # foot world linear velocity for feet_slide (COM or origin), per engine
+        if feet_slide_velocity not in ("com", "origin"):
+            raise ValueError("feet_slide_velocity must be 'com' or 'origin'")
+        self.feet_slide_velocity = feet_slide_velocity
         self.foot_site = wp.vec2i(0, 0)
         # env origins: flat -> a grid with 2.5 m spacing (Isaac env_spacing); rough -> terrain cell centers
         if terrain == "flat":
@@ -684,7 +693,8 @@ class G1VelocityTask:
         if self.engine == "newton":
             foot_vel = d.foot_vel                    # written by NewtonSim from the foot bodies' state
         else:
-            wp.launch(g1_foot_vel_mjwarp, dim=self.n, inputs=[d.cvel, d.xpos, d.subtree_com, self.foot_body, self.foot_root],
+            wp.launch(g1_foot_vel_mjwarp, dim=self.n, inputs=[d.cvel, d.xipos if self.feet_slide_velocity == "com" else d.xpos,
+                                                              d.subtree_com, self.foot_body, self.foot_root],
                       outputs=[self.foot_vel], device=self.device)
             foot_vel = self.foot_vel
         if self.contact is not None:
