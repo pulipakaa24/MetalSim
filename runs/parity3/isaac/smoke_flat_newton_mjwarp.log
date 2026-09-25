@@ -1,0 +1,308 @@
+[INFO]: Parsing configuration from: isaaclab_tasks.core.velocity.config.g1.flat_env_cfg:G1FlatEnvCfg
+[INFO]: Parsing configuration from: isaaclab_tasks.core.velocity.config.g1.agents.rsl_rl_ppo_cfg:G1FlatPPORunnerCfg
+
+╭─ Isaac Lab · train ────────────────────────────╮      Welcome to Isaac Lab!
+│ Task          Isaac-Velocity-Flat-G1           │
+│ Workflow      manager-based                    │             \   /
+│ RL library    rsl_rl                           │           .-------.
+│ Physics       newton_mjwarp                    │           | o   o |
+│ Renderer      n/a (no camera sensors)          │           |   _   |
+│ Visualizer    none (headless)                  │           '-------'
+│ Device        cuda:0                           │
+│ Environments  4096                             │
+╰────────────────────────────────────────────────╯
+
+[1/3] Launching simulation
+[INFO] Logging experiment in directory: /home/aditya_nianticspatial_com/IsaacLab3/logs/rsl_rl/g1_flat
+Exact experiment name requested from command line: 2026-09-25_17-15-42
+[2/3] Creating environment
+Visual material specified for ground plane but no diffuse color found. Preserving the ground plane's authored material.
+I: Initializing Version 2.72.3-release.7151+gl.5390bed9
+I: Client ID: KK3HAZBN
+I: Not using Hub: Hub not found
+I: Successfully created S3 provider for https://omniverse-content-production.s3-us-west-2.amazonaws.com
+I: Using CloudFront http://dcb18d6mfegct.cloudfront.net/, List = No
+Serving remote assets from the local cache under '/tmp'. Each copy is checked against the server before use; delete the directory to force a full re-download.
+/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_newton/isaaclab_newton/cloner/replicate.py:141: FutureWarning: Newton shape color replacement is enabled; this workaround will be deprecated in a future release.
+  replace_newton_builder_shape_colors(builder, stage)
+/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_newton/isaaclab_newton/cloner/newton_clone_utils.py:158: FutureWarning: Newton shape color replacement is enabled; this workaround will be deprecated in a future release.
+  replace_newton_builder_shape_colors(builder, stage)
+[INFO]: Base environment:
+	Environment device    : cuda:0
+	Environment seed      : 0
+	Physics step-size     : 0.005
+	Rendering step-size   : 0.02
+	Environment step-size : 0.02
+[INFO]: Time taken for scene creation Last: 9.281176 s, Mean: 9.281176 s, Std: 0.000000 s, N: 1
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 4096
+	Environment spacing   : 2.5
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : ['/World/ground']
+	Replicate physics     : True
+Finalize builder took: Last: 4.257360 s, Mean: 4.257360 s, Std: 0.000000 s, N: 1
+Contact sensor construction took: Last: 0.639461 s, Mean: 0.639461 s, Std: 0.000000 s, N: 1
+Initialize solver took: Last: 45.924911 s, Mean: 45.924911 s, Std: 0.000000 s, N: 1
+CUDA graph took: Last: 67.929264 s, Mean: 67.929264 s, Std: 0.000000 s, N: 1
+[INFO]: Time taken for simulation start Last: 174.026758 s, Mean: 174.026758 s, Std: 0.000000 s, N: 1
+[INFO] Command Manager:  <CommandManager> contains 1 active terms.
++------------------------------------------------+
+|              Active Command Terms              |
++-------+---------------+------------------------+
+| Index | Name          |          Type          |
++-------+---------------+------------------------+
+|   0   | base_velocity | UniformVelocityCommand |
++-------+---------------+------------------------+
+
+[INFO] Event Manager:  <EventManager> contains 3 active terms.
++---------------------------------------+
+| Active Event Terms in Mode: 'startup' |
++----------+----------------------------+
+|  Index   | Name                       |
++----------+----------------------------+
+|    0     | physics_material           |
+|    1     | add_base_mass              |
++----------+----------------------------+
++-------------------------------------+
+| Active Event Terms in Mode: 'reset' |
++-------+-----------------------------+
+| Index | Name                        |
++-------+-----------------------------+
+|   0   | base_external_force_torque  |
+|   1   | reset_base                  |
+|   2   | reset_robot_joints          |
++-------+-----------------------------+
++----------------------------------------------+
+|    Active Event Terms in Mode: 'interval'    |
++-------+------------+-------------------------+
+| Index | Name       | Interval time range (s) |
++-------+------------+-------------------------+
+|   0   | push_robot |       (10.0, 15.0)      |
++-------+------------+-------------------------+
+
+[INFO] Recorder Manager:  <RecorderManager> contains 0 active terms.
++-----------------------+
+| Active Recorder Terms |
++------------+----------+
+|   Index    | Name     |
++------------+----------+
++------------+----------+
+
+[INFO] Action Manager:  <ActionManager> contains 1 active terms.
++---------------------------------+
+| Active Action Terms (shape: 37) |
++-------+-----------+-------------+
+| Index | Name      |   Dimension |
++-------+-----------+-------------+
+|   0   | joint_pos |          37 |
++-------+-----------+-------------+
+
+[INFO] Observation Manager: <ObservationManager> contains 1 groups.
++-------------------------------------------------------------+
+| Active Observation Terms in Group: 'policy' (shape: (123,)) |
++-----------+-----------------------------------+-------------+
+|   Index   | Name                              |    Shape    |
++-----------+-----------------------------------+-------------+
+|     0     | base_lin_vel                      |     (3,)    |
+|     1     | base_ang_vel                      |     (3,)    |
+|     2     | projected_gravity                 |     (3,)    |
+|     3     | velocity_commands                 |     (3,)    |
+|     4     | joint_pos                         |    (37,)    |
+|     5     | joint_vel                         |    (37,)    |
+|     6     | actions                           |    (37,)    |
++-----------+-----------------------------------+-------------+
+
+[INFO] Termination Manager:  <TerminationManager> contains 2 active terms.
++---------------------------------+
+|     Active Termination Terms    |
++-------+--------------+----------+
+| Index | Name         | Time Out |
++-------+--------------+----------+
+|   0   | time_out     |   True   |
+|   1   | base_contact |  False   |
++-------+--------------+----------+
+
+[INFO] Reward Manager:  <RewardManager> contains 16 active terms.
++------------------------------------------+
+|           Active Reward Terms            |
++-------+-------------------------+--------+
+| Index | Name                    | Weight |
++-------+-------------------------+--------+
+|   0   | track_lin_vel_xy_exp    |    1.0 |
+|   1   | track_ang_vel_z_exp     |    1.0 |
+|   2   | lin_vel_z_l2            |   -0.2 |
+|   3   | ang_vel_xy_l2           |  -0.05 |
+|   4   | dof_torques_l2          | -2e-06 |
+|   5   | dof_acc_l2              | -1e-07 |
+|   6   | action_rate_l2          | -0.005 |
+|   7   | feet_air_time           |   0.75 |
+|   8   | flat_orientation_l2     |   -1.0 |
+|   9   | dof_pos_limits          |   -1.0 |
+|   10  | termination_penalty     | -200.0 |
+|   11  | feet_slide              |   -0.1 |
+|   12  | joint_deviation_hip     |   -0.1 |
+|   13  | joint_deviation_arms    |   -0.1 |
+|   14  | joint_deviation_fingers |  -0.05 |
+|   15  | joint_deviation_torso   |   -0.1 |
++-------+-------------------------+--------+
+
+[INFO] Curriculum Manager:  <CurriculumManager> contains 0 active terms.
++-------------------------+
+| Active Curriculum Terms |
++-------------+-----------+
+|    Index    | Name      |
++-------------+-----------+
++-------------+-----------+
+
+[INFO]: Completed setting up the environment...
+[3/3] Preparing agent
+--------------------------------------------------------------------------------
+Resolved observation sets: 
+	 actor :  ['policy']
+	 critic :  ['policy']
+--------------------------------------------------------------------------------
+Actor Model: MLPModel(
+  (obs_normalizer): Identity()
+  (distribution): GaussianDistribution()
+  (mlp): MLP(
+    (0): Linear(in_features=123, out_features=256, bias=True)
+    (1): ELU(alpha=1.0)
+    (2): Linear(in_features=256, out_features=128, bias=True)
+    (3): ELU(alpha=1.0)
+    (4): Linear(in_features=128, out_features=128, bias=True)
+    (5): ELU(alpha=1.0)
+    (6): Linear(in_features=128, out_features=37, bias=True)
+  )
+)
+Critic Model: MLPModel(
+  (obs_normalizer): Identity()
+  (mlp): MLP(
+    (0): Linear(in_features=123, out_features=256, bias=True)
+    (1): ELU(alpha=1.0)
+    (2): Linear(in_features=256, out_features=128, bias=True)
+    (3): ELU(alpha=1.0)
+    (4): Linear(in_features=128, out_features=128, bias=True)
+    (5): ELU(alpha=1.0)
+    (6): Linear(in_features=128, out_features=1, bias=True)
+  )
+)
+Could not find git repository in /home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/rsl_rl/__init__.py. Skipping.
+Storing git diff for 'IsaacLab3' in: /home/aditya_nianticspatial_com/IsaacLab3/logs/rsl_rl/g1_flat/2026-09-25_17-15-42/git/IsaacLab3.diff
+################################################################################
+[1m                             Learning iteration 0/3                             [0m 
+
+                            Total steps: 98304 
+                       Steps per second: 24416 
+                        Collection time: 3.692s 
+                          Learning time: 0.334s 
+                        Mean value loss: 0.2063
+                    Mean surrogate loss: 0.0143
+                      Mean entropy loss: 52.5446
+                            Mean reward: -1.50
+                    Mean episode length: 15.29
+                        Mean action std: 1.00
+   Episode_Reward/joint_deviation_torso: -0.0003
+            Episode_Reward/lin_vel_z_l2: -0.0008
+     Metrics/base_velocity/error_vel_xy: 1.0175
+    Metrics/base_velocity/error_vel_yaw: 5.6308
+           Episode_Reward/ang_vel_xy_l2: -0.0172
+     Episode_Reward/joint_deviation_hip: -0.0009
+              Episode_Reward/dof_acc_l2: -0.0019
+     Episode_Reward/track_ang_vel_z_exp: 0.0007
+          Episode_Reward/dof_torques_l2: -0.0007
+           Episode_Termination/time_out: 0.0128
+    Episode_Reward/joint_deviation_arms: -0.0008
+          Episode_Reward/dof_pos_limits: -0.0001
+    Episode_Reward/track_lin_vel_xy_exp: 0.0019
+              Episode_Reward/feet_slide: -0.0009
+                   Metrics/success_rate: 0.0417
+          Episode_Reward/action_rate_l2: -0.0046
+ Episode_Reward/joint_deviation_fingers: -0.0006
+           Episode_Reward/feet_air_time: 0.0000
+     Episode_Reward/termination_penalty: -0.0150
+       Episode_Termination/base_contact: 0.0003
+     Episode_Reward/flat_orientation_l2: -0.0016
+--------------------------------------------------------------------------------
+                         Iteration time: 4.03s
+                           Time elapsed: 0:00:04
+                                    ETA: 0:00:08
+
+################################################################################
+[1m                             Learning iteration 1/3                             [0m 
+
+                            Total steps: 196608 
+                       Steps per second: 64872 
+                        Collection time: 1.371s 
+                          Learning time: 0.144s 
+                        Mean value loss: 3.4053
+                    Mean surrogate loss: -0.0044
+                      Mean entropy loss: 52.5724
+                            Mean reward: -6.44
+                    Mean episode length: 47.43
+                        Mean action std: 1.00
+   Episode_Reward/joint_deviation_torso: -0.0009
+            Episode_Reward/lin_vel_z_l2: -0.0026
+     Metrics/base_velocity/error_vel_xy: 1.3512
+    Metrics/base_velocity/error_vel_yaw: 6.4491
+           Episode_Reward/ang_vel_xy_l2: -0.0589
+     Episode_Reward/joint_deviation_hip: -0.0028
+              Episode_Reward/dof_acc_l2: -0.0053
+     Episode_Reward/track_ang_vel_z_exp: 0.0022
+          Episode_Reward/dof_torques_l2: -0.0022
+           Episode_Termination/time_out: 0.0289
+    Episode_Reward/joint_deviation_arms: -0.0030
+          Episode_Reward/dof_pos_limits: -0.0003
+    Episode_Reward/track_lin_vel_xy_exp: 0.0053
+              Episode_Reward/feet_slide: -0.0021
+                   Metrics/success_rate: 0.0000
+          Episode_Reward/action_rate_l2: -0.0138
+ Episode_Reward/joint_deviation_fingers: -0.0020
+           Episode_Reward/feet_air_time: 0.0001
+     Episode_Reward/termination_penalty: -0.1963
+       Episode_Termination/base_contact: 0.4223
+     Episode_Reward/flat_orientation_l2: -0.0134
+--------------------------------------------------------------------------------
+                         Iteration time: 1.52s
+                           Time elapsed: 0:00:05
+                                    ETA: 0:00:02
+
+################################################################################
+[1m                             Learning iteration 2/3                             [0m 
+
+                            Total steps: 294912 
+                       Steps per second: 64435 
+                        Collection time: 1.379s 
+                          Learning time: 0.147s 
+                        Mean value loss: 1.8138
+                    Mean surrogate loss: -0.0105
+                      Mean entropy loss: 52.6906
+                            Mean reward: -5.97
+                    Mean episode length: 36.54
+                        Mean action std: 1.01
+   Episode_Reward/joint_deviation_torso: -0.0010
+            Episode_Reward/lin_vel_z_l2: -0.0029
+     Metrics/base_velocity/error_vel_xy: 1.3161
+    Metrics/base_velocity/error_vel_yaw: 6.3292
+           Episode_Reward/ang_vel_xy_l2: -0.0633
+     Episode_Reward/joint_deviation_hip: -0.0032
+              Episode_Reward/dof_acc_l2: -0.0059
+     Episode_Reward/track_ang_vel_z_exp: 0.0024
+          Episode_Reward/dof_torques_l2: -0.0024
+           Episode_Termination/time_out: 0.0176
+    Episode_Reward/joint_deviation_arms: -0.0034
+          Episode_Reward/dof_pos_limits: -0.0004
+    Episode_Reward/track_lin_vel_xy_exp: 0.0060
+              Episode_Reward/feet_slide: -0.0024
+                   Metrics/success_rate: 0.0000
+          Episode_Reward/action_rate_l2: -0.0156
+ Episode_Reward/joint_deviation_fingers: -0.0023
+           Episode_Reward/feet_air_time: 0.0001
+     Episode_Reward/termination_penalty: -0.1997
+       Episode_Termination/base_contact: 0.9413
+     Episode_Reward/flat_orientation_l2: -0.0140
+--------------------------------------------------------------------------------
+                         Iteration time: 1.53s
+                           Time elapsed: 0:00:07
+                                    ETA: 0:00:00
+
+Training time: 8.17 seconds

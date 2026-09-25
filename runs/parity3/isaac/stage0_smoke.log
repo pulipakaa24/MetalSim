@@ -1,0 +1,22 @@
++ nvidia-smi --query-gpu=name,driver_version --format=csv
+name, driver_version
+NVIDIA L4, 580.178.04
++ for B in isaacsim_physx newton_mjwarp
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
+++ date +%s
++ t0=1790356320
++ timeout 3600 isaaclab train --rl_library rsl_rl --task Isaac-Velocity-Flat-G1 --num_envs 4096 --max_iterations 3 --seed 0 --viz none physics=isaacsim_physx env.commands.base_velocity.debug_vis=false
+++ date +%s
++ echo 'smoke isaacsim_physx exit 0 in 216 s'
+smoke isaacsim_physx exit 0 in 216 s
++ for B in isaacsim_physx newton_mjwarp
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
+++ date +%s
++ t0=1790356536
++ timeout 3600 isaaclab train --rl_library rsl_rl --task Isaac-Velocity-Flat-G1 --num_envs 4096 --max_iterations 3 --seed 0 --viz none physics=newton_mjwarp env.commands.base_velocity.debug_vis=false
+++ date +%s
++ echo 'smoke newton_mjwarp exit 0 in 204 s'
+smoke newton_mjwarp exit 0 in 204 s
++ touch /home/aditya_nianticspatial_com/parity3/SMOKE_DONE

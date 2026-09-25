@@ -1,0 +1,419 @@
++ export PATH=/home/aditya_nianticspatial_com/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin TERM=xterm OMNI_KIT_ACCEPT_EULA=YES
++ PATH=/home/aditya_nianticspatial_com/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ TERM=xterm
++ OMNI_KIT_ACCEPT_EULA=YES
++ cd /home/aditya_nianticspatial_com
++ '[' -d IsaacLab3 ']'
++ cd IsaacLab3
++ git log -1 '--format=%H %cd'
+ae37b028ea415c91ea2bc32609efcd759ed2b974 Wed Sep 16 15:33:47 2026 -0700
++ '[' -d env_isaaclab3 ']'
++ source env_isaaclab3/bin/activate
+++ '[' -z '' ']'
+++ '[' -n x ']'
+++ SCRIPT_PATH=env_isaaclab3/bin/activate
+++ '[' env_isaaclab3/bin/activate = /home/aditya_nianticspatial_com/install3.sh ']'
+++ deactivate nondestructive
+++ unset -f pydoc
+++ '[' -z '' ']'
+++ '[' -z '' ']'
+++ hash -r
+++ '[' -z '' ']'
+++ unset VIRTUAL_ENV
+++ unset VIRTUAL_ENV_PROMPT
+++ '[' '!' nondestructive = nondestructive ']'
+++ VIRTUAL_ENV=/home/aditya_nianticspatial_com/env_isaaclab3
+++ '[' linux-gnu = cygwin ']'
+++ '[' linux-gnu = msys ']'
+++ export VIRTUAL_ENV
+++ '[' -z '' ']'
+++ unset SCRIPT_PATH
+++ _OLD_VIRTUAL_PATH=/home/aditya_nianticspatial_com/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ PATH=/home/aditya_nianticspatial_com/env_isaaclab3/bin:/home/aditya_nianticspatial_com/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ export PATH
+++ '[' x '!=' x ']'
++++ basename /home/aditya_nianticspatial_com/env_isaaclab3
+++ VIRTUAL_ENV_PROMPT=env_isaaclab3
+++ export VIRTUAL_ENV_PROMPT
+++ '[' -z '' ']'
+++ '[' -z '' ']'
+++ _OLD_VIRTUAL_PS1=
+++ PS1='(env_isaaclab3) '
+++ export PS1
+++ alias pydoc
+++ true
+++ hash -r
++ python --version
+Python 3.12.3
++ uv pip install --upgrade pip
+Using Python 3.12.3 environment at: env_isaaclab3
+Resolved 1 package in 83ms
+Checked 1 package in 0.22ms
++ uv pip install 'isaacsim[all,extscache]==6.1.0.0' --extra-index-url https://pypi.nvidia.com --index-strategy unsafe-best-match --prerelease=allow
+Using Python 3.12.3 environment at: env_isaaclab3
+Resolved 171 packages in 850ms
+Uninstalled 3 packages in 13ms
+Installed 3 packages in 14ms
+ - filelock==3.32.3
+ + filelock==3.25.2
+ - fsspec==2026.7.0
+ + fsspec==2026.2.0
+ - numpy==2.5.2
+ + numpy==2.3.1
++ echo 'isaacsim exit 0'
+isaacsim exit 0
++ uv pip install -U torch==2.11.0 torchvision==0.26.0 --index-url https://download.pytorch.org/whl/cu128
+Using Python 3.12.3 environment at: env_isaaclab3
+Resolved 32 packages in 519ms
+Prepared 3 packages in 0.52ms
+Uninstalled 3 packages in 12ms
+Installed 3 packages in 15ms
+ - filelock==3.25.2
+ + filelock==3.32.3
+ - fsspec==2026.2.0
+ + fsspec==2026.7.0
+ - numpy==2.3.1
+ + numpy==2.5.2
++ echo 'torch exit 0'
+torch exit 0
++ cd IsaacLab3
++ ./isaaclab.sh -i 'newton,rl[rsl-rl],visualizer[kit]'
+[WARNING] isaaclab.sh is deprecated and will be removed in Isaac Lab 3.1. Use 'uv run isaaclab' instead.
+Using Python 3.12.3 environment at: /home/aditya_nianticspatial_com/env_isaaclab3
+Checked 1 package in 2ms
+Using Python 3.12.3 environment at: /home/aditya_nianticspatial_com/env_isaaclab3
+Resolved 1 package in 2ms
+   Building isaaclab @ file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab
+      Built isaaclab @ file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab
+Prepared 1 package in 1.16s
+Uninstalled 1 package in 0.41ms
+Installed 1 package in 0.69ms
+ ~ isaaclab==17.0.2 (from file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab)
+Using Python 3.12.3 environment at: /home/aditya_nianticspatial_com/env_isaaclab3
+Resolved 2 packages in 2ms
+   Building isaaclab-ppisp @ file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_ppisp
+      Built isaaclab-ppisp @ file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_ppisp
+Prepared 1 package in 1.00s
+Uninstalled 1 package in 0.38ms
+Installed 1 package in 0.59ms
+ ~ isaaclab-ppisp==0.3.1 (from file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_ppisp)
+Using Python 3.12.3 environment at: /home/aditya_nianticspatial_com/env_isaaclab3
+Resolved 2 packages in 2ms
+   Building isaaclab-contrib @ file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_contrib
+      Built isaaclab-contrib @ file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_contrib
+Prepared 1 package in 1.03s
+Uninstalled 1 package in 0.39ms
+Installed 1 package in 0.61ms
+ ~ isaaclab-contrib==2.0.1 (from file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_contrib)
+Using Python 3.12.3 environment at: /home/aditya_nianticspatial_com/env_isaaclab3
+Resolved 2 packages in 2ms
+   Building isaaclab-newton @ file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_newton
+      Built isaaclab-newton @ file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_newton
+Prepared 1 package in 1.06s
+Installed 1 package in 0.64ms
+ + isaaclab-newton==5.4.1 (from file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_newton)
+Using Python 3.12.3 environment at: /home/aditya_nianticspatial_com/env_isaaclab3
+Resolved 2 packages in 2ms
+   Building isaaclab-physx @ file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_physx
+      Built isaaclab-physx @ file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_physx
+Prepared 1 package in 1.02s
+Installed 1 package in 0.60ms
+ + isaaclab-physx==6.0.0 (from file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_physx)
+Using Python 3.12.3 environment at: /home/aditya_nianticspatial_com/env_isaaclab3
+Resolved 5 packages in 4ms
+   Building isaaclab-assets @ file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_assets
+      Built isaaclab-assets @ file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_assets
+Prepared 1 package in 1.00s
+Installed 1 package in 0.59ms
+ + isaaclab-assets==0.7.1 (from file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_assets)
+Using Python 3.12.3 environment at: /home/aditya_nianticspatial_com/env_isaaclab3
+Resolved 2 packages in 2ms
+   Building isaaclab-experimental @ file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_experimental
+      Built isaaclab-experimental @ file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_experimental
+Prepared 1 package in 1.01s
+Installed 1 package in 0.56ms
+ + isaaclab-experimental==0.2.1 (from file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_experimental)
+Using Python 3.12.3 environment at: /home/aditya_nianticspatial_com/env_isaaclab3
+Resolved 3 packages in 359ms
+   Building isaaclab-ov @ file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_ov
+Downloading ovstage (61.3MiB)
+      Built isaaclab-ov @ file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_ov
+ Downloaded ovstage
+Prepared 2 packages in 1.48s
+Installed 2 packages in 7ms
+ + isaaclab-ov==2.2.0 (from file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_ov)
+ + ovstage==0.1.1.355824
+Using Python 3.12.3 environment at: /home/aditya_nianticspatial_com/env_isaaclab3
+Resolved 6 packages in 4ms
+   Building isaaclab-tasks @ file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_tasks
+      Built isaaclab-tasks @ file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_tasks
+Prepared 1 package in 1.21s
+Installed 1 package in 0.62ms
+ + isaaclab-tasks==18.0.1 (from file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_tasks)
+Using Python 3.12.3 environment at: /home/aditya_nianticspatial_com/env_isaaclab3
+Resolved 6 packages in 4ms
+   Building isaaclab-tasks-experimental @ file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_tasks_experimental
+      Built isaaclab-tasks-experimental @ file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_tasks_experimental
+Prepared 1 package in 1.01s
+Installed 1 package in 0.58ms
+ + isaaclab-tasks-experimental==0.0.1 (from file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_tasks_experimental)
+Using Python 3.12.3 environment at: /home/aditya_nianticspatial_com/env_isaaclab3
+Resolved 7 packages in 4ms
+   Building isaaclab-rl @ file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_rl
+      Built isaaclab-rl @ file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_rl
+Prepared 1 package in 1.00s
+Installed 1 package in 0.65ms
+ + isaaclab-rl==0.16.3 (from file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_rl)
+Using Python 3.12.3 environment at: /home/aditya_nianticspatial_com/env_isaaclab3
+Resolved 2 packages in 2ms
+   Building isaaclab-visualizers @ file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_visualizers
+      Built isaaclab-visualizers @ file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_visualizers
+Prepared 1 package in 1.00s
+Installed 1 package in 0.60ms
+ + isaaclab-visualizers==1.8.0 (from file:///home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_visualizers)
+Using Python 3.12.3 environment at: /home/aditya_nianticspatial_com/env_isaaclab3
+Resolved 192 packages in 986ms
+Downloading numba (3.7MiB)
+Downloading usd-exchange (19.9MiB)
+Downloading hidapi (1.0MiB)
+Downloading grpcio (6.8MiB)
+Downloading onnx (8.5MiB)
+Downloading plotly (9.2MiB)
+Downloading tokenizers (3.2MiB)
+Downloading warp-lang (155.5MiB)
+Downloading coal (2.1MiB)
+Downloading dash (9.1MiB)
+Downloading transformers (10.5MiB)
+Downloading h5py (5.2MiB)
+Downloading newton (5.3MiB)
+Downloading open3d (382.2MiB)
+Downloading cmeel-boost (34.5MiB)
+Downloading llvmlite (56.9MiB)
+Downloading shapely (2.2MiB)
+Downloading libcoal (2.2MiB)
+Downloading hf-xet (63.5MiB)
+Downloading eigenpy (5.8MiB)
+Downloading cmeel-assimp (14.2MiB)
+Downloading pin (9.5MiB)
+Downloading libpinocchio (3.6MiB)
+Downloading omniverseclient (16.2MiB)
+ Downloaded hidapi
+ Downloaded coal
+ Downloaded shapely
+ Downloaded libcoal
+ Downloaded omniverseclient
+ Downloaded tokenizers
+ Downloaded usd-exchange
+ Downloaded numba
+ Downloaded libpinocchio
+ Downloaded h5py
+ Downloaded newton
+ Downloaded eigenpy
+ Downloaded grpcio
+ Downloaded onnx
+ Downloaded plotly
+ Downloaded dash
+ Downloaded pin
+ Downloaded transformers
+ Downloaded cmeel-assimp
+ Downloaded cmeel-boost
+ Downloaded llvmlite
+ Downloaded hf-xet
+ Downloaded warp-lang
+ Downloaded open3d
+Prepared 78 packages in 6.68s
+Uninstalled 5 packages in 27ms
+Installed 114 packages in 338ms
+ + alphashape==1.3.1
+ + asttokens==3.0.2
+ + blinker==1.9.0
+ - click==8.1.7
+ + click==8.5.0
+ + click-log==0.4.0
+ + cmeel==0.61.0
+ + cmeel-assimp==6.0.5
+ + cmeel-boost==1.90.0
+ + cmeel-console-bridge==1.0.2.3
+ + cmeel-octomap==1.10.0
+ + cmeel-qhull==8.0.2.1
+ + cmeel-tinyxml2==11.0.0
+ + cmeel-urdfdom==6.0.0
+ + cmeel-zlib==1.3.2
+ + coal==3.0.3
+ + comm==0.2.3
+ + configargparse==1.7.7
+ + daqp==0.8.5
+ + dash==4.5.0rc0
+ + decorator==5.3.1
+ + eigenpy==3.13.0
+ + einops==0.9.0.dev0
+ + executing==2.2.1
+ + farama-notifications==0.0.6
+ + fast-simplification==0.2.0
+ + fastjsonschema==2.22.2
+ + flask==3.1.3
+ + gitdb==4.0.12
+ + gitpython==3.1.62
+ + grpcio==1.84.0
+ + gymnasium==1.3.0
+ + h5py==3.16.0
+ + hf-xet==1.7.0.dev1
+ + hidapi==0.15.0
+ + httpcore==1.0.9
+ + httpx==0.28.1
+ + huggingface-hub==1.33.0
+ + hydra-core==1.4.0.dev10
+ + importlib-metadata==9.0.1
+ + ipython==9.12.0
+ + ipython-pygments-lexers==1.1.1
+ + ipywidgets==8.1.9
+ + itsdangerous==2.2.0
+ + janus==2.0.0
+ + jedi==0.20.0
+ + jsonschema==4.26.0
+ + jsonschema-specifications==2025.9.1
+ + jupyter-core==5.9.1
+ + jupyterlab-widgets==3.0.17
+ + lazy-loader==0.6
+ + libcoal==3.0.3
+ + libpinocchio==4.1.0
+ - llvmlite==0.46.0
+ + llvmlite==0.50.0rc3
+ + loop-rate-limiters==1.2.0
+ + markdown==3.11
+ + markdown-it-py==4.2.0
+ + matplotlib-inline==0.2.2
+ + mdurl==0.1.2
+ + meshio==5.3.5
+ + ml-dtypes==0.6.0
+ + msgspec==0.21.1
+ + narwhals==2.26.0
+ + nbformat==5.11.1
+ - newton==1.5.0
+ + newton==1.5.2
+ + numba==0.68.0rc1
+ + omegaconf==2.4.0.dev15
+ + omniverseclient==2.72.3
+ + onnx==1.23.0
+ + onnx-ir==1.0.0
+ + onnxscript==0.7.3.dev20260916
+ + open3d==0.20.0
+ + orjson==3.12.0
+ + parso==0.8.7
+ + pexpect==4.9.0
+ + pin==4.1.0
+ + pin-pink==3.3.0
+ + platformdirs==4.11.13
+ + plotly==7.1.0
+ + plotly-cloud==0.5.0
+ + prettytable==3.18.0
+ + prompt-toolkit==3.0.53
+ + ptyprocess==0.7.0
+ + pure-eval==0.2.4
+ + pyglet==2.1.16
+ + pygments==2.21.0
+ + pyvers==0.2.3
+ + qpsolvers==4.13.0
+ + referencing==0.37.0
+ + regex==2026.9.10
+ + resolve-robotics-uri-py==0.5.1
+ + retrying==1.4.2
+ + rich==15.0.0
+ + rpds-py==2026.6.3
+ + rsl-rl-lib==5.4.1
+ + safetensors==0.9.0rc1
+ + shapely==2.2.0rc1
+ + shellingham==1.5.4
+ + smmap==5.0.3
+ + stack-data==0.6.3
+ + tensorboard==2.21.0
+ + tensorboard-data-server==0.7.2
+ + tensordict==0.14.2
+ + tokenizers==0.23.0rc0
+ + tomli==2.4.1
+ + tomli-w==1.2.0
+ + tqdm==4.70.1
+ + traitlets==5.16.1
+ + transformers==5.10.4
+ + typer==0.27.2
+ - usd-exchange==3.0.0
+ + usd-exchange==2.3.0
+ - warp-lang==1.19.0.dev20260925
+ + warp-lang==1.16.0
+ + wcwidth==0.9.1
+ + werkzeug==3.1.8
+ + widgetsnbextension==4.0.16
+Using Python 3.12.3 environment at: /home/aditya_nianticspatial_com/env_isaaclab3
+Checked 2 packages in 7ms
+[INFO] cmake is already installed.
+[INFO] Installing extensions inside the Isaac Lab repository...
+[INFO] Using Python: "/home/aditya_nianticspatial_com/env_isaaclab3/bin/python"
+[INFO] Using uv/venv environment: /home/aditya_nianticspatial_com/env_isaaclab3
+[INFO] Python executable: /home/aditya_nianticspatial_com/env_isaaclab3/bin/python
+[INFO] Temporarily filtering 1 Isaac Sim pre-bundled package path(s) from PYTHONPATH during pip operations to prevent interference with pre-bundled packages.
+[INFO] Using Python: "/home/aditya_nianticspatial_com/env_isaaclab3/bin/python"
+[INFO] PyTorch 2.11.0+cu128 already installed.
+[INFO] Using Python: "/home/aditya_nianticspatial_com/env_isaaclab3/bin/python"
+[INFO] Installing submodule: isaaclab
+[INFO] Installing submodule: isaaclab_ppisp
+[INFO] Installing submodule: isaaclab_contrib
+[INFO] Installing submodule: isaaclab_newton
+[INFO] Installing submodule: isaaclab_physx
+[INFO] Installing submodule: isaaclab_assets
+[INFO] Installing submodule: isaaclab_experimental
+[INFO] Installing submodule: isaaclab_ov
+[INFO] Installing submodule: isaaclab_tasks
+[INFO] Installing submodule: isaaclab_tasks_experimental
+[INFO] Installing submodule: isaaclab_rl
+[INFO] Installing submodule: isaaclab_visualizers
+[INFO] Installing core dependencies from the root pyproject...
+[INFO] Installing extra feature dependencies...
+[INFO] Newton (engine + viewer) is part of the base install; nothing to install.
+[INFO] Installing RL framework extras: rsl-rl...
+[INFO] Using Python: "/home/aditya_nianticspatial_com/env_isaaclab3/bin/python"
+[INFO] Installing 'rsl-rl' extra dependencies from the root pyproject...
+[INFO] Installing visualizer extras: kit...
+[INFO] Using Python: "/home/aditya_nianticspatial_com/env_isaaclab3/bin/python"
+[INFO] Newton 1.5.2 already installed.
+[INFO] Using Python: "/home/aditya_nianticspatial_com/env_isaaclab3/bin/python"
+[INFO] PyTorch 2.11.0+cu128 already installed.
+[INFO] Using Python: "/home/aditya_nianticspatial_com/env_isaaclab3/bin/python"
+[INFO] Repointed 7 prebundled package(s) in Isaac Sim to the active environment's site-packages.
+[INFO] Setting up editor paths and settings...
+[WARN] Isaac Sim was not found; simulator extension paths were not added.
+Editor settings generated at /home/aditya_nianticspatial_com/IsaacLab3/.vscode/settings.json
+Pyright configuration generated at /home/aditya_nianticspatial_com/IsaacLab3/pyrightconfig.json
++ echo 'isaaclab -i exit 0'
+isaaclab -i exit 0
++ uv pip install imageio
+Using Python 3.12.3 environment at: /home/aditya_nianticspatial_com/env_isaaclab3
+Checked 1 package in 4ms
++ python -c 'import torch, warp, newton, mujoco, mujoco_warp; print('\''torch'\'', torch.__version__, torch.cuda.is_available()); print('\''warp'\'', warp.__version__); print('\''newton'\'', newton.__version__); print('\''mujoco'\'', mujoco.__version__, '\''mjwarp'\'', getattr(mujoco_warp,'\''__version__'\'','\''?'\''))'
+torch 2.11.0+cu128 True
+warp 1.16.0
+newton 1.5.2
+mujoco 3.11.0 mjwarp 3.11.0
++ uv pip list
++ grep -i -E '^(isaacsim |isaaclab|torch |warp-lang|newton|mujoco|rsl-rl)'
+isaaclab                        17.0.2            /home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab
+isaaclab-assets                 0.7.1             /home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_assets
+isaaclab-contrib                2.0.1             /home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_contrib
+isaaclab-experimental           0.2.1             /home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_experimental
+isaaclab-newton                 5.4.1             /home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_newton
+isaaclab-ov                     2.2.0             /home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_ov
+isaaclab-physx                  6.0.0             /home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_physx
+isaaclab-ppisp                  0.3.1             /home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_ppisp
+isaaclab-rl                     0.16.3            /home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_rl
+isaaclab-tasks                  18.0.1            /home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_tasks
+isaaclab-tasks-experimental     0.0.1             /home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_tasks_experimental
+isaaclab-visualizers            1.8.0             /home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_visualizers
+isaacsim                        6.1.0.0
+mujoco                          3.11.0
+mujoco-usd-converter            0.5.0
+mujoco-warp                     3.11.0
+newton                          1.5.2
+newton-usd-schemas              0.4.1
+rsl-rl-lib                      5.4.1
+torch                           2.11.0+cu128
+warp-lang                       1.16.0
++ touch /home/aditya_nianticspatial_com/parity3/INSTALL_DONE
