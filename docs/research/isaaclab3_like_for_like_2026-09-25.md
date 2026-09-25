@@ -176,19 +176,24 @@ the policy's finger targets lie past the limits; Isaac's finger-limit solref (5 
 *stiffer* than the hard-limit preset (5 ms, ζ 1; stiffness ∝ 1/ζ²), so Isaac's settings hold the fingers 2.7× closer
 (0.047–0.051 vs 0.133–0.140 rad) while leaving the large leg joints soft (time constants 0.16–0.46 s).
 
-### 2.3 Cost (4096 envs, flat, full env step with rewards / resets / observations, synchronized, random actions; `runs/il3/bench.log`)
+### 2.3 Cost (4096 envs, flat, full env step with rewards / resets / observations, synchronized, random actions)
+
+Re-taken 2026-09-25 16:07 through the idle-checked queue (device utilisation 0 % at start, `runs/il3/bench_retake2.log`,
+`bench_retake2.queue.out`); the first measurement (`bench.log`, 14:55) fell in a window where a macOS system service
+held ~99 % of the GPU (coordinator's contamination notice) and is superseded, although it agreed within 1 %.
 
 | variant | env-steps/s |
 |---|---|
-| 2.3.2 flat task, MuJoCo defaults (10 / 20 iterations) | 53,509 |
-| flat_il3, MuJoCo defaults | 53,676 |
-| flat_il3 + isaaclab3 (cap 100, once per tick) | 27,520 |
-| flat_il3 + isaaclab3, collision every substep (cap 100) | 27,240 |
-| flat_il3 + isaaclab3, cap 20 (once per tick) | 50,440 |
-| flat_il3 + hardlimits | 53,782 |
+| 2.3.2 flat task, MuJoCo defaults (10 / 20 iterations) | 54,236 |
+| flat_il3, MuJoCo defaults | 53,880 |
+| flat_il3 + hardlimits | 54,019 |
+| flat_il3 + isaaclab3 (cap 100, once per tick) | 27,540 |
+| flat_il3 + isaaclab3, collision every substep (cap 100) | 27,261 |
+| flat_il3 + isaaclab3, cap 20 (once per tick) | 50,357 |
+| flat_il3 + isaaclab3, collision every substep, cap 20 (the training preset) | 49,455 |
 
-The 3.0 task terms cost nothing measurable (+0.3 %); the 100-iteration cap halves the rate on Metal (all iterations
-launch; per-world exit makes most of them no-ops); a cap of 20 recovers 94 %.
+The 3.0 task terms cost nothing measurable (−0.7 %, noise); the 100-iteration cap halves the rate on Metal (all iterations
+launch; per-world exit makes most of them no-ops); a cap of 20 recovers 91–93 %.
 
 **Does the cap of 20 bind?** `runs/il3/niter_probe.py` (flat_il3, 4096 envs, uniform random actions in [−1, 1], 300 control steps, robots falling and lying, every substep read): mean 2.14 iterations per substep, 99.99th percentile 8, maximum 12, and **0 of 9,830,400** substep-worlds above 20, for both collision variants. On this task the cap of 20 is therefore Isaac's cap of 100 to float noise.
 
