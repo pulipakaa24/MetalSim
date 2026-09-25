@@ -1,0 +1,114 @@
+{
+ "ref": "runs/parity3/isaac/fidelity/isaacsim_physx",
+ "other": "runs/parity3/isaac/fidelity/newton_mjwarp",
+ "protocols": {
+  "A_hold": {
+   "steps": 150,
+   "joint_rmse_0.5s": 0.0021514820400625467,
+   "joint_rmse_1s": 0.002442550379782915,
+   "joint_rmse_2s": 0.003962049726396799,
+   "joint_rmse_end": 0.006102691870182753,
+   "joint_err_max": 0.053376827389001846,
+   "divergence_step": null,
+   "divergence_s": null,
+   "root_z_end": [
+    0.053800418972969055,
+    0.053796760737895966
+   ],
+   "root_z_rmse": 0.0046290140599012375,
+   "torque_rms": [
+    5.267106533050537,
+    5.2776970863342285
+   ],
+   "peak_joint_speed": [
+    7.175867557525635,
+    5.944111347198486
+   ],
+   "contact_mean_total": [
+    349.8847351074219,
+    311.00946044921875
+   ],
+   "contact_peak": [
+    8288.5546875,
+    2064.0234375
+   ],
+   "solver_niter_other": {
+    "mean": 1.46,
+    "max": 4,
+    "min": 1
+   }
+  },
+  "B_random": {
+   "steps": 250,
+   "joint_rmse_0.5s": 0.1830688714981079,
+   "joint_rmse_1s": 0.23381200432777405,
+   "joint_rmse_2s": 0.2333812415599823,
+   "joint_rmse_end": 0.20888139307498932,
+   "joint_err_max": 1.2914564609527588,
+   "divergence_step": 0,
+   "divergence_s": 0.02,
+   "root_z_end": [
+    0.14856545627117157,
+    0.08787547051906586
+   ],
+   "root_z_rmse": 0.06291805952787399,
+   "torque_rms": [
+    31.244035720825195,
+    29.16230010986328
+   ],
+   "peak_joint_speed": [
+    32.00001525878906,
+    43.42415237426758
+   ],
+   "contact_mean_total": [
+    343.87274169921875,
+    404.2589111328125
+   ],
+   "contact_peak": [
+    2840.3916015625,
+    10552.96484375
+   ],
+   "solver_niter_other": {
+    "mean": 1.516,
+    "max": 5,
+    "min": 1
+   }
+  },
+  "C_drop": {
+   "steps": 150,
+   "joint_rmse_0.5s": 0.002847592579200864,
+   "joint_rmse_1s": 0.005289780907332897,
+   "joint_rmse_2s": 0.007684806827455759,
+   "joint_rmse_end": 0.0039681182242929935,
+   "joint_err_max": 0.1185581386089325,
+   "divergence_step": 69,
+   "divergence_s": 1.4000000000000001,
+   "root_z_end": [
+    0.053800370544195175,
+    0.05379921570420265
+   ],
+   "root_z_rmse": 0.016632065176963806,
+   "torque_rms": [
+    6.238441467285156,
+    5.955056190490723
+   ],
+   "peak_joint_speed": [
+    10.892704963684082,
+    14.900739669799805
+   ],
+   "contact_mean_total": [
+    291.67498779296875,
+    304.63995361328125
+   ],
+   "contact_peak": [
+    2163.640380859375,
+    2627.06298828125
+   ],
+   "solver_niter_other": {
+    "mean": 1.4666666666666666,
+    "max": 6,
+    "min": 1
+   }
+  }
+ }
+}
