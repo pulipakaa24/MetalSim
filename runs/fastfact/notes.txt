@@ -4,3 +4,8 @@ check.log, check2.log: correctness (floor, replay vs eager, MuJoCo C) valid; the
 ~7 min; coordinator notices 2026-09-25). check.log's tron1_sim new-vs-old comparison is invalid (protocol changed between
 the two processes); check2.log has the valid one. tp.log / tp.jsonl: clean throughput re-measurement (old, new, old, new).
 Decision: settings stay G1-only (Tron1-WF medians -0.6 % / -1.2 % with them; every other scene within +-0.5 %).
+Follow-up (user: generalize): the slowdown was m_dense_max 0 on small trees (Tron1 14 dofs). Threshold defaults
+metal_register_cholesky_max 48 / m_dense_max 32 keep every non-G1 scene on its exact previous M layout (trees 2-18 dofs)
+and give the G1 (43) the verified sparse layout. check_thr.log: correctness vs old (all within the run-to-run floor;
+panda and tron1_wf bitwise at step 1); tp_thr.log / tp_thr.jsonl: clean throughput, old/thr alternating, all within +-1 %
+(Tron1-WF -0.3 % / -0.3 %, inside its old-vs-old spread 0.2-0.4 %). Adopted as BatchSimOptions defaults.

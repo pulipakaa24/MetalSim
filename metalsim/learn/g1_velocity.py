@@ -614,17 +614,15 @@ class G1VelocityTask:
                 from metalsim.learn.terrain import BoxWindow
                 pwf = BoxWindow.FIELDS
             njmax = 256 if terrain_collision in ("hfield", "boxes", "meshes", "boxes_local") else 512   # C's initial set on 0.025 m: 400 rows
-            # factorization settings (throughput only; float-noise-level arithmetic changes, checked against MuJoCo C in
-            # tests/test_g1_fast_factorization.py; docs/research/mjwarp_throughput_2026-09-25.md): the solver Hessian's
-            # Cholesky in registers for the 43 dofs, and M / M - dt*D by MuJoCo Warp's tree-sparse L'DL. G1-only: as
-            # global defaults they matched every other scene to float noise but slowed Tron1 ~1 % (14-dof tree: the
-            # dense tile is faster there; scripts/diagnostics/fast_factorization_scenes.py, runs/fastfact/)
+            # factorization: BatchSimOptions' defaults (register Cholesky bound 48: the solver Hessian's Cholesky in
+            # registers for the 43 dofs; m_dense_max 32: M / M - dt*D of the 43-dof tree by MuJoCo Warp's tree-sparse
+            # L'DL; docs/research/mjwarp_throughput_2026-09-25.md, tests/test_g1_fast_factorization.py, runs/fastfact/)
             if self.il3_events:                           # add_base_mass: per-world masses and the constants derived from them
                 pwf = tuple(pwf) + ("body_mass", "body_inertia", "body_subtreemass", "body_invweight0", "dof_invweight0")
                 if self._solver_preset is not None and self._solver_preset.newton_force_space_limits:
                     pwf = pwf + ("jnt_solref",)
             bso = dict(substeps=self.decimation, njmax=njmax, nconmax=nconmax, solver_iterations=10, ls_iterations=20,
-                       per_world_fields=pwf, metal_register_cholesky_max=48, m_dense_max=0)
+                       per_world_fields=pwf)
             if self._solver_preset is not None:
                 from metalsim.physics import solver_presets
                 bso = solver_presets.batch_options(self._solver_preset, **bso)

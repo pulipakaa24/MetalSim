@@ -18,7 +18,9 @@ import argparse, json, os, sys, time
 import numpy as np, mujoco, warp as wp
 wp.config.quiet = True
 
-CFG = {"old": dict(metal_register_cholesky_max=40, m_dense_max=64), "new": dict(metal_register_cholesky_max=48, m_dense_max=0)}
+CFG = {"old": dict(metal_register_cholesky_max=40, m_dense_max=64), "new": dict(metal_register_cholesky_max=48, m_dense_max=0),
+       # threshold: sparse L'DL only for trees above 32 dofs (the G1's 43; every other scene keeps its dense tile)
+       "thr": dict(metal_register_cholesky_max=48, m_dense_max=32)}
 CHECK = (1, 10, 50, 100, 200)
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
