@@ -480,3 +480,79 @@ from compression plus numerical dissipation, ours from the elasticity damping (0
 |---|---|---|---|
 | rope preset | `physical` (period 1.30 s, decrement 0.02 vs PhysX 1.03 / 0.59) / `physx_ref` (1.077 s / 0.63) | `physical` default (the physics of the stated rod; PhysX's value is its mesh's locking, per its own docs), `physx_ref` only for parity runs | `rope_xpbd_cfg(preset=...)` |
 | cube contact | solref 0.001 1 (penetration 35.7 mm) / direct −1e6 −300 (2.6 mm, bounce 0.140, settle 0.51) / −2e6 −500 (0.3 mm, 0.139, 0.51) | −1e6 −300 with damping 0.1 (within a few mm; slightly more compression); −2e6 −500 is the stiffer alternative | `physx_fit_5p1.json` (`flex/cube`, `flex/cube_stiffer`, `flex/cube_softcontact`) |
+
+## 13. Isaac Lab 3.0 reference (PhysX and Newton VBD), mesh-resolution sweep (measured)
+
+Recorded 2026-09-25 on the parity VM (Isaac Sim 6.1, Isaac Lab v3.0.0-EA, L4) with
+`metalsim/parity/isaac_side/record_deformables_il3.py` on both backends, one Kit process at a time; VM stopped right
+after the fetch. Data: `runs/parity3/isaac/deformable/deformable_il3/{isaacsim_physx,newton_vbd}` (meta.json, cooked
+prims; record.npz local, 190/160 MB). Isaac Lab's automatic tetrahedralization needs `pytetwild`, which is not in the
+3.0 environment and, once installed, aborted Kit ("double free or corruption"); it was removed again and the rods and
+cubes use pre-tetrahedralized structured meshes (`make_tetmeshes.py`: hexahedral grid, 6 tetrahedra per cell; rod
+0.5 × 0.02 m with n = 1, 2, 4, 8 cells across and 10n along, cube 0.2 m with n = 2, 4, 8 per edge), Isaac Lab's
+documented alternative. Isaac Lab 3.0 defaults were used: PhysX volume E 1e6, ν 0.45, density 1000, elasticity
+damping 0.005, 16 iterations; PhysX surface (cloth) the same plus thickness 0.01 (10 kg for 1 m²), bend stiffness 0;
+Newton VBD k_mu = k_lambda = 1e5 (E 2.5e5, ν 0.25), **density 1 kg/m³** (Isaac Lab's Newton default; an 8 g cube,
+a 0.2 g rod), k_damp 0, cloth tri_ke/ka 1e4, edge_ke 5, particle radius 8 mm, VBD 20 iterations × 4 substeps, soft
+contact ke 1e5 kd 1 mu 0.5. The Newton cable (CableObject) went NaN when its first segment was re-posed every step
+(no kinematic API on cables), so it has no usable data. Bulk metrics: `scripts/diagnostics/deformable/il3_analysis.py`
+(same code for Isaac and for ours; `runs/parity3/isaac/deformable/il3_metrics.json`).
+
+**Locking sweep (rod, 1 end face held, released horizontal).**
+
+| backend | cells across | 1 | 2 | 4 | 8 | thin-rod reference (MetalSim XPBD `physical`, 10 / 20 segments) |
+|---|---|---|---|---|---|---|
+| PhysX 3.0 | swing period (s) | 1.016 | 1.117 | 1.261 | 1.477 | 1.113 / 1.115 |
+| PhysX 3.0 | tip drop at 5 s (m) | 0.284 | 0.455 | 0.506 | 0.522 | 0.459 / 0.458 |
+| Newton VBD 3.0 | tip drop at 5 s (m) | 0.085 | 0.314 | 0.435 | 0.445 | 0.009 (analytic cantilever: w L⁴/8EI with ρ = 1 kg/m³) |
+| MuJoCo Warp flex (11×2×2, E 1e6, implicit damping 0.005) | tip drop (m) / period (s) | 0.083 / 0.63 (cantilever bounce) | – | – | – | – |
+
+PhysX: yes, the rod softens monotonically as the mesh refines (drop 0.28 → 0.52 m, period 1.02 → 1.48 s) and crosses
+the thin-rod value between 2 and 4 cells across: the locking explanation holds on PhysX's own solver (n = 8 overshoots,
+still swinging with the tip 0.24 m behind the attachment at 5 s). Newton: the rod also softens with refinement, but
+with density 1 kg/m³ the thin-rod rod is a near-rigid cantilever (9 mm droop), so Newton moves *away* from it: its
+fine meshes are iteration-limited (20 VBD iterations on a stiffness-to-mass ratio of ~10⁸), not locked.
+
+**Soft cube (dropped from 0.5 m).** PhysX 3.0 (n = 2 / 4 / 8): bounce 0.140 / 0.155 / 0.173 m, settle 0.45 / 0.50 /
+0.70 s, rest centroid 0.120 m (rest offset 0.02 m: lowest node at z = 0.020). Newton VBD: 0.108 / 0.111 / 0.140 m,
+settle 0.29 / 0.29 / 0.59 s, rest 0.108 m (particle radius 8 mm).
+
+**MetalSim backends vs the PhysX 3.0 recording** (CPU device, parameters mapped physically; `il3_physx_ours.py`):
+
+| object | metric | PhysX 3.0 (reference mesh) | MetalSim | parameters |
+|---|---|---|---|---|
+| soft cube | bounce / settle / rest centroid / impact minimum | 0.155 m / 0.50 s / 0.120 / 0.110 (n4) | **flex: 0.152 / 0.49 s / 0.120 / 0.116** | E 1e6, ν 0.45, ρ 1000, implicit elasticity damping 0.005 (all PhysX's), vertex radius = rest offset 0.02, direct contact −1e6 −300 |
+| soft cube | same | – | flex, damping 0.02: 0.261 / 0.93 s; 0.05: 0.313 / 1.24 s | (more damping makes it livelier on this contact model) |
+| rope | period / drop | 1.117 / 0.455 (n2), 1.261 / 0.506 (n4) | **XPBD `physical`: 1.113 / 0.459** | E t⁴/12, β 0.005 |
+| rope | same | 1.016 / 0.284 (n1) | flex 11×2×2: 0.63 (bounce) / 0.083 | locks more than PhysX's n1 |
+| cloth | height on box / mean height / extent / settle | 0.421 / 0.272 / 0.698 / 1.01 s | **XPBD, k = E t, no bending: 0.414 / 0.248 / 0.637 / 0.78 s** | radius 0.014 (flexcomp needs radius < half the 3.1 cm spacing; PhysX rests at 0.020) |
+| cloth | same | – | flex StVK membrane (E t, elastic2d stretch, implicit damping): fell through the box and floor | open: to debug |
+
+**PhysX 5.1 PBD cloth: the MetalSim port** (`metalsim/physics/physx_cloth.py`, all ParticleClothDemo parameters, no
+self-collision yet) vs the 5.1 recording: height on box 0.427 (PhysX 0.427), mean height 0.253 (0.267), extent 0.729
+(0.791), settle 0.87 s (1.07), height-map RMSE 5.5 cm; XPBD (physical mapping) 0.425 / 0.270 / 0.771 / 1.23 s, 3.9 cm;
+XPBD fitted (+0.5/s) 0.425 / 0.272 / 0.775 / 1.14 s, 3.3 cm (`runs/deformable/physx_fit51/cloth_three_backends.json`).
+
+**Newton VBD on Metal (same solver).** `scripts/diagnostics/deformable/il3_newton_metal.py` rebuilds the recorded Newton
+scene as Isaac Lab's Newton backend does (contrib builder hooks: add_cloth_mesh / add_soft_mesh with the registry
+values, NewtonShapeCfg defaults, soft-contact settings, pins as inverse mass 0) in `.venv-newton152` (Newton 1.5.2,
+the Warp fork). On the CPU device, 0.3 s of the full scene (cloth, four rods, three cubes) matches the Isaac Newton
+recording to < 1 mm at every sampled point (cloth z-min 0.070 / mean 0.295 both; rod n4 0.507 / 0.761 both). The full
+5 s replay on metal:0 and its throughput (cloth, rod n1, cube n4 at 256 / 1024 / 4096 worlds) are queued at kind low
+(`newton_vbd_replay`); the port note measured VBD cloth (441 particles) 3.6K / 3.7K and cube (125 nodes) 0.69K / 0.57K
+env-steps/s at 1024 / 4096 worlds.
+
+**Recommendation per object type (fidelity first; PhysX 3.0 is the reference for the PhysX backend, the same Newton
+VBD solver on Metal for the Newton backend):**
+
+| object | PhysX-backend parity | Newton-backend parity | MetalSim default |
+|---|---|---|---|
+| cloth | XPBD (only candidate that ran on the 3.0 cloth: height on box −7 mm, mean −2.4 cm, extent −6 cm, settles 0.23 s sooner; 0.30M env-steps/s at 4096 for the 441-vertex cloth); physx_cloth port for the 5.1 PBD cloth | Newton VBD on Metal | XPBDSim |
+| cable / rope | XPBD `physical` (period and droop between PhysX's 2- and 4-cell meshes; PhysX's value depends on its mesh) | Newton VBD / CableObject on Metal (cable NaN in Isaac: no reference) | XPBDSim `physical`; `physx_ref` only to reproduce a 1-cell PhysX mesh |
+| soft volume | MuJoCo Warp flex with implicit damping, every parameter physical (bounce −3 mm, settle −10 ms, rest equal vs PhysX n4) | Newton VBD on Metal | flex (+ implicit damping) |
+
+| decision | options (numbers) | chosen, why | how to switch |
+|---|---|---|---|
+| volume default | flex implicit, PhysX's own parameters (cube within 3 mm / 10 ms of PhysX 3.0 n4) / Newton VBD on Metal (0.57K env-steps/s at 4096) / a PhysX co-rotational port (not built) | flex (closest with no fitted parameter; the FEM port is not needed for this protocol) | `mujoco_warp._src.flex_damping.ENABLE`, `DeformableSim` |
+| cloth default | XPBD / flex membrane (failed) / physx_cloth (5.1 PBD port) / Newton VBD | XPBD for PhysX 3.0 parity; physx_cloth for 5.1 PBD parity; Newton VBD for Newton parity | `XPBDSim`, `PhysXClothSim`, Newton |
+| rope default | XPBD `physical` / `physx_ref` / flex rod | `physical`: PhysX's own sweep converges to it | `rope_xpbd_cfg(preset=...)` |
