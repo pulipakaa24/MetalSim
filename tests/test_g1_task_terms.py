@@ -60,6 +60,14 @@ def _isaac_terms(task, e, flat):
     # one foot is in contact, zero when |command[:, :2]| <= 0.1
     in_c = np.array([sd[task.touch_adr[f]] > 1.0 for f in range(2)])
     air = task.air_time.numpy()[e]; con = task.contact_time.numpy()[e]
+    slide_c = in_c
+    if getattr(task, "contact", None) is not None:
+        # Isaac's ContactSensor data: in_contact = current_contact_time > 0; feet_slide contact = max over the
+        # net_forces_w_history norm > 1 N
+        cs = task.contact.numpy()
+        air = cs["current_air_time"][e, :2]; con = cs["current_contact_time"][e, :2]
+        in_c = con > 0.0
+        slide_c = np.linalg.norm(cs["net_forces_w_history"][e, :, :2], axis=-1).max(0) > 1.0
     mode = np.where(in_c, con, air)
     if flat:
         single = in_c.sum() == 1
@@ -67,7 +75,7 @@ def _isaac_terms(task, e, flat):
     else:
         t[2] = 0.25 * np.sum(np.minimum(mode, 0.4)) * float(in_c.sum() == 1 and np.linalg.norm(cmd) > 0.1)
     # feet_slide -0.1: |body_lin_vel_w[foot].xy| summed over feet in contact
-    t[3] = sum(-0.1 * np.linalg.norm(fv[f, :2]) for f in range(2) if in_c[f])
+    t[3] = sum(-0.1 * np.linalg.norm(fv[f, :2]) for f in range(2) if slide_c[f])
     # joint_deviation_l1: hips yaw/roll -0.1, torso -0.1, arms -0.1, fingers -0.05
     dq = qpos[7:] - default[7:]
     t[4] = -0.1 * np.sum(np.abs(dq[np.isin(group, [0, 3, 4])])) - 0.05 * np.sum(np.abs(dq[group == 5]))
@@ -109,8 +117,8 @@ def test_reward_terms_match_isaac_formulas(engine):
     for e in range(n):
         ref = _isaac_terms(task, e, flat=True)
         for k, v in ref.items():
-            if k == 2 and done[e]:
-                continue                                  # the kernel zeroes the air/contact timers of finished envs
+            if k in (2, 3) and done[e]:
+                continue                                  # finished envs: timers / contact sensor already reset
             rtol, atol = tol.get(k, (1e-4, 1e-5))
             np.testing.assert_allclose(terms[e, k], v, rtol=rtol, atol=atol, err_msg=f"env {e} term {k}")
             checked_air += int(k == 2)
@@ -233,3 +241,48 @@ def test_feet_slide_velocity_is_the_foot_body_world_velocity(engine):
             v6 = np.zeros(6)
             mujoco.mj_objectVelocity(m, d, mujoco.mjtObj.mjOBJ_XBODY, int(task.foot_body[f]), v6, 0)
             np.testing.assert_allclose(fv[e, f], v6[3:], atol=2e-3)
+
+
+def test_contact_sensor_flags_match_touch_sites():
+    """Flat set on MuJoCo Warp: the feet contact flags come from the ContactSensor (Isaac's net normal force,
+    contact iff |F| > 1 N). On a G1 dropped from the initial pose and standing (zero actions), they equal
+    the touch-site flags (touch > 1 N) the task used before, every substep-final step, every env."""
+    n = 64
+    task = G1VelocityTask(n, terrain="flat", seed=3)
+    assert task.contact is not None and task.contact.T == task.hist_substeps
+    task.reset_all()
+    a = wp.zeros((n, task.act_dim), dtype=float, device="metal:0")
+    seen_air = seen_contact = 0
+    for k in range(100):
+        task.launch_apply_action(a); task.sim.launch_step(); task.sim.synchronize()
+        cs = task.contact.numpy(); sd = task.sim.d.sensordata.numpy()
+        f_sensor = np.linalg.norm(cs["net_forces_w"][:, :2], axis=-1) > 1.0
+        f_touch = np.stack([sd[:, task.touch_adr[f]] for f in range(2)], 1) > 1.0
+        np.testing.assert_array_equal(f_sensor, f_touch, err_msg=f"step {k}")
+        # Isaac's air/contact timers agree with the flags
+        np.testing.assert_array_equal(cs["current_contact_time"][:, :2] > 0.0, f_sensor)
+        seen_air += int((~f_sensor).sum()); seen_contact += int(f_sensor.sum())
+    assert seen_contact > 0.9 * 100 * 2 * n * 0.5 and seen_air >= 0
+
+
+def test_rough_terrain_seed_and_isaac_env_assignment():
+    """Rough terrain: default seed 42 (Isaac's rsl_rl default, from which Isaac generates the terrain), terrain
+    generated from the task seed, env i on column floor(i / (n / num_cols)) (Isaac's TerrainImporter),
+    initial levels in [0, max_init_terrain_level = 5]."""
+    from metalsim.learn.terrain import isaac_rough_terrain
+    n = 64
+    task = G1VelocityTask(n, terrain="rough")
+    assert task.seed == 42
+    ref = isaac_rough_terrain(seed=42)
+    np.testing.assert_array_equal(task.hfield["H"], ref["H"])
+    nc = task.hfield["num_cols"]
+    # Isaac TerrainImporter._compute_env_origins_curriculum, verbatim: torch's floor division (fmod-based, float32)
+    # puts e.g. env 16 of 64 over 20 columns on column 4, where exact arithmetic says 5
+    ref_cols = torch.div(torch.arange(n), (n / nc), rounding_mode="floor").to(torch.long).numpy()
+    assert ref_cols[16] == 4 and ref_cols[15] == 4 and ref_cols[17] == 5
+    np.testing.assert_array_equal(task.col.numpy(), ref_cols)
+    lv = task.level.numpy()
+    assert lv.min() >= 0 and lv.max() <= 5 and len(np.unique(lv)) > 1
+    tab = task.hfield["origin_table"]()
+    np.testing.assert_allclose(task.origins.numpy(), tab[lv, task.col.numpy()], atol=1e-6)
+    assert G1VelocityTask(4, terrain="flat").seed == 0
