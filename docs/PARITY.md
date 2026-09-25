@@ -121,24 +121,26 @@ Notes that bear on reading these numbers honestly:
   which is also the flat setting.
 
 
-**Engine comparison at the training setting** (measured 2026-09-24, `scripts/diagnostics/g1_engine_bench.py`,
-`runs/g1_engine_bench.log`; 4096 envs, graph-captured, synchronized, idle GPU; the rows above use the
-5 ms MuJoCo Warp setting of Isaac's task file, the 2.5 ms row is what the G1 actually trains at, §1.5):
+**Engine comparison at the training setting** (`runs/g1_engine_bench_final.log`, measured 2026-09-24
+21:36–21:40 on AC power, GPU idle at start; the MuJoCo Warp 2.5 ms control row ran at the start and end
+of the job, 27,766 and 27,749 env-steps/s, ratio 1.00 to the earlier 27,749, so the run is uncontended;
+4096 envs, graph-captured, synchronized, final actuator recipe, angle-wrap clamp in place):
 
 | engine / setting | physics only | full env step | rollout + inference | full PPO loop |
 |---|---|---|---|---|
-| MuJoCo Warp, 2.5 ms (training setting) | 35,458 | 30,660 | 28,901 | **27,662** env-steps/s |
-| MuJoCo Warp, 5 ms (the rows above) | 67,914 | 55,741 | 55,217 | 50,907 |
-| Newton XPBD, 4 it. at 1.25 ms (training setting) | 146,857 | 146,822 | 135,708 | **112,609** (4.1× MuJoCo Warp; 1.4× Isaac's published 4090 PhysX number, on a 4.5× smaller GPU) |
-| Newton XPBD, 8 it. at 2.5 ms | 161,610 | 162,219 | 147,609 | 120,413 |
+| flat, MuJoCo Warp, 2.5 ms (training setting) | 35,559 | 30,752 | 29,028 | **27,766** env-steps/s |
+| flat, Newton XPBD, 4 it. at 1.25 ms (training setting) | 146,831 | 143,323 | 132,681 | **110,065** (4.0× MuJoCo Warp; 1.3× Isaac's published 4090 PhysX number on a 4.5× smaller GPU) |
+| flat, Newton XPBD, 8 it. at 2.5 ms | 165,746 | 161,547 | 149,597 | 120,823 (4.4×) |
+| rough, MuJoCo Warp, 2.5 ms | 33,074 | 30,849 | 26,844 | 24,792 |
+| rough, Newton XPBD, 4 it. at 1.25 ms | 25,393 | 26,493 | 28,369 | 26,093 (1.05×) |
 
-Nothing is excluded from the PPO-loop column (observations, rewards, resets, inference, update).
-Newton's observation/reward work is almost free (full step ≈ physics only); MuJoCo Warp spends
-~18 ms per step in its reset and kinematics calls. The Newton rows predate the final actuator kernel
-(the final recipe's training run logged 107,355 env-steps/s including the anomaly monitor); a
-re-benchmark with the final recipe is queued. Caveat for the Isaac comparison: PhysX vs XPBD is a
-different solver; Isaac Lab 3.0 itself moves to Newton, so the like-for-like number will be Isaac
-Lab 3.0's, which is not measured here.
+Rough terrain has **no speed advantage on Newton**: its heightfield collision costs about 6× its flat
+physics (161 vs 28 ms per step at 4096 envs), an open item. Drift remedies, physics only, flat: 4 it. at
+0.625 ms 74,328 (half the rate; the setting that matches PhysX best, §1.7), joint projection 130,931
+(unusable, §2.1), re-centred joints 149,849 (free). Nothing is excluded from the PPO-loop column.
+The rows above the table use the 5 ms MuJoCo Warp setting of Isaac's task file. Caveat for the Isaac
+comparison: PhysX vs XPBD is a different solver; Isaac Lab 3.0 itself moves to Newton, so the
+like-for-like number will be Isaac Lab 3.0's, which is not measured here.
 
 ### 1.5 Learning on the G1 task
 
@@ -385,6 +387,34 @@ at t = 0 (±0.085 rad, 0.34 rad/s, decaying within 0.5 s; hip yaw −0.10 rad in
 at their targets — a start-up transient on the PhysX side (hypothesis: finger self-collision at the
 default pose; not verified). The 0.1 rad divergence step of A_hold (1.34 s) is at the moment of the
 torso impact, where these transients and the contact model meet.
+
+**The same protocol on Newton XPBD** (`scripts/diagnostics/newton_record_g1.py`, CPU device which
+matches Metal to ~1e-6, `runs/parity/report_newton_{it4_1p25ms,it4_0p625ms}`, measured 2026-09-24,
+Newton commit 45458023 with the angle-wrap clamp; MuJoCo Warp rows repeated for reference):
+
+| protocol / engine | joint RMSE 0.5 / 1 / 2 s | divergence | root z RMSE | orientation mean / max | contact mean total / peak N (Isaac) | torque RMS (Isaac) | peak joint speed (Isaac) |
+|---|---|---|---|---|---|---|---|
+| A_hold, MuJoCo Warp | 0.005 / 0.006 / 0.009 rad | 1.34 s | 0.013 m | 0.02 / 0.11 rad | 319 / 3866 (302 / 712) | 5.25 (5.29) | 6.3 (6.9) |
+| A_hold, Newton 4 it. 1.25 ms | 0.008 / 0.009 / 0.051 | 1.26 s | 0.013 | 0.02 / 0.11 | 337 / 4911 | 4.88 | 9.1 |
+| A_hold, Newton 4 it. 0.625 ms | 0.004 / 0.005 / 0.048 | 1.34 s | 0.002 | 0.01 / 0.10 | 283 / **504** | 5.00 | 10.1 |
+| B_random, MuJoCo Warp | 0.115 / 0.126 / 0.102 | step 0 | 0.068 | 2.17 / 2.83 | 323 / 1753 (329 / 2847) | 28.5 (29.9) | 47.2 (32.0) |
+| B_random, Newton 1.25 ms | 0.119 / 0.072 / 0.093 | step 0 | 0.068 | 1.32 / 2.07 | 418 / 5564 | 33.8 | 60.7 |
+| B_random, Newton 0.625 ms | 0.078 / 0.063 / 0.056 | step 0 | 0.054 | 0.71 / 2.24 | 373 / 11042 | 31.6 | 56.5 |
+| C_drop, MuJoCo Warp | 0.014 / 0.015 / 0.006 | none | 0.035 | 0.06 / 0.24 | 332 / 3499 (288 / 1030) | 6.19 (6.17) | 7.2 (10.6) |
+| C_drop, Newton 1.25 ms | 0.019 / 0.021 / 0.050 | none | 0.088 | 0.11 / 0.59 | 416 / 13713 | 6.19 | 10.9 |
+| C_drop, Newton 0.625 ms | 0.017 / 0.015 / 0.047 | none | 0.027 | 0.05 / 0.19 | 444 / 19293 | 5.93 | 15.1 |
+
+Reading: at 4 it. / 0.625 ms Newton is at least as close to PhysX as MuJoCo Warp on joint RMSE up to
+1 s, root height and orientation, and clearly closer on the chaotic protocol (0.078 / 0.063 / 0.056 rad
+vs 0.115 / 0.126 / 0.102; orientation error 0.71 vs 2.17 rad). At the 1.25 ms training setting it
+roughly matches MuJoCo Warp on hold and random but is worse on the drop (root-height RMSE 0.088 vs
+0.035 m, orientation max 0.59 vs 0.24 rad). Newton's 2 s joint RMSE sits at ~0.05 rad on every
+protocol where MuJoCo Warp stays at 0.006–0.009: that is after the robot has fallen, most likely the
+lying posture rather than the dynamics (unverified). Contact peaks are not like for like: Newton
+reports the full contact-force magnitude from per-substep impulses, MuJoCo's touch sensor the normal
+force only; mean totals are within ~30 % of Isaac on every engine and torque RMS within 13 %. So the
+setting that matches PhysX best costs half of Newton's throughput (74 K physics-only vs 149 K), still
+2.1× MuJoCo Warp.
 
 **Rendering** (Isaac RTX vs MetalSim, same state per frame; brightness-matched = MetalSim scaled to
 Isaac's mean, because the engines' light units differ):
