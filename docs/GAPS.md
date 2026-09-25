@@ -22,11 +22,11 @@ the Newton-engine evaluation. Evidence for each row is in `PARITY.md`.
 
 | gap | status | next step |
 |---|---|---|
-| Contact model: soft contacts and soft joint limits (5–7 cm impact penetration, 0.17 rad past limits) | tunable to 0.85 cm / 0.00 cm at rest with τ 5 ms + impedance 0.99, 0.00 cm with speculative contact, at higher impact peaks | apply and quantify with the drop-test row of the fidelity protocol against the L4 recordings |
-| Learning parity on G1 | stands but does not track; return still negative | compare per-term rewards with Isaac's own rsl_rl log (recording on the VM) |
-| Rendering vs Isaac RTX; denoiser; MetalFX; MaterialX | fidelity recordings in progress on the VM; no denoiser/MetalFX/MaterialX | run `metalsim.parity.compare` when the recordings land |
+| Contact model: soft contacts and soft joint limits (5–7 cm impact penetration, 0.17 rad past limits) | measured against PhysX on the L4 (PARITY §1.7): the 1 m drop lands in the same state (root z RMSE 3.5 cm, joints within 0.06 rad) but MetalSim's contact-force peaks are 3.4–5.7× Isaac's at equal mean force; Newton XPBD gives 0.16–0.69 cm impact penetration (§2.1) | subsumed by the Newton path; on MuJoCo, τ 5 ms + impedance 0.99 + speculative contact is the tunable |
+| Learning parity on G1 | per-term comparison done (PARITY §1.5): Isaac tracks 0.78 of max by it 200 with no falls; ours 0.11 at it 1000 with 70–89 % falls; learning-speed gap > 5× | learner differential in progress: the real rsl_rl on our task via a VecEnv adapter (engine-independent), and a PPO run on the Newton backend (engine half) |
+| Rendering vs Isaac RTX; denoiser; MetalFX; MaterialX | measured (PARITY §1.7): robot-only, states agreeing, tier 2 vs RTX 13.7 dB PSNR / 0.48 SSIM (tier 0: 11.5 / 0.35); silhouettes IoU 0.83, robot depth 2.6 cm RMSE; Isaac's RT and PT frames equally far from ours, so the gap is materials/lights (darker plates, hard sun shadow), not noise | re-record with a grey ground (stage 6, queued) for whole-frame rows; then material/light model work: area sun, OmniPBR parameter audit, denoiser |
 | Contact sensing (touch sites, no force history) | open | contact-force reduction per body from the contact buffer |
-| Sensors: beam divergence, multi-return, radar | open | – |
+| Sensors: beam divergence, multi-return, radar | open; lidar-based RL now demonstrated (`metalsim.learn.lidar_nav`, 21.2 K env-steps/s, time-to-goal 218 → 69 steps) | – |
 | Exact terrain heights | re-implemented generator | port Isaac's generator functions |
 | Throughput | 0.59× a 4090 raw (2.6× per TFLOPS); 1.4× the L4 on G1 rough | reset/obs overhead 23 % of the step |
 | Camera-RL throughput | 7.5K env-steps/s incl. training vs Isaac's 32K (4090); learns | CNN update on MPS is 76 % of the time |
