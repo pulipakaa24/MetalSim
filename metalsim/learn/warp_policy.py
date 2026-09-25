@@ -99,6 +99,10 @@ class WarpMLPPolicy:
         self.net, self.n, self.obs_dim, self.act_dim, self.device = net, num_envs, obs_dim, act_dim, device
         self.seed = seed
         self.step_idx = wp.zeros(1, dtype=int, device=device)   # device-side step counter (graph-replay safe)
+        # Free-running step counter that keys the random streams (action noise here; observation noise,
+        # commands and resets in tasks that take it). ``step_idx`` is rewound every rollout and indexes the
+        # rollout buffers; keying the RNG on it replayed the same noise sequence in every rollout.
+        self.rng_step = wp.zeros(1, dtype=int, device=device)
         self.actor_layers = self._bind_layers(net.actor)
         self.critic_layers = self._bind_layers(net.critic)
         self.log_std = self._bind_param(net.log_std)
@@ -154,7 +158,7 @@ class WarpMLPPolicy:
             wp.launch(mlp_layer, dim=(self.n, W.shape[0]), inputs=[xc, W, b, act, y], device=self.device)
             xc = y
         wp.launch(sample_gaussian, dim=self.n,
-                  inputs=[self.actor_act[-1], self.log_std, self.seed, self.step_idx, self.action, self.logp,
+                  inputs=[self.actor_act[-1], self.log_std, self.seed, self.rng_step, self.action, self.logp,
                           self.ctrl_lo, self.ctrl_hi, ctrl], device=self.device)
 
     def store(self, obs: wp.array, bufs: "RolloutBuffers") -> None:
@@ -162,9 +166,10 @@ class WarpMLPPolicy:
         wp.launch(store_step, dim=self.n, inputs=[self.step_idx, obs, self.action, self.logp, self.critic_act[-1],
                                                     bufs.obs, bufs.act, bufs.logp, bufs.value], device=self.device)
         wp.launch(bump, dim=1, inputs=[self.step_idx], device=self.device)
+        wp.launch(bump, dim=1, inputs=[self.rng_step], device=self.device)
 
     def rewind(self) -> None:
-        """Reset the step index (start of a rollout). Launched on the Warp queue, no sync."""
+        """Reset the buffer row index (start of a rollout; ``rng_step`` keeps running). Warp queue, no sync."""
         wp.launch(zero_int, dim=1, inputs=[self.step_idx], device=self.device)
 
 
