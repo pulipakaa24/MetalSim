@@ -1,0 +1,35 @@
+holder: {"name": "rtx_parity_rlfid", "kind": "render", "minutes": 10.0, "pid": 44997, "start": 1790344664.5497532}
+  waiting [render] rtx_parity_protocols est 30.0 min, queued 190 s ago
+  waiting [train] g1_rough_terms_it1000 est 12.0 min, queued 731 s ago
+  waiting [train] g1_rough_transfer_all est 10.0 min, queued 431 s ago
+  waiting [train] g1_terms_oldcollider_tau5_imp99_hardlimits est 8.0 min, queued 2 s ago
+  waiting [low] flex_tests_metal est 15.0 min, queued 14538 s ago
+  waiting [low] mjw_tp_profile est 15.0 min, queued 14502 s ago
+  waiting [low] rough_cmp_tests est 15.0 min, queued 14308 s ago
+  waiting [low] mjw_tp_variants1 est 20.0 min, queued 14172 s ago
+  waiting [low] mjw_tp_checks1 est 25.0 min, queued 14048 s ago
+  waiting [low] g1_rough_step_profile est 10.0 min, queued 13563 s ago
+[fidelity] RL 256x100x100 1 spp sun_disk+tonemap+atrous3: 30.60 dB vs 256-pass converged
+[fidelity] RL 256x100x100 1 spp sun_disk+tonemap+oidn: 31.00 dB vs 256-pass converged
+[fidelity] RL 256x100x100 4 spp sun_disk+tonemap: 36.69 dB vs 64-pass converged
+[fidelity] RL 256x100x100 4 spp sun_disk+tonemap+atrous: 35.84 dB vs 64-pass converged
+[fidelity] RL 256x100x100 4 spp sun_disk+tonemap+atrous3: 36.52 dB vs 64-pass converged
+[fidelity] RL 256x100x100 4 spp sun_disk+tonemap+oidn: 37.69 dB vs 64-pass converged
+{
+ "rl_fidelity_1spp": {
+  "sun_disk+tonemap": 29.711048857877827,
+  "sun_disk+tonemap+atrous": 31.13023515076008,
+  "sun_disk+tonemap+atrous3": 30.595029761002515,
+  "sun_disk+tonemap+oidn": 31.000233873487677
+ },
+ "rl_fidelity_4spp": {
+  "sun_disk+tonemap": 36.689320046538086,
+  "sun_disk+tonemap+atrous": 35.8355957423651,
+  "sun_disk+tonemap+atrous3": 36.51747022486649,
+  "sun_disk+tonemap+oidn": 37.68599643834734
+ }
+}
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+15 passed, 1 warning in 6.68s

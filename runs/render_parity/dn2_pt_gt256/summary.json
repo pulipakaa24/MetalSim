@@ -1,0 +1,28 @@
+{
+ "preset": "tonemap_cal_fvg",
+ "kwargs": {
+  "material_model": "{None: 'omnipbr', 'ground': 'usd_preview_fv'}",
+  "center_sample": true,
+  "usd_lights": [
+   {
+    "intensity": 3000.0,
+    "color": [
+     1.0,
+     0.98,
+     0.95
+    ],
+    "angle_deg": 0.53
+   }
+  ],
+  "dome": "(400.0, [0.75, 0.8, 0.9])",
+  "headlight": false,
+  "clip_far": 100.0,
+  "tonemap": "rtx",
+  "exposure": 0.0008725
+ },
+ "spp": 16,
+ "passes": 16,
+ "bounces": 3,
+ "frames": 22,
+ "render_ms_per_frame_host_path": 131.62144774832996
+}

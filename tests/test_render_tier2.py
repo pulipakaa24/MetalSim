@@ -174,3 +174,49 @@ def test_cartpole_rgb_rollout_tier2():
     env.synchronize()
     img = obs["image"].cpu().numpy()
     assert img.shape == (32, 100, 100, 3) and img.std() > 10 and torch.isfinite(r).all()
+
+
+def test_usd_units_lambertian_sun_disk_and_dome():
+    """USD / RTX mode: a DistantLight of intensity I (0.53 deg disk) gives irradiance pi*I at normal incidence,
+    so a Lambertian plane (OmniPBR with specular_level 0, i.e. pure Lambert) reads albedo * I; a textureless
+    DomeLight of intensity S*colour is a uniform environment of that radiance (white furnace)."""
+    model = mujoco.MjModel.from_xml_string(LAMBERT)
+    rend = Tier2Renderer(model, 1, width=64, height=64, camera="cam", spp=16, max_bounces=0, material_model="omnipbr",
+                         usd_lights=[{"intensity": 3000.0, "color": (1, 1, 1), "angle_deg": 0.53}], headlight=False)
+    hdr = rend.render_host([_fwd(model)], passes=4)["hdr"][0]
+    print(f"usd sun: mean {hdr.mean():.2f} (expected {0.8 * 3000:.0f})")
+    assert abs(hdr.mean() / (0.8 * 3000) - 1) < 0.01
+    fm = mujoco.MjModel.from_xml_string(FURNACE)
+    rend = Tier2Renderer(fm, 1, width=64, height=64, camera="cam", spp=32, max_bounces=1, material_model="omnipbr",
+                         dome=(400.0, (0.75, 0.8, 0.9)), headlight=False)
+    hdr = rend.render_host([_fwd(fm)], passes=4)["hdr"][0]
+    exp = 400 * np.array([0.75, 0.8, 0.9])
+    print("usd dome furnace:", hdr.reshape(-1, 3).mean(0), "expected", exp)
+    assert np.allclose(hdr.reshape(-1, 3).mean(0) / exp, 1, atol=0.02)
+
+
+def test_rtx_tonemap_and_denoisers_on_furnace():
+    """RTX display transform: 8-bit output = sRGB(ACES(exposure * radiance)); both denoisers keep the mean of a
+    furnace image (white plane under a uniform dome) and reduce its Monte Carlo noise."""
+    from metalsim.render.tier2 import rtx_exposure
+    fm = mujoco.MjModel.from_xml_string(FURNACE)
+    k = rtx_exposure()
+    tm = lambda L: 255 * (1.055 * np.clip(L * k * (2.51 * L * k + 0.03) / (L * k * (2.43 * L * k + 0.59) + 0.14), 0, 1) ** (1 / 2.4) - 0.055)
+    ran = 0
+    for dn in (None, "atrous", "oidn"):
+        try:
+            rend = Tier2Renderer(fm, 2, width=48, height=48, camera="cam", spp=4, max_bounces=1, dome=(400.0, (0.8, 0.8, 0.8)),
+                                 headlight=False, tonemap="rtx", exposure=k, denoise=dn)
+        except ImportError:
+            continue
+        out = rend.render_host([_fwd(fm), _fwd(fm)], passes=1)
+        L = out["hdr"]
+        if dn is None:
+            assert abs(out["rgb"].mean() - tm(L).mean()) < 1.5
+            continue
+        ran += 1
+        noisy, clean = out["hdr_mean"], out["hdr_denoised"]
+        print(f"{dn}: mean {noisy.mean():.1f} -> {clean.mean():.1f}, std {noisy.std():.1f} -> {clean.std():.1f}")
+        assert abs(clean.mean() / noisy.mean() - 1) < 0.02 and clean.std() < 0.5 * noisy.std()
+        assert abs(out["rgb"].mean() - tm(clean).mean()) < 1.5
+    assert ran >= 1

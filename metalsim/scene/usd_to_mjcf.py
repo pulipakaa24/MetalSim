@@ -141,6 +141,7 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True, vi
             if src:
                 shader = UsdShade.Shader(src[0].GetPrim())
             rgba = [0.8, 0.8, 0.8, 1.0]; rough = 0.5; metal = 0.0; tex = None
+            specular = 0.5   # MuJoCo material `specular`, read by tier 2 as F0 = 0.08 * specular (OmniPBR specular_level; ior 1.5 -> 0.5)
             mdl = shader.GetPrim().GetAttribute("info:mdl:sourceAsset").Get() if shader else None
             if shader and mdl:
                 # OmniPBR parameters (the subset MuJoCo materials can carry): constant colour or diffuse
@@ -158,6 +159,8 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True, vi
                 if rr is not None: rough = float(rr)
                 if mt is not None: metal = float(mt)
                 if op is not None: rgba[3] = float(op)
+                sl = _in("specular_level")   # OmniPBR: custom_curve_layer weight over a 0.08 -> 1 curve (default 0.5)
+                if sl is not None: specular = float(sl)
                 ec = _in("emissive_color"); ei = _in("emissive_intensity"); ee = _in("enable_emission")
                 emission = float(ei) if (ee and ei is not None) else 0.0
             elif shader:
@@ -181,6 +184,9 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True, vi
                 r = shader.GetInput("roughness"); mt = shader.GetInput("metallic")
                 if r and r.Get() is not None: rough = float(r.Get())
                 if mt and mt.Get() is not None: metal = float(mt.Get())
+                ior = shader.GetInput("ior")   # UsdPreviewSurface metallic workflow: F0 = ((1 - ior) / (1 + ior))^2
+                if ior and ior.Get() is not None:
+                    specular = float(((1.0 - ior.Get()) / (1.0 + ior.Get())) ** 2 / 0.08)
             else:
                 emission = 0.0
             mm = spec.add_material()
@@ -193,6 +199,7 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True, vi
                 mm.emission = min(emission, 10.0)
             mm.roughness = rough
             mm.metallic = metal
+            mm.specular = min(max(specular, 0.0), 1.0)
             mm.shininess = max(0.0, 1.0 - rough)
             if prim.HasAttribute("mjc:reflectance"):
                 mm.reflectance = float(prim.GetAttribute("mjc:reflectance").Get())
