@@ -35,7 +35,16 @@ the Newton-engine evaluation. Evidence for each row is in `PARITY.md`.
 | Camera-RL throughput | **11,416 env-steps/s incl. training** (was 7,483) vs Isaac's 32 K (4090); learning curve tracks the reference at matched iterations (one seed each). Commit 2796675: `PPOConfig.fast_update` (per-rollout image means, compiled loss and gradient clip, fused Adam: 7.2 → 5.2 s per update) plus two Metal kernels in `metalsim/learn/metal_conv.py` via `torch.mps.compile_shader` for conv1's weight gradient (8.9 → 1.6 ms, 1.6 → 9 TFLOP/s) and conv2's input gradient (6.7 → 2.9 ms): update 3.86 s (1.86×); 11 tests | next: conv2/conv3 weight gradients (~8 ms per minibatch, still MPSGraph), conv1 forward (4 TFLOP/s), the 3 ms image gather; then MLX for the fused update as the compounding step. Estimated ceiling ~16–17 K env-steps/s on this pipeline (update floor 1.7–2.0 s), then the 1.9 s rollout limits; Isaac's 32 K is a hardware gap |
 | Deformables on Metal; upstreaming the forks | open | – |
 
-## Opened by the Newton XPBD evaluation (status 2026-09-24, measured unless noted)
+## Newton XPBD: archived as an experimental option (2026-09-25)
+
+Decision after the measurements: MuJoCo Warp is the parity engine (see "Engine position" below);
+Newton XPBD stays in the tree (`engine="newton"`, its tests, the fork with six solver fixes) as a
+validated 1.6× throughput option with a stated fidelity cost (loose joints, 14–23 % over-travel of
+PhysX-trained policies, harder impacts) and is not used for parity claims. The three solver defects
+found are being filed upstream (`scripts/diagnostics/newton_upstream/FILED.md`). No further GPU or
+agent time is spent on it unless MuJoCo Warp's contact work fails to close the impact-peak gap.
+
+## Ledger of the Newton XPBD evaluation (status 2026-09-24, measured unless noted)
 
 | issue | status | evidence / next step |
 |---|---|---|
