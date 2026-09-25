@@ -1,0 +1,1065 @@
+holder: {"name": "mtlc", "kind": "low", "minutes": 10.0, "pid": 67831, "start": 1790355847.837387}
+lib=0x0 time=2.7s
+#define assert(x) ((void)0)
+        ^
+/System/Library/PrivateFrameworks/GPUCompiler.framework/Versions/32023/Libraries/lib/clang/32023.886/include/metal/metal_assert:19:9: note: previous definition is here
+#define assert(condition) ((void) 0)
+        ^
+    if constexpr (N > 3) {
+       ^
+    if constexpr (N > 2) {
+       ^
+    if constexpr (N > 1) {
+       ^
+    if constexpr (N > 0) {
+       ^
+    if constexpr (I + 1 < Length) {
+       ^
+        if (i != idx)
+            ~ ^  ~~~
+            if (i != row || j != col)
+                            ~ ^  ~~~
+            if (i != row || j != col)
+                ~ ^  ~~~
+            if (i == row)
+                ~ ^  ~~~
+        if (i != idx)
+            ~ ^  ~~~
+        if (i != idx)
+            ~ ^  ~~~
+    const float Dz = dir[kz];
+                ^
+    const vec3 dW_dp = vec3(dW_dpx, dW_dpy, dW_dpz);
+               ^
+    const vec3 dW_dD = vec3(dW_dDx, dW_dDy, dW_dDz);
+               ^
+    size_t length = *((size_t WP_THREAD*)bucket->lengths + index_in_bucket);
+           ^
+    size_t length = *((size_t WP_THREAD*)bucket->lengths + index_in_bucket);
+           ^
+    for (int i = 0; i < octaves; i++) {
+                    ~ ^ ~~~~~~~
+    for (int i = 0; i < octaves; i++) {
+                    ~ ^ ~~~~~~~
+    for (int i = 0; i < octaves; i++) {
+                    ~ ^ ~~~~~~~
+    if constexpr (QUERY_KIND == BvhQueryKind::SPHERE) {
+       ^
+    } else if constexpr (QUERY_KIND == BvhQueryKind::CAPSULE) {
+              ^
+    } else if constexpr (QUERY_KIND == BvhQueryKind::RAY) {
+              ^
+            if constexpr (QUERY_KIND == BvhQueryKind::AABB || WP_METAL) {
+               ^
+        const float4 WP_DEVICE* global128 = reinterpret_cast<const float4 WP_DEVICE*>(global_bytes);
+                                ^
+                if constexpr (TEST_SINGLETON)
+                   ^
+    constexpr int n = TileA::Layout::Shape::dim(1);
+                  ^
+    WP_TILE_ARENA_NULL
+    ^
+program_source:23137:46: note: expanded from macro 'WP_TILE_ARENA_NULL'
+#define WP_TILE_ARENA_NULL threadgroup char* _wp_arena = nullptr;  // adjoint-only bodies: parsed, never run
+                                             ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const wp::int32 var_49 = 0;
+                    ^
+    const wp::int32 var_63 = 1;
+                    ^
+    const wp::int32 var_77 = 2;
+                    ^
+    const wp::int32 var_91 = 3;
+                    ^
+    const wp::int32 var_105 = 4;
+                    ^
+    const wp::int32 var_119 = 5;
+                    ^
+    const wp::int32 var_133 = 6;
+                    ^
+    const wp::int32 var_147 = 7;
+                    ^
+    const wp::int32 var_161 = 8;
+                    ^
+    const wp::int32 var_175 = 9;
+                    ^
+    const wp::int32 var_189 = 10;
+                    ^
+    const wp::int32 var_203 = 11;
+                    ^
+    const wp::int32 var_217 = 12;
+                    ^
+    const wp::int32 var_231 = 13;
+                    ^
+    const wp::int32 var_245 = 14;
+                    ^
+    const wp::int32 var_283 = 0;
+                    ^
+    const wp::int32 var_292 = 1;
+                    ^
+    const wp::int32 var_301 = 2;
+                    ^
+    const wp::int32 var_310 = 3;
+                    ^
+    const wp::int32 var_319 = 4;
+                    ^
+    const wp::int32 var_328 = 5;
+                    ^
+    const wp::int32 var_337 = 6;
+                    ^
+    const wp::int32 var_346 = 7;
+                    ^
+    const wp::int32 var_355 = 8;
+                    ^
+    const wp::int32 var_364 = 9;
+                    ^
+    const wp::int32 var_373 = 10;
+                    ^
+    const wp::int32 var_382 = 11;
+                    ^
+    const wp::int32 var_391 = 12;
+                    ^
+    const wp::int32 var_400 = 13;
+                    ^
+    const wp::int32 var_409 = 14;
+                    ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const wp::float32 var_15 = 3.141592653589793;
+                      ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const wp::float32 var_6 = 3.141592653589793;
+                      ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const wp::int32 var_0 = 3;
+                    ^
+    const wp::int32 var_2 = 3;
+                    ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const wp::int32 var_6 = 3;
+                    ^
+    const wp::int32 var_29 = 3;
+                    ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const wp::int32 var_11 = 3;
+                    ^
+    const wp::int32 var_91 = 3;
+                    ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    var_32 = wp::where(var_13, var_15, var_22);
+                               ^~~~~~
+    var_32 = wp::where(var_13, var_15, var_22);
+                                       ^~~~~~
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const wp::int32 var_14 = 3;
+                    ^
+    const wp::int32 var_48 = 3;
+                    ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const wp::int32 var_44 = 3;
+                    ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const wp::int32 var_408 = 3;
+                    ^
+    var_1545 = wp::where(var_497, var_500, var_1504);
+                                  ^~~~~~~
+    var_1546 = wp::where(var_497, var_504, var_1505);
+                                  ^~~~~~~
+    var_1552 = wp::where(var_497, var_534, var_1511);
+                                  ^~~~~~~
+    var_1553 = wp::where(var_497, var_538, var_1512);
+                                  ^~~~~~~
+        var_1500 = wp::where(var_559, var_561, var_1458);
+                                      ^~~~~~~
+        var_1504 = wp::where(var_559, var_572, var_1461);
+                                      ^~~~~~~
+        var_1505 = wp::where(var_559, var_576, var_1462);
+                                      ^~~~~~~
+        var_1511 = wp::where(var_559, var_606, var_1463);
+                                      ^~~~~~~
+        var_1512 = wp::where(var_559, var_610, var_1464);
+                                      ^~~~~~~
+        var_1515 = wp::where(var_559, var_634, var_928);
+                                      ^~~~~~~
+        var_1515 = wp::where(var_559, var_634, var_928);
+                                               ^~~~~~~
+        var_1518 = wp::where(var_559, var_637, var_1467);
+                                      ^~~~~~~
+        var_1520 = wp::where(var_559, var_645, var_1469);
+                                      ^~~~~~~
+        var_1521 = wp::where(var_559, var_651, var_1470);
+                                      ^~~~~~~
+        var_1522 = wp::where(var_559, var_657, var_1471);
+                                      ^~~~~~~
+        var_1525 = wp::where(var_559, var_664, var_1423);
+                                      ^~~~~~~
+        var_1525 = wp::where(var_559, var_664, var_1423);
+                                               ^~~~~~~~
+        var_1526 = wp::where(var_559, var_666, var_1424);
+                                      ^~~~~~~
+        var_1526 = wp::where(var_559, var_666, var_1424);
+                                               ^~~~~~~~
+        var_1530 = wp::where(var_559, var_671, var_1425);
+                                      ^~~~~~~
+        var_1530 = wp::where(var_559, var_671, var_1425);
+                                               ^~~~~~~~
+        var_1531 = wp::where(var_559, var_675, var_1482);
+                                      ^~~~~~~
+        var_1532 = wp::where(var_559, var_676, var_1483);
+                                      ^~~~~~~
+            var_1458 = wp::where(var_693, var_695, var_844);
+                                          ^~~~~~~
+            var_1458 = wp::where(var_693, var_695, var_844);
+                                                   ^~~~~~~
+            var_1461 = wp::where(var_693, var_706, var_860);
+                                          ^~~~~~~
+            var_1461 = wp::where(var_693, var_706, var_860);
+                                                   ^~~~~~~
+            var_1462 = wp::where(var_693, var_710, var_864);
+                                          ^~~~~~~
+            var_1462 = wp::where(var_693, var_710, var_864);
+                                                   ^~~~~~~
+            var_1463 = wp::where(var_693, var_740, var_897);
+                                          ^~~~~~~
+            var_1463 = wp::where(var_693, var_740, var_897);
+                                                   ^~~~~~~
+            var_1464 = wp::where(var_693, var_744, var_901);
+                                          ^~~~~~~
+            var_1464 = wp::where(var_693, var_744, var_901);
+                                                   ^~~~~~~
+            var_1467 = wp::where(var_693, var_762, var_1431);
+                                          ^~~~~~~
+            var_1467 = wp::where(var_693, var_762, var_1431);
+                                                   ^~~~~~~~
+            var_1469 = wp::where(var_693, var_770, var_1433);
+                                          ^~~~~~~
+            var_1469 = wp::where(var_693, var_770, var_1433);
+                                                   ^~~~~~~~
+            var_1470 = wp::where(var_693, var_776, var_1434);
+                                          ^~~~~~~
+            var_1470 = wp::where(var_693, var_776, var_1434);
+                                                   ^~~~~~~~
+            var_1471 = wp::where(var_693, var_782, var_1429);
+                                          ^~~~~~~
+            var_1471 = wp::where(var_693, var_782, var_1429);
+                                                   ^~~~~~~~
+            var_1476 = wp::where(var_693, var_788, var_1186);
+                                          ^~~~~~~
+            var_1476 = wp::where(var_693, var_788, var_1186);
+                                                   ^~~~~~~~
+            var_1481 = wp::where(var_693, var_794, var_1187);
+                                          ^~~~~~~
+            var_1481 = wp::where(var_693, var_794, var_1187);
+                                                   ^~~~~~~~
+            var_1482 = wp::where(var_693, var_798, var_1435);
+                                          ^~~~~~~
+            var_1482 = wp::where(var_693, var_798, var_1435);
+                                                   ^~~~~~~~
+            var_1483 = wp::where(var_693, var_799, var_1436);
+                                          ^~~~~~~
+            var_1483 = wp::where(var_693, var_799, var_1436);
+                                                   ^~~~~~~~
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    var_747 = wp::where(var_440, var_442, var_425);
+                                 ^~~~~~~
+    var_748 = wp::where(var_440, var_444, var_426);
+                                 ^~~~~~~
+    var_751 = wp::where(var_440, var_454, var_429);
+                                 ^~~~~~~
+    var_756 = wp::where(var_440, var_737, var_434);
+                                 ^~~~~~~
+    var_758 = wp::where(var_440, var_739, var_436);
+                                 ^~~~~~~
+    var_759 = wp::where(var_440, var_740, var_437);
+                                 ^~~~~~~
+    var_425 = wp::where(var_349, var_351, var_343);
+                                 ^~~~~~~
+    var_426 = wp::where(var_349, var_353, var_344);
+                                 ^~~~~~~
+    var_429 = wp::where(var_349, var_355, var_271);
+                                 ^~~~~~~
+    var_429 = wp::where(var_349, var_355, var_271);
+                                          ^~~~~~~
+    var_434 = wp::where(var_349, var_384, var_300);
+                                 ^~~~~~~
+    var_434 = wp::where(var_349, var_384, var_300);
+                                          ^~~~~~~
+    var_436 = wp::where(var_349, var_392, var_308);
+                                 ^~~~~~~
+    var_436 = wp::where(var_349, var_392, var_308);
+                                          ^~~~~~~
+    var_437 = wp::where(var_349, var_398, var_314);
+                                 ^~~~~~~
+    var_437 = wp::where(var_349, var_398, var_314);
+                                          ^~~~~~~
+    var_438 = wp::where(var_349, var_418, var_333);
+                                 ^~~~~~~
+    var_438 = wp::where(var_349, var_418, var_333);
+                                          ^~~~~~~
+    var_343 = wp::where(var_265, var_267, var_238);
+                                 ^~~~~~~
+    var_343 = wp::where(var_265, var_267, var_238);
+                                          ^~~~~~~
+    var_344 = wp::where(var_265, var_269, var_240);
+                                 ^~~~~~~
+    var_344 = wp::where(var_265, var_269, var_240);
+                                          ^~~~~~~
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    wp::array_t<wp::float32> var_body_particle_contact_material_ke = _wp_args->body_particle_contact_material_ke;
+                             ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const bool var_159 = true;
+               ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+    const int _wp_fixed_frame = 0;  // fixed-array scratch of this frame
+              ^
+static CUDA_CALLABLE vec3 closest_point_edge_edge(vec3 p1, vec3 q1, vec3 p2, vec3 q2, float32 epsilon)
+                          ^
+static CUDA_CALLABLE void adj_closest_point_edge_edge(
+                          ^
+static WP_CONSTANT const int ARRAY_TYPE_REGULAR = 0;
+                             ^
+static WP_CONSTANT const int ARRAY_TYPE_INDEXED = 1;
+                             ^
+static WP_CONSTANT const int ARRAY_TYPE_FABRIC = 2;
+                             ^
+static WP_CONSTANT const int ARRAY_TYPE_FABRIC_INDEXED = 3;
+                             ^
+static inline pnanovdb_buf_t pnanovdb_make_buf(device uint32_t* data, uint64_t size_in_words)
+                             ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_uint32_as_uint64(pnanovdb_uint32_t x, pnanovdb_uint32_t y) { return ((pnanovdb_uint64_t)x) | (((pnanovdb_uint64_t)y) << 32u); }
+                                        ^
+PNANOVDB_FORCE_INLINE float pnanovdb_min(float a, float b) { return a < b ? a : b; }
+                            ^
+PNANOVDB_FORCE_INLINE float pnanovdb_max(float a, float b) { return a > b ? a : b; }
+                            ^
+PNANOVDB_FORCE_INLINE pnanovdb_vec3_t pnanovdb_vec3_uniform(float a)
+                                      ^
+PNANOVDB_FORCE_INLINE pnanovdb_vec3_t pnanovdb_vec3_add(const pnanovdb_vec3_t a, const pnanovdb_vec3_t b)
+                                      ^
+PNANOVDB_FORCE_INLINE pnanovdb_vec3_t pnanovdb_vec3_sub(const pnanovdb_vec3_t a, const pnanovdb_vec3_t b)
+                                      ^
+PNANOVDB_FORCE_INLINE pnanovdb_vec3_t pnanovdb_vec3_mul(const pnanovdb_vec3_t a, const pnanovdb_vec3_t b)
+                                      ^
+PNANOVDB_FORCE_INLINE pnanovdb_vec3_t pnanovdb_vec3_div(const pnanovdb_vec3_t a, const pnanovdb_vec3_t b)
+                                      ^
+PNANOVDB_FORCE_INLINE pnanovdb_vec3_t pnanovdb_vec3_min(const pnanovdb_vec3_t a, const pnanovdb_vec3_t b)
+                                      ^
+PNANOVDB_FORCE_INLINE pnanovdb_vec3_t pnanovdb_vec3_max(const pnanovdb_vec3_t a, const pnanovdb_vec3_t b)
+                                      ^
+PNANOVDB_FORCE_INLINE pnanovdb_vec3_t pnanovdb_coord_to_vec3(const pnanovdb_coord_t coord)
+                                      ^
+PNANOVDB_FORCE_INLINE pnanovdb_coord_t pnanovdb_coord_uniform(const pnanovdb_int32_t a)
+                                       ^
+PNANOVDB_FORCE_INLINE pnanovdb_bool_t pnanovdb_address_in_interval(pnanovdb_address_t address, pnanovdb_address_t min_address, pnanovdb_address_t max_address)
+                                      ^
+PNANOVDB_FORCE_INLINE pnanovdb_int32_t pnanovdb_read_int32(pnanovdb_buf_t buf, pnanovdb_address_t address)
+                                       ^
+PNANOVDB_FORCE_INLINE pnanovdb_vec3_t pnanovdb_read_vec3(pnanovdb_buf_t buf, pnanovdb_address_t address)
+                                      ^
+PNANOVDB_FORCE_INLINE pnanovdb_vec3_t pnanovdb_read_vec3u16(pnanovdb_buf_t buf, pnanovdb_address_t address)
+                                      ^
+PNANOVDB_FORCE_INLINE pnanovdb_vec3_t pnanovdb_read_vec3u8(pnanovdb_buf_t buf, pnanovdb_address_t address)
+                                      ^
+PNANOVDB_FORCE_INLINE pnanovdb_bool_t pnanovdb_read_bit(pnanovdb_buf_t buf, pnanovdb_address_t address, pnanovdb_uint32_t bit_offset)
+                                      ^
+PNANOVDB_FORCE_INLINE short pnanovdb_read_half(pnanovdb_buf_t buf, pnanovdb_address_t address)
+                            ^
+PNANOVDB_FORCE_INLINE void pnanovdb_write_int32(pnanovdb_buf_t buf, pnanovdb_address_t address, pnanovdb_int32_t value)
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_write_vec3(pnanovdb_buf_t buf, pnanovdb_address_t address, PNANOVDB_IN(pnanovdb_vec3_t) value)
+                           ^
+PNANOVDB_STATIC_CONST pnanovdb_uint32_t pnanovdb_grid_type_value_strides_bits[PNANOVDB_GRID_TYPE_END]  = {  0, 32, 64, 16, 32, 64,  96, 192,  0, 16, 32,  1, 32,  4,  8, 16,  0, 128, 256,  0,  0,  0,  0, 16, 24, 48,  8 };
+                                        ^
+PNANOVDB_STATIC_CONST pnanovdb_uint32_t pnanovdb_grid_type_table_strides_bits[PNANOVDB_GRID_TYPE_END]  = { 64, 64, 64, 64, 64, 64, 128, 192, 64, 64, 64, 64, 64, 64, 64, 64, 64, 128, 256, 64, 64, 64, 64, 64, 64, 64, 64 };
+                                        ^
+PNANOVDB_STATIC_CONST pnanovdb_uint32_t pnanovdb_grid_type_minmax_strides_bits[PNANOVDB_GRID_TYPE_END] = {  0, 32, 64, 16, 32, 64,  96, 192,  8, 16, 32,  8, 32, 32, 32, 32, 32, 128, 256, 64, 64, 64, 64, 64, 24, 48,  8 };
+                                        ^
+PNANOVDB_STATIC_CONST pnanovdb_uint32_t pnanovdb_grid_type_minmax_aligns_bits[PNANOVDB_GRID_TYPE_END]  = {  0, 32, 64, 16, 32, 64,  32,  64,  8, 16, 32,  8, 32, 32, 32, 32, 32,  32,  64, 64, 64, 64, 64, 64,  8, 16,  8 };
+                                        ^
+PNANOVDB_STATIC_CONST pnanovdb_uint32_t pnanovdb_grid_type_stat_strides_bits[PNANOVDB_GRID_TYPE_END]   = {  0, 32, 64, 32, 32, 64,  32,  64,  8, 32, 32,  8, 32, 32, 32, 32, 32,  32,  64, 64, 64, 64, 64, 64, 32, 32, 32 };
+                                        ^
+PNANOVDB_STATIC_CONST pnanovdb_uint32_t pnanovdb_grid_type_leaf_type[PNANOVDB_GRID_TYPE_END]           = {  0,  0,  0,  0,  0,  0,  0,    0,  1,  0,  0,  1,  0,  2,  2,  2,  2,   0,   0,  3,  3,  4,  4,  5,  0,  0,  0 };
+                                        ^
+PNANOVDB_FORCE_INLINE float pnanovdb_map_get_taperf(pnanovdb_buf_t buf, pnanovdb_map_handle_t p, pnanovdb_uint32_t index) {
+                            ^
+PNANOVDB_FORCE_INLINE double pnanovdb_map_get_matd(pnanovdb_buf_t buf, pnanovdb_map_handle_t p, pnanovdb_uint32_t index) {
+                             ^
+PNANOVDB_FORCE_INLINE double pnanovdb_map_get_invmatd(pnanovdb_buf_t buf, pnanovdb_map_handle_t p, pnanovdb_uint32_t index) {
+                             ^
+PNANOVDB_FORCE_INLINE double pnanovdb_map_get_vecd(pnanovdb_buf_t buf, pnanovdb_map_handle_t p, pnanovdb_uint32_t index) {
+                             ^
+PNANOVDB_FORCE_INLINE double pnanovdb_map_get_taperd(pnanovdb_buf_t buf, pnanovdb_map_handle_t p, pnanovdb_uint32_t index) {
+                             ^
+PNANOVDB_FORCE_INLINE void pnanovdb_map_set_matf(pnanovdb_buf_t buf, pnanovdb_map_handle_t p, pnanovdb_uint32_t index, float matf) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_map_set_invmatf(pnanovdb_buf_t buf, pnanovdb_map_handle_t p, pnanovdb_uint32_t index, float invmatf) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_map_set_vecf(pnanovdb_buf_t buf, pnanovdb_map_handle_t p, pnanovdb_uint32_t index, float vecf) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_map_set_taperf(pnanovdb_buf_t buf, pnanovdb_map_handle_t p, pnanovdb_uint32_t index, float taperf) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_map_set_matd(pnanovdb_buf_t buf, pnanovdb_map_handle_t p, pnanovdb_uint32_t index, double matd) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_map_set_invmatd(pnanovdb_buf_t buf, pnanovdb_map_handle_t p, pnanovdb_uint32_t index, double invmatd) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_map_set_vecd(pnanovdb_buf_t buf, pnanovdb_map_handle_t p, pnanovdb_uint32_t index, double vecd) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_map_set_taperd(pnanovdb_buf_t buf, pnanovdb_map_handle_t p, pnanovdb_uint32_t index, double taperd) {
+                           ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_grid_get_magic(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p) {
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_grid_get_checksum(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p) {
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint32_t pnanovdb_grid_get_version(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p) {
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint32_t pnanovdb_grid_get_flags(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p) {
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint32_t pnanovdb_grid_get_grid_index(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p) {
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint32_t pnanovdb_grid_get_grid_count(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p) {
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_grid_get_grid_size(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p) {
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint32_t pnanovdb_grid_get_grid_name(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p, pnanovdb_uint32_t index) {
+                                        ^
+PNANOVDB_FORCE_INLINE double pnanovdb_grid_get_world_bbox(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p, pnanovdb_uint32_t index) {
+                             ^
+PNANOVDB_FORCE_INLINE double pnanovdb_grid_get_voxel_size(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p, pnanovdb_uint32_t index) {
+                             ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint32_t pnanovdb_grid_get_grid_class(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p) {
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint32_t pnanovdb_grid_get_blind_metadata_count(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p) {
+                                        ^
+PNANOVDB_FORCE_INLINE void pnanovdb_grid_set_magic(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p, pnanovdb_uint64_t magic) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_grid_set_checksum(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p, pnanovdb_uint64_t checksum) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_grid_set_version(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p, pnanovdb_uint32_t version) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_grid_set_flags(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p, pnanovdb_uint32_t flags) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_grid_set_grid_index(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p, pnanovdb_uint32_t grid_index) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_grid_set_grid_count(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p, pnanovdb_uint32_t grid_count) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_grid_set_grid_size(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p, pnanovdb_uint64_t grid_size) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_grid_set_grid_name(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p, pnanovdb_uint32_t index, pnanovdb_uint32_t grid_name) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_grid_set_world_bbox(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p, pnanovdb_uint32_t index, double world_bbox) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_grid_set_voxel_size(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p, pnanovdb_uint32_t index, double voxel_size) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_grid_set_grid_class(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p, pnanovdb_uint32_t grid_class) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_grid_set_grid_type(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p, pnanovdb_uint32_t grid_type) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_grid_set_blind_metadata_offset(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p, pnanovdb_uint64_t blind_metadata_offset) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_grid_set_blind_metadata_count(pnanovdb_buf_t buf, pnanovdb_grid_handle_t p, pnanovdb_uint32_t metadata_count) {
+                           ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint32_t pnanovdb_make_version(pnanovdb_uint32_t major, pnanovdb_uint32_t minor, pnanovdb_uint32_t patch_num)
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint32_t pnanovdb_version_get_major(pnanovdb_uint32_t version)
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint32_t pnanovdb_version_get_minor(pnanovdb_uint32_t version)
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint32_t pnanovdb_version_get_patch(pnanovdb_uint32_t version)
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_gridblindmetadata_get_value_count(pnanovdb_buf_t buf, pnanovdb_gridblindmetadata_handle_t p) {
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint32_t pnanovdb_gridblindmetadata_get_value_size(pnanovdb_buf_t buf, pnanovdb_gridblindmetadata_handle_t p) {
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint32_t pnanovdb_gridblindmetadata_get_semantic(pnanovdb_buf_t buf, pnanovdb_gridblindmetadata_handle_t p) {
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint32_t pnanovdb_gridblindmetadata_get_data_class(pnanovdb_buf_t buf, pnanovdb_gridblindmetadata_handle_t p) {
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint32_t pnanovdb_gridblindmetadata_get_data_type(pnanovdb_buf_t buf, pnanovdb_gridblindmetadata_handle_t p) {
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint32_t pnanovdb_gridblindmetadata_get_name(pnanovdb_buf_t buf, pnanovdb_gridblindmetadata_handle_t p, pnanovdb_uint32_t index) {
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_tree_get_node_offset_lower(pnanovdb_buf_t buf, pnanovdb_tree_handle_t p) {
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_tree_get_node_offset_upper(pnanovdb_buf_t buf, pnanovdb_tree_handle_t p) {
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint32_t pnanovdb_tree_get_node_count_lower(pnanovdb_buf_t buf, pnanovdb_tree_handle_t p) {
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint32_t pnanovdb_tree_get_node_count_upper(pnanovdb_buf_t buf, pnanovdb_tree_handle_t p) {
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint32_t pnanovdb_tree_get_tile_count_leaf(pnanovdb_buf_t buf, pnanovdb_tree_handle_t p) {
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint32_t pnanovdb_tree_get_tile_count_lower(pnanovdb_buf_t buf, pnanovdb_tree_handle_t p) {
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint32_t pnanovdb_tree_get_tile_count_upper(pnanovdb_buf_t buf, pnanovdb_tree_handle_t p) {
+                                        ^
+PNANOVDB_FORCE_INLINE void pnanovdb_tree_set_node_offset_leaf(pnanovdb_buf_t buf, pnanovdb_tree_handle_t p, pnanovdb_uint64_t node_offset_leaf) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_tree_set_node_offset_lower(pnanovdb_buf_t buf, pnanovdb_tree_handle_t p, pnanovdb_uint64_t node_offset_lower) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_tree_set_node_offset_upper(pnanovdb_buf_t buf, pnanovdb_tree_handle_t p, pnanovdb_uint64_t node_offset_upper) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_tree_set_node_offset_root(pnanovdb_buf_t buf, pnanovdb_tree_handle_t p, pnanovdb_uint64_t node_offset_root) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_tree_set_node_count_leaf(pnanovdb_buf_t buf, pnanovdb_tree_handle_t p, pnanovdb_uint32_t node_count_leaf) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_tree_set_node_count_lower(pnanovdb_buf_t buf, pnanovdb_tree_handle_t p, pnanovdb_uint32_t node_count_lower) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_tree_set_node_count_upper(pnanovdb_buf_t buf, pnanovdb_tree_handle_t p, pnanovdb_uint32_t node_count_upper) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_tree_set_tile_count_leaf(pnanovdb_buf_t buf, pnanovdb_tree_handle_t p, pnanovdb_uint32_t tile_count_leaf) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_tree_set_tile_count_lower(pnanovdb_buf_t buf, pnanovdb_tree_handle_t p, pnanovdb_uint32_t tile_count_lower) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_tree_set_tile_count_upper(pnanovdb_buf_t buf, pnanovdb_tree_handle_t p, pnanovdb_uint32_t tile_count_upper) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_tree_set_voxel_count(pnanovdb_buf_t buf, pnanovdb_tree_handle_t p, pnanovdb_uint64_t voxel_count) {
+                           ^
+PNANOVDB_FORCE_INLINE pnanovdb_coord_t pnanovdb_root_get_bbox_min(pnanovdb_buf_t buf, pnanovdb_root_handle_t p) {
+                                       ^
+PNANOVDB_FORCE_INLINE pnanovdb_coord_t pnanovdb_root_get_bbox_max(pnanovdb_buf_t buf, pnanovdb_root_handle_t p) {
+                                       ^
+PNANOVDB_FORCE_INLINE void pnanovdb_root_set_bbox_min(pnanovdb_buf_t buf, pnanovdb_root_handle_t p, PNANOVDB_IN(pnanovdb_coord_t) bbox_min) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_root_set_bbox_max(pnanovdb_buf_t buf, pnanovdb_root_handle_t p, PNANOVDB_IN(pnanovdb_coord_t) bbox_max) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_root_set_tile_count(pnanovdb_buf_t buf, pnanovdb_root_handle_t p, pnanovdb_uint32_t tile_count) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_root_tile_set_key(pnanovdb_buf_t buf, pnanovdb_root_tile_handle_t p, pnanovdb_uint64_t key) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_root_tile_set_child(pnanovdb_buf_t buf, pnanovdb_root_tile_handle_t p, pnanovdb_int64_t child) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_root_tile_set_state(pnanovdb_buf_t buf, pnanovdb_root_tile_handle_t p, pnanovdb_uint32_t state) {
+                           ^
+PNANOVDB_FORCE_INLINE pnanovdb_coord_t pnanovdb_upper_get_bbox_min(pnanovdb_buf_t buf, pnanovdb_upper_handle_t p) {
+                                       ^
+PNANOVDB_FORCE_INLINE pnanovdb_coord_t pnanovdb_upper_get_bbox_max(pnanovdb_buf_t buf, pnanovdb_upper_handle_t p) {
+                                       ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_upper_get_flags(pnanovdb_buf_t buf, pnanovdb_upper_handle_t p) {
+                                        ^
+PNANOVDB_FORCE_INLINE void pnanovdb_upper_set_bbox_min(pnanovdb_buf_t buf, pnanovdb_upper_handle_t p, PNANOVDB_IN(pnanovdb_coord_t) bbox_min) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_upper_set_bbox_max(pnanovdb_buf_t buf, pnanovdb_upper_handle_t p, PNANOVDB_IN(pnanovdb_coord_t) bbox_max) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_upper_set_child_mask(pnanovdb_buf_t buf, pnanovdb_upper_handle_t p, pnanovdb_uint32_t bit_index, pnanovdb_bool_t value) {
+                           ^
+PNANOVDB_FORCE_INLINE pnanovdb_coord_t pnanovdb_lower_get_bbox_min(pnanovdb_buf_t buf, pnanovdb_lower_handle_t p) {
+                                       ^
+PNANOVDB_FORCE_INLINE pnanovdb_coord_t pnanovdb_lower_get_bbox_max(pnanovdb_buf_t buf, pnanovdb_lower_handle_t p) {
+                                       ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_lower_get_flags(pnanovdb_buf_t buf, pnanovdb_lower_handle_t p) {
+                                        ^
+PNANOVDB_FORCE_INLINE void pnanovdb_lower_set_bbox_min(pnanovdb_buf_t buf, pnanovdb_lower_handle_t p, PNANOVDB_IN(pnanovdb_coord_t) bbox_min) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_lower_set_bbox_max(pnanovdb_buf_t buf, pnanovdb_lower_handle_t p, PNANOVDB_IN(pnanovdb_coord_t) bbox_max) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_lower_set_child_mask(pnanovdb_buf_t buf, pnanovdb_lower_handle_t p, pnanovdb_uint32_t bit_index, pnanovdb_bool_t value) {
+                           ^
+PNANOVDB_FORCE_INLINE pnanovdb_coord_t pnanovdb_leaf_get_bbox_min(pnanovdb_buf_t buf, pnanovdb_leaf_handle_t p) {
+                                       ^
+PNANOVDB_FORCE_INLINE void pnanovdb_leaf_set_bbox_min(pnanovdb_buf_t buf, pnanovdb_leaf_handle_t p, PNANOVDB_IN(pnanovdb_coord_t) bbox_min) {
+                           ^
+PNANOVDB_FORCE_INLINE void pnanovdb_leaf_set_bbox_dif_and_flags(pnanovdb_buf_t buf, pnanovdb_leaf_handle_t p, pnanovdb_uint32_t bbox_dif_and_flags) {
+                           ^
+PNANOVDB_FORCE_INLINE pnanovdb_address_t pnanovdb_grid_get_gridblindmetadata_value_address(pnanovdb_buf_t buf, pnanovdb_grid_handle_t grid, pnanovdb_uint32_t index)
+                                         ^
+PNANOVDB_FORCE_INLINE pnanovdb_root_tile_handle_t pnanovdb_root_get_tile(pnanovdb_grid_type_t grid_type, pnanovdb_root_handle_t root, pnanovdb_uint32_t n)
+                                                  ^
+PNANOVDB_FORCE_INLINE pnanovdb_address_t pnanovdb_leaf_get_ave_address(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, pnanovdb_leaf_handle_t node)
+                                         ^
+PNANOVDB_FORCE_INLINE pnanovdb_address_t pnanovdb_leaf_get_stddev_address(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, pnanovdb_leaf_handle_t node)
+                                         ^
+PNANOVDB_FORCE_INLINE pnanovdb_bool_t pnanovdb_leaf_indexmask_has_stats(pnanovdb_buf_t buf, pnanovdb_leaf_handle_t leaf)
+                                      ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_leaf_indexmask_get_min_index(pnanovdb_buf_t buf, pnanovdb_address_t min_address)
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_leaf_indexmask_get_max_index(pnanovdb_buf_t buf, pnanovdb_address_t max_address)
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_leaf_indexmask_get_ave_index(pnanovdb_buf_t buf, pnanovdb_address_t ave_address)
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_leaf_indexmask_get_dev_index(pnanovdb_buf_t buf, pnanovdb_address_t dev_address)
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_bool_t pnanovdb_leaf_indexmask_get_mask_bit(pnanovdb_buf_t buf, pnanovdb_leaf_handle_t leaf, pnanovdb_uint32_t n)
+                                      ^
+PNANOVDB_FORCE_INLINE void pnanovdb_leaf_indexmask_set_mask_bit(pnanovdb_buf_t buf, pnanovdb_leaf_handle_t leaf, pnanovdb_uint32_t n, pnanovdb_bool_t v)
+                           ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint32_t pnanovdb_leaf_onindexmask_get_value_count(pnanovdb_buf_t buf, pnanovdb_leaf_handle_t leaf)
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_leaf_onindexmask_get_last_offset(pnanovdb_buf_t buf, pnanovdb_leaf_handle_t leaf)
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_bool_t pnanovdb_leaf_onindexmask_has_stats(pnanovdb_buf_t buf, pnanovdb_leaf_handle_t leaf)
+                                      ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_leaf_onindexmask_get_min_index(pnanovdb_buf_t buf, pnanovdb_address_t min_address)
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_leaf_onindexmask_get_max_index(pnanovdb_buf_t buf, pnanovdb_address_t max_address)
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_leaf_onindexmask_get_ave_index(pnanovdb_buf_t buf, pnanovdb_address_t ave_address)
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_leaf_onindexmask_get_dev_index(pnanovdb_buf_t buf, pnanovdb_address_t dev_address)
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_bool_t pnanovdb_leaf_onindexmask_get_mask_bit(pnanovdb_buf_t buf, pnanovdb_leaf_handle_t leaf, pnanovdb_uint32_t n)
+                                      ^
+PNANOVDB_FORCE_INLINE void pnanovdb_leaf_onindexmask_set_mask_bit(pnanovdb_buf_t buf, pnanovdb_leaf_handle_t leaf, pnanovdb_uint32_t n, pnanovdb_bool_t v)
+                           ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_leaf_pointindex_get_point_count(pnanovdb_buf_t buf, pnanovdb_leaf_handle_t leaf)
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_leaf_pointindex_get_first(pnanovdb_buf_t buf, pnanovdb_leaf_handle_t leaf, pnanovdb_uint32_t i)
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_leaf_pointindex_get_last(pnanovdb_buf_t buf, pnanovdb_leaf_handle_t leaf, pnanovdb_uint32_t i)
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_leaf_pointindex_get_value(pnanovdb_buf_t buf, pnanovdb_leaf_handle_t leaf, pnanovdb_uint32_t i)
+                                        ^
+PNANOVDB_FORCE_INLINE void pnanovdb_leaf_pointindex_set_value(pnanovdb_buf_t buf, pnanovdb_leaf_handle_t leaf, pnanovdb_uint32_t i, pnanovdb_uint32_t value)
+                           ^
+PNANOVDB_FORCE_INLINE pnanovdb_address_t pnanovdb_lower_get_min_address(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, pnanovdb_lower_handle_t node)
+                                         ^
+PNANOVDB_FORCE_INLINE pnanovdb_address_t pnanovdb_lower_get_max_address(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, pnanovdb_lower_handle_t node)
+                                         ^
+PNANOVDB_FORCE_INLINE pnanovdb_address_t pnanovdb_lower_get_ave_address(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, pnanovdb_lower_handle_t node)
+                                         ^
+PNANOVDB_FORCE_INLINE pnanovdb_address_t pnanovdb_lower_get_stddev_address(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, pnanovdb_lower_handle_t node)
+                                         ^
+PNANOVDB_FORCE_INLINE pnanovdb_address_t pnanovdb_lower_get_value_address(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, pnanovdb_lower_handle_t lower, PNANOVDB_IN(pnanovdb_coord_t) ijk)
+                                         ^
+PNANOVDB_FORCE_INLINE pnanovdb_address_t pnanovdb_upper_get_min_address(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, pnanovdb_upper_handle_t node)
+                                         ^
+PNANOVDB_FORCE_INLINE pnanovdb_address_t pnanovdb_upper_get_max_address(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, pnanovdb_upper_handle_t node)
+                                         ^
+PNANOVDB_FORCE_INLINE pnanovdb_address_t pnanovdb_upper_get_ave_address(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, pnanovdb_upper_handle_t node)
+                                         ^
+PNANOVDB_FORCE_INLINE pnanovdb_address_t pnanovdb_upper_get_stddev_address(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, pnanovdb_upper_handle_t node)
+                                         ^
+PNANOVDB_FORCE_INLINE pnanovdb_address_t pnanovdb_upper_get_value_address(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, pnanovdb_upper_handle_t upper, PNANOVDB_IN(pnanovdb_coord_t) ijk)
+                                         ^
+PNANOVDB_FORCE_INLINE void pnanovdb_upper_set_table_child(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, pnanovdb_upper_handle_t node, pnanovdb_uint32_t n, pnanovdb_int64_t child)
+                           ^
+PNANOVDB_FORCE_INLINE pnanovdb_address_t pnanovdb_root_get_min_address(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, pnanovdb_root_handle_t root)
+                                         ^
+PNANOVDB_FORCE_INLINE pnanovdb_address_t pnanovdb_root_get_max_address(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, pnanovdb_root_handle_t root)
+                                         ^
+PNANOVDB_FORCE_INLINE pnanovdb_address_t pnanovdb_root_get_ave_address(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, pnanovdb_root_handle_t root)
+                                         ^
+PNANOVDB_FORCE_INLINE pnanovdb_address_t pnanovdb_root_get_stddev_address(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, pnanovdb_root_handle_t root)
+                                         ^
+PNANOVDB_FORCE_INLINE pnanovdb_address_t pnanovdb_root_tile_get_value_address(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, pnanovdb_root_tile_handle_t root_tile)
+                                         ^
+PNANOVDB_FORCE_INLINE pnanovdb_address_t pnanovdb_root_get_value_address_bit(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, pnanovdb_root_handle_t root, PNANOVDB_IN(pnanovdb_coord_t) ijk, PNANOVDB_INOUT(pnanovdb_uint32_t) bit_index)
+                                         ^
+PNANOVDB_FORCE_INLINE float pnanovdb_root_fp4_read_float(pnanovdb_buf_t buf, pnanovdb_address_t address, PNANOVDB_IN(pnanovdb_coord_t) ijk, pnanovdb_uint32_t level)
+                            ^
+PNANOVDB_FORCE_INLINE float pnanovdb_root_fp8_read_float(pnanovdb_buf_t buf, pnanovdb_address_t address, PNANOVDB_IN(pnanovdb_coord_t) ijk, pnanovdb_uint32_t level)
+                            ^
+PNANOVDB_FORCE_INLINE float pnanovdb_root_fp16_read_float(pnanovdb_buf_t buf, pnanovdb_address_t address, PNANOVDB_IN(pnanovdb_coord_t) ijk, pnanovdb_uint32_t level)
+                            ^
+PNANOVDB_FORCE_INLINE float pnanovdb_root_fpn_read_float(pnanovdb_buf_t buf, pnanovdb_address_t address, PNANOVDB_IN(pnanovdb_coord_t) ijk, pnanovdb_uint32_t level)
+                            ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_root_index_get_value_index(pnanovdb_buf_t buf, pnanovdb_address_t address, PNANOVDB_IN(pnanovdb_coord_t) ijk, pnanovdb_uint32_t level)
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_root_onindex_get_value_index(pnanovdb_buf_t buf, pnanovdb_address_t address, PNANOVDB_IN(pnanovdb_coord_t) ijk, pnanovdb_uint32_t level)
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint64_t pnanovdb_root_pointindex_get_point_address_range(
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_address_t pnanovdb_lower_get_value_address_and_cache(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, pnanovdb_lower_handle_t lower, PNANOVDB_IN(pnanovdb_coord_t) ijk, PNANOVDB_INOUT(pnanovdb_readaccessor_t) acc)
+                                         ^
+PNANOVDB_FORCE_INLINE void pnanovdb_lower_set_table_child(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, pnanovdb_lower_handle_t node, pnanovdb_uint32_t n, pnanovdb_int64_t child)
+                           ^
+PNANOVDB_FORCE_INLINE pnanovdb_address_t pnanovdb_upper_get_value_address_and_cache(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, pnanovdb_upper_handle_t upper, PNANOVDB_IN(pnanovdb_coord_t) ijk, PNANOVDB_INOUT(pnanovdb_readaccessor_t) acc)
+                                         ^
+PNANOVDB_FORCE_INLINE pnanovdb_address_t pnanovdb_root_get_value_address_and_cache(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, pnanovdb_root_handle_t root, PNANOVDB_IN(pnanovdb_coord_t) ijk, PNANOVDB_INOUT(pnanovdb_readaccessor_t) acc)
+                                         ^
+PNANOVDB_FORCE_INLINE pnanovdb_address_t pnanovdb_readaccessor_get_value_address(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, PNANOVDB_INOUT(pnanovdb_readaccessor_t) acc, PNANOVDB_IN(pnanovdb_coord_t) ijk)
+                                         ^
+PNANOVDB_FORCE_INLINE pnanovdb_address_t pnanovdb_readaccessor_get_value_address_bit(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, PNANOVDB_INOUT(pnanovdb_readaccessor_t) acc, PNANOVDB_IN(pnanovdb_coord_t) ijk, PNANOVDB_INOUT(pnanovdb_uint32_t) bit_index)
+                                         ^
+PNANOVDB_FORCE_INLINE pnanovdb_uint32_t pnanovdb_readaccessor_get_dim(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, PNANOVDB_INOUT(pnanovdb_readaccessor_t) acc, PNANOVDB_IN(pnanovdb_coord_t) ijk)
+                                        ^
+PNANOVDB_FORCE_INLINE pnanovdb_bool_t pnanovdb_readaccessor_is_active(pnanovdb_grid_type_t grid_type, pnanovdb_buf_t buf, PNANOVDB_INOUT(pnanovdb_readaccessor_t) acc, PNANOVDB_IN(pnanovdb_coord_t) ijk)
+                                      ^
+PNANOVDB_FORCE_INLINE float pnanovdb_dither_lookup(pnanovdb_bool_t enabled, int offset)
+                            ^
+static CUDA_CALLABLE void adj_FloatInterval_9122aba2(const wp::float32 WP_THREAD&,
+                          ^
+static CUDA_CALLABLE void adj_RigidContactHistory_ed8161ff(const wp::array_t<wp::vec_t<3, wp::float32>> WP_THREAD&,
+                          ^
+static CUDA_CALLABLE void adj_RodBendTwistMeasure_dbdb0518(const wp::vec_t<3, wp::float32> WP_THREAD&,
+                          ^
+static CUDA_CALLABLE void adj_JointAxisDriveLimit_1390182d(const wp::float32 WP_THREAD&,
+                          ^
+static CUDA_CALLABLE void adj_RigidForceElementAdjacencyInfo_ba9a9ee7(const wp::array_t<wp::int32> WP_THREAD&,
+                          ^
+static WP_FORCE_INLINE void adj_dat_separation_epsilon_0(
+                            ^
+static WP_FORCE_INLINE void adj_rigid_pose_delta_0(
+                            ^
+static WP_FORCE_INLINE void adj_place_dat_division_plane_0(
+                            ^
+static WP_FORCE_INLINE void adj_planar_truncation_t_0(
+                            ^
+static WP_FORCE_INLINE void adj_rigid_point_trajectory_0(
+                            ^
+static WP_FORCE_INLINE void adj_interval_0(
+                            ^
+static WP_FORCE_INLINE void adj_point_interval_0(
+                            ^
+static CUDA_CALLABLE void adj_next_float_down_0(
+                          ^
+static CUDA_CALLABLE void adj_next_float_up_0(
+                          ^
+static WP_FORCE_INLINE void adj_interval_mul_0(
+                            ^
+static WP_FORCE_INLINE void adj__expand_down_0(
+                            ^
+static WP_FORCE_INLINE void adj__expand_up_0(
+                            ^
+static WP_FORCE_INLINE void adj__linear_sinusoid_interval_0(
+                            ^
+static WP_FORCE_INLINE void adj_interval_add_0(
+                            ^
+static WP_FORCE_INLINE void adj_rigid_point_plane_signed_distance_derivative_interval_0(
+                            ^
+static WP_FORCE_INLINE void adj_rigid_point_plane_signed_distance_interval_0(
+                            ^
+static WP_FORCE_INLINE void adj__rigid_trajectory_prefix_is_interval_safe_0(
+                            ^
+static void adj_rigid_trajectory_truncation_t_0(
+            ^
+static WP_FORCE_INLINE void adj__average_contact_material_0(
+                            ^
+static WP_FORCE_INLINE void adj__contact_penalty_floor_0(
+                            ^
+static WP_FORCE_INLINE void adj__world_selected_0(
+                            ^
+static WP_FORCE_INLINE void adj__shape_world_selected_0(
+                            ^
+static WP_FORCE_INLINE void adj__contact_world_selected_0(
+                            ^
+static WP_FORCE_INLINE void adj__project_coulomb_tangent_0(
+                            ^
+static WP_FORCE_INLINE void adj__quat_rotate_local_z_0(
+                            ^
+static WP_FORCE_INLINE void adj__quat_rotate_local_x_0(
+                            ^
+static WP_FORCE_INLINE void adj__normalize_with_fallback_0(
+                            ^
+static WP_FORCE_INLINE void adj__project_perp_0(
+                            ^
+static WP_FORCE_INLINE void adj__perpendicular_axis_with_fallback_0(
+                            ^
+static WP_FORCE_INLINE void adj__bishop_transport_quat_0(
+                            ^
+static WP_FORCE_INLINE void adj__transport_material_axis_0(
+                            ^
+static WP_FORCE_INLINE void adj__transported_twist_angle_from_material_axes_0(
+                            ^
+static WP_FORCE_INLINE void adj__finite_curvature_binormal_0(
+                            ^
+static WP_FORCE_INLINE void adj__measure_rod_bend_twist_z_0(
+                            ^
+static WP_FORCE_INLINE void adj__wrap_principal_angle_0(
+                            ^
+static WP_FORCE_INLINE void adj__assemble_geometric_rod_kappa_z_0(
+                            ^
+static WP_FORCE_INLINE void adj_compute_geometric_rod_kappa_cached_z_0(
+                            ^
+static WP_FORCE_INLINE void adj__compliant_alm_coefficients_0(
+                            ^
+static WP_FORCE_INLINE void adj__alm_relaxed_ascent_0(
+                            ^
+static WP_FORCE_INLINE void adj__update_dual_vec3_0(
+                            ^
+static WP_FORCE_INLINE void adj__ramp_penalty_k_0(
+                            ^
+static WP_FORCE_INLINE void adj__update_joint_structural_dual_0(
+                            ^
+static WP_FORCE_INLINE void adj_compute_kappa_0(
+                            ^
+static WP_FORCE_INLINE void adj_build_joint_projectors_0(
+                            ^
+static WP_FORCE_INLINE void adj__load_joint_axis_drive_limit_0(
+                            ^
+static WP_FORCE_INLINE void adj__drive_row_needs_state_update_0(
+                            ^
+static WP_FORCE_INLINE void adj__limit_row_exists_0(
+                            ^
+static WP_FORCE_INLINE void adj_quat_velocity_0(
+                            ^
+static WP_FORCE_INLINE void adj_compute_right_jacobian_inverse_0(
+                            ^
+static WP_FORCE_INLINE void adj_compute_kappa_and_jacobian_0(
+                            ^
+static WP_FORCE_INLINE void adj_compute_kappa_dot_0(
+                            ^
+static WP_FORCE_INLINE void adj_resolve_drive_limit_mode_0(
+                            ^
+static WP_FORCE_INLINE void adj__resolve_active_drive_row_0(
+                            ^
+static WP_FORCE_INLINE void adj__spring_damper_step_0(
+                            ^
+static WP_FORCE_INLINE void adj__bilateral_auto_rho_0(
+                            ^
+static WP_FORCE_INLINE void adj__drive_auto_rho_0(
+                            ^
+static WP_FORCE_INLINE void adj__alm_relaxed_ascent_0(
+                            ^
+static WP_FORCE_INLINE void adj__update_drive_lambda_0(
+                            ^
+static WP_FORCE_INLINE void adj__nearest_limit_bound_0(
+                            ^
+static WP_FORCE_INLINE void adj__limit_signed_gap_0(
+                            ^
+static WP_FORCE_INLINE void adj__limit_auto_rho_0(
+                            ^
+static WP_FORCE_INLINE void adj__update_limit_lambda_0(
+                            ^
+static WP_FORCE_INLINE void adj__update_joint_axis_drive_limit_state_0(
+                            ^
+static WP_FORCE_INLINE void adj_integrate_rigid_body_0(
+                            ^
+static WP_FORCE_INLINE void adj_contact_surface_separation_0(
+                            ^
+static WP_FORCE_INLINE void adj__load_solve_weight_0(
+                            ^
+static WP_FORCE_INLINE void adj__material_force_terms_0(
+                            ^
+static WP_FORCE_INLINE void adj__contact_force_terms_0(
+                            ^
+static WP_FORCE_INLINE void adj_contact_surface_point_0(
+                            ^
+static WP_FORCE_INLINE void adj__regularized_coulomb_scale_0(
+                            ^
+static WP_FORCE_INLINE void adj_compute_projected_isotropic_friction_0(
+                            ^
+static WP_FORCE_INLINE void adj_evaluate_rigid_contact_from_collision_0(
+                            ^
+static WP_FORCE_INLINE void adj__evaluate_rigid_soft_contact_force_norm_0(
+                            ^
+static WP_FORCE_INLINE void adj__compute_body_particle_contact_force_0(
+                            ^
+static WP_FORCE_INLINE void adj__eval_soft_ef_contact_0(
+                            ^
+static WP_FORCE_INLINE void adj__reset_world_selected_0(
+                            ^
+static WP_FORCE_INLINE void adj__reset_joint_history_0(
+                            ^
+static WP_FORCE_INLINE void adj__rod_dahl_active_stiffness_0(
+                            ^
+static WP_FORCE_INLINE void adj__rod_bend_twist_delta_0(
+                            ^
+static WP_FORCE_INLINE void adj__dahl_axis_direction_0(
+                            ^
+static WP_FORCE_INLINE void adj__advance_dahl_axis_0(
+                            ^
+static WP_FORCE_INLINE void adj__joint_linear_rho_seed_0(
+                            ^
+static WP_FORCE_INLINE void adj__body_angular_mobility_scalar_0(
+                            ^
+static WP_FORCE_INLINE void adj__joint_angular_rho_seed_0(
+                            ^
+static WP_FORCE_INLINE void adj__structural_joint_auto_rho_0(
+                            ^
+static WP_FORCE_INLINE void adj__drive_row_applies_force_0(
+                            ^
+static WP_FORCE_INLINE void adj__drive_limit_needs_support_0(
+                            ^
+static WP_FORCE_INLINE void adj__joint_axis_linear_support_0(
+                            ^
+static WP_FORCE_INLINE void adj__joint_axis_angular_support_0(
+                            ^
+static WP_FORCE_INLINE void adj__compliant_contact_dual_step_0(
+                            ^
+static WP_FORCE_INLINE void adj__contact_delassus_w_0(
+                            ^
+static WP_FORCE_INLINE void adj__contact_body_conditioning_scale_0(
+                            ^
+static WP_FORCE_INLINE void adj__series_scale_0(
+                            ^
+static WP_FORCE_INLINE void adj__contact_conditioning_scale_0(
+                            ^
+static WP_FORCE_INLINE void adj__contact_auto_normal_rho_0(
+                            ^
+static WP_FORCE_INLINE void adj_orthonormal_basis_0(
+                            ^
+static WP_FORCE_INLINE void adj__contact_body_tangent_block_0(
+                            ^
+static WP_FORCE_INLINE void adj__contact_tangent_conditioning_scale_0(
+                            ^
+static WP_FORCE_INLINE void adj__contact_pair_structural_scale_0(
+                            ^
+static WP_FORCE_INLINE void adj__contact_auto_tangent_rho_0(
+                            ^
+static WP_FORCE_INLINE void adj_get_body_num_adjacent_joints_0(
+                            ^
+static WP_FORCE_INLINE void adj_get_body_adjacent_joint_id_0(
+                            ^
+static WP_FORCE_INLINE void adj__zero_force_hessian_0(
+                            ^
+static WP_FORCE_INLINE void adj__structural_row_has_stiffness_0(
+                            ^
+static WP_FORCE_INLINE void adj__material_force_terms_0(
+                            ^
+static WP_FORCE_INLINE void adj__finite_curvature_binormal_jacobian_0(
+                            ^
+static WP_FORCE_INLINE void adj__transported_twist_angle_derivative_from_measure_0(
+                            ^
+static WP_FORCE_INLINE void adj__transported_twist_angle_jacobian_from_measure_0(
+                            ^
+static WP_FORCE_INLINE void adj__rod_bend_twist_jacobian_z_from_measure_0(
+                            ^
+static WP_FORCE_INLINE void adj__diag_mul_mat33_0(
+                            ^
+static WP_FORCE_INLINE void adj_evaluate_rod_bend_twist_force_hessian_z_0(
+                            ^
+static WP_FORCE_INLINE void adj_evaluate_rod_stretch_shear_force_hessian_0(
+                            ^
+static WP_FORCE_INLINE void adj_evaluate_linear_constraint_force_hessian_0(
+                            ^
+static WP_FORCE_INLINE void adj_evaluate_angular_constraint_force_hessian_0(
+                            ^
+static WP_FORCE_INLINE void adj__evaluate_drive_limit_axis_0(
+                            ^
+static WP_FORCE_INLINE void adj__evaluate_drive_axis_0(
+                            ^
+static WP_FORCE_INLINE void adj__evaluate_limit_axis_0(
+                            ^
+static WP_FORCE_INLINE void adj__eval_joint_axis_drive_limit_0(
+                            ^
+static WP_FORCE_INLINE void adj_apply_angular_drive_limit_torque_0(
+                            ^
+static WP_FORCE_INLINE void adj_apply_linear_drive_limit_force_0(
+                            ^
+static void adj_evaluate_joint_force_hessian_0(
+            ^
+static WP_FORCE_INLINE void adj_ldlt6_solve_0(
+                            ^
+Undefined symbol(s) for architecture 'air64':
+  'nextafterf', referenced from:
+      _ZL31rigid_trajectory_truncation_t_0PU14MTLthreadgroupcPU9MTLdevicecN2wp5vec_tILj3EfEES5_S5_S5_S5_fS5_ffbif in program_object_0
+error: symbol(s) not found for target 'air64-apple-macosx26.7.0'
+
+userInfo: {
+    NSLocalizedDescription = "program_source:357:9: warning: 'assert' macro redefined [-Wmacro-redefined]\n#define assert(x) ((void)0)\n        ^\n/System/Library/PrivateFrameworks/GPUCompiler.framework/Versions/32023/Libraries/lib/clang/32023.886/include/metal/metal_assert:19:9: note: previous definition is here\n#define assert(condition) ((void) 0)\n        ^\nprogram_source:2761:8: warning: constexpr if is a C++17 extension [-Wc++17-extensions]\n    if constexpr (N > 3) {\n       ^\nprogram_source:2766:8: warning: constexpr if is a C++17 extension [-Wc++17-extensions]\n    if constexpr (N > 2) {\n       ^\nprogram_source:2771:8: warning: constexpr if is a C++17 extension [-Wc++17-extensions]\n    if constexpr (N > 1) {\n       ^\nprogram_source:2776:8: warning: constexpr if is a C++17 extension [-Wc++17-extensions]\n    if constexpr (N > 0) {\n       ^\nprogram_source:3835:8: warning: constexpr if is a C++17 extension [-Wc++17-extensions]\n    if constexpr (I + 1 < Length) {\n       ^\nprogram_source:4395:15: warning: comparison of integers of different signs: 'unsigned int' and 'int' [-Wsign-compare]\n        if (i != idx)\n            ~ ^  ~~~\nprogram_source:8563:31: warning: comparison of integers of different signs: 'unsigned int' and 'int' [-Wsign-compare]\n            if (i != row || j != col)\n                            ~ ^  ~~~\nprogram_source:8563:19: warning: comparison of integers of different signs: 'unsigned int' and 'int' [-Wsign-compare]\n            if (i != row || j != col)\n                ~ ^  ~~~\nprogram_source:8594:19: warning: comparison of integers of different signs: 'unsigned int' and 'int' [-Wsign-compare]\n            if (i == row)\n                ~ ^  ~~~\nprogram_source:12060:15: warning: comparison of integers of different signs: 'unsigned int' and 'int' [-Wsign-compare]\n        if (i != idx)\n            ~ ^  ~~~\nprogram_source:13908:15: warning: comparison of integers of different signs: 'unsigned int' and 'int' [-Wsign-compare]\n        if (i != idx)\n            ~ ^  ~~~\nprogram_source:14783:17: warning: unused variable 'Dz' [-Wunused-variable]\n    const float Dz = dir[kz];\n                ^\nprogram_source:14884:16: warning: unused variable 'dW_dp' [-Wunused-variable]\n    const vec3 dW_dp = vec3(dW_dpx, dW_dpy, dW_dpz);\n               ^\nprogram_source:14950:16: warning: unused variable 'dW_dD' [-Wunused-variable]\n    const vec3 dW_dD = vec3(dW_dDx, dW_dDy, dW_dDz);\n               ^\nprogram_source:19134:12: warning: unused variable 'length' [-Wunused-variable]\n    size_t length = *((size_t WP_THREAD*)bucket->lengths + index_in_bucket);\n           ^\nprogram_source:19197:12: warning: unused variable 'length' [-Wunused-variable]\n    size_t length = *((size_t WP_THREAD*)bucket->lengths + index_in_bucket);\n           ^\nprogram_source:21688:23: warning: comparison of integers of different signs: 'int' and 'const wp::uint32' (aka 'const unsigned int') [-Wsign-compare]\n    for (int i = 0; i < o

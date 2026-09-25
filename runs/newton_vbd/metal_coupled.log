@@ -1,0 +1,24 @@
+holder: {"name": "vbd_coupled", "kind": "low", "minutes": 30.0, "pid": 77183, "start": 1790358009.424056}
+=== coupled examples on metal:0 (Newton 1.5.2 + mujoco-warp 3.11.0; one eager frame before capture)
+{"example": "multiphysics.example_mujoco_vbd_coupled_solver", "device": "metal:0", "newton_src": "newton-1.5.2", "build_s": 2.215784458006965, "graph": true, "first_frame_s": 0.1017989160027355, "loop_s": 5.780540249979822, "frames_per_s": 10.206658452072183, "body_q_finite": true, "particle_q_finite": true, "test_final": "pass"}
+{"example": "multiphysics.example_mujoco_vbd_admm_solver", "device": "metal:0", "newton_src": "newton-1.5.2", "build_s": 2.457051125005819, "graph": true, "first_frame_s": 0.06289429200114682, "loop_s": 2.939245415996993, "frames_per_s": 20.073179217662293, "body_q_finite": true, "particle_q_finite": true, "test_final": "pass"}
+=== collision_cloth tests needing usd-core, metal_0
+16 tests selected
+FAILED (failures=1, errors=5)
+RESULT ran=16 failures=1 errors=5 skipped=0
+FAILED newton.tests.test_collision_cloth.TestCollision.test_trimesh_collision_detection_cuda_graph_capturable_metal_0 :: AssertionError: False is not true
+FAILED newton.tests.test_collision_cloth.TestCollision.test_collision_detector_requires_adjacency_metal_0 :: 	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'
+FAILED newton.tests.test_collision_cloth.TestCollision.test_collision_filter_decouple_metal_0 :: 	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'
+FAILED newton.tests.test_collision_cloth.TestCollision.test_collision_filtering_metal_0 :: 	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'
+FAILED newton.tests.test_collision_cloth.TestCollision.test_edge_edge_collision_metal_0 :: 	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'
+FAILED newton.tests.test_collision_cloth.TestCollision.test_vertex_triangle_collision_metal_0 :: 	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'
+=== single coupled test on metal
+1 tests selected
+    raise RuntimeError(
+RuntimeError: Trying to copy source buffer with size (36) to offset (0) is larger than destination size (32)
+FAILED (errors=1)
+RESULT ran=1 failures=0 errors=1 skipped=0
+FAILED newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_compacted_joint_targets_use_local_layout :: RuntimeError: Trying to copy source buffer with size (36) to offset (0) is larger than destination size (32)
+=== soft cube throughput, tile off, 256/1024 worlds
+{"scene": "cube", "device": "metal:0", "newton_src": "newton-1.5.2", "n_particles": 32000, "steps": 30, "substeps": 10, "iterations": 10, "tile": false, "self_contact": false, "graph": true, "perturb": 0.0, "worlds": 256, "env_steps_per_s": 1729.7985176053696, "build_s": 0.7617739170091227, "first_step_s": 0.3735358330013696, "loop_s": 4.143835208000382, "finite": true, "z_min": 0.2968842685222626, "z_mean": 0.3968842327594757, "z_max": 0.496884286403656}
+{"scene": "cube", "device": "metal:0", "newton_src": "newton-1.5.2", "n_particles": 128000, "steps": 30, "substeps": 10, "iterations": 10, "tile": false, "self_contact": false, "graph": true, "perturb": 0.0, "worlds": 1024, "env_steps_per_s": 689.3147062707337, "build_s": 1.9198409999953583, "first_step_s": 1.494729666999774, "loop_s": 41.594934416993055, "finite": true, "z_min": 0.2968842685222626, "z_mean": 0.3968842327594757, "z_max": 0.496884286403656}

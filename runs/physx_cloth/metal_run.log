@@ -1,0 +1,23 @@
+holder: {"name": "physx_cloth", "kind": "low", "minutes": 20.0, "pid": 76826, "start": 1790357933.949068}
+=== tests/test_physx_cloth.py on metal:0
+----------------------------- Captured stdout call -----------------------------
+Module metalsim.physics.physx_cloth 93b1cf4 load on device 'cpu' took 0.96 ms  (cached)
+=========================== short test summary info ============================
+FAILED tests/test_physx_cloth.py::test_metal_equals_cpu_and_graph_equals_eager
+1 failed, 6 passed in 6.45s
+=== throughput (recorder cloth scene: 21x21, 1 m, 0.4 m box; dt 5 ms, 16 iterations + 1 velocity iteration), graph replay
+{"num_envs": 64, "steps": 1700, "wall_s": 3.016307624988258, "env_steps_per_s": 36070.59144056089, "sim_s_per_wall_s": 2.8180149562938195, "finite": true, "particles": 441, "springs": 2438, "iterations": 16, "z_mean_world0": 0.2533624470233917}
+{"num_envs": 256, "steps": 750, "wall_s": 3.0092053749831393, "env_steps_per_s": 63804.21941160323, "sim_s_per_wall_s": 1.2461761603828756, "finite": true, "particles": 441, "springs": 2438, "iterations": 16, "z_mean_world0": 0.25347769260406494}
+{"num_envs": 1024, "steps": 170, "wall_s": 3.0147493749973364, "env_steps_per_s": 57742.77671096749, "sim_s_per_wall_s": 0.281947151909021, "finite": true, "particles": 441, "springs": 2438, "iterations": 16, "z_mean_world0": 0.2557172179222107}
+{"num_envs": 4096, "steps": 40, "wall_s": 3.9623243329988327, "env_steps_per_s": 41349.46718912327, "sim_s_per_wall_s": 0.05047542381484775, "finite": true, "particles": 441, "springs": 2438, "iterations": 16, "z_mean_world0": 0.2817918658256531}
+=== XPBDSim, same topology (box scene 21x21), 16 substeps, for scale
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module metalsim.physics.deformable ca65024 load on device 'metal:0' took 19.19 ms  (cached)
+{"num_envs": 1024, "steps": 940, "wall_s": 3.0106744579970837, "env_steps_per_s": 319715.7359352508, "sim_s_per_wall_s": 1.5611119918713419, "finite": true, "substeps": 16, "ncons": 1240, "ncolors": 6, "nflexvert": 441}
+{"num_envs": 4096, "steps": 210, "wall_s": 3.021038375009084, "env_steps_per_s": 284723.2948497099, "sim_s_per_wall_s": 0.3475626157833373, "finite": true, "substeps": 16, "ncons": 1240, "ncolors": 6, "nflexvert": 441}

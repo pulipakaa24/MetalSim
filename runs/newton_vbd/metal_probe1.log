@@ -1,0 +1,72 @@
+holder: {"name": "vbd_probe", "kind": "low", "minutes": 20.0, "pid": 67260, "start": 1790355768.4626591}
+=== upstream/newton-1.5.2 tile on
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+{"scene": "cloth", "device": "metal:0", "newton_src": "newton-1.5.2", "n_particles": 441, "steps": 40, "substeps": 10, "iterations": 10, "tile": true, "self_contact": false, "graph": false, "build_s": 1.1029012910148595, "first_step_s": 13.820243708003545, "loop_s": 1.226972750009736, "finite": true, "z_min": 0.2752607762813568, "z_mean": 0.35127490758895874, "z_max": 0.43075135350227356}
+{"scene": "cube", "device": "metal:0", "newton_src": "newton-1.5.2", "n_particles": 125, "steps": 40, "substeps": 10, "iterations": 10, "tile": true, "self_contact": false, "graph": false, "build_s": 0.029940332984551787, "first_step_s": 0.090864750003675, "loop_s": 2.4646714169939514, "finite": true, "z_min": 0.2039967030286789, "z_mean": 0.3040037751197815, "z_max": 0.40400731563568115}
+=== upstream/newton tile on
+    if constexpr (N > 0) {
+       ^
+program_source:3835:8: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+    if constexpr (I + 1 < Length) {
+       ^
+program_source:4395:15: warning: comparison of integers of different signs: 'unsigned int' and 'int' [-Wsign-compare]
+        if (i != idx)
+            ~ ^  ~~~
+program_source:8563:31: warning: comparison of integers of different signs: 'unsigned int' and 'int' [-Wsign-compare]
+            if (i != row || j != col)
+                            ~ ^  ~~~
+program_source:8563:19: warning: comparison of integers of different signs: 'unsigned int' and 'int' [-Wsign-compare]
+            if (i != row || j != col)
+                ~ ^  ~~~
+program_source:8594:19: warning: comparison of integers of different signs: 'unsigned int' and 'int' [-Wsign-compare]
+            if (i == row)
+                ~ ^  ~~~
+program_source:12060:15: warning: comparison of integers of different signs: 'unsigned int' and 'int' [-Wsign-compare]
+        if (i != idx)
+            ~ ^  ~~~
+program_source:13908:15: warning: comparison of integers of different signs: 'unsigned int' and 'int' [-Wsign-compare]
+        if (i != idx)
+            ~ ^  ~~~
+program_source:14783:17: warning: unused variable 'Dz' [-Wunused-variable]
+    const float Dz = dir[kz];
+                ^
+program_source:14884:16: warning: unused variable 'dW_dp' [-Wunused-variable]
+    const vec3 dW_dp = vec3(dW_dpx, dW_dpy, dW_dpz);
+               ^
+program_source:14950:16: warning: unused variable 'dW_dD' [-Wunused-variable]
+    const vec3 dW_dD = vec3(dW_dDx, dW_dDy, dW_dDz);
+               ^
+program_source:19134:12: warning: unused variable 'length' [-Wunused-variable]
+    size_t length = *((size_t WP_THREAD*)bucket->lengths + index_in_bucket);
+           ^
+program_source:19197:12: warning: unused variable 'length' [-Wunused-variable]
+    size_t length = *((size_t WP_THREAD*)bucket->lengths + index_in_bucket);
+           ^
+program_source:21688:23: warning: comparison of integers of different signs: 'int' and 'const wp::uint32' (aka 'const unsigned int') [-Wsign-compare]
+    for (int i = 0; i < octaves; i++) {
+                    ~ ^ ~~~~~~~
+program_source:21765:23: warning: comparison of integers of different signs: 'int' and 'const wp::uint32' (aka 'const unsigned int') [-Wsign-compare]
+    for (int i = 0; i < octaves; i++) {
+                    ~ ^ ~~~~~~~
+program_source:21864:23: warning: comparison of integers of different signs: 'int' and 'const wp::uint32' (aka 'const unsigned int') [-Wsign-compare]
+    for (int i = 0; i < octaves; i++) {
+                    ~ ^ ~~~~~~~
+program_source:22710:8: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+    if constexpr (QUERY_KIND == BvhQueryKind::SPHERE) {
+       ^
+program_source:22713:15: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+    } else if constexpr (QUERY_KIND == BvhQueryKind::CAPSULE) {
+              ^
+program_source:22724:15: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+    } else if constexpr (QUERY_KIND == BvhQueryKind::RAY) {
+              ^
+program_source:22816:16: warning: constexpr if is a C++17 extension [-Wc++17-extensions]
+            if constexpr (QUERY_KIND == BvhQueryKind::AABB || WP_METAL) {
+       
+{"scene": "cube", "device": "metal:0", "newton_src": "newton", "error": "Exception: Failed to compile Metal module 'newton._src.solvers.vbd.rigid_vbd_kernels' (device='metal:0', block_dim=256, module_hash=5bda324):\nMetal library compilation failed:\nprogram_source:357:9: warning: 'assert' macro redefined [-Wmacro-redefined]\n#define assert(x) ((void)0)\n        ^\n/System/Library/PrivateFrameworks/GPUCompiler.framework/Versions/32023/Libraries/lib/clang/32023.886/include/metal/metal_assert:19:9: note: previous definition is here\n#define assert(condition) ((void) 0)\n        ^\nprogram_source:2761:8: warning: constexpr if is a C++17 extension [-Wc++17-extensions]\n    if constexpr (N > 3) {\n       ^\nprogram_source:2766:8: warning: constexpr if is a C++17 extension [-Wc++17-extensions]\n    if constexpr (N > 2) {\n       ^\nprogram_source:2771:8: warning: constexpr if is a C++17 extension [-Wc++17-extensions]\n    if constexpr (N > 1) {\n       ^\nprogram_source:2776:8: warning: constexpr if is a C++17 extension [-Wc++17-extensions]\n    if constexpr (N > 0) {\n       ^\nprogram_source:3835:8: warning: constexpr if is a C++17 extension [-Wc++17-extensions]\n    if constexpr (I + 1 < Length) {\n       ^\nprogram_source:4395:15: warning: comparison of integers of different signs: 'unsigned int' and 'int' [-Wsign-compare]\n        if (i != idx)\n            ~ ^  ~~~\nprogram_source:8563:31: warning: comparison of integers of different signs: 'unsigned int' and 'int' [-Wsign-compare]\n            if (i != row || j != col)\n                            ~ ^  ~~~\nprogram_source:8563:19: warning: comparison of integers of different signs: 'unsigned int' and 'int' [-Wsign-compare]\n            if (i != row || j != col)\n                ~ ^  ~~~\nprogram_source:8594:19: warning: comparison of integers of different signs: 'unsigned int' and 'int' [-Wsign-compare]\n            if (i == row)\n                ~ ^  ~~~\nprogram_source:12060:15: warning: comparison of integers of different signs: 'unsigned int' and 'int' [-Wsign-compare]\n        if (i != idx)\n            ~ ^  ~~~\nprogram_source:13908:15: warning: comparison of integers of different signs: 'unsigned int' and 'int' [-Wsign-compare]\n        if (i != idx)\n            ~ ^  ~~~\nprogram_source:14783:17: warning: unused variable 'Dz' [-Wunused-variable]\n    const float Dz = dir[kz];\n                ^\nprogram_source:14884:16: warning: unused variable 'dW_dp' [-Wunused-variable]\n    const vec3 dW_dp = vec3(dW_dpx, dW_dpy, dW_dpz);\n               ^\nprogram_source:14950:16: warning: unused variable 'dW_dD' [-Wunused-variable]\n    const vec3 dW_dD = vec3(dW_dDx, dW_dDy, dW_dDz);\n               ^\nprogram_source:19134:12: warning: unused variable 'length' [-Wunused-variable]\n    size_t length = *((size_t WP_THREAD*)bucket->lengths + index_in_bucket);\n           ^\nprogram_source:19197:12: warning: unused variable 'length' [-Wunused-variable]\n    size_t length = *((size_t WP_THREAD*)bucket->lengths + index_in_bucket);\n           ^\nprogram_source:21688:23: warning: comparison of integers of different signs: 'int' and 'const wp::uint32' (aka 'const unsigned int') [-Wsign-compare]\n    for (int i = 0; i < octaves; i++) {\n                    ~ ^ ~~~~~~~\nprogram_source:21765:23: warning: comparison of integers of different signs: 'int' and 'const wp::uint32' (aka 'const unsigned int') [-Wsign-compare]\n    for (int i = 0; i < octaves; i++) {\n                    ~ ^ ~~~~~~~\nprogram_source:21864:23: warning: comparison of integers of different signs: 'int' and 'const wp::uint32' (aka 'const unsigned int') [-Wsign-compare]\n    for (int i = 0; i < octaves; i++) {\n                    ~ ^ ~~~~~~~\nprogram_source:22710:8: warning: constexpr if is a C++17 extension [-Wc++17-extensions]\n    if constexpr (QUERY_KIND == BvhQueryKind::SPHERE) {\n       ^\nprogram_source:22713:15: warning: constexpr if is a C++17 extension [-Wc++17-extensions]\n    } else if constexpr (QUERY_KIND == BvhQueryKind::CAPSULE) {\n              ^\nprogram_source:22724:15: warning: constexpr if is a C++17 extension [-Wc++17-extensions]\n    } else if constexpr (QUERY_KIND == BvhQueryKind::RAY) {\n              ^\nprogram_source:22816:16: warning: constexpr if is a C++17 extension [-Wc++17-extensions]\n            if constexpr (QUERY_KIND == BvhQueryKind::AABB || WP_METAL) {\n       ", "traceback": "ro-redefined]\n#define assert(x) ((void)0)\n        ^\n/System/Library/PrivateFrameworks/GPUCompiler.framework/Versions/32023/Libraries/lib/clang/32023.886/include/metal/metal_assert:19:9: note: previous definition is here\n#define assert(condition) ((void) 0)\n        ^\nprogram_source:2761:8: warning: constexpr if is a C++17 extension [-Wc++17-extensions]\n    if constexpr (N > 3) {\n       ^\nprogram_source:2766:8: warning: constexpr if is a C++17 extension [-Wc++17-extensions]\n    if constexpr (N > 2) {\n       ^\nprogram_source:2771:8: warning: constexpr if is a C++17 extension [-Wc++17-extensions]\n    if constexpr (N > 1) {\n       ^\nprogram_source:2776:8: warning: constexpr if is a C++17 extension [-Wc++17-extensions]\n    if constexpr (N > 0) {\n       ^\nprogram_source:3835:8: warning: constexpr if is a C++17 extension [-Wc++17-extensions]\n    if constexpr (I + 1 < Length) {\n       ^\nprogram_source:4395:15: warning: comparison of integers of different signs: 'unsigned int' and 'int' [-Wsign-compare]\n        if (i != idx)\n            ~ ^  ~~~\nprogram_source:8563:31: warning: comparison of integers of different signs: 'unsigned int' and 'int' [-Wsign-compare]\n            if (i != row || j != col)\n                            ~ ^  ~~~\nprogram_source:8563:19: warning: comparison of integers of different signs: 'unsigned int' and 'int' [-Wsign-compare]\n            if (i != row || j != col)\n                ~ ^  ~~~\nprogram_source:8594:19: warning: comparison of integers of different signs: 'unsigned int' and 'int' [-Wsign-compare]\n            if (i == row)\n                ~ ^  ~~~\nprogram_source:12060:15: warning: comparison of integers of different signs: 'unsigned int' and 'int' [-Wsign-compare]\n        if (i != idx)\n            ~ ^  ~~~\nprogram_source:13908:15: warning: comparison of integers of different signs: 'unsigned int' and 'int' [-Wsign-compare]\n        if (i != idx)\n            ~ ^  ~~~\nprogram_source:14783:17: warning: unused variable 'Dz' [-Wunused-variable]\n    const float Dz = dir[kz];\n                ^\nprogram_source:14884:16: warning: unused variable 'dW_dp' [-Wunused-variable]\n    const vec3 dW_dp = vec3(dW_dpx, dW_dpy, dW_dpz);\n               ^\nprogram_source:14950:16: warning: unused variable 'dW_dD' [-Wunused-variable]\n    const vec3 dW_dD = vec3(dW_dDx, dW_dDy, dW_dDz);\n               ^\nprogram_source:19134:12: warning: unused variable 'length' [-Wunused-variable]\n    size_t length = *((size_t WP_THREAD*)bucket->lengths + index_in_bucket);\n           ^\nprogram_source:19197:12: warning: unused variable 'length' [-Wunused-variable]\n    size_t length = *((size_t WP_THREAD*)bucket->lengths + index_in_bucket);\n           ^\nprogram_source:21688:23: warning: comparison of integers of different signs: 'int' and 'const wp::uint32' (aka 'const unsigned int') [-Wsign-compare]\n    for (int i = 0; i < octaves; i++) {\n                    ~ ^ ~~~~~~~\nprogram_source:21765:23: warning: comparison of integers of different signs: 'int' and 'const wp::uint32' (aka 'const unsigned int') [-Wsign-compare]\n    for (int i = 0; i < octaves; i++) {\n                    ~ ^ ~~~~~~~\nprogram_source:21864:23: warning: comparison of integers of different signs: 'int' and 'const wp::uint32' (aka 'const unsigned int') [-Wsign-compare]\n    for (int i = 0; i < octaves; i++) {\n                    ~ ^ ~~~~~~~\nprogram_source:22710:8: warning: constexpr if is a C++17 extension [-Wc++17-extensions]\n    if constexpr (QUERY_KIND == BvhQueryKind::SPHERE) {\n       ^\nprogram_source:22713:15: warning: constexpr if is a C++17 extension [-Wc++17-extensions]\n    } else if constexpr (QUERY_KIND == BvhQueryKind::CAPSULE) {\n              ^\nprogram_source:22724:15: warning: constexpr if is a C++17 extension [-Wc++17-extensions]\n    } else if constexpr (QUERY_KIND == BvhQueryKind::RAY) {\n              ^\nprogram_source:22816:16: warning: constexpr if is a C++17 extension [-Wc++17-extensions]\n            if constexpr (QUERY_KIND == BvhQueryKind::AABB || WP_METAL) {\n       \n"}

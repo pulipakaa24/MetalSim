@@ -1,0 +1,226 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+94 tests selected
+test_bending_damping_handles_degenerate_anchor_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_bending_damping_handles_degenerate_anchor_cpu) ... Module newton.tests.test_solver_vbd c6c3812 load on device 'cpu' took 3536.83 ms  (compiled)
+ok
+test_body_body_contact_damping_ignores_penalty_ramp_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_body_body_contact_damping_ignores_penalty_ramp_cpu) ... Module newton._src.solvers.vbd.rigid_vbd_kernels 116efd1 load on device 'cpu' took 0.35 ms  (cached)
+ok
+test_body_body_contact_lists_skip_static_kinematic_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_body_body_contact_lists_skip_static_kinematic_cpu) ... ok
+test_body_particle_contact_damping_ignores_penalty_ramp_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_body_particle_contact_damping_ignores_penalty_ramp_cpu) ... Module newton._src.solvers.vbd.particle_vbd_kernels 59db928 load on device 'cpu' took 0.29 ms  (cached)
+ok
+test_body_particle_contact_damping_is_absolute_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_body_particle_contact_damping_is_absolute_cpu) ... ok
+test_body_particle_contact_lists_skip_static_kinematic_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_body_particle_contact_lists_skip_static_kinematic_cpu) ... ok
+test_cable_soft_dual_slots_clear_preserved_lambda_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_cable_soft_dual_slots_clear_preserved_lambda_cpu) ... ok
+test_capsule_axial_spin_dissipates_via_friction_hard_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_capsule_axial_spin_dissipates_via_friction_hard_cpu) ... Module validate_and_correct_inertia_kernel_fabf4b5a 9ce7e99 load on device 'cpu' took 0.38 ms  (cached)
+Module newton._src.geometry.bvh 0faa6b5 load on device 'cpu' took 0.29 ms  (cached)
+Module newton._src.solvers.solver 8d2ecf9 load on device 'cpu' took 0.27 ms  (cached)
+Module newton._src.sim.collide 2cf7092 load on device 'cpu' took 0.29 ms  (cached)
+Module newton._src.geometry.broad_phase_nxn e19637b load on device 'cpu' took 0.26 ms  (cached)
+Module narrow_phase_primitive_write_contact dc8210d load on device 'cpu' took 0.27 ms  (cached)
+Module narrow_phase_gjk_mpr_True_write_contact_default_default bea986c load on device 'cpu' took 925.02 ms  (compiled)
+Module newton._src.geometry.narrow_phase d3e35a0 load on device 'cpu' took 0.28 ms  (cached)
+Module newton._src.solvers.xpbd.kernels 42f258a load on device 'cpu' took 0.35 ms  (cached)
+ok
+test_capsule_axial_spin_dissipates_via_friction_soft_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_capsule_axial_spin_dissipates_via_friction_soft_cpu) ... ok
+test_collect_rigid_contact_forces_reports_surface_points_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_collect_rigid_contact_forces_reports_surface_points_cpu) ... Module narrow_phase_gjk_mpr_True_write_contact_support_map_lean_post_process_minkowski_only 9462a6d load on device 'cpu' took 0.46 ms  (cached)
+ok
+test_contact_damping_ignores_rigid_motion_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_contact_damping_ignores_rigid_motion_cpu) ... ok
+test_d6_fully_free_structural_slots_are_inactive_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_d6_fully_free_structural_slots_are_inactive_cpu) ... ok
+test_elastic_damping_ignores_rigid_motion_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_elastic_damping_ignores_rigid_motion_cpu) ... ok
+test_joint_angular_dual_projects_free_axis_lambda_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_joint_angular_dual_projects_free_axis_lambda_cpu) ... ok
+test_joint_force_projection_filters_free_direction_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_joint_force_projection_filters_free_direction_cpu) ... ok
+test_reset_masked_rigid_and_soft_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_reset_masked_rigid_and_soft_cpu) ... Module warp._src.coloring 7d28b1b load on device 'cpu' took 0.37 ms  (cached)
+Module newton._src.utils.mesh 8c2dee7 load on device 'cpu' took 0.29 ms  (cached)
+ok
+test_rigid_contact_dual_update_computes_lambda_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_rigid_contact_dual_update_computes_lambda_cpu) ... ok
+test_rigid_contact_history_restore_from_match_index_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_rigid_contact_history_restore_from_match_index_cpu) ... ok
+test_rigid_contact_history_snapshot_copies_active_rows_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_rigid_contact_history_snapshot_copies_active_rows_cpu) ... ok
+test_rigid_contact_history_soft_restores_penalty_only_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_rigid_contact_history_soft_restores_penalty_only_cpu) ... ok
+test_rigid_contact_reset_lifecycle_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_rigid_contact_reset_lifecycle_cpu) ... Module newton._src.geometry.contact_match 5de910a load on device 'cpu' took 0.46 ms  (cached)
+Module newton._src.geometry.contact_sort 1142c97 load on device 'cpu' took 0.28 ms  (cached)
+ok
+test_rigid_contact_reset_ownership_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_rigid_contact_reset_ownership_cpu) ... ok
+test_rigid_contact_stick_eps_are_deprecated_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_rigid_contact_stick_eps_are_deprecated_cpu) ... ok
+test_rigid_reset_cable_history_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_rigid_reset_cable_history_cpu) ... ok
+test_rigid_reset_state_and_history_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_rigid_reset_state_and_history_cpu) ... ok
+test_self_contact_barrier_c2_at_d_min_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_self_contact_barrier_c2_at_d_min_cpu) ... ok
+test_self_contact_barrier_c2_at_tau_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_self_contact_barrier_c2_at_tau_cpu) ... ok
+test_self_contact_damping_uses_relative_gap_rate_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_self_contact_damping_uses_relative_gap_rate_cpu) ... ok
+test_soft_contact_presize_is_world_aware_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_soft_contact_presize_is_world_aware_cpu) ... ok
+test_soft_reset_particle_only_and_external_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_soft_reset_particle_only_and_external_cpu) ... ok
+test_soft_reset_then_step_advances_cloth_and_tet_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_soft_reset_then_step_advances_cloth_and_tet_cpu) ... ok
+test_spring_damping_is_axial_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_spring_damping_is_axial_cpu) ... ok
+test_vbd_custom_attribute_registration_controls_dahl_defaults_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_vbd_custom_attribute_registration_controls_dahl_defaults_cpu) ... ok
+test_vbd_dahl_detection_requires_positive_values_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_vbd_dahl_detection_requires_positive_values_cpu) ... ok
+test_yawed_cable_does_not_inject_energy_hard_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_yawed_cable_does_not_inject_energy_hard_cpu) ... ok
+test_yawed_cable_does_not_inject_energy_soft_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_yawed_cable_does_not_inject_energy_soft_cpu) ... ok
+test_barycentric_force_distribution_cpu (newton.tests.test_solver_vbd.TestVBDFullSurfaceContact.test_barycentric_force_distribution_cpu) ... ok
+test_edge_face_mixes_shape_material_cpu (newton.tests.test_solver_vbd.TestVBDFullSurfaceContact.test_edge_face_mixes_shape_material_cpu) ... ok
+test_edge_face_pushes_vertices_out_cpu (newton.tests.test_solver_vbd.TestVBDFullSurfaceContact.test_edge_face_pushes_vertices_out_cpu) ... Module newton._src.geometry.kernels 1bee81f load on device 'cpu' took 0.45 ms  (cached)
+Module newton._src.geometry.soft_contacts_sdf e219eed load on device 'cpu' took 1014.82 ms  (compiled)
+ok
+test_edge_face_reacts_on_rigid_body_cpu (newton.tests.test_solver_vbd.TestVBDFullSurfaceContact.test_edge_face_reacts_on_rigid_body_cpu) ... ok
+test_edge_face_reacts_through_coupled_proxy_cpu (newton.tests.test_solver_vbd.TestVBDFullSurfaceContact.test_edge_face_reacts_through_coupled_proxy_cpu) ... Module newton._src.solvers.coupled.model_view d783cf3 load on device 'cpu' took 0.37 ms  (cached)
+Module newton._src.solvers.coupled.interface 05475dc load on device 'cpu' took 0.42 ms  (cached)
+Module newton._src.solvers.coupled.solver_coupled 461260c load on device 'cpu' took 0.44 ms  (cached)
+Module newton._src.solvers.vbd.vbd_coupling_kernels 17bc2a3 load on device 'cpu' took 0.29 ms  (cached)
+Module newton._src.solvers.semi_implicit.kernels_contact 88192bb load on device 'cpu' took 0.27 ms  (cached)
+Module newton._src.solvers.coupled.proxy_utils 4de29d2 load on device 'cpu' took 0.25 ms  (cached)
+ok
+test_edge_face_uses_shape_margin_cpu (newton.tests.test_solver_vbd.TestVBDFullSurfaceContact.test_edge_face_uses_shape_margin_cpu) ... ok
+test_flag_off_is_inert_cpu (newton.tests.test_solver_vbd.TestVBDFullSurfaceContact.test_flag_off_is_inert_cpu) ... ok
+test_full_surface_rejected_for_vbd_proxy_particles_cpu (newton.tests.test_solver_vbd.TestVBDFullSurfaceContact.test_full_surface_rejected_for_vbd_proxy_particles_cpu) ... ok
+test_tet_adjacency_complex_pyramid_cpu (newton.tests.test_softbody.TestSoftBody.test_tet_adjacency_complex_pyramid_cpu) ... ok
+test_tet_adjacency_single_tet_cpu (newton.tests.test_softbody.TestSoftBody.test_tet_adjacency_single_tet_cpu) ... ok
+test_tet_energy_cpu (newton.tests.test_softbody.TestSoftBody.test_tet_energy_cpu) ... Module newton.tests.test_softbody ce0366a load on device 'cpu' took 0.37 ms  (cached)
+ok
+test_tet_graph_coloring_is_valid_cpu (newton.tests.test_softbody.TestSoftBody.test_tet_graph_coloring_is_valid_cpu) ... ok
+test_cloth_bending_consistent_angle_computation_semi_implicit_cpu (newton.tests.test_cloth.TestCloth.test_cloth_bending_consistent_angle_computation_semi_implicit_cpu) ... Module newton._src.solvers.semi_implicit.kernels_particle 950817b load on device 'cpu' took 457.50 ms  (compiled)
+ok
+test_cloth_bending_consistent_angle_computation_vbd_cpu (newton.tests.test_cloth.TestCloth.test_cloth_bending_consistent_angle_computation_vbd_cpu) ... ok
+test_cloth_bending_consistent_angle_computation_xpbd_cpu (newton.tests.test_cloth.TestCloth.test_cloth_bending_consistent_angle_computation_xpbd_cpu) ... ok
+test_cloth_bending_non_zero_rest_angle_bending_semi_implicit_cpu (newton.tests.test_cloth.TestCloth.test_cloth_bending_non_zero_rest_angle_bending_semi_implicit_cpu) ... ok
+test_cloth_bending_non_zero_rest_angle_bending_vbd_cpu (newton.tests.test_cloth.TestCloth.test_cloth_bending_non_zero_rest_angle_bending_vbd_cpu) ... ok
+test_cloth_bending_non_zero_rest_angle_bending_xpbd_cpu (newton.tests.test_cloth.TestCloth.test_cloth_bending_non_zero_rest_angle_bending_xpbd_cpu) ... ok
+test_cloth_bending_semi_implicit_cpu (newton.tests.test_cloth.TestCloth.test_cloth_bending_semi_implicit_cpu) ... ok
+test_cloth_bending_vbd_cpu (newton.tests.test_cloth.TestCloth.test_cloth_bending_vbd_cpu) ... ok
+test_cloth_bending_with_complex_rest_angles_semi_implicit_cpu (newton.tests.test_cloth.TestCloth.test_cloth_bending_with_complex_rest_angles_semi_implicit_cpu) ... ok
+test_cloth_bending_with_complex_rest_angles_vbd_cpu (newton.tests.test_cloth.TestCloth.test_cloth_bending_with_complex_rest_angles_vbd_cpu) ... ok
+test_cloth_bending_with_complex_rest_angles_xpbd_cpu (newton.tests.test_cloth.TestCloth.test_cloth_bending_with_complex_rest_angles_xpbd_cpu) ... ok
+test_cloth_bending_xpbd_cpu (newton.tests.test_cloth.TestCloth.test_cloth_bending_xpbd_cpu) ... ok
+test_cloth_body_collision_semi_implicit_cpu (newton.tests.test_cloth.TestCloth.test_cloth_body_collision_semi_implicit_cpu) ... ok
+test_cloth_body_collision_vbd_cpu (newton.tests.test_cloth.TestCloth.test_cloth_body_collision_vbd_cpu) ... ok
+test_cloth_body_collision_xpbd_cpu (newton.tests.test_cloth.TestCloth.test_cloth_body_collision_xpbd_cpu) ... ok
+test_cloth_collision_vbd_cpu (newton.tests.test_cloth.TestCloth.test_cloth_collision_vbd_cpu) ... ok
+test_cloth_enable_tri_contact_semi_implicit_cpu (newton.tests.test_cloth.TestCloth.test_cloth_enable_tri_contact_semi_implicit_cpu) ... final_pos -346.63882
+ok
+test_cloth_free_fall_semi_implicit_cpu (newton.tests.test_cloth.TestCloth.test_cloth_free_fall_semi_implicit_cpu) ... ok
+test_cloth_free_fall_vbd_cpu (newton.tests.test_cloth.TestCloth.test_cloth_free_fall_vbd_cpu) ... ok
+test_cloth_free_fall_with_internal_forces_and_damping_semi_implicit_cpu (newton.tests.test_cloth.TestCloth.test_cloth_free_fall_with_internal_forces_and_damping_semi_implicit_cpu) ... ok
+test_cloth_free_fall_with_internal_forces_and_damping_vbd_cpu (newton.tests.test_cloth.TestCloth.test_cloth_free_fall_with_internal_forces_and_damping_vbd_cpu) ... ok
+test_cloth_free_fall_with_internal_forces_and_damping_xpbd_cpu (newton.tests.test_cloth.TestCloth.test_cloth_free_fall_with_internal_forces_and_damping_xpbd_cpu) ... ok
+test_cloth_free_fall_xpbd_cpu (newton.tests.test_cloth.TestCloth.test_cloth_free_fall_xpbd_cpu) ... ok
+test_cloth_sagging_semi_implicit_cpu (newton.tests.test_cloth.TestCloth.test_cloth_sagging_semi_implicit_cpu) ... ok
+test_cloth_sagging_vbd_cpu (newton.tests.test_cloth.TestCloth.test_cloth_sagging_vbd_cpu) ... ok
+test_cloth_sagging_xpbd_cpu (newton.tests.test_cloth.TestCloth.test_cloth_sagging_xpbd_cpu) ... ok
+test_cloth_stitching_vbd_cpu (newton.tests.test_cloth.TestCloth.test_cloth_stitching_vbd_cpu) ... ok
+test_cloth_stitching_xpbd_cpu (newton.tests.test_cloth.TestCloth.test_cloth_stitching_xpbd_cpu) ... ok
+test_cloth_body_collision_vbd_cpu (newton.tests.test_cloth.TestClothCollisionPipeline.test_cloth_body_collision_vbd_cpu) ... ok
+test_cloth_body_collision_xpbd_cpu (newton.tests.test_cloth.TestClothCollisionPipeline.test_cloth_body_collision_xpbd_cpu) ... ok
+test_cloth_collision_vbd_cpu (newton.tests.test_cloth.TestClothCollisionPipeline.test_cloth_collision_vbd_cpu) ... ok
+test_collision_detector_requires_adjacency_cpu (newton.tests.test_collision_cloth.TestCollision.test_collision_detector_requires_adjacency_cpu) ... ERROR
+test_collision_filter_decouple_cpu (newton.tests.test_collision_cloth.TestCollision.test_collision_filter_decouple_cpu) ... ERROR
+test_collision_filtering_cpu (newton.tests.test_collision_cloth.TestCollision.test_collision_filtering_cpu) ... ERROR
+test_edge_edge_collision_cpu (newton.tests.test_collision_cloth.TestCollision.test_edge_edge_collision_cpu) ... ERROR
+test_edge_edge_collision_cross_world_rejected_cpu (newton.tests.test_collision_cloth.TestCollision.test_edge_edge_collision_cross_world_rejected_cpu) ... ok
+test_edge_edge_collision_same_world_detected_cpu (newton.tests.test_collision_cloth.TestCollision.test_edge_edge_collision_same_world_detected_cpu) ... ok
+test_edge_edge_collision_same_world_in_multiworld_detected_cpu (newton.tests.test_collision_cloth.TestCollision.test_edge_edge_collision_same_world_in_multiworld_detected_cpu) ... ok
+test_global_soft_primitives_filter_compatible_worlds_cpu (newton.tests.test_collision_cloth.TestCollision.test_global_soft_primitives_filter_compatible_worlds_cpu) ... ok
+test_mesh_ground_collision_index_cpu (newton.tests.test_collision_cloth.TestCollision.test_mesh_ground_collision_index_cpu) ... /Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/test_collision_cloth.py:918: UserWarning: Inertia validation corrected 2 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  model = builder.finalize(device=device)
+Module newton._src.geometry.inertia bc8fb00 load on device 'metal:0' took 18.16 ms  (cached)
+Module newton._src.geometry.contact_reduction_global 0a8e255 load on device 'cpu' took 206.58 ms  (compiled)
+Module newton._src.geometry.sdf_contact c34ca0e load on device 'cpu' took 68.78 ms  (compiled)
+Module narrow_phase_mesh_plane_write_contact_to_reducer_True 61437a2 load on device 'cpu' took 121.52 ms  (compiled)
+Module mesh_triangle_contacts_to_reducer_kernel_2e5c3bc3 ba37dcc load on device 'cpu' took 958.45 ms  (compiled)
+Module sdf_contact_write_contact_to_reducer_False_True c17d6d2 load on device 'cpu' took 668.05 ms  (compiled)
+Module export_reduced_contacts_write_contact aa9e146 load on device 'cpu' took 147.68 ms  (compiled)
+ok
+test_multiworld_soft_collision_rebuild_preserves_filtering_cpu (newton.tests.test_collision_cloth.TestCollision.test_multiworld_soft_collision_rebuild_preserves_filtering_cpu) ... ok
+test_particle_collision_cpu (newton.tests.test_collision_cloth.TestCollision.test_particle_collision_cpu) ... Module newton.tests.test_collision_cloth 599466c load on device 'cpu' took 643.41 ms  (compiled)
+ok
+test_vertex_triangle_collision_cpu (newton.tests.test_collision_cloth.TestCollision.test_vertex_triangle_collision_cpu) ... ERROR
+test_vertex_triangle_collision_cross_world_rejected_cpu (newton.tests.test_collision_cloth.TestCollision.test_vertex_triangle_collision_cross_world_rejected_cpu) ... ok
+test_vertex_triangle_collision_same_world_detected_cpu (newton.tests.test_collision_cloth.TestCollision.test_vertex_triangle_collision_same_world_detected_cpu) ... ok
+test_vertex_triangle_collision_same_world_in_multiworld_detected_cpu (newton.tests.test_collision_cloth.TestCollision.test_vertex_triangle_collision_same_world_in_multiworld_detected_cpu) ... ok
+
+======================================================================
+ERROR: test_collision_detector_requires_adjacency_cpu (newton.tests.test_collision_cloth.TestCollision.test_collision_detector_requires_adjacency_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/unittest_utils.py", line 536, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 1442, in test_collision_detector_requires_adjacency
+    vertices, faces = get_data()
+                      ^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 552, in get_data
+    usd_stage = Usd.Stage.Open(os.path.join(warp.examples.get_asset_directory(), "bunny.usd"))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pxr.Tf.ErrorException: 
+	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'
+
+======================================================================
+ERROR: test_collision_filter_decouple_cpu (newton.tests.test_collision_cloth.TestCollision.test_collision_filter_decouple_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/unittest_utils.py", line 536, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 1462, in test_collision_filter_decouple
+    vertices, faces = get_data()
+                      ^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 552, in get_data
+    usd_stage = Usd.Stage.Open(os.path.join(warp.examples.get_asset_directory(), "bunny.usd"))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pxr.Tf.ErrorException: 
+	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'
+
+======================================================================
+ERROR: test_collision_filtering_cpu (newton.tests.test_collision_cloth.TestCollision.test_collision_filtering_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/unittest_utils.py", line 536, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 1286, in test_collision_filtering
+    vertices, faces = get_data()
+                      ^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 552, in get_data
+    usd_stage = Usd.Stage.Open(os.path.join(warp.examples.get_asset_directory(), "bunny.usd"))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pxr.Tf.ErrorException: 
+	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'
+
+======================================================================
+ERROR: test_edge_edge_collision_cpu (newton.tests.test_collision_cloth.TestCollision.test_edge_edge_collision_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/unittest_utils.py", line 536, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 719, in test_edge_edge_collision
+    vertices, faces = get_data()
+                      ^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 552, in get_data
+    usd_stage = Usd.Stage.Open(os.path.join(warp.examples.get_asset_directory(), "bunny.usd"))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pxr.Tf.ErrorException: 
+	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'
+
+======================================================================
+ERROR: test_vertex_triangle_collision_cpu (newton.tests.test_collision_cloth.TestCollision.test_vertex_triangle_collision_cpu)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/unittest_utils.py", line 536, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 563, in test_vertex_triangle_collision
+    vertices, faces = get_data()
+                      ^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 552, in get_data
+    usd_stage = Usd.Stage.Open(os.path.join(warp.examples.get_asset_directory(), "bunny.usd"))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pxr.Tf.ErrorException: 
+	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'
+
+----------------------------------------------------------------------
+Ran 94 tests in 37.719s
+
+FAILED (errors=5)
+RESULT ran=94 failures=0 errors=5 skipped=0
+FAILED newton.tests.test_collision_cloth.TestCollision.test_collision_detector_requires_adjacency_cpu :: 	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'
+FAILED newton.tests.test_collision_cloth.TestCollision.test_collision_filter_decouple_cpu :: 	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'
+FAILED newton.tests.test_collision_cloth.TestCollision.test_collision_filtering_cpu :: 	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'
+FAILED newton.tests.test_collision_cloth.TestCollision.test_edge_edge_collision_cpu :: 	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'
+FAILED newton.tests.test_collision_cloth.TestCollision.test_vertex_triangle_collision_cpu :: 	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'

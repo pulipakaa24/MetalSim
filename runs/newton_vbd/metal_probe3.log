@@ -1,0 +1,13 @@
+holder: {"name": "vbd_probe3", "kind": "low", "minutes": 30.0, "pid": 68650, "start": 1790355938.439806}
+=== warp test_metal nextafterf
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED upstream/warp-innate/warp/tests/test_metal.py::TestMetal::test_nextafterf
+1 failed, 15 deselected, 2 warnings in 0.18s
+=== newton-1.5.2 metal 200 steps eager
+{"scene": "cloth", "device": "metal:0", "newton_src": "newton-1.5.2", "n_particles": 441, "steps": 200, "substeps": 10, "iterations": 10, "tile": true, "self_contact": false, "graph": false, "build_s": 2.161711708002258, "first_step_s": 13.493944791000104, "loop_s": 6.275079082988668, "finite": true, "z_min": 0.024932846426963806, "z_mean": 0.2754533886909485, "z_max": 0.43038785457611084}
+{"scene": "cube", "device": "metal:0", "newton_src": "newton-1.5.2", "n_particles": 125, "steps": 200, "substeps": 10, "iterations": 10, "tile": true, "self_contact": false, "graph": false, "build_s": 0.03239654199569486, "first_step_s": 0.0946745419932995, "loop_s": 12.29721916699782, "finite": true, "z_min": 0.020311305299401283, "z_mean": 0.12381833046674728, "z_max": 0.22454078495502472}
+=== newton metal 200 steps eager
+{"scene": "cloth", "device": "metal:0", "newton_src": "newton", "n_particles": 441, "steps": 200, "substeps": 10, "iterations": 10, "tile": true, "self_contact": false, "graph": false, "build_s": 1.043731082987506, "first_step_s": 15.851145041990094, "loop_s": 6.2265172920015175, "finite": true, "z_min": 0.024932846426963806, "z_mean": 0.2754533886909485, "z_max": 0.43038785457611084}
+{"scene": "cube", "device": "metal:0", "newton_src": "newton", "n_particles": 125, "steps": 200, "substeps": 10, "iterations": 10, "tile": true, "self_contact": false, "graph": false, "build_s": 0.03730562498094514, "first_step_s": 0.07050483301281929, "loop_s": 12.650803707976593, "finite": true, "z_min": 0.020311305299401283, "z_mean": 0.12381833046674728, "z_max": 0.22454078495502472}
