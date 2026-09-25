@@ -211,7 +211,13 @@ transfer directly: Isaac's PhysX-trained policies at iterations 500 / 1000 / 149
 in both directions (iteration 500 stands in Isaac, falls in MetalSim; 1000 and 1500 the reverse),
 consistent with the repeated-noise defect in the old rollout. **A policy trained in PhysX behaves the
 same in MetalSim's MuJoCo Warp physics** is the strongest single parity statement this document can
-make so far; it is measured on one asset, one task, four checkpoints, one seed.
+make so far; it is measured on one asset, one task, four checkpoints, one seed. The same test on
+Newton XPBD (`runs/newton_transfer.log`, pinned upstream build, mean of 4 envs): Isaac's 500 / 1000 /
+1499 checkpoints travel 4.48 / 4.35 / 4.14 m at 4 it. / 1.25 ms and 4.02 / 3.95 / 3.83 m at 0.625 ms,
+against Isaac's 3.19 / 3.02 / 3.11 m and MuJoCo Warp's 3.02 / 2.93 / 3.19 m; all engines keep the
+pelvis at 0.61–0.64 m. Newton over-travels by 37–48 % at the fast setting and 20–35 % at the slow one
+(commanded distance 4.0 m), so the joint drift changes the gait, not just the pose; MuJoCo Warp stays
+within 5 % of Isaac.
 
 Isaac's action_rate term is dominated by its exploration noise (std 0.72–1.0 on 37 joints under
 stochastic actions; ours above is the mean action), so it is not comparable; every other row is. The
