@@ -6,7 +6,8 @@ Physics (same asset, same initial state, same open-loop actions):
 Rendering (same camera, same lights, same state per frame; Isaac RTX vs MetalSim tier 2 / tier 0):
   PSNR, SSIM, LPIPS (AlexNet), FLIP (from metalsim.bench.render_fidelity), on raw images and after
   matching the mean brightness (the two engines' light units differ), silhouette IoU from depth, depth RMSE on
-  the robot silhouette and on the ground plane (sky / far plane masked, z-depth in both engines).
+  the robot silhouette and on the ground plane (sky / far plane masked, z-depth in both engines), and
+  the same image metrics on the robot crop alone (outside the union silhouette set to grey).
 Writes a JSON report and side-by-side composites (Isaac | MetalSim tier 2 | MetalSim tier 0).
 
     python -m metalsim.parity.compare --isaac runs/parity/isaac/rt --metalsim runs/parity/metalsim --out runs/parity/report
@@ -57,6 +58,21 @@ def robot_mask(d, thresh=0.05):
     return robot, ground
 
 
+def masked_stats(x, y, m, lp=None):
+    """PSNR, SSIM and FLIP averaged over the mask pixels only (the grey fill outside the silhouette would
+    otherwise inflate them); LPIPS is over the whole crop (no masked variant) and says so."""
+    from skimage.metrics import structural_similarity
+    from metalsim.bench.render_fidelity import flip
+    mse = float(((x - y)[m] ** 2).mean()); out = {"psnr_db": 10 * np.log10(1.0 / max(mse, 1e-10))}
+    _, smap = structural_similarity(x, y, channel_axis=2, data_range=1.0, full=True); out["ssim"] = float(smap[m].mean())
+    fmap = np.asarray(flip((x * 255).astype(np.uint8), (y * 255).astype(np.uint8))); out["flip"] = float(fmap[m].mean() if fmap.shape == m.shape else fmap.mean())
+    if lp is not None:
+        import torch
+        t = lambda z: torch.from_numpy(np.ascontiguousarray(z.transpose(2, 0, 1))[None] * 2 - 1).float()
+        out["lpips_alex_crop"] = float(lp(t(x), t(y)).item())
+    return out
+
+
 def image_metrics(a, b, da, db, lp=None):
     from skimage.metrics import structural_similarity
     from metalsim.bench.render_fidelity import flip
@@ -74,6 +90,9 @@ def image_metrics(a, b, da, db, lp=None):
     raw = stats(a, b)
     gain = a.mean() / max(b.mean(), 1e-6)
     norm = stats(a, np.clip(b * gain, 0, 1))
+    # robot-only metrics: everything outside the union silhouette set to mid-grey, cropped to its bounding
+    # box (+16 px), brightness matched on the robot pixels. Independent of the ground / sky in each scene.
+    robot = None
     # Depth. Both engines write z-depth (a ground plane fits 1/z affine in pixel coordinates to < 1 mm in
     # Isaac, < 5 mm in MetalSim); Isaac writes inf for the sky and clips at the 100 m far plane, MetalSim
     # writes 0 for a miss. The robot silhouette is every pixel that departs from the fitted ground plane,
@@ -82,7 +101,16 @@ def image_metrics(a, b, da, db, lp=None):
     sil_a, ground_a = robot_mask(da); sil_b, ground_b = robot_mask(db)
     both = sil_a & sil_b; inter = float(both.sum()); union = float((sil_a | sil_b).sum())
     g = ground_a & ground_b
+    uni = sil_a | sil_b
+    if uni.sum() > 100:
+        ys, xs = np.nonzero(uni); y0, y1 = max(0, ys.min() - 16), min(a.shape[0], ys.max() + 17); x0, x1 = max(0, xs.min() - 16), min(a.shape[1], xs.max() + 17)
+        m = uni[y0:y1, x0:x1]; ca = np.where(m[..., None], a[y0:y1, x0:x1], 0.5); cb = np.where(m[..., None], b[y0:y1, x0:x1], 0.5)
+        rg = a[uni].mean() / max(b[uni].mean(), 1e-6)
+        if min(ca.shape[:2]) >= 32:
+            robot = {"raw": masked_stats(ca, cb, m, lp), "brightness_matched": masked_stats(ca, np.clip(np.where(m[..., None], cb * rg, 0.5), 0, 1), m, lp),
+                     "gain": float(rg), "crop_hw": [int(y1 - y0), int(x1 - x0)], "robot_fraction_of_crop": float(m.mean())}
     return {"raw": raw, "brightness_matched": norm, "brightness_gain_applied": float(gain),
+            "robot_crop": robot,
             "silhouette_iou": inter / union if union else None,
             "silhouette_px": {"isaac": int(sil_a.sum()), "metalsim": int(sil_b.sum())},
             "robot_depth_rmse_m": float(np.sqrt(((da - db)[both] ** 2).mean())) if both.any() else None,
@@ -122,6 +150,9 @@ def main():
                                       "raw_mean": {k: float(np.mean([r["raw"][k] for r in rows])) for k in keys},
                                       "brightness_matched_mean": {k: float(np.mean([r["brightness_matched"][k] for r in rows])) for k in keys},
                                       **{k + "_mean": float(np.mean([r[k] for r in rows if r[k] is not None])) for k in ("silhouette_iou", "robot_depth_rmse_m", "robot_depth_agree_1cm", "ground_depth_rmse_m")},
+                                      "robot_crop_raw_mean": {k: float(np.mean([r["robot_crop"]["raw"][k] for r in rows if r["robot_crop"]])) for k in ["psnr_db", "ssim", "flip"] + (["lpips_alex_crop"] if lp else [])},
+                                      "robot_crop_brightness_matched_mean": {k: float(np.mean([r["robot_crop"]["brightness_matched"][k] for r in rows if r["robot_crop"]])) for k in ["psnr_db", "ssim", "flip"] + (["lpips_alex_crop"] if lp else [])},
+                                      "robot_fraction_of_crop_mean": float(np.mean([r["robot_crop"]["robot_fraction_of_crop"] for r in rows if r["robot_crop"]])),
                                       "per_frame": rows}
     json.dump(report, open(os.path.join(a.out, "report.json"), "w"), indent=1)
     print(json.dumps({k: (v if k == "physics" else {t: {kk: vv for kk, vv in r.items() if kk != "per_frame"} for t, r in v.items()}) for k, v in report.items()}, indent=1))

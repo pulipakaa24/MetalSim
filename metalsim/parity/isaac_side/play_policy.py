@@ -53,7 +53,27 @@ if args.render == "pt":
     cfg.sim.render.carb_settings = {"/rtx/rendermode": "PathTracing", "/rtx/pathtracing/spp": 32, "/rtx/pathtracing/totalSpp": 32}
 else:
     cfg.sim.render.rendering_mode = "quality"
+
+def grey_ground(stage_path="/World/ground"):
+    """Isaac Lab's plane terrain ignores `visual_material` (it spawns the default grid environment), so bind a
+    plain grey PreviewSurface on the ground prim, stronger than every descendant binding (the same grey plane
+    MetalSim renders)."""
+    import omni.usd
+    from pxr import Usd
+    stage = omni.usd.get_context().get_stage()
+    mat = sim_utils.PreviewSurfaceCfg(diffuse_color=(0.5, 0.5, 0.5), roughness=0.7); mat.func("/World/Looks/ground_grey", mat)
+    n = 0
+    for prim in Usd.PrimRange(stage.GetPrimAtPath(stage_path), Usd.TraverseInstanceProxies()):
+        if prim.GetTypeName() in ("Mesh", "Plane") and not prim.IsInstanceProxy():
+            sim_utils.bind_visual_material(prim.GetPath().pathString, "/World/Looks/ground_grey", stronger_than_descendants=True); n += 1
+    sim_utils.bind_visual_material(stage_path, "/World/Looks/ground_grey", stronger_than_descendants=True)
+    print(f"[scene] grey ground bound on {stage_path} (+{n} meshes)", flush=True)
 env = gym.make("Isaac-Velocity-Flat-G1-v0", cfg=cfg)
+try:
+    grey_ground()
+    for _ in range(2): env.unwrapped.sim.render()   # let the material bind before the first frame
+except Exception as e:   # never lose a recording over the ground colour; the frames then show Isaac's grid
+    print(f"[scene] grey ground failed: {e!r}", flush=True)
 robot = env.unwrapped.scene["robot"]; camera = env.unwrapped.scene["camera"]
 joint_names = list(robot.joint_names); nj = len(joint_names)
 
