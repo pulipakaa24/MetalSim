@@ -207,6 +207,11 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True, vi
                 mm.textures[int(mujoco.mjtTextureRole.mjTEXROLE_RGB)] = t.name
             mat_by_path[prim.GetPath()] = mm.name
 
+    # -- MaterialX materials (.mtlx arcs, outputs:mtlx:surface): flattened into the same table; no-op otherwise
+    from metalsim.scene import materialx as _mtlx
+    if _mtlx.stage_has_materialx(stage):
+        _mtlx.import_materials(stage, spec, mat_by_path, base_dir)
+
     # -- bodies -----------------------------------------------------------------------------------
     rigid = [p for p in stage.Traverse() if p.HasAPI(UsdPhysics.RigidBodyAPI)]
     # joints indexed by child body
