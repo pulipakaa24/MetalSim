@@ -322,3 +322,207 @@ class G1XPBD:
 
     def pelvis_z(self) -> np.ndarray:
         return self.s0.body_q.numpy().reshape(self.n_envs, -1, 7)[:, 0, 2]
+
+
+# --------------------------------------------------------------------------------------------------
+# NewtonSim: a drop-in for metalsim.physics.batch.BatchSim in the G1 task. The task's kernels read and
+# write MuJoCo-layout arrays (qpos [x y z qw qx qy qz, joints], qvel [v_world, w_body, joint rates],
+# qacc, qfrc_actuator, sensordata, cvel, ctrl); NewtonSim keeps those arrays and converts to / from
+# Newton's maximal-coordinate state inside the captured graph, so observation, reward, termination and
+# reset code is shared verbatim between the engines. Joints are matched by name (the MuJoCo model built
+# from the same USD is the metadata source; FK of both agrees to 5e-7 m).
+
+@wp.kernel
+def _ctrl_to_target(ctrl: wp.array2d[float], dof_of: wp.array[int], nd: int, target: wp.array[float]):
+    e, i = wp.tid()
+    target[e * nd + dof_of[i]] = ctrl[e, i]
+
+
+@wp.kernel
+def _copy_joint_qd(src: wp.array[float], dst: wp.array[float]):
+    dst[wp.tid()] = src[wp.tid()]
+
+
+@wp.kernel
+def _to_mujoco(body_q: wp.array[wp.transform], body_qd: wp.array[wp.spatial_vector], body_com: wp.array[wp.vec3],
+               joint_q: wp.array[float], joint_qd: wp.array[float], joint_qd_prev: wp.array[float], joint_f: wp.array[float],
+               nb: int, nc: int, nd: int, coord_of: wp.array[int], dof_of: wp.array[int],
+               foot_nb: wp.vec2i, foot_mj: wp.vec2i, inv_dt: float,
+               qpos: wp.array2d[float], qvel: wp.array2d[float], qacc: wp.array2d[float], qfrc: wp.array2d[float],
+               cvel: wp.array2d[wp.spatial_vector]):
+    e = wp.tid()
+    r = e * nb                                           # root body (pelvis) is local body 0
+    X = body_q[r]
+    p = wp.transform_get_translation(X); qr = wp.transform_get_rotation(X)
+    v_com = wp.spatial_top(body_qd[r]); w_w = wp.spatial_bottom(body_qd[r])
+    v_o = v_com - wp.cross(w_w, wp.quat_rotate(qr, body_com[r]))     # MuJoCo: velocity of the body origin
+    w_b = wp.quat_rotate_inv(qr, w_w)                                  # MuJoCo free joint: body-frame angular velocity
+    qpos[e, 0] = p[0]; qpos[e, 1] = p[1]; qpos[e, 2] = p[2]
+    qpos[e, 3] = qr[3]; qpos[e, 4] = qr[0]; qpos[e, 5] = qr[1]; qpos[e, 6] = qr[2]
+    qvel[e, 0] = v_o[0]; qvel[e, 1] = v_o[1]; qvel[e, 2] = v_o[2]
+    qvel[e, 3] = w_b[0]; qvel[e, 4] = w_b[1]; qvel[e, 5] = w_b[2]
+    for i in range(coord_of.shape[0]):
+        c = e * nc + coord_of[i]; d = e * nd + dof_of[i]
+        qpos[e, 7 + i] = joint_q[c]
+        qvel[e, 6 + i] = joint_qd[d]
+        qacc[e, 6 + i] = (joint_qd[d] - joint_qd_prev[d]) * inv_dt
+        qfrc[e, 6 + i] = joint_f[d]
+    for f in range(2):                                   # feet: [angular, linear COM velocity] (feet_slide)
+        cv = body_qd[e * nb + foot_nb[f]]
+        cvel[e, foot_mj[f]] = wp.spatial_vector(wp.spatial_bottom(cv), wp.spatial_top(cv))
+
+
+@wp.kernel
+def _from_mujoco(mask: wp.array[wp.bool], qpos: wp.array2d[float], qvel: wp.array2d[float], body_com: wp.array[wp.vec3],
+                 nb: int, nc: int, nd: int, coord_of: wp.array[int], dof_of: wp.array[int],
+                 joint_q: wp.array[float], joint_qd: wp.array[float]):
+    e = wp.tid()
+    if not mask[e]:
+        return
+    c0 = e * nc; d0 = e * nd
+    qr = wp.quat(qpos[e, 4], qpos[e, 5], qpos[e, 6], qpos[e, 3])
+    for k in range(3):
+        joint_q[c0 + k] = qpos[e, k]
+    joint_q[c0 + 3] = qr[0]; joint_q[c0 + 4] = qr[1]; joint_q[c0 + 5] = qr[2]; joint_q[c0 + 6] = qr[3]
+    w_w = wp.quat_rotate(qr, wp.vec3(qvel[e, 3], qvel[e, 4], qvel[e, 5]))
+    v_com = wp.vec3(qvel[e, 0], qvel[e, 1], qvel[e, 2]) + wp.cross(w_w, wp.quat_rotate(qr, body_com[e * nb]))
+    joint_qd[d0 + 0] = v_com[0]; joint_qd[d0 + 1] = v_com[1]; joint_qd[d0 + 2] = v_com[2]
+    joint_qd[d0 + 3] = w_w[0]; joint_qd[d0 + 4] = w_w[1]; joint_qd[d0 + 5] = w_w[2]
+    for i in range(coord_of.shape[0]):
+        joint_q[c0 + coord_of[i]] = qpos[e, 7 + i]
+        joint_qd[d0 + dof_of[i]] = qvel[e, 6 + i]
+
+
+@wp.kernel
+def _touch(count: wp.array[int], shape0: wp.array[int], shape1: wp.array[int], force: wp.array[wp.spatial_vector],
+           shape_slot: wp.array[int], shape_env: wp.array[int], adr: wp.vec3i, sensordata: wp.array2d[float]):
+    k = wp.tid()
+    if k >= count[0]:
+        return
+    f = wp.length(wp.spatial_top(force[k]))
+    for s in range(2):
+        sh = shape0[k]
+        if s == 1:
+            sh = shape1[k]
+        if sh >= 0:
+            slot = shape_slot[sh]
+            if slot >= 0:
+                wp.atomic_add(sensordata, shape_env[sh], adr[slot], f)
+
+
+class _NewtonData:
+    """MuJoCo-layout arrays the task kernels use (subset of mujoco_warp.Data)."""
+
+
+class NewtonSim:
+    """N G1 worlds on Newton XPBD with ``BatchSim``'s interface for the G1 task (``launch_step``,
+    ``d.*`` MuJoCo-layout arrays, ``_reset_mask``, event ordering). One ``launch_step`` = one control
+    step = ``substeps`` XPBD steps of ``dt`` with Isaac's actuator (``ActuatorPD``) reading ``d.ctrl``.
+    ``sensordata`` holds contact normal+friction force magnitudes summed per touch slot (feet, torso)."""
+
+    def __init__(self, mj_model, num_envs: int, iterations: int = 4, dt: float = 0.00125, control_dt: float = 0.02,
+                 device: str = "metal:0", mesh_to_box: bool = True, touch_bodies=("left_ankle_roll_link", "right_ankle_roll_link", "torso_link")):
+        import mujoco
+        from metalsim.interop import warp_metal as wm
+        self.mj_model = mj = mj_model
+        self.n = n = num_envs; self.dt_phys = dt; self.iterations = iterations
+        self.substeps = int(round(control_dt / dt))
+        self.device = wp.get_device(device)
+        z0 = float(mj.key_qpos[0][2]) if mj.nkey else 0.74
+        with wp.ScopedDevice(self.device):
+            builder, act = scene(n, spacing=0.0, z0=z0, armature_inertia="iso", mesh_to_box=mesh_to_box)
+            builder.joint_target_ke = [0.0] * builder.joint_dof_count; builder.joint_target_kd = [0.0] * builder.joint_dof_count
+            self.model = m = builder.finalize()
+            m.request_contact_attributes("force")
+            self.solver = newton.solvers.SolverXPBD(m, iterations=iterations, joint_linear_relaxation=0.4, joint_angular_relaxation=0.4)
+            self.s0, self.s1 = m.state(), m.state(); self.control = m.control()
+            newton.eval_fk(m, m.joint_q, m.joint_qd, self.s0)
+            self.contacts = m.collide(self.s0)
+            assert m.articulation_count == n
+            self.nb, self.nc, self.nd = m.body_count // n, m.joint_coord_count // n, m.joint_dof_count // n
+            # per-env name maps: MuJoCo actuator i (joint i + 1) -> Newton coordinate / DOF offset in an env
+            lab = [l.split("/")[-1] for l in m.joint_label[: m.joint_count // n]]
+            qs, qds = m.joint_q_start.numpy(), m.joint_qd_start.numpy()
+            names = [mujoco.mj_id2name(mj, mujoco.mjtObj.mjOBJ_JOINT, mj.actuator_trnid[i, 0]) for i in range(mj.nu)]
+            assert all(mj.jnt_qposadr[mj.actuator_trnid[i, 0]] == 7 + i for i in range(mj.nu)), "MuJoCo qpos must follow actuator order"
+            self.coord_of = wp.array([int(qs[lab.index(nm)]) for nm in names], dtype=int)
+            self.dof_of = wp.array([int(qds[lab.index(nm)]) for nm in names], dtype=int)
+            blab = [l.split("/")[-1] for l in m.body_label[: self.nb]]
+            assert blab[0] == "pelvis"
+            mjb = lambda nm: mujoco.mj_name2id(mj, mujoco.mjtObj.mjOBJ_BODY, nm)
+            self.foot_nb = wp.vec2i(blab.index(touch_bodies[0]), blab.index(touch_bodies[1]))
+            self.foot_mj = wp.vec2i(mjb(touch_bodies[0]), mjb(touch_bodies[1]))
+            sb = m.shape_body.numpy()
+            self.shape_slot = wp.array([touch_bodies.index(blab[b % self.nb]) if b >= 0 and blab[b % self.nb] in touch_bodies else -1 for b in sb], dtype=int)
+            self.shape_env = wp.array([b // self.nb if b >= 0 else 0 for b in sb], dtype=int)
+            sadr = lambda nm: int(mj.sensor_adr[mujoco.mj_name2id(mj, mujoco.mjtObj.mjOBJ_SENSOR, nm + "_touch")])
+            self.touch_adr = wp.vec3i(*[sadr(b) for b in touch_bodies])
+            # actuator: per-DOF gains from the same builder (Isaac's groups), target written from ctrl
+            self.actuator = ActuatorPD(m, act["kp"], act["kd"], act["effort"], act["target"], None, dt, "ipd")
+            self.joint_qd_prev = wp.zeros(m.joint_dof_count, dtype=float)
+            self.joint_q = wp.clone(m.joint_q); self.joint_qd = wp.clone(m.joint_qd)
+            # MuJoCo-layout data
+            z = lambda *s, dtype=float: wp.zeros(*s, dtype=dtype)
+            d = self.d = _NewtonData()
+            d.qpos = wp.array(np.tile(mj.key_qpos[0], (n, 1)).astype(np.float32), dtype=float)
+            d.qvel = z((n, mj.nv)); d.qacc = z((n, mj.nv)); d.qfrc_actuator = z((n, mj.nv))
+            d.sensordata = z((n, mj.nsensordata)); d.site_xpos = z((n, 1), dtype=wp.vec3)
+            d.cvel = z((n, mj.nbody), dtype=wp.spatial_vector); d.ctrl = z((n, mj.nu))
+            d.ctrl.assign(np.tile(mj.key_qpos[0][7:], (n, 1)).astype(np.float32))
+            self._reset_mask = z(n, dtype=wp.bool)
+        self.event = wm.SharedEvent(device, "metalsim.physics.newton")
+        self._wm = wm
+
+    # -- BatchSim interface ---------------------------------------------------------------------------
+    def launch_step(self) -> None:
+        m = self.model
+        with wp.ScopedDevice(self.device):
+            wp.launch(_ctrl_to_target, dim=(self.n, self.mj_model.nu), inputs=[self.d.ctrl, self.dof_of, self.nd, self.actuator.target])
+            for k in range(self.substeps):
+                self.actuator.apply(self.s0, self.control)          # eval_ik -> actuator.joint_q/qd, torques
+                if k == self.substeps - 1:
+                    wp.launch(_copy_joint_qd, dim=m.joint_dof_count, inputs=[self.actuator.joint_qd, self.joint_qd_prev])
+                self.s0.clear_forces()
+                self.contacts = m.collide(self.s0, self.contacts)
+                self.solver.step(self.s0, self.s1, self.control, self.contacts, self.dt_phys)
+                self.s0, self.s1 = self.s1, self.s0
+            self.solver.update_contacts(self.contacts)
+            self._sync_out()
+
+    def _sync_out(self):
+        m, d = self.model, self.d
+        newton.eval_ik(m, self.s0, self.joint_q, self.joint_qd)
+        wp.launch(_to_mujoco, dim=self.n, inputs=[self.s0.body_q, self.s0.body_qd, m.body_com, self.joint_q, self.joint_qd,
+                  self.joint_qd_prev, self.control.joint_f, self.nb, self.nc, self.nd, self.coord_of, self.dof_of,
+                  self.foot_nb, self.foot_mj, 1.0 / self.dt_phys], outputs=[d.qpos, d.qvel, d.qacc, d.qfrc_actuator, d.cvel])
+        d.sensordata.zero_()
+        wp.launch(_touch, dim=self.contacts.rigid_contact_max, inputs=[self.contacts.rigid_contact_count, self.contacts.rigid_contact_shape0,
+                  self.contacts.rigid_contact_shape1, self.contacts.force, self.shape_slot, self.shape_env, self.touch_adr],
+                  outputs=[d.sensordata])
+
+    def launch_reset(self, mask=None) -> None:
+        """Write the MuJoCo-layout qpos/qvel of the masked worlds into Newton's state (after g1_reset)."""
+        m = self.model; mask = self._reset_mask if mask is None else mask
+        with wp.ScopedDevice(self.device):
+            wp.launch(_from_mujoco, dim=self.n, inputs=[mask, self.d.qpos, self.d.qvel, m.body_com, self.nb, self.nc, self.nd,
+                      self.coord_of, self.dof_of], outputs=[self.joint_q, self.joint_qd])
+            newton.eval_fk(m, self.joint_q, self.joint_qd, self.s0, mask=mask)
+
+    def step(self) -> int:
+        self.launch_step()
+        return self._signal()
+
+    def wait(self, event, value: int) -> None:
+        self._wm.wait(event, value, self.device)
+
+    def _signal(self) -> int:
+        v = self.event.next_value()
+        self._wm.signal(self.event, v, self.device)
+        return v
+
+    def after(self, value: int) -> None:
+        from metalsim.interop import torch_bridge as tb
+        tb.wait_event(self.event, value)
+
+    def synchronize(self) -> None:
+        wp.synchronize_device(self.device)

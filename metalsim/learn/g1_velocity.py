@@ -25,6 +25,13 @@ damping, effort limit and armature) and Isaac's initial state. Task terms follow
 
 Contact quantities come from MuJoCo touch sensors added to the feet and torso (sites enclosing
 the colliders), evaluated by MuJoCo Warp each step.
+
+Engines (``G1VelocityTask(engine=...)``): "mjwarp" (default; MuJoCo Warp, ``BatchSim``) or "newton"
+(Newton XPBD, ``metalsim.physics.newton_backend.NewtonSim``: Isaac's actuator via ActuatorPD, joint
+relaxation 0.4/0.4, ``newton_iterations`` at ``newton_dt``). NewtonSim exposes the same MuJoCo-layout
+state arrays, so observation, reward, termination and reset kernels are shared verbatim; on Newton the
+touch "sensors" are contact force magnitudes on the foot / torso colliders (XPBD update_contacts), qacc
+is the last substep's joint velocity difference, and feet_slide reads the foot COM velocity.
 """
 from __future__ import annotations
 
@@ -380,7 +387,7 @@ class G1VelocityTask:
     """Isaac Lab velocity task shape for `metalsim.learn.ppo_warp.PPOWarp`."""
 
     def __init__(self, n, terrain: str = "flat", seed: int = 0, height_scan: bool | None = None, device="metal:0",
-                 physics_dt: float = PHYSICS_DT):
+                 physics_dt: float = PHYSICS_DT, engine: str = "mjwarp", newton_iterations: int = 4, newton_dt: float = 0.00125):
         self.n, self.seed, self.device = n, seed, device
         self.terrain_kind = terrain
         self.hfield = None
@@ -388,15 +395,26 @@ class G1VelocityTask:
         if terrain != "flat":
             from metalsim.learn.terrain import isaac_rough_terrain
             self.hfield = isaac_rough_terrain(seed=seed)
-        self.model, self.info = build_g1_model(terrain, self.hfield, physics_dt=physics_dt)
-        self.physics_dt = physics_dt
+        self.engine = engine
+        if engine not in ("mjwarp", "newton"):
+            raise ValueError(f"engine must be 'mjwarp' or 'newton', not {engine!r}")
+        if engine == "newton" and terrain != "flat":
+            raise NotImplementedError("the Newton engine path supports the flat task only (no heightfield)")
+        self.model, self.info = build_g1_model(terrain, self.hfield, physics_dt=physics_dt)   # metadata source for both engines
         m = self.model
         self.nj = m.nu
-        self.decimation = int(round(CONTROL_DT / physics_dt))
-        # contact capacity: 3 colliders x <= 4 kept contacts per pair; MuJoCo Warp's heightfield default
-        # (256 per world) sizes GPU scratch by naconmax and exhausts memory at 4096 worlds
-        self.sim = BatchSim(m, n, options=BatchSimOptions(substeps=self.decimation, njmax=256, nconmax=32,
-                                                          solver_iterations=10, ls_iterations=20))
+        if engine == "newton":
+            from metalsim.physics.newton_backend import NewtonSim
+            self.physics_dt = newton_dt
+            self.sim = NewtonSim(m, n, iterations=newton_iterations, dt=newton_dt, control_dt=CONTROL_DT, device=device)
+            self.decimation = self.sim.substeps
+        else:
+            self.physics_dt = physics_dt
+            self.decimation = int(round(CONTROL_DT / physics_dt))
+            # contact capacity: 3 colliders x <= 4 kept contacts per pair; MuJoCo Warp's heightfield default
+            # (256 per world) sizes GPU scratch by naconmax and exhausts memory at 4096 worlds
+            self.sim = BatchSim(m, n, options=BatchSimOptions(substeps=self.decimation, njmax=256, nconmax=32,
+                                                              solver_iterations=10, ls_iterations=20))
         self.max_t = int(EPISODE_S / CONTROL_DT)
         self.n_scan = 187 if self.use_scan else 0
         self.obs_dim = 12 + 3 * self.nj + self.n_scan
@@ -480,6 +498,11 @@ class G1VelocityTask:
             self.resample, int(10.0 / CONTROL_DT), self.ep_ret, self.ep_len, self.stats, self.stats_i, self.terms,
             self.curriculum, self.level, self.col, self.origin_table, self.n_levels, self.n_cols, self.cell_size, EPISODE_S,
             self.origins, self.seed], device=self.device)
+        if self.engine == "newton":
+            wp.launch(g1_reset, dim=self.n, inputs=[self.sim._reset_mask, self.default_q, self.origins, self.seed, pol.step_idx,
+                                                    d.qpos, d.qvel, self.last_action, self.prev_action], device=self.device)
+            self.sim.launch_reset()          # MuJoCo-layout reset state -> Newton joint coordinates -> FK (masked)
+            return
         import mujoco_warp as mjw
         mjw.reset_data(self.sim.m, d, reset=self.sim._reset_mask)
         wp.launch(g1_reset, dim=self.n, inputs=[self.sim._reset_mask, self.default_q, self.origins, self.seed, pol.step_idx,
@@ -493,6 +516,14 @@ class G1VelocityTask:
         """Host-driven initial reset (once)."""
         self.sim._reset_mask.fill_(True)
         idx = wp.zeros(1, dtype=int, device=self.device)
+        if self.engine == "newton":
+            with wp.ScopedDevice(self.device):
+                wp.launch(g1_reset, dim=self.n, inputs=[self.sim._reset_mask, self.default_q, self.origins, self.seed, idx,
+                                                        self.sim.d.qpos, self.sim.d.qvel, self.last_action, self.prev_action], device=self.device)
+                self.sim.launch_reset()
+                self.sim.d.sensordata.zero_(); self.sim.d.qacc.zero_(); self.sim.d.qfrc_actuator.zero_()
+            self.sim.synchronize()
+            return
         import mujoco_warp as mjw
         with wp.ScopedDevice(self.device):
             mjw.reset_data(self.sim.m, self.sim.d, reset=self.sim._reset_mask)
@@ -572,19 +603,23 @@ def g1_ppo_config(terrain: str, iterations: int, seed: int = 0):
                          hidden=(512, 256, 128) if terrain != "flat" else (256, 128, 128), log_every=1)
 
 
-def train_g1(n=4096, terrain="flat", iterations=1500, seed=0, log_path=None, checkpoint=None, physics_dt=PHYSICS_DT):
+def train_g1(n=4096, terrain="flat", iterations=1500, seed=0, log_path=None, checkpoint=None, physics_dt=PHYSICS_DT,
+             engine="mjwarp", newton_iterations=4, newton_dt=0.00125):
     from metalsim.learn.ppo_warp import PPOWarp
-    task = G1VelocityTask(n, terrain=terrain, seed=seed, physics_dt=physics_dt)
+    task = G1VelocityTask(n, terrain=terrain, seed=seed, physics_dt=physics_dt, engine=engine,
+                          newton_iterations=newton_iterations, newton_dt=newton_dt)
     algo = PPOWarp(task, g1_ppo_config(terrain, iterations, seed))
     f = open(log_path, "a") if log_path else None
     def log(msg):
         print(msg, flush=True)
         if f:
             f.write(msg + "\n"); f.flush()
-    log(f"G1 {terrain} PPO: N={n} obs_dim {task.obs_dim} act_dim {task.act_dim} rollout 24 x {iterations} iterations, physics dt {physics_dt} (decimation {task.decimation})")
+    eng = f"newton XPBD {newton_iterations} it" if engine == "newton" else "mjwarp"
+    log(f"G1 {terrain} PPO: N={n} obs_dim {task.obs_dim} act_dim {task.act_dim} rollout 24 x {iterations} iterations, engine {eng}, "
+        f"physics dt {task.physics_dt} (decimation {task.decimation}), seed {seed}")
     def save(path, it):
         torch.save({"net": algo.net.state_dict(), "terrain": terrain, "n": n, "iterations": it, "obs_dim": task.obs_dim,
-                    "act_dim": task.act_dim, "hidden": algo.cfg.hidden}, path)
+                    "act_dim": task.act_dim, "hidden": algo.cfg.hidden, "engine": engine}, path)
     cb = (lambda it, a: save(checkpoint.replace(".pt", f"_it{it}.pt"), it) if it % 100 == 0 else None) if checkpoint else None
     from metalsim.learn.monitor import AnomalyMonitor
     mon = AnomalyMonitor(task, algo.cfg, log=log, path=(log_path + ".anomalies.jsonl") if log_path else None)
@@ -598,14 +633,21 @@ def train_g1(n=4096, terrain="flat", iterations=1500, seed=0, log_path=None, che
 if __name__ == "__main__":
     import sys
     wp.config.quiet = True
+    # optional flags (any position): --engine mjwarp|newton, --newton_it N, --newton_dt S
+    opts = {"--engine": "mjwarp", "--newton_it": "4", "--newton_dt": "0.00125"}
+    for k in list(opts):
+        if k in sys.argv:
+            i = sys.argv.index(k); opts[k] = sys.argv[i + 1]; del sys.argv[i:i + 2]
+    ekw = dict(engine=opts["--engine"], newton_iterations=int(opts["--newton_it"]), newton_dt=float(opts["--newton_dt"]))
     n = int(sys.argv[1]) if len(sys.argv) > 1 else 4096
     terrain = sys.argv[2] if len(sys.argv) > 2 else "flat"
     if len(sys.argv) > 3 and sys.argv[3] == "train":
         train_g1(n, terrain, int(sys.argv[4]) if len(sys.argv) > 4 else 1500, log_path=sys.argv[5] if len(sys.argv) > 5 else None,
-                 checkpoint=sys.argv[6] if len(sys.argv) > 6 else None, physics_dt=float(sys.argv[7]) if len(sys.argv) > 7 else PHYSICS_DT)
+                 checkpoint=sys.argv[6] if len(sys.argv) > 6 and sys.argv[6] != "-" else None,
+                 physics_dt=float(sys.argv[7]) if len(sys.argv) > 7 else PHYSICS_DT, **ekw)
         sys.exit(0)
-    task = G1VelocityTask(n, terrain=terrain)
-    print(f"G1 ({terrain}): nbody {task.model.nbody} nv {task.model.nv} nu {task.model.nu} ngeom {task.model.ngeom} obs_dim {task.obs_dim}")
+    task = G1VelocityTask(n, terrain=terrain, physics_dt=float(sys.argv[3]) if len(sys.argv) > 3 else PHYSICS_DT, **ekw)
+    print(f"G1 ({terrain}, {task.engine}, physics dt {task.physics_dt}): nbody {task.model.nbody} nv {task.model.nv} nu {task.model.nu} ngeom {task.model.ngeom} obs_dim {task.obs_dim}")
     r = benchmark_step(task, num_frames=100)
     # synchronized measurement over the same protocol
     t0 = time.perf_counter(); r2 = benchmark_step(task, num_frames=100); task.sim.synchronize(); dt = time.perf_counter() - t0
