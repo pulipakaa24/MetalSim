@@ -10,17 +10,24 @@ What this module gets right that the first feasibility scripts did not (see
 * ``SolverXPBD`` integrates maximal coordinates only: ``State.joint_q``/``joint_qd`` are never written.
   Read joint coordinates with ``newton.eval_ik`` (``joint_state``), not from ``State.joint_q``.
 
-Two drive models are provided:
+* Newton's default joint relaxation (linear 0.7, angular 0.4) scales the linear and angular parts of the
+  same joint impulse differently, so joints transmit torque wrongly (one-joint pendulum: response to a
+  joint torque +43 %, to gravity -18 %, at any iteration count). Equal factors are exact; angular > 0.4
+  diverges on the G1, so both are 0.4 here.
 
-* ``drive="xpbd"``: XPBD's own compliance drive (compliance 1/ke, damping via kd/ke). Implicit, but
-  its effective stiffness is not ``ke``: corrections are velocity impulses without lambda
-  accumulation, so the stiffness grows with ``iterations`` x ``joint_angular_relaxation``. No
-  effort limit, no armature.
-* ``drive="pd"``: Isaac Lab's explicit actuator law computed every substep,
-  ``tau = clip(kp (q* - q) - kd qd, -effort, effort)``, written to ``Control.joint_f`` (XPBD's
-  own drives are disabled with ke = kd = 0). Exact gains and effort limits. Armature is
-  approximated by adding ``armature`` to the child body's rotational inertia about the joint axis
-  (``add_armature_inertia``).
+Drive models (``G1XPBD.drive``):
+
+* ``"ipd"`` (recommended): Isaac Lab's actuator computed every substep by ``ActuatorPD`` and applied
+  through ``Control.joint_f`` (XPBD's own drives off): ``tau = clip(kp (q* - q) - kd qd / (1 + kd dt / I),
+  +-effort)`` with I the local two-body inertia about the joint axis (backward Euler on the damper's own
+  effect: exact at rest, stable for Isaac's kd 10 on 1e-6 kg m^2 hand links). Armature is added
+  isotropically to the child body's inertia (``armature_inertia="iso"``); without it the explicit
+  stiffness diverges on the light links. Against the exact static PD equilibrium (fixed base):
+  <= 0.006 rad at 1 iteration, <= 0.001 rad at 4.
+* ``"xpbd"``: XPBD's own compliance drive (compliance 1/ke, damping kd/ke). Corrections are velocity
+  impulses without lambda accumulation, so the effective stiffness is not ke (pendulum: 72..1240 Nm/rad
+  for ke 200 over 1..16 iterations; G1 fixed base 0.03-0.4 rad off). No effort limit, no armature.
+* ``"pd"``: plain explicit PD via ``joint_f`` (diverges at 2.5 ms on the hand links; reference only).
 """
 from __future__ import annotations
 
