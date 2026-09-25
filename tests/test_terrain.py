@@ -93,7 +93,7 @@ def test_hfield_mesh_contacts_match_mujoco_c():
     launched to 2.3 m."""
     import mujoco
     from metalsim.learn.g1_velocity import G1VelocityTask
-    task = G1VelocityTask(4, terrain="rough", seed=0); m = task.model
+    task = G1VelocityTask(4, terrain="rough", seed=0, terrain_collision="hfield"); m = task.model   # the heightfield kernel
     task.reset_all()
     org = task.origins.numpy()
     q = np.tile(m.key_qpos[0], (4, 1)).astype(np.float32); q[:, :2] = org[:, :2]; q[:, 2] = org[:, 2] + 0.74
@@ -317,3 +317,96 @@ def test_height_scan_ray_order_matches_isaac_recording():
             err[order] = np.abs(np.clip(out.numpy(), -1, 1) - obs0[:, -187:])
         assert err["xy"].max() < 1e-3, (path, err["xy"].max())
         assert err["ij"].max() > 0.02, path
+
+
+# --------------------------------------------------------------------------------------------------
+# collision surfaces for Isaac's vertical walls (metalsim.learn.terrain TERRAIN_COLLISION;
+# docs/research/terrain_walls_2026-09-25.md)
+
+def test_terrain_collision_surfaces_vs_isaac_mesh():
+    """Off-grid, the top of the MuJoCo collision geometry of each option against Isaac's own ray cast on Isaac's own
+    terrain mesh (its generator run here, CPU torch box heights) at random points in every sub-terrain type: "boxes"
+    (Isaac's trimesh sub-terrains as its own boxes) is exact on the stair and box cells, where the 0.1 m heightfield
+    ramps the walls; the height-scan grid ``H`` is the same in every mode."""
+    from metalsim.learn.terrain import collision_top
+    R = _isaac_ref()
+    isaac = R.isaac_rough_generator(seed=0)
+    rng = np.random.default_rng(0)
+    base = isaac_rough_terrain(seed=0, torch_device="cpu")
+    types = {}
+    for s in base["generator"].sub_terrains:
+        types.setdefault(s.name, []).append((s.row, s.col))
+    pts = {}
+    for name, cells in types.items():
+        rc = np.array(cells)[rng.integers(0, len(cells), 4000)]
+        pts[name] = np.stack([rc[:, 0] * 8.0 - 40.0 + rng.uniform(0, 8, 4000), rc[:, 1] * 8.0 - 80.0 + rng.uniform(0, 8, 4000)], 1)
+    ref = {n: _warp_raycast(isaac.terrain_mesh, p) for n, p in pts.items()}
+    err = {}
+    for mode in ("hfield", "boxes"):
+        hf = base if mode == "hfield" else isaac_rough_terrain(seed=0, torch_device="cpu", collision=mode)
+        assert np.array_equal(hf["H"], base["H"])            # the height scan reads the same exact grid in every mode
+        # within 0.1 mm of a wall take the better side (Isaac's float32 vertices vs the float64 box geoms)
+        err[mode] = {n: np.min([np.abs(collision_top(hf, p[:, 0] + dx, p[:, 1] + dy) - ref[n])
+                                for dx, dy in ((0, 0), (1e-4, 0), (-1e-4, 0), (0, 1e-4), (0, -1e-4))], 0) for n, p in pts.items()}
+    for n in ("pyramid_stairs", "pyramid_stairs_inv", "boxes"):
+        print(f"{n}: hfield mean {err['hfield'][n].mean():.4f} p99 {np.percentile(err['hfield'][n], 99):.3f} max "
+              f"{err['hfield'][n].max():.3f} m; boxes max {err['boxes'][n].max():.1e} m")
+        assert err["boxes"][n].max() < 1e-5 and np.percentile(err["hfield"][n], 99) > 0.05
+    for n in ("random_rough", "hf_pyramid_slope", "hf_pyramid_slope_inv"):    # height-field cells: same heightfield in both
+        assert np.allclose(err["boxes"][n], err["hfield"][n], atol=1e-6)     # (float32 data renormalised to a lower zmin)
+
+
+def test_exact_height_scan_matches_isaac_raycast():
+    """HeightScanner(surface="exact") off the grid (random torso positions and yaws on every sub-terrain type) against
+    Isaac's ray cast on Isaac's own mesh: exact on the box-built sub-terrains (stairs, inverted stairs, boxes), where the
+    default grid interpolation reads walls as 0.1 m ramps; identical to the grid scan elsewhere. Warp CPU device."""
+    from metalsim.learn.terrain import box_cell_tops, height_scan_exact, height_scan_grid, scan_grid
+    R = _isaac_ref()
+    isaac = R.isaac_rough_generator(seed=0)
+    hf = isaac_rough_terrain(seed=0, torch_device="cpu"); gen = hf["generator"]
+    rng = np.random.default_rng(3); n = 600
+    cells = [(s.row, s.col, s.boxes is not None) for s in gen.sub_terrains]
+    pick = np.array(cells)[rng.integers(0, len(cells), n)]
+    pos = np.stack([pick[:, 0] * 8.0 - 40.0 + rng.uniform(1.0, 7.0, n), pick[:, 1] * 8.0 - 80.0 + rng.uniform(1.0, 7.0, n),
+                    np.full(n, 1.0)], 1).astype(np.float32)
+    yaw = rng.uniform(-np.pi, np.pi, n)
+    xm = np.zeros((n, 1, 3, 3), np.float32); xm[:, 0, 0, 0] = np.cos(yaw); xm[:, 0, 0, 1] = -np.sin(yaw)
+    xm[:, 0, 1, 0] = np.sin(yaw); xm[:, 0, 1, 1] = np.cos(yaw); xm[:, 0, 2, 2] = 1.0
+    dev = "cpu"
+    xp = wp.array(pos[:, None], dtype=wp.vec3, device=dev); xmw = wp.array(xm, dtype=wp.mat33, device=dev)
+    g = scan_grid("xy"); grid = wp.array(g, dtype=float, device=dev)
+    H = wp.array(hf["H"].astype(np.float32), dtype=float, device=dev)
+    blk, F = box_cell_tops(gen)
+    common = [xp, xmw, 0, grid, H, float(hf["res"]), float(hf["size"][0]), float(hf["size"][1]), 0.5]
+    out_e = wp.zeros((n, 187), dtype=float, device=dev); out_g = wp.zeros((n, 187), dtype=float, device=dev)
+    wp.launch(height_scan_exact, dim=(n, 187), inputs=common + [wp.array(blk, dtype=int, device=dev), wp.array(F, dtype=float, device=dev),
+                                                                8.0, -40.0, -80.0, 0.025, out_e], device=dev)
+    wp.launch(height_scan_grid, dim=(n, 187), inputs=common + [out_g], device=dev)
+    rx = pos[:, 0:1] + np.cos(yaw)[:, None] * g[None, :, 0] - np.sin(yaw)[:, None] * g[None, :, 1]
+    ry = pos[:, 1:2] + np.sin(yaw)[:, None] * g[None, :, 0] + np.cos(yaw)[:, None] * g[None, :, 1]
+    ref = 1.0 - _warp_raycast(isaac.terrain_mesh, np.stack([rx.ravel(), ry.ravel()], 1)).reshape(n, 187) - 0.5
+    box = pick[:, 2].astype(bool)
+    ee, eg = np.abs(out_e.numpy() - ref), np.abs(out_g.numpy() - ref)
+    print(f"box-built cells, {int(box.sum()) * 187} rays: exact scan max {ee[box].max():.1e} m, >1 mm {np.mean(ee[box] > 1e-3):.5f}; "
+          f"grid scan mean {eg[box].mean():.4f} p99 {np.percentile(eg[box], 99):.3f} max {eg[box].max():.3f} m")
+    assert np.mean(ee[box] > 1e-3) < 1e-4 and np.percentile(eg[box], 99) > 0.05
+    assert np.array_equal(out_e.numpy()[~box], out_g.numpy()[~box])
+
+
+@pytest.mark.parametrize("mode", ["boxes", "meshes", "boxes_local"])
+def test_step_edge_contacts_match_mujoco_c(mode):
+    """The G1 foot collider at a 0.11 m riser of the inverted-stairs pit (scripts/diagnostics/terrain_step_edge.py):
+    stubbing into the riser at 1 m/s and landing across the riser edge, MuJoCo Warp vs MuJoCo C on the same model.
+    With Isaac's boxes the riser is a wall: the toe stops at it (soft-contact penetration only), the foot does not
+    climb, a near-horizontal contact normal appears, and Warp follows C's trajectory ("boxes_local": Warp with the
+    per-world box window against C on all boxes). The 0.1 m heightfield fails all of this (runs/terrain_walls/step_edge.jsonl:
+    Warp's normal never below z 0.67, Warp vs C 0.21 m apart after 0.4 s)."""
+    import os, sys
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts", "diagnostics"))
+    import terrain_step_edge as S
+    r = S.run(mode)
+    print(r)
+    for side in ("C", "warp"):
+        assert r[side]["stub_toe_x_max_minus_riser"] < 0.01 and r[side]["stub_sole_rise"] < 0.01
+        assert r[side]["stub_min_abs_normal_z"] < 0.2
+    assert max(r["warp_vs_C_pos_final"]) < 0.01 and r["warp_vs_C_pos_max"] < 0.02

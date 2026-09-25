@@ -59,15 +59,32 @@ def main():
     ap.add_argument("--steps", type=int, default=400); ap.add_argument("--physics_dt", type=float, default=0.0025)
     ap.add_argument("--isaac_play", default=None, help="play_rough tree from the VM (L<level>/<label>/meta.json, traj.npz)")
     ap.add_argument("--out", default=None, help="append JSON lines here")
+    ap.add_argument("--terrain_collision", default="boxes_local", help="collision surface (metalsim.learn.terrain."
+                    "TERRAIN_COLLISION): boxes_local (default since 2026-09-25), hfield (0.1 m, before), boxes, meshes, "
+                    "hfield_fine[:res], boxes_fine[:res]")
+    ap.add_argument("--reps", type=int, default=1, help="envs per cell type: rep 0 is the protocol start, reps 1.. start "
+                    "at a seeded uniform +-jitter xy offset (fall rates with more samples; Isaac comparison only for reps 1)")
+    ap.add_argument("--jitter", type=float, default=0.05)
+    ap.add_argument("--traj_dir", default=None, help="save root position/quaternion and joint positions every step here")
+    ap.add_argument("--scan_surface", default="exact", help="height scan: exact (default since 2026-09-25) or grid (0.1 m "
+                    "interpolation, before)")
     a = ap.parse_args(); wp.config.quiet = True
-    n = 4
-    task = G1VelocityTask(n, terrain="rough", seed=a.seed, physics_dt=a.physics_dt, scan_ordering="xy")   # Isaac's ray order
+    n = 4 * a.reps
+    coll, _, fine_res = a.terrain_collision.partition(":")
+    if fine_res:                                  # hfield_fine:<res>
+        import metalsim.learn.terrain as T
+        _orig = T.isaac_rough_terrain; T.isaac_rough_terrain = lambda **kw: _orig(fine_res=float(fine_res), **kw)
+    task = G1VelocityTask(n, terrain="rough", seed=a.seed, physics_dt=a.physics_dt, scan_ordering="xy",   # Isaac's ray order
+                          terrain_collision=coll, scan_surface=a.scan_surface)
     m = task.model
     our_joints = [mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_JOINT, j) for j in range(1, m.njnt)]
     nj = task.nj
     tab = task.hfield["origin_table"]()                       # (rows, cols, 3)
     ground = ground_fn(task.hfield)
     cols = task.col.numpy()
+    if a.reps > 1:        # the protocol's four columns (Isaac's floor(i / (4 / 20)) in float32 for 4 envs), repeated
+        cols = np.tile(np.array([0, 4, 9, 14]), a.reps)
+        jit = np.random.default_rng(1234).uniform(-a.jitter, a.jitter, (n, 2)).astype(np.float32); jit[:4] = 0.0
     isaac_joints = None
     if a.isaac_play:
         tr = sorted(glob.glob(os.path.join(a.isaac_play, "L*", "*", "traj.npz")))
@@ -85,6 +102,8 @@ def main():
     results = []
     for lv in a.level:
         origins = tab[lv, cols].astype(np.float32)
+        if a.reps > 1:
+            origins = origins.copy(); origins[:, :2] += jit    # start offset (the origin z stays the cell's)
         for spec in a.ckpt:
             label, path = spec.split("=", 1)
             actor, src, order = load_actor(path)
@@ -99,7 +118,7 @@ def main():
             task.sim.t.qpos.copy_(q0); task.sim.t.qvel.zero_(); task.last_action.zero_(); task.prev_action.zero_()
             torch.mps.synchronize()          # the copies run on the MPS queue; forward kinematics (Warp queue) must see them
             v = task.sim.forward(); task.sim.after(v); task.sim.synchronize()
-            last = torch.zeros(n, nj, device="mps"); obs0 = None; hag = []
+            last = torch.zeros(n, nj, device="mps"); obs0 = None; hag = []; traj = []
             for t in range(a.steps):
                 wp.launch(bump, dim=1, inputs=[step_idx], device="metal:0"); task.scanner.launch(step_idx)
                 vs = task.sim._signal(); task.sim.after(vs)
@@ -118,16 +137,21 @@ def main():
                 act = act.clamp(-100, 100); last = act
                 task.action_scratch.assign(act.cpu().numpy().astype(np.float32)); task.launch_apply_action(task.action_scratch)
                 task.sim.step()
+                if a.traj_dir:
+                    traj.append(task.sim.d.qpos.numpy().copy())
                 if t % 10 == 9:
                     qn = task.sim.d.qpos.numpy(); hag.append(qn[:, 2] - ground(qn[:, 0], qn[:, 1]))
             task.sim.synchronize()
             qf = task.sim.d.qpos.numpy()
             x = (qf[:, 0] - origins[:, 0]).tolist(); z = (qf[:, 2] - origins[:, 2]).tolist()
             hag = np.array(hag)
-            r = {"label": label, "ckpt": path, "src": src, "scan_ordering": order, "level": lv, "columns": cols.tolist(), "x": x, "z": z,
+            r = {"label": label, "ckpt": path, "src": src, "scan_ordering": order, "terrain_collision": a.terrain_collision, "scan_surface": a.scan_surface,
+                 "level": lv, "columns": cols.tolist(), "x": x, "z": z,
                  "hag_final": hag[-1].tolist(), "hag_min": hag.min(0).tolist()}
+            if a.reps > 1:
+                r["reps"] = a.reps; r["jitter"] = a.jitter
             im = os.path.join(a.isaac_play or "", f"L{lv}", label, "meta.json")
-            if a.isaac_play and os.path.exists(im):
+            if a.isaac_play and os.path.exists(im) and a.reps == 1:
                 mi = json.load(open(im)); io0 = np.array(mi["obs0"], np.float32)
                 r["isaac_x"] = mi["final_root_x"]; r["isaac_z"] = mi["final_root_z"]
                 tr = np.load(im.replace("meta.json", "traj.npz")); eo = np.array(mi["env_origins"], np.float32)
@@ -140,6 +164,10 @@ def main():
                 r["head0_max_abs_diff"] = float(np.abs(io0[:, :12] - obs0[:, :12]).max())
                 dsc = np.abs(io0[:, 12 + 3 * nj:] - obs0[:, 12 + 3 * nj:])
                 r["scan0_max_abs_diff_per_env"] = dsc.max(1).tolist(); r["scan0_rays_over_2cm_per_env"] = (dsc > 0.02).sum(1).tolist()
+            if a.traj_dir:
+                os.makedirs(a.traj_dir, exist_ok=True)
+                np.savez(os.path.join(a.traj_dir, f"L{lv}_{label}_{a.terrain_collision.replace(':', '_')}_{a.scan_surface}.npz"),
+                         qpos=np.array(traj), origins=origins)
             print(json.dumps(r), flush=True); results.append(r)
             if a.out:
                 with open(a.out, "a") as f: f.write(json.dumps(r) + "\n")
@@ -149,6 +177,18 @@ def main():
     for r in results:
         print(f"| {r['level']} | {r['label']} | {fmt(r.get('isaac_x'))} | {fmt2(r.get('isaac_hag_final'), r.get('isaac_hag_min'))} | "
               f"{fmt(r['x'])} | {fmt2(r['hag_final'], r['hag_min'])} |")
+    # falls: final pelvis height above the local ground below 0.3 m (standing ~0.66-0.75 m, fallen < 0.1 m)
+    names = {0: "pyramid stairs", 4: "inverted stairs", 9: "boxes", 14: "random rough"}
+    print(f"falls (pelvis above ground < {FALL_HAG} m at the end) per cell type, terrain_collision={a.terrain_collision}, "
+          f"scan_surface={a.scan_surface}, reps={a.reps}:")
+    for c in (0, 4, 9, 14):
+        idx = [i for i, cc in enumerate(cols.tolist()) if cc == c]
+        f = sum(r["hag_final"][i] < FALL_HAG for r in results for i in idx); dx = np.mean([r["x"][i] for r in results for i in idx])
+        print(f"  {names.get(c, c)}: {f} / {len(results) * len(idx)} falls, mean x {dx:.2f} m")
+    print(f"  total: {sum(sum(h < FALL_HAG for h in r['hag_final']) for r in results)} / {len(results) * len(cols)}")
+
+
+FALL_HAG = 0.3
 
 
 if __name__ == "__main__":

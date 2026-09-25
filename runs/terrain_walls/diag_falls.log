@@ -1,0 +1,37 @@
+holder: {"name": "terrain_walls_diag", "kind": "render", "minutes": 15.0, "pid": 56348, "start": 1790350645.996493}
+  waiting [render] terrain_walls_transfer3 est 30.0 min, queued 1016 s ago
+  waiting [low] flex_metal_run2 est 30.0 min, queued 2634 s ago
+  waiting [low] mjw_tp_round4 est 30.0 min, queued 2226 s ago
+| level | policy | Isaac x [m] per env (cols 0/4/9/14) | Isaac pelvis above ground final (min) | MetalSim x | MetalSim pelvis above ground final (min) |
+| 3 | isaac_it500 | 1.04 / 2.28 / 0.51 / 0.83 | 0.66 (0.66) / 0.73 (0.66) / 0.67 (0.67) / 0.72 (0.63) | 2.97 / 0.89 / 1.49 / 0.12 | 0.68 (0.64) / 0.07 (0.07) / 0.63 (0.63) / 0.64 (0.64) |
+| 3 | isaac_it1000 | 1.12 / 3.35 / 0.81 / 1.65 | 0.66 (0.66) / 0.69 (0.65) / 0.67 (0.67) / 0.67 (0.65) | 3.62 / 1.00 / 3.71 / 3.60 | 0.68 (0.63) / 0.05 (0.04) / 0.67 (0.57) / 0.69 (0.65) |
+| 6 | isaac_it500 | 0.56 / 0.35 / 0.94 / 2.34 | 0.68 (0.67) / 0.69 (0.68) / 0.65 (0.65) / 0.70 (0.66) | 1.17 / 1.14 / 2.40 / 2.18 | 0.57 (0.57) / 0.15 (0.05) / 0.66 (0.62) / 0.71 (0.59) |
+| 6 | isaac_it1000 | 0.89 / 3.31 / 2.08 / 1.67 | 0.66 (0.66) / 0.69 (0.63) / 0.61 (0.61) / 0.69 (0.65) | 2.17 / 0.46 / 3.56 / 3.78 | 0.69 (0.56) / 0.03 (0.03) / 0.72 (0.65) / 0.72 (0.64) |
+falls (pelvis above ground < 0.3 m at the end) per cell type, terrain_collision=boxes_local, scan_surface=grid:
+  pyramid stairs: 0 / 4 falls, mean x 2.48 m
+  inverted stairs: 4 / 4 falls, mean x 0.87 m
+  boxes: 0 / 4 falls, mean x 2.79 m
+  random rough: 0 / 4 falls, mean x 2.42 m
+  total: 4 / 16
+| level | policy | Isaac x [m] per env (cols 0/4/9/14) | Isaac pelvis above ground final (min) | MetalSim x | MetalSim pelvis above ground final (min) |
+| 3 | isaac_it500 | 1.04 / 2.28 / 0.51 / 0.83 | 0.66 (0.66) / 0.73 (0.66) / 0.67 (0.67) / 0.72 (0.63) | 1.90 / 0.23 / 2.38 / 0.12 | 0.71 (0.62) / 0.07 (0.05) / 0.68 (0.63) / 0.64 (0.64) |
+| 3 | isaac_it1000 | 1.12 / 3.35 / 0.81 / 1.65 | 0.66 (0.66) / 0.69 (0.65) / 0.67 (0.67) / 0.67 (0.65) | 3.50 / 3.65 / 4.44 / 3.59 | 0.68 (0.63) / 0.68 (0.65) / 0.67 (0.60) / 0.69 (0.65) |
+| 6 | isaac_it500 | 0.56 / 0.35 / 0.94 / 2.34 | 0.68 (0.67) / 0.69 (0.68) / 0.65 (0.65) / 0.70 (0.66) | 1.48 / 3.03 / 2.79 / 2.17 | 0.56 (0.56) / 0.70 (0.64) / 0.85 (0.39) / 0.72 (0.59) |
+| 6 | isaac_it1000 | 0.89 / 3.31 / 2.08 / 1.67 | 0.66 (0.66) / 0.69 (0.63) / 0.61 (0.61) / 0.69 (0.65) | 2.22 / 0.46 / 3.99 / 3.80 | 0.66 (0.58) / 0.03 (0.03) / 0.69 (0.63) / 0.71 (0.64) |
+falls (pelvis above ground < 0.3 m at the end) per cell type, terrain_collision=boxes, scan_surface=grid:
+  pyramid stairs: 0 / 4 falls, mean x 2.28 m
+  inverted stairs: 2 / 4 falls, mean x 1.84 m
+  boxes: 0 / 4 falls, mean x 3.40 m
+  random rough: 0 / 4 falls, mean x 2.42 m
+  total: 2 / 16
+| level | policy | Isaac x [m] per env (cols 0/4/9/14) | Isaac pelvis above ground final (min) | MetalSim x | MetalSim pelvis above ground final (min) |
+| 3 | isaac_it500 | 1.04 / 2.28 / 0.51 / 0.83 | 0.66 (0.66) / 0.73 (0.66) / 0.67 (0.67) / 0.72 (0.63) | 3.14 / 0.22 / 1.47 / 0.12 | 0.71 (0.63) / 0.07 (0.06) / 0.68 (0.66) / 0.64 (0.64) |
+| 3 | isaac_it1000 | 1.12 / 3.35 / 0.81 / 1.65 | 0.66 (0.66) / 0.69 (0.65) / 0.67 (0.67) / 0.67 (0.65) | 4.43 / 0.22 / 0.73 / 3.58 | 0.68 (0.64) / 0.03 (0.03) / 0.02 (0.01) / 0.69 (0.65) |
+| 6 | isaac_it500 | 0.56 / 0.35 / 0.94 / 2.34 | 0.68 (0.67) / 0.69 (0.68) / 0.65 (0.65) / 0.70 (0.66) | 2.16 / 0.19 / 2.04 / 2.20 | 0.67 (0.63) / 0.07 (0.02) / 0.67 (0.64) / 0.70 (0.59) |
+| 6 | isaac_it1000 | 0.89 / 3.31 / 2.08 / 1.67 | 0.66 (0.66) / 0.69 (0.63) / 0.61 (0.61) / 0.69 (0.65) | 4.77 / 0.22 / 2.01 / 3.68 | 0.74 (0.61) / 0.03 (0.03) / 0.65 (0.65) / 0.70 (0.64) |
+falls (pelvis above ground < 0.3 m at the end) per cell type, terrain_collision=hfield, scan_surface=grid, reps=1:
+  pyramid stairs: 0 / 4 falls, mean x 3.63 m
+  inverted stairs: 4 / 4 falls, mean x 0.21 m
+  boxes: 1 / 4 falls, mean x 1.56 m
+  random rough: 0 / 4 falls, mean x 2.39 m
+  total: 5 / 16

@@ -99,6 +99,8 @@ def build_g1_model(terrain: str = "flat", hfield=None, visuals: bool = False, ph
         g = spec.worldbody.add_geom(); g.name = "ground"; g.type = mujoco.mjtGeom.mjGEOM_HFIELD; g.hfieldname = "terrain"
         g.pos = [0.0, 0.0, hfield["zmin"]]       # MuJoCo's surface is data*size_z above the geom: put it at the true heights
         g.friction = [0.8, 0.005, 0.0001]
+        from metalsim.learn.terrain import add_terrain_geoms
+        add_terrain_geoms(spec, hfield, g)       # hfield["collision"]: "hfield" leaves this geom as is; see TERRAIN_COLLISION
     # actuators: Isaac's implicit PD groups (USD drives were not converted)
     joints = [j for j in spec.joints if j.type != mujoco.mjtJoint.mjJNT_FREE]
     for j in joints:
@@ -488,7 +490,8 @@ class G1VelocityTask:
     def __init__(self, n, terrain: str = "flat", seed: int | None = None, height_scan: bool | None = None, device="metal:0",
                  physics_dt: float = PHYSICS_DT, engine: str = "mjwarp", newton_iterations: int = 4, newton_dt: float = 0.00125,
                  newton_kw: dict | None = None,
-                 reward_cfg: str | None = None, scan_ordering: str = "xy"):
+                 reward_cfg: str | None = None, scan_ordering: str = "xy", terrain_collision: str | None = None,
+                 scan_surface: str | None = None):
         """``reward_cfg``: "flat" = Isaac's G1FlatEnvCfg (default on flat terrain): track_ang_vel_z 1.0,
         lin_vel_y in +-0.5, feet_air_time 0.75 x min over feet (xy command norm), lin_vel_z_l2 -0.2 and
         ang_vel_xy_l2 -0.05 in the body frame, dof_torques_l2 -2e-6 and dof_acc_l2 -1e-7 on hips + knees,
@@ -509,13 +512,24 @@ class G1VelocityTask:
         generator seeded with ``seed``; Isaac draws it from the CUDA generator, so the draw itself differs)."""
         if seed is None:
             seed = 42 if terrain != "flat" else 0
+        # rough terrain collision surface and height-scan evaluation (2026-09-25, runs/terrain_walls/): default = Isaac's
+        # trimesh sub-terrains as its own boxes, windowed per world ("boxes_local"; the 0.1 m heightfield, "hfield", turned
+        # Isaac's vertical walls into 0.1 m ramps), and the exact height scan on those cells ("exact"; "grid" = the 0.1 m
+        # interpolation used before). Newton keeps the heightfield (no per-world box window there).
+        if terrain_collision is None:
+            terrain_collision = "boxes_local" if (engine == "mjwarp" and terrain != "flat") else "hfield"
+        if scan_surface is None:
+            scan_surface = "exact"
+        self.terrain_collision, self.scan_surface = terrain_collision, scan_surface
         self.n, self.seed, self.device = n, seed, device
         self.terrain_kind = terrain
         self.hfield = None
         self.use_scan = (terrain != "flat") if height_scan is None else height_scan
         if terrain != "flat":
             from metalsim.learn.terrain import isaac_rough_terrain
-            self.hfield = isaac_rough_terrain(seed=seed)
+            # terrain_collision: the collision surface (metalsim.learn.terrain.TERRAIN_COLLISION); the height scan reads
+            # the exact 0.1 m grid in every mode
+            self.hfield = isaac_rough_terrain(seed=seed, collision=terrain_collision)
         self.engine = engine
         if engine not in ("mjwarp", "newton"):
             raise ValueError(f"engine must be 'mjwarp' or 'newton', not {engine!r}")
@@ -533,8 +547,16 @@ class G1VelocityTask:
             self.decimation = int(round(CONTROL_DT / physics_dt))
             # contact capacity: 3 colliders x <= 4 kept contacts per pair; MuJoCo Warp's heightfield default
             # (256 per world) sizes GPU scratch by naconmax and exhausts memory at 4096 worlds
-            self.sim = BatchSim(m, n, options=BatchSimOptions(substeps=self.decimation, njmax=256, nconmax=32,
-                                                              solver_iterations=10, ls_iterations=20))
+            # box / fine-heightfield terrains: a foot can touch several boxes (up to 4 contacts per box-mesh pair), and
+            # MuJoCo C's initial contact set on them (checked by put_data) reaches 37 (boxes) / 100 (0.025 m hfield)
+            nconmax = 32 if terrain_collision == "hfield" else 128
+            pwf = ()
+            if terrain_collision == "boxes_local":        # per-world terrain box slots (metalsim.learn.terrain.BoxWindow)
+                from metalsim.learn.terrain import BoxWindow
+                pwf = BoxWindow.FIELDS
+            njmax = 256 if terrain_collision in ("hfield", "boxes", "meshes", "boxes_local") else 512   # C's initial set on 0.025 m: 400 rows
+            self.sim = BatchSim(m, n, options=BatchSimOptions(substeps=self.decimation, njmax=njmax, nconmax=nconmax,
+                                                              solver_iterations=10, ls_iterations=20, per_world_fields=pwf))
         self.max_t = int(EPISODE_S / CONTROL_DT)
         self.n_scan = 187 if self.use_scan else 0
         self.obs_dim = 12 + 3 * self.nj + self.n_scan
@@ -606,7 +628,8 @@ class G1VelocityTask:
         self.scanner = None
         if self.use_scan:
             from metalsim.learn.terrain import HeightScanner
-            self.scanner = HeightScanner(self, self.hfield, ordering=scan_ordering)   # "xy" = Isaac's ray order
+            self.scanner = HeightScanner(self, self.hfield, ordering=scan_ordering,   # "xy" = Isaac's ray order
+                                         surface=scan_surface)   # "exact": Isaac's walls off the grid on box-built cells
         # contact history window: Isaac's ContactSensor keeps 3 physics steps of 5 ms (15 ms); here the same
         # 15 ms, round(15 ms / dt) substeps (6 at 2.5 ms)
         self.hist_substeps = max(1, min(self.decimation, int(round(0.015 / self.physics_dt))))
@@ -624,6 +647,16 @@ class G1VelocityTask:
                                          history_length=self.hist_substeps, track_air_time=True, force_threshold=1.0)
             self.use_sensor = 1
         self._dummy2 = z((n, 2))
+        self.box_window = None
+        if engine == "mjwarp" and terrain_collision == "boxes_local":
+            from metalsim.learn.terrain import BoxWindow
+            self.box_window = BoxWindow(self.sim, self.hfield, device=device)
+            self.sim.add_substep_hook(self.box_window.launch)          # current after every substep
+            _apply = self.launch_apply_action                            # and before every control step (after resets)
+            def _apply_and_window(action, _apply=_apply):
+                _apply(action); self.box_window.launch()
+            self.launch_apply_action = _apply_and_window
+            self.box_window.launch()
         self.sim.synchronize()
         # start from the initial pose everywhere
         self.pol_step = None
@@ -779,11 +812,12 @@ def g1_ppo_config(terrain: str, iterations: int, seed: int = 0):
 
 
 def train_g1(n=4096, terrain="flat", iterations=1500, seed=None, log_path=None, checkpoint=None, physics_dt=PHYSICS_DT,
-             engine="mjwarp", newton_iterations=4, newton_dt=0.00125, newton_kw=None, reward_cfg=None, scan_ordering="xy"):
+             engine="mjwarp", newton_iterations=4, newton_dt=0.00125, newton_kw=None, reward_cfg=None, scan_ordering="xy",
+             terrain_collision=None, scan_surface=None):
     from metalsim.learn.ppo_warp import PPOWarp
     task = G1VelocityTask(n, terrain=terrain, seed=seed, physics_dt=physics_dt, engine=engine,
                           newton_iterations=newton_iterations, newton_dt=newton_dt, newton_kw=newton_kw, reward_cfg=reward_cfg,
-                          scan_ordering=scan_ordering)
+                          scan_ordering=scan_ordering, terrain_collision=terrain_collision, scan_surface=scan_surface)
     seed = task.seed                     # None -> the task's default (42 rough, Isaac's; 0 flat)
     algo = PPOWarp(task, g1_ppo_config(terrain, iterations, seed))
     f = open(log_path, "a") if log_path else None
@@ -794,11 +828,13 @@ def train_g1(n=4096, terrain="flat", iterations=1500, seed=None, log_path=None, 
     eng = f"newton XPBD {newton_iterations} it {newton_kw or ''}" if engine == "newton" else "mjwarp"
     log(f"G1 {terrain} PPO: N={n} obs_dim {task.obs_dim} act_dim {task.act_dim} rollout 24 x {iterations} iterations, engine {eng}, "
         f"physics dt {task.physics_dt} (decimation {task.decimation}), seed {seed}, reward_cfg {task.reward_cfg}, "
-        f"height-scan ray order {task.scanner.ordering if task.scanner is not None else '-'}")
+        f"height-scan ray order {task.scanner.ordering if task.scanner is not None else '-'}, terrain collision "
+        f"{task.terrain_collision}, height scan {task.scan_surface}")
     def save(path, it):
         torch.save({"net": algo.net.state_dict(), "terrain": terrain, "n": n, "iterations": it, "obs_dim": task.obs_dim,
                     "act_dim": task.act_dim, "hidden": algo.cfg.hidden, "engine": engine, "reward_cfg": task.reward_cfg,
-                    "scan_ordering": task.scanner.ordering if task.scanner is not None else None}, path)
+                    "scan_ordering": task.scanner.ordering if task.scanner is not None else None,
+                    "terrain_collision": task.terrain_collision, "scan_surface": task.scan_surface}, path)
     def cb(it, a):
         if checkpoint and it % 100 == 0:
             save(checkpoint.replace(".pt", f"_it{it}.pt"), it)
@@ -817,7 +853,8 @@ if __name__ == "__main__":
     import sys
     wp.config.quiet = True
     # optional flags (any position): --engine mjwarp|newton, --newton_it N, --newton_dt S
-    opts = {"--engine": "mjwarp", "--newton_it": "4", "--newton_dt": "0.00125", "--newton_limit_margin": "0.15", "--newton_kw": "", "--seed": "0", "--reward_cfg": "", "--scan_ordering": "xy"}
+    opts = {"--engine": "mjwarp", "--newton_it": "4", "--newton_dt": "0.00125", "--newton_limit_margin": "0.15", "--newton_kw": "", "--seed": "0", "--reward_cfg": "", "--scan_ordering": "xy",
+            "--terrain_collision": "", "--scan_surface": ""}
     for k in list(opts):
         if k in sys.argv:
             i = sys.argv.index(k); opts[k] = sys.argv[i + 1]; del sys.argv[i:i + 2]
@@ -832,7 +869,8 @@ if __name__ == "__main__":
         train_g1(n, terrain, int(sys.argv[4]) if len(sys.argv) > 4 else 1500, log_path=sys.argv[5] if len(sys.argv) > 5 else None,
                  checkpoint=sys.argv[6] if len(sys.argv) > 6 and sys.argv[6] != "-" else None,
                  physics_dt=float(sys.argv[7]) if len(sys.argv) > 7 else PHYSICS_DT, seed=int(opts["--seed"]),
-                 reward_cfg=opts["--reward_cfg"] or None, scan_ordering=opts["--scan_ordering"], **ekw)
+                 reward_cfg=opts["--reward_cfg"] or None, scan_ordering=opts["--scan_ordering"],
+                 terrain_collision=opts["--terrain_collision"] or None, scan_surface=opts["--scan_surface"] or None, **ekw)
         sys.exit(0)
     task = G1VelocityTask(n, terrain=terrain, physics_dt=float(sys.argv[3]) if len(sys.argv) > 3 else PHYSICS_DT, **ekw)
     print(f"G1 ({terrain}, {task.engine}, physics dt {task.physics_dt}): nbody {task.model.nbody} nv {task.model.nv} nu {task.model.nu} ngeom {task.model.ngeom} obs_dim {task.obs_dim}")
