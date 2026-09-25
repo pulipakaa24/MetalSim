@@ -1,0 +1,343 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+117 tests selected
+test_count_override_slices_frequency_arrays (newton.tests.test_coupled_solver.TestModelView.test_count_override_slices_frequency_arrays)
+Frequency-matched arrays should follow view-local counts. ... Module validate_and_correct_inertia_kernel_fabf4b5a 9ce7e99 load on device 'cpu' took 0.84 ms  (cached)
+Module newton._src.geometry.bvh 0faa6b5 load on device 'cpu' took 0.28 ms  (cached)
+ok
+test_disable_body_dynamics (newton.tests.test_coupled_solver.TestModelView.test_disable_body_dynamics)
+disable_body_dynamics should zero inverse inertia without changing flags. ... Module newton._src.solvers.coupled.model_view d783cf3 load on device 'cpu' took 0.29 ms  (cached)
+ok
+test_disable_joints_rewrites_cable_type_in_view (newton.tests.test_coupled_solver.TestModelView.test_disable_joints_rewrites_cable_type_in_view)
+disable_joints should expose disabled cable joints as D6 in the view. ... ok
+test_disable_particles (newton.tests.test_coupled_solver.TestModelView.test_disable_particles)
+disable_particles should clear only view-local active flags. ... ok
+test_fallback_to_parent (newton.tests.test_coupled_solver.TestModelView.test_fallback_to_parent)
+Unoverridden attributes should come from the parent model. ... ok
+test_mark_proxy_bodies (newton.tests.test_coupled_solver.TestModelView.test_mark_proxy_bodies)
+mark_proxy_bodies should mark only the view-local body flags. ... ok
+test_override (newton.tests.test_coupled_solver.TestModelView.test_override)
+Overridden attributes should take precedence. ... ok
+test_override_accepts_set_subclass_parent (newton.tests.test_coupled_solver.TestModelView.test_override_accepts_set_subclass_parent)
+Set overrides should accept a native set when the parent uses a set subclass. ... ok
+test_set_body_inertial_properties (newton.tests.test_coupled_solver.TestModelView.test_set_body_inertial_properties)
+set_body_inertial_properties should replace mass and full inertia. ... ok
+test_set_body_mass_rejects_static_to_dynamic_without_inertia (newton.tests.test_coupled_solver.TestModelView.test_set_body_mass_rejects_static_to_dynamic_without_inertia)
+set_body_mass should not create finite mass with zero inertia. ... ok
+test_setattr_allows_none_when_parent_is_array (newton.tests.test_coupled_solver.TestModelView.test_setattr_allows_none_when_parent_is_array) ... ok
+test_setattr_rejects_device_mismatch (newton.tests.test_coupled_solver.TestModelView.test_setattr_rejects_device_mismatch) ... skipped 'Requires CUDA'
+test_setattr_rejects_dtype_mismatch (newton.tests.test_coupled_solver.TestModelView.test_setattr_rejects_dtype_mismatch) ... ok
+test_setattr_rejects_ndim_mismatch (newton.tests.test_coupled_solver.TestModelView.test_setattr_rejects_ndim_mismatch) ... ok
+test_setattr_rejects_unknown_name (newton.tests.test_coupled_solver.TestModelView.test_setattr_rejects_unknown_name) ... ok
+test_setattr_rejects_wrong_python_type (newton.tests.test_coupled_solver.TestModelView.test_setattr_rejects_wrong_python_type) ... ok
+test_state_creation (newton.tests.test_coupled_solver.TestModelView.test_state_creation)
+view.state() should create a valid State. ... ok
+test_state_creation_respects_view_count_overrides (newton.tests.test_coupled_solver.TestModelView.test_state_creation_respects_view_count_overrides)
+view.state() should size state arrays from view-local counts. ... ok
+test_state_creation_respects_view_zero_count (newton.tests.test_coupled_solver.TestModelView.test_state_creation_respects_view_zero_count)
+view.state() should clear state fields hidden by view-local counts. ... ok
+test_state_creation_uses_view_overrides (newton.tests.test_coupled_solver.TestModelView.test_state_creation_uses_view_overrides)
+view.state() should clone state-relevant view-local arrays. ... ok
+test_zero_count_override_exposes_empty_frequency_arrays (newton.tests.test_coupled_solver.TestModelView.test_zero_count_override_exposes_empty_frequency_arrays)
+Zero-count views should expose empty arrays, not parent arrays. ... ok
+test_zero_particle_mass (newton.tests.test_coupled_solver.TestModelView.test_zero_particle_mass)
+zero_particle_mass should zero forward and inverse mass arrays. ... ok
+test_compact_shape_namespace_option_is_not_exposed (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_compact_shape_namespace_option_is_not_exposed)
+Coupled entries should use the shared global shape namespace. ... ok
+test_compacted_joint_targets_use_local_layout (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_compacted_joint_targets_use_local_layout)
+Joint targets and their derived starts should use compact layout. ... ERROR
+test_compaction_fallback_reports_reason (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_compaction_fallback_reports_reason) ... ok
+test_configure_view_applies_after_compaction (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_configure_view_applies_after_compaction) ... Module newton._src.utils.mesh 8c2dee7 load on device 'cpu' took 0.34 ms  (cached)
+ok
+test_custom_control_arrays_are_mapped_to_entries (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_custom_control_arrays_are_mapped_to_entries)
+Custom CONTROL attributes should follow their compact frequency map. ... Module newton._src.solvers.coupled.solver_coupled 461260c load on device 'cpu' took 0.33 ms  (cached)
+ok
+test_duplicate_shape_ownership_is_rejected (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_duplicate_shape_ownership_is_rejected) ... ok
+test_entries_preserve_global_shape_ids_by_default (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_entries_preserve_global_shape_ids_by_default)
+Entry shape views should keep global shape arrays with hidden dummies. ... ok
+test_entry_contacts_preserves_contact_matching_mode (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_entry_contacts_preserves_contact_matching_mode)
+Preserve matching mode metadata when coupled entry buffers are reused. ... Module newton._src.sim.collide 2cf7092 load on device 'cpu' took 0.32 ms  (cached)
+Module newton._src.geometry.broad_phase_nxn e19637b load on device 'cpu' took 0.26 ms  (cached)
+Module narrow_phase_primitive_write_contact dc8210d load on device 'cpu' took 0.27 ms  (cached)
+Module narrow_phase_gjk_mpr_True_write_contact_support_map_lean_post_process_minkowski_only 9462a6d load on device 'cpu' took 0.33 ms  (cached)
+Module newton._src.geometry.narrow_phase d3e35a0 load on device 'cpu' took 0.27 ms  (cached)
+Module newton._src.geometry.contact_match 5de910a load on device 'cpu' took 0.27 ms  (cached)
+Module newton._src.geometry.contact_sort 1142c97 load on device 'cpu' took 0.24 ms  (cached)
+ok
+test_entry_control_arrays_are_mapped_to_local_dofs (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_entry_control_arrays_are_mapped_to_local_dofs)
+Entry solvers should receive control arrays in their local DOF namespace. ... ok
+test_entry_in_place_steps_same_state (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_entry_in_place_steps_same_state)
+Entries can opt into same-object state input/output stepping. ... Module newton.tests.test_coupled_solver c6d4251 load on device 'cpu' took 0.37 ms  (cached)
+ok
+test_entry_in_place_substeps_same_state (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_entry_in_place_substeps_same_state)
+In-place entries can substep without allocating scratch states. ... ok
+test_entry_shapes_filter_shape_contact_pairs (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_entry_shapes_filter_shape_contact_pairs)
+Entry shape masks should prune explicit contact pairs in each view. ... ok
+test_full_surface_contacts_degrade_per_entry (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_full_surface_contacts_degrade_per_entry)
+Keep only particle contacts for an unsupported entry. ... ok
+test_full_surface_records_straddling_entries_are_dropped (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_full_surface_records_straddling_entries_are_dropped)
+Drop a full-surface record spanning two capable entries. ... ok
+test_full_surface_records_survive_the_entry_filter (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_full_surface_records_survive_the_entry_filter)
+Keep a full-surface record owned by a capable entry. ... ok
+test_notify_model_changed_refreshes_compacted_properties (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_notify_model_changed_refreshes_compacted_properties)
+Runtime parent property changes should reach compact model arrays. ... ok
+test_notify_model_changed_refreshes_view_inertial_masks (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_notify_model_changed_refreshes_view_inertial_masks)
+Runtime parent inertial edits should refresh derived view masks. ... ok
+test_particle_entry_without_shapes_keeps_global_static_shapes (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_particle_entry_without_shapes_keeps_global_static_shapes)
+Particle-only entries should inherit global static shapes by default. ... ok
+test_particle_views_deactivate_non_owned_particles (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_particle_views_deactivate_non_owned_particles)
+Each particle owner view should expose only its owned particles as active. ... ok
+test_particles_keep_global_connectivity_while_rigid_domains_compact (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_particles_keep_global_connectivity_while_rigid_domains_compact)
+Particle identity mappings must not prevent independent rigid compaction. ... ok
+test_preserved_global_shape_ids_remap_hidden_shapes_in_mixed_views (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_preserved_global_shape_ids_remap_hidden_shapes_in_mixed_views)
+Preserved shape ids should not leave hidden shapes attached to omitted bodies. ... ok
+test_proxy_collision_contacts_bypass_preserved_shape_filter (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_proxy_collision_contacts_bypass_preserved_shape_filter)
+Proxy-local contacts are already generated in the destination view. ... Module newton._src.solvers.coupled.interface 05475dc load on device 'cpu' took 0.41 ms  (cached)
+Module newton._src.solvers.coupled.proxy_utils 4de29d2 load on device 'cpu' took 0.29 ms  (cached)
+Module _copy_reset_view_rows_kernel_657d05d9 b87087f load on device 'cpu' took 0.26 ms  (cached)
+Module _copy_reset_view_rows_kernel_657d05d9 0062f49 load on device 'cpu' took 0.26 ms  (cached)
+Module _zero_reset_view_rows_kernel_3d9404f7 f9e3da3 load on device 'cpu' took 0.24 ms  (cached)
+Module _reset_proxy_values_masked_kernel_75bd47aa 706de24 load on device 'cpu' took 0.25 ms  (cached)
+ok
+test_proxy_coupling_rejects_destination_owned_proxy_body (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_proxy_coupling_rejects_destination_owned_proxy_body)
+Proxy body ids must not alias bodies owned by the destination. ... ok
+test_proxy_coupling_rejects_destination_owned_proxy_particle (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_proxy_coupling_rejects_destination_owned_proxy_particle)
+Proxy particle ids must not alias particles owned by the destination. ... ok
+test_proxy_coupling_rejects_invalid_numerical_config (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_proxy_coupling_rejects_invalid_numerical_config) ... ok
+test_proxy_coupling_rejects_more_than_two_entries (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_proxy_coupling_rejects_more_than_two_entries)
+Generic proxy coupling is currently limited to one solver pair. ... ok
+test_proxy_coupling_rejects_unowned_source_body (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_proxy_coupling_rejects_unowned_source_body) ... ok
+test_proxy_destination_view_marks_proxy_flags (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_proxy_destination_view_marks_proxy_flags)
+Proxy destination views should expose proxy bodies through body_flags. ... ok
+test_proxy_harvest_uses_filtered_preserved_shape_contacts (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_proxy_harvest_uses_filtered_preserved_shape_contacts)
+Custom proxy harvest should receive the contacts used by the step. ... ok
+test_proxy_shape_visibility_keeps_proxy_contact_pairs (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_proxy_shape_visibility_keeps_proxy_contact_pairs)
+Proxy destination views should keep shape pairs touching proxy bodies. ... ok
+test_rejects_solver_without_coupling_interface_during_construction (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_rejects_solver_without_coupling_interface_during_construction) ... ok
+test_soft_contact_filter_preserves_unified_fields_cpu (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_soft_contact_filter_preserves_unified_fields_cpu) ... ok
+test_step (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_step)
+SolverCoupled.step() should advance both bodies. ... Module newton._src.solvers.semi_implicit.kernels_contact 88192bb load on device 'cpu' took 0.40 ms  (cached)
+Module newton._src.solvers.solver 8d2ecf9 load on device 'cpu' took 0.28 ms  (cached)
+ok
+test_body_proxy_aitken_relaxation_converges_affine_fixed_point (newton.tests.test_coupled_solver.TestSolverCoupledBodyProxyInertia.test_body_proxy_aitken_relaxation_converges_affine_fixed_point) ... Module newton._src.solvers.coupled.solver_coupled_proxy 8b0b580 load on device 'cpu' took 0.30 ms  (cached)
+Module newton._src.solvers.coupled.proxy_utils a191a51 load on device 'cpu' took 0.25 ms  (cached)
+Module newton._src.solvers.coupled.solver_coupled_proxy a752b12 load on device 'cpu' took 0.23 ms  (cached)
+Module newton._src.solvers.coupled.solver_coupled_proxy 713fee2 load on device 'cpu' took 0.23 ms  (cached)
+ok
+test_body_proxy_feedback_relaxation_blends_next_step_force_input (newton.tests.test_coupled_solver.TestSolverCoupledBodyProxyInertia.test_body_proxy_feedback_relaxation_blends_next_step_force_input) ... Module newton._src.solvers.coupled.proxy_utils 0c32482 load on device 'cpu' took 0.28 ms  (cached)
+ok
+test_body_proxy_maps_proxy_indexed_feedback_to_source (newton.tests.test_coupled_solver.TestSolverCoupledBodyProxyInertia.test_body_proxy_maps_proxy_indexed_feedback_to_source) ... ok
+test_cross_world_body_proxy_mapping_is_rejected (newton.tests.test_coupled_solver.TestSolverCoupledBodyProxyInertia.test_cross_world_body_proxy_mapping_is_rejected) ... ok
+test_duplicate_body_proxy_mapping_ids_are_rejected (newton.tests.test_coupled_solver.TestSolverCoupledBodyProxyInertia.test_duplicate_body_proxy_mapping_ids_are_rejected) ... ok
+test_masked_reset_preserves_other_world_proxy_history (newton.tests.test_coupled_solver.TestSolverCoupledBodyProxyInertia.test_masked_reset_preserves_other_world_proxy_history)
+Verify masked reset preserves other world proxy history. ... ok
+test_graph_capture_setup_stays_solver_specific (newton.tests.test_coupled_solver.TestSolverCoupledContactsAndMPM.test_graph_capture_setup_stays_solver_specific)
+Verify coupled solvers do not expose a generic graph protocol. ... ok
+test_implicit_mpm_reset_syncs_namespaced_non_in_place_state (newton.tests.test_coupled_solver.TestSolverCoupledContactsAndMPM.test_implicit_mpm_reset_syncs_namespaced_non_in_place_state)
+Verify coupled reset mirrors MPM history into the non-in-place output state. ... Module newton._src.solvers.implicit_mpm.implicit_mpm_model 1008cb2 load on device 'cpu' took 0.33 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.mark_active_cells_by_environment_bb36e7a9 e326301 load on device 'cpu' took 0.30 ms  (cached)
+Module warp.fem.utils c7f477f load on device 'cpu' took 0.27 ms  (cached)
+Module warp._src.fem.quadrature.pic_quadrature.dyn.bin_particles_cfec66a0 6ccd55f load on device 'cpu' took 0.31 ms  (cached)
+Module warp._src.fem.quadrature.pic_quadrature.dyn.finalize_cell_particle_data_6af46dcb ffa9323 load on device 'cpu' took 0.27 ms  (cached)
+Module warp._src.fem.space.partition.dyn.node_environment_from_cells_kernel_ed0ac23a 67eafa0 load on device 'cpu' took 0.28 ms  (cached)
+Module warp.fem.space.partition a1ed25e load on device 'cpu' took 0.25 ms  (cached)
+Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_79dea625 8fb205b load on device 'cpu' took 0.25 ms  (cached)
+Module warp.fem.space.restriction 769a634 load on device 'cpu' took 0.24 ms  (cached)
+Module warp._src.fem.space.partition.dyn.node_environment_from_cells_kernel_57e40d57 218f570 load on device 'cpu' took 0.25 ms  (cached)
+Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_0c9a3b15 4d44213 load on device 'cpu' took 0.24 ms  (cached)
+Module warp._src.fem.space.partition.dyn.node_environment_from_cells_kernel_73555e75 f23d9cd load on device 'cpu' took 0.25 ms  (cached)
+Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_76730fc2 7e25242 load on device 'cpu' took 0.24 ms  (cached)
+Module _copy_reset_view_rows_kernel_657d05d9 a26ddc5 load on device 'cpu' took 0.33 ms  (cached)
+Module reset_mpm_grid_warmstart_05290b9e 0c53f25 load on device 'cpu' took 0.25 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels e0e5f0f load on device 'cpu' took 0.28 ms  (cached)
+Module _copy_reset_view_rows_kernel_657d05d9 4754c3d load on device 'cpu' took 0.24 ms  (cached)
+Module _copy_reset_view_rows_kernel_657d05d9 dbb3560 load on device 'cpu' took 0.24 ms  (cached)
+Module _zero_reset_view_rows_kernel_3d9404f7 d9d87db load on device 'cpu' took 0.25 ms  (cached)
+Module _scatter_reset_owned_rows_kernel_f55f6b40 1c2dd13 load on device 'cpu' took 0.23 ms  (cached)
+Module _scatter_reset_owned_rows_kernel_f55f6b40 ecfa1eb load on device 'cpu' took 0.24 ms  (cached)
+Module _scatter_reset_owned_rows_kernel_f55f6b40 35e76f6 load on device 'cpu' took 0.24 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.integrate_fraction_a6ee64f2 3835637 load on device 'cpu' took 0.28 ms  (cached)
+Module newton._src.solvers.implicit_mpm.rasterized_collisions.world_position_23c70758 2ae6621 load on device 'cpu' took 0.25 ms  (cached)
+Module newton._src.solvers.implicit_mpm.rasterized_collisions fc44406 load on device 'cpu' took 0.27 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.collision_weight_field_9442c602 1c81668 load on device 'cpu' took 0.27 ms  (cached)
+Module _bsr_accumulate_triplet_values_d510c63e a32d844 load on device 'cpu' took 0.24 ms  (cached)
+Module warp._src.fem.quadrature.quadrature.dyn.quadrature_point_element_indices_a241bf50 a8ee91e load on device 'cpu' took 0.27 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.integrate_velocity_9f664bb6 30144e6 load on device 'cpu' took 0.25 ms  (cached)
+Module warp._src.fem.field.virtual.dyn.dispatch_linear_kernel_fn_9e27db3d 862e9d0 load on device 'cpu' took 0.25 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.integrate_mass_677591ad 091162c load on device 'cpu' took 0.22 ms  (cached)
+Module warp._src.fem.field.virtual.dyn.dispatch_linear_kernel_fn_f3f4973f 1f72fce load on device 'cpu' took 0.23 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.integrate_yield_parameters_082200be 8fa4dbe load on device 'cpu' took 0.27 ms  (cached)
+Module warp._src.fem.field.virtual.dyn.dispatch_linear_kernel_fn_b053158e ba6c0ed load on device 'cpu' took 0.25 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.integrate_active_fraction_b9588c00 1c07f64 load on device 'cpu' took 0.26 ms  (cached)
+Module warp._src.fem.field.virtual.dyn.dispatch_linear_kernel_fn_c50d160f b152fb8 load on device 'cpu' took 0.26 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.strain_delta_form_6c06d6fe bf6c868 load on device 'cpu' took 0.27 ms  (cached)
+Module warp._src.fem.field.virtual.dyn.dispatch_bilinear_kernel_fn_115115c5 f9713a4 load on device 'cpu' took 0.26 ms  (cached)
+Module warp.fem.integrate._identity_field_2580ad44 cb8660b load on device 'cpu' took 0.26 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.mass_form_4ee6bab2 12be8f5 load on device 'cpu' took 0.26 ms  (cached)
+Module warp._src.fem.field.virtual.dyn.dispatch_bilinear_kernel_fn_7d02e51b ae79b85 load on device 'cpu' took 0.26 ms  (cached)
+Module warp.sparse 26ecbcc load on device 'cpu' took 0.27 ms  (cached)
+Module _bsr_assign_copy_blocks_7e66096f 7e1be23 load on device 'cpu' took 0.24 ms  (cached)
+Module compute_eigenvalues_3f6d0f4e d63483e load on device 'cpu' took 0.24 ms  (cached)
+Module inverse_scale_vector_b73b086f 84f2102 load on device 'cpu' took 0.24 ms  (cached)
+Module _bsr_transpose_values_6034e41a d835489 load on device 'cpu' took 0.25 ms  (cached)
+Module newton._src.solvers.implicit_mpm.contact_solver_kernels cfb11f0 load on device 'cpu' took 0.25 ms  (cached)
+Module newton._src.solvers.implicit_mpm.rheology_solver_kernels e950982 load on device 'cpu' took 0.44 ms  (cached)
+Module newton._src.solvers.implicit_mpm.solve_rheology fb994d0 load on device 'cpu' took 0.29 ms  (cached)
+Module newton._src.solvers.implicit_mpm.rheology_solver_kernels.dyn.jacobi_solve_kernel_impl_64867ed4 c3a08ee load on device 'cpu' took 0.27 ms  (cached)
+Module scatter_field_dof_values_3c04967b ecbf7ef load on device 'cpu' took 0.26 ms  (cached)
+Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_72a131a5 2421bd5 load on device 'cpu' took 0.25 ms  (cached)
+Module warp.fem.integrate._identity_field_811de68a 0b1bf00 load on device 'cpu' took 0.28 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_b0d8483b c8a4d1f load on device 'cpu' took 0.32 ms  (cached)
+ok
+test_compacted_articulation_end_excludes_loop_joint (newton.tests.test_coupled_solver.TestSolverCoupledMuJoCoVBDMultiEnv.test_compacted_articulation_end_excludes_loop_joint) ... ok
+test_compacted_multi_world_articulation_end_is_rebased (newton.tests.test_coupled_solver.TestSolverCoupledMuJoCoVBDMultiEnv.test_compacted_multi_world_articulation_end_is_rebased)
+articulation_end must be rebased to local joint ids, matching articulation_start. ... Module warp._src.coloring 7d28b1b load on device 'cpu' took 0.36 ms  (cached)
+ok
+test_cross_world_particle_proxy_mapping_is_rejected (newton.tests.test_coupled_solver.TestSolverCoupledParticleProxy.test_cross_world_particle_proxy_mapping_is_rejected)
+Verify cross world particle proxy mapping is rejected. ... ok
+test_duplicate_particle_proxy_mapping_ids_are_rejected (newton.tests.test_coupled_solver.TestSolverCoupledParticleProxy.test_duplicate_particle_proxy_mapping_ids_are_rejected) ... ok
+test_global_mask_resets_global_proxy_history (newton.tests.test_coupled_solver.TestSolverCoupledParticleProxy.test_global_mask_resets_global_proxy_history)
+Reset global proxy history through the final world-mask entry. ... Module _reset_proxy_values_masked_kernel_75bd47aa 7228066 load on device 'cpu' took 0.32 ms  (cached)
+ok
+test_masked_reset_preserves_other_world_proxy_history (newton.tests.test_coupled_solver.TestSolverCoupledParticleProxy.test_masked_reset_preserves_other_world_proxy_history)
+Verify masked reset preserves other world proxy history. ... ok
+test_particle_proxy_aitken_relaxation_kernels (newton.tests.test_coupled_solver.TestSolverCoupledParticleProxy.test_particle_proxy_aitken_relaxation_kernels) ... Module newton._src.solvers.coupled.proxy_utils 373065f load on device 'cpu' took 0.30 ms  (cached)
+Module newton._src.solvers.coupled.solver_coupled_proxy b8d5c5b load on device 'cpu' took 0.27 ms  (cached)
+Module newton._src.solvers.coupled.solver_coupled_proxy 9af6ebf load on device 'cpu' took 0.26 ms  (cached)
+ok
+test_particle_proxy_feedback_is_applied_on_next_step (newton.tests.test_coupled_solver.TestSolverCoupledParticleProxy.test_particle_proxy_feedback_is_applied_on_next_step) ... ok
+test_particle_proxy_feedback_overrelaxation_is_applied_on_next_step (newton.tests.test_coupled_solver.TestSolverCoupledParticleProxy.test_particle_proxy_feedback_overrelaxation_is_applied_on_next_step) ... Module newton._src.solvers.coupled.proxy_utils 65abe03 load on device 'cpu' took 0.35 ms  (cached)
+ok
+test_particle_proxy_feedback_relaxation_handles_zeroing_custom_harvest (newton.tests.test_coupled_solver.TestSolverCoupledParticleProxy.test_particle_proxy_feedback_relaxation_handles_zeroing_custom_harvest) ... ok
+test_particle_proxy_maps_proxy_indexed_feedback_to_source (newton.tests.test_coupled_solver.TestSolverCoupledParticleProxy.test_particle_proxy_maps_proxy_indexed_feedback_to_source) ... ok
+test_proxy_destination_view_keeps_and_scales_particle_mass (newton.tests.test_coupled_solver.TestSolverCoupledParticleProxy.test_proxy_destination_view_keeps_and_scales_particle_mass) ... ok
+test_proxy_destination_view_marks_proxy_particle_flags (newton.tests.test_coupled_solver.TestSolverCoupledParticleProxy.test_proxy_destination_view_marks_proxy_particle_flags) ... ok
+test_xpbd_ignores_proxy_particle_proxy_body_contacts (newton.tests.test_coupled_solver.TestSolverCoupledParticleProxy.test_xpbd_ignores_proxy_particle_proxy_body_contacts) ... Module newton._src.geometry.kernels 1bee81f load on device 'cpu' took 0.41 ms  (cached)
+Module newton._src.solvers.xpbd.kernels 42f258a load on device 'cpu' took 0.32 ms  (cached)
+ok
+test_xpbd_ignores_proxy_proxy_particle_contacts (newton.tests.test_coupled_solver.TestSolverCoupledParticleProxy.test_xpbd_ignores_proxy_proxy_particle_contacts) ... ok
+test_xpbd_ignores_proxy_static_particle_contacts (newton.tests.test_coupled_solver.TestSolverCoupledParticleProxy.test_xpbd_ignores_proxy_static_particle_contacts) ... ok
+test_aliased_proxy_joint_copies_control_target_each_iteration (newton.tests.test_coupled_solver.TestSolverCoupledProxyJoints.test_aliased_proxy_joint_copies_control_target_each_iteration) ... ok
+test_mask_is_forwarded_without_touching_unselected_rows (newton.tests.test_coupled_solver.TestSolverCoupledResetMask.test_mask_is_forwarded_without_touching_unselected_rows)
+Normalize once, then preserve unselected state and history. ... Module _scatter_reset_owned_rows_kernel_f55f6b40 ef80def load on device 'cpu' took 0.41 ms  (cached)
+ok
+test_missing_reset_inputs_zero_selected_transform_and_scalar_rows (newton.tests.test_coupled_solver.TestSolverCoupledResetMask.test_missing_reset_inputs_zero_selected_transform_and_scalar_rows)
+Zero selected transform and scalar rows when reset inputs are missing. ... Module _zero_reset_view_rows_kernel_3d9404f7 9311f57 load on device 'cpu' took 0.30 ms  (cached)
+Module _zero_reset_view_rows_kernel_3d9404f7 c69d4f3 load on device 'cpu' took 0.26 ms  (cached)
+ok
+test_registered_state_attributes_follow_compact_masked_reset (newton.tests.test_coupled_solver.TestSolverCoupledResetMask.test_registered_state_attributes_follow_compact_masked_reset)
+Synchronize selected custom STATE rows through compact entry mappings. ... ok
+test_compacted_custom_frequency_namespace_metadata_is_generic (newton.tests.test_coupled_solver.TestSolverCoupledVBDColoring.test_compacted_custom_frequency_namespace_metadata_is_generic) ... ok
+test_compacted_custom_namespace_does_not_mutate_parent (newton.tests.test_coupled_solver.TestSolverCoupledVBDColoring.test_compacted_custom_namespace_does_not_mutate_parent)
+Compacted entry namespaces must be view-local, not parent aliases. ... Module newton._src.solvers.vbd.rigid_vbd_kernels 116efd1 load on device 'cpu' took 0.38 ms  (cached)
+ok
+test_compacted_vbd_entry_color_groups_are_valid (newton.tests.test_coupled_solver.TestSolverCoupledVBDColoring.test_compacted_vbd_entry_color_groups_are_valid) ... /Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/test_coupled_solver.py:3321: UserWarning: Inertia validation corrected 5 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  model = builder.finalize(device="cpu")
+ok
+test_compaction_projects_attribute_spec_registration (newton.tests.test_coupled_solver.TestSolverCoupledVBDColoring.test_compaction_projects_attribute_spec_registration) ... ok
+test_compaction_projects_late_registered_attribute (newton.tests.test_coupled_solver.TestSolverCoupledVBDColoring.test_compaction_projects_late_registered_attribute) ... ok
+test_compaction_rejects_misaligned_late_registered_attribute (newton.tests.test_coupled_solver.TestSolverCoupledVBDColoring.test_compaction_rejects_misaligned_late_registered_attribute) ... ok
+test_compaction_validates_custom_reference_storage (newton.tests.test_coupled_solver.TestSolverCoupledVBDColoring.test_compaction_validates_custom_reference_storage) ... ok
+test_metadata_projects_custom_rows_across_worlds (newton.tests.test_coupled_solver.TestSolverCoupledVBDColoring.test_metadata_projects_custom_rows_across_worlds) ... ok
+test_metadata_projects_nonprefix_custom_references (newton.tests.test_coupled_solver.TestSolverCoupledVBDColoring.test_metadata_projects_nonprefix_custom_references)
+Project custom-frequency metadata without claiming reset ownership. ... ok
+test_effective_inertia_preserves_anisotropic_free_body_inertia (newton.tests.test_coupled_solver.TestSolverMuJoCoCouplingHooks.test_effective_inertia_preserves_anisotropic_free_body_inertia) ... Module newton._src.solvers.mujoco.kernels e660ce7 load on device 'cpu' took 0.50 ms  (cached)
+Module mujoco_warp._src.io 8ca4fa2 load on device 'cpu' took 0.36 ms  (cached)
+Module mujoco_warp._src.smooth 3820599 load on device 'cpu' took 0.34 ms  (cached)
+Module _small_cholesky_factorize_block__locals__kernel_cee488c4 cd6c259 load on device 'cpu' took 0.25 ms  (cached)
+Module _small_cholesky_solve_block__locals__kernel_c2aec48f c1a01a7 load on device 'cpu' took 0.25 ms  (cached)
+ok
+test_gravity_acceleration_hook_uses_body_gravcomp (newton.tests.test_coupled_solver.TestSolverMuJoCoCouplingHooks.test_gravity_acceleration_hook_uses_body_gravcomp) ... Module _small_cholesky_factorize_block__locals__kernel_7ab10274 ae5c19a load on device 'cpu' took 0.29 ms  (cached)
+Module _small_cholesky_solve_block__locals__kernel_1d4237a6 2418014 load on device 'cpu' took 0.25 ms  (cached)
+ok
+test_gravity_acceleration_kernel_uses_global_gravity (newton.tests.test_coupled_solver.TestSolverMuJoCoCouplingHooks.test_gravity_acceleration_kernel_uses_global_gravity)
+Use dedicated global gravity in the multi-world coupling kernel. ... Module newton._src.solvers.mujoco.kernels 0b4ea96 load on device 'metal:0' took 38.99 ms  (cached)
+ok
+test_external_rigid_solver_harvests_particle_soft_contacts (newton.tests.test_coupled_solver.TestSolverVBDCouplingHooks.test_external_rigid_solver_harvests_particle_soft_contacts) ... Module newton._src.solvers.vbd.particle_vbd_kernels 59db928 load on device 'cpu' took 0.41 ms  (cached)
+Module newton._src.solvers.vbd.vbd_coupling_kernels 17bc2a3 load on device 'cpu' took 0.32 ms  (cached)
+ok
+test_reset_preserves_pose_history_cpu (newton.tests.test_coupled_solver.TestSolverVBDCouplingHooks.test_reset_preserves_pose_history_cpu) ... Module _scatter_reset_owned_rows_kernel_f55f6b40 5ebf18c load on device 'cpu' took 833.95 ms  (compiled)
+ok
+test_custom_attribute_attachment_closes_gap (newton.tests.test_admm_coupled_solver.TestAdmmBodyParticleAttachment.test_custom_attribute_attachment_closes_gap) ... Module newton._src.solvers.coupled.solver_coupled_admm ad98eb6 load on device 'cpu' took 0.31 ms  (cached)
+Module newton._src.solvers.coupled.admm_utils 5bfa0e6 load on device 'cpu' took 0.36 ms  (cached)
+Module newton._src.sim.articulation afc146e load on device 'cpu' took 0.27 ms  (cached)
+ok
+test_masked_reset_preserves_unselected_attachment_history (newton.tests.test_admm_coupled_solver.TestAdmmBodyParticleAttachment.test_masked_reset_preserves_unselected_attachment_history)
+Clear selected attachment duals and preserve every other row. ... ok
+test_collision_frictional_contact_holds_subcritical_inclined_box (newton.tests.test_admm_coupled_solver.TestAdmmCollisionDetection.test_collision_frictional_contact_holds_subcritical_inclined_box) ... Module newton.tests.test_admm_coupled_solver 469f5d5 load on device 'cpu' took 0.36 ms  (cached)
+ok
+test_collision_frictional_contact_matches_inclined_plane_box_motion (newton.tests.test_admm_coupled_solver.TestAdmmCollisionDetection.test_collision_frictional_contact_matches_inclined_plane_box_motion) ... ok
+test_collision_particle_particle_contacts_are_refreshed_in_solver (newton.tests.test_admm_coupled_solver.TestAdmmCollisionDetection.test_collision_particle_particle_contacts_are_refreshed_in_solver) ... Module newton._src.solvers.coupled.admm_contact_stream 5b558b7 load on device 'cpu' took 0.39 ms  (cached)
+ok
+test_collision_particle_particle_contacts_respect_disabled_model_particle_grid (newton.tests.test_admm_coupled_solver.TestAdmmCollisionDetection.test_collision_particle_particle_contacts_respect_disabled_model_particle_grid) ... ok
+test_collision_particle_shape_contacts_are_refreshed_in_solver (newton.tests.test_admm_coupled_solver.TestAdmmCollisionDetection.test_collision_particle_shape_contacts_are_refreshed_in_solver) ... ok
+test_collision_rigid_rigid_frictional_contact_matches_inclined_plane_box_motion (newton.tests.test_admm_coupled_solver.TestAdmmCollisionDetection.test_collision_rigid_rigid_frictional_contact_matches_inclined_plane_box_motion) ... ok
+test_masked_reset_preserves_unselected_contact_history (newton.tests.test_admm_coupled_solver.TestAdmmCollisionDetection.test_masked_reset_preserves_unselected_contact_history)
+Clear only dynamic contact duals touching the reset world. ... ok
+test_rigid_contact_detection_rejects_cross_world_pairs (newton.tests.test_admm_coupled_solver.TestAdmmCollisionDetection.test_rigid_contact_detection_rejects_cross_world_pairs) ... ok
+test_body_f_reaches_mujoco (newton.tests.test_admm_coupled_solver.TestAdmmExternalForces.test_body_f_reaches_mujoco)
+An upward ``body_f`` on the rigid sphere should slow its fall ... Module mujoco_warp._src.constraint 2c85c47 load on device 'cpu' took 0.42 ms  (cached)
+Module _friction_dof__locals__kernel_2497808c a84cdb5 load on device 'cpu' took 0.44 ms  (cached)
+Module _efc_contact_init__locals__kernel_3ea45cf1 c0a3684 load on device 'cpu' took 0.25 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_c51cb1c3 5770f96 load on device 'cpu' took 0.28 ms  (cached)
+Module _efc_contact_update__locals__kernel_c0eec458 1de823c load on device 'cpu' took 0.50 ms  (cached)
+Module mujoco_warp._src.passive 453ba32 load on device 'cpu' took 0.37 ms  (cached)
+Module _qfrc_smooth__locals__kernel_5565c635 d7fd775 load on device 'cpu' took 0.26 ms  (cached)
+Module mujoco_warp._src.support 82c336a load on device 'cpu' took 0.25 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_0e32390f 6d0ca20 load on device 'cpu' took 0.27 ms  (cached)
+Module _solve_init_dof__locals__kernel_e87bdcff 53b94fa load on device 'cpu' took 0.28 ms  (cached)
+Module mujoco_warp._src.solver a784a9f load on device 'cpu' took 0.31 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_5727716d 0bd624b load on device 'cpu' took 52.23 ms  (compiled)
+Module mul_m_kernel__locals___mul_m_181dec87 dab089c load on device 'cpu' took 0.26 ms  (cached)
+Module _update_constraint_efc__locals__kernel_19d29692 9736111 load on device 'cpu' took 0.27 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_c66443db 06238b1 load on device 'cpu' took 0.23 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_f7de314f eb40ea4 load on device 'cpu' took 0.23 ms  (cached)
+Module _update_gradient_grad__locals__kernel_2cfd15ea 588c506 load on device 'cpu' took 0.21 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_91377587 4d956f1 load on device 'cpu' took 192.21 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_b2a4be1e 7aef1c8 load on device 'cpu' took 130.62 ms  (compiled)
+Module _linesearch_iterative_kernel__locals__kernel_83c01277 ff28f72 load on device 'cpu' took 0.31 ms  (cached)
+Module _update_constraint_efc__locals__kernel_5e35a0de fe6bf95 load on device 'cpu' took 0.28 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_765d26af 0afebdf load on device 'cpu' took 0.24 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_efde2572 2d4bf8b load on device 'cpu' took 0.23 ms  (cached)
+Module _update_gradient_grad__locals__kernel_340fbe9f 2f70b2c load on device 'cpu' took 0.23 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_ad66c2c1 31f8981 load on device 'cpu' took 132.17 ms  (compiled)
+Module mujoco_warp._src.sensor 72cc533 load on device 'cpu' took 0.35 ms  (cached)
+Module mujoco_warp._src.derivative d9b5d24 load on device 'cpu' took 0.30 ms  (cached)
+Module mujoco_warp._src.forward 9bc9c80 load on device 'cpu' took 0.27 ms  (cached)
+Module _next_time_builder__locals___next_time_b2d89ad4 05ed600 load on device 'cpu' took 0.24 ms  (cached)
+ok
+test_xpbd_vbd_contact_proximal_refresh_is_graph_capturable (newton.tests.test_admm_coupled_solver.TestAdmmGraphCapture.test_xpbd_vbd_contact_proximal_refresh_is_graph_capturable) ... skipped 'CUDA graph capture requires CUDA'
+test_ball_joint_attachment_closes_anchor_gap (newton.tests.test_admm_coupled_solver.TestAdmmModelJointInterface.test_ball_joint_attachment_closes_anchor_gap) ... ok
+test_joint_proxy_shape_collisions_disabled_after_shape_compaction (newton.tests.test_admm_coupled_solver.TestAdmmModelJointInterface.test_joint_proxy_shape_collisions_disabled_after_shape_compaction) ... ok
+test_rejects_cross_solver_joint_owned_by_subsolver (newton.tests.test_admm_coupled_solver.TestAdmmModelJointInterface.test_rejects_cross_solver_joint_owned_by_subsolver) ... ok
+test_revolute_axis_frames_handle_antiparallel_x_axis (newton.tests.test_admm_coupled_solver.TestAdmmModelJointInterface.test_revolute_axis_frames_handle_antiparallel_x_axis) ... ok
+test_gamma_does_not_change_unconstrained_freefall (newton.tests.test_admm_coupled_solver.TestAdmmProximal.test_gamma_does_not_change_unconstrained_freefall) ... ok
+test_admm_iters_idempotent_with_no_coupling (newton.tests.test_admm_coupled_solver.TestAdmmSmoke.test_admm_iters_idempotent_with_no_coupling)
+With gamma=0 and no attachments the iteration count should not ... ok
+test_construct_and_step_no_attachments (newton.tests.test_admm_coupled_solver.TestAdmmSmoke.test_construct_and_step_no_attachments) ... ok
+test_rejects_invalid_numerical_config (newton.tests.test_admm_coupled_solver.TestAdmmSmoke.test_rejects_invalid_numerical_config) ... ok
+
+======================================================================
+ERROR: test_compacted_joint_targets_use_local_layout (newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_compacted_joint_targets_use_local_layout)
+Joint targets and their derived starts should use compact layout.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/test_coupled_solver.py", line 1414, in test_compacted_joint_targets_use_local_layout
+    model.joint_target_q.assign(np.arange(model.joint_coord_count, dtype=np.float32))
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/types.py", line 4532, in assign
+    warp.copy(self, array(data=src, dtype=self.dtype, copy=False, device="cpu"))
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 15115, in copy
+    raise RuntimeError(
+RuntimeError: Trying to copy source buffer with size (36) to offset (0) is larger than destination size (32)
+
+----------------------------------------------------------------------
+Ran 117 tests in 6.198s
+
+FAILED (errors=1, skipped=2)
+RESULT ran=117 failures=0 errors=1 skipped=2
+FAILED newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_compacted_joint_targets_use_local_layout :: RuntimeError: Trying to copy source buffer with size (36) to offset (0) is larger than destination size (32)

@@ -1,0 +1,105 @@
+holder: {"name": "vbd_tests", "kind": "low", "minutes": 60.0, "pid": 75209, "start": 1790357683.28476}
+=== Newton 1.5.2 VBD/cloth/softbody tests, metal_0 variants
+95 tests selected
+test_body_body_contact_lists_skip_static_kinematic_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_body_body_contact_lists_skip_static_kinematic_metal_0) ... ok
+test_body_particle_contact_damping_is_absolute_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_body_particle_contact_damping_is_absolute_metal_0) ... ok
+test_body_particle_contact_lists_skip_static_kinematic_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_body_particle_contact_lists_skip_static_kinematic_metal_0) ... ok
+test_cable_soft_dual_slots_clear_preserved_lambda_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_cable_soft_dual_slots_clear_preserved_lambda_metal_0) ... ok
+test_capsule_axial_spin_dissipates_via_friction_soft_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_capsule_axial_spin_dissipates_via_friction_soft_metal_0) ... ok
+test_contact_damping_ignores_rigid_motion_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_contact_damping_ignores_rigid_motion_metal_0) ... ok
+test_d6_fully_free_structural_slots_are_inactive_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_d6_fully_free_structural_slots_are_inactive_metal_0) ... ok
+test_elastic_damping_ignores_rigid_motion_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_elastic_damping_ignores_rigid_motion_metal_0) ... ok
+test_joint_angular_dual_projects_free_axis_lambda_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_joint_angular_dual_projects_free_axis_lambda_metal_0) ... ok
+test_joint_force_projection_filters_free_direction_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_joint_force_projection_filters_free_direction_metal_0) ... ok
+test_rigid_contact_dual_update_computes_lambda_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_rigid_contact_dual_update_computes_lambda_metal_0) ... ok
+test_rigid_contact_history_restore_from_match_index_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_rigid_contact_history_restore_from_match_index_metal_0) ... ok
+test_rigid_contact_history_snapshot_copies_active_rows_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_rigid_contact_history_snapshot_copies_active_rows_metal_0) ... ok
+test_rigid_contact_history_soft_restores_penalty_only_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_rigid_contact_history_soft_restores_penalty_only_metal_0) ... ok
+test_rigid_contact_reset_ownership_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_rigid_contact_reset_ownership_metal_0) ... ok
+test_rigid_contact_stick_eps_are_deprecated_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_rigid_contact_stick_eps_are_deprecated_metal_0) ... ok
+test_rigid_reset_cable_history_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_rigid_reset_cable_history_metal_0) ... ok
+test_rigid_reset_state_and_history_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_rigid_reset_state_and_history_metal_0) ... ok
+test_self_contact_barrier_c2_at_d_min_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_self_contact_barrier_c2_at_d_min_metal_0) ... ok
+test_self_contact_barrier_c2_at_tau_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_self_contact_barrier_c2_at_tau_metal_0) ... ok
+test_self_contact_damping_uses_relative_gap_rate_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_self_contact_damping_uses_relative_gap_rate_metal_0) ... ok
+test_soft_contact_presize_is_world_aware_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_soft_contact_presize_is_world_aware_metal_0) ... ok
+test_soft_reset_particle_only_and_external_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_soft_reset_particle_only_and_external_metal_0) ... ok
+test_soft_reset_then_step_advances_cloth_and_tet_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_soft_reset_then_step_advances_cloth_and_tet_metal_0) ... ok
+test_spring_damping_is_axial_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_spring_damping_is_axial_metal_0) ... ok
+test_vbd_custom_attribute_registration_controls_dahl_defaults_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_vbd_custom_attribute_registration_controls_dahl_defaults_metal_0) ... ok
+test_vbd_dahl_detection_requires_positive_values_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_vbd_dahl_detection_requires_positive_values_metal_0) ... ok
+test_yawed_cable_does_not_inject_energy_hard_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_yawed_cable_does_not_inject_energy_hard_metal_0) ... ok
+test_yawed_cable_does_not_inject_energy_soft_metal_0 (newton.tests.test_solver_vbd.TestSolverVBD.test_yawed_cable_does_not_inject_energy_soft_metal_0) ... ok
+test_barycentric_force_distribution_metal_0 (newton.tests.test_solver_vbd.TestVBDFullSurfaceContact.test_barycentric_force_distribution_metal_0) ... ok
+test_edge_face_mixes_shape_material_metal_0 (newton.tests.test_solver_vbd.TestVBDFullSurfaceContact.test_edge_face_mixes_shape_material_metal_0) ... ok
+test_edge_face_reacts_on_rigid_body_metal_0 (newton.tests.test_solver_vbd.TestVBDFullSurfaceContact.test_edge_face_reacts_on_rigid_body_metal_0) ... ok
+test_edge_face_uses_shape_margin_metal_0 (newton.tests.test_solver_vbd.TestVBDFullSurfaceContact.test_edge_face_uses_shape_margin_metal_0) ... ok
+test_flag_off_is_inert_metal_0 (newton.tests.test_solver_vbd.TestVBDFullSurfaceContact.test_flag_off_is_inert_metal_0) ... ok
+test_full_surface_rejected_for_vbd_proxy_particles_metal_0 (newton.tests.test_solver_vbd.TestVBDFullSurfaceContact.test_full_surface_rejected_for_vbd_proxy_particles_metal_0) ... ok
+test_tet_adjacency_complex_pyramid_metal_0 (newton.tests.test_softbody.TestSoftBody.test_tet_adjacency_complex_pyramid_metal_0) ... ok
+test_tet_adjacency_single_tet_metal_0 (newton.tests.test_softbody.TestSoftBody.test_tet_adjacency_single_tet_metal_0) ... ok
+test_tet_graph_coloring_is_valid_metal_0 (newton.tests.test_softbody.TestSoftBody.test_tet_graph_coloring_is_valid_metal_0) ... ok
+test_cloth_bending_consistent_angle_computation_vbd_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_bending_consistent_angle_computation_vbd_metal_0) ... ok
+test_cloth_bending_consistent_angle_computation_xpbd_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_bending_consistent_angle_computation_xpbd_metal_0) ... ok
+test_cloth_bending_non_zero_rest_angle_bending_semi_implicit_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_bending_non_zero_rest_angle_bending_semi_implicit_metal_0) ... ok
+test_cloth_bending_non_zero_rest_angle_bending_vbd_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_bending_non_zero_rest_angle_bending_vbd_metal_0) ... ok
+test_cloth_bending_non_zero_rest_angle_bending_xpbd_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_bending_non_zero_rest_angle_bending_xpbd_metal_0) ... ok
+test_cloth_bending_semi_implicit_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_bending_semi_implicit_metal_0) ... ok
+test_cloth_bending_vbd_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_bending_vbd_metal_0) ... ok
+test_cloth_bending_with_complex_rest_angles_semi_implicit_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_bending_with_complex_rest_angles_semi_implicit_metal_0) ... ok
+test_cloth_bending_with_complex_rest_angles_vbd_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_bending_with_complex_rest_angles_vbd_metal_0) ... ok
+test_cloth_bending_with_complex_rest_angles_xpbd_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_bending_with_complex_rest_angles_xpbd_metal_0) ... ok
+test_cloth_bending_xpbd_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_bending_xpbd_metal_0) ... ok
+test_cloth_body_collision_semi_implicit_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_body_collision_semi_implicit_metal_0) ... ok
+test_cloth_body_collision_vbd_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_body_collision_vbd_metal_0) ... ok
+test_cloth_body_collision_xpbd_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_body_collision_xpbd_metal_0) ... ok
+test_cloth_free_fall_semi_implicit_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_free_fall_semi_implicit_metal_0) ... ok
+test_cloth_free_fall_vbd_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_free_fall_vbd_metal_0) ... ok
+test_cloth_free_fall_with_internal_forces_and_damping_semi_implicit_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_free_fall_with_internal_forces_and_damping_semi_implicit_metal_0) ... ok
+test_cloth_free_fall_with_internal_forces_and_damping_vbd_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_free_fall_with_internal_forces_and_damping_vbd_metal_0) ... ok
+test_cloth_free_fall_with_internal_forces_and_damping_xpbd_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_free_fall_with_internal_forces_and_damping_xpbd_metal_0) ... ok
+test_cloth_free_fall_xpbd_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_free_fall_xpbd_metal_0) ... ok
+test_cloth_sagging_semi_implicit_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_sagging_semi_implicit_metal_0) ... ok
+test_cloth_sagging_vbd_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_sagging_vbd_metal_0) ... ok
+test_cloth_sagging_xpbd_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_sagging_xpbd_metal_0) ... ok
+test_cloth_stitching_vbd_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_stitching_vbd_metal_0) ... ok
+test_cloth_stitching_xpbd_metal_0 (newton.tests.test_cloth.TestCloth.test_cloth_stitching_xpbd_metal_0) ... ok
+test_cloth_body_collision_vbd_metal_0 (newton.tests.test_cloth.TestClothCollisionPipeline.test_cloth_body_collision_vbd_metal_0) ... ok
+test_cloth_body_collision_xpbd_metal_0 (newton.tests.test_cloth.TestClothCollisionPipeline.test_cloth_body_collision_xpbd_metal_0) ... ok
+test_cloth_collision_vbd_metal_0 (newton.tests.test_cloth.TestClothCollisionPipeline.test_cloth_collision_vbd_metal_0) ... ok
+test_collision_detector_requires_adjacency_metal_0 (newton.tests.test_collision_cloth.TestCollision.test_collision_detector_requires_adjacency_metal_0) ... ERROR
+test_collision_filter_decouple_metal_0 (newton.tests.test_collision_cloth.TestCollision.test_collision_filter_decouple_metal_0) ... ERROR
+test_collision_filtering_metal_0 (newton.tests.test_collision_cloth.TestCollision.test_collision_filtering_metal_0) ... skipped 'Requires usd-core'
+test_edge_edge_collision_cross_world_rejected_metal_0 (newton.tests.test_collision_cloth.TestCollision.test_edge_edge_collision_cross_world_rejected_metal_0) ... ok
+test_edge_edge_collision_metal_0 (newton.tests.test_collision_cloth.TestCollision.test_edge_edge_collision_metal_0) ... skipped 'Requires usd-core'
+test_edge_edge_collision_same_world_detected_metal_0 (newton.tests.test_collision_cloth.TestCollision.test_edge_edge_collision_same_world_detected_metal_0) ... ok
+test_edge_edge_collision_same_world_in_multiworld_detected_metal_0 (newton.tests.test_collision_cloth.TestCollision.test_edge_edge_collision_same_world_in_multiworld_detected_metal_0) ... ok
+test_global_soft_primitives_filter_compatible_worlds_metal_0 (newton.tests.test_collision_cloth.TestCollision.test_global_soft_primitives_filter_compatible_worlds_metal_0) ... ok
+test_multiworld_soft_collision_rebuild_preserves_filtering_metal_0 (newton.tests.test_collision_cloth.TestCollision.test_multiworld_soft_collision_rebuild_preserves_filtering_metal_0) ... ok
+test_trimesh_collision_detection_cuda_graph_capturable_metal_0 (newton.tests.test_collision_cloth.TestCollision.test_trimesh_collision_detection_cuda_graph_capturable_metal_0) ... FAIL
+test_vertex_triangle_collision_cross_world_rejected_metal_0 (newton.tests.test_collision_cloth.TestCollision.test_vertex_triangle_collision_cross_world_rejected_metal_0) ... ok
+test_vertex_triangle_collision_metal_0 (newton.tests.test_collision_cloth.TestCollision.test_vertex_triangle_collision_metal_0) ... skipped 'Requires usd-core'
+test_vertex_triangle_collision_same_world_detected_metal_0 (newton.tests.test_collision_cloth.TestCollision.test_vertex_triangle_collision_same_world_detected_metal_0) ... ok
+test_vertex_triangle_collision_same_world_in_multiworld_detected_metal_0 (newton.tests.test_collision_cloth.TestCollision.test_vertex_triangle_collision_same_world_in_multiworld_detected_metal_0) ... ok
+FAILED (failures=1, errors=2, skipped=3)
+RESULT ran=95 failures=1 errors=2 skipped=3
+FAILED newton.tests.test_collision_cloth.TestCollision.test_trimesh_collision_detection_cuda_graph_capturable_metal_0 :: AssertionError: False is not true
+FAILED newton.tests.test_collision_cloth.TestCollision.test_collision_detector_requires_adjacency_metal_0 :: ModuleNotFoundError: No module named 'pxr'
+FAILED newton.tests.test_collision_cloth.TestCollision.test_collision_filter_decouple_metal_0 :: ModuleNotFoundError: No module named 'pxr'
+=== Newton 1.5.2 coupled-solver tests on metal:0 (default device)
+118 tests selected
+Joint targets and their derived starts should use compact layout. ... ERROR
+test_mask_is_forwarded_without_touching_unselected_rows (newton.tests.test_coupled_solver.TestSolverCoupledResetMask.test_mask_is_forwarded_without_touching_unselected_rows)
+Normalize once, then preserve unselected state and history. ... Module _scatter_reset_owned_rows_kernel_f55f6b40 ef80def load on device 'cpu' took 71.69 ms  (compiled)
+test_missing_reset_inputs_zero_selected_transform_and_scalar_rows (newton.tests.test_coupled_solver.TestSolverCoupledResetMask.test_missing_reset_inputs_zero_selected_transform_and_scalar_rows)
+Zero selected transform and scalar rows when reset inputs are missing. ... Module _zero_reset_view_rows_kernel_3d9404f7 9311f57 load on device 'cpu' took 65.16 ms  (compiled)
+Synchronize selected custom STATE rows through compact entry mappings. ... ok
+test_masked_reset_preserves_unselected_attachment_history (newton.tests.test_admm_coupled_solver.TestAdmmBodyParticleAttachment.test_masked_reset_preserves_unselected_attachment_history)
+Clear selected attachment duals and preserve every other row. ... ok
+test_masked_reset_preserves_unselected_contact_history (newton.tests.test_admm_coupled_solver.TestAdmmCollisionDetection.test_masked_reset_preserves_unselected_contact_history)
+FAILED (errors=1, skipped=2)
+RESULT ran=118 failures=0 errors=1 skipped=2
+FAILED newton.tests.test_coupled_solver.TestSolverCoupledBasic.test_compacted_joint_targets_use_local_layout :: RuntimeError: Trying to copy source buffer with size (36) to offset (0) is larger than destination size (32)
+=== coupled examples on metal:0 (Newton 1.5.2 + mujoco-warp 3.11.0)
+{"example": "multiphysics.example_mujoco_vbd_coupled_solver", "device": "metal:0", "newton_src": "newton-1.5.2", "error": "RuntimeError: SolverVBD body-body contact state buffer needs to grow from 0 to 1000 during graph capture, but allocation during capture is not enabled on this device. Run one uncaptured step (or force-collection pass) before capture so the contact buffers are sized for the scene, or enable Warp's stream-ordered memory pool on this device. Rigid buffers can also be pre-sized by constructing CollisionPipeline before SolverVBD, which publishes model.rigid_contact_max; there is no equivalent for body-particle contacts.", "traceback": "Traceback (most recent call last):\n  File \"/Users/aditya/robosim/scripts/diagnostics/newton_vbd/coupled_probe.py\", line 36, in main\n    ex = mod.Example(viewer, args)\n         ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/aditya/robosim/upstream/newton-1.5.2/newton/examples/multiphysics/example_mujoco_vbd_coupled_solver.py\", line 210, in __init__\n    self.capture()\n  File \"/Users/aditya/robosim/upstream/newton-1.5.2/newton/examples/multiphysics/example_mujoco_vbd_coupled_solver.py\", line 213, in capture\n    self.graph = _capture_frame_graph(self.model, self.simulate)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/aditya/robosim/upstream/newton-1.5.2/newton/examples/multiphysics/example_mujoco_vbd_coupled_solver.py\", line 84, in _capture_frame_graph\n    simulate()\n  File \"/Users/aditya/robosim/upstream/newton-1.5.2/newton/examples/multiphysics/example_mujoco_vbd_coupled_solver.py\", line 220, in simulate\n    self.solver.step(self.state_0, self.state_1, self.control, self.contacts, self.sim_dt)\n  File \"/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/coupled/solver_coupled.py\", line 2223, in step\n    self._step_coupled(state_in, state_out, control, contacts, dt)\n  File \"/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/coupled/solver_coupled_proxy.py\", line 1335, in _step_coupled\n    self._step_proxy(state_in, control, contacts, dt, iteration_restart=k > 0)\n  File \"/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/coupled/solver_coupled_proxy.py\", line 1526, in _step_proxy\n    dst_contacts_used = self._step_entry(\n                        ^^^^^^^^^^^^^^^^^\n  File \"/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/coupled/solver_coupled.py\", line 2689, in _step_entry\n    entry.solver.step(entry.state_0, entry.state_1, control, contacts, dt)\n  File \"/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/vbd/solver_vbd.py\", line 1820, in step\n    self._initialize_rigid_bodies(state_in, control, contacts, dt, update_rigid)\n  File \"/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/vbd/solver_vbd.py\", line 2215, in _initialize_rigid_bodies\n    self._raise_if_capturing_resize(\n  File \"/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/vbd/solv
+{"example": "multiphysics.example_mujoco_vbd_admm_solver", "device": "metal:0", "newton_src": "newton-1.5.2", "error": "RuntimeError: SolverVBD body-body contact state buffer needs to grow from 0 to 1000 during graph capture, but allocation during capture is not enabled on this device. Run one uncaptured step (or force-collection pass) before capture so the contact buffers are sized for the scene, or enable Warp's stream-ordered memory pool on this device. Rigid buffers can also be pre-sized by constructing CollisionPipeline before SolverVBD, which publishes model.rigid_contact_max; there is no equivalent for body-particle contacts.", "traceback": "Traceback (most recent call last):\n  File \"/Users/aditya/robosim/scripts/diagnostics/newton_vbd/coupled_probe.py\", line 36, in main\n    ex = mod.Example(viewer, args)\n         ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/aditya/robosim/upstream/newton-1.5.2/newton/examples/multiphysics/example_mujoco_vbd_admm_solver.py\", line 242, in __init__\n    self.capture()\n  File \"/Users/aditya/robosim/upstream/newton-1.5.2/newton/examples/multiphysics/example_mujoco_vbd_admm_solver.py\", line 251, in capture\n    self.graph = _capture_frame_graph(self.model, self.simulate)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/aditya/robosim/upstream/newton-1.5.2/newton/examples/multiphysics/example_mujoco_vbd_admm_solver.py\", line 85, in _capture_frame_graph\n    simulate()\n  File \"/Users/aditya/robosim/upstream/newton-1.5.2/newton/examples/multiphysics/example_mujoco_vbd_admm_solver.py\", line 261, in simulate\n    self.solver.step(self.state_0, self.state_1, self.control, self.contacts, self.sim_dt)\n  File \"/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/coupled/solver_coupled.py\", line 2223, in step\n    self._step_coupled(state_in, state_out, control, contacts, dt)\n  File \"/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/coupled/solver_coupled_admm.py\", line 2874, in _step_coupled\n    self._step_entry(entry, control, contacts, dt)\n  File \"/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/coupled/solver_coupled.py\", line 2689, in _step_entry\n    entry.solver.step(entry.state_0, entry.state_1, control, contacts, dt)\n  File \"/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/vbd/solver_vbd.py\", line 1820, in step\n    self._initialize_rigid_bodies(state_in, control, contacts, dt, update_rigid)\n  File \"/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/vbd/solver_vbd.py\", line 2215, in _initialize_rigid_bodies\n    self._raise_if_capturing_resize(\n  File \"/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/vbd/solver_vbd.py\", line 1177, in _raise_if_capturing_resize\n    raise RuntimeError(\nRuntimeError: SolverVBD body-body contact state buffer needs to grow from 0 to 1000 during graph capture, but allocation during capture is not enabled on this device. Run one uncaptured

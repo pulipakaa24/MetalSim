@@ -1,0 +1,14 @@
+holder: {"name": "physx_cloth_t", "kind": "low", "minutes": 10.0, "pid": 77491, "start": 1790358084.751184}
+>       assert np.abs(g.x.numpy() - c.x.numpy()).max() < 1e-4
+E       AssertionError: assert np.float32(0.00019297004) < 0.0001
+E        +  where np.float32(0.00019297004) = <built-in method max of numpy.ndarray object at 0x10b657a50>()
+E        +    where <built-in method max of numpy.ndarray object at 0x10b657a50> = array([[[2.3841858e-07, 2.3841858e-07, 0.0000000e+00],\n        [2.9802322e-07, 1.7881393e-07, 0.0000000e+00],\n        ...5e-08, 0.0000000e+00],\n        [0.0000000e+00, 8.9406967e-08, 0.0000000e+00]]],\n      shape=(4, 441, 3), dtype=float32).max
+E        +      where array([[[2.3841858e-07, 2.3841858e-07, 0.0000000e+00],\n        [2.9802322e-07, 1.7881393e-07, 0.0000000e+00],\n        ...5e-08, 0.0000000e+00],\n        [0.0000000e+00, 8.9406967e-08, 0.0000000e+00]]],\n      shape=(4, 441, 3), dtype=float32) = <ufunc 'absolute'>((array([[[-0.4957852 , -0.49577495,  0.29889488],\n        [-0.44573832, -0.49682334,  0.29889488],\n        [-0.39562696...,  0.4637585 ,  0.30923092],\n        [ 0.5056509 ,  0.46286777,  0.30923092]]],\n      shape=(4, 441, 3), dtype=float32) - array([[[-0.49578497, -0.49577472,  0.29889488],\n        [-0.44573802, -0.49682352,  0.29889488],\n        [-0.39562687...,  0.46375856,  0.30923092],\n        [ 0.5056509 ,  0.46286786,  0.30923092]]],\n      shape=(4, 441, 3), dtype=float32)))
+E        +        where <ufunc 'absolute'> = np.abs
+E        +        and   array([[[-0.4957852 , -0.49577495,  0.29889488],\n        [-0.44573832, -0.49682334,  0.29889488],\n        [-0.39562696...,  0.4637585 ,  0.30923092],\n        [ 0.5056509 ,  0.46286777,  0.30923092]]],\n      shape=(4, 441, 3), dtype=float32) = numpy()
+E        +          where numpy = array(shape=(4, 441), dtype=vec3f).numpy
+E        +            where array(shape=(4, 441), dtype=vec3f) = <metalsim.physics.physx_cloth.PhysXClothSim object at 0x108e4e8d0>.x
+E        +        and   array([[[-0.49578497, -0.49577472,  0.29889488],\n        [-0.44573802, -0.49682352,  0.29889488],\n        [-0.39562687...,  0.46375856,  0.30923092],\n        [ 0.5056509 ,  0.46286786,  0.30923092]]],\n      shape=(4, 441, 3), dtype=float32) = numpy()
+E        +          where numpy = array(shape=(4, 441), dtype=vec3f).numpy
+E        +            where array(shape=(4, 441), dtype=vec3f) = <metalsim.physics.physx_cloth.PhysXClothSim object at 0x108e4e270>.x
+1 failed, 6 deselected in 0.63s
