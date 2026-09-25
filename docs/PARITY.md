@@ -480,6 +480,9 @@ Isaac's env→column assignment, 4096 envs, seed 0, 1500 iterations at 23.3 K en
 | 1000 | 882 / +5.4 / 5.96 | 991 / +11.3 / 6.01 |
 | 1500 | 966 / +14.1 / 5.90 | 992 / +16.4 / 6.10 |
 
+A second seed (`runs/g1_rough_ppowarp_fixed_seed2.log`, seed 2): −0.1 / 971 at 300, +5.0 / 958 at 500, +14.3 / 991 at
+1000, **+22.6 / 998 / level 6.08 at 1500** (seed 0: +16.4 / 992 / 6.10; Isaac +14.1 / 966 / 5.90); a third seed is
+queued (its first attempt failed at start-up with a Metal out-of-memory error, under investigation).
 Ours climbs the curriculum 50–100 iterations later, then matches Isaac's terrain level (~6.0 from
 iteration 750) with longer episodes and a higher return; no blow-ups. Per-term at iteration 1000
 (stochastic actions; ours evaluated on levels 0–5 with the curriculum running, Isaac's on its
