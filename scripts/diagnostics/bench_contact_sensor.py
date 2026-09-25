@@ -32,6 +32,9 @@ def timed(sim, steps=STEPS):
 
 
 def main():
+    import subprocess, datetime
+    print('gpu_lock status at start', datetime.datetime.now().isoformat(timespec='seconds'), flush=True)
+    print(subprocess.run(['python3', 'scripts/gpu_lock.py', 'status'], capture_output=True, text=True).stdout, flush=True)
     m, _ = build_g1_model("flat")
     sim = BatchSim(m, N, options=BatchSimOptions(substeps=4, njmax=256, nconmax=32, solver_iterations=10, ls_iterations=20))
     q = np.tile(m.key_qpos[0], (N, 1)).astype(np.float32)
@@ -47,19 +50,20 @@ def main():
     }
     sensors = {k: ContactSensor(sim, **v, attach=False) for k, v in configs.items()}
     res = {"plain": []} | {k: [] for k in configs}
-    for rep in range(3):
+    for rep in range(7):
         for name in res:
             sim._substep_hooks = [] if name == "plain" else [sensors[name].launch]
             with wp.ScopedDevice(sim.device):
                 sim._capture()
             reset_state()
             res[name].append(timed(sim))
-    base = np.median(res["plain"])
-    print(f"G1 MuJoCo Warp, {N} worlds, 4 substeps x 5 ms per step, graph replay, synchronized, median of 3 x {STEPS} steps")
+    base = np.median(res["plain"]); bmin = np.min(res["plain"])
+    print(f"G1 MuJoCo Warp, {N} worlds, 4 substeps x 5 ms per step, graph replay, synchronized, min and median of 7 interleaved x {STEPS} steps")
     for name, v in res.items():
-        med = np.median(v)
-        extra = "" if name == "plain" else f"  (+{med - base:.3f} ms/step, +{(med - base) / 4 * 1e3:.0f} us/substep, {100 * (med - base) / base:+.1f} %)"
-        print(f"  {name:40s} {med:8.3f} ms/step  runs {np.round(v, 3).tolist()}{extra}")
+        med, mn = np.median(v), np.min(v)
+        extra = "" if name == "plain" else (f"  min +{mn - bmin:.3f} ms/step ({100 * (mn - bmin) / bmin:+.1f} %), "
+                                            f"median +{med - base:.3f} ms/step ({100 * (med - base) / base:+.1f} %)")
+        print(f"  {name:40s} min {mn:8.3f} median {med:8.3f} ms/step  runs {np.round(v, 2).tolist()}{extra}")
     # sensor kernels alone (4 substeps' worth), captured
     for name, s in sensors.items():
         with wp.ScopedCapture(device=sim.device) as cap:
