@@ -1,0 +1,33 @@
+=== start Fri Sep 25 10:06:55 PDT 2026
+holder: {"name": "mjw_tp_fulltests", "kind": "low", "minutes": 60.0, "pid": 69099, "start": 1790356015.1992042}
+    a = self.to("cpu", requires_grad=False)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/types.py:4669: in to
+    return warp.clone(self, device=device, requires_grad=requires_grad)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/context.py:10501: in clone
+    warp.copy(arr, src)
+upstream/warp-innate/warp/_src/context.py:15016: in copy
+    device.metal_synchronize()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = 'metal:0'
+
+    def metal_synchronize(self):
+        """Wait for all outstanding GPU work on this Metal device, raising on GPU errors."""
+        if self.runtime.core.wp_metal_synchronize(self.metal_ordinal) != 0:
+>           raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
+E           RuntimeError: Metal error on device metal:0: Cannot synchronize device "Apple M4 Max" during graph capture
+
+upstream/warp-innate/warp/_src/context.py:6066: RuntimeError
+----------------------------- Captured stdout call -----------------------------
+Module mujoco_warp._src.smooth f80c523 load on device 'metal:0' took 1989.87 ms  (compiled)
+Module _primitive_narrowphase__locals__primitive_narrowphase_156c68cd 156c68c load on device 'metal:0' took 537.36 ms  (compiled)
+Module mujoco_warp._src.collision_flex 62420be load on device 'metal:0' took 495.54 ms  (compiled)
+----------------------------- Captured stderr call -----------------------------
+Cannot synchronize device "Apple M4 Max" during graph capture
+=========================== short test summary info ============================
+FAILED tests/test_deformable.py::test_mjw_flex_free_fall_matches_mujoco_c - R...
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 8 passed in 9.51s
+=== end Fri Sep 25 10:07:06 PDT 2026

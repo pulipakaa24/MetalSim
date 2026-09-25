@@ -1,7 +1,7 @@
 From 786cdae38050b04cc3e3a00e71546ce949b9e50a Mon Sep 17 00:00:00 2001
 From: Aditya Pulipaka <adipu@utexas.edu>
 Date: Thu, 24 Sep 2026 16:57:36 -0700
-Subject: [PATCH 4/4] Metal: fixed-size arrays (wp.zeros in kernels);
+Subject: [PATCH 4/5] Metal: fixed-size arrays (wp.zeros in kernels);
  thread-qualify reference casts in native snippets
 
 MSL has no derived classes and its address spaces are disjoint, so the CPU/CUDA

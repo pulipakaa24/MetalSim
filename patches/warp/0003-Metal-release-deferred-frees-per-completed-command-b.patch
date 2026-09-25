@@ -1,7 +1,7 @@
 From 7b5c828afaaf99126e5ea10d3f3ea4db82be2cbf Mon Sep 17 00:00:00 2001
 From: Aditya Pulipaka <adipu@utexas.edu>
 Date: Wed, 23 Sep 2026 14:13:39 -0700
-Subject: [PATCH 3/4] Metal: release deferred frees per completed command
+Subject: [PATCH 3/5] Metal: release deferred frees per completed command
  buffer; WP_METAL_INFLIGHT and WP_METAL_ICB_BATCH knobs
 
 Long eager loops that allocate temporaries every step (MuJoCo Warp) deferred every free until the next

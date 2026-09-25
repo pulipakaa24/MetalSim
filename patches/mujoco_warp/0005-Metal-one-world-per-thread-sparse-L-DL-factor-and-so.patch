@@ -1,0 +1,242 @@
+From ad2212000943ac4285afcf6e942754329bf2cf44 Mon Sep 17 00:00:00 2001
+From: Aditya Pulipaka <adipu@utexas.edu>
+Date: Fri, 25 Sep 2026 09:22:55 -0700
+Subject: [PATCH 5/7] Metal: one-world-per-thread sparse L'DL factor and solve;
+ skip no-op gravcomp / tendon-damping launches
+
+- _factor_i_sparse on Metal: the whole L'DL factorization of a world in one thread (one launch instead of a
+  copy, one launch per tree level and the diagonal); same updates in the same level order, updates of a
+  level that hit the same row applied in list order instead of atomically (float rounding only; bitwise
+  equal to the level-parallel path on CPU).
+- _solve_LD_sparse on Metal: the fused solve ran one lane per world in one-thread threadgroups (the CPU
+  fallback, dim_block 1); now one world per thread in full threadgroups (BlockDim.sparse_ldl_serial, 32),
+  the same operation sequence, bit for bit.
+- passive: the gravity-compensation kernel ((nworld, nbody-1, nv) threads) is launched only when a body
+  has gravcomp at put_model time or body_gravcomp is batched (Model.has_gravcomp), as MuJoCo C's ngravcomp.
+- derivative: the tendon-damping qDeriv kernel is launched only when the model has tendons.
+MetalSim G1 flat (m_dense_max 0, register Cholesky 48): training loop 46.8K -> 52.5K env-steps/s.
+
+Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>
+---
+ mujoco_warp/_src/derivative.py |   2 +-
+ mujoco_warp/_src/io.py         |   1 +
+ mujoco_warp/_src/passive.py    |   3 +-
+ mujoco_warp/_src/smooth.py     | 108 +++++++++++++++++++++++++++++++++
+ mujoco_warp/_src/types.py      |   6 ++
+ 5 files changed, 118 insertions(+), 2 deletions(-)
+
+diff --git a/mujoco_warp/_src/derivative.py b/mujoco_warp/_src/derivative.py
+index 22b6f62..5e449d6 100644
+--- a/mujoco_warp/_src/derivative.py
++++ b/mujoco_warp/_src/derivative.py
+@@ -1230,7 +1230,7 @@ def deriv_smooth_vel(m: Model, d: Data, out: wp.array2d[float]):
+     # TODO(team): directly utilize M for these settings
+     wp.copy(out, d.M)
+ 
+-  if not (m.opt.disableflags & DisableBit.DAMPER):
++  if m.ntendon and not (m.opt.disableflags & DisableBit.DAMPER):   # the kernel loops over tendons
+     wp.launch(
+       _qderiv_tendon_damping,
+       dim=(d.nworld, Mi.size),
+diff --git a/mujoco_warp/_src/io.py b/mujoco_warp/_src/io.py
+index db90f13..254a26d 100644
+--- a/mujoco_warp/_src/io.py
++++ b/mujoco_warp/_src/io.py
+@@ -430,6 +430,7 @@ def put_model(mjm: mujoco.MjModel, batch_sizes: dict[str, int] | None = None) ->
+     m.block_dim.linesearch_iterative = 256
+   m.is_sparse = is_sparse(mjm)
+   m.has_fluid = bool(mjm.opt.wind.any() or mjm.opt.density > 0 or mjm.opt.viscosity > 0)
++  m.has_gravcomp = bool(mjm.ngravcomp > 0 or "body_gravcomp" in batch_sizes)
+   m.nflexintcell = _get_nflexintcell(mjm)
+ 
+   # Precompute flex_cell_map
+diff --git a/mujoco_warp/_src/passive.py b/mujoco_warp/_src/passive.py
+index 64f5082..7c5ef70 100644
+--- a/mujoco_warp/_src/passive.py
++++ b/mujoco_warp/_src/passive.py
+@@ -1407,7 +1407,8 @@ def passive(m: Model, d: Data):
+ 
+   gravity_enabled = not (m.opt.disableflags & DisableBit.GRAVITY)
+   d.qfrc_gravcomp.zero_()
+-  if gravity_enabled:
++  # (nworld, nbody - 1, nv) threads that write nothing when no body has gravcomp (MuJoCo C: ngravcomp)
++  if gravity_enabled and m.has_gravcomp:
+     wp.launch(
+       _gravity_force,
+       dim=(d.nworld, m.nbody - 1, m.nv),
+diff --git a/mujoco_warp/_src/smooth.py b/mujoco_warp/_src/smooth.py
+index 90ff351..de2fd2e 100644
+--- a/mujoco_warp/_src/smooth.py
++++ b/mujoco_warp/_src/smooth.py
+@@ -1222,8 +1222,62 @@ def _qLDiag_div(
+   D_out[worldid, dofid] = 1.0 / L_in[worldid, diag_i]
+ 
+ 
++@cache_kernel
++def _factor_i_sparse_serial(nlevels: int):
++  """Whole sparse L'*D*L factorization of one world per thread (Metal).
++
++  The level-parallel path launches one kernel per tree level (plus a copy and the diagonal): on
++  Metal every launch is a full GPU drain, and the levels of a single tree hold only a few updates
++  per world. Same updates in the same level order; updates of one level that hit the same row are
++  applied in list order instead of atomically in any order (float rounding only).
++  """
++  NLEVELS = nlevels
++
++  @wp.kernel(module="unique", enable_backward=False)
++  def kernel(
++    # Model:
++    M_rownnz: wp.array[int],
++    M_rowadr: wp.array[int],
++    # In:
++    all_updates: wp.array[wp.vec3i],
++    level_offsets: wp.array[int],
++    M_in: wp.array2d[float],
++    # Out:
++    L_out: wp.array2d[float],
++    D_out: wp.array2d[float],
++  ):
++    worldid = wp.tid()
++    for e in range(M_in.shape[1]):
++      L_out[worldid, e] = M_in[worldid, e]
++    for level in range(wp.static(NLEVELS)):
++      level_idx = wp.static(NLEVELS) - 1 - level
++      for u in range(level_offsets[level_idx], level_offsets[level_idx + 1]):
++        update = all_updates[u]
++        i, k, Madr_ki = update[0], update[1], update[2]
++        Madr_i = M_rowadr[i]
++        rowadr_k = M_rowadr[k]
++        tmp = L_out[worldid, Madr_ki] / L_out[worldid, rowadr_k + M_rownnz[k] - 1]
++        for j in range(M_rownnz[i]):
++          L_out[worldid, Madr_i + j] = L_out[worldid, Madr_i + j] - L_out[worldid, rowadr_k + j] * tmp
++        L_out[worldid, Madr_ki] = tmp
++    for dofid in range(D_out.shape[1]):
++      D_out[worldid, dofid] = 1.0 / L_out[worldid, M_rowadr[dofid] + M_rownnz[dofid] - 1]
++
++  return kernel
++
++
+ def _factor_i_sparse(m: Model, d: Data, M: wp.array2d[float], L: wp.array2d[float], D: wp.array2d[float]):
+   """Sparse L'*D*L factorization of inertia-like matrix M, assumed spd."""
++  if getattr(wp.get_device(), "is_metal", False):
++    wp.launch(
++      _factor_i_sparse_serial(len(m.qLD_updates)),
++      dim=d.nworld,
++      inputs=[m.M_rownnz, m.M_rowadr, m.qLD_all_updates, m.qLD_level_offsets, M],
++      outputs=[L, D],
++      block_dim=m.block_dim.sparse_ldl_serial,
++    )
++    return
++
+   wp.copy(L, M)
+ 
+   for i in reversed(range(len(m.qLD_updates))):
+@@ -3406,6 +3460,51 @@ def _solve_LD_sparse_fused(nv: int, nlevels: int):
+   return kernel
+ 
+ 
++@cache_kernel
++def _solve_LD_sparse_serial(nv: int, nlevels: int):
++  """_solve_LD_sparse_fused with one world per thread in full threadgroups (Metal).
++
++  Off CUDA the fused kernel runs one lane per world in one-thread threadgroups (1/32 of a SIMD
++  group). This is the same sequence of operations per world, so the result is unchanged bit for bit.
++  """
++
++  @wp.kernel(module="unique", enable_backward=False)
++  def kernel(
++    # Model:
++    qLD_block_adr: wp.array[int],
++    # In:
++    L: wp.array2d[float],
++    D: wp.array2d[float],
++    all_updates: wp.array[wp.vec3i],
++    level_offsets: wp.array[int],
++    y: wp.array2d[float],
++    # Out:
++    x_out: wp.array2d[float],
++  ):
++    worldid = wp.tid()
++    NV = wp.static(nv)
++    NLEVELS = wp.static(nlevels)
++    for dofid in range(NV):
++      if qLD_block_adr[dofid] == Q_LD_BLOCK_SPARSE:
++        x_out[worldid, dofid] = y[worldid, dofid]
++    for level in range(NLEVELS):
++      level_idx = NLEVELS - 1 - level
++      for u in range(level_offsets[level_idx], level_offsets[level_idx + 1]):
++        update = all_updates[u]
++        i, k, Madr_ki = update[0], update[1], update[2]
++        x_out[worldid, i] = x_out[worldid, i] - L[worldid, Madr_ki] * x_out[worldid, k]
++    for dofid in range(NV):
++      if qLD_block_adr[dofid] == Q_LD_BLOCK_SPARSE:
++        x_out[worldid, dofid] = x_out[worldid, dofid] * D[worldid, dofid]
++    for level in range(NLEVELS):
++      for u in range(level_offsets[level], level_offsets[level + 1]):
++        update = all_updates[u]
++        i, k, Madr_ki = update[0], update[1], update[2]
++        x_out[worldid, k] = x_out[worldid, k] - L[worldid, Madr_ki] * x_out[worldid, i]
++
++  return kernel
++
++
+ def _solve_LD_sparse(
+   m: Model,
+   d: Data,
+@@ -3416,6 +3515,15 @@ def _solve_LD_sparse(
+ ):
+   """Computes sparse backsubstitution: x = inv(L'*D*L)*y."""
+   nlevels = len(m.qLD_updates)
++  if getattr(wp.get_device(), "is_metal", False):
++    wp.launch(
++      _solve_LD_sparse_serial(m.nv, nlevels),
++      dim=d.nworld,
++      inputs=[m.qLD_block_adr, L, D, m.qLD_all_updates, m.qLD_level_offsets, y],
++      outputs=[x],
++      block_dim=m.block_dim.sparse_ldl_serial,
++    )
++    return
+   if wp.get_device().is_cuda:
+     dim_block = m.block_dim.solve_LD_sparse_fused
+   else:
+diff --git a/mujoco_warp/_src/types.py b/mujoco_warp/_src/types.py
+index 82d380d..94adb4f 100644
+--- a/mujoco_warp/_src/types.py
++++ b/mujoco_warp/_src/types.py
+@@ -69,6 +69,8 @@ class BlockDim:
+     cholesky_solve: Cholesky solve block dimension (smooth)
+     small_cholesky: scalar small-block Cholesky block dimension (smooth)
+     solve_LD_sparse_fused: solve LD sparse fused block dimension (smooth)
++    sparse_ldl_serial: threads (worlds) per threadgroup of the one-world-per-thread sparse L'DL
++      factor and solve used on Metal (smooth)
+     update_gradient_cholesky: update gradient Cholesky block dimension (solver)
+     update_gradient_cholesky_blocked: update gradient Cholesky blocked block dimension (solver)
+     update_gradient_JTDAJ_sparse: update gradient JTDAJ sparse block dimension (solver)
+@@ -102,6 +104,7 @@ class BlockDim:
+   cholesky_solve: int = 64
+   small_cholesky: int = 64
+   solve_LD_sparse_fused: int = 128
++  sparse_ldl_serial: int = 32
+   # solver
+   update_gradient_cholesky: int = 64
+   update_gradient_cholesky_blocked: int = 32
+@@ -1443,6 +1446,8 @@ class Model:
+     qLD_block_adr: packed factor offset; Q_LD_BLOCK_* sentinel otherwise (nv,)
+     flg_adhesion: flag indicating if model has passive adhesion
+     has_fluid: True if wind, density, or viscosity are non-zero at put_model time
++    has_gravcomp: True if any body has gravity compensation at put_model time, or body_gravcomp is
++      batched per world (the gravity-compensation launch is skipped otherwise, as MuJoCo C does)
+     flg_surfacevel: whether model has non-zero surfacevel
+     has_sdf_geom: whether the model contains SDF geoms
+     has_flex_selfcollide: whether any flex has self-collision enabled
+@@ -1943,6 +1948,7 @@ class Model:
+   qLD_block_adr: array("nv", int)
+   flg_adhesion: bool
+   has_fluid: bool
++  has_gravcomp: bool
+   flg_surfacevel: bool
+   has_sdf_geom: bool
+   has_flex_selfcollide: bool
+-- 
+2.54.0 (Apple Git-157)
+
