@@ -3,7 +3,13 @@ one captured graph (observation gather, Warp MLP policy, buffer store, physics s
 termination kernels); PyTorch touches the GPU once per update (GAE + minibatch epochs on the
 zero-copy rollout buffers). One host synchronization per rollout.
 
-Tasks plug in through ``WarpTask``: kernels for observations, reward/termination and reset.
+Tasks plug in by duck typing (there is no base class): ``n``, ``obs_dim``, ``act_dim``, ``ctrl_lo`` /
+``ctrl_hi``, an ``obs`` array, a ``sim`` (``BatchSim``), ``launch_obs()``, ``launch_reward_done_reset(pol,
+bufs)`` and ``episode_stats()``; optionally ``launch_apply_action`` + ``action_scratch``, ``launch_physics``,
+``launch_timeouts`` and ``needs_step_idx``. ``CartpoleTask`` below is the minimal example,
+``metalsim.learn.g1_velocity.G1VelocityTask`` the full one.
+
+    python -m metalsim.learn.ppo_warp [num_envs]      # Cartpole-Direct with Isaac's rsl_rl config (default 4096)
 ``CartpoleTask`` reproduces Isaac Lab's Cartpole-Direct-v0 (reward terms, termination bounds,
 reset distribution) so its rsl_rl PPO config (16 steps/env, 150 iterations, MLP 32x32) can be
 run for the RL reproducibility check.

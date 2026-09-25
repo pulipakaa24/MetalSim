@@ -9,6 +9,8 @@ Observation (68): 64 ranges / max_range, goal delta (2) / 8, velocity (2) / 2.
 Action (2): commanded planar velocity in [-1, 1] x 1.5 m/s.
 Reward: 10 x progress towards the goal per step, +10 at the goal (< 0.4 m), -1 per step in contact
 with an obstacle, -0.01 |a|^2. Episode 15 s at 20 Hz control (5 physics substeps at 100 Hz).
+
+    python -m metalsim.learn.lidar_nav [num_envs=1024] [iterations=300] [log_path] [checkpoint.pt]
 """
 from __future__ import annotations
 

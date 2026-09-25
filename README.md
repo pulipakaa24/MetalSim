@@ -15,15 +15,17 @@ Phase logs and measurements live in `docs/`.
 
 ## Install
 
-MetalSim runs on two forks, neither on PyPI:
+Needs an Apple Silicon Mac with the Xcode Command Line Tools (`xcode-select --install`) and Python 3.12
+or newer. MetalSim runs on two forks, neither on PyPI:
 
 - Warp: https://github.com/pulipakaa24/warp branch `metalsim` (innate-inc's Metal backend plus the
-  changes in `patches/`).
+  commits in `patches/warp/`).
 - MuJoCo Warp: https://github.com/pulipakaa24/mujoco_warp branch `metalsim` (the `metal` device branch
-  plus the heightfield plane-contact fix in `patches/`).
+  plus the contact fixes in `patches/mujoco_warp/`).
 
 ```
-python -m venv .venv && source .venv/bin/activate
+git clone https://github.com/pulipakaa24/MetalSim && cd MetalSim
+python3 -m venv .venv && source .venv/bin/activate
 pip install -e ".[test]"
 scripts/setup_warp.sh                      # clones, builds (build_lib.py --no-cuda) and installs the Warp fork
 pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@metalsim#egg=mujoco-warp"
@@ -31,9 +33,10 @@ scripts/fetch_isaac_assets.sh              # NVIDIA's g1_minimal.usd for the G1 
 pytest tests -q
 ```
 
-Set `METALSIM_WARP_REPO` / `METALSIM_WARP_REF` to point the script at another fork or commit. The
-Warp change set is also kept as `patches/*.patch` against innate-inc/warp so a fresh clone can be
-rebuilt without the fork.
+Set `METALSIM_WARP_REPO` / `METALSIM_WARP_REF` (branch, tag or commit) to point the script at another
+fork or commit. If the fork is unreachable the script rebuilds it from innate-inc/warp plus
+`patches/warp/`. Optional extras (`parity`, `rslrl`, `newton`, `tron1`, `learn`), the exact fork
+commits, first runs and bringing your own robot are in [`docs/GUIDE.md`](docs/GUIDE.md).
 
 ## What is and is not claimed
 
