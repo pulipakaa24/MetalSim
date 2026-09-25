@@ -42,10 +42,14 @@ class Tuning:
     gap: float | None = None
     limit_solref: tuple | None = None
     limit_solimp: tuple | None = None
-    margin_geoms: tuple | None = None   # geom names that get margin/gap (None: all). A pair uses the max
-                                        # of its geoms' margin/gap, so margin on the ground alone covers
-                                        # every ground contact; MuJoCo Warp rejects margin on mesh-mesh
-                                        # pairs with MULTICCD (e.g. foot-foot)
+    cone: str | None = None             # "pyramidal" | "elliptic"
+    impratio: float | None = None       # frictional-to-normal impedance ratio (elliptic cones only)
+    friction: float | None = None       # sliding friction on all geoms (pair value = max of the two)
+    margin_geoms: tuple | None = None   # geom names that get margin/gap (None: all). A pair's margin/gap is
+                                        # the SUM of its geoms' (C engine_collision_driver.c:166/175, MuJoCo
+                                        # Warp collision_core.contact_margin_gap), so margin on the ground alone
+                                        # gives every ground pair exactly that margin; MuJoCo Warp rejects
+                                        # margin on mesh-mesh pairs with MULTICCD (e.g. foot-foot)
     note: str = ""
 
 
@@ -131,11 +135,34 @@ def set_joint_limits(m, solref=None, solimp=None, joints=None):
     return m
 
 
+def set_solver(m, cone=None, impratio=None):
+    """Friction cone type and impratio on an MjModel or MjSpec."""
+    opt = m.option if isinstance(m, mujoco.MjSpec) else m.opt
+    if cone is not None:
+        opt.cone = {"pyramidal": mujoco.mjtCone.mjCONE_PYRAMIDAL, "elliptic": mujoco.mjtCone.mjCONE_ELLIPTIC}[cone]
+    if impratio is not None:
+        opt.impratio = impratio
+    return m
+
+
+def set_friction(m, sliding):
+    """Sliding friction coefficient on every geom (MuJoCo combines a pair's friction by the max)."""
+    if isinstance(m, mujoco.MjSpec):
+        for g in m.geoms:
+            g.friction = [sliding, g.friction[1], g.friction[2]]
+    else:
+        m.geom_friction[:, 0] = sliding
+    return m
+
+
 def apply(m, tuning: str | Tuning):
     """Apply a preset name or a ``Tuning`` to an MjModel (in place, returned) or MjSpec."""
     t = PRESETS[tuning] if isinstance(tuning, str) else tuning
     set_contacts(m, t.contact_solref, t.contact_solimp, t.margin, t.gap, margin_geoms=t.margin_geoms)
     set_joint_limits(m, t.limit_solref, t.limit_solimp)
+    set_solver(m, t.cone, t.impratio)
+    if t.friction is not None:
+        set_friction(m, t.friction)
     return m
 
 
@@ -178,6 +205,33 @@ class g1_model_tuning:
         self._g1.build_g1_model = self._orig
         return False
 
+
+_HL = dict(limit_solref=(0.005, 1.0), limit_solimp=(0.99, 0.999, 0.001, 0.5, 2.0))
+PRESETS.update({
+    # MuJoCo docs: "When contact slip is a problem, the best way to suppress it is to use elliptic cones, large
+    # impratio, and the Newton algorithm" (modeling.html); MuJoCo Warp has no noslip solver
+    "elliptic_hardlimits": Tuning(cone="elliptic", impratio=1.0, **_HL, note="elliptic cone, impratio 1, hard limits"),
+    "elliptic_imp10_hardlimits": Tuning(cone="elliptic", impratio=10.0, **_HL, note="elliptic cone, impratio 10, hard limits"),
+    "tau5_imp99_elliptic_hardlimits": Tuning(contact_solref=(0.005, 1.0), contact_solimp=(0.99, 0.999, 0.001, 0.5, 2.0),
+                                             cone="elliptic", impratio=1.0, **_HL,
+                                             note="tau5_imp99 + elliptic cone, impratio 1, hard limits"),
+    # tau5_imp99 + elliptic impratio 10 diverges in the MuJoCo C drop (2.08 s at 2.5 ms): not offered
+    # Isaac Lab develop's own MuJoCo Warp config for the velocity task: NewtonShapeCfg(ke=160000, kd=1100), 2.5 ms;
+    # mapped here to MuJoCo's direct solref form (-stiffness, -damping), which is an assumption about Newton's mapping;
+    # measured in the MuJoCo C drop the G1 does not fall (pelvis 0.688 m at 3 s vs Isaac 0.054) with 16.6 kN peaks, so
+    # this mapping is not Newton's and the preset is kept only as a record
+    "isaaclab_mjw_kekd_hardlimits": Tuning(contact_solref=(-160000.0, -1100.0), **_HL,
+                                           note="direct solref (-1.6e5, -1.1e3) as Isaac Lab's MJWarp ke/kd, hard limits"),
+})
+
+PRESETS.update({
+    # cheaper routes to stiffer contacts (throughput rule): tau 10 ms instead of the 5 ms floor, and an impedance
+    # that is MuJoCo's 0.9 at touch-down and ramps to 0.999 over 5 mm of penetration (stiff only on impact)
+    "tau10_imp99_hardlimits": Tuning(contact_solref=(0.01, 1.0), contact_solimp=(0.99, 0.999, 0.001, 0.5, 2.0), **_HL,
+                                     note="contact tau 10 ms, impedance 0.99-0.999, hard limits"),
+    "tau10_impact_hardlimits": Tuning(contact_solref=(0.01, 1.0), contact_solimp=(0.9, 0.999, 0.005, 0.5, 2.0), **_HL,
+                                      note="contact tau 10 ms, impedance 0.9 -> 0.999 over 5 mm (stiff on impact), hard limits"),
+})
 
 # Measured against Isaac's PhysX recordings (parity_out2, protocols A_hold / B_random / C_drop):
 # see scripts/diagnostics/bench_contact_tuning.py and runs/parity/tuning/report_*.

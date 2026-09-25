@@ -65,9 +65,13 @@ def test_stack_sign_history_filter_and_graph():
     sim.synchronize()
     hist_ref = []
     c0 = wm.counters()
+    from metalsim.interop import torch_bridge as tb
     for _ in range(3):
         v = sim.step(); sim.after(v)
         hist_ref.append(cs.net_forces_w.clone())
+        # the next step overwrites net_forces_w: order it after torch's clone (write-after-read), else under load the
+        # clone can read the next step's values (seen once as a ~1e-7 mismatch)
+        w = sim.event.next_value(); tb.signal_event(sim.event, w); sim.wait(sim.event, w)
     torch.mps.synchronize()
     assert (wm.counters() - c0).syncs == 0
     o = cs.numpy()
