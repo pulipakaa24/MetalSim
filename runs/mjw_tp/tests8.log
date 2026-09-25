@@ -1,0 +1,52 @@
+=== start Fri Sep 25 09:42:54 PDT 2026
+holder: {"name": "mjw_tp_round8", "kind": "low", "minutes": 30.0, "pid": 63744, "start": 1790354557.5379689}
+  waiting [low] flex_merge_rigid_ab est 15.0 min, queued 1 s ago
+tests/test_physics.py::test_one_step_parity_vs_mujoco_c[go1]
+  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+28 passed, 2 warnings in 17.33s
+variant {'label': 'fuse 0'}
+it    1 steps     98304 sps   48,106 | ep_ret    0.00 ep_len    0.0 (n=0) | pg 0.022 vf 3.106 kl 0.0728 lr 1.0e-05
+it    2 steps    196608 sps   52,269 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.002 vf 0.637 kl 0.0056 lr 2.6e-04
+it    3 steps    294912 sps   53,975 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.005 vf 0.287 kl 0.0128 lr 8.6e-04
+it    4 steps    393216 sps   54,888 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.002 vf 0.899 kl 0.0129 lr 5.8e-04
+it    5 steps    491520 sps   54,784 | ep_ret  -20.63 ep_len  115.0 (n=3139) | pg -0.001 vf 6.602 kl 0.0149 lr 5.8e-04
+it    6 steps    589824 sps   54,154 | ep_ret  -17.06 ep_len   91.5 (n=1347) | pg -0.004 vf 0.620 kl 0.0140 lr 5.8e-04
+it    7 steps    688128 sps   53,815 | ep_ret   -6.31 ep_len   40.1 (n=3132) | pg -0.001 vf 1.087 kl 0.0116 lr 5.8e-04
+it    8 steps    786432 sps   53,579 | ep_ret   -6.10 ep_len   39.4 (n=2320) | pg -0.003 vf 0.764 kl 0.0124 lr 3.8e-04
+it    9 steps    884736 sps   53,378 | ep_ret   -5.98 ep_len   39.9 (n=2459) | pg -0.000 vf 0.560 kl 0.0103 lr 2.6e-04
+it   10 steps    983040 sps   53,224 | ep_ret   -5.95 ep_len   39.3 (n=2537) | pg -0.004 vf 0.460 kl 0.0095 lr 8.6e-04
+it   11 steps   1081344 sps   53,080 | ep_ret   -5.94 ep_len   39.8 (n=2467) | pg 0.001 vf 0.368 kl 0.0181 lr 7.6e-05
+it   12 steps   1179648 sps   52,967 | ep_ret   -5.92 ep_len   39.6 (n=2413) | pg -0.003 vf 0.252 kl 0.0073 lr 3.8e-04
+it   13 steps   1277952 sps   52,865 | ep_ret   -5.93 ep_len   40.5 (n=2454) | pg -0.005 vf 0.204 kl 0.0119 lr 5.8e-04
+it   14 steps   1376256 sps   52,773 | ep_ret   -5.90 ep_len   40.2 (n=2415) | pg -0.002 vf 0.131 kl 0.0128 lr 3.8e-04
+it   15 steps   1474560 sps   52,683 | ep_ret   -5.89 ep_len   40.6 (n=2420) | pg -0.004 vf 0.070 kl 0.0104 lr 3.8e-04
+it   16 steps   1572864 sps   52,620 | ep_ret   -5.85 ep_len   40.6 (n=2475) | pg -0.009 vf 0.050 kl 0.0129 lr 8.6e-04
+it   17 steps   1671168 sps   52,549 | ep_ret   -5.81 ep_len   40.5 (n=2378) | pg -0.008 vf 0.035 kl 0.0125 lr 3.8e-04
+it   18 steps   1769472 sps   52,492 | ep_ret   -5.76 ep_len   40.8 (n=2394) | pg -0.014 vf 0.022 kl 0.0142 lr 5.8e-04
+it   19 steps   1867776 sps   52,438 | ep_ret   -5.75 ep_len   41.5 (n=2349) | pg -0.014 vf 0.015 kl 0.0149 lr 5.8e-04
+it   20 steps   1966080 sps   52,383 | ep_ret   -5.71 ep_len   42.0 (n=2286) | pg -0.016 vf 0.013 kl 0.0157 lr 8.6e-04
+variant {'label': 'fuse 1'}
+it    1 steps     98304 sps   51,702 | ep_ret    0.00 ep_len    0.0 (n=0) | pg 0.022 vf 3.106 kl 0.0728 lr 1.0e-05
+it    2 steps    196608 sps   57,038 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.002 vf 0.637 kl 0.0056 lr 2.6e-04
+it    3 steps    294912 sps   59,224 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.005 vf 0.287 kl 0.0128 lr 8.6e-04
+it    4 steps    393216 sps   60,291 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.003 vf 0.899 kl 0.0126 lr 5.8e-04
+it    5 steps    491520 sps   59,941 | ep_ret  -20.62 ep_len  115.0 (n=3136) | pg -0.002 vf 6.591 kl 0.0146 lr 5.8e-04
+it    6 steps    589824 sps   59,057 | ep_ret  -17.14 ep_len   91.9 (n=1338) | pg -0.004 vf 0.611 kl 0.0139 lr 5.8e-04
+it    7 steps    688128 sps   58,567 | ep_ret   -6.34 ep_len   40.3 (n=3141) | pg -0.001 vf 1.089 kl 0.0114 lr 5.8e-04
+it    8 steps    786432 sps   58,207 | ep_ret   -6.07 ep_len   39.1 (n=2328) | pg -0.003 vf 0.769 kl 0.0125 lr 3.8e-04
+it    9 steps    884736 sps   57,907 | ep_ret   -6.00 ep_len   40.1 (n=2462) | pg 0.001 vf 0.563 kl 0.0099 lr 2.6e-04
+it   10 steps    983040 sps   57,678 | ep_ret   -5.94 ep_len   39.2 (n=2534) | pg -0.005 vf 0.475 kl 0.0093 lr 8.6e-04
+it   11 steps   1081344 sps   57,463 | ep_ret   -5.95 ep_len   39.9 (n=2412) | pg -0.005 vf 0.268 kl 0.0147 lr 1.3e-03
+it   12 steps   1179648 sps   57,276 | ep_ret   -5.92 ep_len   39.8 (n=2491) | pg -0.001 vf 0.200 kl 0.0155 lr 2.6e-04
+it   13 steps   1277952 sps   57,119 | ep_ret   -5.92 ep_len   40.3 (n=2437) | pg -0.004 vf 0.146 kl 0.0102 lr 8.6e-04
+it   14 steps   1376256 sps   56,996 | ep_ret   -5.88 ep_len   40.0 (n=2467) | pg -0.009 vf 0.077 kl 0.0130 lr 1.3e-03
+it   15 steps   1474560 sps   56,872 | ep_ret   -5.86 ep_len   40.3 (n=2352) | pg -0.010 vf 0.052 kl 0.0152 lr 5.8e-04
+it   16 steps   1572864 sps   56,761 | ep_ret   -5.84 ep_len   41.1 (n=2440) | pg -0.012 vf 0.034 kl 0.0142 lr 1.3e-03
+it   17 steps   1671168 sps   56,657 | ep_ret   -5.81 ep_len   41.6 (n=2295) | pg -0.015 vf 0.021 kl 0.0158 lr 5.8e-04
+it   18 steps   1769472 sps   56,567 | ep_ret   -5.76 ep_len   41.7 (n=2361) | pg -0.014 vf 0.016 kl 0.0153 lr 1.3e-03
+it   19 steps   1867776 sps   56,490 | ep_ret   -5.72 ep_len   42.0 (n=2299) | pg -0.015 vf 0.014 kl 0.0168 lr 8.6e-04
+it   20 steps   1966080 sps   56,401 | ep_ret   -5.72 ep_len   43.1 (n=2251) | pg -0.015 vf 0.012 kl 0.0173 lr 8.6e-04
+=== end Fri Sep 25 09:44:33 PDT 2026

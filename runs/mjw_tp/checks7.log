@@ -1,0 +1,76 @@
+=== start Fri Sep 25 09:39:33 PDT 2026
+holder: {"name": "mjw_tp_round7", "kind": "low", "minutes": 45.0, "pid": 62973, "start": 1790354273.2821078}
+=== variant {'label': 'fusion off'}; N=512, 50 control steps, deterministic actions
+njmax 256 naconmax 16384 sparse False
+--- floor: two graph-replay instances of this configuration
+   step    1: qpos max 5.22e-07 median 0.0e+00 | obs max 1.25e-04 | rew max 1.09e-07
+   step    2: qpos max 1.94e-06 median 0.0e+00 | obs max 4.12e-04 | rew max 5.43e-07
+   step    5: qpos max 6.35e-03 median 5.6e-09 | obs max 2.80e-01 | rew max 1.07e-03
+   step   10: qpos max 3.28e-02 median 4.3e-08 | obs max 1.32e+00 | rew max 2.39e-03
+   step   20: qpos max 8.15e-02 median 7.5e-08 | obs max 2.20e+00 | rew max 6.46e-03
+   step   30: qpos max 7.64e-01 median 1.2e-07 | obs max 1.41e+01 | rew max 4.00e+00
+   step   40: qpos max 5.37e-01 median 6.0e-08 | obs max 6.70e+00 | rew max 1.56e-02
+   step   50: qpos max 1.62e+00 median 3.0e-08 | obs max 8.17e+00 | rew max 4.08e+00
+--- graph replay vs eager launches (same configuration)
+   step    1: qpos max 2.98e-07 median 0.0e+00 | obs max 1.03e-04 | rew max 8.10e-08
+   step    2: qpos max 2.80e-06 median 0.0e+00 | obs max 3.48e-04 | rew max 3.88e-07
+   step    5: qpos max 6.35e-03 median 7.5e-09 | obs max 2.79e-01 | rew max 1.06e-03
+   step   10: qpos max 3.28e-02 median 4.3e-08 | obs max 1.30e+00 | rew max 2.39e-03
+   step   20: qpos max 8.15e-02 median 7.5e-08 | obs max 2.20e+00 | rew max 2.45e-03
+   step   30: qpos max 7.64e-01 median 1.2e-07 | obs max 1.41e+01 | rew max 4.00e+00
+   step   40: qpos max 5.37e-01 median 6.0e-08 | obs max 1.09e+01 | rew max 4.02e+00
+   step   50: qpos max 1.93e+00 median 3.0e-08 | obs max 1.09e+01 | rew max 4.08e+00
+capacity replay: nefc max 39 (njmax 256), nacon max 1695 (naconmax 16384); overflow {'LS_ITERATIONS': 471}
+capacity replay 2: nefc max 39 (njmax 256), nacon max 1695 (naconmax 16384); overflow {'LS_ITERATIONS': 472}
+capacity eager: nefc max 39 (njmax 256), nacon max 1695 (naconmax 16384); overflow {'LS_ITERATIONS': 467}
+--- physics protocol vs MuJoCo C (4 worlds: PD hold + fixed random targets; |dq| max / median)
+   t=0.02s 4.08e-06/1.6e-08  t=0.04s 5.04e-06/3.7e-08  t=0.08s 1.51e-01/1.5e-02  t=0.24s 2.74e-01/4.8e-02  t=0.50s 1.99e-01/6.5e-02  t=1.00s 6.25e-01/1.1e-01
+=== done
+=== variant {'label': 'fused'}; N=512, 50 control steps, deterministic actions
+njmax 256 naconmax 16384 sparse False
+--- floor: two graph-replay instances of this configuration
+   step    1: qpos max 3.54e-06 median 0.0e+00 | obs max 3.61e-04 | rew max 1.22e-07
+   step    2: qpos max 4.75e-06 median 0.0e+00 | obs max 6.65e-04 | rew max 5.94e-07
+   step    5: qpos max 1.15e-03 median 6.8e-09 | obs max 1.88e-01 | rew max 4.98e-05
+   step   10: qpos max 2.37e-02 median 4.1e-08 | obs max 1.32e+00 | rew max 2.39e-03
+   step   20: qpos max 8.15e-02 median 6.5e-08 | obs max 2.20e+00 | rew max 2.45e-03
+   step   30: qpos max 2.05e-01 median 1.2e-07 | obs max 2.51e+00 | rew max 9.25e-03
+   step   40: qpos max 8.88e-01 median 6.0e-08 | obs max 1.09e+01 | rew max 4.02e+00
+   step   50: qpos max 1.30e+00 median 3.0e-08 | obs max 8.17e+00 | rew max 1.50e-02
+--- graph replay vs eager launches (same configuration)
+   step    1: qpos max 3.57e-07 median 0.0e+00 | obs max 7.34e-05 | rew max 1.27e-07
+   step    2: qpos max 2.02e-06 median 0.0e+00 | obs max 4.25e-04 | rew max 5.43e-07
+   step    5: qpos max 2.64e-02 median 7.5e-09 | obs max 6.50e-01 | rew max 1.06e-03
+   step   10: qpos max 3.28e-02 median 4.1e-08 | obs max 1.30e+00 | rew max 2.39e-03
+   step   20: qpos max 8.15e-02 median 6.7e-08 | obs max 2.96e+00 | rew max 9.59e-03
+   step   30: qpos max 2.05e-01 median 1.2e-07 | obs max 3.35e+00 | rew max 4.13e-03
+   step   40: qpos max 1.36e+00 median 6.0e-08 | obs max 9.20e+00 | rew max 4.00e+00
+   step   50: qpos max 1.39e+00 median 3.0e-08 | obs max 8.17e+00 | rew max 1.61e-02
+capacity replay: nefc max 39 (njmax 256), nacon max 1695 (naconmax 16384); overflow {'LS_ITERATIONS': 471}
+capacity replay 2: nefc max 39 (njmax 256), nacon max 1695 (naconmax 16384); overflow {'LS_ITERATIONS': 467}
+capacity eager: nefc max 39 (njmax 256), nacon max 1695 (naconmax 16384); overflow {'LS_ITERATIONS': 470}
+--- physics protocol vs MuJoCo C (4 worlds: PD hold + fixed random targets; |dq| max / median)
+   t=0.02s 4.08e-06/1.6e-08  t=0.04s 5.04e-06/3.7e-08  t=0.08s 1.51e-01/1.5e-02  t=0.24s 2.74e-01/4.8e-02  t=0.50s 1.97e-01/6.5e-02  t=1.00s 6.42e-01/1.1e-01
+--- this configuration vs reference {"label": "fusion off"} (graph replay)
+   step    1: qpos max 3.58e-07 median 0.0e+00 | obs max 6.15e-05 | rew max 1.22e-07
+   step    2: qpos max 2.38e-06 median 0.0e+00 | obs max 2.78e-04 | rew max 5.42e-07
+   step    5: qpos max 2.64e-02 median 5.8e-09 | obs max 6.50e-01 | rew max 1.06e-03
+   step   10: qpos max 3.28e-02 median 4.5e-08 | obs max 1.30e+00 | rew max 2.39e-03
+   step   20: qpos max 8.15e-02 median 7.5e-08 | obs max 2.96e+00 | rew max 9.59e-03
+   step   30: qpos max 7.64e-01 median 1.2e-07 | obs max 1.41e+01 | rew max 4.00e+00
+   step   40: qpos max 1.36e+00 median 6.0e-08 | obs max 9.20e+00 | rew max 4.00e+00
+   step   50: qpos max 1.93e+00 median 3.0e-08 | obs max 8.17e+00 | rew max 4.08e+00
+   reference MuJoCo C protocol: t=0.02s 4.08e-06/1.6e-08  t=0.04s 5.04e-06/3.7e-08  t=0.08s 1.51e-01/1.5e-02  t=0.24s 2.74e-01/4.8e-02  t=0.50s 1.99e-01/6.5e-02  t=1.00s 6.25e-01/1.1e-01
+=== done
+=== pytest
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+28 passed, 2 warnings in 18.39s
+=== MuJoCo Warp fork tests (smooth / passive / derivative / solver / forward; Metal default device)
+........................................................................ [ 22%]
+.....................................................ss................. [ 44%]
+...s.................................................................... [ 66%]
+...............................s...................................... [ 87%]
+........ss.......ss.s.s..s...............                                [100%]
+316 passed, 11 skipped, 2 subtests passed in 105.08s (0:01:45)
+=== end Fri Sep 25 09:42:01 PDT 2026

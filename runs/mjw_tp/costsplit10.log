@@ -1,0 +1,24 @@
+=== start Fri Sep 25 09:55:03 PDT 2026 power: Now drawing from 'AC Power'
+holder: {"name": "mjw_tp_round10", "kind": "low", "minutes": 15.0, "pid": 65225, "start": 1790355303.5793412}
+[default (steps 1-4)] N=4096 njmax 256 naconmax 131072 is_sparse False
+[default (steps 1-4)] physics only 50.6 ms/step -> 80,909 env-steps/s
+[default (steps 1-4)] full env step 60.6 ms -> 67,579 env-steps/s
+[default (steps 1-4)] after random-action steps: nefc max 44 mean 15.1; nacon 11847 (2.89/world); overflow {'LS_ITERATIONS': 3831}
+[default (steps 1-4)] rollout + inference 66.7 ms/step -> 61,430 env-steps/s
+[default (steps 1-4)] PPO update 149 ms -> full loop 56,193 env-steps/s
+[default (steps 1-4)] SUMMARY physics 80,909 | step 67,579 | rollout 61,430 | loop 56,193  (ms: physics 50.6, step 60.6, rollout/step 66.7, update 149)
+[blocked Hessian Cholesky] N=4096 njmax 256 naconmax 131072 is_sparse False
+[blocked Hessian Cholesky] physics only 62.5 ms/step -> 65,577 env-steps/s
+[blocked Hessian Cholesky] full env step 74.7 ms -> 54,797 env-steps/s
+[blocked Hessian Cholesky] after random-action steps: nefc max 49 mean 15.1; nacon 11804 (2.88/world); overflow {'LS_ITERATIONS': 3835}
+[blocked Hessian Cholesky] rollout + inference 82.2 ms/step -> 49,851 env-steps/s
+[blocked Hessian Cholesky] PPO update 153 ms -> full loop 46,264 env-steps/s
+[blocked Hessian Cholesky] SUMMARY physics 65,577 | step 54,797 | rollout 49,851 | loop 46,264  (ms: physics 62.5, step 74.7, rollout/step 82.2, update 153)
+[default repeat] N=4096 njmax 256 naconmax 131072 is_sparse False
+[default repeat] physics only 50.8 ms/step -> 80,651 env-steps/s
+[default repeat] full env step 60.4 ms -> 67,775 env-steps/s
+[default repeat] after random-action steps: nefc max 44 mean 15.1; nacon 11765 (2.87/world); overflow {'LS_ITERATIONS': 3838}
+[default repeat] rollout + inference 66.8 ms/step -> 61,359 env-steps/s
+[default repeat] PPO update 154 ms -> full loop 55,971 env-steps/s
+[default repeat] SUMMARY physics 80,651 | step 67,775 | rollout 61,359 | loop 55,971  (ms: physics 50.8, step 60.4, rollout/step 66.8, update 154)
+=== end Fri Sep 25 09:56:21 PDT 2026

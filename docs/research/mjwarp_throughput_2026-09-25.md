@@ -115,3 +115,62 @@ consumed by nothing in the training graph.
    schedule; 4–5 % of the loop.
 
 Measured outcome: see the "Results" section appended after the runs.
+
+## 5. Results (measured 2026-09-25 on the M4 Max, GPU through the queue; logs in `runs/mjw_tp/`)
+
+### Profile of the starting point (`runs/mjw_tp/profile.log`)
+
+- Outside physics the env step costs **6.5 ms of 128 ms** in graph replay (reward 0.07, `reset_data` 0.13,
+  contact-sensor reset 0.02, `g1_reset` 0.02, kinematics 0.13, commands + obs 0.05 ms as separate graphs; the
+  rest is dispatch drains). The "~18 ms / 23 % reset-obs overhead" was the difference between physics-only
+  (robots standing from reset) and the full step (random actions, more contacts): physics measured in a
+  different state, not task work. Removing the post-reset kinematics gains 0 %.
+- Per-kernel (WP_METAL_PROFILE=1): dense 43×43 Cholesky kernels were about two thirds of physics:
+  `_tile_cholesky_factorize_solve_block` (M and M − dt·D, 3.25 ms per call, 2 per substep), the Newton
+  Hessian's `_update_gradient_cholesky` (2.6 ms initial + 0.4 ms per iteration), `_update_gradient_h_incremental`
+  0.19 ms per iteration. Cause: the Warp fork's register Cholesky (one SIMD group, no barriers) was limited to
+  n ≤ 40; the G1's 43 dofs took the cooperative path with a threadgroup barrier per column.
+- Dispatch cost in a replayed ICB graph (`metal_dispatch_cost.py`): 1.9 µs for a 4,096-thread no-op, 26 µs at
+  1 M threads, 92 µs at 3.9 M threads: dispatch count is cheap, capacity-sized empty grids are not.
+
+### Steps (4096 envs, flat, 2.5 ms; env-steps/s: physics only | full env step | rollout + inference | full PPO loop)
+
+| step | change | physics | step | rollout | loop | loop gain | checks |
+|---|---|---|---|---|---|---|---|
+| 0 | as committed before (same session: 36.2K / 31.5K / 29.1K / 27.9K; ms: 113 / 130 / 141 per step, update 145–155 per iteration) | 36,202 | 31,494 | 29,134 | 27,937 | – | – |
+| 1 | Warp fork b9557cb: `metal_register_cholesky_max` 48 (register path for n = 43) | 50,663 | 45,272 | 42,955 | 40,297 | +44 % | floor, eager, MuJoCo C, probe |
+| 2 | `m_dense_max` 0: M and M − dt·D by MuJoCo Warp's tree-sparse L'DL | 61,470 | 53,486 | 50,471 | 46,764 | +16 % | floor, eager, MuJoCo C, probe, rough |
+| 3 | MuJoCo Warp fork ad22120: one-world-per-thread sparse L'DL factor/solve on Metal (the solve ran in 1-thread threadgroups); skip the no-op gravcomp ((nworld, nbody−1, nv) = 7.7 M threads) and tendon-damping launches | 71,463 | 61,324 | 56,981 | 52,464 | +12 % | floor, eager, MuJoCo C; solve bitwise, factor bitwise on CPU |
+| 4 | MuJoCo Warp fork ccfaffb: incremental Hessian update fused into the register Cholesky launch | 80,994 | 67,620 | 61,676 | 56,575 | +7.7 % | bitwise on CPU; floor, eager, MuJoCo C, probe; fork tests 316 passed |
+| final (same session as a re-measured original) | | 80,469–80,885 | 67,6xx | 61,059–61,510 | **55,769–56,250** vs 28,200 | **2.0×** | |
+
+Per control step after: physics 50.6–50.9 ms, full step 60.6 ms, rollout + inference 66.6–67.1 ms, PPO update
+149–153 ms per iteration (unchanged). Rough terrain (boxes): full loop 23.7K → 41.9K (1.77×), update 310 ms.
+
+Correctness (every step): the variant against the previous configuration stays within the run-to-run floor of
+either configuration (MuJoCo Warp's atomics order contacts and rows nondeterministically; after one control
+step qpos differs by ≤ 3.6e-6 rad, median 0, the same as two instances of one configuration); graph replay
+equals eager launches to the same floor; the MuJoCo C protocol (PD hold + fixed random targets) gives 4.08e-6
+after one control step and the same envelope later for every configuration; 20-iteration training probes
+give the same episode-length trend (it 5: 115.0, it 6: 91.5–91.9, it 20: 41.5–43.1); overflow flags unchanged;
+`tests/test_g1_parity.py tests/test_g1_task_terms.py tests/test_physics.py tests/test_g1_fast_factorization.py`
+28 passed.
+
+### Rejected (kept behind flags or as patches, with numbers)
+
+| option | loop effect | how to re-enable |
+|---|---|---|
+| `njmax` 128 / `nconmax` 16 (provable bound 97 rows / 15 contacts) | +1.8 % | `BatchSimOptions(njmax=128, nconmax=16)` |
+| sparse constraint Jacobian | +2.2 % (before step 4; the fused path is dense-only) | `BatchSimOptions(jacobian="sparse")` |
+| no post-reset kinematics (flat) | 0 % | – (measurement only) |
+| `WP_METAL_INFLIGHT` 16 / 256, `WP_METAL_ICB_BATCH` 256 | 0 / 0 / −11 % | environment variables |
+| `BlockDim.sparse_ldl_serial` 16 | +1.1 % | `BatchSimOptions(block_dim={"sparse_ldl_serial": 16})` |
+| blocked (16-wide) Hessian Cholesky | −18 % | `MJW_METAL_DENSE_CHOL_MAX=32` |
+| compact per-lane storage in the register Cholesky | −11 % (n = 43: 1.41 vs 1.11 ms) | `runs/mjw_tp/rejected_warp_compact_register_cholesky.patch` |
+| Schur-complement Hessian solve (core 19 + arms 24, tile ops) | 1.35 vs 1.11 ms per 4096 solves | `scripts/diagnostics/metal_schur_cost.py` |
+| removing the per-minibatch KL `.item()` in the update | ≤ 1 % (update 159 vs 142–148 ms) | – |
+
+Stop: after step 4 every remaining candidate measured under 3 % or negative. Remaining time: the 43×43 Cholesky
+(fused kernel 0.25 ms per iteration, initial 1.2 ms per substep; n = 32 costs 0.27 ms, n = 43 1.11 ms, so the
+second column per lane is the cost), the one-thread-per-world sparse L'DL of M (0.5 ms per call), and the Warp
+MLP inference in the rollout (~6 ms per step, `metalsim/learn/warp_policy.py`: one thread per (env, output)).

@@ -1,0 +1,158 @@
+=== start Fri Sep 25 09:23:23 PDT 2026 power: Now drawing from 'AC Power'
+holder: {"name": "mjw_tp_round6", "kind": "low", "minutes": 30.0, "pid": 61647, "start": 1790353403.0042582}
+task: terrain flat, reward_cfg flat, obs_dim 123, height scan 0 rays
+=== segment graphs, N=4096, dt 2.5 ms, decimation 8, 20 replays each, synchronized; reset segments with 2% of envs flagged
+  apply_action                                                0.03 ms   dispatches     3 cmdbufs   1 syncs 1
+  physics (substeps + contact-sensor hooks)                  60.94 ms   dispatches  1712 cmdbufs   1 syncs 1
+  reward/done (foot vel, hist max, reward kernel)             0.07 ms   dispatches     3 cmdbufs   1 syncs 1
+  mjw.reset_data (masked)                                     0.13 ms   dispatches     6 cmdbufs   1 syncs 1
+  contact sensor reset                                        0.02 ms   dispatches     1 cmdbufs   1 syncs 1
+  g1_reset (masked)                                           0.02 ms   dispatches     1 cmdbufs   1 syncs 1
+  mjw.kinematics (all worlds)                                 0.13 ms   dispatches     5 cmdbufs   1 syncs 1
+  commands + obs (incl. height scan on rough)                 0.05 ms   dispatches     2 cmdbufs   1 syncs 1
+  sum of segments                                            61.39 ms
+  whole step graph                                           64.39 ms   dispatches  1733 cmdbufs   1 syncs 1  -> 63,610 env-steps/s
+  outside physics: 3.45 ms (5.4% of the step)
+=== one physics substep split (pieces captured separately; they overlap state, so not additive exactly)
+  fwd_position (kinematics, com, crb, factor, collision, make_constraint, transmission)          1.04 ms  dispatches   51
+    of which collision                                                                           0.26 ms  dispatches    6
+  sensor_pos + fwd_velocity + sensor_vel                                                         0.23 ms  dispatches   23
+  fwd_actuation + fwd_acceleration(factorize)                                                    0.78 ms  dispatches    8
+  solver.solve                                                                                   4.96 ms  dispatches  115
+  sensor_acc + integrate (implicitfast)                                                          0.84 ms  dispatches   13
+  mjw.step (whole substep)                                                                       8.73 ms  dispatches  212
+task: terrain flat, reward_cfg flat, obs_dim 123, height scan 0 rays
+=== per-kernel GPU time (WP_METAL_PROFILE=1, eager, one command buffer per dispatch), N=4096; 3 steps per segment
+--- apply_action: 0.02 ms/step GPU (sum of per-dispatch times)
+      0.015 ms  x  1  g1_apply_action_53cf971f_metal_forward
+      0.003 ms  x  1  bump_5b8a90a6_metal_forward
+      0.002 ms  x  1  zero_int_9a9af4a3_metal_forward
+--- physics (substeps + contact-sensor hooks): 87.44 ms/step GPU (sum of per-dispatch times)
+     16.011 ms  x 80  _update_gradient_cholesky__locals__kernel_f4bca835_metal_forward
+     15.596 ms  x 80  _update_gradient_h_incremental_9c0c45bc_metal_forward
+      9.883 ms  x  8  _update_gradient_cholesky__locals__kernel_cf59d677_metal_forward
+      8.056 ms  x 16  _factor_i_sparse_serial__locals__kernel_8c1557af_metal_forward
+      4.853 ms  x 80  _update_constraint_efc__locals__kernel_afa7fbbf_metal_forward
+      3.713 ms  x 16  _solve_LD_sparse_serial__locals__kernel_ae6d7fc3_metal_forward
+      3.327 ms  x 80  _linesearch_iterative_kernel__locals__kernel_8deb9b8b_metal_forward
+      2.798 ms  x  8  _update_gradient_JTDAJ_dense_tiled__locals__kernel_44bf422b_metal_forward
+      2.391 ms  x 88  mul_m_kernel__locals___mul_m_9c0838e9_metal_forward
+      2.288 ms  x  8  ccd_kernel_builder__locals__ccd_kernel_f71f2442_metal_forward
+      1.263 ms  x 80  _update_constraint_init_qfrc_constraint_dense__locals__kernel_935a1343_metal_forward
+      1.196 ms  x  8  _efc_contact_jac_dense__locals__kernel_4179614b_metal_forward
+--- reward/done (foot vel, hist max, reward kernel): 0.26 ms/step GPU (sum of per-dispatch times)
+      0.202 ms  x  1  g1_reward_done_abb61845_metal_forward
+      0.032 ms  x  1  g1_foot_vel_mjwarp_35b9d166_metal_forward
+      0.029 ms  x  1  g1_contact_hist_max_3984b96a_metal_forward
+--- mjw.reset_data (masked): 0.64 ms/step GPU (sum of per-dispatch times)
+      0.281 ms  x  1  reset_data__locals__reset_M_7a2e02e4_metal_forward
+      0.184 ms  x  1  reset_data__locals__reset_xfrc_applied_8796844c_metal_forward
+      0.057 ms  x  1  reset_data__locals__reset_nworld_712d8f63_metal_forward
+      0.044 ms  x  1  reset_data__locals__reset_sleep_cb1aa781_metal_forward
+      0.040 ms  x  1  reset_data__locals__reset_mocap_9e83f44d_metal_forward
+      0.039 ms  x  1  reset_data__locals__reset_contact_fa27c589_metal_forward
+--- contact sensor reset: 0.02 ms/step GPU (sum of per-dispatch times)
+      0.023 ms  x  1  _reset_bde926f0_metal_forward
+--- g1_reset (masked): 0.05 ms/step GPU (sum of per-dispatch times)
+      0.048 ms  x  1  g1_reset_590af5cf_metal_forward
+--- mjw.kinematics (all worlds): 0.48 ms/step GPU (sum of per-dispatch times)
+      0.262 ms  x  1  _kinematics_branch_95f8028e_metal_forward
+      0.072 ms  x  1  _compute_body_inertial_frames_d3bdd81a_metal_forward
+      0.070 ms  x  1  _compute_body_matrices_27760750_metal_forward
+      0.053 ms  x  1  _geom_local_to_global_e28b714c_metal_forward
+      0.022 ms  x  1  _site_local_to_global_084f92a4_metal_forward
+--- commands + obs (incl. height scan on rough): 0.17 ms/step GPU (sum of per-dispatch times)
+      0.136 ms  x  1  g1_obs_e7df2c00_metal_forward
+      0.031 ms  x  1  g1_commands_c0476e57_metal_forward
+---   substep: fwd_position (kinematics, com, crb, factor, collision, make_constraint, transmission): 4.35 ms/step GPU (sum of per-dispatch times)
+      1.090 ms  x  1  ccd_kernel_builder__locals__ccd_kernel_f71f2442_metal_forward
+      0.639 ms  x  1  _efc_contact_jac_dense__locals__kernel_4179614b_metal_forward
+      0.494 ms  x 12  _crb_accumulate_073a11b8_metal_forward
+      0.280 ms  x  1  _M_13671fca_metal_forward
+      0.271 ms  x  1  _kinematics_branch_95f8028e_metal_forward
+      0.252 ms  x 12  _subtree_com_acc_350f0560_metal_forward
+      0.187 ms  x  6  wp_memset
+      0.138 ms  x  1  _efc_contact_update__locals__kernel_6f39c81f_metal_forward
+      0.136 ms  x  1  _limit_slide_hinge__locals__kernel_dc200dd6_metal_forward
+      0.114 ms  x  1  _primitive_narrowphase__locals__primitive_narrowphase_3a12219b_metal_forward
+      0.093 ms  x  1  wp_memcpy
+      0.086 ms  x  1  _transmission_4db1a205_metal_forward
+---   substep: sensor_pos + fwd_velocity + sensor_vel: 0.94 ms/step GPU (sum of per-dispatch times)
+      0.361 ms  x 12  _cfrc_backward_72237d38_metal_forward
+      0.151 ms  x  1  _comvel_branch_0f933c58_metal_forward
+      0.090 ms  x  1  _cfrc_3922b605_metal_forward
+      0.078 ms  x  1  _cacc_branch_ffe1d6c4_metal_forward
+      0.073 ms  x  1  _spring_damper_dof_passive_7b46d40c_metal_forward
+      0.044 ms  x  1  _actuator_velocity_00a052f5_metal_forward
+      0.044 ms  x  1  _qfrc_bias_4085b6de_metal_forward
+      0.041 ms  x  1  _qfrc_passive_kernel__locals__kernel_d84f5901_metal_forward
+      0.034 ms  x  2  wp_memset
+      0.012 ms  x  1  _cacc_world_6ec26fdb_metal_forward
+      0.011 ms  x  1  _comvel_root_15820f35_metal_forward
+---   substep: fwd_actuation + fwd_acceleration(factorize): 3.44 ms/step GPU (sum of per-dispatch times)
+      2.057 ms  x  1  _factor_i_sparse_serial__locals__kernel_8c1557af_metal_forward
+      0.950 ms  x  1  _solve_LD_sparse_serial__locals__kernel_ae6d7fc3_metal_forward
+      0.205 ms  x  1  _apply_ft_1667a928_metal_forward
+      0.077 ms  x  1  _actuator_force_9287f290_metal_forward
+      0.051 ms  x  1  _qfrc_actuator_6de5c51c_metal_forward
+      0.045 ms  x  1  _qfrc_smooth__locals__kernel_33de72f1_metal_forward
+      0.039 ms  x  1  _qfrc_actuator_gravcomp_limits_a91eb6a0_metal_forward
+      0.015 ms  x  1  wp_memset
+---   substep: solver.solve: 10.46 ms/step GPU (sum of per-dispatch times)
+      2.562 ms  x  1  _update_gradient_cholesky__locals__kernel_cf59d677_metal_forward
+      2.288 ms  x 10  _update_gradient_cholesky__locals__kernel_f4bca835_metal_forward
+      2.278 ms  x 10  _update_gradient_h_incremental_9c0c45bc_metal_forward
+      0.713 ms  x 10  _update_constraint_efc__locals__kernel_afa7fbbf_metal_forward
+      0.700 ms  x  1  _update_gradient_JTDAJ_dense_tiled__locals__kernel_44bf422b_metal_forward
+      0.543 ms  x 10  _linesearch_iterative_kernel__locals__kernel_8deb9b8b_metal_forward
+      0.443 ms  x 11  mul_m_kernel__locals___mul_m_9c0838e9_metal_forward
+      0.189 ms  x 10  _update_constraint_init_qfrc_constraint_dense__locals__kernel_935a1343_metal_forward
+      0.148 ms  x 10  _update_gradient_grad__locals__kernel_7f5e4a38_metal_forward
+      0.147 ms  x  1  _solve_init_jaref_kernel__locals__kernel_1116a354_metal_forward
+      0.112 ms  x  1  _update_constraint_efc__locals__kernel_d88e782a_metal_forward
+      0.065 ms  x  1  _update_constraint_init_qfrc_constraint_dense__locals__kernel_70c42511_metal_forward
+---   substep: sensor_acc + integrate (implicitfast): 3.90 ms/step GPU (sum of per-dispatch times)
+      2.057 ms  x  1  _factor_i_sparse_serial__locals__kernel_8c1557af_metal_forward
+      0.980 ms  x  1  _solve_LD_sparse_serial__locals__kernel_ae6d7fc3_metal_forward
+      0.365 ms  x  1  _qderiv_actuator_passive_6cbfee2a_metal_forward
+      0.089 ms  x  1  wp_memset
+      0.082 ms  x  1  _sensor_touch_0008103e_metal_forward
+      0.067 ms  x  1  _qderiv_actuator_passive_vel_ccdd93c1_metal_forward
+      0.059 ms  x  1  _next_position_1c101e8d_metal_forward
+      0.057 ms  x  1  _qderiv_actuator_passive_actuation_sparse_9edf10e9_metal_forward
+      0.039 ms  x  1  _next_velocity_d66c2f53_metal_forward
+      0.039 ms  x  1  _next_activation_becb463e_metal_forward
+      0.032 ms  x  1  _sensor_acc_b295114e_metal_forward
+      0.016 ms  x  1  wp_memcpy
+=== top kernels overall (ms per control step; substep pieces are per substep, excluded)
+     16.011 ms  x 80  [physics (substeps + contact-sensor hooks] _update_gradient_cholesky__locals__kernel_f4bca835_metal_forward
+     15.596 ms  x 80  [physics (substeps + contact-sensor hooks] _update_gradient_h_incremental_9c0c45bc_metal_forward
+      9.883 ms  x  8  [physics (substeps + contact-sensor hooks] _update_gradient_cholesky__locals__kernel_cf59d677_metal_forward
+      8.056 ms  x 16  [physics (substeps + contact-sensor hooks] _factor_i_sparse_serial__locals__kernel_8c1557af_metal_forward
+      4.853 ms  x 80  [physics (substeps + contact-sensor hooks] _update_constraint_efc__locals__kernel_afa7fbbf_metal_forward
+      3.713 ms  x 16  [physics (substeps + contact-sensor hooks] _solve_LD_sparse_serial__locals__kernel_ae6d7fc3_metal_forward
+      3.327 ms  x 80  [physics (substeps + contact-sensor hooks] _linesearch_iterative_kernel__locals__kernel_8deb9b8b_metal_forward
+      2.798 ms  x  8  [physics (substeps + contact-sensor hooks] _update_gradient_JTDAJ_dense_tiled__locals__kernel_44bf422b_metal_forward
+      2.391 ms  x 88  [physics (substeps + contact-sensor hooks] mul_m_kernel__locals___mul_m_9c0838e9_metal_forward
+      2.288 ms  x  8  [physics (substeps + contact-sensor hooks] ccd_kernel_builder__locals__ccd_kernel_f71f2442_metal_forward
+      1.263 ms  x 80  [physics (substeps + contact-sensor hooks] _update_constraint_init_qfrc_constraint_dense__locals__kernel_935a1343_metal_forward
+      1.196 ms  x  8  [physics (substeps + contact-sensor hooks] _efc_contact_jac_dense__locals__kernel_4179614b_metal_forward
+      1.156 ms  x 96  [physics (substeps + contact-sensor hooks] _crb_accumulate_073a11b8_metal_forward
+      0.982 ms  x 80  [physics (substeps + contact-sensor hooks] _update_gradient_grad__locals__kernel_7f5e4a38_metal_forward
+      0.972 ms  x120  [physics (substeps + contact-sensor hooks] wp_memset
+      0.893 ms  x  8  [physics (substeps + contact-sensor hooks] _qderiv_actuator_passive_6cbfee2a_metal_forward
+      0.869 ms  x 96  [physics (substeps + contact-sensor hooks] _cfrc_backward_72237d38_metal_forward
+      0.657 ms  x  8  [physics (substeps + contact-sensor hooks] _M_13671fca_metal_forward
+      0.648 ms  x  8  [physics (substeps + contact-sensor hooks] _solve_init_jaref_kernel__locals__kernel_1116a354_metal_forward
+      0.633 ms  x 96  [physics (substeps + contact-sensor hooks] _subtree_com_acc_350f0560_metal_forward
+      0.575 ms  x  8  [physics (substeps + contact-sensor hooks] _kinematics_branch_95f8028e_metal_forward
+      0.529 ms  x  8  [physics (substeps + contact-sensor hooks] _update_constraint_efc__locals__kernel_d88e782a_metal_forward
+      0.459 ms  x 80  [physics (substeps + contact-sensor hooks] _solve_done__locals__kernel_318c149b_metal_forward
+      0.427 ms  x  8  [physics (substeps + contact-sensor hooks] _apply_ft_1667a928_metal_forward
+      0.360 ms  x  8  [physics (substeps + contact-sensor hooks] _cfrc_3922b605_metal_forward
+      0.339 ms  x  8  [physics (substeps + contact-sensor hooks] _comvel_branch_0f933c58_metal_forward
+      0.337 ms  x 80  [physics (substeps + contact-sensor hooks] _update_gradient_zero_grad_dot__locals__kernel_382f12e9_metal_forward
+      0.323 ms  x  8  [physics (substeps + contact-sensor hooks] _primitive_narrowphase__locals__primitive_narrowphase_3a12219b_metal_forward
+      0.315 ms  x  8  [physics (substeps + contact-sensor hooks] _efc_contact_update__locals__kernel_6f39c81f_metal_forward
+      0.306 ms  x  8  [physics (substeps + contact-sensor hooks] _limit_slide_hinge__locals__kernel_dc200dd6_metal_forward
+=== end Fri Sep 25 09:23:39 PDT 2026

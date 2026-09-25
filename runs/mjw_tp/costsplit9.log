@@ -1,0 +1,26 @@
+=== start Fri Sep 25 09:51:54 PDT 2026 power: Now drawing from 'AC Power'
+holder: {"name": "mjw_tp_round9", "kind": "low", "minutes": 30.0, "pid": 64779, "start": 1790355114.409143}
+=== register Cholesky cost (after; before: runs/mjw_tp/cholcost9.log)
+n=12: 0.103 ms per launch of 4096 factor+solve (residual 3.8e-07)
+n=19: 0.127 ms per launch of 4096 factor+solve (residual 6.2e-07)
+n=24: 0.159 ms per launch of 4096 factor+solve (residual 6.8e-07)
+n=32: 0.266 ms per launch of 4096 factor+solve (residual 8.0e-07)
+n=43: 1.412 ms per launch of 4096 factor+solve (residual 9.9e-07)
+=== Warp fork Metal Cholesky tests
+..                                                                       [100%]
+2 passed, 13 deselected in 27.93s
+[step5 compact register Cholesky] N=4096 njmax 256 naconmax 131072 is_sparse False
+[step5 compact register Cholesky] physics only 54.9 ms/step -> 74,575 env-steps/s
+[step5 compact register Cholesky] full env step 67.3 ms -> 60,824 env-steps/s
+[step5 compact register Cholesky] after random-action steps: nefc max 42 mean 15.3; nacon 11989 (2.93/world); overflow {'LS_ITERATIONS': 3833}
+[step5 compact register Cholesky] rollout + inference 75.2 ms/step -> 54,488 env-steps/s
+[step5 compact register Cholesky] PPO update 153 ms -> full loop 50,233 env-steps/s
+[step5 compact register Cholesky] SUMMARY physics 74,575 | step 60,824 | rollout 54,488 | loop 50,233  (ms: physics 54.9, step 67.3, rollout/step 75.2, update 153)
+[step5 repeat] N=4096 njmax 256 naconmax 131072 is_sparse False
+[step5 repeat] physics only 54.9 ms/step -> 74,640 env-steps/s
+[step5 repeat] full env step 67.5 ms -> 60,675 env-steps/s
+[step5 repeat] after random-action steps: nefc max 44 mean 15.1; nacon 11810 (2.88/world); overflow {'LS_ITERATIONS': 3842}
+[step5 repeat] rollout + inference 75.2 ms/step -> 54,441 env-steps/s
+[step5 repeat] PPO update 153 ms -> full loop 50,199 env-steps/s
+[step5 repeat] SUMMARY physics 74,640 | step 60,675 | rollout 54,441 | loop 50,199  (ms: physics 54.9, step 67.5, rollout/step 75.2, update 153)
+=== end Fri Sep 25 09:53:53 PDT 2026

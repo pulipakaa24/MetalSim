@@ -1,0 +1,62 @@
+=== start Fri Sep 25 09:53:53 PDT 2026
+holder: {"name": "mjw_tp_round9", "kind": "low", "minutes": 30.0, "pid": 64779, "start": 1790355114.409143}
+=== variant {'label': 'step5'}; N=512, 50 control steps, deterministic actions
+njmax 256 naconmax 16384 sparse False
+--- floor: two graph-replay instances of this configuration
+   step    1: qpos max 2.44e-06 median 0.0e+00 | obs max 2.50e-04 | rew max 1.03e-07
+   step    2: qpos max 3.47e-06 median 0.0e+00 | obs max 2.61e-04 | rew max 4.23e-07
+   step    5: qpos max 2.64e-02 median 7.5e-09 | obs max 6.50e-01 | rew max 1.07e-03
+   step   10: qpos max 3.28e-02 median 4.2e-08 | obs max 1.30e+00 | rew max 2.39e-03
+   step   20: qpos max 8.15e-02 median 6.3e-08 | obs max 2.20e+00 | rew max 2.45e-03
+   step   30: qpos max 2.05e-01 median 1.2e-07 | obs max 3.66e+00 | rew max 9.25e-03
+   step   40: qpos max 6.19e-01 median 6.0e-08 | obs max 1.09e+01 | rew max 4.02e+00
+   step   50: qpos max 1.93e+00 median 3.0e-08 | obs max 8.17e+00 | rew max 1.84e-02
+--- graph replay vs eager launches (same configuration)
+   step    1: qpos max 2.86e-06 median 0.0e+00 | obs max 2.93e-04 | rew max 1.64e-07
+   step    2: qpos max 4.04e-06 median 0.0e+00 | obs max 3.47e-04 | rew max 5.43e-07
+   step    5: qpos max 2.64e-02 median 7.5e-09 | obs max 6.50e-01 | rew max 1.06e-03
+   step   10: qpos max 3.28e-02 median 4.5e-08 | obs max 7.61e-01 | rew max 2.15e-03
+   step   20: qpos max 4.03e-02 median 7.5e-08 | obs max 2.81e+00 | rew max 6.63e-03
+   step   30: qpos max 1.68e-01 median 1.2e-07 | obs max 2.31e+00 | rew max 1.09e-02
+   step   40: qpos max 6.19e-01 median 6.0e-08 | obs max 6.70e+00 | rew max 1.16e-02
+   step   50: qpos max 1.93e+00 median 3.0e-08 | obs max 1.09e+01 | rew max 4.08e+00
+capacity replay: nefc max 39 (njmax 256), nacon max 1695 (naconmax 16384); overflow {'LS_ITERATIONS': 468}
+capacity replay 2: nefc max 39 (njmax 256), nacon max 1695 (naconmax 16384); overflow {'LS_ITERATIONS': 468}
+capacity eager: nefc max 39 (njmax 256), nacon max 1695 (naconmax 16384); overflow {'LS_ITERATIONS': 469}
+--- physics protocol vs MuJoCo C (4 worlds: PD hold + fixed random targets; |dq| max / median)
+   t=0.02s 4.08e-06/1.6e-08  t=0.04s 5.04e-06/3.7e-08  t=0.08s 1.51e-01/1.5e-02  t=0.24s 2.74e-01/4.8e-02  t=0.50s 1.99e-01/6.5e-02  t=1.00s 6.27e-01/1.1e-01
+--- this configuration vs reference {"label": "fusion off"} (graph replay)
+   step    1: qpos max 2.85e-06 median 0.0e+00 | obs max 2.94e-04 | rew max 1.70e-07
+   step    2: qpos max 4.17e-06 median 0.0e+00 | obs max 2.61e-04 | rew max 2.26e-07
+   step    5: qpos max 2.64e-02 median 7.5e-09 | obs max 6.50e-01 | rew max 1.07e-03
+   step   10: qpos max 3.28e-02 median 4.5e-08 | obs max 1.32e+00 | rew max 2.39e-03
+   step   20: qpos max 8.15e-02 median 8.2e-08 | obs max 2.20e+00 | rew max 6.66e-03
+   step   30: qpos max 7.64e-01 median 1.2e-07 | obs max 1.41e+01 | rew max 4.00e+00
+   step   40: qpos max 6.19e-01 median 6.0e-08 | obs max 1.09e+01 | rew max 4.02e+00
+   step   50: qpos max 1.62e+00 median 3.0e-08 | obs max 8.17e+00 | rew max 4.08e+00
+   reference MuJoCo C protocol: t=0.02s 4.08e-06/1.6e-08  t=0.04s 5.04e-06/3.7e-08  t=0.08s 1.51e-01/1.5e-02  t=0.24s 2.74e-01/4.8e-02  t=0.50s 1.99e-01/6.5e-02  t=1.00s 6.25e-01/1.1e-01
+=== done
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+28 passed, 2 warnings in 17.15s
+variant {'label': 'step5'}
+it    1 steps     98304 sps   51,392 | ep_ret    0.00 ep_len    0.0 (n=0) | pg 0.022 vf 3.106 kl 0.0727 lr 1.0e-05
+it    2 steps    196608 sps   56,878 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.002 vf 0.637 kl 0.0056 lr 2.6e-04
+it    3 steps    294912 sps   59,019 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.005 vf 0.287 kl 0.0128 lr 8.6e-04
+it    4 steps    393216 sps   60,228 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.002 vf 0.899 kl 0.0129 lr 5.8e-04
+it    5 steps    491520 sps   59,888 | ep_ret  -20.63 ep_len  115.0 (n=3137) | pg -0.002 vf 6.594 kl 0.0143 lr 5.8e-04
+it    6 steps    589824 sps   58,942 | ep_ret  -16.99 ep_len   91.1 (n=1354) | pg -0.004 vf 0.621 kl 0.0142 lr 5.8e-04
+it    7 steps    688128 sps   58,424 | ep_ret   -6.33 ep_len   40.3 (n=3135) | pg -0.000 vf 1.091 kl 0.0118 lr 5.8e-04
+it    8 steps    786432 sps   58,055 | ep_ret   -6.08 ep_len   39.1 (n=2307) | pg -0.003 vf 0.752 kl 0.0124 lr 1.3e-03
+it    9 steps    884736 sps   57,751 | ep_ret   -6.01 ep_len   40.4 (n=2459) | pg -0.001 vf 0.532 kl 0.0139 lr 8.6e-04
+it   10 steps    983040 sps   57,523 | ep_ret   -5.94 ep_len   39.2 (n=2556) | pg 0.000 vf 0.424 kl 0.0164 lr 1.1e-04
+it   11 steps   1081344 sps   57,339 | ep_ret   -5.94 ep_len   39.8 (n=2416) | pg 0.013 vf 0.280 kl 0.0187 lr 1.0e-05
+it   12 steps   1179648 sps   57,173 | ep_ret   -5.93 ep_len   39.9 (n=2507) | pg 0.007 vf 0.234 kl 0.0124 lr 1.0e-05
+it   13 steps   1277952 sps   57,032 | ep_ret   -5.91 ep_len   39.7 (n=2456) | pg -0.001 vf 0.185 kl 0.0062 lr 2.6e-04
+it   14 steps   1376256 sps   56,920 | ep_ret   -5.91 ep_len   39.8 (n=2437) | pg -0.004 vf 0.129 kl 0.0102 lr 8.6e-04
+it   15 steps   1474560 sps   56,810 | ep_ret   -5.89 ep_len   39.9 (n=2434) | pg -0.004 vf 0.067 kl 0.0146 lr 1.7e-04
+it   16 steps   1572864 sps   56,707 | ep_ret   -5.87 ep_len   40.5 (n=2463) | pg -0.004 vf 0.051 kl 0.0140 lr 3.4e-05
+it   17 steps   1671168 sps   56,626 | ep_ret   -5.84 ep_len   40.7 (n=2360) | pg -0.006 vf 0.033 kl 0.0067 lr 3.8e-04
+it   18 steps   1769472 sps   56,558 | ep_ret   -5.81 ep_len   41.0 (n=2391) | pg -0.014 vf 0.022 kl 0.0115 lr 8.6e-04
+it   19 steps   1867776 sps   56,483 | ep_ret   -5.76 ep_len   41.0 (n=2399) | pg -0.014 vf 0.013 kl 0.0163 lr 5.8e-04
+it   20 steps   1966080 sps   56,401 | ep_ret   -5.73 ep_len   41.5 (n=2352) | pg -0.015 vf 0.011 kl 0.0155 lr 5.8e-04
+=== end Fri Sep 25 09:55:01 PDT 2026

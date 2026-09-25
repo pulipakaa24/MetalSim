@@ -1,0 +1,31 @@
+=== start Fri Sep 25 09:37:53 PDT 2026 power: Now drawing from 'AC Power'
+holder: {"name": "mjw_tp_round7", "kind": "low", "minutes": 45.0, "pid": 62973, "start": 1790354273.2821078}
+[default, fusion off (steps 1-3)] N=4096 njmax 256 naconmax 131072 is_sparse False
+[default, fusion off (steps 1-3)] physics only 57.3 ms/step -> 71,476 env-steps/s
+[default, fusion off (steps 1-3)] full env step 66.8 ms -> 61,300 env-steps/s
+[default, fusion off (steps 1-3)] after random-action steps: nefc max 47 mean 14.9; nacon 11683 (2.85/world); overflow {'LS_ITERATIONS': 3810}
+[default, fusion off (steps 1-3)] rollout + inference 71.9 ms/step -> 56,988 env-steps/s
+[default, fusion off (steps 1-3)] PPO update 146 ms -> full loop 52,547 env-steps/s
+[default, fusion off (steps 1-3)] SUMMARY physics 71,476 | step 61,300 | rollout 56,988 | loop 52,547  (ms: physics 57.3, step 66.8, rollout/step 71.9, update 146)
+[step4 fused H update + Cholesky] N=4096 njmax 256 naconmax 131072 is_sparse False
+[step4 fused H update + Cholesky] physics only 50.6 ms/step -> 80,994 env-steps/s
+[step4 fused H update + Cholesky] full env step 60.6 ms -> 67,620 env-steps/s
+[step4 fused H update + Cholesky] after random-action steps: nefc max 49 mean 15.1; nacon 11833 (2.89/world); overflow {'LS_ITERATIONS': 3834}
+[step4 fused H update + Cholesky] rollout + inference 66.4 ms/step -> 61,676 env-steps/s
+[step4 fused H update + Cholesky] PPO update 144 ms -> full loop 56,575 env-steps/s
+[step4 fused H update + Cholesky] SUMMARY physics 80,994 | step 67,620 | rollout 61,676 | loop 56,575  (ms: physics 50.6, step 60.6, rollout/step 66.4, update 144)
+[fusion off repeat] N=4096 njmax 256 naconmax 131072 is_sparse False
+[fusion off repeat] physics only 57.3 ms/step -> 71,471 env-steps/s
+[fusion off repeat] full env step 67.0 ms -> 61,172 env-steps/s
+[fusion off repeat] after random-action steps: nefc max 40 mean 15.2; nacon 11965 (2.92/world); overflow {'LS_ITERATIONS': 3833}
+[fusion off repeat] rollout + inference 71.8 ms/step -> 57,070 env-steps/s
+[fusion off repeat] PPO update 153 ms -> full loop 52,422 env-steps/s
+[fusion off repeat] SUMMARY physics 71,471 | step 61,172 | rollout 57,070 | loop 52,422  (ms: physics 57.3, step 67.0, rollout/step 71.8, update 153)
+[step4 repeat] N=4096 njmax 256 naconmax 131072 is_sparse False
+[step4 repeat] physics only 50.5 ms/step -> 81,058 env-steps/s
+[step4 repeat] full env step 60.5 ms -> 67,675 env-steps/s
+[step4 repeat] after random-action steps: nefc max 51 mean 15.1; nacon 0 (0.00/world); overflow {'LS_ITERATIONS': 3818}
+[step4 repeat] rollout + inference 66.3 ms/step -> 61,746 env-steps/s
+[step4 repeat] PPO update 147 ms -> full loop 56,519 env-steps/s
+[step4 repeat] SUMMARY physics 81,058 | step 67,675 | rollout 61,746 | loop 56,519  (ms: physics 50.5, step 60.5, rollout/step 66.3, update 147)
+=== end Fri Sep 25 09:39:33 PDT 2026
