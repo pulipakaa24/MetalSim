@@ -1,0 +1,146 @@
+{
+ "physics": {
+  "A_hold": {
+   "steps": 150,
+   "joint_rmse_rad": {
+    "t0.5s": 0.005039003677666187,
+    "t1s": 0.002295220736414194,
+    "t2s": 0.010959302075207233,
+    "end": 0.009978489950299263,
+    "max": 0.02952805906534195
+   },
+   "divergence_step_0.1rad": 150,
+   "divergence_time_s": 3.0,
+   "root_height": {
+    "isaac_end": 0.05380211025476456,
+    "metalsim_end": 0.06470050662755966,
+    "rmse": 0.016437964513897896
+   },
+   "root_orientation_err_rad": {
+    "mean": 0.010859513655304909,
+    "max": 0.0760856419801712
+   },
+   "peak_joint_speed_rad_s": {
+    "isaac": 6.861039161682129,
+    "metalsim": 7.245735168457031
+   },
+   "contact_force_N": {
+    "isaac_mean_total": 302.4049377441406,
+    "metalsim_mean_total": 300.5220642089844,
+    "isaac_peak": 712.2770385742188,
+    "metalsim_peak": 3058.11279296875
+   },
+   "torque_rms_Nm": {
+    "isaac": 5.288428783416748,
+    "metalsim": 5.258552074432373
+   },
+   "penetration_m": {
+    "metalsim_max": 0.0,
+    "metalsim_mean_when_in_contact": 0.0,
+    "isaac": null
+   },
+   "limit_excursion_rad": {
+    "isaac_max_ctrl": 0.004741529049704041,
+    "metalsim_max_ctrl": 0.021513858856985535,
+    "isaac_steps_over_0.01": 0,
+    "metalsim_steps_over_0.01": 4,
+    "metalsim_max_substep": 0.024440348148345947
+   }
+  },
+  "B_random": {
+   "steps": 250,
+   "joint_rmse_rad": {
+    "t0.5s": 0.026307033374905586,
+    "t1s": 0.09059535712003708,
+    "t2s": 0.06714768707752228,
+    "end": 0.04557916522026062,
+    "max": 0.20132942497730255
+   },
+   "divergence_step_0.1rad": 4,
+   "divergence_time_s": 0.08,
+   "root_height": {
+    "isaac_end": 0.14033684134483337,
+    "metalsim_end": 0.16759659349918365,
+    "rmse": 0.04097001254558563
+   },
+   "root_orientation_err_rad": {
+    "mean": 0.43179693818092346,
+    "max": 0.9108934998512268
+   },
+   "peak_joint_speed_rad_s": {
+    "isaac": 32.00001525878906,
+    "metalsim": 46.75874328613281
+   },
+   "contact_force_N": {
+    "isaac_mean_total": 329.4166564941406,
+    "metalsim_mean_total": 437.3426208496094,
+    "isaac_peak": 2847.163330078125,
+    "metalsim_peak": 6117.302734375
+   },
+   "torque_rms_Nm": {
+    "isaac": 29.949527740478516,
+    "metalsim": 28.192943572998047
+   },
+   "penetration_m": {
+    "metalsim_max": 0.01231088861823082,
+    "metalsim_mean_when_in_contact": 0.002777605317533016,
+    "isaac": null
+   },
+   "limit_excursion_rad": {
+    "isaac_max_ctrl": 0.001549847513316993,
+    "metalsim_max_ctrl": 0.16686932188493964,
+    "isaac_steps_over_0.01": 0,
+    "metalsim_steps_over_0.01": 218,
+    "metalsim_max_substep": 0.16686934232711792
+   }
+  },
+  "C_drop": {
+   "steps": 150,
+   "joint_rmse_rad": {
+    "t0.5s": 0.0069406889379024506,
+    "t1s": 0.0149788623675704,
+    "t2s": 0.00814443826675415,
+    "end": 0.007359522860497236,
+    "max": 0.06271778792142868
+   },
+   "divergence_step_0.1rad": 0,
+   "divergence_time_s": 0.0,
+   "root_height": {
+    "isaac_end": 0.05380271375179291,
+    "metalsim_end": 0.06427185982465744,
+    "rmse": 0.038088373839855194
+   },
+   "root_orientation_err_rad": {
+    "mean": 0.05123137682676315,
+    "max": 0.22892627120018005
+   },
+   "peak_joint_speed_rad_s": {
+    "isaac": 10.601576805114746,
+    "metalsim": 15.851814270019531
+   },
+   "contact_force_N": {
+    "isaac_mean_total": 288.4056701660156,
+    "metalsim_mean_total": 275.2678527832031,
+    "isaac_peak": 1029.7064208984375,
+    "metalsim_peak": 1400.8597412109375
+   },
+   "torque_rms_Nm": {
+    "isaac": 6.169229030609131,
+    "metalsim": 5.99575138092041
+   },
+   "penetration_m": {
+    "metalsim_max": 0.0,
+    "metalsim_mean_when_in_contact": 0.0,
+    "isaac": null
+   },
+   "limit_excursion_rad": {
+    "isaac_max_ctrl": 0.003954390110800232,
+    "metalsim_max_ctrl": 0.023253658833334412,
+    "isaac_steps_over_0.01": 0,
+    "metalsim_steps_over_0.01": 4,
+    "metalsim_max_substep": 0.02493298053741455
+   }
+  }
+ },
+ "render": {}
+}
