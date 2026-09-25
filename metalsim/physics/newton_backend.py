@@ -685,14 +685,16 @@ class NewtonSim:
             self.actuator = ActuatorPD(m, act["kp"], act["kd"], act["effort"], act["target"], None, dt, "ipd", **(actuator_kw or {}))
             self.drive = drive
             if drive == "solver":
-                if getattr(self.solver, "_joint_drive_f", None) is None:
+                if not hasattr(self.solver, "joint_drive_mode"):
                     raise RuntimeError("drive='solver' needs a SolverXPBD with joint_drive_mode (the Newton fork)")
                 m.joint_target_ke.assign(act["kp"].astype(np.float32)); m.joint_target_kd.assign(act["kd"].astype(np.float32))
                 self.actuator.kp.zero_(); self.actuator.kd.zero_()        # ActuatorPD then only evaluates joint state (qacc)
                 tqs = m.joint_target_q_start.numpy()
                 self.tq_of = wp.array([int(tqs[lab.index(nm)]) for nm in names], dtype=int)
                 self.ntq = self.control.joint_target_q.shape[0] // n
-                self.tau_src = self.solver._joint_drive_f                  # the solver's drive force of the step (per DOF)
+                # total drive force of the step per DOF (fork >= 242eeda7: public joint_drive_force; 9b0901d3: explicit part only)
+                f = getattr(self.solver, "joint_drive_force", None)
+                self.tau_src = f if f is not None else self.solver._joint_drive_f
             else:
                 self.tau_src = self.control.joint_f
             self.joint_qd_prev = wp.zeros(m.joint_dof_count, dtype=float)
