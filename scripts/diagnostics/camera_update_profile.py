@@ -28,6 +28,7 @@ from metalsim.learn.ppo import PPO, PPOConfig
 
 N_ENVS, T, H, W = 1024, 64, 100, 100
 EPOCHS, MINIBATCHES = 4, 32
+GATHER = True            # PPOConfig.gather_in_graph for the fast parts (--no-gather-in-graph)
 ROLLOUT_S = 1.4          # measured rollout time per iteration (docs/GAPS.md), used for implied env-steps/s
 
 
@@ -41,8 +42,8 @@ class StubEnv:
     obs_space = {"image": (H, W, 3), "qpos": (4,)}
 
 
-def make_ppo(seed=0, fast=False, kernels=False):
-    cfg = PPOConfig(fast_update=fast, metal_conv_kernels=kernels, total_steps=0, rollout=T, epochs=EPOCHS, minibatches=MINIBATCHES, lr=1e-4, gamma=0.99, lam=0.95,
+def make_ppo(seed=0, fast=False, kernels=False, gather=None):
+    cfg = PPOConfig(fast_update=fast, metal_conv_kernels=kernels, gather_in_graph=GATHER if gather is None else gather, total_steps=0, rollout=T, epochs=EPOCHS, minibatches=MINIBATCHES, lr=1e-4, gamma=0.99, lam=0.95,
                     clip=0.2, ent_coef=0.0, vf_coef=1.0, max_grad_norm=1.0, desired_kl=0.008, clip_value=True, feat=512,
                     activation="elu", qpos_dim=0, center_images=True, value_norm=True, seed=seed)
     ppo = PPO(StubEnv(), cfg)
@@ -80,8 +81,13 @@ def _time_update(name, ppo, args):
     adv, ret = ppo.gae(torch.zeros(N_ENVS, device="mps"))
     t0 = time.perf_counter(); ppo.update(adv, ret); torch.mps.synchronize()
     print(f"first update incl. compile: {time.perf_counter() - t0:.1f} s", flush=True)
-    med, mn = timeit(lambda: ppo.update(adv, ret), reps=args.update_reps, warmup=1)
-    print(f"{name:52s} median {med:8.3f} s  min {mn:8.3f} s  (implied {sps(med):,.0f} env-steps/s)", flush=True)
+    ppo.update(adv, ret); torch.mps.synchronize()
+    ts = []
+    for _ in range(args.update_reps):
+        t0 = time.perf_counter(); ppo.update(adv, ret); torch.mps.synchronize(); ts.append(time.perf_counter() - t0)
+    med, mn = float(np.median(ts)), float(np.min(ts))
+    print(f"{name:52s} median {med:8.3f} s  min {mn:8.3f} s  (implied {sps(med):,.0f} env-steps/s)  "
+          f"all: {' '.join(f'{t:.2f}' for t in ts)}", flush=True)
 
 
 def part_fast(args):
@@ -94,24 +100,84 @@ def part_fastk(args):
     _time_update("PPO.update fast_update + Metal kernels (3b)", make_ppo(fast=True, kernels=True), args)
 
 
+INTERLEAVE = [
+    ("3b: c1_wgrad,c2_dgrad", "c1_wgrad,c2_dgrad", False),
+    ("+ c2_wgrad", "c1_wgrad,c2_dgrad,c2_wgrad", False),
+    ("+ c3_wgrad", "c1_wgrad,c2_dgrad,c3_wgrad", False),
+    ("+ c1_fwd", "c1_wgrad,c2_dgrad,c1_fwd", False),
+    ("+ c1_fwd + gather_in_graph", "c1_wgrad,c2_dgrad,c1_fwd", True),
+    ("+ c1_fwd + c3_wgrad + gather_in_graph", "c1_wgrad,c2_dgrad,c1_fwd,c3_wgrad", True),
+]
+
+
+def part_interleave(args):
+    """Update time of several kernel configurations, each its own PPO (compiled with its ENABLED set), timed in
+    interleaved rounds so drift and thermal state hit all configurations equally."""
+    from metalsim.learn import metal_conv as mc
+    runs = []
+    for name, on, gather in INTERLEAVE:
+        for k in mc.ENABLED:
+            mc.ENABLED[k] = k in on.split(",")
+        ppo = make_ppo(fast=True, kernels=True, gather=gather)
+        adv, ret = ppo.gae(torch.zeros(N_ENVS, device="mps"))
+        ppo.update(adv, ret); ppo.update(adv, ret); torch.mps.synchronize()     # compile + warm
+        runs.append((name, ppo, adv, ret, []))
+    for _ in range(args.update_reps):
+        for name, ppo, adv, ret, ts in runs:
+            t0 = time.perf_counter(); ppo.update(adv, ret); torch.mps.synchronize(); ts.append(time.perf_counter() - t0)
+    for name, ppo, adv, ret, ts in runs:
+        med, mn = float(np.median(ts)), float(np.min(ts))
+        print(f"{name:52s} median {med:8.3f} s  min {mn:8.3f} s  (implied {sps(med):,.0f} env-steps/s)", flush=True)
+
+
+def part_c2parts(args):
+    """conv2 weight-gradient kernel: cost of the space-to-depth copy, the gy padding and the kernel itself."""
+    from metalsim.learn import metal_conv as mc
+    mb = 2048
+    x = torch.randn(mb, 32, 24, 24, device="mps"); gy = torch.randn(mb, 64, 11, 11, device="mps")
+    N = mb
+
+    def s2dcopy():
+        buf = mc._with_slack(N * 128 * 144, x)
+        buf[:N * 128 * 144].view(N, 32, 2, 2, 12, 12).copy_(x.view(N, 32, 12, 2, 12, 2).permute(0, 1, 3, 5, 2, 4))
+        return buf
+    m = timeit(s2dcopy, 20); row("conv2 wgrad: s2d copy", *m)
+    m = timeit(lambda: mc._pad_gy(gy, 12, 136), 20); row("conv2 wgrad: pad gy", *m)
+    buf = s2dcopy(); gyp = mc._pad_gy(gy, 12, 136)
+    for spt in (2, 4, 8, 16):
+        m = timeit(lambda: mc._wgrad_s1("c2", buf, gyp, N, spt), 20); row(f"conv2 wgrad: kernel + reduce SPT={spt}", *m)
+    x3 = torch.randn(mb, 64, 11, 11, device="mps"); g3 = torch.randn(mb, 64, 9, 9, device="mps")
+    b3 = mc._with_slack(N * 64 * 121, x3); b3[:N * 64 * 121].view_as(x3).copy_(x3); g3p = mc._pad_gy(g3, 11, 104)
+    for spt in (2, 4, 8, 16):
+        m = timeit(lambda: mc._wgrad_s1("c3", b3, g3p, N, spt), 20); row(f"conv3 wgrad: kernel + reduce SPT={spt}", *m)
+
+
 def part_kernels(args):
     """Custom Metal kernels vs MPSGraph (aten.convolution_backward) on the exact minibatch shapes."""
-    from metalsim.learn.metal_conv import conv1_weight_grad, conv2_input_grad
+    from metalsim.learn.metal_conv import conv1_weight_grad, conv2_input_grad, conv2_weight_grad, conv3_weight_grad, conv1_forward
     mb = 2048
+    cb = torch.ops.aten.convolution_backward
     x1 = torch.randint(0, 256, (mb, 3, 100, 100), device="mps").float(); w1 = torch.randn(32, 3, 8, 8, device="mps") * 0.05
     g1 = torch.randn(mb, 32, 24, 24, device="mps")
     x2 = torch.randn(mb, 32, 24, 24, device="mps"); w2 = torch.randn(64, 32, 4, 4, device="mps") * 0.05
     g2 = torch.randn(mb, 64, 11, 11, device="mps")
-    f1 = 2 * g1.numel() * 3 * 64; f2 = 2 * g2.numel() * 32 * 16
-    cb = torch.ops.aten.convolution_backward
+    x3 = torch.randn(mb, 64, 11, 11, device="mps"); w3 = torch.randn(64, 64, 3, 3, device="mps") * 0.05
+    g3 = torch.randn(mb, 64, 9, 9, device="mps")
+    b1 = torch.randn(32, device="mps")
+    f1 = 2 * g1.numel() * 3 * 64; f2 = 2 * g2.numel() * 32 * 16; f3 = 2 * g3.numel() * 64 * 9
     for name, fn, fl in (
             ("conv1 wgrad  MPSGraph", lambda: cb(g1, x1, w1, [32], [4, 4], [0, 0], [1, 1], False, [0, 0], 1, [False, True, False]), f1),
             ("conv1 wgrad  Metal kernel", lambda: conv1_weight_grad(x1, g1), f1),
             ("conv2 dgrad  MPSGraph", lambda: cb(g2, x2, w2, [64], [2, 2], [0, 0], [1, 1], False, [0, 0], 1, [True, False, False]), f2),
-            ("conv2 dgrad  Metal kernel", lambda: conv2_input_grad(g2, w2), f2)):
+            ("conv2 dgrad  Metal kernel", lambda: conv2_input_grad(g2, w2), f2),
+            ("conv2 wgrad  MPSGraph", lambda: cb(g2, x2, w2, [64], [2, 2], [0, 0], [1, 1], False, [0, 0], 1, [False, True, False]), f2),
+            ("conv2 wgrad  Metal kernel (incl. s2d + pad)", lambda: conv2_weight_grad(x2, g2), f2),
+            ("conv3 wgrad  MPSGraph", lambda: cb(g3, x3, w3, [64], [1, 1], [0, 0], [1, 1], False, [0, 0], 1, [False, True, False]), f3),
+            ("conv3 wgrad  Metal kernel (incl. copy + pad)", lambda: conv3_weight_grad(x3, g3), f3),
+            ("conv1 fwd    MPSGraph", lambda: F.conv2d(x1, w1, b1, stride=4), f1),
+            ("conv1 fwd    Metal kernel", lambda: conv1_forward(x1, w1, b1), f1)):
         m = timeit(fn, 20)
         row(f"{name} [{fl / m[0] / 1e12:5.2f} TF/s]", *m)
-
 
 def part_update(args):
     ppo = make_ppo()
@@ -565,6 +631,92 @@ def part_mlx(args):
               f"(implied {sps(med):,.0f} env-steps/s)", flush=True)
 
 
+def part_mlx2(args):
+    """Whole update in MLX, functional fp32 master weights; preprocessing (gather from the uint8 NHWC rollout buffer,
+    per-image mean subtraction from precomputed means, /255), loss, backward, grad clip and Adam in one mx.compile'd
+    step per minibatch, plus the KL .item() per minibatch as in PPO.update. dt = compute dtype (float32 / float16);
+    weights stay fp32 and are cast per layer (mixed precision)."""
+    import mlx.core as mx
+    import mlx.optimizers as mopt
+    mb = 2048
+    rng = np.random.default_rng(0)
+    NB = T * N_ENVS
+    buf = mx.array(rng.integers(0, 256, (NB, H, W, 3), dtype=np.uint8))
+    means = buf.reshape(NB, -1, 3).astype(mx.float32).mean(axis=1) / 255.0
+    acts = mx.array(rng.standard_normal((NB, 1), dtype=np.float32)); lo_all = mx.array(rng.standard_normal(NB, dtype=np.float32) - 1)
+    adv_all = mx.array(rng.standard_normal(NB, dtype=np.float32)); ret_all = mx.array(rng.standard_normal(NB, dtype=np.float32))
+    vo_all = mx.array(rng.standard_normal(NB, dtype=np.float32))
+    mx.eval(buf, means, acts, lo_all, adv_all, ret_all, vo_all)
+    sync = mx.synchronize
+
+    def init():
+        def u(shape, fan_in):
+            b = 1 / math.sqrt(fan_in)
+            return mx.random.uniform(-b, b, shape)
+        return {"c1w": u((32, 8, 8, 3), 192), "c1b": u((32,), 192), "c2w": u((64, 4, 4, 32), 512), "c2b": u((64,), 512),
+                "c3w": u((64, 3, 3, 64), 576), "c3b": u((64,), 576), "fw": u((512, 5184), 5184), "fb": u((512,), 5184),
+                "pw": u((1, 512), 512), "pb": u((1,), 512), "vw": u((1, 512), 512), "vb": u((1,), 512), "log_std": mx.zeros((1,))}
+
+    variants = [("float32", False), ("float16", False)] if not getattr(args, "mlx_bound", False) else [("float32", True), ("float16", True)]
+    for dname, free_c1w in variants:
+        dt = getattr(mx, dname)
+        if free_c1w:
+            dname = dname + " [bound: conv1 wgrad free]"
+        params = init()
+        opt = mopt.Adam(learning_rate=1e-4, eps=1e-5)
+        opt.init(params)
+
+        def loss_fn(p, idx):
+            x = buf[idx].astype(mx.float32)
+            x = ((x - means[idx][:, None, None, :] * 255.0) * (1 / 255.0)).astype(dt)
+            c = lambda h, w, b, s: mx.conv2d(h, p[w].astype(dt), stride=s) + p[b].astype(dt)
+            if free_c1w:     # lower bound: conv1's weight gradient costs nothing (stop_gradient)
+                h = mx.maximum(mx.conv2d(x, mx.stop_gradient(p["c1w"]).astype(dt), stride=4) + p["c1b"].astype(dt), 0)
+            else:
+                h = mx.maximum(c(x, "c1w", "c1b", 4), 0); h = mx.maximum(c(h, "c2w", "c2b", 2), 0); h = mx.maximum(c(h, "c3w", "c3b", 1), 0)
+            h = h.transpose(0, 3, 1, 2).reshape(h.shape[0], -1)
+            f = h @ p["fw"].astype(dt).T + p["fb"].astype(dt)
+            f = mx.where(f > 0, f, mx.exp(mx.minimum(f, 0)) - 1)
+            mean = (f @ p["pw"].astype(dt).T + p["pb"].astype(dt)).astype(mx.float32)
+            v = (f @ p["vw"].astype(dt).T + p["vb"].astype(dt)).astype(mx.float32).squeeze(-1)
+            a, lo, adv, ret, vo = acts[idx], lo_all[idx], adv_all[idx], ret_all[idx], vo_all[idx]
+            std = mx.exp(mx.clip(p["log_std"], -20.0, 2.0))
+            logp = (-((a - mean) ** 2) / (2 * std ** 2) - mx.log(std) - 0.5 * math.log(2 * math.pi)).sum(-1)
+            ratio = mx.exp(logp - lo)
+            pg = -mx.minimum(ratio * adv, mx.clip(ratio, 0.8, 1.2) * adv).mean()
+            v_c = vo + mx.clip(v - vo, -0.2, 0.2)
+            vf = mx.maximum((v - ret) ** 2, (v_c - ret) ** 2).mean()
+            return pg + vf, (lo - logp).mean()
+
+        vg = mx.value_and_grad(loss_fn)
+
+        def step(p, idx):
+            (l, kl), g = vg(p, idx)
+            g, _ = mopt.clip_grad_norm(g, 1.0)
+            return opt.apply_gradients(g, p), l, kl
+
+        state = [opt.state]
+        cstep = mx.compile(step, inputs=state, outputs=state)
+        box = [params]
+
+        def mb_once(idx):
+            p, l, kl = cstep(box[0], idx)
+            box[0] = p
+            mx.eval(p, l, kl, opt.state)
+            return kl.item()
+        idx0 = mx.array(rng.permutation(NB)[:mb].astype(np.int32))
+        m = timeit(lambda: mb_once(idx0), 20, sync=sync); row(f"MLX2 {dname} one minibatch (gather..Adam, compiled)", *m, 128 * m[0])
+
+        def full_update():
+            for _ in range(EPOCHS):
+                perm = mx.random.permutation(NB).astype(mx.int32)
+                for i in range(MINIBATCHES):
+                    mb_once(perm[i * mb:(i + 1) * mb])
+        med, mn = timeit(full_update, 3, warmup=1, sync=sync)
+        print(f"{'MLX2 ' + dname + ' full update':52s} median {med:8.3f} s  min {mn:8.3f} s  "
+              f"(implied {sps(med):,.0f} env-steps/s)", flush=True)
+
+
 def part_mlxlayers(args):
     import mlx.core as mx
     mb = 2048
@@ -591,7 +743,19 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--parts", default="update,split,layers,alt,fp16,bf16,fusedadam,mlx,mlxlayers,compile")
     ap.add_argument("--update-reps", type=int, default=3)
+    ap.add_argument("--kernels", default=None, help="comma list of metal_conv.ENABLED keys to keep on (others off)")
+    ap.add_argument("--no-gather-in-graph", action="store_true")
+    ap.add_argument("--mlx-bound", action="store_true", help="mlx2: lower bound with conv1's weight gradient free")
     args = ap.parse_args()
+    global GATHER
+    GATHER = not args.no_gather_in_graph
+    print(f"gather_in_graph = {GATHER}", flush=True)
+    if args.kernels is not None:
+        from metalsim.learn import metal_conv as mc
+        on = set(k for k in args.kernels.split(",") if k)
+        for k in mc.ENABLED:
+            mc.ENABLED[k] = k in on
+        print(f"metal_conv.ENABLED = {mc.ENABLED}", flush=True)
     print(f"torch {torch.__version__}", flush=True)
     import subprocess
     for p in args.parts.split(","):

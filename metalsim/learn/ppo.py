@@ -73,6 +73,8 @@ class PPOConfig:
     # with fast_update: custom Metal kernels (metalsim/learn/metal_conv.py) for conv1's weight gradient and conv2's
     # input gradient, the two ops MPSGraph runs at 1.6 / 2.5 TFLOP/s (Isaac camera-cartpole shapes only; else aten)
     metal_conv_kernels: bool = True
+    # with fast_update: the minibatch image gather inside the compiled loss (fused with the preprocessing pass)
+    gather_in_graph: bool = True
 
 
 class NatureCNN(nn.Module):
@@ -99,18 +101,19 @@ class NatureCNN(nn.Module):
         The conversion, centering and scale are one elementwise expression (one fused kernel under torch.compile).
         Folding the centering into conv1 instead (conv(x, W/255) + b - m @ sum_hw W) is exact algebra but costs fp32
         precision through cancellation: conv1 weight-gradient error vs fp64 3e-5 instead of 4e-6 (CPU, measured)."""
-        c1, c2 = self.conv[0], self.conv[2]
+        c1, c2, c3 = self.conv[0], self.conv[2], self.conv[4]
         if self.metal_kernels:
             from metalsim.learn import metal_conv as mc
-            conv1, conv2 = mc.conv1, mc.conv2
+            conv1, conv2, conv3 = mc.conv1, mc.conv2, mc.conv3
         else:
-            conv1 = conv2 = lambda x, w, b, s: F.conv2d(x, w, b, stride=s)
+            conv1 = conv2 = conv3 = lambda x, w, b, s: F.conv2d(x, w, b, stride=s)
         if mean is not None:
             x = (x_u8.float() - mean[:, :, None, None] * 255.0) * (1.0 / 255.0)
         else:
             x = x_u8.float() * (1.0 / 255.0)
         y = conv2(F.relu(conv1(x, c1.weight, c1.bias, c1.stride[0])), c2.weight, c2.bias, c2.stride[0])
-        return self.fc(self.conv[3:](y))
+        y = F.relu(conv3(F.relu(y), c3.weight, c3.bias, c3.stride[0]))
+        return self.fc(y.flatten(1))
 
 
 class ActorCritic(nn.Module):
@@ -273,9 +276,13 @@ class PPO:
             adv[t] = gae
         return adv, adv + self.buf_v
 
-    def _mb_loss(self, img, q, img_mean, a, logp_old, adv, ret, v_old):
-        """PPO minibatch loss (fast path). Returns loss, pg, vf, logp."""
+    def _mb_loss(self, img, q, img_mean, a, logp_old, adv, ret, v_old, idx=None):
+        """PPO minibatch loss (fast path). Returns loss, pg, vf, logp. With idx, img / q / img_mean are the whole
+        rollout buffers and the minibatch gather happens inside the compiled graph (fused with the uint8 -> float
+        preprocessing by Inductor)."""
         cfg = self.cfg
+        if idx is not None:
+            img, q, img_mean = img[idx], q[idx], img_mean[idx]
         mean, v = self.net.forward_fast(img, q, img_mean)
         d = self.net.dist(mean)
         logp = d.log_prob(a).sum(-1)
@@ -314,8 +321,12 @@ class PPO:
             for i in range(cfg.minibatches):
                 idx = perm[i * mb:(i + 1) * mb]
                 if cfg.fast_update:
-                    loss, pg, vf, logp = self._mb_loss_c(img[idx], q[idx], img_mean[idx], a[idx], logp_old[idx],
-                                                         adv[idx], ret[idx], v_buf[idx])
+                    if cfg.gather_in_graph:
+                        loss, pg, vf, logp = self._mb_loss_c(img, q, img_mean, a[idx], logp_old[idx], adv[idx], ret[idx],
+                                                             v_buf[idx], idx)
+                    else:
+                        loss, pg, vf, logp = self._mb_loss_c(img[idx], q[idx], img_mean[idx], a[idx], logp_old[idx],
+                                                             adv[idx], ret[idx], v_buf[idx])
                 else:
                     mean, v = self.net(img[idx], q[idx], nchw=True)
                     d = self.net.dist(mean)
