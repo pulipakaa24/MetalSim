@@ -1,0 +1,107 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth ea5c7c8 load on device 'metal:0' took 27.81 ms  (cached)
+Module _nxn_broadphase__locals__kernel_13ac863e 13ac863 load on device 'metal:0' took 18.07 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_8a5df304 8a5df30 load on device 'metal:0' took 27.22 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_78fb2dbf 78fb2db load on device 'metal:0' took 20.78 ms  (cached)
+Module mujoco_warp._src.constraint 2c64b8d load on device 'metal:0' took 17.32 ms  (cached)
+Module _friction_dof__locals__kernel_71517a5a 71517a5 load on device 'metal:0' took 17.57 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_77544377 7754437 load on device 'metal:0' took 17.06 ms  (cached)
+Module _efc_contact_init__locals__kernel_61c7a354 61c7a35 load on device 'metal:0' took 16.62 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_d7afd5bd e96e9eb load on device 'metal:0' took 16.93 ms  (cached)
+Module _efc_contact_update__locals__kernel_a78f94fc a78f94f load on device 'metal:0' took 17.01 ms  (cached)
+Module mujoco_warp._src.forward 64fd1ac load on device 'metal:0' took 22.80 ms  (cached)
+Module mujoco_warp._src.passive 9eecbc5 load on device 'metal:0' took 21.95 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_41a4523d 41a4523 load on device 'metal:0' took 16.58 ms  (cached)
+Module mujoco_warp._src.forward 8644a19 load on device 'metal:0' took 23.03 ms  (cached)
+Module _qfrc_smooth__locals__kernel_5565c635 5565c63 load on device 'metal:0' took 16.72 ms  (cached)
+Module mujoco_warp._src.support 8e2ca55 load on device 'metal:0' took 16.93 ms  (cached)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_c849d179 af018c2 load on device 'metal:0' took 16.62 ms  (cached)
+Module _solve_init_dof__locals__kernel_6c9fecda 6c9fecd load on device 'metal:0' took 16.68 ms  (cached)
+Module mujoco_warp._src.solver b7da940 load on device 'metal:0' took 17.74 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_c92100ed c92100e load on device 'metal:0' took 16.58 ms  (cached)
+Module mul_m_kernel__locals___mul_m_924d61d1 924d61d load on device 'metal:0' took 17.17 ms  (cached)
+Module _update_constraint_efc__locals__kernel_59b76e16 59b76e1 load on device 'metal:0' took 17.07 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_5a6ce8fb 5a6ce8f load on device 'metal:0' took 17.03 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_563a7193 563a719 load on device 'metal:0' took 16.75 ms  (cached)
+Module _update_gradient_grad__locals__kernel_a8ff13d7 a8ff13d load on device 'metal:0' took 16.65 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_3d0778ce b888581 load on device 'metal:0' took 16.79 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_2fc8ec32 e7e5510 load on device 'metal:0' took 16.82 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_e82cf69b 8525b45 load on device 'metal:0' took 18.10 ms  (cached)
+Module _update_constraint_efc__locals__kernel_bf65bc4b bf65bc4 load on device 'metal:0' took 17.20 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_1a551002 1a55100 load on device 'metal:0' took 16.62 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_65cece82 65cece8 load on device 'metal:0' took 16.45 ms  (cached)
+Module _update_gradient_grad__locals__kernel_e1825747 e182574 load on device 'metal:0' took 16.65 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_c2df9e85 4ace2d1 load on device 'metal:0' took 16.79 ms  (cached)
+Module _solve_done__locals__kernel_0b0b8060 0b0b806 load on device 'metal:0' took 16.53 ms  (cached)
+Module mujoco_warp._src.sensor 05b20a3 load on device 'metal:0' took 27.10 ms  (cached)
+Module mujoco_warp._src.derivative e042361 load on device 'metal:0' took 19.55 ms  (cached)
+Module _next_time_builder__locals___next_time_46990cad 46990ca load on device 'metal:0' took 16.66 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_23cf7deb 23cf7de load on device 'metal:0' took 16.87 ms  (cached)
+Module reset_data__locals__reset_M_4a6094a4 4a6094a load on device 'metal:0' took 16.54 ms  (cached)
+Module reset_data__locals__reset_mocap_7457a9a8 7457a9a load on device 'metal:0' took 16.42 ms  (cached)
+Module reset_data__locals__reset_contact_51a17304 51a1730 load on device 'metal:0' took 16.66 ms  (cached)
+Module reset_data__locals__reset_sleep_e31fb6d1 e31fb6d load on device 'metal:0' took 16.63 ms  (cached)
+Module reset_data__locals__reset_nworld_881fbae0 881fbae load on device 'metal:0' took 16.75 ms  (cached)
+before 8 [-0.00657414 -0.00657414 -0.00657414 -0.00657414 -0.00454308 -0.00454308
+ -0.00454308 -0.00454308] [[-0.0693182   0.08513668 -0.00328707]
+ [-0.0693182  -0.15060593 -0.00328707]
+ [-0.0693182   0.15060593 -0.00328707]
+ [-0.0693182  -0.08513668 -0.00328707]
+ [ 0.1337809   0.15060593 -0.00227154]
+ [ 0.1337809  -0.08513668 -0.00227154]
+ [ 0.1337809   0.08513668 -0.00227154]
+ [ 0.1337809  -0.15060593 -0.00227154]] [[0 1]
+ [0 2]
+ [0 1]
+ [0 2]
+ [0 1]
+ [0 2]
+ [0 1]
+ [0 2]] [[0. 0. 1.]
+ [0. 0. 1.]
+ [0. 0. 1.]
+ [0. 0. 1.]
+ [0. 0. 1.]
+ [0. 0. 1.]
+ [0. 0. 1.]
+ [0. 0. 1.]]
+Module metalsim.physics.solver_presets 3e935cd load on device 'metal:0' took 18.62 ms  (cached)
+la [[-6.9318198e-02  8.5136682e-02 -1.3969839e-09]
+ [-6.9318198e-02 -1.5060593e-01 -1.3969839e-09]
+ [-6.9318198e-02  1.5060593e-01 -1.3969839e-09]
+ [-6.9318198e-02 -8.5136682e-02 -1.3969839e-09]
+ [ 1.3378090e-01  1.5060593e-01 -9.3132257e-10]
+ [ 1.3378090e-01 -8.5136682e-02 -9.3132257e-10]
+ [ 1.3378090e-01  8.5136682e-02 -9.3132257e-10]
+ [ 1.3378090e-01 -1.5060593e-01 -9.3132257e-10]] lb [[-0.0656376  -0.03273463 -0.03442401]
+ [-0.0656376  -0.03273463 -0.03442401]
+ [-0.0656376   0.03273463 -0.03442401]
+ [-0.0656376   0.03273463 -0.03442401]
+ [ 0.13747172  0.03273463 -0.03442402]
+ [ 0.13747172  0.03273463 -0.03442402]
+ [ 0.13747172 -0.03273463 -0.03442402]
+ [ 0.13747172 -0.03273463 -0.03442402]]
+refreshed [-0.00557416 -0.00557416 -0.00557416 -0.00557416 -0.00354311 -0.00354311
+ -0.00354311 -0.00354311] [[-0.06931822  0.08513667 -0.00278708]
+ [-0.06931822 -0.15060595 -0.00278708]
+ [-0.06931822  0.15060595 -0.00278708]
+ [-0.06931822 -0.08513667 -0.00278708]
+ [ 0.13378093  0.15060595 -0.00177156]
+ [ 0.13378093 -0.08513667 -0.00177156]
+ [ 0.13378093  0.08513667 -0.00177156]
+ [ 0.13378093 -0.15060595 -0.00177156]]
+fresh 8 [-0.00557415 -0.00557415 -0.00557415 -0.00557415 -0.0035431  -0.0035431
+ -0.0035431  -0.0035431 ] [[-0.0693182   0.08513668 -0.00278708]
+ [-0.0693182  -0.15060593 -0.00278708]
+ [-0.0693182   0.15060593 -0.00278708]
+ [-0.0693182  -0.08513668 -0.00278708]
+ [ 0.1337809   0.15060593 -0.00177155]
+ [ 0.1337809  -0.08513668 -0.00177155]
+ [ 0.1337809   0.08513668 -0.00177155]
+ [ 0.1337809  -0.15060593 -0.00177155]]

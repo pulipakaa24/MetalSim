@@ -4,6 +4,7 @@ per-term outputs on the live simulation state."""
 import mujoco
 import numpy as np
 import pytest
+import copy
 import importlib.util
 
 import torch
@@ -43,6 +44,15 @@ def _one_step(task, n, seed_actions=3):
     return bufs.done.numpy()[0] > 0.5
 
 
+def _root_com_velocity(task, qpos, qvel):
+    """(angular, linear) world velocity of the root body's centre of mass from MuJoCo C (mj_objectVelocity, mjOBJ_BODY),
+    for a (qpos, qvel) state: Isaac Lab's root_com_ang_vel_w / root_com_lin_vel_w."""
+    m = task.model; d = mujoco.MjData(m)
+    d.qpos[:] = qpos; d.qvel[:] = qvel; mujoco.mj_forward(m, d)
+    v6 = np.zeros(6); mujoco.mj_objectVelocity(m, d, mujoco.mjtObj.mjOBJ_BODY, int(m.jnt_bodyid[0]), v6, 0)
+    return v6[:3], v6[3:]
+
+
 def _isaac_terms(task, e, flat, rough_isaac=False):
     """Isaac Lab's reward terms (weights applied, before x dt) recomputed in numpy from the live state:
     G1FlatEnvCfg (flat), G1RoughEnvCfg exactly (rough_isaac) or G1RoughEnvCfg as first ported (neither)."""
@@ -54,7 +64,10 @@ def _isaac_terms(task, e, flat, rough_isaac=False):
     sd = d.sensordata.numpy()[e]; qacc = d.qacc.numpy()[e]; tau = d.qfrc_actuator.numpy()[e]
     fv = (d.foot_vel if task.engine == "newton" else task.foot_vel).numpy()[e]      # what the reward kernel read
     R = _rot(qpos[3:7])
-    v_w = qvel[0:3]; w_b = qvel[3:6]; w_w = R @ w_b; v_b = R.T @ v_w
+    v_w = qvel[0:3]; w_b = qvel[3:6]; w_w = R @ w_b
+    if getattr(task, "il3", False):
+        v_w = _root_com_velocity(task, qpos, qvel)[1]    # Isaac's root_lin_vel_w = the root body's COM velocity
+    v_b = R.T @ v_w
     yaw = np.arctan2(R[1, 0], R[0, 0])
     v_yaw = np.array([np.cos(yaw) * v_w[0] + np.sin(yaw) * v_w[1], -np.sin(yaw) * v_w[0] + np.cos(yaw) * v_w[1]])
     t = {}
@@ -325,6 +338,185 @@ def test_rough_terrain_seed_and_isaac_env_assignment():
     tab = task.hfield["origin_table"]()
     np.testing.assert_allclose(task.origins.numpy(), tab[lv, task.col.numpy()], atol=1e-6)
     assert G1VelocityTask(4, terrain="flat").seed == 0
+
+
+# --------------------------------------------------------------------------------------------------------------------
+# Isaac Lab 3.0.0-EA task differences (reward_cfg "flat_il3" / "rough_il3", metalsim.learn.g1_il3): each event's
+# distribution and application against Isaac Lab v3.0.0-EA's formulas (upstream/IsaacLab3, paths in g1_il3's docstring)
+
+from scipy import stats as _st
+
+
+def _ks_uniform(x, lo, hi, alpha=1e-3):
+    """Kolmogorov-Smirnov test of x against U(lo, hi) (p > alpha) and support within [lo, hi]."""
+    x = np.asarray(x, np.float64)
+    assert x.min() >= lo - 1e-6 and x.max() <= hi + 1e-6, (x.min(), x.max(), lo, hi)
+    p = _st.kstest(x, "uniform", args=(lo, hi - lo)).pvalue
+    assert p > alpha, f"not U({lo}, {hi}): KS p = {p:.2e}"
+
+
+@pytest.mark.parametrize("reward_cfg", ["flat_il3", "rough_il3"])
+def test_il3_reward_terms_match_isaac_formulas(reward_cfg):
+    """The il3 configs keep 3.0's (unchanged) reward sets; the linear-velocity terms read the root COM velocity
+    (recomputed with MuJoCo C's mj_objectVelocity of the pelvis COM), the contact terms Isaac 3.0's sensor semantics
+    (5 ms ticks, 3-tick history, Newton's 0 N air-time threshold)."""
+    n = 8
+    task = G1VelocityTask(n, terrain="flat", seed=1, reward_cfg=reward_cfg)
+    assert task.il3 and task.il3_events and task.contact is not None and task.hist_substeps == 3
+    done = _one_step(task, n)
+    terms = task.terms.numpy()
+    checked = 0
+    for e in range(n):
+        ref = _isaac_terms(task, e, flat=reward_cfg == "flat_il3", rough_isaac=reward_cfg == "rough_il3")
+        for k, v in ref.items():
+            if k in (2, 3) and done[e]:
+                continue
+            rtol, atol = (1e-3, 1e-6) if k in (10, 11) else (1e-4, 1e-5)
+            np.testing.assert_allclose(terms[e, k], v, rtol=rtol, atol=atol, err_msg=f"env {e} term {k}")
+            checked += 1
+    assert checked > 10 * n
+
+
+def test_il3_base_lin_vel_is_the_root_com_velocity():
+    """policy obs base_lin_vel = root_lin_vel_b = the pelvis COM's velocity in the pelvis frame (Isaac Lab 3.0 and 2.3.2
+    articulation data); the 2.3.2 ports keep the frame origin's."""
+    n = 16
+    task = G1VelocityTask(n, terrain="flat", seed=2, reward_cfg="flat_il3")
+    benchmark_step(task, num_frames=4, warmup=0)       # moving robots
+    task.sim.synchronize()
+    qpos = task.sim.d.qpos.numpy().astype(np.float64); qvel = task.sim.d.qvel.numpy().astype(np.float64)
+    idx = wp.zeros(1, dtype=int, device="metal:0"); task.launch_obs(idx); task.sim.synchronize()
+    obs = task.obs.numpy()
+    # the push timer (>= 10 s) cannot fire here, so qvel is what launch_obs read
+    far = 0
+    for e in range(n):
+        w_w, v_com = _root_com_velocity(task, qpos[e], qvel[e])
+        v_b = _rot(qpos[e, 3:7]).T @ v_com
+        assert np.all(np.abs(obs[e, 0:3] - v_b) <= 0.1 + 1e-4)                      # +-0.1 uniform noise
+        far += int(np.linalg.norm(v_b - _rot(qpos[e, 3:7]).T @ qvel[e, :3]) > 0.02)
+    assert far > 0            # the COM and frame-origin velocities differ on moving robots
+
+
+def test_il3_reset_root_state_distribution_and_application():
+    """reset_root_state_uniform (3.0 base config): root position default + origin + U(+-0.5) in x, y; orientation
+    default * yaw with yaw ~ U(-3.14, 3.14); root COM velocity (world) U(+-0.5) on x, y, z and angular velocity (world)
+    U(+-0.5) on roll, pitch, yaw, written as the COM velocity (checked with MuJoCo C's mj_objectVelocity);
+    reset_joints_by_scale (1, 1): default joints, zero joint velocity; push timer U(10, 15) s."""
+    from metalsim.learn import g1_il3
+    n = 4096
+    task = G1VelocityTask(n, terrain="flat", seed=3, reward_cfg="flat_il3")
+    task.reset_all()
+    qpos = task.sim.d.qpos.numpy().astype(np.float64); qvel = task.sim.d.qvel.numpy().astype(np.float64)
+    o = task.origins.numpy(); default = task.default_q.numpy()
+    _ks_uniform(qpos[:, 0] - o[:, 0], -0.5, 0.5); _ks_uniform(qpos[:, 1] - o[:, 1], -0.5, 0.5)
+    np.testing.assert_allclose(qpos[:, 2], o[:, 2] + default[2], atol=1e-6)
+    assert np.allclose(qpos[:, 4:6], 0.0) and np.allclose(np.linalg.norm(qpos[:, 3:7], axis=1), 1.0, atol=1e-5)
+    yaw = 2 * np.arctan2(qpos[:, 6], qpos[:, 3]); yaw = (yaw + np.pi) % (2 * np.pi) - np.pi
+    _ks_uniform(yaw, -3.14, 3.14)
+    np.testing.assert_allclose(qpos[:, 7:], np.tile(default[7:], (n, 1)), atol=1e-6)
+    assert np.all(qvel[:, 6:] == 0.0)
+    W = np.zeros((n, 3)); V = np.zeros((n, 3))
+    for e in range(n):
+        W[e], V[e] = _root_com_velocity(task, qpos[e], qvel[e])
+    for k in range(3):
+        _ks_uniform(V[:, k], -0.5, 0.5); _ks_uniform(W[:, k], -0.5, 0.5)
+    assert np.abs(np.corrcoef(np.concatenate([V, W], 1).T) - np.eye(6)).max() < 0.1      # independent axes
+    _ks_uniform(task.push_left.numpy(), 10.0, 15.0)
+    # il3_events=False: same reset semantics without the velocity randomization (deterministic protocols)
+    t2 = G1VelocityTask(8, terrain="flat", seed=3, reward_cfg="flat_il3", il3_events=False)
+    t2.reset_all()
+    assert np.all(t2.sim.d.qvel.numpy() == 0.0) and t2.mass_info is None
+
+
+def test_il3_push_robot_interval_and_velocity():
+    """push_by_setting_velocity with EventManager's interval rule: every env step time_left -= 0.02 s; envs with
+    time_left < 1e-6 get root COM velocity += U(+-0.5) in world x, y (z and angular unchanged) and a new time_left
+    ~ U(10, 15); the others keep counting down."""
+    n = 4096
+    task = G1VelocityTask(n, terrain="flat", seed=4, reward_cfg="flat_il3")
+    task.reset_all()
+    rng = np.random.default_rng(0)
+    tl = np.where(np.arange(n) % 2 == 0, 0.02, rng.uniform(0.0205, 5.0, n)).astype(np.float32)   # even envs fire now
+    tl[1] = np.float32(0.020002)                                                                # just above 0.02 + 1e-6: counts down
+    task.push_left.assign(tl)
+    qpos = task.sim.d.qpos.numpy().astype(np.float64); v0 = task.sim.d.qvel.numpy().astype(np.float64)
+    idx = wp.zeros(1, dtype=int, device="metal:0"); task.launch_obs(idx); task.sim.synchronize()
+    v1 = task.sim.d.qvel.numpy().astype(np.float64); tl1 = task.push_left.numpy()
+    fire = (tl - np.float32(0.02)) < 1e-6
+    assert fire[0] and not fire[1] and fire.sum() == n // 2
+    np.testing.assert_allclose(tl1[~fire], (tl - np.float32(0.02))[~fire], atol=1e-6)
+    _ks_uniform(tl1[fire], 10.0, 15.0)
+    dv = v1 - v0
+    assert np.all(dv[~fire] == 0.0) and np.all(dv[fire][:, 2:] == 0.0)
+    _ks_uniform(dv[fire, 0], -0.5, 0.5); _ks_uniform(dv[fire, 1], -0.5, 0.5)
+    # the push acts on the COM velocity: MuJoCo C's COM velocity changes by exactly dv, the angular velocity not at all
+    for e in np.nonzero(fire)[0][:16]:
+        w0, c0 = _root_com_velocity(task, qpos[e], v0[e]); w1, c1 = _root_com_velocity(task, qpos[e], v1[e])
+        np.testing.assert_allclose(c1 - c0, dv[e, :3], atol=1e-5); np.testing.assert_allclose(w1, w0, atol=1e-6)
+    assert int(task.pushes.numpy()[0]) == n // 2
+
+
+@pytest.mark.parametrize("solver_cfg", [None, "isaaclab3"])
+def test_il3_add_base_mass_distribution_and_constants(solver_cfg):
+    """randomize_rigid_body_mass (operation scale, log_uniform (1/1.25, 1.25), recompute_inertia) on torso_link, once per
+    env: mass and inertia scaled by the same factor, log(factor) ~ U(log 0.8, log 1.25), every other body unchanged, and
+    the derived constants equal MuJoCo C's mj_setConst on the same masses (what Newton's notify_model_changed runs:
+    set_const_fixed + set_const_0). With Isaac's MuJoCo Warp preset the joint-limit solref follows the new
+    dof_invweight0 as Newton's update_jnt_solref_from_invweight0 does (timeconst ~ 1/invw, dampratio ~ sqrt(invw))."""
+    from metalsim.learn import g1_il3
+    n = 4096
+    task = G1VelocityTask(n, terrain="flat", seed=5, reward_cfg="flat_il3", solver_cfg=solver_cfg, physics_dt=0.0025)
+    m0 = task.model; b = mujoco.mj_name2id(m0, mujoco.mjtObj.mjOBJ_BODY, g1_il3.MASS_BODY)
+    mass = task.sim.m.body_mass.numpy(); inert = task.sim.m.body_inertia.numpy()
+    s = mass[:, b] / m0.body_mass[b]
+    _ks_uniform(np.log(s), np.log(0.8), np.log(1.25))
+    np.testing.assert_allclose(inert[:, b] / m0.body_inertia[b][None], np.repeat(s[:, None], 3, 1), rtol=1e-5)
+    others = np.arange(m0.nbody) != b
+    np.testing.assert_allclose(mass[:, others], np.tile(m0.body_mass[others], (n, 1)), rtol=1e-6)
+    sub = task.sim.m.body_subtreemass.numpy(); inv_d = task.sim.m.dof_invweight0.numpy(); inv_b = task.sim.m.body_invweight0.numpy()
+    np.testing.assert_allclose(sub[:, 0], m0.body_mass.sum() + (s - 1) * m0.body_mass[b], rtol=1e-5)
+    for e in (0, 1, 2, int(np.argmin(s)), int(np.argmax(s))):
+        mm = copy.deepcopy(task.model); mm.body_mass[b] = mass[e, b]; mm.body_inertia[b] = inert[e, b]
+        dd = mujoco.MjData(mm); mujoco.mj_setConst(mm, dd)
+        np.testing.assert_allclose(inv_d[e], mm.dof_invweight0, rtol=2e-3, atol=1e-6)
+        np.testing.assert_allclose(inv_b[e], mm.body_invweight0, rtol=2e-3, atol=1e-6)
+        if solver_cfg == "isaaclab3":
+            sr = task.sim.m.jnt_solref.numpy()[e]
+            mm0 = copy.deepcopy(m0); dd0 = mujoco.MjData(mm0); mujoco.mj_setConst(mm0, dd0)
+            for j in range(1, m0.njnt):
+                r = mm.dof_invweight0[m0.jnt_dofadr[j]] / mm0.dof_invweight0[m0.jnt_dofadr[j]]
+                np.testing.assert_allclose(sr[j], [m0.jnt_solref[j, 0] / r, m0.jnt_solref[j, 1] * np.sqrt(r)], rtol=3e-3)
+    # the nominal solver statistic is kept (shared across worlds)
+    assert abs(float(task.sim.m.stat.meaninertia.numpy()[0]) - float(m0.stat.meaninertia)) < 1e-3 * float(m0.stat.meaninertia) + 1e-9
+
+
+def test_il3_contact_sensor_ticks():
+    """Isaac Lab 3.0 on Newton: contact sensor updated once per 5 ms tick (every 2nd 2.5 ms substep) with 5 ms
+    air/contact-time increments, 3-tick history, in contact iff the normal force is > 0 N."""
+    n = 64
+    task = G1VelocityTask(n, terrain="flat", seed=6, reward_cfg="flat_il3", il3_events=False, physics_dt=0.0025)
+    cs = task.contact
+    assert cs.T == 3 and abs(cs.dt - 0.005) < 1e-12 and cs.force_threshold == 0.0 and task.sensor_tick == 2
+    task.reset_all()
+    a = wp.zeros((n, task.act_dim), dtype=float, device="metal:0")
+    for k in range(1, 26):
+        task.launch_apply_action(a); task.sim.launch_step(); task.sim.synchronize()
+        c = cs.numpy()
+        con = c["current_contact_time"][:, :2]; air = c["current_air_time"][:, :2]
+        t = np.maximum(con, air)
+        np.testing.assert_allclose(t / 0.005, np.round(t / 0.005), atol=1e-3)          # whole 5 ms ticks
+        np.testing.assert_array_equal(con > 0.0, np.linalg.norm(c["net_forces_w"][:, :2], axis=-1) > 0.0)
+    standing = (con > 0).all(1)
+    assert standing.sum() > n // 2
+    assert 0.4 < con[standing].max() <= 25 * 4 * 0.005 + 1e-4                              # 4 ticks per control step
+    # physx backend threshold: 1 N (Isaac Lab 3.0 PhysX sensor and 2.3.2)
+    assert G1VelocityTask(4, terrain="flat", seed=6, reward_cfg="flat_il3", il3_backend="physx").contact.force_threshold == 1.0
+
+
+def test_il3_rough_defaults():
+    """rough_il3: rough_isaac rewards / commands, Newton's rasterized 0.1 m heightfield for collision, exact scan."""
+    task = G1VelocityTask(64, terrain="rough", reward_cfg="rough_il3")
+    assert task.isaac_flat == 2 and task.lin_vel_y == 0.0 and task.terrain_collision == "hfield" and task.scan_surface == "exact"
 
 
 def test_default_task_carries_the_recommended_contact_preset():

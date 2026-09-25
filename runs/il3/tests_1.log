@@ -1,0 +1,192 @@
+== Fri Sep 25 14:47:53 PDT 2026
+holder: {"name": "il3_tests", "kind": "timing", "minutes": 15.0, "pid": 13269, "start": 1790372873.298593}
+  waiting [timing] il3_fidelity est 20.0 min, queued 1574 s ago
+  waiting [timing] il3_bench est 10.0 min, queued 1573 s ago
+  waiting [train] camera_cartpole_physical_full2 est 25.0 min, queued 3943 s ago
+  waiting [low] newton_vbd_replay est 40.0 min, queued 1965 s ago
+  waiting [low] il3_physx_ours est 40.0 min, queued 536 s ago
+.F.F................F..F.                                                [100%]
+=================================== FAILURES ===================================
+________________ test_once_per_tick_contacts_follow_the_bodies _________________
+
+    def test_once_per_tick_contacts_follow_the_bodies():
+        """The second substep of a tick keeps the first substep's contacts and moves their witness points with the bodies:
+        for plane-vertex contacts the refreshed distance equals a fresh collision pass on the moved bodies."""
+        import mujoco_warp as mjw
+        m, sim = _standing_sim("isaaclab3")
+        d = sim.d; dev = sim.device
+        la = wp.zeros(d.naconmax, dtype=wp.vec3, device=dev); lb = wp.zeros(d.naconmax, dtype=wp.vec3, device=dev)
+        with wp.ScopedDevice(dev):
+            wp.launch(solver_presets._save_witness, dim=d.naconmax, inputs=[d.nacon, d.contact.dist, d.contact.pos, d.contact.frame,
+                      d.contact.geom, d.contact.worldid, sim.m.geom_bodyid, d.xpos, d.xmat, la, lb])
+        sim.synchronize()
+        nc = int(d.nacon.numpy()[0]); assert nc >= 8
+        # move the robots: 1 mm up, a small roll and yaw of the whole robot, a small knee bend in world 1
+        q = d.qpos.numpy().copy()
+        q[:, 2] += 0.001
+        for e in range(sim.n):
+            rq = np.zeros(4); mujoco.mju_axisAngle2Quat(rq, np.array([0.3, 0.2, 1.0]) / np.linalg.norm([0.3, 0.2, 1.0]), 0.004 * (e + 1))
+            out = np.zeros(4); mujoco.mju_mulQuat(out, rq, q[e, 3:7].astype(np.float64)); q[e, 3:7] = out
+        d.qpos.assign(q)
+        with wp.ScopedDevice(dev):
+            mjw.kinematics(sim.m, d)
+            wp.launch(solver_presets._refresh_contacts, dim=d.naconmax, inputs=[d.nacon, d.contact.frame, d.contact.geom,
+                      d.contact.worldid, sim.m.geom_bodyid, d.xpos, d.xmat, la, lb, d.contact.dist, d.contact.pos, d.contact.efc_address])
+        sim.synchronize()
+        def witness_b(c, n):     # the point on geom[1] (the foot vertex for plane-mesh contacts): pos + dist/2 normal
+            return c["pos"][:n] + 0.5 * c["dist"][:n, None] * c["frame"][:n, 0, :]
+        keys = ("dist", "pos", "geom", "worldid", "frame")
+        ref = {k: getattr(d.contact, k).numpy()[:nc].copy() for k in keys}
+        assert np.all(d.contact.efc_address.numpy()[:nc] == -1)
+        with wp.ScopedDevice(dev):
+            mjw.forward(sim.m, d)                                  # fresh collision on the moved bodies
+        sim.synchronize()
+        nf = int(d.nacon.numpy()[0])
+        fresh = {k: getattr(d.contact, k).numpy()[:nf] for k in keys}
+        pr, pf = witness_b(ref, nc), witness_b(fresh, nf)
+        matched = 0
+        for c in range(nf):
+            cand = np.nonzero((ref["worldid"] == fresh["worldid"][c]) & np.all(ref["geom"] == fresh["geom"][c], 1))[0]
+            if not len(cand):
+                continue
+            k = cand[np.argmin(np.linalg.norm(pr[cand] - pf[c], axis=1))]
+            if np.linalg.norm(pr[k] - pf[c]) < 1e-4:               # the same vertex
+                np.testing.assert_allclose(ref["dist"][k], fresh["dist"][c], atol=2e-6)
+                matched += 1
+>       assert matched >= 0.9 * nf
+E       assert 0 >= (0.9 * 32)
+
+tests/test_solver_presets.py:96: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Module mujoco_warp._src.smooth ea5c7c8 load on device 'metal:0' took 28.01 ms  (cached)
+Module _nxn_broadphase__locals__kernel_13ac863e 13ac863 load on device 'metal:0' took 18.31 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_8a5df304 8a5df30 load on device 'metal:0' took 2563.30 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_78fb2dbf 78fb2db load on device 'metal:0' took 724.31 ms  (cached)
+Module mujoco_warp._src.constraint 2c64b8d load on device 'metal:0' took 16.83 ms  (cached)
+Module _friction_dof__locals__kernel_71517a5a 71517a5 load on device 'metal:0' took 17.51 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_77544377 7754437 load on device 'metal:0' took 17.02 ms  (cached)
+Module _efc_contact_init__locals__kernel_61c7a354 61c7a35 load on device 'metal:0' took 16.74 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_d7afd5bd e96e9eb load on device 'metal:0' took 16.84 ms  (cached)
+Module _efc_contact_update__locals__kernel_a78f94fc a78f94f load on device 'metal:0' took 17.18 ms  (cached)
+Module mujoco_warp._src.forward 64fd1ac load on device 'metal:0' took 23.51 ms  (cached)
+Module mujoco_warp._src.passive 9eecbc5 load on device 'metal:0' took 22.74 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_41a4523d 41a4523 load on device 'metal:0' took 16.96 ms  (cached)
+Module mujoco_warp._src.forward 8644a19 load on device 'metal:0' took 23.95 ms  (cached)
+Module _qfrc_smooth__locals__kernel_5565c635 5565c63 load on device 'metal:0' took 17.17 ms  (cached)
+Module mujoco_warp._src.support 8e2ca55 load on device 'metal:0' took 17.39 ms  (cached)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_c849d179 af018c2 load on device 'metal:0' took 360.98 ms  (cached)
+Module _solve_init_dof__locals__kernel_6c9fecda 6c9fecd load on device 'metal:0' took 17.10 ms  (cached)
+Module mujoco_warp._src.solver b7da940 load on device 'metal:0' took 18.71 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_c92100ed c92100e load on device 'metal:0' took 301.36 ms  (cached)
+Module mul_m_kernel__locals___mul_m_924d61d1 924d61d load on device 'metal:0' took 18.12 ms  (cached)
+Module _update_constraint_efc__locals__kernel_59b76e16 59b76e1 load on device 'metal:0' took 17.20 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_5a6ce8fb 5a6ce8f load on device 'metal:0' took 17.09 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_563a7193 563a719 load on device 'metal:0' took 17.02 ms  (cached)
+Module _update_gradient_grad__locals__kernel_a8ff13d7 a8ff13d load on device 'metal:0' took 16.35 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_3d0778ce b888581 load on device 'metal:0' took 380.09 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_2fc8ec32 e7e5510 load on device 'metal:0' took 364.64 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_e82cf69b 8525b45 load on device 'metal:0' took 19.37 ms  (cached)
+Module _update_constraint_efc__locals__kernel_bf65bc4b bf65bc4 load on device 'metal:0' took 17.12 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_1a551002 1a55100 load on device 'metal:0' took 16.90 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_65cece82 65cece8 load on device 'metal:0' took 17.04 ms  (cached)
+Module _update_gradient_grad__locals__kernel_e1825747 e182574 load on device 'metal:0' took 16.56 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_c2df9e85 4ace2d1 load on device 'metal:0' took 382.80 ms  (cached)
+Module _solve_done__locals__kernel_0b0b8060 0b0b806 load on device 'metal:0' took 17.08 ms  (cached)
+Module mujoco_warp._src.sensor 05b20a3 load on device 'metal:0' took 1526.55 ms  (cached)
+Module mujoco_warp._src.derivative e042361 load on device 'metal:0' took 19.97 ms  (cached)
+Module _next_time_builder__locals___next_time_46990cad 46990ca load on device 'metal:0' took 16.76 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_23cf7deb 23cf7de load on device 'metal:0' took 16.69 ms  (cached)
+Module reset_data__locals__reset_M_4a6094a4 4a6094a load on device 'metal:0' took 16.46 ms  (cached)
+Module reset_data__locals__reset_mocap_7457a9a8 7457a9a load on device 'metal:0' took 17.46 ms  (cached)
+Module reset_data__locals__reset_contact_51a17304 51a1730 load on device 'metal:0' took 17.28 ms  (cached)
+Module reset_data__locals__reset_sleep_e31fb6d1 e31fb6d load on device 'metal:0' took 16.14 ms  (cached)
+Module reset_data__locals__reset_nworld_881fbae0 881fbae load on device 'metal:0' took 16.57 ms  (cached)
+Module metalsim.physics.solver_presets 3e935cd load on device 'metal:0' took 482.57 ms  (compiled)
+_____________ test_iteration_cap_only_changes_worlds_that_reach_it _____________
+
+    def test_iteration_cap_only_changes_worlds_that_reach_it():
+        """MuJoCo Warp exits every world at the tolerance (graph conditional or not): with caps 100 and 20 the states are
+        identical when no world needs more than 20 iterations."""
+        res = {}
+        for preset in ("isaaclab3", "isaaclab3_cap20"):
+            m, sim = _standing_sim(preset, substeps=8)
+            solver_presets.install(sim, preset)
+            sim.t.ctrl.copy_(sim.t.qpos[:, 7:].clone())
+            for _ in range(10):
+                sim.step()
+            sim.synchronize()
+            res[preset] = (sim.d.qpos.numpy().copy(), int(sim.d.solver_niter.numpy().max()), sim.overflow_flags())
+        assert res["isaaclab3"][1] < 20 and "ITERATIONS" not in res["isaaclab3_cap20"][2]
+>       np.testing.assert_array_equal(res["isaaclab3"][0], res["isaaclab3_cap20"][0])
+E       AssertionError: 
+E       Arrays are not equal
+E       
+E       Mismatched elements: 112 / 176 (63.6%)
+E       First 5 mismatches are at indices:
+E        [0, 0]: 0.005718676373362541 (ACTUAL), 0.005718672648072243 (DESIRED)
+E        [0, 1]: 7.033431757008657e-05 (ACTUAL), 7.034315058263019e-05 (DESIRED)
+E        [0, 4]: -3.885286787408404e-05 (ACTUAL), -3.8812020648038015e-05 (DESIRED)
+E        [0, 5]: 0.008571743965148926 (ACTUAL), 0.008571731857955456 (DESIRED)
+E        [0, 6]: -5.91973694099579e-05 (ACTUAL), -5.921968840993941e-05 (DESIRED)
+E       Max absolute difference among violations: 1.2149394e-07
+E       Max relative difference among violations: 0.01156122
+E        ACTUAL: array([[ 5.718676e-03,  7.033432e-05,  7.531312e-01,  9.999633e-01,
+E               -3.885287e-05,  8.571744e-03, -5.919737e-05, -1.326401e-02,
+E               -2.095063e-04, -7.858527e-04,  1.593576e-02, -2.003234e-02,...
+E        DESIRED: array([[ 5.718673e-03,  7.034315e-05,  7.531312e-01,  9.999633e-01,
+E               -3.881202e-05,  8.571732e-03, -5.921969e-05, -1.326396e-02,
+E               -2.096278e-04, -7.857862e-04,  1.593579e-02, -2.003241e-02,...
+
+tests/test_solver_presets.py:131: AssertionError
+__________________ test_il3_push_robot_interval_and_velocity ___________________
+
+    def test_il3_push_robot_interval_and_velocity():
+        """push_by_setting_velocity with EventManager's interval rule: every env step time_left -= 0.02 s; envs with
+        time_left < 1e-6 get root COM velocity += U(+-0.5) in world x, y (z and angular unchanged) and a new time_left
+        ~ U(10, 15); the others keep counting down."""
+        n = 4096
+        task = G1VelocityTask(n, terrain="flat", seed=4, reward_cfg="flat_il3")
+        task.reset_all()
+        rng = np.random.default_rng(0)
+        tl = np.where(np.arange(n) % 2 == 0, 0.02, rng.uniform(0.0205, 5.0, n)).astype(np.float32)   # even envs fire now
+        tl[1] = np.float32(0.0200001)                                                               # just above: counts down
+        task.push_left.assign(tl)
+        qpos = task.sim.d.qpos.numpy().astype(np.float64); v0 = task.sim.d.qvel.numpy().astype(np.float64)
+        idx = wp.zeros(1, dtype=int, device="metal:0"); task.launch_obs(idx); task.sim.synchronize()
+        v1 = task.sim.d.qvel.numpy().astype(np.float64); tl1 = task.push_left.numpy()
+        fire = (tl - np.float32(0.02)) < 1e-6
+>       assert fire[0] and not fire[1] and fire.sum() == n // 2
+E       assert (np.True_ and not np.True_)
+
+tests/test_g1_task_terms.py:446: AssertionError
+________________________ test_il3_contact_sensor_ticks _________________________
+
+    def test_il3_contact_sensor_ticks():
+        """Isaac Lab 3.0 on Newton: contact sensor updated once per 5 ms tick (every 2nd 2.5 ms substep) with 5 ms
+        air/contact-time increments, 3-tick history, in contact iff the normal force is > 0 N."""
+        n = 64
+        task = G1VelocityTask(n, terrain="flat", seed=6, reward_cfg="flat_il3", il3_events=False)
+        cs = task.contact
+>       assert cs.T == 3 and abs(cs.dt - 0.005) < 1e-12 and cs.force_threshold == 0.0 and task.sensor_tick == 2
+E       assert (3 == 3 and 0.0 < 1e-12 and 0.0 == 0.0 and 1 == 2)
+E        +  where 3 = <metalsim.sensors.contact.ContactSensor object at 0x17665cce0>.T
+E        +  and   0.0 = abs((0.005 - 0.005))
+E        +    where 0.005 = <metalsim.sensors.contact.ContactSensor object at 0x17665cce0>.dt
+E        +  and   0.0 = <metalsim.sensors.contact.ContactSensor object at 0x17665cce0>.force_threshold
+E        +  and   1 = <metalsim.learn.g1_velocity.G1VelocityTask object at 0x17402f590>.sensor_tick
+
+tests/test_g1_task_terms.py:499: AssertionError
+=============================== warnings summary ===============================
+tests/test_g1_task_terms.py::test_rough_terrain_seed_and_isaac_env_assignment
+tests/test_g1_task_terms.py::test_il3_rough_defaults
+  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_solver_presets.py::test_once_per_tick_contacts_follow_the_bodies
+FAILED tests/test_solver_presets.py::test_iteration_cap_only_changes_worlds_that_reach_it
+FAILED tests/test_g1_task_terms.py::test_il3_push_robot_interval_and_velocity
+FAILED tests/test_g1_task_terms.py::test_il3_contact_sensor_ticks - assert (3...
+4 failed, 21 passed, 2 warnings in 34.16s
+exit 1 Fri Sep 25 14:48:29 PDT 2026

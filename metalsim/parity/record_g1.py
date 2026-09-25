@@ -19,7 +19,7 @@ from metalsim.learn.g1_velocity import build_g1_model, ACTION_SCALE, INIT_POS
 from metalsim.physics.batch import BatchSim, BatchSimOptions
 from metalsim.render.tier2 import Tier2Renderer
 from metalsim.render.tier0 import Tier0Renderer
-from metalsim.physics import contact_tuning
+from metalsim.physics import contact_tuning, solver_presets
 from metalsim.sensors.contact import ContactSensor
 
 
@@ -78,6 +78,9 @@ def main():
     ap.add_argument("--frame_every", type=int, default=5); ap.add_argument("--num_envs", type=int, default=4)
     ap.add_argument("--contact_tuning", default="default", choices=sorted(contact_tuning.PRESETS),
                     help="metalsim.physics.contact_tuning preset applied to the model")
+    ap.add_argument("--solver_cfg", default=None, choices=sorted(solver_presets.PRESETS),
+                    help="metalsim.physics.solver_presets preset (e.g. isaaclab3: Isaac Lab 3.0's own MuJoCo Warp settings), "
+                         "applied after --contact_tuning")
     ap.add_argument("--no_render", action="store_true", help="physics only (no tier 2 / tier 0 frames)")
     ap.add_argument("--tier2_mode", default="rtx", help="tier-2 preset of metalsim.render.rtx_parity: rtx (the RTX-parity default), "
                     "legacy (MuJoCo-unit lights, linear clamp: the renderer before 2026-09-25), or any preset name")
@@ -91,13 +94,21 @@ def main():
     contact_tuning.apply(m, a.contact_tuning)
     for w in contact_tuning.check_timestep(m, a.contact_tuning):
         print("[metalsim] warning:", w)
+    if a.solver_cfg:
+        solver_presets.apply(m, a.solver_cfg)
     our_joints = [mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_JOINT, j) for j in range(1, m.njnt)]
     act_names = [mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_ACTUATOR, i) for i in range(m.nu)]
     to_isaac = np.array([our_joints.index(n) for n in isaac_joints])            # our joint index for each Isaac joint
     act_of_joint = {mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_JOINT, m.actuator_trnid[i][0]): i for i in range(m.nu)}
     act_isaac = np.array([act_of_joint[n] for n in isaac_joints])
     n = a.num_envs; dec = int(round(meta["control_dt"] / a.physics_dt))
-    sim = BatchSim(m, n, options=BatchSimOptions(substeps=dec, njmax=256, nconmax=32, solver_iterations=10, ls_iterations=20)); sim.synchronize()
+    bso = dict(substeps=dec, njmax=256, nconmax=32, solver_iterations=10, ls_iterations=20)
+    if a.solver_cfg:
+        bso = solver_presets.batch_options(a.solver_cfg, **bso)
+    sim = BatchSim(m, n, options=BatchSimOptions(**bso))
+    if a.solver_cfg:
+        solver_presets.install(sim, a.solver_cfg)              # e.g. collision once per 5 ms tick
+    sim.synchronize()
     cam = meta["camera"]
     if not a.no_render:
         rend2 = Tier2Renderer(m, n, width=cam["width"], height=cam["height"], camera="hero", spp=16, max_bounces=3, **tier2_parity_kwargs(meta, a.tier2_mode))
@@ -127,6 +138,7 @@ def main():
     jr = {mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_JOINT, j): (m.jnt_range[j].tolist() if m.jnt_limited[j] else None) for j in range(1, m.njnt)}
     json.dump({"our_joints": our_joints, "isaac_joints": isaac_joints, "physics_dt": a.physics_dt, "decimation": dec,
                "contact_tuning": a.contact_tuning, "tuning": repr(contact_tuning.PRESETS[a.contact_tuning]),
+               "solver_cfg": a.solver_cfg, "solver_preset": repr(solver_presets.PRESETS[a.solver_cfg]) if a.solver_cfg else None,
                "joint_range_isaac_order": [jr[nm] for nm in isaac_joints], "contact": "ContactSensor net normal force (Isaac net_forces_w)"},
               open(os.path.join(a.out, "meta.json"), "w"), indent=1)
     for tag, (T, act_fn, drop_z) in protocols.items():
@@ -134,7 +146,7 @@ def main():
         if drop_z is not None: q[:, 2] = drop_z
         sim.set_state(q, np.zeros((n, m.nv), np.float32)); v = sim.forward(); sim.after(v); sim.synchronize()
         rec = {k: [] for k in ("joint_pos", "joint_vel", "root_pos", "root_quat", "root_lin_vel_b", "root_ang_vel_b", "torque", "contact",
-                               "contact_touch", "penetration", "limit_excursion")}
+                               "contact_touch", "penetration", "limit_excursion", "solver_niter")}
         for t in range(T):
             a_isaac = act_fn(t)                                              # (n, nj) in Isaac joint order
             ctrl = np.tile(default[7:], (n, 1)).astype(np.float32)
@@ -155,6 +167,7 @@ def main():
                 if nm in touch: ct_[:, k, 2] = sd[:, touch[nm]]                 # touch sensors (normal force magnitude), previous recordings
             rec["contact"].append(cf); rec["contact_touch"].append(ct_)
             rec["penetration"].append(np.maximum(pen.numpy(), 0.0)); rec["limit_excursion"].append(np.maximum(exc.numpy(), 0.0))
+            rec["solver_niter"].append(sim.d.solver_niter.numpy().copy())     # last substep, as Isaac's recording
             if not a.no_render and t % a.frame_every == 0:
                 vr = rend2.render(sim, vs, passes=8); rend2.wait_sim_after_render(sim, vr); rend2.after(vr); torch.mps.synchronize()
                 iio.imwrite(os.path.join(a.out, f"{tag}_{t:04d}_rgb.png"), rend2.out.rgb[0].cpu().numpy()); np.save(os.path.join(a.out, f"{tag}_{t:04d}_depth.npy"), rend2.out.depth[0].cpu().numpy())

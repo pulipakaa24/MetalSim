@@ -152,15 +152,18 @@ def quat_to_mat_wxyz(q: wp.vec4) -> wp.mat33:
 @wp.kernel
 def g1_obs(qpos: wp.array2d(dtype=float), qvel: wp.array2d(dtype=float), default_q: wp.array(dtype=float),
            cmd: wp.array2d(dtype=float), last_action: wp.array2d(dtype=float), height_scan: wp.array2d(dtype=float),
-           n_scan: int, noise_seed: int, step_idx: wp.array(dtype=int), obs: wp.array2d(dtype=float)):
+           n_scan: int, noise_seed: int, step_idx: wp.array(dtype=int), obs: wp.array2d(dtype=float),
+           root_com: wp.vec3):
+    """``root_com``: the root body's COM in its frame; base_lin_vel is then the COM's velocity (Isaac's root_lin_vel_b =
+    root_com_lin_vel_b); (0, 0, 0) = the free joint's frame-origin velocity (the 2.3.2 ports, unchanged)."""
     e = wp.tid()
     nj = qpos.shape[1] - 7
     q = wp.vec4(qpos[e, 3], qpos[e, 4], qpos[e, 5], qpos[e, 6])
     R = quat_to_mat_wxyz(q)
     Rt = wp.transpose(R)
-    v_w = wp.vec3(qvel[e, 0], qvel[e, 1], qvel[e, 2])
-    v_b = Rt * v_w                                   # base linear velocity in the body frame
     w_b = wp.vec3(qvel[e, 3], qvel[e, 4], qvel[e, 5])   # MuJoCo free-joint angular velocity is body-frame
+    v_w = wp.vec3(qvel[e, 0], qvel[e, 1], qvel[e, 2]) + wp.cross(R * w_b, R * root_com)
+    v_b = Rt * v_w                                   # base linear velocity in the body frame
     g_b = Rt * wp.vec3(0.0, 0.0, -1.0)
     rng = wp.rand_init(noise_seed, step_idx[0] * 7919 + e)
     obs[e, 0] = v_b[0] + wp.randf(rng, -0.1, 0.1); obs[e, 1] = v_b[1] + wp.randf(rng, -0.1, 0.1); obs[e, 2] = v_b[2] + wp.randf(rng, -0.1, 0.1)
@@ -229,8 +232,9 @@ def g1_reward_done(qpos: wp.array2d(dtype=float), qvel: wp.array2d(dtype=float),
                    n_levels: int, n_cols: int, cell_size: float, episode_s: float, origins: wp.array2d(dtype=float),
                    seed: int, isaac_flat: int, torso_hist: wp.array(dtype=float),
                    use_sensor: int, sens_air: wp.array2d(dtype=float), sens_con: wp.array2d(dtype=float),
-                   foot_hist: wp.array2d(dtype=float)):
-    """Reward, termination and episode bookkeeping. ``isaac_flat`` = 1 selects Isaac's G1FlatEnvCfg reward set
+                   foot_hist: wp.array2d(dtype=float), root_com: wp.vec3):
+    """Reward, termination and episode bookkeeping. ``root_com`` as in g1_obs (root linear velocity of the COM for the
+    Isaac Lab 3.0 configs; zero = frame origin). ``isaac_flat`` = 1 selects Isaac's G1FlatEnvCfg reward set
     (see G1VelocityTask), 0 the G1RoughEnvCfg set as ported first, 2 Isaac's G1RoughEnvCfg exactly (the rough
     weights with the formulas of the flat port: feet air time as min over feet with the xy command norm,
     ang_vel_xy in the body frame, soft joint limits, contact-history termination / ContactSensor). ``jnt_range`` holds the limits the
@@ -245,9 +249,9 @@ def g1_reward_done(qpos: wp.array2d(dtype=float), qvel: wp.array2d(dtype=float),
     q = wp.vec4(qpos[e, 3], qpos[e, 4], qpos[e, 5], qpos[e, 6])
     R = quat_to_mat_wxyz(q)
     Rt = wp.transpose(R)
-    v_w = wp.vec3(qvel[e, 0], qvel[e, 1], qvel[e, 2])
     w_b = wp.vec3(qvel[e, 3], qvel[e, 4], qvel[e, 5])
     w_w = R * w_b
+    v_w = wp.vec3(qvel[e, 0], qvel[e, 1], qvel[e, 2]) + wp.cross(w_w, R * root_com)
     g_b = Rt * wp.vec3(0.0, 0.0, -1.0)
     # yaw-frame linear velocity (Isaac: rotate world velocity by inverse yaw)
     yaw = wp.atan2(R[1, 0], R[0, 0])
@@ -492,7 +496,8 @@ class G1VelocityTask:
                  physics_dt: float = PHYSICS_DT, engine: str = "mjwarp", newton_iterations: int = 4, newton_dt: float = 0.00125,
                  newton_kw: dict | None = None,
                  reward_cfg: str | None = None, scan_ordering: str = "xy", terrain_collision: str | None = None,
-                 scan_surface: str | None = None, feet_slide_velocity: str = "com", contact_cfg: str | None = "recommended"):
+                 scan_surface: str | None = None, feet_slide_velocity: str = "com", solver_cfg: str | None = None,
+                 il3_events: bool | None = None, il3_backend: str = "newton_mjwarp", contact_cfg: str | None = "recommended"):
         """``feet_slide_velocity``: "com" (default) = the foot's centre-of-mass world velocity, Isaac Lab 2.3.2's
         ``body_lin_vel_w`` (= ``body_com_lin_vel_w``) used by ``mdp.feet_slide``; "origin" = the foot body frame
         origin's velocity (MetalSim before 2026-09-25). MuJoCo Warp engine only; the archived Newton path
@@ -515,9 +520,32 @@ class G1VelocityTask:
         terrain; 0 on flat) seeds the task's random streams and, on rough terrain, the terrain generator.
         Rough terrain assigns env i to terrain column floor(i / (n / num_cols)) as Isaac's
         TerrainImporter does and draws the initial level uniformly in [0, 5] with torch.randint (CPU
-        generator seeded with ``seed``; Isaac draws it from the CUDA generator, so the draw itself differs)."""
+        generator seeded with ``seed``; Isaac draws it from the CUDA generator, so the draw itself differs).
+
+        Isaac Lab 3.0.0-EA (``metalsim.learn.g1_il3``): ``reward_cfg="flat_il3"`` / ``"rough_il3"`` = the flat / rough_isaac
+        reward sets with 3.0's task differences: push_robot every 10-15 s (root COM velocity += U(+-0.5) m/s in x, y),
+        add_base_mass on torso_link (log-uniform x[0.8, 1.25], inertia scaled alike, per world), reset root COM
+        velocity U(+-0.5) on six axes and yaw U(+-3.14), the root linear velocity of the pelvis COM in observations and
+        rewards (Isaac's root_lin_vel_*), the contact sensor sampled once per 5 ms tick with a 3-tick history and
+        ``il3_backend``'s air-time threshold (newton_mjwarp 0 N, physx 1 N), rough terrain collision on the 0.1 m
+        heightfield (Newton rasterizes 3.0's terrain). ``il3_events=False`` keeps the il3 semantics without the three
+        randomizations (deterministic protocols). ``solver_cfg``: a ``metalsim.physics.solver_presets`` preset
+        ("isaaclab3": Isaac's own MuJoCo Warp settings) or a ``metalsim.physics.contact_tuning`` preset name
+        (e.g. "hardlimits"); None keeps the task's MuJoCo defaults with 10 / 20 iterations."""
         if seed is None:
             seed = 42 if terrain != "flat" else 0
+        rc = reward_cfg or ("flat" if terrain == "flat" else "rough")
+        if rc not in ("flat", "rough", "rough_isaac", "flat_il3", "rough_il3"):
+            raise ValueError(f"reward_cfg must be 'flat', 'rough', 'rough_isaac', 'flat_il3' or 'rough_il3', not {rc!r}")
+        self.il3 = rc.endswith("_il3")
+        self.il3_events = self.il3 and (True if il3_events is None else bool(il3_events))
+        if self.il3 and il3_backend not in ("newton_mjwarp", "physx"):
+            raise ValueError("il3_backend must be 'newton_mjwarp' or 'physx'")
+        self.il3_backend = il3_backend
+        if self.il3 and engine != "mjwarp":
+            raise ValueError("the Isaac Lab 3.0 configs run on the MuJoCo Warp engine")
+        if self.il3 and terrain != "flat" and terrain_collision is None:
+            terrain_collision = "hfield"       # Isaac Lab 3.0 on Newton: the terrain mesh rasterized to a 0.1 m heightfield
         # rough terrain collision surface and height-scan evaluation (2026-09-25, runs/terrain_walls/): default = Isaac's
         # trimesh sub-terrains as its own boxes, windowed per world ("boxes_local"; the 0.1 m heightfield, "hfield", turned
         # Isaac's vertical walls into 0.1 m ramps), and the exact height scan on those cells ("exact"; "grid" = the 0.1 m
@@ -542,7 +570,8 @@ class G1VelocityTask:
         self.model, self.info = build_g1_model(terrain, self.hfield, physics_dt=physics_dt)   # metadata source for both engines
         m = self.model
         # contact/limit stiffness (metalsim.physics.contact_tuning preset; "recommended" = tau10_impact_hardlimits, the
-        # 2026-09-25 PhysX-parity decision; "default" or None = MuJoCo's defaults). MuJoCo Warp only.
+        # 2026-09-25 PhysX-parity decision; "default" or None = MuJoCo's defaults). MuJoCo Warp only; applied before
+        # solver_cfg, so an explicit other-simulator solver_cfg (e.g. "isaaclab3") overrides what it sets.
         from metalsim.physics import contact_tuning
         self.contact_cfg = contact_cfg if engine == "mjwarp" else None
         if contact_tuning.active_override() is not None:        # a g1_model_tuning(...) context already tuned the model
@@ -552,6 +581,19 @@ class G1VelocityTask:
             if self.contact_cfg not in contact_tuning.PRESETS:
                 raise ValueError(f"unknown contact_cfg {contact_cfg!r}; presets: {sorted(contact_tuning.PRESETS)}")
             contact_tuning.apply(m, self.contact_cfg)
+        self.solver_cfg = solver_cfg
+        self._solver_preset = None
+        if solver_cfg:
+            from metalsim.physics import solver_presets, contact_tuning
+            if engine != "mjwarp":
+                raise ValueError("solver_cfg applies to the MuJoCo Warp engine")
+            if solver_cfg in solver_presets.PRESETS:
+                self._solver_preset = solver_presets.PRESETS[solver_cfg]
+                solver_presets.apply(m, solver_cfg)
+            elif solver_cfg in contact_tuning.PRESETS:
+                contact_tuning.apply(m, solver_cfg)
+            else:
+                raise ValueError(f"unknown solver_cfg {solver_cfg!r}")
         self.nj = m.nu
         if engine == "newton":
             from metalsim.physics.newton_backend import NewtonSim
@@ -572,12 +614,21 @@ class G1VelocityTask:
                 from metalsim.learn.terrain import BoxWindow
                 pwf = BoxWindow.FIELDS
             njmax = 256 if terrain_collision in ("hfield", "boxes", "meshes", "boxes_local") else 512   # C's initial set on 0.025 m: 400 rows
-            # factorization settings (throughput only; float-noise-level arithmetic changes, checked against MuJoCo C in
-            # tests/test_g1_fast_factorization.py; docs/research/mjwarp_throughput_2026-09-25.md): the solver Hessian's
-            # Cholesky in registers for the 43 dofs, and M / M - dt*D by MuJoCo Warp's tree-sparse L'DL
-            self.sim = BatchSim(m, n, options=BatchSimOptions(substeps=self.decimation, njmax=njmax, nconmax=nconmax,
-                                                              solver_iterations=10, ls_iterations=20, per_world_fields=pwf,
-                                                              metal_register_cholesky_max=48, m_dense_max=0))
+            # factorization: BatchSimOptions' defaults since 2026-09-25 (metal_register_cholesky_max 48: the solver
+            # Hessian's Cholesky in registers for the 43 dofs; m_dense_max 0: M / M - dt*D by MuJoCo Warp's tree-sparse
+            # L'DL; docs/research/mjwarp_throughput_2026-09-25.md, tests/test_g1_fast_factorization.py)
+            if self.il3_events:                           # add_base_mass: per-world masses and the constants derived from them
+                pwf = tuple(pwf) + ("body_mass", "body_inertia", "body_subtreemass", "body_invweight0", "dof_invweight0")
+                if self._solver_preset is not None and self._solver_preset.newton_force_space_limits:
+                    pwf = pwf + ("jnt_solref",)
+            bso = dict(substeps=self.decimation, njmax=njmax, nconmax=nconmax, solver_iterations=10, ls_iterations=20,
+                       per_world_fields=pwf)
+            if self._solver_preset is not None:
+                from metalsim.physics import solver_presets
+                bso = solver_presets.batch_options(self._solver_preset, **bso)
+            self.sim = BatchSim(m, n, options=BatchSimOptions(**bso))
+            if self._solver_preset is not None:
+                solver_presets.install(self.sim, self._solver_preset)     # e.g. collision once per 5 ms tick
         self.max_t = int(EPISODE_S / CONTROL_DT)
         self.n_scan = 187 if self.use_scan else 0
         self.obs_dim = 12 + 3 * self.nj + self.n_scan
@@ -596,10 +647,21 @@ class G1VelocityTask:
         # 3 feet_slide, 4 joint_deviation (all groups), 5 flat_orientation, 6 action_rate, 7 termination,
         # 8 lin_vel_z, 9 ang_vel_xy, 10 dof_torques, 11 dof_acc, 12 dof_pos_limits
         self.terms = z((n, 13))
-        self.reward_cfg = reward_cfg or ("flat" if terrain == "flat" else "rough")
-        if self.reward_cfg not in ("flat", "rough", "rough_isaac"):
-            raise ValueError(f"reward_cfg must be 'flat', 'rough' or 'rough_isaac', not {self.reward_cfg!r}")
-        self.isaac_flat = {"flat": 1, "rough": 0, "rough_isaac": 2}[self.reward_cfg]
+        self.reward_cfg = rc
+        self.isaac_flat = {"flat": 1, "rough": 0, "rough_isaac": 2, "flat_il3": 1, "rough_il3": 2}[self.reward_cfg]
+        # root body COM in its frame: Isaac's root_lin_vel_* is the root COM's velocity (il3 configs); zero = frame origin
+        root_body = int(m.jnt_bodyid[0])
+        self.root_com = wp.vec3(*[float(x) for x in m.body_ipos[root_body]]) if self.il3 else wp.vec3(0.0, 0.0, 0.0)
+        self.mass_info = None
+        if self.il3_events and engine == "mjwarp":
+            from metalsim.learn import g1_il3
+            self.mass_scale = g1_il3.sample_mass_scale(n, seed)
+            self.mass_info = g1_il3.apply_add_base_mass(
+                self.sim, m, self.mass_scale,
+                force_space_limits=bool(self._solver_preset is not None and self._solver_preset.newton_force_space_limits))
+        self.push_left = z(n); self.pushes = z(1, dtype=int)
+        self.log_terms = self.il3
+        self.ep_terms = z((n, 13)); self._term_sums = z(13); self.term_count = z(2, dtype=int)
         self.lin_vel_y = {1: 0.5, 0: 1.0, 2: 0.0}[self.isaac_flat]     # G1RoughEnvCfg: lin_vel_y = (0, 0)
         self.torso_hist = z(n)
         # joint groups for reward terms
@@ -667,8 +729,28 @@ class G1VelocityTask:
             # body with a substep history and air/contact times, updated after every substep (BatchSim substep
             # hook, so every sim.launch_step / captured step includes it); reset with the envs
             from metalsim.sensors.contact import ContactSensor
-            self.contact = ContactSensor(self.sim, ["left_ankle_roll_link", "right_ankle_roll_link", "torso_link"],
-                                         history_length=self.hist_substeps, track_air_time=True, force_threshold=1.0)
+            bodies = ["left_ankle_roll_link", "right_ankle_roll_link", "torso_link"]
+            if self.il3:
+                # Isaac Lab 3.0: the sensor is updated once per 5 ms physics tick with that tick's last-substep forces,
+                # history 3 ticks, air/contact time in steps of 5 ms, threshold per backend (Newton 0 N, PhysX 1 N)
+                from metalsim.learn import g1_il3
+                tick = max(1, int(round(g1_il3.SENSOR_TICK_S / self.physics_dt)))
+                if self.decimation % tick:
+                    raise ValueError("the control step must hold a whole number of 5 ms ticks")
+                self.hist_substeps = g1_il3.SENSOR_HISTORY
+                self.contact = ContactSensor(self.sim, bodies, history_length=self.hist_substeps, track_air_time=True,
+                                             force_threshold=g1_il3.AIR_TIME_THRESHOLD[il3_backend], attach=False)
+                self.contact.dt = tick * self.physics_dt
+                self.sensor_tick = tick
+                calls = [0]
+                def _tick_hook(calls=calls, tick=tick, cs=self.contact):
+                    calls[0] += 1                 # substep index within each (captured or eager) step, modulo the tick
+                    if calls[0] % tick == 0:
+                        cs.launch()
+                self.sim.add_substep_hook(_tick_hook, self.contact.launch_reset)
+            else:
+                self.contact = ContactSensor(self.sim, bodies, history_length=self.hist_substeps, track_air_time=True,
+                                             force_threshold=1.0)
             self.use_sensor = 1
         self._dummy2 = z((n, 2))
         self.box_window = None
@@ -692,8 +774,14 @@ class G1VelocityTask:
             self.scanner.launch(step_idx)
         wp.launch(g1_commands, dim=self.n, inputs=[self.sim.d.qpos, self.cmd, self.heading, self.standing, self.resample,
                                                    self.seed, step_idx, self.lin_vel_y], device=self.device)
+        if self.il3_events:          # Isaac Lab 3.0 push_robot: after resets and the command update, before observations
+            from metalsim.learn import g1_il3
+            wp.launch(g1_il3.g1_push_il3, dim=self.n, inputs=[self.seed, step_idx, CONTROL_DT, g1_il3.PUSH_INTERVAL_S[0],
+                                                              g1_il3.PUSH_INTERVAL_S[1], g1_il3.PUSH_VEL, self.push_left,
+                                                              self.sim.d.qvel, self.pushes], device=self.device)
         wp.launch(g1_obs, dim=self.n, inputs=[self.sim.d.qpos, self.sim.d.qvel, self.default_q, self.cmd, self.last_action,
-                                              self.height_scan, self.n_scan, self.seed, step_idx, self.obs], device=self.device)
+                                              self.height_scan, self.n_scan, self.seed, step_idx, self.obs, self.root_com],
+                  device=self.device)
 
     def launch_apply_action(self, action):
         wp.launch(g1_apply_action, dim=self.n, inputs=[action, self.default_q, ACTION_SCALE, self.last_action, self.prev_action,
@@ -719,8 +807,13 @@ class G1VelocityTask:
             self.contact_time, CONTROL_DT, self.t, self.max_t, pol.step_idx, bufs.rew, bufs.done, self.sim._reset_mask,
             self.resample, int(10.0 / CONTROL_DT), self.ep_ret, self.ep_len, self.stats, self.stats_i, self.terms,
             self.curriculum, self.level, self.col, self.origin_table, self.n_levels, self.n_cols, self.cell_size, EPISODE_S,
-            self.origins, self.seed, self.isaac_flat, self.torso_hist, self.use_sensor, sens_air, sens_con, self.foot_hist],
-            device=self.device)
+            self.origins, self.seed, self.isaac_flat, self.torso_hist, self.use_sensor, sens_air, sens_con, self.foot_hist,
+            self.root_com], device=self.device)
+        if self.log_terms:
+            from metalsim.learn import g1_il3
+            wp.launch(g1_il3.g1_term_episode_sums, dim=self.n, inputs=[pol.step_idx, bufs.done, self.terms, CONTROL_DT, EPISODE_S,
+                                                                       self.ep_terms, self._term_sums, self.term_count],
+                      device=self.device)
         if self.engine == "newton":
             wp.launch(g1_reset, dim=self.n, inputs=[self.sim._reset_mask, self.default_q, self.origins, self.seed, pol.step_idx,
                                                     d.qpos, d.qvel, self.last_action, self.prev_action], device=self.device)
@@ -731,13 +824,36 @@ class G1VelocityTask:
         if self.contact is not None:     # Isaac resets the contact sensor (history, air/contact times) with the env
             self.contact.launch_reset(self.sim._reset_mask)
         # reset randomization keyed by the free-running counter when the caller has one (PPOWarp's rng_step)
-        wp.launch(g1_reset, dim=self.n, inputs=[self.sim._reset_mask, self.default_q, self.origins, self.seed,
-                                                getattr(pol, "rng_step", pol.step_idx),
-                                                d.qpos, d.qvel, self.last_action, self.prev_action], device=self.device)
+        self._launch_reset_kernel(getattr(pol, "rng_step", pol.step_idx))
         # After a reset only the kinematics are needed before the next observation (body poses for
         # the height scan); everything else (sensors, accelerations, contact forces) is produced by
         # the next step itself. A full forward pass here cost ~20 ms per step at 4096 envs.
         mjw.kinematics(self.sim.m, d)
+
+    def _launch_reset_kernel(self, step_idx):
+        """Masked env resets (MuJoCo Warp): the 2.3.2 ports' g1_reset, or Isaac Lab 3.0's (g1_il3.g1_reset_il3)."""
+        d = self.sim.d
+        if self.il3:
+            from metalsim.learn import g1_il3
+            wp.launch(g1_il3.g1_reset_il3, dim=self.n, inputs=[
+                self.sim._reset_mask, self.default_q, self.origins, self.seed, step_idx, self.root_com,
+                g1_il3.RESET_VEL if self.il3_events else 0.0, g1_il3.RESET_YAW, g1_il3.RESET_XY,
+                g1_il3.PUSH_INTERVAL_S[0], g1_il3.PUSH_INTERVAL_S[1], self.push_left,
+                d.qpos, d.qvel, self.last_action, self.prev_action], device=self.device)
+            return
+        wp.launch(g1_reset, dim=self.n, inputs=[self.sim._reset_mask, self.default_q, self.origins, self.seed, step_idx,
+                                                d.qpos, d.qvel, self.last_action, self.prev_action], device=self.device)
+
+    def term_stats(self) -> dict:
+        """Per-term episode means (Isaac's Episode_Reward/<term>: episode sum of value x dt / 20 s) over the episodes
+        that ended since the last call, the fall fraction and the push count; resets the accumulators (synchronizes)."""
+        from metalsim.learn import g1_il3
+        st = self._term_sums.numpy(); c = self.term_count.numpy(); p = int(self.pushes.numpy()[0])
+        self._term_sums.zero_(); self.term_count.zero_(); self.pushes.zero_()
+        k = int(c[0])
+        out = {nm: (float(st[i]) / k if k else None) for i, nm in enumerate(g1_il3.TERM_NAMES)}
+        out.update({"episodes": k, "base_contact": (float(c[1]) / k if k else None), "pushes": p})
+        return out
 
     def launch_timeouts(self, pol, bufs):
         """Time-out flags of this step into ``bufs.timeout`` (for PPO's bootstrapping on truncation)."""
@@ -760,8 +876,7 @@ class G1VelocityTask:
             mjw.reset_data(self.sim.m, self.sim.d, reset=self.sim._reset_mask)
             if self.contact is not None:
                 self.contact.launch_reset(self.sim._reset_mask)
-            wp.launch(g1_reset, dim=self.n, inputs=[self.sim._reset_mask, self.default_q, self.origins, self.seed, idx,
-                                                    self.sim.d.qpos, self.sim.d.qvel, self.last_action, self.prev_action], device=self.device)
+            self._launch_reset_kernel(idx)
             mjw.forward(self.sim.m, self.sim.d)
         self.sim.synchronize()
 
@@ -838,12 +953,13 @@ def g1_ppo_config(terrain: str, iterations: int, seed: int = 0):
 
 def train_g1(n=4096, terrain="flat", iterations=1500, seed=None, log_path=None, checkpoint=None, physics_dt=PHYSICS_DT,
              engine="mjwarp", newton_iterations=4, newton_dt=0.00125, newton_kw=None, reward_cfg=None, scan_ordering="xy",
-             terrain_collision=None, scan_surface=None, contact_cfg="recommended"):
+             terrain_collision=None, scan_surface=None, solver_cfg=None, il3_events=None, il3_backend="newton_mjwarp",
+             contact_cfg="recommended"):
     from metalsim.learn.ppo_warp import PPOWarp
     task = G1VelocityTask(n, terrain=terrain, seed=seed, physics_dt=physics_dt, engine=engine,
                           newton_iterations=newton_iterations, newton_dt=newton_dt, newton_kw=newton_kw, reward_cfg=reward_cfg,
                           scan_ordering=scan_ordering, terrain_collision=terrain_collision, scan_surface=scan_surface,
-                          contact_cfg=contact_cfg)
+                          solver_cfg=solver_cfg, il3_events=il3_events, il3_backend=il3_backend, contact_cfg=contact_cfg)
     seed = task.seed                     # None -> the task's default (42 rough, Isaac's; 0 flat)
     algo = PPOWarp(task, g1_ppo_config(terrain, iterations, seed))
     f = open(log_path, "a") if log_path else None
@@ -855,17 +971,22 @@ def train_g1(n=4096, terrain="flat", iterations=1500, seed=None, log_path=None, 
     log(f"G1 {terrain} PPO: N={n} obs_dim {task.obs_dim} act_dim {task.act_dim} rollout 24 x {iterations} iterations, engine {eng}, "
         f"physics dt {task.physics_dt} (decimation {task.decimation}), seed {seed}, reward_cfg {task.reward_cfg}, "
         f"height-scan ray order {task.scanner.ordering if task.scanner is not None else '-'}, terrain collision "
-        f"{task.terrain_collision}, height scan {task.scan_surface}")
+        f"{task.terrain_collision}, height scan {task.scan_surface}, solver_cfg {task.solver_cfg}"
+        + (f", Isaac Lab 3.0 events {task.il3_events} (backend {task.il3_backend}), add_base_mass {task.mass_info}" if task.il3 else ""))
     def save(path, it):
         torch.save({"net": algo.net.state_dict(), "terrain": terrain, "n": n, "iterations": it, "obs_dim": task.obs_dim,
                     "act_dim": task.act_dim, "hidden": algo.cfg.hidden, "engine": engine, "reward_cfg": task.reward_cfg,
                     "scan_ordering": task.scanner.ordering if task.scanner is not None else None,
-                    "terrain_collision": task.terrain_collision, "scan_surface": task.scan_surface}, path)
+                    "terrain_collision": task.terrain_collision, "scan_surface": task.scan_surface, "solver_cfg": task.solver_cfg,
+                    "il3_events": task.il3_events}, path)
     def cb(it, a):
         if checkpoint and it % 100 == 0:
             save(checkpoint.replace(".pt", f"_it{it}.pt"), it)
         if task.curriculum == 1:          # Isaac's Curriculum/terrain_levels: mean terrain level over all envs
             log(f"terrain it {it:4d} mean_level {float(task.level.numpy().mean()):.4f}")
+        if task.log_terms:                # Isaac's Episode_Reward/<term> over the episodes ended this iteration
+            import json as _json
+            log(f"terms it {it:4d} " + _json.dumps({k: (round(v, 5) if isinstance(v, float) else v) for k, v in task.term_stats().items()}))
     from metalsim.learn.monitor import AnomalyMonitor
     mon = AnomalyMonitor(task, algo.cfg, log=log, path=(log_path + ".anomalies.jsonl") if log_path else None)
     algo.train(log=log, callback=cb, monitor=mon)
@@ -880,7 +1001,7 @@ if __name__ == "__main__":
     wp.config.quiet = True
     # optional flags (any position): --engine mjwarp|newton, --newton_it N, --newton_dt S
     opts = {"--engine": "mjwarp", "--newton_it": "4", "--newton_dt": "0.00125", "--newton_limit_margin": "0.15", "--newton_kw": "", "--seed": "0", "--reward_cfg": "", "--scan_ordering": "xy",
-            "--terrain_collision": "", "--scan_surface": "", "--contact_cfg": "recommended"}
+            "--terrain_collision": "", "--scan_surface": "", "--solver_cfg": "", "--il3_events": "", "--il3_backend": "newton_mjwarp", "--contact_cfg": "recommended"}
     for k in list(opts):
         if k in sys.argv:
             i = sys.argv.index(k); opts[k] = sys.argv[i + 1]; del sys.argv[i:i + 2]
@@ -897,9 +1018,11 @@ if __name__ == "__main__":
                  physics_dt=float(sys.argv[7]) if len(sys.argv) > 7 else PHYSICS_DT, seed=int(opts["--seed"]),
                  reward_cfg=opts["--reward_cfg"] or None, scan_ordering=opts["--scan_ordering"],
                  terrain_collision=opts["--terrain_collision"] or None, scan_surface=opts["--scan_surface"] or None,
-                 contact_cfg=opts["--contact_cfg"], **ekw)
+                 solver_cfg=opts["--solver_cfg"] or None, il3_events=(None if opts["--il3_events"] == "" else opts["--il3_events"] in ("1", "true", "True")),
+                 il3_backend=opts["--il3_backend"], contact_cfg=opts["--contact_cfg"], **ekw)
         sys.exit(0)
     task = G1VelocityTask(n, terrain=terrain, physics_dt=float(sys.argv[3]) if len(sys.argv) > 3 else PHYSICS_DT,
+                          reward_cfg=opts["--reward_cfg"] or None, solver_cfg=opts["--solver_cfg"] or None,
                           contact_cfg=opts["--contact_cfg"], **ekw)
     print(f"G1 ({terrain}, {task.engine}, physics dt {task.physics_dt}): nbody {task.model.nbody} nv {task.model.nv} nu {task.model.nu} ngeom {task.model.ngeom} obs_dim {task.obs_dim}")
     r = benchmark_step(task, num_frames=100)
