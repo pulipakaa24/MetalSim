@@ -1,0 +1,16 @@
+=== start Thu Sep 24 23:30:59 PDT 2026 power: Now drawing from 'AC Power'
+| setting | blown of 1024 (3 sigma, 400 steps) | peak joint speed [rad/s] | preflight | physics env-steps/s (4096) |
+|---|---|---|---|---|
+| 4:1.25 | 48 | 700 | FAIL | 147,174 |
+| 4:1.25:rc | 34 | 313 | FAIL | 147,516 |
+| 6:1.25:rc | 24 | 367 | FAIL | 106,576 |
+| 8:1.25:rc | 23 | 834 | FAIL | 83,400 |
+| 4:0.8333:rc | 17 | 268 | FAIL | 98,172 |
+| setting | blown of 1024 (3 sigma, 400 steps) | peak joint speed [rad/s] | preflight | physics env-steps/s (4096) |
+|---|---|---|---|---|
+| 4:0.625:rc | 3 | 164 | FAIL | 73,746 |
+| 8:2.5:rc | 98 | 552 | FAIL | 165,610 |
+| 4:1.25:rc:stiff | 0 | 116 | PASS | 148,368 |
+| 4:1.25:rc:relax=0.3 | 49 | 507 | FAIL | 146,688 |
+| 6:0.8333:rc | 9 | 238 | FAIL | 70,883 |
+=== end Thu Sep 24 23:33:50 PDT 2026 power: Now drawing from 'AC Power'
