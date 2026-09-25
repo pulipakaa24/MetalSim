@@ -139,7 +139,32 @@ Rough terrain has **no speed advantage on Newton**: its heightfield collision co
 physics (161 vs 28 ms per step at 4096 envs), an open item. Drift remedies, physics only, flat: 4 it. at
 0.625 ms 74,328 (half the rate; the setting that matches PhysX best, §1.7), joint projection 130,931
 (unusable, §2.1), re-centred joints 149,849 (free). Nothing is excluded from the PPO-loop column.
-The rows above the table use the 5 ms MuJoCo Warp setting of Isaac's task file. Caveat for the Isaac
+The rows above the table use the 5 ms MuJoCo Warp setting of Isaac's task file.
+
+**Throughput work on MuJoCo Warp, 2026-09-25** (`docs/research/mjwarp_throughput_2026-09-25.md`,
+`runs/mjw_tp/`, MetalSim d867143 + df0fda1, Warp fork b9557cb, MuJoCo Warp fork ad22120 / ccfaffb /
+1791414; measured back to back in one session, 4096 envs, 2.5 ms, physics results unchanged to float
+noise: ≤ 3.6e-6 rad after one control step between variants, 4.08e-6 vs MuJoCo C in every variant,
+same training-probe trend, 316 MuJoCo Warp fork tests green on Metal):
+
+| step | change | physics only | full env step | rollout + inference | full PPO loop |
+|---|---|---|---|---|---|
+| before | | 36,202 | 31,494 | 29,134 | 27,937 |
+| 1 | Warp fork: register Cholesky allowed up to size 48, so the G1's 43 dofs take the fast path | 50,663 | 45,272 | 42,955 | 40,297 |
+| 2 | mass matrix factored with MuJoCo Warp's tree-sparse L'DL instead of dense | 61,470 | 53,486 | 50,471 | 46,764 |
+| 3 | MuJoCo Warp fork: sparse L'DL one world per thread; two no-op launches skipped | 71,463 | 61,324 | 56,981 | 52,464 |
+| 4 | MuJoCo Warp fork: incremental Hessian update fused into the Cholesky launch | 80,994 | 67,620 | 61,676 | **56,575** |
+
+Per control step the physics went from 111 to 51 ms. Correction to the earlier reading of the cost
+split: the "~18 ms / 23 % reset-and-observation overhead" quoted before was not task work; timing
+each piece as its own graph puts everything outside physics at 6.5 ms of a 128 ms step, and the gap
+came from comparing physics-only (robots standing still) with the full step (random actions, more
+contacts). Two thirds of physics was the dense 43×43 Cholesky, which the Warp fork only kept in
+registers up to size 40. Rough terrain: 23.7 K → 41.9 K full loop. With this, the G1 flat training
+loop on the M4 Max (56.6 K) exceeds Isaac Lab 2.3.2 + PhysX on the L4 (45.9 K, measured) and is 0.69×
+NVIDIA's published 4090 number (82 K, reported). Rejected options with their effect are in
+DECISIONS.md; the remaining costs, ranked: the 43×43 Cholesky (1.11 ms per batch vs 0.27 at size
+32), the one-thread sparse factorization (~0.5 ms), the Warp MLP inference (~6 ms per step). Caveat for the Isaac
 comparison: PhysX vs XPBD is a different solver; Isaac Lab 3.0 itself moves to Newton, so the
 like-for-like number will be Isaac Lab 3.0's, which is not measured here.
 

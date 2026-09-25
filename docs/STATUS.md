@@ -58,7 +58,8 @@ published benchmark. Neither is cited as physics parity evidence.
 
 ## Headline throughput (uncontended)
 
-- **G1 (Isaac's asset), 4096 envs, synchronized, uncontended (2026-09-24)**: flat step only 55.2K
+- **G1 (Isaac's asset), 4096 envs, 2.5 ms training setting, after the 2026-09-25 factorization work**: physics only 81.0K, full env step 67.6K, rollout + inference 61.7K, **full PPO loop 56.6K env-steps/s** (was 27.9K; rough 41.9K, was 23.7K), physics unchanged to float noise (`PARITY.md` §1.4). This is above Isaac Lab 2.3.2 + PhysX on the L4 (45.9K measured) and 0.69× the published 4090 figure.
+- **Earlier (5 ms setting), 2026-09-24**: flat step only 55.2K
   env-steps/s (Isaac Lab RTX 4090 published 94K); step + Warp-policy inference 55.4K (88K); full PPO
   loop 47.8–51.7K (82K). Rough (patched heightfield kernel): 55.4K / 47.8K / 39.8–42.2K. Raw 0.48–0.63×
   on a chip with 4.5× less peak FP32; 2.2–2.8× per TFLOPS. Physics alone 68.6K flat, 61.3K rough.
