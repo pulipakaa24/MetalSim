@@ -1,0 +1,146 @@
+{
+ "physics": {
+  "A_hold": {
+   "steps": 150,
+   "joint_rmse_rad": {
+    "t0.5s": 0.004967201501131058,
+    "t1s": 0.0024659738410264254,
+    "t2s": 0.00850623194128275,
+    "end": 0.0065581826493144035,
+    "max": 0.034166865050792694
+   },
+   "divergence_step_0.1rad": 67,
+   "divergence_time_s": 1.34,
+   "root_height": {
+    "isaac_end": 0.05380211025476456,
+    "metalsim_end": 0.054136972874403,
+    "rmse": 0.010830872692167759
+   },
+   "root_orientation_err_rad": {
+    "mean": 0.012949625961482525,
+    "max": 0.07415550947189331
+   },
+   "peak_joint_speed_rad_s": {
+    "isaac": 6.861039161682129,
+    "metalsim": 6.463001728057861
+   },
+   "contact_force_N": {
+    "isaac_mean_total": 302.4049377441406,
+    "metalsim_mean_total": 300.2567138671875,
+    "isaac_peak": 712.2770385742188,
+    "metalsim_peak": 1588.951171875
+   },
+   "torque_rms_Nm": {
+    "isaac": 5.288428783416748,
+    "metalsim": 5.3160881996154785
+   },
+   "penetration_m": {
+    "metalsim_max": 0.008142362348735332,
+    "metalsim_mean_when_in_contact": 0.0004290164797566831,
+    "isaac": null
+   },
+   "limit_excursion_rad": {
+    "isaac_max_ctrl": 0.004741529049704041,
+    "metalsim_max_ctrl": 0.0021442566536163943,
+    "isaac_steps_over_0.01": 0,
+    "metalsim_steps_over_0.01": 0,
+    "metalsim_max_substep": 0.003416001796722412
+   }
+  },
+  "B_random": {
+   "steps": 250,
+   "joint_rmse_rad": {
+    "t0.5s": 0.04655581712722778,
+    "t1s": 0.11553168296813965,
+    "t2s": 0.11477302014827728,
+    "end": 0.04745066538453102,
+    "max": 0.19518089294433594
+   },
+   "divergence_step_0.1rad": 0,
+   "divergence_time_s": 0.0,
+   "root_height": {
+    "isaac_end": 0.14033684134483337,
+    "metalsim_end": 0.14868015050888062,
+    "rmse": 0.12890596687793732
+   },
+   "root_orientation_err_rad": {
+    "mean": 1.8039472103118896,
+    "max": 3.1348438262939453
+   },
+   "peak_joint_speed_rad_s": {
+    "isaac": 32.00001525878906,
+    "metalsim": 39.102142333984375
+   },
+   "contact_force_N": {
+    "isaac_mean_total": 329.4166564941406,
+    "metalsim_mean_total": 369.4654235839844,
+    "isaac_peak": 2847.163330078125,
+    "metalsim_peak": 3401.85791015625
+   },
+   "torque_rms_Nm": {
+    "isaac": 29.949527740478516,
+    "metalsim": 28.628231048583984
+   },
+   "penetration_m": {
+    "metalsim_max": 0.025426169857382774,
+    "metalsim_mean_when_in_contact": 0.006361153442412615,
+    "isaac": null
+   },
+   "limit_excursion_rad": {
+    "isaac_max_ctrl": 0.001549847513316993,
+    "metalsim_max_ctrl": 0.08512741327285767,
+    "isaac_steps_over_0.01": 0,
+    "metalsim_steps_over_0.01": 158,
+    "metalsim_max_substep": 0.08512741327285767
+   }
+  },
+  "C_drop": {
+   "steps": 150,
+   "joint_rmse_rad": {
+    "t0.5s": 0.00782859418541193,
+    "t1s": 0.01419989112764597,
+    "t2s": 0.012637995183467865,
+    "end": 0.010732698254287243,
+    "max": 0.06426320970058441
+   },
+   "divergence_step_0.1rad": 0,
+   "divergence_time_s": 0.0,
+   "root_height": {
+    "isaac_end": 0.05380271375179291,
+    "metalsim_end": 0.05444467440247536,
+    "rmse": 0.03545229509472847
+   },
+   "root_orientation_err_rad": {
+    "mean": 0.05788838863372803,
+    "max": 0.24337203800678253
+   },
+   "peak_joint_speed_rad_s": {
+    "isaac": 10.601576805114746,
+    "metalsim": 9.13841438293457
+   },
+   "contact_force_N": {
+    "isaac_mean_total": 288.4056701660156,
+    "metalsim_mean_total": 327.8980712890625,
+    "isaac_peak": 1029.7064208984375,
+    "metalsim_peak": 5595.0830078125
+   },
+   "torque_rms_Nm": {
+    "isaac": 6.169229030609131,
+    "metalsim": 5.944382667541504
+   },
+   "penetration_m": {
+    "metalsim_max": 0.01629341021180153,
+    "metalsim_mean_when_in_contact": 0.0007162317051552236,
+    "isaac": null
+   },
+   "limit_excursion_rad": {
+    "isaac_max_ctrl": 0.003954390110800232,
+    "metalsim_max_ctrl": 0.0017170105598663943,
+    "isaac_steps_over_0.01": 0,
+    "metalsim_steps_over_0.01": 0,
+    "metalsim_max_substep": 0.0022087693214416504
+   }
+  }
+ },
+ "render": {}
+}

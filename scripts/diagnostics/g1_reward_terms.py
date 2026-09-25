@@ -27,12 +27,14 @@ TERM_NAMES = ["track_lin_vel_xy_exp", "track_ang_vel_z_exp", "feet_air_time", "f
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("ckpt"); ap.add_argument("--envs", type=int, default=1024); ap.add_argument("--steps", type=int, default=1000)
     ap.add_argument("--physics_dt", type=float, default=0.0025); ap.add_argument("--terrain", default="flat"); ap.add_argument("--stochastic", action="store_true")
-    ap.add_argument("--reward_cfg", default=None, choices=(None, "flat", "rough"), help="default: the terrain's (flat -> Isaac G1FlatEnvCfg)")
+    ap.add_argument("--reward_cfg", default=None, choices=(None, "flat", "rough", "rough_isaac"), help="default: the terrain's (flat -> Isaac G1FlatEnvCfg)")
     ap.add_argument("--engine", default="mjwarp", choices=("mjwarp", "newton")); ap.add_argument("--newton_it", type=int, default=4)
     ap.add_argument("--newton_dt", type=float, default=0.00125); ap.add_argument("--newton_limit_margin", default="0.15", help="'none' = USD limits")
     ap.add_argument("--newton_kw", default="", help="NewtonSim options, e.g. drive=solver,joint_coloring=True,relaxation=0.8")
     ap.add_argument("--contact_tuning", default=None, help="metalsim.physics.contact_tuning preset applied to the G1 model (MuJoCo Warp)")
     ap.add_argument("--out", default=None, help="write the JSON report here")
+    ap.add_argument("--seed", type=int, default=1, help="task seed (commands, resets); repeat with other seeds for the noise floor")
+    ap.add_argument("--seed", type=int, default=1, help="task seed (on rough terrain also the terrain seed; the training run's for its terrain)")
     a = ap.parse_args(); wp.config.quiet = True
     ck = torch.load(a.ckpt, map_location="mps", weights_only=False); sd = ck["net"]
     hidden = tuple(sd[k].shape[0] for k in sorted((k for k in sd if k.startswith("actor.") and k.endswith("weight")), key=lambda s: int(s.split(".")[1]))[:-1])
@@ -46,7 +48,7 @@ def main():
     import contextlib
     from metalsim.physics import contact_tuning
     with (contact_tuning.g1_model_tuning(a.contact_tuning) if a.contact_tuning else contextlib.nullcontext()):
-        task = G1VelocityTask(a.envs, terrain=a.terrain, seed=1, physics_dt=a.physics_dt, reward_cfg=a.reward_cfg, **ekw)
+        task = G1VelocityTask(a.envs, terrain=a.terrain, seed=a.seed, physics_dt=a.physics_dt, reward_cfg=a.reward_cfg, **ekw)
     net = ActorCriticMLP(task.obs_dim, task.act_dim, hidden=hidden).to("mps"); net.load_state_dict(sd); net.eval()
     n = a.envs
     class _Pol: step_idx = wp.zeros(1, dtype=int, device=task.device)
@@ -78,7 +80,7 @@ def main():
     ret = S.sum(1); rep = ({"ckpt": a.ckpt, "iterations": ck.get("iterations"), "episodes": int(len(L)), "mean_episode_length": float(L.mean()), "mean_return": float(ret.mean()),
                                       "terminations": term_counts, "Episode_Reward": {k: round(float(v), 4) for k, v in zip(TERM_NAMES, per_term)},
                                       "note": "per-second average over the episode like Isaac's RewardManager; joint_deviation_all = hip+arms+fingers+torso", "reward_cfg": task.reward_cfg,
-                                      "engine": task.engine, "physics_dt": task.physics_dt, "contact_tuning": a.contact_tuning})
+                                      "engine": task.engine, "physics_dt": task.physics_dt, "contact_tuning": a.contact_tuning, "seed": a.seed})
     print(json.dumps(rep, indent=1))
     if a.out:
         json.dump(rep, open(a.out, "w"), indent=1)
