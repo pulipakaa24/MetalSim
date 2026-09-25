@@ -6,7 +6,7 @@ the mean over episodes finished in that iteration (PPOWarp is 1-based).
     python scripts/diagnostics/g1_learning_curves.py
 """
 import re, json, sys
-ITS = [50, 100, 150, 200, 300, 500, 750, 1000, 1500]
+ITS = [50, 100, 150, 200, 250, 300, 400, 500, 750, 1000, 1500]
 def isaac():
     out = {}; it = None
     for line in open("runs/parity/isaac_train_g1_flat_terms.txt"):
@@ -43,7 +43,7 @@ def terms(path):
     return out
 I = isaac(); P = ppowarp("runs/g1_flat_ppo_1500_dt25_fixed.log"); R = rslrl("runs/g1_flat_rslrl_ppo.log"); RT = terms("runs/g1_flat_rslrl_ppo.terms.jsonl")
 extra = {}
-for name, path in [("PPOWarp-fixed", "runs/g1_flat_ppowarp_fixed_legacytask.log")]:
+for name, path in [("PPOWarp-fixed", "runs/g1_flat_ppowarp_fixed.log"), ("Newton-PPOWarp-fixed", "runs/g1_flat_newton_ppo_fixed.log")]:
     try: extra[name] = ppowarp(path)
     except FileNotFoundError: pass
 try: RF = rslrl("runs/g1_flat_rslrl_ppo_isaacflatcfg.log"); RFT = terms("runs/g1_flat_rslrl_ppo_isaacflatcfg.terms.jsonl")
