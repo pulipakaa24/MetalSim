@@ -15,14 +15,19 @@ Phase logs and measurements live in `docs/`.
 
 ## Install
 
-MetalSim runs on its fork of Warp, https://github.com/pulipakaa24/warp branch `metalsim` (innate-inc's Metal
-backend plus the changes in `patches/`), and on MuJoCo Warp's `metal` branch. Neither is on PyPI.
+MetalSim runs on two forks, neither on PyPI:
+
+- Warp: https://github.com/pulipakaa24/warp branch `metalsim` (innate-inc's Metal backend plus the
+  changes in `patches/`).
+- MuJoCo Warp: https://github.com/pulipakaa24/mujoco_warp branch `metalsim` (the `metal` device branch
+  plus the heightfield plane-contact fix in `patches/`).
 
 ```
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[test]"
 scripts/setup_warp.sh                      # clones, builds (build_lib.py --no-cuda) and installs the Warp fork
-pip install -e upstream/mujoco_warp        # MuJoCo Warp, branch metal
+pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@metalsim#egg=mujoco-warp"
+scripts/fetch_isaac_assets.sh              # NVIDIA's g1_minimal.usd for the G1 parity tests (not redistributed)
 pytest tests -q
 ```
 

@@ -5,8 +5,8 @@ Physics (same asset, same initial state, same open-loop actions):
   the max joint error exceeds 0.1 rad), foot contact-force statistics, peak joint speed.
 Rendering (same camera, same lights, same state per frame; Isaac RTX vs MetalSim tier 2 / tier 0):
   PSNR, SSIM, LPIPS (AlexNet), FLIP (from metalsim.bench.render_fidelity), on raw images and after
-  matching the mean brightness (the two engines' light units differ), silhouette IoU from depth,
-  depth RMSE on the common silhouette.
+  matching the mean brightness (the two engines' light units differ), silhouette IoU from depth, depth RMSE on
+  the robot silhouette and on the ground plane (sky / far plane masked, z-depth in both engines).
 Writes a JSON report and side-by-side composites (Isaac | MetalSim tier 2 | MetalSim tier 0).
 
     python -m metalsim.parity.compare --isaac runs/parity/isaac/rt --metalsim runs/parity/metalsim --out runs/parity/report
@@ -42,6 +42,21 @@ def physics_metrics(isaac, ours, tag):
             "torque_rms_Nm": {"isaac": float(np.sqrt((A["torque"][:T, 0] ** 2).mean())), "metalsim": float(np.sqrt((B["torque"][:T, 0] ** 2).mean()))}}
 
 
+def robot_mask(d, thresh=0.05):
+    """Pixels off the ground plane (robot), and pixels on it, from a z-depth image: fit 1/z = a u + b v + c
+    on the outer lower image (no robot there in the protocol camera), residual > thresh m = robot.
+    thresh 5 cm: MetalSim tier-2 depth carries ~4 mm RMS (1.5 cm max) noise on the plane; Isaac's is exact."""
+    d = d.astype(np.float64); H, W = d.shape
+    v, u = np.mgrid[0:H, 0:W]
+    valid = np.isfinite(d) & (d > 0) & (d < 50.0)
+    sel = valid & (v > 0.55 * H) & ((u < 0.3 * W) | (u > 0.7 * W))
+    A = np.stack([u[sel], v[sel], np.ones(sel.sum())], 1); c = np.linalg.lstsq(A, 1.0 / d[sel], rcond=None)[0]
+    den = c[0] * u + c[1] * v + c[2]; plane = np.where(den > 1e-9, 1.0 / np.maximum(den, 1e-9), np.inf)   # above the horizon -> inf
+    robot = valid & (plane - d > thresh)
+    ground = valid & (np.abs(plane - d) <= thresh)
+    return robot, ground
+
+
 def image_metrics(a, b, da, db, lp=None):
     from skimage.metrics import structural_similarity
     from metalsim.bench.render_fidelity import flip
@@ -59,11 +74,20 @@ def image_metrics(a, b, da, db, lp=None):
     raw = stats(a, b)
     gain = a.mean() / max(b.mean(), 1e-6)
     norm = stats(a, np.clip(b * gain, 0, 1))
-    sil_a = da < 50.0; sil_b = db < 50.0           # depth: robot + ground < far plane; use the robot region: depth < ground-plane depth is not separable, so compare full depth
-    both = sil_a & sil_b
+    # Depth. Both engines write z-depth (a ground plane fits 1/z affine in pixel coordinates to < 1 mm in
+    # Isaac, < 5 mm in MetalSim); Isaac writes inf for the sky and clips at the 100 m far plane, MetalSim
+    # writes 0 for a miss. The robot silhouette is every pixel that departs from the fitted ground plane,
+    # so the comparison covers (i) silhouette IoU, (ii) depth RMSE on the robot (both silhouettes),
+    # (iii) depth RMSE on the ground both engines see.
+    sil_a, ground_a = robot_mask(da); sil_b, ground_b = robot_mask(db)
+    both = sil_a & sil_b; inter = float(both.sum()); union = float((sil_a | sil_b).sum())
+    g = ground_a & ground_b
     return {"raw": raw, "brightness_matched": norm, "brightness_gain_applied": float(gain),
-            "depth_rmse_m": float(np.sqrt(((da - db)[both] ** 2).mean())) if both.any() else None,
-            "depth_agree_1cm": float((np.abs(da - db)[both] < 0.01).mean()) if both.any() else None}
+            "silhouette_iou": inter / union if union else None,
+            "silhouette_px": {"isaac": int(sil_a.sum()), "metalsim": int(sil_b.sum())},
+            "robot_depth_rmse_m": float(np.sqrt(((da - db)[both] ** 2).mean())) if both.any() else None,
+            "robot_depth_agree_1cm": float((np.abs(da - db)[both] < 0.01).mean()) if both.any() else None,
+            "ground_depth_rmse_m": float(np.sqrt(((da - db)[g] ** 2).mean())) if g.any() else None}
 
 
 def main():
@@ -97,8 +121,7 @@ def main():
             report["render"][tier] = {"frames": len(rows),
                                       "raw_mean": {k: float(np.mean([r["raw"][k] for r in rows])) for k in keys},
                                       "brightness_matched_mean": {k: float(np.mean([r["brightness_matched"][k] for r in rows])) for k in keys},
-                                      "depth_rmse_m_mean": float(np.mean([r["depth_rmse_m"] for r in rows if r["depth_rmse_m"] is not None])),
-                                      "depth_agree_1cm_mean": float(np.mean([r["depth_agree_1cm"] for r in rows if r["depth_agree_1cm"] is not None])),
+                                      **{k + "_mean": float(np.mean([r[k] for r in rows if r[k] is not None])) for k in ("silhouette_iou", "robot_depth_rmse_m", "robot_depth_agree_1cm", "ground_depth_rmse_m")},
                                       "per_frame": rows}
     json.dump(report, open(os.path.join(a.out, "report.json"), "w"), indent=1)
     print(json.dumps({k: (v if k == "physics" else {t: {kk: vv for kk, vv in r.items() if kk != "per_frame"} for t, r in v.items()}) for k, v in report.items()}, indent=1))
