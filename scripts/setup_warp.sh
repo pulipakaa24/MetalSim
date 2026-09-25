@@ -9,7 +9,7 @@ REPO=${METALSIM_WARP_REPO:-https://github.com/pulipakaa24/warp}     # fork of in
 REF=${METALSIM_WARP_REF:-metalsim}
 if [ ! -d "$DIR" ]; then
   { git clone "$REPO" "$DIR" && git -C "$DIR" checkout -q "$REF"; } || {     # REF: branch, tag or commit
-    # the fork is innate-inc/warp ce15f6bb plus the four commits exported to patches/warp/ (same tree as fork 786cdae)
+    # the fork is innate-inc/warp ce15f6bb plus the five commits exported to patches/warp/ (same tree as fork b9557cb)
     echo "fork not reachable; cloning innate-inc/warp at ce15f6bb and applying patches/warp/"; rm -rf "$DIR"
     git clone https://github.com/innate-inc/warp "$DIR"
     git -C "$DIR" checkout -q ce15f6bb2545e2d6c4a4c1fac8e40bb800db7265

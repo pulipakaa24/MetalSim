@@ -1,0 +1,151 @@
+From ccfaffb38d9e4ff765214d24c2eebbbdb4358b1d Mon Sep 17 00:00:00 2001
+From: Aditya Pulipaka <adipu@utexas.edu>
+Date: Fri, 25 Sep 2026 09:42:16 -0700
+Subject: [PATCH 6/7] Metal: incremental Newton-Hessian update fused into the
+ register Cholesky launch
+
+On Metal every launch drains the GPU; the incremental H update ran as its own (nworld, nv(nv+1)/2) grid
+that mostly exits early, followed by the one-SIMD-group-per-world Cholesky. The fused kernel lets the
+world's 32 lanes apply the same per-element update (same arithmetic, same order), barrier, then factor
+and solve as before. Bitwise equal to the two-kernel path on CPU (G1 with 35 constraint rows, 3 steps).
+MJW_METAL_FUSE_H_CHOLESKY=0 restores the separate launches.
+MetalSim G1 flat, 4096 envs: training loop 52.5K -> 56.5K env-steps/s; fork tests (smooth, passive,
+derivative, solver, forward) 316 passed on Metal.
+
+Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>
+---
+ mujoco_warp/_src/solver.py | 104 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 104 insertions(+)
+
+diff --git a/mujoco_warp/_src/solver.py b/mujoco_warp/_src/solver.py
+index 680354a..2171722 100644
+--- a/mujoco_warp/_src/solver.py
++++ b/mujoco_warp/_src/solver.py
+@@ -14,6 +14,7 @@
+ # ==============================================================================
+ 
+ import dataclasses
++import os
+ from math import ceil
+ from typing import Any
+ 
+@@ -2613,6 +2614,90 @@ def _update_gradient_cholesky(tile_size: int, skip_noflip: bool = False):
+   return kernel
+ 
+ 
++# Metal: fuse the incremental Hessian update into the register Cholesky (MJW_METAL_FUSE_H_CHOLESKY=0 disables).
++# Every launch is a full GPU drain on Metal, and the update ran as a separate (nworld, nv*(nv+1)/2) grid that
++# mostly exits early; here the world's 32 lanes apply it (same arithmetic per element) before factoring.
++_METAL_FUSE_H_CHOLESKY = os.environ.get("MJW_METAL_FUSE_H_CHOLESKY", "1") != "0"
++
++
++def _fuse_h_cholesky() -> bool:
++  return _METAL_FUSE_H_CHOLESKY and getattr(wp.get_device(), "is_metal", False)
++
++
++@cache_kernel
++def _update_gradient_h_incremental_cholesky(tile_size: int, skip_noflip: bool):
++  SKIP_NOFLIP = skip_noflip
++  TRI = tile_size * (tile_size + 1) // 2
++
++  @wp.func_native(snippet="WP_TILE_SYNC();")
++  def _syncthreads():
++    pass
++
++  @wp.kernel(module="unique", enable_backward=False, grid_stride=False)
++  def kernel(
++    # Data in:
++    efc_J_in: wp.array3d[float],
++    efc_D_in: wp.array2d[float],
++    efc_state_in: wp.array2d[int],
++    # In:
++    quad_changed_ids_in: wp.array2d[int],
++    quad_changed_count_in: wp.array[int],
++    ctx_grad_in: wp.array2d[float],
++    state_changed_count_in: wp.array[int],
++    ctx_done_in: wp.array[bool],
++    # In/out:
++    ctx_h_out: wp.array3d[float],
++    # Out:
++    ctx_search_out: wp.array2d[float],
++    ctx_search_dot_out: wp.array[float],
++    ctx_newton_decrement_out: wp.array[float],
++  ):
++    worldid, lane = wp.tid()
++    TILE_SIZE = wp.static(tile_size)
++
++    # _update_gradient_h_incremental, element for element (no done check there either)
++    n_changes = quad_changed_count_in[worldid]
++    if n_changes > 0:
++      for elementid in range(lane, wp.static(TRI), wp.block_dim()):
++        col = (int(wp.sqrt(float(1 + 8 * elementid))) - 1) // 2
++        row = elementid - (col * (col + 1)) // 2
++        delta = float(0.0)
++        for change_idx in range(n_changes):
++          efcid = quad_changed_ids_in[worldid, change_idx]
++          Jrow = efc_J_in[worldid, efcid, row]
++          if Jrow == 0.0:
++            continue
++          Jcol = efc_J_in[worldid, efcid, col]
++          if Jcol == 0.0:
++            continue
++          D = efc_D_in[worldid, efcid]
++          if efc_state_in[worldid, efcid] == types.ConstraintState.QUADRATIC.value:
++            delta += D * Jrow * Jcol
++          else:
++            delta -= D * Jrow * Jcol
++        if delta != 0.0:
++          ctx_h_out[worldid, row, col] += delta
++    _syncthreads()
++
++    # _update_gradient_cholesky
++    if ctx_done_in[worldid]:
++      return
++    if wp.static(SKIP_NOFLIP):
++      if state_changed_count_in[worldid] == 0:
++        return
++
++    mat_tile = wp.tile_load(ctx_h_out[worldid], shape=(TILE_SIZE, TILE_SIZE))
++    wp.tile_cholesky_inplace(mat_tile, fill_mode="upper")
++    input_tile = wp.tile_load(ctx_grad_in[worldid], shape=TILE_SIZE)
++    output_tile = wp.tile_cholesky_solve(mat_tile, input_tile, fill_mode="upper")
++    sums = wp.tile_reduce(wp.add, wp.tile_map(solve_search_sums, input_tile, output_tile))[0]
++    ctx_search_dot_out[worldid] = sums[0]
++    ctx_newton_decrement_out[worldid] = sums[1]
++    wp.tile_store(ctx_search_out[worldid], wp.tile_map(wp.mul, output_tile, -1.0))
++
++  return kernel
++
++
+ @cache_kernel
+ def _update_gradient_cholesky_blocked(tile_size: int, matrix_size: int, vector_size: int):
+   @wp.kernel(module="unique", enable_backward=False, grid_stride=False, module_options={"enable_mathdx_gemm": False})
+@@ -3276,6 +3361,25 @@ def _update_gradient_incremental(m: types.Model, d: types.Data, ctx: SolverConte
+       ],
+       outputs=[ctx.h],
+     )
++  elif _fuse_h_cholesky() and m.nv <= 64:
++    wp.launch_tiled(
++      _update_gradient_h_incremental_cholesky(m.nv, stable_fast),
++      dim=d.nworld,
++      inputs=[
++        d.efc.J,
++        d.efc.D,
++        d.efc.state,
++        ctx.quad_changed_ids,
++        ctx.quad_changed_count,
++        ctx.grad,
++        ctx.state_changed_count if stable_fast else d.nefc,
++        ctx.done,
++        ctx.h,
++      ],
++      outputs=[ctx.search, ctx.search_dot, ctx.newton_decrement],
++      block_dim=32,
++    )
++    return
+   else:
+     tri_dim = m.nv * (m.nv + 1) // 2
+     wp.launch(
+-- 
+2.54.0 (Apple Git-157)
+

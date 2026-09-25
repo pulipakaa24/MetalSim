@@ -1,7 +1,7 @@
 From b1ec949e925f0cf62a94fcc7f900b2ce176ec9e0 Mon Sep 17 00:00:00 2001
 From: Aditya Pulipaka <adipu@utexas.edu>
 Date: Tue, 22 Sep 2026 16:50:19 -0700
-Subject: [PATCH 2/4] Metal: replay captured graphs through indirect command
+Subject: [PATCH 2/5] Metal: replay captured graphs through indirect command
  buffers; runtime counters
 
 Graph replay re-encoded every recorded dispatch on the CPU (~4 us each; a MuJoCo

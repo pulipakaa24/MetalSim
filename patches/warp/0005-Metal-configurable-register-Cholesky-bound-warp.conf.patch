@@ -1,0 +1,143 @@
+From b9557cb987a51b51aae947f5345b61aeb6e28b32 Mon Sep 17 00:00:00 2001
+From: Aditya Pulipaka <adipu@utexas.edu>
+Date: Fri, 25 Sep 2026 09:22:55 -0700
+Subject: [PATCH 5/5] Metal: configurable register-Cholesky bound
+ (warp.config.metal_register_cholesky_max, default 40)
+
+tile_cholesky factors matrices up to the bound in registers (one SIMD group, no barriers) and larger
+ones on the cooperative path with a threadgroup barrier per column. The bound was fixed at 40; MuJoCo
+Warp's G1 (43 dofs) fell just above it, and its dense Cholesky kernels ran about 8x slower than the
+register path. The value is emitted as WP_METAL_REGISTER_CHOLESKY_MAX into every Metal module, read by
+the scratch sizing in codegen, and folded into the module hash when it differs from the default.
+MetalSim's G1 task sets 48: G1 flat training loop 27.9K -> 40.3K env-steps/s on the M4 Max.
+Test: factor and solve for n = 41, 43, 48, 64 with the bound at 64 match numpy.
+
+Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>
+---
+ warp/_src/codegen.py        |  2 +-
+ warp/_src/context.py        |  7 +++++++
+ warp/config.py              |  6 ++++++
+ warp/native/tile_cholesky.h |  8 +++++++-
+ warp/tests/test_metal.py    | 25 +++++++++++++++++++++++++
+ 5 files changed, 46 insertions(+), 2 deletions(-)
+
+diff --git a/warp/_src/codegen.py b/warp/_src/codegen.py
+index fe2e7ef..4e782aa 100644
+--- a/warp/_src/codegen.py
++++ b/warp/_src/codegen.py
+@@ -1919,7 +1919,7 @@ def metal_tile_scratch_bytes(key: str, args: Mapping[str, Any], block_dim: int)
+         return tiles[0].size * elem + block_dim
+     if key == "tile_cholesky":
+         n = tiles[0].shape[0]
+-        if 1 < block_dim <= 32 and n <= 40:
++        if 1 < block_dim <= 32 and n <= warp.config.metal_register_cholesky_max:
+             return 0  # register-and-shuffle path (tile_cholesky.h metal_register_cholesky): no workspaces
+         return 2 * n * n * elem  # W1, W2 workspaces
+     if key in ("tile_cholesky_solve", "tile_lower_solve", "tile_upper_solve"):
+diff --git a/warp/_src/context.py b/warp/_src/context.py
+index db7510e..3eecb6c 100644
+--- a/warp/_src/context.py
++++ b/warp/_src/context.py
+@@ -3088,6 +3088,11 @@ class ModuleHasher:
+         # the native headers the kernels compile against (see native_headers_digest())
+         ch.update(native_headers_digest())
+ 
++        # Metal codegen settings read from warp.config at build time (only when changed from the
++        # default, so default builds keep their hashes)
++        if warp.config.metal_register_cholesky_max != 40:
++            ch.update(bytes(f"metal_register_cholesky_max:{int(warp.config.metal_register_cholesky_max)}", "utf-8"))
++
+         # Note: cuda_output defaults to None in the options dict and is not
+         # resolved before hashing, so modules with different cuda_output
+         # configs get the same hash. This is fine because cuda_output only
+@@ -3767,6 +3772,8 @@ class ModuleBuilder:
+         type_defines = "" if "bfloat16" in source else "#define WP_NO_BFLOAT16\n"
+         if device == "metal" and self.options.get("verify_fp"):
+             type_defines += "#define WP_VERIFY_FP\n"  # CPU/CUDA pass this as a compiler flag
++        if device == "metal":
++            type_defines += f"#define WP_METAL_REGISTER_CHOLESKY_MAX {int(warp.config.metal_register_cholesky_max)}\n"
+ 
+         # add headers
+         #
+diff --git a/warp/config.py b/warp/config.py
+index b2e7592..810aa43 100644
+--- a/warp/config.py
++++ b/warp/config.py
+@@ -348,6 +348,12 @@ directly as a context manager.
+ Note: Impacts performance when active due to call-stack introspection.
+ """
+ 
++metal_register_cholesky_max: int = 40
++"""Largest matrix dimension that ``tile_cholesky`` factors in registers on Metal (one SIMD group,
++lanes own columns, SIMD-shuffle broadcasts, no barriers); larger matrices use the cooperative scalar
++path with a threadgroup barrier per column. Read when a module is built (part of its hash). Above
++about 64 the per-lane column registers spill."""
++
+ max_unroll: int = 16
+ """Maximum unroll factor for loops.
+ 
+diff --git a/warp/native/tile_cholesky.h b/warp/native/tile_cholesky.h
+index 29a1f0d..b588dad 100644
+--- a/warp/native/tile_cholesky.h
++++ b/warp/native/tile_cholesky.h
+@@ -80,6 +80,12 @@ namespace partitioned_gemm {
+ // and WP_TILE_SYNC() is a no-op -- behaviour matches the prior single-threaded
+ // scalar fallback.
+ #if defined(__METAL_VERSION__)
++// Largest matrix dimension factored by the register path below (larger ones use the cooperative
++// scalar path with a threadgroup barrier per column). Set per module from warp.config.
++// metal_register_cholesky_max (codegen defines it; the Python scratch sizing reads the same value).
++#ifndef WP_METAL_REGISTER_CHOLESKY_MAX
++#define WP_METAL_REGISTER_CHOLESKY_MAX 40
++#endif
+ // Register Cholesky for blocks of at most one SIMD group: lane l owns columns l, l+BD, ... of the
+ // factor in registers; the owner of column j scales it, the column is broadcast with SIMD shuffles
+ // and every lane applies the rank-1 update to its own columns. No threadgroup memory and no
+@@ -163,7 +169,7 @@ template <bool Upper, typename TileA, typename TileOut>
+ inline WP_FORCE_INLINE CUDA_CALLABLE void scalar_cholesky_impl(TileA WP_THREAD& A, TileOut WP_THREAD& Out)
+ {
+ #if defined(__METAL_VERSION__)
+-    if constexpr (WP_TILE_BLOCK_DIM > 1 && WP_TILE_BLOCK_DIM <= 32 && TileA::Layout::Shape::dim(1) <= 40) {
++    if constexpr (WP_TILE_BLOCK_DIM > 1 && WP_TILE_BLOCK_DIM <= 32 && TileA::Layout::Shape::dim(1) <= WP_METAL_REGISTER_CHOLESKY_MAX) {
+         metal_register_cholesky<Upper>(A, Out);
+         return;
+     }
+diff --git a/warp/tests/test_metal.py b/warp/tests/test_metal.py
+index 5c4590d..1435d43 100644
+--- a/warp/tests/test_metal.py
++++ b/warp/tests/test_metal.py
+@@ -341,6 +341,31 @@ class TestMetal(unittest.TestCase):
+                 np.testing.assert_allclose(factor.numpy(), u_ref, rtol=1e-4, atol=1e-4, err_msg=msg)
+                 np.testing.assert_allclose(x.numpy(), x_ref, rtol=1e-3, atol=1e-4, err_msg=msg)
+ 
++    def test_tile_cholesky_register_bound_configurable(self):
++        """``warp.config.metal_register_cholesky_max`` moves matrices above the default bound (40) onto the
++        register path (MuJoCo Warp's G1 has 43 dofs); the factor and solve must still match numpy."""
++        rng = np.random.default_rng(1)
++        worlds = 4
++        old = wp.config.metal_register_cholesky_max
++        try:
++            wp.config.metal_register_cholesky_max = 64
++            for n in (41, 43, 48, 64):
++                m = rng.standard_normal((worlds, n, n)).astype(np.float32)
++                a_np = m @ m.transpose(0, 2, 1) + n * np.eye(n, dtype=np.float32)
++                b_np = rng.standard_normal((worlds, n)).astype(np.float32)
++                x_ref = np.linalg.solve(a_np.astype(np.float64), b_np.astype(np.float64)[..., None])[..., 0]
++                u_ref = np.linalg.cholesky(a_np.astype(np.float64)).transpose(0, 2, 1)
++                kernel = _make_cholesky_kernel(n)
++                a = wp.array(a_np, dtype=float, device=self.device)
++                b = wp.array(b_np, dtype=float, device=self.device)
++                factor = wp.zeros((worlds, n, n), dtype=float, device=self.device)
++                x = wp.zeros((worlds, n), dtype=float, device=self.device)
++                wp.launch_tiled(kernel, dim=[worlds], inputs=[a, b, factor, x], device=self.device, block_dim=32)
++                np.testing.assert_allclose(factor.numpy(), u_ref, rtol=1e-4, atol=1e-4, err_msg=f"n={n}")
++                np.testing.assert_allclose(x.numpy(), x_ref, rtol=1e-3, atol=1e-4, err_msg=f"n={n}")
++        finally:
++            wp.config.metal_register_cholesky_max = old
++
+     def test_tile_ops_across_block_boundary(self):
+         """Tile sizes just below, at and above the block size, and above two blocks.
+ 
+-- 
+2.54.0 (Apple Git-157)
+
