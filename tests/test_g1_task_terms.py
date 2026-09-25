@@ -1,12 +1,13 @@
 """G1 task terms recomputed from Isaac Lab's formulas (isaaclab mdp rewards / observations, as
 transcribed in assets/isaac/g1_rewards.py and g1_velocity_env_cfg.py) against the Warp kernels'
 per-term outputs on the live simulation state."""
+import mujoco
 import numpy as np
 import pytest
 import torch
 import warp as wp
 
-from metalsim.learn.g1_velocity import G1VelocityTask, ACTION_SCALE, CONTROL_DT, benchmark_step
+from metalsim.learn.g1_velocity import G1VelocityTask, ACTION_SCALE, CONTROL_DT, benchmark_step, g1_foot_vel_mjwarp
 
 pytestmark = pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal")
 
@@ -41,6 +42,7 @@ def test_reward_terms_match_isaac_formulas(engine):
     qpos = task.sim.d.qpos.numpy(); qvel = task.sim.d.qvel.numpy(); cmd = task.cmd.numpy()
     terms = task.terms.numpy(); last = task.last_action.numpy(); prev = task.prev_action.numpy()
     default = task.default_q.numpy(); group = task.group.numpy()
+    fv = (task.sim.d.foot_vel if task.engine == "newton" else task.foot_vel).numpy()   # what the reward kernel read
     for e in range(n):
         R = _rot(qpos[e, 3:7])
         v_w = qvel[e, 0:3]; w_w = R @ qvel[e, 3:6]
@@ -64,6 +66,10 @@ def test_reward_terms_match_isaac_formulas(engine):
         np.testing.assert_allclose(got[5], r_orient, rtol=1e-4, atol=1e-5)
         np.testing.assert_allclose(got[4], r_dev, rtol=1e-4, atol=1e-4)
         np.testing.assert_allclose(got[6], r_rate, rtol=1e-4, atol=1e-5)
+        # feet_slide, weight -0.1: |body_lin_vel_w[foot].xy| summed over feet in contact (touch > 1 N)
+        sd = task.sim.d.sensordata.numpy()[e]
+        r_slide = sum(-0.1 * np.linalg.norm(fv[e, f, :2]) for f in range(2) if sd[task.touch_adr[f]] > 1.0)
+        np.testing.assert_allclose(got[3], r_slide, rtol=1e-4, atol=1e-5)
         assert got[7] in (0.0, -200.0)                      # termination penalty term (is_terminated, weight -200; x dt in the sum like every term)
     # the summed reward is the dt-weighted sum of the terms (Isaac multiplies each term by step dt)
     # plus the termination penalty; check the sign/scale on the tracking-dominated terms
@@ -93,3 +99,44 @@ def test_observation_layout_and_action_mapping(engine):
     np.testing.assert_allclose(task.last_action.numpy(), a.numpy(), atol=1e-6)
     assert abs(task.decimation * task.physics_dt - CONTROL_DT) < 1e-9     # 50 Hz control on either engine
     assert task.max_t == 1000                                 # 20 s episodes at 50 Hz
+
+
+def _foot_vel_now(task):
+    """The foot velocities the reward kernel receives, for the task's current state."""
+    if task.engine == "newton":
+        # XPBD's maximal-coordinate state is not exactly a reduced-coordinate state (unconverged joint
+        # constraints: feet up to ~1.6 cm / ~0.4 m/s off the joint-space reconstruction under random actions),
+        # so make the bodies consistent with the reported qpos/qvel first (the task's own reset path: FK),
+        # then read foot_vel through the normal output conversion
+        sim = task.sim
+        sim._reset_mask.fill_(True); sim.launch_reset()
+        with wp.ScopedDevice("metal:0"):
+            sim._sync_out()
+        sim.synchronize()
+        return sim.d.foot_vel.numpy()
+    d = task.sim.d
+    task.sim.forward(); task.sim.synchronize()             # MuJoCo Warp: cvel/xpos/subtree_com of the current qpos/qvel
+    wp.launch(g1_foot_vel_mjwarp, dim=task.n, inputs=[d.cvel, d.xpos, d.subtree_com, task.foot_body, task.foot_root],
+              outputs=[task.foot_vel], device="metal:0")
+    task.sim.synchronize()
+    return task.foot_vel.numpy()
+
+
+@pytest.mark.parametrize("engine", ENGINES)
+def test_feet_slide_velocity_is_the_foot_body_world_velocity(engine):
+    """Isaac's feet_slide reads body_lin_vel_w of the feet: the foot body frame origin's linear velocity in
+    the world frame. On a moving G1 (random actions), the velocity handed to the reward kernel equals MuJoCo
+    C's mj_objectVelocity(mjOBJ_XBODY, flg_local=0) for the same qpos/qvel."""
+    n = 4
+    task = G1VelocityTask(n, terrain="flat", seed=6, **engine)
+    benchmark_step(task, num_frames=8, warmup=0)            # random actions in [-1, 1]: robots moving
+    qpos = task.sim.d.qpos.numpy().astype(np.float64); qvel = task.sim.d.qvel.numpy().astype(np.float64)
+    fv = _foot_vel_now(task)
+    m = task.model; d = mujoco.MjData(m)
+    assert np.abs(fv).max() > 0.05                          # feet actually moving
+    for e in range(n):
+        d.qpos[:] = qpos[e]; d.qvel[:] = qvel[e]; mujoco.mj_forward(m, d)
+        for f in range(2):
+            v6 = np.zeros(6)
+            mujoco.mj_objectVelocity(m, d, mujoco.mjtObj.mjOBJ_XBODY, int(task.foot_body[f]), v6, 0)
+            np.testing.assert_allclose(fv[e, f], v6[3:], atol=2e-3)

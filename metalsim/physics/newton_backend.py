@@ -393,7 +393,7 @@ class G1XPBD:
 # --------------------------------------------------------------------------------------------------
 # NewtonSim: a drop-in for metalsim.physics.batch.BatchSim in the G1 task. The task's kernels read and
 # write MuJoCo-layout arrays (qpos [x y z qw qx qy qz, joints], qvel [v_world, w_body, joint rates],
-# qacc, qfrc_actuator, sensordata, cvel, ctrl); NewtonSim keeps those arrays and converts to / from
+# qacc, qfrc_actuator, sensordata, ctrl) plus foot_vel (feet body-origin world velocity for feet_slide); NewtonSim keeps those arrays and converts to / from
 # Newton's maximal-coordinate state inside the captured graph, so observation, reward, termination and
 # reset code is shared verbatim between the engines. Joints are matched by name (the MuJoCo model built
 # from the same USD is the metadata source; FK of both agrees to 5e-7 m).
@@ -412,10 +412,10 @@ def _copy_joint_qd(src: wp.array[float], dst: wp.array[float]):
 @wp.kernel
 def _to_mujoco(body_q: wp.array[wp.transform], body_qd: wp.array[wp.spatial_vector], body_com: wp.array[wp.vec3],
                joint_q: wp.array[float], joint_qd: wp.array[float], joint_qd_prev: wp.array[float], joint_f: wp.array[float],
-               body_mass: wp.array[float], nb: int, nc: int, nd: int, coord_of: wp.array[int], dof_of: wp.array[int],
-               foot_nb: wp.vec2i, foot_mj: wp.vec2i, inv_dt: float,
+               nb: int, nc: int, nd: int, coord_of: wp.array[int], dof_of: wp.array[int],
+               foot_nb: wp.vec2i, inv_dt: float,
                qpos: wp.array2d[float], qvel: wp.array2d[float], qacc: wp.array2d[float], qfrc: wp.array2d[float],
-               cvel: wp.array2d[wp.spatial_vector]):
+               foot_vel: wp.array2d[wp.vec3]):
     e = wp.tid()
     r = e * nb                                           # root body (pelvis) is local body 0
     X = body_q[r]
@@ -433,19 +433,11 @@ def _to_mujoco(body_q: wp.array[wp.transform], body_qd: wp.array[wp.spatial_vect
         qvel[e, 6 + i] = joint_qd[d]
         qacc[e, 6 + i] = (joint_qd[d] - joint_qd_prev[d]) * inv_dt
         qfrc[e, 6 + i] = joint_f[d]
-    # feet: MuJoCo's cvel semantics (what the task's feet_slide reads on MuJoCo Warp): [angular, linear] of the
-    # body's rigid motion evaluated at the robot's COM (subtree COM of the tree root), world orientation
-    mc = wp.vec3(0.0); mt = float(0.0)
-    for k in range(nb):
-        b = e * nb + k
-        mc += body_mass[b] * wp.transform_point(body_q[b], body_com[b]); mt += body_mass[b]
-    c_robot = mc / mt
-    for f in range(2):
+    for f in range(2):                                   # feet_slide: foot body frame origin, world linear velocity
         b = e * nb + foot_nb[f]
-        cv = body_qd[b]
-        w = wp.spatial_bottom(cv)
-        v = wp.spatial_top(cv) + wp.cross(w, c_robot - wp.transform_point(body_q[b], body_com[b]))
-        cvel[e, foot_mj[f]] = wp.spatial_vector(w, v)
+        Xf = body_q[b]
+        w = wp.spatial_bottom(body_qd[b])
+        foot_vel[e, f] = wp.spatial_top(body_qd[b]) - wp.cross(w, wp.quat_rotate(wp.transform_get_rotation(Xf), body_com[b]))
 
 
 @wp.kernel
@@ -547,7 +539,7 @@ class NewtonSim:
             d.qpos = wp.array(np.tile(mj.key_qpos[0], (n, 1)).astype(np.float32), dtype=float)
             d.qvel = z((n, mj.nv)); d.qacc = z((n, mj.nv)); d.qfrc_actuator = z((n, mj.nv))
             d.sensordata = z((n, mj.nsensordata)); d.site_xpos = z((n, 1), dtype=wp.vec3)
-            d.cvel = z((n, mj.nbody), dtype=wp.spatial_vector); d.ctrl = z((n, mj.nu))
+            d.foot_vel = z((n, 2), dtype=wp.vec3); d.ctrl = z((n, mj.nu))   # feet: world linear velocity of the body origin
             d.ctrl.assign(np.tile(mj.key_qpos[0][7:], (n, 1)).astype(np.float32))
             self._reset_mask = z(n, dtype=wp.bool)
         self.event = wm.SharedEvent(device, "metalsim.physics.newton")
@@ -573,8 +565,8 @@ class NewtonSim:
         m, d = self.model, self.d
         newton.eval_ik(m, self.s0, self.joint_q, self.joint_qd)
         wp.launch(_to_mujoco, dim=self.n, inputs=[self.s0.body_q, self.s0.body_qd, m.body_com, self.joint_q, self.joint_qd,
-                  self.joint_qd_prev, self.control.joint_f, m.body_mass, self.nb, self.nc, self.nd, self.coord_of, self.dof_of,
-                  self.foot_nb, self.foot_mj, 1.0 / (self.acc_window * self.dt_phys)], outputs=[d.qpos, d.qvel, d.qacc, d.qfrc_actuator, d.cvel])
+                  self.joint_qd_prev, self.control.joint_f, self.nb, self.nc, self.nd, self.coord_of, self.dof_of,
+                  self.foot_nb, 1.0 / (self.acc_window * self.dt_phys)], outputs=[d.qpos, d.qvel, d.qacc, d.qfrc_actuator, d.foot_vel])
         d.sensordata.zero_()
         wp.launch(_touch, dim=self.contacts.rigid_contact_max, inputs=[self.contacts.rigid_contact_count, self.contacts.rigid_contact_shape0,
                   self.contacts.rigid_contact_shape1, self.contacts.force, self.shape_slot, self.shape_env, self.touch_adr],
