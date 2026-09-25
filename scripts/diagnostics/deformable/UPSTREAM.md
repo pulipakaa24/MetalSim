@@ -1,5 +1,11 @@
 # MuJoCo Warp flex fixes proposed upstream (not filed yet)
 
+**Pre-filing step (required):** the MuJoCo Warp project's CLA check rejects commits co-authored by AI assistants
+(`AGENTS.md` in the repository). Before filing, rewrite the `metalsim-flex` commits of the fork (and the flex commits
+in the merge / `patches/mujoco_warp/0008-0016`) without the `Co-Authored-By: Claude ...` trailer, on a fresh branch cut
+for the upstream PRs. MetalSim's own commits keep the trailer. Not rewritten yet (the fork branches are pinned by
+the patch series and the merged heads).
+
 Target: google-deepmind/mujoco_warp (base v3.14.0, `88af9cc`). Fixes live on github.com/pulipakaa24/mujoco_warp branch
 `metalsim-flex` (commits listed per item); each is behind a module flag in `mujoco_warp/_src/collision_flex.py` so the
 upstream behaviour is one assignment away. Reference: MuJoCo C 3.14.0 (pip) and MuJoCo C `main` (2026-09-23, built

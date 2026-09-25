@@ -867,3 +867,32 @@ def _main():
 
 if __name__ == "__main__":
     _main()
+
+
+# --------------------------------------------------------------------------------------------------
+# Rope presets for XPBDSim (midpoint rod bending, PhysX-form per-constraint damping)
+# --------------------------------------------------------------------------------------------------
+
+ROPE_PRESETS = {
+    # Euler-Bernoulli rod: EI = E t^4 / 12 from the material and the square cross-section; damping beta = the material's
+    # stiffness-proportional damping. Default. Measured on the PhysX 5.1 rope protocol (0.5 x 0.02 m, E 1e5, beta
+    # 0.005, released horizontal, clamped end): period 1.304 s, log decrement 0.021 (PhysX: 1.026 s, 0.59).
+    "physical": {"EI_scale": 1.0, "beta": None},
+    # Parity with PhysX's recorded rod only: its 11x2x2 hexahedral mesh (one cell across) locks in bending; the same
+    # mesh measured in flex has EI_eff = 1.65e-2 N m^2 = 12.4x E t^4/12, and its dissipation is mostly numerical
+    # (beta fitted 0.1 = 20x its stated 0.005). Measured: period 1.077 s, log decrement 0.63, first back-swing -0.312 m.
+    "physx_ref": {"EI_scale": 12.4, "beta": 0.1},
+}
+
+
+def rope_xpbd_cfg(preset: str = "physical", youngs_modulus: float = 1e5, thickness: float = 0.02, segment: float = 0.05,
+                  beta: float = 0.005, substeps: int = 16, **kw) -> XPBDCfg:
+    """XPBDCfg for a rope of square cross-section `thickness` discretised in segments of length `segment`:
+    stretch k = E A / l, rod bending k = 4 EI / l^3 (midpoint constraint), damping d = beta k per constraint."""
+    pr = ROPE_PRESETS[preset]
+    A, I = thickness ** 2, thickness ** 4 / 12.0
+    EI = youngs_modulus * I * pr["EI_scale"]
+    b = beta if pr["beta"] is None else pr["beta"]
+    ks, kb = youngs_modulus * A / segment, 4.0 * EI / segment ** 3
+    return XPBDCfg(substeps=substeps, stretch_compliance=1.0 / ks, bend_compliance=1.0 / kb, stretch_damping=b * ks,
+                   bend_damping=b * kb, damping=kw.pop("damping", 0.0), rope_bending="midpoint", **kw)

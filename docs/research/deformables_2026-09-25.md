@@ -430,3 +430,53 @@ choice (PhysX-style co-rotational FEM port, Newton VBD on Metal, or flex) waits 
 | rope backend | XPBD β 0.1: period 1.077, decrement 0.63, back-swing −0.312, drop 0.494, 2.57M/s / flex implicit 5e-3: 1.018, 0.24, −0.402, 0.419, 9.4K/s | XPBD (closer on 4 of 5 metrics, 270× faster); flex kept | `DeformableSim` |
 | flex elasticity damping | explicit (≤1e-4 rod, ≤1e-3 cube at 0.5 ms) / implicit CG | implicit when damping > explicit limit (opt-in: default off keeps MuJoCo C parity) | `mujoco_warp._src.flex_damping.ENABLE` |
 | cube settings | explicit 1e-3 (bounce 0.262, settle 1.97 s) / implicit 0.2 + solref 0.001 (0.132, 0.55 s) | implicit 0.2 (fitted; penetration still 3.6 cm) | `physx_fit_5p1.json` |
+
+**Why the recorded rod is stiff, sources.** NVIDIA's PhysX soft-body documentation states that a higher-resolution
+simulation mesh appears softer at the same Young's modulus
+(https://nvidia-omniverse.github.io/PhysX/physx/5.4.1/docs/SoftBodies.html), and the FEM literature on shear locking
+explains why: first-order solid elements are too stiff in bending, hexahedra less so than tetrahedra
+(https://www.sciencedirect.com/topics/engineering/shear-locking). Local mesh sweep (`scripts/diagnostics/deformable/mesh_sweep.py`,
+`runs/deformable/physx_fit51/mesh_sweep_local.json`; static cantilever under 1 % gravity, same 0.5 × 0.02 m rod,
+E 1e5, ν 0.4, flex StVK tetrahedra): EI_eff / (E t⁴/12) = 14.0 at 1 cell across (5 cm along), 7.0 at 2 across,
+7.3 at 1 across with 2 cm cells along; the 4-across and cubic-2-across meshes diverged at dt 2.5e-4 / 1e-4 (explicit
+flex elasticity on 5 mm cells). Refining halves the locking factor each time, as locking predicts. The XPBD rod (1D,
+no cross-section to lock), `physical` preset: period 1.37 / 1.30 / 1.25 / 1.26 s at 5 / 10 / 20 / 40 segments,
+converging to the thin-rod value. The flex cube at 2 / 4 / 8 cells per edge (implicit damping 0.1, stiff contact):
+bounce 0.122 / 0.140 / 0.216 m, settling 0.45 / 0.51 / 0.82 s (finer meshes softer and livelier at the same E and
+damping). The same sweep is in the Isaac Lab 3.0 recorder (`--resolutions d,2,4,8` for rope and cube, PhysX and
+Newton VBD) so the explanation is tested on their solvers: the rope period should move from 1.03 s toward
+~1.25–1.3 s as the PhysX mesh refines.
+
+**Rope presets** (`metalsim.physics.deformable.ROPE_PRESETS`, `rope_xpbd_cfg`): `physical` (default; Euler–Bernoulli
+EI = E t⁴/12, the material's damping; on the PhysX protocol: period 1.304 s, log decrement 0.021) and `physx_ref`
+(parity comparisons only; mesh-locked EI = 12.4 × E t⁴/12, β 0.1; period 1.077 s, log decrement 0.63, first
+back-swing −0.312 m).
+
+## 12. Soft-cube penetration (measured)
+
+The 3.6 cm was transient (at impact); at rest the lowest node already sat at +0.9 mm. It came from the contact time
+constant, which MuJoCo floors at 2 dt (0.001 s at dt 0.5 ms), not from impedance: solimp 0.99/0.999 or 0.999/0.9999
+changed nothing (−3.6 cm), a 5 mm margin lifted the rest pose 6 mm. Direct stiffness/damping solrefs (negative
+MuJoCo solref, no time-constant floor) remove it; the elasticity damping then has to come down because the contact
+no longer absorbs the impact (`runs/deformable/physx_fit51/cube_penetration.jsonl`; all at dt 0.5 ms, implicit
+elasticity damping):
+
+| candidate | bounce (m) | settle (s) | max penetration (mm) | impact centroid min (m) | 4096 envs env-steps/s |
+|---|---|---|---|---|---|
+| PhysX 5.1 | 0.135 | 0.55 | 1.6 | 0.079 | – |
+| solref 0.001 1, damping 0.2 (previous fit) | 0.132 | 0.55 | 35.7 | 0.063 | 2.9K |
+| + solimp 0.99 0.999 | 0.132 | 0.59 | 36.3 | 0.063 | – |
+| + margin 5 mm | 0.138 | 0.59 | 31.4 | 0.068 | – |
+| solref −1e6 −2000, damping 0.2 | 0.110 | 0.39 | 1.2 | 0.098 | – |
+| solref −1e6 −500, damping 0.1 | 0.127 | 0.47 | 2.4 | 0.095 | – |
+| **solref −1e6 −300, damping 0.1 (chosen)** | **0.140** | **0.51** | **2.6** | 0.095 | **2.9K** |
+| solref −2e6 −500, damping 0.15 | 0.139 | 0.51 | 0.3 | 0.098 | 2.9K |
+| solref −3e5 −1000, damping 0.1 | 0.113 | 0.42 | 4.5 | 0.094 | – |
+
+Remaining: PhysX's cube compresses to a centroid of 0.079 m at impact (2 cm), ours to 0.095 m; its bounce/settle come
+from compression plus numerical dissipation, ours from the elasticity damping (0.1, 20× PhysX's 0.005).
+
+| decision | options (numbers) | chosen, why | how to switch |
+|---|---|---|---|
+| rope preset | `physical` (period 1.30 s, decrement 0.02 vs PhysX 1.03 / 0.59) / `physx_ref` (1.077 s / 0.63) | `physical` default (the physics of the stated rod; PhysX's value is its mesh's locking, per its own docs), `physx_ref` only for parity runs | `rope_xpbd_cfg(preset=...)` |
+| cube contact | solref 0.001 1 (penetration 35.7 mm) / direct −1e6 −300 (2.6 mm, bounce 0.140, settle 0.51) / −2e6 −500 (0.3 mm, 0.139, 0.51) | −1e6 −300 with damping 0.1 (within a few mm; slightly more compression); −2e6 −500 is the stiffer alternative | `physx_fit_5p1.json` (`flex/cube`, `flex/cube_stiffer`, `flex/cube_softcontact`) |

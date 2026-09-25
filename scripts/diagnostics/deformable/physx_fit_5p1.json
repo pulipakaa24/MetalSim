@@ -24,14 +24,21 @@
   "substeps": 16
  },
  "flex/cube": {
+  "elastic_damping": 0.1,
+  "implicit_damping": true,
+  "contact_solref": "-1e6 -300",
+  "dt": 0.0005
+ },
+ "flex/cube_softcontact": {
   "elastic_damping": 0.2,
   "implicit_damping": true,
   "contact_solref": "0.001 1",
   "dt": 0.0005
  },
- "flex/cube_explicit_prev": {
-  "elastic_damping": 0.001,
-  "contact_solref": "0.005 1",
+ "flex/cube_stiffer": {
+  "elastic_damping": 0.15,
+  "implicit_damping": true,
+  "contact_solref": "-2e6 -500",
   "dt": 0.0005
  }
 }

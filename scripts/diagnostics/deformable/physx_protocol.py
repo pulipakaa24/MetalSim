@@ -81,7 +81,7 @@ def cube_metrics(pos, vel, mass_per_node, size=0.2):
             "t_impact_min": float(kmin * dt), "min_centroid_z": float(cz[kmin]), "bounce_peak_z": float(cz[peak]),
             "bounce_peak_t": float(peak * dt), "rest_centroid_z": float(cz[-1]), "rest_height": float(np.ptp(pos[-1, :, 2])),
             "max_compression": float(1 - np.ptp(pos[kmin, :, 2]) / size), "settle_time": _settle_time(ke, dt),
-            "min_node_z": float(pos[:, :, 2].min()), "_cz": cz}
+            "min_node_z": float(pos[:, :, 2].min()), "rest_min_node_z": float(pos[-1, :, 2].min()), "_cz": cz}
 
 
 def physx_metrics(rec_dir):
@@ -145,7 +145,8 @@ def cube_xml(meta, p, dt):
     <flexcomp name="cube" type="grid" count="{n} {n} {n}" spacing="{sp} {sp} {sp}" pos="0 0 {c['z0']}" dim="3"
       radius="{p.get('cube_radius', 0.001)}" mass="{c['mass']}">
       <elasticity young="{m['youngs_modulus']}" poisson="{m['poissons_ratio']}" damping="{p['elastic_damping']}"/>
-      <contact condim="3" friction="{fr}" solref="{p['contact_solref']}" selfcollide="none"/>
+      <contact condim="3" friction="{fr}" solref="{p['contact_solref']}" solimp="{p.get('contact_solimp', '0.9 0.95 0.001 0.5 2')}"
+        margin="{p.get('contact_margin', 0)}" selfcollide="none"/>
     </flexcomp></worldbody></mujoco>"""
 
 
@@ -248,7 +249,7 @@ def make_xpbd(obj, meta, params=None, device="cpu", nworld=1, _info=None):
         rope_phys = {"l": l, "rhoAl": mat["density"] * A * l, "k_stretch": ks, "k_bend": kb, "beta": beta}
         xml = f"""<mujoco><option timestep="{1.0/HZ}"/><worldbody><geom type="plane" size="3 3 0.1"/>
           <flexcomp name="rope" type="grid" count="{nseg + 2} 1 1" spacing="{l} 0.02 0.02" pos="{(r['length'] - l)/2} 0 {r['z0']}"
-            dim="1" radius="{t/2}" mass="{r['mass']}"><pin id="0 1"/><edge equality="true"/></flexcomp></worldbody></mujoco>"""
+            dim="1" radius="{min(t / 2, 0.45 * l)}" mass="{r['mass']}"><pin id="0 1"/><edge equality="true"/></flexcomp></worldbody></mujoco>"""
     m = mujoco.MjModel.from_xml_string(xml)
     cfg = dfm.XPBDCfg(substeps=int(p["substeps"]), stretch_compliance=p["stretch_compliance"], bend_compliance=p["bend_compliance"],
                       stretch_damping=p["stretch_damping"], bend_damping=p["bend_damping"], damping=p["damping"],

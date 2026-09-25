@@ -1,0 +1,206 @@
+{
+ "A current (solimp default)": {
+  "bounce_peak_z": 0.1315,
+  "settle_time": 0.545,
+  "min_node_z": -0.0357,
+  "rest_min_node_z": 0.0009,
+  "min_centroid_z": 0.0632,
+  "rest_centroid_z": 0.0998,
+  "finite": true,
+  "params": {
+   "elastic_damping": 0.2,
+   "implicit_damping": true,
+   "contact_solref": "0.001 1"
+  }
+ },
+ "B solimp 0.99 0.999 0.001": {
+  "bounce_peak_z": 0.1324,
+  "settle_time": 0.59,
+  "min_node_z": -0.0363,
+  "rest_min_node_z": 0.001,
+  "min_centroid_z": 0.0626,
+  "rest_centroid_z": 0.0998,
+  "finite": true,
+  "params": {
+   "elastic_damping": 0.2,
+   "implicit_damping": true,
+   "contact_solref": "0.001 1",
+   "contact_solimp": "0.99 0.999 0.001 0.5 2"
+  }
+ },
+ "C solimp 0.999 0.9999 0.001": {
+  "bounce_peak_z": 0.1324,
+  "settle_time": 0.59,
+  "min_node_z": -0.0363,
+  "rest_min_node_z": 0.001,
+  "min_centroid_z": 0.0626,
+  "rest_centroid_z": 0.0999,
+  "finite": true,
+  "params": {
+   "elastic_damping": 0.2,
+   "implicit_damping": true,
+   "contact_solref": "0.001 1",
+   "contact_solimp": "0.999 0.9999 0.001 0.5 2"
+  }
+ },
+ "D solref -1e6 -2e3 (direct stiffness)": {
+  "bounce_peak_z": 0.1096,
+  "settle_time": 0.385,
+  "min_node_z": -0.0012,
+  "rest_min_node_z": 0.001,
+  "min_centroid_z": 0.0975,
+  "rest_centroid_z": 0.0999,
+  "finite": true,
+  "params": {
+   "elastic_damping": 0.2,
+   "implicit_damping": true,
+   "contact_solref": "-1e6 -2000"
+  }
+ },
+ "E margin 5 mm + solimp 0.99": {
+  "bounce_peak_z": 0.1379,
+  "settle_time": 0.59,
+  "min_node_z": -0.0314,
+  "rest_min_node_z": 0.006,
+  "min_centroid_z": 0.0675,
+  "rest_centroid_z": 0.1048,
+  "finite": true,
+  "params": {
+   "elastic_damping": 0.2,
+   "implicit_damping": true,
+   "contact_solref": "0.001 1",
+   "contact_margin": 0.005,
+   "contact_solimp": "0.99 0.999 0.001 0.5 2"
+  }
+ }
+}
+{
+ "F -1e6 -2e3, damp 0.1": {
+  "bounce_peak_z": 0.1015,
+  "settle_time": 0.29,
+  "min_node_z": -0.0011,
+  "rest_min_node_z": 0.001,
+  "min_centroid_z": 0.0966,
+  "rest_centroid_z": 0.0999,
+  "finite": true,
+  "params": {
+   "elastic_damping": 0.1,
+   "implicit_damping": true,
+   "contact_solref": "-1e6 -2000"
+  }
+ },
+ "G -1e6 -2e3, damp 0.05": {
+  "bounce_peak_z": 0.0998,
+  "settle_time": 0.295,
+  "min_node_z": -0.0008,
+  "rest_min_node_z": 0.001,
+  "min_centroid_z": 0.095,
+  "rest_centroid_z": 0.0999,
+  "finite": true,
+  "params": {
+   "elastic_damping": 0.05,
+   "implicit_damping": true,
+   "contact_solref": "-1e6 -2000"
+  }
+ },
+ "H -1e6 -500, damp 0.1": {
+  "bounce_peak_z": 0.1271,
+  "settle_time": 0.47,
+  "min_node_z": -0.0024,
+  "rest_min_node_z": 0.001,
+  "min_centroid_z": 0.0953,
+  "rest_centroid_z": 0.0999,
+  "finite": true,
+  "params": {
+   "elastic_damping": 0.1,
+   "implicit_damping": true,
+   "contact_solref": "-1e6 -500"
+  }
+ },
+ "I -3e5 -1e3, damp 0.1": {
+  "bounce_peak_z": 0.1134,
+  "settle_time": 0.415,
+  "min_node_z": -0.0045,
+  "rest_min_node_z": 0.001,
+  "min_centroid_z": 0.0939,
+  "rest_centroid_z": 0.0999,
+  "finite": true,
+  "params": {
+   "elastic_damping": 0.1,
+   "implicit_damping": true,
+   "contact_solref": "-3e5 -1000"
+  }
+ },
+ "J -1e6 -500, damp 0.05": {
+  "bounce_peak_z": 0.0999,
+  "settle_time": 0.295,
+  "min_node_z": -0.0017,
+  "rest_min_node_z": 0.001,
+  "min_centroid_z": 0.0947,
+  "rest_centroid_z": 0.0999,
+  "finite": true,
+  "params": {
+   "elastic_damping": 0.05,
+   "implicit_damping": true,
+   "contact_solref": "-1e6 -500"
+  }
+ }
+}
+{
+ "K -1e6 -300, damp 0.1": {
+  "bounce_peak_z": 0.1395,
+  "settle_time": 0.51,
+  "min_node_z": -0.0026,
+  "rest_min_node_z": 0.001,
+  "min_centroid_z": 0.0951,
+  "rest_centroid_z": 0.0999,
+  "finite": true,
+  "params": {
+   "elastic_damping": 0.1,
+   "implicit_damping": true,
+   "contact_solref": "-1e6 -300"
+  }
+ },
+ "L -1e6 -300, damp 0.2": {
+  "bounce_peak_z": 0.2034,
+  "settle_time": 0.755,
+  "min_node_z": -0.0031,
+  "rest_min_node_z": 0.001,
+  "min_centroid_z": 0.0956,
+  "rest_centroid_z": 0.0999,
+  "finite": true,
+  "params": {
+   "elastic_damping": 0.2,
+   "implicit_damping": true,
+   "contact_solref": "-1e6 -300"
+  }
+ },
+ "M -1e6 -500, damp 0.2": {
+  "bounce_peak_z": 0.176,
+  "settle_time": 0.685,
+  "min_node_z": -0.0028,
+  "rest_min_node_z": 0.001,
+  "min_centroid_z": 0.0959,
+  "rest_centroid_z": 0.0999,
+  "finite": true,
+  "params": {
+   "elastic_damping": 0.2,
+   "implicit_damping": true,
+   "contact_solref": "-1e6 -500"
+  }
+ },
+ "N -2e6 -500, damp 0.15": {
+  "bounce_peak_z": 0.1386,
+  "settle_time": 0.505,
+  "min_node_z": -0.0003,
+  "rest_min_node_z": 0.001,
+  "min_centroid_z": 0.098,
+  "rest_centroid_z": 0.0999,
+  "finite": true,
+  "params": {
+   "elastic_damping": 0.15,
+   "implicit_damping": true,
+   "contact_solref": "-2e6 -500"
+  }
+ }
+}
