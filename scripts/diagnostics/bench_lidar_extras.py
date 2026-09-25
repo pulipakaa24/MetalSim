@@ -15,6 +15,9 @@ REPS = 200
 
 
 def main():
+    import subprocess, datetime
+    print('gpu_lock status at start', datetime.datetime.now().isoformat(timespec='seconds'), flush=True)
+    print(subprocess.run(['python3', 'scripts/gpu_lock.py', 'status'], capture_output=True, text=True).stdout, flush=True)
     env = LidarNavEnv(LidarNavConfig(num_envs=1024))
     env.reset(); env.synchronize()
     rt, base = env.rt, env.lidar

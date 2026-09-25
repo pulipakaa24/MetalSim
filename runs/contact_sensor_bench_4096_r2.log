@@ -1,0 +1,62 @@
+gpu_lock status at start 2026-09-24T21:44:42
+holder: {"name": "contact_sensor_bench2", "kind": "timing", "minutes": 12.0, "pid": 57566, "start": 1790311481.701875}
+  waiting [render] replay_rerender est 15.0 min, queued 1498 s ago
+  waiting [train] g1_flat_newton_ppo_fixed est 35.0 min, queued 279 s ago
+
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth 0cc2fb1 load on device 'metal:0' took 28.08 ms  (cached)
+Module _nxn_broadphase__locals__kernel_77109f20 77109f2 load on device 'metal:0' took 18.17 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_95433903 9543390 load on device 'metal:0' took 26.09 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_d2ba17d7 d2ba17d load on device 'metal:0' took 19.56 ms  (cached)
+Module mujoco_warp._src.constraint 6b6848e load on device 'metal:0' took 16.87 ms  (cached)
+Module _friction_dof__locals__kernel_646d9a17 646d9a1 load on device 'metal:0' took 17.19 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_2af29aef 2af29ae load on device 'metal:0' took 17.37 ms  (cached)
+Module _efc_contact_init__locals__kernel_41c302bb 41c302b load on device 'metal:0' took 17.03 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_1a4b2876 66f5008 load on device 'metal:0' took 17.23 ms  (cached)
+Module _efc_contact_update__locals__kernel_63b3d93a 63b3d93 load on device 'metal:0' took 17.40 ms  (cached)
+Module mujoco_warp._src.forward c9fb78c load on device 'metal:0' took 23.59 ms  (cached)
+Module mujoco_warp._src.passive 01837ed load on device 'metal:0' took 23.69 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_15bb4c69 15bb4c6 load on device 'metal:0' took 17.94 ms  (cached)
+Module mujoco_warp._src.forward d62b5a2 load on device 'metal:0' took 24.09 ms  (cached)
+Module _qfrc_smooth__locals__kernel_879019a1 879019a load on device 'metal:0' took 17.30 ms  (cached)
+Module mujoco_warp._src.support 8f02f5a load on device 'metal:0' took 17.41 ms  (cached)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_9171eb37 f438033 load on device 'metal:0' took 17.64 ms  (cached)
+Module _solve_init_dof__locals__kernel_d2b89306 d2b8930 load on device 'metal:0' took 18.36 ms  (cached)
+Module mujoco_warp._src.solver 4615040 load on device 'metal:0' took 18.24 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_61609ca9 61609ca load on device 'metal:0' took 17.34 ms  (cached)
+Module mul_m_kernel__locals___mul_m_1dc6ad98 1dc6ad9 load on device 'metal:0' took 17.12 ms  (cached)
+Module _update_constraint_efc__locals__kernel_19ee8eff 19ee8ef load on device 'metal:0' took 17.48 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_f4d269f2 f4d269f load on device 'metal:0' took 17.08 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_1b7ae334 1b7ae33 load on device 'metal:0' took 17.64 ms  (cached)
+Module _update_gradient_grad__locals__kernel_d8d45da1 d8d45da load on device 'metal:0' took 16.79 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_53d49923 4a8c7b0 load on device 'metal:0' took 17.27 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_c5a7f647 8641a45 load on device 'metal:0' took 17.15 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_3ec90fd4 72d6af5 load on device 'metal:0' took 18.20 ms  (cached)
+Module _update_constraint_efc__locals__kernel_2d3da595 2d3da59 load on device 'metal:0' took 17.73 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_747e54a4 747e54a load on device 'metal:0' took 17.02 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_5bb67707 5bb6770 load on device 'metal:0' took 17.25 ms  (cached)
+Module _update_gradient_grad__locals__kernel_c6377c8b c6377c8 load on device 'metal:0' took 17.07 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_8d1dce9c 2c8c4f6 load on device 'metal:0' took 17.69 ms  (cached)
+Module _solve_done__locals__kernel_e377d69b e377d69 load on device 'metal:0' took 17.42 ms  (cached)
+Module mujoco_warp._src.sensor 50c46e2 load on device 'metal:0' took 27.92 ms  (cached)
+Module mujoco_warp._src.derivative 1793cac load on device 'metal:0' took 19.87 ms  (cached)
+Module _next_time_builder__locals___next_time_77f65a33 77f65a3 load on device 'metal:0' took 17.02 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_7fdbdb61 7fdbdb6 load on device 'metal:0' took 17.82 ms  (cached)
+Module reset_data__locals__reset_M_232d5062 232d506 load on device 'metal:0' took 17.73 ms  (cached)
+Module reset_data__locals__reset_mocap_29da3eb8 29da3eb load on device 'metal:0' took 17.62 ms  (cached)
+Module reset_data__locals__reset_contact_818d93f9 818d93f load on device 'metal:0' took 17.49 ms  (cached)
+Module reset_data__locals__reset_sleep_ae682850 ae68285 load on device 'metal:0' took 17.81 ms  (cached)
+Module reset_data__locals__reset_nworld_532a08b2 532a08b load on device 'metal:0' took 17.22 ms  (cached)
+Module metalsim.sensors.contact bb11b98 load on device 'metal:0' took 674.42 ms  (cached)
+G1 MuJoCo Warp, 4096 worlds, 4 substeps x 5 ms per step, graph replay, synchronized, min and median of 7 interleaved x 50 steps
+  plain                                    min   58.274 median   58.315 ms/step  runs [58.33, 58.33, 58.31, 58.65, 58.31, 58.27, 58.31]
+  feet+torso, history 3, air time          min   58.417 median   58.475 ms/step  runs [58.92, 58.42, 58.54, 58.5, 58.44, 58.43, 58.48]  min +0.143 ms/step (+0.2 %), median +0.160 ms/step (+0.3 %)
+  + filter [ground], force_mode total      min   58.454 median   58.542 ms/step  runs [61.43, 58.54, 58.92, 58.64, 58.46, 58.45, 58.47]  min +0.180 ms/step (+0.3 %), median +0.227 ms/step (+0.4 %)
+  sensor kernels alone [feet+torso, history 3, air time]: 0.072 ms per 4 substeps
+  sensor kernels alone [+ filter [ground], force_mode total]: 0.083 ms per 4 substeps

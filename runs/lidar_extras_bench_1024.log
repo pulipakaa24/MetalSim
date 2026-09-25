@@ -1,0 +1,72 @@
+gpu_lock status at start 2026-09-24T21:42:38
+holder: {"name": "lidar_extras_bench", "kind": "timing", "minutes": 6.0, "pid": 56947, "start": 1790311357.1705668}
+  waiting [timing] camera_update_profile est 12.0 min, queued 235 s ago
+  waiting [render] replay_rerender est 15.0 min, queued 1373 s ago
+  waiting [train] g1_flat_newton_ppo_fixed est 35.0 min, queued 154 s ago
+
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth 0cc2fb1 load on device 'metal:0' took 28.73 ms  (cached)
+Module _nxn_broadphase__locals__kernel_77109f20 77109f2 load on device 'metal:0' took 18.06 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_8da35c43 8da35c4 load on device 'metal:0' took 28.75 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_c30d2ccf c30d2cc load on device 'metal:0' took 27.45 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_2cdddde8 2cdddde load on device 'metal:0' took 20.24 ms  (cached)
+Module mujoco_warp._src.constraint 6b6848e load on device 'metal:0' took 17.06 ms  (cached)
+Module _friction_dof__locals__kernel_bb4a5d2d bb4a5d2 load on device 'metal:0' took 17.94 ms  (cached)
+Module _efc_contact_init__locals__kernel_e1b478da e1b478d load on device 'metal:0' took 17.61 ms  (cached)
+Module _efc_contact_jac_sparse__locals__kernel_c2607b74 c2607b7 load on device 'metal:0' took 17.88 ms  (cached)
+Module _efc_contact_update__locals__kernel_63b3d93a 63b3d93 load on device 'metal:0' took 17.79 ms  (cached)
+Module mujoco_warp._src.forward c9fb78c load on device 'metal:0' took 23.56 ms  (cached)
+Module mujoco_warp._src.passive 01837ed load on device 'metal:0' took 22.47 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_15bb4c69 15bb4c6 load on device 'metal:0' took 17.18 ms  (cached)
+Module mujoco_warp._src.forward d62b5a2 load on device 'metal:0' took 23.28 ms  (cached)
+Module _qfrc_smooth__locals__kernel_879019a1 879019a load on device 'metal:0' took 16.95 ms  (cached)
+Module mujoco_warp._src.support 8f02f5a load on device 'metal:0' took 17.34 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_d33c2200 4fce1ed load on device 'metal:0' took 18.68 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_fcba8fff 1f9982f load on device 'metal:0' took 18.39 ms  (cached)
+Module _solve_init_dof__locals__kernel_417bc8c8 417bc8c load on device 'metal:0' took 17.55 ms  (cached)
+Module mujoco_warp._src.solver 4615040 load on device 'metal:0' took 18.25 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_120712f4 120712f load on device 'metal:0' took 17.42 ms  (cached)
+Module mul_m_kernel__locals___mul_m_1dc6ad98 1dc6ad9 load on device 'metal:0' took 17.14 ms  (cached)
+Module _update_constraint_efc__locals__kernel_19ee8eff 19ee8ef load on device 'metal:0' took 17.23 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_sparse__locals__kernel_1c18d833 1c18d83 load on device 'metal:0' took 18.54 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_1b7ae334 1b7ae33 load on device 'metal:0' took 17.05 ms  (cached)
+Module _update_gradient_grad__locals__kernel_d8d45da1 d8d45da load on device 'metal:0' took 17.09 ms  (cached)
+Module _update_gradient_init_h_sparse__locals__kernel_89fa16a4 89fa16a load on device 'metal:0' took 17.48 ms  (cached)
+Module _JTDACJ_sparse__locals__kernel_5cf3bed9 b95cfef load on device 'metal:0' took 17.48 ms  (cached)
+Module _update_gradient_cholesky_blocked__locals__kernel_7909e1c9 0d88179 load on device 'metal:0' took 18.18 ms  (cached)
+Module _linesearch_jv_fused_kernel__locals__kernel_4aaded00 4aaded0 load on device 'metal:0' took 17.62 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_84fa49e5 46f3fa5 load on device 'metal:0' took 18.86 ms  (cached)
+Module _update_constraint_efc__locals__kernel_2d3da595 2d3da59 load on device 'metal:0' took 17.39 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_5bb67707 5bb6770 load on device 'metal:0' took 17.09 ms  (cached)
+Module _update_gradient_grad__locals__kernel_c6377c8b c6377c8 load on device 'metal:0' took 16.92 ms  (cached)
+Module _update_gradient_h_incremental_sparse__locals__kernel_951dba12 951dba1 load on device 'metal:0' took 18.27 ms  (cached)
+Module _update_gradient_cholesky_blocked_skip_unchanged__locals__kernel_770d2599 73e6858 load on device 'metal:0' took 18.39 ms  (cached)
+Module _solve_done__locals__kernel_e377d69b e377d69 load on device 'metal:0' took 17.07 ms  (cached)
+Module mujoco_warp._src.sensor 50c46e2 load on device 'metal:0' took 27.92 ms  (cached)
+Module mujoco_warp._src.derivative 1793cac load on device 'metal:0' took 19.87 ms  (cached)
+Module _next_time_builder__locals___next_time_77f65a33 77f65a3 load on device 'metal:0' took 16.97 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_7fdbdb61 7fdbdb6 load on device 'metal:0' took 16.97 ms  (cached)
+Module reset_data__locals__reset_M_232d5062 232d506 load on device 'metal:0' took 16.90 ms  (cached)
+Module reset_data__locals__reset_mocap_29da3eb8 29da3eb load on device 'metal:0' took 17.00 ms  (cached)
+Module reset_data__locals__reset_contact_818d93f9 818d93f load on device 'metal:0' took 17.35 ms  (cached)
+Module reset_data__locals__reset_sleep_ae682850 ae68285 load on device 'metal:0' took 17.16 ms  (cached)
+Module reset_data__locals__reset_nworld_532a08b2 532a08b load on device 'metal:0' took 16.95 ms  (cached)
+lidar kernel per 64-beam scan x 1024 envs (65,536 beams), median of 5 x 200 encodes in one command buffer
+  default (1 ray, first hit)                        23.5 us   ( 1.00x default)   runs [23.8, 23.4, 23.5, 23.6, 22.2]
+  reflectance table (ext kernel, 1 ray)             30.5 us   ( 1.29x default)   runs [31.7, 30.6, 29.9, 30.5, 24.9]
+  multi-return 2 (re-cast)                          58.0 us   ( 2.46x default)   runs [57.7, 58.1, 58.2, 57.7, 58.0]
+  multi-return 4 (re-cast)                         103.5 us   ( 4.40x default)   runs [100.0, 99.1, 103.5, 103.7, 104.3]
+  divergence 4 rays                                 92.3 us   ( 3.92x default)   runs [96.7, 93.6, 92.3, 92.3, 90.7]
+  divergence 8 rays                                195.5 us   ( 8.30x default)   runs [194.6, 195.5, 195.0, 203.6, 201.9]
+  divergence 16 rays                               494.0 us   (20.98x default)   runs [494.0, 483.3, 500.7, 497.9, 480.6]
+  divergence 32 rays                              1823.6 us   (77.46x default)   runs [1823.6, 1836.1, 1821.1, 1825.9, 1822.8]
+  divergence 16 rays + 2 returns (re-cast)        1333.6 us   (56.65x default)   runs [1332.2, 1302.8, 1336.9, 1336.0, 1333.6]
+  full trace (refit + TLAS rebuild + default kernel), synchronized per 100: 763.5 us
+Module metalsim.sensors.radar 82ad04f load on device 'metal:0' took 428.11 ms  (cached)
+  radar-lite 512 rays x 1024 envs, full trace + Doppler/RCS kernel, synchronized per 100: 1119.5 us
