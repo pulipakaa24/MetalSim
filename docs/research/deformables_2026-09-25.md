@@ -389,7 +389,7 @@ largely numerical (XPBD with 16 iterations on stiff tetrahedra). Matching it nee
 | log decrement | 0.59 | 0.02 | 0.08 | 0.63 | 0.09 | 0.24 | 0.15 |
 | first back-swing x (m) | −0.305 | −0.485 | −0.331 | −0.312 | −0.456 | −0.402 | −0.437 |
 | rest tip drop (m) | 0.477 | 0.434 | 0.494 | 0.494 | 0.429 | 0.419 | 0.453 |
-| swing peaks (m, half-cycles) | 0.305, 0.36, 0.30, 0.11, 0.11, 0.10 | 0.49, 0.48, 0.46, 0.44 | 0.33, 0.49, 0.26, 0.47 | 0.31, 0.42, 0.16, 0.32, 0.07 | 0.46, 0.23, 0.34, 0.12 | 0.40, 0.21, 0.37, 0.15 | 0.44, 0.26, 0.40, 0.23 |
+| swing peaks (m, half-cycles) | 0.305, 0.374, 0.115, 0.284, 0.029 | 0.49, 0.48, 0.46, 0.44 | 0.33, 0.49, 0.26, 0.47 | 0.31, 0.42, 0.16, 0.32, 0.07 | 0.46, 0.23, 0.34, 0.12 | 0.40, 0.21, 0.37, 0.15 | 0.44, 0.26, 0.40, 0.23 |
 | Metal env-steps/s at 4096 | – | – | – | 2.57M | 11.7K | 9.4K | – |
 
 (PhysX swing peaks from its trace: `rope_metrics` on `runs/deformable/isaac51`; all rows in
