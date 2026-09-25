@@ -200,8 +200,15 @@ env-steps/s in the training loop, measured): return 25.3 / 27.3 / 27.2 at iterat
 (`isaac_side/play_policy.py`, 400 steps, 4 envs, mean action, `runs/parity/isaac/parity_out/play`):
 Isaac's iteration-100 policy stands (pelvis 0.70 m) and its 500 / 1000 policies walk (0.62–0.63 m) in
 Isaac; MetalSim's iteration-500 policy also survives 400 steps in Isaac (0.56–0.59 m) while its
-iteration-100, 1000 and 1500 policies fall there (0.03–0.11 m); side-by-side videos of the same
-checkpoints in both simulators are in the gallery.
+iteration-100, 1000 and 1500 policies fall there (0.03–0.11 m). The side-by-side videos
+(`docs/gallery/g1_stage_*.mp4`, `metalsim.parity.side_by_side`, 8 s each) measure the cross-simulator
+transfer directly: Isaac's PhysX-trained policies at iterations 500 / 1000 / 1499 travel 3.19 / 3.02 /
+3.11 m in Isaac and 3.09 / 2.96 / 3.21 m in MetalSim, ending at pelvis height 0.62–0.64 vs
+0.61–0.63 m; its iteration-100 policy stands in both (0.70 m). MetalSim's pre-fix policies are brittle
+in both directions (iteration 500 stands in Isaac, falls in MetalSim; 1000 and 1500 the reverse),
+consistent with the repeated-noise defect in the old rollout. **A policy trained in PhysX behaves the
+same in MetalSim's MuJoCo Warp physics** is the strongest single parity statement this document can
+make so far; it is measured on one asset, one task, four checkpoints, one seed.
 
 Isaac's action_rate term is dominated by its exploration noise (std 0.72–1.0 on 37 joints under
 stochastic actions; ours above is the mean action), so it is not comparable; every other row is. The
