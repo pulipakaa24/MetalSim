@@ -5,6 +5,7 @@ Classes (granted in this order when the GPU frees up; FIFO within a class):
   timing  (0)  short measurements that need an idle GPU (benchmarks, profiles); <= 15 min
   render  (1)  renders / short rollouts
   train   (2)  long training runs
+  low     (3)  background optimisation work; granted only when nothing else waits
 A holder is recorded in runs/.gpu_lock (text: name, kind, pid, start) and runs/.gpu_lock.d/ (the atomic
 token); a holder whose pid is gone is released automatically. Scripts that only check the file still
 interoperate. Waiting jobs register tickets in runs/gpu_queue/.
@@ -18,7 +19,7 @@ import argparse, json, os, sys, time
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOCK = os.path.join(ROOT, "runs", ".gpu_lock"); LOCKD = LOCK + ".d"; Q = os.path.join(ROOT, "runs", "gpu_queue")
-PRIO = {"timing": 0, "render": 1, "train": 2}
+PRIO = {"timing": 0, "render": 1, "train": 2, "low": 3}
 
 
 def alive(pid):
