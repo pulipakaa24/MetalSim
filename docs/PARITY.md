@@ -314,30 +314,32 @@ torso impact, where these transients and the contact model meet.
 **Rendering** (Isaac RTX vs MetalSim, same state per frame; brightness-matched = MetalSim scaled to
 Isaac's mean, because the engines' light units differ):
 
-| Isaac renderer | MetalSim tier | frames | whole frame, raw PSNR / SSIM / LPIPS / FLIP | whole frame, brightness-matched | robot pixels only (states agree, IoU > 0.7), brightness-matched PSNR / SSIM / FLIP, LPIPS on the crop | silhouette IoU | robot depth RMSE |
-|---|---|---|---|---|---|---|---|
-| RTX real-time | tier 2 (16 spp × 4) | 110 | 12.7 dB / 0.62 / 0.69 / 0.60 | 17.6 dB / 0.67 / 0.65 / 0.41 | 13.7 dB / 0.48 / 0.024 / 0.041 (n = 51) | 0.83 | 2.6 cm |
-| RTX real-time | tier 0 (raster) | 110 | 12.6 / 0.68 / 0.67 / 0.63 | 12.4 / 0.68 / 0.67 / 0.64 | 11.5 dB / 0.35 / 0.028 / 0.061 | 0.83 | 2.6 cm |
-| RTX path tracer, 32 spp | tier 2 | 22 | 12.0 / 0.61 / 0.70 / 0.62 | 17.3 / 0.67 / 0.66 / 0.42 | 13.8 dB / 0.49 / 0.026 / 0.040 (n = 12) | 0.84 | 2.9 cm |
-| RTX path tracer, 32 spp | tier 0 | 22 | 12.7 / 0.68 / 0.68 / 0.62 | 12.6 / 0.68 / 0.68 / 0.62 | 11.8 dB / 0.38 / 0.029 / 0.058 | 0.84 | 2.9 cm |
+| Isaac renderer | MetalSim tier | frames | whole frame: PSNR / SSIM / LPIPS / FLIP (raw; brightness gain ≈ 1.0) | robot pixels only, states agreeing (IoU > 0.7): PSNR / SSIM / FLIP, LPIPS on the crop | silhouette IoU (agreeing) | robot depth RMSE (agreeing) |
+|---|---|---|---|---|---|---|
+| RTX real-time | tier 2 (16 spp × 4) | 110 | **18.0 dB / 0.876 / 0.401 / 0.446** | 13.4 dB / 0.47 / 0.092 / 0.130 (n = 52) | 0.86 | 2.7 cm |
+| RTX real-time | tier 0 (raster) | 110 | 8.3 dB / 0.815 / 0.419 / 0.691 (brightness-matched 9.9 / 0.880 / 0.387 / 0.641, gain 1.41) | 11.0 dB / 0.32 / 0.103 / 0.168 | 0.86 | 2.7 cm |
+| RTX path tracer, 32 spp | tier 2 | 22 | 17.6 dB / 0.860 / 0.435 / 0.448 | 13.7 dB / 0.49 / 0.097 / 0.132 (n = 12) | 0.87 | 2.9 cm |
+| RTX path tracer, 32 spp | tier 0 | 22 | 8.5 / 0.802 / 0.444 / 0.698 (matched 9.6 / 0.859 / 0.416 / 0.663) | 11.1 dB / 0.33 / 0.109 / 0.172 | 0.87 | 2.9 cm |
 
-How to read these. The **whole-frame** numbers are dominated by a scene mismatch, not by the
-renderers: Isaac Lab's plane terrain ignores `visual_material`, so Isaac's frames show its default
-blue grid ground and the neighbouring envs on the horizon, while MetalSim renders the grey plane the
-script asked both for (see the gallery composites). Brightness matching helps tier 2 by 5 dB because
-the engines' light units differ (MetalSim tier 2 is 1.3× brighter on the frame, 1.08× on the robot).
-The **robot-only** columns mask everything outside the union silhouette and average over the robot's
-pixels on frames where the physics states agree, so they compare the shading of the same asset with
-the same materials, sun and dome: tier 2 is 2 dB / +0.13 SSIM closer to RTX than tier 0, and Isaac's
-real-time and path-traced frames are equally far from ours (they are within 0.2 dB of each other),
-i.e. the gap is in the material and light model (MetalSim's plates render darker, its sun shadow is
-hard-edged; no denoiser, no area lights), not in noise. 13.7 dB / 0.48 SSIM on the robot is a **large**
-remaining gap and is reported as such; it is measured, not estimated. Silhouettes agree (IoU 0.83 on
-agreeing states; 0.48–0.52 over all frames because B_random diverges) and the robot's z-depth agrees to
-2.6–2.9 cm RMSE; the ground plane depth agrees to 7 mm, of which ~4 mm is tier 2's own depth noise.
-Depth conventions: both engines write z-depth; Isaac writes inf for the sky and clips at the 100 m far
-plane, MetalSim writes 0 on a miss (`compare.robot_mask`). A re-recording with the grey ground bound
-on the Isaac side (`stage6.sh`, one env, no horizon robots) is queued to replace the whole-frame rows.
+These are from the second recording (`runs/parity/isaac/parity_out2`, `report_rt2` / `report_pt2`), in
+which the grey ground is actually bound on the Isaac side (Isaac Lab's plane terrain ignores
+`visual_material`; the first recording showed its default grid and the neighbouring envs, whole-frame
+12.7 dB / 0.62 SSIM, and is kept in `report_rt` / `report_pt` for the record; its robot-only numbers
+were within 0.3 dB of these). Tier 2's exposure matches RTX's without correction (gain 1.03); tier 0
+renders 1.4× darker. Whole-frame, tier 2 is at 18 dB / 0.88 SSIM against RTX: the ground, sky and
+silhouette agree; what remains is the robot itself. The **robot-only** columns average over the
+robot's pixels on frames where the physics states agree and so compare the shading of the same asset,
+materials, sun and dome: tier 2 is 2.4 dB / +0.15 SSIM closer to RTX than tier 0, and Isaac's real-time
+and path-traced frames are equally far from ours (within 0.3 dB of each other), so the gap is in the
+material and light model, not in noise: MetalSim's plates render darker and bluer (the dome's colour
+bleeds into ours; RTX's sky reads neutral grey 168/173/180 vs ours 191/204/229), its sun shadow is
+hard-edged (no area light), and there is no denoiser. 13.4 dB / 0.47 SSIM on the robot is a **large**
+remaining gap and is reported as such; it is measured, not estimated. Silhouettes agree (IoU 0.86 on
+agreeing states) and the robot's z-depth to 2.7–2.9 cm RMSE; the ground plane depth to 7 mm, of which
+~4 mm is tier 2's own depth noise. Depth conventions: both engines write z-depth; Isaac writes inf for
+the sky and clips at the 100 m far plane, MetalSim writes 0 on a miss (`compare.robot_mask`). One
+visible scene difference remains on our side: MetalSim's ground plane is tessellated to a finite extent
+and ends before the horizon, where RTX's reaches it.
 
 ## 2. Platform capabilities (the workstreams), with the tests behind them
 
