@@ -235,3 +235,71 @@ physics steps/s at 4096 envs (STATUS); Isaac Lab publishes no deformable through
 | cables / ropes (Newton VBD cable) | 1D flex with capsule-element contacts (fixed here) | no bending/twist energy without the `cable` plugin (unsupported by MuJoCo Warp) |
 | coupling with articulations (PhysX two-way; Newton `CoupledSolver`) | one MuJoCo solve for robot + flex (two-way by construction); G1 + cloth + cable at 20.0K env-steps/s (2048 envs) | 4096 G1 worlds exceed memory with the default CCD workspace |
 | throughput | 54.1K env-steps/s at 4096 for a 112-vertex cloth+cable scene (faithful), 2.35M for XPBD (not faithful) | Isaac publishes none; next cuts in §5 item 4; Metal EPA precision on mesh face contacts (§6) |
+
+## 9. PhysX's deformable formulations from the source, and which MetalSim backend shares them
+
+Primary sources (all read, not summarised from docs): PhysX SDK 5.6.1 (tag `107.3-physx-5.6.1`, the PhysX in Isaac Sim
+5.1 / omni.physx 107.3) and PhysX main (5.11, `da950a3`), github.com/NVIDIA-Omniverse/PhysX (BSD-3, GPU code included);
+Isaac Lab v2.3.2 and v3.0.0-EA (`ae37b02`); Newton `90e2332` (upstream/newton).
+
+**Particle cloth (PBD).** `PxParticleClothBuffer` / `PxParticleSpring` (5.6.1 `include/PxParticleBuffer.h`), solved by
+`ps_solveSpringsLaunch` (`source/gpusimulationcontroller/src/CUDA/particlesystem.cu` ~L4137–4300): every cloth
+spring is a distance constraint with stiffness `k` and damping `d` applied as an implicit spring,
+`a = dt(dt k + d)`, `x = 1/(1 + a w)`, position and velocity updated together, clamped to the full error — i.e. a
+compliant (XPBD-type) distance constraint with compliance `1/k`. Springs are processed in partitions (graph colouring:
+parallel Gauss–Seidel). Under TGS (Isaac's default) `PxgPBDParticleSystemCore::solveTGS` steps the particles
+(`stepParticleSystems`, L541) and solves springs/contacts (`solveParticleCollision` → `solveSprings`, L373) once per
+position iteration, so the 16 position iterations are 16 substeps ("small steps" XPBD). There are only distance springs:
+omni.physx's `PhysxAutoParticleClothAPI` generates stretch (mesh edges), shear and bend springs (`springStretchStiffness`,
+`springShearStiffness`, `springBendStiffness`, `springDamping`; `omni.physx.scripts.particleUtils.add_physx_particle_cloth`),
+no volume constraint (`pressure` is only for inflatables). Contacts treat particles as spheres: `restOffset` (particle
+radius for solids, `solidRestOffset`) and `contactOffset` (contact generation distance); self-collision filtering uses
+2.01 × solidRestOffset (particlesystem.cu L1192). The particle cloth API is **gone on PhysX main** (5.11: the spring
+solve is commented out in `PxgParticleSystemCore.h` L140, no `PxParticleSpring`); it is deprecated in omni.physx 107.3
+("DEPRECATED: Will be replaced by new deformable implementation").
+
+**FEM cloth (`PxDeformableSurface`, Isaac Sim 6 surface deformables).** `FEMCloth.cu`, `FEMClothUtil.cuh` (main): XPBD
+"fixed corotated" membrane (L417) and XPBD "Discrete Shells" bending (L523); material `PxDeformableSurfaceMaterial`
+(Young's modulus, Poisson, thickness, bending stiffness/damping).
+
+**FEM soft body (`PxSoftBody` → `PxDeformableVolume`).** `softBodyGM.cu` (5.6.1): the simulation mesh is a hexahedral
+grid ("GM"), each cell split into tetrahedra; per-tet XPBD constraints — default `eCO_ROTATIONAL` (ARAP deviatoric term
+with `alphaTilde = 1/(dt² · 2 μ V)` plus a volume term) or `eNEO_HOOKEAN` (`tetrahedronsSolveInnerNeoHookean`,
+`alpha = invDt² / E`), damping `elasticityDamping × dampingScale` inside the constraint (`PxDeformableVolumeMaterial.h`
+L39–46: "eCO_ROTATIONAL: Default model. Well suited for high stiffness"). Solved in partitions (parallel Gauss–Seidel,
+Jacobi fallback above `SB_PARTITION_LIMIT`, L1454–1503) once per TGS iteration; rotations extracted per tet
+(Müller's rotation extraction, `deformableUtils.cuh` L43) once per step.
+
+**Isaac Lab v2.3.2 mapping.** `DeformableBodyMaterialCfg` → `spawn_deformable_body_material`
+(`sim/spawners/materials/physics_materials.py` L110–128) applies `PhysxSchema.PhysxDeformableBodyMaterialAPI` and sets
+`density`, `dynamicFriction`, `youngsModulus`, `poissonsRatio`, `elasticityDamping`, `dampingScale` one to one.
+`DeformableBodyPropertiesCfg` → `modify_deformable_body_properties` (`sim/schemas/schemas.py` L930–975): mesh and solver
+options through `deformable_utils.add_physx_deformable_body(...)` (`simulation_hexahedral_resolution`,
+collision simplification, `solver_position_iteration_count`, `vertex_velocity_damping`, sleep/settling, `self_collision`,
+`self_collision_filter_distance`), `rest_offset` / `contact_offset` on `PhysxCollisionAPI`, the rest on
+`PhysxDeformableAPI`. `DeformableObject` reads and writes nodes through `physics_sim_view.create_soft_body_view`
+(`assets/deformable_object/deformable_object.py` L327). **Isaac Lab v2.3.2 exposes no cloth object**: only volume
+soft bodies. The 5.1 recording therefore made its cloth with omni.physx `particleUtils` directly (ParticleClothDemo
+values), and its rope as a thin volume soft body.
+
+**Isaac Lab 3.0-EA.** `DeformableObject` covers both backends: PhysX (`isaaclab_physx`) surface deformables
+(`PhysxSurfaceDeformableBodyMaterialCfg`: density 1000, friction 0.25, Young's modulus 1e6, Poisson 0.45,
+`surface_thickness` 0.01, stretch/shear/bend stiffness, `bend_damping`, `elasticity_damping` 0.005) and volume
+deformables (`PhysxDeformableBodyMaterialCfg`); Newton VBD (`isaaclab_newton`): volumes with `k_mu`, `k_lambda`, `k_damp`
+(stable Neo-Hookean, Newton `particle_vbd_kernels.py` L178–218), cloth with `tri_ke`, `tri_ka`, `tri_kd` (Neo-Hookean
+membrane, L532–578) and `edge_ke`, `edge_kd` (dihedral-angle bending, L694–798); a Newton-only `CableObject` (VBD rod:
+`CableMaterialCfg` thickness, density, stretch/bend/shear/twist moduli). `scripts/demos/deformables.py` is the reference
+usage. Recording script prepared: `metalsim/parity/isaac_side/record_deformables_il3.py` (both backends, same three
+protocols); not run (the 3.0 environment is being built by another agent).
+
+**Which MetalSim backend shares the formulation:**
+
+| object | PhysX (5.1, recorded) | MuJoCo Warp flex | MetalSim XPBD | physical mappings / fitted |
+|---|---|---|---|---|
+| cloth | PBD particle cloth: compliant distance springs (stretch/shear/bend), 16 TGS substeps, sphere contacts | soft edge-equality constraints (or explicit edge springs / StVK membrane + bending), solved in the global constraint solve; capsule-triangle contacts | **same family**: compliant distance constraints on edges and bending pairs, small steps, coloured Gauss–Seidel, sphere-vertex contacts | XPBD: compliance = 1/k, damping = d per spring, substeps = position iterations, radius = rest offset, mass, friction (all physical); flex: solref (−2k/m, −2d/m) from the spring (physical in the small-deformation limit), contact solref fitted, no bending in equality mode |
+| cable/rope | thin FEM volume (co-rotational XPBD tets) with kinematic end nodes | thin flex volume (StVK tets), pinned vertices: **same family** (FEM volume), different constitutive law and explicit integration | 1D chain with distance + bending constraints: different family (rod, not a volume) | flex: Young's modulus, Poisson ratio, density, pin (physical); elastic damping fitted (PhysX's 0.005 is unstable in explicit flex elasticity); XPBD: bending compliance and damping fitted |
+| soft volume | FEM co-rotational XPBD on a hexahedral-cell tet mesh | flex volume (StVK, explicit): FEM family | not implemented | flex: E, ν, density, friction (physical); damping and contact softness fitted |
+
+Newton VBD (Isaac Lab 3.0) is a block-descent implicit solver on the same kinds of energies (Neo-Hookean membranes and
+volumes, dihedral bending): closer to flex's energy-based FEM than to PBD springs; the 3.0 recordings will say whether
+XPBD (for PhysX PBD cloth) or flex (for FEM/VBD) is the closer default per object type.
