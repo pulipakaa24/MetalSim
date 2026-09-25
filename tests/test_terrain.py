@@ -1,5 +1,6 @@
-"""Rough terrain (Isaac's terrain generator layout) and the Metal height scanner (Isaac's
-RayCaster height scan), checked against MuJoCo's mj_ray on the same heightfield."""
+"""Rough terrain (Isaac Lab's terrain generator, ported) checked against Isaac's own generator code,
+and the height scanner (Isaac's RayCaster height scan) checked against MuJoCo's mj_ray on the same
+heightfield."""
 import mujoco
 import numpy as np
 import pytest
@@ -14,10 +15,12 @@ pytestmark = pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal
 
 def test_terrain_layout():
     hf = isaac_rough_terrain(num_rows=2, num_cols=4, seed=0)
-    H = hf["H"]
-    assert H.shape == (2 * 80 + 40, 4 * 80 + 40)
+    H = hf["H"]                                         # [y index, x index]; Isaac: rows along x, 20 m border
+    assert H.shape == (4 * 80 + 2 * 200 + 1, 2 * 80 + 2 * 200 + 1)
+    assert hf["size"][0] == 28.0 and hf["size"][1] == 36.0     # centred like Isaac's terrain
     assert hf["zmax"] - hf["zmin"] > 0.2                # stairs/boxes present
-    assert np.abs(H[:20]).max() == 0 and np.abs(H[:, :20]).max() == 0   # flat border
+    assert np.abs(H[:200]).max() == 0 and np.abs(H[:, :200]).max() == 0   # flat border
+    assert hf["origin_table"]().shape == (2, 4, 3)
     o = hf["origins"](64, 0)
     assert o.shape == (64, 3) and np.isfinite(o).all()
     V, F = hf["mesh"]()
@@ -119,3 +122,167 @@ def test_hfield_mesh_contacts_match_mujoco_c():
           f"pelvis z ours {ours.round(3)} vs C {np.round(ref, 3)}")
     assert worst_normal > 0.0 and worst_pen < max(0.02, 1.5 * c_pen)   # the initial placement intersects terrain boxes
     assert np.all(np.abs(ours - np.array(ref)) < 0.05)
+
+
+# --------------------------------------------------------------------------------------------------
+# exactness against Isaac Lab's own terrain generator (v2.3.2 sources in assets/isaac/terrains/, run on
+# the CPU through tests/isaac_terrain_ref.py)
+
+def _isaac_ref():
+    import os, sys
+    sys.path.insert(0, os.path.dirname(__file__))
+    import isaac_terrain_ref
+    return isaac_terrain_ref
+
+
+def _surface_of_isaac_mesh(mesh, shape, x0, y0, res=0.1):
+    """Top surface of an Isaac trimesh at the grid points (x0 + i res, y0 + j res)."""
+    from metalsim.learn.isaac_terrain import top_surface_of_triangles
+    V = np.asarray(mesh.vertices); F = np.asarray(mesh.faces)
+    P = np.stack([(V[:, 0] - x0) / res, (V[:, 1] - y0) / res], 1)
+    r = np.round(P); snap = np.abs(P - r) < 1e-3; P[snap] = r[snap]     # float32 vertices of grid points
+    return top_surface_of_triangles(P, V[:, 2].astype(np.float32).astype(np.float64), F, shape).astype(np.float32)
+
+
+def _warp_raycast(mesh, xy):
+    """Isaac's RayCaster operation (isaaclab.utils.warp.raycast_mesh: wp.mesh_query_ray on the float32
+    terrain mesh) straight down from 20 m, on Warp's CPU device."""
+    m = wp.Mesh(points=wp.array(np.asarray(mesh.vertices, np.float32), dtype=wp.vec3, device="cpu"),
+                indices=wp.array(np.asarray(mesh.faces, np.int32).ravel(), dtype=wp.int32, device="cpu"))
+    out = wp.zeros(len(xy), dtype=float, device="cpu")
+    wp.launch(_raycast_down, dim=len(xy), inputs=[m.id, wp.array(xy.astype(np.float32), dtype=wp.vec2, device="cpu"), out],
+              device="cpu")
+    return out.numpy()
+
+
+@wp.kernel
+def _raycast_down(mesh: wp.uint64, xy: wp.array(dtype=wp.vec2), out: wp.array(dtype=float)):
+    i = wp.tid()
+    q = wp.mesh_query_ray(mesh, wp.vec3(xy[i][0], xy[i][1], 20.0), wp.vec3(0.0, 0.0, -1.0), 1.0e6)
+    out[i] = 20.0 - q.t if q.result else -1.0e9
+
+
+def test_isaac_rough_terrain_exact():
+    """Isaac-Velocity-Rough-G1-v0's terrain at env seed 0: Isaac's TerrainGenerator (its code, CPU torch)
+    vs ours with torch_device="cpu": env origins bit-for-bit, heightfield = the top surface of Isaac's
+    terrain mesh at every grid point bit-for-bit, and within float32 ray precision of Isaac's own
+    ray cast (wp.mesh_query_ray) everywhere except on vertical walls lying on grid lines."""
+    from metalsim.learn.isaac_terrain import isaac_rough_terrain_generator
+    R = _isaac_ref()
+    isaac = R.isaac_rough_generator(seed=0)
+    ours = isaac_rough_terrain_generator(seed=0, torch_device="cpu")
+    assert np.array_equal(isaac.terrain_origins, ours.terrain_origins)
+    hf = isaac_rough_terrain(seed=0, torch_device="cpu")
+    assert np.array_equal(hf["origin_table"](), isaac.terrain_origins.astype(np.float32))
+    H = hf["H"].T                                       # back to Isaac's [x, y]
+    assert H.shape == (1201, 2001) and hf["size"][:2] == [60.0, 100.0]
+    ref = _surface_of_isaac_mesh(isaac.terrain_mesh, H.shape, -60.0, -100.0)
+    assert np.array_equal(H.astype(np.float32), ref), f"max diff {np.abs(H - ref).max()}"
+    # Isaac's own ray cast at every grid point
+    ix, iy = np.meshgrid(np.arange(H.shape[0]), np.arange(H.shape[1]), indexing="ij")
+    z = _warp_raycast(isaac.terrain_mesh, np.stack([ix.ravel() * 0.1 - 60.0, iy.ravel() * 0.1 - 100.0], 1)).reshape(H.shape)
+    d = np.abs(z - H)
+    wall = np.zeros(H.shape, bool)
+    for a in (-1, 1):
+        for ax in (0, 1):
+            wall |= np.abs(np.roll(H, a, ax) - H) > 1e-3
+    print(f"Isaac ray cast vs ours at {H.size} grid points: {np.mean(d < 1e-5):.4f} within 1e-5 m "
+          f"(max {d[~wall].max():.1e} off walls); {int((d > 1e-5).sum())} differ, all on walls: {bool(np.all(wall[d > 1e-5]))}")
+    assert d[~wall].max() < 1e-5 and np.all(wall[d > 1e-5]) and (d > 1e-5).mean() < 1e-3
+    # Isaac on an NVIDIA GPU draws the random-grid box heights from torch's CUDA Philox generator: the
+    # default torch_device="cuda" differs from the CPU run only in the four "boxes" columns (8-11)
+    cuda = isaac_rough_terrain_generator(seed=0)
+    diff_cols = np.nonzero(np.any(cuda.surface != ours.surface, axis=0))[0]
+    assert diff_cols.min() >= 200 + 8 * 80 and diff_cols.max() <= 200 + 12 * 80
+    assert np.array_equal(np.delete(cuda.terrain_origins, [8, 9, 10, 11], 1), np.delete(ours.terrain_origins, [8, 9, 10, 11], 1))
+
+
+def test_torch_cuda_uniform_reproduction():
+    """The Philox4x32-10 generator behind torch's CUDA uniform_: Random123 known-answer vectors, and
+    torch.manual_seed(0); torch.rand(8, device="cuda") = [0.3990, 0.5167, 0.0249, 0.9401, 0.9459,
+    0.7967, 0.4150, 0.8203] (the values torch prints on NVIDIA GPUs)."""
+    from metalsim.learn.isaac_terrain import TorchUniform, philox4x32_10
+    kat = [((0, 0, 0, 0), (0, 0), (0x6627E8D5, 0xE169C58D, 0xBC57AC4C, 0x9B00DBD8)),
+           ((0xFFFFFFFF,) * 4, (0xFFFFFFFF,) * 2, (0x408F276D, 0x41C83B0E, 0xA20BC7C6, 0x6D5451FD)),
+           ((0x243F6A88, 0x85A308D3, 0x13198A2E, 0x03707344), (0xA4093822, 0x299F31D0), (0xD16CFE09, 0x94FDCCEB, 0x5001E420, 0x24126EA1))]
+    for ctr, key, want in kat:
+        got = philox4x32_10([np.array([c], np.uint32) for c in ctr], key)
+        assert tuple(int(g[0]) for g in got) == want
+    r = TorchUniform(0, "cuda")(8, 0.0, 1.0)
+    assert np.allclose(r, [0.3990, 0.5167, 0.0249, 0.9401, 0.9459, 0.7967, 0.4150, 0.8203], atol=5e-5)
+
+
+def _isaac_sub_cfg(R, ours_cfg):
+    """Isaac's cfg object for one of our sub-terrain cfgs (same parameters)."""
+    tg = R.load()
+    from metalsim.learn.isaac_terrain import HfCfg
+    cls = {"hf_random_uniform": "HfRandomUniformTerrainCfg", "hf_pyramid_stairs": "HfPyramidStairsTerrainCfg",
+           "hf_discrete_obstacles": "HfDiscreteObstaclesTerrainCfg", "mesh_pyramid_stairs": "MeshPyramidStairsTerrainCfg",
+           "mesh_inverted_pyramid_stairs": "MeshInvertedPyramidStairsTerrainCfg", "mesh_random_grid": "MeshRandomGridTerrainCfg",
+           "hf_pyramid_sloped": "HfPyramidSlopedTerrainCfg"}[ours_cfg.function]
+    fields = {k: v for k, v in vars(ours_cfg).items() if k != "function" and v is not None}
+    if not isinstance(ours_cfg, HfCfg):
+        for k in ("grid_width", "grid_height_range", "step_height_range", "step_width"):
+            fields.pop(k, None) if getattr(ours_cfg, k) is None else None
+    else:
+        for k in ("obstacle_height_mode",):
+            if ours_cfg.function != "hf_discrete_obstacles":
+                fields.pop(k)
+        if ours_cfg.function not in ("hf_pyramid_sloped", "hf_pyramid_stairs"):
+            fields.pop("inverted")
+        if ours_cfg.function == "hf_random_uniform":
+            fields.pop("platform_width")
+    return getattr(tg, cls)(**fields)
+
+
+def _sub_cfgs():
+    from metalsim.learn.isaac_terrain import HfCfg, MeshCfg, rough_terrains_cfg
+    hf = dict(size=(8.0, 8.0), horizontal_scale=0.1, vertical_scale=0.005, slope_threshold=0.75)
+    out = {name: c for name, c in rough_terrains_cfg().sub_terrains.items()}
+    for c in out.values():
+        if isinstance(c, HfCfg):
+            c.slope_threshold = 0.75
+    out["hf_pyramid_stairs"] = HfCfg("hf_pyramid_stairs", step_height_range=(0.05, 0.23), step_width=0.3, platform_width=3.0,
+                                     border_width=0.25, **hf)
+    out["hf_pyramid_stairs_inv"] = HfCfg("hf_pyramid_stairs", step_height_range=(0.05, 0.23), step_width=0.3,
+                                         platform_width=3.0, border_width=0.25, inverted=True, **hf)
+    out["hf_discrete_obstacles"] = HfCfg("hf_discrete_obstacles", obstacle_width_range=(0.5, 2.0),
+                                         obstacle_height_range=(0.05, 0.3), num_obstacles=40, platform_width=2.0,
+                                         border_width=0.25, **hf)
+    return out
+
+
+@pytest.mark.parametrize("name", ["pyramid_stairs", "pyramid_stairs_inv", "boxes", "random_rough", "hf_pyramid_slope",
+                                  "hf_pyramid_slope_inv", "hf_pyramid_stairs", "hf_pyramid_stairs_inv", "hf_discrete_obstacles"])
+def test_isaac_sub_terrain_exact(name):
+    """Each ported sub-terrain function against Isaac's (same cfg, same random state) at several
+    difficulties: origin bit-for-bit; height-field terrains: Isaac's mesh vertices (after its slope-
+    threshold moves) bit-for-bit from our heights and moves; every terrain: top surface on the grid
+    bit-for-bit."""
+    import torch
+    from metalsim.learn.isaac_terrain import HfCfg, TorchUniform, height_field_terrain, height_field_vertex_moves, sub_terrain
+    R = _isaac_ref()
+    cfg = _sub_cfgs()[name]
+    cfg.size = (8.0, 8.0)
+    for k, difficulty in enumerate([0.0, 0.13, 0.5, 0.77, 0.999]):
+        seed = 17 + k
+        icfg = _isaac_sub_cfg(R, cfg)
+        np.random.seed(seed); torch.manual_seed(seed)
+        meshes, iorigin = icfg.function(difficulty, icfg.copy())
+        import trimesh
+        imesh = trimesh.util.concatenate(meshes)
+        rs = np.random.RandomState(seed); tr = TorchUniform(seed, "cpu")
+        surf, origin, heights, boxes = sub_terrain(difficulty, cfg, rs, tr, 0.1)
+        assert np.array_equal(origin, iorigin + np.array([-4.0, -4.0, 0.0])), (origin, iorigin)
+        ref = _surface_of_isaac_mesh(imesh, surf.shape, 0.0, 0.0)
+        assert np.array_equal(surf, ref), f"{name} d={difficulty}: max diff {np.abs(surf - ref).max()}"
+        if isinstance(cfg, HfCfg):
+            import copy
+            c2 = copy.deepcopy(cfg)
+            h2, _ = height_field_terrain(difficulty, c2, np.random.RandomState(seed))
+            dx, dy = height_field_vertex_moves(h2, 0.1, 0.005, 0.75)
+            lin = np.linspace(0, 80 * 0.1, 81)
+            X = (lin[:, None] + dx * 0.1).astype(np.float32); Y = (lin[None, :] + dy * 0.1).astype(np.float32)
+            ours_v = np.stack([X.ravel(), Y.ravel(), (h2.flatten() * 0.005).astype(np.float32)], 1)
+            # trimesh merges coincident vertices (moved vertices land on their neighbours): compare as sets
+            assert np.array_equal(np.unique(ours_v, axis=0), np.unique(np.asarray(meshes[0].vertices, np.float32), axis=0))
