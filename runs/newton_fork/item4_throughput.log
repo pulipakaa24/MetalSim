@@ -1,0 +1,36 @@
+# item 4/3 throughput, 4096 envs, Metal, physics-only graph replay of one 50 Hz step
+Thu Sep 24 22:30:12 PDT 2026
+holder: {"name": "g1_flat_rslrl_isaacflatcfg", "kind": "train", "minutes": 30.0, "pid": 62863, "start": 1790313230.220779}
+  waiting [timing] camera_update_3d est 6.0 min, queued 930 s ago
+  waiting [timing] contact_tuning_bench est 15.0 min, queued 609 s ago
+  waiting [train] g1_flat_newton0625_ppo_fixed est 45.0 min, queued 1253 s ago
+holder: {"name": "newton_fork_throughput", "kind": "timing", "minutes": 15.0, "pid": 69599, "start": 1790315229.285631}
+  waiting [timing] camera_update_3e est 5.0 min, queued 353 s ago
+  waiting [timing] contact_tuning_bench_oldcollider est 8.0 min, queued 4 s ago
+  waiting [train] g1_flat_newton0625_ppo_fixed est 45.0 min, queued 2270 s ago
+  waiting [train] g1_flat_ppowarp_fixed_flatcfg est 70.0 min, queued 353 s ago
+  waiting [train] g1_terms_tuning_default est 8.0 min, queued 293 s ago
+Thu Sep 24 22:47:09 PDT 2026
+$ .venv/bin/python scripts/diagnostics/newton_fork/throughput.py 4:1.25 4:0.625   (pinned upstream)
+newton at /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/__init__.py, fork False, N 4096
+| 4:1.25 | 145,424 env-steps/s | blocks 146,942, 145,178, 145,424 |
+| 4:0.625 | 72,439 env-steps/s | blocks 74,070, 72,439, 71,444 |
+$ .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/throughput.py ...
+newton at /Users/aditya/robosim/upstream/newton/newton/__init__.py, fork True, N 4096
+| 4:1.25 | 94,807 env-steps/s | blocks 94,954, 94,382, 94,807 |
+| 4:0.625 | 47,191 env-steps/s | blocks 47,325, 46,970, 47,191 |
+| 4:1.25:extra=2 | 72,647 env-steps/s | blocks 72,032, 72,904, 72,647 |
+| 4:1.25:extra=4 | 57,584 env-steps/s | blocks 57,669, 57,448, 57,584 |
+| 4:1.25:relax=0.8/0.8:color | 39,474 env-steps/s | blocks 39,507, 39,366, 39,474 |
+| 3:1.25:relax=0.8/0.8:color | 51,068 env-steps/s | blocks 51,068, 51,017, 51,163 |
+| 4:1.25:relax=1.0/0.5:color | 39,254 env-steps/s | blocks 39,028, 39,254, 39,300 |
+| 4:1.25:solverdrive | 98,404 env-steps/s | blocks 99,120, 98,404, 98,319 |
+| 4:1.25:relax=0.5/0.4 | 100,667 env-steps/s | blocks 101,263, 100,484, 100,667 |
+| 4:1.25 | 100,831 env-steps/s | blocks 101,790, 100,831, 100,590 |
+Thu Sep 24 22:48:41 PDT 2026
+holder: {"name": "newton_fork_throughput", "kind": "timing", "minutes": 15.0, "pid": 69599, "start": 1790315229.285631}
+  waiting [timing] camera_update_3e est 5.0 min, queued 445 s ago
+  waiting [timing] contact_tuning_bench_oldcollider est 8.0 min, queued 96 s ago
+  waiting [train] g1_flat_newton0625_ppo_fixed est 45.0 min, queued 2362 s ago
+  waiting [train] g1_flat_ppowarp_fixed_flatcfg est 70.0 min, queued 445 s ago
+  waiting [train] g1_terms_tuning_default est 8.0 min, queued 385 s ago

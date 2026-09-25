@@ -1,6 +1,6 @@
 """Physics-only throughput of the Newton fork's options on Metal: graph replay of one 50 Hz control step
 (NewtonSim.step), N envs (default 4096), env-steps/s, median of 3 blocks of 20 steps after warm-up.
-Configs: IT:DT_MS[:relax=L/A][:color][:extra=K][:solverdrive], e.g. 4:1.25  4:0.625  4:1.25:relax=0.8/0.8:color
+Configs: IT:DT_MS[:relax=L/A][:color][:extra=K][:solverdrive][:mode=pd|implicit|compliance], e.g. 4:1.25  4:0.625  4:1.25:relax=0.8/0.8:color
 Run through the GPU queue: scripts/gpu_run.sh NAME timing 15 -- .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/throughput.py ..."""
 import sys, time, inspect, numpy as np, warp as wp, newton
 wp.config.quiet = True
@@ -31,6 +31,7 @@ for cfg in args:
         elif x == "color": skw["joint_coloring"] = True
         elif x.startswith("extra="): skw["joint_extra_iterations"] = int(x[6:])
         elif x == "solverdrive": solverdrive = True; skw["joint_drive_mode"] = "pd"
+        elif x.startswith("mode="): skw["joint_drive_mode"] = x[5:]
     _X = newton.solvers.SolverXPBD
     class _XR(_X):
         def __init__(self, mm, **k):
@@ -42,6 +43,7 @@ for cfg in args:
         if solverdrive:
             M, act = sim.model, sim.actuator
             M.joint_target_ke.assign(act.kp.numpy()); M.joint_target_kd.assign(act.kd.numpy()); act.kp.zero_(); act.kd.zero_()
+            sim.solver.notify_model_changed(newton.ModelFlags.JOINT_DOF_PROPERTIES)
             qs, qds = M.joint_q_start.numpy(), M.joint_qd_start.numpy()
             rev = [j for j in range(M.joint_count) if qds[j + 1] - qds[j] == 1]
             dof = wp.array([int(qds[j]) for j in rev], dtype=int, device=sim.device); coord = wp.array([int(qs[j]) for j in rev], dtype=int, device=sim.device)

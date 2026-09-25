@@ -1,0 +1,44 @@
+# final throughput, 4096 envs, Metal, physics-only graph replay of one 50 Hz step; dev = upstream/newton-dev (refactor + vectorized drive rows)
+Thu Sep 24 23:28:29 PDT 2026
+holder: {"name": "newton_reward_terms", "kind": "timing", "minutes": 12.0, "pid": 77152, "start": 1790317595.849678}
+  waiting [render] stage_videos_round2 est 10.0 min, queued 590 s ago
+  waiting [train] g1_flat_ppowarp_fixed_flatcfg est 70.0 min, queued 2833 s ago
+  waiting [train] g1_terms_tuning_default est 8.0 min, queued 2773 s ago
+  waiting [train] g1_terms_oldcollider_default est 8.0 min, queued 2168 s ago
+  waiting [train] camera_cartpole_fast est 20.0 min, queued 2166 s ago
+  waiting [train] g1_preflight_tuned_recommended est 12.0 min, queued 2160 s ago
+holder: {"name": "newton_fork_throughput3", "kind": "timing", "minutes": 15.0, "pid": 77710, "start": 1790317859.690592}
+  waiting [timing] newton_stability_sweep_a est 15.0 min, queued 1 s ago
+  waiting [render] stage_videos_round2 est 10.0 min, queued 740 s ago
+  waiting [train] g1_flat_ppowarp_fixed_flatcfg est 70.0 min, queued 2984 s ago
+  waiting [train] g1_terms_tuning_default est 8.0 min, queued 2923 s ago
+  waiting [train] g1_terms_oldcollider_default est 8.0 min, queued 2319 s ago
+  waiting [train] camera_cartpole_fast est 20.0 min, queued 2316 s ago
+  waiting [train] g1_preflight_tuned_recommended est 12.0 min, queued 2311 s ago
+Thu Sep 24 23:30:59 PDT 2026
+$ .venv/bin/python scripts/diagnostics/newton_fork/throughput.py 4:1.25 4:0.625  (pinned upstream)
+newton at /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/__init__.py, fork False, N 4096
+| 4:1.25 | 149,795 env-steps/s | blocks 150,245, 148,875, 149,795 |
+| 4:0.625 | 73,814 env-steps/s | blocks 73,865, 73,402, 73,814 |
+$ PYTHONPATH=upstream/newton-dev .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/throughput.py ...
+newton at /Users/aditya/robosim/upstream/newton-dev/newton/__init__.py, fork True, N 4096
+| 4:1.25 | 128,839 env-steps/s | blocks 128,851, 127,958, 128,839 |
+| 4:1.25:mode=compliance | 139,062 env-steps/s | blocks 139,103, 138,154, 139,062 |
+| 4:1.25:solverdrive | 82,222 env-steps/s | blocks 82,652, 82,090, 82,222 |
+| 4:0.625 | 64,474 env-steps/s | blocks 64,504, 63,969, 64,474 |
+| 4:0.625:solverdrive | 40,740 env-steps/s | blocks 41,142, 40,740, 40,662 |
+| 4:1.25:extra=2 | 100,940 env-steps/s | blocks 100,940, 100,461, 100,965 |
+| 4:1.25:extra=4 | 83,351 env-steps/s | blocks 83,414, 82,997, 83,351 |
+| 4:1.25:extra=2:solverdrive | 60,805 env-steps/s | blocks 61,220, 60,805, 60,749 |
+| 4:1.25:relax=0.8/0.8:color | 54,636 env-steps/s | blocks 54,917, 54,636, 54,513 |
+$ pinned again
+| 4:1.25 | 147,902 env-steps/s | blocks 148,067, 146,875, 147,902 |
+Thu Sep 24 23:32:07 PDT 2026
+holder: {"name": "newton_fork_throughput3", "kind": "timing", "minutes": 15.0, "pid": 77710, "start": 1790317859.690592}
+  waiting [timing] newton_stability_sweep_a est 15.0 min, queued 68 s ago
+  waiting [render] stage_videos_round2 est 10.0 min, queued 808 s ago
+  waiting [train] g1_flat_ppowarp_fixed_flatcfg est 70.0 min, queued 3051 s ago
+  waiting [train] g1_terms_tuning_default est 8.0 min, queued 2991 s ago
+  waiting [train] g1_terms_oldcollider_default est 8.0 min, queued 2386 s ago
+  waiting [train] camera_cartpole_fast est 20.0 min, queued 2384 s ago
+  waiting [train] g1_preflight_tuned_recommended est 12.0 min, queued 2379 s ago
