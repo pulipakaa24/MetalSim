@@ -35,6 +35,7 @@ def main():
     ap.add_argument("--ckpt", required=True); ap.add_argument("--out", required=True); ap.add_argument("--label", default="")
     ap.add_argument("--isaac_meta", default=None, help="meta.json of the Isaac recording (camera/lights); defaults to <isaac>/../../rt/meta.json")
     ap.add_argument("--physics_dt", type=float, default=0.0025); ap.add_argument("--spp", type=int, default=16); ap.add_argument("--passes", type=int, default=4)
+    ap.add_argument("--tier2_mode", default="rtx", help="tier-2 preset (metalsim.render.rtx_parity): rtx = RTX-parity default, legacy = before 2026-09-25")
     a = ap.parse_args(); wp.config.quiet = True
     meta_path = a.isaac_meta or os.path.join(a.isaac, "..", "..", "rt", "meta.json")
     meta = json.load(open(meta_path)); pmeta = json.load(open(os.path.join(a.isaac, "meta.json")))
@@ -54,7 +55,8 @@ def main():
     pol_of_ours = np.array([pol_joints.index(n) for n in our_joints]); ours_of_pol = np.array([our_joints.index(n) for n in pol_joints])
     perm_obs = torch.as_tensor(ours_of_pol, device="mps"); perm_act = torch.as_tensor(pol_of_ours, device="mps")
     cam = meta["camera"]
-    rend = Tier2Renderer(hero, 1, width=cam["width"], height=cam["height"], camera="hero", spp=a.spp, max_bounces=3)
+    from metalsim.parity.record_g1 import tier2_parity_kwargs
+    rend = Tier2Renderer(hero, 1, width=cam["width"], height=cam["height"], camera="hero", spp=a.spp, max_bounces=3, **tier2_parity_kwargs(meta, a.tier2_mode))
     # deterministic start: Isaac's default state at the origin, command (0.5, 0, 0)
     task.origins.assign(np.zeros((1, 3), np.float32)); task.reset_all()
     q0 = hero.key_qpos[0].astype(np.float32); task.sim.t.qpos.copy_(torch.as_tensor(q0)[None]); task.sim.t.qvel.zero_()

@@ -59,8 +59,16 @@ class CartpoleRGBConfig:
     seed: int = 0
     render: bool = True
     tier: int = 0          # 0 raster, 1 hybrid RT (fragment-stage rays), 2 path tracer
-    spp: int = 1           # tier 2: paths per pixel per step
+    spp: int | None = None # tier 2: paths per pixel per step (None: 4 in the physical mode, 1 in legacy)
     max_bounces: int = 2   # tier 2
+    # tier 2 shading: "physical" = MDL-layered OmniPBR BRDF, 0.53-degree sun disk, RTX display transform (ACES + sRGB),
+    # 4 spp, no denoiser (best fidelity per ms at 1024 envs, docs/research/rendering_vs_rtx_2026-09-25.md §3.3);
+    # "legacy" = the renderer before 2026-09-25 (linear clamp, delta sun, 1 spp)
+    render_mode: str = "physical"
+    # physical mode: linear exposure before ACES + sRGB. MuJoCo scenes are authored for a linear-clamp display; 1.0
+    # washes this one out (mean 186 vs 95, contrast halved, and PPO did not learn in 10 iterations); 0.25 maps its
+    # mid-grey (radiance ~0.37) to the same display value as before
+    tier2_exposure: float = 0.25
 
 
 class CartpoleRGBEnv:
@@ -74,9 +82,14 @@ class CartpoleRGBEnv:
         if not self.cfg.render:
             self.rend = None
         elif self.cfg.tier == 2:
-            from metalsim.render.tier2 import Tier2Renderer
+            from metalsim.render.tier2 import Tier2Renderer, mujoco_scene_kwargs
+            phys = self.cfg.render_mode == "physical"
+            if self.cfg.render_mode not in ("physical", "legacy"):
+                raise ValueError(f"render_mode {self.cfg.render_mode!r}")
+            spp = self.cfg.spp if self.cfg.spp is not None else (4 if phys else 1)
             self.rend = Tier2Renderer(self.model, self.n, width=self.cfg.width, height=self.cfg.height, camera="cam",
-                                      spp=self.cfg.spp, max_bounces=self.cfg.max_bounces, seed=self.cfg.seed)
+                                      spp=spp, max_bounces=self.cfg.max_bounces, seed=self.cfg.seed,
+                                      **(mujoco_scene_kwargs(self.model, exposure=self.cfg.tier2_exposure) if phys else {}))
         else:
             self.rend = Tier0Renderer(self.model, self.n, width=self.cfg.width, height=self.cfg.height, camera="cam",
                                       outputs=("rgb",), tier=self.cfg.tier)
@@ -151,10 +164,10 @@ class CartpoleRGBEnv:
         torch.mps.synchronize()
 
 
-def benchmark(n=1024, steps=200, render=True, tier=0, spp=1, max_bounces=2):
+def benchmark(n=1024, steps=200, render=True, tier=0, spp=None, max_bounces=2, render_mode="physical"):
     """Isaac Lab's benchmark_non_rl methodology: env-steps/s of step (physics + render + reward/reset)."""
     import time
-    env = CartpoleRGBEnv(CartpoleRGBConfig(num_envs=n, render=render, tier=tier, spp=spp, max_bounces=max_bounces))
+    env = CartpoleRGBEnv(CartpoleRGBConfig(num_envs=n, render=render, tier=tier, spp=spp, max_bounces=max_bounces, render_mode=render_mode))
     env.reset()
     a = torch.zeros(n, 1, device="mps")
     for _ in range(5):
@@ -174,5 +187,5 @@ if __name__ == "__main__":
     print(f"Cartpole (state only), N={n}: {benchmark(n, render=False):,.0f} env-steps/s")
     print(f"Cartpole-RGB 100x100 tier 0, N={n}: {benchmark(n, render=True):,.0f} env-steps/s  (Isaac Lab, RTX 4090, published: 50,000 step-only)")
     print(f"Cartpole-RGB 100x100 tier 1, N={n}: {benchmark(n, render=True, tier=1):,.0f} env-steps/s")
-    for spp, nb in ((1, 1), (1, 2), (4, 2)):
-        print(f"Cartpole-RGB 100x100 tier 2 (spp {spp}, bounces {nb}), N={n}: {benchmark(n, steps=50, render=True, tier=2, spp=spp, max_bounces=nb):,.0f} env-steps/s")
+    for mode, spp, nb in (("legacy", 1, 1), ("legacy", 1, 2), ("legacy", 4, 2), ("physical", 4, 2)):
+        print(f"Cartpole-RGB 100x100 tier 2 {mode} (spp {spp}, bounces {nb}), N={n}: {benchmark(n, steps=50, render=True, tier=2, spp=spp, max_bounces=nb, render_mode=mode):,.0f} env-steps/s")

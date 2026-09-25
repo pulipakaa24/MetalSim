@@ -232,6 +232,24 @@ At the RL budget samples beat denoising: 4 spp without a denoiser (38.6 ms) is 5
 with the best denoiser (24.5 ms). The in-command-buffer à-trous filter is the cheap batched option at 1 spp (+1.4 dB
 for +13 ms at 1024 envs), OIDN's is 10× the render cost at this size. Sun disk and tone map cost 0.2 ms per batch.
 
+**Applied to camera RL (2026-09-25, follow-up).** `CartpoleRGBConfig.render_mode="physical"` is now the tier-2
+default: MDL-layered OmniPBR BRDF, 0.53° sun disk, ACES + sRGB with `tier2_exposure` 0.25, 4 spp, no denoiser
+(`render_mode="legacy"` restores the old path, 1 spp). Measured (`runs/render_parity/job8b.log`, `job9.log`, `job10.log`):
+
+| | env step, 1024 envs (physics + render + reward) | PPO incl. training, 10 it. | return at it. 5 / 10 |
+|---|---|---|---|
+| legacy, 1 spp | 30.5 ms (33,615 env-steps/s) | 11,301 env-steps/s | 24.8 / 45.7 |
+| legacy, 4 spp | 56.9 ms | – | – |
+| physical, 4 spp, exposure 1.0 | 56.9 ms | 7,561 | 9.3 / 6.7 (**no learning**: image mean 186 vs 95, contrast halved) |
+| **physical, 4 spp, exposure 0.25 (default)** | 56.9 ms | 8,809 | 29.5 / 45.7 |
+
+Exposure 1.0 washes out a scene authored for a linear-clamp display; 0.25 maps its mid-grey to the old display value
+and the learning signal matches the legacy run over the first 10 iterations (same seed). Cost: +26 ms per 1024-env
+step, all from 4 spp (the tone map and sun disk are free); −22 % end-to-end PPO throughput.
+
+**Gallery videos** (`docs/gallery/g1_stage_*.mp4`, 12 files, via `scripts/gallery/g1_stage_videos.sh` + round 2):
+re-rendered with `metalsim.parity.side_by_side --tier2_mode rtx` (preset `oidn_cal_fvg`, 16 spp × 4 passes).
+
 ### 3.4 Protocol replay (physics re-simulated, `runs/parity/metalsim2`, reports `runs/parity/report_{rt4,pt4}`)
 
 | | whole frame PSNR / SSIM / LPIPS / FLIP | robot, states agreeing (IoU > 0.7): PSNR / SSIM / LPIPS / FLIP (brightness-matched PSNR) | n | robot depth RMSE |
