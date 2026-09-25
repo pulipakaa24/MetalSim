@@ -478,6 +478,23 @@ def _touch(count: wp.array[int], shape0: wp.array[int], shape1: wp.array[int], f
                 wp.atomic_add(sensordata, shape_env[sh], adr[slot], f)
 
 
+@wp.kernel
+def _touch_hist_max(count: wp.array[int], shape0: wp.array[int], shape1: wp.array[int], force: wp.array[wp.spatial_vector],
+                    shape_slot: wp.array[int], shape_env: wp.array[int], slot_sel: int, hist: wp.array[float]):
+    """Running max over substeps of the per-env summed contact force on one touch slot (contact history)."""
+    k = wp.tid()
+    if k >= count[0]:
+        return
+    f = wp.length(wp.spatial_top(force[k]))
+    for s in range(2):
+        sh = shape0[k]
+        if s == 1:
+            sh = shape1[k]
+        if sh >= 0:
+            if shape_slot[sh] == slot_sel:
+                wp.atomic_max(hist, shape_env[sh], f)
+
+
 class _NewtonData:
     """MuJoCo-layout arrays the task kernels use (subset of mujoco_warp.Data)."""
 
@@ -542,6 +559,10 @@ class NewtonSim:
             d.foot_vel = z((n, 2), dtype=wp.vec3); d.ctrl = z((n, mj.nu))   # feet: world linear velocity of the body origin
             d.ctrl.assign(np.tile(mj.key_qpos[0][7:], (n, 1)).astype(np.float32))
             self._reset_mask = z(n, dtype=wp.bool)
+        # optional contact history (Isaac's ContactSensor history): per-env max over the last ``hist_substeps``
+        # substeps of the contact force on touch slot ``hist_slot`` (2 = torso), written to ``hist_out``.
+        # Per-contact max, not the per-shape sum, on the substeps before the last (summed on the last).
+        self.hist_out, self.hist_substeps, self.hist_slot = None, 0, 2
         self.event = wm.SharedEvent(device, "metalsim.physics.newton")
         self._wm = wm
 
@@ -558,6 +579,14 @@ class NewtonSim:
                 self.pipeline.collide(self.s0, self.contacts)
                 self.solver.step(self.s0, self.s1, self.control, self.contacts, self.dt_phys)
                 self.s0, self.s1 = self.s1, self.s0
+                j = k - (self.substeps - self.hist_substeps)
+                if self.hist_out is not None and j >= 0:
+                    if j == 0:
+                        self.hist_out.zero_()
+                    self.solver.update_contacts(self.contacts)
+                    wp.launch(_touch_hist_max, dim=self.contacts.rigid_contact_max, inputs=[self.contacts.rigid_contact_count,
+                              self.contacts.rigid_contact_shape0, self.contacts.rigid_contact_shape1, self.contacts.force,
+                              self.shape_slot, self.shape_env, self.hist_slot], outputs=[self.hist_out])
             self.solver.update_contacts(self.contacts)
             self._sync_out()
 
