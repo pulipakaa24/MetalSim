@@ -211,7 +211,12 @@ transfer directly: Isaac's PhysX-trained policies at iterations 500 / 1000 / 149
 in both directions (iteration 500 stands in Isaac, falls in MetalSim; 1000 and 1500 the reverse),
 consistent with the repeated-noise defect in the old rollout. **A policy trained in PhysX behaves the
 same in MetalSim's MuJoCo Warp physics** is the strongest single parity statement this document can
-make so far; it is measured on one asset, one task, four checkpoints, one seed. The same test on
+make so far; it is measured on one asset, one task, four checkpoints, one seed. Round two with the fixed learner's own checkpoints (`docs/gallery/g1_stage_metalsim_fixed_it*.mp4`,
+recorded 2026-09-25; MetalSim side on the corrected collider 284dcd1): iteration 1000 walks 3.90 m in
+Isaac's PhysX and 4.06 m in MetalSim, upright in both (pelvis 0.67 / 0.69 m); iteration 500 3.27 vs
+4.16 m; iteration 300 stands in PhysX (0.05 m) but walks here (3.46 m); iteration 100 falls in both.
+So the transfer holds in both directions once a policy tracks the command, with an early-gait
+exception at iteration 300. The same test on
 Newton XPBD (`runs/newton_transfer.log`, pinned upstream build, mean of 4 envs): Isaac's 500 / 1000 /
 1499 checkpoints travel 4.48 / 4.35 / 4.14 m at 4 it. / 1.25 ms and 4.02 / 3.95 / 3.83 m at 0.625 ms,
 against Isaac's 3.19 / 3.02 / 3.11 m and MuJoCo Warp's 3.02 / 2.93 / 3.19 m; all engines keep the
