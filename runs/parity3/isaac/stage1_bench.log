@@ -1,0 +1,186 @@
++ mkdir -p /home/aditya_nianticspatial_com/parity3/bench
++ '[' '!' -f /home/aditya_nianticspatial_com/parity3/fidelity/newton_mjwarp/DONE ']'
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ rm -rf /home/aditya_nianticspatial_com/parity3/fidelity/newton_mjwarp
+++ date +%s
++ t0=1790357905
++ timeout 3600 python /home/aditya_nianticspatial_com/parity3_scripts/record_g1.py --out /home/aditya_nianticspatial_com/parity3/fidelity/newton_mjwarp --frame_every 5 --viz none physics=newton_mjwarp
+++ date +%s
++ echo 'fidelity newton_mjwarp retry exit 0 in 85 s'
+fidelity newton_mjwarp retry exit 0 in 85 s
++ for TASK in Isaac-Velocity-Flat-G1 Isaac-Velocity-Rough-G1
++ for B in newton_mjwarp isaacsim_physx
++ for V in a b c
++ case $V in
++ X='--num_steps 1000 --warmup_steps 50'
++ d=/home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_newton_mjwarp_a
++ mkdir -p /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_newton_mjwarp_a
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
+++ date +%s
++ t0=1790357990
++ timeout 5400 isaaclab benchmark runtime --task Isaac-Velocity-Flat-G1 --num_envs 4096 --seed 0 --num_steps 1000 --warmup_steps 50 --output_path /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_newton_mjwarp_a --benchmark_formatter schema,summary,json --viz none physics=newton_mjwarp env.commands.base_velocity.debug_vis=false
++ tee -a /home/aditya_nianticspatial_com/parity3/bench/summary.txt
+++ date +%s
++ echo 'bench Isaac-Velocity-Flat-G1 newton_mjwarp a exit 0 in 90 s'
+bench Isaac-Velocity-Flat-G1 newton_mjwarp a exit 0 in 90 s
++ for V in a b c
++ case $V in
++ X='--num_steps 1000 --warmup_steps 50 --measure_sync_step'
++ d=/home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_newton_mjwarp_b
++ mkdir -p /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_newton_mjwarp_b
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
+++ date +%s
++ t0=1790358080
++ timeout 5400 isaaclab benchmark runtime --task Isaac-Velocity-Flat-G1 --num_envs 4096 --seed 0 --num_steps 1000 --warmup_steps 50 --measure_sync_step --output_path /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_newton_mjwarp_b --benchmark_formatter schema,summary,json --viz none physics=newton_mjwarp env.commands.base_velocity.debug_vis=false
++ tee -a /home/aditya_nianticspatial_com/parity3/bench/summary.txt
+++ date +%s
++ echo 'bench Isaac-Velocity-Flat-G1 newton_mjwarp b exit 0 in 91 s'
+bench Isaac-Velocity-Flat-G1 newton_mjwarp b exit 0 in 91 s
++ for V in a b c
++ case $V in
++ X='--num_steps 100 --warmup_steps 0'
++ d=/home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_newton_mjwarp_c
++ mkdir -p /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_newton_mjwarp_c
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
+++ date +%s
++ t0=1790358171
++ timeout 5400 isaaclab benchmark runtime --task Isaac-Velocity-Flat-G1 --num_envs 4096 --seed 0 --num_steps 100 --warmup_steps 0 --output_path /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_newton_mjwarp_c --benchmark_formatter schema,summary,json --viz none physics=newton_mjwarp env.commands.base_velocity.debug_vis=false
++ tee -a /home/aditya_nianticspatial_com/parity3/bench/summary.txt
+++ date +%s
++ echo 'bench Isaac-Velocity-Flat-G1 newton_mjwarp c exit 0 in 34 s'
+bench Isaac-Velocity-Flat-G1 newton_mjwarp c exit 0 in 34 s
++ for B in newton_mjwarp isaacsim_physx
++ for V in a b c
++ case $V in
++ X='--num_steps 1000 --warmup_steps 50'
++ d=/home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_isaacsim_physx_a
++ mkdir -p /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_isaacsim_physx_a
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
+++ date +%s
++ t0=1790358205
++ timeout 5400 isaaclab benchmark runtime --task Isaac-Velocity-Flat-G1 --num_envs 4096 --seed 0 --num_steps 1000 --warmup_steps 50 --output_path /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_isaacsim_physx_a --benchmark_formatter schema,summary,json --viz none physics=isaacsim_physx env.commands.base_velocity.debug_vis=false
++ tee -a /home/aditya_nianticspatial_com/parity3/bench/summary.txt
+++ date +%s
++ echo 'bench Isaac-Velocity-Flat-G1 isaacsim_physx a exit 0 in 300 s'
+bench Isaac-Velocity-Flat-G1 isaacsim_physx a exit 0 in 300 s
++ for V in a b c
++ case $V in
++ X='--num_steps 1000 --warmup_steps 50 --measure_sync_step'
++ d=/home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_isaacsim_physx_b
++ mkdir -p /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_isaacsim_physx_b
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
+++ date +%s
++ t0=1790358505
++ timeout 5400 isaaclab benchmark runtime --task Isaac-Velocity-Flat-G1 --num_envs 4096 --seed 0 --num_steps 1000 --warmup_steps 50 --measure_sync_step --output_path /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_isaacsim_physx_b --benchmark_formatter schema,summary,json --viz none physics=isaacsim_physx env.commands.base_velocity.debug_vis=false
++ tee -a /home/aditya_nianticspatial_com/parity3/bench/summary.txt
+++ date +%s
++ echo 'bench Isaac-Velocity-Flat-G1 isaacsim_physx b exit 0 in 293 s'
+bench Isaac-Velocity-Flat-G1 isaacsim_physx b exit 0 in 293 s
++ for V in a b c
++ case $V in
++ X='--num_steps 100 --warmup_steps 0'
++ d=/home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_isaacsim_physx_c
++ mkdir -p /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_isaacsim_physx_c
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
+++ date +%s
++ t0=1790358798
++ timeout 5400 isaaclab benchmark runtime --task Isaac-Velocity-Flat-G1 --num_envs 4096 --seed 0 --num_steps 100 --warmup_steps 0 --output_path /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_isaacsim_physx_c --benchmark_formatter schema,summary,json --viz none physics=isaacsim_physx env.commands.base_velocity.debug_vis=false
++ tee -a /home/aditya_nianticspatial_com/parity3/bench/summary.txt
+++ date +%s
++ echo 'bench Isaac-Velocity-Flat-G1 isaacsim_physx c exit 0 in 206 s'
+bench Isaac-Velocity-Flat-G1 isaacsim_physx c exit 0 in 206 s
++ for TASK in Isaac-Velocity-Flat-G1 Isaac-Velocity-Rough-G1
++ for B in newton_mjwarp isaacsim_physx
++ for V in a b c
++ case $V in
++ X='--num_steps 1000 --warmup_steps 50'
++ d=/home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_newton_mjwarp_a
++ mkdir -p /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_newton_mjwarp_a
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
+++ date +%s
++ t0=1790359004
++ timeout 5400 isaaclab benchmark runtime --task Isaac-Velocity-Rough-G1 --num_envs 4096 --seed 0 --num_steps 1000 --warmup_steps 50 --output_path /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_newton_mjwarp_a --benchmark_formatter schema,summary,json --viz none physics=newton_mjwarp env.commands.base_velocity.debug_vis=false
++ tee -a /home/aditya_nianticspatial_com/parity3/bench/summary.txt
+++ date +%s
++ echo 'bench Isaac-Velocity-Rough-G1 newton_mjwarp a exit 0 in 140 s'
+bench Isaac-Velocity-Rough-G1 newton_mjwarp a exit 0 in 140 s
++ for V in a b c
++ case $V in
++ X='--num_steps 1000 --warmup_steps 50 --measure_sync_step'
++ d=/home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_newton_mjwarp_b
++ mkdir -p /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_newton_mjwarp_b
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
+++ date +%s
++ t0=1790359144
++ timeout 5400 isaaclab benchmark runtime --task Isaac-Velocity-Rough-G1 --num_envs 4096 --seed 0 --num_steps 1000 --warmup_steps 50 --measure_sync_step --output_path /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_newton_mjwarp_b --benchmark_formatter schema,summary,json --viz none physics=newton_mjwarp env.commands.base_velocity.debug_vis=false
++ tee -a /home/aditya_nianticspatial_com/parity3/bench/summary.txt
+++ date +%s
++ echo 'bench Isaac-Velocity-Rough-G1 newton_mjwarp b exit 0 in 125 s'
+bench Isaac-Velocity-Rough-G1 newton_mjwarp b exit 0 in 125 s
++ for V in a b c
++ case $V in
++ X='--num_steps 100 --warmup_steps 0'
++ d=/home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_newton_mjwarp_c
++ mkdir -p /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_newton_mjwarp_c
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
+++ date +%s
++ t0=1790359269
++ timeout 5400 isaaclab benchmark runtime --task Isaac-Velocity-Rough-G1 --num_envs 4096 --seed 0 --num_steps 100 --warmup_steps 0 --output_path /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_newton_mjwarp_c --benchmark_formatter schema,summary,json --viz none physics=newton_mjwarp env.commands.base_velocity.debug_vis=false
++ tee -a /home/aditya_nianticspatial_com/parity3/bench/summary.txt
+++ date +%s
++ echo 'bench Isaac-Velocity-Rough-G1 newton_mjwarp c exit 0 in 42 s'
+bench Isaac-Velocity-Rough-G1 newton_mjwarp c exit 0 in 42 s
++ for B in newton_mjwarp isaacsim_physx
++ for V in a b c
++ case $V in
++ X='--num_steps 1000 --warmup_steps 50'
++ d=/home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_a
++ mkdir -p /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_a
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
+++ date +%s
++ t0=1790359311
++ timeout 5400 isaaclab benchmark runtime --task Isaac-Velocity-Rough-G1 --num_envs 4096 --seed 0 --num_steps 1000 --warmup_steps 50 --output_path /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_a --benchmark_formatter schema,summary,json --viz none physics=isaacsim_physx env.commands.base_velocity.debug_vis=false
++ tee -a /home/aditya_nianticspatial_com/parity3/bench/summary.txt
+++ date +%s
++ echo 'bench Isaac-Velocity-Rough-G1 isaacsim_physx a exit 0 in 330 s'
+bench Isaac-Velocity-Rough-G1 isaacsim_physx a exit 0 in 330 s
++ for V in a b c
++ case $V in
++ X='--num_steps 1000 --warmup_steps 50 --measure_sync_step'
++ d=/home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_b
++ mkdir -p /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_b
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
+++ date +%s
++ t0=1790359641
++ timeout 5400 isaaclab benchmark runtime --task Isaac-Velocity-Rough-G1 --num_envs 4096 --seed 0 --num_steps 1000 --warmup_steps 50 --measure_sync_step --output_path /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_b --benchmark_formatter schema,summary,json --viz none physics=isaacsim_physx env.commands.base_velocity.debug_vis=false
++ tee -a /home/aditya_nianticspatial_com/parity3/bench/summary.txt
+++ date +%s
++ echo 'bench Isaac-Velocity-Rough-G1 isaacsim_physx b exit 0 in 323 s'
+bench Isaac-Velocity-Rough-G1 isaacsim_physx b exit 0 in 323 s
++ for V in a b c
++ case $V in
++ X='--num_steps 100 --warmup_steps 0'
++ d=/home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_c
++ mkdir -p /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_c
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
+++ date +%s
++ t0=1790359964
++ timeout 5400 isaaclab benchmark runtime --task Isaac-Velocity-Rough-G1 --num_envs 4096 --seed 0 --num_steps 100 --warmup_steps 0 --output_path /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_c --benchmark_formatter schema,summary,json --viz none physics=isaacsim_physx env.commands.base_velocity.debug_vis=false
++ tee -a /home/aditya_nianticspatial_com/parity3/bench/summary.txt
+++ date +%s
++ echo 'bench Isaac-Velocity-Rough-G1 isaacsim_physx c exit 0 in 211 s'
+bench Isaac-Velocity-Rough-G1 isaacsim_physx c exit 0 in 211 s
++ touch /home/aditya_nianticspatial_com/parity3/BENCH_DONE

@@ -1,0 +1,158 @@
+{
+  "run": {
+    "run_id": "runtime_newton_mjwarp_Isaac-Velocity-Flat-G1_20260925T174248_seed0",
+    "framework": null,
+    "config": {
+      "physics_backend": "newton_mjwarp",
+      "rendering_backend": "none",
+      "presets": []
+    },
+    "task": "Isaac-Velocity-Flat-G1",
+    "seed": 0,
+    "start_time_utc": "2026-09-25T17:41:23.676180+00:00",
+    "end_time_utc": "2026-09-25T17:42:48.680948+00:00",
+    "duration_s": 85.004768,
+    "status": "completed",
+    "num_envs": 4096,
+    "max_iterations": null
+  },
+  "versions": {
+    "isaaclab": "17.0.2",
+    "isaacsim": null,
+    "kit": null,
+    "newton": "1.5.2",
+    "warp": "1.16.0",
+    "mjwarp": "3.11.0",
+    "torch": "2.11.0+cu128",
+    "rsl_rl": "5.4.1",
+    "rl_games": null,
+    "skrl": null,
+    "sb3": null,
+    "git_commit": "ae37b028ea415c91ea2bc32609efcd759ed2b974",
+    "git_branch": "HEAD",
+    "git_dirty": false,
+    "numpy": "2.5.2",
+    "isaaclab_newton": "5.4.1",
+    "isaaclab_physx": "6.0.0",
+    "isaaclab_ov": "2.2.0",
+    "isaaclab_tasks": "18.0.1",
+    "isaaclab_rl": "0.16.3",
+    "ovrtx": null,
+    "ovphysx": null,
+    "mujoco": "3.11.0",
+    "cuda_bindings": "12.9.7",
+    "usd_core": null,
+    "usd_exchange": "2.3.0",
+    "isaaclab_release": null
+  },
+  "hardware": {
+    "hostname": "aditya-isaac.us-west1-a.c.mcmc-193822.internal",
+    "gpu_devices": [
+      {
+        "name": "NVIDIA L4",
+        "mem_gb": 22.03,
+        "compute_cap": "8.9"
+      }
+    ],
+    "cpu_name": "Intel(R) Xeon(R) CPU @ 2.20GHz",
+    "cpu_count": 16,
+    "ram_gb": 62.79
+  },
+  "runtime": {
+    "startup_time_s": {
+      "app_launch": 0.001708551,
+      "env_creation": 18.673200178,
+      "first_step": 0.351366054,
+      "python_imports": 2.456031286,
+      "task_config": 0.706874673
+    },
+    "iterations_completed": 1000,
+    "total_wall_time_s": 61.091350561,
+    "steps_per_iteration": 4096,
+    "iteration_time_s": {
+      "mean": 0.061091350561,
+      "std": 0.0007320779650230954,
+      "peak": 0.066095653
+    },
+    "collection_fps": {
+      "mean": 67047.13453519292,
+      "std": 792.6131590090527,
+      "peak": 68955.22248858758
+    },
+    "total_fps": {
+      "mean": 67047.13453519292,
+      "std": 792.6131590090527,
+      "peak": 68955.22248858758
+    },
+    "iterations_per_s": {
+      "mean": 16.368929329881084,
+      "std": 0.1935090720236945,
+      "peak": 16.834771115377826
+    },
+    "environment_step_timing": {
+      "environment_step_time_s": {
+        "mean": 0.06101630528699934,
+        "std": 0.0007287855012225597,
+        "peak": 0.06600160900006813
+      },
+      "environment_step_fps": {
+        "mean": 67129.5972565669,
+        "std": 791.1065800253871,
+        "peak": 69042.54143161277
+      },
+      "simulation_step_time_s": {
+        "mean": 0.042037314584989875,
+        "std": 0.00027712981449928983,
+        "peak": 0.04319234700005836
+      },
+      "outside_simulation_step_time_s": {
+        "mean": 0.01897899070200947,
+        "std": 0.0006258698725745581,
+        "peak": 0.023301115000776917
+      },
+      "outside_simulation_step_fraction": 0.3110478520903378,
+      "environment_step_calls": 1000,
+      "simulation_step_calls": 4000,
+      "measurement_mode": "serialized_synchronized",
+      "warmup_steps": 50
+    }
+  },
+  "resources": {
+    "gpu_util_pct": {
+      "mean": 70.19,
+      "std": 5.13,
+      "peak": null
+    },
+    "gpu_mem_gb": {
+      "mean": 1.65,
+      "std": 0.0,
+      "peak": 1.65
+    },
+    "cpu_util_pct": {
+      "mean": 101.58305084745761,
+      "std": 13.464937257909487,
+      "peak": null
+    },
+    "ram_gb": {
+      "mean": 2.48,
+      "std": 0.0,
+      "peak": 2.48
+    },
+    "devices": {
+      "0": {
+        "util_pct": {
+          "mean": 70.19,
+          "std": 5.13,
+          "peak": null
+        },
+        "mem_gb": {
+          "mean": 1.65,
+          "std": 0.0,
+          "peak": 1.65
+        }
+      }
+    }
+  },
+  "extra": null,
+  "schema_version": "1.4"
+}

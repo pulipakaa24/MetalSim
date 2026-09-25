@@ -1,0 +1,359 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1790359645.389103   14452 descriptor_database.cc:633] File already exists in database: grpc/health/v1/health.proto
+W0000 00:00:1790359645.389168   14452 message.cc:301] Protobuf GeneratedMessageFactory: File is already registered: grpc/health/v1/health.proto
+[ISAACLAB] AppLauncher initialization complete
+[ISAACLAB] Kit version: 110.3.0+feature.371399.00c488ae.gl
+[ISAACLAB] Kit kernel:  210.3.2+release.14366.2926fc80.gl
+[ISAACLAB] Kit hash:    00c488ae
+[INFO]: Parsing configuration from: isaaclab_tasks.core.velocity.config.g1.rough_env_cfg:G1RoughEnvCfg
+[INFO]: Using metrics formatters = ['schema', 'summary', 'json']
+Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/isaacsim/kit/data/Kit/IsaacLab/3.0/user.config.json'
+2026-09-25T18:07:25Z [0ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
+2026-09-25T18:07:25Z [16ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.178.04    | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA L4                        | Yes: 0 |     | 23034   MB | 10de      | 0          |
+|     |                                  |        |     |            | 27b8      | e5ad23ce.. |
+|     |                                  |        |     |            | 0         |            |
+|=============================================================================================|
+| OS: 24.04.5 LTS (Noble Numbat) ubuntu, Version: 24.04.5, Kernel: 7.0.0-1011-gcp
+| Processor: Intel(R) Xeon(R) CPU @ 2.20GHz
+| Cores: 8 | Logical Cores: 16
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 64293 | Free Memory: 60708
+| Total Page/Swap (MB): 0 | Free Page/Swap: 0
+|---------------------------------------------------------------------------------------------|
+2026-09-25T18:07:27Z [1,915ms] [Warning] [omni.rtx] ECC is enabled on physical device 0
+2026-09-25T18:07:28Z [2,333ms] [Warning] [omni.log] Source: omni.hydra was already registered.
+2026-09-25T18:07:28Z [2,386ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.
+2026-09-25T18:07:28Z [2,386ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)
+2026-09-25T18:07:28Z [2,432ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.
+2026-09-25T18:07:28Z [2,432ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)
+2026-09-25T18:07:28Z [2,435ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.
+2026-09-25T18:07:28Z [2,435ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)
+2026-09-25T18:07:28Z [2,779ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxSettingsGlobalRtAdvancedAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,779ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxSettingsGlobalRtAdvancedAPI_1'
+2026-09-25T18:07:28Z [2,779ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxSettingsGlobalPtAdvancedAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,779ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxSettingsGlobalPtAdvancedAPI_1'
+2026-09-25T18:07:28Z [2,779ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxSettingsCommonAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,779ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxSettingsCommonAPI_1'
+2026-09-25T18:07:28Z [2,779ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxSettingsCommonAdvancedAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,779ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxSettingsCommonAdvancedAPI_1'
+2026-09-25T18:07:28Z [2,779ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxSettingsMinimalAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,779ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxSettingsMinimalAPI_1'
+2026-09-25T18:07:28Z [2,779ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxSettingsRtAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,779ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxSettingsRtAPI_1'
+2026-09-25T18:07:28Z [2,779ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxSettingsRtAdvancedAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,779ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxSettingsRtAdvancedAPI_1'
+2026-09-25T18:07:28Z [2,779ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxSettingsPtAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,779ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxSettingsPtAPI_1'
+2026-09-25T18:07:28Z [2,779ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxSettingsPtAdvancedAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,779ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxSettingsPtAdvancedAPI_1'
+2026-09-25T18:07:28Z [2,779ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxCameraExposureAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,779ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxCameraExposureAPI_1'
+2026-09-25T18:07:28Z [2,779ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxCameraAutoExposureAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,779ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxCameraAutoExposureAPI_1'
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxPostColorGradingAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxPostColorGradingAPI_1'
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxPostChromaticAberrationAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxPostChromaticAberrationAPI_1'
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxPostBloomPhysicalAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxPostBloomPhysicalAPI_1'
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxPostMatteObjectAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxPostMatteObjectAPI_1'
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxPostCompositingAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxPostCompositingAPI_1'
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxPostTonemapAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxPostTonemapAPI_1'
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxPostTonemapIrayReinhardAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxPostTonemapIrayReinhardAPI_1'
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxPostDofAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxPostDofAPI_1'
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxPostMotionBlurAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxPostMotionBlurAPI_1'
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxPostTvNoiseAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxPostTvNoiseAPI_1'
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxDebugSettingsAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxDebugSettingsAPI_1'
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxPostDebugSettingsAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxPostDebugSettingsAPI_1'
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxXrAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxXrAPI_1'
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] FindAppliedAPIPrimDefinition('OmniRtxSettingsParticleFieldAPI_1') returned nothing
+2026-09-25T18:07:28Z [2,780ms] [Error] [omni.rtx] Could not find UsdPrimDefinition for 'OmniRtxSettingsParticleFieldAPI_1'
+2026-09-25 18:07:29 [8,085ms] [WARNING] [isaacsim.benchmark.services.datarecorders.gpu_frametime] GPUFrametimeRecorder: Failed to initialize HydraEngineStats: No module named 'omni.hydra.engine'
+2026-09-25 18:07:29 [8,086ms] [INFO] [isaacsim.benchmark.services.datarecorders.physics_frametime] PhysicsFrametimeRecorder: Started collecting
+2026-09-25 18:07:29 [8,086ms] [INFO] [isaacsim.benchmark.services.datarecorders.render_frametime] RenderFrametimeRecorder: Started collecting
+2026-09-25 18:07:29 [8,086ms] [INFO] [isaacsim.benchmark.services.datarecorders.app_frametime] AppFrametimeRecorder: Started collecting
+2026-09-25 18:07:29 [8,086ms] [INFO] [isaacsim.benchmark.services.datarecorders.gpu_frametime] GPUFrametimeRecorder: Started collecting
+[INFO]: Starting
+[INFO]: Base environment:
+	Environment device    : cuda:0
+	Environment seed      : 0
+	Physics step-size     : 0.005
+	Rendering step-size   : 0.02
+	Environment step-size : 0.02
+[INFO] Generating terrains based on curriculum took Last: 2.810980 s
+[INFO]: Registered backend 'physx' for factory Articulation.
+[INFO]: Loading local copy of remote asset 'https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.1/Isaac/IsaacLab/Robots/Unitree/G1/g1_minimal.usd' from '/tmp/https/omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.1/Isaac/IsaacLab/Robots/Unitree/G1/g1_minimal.usd'.
+[INFO]: Registered backend 'physx' for factory RayCaster.
+[INFO]: Registered backend 'physx' for factory ContactSensor.
+[INFO]: Physics scene prim path: /physicsScene
+[INFO]: Time taken for scene creation Last: 29.632622 s, Mean: 29.632622 s, Std: 0.000000 s, N: 1
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 4096
+	Environment spacing   : 2.5
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : ['/World/ground']
+	Replicate physics     : True
+[INFO]: Simulation parameters for joints in /World/envs/env_[^/]+/Robot:
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+|                                                      Simulation Joint Information (Prim path: /World/envs/env_[^/]+/Robot)                                                      |
++-------+----------------------------+-----------+---------+----------+-----------------+------------------+------------------+-----------------+-----------------+---------------+
+| Index | Name                       | Stiffness | Damping | Armature | Static Friction | Dynamic Friction | Viscous Friction | Position Limits | Velocity Limits | Effort Limits |
++-------+----------------------------+-----------+---------+----------+-----------------+------------------+------------------+-----------------+-----------------+---------------+
+|   0   | left_hip_pitch_joint       |  200.000  |  5.000  |  0.010   |      0.000      |      0.000       |      0.000       | [-2.350, 3.050] |      32.000     |    300.000    |
+|   1   | right_hip_pitch_joint      |  200.000  |  5.000  |  0.010   |      0.000      |      0.000       |      0.000       | [-2.350, 3.050] |      32.000     |    300.000    |
+|   2   | torso_joint                |  200.000  |  5.000  |  0.010   |      0.000      |      0.000       |      0.000       | [-2.618, 2.618] |      32.000     |    300.000    |
+|   3   | left_hip_roll_joint        |  150.000  |  5.000  |  0.010   |      0.000      |      0.000       |      0.000       | [-0.260, 2.530] |      32.000     |    300.000    |
+|   4   | right_hip_roll_joint       |  150.000  |  5.000  |  0.010   |      0.000      |      0.000       |      0.000       | [-2.530, 0.260] |      32.000     |    300.000    |
+|   5   | left_shoulder_pitch_joint  |   40.000  |  10.000 |  0.010   |      0.000      |      0.000       |      0.000       | [-2.967, 2.792] |      53.000     |    300.000    |
+|   6   | right_shoulder_pitch_joint |   40.000  |  10.000 |  0.010   |      0.000      |      0.000       |      0.000       | [-2.967, 2.792] |      53.000     |    300.000    |
+|   7   | left_hip_yaw_joint         |  150.000  |  5.000  |  0.010   |      0.000      |      0.000       |      0.000       | [-2.750, 2.750] |      32.000     |    300.000    |
+|   8   | right_hip_yaw_joint        |  150.000  |  5.000  |  0.010   |      0.000      |      0.000       |      0.000       | [-2.750, 2.750] |      32.000     |    300.000    |
+|   9   | left_shoulder_roll_joint   |   40.000  |  10.000 |  0.010   |      0.000      |      0.000       |      0.000       | [-1.588, 2.251] |      53.000     |    300.000    |
+|   10  | right_shoulder_roll_joint  |   40.000  |  10.000 |  0.010   |      0.000      |      0.000       |      0.000       | [-2.251, 1.588] |      53.000     |    300.000    |
+|   11  | left_knee_joint            |  200.000  |  5.000  |  0.010   |      0.000      |      0.000       |      0.000       | [-0.335, 2.545] |      20.000     |    300.000    |
+|   12  | right_knee_joint           |  200.000  |  5.000  |  0.010   |      0.000      |      0.000       |      0.000       | [-0.335, 2.545] |      20.000     |    300.000    |
+|   13  | left_shoulder_yaw_joint    |   40.000  |  10.000 |  0.010   |      0.000      |      0.000       |      0.000       | [-2.618, 2.618] |      53.000     |    300.000    |
+|   14  | right_shoulder_yaw_joint   |   40.000  |  10.000 |  0.010   |      0.000      |      0.000       |      0.000       | [-2.618, 2.618] |      53.000     |    300.000    |
+|   15  | left_ankle_pitch_joint     |   20.000  |  2.000  |  0.010   |      0.000      |      0.000       |      0.000       | [-0.680, 0.730] |      53.000     |     20.000    |
+|   16  | right_ankle_pitch_joint    |   20.000  |  2.000  |  0.010   |      0.000      |      0.000       |      0.000       | [-0.680, 0.730] |      53.000     |     20.000    |
+|   17  | left_elbow_pitch_joint     |   40.000  |  10.000 |  0.010   |      0.000      |      0.000       |      0.000       | [-0.227, 3.421] |      53.000     |    300.000    |
+|   18  | right_elbow_pitch_joint    |   40.000  |  10.000 |  0.010   |      0.000      |      0.000       |      0.000       | [-0.227, 3.421] |      53.000     |    300.000    |
+|   19  | left_ankle_roll_joint      |   20.000  |  2.000  |  0.010   |      0.000      |      0.000       |      0.000       | [-0.262, 0.262] |      53.000     |     20.000    |
+|   20  | right_ankle_roll_joint     |   20.000  |  2.000  |  0.010   |      0.000      |      0.000       |      0.000       | [-0.262, 0.262] |      53.000     |     20.000    |
+|   21  | left_elbow_roll_joint      |   40.000  |  10.000 |  0.010   |      0.000      |      0.000       |      0.000       | [-2.094, 2.094] |      53.000     |    300.000    |
+|   22  | right_elbow_roll_joint     |   40.000  |  10.000 |  0.010   |      0.000      |      0.000       |      0.000       | [-2.094, 2.094] |      53.000     |    300.000    |
+|   23  | left_five_joint            |   40.000  |  10.000 |  0.001   |      0.000      |      0.000       |      0.000       | [-1.840, 0.300] |      23.000     |    300.000    |
+|   24  | left_three_joint           |   40.000  |  10.000 |  0.001   |      0.000      |      0.000       |      0.000       | [-1.840, 0.300] |      23.000     |    300.000    |
+|   25  | left_zero_joint            |   40.000  |  10.000 |  0.001   |      0.000      |      0.000       |      0.000       | [-0.524, 0.524] |      23.000     |    300.000    |
+|   26  | right_five_joint           |   40.000  |  10.000 |  0.001   |      0.000      |      0.000       |      0.000       | [-0.300, 1.840] |      23.000     |    300.000    |
+|   27  | right_three_joint          |   40.000  |  10.000 |  0.001   |      0.000      |      0.000       |      0.000       | [-0.300, 1.840] |      23.000     |    300.000    |
+|   28  | right_zero_joint           |   40.000  |  10.000 |  0.001   |      0.000      |      0.000       |      0.000       | [-0.524, 0.524] |      23.000     |    300.000    |
+|   29  | left_six_joint             |   40.000  |  10.000 |  0.001   |      0.000      |      0.000       |      0.000       | [-1.840, 0.000] |      23.000     |    300.000    |
+|   30  | left_four_joint            |   40.000  |  10.000 |  0.001   |      0.000      |      0.000       |      0.000       | [-1.840, 0.000] |      23.000     |    300.000    |
+|   31  | left_one_joint             |   40.000  |  10.000 |  0.001   |      0.000      |      0.000       |      0.000       | [-1.000, 1.200] |      23.000     |    300.000    |
+|   32  | right_six_joint            |   40.000  |  10.000 |  0.001   |      0.000      |      0.000       |      0.000       |  [0.000, 1.840] |      23.000     |    300.000    |
+|   33  | right_four_joint           |   40.000  |  10.000 |  0.001   |      0.000      |      0.000       |      0.000       |  [0.000, 1.840] |      23.000     |    300.000    |
+|   34  | right_one_joint            |   40.000  |  10.000 |  0.001   |      0.000      |      0.000       |      0.000       | [-1.200, 1.000] |      23.000     |    300.000    |
+|   35  | left_two_joint             |   40.000  |  10.000 |  0.001   |      0.000      |      0.000       |      0.000       |  [0.000, 1.840] |      23.000     |    300.000    |
+|   36  | right_two_joint            |   40.000  |  10.000 |  0.001   |      0.000      |      0.000       |      0.000       | [-1.840, 0.000] |      23.000     |    300.000    |
++-------+----------------------------+-----------+---------+----------+-----------------+------------------+------------------+-----------------+-----------------+---------------+
+[INFO]: Read mesh prim: /World/ground/terrain/mesh with 626303 vertices and 3578904 faces.
+[INFO]: Time taken for simulation start Last: 151.271784 s, Mean: 151.271784 s, Std: 0.000000 s, N: 1
+[INFO] Command Manager:  <CommandManager> contains 1 active terms.
++------------------------------------------------+
+|              Active Command Terms              |
++-------+---------------+------------------------+
+| Index | Name          |          Type          |
++-------+---------------+------------------------+
+|   0   | base_velocity | UniformVelocityCommand |
++-------+---------------+------------------------+
+
+[INFO] Event Manager:  <EventManager> contains 3 active terms.
++---------------------------------------+
+| Active Event Terms in Mode: 'startup' |
++----------+----------------------------+
+|  Index   | Name                       |
++----------+----------------------------+
+|    0     | physics_material           |
+|    1     | add_base_mass              |
++----------+----------------------------+
++-------------------------------------+
+| Active Event Terms in Mode: 'reset' |
++-------+-----------------------------+
+| Index | Name                        |
++-------+-----------------------------+
+|   0   | base_external_force_torque  |
+|   1   | reset_base                  |
+|   2   | reset_robot_joints          |
++-------+-----------------------------+
++----------------------------------------------+
+|    Active Event Terms in Mode: 'interval'    |
++-------+------------+-------------------------+
+| Index | Name       | Interval time range (s) |
++-------+------------+-------------------------+
+|   0   | push_robot |       (10.0, 15.0)      |
++-------+------------+-------------------------+
+
+[INFO] Recorder Manager:  <RecorderManager> contains 0 active terms.
++-----------------------+
+| Active Recorder Terms |
++------------+----------+
+|   Index    | Name     |
++------------+----------+
++------------+----------+
+
+[INFO]: Resolved joint names for the action term JointPositionAction: ['left_hip_pitch_joint', 'right_hip_pitch_joint', 'torso_joint', 'left_hip_roll_joint', 'right_hip_roll_joint', 'left_shoulder_pitch_joint', 'right_shoulder_pitch_joint', 'left_hip_yaw_joint', 'right_hip_yaw_joint', 'left_shoulder_roll_joint', 'right_shoulder_roll_joint', 'left_knee_joint', 'right_knee_joint', 'left_shoulder_yaw_joint', 'right_shoulder_yaw_joint', 'left_ankle_pitch_joint', 'right_ankle_pitch_joint', 'left_elbow_pitch_joint', 'right_elbow_pitch_joint', 'left_ankle_roll_joint', 'right_ankle_roll_joint', 'left_elbow_roll_joint', 'right_elbow_roll_joint', 'left_five_joint', 'left_three_joint', 'left_zero_joint', 'right_five_joint', 'right_three_joint', 'right_zero_joint', 'left_six_joint', 'left_four_joint', 'left_one_joint', 'right_six_joint', 'right_four_joint', 'right_one_joint', 'left_two_joint', 'right_two_joint'] [tensor([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17,
+        18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35,
+        36], device='cuda:0', dtype=torch.int32)]
+[INFO] Action Manager:  <ActionManager> contains 1 active terms.
++---------------------------------+
+| Active Action Terms (shape: 37) |
++-------+-----------+-------------+
+| Index | Name      |   Dimension |
++-------+-----------+-------------+
+|   0   | joint_pos |          37 |
++-------+-----------+-------------+
+
+[INFO] Observation Manager: <ObservationManager> contains 1 groups.
++-------------------------------------------------------------+
+| Active Observation Terms in Group: 'policy' (shape: (310,)) |
++-----------+----------------------------------+--------------+
+|   Index   | Name                             |    Shape     |
++-----------+----------------------------------+--------------+
+|     0     | base_lin_vel                     |     (3,)     |
+|     1     | base_ang_vel                     |     (3,)     |
+|     2     | projected_gravity                |     (3,)     |
+|     3     | velocity_commands                |     (3,)     |
+|     4     | joint_pos                        |    (37,)     |
+|     5     | joint_vel                        |    (37,)     |
+|     6     | actions                          |    (37,)     |
+|     7     | height_scan                      |    (187,)    |
++-----------+----------------------------------+--------------+
+
+[INFO] Termination Manager:  <TerminationManager> contains 2 active terms.
++---------------------------------+
+|     Active Termination Terms    |
++-------+--------------+----------+
+| Index | Name         | Time Out |
++-------+--------------+----------+
+|   0   | time_out     |   True   |
+|   1   | base_contact |  False   |
++-------+--------------+----------+
+
+[INFO] Reward Manager:  <RewardManager> contains 16 active terms.
++---------------------------------------------+
+|             Active Reward Terms             |
++-------+-------------------------+-----------+
+| Index | Name                    |    Weight |
++-------+-------------------------+-----------+
+|   0   | track_lin_vel_xy_exp    |       1.0 |
+|   1   | track_ang_vel_z_exp     |       2.0 |
+|   2   | lin_vel_z_l2            |       0.0 |
+|   3   | ang_vel_xy_l2           |     -0.05 |
+|   4   | dof_torques_l2          |  -1.5e-07 |
+|   5   | dof_acc_l2              | -1.25e-07 |
+|   6   | action_rate_l2          |    -0.005 |
+|   7   | feet_air_time           |      0.25 |
+|   8   | flat_orientation_l2     |      -1.0 |
+|   9   | dof_pos_limits          |      -1.0 |
+|   10  | termination_penalty     |    -200.0 |
+|   11  | feet_slide              |      -0.1 |
+|   12  | joint_deviation_hip     |      -0.1 |
+|   13  | joint_deviation_arms    |      -0.1 |
+|   14  | joint_deviation_fingers |     -0.05 |
+|   15  | joint_deviation_torso   |      -0.1 |
++-------+-------------------------+-----------+
+
+[INFO] Curriculum Manager:  <CurriculumManager> contains 1 active terms.
++-------------------------+
+| Active Curriculum Terms |
++-------+-----------------+
+| Index | Name            |
++-------+-----------------+
+|   0   | terrain_levels  |
++-------+-----------------+
+
+[INFO]: Completed setting up the environment...
+2026-09-25 18:12:36 [314,376ms] [INFO] [isaacsim.benchmark.services.datarecorders.physics_frametime] PhysicsFrametimeRecorder: Stopped collecting. Collected 4199 samples
+2026-09-25 18:12:36 [314,376ms] [INFO] [isaacsim.benchmark.services.datarecorders.render_frametime] RenderFrametimeRecorder: Stopped collecting. Collected 16760 samples
+2026-09-25 18:12:36 [314,376ms] [INFO] [isaacsim.benchmark.services.datarecorders.app_frametime] AppFrametimeRecorder: Stopped collecting. Collected 1 samples
+2026-09-25 18:12:36 [314,376ms] [INFO] [isaacsim.benchmark.services.datarecorders.gpu_frametime] GPUFrametimeRecorder: Stopped collecting. Collected 0 samples
+2026-09-25 18:12:36 [314,436ms] [WARNING] [isaacsim.benchmark.services.datarecorders.gpu_frametime] GPUFrametimeRecorder: No samples collected
+[INFO]: Wrote schema bundle to /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_b/benchmark_runtime_Isaac-Velocity-Rough-G1_2026-09-25_18-07-26-982927_e0075c5e_schema.json
+[INFO]: Setting test name to benchmark_runtime
+Results written to: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_b/benchmark_runtime_Isaac-Velocity-Rough-G1_2026-09-25_18-07-26-982927_e0075c5e_summary.json
+
+|------------------------------------------------------------------------------------|
+|                                   Summary Report                                   |
+|------------------------------------------------------------------------------------|
+| workflow_name: benchmark_runtime                                                   |
+| timestamp: 2026-09-25T18:07:26.983287                                              |
+| task: Isaac-Velocity-Rough-G1                                                      |
+| num_envs: 4096                                                                     |
+| num_cpus: 16                                                                       |
+| commit: ae37b028                                                                   |
+| branch: HEAD                                                                       |
+| gpu_name: NVIDIA L4                                                                |
+| gpu_total_memory_gb: 22.03                                                         |
+|------------------------------------------------------------------------------------|
+| Phase: runtime                                                                     |
+| Collection:                                                                        |
+|   Serialized Diagnostic Collection FPS (mean/std/max): 35325.79 / 4186.50 /        |
+| 41565.10 FPS                                                                       |
+| Throughput:                                                                        |
+|   Serialized Diagnostic Total FPS (mean/std/max): 35325.79 / 4186.50 / 41565.10    |
+| FPS                                                                                |
+|   Serialized Synchronized Environment Step FPS (mean/std/max): 35356.76 / 4192.51  |
+| / 41629.61 FPS                                                                     |
+| Other:                                                                             |
+|   Serialized Diagnostic Iteration Time (mean/std/max): 115.95 / 18.17 / 215.40 ms  |
+|   Synchronized Simulation Time per Environment Step (mean/std/max): 85.59 / 12.28  |
+| / 147.71 ms                                                                        |
+|   Outside Simulation Time per Environment Step (mean/std/max): 30.26 / 11.25 /     |
+| 130.74 ms                                                                          |
+|   Serialized Diagnostic Iterations per Second (mean/std/max): 8.62 / 1.02 / 10.15  |
+| iterations/s                                                                       |
+|------------------------------------------------------------------------------------|
+| Phase: startup                                                                     |
+| App Launch Time: 1772.76 ms                                                        |
+| Python Imports Time: 2481.80 ms                                                    |
+| Task Creation and Start Time: 689.54 ms                                            |
+| Scene Creation Time: 182932.30 ms                                                  |
+| Simulation Start Time: 307.24 ms                                                   |
+| Total Start Time (Launch to Train): 188183.64 ms                                   |
+|------------------------------------------------------------------------------------|
+| Phase: frametime                                                                   |
+|------------------------------------------------------------------------------------|
+| System:                                                                            |
+| cpu_name: Intel(R) Xeon(R) CPU @ 2.20GHz                                           |
+| physical_cores: 16                                                                 |
+| total_ram_gb: 62.79                                                                |
+| gpu_device_count: 1                                                                |
+| cuda_version: 12.8                                                                 |
+|------------------------------------------------------------------------------------|
+[INFO]: Setting test name to benchmark_runtime
+Results written to: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_b/benchmark_runtime_Isaac-Velocity-Rough-G1_2026-09-25_18-07-26-982927_e0075c5e_json.json
+
+================================================================
+ Runtime summary: Isaac-Velocity-Rough-G1 (4096 envs, physx)
+================================================================
+ total_fps                 35,326 steps/s  std 4,187  peak 41,565
+ collection_fps            35,326 steps/s  std 4,187  peak 41,565
+ iteration_time            0.116 s  std 0.018  peak 0.215
+ iterations                1,000
+ steps_per_iteration       4,096
+ total_wall_time           115.95 s
+----------------------------------------------------------------
+ startup (launch/env/step) 1.77 / 182.93 / 0.31 s
+ gpu_util                  71.0 %  std 3.0
+ gpu_mem                   7.80 GB  peak 7.80
+----------------------------------------------------------------
+ report: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_b/benchmark_runtime_Isaac-Velocity-Rough-G1_2026-09-25_18-07-26-982927_e0075c5e_schema.json
+ report: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_b/benchmark_runtime_Isaac-Velocity-Rough-G1_2026-09-25_18-07-26-982927_e0075c5e_summary.json
+ report: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_b/benchmark_runtime_Isaac-Velocity-Rough-G1_2026-09-25_18-07-26-982927_e0075c5e_json.json
+================================================================
+[INFO]: SimulationContext cleared
+2026-09-25T18:07:30Z [4,217ms] [Warning] [omni.usd] Encountered USD Warnings but USD Diagnostics are currently muted. To view USD Warnings, please set the '/persistent/app/usd/muteUsdDiagnostics' setting to false in Preferences page.
+2026-09-25T18:07:38Z [12,237ms] [Warning] [isaaclab.utils.assets] Serving remote assets from the local cache under '/tmp'. Each copy is checked against the server before use; delete the directory to force a full re-download.
+2026-09-25T18:08:44Z [78,492ms] [Warning] [usdrt.population.plugin] Last global time was not created. Did you call setEnableUsdNoticeHandling?
+2026-09-25T18:10:27Z [181,648ms] [Warning] [omni.usd] Coding Error: in GetTransform at line 2587 of ./builds/omniverse/usd-ci/conan/src/0.25.11.kit.5/pxr/usdImaging/usdImaging/delegate.cpp -- Failed verification: ' primInfo '
+

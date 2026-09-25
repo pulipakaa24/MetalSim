@@ -1,0 +1,158 @@
+{
+  "run": {
+    "run_id": "runtime_physx_Isaac-Velocity-Flat-G1_20260925T175310_seed0",
+    "framework": null,
+    "config": {
+      "physics_backend": "physx",
+      "rendering_backend": "none",
+      "presets": []
+    },
+    "task": "Isaac-Velocity-Flat-G1",
+    "seed": 0,
+    "start_time_utc": "2026-09-25T17:48:29.102560+00:00",
+    "end_time_utc": "2026-09-25T17:53:10.620394+00:00",
+    "duration_s": 281.517834,
+    "status": "completed",
+    "num_envs": 4096,
+    "max_iterations": null
+  },
+  "versions": {
+    "isaaclab": "17.0.2",
+    "isaacsim": "6.1.0-rc.26+release.49347.2d230af4.gl",
+    "kit": "110.3.0+feature.371399.00c488ae.gl",
+    "newton": "1.5.2",
+    "warp": "1.16.0",
+    "mjwarp": "3.11.0",
+    "torch": "2.11.0+cu128",
+    "rsl_rl": "5.4.1",
+    "rl_games": null,
+    "skrl": null,
+    "sb3": null,
+    "git_commit": "ae37b028ea415c91ea2bc32609efcd759ed2b974",
+    "git_branch": "HEAD",
+    "git_dirty": false,
+    "numpy": "2.5.2",
+    "isaaclab_newton": "5.4.1",
+    "isaaclab_physx": "6.0.0",
+    "isaaclab_ov": "2.2.0",
+    "isaaclab_tasks": "18.0.1",
+    "isaaclab_rl": "0.16.3",
+    "ovrtx": null,
+    "ovphysx": null,
+    "mujoco": "3.11.0",
+    "cuda_bindings": "12.9.7",
+    "usd_core": null,
+    "usd_exchange": "2.3.0",
+    "isaaclab_release": null
+  },
+  "hardware": {
+    "hostname": "aditya-isaac.us-west1-a.c.mcmc-193822.internal",
+    "gpu_devices": [
+      {
+        "name": "NVIDIA L4",
+        "mem_gb": 22.03,
+        "compute_cap": "8.9"
+      }
+    ],
+    "cpu_name": "Intel(R) Xeon(R) CPU @ 2.20GHz",
+    "cpu_count": 16,
+    "ram_gb": 62.79
+  },
+  "runtime": {
+    "startup_time_s": {
+      "app_launch": 1.719054002,
+      "env_creation": 177.94530043,
+      "first_step": 0.316775398,
+      "python_imports": 2.469661289,
+      "task_config": 0.710375531
+    },
+    "iterations_completed": 1000,
+    "total_wall_time_s": 91.587892716,
+    "steps_per_iteration": 4096,
+    "iteration_time_s": {
+      "mean": 0.091587892716,
+      "std": 0.017005091009230366,
+      "peak": 0.203762118
+    },
+    "collection_fps": {
+      "mean": 44722.06837099165,
+      "std": 5479.709379472288,
+      "peak": 49512.400166664345
+    },
+    "total_fps": {
+      "mean": 44722.06837099165,
+      "std": 5479.709379472288,
+      "peak": 49512.400166664345
+    },
+    "iterations_per_s": {
+      "mean": 10.918473723386633,
+      "std": 1.3378196727227265,
+      "peak": 12.087988321939537
+    },
+    "environment_step_timing": {
+      "environment_step_time_s": {
+        "mean": 0.09149460753199673,
+        "std": 0.017002621450457462,
+        "peak": 0.20367187100009687
+      },
+      "environment_step_fps": {
+        "mean": 44767.665663439024,
+        "std": 5487.075134968751,
+        "peak": 49581.225662096076
+      },
+      "simulation_step_time_s": {
+        "mean": 0.06442749826202089,
+        "std": 0.009215843969888095,
+        "peak": 0.13179561600009038
+      },
+      "outside_simulation_step_time_s": {
+        "mean": 0.027067109269975846,
+        "std": 0.011152419641054737,
+        "peak": 0.09323736000078497
+      },
+      "outside_simulation_step_fraction": 0.29583283649268793,
+      "environment_step_calls": 1000,
+      "simulation_step_calls": 4000,
+      "measurement_mode": "serialized_synchronized",
+      "warmup_steps": 50
+    }
+  },
+  "resources": {
+    "gpu_util_pct": {
+      "mean": 66.28,
+      "std": 3.82,
+      "peak": null
+    },
+    "gpu_mem_gb": {
+      "mean": 7.31,
+      "std": 0.0,
+      "peak": 7.31
+    },
+    "cpu_util_pct": {
+      "mean": 156.46999999999997,
+      "std": 17.75765408157881,
+      "peak": null
+    },
+    "ram_gb": {
+      "mean": 12.73,
+      "std": 0.0,
+      "peak": 12.73
+    },
+    "devices": {
+      "0": {
+        "util_pct": {
+          "mean": 66.28,
+          "std": 3.82,
+          "peak": null
+        },
+        "mem_gb": {
+          "mean": 7.31,
+          "std": 0.0,
+          "peak": 7.31
+        }
+      }
+    }
+  },
+  "extra": null,
+  "schema_version": "1.4"
+}
