@@ -1,8 +1,9 @@
 From 284dcd12ff37d56ea0201ade4e7f941d772a0f28 Mon Sep 17 00:00:00 2001
 From: Aditya Pulipaka <adipu@utexas.edu>
 Date: Thu, 24 Sep 2026 22:15:11 -0700
-Subject: [PATCH] plane_convex: MuJoCo C's mjc_PlaneConvex contact set (support
- vertex + max-area quad of the most anti-aligned adjacent face), margin-aware
+Subject: [PATCH 1/2] plane_convex: MuJoCo C's mjc_PlaneConvex contact set
+ (support vertex + max-area quad of the most anti-aligned adjacent face),
+ margin-aware
 
 The previous heuristic kept only vertices within 1 mm of the deepest one, so a tilted mesh face (a
 landing foot) produced 2 contacts where MuJoCo C produces 4, and it returned no contacts when the
@@ -195,6 +196,55 @@ index c2824c6..f79dd75 100644
  
    frame = make_frame(normal)
    for i in range(4):
+-- 
+2.54.0 (Apple Git-157)
+
+
+From a8e64857ea81c5277f55ec7a995adc1e99191e09 Mon Sep 17 00:00:00 2001
+From: Aditya Pulipaka <adipu@utexas.edu>
+Date: Thu, 24 Sep 2026 22:51:01 -0700
+Subject: [PATCH 2/2] plane_convex: MJW_PLANE_CONVEX=legacy environment switch
+ pins the previous heuristic (A/B comparisons)
+
+Co-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>
+---
+ mujoco_warp/_src/collision_primitive.py | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/mujoco_warp/_src/collision_primitive.py b/mujoco_warp/_src/collision_primitive.py
+index f79dd75..4234786 100644
+--- a/mujoco_warp/_src/collision_primitive.py
++++ b/mujoco_warp/_src/collision_primitive.py
+@@ -15,6 +15,8 @@
+ 
+ from typing import Tuple
+ 
++import os
++
+ import warp as wp
+ 
+ from mujoco_warp._src.collision_core import CollisionContext
+@@ -48,6 +50,11 @@ from mujoco_warp._src.warp_util import event_scope
+ wp.set_module_options({"enable_backward": False})
+ 
+ 
++# MJW_PLANE_CONVEX=legacy (read at import) restores the previous 4-point heuristic for every convex geom
++# (MetalSim A/B comparisons); default: MuJoCo C's contact set for meshes with polygon data.
++PLANE_CONVEX_LEGACY = os.environ.get("MJW_PLANE_CONVEX", "c").lower() == "legacy"
++
++
+ @wp.func
+ def _plane_convex_area4(
+   vert: wp.array[wp.vec3], vertadr: int, polyvert: wp.array[int], fadr: int, a: int, b: int, c: int, d: int
+@@ -73,7 +80,7 @@ def plane_convex(
+   reported with their distance and dropped by write_contact. Meshes without polygon data fall back
+   to the 4-point heuristic (_plane_convex_heuristic).
+   """
+-  if convex.mesh_polynum <= 0:
++  if wp.static(PLANE_CONVEX_LEGACY) or convex.mesh_polynum <= 0:
+     return _plane_convex_heuristic(plane_normal, plane_pos, convex, margin)
+ 
+   contact_dist = wp.vec4(MJ_MAXVAL)
 -- 
 2.54.0 (Apple Git-157)
 
