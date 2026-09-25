@@ -1,0 +1,110 @@
+{
+ "physics": {
+  "A_hold": {
+   "steps": 150,
+   "joint_rmse_rad": {
+    "t0.5s": 0.007648285012692213,
+    "t1s": 0.0085060503333807,
+    "t2s": 0.05135519430041313,
+    "end": 0.05103446915745735,
+    "max": 0.05720166489481926
+   },
+   "divergence_step_0.1rad": 63,
+   "divergence_time_s": 1.26,
+   "root_height": {
+    "isaac_end": 0.05380211025476456,
+    "metalsim_end": 0.05379849299788475,
+    "rmse": 0.013026483356952667
+   },
+   "root_orientation_err_rad": {
+    "mean": 0.019306611269712448,
+    "max": 0.10560527443885803
+   },
+   "peak_joint_speed_rad_s": {
+    "isaac": 6.861039161682129,
+    "metalsim": 9.134486198425293
+   },
+   "contact_force_N": {
+    "isaac_mean_total": 302.4049377441406,
+    "metalsim_mean_total": 336.5287780761719,
+    "isaac_peak": 712.2770385742188,
+    "metalsim_peak": 4911.060546875
+   },
+   "torque_rms_Nm": {
+    "isaac": 5.288428783416748,
+    "metalsim": 4.881138324737549
+   }
+  },
+  "B_random": {
+   "steps": 250,
+   "joint_rmse_rad": {
+    "t0.5s": 0.1188281923532486,
+    "t1s": 0.07166904211044312,
+    "t2s": 0.09334196150302887,
+    "end": 0.09929028898477554,
+    "max": 0.19221380352973938
+   },
+   "divergence_step_0.1rad": 0,
+   "divergence_time_s": 0.0,
+   "root_height": {
+    "isaac_end": 0.14033684134483337,
+    "metalsim_end": 0.1566658616065979,
+    "rmse": 0.06842498481273651
+   },
+   "root_orientation_err_rad": {
+    "mean": 1.3213419914245605,
+    "max": 2.070056200027466
+   },
+   "peak_joint_speed_rad_s": {
+    "isaac": 32.00001525878906,
+    "metalsim": 60.67209243774414
+   },
+   "contact_force_N": {
+    "isaac_mean_total": 329.4166564941406,
+    "metalsim_mean_total": 418.13287353515625,
+    "isaac_peak": 2847.163330078125,
+    "metalsim_peak": 5563.56396484375
+   },
+   "torque_rms_Nm": {
+    "isaac": 29.949527740478516,
+    "metalsim": 33.83701705932617
+   }
+  },
+  "C_drop": {
+   "steps": 150,
+   "joint_rmse_rad": {
+    "t0.5s": 0.018647637218236923,
+    "t1s": 0.020970484241843224,
+    "t2s": 0.05000817030668259,
+    "end": 0.0500231496989727,
+    "max": 0.12522651255130768
+   },
+   "divergence_step_0.1rad": 0,
+   "divergence_time_s": 0.0,
+   "root_height": {
+    "isaac_end": 0.05380271375179291,
+    "metalsim_end": 0.053798653185367584,
+    "rmse": 0.0881095752120018
+   },
+   "root_orientation_err_rad": {
+    "mean": 0.10840320587158203,
+    "max": 0.5889232158660889
+   },
+   "peak_joint_speed_rad_s": {
+    "isaac": 10.601576805114746,
+    "metalsim": 10.858484268188477
+   },
+   "contact_force_N": {
+    "isaac_mean_total": 288.4056701660156,
+    "metalsim_mean_total": 415.50164794921875,
+    "isaac_peak": 1029.7064208984375,
+    "metalsim_peak": 13713.47265625
+   },
+   "torque_rms_Nm": {
+    "isaac": 6.169229030609131,
+    "metalsim": 6.192337512969971
+   }
+  }
+ },
+ "render": {}
+}
