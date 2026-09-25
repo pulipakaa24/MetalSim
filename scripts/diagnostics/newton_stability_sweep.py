@@ -3,8 +3,8 @@ N(0, 3) actions; pass = at most 1 blown-up episode) vs physics throughput (task.
 env-steps/s at 50 Hz), for solver iterations x substep, joint relaxation, and the actuator's leg branch
 (stiff_implicit: stiffness integrated implicitly too, bias 1/(1 + kp dt^2 / I) at rest).
 
-usage: python scripts/diagnostics/newton_stability_sweep.py [config ...]   config = IT:DT_MS[:relax=R][:stiff][:rc]"""
-import sys, io, time, contextlib, numpy as np, warp as wp
+usage: python scripts/diagnostics/newton_stability_sweep.py [config ...]   config = IT:DT_MS[:relax=R][:stiff][:rc][:nolim]"""
+import sys, io, time, contextlib, subprocess, numpy as np, warp as wp
 wp.config.quiet = True
 from metalsim.learn.g1_velocity import G1VelocityTask
 from metalsim.learn import g1_preflight
@@ -18,10 +18,12 @@ def parse(c):
     for x in p[2:]:
         if x == "stiff": kw.setdefault("actuator_kw", {})["stiff_implicit"] = True
         elif x.startswith("relax="): kw["relaxation"] = float(x.split("=")[1])
+        elif x == "nolim": kw["limit_margin"] = None        # USD limits as authored (no +-(pi - 0.15) clamp)
         elif x == "rc": kw["recenter"] = True          # revolute zeros at the middle of the limit range
     return it, dt, kw
 
 
+print("install:", subprocess.run([sys.executable, "scripts/diagnostics/newton_stamp.py"], capture_output=True, text=True).stdout.strip())
 print("| setting | blown of 1024 (3 sigma, 400 steps) | peak joint speed [rad/s] | preflight | physics env-steps/s (4096) |")
 print("|---|---|---|---|---|", flush=True)
 for c in sys.argv[1:] or DEFAULT:
