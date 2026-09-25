@@ -1,5 +1,5 @@
 #!/bin/bash
-# scripts/gpu_run.sh NAME KIND MINUTES -- command args...   (KIND: timing | render | train)
+# scripts/gpu_run.sh NAME KIND MINUTES -- command args...   (KIND: timing | render | train | low)
 # Acquires the GPU through the priority queue, runs the command, releases on any exit. The lock records the
 # job's own pid (not this wrapper's), and the job is killed if this wrapper is terminated, so a cut-off tool
 # call cannot leave a running job with an abandoned-looking lock.
