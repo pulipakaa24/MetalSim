@@ -1,0 +1,39 @@
+== Fri Sep 25 09:44:34 PDT 2026
+holder: {"name": "flex_merge_rigid_ab", "kind": "low", "minutes": 15.0, "pid": 63989, "start": 1790354674.3543942}
+== flexbase: /Users/aditya/robosim/upstream/warp-innate-base/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-base/mujoco_warp/__init__.py
+ad22120 Metal: one-world-per-thread sparse L'DL factor and solve; skip no-op gravcomp / tendon-damping launches
+tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[boxes]
+tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[meshes]
+tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[boxes_local]
+  /Users/aditya/robosim/upstream/mujoco_warp-base/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 3 durations ==============================
+30.98s call     tests/test_physics.py::test_one_step_parity_vs_mujoco_c[so101_lift]
+12.51s call     tests/test_physics.py::test_one_step_parity_vs_mujoco_c[g1]
+10.46s call     tests/test_terrain.py::test_terrain_layout
+35 passed, 6 warnings in 132.24s (0:02:12)
+wrote scratch/deformable/merge/rigid_metal_flexbase.npz {'g1_isaac_qpos': (8, 44), 'g1_isaac_qvel': (8, 43), 'go1_qpos': (8, 19), 'go1_qvel': (8, 18), 'panda_qpos': (8, 9), 'panda_qvel': (8, 9)}
+== flexmerge: /Users/aditya/robosim/upstream/warp-innate-merge/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-merge/mujoco_warp/__init__.py
+2818150 Merge branch 'metalsim-flex' into HEAD
+tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[boxes]
+tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[meshes]
+tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[boxes_local]
+  /Users/aditya/robosim/upstream/mujoco_warp-merge/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+============================= slowest 3 durations ==============================
+26.10s call     tests/test_physics.py::test_one_step_parity_vs_mujoco_c[so101_lift]
+11.58s call     tests/test_physics.py::test_one_step_parity_vs_mujoco_c[g1]
+8.66s call     tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[boxes]
+35 passed, 6 warnings in 119.18s (0:01:59)
+wrote scratch/deformable/merge/rigid_metal_flexmerge.npz {'g1_isaac_qpos': (8, 44), 'g1_isaac_qvel': (8, 43), 'go1_qpos': (8, 19), 'go1_qvel': (8, 18), 'panda_qpos': (8, 9), 'panda_qvel': (8, 9)}
+metal g1_isaac_qpos max diff 9.537e-07
+metal g1_isaac_qvel max diff 1.597e-05
+metal go1_qpos max diff 5.960e-07
+metal go1_qvel max diff 1.053e-05
+metal panda_qpos bitwise equal
+metal panda_qvel bitwise equal
+== done Fri Sep 25 09:49:52 PDT 2026
