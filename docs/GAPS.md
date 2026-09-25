@@ -102,6 +102,22 @@ MetalSim's MuJoCo Warp is compared like for like against Isaac's own MuJoCo-Warp
 formulation under Newton is VBD with coupling, so making VBD run on the Metal Warp fork is the
 priority over porting PhysX's solvers; PhysX's `DeformablePrim` remains the PhysX-backend reference.
 
+## What "fidelity" is measured against (grounding note, 2026-09-25)
+
+PhysX is not established as the most realistic engine; no engine is. The robotics literature leans
+the other way for articulated robots: the ICRA 2015 comparison (Erez, Tassa, Todorov; MuJoCo's own
+authors) found MuJoCo the most accurate and fastest for robotics-type contact, with PhysX/Bullet/Havok
+suited to gaming-type contact; ETH's SimBenchmark rates engines on speed-accuracy curves and notes
+MuJoCo's soft contact cannot control elasticity and has consistent slip; a 2023 comparative study
+reports Isaac Sim's PhysX trading contact-dynamics accuracy for scalability; and humanoid sim-to-real
+work (Humanoid-Gym, PolySim) uses MuJoCo as the validation step for Isaac-trained policies because its
+dynamics are closer to the real robot. NVIDIA itself now ships MuJoCo Warp as Newton's primary solver
+in Isaac Lab 3.0. So PhysX parity in these documents is a *reference* goal (matching what Isaac users
+get, on hardware we cannot run), not a realism endpoint. The realism endpoint is the real robot: a
+hardware protocol (drop / step-response / walking-distance on the user's Tron1) is the reference that
+outranks both simulators, and where MuJoCo's soft contacts and slip deviate from PhysX they also
+deviate from reality in the same direction, so tuning them toward PhysX's hard contacts is not wasted.
+
 ## Engine position (2026-09-24, after the measurements)
 
 MuJoCo Warp is the parity engine, not a stopgap. Measured: it matches the PhysX open-loop protocol
