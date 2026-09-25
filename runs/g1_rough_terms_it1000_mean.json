@@ -1,0 +1,32 @@
+{
+ "ckpt": "runs/policies/g1_rough_ppowarp_fixed_it1000.pt",
+ "iterations": 1000,
+ "episodes": 1029,
+ "mean_episode_length": 987.8474246841594,
+ "mean_return": 34.14105763763985,
+ "terminations": {
+  "fell": 24,
+  "timeout": 1005
+ },
+ "Episode_Reward": {
+  "track_lin_vel_xy_exp": 0.8522,
+  "track_ang_vel_z_exp": 1.1223,
+  "feet_air_time": 0.0041,
+  "feet_slide": -0.0466,
+  "joint_deviation_all": -0.1679,
+  "flat_orientation_l2": -0.0094,
+  "action_rate_l2": -0.0111,
+  "termination_penalty": -0.0047,
+  "lin_vel_z_l2": 0.0,
+  "ang_vel_xy_l2": -0.009,
+  "dof_torques_l2": -0.0004,
+  "dof_acc_l2": -0.0148,
+  "dof_pos_limits": -0.0079
+ },
+ "note": "per-second average over the episode like Isaac's RewardManager; joint_deviation_all = hip+arms+fingers+torso",
+ "reward_cfg": "rough_isaac",
+ "engine": "mjwarp",
+ "physics_dt": 0.0025,
+ "contact_tuning": null,
+ "seed": 0
+}

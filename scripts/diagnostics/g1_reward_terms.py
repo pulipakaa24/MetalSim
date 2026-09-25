@@ -34,7 +34,6 @@ def main():
     ap.add_argument("--contact_tuning", default=None, help="metalsim.physics.contact_tuning preset applied to the G1 model (MuJoCo Warp)")
     ap.add_argument("--out", default=None, help="write the JSON report here")
     ap.add_argument("--seed", type=int, default=1, help="task seed (commands, resets); repeat with other seeds for the noise floor")
-    ap.add_argument("--seed", type=int, default=1, help="task seed (on rough terrain also the terrain seed; the training run's for its terrain)")
     a = ap.parse_args(); wp.config.quiet = True
     ck = torch.load(a.ckpt, map_location="mps", weights_only=False); sd = ck["net"]
     hidden = tuple(sd[k].shape[0] for k in sorted((k for k in sd if k.startswith("actor.") and k.endswith("weight")), key=lambda s: int(s.split(".")[1]))[:-1])
@@ -48,7 +47,9 @@ def main():
     import contextlib
     from metalsim.physics import contact_tuning
     with (contact_tuning.g1_model_tuning(a.contact_tuning) if a.contact_tuning else contextlib.nullcontext()):
-        task = G1VelocityTask(a.envs, terrain=a.terrain, seed=a.seed, physics_dt=a.physics_dt, reward_cfg=a.reward_cfg, **ekw)
+        # the height-scan ray order the checkpoint was trained with (checkpoints before 2026-09-25 carry no key: "ij")
+        task = G1VelocityTask(a.envs, terrain=a.terrain, seed=a.seed, physics_dt=a.physics_dt, reward_cfg=a.reward_cfg,
+                              scan_ordering=ck.get("scan_ordering") or "ij", **ekw)
     net = ActorCriticMLP(task.obs_dim, task.act_dim, hidden=hidden).to("mps"); net.load_state_dict(sd); net.eval()
     n = a.envs
     class _Pol: step_idx = wp.zeros(1, dtype=int, device=task.device)

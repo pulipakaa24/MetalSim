@@ -286,3 +286,34 @@ def test_isaac_sub_terrain_exact(name):
             ours_v = np.stack([X.ravel(), Y.ravel(), (h2.flatten() * 0.005).astype(np.float32)], 1)
             # trimesh merges coincident vertices (moved vertices land on their neighbours): compare as sets
             assert np.array_equal(np.unique(ours_v, axis=0), np.unique(np.asarray(meshes[0].vertices, np.float32), axis=0))
+
+
+def test_height_scan_ray_order_matches_isaac_recording():
+    """The height-scan rays are in Isaac's order (GridPatternCfg ordering "xy": x fastest). Oracle: Isaac Sim 5.1's own
+    step-0 policy observation recorded by isaac_side/play_policy.py on the training terrain (env seed 0, rows 3 and 6,
+    columns 0/4/9/14, robot in its default pose at the cell origin). Runs the scan kernel on Warp's CPU device. The
+    legacy "ij" order (MetalSim before 2026-09-25) must differ on the random-rough cell, where the scan is not symmetric."""
+    import glob, json, mujoco
+    from metalsim.learn.terrain import height_scan_grid, scan_grid
+    from metalsim.learn.g1_velocity import build_g1_model
+    metas = sorted(glob.glob("runs/parity/isaac/rough/play_rough/L*/isaac_it500/meta.json"))
+    if not metas:
+        pytest.skip("Isaac recording not present (runs/parity/isaac/rough/play_rough)")
+    hf = isaac_rough_terrain(seed=0)
+    m, _ = build_g1_model("flat"); body = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, "torso_link")
+    H = wp.array(hf["H"].astype(np.float32), dtype=float, device="cpu")
+    for path in metas:
+        mt = json.load(open(path)); obs0 = np.array(mt["obs0"], np.float32); eo = np.array(mt["env_origins"], np.float32)
+        xp, xm = [], []
+        for o in eo:
+            d = mujoco.MjData(m); d.qpos[:] = m.key_qpos[0]; d.qpos[:3] = o + m.key_qpos[0][:3]; mujoco.mj_kinematics(m, d)
+            xp.append(d.xpos.copy()); xm.append(d.xmat.reshape(-1, 3, 3).copy())
+        xp = wp.array(np.array(xp, np.float32), dtype=wp.vec3, device="cpu"); xm = wp.array(np.array(xm, np.float32), dtype=wp.mat33, device="cpu")
+        err = {}
+        for order in ("xy", "ij"):
+            grid = wp.array(scan_grid(order), dtype=float, device="cpu"); out = wp.zeros((len(eo), 187), dtype=float, device="cpu")
+            wp.launch(height_scan_grid, dim=(len(eo), 187), inputs=[xp, xm, body, grid, H, float(hf["res"]), float(hf["size"][0]),
+                                                                    float(hf["size"][1]), 0.5, out], device="cpu")
+            err[order] = np.abs(np.clip(out.numpy(), -1, 1) - obs0[:, -187:])
+        assert err["xy"].max() < 1e-3, (path, err["xy"].max())
+        assert err["ij"].max() > 0.02, path

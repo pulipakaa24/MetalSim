@@ -1,0 +1,70 @@
+/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  warnings.warn(
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth 0cc2fb1 load on device 'metal:0' took 26.68 ms  (cached)
+Module _nxn_broadphase__locals__kernel_77109f20 77109f2 load on device 'metal:0' took 17.85 ms  (cached)
+Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_22e41e39 22e41e3 load on device 'metal:0' took 20.16 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_95433903 9543390 load on device 'metal:0' took 26.73 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_fb20836b fb20836 load on device 'metal:0' took 17.70 ms  (cached)
+Module mujoco_warp._src.constraint 6b6848e load on device 'metal:0' took 16.69 ms  (cached)
+Module _friction_dof__locals__kernel_646d9a17 646d9a1 load on device 'metal:0' took 17.29 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_2af29aef 2af29ae load on device 'metal:0' took 17.83 ms  (cached)
+Module _efc_contact_init__locals__kernel_41c302bb 41c302b load on device 'metal:0' took 16.71 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_1a4b2876 66f5008 load on device 'metal:0' took 17.33 ms  (cached)
+Module _efc_contact_update__locals__kernel_63b3d93a 63b3d93 load on device 'metal:0' took 17.12 ms  (cached)
+Module mujoco_warp._src.forward c9fb78c load on device 'metal:0' took 23.06 ms  (cached)
+Module mujoco_warp._src.passive 01837ed load on device 'metal:0' took 22.89 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_15bb4c69 15bb4c6 load on device 'metal:0' took 16.70 ms  (cached)
+Module mujoco_warp._src.forward d62b5a2 load on device 'metal:0' took 22.66 ms  (cached)
+Module _qfrc_smooth__locals__kernel_879019a1 879019a load on device 'metal:0' took 16.60 ms  (cached)
+Module mujoco_warp._src.support 8f02f5a load on device 'metal:0' took 16.87 ms  (cached)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_9171eb37 f438033 load on device 'metal:0' took 16.53 ms  (cached)
+Module _solve_init_dof__locals__kernel_d2b89306 d2b8930 load on device 'metal:0' took 16.48 ms  (cached)
+Module mujoco_warp._src.solver 4615040 load on device 'metal:0' took 17.64 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_61609ca9 61609ca load on device 'metal:0' took 16.44 ms  (cached)
+Module mul_m_kernel__locals___mul_m_1dc6ad98 1dc6ad9 load on device 'metal:0' took 16.83 ms  (cached)
+Module _update_constraint_efc__locals__kernel_19ee8eff 19ee8ef load on device 'metal:0' took 16.88 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_f4d269f2 f4d269f load on device 'metal:0' took 16.57 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_1b7ae334 1b7ae33 load on device 'metal:0' took 16.52 ms  (cached)
+Module _update_gradient_grad__locals__kernel_d8d45da1 d8d45da load on device 'metal:0' took 16.12 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_53d49923 4a8c7b0 load on device 'metal:0' took 16.60 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_c5a7f647 8641a45 load on device 'metal:0' took 16.66 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_3ec90fd4 72d6af5 load on device 'metal:0' took 17.84 ms  (cached)
+Module _update_constraint_efc__locals__kernel_2d3da595 2d3da59 load on device 'metal:0' took 16.97 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_747e54a4 747e54a load on device 'metal:0' took 16.51 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_5bb67707 5bb6770 load on device 'metal:0' took 16.48 ms  (cached)
+Module _update_gradient_grad__locals__kernel_c6377c8b c6377c8 load on device 'metal:0' took 16.51 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_8d1dce9c 2c8c4f6 load on device 'metal:0' took 16.72 ms  (cached)
+Module _solve_done__locals__kernel_e377d69b e377d69 load on device 'metal:0' took 16.52 ms  (cached)
+Module mujoco_warp._src.sensor 50c46e2 load on device 'metal:0' took 27.00 ms  (cached)
+Module mujoco_warp._src.derivative 1793cac load on device 'metal:0' took 19.54 ms  (cached)
+Module _next_time_builder__locals___next_time_77f65a33 77f65a3 load on device 'metal:0' took 16.50 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_7fdbdb61 7fdbdb6 load on device 'metal:0' took 17.50 ms  (cached)
+Module reset_data__locals__reset_M_232d5062 232d506 load on device 'metal:0' took 16.58 ms  (cached)
+Module reset_data__locals__reset_mocap_29da3eb8 29da3eb load on device 'metal:0' took 16.53 ms  (cached)
+Module reset_data__locals__reset_contact_818d93f9 818d93f load on device 'metal:0' took 16.57 ms  (cached)
+Module reset_data__locals__reset_sleep_ae682850 ae68285 load on device 'metal:0' took 16.51 ms  (cached)
+Module reset_data__locals__reset_nworld_532a08b2 532a08b load on device 'metal:0' took 16.55 ms  (cached)
+[terrain] origin table vs Isaac (runs/parity/isaac/rough/play_rough/L3/isaac_it1000/meta.json): max |diff| 0.00e+00 m over (10, 20, 3); Isaac terrain_types [0, 4, 9, 14] ours [0, 4, 9, 14]
+Module metalsim.learn.g1_velocity 6934f8c load on device 'metal:0' took 21.65 ms  (cached)
+Module metalsim.learn.warp_policy e25adaa load on device 'metal:0' took 18.87 ms  (cached)
+Module metalsim.learn.terrain 65cf217 load on device 'metal:0' took 18.58 ms  (cached)
+{"label": "isaac_it500", "ckpt": "runs/parity/isaac/rough/rsl_rl_g1_rough/2026-09-25_09-54-11/model_500.pt", "src": "rsl_rl", "level": 3, "columns": [0, 4, 9, 14], "x": [0.20513343811035156, 0.1811237335205078, 0.726231575012207, 0.122314453125], "z": [0.4028462767601013, 0.07445764541625977, 0.5521190762519836, 0.6313619017601013], "hag_final": [0.7157387435436249, 0.07445764541625977, 0.6130234077572823, 0.6475470906664063], "hag_min": [0.6135159134864807, 0.06422591209411621, 0.5983271971344948, 0.6475470906664063], "isaac_x": [1.0422697067260742, 2.2798643112182617, 0.5107212066650391, 0.8309574127197266], "isaac_z": [0.6584842801094055, 1.1730551719665527, 0.6744750142097473, 0.6570677757263184], "isaac_hag_final": [0.6584842801094055, 0.7327255308628082, 0.6744750365614891, 0.7174594134004799], "isaac_hag_min": [0.6557429432868958, 0.6553885340690613, 0.6744750365614891, 0.6301853950870832], "env_origin_max_abs_diff": 0.0, "scan0_max_abs_diff": 0.15671241283416748, "scan0_mean_abs_diff": 0.00829404965043068, "head0_max_abs_diff": 0.0}
+{"label": "isaac_it1000", "ckpt": "runs/parity/isaac/rough/rsl_rl_g1_rough/2026-09-25_09-54-11/model_1000.pt", "src": "rsl_rl", "level": 3, "columns": [0, 4, 9, 14], "x": [3.1058759689331055, 0.17719173431396484, 2.410395622253418, 3.618438720703125], "z": [-0.0011637210845947266, 0.03317224979400635, 0.5471311807632446, 0.6434000730514526], "hag_final": [0.728918731212616, 0.03317224979400635, 0.695481798038827, 0.6785026377976789], "hag_min": [0.6478947401046753, 0.03317224979400635, 0.6150404029540368, 0.6452737792701833], "isaac_x": [1.1192750930786133, 3.345950126647949, 0.8096027374267578, 1.647970199584961], "isaac_z": [0.6641102433204651, 1.456272840499878, 0.6688417196273804, 0.641849935054779], "isaac_hag_final": [0.6641102433204651, 0.685696005821228, 0.6688417419791222, 0.6729936729860966], "isaac_hag_min": [0.6630269885063171, 0.6453968286514282, 0.6687118634581566, 0.6534714568966056], "env_origin_max_abs_diff": 0.0, "scan0_max_abs_diff": 0.15671241283416748, "scan0_mean_abs_diff": 0.00829404965043068, "head0_max_abs_diff": 0.0}
+{"label": "isaac_it1499", "ckpt": "runs/parity/isaac/rough/rsl_rl_g1_rough/2026-09-25_09-54-11/model_1499.pt", "src": "rsl_rl", "level": 3, "columns": [0, 4, 9, 14], "x": [4.105655193328857, 1.4580049514770508, 4.268509864807129, 4.414981842041016], "z": [-0.05132460594177246, 0.8573898673057556, 0.6203779578208923, 0.6315972208976746], "hag_final": [0.6787578463554382, 0.6834544163939427, 0.6212588623166084, 0.643757530395956], "hag_min": [0.592687234893674, 0.6482839491218328, 0.57913688570261, 0.6399290170814711], "isaac_x": [3.537445068359375, 2.56795597076416, 2.820028305053711, 2.0892982482910156], "isaac_z": [-0.05582302808761597, 1.284777283668518, 0.5550368428230286, 0.6295953989028931], "isaac_hag_final": [0.6742594242095947, 0.7343652546405792, 0.6849023133950141, 0.6361708312018688], "isaac_hag_min": [0.6217244863510132, 0.6556192934513092, 0.5897731631994247, 0.6361708312018688], "env_origin_max_abs_diff": 0.0, "scan0_max_abs_diff": 0.15671241283416748, "scan0_mean_abs_diff": 0.00829404965043068, "head0_max_abs_diff": 0.0}
+{"label": "isaac_it500", "ckpt": "runs/parity/isaac/rough/rsl_rl_g1_rough/2026-09-25_09-54-11/model_500.pt", "src": "rsl_rl", "level": 6, "columns": [0, 4, 9, 14], "x": [0.06340980529785156, 0.22759246826171875, 0.7939233779907227, 2.2425546646118164], "z": [0.31527042388916016, 0.07600951194763184, 0.5652883052825928, 0.6477019786834717], "hag_final": [0.6531093120574951, 0.07600951194763184, 0.6884282249957323, 0.7009368668518619], "hag_min": [0.609487001414891, 0.07174837589263916, 0.6301120364576036, 0.6509502259222755], "isaac_x": [0.5596647262573242, 0.34592437744140625, 0.9425363540649414, 2.3362369537353516], "isaac_z": [0.6830683946609497, 0.6872245073318481, 0.6527960300445557, 0.6736473441123962], "isaac_hag_final": [0.6830683946609497, 0.6872245073318481, 0.6527960300445557, 0.6986299388464527], "isaac_hag_min": [0.671396017074585, 0.679735004901886, 0.6527960300445557, 0.6601087079152017], "env_origin_max_abs_diff": 0.0, "scan0_max_abs_diff": 0.22480690479278564, "scan0_mean_abs_diff": 0.008711126632988453, "head0_max_abs_diff": 0.0}
+{"label": "isaac_it1000", "ckpt": "runs/parity/isaac/rough/rsl_rl_g1_rough/2026-09-25_09-54-11/model_1000.pt", "src": "rsl_rl", "level": 6, "columns": [0, 4, 9, 14], "x": [4.018115997314453, 0.14433956146240234, 1.1918296813964844, 3.923029899597168], "z": [-1.0372600555419922, 0.03317070007324219, -0.09422699362039566, 0.6166623830795288], "hag_final": [0.1451759934425354, 0.03317070007324219, 0.06469504038127447, 0.7166624069213867], "hag_min": [0.061575485655339435, 0.03317070007324219, 0.06469504038127447, 0.6404854379032905], "isaac_x": [0.8945722579956055, 3.3091020584106445, 2.0843257904052734, 1.6692705154418945], "isaac_z": [0.6599880456924438, 1.8199844360351562, 0.5570812821388245, 0.656974196434021], "isaac_hag_final": [0.6599880456924438, 0.6853625774383545, 0.6135870232610614, 0.6886791638993666], "isaac_hag_min": [0.6599880456924438, 0.6299827946586447, 0.6135870232610614, 0.650773057664806], "env_origin_max_abs_diff": 0.0, "scan0_max_abs_diff": 0.22480690479278564, "scan0_mean_abs_diff": 0.008711126632988453, "head0_max_abs_diff": 0.0}
+{"label": "isaac_it1499", "ckpt": "runs/parity/isaac/rough/rsl_rl_g1_rough/2026-09-25_09-54-11/model_1499.pt", "src": "rsl_rl", "level": 6, "columns": [0, 4, 9, 14], "x": [0.029407501220703125, -0.03835487365722656, 1.2577590942382812, 4.083009719848633], "z": [-1.14963698387146, 0.0322650671005249, 0.5164554119110107, 0.5908920764923096], "hag_final": [0.032799068838357925, 0.0322650671005249, 0.7526616007089615, 0.6908921003341675], "hag_min": [0.032799068838357925, 0.03208494186401367, 0.4843892288078223, 0.6249888421443861], "isaac_x": [3.0390472412109375, 3.854628562927246, 3.3748559951782227, 3.202481269836426], "isaac_z": [-0.41673195362091064, 1.7995095252990723, 0.5545957684516907, 0.6468455791473389], "isaac_hag_final": [0.6627379386554821, 0.6648876667022705, 0.817986491634656, 0.6553878879777265], "isaac_hag_min": [0.5966002941131592, 0.5863056182861328, 0.6376634836196899, 0.6217485049419057], "env_origin_max_abs_diff": 0.0, "scan0_max_abs_diff": 0.22480690479278564, "scan0_mean_abs_diff": 0.008711126632988453, "head0_max_abs_diff": 0.0}
+| level | policy | Isaac x [m] per env (cols 0/4/9/14) | Isaac pelvis above ground final (min) | MetalSim x | MetalSim pelvis above ground final (min) |
+| 3 | isaac_it500 | 1.04 / 2.28 / 0.51 / 0.83 | 0.66 (0.66) / 0.73 (0.66) / 0.67 (0.67) / 0.72 (0.63) | 0.21 / 0.18 / 0.73 / 0.12 | 0.72 (0.61) / 0.07 (0.06) / 0.61 (0.60) / 0.65 (0.65) |
+| 3 | isaac_it1000 | 1.12 / 3.35 / 0.81 / 1.65 | 0.66 (0.66) / 0.69 (0.65) / 0.67 (0.67) / 0.67 (0.65) | 3.11 / 0.18 / 2.41 / 3.62 | 0.73 (0.65) / 0.03 (0.03) / 0.70 (0.62) / 0.68 (0.65) |
+| 3 | isaac_it1499 | 3.54 / 2.57 / 2.82 / 2.09 | 0.67 (0.62) / 0.73 (0.66) / 0.68 (0.59) / 0.64 (0.64) | 4.11 / 1.46 / 4.27 / 4.41 | 0.68 (0.59) / 0.68 (0.65) / 0.62 (0.58) / 0.64 (0.64) |
+| 6 | isaac_it500 | 0.56 / 0.35 / 0.94 / 2.34 | 0.68 (0.67) / 0.69 (0.68) / 0.65 (0.65) / 0.70 (0.66) | 0.06 / 0.23 / 0.79 / 2.24 | 0.65 (0.61) / 0.08 (0.07) / 0.69 (0.63) / 0.70 (0.65) |
+| 6 | isaac_it1000 | 0.89 / 3.31 / 2.08 / 1.67 | 0.66 (0.66) / 0.69 (0.63) / 0.61 (0.61) / 0.69 (0.65) | 4.02 / 0.14 / 1.19 / 3.92 | 0.15 (0.06) / 0.03 (0.03) / 0.06 (0.06) / 0.72 (0.64) |
+| 6 | isaac_it1499 | 3.04 / 3.85 / 3.37 / 3.20 | 0.66 (0.60) / 0.66 (0.59) / 0.82 (0.64) / 0.66 (0.62) | 0.03 / -0.04 / 1.26 / 4.08 | 0.03 (0.03) / 0.03 (0.03) / 0.75 (0.48) / 0.69 (0.62) |

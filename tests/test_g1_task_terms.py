@@ -43,9 +43,10 @@ def _one_step(task, n, seed_actions=3):
     return bufs.done.numpy()[0] > 0.5
 
 
-def _isaac_terms(task, e, flat):
+def _isaac_terms(task, e, flat, rough_isaac=False):
     """Isaac Lab's reward terms (weights applied, before x dt) recomputed in numpy from the live state:
-    G1FlatEnvCfg (flat) or G1RoughEnvCfg as first ported (rough)."""
+    G1FlatEnvCfg (flat), G1RoughEnvCfg exactly (rough_isaac) or G1RoughEnvCfg as first ported (neither)."""
+    exact = flat or rough_isaac
     d = task.sim.d
     qpos = d.qpos.numpy()[e]; qvel = d.qvel.numpy()[e]; cmd = task.cmd.numpy()[e]
     last = task.last_action.numpy()[e]; prev = task.prev_action.numpy()[e]
@@ -73,9 +74,9 @@ def _isaac_terms(task, e, flat):
         in_c = con > 0.0
         slide_c = np.linalg.norm(cs["net_forces_w_history"][e, :, :2], axis=-1).max(0) > 1.0
     mode = np.where(in_c, con, air)
-    if flat:
+    if exact:
         single = in_c.sum() == 1
-        t[2] = 0.75 * min(np.min(np.where(single, mode, 0.0)), 0.4) * float(np.linalg.norm(cmd[:2]) > 0.1)
+        t[2] = (0.75 if flat else 0.25) * min(np.min(np.where(single, mode, 0.0)), 0.4) * float(np.linalg.norm(cmd[:2]) > 0.1)
     else:
         t[2] = 0.25 * np.sum(np.minimum(mode, 0.4)) * float(in_c.sum() == 1 and np.linalg.norm(cmd) > 0.1)
     # feet_slide -0.1: |body_lin_vel_w[foot].xy| summed over feet in contact
@@ -93,6 +94,11 @@ def _isaac_terms(task, e, flat):
         t[9] = -0.05 * np.sum(w_b[:2] ** 2)          # ang_vel_xy_l2 on root_ang_vel_b
         t[10] = -2.0e-6 * np.sum(tau[6:][hk] ** 2)   # dof_torques_l2 (hips, knees)
         t[11] = -1.0e-7 * np.sum(qacc[6:][hk] ** 2)  # dof_acc_l2 (hips, knees)
+    elif rough_isaac:                                # G1RoughEnvCfg: lin_vel_z 0, ang_vel_xy body frame, rough weights
+        t[8] = 0.0
+        t[9] = -0.05 * np.sum(w_b[:2] ** 2)
+        t[10] = -1.5e-7 * np.sum(tau[6:][group <= 2] ** 2)   # hips, knees, ankles
+        t[11] = -1.25e-7 * np.sum(qacc[6:][hk] ** 2)
     else:
         t[8] = 0.0
         t[9] = -0.05 * np.sum(w_w[:2] ** 2)
@@ -101,7 +107,7 @@ def _isaac_terms(task, e, flat):
     # joint_pos_limits -1.0 on the ankles: soft limits (G1_CFG soft_joint_pos_limit_factor 0.9) for the flat set
     m = task.model
     jr = np.array([m.jnt_range[m.actuator_trnid[i][0]] for i in range(m.nu)])
-    if flat:
+    if exact:
         mid = jr.mean(1); half = 0.5 * (jr[:, 1] - jr[:, 0]); jr = np.stack([mid - 0.9 * half, mid + 0.9 * half], 1)
     q = qpos[7:]; an = group == 2
     t[12] = -1.0 * np.sum(np.maximum(jr[an, 0] - q[an], 0.0) + np.maximum(q[an] - jr[an, 1], 0.0))
@@ -144,6 +150,29 @@ def test_rough_reward_set_unchanged():
                 continue
             rtol, atol = (1e-3, 1e-6) if k in (10, 11) else (1e-4, 1e-5)
             np.testing.assert_allclose(terms[e, k], v, rtol=rtol, atol=atol, err_msg=f"env {e} term {k}")
+
+
+def test_rough_isaac_reward_set_matches_isaac_formulas():
+    """reward_cfg="rough_isaac" = Isaac's G1RoughEnvCfg exactly: all 13 terms against Isaac's formulas with the rough
+    weights, commands with lin_vel_y = (0, 0), ContactSensor-based contact terms (MuJoCo Warp)."""
+    n = 8
+    task = G1VelocityTask(n, terrain="flat", seed=1, reward_cfg="rough_isaac")
+    assert task.isaac_flat == 2 and task.lin_vel_y == 0.0 and task.contact is not None
+    done = _one_step(task, n)
+    terms = task.terms.numpy()
+    checked_air = 0
+    for e in range(n):
+        ref = _isaac_terms(task, e, flat=False, rough_isaac=True)
+        for k, v in ref.items():
+            if k in (2, 3) and done[e]:
+                continue
+            rtol, atol = (1e-3, 1e-6) if k in (10, 11) else (1e-4, 1e-5)
+            np.testing.assert_allclose(terms[e, k], v, rtol=rtol, atol=atol, err_msg=f"env {e} term {k}")
+            checked_air += int(k == 2)
+    assert checked_air > 0
+    task.reset_all(); idx = wp.zeros(1, dtype=int, device="metal:0")
+    task.resample.assign(np.ones(n, bool)); task.launch_obs(idx); task.sim.synchronize()
+    assert np.all(task.cmd.numpy()[:, 1] == 0.0)
 
 
 @pytest.mark.parametrize("engine", ENGINES)

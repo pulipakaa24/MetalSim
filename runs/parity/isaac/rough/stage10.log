@@ -1,0 +1,48 @@
++ export PATH=/home/aditya_nianticspatial_com/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin TERM=xterm OMNI_KIT_ACCEPT_EULA=YES
++ PATH=/home/aditya_nianticspatial_com/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ TERM=xterm
++ OMNI_KIT_ACCEPT_EULA=YES
++ source /home/aditya_nianticspatial_com/env_isaaclab/bin/activate
+++ '[' -z '' ']'
+++ '[' -n x ']'
+++ SCRIPT_PATH=/home/aditya_nianticspatial_com/env_isaaclab/bin/activate
+++ '[' /home/aditya_nianticspatial_com/env_isaaclab/bin/activate = /home/aditya_nianticspatial_com/stage10.sh ']'
+++ deactivate nondestructive
+++ unset -f pydoc
+++ '[' -z '' ']'
+++ '[' -z '' ']'
+++ hash -r
+++ '[' -z '' ']'
+++ unset VIRTUAL_ENV
+++ unset VIRTUAL_ENV_PROMPT
+++ '[' '!' nondestructive = nondestructive ']'
+++ VIRTUAL_ENV=/home/aditya_nianticspatial_com/env_isaaclab
+++ '[' linux-gnu = cygwin ']'
+++ '[' linux-gnu = msys ']'
+++ export VIRTUAL_ENV
+++ '[' -z '' ']'
+++ unset SCRIPT_PATH
+++ _OLD_VIRTUAL_PATH=/home/aditya_nianticspatial_com/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ PATH=/home/aditya_nianticspatial_com/env_isaaclab/bin:/home/aditya_nianticspatial_com/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ export PATH
+++ '[' x '!=' x ']'
++++ basename /home/aditya_nianticspatial_com/env_isaaclab
+++ VIRTUAL_ENV_PROMPT=env_isaaclab
+++ export VIRTUAL_ENV_PROMPT
+++ '[' -z '' ']'
+++ '[' -z '' ']'
+++ _OLD_VIRTUAL_PS1=
+++ PS1='(env_isaaclab) '
+++ export PS1
+++ alias pydoc
+++ true
+++ hash -r
++ cd /home/aditya_nianticspatial_com/IsaacLab
++ mkdir -p /home/aditya_nianticspatial_com/parity_out
++ rm -f /home/aditya_nianticspatial_com/ROUGH_DONE
++ python scripts/reinforcement_learning/rsl_rl/train.py --task Isaac-Velocity-Rough-G1-v0 --num_envs 4096 --headless --max_iterations 1500 --seed 0 env.commands.base_velocity.debug_vis=false env.scene.height_scanner.debug_vis=false
++ echo 'train exit 0'
+train exit 0
++ rm -rf /home/aditya_nianticspatial_com/parity_out/rsl_rl_g1_rough
++ cp -r logs/rsl_rl/g1_rough /home/aditya_nianticspatial_com/parity_out/rsl_rl_g1_rough
++ touch /home/aditya_nianticspatial_com/ROUGH_DONE
