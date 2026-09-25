@@ -1,0 +1,48 @@
+# item 5 (rest height), Thu Sep 24 22:33:43 PDT 2026, CPU device, fork 9f626ce2
+holder: {"name": "g1_flat_rslrl_isaacflatcfg", "kind": "train", "minutes": 30.0, "pid": 62863, "start": 1790313230.220779}
+  waiting [timing] camera_update_3d est 6.0 min, queued 1141 s ago
+  waiting [timing] contact_tuning_bench est 15.0 min, queued 819 s ago
+  waiting [timing] newton_fork_throughput est 15.0 min, queued 210 s ago
+  waiting [train] g1_flat_newton0625_ppo_fixed est 45.0 min, queued 1464 s ago
+$ .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/rest_height.py 
+newton at /Users/aditya/robosim/upstream/newton/newton/__init__.py; XPBD 4 it / 1.25 ms, relaxation 0.4, solver kwargs {'joint_armature_inertia': 'none'}; MuJoCo C 2.5 ms
+| isaac | MuJoCo C | z every 0.25 s [0.7101, 0.7082, 0.6924, 0.619, 0.3291, 0.0573] | lowest foot point -0.72 mm | left_hip_pitch -0.1187, left_knee +0.4858, left_ankle_pitch -0.2905, left_hip_roll +0.0004, left_ankle_roll -0.0012 |
+| isaac | Newton XPBD | z every 0.25 s [0.7025, 0.7009, 0.6886, 0.6221, 0.3632, 0.0618] | lowest foot point -0.10 mm | left_hip_pitch -0.1084, left_knee +0.5074, left_ankle_pitch -0.0448, left_hip_roll +0.0012, left_ankle_roll -0.0071 |
+| quasi | MuJoCo C | z every 0.25 s [0.7136, 0.7127, 0.712, 0.7115, 0.7112, 0.7113] | lowest foot point -0.70 mm | left_hip_pitch -0.1893, left_knee +0.4961, left_ankle_pitch -0.2382, left_hip_roll +0.0000, left_ankle_roll -0.0001 |
+| quasi | Newton XPBD | z every 0.25 s [0.71, 0.7078, 0.7069, 0.7065, 0.7064, 0.7066] | lowest foot point -0.33 mm | left_hip_pitch -0.1893, left_knee +0.4959, left_ankle_pitch -0.2383, left_hip_roll +0.0004, left_ankle_roll -0.0009 |
+$ .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/rest_height.py --it 16
+newton at /Users/aditya/robosim/upstream/newton/newton/__init__.py; XPBD 16 it / 1.25 ms, relaxation 0.4, solver kwargs {'joint_armature_inertia': 'none'}; MuJoCo C 2.5 ms
+| isaac | MuJoCo C | z every 0.25 s [0.7101, 0.7082, 0.6924, 0.619, 0.3291, 0.0573] | lowest foot point -0.72 mm | left_hip_pitch -0.1187, left_knee +0.4858, left_ankle_pitch -0.2905, left_hip_roll +0.0004, left_ankle_roll -0.0012 |
+| isaac | Newton XPBD | z every 0.25 s [0.7076, 0.7063, 0.6937, 0.6337, 0.397, 0.0531] | lowest foot point -0.03 mm | left_hip_pitch -0.0971, left_knee +0.5311, left_ankle_pitch -0.1111, left_hip_roll -0.0005, left_ankle_roll -0.0081 |
+| quasi | MuJoCo C | z every 0.25 s [0.7136, 0.7127, 0.712, 0.7115, 0.7112, 0.7113] | lowest foot point -0.70 mm | left_hip_pitch -0.1893, left_knee +0.4961, left_ankle_pitch -0.2382, left_hip_roll +0.0000, left_ankle_roll -0.0001 |
+| quasi | Newton XPBD | z every 0.25 s [0.7137, 0.7121, 0.7113, 0.7107, 0.7105, 0.7107] | lowest foot point -0.08 mm | left_hip_pitch -0.1893, left_knee +0.4960, left_ankle_pitch -0.2384, left_hip_roll +0.0000, left_ankle_roll -0.0002 |
+$ .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/rest_height.py --dt_ms 0.625
+newton at /Users/aditya/robosim/upstream/newton/newton/__init__.py; XPBD 4 it / 0.625 ms, relaxation 0.4, solver kwargs {'joint_armature_inertia': 'none'}; MuJoCo C 2.5 ms
+| isaac | MuJoCo C | z every 0.25 s [0.7101, 0.7082, 0.6924, 0.619, 0.3291, 0.0573] | lowest foot point -0.72 mm | left_hip_pitch -0.1187, left_knee +0.4858, left_ankle_pitch -0.2905, left_hip_roll +0.0004, left_ankle_roll -0.0012 |
+| isaac | Newton XPBD | z every 0.25 s [0.7079, 0.7072, 0.6941, 0.6349, 0.403, 0.0595] | lowest foot point -0.03 mm | left_hip_pitch -0.0718, left_knee +0.5335, left_ankle_pitch -0.1124, left_hip_roll +0.0003, left_ankle_roll -0.0052 |
+| quasi | MuJoCo C | z every 0.25 s [0.7136, 0.7127, 0.712, 0.7115, 0.7112, 0.7113] | lowest foot point -0.70 mm | left_hip_pitch -0.1893, left_knee +0.4961, left_ankle_pitch -0.2382, left_hip_roll +0.0000, left_ankle_roll -0.0001 |
+| quasi | Newton XPBD | z every 0.25 s [0.7131, 0.7119, 0.7112, 0.7107, 0.7105, 0.7107] | lowest foot point -0.08 mm | left_hip_pitch -0.1895, left_knee +0.4954, left_ankle_pitch -0.2392, left_hip_roll +0.0003, left_ankle_roll -0.0005 |
+$ .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/rest_height.py --kw joint_coloring=True --relax 0.8
+newton at /Users/aditya/robosim/upstream/newton/newton/__init__.py; XPBD 4 it / 1.25 ms, relaxation 0.8, solver kwargs {'joint_armature_inertia': 'none', 'joint_coloring': True}; MuJoCo C 2.5 ms
+| isaac | MuJoCo C | z every 0.25 s [0.7101, 0.7082, 0.6924, 0.619, 0.3291, 0.0573] | lowest foot point -0.72 mm | left_hip_pitch -0.1187, left_knee +0.4858, left_ankle_pitch -0.2905, left_hip_roll +0.0004, left_ankle_roll -0.0012 |
+| isaac | Newton XPBD | z every 0.25 s [0.7071, 0.7055, 0.6908, 0.6248, 0.358, 0.0576] | lowest foot point -0.05 mm | left_hip_pitch -0.1276, left_knee +0.4930, left_ankle_pitch -0.0500, left_hip_roll +0.0007, left_ankle_roll +0.0051 |
+| quasi | MuJoCo C | z every 0.25 s [0.7136, 0.7127, 0.712, 0.7115, 0.7112, 0.7113] | lowest foot point -0.70 mm | left_hip_pitch -0.1893, left_knee +0.4961, left_ankle_pitch -0.2382, left_hip_roll +0.0000, left_ankle_roll -0.0001 |
+| quasi | Newton XPBD | z every 0.25 s [0.7131, 0.7116, 0.7108, 0.7103, 0.7101, 0.7103] | lowest foot point -0.34 mm | left_hip_pitch -0.1873, left_knee +0.4958, left_ankle_pitch -0.2406, left_hip_roll +0.0002, left_ankle_roll -0.0007 |
+$ .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/rest_height.py --kw joint_coloring=True --relax 1.0
+newton at /Users/aditya/robosim/upstream/newton/newton/__init__.py; XPBD 4 it / 1.25 ms, relaxation 1.0, solver kwargs {'joint_armature_inertia': 'none', 'joint_coloring': True}; MuJoCo C 2.5 ms
+| isaac | MuJoCo C | z every 0.25 s [0.7101, 0.7082, 0.6924, 0.619, 0.3291, 0.0573] | lowest foot point -0.72 mm | left_hip_pitch -0.1187, left_knee +0.4858, left_ankle_pitch -0.2905, left_hip_roll +0.0004, left_ankle_roll -0.0012 |
+| isaac | Newton XPBD | z every 0.25 s [0.7078, 0.7061, 0.6907, 0.6226, 0.3525, 0.0555] | lowest foot point -0.04 mm | left_hip_pitch -0.1343, left_knee +0.4861, left_ankle_pitch -0.0431, left_hip_roll +0.0005, left_ankle_roll +0.0049 |
+| quasi | MuJoCo C | z every 0.25 s [0.7136, 0.7127, 0.712, 0.7115, 0.7112, 0.7113] | lowest foot point -0.70 mm | left_hip_pitch -0.1893, left_knee +0.4961, left_ankle_pitch -0.2382, left_hip_roll +0.0000, left_ankle_roll -0.0001 |
+| quasi | Newton XPBD | z every 0.25 s [0.7136, 0.7122, 0.7114, 0.7109, 0.7106, 0.7108] | lowest foot point -0.34 mm | left_hip_pitch -0.1864, left_knee +0.4960, left_ankle_pitch -0.2413, left_hip_roll -0.0002, left_ankle_roll -0.0008 |
+$ .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/rest_height.py --it 16 --kw joint_coloring=True --relax 1.0
+newton at /Users/aditya/robosim/upstream/newton/newton/__init__.py; XPBD 16 it / 1.25 ms, relaxation 1.0, solver kwargs {'joint_armature_inertia': 'none', 'joint_coloring': True}; MuJoCo C 2.5 ms
+| isaac | MuJoCo C | z every 0.25 s [0.7101, 0.7082, 0.6924, 0.619, 0.3291, 0.0573] | lowest foot point -0.72 mm | left_hip_pitch -0.1187, left_knee +0.4858, left_ankle_pitch -0.2905, left_hip_roll +0.0004, left_ankle_roll -0.0012 |
+| isaac | Newton XPBD | z every 0.25 s [0.7089, 0.7073, 0.6932, 0.6292, 0.3815, 0.0555] | lowest foot point -0.01 mm | left_hip_pitch -0.1266, left_knee +0.5012, left_ankle_pitch -0.1532, left_hip_roll -0.0006, left_ankle_roll -0.0034 |
+| quasi | MuJoCo C | z every 0.25 s [0.7136, 0.7127, 0.712, 0.7115, 0.7112, 0.7113] | lowest foot point -0.70 mm | left_hip_pitch -0.1893, left_knee +0.4961, left_ankle_pitch -0.2382, left_hip_roll +0.0000, left_ankle_roll -0.0001 |
+| quasi | Newton XPBD | z every 0.25 s [0.7147, 0.7133, 0.7125, 0.7118, 0.7115, 0.7116] | lowest foot point -0.08 mm | left_hip_pitch -0.1883, left_knee +0.4966, left_ankle_pitch -0.2383, left_hip_roll -0.0010, left_ankle_roll -0.0005 |
+$ .venv/bin/python scripts/diagnostics/newton_fork/rest_height.py   (pinned upstream)
+newton at /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/__init__.py; XPBD 4 it / 1.25 ms, relaxation 0.4, solver kwargs {}; MuJoCo C 2.5 ms
+| isaac | MuJoCo C | z every 0.25 s [0.7101, 0.7082, 0.6924, 0.619, 0.3291, 0.0573] | lowest foot point -0.72 mm | left_hip_pitch -0.1187, left_knee +0.4858, left_ankle_pitch -0.2905, left_hip_roll +0.0004, left_ankle_roll -0.0012 |
+| isaac | Newton XPBD | z every 0.25 s [0.7025, 0.7009, 0.6886, 0.6221, 0.3632, 0.0617] | lowest foot point -0.10 mm | left_hip_pitch -0.1086, left_knee +0.5073, left_ankle_pitch -0.0451, left_hip_roll +0.0012, left_ankle_roll -0.0066 |
+| quasi | MuJoCo C | z every 0.25 s [0.7136, 0.7127, 0.712, 0.7115, 0.7112, 0.7113] | lowest foot point -0.70 mm | left_hip_pitch -0.1893, left_knee +0.4961, left_ankle_pitch -0.2382, left_hip_roll +0.0000, left_ankle_roll -0.0001 |
+| quasi | Newton XPBD | z every 0.25 s [0.71, 0.7078, 0.7069, 0.7065, 0.7064, 0.7066] | lowest foot point -0.33 mm | left_hip_pitch -0.1893, left_knee +0.4959, left_ankle_pitch -0.2383, left_hip_roll +0.0003, left_ankle_roll -0.0009 |

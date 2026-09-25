@@ -1,0 +1,15 @@
+# item 6 (per-body contact forces), Thu Sep 24 22:34:45 PDT 2026, CPU device, fork 9f626ce2
+holder: {"name": "g1_flat_rslrl_isaacflatcfg", "kind": "train", "minutes": 30.0, "pid": 62863, "start": 1790313230.220779}
+  waiting [timing] camera_update_3d est 6.0 min, queued 1203 s ago
+  waiting [timing] contact_tuning_bench est 15.0 min, queued 882 s ago
+  waiting [timing] newton_fork_throughput est 15.0 min, queued 273 s ago
+  waiting [train] g1_flat_newton0625_ppo_fixed est 45.0 min, queued 1526 s ago
+$ .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/contact_stack.py
+body 0 m g 313.920 | solver body_contact_force total [7.00000e-03 0.00000e+00 3.13848e+02] normal [-1.00000e-03 -0.00000e+00  3.13848e+02] | sum of update_contacts per contact [1.00000e-02 0.00000e+00 2.94257e+02]
+body 1 m g 117.720 | solver body_contact_force total [-1.50000e-02 -0.00000e+00  1.17551e+02] normal [1.00000e-03 0.00000e+00 1.17551e+02] | sum of update_contacts per contact [-1.0000e-02 -0.0000e+00  7.8367e+01]
+$ .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/contact_forces.py
+newton at /Users/aditya/robosim/upstream/newton/newton/__init__.py; XPBD 4 it / 1.25 ms, solver kwargs {'body_contact_forces': True, 'joint_armature_inertia': 'none'}; robot weight 316.26 N
+| env 0 | body_contact_force normal: L [0.0, 0.0, 158.7899932861328] R [0.0, 0.0, 157.6699981689453] sum z 316.46 N (1.0006 x weight) | total sum [1.1100000143051147, 0.019999999552965164, 316.4599914550781] | update_contacts summed per body: sum z 316.46 N (1.0006) | NewtonSim touch (|f| sums) L 158.80 R 157.67 sum 316.46 (1.0006) |
+| env 1 | body_contact_force normal: L [0.0, 0.0, 158.8000030517578] R [0.0, 0.0, 157.6699981689453] sum z 316.47 N (1.0007 x weight) | total sum [0.9200000166893005, 0.019999999552965164, 316.4700012207031] | update_contacts summed per body: sum z 316.47 N (1.0007) | NewtonSim touch (|f| sums) L 158.80 R 157.67 sum 316.47 (1.0007) |
+torso / pelvis net force (not touching): [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
+| landing + fall, feet in contact (142 foot-steps) | touch / |net vector| p50 1.000 p99 1.018 max 1.024 | tangential share of net p50 0.180 max 0.707 | |normal-only| / |total| p50 0.984 min 0.707 |
