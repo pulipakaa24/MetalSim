@@ -9,7 +9,7 @@ I=runs/contact_research/isaac_model_1000_metalsim.pt; I5=runs/contact_research/i
 U=runs/policies/g1_flat_rslrl/g1_flat_rslrl_it1000.pt; U4=runs/policies/g1_flat_rslrl/g1_flat_rslrl_it400.pt
 run() { name=$1; shift; t0=$(date +%s); $PY $S "$@" --out $O/$name.json > $O/$name.log 2>&1; echo "$name rc=$? $(( $(date +%s)-t0 )) s"; }
 if [ "$1" = 1 ]; then
-  run smoke $I --envs 16 --steps 60
+  run smoke $I --envs 16 --steps 1100
   run isaac1000_default $I
   run isaac1000_tau10_impact $I --contact_tuning tau10_impact_hardlimits
   run isaac1000_tau5 $I --contact_tuning tau5_imp99_hardlimits

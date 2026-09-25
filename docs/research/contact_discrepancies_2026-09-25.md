@@ -11,7 +11,7 @@ outputs: `runs/contact_research/`.
 | discrepancy | verdict | evidence (short) |
 |---|---|---|
 | A. impact peak (3.0–3.7 kN vs 0.6–1.0 kN) | **reporting artefact** (plus a different sub-step time profile that no control-rate recording can resolve); **no physics difference found** | Isaac's own recorded states give its contact impulses by momentum balance: its sensor saw 42–45 % less impulse than its bodies received during the torso impacts. Impulses agree to 1–4 % for every setting. Force averaged over each 20 ms control step peaks at 2.0–2.2 kN in PhysX and 2.4–2.6 kN in MuJoCo (default); MuJoCo's 5 ms peak lies inside the bounds PhysX's own data allow. The "drop peak" in the tables is the torso hitting the floor at ~1.4 s, not the 1 m landing. The landing itself reads 917 vs 1030 N per foot. |
-| B. feet_air_time / feet_slide | **policy difference** (training stage, and deterministic play compared with stochastic training logs), with a **secondary contact-model effect**: stiff settings make the foot contact chatter at 2.5 ms | (see B below; the rollout numbers are filled in from the GPU batch) Isaac Lab 3.0's own MuJoCo Warp training of this task has air time 0.015 / 0.026 / 0.042 / 0.049 at iterations 300 / 500 / 1000 / 1499, against PhysX's 0.028 / 0.036 / 0.045 / 0.046. It reaches PhysX's value later, and at iteration 400 it sits at our 0.02. Slide at iteration 1000: −0.012 vs PhysX −0.013. |
+| B. feet_air_time / feet_slide | **mainly a policy difference**, with a **secondary physics difference in transfer** and a small **convention difference** in slide | With the default contact model held fixed, five policies span 0.022 to 0.048 (measured, B(1)). Our own iteration-1000 policy reaches 0.048, above Isaac's 0.0446. The table's 0.016–0.022 is one policy at iteration 400: the flat-config run, played with mean actions. Isaac's own checkpoint 1000 gets 0.029 with default contacts and 0.037 with impact-only stiffening, against its log value 0.0446. For that policy the contact model moves air time by 26 %, slide from −0.021 to −0.016 (Isaac −0.013) and falls from 310 to 142. Our slide uses the foot frame-origin velocity, while Isaac uses the COM velocity: 5–15 % more slide on our side. Stiff settings make the contact flag chatter (B(3)). |
 
 ## A. Impact peak
 
@@ -283,7 +283,59 @@ the toe edge, lift.
 
 ### B(1) Isaac's checkpoints in our simulator (measured, GPU)
 
-PENDING
+Isaac's rsl_rl checkpoints were converted to our joint order (`isaac_ckpt_to_metalsim.py`; the actions match the
+`side_by_side.py` mapping to 1.4e-6). They were played with `air_time_rollout.py`: 1024 envs × 1000 control steps, the task's own
+random commands and resets, mean action unless noted, seed 1 unless noted. The rollout uses the same per-term accounting as
+`g1_reward_terms.py`. feet_slide is given both ways: with the foot frame-origin velocity (the task kernel) and with the foot COM
+velocity (Isaac Lab 2.3.2).
+* Runs: `run_air_time_batch.sh`, logs in `runs/contact_research/air_time/`, table `runs/contact_research/air_time_table.md`.
+* Rows marked † are the contact-fidelity agent's rollout of the flat-config iteration-400 policy that the tuning table used
+  (`runs/contact_research/flatcfg400/`, same script).
+* The first attempt of these runs died of a Metal out-of-memory error while a training job was releasing the GPU
+  (`air_time/failed_oom/`) and was re-run.
+
+| policy (trained in) | contact | actions | feet_air_time | feet_slide origin / COM | Isaac log at that iteration (air / slide) | falls / episodes | median air phase | air / contact phases < 20 ms |
+|---|---|---|---|---|---|---|---|---|
+| Isaac it 1000 (PhysX) | default | mean | 0.0293 (seed 2: 0.0300) | −0.0211 / −0.0201 | 0.0446 / −0.0127 | 310 / 1244 | 105 ms | 17 % / 17 % |
+| Isaac it 1000 | τ10 impact-only + hard limits | mean | **0.0368** | −0.0161 / **−0.0144** | 0.0446 / −0.0127 | 142 / 1122 | 110 ms | 32 % / 35 % |
+| Isaac it 1000 | τ5 imp 0.99 + hard limits | mean | 0.0339 | −0.0131 / −0.0113 | 0.0446 / −0.0127 | 125 / 1103 | **12 ms** | 51 % / 57 % |
+| Isaac it 1000 | default | stochastic | 0.0226 | −0.0222 / −0.0206 | 0.0446 / −0.0127 | 610 / 1463 | 95 ms | 26 % / 23 % |
+| Isaac it 1000 | τ10 impact-only | stochastic | 0.0302 | −0.0200 / −0.0176 | 0.0446 / −0.0127 | 289 / 1214 | 92 ms | 36 % / 38 % |
+| Isaac it 500 (PhysX) | default | mean | 0.0218 | −0.0173 / −0.0163 | 0.0364 / −0.0148 | 508 / 1408 | 97 ms | 16 % / 16 % |
+| ours it 1000 (`g1_flat_rslrl`, MuJoCo Warp) | default | mean | **0.0479** | −0.0123 / −0.0118 | 0.0446 / −0.0127 | 37 / 1050 | 177 ms | 13 % / 13 % |
+| ours it 1000 | τ10 impact-only | mean | 0.0465 | −0.0089 / −0.0082 | 0.0446 / −0.0127 | 47 / 1053 | 172 ms | 25 % / 27 % |
+| ours it 400 (`g1_flat_rslrl`) | default | mean | 0.0388 | −0.0234 / −0.0215 | 0.0349 / −0.0175 | 27 / 1041 | 155 ms | 19 % / 20 % |
+| ours it 400 | τ10 impact-only | mean | 0.0367 | −0.0176 / −0.0154 | 0.0349 / −0.0175 | 51 / 1062 | 142 ms | 36 % / 42 % |
+| ours it 400, flat config† (the tuning table's policy) | default (seeds 1/2/3) | mean | 0.0217 / 0.0220 / 0.0218 | −0.0480 / −0.0444 | 0.0349 / −0.0175 | 31 / 1041 | 72 ms | 9 % / 8 % |
+| same† | τ10 impact-only (seeds 1/2/3) | mean | 0.0202 / 0.0200 / 0.0192 | −0.0355 / −0.0321 | | 53 / 1054 | 65 ms | 38 % / 42 % |
+| same† | τ5 imp 0.99 (seeds 1/2) | mean | 0.0157 / 0.0151 | −0.0258 / −0.0222 | | 125 / 1098 | 10 ms | 54 % / 65 % |
+
+Reading:
+1. **Air time is mainly a property of the policy.**
+   * With the default contact model fixed, five policies give 0.022–0.048.
+   * The seed-to-seed spread is ±0.0005 (three seeds of the flat-config policy, two of Isaac it 1000).
+   * The tuning table's gap (0.016–0.022 vs 0.035) came from one early policy whose gait takes short steps: median air phase
+     72 ms, against 105–177 ms for the others.
+   * Our other iteration-1000 policy (`g1_flat_rslrl`) exceeds Isaac's logged air time (0.048 vs 0.0446) and matches its slide
+     (−0.0118 vs −0.0127, COM convention).
+2. **Isaac's policy does not reach its own log value in our simulator.** It gets 0.029–0.037 with mean actions, and 0.023–0.030
+   with the stochastic actions its log was made with. Two things make up that gap:
+   * **Transfer falls, a physics effect.** 142–610 falls in 1103–1463 episodes, where Isaac's training at iteration 1000 had a
+     mean episode length of 991 of 1000 steps. The contact model changes this: impact-only stiffening halves the falls
+     (310 → 142), raises air time 26 % (0.029 → 0.037) and brings slide from −0.020 to −0.014 (COM convention). That is
+     Isaac's −0.0127 within 13 %, and closer than any other setting except τ5.
+   * **The log's own conditions.** Isaac's log comes from training: stochastic actions under training randomization, as
+     configured in Isaac's velocity env cfg. Those cannot be reproduced in a mean-action playback. Its value is therefore an
+     upper reference, not a like-for-like target.
+3. **Stiff contacts cut air phases into pieces.**
+   * Under τ5 the median air phase falls to 10–12 ms and more than half of all phases last under 20 ms. That is the chatter of
+     B(3), now measured in closed loop.
+   * Air time still stays at 0.034 for Isaac's policy, because the reward takes the minimum over feet only during single
+     stance, but the timers are corrupted.
+   * Impact-only stiffening also raises short phases, from 13–19 % to 25–42 %.
+4. **Slide convention.** Isaac's COM-velocity convention gives 5–15 % less slide than our frame-origin convention on every
+   run. It is a small systematic bias in our kernel (`metalsim/learn/g1_velocity.py`, `g1_foot_vel_mjwarp` uses `xpos`
+   rather than `xipos`); fixing it is for the task owner, since the file is not mine to edit.
 
 ### B: Isaac Lab 3.0's own MuJoCo Warp training (measured by NVIDIA's pipeline, L4, `runs/parity3/isaac/train/summary_flat_newton_mjwarp.json`, commit c6d17fd)
 
@@ -306,10 +358,11 @@ PENDING
 | # | remedy | discrepancy | expected effect | cost |
 |---|---|---|---|---|
 | 1 | Compare impacts by **impulse and momentum-derived 20 ms force** (both engines, from recorded states), not by the control-step sensor sample. Report per-body peaks only with the event named. | A | Closes the "3–5×" to the measured 1–4 % (impulse) and +18–21 % (20 ms peak). No physics change. | A column in `compare.py` (≈40 lines, the `momentum_impulse.py` logic); zero runtime cost |
-| 2 | Compare air time / slide at **matched iteration and matched action mode**: Isaac's training log against our training log, or deterministic playback in both engines. Add Isaac's checkpoint played in our sim as the policy-independent row (B(1)). | B | Removes the stage and mode part of the gap (measured in B(1) / the Isaac Lab 3.0 run) | Existing scripts |
-| 3 | Keep **default or τ10 impact-only** contacts. Do not adopt τ5 / 0.99 impedance or the Isaac Lab 3.0 mapping for fidelity. | A, B | They exceed PhysX's own 5 ms upper bound at torso impacts (measured) and double foot chatter (measured) | none |
-| 4 | Train to ≥ 1000 iterations before comparing gait terms | B | Air time 0.042–0.049 in Isaac Lab 3.0's MuJoCo Warp run (measured there); ours expected similar | Training time |
-| 5 | Reduce touch-down chatter with **direct-form damping below deadbeat** (−k, −b with b·h ≈ 0.4–0.7 at the same k) on foot geoms with `priority` 1 | B (and A if stiff contacts are wanted) | Fewer 2.5 ms gaps and ≈ 30–60 % lower first-step spike at equal resting depth (estimate from the force law) | Preset plus a GPU check; no throughput change expected |
+| 2 | Compare air time / slide on **several policies at matched iteration and action mode**, and always include Isaac's checkpoint played in our sim (`air_time_rollout.py`). Do not rank contact presets on one policy's gait terms. | B | The policy spread (0.022–0.048 at fixed contacts, measured) is 10× the preset effect on the table's policy (0.016–0.022) | Existing scripts, ~75 s per rollout |
+| 2b | feet_slide on the foot **COM velocity** (`xipos` instead of `xpos` in `g1_foot_vel_mjwarp`), as Isaac Lab 2.3.2's `body_lin_vel_w` | B | −5 to −15 % slide magnitude (measured on 13 runs) | One line in `metalsim/learn/g1_velocity.py` (task owner) |
+| 3 | Keep **τ10 impact-only + hard limits** (the provisional pick) on the evidence of Isaac's own policy: fewest transfer falls besides τ5 (142 vs 310), air time 0.037 and slide −0.014 (COM) against Isaac's −0.013. Do not adopt τ5 / 0.99 impedance or the Isaac Lab 3.0 mapping. | A, B | τ5 and the mapping exceed PhysX's own 5 ms upper bound at torso impacts, and give a 10–12 ms median air phase from chatter (measured) | none |
+| 4 | Train to ≥ 1000 iterations before comparing gait terms | B | Measured: ours it 1000 at 0.048 / −0.012; Isaac Lab 3.0's MuJoCo Warp run at 0.042 / −0.012 | Training time |
+| 5 | Reduce touch-down chatter (and with it transfer falls, estimated) with **direct-form damping below deadbeat** (−k, −b with b·h ≈ 0.4–0.7 at the same k) on foot geoms with `priority` 1 | B (and A if stiff contacts are wanted) | Fewer 2.5 ms gaps and ≈ 30–60 % lower first-step spike at equal resting depth (estimate from the force law) | Preset plus a GPU check; no throughput change expected |
 | 6 | Per-geom torso-only softening (priority + solref) | A (torso impact only) | Lowers the torso's 5 ms peak toward the lower half of PhysX's bounds. Not needed for fidelity. | Preset; none |
 | 7 | A PhysX-style sensor window (mean of the last 5 ms) | A | **None measured**: 4080 vs 3715 N for default; the sub-step time profile differs, not the window | Not recommended |
 | 8 | `integrator="discrete"` (MuJoCo 3.13) | A, B | Stiff contacts without the deadbeat spike (per the docs) | Not available in MuJoCo Warp; would need porting |
@@ -317,4 +370,10 @@ PENDING
 
 ## Addendum: GPU checks
 
-PENDING
+**MuJoCo Warp confirmation (measured, GPU queue, `substep_forces.py --engine warp`, `runs/contact_research/substep_warp_{default,tau10_impact_hardlimits}.npz`, log `substep_warp.log`).**
+Warp's per-substep recordings match MuJoCo C to within 0.3 % on every quantity used above:
+* default: identical, 5 ms / 20 ms peak and impulse (2961 / 2421 N / 193.1 N s landing; 4404 / 2602 N / 237.9 N s drop
+  torso; 4364 / 2581 N / 250.9 N s hold torso);
+* τ10 impact-only: drop torso 5 ms peak 7880 vs 7862 N, 20 ms peak 3727 vs 3716 N; landing and hold identical.
+
+The A(1) conclusions therefore hold for MuJoCo Warp on Metal. B(1) above ran on MuJoCo Warp on the GPU.
