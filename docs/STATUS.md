@@ -1,4 +1,4 @@
-# Status against the plan (2026-09-23)
+# Status against the plan (2026-09-24)
 
 Machine: Apple M4 Max (40-core GPU, 18.4 TFLOPS FP32 vendor peak), 64 GB, macOS 26.7, Command Line
 Tools only. Every figure below is **measured** here unless marked reported. The per-row evidence
@@ -6,6 +6,15 @@ Tools only. Every figure below is **measured** here unless marked reported. The 
 incidents is in `PHASES.md`; sources in `RESEARCH.md`; tests in `tests/` (all pass).
 
 ## What the parity claim rests on now
+
+Physics against PhysX (Isaac Sim 5.1 on an NVIDIA L4, `PARITY.md` §1.7, measured 2026-09-24): the
+same G1 asset under the same open-loop protocols lands in the same state (hold and 1 m drop: joints
+within 0.03–0.06 rad throughout, root height RMSE 1.3 / 3.5 cm, torque RMS within 1 %); the contact
+model differs in the impact peak (MuJoCo soft contact: 3.4–5.7× PhysX's peak force at equal mean).
+Newton XPBD on the Metal Warp fork (`PARITY.md` §2.1) now runs the G1 with working drives, mesh
+colliders and Isaac's actuator limits, tracks MuJoCo C within 0.02–0.04 rad, and gives 4.0–4.5× MuJoCo
+Warp's physics rate at 4096 envs with 0.16–0.69 cm impact penetration; it is not yet wired into the
+task code.
 
 The direct comparison is **Isaac-Velocity-{Flat,Rough}-G1** on Isaac Lab's own `g1_minimal.usd`
 (the asset Isaac loads), with Isaac's actuator table, initial state, observation/reward/termination
@@ -39,11 +48,11 @@ published benchmark. Neither is cited as physics parity evidence.
 |---|---|
 | Physics: MuJoCo Warp suite green on Metal; trajectory parity vs CPU MuJoCo | 1447/1450 (3 flex deformable failures); one-step parity on 4 robots; G1 (Isaac's asset) 0.5 s incl. landing: max joint diff 1.2e-2 rad, median 3.6e-5 |
 | Rendering tier 0: silhouette IoU > 0.95, texture corr > 0.99 | 0.994–0.997; 0.996 |
-| Rendering tier 1/2 vs Isaac RTX on a shared USD scene | not testable here (no Isaac); tier 2 validated radiometrically (analytic + furnace) and against tier 0 (43 dB direct light); tier 1 vs MuJoCo PSNR 19.7 |
+| Rendering tier 1/2 vs Isaac RTX on a shared USD scene | **measured** against Isaac Sim 5.1 RTX on an L4, same G1 asset/state/camera/lights (`PARITY.md` §1.7): robot-only, brightness-matched, states agreeing: tier 2 13.7 dB PSNR / 0.48 SSIM / FLIP 0.024, tier 0 11.5 dB / 0.35; silhouette IoU 0.83, robot depth RMSE 2.6 cm; whole-frame rows await the grey-ground re-recording (Isaac's plane terrain ignored the material). Tier 2 also validated radiometrically (analytic + furnace) |
 | Sensors: lidar vs Isaac RTX lidar | vs MuJoCo `mj_ray`: median < 2 mm; height scan exact on the heightfield |
 | Lidar-based RL | `metalsim.learn.lidar_nav` learns goal navigation from a 64-beam scan: 1024 envs × 300 iterations at 21.2 K env-steps/s, time-to-goal 218 → 69 steps (measured) |
 | Pipeline: zero host copies per step, one sync per rollout | runtime counters on physics, render, sensor and Warp-rollout loops: 0 syncs, 0 host ops |
-| Training: identical PPO config, identical result | G1 flat: Isaac's PPO config on Isaac's asset learns (episode length rises from ~40 to 343 steps over 300 iterations, `PARITY.md` §1.5; no published Isaac curve to match); cartpole (rsl_rl config) reaches 295/300; SO-101 lift demoted to a pipeline demo (success 0 at 3M steps, no published reference) |
+| Training: identical PPO config, identical result | **not met.** Isaac's own rsl_rl run on the L4 (per-term log) tracks the command at 0.78 of max by iteration 200 and 0.90 by 300 with full 1000-step episodes; ours reaches 0.11 tracking at iteration 1000 with 70–89 % of episodes ending in a fall (`PARITY.md` §1.5). Learner differential (real rsl_rl on our task) and a Newton-backend PPO run are in progress to split learner vs simulation |
 
 ## Headline throughput (uncontended)
 
