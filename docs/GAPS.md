@@ -18,7 +18,52 @@ the Newton-engine evaluation. Evidence for each row is in `PARITY.md`.
 | Install path | public forks of Warp and MuJoCo Warp with setup scripts; **fresh-clone install verified 2026-09-25** (ee0af6b, dcaa79a): README followed literally on a new venv → 113 passed / 14 skipped (optional packages) in 2.5 min; full patch series for both forks under `patches/`, optional extras `newton`, `parity`, `rslrl`; `docs/GUIDE.md` (install, first runs, bring your own robot, pre-flight and monitor flags, fidelity protocol, GPU queue, throughput-vs-fidelity knobs); `CHANGELOG.md` | remaining: forks not upstreamed (Warp, MuJoCo Warp); first-run kernel compile and PyTorch download times not measured cold |
 | Silent RL failures | task-agnostic anomaly monitor + pre-flight | first probe flagged joint-limit and penetration issues on its own |
 
-## Still open (MuJoCo Warp path)
+## Closed on 2026-09-25 (detail rows kept below under "Ledger of 2026-09-25 rows")
+
+| gap | how it was closed | evidence |
+|---|---|---|
+| Learning parity on G1 (flat) | three PPO rollout bugs fixed (repeated noise, phantom boundary action, time-outs as falls); Isaac's flat config ported exactly | +28.4 / 26.3 / 26.0 return at iteration 1000 over three seeds vs Isaac's +27.3; full episodes at the same iteration; PARITY §1.5 |
+| Learning parity on G1 (rough) | exact rough config, Isaac's terrain generator, seed and column assignment; height-scan ray order fixed | ours +16.4 / level 6.1 vs Isaac's +14.1 / 5.9 at iteration 1500 (one seed each; two more seeds running); PARITY §1.5 |
+| Cross-simulator transfer | – | Isaac's policies walk within 5 % of their PhysX distance here (3 % with the tuned contacts); ours walk in PhysX once they track; PARITY §1.5 |
+| Contact "impact peak" gap (3–5×) | shown to be a reporting artefact (Isaac's sensor reports the last 5 ms of each 20 ms step) | impulses per event match Isaac within 1–4 % by momentum change; PARITY §1.7 correction |
+| Soft joint limits | hard-limit preset | limit excursion 0.030 → 0.001 rad at no cost |
+| Foot contact set (`plane_convex`) | fork fix, C-exact set, switchable | landing contact sets 61 → 0 of 691 differ from MuJoCo C |
+| Feet-slide reward term | per-foot velocity kernel on both engines | vs `mj_objectVelocity` to 2e-3 m/s |
+| Contact sensing | Isaac ContactSensor semantics as Warp kernels | vs MuJoCo C to 1e-4 N; +0.3 % step cost |
+| Sensor extras (divergence, multi-return, intensity, radar-lite) | `lidar_ext` kernel, `radar.py`, default scan unchanged | tests per feature; costs per option |
+| Exact terrain heights | verbatim port of Isaac Lab v2.3.2's generator | grid-exact vs Isaac's own code; 99.99 % within 1e-5 m of its ray cast |
+| Vertical-wall terrain (collision) | exact boxes windowed per robot + exact scan | Isaac's checkpoints' wall-cell falls 47 → 14 of 96 (final checkpoint 0 / 32); −6 % throughput |
+| Rendering vs RTX | MDL-defined BRDFs, USD light units, sun disk, ACES + sRGB, OIDN on Metal | robot vs RTX path tracer 13.9 → 28.8 dB (RTX's own modes 25.9 dB apart); whole frame 45.6 dB |
+| Throughput | 43-dof Cholesky fast path, sparse L'DL, fused Hessian update (forks) | G1 full PPO loop 27.9 → 56.6 K env-steps/s; above Isaac 2.3.2 + PhysX on the L4 (45.9 K) |
+| Camera-RL throughput | compiled update, Metal gradient kernels, fused gather | 7.5 → 12.7 K env-steps/s incl. training; the rest of the 2.5× to a 4090 is hardware |
+| Replicator | annotators, BasicWriter layout, event terms | 24 exact-match tests |
+| MaterialX | load-time flattening of four surface types | zero render cost; unmapped lobes listed |
+| Deformables (PhysX 5.1) | MuJoCo Warp flex 237/237 on Metal with five contact fixes; implicit damping; XPBD cloth/rope | cloth 2 mm / 3.3 cm, rope 1.077 vs 1.026 s, cube bounce 0.140 vs 0.135 m, penetration 2.6 vs 1.6 mm (fitted damping, stated) |
+| Install path | fresh-clone install verified, full patch series, user guide, changelog | 113 passed / 14 skipped from a fresh clone |
+| Newton XPBD (archived as experimental) | six solver defects fixed in the fork; three upstream issues and PRs filed | see the Newton section |
+
+## Open (2026-09-25 evening)
+
+| gap | status | owner / next |
+|---|---|---|
+| Contact preset: final pick | provisional impact-only stiffening + hard limits (transfer error 3.3 cm, 1.02× cost); re-ranking on impulse / 20 ms mean force / slide / transfer / chatter / stability after the reporting-artefact finding; feet_slide and air-time batch with a seed-noise band done, being analysed | contact-fidelity agent; then a like-for-like training run with the chosen preset |
+| Feet air time vs Isaac | 0.016–0.022 vs 0.035 is policy stage plus contact chatter, not the contact model (Isaac Lab 3.0's own MuJoCo Warp reaches 0.042 by iteration 1000); controlled check with Isaac's checkpoints in our sim being finished | contact-research agent |
+| Isaac Lab 3.0-EA reference (both backends) | environment built on the VM; benchmarks and flat training on PhysX and Newton/MuJoCo-Warp in progress, fidelity protocols to follow; everything so far is vs 5.1 / 2.3.2 PhysX | VM agent; then re-run every comparison against `runs/parity3/` |
+| Deformables: volume formulation and the 3.0 recordings | XPBD cloth and flex rope/cube match PhysX 5.1 by fitting; the formulation for volumes (PhysX-style FEM port, Newton VBD on Metal, flex) and the mesh-resolution locking test wait for the 3.0 recordings (PhysX 6 FEM cloth, Newton VBD, same solver on Metal); cube compresses less on impact (0.095 vs 0.079 m) | deformables agent, standing by for the 3.0 environment |
+| Newton 1.5.2 (Isaac Lab 3.0's pin) needs mujoco-warp 3.11 | our fork is 3.14 + fixes; the 3.0 Newton reference runs stock 3.11 without them | port the fixes to 3.11 or move the reference to the version that takes 3.14 |
+| Hardware validation | none; the endpoint that outranks both simulators | user's Tron1 run; then a hardware protocol (drop, step response, walking distance) as the top-ranked criterion |
+| Breadth | one asset (G1) validated end to end | Tron1 next |
+| Multi-seed rough | seeds 1 and 2 queued | – |
+| Fast-factorization defaults | G1-only; other scenes unverified | verify on cartpole / lift / lidar / Tron1, then make global |
+| Camera-RL residual | 12.7 K vs 32 K (hardware); untried: Apple's Metal Performance Primitives conv op | low |
+| Robot appearance residual | exposure is a fitted constant 9 % off the documented formula; RTX real-time shortcuts and NVIDIA denoisers not reproducible | low |
+| Renders of the rough task model | show only the heightfield on box cells (boxes live in per-world slots) | low |
+| Intermittent `test_ppo_warp_rollout` noise test under GPU load | unverified (the contact-sensor one was a real race, fixed) | reproduce loaded vs idle |
+| Upstreaming the Warp and MuJoCo Warp forks | not proposed; flex commits and patches 0008–0016 carry a co-author trailer the MuJoCo Warp CLA rejects (rewrite on a fresh branch before filing); `UPSTREAM.md` lists the six flex fixes | after the 3.0 reference lands |
+| Newton upstream PRs | #4316–#4318 open, blocked on the EasyCLA signature | user |
+| Isaac features not covered | MPM / particles, Kamino, kinematic node targets and per-element stress for deformables, skeleton / occlusion annotators, texture-swap and scatter randomizers, ROS 2 bridge | not started |
+
+## Ledger of 2026-09-25 rows (kept for traceability)
 
 | gap | status | next step |
 |---|---|---|
