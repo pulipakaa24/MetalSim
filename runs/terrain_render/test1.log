@@ -1,0 +1,23 @@
+holder: {"name": "terrain_slots_test", "kind": "render", "minutes": 6.0, "pid": 26974, "start": 1790376676.6983218}
+  waiting [train] camera_cartpole_physical_full2 est 25.0 min, queued 7746 s ago
+  waiting [train] g1_flat_flatcfg_tau10 est 80.0 min, queued 3512 s ago
+  waiting [train] il3_train_flat est 70.0 min, queued 3128 s ago
+  waiting [low] newton_vbd_replay est 40.0 min, queued 5768 s ago
+  waiting [low] il3_physx_ours est 40.0 min, queued 4339 s ago
+  waiting [low] kamino_tests_fork est 40.0 min, queued 3148 s ago
+  waiting [low] kamino_tests_152 est 30.0 min, queued 2319 s ago
+  waiting [low] cl_kamino est 45.0 min, queued 988 s ago
+  waiting [low] cl_mjw est 40.0 min, queued 964 s ago
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+.tier 0: |new - C(boxes)| median 0.01 mm, <1 cm 1.000; |old - C(hfield only)| median 0.01 mm; |old - C(boxes)| median 215.1 mm
+.tier 2: |new - C(boxes)| median 0.00 mm, <1 cm 1.000; |old - C(hfield only)| median 0.00 mm; |old - C(boxes)| median 215.1 mm
+.
+3 passed in 5.23s
+scripts/gpu_run.sh: line 19: syntax error near unexpected token `)'
+scripts/gpu_run.sh: line 19: `ripts/gpu_util.sh); [ "${u:-0}" -lt 10 ] && break; sleep 2; done'

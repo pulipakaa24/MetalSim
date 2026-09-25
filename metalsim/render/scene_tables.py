@@ -238,6 +238,11 @@ class SceneTables:
     params: np.ndarray          # (4, 4) float32, see scene_params
     n_envs: int
     G: int
+    # slots drawn as a unit primitive scaled by the per-world geom_size at render time (see build_scene_tables)
+    sized: np.ndarray = None    # (G,) bool
+
+    def sized_geom_ids(self) -> list:
+        return [g for g, f in zip(self.geoms, self.sized) if f] if self.sized is not None else []
 
     # material block layout (float4 x 4)
     # 0: rgba (base color); 1: metallic, roughness, specular, emission; 2: atlas u0,v0,du,dv;
@@ -308,18 +313,65 @@ def _decimate(v, f, target_faces):
     return best
 
 
+SIZED_GEOM_PREFIX = "tslot"      # metalsim.learn.terrain: BoxWindow's per-world terrain box slots ("boxes_local")
+
+
+def per_world_size_geoms(m: mujoco.MjModel) -> list:
+    """Geoms whose size is per world at run time and must be drawn from ``geom_size`` rather than the compiled
+    model: the rough terrain's box slots (``tslot<i>``, BoxWindow writes their per-world size and position)."""
+    out = []
+    for g in range(m.ngeom):
+        nm = mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_GEOM, g) or ""
+        if nm.startswith(SIZED_GEOM_PREFIX) and int(m.geom_type[g]) == int(mujoco.mjtGeom.mjGEOM_BOX):
+            out.append(g)
+    return out
+
+
+def hfield_mesh(m: mujoco.MjModel, hid: int):
+    """Indexed top surface of heightfield ``hid`` in its geom frame, MuJoCo's geometry: sample (r, c) at
+    x = -sx + 2 sx c / (ncol - 1), y = -sy + 2 sy r / (nrow - 1), z = data * sz, each cell split along
+    (c, r)-(c+1, r+1) as MuJoCo's collider and renderer do. Smooth vertex normals from the grid's central
+    differences (shading only), UVs over the extent. Returns (verts, normals, uvs, idx)."""
+    nrow, ncol = int(m.hfield_nrow[hid]), int(m.hfield_ncol[hid])
+    sx, sy, sz, _ = (float(v) for v in m.hfield_size[hid])
+    adr = int(m.hfield_adr[hid])
+    Z = m.hfield_data[adr:adr + nrow * ncol].astype(np.float64).reshape(nrow, ncol) * sz
+    xs = np.linspace(-sx, sx, ncol); ys = np.linspace(-sy, sy, nrow)
+    X, Y = np.meshgrid(xs, ys)
+    verts = np.stack([X.ravel(), Y.ravel(), Z.ravel()], 1)
+    r, c = np.mgrid[0:nrow - 1, 0:ncol - 1]
+    i00 = (r * ncol + c).ravel(); i01 = i00 + 1; i10 = i00 + ncol; i11 = i10 + 1
+    idx = np.concatenate([np.stack([i00, i01, i11], 1), np.stack([i00, i11, i10], 1)]).astype(np.uint32)
+    dzdx = np.gradient(Z, xs, axis=1) if ncol > 1 else np.zeros_like(Z)
+    dzdy = np.gradient(Z, ys, axis=0) if nrow > 1 else np.zeros_like(Z)
+    normals = np.stack([-dzdx.ravel(), -dzdy.ravel(), np.ones(Z.size)], 1)
+    normals /= np.linalg.norm(normals, axis=1, keepdims=True)
+    uvs = np.stack([(X.ravel() + sx) / max(2 * sx, 1e-9), (Y.ravel() + sy) / max(2 * sy, 1e-9)], 1)
+    return verts, normals, uvs, idx
+
+
 def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, include_planes: bool = True,
-                       plane_extent: float = 5.0, smooth: bool = True, decimate_faces: int = 0) -> SceneTables:
-    """``decimate_faces``: per-mesh triangle budget for a level of detail (0 = undecimated)."""
+                       plane_extent: float = 5.0, smooth: bool = True, decimate_faces: int = 0,
+                       sized_geoms="auto", draw_hfields: bool = True) -> SceneTables:
+    """``decimate_faces``: per-mesh triangle budget for a level of detail (0 = undecimated).
+
+    ``sized_geoms``: box geoms drawn as a unit box scaled at render time by the per-world ``geom_size`` (the renderer
+    reads MuJoCo Warp's ``Model.geom_size``); "auto" = ``per_world_size_geoms(m)`` (the rough terrain's box slots),
+    () = the previous behaviour (every box baked at its compiled size; the slots then drew as 2 mm cubes). Their
+    material is the terrain heightfield's (the first drawn hfield geom), when the model has one.
+    ``draw_hfields``: heightfield geoms as their exact top surface (False: skipped, the previous behaviour)."""
+    if isinstance(sized_geoms, str):
+        sized_geoms = per_world_size_geoms(m) if sized_geoms == "auto" else ()
+    sized_set = {int(g) for g in sized_geoms}
     mesh_cache = {}
     meshes, geoms, geom_mesh = [], [], []
     all_v, all_n, all_uv, all_i = [], [], [], []
     v_off = i_off = 0
     atlas = TextureAtlas.build(m)
 
-    def geom_tris(g):
+    def geom_tris(g, unit=False):
         t = int(m.geom_type[g])
-        size = m.geom_size[g]
+        size = np.ones(3) if unit else m.geom_size[g]
         if t == mujoco.mjtGeom.mjGEOM_MESH:
             mid = int(m.geom_dataid[g])
             va, vn = int(m.mesh_vertadr[mid]), int(m.mesh_vertnum[mid])
@@ -369,9 +421,25 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
             continue
         if m.geom_rgba[g][3] == 0.0 and int(m.geom_matid[g]) < 0:
             continue
-        key = ("mesh", int(m.geom_dataid[g])) if t == mujoco.mjtGeom.mjGEOM_MESH else (t, tuple(np.round(m.geom_size[g], 6)))
+        if t == mujoco.mjtGeom.mjGEOM_HFIELD:
+            if not draw_hfields:
+                continue
+            key = ("hfield", int(m.geom_dataid[g]))
+            if key not in mesh_cache:
+                verts, normals, uvs, idx = hfield_mesh(m, int(m.geom_dataid[g]))
+                mesh_cache[key] = len(meshes)
+                meshes.append({"i_off": i_off, "i_count": int(idx.size), "radius": float(np.linalg.norm(verts, axis=1).max())})
+                all_v.append(verts); all_n.append(normals); all_uv.append(uvs)
+                all_i.append(idx.reshape(-1) + v_off)
+                v_off += len(verts); i_off += idx.size
+            geom_mesh.append(mesh_cache[key]); geoms.append(g)
+            continue
+        if g in sized_set:
+            key = ("unit", t)
+        else:
+            key = ("mesh", int(m.geom_dataid[g])) if t == mujoco.mjtGeom.mjGEOM_MESH else (t, tuple(np.round(m.geom_size[g], 6)))
         if key not in mesh_cache:
-            tri, uv = geom_tris(g)
+            tri, uv = geom_tris(g, unit=g in sized_set)
             if tri is None:
                 continue
             verts, normals, uvs, idx = _tris_to_indexed(tri, uv, smooth=smooth and t == mujoco.mjtGeom.mjGEOM_MESH
@@ -441,6 +509,8 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
                     if gt == mujoco.mjtGeom.mjGEOM_PLANE:
                         ext = np.array([m.geom_size[g][0] if m.geom_size[g][0] > 0 else plane_extent,
                                         m.geom_size[g][1] if m.geom_size[g][1] > 0 else plane_extent]) * 2
+                    elif gt == mujoco.mjtGeom.mjGEOM_HFIELD:      # UVs span the heightfield's extent
+                        ext = 2 * m.hfield_size[int(m.geom_dataid[g])][:2]
                     else:
                         ext = np.sort(m.geom_size[g][:3])[-2:] * 2
                     mats[slot, 12:14] = m.mat_texrepeat[mat] * ext
@@ -450,9 +520,22 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
         body = int(m.geom_bodyid[g])
         semantic[slot] = (g, body, int(m.body_rootid[body]), int(m.geom_group[g]))
         static[slot] = body == 0
+    sized = np.array([g in sized_set for g in geoms], bool)
+    terrain = [s_ for s_, g in enumerate(geoms) if int(m.geom_type[g]) == int(mujoco.mjtGeom.mjGEOM_HFIELD)]
+    if sized.any() and terrain:
+        tm = mats[terrain[0]].copy()            # the slot boxes are pieces of the terrain: its material, untextured
+        if tm[14] > 0.5:                        # (a unit box's UVs would stretch one texture tile per face): the
+            u0, v0, du, dv = tm[8:12]           # texture's mean colour folded into the base colour
+            H_, W_ = atlas.image.shape[:2]
+            px = atlas.image[int(v0 * H_):max(int((v0 + dv) * H_), int(v0 * H_) + 1),
+                             int(u0 * W_):max(int((u0 + du) * W_), int(u0 * W_) + 1), :3]
+            tm[0:3] *= px.reshape(-1, 3).mean(0) / 255.0
+        tm[12:15] = (1.0, 1.0, 0.0)
+        mats[sized] = tm
     return SceneTables(vertices=inter, indices=indices, meshes=meshes, geoms=geoms, geom_mesh=geom_mesh,
                        draws=draws, inst_table=inst_table, materials=mats, atlas=atlas, semantic=semantic,
-                       static_geom=static, lights=build_lights(m), params=scene_params(m), n_envs=n_envs, G=G)
+                       static_geom=static, lights=build_lights(m), params=scene_params(m), n_envs=n_envs, G=G,
+                       sized=sized)
 
 
 def quats_to_mats(q: np.ndarray) -> np.ndarray:

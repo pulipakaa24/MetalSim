@@ -29,7 +29,9 @@ from metalsim.render.scene_tables import CameraIntrinsics, build_scene_tables
 
 class RayTracer:
     def __init__(self, model, n_envs: int, *, max_range: float = 10.0, max_group=3, include_planes=True,
-                 decimate_faces: int = 0, ctx: MetalContext | None = None, device="metal:0"):
+                 decimate_faces: int = 0, terrain_slots: bool = True, draw_hfields: bool = True,
+                 ctx: MetalContext | None = None, device="metal:0"):
+        """``terrain_slots`` / ``draw_hfields``: see ``Tier0Renderer`` (False = the previous behaviour)."""
         self.m = model
         self.n = n_envs
         self.device = device
@@ -37,8 +39,13 @@ class RayTracer:
         if not self.ctx.device.supportsRaytracing():
             raise RuntimeError("this GPU has no Metal ray tracing support")
         self.tables = build_scene_tables(model, n_envs, max_group=max_group, include_planes=include_planes,
-                                         decimate_faces=decimate_faces)
+                                         decimate_faces=decimate_faces, sized_geoms="auto" if terrain_slots else (),
+                                         draw_hfields=draw_hfields)
         t = self.tables
+        self.sized = None
+        if t.sized.any():
+            from metalsim.render.sized import SizedGeoms
+            self.sized = SizedGeoms(self.ctx, model, n_envs, t.sized_geom_ids())
         self.G = t.G
         self.tpr = int(np.ceil(np.sqrt(n_envs)))
         extent = float(model.stat.extent)
@@ -123,6 +130,12 @@ class RayTracer:
         self.inst_as = c.device.newAccelerationStructureWithSize_(s.accelerationStructureSize)
         self.inst_scratch = c.buffer(max(int(s.buildScratchBufferSize), 16), label="rt_inst_scratch")
 
+    def encode_geom_xmat(self, cb, sim, gm_buf, gm_off):
+        """The geom_xmat to refit from: the physics buffer, or its copy with the per-world slot sizes folded in."""
+        if self.sized is None:
+            return gm_buf, gm_off
+        return self.sized.encode(cb, gm_buf, gm_off, sim.m.geom_size)
+
     def _encode_refit_and_build(self, cb, geom_xpos, gx_off, geom_xmat, gm_off):
         ce = cb.computeCommandEncoder()
         ce.setComputePipelineState_(self.p_refit)
@@ -187,7 +200,8 @@ class RayTracer:
         gx, gm = wm.buffer_of(sim.d.geom_xpos), wm.buffer_of(sim.d.geom_xmat)
         cb = self.ctx.command_buffer()
         self.ctx.wait_for(cb, sim.event, after_value)
-        self._encode_refit_and_build(cb, gx.buffer, gx.offset, gm.buffer, gm.offset)
+        gm_buf, gm_off = self.encode_geom_xmat(cb, sim, gm.buffer, gm.offset)
+        self._encode_refit_and_build(cb, gx.buffer, gx.offset, gm_buf, gm_off)
         for s in sensors:
             s.encode(cb, sim=sim)
         v = self.ctx.signal(cb)
@@ -199,7 +213,8 @@ class RayTracer:
         n, ng, ns, nc = self.n, self.m.ngeom, max(self.m.nsite, 1), max(self.m.ncam, 1)
         c = self.ctx
         c.write_buffer(self._host_geom_xpos, np.stack([d.geom_xpos for d in datas]).astype(np.float32).reshape(n, ng, 3))
-        c.write_buffer(self._host_geom_xmat, np.stack([d.geom_xmat for d in datas]).astype(np.float32).reshape(n, ng, 9))
+        gm = np.stack([d.geom_xmat for d in datas]).astype(np.float32).reshape(n, ng, 9)
+        c.write_buffer(self._host_geom_xmat, self.sized.scale_host(gm).astype(np.float32) if self.sized is not None else gm)
         if self.m.nsite:
             c.write_buffer(self._host_site_xpos, np.stack([d.site_xpos for d in datas]).astype(np.float32).reshape(n, ns, 3))
             c.write_buffer(self._host_site_xmat, np.stack([d.site_xmat for d in datas]).astype(np.float32).reshape(n, ns, 9))

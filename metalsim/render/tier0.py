@@ -41,9 +41,14 @@ class Tier0Renderer:
     def __init__(self, model: mujoco.MjModel, n_envs: int, *, width=128, height=128, camera: str | int | None = None,
                  max_group=3, include_planes=True, backgrounds=False, outputs=("rgb",), seg_mode=SEG_SLOT,
                  decimate_faces: int = 0, shadows: bool = True, tier: int = 0, rt_samples: int = 4,
+                 terrain_slots: bool = True, draw_hfields: bool = True,
                  ctx: MetalContext | None = None, device="metal:0"):
         """tier 0: raster + shadow maps. tier 1: raster G-buffer with ray-traced shadows, ambient
-        occlusion and mirror reflections from the fragment stage (Metal hardware ray tracing)."""
+        occlusion and mirror reflections from the fragment stage (Metal hardware ray tracing).
+
+        ``terrain_slots``: draw the rough terrain's per-world box slots at their per-world ``geom_size``
+        (``scene_tables.per_world_size_geoms``; False = the previous behaviour, the slots baked at their compiled
+        2 mm size). ``draw_hfields``: heightfields as their exact surface (False = not drawn, the previous behaviour)."""
         self.m = model
         self.tier = tier
         self.rt_samples = rt_samples
@@ -57,7 +62,8 @@ class Tier0Renderer:
         self.ctx = ctx or MetalContext(device)
         self.device = device
         self.tables: SceneTables = build_scene_tables(model, n_envs, max_group=max_group, include_planes=include_planes,
-                                                      decimate_faces=decimate_faces)
+                                                      decimate_faces=decimate_faces, sized_geoms="auto" if terrain_slots else (),
+                                                      draw_hfields=draw_hfields)
         self.G = self.tables.G
         self.seg_mode = seg_mode
         self.use_bg = backgrounds
@@ -78,10 +84,15 @@ class Tier0Renderer:
         self._build_pipelines()
         self._alloc_outputs(outputs)
         self._host_sim = None
+        self.sized = None
+        if self.tables.sized.any():
+            from metalsim.render.sized import SizedGeoms
+            self.sized = SizedGeoms(self.ctx, model, n_envs, self.tables.sized_geom_ids())
         if tier >= 1:
             from metalsim.sensors.raytrace import RayTracer
             self.rt = RayTracer(model, n_envs, max_range=50.0, max_group=max_group, include_planes=include_planes,
-                                decimate_faces=decimate_faces, ctx=self.ctx, device=device)
+                                decimate_faces=decimate_faces, terrain_slots=terrain_slots, draw_hfields=draw_hfields,
+                                ctx=self.ctx, device=device)
             ro = np.zeros(4, np.uint32); ro[0] = self.rt.tpr; ro.view(np.float32)[1] = self.rt.stride; ro[2] = rt_samples
             self.rt_offset_buf = self.ctx.buffer(16, ro, "rt_offset")
 
@@ -419,8 +430,11 @@ class Tier0Renderer:
         cb = self.ctx.command_buffer()
         self.ctx.wait_for(cb, sim.event, after_value)
         lx = views.get("light_xpos"); ld = views.get("light_xdir")
-        self._encode(cb, views["geom_xpos"].buffer, views["geom_xpos"].offset, views["geom_xmat"].buffer,
-                     views["geom_xmat"].offset, views["cam_xpos"].buffer, views["cam_xpos"].offset,
+        gm_buf, gm_off = views["geom_xmat"].buffer, views["geom_xmat"].offset
+        if self.sized is not None:          # per-world slot sizes folded into a copy of geom_xmat
+            gm_buf, gm_off = self.sized.encode(cb, gm_buf, gm_off, sim.m.geom_size)
+        self._encode(cb, views["geom_xpos"].buffer, views["geom_xpos"].offset, gm_buf,
+                     gm_off, views["cam_xpos"].buffer, views["cam_xpos"].offset,
                      views["cam_xmat"].buffer, views["cam_xmat"].offset,
                      lx.buffer if lx else None, lx.offset if lx else 0, ld.buffer if ld else None, ld.offset if ld else 0)
         v = self.ctx.signal(cb)
@@ -438,12 +452,15 @@ class Tier0Renderer:
 
     # -- host path (tests, tools): render from MjData ------------------------------------------------
 
-    def render_host(self, datas, cam_pos=None, cam_quat=None):
+    def render_host(self, datas, cam_pos=None, cam_quat=None, geom_size=None):
         """Render from a list of N ``mujoco.MjData`` (mj_forward'd). Optional per-env camera pose
-        overrides ``(N,3)``/``(N,4)`` replace the model camera. Synchronizes; returns numpy outputs."""
+        overrides ``(N,3)``/``(N,4)`` replace the model camera; ``geom_size`` (N, ngeom, 3): per-world sizes of the
+        terrain slots (default the model's). Synchronizes; returns numpy outputs."""
         n, ng, nc = self.n, self.m.ngeom, max(self.m.ncam, 1)
         gx = np.stack([d.geom_xpos for d in datas]).astype(np.float32).reshape(n, ng, 3)
         gm = np.stack([d.geom_xmat for d in datas]).astype(np.float32).reshape(n, ng, 9)
+        if self.sized is not None:
+            gm = self.sized.scale_host(gm, geom_size).astype(np.float32)
         if cam_pos is not None:
             cx = np.zeros((n, nc, 3), np.float32); cm = np.zeros((n, nc, 9), np.float32)
             cx[:, self.cam_id] = cam_pos
