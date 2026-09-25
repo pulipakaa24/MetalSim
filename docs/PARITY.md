@@ -468,8 +468,22 @@ and 6, columns for pyramid stairs, inverted stairs, boxes, random rough; 400 ste
 `runs/g1_rough_transfer.jsonl`): Isaac's checkpoints fall 0 / 24 in Isaac and 7 / 24 in MetalSim (5 in
 the inverted-stairs pit); ours 0 / 24 in MetalSim and 12 / 24 in Isaac (inverted stairs and boxes).
 Both directions work on pyramid stairs and random rough and fail on vertical-wall terrain, where our
-0.1 m heightfield turns Isaac's walls into ramps (§1.2 terrain row); that is the open rough-terrain
-gap. Remaining setup differences: PhysX 5 ms × 4 vs MuJoCo Warp 2.5 ms × 8; soft contacts; rsl_rl vs
+0.1 m heightfield turns Isaac's walls into ramps (§1.2 terrain row). **Fixed on the collision side**
+(0cfb188, adefb18, `docs/research/terrain_walls_2026-09-25.md`): Isaac's stair and box cells are unions
+of boxes, so the G1 rough task now collides with those boxes exactly (each world holds only the boxes
+within 2.4 m of its robot, 96 slots, at most 50 used), and the height scan samples Isaac's exact top
+on a 0.025 m grid on those cells (within 4.8 µm of Isaac's ray cast over 67,507 rays, vs a 99th
+percentile of 177 mm for grid interpolation). Measured at 4096 envs: 27,826 env-steps/s (−6 %); a
+foot stepping onto a step edge now matches MuJoCo C (2 mm) where the heightfield never touched the
+wall. Finer heightfields (0.05 / 0.025 m) made transfer worse (60 / 96 and 64 / 96 falls: a steeper ramp
+lifts the foot over the step); all 14,080 boxes in one model or Isaac's box triangles as meshes are
+exact but run out of GPU memory at 4096 envs (−22 % at 1024). Transfer of Isaac's checkpoints on the
+wall cells with 8 starts each: 47 / 96 falls on the heightfield → 14 / 96 on the exact surface (boxes
+13 → 2 of 48, inverted stairs 34 → 12); Isaac's final checkpoint 0 / 32 wall-cell falls (was 8 / 32);
+its earlier checkpoints still fall in the inverted-stairs pit in 6 of 16 starts, where the geometry is
+now exact to 5 µm, so the remainder is the physics differences (PhysX step, soft contacts: Isaac's
+checkpoint 500 crosses the pit at a quarter of our speed). Our own checkpoints: 1 / 96 → 4 / 96. The
+old heightfield stays behind `terrain_collision="hfield"`, the grid scan behind `scan_surface="grid"`. Remaining setup differences: PhysX 5 ms × 4 vs MuJoCo Warp 2.5 ms × 8; soft contacts; rsl_rl vs
 our PPO; Isaac's last-100-episode logging vs ours per iteration; different random generators;
 contact history 6 × 2.5 ms vs 3 × 5 ms; our training run used the old scan order.
 
