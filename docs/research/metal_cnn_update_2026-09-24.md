@@ -273,3 +273,29 @@ kernel, adjusted): gather + compiled forward ≈ 12 ms, backward ≈ 17 ms (conv
 gradients through MPSGraph at 3.3–3.8 TFLOP/s ≈ 8 ms are now the largest single items), clip + Adam
 ≈ 1 ms. Remaining gap to the floor: those two MPSGraph weight gradients, conv1's forward at 4 TFLOP/s,
 and the uint8 gather (3 ms).
+
+### 6.1 Camera-cartpole training with the shipped defaults [measured]
+
+    scripts/gpu_run.sh camera_cartpole_fast train 20 -- .venv/bin/python -m metalsim.learn.train_cartpole_rgb \
+        --envs 1024 --tier 0 --steps 8000000 --log runs/camera_cartpole_tier0_fast.log
+
+Same config and seed (42) as runs/camera_cartpole_tier0.log. Return / episode length, mean over ±2
+iterations at matched iterations (cumulative env-steps/s in the last columns):
+
+| it | env-steps | return ref | return fast | length ref | length fast | steps/s ref | steps/s fast |
+|---|---|---|---|---|---|---|---|
+| 1 | 65,536 | 13.4 | 13.0 | 33.2 | 33.0 | 6,733 | 10,131 |
+| 10 | 655,360 | 45.4 | 44.6 | 72.1 | 71.2 | 7,324 | 11,467 |
+| 20 | 1.31 M | 68.5 | 67.2 | 102.1 | 98.7 | 7,421 | 11,387 |
+| 40 | 2.62 M | 82.0 | 78.1 | 124.3 | 117.7 | 7,463 | 10,983 |
+| 60 | 3.93 M | 82.7 | 87.7 | 128.1 | 133.0 | 7,484 | 11,183 |
+| 100 | 6.55 M | 86.2 | 90.0 | 134.3 | 137.0 | 7,474 | 11,363 |
+| 123 | 8.06 M | 84.9 | 91.4 | 132.4 | 140.2 | 7,484 | 11,416 |
+
+Last 20 iterations: return 86.3 (ref) vs 89.7 (fast), length 135.1 vs 137.5. The curves agree within
+what one seed per side can resolve (the fast path is not bitwise identical, so the runs diverge in
+their random streams from the first update). Whole run: **8.06 M steps in 706 s = 11,416 env-steps/s
+including training** (ref 1077 s, 7,483/s: 1.53×); time split env 0.5 % / policy (rollout incl.
+rendering) 32.9 % / update 66.6 %. Isaac Lab publishes 32K on an RTX 4090. With the update at the
+estimated hardware floor (1.7–2.0 s) and the rollout unchanged, the same pipeline would run at
+≈ 16–17K env-steps/s (estimated); past that the rollout (~1.9 s per iteration here) is the next limit.
