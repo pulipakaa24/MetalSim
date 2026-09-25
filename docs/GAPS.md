@@ -22,13 +22,14 @@ the Newton-engine evaluation. Evidence for each row is in `PARITY.md`.
 
 | gap | status | next step |
 |---|---|---|
+| Feet-slide reward term uses MuJoCo `cvel` at the subtree COM instead of the foot body's own velocity (Isaac's `body_lin_vel_w`) | **new, open** (found by the Newton integration) | fix in the shared kernel on both engines, test against `mj_objectVelocity` |
 | Contact model: soft contacts and soft joint limits (5–7 cm impact penetration, 0.17 rad past limits) | measured against PhysX on the L4 (PARITY §1.7): the 1 m drop lands in the same state (root z RMSE 3.5 cm, joints within 0.06 rad) but MetalSim's contact-force peaks are 3.4–5.7× Isaac's at equal mean force; Newton XPBD gives 0.16–0.69 cm impact penetration (§2.1) | subsumed by the Newton path; on MuJoCo, τ 5 ms + impedance 0.99 + speculative contact is the tunable |
 | Learning parity on G1 | per-term comparison done (PARITY §1.5): Isaac tracks 0.78 of max by it 200 with no falls; ours 0.11 at it 1000 with 70–89 % falls; learning-speed gap > 5× | learner differential in progress: the real rsl_rl on our task via a VecEnv adapter (engine-independent), and a PPO run on the Newton backend (engine half) |
 | Rendering vs Isaac RTX; denoiser; MetalFX; MaterialX | measured (PARITY §1.7): robot-only, states agreeing, tier 2 vs RTX 13.7 dB PSNR / 0.48 SSIM (tier 0: 11.5 / 0.35); silhouettes IoU 0.83, robot depth 2.6 cm RMSE; Isaac's RT and PT frames equally far from ours, so the gap is materials/lights (darker plates, hard sun shadow), not noise | re-record with a grey ground (stage 6, queued) for whole-frame rows; then material/light model work: area sun, OmniPBR parameter audit, denoiser |
 | Contact sensing (touch sites, no force history) | open | contact-force reduction per body from the contact buffer |
 | Sensors: beam divergence, multi-return, radar | open; lidar-based RL now demonstrated (`metalsim.learn.lidar_nav`, 21.2 K env-steps/s, time-to-goal 218 → 69 steps) | – |
 | Exact terrain heights | re-implemented generator | port Isaac's generator functions |
-| Throughput | 0.59× a 4090 raw (2.6× per TFLOPS); 1.4× the L4 on G1 rough | reset/obs overhead 23 % of the step |
+| Throughput | MuJoCo Warp at the 2.5 ms training setting: 27.7 K full-PPO env-steps/s (0.34× the 4090's published 82 K); Newton XPBD: 112.6 K (1.4×), PARITY §1.4 | subsumed by the Newton path |
 | Camera-RL throughput | 7.5K env-steps/s incl. training vs Isaac's 32K (4090); learns | CNN update on MPS is 76 % of the time |
 | Deformables on Metal; upstreaming the forks | open | – |
 
@@ -45,9 +46,12 @@ the Newton-engine evaluation. Evidence for each row is in `PARITY.md`.
 | Newton rests the G1 ~1 cm lower than MuJoCo (0.69–0.70 vs 0.71 m) | open | cause not found |
 | VBD solver fails to compile on Metal | open, low | not needed for rigid robots |
 | Featherstone on the G1: NaN at 2.5 ms, no result at 1.25 ms in 400 s | open, low | XPBD is the path |
-| State layout: maximal coordinates, no MuJoCo sensors, approximate contact forces | **in progress** | engine switch in the G1 task (obs/reward/termination from body state + `eval_ik`), then a PPO run against `runs/g1_flat_ppo_1500_dt25_fixed.log` |
-| Learning parity on Newton | open | no policy trained on Newton yet (run in progress) |
+| State layout: maximal coordinates, no MuJoCo sensors, approximate contact forces | **closed** | `G1VelocityTask(engine="newton")`: same kernels, body state vs MuJoCo to 1e-5, foot/torso contact from collider forces, 9 invariant tests; full PPO loop 112.6 K env-steps/s at 4096 envs (4.1× MuJoCo Warp) |
+| Learning parity on Newton | **measured, same as MuJoCo Warp** | 1500-iteration run: same curve shape (length 45 → 628, return −5 → −24); the Isaac gap is not an engine effect (PARITY §1.5) |
 | `ActuatorPD` is MetalSim code, not Newton's; damping capped at one step's removal on very light links | open, low | document; revisit if hand joints misbehave |
+| 3σ stress check fails at the fast Newton settings (37 of 1024 worlds in 400 steps at 4 it./1.25 ms; 8 it./0.625 ms passes at MuJoCo-Warp-like cost) | open, medium | validated for the 1σ training regime only; 36 blow-ups in 838,589 episodes during training, all caught by the guard |
+| Newton monitor coverage: penetration / energy / overflow checks have no source fields | open, low | derive from contact depth and body energy |
+| Newton rough terrain | open | needs a heightfield collider on the Newton path |
 | Newton API churn (alpha) | low | pin the version (1.7.0.dev) |
 | Importer copies the USD's gravity 0 | low | set gravity explicitly (done in `g1_builder`) |
 

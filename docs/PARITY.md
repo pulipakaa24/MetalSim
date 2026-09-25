@@ -119,6 +119,26 @@ Notes that bear on reading these numbers honestly:
   per-thread state; the task now sets 32 contact slots per world (3 colliders × ≤ 4 kept contacts),
   which is also the flat setting.
 
+
+**Engine comparison at the training setting** (measured 2026-09-24, `scripts/diagnostics/g1_engine_bench.py`,
+`runs/g1_engine_bench.log`; 4096 envs, graph-captured, synchronized, idle GPU; the rows above use the
+5 ms MuJoCo Warp setting of Isaac's task file, the 2.5 ms row is what the G1 actually trains at, §1.5):
+
+| engine / setting | physics only | full env step | rollout + inference | full PPO loop |
+|---|---|---|---|---|
+| MuJoCo Warp, 2.5 ms (training setting) | 35,458 | 30,660 | 28,901 | **27,662** env-steps/s |
+| MuJoCo Warp, 5 ms (the rows above) | 67,914 | 55,741 | 55,217 | 50,907 |
+| Newton XPBD, 4 it. at 1.25 ms (training setting) | 146,857 | 146,822 | 135,708 | **112,609** (4.1× MuJoCo Warp; 1.4× Isaac's published 4090 PhysX number, on a 4.5× smaller GPU) |
+| Newton XPBD, 8 it. at 2.5 ms | 161,610 | 162,219 | 147,609 | 120,413 |
+
+Nothing is excluded from the PPO-loop column (observations, rewards, resets, inference, update).
+Newton's observation/reward work is almost free (full step ≈ physics only); MuJoCo Warp spends
+~18 ms per step in its reset and kinematics calls. The Newton rows predate the final actuator kernel
+(the final recipe's training run logged 107,355 env-steps/s including the anomaly monitor); a
+re-benchmark with the final recipe is queued. Caveat for the Isaac comparison: PhysX vs XPBD is a
+different solver; Isaac Lab 3.0 itself moves to Newton, so the like-for-like number will be Isaac
+Lab 3.0's, which is not measured here.
+
 ### 1.5 Learning on the G1 task
 
 **Two defects found by running Isaac's full 1,500 iterations, both now fixed.**
@@ -183,6 +203,32 @@ iteration 100 ≈ ours at 300). Whether the learner or the simulation is respons
 a learner differential: the real rsl_rl library trained on our task through a VecEnv adapter, with
 Isaac's exact configuration (`metalsim/learn/train_g1_rslrl.py`, in progress), while the Newton
 backend answers the physics half (§2.1).
+
+**Same task on Newton XPBD** (`G1VelocityTask(engine="newton")`, 4 it. at 1.25 ms, same PPO config and
+seed, 1500 iterations, `runs/g1_flat_newton_ppo.log`, `scripts/diagnostics/compare_training_logs.py`;
+measured 2026-09-24; return and length averaged over ±5 iterations):
+
+| iteration | MuJoCo Warp return / length | Newton return / length |
+|---|---|---|
+| 100 | −5.2 / 50 | −5.4 / 45 |
+| 300 | −5.1 / 65 | −5.9 / 102 |
+| 500 | −6.4 / 118 | −11.3 / 303 |
+| 750 | −18.6 / 634 | −16.5 / 508 |
+| 1000 | −24.3 / 773 | −19.3 / 586 |
+| 1500 | −25.4 / 544 | −23.6 / 628 |
+
+The curve has the same shape on both engines (episodes lengthen to 500–770 steps while the return
+falls; neither tracks), so the learning gap against Isaac is **not an engine effect**; Newton reaches
+each milestone 4–6× sooner in wall-clock (episode length 200 at 6.3 min vs 37 min). This leaves the
+learner as the prime suspect (the learning-rate trace: ours decays 2.6e-4 → 2.3e-5 over the run
+while the per-iteration KL stays at 0.011–0.017 and never drops below rsl_rl's raise threshold of
+0.005; Isaac's action std falls 1.0 → 0.64 by iteration 600); the rsl_rl-on-our-task differential is
+running. Also found on the way: the reference path's feet-slide term used MuJoCo's `cvel` (spatial
+velocity at the subtree COM) as the foot velocity instead of the foot body's own linear velocity
+(Isaac's `body_lin_vel_w`); the fix on both engines is in progress. Newton preflight: termination −4
+and the PPO probe pass; the random-policy return (−8.3, bound −8) and the 3σ stress check (37 of 1024
+worlds blow up in 400 steps at the fast settings; 8 it. at 0.625 ms passes but costs the speed gain)
+fail, so the fast Newton settings are validated for the 1σ training regime only.
 
 ### 1.6 Rough terrain: MuJoCo Warp's heightfield contacts, found defective and patched
 
@@ -373,8 +419,10 @@ XPBD 2 it. 2.5 ms 1.09 / 0.07 cm; 4 it. 0.69 / 0.03; 8 it. 0.36 / 0.01; 4 it. 1.
 8 it. 1.25 ms 0.16 / 0.00; MuJoCo C default 2.97 / 0.06. Isaac's PhysX recording of the same drop
 (§1.7) is the reference.
 
-Still open on the Newton path: integration into the task code (maximal coordinates, no MuJoCo
-sensors, approximate contact forces), learning parity (no policy trained on Newton yet), `ActuatorPD`
+Still open on the Newton path (integration into the task code is done, §1.5: `engine="newton"` runs
+the same observation/reward/termination kernels, 9 invariant tests in `tests/test_g1_newton_engine.py`,
+flat terrain only): 3σ stability at the fast settings, the monitor's penetration/energy/overflow
+checks (no such fields on Newton), rough terrain (needs a heightfield), `ActuatorPD`
 is MetalSim code rather than Newton's (its damping is capped at what one step can remove on very light
 links), and two upstream issues to raise (relaxation defaults, biased compliance drive).
 
