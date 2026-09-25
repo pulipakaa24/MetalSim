@@ -30,7 +30,7 @@ Isaac Lab 3.0 EA pins; [NF] `upstream/newton` = MetalSim fork branch `metalsim` 
 * The earlier ledger row "VBD fails to compile on Metal" (GAPS, Newton XPBD ledger) is closed for both Newton
   versions. The error was invisible in Warp's exception because the fork's Metal compile-log filter drops lines
   after a warning and keeps only 4,096 bytes. Recompiling the cached `.metal` source through a 30-line Objective-C
-  harness (`MTLDevice newLibraryWithSource`, the fork's compile options) printed the full log.
+  harness (`scripts/diagnostics/newton_vbd/mtlc.m`: `MTLDevice newLibraryWithSource`, the fork's compile options) printed the full log (`runs/newton_vbd/mtlc_fork_rigid.log`).
 * **Metal matches the CPU device** to float32 sensitivity. Soft cube, 200 steps: at most 1.3e-4 m. Cloth draped
   over a box edge: at most 0.18 m, against 0.16 m when the CPU is compared with itself from a start perturbed by
   1e-7 m. Median vertex error at step 199: 1.2e-2 m (Metal) vs 1.4e-2 m (perturbed CPU).
