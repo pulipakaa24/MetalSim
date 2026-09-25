@@ -568,6 +568,8 @@ class G1VelocityTask:
         # contact history for the torso termination (flat set, MuJoCo Warp): every caller steps through
         # sim.launch_step, so the per-substep max is recorded by wrapping it
         self.hist_substeps = max(1, min(self.decimation, int(round(0.015 / self.physics_dt))))
+        if self.isaac_flat and engine == "newton":       # NewtonSim records the torso contact history itself
+            self.sim.hist_out, self.sim.hist_substeps = self.torso_hist, self.hist_substeps
         if self.isaac_flat and engine == "mjwarp":
             self._plain_launch_step = self.sim.launch_step
             self.sim.launch_step = self._launch_step_with_contact_history
