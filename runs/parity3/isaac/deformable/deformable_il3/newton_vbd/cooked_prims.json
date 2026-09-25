@@ -1,0 +1,682 @@
+{
+ "/World/cloth_scene": {
+  "type": "",
+  "schemas": [],
+  "attrs": {}
+ },
+ "/World/cloth_scene/box": {
+  "type": "Xform",
+  "schemas": [],
+  "attrs": {
+   "purpose": "default",
+   "visibility": "inherited",
+   "xformOp:orient": "(1, 0, 0, 0)",
+   "xformOp:scale": "(1, 1, 1)",
+   "xformOp:translate": "(0, 0, 0.20000000298023224)",
+   "xformOpOrder": "[xformOp:translate, xformOp:orient, xformOp:scale]"
+  }
+ },
+ "/World/cloth_scene/box/geometry": {
+  "type": "",
+  "schemas": [],
+  "attrs": {}
+ },
+ "/World/cloth_scene/box/geometry/mesh": {
+  "type": "Cube",
+  "schemas": [
+   "PhysicsCollisionAPI",
+   "MaterialBindingAPI"
+  ],
+  "attrs": {
+   "doubleSided": "False",
+   "extent": "[(-1, -1, -1), (1, 1, 1)]",
+   "orientation": "rightHanded",
+   "physics:collisionEnabled": "True",
+   "purpose": "default",
+   "size": "0.4",
+   "visibility": "inherited",
+   "xformOp:orient": "(1, 0, 0, 0)",
+   "xformOp:scale": "(1, 1, 1)",
+   "xformOp:translate": "(0, 0, 0)",
+   "xformOpOrder": "[xformOp:translate, xformOp:orient, xformOp:scale]"
+  }
+ },
+ "/World/cloth_scene/box/geometry/material": {
+  "type": "Material",
+  "schemas": [
+   "PhysicsMaterialAPI"
+  ],
+  "attrs": {
+   "physics:density": "0.0",
+   "physics:dynamicFriction": "0.5",
+   "physics:restitution": "0.0",
+   "physics:staticFriction": "0.5"
+  }
+ },
+ "/World/cloth_scene/cloth": {
+  "type": "Xform",
+  "schemas": [
+   "MaterialBindingAPI"
+  ],
+  "attrs": {
+   "purpose": "default",
+   "visibility": "inherited",
+   "xformOp:orient": "(1, 0, 0, 0)",
+   "xformOp:scale": "(1, 1, 1)",
+   "xformOp:translate": "(0, 0, 0.5)",
+   "xformOpOrder": "[xformOp:translate, xformOp:orient, xformOp:scale]"
+  }
+ },
+ "/World/cloth_scene/cloth/geometry": {
+  "type": "",
+  "schemas": [],
+  "attrs": {}
+ },
+ "/World/cloth_scene/cloth/geometry/mesh": {
+  "type": "Mesh",
+  "schemas": [],
+  "attrs": {
+   "cornerIndices": "[]",
+   "cornerSharpnesses": "[]",
+   "creaseIndices": "[]",
+   "creaseLengths": "[]",
+   "creaseSharpnesses": "[]",
+   "doubleSided": "False",
+   "faceVaryingLinearInterpolation": "cornersPlus1",
+   "faceVertexCounts": "<array (2048,) int32 in cooked.npz[|World|cloth_scene|cloth|geometry|mesh:faceVertexCounts]>",
+   "faceVertexIndices": "<array (6144,) int32 in cooked.npz[|World|cloth_scene|cloth|geometry|mesh:faceVertexIndices]>",
+   "holeIndices": "[]",
+   "interpolateBoundary": "edgeAndCorner",
+   "orientation": "rightHanded",
+   "points": "<array (1089, 3) float32 in cooked.npz[|World|cloth_scene|cloth|geometry|mesh:points]>",
+   "purpose": "default",
+   "subdivisionScheme": "bilinear",
+   "triangleSubdivisionRule": "catmullClark",
+   "visibility": "inherited",
+   "xformOp:orient": "(1, 0, 0, 0)",
+   "xformOp:scale": "(1, 1, 1)",
+   "xformOp:translate": "(0, 0, 0)",
+   "xformOpOrder": "[xformOp:translate, xformOp:orient, xformOp:scale]"
+  }
+ },
+ "/World/cloth_scene/cloth/geometry/material": {
+  "type": "Material",
+  "schemas": [],
+  "attrs": {
+   "newton:density": "1.0",
+   "newton:edgeKd": "0.009999999776482582",
+   "newton:edgeKe": "5.0",
+   "newton:particleRadius": "0.00800000037997961",
+   "newton:triKa": "10000.0",
+   "newton:triKd": "1.500000053056283e-06",
+   "newton:triKe": "10000.0"
+  }
+ },
+ "/World/cloth_scene/cloth/sim_mesh": {
+  "type": "Mesh",
+  "schemas": [
+   "PhysicsCollisionAPI"
+  ],
+  "attrs": {
+   "cornerIndices": "[]",
+   "cornerSharpnesses": "[]",
+   "creaseIndices": "[]",
+   "creaseLengths": "[]",
+   "creaseSharpnesses": "[]",
+   "doubleSided": "False",
+   "faceVaryingLinearInterpolation": "cornersPlus1",
+   "faceVertexCounts": "<array (2048,) int32 in cooked.npz[|World|cloth_scene|cloth|sim_mesh:faceVertexCounts]>",
+   "faceVertexIndices": "<array (6144,) int32 in cooked.npz[|World|cloth_scene|cloth|sim_mesh:faceVertexIndices]>",
+   "holeIndices": "[]",
+   "interpolateBoundary": "edgeAndCorner",
+   "orientation": "rightHanded",
+   "physics:collisionEnabled": "True",
+   "points": "<array (1089, 3) float32 in cooked.npz[|World|cloth_scene|cloth|sim_mesh:points]>",
+   "purpose": "guide",
+   "subdivisionScheme": "catmullClark",
+   "triangleSubdivisionRule": "catmullClark",
+   "visibility": "inherited",
+   "xformOp:orient": "(1, 0, 0, 0)",
+   "xformOp:scale": "(1, 1, 1)",
+   "xformOp:translate": "(0, 0, 0)",
+   "xformOpOrder": "[xformOp:translate, xformOp:orient, xformOp:scale]"
+  }
+ },
+ "/World/rope_scene": {
+  "type": "",
+  "schemas": [],
+  "attrs": {}
+ },
+ "/World/rope_scene/rod_n1": {
+  "type": "Xform",
+  "schemas": [
+   "MaterialBindingAPI"
+  ],
+  "attrs": {
+   "purpose": "default",
+   "visibility": "inherited",
+   "xformOp:orient": "(1, 0, 0, 0)",
+   "xformOp:scale": "(1, 1, 1)",
+   "xformOp:translate": "(10.25, -0, 1)",
+   "xformOpOrder": "[xformOp:translate, xformOp:orient, xformOp:scale]"
+  }
+ },
+ "/World/rope_scene/rod_n1/sim_mesh": {
+  "type": "TetMesh",
+  "schemas": [
+   "PhysicsCollisionAPI"
+  ],
+  "attrs": {
+   "doubleSided": "False",
+   "orientation": "rightHanded",
+   "physics:collisionEnabled": "True",
+   "points": "<array (44, 3) float32 in cooked.npz[|World|rope_scene|rod_n1|sim_mesh:points]>",
+   "purpose": "guide",
+   "surfaceFaceVertexIndices": "<array (84, 3) int32 in cooked.npz[|World|rope_scene|rod_n1|sim_mesh:surfaceFaceVertexIndices]>",
+   "tetVertexIndices": "<array (60, 4) int32 in cooked.npz[|World|rope_scene|rod_n1|sim_mesh:tetVertexIndices]>",
+   "visibility": "inherited"
+  }
+ },
+ "/World/rope_scene/rod_n1/vis_mesh": {
+  "type": "Mesh",
+  "schemas": [],
+  "attrs": {
+   "cornerIndices": "[]",
+   "cornerSharpnesses": "[]",
+   "creaseIndices": "[]",
+   "creaseLengths": "[]",
+   "creaseSharpnesses": "[]",
+   "doubleSided": "False",
+   "faceVaryingLinearInterpolation": "cornersPlus1",
+   "faceVertexCounts": "<array (84,) int32 in cooked.npz[|World|rope_scene|rod_n1|vis_mesh:faceVertexCounts]>",
+   "faceVertexIndices": "<array (252,) int32 in cooked.npz[|World|rope_scene|rod_n1|vis_mesh:faceVertexIndices]>",
+   "holeIndices": "[]",
+   "interpolateBoundary": "edgeAndCorner",
+   "orientation": "rightHanded",
+   "points": "<array (44, 3) float32 in cooked.npz[|World|rope_scene|rod_n1|vis_mesh:points]>",
+   "purpose": "default",
+   "subdivisionScheme": "catmullClark",
+   "triangleSubdivisionRule": "catmullClark",
+   "visibility": "inherited",
+   "xformOp:orient": "(1, 0, 0, 0)",
+   "xformOp:scale": "(1, 1, 1)",
+   "xformOp:translate": "(0, 0, 0)",
+   "xformOpOrder": "[xformOp:translate, xformOp:orient, xformOp:scale]"
+  }
+ },
+ "/World/rope_scene/rod_n1/material": {
+  "type": "Material",
+  "schemas": [],
+  "attrs": {
+   "newton:density": "1.0",
+   "newton:kDamp": "0.0",
+   "newton:kLambda": "100000.0",
+   "newton:kMu": "100000.0",
+   "newton:particleRadius": "0.00800000037997961"
+  }
+ },
+ "/World/rope_scene/rod_n2": {
+  "type": "Xform",
+  "schemas": [
+   "MaterialBindingAPI"
+  ],
+  "attrs": {
+   "purpose": "default",
+   "visibility": "inherited",
+   "xformOp:orient": "(1, 0, 0, 0)",
+   "xformOp:scale": "(1, 1, 1)",
+   "xformOp:translate": "(10.25, -2, 1)",
+   "xformOpOrder": "[xformOp:translate, xformOp:orient, xformOp:scale]"
+  }
+ },
+ "/World/rope_scene/rod_n2/sim_mesh": {
+  "type": "TetMesh",
+  "schemas": [
+   "PhysicsCollisionAPI"
+  ],
+  "attrs": {
+   "doubleSided": "False",
+   "orientation": "rightHanded",
+   "physics:collisionEnabled": "True",
+   "points": "<array (189, 3) float32 in cooked.npz[|World|rope_scene|rod_n2|sim_mesh:points]>",
+   "purpose": "guide",
+   "surfaceFaceVertexIndices": "<array (336, 3) int32 in cooked.npz[|World|rope_scene|rod_n2|sim_mesh:surfaceFaceVertexIndices]>",
+   "tetVertexIndices": "<array (480, 4) int32 in cooked.npz[|World|rope_scene|rod_n2|sim_mesh:tetVertexIndices]>",
+   "visibility": "inherited"
+  }
+ },
+ "/World/rope_scene/rod_n2/vis_mesh": {
+  "type": "Mesh",
+  "schemas": [],
+  "attrs": {
+   "cornerIndices": "[]",
+   "cornerSharpnesses": "[]",
+   "creaseIndices": "[]",
+   "creaseLengths": "[]",
+   "creaseSharpnesses": "[]",
+   "doubleSided": "False",
+   "faceVaryingLinearInterpolation": "cornersPlus1",
+   "faceVertexCounts": "<array (336,) int32 in cooked.npz[|World|rope_scene|rod_n2|vis_mesh:faceVertexCounts]>",
+   "faceVertexIndices": "<array (1008,) int32 in cooked.npz[|World|rope_scene|rod_n2|vis_mesh:faceVertexIndices]>",
+   "holeIndices": "[]",
+   "interpolateBoundary": "edgeAndCorner",
+   "orientation": "rightHanded",
+   "points": "<array (189, 3) float32 in cooked.npz[|World|rope_scene|rod_n2|vis_mesh:points]>",
+   "purpose": "default",
+   "subdivisionScheme": "catmullClark",
+   "triangleSubdivisionRule": "catmullClark",
+   "visibility": "inherited",
+   "xformOp:orient": "(1, 0, 0, 0)",
+   "xformOp:scale": "(1, 1, 1)",
+   "xformOp:translate": "(0, 0, 0)",
+   "xformOpOrder": "[xformOp:translate, xformOp:orient, xformOp:scale]"
+  }
+ },
+ "/World/rope_scene/rod_n2/material": {
+  "type": "Material",
+  "schemas": [],
+  "attrs": {
+   "newton:density": "1.0",
+   "newton:kDamp": "0.0",
+   "newton:kLambda": "100000.0",
+   "newton:kMu": "100000.0",
+   "newton:particleRadius": "0.00800000037997961"
+  }
+ },
+ "/World/rope_scene/rod_n4": {
+  "type": "Xform",
+  "schemas": [
+   "MaterialBindingAPI"
+  ],
+  "attrs": {
+   "purpose": "default",
+   "visibility": "inherited",
+   "xformOp:orient": "(1, 0, 0, 0)",
+   "xformOp:scale": "(1, 1, 1)",
+   "xformOp:translate": "(10.25, -4, 1)",
+   "xformOpOrder": "[xformOp:translate, xformOp:orient, xformOp:scale]"
+  }
+ },
+ "/World/rope_scene/rod_n4/sim_mesh": {
+  "type": "TetMesh",
+  "schemas": [
+   "PhysicsCollisionAPI"
+  ],
+  "attrs": {
+   "doubleSided": "False",
+   "orientation": "rightHanded",
+   "physics:collisionEnabled": "True",
+   "points": "<array (1025, 3) float32 in cooked.npz[|World|rope_scene|rod_n4|sim_mesh:points]>",
+   "purpose": "guide",
+   "surfaceFaceVertexIndices": "<array (1344, 3) int32 in cooked.npz[|World|rope_scene|rod_n4|sim_mesh:surfaceFaceVertexIndices]>",
+   "tetVertexIndices": "<array (3840, 4) int32 in cooked.npz[|World|rope_scene|rod_n4|sim_mesh:tetVertexIndices]>",
+   "visibility": "inherited"
+  }
+ },
+ "/World/rope_scene/rod_n4/vis_mesh": {
+  "type": "Mesh",
+  "schemas": [],
+  "attrs": {
+   "cornerIndices": "[]",
+   "cornerSharpnesses": "[]",
+   "creaseIndices": "[]",
+   "creaseLengths": "[]",
+   "creaseSharpnesses": "[]",
+   "doubleSided": "False",
+   "faceVaryingLinearInterpolation": "cornersPlus1",
+   "faceVertexCounts": "<array (1344,) int32 in cooked.npz[|World|rope_scene|rod_n4|vis_mesh:faceVertexCounts]>",
+   "faceVertexIndices": "<array (4032,) int32 in cooked.npz[|World|rope_scene|rod_n4|vis_mesh:faceVertexIndices]>",
+   "holeIndices": "[]",
+   "interpolateBoundary": "edgeAndCorner",
+   "orientation": "rightHanded",
+   "points": "<array (1025, 3) float32 in cooked.npz[|World|rope_scene|rod_n4|vis_mesh:points]>",
+   "purpose": "default",
+   "subdivisionScheme": "catmullClark",
+   "triangleSubdivisionRule": "catmullClark",
+   "visibility": "inherited",
+   "xformOp:orient": "(1, 0, 0, 0)",
+   "xformOp:scale": "(1, 1, 1)",
+   "xformOp:translate": "(0, 0, 0)",
+   "xformOpOrder": "[xformOp:translate, xformOp:orient, xformOp:scale]"
+  }
+ },
+ "/World/rope_scene/rod_n4/material": {
+  "type": "Material",
+  "schemas": [],
+  "attrs": {
+   "newton:density": "1.0",
+   "newton:kDamp": "0.0",
+   "newton:kLambda": "100000.0",
+   "newton:kMu": "100000.0",
+   "newton:particleRadius": "0.00800000037997961"
+  }
+ },
+ "/World/rope_scene/rod_n8": {
+  "type": "Xform",
+  "schemas": [
+   "MaterialBindingAPI"
+  ],
+  "attrs": {
+   "purpose": "default",
+   "visibility": "inherited",
+   "xformOp:orient": "(1, 0, 0, 0)",
+   "xformOp:scale": "(1, 1, 1)",
+   "xformOp:translate": "(10.25, -6, 1)",
+   "xformOpOrder": "[xformOp:translate, xformOp:orient, xformOp:scale]"
+  }
+ },
+ "/World/rope_scene/rod_n8/sim_mesh": {
+  "type": "TetMesh",
+  "schemas": [
+   "PhysicsCollisionAPI"
+  ],
+  "attrs": {
+   "doubleSided": "False",
+   "orientation": "rightHanded",
+   "physics:collisionEnabled": "True",
+   "points": "<array (6561, 3) float32 in cooked.npz[|World|rope_scene|rod_n8|sim_mesh:points]>",
+   "purpose": "guide",
+   "surfaceFaceVertexIndices": "<array (5376, 3) int32 in cooked.npz[|World|rope_scene|rod_n8|sim_mesh:surfaceFaceVertexIndices]>",
+   "tetVertexIndices": "<array (30720, 4) int32 in cooked.npz[|World|rope_scene|rod_n8|sim_mesh:tetVertexIndices]>",
+   "visibility": "inherited"
+  }
+ },
+ "/World/rope_scene/rod_n8/vis_mesh": {
+  "type": "Mesh",
+  "schemas": [],
+  "attrs": {
+   "cornerIndices": "[]",
+   "cornerSharpnesses": "[]",
+   "creaseIndices": "[]",
+   "creaseLengths": "[]",
+   "creaseSharpnesses": "[]",
+   "doubleSided": "False",
+   "faceVaryingLinearInterpolation": "cornersPlus1",
+   "faceVertexCounts": "<array (5376,) int32 in cooked.npz[|World|rope_scene|rod_n8|vis_mesh:faceVertexCounts]>",
+   "faceVertexIndices": "<array (16128,) int32 in cooked.npz[|World|rope_scene|rod_n8|vis_mesh:faceVertexIndices]>",
+   "holeIndices": "[]",
+   "interpolateBoundary": "edgeAndCorner",
+   "orientation": "rightHanded",
+   "points": "<array (6561, 3) float32 in cooked.npz[|World|rope_scene|rod_n8|vis_mesh:points]>",
+   "purpose": "default",
+   "subdivisionScheme": "catmullClark",
+   "triangleSubdivisionRule": "catmullClark",
+   "visibility": "inherited",
+   "xformOp:orient": "(1, 0, 0, 0)",
+   "xformOp:scale": "(1, 1, 1)",
+   "xformOp:translate": "(0, 0, 0)",
+   "xformOpOrder": "[xformOp:translate, xformOp:orient, xformOp:scale]"
+  }
+ },
+ "/World/rope_scene/rod_n8/material": {
+  "type": "Material",
+  "schemas": [],
+  "attrs": {
+   "newton:density": "1.0",
+   "newton:kDamp": "0.0",
+   "newton:kLambda": "100000.0",
+   "newton:kMu": "100000.0",
+   "newton:particleRadius": "0.00800000037997961"
+  }
+ },
+ "/World/rope_scene/cable": {
+  "type": "Xform",
+  "schemas": [],
+  "attrs": {
+   "purpose": "default",
+   "visibility": "inherited",
+   "xformOp:orient": "(1, 0, 0, 0)",
+   "xformOp:scale": "(1, 1, 1)",
+   "xformOp:translate": "(10, 3, 1)",
+   "xformOpOrder": "[xformOp:translate, xformOp:orient, xformOp:scale]"
+  }
+ },
+ "/World/rope_scene/cable/geometry": {
+  "type": "",
+  "schemas": [],
+  "attrs": {}
+ },
+ "/World/rope_scene/cable/geometry/mesh": {
+  "type": "BasisCurves",
+  "schemas": [
+   "PhysicsCollisionAPI",
+   "MaterialBindingAPI"
+  ],
+  "attrs": {
+   "basis": "bezier",
+   "curveVertexCounts": "[21]",
+   "doubleSided": "False",
+   "orientation": "rightHanded",
+   "physics:collisionEnabled": "True",
+   "points": "<array (21, 3) float32 in cooked.npz[|World|rope_scene|cable|geometry|mesh:points]>",
+   "purpose": "default",
+   "type": "linear",
+   "visibility": "inherited",
+   "widths": "[0.02]",
+   "wrap": "nonperiodic",
+   "xformOp:orient": "(1, 0, 0, 0)",
+   "xformOp:scale": "(1, 1, 1)",
+   "xformOp:translate": "(0, 0, 0)",
+   "xformOpOrder": "[xformOp:translate, xformOp:orient, xformOp:scale]"
+  }
+ },
+ "/World/rope_scene/cable/geometry/physics_material": {
+  "type": "Material",
+  "schemas": [],
+  "attrs": {
+   "physics:bendStiffness": "1000000.0",
+   "physics:density": "1000.0",
+   "physics:stretchStiffness": "1000000000.0",
+   "physics:thickness": "0.019999999552965164"
+  }
+ },
+ "/World/cube_scene": {
+  "type": "",
+  "schemas": [],
+  "attrs": {}
+ },
+ "/World/cube_scene/cube_n2": {
+  "type": "Xform",
+  "schemas": [
+   "MaterialBindingAPI"
+  ],
+  "attrs": {
+   "purpose": "default",
+   "visibility": "inherited",
+   "xformOp:orient": "(1, 0, 0, 0)",
+   "xformOp:scale": "(1, 1, 1)",
+   "xformOp:translate": "(20, -0, 0.5)",
+   "xformOpOrder": "[xformOp:translate, xformOp:orient, xformOp:scale]"
+  }
+ },
+ "/World/cube_scene/cube_n2/sim_mesh": {
+  "type": "TetMesh",
+  "schemas": [
+   "PhysicsCollisionAPI"
+  ],
+  "attrs": {
+   "doubleSided": "False",
+   "orientation": "rightHanded",
+   "physics:collisionEnabled": "True",
+   "points": "<array (27, 3) float32 in cooked.npz[|World|cube_scene|cube_n2|sim_mesh:points]>",
+   "purpose": "guide",
+   "surfaceFaceVertexIndices": "<array (48, 3) int32 in cooked.npz[|World|cube_scene|cube_n2|sim_mesh:surfaceFaceVertexIndices]>",
+   "tetVertexIndices": "<array (48, 4) int32 in cooked.npz[|World|cube_scene|cube_n2|sim_mesh:tetVertexIndices]>",
+   "visibility": "inherited"
+  }
+ },
+ "/World/cube_scene/cube_n2/vis_mesh": {
+  "type": "Mesh",
+  "schemas": [],
+  "attrs": {
+   "cornerIndices": "[]",
+   "cornerSharpnesses": "[]",
+   "creaseIndices": "[]",
+   "creaseLengths": "[]",
+   "creaseSharpnesses": "[]",
+   "doubleSided": "False",
+   "faceVaryingLinearInterpolation": "cornersPlus1",
+   "faceVertexCounts": "<array (48,) int32 in cooked.npz[|World|cube_scene|cube_n2|vis_mesh:faceVertexCounts]>",
+   "faceVertexIndices": "<array (144,) int32 in cooked.npz[|World|cube_scene|cube_n2|vis_mesh:faceVertexIndices]>",
+   "holeIndices": "[]",
+   "interpolateBoundary": "edgeAndCorner",
+   "orientation": "rightHanded",
+   "points": "<array (27, 3) float32 in cooked.npz[|World|cube_scene|cube_n2|vis_mesh:points]>",
+   "purpose": "default",
+   "subdivisionScheme": "catmullClark",
+   "triangleSubdivisionRule": "catmullClark",
+   "visibility": "inherited",
+   "xformOp:orient": "(1, 0, 0, 0)",
+   "xformOp:scale": "(1, 1, 1)",
+   "xformOp:translate": "(0, 0, 0)",
+   "xformOpOrder": "[xformOp:translate, xformOp:orient, xformOp:scale]"
+  }
+ },
+ "/World/cube_scene/cube_n2/material": {
+  "type": "Material",
+  "schemas": [],
+  "attrs": {
+   "newton:density": "1.0",
+   "newton:kDamp": "0.0",
+   "newton:kLambda": "100000.0",
+   "newton:kMu": "100000.0",
+   "newton:particleRadius": "0.00800000037997961"
+  }
+ },
+ "/World/cube_scene/cube_n4": {
+  "type": "Xform",
+  "schemas": [
+   "MaterialBindingAPI"
+  ],
+  "attrs": {
+   "purpose": "default",
+   "visibility": "inherited",
+   "xformOp:orient": "(1, 0, 0, 0)",
+   "xformOp:scale": "(1, 1, 1)",
+   "xformOp:translate": "(20, -2, 0.5)",
+   "xformOpOrder": "[xformOp:translate, xformOp:orient, xformOp:scale]"
+  }
+ },
+ "/World/cube_scene/cube_n4/sim_mesh": {
+  "type": "TetMesh",
+  "schemas": [
+   "PhysicsCollisionAPI"
+  ],
+  "attrs": {
+   "doubleSided": "False",
+   "orientation": "rightHanded",
+   "physics:collisionEnabled": "True",
+   "points": "<array (125, 3) float32 in cooked.npz[|World|cube_scene|cube_n4|sim_mesh:points]>",
+   "purpose": "guide",
+   "surfaceFaceVertexIndices": "<array (192, 3) int32 in cooked.npz[|World|cube_scene|cube_n4|sim_mesh:surfaceFaceVertexIndices]>",
+   "tetVertexIndices": "<array (384, 4) int32 in cooked.npz[|World|cube_scene|cube_n4|sim_mesh:tetVertexIndices]>",
+   "visibility": "inherited"
+  }
+ },
+ "/World/cube_scene/cube_n4/vis_mesh": {
+  "type": "Mesh",
+  "schemas": [],
+  "attrs": {
+   "cornerIndices": "[]",
+   "cornerSharpnesses": "[]",
+   "creaseIndices": "[]",
+   "creaseLengths": "[]",
+   "creaseSharpnesses": "[]",
+   "doubleSided": "False",
+   "faceVaryingLinearInterpolation": "cornersPlus1",
+   "faceVertexCounts": "<array (192,) int32 in cooked.npz[|World|cube_scene|cube_n4|vis_mesh:faceVertexCounts]>",
+   "faceVertexIndices": "<array (576,) int32 in cooked.npz[|World|cube_scene|cube_n4|vis_mesh:faceVertexIndices]>",
+   "holeIndices": "[]",
+   "interpolateBoundary": "edgeAndCorner",
+   "orientation": "rightHanded",
+   "points": "<array (125, 3) float32 in cooked.npz[|World|cube_scene|cube_n4|vis_mesh:points]>",
+   "purpose": "default",
+   "subdivisionScheme": "catmullClark",
+   "triangleSubdivisionRule": "catmullClark",
+   "visibility": "inherited",
+   "xformOp:orient": "(1, 0, 0, 0)",
+   "xformOp:scale": "(1, 1, 1)",
+   "xformOp:translate": "(0, 0, 0)",
+   "xformOpOrder": "[xformOp:translate, xformOp:orient, xformOp:scale]"
+  }
+ },
+ "/World/cube_scene/cube_n4/material": {
+  "type": "Material",
+  "schemas": [],
+  "attrs": {
+   "newton:density": "1.0",
+   "newton:kDamp": "0.0",
+   "newton:kLambda": "100000.0",
+   "newton:kMu": "100000.0",
+   "newton:particleRadius": "0.00800000037997961"
+  }
+ },
+ "/World/cube_scene/cube_n8": {
+  "type": "Xform",
+  "schemas": [
+   "MaterialBindingAPI"
+  ],
+  "attrs": {
+   "purpose": "default",
+   "visibility": "inherited",
+   "xformOp:orient": "(1, 0, 0, 0)",
+   "xformOp:scale": "(1, 1, 1)",
+   "xformOp:translate": "(20, -4, 0.5)",
+   "xformOpOrder": "[xformOp:translate, xformOp:orient, xformOp:scale]"
+  }
+ },
+ "/World/cube_scene/cube_n8/sim_mesh": {
+  "type": "TetMesh",
+  "schemas": [
+   "PhysicsCollisionAPI"
+  ],
+  "attrs": {
+   "doubleSided": "False",
+   "orientation": "rightHanded",
+   "physics:collisionEnabled": "True",
+   "points": "<array (729, 3) float32 in cooked.npz[|World|cube_scene|cube_n8|sim_mesh:points]>",
+   "purpose": "guide",
+   "surfaceFaceVertexIndices": "<array (768, 3) int32 in cooked.npz[|World|cube_scene|cube_n8|sim_mesh:surfaceFaceVertexIndices]>",
+   "tetVertexIndices": "<array (3072, 4) int32 in cooked.npz[|World|cube_scene|cube_n8|sim_mesh:tetVertexIndices]>",
+   "visibility": "inherited"
+  }
+ },
+ "/World/cube_scene/cube_n8/vis_mesh": {
+  "type": "Mesh",
+  "schemas": [],
+  "attrs": {
+   "cornerIndices": "[]",
+   "cornerSharpnesses": "[]",
+   "creaseIndices": "[]",
+   "creaseLengths": "[]",
+   "creaseSharpnesses": "[]",
+   "doubleSided": "False",
+   "faceVaryingLinearInterpolation": "cornersPlus1",
+   "faceVertexCounts": "<array (768,) int32 in cooked.npz[|World|cube_scene|cube_n8|vis_mesh:faceVertexCounts]>",
+   "faceVertexIndices": "<array (2304,) int32 in cooked.npz[|World|cube_scene|cube_n8|vis_mesh:faceVertexIndices]>",
+   "holeIndices": "[]",
+   "interpolateBoundary": "edgeAndCorner",
+   "orientation": "rightHanded",
+   "points": "<array (729, 3) float32 in cooked.npz[|World|cube_scene|cube_n8|vis_mesh:points]>",
+   "purpose": "default",
+   "subdivisionScheme": "catmullClark",
+   "triangleSubdivisionRule": "catmullClark",
+   "visibility": "inherited",
+   "xformOp:orient": "(1, 0, 0, 0)",
+   "xformOp:scale": "(1, 1, 1)",
+   "xformOp:translate": "(0, 0, 0)",
+   "xformOpOrder": "[xformOp:translate, xformOp:orient, xformOp:scale]"
+  }
+ },
+ "/World/cube_scene/cube_n8/material": {
+  "type": "Material",
+  "schemas": [],
+  "attrs": {
+   "newton:density": "1.0",
+   "newton:kDamp": "0.0",
+   "newton:kLambda": "100000.0",
+   "newton:kMu": "100000.0",
+   "newton:particleRadius": "0.00800000037997961"
+  }
+ }
+}

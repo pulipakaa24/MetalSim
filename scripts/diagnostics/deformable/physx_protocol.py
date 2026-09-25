@@ -106,13 +106,20 @@ def cloth_xml(meta, p, dt):
     n, w = c["verts_per_side"], c["size_m"]
     sp = w / (n - 1)
     fr = max(c["pbd_friction"], g["dynamic_friction"])                      # PHYS (MuJoCo combines by max)
+    if p.get("young"):     # FEM membrane (PhysX surface deformable / flex StVK), needs the Euler integrator
+        integ = ""
+        stretch = (f'<edge equality="false"/><elasticity young="{p["young"]}" poisson="{p["poisson"]}" thickness="{p["thickness"]}" '
+                   f'damping="{p.get("elastic_damping", 0)}" elastic2d="{p.get("elastic2d", "stretch")}"/>')
+    else:
+        integ = 'integrator="implicitfast"'
+        stretch = f'<edge equality="true" solref="{p["edge_solref"]}"/>'
     return f"""<mujoco><option timestep="{dt}" solver="CG" iterations="{p.get('iterations', 50)}" ls_iterations="20" jacobian="sparse"
-      integrator="implicitfast"><flag energy="disable"/></option>
+      {integ}><flag energy="disable"/></option>
     <worldbody><geom type="plane" size="3 3 0.1" friction="{g['dynamic_friction']} 0.005 0.0001"/>
     <geom type="box" size="{c['box_size']/2} {c['box_size']/2} {c['box_size']/2}" pos="0 0 {c['box_size']/2}" friction="{g['dynamic_friction']} 0.005 0.0001"/>
     <flexcomp name="cloth" type="grid" count="{n} {n} 1" spacing="{sp} {sp} {sp}" pos="0 0 {c['z0']}" dim="2"
       radius="{c['particle_rest_offset']}" mass="{c['mass']}">
-      <edge equality="true" solref="{p['edge_solref']}"/>
+      {stretch}
       <contact condim="3" friction="{fr}" solref="{p['contact_solref']}" selfcollide="none"/>
     </flexcomp></worldbody></mujoco>"""
 
@@ -170,7 +177,7 @@ XPBD_DEFAULTS = {
 
 def _flex_params(obj, meta, params):
     p = dict(FLEX_DEFAULTS[obj]); p.update(params or {})
-    if obj == "cloth" and p.get("edge_solref") is None:
+    if obj == "cloth" and p.get("edge_solref") is None and not p.get("young"):
         c = meta["scenes"]["cloth"]
         k, d, m = c["spring_stretch_stiffness"], c["spring_damping"], c["particle_mass"]
         p["edge_solref"] = f"{-2 * k / m} {-2 * d / m}"
@@ -405,3 +412,23 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+def run_physxcloth(obj, meta, params=None, device="cpu", nworld=1):
+    """MetalSim's port of PhysX 5.6.1's PBD particle cloth (metalsim.physics.physx_cloth) on the 5.1 cloth protocol:
+    every parameter physical (the recorder's ParticleClothDemo values)."""
+    assert obj == "cloth"
+    from metalsim.physics import physx_cloth as pc
+    c = meta["scenes"]["cloth"]; g = meta["ground"]
+    p = dict(params or {})
+    cfg = pc.PhysXClothCfg(iterations=c["solver_position_iterations"], rest_offset=c["particle_rest_offset"], contact_offset=c["contact_offset"],
+                           friction=c["pbd_friction"], stretch_stiffness=c["spring_stretch_stiffness"], shear_stiffness=c["spring_shear_stiffness"],
+                           bend_stiffness=c["spring_bend_stiffness"], spring_damping=c["spring_damping"], **p)
+    mesh = pc.grid_cloth(c["verts_per_side"], c["size_m"], z0=c["z0"], mass=c["particle_mass"])
+    sim = pc.PhysXClothSim(mesh, nworld, obstacles=[pc.plane(), pc.box((0, 0, c["box_size"] / 2), (c["box_size"] / 2,) * 3)], cfg=cfg,
+                           device=device, capture=device != "cpu")
+    P, V = [sim.x.numpy()[0].copy()], [sim.v.numpy()[0].copy()]
+    t0 = time.time()
+    for _ in range(int(round(T_END * HZ))):
+        sim.step(); P.append(sim.x.numpy()[0].copy()); V.append(sim.v.numpy()[0].copy())
+    return np.array(P), np.array(V), {"nvert": len(mesh.x), "wall_s": time.time() - t0, "params": p, "pinned": None}

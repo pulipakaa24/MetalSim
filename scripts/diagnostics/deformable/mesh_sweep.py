@@ -4,6 +4,8 @@ flex rod: static cantilever (reduced gravity, heavily damped via implicit dampin
 flex cube: rest height and drop bounce vs cells per edge;
 XPBD rod: swing period vs segment count with the `physical` preset (a 1D rod has no cross-section to lock).
 usage: mesh_sweep.py OUT.json"""
+import warp as wp
+wp.set_device("cpu")   # CPU device only: no GPU work, no queue needed
 import sys, os, json, numpy as np, mujoco, warp as wp
 wp.config.quiet = True
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

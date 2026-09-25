@@ -1,0 +1,257 @@
+{
+ "isaacsim_physx": {
+  "cloth": {
+   "rest_top_z": 0.4212145507335663,
+   "rest_mean_z": 0.27182823419570923,
+   "rest_min_z": 0.01999998465180397,
+   "xy_extent": 0.6980649828910828,
+   "settle_time": 1.01,
+   "finite": true
+  },
+  "rope": {
+   "n1": {
+    "length0": 0.5,
+    "rest_tip_drop": 0.28449690341949463,
+    "rest_tip_x": 0.3791694641113281,
+    "min_tip_z": -0.4449463486671448,
+    "osc_axis": "x",
+    "period": 1.01625,
+    "log_decrement": 0.09992731196579682,
+    "peaks": [
+     0.1853,
+     0.272,
+     0.159,
+     0.1797,
+     0.1027,
+     0.1124
+    ],
+    "finite": true
+   },
+   "n2": {
+    "length0": 0.5,
+    "rest_tip_drop": 0.4550855755805969,
+    "rest_tip_x": 0.006266593933105469,
+    "min_tip_z": -0.5042133331298828,
+    "osc_axis": "x",
+    "period": 1.1175,
+    "log_decrement": 0.30501268343791077,
+    "peaks": [
+     0.5307,
+     0.2201,
+     0.398,
+     0.2188,
+     0.3293,
+     0.1155
+    ],
+    "finite": true
+   },
+   "n4": {
+    "length0": 0.5,
+    "rest_tip_drop": 0.506295919418335,
+    "rest_tip_x": 0.18551921844482422,
+    "min_tip_z": -0.5740288496017456,
+    "osc_axis": "x",
+    "period": 1.2614285714285713,
+    "log_decrement": -0.07174151292351139,
+    "peaks": [
+     0.3437,
+     0.55,
+     0.2231,
+     0.4975,
+     0.1902,
+     0.492
+    ],
+    "finite": true
+   },
+   "n8": {
+    "length0": 0.5,
+    "rest_tip_drop": 0.5218615531921387,
+    "rest_tip_x": -0.23926162719726562,
+    "min_tip_z": -0.7204546928405762,
+    "osc_axis": "x",
+    "period": 1.4766666666666666,
+    "log_decrement": 0.22554391970102317,
+    "peaks": [
+     0.5651,
+     0.1912,
+     0.4987,
+     0.3025,
+     0.3471,
+     0.183
+    ],
+    "finite": true
+   }
+  },
+  "cube": {
+   "n2": {
+    "t_impact_min": 0.275,
+    "min_centroid_z": 0.11424970626831055,
+    "bounce_peak_z": 0.13945333659648895,
+    "rest_centroid_z": 0.1197241023182869,
+    "rest_height": 0.19976313412189484,
+    "settle_time": 0.445,
+    "min_node_z": 0.019996045157313347,
+    "finite": true
+   },
+   "n4": {
+    "t_impact_min": 0.28,
+    "min_centroid_z": 0.11038782447576523,
+    "bounce_peak_z": 0.1544959396123886,
+    "rest_centroid_z": 0.11953900009393692,
+    "rest_height": 0.1995713710784912,
+    "settle_time": 0.495,
+    "min_node_z": 0.01999598555266857,
+    "finite": true
+   },
+   "n8": {
+    "t_impact_min": 0.28,
+    "min_centroid_z": 0.10538814216852188,
+    "bounce_peak_z": 0.1726011484861374,
+    "rest_centroid_z": 0.11922185122966766,
+    "rest_height": 0.19928252696990967,
+    "settle_time": 0.7000000000000001,
+    "min_node_z": 0.019350510090589523,
+    "finite": true
+   }
+  },
+  "material": {
+   "elasticity_damping": 0.005,
+   "density": 1000.0,
+   "static_friction": 0.5,
+   "dynamic_friction": 0.5,
+   "youngs_modulus": 1000000.0,
+   "poissons_ratio": 0.45,
+   "func": "isaaclab.sim.spawners.materials.physics_materials:spawn_deformable_body_material",
+   "_usd_applied_schema": "OmniPhysicsDeformableMaterialAPI",
+   "_usd_field_exceptions": "{}",
+   "_usd_namespace": "omniphysics"
+  }
+ },
+ "newton_vbd": {
+  "cloth": {
+   "rest_top_z": 0.4270358979701996,
+   "rest_mean_z": 0.32619038224220276,
+   "rest_min_z": 0.10359456390142441,
+   "xy_extent": 0.8571034669876099,
+   "settle_time": 4.925,
+   "finite": true
+  },
+  "rope": {
+   "n1": {
+    "length0": 0.5,
+    "rest_tip_drop": 0.08493340015411377,
+    "rest_tip_x": 0.48934268951416016,
+    "min_tip_z": -0.13595861196517944,
+    "osc_axis": "z",
+    "period": 0.48736842105263156,
+    "log_decrement": -0.026903907339290007,
+    "peaks": [
+     0.0498,
+     0.0327,
+     0.0163,
+     0.0372,
+     0.0481,
+     0.057
+    ],
+    "finite": true
+   },
+   "n2": {
+    "length0": 0.5,
+    "rest_tip_drop": 0.31356728076934814,
+    "rest_tip_x": 0.266387939453125,
+    "min_tip_z": -0.4483764171600342,
+    "osc_axis": "x",
+    "period": 0.8590000000000001,
+    "log_decrement": 0.3385476096509402,
+    "peaks": [
+     0.2775,
+     0.2661,
+     0.2509,
+     0.163,
+     0.2018,
+     0.0511
+    ],
+    "finite": true
+   },
+   "n4": {
+    "length0": 0.5,
+    "rest_tip_drop": 0.43545663356781006,
+    "rest_tip_x": 0.21787071228027344,
+    "min_tip_z": -0.4953598380088806,
+    "osc_axis": "x",
+    "period": 0.7709999999999999,
+    "log_decrement": -0.052424625924971324,
+    "peaks": [
+     0.2109,
+     0.0063,
+     0.1512,
+     0.3407,
+     0.0931,
+     0.2741
+    ],
+    "finite": true
+   },
+   "n8": {
+    "length0": 0.5,
+    "rest_tip_drop": 0.4449346661567688,
+    "rest_tip_x": 0.06850242614746094,
+    "min_tip_z": -0.6035614013671875,
+    "osc_axis": "z",
+    "period": 0.6584615384615384,
+    "log_decrement": 0.0670399288638219,
+    "peaks": [
+     0.4871,
+     0.3461,
+     0.5771,
+     0.3115,
+     0.5191,
+     0.3483
+    ],
+    "finite": true
+   }
+  },
+  "cube": {
+   "n2": {
+    "t_impact_min": 0.28500000000000003,
+    "min_centroid_z": 0.10799034684896469,
+    "bounce_peak_z": 0.10803905129432678,
+    "rest_centroid_z": 0.10799925774335861,
+    "rest_height": 0.2000000923871994,
+    "settle_time": 0.28500000000000003,
+    "min_node_z": 0.007976940833032131,
+    "finite": true
+   },
+   "n4": {
+    "t_impact_min": 0.28500000000000003,
+    "min_centroid_z": 0.10778746008872986,
+    "bounce_peak_z": 0.11101128906011581,
+    "rest_centroid_z": 0.10799603909254074,
+    "rest_height": 0.19999833405017853,
+    "settle_time": 0.28500000000000003,
+    "min_node_z": 0.00793575681746006,
+    "finite": true
+   },
+   "n8": {
+    "t_impact_min": 0.28500000000000003,
+    "min_centroid_z": 0.10579387098550797,
+    "bounce_peak_z": 0.13986799120903015,
+    "rest_centroid_z": 0.1079743504524231,
+    "rest_height": 0.1999829113483429,
+    "settle_time": 0.585,
+    "min_node_z": 0.0075872959569096565,
+    "finite": true
+   }
+  },
+  "material": {
+   "density": 1.0,
+   "particle_radius": 0.008,
+   "func": "isaaclab.sim.spawners.materials.physics_materials:spawn_deformable_body_material",
+   "k_mu": 100000.0,
+   "k_lambda": 100000.0,
+   "k_damp": 0.0,
+   "_usd_applied_schema": null,
+   "_usd_field_exceptions": "{}",
+   "_usd_namespace": "newton"
+  }
+ }
+}

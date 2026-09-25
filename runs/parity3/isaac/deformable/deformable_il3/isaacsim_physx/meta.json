@@ -1,0 +1,491 @@
+{
+ "physics": "isaacsim_physx",
+ "physics_dt": 0.005,
+ "seconds": 5.0,
+ "gravity": [
+  0,
+  0,
+  -9.81
+ ],
+ "isaac_lab": "3.0.0-EA",
+ "scenes": {
+  "cloth": {
+   "size": [
+    1.0,
+    1.0
+   ],
+   "edge_refinement": 21,
+   "z0": 0.5,
+   "box": 0.4,
+   "material": {
+    "elasticity_damping": 0.005,
+    "density": 1000.0,
+    "static_friction": 0.25,
+    "dynamic_friction": 0.25,
+    "youngs_modulus": 1000000.0,
+    "poissons_ratio": 0.45,
+    "surface_thickness": 0.01,
+    "surface_stretch_stiffness": 0.0,
+    "surface_shear_stiffness": 0.0,
+    "surface_bend_stiffness": 0.0,
+    "func": "isaaclab.sim.spawners.materials.physics_materials:spawn_deformable_body_material",
+    "bend_damping": 0.0,
+    "_usd_applied_schema": "PhysxSurfaceDeformableMaterialAPI",
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "physxDeformableMaterial"
+   },
+   "props": {
+    "solver_position_iteration_count": 16,
+    "linear_damping": null,
+    "max_linear_velocity": null,
+    "settling_damping": null,
+    "settling_threshold": null,
+    "sleep_threshold": null,
+    "max_depenetration_velocity": null,
+    "self_collision": null,
+    "self_collision_filter_distance": null,
+    "enable_speculative_c_c_d": null,
+    "disable_gravity": null,
+    "collision_pair_update_frequency": null,
+    "collision_iteration_multiplier": null,
+    "deformable_body_enabled": null,
+    "kinematic_enabled": false,
+    "mass": null,
+    "_usd_applied_schema": null,
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "omniphysics"
+   }
+  },
+  "rod_n1": {
+   "size": [
+    0.5,
+    0.02,
+    0.02
+   ],
+   "z0": 1.0,
+   "x0": 10.0,
+   "y0": -0.0,
+   "cells_across": "1",
+   "edge_refinement": null,
+   "mesh": "structured hex->6 tets, cell aspect 2.5",
+   "pinned": "-x end, nodes within 0.01 m",
+   "material": {
+    "elasticity_damping": 0.005,
+    "density": 1000.0,
+    "static_friction": 0.5,
+    "dynamic_friction": 0.5,
+    "youngs_modulus": 1000000.0,
+    "poissons_ratio": 0.45,
+    "func": "isaaclab.sim.spawners.materials.physics_materials:spawn_deformable_body_material",
+    "_usd_applied_schema": "OmniPhysicsDeformableMaterialAPI",
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "omniphysics"
+   },
+   "props": {
+    "solver_position_iteration_count": 16,
+    "linear_damping": null,
+    "max_linear_velocity": null,
+    "settling_damping": null,
+    "settling_threshold": null,
+    "sleep_threshold": null,
+    "max_depenetration_velocity": null,
+    "self_collision": null,
+    "self_collision_filter_distance": null,
+    "enable_speculative_c_c_d": null,
+    "disable_gravity": null,
+    "collision_pair_update_frequency": null,
+    "collision_iteration_multiplier": null,
+    "deformable_body_enabled": null,
+    "kinematic_enabled": false,
+    "mass": null,
+    "_usd_applied_schema": null,
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "omniphysics"
+   },
+   "n_pinned": 4,
+   "pinned_mask_key": "rod_n1_pinned"
+  },
+  "rod_n2": {
+   "size": [
+    0.5,
+    0.02,
+    0.02
+   ],
+   "z0": 1.0,
+   "x0": 10.0,
+   "y0": -2.0,
+   "cells_across": "2",
+   "edge_refinement": null,
+   "mesh": "structured hex->6 tets, cell aspect 2.5",
+   "pinned": "-x end, nodes within 0.01 m",
+   "material": {
+    "elasticity_damping": 0.005,
+    "density": 1000.0,
+    "static_friction": 0.5,
+    "dynamic_friction": 0.5,
+    "youngs_modulus": 1000000.0,
+    "poissons_ratio": 0.45,
+    "func": "isaaclab.sim.spawners.materials.physics_materials:spawn_deformable_body_material",
+    "_usd_applied_schema": "OmniPhysicsDeformableMaterialAPI",
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "omniphysics"
+   },
+   "props": {
+    "solver_position_iteration_count": 16,
+    "linear_damping": null,
+    "max_linear_velocity": null,
+    "settling_damping": null,
+    "settling_threshold": null,
+    "sleep_threshold": null,
+    "max_depenetration_velocity": null,
+    "self_collision": null,
+    "self_collision_filter_distance": null,
+    "enable_speculative_c_c_d": null,
+    "disable_gravity": null,
+    "collision_pair_update_frequency": null,
+    "collision_iteration_multiplier": null,
+    "deformable_body_enabled": null,
+    "kinematic_enabled": false,
+    "mass": null,
+    "_usd_applied_schema": null,
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "omniphysics"
+   },
+   "n_pinned": 9,
+   "pinned_mask_key": "rod_n2_pinned"
+  },
+  "rod_n4": {
+   "size": [
+    0.5,
+    0.02,
+    0.02
+   ],
+   "z0": 1.0,
+   "x0": 10.0,
+   "y0": -4.0,
+   "cells_across": "4",
+   "edge_refinement": null,
+   "mesh": "structured hex->6 tets, cell aspect 2.5",
+   "pinned": "-x end, nodes within 0.01 m",
+   "material": {
+    "elasticity_damping": 0.005,
+    "density": 1000.0,
+    "static_friction": 0.5,
+    "dynamic_friction": 0.5,
+    "youngs_modulus": 1000000.0,
+    "poissons_ratio": 0.45,
+    "func": "isaaclab.sim.spawners.materials.physics_materials:spawn_deformable_body_material",
+    "_usd_applied_schema": "OmniPhysicsDeformableMaterialAPI",
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "omniphysics"
+   },
+   "props": {
+    "solver_position_iteration_count": 16,
+    "linear_damping": null,
+    "max_linear_velocity": null,
+    "settling_damping": null,
+    "settling_threshold": null,
+    "sleep_threshold": null,
+    "max_depenetration_velocity": null,
+    "self_collision": null,
+    "self_collision_filter_distance": null,
+    "enable_speculative_c_c_d": null,
+    "disable_gravity": null,
+    "collision_pair_update_frequency": null,
+    "collision_iteration_multiplier": null,
+    "deformable_body_enabled": null,
+    "kinematic_enabled": false,
+    "mass": null,
+    "_usd_applied_schema": null,
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "omniphysics"
+   },
+   "n_pinned": 25,
+   "pinned_mask_key": "rod_n4_pinned"
+  },
+  "rod_n8": {
+   "size": [
+    0.5,
+    0.02,
+    0.02
+   ],
+   "z0": 1.0,
+   "x0": 10.0,
+   "y0": -6.0,
+   "cells_across": "8",
+   "edge_refinement": null,
+   "mesh": "structured hex->6 tets, cell aspect 2.5",
+   "pinned": "-x end, nodes within 0.01 m",
+   "material": {
+    "elasticity_damping": 0.005,
+    "density": 1000.0,
+    "static_friction": 0.5,
+    "dynamic_friction": 0.5,
+    "youngs_modulus": 1000000.0,
+    "poissons_ratio": 0.45,
+    "func": "isaaclab.sim.spawners.materials.physics_materials:spawn_deformable_body_material",
+    "_usd_applied_schema": "OmniPhysicsDeformableMaterialAPI",
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "omniphysics"
+   },
+   "props": {
+    "solver_position_iteration_count": 16,
+    "linear_damping": null,
+    "max_linear_velocity": null,
+    "settling_damping": null,
+    "settling_threshold": null,
+    "sleep_threshold": null,
+    "max_depenetration_velocity": null,
+    "self_collision": null,
+    "self_collision_filter_distance": null,
+    "enable_speculative_c_c_d": null,
+    "disable_gravity": null,
+    "collision_pair_update_frequency": null,
+    "collision_iteration_multiplier": null,
+    "deformable_body_enabled": null,
+    "kinematic_enabled": false,
+    "mass": null,
+    "_usd_applied_schema": null,
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "omniphysics"
+   },
+   "n_pinned": 81,
+   "pinned_mask_key": "rod_n8_pinned"
+  },
+  "cube_n2": {
+   "size": 0.2,
+   "z0": 0.5,
+   "x0": 20.0,
+   "y0": -0.0,
+   "cells_per_edge": "2",
+   "edge_refinement": null,
+   "material": {
+    "elasticity_damping": 0.005,
+    "density": 1000.0,
+    "static_friction": 0.5,
+    "dynamic_friction": 0.5,
+    "youngs_modulus": 1000000.0,
+    "poissons_ratio": 0.45,
+    "func": "isaaclab.sim.spawners.materials.physics_materials:spawn_deformable_body_material",
+    "_usd_applied_schema": "OmniPhysicsDeformableMaterialAPI",
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "omniphysics"
+   },
+   "props": {
+    "solver_position_iteration_count": 16,
+    "linear_damping": null,
+    "max_linear_velocity": null,
+    "settling_damping": null,
+    "settling_threshold": null,
+    "sleep_threshold": null,
+    "max_depenetration_velocity": null,
+    "self_collision": null,
+    "self_collision_filter_distance": null,
+    "enable_speculative_c_c_d": null,
+    "disable_gravity": null,
+    "collision_pair_update_frequency": null,
+    "collision_iteration_multiplier": null,
+    "deformable_body_enabled": null,
+    "kinematic_enabled": false,
+    "mass": null,
+    "_usd_applied_schema": null,
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "omniphysics"
+   }
+  },
+  "cube_n4": {
+   "size": 0.2,
+   "z0": 0.5,
+   "x0": 20.0,
+   "y0": -2.0,
+   "cells_per_edge": "4",
+   "edge_refinement": null,
+   "material": {
+    "elasticity_damping": 0.005,
+    "density": 1000.0,
+    "static_friction": 0.5,
+    "dynamic_friction": 0.5,
+    "youngs_modulus": 1000000.0,
+    "poissons_ratio": 0.45,
+    "func": "isaaclab.sim.spawners.materials.physics_materials:spawn_deformable_body_material",
+    "_usd_applied_schema": "OmniPhysicsDeformableMaterialAPI",
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "omniphysics"
+   },
+   "props": {
+    "solver_position_iteration_count": 16,
+    "linear_damping": null,
+    "max_linear_velocity": null,
+    "settling_damping": null,
+    "settling_threshold": null,
+    "sleep_threshold": null,
+    "max_depenetration_velocity": null,
+    "self_collision": null,
+    "self_collision_filter_distance": null,
+    "enable_speculative_c_c_d": null,
+    "disable_gravity": null,
+    "collision_pair_update_frequency": null,
+    "collision_iteration_multiplier": null,
+    "deformable_body_enabled": null,
+    "kinematic_enabled": false,
+    "mass": null,
+    "_usd_applied_schema": null,
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "omniphysics"
+   }
+  },
+  "cube_n8": {
+   "size": 0.2,
+   "z0": 0.5,
+   "x0": 20.0,
+   "y0": -4.0,
+   "cells_per_edge": "8",
+   "edge_refinement": null,
+   "material": {
+    "elasticity_damping": 0.005,
+    "density": 1000.0,
+    "static_friction": 0.5,
+    "dynamic_friction": 0.5,
+    "youngs_modulus": 1000000.0,
+    "poissons_ratio": 0.45,
+    "func": "isaaclab.sim.spawners.materials.physics_materials:spawn_deformable_body_material",
+    "_usd_applied_schema": "OmniPhysicsDeformableMaterialAPI",
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "omniphysics"
+   },
+   "props": {
+    "solver_position_iteration_count": 16,
+    "linear_damping": null,
+    "max_linear_velocity": null,
+    "settling_damping": null,
+    "settling_threshold": null,
+    "sleep_threshold": null,
+    "max_depenetration_velocity": null,
+    "self_collision": null,
+    "self_collision_filter_distance": null,
+    "enable_speculative_c_c_d": null,
+    "disable_gravity": null,
+    "collision_pair_update_frequency": null,
+    "collision_iteration_multiplier": null,
+    "deformable_body_enabled": null,
+    "kinematic_enabled": false,
+    "mass": null,
+    "_usd_applied_schema": null,
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "omniphysics"
+   }
+  }
+ },
+ "errors": {},
+ "physics_cfg": {
+  "class_type": "isaaclab_physx.physics.physx_manager:PhysxManager",
+  "deterministic": false,
+  "solver_type": 1,
+  "solve_articulation_contact_last": false,
+  "min_position_iteration_count": 1,
+  "max_position_iteration_count": 255,
+  "min_velocity_iteration_count": 0,
+  "max_velocity_iteration_count": 255,
+  "enable_scene_query_support": false,
+  "enable_ccd": false,
+  "enable_stabilization": false,
+  "enable_external_forces_every_iteration": true,
+  "enable_enhanced_determinism": false,
+  "bounce_threshold_velocity": 0.5,
+  "friction_offset_threshold": 0.04,
+  "friction_correlation_distance": 0.025,
+  "gpu_max_rigid_contact_count": 8388608,
+  "gpu_max_rigid_patch_count": 163840,
+  "gpu_found_lost_pairs_capacity": 2097152,
+  "gpu_found_lost_aggregate_pairs_capacity": 33554432,
+  "gpu_total_aggregate_pairs_capacity": 2097152,
+  "gpu_collision_stack_size": 67108864,
+  "gpu_heap_capacity": 67108864,
+  "gpu_temp_buffer_capacity": 16777216,
+  "gpu_max_num_partitions": 8,
+  "gpu_max_soft_body_contacts": 1048576,
+  "gpu_max_particle_contacts": 1048576
+ },
+ "ground": {
+  "func": "isaaclab.sim.spawners.from_files.from_files:spawn_ground_plane",
+  "visible": true,
+  "semantic_tags": null,
+  "copy_from_source": true,
+  "spawn_path": null,
+  "usd_path": "https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.1/Isaac/IsaacLab/Environments/Grid/default_ground_plane_checker_v1/default_ground_plane.usda",
+  "color": null,
+  "size": [
+   100.0,
+   100.0
+  ],
+  "physics_material": "{'func': 'isaaclab.sim.spawners.materials.physics_materials:spawn_rigid_body_material', 'static_friction': 0.5, 'dynamic_friction': 0.5, 'restitution': 0.0, 'density': None, '_usd_applied_schema': None, '_usd_field_exceptions': {}, '_usd_namespace': 'physics'}"
+ },
+ "cooked_prims": 40,
+ "wall_s_including_readback": 8.38652491569519,
+ "counts": {
+  "cloth_pos": [
+   1089,
+   3
+  ],
+  "cloth_vel": [
+   1089,
+   3
+  ],
+  "rod_n1_pos": [
+   44,
+   3
+  ],
+  "rod_n1_vel": [
+   44,
+   3
+  ],
+  "rod_n2_pos": [
+   189,
+   3
+  ],
+  "rod_n2_vel": [
+   189,
+   3
+  ],
+  "rod_n4_pos": [
+   1025,
+   3
+  ],
+  "rod_n4_vel": [
+   1025,
+   3
+  ],
+  "rod_n8_pos": [
+   6561,
+   3
+  ],
+  "rod_n8_vel": [
+   6561,
+   3
+  ],
+  "cube_n2_pos": [
+   27,
+   3
+  ],
+  "cube_n2_vel": [
+   27,
+   3
+  ],
+  "cube_n4_pos": [
+   125,
+   3
+  ],
+  "cube_n4_vel": [
+   125,
+   3
+  ],
+  "cube_n8_pos": [
+   729,
+   3
+  ],
+  "cube_n8_vel": [
+   729,
+   3
+  ]
+ }
+}
