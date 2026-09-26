@@ -620,6 +620,46 @@ Throughput (training loop, env-steps/s):
 * Throughput 48.9 K env-steps/s median (M4 Max) vs Isaac 59.4 K (Newton) / 47.3 K (PhysX) on the L4.
 
 
+### 6.7 Mechanism of the early transient (verdict)
+
+**Verdict: the early blow-ups came from a trainer start-state defect combined with Isaac's contact stiffness. PPOWarp
+started every env's first episode from MuJoCo's qpos0, embedded in the ground. Isaac's stiff contact (5 ms, damping
+ratio 1.375) ejected those robots 13–42 m into the air, where the free-falling legs, driven at the 300 N·m effort limit
+with no ground contact, spun past 100 rad/s until the integrator failed. Isaac never starts from qpos0 (`env.reset()`
+first), so its Newton pipeline cannot show this.**
+
+Evidence (`runs/il3/transient_trace.py` / `.log`, PPOWarp-initialised policy, seed 0, no policy updates, 320 control steps
+× 4096 envs, eager substeps; `runs/il3/transient_analyze.py`, MuJoCo C replay of the dumped windows):
+
+| start | contacts | blown (all in the first episode) | first episode ends at (median step) |
+|---|---|---|---|
+| qpos0 (as training did), rough | Isaac's | 1,163 | 306 |
+| task reset (Isaac's spawn), rough | Isaac's | 0 | 38 |
+| qpos0, rough | MuJoCo default | 0 | 124 |
+| qpos0, flat | Isaac's | 81 | 296 |
+
+* qpos0 puts the root at the world origin at z = 0 with zero joints. On flat the feet start 0.754 m below the plane (8
+  contacts at −0.754 m); on rough, contacts start at −5 to −6 cm at (0, 0). With Isaac's contact stiffness the correction
+  launches the robots. At the start of each dumped 24-substep window (24 substeps before blow-up) the pelvis was at z =
+  30–42 m (rough) and 13–22 m (flat), falling at 10–17 m/s, with mechanical energy 30–67 kJ against ~220 J standing. That
+  is a 5–6 s ballistic flight, which is why no episode ended (no torso contact) for ~230–300 steps.
+* In flight the policy's saturating random targets drive the hips at the effort limit (actuator force ±300 N·m on the
+  fastest joint, no contact, no limit force). The first joint past 3× the 37 rad/s limit is a hip (rough: left_hip_roll 6
+  of 8, left_hip_pitch 2; flat: right_hip_pitch 4, right_hip_roll 3, left_hip_roll 1), not a finger (the late,
+  mixed-preset blow-ups were fingers, §6.2). Joint speeds reach 100–290 rad/s within 24 substeps, then qpos/qvel leave the
+  finite range. The C replays of those windows diverge from the GPU trajectories within a few substeps (chaotic, and not
+  reproduced exactly), so they establish the regime, not the exact final substep.
+* Energy therefore enters through the contact spring (the ejection from a deep initial penetration). It is then pumped by
+  the actuators at airborne joints. The soft joint limits play no part: limit force 0 in the windows, and hard limits in
+  the A/B still blew up.
+* The deterministic 7 / 52 / 246 / 474 / 14 profile at iterations 10–14 is the landing time distribution of the ejected
+  first episodes (steps 230–330, i.e. iterations 10–14 of 24 steps), not a policy-update effect. The flat 34 of the
+  corrected flat run fall in the same window (iterations 11–13) and come from the same mechanism.
+* Fix: `PPOWarp.prepare()` resets every env through the task before the first rollout (`initial_reset=True`, default;
+  test `test_trainer_first_observation_comes_from_the_task_reset`). The qpos0 start is archived. This affects every
+  earlier PPOWarp G1 run's first episode (PARITY §1.5 note, DECISIONS row).
+
+
 ### 6.8 Corrected rough 3.0 run (`il3fix_rough_s0`, 2026-09-26 03:00–04:00)
 
 Same corrected preset; rough_il3 (0.1 m heightfield collision, exact scan), seed 0. Log `runs/il3/il3fix_rough_s0.log`,
