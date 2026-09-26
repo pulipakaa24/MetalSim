@@ -798,7 +798,7 @@ Throughput (training loop, env-steps/s):
   300, +15.4 vs +19.6 at 500. §6.6 (qpos0 start) had +0.6 and +13.8 there.
 * Return at 1499 **+23.9** (±5 mean +23.8) vs Isaac +27.5; §6.6 reached +27.5. Same config apart from the start state and
   the same seed, but different trajectories. The 3.6 difference between the two MetalSim runs is of the order of the
-  2.3.2-task seed spread (±1.3 over three seeds, one outlier-free), so single-seed final returns do not separate
+  2.3.2-task seed spread (28.4 / 26.3 / 26.0 at iteration 1000, a 2.4 range), so single-seed final returns do not separate
   configurations. The early curve (where the start state acts) is the robust signal: it moved toward Isaac's.
 * Per term at 1499 the gap is yaw tracking (0.671 vs 0.753) and linear tracking (0.921 vs 0.940); detail in
   `runs/il3/curves_il3fix2_flat.md`.
