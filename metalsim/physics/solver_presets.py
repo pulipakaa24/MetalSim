@@ -135,6 +135,9 @@ def apply(m: mujoco.MjModel, name: str | SolverPreset) -> mujoco.MjModel:
         for j in range(m.njnt):
             nm = mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_JOINT, j)
             if m.jnt_type[j] == mujoco.mjtJoint.mjJNT_FREE:
+                # no limit on the root; Isaac's model carries MuJoCo's defaults there (recorded jnt_solref[0] = (0.02, 1),
+                # jnt_solimp[0] default). Set them so the preset's model does not depend on what a contact preset left
+                m.jnt_solref[j] = (0.02, 1.0); m.jnt_solimp[j] = ISAACLAB3_LIMIT_SOLIMP
                 continue
             if nm not in lim:
                 raise KeyError(f"joint {nm} has no recorded Isaac limit solref")

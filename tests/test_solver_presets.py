@@ -24,7 +24,9 @@ def test_isaaclab3_model_fields_match_the_recording():
     contact_tuning.apply(m, "recommended")          # the task applies its contact_cfg first: the preset must override all of it
     solver_presets.apply(m, "isaaclab3")
     lim = json.load(open("runs/parity3/isaac/fidelity/newton_mjwarp/meta.json"))["newton"]["mjw_model_joint_actuator"]["jnt_solimp"]["first_world"]
-    np.testing.assert_allclose(m.jnt_solimp[1:], np.array(lim)[1:], rtol=1e-6)
+    np.testing.assert_allclose(m.jnt_solimp, np.tile(np.array(lim)[0], (m.njnt, 1)), rtol=1e-6)   # one row for every joint
+    rs = json.load(open("runs/parity3/isaac/fidelity/newton_mjwarp/meta.json"))["newton"]["mjw_model_joint_actuator"]["jnt_solref"]["first_world"]
+    np.testing.assert_allclose(m.jnt_solref[0], np.array(rs)[0], rtol=1e-4)                     # free joint (per-name loop below)
     rec = json.load(open(solver_presets.ISAACLAB3_SETTINGS))
     assert m.opt.iterations == rec["solver"]["iterations"] == 100 and m.opt.ls_iterations == rec["solver"]["ls_iterations"] == 50
     assert m.opt.tolerance == pytest.approx(rec["solver"]["tolerance"]) and m.opt.ls_tolerance == pytest.approx(rec["solver"]["ls_tolerance"])
