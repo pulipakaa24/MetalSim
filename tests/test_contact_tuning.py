@@ -30,3 +30,23 @@ def test_g1_builder_context_restores():
     with ct.g1_model_tuning("recommended"):
         assert g1.build_g1_model is not orig
     assert g1.build_g1_model is orig
+
+
+def test_elliptic_presets_set_cone_and_impratio():
+    """tau10_impact_hardlimits_ellip{1,10,100}: the adopted contact/limit stiffness plus the elliptic cone and impratio."""
+    base = mujoco.MjModel.from_xml_string(XML); ct.apply(base, "tau10_impact_hardlimits")
+    assert base.opt.cone == mujoco.mjtCone.mjCONE_PYRAMIDAL and base.opt.impratio == 1.0     # the base preset leaves the cone alone
+    for imp in (1, 10, 100):
+        m = mujoco.MjModel.from_xml_string(XML); ct.apply(m, f"tau10_impact_hardlimits_ellip{imp}")
+        assert m.opt.cone == mujoco.mjtCone.mjCONE_ELLIPTIC and m.opt.impratio == imp
+        assert np.allclose(m.geom_solref, base.geom_solref) and np.allclose(m.geom_solimp, base.geom_solimp)
+        assert np.allclose(m.jnt_solref, base.jnt_solref) and np.allclose(m.jnt_solimp, base.jnt_solimp)
+        assert np.allclose(m.geom_margin, base.geom_margin) and np.allclose(m.geom_friction, base.geom_friction)
+        s = mujoco.MjSpec.from_string(XML); ct.apply(s, f"tau10_impact_hardlimits_ellip{imp}"); m2 = s.compile()
+        assert m2.opt.cone == mujoco.mjtCone.mjCONE_ELLIPTIC and m2.opt.impratio == imp
+    # the G1 task's builder applies the preset through contact_cfg; check the model it would build (CPU, no GPU)
+    from metalsim.learn.g1_velocity import build_g1_model
+    g1m, _ = build_g1_model("flat", physics_dt=0.0025); ct.apply(g1m, "tau10_impact_hardlimits_ellip10")
+    assert g1m.opt.cone == mujoco.mjtCone.mjCONE_ELLIPTIC and g1m.opt.impratio == 10.0
+    assert np.allclose(g1m.geom_solref, [0.01, 1.0]) and np.allclose(g1m.geom_solimp[:, :3], [0.9, 0.999, 0.005])
+    assert np.allclose(g1m.jnt_solref[g1m.jnt_limited.astype(bool)], [0.005, 1.0])
