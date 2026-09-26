@@ -1,0 +1,17 @@
+== Fri Sep 25 18:15:33 PDT 2026
+holder: {"name": "newton_vbd_replay", "kind": "low", "minutes": 40.0, "pid": 58993, "start": 1790385333.389673}
+  waiting [low] kamino_tests_fork est 40.0 min, queued 11805 s ago
+  waiting [low] kamino_tests_152 est 30.0 min, queued 10975 s ago
+  waiting [low] cl_kamino est 45.0 min, queued 9644 s ago
+  waiting [low] cl_mjw est 40.0 min, queued 9621 s ago
+NEWTON_METAL_DONE metal:0 92.90380995802116 {'cloth': 1089, 'rod_n1': 44, 'rod_n2': 189, 'rod_n4': 1025, 'rod_n8': 6561, 'cube_n2': 27, 'cube_n4': 125, 'cube_n8': 729}
+{"bench": "cloth", "worlds": 256, "particles_per_world": 1089, "env_steps_per_s": 1543.0361292020862, "ms_per_frame": 165.90667914715596, "finite": true}
+{"bench": "cloth", "worlds": 1024, "particles_per_world": 1089, "env_steps_per_s": 1429.8631028373425, "ms_per_frame": 716.1524749943055, "finite": true}
+{"bench": "cloth", "worlds": 4096, "particles_per_world": 1089, "env_steps_per_s": 1209.3302307602316, "ms_per_frame": 3386.9987666024826, "finite": true}
+{"bench": "rope", "worlds": 256, "particles_per_world": 44, "env_steps_per_s": 6673.067209066608, "ms_per_frame": 38.3631682372652, "finite": true}
+{"bench": "rope", "worlds": 1024, "particles_per_world": 44, "env_steps_per_s": 11815.431031870374, "ms_per_frame": 86.66632619985778, "finite": true}
+{"bench": "rope", "worlds": 4096, "particles_per_world": 44, "env_steps_per_s": 6636.264676488938, "ms_per_frame": 617.2146832104772, "finite": true}
+{"bench": "cube", "worlds": 256, "particles_per_world": 125, "env_steps_per_s": 2735.4168091552287, "ms_per_frame": 93.58719999935212, "finite": true}
+{"bench": "cube", "worlds": 1024, "particles_per_world": 125, "env_steps_per_s": 936.841926189537, "ms_per_frame": 1093.0339167942293, "finite": true}
+{"bench": "cube", "worlds": 4096, "particles_per_world": 125, "env_steps_per_s": 835.1303607685576, "ms_per_frame": 4904.6235083951615, "finite": true}
+== done Fri Sep 25 18:20:48 PDT 2026

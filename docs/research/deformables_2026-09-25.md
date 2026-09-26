@@ -568,3 +568,26 @@ in the process.
 | decision | options (numbers) | chosen, why | how to switch |
 |---|---|---|---|
 | flex per-pair contact cap | 50 (MuJoCo C; large cloths fall through) / 400 (membrane cloth rests at 0.420 m, = uncapped C 0.422) | 50 by default (parity), 400 for cloths over ~20 × 20 vertices | `collision_flex.FLEX_MAXCONPAIR`, `maxconpair` in the protocol |
+
+**Newton VBD on Metal vs Isaac Lab 3.0's Newton backend (same solver, measured).** Full 5 s replay of the recorded
+scene on metal:0 (`il3_newton_metal.py`, `.venv-newton152`, graph replay, queue kind low;
+`runs/parity3/isaac/deformable/newton_metal.log`, `newton_metal_vs_isaac.json`). Max vertex difference to the Isaac
+(CUDA, L4) recording at 5 s: cloth 0.7 mm, cubes 0.2–0.4 mm, rods n1/n2/n4 0.1 / 0.4 / 1.2 mm; the finest rod (n8,
+6561 nodes, still swinging) diverges late: 1.9 mm at 2 s, 14 cm at 5 s (median 4.4 cm), float32 chaos in a lightly
+damped swing (its tip drop 0.445 vs 0.388 m at 5 s, period identical 0.658 s). Every bulk metric of cloth, cube and
+the n1–n4 rods agrees to the third decimal (cube n4 bounce 0.1110 / 0.1112 m, settle 0.285 / 0.285 s; cloth height
+on box 0.427 / 0.427, extent 0.857 / 0.857). Throughput on Metal (graph replay, 20 VBD iterations × 4 substeps per
+5 ms frame):
+
+| Newton VBD on Metal | 256 | 1024 | 4096 worlds |
+|---|---|---|---|
+| cloth (1089 particles) | 1.54K | 1.43K | 1.21K env-steps/s |
+| rod (44 nodes) | 6.7K | 11.8K | 6.6K |
+| cube (125 nodes) | 2.7K | 0.94K | 0.84K |
+
+For comparison at 4096 on Metal: XPBD cloth (441 vertices) 0.31M, flex cube (125 vertices) 2.9K, XPBD rod 2.57M
+env-steps/s.
+
+| decision | options (numbers) | chosen, why | how to switch |
+|---|---|---|---|
+| Newton-backend parity engine | Newton VBD on Metal (same solver: ≤ 1.2 mm on cloth, cubes, n1–n4 rods over 5 s; 0.8–12K env-steps/s) / MetalSim backends (different models) | Newton VBD on Metal (`.venv-newton152`, Newton 1.5.2, stock mujoco-warp 3.11) for any comparison against Isaac Lab 3.0's Newton backend | `scripts/diagnostics/deformable/il3_newton_metal.py` |
