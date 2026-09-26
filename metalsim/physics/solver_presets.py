@@ -104,6 +104,15 @@ PRESETS: dict[str, SolverPreset] = {
     "isaaclab3_mixed_recommended_limits": SolverPreset(iterations=20, ls_iterations=50, collision_every=1,
                                                        **{**_IL3, "limit_solimp": (0.99, 0.999, 0.001, 0.5, 2.0)},
                                                        note="isaaclab3_every_substep_cap20 with the recommended preset's limit impedance"),
+    # single-item variants of the training preset for the rough blow-up diagnosis (2026-09-25 evening)
+    "isaaclab3_every_substep_cap20_hardlimits": SolverPreset(iterations=20, ls_iterations=50, collision_every=1,
+                                                             **{**_IL3, "limit_solref": "hard", "newton_force_space_limits": False},
+                                                             note="training preset with the hard-limit preset's joint limits"),
+    "isaaclab3_every_substep_cap20_nogap": SolverPreset(iterations=20, ls_iterations=50, collision_every=1, **{**_IL3, "geom_gap": 0.0},
+                                                        note="training preset without Isaac's 1 cm per-geom contact gap"),
+    "isaaclab3_every_substep_cap20_mjcontact": SolverPreset(iterations=20, ls_iterations=50, collision_every=1,
+                                                            **{**_IL3, "contact_solref": (0.02, 1.0), "geom_gap": 0.0},
+                                                            note="training preset with MuJoCo's default contact solref and no gap (limits and caps kept)"),
     # archived A/B variants of single items
     "isaaclab3_collide_every_substep": SolverPreset(iterations=100, ls_iterations=50, collision_every=1, **_IL3,
                                                     note="isaaclab3 with MuJoCo Warp's collision on every substep"),

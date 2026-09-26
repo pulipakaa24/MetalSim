@@ -1,0 +1,18 @@
+{
+ "terrain": "flat",
+ "preset": "isaaclab3_every_substep_cap20",
+ "ckpt": "runs/il3/ckpt/train_flat_il3_isaaclab3_every_substep_cap20_s0.pt",
+ "steps": 500,
+ "cap": 20,
+ "niter": {
+  "max": 9,
+  "p99.9": 8.0,
+  "substep_worlds_at_cap": 0,
+  "of": 16384000
+ },
+ "overflow": {},
+ "blowups": 0,
+ "isaac_style_torso_terminations": 18,
+ "criterion": "blow-up = any |qpos| or |qvel| > 1000 or non-finite after a control step (g1_reward_done); Isaac 3.0 terminates only on time_out and torso contact > 1 N (TerminationsCfg), so every blow-up here is a state Isaac's task would not end by itself",
+ "all_worlds_pushed_within_50_steps": 0.00390625
+}

@@ -15,10 +15,15 @@ terrain, ckpt, preset = sys.argv[1], sys.argv[2], sys.argv[3]
 STEPS = int(sys.argv[4]) if len(sys.argv) > 4 else 500
 OUT = sys.argv[5] if len(sys.argv) > 5 else None
 N = 4096
-task = G1VelocityTask(N, terrain=terrain, seed=0, physics_dt=0.0025, reward_cfg=f"{terrain}_il3", solver_cfg=preset)
+kw = dict(contact_cfg=preset.split(":", 1)[1], solver_cfg=None) if preset.startswith("contact:") else dict(solver_cfg=preset)
+task = G1VelocityTask(N, terrain=terrain, seed=0, physics_dt=0.0025, reward_cfg=f"{terrain}_il3", **kw)
 m = task.model; d = task.sim.d; cap = int(task.sim.m.opt.iterations)
-ck = torch.load(ckpt, map_location="cpu", weights_only=False)
-net = ActorCriticMLP(task.obs_dim, task.act_dim, hidden=tuple(ck["hidden"])); net.load_state_dict(ck["net"]); net = net.to("mps").eval()
+if ckpt == "init":        # a freshly initialised policy (std 1), the regime of the first training iterations
+    torch.manual_seed(0)
+    net = ActorCriticMLP(task.obs_dim, task.act_dim, hidden=(512, 256, 128) if terrain != "flat" else (256, 128, 128)).to("mps").eval()
+else:
+    ck = torch.load(ckpt, map_location="cpu", weights_only=False)
+    net = ActorCriticMLP(task.obs_dim, task.act_dim, hidden=tuple(ck["hidden"])); net.load_state_dict(ck["net"]); net = net.to("mps").eval()
 names = [mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_JOINT, j) for j in range(1, m.njnt)]
 adr = np.array([m.jnt_qposadr[j] for j in range(1, m.njnt)]); dadr = np.array([m.jnt_dofadr[j] for j in range(1, m.njnt)])
 lo = m.jnt_range[1:, 0]; hi = m.jnt_range[1:, 1]
@@ -32,7 +37,10 @@ bufs.rew = wp.zeros((1, N), dtype=float, device="metal:0"); bufs.done = wp.zeros
 t_obs = tb.mps_tensor(task.obs); std = torch.exp(net.log_std.detach())
 gen = torch.Generator(device="mps").manual_seed(0)
 H = 10
-exc_h = np.zeros((H, N)); excj_h = np.zeros((H, N), int); spd_h = np.zeros((H, N)); spdj_h = np.zeros((H, N), int); pen_h = np.zeros((H, N))
+exc_h = np.zeros((H, N)); excj_h = np.zeros((H, N), int); spd_h = np.zeros((H, N)); spdj_h = np.zeros((H, N), int); pen_h = np.zeros((H, N)); ke_h = np.zeros((H, N)); torso_h = np.zeros((H, N), bool)
+VEL_LIMIT = 37.0     # the anomaly monitor's actuator velocity limit (rad/s)
+torso_terms = 0      # Isaac-style terminations: torso contact (illegal_contact, > 1 N over the 3-tick history) on finite envs
+M_diag = None
 last_push = np.full(N, -10**6); prev_left = task.push_left.numpy().copy()
 niter_max = []; at_cap = 0; ov = collections.Counter(); events = []
 wp.launch(bump, dim=1, inputs=[pol.step_idx], device="metal:0"); wp.launch(bump, dim=1, inputs=[pol.rng_step], device="metal:0")
@@ -60,6 +68,10 @@ for k in range(STEPS):
     exc_h = np.roll(exc_h, 1, 0); excj_h = np.roll(excj_h, 1, 0); spd_h = np.roll(spd_h, 1, 0); spdj_h = np.roll(spdj_h, 1, 0); pen_h = np.roll(pen_h, 1, 0)
     exc_h[0] = np.nan_to_num(ex.max(1), nan=9e9); excj_h[0] = np.nan_to_num(ex, nan=9e9).argmax(1)
     spd_h[0] = np.nan_to_num(sp.max(1), nan=9e9); spdj_h[0] = np.nan_to_num(sp, nan=9e9).argmax(1); pen_h[0] = pmax
+    # kinetic energy proxy of the joints and root (0.5 * sum qvel^2 over dofs, unit masses), for energy jumps
+    ke = 0.5 * np.nan_to_num(qv, nan=1e9, posinf=1e9, neginf=1e9).clip(-1e6, 1e6) ** 2
+    ke_h = np.roll(ke_h, 1, 0); ke_h[0] = ke.sum(1)
+    th = task.torso_hist.numpy()      # history max from the previous step's reward launch (current step: below)
     blown = ~np.isfinite(q).all(1) | ~np.isfinite(qv).all(1) | (np.abs(np.nan_to_num(q, nan=1e9)) > 1000).any(1) | (np.abs(np.nan_to_num(qv, nan=1e9)) > 1000).any(1)
     lvl = task.level.numpy(); col = task.col.numpy()
     for e in np.nonzero(blown)[0]:
@@ -69,15 +81,24 @@ for k in range(STEPS):
                        "pre_limit_excursion": float(exc_h[1:, e].max()), "pre_limit_joint": names[int(excj_h[i1, e])],
                        "pre_joint_speed": float(spd_h[1:, e].max()), "pre_speed_joint": names[int(spdj_h[int(np.argmax(spd_h[1:, e])) + 1, e])],
                        "pre_penetration_m": float(pen_h[1:, e].max()),
-                       "blowup_speed_joint": names[int(spdj_h[0, e])]})
+                       "blowup_speed_joint": names[int(spdj_h[0, e])],
+                       "pre_speed_over_3x_limit": bool(spd_h[1:, e].max() > 3 * VEL_LIMIT),
+                       "pre_penetration_over_2cm": bool(pen_h[1:, e].max() > 0.02),
+                       "energy_jump_x": float(ke_h[1, e] / max(ke_h[2:, e].max(), 1e-6)) if np.isfinite(ke_h[1, e]) else None,
+                       "torso_contact_before": bool(torso_h[1:, e].any())})
     wp.launch(bump, dim=1, inputs=[pol.step_idx], device="metal:0"); wp.launch(bump, dim=1, inputs=[pol.rng_step], device="metal:0")
     task.launch_reward_done_reset(pol, bufs); task.launch_obs(pol.rng_step)
+    th = task.torso_hist.numpy(); torso_h = np.roll(torso_h, 1, 0); torso_h[0] = th > 1.0
+    torso_terms += int(((th > 1.0) & ~blown).sum())
     pl = task.push_left.numpy(); last_push[pl > prev_left + 1.0] = k; prev_left = pl.copy()
 ov = task.sim.overflow_flags()          # sticky per-world bits: worlds that ever overflowed
 nm = np.array(niter_max)
 res = {"terrain": terrain, "preset": preset, "ckpt": ckpt, "steps": STEPS, "cap": cap,
        "niter": {"max": int(nm.max()), "p99.9": float(np.percentile(nm, 99.9)), "substep_worlds_at_cap": at_cap, "of": len(nm) * N},
-       "overflow": dict(ov), "blowups": len(events)}
+       "overflow": dict(ov), "blowups": len(events), "isaac_style_torso_terminations": torso_terms,
+       "criterion": "blow-up = any |qpos| or |qvel| > 1000 or non-finite after a control step (g1_reward_done); Isaac 3.0 "
+                    "terminates only on time_out and torso contact > 1 N (TerminationsCfg), so every blow-up here is a state "
+                    "Isaac's task would not end by itself"}
 if events:
     E = events
     res["blowup_levels"] = collections.Counter(e["level"] for e in E).most_common()
@@ -91,6 +112,11 @@ if events:
     res["blowup_speed_joint"] = collections.Counter(e["blowup_speed_joint"] for e in E).most_common(6)
     for f in ("pre_limit_excursion", "pre_joint_speed", "pre_penetration_m"):
         x = np.array([e[f] for e in E]); res[f] = {"median": float(np.median(x)), "p90": float(np.percentile(x, 90)), "max": float(x.max())}
+    for f in ("pre_speed_over_3x_limit", "pre_penetration_over_2cm", "torso_contact_before"):
+        res[f"frac_{f}"] = float(np.mean([e[f] for e in E]))
+    ej = np.array([e["energy_jump_x"] for e in E if e["energy_jump_x"] is not None])
+    res["energy_jump_x_median"] = float(np.median(ej)) if len(ej) else None
+    res["frac_nonphysical_before_blowup"] = float(np.mean([e["pre_speed_over_3x_limit"] or e["pre_penetration_over_2cm"] for e in E]))
     res["events"] = E[:200]
 # base rates over all worlds, last step: pushes within 50 steps
 res["all_worlds_pushed_within_50_steps"] = float(((STEPS - 1 - last_push) < 50).mean())
