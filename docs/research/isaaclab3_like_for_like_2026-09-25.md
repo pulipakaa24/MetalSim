@@ -491,6 +491,17 @@ unconfirmed**. What it establishes: Isaac's contact stiffness is not transferabl
 (Newton's own collision pipeline, which Isaac uses, is not reproduced; §2.1). The policy side (action statistics) of the
 2.3.2-task comparison could not be taken: that 12-iteration run hit GPU timeouts.
 
+**A known early handicap of the like-for-like rough comparison.** The transient is a property of Isaac's contact
+stiffness on MuJoCo Warp's collision pipeline. Isaac's own Newton pipeline does not show it: its rough log has no NaN or
+overflow messages, and its returns are smooth through iterations 10–20 (−5.69 at 16, −5.60 at 20). MetalSim's rough 3.0
+comparison therefore starts with about 800 blown episodes in the first 150 iterations (all at 10–14). Effect, from the
+500-iteration probe (`rough_il3_fixedlimits_probe500.log`, ±5-iteration means): −83 at iteration 16 (blown episodes carry
+the −400-scale returns of held-up robots) back to −6.6 at 20 and −5.7 at 30. Isaac: −5.18 at 30, −4.81 at 50; the probe
+−5.06 at 50. The learning rate collapsed to its 1e-5 floor for iterations 11–13, and the value loss peaked at 2,258 before
+recovering. Estimate (not measured by a controlled pair): a delay of about 15–20 iterations, worth well under 0.5 return at
+iteration 1499, where Isaac's curve rises by about 0.01 per iteration. The final-return comparison is not materially
+affected; the curve between iterations 10 and 30 is.
+
 ### 6.4 Iteration cap under contact_cfg "recommended"
 
 `runs/il3/cap_probe2_{flat,rough}.json`: 4096 envs, random actions, 10 states each, one control step per cap vs cap 100.
@@ -500,6 +511,29 @@ up to 2.9 / 4.5 rad/s in some world, p99 0.0013 / 0.0006 rad/s. Cap 10 gives p99
 difference in the worlds that hit it (1.1 / 1.75 rad/s) is below that floor. **The cap of 10 does not change states
 measurably**; raising it is not needed for fidelity. The reload itself is not bit-reproducible (the floor): a separate
 finding.
+
+### 6.4b Determinism on Metal
+
+Reloading a saved state (qpos, qvel, ctrl, qacc_warmstart) and re-stepping one control step is not bit-reproducible:
+up to 2.9 (flat) / 4.5 (rough) rad/s in the worst world of 4096, p99 1e-3 rad/s (§6.4). Where it comes from: MuJoCo
+Warp accumulates with floating-point atomics whose order the GPU does not fix. Counts of `wp.atomic_*` in
+`upstream/mujoco_warp/mujoco_warp/_src`: constraint.py 52 (constraint-row assembly and efc address reservation),
+smooth.py 45 (composite inertia, com velocities, Jacobian products), solver.py 13 (gradients, the unconverged-world
+counter), collision_driver.py 1 (the contact counter: contact order varies run to run), forward.py 2; also
+collision_core / convex / flex, passive, sensor, derivative, island, set_const. The solver comment at solver.py:2612
+notes one sum made deterministic by visiting contacts in row order; the contact counter itself is not. Not all of the
+state left out of the reload (e.g. the contact buffer order) is covered, so part of the floor may be the reload itself,
+not the atomics.
+
+A deterministic mode exists upstream but not for Metal. Warp (our fork's base, `warp/config.py`) has
+`warp.config.deterministic = DeterministicMode.RUN_TO_RUN | GPU_TO_GPU` (`warp/_src/deterministic.py`: scatter-sort-reduce
+for accumulating atomics, a two-pass scheme for counter atomics). Newton 1.5.2 drives it for MuJoCo Warp's modules
+(`SolverMuJoCo._set_mujoco_warp_module_options`: per-module `deterministic` and `deterministic_max_records`, with a
+record bound derived from njmax and constraint-row widths). Isaac Lab 3.0 exposes it as `NewtonCfg.deterministic_mode`;
+Isaac's G1 recording ran `"not_guaranteed"` (meta.json), so **Isaac's own reference runs are not bit-reproducible either**.
+Warp's implementation is written for CUDA (stream-capture mode exchange, CUDA copies in `deterministic.py`); nothing
+in it targets Metal. Enabling it on Metal would be a port (sort/reduce kernels plus the capture handling); not attempted.
+Consequence for this work: single-step state comparisons need the repeat-run floor as their reference, as §6.4 now does.
 
 ### 6.5 Re-runs queued
 
