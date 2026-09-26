@@ -62,7 +62,7 @@ listing its commits, and keeps its upstream licence unchanged. "Head" is the bra
 
 [github.com/pulipakaa24/warp](https://github.com/pulipakaa24/warp), branch
 [`metalsim`](https://github.com/pulipakaa24/warp/tree/metalsim), head
-[`8348db3d`](https://github.com/pulipakaa24/warp/commit/8348db3d) (2026-09-26; the results before that day's throughput work were
+[`9df9acee`](https://github.com/pulipakaa24/warp/commit/9df9acee) (2026-09-26; the results before that day's throughput work were
 produced at [`4127c48`](https://github.com/pulipakaa24/warp/commit/4127c4818334080de6f3d23aef522e582ff6a2a7), code
 [`f194006`](https://github.com/pulipakaa24/warp/commit/f194006a4cf197fda93633252af81bc3f57f5561)). Base: innate-inc/warp
 `ce15f6b`, NVIDIA Warp with innate-inc's Metal backend. Apache-2.0.
@@ -89,7 +89,7 @@ first four commits plus the graph-capture sort; merged into `metalsim`.
 
 [github.com/pulipakaa24/mujoco_warp](https://github.com/pulipakaa24/mujoco_warp), branch
 [`metalsim`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), head
-[`edae7b7`](https://github.com/pulipakaa24/mujoco_warp/commit/edae7b7) (2026-09-26;
+[`f33005f`](https://github.com/pulipakaa24/mujoco_warp/commit/f33005f) (2026-09-26;
 the rigid-body results before the elliptic-cone work were produced at
 [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) / code
 [`8fbf965`](https://github.com/pulipakaa24/mujoco_warp/commit/8fbf965acb630aa32573dda802404d519c843a99)). Base: Google
