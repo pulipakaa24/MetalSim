@@ -303,8 +303,20 @@ KMAX 12: p99 8.0e-3, max 9.4e-2 (7-12 vectors p99 3.2e-2); KMAX 0 and a reuse-di
 mode 2 over 160 iteration records (the kernels are exact re-implementations of the per-entry path). Kernel form
 after the first Metal run: a single matrix tile per world (the two-tile form asked 39 KB of threadgroup memory,
 above Metal's 32 KB) prepared by `_cone_update_prepare` (h + cone for worlds above KMAX, h for a refactorization,
-the stored factor for a reuse); the stable-state skip mirrors mode 2's. Metal throughput / check: pending
-(`runs/tp26/cone2.wrapper.log`). Metal check and throughput on the G1
+the stored factor for a reuse); the stable-state skip mirrors mode 2's.
+
+**Measured on Metal and rejected** (`runs/tp26/cone2.wrapper.log`, 07:36-07:41, interleaved 0 1 0 1, 4096 worlds,
+elliptic cones, physics steps/s): G1 task ellip10 2,606-2,607 K -> 2,180 K (-16 %), Go2 644-646 K -> 615 K (-5 %),
+DeepMind humanoid 704-705 K -> 533 K (-24 %), SO-101 866-869 K -> 774-775 K (-11 %). Per-kernel profile of the G1
+task with the update path (15.85 ms GPU per physics step): the factor / update / solve launch 4.25 ms over 10
+iterations (0.42 ms each, no cheaper than a refactorization: the k x 43-column sqrt / divide chain of the rank-1
+recurrence has the factorization's latency on one SIMD group), the prepare pass 2.36 ms (the stored factor
+travels through htot), `_cone_vectors` 0.56. Physics within the floors: Go2 (elliptic_check, 512 worlds, 200
+steps) 3.8e-7 rad at step 1 growing to 9.4e-4 at step 200, the reference's own two-instance value; G1 task
+(g1_tp_check, ellip10, 512 envs) step 1 8.2e-7 (floors 6.3e-7 / 2.1e-6), step 50 0.90 (floors 0.85 / 0.82), MuJoCo C
+protocol identical to 0.5 s. Archived off (`MJW_ELLIPTIC_CONE_UPDATE=1`); MuJoCo C's scheme pays in double on a
+CPU where a rank-1 update is 40x cheaper than a refactorization, not on a 32-lane register factorization whose
+cost is latency rather than flops. Metal check and throughput on the G1
 task (ellip10), Go2, humanoid, SO-101: `runs/tp26/cone.wrapper.log`.
 
 ## 9. Before / after, everything landed today (measured, `runs/tp26/final.wrapper.log` and the interleaved A/Bs above)
@@ -352,8 +364,9 @@ mapping bitwise. Learning untouched (no reward, observation, reset or update cha
 6. Rough terrain: act() 12.4 -> ~6 ms per step with the policy mapping (7 % of the rough step, estimated from
    the isolated kernel numbers, not re-measured on the rough loop); the rough capacities (256 / 128) are not
    model-bounded (section 4c), so no bound can be applied there.
-7. Elliptic cones: the rank-1 cone update (section 8) pending its Metal measurement; the coordinator's estimate
-   is <= 6 % of the elliptic step.
+7. Elliptic cones: the rank-1 cone update (section 8) measured 5-24 % slower on every model and is archived;
+   the remaining elliptic premium (per-entry cone term 2.5 ms, refactorization 1.0 ms of 15.6 ms per G1 step) has
+   no cheaper exact form on this hardware that was found today.
 
 ## 6. Options that change results (reported, not landed)
 
