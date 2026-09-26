@@ -557,8 +557,17 @@ factor 0.95); elliptic baseline 16.86 (Cholesky 6.01 ×11, cone term 2.39, tiled
 In the task's own protocol (`bench_contact_tuning.py`: 4096 worlds, standing start, 3 s, 8 substeps of 2.5 ms,
 physics only, 3 interleaved repeats): `recommended` 78,349 env-steps/s, `tau10_impact_hardlimits_ellip10`
 **64,519 (1.21×)** with mode 2, against 55,379 (1.42×) at `b630530` and 11,029 (7.07×) before the launch fix:
-the elliptic premium on the G1 task is now 21 % physics-only (estimated ~15 % in the full PPO loop, where
-physics is ~60 % of the step; the earlier 1.44× loop measurement was with the 1.42× physics).
+the elliptic premium on the G1 task is now 21 % physics-only in that protocol. **Full-loop A/B (measured,
+`scripts/diagnostics/g1_tp_variants.py 4096`, mode 2 live at fork `9b4e96a`, two repeats interleaved,
+`runs/competitors/e2_loop_ab.log`)**, env-steps/s recommended vs `tau10_impact_hardlimits_ellip10`:
+physics only 83,393 / 83,423 vs 64,807 / 64,729 (**1.29×**); full env step 55,791 / 55,760 vs 40,488 / 40,358
+(1.38×); rollout + inference 56,097 / 56,200 vs 42,378 / 42,261 (1.33×); **full PPO loop 51,715 / 51,955 vs
+39,857 / 39,711 = 1.30×** (PPO update 143–149 ms in both). Before this work the loop ratio was 1.44×
+(29.3 K vs 42.2 K in the training runs), so the loop premium fell from 44 % to 30 %; the earlier "~15 %"
+was an estimate and is superseded. The env-step ratio (1.38×) exceeds the physics ratio (1.29×) because the
+non-physics part of the step is 24 ms under pyramidal and 38 ms under elliptic (the random-action protocol's
+resets and post-reset kinematics run on more worlds when the robots fall differently); the loop ratio is
+the number for the default decision.
 
 Reading:
 - The "rebuild every iteration" structure was not the cost it looked like: the tiled JᵀDJ rebuild is

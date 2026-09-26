@@ -144,7 +144,7 @@ passed / 39 skipped / 2 failed, both failures pre-existing at `07a51a6`. **2026-
 `metalsim-elliptic2` `b0150ac`, pending merge; research note §8):** MuJoCo C's incremental Newton structure
 for elliptic cones (quadratic Hessian kept across iterations, cone term rebuilt per iteration into a second
 buffer, plain register Cholesky) brings the G1 task's elliptic impratio 10 from 55,379 to **64,519
-env-steps/s physics-only, 1.21× the recommended preset** (was 1.42×; Go2 623 K, humanoid 666 K, SO-101 847 K
+env-steps/s physics-only, 1.21× the recommended preset** (was 1.42×; full PPO loop 1.30×, 39.8 K vs 51.8 K env-steps/s, was 1.44×; Go2 623 K, humanoid 666 K, SO-101 847 K
 physics steps/s on the Menagerie protocol, +4–7 %). What remains of the premium is the cone term itself
 (16 % of the step), the Cholesky that worlds with cone rows must run every iteration, and the elliptic line
 search; elliptic needs 9 % more Newton iterations than pyramidal on walking states. The elliptic premium that remains is structural: the
