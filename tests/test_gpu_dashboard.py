@@ -36,3 +36,11 @@ def test_rate_and_eta():
     rate, eta = gd.rate_and_eta(st, "k", 160, 1000, 30.0)
     assert abs(rate - 2.0) < 1e-9 and abs(eta - 420.0) < 1e-6
     assert gd.rate_and_eta(st, "k", 5, 1000, 40.0) == (None, None)      # restart resets the window
+
+
+def test_counter_reset_counts_a_new_stage():
+    st = {}
+    gd.rate_and_eta(st, "k", 100, 800, 0.0)
+    gd.rate_and_eta(st, "k", 800, 800, 100.0)
+    gd.rate_and_eta(st, "k", 50, 800, 130.0)          # the job's next probe: counter went back down
+    assert st["k"]["stage"] == 1 and st["k"]["c0"] == 50
