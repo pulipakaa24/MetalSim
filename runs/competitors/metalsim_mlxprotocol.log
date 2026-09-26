@@ -1,0 +1,11 @@
+holder: none
+[gpu_run] vs_mlxcpp start: device utilisation 0% (18:40:02)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.7 s: none >= 1 %
+RESULT {"engine": "metalsim", "model": "go2", "N": 256, "iters": 100, "ls": 50, "sps_mean": 21788, "sps_best": 21844, "finite": true, "overflow": {}}
+RESULT {"engine": "metalsim", "model": "go2", "N": 2048, "iters": 100, "ls": 50, "sps_mean": 40178, "sps_best": 40185, "finite": true, "overflow": {}}
+RESULT {"engine": "metalsim", "model": "go2", "N": 4096, "iters": 100, "ls": 50, "sps_mean": 42917, "sps_best": 42936, "finite": true, "overflow": {}}
+RESULT {"engine": "metalsim", "model": "humanoid", "N": 256, "iters": 100, "ls": 50, "sps_mean": 45725, "sps_best": 45778, "finite": true, "overflow": {}}
+RESULT {"engine": "metalsim", "model": "humanoid", "N": 2048, "iters": 100, "ls": 50, "sps_mean": 253660, "sps_best": 253777, "finite": true, "overflow": {}}
+RESULT {"engine": "metalsim", "model": "humanoid", "N": 4096, "iters": 100, "ls": 50, "sps_mean": 395734, "sps_best": 395845, "finite": true, "overflow": {}}
+[gpu_run] vs_mlxcpp end: device utilisation 100% (18:41:21), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.7 s: none >= 1 %
