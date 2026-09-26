@@ -15,7 +15,10 @@ terrain, ckpt, preset = sys.argv[1], sys.argv[2], sys.argv[3]
 STEPS = int(sys.argv[4]) if len(sys.argv) > 4 else 500
 OUT = sys.argv[5] if len(sys.argv) > 5 else None
 N = 4096
-kw = dict(contact_cfg=preset.split(":", 1)[1], solver_cfg=None) if preset.startswith("contact:") else dict(solver_cfg=preset)
+base_preset, _, mod = preset.partition("+")
+kw = dict(contact_cfg=base_preset.split(":", 1)[1], solver_cfg=None) if base_preset.startswith("contact:") else dict(solver_cfg=base_preset)
+if mod == "mjwfactor":      # MuJoCo Warp's own factorization defaults instead of the task's fast paths
+    kw["batch_options"] = {"metal_register_cholesky_max": None, "m_dense_max": None}
 task = G1VelocityTask(N, terrain=terrain, seed=0, physics_dt=0.0025, reward_cfg=f"{terrain}_il3", **kw)
 m = task.model; d = task.sim.d; cap = int(task.sim.m.opt.iterations)
 if ckpt == "init":        # a freshly initialised policy (std 1), the regime of the first training iterations
@@ -100,7 +103,8 @@ for k in range(STEPS):
                        "pre_penetration_over_2cm": bool(pen_h[1:, e].max() > 0.02),
                        "energy_jump_x": float(ke_h[1, e] / max(ke_h[2:, e].max(), 1e-6)) if np.isfinite(ke_h[1, e]) else None,
                        "torso_contact_before": bool(torso_h[1:, e].any()), "spawn_penetration_m": float(_pen0[e]),
-                       "first_episode": bool(k < 1000)})
+                       "first_episode": bool(k < 1000),
+                       "nonfinite": bool(not (np.isfinite(q[e]).all() and np.isfinite(qv[e]).all()))})
     wp.launch(bump, dim=1, inputs=[pol.step_idx], device="metal:0"); wp.launch(bump, dim=1, inputs=[pol.rng_step], device="metal:0")
     task.launch_reward_done_reset(pol, bufs); task.launch_obs(pol.rng_step)
     th = task.torso_hist.numpy(); torso_h = np.roll(torso_h, 1, 0); torso_h[0] = th > 1.0
@@ -131,6 +135,7 @@ if events:
         res[f"frac_{f}"] = float(np.mean([e[f] for e in E]))
     ej = np.array([e["energy_jump_x"] for e in E if e["energy_jump_x"] is not None])
     res["energy_jump_x_median"] = float(np.median(ej)) if len(ej) else None
+    res["frac_nonfinite"] = float(np.mean([e["nonfinite"] for e in E]))
     res["blowups_in_first_50_steps"] = int(sum(e["step"] < 50 for e in E))
     res["frac_blowups_spawned_penetrating"] = float(np.mean([e["spawn_penetration_m"] > 0 for e in E]))
     leg = ("hip", "knee", "ankle", "torso")

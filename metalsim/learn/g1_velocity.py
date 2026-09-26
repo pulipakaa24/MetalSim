@@ -498,7 +498,7 @@ class G1VelocityTask:
                  reward_cfg: str | None = None, scan_ordering: str = "xy", terrain_collision: str | None = None,
                  scan_surface: str | None = None, feet_slide_velocity: str = "com", solver_cfg: str | None = None,
                  il3_events: bool | None = None, il3_backend: str = "newton_mjwarp", contact_cfg: str | None = "recommended",
-                 base_velocity: str = "com"):
+                 base_velocity: str = "com", batch_options: dict | None = None):
         """``feet_slide_velocity``: "com" (default) = the foot's centre-of-mass world velocity, Isaac Lab 2.3.2's
         ``body_lin_vel_w`` (= ``body_com_lin_vel_w``) used by ``mdp.feet_slide``; "origin" = the foot body frame
         origin's velocity (MetalSim before 2026-09-25). MuJoCo Warp engine only; the archived Newton path
@@ -641,6 +641,8 @@ class G1VelocityTask:
             if self._solver_preset is not None:
                 from metalsim.physics import solver_presets
                 bso = solver_presets.batch_options(self._solver_preset, **bso)
+            if batch_options:                             # diagnostic overrides of the BatchSim options (e.g. factorization)
+                bso.update(batch_options)
             self.sim = BatchSim(m, n, options=BatchSimOptions(**bso))
             if self._solver_preset is not None:
                 solver_presets.install(self.sim, self._solver_preset)     # e.g. collision once per 5 ms tick

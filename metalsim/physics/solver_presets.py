@@ -79,6 +79,9 @@ class SolverPreset:
     geom_margin: float | None = None
     limit_solref: str | None = None        # "isaaclab3_live": per-joint values recorded from Isaac's live model
     limit_solimp: tuple | None = None      # overrides the limit impedance set with limit_solref (archived mixed variant only)
+    limit_override: tuple | None = None    # (joint-name regex, solref, solimp) applied last (diagnostic variants)
+    effort_limit: str | None = None        # "joint": the effort limit as the joint's actuatorfrcrange (Newton's MJCF) instead of
+                                           # the actuator's forcerange (MetalSim's build); same total clamp, different place
     collision_every: int = 1               # substeps per collision pass (2 = once per 5 ms tick at 2.5 ms)
     newton_force_space_limits: bool = False   # joint-limit solref follows dof_invweight0 (after mass changes)
     note: str = ""
@@ -113,6 +116,13 @@ PRESETS: dict[str, SolverPreset] = {
     "isaaclab3_every_substep_cap20_mjcontact": SolverPreset(iterations=20, ls_iterations=50, collision_every=1,
                                                             **{**_IL3, "contact_solref": (0.02, 1.0), "geom_gap": 0.0},
                                                             note="training preset with MuJoCo's default contact solref and no gap (limits and caps kept)"),
+    "isaaclab3_every_substep_cap20_hardfingers": SolverPreset(iterations=20, ls_iterations=50, collision_every=1,
+                                                              **{**_IL3, "limit_override": (r".*_(zero|one|two|three|four|five|six)_joint",
+                                                                                            (0.005, 1.0), (0.99, 0.999, 0.001, 0.5, 2.0))},
+                                                              note="training preset with the hard-limit preset's limits on the 14 finger joints only"),
+    "isaaclab3_every_substep_cap20_jointeffort": SolverPreset(iterations=20, ls_iterations=50, collision_every=1,
+                                                              **{**_IL3, "effort_limit": "joint"},
+                                                              note="training preset with the effort limit on the joint (Newton's layout)"),
     # archived A/B variants of single items
     "isaaclab3_collide_every_substep": SolverPreset(iterations=100, ls_iterations=50, collision_every=1, **_IL3,
                                                     note="isaaclab3 with MuJoCo Warp's collision on every substep"),
@@ -152,7 +162,18 @@ def apply(m: mujoco.MjModel, name: str | SolverPreset) -> mujoco.MjModel:
                 raise KeyError(f"joint {nm} has no recorded Isaac limit solref")
             m.jnt_solref[j] = lim[nm]
             m.jnt_solimp[j] = p.limit_solimp or ISAACLAB3_LIMIT_SOLIMP   # recorded jnt_solimp (a contact preset applied before may have set 0.99+)
-    elif p.limit_solref == "hard":
+    if p.effort_limit == "joint":
+        for a in range(m.nu):
+            j = m.actuator_trnid[a][0]
+            m.jnt_actfrclimited[j] = 1; m.jnt_actfrcrange[j] = m.actuator_forcerange[a]
+            m.actuator_forcelimited[a] = 0
+    if p.limit_override is not None:
+        import re as _re
+        rx, sr, si = p.limit_override
+        for j in range(m.njnt):
+            if _re.fullmatch(rx, mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_JOINT, j) or ""):
+                m.jnt_solref[j] = sr; m.jnt_solimp[j] = si
+    if p.limit_solref == "hard":
         from metalsim.physics import contact_tuning     # read-only use of the contact agent's hard-limit values
         hl = contact_tuning.PRESETS["hardlimits"]
         contact_tuning.set_joint_limits(m, hl.limit_solref, hl.limit_solimp)
