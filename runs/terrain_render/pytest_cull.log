@@ -1,0 +1,58 @@
+holder: {"name": "pytest_full_cull", "kind": "render", "minutes": 8.0, "pid": 2843, "start": 1790392660.9201531, "queued": 1790385874.9434893, "cmd": "runs/terrain_render/run_pytest.sh", "cwd": "/Users/aditya/robosim"}
+  waiting [render] ellip_check_base est 8.0 min, queued 2258 s ago
+  waiting [render] ellip_check_world est 8.0 min, queued 2258 s ago
+  waiting [render] ellip_check_contact est 8.0 min, queued 2257 s ago
+  waiting [render] ellip_check_g1dense_base est 6.0 min, queued 2110 s ago
+  waiting [render] ellip_check_g1dense_world est 6.0 min, queued 2110 s ago
+  waiting [render] ellip_fid_rec est 25.0 min, queued 1689 s ago
+  waiting [render] ellip_fid_transfer est 12.0 min, queued 1688 s ago
+  waiting [render] ellip_fid_air est 20.0 min, queued 1688 s ago
+  waiting [render] ellip_pytest est 25.0 min, queued 1687 s ago
+  waiting [render] envmap_port est 20.0 min, queued 1532 s ago
+  waiting [train] il3_rough_probe500 est 45.0 min, queued 2230 s ago
+  waiting [train] g1_flat_flatcfg_com est 50.0 min, queued 2202 s ago
+  waiting [train] il3_blowup_probe est 30.0 min, queued 2112 s ago
+  waiting [low] kamino_tests_fork est 40.0 min, queued 19132 s ago
+  waiting [low] kamino_tests_152 est 30.0 min, queued 18303 s ago
+  waiting [low] cl_kamino est 45.0 min, queued 16972 s ago
+  waiting [low] cl_mjw est 40.0 min, queued 16948 s ago
+E           Not equal to tolerance rtol=1e-07, atol=0
+E           recommended+isaaclab3: jnt_solref
+E           Mismatched elements: 1 / 76 (1.32%)
+E           Mismatch at index:
+E            [0, 0]: 0.005 (ACTUAL), 0.02 (DESIRED)
+E           Max absolute difference among violations: 0.015
+E           Max relative difference among violations: 0.75
+E            ACTUAL: array([[0.005  , 1.     ],
+E                  [0.45597, 0.03311],
+E                  [0.45886, 0.03301],...
+E            DESIRED: array([[0.02   , 1.     ],
+E                  [0.45597, 0.03311],
+E                  [0.45886, 0.03301],...
+
+tests/test_solver_presets.py:158: AssertionError
+=============================== warnings summary ===============================
+tests/test_g1_newton_engine.py::test_graph_replay_matches_eager
+  /Users/aditya/robosim/metalsim/learn/g1_velocity.py:951: RuntimeWarning: Mean of empty slice
+    return {"num_envs": n, "frames": num_frames, "mean_step_ms": t_ns.mean() / 1e6, "fps_isaac_style": n / (t_ns.mean() / 1e9)}
+
+tests/test_g1_newton_engine.py::test_graph_replay_matches_eager
+  /Users/aditya/robosim/.venv/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+    ret = ret.dtype.type(ret / rcount)
+
+tests/test_g1_task_terms.py::test_rough_terrain_seed_and_isaac_env_assignment
+tests/test_g1_task_terms.py::test_il3_rough_defaults
+  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+tests/test_physics.py::test_one_step_parity_vs_mujoco_c[go1]
+tests/test_render_tier2.py::test_gpu_path_from_batchsim_matches_host
+tests/test_sensors_rt.py::test_gpu_path_ordering_with_sim
+  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_solver_presets.py::test_effective_model_fields_per_preset_combination[recommended-isaaclab3]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 186 passed, 7 warnings in 167.76s (0:02:47)
