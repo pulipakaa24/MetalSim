@@ -15,10 +15,12 @@ terrain, ckpt, preset = sys.argv[1], sys.argv[2], sys.argv[3]
 STEPS = int(sys.argv[4]) if len(sys.argv) > 4 else 500
 OUT = sys.argv[5] if len(sys.argv) > 5 else None
 N = 4096
-base_preset, _, mod = preset.partition("+")
+base_preset, *mods = preset.split("+")
 kw = dict(contact_cfg=base_preset.split(":", 1)[1], solver_cfg=None) if base_preset.startswith("contact:") else dict(solver_cfg=base_preset)
-if mod == "mjwfactor":      # MuJoCo Warp's own factorization defaults instead of the task's fast paths
+if "mjwfactor" in mods:     # MuJoCo Warp's own factorization defaults instead of the task's fast paths
     kw["batch_options"] = {"metal_register_cholesky_max": None, "m_dense_max": None}
+if "actuatoreffort" in mods:  # the archived effort-limit layout (actuator forcerange), what the il3fix runs used
+    kw["effort_limit"] = "actuator"
 task = G1VelocityTask(N, terrain=terrain, seed=0, physics_dt=0.0025, reward_cfg=f"{terrain}_il3", **kw)
 m = task.model; d = task.sim.d; cap = int(task.sim.m.opt.iterations)
 if ckpt == "init":        # a freshly initialised policy (std 1), the regime of the first training iterations

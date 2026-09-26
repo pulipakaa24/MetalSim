@@ -164,6 +164,8 @@ def apply(m: mujoco.MjModel, name: str | SolverPreset) -> mujoco.MjModel:
             m.jnt_solimp[j] = p.limit_solimp or ISAACLAB3_LIMIT_SOLIMP   # recorded jnt_solimp (a contact preset applied before may have set 0.99+)
     if p.effort_limit == "joint":
         for a in range(m.nu):
+            if not m.actuator_forcelimited[a]:
+                continue                          # already on the joint (build_g1_model's default since 2026-09-26)
             j = m.actuator_trnid[a][0]
             m.jnt_actfrclimited[j] = 1; m.jnt_actfrcrange[j] = m.actuator_forcerange[a]
             m.actuator_forcelimited[a] = 0

@@ -160,3 +160,45 @@ def test_effective_model_fields_per_preset_combination(contact_cfg, solver_cfg):
         np.testing.assert_allclose(getattr(m, f), getattr(ref, f), rtol=1e-7, err_msg=f"{contact_cfg}+{solver_cfg}: {f}")
     for f in ("iterations", "ls_iterations", "tolerance", "ls_tolerance", "cone", "impratio", "integrator"):
         assert getattr(m.opt, f) == getattr(ref.opt, f), (contact_cfg, solver_cfg, f)
+
+
+def test_g1_actuator_and_joint_fields_match_newtons_model():
+    """The G1 drive as Newton builds Isaac Lab 3.0's MuJoCo Warp model (newton_generated.xml): per joint a position <general>
+    (gain kp, bias -kp q) and a velocity <general> (gain kd, bias -kd qd), no actuator force limit, the effort limit on
+    the joint's actuatorfrcrange. MetalSim's single affine actuator is the same sum; the effort limit is on the joint too
+    (build_g1_model effort_limit="joint"; "actuator" = the archived layout)."""
+    import re
+    X = open("runs/parity3/isaac/fidelity/newton_mjwarp/newton_generated.xml").read()
+    m, _ = build_g1_model("flat", physics_dt=0.0025)
+    for a in range(m.nu):
+        j = m.actuator_trnid[a][0]; nm = mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_JOINT, j)
+        acts = re.findall(r'<general joint="[^"]*_%s" biastype="affine" gainprm="([^"]*)" biasprm="([^"]*)"' % nm, X)
+        assert len(acts) == 2, nm
+        kp = float(acts[0][0]); kd = float(acts[1][0])
+        assert [float(x) for x in acts[0][1].split()] == [0.0, -kp] and [float(x) for x in acts[1][1].split()] == [0.0, 0.0, -kd]
+        np.testing.assert_allclose([m.actuator_gainprm[a][0], *m.actuator_biasprm[a][:3]], [kp, 0.0, -kp, -kd])
+        jx = re.search(r'<joint name="[^"]*_%s"[^>]*>' % nm, X).group(0)
+        lo, hi = (float(x) for x in re.search(r'actuatorfrcrange="([^"]*)"', jx).group(1).split())
+        assert not m.actuator_forcelimited[a] and m.jnt_actfrclimited[j]
+        np.testing.assert_allclose(m.jnt_actfrcrange[j], [lo, hi])
+        np.testing.assert_allclose(m.dof_armature[m.jnt_dofadr[j]], float(re.search(r'armature="([^"]*)"', jx).group(1)))
+    old, _ = build_g1_model("flat", physics_dt=0.0025, effort_limit="actuator")
+    assert old.actuator_forcelimited.all() and not old.jnt_actfrclimited[1:].any()
+
+
+def test_saturated_finger_keeps_implicit_damping():
+    """Unit proof (MuJoCo C): a finger driven towards its limit at 60 rad/s with its drive saturated stays bounded with the
+    effort limit on the joint, and blows up within a few substeps with it on the actuator (MuJoCo drops a clamped
+    actuator's velocity derivative)."""
+    import copy
+    base, _ = build_g1_model("flat", physics_dt=0.0025)
+    for layout, ok in (("joint", True), ("actuator", False)):
+        m, _ = build_g1_model("flat", physics_dt=0.0025, effort_limit=layout); m.opt.gravity[:] = 0
+        solver_presets.apply(m, "isaaclab3_every_substep_cap20")
+        d = mujoco.MjData(m); mujoco.mj_resetDataKeyframe(m, d, 0)
+        j = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_JOINT, "left_four_joint"); a = [i for i in range(m.nu) if m.actuator_trnid[i][0] == j][0]
+        d.ctrl[:] = m.key_qpos[0][7:]; d.ctrl[a] = -1.84; d.qpos[m.jnt_qposadr[j]] = -1.70; d.qvel[m.jnt_dofadr[j]] = -60.0
+        vmax = 0.0
+        for _ in range(40):
+            mujoco.mj_step(m, d); v = abs(float(d.qvel[m.jnt_dofadr[j]])); vmax = max(vmax, v if np.isfinite(v) else 1e9)
+        assert (vmax < 100.0) == ok, (layout, vmax)
