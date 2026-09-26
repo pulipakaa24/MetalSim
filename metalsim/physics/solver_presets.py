@@ -38,6 +38,13 @@ njmax 95 / nconmax 10 (flat)            G1FlatEnvCfg                            
                                                                                              here (overflow would drop constraints)
 =====================================  ==============================================  ========================================
 
+Order of application (the one place it is defined; ``G1VelocityTask`` follows it): the task's ``contact_cfg``
+(``metalsim.physics.contact_tuning``, default "recommended") is applied first, then ``solver_cfg``. A solver preset here
+therefore sets EVERY contact and joint-limit field it owns — geom solref / solimp / gap / margin and jnt solref / solimp —
+so nothing of the contact preset underneath survives (``test_effective_model_fields_per_preset_combination``). Before
+2026-09-25 19:50 ``apply`` did not set jnt_solimp or margin, and the il3 training runs composed Isaac's limit solref with
+the recommended preset's 0.99–0.999 limit impedance (superseded; research note §3).
+
 Usage::
 
     from metalsim.physics import solver_presets
@@ -56,6 +63,7 @@ import numpy as np
 import warp as wp
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+ISAACLAB3_LIMIT_SOLIMP = (0.9, 0.95, 0.001, 0.5, 2.0)   # live mjw_model.jnt_solimp, every joint (meta.json)
 ISAACLAB3_SETTINGS = os.path.join(ROOT, "runs", "parity3", "isaac", "newton_mjwarp_settings.json")
 
 
@@ -68,14 +76,16 @@ class SolverPreset:
     contact_solref: tuple | None = None
     contact_solimp: tuple | None = None
     geom_gap: float | None = None          # per geom (a pair's gap is the sum)
+    geom_margin: float | None = None
     limit_solref: str | None = None        # "isaaclab3_live": per-joint values recorded from Isaac's live model
+    limit_solimp: tuple | None = None      # overrides the limit impedance set with limit_solref (archived mixed variant only)
     collision_every: int = 1               # substeps per collision pass (2 = once per 5 ms tick at 2.5 ms)
     newton_force_space_limits: bool = False   # joint-limit solref follows dof_invweight0 (after mass changes)
     note: str = ""
 
 
 _IL3 = dict(tolerance=1e-6, ls_tolerance=0.01, contact_solref=(0.0018182, 1.375), contact_solimp=(0.9, 0.95, 0.001, 0.5, 2.0),
-            geom_gap=0.01, limit_solref="isaaclab3_live", newton_force_space_limits=True)
+            geom_gap=0.01, geom_margin=0.0, limit_solref="isaaclab3_live", newton_force_space_limits=True)
 PRESETS: dict[str, SolverPreset] = {
     "isaaclab3": SolverPreset(iterations=100, ls_iterations=50, collision_every=2, **_IL3,
                               note="Isaac Lab 3.0-EA newton_mjwarp settings for the G1 (caps 100/50, tolerance 1e-6, "
@@ -89,6 +99,11 @@ PRESETS: dict[str, SolverPreset] = {
     # iteration cap of 20 (1.8x the throughput of the cap of 100; per-world exit at the same tolerance)
     "isaaclab3_every_substep_cap20": SolverPreset(iterations=20, ls_iterations=50, collision_every=1, **_IL3,
                                                   note="isaaclab3, collision every substep, iteration cap 20"),
+    # archived: what both il3 training runs of 2026-09-25 17:16-19:36 actually ran (the task's contact_cfg "recommended"
+    # left its 0.99-0.999 limit impedance under Isaac's soft limit solref; superseded, kept to reproduce those runs)
+    "isaaclab3_mixed_recommended_limits": SolverPreset(iterations=20, ls_iterations=50, collision_every=1,
+                                                       **{**_IL3, "limit_solimp": (0.99, 0.999, 0.001, 0.5, 2.0)},
+                                                       note="isaaclab3_every_substep_cap20 with the recommended preset's limit impedance"),
     # archived A/B variants of single items
     "isaaclab3_collide_every_substep": SolverPreset(iterations=100, ls_iterations=50, collision_every=1, **_IL3,
                                                     note="isaaclab3 with MuJoCo Warp's collision on every substep"),
@@ -114,6 +129,7 @@ def apply(m: mujoco.MjModel, name: str | SolverPreset) -> mujoco.MjModel:
     if p.contact_solref is not None: m.geom_solref[:] = p.contact_solref
     if p.contact_solimp is not None: m.geom_solimp[:] = p.contact_solimp
     if p.geom_gap is not None: m.geom_gap[:] = p.geom_gap
+    if p.geom_margin is not None: m.geom_margin[:] = p.geom_margin
     if p.limit_solref == "isaaclab3_live":
         lim = isaaclab3_joint_limits()
         for j in range(m.njnt):
@@ -123,6 +139,7 @@ def apply(m: mujoco.MjModel, name: str | SolverPreset) -> mujoco.MjModel:
             if nm not in lim:
                 raise KeyError(f"joint {nm} has no recorded Isaac limit solref")
             m.jnt_solref[j] = lim[nm]
+            m.jnt_solimp[j] = p.limit_solimp or ISAACLAB3_LIMIT_SOLIMP   # recorded jnt_solimp (a contact preset applied before may have set 0.99+)
     elif p.limit_solref == "hard":
         from metalsim.physics import contact_tuning     # read-only use of the contact agent's hard-limit values
         hl = contact_tuning.PRESETS["hardlimits"]

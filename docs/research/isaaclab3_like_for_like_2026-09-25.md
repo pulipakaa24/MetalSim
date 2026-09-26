@@ -11,6 +11,14 @@ Sources: Isaac Lab tag `v3.0.0-EA` (commit ae37b028, 2026-09-16) cloned to `upst
 `runs/parity3/isaac/fidelity/newton_mjwarp/{meta.json,newton_generated.xml}`). Paths below are relative to each
 repository's `source/` unless stated. Every number is measured unless marked otherwise.
 
+> **Correction (2026-09-25, 19:50).** The two il3 training runs in §3 (flat +24.9, rough +6.1 / 1,615 blow-ups) and the
+> transfer table in §2.2 ran a **mixed preset**. Since e3ba79f the task applies `contact_cfg="recommended"` before
+> `solver_cfg`, and `solver_presets.apply` did not set the joint-limit impedance or the geom margin. The runs therefore
+> combined Isaac's soft limit solref with the hard-limit impedance 0.99–0.999 instead of Isaac's 0.9–0.95. Those numbers
+> are **superseded** (logs kept, `runs/il3/SUPERSEDED_mixed_preset.md`; reproducible as
+> `solver_cfg="isaaclab3_mixed_recommended_limits"`). The fidelity table in §2.2 is unaffected (`record_g1` does not use
+> the task). Re-runs follow in §6.
+
 ## 1. The 3.0 G1 task differences, ported (`reward_cfg="flat_il3"` / `"rough_il3"`)
 
 Code: `metalsim/learn/g1_il3.py` (kernels, constants, citations), switches in `G1VelocityTask`
@@ -149,7 +157,7 @@ Reading:
   error, penetration similar), once-per-tick on the drop end error (0.0025 vs 0.0032) and hold root height. Honouring
   the reuse without Newton's own contact set does not buy fidelity, so it stays an option.
 
-**Transfer of Isaac Lab 3.0's own checkpoints into MetalSim** (`scripts/diagnostics/il3_transfer.py`, `runs/il3/step2b.log`,
+**Transfer of Isaac Lab 3.0's own checkpoints into MetalSim** (SUPERSEDED: every column ran on top of the task's `contact_cfg="recommended"`; re-take pending) (`scripts/diagnostics/il3_transfer.py`, `runs/il3/step2b.log`,
 `runs/il3/transfer_*.json`; flat_il3 task with the events off, command (0.5, 0, 0) for 8 s = 4.0 m commanded, 4 envs, mean
 action; cells: x travelled mean (range) / final pelvis z / torso contacts / largest joint-limit excursion and its joint).
 No Isaac-side play of the 3.0 checkpoints was recorded, so the columns compare presets with each other and with the
@@ -200,7 +208,7 @@ launch; per-world exit makes most of them no-ops); a cap of 20 recovers 91–93 
 
 ## 3. Training like for like
 
-### 3.1 Flat (measured 2026-09-25, 17:16–18:15)
+### 3.1 Flat (measured 2026-09-25, 17:16–18:15) — SUPERSEDED, mixed preset
 
 Run: `runs/il3/run_train.sh flat isaaclab3_every_substep_cap20 1500 0` = `python -m metalsim.learn.g1_velocity 4096 flat train
 1500 ... 0.0025 --reward_cfg flat_il3 --solver_cfg isaaclab3_every_substep_cap20 --seed 0` (PPOWarp, Isaac's G1 flat PPO
@@ -298,7 +306,7 @@ Reading (one seed on each side; MetalSim's three 2.3.2-task seeds spread ±1.3 a
 `gpu_run.sh` job launched 17:53–18:16 started without the lock. Fixed with `dest="job_cmd"`; the coordinator kept the fix and
 added `tests/test_gpu_queue.py` (8c208bf). No timing number in this note was taken in that window (bench re-take 16:07).
 
-### 3.2 Rough (measured 2026-09-25, 18:30–19:36)
+### 3.2 Rough (measured 2026-09-25, 18:30–19:36) — SUPERSEDED, mixed preset
 
 Run: `runs/il3/run_train.sh rough isaaclab3_every_substep_cap20 1500 0` (`reward_cfg="rough_il3"`: rough_isaac rewards,
 3.0 events, collision on the 0.1 m heightfield as Newton rasterizes it, exact height scan, terrain seed 0 = Isaac's
@@ -409,7 +417,7 @@ Between MetalSim's `flat_il3` / `rough_il3` run and Isaac Lab 3.0's `Isaac-Veloc
    masses, inertias, COMs, ranges, armature and gains equal to 5e-6 relative (§1.3); the collision shapes (4 geoms: two
    foot boxes, torso box, plane) the same.
 9. **`njmax` / `nconmax`**: Isaac's 95 / 10 (flat) could drop contacts on overflow; MetalSim's buffers do not overflow.
-10. **Joint-limit solref after mass randomization**: re-scaled per world with MetalSim's own `dof_invweight0` ratio;
+10. **Joint-limit solref after mass randomization** (Newton's force-space conversion `update_jnt_solref_from_invweight0` scales by `dof_invweight0 · (1 − dmax)` with `dmax = jnt_solimp[1]`, which is 0.95 in Isaac's model; MetalSim's per-world rescale keeps timeconst ∝ 1/invweight and dampratio ∝ √invweight at fixed dmax, so it is consistent only with Isaac's limit impedance 0.9–0.95, which the preset now sets; the mixed runs had dmax 0.999, for which the recorded solrefs are not what Newton would have produced): re-scaled per world with MetalSim's own `dof_invweight0` ratio;
     Isaac's absolute `dof_invweight0` is not recorded (the nominal per-joint values are).
 11. **Rough iteration cap**: the cap-20 probe (0 of 9.8 M substep-worlds above 20) was run on flat terrain only; on the
     heightfield it is unmeasured.
