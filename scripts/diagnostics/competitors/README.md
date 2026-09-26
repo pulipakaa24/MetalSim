@@ -1,6 +1,7 @@
 # Cross-engine benchmarks (MetalSim vs Genesis vs MuJoCo-MLX-Cpp)
 
-Findings: `docs/HANDOFF_elliptic_cone_perf.md`. Logs: `runs/competitors/`.
+Findings: `docs/HANDOFF_elliptic_cone_perf.md` (the elliptic-cone issue) and `docs/research/competitors_2026-09-25.md`
+(the full survey and every measured result). Logs: `runs/competitors/`. `*_contacts.py`: contacts per world.
 
 ```
 git clone --depth 1 --filter=blob:none --sparse https://github.com/google-deepmind/mujoco_menagerie.git scripts/diagnostics/competitors/menagerie
