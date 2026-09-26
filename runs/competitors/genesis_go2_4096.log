@@ -1,0 +1,793 @@
+holder: none
+[gpu_run] genesis_go2_4096 start: device utilisation 0% (18:20:59)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
+/private/tmp/claude-501/-Users-adipu/9a822411-34bf-4cef-b60f-85f73fa5e507/scratchpad/venv_genesis/lib/python3.12/site-packages/torch/jit/_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+/private/tmp/claude-501/-Users-adipu/9a822411-34bf-4cef-b60f-85f73fa5e507/scratchpad/venv_genesis/lib/python3.12/site-packages/torch/jit/_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+  warnings.warn(
+[38;5;226m[Genesis] [18:21:07] [WARNING] Neutral robot position (qpos0) exceeds joint limits.[0m
+/private/tmp/claude-501/-Users-adipu/9a822411-34bf-4cef-b60f-85f73fa5e507/scratchpad/venv_genesis/lib/python3.12/site-packages/quadrants/lang/ast/ast_transformers/function_def_transformer.py:715: DeprecationWarning: ast.Str is deprecated and will be removed in Python 3.14; use ast.Constant instead
+  return index == 0 and isinstance(stmt, ast.Expr) and isinstance(stmt.value, (ast.Constant, ast.Str))
+--------------------------------------------------------------------------------
+Resolved observation sets: 
+	 actor :  ['policy']
+	 critic :  ['policy']
+--------------------------------------------------------------------------------
+Actor Model: MLPModel(
+  (obs_normalizer): Identity()
+  (distribution): GaussianDistribution()
+  (mlp): MLP(
+    (0): Linear(in_features=45, out_features=512, bias=True)
+    (1): ELU(alpha=1.0)
+    (2): Linear(in_features=512, out_features=256, bias=True)
+    (3): ELU(alpha=1.0)
+    (4): Linear(in_features=256, out_features=128, bias=True)
+    (5): ELU(alpha=1.0)
+    (6): Linear(in_features=128, out_features=12, bias=True)
+  )
+)
+Critic Model: MLPModel(
+  (obs_normalizer): Identity()
+  (mlp): MLP(
+    (0): Linear(in_features=45, out_features=512, bias=True)
+    (1): ELU(alpha=1.0)
+    (2): Linear(in_features=512, out_features=256, bias=True)
+    (3): ELU(alpha=1.0)
+    (4): Linear(in_features=256, out_features=128, bias=True)
+    (5): ELU(alpha=1.0)
+    (6): Linear(in_features=128, out_features=1, bias=True)
+  )
+)
+Could not find git repository in /private/tmp/claude-501/-Users-adipu/9a822411-34bf-4cef-b60f-85f73fa5e507/scratchpad/venv_genesis/lib/python3.12/site-packages/rsl_rl/__init__.py. Skipping.
+################################################################################
+[1m                            Learning iteration 0/30                             [0m 
+
+                               Run name: go2_4096
+                            Total steps: 98304 
+                       Steps per second: 33638 
+                        Collection time: 2.058s 
+                          Learning time: 0.864s 
+                        Mean value loss: 0.0098
+                    Mean surrogate loss: -0.0060
+                      Mean entropy loss: 17.0468
+                            Mean reward: -0.15
+                    Mean episode length: 22.36
+                        Mean action std: 1.00
+      Mean episode rew_tracking_lin_vel: 0.0040
+      Mean episode rew_tracking_ang_vel: 0.0019
+             Mean episode rew_lin_vel_z: -0.0049
+           Mean episode rew_base_height: -0.0029
+           Mean episode rew_action_rate: -0.0014
+    Mean episode rew_similar_to_default: -0.0018
+--------------------------------------------------------------------------------
+                         Iteration time: 2.92s
+                           Time elapsed: 0:00:02
+                                    ETA: 0:01:24
+
+################################################################################
+[1m                            Learning iteration 1/30                             [0m 
+
+                               Run name: go2_4096
+                            Total steps: 196608 
+                       Steps per second: 169346 
+                        Collection time: 0.313s 
+                          Learning time: 0.268s 
+                        Mean value loss: 0.0016
+                    Mean surrogate loss: -0.0083
+                      Mean entropy loss: 17.0424
+                            Mean reward: -0.16
+                    Mean episode length: 27.18
+                        Mean action std: 1.00
+      Mean episode rew_tracking_lin_vel: 0.0066
+      Mean episode rew_tracking_ang_vel: 0.0033
+             Mean episode rew_lin_vel_z: -0.0067
+           Mean episode rew_base_height: -0.0040
+           Mean episode rew_action_rate: -0.0029
+    Mean episode rew_similar_to_default: -0.0044
+--------------------------------------------------------------------------------
+                         Iteration time: 0.58s
+                           Time elapsed: 0:00:03
+                                    ETA: 0:00:49
+
+################################################################################
+[1m                            Learning iteration 2/30                             [0m 
+
+                               Run name: go2_4096
+                            Total steps: 294912 
+                       Steps per second: 168071 
+                        Collection time: 0.315s 
+                          Learning time: 0.269s 
+                        Mean value loss: 0.0012
+                    Mean surrogate loss: -0.0092
+                      Mean entropy loss: 17.0167
+                            Mean reward: -0.13
+                    Mean episode length: 30.53
+                        Mean action std: 1.00
+      Mean episode rew_tracking_lin_vel: 0.0083
+      Mean episode rew_tracking_ang_vel: 0.0037
+             Mean episode rew_lin_vel_z: -0.0066
+           Mean episode rew_base_height: -0.0040
+           Mean episode rew_action_rate: -0.0033
+    Mean episode rew_similar_to_default: -0.0050
+--------------------------------------------------------------------------------
+                         Iteration time: 0.58s
+                           Time elapsed: 0:00:04
+                                    ETA: 0:00:36
+
+################################################################################
+[1m                            Learning iteration 3/30                             [0m 
+
+                               Run name: go2_4096
+                            Total steps: 393216 
+                       Steps per second: 168143 
+                        Collection time: 0.310s 
+                          Learning time: 0.274s 
+                        Mean value loss: 0.0011
+                    Mean surrogate loss: -0.0104
+                      Mean entropy loss: 16.9749
+                            Mean reward: -0.10
+                    Mean episode length: 28.90
+                        Mean action std: 0.99
+      Mean episode rew_tracking_lin_vel: 0.0093
+      Mean episode rew_tracking_ang_vel: 0.0038
+             Mean episode rew_lin_vel_z: -0.0064
+           Mean episode rew_base_height: -0.0038
+           Mean episode rew_action_rate: -0.0034
+    Mean episode rew_similar_to_default: -0.0050
+--------------------------------------------------------------------------------
+                         Iteration time: 0.58s
+                           Time elapsed: 0:00:04
+                                    ETA: 0:00:30
+
+################################################################################
+[1m                            Learning iteration 4/30                             [0m 
+
+                               Run name: go2_4096
+                            Total steps: 491520 
+                       Steps per second: 170828 
+                        Collection time: 0.307s 
+                          Learning time: 0.269s 
+                        Mean value loss: 0.0010
+                    Mean surrogate loss: -0.0109
+                      Mean entropy loss: 16.9370
+                            Mean reward: -0.06
+                    Mean episode length: 24.30
+                        Mean action std: 0.99
+      Mean episode rew_tracking_lin_vel: 0.0094
+      Mean episode rew_tracking_ang_vel: 0.0036
+             Mean episode rew_lin_vel_z: -0.0060
+           Mean episode rew_base_height: -0.0035
+           Mean episode rew_action_rate: -0.0032
+    Mean episode rew_similar_to_default: -0.0045
+--------------------------------------------------------------------------------
+                         Iteration time: 0.58s
+                           Time elapsed: 0:00:05
+                                    ETA: 0:00:26
+
+################################################################################
+[1m                            Learning iteration 5/30                             [0m 
+
+                               Run name: go2_4096
+                            Total steps: 589824 
+                       Steps per second: 171393 
+                        Collection time: 0.306s 
+                          Learning time: 0.268s 
+                        Mean value loss: 0.0010
+                    Mean surrogate loss: -0.0111
+                      Mean entropy loss: 16.9049
+                            Mean reward: -0.06
+                    Mean episode length: 22.16
+                        Mean action std: 0.99
+      Mean episode rew_tracking_lin_vel: 0.0097
+      Mean episode rew_tracking_ang_vel: 0.0036
+             Mean episode rew_lin_vel_z: -0.0058
+           Mean episode rew_base_height: -0.0034
+           Mean episode rew_action_rate: -0.0030
+    Mean episode rew_similar_to_default: -0.0042
+--------------------------------------------------------------------------------
+                         Iteration time: 0.57s
+                           Time elapsed: 0:00:05
+                                    ETA: 0:00:23
+
+################################################################################
+[1m                            Learning iteration 6/30                             [0m 
+
+                               Run name: go2_4096
+                            Total steps: 688128 
+                       Steps per second: 170972 
+                        Collection time: 0.306s 
+                          Learning time: 0.269s 
+                        Mean value loss: 0.0010
+                    Mean surrogate loss: -0.0111
+                      Mean entropy loss: 16.8806
+                            Mean reward: -0.04
+                    Mean episode length: 23.68
+                        Mean action std: 0.99
+      Mean episode rew_tracking_lin_vel: 0.0093
+      Mean episode rew_tracking_ang_vel: 0.0033
+             Mean episode rew_lin_vel_z: -0.0056
+           Mean episode rew_base_height: -0.0031
+           Mean episode rew_action_rate: -0.0026
+    Mean episode rew_similar_to_default: -0.0035
+--------------------------------------------------------------------------------
+                         Iteration time: 0.57s
+                           Time elapsed: 0:00:06
+                                    ETA: 0:00:21
+
+################################################################################
+[1m                            Learning iteration 7/30                             [0m 
+
+                               Run name: go2_4096
+                            Total steps: 786432 
+                       Steps per second: 170252 
+                        Collection time: 0.307s 
+                          Learning time: 0.270s 
+                        Mean value loss: 0.0010
+                    Mean surrogate loss: -0.0079
+                      Mean entropy loss: 16.8688
+                            Mean reward: -0.02
+                    Mean episode length: 21.25
+                        Mean action std: 0.99
+      Mean episode rew_tracking_lin_vel: 0.0094
+      Mean episode rew_tracking_ang_vel: 0.0031
+             Mean episode rew_lin_vel_z: -0.0054
+           Mean episode rew_base_height: -0.0030
+           Mean episode rew_action_rate: -0.0024
+    Mean episode rew_similar_to_default: -0.0032
+--------------------------------------------------------------------------------
+                         Iteration time: 0.58s
+                           Time elapsed: 0:00:06
+                                    ETA: 0:00:19
+
+################################################################################
+[1m                            Learning iteration 8/30                             [0m 
+
+                               Run name: go2_4096
+                            Total steps: 884736 
+                       Steps per second: 172437 
+                        Collection time: 0.300s 
+                          Learning time: 0.270s 
+                        Mean value loss: 0.0010
+                    Mean surrogate loss: -0.0090
+                      Mean entropy loss: 16.8529
+                            Mean reward: -0.01
+                    Mean episode length: 20.07
+                        Mean action std: 0.99
+      Mean episode rew_tracking_lin_vel: 0.0094
+      Mean episode rew_tracking_ang_vel: 0.0029
+             Mean episode rew_lin_vel_z: -0.0053
+           Mean episode rew_base_height: -0.0029
+           Mean episode rew_action_rate: -0.0022
+    Mean episode rew_similar_to_default: -0.0029
+--------------------------------------------------------------------------------
+                         Iteration time: 0.57s
+                           Time elapsed: 0:00:07
+                                    ETA: 0:00:17
+
+################################################################################
+[1m                            Learning iteration 9/30                             [0m 
+
+                               Run name: go2_4096
+                            Total steps: 983040 
+                       Steps per second: 172707 
+                        Collection time: 0.301s 
+                          Learning time: 0.268s 
+                        Mean value loss: 0.0011
+                    Mean surrogate loss: -0.0095
+                      Mean entropy loss: 16.8363
+                            Mean reward: 0.01
+                    Mean episode length: 21.52
+                        Mean action std: 0.98
+      Mean episode rew_tracking_lin_vel: 0.0100
+      Mean episode rew_tracking_ang_vel: 0.0029
+             Mean episode rew_lin_vel_z: -0.0052
+           Mean episode rew_base_height: -0.0029
+           Mean episode rew_action_rate: -0.0022
+    Mean episode rew_similar_to_default: -0.0029
+--------------------------------------------------------------------------------
+                         Iteration time: 0.57s
+                           Time elapsed: 0:00:08
+                                    ETA: 0:00:16
+
+################################################################################
+[1m                            Learning iteration 10/30                            [0m 
+
+                               Run name: go2_4096
+                            Total steps: 1081344 
+                       Steps per second: 171623 
+                        Collection time: 0.303s 
+                          Learning time: 0.270s 
+                        Mean value loss: 0.0013
+                    Mean surrogate loss: -0.0094
+                      Mean entropy loss: 16.8221
+                            Mean reward: 0.01
+                    Mean episode length: 19.19
+                        Mean action std: 0.98
+      Mean episode rew_tracking_lin_vel: 0.0108
+      Mean episode rew_tracking_ang_vel: 0.0030
+             Mean episode rew_lin_vel_z: -0.0051
+           Mean episode rew_base_height: -0.0029
+           Mean episode rew_action_rate: -0.0023
+    Mean episode rew_similar_to_default: -0.0030
+--------------------------------------------------------------------------------
+                         Iteration time: 0.57s
+                           Time elapsed: 0:00:08
+                                    ETA: 0:00:15
+
+################################################################################
+[1m                            Learning iteration 11/30                            [0m 
+
+                               Run name: go2_4096
+                            Total steps: 1179648 
+                       Steps per second: 170981 
+                        Collection time: 0.305s 
+                          Learning time: 0.270s 
+                        Mean value loss: 0.0016
+                    Mean surrogate loss: -0.0106
+                      Mean entropy loss: 16.7965
+                            Mean reward: 0.07
+                    Mean episode length: 24.39
+                        Mean action std: 0.98
+      Mean episode rew_tracking_lin_vel: 0.0117
+      Mean episode rew_tracking_ang_vel: 0.0031
+             Mean episode rew_lin_vel_z: -0.0050
+           Mean episode rew_base_height: -0.0029
+           Mean episode rew_action_rate: -0.0024
+    Mean episode rew_similar_to_default: -0.0032
+--------------------------------------------------------------------------------
+                         Iteration time: 0.57s
+                           Time elapsed: 0:00:09
+                                    ETA: 0:00:13
+
+################################################################################
+[1m                            Learning iteration 12/30                            [0m 
+
+                               Run name: go2_4096
+                            Total steps: 1277952 
+                       Steps per second: 171089 
+                        Collection time: 0.305s 
+                          Learning time: 0.270s 
+                        Mean value loss: 0.0021
+                    Mean surrogate loss: -0.0100
+                      Mean entropy loss: 16.7758
+                            Mean reward: 0.08
+                    Mean episode length: 23.96
+                        Mean action std: 0.98
+      Mean episode rew_tracking_lin_vel: 0.0130
+      Mean episode rew_tracking_ang_vel: 0.0033
+             Mean episode rew_lin_vel_z: -0.0049
+           Mean episode rew_base_height: -0.0030
+           Mean episode rew_action_rate: -0.0025
+    Mean episode rew_similar_to_default: -0.0034
+--------------------------------------------------------------------------------
+                         Iteration time: 0.57s
+                           Time elapsed: 0:00:09
+                                    ETA: 0:00:12
+
+################################################################################
+[1m                            Learning iteration 13/30                            [0m 
+
+                               Run name: go2_4096
+                            Total steps: 1376256 
+                       Steps per second: 171123 
+                        Collection time: 0.302s 
+                          Learning time: 0.272s 
+                        Mean value loss: 0.0024
+                    Mean surrogate loss: -0.0091
+                      Mean entropy loss: 16.7619
+                            Mean reward: 0.09
+                    Mean episode length: 25.13
+                        Mean action std: 0.98
+      Mean episode rew_tracking_lin_vel: 0.0146
+      Mean episode rew_tracking_ang_vel: 0.0035
+             Mean episode rew_lin_vel_z: -0.0048
+           Mean episode rew_base_height: -0.0030
+           Mean episode rew_action_rate: -0.0027
+    Mean episode rew_similar_to_default: -0.0037
+--------------------------------------------------------------------------------
+                         Iteration time: 0.57s
+                           Time elapsed: 0:00:10
+                                    ETA: 0:00:11
+
+################################################################################
+[1m                            Learning iteration 14/30                            [0m 
+
+                               Run name: go2_4096
+                            Total steps: 1474560 
+                       Steps per second: 171517 
+                        Collection time: 0.299s 
+                          Learning time: 0.274s 
+                        Mean value loss: 0.0028
+                    Mean surrogate loss: -0.0089
+                      Mean entropy loss: 16.7460
+                            Mean reward: 0.12
+                    Mean episode length: 25.45
+                        Mean action std: 0.98
+      Mean episode rew_tracking_lin_vel: 0.0158
+      Mean episode rew_tracking_ang_vel: 0.0036
+             Mean episode rew_lin_vel_z: -0.0047
+           Mean episode rew_base_height: -0.0030
+           Mean episode rew_action_rate: -0.0028
+    Mean episode rew_similar_to_default: -0.0040
+--------------------------------------------------------------------------------
+                         Iteration time: 0.57s
+                           Time elapsed: 0:00:10
+                                    ETA: 0:00:10
+
+################################################################################
+[1m                            Learning iteration 15/30                            [0m 
+
+                               Run name: go2_4096
+                            Total steps: 1572864 
+                       Steps per second: 171735 
+                        Collection time: 0.303s 
+                          Learning time: 0.269s 
+                        Mean value loss: 0.0033
+                    Mean surrogate loss: -0.0079
+                      Mean entropy loss: 16.7331
+                            Mean reward: 0.14
+                    Mean episode length: 27.28
+                        Mean action std: 0.98
+      Mean episode rew_tracking_lin_vel: 0.0173
+      Mean episode rew_tracking_ang_vel: 0.0038
+             Mean episode rew_lin_vel_z: -0.0046
+           Mean episode rew_base_height: -0.0030
+           Mean episode rew_action_rate: -0.0030
+    Mean episode rew_similar_to_default: -0.0043
+--------------------------------------------------------------------------------
+                         Iteration time: 0.57s
+                           Time elapsed: 0:00:11
+                                    ETA: 0:00:10
+
+################################################################################
+[1m                            Learning iteration 16/30                            [0m 
+
+                               Run name: go2_4096
+                            Total steps: 1671168 
+                       Steps per second: 171353 
+                        Collection time: 0.302s 
+                          Learning time: 0.271s 
+                        Mean value loss: 0.0033
+                    Mean surrogate loss: -0.0071
+                      Mean entropy loss: 16.7090
+                            Mean reward: 0.15
+                    Mean episode length: 27.84
+                        Mean action std: 0.97
+      Mean episode rew_tracking_lin_vel: 0.0189
+      Mean episode rew_tracking_ang_vel: 0.0040
+             Mean episode rew_lin_vel_z: -0.0045
+           Mean episode rew_base_height: -0.0031
+           Mean episode rew_action_rate: -0.0032
+    Mean episode rew_similar_to_default: -0.0046
+--------------------------------------------------------------------------------
+                         Iteration time: 0.57s
+                           Time elapsed: 0:00:12
+                                    ETA: 0:00:09
+
+################################################################################
+[1m                            Learning iteration 17/30                            [0m 
+
+                               Run name: go2_4096
+                            Total steps: 1769472 
+                       Steps per second: 171513 
+                        Collection time: 0.302s 
+                          Learning time: 0.271s 
+                        Mean value loss: 0.0027
+                    Mean surrogate loss: -0.0058
+                      Mean entropy loss: 16.6609
+                            Mean reward: 0.18
+                    Mean episode length: 29.37
+                        Mean action std: 0.97
+      Mean episode rew_tracking_lin_vel: 0.0199
+      Mean episode rew_tracking_ang_vel: 0.0041
+             Mean episode rew_lin_vel_z: -0.0044
+           Mean episode rew_base_height: -0.0031
+           Mean episode rew_action_rate: -0.0033
+    Mean episode rew_similar_to_default: -0.0049
+--------------------------------------------------------------------------------
+                         Iteration time: 0.57s
+                           Time elapsed: 0:00:12
+                                    ETA: 0:00:08
+
+################################################################################
+[1m                            Learning iteration 18/30                            [0m 
+
+                               Run name: go2_4096
+                            Total steps: 1867776 
+                       Steps per second: 169584 
+                        Collection time: 0.308s 
+                          Learning time: 0.272s 
+                        Mean value loss: 0.0024
+                    Mean surrogate loss: -0.0057
+                      Mean entropy loss: 16.6110
+                            Mean reward: 0.20
+                    Mean episode length: 30.28
+                        Mean action std: 0.96
+      Mean episode rew_tracking_lin_vel: 0.0210
+      Mean episode rew_tracking_ang_vel: 0.0043
+             Mean episode rew_lin_vel_z: -0.0043
+           Mean episode rew_base_height: -0.0031
+           Mean episode rew_action_rate: -0.0033
+    Mean episode rew_similar_to_default: -0.0050
+--------------------------------------------------------------------------------
+                         Iteration time: 0.58s
+                           Time elapsed: 0:00:13
+                                    ETA: 0:00:07
+
+################################################################################
+[1m                            Learning iteration 19/30                            [0m 
+
+                               Run name: go2_4096
+                            Total steps: 1966080 
+                       Steps per second: 171121 
+                        Collection time: 0.303s 
+                          Learning time: 0.271s 
+                        Mean value loss: 0.0020
+                    Mean surrogate loss: -0.0066
+                      Mean entropy loss: 16.5656
+                            Mean reward: 0.23
+                    Mean episode length: 31.61
+                        Mean action std: 0.96
+      Mean episode rew_tracking_lin_vel: 0.0229
+      Mean episode rew_tracking_ang_vel: 0.0046
+             Mean episode rew_lin_vel_z: -0.0042
+           Mean episode rew_base_height: -0.0032
+           Mean episode rew_action_rate: -0.0036
+    Mean episode rew_similar_to_default: -0.0056
+--------------------------------------------------------------------------------
+                         Iteration time: 0.57s
+                           Time elapsed: 0:00:13
+                                    ETA: 0:00:06
+
+################################################################################
+[1m                            Learning iteration 20/30                            [0m 
+
+                               Run name: go2_4096
+                            Total steps: 2064384 
+                       Steps per second: 170770 
+                        Collection time: 0.304s 
+                          Learning time: 0.271s 
+                        Mean value loss: 0.0017
+                    Mean surrogate loss: -0.0056
+                      Mean entropy loss: 16.5257
+                            Mean reward: 0.27
+                    Mean episode length: 35.72
+                        Mean action std: 0.96
+      Mean episode rew_tracking_lin_vel: 0.0242
+      Mean episode rew_tracking_ang_vel: 0.0048
+             Mean episode rew_lin_vel_z: -0.0041
+           Mean episode rew_base_height: -0.0032
+           Mean episode rew_action_rate: -0.0037
+    Mean episode rew_similar_to_default: -0.0059
+--------------------------------------------------------------------------------
+                         Iteration time: 0.58s
+                           Time elapsed: 0:00:14
+                                    ETA: 0:00:06
+
+################################################################################
+[1m                            Learning iteration 21/30                            [0m 
+
+                               Run name: go2_4096
+                            Total steps: 2162688 
+                       Steps per second: 171244 
+                        Collection time: 0.301s 
+                          Learning time: 0.273s 
+                        Mean value loss: 0.0022
+                    Mean surrogate loss: -0.0052
+                      Mean entropy loss: 16.4693
+                            Mean reward: 0.27
+                    Mean episode length: 34.86
+                        Mean action std: 0.95
+      Mean episode rew_tracking_lin_vel: 0.0257
+      Mean episode rew_tracking_ang_vel: 0.0051
+             Mean episode rew_lin_vel_z: -0.0040
+           Mean episode rew_base_height: -0.0032
+           Mean episode rew_action_rate: -0.0039
+    Mean episode rew_similar_to_default: -0.0063
+--------------------------------------------------------------------------------
+                         Iteration time: 0.57s
+                           Time elapsed: 0:00:15
+                                    ETA: 0:00:05
+
+################################################################################
+[1m                            Learning iteration 22/30                            [0m 
+
+                               Run name: go2_4096
+                            Total steps: 2260992 
+                       Steps per second: 171698 
+                        Collection time: 0.301s 
+                          Learning time: 0.271s 
+                        Mean value loss: 0.0014
+                    Mean surrogate loss: -0.0058
+                      Mean entropy loss: 16.3947
+                            Mean reward: 0.30
+                    Mean episode length: 36.69
+                        Mean action std: 0.95
+      Mean episode rew_tracking_lin_vel: 0.0264
+      Mean episode rew_tracking_ang_vel: 0.0053
+             Mean episode rew_lin_vel_z: -0.0040
+           Mean episode rew_base_height: -0.0032
+           Mean episode rew_action_rate: -0.0040
+    Mean episode rew_similar_to_default: -0.0066
+--------------------------------------------------------------------------------
+                         Iteration time: 0.57s
+                           Time elapsed: 0:00:15
+                                    ETA: 0:00:04
+
+################################################################################
+[1m                            Learning iteration 23/30                            [0m 
+
+                               Run name: go2_4096
+                            Total steps: 2359296 
+                       Steps per second: 171601 
+                        Collection time: 0.301s 
+                          Learning time: 0.272s 
+                        Mean value loss: 0.0013
+                    Mean surrogate loss: -0.0046
+                      Mean entropy loss: 16.3325
+                            Mean reward: 0.31
+                    Mean episode length: 38.99
+                        Mean action std: 0.94
+      Mean episode rew_tracking_lin_vel: 0.0276
+      Mean episode rew_tracking_ang_vel: 0.0056
+             Mean episode rew_lin_vel_z: -0.0040
+           Mean episode rew_base_height: -0.0032
+           Mean episode rew_action_rate: -0.0041
+    Mean episode rew_similar_to_default: -0.0071
+--------------------------------------------------------------------------------
+                         Iteration time: 0.57s
+                           Time elapsed: 0:00:16
+                                    ETA: 0:00:04
+
+################################################################################
+[1m                            Learning iteration 24/30                            [0m 
+
+                               Run name: go2_4096
+                            Total steps: 2457600 
+                       Steps per second: 172817 
+                        Collection time: 0.299s 
+                          Learning time: 0.270s 
+                        Mean value loss: 0.0012
+                    Mean surrogate loss: -0.0050
+                      Mean entropy loss: 16.2928
+                            Mean reward: 0.33
+                    Mean episode length: 40.47
+                        Mean action std: 0.94
+      Mean episode rew_tracking_lin_vel: 0.0295
+      Mean episode rew_tracking_ang_vel: 0.0061
+             Mean episode rew_lin_vel_z: -0.0039
+           Mean episode rew_base_height: -0.0032
+           Mean episode rew_action_rate: -0.0044
+    Mean episode rew_similar_to_default: -0.0078
+--------------------------------------------------------------------------------
+                         Iteration time: 0.57s
+                           Time elapsed: 0:00:16
+                                    ETA: 0:00:03
+
+################################################################################
+[1m                            Learning iteration 25/30                            [0m 
+
+                               Run name: go2_4096
+                            Total steps: 2555904 
+                       Steps per second: 167515 
+                        Collection time: 0.311s 
+                          Learning time: 0.275s 
+                        Mean value loss: 0.0011
+                    Mean surrogate loss: -0.0035
+                      Mean entropy loss: 16.2379
+                            Mean reward: 0.35
+                    Mean episode length: 44.10
+                        Mean action std: 0.93
+      Mean episode rew_tracking_lin_vel: 0.0307
+      Mean episode rew_tracking_ang_vel: 0.0064
+             Mean episode rew_lin_vel_z: -0.0039
+           Mean episode rew_base_height: -0.0032
+           Mean episode rew_action_rate: -0.0046
+    Mean episode rew_similar_to_default: -0.0082
+--------------------------------------------------------------------------------
+                         Iteration time: 0.59s
+                           Time elapsed: 0:00:17
+                                    ETA: 0:00:02
+
+################################################################################
+[1m                            Learning iteration 26/30                            [0m 
+
+                               Run name: go2_4096
+                            Total steps: 2654208 
+                       Steps per second: 171130 
+                        Collection time: 0.301s 
+                          Learning time: 0.273s 
+                        Mean value loss: 0.0009
+                    Mean surrogate loss: -0.0044
+                      Mean entropy loss: 16.1691
+                            Mean reward: 0.38
+                    Mean episode length: 45.25
+                        Mean action std: 0.93
+      Mean episode rew_tracking_lin_vel: 0.0320
+      Mean episode rew_tracking_ang_vel: 0.0067
+             Mean episode rew_lin_vel_z: -0.0039
+           Mean episode rew_base_height: -0.0032
+           Mean episode rew_action_rate: -0.0048
+    Mean episode rew_similar_to_default: -0.0087
+--------------------------------------------------------------------------------
+                         Iteration time: 0.57s
+                           Time elapsed: 0:00:17
+                                    ETA: 0:00:01
+
+################################################################################
+[1m                            Learning iteration 27/30                            [0m 
+
+                               Run name: go2_4096
+                            Total steps: 2752512 
+                       Steps per second: 170770 
+                        Collection time: 0.304s 
+                          Learning time: 0.271s 
+                        Mean value loss: 0.0009
+                    Mean surrogate loss: -0.0037
+                      Mean entropy loss: 16.0953
+                            Mean reward: 0.40
+                    Mean episode length: 47.06
+                        Mean action std: 0.92
+      Mean episode rew_tracking_lin_vel: 0.0333
+      Mean episode rew_tracking_ang_vel: 0.0071
+             Mean episode rew_lin_vel_z: -0.0039
+           Mean episode rew_base_height: -0.0032
+           Mean episode rew_action_rate: -0.0049
+    Mean episode rew_similar_to_default: -0.0092
+--------------------------------------------------------------------------------
+                         Iteration time: 0.58s
+                           Time elapsed: 0:00:18
+                                    ETA: 0:00:01
+
+################################################################################
+[1m                            Learning iteration 28/30                            [0m 
+
+                               Run name: go2_4096
+                            Total steps: 2850816 
+                       Steps per second: 170227 
+                        Collection time: 0.303s 
+                          Learning time: 0.274s 
+                        Mean value loss: 0.0009
+                    Mean surrogate loss: -0.0035
+                      Mean entropy loss: 16.0370
+                            Mean reward: 0.41
+                    Mean episode length: 49.48
+                        Mean action std: 0.92
+      Mean episode rew_tracking_lin_vel: 0.0344
+      Mean episode rew_tracking_ang_vel: 0.0075
+             Mean episode rew_lin_vel_z: -0.0039
+           Mean episode rew_base_height: -0.0032
+           Mean episode rew_action_rate: -0.0051
+    Mean episode rew_similar_to_default: -0.0097
+--------------------------------------------------------------------------------
+                         Iteration time: 0.58s
+                           Time elapsed: 0:00:19
+                                    ETA: 0:00:00
+
+################################################################################
+[1m                            Learning iteration 29/30                            [0m 
+
+                               Run name: go2_4096
+                            Total steps: 2949120 
+                       Steps per second: 171325 
+                        Collection time: 0.304s 
+                          Learning time: 0.269s 
+                        Mean value loss: 0.0008
+                    Mean surrogate loss: -0.0061
+                      Mean entropy loss: 15.9845
+                            Mean reward: 0.43
+                    Mean episode length: 53.67
+                        Mean action std: 0.92
+      Mean episode rew_tracking_lin_vel: 0.0362
+      Mean episode rew_tracking_ang_vel: 0.0080
+             Mean episode rew_lin_vel_z: -0.0039
+           Mean episode rew_base_height: -0.0032
+           Mean episode rew_action_rate: -0.0054
+    Mean episode rew_similar_to_default: -0.0103
+--------------------------------------------------------------------------------
+                         Iteration time: 0.57s
+                           Time elapsed: 0:00:19
+                                    ETA: 0:00:00
+
+[gpu_run] genesis_go2_4096 end: device utilisation 72% (18:21:58), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
