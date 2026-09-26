@@ -28,6 +28,20 @@ names = [mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_JOINT, j) for j in range(1, m.
 adr = np.array([m.jnt_qposadr[j] for j in range(1, m.njnt)]); dadr = np.array([m.jnt_dofadr[j] for j in range(1, m.njnt)])
 lo = m.jnt_range[1:, 0]; hi = m.jnt_range[1:, 1]
 task.reset_all()
+# spawn check: contacts of the reset state (reset_all ran mj_forward): deepest penetration per world and the smallest
+# distance (active or within Isaac's 2 cm pair gap) of any body to the terrain; spawn height = origin z (the sub-terrain
+# origin's height, Isaac's env_origins) + the default root height 0.74 m, as Isaac's reset_root_state_uniform
+def _spawn_stats():
+    nc = int(d.nacon.numpy()[0]); pen = np.zeros(N); mind = np.full(N, np.inf)
+    if nc:
+        dist = d.contact.dist.numpy()[:nc]; w = d.contact.worldid.numpy()[:nc]
+        np.maximum.at(pen, w, -dist); np.minimum.at(mind, w, dist)
+    return pen, mind
+_pen0, _mind0 = _spawn_stats()
+spawn = {"worlds_penetrating_at_spawn": int((_pen0 > 0).sum()), "max_spawn_penetration_m": float(_pen0.max()),
+         "worlds_with_contact_within_gap_at_spawn": int(np.isfinite(_mind0).sum()),
+         "spawn_z_minus_origin_z": float(np.median(d.qpos.numpy()[:, 2] - task.origins.numpy()[:, 2]))}
+print("spawn", json.dumps(spawn), flush=True)
 
 class _Pol:
     step_idx = wp.zeros(1, dtype=int, device="metal:0")
@@ -85,7 +99,8 @@ for k in range(STEPS):
                        "pre_speed_over_3x_limit": bool(spd_h[1:, e].max() > 3 * VEL_LIMIT),
                        "pre_penetration_over_2cm": bool(pen_h[1:, e].max() > 0.02),
                        "energy_jump_x": float(ke_h[1, e] / max(ke_h[2:, e].max(), 1e-6)) if np.isfinite(ke_h[1, e]) else None,
-                       "torso_contact_before": bool(torso_h[1:, e].any())})
+                       "torso_contact_before": bool(torso_h[1:, e].any()), "spawn_penetration_m": float(_pen0[e]),
+                       "first_episode": bool(k < 1000)})
     wp.launch(bump, dim=1, inputs=[pol.step_idx], device="metal:0"); wp.launch(bump, dim=1, inputs=[pol.rng_step], device="metal:0")
     task.launch_reward_done_reset(pol, bufs); task.launch_obs(pol.rng_step)
     th = task.torso_hist.numpy(); torso_h = np.roll(torso_h, 1, 0); torso_h[0] = th > 1.0
@@ -95,7 +110,7 @@ ov = task.sim.overflow_flags()          # sticky per-world bits: worlds that eve
 nm = np.array(niter_max)
 res = {"terrain": terrain, "preset": preset, "ckpt": ckpt, "steps": STEPS, "cap": cap,
        "niter": {"max": int(nm.max()), "p99.9": float(np.percentile(nm, 99.9)), "substep_worlds_at_cap": at_cap, "of": len(nm) * N},
-       "overflow": dict(ov), "blowups": len(events), "isaac_style_torso_terminations": torso_terms,
+       "overflow": dict(ov), "blowups": len(events), "spawn": spawn, "isaac_style_torso_terminations": torso_terms,
        "criterion": "blow-up = any |qpos| or |qvel| > 1000 or non-finite after a control step (g1_reward_done); Isaac 3.0 "
                     "terminates only on time_out and torso contact > 1 N (TerminationsCfg), so every blow-up here is a state "
                     "Isaac's task would not end by itself"}
@@ -116,6 +131,11 @@ if events:
         res[f"frac_{f}"] = float(np.mean([e[f] for e in E]))
     ej = np.array([e["energy_jump_x"] for e in E if e["energy_jump_x"] is not None])
     res["energy_jump_x_median"] = float(np.median(ej)) if len(ej) else None
+    res["blowups_in_first_50_steps"] = int(sum(e["step"] < 50 for e in E))
+    res["frac_blowups_spawned_penetrating"] = float(np.mean([e["spawn_penetration_m"] > 0 for e in E]))
+    leg = ("hip", "knee", "ankle", "torso")
+    res["frac_pre_limit_joint_leg"] = float(np.mean([any(t in e["pre_limit_joint"] for t in leg) for e in E]))
+    res["frac_pre_speed_joint_leg"] = float(np.mean([any(t in e["pre_speed_joint"] for t in leg) for e in E]))
     res["frac_nonphysical_before_blowup"] = float(np.mean([e["pre_speed_over_3x_limit"] or e["pre_penetration_over_2cm"] for e in E]))
     res["events"] = E[:200]
 # base rates over all worlds, last step: pushes within 50 steps
