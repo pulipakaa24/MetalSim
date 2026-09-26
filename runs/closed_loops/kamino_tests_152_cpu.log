@@ -1,0 +1,834 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+..........................
+----------------------------------------------------------------------
+Ran 26 tests in 0.029s
+
+OK
+MODULE test_core_builder: ran=26 fail=0 err=0 skip=0 (0 s)
+.Module newton._src.geometry.inertia d60da98 load on device 'cpu' took 1.01 ms  (cached)
+.
+----------------------------------------------------------------------
+Ran 2 tests in 0.002s
+
+OK
+MODULE test_core_geometry: ran=2 fail=0 err=0 skip=0 (0 s)
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+OK
+MODULE test_core_joints: ran=1 fail=0 err=0 skip=0 (0 s)
+......
+----------------------------------------------------------------------
+Ran 6 tests in 0.000s
+
+OK
+MODULE test_core_materials: ran=6 fail=0 err=0 skip=0 (0 s)
+....Module validate_and_correct_inertia_kernel_fabf4b5a 9ce7e99 load on device 'cpu' took 0.39 ms  (cached)
+Module newton._src.geometry.bvh 0faa6b5 load on device 'cpu' took 0.30 ms  (cached)
+Module newton._src.solvers.kamino._src.core.conversions 64509a0 load on device 'cpu' took 0.43 ms  (cached)
+Module newton._src.solvers.kamino._src.core.bodies a6cddc6 load on device 'cpu' took 0.27 ms  (cached)
+Module map_sub 46e172e load on device 'cpu' took 0.23 ms  (cached)
+Module map_sub 0c93633 load on device 'cpu' took 0.76 ms  (cached)
+Module map_sub 8e9af81 load on device 'cpu' took 0.21 ms  (cached)
+Module map_sub 3eb598d load on device 'cpu' took 0.20 ms  (cached)
+Module map_sub 92712a2 load on device 'cpu' took 0.20 ms  (cached)
+Module map_sub e945546 load on device 'cpu' took 0.21 ms  (cached)
+Module map_sub 5a52ed7 load on device 'cpu' took 0.21 ms  (cached)
+Module map_sub a19ac26 load on device 'cpu' took 0.28 ms  (cached)
+Module map_sub d5e161e load on device 'cpu' took 0.84 ms  (cached)
+.Module map_sub 3fc40a8 load on device 'cpu' took 914.79 ms  (compiled)
+.Cloning https://github.com/newton-physics/newton-assets.git (ref: 261cd1f429619d8ef4f546bd788ab9dea906b5e1)...
+Successfully downloaded folder to: /Users/aditya/Library/Caches/newton/newton-assets_disneyresearch_56289e70_261cd1f4/disneyresearch
+..Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_3) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_3) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_3) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_3) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_4) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_4) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_4) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_4) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_5) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_5) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_5) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_5) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_6) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_6) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_6) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_6) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_7) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_7) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_7) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_7) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_8) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_8) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_8) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_8) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_9) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_9) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_9) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_9) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_10) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_10) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_10) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_10) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_11) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_11) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_11) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_11) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_12) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_12) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_12) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_12) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_13) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_13) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_13) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_13) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Cloning https://github.com/newton-physics/newton-assets.git (ref: 261cd1f429619d8ef4f546bd788ab9dea906b5e1)...
+Successfully downloaded folder to: /Users/aditya/Library/Caches/newton/newton-assets_anybotics_anymal_d_5af8de00_261cd1f4/anybotics_anymal_d
+../Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:562: UserWarning: Inertia validation corrected 2 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  model_newton: Model = builder_newton.finalize(skip_validation_joints=True, device=self.default_device)
+./Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:655: UserWarning: Inertia validation corrected 3 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  model_newton: Model = builder_newton.finalize(skip_validation_joints=True, device=self.default_device)
+./Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:776: UserWarning: Inertia validation corrected 3 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  return builder_newton.finalize(skip_validation_joints=True, device=self.default_device)
+/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:776: UserWarning: Inertia validation corrected 3 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  return builder_newton.finalize(skip_validation_joints=True, device=self.default_device)
+Module newton._src.solvers.kamino._src.kinematics.constraints 5516130 load on device 'cpu' took 0.47 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.jacobians 374e63a load on device 'cpu' took 0.38 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.resets 8b1933c load on device 'cpu' took 0.33 ms  (cached)
+../Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:960: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  model_newton: Model = builder_newton.finalize(skip_validation_joints=True, device=self.default_device)
+./Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:701: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  return builder_newton.finalize(skip_validation_joints=True, device=self.default_device)
+......
+----------------------------------------------------------------------
+Ran 21 tests in 7.443s
+
+OK
+MODULE test_core_model: ran=21 fail=0 err=0 skip=0 (7 s)
+...........
+----------------------------------------------------------------------
+Ran 11 tests in 0.001s
+
+OK
+MODULE test_core_shapes: ran=11 fail=0 err=0 skip=0 (0 s)
+.................................
+----------------------------------------------------------------------
+Ran 33 tests in 0.001s
+
+OK
+MODULE test_core_types: ran=33 fail=0 err=0 skip=0 (0 s)
+...................
+----------------------------------------------------------------------
+Ran 19 tests in 0.002s
+
+OK
+MODULE test_core_world: ran=19 fail=0 err=0 skip=0 (0 s)
+Module newton._src.solvers.kamino._src.kinematics.joints ac3a35f load on device 'cpu' took 0.45 ms  (cached)
+Module newton._src.solvers.kamino._src.geometry.primitive.broadphase 8d3acda load on device 'cpu' took 0.26 ms  (cached)
+Module newton._src.solvers.kamino._src.geometry.primitive.narrowphase 49ccc15 load on device 'cpu' took 0.31 ms  (cached)
+..Module newton._src.solvers.kamino._src.kinematics.limits fcc7c3d load on device 'cpu' took 0.35 ms  (cached)
+.Module newton._src.solvers.kamino._src.dynamics.delassus 06b043b load on device 'cpu' took 0.30 ms  (cached)
+....Module newton._src.solvers.kamino._src.linalg.factorize.llt_sequential b6293bb load on device 'cpu' took 0.35 ms  (cached)
+....Module newton._src.solvers.kamino._src.dynamics.delassus c6cbd44 load on device 'cpu' took 0.46 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus f14c425 load on device 'cpu' took 0.40 ms  (cached)
+...Module newton._src.solvers.kamino.tests.utils.extract 4cadfa9 load on device 'cpu' took 0.30 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 9b57534 load on device 'cpu' took 0.24 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 4295c27 load on device 'cpu' took 0.38 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus bacee56 load on device 'cpu' took 0.30 ms  (cached)
+.Module newton._src.solvers.kamino._src.linalg.blas 6833105 load on device 'cpu' took 0.41 ms  (cached)
+.....Module newton._src.solvers.kamino._src.dynamics.delassus 1942843 load on device 'cpu' took 0.46 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus 7270dd3 load on device 'cpu' took 0.37 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus 456872f load on device 'cpu' took 0.45 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus e16e9a1 load on device 'cpu' took 0.37 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus 9f41050 load on device 'cpu' took 0.28 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus e82af62 load on device 'cpu' took 0.26 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus 0bf3e1b load on device 'cpu' took 0.35 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus 1e8ee2b load on device 'cpu' took 0.30 ms  (cached)
+.Module newton._src.solvers.kamino._src.linalg.blas 7934388 load on device 'cpu' took 0.50 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 3237907 load on device 'cpu' took 0.42 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus d41b2c0 load on device 'cpu' took 0.29 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus d147fde load on device 'cpu' took 0.48 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus 8d65bd1 load on device 'cpu' took 0.38 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus f9828a5 load on device 'cpu' took 0.37 ms  (cached)
+.Module newton._src.solvers.kamino._src.dynamics.delassus 60b8e76 load on device 'cpu' took 0.44 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus 077ebd1 load on device 'cpu' took 0.50 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus 07b4965 load on device 'cpu' took 0.36 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus 0f6a949 load on device 'cpu' took 0.30 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus 6d47167 load on device 'cpu' took 0.30 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus d1c3c1a load on device 'cpu' took 0.41 ms  (cached)
+.
+----------------------------------------------------------------------
+Ran 23 tests in 1.141s
+
+OK
+MODULE test_dynamics_delassus: ran=23 fail=0 err=0 skip=0 (1 s)
+.Module newton._src.solvers.kamino._src.dynamics.dual 579bbed load on device 'cpu' took 0.41 ms  (cached)
+.
+----------------------------------------------------------------------
+Ran 2 tests in 0.017s
+
+OK
+MODULE test_dynamics_dual: ran=2 fail=0 err=0 skip=0 (0 s)
+Module newton._src.solvers.kamino.tests.utils.make aad2727 load on device 'cpu' took 0.33 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.wrenches f58a032 load on device 'cpu' took 0.30 ms  (cached)
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.023s
+
+OK
+MODULE test_dynamics_wrenches: ran=4 fail=0 err=0 skip=0 (0 s)
+Module newton._src.solvers.kamino._src.geometry.aggregation 4565053 load on device 'cpu' took 0.30 ms  (cached)
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.004s
+
+OK
+MODULE test_geometry_aggregation: ran=1 fail=0 err=0 skip=0 (0 s)
+Module newton._src.sim.articulation afc146e load on device 'cpu' took 0.36 ms  (cached)
+Module newton._src.sim.collide 2cf7092 load on device 'cpu' took 0.36 ms  (cached)
+Module newton._src.geometry.broad_phase_nxn e19637b load on device 'cpu' took 0.29 ms  (cached)
+Module narrow_phase_primitive_write_contact 05b1bd0 load on device 'cpu' took 0.39 ms  (cached)
+Module narrow_phase_gjk_mpr_True_write_contact_support_map_lean_post_process_minkowski_only 07f0b43 load on device 'cpu' took 0.33 ms  (cached)
+Module newton._src.geometry.narrow_phase d3e35a0 load on device 'cpu' took 0.26 ms  (cached)
+Module make_convert_contacts_newton_to_kamino__locals___convert_contacts_newton_to_kamino_a9569540 e6b7f5e load on device 'cpu' took 0.25 ms  (cached)
+.Module newton._src.sim.contacts d7a82d4 load on device 'cpu' took 0.45 ms  (cached)
+Module newton._src.solvers.kamino._src.geometry.contacts 31f7a16 load on device 'cpu' took 0.24 ms  (cached)
+........Module make_convert_contacts_newton_to_kamino__locals___convert_contacts_newton_to_kamino_58ff650a 7f7e3d4 load on device 'cpu' took 0.37 ms  (cached)
+...Module newton._src.solvers.kamino.tests.test_geometry_contacts fca3247 load on device 'cpu' took 0.41 ms  (cached)
+........
+----------------------------------------------------------------------
+Ran 20 tests in 1.740s
+
+OK
+MODULE test_geometry_contacts: ran=20 fail=0 err=0 skip=0 (2 s)
+......Module newton._src.solvers.kamino._src.geometry.unified 1ab5148 load on device 'cpu' took 0.86 ms  (cached)
+Module narrow_phase_primitive__write_contact_unified_kamino f076d6e load on device 'cpu' took 0.31 ms  (cached)
+Module narrow_phase_gjk_mpr_True__write_contact_unified_kamino_default_default fc39490 load on device 'cpu' took 0.89 ms  (cached)
+...[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:01:54,287][builder.py:938][WARNING]: Zero bodies in world 1, no base body assigned.[0m
+.
+----------------------------------------------------------------------
+Ran 10 tests in 0.054s
+
+OK
+MODULE test_geometry_detector: ran=10 fail=0 err=0 skip=0 (0 s)
+Module newton._src.solvers.kamino.tests.test_geometry_keying b1b556a load on device 'cpu' took 0.38 ms  (cached)
+.Module newton._src.solvers.kamino.tests.test_geometry_keying f405e4b load on device 'cpu' took 0.23 ms  (cached)
+..Module newton._src.solvers.kamino._src.geometry.keying 2a5fcb1 load on device 'cpu' took 0.22 ms  (cached)
+...Module newton._src.solvers.kamino.tests.test_geometry_keying 56fc204 load on device 'cpu' took 0.25 ms  (cached)
+.Module newton._src.solvers.kamino.tests.test_geometry_keying 16039bd load on device 'cpu' took 0.25 ms  (cached)
+Module newton._src.solvers.kamino.tests.test_geometry_keying 2cf76f6 load on device 'cpu' took 0.24 ms  (cached)
+Module newton._src.solvers.kamino.tests.test_geometry_keying 045a8b0 load on device 'cpu' took 0.21 ms  (cached)
+Module newton._src.solvers.kamino.tests.test_geometry_keying 4fa1b97 load on device 'cpu' took 0.20 ms  (cached)
+.
+----------------------------------------------------------------------
+Ran 8 tests in 0.008s
+
+OK
+MODULE test_geometry_keying: ran=8 fail=0 err=0 skip=0 (0 s)
+.........Module newton._src.solvers.kamino._src.solvers.warmstart 35abd9b load on device 'cpu' took 0.29 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.common 15151f3 load on device 'cpu' took 0.68 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels bf248d6 load on device 'cpu' took 0.32 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked 0a0823c load on device 'cpu' took 0.21 ms  (cached)
+Module make_desaxce_correction_and_velocity_bias_kernel__locals___compute_desaxce_correction_and_velocity_bias_4c2d9505 5358c5e load on device 'cpu' took 0.22 ms  (cached)
+Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_1f79cdd4 38472b8 load on device 'cpu' took 0.20 ms  (cached)
+Module newton._src.solvers.kamino._src.integrators.euler e440779 load on device 'cpu' took 0.33 ms  (cached)
+Module newton._src.solvers.kamino._src.core.time b279246 load on device 'cpu' took 0.25 ms  (cached)
+....
+----------------------------------------------------------------------
+Ran 13 tests in 0.157s
+
+OK
+MODULE test_geometry_margin_gap: ran=13 fail=0 err=0 skip=0 (0 s)
+Module newton._src.geometry.contact_reduction_global 0a8e255 load on device 'cpu' took 0.46 ms  (cached)
+Module mesh_triangle_contacts_to_reducer_kernel_2e5c3bc3 ba37dcc load on device 'cpu' took 0.34 ms  (cached)
+Module export_reduced_contacts_write_contact 5ac53df load on device 'cpu' took 0.26 ms  (cached)
+.ssssssModule export_reduced_contacts__write_contact_unified_kamino 6adc160 load on device 'cpu' took 0.46 ms  (cached)
+.....
+----------------------------------------------------------------------
+Ran 12 tests in 0.492s
+
+OK (skipped=6)
+MODULE test_geometry_mesh_heightfield: ran=12 fail=0 err=0 skip=6 (0 s)
+.....................
+----------------------------------------------------------------------
+Ran 21 tests in 0.535s
+
+OK
+MODULE test_geometry_primitive: ran=21 fail=0 err=0 skip=0 (1 s)
+Module newton._src.geometry.broad_phase_sap 812d0e5 load on device 'cpu' took 0.45 ms  (cached)
+.....F..........
+======================================================================
+FAIL: test_05_box_on_box_simple (newton._src.solvers.kamino.tests.test_geometry_unified.TestCollisionPipelineUnified.test_05_box_on_box_simple)
+Tests unified pipeline output contacts for the case of two boxes
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_geometry_unified.py", line 473, in test_05_box_on_box_simple
+    test_unified_pipeline(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_geometry_unified.py", line 147, in test_unified_pipeline
+    check_contacts(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_geometry_primitive.py", line 329, in check_contacts
+    np.testing.assert_allclose(
+  File "/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 1780, in assert_allclose
+    assert_array_compare(compare, actual, desired, err_msg=str(err_msg),
+  File "/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 988, in assert_array_compare
+    raise AssertionError(msg)
+AssertionError: 
+Not equal to tolerance rtol=0, atol=1e-05
+
+unified CD pipeline: Failed `position_A` check for `box_on_box_simple using nxn`
+
+Mismatched elements: 4 / 12 (33.3%)
+Mismatch at indices:
+ [0, 1]: 0.5 (ACTUAL), -0.5 (DESIRED)
+ [1, 0]: -0.5 (ACTUAL), 0.5 (DESIRED)
+ [2, 1]: -0.5 (ACTUAL), 0.5 (DESIRED)
+ [3, 0]: 0.5 (ACTUAL), -0.5 (DESIRED)
+Max absolute difference among violations: 1.
+Max relative difference among violations: 2.
+ ACTUAL: array([[-0.5  ,  0.5  ,  0.005],
+       [-0.5  , -0.5  ,  0.005],
+       [ 0.5  , -0.5  ,  0.005],
+       [ 0.5  ,  0.5  ,  0.005]], dtype=float32)
+ DESIRED: array([[-0.5  , -0.5  ,  0.005],
+       [ 0.5  , -0.5  ,  0.005],
+       [ 0.5  ,  0.5  ,  0.005],
+       [-0.5  ,  0.5  ,  0.005]], dtype=float32)
+
+----------------------------------------------------------------------
+Ran 16 tests in 2.316s
+
+FAILED (failures=1)
+MODULE test_geometry_unified: ran=16 fail=1 err=0 skip=0 (2 s)
+[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:01:57,803][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:01:57,815][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:01:57,827][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:01:57,838][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.Module newton._src.solvers.kamino.tests.test_gimbal d62bda0 load on device 'cpu' took 0.48 ms  (cached)
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:01:57,852][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+Module newton._src.solvers.kamino._src.solvers.fk.kernels 1e3a273 load on device 'cpu' took 0.52 ms  (cached)
+Module newton._src.solvers.kamino._src.utils.world_equivalence d478939 load on device 'cpu' took 0.30 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.fk.kernels_tile_2d 488d993 load on device 'cpu' took 0.34 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.fk.kernels bf087d3 load on device 'cpu' took 0.32 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.fk.kernels_tile_1d 1540f1a load on device 'cpu' took 0.21 ms  (cached)
+Module create_eval_min_num_iterations_kernel__locals___eval_min_num_iterations_97c062a0 b0fca93 load on device 'cpu' took 0.20 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked_semi_sparse a81d428 load on device 'cpu' took 0.21 ms  (cached)
+....[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:01:57,886][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+..[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:01:58,029][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+..sssssss
+----------------------------------------------------------------------
+Ran 17 tests in 0.236s
+
+OK (skipped=7)
+MODULE test_gimbal: ran=17 fail=0 err=0 skip=7 (0 s)
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.014s
+
+OK
+MODULE test_kinematics_constraints: ran=3 fail=0 err=0 skip=0 (0 s)
+...........................
+----------------------------------------------------------------------
+Ran 27 tests in 0.095s
+
+OK
+MODULE test_kinematics_jacobians: ran=27 fail=0 err=0 skip=0 (0 s)
+Module newton._src.solvers.kamino.tests.test_kinematics_joints 20f229e load on device 'cpu' took 0.32 ms  (cached)
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.015s
+
+OK
+MODULE test_kinematics_joints: ran=5 fail=0 err=0 skip=0 (0 s)
+..Module newton._src.solvers.kamino.tests.test_kinematics_limits f156dc7 load on device 'cpu' took 0.30 ms  (cached)
+.
+----------------------------------------------------------------------
+Ran 3 tests in 0.006s
+
+OK
+MODULE test_kinematics_limits: ran=3 fail=0 err=0 skip=0 (0 s)
+Module create_eval_min_num_iterations_kernel__locals___eval_min_num_iterations_c3eac833 a500eae load on device 'cpu' took 0.40 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.joints 34f966d load on device 'cpu' took 0.43 ms  (cached)
+.Module newton._src.solvers.kamino._src.solvers.fk.kernels_tile_1d fd42f42 load on device 'cpu' took 0.38 ms  (cached)
+Module create_eval_min_num_iterations_kernel__locals___eval_min_num_iterations_754bdcff 23db85a load on device 'cpu' took 0.27 ms  (cached)
+....Module create_eval_min_num_iterations_kernel__locals___eval_min_num_iterations_4ef807cf 09fb2ad load on device 'cpu' took 0.35 ms  (cached)
+.
+----------------------------------------------------------------------
+Ran 6 tests in 0.200s
+
+OK
+MODULE test_kinematics_resets: ran=6 fail=0 err=0 skip=0 (0 s)
+sss
+----------------------------------------------------------------------
+Ran 3 tests in 0.000s
+
+OK (skipped=3)
+MODULE test_linalg_conjugate_fused: ran=3 fail=0 err=0 skip=3 (0 s)
+............[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:01:58,372][core.py:582][WARNING]: tolerance 'tol' = 1e-10 is smaller than machine epsilon for the specified dtype '<class 'warp._src.types.float32'>' (eps = 1.1920928955078125e-07). Clamping to eps.[0m
+.
+----------------------------------------------------------------------
+Ran 13 tests in 0.001s
+
+OK
+MODULE test_linalg_core: ran=13 fail=0 err=0 skip=0 (0 s)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked 32488e5 load on device 'cpu' took 0.40 ms  (cached)
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.786s
+
+OK
+MODULE test_linalg_factorize_llt_blocked: ran=4 fail=0 err=0 skip=0 (1 s)
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.002s
+
+OK
+MODULE test_linalg_factorize_llt_sequential: ran=4 fail=0 err=0 skip=0 (0 s)
+Module newton._src.solvers.kamino._src.linalg.conjugate 8d7ea7e load on device 'cpu' took 0.36 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.conjugate 96744ac load on device 'cpu' took 0.35 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.conjugate 5e99457 load on device 'cpu' took 0.27 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.conjugate 9b91e02 load on device 'cpu' took 0.22 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.conjugate 47c34eb load on device 'cpu' took 0.21 ms  (cached)
+ssModule newton._src.solvers.kamino._src.linalg.conjugate c8a7619 load on device 'cpu' took 0.23 ms  (cached)
+sssss.s.sModule newton._src.solvers.kamino._src.linalg.conjugate 8679f00 load on device 'cpu' took 0.40 ms  (cached)
+..s.sModule newton._src.solvers.kamino._src.linalg.conjugate 650b55b load on device 'cpu' took 0.49 ms  (cached)
+.sss
+----------------------------------------------------------------------
+Ran 20 tests in 0.091s
+
+OK (skipped=14)
+MODULE test_linalg_solve_cg: ran=20 fail=0 err=0 skip=14 (0 s)
+.Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked d5149ca load on device 'cpu' took 0.52 ms  (cached)
+....
+----------------------------------------------------------------------
+Ran 5 tests in 0.581s
+
+OK
+MODULE test_linalg_solver_llt_blocked: ran=5 fail=0 err=0 skip=0 (1 s)
+.Module rcm_batch_kernels_float32 779b447 load on device 'cpu' took 0.46 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked_rcm 46a8195 load on device 'cpu' took 0.41 ms  (cached)
+......s..Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked_rcm a4707f2 load on device 'cpu' took 0.42 ms  (cached)
+.
+----------------------------------------------------------------------
+Ran 11 tests in 0.726s
+
+OK (skipped=1)
+MODULE test_linalg_solver_llt_blocked_rcm: ran=11 fail=0 err=0 skip=1 (1 s)
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.002s
+
+OK
+MODULE test_linalg_solver_llt_sequential: ran=5 fail=0 err=0 skip=0 (0 s)
+.........Module newton._src.solvers.kamino._src.linalg.blas ef64981 load on device 'cpu' took 0.42 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 9287200 load on device 'cpu' took 0.41 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas ed47c6e load on device 'cpu' took 0.45 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas fa06052 load on device 'cpu' took 0.33 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 7be68a2 load on device 'cpu' took 0.39 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 69c0bba load on device 'cpu' took 0.46 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas d93da17 load on device 'cpu' took 0.44 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 3f08700 load on device 'cpu' took 0.41 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas d63975d load on device 'cpu' took 0.51 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 44b9044 load on device 'cpu' took 0.40 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas b03b4fb load on device 'cpu' took 0.37 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 201e009 load on device 'cpu' took 0.46 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 017a6c6 load on device 'cpu' took 0.47 ms  (cached)
+..Module newton._src.solvers.kamino._src.linalg.blas 02953e6 load on device 'cpu' took 0.94 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas d476360 load on device 'cpu' took 0.97 ms  (cached)
+.
+----------------------------------------------------------------------
+Ran 12 tests in 1.933s
+
+OK
+MODULE test_linalg_sparse: ran=12 fail=0 err=0 skip=0 (2 s)
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+OK
+MODULE test_linalg_utils_matrix: ran=1 fail=0 err=0 skip=0 (0 s)
+./Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/linalg/_linalg.py:2349: RuntimeWarning: divide by zero encountered in slogdet
+  sign, logdet = _umath_linalg.slogdet(a, signature=signature)
+/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/linalg/_linalg.py:2349: RuntimeWarning: overflow encountered in slogdet
+  sign, logdet = _umath_linalg.slogdet(a, signature=signature)
+/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/linalg/_linalg.py:2349: RuntimeWarning: invalid value encountered in slogdet
+  sign, logdet = _umath_linalg.slogdet(a, signature=signature)
+...................
+----------------------------------------------------------------------
+Ran 20 tests in 2.415s
+
+OK
+MODULE test_linalg_utils_rand: ran=20 fail=0 err=0 skip=0 (2 s)
+..........Module newton._src.solvers.kamino.tests.test_solver_kamino e268bef load on device 'cpu' took 0.56 ms  (cached)
+Module make_desaxce_correction_and_velocity_bias_kernel__locals___compute_desaxce_correction_and_velocity_bias_45adaaf9 d6c0318 load on device 'cpu' took 0.32 ms  (cached)
+Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_bf13abc5 724cde7 load on device 'cpu' took 0.28 ms  (cached)
+.....Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_d044839c 22d722c load on device 'cpu' took 0.48 ms  (cached)
+..Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_030535f0 6d32ad3 load on device 'cpu' took 0.39 ms  (cached)
+.
+----------------------------------------------------------------------
+Ran 18 tests in 9.095s
+
+OK
+MODULE test_solver_kamino: ran=18 fail=0 err=0 skip=0 (9 s)
+/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solver_kamino_joint_frames.py:135: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  model = builder.finalize()
+[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,012][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+./Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solver_kamino_joint_frames.py:71: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  return builder.finalize()
+[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,015][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,018][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,021][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,023][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_824dc0b3 e5e5477 load on device 'cpu' took 0.45 ms  (cached)
+.
+----------------------------------------------------------------------
+Ran 5 tests in 0.143s
+
+OK
+MODULE test_solver_kamino_joint_frames: ran=5 fail=0 err=0 skip=0 (0 s)
+[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,163][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,172][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,182][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,191][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,199][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,207][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,215][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,224][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,232][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,242][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,250][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,259][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,267][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,275][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,283][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,292][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,306][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,315][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,325][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+....[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,370][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,380][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,387][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+Module newton._src.solvers.kamino._src.solvers.fk.kernels_tile_1d b550265 load on device 'cpu' took 0.43 ms  (cached)
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,401][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,409][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,420][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,437][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,445][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,454][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,462][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,471][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,478][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,487][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,494][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,503][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,520][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,529][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,536][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.
+----------------------------------------------------------------------
+Ran 30 tests in 0.384s
+
+OK
+MODULE test_solver_kamino_notify: ran=30 fail=0 err=0 skip=0 (0 s)
+.Module newton._src.solvers.kamino._src.solvers.dvi.kernels 302fe99 load on device 'cpu' took 0.42 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.dvi.sparse_kernels e5e8897 load on device 'cpu' took 0.27 ms  (cached)
+......[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,830][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+............Module newton._src.solvers.kamino._src.solvers.metrics 7e06506 load on device 'cpu' took 0.45 ms  (cached)
+...............[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:19,935][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:20,720][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:20,889][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.s......sss[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:27,981][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.
+----------------------------------------------------------------------
+Ran 47 tests in 13.500s
+
+OK (skipped=4)
+MODULE test_solvers_dvi: ran=47 fail=0 err=0 skip=4 (13 s)
+Module newton._src.solvers.kamino._src.solvers.fk.kernels 60e6385 load on device 'cpu' took 0.53 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.sparse_matrix 9cdbec0 load on device 'cpu' took 0.24 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 1c4884e load on device 'cpu' took 0.88 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 52000b7 load on device 'cpu' took 0.47 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 86eaf65 load on device 'cpu' took 0.33 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 5321120 load on device 'cpu' took 0.34 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas d86a4c6 load on device 'cpu' took 0.56 ms  (cached)
+..[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:29,865][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+Module create_eval_min_num_iterations_kernel__locals___eval_min_num_iterations_deb74d94 65234cb load on device 'cpu' took 0.43 ms  (cached)
+.Module newton._src.solvers.kamino._src.solvers.fk.kernels_tile_1d 983a734 load on device 'cpu' took 0.45 ms  (cached)
+Module create_eval_min_num_iterations_kernel__locals___eval_min_num_iterations_665592db bf896fb load on device 'cpu' took 0.24 ms  (cached)
+.Module newton._src.solvers.kamino._src.solvers.fk.kernels a1e31f5 load on device 'cpu' took 0.53 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.fk.kernels_tile_1d 2709165 load on device 'cpu' took 0.38 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.fk.kernels bcc3f56 load on device 'cpu' took 0.51 ms  (cached)
+......[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:51,203][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+...
+----------------------------------------------------------------------
+Ran 13 tests in 23.277s
+
+OK
+MODULE test_solvers_forward_kinematics: ran=13 fail=0 err=0 skip=0 (23 s)
+...Module newton._src.solvers.kamino._src.solvers.padmm.kernels 0437a13 load on device 'cpu' took 0.43 ms  (cached)
+Module make_desaxce_correction_and_velocity_bias_kernel__locals___compute_desaxce_correction_and_velocity_bias_6186a688 10a49b8 load on device 'cpu' took 0.27 ms  (cached)
+Module _make_compute_infnorm_residuals_kernel__locals___compute_infnorm_residuals_a5c6c6b5 16bc583 load on device 'cpu' took 0.28 ms  (cached)
+.Module _make_compute_infnorm_residuals_kernel__locals___compute_infnorm_residuals_8e299883 a8725bf load on device 'cpu' took 0.31 ms  (cached)
+.....
+----------------------------------------------------------------------
+Ran 9 tests in 0.402s
+
+OK
+MODULE test_solvers_metrics: ran=9 fail=0 err=0 skip=0 (0 s)
+...Module newton._src.solvers.kamino._src.solvers.padmm.kernels bf248d6 load on device 'cpu' took 0.53 ms  (cached)
+.Module newton._src.solvers.kamino._src.solvers.padmm.kernels 0437a13 load on device 'cpu' took 0.40 ms  (cached)
+..Module newton._src.solvers.kamino._src.solvers.padmm.kernels bf248d6 load on device 'cpu' took 0.69 ms  (cached)
+...
+----------------------------------------------------------------------
+Ran 9 tests in 0.228s
+
+OK
+MODULE test_solvers_padmm: ran=9 fail=0 err=0 skip=0 (0 s)
+.Module newton._src.solvers.kamino._src.utils.control.animation e7fa5e5 load on device 'cpu' took 60.54 ms  (compiled)
+....
+----------------------------------------------------------------------
+Ran 5 tests in 0.770s
+
+OK
+MODULE test_utils_control_animation: ran=5 fail=0 err=0 skip=0 (1 s)
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+OK
+MODULE test_utils_control_pid: ran=1 fail=0 err=0 skip=0 (0 s)
+.Module newton._src.solvers.kamino._src.utils.control.rand a82b4d9 load on device 'cpu' took 0.32 ms  (cached)
+..
+----------------------------------------------------------------------
+Ran 3 tests in 0.007s
+
+OK
+MODULE test_utils_control_rand: ran=3 fail=0 err=0 skip=0 (0 s)
+.............................................
+.
+.
+.
+.........
+----------------------------------------------------------------------
+Ran 57 tests in 0.626s
+
+OK
+MODULE test_utils_io_usd: ran=57 fail=0 err=0 skip=0 (1 s)
+[38;5;13m[KAMINO][0m[34;20m[2026-09-25 15:02:53,366][logger.py:139][DEBUG]: Log level set to: DEBUG[0m
+[38;5;13m[KAMINO][0m[34;20m[2026-09-25 15:02:53,366][test_utils_logger.py:39][DEBUG]: This is a debug message.[0m
+[38;5;13m[KAMINO][0m[37m[2026-09-25 15:02:53,366][test_utils_logger.py:40][INFO]: This is an info message.[0m
+[38;5;13m[KAMINO][0m[32;20m[2026-09-25 15:02:53,366][test_utils_logger.py:41][NOTIF]: This is a notification message.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:53,366][test_utils_logger.py:42][WARNING]: This is a warning message.[0m
+[38;5;13m[KAMINO][0m[31;20m[2026-09-25 15:02:53,366][test_utils_logger.py:43][ERROR]: This is an error message.[0m
+[38;5;13m[KAMINO][0m[31;1m[2026-09-25 15:02:53,366][test_utils_logger.py:44][CRITICAL]: This is a critical message.[0m
+
+.[38;5;13m[KAMINO][0m[34;20m[2026-09-25 15:02:53,366][logger.py:139][DEBUG]: Log level set to: DEBUG[0m
+[38;5;13m[KAMINO][0m[34;20m[2026-09-25 15:02:53,366][test_utils_logger.py:28][DEBUG]: This is a debug message.[0m
+[38;5;13m[KAMINO][0m[37m[2026-09-25 15:02:53,366][test_utils_logger.py:29][INFO]: This is an info message.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:53,366][test_utils_logger.py:30][WARNING]: This is a warning message.[0m
+[38;5;13m[KAMINO][0m[31;20m[2026-09-25 15:02:53,366][test_utils_logger.py:31][ERROR]: This is an error message.[0m
+[38;5;13m[KAMINO][0m[31;1m[2026-09-25 15:02:53,366][test_utils_logger.py:32][CRITICAL]: This is a critical message.[0m
+
+.
+----------------------------------------------------------------------
+Ran 2 tests in 0.000s
+
+OK
+MODULE test_utils_logger: ran=2 fail=0 err=0 skip=0 (0 s)
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.001s
+
+OK
+MODULE test_utils_profiles: ran=5 fail=0 err=0 skip=0 (0 s)
+.........
+----------------------------------------------------------------------
+Ran 9 tests in 0.001s
+
+OK
+MODULE test_utils_random: ran=9 fail=0 err=0 skip=0 (0 s)
+Module newton._src.solvers.kamino.tests.test_utils_sim_simulator e268bef load on device 'cpu' took 0.36 ms  (cached)
+Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_f077b563 3cdc6d8 load on device 'cpu' took 0.35 ms  (cached)
+..
+----------------------------------------------------------------------
+Ran 2 tests in 5.164s
+
+OK
+MODULE test_utils_sim_simulator: ran=2 fail=0 err=0 skip=0 (5 s)
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+OK
+MODULE test_utils_world_equivalence: ran=1 fail=0 err=0 skip=0 (0 s)
+
+=== device cpu, 75 s
+test_core_builder                                       ran=26 fail=0 err=0 skip=0 (0 s)
+test_core_geometry                                      ran=2 fail=0 err=0 skip=0 (0 s)
+test_core_joints                                        ran=1 fail=0 err=0 skip=0 (0 s)
+test_core_materials                                     ran=6 fail=0 err=0 skip=0 (0 s)
+test_core_model                                         ran=21 fail=0 err=0 skip=0 (7 s)
+test_core_shapes                                        ran=11 fail=0 err=0 skip=0 (0 s)
+test_core_types                                         ran=33 fail=0 err=0 skip=0 (0 s)
+test_core_world                                         ran=19 fail=0 err=0 skip=0 (0 s)
+test_dynamics_delassus                                  ran=23 fail=0 err=0 skip=0 (1 s)
+test_dynamics_dual                                      ran=2 fail=0 err=0 skip=0 (0 s)
+test_dynamics_wrenches                                  ran=4 fail=0 err=0 skip=0 (0 s)
+test_geometry_aggregation                               ran=1 fail=0 err=0 skip=0 (0 s)
+test_geometry_contacts                                  ran=20 fail=0 err=0 skip=0 (2 s)
+test_geometry_detector                                  ran=10 fail=0 err=0 skip=0 (0 s)
+test_geometry_keying                                    ran=8 fail=0 err=0 skip=0 (0 s)
+test_geometry_margin_gap                                ran=13 fail=0 err=0 skip=0 (0 s)
+test_geometry_mesh_heightfield                          ran=12 fail=0 err=0 skip=6 (0 s)
+test_geometry_primitive                                 ran=21 fail=0 err=0 skip=0 (1 s)
+test_geometry_unified                                   ran=16 fail=1 err=0 skip=0 (2 s)
+test_gimbal                                             ran=17 fail=0 err=0 skip=7 (0 s)
+test_kinematics_constraints                             ran=3 fail=0 err=0 skip=0 (0 s)
+test_kinematics_jacobians                               ran=27 fail=0 err=0 skip=0 (0 s)
+test_kinematics_joints                                  ran=5 fail=0 err=0 skip=0 (0 s)
+test_kinematics_limits                                  ran=3 fail=0 err=0 skip=0 (0 s)
+test_kinematics_resets                                  ran=6 fail=0 err=0 skip=0 (0 s)
+test_linalg_conjugate_fused                             ran=3 fail=0 err=0 skip=3 (0 s)
+test_linalg_core                                        ran=13 fail=0 err=0 skip=0 (0 s)
+test_linalg_factorize_llt_blocked                       ran=4 fail=0 err=0 skip=0 (1 s)
+test_linalg_factorize_llt_sequential                    ran=4 fail=0 err=0 skip=0 (0 s)
+test_linalg_solve_cg                                    ran=20 fail=0 err=0 skip=14 (0 s)
+test_linalg_solver_llt_blocked                          ran=5 fail=0 err=0 skip=0 (1 s)
+test_linalg_solver_llt_blocked_rcm                      ran=11 fail=0 err=0 skip=1 (1 s)
+test_linalg_solver_llt_sequential                       ran=5 fail=0 err=0 skip=0 (0 s)
+test_linalg_sparse                                      ran=12 fail=0 err=0 skip=0 (2 s)
+test_linalg_utils_matrix                                ran=1 fail=0 err=0 skip=0 (0 s)
+test_linalg_utils_rand                                  ran=20 fail=0 err=0 skip=0 (2 s)
+test_solver_kamino                                      ran=18 fail=0 err=0 skip=0 (9 s)
+test_solver_kamino_joint_frames                         ran=5 fail=0 err=0 skip=0 (0 s)
+test_solver_kamino_notify                               ran=30 fail=0 err=0 skip=0 (0 s)
+test_solvers_dvi                                        ran=47 fail=0 err=0 skip=4 (13 s)
+test_solvers_forward_kinematics                         ran=13 fail=0 err=0 skip=0 (23 s)
+test_solvers_metrics                                    ran=9 fail=0 err=0 skip=0 (0 s)
+test_solvers_padmm                                      ran=9 fail=0 err=0 skip=0 (0 s)
+test_utils_control_animation                            ran=5 fail=0 err=0 skip=0 (1 s)
+test_utils_control_pid                                  ran=1 fail=0 err=0 skip=0 (0 s)
+test_utils_control_rand                                 ran=3 fail=0 err=0 skip=0 (0 s)
+test_utils_io_usd                                       ran=57 fail=0 err=0 skip=0 (1 s)
+test_utils_logger                                       ran=2 fail=0 err=0 skip=0 (0 s)
+test_utils_profiles                                     ran=5 fail=0 err=0 skip=0 (0 s)
+test_utils_random                                       ran=9 fail=0 err=0 skip=0 (0 s)
+test_utils_sim_simulator                                ran=2 fail=0 err=0 skip=0 (5 s)
+test_utils_world_equivalence                            ran=1 fail=0 err=0 skip=0 (0 s)
+FAILED newton._src.solvers.kamino.tests.test_geometry_unified.TestCollisionPipelineUnified.test_05_box_on_box_simple ::        [-0.5  ,  0.5  ,  0.005]], dtype=float32)
+Warning: Kamino contact capacity exceeded. Increase collision_detector.max_contacts_per_world.
