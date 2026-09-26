@@ -524,10 +524,14 @@ def test_default_task_carries_the_recommended_contact_preset():
     decision) by default; contact_cfg="default" keeps MuJoCo's defaults; a g1_model_tuning context wins over both."""
     from metalsim.physics import contact_tuning as ct
     t = ct.PRESETS["recommended"]
-    assert t is ct.PRESETS["tau10_impact_hardlimits"]
+    assert t is ct.PRESETS["tau10_impact_hardlimits_ellip10"]           # 2026-09-26: elliptic cones, impratio 10, cap 20
+    assert ct.PRESETS["recommended_pyramidal"] is ct.PRESETS["tau10_impact_hardlimits"]
     task = G1VelocityTask(2, terrain="flat", seed=0)
     m = task.model
     assert task.contact_cfg == "recommended"
+    import mujoco
+    assert m.opt.cone == mujoco.mjtCone.mjCONE_ELLIPTIC and m.opt.impratio == 10.0 and m.opt.iterations == 20
+    assert task.sim.opt.solver_iterations == 20
     np.testing.assert_allclose(m.geom_solref, np.tile(t.contact_solref, (m.ngeom, 1)))
     np.testing.assert_allclose(m.geom_solimp, np.tile(t.contact_solimp, (m.ngeom, 1)))
     lim = m.jnt_limited.astype(bool)
@@ -577,3 +581,12 @@ def test_trainer_first_observation_comes_from_the_task_reset(terrain, reward_cfg
     t2 = G1VelocityTask(8, terrain="flat", reward_cfg="flat", physics_dt=0.0025)
     a2 = PPOWarp(t2, g1_ppo_config("flat", 1, 0, initial_reset=False)); a2.prepare(); t2.sim.synchronize()
     assert np.allclose(t2.sim.d.qpos.numpy()[:, 2], 0.0)                     # qpos0: root at z = 0 (archived start)
+
+
+def test_isaaclab3_solver_preset_owns_the_cone():
+    """Isaac's G1 settings are pyramidal / impratio 1; the isaaclab3 solver_cfg must impose them even though the task's
+    default contact preset is now elliptic (a partial override once composed two limit models)."""
+    import mujoco
+    task = G1VelocityTask(2, terrain="flat", seed=0, solver_cfg="isaaclab3_every_substep_cap20")
+    m = task.model
+    assert m.opt.cone == mujoco.mjtCone.mjCONE_PYRAMIDAL and m.opt.impratio == 1.0 and m.opt.iterations == 20

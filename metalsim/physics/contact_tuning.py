@@ -44,6 +44,8 @@ class Tuning:
     limit_solimp: tuple | None = None
     cone: str | None = None             # "pyramidal" | "elliptic"
     impratio: float | None = None       # frictional-to-normal impedance ratio (elliptic cones only)
+    solver_iterations: int | None = None   # Newton iteration cap the preset needs (elliptic: 20; cap 10 leaves ~15 % of worlds
+                                        # unconverged and moves states above the noise floor, research note elliptic_cones §8.5)
     friction: float | None = None       # sliding friction on all geoms (pair value = max of the two)
     margin_geoms: tuple | None = None   # geom names that get margin/gap (None: all). A pair's margin/gap is
                                         # the SUM of its geoms' (C engine_collision_driver.c:166/175, MuJoCo
@@ -135,13 +137,15 @@ def set_joint_limits(m, solref=None, solimp=None, joints=None):
     return m
 
 
-def set_solver(m, cone=None, impratio=None):
+def set_solver(m, cone=None, impratio=None, iterations=None):
     """Friction cone type and impratio on an MjModel or MjSpec."""
     opt = m.option if isinstance(m, mujoco.MjSpec) else m.opt
     if cone is not None:
         opt.cone = {"pyramidal": mujoco.mjtCone.mjCONE_PYRAMIDAL, "elliptic": mujoco.mjtCone.mjCONE_ELLIPTIC}[cone]
     if impratio is not None:
         opt.impratio = impratio
+    if iterations is not None:
+        opt.iterations = iterations
     return m
 
 
@@ -160,7 +164,7 @@ def apply(m, tuning: str | Tuning):
     t = PRESETS[tuning] if isinstance(tuning, str) else tuning
     set_contacts(m, t.contact_solref, t.contact_solimp, t.margin, t.gap, margin_geoms=t.margin_geoms)
     set_joint_limits(m, t.limit_solref, t.limit_solimp)
-    set_solver(m, t.cone, t.impratio)
+    set_solver(m, t.cone, t.impratio, t.solver_iterations)
     if t.friction is not None:
         set_friction(m, t.friction)
     return m
@@ -251,7 +255,7 @@ PRESETS.update({
 # 2026-09-25 decision (docs/DECISIONS.md): tau10_impact_hardlimits, the only preset reproducing Isaac's PhysX-trained
 # policy transfer within noise (3.3 cm), feet_slide 28 % closer, hard limits, 1.02x cost (runs/contact_research/
 # final_ranking_2026-09-25.md). G1VelocityTask applies it by default (contact_cfg="recommended").
-PRESETS["recommended"] = PRESETS["tau10_impact_hardlimits"]
+# (until 2026-09-26; see below: "recommended" is now the elliptic preset, this one is "recommended_pyramidal")
 
 # Elliptic friction cones on top of the adopted preset (2026-09-25 evening, docs/research/elliptic_cones_2026-09-25.md):
 # with the fork's per-world cone Hessian (MuJoCo Warp fork c301880) elliptic cones cost 1.41-1.53x instead of 7x on the
@@ -264,7 +268,16 @@ _T10 = PRESETS["tau10_impact_hardlimits"]
 PRESETS.update({
     f"tau10_impact_hardlimits_ellip{imp}": Tuning(contact_solref=_T10.contact_solref, contact_solimp=_T10.contact_solimp,
                                                   limit_solref=_T10.limit_solref, limit_solimp=_T10.limit_solimp,
-                                                  cone="elliptic", impratio=float(imp),
-                                                  note=f"{_T10.note} + elliptic cone, impratio {imp}")
+                                                  cone="elliptic", impratio=float(imp), solver_iterations=20,
+                                                  note=f"{_T10.note} + elliptic cone, impratio {imp}, Newton cap 20")
     for imp in (1, 10, 100)
 })
+
+# 2026-09-26, owner's decision: elliptic cones (impratio 10, Newton cap 20) are the G1 default. Fidelity first: the exact
+# cone is PhysX's, and it brings the 20 ms impact forces to 1.08x / 1.07x of PhysX's (pyramidal 1.70x / 1.23x); learning is
+# inside seed spread (+26.3 vs +27.85 / +27.1 at iteration 1000, one seed). Cost: 1.60x on the full PPO loop at cap 20
+# (32.3 K vs 51.8 K env-steps/s at 4096 envs, measured 2026-09-26 before the day's throughput work). Counter-signal:
+# +7-10 % falls of a PhysX-trained checkpoint (within one seed sd, cause not established). SWITCHING OFF: contact_cfg=
+# "recommended_pyramidal" (the previous default, tau10_impact_hardlimits) or "default" (MuJoCo's contacts); CLI --contact_cfg.
+PRESETS["recommended_pyramidal"] = PRESETS["tau10_impact_hardlimits"]
+PRESETS["recommended"] = PRESETS["tau10_impact_hardlimits_ellip10"]

@@ -55,6 +55,7 @@ commit order within each area (`git log` for the full messages). Dates are the c
 
 ## G1 velocity task and PPO learning
 
+- 09-26 G1 default contacts: elliptic friction cones, impratio 10, Newton cap 20 (`recommended` = `tau10_impact_hardlimits_ellip10`; `recommended_pyramidal` archives the previous default); contact presets carry their Newton cap; the isaaclab3 solver presets own the cone (pyramidal, impratio 1); headline re-runs queued
 - 09-24 `8954ad7` Blow-up guard by magnitude, non-finite rows dropped from the PPO update, per-iteration callback with periodic checkpoints; hero cartpole video
 - 09-24 `40af1c8` G1 1,500-iteration run recorded (learns to stand for 12 s by it 750, then degrades); G1 tier-2 policy video; camera-cartpole PPO brought to Isaac's skrl config
 - 09-24 `a6f6eca` G1 blow-up root cause: explicit actuator stiffness at 5 ms with Isaac's kp 200 (0/8 blow-ups at 2.5 ms); physics_dt option; camera PPO gets Isaac's image centering and skrl value scaler
