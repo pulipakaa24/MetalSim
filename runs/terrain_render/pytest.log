@@ -1,0 +1,39 @@
+[gpu_run] pytest_full_thr_slots start: device utilisation 0% (17:14:05)
+holder: {"name": "pytest_full_thr_slots", "kind": "timing", "minutes": 15.0, "pid": 42283, "start": 1790381645.5880861}
+  waiting [train] il3_train_flat est 70.0 min, queued 8097 s ago
+  waiting [low] newton_vbd_replay est 40.0 min, queued 10737 s ago
+  waiting [low] kamino_tests_fork est 40.0 min, queued 8117 s ago
+  waiting [low] kamino_tests_152 est 30.0 min, queued 7288 s ago
+  waiting [low] cl_kamino est 45.0 min, queued 5957 s ago
+  waiting [low] cl_mjw est 40.0 min, queued 5933 s ago
+........ssssssssss...................................................... [ 34%]
+........................................................................ [ 69%]
+..............................................................           [100%]
+=============================== warnings summary ===============================
+tests/test_g1_newton_engine.py::test_graph_replay_matches_eager
+  /Users/aditya/robosim/metalsim/learn/g1_velocity.py:939: RuntimeWarning: Mean of empty slice
+    return {"num_envs": n, "frames": num_frames, "mean_step_ms": t_ns.mean() / 1e6, "fps_isaac_style": n / (t_ns.mean() / 1e9)}
+
+tests/test_g1_newton_engine.py::test_graph_replay_matches_eager
+  /Users/aditya/robosim/.venv/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+    ret = ret.dtype.type(ret / rcount)
+
+tests/test_g1_task_terms.py::test_rough_terrain_seed_and_isaac_env_assignment
+tests/test_g1_task_terms.py::test_il3_rough_defaults
+tests/test_terrain.py::test_g1_rough_task_runs
+tests/test_terrain.py::test_hfield_mesh_contacts_match_mujoco_c
+tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[boxes]
+tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[meshes]
+tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[boxes_local]
+  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+tests/test_physics.py::test_one_step_parity_vs_mujoco_c[go1]
+tests/test_render_tier2.py::test_gpu_path_from_batchsim_matches_host
+tests/test_sensors_rt.py::test_gpu_path_ordering_with_sim
+  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+196 passed, 10 skipped, 12 warnings in 164.86s (0:02:44)
+[gpu_run] pytest_full_thr_slots end: device utilisation 96% (17:16:51), exit 0
