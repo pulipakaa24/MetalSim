@@ -257,7 +257,7 @@ PRESETS["recommended"] = PRESETS["tau10_impact_hardlimits"]
 # with the fork's per-world cone Hessian (MuJoCo Warp fork c301880) elliptic cones cost 1.41-1.53x instead of 7x on the
 # G1 task. On the PhysX protocol, impratio 10 brings the drop-torso / hold 20 ms forces from 1.70x / 1.23x of PhysX's
 # to 1.08x / 1.07x, penetration 1.64 -> 1.55 cm, feet_slide of Isaac's checkpoint -0.0144 -> -0.0131 (Isaac -0.0127),
-# transfer unchanged; +18 % falls of the PhysX-trained checkpoint (under characterisation). impratio 100 leaves ~90 %
+# transfer unchanged; +7-10 % falls of the PhysX-trained checkpoint (3 seeds, within one seed sd). impratio 100 leaves ~90 %
 # of worlds at the 10-iteration cap; impratio 1 is the plain elliptic cone. Candidate default for the G1 task
 # (owner's decision after the confirming training run runs/g1_flat_flatcfg_ellip10.log).
 _T10 = PRESETS["tau10_impact_hardlimits"]

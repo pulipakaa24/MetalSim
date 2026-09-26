@@ -247,7 +247,7 @@ the landing is unchanged (1.35×), joint-limit behaviour unchanged, and Isaac's 
 distance (within the 4-env spread). Foot sliding of Isaac's checkpoint moves from −0.0144 to −0.0131
 (Isaac −0.0127; noise ±0.0006), i.e. the "no slide gain" of the earlier row was true for the soft default
 contacts it was measured on and is a 9 % gain on the adopted preset; air time +0.0008 (noise ±0.0005, so
-marginal); falls of the PhysX-trained checkpoint 142 → 160–171 (+13–20 %, the one metric that moves away).
+marginal); falls of the PhysX-trained checkpoint 142 → 160–171 in the single-seed run (+13–20 %; over 3 seeds 149 ± 13 → 160–164 ± 11–22, +7–10 %, §7.2: the one metric that moves away).
 Impratio 100 converges in fewer than 10 Newton iterations in only ~10 % of the worlds (the 1.53× cost), so it
 is not usable at this budget; impratio 10 leaves 60–177 worlds at the cap (pyramidal: 0).
 
@@ -366,8 +366,47 @@ Characterisation (`scripts/diagnostics/competitors/g1_falls.py`, `g1_falls_batch
 `runs/competitors/g1_falls/`): 3 seeds × 4 presets for checkpoint 1000, checkpoints 500 and 1499 for pyramidal
 vs impratio 10, plus `default` and `tau5_imp99_hardlimits` for scale; per fall: time into the episode, pelvis
 pitch / roll 40 ms before the torso contact (forward / backward / sideways), the command in force, and how
-many distinct envs fell. **Results: pending (queued as `g1_falls1` / `g1_falls2`, render class, behind a
-training job); filled in below when they land.**
+many distinct envs fell. Results (measured, `runs/competitors/g1_falls/`, table by `g1_falls_table.py`):
+
+| checkpoint | preset | falls per seed (episodes) | mean ± sd | envs that fell (twice or more) | fall time 1–5 s / 5–15 s / ≥ 15 s | median s | forward / backward / sideways 40 ms before | mean \|cmd_xy\| at fall (n at < 0.1) |
+|---|---|---|---|---|---|---|---|---|
+| 1000 | `default` (soft contacts) | 349 (1283) | 349 | 90 (77) | 260 / 86 / 3 | 3.3 | 235 / 33 / 81 | 0.38 (31) |
+| 1000 | `tau5_imp99_hardlimits` | 134 (1114) | 134 | 44 (28) | 96 / 38 / 0 | 3.5 | 118 / 10 / 6 | 0.41 (13) |
+| 1000 | **`tau10_impact_hardlimits`** (adopted) | 152 / 134 / 160 | **149 ± 13** | 43 (30) / 37 (27) / 48 (31) | 347 / 94 / 5 | 3.2 | 345 / 33 / 68 | 0.38 (21) |
+| 1000 | + elliptic impratio 1 | 164 / 148 / 169 | 160 ± 11 | 50 (33) / 34 (29) / 51 (33) | 374 / 102 / 5 | 3.2 | 404 / 21 / 56 | 0.39 (27) |
+| 1000 | **+ elliptic impratio 10** | 165 / 146 / 175 | **162 ± 15** | 47 (31) / 33 (29) / 52 (35) | 378 / 104 / 4 | 3.0 | 407 / 20 / 59 | 0.39 (27) |
+| 1000 | + elliptic impratio 100 | 159 / 144 / 188 | 164 ± 22 | 46 (32) / 34 (28) / 53 (38) | 389 / 99 / 3 | 3.0 | 415 / 22 / 54 | 0.40 (26) |
+| 500 | `tau10_impact_hardlimits` | 240 (1197) | 240 | 67 (31) | 186 / 33 / 2 (+ 19 in the first second) | 2.3 | 156 / 57 / 27 | 0.58 (8) |
+| 500 | + elliptic impratio 10 | 278 (1233) | 278 | 69 (38) | 225 / 33 / 0 (+ 20) | 2.3 | 216 / 38 / 24 | 0.62 (4) |
+| 1499 | `tau10_impact_hardlimits` | 205 (1177) | 205 | 52 (39) | 166 / 39 / 0 | 3.0 | 60 / 65 / 80 | 0.32 (51) |
+| 1499 | + elliptic impratio 10 | 222 (1190) | 222 | 56 (40) | 179 / 42 / 1 | 2.8 | 72 / 71 / 79 | 0.32 (57) |
+
+Reading:
+- **How solid**: over three seeds the elliptic excess on checkpoint 1000 is +11 to +15 falls on 149
+  (**+7 to +10 %**, not the +18 % of the single-seed run), which is about one seed standard deviation
+  (11–22 falls) and the same for impratio 1, 10 and 100. The direction is consistent across the three
+  checkpoints (500: +16 %, 1000: +9 %, 1499: +8 %, one seed each), so it is probably a real but small effect;
+  a 3-seed sd of 13–15 means it would need ~6 seeds per arm to be shown at 2σ. For scale, the contact
+  stiffness moves the same count from 349 (soft default) to 134–149, i.e. the cone effect is a tenth of the
+  stiffness effect.
+- **What kind of fall**: none is a start-up failure (0 falls in the first second for checkpoint 1000; 19–20
+  for checkpoint 500 under both cones), the median fall is 3.0–3.5 s into a 20 s episode, and every fall is
+  a genuine topple (pelvis tilted > 0.3 rad 40 ms before the torso contact, "upright" count 0). Falls are
+  concentrated: 33–53 of 1024 envs fall, and 27–38 of those fall twice or more, so the episodes that fall
+  are particular command / reset draws that this policy cannot handle in our contact model, not a diffuse
+  rate. At checkpoint 1000 the falls are forward under a forward command (mean |cmd_xy| 0.38–0.40 m/s,
+  only ~6 % at a standing command); elliptic cones add forward falls (345 → 404–415 over 3 seeds) and remove
+  a few sideways ones (68 → 54–59); checkpoint 1499 falls in all directions equally.
+- **Why a PhysX-trained policy falls slightly more in the more PhysX-like cone**: not established. The
+  candidates are (i) the torso-contact termination is ours, and the elliptic cone changes the impact force
+  profile (§4.1) which is exactly what decides whether a stumble ends in a > 1 N torso touch; (ii) the
+  policy was trained with PhysX's patch-friction model at 200 Hz on 5 ms steps and the flat stiffness
+  (Isaac Lab's contact offsets), so the "more PhysX-like" friction cone is combined with a contact stiffness
+  that is not PhysX's, and the combination was never seen in training; (iii) plain policy sensitivity
+  (checkpoint 500 falls 60–90 % more than 1000 under every setting). What is established is that slide,
+  air time, transfer distance and the force profile move toward PhysX under elliptic cones while the fall
+  count moves 7–10 % away, within one seed sd. The confirming training run (§7.1) is the right arbiter for
+  the default: a policy trained on the elliptic preset does not have caveat (ii).
 
 ### 7.3 `so101_lift.py` ctrl ordering
 
@@ -390,7 +429,8 @@ if a stale `ctrl` reached the physics. No change to `metalsim/learn/so101_lift.p
   `4d53712`): primitives take upstream's GJK/EPA path, meshes keep the plane path;
   `HFIELD_PLANE_CONTACTS_PRIMITIVES = True` restores the previous form (archived). CPU: `-k hfield` 3 passed
   (was 1 failed). MetalSim's `tests/test_terrain.py::test_hfield_mesh_contacts_match_mujoco_c` (the G1 feet,
-  mesh path unchanged) and `test_plane_convex_contacts.py` against that branch: queued (`hfield_gate_tests2`).
+  mesh path unchanged) and `test_plane_convex_contacts.py` against that branch on Metal: 24 passed; the fork's
+  own `collision_driver_test -k hfield` on Metal: 3 passed (`runs/competitors/hfield_gate_tests{,2}.log`).
   Not merged (coordinator's call; the G1 rough task uses mesh feet on the heightfield, so its contacts are
   unchanged; scenes with primitive geoms on heightfields go back to upstream's behaviour).
 - `io_test::test_put_data_nefc_zero_dense` (`AssertionError: 1 != 0` at `self.assertEqual(mjd.nefc, 0)`): the
