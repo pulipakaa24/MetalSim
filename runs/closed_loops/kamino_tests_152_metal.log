@@ -1,0 +1,1907 @@
+holder: {"name": "fastfact_scenes", "kind": "timing", "minutes": 15.0, "pid": 15513, "start": 1790373458.9628701}
+  waiting [timing] il3_step2b est 15.0 min, queued 831 s ago
+  waiting [render] terrain_slots_test est 6.0 min, queued 620 s ago
+  waiting [train] camera_cartpole_physical_full2 est 25.0 min, queued 5427 s ago
+  waiting [train] g1_flat_flatcfg_tau10 est 80.0 min, queued 1194 s ago
+  waiting [train] il3_train_flat est 70.0 min, queued 810 s ago
+  waiting [low] newton_vbd_replay est 40.0 min, queued 3449 s ago
+  waiting [low] il3_physx_ours est 40.0 min, queued 2021 s ago
+  waiting [low] kamino_tests_fork est 40.0 min, queued 829 s ago
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+..........................
+----------------------------------------------------------------------
+Ran 26 tests in 0.050s
+
+OK
+MODULE test_core_builder: ran=26 fail=0 err=0 skip=0 (0 s)
+.Module newton._src.geometry.inertia bc8fb00 load on device 'metal:0' took 18.09 ms  (cached)
+.
+----------------------------------------------------------------------
+Ran 2 tests in 0.020s
+
+OK
+MODULE test_core_geometry: ran=2 fail=0 err=0 skip=0 (0 s)
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+OK
+MODULE test_core_joints: ran=1 fail=0 err=0 skip=0 (0 s)
+......
+----------------------------------------------------------------------
+Ran 6 tests in 0.000s
+
+OK
+MODULE test_core_materials: ran=6 fail=0 err=0 skip=0 (0 s)
+....Module validate_and_correct_inertia_kernel_fabf4b5a fabf4b5 load on device 'metal:0' took 16.71 ms  (cached)
+Module newton._src.geometry.bvh b41ac23 load on device 'metal:0' took 18.27 ms  (cached)
+Module newton._src.solvers.kamino._src.core.conversions 604a57d load on device 'metal:0' took 629.36 ms  (compiled)
+Module newton._src.solvers.kamino._src.core.bodies 9b91a5b load on device 'metal:0' took 430.06 ms  (compiled)
+Module map_sub a7c7c2f load on device 'metal:0' took 344.70 ms  (compiled)
+Module map_sub 3e63d28 load on device 'metal:0' took 345.14 ms  (compiled)
+Module map_sub ff5f207 load on device 'metal:0' took 351.54 ms  (compiled)
+Module map_sub 783ba8c load on device 'metal:0' took 366.67 ms  (compiled)
+Module map_sub c1bff31 load on device 'metal:0' took 372.93 ms  (compiled)
+Module map_sub 4113f60 load on device 'metal:0' took 387.44 ms  (compiled)
+Module map_sub ad03dc2 load on device 'metal:0' took 379.21 ms  (compiled)
+Module map_sub a671210 load on device 'metal:0' took 387.64 ms  (compiled)
+Module map_sub 1840bee load on device 'metal:0' took 380.25 ms  (compiled)
+.Module map_sub c8adaa6 load on device 'metal:0' took 376.38 ms  (compiled)
+...Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_3) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_3) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_3) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_3) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_4) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_4) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_4) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_4) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_5) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_5) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_5) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_5) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_6) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_6) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_6) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_6) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_7) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_7) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_7) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_7) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_8) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_8) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_8) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_8) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_9) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_9) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_9) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_9) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_10) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_10) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_10) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_10) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_11) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_11) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_11) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_11) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_12) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_12) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_12) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_12) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_13) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_13) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_13) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_13) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LF_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/LH_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RF_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_HIP/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_THIGH/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_THIGH/visuals/mesh_1) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_THIGH/visuals/mesh_2) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_SHANK/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
+../Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:562: UserWarning: Inertia validation corrected 2 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  model_newton: Model = builder_newton.finalize(skip_validation_joints=True, device=self.default_device)
+./Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:655: UserWarning: Inertia validation corrected 3 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  model_newton: Model = builder_newton.finalize(skip_validation_joints=True, device=self.default_device)
+./Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:776: UserWarning: Inertia validation corrected 3 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  return builder_newton.finalize(skip_validation_joints=True, device=self.default_device)
+/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:776: UserWarning: Inertia validation corrected 3 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  return builder_newton.finalize(skip_validation_joints=True, device=self.default_device)
+Module newton._src.solvers.kamino._src.kinematics.constraints 05ec3df load on device 'metal:0' took 370.82 ms  (compiled)
+Module newton._src.solvers.kamino._src.kinematics.jacobians 5626a5a load on device 'metal:0' took 1752.43 ms  (compiled)
+Module newton._src.solvers.kamino._src.kinematics.resets 91422ab load on device 'metal:0' took 653.02 ms  (compiled)
+../Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:960: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  model_newton: Model = builder_newton.finalize(skip_validation_joints=True, device=self.default_device)
+./Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:701: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  return builder_newton.finalize(skip_validation_joints=True, device=self.default_device)
+......
+----------------------------------------------------------------------
+Ran 21 tests in 10.466s
+
+OK
+MODULE test_core_model: ran=21 fail=0 err=0 skip=0 (10 s)
+...........
+----------------------------------------------------------------------
+Ran 11 tests in 0.002s
+
+OK
+MODULE test_core_shapes: ran=11 fail=0 err=0 skip=0 (0 s)
+.................................
+----------------------------------------------------------------------
+Ran 33 tests in 0.002s
+
+OK
+MODULE test_core_types: ran=33 fail=0 err=0 skip=0 (0 s)
+...................
+----------------------------------------------------------------------
+Ran 19 tests in 0.001s
+
+OK
+MODULE test_core_world: ran=19 fail=0 err=0 skip=0 (0 s)
+Module newton._src.solvers.kamino._src.kinematics.joints e88c145 load on device 'metal:0' took 638.33 ms  (compiled)
+Module newton._src.solvers.kamino._src.geometry.primitive.broadphase 9ec59ee load on device 'metal:0' took 451.62 ms  (cached)
+Module newton._src.solvers.kamino._src.geometry.primitive.narrowphase b2ad168 load on device 'metal:0' took 1523.74 ms  (compiled)
+..Module newton._src.solvers.kamino._src.kinematics.limits daebf49 load on device 'metal:0' took 492.01 ms  (compiled)
+.Module newton._src.solvers.kamino._src.dynamics.delassus c624cc0 load on device 'metal:0' took 433.48 ms  (compiled)
+....Module newton._src.solvers.kamino._src.linalg.factorize.llt_sequential 8ad4265 load on device 'metal:0' took 326.15 ms  (cached)
+....Module newton._src.solvers.kamino._src.dynamics.delassus 7c6a5ae load on device 'metal:0' took 458.02 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 640b018 load on device 'metal:0' took 469.01 ms  (compiled)
+...Module newton._src.solvers.kamino.tests.utils.extract 2bc107c load on device 'metal:0' took 350.52 ms  (compiled)
+Module newton._src.solvers.kamino._src.linalg.blas f372d81 load on device 'metal:0' took 394.66 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas a0a74e9 load on device 'metal:0' took 395.92 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus 4da3db8 load on device 'metal:0' took 481.79 ms  (compiled)
+.Module newton._src.solvers.kamino._src.linalg.blas f7f51bc load on device 'metal:0' took 417.97 ms  (cached)
+.....Module newton._src.solvers.kamino._src.dynamics.delassus 345e224 load on device 'metal:0' took 478.62 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 47db8a3 load on device 'metal:0' took 491.48 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 005c7ef load on device 'metal:0' took 499.29 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus baec4ea load on device 'metal:0' took 512.43 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus f952b85 load on device 'metal:0' took 519.35 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus c986318 load on device 'metal:0' took 531.50 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus fb86584 load on device 'metal:0' took 552.07 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 1aa7299 load on device 'metal:0' took 551.19 ms  (compiled)
+.Module newton._src.solvers.kamino._src.linalg.blas 4e1bacc load on device 'metal:0' took 415.77 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 8db9df8 load on device 'metal:0' took 415.65 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus d3b614c load on device 'metal:0' took 564.27 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 909d671 load on device 'metal:0' took 574.51 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 1b700c1 load on device 'metal:0' took 603.85 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 9b35178 load on device 'metal:0' took 613.38 ms  (compiled)
+.Module newton._src.solvers.kamino._src.dynamics.delassus 7edf61b load on device 'metal:0' took 604.66 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 34bca91 load on device 'metal:0' took 636.83 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 569aa22 load on device 'metal:0' took 656.50 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 79a2a1d load on device 'metal:0' took 660.34 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 3fd7c70 load on device 'metal:0' took 651.72 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 9cd2001 load on device 'metal:0' took 670.68 ms  (compiled)
+.
+----------------------------------------------------------------------
+Ran 23 tests in 21.188s
+
+OK
+MODULE test_dynamics_delassus: ran=23 fail=0 err=0 skip=0 (21 s)
+.Module newton._src.solvers.kamino._src.dynamics.dual b3b3a67 load on device 'metal:0' took 493.80 ms  (compiled)
+.
+----------------------------------------------------------------------
+Ran 2 tests in 0.588s
+
+OK
+MODULE test_dynamics_dual: ran=2 fail=0 err=0 skip=0 (1 s)
+Module newton._src.solvers.kamino.tests.utils.make 3e602bf load on device 'metal:0' took 398.74 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.wrenches bb2cdde load on device 'metal:0' took 487.53 ms  (compiled)
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.991s
+
+OK
+MODULE test_dynamics_wrenches: ran=4 fail=0 err=0 skip=0 (1 s)
+Module newton._src.solvers.kamino._src.geometry.aggregation 675d56a load on device 'metal:0' took 324.84 ms  (cached)
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.332s
+
+OK
+MODULE test_geometry_aggregation: ran=1 fail=0 err=0 skip=0 (0 s)
+Module newton._src.sim.articulation 9d521ec load on device 'metal:0' took 30.22 ms  (cached)
+Module newton._src.sim.collide 76148fa load on device 'metal:0' took 17.80 ms  (cached)
+Module newton._src.geometry.broad_phase_nxn 50ee4bc load on device 'metal:0' took 17.31 ms  (cached)
+Module narrow_phase_primitive_write_contact ae2f45e load on device 'metal:0' took 139.65 ms  (compiled)
+Module narrow_phase_gjk_mpr_True_write_contact_support_map_lean_post_process_minkowski_only 5ef5414 load on device 'metal:0' took 247.46 ms  (compiled)
+Module newton._src.geometry.narrow_phase ccb4054 load on device 'metal:0' took 18.85 ms  (cached)
+Module make_convert_contacts_newton_to_kamino__locals___convert_contacts_newton_to_kamino_a9569540 a956954 load on device 'metal:0' took 403.99 ms  (compiled)
+.Module newton._src.sim.contacts f57a683 load on device 'metal:0' took 289.86 ms  (cached)
+Module newton._src.solvers.kamino._src.geometry.contacts f0319ce load on device 'metal:0' took 329.53 ms  (cached)
+........Module make_convert_contacts_newton_to_kamino__locals___convert_contacts_newton_to_kamino_58ff650a 58ff650 load on device 'metal:0' took 403.44 ms  (compiled)
+...Module newton._src.solvers.kamino.tests.test_geometry_contacts 951ba1e load on device 'metal:0' took 361.27 ms  (compiled)
+........
+----------------------------------------------------------------------
+Ran 20 tests in 3.918s
+
+OK
+MODULE test_geometry_contacts: ran=20 fail=0 err=0 skip=0 (4 s)
+......Module newton._src.solvers.kamino._src.geometry.unified afbf6c2 load on device 'metal:0' took 526.53 ms  (compiled)
+Module narrow_phase_primitive__write_contact_unified_kamino a7aa12a load on device 'metal:0' took 1964.71 ms  (compiled)
+Module narrow_phase_gjk_mpr_True__write_contact_unified_kamino_default_default d712053 load on device 'metal:0' took 2305.88 ms  (compiled)
+...[38;5;13m[KAMINO][0m[33;20m[2026-09-25 23:59:56,357][builder.py:938][WARNING]: Zero bodies in world 1, no base body assigned.[0m
+.
+----------------------------------------------------------------------
+Ran 10 tests in 6.289s
+
+OK
+MODULE test_geometry_detector: ran=10 fail=0 err=0 skip=0 (6 s)
+Module newton._src.solvers.kamino.tests.test_geometry_keying 77f2ea4 load on device 'metal:0' took 350.56 ms  (compiled)
+.Module newton._src.solvers.kamino.tests.test_geometry_keying 4ccf4ed load on device 'metal:0' took 360.43 ms  (compiled)
+..Module newton._src.solvers.kamino._src.geometry.keying ccefe53 load on device 'metal:0' took 297.89 ms  (cached)
+...Module newton._src.solvers.kamino.tests.test_geometry_keying 214a88f load on device 'metal:0' took 368.13 ms  (compiled)
+.Module newton._src.solvers.kamino.tests.test_geometry_keying 9ffa8f9 load on device 'metal:0' took 360.95 ms  (compiled)
+Module newton._src.solvers.kamino.tests.test_geometry_keying e7b3670 load on device 'metal:0' took 366.05 ms  (compiled)
+Module newton._src.solvers.kamino.tests.test_geometry_keying 8c41747 load on device 'metal:0' took 358.78 ms  (compiled)
+Module newton._src.solvers.kamino.tests.test_geometry_keying 5e23d93 load on device 'metal:0' took 364.92 ms  (compiled)
+.
+----------------------------------------------------------------------
+Ran 8 tests in 2.857s
+
+OK
+MODULE test_geometry_keying: ran=8 fail=0 err=0 skip=0 (3 s)
+.........Module newton._src.solvers.kamino._src.solvers.warmstart 56f4169 load on device 'metal:0' took 556.32 ms  (compiled)
+Module newton._src.solvers.kamino._src.solvers.common 043ca4c load on device 'metal:0' took 387.05 ms  (compiled)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels eda300c load on device 'metal:0' took 650.98 ms  (compiled)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked 72bd391 load on device 'metal:0' took 500.75 ms  (cached)
+Module make_desaxce_correction_and_velocity_bias_kernel__locals___compute_desaxce_correction_and_velocity_bias_4c2d9505 4c2d950 load on device 'metal:0' took 385.41 ms  (compiled)
+Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_1f79cdd4 09ed5eb load on device 'metal:0' took 489.29 ms  (compiled)
+Module newton._src.solvers.kamino._src.integrators.euler 21d3482 load on device 'metal:0' took 440.69 ms  (compiled)
+Module newton._src.solvers.kamino._src.core.time 5331e9f load on device 'metal:0' took 311.15 ms  (cached)
+....
+----------------------------------------------------------------------
+Ran 13 tests in 4.441s
+
+OK
+MODULE test_geometry_margin_gap: ran=13 fail=0 err=0 skip=0 (4 s)
+Module newton._src.geometry.narrow_phase 816672a load on device 'metal:0' took 20.36 ms  (cached)
+Module newton._src.geometry.contact_reduction_global c5801f1 load on device 'metal:0' took 18.74 ms  (cached)
+Module mesh_triangle_contacts_to_reducer_kernel_2e5c3bc3 2153b50 load on device 'metal:0' took 25.40 ms  (cached)
+Module newton._src.geometry.contact_reduction_global dc2843a load on device 'metal:0' took 18.71 ms  (cached)
+Module export_reduced_contacts_write_contact 4b98431 load on device 'metal:0' took 82.45 ms  (compiled)
+.ssssssModule export_reduced_contacts__write_contact_unified_kamino 893bfa1 load on device 'metal:0' took 524.03 ms  (compiled)
+.....
+----------------------------------------------------------------------
+Ran 12 tests in 1.246s
+
+OK (skipped=6)
+MODULE test_geometry_mesh_heightfield: ran=12 fail=0 err=0 skip=6 (1 s)
+.....................
+----------------------------------------------------------------------
+Ran 21 tests in 1.134s
+
+OK
+MODULE test_geometry_primitive: ran=21 fail=0 err=0 skip=0 (1 s)
+Module newton._src.geometry.broad_phase_sap e2f69e0 load on device 'metal:0' took 435.15 ms  (compiled)
+.....F..........
+======================================================================
+FAIL: test_05_box_on_box_simple (newton._src.solvers.kamino.tests.test_geometry_unified.TestCollisionPipelineUnified.test_05_box_on_box_simple)
+Tests unified pipeline output contacts for the case of two boxes
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_geometry_unified.py", line 473, in test_05_box_on_box_simple
+    test_unified_pipeline(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_geometry_unified.py", line 147, in test_unified_pipeline
+    check_contacts(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_geometry_primitive.py", line 329, in check_contacts
+    np.testing.assert_allclose(
+  File "/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 1780, in assert_allclose
+    assert_array_compare(compare, actual, desired, err_msg=str(err_msg),
+  File "/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 988, in assert_array_compare
+    raise AssertionError(msg)
+AssertionError: 
+Not equal to tolerance rtol=0, atol=1e-05
+
+unified CD pipeline: Failed `position_A` check for `box_on_box_simple using nxn`
+
+Mismatched elements: 4 / 12 (33.3%)
+Mismatch at indices:
+ [0, 1]: 0.5 (ACTUAL), -0.5 (DESIRED)
+ [1, 0]: -0.5 (ACTUAL), 0.5 (DESIRED)
+ [2, 1]: -0.5 (ACTUAL), 0.5 (DESIRED)
+ [3, 0]: 0.5 (ACTUAL), -0.5 (DESIRED)
+Max absolute difference among violations: 1.
+Max relative difference among violations: 2.
+ ACTUAL: array([[-0.5  ,  0.5  ,  0.005],
+       [-0.5  , -0.5  ,  0.005],
+       [ 0.5  , -0.5  ,  0.005],
+       [ 0.5  ,  0.5  ,  0.005]], dtype=float32)
+ DESIRED: array([[-0.5  , -0.5  ,  0.005],
+       [ 0.5  , -0.5  ,  0.005],
+       [ 0.5  ,  0.5  ,  0.005],
+       [-0.5  ,  0.5  ,  0.005]], dtype=float32)
+
+----------------------------------------------------------------------
+Ran 16 tests in 3.529s
+
+FAILED (failures=1)
+MODULE test_geometry_unified: ran=16 fail=1 err=0 skip=0 (4 s)
+[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:09,581][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:09,608][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:09,619][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:09,628][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+Module validate_and_correct_inertia_kernel_fabf4b5a 9ce7e99 load on device 'cpu' took 0.84 ms  (cached)
+Module newton._src.solvers.kamino._src.core.conversions 64509a0 load on device 'cpu' took 0.83 ms  (cached)
+Module newton._src.solvers.kamino._src.core.bodies a6cddc6 load on device 'cpu' took 0.44 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.constraints 5516130 load on device 'cpu' took 0.45 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.jacobians 374e63a load on device 'cpu' took 0.65 ms  (cached)
+Module newton._src.sim.articulation afc146e load on device 'cpu' took 0.88 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.joints ac3a35f load on device 'cpu' took 0.30 ms  (cached)
+.Module newton._src.solvers.kamino.tests.test_gimbal d62bda0 load on device 'cpu' took 0.55 ms  (cached)
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:09,640][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+Module newton._src.solvers.kamino._src.solvers.fk.kernels 1e3a273 load on device 'cpu' took 1.02 ms  (cached)
+Module newton._src.solvers.kamino._src.utils.world_equivalence d478939 load on device 'cpu' took 0.57 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.fk.kernels_tile_2d 488d993 load on device 'cpu' took 0.37 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.fk.kernels bf087d3 load on device 'cpu' took 0.60 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.resets 8b1933c load on device 'cpu' took 0.54 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.fk.kernels_tile_1d 1540f1a load on device 'cpu' took 0.41 ms  (cached)
+Module create_eval_min_num_iterations_kernel__locals___eval_min_num_iterations_97c062a0 b0fca93 load on device 'cpu' took 0.49 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked_semi_sparse a81d428 load on device 'cpu' took 0.46 ms  (cached)
+....[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:09,681][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+..[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:09,689][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+..sssssss
+----------------------------------------------------------------------
+Ran 17 tests in 0.125s
+
+OK (skipped=7)
+MODULE test_gimbal: ran=17 fail=0 err=0 skip=7 (0 s)
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.025s
+
+OK
+MODULE test_kinematics_constraints: ran=3 fail=0 err=0 skip=0 (0 s)
+...........................
+----------------------------------------------------------------------
+Ran 27 tests in 0.259s
+
+OK
+MODULE test_kinematics_jacobians: ran=27 fail=0 err=0 skip=0 (0 s)
+Module newton._src.solvers.kamino.tests.test_kinematics_joints 1f78998 load on device 'metal:0' took 461.39 ms  (compiled)
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.494s
+
+OK
+MODULE test_kinematics_joints: ran=5 fail=0 err=0 skip=0 (0 s)
+..Module newton._src.solvers.kamino.tests.test_kinematics_limits 0bf8a77 load on device 'metal:0' took 422.24 ms  (compiled)
+.
+----------------------------------------------------------------------
+Ran 3 tests in 0.432s
+
+OK
+MODULE test_kinematics_limits: ran=3 fail=0 err=0 skip=0 (0 s)
+Module newton._src.solvers.kamino._src.solvers.fk.kernels 90a111f load on device 'metal:0' took 897.65 ms  (compiled)
+Module newton._src.solvers.kamino._src.utils.world_equivalence a57bc9f load on device 'metal:0' took 305.02 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.fk.kernels_tile_2d c6d8f12 load on device 'metal:0' took 461.61 ms  (compiled)
+Module newton._src.solvers.kamino._src.solvers.fk.kernels_tile_1d 2bab983 load on device 'metal:0' took 352.45 ms  (cached)
+Module create_eval_min_num_iterations_kernel__locals___eval_min_num_iterations_c3eac833 2d94966 load on device 'metal:0' took 312.01 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked_semi_sparse c9fbc5e load on device 'metal:0' took 500.22 ms  (compiled)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked_semi_sparse 6a8787d load on device 'metal:0' took 496.40 ms  (compiled)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked_semi_sparse 90e0e52 load on device 'metal:0' took 501.32 ms  (compiled)
+Module newton._src.solvers.kamino._src.kinematics.joints d058e56 load on device 'metal:0' took 839.41 ms  (compiled)
+.Module newton._src.solvers.kamino._src.solvers.fk.kernels_tile_1d d78db58 load on device 'metal:0' took 398.77 ms  (cached)
+Module create_eval_min_num_iterations_kernel__locals___eval_min_num_iterations_754bdcff d4c9d47 load on device 'metal:0' took 314.24 ms  (cached)
+....Module create_eval_min_num_iterations_kernel__locals___eval_min_num_iterations_4ef807cf 653e86b load on device 'metal:0' took 312.96 ms  (cached)
+.
+----------------------------------------------------------------------
+Ran 6 tests in 6.734s
+
+OK
+MODULE test_kinematics_resets: ran=6 fail=0 err=0 skip=0 (7 s)
+sss
+----------------------------------------------------------------------
+Ran 3 tests in 0.000s
+
+OK (skipped=3)
+MODULE test_linalg_conjugate_fused: ran=3 fail=0 err=0 skip=3 (0 s)
+............[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:17,650][core.py:582][WARNING]: tolerance 'tol' = 1e-10 is smaller than machine epsilon for the specified dtype '<class 'warp._src.types.float32'>' (eps = 1.1920928955078125e-07). Clamping to eps.[0m
+.
+----------------------------------------------------------------------
+Ran 13 tests in 0.001s
+
+OK
+MODULE test_linalg_core: ran=13 fail=0 err=0 skip=0 (0 s)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked 3b36299 load on device 'metal:0' took 760.03 ms  (compiled)
+x_err_l2: 15.382566452026367
+x_err_mean: 0.25708556175231934
+x_err_max: 1.4904685020446777
+
+
+Fx_err_l2: 13.823046684265137
+x_err_mean: 0.2655371427536011
+x_err_max: 1.3703656196594238
+
+
+F.x_err_l2: 1.9450520277023315
+x_err_mean: 0.19174456596374512
+x_err_max: 0.8618447780609131
+
+
+F
+======================================================================
+FAIL: test_01_single_problem_dims_all_active (newton._src.solvers.kamino.tests.test_linalg_factorize_llt_blocked.TestLinAlgLLTBlocked.test_01_single_problem_dims_all_active)
+Test the blocked LLT solver on a single small problem.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_factorize_llt_blocked.py", line 174, in test_01_single_problem_dims_all_active
+    self.assertTrue(is_x_close)
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_02_single_problem_dims_partially_active (newton._src.solvers.kamino.tests.test_linalg_factorize_llt_blocked.TestLinAlgLLTBlocked.test_02_single_problem_dims_partially_active)
+Test the blocked LLT solver on a single small problem.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_factorize_llt_blocked.py", line 332, in test_02_single_problem_dims_partially_active
+    self.assertTrue(is_x_close)
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_04_multiple_problems_dims_partially_active (newton._src.solvers.kamino.tests.test_linalg_factorize_llt_blocked.TestLinAlgLLTBlocked.test_04_multiple_problems_dims_partially_active)
+Test the blocked LLT solver on multiple small problems.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_factorize_llt_blocked.py", line 666, in test_04_multiple_problems_dims_partially_active
+    self.assertTrue(is_x_close)
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 4 tests in 2.433s
+
+FAILED (failures=3)
+MODULE test_linalg_factorize_llt_blocked: ran=4 fail=3 err=0 skip=0 (2 s)
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.007s
+
+OK
+MODULE test_linalg_factorize_llt_sequential: ran=4 fail=0 err=0 skip=0 (0 s)
+Module newton._src.solvers.kamino._src.linalg.conjugate 8d7ea7e load on device 'cpu' took 0.32 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.conjugate 96744ac load on device 'cpu' took 0.25 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 3237907 load on device 'cpu' took 0.27 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.conjugate 5e99457 load on device 'cpu' took 0.25 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.conjugate 9b91e02 load on device 'cpu' took 0.24 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.conjugate 47c34eb load on device 'cpu' took 0.25 ms  (cached)
+ssModule newton._src.solvers.kamino._src.linalg.conjugate c8a7619 load on device 'cpu' took 0.26 ms  (cached)
+sssss.s.sModule newton._src.solvers.kamino._src.linalg.conjugate 8679f00 load on device 'cpu' took 0.39 ms  (cached)
+..s.sModule newton._src.solvers.kamino._src.linalg.conjugate 650b55b load on device 'cpu' took 0.40 ms  (cached)
+.sss
+----------------------------------------------------------------------
+Ran 20 tests in 0.092s
+
+OK (skipped=14)
+MODULE test_linalg_solve_cg: ran=20 fail=0 err=0 skip=14 (0 s)
+.Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked ddf4ceb load on device 'metal:0' took 748.27 ms  (cached)
+x_err_l2: 14.057287216186523
+x_err_mean: 0.23489351570606232
+x_err_max: 1.6638853549957275
+
+
+Fx_err_l2: 12.848321914672852
+x_err_mean: 0.23883938789367676
+x_err_max: 1.4165228605270386
+
+
+F.x_err_l2: 1.3261923789978027
+x_err_mean: 0.11584992706775665
+x_err_max: 0.5269640684127808
+
+
+F
+======================================================================
+FAIL: test_01_single_problem_dims_all_active (newton._src.solvers.kamino.tests.test_linalg_solver_llt_blocked.TestLinAlgLLTBlockedSolver.test_01_single_problem_dims_all_active)
+Test the blocked LLT solver on a single small problem.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked.py", line 174, in test_01_single_problem_dims_all_active
+    self.assertTrue(is_x_close)
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_02_single_problem_dims_partially_active (newton._src.solvers.kamino.tests.test_linalg_solver_llt_blocked.TestLinAlgLLTBlockedSolver.test_02_single_problem_dims_partially_active)
+Test the blocked LLT solver on a single small problem.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked.py", line 313, in test_02_single_problem_dims_partially_active
+    self.assertTrue(is_x_close)
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_04_multiple_problems_dims_partially_active (newton._src.solvers.kamino.tests.test_linalg_solver_llt_blocked.TestLinAlgLLTBlockedSolver.test_04_multiple_problems_dims_partially_active)
+Test the blocked LLT solver on multiple small problems.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked.py", line 607, in test_04_multiple_problems_dims_partially_active
+    self.assertTrue(is_x_close)
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 5 tests in 1.390s
+
+FAILED (failures=3)
+MODULE test_linalg_solver_llt_blocked: ran=5 fail=3 err=0 skip=0 (1 s)
+.Module rcm_batch_kernels_float32 c4c7a1b load on device 'metal:0' took 362.30 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked_rcm 44b1097 load on device 'metal:0' took 569.80 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked_rcm ddc6c09 load on device 'metal:0' took 587.49 ms  (cached)
+x_err_l2: 14.087207794189453
+x_err_mean: 0.23203197121620178
+x_err_max: 1.381617546081543
+
+
+Fx_err_l2: 12.67164134979248
+x_err_mean: 0.23904994130134583
+x_err_max: 1.5307188034057617
+
+
+F.x_err_l2: 1.5120809078216553
+x_err_mean: 0.13366201519966125
+x_err_max: 0.6144784092903137
+
+
+FModule rcm_batch_kernels_float32 779b447 load on device 'cpu' took 0.61 ms  (cached)
+.Fs.FKernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked_rcm d1c7199 load on device 'metal:0' took 942.26 ms  (compiled)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked_rcm e0b9b99 load on device 'metal:0' took 943.84 ms  (compiled)
+E
+======================================================================
+ERROR: test_solve_with_fewer_threads_than_tile_rows (newton._src.solvers.kamino.tests.test_linalg_solver_llt_blocked_rcm.TestLinAlgLLTBlockedRCMSolver.test_solve_with_fewer_threads_than_tile_rows)
+Verify the solve gathers every right-hand-side row.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked_rcm.py", line 274, in test_solve_with_fewer_threads_than_tile_rows
+    solver.compute(matrix_wp)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+    self._compute_impl(A=A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+    self._factorize(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+    self._factorize_impl(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked_rcm_solver.py", line 401, in _factorize_impl
+    llt_blocked_rcm_factorize(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked_rcm.py", line 824, in llt_blocked_rcm_factorize
+    wp.launch_tiled(
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+    return launch(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+    raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
+RuntimeError: Failed to launch kernel 'make_llt_blocked_rcm_factorize_kernel__locals__llt_blocked_rcm_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, tpo=array_t, A=array_t, tile_pattern=array_t, L=array_t)
+
+======================================================================
+FAIL: test_01_single_problem_dims_all_active (newton._src.solvers.kamino.tests.test_linalg_solver_llt_blocked_rcm.TestLinAlgLLTBlockedRCMSolver.test_01_single_problem_dims_all_active)
+Test the blocked LLT solver on a single small problem.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked_rcm.py", line 372, in test_01_single_problem_dims_all_active
+    self.assertTrue(is_x_close)
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_02_single_problem_dims_partially_active (newton._src.solvers.kamino.tests.test_linalg_solver_llt_blocked_rcm.TestLinAlgLLTBlockedRCMSolver.test_02_single_problem_dims_partially_active)
+Test the blocked LLT solver on a single small problem.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked_rcm.py", line 492, in test_02_single_problem_dims_partially_active
+    self.assertTrue(is_x_close)
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_04_multiple_problems_dims_partially_active (newton._src.solvers.kamino.tests.test_linalg_solver_llt_blocked_rcm.TestLinAlgLLTBlockedRCMSolver.test_04_multiple_problems_dims_partially_active)
+Test the blocked LLT solver on multiple small problems.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked_rcm.py", line 744, in test_04_multiple_problems_dims_partially_active
+    self.assertTrue(is_x_close)
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_cached_permutation_with_changed_sparsity (newton._src.solvers.kamino.tests.test_linalg_solver_llt_blocked_rcm.TestLinAlgLLTBlockedRCMSolver.test_cached_permutation_with_changed_sparsity)
+Verify cached RCM remains correct when numeric sparsity changes.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked_rcm.py", line 167, in test_cached_permutation_with_changed_sparsity
+    np.testing.assert_allclose(result_wp.numpy(), expected, rtol=1.0e-3, atol=1.0e-4)
+  File "/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 1780, in assert_allclose
+    assert_array_compare(compare, actual, desired, err_msg=str(err_msg),
+  File "/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 988, in assert_array_compare
+    raise AssertionError(msg)
+AssertionError: 
+Not equal to tolerance rtol=0.001, atol=0.0001
+
+Mismatched elements: 34 / 96 (35.4%)
+First 5 mismatches are at indices:
+ [32]: -0.1297406256198883 (ACTUAL), -0.1478486955165863 (DESIRED)
+ [33]: 0.32106003165245056 (ACTUAL), 0.33521655201911926 (DESIRED)
+ [34]: 0.20582172274589539 (ACTUAL), 0.1963115781545639 (DESIRED)
+ [35]: -0.37264564633369446 (ACTUAL), -0.37727317214012146 (DESIRED)
+ [36]: 0.5358198881149292 (ACTUAL), 0.5478470921516418 (DESIRED)
+Max absolute difference among violations: 0.0298118
+Max relative difference among violations: 0.26320222
+ ACTUAL: array([-0.605902,  0.626897, -0.346404, -0.607976,  0.117371,  0.211472, -0.622196,  0.089916,  0.337008,  0.112531,  0.180477, -0.534315,  0.039547, -0.060075, -0.101531,  0.346806,  0.538905,  0.804148,  0.419976,  0.027498,  0.118003,  0.337272,  0.063009,  0.085894,  0.262615,  0.089315, -0.246652, -0.10663 ,  0.251201,  0.029479,  0.153034,  0.275617, -0.129741,  0.32106 ,  0.205822, -0.372646,  0.53582 , -0.252075, -0.642992, -0.413947, -0.365584, -0.078862, -0.114623, -0.162048,  0.30286 ,  0.087309,  0.088821,  0.180569,  0.29303 , -0.664027, -0.256043, -0.732212,  0.027777,  0.024339,  0.45    ,  0.47015 ,  0.030398, -0.172663,  0.132355, -0.233012, -0.023197,  0.359297, -0.194062,  0.295602,  0.262403, -0.319049,  0.26491 ,  0.179982,  0.056465, -0.194677, -0.359618, -0.19049 ,  0.211521, -0.366113,  0.169305, -0.341229, -0.087666, -0.027711,  0.856318, -0.359053,  0.544228,  0.060896,  0.119557, -0.004049,  0.289511, -0.003861,  0.49134 , -0.124882,  0.331197, -0.286849,  0.07015 , -0.369737,  0.280255,  0.596137, -0.051433, -0.077835], dtype=float32)
+ DESIRED: array([-0.605902,  0.626897, -0.346404, -0.607976,  0.117371,  0.211473, -0.622196,  0.089916,  0.337008,  0.112531,  0.180477, -0.534315,  0.039547, -0.060075, -0.101531,  0.346806,  0.538904,  0.804148,  0.419976,  0.027498,  0.118003,  0.337272,  0.063009,  0.085894,  0.262615,  0.089315, -0.246652, -0.10663 ,  0.251201,  0.029479,  0.153034,  0.275617, -0.147849,  0.335217,  0.196312, -0.377273,  0.547847, -0.232551, -0.658563, -0.391022, -0.354608, -0.080451, -0.116494, -0.160094,  0.300138,  0.086633,  0.087188,  0.178114,  0.292894, -0.664014, -0.255774, -0.732352,  0.027603,  0.024242,  0.450026,  0.470024,  0.030434, -0.172648,  0.132375, -0.232999, -0.02322 ,  0.359307, -0.19406 ,  0.295593,  0.280863, -0.289237,  0.254884,  0.209033,  0.076636, -0.1816  , -0.348226, -0.183395,  0.220925, -0.367637,  0.174097, -0.343248, -0.08614 , -0.026533,  0.855899, -0.360416,  0.543907,  0.061016,  0.119852, -0.003885,  0.289439, -0.003848,  0.491282, -0.124808,  0.331166, -0.286853,  0.070136, -0.369709,  0.280245,  0.596145, -0.051431, -0.077835], dtype=float32)
+
+======================================================================
+FAIL: test_parallel_factorization_with_partial_tile (newton._src.solvers.kamino.tests.test_linalg_solver_llt_blocked_rcm.TestLinAlgLLTBlockedRCMSolver.test_parallel_factorization_with_partial_tile)
+Factorize and solve a system whose final tile is partial.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked_rcm.py", line 195, in test_parallel_factorization_with_partial_tile
+    np.testing.assert_allclose(result_wp.numpy(), expected, rtol=1.0e-4, atol=1.0e-5)
+  File "/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 1780, in assert_allclose
+    assert_array_compare(compare, actual, desired, err_msg=str(err_msg),
+  File "/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 988, in assert_array_compare
+    raise AssertionError(msg)
+AssertionError: 
+Not equal to tolerance rtol=0.0001, atol=1e-05
+
+Mismatched elements: 4 / 33 (12.1%)
+Mismatch at indices:
+ [1]: 0.5819889307022095 (ACTUAL), 0.6559112071990967 (DESIRED)
+ [2]: 0.6559112071990967 (ACTUAL), 0.6653005480766296 (DESIRED)
+ [3]: 0.6653005480766296 (ACTUAL), 0.6664931178092957 (DESIRED)
+ [4]: 0.6664931774139404 (ACTUAL), 0.6666446328163147 (DESIRED)
+Max absolute difference among violations: 0.07392228
+Max relative difference among violations: 0.112701654
+ ACTUAL: array([0.581989, 0.581989, 0.655911, 0.665301, 0.666493, 0.666645, 0.666664, 0.666666, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666666, 0.666664, 0.666645, 0.666493, 0.6653  , 0.655911, 0.581989], dtype=float32)
+ DESIRED: array([0.581989, 0.655911, 0.665301, 0.666493, 0.666645, 0.666664, 0.666666, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666666, 0.666664, 0.666645, 0.666493, 0.665301, 0.655911, 0.581989], dtype=float32)
+
+----------------------------------------------------------------------
+Ran 11 tests in 4.795s
+
+FAILED (failures=5, errors=1, skipped=1)
+MODULE test_linalg_solver_llt_blocked_rcm: ran=11 fail=5 err=1 skip=1 (5 s)
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.011s
+
+OK
+MODULE test_linalg_solver_llt_sequential: ran=5 fail=0 err=0 skip=0 (0 s)
+.........Module newton._src.solvers.kamino._src.linalg.blas 311fb6b load on device 'metal:0' took 423.32 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 78ba7a4 load on device 'metal:0' took 429.38 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas ce1d58f load on device 'metal:0' took 431.67 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 047572a load on device 'metal:0' took 436.59 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 4bdc3ff load on device 'metal:0' took 447.89 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas af86bd4 load on device 'metal:0' took 450.75 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 2c64e6b load on device 'metal:0' took 450.84 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 746a442 load on device 'metal:0' took 463.31 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas e3f90de load on device 'metal:0' took 459.47 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 9f74da6 load on device 'metal:0' took 482.36 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas c019ef8 load on device 'metal:0' took 490.08 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 98f2455 load on device 'metal:0' took 487.06 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 1f1db40 load on device 'metal:0' took 485.83 ms  (cached)
+..Module newton._src.solvers.kamino._src.linalg.blas dbe0085 load on device 'metal:0' took 519.69 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas f2ed8e6 load on device 'metal:0' took 517.23 ms  (cached)
+.
+----------------------------------------------------------------------
+Ran 12 tests in 8.874s
+
+OK
+MODULE test_linalg_sparse: ran=12 fail=0 err=0 skip=0 (9 s)
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+OK
+MODULE test_linalg_utils_matrix: ran=1 fail=0 err=0 skip=0 (0 s)
+./Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/linalg/_linalg.py:2349: RuntimeWarning: divide by zero encountered in slogdet
+  sign, logdet = _umath_linalg.slogdet(a, signature=signature)
+/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/linalg/_linalg.py:2349: RuntimeWarning: overflow encountered in slogdet
+  sign, logdet = _umath_linalg.slogdet(a, signature=signature)
+/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/linalg/_linalg.py:2349: RuntimeWarning: invalid value encountered in slogdet
+  sign, logdet = _umath_linalg.slogdet(a, signature=signature)
+...................
+----------------------------------------------------------------------
+Ran 20 tests in 2.378s
+
+OK
+MODULE test_linalg_utils_rand: ran=20 fail=0 err=0 skip=0 (2 s)
+..........Module newton._src.solvers.kamino.tests.test_solver_kamino 3ab8f6d load on device 'metal:0' took 342.97 ms  (compiled)
+Module make_desaxce_correction_and_velocity_bias_kernel__locals___compute_desaxce_correction_and_velocity_bias_45adaaf9 45adaaf load on device 'metal:0' took 357.73 ms  (compiled)
+Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_bf13abc5 18356f5 load on device 'metal:0' took 466.07 ms  (compiled)
+.....Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_d044839c e498747 load on device 'metal:0' took 460.32 ms  (compiled)
+..Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_030535f0 2745c00 load on device 'metal:0' took 475.94 ms  (compiled)
+.
+----------------------------------------------------------------------
+Ran 18 tests in 15.945s
+
+OK
+MODULE test_solver_kamino: ran=18 fail=0 err=0 skip=0 (16 s)
+/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solver_kamino_joint_frames.py:135: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  model = builder.finalize()
+[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:53,596][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+./Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solver_kamino_joint_frames.py:71: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  return builder.finalize()
+[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:53,602][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:53,609][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:53,621][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:53,630][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_824dc0b3 824dc0b load on device 'metal:0' took 467.09 ms  (compiled)
+.
+----------------------------------------------------------------------
+Ran 5 tests in 0.646s
+
+OK
+MODULE test_solver_kamino_joint_frames: ran=5 fail=0 err=0 skip=0 (1 s)
+[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:54,247][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:54,278][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:54,305][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:54,325][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:54,342][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:54,361][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:54,377][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:54,395][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:54,413][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:54,434][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:54,451][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:54,470][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:54,487][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:54,505][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:54,522][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:54,540][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:54,573][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:54,593][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:54,614][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+....[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:54,714][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:54,735][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:54,751][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+Module newton._src.solvers.kamino._src.solvers.fk.kernels_tile_1d ad95916 load on device 'metal:0' took 449.08 ms  (cached)
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:55,234][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:55,248][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:55,270][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:55,310][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:55,329][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:55,347][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:55,478][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:55,498][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:55,515][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:55,532][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:55,545][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:55,557][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:55,594][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:55,612][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:55,629][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+.
+----------------------------------------------------------------------
+Ran 30 tests in 1.402s
+
+OK
+MODULE test_solver_kamino_notify: ran=30 fail=0 err=0 skip=0 (1 s)
+.Warning: Kamino contact capacity exceeded. Increase collision_detector.max_contacts_per_world.
+Module newton._src.solvers.kamino._src.solvers.dvi.kernels 08203a0 load on device 'metal:0' took 483.64 ms  (compiled)
+Module newton._src.solvers.kamino._src.solvers.dvi.sparse_kernels 133b45c load on device 'metal:0' took 530.28 ms  (compiled)
+Module newton._src.solvers.kamino._src.solvers.dvi.kernels 302fe99 load on device 'metal:0' took 489.64 ms  (compiled)
+....Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes
+E.[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:57,454][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes
+E...Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes
+EKernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes
+EKernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes
+EKernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes
+EKernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes
+E...Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes
+Module newton._src.solvers.kamino._src.solvers.metrics 95c5e90 load on device 'metal:0' took 578.22 ms  (compiled)
+Module newton._src.solvers.kamino._src.solvers.dvi.sparse_kernels e5e8897 load on device 'metal:0' took 545.42 ms  (compiled)
+EKernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes
+EKernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes
+EKernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes
+E...Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes
+E.....Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes
+EKernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes
+E..Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes
+E[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:01:40,688][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes
+E[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:01:40,712][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes
+E[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:01:40,894][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes
+Es..Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes
+EKernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes
+E...sss[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:01:48,550][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes
+E
+======================================================================
+ERROR: test_01_dvi_solve_dense_dual_problem (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_01_dvi_solve_dense_dual_problem)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 540, in test_01_dvi_solve_dense_dual_problem
+    solver.solve(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+    self._solve_with_bilateral_direct_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+    self._factor_bilateral_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+    self._bilateral_solver.compute(A=operator.mat)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+    self._compute_impl(A=A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+    self._factorize(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+    self._factorize_impl(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+    factorize.llt_blocked_factorize(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+    wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+    return launch(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+    raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
+RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+
+======================================================================
+ERROR: test_02_public_solver_step_with_dvi (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_02_public_solver_step_with_dvi)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 607, in test_02_public_solver_step_with_dvi
+    solver.step(state_in, state_out, control=None, contacts=None, dt=1e-3)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/solver_kamino.py", line 1000, in step
+    self._solver_kamino.step(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 716, in step
+    self._integrator.integrate(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/integrators/euler.py", line 250, in integrate
+    forward(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1134, in _solve_forward_dynamics
+    self._forward(contacts=contacts)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1070, in _forward
+    self._update_constraints(contacts=contacts)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1022, in _update_constraints
+    self._solver_fd.solve(problem=self._problem_fd)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+    self._solve_with_bilateral_direct_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+    self._factor_bilateral_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+    self._bilateral_solver.compute(A=operator.mat)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+    self._compute_impl(A=A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+    self._factorize(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+    self._factorize_impl(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+    factorize.llt_blocked_factorize(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+    wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+    return launch(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+    raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
+RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+
+======================================================================
+ERROR: test_03d1_sparse_dvi_honors_per_world_bilateral_intervals (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03d1_sparse_dvi_honors_per_world_bilateral_intervals)
+Restrict sparse bilateral re-solves to each world's configured interval.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 997, in test_03d1_sparse_dvi_honors_per_world_bilateral_intervals
+    solver.solve(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 435, in solve
+    self._sparse_path.solve(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 105, in solve
+    _solve_sparse_with_bilateral_direct_block(self, problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 471, in _solve_sparse_with_bilateral_direct_block
+    _factor_sparse_bilateral_block(path, problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 372, in _factor_sparse_bilateral_block
+    path.bilateral_solver.compute(A=operator.mat)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+    self._compute_impl(A=A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+    self._factorize(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+    self._factorize_impl(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+    factorize.llt_blocked_factorize(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+    wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+    return launch(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+    raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
+RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+
+======================================================================
+ERROR: test_03d2_dvi_direct_block_finishes_with_bilateral_solve (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03d2_dvi_direct_block_finishes_with_bilateral_solve)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1043, in test_03d2_dvi_direct_block_finishes_with_bilateral_solve
+    solver.solve(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+    self._solve_with_bilateral_direct_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+    self._factor_bilateral_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+    self._bilateral_solver.compute(A=operator.mat)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+    self._compute_impl(A=A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+    self._factorize(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+    self._factorize_impl(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+    factorize.llt_blocked_factorize(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+    wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+    return launch(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+    raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
+RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+
+======================================================================
+ERROR: test_03d_dvi_direct_block_honors_per_world_iteration_counts (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03d_dvi_direct_block_honors_per_world_iteration_counts)
+Honor each world's projected and bilateral iteration schedule.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 943, in test_03d_dvi_direct_block_honors_per_world_iteration_counts
+    normal_sums = solve_normal_sums()
+                  ^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 921, in solve_normal_sums
+    solver.solve(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+    self._solve_with_bilateral_direct_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+    self._factor_bilateral_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+    self._bilateral_solver.compute(A=operator.mat)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+    self._compute_impl(A=A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+    self._factorize(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+    self._factorize_impl(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+    factorize.llt_blocked_factorize(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+    wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+    return launch(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+    raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
+RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+
+======================================================================
+ERROR: test_03e_dvi_direct_block_no_unilateral_rows_reports_single_iteration (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03e_dvi_direct_block_no_unilateral_rows_reports_single_iteration)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1090, in test_03e_dvi_direct_block_no_unilateral_rows_reports_single_iteration
+    solver.solve(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+    self._solve_with_bilateral_direct_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+    self._factor_bilateral_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+    self._bilateral_solver.compute(A=operator.mat)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+    self._compute_impl(A=A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+    self._factorize(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+    self._factorize_impl(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+    factorize.llt_blocked_factorize(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+    wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+    return launch(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+    raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
+RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+
+======================================================================
+ERROR: test_03f_dvi_bilateral_only_solve_resets_stale_status (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03f_dvi_bilateral_only_solve_resets_stale_status)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1145, in test_03f_dvi_bilateral_only_solve_resets_stale_status
+    solver.solve(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+    self._solve_with_bilateral_direct_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+    self._factor_bilateral_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+    self._bilateral_solver.compute(A=operator.mat)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+    self._compute_impl(A=A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+    self._factorize(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+    self._factorize_impl(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+    factorize.llt_blocked_factorize(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+    wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+    return launch(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+    raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
+RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+
+======================================================================
+ERROR: test_03h_dvi_canonical_contact_solution_metrics (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03h_dvi_canonical_contact_solution_metrics) (builder='build_boxes_hinged', sparse=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 2087, in test_03h_dvi_canonical_contact_solution_metrics
+    solver = _solve_dvi(test.model, test.problem, config=config, setup=test)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 225, in _solve_dvi
+    solver.solve(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+    self._solve_with_bilateral_direct_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+    self._factor_bilateral_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+    self._bilateral_solver.compute(A=operator.mat)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+    self._compute_impl(A=A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+    self._factorize(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+    self._factorize_impl(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+    factorize.llt_blocked_factorize(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+    wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+    return launch(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+    raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
+RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+
+======================================================================
+ERROR: test_03h_dvi_canonical_contact_solution_metrics (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03h_dvi_canonical_contact_solution_metrics) (builder='build_boxes_hinged', sparse=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 2087, in test_03h_dvi_canonical_contact_solution_metrics
+    solver = _solve_dvi(test.model, test.problem, config=config, setup=test)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 225, in _solve_dvi
+    solver.solve(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 435, in solve
+    self._sparse_path.solve(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 105, in solve
+    _solve_sparse_with_bilateral_direct_block(self, problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 471, in _solve_sparse_with_bilateral_direct_block
+    _factor_sparse_bilateral_block(path, problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 372, in _factor_sparse_bilateral_block
+    path.bilateral_solver.compute(A=operator.mat)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+    self._compute_impl(A=A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+    self._factorize(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+    self._factorize_impl(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+    factorize.llt_blocked_factorize(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+    wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+    return launch(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+    raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
+RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+
+======================================================================
+ERROR: test_03i_dvi_coldstart_is_repeatable (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03i_dvi_coldstart_is_repeatable) (sparse=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1303, in test_03i_dvi_coldstart_is_repeatable
+    solver = _solve_dvi(test.model, test.problem, config=config, setup=test)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 225, in _solve_dvi
+    solver.solve(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+    self._solve_with_bilateral_direct_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+    self._factor_bilateral_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+    self._bilateral_solver.compute(A=operator.mat)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+    self._compute_impl(A=A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+    self._factorize(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+    self._factorize_impl(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+    factorize.llt_blocked_factorize(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+    wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+    return launch(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+    raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
+RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+
+======================================================================
+ERROR: test_03i_dvi_coldstart_is_repeatable (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03i_dvi_coldstart_is_repeatable) (sparse=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1303, in test_03i_dvi_coldstart_is_repeatable
+    solver = _solve_dvi(test.model, test.problem, config=config, setup=test)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 225, in _solve_dvi
+    solver.solve(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 435, in solve
+    self._sparse_path.solve(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 105, in solve
+    _solve_sparse_with_bilateral_direct_block(self, problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 471, in _solve_sparse_with_bilateral_direct_block
+    _factor_sparse_bilateral_block(path, problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 372, in _factor_sparse_bilateral_block
+    path.bilateral_solver.compute(A=operator.mat)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+    self._compute_impl(A=A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+    self._factorize(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+    self._factorize_impl(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+    factorize.llt_blocked_factorize(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+    wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+    return launch(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+    raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
+RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+
+======================================================================
+ERROR: test_04_dvi_solve_active_joint_limit (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_04_dvi_solve_active_joint_limit)
+Resolve an active joint limit through the inequality solver.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1341, in test_04_dvi_solve_active_joint_limit
+    solver = _solve_dvi(
+             ^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 225, in _solve_dvi
+    solver.solve(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+    self._solve_with_bilateral_direct_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+    self._factor_bilateral_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+    self._bilateral_solver.compute(A=operator.mat)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+    self._compute_impl(A=A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+    self._factorize(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+    self._factorize_impl(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+    factorize.llt_blocked_factorize(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+    wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+    return launch(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+    raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
+RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+
+======================================================================
+ERROR: test_05d_dvi_colors_contacts_with_joint_limits (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_05d_dvi_colors_contacts_with_joint_limits) (sparse=False)
+Solve contacts and joint limits through one colored inequality path.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1847, in test_05d_dvi_colors_contacts_with_joint_limits
+    solver = _solve_dvi(
+             ^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 225, in _solve_dvi
+    solver.solve(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+    self._solve_with_bilateral_direct_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+    self._factor_bilateral_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+    self._bilateral_solver.compute(A=operator.mat)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+    self._compute_impl(A=A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+    self._factorize(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+    self._factorize_impl(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+    factorize.llt_blocked_factorize(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+    wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+    return launch(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+    raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
+RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+
+======================================================================
+ERROR: test_05d_dvi_colors_contacts_with_joint_limits (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_05d_dvi_colors_contacts_with_joint_limits) (sparse=True)
+Solve contacts and joint limits through one colored inequality path.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1847, in test_05d_dvi_colors_contacts_with_joint_limits
+    solver = _solve_dvi(
+             ^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 225, in _solve_dvi
+    solver.solve(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 435, in solve
+    self._sparse_path.solve(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 105, in solve
+    _solve_sparse_with_bilateral_direct_block(self, problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 471, in _solve_sparse_with_bilateral_direct_block
+    _factor_sparse_bilateral_block(path, problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 372, in _factor_sparse_bilateral_block
+    path.bilateral_solver.compute(A=operator.mat)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+    self._compute_impl(A=A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+    self._factorize(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+    self._factorize_impl(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+    factorize.llt_blocked_factorize(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+    wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+    return launch(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+    raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
+RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+
+======================================================================
+ERROR: test_07_dvi_singular_limit_rows_remain_finite (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_07_dvi_singular_limit_rows_remain_finite)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1379, in test_07_dvi_singular_limit_rows_remain_finite
+    solver = _solve_dvi(
+             ^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 225, in _solve_dvi
+    solver.solve(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+    self._solve_with_bilateral_direct_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+    self._factor_bilateral_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+    self._bilateral_solver.compute(A=operator.mat)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+    self._compute_impl(A=A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+    self._factorize(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+    self._factorize_impl(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+    factorize.llt_blocked_factorize(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+    wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+    return launch(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+    raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
+RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+
+======================================================================
+ERROR: test_08_public_solver_short_rollout_with_dvi (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_08_public_solver_short_rollout_with_dvi)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1432, in test_08_public_solver_short_rollout_with_dvi
+    solver.step(state_in, state_out, control=None, contacts=None, dt=1e-3)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/solver_kamino.py", line 1000, in step
+    self._solver_kamino.step(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 716, in step
+    self._integrator.integrate(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/integrators/euler.py", line 250, in integrate
+    forward(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1134, in _solve_forward_dynamics
+    self._forward(contacts=contacts)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1070, in _forward
+    self._update_constraints(contacts=contacts)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1022, in _update_constraints
+    self._solver_fd.solve(problem=self._problem_fd)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+    self._solve_with_bilateral_direct_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+    self._factor_bilateral_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+    self._bilateral_solver.compute(A=operator.mat)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+    self._compute_impl(A=A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+    self._factorize(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+    self._factorize_impl(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+    factorize.llt_blocked_factorize(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+    wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+    return launch(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+    raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
+RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+
+======================================================================
+ERROR: test_08a_public_solver_heterogeneous_contact_rollout_with_dvi (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_08a_public_solver_heterogeneous_contact_rollout_with_dvi) (sparse=False)
+Use Cholesky for heterogeneous dense and sparse DVI rollouts.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1465, in test_08a_public_solver_heterogeneous_contact_rollout_with_dvi
+    solver.step(state_in, state_out, control=control, contacts=None, dt=1.0e-3)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/solver_kamino.py", line 1000, in step
+    self._solver_kamino.step(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 716, in step
+    self._integrator.integrate(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/integrators/euler.py", line 250, in integrate
+    forward(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1134, in _solve_forward_dynamics
+    self._forward(contacts=contacts)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1070, in _forward
+    self._update_constraints(contacts=contacts)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1022, in _update_constraints
+    self._solver_fd.solve(problem=self._problem_fd)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+    self._solve_with_bilateral_direct_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+    self._factor_bilateral_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+    self._bilateral_solver.compute(A=operator.mat)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+    self._compute_impl(A=A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+    self._factorize(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+    self._factorize_impl(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+    factorize.llt_blocked_factorize(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+    wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+    return launch(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+    raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
+RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+
+======================================================================
+ERROR: test_08a_public_solver_heterogeneous_contact_rollout_with_dvi (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_08a_public_solver_heterogeneous_contact_rollout_with_dvi) (sparse=True)
+Use Cholesky for heterogeneous dense and sparse DVI rollouts.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1465, in test_08a_public_solver_heterogeneous_contact_rollout_with_dvi
+    solver.step(state_in, state_out, control=control, contacts=None, dt=1.0e-3)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/solver_kamino.py", line 1000, in step
+    self._solver_kamino.step(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 716, in step
+    self._integrator.integrate(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/integrators/euler.py", line 250, in integrate
+    forward(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1134, in _solve_forward_dynamics
+    self._forward(contacts=contacts)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1070, in _forward
+    self._update_constraints(contacts=contacts)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1022, in _update_constraints
+    self._solver_fd.solve(problem=self._problem_fd)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 435, in solve
+    self._sparse_path.solve(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 105, in solve
+    _solve_sparse_with_bilateral_direct_block(self, problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 471, in _solve_sparse_with_bilateral_direct_block
+    _factor_sparse_bilateral_block(path, problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 372, in _factor_sparse_bilateral_block
+    path.bilateral_solver.compute(A=operator.mat)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+    self._compute_impl(A=A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+    self._factorize(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+    self._factorize_impl(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+    factorize.llt_blocked_factorize(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+    wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+    return launch(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+    raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
+RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+
+======================================================================
+ERROR: test_08d3_dvi_friction_propagates_through_fixed_joint (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_08d3_dvi_friction_propagates_through_fixed_joint) (sparse=False)
+Converge articulated contact friction at a 2 kHz step rate.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 2335, in test_08d3_dvi_friction_propagates_through_fixed_joint
+    solver.step(state_0, state_1, control=None, contacts=None, dt=dt)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/solver_kamino.py", line 1000, in step
+    self._solver_kamino.step(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 716, in step
+    self._integrator.integrate(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/integrators/euler.py", line 250, in integrate
+    forward(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1134, in _solve_forward_dynamics
+    self._forward(contacts=contacts)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1070, in _forward
+    self._update_constraints(contacts=contacts)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1022, in _update_constraints
+    self._solver_fd.solve(problem=self._problem_fd)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+    self._solve_with_bilateral_direct_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+    self._factor_bilateral_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+    self._bilateral_solver.compute(A=operator.mat)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+    self._compute_impl(A=A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+    self._factorize(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+    self._factorize_impl(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+    factorize.llt_blocked_factorize(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+    wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+    return launch(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+    raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
+RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+
+======================================================================
+ERROR: test_08d3_dvi_friction_propagates_through_fixed_joint (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_08d3_dvi_friction_propagates_through_fixed_joint) (sparse=True)
+Converge articulated contact friction at a 2 kHz step rate.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 2335, in test_08d3_dvi_friction_propagates_through_fixed_joint
+    solver.step(state_0, state_1, control=None, contacts=None, dt=dt)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/solver_kamino.py", line 1000, in step
+    self._solver_kamino.step(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 716, in step
+    self._integrator.integrate(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/integrators/euler.py", line 250, in integrate
+    forward(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1134, in _solve_forward_dynamics
+    self._forward(contacts=contacts)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1070, in _forward
+    self._update_constraints(contacts=contacts)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1022, in _update_constraints
+    self._solver_fd.solve(problem=self._problem_fd)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 435, in solve
+    self._sparse_path.solve(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 105, in solve
+    _solve_sparse_with_bilateral_direct_block(self, problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 471, in _solve_sparse_with_bilateral_direct_block
+    _factor_sparse_bilateral_block(path, problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 372, in _factor_sparse_bilateral_block
+    path.bilateral_solver.compute(A=operator.mat)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+    self._compute_impl(A=A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+    self._factorize(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+    self._factorize_impl(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+    factorize.llt_blocked_factorize(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+    wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+    return launch(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+    raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
+RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+
+======================================================================
+ERROR: test_12_dvi_opening_contact_releases_warmstarted_force (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_12_dvi_opening_contact_releases_warmstarted_force)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 2040, in test_12_dvi_opening_contact_releases_warmstarted_force
+    solver.step(state_0, state_1, control=None, contacts=None, dt=1e-3)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/solver_kamino.py", line 1000, in step
+    self._solver_kamino.step(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 716, in step
+    self._integrator.integrate(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/integrators/euler.py", line 250, in integrate
+    forward(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1134, in _solve_forward_dynamics
+    self._forward(contacts=contacts)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1070, in _forward
+    self._update_constraints(contacts=contacts)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1022, in _update_constraints
+    self._solver_fd.solve(problem=self._problem_fd)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+    self._solve_with_bilateral_direct_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+    self._factor_bilateral_block(problem)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+    self._bilateral_solver.compute(A=operator.mat)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+    self._compute_impl(A=A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+    self._factorize(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+    self._factorize_impl(A, **kwargs)
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+    factorize.llt_blocked_factorize(
+  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+    wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+    return launch(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+    raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
+RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+
+----------------------------------------------------------------------
+Ran 47 tests in 53.117s
+
+FAILED (errors=21, skipped=4)
+MODULE test_solvers_dvi: ran=47 fail=0 err=21 skip=4 (53 s)
+Module create_eval_min_num_iterations_kernel__locals___eval_min_num_iterations_97c062a0 32badfc load on device 'metal:0' took 326.74 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.fk.kernels 06aef86 load on device 'metal:0' took 999.33 ms  (compiled)
+Module newton._src.solvers.kamino._src.linalg.sparse_matrix 5c15987 load on device 'metal:0' took 308.04 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 8ee35a7 load on device 'metal:0' took 525.76 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas e1a50d7 load on device 'metal:0' took 525.58 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 678508f load on device 'metal:0' took 527.61 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 20baae9 load on device 'metal:0' took 524.62 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.conjugate efb5f6e load on device 'metal:0' took 327.54 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 94f9e08 load on device 'metal:0' took 539.95 ms  (cached)
+..[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:01:58,115][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+Module create_eval_min_num_iterations_kernel__locals___eval_min_num_iterations_deb74d94 19dc0d4 load on device 'metal:0' took 315.57 ms  (cached)
+.Module newton._src.solvers.kamino._src.solvers.fk.kernels_tile_1d 6f998f9 load on device 'metal:0' took 509.17 ms  (cached)
+Module create_eval_min_num_iterations_kernel__locals___eval_min_num_iterations_665592db 7164379 load on device 'metal:0' took 311.96 ms  (cached)
+.Module newton._src.solvers.kamino._src.solvers.fk.kernels 3297f9a load on device 'metal:0' took 1176.32 ms  (compiled)
+Module newton._src.solvers.kamino._src.solvers.fk.kernels_tile_1d 9800c30 load on device 'metal:0' took 576.19 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.fk.kernels cf33e15 load on device 'metal:0' took 1284.90 ms  (compiled)
+......[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:03:01,507][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+...
+----------------------------------------------------------------------
+Ran 13 tests in 72.964s
+
+OK
+MODULE test_solvers_forward_kinematics: ran=13 fail=0 err=0 skip=0 (73 s)
+...Module newton._src.solvers.kamino._src.solvers.padmm.kernels 888b5fc load on device 'metal:0' took 625.28 ms  (compiled)
+Module make_desaxce_correction_and_velocity_bias_kernel__locals___compute_desaxce_correction_and_velocity_bias_6186a688 6186a68 load on device 'metal:0' took 358.54 ms  (compiled)
+Module _make_compute_infnorm_residuals_kernel__locals___compute_infnorm_residuals_a5c6c6b5 ae49d31 load on device 'metal:0' took 427.38 ms  (compiled)
+.Module _make_compute_infnorm_residuals_kernel__locals___compute_infnorm_residuals_8e299883 ab3ef8b load on device 'metal:0' took 421.98 ms  (compiled)
+.....
+----------------------------------------------------------------------
+Ran 9 tests in 2.642s
+
+OK
+MODULE test_solvers_metrics: ran=9 fail=0 err=0 skip=0 (3 s)
+...Module newton._src.solvers.kamino._src.solvers.padmm.kernels eda300c load on device 'metal:0' took 19.08 ms  (cached)
+.Module newton._src.solvers.kamino._src.solvers.padmm.kernels 888b5fc load on device 'metal:0' took 18.63 ms  (cached)
+..Module newton._src.solvers.kamino._src.solvers.padmm.kernels eda300c load on device 'metal:0' took 18.57 ms  (cached)
+...
+----------------------------------------------------------------------
+Ran 9 tests in 0.380s
+
+OK
+MODULE test_solvers_padmm: ran=9 fail=0 err=0 skip=0 (0 s)
+.Module newton._src.solvers.kamino._src.utils.control.animation 5631298 load on device 'metal:0' took 349.55 ms  (compiled)
+....
+----------------------------------------------------------------------
+Ran 5 tests in 3.684s
+
+OK
+MODULE test_utils_control_animation: ran=5 fail=0 err=0 skip=0 (4 s)
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.000s
+
+OK
+MODULE test_utils_control_pid: ran=1 fail=0 err=0 skip=0 (0 s)
+.Module newton._src.solvers.kamino._src.utils.control.rand 9e7664d load on device 'metal:0' took 353.84 ms  (compiled)
+..
+----------------------------------------------------------------------
+Ran 3 tests in 0.373s
+
+OK
+MODULE test_utils_control_rand: ran=3 fail=0 err=0 skip=0 (0 s)
+.............................................
+.
+.
+.
+.........
+----------------------------------------------------------------------
+Ran 57 tests in 0.665s
+
+OK
+MODULE test_utils_io_usd: ran=57 fail=0 err=0 skip=0 (1 s)
+[38;5;13m[KAMINO][0m[34;20m[2026-09-26 00:03:09,487][logger.py:139][DEBUG]: Log level set to: DEBUG[0m
+[38;5;13m[KAMINO][0m[34;20m[2026-09-26 00:03:09,487][test_utils_logger.py:39][DEBUG]: This is a debug message.[0m
+[38;5;13m[KAMINO][0m[37m[2026-09-26 00:03:09,487][test_utils_logger.py:40][INFO]: This is an info message.[0m
+[38;5;13m[KAMINO][0m[32;20m[2026-09-26 00:03:09,487][test_utils_logger.py:41][NOTIF]: This is a notification message.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:03:09,487][test_utils_logger.py:42][WARNING]: This is a warning message.[0m
+[38;5;13m[KAMINO][0m[31;20m[2026-09-26 00:03:09,487][test_utils_logger.py:43][ERROR]: This is an error message.[0m
+[38;5;13m[KAMINO][0m[31;1m[2026-09-26 00:03:09,487][test_utils_logger.py:44][CRITICAL]: This is a critical message.[0m
+
+.[38;5;13m[KAMINO][0m[34;20m[2026-09-26 00:03:09,487][logger.py:139][DEBUG]: Log level set to: DEBUG[0m
+[38;5;13m[KAMINO][0m[34;20m[2026-09-26 00:03:09,487][test_utils_logger.py:28][DEBUG]: This is a debug message.[0m
+[38;5;13m[KAMINO][0m[37m[2026-09-26 00:03:09,487][test_utils_logger.py:29][INFO]: This is an info message.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:03:09,487][test_utils_logger.py:30][WARNING]: This is a warning message.[0m
+[38;5;13m[KAMINO][0m[31;20m[2026-09-26 00:03:09,487][test_utils_logger.py:31][ERROR]: This is an error message.[0m
+[38;5;13m[KAMINO][0m[31;1m[2026-09-26 00:03:09,487][test_utils_logger.py:32][CRITICAL]: This is a critical message.[0m
+
+.
+----------------------------------------------------------------------
+Ran 2 tests in 0.000s
+
+OK
+MODULE test_utils_logger: ran=2 fail=0 err=0 skip=0 (0 s)
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.001s
+
+OK
+MODULE test_utils_profiles: ran=5 fail=0 err=0 skip=0 (0 s)
+.........
+----------------------------------------------------------------------
+Ran 9 tests in 0.004s
+
+OK
+MODULE test_utils_random: ran=9 fail=0 err=0 skip=0 (0 s)
+Module newton._src.solvers.kamino.tests.test_utils_sim_simulator 3ab8f6d load on device 'metal:0' took 357.21 ms  (compiled)
+Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_f077b563 081d5c5 load on device 'metal:0' took 476.88 ms  (compiled)
+..
+----------------------------------------------------------------------
+Ran 2 tests in 14.623s
+
+OK
+MODULE test_utils_sim_simulator: ran=2 fail=0 err=0 skip=0 (15 s)
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.006s
+
+OK
+MODULE test_utils_world_equivalence: ran=1 fail=0 err=0 skip=0 (0 s)
+
+=== device metal:0, 252 s
+test_core_builder                                       ran=26 fail=0 err=0 skip=0 (0 s)
+test_core_geometry                                      ran=2 fail=0 err=0 skip=0 (0 s)
+test_core_joints                                        ran=1 fail=0 err=0 skip=0 (0 s)
+test_core_materials                                     ran=6 fail=0 err=0 skip=0 (0 s)
+test_core_model                                         ran=21 fail=0 err=0 skip=0 (10 s)
+test_core_shapes                                        ran=11 fail=0 err=0 skip=0 (0 s)
+test_core_types                                         ran=33 fail=0 err=0 skip=0 (0 s)
+test_core_world                                         ran=19 fail=0 err=0 skip=0 (0 s)
+test_dynamics_delassus                                  ran=23 fail=0 err=0 skip=0 (21 s)
+test_dynamics_dual                                      ran=2 fail=0 err=0 skip=0 (1 s)
+test_dynamics_wrenches                                  ran=4 fail=0 err=0 skip=0 (1 s)
+test_geometry_aggregation                               ran=1 fail=0 err=0 skip=0 (0 s)
+test_geometry_contacts                                  ran=20 fail=0 err=0 skip=0 (4 s)
+test_geometry_detector                                  ran=10 fail=0 err=0 skip=0 (6 s)
+test_geometry_keying                                    ran=8 fail=0 err=0 skip=0 (3 s)
+test_geometry_margin_gap                                ran=13 fail=0 err=0 skip=0 (4 s)
+test_geometry_mesh_heightfield                          ran=12 fail=0 err=0 skip=6 (1 s)
+test_geometry_primitive                                 ran=21 fail=0 err=0 skip=0 (1 s)
+test_geometry_unified                                   ran=16 fail=1 err=0 skip=0 (4 s)
+test_gimbal                                             ran=17 fail=0 err=0 skip=7 (0 s)
+test_kinematics_constraints                             ran=3 fail=0 err=0 skip=0 (0 s)
+test_kinematics_jacobians                               ran=27 fail=0 err=0 skip=0 (0 s)
+test_kinematics_joints                                  ran=5 fail=0 err=0 skip=0 (0 s)
+test_kinematics_limits                                  ran=3 fail=0 err=0 skip=0 (0 s)
+test_kinematics_resets                                  ran=6 fail=0 err=0 skip=0 (7 s)
+test_linalg_conjugate_fused                             ran=3 fail=0 err=0 skip=3 (0 s)
+test_linalg_core                                        ran=13 fail=0 err=0 skip=0 (0 s)
+test_linalg_factorize_llt_blocked                       ran=4 fail=3 err=0 skip=0 (2 s)
+test_linalg_factorize_llt_sequential                    ran=4 fail=0 err=0 skip=0 (0 s)
+test_linalg_solve_cg                                    ran=20 fail=0 err=0 skip=14 (0 s)
+test_linalg_solver_llt_blocked                          ran=5 fail=3 err=0 skip=0 (1 s)
+test_linalg_solver_llt_blocked_rcm                      ran=11 fail=5 err=1 skip=1 (5 s)
+test_linalg_solver_llt_sequential                       ran=5 fail=0 err=0 skip=0 (0 s)
+test_linalg_sparse                                      ran=12 fail=0 err=0 skip=0 (9 s)
+test_linalg_utils_matrix                                ran=1 fail=0 err=0 skip=0 (0 s)
+test_linalg_utils_rand                                  ran=20 fail=0 err=0 skip=0 (2 s)
+test_solver_kamino                                      ran=18 fail=0 err=0 skip=0 (16 s)
+test_solver_kamino_joint_frames                         ran=5 fail=0 err=0 skip=0 (1 s)
+test_solver_kamino_notify                               ran=30 fail=0 err=0 skip=0 (1 s)
+test_solvers_dvi                                        ran=47 fail=0 err=21 skip=4 (53 s)
+test_solvers_forward_kinematics                         ran=13 fail=0 err=0 skip=0 (73 s)
+test_solvers_metrics                                    ran=9 fail=0 err=0 skip=0 (3 s)
+test_solvers_padmm                                      ran=9 fail=0 err=0 skip=0 (0 s)
+test_utils_control_animation                            ran=5 fail=0 err=0 skip=0 (4 s)
+test_utils_control_pid                                  ran=1 fail=0 err=0 skip=0 (0 s)
+test_utils_control_rand                                 ran=3 fail=0 err=0 skip=0 (0 s)
+test_utils_io_usd                                       ran=57 fail=0 err=0 skip=0 (1 s)
+test_utils_logger                                       ran=2 fail=0 err=0 skip=0 (0 s)
+test_utils_profiles                                     ran=5 fail=0 err=0 skip=0 (0 s)
+test_utils_random                                       ran=9 fail=0 err=0 skip=0 (0 s)
+test_utils_sim_simulator                                ran=2 fail=0 err=0 skip=0 (15 s)
+test_utils_world_equivalence                            ran=1 fail=0 err=0 skip=0 (0 s)
+FAILED newton._src.solvers.kamino.tests.test_geometry_unified.TestCollisionPipelineUnified.test_05_box_on_box_simple ::        [-0.5  ,  0.5  ,  0.005]], dtype=float32)
+FAILED newton._src.solvers.kamino.tests.test_linalg_factorize_llt_blocked.TestLinAlgLLTBlocked.test_01_single_problem_dims_all_active :: AssertionError: False is not true
+FAILED newton._src.solvers.kamino.tests.test_linalg_factorize_llt_blocked.TestLinAlgLLTBlocked.test_02_single_problem_dims_partially_active :: AssertionError: False is not true
+FAILED newton._src.solvers.kamino.tests.test_linalg_factorize_llt_blocked.TestLinAlgLLTBlocked.test_04_multiple_problems_dims_partially_active :: AssertionError: False is not true
+FAILED newton._src.solvers.kamino.tests.test_linalg_solver_llt_blocked.TestLinAlgLLTBlockedSolver.test_01_single_problem_dims_all_active :: AssertionError: False is not true
+FAILED newton._src.solvers.kamino.tests.test_linalg_solver_llt_blocked.TestLinAlgLLTBlockedSolver.test_02_single_problem_dims_partially_active :: AssertionError: False is not true
+FAILED newton._src.solvers.kamino.tests.test_linalg_solver_llt_blocked.TestLinAlgLLTBlockedSolver.test_04_multiple_problems_dims_partially_active :: AssertionError: False is not true
+FAILED newton._src.solvers.kamino.tests.test_linalg_solver_llt_blocked_rcm.TestLinAlgLLTBlockedRCMSolver.test_01_single_problem_dims_all_active :: AssertionError: False is not true
+FAILED newton._src.solvers.kamino.tests.test_linalg_solver_llt_blocked_rcm.TestLinAlgLLTBlockedRCMSolver.test_02_single_problem_dims_partially_active :: AssertionError: False is not true
+FAILED newton._src.solvers.kamino.tests.test_linalg_solver_llt_blocked_rcm.TestLinAlgLLTBlockedRCMSolver.test_04_multiple_problems_dims_partially_active :: AssertionError: False is not true
+FAILED newton._src.solvers.kamino.tests.test_linalg_solver_llt_blocked_rcm.TestLinAlgLLTBlockedRCMSolver.test_cached_permutation_with_changed_sparsity ::  DESIRED: array([-0.605902,  0.626897, -0.346404, -0.607976,  0.117371,  0.211473, -0.622196,  0.089916,  0.337008,  0.112531,  0.180477, -0.534315,  0.039547, -0.060075, -0.101531,  0.346806,  0.538904,  0.804148,  0.419976,  0.027498,  0.118003,  0.337272,  0.063009,  0.085894,  0.262615,  0.089315, -0.246652, -0.10663 ,  0.251201,  0.029479,  0.153034,  0.275617, -0.147849,  0.335217,  0.196312
+FAILED newton._src.solvers.kamino.tests.test_linalg_solver_llt_blocked_rcm.TestLinAlgLLTBlockedRCMSolver.test_parallel_factorization_with_partial_tile ::  DESIRED: array([0.581989, 0.655911, 0.665301, 0.666493, 0.666645, 0.666664, 0.666666, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666667, 0.666666, 0.666664, 0.666645, 0.666493, 0.665301, 0.655911, 0.581989], dtype=float32)
+FAILED newton._src.solvers.kamino.tests.test_linalg_solver_llt_blocked_rcm.TestLinAlgLLTBlockedRCMSolver.test_solve_with_fewer_threads_than_tile_rows :: RuntimeError: Failed to launch kernel 'make_llt_blocked_rcm_factorize_kernel__locals__llt_blocked_rcm_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, tpo=array_t, A=array_t, tile_pattern=array_t, L=array_t)
+FAILED newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_01_dvi_solve_dense_dual_problem :: RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+FAILED newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_02_public_solver_step_with_dvi :: RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+FAILED newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03d1_sparse_dvi_honors_per_world_bilateral_intervals :: RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+FAILED newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03d2_dvi_direct_block_finishes_with_bilateral_solve :: RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+FAILED newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03d_dvi_direct_block_honors_per_world_iteration_counts :: RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+FAILED newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03e_dvi_direct_block_no_unilateral_rows_reports_single_iteration :: RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+FAILED newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03f_dvi_bilateral_only_solve_resets_stale_status :: RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+FAILED newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03h_dvi_canonical_contact_solution_metrics (builder='build_boxes_hinged', sparse=False) :: RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+FAILED newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03h_dvi_canonical_contact_solution_metrics (builder='build_boxes_hinged', sparse=True) :: RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+FAILED newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03i_dvi_coldstart_is_repeatable (sparse=False) :: RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+FAILED newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03i_dvi_coldstart_is_repeatable (sparse=True) :: RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+FAILED newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_04_dvi_solve_active_joint_limit :: RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+FAILED newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_05d_dvi_colors_contacts_with_joint_limits (sparse=False) :: RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+FAILED newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_05d_dvi_colors_contacts_with_joint_limits (sparse=True) :: RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+FAILED newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_07_dvi_singular_limit_rows_remain_finite :: RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+FAILED newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_08_public_solver_short_rollout_with_dvi :: RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+FAILED newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_08a_public_solver_heterogeneous_contact_rollout_with_dvi (sparse=False) :: RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+FAILED newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_08a_public_solver_heterogeneous_contact_rollout_with_dvi (sparse=True) :: RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+FAILED newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_08d3_dvi_friction_propagates_through_fixed_joint (sparse=False) :: RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+FAILED newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_08d3_dvi_friction_propagates_through_fixed_joint (sparse=True) :: RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+FAILED newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_12_dvi_opening_contact_releases_warmstarted_force :: RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
+scripts/gpu_run.sh: line 19: syntax error near unexpected token `;'
+scripts/gpu_run.sh: line 19: `; do u=$(scripts/gpu_util.sh); [ "${u:-0}" -lt 10 ] && break; sleep 2; done'
