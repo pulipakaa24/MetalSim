@@ -74,11 +74,24 @@ ACTION_SCALE = 0.5
 CONTROL_DT = 0.02
 PHYSICS_DT = 0.005
 EPISODE_S = 20.0
+EFFORT_LIMIT = "joint"      # build_g1_model: "joint" (Newton's layout, default since 2026-09-26) or "actuator" (archived)
 
 
-def build_g1_model(terrain: str = "flat", hfield=None, visuals: bool = False, physics_dt: float = PHYSICS_DT):
+def build_g1_model(terrain: str = "flat", hfield=None, visuals: bool = False, physics_dt: float = PHYSICS_DT,
+                   effort_limit: str | None = None):
     """MjModel of Isaac's G1 (from its USD) on a plane or a heightfield, with Isaac's actuators,
-    initial pose, and touch sensors for contact terms. Returns (model, info)."""
+    initial pose, and touch sensors for contact terms. Returns (model, info).
+
+    ``effort_limit`` (default ``EFFORT_LIMIT`` = "joint"): where Isaac's effort limit (``joint_effort_limit``) is applied.
+    "joint" = the joint's ``actfrcrange`` on the summed actuator force, as Newton builds Isaac Lab 3.0's MuJoCo Warp model
+    (two unclamped <general> actuators, ``actuatorfrcrange`` on the joint; newton_generated.xml); the implicit integrator
+    then keeps the drive's velocity damping even while the torque is clamped. "actuator" = the actuator's ``forcerange``
+    (MetalSim before 2026-09-26, archived): MuJoCo drops a clamped actuator's velocity derivative (engine_derivative.c
+    mjd_actuator_vel, "skip if force is clamped by forcerange"; mujoco_warp derivative.py), so a saturated drive's damping
+    turns explicit, and a finger (kd/I ~ 1e4 1/s at 2.5 ms) blows up in 1-3 substeps (runs/il3/finger_unit.py)."""
+    effort_limit = effort_limit or EFFORT_LIMIT
+    if effort_limit not in ("joint", "actuator"):
+        raise ValueError("effort_limit must be 'joint' or 'actuator'")
     spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
     spec.option.timestep = physics_dt      # 0.005 = Isaac; 0.0025 keeps Isaac's kp 200 drives stable in MuJoCo (explicit stiffness)
     spec.option.integrator = mujoco.mjtIntegrator.mjINT_IMPLICITFAST
@@ -109,7 +122,11 @@ def build_g1_model(terrain: str = "flat", hfield=None, visuals: bool = False, ph
                 act = spec.add_actuator(); act.name = j.name; act.target = j.name; act.trntype = mujoco.mjtTrn.mjTRN_JOINT
                 act.gainprm[0] = kp; act.biasprm[0] = 0; act.biasprm[1] = -kp; act.biasprm[2] = -kv
                 act.gaintype = mujoco.mjtGain.mjGAIN_FIXED; act.biastype = mujoco.mjtBias.mjBIAS_AFFINE
-                act.forcerange = [-eff, eff]; act.forcelimited = mujoco.mjtLimited.mjLIMITED_TRUE
+                if effort_limit == "actuator":
+                    act.forcerange = [-eff, eff]; act.forcelimited = mujoco.mjtLimited.mjLIMITED_TRUE
+                else:
+                    act.forcelimited = mujoco.mjtLimited.mjLIMITED_FALSE
+                    j.actfrcrange = [-eff, eff]; j.actfrclimited = mujoco.mjtLimited.mjLIMITED_TRUE
                 j.armature = arm
                 break
         else:
@@ -498,7 +515,7 @@ class G1VelocityTask:
                  reward_cfg: str | None = None, scan_ordering: str = "xy", terrain_collision: str | None = None,
                  scan_surface: str | None = None, feet_slide_velocity: str = "com", solver_cfg: str | None = None,
                  il3_events: bool | None = None, il3_backend: str = "newton_mjwarp", contact_cfg: str | None = "recommended",
-                 base_velocity: str = "com", batch_options: dict | None = None):
+                 base_velocity: str = "com", batch_options: dict | None = None, effort_limit: str | None = None):
         """``feet_slide_velocity``: "com" (default) = the foot's centre-of-mass world velocity, Isaac Lab 2.3.2's
         ``body_lin_vel_w`` (= ``body_com_lin_vel_w``) used by ``mdp.feet_slide``; "origin" = the foot body frame
         origin's velocity (MetalSim before 2026-09-25). MuJoCo Warp engine only; the archived Newton path
@@ -573,7 +590,9 @@ class G1VelocityTask:
         self.engine = engine
         if engine not in ("mjwarp", "newton"):
             raise ValueError(f"engine must be 'mjwarp' or 'newton', not {engine!r}")
-        self.model, self.info = build_g1_model(terrain, self.hfield, physics_dt=physics_dt)   # metadata source for both engines
+        self.model, self.info = build_g1_model(terrain, self.hfield, physics_dt=physics_dt,
+                                               effort_limit=effort_limit)   # metadata source for both engines
+        self.effort_limit = effort_limit or EFFORT_LIMIT
         m = self.model
         # contact/limit stiffness (metalsim.physics.contact_tuning preset; "recommended" = tau10_impact_hardlimits, the
         # 2026-09-25 PhysX-parity decision; "default" or None = MuJoCo's defaults). MuJoCo Warp only; applied before
@@ -976,13 +995,13 @@ def g1_ppo_config(terrain: str, iterations: int, seed: int = 0, initial_reset: b
 def train_g1(n=4096, terrain="flat", iterations=1500, seed=None, log_path=None, checkpoint=None, physics_dt=PHYSICS_DT,
              engine="mjwarp", newton_iterations=4, newton_dt=0.00125, newton_kw=None, reward_cfg=None, scan_ordering="xy",
              terrain_collision=None, scan_surface=None, solver_cfg=None, il3_events=None, il3_backend="newton_mjwarp",
-             contact_cfg="recommended", base_velocity="com", feet_slide_velocity="com", initial_reset=True):
+             contact_cfg="recommended", base_velocity="com", feet_slide_velocity="com", initial_reset=True, effort_limit=None):
     from metalsim.learn.ppo_warp import PPOWarp
     task = G1VelocityTask(n, terrain=terrain, seed=seed, physics_dt=physics_dt, engine=engine,
                           newton_iterations=newton_iterations, newton_dt=newton_dt, newton_kw=newton_kw, reward_cfg=reward_cfg,
                           scan_ordering=scan_ordering, terrain_collision=terrain_collision, scan_surface=scan_surface,
                           solver_cfg=solver_cfg, il3_events=il3_events, il3_backend=il3_backend, contact_cfg=contact_cfg,
-                          base_velocity=base_velocity, feet_slide_velocity=feet_slide_velocity)
+                          base_velocity=base_velocity, feet_slide_velocity=feet_slide_velocity, effort_limit=effort_limit)
     seed = task.seed                     # None -> the task's default (42 rough, Isaac's; 0 flat)
     algo = PPOWarp(task, g1_ppo_config(terrain, iterations, seed, initial_reset=initial_reset))
     f = open(log_path, "a") if log_path else None
@@ -995,7 +1014,8 @@ def train_g1(n=4096, terrain="flat", iterations=1500, seed=None, log_path=None, 
         f"physics dt {task.physics_dt} (decimation {task.decimation}), seed {seed}, reward_cfg {task.reward_cfg}, "
         f"height-scan ray order {task.scanner.ordering if task.scanner is not None else '-'}, terrain collision "
         f"{task.terrain_collision}, height scan {task.scan_surface}, solver_cfg {task.solver_cfg}, contact_cfg {task.contact_cfg}, "
-        f"base velocity {task.base_velocity}, feet-slide velocity {task.feet_slide_velocity}, initial reset {initial_reset}"
+        f"base velocity {task.base_velocity}, feet-slide velocity {task.feet_slide_velocity}, initial reset {initial_reset}, "
+        f"effort limit on the {task.effort_limit}"
         + (f", Isaac Lab 3.0 events {task.il3_events} (backend {task.il3_backend}), add_base_mass {task.mass_info}" if task.il3 else ""))
     def save(path, it):
         torch.save({"net": algo.net.state_dict(), "terrain": terrain, "n": n, "iterations": it, "obs_dim": task.obs_dim,
@@ -1028,7 +1048,7 @@ if __name__ == "__main__":
     # optional flags (any position): --engine mjwarp|newton, --newton_it N, --newton_dt S
     opts = {"--engine": "mjwarp", "--newton_it": "4", "--newton_dt": "0.00125", "--newton_limit_margin": "0.15", "--newton_kw": "", "--seed": "0", "--reward_cfg": "", "--scan_ordering": "xy",
             "--terrain_collision": "", "--scan_surface": "", "--solver_cfg": "", "--il3_events": "", "--il3_backend": "newton_mjwarp", "--contact_cfg": "recommended", "--base_velocity": "com",
-            "--feet_slide_velocity": "com", "--initial_reset": "1"}
+            "--feet_slide_velocity": "com", "--initial_reset": "1", "--effort_limit": ""}
     for k in list(opts):
         if k in sys.argv:
             i = sys.argv.index(k); opts[k] = sys.argv[i + 1]; del sys.argv[i:i + 2]
@@ -1048,7 +1068,7 @@ if __name__ == "__main__":
                  solver_cfg=opts["--solver_cfg"] or None, il3_events=(None if opts["--il3_events"] == "" else opts["--il3_events"] in ("1", "true", "True")),
                  il3_backend=opts["--il3_backend"], contact_cfg=opts["--contact_cfg"],
                  base_velocity=opts["--base_velocity"], feet_slide_velocity=opts["--feet_slide_velocity"],
-                 initial_reset=opts["--initial_reset"] not in ("0", "false", "False"), **ekw)
+                 initial_reset=opts["--initial_reset"] not in ("0", "false", "False"), effort_limit=opts["--effort_limit"] or None, **ekw)
         sys.exit(0)
     task = G1VelocityTask(n, terrain=terrain, physics_dt=float(sys.argv[3]) if len(sys.argv) > 3 else PHYSICS_DT,
                           reward_cfg=opts["--reward_cfg"] or None, solver_cfg=opts["--solver_cfg"] or None,
