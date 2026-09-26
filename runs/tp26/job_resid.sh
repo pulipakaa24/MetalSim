@@ -7,6 +7,6 @@ WT=/Users/aditya/robosim/upstream/warp-innate-tp:/Users/aditya/robosim/upstream/
 echo "=== start $(date) wt warp $(git -C upstream/warp-innate-tp rev-parse --short HEAD) mjw $(git -C upstream/mujoco_warp-tp rev-parse --short HEAD) power: $(pmset -g batt | head -1)"
 echo "--- residency n=43 $(date +%H:%M:%S)"; PYTHONPATH=$WT python scripts/diagnostics/metal_cholesky_residency.py 43 2>&1 | grep "^n=\|Error\|Traceback" | cut -c1-160
 echo "--- residency n=32 $(date +%H:%M:%S)"; PYTHONPATH=$WT python scripts/diagnostics/metal_cholesky_residency.py 32 2>&1 | grep "^n=\|Error\|Traceback" | cut -c1-160
-echo "--- L'DL check $(date +%H:%M:%S)"; PYTHONPATH=$WT python scripts/diagnostics/ldl_lanes_check.py 64 2>&1 | grep "unrolled\|ALL OK\|FAIL\|Error\|Traceback"
+echo "--- (L'DL check and bench done in resid.wrapper.log)"; false && echo "--- L'DL check $(date +%H:%M:%S)"; PYTHONPATH=$WT python scripts/diagnostics/ldl_lanes_check.py 64 2>&1 | grep "unrolled\|ALL OK\|FAIL\|Error\|Traceback"
 echo "--- L'DL bench $(date +%H:%M:%S)"; PYTHONPATH=$WT python scripts/diagnostics/ldl_lanes_bench.py 4096 2>&1 | grep "serial\|unrolled\|Error\|Traceback"
 echo "=== end $(date) power: $(pmset -g batt | head -1)"

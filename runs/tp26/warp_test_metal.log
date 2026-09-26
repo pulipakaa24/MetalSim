@@ -1,0 +1,24 @@
+.......F........                                                         [100%]
+=================================== FAILURES ===================================
+_________________ TestMetal.test_print_strings_are_per_kernel __________________
+
+self = <warp.tests.test_metal.TestMetal testMethod=test_print_strings_are_per_kernel>
+
+    def test_print_strings_are_per_kernel(self):
+        """String constants with the same generated name in different kernels print their own text."""
+        capture = StdOutCapture()
+        capture.begin()
+        wp.launch(print_first_kernel, dim=1, inputs=[], device=self.device)
+        wp.launch(print_second_kernel, dim=1, inputs=[], device=self.device)
+        wp.synchronize_device(self.device)
+        output = capture.end()
+>       self.assertIn("metal first string", output)
+E       AssertionError: 'metal first string' not found in ''
+
+warp/tests/test_metal.py:323: AssertionError
+----------------------------- Captured stdout call -----------------------------
+metal first string
+metal second string
+=========================== short test summary info ============================
+FAILED warp/tests/test_metal.py::TestMetal::test_print_strings_are_per_kernel
+1 failed, 15 passed in 49.82s

@@ -9,6 +9,9 @@ import numpy as np
 import warp as wp
 wp.config.quiet = True
 wp.config.metal_register_cholesky_max = 48
+import os as _os
+if _os.environ.get("WP_METAL_CHOL_SPLIT") is not None and hasattr(wp.config, "metal_chol_split"):
+    wp.config.metal_chol_split = _os.environ["WP_METAL_CHOL_SPLIT"] != "0"
 
 
 def make(n):

@@ -13,6 +13,9 @@ if os.environ.get("WP_METAL_REGISTER_SOLVE") is not None and hasattr(wp.config, 
     wp.config.metal_register_solve = os.environ["WP_METAL_REGISTER_SOLVE"] != "0"   # fork worktree knob (A/B)
 if os.environ.get("WP_METAL_ROLLED_CHOLESKY") is not None and hasattr(wp.config, "metal_rolled_cholesky"):
     wp.config.metal_rolled_cholesky = int(os.environ["WP_METAL_ROLLED_CHOLESKY"])
+if os.environ.get("WP_METAL_CHOL_SPLIT") is not None and hasattr(wp.config, "metal_chol_split"):
+    wp.config.metal_chol_split = os.environ["WP_METAL_CHOL_SPLIT"] != "0"
+print(f"chol split: {getattr(wp.config, 'metal_chol_split', 'n/a')}", flush=True)
 print(f"rolled cholesky above n: {getattr(wp.config, 'metal_rolled_cholesky', 'n/a')}", flush=True)
 print(f"register solve: {getattr(wp.config, 'metal_register_solve', 'n/a (not in this Warp)')}", flush=True)
 

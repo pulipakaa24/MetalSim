@@ -481,3 +481,28 @@ G1 task, Go2 and the humanoid; `runs/tp26/resid.wrapper.log`). 0.79 -> 0.41 ms p
 solve's 0.207 ms: the dependent shuffle chain (782 shuffles, 2 per update, ~30 cycles each) remains longer than one
 thread's memory chain of the serial kernel. Archived (`MJW_METAL_LDL_UNROLLED_SOLVE=1`); the unrolled factor (11.3)
 stays landed.
+
+### 11.8 Residency test and the split-loop step (measured, `runs/tp26/resid3.wrapper.log`, 09:43)
+
+`scripts/diagnostics/metal_cholesky_residency.py`: the fork's register Cholesky step and register solve templates
+called from a native snippet on H read from device memory, in a plain launch with 32 lanes per world and 1 / 2 / 4 /
+8 worlds per threadgroup, all bitwise equal to the tile path. n = 43: tile path 1.065 ms per 4096 factor + solve;
+the snippet with the **generic** step 4.16 / 4.12 / 4.12 / 4.12 ms (1 / 2 / 4 / 8 worlds per threadgroup: residency
+changes nothing, hypothesis rejected); the snippet with the **split-loop** step (scalar column pivots `ljc0` /
+`ljc1` instead of a per-lane array, the second column's update guarded by the compile-time row index; the same
+products in the same order) **0.601 / 0.599 ms**. n = 32 (one column per lane, the two steps coincide): tile 0.203,
+snippet 0.145. So the generic step's indexed register arrays are what the Metal compiler handles badly at two
+columns per lane, in the snippet context (4.2 ms) and, milder, in the tile path (1.07 ms); the split form is the
+fix. Warp fork `metalsim-tp`: the split step is now the register Cholesky's default (`warp.config.metal_chol_split`,
+`WP_METAL_CHOL_SPLIT=0` restores the generic step); bitwise A/B, cost split and the G1 step: `runs/tp26/split.wrapper.log`.
+
+### 11.9 Test suites (fork heads mujoco_warp 0a9de8e / f33005f, warp 9df9acee)
+
+`runs/tp26/tests4.wrapper.log` (09:42): mujoco_warp `_src` suite **1451 passed, 1 failed, 39 skipped** = the
+baseline (the failure, `io_test::test_put_data_nefc_zero_dense`, is the pre-existing one: MuJoCo 3.14 returns nefc
+1 for that model; it fails identically in `runs/mjw_tp/full_tests2.log`). The 09:27 run (8 failed / 1444) had the
+unrolled schedule as a dataclass field, which broke `io_jax_test` (5) and `types_test` (1): fixed in 0a9de8e (a
+plain attribute; the JAX-converted model then takes the serial kernel). Warp `test_metal`: 15 passed, 1 failed
+(`test_print_strings_are_per_kernel`), which fails identically on the pre-session fork f194006a (a stdout-capture
+test, not a kernel change). MetalSim: 51 passed (physics / capacity / policy / rollout / fast factorization / G1
+task terms); the whole suite on frozen worktrees: `runs/tp26/suite2.wrapper.log`.
