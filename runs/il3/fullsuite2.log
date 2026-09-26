@@ -1,0 +1,117 @@
+== Sat Sep 26 08:41:24 PDT 2026
+holder: {"name": "il3_fullsuite2", "kind": "render", "minutes": 6.0, "pid": 26829, "start": 1790437284.248985, "queued": 1790434398.8276348, "cmd": "runs/il3/run_fullsuite.sh runs/il3/fullsuite2.log", "cwd": "/Users/aditya/robosim"}
+  waiting [train] final_flat_s2 est 60.0 min, queued 7775 s ago
+  waiting [train] final_rough_s0 est 70.0 min, queued 7773 s ago
+  waiting [low] cl_mjw est 40.0 min, queued 25641 s ago
+  waiting [low] cl_kamino2 est 40.0 min, queued 25574 s ago
+  waiting [low] cl_k3_stress_fourbar est 12.0 min, queued 23702 s ago
+  waiting [low] cl_k3_stress_leg est 12.0 min, queued 23701 s ago
+  waiting [low] cl_k3_bench est 12.0 min, queued 23700 s ago
+  waiting [low] cl_k3_il3 est 12.0 min, queued 23699 s ago
+  waiting [low] cl_k3_example est 12.0 min, queued 23698 s ago
+  waiting [low] cl_k3_stress_leg_5ms est 12.0 min, queued 23697 s ago
+  waiting [low] tp26_tests est 25.0 min, queued 17262 s ago
+.........................F
+=================================== FAILURES ===================================
+_________________ test_defaults_and_previous_values_reachable __________________
+
+    def test_defaults_and_previous_values_reachable():
+        """Defaults: register Cholesky bound 48 and sparse L'DL only for M blocks above 32 dofs. A 14-dof tree (Tron1)
+        keeps its dense 14 x 14 tile under the defaults (as before); m_dense_max=0 (the former G1-only setting) sends it
+        to the sparse path; the previous defaults stay reachable. Ends on the defaults (warp.config is process-wide)."""
+        from metalsim.learn.tron1_wf import build_train_model
+        from metalsim.physics.batch import BatchSim, BatchSimOptions
+        o = BatchSimOptions()
+        assert o.m_dense_max == 32 and o.metal_register_cholesky_max == 48
+        m = build_train_model()
+        old = BatchSim(m, 2, options=BatchSimOptions(m_dense_max=None, metal_register_cholesky_max=40, njmax=64))
+        assert old.m.qLD_block_total == 14 * 14 and wp.config.metal_register_cholesky_max == 40
+>       sparse = BatchSim(m, 2, options=BatchSimOptions(m_dense_max=0, njmax=64))
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_g1_fast_factorization.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/physics/batch.py:165: in __init__
+    self._capture()
+metalsim/physics/batch.py:179: in _capture
+    self._launch_substeps()
+metalsim/physics/batch.py:190: in _launch_substeps
+    mjw.step(self.m, self.d)
+upstream/mujoco_warp/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp/mujoco_warp/_src/forward.py:1825: in step
+    forward(m, d)
+upstream/mujoco_warp/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp/mujoco_warp/_src/forward.py:1814: in forward
+    fwd_acceleration(m, d, factorize=True)
+upstream/mujoco_warp/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp/mujoco_warp/_src/forward.py:1774: in fwd_acceleration
+    smooth.factor_solve_i(m, d, d.M, d.qLD, d.qLDiagInv, d.qacc_smooth, d.qfrc_smooth)
+upstream/mujoco_warp/mujoco_warp/_src/smooth.py:4184: in factor_solve_i
+    block_size = tile.size
+      ^^^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp/mujoco_warp/_src/smooth.py:1535: in _factor_i_sparse
+    pki = madr_ki - rowadr[k]
+upstream/warp-innate/warp/_src/context.py:12226: in launch
+    module_exec = kernel.module.load(device, block_dim)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/context.py:5088: in load
+    raise e
+upstream/warp-innate/warp/_src/context.py:5085: in load
+    compiled = self._compile(device, module_dir, output_name, output_arch, options=options)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/context.py:4834: in _compile
+    source_str, source_code_ext, meta, ltoir_values, fatbin_values = self._run_codegen(options, target)
+                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/codegen.py:1836: in locked_call
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+upstream/warp-innate/warp/_src/context.py:4703: in _run_codegen
+    builder = ModuleBuilder(
+upstream/warp-innate/warp/_src/context.py:3350: in __init__
+    self.build_kernel(kernel)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <warp._src.context.ModuleBuilder object at 0x17c011820>
+kernel = <warp._src.context.Kernel object at 0x17bfaedb0>
+
+    def build_kernel(self, kernel):
+        options = self.options | kernel.options
+        kernel.adj.used_by_backward_kernel = options["enable_backward"]
+    
+        if self._kernel_has_invalid_return_annotation(kernel) or self._kernel_has_value_return(kernel):
+>           raise WarpCodegenTypeError(f"'{kernel.key}': {_KERNEL_RETURN_ERROR}")
+E           warp._src.codegen.WarpCodegenTypeError: '_factor_i_sparse_serial__locals__kernel': Warp kernels cannot return values. Write results to output arguments, and omit the return annotation or use `-> None`.
+
+upstream/warp-innate/warp/_src/context.py:3467: WarpCodegenTypeError
+----------------------------- Captured stdout call -----------------------------
+Module ccd_kernel_builder__locals__ccd_kernel_12d54cb6 12d54cb load on device 'metal:0' took 2190.81 ms  (compiled)
+Module ccd_kernel_builder__locals__ccd_kernel_38aecdec 38aecde load on device 'metal:0' took 2131.23 ms  (compiled)
+Module ccd_kernel_builder__locals__ccd_kernel_4908159b 4908159 load on device 'metal:0' took 2121.19 ms  (compiled)
+Module ccd_kernel_builder__locals__ccd_kernel_0577ec93 0577ec9 load on device 'metal:0' took 2589.33 ms  (compiled)
+Module ccd_kernel_builder__locals__ccd_kernel_b6d412e9 b6d412e load on device 'metal:0' took 2551.26 ms  (compiled)
+Module _primitive_narrowphase__locals__primitive_narrowphase_66053e54 66053e5 load on device 'metal:0' took 1188.98 ms  (compiled)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_606622a5 6d83cb5 load on device 'metal:0' took 449.48 ms  (compiled)
+Module _solve_init_jaref_kernel__locals__kernel_59170fda 59170fd load on device 'metal:0' took 371.36 ms  (compiled)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_0e969c9a be72327 load on device 'metal:0' took 434.68 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_4dd74ce7 d4d25fc load on device 'metal:0' took 447.50 ms  (compiled)
+Module _update_constraint_gradient_fused__locals__kernel_3437b0d4 5adb26b load on device 'metal:0' took 400.92 ms  (compiled)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_d5fd0583 88f3d1f load on device 'metal:0' took 473.68 ms  (compiled)
+Module mujoco_warp._src.solver 726a080 load on device 'metal:0' took 571.76 ms  (compiled)
+Module reset_data__locals__reset_xfrc_applied_20ad49f6 20ad49f load on device 'metal:0' took 358.93 ms  (compiled)
+Module reset_data__locals__reset_M_d1cd3c40 d1cd3c4 load on device 'metal:0' took 359.35 ms  (compiled)
+Module reset_data__locals__reset_mocap_746e7ac8 746e7ac load on device 'metal:0' took 377.07 ms  (compiled)
+Module reset_data__locals__reset_contact_68a4d2a4 68a4d2a load on device 'metal:0' took 378.61 ms  (compiled)
+Module reset_data__locals__reset_sleep_04546723 0454672 load on device 'metal:0' took 367.73 ms  (compiled)
+Module reset_data__locals__reset_nworld_e7d6d3fc e7d6d3f load on device 'metal:0' took 393.45 ms  (compiled)
+Module _factor_i_sparse_serial__locals__kernel_9984ada4 86338e0 load on device 'metal:0' took 0.04 ms  (error)
+=========================== short test summary info ============================
+FAILED tests/test_g1_fast_factorization.py::test_defaults_and_previous_values_reachable
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 25 passed in 110.85s (0:01:50)
+exit 1 Sat Sep 26 08:43:17 PDT 2026
