@@ -10,7 +10,7 @@ wp.config.quiet = True
 from metalsim.learn.g1_velocity import G1VelocityTask
 from metalsim.learn.warp_policy import RolloutBuffers, bump
 terrain = sys.argv[1]; OUT = sys.argv[2] if len(sys.argv) > 2 else None
-N = 4096; CAPS = [10, 20, 40]
+N = 4096; CAPS = [10, 20, 40, 100]   # 100 = control: the same cap re-run from the reloaded state (noise floor)
 task = G1VelocityTask(N, terrain=terrain, seed=0, physics_dt=0.0025, reward_cfg="flat" if terrain == "flat" else "rough_isaac",
                       contact_cfg="recommended")
 d, m = task.sim.d, task.sim.m
@@ -43,6 +43,8 @@ for k in range(200):
             load(st); hit, _ = control_step(c); cur = save()
             dq = np.abs(cur["qpos"] - ref["qpos"]).max(1); dv = np.abs(cur["qvel"] - ref["qvel"]).max(1)
             row[f"cap{c}"] = {"worlds_hitting_cap": int(hit.sum()), "max_dqpos": float(dq.max()), "max_dqvel": float(dv.max()),
+                              "p99_dqvel": float(np.percentile(dv, 99)), "median_dqvel": float(np.median(dv)),
+                              "max_dqvel_in_hitting": float(dv[hit].max()) if hit.any() else None,
                               "worlds_dqvel_gt_0.01": int((dv > 0.01).sum()), "max_dqvel_in_non_hitting": float(dv[~hit].max()) if (~hit).any() else 0.0}
         res["points"].append(row); print(json.dumps(row), flush=True)
         load(ref)                                           # continue the rollout on the cap-100 trajectory
@@ -53,6 +55,8 @@ for k in range(200):
 for c in CAPS:
     P = res["points"]
     res[f"summary_cap{c}"] = {"worlds_hitting_cap_mean_per_step": float(np.mean([p[f"cap{c}"]["worlds_hitting_cap"] for p in P])),
-                              "max_dqpos": max(p[f"cap{c}"]["max_dqpos"] for p in P), "max_dqvel": max(p[f"cap{c}"]["max_dqvel"] for p in P)}
+                              "max_dqpos": max(p[f"cap{c}"]["max_dqpos"] for p in P), "max_dqvel": max(p[f"cap{c}"]["max_dqvel"] for p in P),
+                              "p99_dqvel_max": max(p[f"cap{c}"]["p99_dqvel"] for p in P),
+                              "max_dqvel_in_hitting": max((p[f"cap{c}"]["max_dqvel_in_hitting"] or 0.0) for p in P)}
 print(json.dumps({k: v for k, v in res.items() if k != "points"}, indent=1))
 if OUT: json.dump(res, open(OUT, "w"), indent=1)

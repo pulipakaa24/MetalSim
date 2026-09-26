@@ -1,0 +1,190 @@
+== Fri Sep 25 22:19:21 PDT 2026
+holder: {"name": "il3_cap_probe", "kind": "train", "minutes": 20.0, "pid": 41853, "start": 1790399958.69201, "queued": 1790393096.9540577, "cmd": "runs/il3/run_cap_probe.sh", "cwd": "/Users/aditya/robosim"}
+  waiting [train] il3_blowup_ab est 35.0 min, queued 5418 s ago
+  waiting [train] g1_flat_flatcfg_ellip10 est 70.0 min, queued 5290 s ago
+  waiting [low] kamino_tests_fork est 40.0 min, queued 26433 s ago
+  waiting [low] kamino_tests_152 est 30.0 min, queued 25604 s ago
+  waiting [low] cl_kamino est 45.0 min, queued 24273 s ago
+  waiting [low] cl_mjw est 40.0 min, queued 24249 s ago
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 26.55 ms  (cached)
+Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 17.57 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_78310433 7831043 load on device 'metal:0' took 25.35 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_a5bbb2cb a5bbb2c load on device 'metal:0' took 19.51 ms  (cached)
+Module mujoco_warp._src.constraint f5f4518 load on device 'metal:0' took 18.07 ms  (cached)
+Module _friction_dof__locals__kernel_0bb9a331 0bb9a33 load on device 'metal:0' took 17.69 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_914cb5e1 914cb5e load on device 'metal:0' took 16.56 ms  (cached)
+Module _efc_contact_init__locals__kernel_03ee81b4 03ee81b load on device 'metal:0' took 16.35 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_16824443 e86c3ac load on device 'metal:0' took 19.11 ms  (cached)
+Module _efc_contact_update__locals__kernel_89d497ae 89d497a load on device 'metal:0' took 18.13 ms  (cached)
+Module mujoco_warp._src.forward 4772766 load on device 'metal:0' took 22.56 ms  (cached)
+Module mujoco_warp._src.passive 9e93f67 load on device 'metal:0' took 21.69 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_8ed29e9b 8ed29e9 load on device 'metal:0' took 16.54 ms  (cached)
+Module mujoco_warp._src.forward d28e0c7 load on device 'metal:0' took 22.17 ms  (cached)
+Module _qfrc_smooth__locals__kernel_08dfc9ad 08dfc9a load on device 'metal:0' took 15.89 ms  (cached)
+Module mujoco_warp._src.support 040f2c5 load on device 'metal:0' took 16.15 ms  (cached)
+Module _factor_i_sparse_serial__locals__kernel_bbc34dce 0938022 load on device 'metal:0' took 17.02 ms  (cached)
+Module _solve_LD_sparse_serial__locals__kernel_da14e052 352f4b8 load on device 'metal:0' took 17.02 ms  (cached)
+Module _solve_init_dof__locals__kernel_8e985b01 8e985b0 load on device 'metal:0' took 16.18 ms  (cached)
+Module mujoco_warp._src.solver 118abcd load on device 'metal:0' took 17.75 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_7c1132c5 7c1132c load on device 'metal:0' took 16.31 ms  (cached)
+Module mul_m_kernel__locals___mul_m_505d9f1c 505d9f1 load on device 'metal:0' took 16.39 ms  (cached)
+Module _update_constraint_efc__locals__kernel_55fc5219 55fc521 load on device 'metal:0' took 16.53 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_6f502a20 6f502a2 load on device 'metal:0' took 16.22 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_86f1e084 86f1e08 load on device 'metal:0' took 15.89 ms  (cached)
+Module _update_gradient_grad__locals__kernel_e5baa4a1 e5baa4a load on device 'metal:0' took 16.20 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_712c31a5 8925ee6 load on device 'metal:0' took 16.29 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_ad48cc59 0434274 load on device 'metal:0' took 16.30 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_a2a614b4 7ad7e38 load on device 'metal:0' took 17.35 ms  (cached)
+Module _update_constraint_efc__locals__kernel_3649f6fe 3649f6f load on device 'metal:0' took 16.50 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_20171f2f 20171f2 load on device 'metal:0' took 16.16 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_67211e0e 67211e0 load on device 'metal:0' took 16.49 ms  (cached)
+Module _update_gradient_grad__locals__kernel_7aee5faa 7aee5fa load on device 'metal:0' took 16.51 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_ff0e6fb9 f5091d7 load on device 'metal:0' took 16.29 ms  (cached)
+Module _solve_done__locals__kernel_d351f953 d351f95 load on device 'metal:0' took 16.02 ms  (cached)
+Module mujoco_warp._src.sensor c2b0248 load on device 'metal:0' took 26.27 ms  (cached)
+Module mujoco_warp._src.derivative 356952f load on device 'metal:0' took 18.90 ms  (cached)
+Module _next_time_builder__locals___next_time_bd97507a bd97507 load on device 'metal:0' took 16.30 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_f05e0f72 f05e0f7 load on device 'metal:0' took 15.96 ms  (cached)
+Module reset_data__locals__reset_M_debb12fa debb12f load on device 'metal:0' took 15.98 ms  (cached)
+Module reset_data__locals__reset_mocap_d5f6a172 d5f6a17 load on device 'metal:0' took 16.12 ms  (cached)
+Module reset_data__locals__reset_contact_10be067b 10be067 load on device 'metal:0' took 16.25 ms  (cached)
+Module reset_data__locals__reset_sleep_4c0bb4a4 4c0bb4a load on device 'metal:0' took 16.34 ms  (cached)
+Module reset_data__locals__reset_nworld_f0ec89aa f0ec89a load on device 'metal:0' took 16.15 ms  (cached)
+Module metalsim.sensors.contact 8b280a6 load on device 'metal:0' took 18.94 ms  (cached)
+Module metalsim.learn.g1_velocity 98312b6 load on device 'metal:0' took 21.70 ms  (cached)
+Module metalsim.learn.warp_policy a9b40e0 load on device 'metal:0' took 16.32 ms  (cached)
+{"step": 19, "max_niter_cap100": 14, "worlds_at_cap100": 0, "cap10": {"worlds_hitting_cap": 24, "max_dqpos": 0.019773215055465698, "max_dqvel": 2.8707540035247803, "worlds_dqvel_gt_0.01": 19, "max_dqvel_in_non_hitting": 2.8707540035247803}, "cap20": {"worlds_hitting_cap": 0, "max_dqpos": 0.01977461576461792, "max_dqvel": 2.871114730834961, "worlds_dqvel_gt_0.01": 18, "max_dqvel_in_non_hitting": 2.871114730834961}, "cap40": {"worlds_hitting_cap": 0, "max_dqpos": 0.0197736918926239, "max_dqvel": 2.8709306716918945, "worlds_dqvel_gt_0.01": 16, "max_dqvel_in_non_hitting": 2.8709306716918945}}
+{"step": 39, "max_niter_cap100": 11, "worlds_at_cap100": 0, "cap10": {"worlds_hitting_cap": 20, "max_dqpos": 0.004122436046600342, "max_dqvel": 2.8326854705810547, "worlds_dqvel_gt_0.01": 8, "max_dqvel_in_non_hitting": 2.8326854705810547}, "cap20": {"worlds_hitting_cap": 0, "max_dqpos": 0.0041221678256988525, "max_dqvel": 2.06364107131958, "worlds_dqvel_gt_0.01": 7, "max_dqvel_in_non_hitting": 2.06364107131958}, "cap40": {"worlds_hitting_cap": 0, "max_dqpos": 0.004872262477874756, "max_dqvel": 1.519547462463379, "worlds_dqvel_gt_0.01": 7, "max_dqvel_in_non_hitting": 1.519547462463379}}
+{"step": 59, "max_niter_cap100": 14, "worlds_at_cap100": 0, "cap10": {"worlds_hitting_cap": 31, "max_dqpos": 0.0018172115087509155, "max_dqvel": 0.30434349179267883, "worlds_dqvel_gt_0.01": 8, "max_dqvel_in_non_hitting": 0.30434349179267883}, "cap20": {"worlds_hitting_cap": 0, "max_dqpos": 0.0011304635554552078, "max_dqvel": 0.30432775616645813, "worlds_dqvel_gt_0.01": 5, "max_dqvel_in_non_hitting": 0.30432775616645813}, "cap40": {"worlds_hitting_cap": 0, "max_dqpos": 0.016204655170440674, "max_dqvel": 0.4785735607147217, "worlds_dqvel_gt_0.01": 6, "max_dqvel_in_non_hitting": 0.4785735607147217}}
+{"step": 79, "max_niter_cap100": 14, "worlds_at_cap100": 0, "cap10": {"worlds_hitting_cap": 17, "max_dqpos": 0.003887861967086792, "max_dqvel": 0.6393213272094727, "worlds_dqvel_gt_0.01": 9, "max_dqvel_in_non_hitting": 0.48383501172065735}, "cap20": {"worlds_hitting_cap": 0, "max_dqpos": 0.004031732678413391, "max_dqvel": 0.47133350372314453, "worlds_dqvel_gt_0.01": 4, "max_dqvel_in_non_hitting": 0.47133350372314453}, "cap40": {"worlds_hitting_cap": 0, "max_dqpos": 0.0040318965911865234, "max_dqvel": 0.4713726043701172, "worlds_dqvel_gt_0.01": 5, "max_dqvel_in_non_hitting": 0.4713726043701172}}
+{"step": 99, "max_niter_cap100": 13, "worlds_at_cap100": 0, "cap10": {"worlds_hitting_cap": 21, "max_dqpos": 0.0019482471980154514, "max_dqvel": 0.6317939162254333, "worlds_dqvel_gt_0.01": 8, "max_dqvel_in_non_hitting": 0.6317939162254333}, "cap20": {"worlds_hitting_cap": 0, "max_dqpos": 0.00544331967830658, "max_dqvel": 0.8051002621650696, "worlds_dqvel_gt_0.01": 6, "max_dqvel_in_non_hitting": 0.8051002621650696}, "cap40": {"worlds_hitting_cap": 0, "max_dqpos": 0.00544331967830658, "max_dqvel": 0.8048805594444275, "worlds_dqvel_gt_0.01": 4, "max_dqvel_in_non_hitting": 0.8048805594444275}}
+{"step": 119, "max_niter_cap100": 12, "worlds_at_cap100": 0, "cap10": {"worlds_hitting_cap": 23, "max_dqpos": 0.0050275325775146484, "max_dqvel": 0.47681355476379395, "worlds_dqvel_gt_0.01": 9, "max_dqvel_in_non_hitting": 0.47681355476379395}, "cap20": {"worlds_hitting_cap": 0, "max_dqpos": 0.005028784275054932, "max_dqvel": 0.29655689001083374, "worlds_dqvel_gt_0.01": 6, "max_dqvel_in_non_hitting": 0.29655689001083374}, "cap40": {"worlds_hitting_cap": 0, "max_dqpos": 0.00326751172542572, "max_dqvel": 0.36557579040527344, "worlds_dqvel_gt_0.01": 4, "max_dqvel_in_non_hitting": 0.36557579040527344}}
+{"step": 139, "max_niter_cap100": 12, "worlds_at_cap100": 0, "cap10": {"worlds_hitting_cap": 21, "max_dqpos": 0.005148053169250488, "max_dqvel": 1.9129307270050049, "worlds_dqvel_gt_0.01": 6, "max_dqvel_in_non_hitting": 1.9129307270050049}, "cap20": {"worlds_hitting_cap": 0, "max_dqpos": 0.005147874355316162, "max_dqvel": 1.9129416942596436, "worlds_dqvel_gt_0.01": 5, "max_dqvel_in_non_hitting": 1.9129416942596436}, "cap40": {"worlds_hitting_cap": 0, "max_dqpos": 0.004362091422080994, "max_dqvel": 1.3333773612976074, "worlds_dqvel_gt_0.01": 4, "max_dqvel_in_non_hitting": 1.3333773612976074}}
+{"step": 159, "max_niter_cap100": 12, "worlds_at_cap100": 0, "cap10": {"worlds_hitting_cap": 24, "max_dqpos": 0.008080601692199707, "max_dqvel": 0.4699821472167969, "worlds_dqvel_gt_0.01": 10, "max_dqvel_in_non_hitting": 0.4699821472167969}, "cap20": {"worlds_hitting_cap": 0, "max_dqpos": 0.00855720043182373, "max_dqvel": 0.44890427589416504, "worlds_dqvel_gt_0.01": 5, "max_dqvel_in_non_hitting": 0.44890427589416504}, "cap40": {"worlds_hitting_cap": 0, "max_dqpos": 0.00855720043182373, "max_dqvel": 1.2408032417297363, "worlds_dqvel_gt_0.01": 8, "max_dqvel_in_non_hitting": 1.2408032417297363}}
+{"step": 179, "max_niter_cap100": 13, "worlds_at_cap100": 0, "cap10": {"worlds_hitting_cap": 27, "max_dqpos": 0.007168233394622803, "max_dqvel": 0.4653794765472412, "worlds_dqvel_gt_0.01": 13, "max_dqvel_in_non_hitting": 0.4653794765472412}, "cap20": {"worlds_hitting_cap": 0, "max_dqpos": 0.004057757556438446, "max_dqvel": 0.8670916557312012, "worlds_dqvel_gt_0.01": 5, "max_dqvel_in_non_hitting": 0.8670916557312012}, "cap40": {"worlds_hitting_cap": 0, "max_dqpos": 0.004080727696418762, "max_dqvel": 0.46537208557128906, "worlds_dqvel_gt_0.01": 5, "max_dqvel_in_non_hitting": 0.46537208557128906}}
+{"step": 199, "max_niter_cap100": 13, "worlds_at_cap100": 0, "cap10": {"worlds_hitting_cap": 20, "max_dqpos": 0.004966259002685547, "max_dqvel": 0.38038158416748047, "worlds_dqvel_gt_0.01": 5, "max_dqvel_in_non_hitting": 0.38038158416748047}, "cap20": {"worlds_hitting_cap": 0, "max_dqpos": 0.0019693151116371155, "max_dqvel": 0.41025829315185547, "worlds_dqvel_gt_0.01": 6, "max_dqvel_in_non_hitting": 0.41025829315185547}, "cap40": {"worlds_hitting_cap": 0, "max_dqpos": 0.001969657838344574, "max_dqvel": 0.2652912139892578, "worlds_dqvel_gt_0.01": 5, "max_dqvel_in_non_hitting": 0.2652912139892578}}
+{
+ "terrain": "flat",
+ "contact_cfg": "recommended",
+ "caps": [
+  10,
+  20,
+  40
+ ],
+ "summary_cap10": {
+  "worlds_hitting_cap_mean_per_step": 22.8,
+  "max_dqpos": 0.019773215055465698,
+  "max_dqvel": 2.8707540035247803
+ },
+ "summary_cap20": {
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "max_dqpos": 0.01977461576461792,
+  "max_dqvel": 2.871114730834961
+ },
+ "summary_cap40": {
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "max_dqpos": 0.0197736918926239,
+  "max_dqvel": 2.8709306716918945
+ }
+}
+/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  warnings.warn(
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 27.26 ms  (cached)
+Module _nxn_broadphase__locals__kernel_28decaf1 28decaf load on device 'metal:0' took 18.83 ms  (cached)
+Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_b3132664 b313266 load on device 'metal:0' took 24.50 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_d21969d4 d21969d load on device 'metal:0' took 27.84 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_78310433 7831043 load on device 'metal:0' took 26.81 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_0db2ba1e 0db2ba1 load on device 'metal:0' took 18.10 ms  (cached)
+Module mujoco_warp._src.constraint f5f4518 load on device 'metal:0' took 16.74 ms  (cached)
+Module _friction_dof__locals__kernel_0bb9a331 0bb9a33 load on device 'metal:0' took 16.90 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_914cb5e1 914cb5e load on device 'metal:0' took 16.96 ms  (cached)
+Module _efc_contact_init__locals__kernel_03ee81b4 03ee81b load on device 'metal:0' took 16.64 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_16824443 e86c3ac load on device 'metal:0' took 17.96 ms  (cached)
+Module _efc_contact_update__locals__kernel_89d497ae 89d497a load on device 'metal:0' took 17.18 ms  (cached)
+Module mujoco_warp._src.forward 4772766 load on device 'metal:0' took 22.94 ms  (cached)
+Module mujoco_warp._src.passive 9e93f67 load on device 'metal:0' took 22.22 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_8ed29e9b 8ed29e9 load on device 'metal:0' took 17.16 ms  (cached)
+Module mujoco_warp._src.forward d28e0c7 load on device 'metal:0' took 23.32 ms  (cached)
+Module _qfrc_smooth__locals__kernel_08dfc9ad 08dfc9a load on device 'metal:0' took 17.19 ms  (cached)
+Module mujoco_warp._src.support 040f2c5 load on device 'metal:0' took 16.99 ms  (cached)
+Module _factor_i_sparse_serial__locals__kernel_bbc34dce 0938022 load on device 'metal:0' took 17.50 ms  (cached)
+Module _solve_LD_sparse_serial__locals__kernel_da14e052 352f4b8 load on device 'metal:0' took 17.52 ms  (cached)
+Module _solve_init_dof__locals__kernel_8e985b01 8e985b0 load on device 'metal:0' took 16.65 ms  (cached)
+Module mujoco_warp._src.solver 118abcd load on device 'metal:0' took 18.47 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_7c1132c5 7c1132c load on device 'metal:0' took 16.65 ms  (cached)
+Module mul_m_kernel__locals___mul_m_505d9f1c 505d9f1 load on device 'metal:0' took 16.94 ms  (cached)
+Module _update_constraint_efc__locals__kernel_55fc5219 55fc521 load on device 'metal:0' took 17.02 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_6f502a20 6f502a2 load on device 'metal:0' took 16.83 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_86f1e084 86f1e08 load on device 'metal:0' took 16.75 ms  (cached)
+Module _update_gradient_grad__locals__kernel_e5baa4a1 e5baa4a load on device 'metal:0' took 16.72 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_712c31a5 8925ee6 load on device 'metal:0' took 16.94 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_ad48cc59 0434274 load on device 'metal:0' took 16.93 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_a2a614b4 7ad7e38 load on device 'metal:0' took 17.96 ms  (cached)
+Module _update_constraint_efc__locals__kernel_3649f6fe 3649f6f load on device 'metal:0' took 17.07 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_20171f2f 20171f2 load on device 'metal:0' took 16.71 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_67211e0e 67211e0 load on device 'metal:0' took 16.53 ms  (cached)
+Module _update_gradient_grad__locals__kernel_7aee5faa 7aee5fa load on device 'metal:0' took 16.74 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_ff0e6fb9 f5091d7 load on device 'metal:0' took 17.01 ms  (cached)
+Module _solve_done__locals__kernel_d351f953 d351f95 load on device 'metal:0' took 16.61 ms  (cached)
+Module mujoco_warp._src.sensor c2b0248 load on device 'metal:0' took 27.37 ms  (cached)
+Module mujoco_warp._src.derivative 356952f load on device 'metal:0' took 19.73 ms  (cached)
+Module _next_time_builder__locals___next_time_bd97507a bd97507 load on device 'metal:0' took 16.77 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_f05e0f72 f05e0f7 load on device 'metal:0' took 16.94 ms  (cached)
+Module reset_data__locals__reset_M_debb12fa debb12f load on device 'metal:0' took 16.68 ms  (cached)
+Module reset_data__locals__reset_mocap_d5f6a172 d5f6a17 load on device 'metal:0' took 16.53 ms  (cached)
+Module reset_data__locals__reset_contact_10be067b 10be067 load on device 'metal:0' took 16.82 ms  (cached)
+Module reset_data__locals__reset_sleep_4c0bb4a4 4c0bb4a load on device 'metal:0' took 16.79 ms  (cached)
+Module reset_data__locals__reset_nworld_f0ec89aa f0ec89a load on device 'metal:0' took 16.96 ms  (cached)
+Module metalsim.sensors.contact 8b280a6 load on device 'metal:0' took 19.22 ms  (cached)
+Module metalsim.learn.terrain 595c542 load on device 'metal:0' took 21.31 ms  (cached)
+Module metalsim.learn.g1_velocity 98312b6 load on device 'metal:0' took 25.42 ms  (cached)
+Module metalsim.learn.warp_policy a9b40e0 load on device 'metal:0' took 17.80 ms  (cached)
+{"step": 19, "max_niter_cap100": 15, "worlds_at_cap100": 0, "cap10": {"worlds_hitting_cap": 37, "max_dqpos": 0.01619824767112732, "max_dqvel": 4.177148818969727, "worlds_dqvel_gt_0.01": 34, "max_dqvel_in_non_hitting": 4.177148818969727}, "cap20": {"worlds_hitting_cap": 0, "max_dqpos": 0.01262083649635315, "max_dqvel": 4.177149295806885, "worlds_dqvel_gt_0.01": 27, "max_dqvel_in_non_hitting": 4.177149295806885}, "cap40": {"worlds_hitting_cap": 0, "max_dqpos": 0.009615272283554077, "max_dqvel": 3.846067428588867, "worlds_dqvel_gt_0.01": 23, "max_dqvel_in_non_hitting": 3.846067428588867}}
+{"step": 39, "max_niter_cap100": 14, "worlds_at_cap100": 0, "cap10": {"worlds_hitting_cap": 24, "max_dqpos": 0.03737032040953636, "max_dqvel": 2.7188358306884766, "worlds_dqvel_gt_0.01": 13, "max_dqvel_in_non_hitting": 1.971551537513733}, "cap20": {"worlds_hitting_cap": 0, "max_dqpos": 0.03737032040953636, "max_dqvel": 1.572307825088501, "worlds_dqvel_gt_0.01": 8, "max_dqvel_in_non_hitting": 1.572307825088501}, "cap40": {"worlds_hitting_cap": 0, "max_dqpos": 0.014571860432624817, "max_dqvel": 2.5300121307373047, "worlds_dqvel_gt_0.01": 13, "max_dqvel_in_non_hitting": 2.5300121307373047}}
+{"step": 59, "max_niter_cap100": 12, "worlds_at_cap100": 0, "cap10": {"worlds_hitting_cap": 22, "max_dqpos": 0.006713837385177612, "max_dqvel": 1.7477707862854004, "worlds_dqvel_gt_0.01": 9, "max_dqvel_in_non_hitting": 0.7222797870635986}, "cap20": {"worlds_hitting_cap": 0, "max_dqpos": 0.002764299511909485, "max_dqvel": 1.0927271842956543, "worlds_dqvel_gt_0.01": 4, "max_dqvel_in_non_hitting": 1.0927271842956543}, "cap40": {"worlds_hitting_cap": 0, "max_dqpos": 0.006714671850204468, "max_dqvel": 0.7222762703895569, "worlds_dqvel_gt_0.01": 7, "max_dqvel_in_non_hitting": 0.7222762703895569}}
+{"step": 79, "max_niter_cap100": 12, "worlds_at_cap100": 0, "cap10": {"worlds_hitting_cap": 15, "max_dqpos": 0.00487421452999115, "max_dqvel": 0.693385124206543, "worlds_dqvel_gt_0.01": 10, "max_dqvel_in_non_hitting": 0.693385124206543}, "cap20": {"worlds_hitting_cap": 0, "max_dqpos": 0.00487426295876503, "max_dqvel": 1.3280785083770752, "worlds_dqvel_gt_0.01": 12, "max_dqvel_in_non_hitting": 1.3280785083770752}, "cap40": {"worlds_hitting_cap": 0, "max_dqpos": 0.006982758641242981, "max_dqvel": 1.3280754089355469, "worlds_dqvel_gt_0.01": 11, "max_dqvel_in_non_hitting": 1.3280754089355469}}
+{"step": 99, "max_niter_cap100": 15, "worlds_at_cap100": 0, "cap10": {"worlds_hitting_cap": 24, "max_dqpos": 0.008333355188369751, "max_dqvel": 1.7304434776306152, "worlds_dqvel_gt_0.01": 12, "max_dqvel_in_non_hitting": 1.7304434776306152}, "cap20": {"worlds_hitting_cap": 0, "max_dqpos": 0.008333355188369751, "max_dqvel": 1.8335208892822266, "worlds_dqvel_gt_0.01": 9, "max_dqvel_in_non_hitting": 1.8335208892822266}, "cap40": {"worlds_hitting_cap": 0, "max_dqpos": 0.0034670233726501465, "max_dqvel": 1.3301206827163696, "worlds_dqvel_gt_0.01": 8, "max_dqvel_in_non_hitting": 1.3301206827163696}}
+{"step": 119, "max_niter_cap100": 13, "worlds_at_cap100": 0, "cap10": {"worlds_hitting_cap": 22, "max_dqpos": 0.004041984677314758, "max_dqvel": 1.5137317180633545, "worlds_dqvel_gt_0.01": 9, "max_dqvel_in_non_hitting": 1.5137317180633545}, "cap20": {"worlds_hitting_cap": 0, "max_dqpos": 0.004151523113250732, "max_dqvel": 1.5137269496917725, "worlds_dqvel_gt_0.01": 6, "max_dqvel_in_non_hitting": 1.5137269496917725}, "cap40": {"worlds_hitting_cap": 0, "max_dqpos": 0.009830191731452942, "max_dqvel": 1.5137321949005127, "worlds_dqvel_gt_0.01": 12, "max_dqvel_in_non_hitting": 1.5137321949005127}}
+{"step": 139, "max_niter_cap100": 15, "worlds_at_cap100": 0, "cap10": {"worlds_hitting_cap": 13, "max_dqpos": 0.006451856344938278, "max_dqvel": 0.8619790077209473, "worlds_dqvel_gt_0.01": 14, "max_dqvel_in_non_hitting": 0.8619790077209473}, "cap20": {"worlds_hitting_cap": 0, "max_dqpos": 0.007794298231601715, "max_dqvel": 1.7238821983337402, "worlds_dqvel_gt_0.01": 10, "max_dqvel_in_non_hitting": 1.7238821983337402}, "cap40": {"worlds_hitting_cap": 0, "max_dqpos": 0.0077942851930856705, "max_dqvel": 2.5135297775268555, "worlds_dqvel_gt_0.01": 17, "max_dqvel_in_non_hitting": 2.5135297775268555}}
+{"step": 159, "max_niter_cap100": 12, "worlds_at_cap100": 0, "cap10": {"worlds_hitting_cap": 12, "max_dqpos": 0.006393827497959137, "max_dqvel": 2.1675338745117188, "worlds_dqvel_gt_0.01": 11, "max_dqvel_in_non_hitting": 2.1675338745117188}, "cap20": {"worlds_hitting_cap": 0, "max_dqpos": 0.0027432143688201904, "max_dqvel": 0.24043512344360352, "worlds_dqvel_gt_0.01": 5, "max_dqvel_in_non_hitting": 0.24043512344360352}, "cap40": {"worlds_hitting_cap": 0, "max_dqpos": 0.003545045852661133, "max_dqvel": 0.6364262104034424, "worlds_dqvel_gt_0.01": 5, "max_dqvel_in_non_hitting": 0.6364262104034424}}
+{"step": 179, "max_niter_cap100": 11, "worlds_at_cap100": 0, "cap10": {"worlds_hitting_cap": 18, "max_dqpos": 0.018142588436603546, "max_dqvel": 1.5020360946655273, "worlds_dqvel_gt_0.01": 12, "max_dqvel_in_non_hitting": 1.5020360946655273}, "cap20": {"worlds_hitting_cap": 0, "max_dqpos": 0.018142573535442352, "max_dqvel": 1.502044916152954, "worlds_dqvel_gt_0.01": 16, "max_dqvel_in_non_hitting": 1.502044916152954}, "cap40": {"worlds_hitting_cap": 0, "max_dqpos": 0.018142573535442352, "max_dqvel": 1.3039616346359253, "worlds_dqvel_gt_0.01": 19, "max_dqvel_in_non_hitting": 1.3039616346359253}}
+{"step": 199, "max_niter_cap100": 13, "worlds_at_cap100": 0, "cap10": {"worlds_hitting_cap": 14, "max_dqpos": 0.006265506148338318, "max_dqvel": 1.4347095489501953, "worlds_dqvel_gt_0.01": 13, "max_dqvel_in_non_hitting": 1.4347095489501953}, "cap20": {"worlds_hitting_cap": 0, "max_dqpos": 0.00725400447845459, "max_dqvel": 1.3825974464416504, "worlds_dqvel_gt_0.01": 14, "max_dqvel_in_non_hitting": 1.3825974464416504}, "cap40": {"worlds_hitting_cap": 0, "max_dqpos": 0.007254242897033691, "max_dqvel": 1.3825974464416504, "worlds_dqvel_gt_0.01": 15, "max_dqvel_in_non_hitting": 1.3825974464416504}}
+{
+ "terrain": "rough",
+ "contact_cfg": "recommended",
+ "caps": [
+  10,
+  20,
+  40
+ ],
+ "summary_cap10": {
+  "worlds_hitting_cap_mean_per_step": 20.1,
+  "max_dqpos": 0.03737032040953636,
+  "max_dqvel": 4.177148818969727
+ },
+ "summary_cap20": {
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "max_dqpos": 0.03737032040953636,
+  "max_dqvel": 4.177149295806885
+ },
+ "summary_cap40": {
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "max_dqpos": 0.018142573535442352,
+  "max_dqvel": 3.846067428588867
+ }
+}
+exit 0 Fri Sep 25 22:23:14 PDT 2026
