@@ -1,0 +1,73 @@
+=== g1 preset=None substeps=1 cone=elliptic N=512 S=200 MJW_JTCJ_MODE=(default) mujoco_warp=/Users/aditya/robosim/upstream/mujoco_warp-ellip2c/mujoco_warp
+Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 27.63 ms  (cached)
+Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 18.23 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_26fc98f9 26fc98f load on device 'metal:0' took 24.23 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_9e9003e1 9e9003e load on device 'metal:0' took 22.83 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_35eaa2f8 35eaa2f load on device 'metal:0' took 23.57 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_a864ea0c a864ea0 load on device 'metal:0' took 23.99 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_88240951 8824095 load on device 'metal:0' took 21.11 ms  (cached)
+Module mujoco_warp._src.constraint f5f4518 load on device 'metal:0' took 17.16 ms  (cached)
+Module _friction_dof__locals__kernel_0bb9a331 0bb9a33 load on device 'metal:0' took 17.02 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_914cb5e1 914cb5e load on device 'metal:0' took 17.05 ms  (cached)
+Module _efc_contact_init__locals__kernel_7bf04e1f 7bf04e1 load on device 'metal:0' took 16.76 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_1364491d 6a9b106 load on device 'metal:0' took 16.62 ms  (cached)
+Module _efc_contact_update__locals__kernel_a5cf4f2b a5cf4f2 load on device 'metal:0' took 17.44 ms  (cached)
+Module mujoco_warp._src.forward 4772766 load on device 'metal:0' took 22.97 ms  (cached)
+Module mujoco_warp._src.passive 9e93f67 load on device 'metal:0' took 22.27 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_8ed29e9b 8ed29e9 load on device 'metal:0' took 16.52 ms  (cached)
+Module mujoco_warp._src.sensor c2b0248 load on device 'metal:0' took 27.47 ms  (cached)
+Module mujoco_warp._src.forward d28e0c7 load on device 'metal:0' took 23.55 ms  (cached)
+Module _qfrc_smooth__locals__kernel_08dfc9ad 08dfc9a load on device 'metal:0' took 16.86 ms  (cached)
+Module mujoco_warp._src.support 040f2c5 load on device 'metal:0' took 16.93 ms  (cached)
+Module _factor_i_sparse_serial__locals__kernel_3de45b2a 3ef8be8 load on device 'metal:0' took 18.66 ms  (cached)
+Module _solve_LD_sparse_serial__locals__kernel_0f93a2ff bb1a937 load on device 'metal:0' took 17.56 ms  (cached)
+Module _solve_init_dof__locals__kernel_8e985b01 8e985b0 load on device 'metal:0' took 16.86 ms  (cached)
+Module mujoco_warp._src.solver f23e090 load on device 'metal:0' took 18.42 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_5ed5e677 5ed5e67 load on device 'metal:0' took 16.65 ms  (cached)
+Module mul_m_kernel__locals___mul_m_505d9f1c 505d9f1 load on device 'metal:0' took 17.01 ms  (cached)
+Module _update_constraint_efc__locals__kernel_1994cb68 1994cb6 load on device 'metal:0' took 16.98 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_6f502a20 6f502a2 load on device 'metal:0' took 16.62 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_86f1e084 86f1e08 load on device 'metal:0' took 16.63 ms  (cached)
+Module _update_gradient_grad__locals__kernel_e5baa4a1 e5baa4a load on device 'metal:0' took 17.70 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_9761688c bba40ed load on device 'metal:0' took 17.99 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_c9405a9e 3ca3a21 load on device 'metal:0' took 20.59 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_343096c5 47e4e92 load on device 'metal:0' took 19.05 ms  (cached)
+Module _update_constraint_efc__locals__kernel_49bd7abe 49bd7ab load on device 'metal:0' took 16.87 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_20171f2f 20171f2 load on device 'metal:0' took 17.33 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_67211e0e 67211e0 load on device 'metal:0' took 19.35 ms  (cached)
+Module _update_gradient_grad__locals__kernel_7aee5faa 7aee5fa load on device 'metal:0' took 19.19 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_c2221db6 82609d6 load on device 'metal:0' took 16.96 ms  (cached)
+Module _solve_done__locals__kernel_d351f953 d351f95 load on device 'metal:0' took 16.87 ms  (cached)
+Module mujoco_warp._src.derivative 356952f load on device 'metal:0' took 19.79 ms  (cached)
+Module _next_time_builder__locals___next_time_bd97507a bd97507 load on device 'metal:0' took 16.89 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_f05e0f72 f05e0f7 load on device 'metal:0' took 16.88 ms  (cached)
+Module reset_data__locals__reset_M_debb12fa debb12f load on device 'metal:0' took 16.64 ms  (cached)
+Module reset_data__locals__reset_mocap_d5f6a172 d5f6a17 load on device 'metal:0' took 16.52 ms  (cached)
+Module reset_data__locals__reset_contact_10be067b 10be067 load on device 'metal:0' took 16.60 ms  (cached)
+Module reset_data__locals__reset_sleep_4c0bb4a4 4c0bb4a load on device 'metal:0' took 16.63 ms  (cached)
+Module reset_data__locals__reset_nworld_f0ec89aa f0ec89a load on device 'metal:0' took 16.93 ms  (cached)
+njmax 512 naconmax 24576 sparse False JAC=dense nv 35 ndof_tri 630
+--- floor: two graph-replay instances of this configuration
+   step    1: qpos max 5.40e-07 median 4.4e-11 | qvel max 1.35e-04 | worlds with |dq| > 1e-3: 0.0 %
+   step    2: qpos max 1.08e-06 median 1.2e-10 | qvel max 1.34e-04 | worlds with |dq| > 1e-3: 0.0 %
+   step    4: qpos max 2.17e-06 median 3.5e-10 | qvel max 1.38e-04 | worlds with |dq| > 1e-3: 0.0 %
+   step   10: qpos max 5.80e-06 median 3.7e-09 | qvel max 1.65e-04 | worlds with |dq| > 1e-3: 0.0 %
+   step   25: qpos max 2.04e-05 median 2.3e-08 | qvel max 3.16e-04 | worlds with |dq| > 1e-3: 0.0 %
+   step   50: qpos max 3.98e-03 median 8.9e-08 | qvel max 7.60e-01 | worlds with |dq| > 1e-3: 0.6 %
+   step  100: qpos max 3.43e-02 median 2.7e-07 | qvel max 1.55e+00 | worlds with |dq| > 1e-3: 4.1 %
+   step  200: qpos max 3.40e-01 median 2.9e-06 | qvel max 8.18e+00 | worlds with |dq| > 1e-3: 15.6 %
+capacity replay: nefc max 122 (njmax 512), nacon max 4627 (naconmax 24576); overflow {'ITERATIONS': 31, 'LS_ITERATIONS': 512}
+capacity replay 2: nefc max 122 (njmax 512), nacon max 4621 (naconmax 24576); overflow {'ITERATIONS': 30, 'LS_ITERATIONS': 512}
+--- MuJoCo C oracle (4 worlds: PD hold + fixed random targets; |dq| max / median)
+   t=0.004s 5.91e-08/5.4e-10  t=0.008s 8.45e-08/1.3e-09  t=0.016s 1.23e-07/3.2e-09  t=0.048s 2.76e-07/3.4e-08  t=0.100s 6.23e-07/1.3e-07  t=0.200s 1.95e-06/1.6e-07  t=0.400s 3.55e-06/4.0e-07
+--- this configuration vs reference [g1 (default) JAC=dense /Users/aditya/robosim/upstream/mujoco_warp-ellip-base/mujoco_warp] (graph replay)
+   step    1: qpos max 1.45e-07 median 5.8e-11 | qvel max 3.63e-05 | worlds with |dq| > 1e-3: 0.0 %
+   step    2: qpos max 2.84e-07 median 1.3e-10 | qvel max 3.48e-05 | worlds with |dq| > 1e-3: 0.0 %
+   step    4: qpos max 5.74e-07 median 4.7e-10 | qvel max 1.28e-04 | worlds with |dq| > 1e-3: 0.0 %
+   step   10: qpos max 1.51e-06 median 4.9e-09 | qvel max 5.41e-05 | worlds with |dq| > 1e-3: 0.0 %
+   step   25: qpos max 2.38e-06 median 2.7e-08 | qvel max 9.27e-05 | worlds with |dq| > 1e-3: 0.0 %
+   step   50: qpos max 3.98e-03 median 8.9e-08 | qvel max 7.60e-01 | worlds with |dq| > 1e-3: 0.8 %
+   step  100: qpos max 3.43e-02 median 3.0e-07 | qvel max 1.68e+00 | worlds with |dq| > 1e-3: 5.3 %
+   step  200: qpos max 6.23e-01 median 3.2e-06 | qvel max 6.52e+00 | worlds with |dq| > 1e-3: 16.2 %
+   reference MuJoCo C oracle: t=0.004s 6.50e-02/3.6e-03  t=0.008s 1.23e-01/7.0e-03  t=0.016s 2.37e-01/1.6e-02  t=0.048s 5.79e-01/3.6e-02  t=0.100s 8.95e-01/6.3e-02  t=0.200s 1.43e+00/6.7e-02  t=0.400s 1.51e+00/9.5e-02
+=== done
