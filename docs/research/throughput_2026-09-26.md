@@ -144,6 +144,17 @@ capacities). Result-neutral by construction: no overflow is possible below the b
 every kernel's arithmetic are unchanged (the earlier +1.8 % row in DECISIONS was the same idea measured under
 default contacts without the guard).
 
+## 4c. Rough task capacities: not bounded, guard now in place (finding, not a throughput change)
+
+The rough task (`boxes_local`: 96 per-world box slots around the robot, refreshed every substep) runs with
+njmax 256 / nconmax 128 per world. Its model has 288 box-mesh pairs (GJK/EPA with MULTICCD: up to 4 contacts each),
+3 heightfield-mesh pairs (kernel-capped) and 3 mesh-mesh pairs: the model bound is above 1,150 contacts and 4,600 rows
+per world, so the 128 / 256 capacities are a practical choice (2.6 contacts per world observed), not a guarantee. An
+overflow would have been silent until today (`monitor.py` looked for flag names that do not exist); it now raises at
+every PPO log point (`BatchSim.check_overflow()`), and `capacity.bounds` refuses the model (heightfield geom) rather
+than pretend. Recommendation for the task owner: keep the guard, and size `nconmax` from the largest observed
+`nacon` over a training run plus margin.
+
 ## 5. Rough terrain under the preset (measured, `runs/tp26/rough.wrapper.log`, 04:11-04:12; first measurement)
 
 | rough (boxes_local, 4096, `--quick`, interleaved R N R N) | physics only | full env step | Newton cap hit |
@@ -185,6 +196,15 @@ per-iteration kernels into one launch: 0.4 ms per substep at 10 us a dispatch, s
 latency of the n = 43 factorization (the 32 -> 43 cost jump, 0.17 -> 0.97 ms per 4096, is 2.4x the flop ratio;
 not register spill: the compact layout did not help; unresolved), (c) the line-search kernel's latency.
 
+### 2d. Rolled register Cholesky (rejected)
+
+Hypothesis from 4b (b): the 33 -> 48 cost growth is instruction fetch of the ~n^2 unrolled code. Test: the same lane
+layout and operations with runtime loops (`metal_rolled_cholesky`, `WP_METAL_ROLLED_CHOLESKY`), bitwise the same
+factor and solve (`runs/tp26/rolled.wrapper.log`): factor 3.36 vs 0.98 ms at n = 43, 0.66 vs 0.19 at 32, 5.18 vs 1.94
+at 48. Rejected: thread-memory arrays cost far more than the unrolled code; the register form is the right one and
+its n = 43 cost is unexplained by these two hypotheses (register pressure limiting resident SIMD groups remains the
+candidate; a 64-lane / two-SIMD-group form with one threadgroup exchange per column is the untested option).
+
 ### 2c. Fused per-iteration update launch (MuJoCo Warp fork `metalsim-tp`, in measurement)
 
 `_update_constraint_gradient_fused`: the five launches between the line search and the Hessian update (zero the
@@ -221,6 +241,54 @@ the loop. Removing the adaptive-KL `.item()` per minibatch (a host sync) saves 1
 (no foreach on MPS), the GAE recursion is 0.8 ms, forward + backward 101 ms, Adam ~0. Both removable pieces change
 results (the lr schedule, the clipping), so they are options (each ~1 % of the loop), not changes; the
 forward/backward is compute (torch.compile changes numerics; not tried).
+
+## 5b. Physics identity evidence for the landed fork changes (measured, `runs/tp26/check.wrapper.log`, `check_base.npz` / `check_wt.npz`)
+
+`scripts/diagnostics/g1_tp_check.py` (512 envs, 50 control steps, deterministic actions, the task default preset,
+bound capacities): installed forks vs the worktree (register solve + fused per-iteration launches), graph replay:
+
+| control step | qpos max | qpos p99 | qpos median | obs max | reward max |
+|---|---|---|---|---|---|
+| 1 | 1.96e-6 rad | 1.2e-7 | 0 | 5.3e-4 | 6.3e-7 |
+| 2 | 9.6e-6 | 1.1e-6 | 1.9e-9 | 1.1e-3 | 2.0e-6 |
+| 5 | 3.4e-3 | 3.0e-6 | 3.0e-8 | 0.84 | 1.3e-3 |
+| 50 | 1.8 (chaotic, as two instances of one configuration: 9.2 rad in `runs/mjw_tp/final_checks.log`) | 2.4e-2 | 8.2e-8 | 9.4 | 4.1 |
+
+The register solve changes the summation order of every Newton solve in every world, so the one-step difference
+(max 2e-6 rad, p99 1.2e-7) is above the atomics-only floor of two identical instances (max 1.3-1.5e-7) but is
+float32 noise (1e-7 relative) and far below the protocol's p99 criterion (~1e-3). MuJoCo C protocol (4 worlds, PD
+hold + fixed random targets, |dq| max / median): installed 4.08e-6 / 1.3e-8 at 0.02 s, 4.41e-6 / 2.2e-8 at 0.04 s,
+0.156 / 0.015 at 0.08 s, 0.244 / 0.061 at 0.5 s, 0.466 / 0.12 at 1 s; worktree 4.08e-6, 4.41e-6, 0.156, 0.237,
+0.456 (the same envelope; the divergence after 0.08 s is the chaotic random-target protocol, identical for every
+configuration measured on 2026-09-25). Capacity / overflow unchanged (nefc max 35 of 144, ITERATIONS cap hits 31-36
+of 512, LS 476-481 in both). The fused launches alone (`runs/tp26/check2.wrapper.log`, fused vs unfused within the worktree): step 1 qpos max
+1.38e-6 (the two configurations' own two-instance floors: 1.51e-6 and 1.85e-6), step 5 1.08e-3 (floors 3.4e-3 /
+1.08e-3), step 50 1.80 (floors 1.63 / 1.80), MuJoCo C protocol identical at 0.02-0.24 s (4.08e-6, 4.41e-6, 0.156,
+0.256) and within the envelope after: the fusion is inside the run-to-run floor at every step.
+
+## 8. Elliptic cones: the cone term as rank-1 updates of the stored factor (coordinator item; in measurement)
+
+With the elliptic incremental path (fork head 9b4e96a, mode 2) the remaining elliptic premium on the G1 task is a
+per-entry cone term plus a full register Cholesky of htot = h + cone every iteration for worlds with CONE rows.
+MuJoCo C (`engine_solver.c` `HessianConeUpdate`) copies L into Lcone and applies dim rank-1 updates per cone contact
+with v = L_con' Z (L_con the Cholesky of the contact's local curvature). Implemented on `metalsim-tp` (MuJoCo Warp
+2d37... `MJW_ELLIPTIC_CONE_UPDATE=1`, Warp `tile_cholesky_update_inplace` with a register form: lanes own rows, L[k,k]
+and x[k] broadcast by SIMD shuffle, no barriers): `_cone_vectors` builds the vectors per world (worlds above
+`MJW_CONE_UPDATE_KMAX` = 6 cone rows keep the per-entry path), the factor of h is stored in `ctx.hfactor` and reused
+across iterations without a quadratic flip. Cone statistics on the G1 task with `tau10_impact_hardlimits_ellip10`
+(CPU device, `runs/tp26/solver_iters_ellip10.log`, 64 worlds x 64 substeps): 87 % of solving world-iterations have
+cone rows, 65 % of those with no quadratic flip (a factor reuse + updates instead of a refactorization); rows per
+cone world: 3-4 in 40 %, 5-6 in 30 %, 9-12 in 25 %, 13-24 in 5 %.
+
+CPU-device numerics (`scripts/diagnostics/cone_update_cpu_check.py`, 16 worlds x 24 substeps, 1112 iteration solves):
+search-direction error against the float64 solve of h + cone term: mode 2 (per-entry + refactor) median 5.4e-6,
+p99 1.4e-3, max 7.1e-3; mode 3 (rank-1 updates) median 2.2e-6, p99 1.7e-3, first version max 0.42 in one solve
+(the local Cholesky's absolute 1e-15 pivot floor in float32: a near-zero pivot blows its column up), replaced by a
+relative tolerance (1e-6 of the largest local diagonal) that drops the direction: median 2.1e-6, p99 2.0e-3, max 2.1e-2
+(worlds with 1-3 vectors p99 6.2e-3; the per-entry path's own tail is 1.4e-3 / 7.1e-3: these cone Hessians are
+ill-conditioned in float32 on either path). Trajectories mode 3 vs mode 2: |dq| max 1.2e-7 / 3.6e-6 / 3.4e-6 rad
+after 1 / 2 / 3 control steps (mode 2 vs itself on the CPU: 0; the Metal run-to-run floor at step 2 is 8e-6). Metal check and throughput on the G1
+task (ellip10), Go2, humanoid, SO-101: `runs/tp26/cone.wrapper.log`.
 
 ## 6. Options that change results (reported, not landed)
 

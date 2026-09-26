@@ -1,0 +1,69 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth 0ff6684 load on device 'cpu' took 2462.62 ms  (compiled)
+Module _nxn_broadphase__locals__kernel_1c8f4770 8c8bdc1 load on device 'cpu' took 185.64 ms  (compiled)
+Module ccd_kernel_builder__locals__ccd_kernel_17e5ebf4 a69da1b load on device 'cpu' took 1845.96 ms  (compiled)
+Module _primitive_narrowphase__locals__primitive_narrowphase_02e8d4ad ee8554e load on device 'cpu' took 656.36 ms  (compiled)
+Module mujoco_warp._src.constraint 1144391 load on device 'cpu' took 45.72 ms  (compiled)
+Module _friction_dof__locals__kernel_88e025d4 fb48880 load on device 'cpu' took 98.76 ms  (compiled)
+Module _limit_slide_hinge__locals__kernel_35389d51 435edfa load on device 'cpu' took 101.07 ms  (compiled)
+Module _efc_contact_init__locals__kernel_de148a07 109e219 load on device 'cpu' took 54.80 ms  (compiled)
+Module _efc_contact_jac_dense__locals__kernel_c8c36cbe 684fc1a load on device 'cpu' took 203.79 ms  (compiled)
+Module _efc_contact_update__locals__kernel_c3b4a8d2 dfa312f load on device 'cpu' took 100.57 ms  (compiled)
+Module mujoco_warp._src.forward 804256b load on device 'cpu' took 964.96 ms  (compiled)
+Module mujoco_warp._src.passive 681d8cb load on device 'cpu' took 845.56 ms  (compiled)
+Module _qfrc_passive_kernel__locals__kernel_11bd280c 5238899 load on device 'cpu' took 47.60 ms  (compiled)
+Module _qfrc_smooth__locals__kernel_1cb99547 d53779d load on device 'cpu' took 45.74 ms  (compiled)
+Module mujoco_warp._src.support 790797f load on device 'cpu' took 113.56 ms  (compiled)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_62b93402 11b1b48 load on device 'cpu' took 119.33 ms  (compiled)
+Module _solve_init_dof__locals__kernel_00123cac dbf6486 load on device 'cpu' took 45.93 ms  (compiled)
+Module mujoco_warp._src.solver 7609fd5 load on device 'cpu' took 312.89 ms  (compiled)
+Module _solve_init_jaref_kernel__locals__kernel_656c200c 52d3826 load on device 'cpu' took 51.81 ms  (compiled)
+Module mul_m_kernel__locals___mul_m_3deaac68 213435a load on device 'cpu' took 73.39 ms  (compiled)
+Module _update_constraint_efc__locals__kernel_dffe3eb8 79ffe97 load on device 'cpu' took 86.07 ms  (compiled)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_7f247776 bd0cf33 load on device 'cpu' took 52.75 ms  (compiled)
+Module _update_gradient_zero_grad_dot__locals__kernel_223124f3 59c948d load on device 'cpu' took 47.24 ms  (compiled)
+Module _update_gradient_grad__locals__kernel_b9bbf79b 6a2a99e load on device 'cpu' took 48.87 ms  (compiled)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_58eadeaa bf14b02 load on device 'cpu' took 179.97 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_79a76b48 adaa9d4 load on device 'cpu' took 148.92 ms  (compiled)
+Module _linesearch_iterative_kernel__locals__kernel_b2eeee07 9398502 load on device 'cpu' took 322.28 ms  (compiled)
+Module _update_constraint_efc__locals__kernel_68af41e6 129a0e9 load on device 'cpu' took 97.68 ms  (compiled)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_4797e916 ee9d442 load on device 'cpu' took 53.59 ms  (compiled)
+Module _update_gradient_zero_grad_dot__locals__kernel_8eb9cb2b 349c75c load on device 'cpu' took 49.70 ms  (compiled)
+Module _update_gradient_grad__locals__kernel_6aa889d0 6b83b99 load on device 'cpu' took 49.33 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_bf1f27f3 d46f9a1 load on device 'cpu' took 149.42 ms  (compiled)
+Module _solve_done__locals__kernel_b12f0605 c5ad2c2 load on device 'cpu' took 53.65 ms  (compiled)
+Module mujoco_warp._src.sensor 9c68eb8 load on device 'cpu' took 1580.62 ms  (compiled)
+Module mujoco_warp._src.derivative ebc1d59 load on device 'cpu' took 522.07 ms  (compiled)
+Module _next_time_builder__locals___next_time_3c568a87 7db6c03 load on device 'cpu' took 56.32 ms  (compiled)
+
+=== tau10_impact_hardlimits_ellip10: N=64, 64 substeps (13 s), iterations cap 10; solver_niter mean 4.14 p50 4 p90 8 max 10; at cap 177/4096 (4.3 %); overflow ITERATIONS 45 LS 64 worlds; nefc mean 7.2
+  it | solving % | refactor % | solve-only % | ls_exh % | flips/refactor world: 1 | 2 | 3-4 | 5-8 | 9-16 | >16 | adds | removes
+   1 |     78.5 |      78.5 |        25.2 |     0.0 |  1603 |   176 |   267 |    93 |    47 |     0 |  3698 |   185
+   2 |     64.3 |      63.1 |        37.7 |     0.0 |   437 |    29 |   397 |   120 |    58 |     1 |  2635 |   444
+   3 |     53.5 |      53.3 |        33.5 |     0.0 |   173 |     9 |   434 |   116 |    77 |     0 |  2460 |   567
+   4 |     43.2 |      43.0 |        28.3 |     0.0 |   109 |     5 |   351 |    92 |    48 |     0 |  1529 |   716
+   5 |     30.1 |      30.0 |        20.8 |     0.0 |    63 |     1 |   223 |    66 |    20 |     0 |   757 |   591
+   6 |     19.7 |      19.7 |        14.4 |     0.0 |    24 |     1 |   148 |    36 |     8 |     0 |   434 |   343
+   7 |     12.5 |      12.5 |         9.5 |     0.0 |    17 |     0 |    89 |    16 |     3 |     0 |   253 |   155
+   8 |      7.7 |       7.7 |         5.8 |     0.0 |     6 |     0 |    60 |     9 |     2 |     0 |   153 |   107
+   9 |      4.3 |       4.3 |         3.5 |     0.0 |     4 |     0 |    24 |     7 |     0 |     0 |    67 |    52
+  10 |      0.0 |       0.0 |         0.0 |     0.0 |     0 |     0 |     0 |     0 |     0 |     0 |     0 |     0
+  elliptic: it | cone worlds (still solving) | of which with a quad flip too | cone rows per cone world: <=2 | 3-4 | 5-6 | 7-8 | 9-12 | 13-16 | 17-24 | >24
+   1 |   2223 |   1197 |     0 |   891 |   640 |     0 |   556 |    83 |    53 |     0
+   2 |   2258 |    720 |     0 |   842 |   691 |     0 |   569 |   106 |    50 |     0
+   3 |   2009 |    642 |     0 |   703 |   673 |     0 |   498 |    92 |    43 |     0
+   4 |   1659 |    503 |     0 |   531 |   568 |     0 |   452 |    72 |    36 |     0
+   5 |   1193 |    339 |     0 |   314 |   408 |     0 |   378 |    64 |    29 |     0
+   6 |    796 |    207 |     0 |   174 |   255 |     0 |   295 |    54 |    18 |     0
+   7 |    513 |    125 |     0 |    96 |   159 |     0 |   200 |    37 |    21 |     0
+   8 |    312 |     75 |     0 |    43 |    91 |     0 |   142 |    26 |    10 |     0
+   9 |    176 |     35 |     0 |    18 |    54 |     0 |    77 |    18 |     9 |     0
+  10 |      0 |      0 |     0 |     0 |     0 |     0 |     0 |     0 |     0 |     0
+  cone-world iterations total 11139 of 12857 solving world-iterations; without a quad flip 7296
+  total refactorizations 12788 = 3.12 per world-substep (initial factorization excluded); solve-only 7319; flips 11986 adds / 3160 removes over 5469 worlds (mean 2.77 per refactoring world)

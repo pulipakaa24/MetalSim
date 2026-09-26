@@ -1,0 +1,39 @@
+[gpu_run] tp26_rolled start: device utilisation 0% (04:42:44)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   1.5 %
+=== start Sat Sep 26 04:42:47 PDT 2026 wt warp 2869a2f7 power: Now drawing from 'AC Power'
+--- unrolled (worktree default) 04:42:47
+rolled cholesky above n: 0
+n=32: copy 0.075 ms | factor 0.189 ms | solve 0.168 ms (residual 7.9e-07) | factor+solve 0.201 ms (residual 7.9e-07)  [per launch of 4096, block_dim 32, graph replay]
+n=40: copy 0.178 ms | factor 0.545 ms | solve 0.258 ms (residual 9.0e-07) | factor+solve 0.597 ms (residual 9.0e-07)  [per launch of 4096, block_dim 32, graph replay]
+n=43: copy 0.245 ms | factor 0.981 ms | solve 0.335 ms (residual 1.0e-06) | factor+solve 1.039 ms (residual 1.0e-06)  [per launch of 4096, block_dim 32, graph replay]
+n=48: copy 0.301 ms | factor 1.943 ms | solve 0.522 ms (residual 1.5e-06) | factor+solve 2.163 ms (residual 1.5e-06)  [per launch of 4096, block_dim 32, graph replay]
+--- rolled above 32 04:42:59
+rolled cholesky above n: 32
+n=32: copy 0.062 ms | factor 0.175 ms | solve 0.119 ms (residual 7.9e-07) | factor+solve 0.208 ms (residual 7.9e-07)  [per launch of 4096, block_dim 32, graph replay]
+n=40: copy 0.185 ms | factor 2.423 ms | solve 0.256 ms (residual 9.0e-07) | factor+solve 2.648 ms (residual 9.0e-07)  [per launch of 4096, block_dim 32, graph replay]
+n=43: copy 0.245 ms | factor 3.363 ms | solve 0.332 ms (residual 1.0e-06) | factor+solve 3.367 ms (residual 1.0e-06)  [per launch of 4096, block_dim 32, graph replay]
+n=48: copy 0.300 ms | factor 5.181 ms | solve 0.526 ms (residual 1.5e-06) | factor+solve 5.261 ms (residual 1.5e-06)  [per launch of 4096, block_dim 32, graph replay]
+--- rolled above 0 (also n = 32) 04:43:12
+rolled cholesky above n: 1
+n=32: copy 0.060 ms | factor 0.659 ms | solve 0.118 ms (residual 7.9e-07) | factor+solve 2.038 ms (residual 7.9e-07)  [per launch of 4096, block_dim 32, graph replay]
+n=43: copy 0.241 ms | factor 3.350 ms | solve 0.334 ms (residual 1.0e-06) | factor+solve 3.360 ms (residual 1.0e-06)  [per launch of 4096, block_dim 32, graph replay]
+--- bitwise: rolled vs unrolled 04:43:18
+saved
+  f33: bitwise
+  x33: bitwise
+  f40: bitwise
+  x40: bitwise
+  f43: bitwise
+  x43: bitwise
+  f48: bitwise
+  x48: bitwise
+  f32: bitwise
+  x32: bitwise
+  f16: bitwise
+  x16: bitwise
+ALL BITWISE
+=== end Sat Sep 26 04:43:32 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] tp26_rolled end: device utilisation 0% (04:43:32), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+lock held by e2_check_sz, not tp26_rolled; not released

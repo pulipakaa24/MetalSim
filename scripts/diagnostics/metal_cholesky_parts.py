@@ -11,6 +11,9 @@ wp.config.quiet = True
 wp.config.metal_register_cholesky_max = 48
 if os.environ.get("WP_METAL_REGISTER_SOLVE") is not None and hasattr(wp.config, "metal_register_solve"):
     wp.config.metal_register_solve = os.environ["WP_METAL_REGISTER_SOLVE"] != "0"   # fork worktree knob (A/B)
+if os.environ.get("WP_METAL_ROLLED_CHOLESKY") is not None and hasattr(wp.config, "metal_rolled_cholesky"):
+    wp.config.metal_rolled_cholesky = int(os.environ["WP_METAL_ROLLED_CHOLESKY"])
+print(f"rolled cholesky above n: {getattr(wp.config, 'metal_rolled_cholesky', 'n/a')}", flush=True)
 print(f"register solve: {getattr(wp.config, 'metal_register_solve', 'n/a (not in this Warp)')}", flush=True)
 
 

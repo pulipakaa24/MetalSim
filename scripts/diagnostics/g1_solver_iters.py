@@ -28,16 +28,20 @@ dev = wp.get_device("cpu")
 
 
 class Stats:
-    def __init__(self, iters):
-        self.iters = iters
+    def __init__(self, iters, cone=False):
+        self.iters = iters; self.cone = cone
         self.undone = np.zeros(iters, np.int64); self.refactor = np.zeros(iters, np.int64)
         self.solve_only = np.zeros(iters, np.int64); self.adds = np.zeros(iters, np.int64); self.removes = np.zeros(iters, np.int64)
         self.hist = np.zeros((iters, 6), np.int64)   # flips per refactoring world: 1, 2, 3-4, 5-8, 9-16, >16
         self.substeps = 0; self.niter = []; self.cap = 0
         self.ls_exh = np.zeros(iters, np.int64)
+        self.cone_worlds = np.zeros(iters, np.int64); self.cone_rows_hist = np.zeros((iters, 8), np.int64)   # k = cone rows per cone world: 1-2,3-4,5-6,7-8,9-12,13-16,17-24,>24
+        self.cone_and_flip = np.zeros(iters, np.int64)
 
     def record(self, k, ctx, d):
         done = ctx.done.numpy(); sc = ctx.state_changed_count.numpy(); qc = ctx.quad_changed_count.numpy()
+        if sc.size == 0:      # no incremental tracking on this path (elliptic cones on the installed fork): count solving worlds only
+            self.undone[k] += (~done).sum(); return
         ids = ctx.quad_changed_ids.numpy(); st = d.efc.state.numpy()
         und = ~done
         self.undone[k] += und.sum()
@@ -45,6 +49,13 @@ class Stats:
         self.refactor[k] += rf.sum()
         self.solve_only[k] += (rf & (qc == 0)).sum()
         self.ls_exh[k] += (und & ctx.ls_exhausted.numpy()).sum()
+        if self.cone:
+            cone = (st == T.ConstraintState.CONE.value)
+            nrow = np.array([cone[w, :int(n)].sum() for w, n in enumerate(d.nefc.numpy())])
+            cw = und & (nrow > 0)
+            self.cone_worlds[k] += cw.sum(); self.cone_and_flip[k] += (cw & (qc > 0)).sum()
+            for n in nrow[cw]:
+                self.cone_rows_hist[k, 0 if n <= 2 else 1 if n <= 4 else 2 if n <= 6 else 3 if n <= 8 else 4 if n <= 12 else 5 if n <= 16 else 6 if n <= 24 else 7] += 1
         for w in np.nonzero(rf & (qc > 0))[0]:
             n = int(qc[w])
             self.hist[k, 0 if n == 1 else 1 if n == 2 else 2 if n <= 4 else 3 if n <= 8 else 4 if n <= 16 else 5] += 1
@@ -64,7 +75,7 @@ def run(name):
         mw = mjw.put_model(m); mw.opt.graph_conditional = False; mw.opt.warn_overflow = 0
         d = mjw.put_data(m, mjd, nworld=N, nconmax=128, njmax=512)
         iters = int(mw.opt.iterations)
-        stats = Stats(iters)
+        stats = Stats(iters, cone=int(m.opt.cone) == 1)
         orig = S._solver_iteration
         state = {"k": 0}
 
@@ -100,6 +111,11 @@ def run(name):
         h = stats.hist[k]
         print(f"  {k+1:2d} | {100*stats.undone[k]/W:8.1f} | {100*stats.refactor[k]/W:9.1f} | {100*stats.solve_only[k]/W:11.1f} | "
               f"{100*stats.ls_exh[k]/W:7.1f} | " + " | ".join(f"{v:5d}" for v in h) + f" | {stats.adds[k]:5d} | {stats.removes[k]:5d}")
+    if stats.cone:
+        print("  elliptic: it | cone worlds (still solving) | of which with a quad flip too | cone rows per cone world: <=2 | 3-4 | 5-6 | 7-8 | 9-12 | 13-16 | 17-24 | >24")
+        for k in range(iters):
+            print(f"  {k+1:2d} | {stats.cone_worlds[k]:6d} | {stats.cone_and_flip[k]:6d} | " + " | ".join(f"{v:5d}" for v in stats.cone_rows_hist[k]))
+        print(f"  cone-world iterations total {stats.cone_worlds.sum()} of {stats.undone.sum()} solving world-iterations; without a quad flip {stats.cone_worlds.sum() - stats.cone_and_flip.sum()}")
     tot_ref = stats.refactor.sum(); tot_flip = stats.hist.sum()
     print(f"  total refactorizations {tot_ref} = {tot_ref/W:.2f} per world-substep (initial factorization excluded); "
           f"solve-only {stats.solve_only.sum()}; flips {stats.adds.sum()} adds / {stats.removes.sum()} removes over {tot_flip} worlds "
