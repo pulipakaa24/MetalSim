@@ -96,6 +96,8 @@ def main():
         if h and a.name and h.get("name") not in (a.name, None): print(f"lock held by {h.get('name')}, not {a.name}; not released"); sys.exit(1)
         if h and a.pid != os.getppid() and h.get("pid") and h["pid"] != a.pid:   # a late release from an older job of the same name must not free its successor
             print(f"lock held by pid {h['pid']}, release asked for pid {a.pid}; not released"); sys.exit(1)
+        if h is None and a.rc is not None:            # a waiter already freed the dead holder; still record the exit code
+            _hist("exit", name=a.name, rc=a.rc); return
         _release(rc=a.rc)
     elif a.json:
         print(json.dumps({"holder": holder(), "waiting": [tk for _, _, _, tk in tickets()], "now": time.time()}))

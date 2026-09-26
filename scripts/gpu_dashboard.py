@@ -163,6 +163,9 @@ def history(n=12):
                 g = grants.pop(e.get("name"), {})
                 done.append(dict(name=e.get("name"), kind=e.get("kind") or g.get("kind"), start=e.get("start") or g.get("t"), end=e["t"],
                                  rc=e.get("rc"), forced=e.get("forced"), cmd=g.get("cmd")))
+            elif e["ev"] == "exit":                   # the wrapper's exit code, logged after a waiter freed the dead holder
+                for d in reversed(done):
+                    if d["name"] == e.get("name") and d.get("rc") is None: d["rc"] = e.get("rc"); break
     except OSError: pass
     return done[-n:][::-1]
 
