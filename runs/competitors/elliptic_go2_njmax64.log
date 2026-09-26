@@ -1,0 +1,8 @@
+[gpu_run] ellip_go2_njmax64 start: device utilisation 0% (20:11:20)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+LABEL go2_njmax64 mjw=/Users/aditya/robosim/upstream/mujoco_warp-ellip/mujoco_warp/__init__.py head=07a51a6 N=4096 env=MJW_JTCJ_MODE=world NJMAX=64 
+== go2 elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "go2", "N": 4096, "mode": "matched", "nv": 18, "nu": 12, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 608499, "finite": true, "base_z_mean": 0.189, "overflow": {"ITERATIONS": 979, "LS_ITERATIONS": 4096}}
+[gpu_run] ellip_go2_njmax64 end: device utilisation 100% (20:11:34), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+lock held by ellip_g1_groups4, not ellip_go2_njmax64; not released

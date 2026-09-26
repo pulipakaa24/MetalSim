@@ -1,0 +1,9 @@
+== stage transfer mjw=/Users/aditya/robosim/upstream/mujoco_warp-ellip head=07a51a6 presets=tau10_impact_elliptic_hardlimits tau10_impact_elliptic_imp10_hardlimits tau10_impact_elliptic_imp100_hardlimits Fri Sep 25 20:22:59 PDT 2026
+holder: {"name": "ellip_fid_transfer", "kind": "render", "minutes": 12.0, "pid": 4945, "start": 1790392979.460696, "queued": 1790390972.6728702, "cmd": "scripts/diagnostics/competitors/elliptic_fidelity_g1.sh /Users/aditya/robosim/upstream/mujoco_warp-ellip transfer", "cwd": "/Users/aditya/robosim"}
+install: newton {'path': '/Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton', 'url': 'https://github.com/newton-physics/newton', 'commit': '45458023f24629c1feffb1f336594808f537db14', 'editable': False} | warp {'path': '/Users/aditya/robosim/upstream/warp-innate/warp', 'git_head': '4127c481', 'git_dirty': False}
+| checkpoint | mjwarp:tau10_impact_hardlimits x [m] / pelvis z [m] | mjwarp:tau10_impact_elliptic_hardlimits x [m] / pelvis z [m] | mjwarp:tau10_impact_elliptic_imp10_hardlimits x [m] / pelvis z [m] | mjwarp:tau10_impact_elliptic_imp100_hardlimits x [m] / pelvis z [m] |
+|---|---|---|---|---|
+| Isaac it 500 | 3.25 (3.19-3.29) / 0.622 (0.62-0.63) | 3.24 (3.18-3.28) / 0.622 (0.62-0.63) | 3.25 (3.19-3.28) / 0.621 (0.61-0.63) | 3.24 (3.17-3.28) / 0.621 (0.62-0.63) |
+| Isaac it 1000 | 2.99 (2.92-3.06) / 0.631 (0.62-0.64) | 2.97 (2.88-3.01) / 0.631 (0.62-0.64) | 2.97 (2.91-3.01) / 0.632 (0.62-0.65) | 2.96 (2.88-3.02) / 0.631 (0.62-0.65) |
+| Isaac it 1499 | 3.05 (3.03-3.07) / 0.638 (0.63-0.65) | 3.05 (3.01-3.06) / 0.637 (0.63-0.64) | 3.04 (3.01-3.05) / 0.638 (0.63-0.65) | 3.03 (2.99-3.05) / 0.637 (0.63-0.64) |
+== stage transfer done Fri Sep 25 20:25:00 PDT 2026

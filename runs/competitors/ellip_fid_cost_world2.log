@@ -1,0 +1,49 @@
+[gpu_run] ellip_fid_cost_w2 start: device utilisation 0% (20:25:00)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    476 WindowServer                       1.2 %
+[gpu_run] gpu_top:   pid  58458 Terminal                           1.1 %
+== stage cost mjw=/Users/aditya/robosim/upstream/mujoco_warp-ellip head=07a51a6 presets=tau10_impact_hardlimits tau10_impact_elliptic_hardlimits tau10_impact_elliptic_imp10_hardlimits tau10_impact_elliptic_imp100_hardlimits Fri Sep 25 20:25:03 PDT 2026
+holder: {"name": "ellip_fid_cost_w2", "kind": "timing", "minutes": 9.0, "pid": 5751, "start": 1790393100.723559, "queued": 1790393020.6421602, "cmd": "env PRESETS=tau10_impact_hardlimits tau10_impact_elliptic_hardlimits tau10_impact_elliptic_imp10_hardlimits tau10_impact_elliptic_imp100_hardlimits scripts/diagnostics/competitors/elliptic_fidelity_g1.sh /Users/aditya/robosim/upstream/mujoco_warp-ellip cost", "cwd": "/Users/aditya/robosim"}
+gpu_lock status at start 2026-09-25T20:25:04
+holder: {"name": "ellip_fid_cost_w2", "kind": "timing", "minutes": 9.0, "pid": 5751, "start": 1790393100.723559, "queued": 1790393020.6421602, "cmd": "env PRESETS=tau10_impact_hardlimits tau10_impact_elliptic_hardlimits tau10_impact_elliptic_imp10_hardlimits tau10_impact_elliptic_imp100_hardlimits scripts/diagnostics/competitors/elliptic_fidelity_g1.sh /Users/aditya/robosim/upstream/mujoco_warp-ellip cost", "cwd": "/Users/aditya/robosim"}
+  waiting [render] ellip_fid_air est 20.0 min, queued 2132 s ago
+  waiting [render] ellip_pytest est 25.0 min, queued 2131 s ago
+  waiting [render] envmap_port est 20.0 min, queued 1976 s ago
+  waiting [render] ellip_check_world2 est 8.0 min, queued 418 s ago
+  waiting [render] ellip_check_g1dense_world2 est 6.0 min, queued 417 s ago
+  waiting [render] ellip_check_base2 est 8.0 min, queued 149 s ago
+  waiting [render] ellip_check_g1dense_base2 est 6.0 min, queued 149 s ago
+  waiting [render] ellip_check_world_b est 8.0 min, queued 148 s ago
+  waiting [render] ellip_check_contact_b est 8.0 min, queued 148 s ago
+  waiting [render] ellip_so101_creep2 est 8.0 min, queued 119 s ago
+  waiting [render] il3_fullsuite est 15.0 min, queued 56 s ago
+  waiting [train] il3_rough_probe500 est 45.0 min, queued 2674 s ago
+  waiting [train] il3_blowup_probe est 30.0 min, queued 2556 s ago
+  waiting [train] g1_flat_flatcfg_com est 50.0 min, queued 43 s ago
+  waiting [train] il3_cap_probe est 20.0 min, queued 8 s ago
+  waiting [low] kamino_tests_fork est 40.0 min, queued 19576 s ago
+  waiting [low] kamino_tests_152 est 30.0 min, queued 18747 s ago
+  waiting [low] cl_kamino est 45.0 min, queued 17416 s ago
+  waiting [low] cl_mjw est 40.0 min, queued 17392 s ago
+
+mujoco_warp from /Users/aditya/robosim/upstream/mujoco_warp-ellip/mujoco_warp/__init__.py
+  tau10_impact_hardlimits: overflow {'LS_ITERATIONS': 4096}
+  tau10_impact_elliptic_hardlimits: overflow {'LS_ITERATIONS': 4096}
+  tau10_impact_elliptic_imp10_hardlimits: overflow {'ITERATIONS': 60, 'LS_ITERATIONS': 4096}
+  tau10_impact_elliptic_imp100_hardlimits: overflow {'ITERATIONS': 3607, 'LS_ITERATIONS': 4096}
+  tau10_impact_hardlimits: overflow {'LS_ITERATIONS': 4096}
+  tau10_impact_elliptic_hardlimits: overflow {'LS_ITERATIONS': 4096}
+  tau10_impact_elliptic_imp10_hardlimits: overflow {'ITERATIONS': 116, 'LS_ITERATIONS': 4096}
+  tau10_impact_elliptic_imp100_hardlimits: overflow {'ITERATIONS': 4014, 'LS_ITERATIONS': 4096}
+  tau10_impact_hardlimits: overflow {'LS_ITERATIONS': 4096}
+  tau10_impact_elliptic_hardlimits: overflow {'LS_ITERATIONS': 4096}
+  tau10_impact_elliptic_imp10_hardlimits: overflow {'ITERATIONS': 177, 'LS_ITERATIONS': 4096}
+  tau10_impact_elliptic_imp100_hardlimits: overflow {'ITERATIONS': 4079, 'LS_ITERATIONS': 4096}
+G1 MuJoCo Warp physics only, 4096 worlds, 2.5 ms x 8 substeps per control step, 3 s from standing, 3 interleaved repeats
+  tau10_impact_hardlimits         52.49 ms/control step (min 52.43)      78038 env-steps/s      624305 2.5ms-steps/s  (1.000x tau10_impact_hardlimits)  runs [52.58, 52.49, 52.43]
+  tau10_impact_elliptic_hardlimits    73.96 ms/control step (min 73.95)      55379 env-steps/s      443031 2.5ms-steps/s  (1.409x tau10_impact_hardlimits)  runs [74.04, 73.95, 73.96]
+  tau10_impact_elliptic_imp10_hardlimits    74.69 ms/control step (min 74.54)      54841 env-steps/s      438725 2.5ms-steps/s  (1.423x tau10_impact_hardlimits)  runs [74.74, 74.69, 74.54]
+  tau10_impact_elliptic_imp100_hardlimits    80.22 ms/control step (min 80.04)      51062 env-steps/s      408500 2.5ms-steps/s  (1.528x tau10_impact_hardlimits)  runs [80.22, 80.28, 80.04]
+== stage cost done Fri Sep 25 20:27:15 PDT 2026
+[gpu_run] ellip_fid_cost_w2 end: device utilisation 100% (20:27:15), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %

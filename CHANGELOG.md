@@ -14,6 +14,7 @@ commit order within each area (`git log` for the full messages). Dates are the c
 
 ## Physics (MuJoCo Warp on Metal) and interop
 
+- 09-25 Elliptic friction cones on Metal: reproduced the handoff (2.4–7× slower than pyramidal), fixed in the fork worktree (`c301880`, branch `metalsim-elliptic`, pending merge: per-world cone-list Hessian term, full-width sparse assembly groups, every previous form behind `MJW_JTCJ_MODE` / `MJW_JTDAJ_ELLIPTIC_LANES`), audited every other non-CUDA fallback, re-ran the G1 fidelity protocol and an SO-101 creep protocol with elliptic cones; upstream PR draft `scripts/diagnostics/mjwarp_upstream/DRAFT_elliptic_launch.md`; `docs/research/elliptic_cones_2026-09-25.md`; scripts `scripts/diagnostics/competitors/elliptic_*`, `so101_creep.py`
 - 09-25 Shared fork checkouts fast-forwarded to the documented heads (mujoco_warp 1791414 -> 07a51a6, warp 9050cb5 -> 4127c48) after the throughput A/B showed them identical for the G1 (flex changes gated on nflex > 0); the local branches had never been advanced
 - 09-22 `b773ae7` orchard: project skeleton and SO-101 lift scene
 - 09-22 `7d64c48` interop: zero-copy MPS tensors over Warp Metal arrays and cross-queue event ordering

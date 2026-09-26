@@ -1,0 +1,25 @@
+[gpu_run] ellip_go2_world2 start: device utilisation 0% (20:15:26)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    476 WindowServer                       1.9 %
+LABEL go2_world2 mjw=/Users/aditya/robosim/upstream/mujoco_warp-ellip/mujoco_warp/__init__.py head=07a51a6 N=4096 env=MJW_JTCJ_MODE=world2 
+== go2 elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "go2", "N": 4096, "mode": "matched", "nv": 18, "nu": 12, "iters": 10, "ls": 20, "build_s": 1.6, "steps_per_s": 580420, "finite": true, "base_z_mean": 0.189, "overflow": {"ITERATIONS": 1011, "LS_ITERATIONS": 4096}}
+== profile go2 elliptic
+KERNELS go2 N=4096: 8.97 ms/step GPU (sum of per-dispatch times), 198 dispatches/step
+     1.771 ms  19.7%  x 11  _update_constraint_efc__locals__kernel_d88e782a_metal_forward
+     1.259 ms  14.0%  x 11  _update_gradient_JTCJ_dense_world2_52c45e99_metal_forward
+     1.092 ms  12.2%  x 11  _update_gradient_JTDAJ_dense_tiled__locals__kernel_3e9ade00_metal_forward
+     0.964 ms  10.8%  x 10  _linesearch_iterative_kernel__locals__kernel_6a792f2a_metal_forward
+     0.798 ms   8.9%  x 11  _update_gradient_cholesky__locals__kernel_9c3e4676_metal_forward
+     0.432 ms   4.8%  x  2  _tile_cholesky_factorize_solve_block__locals__kernel_44479549_metal_forward
+     0.337 ms   3.8%  x 11  _update_gradient_JTCJ_cone_list_0a67bc87_metal_forward
+     0.257 ms   2.9%  x 11  _update_constraint_init_qfrc_constraint_dense__locals__kernel_70c42511_metal_forward
+     0.206 ms   2.3%  x  1  _solve_init_jaref_kernel__locals__kernel_d4dcae8c_metal_forward
+     0.163 ms   1.8%  x 11  mul_m_kernel__locals___mul_m_9c0838e9_metal_forward
+     0.159 ms   1.8%  x  1  _efc_contact_jac_dense__locals__kernel_3dfc3ac0_metal_forward
+     0.106 ms   1.2%  x  1  _efc_contact_update__locals__kernel_488f1e13_metal_forward
+     0.100 ms   1.1%  x 11  _update_gradient_grad__locals__kernel_72941948_metal_forward
+[gpu_run] ellip_go2_world2 end: device utilisation 25% (20:15:46), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    476 WindowServer                       4.9 %
+lock held by ellip_g1dense_world2, not ellip_go2_world2; not released

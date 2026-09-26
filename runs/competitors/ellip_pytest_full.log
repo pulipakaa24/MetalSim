@@ -1,0 +1,26 @@
+mujoco_warp/_src/sensor_test.py: 3 warnings
+  /Users/aditya/robosim/upstream/mujoco_warp-ellip/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+mujoco_warp/_src/collision_driver_test.py::CollisionTest::test_hfield_collision0
+mujoco_warp/_src/collision_driver_test.py::CollisionTest::test_hfield_maxconpair
+  /Users/aditya/robosim/upstream/mujoco_warp-ellip/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'BOX')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+mujoco_warp/_src/collision_driver_test.py::CollisionTest::test_hfield_collision1
+  /Users/aditya/robosim/upstream/mujoco_warp-ellip/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp0
+mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp1
+mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp4
+mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp5
+  /Users/aditya/robosim/upstream/mujoco_warp-ellip/mujoco_warp/_src/io.py:334: UserWarning: Bending damping is not yet supported for interpolated flex shells.
+    warnings.warn("Bending damping is not yet supported for interpolated flex shells.")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED mujoco_warp/_src/collision_driver_test.py::CollisionTest::test_hfield_maxconpair
+FAILED mujoco_warp/_src/io_test.py::IOTest::test_put_data_nefc_zero_dense - A...
+2 failed, 1450 passed, 39 skipped, 28 warnings, 8 subtests passed in 422.72s (0:07:02)
+PYTEST_DONE

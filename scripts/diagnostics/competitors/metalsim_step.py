@@ -5,7 +5,7 @@ from metalsim.physics.batch import BatchSim, BatchSimOptions
 name, N, mode = sys.argv[1], int(sys.argv[2]), sys.argv[3]          # mode: matched | default
 R = ROBOTS[name]
 spec = mujoco.MjSpec.from_file(R["scene"])
-LIM = force_limits(mujoco.MjModel.from_xml_path(R["scene"]))
+LIM = force_limits(mujoco.MjModel.from_xml_path(R["scene"])) if R["kp"] is not None else []
 for a, (lo, hi) in zip(spec.actuators, LIM):                         # motor -> PD position servo, force-limited
     a.set_to_position(kp=R["kp"], kv=R["kd"])
     a.ctrllimited = mujoco.mjtLimited.mjLIMITED_FALSE
@@ -19,7 +19,8 @@ for gm in spec.geoms:
 m = spec.compile()
 home = m.key_qpos[0].copy() if m.nkey else m.qpos0.copy()
 qadr = [m.jnt_qposadr[m.actuator_trnid[i, 0]] for i in range(m.nu)]
-opts = BatchSimOptions(solver_iterations=10, ls_iterations=20) if mode == "matched" else BatchSimOptions()
+JAC = os.environ.get("JAC")                                           # dense | sparse: MuJoCo Warp constraint-Jacobian layout (default: its auto rule, sparse for nv > 32)
+opts = BatchSimOptions(solver_iterations=10, ls_iterations=20, jacobian=JAC, **({"njmax": int(os.environ["NJMAX"])} if os.environ.get("NJMAX") else {})) if mode == "matched" else BatchSimOptions(jacobian=JAC, **({"njmax": int(os.environ["NJMAX"])} if os.environ.get("NJMAX") else {}))
 t0 = time.time(); sim = BatchSim(m, N, options=opts); sim.set_state(home); sim.forward(); sim.synchronize(); t_build = time.time() - t0
 q_home = torch.tensor(home[qadr], device="mps", dtype=torch.float32)
 g = torch.Generator(device="mps").manual_seed(0)

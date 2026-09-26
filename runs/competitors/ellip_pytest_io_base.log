@@ -1,0 +1,13 @@
+      """)
+      mjd = mujoco.MjData(mjm)
+      mujoco.mj_forward(mjm, mjd)
+    
+      self.assertFalse(mujoco.mj_isSparse(mjm))
+>     self.assertEqual(mjd.nefc, 0)
+E     AssertionError: 1 != 0
+
+mujoco_warp/_src/io_test.py:2071: AssertionError
+=========================== short test summary info ============================
+FAILED mujoco_warp/_src/io_test.py::IOTest::test_put_data_nefc_zero_dense - A...
+1 failed in 0.11s
+PYTEST_DONE
