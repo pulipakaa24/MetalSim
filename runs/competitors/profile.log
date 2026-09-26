@@ -1,0 +1,52 @@
+holder: none
+[gpu_run] go2_profile start: device utilisation 0% (19:05:35)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.7 s: none >= 1 %
+VARIANT {"robot": "go2", "N": 4096, "variant": "base", "steps_per_s": 262584, "contacts_per_world": 5.07, "base_z": 0.191}
+VARIANT {"robot": "go2", "N": 4096, "variant": "flooronly", "steps_per_s": 270569, "contacts_per_world": 5.07, "base_z": 0.191}
+Module ccd_kernel_builder__locals__ccd_kernel_2ef89c06 2ef89c0 load on device 'metal:0' took 2793.57 ms  (compiled)
+Module _primitive_narrowphase__locals__primitive_narrowphase_937f8872 937f887 load on device 'metal:0' took 1628.24 ms  (compiled)
+VARIANT {"robot": "go2", "N": 4096, "variant": "capsule", "steps_per_s": 266615, "contacts_per_world": 5.06, "base_z": 0.191}
+VARIANT {"robot": "go2", "N": 4096, "variant": "capsule+flooronly", "steps_per_s": 270328, "contacts_per_world": 5.06, "base_z": 0.191}
+VARIANT {"robot": "g1", "N": 4096, "variant": "base", "steps_per_s": 226259, "contacts_per_world": 19.79, "base_z": 0.091}
+VARIANT {"robot": "g1", "N": 4096, "variant": "flooronly", "steps_per_s": 428741, "contacts_per_world": 18.47, "base_z": 0.078}
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/adipu/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 27.02 ms  (cached)
+--
+KERNELS go2 N=4096: 13.45 ms/step GPU (sum of per-dispatch times), 187 dispatches/step
+     9.706 ms  72.2%  x 11  _update_gradient_JTCJ_dense_f52c2ac2_metal_forward
+     0.620 ms   4.6%  x 10  _linesearch_iterative_kernel__locals__kernel_6a792f2a_metal_forward
+     0.558 ms   4.1%  x 11  _update_gradient_JTDAJ_dense_tiled__locals__kernel_3e9ade00_metal_forward
+     0.501 ms   3.7%  x 11  _update_gradient_cholesky__locals__kernel_9c3e4676_metal_forward
+     0.348 ms   2.6%  x 11  _update_constraint_efc__locals__kernel_d88e782a_metal_forward
+     0.253 ms   1.9%  x  2  _tile_cholesky_factorize_solve_block__locals__kernel_44479549_metal_forward
+     0.157 ms   1.2%  x 11  _update_constraint_init_qfrc_constraint_dense__locals__kernel_70c42511_metal_forward
+     0.094 ms   0.7%  x  1  _efc_contact_jac_dense__locals__kernel_3dfc3ac0_metal_forward
+     0.093 ms   0.7%  x 11  mul_m_kernel__locals___mul_m_9c0838e9_metal_forward
+     0.069 ms   0.5%  x  1  ccd_kernel_builder__locals__ccd_kernel_9f2ce3c5_metal_forward
+     0.068 ms   0.5%  x  1  ccd_kernel_builder__locals__ccd_kernel_2f8a24c4_metal_forward
+     0.064 ms   0.5%  x  1  ccd_kernel_builder__locals__ccd_kernel_a5a0d9d1_metal_forward
+     0.054 ms   0.4%  x  1  _solve_init_jaref_kernel__locals__kernel_d4dcae8c_metal_forward
+     0.053 ms   0.4%  x 11  _update_gradient_grad__locals__kernel_72941948_metal_forward
+     0.052 ms   0.4%  x 10  _solve_done__locals__kernel_318c149b_metal_forward
+     0.047 ms   0.3%  x  5  _crb_accumulate_073a11b8_metal_forward
+     0.045 ms   0.3%  x  1  _primitive_narrowphase__locals__primitive_narrowphase_782723f8_metal_forward
+     0.043 ms   0.3%  x  1  _efc_contact_update__locals__kernel_488f1e13_metal_forward
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/adipu/Library/Caches/warp/1.18.0.dev20260917
+KERNELS g1 N=4096: 20.75 ms/step GPU (sum of per-dispatch times), 254 dispatches/step
+     7.265 ms  35.0%  x  1  ccd_kernel_builder__locals__ccd_kernel_f71f2442_metal_forward
+     2.916 ms  14.1%  x 10  _update_gradient_cholesky__locals__kernel_65bdbbe7_metal_forward
+     1.322 ms   6.4%  x  1  ccd_kernel_builder__locals__ccd_kernel_44365c64_metal_forward
+     0.905 ms   4.4%  x  2  _factor_i_sparse_serial__locals__kernel_169e9bc9_metal_forward
+     0.880 ms   4.2%  x 10  _linesearch_iterative_kernel__locals__kernel_2db662d9_metal_forward
+[gpu_run] go2_profile end: device utilisation 0% (19:07:31), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.7 s: none >= 1 %
