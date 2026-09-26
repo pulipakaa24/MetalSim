@@ -839,3 +839,28 @@ Newton's layout exactly; the archived actuator clamp stays selectable. Test `tes
 checks every joint's kp, kd, force limits and armature against newton_generated.xml.
 
 Final runs queued with both fixes (reset start, joint clamp): flat 3.0 seeds 0, 1, 2 and rough 3.0 seed 0, 1500 iterations.
+
+
+### 6.11 Final flat 3.0, three seeds (both fixes: task reset before training, joint effort clamp)
+
+`runs/il3/final_flat_il3_s{0,1,2}.log` (2026-09-26 06:30–09:26), flat_il3, `isaaclab3_every_substep_cap20` on contact_cfg
+"recommended", 4096 envs, 1500 iterations. Per-seed curves in `runs/il3/curves_final_flat_s*.md`. Seeds 0–1 ran on
+mujoco_warp 9b4e96a, seed 2 on edae7b7 (the throughput agent's register L'DL, described as float-noise equivalent for the
+G1). Return (±5-iteration mean; Isaac: last-100-episode mean, one seed per backend):
+
+| iteration | seed 0 | seed 1 | seed 2 | mean ± sd | Isaac Newton | Isaac PhysX |
+|---|---|---|---|---|---|---|
+| 150 | −10.7 | −11.1 | −11.3 | −11.0 ± 0.3 | −9.4 | −6.6 |
+| 200 | −4.5 | −5.3 | −5.3 | −5.0 ± 0.5 | −4.6 | +4.3 |
+| 300 | +7.9 | +7.8 | +6.1 | +7.2 ± 1.0 | +8.4 | +14.4 |
+| 500 | +18.8 | +18.3 | +16.4 | +17.9 ± 1.3 | +19.6 | +23.8 |
+| 750 | +24.0 | +24.5 | +21.2 | +23.2 ± 1.8 | +24.6 | +26.2 |
+| 1000 | +25.9 | +26.9 | +23.4 | +25.4 ± 1.8 | +25.9 | +28.0 |
+| 1250 | +26.6 | +28.1 | +24.8 | +26.5 ± 1.7 | +27.1 | +28.3 |
+| 1499 | +26.8 | +28.4 | +25.7 | **+27.0 ± 1.4** | **+27.5** | +28.9 |
+
+**Claim: on Isaac Lab 3.0's flat G1 task with Isaac's own MuJoCo Warp settings, MetalSim trains to +27.0 ± 1.4 at
+iteration 1499 (three seeds) vs Isaac's Newton/MuJoCo-Warp run +27.5 (one seed), inside one standard deviation, with the
+learning curve within one standard deviation of Isaac's from iteration 200 onward (the mean lags by 0.5–1.7 between 300
+and 750).** 0 blow-ups in all three seeds. Remaining term gap at 1499 (seed 2): yaw tracking below Isaac's; feet air time
+above.
