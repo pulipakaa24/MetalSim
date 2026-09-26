@@ -609,6 +609,8 @@ class G1VelocityTask:
             # box / fine-heightfield terrains: a foot can touch several boxes (up to 4 contacts per box-mesh pair), and
             # MuJoCo C's initial contact set on them (checked by put_data) reaches 37 (boxes) / 100 (0.025 m hfield)
             nconmax = 32 if terrain_collision == "hfield" else 128
+            if self._solver_preset is not None and self._solver_preset.geom_gap and terrain != "flat":
+                nconmax = max(nconmax, 64)   # Isaac's 2 cm pair gap adds (inactive) contacts: C's initial set on the heightfield is 36
             pwf = ()
             if terrain_collision == "boxes_local":        # per-world terrain box slots (metalsim.learn.terrain.BoxWindow)
                 from metalsim.learn.terrain import BoxWindow
