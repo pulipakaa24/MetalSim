@@ -1,0 +1,47 @@
+[gpu_run] terrain_cull_cost start: device utilisation 0% (18:20:50)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   1.9 %
+holder: {"name": "terrain_cull_cost", "kind": "timing", "minutes": 12.0, "pid": 60853, "start": 1790385648.896684, "queued": 1790385423.71316, "cmd": "runs/terrain_render/run_cost_cull.sh", "cwd": "/Users/aditya/robosim"}
+  waiting [render] terrain_cull_test2 est 6.0 min, queued 230 s ago
+  waiting [train] il3_train_rough est 100.0 min, queued 231 s ago
+  waiting [low] kamino_tests_fork est 40.0 min, queued 12125 s ago
+  waiting [low] kamino_tests_152 est 30.0 min, queued 11296 s ago
+  waiting [low] cl_kamino est 45.0 min, queued 9965 s ago
+  waiting [low] cl_mjw est 40.0 min, queued 9941 s ago
+busy processes (cpu > 40 %):
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+G1 rough (boxes_local), 1024 envs, 128x128 head camera; box window overflow 0, most boxes in a window 50
+{"tier": 0, "config": "before", "coarse": 1, "n": 1024, "size": 128, "ms_best": 1.6614084015600383, "ms_median": 1.6630124999210238, "fps_envs": 616344.5417986806, "drawn_slots": 99, "tris_per_env": 1188, "build_s": 0.0316907920059748, "depth_valid": 0.0}
+{"tier": 0, "config": "slots", "coarse": 1, "n": 1024, "size": 128, "ms_best": 2.747154200915247, "ms_median": 2.753316698363051, "fps_envs": 372749.3708430499, "drawn_slots": 99, "tris_per_env": 1188, "build_s": 0.028453332954086363, "depth_valid": 0.24608230590820312}
+{"tier": 0, "config": "after", "coarse": 1, "tiles": 9375, "visible": 49550, "shadow_visible": 276910, "n": 1024, "size": 128, "ms_best": 30.279587500263005, "ms_median": 30.279620899818838, "fps_envs": 33818.16215267482, "drawn_slots": 100, "tris_per_env": 4801188, "build_s": 0.19011637498624623, "depth_valid": 0.9766731262207031}
+{"tier": 0, "config": "after_full", "coarse": 1, "rgb_equal_after": true, "depth_equal_after": true, "rgb_pixels_differing": 0, "n": 1024, "size": 128, "ms_best": 2913.175462500658, "ms_median": 2918.8161166966893, "fps_envs": 351.5064619969724, "drawn_slots": 100, "tris_per_env": 4801188, "build_s": 0.14796691696392372, "depth_valid": 0.9766731262207031}
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+G1 rough (boxes_local), 1024 envs, 128x128 head camera; box window overflow 0, most boxes in a window 50
+{"tier": 2, "config": "hfield", "coarse": 1, "n": 1024, "size": 128, "ms_best": 157.74787500267848, "ms_median": 158.6992583994288, "fps_envs": 6491.371119786006, "drawn_slots": 100, "tris_per_env": 4801188, "build_s": 0.2683589579537511, "depth_valid": 1.0}
+{"tier": 2, "config": "after", "coarse": 1, "n": 1024, "size": 128, "ms_best": 189.88830409944057, "ms_median": 189.89214999601245, "fps_envs": 5392.64387481049, "drawn_slots": 100, "tris_per_env": 4801188, "build_s": 0.2326480420306325, "depth_valid": 1.0}
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+G1 rough (boxes_local), 1024 envs, 128x128 head camera; box window overflow 0, most boxes in a window 50
+{"tier": 2, "config": "hfield", "coarse": 4, "n": 1024, "size": 128, "ms_best": 133.32030000165105, "ms_median": 133.34707079920918, "fps_envs": 7680.750793294936, "drawn_slots": 100, "tris_per_env": 301188, "build_s": 0.06585354200797155, "depth_valid": 1.0}
+{"tier": 2, "config": "after", "coarse": 4, "n": 1024, "size": 128, "ms_best": 164.9869667016901, "ms_median": 165.31707079848275, "fps_envs": 6206.550859568656, "drawn_slots": 100, "tris_per_env": 301188, "build_s": 0.0621876249788329, "depth_valid": 1.0}
+[gpu_run] terrain_cull_cost end: device utilisation 3% (18:23:31), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   2.1 %
+lock held by terrain_cull_test2, not terrain_cull_cost; not released

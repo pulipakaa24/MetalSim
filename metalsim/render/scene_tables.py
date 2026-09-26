@@ -428,7 +428,8 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
             if key not in mesh_cache:
                 verts, normals, uvs, idx = hfield_mesh(m, int(m.geom_dataid[g]))
                 mesh_cache[key] = len(meshes)
-                meshes.append({"i_off": i_off, "i_count": int(idx.size), "radius": float(np.linalg.norm(verts, axis=1).max())})
+                meshes.append({"i_off": i_off, "i_count": int(idx.size), "radius": float(np.linalg.norm(verts, axis=1).max()),
+                               "v_off": v_off, "hfield": int(m.geom_dataid[g])})   # row-major (nrow, ncol) grid from v_off
                 all_v.append(verts); all_n.append(normals); all_uv.append(uvs)
                 all_i.append(idx.reshape(-1) + v_off)
                 v_off += len(verts); i_off += idx.size
@@ -532,9 +533,19 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
             tm[0:3] *= px.reshape(-1, 3).mean(0) / 255.0
         tm[12:15] = (1.0, 1.0, 0.0)
         mats[sized] = tm
+    params = scene_params(m)
+    if sized.any():
+        # MuJoCo's stat.center / extent include the slots parked 1 km under the terrain (1115 m instead of ~117 m for
+        # Isaac's rough terrain), which scaled tier 0's per-env shadow map to 11.6 m texels. Renderer bounds: the
+        # drawn geoms except the slots, at qpos0.
+        d = mujoco.MjData(m); mujoco.mj_kinematics(m, d)
+        keep = [g for g in geoms if g not in sized_set]
+        lo = np.min([d.geom_xpos[g] - m.geom_rbound[g] for g in keep], axis=0)
+        hi = np.max([d.geom_xpos[g] + m.geom_rbound[g] for g in keep], axis=0)
+        params[0, :3] = 0.5 * (lo + hi); params[0, 3] = max(float(0.5 * (hi - lo).max()), 0.1)
     return SceneTables(vertices=inter, indices=indices, meshes=meshes, geoms=geoms, geom_mesh=geom_mesh,
                        draws=draws, inst_table=inst_table, materials=mats, atlas=atlas, semantic=semantic,
-                       static_geom=static, lights=build_lights(m), params=scene_params(m), n_envs=n_envs, G=G,
+                       static_geom=static, lights=build_lights(m), params=params, n_envs=n_envs, G=G,
                        sized=sized)
 
 

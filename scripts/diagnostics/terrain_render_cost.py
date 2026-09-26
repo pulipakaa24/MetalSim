@@ -17,14 +17,21 @@ import numpy as np, mujoco, torch, warp as wp
 wp.config.quiet = True
 
 CONFIGS = {"before": dict(terrain_slots=False, draw_hfields=False), "slots": dict(terrain_slots=True, draw_hfields=False),
-           "hfield": dict(terrain_slots=False, draw_hfields=True), "after": dict(terrain_slots=True, draw_hfields=True)}
+           "hfield": dict(terrain_slots=False, draw_hfields=True), "after": dict(terrain_slots=True, draw_hfields=True),
+           "after_full": dict(terrain_slots=True, draw_hfields=True, hfield_cull=False)}     # tier 0: no tile culling
 
 
-def rough_scene(n, seed=0, visuals=False):
+def rough_scene(n, seed=0, visuals=False, coarse=1):
+    """``coarse`` k > 1: the collision heightfield subsampled every k-th sample (same extent, k^2 fewer triangles;
+    for the tier-2 check of BVH cost vs triangle count only)."""
     from metalsim.learn.g1_velocity import build_g1_model
     from metalsim.learn.terrain import isaac_rough_terrain, BoxWindow
     from metalsim.physics.batch import BatchSim, BatchSimOptions
     hf = isaac_rough_terrain(seed=seed, collision="boxes_local")
+    if coarse > 1:
+        ch = hf["collision_hfield"]; dd = ch["data"][::coarse, ::coarse]
+        assert (ch["nrow"] - 1) % coarse == 0 and (ch["ncol"] - 1) % coarse == 0
+        hf = dict(hf, collision_hfield=dict(ch, data=np.ascontiguousarray(dd), nrow=dd.shape[0], ncol=dd.shape[1]))
     m, info = build_g1_model("rough", hf, visuals=visuals)
     spec = info["spec"]
     tb = next(b for b in spec.bodies if b.name == "torso_link")
@@ -61,15 +68,16 @@ def time_renderer(r, sim, frames, tier):
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("--n", type=int, default=1024); ap.add_argument("--size", type=int, default=128)
     ap.add_argument("--frames", type=int, default=10); ap.add_argument("--tiers", default="0,2"); ap.add_argument("--configs", default="before,slots,hfield,after")
-    ap.add_argument("--out", default="runs/terrain_render")
+    ap.add_argument("--out", default="runs/terrain_render"); ap.add_argument("--coarse", type=int, default=1)
+    ap.add_argument("--tag", default="")
     a = ap.parse_args(); os.makedirs(a.out, exist_ok=True)
     import imageio.v2 as iio
     from metalsim.render.tier0 import Tier0Renderer
     from metalsim.render.tier2 import Tier2Renderer, mujoco_scene_kwargs
-    m, sim, hf, win = rough_scene(a.n)
+    m, sim, hf, win = rough_scene(a.n, coarse=a.coarse)
     ov = win.overflow.numpy()
     print(f"G1 rough (boxes_local), {a.n} envs, {a.size}x{a.size} head camera; box window overflow {int(ov[0])}, most boxes in a window {int(ov[1])}", flush=True)
-    rows = []
+    rows = []; frames = {}
     for tier in [int(t) for t in a.tiers.split(",")]:
         for name in a.configs.split(","):
             kw = CONFIGS[name]
@@ -77,14 +85,24 @@ def main():
             if tier == 0:
                 r = Tier0Renderer(m, a.n, width=a.size, height=a.size, camera="head", outputs=("rgb", "depth"), **kw)
             else:
+                kw2 = {k: v for k, v in kw.items() if k != "hfield_cull"}
                 r = Tier2Renderer(m, a.n, width=a.size, height=a.size, camera="head", spp=4, max_bounces=2,
-                                  **mujoco_scene_kwargs(m, exposure=0.25), **kw)
+                                  **mujoco_scene_kwargs(m, exposure=0.25), **kw2)
             build_s = time.perf_counter() - t0
             best, med = time_renderer(r, sim, a.frames, tier)
             rgb = r.out.rgb[:16].cpu().numpy(); dep = r.out.depth[:16].cpu().numpy()
             tile = np.concatenate([np.concatenate(list(rgb[i * 4:(i + 1) * 4]), 1) for i in range(4)], 0)
-            iio.imwrite(os.path.join(a.out, f"tier{tier}_{name}.png"), tile)
-            row = dict(tier=tier, config=name, n=a.n, size=a.size, ms_best=best, ms_median=med, fps_envs=a.n / best * 1e3,
+            iio.imwrite(os.path.join(a.out, f"tier{tier}_{name}{a.tag}.png"), tile)
+            if tier == 0:       # culled vs full rasterization, all envs
+                full = frames.setdefault(name, (r.out.rgb.cpu().numpy(), r.out.depth.cpu().numpy()))
+            extra = {}
+            if tier == 0 and getattr(r, "hfield_cull", False):
+                nv, ns = r.hfield_visible_counts(); extra = dict(tiles=r.n_tiles, visible=nv, shadow_visible=ns)
+            if tier == 0 and name == "after_full" and "after" in frames:
+                extra.update(rgb_equal_after=bool(np.array_equal(frames["after"][0], frames["after_full"][0])),
+                             depth_equal_after=bool(np.array_equal(frames["after"][1], frames["after_full"][1])),
+                             rgb_pixels_differing=int((frames["after"][0] != frames["after_full"][0]).any(-1).sum()))
+            row = dict(tier=tier, config=name, coarse=a.coarse, **extra, n=a.n, size=a.size, ms_best=best, ms_median=med, fps_envs=a.n / best * 1e3,
                        drawn_slots=int(r.tables.G), tris_per_env=int(sum(r.tables.meshes[k]["i_count"] for k in r.tables.geom_mesh) // 3), build_s=build_s,
                        depth_valid=float((dep > 0).mean()))
             rows.append(row)

@@ -22,6 +22,7 @@ struct EnvParams {            // built on the GPU by build_env_params
     float4   cam_pos;         // world position, w = near
     float4   cam_fwd;         // world forward (-Z of the camera), w = far
     float4   misc;            // x: shadow caster light index (-1 none, MAX_LIGHTS = DR light), y: n lights, z: headlight active
+    float4   caster_dir;      // xyz direction the shadow caster's light travels (normalized), w = 1 if there is a caster
 };
 
 struct CameraSpec {           // per env, host- or torch-written (28 floats)
@@ -158,6 +159,7 @@ kernel void build_env_params(
     p.cam_pos = float4(pos, n);
     p.cam_fwd = float4(-R[2], f);
     p.misc = float4(float(caster), float(min(c.n_light, uint(MAX_LIGHTS))), sp.hl_specular.w, 0);
+    p.caster_dir = float4(normalize(cdir), caster >= 0 ? 1.0 : 0.0);
     envs[e] = p;
 }
 
@@ -189,18 +191,25 @@ struct FSIn {
     uint   slot [[flat]];
 };
 
-inline void instance_world(uint inst, device const uint2* inst_tab, device const int* slot_geom,
-                           device const float* geom_xpos, device const float* geom_xmat, constant Consts& c,
-                           float3 pos_l, float3 nrm_l, thread float3& p, thread float3& n, thread uint& env, thread uint& slot)
+inline void slot_world(uint env, uint slot, device const int* slot_geom,
+                       device const float* geom_xpos, device const float* geom_xmat, constant Consts& c,
+                       float3 pos_l, float3 nrm_l, thread float3& p, thread float3& n)
 {
-    uint2 pair = inst_tab[inst];
-    env = pair.x; slot = pair.y;
     uint g = uint(slot_geom[slot]);
     uint gi = env * c.n_geoms + g;
     device const float* xp = geom_xpos + gi * 3;
     float3x3 R = load_mat33(geom_xmat + gi * 9);
     p = R * pos_l + float3(xp[0], xp[1], xp[2]);
     n = R * nrm_l;
+}
+
+inline void instance_world(uint inst, device const uint2* inst_tab, device const int* slot_geom,
+                           device const float* geom_xpos, device const float* geom_xmat, constant Consts& c,
+                           float3 pos_l, float3 nrm_l, thread float3& p, thread float3& n, thread uint& env, thread uint& slot)
+{
+    uint2 pair = inst_tab[inst];
+    env = pair.x; slot = pair.y;
+    slot_world(env, slot, slot_geom, geom_xpos, geom_xmat, c, pos_l, nrm_l, p, n);
 }
 
 inline void clip_to_tile(thread float* cd, float4 clip, float4 tile) {
@@ -381,6 +390,152 @@ struct BGOut {
     float2 uv;
     uint env [[flat]];
 };
+
+// -------------------------------------------------------------------------------------------------
+// heightfield tile culling (Tier0Renderer(hfield_cull=True)): a heightfield is drawn as T x T-cell tiles; per frame
+// hf_cull appends the (env, tile) pairs whose box meets the env's view frustum (render pass) and whose box swept
+// along the shadow caster's light down to the field's lowest point, grown by a shadow-map margin, meets it (shadow
+// pass: every occluder of a visible point, including the texels its filtered lookup reads). hf_tile_vs fetches the
+// same vertex records and transforms them with the same code as geom_vs, so the visible pixels are unchanged.
+
+struct HfTile  { int slot, vbase, nrow, ncol, r0, c0, field, _p; };
+struct HfBox   { float4 lo, hi; };                                     // geom-frame AABB (w unused)
+struct CullConsts { uint n_envs, n_tiles, T, flags; float margin, _a, _b, _c; };   // flags bit0: shadow list
+
+inline void box_world(HfBox b, float3x3 R, float3 t, thread float3& lo, thread float3& hi) {
+    lo = float3(INFINITY); hi = float3(-INFINITY);
+    for (uint k = 0; k < 8; ++k) {
+        float3 q = float3((k & 1) ? b.hi.x : b.lo.x, (k & 2) ? b.hi.y : b.lo.y, (k & 4) ? b.hi.z : b.lo.z);
+        float3 w = R * q + t; lo = min(lo, w); hi = max(hi, w);
+    }
+}
+
+inline bool box_in_frustum(float4x4 M, float3 lo, float3 hi) {   // conservative: false only if all corners are outside one plane
+    uint o0 = 0, o1 = 0, o2 = 0, o3 = 0, o4 = 0, o5 = 0;
+    for (uint k = 0; k < 8; ++k) {
+        float4 q = M * float4((k & 1) ? hi.x : lo.x, (k & 2) ? hi.y : lo.y, (k & 4) ? hi.z : lo.z, 1.0);
+        o0 += q.x < -q.w; o1 += q.x > q.w; o2 += q.y < -q.w; o3 += q.y > q.w; o4 += q.z < 0.0; o5 += q.z > q.w;
+    }
+    return !(o0 == 8 || o1 == 8 || o2 == 8 || o3 == 8 || o4 == 8 || o5 == 8);
+}
+
+kernel void hf_cull_reset(device atomic_uint* args [[buffer(0)]], constant CullConsts& cc [[buffer(1)]],
+                          uint i [[thread_position_in_grid]])
+{   // two MTLDrawIndexedPrimitivesIndirectArguments, 8 uints apart: index count, instance count, 0, 0, 0
+    if (i >= 2) return;
+    device atomic_uint* a = args + i * 8;
+    atomic_store_explicit(a + 0, cc.T * cc.T * 6, memory_order_relaxed);
+    for (uint k = 1; k < 5; ++k) atomic_store_explicit(a + k, 0u, memory_order_relaxed);
+}
+
+kernel void hf_cull(
+    device const EnvParams* envs      [[buffer(0)]],
+    device const HfTile*    tiles     [[buffer(1)]],
+    device const HfBox*     boxes     [[buffer(2)]],
+    device const HfBox*     fields    [[buffer(3)]],
+    device const int*       slot_geom [[buffer(4)]],
+    device const float*     geom_xpos [[buffer(5)]],
+    device const float*     geom_xmat [[buffer(6)]],
+    constant Consts&        c         [[buffer(7)]],
+    constant CullConsts&    cc        [[buffer(8)]],
+    device uint2*           vis       [[buffer(9)]],
+    device uint2*           svis      [[buffer(10)]],
+    device atomic_uint*     args      [[buffer(11)]],
+    uint i [[thread_position_in_grid]])
+{
+    if (i >= cc.n_envs * cc.n_tiles) return;
+    uint env = i / cc.n_tiles, k = i - env * cc.n_tiles;
+    HfTile td = tiles[k];
+    uint gi = env * c.n_geoms + uint(slot_geom[td.slot]);
+    device const float* xp = geom_xpos + gi * 3;
+    float3x3 R = load_mat33(geom_xmat + gi * 9);
+    float3 t = float3(xp[0], xp[1], xp[2]);
+    float3 lo, hi; box_world(boxes[k], R, t, lo, hi);
+    EnvParams e = envs[env];
+    if (box_in_frustum(e.view_proj, lo, hi)) {
+        uint idx = atomic_fetch_add_explicit(args + 1, 1u, memory_order_relaxed);
+        vis[idx] = uint2(env, k);
+    }
+    if ((cc.flags & 1u) && e.caster_dir.w > 0.5) {
+        float3 L = e.caster_dir.xyz;
+        bool s = true;
+        if (L.z < -1e-3) {
+            float3 flo, fhi; box_world(fields[td.field], R, t, flo, fhi);
+            float3 d = L * ((hi.z - flo.z) / -L.z);            // down to the field's lowest point
+            float3 slo = min(lo, lo + d) - cc.margin, shi = max(hi, hi + d) + cc.margin;
+            s = box_in_frustum(e.view_proj, slo, shi);
+        }
+        if (s) {
+            uint idx = atomic_fetch_add_explicit(args + 9, 1u, memory_order_relaxed);
+            svis[idx] = uint2(env, k);
+        }
+    }
+}
+
+inline void hf_vertex(uint vid, uint2 ek, device const HfTile* tiles, device const float* verts, constant CullConsts& cc,
+                      thread float3& pos, thread float3& nrm, thread float2& uv, thread uint& slot)
+{
+    HfTile td = tiles[ek.y];
+    uint T1 = cc.T + 1, lr = vid / T1, lc = vid - lr * T1;
+    int r = min(td.r0 + int(lr), td.nrow - 1), col = min(td.c0 + int(lc), td.ncol - 1);   // past the edge: degenerate
+    device const float* v = verts + (uint(td.vbase) + uint(r * td.ncol + col)) * 8;
+    pos = float3(v[0], v[1], v[2]); nrm = float3(v[3], v[4], v[5]); uv = float2(v[6], v[7]);
+    slot = uint(td.slot);
+}
+
+vertex VSOut hf_tile_vs(
+    uint vid [[vertex_id]],
+    uint inst [[instance_id]],
+    device const float*     verts     [[buffer(0)]],
+    device const EnvParams* envs      [[buffer(1)]],
+    device const uint2*     vis       [[buffer(2)]],
+    device const int*       slot_geom [[buffer(3)]],
+    device const float*     geom_xpos [[buffer(4)]],
+    device const float*     geom_xmat [[buffer(5)]],
+    device const HfTile*    tiles     [[buffer(6)]],
+    constant Consts&        c         [[buffer(7)]],
+    constant CullConsts&    cc        [[buffer(8)]])
+{
+    uint2 ek = vis[inst];
+    float3 pos, nrm; float2 uv; uint slot;
+    hf_vertex(vid, ek, tiles, verts, cc, pos, nrm, uv, slot);
+    uint env = ek.x;
+    float3 p, n;
+    slot_world(env, slot, slot_geom, geom_xpos, geom_xmat, c, pos, nrm, p, n);
+    EnvParams e = envs[env];
+    float4 clip = tile_clip(e.view_proj * float4(p, 1.0), e.tile);
+    VSOut o;
+    o.clip = clip;
+    clip_to_tile(o.clip_distance, clip, e.tile);
+    o.world_pos = p; o.normal_w = n; o.uv = uv; o.env = env; o.slot = slot;
+    return o;
+}
+
+vertex ShadowOut hf_tile_shadow_vs(
+    uint vid [[vertex_id]],
+    uint inst [[instance_id]],
+    device const float*     verts     [[buffer(0)]],
+    device const EnvParams* envs      [[buffer(1)]],
+    device const uint2*     vis       [[buffer(2)]],
+    device const int*       slot_geom [[buffer(3)]],
+    device const float*     geom_xpos [[buffer(4)]],
+    device const float*     geom_xmat [[buffer(5)]],
+    device const HfTile*    tiles     [[buffer(6)]],
+    constant Consts&        c         [[buffer(7)]],
+    constant CullConsts&    cc        [[buffer(8)]])
+{
+    uint2 ek = vis[inst];
+    float3 pos, nrm; float2 uv; uint slot;
+    hf_vertex(vid, ek, tiles, verts, cc, pos, nrm, uv, slot);
+    float3 p, n;
+    slot_world(ek.x, slot, slot_geom, geom_xpos, geom_xmat, c, pos, nrm, p, n);
+    EnvParams e = envs[ek.x];
+    float4 clip = tile_clip(e.light_vp * float4(p, 1.0), e.shadow_tile);
+    ShadowOut o;
+    o.clip = clip;
+    clip_to_tile(o.clip_distance, clip, e.shadow_tile);
+    return o;
+}
 
 vertex BGOut bg_vs(uint vid [[vertex_id]], uint env [[instance_id]], device const EnvParams* envs [[buffer(1)]])
 {
