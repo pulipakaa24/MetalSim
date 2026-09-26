@@ -369,6 +369,16 @@ episodes by iteration 150; Isaac's single run: +27.3 / 991. So the like-for-like
 seeds: the same return as Isaac's within seed spread. This is the acceptance test "identical PPO
 config, identical result" of the plan, met on one task (three seeds ours, one seed Isaac's).
 
+**Confirming run with the final contact preset (measured 2026-09-25 evening,
+`runs/g1_flat_ppowarp_fixed_flatcfg_tau10.log`):** the same flat config and PPO with
+`contact_cfg="recommended"` (= `tau10_impact_hardlimits`, now the task default) reaches **+27.85 / 1000 at
+iteration 1000** (19.9 / 1000 at 500, 26.8 at 900), against +28.4 / 26.3 / 26.0 with MuJoCo's default
+contacts (one seed each, seed 0). The difference is inside the seed spread (±1.3), so the preset that
+matches PhysX best on the physical metrics (§1.7) costs nothing measurable in learning. The anomaly
+monitor's contact-penetration flags fall from 999 to 95 log points (2 cm threshold; the preset's measured
+penetration is 1.64 vs 2.97 cm); the "joint limit violated by > 0.05 rad" flag fires every iteration in
+both runs (soft limits are penalties in Isaac's config too) and is not a difference between them.
+
 **Fixed PPO, demonstrated** (`runs/g1_flat_ppowarp_fixed.log`, MuJoCo Warp, 4096 envs, 1000 iterations,
 same config and seed, measured 2026-09-24, 25.3 K env-steps/s including the monitor):
 

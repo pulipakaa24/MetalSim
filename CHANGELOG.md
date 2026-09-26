@@ -5,6 +5,7 @@ commit order within each area (`git log` for the full messages). Dates are the c
 
 ## Install and packaging
 
+- 09-25 `99c331f` MIT licence (LICENSE, pyproject metadata), THIRD_PARTY_NOTICES.md with the IP audit and `licenses/`, source headers on the three ported files, README rewritten as the front page (what was built in each fork + branch, heads and commits); `METALSIM_CHANGES.md` pushed to every fork branch
 - 09-23 `f3d5859` Rename to MetalSim (package metalsim); Warp fork setup script and patches; heightfield defect localized
 - 09-23 `be1e347` Point the Warp setup at the pulipakaa24/warp fork (branch metalsim)
 - 09-23 `c2fbe01` Fetch NVIDIA Isaac assets instead of committing them; tron1 rename leftovers
