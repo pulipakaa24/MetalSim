@@ -332,8 +332,75 @@ test suite, audit, G1 fidelity re-check, SO-101 creep protocol, upstream PR draf
   of the PhysX-trained checkpoint.
 - The remaining elliptic premium (H rebuilt every iteration, §2.2) and the sparse-path `init_h_sparse` (§3)
   are the next throughput items if elliptic becomes a default.
-- Two pre-existing test failures at `07a51a6` (§2.3) belong to the flex merge, not to this work.
-- `metalsim/learn/so101_lift.py`'s torch-side `ctrl` write before `sim.step()` (§2.3) should be checked by
-  its owner.
+- The two pre-existing fork test failures are root-caused in §7 (one fixed on a fork branch, one a MuJoCo
+  version dependence).
+- `metalsim/learn/so101_lift.py`: **no race** (correction of the first version of §2.3): its `step()` signals
+  the learner event from torch after the `ctrl` write and the sim waits on it before its graph
+  (`_learner_done`), and `sim.after(vs)` makes torch wait for the step's completion before the next write.
+  My check scripts lacked exactly that pair. `tests/test_lift_ctrl_ordering.py` pins the order of the four
+  calls per step and checks the event-ordered loop against host-synchronised stepping (§7).
 - Upstream `main`'s scale-invariant cone math (`bc8ed60`) is not in the fork (v3.14.0 form kept for
   float-noise parity with the unpatched fork); adopting it is a separate upstream-tracking change.
+
+## 7. Follow-ups requested by the coordinator (2026-09-25 late evening)
+
+### 7.1 Confirming training run (G1 default decision, learning side)
+
+Preset `tau10_impact_hardlimits_ellip10` (and `_ellip1`, `_ellip100`) added to `metalsim/physics/contact_tuning.py`
+(the adopted preset plus elliptic cone and impratio; `tests/test_contact_tuning.py::test_elliptic_presets_set_cone_and_impratio`
+checks the MjModel / MjSpec fields and the G1 builder's model: 3 passed). Queued (train class) as
+`runs/il3/run_train2.sh flat flat tau10_impact_hardlimits_ellip10 none 1000 0 g1_flat_flatcfg_ellip10 com origin`,
+i.e. the queued COM run's command with the contact preset swapped (2.3.2 flat config, base_velocity com,
+feet_slide_velocity origin, seed 0, 1000 iterations, same PPO): log `runs/il3/g1_flat_flatcfg_ellip10.log`,
+stdout `runs/il3/g1_flat_flatcfg_ellip10.stdout`. Comparison targets: +28.4 (default contacts), +27.85
+(`recommended`), and `runs/il3/g1_flat_flatcfg_com.log` (queued ahead of it). Not finished at the time of writing.
+
+### 7.2 The +18 % falls of the PhysX-trained checkpoint under elliptic cones
+
+Setup of the number: Isaac's PhysX-trained flat checkpoint at iteration 1000 (`runs/contact_research/
+isaac_model_1000_metalsim.pt`), played with the mean action on the task's own commands and resets, 1024 envs ×
+1000 control steps (20 s), seed 1, one run per preset; a fall is the task's termination (torso touch force
+> 1 N over the 15 ms history, the only non-time-out termination), so every fall is a torso-to-ground contact.
+Counts: pyramidal 142 falls in 1122 episodes, elliptic impratio 1 / 10 / 100: 171 / 168 / 160 in ~1140.
+Characterisation (`scripts/diagnostics/competitors/g1_falls.py`, `g1_falls_batch.sh`, `g1_falls_table.py`;
+`runs/competitors/g1_falls/`): 3 seeds × 4 presets for checkpoint 1000, checkpoints 500 and 1499 for pyramidal
+vs impratio 10, plus `default` and `tau5_imp99_hardlimits` for scale; per fall: time into the episode, pelvis
+pitch / roll 40 ms before the torso contact (forward / backward / sideways), the command in force, and how
+many distinct envs fell. **Results: pending (queued as `g1_falls1` / `g1_falls2`, render class, behind a
+training job); filled in below when they land.**
+
+### 7.3 `so101_lift.py` ctrl ordering
+
+Finding corrected: the env is already event-ordered (see §6). Added `tests/test_lift_ctrl_ordering.py`
+(needs Metal; queued as `lift_ordering_test`): (a) per `step()`, the calls are exactly `signal(learner event)`
+→ `sim.wait(learner event, same value)` → physics → `sim.after(v)`, three steps in a row, and the sim's `ctrl`
+equals what `step()` computed; (b) 30 random-action steps with no host sync give the same `qpos` (1e-4) as
+stepping with a host sync after every step. (a) fails if `_learner_done()` or `after()` is dropped; (b) fails
+if a stale `ctrl` reached the physics. No change to `metalsim/learn/so101_lift.py`.
+
+### 7.4 The two pre-existing fork test failures (both fail on the CPU device too, so not Metal-specific)
+
+- `collision_driver_test::test_hfield_maxconpair` (a 2 × 2 m box resting 1 mm into a 0.2 × 0.2 m heightfield,
+  expects 4 contacts, gets 0): passes at `8ce5bb0` (Metal device patch), fails from `f2716b4` (the fork's
+  per-triangle heightfield plane contacts, MetalSim's rough-terrain fix). Root cause: that path tests every
+  vertex of a mesh of ≤ 256 vertices against each triangle's column (the G1 feet), but for primitives it only
+  has the single support point along the triangle normal, and a box's bottom corner lies outside every
+  triangle's footprint of a heightfield smaller than the box, so no triangle claims a contact; upstream's
+  GJK/EPA against the prism clips the box instead. Fix on fork branch `metalsim-hfield-test` (`b630530`, from
+  `4d53712`): primitives take upstream's GJK/EPA path, meshes keep the plane path;
+  `HFIELD_PLANE_CONTACTS_PRIMITIVES = True` restores the previous form (archived). CPU: `-k hfield` 3 passed
+  (was 1 failed). MetalSim's `tests/test_terrain.py::test_hfield_mesh_contacts_match_mujoco_c` (the G1 feet,
+  mesh path unchanged) and `test_plane_convex_contacts.py` against that branch: queued (`hfield_gate_tests2`).
+  Not merged (coordinator's call; the G1 rough task uses mesh feet on the heightfield, so its contacts are
+  unchanged; scenes with primitive geoms on heightfields go back to upstream's behaviour).
+- `io_test::test_put_data_nefc_zero_dense` (`AssertionError: 1 != 0` at `self.assertEqual(mjd.nefc, 0)`): the
+  assertion is on MuJoCo C's own `MjData` before MuJoCo Warp is involved. In the installed MuJoCo 3.14.0 the
+  fixture's tendon with `frictionloss="0.5"` instantiates one `mjCNSTR_FRICTION_TENDON` row (nefc = 1); the test
+  (added with the v3.14.0 bump, `88af9cc`) expects none, and fails identically on upstream `main` `cc97eea` with
+  3.14.0. Upstream's lock file pins a MuJoCo nightly from py.mujoco.org (`3.13.1.dev984848064`), where the
+  fixture evidently has nefc = 0; so this is a MuJoCo-version dependence of the test, not a fork or Metal
+  defect. No change; expected to fail with a released MuJoCo 3.14.0.
+- Aside noticed while bisecting: every pre-existing MetalSim commit on the fork's `metalsim` branch
+  (`f2716b4` … `07a51a6`) carries a `Co-Authored-By: Claude` trailer, so that branch's history is not
+  CLA-clean as a whole; anything for upstream has to be re-committed on a clean branch (as the PR branch
+  `elliptic-jtcj-offcuda` is: one clean commit on upstream `main`; my two `metalsim` commits carry no trailer).
