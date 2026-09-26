@@ -128,8 +128,8 @@ def rate_and_eta(st, key, cur, total, now):
     """Counter rate over the observed window of this job (first sample vs now), ETA to total."""
     if cur is None: return None, None
     s = st.setdefault(key, {})
-    if "t0" not in s or cur < s.get("last", 0):       # new job under an old name, or a restart
-        s.update(t0=now, c0=cur, last=cur, tl=now); return None, None
+    if "t0" not in s or cur < s.get("last", 0):       # a counter reset: the job moved on to its next stage (or restarted)
+        s.update(t0=now, c0=cur, last=cur, tl=now, stage=s.get("stage", 0) + (1 if "t0" in s else 0)); return None, None
     s["last"] = cur; s["tl"] = now
     dt = now - s["t0"]; dc = cur - s["c0"]
     if dt < 20 or dc <= 0: return None, None
@@ -183,11 +183,13 @@ def job_view(rec, procs, st, now, running):
         start = rec.get("start", now); view["elapsed"] = now - start
         lines = tail(logs[0]) if logs else []
         cur, tot, pct, name, src = parse_progress(lines, cmd)
-        rate, eta = rate_and_eta(st, f"{rec['name']}:{int(start)}", cur, tot, now)
+        key = f"{rec['name']}:{int(start)}"
+        rate, eta = rate_and_eta(st, key, cur, tot, now)
+        stage = st.get(key, {}).get("stage", 0)          # counters that reset within one job: sequential stages
         if pct is None and rec.get("minutes"):
             pct = min(99.0, 100.0 * view["elapsed"] / (60.0 * rec["minutes"])); src = "elapsed / estimate"
             eta = max(0.0, 60.0 * rec["minutes"] - view["elapsed"])
-        view.update(current=cur, total=tot, percent=pct, counter=name, progress_source=src, rate=rate, eta=eta,
+        view.update(current=cur, total=tot, percent=pct, counter=name, progress_source=src, rate=rate, eta=eta, stage=stage,
                     last_line=(lines[-1][:200] if lines else ""), last_lines=lines[-4:])
         # busy check: the newest log should be moving
         view["log_age"] = (now - os.path.getmtime(logs[0])) if logs else None
@@ -228,6 +230,7 @@ def render_text(snap):
     for j in snap["jobs"]:
         if j["state"] == "running":
             prog = f"{j['current']}/{j['total']}" if j.get("total") else (f"{j['current']}" if j.get("current") is not None else "")
+            if j.get("stage"): prog = f"stage {j['stage'] + 1}, {prog}"
             out.append(f"  RUNNING [{j['kind']}] {j['name']}  {bar(j.get('percent'))} {j.get('percent') or 0:5.1f}%  {prog}  "
                        f"elapsed {fmt_dur(j['elapsed'])}  eta {fmt_dur(j.get('eta'))}  ({j.get('progress_source') or 'no progress signal'})")
             if j.get("logs"): out.append(f"      log {j['logs'][0]}  (last write {fmt_dur(j.get('log_age'))} ago)")
@@ -249,6 +252,7 @@ def render_html(snap, refresh=10):
     for j in snap["jobs"]:
         if j["state"] == "running":
             pct = j.get("percent"); prog = f"{j['current']} / {j['total']}" if j.get("total") else (f"{j['current']}" if j.get("current") is not None else "")
+            if j.get("stage"): prog = f"stage {j['stage'] + 1} · {prog}"
             rows.append(f"""<div class="job run"><div class="head"><span class="kind">{e(j['kind'])}</span><b>{e(j['name'])}</b>
               <span class="pct">{'' if pct is None else f'{pct:.1f}%'}</span></div>
               <div class="bar"><div style="width:{0 if pct is None else min(100, pct):.1f}%"></div></div>
