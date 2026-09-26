@@ -34,7 +34,11 @@ def _model(hf, mode_geoms=True):
     pg.contype = 0; pg.conaffinity = 0; pg.mass = 1.0
     cx, cy = x_riser + 0.3, plat[1]
     c = spec.worldbody.add_camera(); c.name = "down"; c.pos = [cx, cy, z_top + CAM_UP]; c.fovy = 60.0   # identity: looks along -z
+    o = spec.worldbody.add_camera(); o.name = "oblique"; o.pos = [cx - 2.0, cy - 0.5, z_top + 1.5]; o.fovy = 70.0
+    a = np.deg2rad(30.0); xa = np.array([0.0, -1.0, 0.0]); ya = np.array([np.sin(a), 0.0, np.cos(a)])
+    qo = np.zeros(4); mujoco.mju_mat2Quat(qo, np.stack([xa, ya, np.cross(xa, ya)], 1).reshape(-1)); o.quat = qo.tolist()
     l = spec.worldbody.add_light(); l.type = mujoco.mjtLightType.mjLIGHT_DIRECTIONAL; l.dir = [0.3, 0.2, -1.0]; l.pos = [cx, cy, 5]
+    l.castshadow = True
     return spec.compile(), dict(x_riser=float(x_riser), z_top=float(z_top), cx=float(cx), cy=float(cy))
 
 
@@ -108,3 +112,24 @@ def test_slot_boxes_render_the_stairs(scene, tier):
         slot0 = mujoco.mj_name2id(scene["m"], mujoco.mjtObj.mjOBJ_GEOM, "tslot0")
         ground = mujoco.mj_name2id(scene["m"], mujoco.mjtObj.mjOBJ_GEOM, "ground")
         assert np.mean(seg >= slot0 + 1) > 0.95 and np.all(seg_old == ground + 1)
+
+
+@pytest.mark.parametrize("camera", ["down", "oblique"])
+def test_hfield_tile_culling_is_pixel_exact(scene, camera):
+    """Tier 0 with the heightfield drawn as GPU-culled 16 x 16-cell tiles (the default) equals the full rasterization
+    (hfield_cull=False) pixel for pixel: RGB with shadows on (the shadow pass keeps every tile that can occlude a
+    visible point), depth and geom ids; only a small fraction of the 4.8 M-triangle field's tiles is drawn."""
+    from metalsim.render.tier0 import Tier0Renderer, SEG_GEOM
+    sim = scene["sim"]; out = {}
+    for cull in (True, False):
+        r = Tier0Renderer(scene["m"], 1, width=W, height=H, camera=camera, outputs=("rgb", "depth", "seg"), seg_mode=SEG_GEOM,
+                          hfield_cull=cull)
+        v = r.render(sim, sim.event.value); r.after(v); torch.mps.synchronize()
+        out[cull] = {k: getattr(r.out, k)[0].cpu().numpy().copy() for k in ("rgb", "depth", "seg")}
+        if cull:
+            nvis, nshadow = r.hfield_visible_counts(); ntiles = r.n_tiles
+    print(f"{camera}: tiles drawn {nvis} (shadow pass {nshadow}) of {ntiles}")
+    assert 0 < nvis <= nshadow < 0.05 * ntiles
+    assert (out[True]["depth"] > 0).mean() > 0.5
+    for k in ("rgb", "depth", "seg"):
+        assert np.array_equal(out[True][k], out[False][k]), (k, np.abs(out[True][k].astype(float) - out[False][k]).max())

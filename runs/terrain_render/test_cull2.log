@@ -1,0 +1,25 @@
+holder: {"name": "terrain_cull_test2", "kind": "render", "minutes": 6.0, "pid": 61804, "start": 1790385814.0557282, "queued": 1790385423.7130215, "cmd": "runs/terrain_render/run_test.sh", "cwd": "/Users/aditya/robosim"}
+  waiting [train] il3_train_rough est 100.0 min, queued 391 s ago
+  waiting [low] kamino_tests_fork est 40.0 min, queued 12285 s ago
+  waiting [low] kamino_tests_152 est 30.0 min, queued 11456 s ago
+  waiting [low] cl_kamino est 45.0 min, queued 10125 s ago
+  waiting [low] cl_mjw est 40.0 min, queued 10101 s ago
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+.tier 0: |new - C(boxes)| median 0.01 mm, <1 cm 1.000; |old - C(hfield only)| median 0.01 mm; |old - C(boxes)| median 215.1 mm
+.tier 2: |new - C(boxes)| median 0.00 mm, <1 cm 1.000; |old - C(hfield only)| median 0.00 mm; |old - C(boxes)| median 215.1 mm
+.down: tiles drawn 4 (shadow pass 66) of 9375
+.oblique: tiles drawn 48 (shadow pass 168) of 9375
+.WARNING: ARB_clip_control unavailable while mjDEPTH_ZEROFAR requested, depth accuracy will be limited
+
+silhouette IoU [0.9971 0.9967 0.996  0.9939] depth median err (m) [7.0e-05 1.1e-04 1.4e-04 1.4e-04] seg IoU min 0.9871
+.texture pattern correlation 0.9939
+.SO-101 silhouette IoU vs mujoco.Renderer (env 0): 1.0
+per-step mean intensity: [89.16 89.17 89.25 89.06 89.09] ...
+.
+9 passed in 7.62s

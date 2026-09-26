@@ -41,14 +41,17 @@ class Tier0Renderer:
     def __init__(self, model: mujoco.MjModel, n_envs: int, *, width=128, height=128, camera: str | int | None = None,
                  max_group=3, include_planes=True, backgrounds=False, outputs=("rgb",), seg_mode=SEG_SLOT,
                  decimate_faces: int = 0, shadows: bool = True, tier: int = 0, rt_samples: int = 4,
-                 terrain_slots: bool = True, draw_hfields: bool = True,
+                 terrain_slots: bool = True, draw_hfields: bool = True, hfield_cull: bool = True, hfield_tile: int = 16,
                  ctx: MetalContext | None = None, device="metal:0"):
         """tier 0: raster + shadow maps. tier 1: raster G-buffer with ray-traced shadows, ambient
         occlusion and mirror reflections from the fragment stage (Metal hardware ray tracing).
 
         ``terrain_slots``: draw the rough terrain's per-world box slots at their per-world ``geom_size``
         (``scene_tables.per_world_size_geoms``; False = the previous behaviour, the slots baked at their compiled
-        2 mm size). ``draw_hfields``: heightfields as their exact surface (False = not drawn, the previous behaviour)."""
+        2 mm size). ``draw_hfields``: heightfields as their exact surface (False = not drawn, the previous behaviour).
+        ``hfield_cull``: heightfields drawn as ``hfield_tile`` x ``hfield_tile``-cell tiles culled per env on the GPU
+        against the env's view frustum (and, for the shadow pass, the frustum swept toward the shadow caster); False =
+        every triangle once per env (the full rasterization path)."""
         self.m = model
         self.tier = tier
         self.rt_samples = rt_samples
@@ -67,12 +70,13 @@ class Tier0Renderer:
         self.G = self.tables.G
         hf_tris = sum(self.tables.meshes[k]["i_count"] // 3 for g, k in zip(self.tables.geoms, self.tables.geom_mesh)
                       if int(model.geom_type[g]) == int(mujoco.mjtGeom.mjGEOM_HFIELD))
-        if hf_tris * n_envs > 2e8:
+        self.hfield_cull, self.hfield_tile = bool(hfield_cull and hf_tris), int(hfield_tile)
+        if hf_tris * n_envs > 2e8 and not self.hfield_cull:
             # the raster draws every triangle once per env: Isaac's rough terrain (4.8 M) at 1024 envs is 2.9 s per frame
             # (runs/terrain_render/cost.log); the ray tracer (tier 2) is unaffected (158 ms)
             import warnings
             warnings.warn(f"tier 0 draws the heightfield in full per env: {hf_tris * n_envs / 1e6:.0f} M triangles per frame "
-                          f"(~{hf_tris * n_envs / 1.7e9:.1f} s at 1024 envs on the M4 Max); draw_hfields=False skips it")
+                          f"(~{hf_tris * n_envs / 1.7e9:.1f} s at 1024 envs on the M4 Max); hfield_cull=True culls it per env")
         self.seg_mode = seg_mode
         self.use_bg = backgrounds
         self.bg_layers = min(n_envs, 2048)
@@ -89,6 +93,7 @@ class Tier0Renderer:
         self.cam_id = cam_id
         self.intrinsics = CameraIntrinsics.from_model(model, cam_id, width, height)
         self._build_resources()
+        self._build_hfield_tiles()
         self._build_pipelines()
         self._alloc_outputs(outputs)
         self._host_sim = None
@@ -114,7 +119,7 @@ class Tier0Renderer:
         self.slot_geom = c.buffer(4 * self.G, np.asarray(t.geoms, np.int32), "slot_geom")
         self.mat_buf = c.buffer(t.materials.nbytes, t.materials, "materials")
         self.sem_buf = c.buffer(t.semantic.nbytes, t.semantic, "semantic")
-        self.env_buf = c.buffer(self.n * (2 * 64 + 8 * 16), label="env_params")
+        self.env_buf = c.buffer(self.n * (2 * 64 + 9 * 16), label="env_params")
         # per-env camera spec (host-written); defaults: model camera, no delta, white light from above
         # CameraSpec layout (28 floats = 112 bytes): intrinsics 0:4, pos_delta 4:8, rot_delta 8:12,
         # light 12:16 (w intensity), ambient 16:20 (w background mode), clear_color 20:24, cam_id 24 (int)
@@ -185,6 +190,61 @@ class Tier0Renderer:
             lp[:, i] = self.m.light_pos[i]; ld[:, i] = self.m.light_dir[i]
         c.write_buffer(self._host_light_xpos, lp); c.write_buffer(self._host_light_xdir, ld)
 
+    def _build_hfield_tiles(self):
+        """Tile tables for GPU culling of heightfields (see hf_cull in tier0.metal)."""
+        t, m, T = self.tables, self.m, self.hfield_tile
+        hf_mesh = {k for k, mesh in enumerate(t.meshes) if "hfield" in mesh}
+        self._draws = [d for k, d in enumerate(t.draws) if not (self.hfield_cull and k in hf_mesh)]
+        self.n_tiles = 0
+        if not self.hfield_cull:
+            return
+        tiles, boxes, fields = [], [], []
+        for slot, (g, k) in enumerate(zip(t.geoms, t.geom_mesh)):
+            if k not in hf_mesh:
+                continue
+            hid = t.meshes[k]["hfield"]; vbase = t.meshes[k]["v_off"]
+            nrow, ncol = int(m.hfield_nrow[hid]), int(m.hfield_ncol[hid])
+            sx, sy, sz, _ = (float(v) for v in m.hfield_size[hid])
+            Z = m.hfield_data[int(m.hfield_adr[hid]):int(m.hfield_adr[hid]) + nrow * ncol].astype(np.float64).reshape(nrow, ncol) * sz
+            xs = np.linspace(-sx, sx, ncol); ys = np.linspace(-sy, sy, nrow)
+            fi = len(fields)
+            fields.append([-sx, -sy, Z.min(), 0, sx, sy, Z.max(), 0])
+            for r0 in range(0, nrow - 1, T):
+                for c0 in range(0, ncol - 1, T):
+                    r1, c1 = min(r0 + T, nrow - 1), min(c0 + T, ncol - 1)
+                    blk = Z[r0:r1 + 1, c0:c1 + 1]
+                    tiles.append([slot, vbase, nrow, ncol, r0, c0, fi, 0])
+                    boxes.append([xs[c0], ys[r0], blk.min(), 0, xs[c1], ys[r1], blk.max(), 0])
+        c = self.ctx
+        # float32 boxes widened by one ulp-scale margin so the float32 vertices never poke out of their tile's box
+        B = np.asarray(boxes, np.float64); F = np.asarray(fields, np.float64)
+        B[:, :3] -= 1e-4; B[:, 4:7] += 1e-4
+        self.n_tiles = len(tiles)
+        self.hf_tiles = c.buffer(len(tiles) * 32, np.asarray(tiles, np.int32), "hf_tiles")
+        self.hf_boxes = c.buffer(len(tiles) * 32, B.astype(np.float32), "hf_boxes")
+        self.hf_fields = c.buffer(len(fields) * 32, F.astype(np.float32), "hf_fields")
+        cap = self.n * self.n_tiles
+        self.hf_vis = c.buffer(cap * 8, label="hf_visible")
+        self.hf_svis = c.buffer(cap * 8, label="hf_shadow_visible")
+        self.hf_args = c.buffer(64, np.zeros(16, np.uint32), "hf_draw_args")
+        r = float(t.params[0, 3])
+        cc = np.zeros(8, np.uint32); cc[:4] = (self.n, self.n_tiles, T, 1 if self.shadows else 0)
+        cc.view(np.float32)[4] = 2.0 * (2.0 * r / self.sw)       # two shadow texels (hardware 2x2 filtered compare)
+        self.hf_cc = c.buffer(32, cc, "hf_cull_consts")
+        li = []
+        for i in range(T):
+            for j in range(T):
+                a, b, cc_, d = i * (T + 1) + j, i * (T + 1) + j + 1, (i + 1) * (T + 1) + j + 1, (i + 1) * (T + 1) + j
+                li += [a, b, cc_, a, cc_, d]                # MuJoCo's cell split, as hfield_mesh
+        li = np.asarray(li, np.uint32)
+        self.hf_ibuf = c.buffer(li.nbytes, li, "hf_tile_indices")
+
+    def hfield_visible_counts(self) -> tuple:
+        """(render, shadow) visible (env, tile) pairs of the last frame (synchronizes)."""
+        self.ctx.synchronize()
+        a = self.ctx.buffer_array(self.hf_args, np.uint32, (16,))
+        return int(a[1]), int(a[9])
+
     def _build_pipelines(self):
         c = self.ctx
         lib = c.library("tier0")
@@ -223,6 +283,14 @@ class Tier0Renderer:
         d.setDepthAttachmentPixelFormat_(Metal.MTLPixelFormatDepth32Float)
         self.shadow_pipe = c.render_pipeline(d)
         self.shadow_ds = self.geo_ds
+        if self.hfield_cull:
+            self.hf_pipe, _ = make("hf_tile_vs", "geom_fs_rt" if self.tier >= 1 else "geom_fs", True, Metal.MTLCompareFunctionLess, False)
+            d = Metal.MTLRenderPipelineDescriptor.new()
+            d.setVertexFunction_(lib.newFunctionWithName_("hf_tile_shadow_vs"))
+            d.setDepthAttachmentPixelFormat_(Metal.MTLPixelFormatDepth32Float)
+            self.hf_shadow_pipe = c.render_pipeline(d)
+            self.p_hf_reset = c.compute_pipeline(lib, "hf_cull_reset")
+            self.p_hf_cull = c.compute_pipeline(lib, "hf_cull")
 
     def _alloc_outputs(self, outputs):
         """Output tensors live in Warp arrays on metal:0 so that they are simultaneously Warp arrays,
@@ -317,6 +385,19 @@ class Tier0Renderer:
         ce.setBuffer_offset_atIndex_(self.params_buf, 0, 7)
         ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n, 1, 1), Metal.MTLSize(min(self.n, 64), 1, 1))
         ce.endEncoding()
+        # 1a. heightfield tiles: per-env visible lists and indirect draw arguments (serial dispatches)
+        if self.hfield_cull:
+            ce = cb.computeCommandEncoder()
+            ce.setComputePipelineState_(self.p_hf_reset)
+            ce.setBuffer_offset_atIndex_(self.hf_args, 0, 0); ce.setBuffer_offset_atIndex_(self.hf_cc, 0, 1)
+            ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(2, 1, 1), Metal.MTLSize(2, 1, 1))
+            ce.setComputePipelineState_(self.p_hf_cull)
+            for i, (b, o) in enumerate(((self.env_buf, 0), (self.hf_tiles, 0), (self.hf_boxes, 0), (self.hf_fields, 0),
+                                        (self.slot_geom, 0), (geom_xpos, geom_xpos_off), (geom_xmat, geom_xmat_off),
+                                        (self.consts_buf, 0), (self.hf_cc, 0), (self.hf_vis, 0), (self.hf_svis, 0), (self.hf_args, 0))):
+                ce.setBuffer_offset_atIndex_(b, o, i)
+            ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n * self.n_tiles, 1, 1), Metal.MTLSize(256, 1, 1))
+            ce.endEncoding()
         # 1b. shadow pass: depth from the caster light into the shadow atlas
         if self.shadows:
             sp = Metal.MTLRenderPassDescriptor.new()
@@ -336,9 +417,14 @@ class Tier0Renderer:
             se.setVertexBuffer_offset_atIndex_(geom_xmat, geom_xmat_off, 5)
             se.setVertexBuffer_offset_atIndex_(self.color_buf, 0, 6)
             se.setVertexBuffer_offset_atIndex_(self.consts_buf, 0, 7)
-            for i_off, i_count, first, count in self.tables.draws:
+            for i_off, i_count, first, count in self._draws:
                 se.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_instanceCount_baseVertex_baseInstance_(
                     Metal.MTLPrimitiveTypeTriangle, i_count, Metal.MTLIndexTypeUInt32, self.ibuf, i_off * 4, count, 0, first)
+            if self.hfield_cull:
+                se.setRenderPipelineState_(self.hf_shadow_pipe)
+                self._bind_hf(se, self.hf_svis)
+                se.drawIndexedPrimitives_indexType_indexBuffer_indexBufferOffset_indirectBuffer_indirectBufferOffset_(
+                    Metal.MTLPrimitiveTypeTriangle, Metal.MTLIndexTypeUInt32, self.hf_ibuf, 0, self.hf_args, 32)
             se.endEncoding()
         # 1c. tier 1: refit instance descriptors from the same physics buffers and rebuild the instance AS
         if self.rt is not None:
@@ -405,9 +491,14 @@ class Tier0Renderer:
             re.setFragmentBuffer_offset_atIndex_(rt.vbuf, 0, 15)
             re.setFragmentBuffer_offset_atIndex_(rt.ibuf, 0, 16)
             re.setFragmentBuffer_offset_atIndex_(rt.inst_desc, 0, 17)
-        for i_off, i_count, first, count in self.tables.draws:
+        for i_off, i_count, first, count in self._draws:
             re.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_instanceCount_baseVertex_baseInstance_(
                 Metal.MTLPrimitiveTypeTriangle, i_count, Metal.MTLIndexTypeUInt32, self.ibuf, i_off * 4, count, 0, first)
+        if self.hfield_cull:
+            re.setRenderPipelineState_(self.hf_pipe)
+            self._bind_hf(re, self.hf_vis)
+            re.drawIndexedPrimitives_indexType_indexBuffer_indexBufferOffset_indirectBuffer_indirectBufferOffset_(
+                Metal.MTLPrimitiveTypeTriangle, Metal.MTLIndexTypeUInt32, self.hf_ibuf, 0, self.hf_args, 0)
         re.endEncoding()
         # 3. untile into learner buffers
         ue = cb.computeCommandEncoder()
@@ -426,6 +517,13 @@ class Tier0Renderer:
         ue.setBuffer_offset_atIndex_(self.outputs_buf, 0, 7)
         ue.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.tw, self.th, self.n), Metal.MTLSize(16, 16, 1))
         ue.endEncoding()
+
+    def _bind_hf(self, enc, vis):
+        """Vertex buffers of the tile draw (1, 3, 4, 5, 7 stay bound from the preceding draws)."""
+        enc.setVertexBuffer_offset_atIndex_(self.vbuf, 0, 0)
+        enc.setVertexBuffer_offset_atIndex_(vis, 0, 2)
+        enc.setVertexBuffer_offset_atIndex_(self.hf_tiles, 0, 6)
+        enc.setVertexBuffer_offset_atIndex_(self.hf_cc, 0, 8)
 
     def render(self, sim, after_value: int | None = None) -> int:
         """GPU path: render the current physics state of ``sim`` (a BatchSim). Waits for

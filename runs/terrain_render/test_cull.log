@@ -1,0 +1,49 @@
+holder: {"name": "terrain_cull_test", "kind": "render", "minutes": 6.0, "pid": 58893, "start": 1790385318.6478028}
+  waiting [train] il3_train_rough est 100.0 min, queued 3363 s ago
+  waiting [low] newton_vbd_replay est 40.0 min, queued 14410 s ago
+  waiting [low] kamino_tests_fork est 40.0 min, queued 11790 s ago
+  waiting [low] kamino_tests_152 est 30.0 min, queued 10960 s ago
+  waiting [low] cl_kamino est 45.0 min, queued 9629 s ago
+  waiting [low] cl_mjw est 40.0 min, queued 9606 s ago
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+.tier 0: |new - C(boxes)| median 0.01 mm, <1 cm 1.000; |old - C(hfield only)| median 0.01 mm; |old - C(boxes)| median 215.1 mm
+.tier 2: |new - C(boxes)| median 0.00 mm, <1 cm 1.000; |old - C(hfield only)| median 0.00 mm; |old - C(boxes)| median 215.1 mm
+.down: tiles drawn 4 (shadow pass 2410) of 9375
+F
+=================================== FAILURES ===================================
+________________ test_hfield_tile_culling_is_pixel_exact[down] _________________
+
+scene = {'sim': <metalsim.physics.batch.BatchSim object at 0x11dc3b890>, 'm': <mujoco._structs.MjModel object at 0x11d0995f0>,...9, 1.55967039, 1.55967039,
+       1.55967039, 1.55967039, 1.55967039, 1.55967039, 1.55967039,
+       1.55967039]), ...}
+camera = 'down'
+
+    @pytest.mark.parametrize("camera", ["down", "oblique"])
+    def test_hfield_tile_culling_is_pixel_exact(scene, camera):
+        """Tier 0 with the heightfield drawn as GPU-culled 16 x 16-cell tiles (the default) equals the full rasterization
+        (hfield_cull=False) pixel for pixel: RGB with shadows on (the shadow pass keeps every tile that can occlude a
+        visible point), depth and geom ids; only a small fraction of the 4.8 M-triangle field's tiles is drawn."""
+        from metalsim.render.tier0 import Tier0Renderer, SEG_GEOM
+        sim = scene["sim"]; out = {}
+        for cull in (True, False):
+            r = Tier0Renderer(scene["m"], 1, width=W, height=H, camera=camera, outputs=("rgb", "depth", "seg"), seg_mode=SEG_GEOM,
+                              hfield_cull=cull)
+            v = r.render(sim, sim.event.value); r.after(v); torch.mps.synchronize()
+            out[cull] = {k: getattr(r.out, k)[0].cpu().numpy().copy() for k in ("rgb", "depth", "seg")}
+            if cull:
+                nvis, nshadow = r.hfield_visible_counts(); ntiles = r.n_tiles
+        print(f"{camera}: tiles drawn {nvis} (shadow pass {nshadow}) of {ntiles}")
+>       assert 0 < nvis <= nshadow < 0.02 * ntiles
+E       assert 2410 < (0.02 * 9375)
+
+tests/test_render_terrain_slots.py:132: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_render_terrain_slots.py::test_hfield_tile_culling_is_pixel_exact[down]
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 3 passed in 5.90s
