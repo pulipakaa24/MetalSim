@@ -1,0 +1,33 @@
+[gpu_run] tp26_resid2 start: device utilisation 0% (09:39:21)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   2.1 %
+=== start Sat Sep 26 09:39:24 PDT 2026 wt warp 9df9acee mjw f33005f power: Now drawing from 'AC Power'
+--- residency n=43 09:39:24
+n=43: tile path (block_dim 32, one world per threadgroup): 1.068 ms per 4096 factor+solve
+Traceback (most recent call last):
+--- residency n=32 09:39:25
+n=32: tile path (block_dim 32, one world per threadgroup): 0.203 ms per 4096 factor+solve
+Traceback (most recent call last):
+--- (L'DL check and bench done in resid.wrapper.log)
+Module _factor_i_sparse_unrolled__locals__kernel_f15dd24f 6e9f1fa load on device 'metal:0' took 18.48 ms  (cached)
+Module _solve_LD_sparse_unrolled__locals__kernel_be0563f2 1254cfc load on device 'metal:0' took 18.39 ms  (cached)
+  unrolled: factor bitwise | solve on the serial factor: bitwise
+Module _factor_i_sparse_unrolled__locals__kernel_3bf3bc0e d77f845 load on device 'metal:0' took 17.17 ms  (cached)
+Module _solve_LD_sparse_unrolled__locals__kernel_d9d2768a 4ad2324 load on device 'metal:0' took 17.31 ms  (cached)
+  unrolled: factor bitwise | solve on the serial factor: bitwise
+Module _factor_i_sparse_unrolled__locals__kernel_59959252 c284fbf load on device 'metal:0' took 17.21 ms  (cached)
+Module _solve_LD_sparse_unrolled__locals__kernel_919473b3 6167314 load on device 'metal:0' took 17.94 ms  (cached)
+  unrolled: factor bitwise | solve on the serial factor: bitwise
+ALL OK
+--- L'DL bench 09:39:28
+Module _factor_i_sparse_serial__locals__kernel_4a9a30d6 34640de load on device 'metal:0' took 17.34 ms  (cached)
+factor serial : 0.454 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+Module _solve_LD_sparse_serial__locals__kernel_f859468c 1037d66 load on device 'metal:0' took 16.89 ms  (cached)
+solve serial  : 0.208 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+Module _factor_i_sparse_unrolled__locals__kernel_f15dd24f 6e9f1fa load on device 'metal:0' took 17.22 ms  (cached)
+factor unrolled: 0.314 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+Module _solve_LD_sparse_unrolled__locals__kernel_be0563f2 1254cfc load on device 'metal:0' took 17.63 ms  (cached)
+solve unrolled: 0.405 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+=== end Sat Sep 26 09:39:31 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] tp26_resid2 end: device utilisation 92% (09:39:31), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %

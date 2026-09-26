@@ -25,15 +25,15 @@ SNIP = f"""
         for (int i = 0; i < N; ++i)
             col[c][i] = (jc < N && i >= jc) ? h.data[jc * N + i] : 0.0f;   // upper storage: H[jc, i]
     }}
-    wp::metal_register_cholesky_step<0, N, CPL, BD, float>(col, lane);
+    wp::partitioned_gemm::metal_register_cholesky_step<0, N, CPL, BD, float>(col, lane);
     thread float b[CPL]; thread float y[CPL]; thread float x[CPL];
 #pragma clang loop unroll(full)
     for (int c = 0; c < CPL; ++c) {{
         const int jc = lane + c * BD;
         b[c] = (jc < N) ? g.data[jc] : 0.0f; y[c] = 0.0f; x[c] = 0.0f;
     }}
-    wp::metal_register_forward_step<0, N, CPL, BD, float>(col, y, b, lane);
-    wp::metal_register_backward_step<N - 1, N, CPL, BD, float>(col, y, x, lane);
+    wp::partitioned_gemm::metal_register_forward_step<0, N, CPL, BD, float>(col, y, b, lane);
+    wp::partitioned_gemm::metal_register_backward_step<N - 1, N, CPL, BD, float>(col, y, x, lane);
 #pragma clang loop unroll(full)
     for (int c = 0; c < CPL; ++c) {{
         const int jc = lane + c * BD;
@@ -48,8 +48,8 @@ def chol_solve_native(h: wp.array2d[float], g: wp.array[float], out: wp.array[fl
     pass
 
 
-SNIP_SPLIT = SNIP.replace("wp::metal_register_cholesky_step<0, N, CPL, BD, float>(col, lane);",
-                          "wp::metal_register_cholesky_step_split<0, N, CPL, BD, float>(col, lane);")
+SNIP_SPLIT = SNIP.replace("wp::partitioned_gemm::metal_register_cholesky_step<0, N, CPL, BD, float>(col, lane);",
+                          "wp::partitioned_gemm::metal_register_cholesky_step_split<0, N, CPL, BD, float>(col, lane);")
 
 
 @wp.kernel(enable_backward=False, module="unique")
