@@ -10,7 +10,7 @@ set -u
 main() {
   NAME=$1; KIND=$2; MIN=$3; shift 3; [ "$1" = "--" ] && shift
   cd "$(dirname "$0")/.."
-  python3 scripts/gpu_lock.py acquire "$NAME" --kind "$KIND" --minutes "$MIN" --pid $$
+  python3 scripts/gpu_lock.py acquire "$NAME" --kind "$KIND" --minutes "$MIN" --pid $$ --cmd "$*"
   if [ "$KIND" = "timing" ]; then
     for i in $(seq 1 60); do u=$(scripts/gpu_util.sh); [ "${u:-0}" -lt 10 ] && break; sleep 2; done
     echo "[gpu_run] $NAME start: device utilisation ${u:-?}% ($(date +%H:%M:%S))"; python3 scripts/gpu_top.py 2>/dev/null | head -4 | sed "s/^/[gpu_run] gpu_top: /"
@@ -18,7 +18,7 @@ main() {
   "$@" &
   CHILD=$!
   python3 scripts/gpu_lock.py setpid "$NAME" --pid $CHILD
-  trap 'kill $CHILD 2>/dev/null; wait $CHILD 2>/dev/null; python3 scripts/gpu_lock.py release "$NAME" --pid $CHILD' EXIT INT TERM HUP
+  trap 'kill $CHILD 2>/dev/null; wait $CHILD 2>/dev/null; python3 scripts/gpu_lock.py release "$NAME" --pid $CHILD --rc ${RC:-130}' EXIT INT TERM HUP
   wait $CHILD
   RC=$?
   [ "$KIND" = "timing" ] && { echo "[gpu_run] $NAME end: device utilisation $(scripts/gpu_util.sh)% ($(date +%H:%M:%S)), exit $RC"; python3 scripts/gpu_top.py 2>/dev/null | head -4 | sed "s/^/[gpu_run] gpu_top: /"; }

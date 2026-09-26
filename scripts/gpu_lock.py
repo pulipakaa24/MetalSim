@@ -19,6 +19,13 @@ import argparse, json, os, sys, time
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LOCK = os.path.join(ROOT, "runs", ".gpu_lock"); LOCKD = LOCK + ".d"; Q = os.path.join(ROOT, "runs", "gpu_queue")
+HIST = os.path.join(ROOT, "runs", "gpu_history.jsonl")      # one line per grant and per release (the dashboard reads it)
+
+
+def _hist(ev, **kw):
+    try:
+        with open(HIST, "a") as f: f.write(json.dumps(dict(ev=ev, t=time.time(), **kw)) + "\n")
+    except OSError: pass
 PRIO = {"timing": 0, "render": 1, "train": 2, "low": 3}
 
 
@@ -36,7 +43,10 @@ def holder():
     return h
 
 
-def _release(force=False):
+def _release(force=False, rc=None):
+    if os.path.exists(LOCK):
+        try: h = json.load(open(LOCK)); _hist("release", name=h.get("name"), kind=h.get("kind"), start=h.get("start"), rc=rc, forced=force)
+        except Exception: pass
     for p in (LOCK,):
         if os.path.exists(p): os.remove(p)
     if os.path.isdir(LOCKD): os.rmdir(LOCKD)
@@ -52,10 +62,10 @@ def tickets():
     out.sort(); return out
 
 
-def acquire(name, kind, minutes, pid):
+def acquire(name, kind, minutes, pid, cmd=None):
     os.makedirs(Q, exist_ok=True)
     tf = os.path.join(Q, f"{time.time():.3f}_{PRIO[kind]}_{name}.json")
-    json.dump({"name": name, "kind": kind, "minutes": minutes, "pid": pid, "t": time.time()}, open(tf, "w"))
+    json.dump({"name": name, "kind": kind, "minutes": minutes, "pid": pid, "t": time.time(), "cmd": cmd, "cwd": os.getcwd()}, open(tf, "w"))
     while True:
         h = holder()
         if h is None:
@@ -65,7 +75,8 @@ def acquire(name, kind, minutes, pid):
                     os.mkdir(LOCKD)                                   # atomic
                 except FileExistsError:
                     time.sleep(2); continue
-                json.dump({"name": name, "kind": kind, "minutes": minutes, "pid": pid, "start": time.time()}, open(LOCK, "w"))
+                json.dump({"name": name, "kind": kind, "minutes": minutes, "pid": pid, "start": time.time(), "queued": os.path.getmtime(tf), "cmd": cmd, "cwd": os.getcwd()}, open(LOCK, "w"))
+                _hist("grant", name=name, kind=kind, minutes=minutes, cmd=cmd)
                 os.remove(tf); return
         time.sleep(5)
 
@@ -73,8 +84,10 @@ def acquire(name, kind, minutes, pid):
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument("cmd", choices=["acquire", "release", "status", "setpid"]); ap.add_argument("name", nargs="?")
     ap.add_argument("--kind", default="train", choices=list(PRIO)); ap.add_argument("--minutes", type=float, default=30); ap.add_argument("--pid", type=int, default=os.getppid())
+    ap.add_argument("--cmd", default=None, help="the job's command line, recorded for the dashboard"); ap.add_argument("--rc", type=int, default=None, help="exit code, recorded on release")
+    ap.add_argument("--json", action="store_true")
     a = ap.parse_args()
-    if a.cmd == "acquire": acquire(a.name, a.kind, a.minutes, a.pid)
+    if a.cmd == "acquire": acquire(a.name, a.kind, a.minutes, a.pid, a.cmd)
     elif a.cmd == "setpid":                       # the wrapper registers the real job process once spawned
         h = holder()
         if h and h.get("name") == a.name: h["pid"] = a.pid; json.dump(h, open(LOCK, "w"))
@@ -83,7 +96,9 @@ def main():
         if h and a.name and h.get("name") not in (a.name, None): print(f"lock held by {h.get('name')}, not {a.name}; not released"); sys.exit(1)
         if h and a.pid != os.getppid() and h.get("pid") and h["pid"] != a.pid:   # a late release from an older job of the same name must not free its successor
             print(f"lock held by pid {h['pid']}, release asked for pid {a.pid}; not released"); sys.exit(1)
-        _release()
+        _release(rc=a.rc)
+    elif a.json:
+        print(json.dumps({"holder": holder(), "waiting": [tk for _, _, _, tk in tickets()], "now": time.time()}))
     else:
         h = holder(); print("holder:", json.dumps(h) if h else "none")
         for pr, t, f, tk in tickets(): print(f"  waiting [{tk['kind']}] {tk['name']} est {tk['minutes']} min, queued {time.time() - t:.0f} s ago")
