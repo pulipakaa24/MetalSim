@@ -65,7 +65,7 @@ def _isaac_terms(task, e, flat, rough_isaac=False):
     fv = (d.foot_vel if task.engine == "newton" else task.foot_vel).numpy()[e]      # what the reward kernel read
     R = _rot(qpos[3:7])
     v_w = qvel[0:3]; w_b = qvel[3:6]; w_w = R @ w_b
-    if getattr(task, "il3", False):
+    if getattr(task, "base_velocity", "origin") == "com":
         v_w = _root_com_velocity(task, qpos, qvel)[1]    # Isaac's root_lin_vel_w = the root body's COM velocity
     v_b = R.T @ v_w
     yaw = np.arctan2(R[1, 0], R[0, 0])
@@ -538,3 +538,20 @@ def test_default_task_carries_the_recommended_contact_preset():
     with ct.g1_model_tuning("tau5_imp99_hardlimits"):
         m5 = G1VelocityTask(2, terrain="flat", seed=0).model
     np.testing.assert_allclose(m5.geom_solref, np.tile((0.005, 1.0), (m5.ngeom, 1)))
+
+
+@pytest.mark.parametrize("reward_cfg", ["flat", "rough", "rough_isaac"])
+def test_base_velocity_option_2_3_2_configs(reward_cfg):
+    """2.3.2 configs: base_velocity "com" (default) = Isaac's root_com_lin_vel (tracking and lin_vel_z recomputed with
+    MuJoCo C's pelvis-COM velocity); the archived "origin" keeps the frame-origin velocity (recomputed from qvel)."""
+    n = 8
+    for bv in ("com", "origin"):
+        task = G1VelocityTask(n, terrain="flat", seed=1, reward_cfg=reward_cfg, base_velocity=bv)
+        assert task.base_velocity == bv
+        _one_step(task, n)
+        terms = task.terms.numpy()
+        for e in range(n):
+            ref = _isaac_terms(task, e, flat=reward_cfg == "flat", rough_isaac=reward_cfg == "rough_isaac")
+            for k in (0, 8):
+                np.testing.assert_allclose(terms[e, k], ref[k], rtol=1e-4, atol=1e-5, err_msg=f"{bv} env {e} term {k}")
+    assert G1VelocityTask(2, terrain="flat").base_velocity == "com"

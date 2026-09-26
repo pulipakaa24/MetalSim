@@ -816,6 +816,16 @@ the 3.0 task with its extra events): return +3.0 / level 1.7 at 300, +8.9 / 4.2 
 the 2.3.2 rough task: +16.4 and +22.6 over two seeds, levels 6.1). Not like for like until 3.0's push and
 mass-randomization events are ported to our task.
 
+**Like-for-like port of the 3.0 task (2026-09-25, `docs/research/isaaclab3_like_for_like_2026-09-25.md`).** 3.0's
+events and semantics are ported as `reward_cfg="flat_il3"` / `"rough_il3"`, and Isaac's own MuJoCo-Warp settings as
+`solver_cfg="isaaclab3"`. Fidelity against the Newton recording: Isaac's soft joint limits reproduce its limit
+excursions (random protocol 0.216 vs Isaac 0.227 rad; hard limits 0.068). The first il3 training runs (flat +24.9 vs
+Isaac Newton +27.5; rough +6.1 / level 5.70 vs +14.5 / 5.80, 1,615 blow-ups) ran a **mixed preset** (the task's
+contact_cfg "recommended" left the hard-limit impedance under Isaac's soft limit solref) and are **superseded**; re-runs
+are in progress. Also found: the 2.3.2 ports read the pelvis frame-origin velocity where Isaac reads the pelvis COM
+velocity (`root_lin_vel_*`); the COM velocity is now the default (`base_velocity="origin"` archived), and a
+confirming 2.3.2 flat run is queued.
+
 ## 2. Platform capabilities (the workstreams), with the tests behind them
 
 | capability | Isaac | ours | test (assertion) | result | verdict |

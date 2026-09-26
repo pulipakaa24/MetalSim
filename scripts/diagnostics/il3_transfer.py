@@ -35,8 +35,12 @@ def load_actor(path):
 
 
 def make(preset):
+    """preset: a contact_tuning name (applied as the task's contact_cfg, "default" = MuJoCo's defaults) or a solver_presets
+    name (applied on top of MuJoCo's defaults)."""
+    from metalsim.physics import solver_presets
+    sp = preset in solver_presets.PRESETS
     return G1VelocityTask(N, terrain="flat", seed=0, physics_dt=0.0025, reward_cfg="flat_il3", il3_events=False,
-                          solver_cfg=None if preset == "default" else preset)
+                          contact_cfg="default" if sp else preset, solver_cfg=preset if sp else None)
 
 
 def play(task, actor, pol_joints):

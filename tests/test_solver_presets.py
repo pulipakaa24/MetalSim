@@ -19,8 +19,12 @@ pytestmark = pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal
 
 
 def test_isaaclab3_model_fields_match_the_recording():
+    from metalsim.physics import contact_tuning
     m, _ = build_g1_model("flat", physics_dt=0.0025)
+    contact_tuning.apply(m, "recommended")          # the task applies its contact_cfg first: the preset must override all of it
     solver_presets.apply(m, "isaaclab3")
+    lim = json.load(open("runs/parity3/isaac/fidelity/newton_mjwarp/meta.json"))["newton"]["mjw_model_joint_actuator"]["jnt_solimp"]["first_world"]
+    np.testing.assert_allclose(m.jnt_solimp[1:], np.array(lim)[1:], rtol=1e-6)
     rec = json.load(open(solver_presets.ISAACLAB3_SETTINGS))
     assert m.opt.iterations == rec["solver"]["iterations"] == 100 and m.opt.ls_iterations == rec["solver"]["ls_iterations"] == 50
     assert m.opt.tolerance == pytest.approx(rec["solver"]["tolerance"]) and m.opt.ls_tolerance == pytest.approx(rec["solver"]["ls_tolerance"])
@@ -133,3 +137,24 @@ def test_iteration_cap_only_changes_worlds_that_reach_it():
     # measured 2026-09-25: not bit-identical (max 1.2e-7 after 0.2 s: the extra, masked iterations still launch some
     # unmasked bookkeeping kernels), i.e. float noise
     np.testing.assert_allclose(res["isaaclab3"][0], res["isaaclab3_cap20"][0], atol=1e-5)
+
+
+@pytest.mark.parametrize("contact_cfg,solver_cfg", [("default", None), ("recommended", None), ("recommended", "isaaclab3"),
+                                                    ("recommended", "isaaclab3_every_substep_cap20"),
+                                                    ("recommended", "isaaclab3_hardlimits"), ("default", "isaaclab3")])
+def test_effective_model_fields_per_preset_combination(contact_cfg, solver_cfg):
+    """The task's effective contact / limit fields equal the intended preset alone applied to the raw model: contact_cfg
+    first, then solver_cfg (solver_presets docstring), with the solver preset owning every field it touches."""
+    from metalsim.learn.g1_velocity import G1VelocityTask
+    from metalsim.physics import contact_tuning
+    task = G1VelocityTask(2, terrain="flat", seed=0, physics_dt=0.0025, reward_cfg="flat", contact_cfg=contact_cfg, solver_cfg=solver_cfg)
+    ref, _ = build_g1_model("flat", physics_dt=0.0025)
+    if solver_cfg is None:
+        contact_tuning.apply(ref, contact_cfg)
+    else:
+        solver_presets.apply(ref, solver_cfg)            # alone, on MuJoCo's defaults
+    m = task.model
+    for f in ("geom_solref", "geom_solimp", "geom_gap", "geom_margin", "jnt_solref", "jnt_solimp", "geom_friction"):
+        np.testing.assert_allclose(getattr(m, f), getattr(ref, f), rtol=1e-7, err_msg=f"{contact_cfg}+{solver_cfg}: {f}")
+    for f in ("iterations", "ls_iterations", "tolerance", "ls_tolerance", "cone", "impratio", "integrator"):
+        assert getattr(m.opt, f) == getattr(ref.opt, f), (contact_cfg, solver_cfg, f)
