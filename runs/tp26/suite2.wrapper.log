@@ -1,0 +1,11 @@
+=== start Sat Sep 26 09:43:40 PDT 2026 metalsim ee78e28 frozen warp 9df9acee mjw 0a9de8e
+imports /Users/aditya/robosim/upstream/warp-innate-tp-test/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp-test/mujoco_warp/__init__.py
+--- metalsim suite 09:43:41
+246 passed, 14 warnings in 233.90s (0:03:53)
+--- mujoco_warp full suite 09:47:35
+FAILED mujoco_warp/_src/io_test.py::IOTest::test_put_data_nefc_zero_dense - A...
+1 failed, 1451 passed, 39 skipped, 28 warnings, 8 subtests passed in 56.33s
+--- warp test_metal 09:48:34
+FAILED warp/tests/test_metal.py::TestMetal::test_print_strings_are_per_kernel
+1 failed, 15 passed in 4.20s
+=== end Sat Sep 26 09:48:39 PDT 2026

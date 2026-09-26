@@ -1,0 +1,90 @@
+........................................ss.............................. [  4%]
+........................................................................ [  9%]
+.......................................................s.s.............. [ 14%]
+................................ss....................s................. [ 19%]
+..........................ss..ssssss..s..........s..........s........s.. [ 24%]
+........................................................................ [ 28%]
+........................................................................ [ 33%]
+..............................................................s......... [ 38%]
+.....................................ss.......ss.s.s..s................. [ 43%]
+........................................................................ [ 48%]
+...............................................ss...ss.................. [ 53%]
+............................................................F........... [ 57%]
+.......................................s...ssss................... [ 62%]
+........................................................................ [ 67%]
+......................................s................................. [ 72%]
+........................................................................ [ 76%]
+.......s................................................................ [ 81%]
+........................................................................ [ 86%]
+...................................................................... [ 91%]
+.........................................s.............................. [ 96%]
+...........................................................              [100%]
+=================================== FAILURES ===================================
+_____________________ IOTest.test_put_data_nefc_zero_dense _____________________
+
+self = <mujoco_warp._src.io_test.IOTest testMethod=test_put_data_nefc_zero_dense>
+
+    def test_put_data_nefc_zero_dense(self):
+      """put_data succeeds for dense models with nefc=0 and non-empty efc_J."""
+      # A tendon with frictionloss causes MuJoCo to pre-allocate efc_J with
+      # size nv even when nefc=0, causing reshape((0, nv)) to fail.
+      mjm = mujoco.MjModel.from_xml_string("""
+        <mujoco>
+          <worldbody>
+            <body pos="0 0 1">
+              <freejoint/>
+              <geom type="box" size="0.1 0.1 0.1" mass="1.0"/>
+              <site name="s1" pos="0 0 0.1"/>
+              <body pos="0.3 0 0">
+                <joint type="hinge" axis="0 0 1"/>
+                <geom type="sphere" size="0.05" mass="0.2"/>
+                <site name="s2" pos="0 0 -0.05"/>
+              </body>
+            </body>
+          </worldbody>
+          <tendon>
+            <spatial limited="true" range="0 0.5"
+              damping="2.0" stiffness="10.0" frictionloss="0.5">
+              <site site="s1"/>
+              <site site="s2"/>
+            </spatial>
+          </tendon>
+        </mujoco>
+      """)
+      mjd = mujoco.MjData(mjm)
+      mujoco.mj_forward(mjm, mjd)
+    
+      self.assertFalse(mujoco.mj_isSparse(mjm))
+>     self.assertEqual(mjd.nefc, 0)
+E     AssertionError: 1 != 0
+
+mujoco_warp/_src/io_test.py:2071: AssertionError
+=============================== warnings summary ===============================
+mujoco_warp/_src/bvh_test.py: 7 warnings
+mujoco_warp/_src/collision_driver_test.py: 1 warning
+mujoco_warp/_src/render_test.py: 7 warnings
+mujoco_warp/_src/render_util_test.py: 3 warnings
+mujoco_warp/_src/sensor_test.py: 3 warnings
+  /Users/aditya/robosim/upstream/mujoco_warp-tp-test/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+mujoco_warp/_src/collision_driver_test.py::CollisionTest::test_hfield_collision0
+mujoco_warp/_src/collision_driver_test.py::CollisionTest::test_hfield_maxconpair
+  /Users/aditya/robosim/upstream/mujoco_warp-tp-test/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'BOX')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+mujoco_warp/_src/collision_driver_test.py::CollisionTest::test_hfield_collision1
+  /Users/aditya/robosim/upstream/mujoco_warp-tp-test/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp0
+mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp1
+mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp4
+mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp5
+  /Users/aditya/robosim/upstream/mujoco_warp-tp-test/mujoco_warp/_src/io.py:334: UserWarning: Bending damping is not yet supported for interpolated flex shells.
+    warnings.warn("Bending damping is not yet supported for interpolated flex shells.")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED mujoco_warp/_src/io_test.py::IOTest::test_put_data_nefc_zero_dense - A...
+1 failed, 1451 passed, 39 skipped, 28 warnings, 8 subtests passed in 56.33s
