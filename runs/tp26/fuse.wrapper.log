@@ -1,0 +1,76 @@
+[gpu_run] tp26_fuse start: device utilisation 0% (04:28:44)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+=== start Sat Sep 26 04:28:46 PDT 2026 metalsim 9a3ef74 wt warp 139385a8 mjw dd42c23 power: Now drawing from 'AC Power'
+--- F1 fused 04:28:47
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[F1_fused] N=4096 njmax 144 naconmax 98304 is_sparse False
+[F1_fused] physics only 45.4 ms/step -> 90,312 env-steps/s
+[F1_fused] full env step 67.4 ms -> 60,803 env-steps/s
+[F1_fused] after random-action steps: nefc max 43 mean 14.5; nacon 11233 (2.74/world); overflow {'ITERATIONS': 25, 'LS_ITERATIONS': 3889}
+--- U1 unfused 04:29:01
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[U1_unfused] N=4096 njmax 144 naconmax 98304 is_sparse False
+[U1_unfused] physics only 47.7 ms/step -> 85,862 env-steps/s
+[U1_unfused] full env step 70.1 ms -> 58,439 env-steps/s
+[U1_unfused] after random-action steps: nefc max 46 mean 14.4; nacon 11092 (2.71/world); overflow {'ITERATIONS': 28, 'LS_ITERATIONS': 3880}
+--- F2 fused 04:29:15
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[F2_fused] N=4096 njmax 144 naconmax 98304 is_sparse False
+[F2_fused] physics only 45.4 ms/step -> 90,182 env-steps/s
+[F2_fused] full env step 67.4 ms -> 60,762 env-steps/s
+[F2_fused] after random-action steps: nefc max 46 mean 14.4; nacon 11326 (2.77/world); overflow {'ITERATIONS': 21, 'LS_ITERATIONS': 3871}
+--- U2 unfused 04:29:29
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[U2_unfused] N=4096 njmax 144 naconmax 98304 is_sparse False
+[U2_unfused] physics only 47.9 ms/step -> 85,543 env-steps/s
+[U2_unfused] full env step 69.9 ms -> 58,589 env-steps/s
+[U2_unfused] after random-action steps: nefc max 38 mean 14.4; nacon 11236 (2.74/world); overflow {'ITERATIONS': 30, 'LS_ITERATIONS': 3887}
+--- itercost fused 04:29:43
+state: nefc mean 7.9 max 35, nacon 1.67 per world
+  k | solve ms (graph, per substep) | marginal ms of iteration k | worlds converged before iteration k
+   0 |   1.497 |   1.497 |     0
+   1 |   2.732 |   1.235 |     0
+   2 |   3.629 |   0.897 |  1018
+   3 |   4.261 |   0.632 |  2145
+   4 |   4.669 |   0.409 |  2892
+   5 |   4.977 |   0.308 |  3429
+   6 |   5.211 |   0.234 |  3755
+   7 |   5.404 |   0.193 |  3944
+   8 |   5.598 |   0.194 |  4025
+   9 |   5.765 |   0.167 |  4068
+  10 |   5.919 |   0.154 |  4088
+--- D1 mapping D (installed forks, full variants) 04:29:53
+[D1_map4] N=4096 njmax 144 naconmax 98304 is_sparse False
+[D1_map4] physics only 49.1 ms/step -> 83,361 env-steps/s
+[D1_map4] full env step 73.7 ms -> 55,597 env-steps/s
+[D1_map4] after random-action steps: nefc max 39 mean 14.4; nacon 11257 (2.75/world); overflow {'ITERATIONS': 22, 'LS_ITERATIONS': 3882}
+[D1_map4] rollout + inference 72.9 ms/step -> 56,201 env-steps/s
+[D1_map4] PPO update 144 ms -> full loop 51,918 env-steps/s
+[D1_map4] SUMMARY physics 83,361 | step 55,597 | rollout 56,201 | loop 51,918  (ms: physics 49.1, step 73.7, rollout/step 72.9, update 144)
+--- A1 mapping A 04:30:20
+[A1_map1] N=4096 njmax 144 naconmax 98304 is_sparse False
+[A1_map1] physics only 49.2 ms/step -> 83,293 env-steps/s
+[A1_map1] full env step 73.7 ms -> 55,584 env-steps/s
+[A1_map1] after random-action steps: nefc max 41 mean 14.6; nacon 11306 (2.76/world); overflow {'ITERATIONS': 36, 'LS_ITERATIONS': 3896}
+[A1_map1] rollout + inference 74.2 ms/step -> 55,197 env-steps/s
+[A1_map1] PPO update 149 ms -> full loop 50,925 env-steps/s
+[A1_map1] SUMMARY physics 83,293 | step 55,584 | rollout 55,197 | loop 50,925  (ms: physics 49.2, step 73.7, rollout/step 74.2, update 149)
+--- D2 mapping D (installed forks, full variants) 04:30:46
+[D2_map4] N=4096 njmax 144 naconmax 98304 is_sparse False
+[D2_map4] physics only 49.2 ms/step -> 83,295 env-steps/s
+[D2_map4] full env step 73.6 ms -> 55,653 env-steps/s
+[D2_map4] after random-action steps: nefc max 40 mean 14.5; nacon 11289 (2.76/world); overflow {'ITERATIONS': 18, 'LS_ITERATIONS': 3874}
+[D2_map4] rollout + inference 72.7 ms/step -> 56,313 env-steps/s
+[D2_map4] PPO update 149 ms -> full loop 51,877 env-steps/s
+[D2_map4] SUMMARY physics 83,295 | step 55,653 | rollout 56,313 | loop 51,877  (ms: physics 49.2, step 73.6, rollout/step 72.7, update 149)
+--- A2 mapping A 04:31:12
+[A2_map1] N=4096 njmax 144 naconmax 98304 is_sparse False
+[A2_map1] physics only 49.2 ms/step -> 83,285 env-steps/s
+[A2_map1] full env step 73.6 ms -> 55,673 env-steps/s
+[A2_map1] after random-action steps: nefc max 40 mean 14.4; nacon 11267 (2.75/world); overflow {'ITERATIONS': 36, 'LS_ITERATIONS': 3884}
+[A2_map1] rollout + inference 74.2 ms/step -> 55,191 env-steps/s
+[A2_map1] PPO update 150 ms -> full loop 50,912 env-steps/s
+[A2_map1] SUMMARY physics 83,285 | step 55,673 | rollout 55,191 | loop 50,912  (ms: physics 49.2, step 73.6, rollout/step 74.2, update 150)
+=== end Sat Sep 26 04:31:39 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] tp26_fuse end: device utilisation 98% (04:31:39), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %

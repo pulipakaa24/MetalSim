@@ -91,3 +91,27 @@ def test_rollout_without_torch_launches():
     assert pol.step_idx.numpy()[0] == T
     print(f"rollout of {T} steps x {n} envs as {T} graph replays: {n * T / total:,.0f} env-steps/s, host "
           f"{host / T * 1e3:.3f} ms/step, {d.dispatches // T} dispatches/step, 0 torch launches per step")
+
+
+def test_layer_mapping_bitwise():
+    """mlp_layer4 (four outputs per thread, envs fastest; the default mapping since 2026-09-26) gives bitwise the
+    same activations, actions and log-probs as the original one-thread-per-(env, output) kernel: each output keeps
+    the same sequential dot product, only the thread-to-work mapping differs."""
+    from metalsim.learn import warp_policy as WPL
+    n = 512
+    for obs_dim, hidden, act_dim in ((123, (256, 128, 128), 37), (310, (512, 256, 128), 37), (4, (32, 32), 1)):
+        torch.manual_seed(1)
+        net = ActorCriticMLP(obs_dim, act_dim, hidden=hidden).to("mps")
+        pol = WarpMLPPolicy(net, n, obs_dim, act_dim, [-1.0] * act_dim, [1.0] * act_dim)
+        obs = wp.array(np.random.default_rng(0).standard_normal((n, obs_dim)).astype(np.float32), dtype=float, device="metal:0")
+        ctrl = wp.zeros((n, act_dim), dtype=float, device="metal:0")
+        outs = {}
+        for mapping in ("A", "D"):
+            WPL._MLP_MAPPING = mapping
+            pol.act(obs, ctrl); wp.synchronize_device("metal:0")
+            outs[mapping] = [a.numpy().copy() for a in pol.actor_act + pol.critic_act + [pol.action, ctrl]] + [pol.logp.numpy().copy()]
+            # the same RNG stream: rewind the step counter so the samples match
+            pol.rng_step.zero_() if hasattr(pol.rng_step, "zero_") else None
+        WPL._MLP_MAPPING = "D"
+        for a, b in zip(outs["A"], outs["D"]):
+            assert np.array_equal(a, b)
