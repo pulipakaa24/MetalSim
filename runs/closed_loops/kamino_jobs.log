@@ -1,0 +1,277 @@
+holder: {"name": "cl_kamino", "kind": "low", "minutes": 45.0, "pid": 76882, "start": 1790411643.770488, "queued": 1790411643.7701726, "cmd": "scripts/diagnostics/closed_loops/kamino_jobs.sh", "cwd": "/Users/aditya/robosim"}
+  waiting [low] cl_mjw est 40.0 min, queued 0 s ago
+/Users/aditya/robosim/scripts/diagnostics/closed_loops/kamino_probe.py:52: DeprecationWarning: Scalar ModelBuilder.gravity is deprecated in Newton 1.4; pass a gravity vector instead. Scalar gravity will be removed in a future release.
+  b = newton.ModelBuilder(up_axis=newton.Axis.Z, gravity=-M.G)
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module validate_and_correct_inertia_kernel_fabf4b5a fabf4b5 load on device 'metal:0' took 18.41 ms  (cached)
+Module newton._src.solvers.kamino._src.core.conversions b44e103 load on device 'metal:0' took 20.79 ms  (cached)
+Module newton._src.solvers.kamino._src.core.bodies 16d0ef7 load on device 'metal:0' took 16.73 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.constraints 35359c9 load on device 'metal:0' took 16.87 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.jacobians 79548ab load on device 'metal:0' took 23.90 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.resets 346423e load on device 'metal:0' took 19.29 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.joints 77bac74 load on device 'metal:0' took 21.03 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.wrenches 33b2bef load on device 'metal:0' took 17.61 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus 6aecdf5 load on device 'metal:0' took 17.82 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.dual 65eeb2a load on device 'metal:0' took 17.47 ms  (cached)
+Module newton._src.solvers.kamino._src.geometry.keying ccefe53 load on device 'metal:0' took 16.74 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.warmstart 1632a54 load on device 'metal:0' took 18.73 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.common 598a60a load on device 'metal:0' took 18.74 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels 47bb746 load on device 'metal:0' took 18.95 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked 72bd391 load on device 'metal:0' took 17.30 ms  (cached)
+Module make_desaxce_correction_and_velocity_bias_kernel__locals___compute_desaxce_correction_and_velocity_bias_4e50cf85 4e50cf8 load on device 'metal:0' took 16.82 ms  (cached)
+Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_ab01341a ab01341 load on device 'metal:0' took 18.12 ms  (cached)
+Module newton._src.solvers.kamino._src.integrators.euler 26a6426 load on device 'metal:0' took 16.27 ms  (cached)
+Module newton._src.solvers.kamino._src.core.time 5331e9f load on device 'metal:0' took 16.04 ms  (cached)
+{"mech": "fourbar", "device": "metal:0", "dt": 0.0025, "T": 5.0, "worlds": 1, "torque": "none", "solver": "padmm", "iters": 200, "tol": 1e-06, "alpha": 0.01, "newton": "1.7.0.dev0", "closure_max": 0.0005751771171974231, "closure_mean": 0.00031166114023578053, "closure_final": 0.0002868420635979832, "nonfinite_worlds": 0, "blown_at_step": null, "peak_body_ang_speed": 18.161836624145508, "wall_s": 226.06172704696655, "first_step_s": 0.36151790618896484, "status_sample": "[(0, 200, 0., 6.820842e-05, 0., 1.4773165e-07, 1.4773165e-07, 0., 2.1814561e-14, 2.1814561e-14, 2.1792747e-14, 1, 101)]"}
+[run_to] exit 0 after 228 s: s/diagnostics/closed_loops/kamino_probe.py --mech fourbar --device metal:0 --dt 0.0025 --T 5 --out runs/closed_loops/kamino/fork_fourbar_none_dt0.0025_metal.npz
+/Users/aditya/robosim/scripts/diagnostics/closed_loops/kamino_probe.py:52: DeprecationWarning: Scalar ModelBuilder.gravity is deprecated in Newton 1.4; pass a gravity vector instead. Scalar gravity will be removed in a future release.
+  b = newton.ModelBuilder(up_axis=newton.Axis.Z, gravity=-M.G)
+[38;5;13m[KAMINO][0m[33;20m[2026-09-26 01:37:53,377][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module validate_and_correct_inertia_kernel_fabf4b5a fabf4b5 load on device 'metal:0' took 17.41 ms  (cached)
+Module newton._src.solvers.kamino._src.core.conversions 604a57d load on device 'metal:0' took 20.91 ms  (cached)
+Module newton._src.solvers.kamino._src.core.bodies 9b91a5b load on device 'metal:0' took 16.98 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.constraints 05ec3df load on device 'metal:0' took 17.51 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.jacobians 5626a5a load on device 'metal:0' took 24.89 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.resets 91422ab load on device 'metal:0' took 19.41 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.joints e88c145 load on device 'metal:0' took 21.04 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.wrenches bb2cdde load on device 'metal:0' took 17.83 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus c624cc0 load on device 'metal:0' took 17.40 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.dual b3b3a67 load on device 'metal:0' took 18.07 ms  (cached)
+Module newton._src.solvers.kamino._src.geometry.keying ccefe53 load on device 'metal:0' took 16.47 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.warmstart 56f4169 load on device 'metal:0' took 18.19 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.common 07d2d33 load on device 'metal:0' took 571.54 ms  (compiled)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels eda300c load on device 'metal:0' took 20.68 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked 72bd391 load on device 'metal:0' took 17.19 ms  (cached)
+Module make_desaxce_correction_and_velocity_bias_kernel__locals___compute_desaxce_correction_and_velocity_bias_4c2d9505 4c2d950 load on device 'metal:0' took 18.32 ms  (cached)
+Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_824dc0b3 824dc0b load on device 'metal:0' took 18.82 ms  (cached)
+Module newton._src.solvers.kamino._src.integrators.euler 21d3482 load on device 'metal:0' took 17.57 ms  (cached)
+Module newton._src.solvers.kamino._src.core.time 5331e9f load on device 'metal:0' took 16.59 ms  (cached)
+{"mech": "fourbar", "device": "metal:0", "dt": 0.0025, "T": 5.0, "worlds": 1, "torque": "none", "solver": "padmm", "iters": 200, "tol": 1e-06, "alpha": 0.01, "newton": "1.5.2", "closure_max": 0.0005750388225516879, "closure_mean": 0.00031106208451948855, "closure_final": 0.00028522852704540455, "nonfinite_worlds": 0, "blown_at_step": null, "peak_body_ang_speed": 18.161842346191406, "wall_s": 211.7453179359436, "first_step_s": 1.0019161701202393}
+[run_to] exit 0 after 213 s: ts/diagnostics/closed_loops/kamino_probe.py --mech fourbar --device metal:0 --dt 0.0025 --T 5 --out runs/closed_loops/kamino/152_fourbar_none_dt0.0025_metal.npz
+/Users/aditya/robosim/scripts/diagnostics/closed_loops/kamino_probe.py:52: DeprecationWarning: Scalar ModelBuilder.gravity is deprecated in Newton 1.4; pass a gravity vector instead. Scalar gravity will be removed in a future release.
+  b = newton.ModelBuilder(up_axis=newton.Axis.Z, gravity=-M.G)
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module validate_and_correct_inertia_kernel_fabf4b5a fabf4b5 load on device 'metal:0' took 17.05 ms  (cached)
+Module newton._src.solvers.kamino._src.core.conversions b44e103 load on device 'metal:0' took 19.95 ms  (cached)
+Module newton._src.solvers.kamino._src.core.bodies 16d0ef7 load on device 'metal:0' took 16.80 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.constraints 35359c9 load on device 'metal:0' took 16.92 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.jacobians 79548ab load on device 'metal:0' took 23.08 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.resets 346423e load on device 'metal:0' took 18.88 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.joints 77bac74 load on device 'metal:0' took 20.56 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.limits 95dbc5c load on device 'metal:0' took 19.18 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.wrenches 33b2bef load on device 'metal:0' took 18.32 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus 6aecdf5 load on device 'metal:0' took 17.20 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.dual 65eeb2a load on device 'metal:0' took 17.53 ms  (cached)
+Module newton._src.solvers.kamino._src.geometry.keying ccefe53 load on device 'metal:0' took 16.20 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.warmstart 1632a54 load on device 'metal:0' took 17.30 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.common 598a60a load on device 'metal:0' took 17.33 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels 47bb746 load on device 'metal:0' took 19.46 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked 72bd391 load on device 'metal:0' took 17.19 ms  (cached)
+Module make_desaxce_correction_and_velocity_bias_kernel__locals___compute_desaxce_correction_and_velocity_bias_4e50cf85 4e50cf8 load on device 'metal:0' took 16.50 ms  (cached)
+Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_ab01341a ab01341 load on device 'metal:0' took 18.15 ms  (cached)
+Module newton._src.solvers.kamino._src.integrators.euler 26a6426 load on device 'metal:0' took 16.26 ms  (cached)
+Module newton._src.solvers.kamino._src.core.time 5331e9f load on device 'metal:0' took 16.27 ms  (cached)
+{"mech": "leg", "device": "metal:0", "dt": 0.0025, "T": 2.0, "worlds": 1, "torque": "none", "solver": "padmm", "iters": 200, "tol": 1e-06, "alpha": 0.01, "newton": "1.7.0.dev0", "closure_max": 0.0008534216325194177, "closure_mean": 0.0004806129008010191, "closure_final": 0.0006800074474087477, "nonfinite_worlds": 0, "blown_at_step": null, "peak_body_ang_speed": 5.274167060852051, "wall_s": 79.34450387954712, "first_step_s": 0.38460493087768555, "status_sample": "[(0, 200, 0., 1.941536e-05, 0., 1.8459438e-08, 1.8459438e-08, 0., 3.408731e-16, 3.408731e-16, 3.4053223e-16, 1, 107)]"}
+[run_to] exit 0 after 81 s: n scripts/diagnostics/closed_loops/kamino_probe.py --mech leg --device metal:0 --dt 0.0025 --T 2 --out runs/closed_loops/kamino/fork_leg_none_dt0.0025_metal.npz
+/Users/aditya/robosim/scripts/diagnostics/closed_loops/kamino_probe.py:52: DeprecationWarning: Scalar ModelBuilder.gravity is deprecated in Newton 1.4; pass a gravity vector instead. Scalar gravity will be removed in a future release.
+  b = newton.ModelBuilder(up_axis=newton.Axis.Z, gravity=-M.G)
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module validate_and_correct_inertia_kernel_fabf4b5a fabf4b5 load on device 'metal:0' took 17.23 ms  (cached)
+Module newton._src.solvers.kamino._src.core.conversions b44e103 load on device 'metal:0' took 19.79 ms  (cached)
+Module newton._src.solvers.kamino._src.core.bodies 16d0ef7 load on device 'metal:0' took 16.82 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.constraints 35359c9 load on device 'metal:0' took 17.37 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.jacobians 79548ab load on device 'metal:0' took 23.06 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.resets 346423e load on device 'metal:0' took 18.97 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.joints 77bac74 load on device 'metal:0' took 20.11 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.limits 95dbc5c load on device 'metal:0' took 17.56 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.wrenches 33b2bef load on device 'metal:0' took 18.43 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus 6aecdf5 load on device 'metal:0' took 17.35 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.dual 65eeb2a load on device 'metal:0' took 17.72 ms  (cached)
+Module newton._src.solvers.kamino._src.geometry.keying ccefe53 load on device 'metal:0' took 16.32 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.warmstart 1632a54 load on device 'metal:0' took 17.45 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.common 598a60a load on device 'metal:0' took 17.48 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels 47bb746 load on device 'metal:0' took 19.43 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked 72bd391 load on device 'metal:0' took 17.22 ms  (cached)
+Module make_desaxce_correction_and_velocity_bias_kernel__locals___compute_desaxce_correction_and_velocity_bias_4e50cf85 4e50cf8 load on device 'metal:0' took 16.90 ms  (cached)
+Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_ab01341a ab01341 load on device 'metal:0' took 17.80 ms  (cached)
+Module newton._src.solvers.kamino._src.integrators.euler 26a6426 load on device 'metal:0' took 16.51 ms  (cached)
+Module newton._src.solvers.kamino._src.core.time 5331e9f load on device 'metal:0' took 16.18 ms  (cached)
+{"mech": "leg", "device": "metal:0", "dt": 0.005, "T": 2.0, "worlds": 1, "torque": "none", "solver": "padmm", "iters": 200, "tol": 1e-06, "alpha": 0.01, "newton": "1.7.0.dev0", "closure_max": 0.002657576963607295, "closure_mean": 0.0016360534702076976, "closure_final": 0.00242458814679716, "nonfinite_worlds": 0, "blown_at_step": null, "peak_body_ang_speed": 5.242714881896973, "wall_s": 37.8651909828186, "first_step_s": 0.38222813606262207, "status_sample": "[(0, 200, 0., 8.755975e-06, 0., 8.351541e-09, 8.351541e-09, 0., 6.980261e-17, 6.980261e-17, 6.973281e-17, 1, 89)]"}
+[run_to] exit 0 after 39 s: hon scripts/diagnostics/closed_loops/kamino_probe.py --mech leg --device metal:0 --dt 0.005 --T 2 --out runs/closed_loops/kamino/fork_leg_none_dt0.005_metal.npz
+/Users/aditya/robosim/scripts/diagnostics/closed_loops/kamino_probe.py:52: DeprecationWarning: Scalar ModelBuilder.gravity is deprecated in Newton 1.4; pass a gravity vector instead. Scalar gravity will be removed in a future release.
+  b = newton.ModelBuilder(up_axis=newton.Axis.Z, gravity=-M.G)
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module validate_and_correct_inertia_kernel_fabf4b5a fabf4b5 load on device 'metal:0' took 16.87 ms  (cached)
+Module newton._src.solvers.kamino._src.core.conversions b44e103 load on device 'metal:0' took 20.05 ms  (cached)
+Module newton._src.solvers.kamino._src.core.bodies 16d0ef7 load on device 'metal:0' took 16.75 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.constraints 35359c9 load on device 'metal:0' took 17.32 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.jacobians 79548ab load on device 'metal:0' took 23.36 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.resets 346423e load on device 'metal:0' took 19.05 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.joints 77bac74 load on device 'metal:0' took 19.30 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.wrenches 33b2bef load on device 'metal:0' took 17.63 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus 6aecdf5 load on device 'metal:0' took 17.16 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.dual 65eeb2a load on device 'metal:0' took 17.56 ms  (cached)
+Module newton._src.solvers.kamino._src.geometry.keying ccefe53 load on device 'metal:0' took 15.95 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.warmstart 1632a54 load on device 'metal:0' took 17.23 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.common 598a60a load on device 'metal:0' took 18.41 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels 47bb746 load on device 'metal:0' took 19.35 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked 72bd391 load on device 'metal:0' took 18.04 ms  (cached)
+Module make_desaxce_correction_and_velocity_bias_kernel__locals___compute_desaxce_correction_and_velocity_bias_4e50cf85 4e50cf8 load on device 'metal:0' took 17.63 ms  (cached)
+Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_ab01341a ab01341 load on device 'metal:0' took 18.85 ms  (cached)
+Module newton._src.solvers.kamino._src.integrators.euler 26a6426 load on device 'metal:0' took 17.19 ms  (cached)
+Module newton._src.solvers.kamino._src.core.time 5331e9f load on device 'metal:0' took 16.90 ms  (cached)
+{"mech": "fourbar", "device": "metal:0", "dt": 0.005, "T": 5.0, "worlds": 1, "torque": "none", "solver": "padmm", "iters": 200, "tol": 1e-06, "alpha": 0.01, "newton": "1.7.0.dev0", "closure_max": 0.001632588178517504, "closure_mean": 0.0010132604381713239, "closure_final": 0.0006821103108764637, "nonfinite_worlds": 0, "blown_at_step": null, "peak_body_ang_speed": 17.28925132751465, "wall_s": 105.6962959766388, "first_step_s": 0.36195898056030273, "status_sample": "[(0, 200, 0., 2.4851215e-05, 0., 8.152451e-13, 3.3306254e-08, 0., 1.1115233e-15, 1.1115233e-15, 1.1104118e-15, 1, 102)]"}
+[run_to] exit 0 after 107 s: pts/diagnostics/closed_loops/kamino_probe.py --mech fourbar --device metal:0 --dt 0.005 --T 5 --out runs/closed_loops/kamino/fork_fourbar_none_dt0.005_metal.npz
+/Users/aditya/robosim/scripts/diagnostics/closed_loops/kamino_probe.py:52: DeprecationWarning: Scalar ModelBuilder.gravity is deprecated in Newton 1.4; pass a gravity vector instead. Scalar gravity will be removed in a future release.
+  b = newton.ModelBuilder(up_axis=newton.Axis.Z, gravity=-M.G)
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module validate_and_correct_inertia_kernel_fabf4b5a fabf4b5 load on device 'metal:0' took 18.31 ms  (cached)
+Module newton._src.solvers.kamino._src.core.conversions b44e103 load on device 'metal:0' took 20.54 ms  (cached)
+Module newton._src.solvers.kamino._src.core.bodies 16d0ef7 load on device 'metal:0' took 17.22 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.constraints 35359c9 load on device 'metal:0' took 17.74 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.jacobians 79548ab load on device 'metal:0' took 23.50 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.resets 346423e load on device 'metal:0' took 19.50 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.joints 77bac74 load on device 'metal:0' took 21.35 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.wrenches 33b2bef load on device 'metal:0' took 18.96 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus 6aecdf5 load on device 'metal:0' took 18.29 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.dual 65eeb2a load on device 'metal:0' took 18.39 ms  (cached)
+Module newton._src.solvers.kamino._src.geometry.keying ccefe53 load on device 'metal:0' took 16.93 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.warmstart 1632a54 load on device 'metal:0' took 18.07 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.common 598a60a load on device 'metal:0' took 18.20 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels 47bb746 load on device 'metal:0' took 19.80 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked 72bd391 load on device 'metal:0' took 17.50 ms  (cached)
+Module make_desaxce_correction_and_velocity_bias_kernel__locals___compute_desaxce_correction_and_velocity_bias_4e50cf85 4e50cf8 load on device 'metal:0' took 16.48 ms  (cached)
+Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_ab01341a ab01341 load on device 'metal:0' took 17.94 ms  (cached)
+Module newton._src.solvers.kamino._src.integrators.euler 26a6426 load on device 'metal:0' took 17.34 ms  (cached)
+Module newton._src.solvers.kamino._src.core.time 5331e9f load on device 'metal:0' took 17.09 ms  (cached)
+{"mech": "fourbar", "device": "metal:0", "dt": 0.0025, "T": 5.0, "worlds": 1, "torque": "none", "solver": "padmm", "iters": 200, "tol": 1e-06, "alpha": 0.0, "newton": "1.7.0.dev0", "closure_max": 0.007161434465738115, "closure_mean": 0.003750348222747493, "closure_final": 0.007161434465738115, "nonfinite_worlds": 0, "blown_at_step": null, "peak_body_ang_speed": 17.738676071166992, "wall_s": 202.19134378433228, "first_step_s": 0.3684408664703369, "status_sample": "[(0, 200, 0., 0.00010701, 0., 0., 1.7829984e-07, 0., 3.1847714e-14, 3.1847714e-14, 3.1815865e-14, 1, 104)]"}
+[run_to] exit 0 after 204 s: loops/kamino_probe.py --mech fourbar --device metal:0 --dt 0.0025 --T 5 --alpha 0.0 --out runs/closed_loops/kamino/fork_fourbar_none_dt0.0025_metal_alpha0.0.npz
+/Users/aditya/robosim/scripts/diagnostics/closed_loops/kamino_probe.py:52: DeprecationWarning: Scalar ModelBuilder.gravity is deprecated in Newton 1.4; pass a gravity vector instead. Scalar gravity will be removed in a future release.
+  b = newton.ModelBuilder(up_axis=newton.Axis.Z, gravity=-M.G)
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module validate_and_correct_inertia_kernel_fabf4b5a fabf4b5 load on device 'metal:0' took 17.81 ms  (cached)
+Module newton._src.solvers.kamino._src.core.conversions b44e103 load on device 'metal:0' took 20.81 ms  (cached)
+Module newton._src.solvers.kamino._src.core.bodies 16d0ef7 load on device 'metal:0' took 17.26 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.constraints 35359c9 load on device 'metal:0' took 17.17 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.jacobians 79548ab load on device 'metal:0' took 23.54 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.resets 346423e load on device 'metal:0' took 19.23 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.joints 77bac74 load on device 'metal:0' took 20.33 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.wrenches 33b2bef load on device 'metal:0' took 18.26 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus 6aecdf5 load on device 'metal:0' took 17.67 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.dual 65eeb2a load on device 'metal:0' took 17.82 ms  (cached)
+Module newton._src.solvers.kamino._src.geometry.keying ccefe53 load on device 'metal:0' took 16.61 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.warmstart 1632a54 load on device 'metal:0' took 17.59 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.common 598a60a load on device 'metal:0' took 19.30 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels 47bb746 load on device 'metal:0' took 19.89 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked 72bd391 load on device 'metal:0' took 17.28 ms  (cached)
+Module make_desaxce_correction_and_velocity_bias_kernel__locals___compute_desaxce_correction_and_velocity_bias_4e50cf85 4e50cf8 load on device 'metal:0' took 16.11 ms  (cached)
+Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_ab01341a ab01341 load on device 'metal:0' took 17.42 ms  (cached)
+Module newton._src.solvers.kamino._src.integrators.euler 26a6426 load on device 'metal:0' took 16.53 ms  (cached)
+Module newton._src.solvers.kamino._src.core.time 5331e9f load on device 'metal:0' took 16.31 ms  (cached)
+{"mech": "fourbar", "device": "metal:0", "dt": 0.0025, "T": 5.0, "worlds": 1, "torque": "none", "solver": "padmm", "iters": 200, "tol": 1e-06, "alpha": 0.1, "newton": "1.7.0.dev0", "closure_max": 0.00016959117507367528, "closure_mean": 4.458903469117605e-05, "closure_final": 5.6936489039905255e-06, "nonfinite_worlds": 0, "blown_at_step": null, "peak_body_ang_speed": 19.837472915649414, "wall_s": 206.85469222068787, "first_step_s": 0.4306161403656006, "status_sample": "[(0, 200, 0., 2.2083987e-05, 0., 0., 4.0190933e-08, 0., 1.6177138e-15, 1.6177138e-15, 1.6160961e-15, 1, 109)]"}
+[run_to] exit 0 after 208 s: loops/kamino_probe.py --mech fourbar --device metal:0 --dt 0.0025 --T 5 --alpha 0.1 --out runs/closed_loops/kamino/fork_fourbar_none_dt0.0025_metal_alpha0.1.npz
+/Users/aditya/robosim/scripts/diagnostics/closed_loops/kamino_probe.py:52: DeprecationWarning: Scalar ModelBuilder.gravity is deprecated in Newton 1.4; pass a gravity vector instead. Scalar gravity will be removed in a future release.
+  b = newton.ModelBuilder(up_axis=newton.Axis.Z, gravity=-M.G)
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module validate_and_correct_inertia_kernel_fabf4b5a fabf4b5 load on device 'metal:0' took 17.79 ms  (cached)
+Module newton._src.solvers.kamino._src.core.conversions b44e103 load on device 'metal:0' took 21.00 ms  (cached)
+Module newton._src.solvers.kamino._src.core.bodies 16d0ef7 load on device 'metal:0' took 17.05 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.constraints 35359c9 load on device 'metal:0' took 17.75 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.jacobians 79548ab load on device 'metal:0' took 23.49 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.resets 346423e load on device 'metal:0' took 19.41 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.joints 77bac74 load on device 'metal:0' took 20.50 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.wrenches 33b2bef load on device 'metal:0' took 19.70 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus 6aecdf5 load on device 'metal:0' took 17.98 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.dual 65eeb2a load on device 'metal:0' took 18.07 ms  (cached)
+Module newton._src.solvers.kamino._src.geometry.keying ccefe53 load on device 'metal:0' took 16.32 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.warmstart 1632a54 load on device 'metal:0' took 18.15 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.common 598a60a load on device 'metal:0' took 18.09 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels 47bb746 load on device 'metal:0' took 19.38 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked 72bd391 load on device 'metal:0' took 17.19 ms  (cached)
+Module make_desaxce_correction_and_velocity_bias_kernel__locals___compute_desaxce_correction_and_velocity_bias_4e50cf85 4e50cf8 load on device 'metal:0' took 17.46 ms  (cached)
+Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_ab01341a ab01341 load on device 'metal:0' took 17.60 ms  (cached)
+Module newton._src.solvers.kamino._src.integrators.euler 26a6426 load on device 'metal:0' took 16.43 ms  (cached)
+Module newton._src.solvers.kamino._src.core.time 5331e9f load on device 'metal:0' took 16.39 ms  (cached)
+{"mech": "fourbar", "device": "metal:0", "dt": 0.0025, "T": 5.0, "worlds": 1, "torque": "none", "solver": "padmm", "iters": 200, "tol": 1e-06, "alpha": 0.5, "newton": "1.7.0.dev0", "closure_max": 4.43324198695199e-05, "closure_mean": 9.98840187358724e-06, "closure_final": 8.390678383228826e-06, "nonfinite_worlds": 0, "blown_at_step": null, "peak_body_ang_speed": 20.7373046875, "wall_s": 220.47372174263, "first_step_s": 0.4399280548095703, "status_sample": "[(0, 200, 0., 2.57717e-05, 0., 3.2416995e-08, 3.2416995e-08, 0., 1.0514774e-15, 1.0514774e-15, 1.0504259e-15, 1, 99)]"}
+[run_to] exit 0 after 222 s: loops/kamino_probe.py --mech fourbar --device metal:0 --dt 0.0025 --T 5 --alpha 0.5 --out runs/closed_loops/kamino/fork_fourbar_none_dt0.0025_metal_alpha0.5.npz
+/Users/aditya/robosim/scripts/diagnostics/closed_loops/kamino_probe.py:52: DeprecationWarning: Scalar ModelBuilder.gravity is deprecated in Newton 1.4; pass a gravity vector instead. Scalar gravity will be removed in a future release.
+  b = newton.ModelBuilder(up_axis=newton.Axis.Z, gravity=-M.G)
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module validate_and_correct_inertia_kernel_fabf4b5a fabf4b5 load on device 'metal:0' took 17.13 ms  (cached)
+Module newton._src.solvers.kamino._src.core.conversions b44e103 load on device 'metal:0' took 20.91 ms  (cached)
+Module newton._src.solvers.kamino._src.core.bodies 16d0ef7 load on device 'metal:0' took 16.88 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.constraints 35359c9 load on device 'metal:0' took 16.95 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.jacobians 79548ab load on device 'metal:0' took 23.13 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.resets 346423e load on device 'metal:0' took 19.04 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.joints 77bac74 load on device 'metal:0' took 20.34 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.wrenches 33b2bef load on device 'metal:0' took 19.39 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus 6aecdf5 load on device 'metal:0' took 19.02 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.dual 65eeb2a load on device 'metal:0' took 18.82 ms  (cached)
+Module newton._src.solvers.kamino._src.geometry.keying ccefe53 load on device 'metal:0' took 16.49 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.warmstart 1632a54 load on device 'metal:0' took 17.51 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.common 598a60a load on device 'metal:0' took 20.74 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels 47bb746 load on device 'metal:0' took 21.84 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked 72bd391 load on device 'metal:0' took 17.99 ms  (cached)
+Module make_desaxce_correction_and_velocity_bias_kernel__locals___compute_desaxce_correction_and_velocity_bias_4e50cf85 4e50cf8 load on device 'metal:0' took 16.49 ms  (cached)
+Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_ab01341a ab01341 load on device 'metal:0' took 17.41 ms  (cached)
+Module newton._src.solvers.kamino._src.integrators.euler 26a6426 load on device 'metal:0' took 16.62 ms  (cached)
+Module newton._src.solvers.kamino._src.core.time 5331e9f load on device 'metal:0' took 16.40 ms  (cached)
+{"mech": "fourbar", "device": "metal:0", "dt": 0.0025, "T": 5.0, "worlds": 1, "torque": "sigma3", "solver": "padmm", "iters": 200, "tol": 1e-06, "alpha": 0.01, "newton": "1.7.0.dev0", "closure_max": 0.0008156531809681139, "closure_mean": 0.0003062918052552529, "closure_final": 0.00021563378360616876, "nonfinite_worlds": 0, "blown_at_step": null, "peak_body_ang_speed": 26.778078079223633, "wall_s": 218.68699288368225, "first_step_s": 0.37338805198669434, "status_sample": "[(0, 200, 0., 0.00013832, 0., 0., 1.1688804e-07, 0., 1.3662813e-14, 1.3662813e-14, 1.36791255e-14, 0, 98)]"}
+[run_to] exit 0 after 220 s: ed_loops/kamino_probe.py --mech fourbar --device metal:0 --dt 0.0025 --T 5 --torque sigma3 --out runs/closed_loops/kamino/fork_fourbar_sigma3_dt0.0025_metal.npz
+/Users/aditya/robosim/scripts/diagnostics/closed_loops/kamino_probe.py:52: DeprecationWarning: Scalar ModelBuilder.gravity is deprecated in Newton 1.4; pass a gravity vector instead. Scalar gravity will be removed in a future release.
+  b = newton.ModelBuilder(up_axis=newton.Axis.Z, gravity=-M.G)

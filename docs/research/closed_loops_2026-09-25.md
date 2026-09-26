@@ -10,29 +10,33 @@ Newton builder and an exact planar reference; `mjw_loops.py` MuJoCo C / MuJoCo W
 SolverKamino; `ref_traj.py`; `analyze.py`; `c_sweep.sh`, `kamino_jobs.sh`, `mjw_jobs.sh`, `run_kamino_tests.py`).
 Data and logs: `runs/closed_loops/`.
 
-## Summary (status 2026-09-25 evening; GPU-queue work still pending, see §6)
+## Summary (2026-09-26)
 
 * **The user robot has no loops in simulation.** TRON1 WF (`neq = 0`, pure tree); nothing to close today.
-* **MuJoCo soft closure, measured in MuJoCo C (float64) against an exact hard-loop reference, is adequate at
-  2.5 ms and 5 ms for these mechanisms:** closure error 0.36–2.3 mm on a passive 0.3 m crank-rocker, 2 µm–0.35 mm on
-  a hanging parallelogram-knee leg, and 0.6–3.4 mm under 3σ random torques; the solref time constant sets the
-  error almost linearly (5 ms → 20 ms: 0.36 → 1.16 mm at 2.5 ms). But **softness costs energy and phase**: the
-  undamped four-bar loses 1–8 % energy over 5 s (the reference conserves it to 1e-8) and drifts 0.56–2.4 rad in
-  crank angle after 5 s; the stiffer the closure, the worse the energy loss (solref 5 ms: −5.2 %; 20 ms with
-  solimp 0.99/0.999: −1.1 %). With realistic joint damping (the 3σ runs) trajectories stay within 0.07–0.16 rad
-  of the reference over 5 s.
-* **Kamino compiles and runs on the CPU device** in both Newton 1.5.2 (624 tests: 1 failure, a geometry
-  tolerance test) and the 1.7.0.dev fork (607 tests: 0 failures), and its hard closure on our four-bar is 0.4–0.8 mm
-  at 2.5 ms with default settings (Baumgarte α 0.01, CPU, 1 s) with 17 % energy loss over 1 s: its first-order
-  semi-implicit integration dissipates more than MuJoCo's soft closure here (single CPU run; to be confirmed).
-* **Kamino on Metal: not yet measured.** The Metal test suites, CPU-vs-Metal agreement, 1024-world stress and
-  throughput are queued (`kamino_tests_fork`, `kamino_tests_152`, `cl_kamino`) and had not started after 8 h behind
-  higher-priority jobs. Source reading predicts it can run: the PADMM loop uses `wp.capture_while`, which the Warp
-  fork implements on Metal (`warp/_src/context.py`, `_metal_capture_conditional`), and Isaac Lab 3.0 turns graph
-  conditionals off anyway.
-* **MuJoCo Warp on Metal (trajectory agreement with C, 1024-world stress, throughput): queued (`cl_mjw`), not run.**
-* Verdict so far and the native hard-loop scope: §5.
-
+* **Kamino runs on Metal.** SolverKamino (PADMM backend, the default) in Newton 1.5.2 and the 1.7.0.dev fork runs
+  on the Metal Warp fork with no code change, and matches the CPU device to **1.0e-3 rad after 5 s** (four-bar,
+  2.5 ms; 1e-5 rad at 0.5 s) and 9e-5 rad on the leg (measured, queued). Two Metal defects found, neither in our
+  mechanisms' path: (1) the blocked-Cholesky (LLTB) **backward solve is wrong on Metal for matrices larger than one
+  16-row block** (x error up to 2.3 in Newton's own tests) because a Newton native snippet stages tiles in
+  `__shared__` arrays only under `__CUDA_ARCH__` and in per-thread arrays otherwise; Newton's switch
+  `NEWTON_KAMINO_DISABLE_TILE_TRANSPOSE_UPDATE=1` selects the generic path (verification queued); (2) the DVI
+  backend's factorisation kernel asks for 82,432 bytes of threadgroup memory, the M4 Max allows 32,768: DVI does not
+  run on Metal (70 of 607 fork tests error on it). Throughput: single-world steps take ~100 ms (200 host-synchronised
+  PADMM iterations); 1024-world numbers queued.
+* **Hard vs soft closure, both measured against an exact reference** (planar DAE, 1e-11 m): at 2.5 ms Kamino's
+  closure error is 0.58 mm at its default Baumgarte α 0.01 and **0.044 mm at α 0.5**; MuJoCo's soft `connect` is
+  0.36–1.16 mm (solref 5–20 ms). But Kamino at its default α loses **32 % of the energy in 5 s** on the undamped
+  four-bar (α 0.1, Isaac Lab 3.0's value: −14 %; α 0.5: −1.0 %), against −1.1 to −5.2 % for MuJoCo; trajectory
+  error after 5 s: Kamino α 0.5 0.38 rad, MuJoCo best 0.56 rad, Kamino default 2.6 rad. With joint damping and 3σ
+  torques all are within 0.08–0.5 rad over 5 s.
+* **MuJoCo Warp soft closure is adequate at 2.5 ms and 5 ms** for these mechanisms: MuJoCo Warp (float32, CPU
+  device) reproduces MuJoCo C's closure numbers (four-bar 1.19 vs 1.07 mm, leg 0.35 vs 0.35 mm at 2.5 ms) and its
+  trajectories (leg 1e-4 rad over 2 s; undamped four-bar 0.015 rad at 1 s, 0.32 rad at 5 s); under 3σ
+  torques, 1024 worlds × 8 s in MuJoCo C: 0 blown, closure max 5.6 / 11.7 mm (four-bar, 2.5 / 5 ms) and 14.7 /
+  25.6 mm (leg). Metal-device MuJoCo Warp runs (agreement, 1024-world stress, throughput) are queued (`cl_mjw`).
+* **Verdict** (§5): MuJoCo Warp's soft closure is adequate for learning on loop-legged robots at 2.5 ms with the
+  loop equalities stiffened (solref ≈ 5–10 ms, as Menagerie's Cassie does), mm-level closure; Kamino is the more
+  accurate closure on Metal (hard, 0.04 mm at α 0.5) but is 1–2 orders slower per step here and beta.
 
 ## 1. Does the user robot have loops?
 
@@ -214,50 +218,121 @@ impedance (0.99/0.999) hardly changes closure in the four-bar (the violation is 
 timeconst at the 2.5 ms step (= 2·dt, refsafe's floor) halves the error of the default 20 ms but loses 5 % energy
 in 5 s: stiff soft constraints are dissipative in MuJoCo's implicit scheme.
 
-Kamino, CPU device, one run (fork 1.7.0.dev, defaults, four-bar passive, 2.5 ms, 1 s, taken **outside the queue**
-before the coordinator's rule was restated; the process that was killed for contaminating a timing run was a
-numpy reference script, not this one): closure max 0.82 mm, mean 0.44 mm; energy 1.689 → 1.402 J (−17 %) in 1 s;
-PADMM converged in 23 iterations to 1e-6. Crank angle within 0.05 rad of the reference at 0.3 s, then lags (0.8 rad
-at 0.6 s) because of the energy loss.
+### 4.1 MuJoCo C, 1024 worlds × 8 s under 3σ torques (400 control steps, damped; CPU, not queued)
 
-<!-- MEASUREMENTS -->
+| mechanism | dt | blown | closure max over worlds and time | per-step p99, max over time | peak joint speed |
+|---|---|---|---|---|---|
+| four-bar | 2.5 ms | 0 / 1024 | 5.6 mm | 2.6 mm | 68 rad/s |
+| four-bar | 5 ms | 0 / 1024 | 11.7 mm | 5.3 mm | 69 rad/s |
+| leg | 2.5 ms | 0 / 1024 | 14.7 mm | 8.1 mm | 121 rad/s |
+| leg | 5 ms | 0 / 1024 | 25.6 mm | 10.7 mm | 136 rad/s |
 
-## 5. Verdict (provisional) and the native hard-loop scope
+(`runs/closed_loops/mjw/C_w1024.log`.) Default solref/solimp; the 5 ms-timeconst variant on Metal is queued.
 
-* **Adequacy of MuJoCo Warp's soft closure at our steps.** On MuJoCo C numbers (MuJoCo Warp's equations are the
-  same; its float32 agreement on Metal is queued): millimetre-level closure (≤ 3.4 mm at 5 ms, ≤ 1.7 mm at 2.5 ms
-  under 3σ torques on a 0.3 m four-bar; ≤ 19 mm on the leg at 5 ms under 3σ, ≤ 12 mm at 2.5 ms). Adequate for
-  learning locomotion on a Digit/Cassie-class leg if the loop constraints are stiffened (Cassie ships solref 5 ms)
-  and the step is 2.5 ms; the visible cost is energy dissipation in undamped loops, which real, damped drivetrains
-  mask. Not adequate where the loop geometry itself is the observable (precision linkages, parallel grippers
-  measured to < 1 mm), or at 5 ms with heavy loads through the loop.
-* **Kamino on Metal**: unknown until the queue runs; CPU runs and the source suggest no blocker.
-* **What a native hard-loop solver for MetalSim would need (scope only):** (1) loop-closing joint rows in
-  MuJoCo Warp's constraint assembly as hard rows (zero regularisation, R → 0) with a solver that tolerates
-  rank-deficient Jacobians (redundant planar rows): the Newton/CG solver needs a proximal term like Kamino's;
-  (2) a position-level projection after integration (Newton–Raphson on g(q) = 0 in the loop coordinates, few
-  iterations per step) to remove drift without Baumgarte energy loss; (3) or the reduced-coordinate route
-  (PhysX-style): tree articulation + loop joints solved by the iterative contact solver, which is what MuJoCo
-  already is with soft rows. Realistic path: (2) as a post-step kernel on MuJoCo Warp (per-world, small dense
-  Jacobian, ~days of work) before anything solver-level.
+## 4b. Kamino and MuJoCo Warp, CPU device and Metal
 
-## 6. Decisions (DECISIONS.md-style rows; not yet copied into docs/DECISIONS.md)
+Same metrics as §4 (`analyze.py`), single world. CPU-device runs 2026-09-26 while the queue was paused
+(`runs/closed_loops/cpu/`); Metal runs through the queue (`runs/closed_loops/kamino/`, log
+`runs/closed_loops/kamino_jobs.log`). Kamino defaults unless stated: PADMM, 200 iterations, tolerance 1e-6, α 0.01,
+semi-implicit Euler. PADMM hit the 200-iteration cap on every step checked (`status`: iterations 200).
 
-| date | decision | options considered (with numbers) | chosen and why | how to re-enable the others |
-|---|---|---|---|---|
-| 2026-09-25 | Four-bar start pose | 60° crank start (grazes the upper equilibrium near 80°: every engine within 0.14 rad at 2 s would diverge to >1 rad) vs −20° (inside the well) | −20°: comparisons measure closure, not a tipping point | `fourbar_geometry(theta_crank=math.radians(60))` |
-| 2026-09-25 | 3σ torque scale and damping | σ 1 N·m crank / 5+3 N·m leg, undamped: 95–240 rad/s, leg 4/32 and 16/32 MuJoCo C blow-ups; σ 0.3 / 4+0.75 N·m undamped: leg 3σ still blows up; same σ with viscous joint damping: 0/32, ≤ 106 rad/s | damped (real drivetrains are damped) | `SIGMA_TAU`, `DAMPING`, `mjcf(damped=False)` |
-| 2026-09-25 | Leg geometry | knee 60° start / limits 5–115° / bell crank 150°: rests on the limit (limit rows active through the run) vs 20° / −30…95° / 125° | the latter: the loop, not the limit, is measured | `leg_geometry(q_knee=, gamma=)` |
+| engine | case | dt | angle err 1 s / 2 s / 5 s [rad] | energy drift [%] | closure max / mean [mm] |
+|---|---|---|---|---|---|
+| Kamino fork, Metal | four-bar passive | 2.5 ms | 0.80 / 2.16 / 2.58 | −32.5 | 0.58 / 0.31 |
+| Kamino 1.5.2, Metal | four-bar passive | 2.5 ms | 0.80 / 2.16 / 2.58 | −32.5 | 0.58 / 0.31 |
+| Kamino fork, Metal, α 0 | four-bar passive | 2.5 ms | 0.90 / 2.20 / 2.54 | −46.3 | 7.2 / 3.8 |
+| Kamino fork, Metal, α 0.1 | four-bar passive | 2.5 ms | 0.22 / 0.97 / 2.75 | −14.2 | 0.17 / 0.045 |
+| Kamino fork, Metal, α 0.5 | four-bar passive | 2.5 ms | 0.024 / 0.060 / 0.38 | −1.0 | 0.044 / 0.010 |
+| Kamino fork, CPU, IL3 settings (α 0.1, tol 1e-4, 100 it.) | four-bar passive | 2.5 ms | 0.22 / 0.97 / 2.75 | −14.2 | 0.17 / 0.045 |
+| Kamino fork, Metal | four-bar passive | 5 ms | 1.24 / 2.44 / 2.44 | −40.8 | 1.63 / 1.01 |
+| MuJoCo Warp, CPU | four-bar passive | 2.5 ms | 0.021 / 0.14 / 0.80 | −1.8 | 1.19 / 0.49 |
+| MuJoCo Warp, CPU | four-bar passive | 5 ms | 0.041 / 0.17 / 0.92 | −1.9 | 2.44 / 0.92 |
+| Kamino fork, Metal | leg passive (2 s) | 2.5 ms | 0.007 / 0.014 / – | −0.10 | 0.85 / 0.48 |
+| Kamino fork, Metal | leg passive (2 s) | 5 ms | 0.016 / 0.031 / – | −0.23 | 2.66 / 1.64 |
+| MuJoCo Warp, CPU | leg passive (2 s) | 2.5 ms | 0.014 / 0.014 / – | −0.02 | 0.35 / 0.29 |
+| MuJoCo Warp, CPU | leg passive (2 s) | 5 ms | 0.021 / 0.021 / – | −0.04 | 0.35 / 0.29 |
+| Kamino fork, Metal | four-bar 3σ, damped | 2.5 ms | 0.13 / 0.22 / 0.52 | | 0.82 / 0.31 |
+| Kamino fork, CPU | four-bar 3σ, damped | 5 ms | 0.27 / 0.27 / 0.86 | | 2.61 / 1.17 |
+| MuJoCo Warp, CPU | four-bar 3σ, damped | 2.5 ms | 0.028 / 0.038 / 0.076 | | 1.66 / 0.33 |
+| MuJoCo Warp, CPU | four-bar 3σ, damped | 5 ms | 0.057 / 0.069 / 0.14 | | 3.43 / 0.61 |
+
+* **CPU vs Metal (Kamino)**: max body-angle difference 1e-5 rad at 0.5 s, 1.0e-3 rad at 5 s (four-bar, fork; 1.4e-3
+  for 1.5.2), 9e-5 rad at 2 s (leg), 2e-4 rad at 5 s (four-bar, 5 ms). Newton 1.5.2 and the fork agree to 2.4e-5 rad
+  over 5 s on the CPU.
+* Kamino's energy loss falls monotonically with the Baumgarte gain (α 0 → 0.5: −46 → −1 %). Likely mechanism (not
+  verified in code): with weak stabilisation the position drift grows and each step's velocity-level constraint
+  solve, applied at a drifted configuration, removes energy. At α 0.5 Kamino is the most
+  accurate engine here. The loss depends on the mechanism: the quasi-static leg loses 0.1 %.
+* MuJoCo Warp float32 on the CPU device vs MuJoCo C float64 (same MJCF, default solref): leg 1.1e-4 rad over 2 s;
+  damped 3σ four-bar 1.1e-3 rad at 1 s, 7.9e-3 rad at 5 s; undamped passive four-bar 0.015 rad at 1 s, 0.06 at 2 s,
+  0.32 rad at 5 s (a conservative 1-DoF system accumulates phase differences). Closure agrees to 10 %.
+* Wall time per 5 s single-world four-bar run: Kamino ~200 s on Metal, 63 s on the CPU device (100 / 32 ms per
+  step: 200 PADMM iterations whose loop condition is read on the host through `capture_while` outside a capture);
+  MuJoCo Warp 3 s on the CPU device.
+
+### 4c. Kamino test suites on Metal (queued runs, 2026-09-25/26)
+
+| suite | CPU device | Metal |
+|---|---|---|
+| Newton 1.5.2 (`newton._src.solvers.kamino.tests`, 52 modules) | 624 run, 1 fail (box-on-box tolerance), 0 err | 624 run, 12 fail, 22 err |
+| fork 1.7.0.dev (`newton.tests.kamino`, 45 modules) | 607 run, 0 fail, 0 err | 607 run, 10 fail, 70 err |
+
+Every Metal-only failure falls in two groups: (a) `Kernel requests 82432 bytes of threadgroup memory but device
+"Apple M4 Max" supports at most 32768 bytes` in `llt_blocked_factorize_kernel` / `llt_blocked_rcm_factorize_kernel`
+(all DVI-backend tests, the DVI configurations of the joint-effort-limit and joint-friction tests, body flags); (b)
+LLTB / LLTB-RCM solve tests with multi-block matrices: factorisation L correct, backward solve x wrong (error up to
+2.3). Cause of (b), from source: `_tile_builtins.make_tile_matmul_left_transpose_update_func` declares its staging
+arrays `__shared__` under `#if defined(__CUDA_ARCH__)` and as plain per-thread arrays otherwise; each thread fills
+only its own tile registers, so on Metal the reduction reads uninitialised entries. It triggers only when the
+system spans more than one tile block (the tests use 16-row blocks) (not our four-bar or leg: CPU and Metal agree), i.e. it will hit
+real robots. Remedy without code change: `NEWTON_KAMINO_DISABLE_TILE_TRANSPOSE_UPDATE=1` (Newton's own switch; the
+fallback uses `tile_transpose` + `tile_matmul`), verification queued (`cl_kamino2`). Upstream fix: stage through
+`WP_TILE_ALLOC` / threadgroup memory on non-CUDA GPUs. (a) needs a smaller block size for Metal's 32 KB limit.
+Newton's `kamino_basic_fourbar` example ran on the CPU device (50 frames); its Metal run is queued.
+
+A 1024-world × 8 s Kamino stress run held the GPU for > 6 min without output (alive at 17 % CPU, waiting on
+command buffers: ~100 ms per step × 3,200 steps) and was killed at the coordinator's request 2026-09-26 02:06; the
+remaining steps are re-queued as 2 s runs, one ticket each, with a 600 s per-step cap (`kamino_jobs3.sh`).
+
+## 5. Verdict and the native hard-loop scope
+
+* **Is MuJoCo Warp's soft closure adequate at our step sizes?** Yes for learning on loop-legged robots, with
+  numbers: closure 0.4–1.2 mm (2.5 ms) and 1.3–2.4 mm (5 ms) on a passive 0.3 m four-bar, 0.002–0.35 mm on the leg;
+  under 3σ torques over 1024 worlds × 8 s, 0 blow-ups, worst closure 5.6 / 14.7 mm at 2.5 ms (four-bar / leg) and
+  11.7 / 25.6 mm at 5 ms. Stiffen the loop equalities (solref 5–10 ms; the error scales roughly with the time
+  constant) and prefer 2.5 ms. Costs: soft stiff constraints dissipate (−1 to −5 % energy in 5 s undamped), and the
+  closure error grows with load; not adequate where sub-millimetre loop geometry is the observable.
+* **Does Kamino run on Metal?** Yes (PADMM, both Newton versions, CPU-matching to 1e-3 rad over 5 s), with two
+  Metal defects in its linear algebra that our small mechanisms do not reach: the multi-block LLTB solve (wrong
+  results; Newton switch available) and the DVI factorisation's 82 KB threadgroup request (DVI unusable). Use α ≈ 0.5
+  for loops: at the default 0.01 it loses 32 % of the energy in 5 s. Per-step cost is 1–2 orders above MuJoCo Warp
+  here (throughput queued).
+* **Isaac / PhysX reference.** Isaac Lab 3.0 keeps closed-loop Digit PhysX-only; PhysX closes loops with iterative
+  maximal-coordinate joints next to the reduced-coordinate tree, i.e. also not exactly closed. A PhysX recording of
+  this four-bar would place PhysX on the same axis; noted, VM not started.
+* **What a native hard-loop solver would need (scope only):** (1) hard loop rows in MuJoCo Warp's constraint solve
+  (zero regularisation) plus a proximal/regularised treatment of the rank-deficient loop Jacobian (Kamino's P-ADMM
+  does this); (2) or, cheaper, a position-level projection kernel after each MuJoCo Warp step (Gauss–Newton on the
+  loop residual in joint space, per world, small dense Jacobian) and the matching velocity projection, which removes
+  drift without Baumgarte energy loss; (3) or adopt Kamino for loop robots once its Metal linear-algebra defects are
+  fixed upstream and its per-step cost is acceptable. (2) is the realistic first step.
+
+## 6. Decisions
+
+The three set-up rows (four-bar start pose, 3σ scale and damping, leg geometry) are in `docs/DECISIONS.md`
+(2026-09-26).
 
 Runs taken outside the GPU queue (Warp CPU device, before the rule was restated to me): the Kamino CPU test suites
 (`kamino_tests_*_cpu.log`), Newton's `kamino_basic_fourbar` example on CPU (compiles and runs, 50 frames, 13 s),
 and the single Kamino CPU probe in §4. They are CPU-only and carry no timing claims.
 
-## 7. Left to do (all queued, kind low)
+## 7. Left to do (queued, kind low; results land in `runs/closed_loops/`)
 
-`kamino_tests_fork` / `kamino_tests_152` (Kamino unit tests on metal:0), `cl_kamino`
-(`scripts/diagnostics/closed_loops/kamino_jobs.sh`: CPU vs Metal agreement, 1.5.2 vs fork, α sweep, 1024-world 3σ,
-throughput graph vs eager, Isaac Lab 3.0 settings, Newton's example), `cl_mjw` (`mjw_jobs.sh`: C / MJW-CPU /
-MJW-Metal agreement, solref sensitivity on Metal, 1024-world 3σ for MJW and C, throughput with and without the
-equality). PhysX: a recording of the same four-bar with an `excludeFromArticulation` loop joint would close the
-comparison; noted, VM not started.
+* `cl_mjw` (`mjw_jobs.sh` → `runs/closed_loops/mjw/`, log `mjw_jobs.log`): MuJoCo Warp on Metal vs MuJoCo C and the
+  reference (four-bar, leg, 3σ; 2.5 and 5 ms), solref sensitivity on Metal, 1024-world 3σ on Metal, throughput
+  with and without the loop equality at 1024 / 4096 worlds.
+* `cl_kamino2` (`kamino_jobs2.sh`, log `kamino_jobs2.log`): LLTB tests and Kamino runs on Metal with
+  `NEWTON_KAMINO_DISABLE_TILE_TRANSPOSE_UPDATE=1`, leg 1024-world 3σ at α 0.5, leg throughput.
+* `cl_k3_*` (`kamino_jobs3.sh STEP`, logs `kamino_jobs3_STEP.log`): 1024-world 3σ (four-bar, leg, leg at 5 ms),
+  throughput graph vs eager, Isaac Lab 3.0 settings on Metal, Newton's example on Metal.
+* PhysX recording of the four-bar (not started).

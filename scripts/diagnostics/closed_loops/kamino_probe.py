@@ -102,6 +102,8 @@ def main():
         clos_p99[k + 1] = np.percentile(ce[fin], 99) if fin.any() else np.nan
         if blown_at is None and not fin.all():
             blown_at = k
+        if k % 400 == 399:
+            print(f"[kamino_probe] step {k + 1}/{nsteps} {time.time() - t0:.0f} s", flush=True)
         if k % 20 == 19:
             w = s0.body_qd.numpy().reshape(a.worlds, nb, 6)[..., 3:]
             ok = np.isfinite(w).all(axis=(1, 2))
