@@ -65,7 +65,7 @@ def tickets():
 def acquire(name, kind, minutes, pid, cmd=None, front=False):
     os.makedirs(Q, exist_ok=True)
     t0 = 0.0 if front else time.time()                 # front: ahead of every waiter of its class (tickets sort by class, then t)
-    tf = os.path.join(Q, f"{t0:.3f}_{PRIO[kind]}_{name}.json")
+    tf = os.path.join(Q, f"{t0:.3f}_{PRIO[kind]}_{name}_{pid}.json")   # pid in the name: two tickets of one name can never be confused
     json.dump({"name": name, "kind": kind, "minutes": minutes, "pid": pid, "t": t0, "cmd": cmd, "cwd": os.getcwd()}, open(tf, "w"))
     while True:
         h = holder()
