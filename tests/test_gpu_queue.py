@@ -44,3 +44,12 @@ def test_exit_code_recorded_when_a_waiter_freed_the_holder():
     _main("release", "t3", "--pid", str(os.getpid()), "--rc", "3")
     ev = [json.loads(l) for l in open(g.HIST)]
     assert [e["ev"] for e in ev] == ["grant", "release", "exit"] and ev[2]["rc"] == 3
+
+
+def test_front_ticket_sorts_ahead_of_older_tickets_of_its_class():
+    _sandbox()
+    os.makedirs(g.Q, exist_ok=True)
+    json.dump({"name": "older", "kind": "timing", "minutes": 1, "pid": os.getpid(), "t": 1.0}, open(os.path.join(g.Q, "1.000_0_older.json"), "w"))
+    tf = os.path.join(g.Q, "0.000_0_PAUSE.json")
+    json.dump({"name": "PAUSE", "kind": "timing", "minutes": 1, "pid": os.getpid(), "t": 0.0}, open(tf, "w"))
+    assert g.tickets()[0][3]["name"] == "PAUSE"

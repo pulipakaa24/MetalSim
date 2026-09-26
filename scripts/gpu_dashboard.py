@@ -224,6 +224,7 @@ def bar(pct, width=24):
 
 def render_text(snap):
     out = [f"GPU queue  {time.strftime('%H:%M:%S', time.localtime(snap['now']))}   device utilisation {snap['gpu_util']}%"]
+    if any(j["name"] == "PAUSE" and j["state"] == "running" for j in snap["jobs"]): out.append("  QUEUE PAUSED (scripts/gpu_resume.sh to continue); waiting jobs stay queued")
     for j in snap["jobs"]:
         if j["state"] == "running":
             prog = f"{j['current']}/{j['total']}" if j.get("total") else (f"{j['current']}" if j.get("current") is not None else "")
@@ -274,7 +275,7 @@ h1{{font-size:18px;margin:0 0 4px}} .sub{{color:var(--mut);margin-bottom:12px}}
 .bar{{height:8px;background:var(--wait);border-radius:4px;margin:6px 0;overflow:hidden}} .bar div{{height:100%;background:var(--run)}}
 .meta,.cmd{{color:var(--mut);font-size:12px;word-break:break-all}} pre{{font-size:11px;white-space:pre-wrap;margin:6px 0;color:var(--fg);opacity:.85}}
 table{{border-collapse:collapse;font-size:12px}} td{{padding:2px 8px;border-bottom:1px solid var(--wait)}}</style></head><body>
-<h1>GPU queue</h1><div class="sub">{time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(snap['now']))} · device utilisation {snap['gpu_util']}% · refreshes every {refresh} s</div>
+<h1>GPU queue</h1>{'<div class="job run" style="border-left-color:#c62828"><b>QUEUE PAUSED</b> · scripts/gpu_resume.sh to continue · waiting jobs stay queued</div>' if any(j["name"] == "PAUSE" and j["state"] == "running" for j in snap["jobs"]) else ''}<div class="sub">{time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(snap['now']))} · device utilisation {snap['gpu_util']}% · refreshes every {refresh} s</div>
 {''.join(rows) or '<div class="job">idle: nothing running or waiting</div>'}
 <h1>GPU by process</h1><div class="meta">{top or '–'}</div>
 <h1>Finished</h1><table>{fin or '<tr><td>none recorded yet</td></tr>'}</table>
