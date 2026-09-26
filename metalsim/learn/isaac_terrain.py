@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: MIT AND BSD-3-Clause
+# MetalSim code, MIT (see LICENSE). Ported from Isaac Lab v2.3.2 (isaaclab.terrains): Copyright (c) 2022-2025,
+# The Isaac Lab Project Developers, BSD-3-Clause (licenses/BSD-3-Clause-IsaacLab.txt). See THIRD_PARTY_NOTICES.md.
 """Isaac Lab's terrain generator (v2.3.2), ported to plain numpy so MetalSim builds the same terrain.
 
 Port of ``isaaclab.terrains.TerrainGenerator`` with ``ROUGH_TERRAINS_CFG`` (the terrain of

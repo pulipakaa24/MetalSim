@@ -49,7 +49,8 @@ them: `git clone https://github.com/google-deepmind/mujoco_menagerie upstream/mu
 ### The three forks
 
 MetalSim depends on three forked projects, none of them on PyPI in this form. The commits below are
-what the current results were produced with.
+what the current results were produced with. Each fork's branch head adds only a `METALSIM_CHANGES.md` (the list of MetalSim
+commits on that branch) on top of the commit named here, so installing the branch gives the same code.
 
 **Warp** ([pulipakaa24/warp](https://github.com/pulipakaa24/warp), branch `metalsim`, commit
 `f194006`). NVIDIA Warp with innate-inc's Metal backend, plus seven MetalSim commits: interop entry
