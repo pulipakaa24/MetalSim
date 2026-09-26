@@ -294,6 +294,16 @@ Classes, granted in this order when the GPU frees up (first come, first served w
 | `train` | training runs |
 | `low` | background work, granted only when nothing else waits |
 
+**Live dashboard.** `scripts/gpu_dashboard.sh` starts a local page at http://localhost:8765 (idempotent;
+`--restart` to restart; `python3 scripts/gpu_dashboard.py --watch` is the terminal form, `/json` the
+machine form). It shows the running job with a progress bar, ETA, its log and last lines, the waiting
+jobs in grant order, GPU time per process, and the finished jobs with exit codes
+(`runs/gpu_history.jsonl`). It is not configured per job: every job that goes through the queue
+appears by itself, its log is found from the files its process tree has open for writing, and progress
+is parsed from generic counters ("it 898", "12/500", "37 %") with the total taken from the log line or
+the command line; when nothing is recognisable it shows elapsed time against the requested minutes and
+the last log line, so a new kind of job is still readable without touching the dashboard.
+
 A holder whose process has died is released automatically. `status` shows the holder and the waiting
 jobs. Example:
 
