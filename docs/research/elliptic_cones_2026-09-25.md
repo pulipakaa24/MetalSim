@@ -476,3 +476,129 @@ if a stale `ctrl` reached the physics. No change to `metalsim/learn/so101_lift.p
   (`f2716b4` … `07a51a6`) carries a `Co-Authored-By: Claude` trailer, so that branch's history is not
   CLA-clean as a whole; anything for upstream has to be re-committed on a clean branch (as the PR branch
   `elliptic-jtcj-offcuda` is: one clean commit on upstream `main`; my two `metalsim` commits carry no trailer).
+
+## 8. Cutting the elliptic premium (2026-09-26, coordinator's follow-up; fork branches `metalsim-elliptic2*`)
+
+Goal: make elliptic cones as cheap as they can be before the G1 default decision. Baseline at fork `fe6fe71`
+(= shared checkout `b630530`): G1 task elliptic impratio 10 at 1.42× physics / 1.44× loop vs pyramidal.
+Protocol for the numbers below: `metalsim_step.py ROBOT 4096 matched` through the timing queue (PD to random
+targets, Newton 10 / 20, 1000 timed steps); `g1task` = the task's own model (Isaac's G1 asset, 43 dofs, its PD
+servos, 2.5 ms × 8 substeps per call, `recommended` or `tau10_impact_hardlimits_ellip10`), physics steps/s.
+Per-kernel profiles are eager-mode GPU time per physics step (`WP_METAL_PROFILE=1`).
+
+### 8.1 What MuJoCo C does (engine_solver.c, 3.3.7, functions `FactorizeHessian`, `HessianIncremental`, `HessianCone`, `mj_solCGNewton`)
+
+`FactorizeHessian` builds H = M + JᵀDJ with D = efc_D on QUADRATIC rows and 0 elsewhere, factorizes it into
+`L`, then, "if (ctx->ncone)", calls `HessianCone`. `HessianIncremental` (called every Newton iteration after
+`CGupdateConstraint`) keeps `L` up to date with `mju_cholUpdate` rank-1 updates for each row whose QUADRATIC
+state flipped (add or subtract J_i·√D_i), falls back to `FactorizeHessian(flg_recompute=1)` if a rank-1 update
+loses rank, and then again calls `HessianCone`. `HessianCone` copies `L` into `Lcone` and, for every contact in
+`mjCNSTRSTATE_CONE`, factorizes the contact's local dim×dim cone Hessian (`con->H`, from
+`mj_constraintUpdate` with `flg_HessianCone`), forms LTJ = Lᵀ_local·J_contact and applies `dim` rank-1
+`mju_cholUpdate`s to `Lcone`. So in C the quadratic part is incremental across iterations, and the cone part is
+re-added from scratch every iteration (it depends on Jaref), as `dim` rank-1 factor updates per cone contact
+on a fresh copy of L.
+
+### 8.2 How often the state changes (measured on the CPU device, `g1_state_changes.py`)
+
+States: 64 worlds of the G1 task model from MuJoCo C (PD hold at the standing keyframe with ±0.05 rad target
+noise resampled every 20 control steps; the robot stands for ~0.5 s and lies on its torso from ~1.5 s, so the
+later snapshots are contact-rich but not walking; the policy-rollout snapshots are `g1_state_dump.py`,
+pending in the render queue). Per Newton iteration (mean over worlds still iterating), elliptic impratio 10:
+
+| snapshot | rows / world | CONE rows / world by iteration | QUADRATIC flips / world by iteration | worlds with 0 flips (of 64) | solver_niter mean (max) |
+|---|---|---|---|---|---|
+| t = 10 (standing) | 26 | 0 | 1.7, 0 | 12, 64 | 1.8 (2) |
+| t = 60 (falling) | 9.5 | 5.2, 6.0, 5.0, 5.3, 6.0, 6.2, 5.7, 7.8, 6.0 | 1.3, 1.3, 2.2, 1.2, 0.8, 0.4, 0.9, 1.2, 3.0 | 18, 35, 33, 48, 59, 62, 61, 63, 62 | 5.2 (10) |
+| t = 100 (on the torso) | 20 | 2.9, 5.0, 6.1, 6.7, 9.0 | 3.5, 3.5, 1.3, 1.0, 0.7 | 4, 27, 50, 57, 62 | 4.0 (8) |
+| t = 200 | 20 | 4.0, 4.4, 5.5, 5.8, 5.2 | 4.5, 3.1, 1.3, 1.2, 1.5 | 4, 24, 48, 58, 62 | 3.8 (7) |
+| t = 300 | 20 | 2.9, 4.4, 4.7, 4.5, 5.0 | 3.8, 3.0, 1.5, 1.5, 1.0 | 8, 31, 49, 57, 62 | 3.6 (7) |
+| all 9 snapshots | | | 2.2 (it 1), 1.6 (it 2) | | **2.76** |
+| same states, pyramidal | 26–34 | – | 2.8 (it 1), 2.7 (it 2) | | **3.07** |
+
+Policy states (`g1_state_dump.py`: the elliptic-trained checkpoint `g1_flat_flatcfg_ellip10.pt` walking on
+the task, 256 envs, snapshots at control steps 2–399, first 64 worlds analysed; the task's njmax 112):
+
+| snapshot | rows / world (elliptic rows) | CONE rows / world by iteration | QUAD flips / world by iteration | solver_niter mean (max), elliptic | same states, pyramidal: rows, flips it 1–3, niter |
+|---|---|---|---|---|---|
+| t = 10 | 12.9 (8.8) | 1.4, 2.9, 4.0, 5.2, 4.1, 6.0, 7.5, 6.8 | 3.8, 1.4, 1.2, 1.5, 3.4, 2.5 | 3.48 (9) | 15.8, 3.8 / 2.2 / 2.6, 3.27 (9) |
+| t = 60 | 12.8 (8.9) | 1.9, 2.5, 3.5, 3.8, 3.0, 4.3, 6.0, 5.0, 7.5 | 3.3, 1.6, 1.6, 1.8, 1.7, 2.1 | 4.14 (10) | 15.8, 3.3 / 2.1 / 2.4, 4.03 (9) |
+| t = 200 | 12.7 (8.7) | 2.4, 4.1, 4.0, 3.8, 3.5, 3.0 | 3.0, 1.5, 1.9, 1.5, 1.4, 1.7 | 4.03 (10) | 15.6, 3.0 / 1.9 / 2.7, 3.62 (8) |
+| t = 399 | 12.9 (8.9) | 1.7, 2.6, 3.4, 4.7, 5.1, 7.0, 7.5, 9.0 | 3.1, 1.7, 1.9, 1.6, 1.8, 1.0 | 3.67 (9) | 15.8, 2.8 / 2.3 / 2.5, 3.61 (7) |
+| all 9 snapshots | | 15–45 % of the elliptic rows are CONE at iteration 1 | 2.8, 1.5, 1.7, 1.7, 2.0, 1.8 | **3.72** | flips 2.9, 2.1, 2.4, 2.2, 2.4; niter **3.41** |
+
+Reading: 1–5 rows flip QUADRATIC state per world-iteration (max 12–13), the same order as pyramidal; 2–9
+rows per world (1–3 contacts, i.e. 15–45 % of the contact rows while walking) sit in the CONE state through
+the iterations, and those rows' curvature changes every iteration whatever the flips. On the walking states
+elliptic needs 9 % more Newton iterations than pyramidal (3.72 vs 3.41; max 10 vs 9, a few worlds hit the cap
+where pyramidal does not; on the falling MuJoCo C states it needs fewer, 2.76 vs 3.07). The extra iterations
+run only on the worlds still iterating (the tail: 10 of 64 worlds beyond iteration 5), so they are a small
+share of the premium; a warm start in force space (item 4) would at best remove that share and cannot be
+made without changing the converged result at the tolerance (the solver converges to the same fixed point
+from either start), so it was not built.
+
+### 8.3 Implementations and measurements
+
+| variant (flag) | G1 task ellip10, physics steps/s | Go2 | humanoid | SO-101 |
+|---|---|---|---|---|
+| pyramidal (`recommended`, reference) | 3,268,888 | 923,850 | 958,995 | 1,065,380 |
+| baseline `b630530` (full JᵀDJ rebuild + cone term + Cholesky every iteration) | 2,061,253 (1.59×) | 580,782 | 640,936 | 816,143 |
+| mode 1: incremental h + cone term added inside the fused Cholesky launch (`MJW_ELLIPTIC_INCREMENTAL=1`) | 1,738,302 (1.88×) | 606,498 | 613,305 | 820,336 |
+| **mode 2: per-entry deltas + cone term → htot, plain register Cholesky (`=2`, default)** | **2,187,925 (1.49×)** | **623,230** | **666,355** | **847,292** |
+| mode 2 + zero-row skip in the cone kernel (`MJW_CONE_SKIP_ZERO=1`, archived: the 3 test loads cost more than the skipped ones) | 2,182,409 (−0.3 %) | 607,832 (−2.5 %) | 660,338 (−0.9 %) | 838,682 (−1.0 %) |
+| line search: secondary rows skip their loads (`MJW_LS_SKIP_SECONDARY`, on top of mode 1) | 1,739,221 (0 %) | 607,770 (+0.2 %) | 614,622 (+0.2 %) | 820,999 (+0.1 %) |
+
+Per-kernel (G1 task, ms of GPU time per physics step, 4096 worlds): pyramidal 10.89 total (fused
+incremental Cholesky 3.38 ×10 + initial Cholesky 1.18, constraint update 1.17, line search 0.54, M
+factor 0.95); elliptic baseline 16.86 (Cholesky 6.01 ×11, cone term 2.39, tiled JᵀDJ 1.41, constraint update
+1.42, line search 1.14); mode 1 18.98 (fused + cone 7.07 ×10 + 2.10, cone term 2.37); mode 2 15.64
+(Cholesky 4.36 ×10 + 1.25, cone term + deltas 2.49, constraint update 1.30, line search 1.19).
+
+In the task's own protocol (`bench_contact_tuning.py`: 4096 worlds, standing start, 3 s, 8 substeps of 2.5 ms,
+physics only, 3 interleaved repeats): `recommended` 78,349 env-steps/s, `tau10_impact_hardlimits_ellip10`
+**64,519 (1.21×)** with mode 2, against 55,379 (1.42×) at `b630530` and 11,029 (7.07×) before the launch fix:
+the elliptic premium on the G1 task is now 21 % physics-only (estimated ~15 % in the full PPO loop, where
+physics is ~60 % of the step; the earlier 1.44× loop measurement was with the 1.42× physics).
+
+Reading:
+- The "rebuild every iteration" structure was not the cost it looked like: the tiled JᵀDJ rebuild is
+  0.13 ms per launch (1.4 ms per step, 8 % of the elliptic step), because the G1's rows fit one or two
+  16-row tiles. Mode 1 loses because adding the cone buffer inside the 32-lane fused kernel costs more
+  (one extra 48 × 48 tile load per world, no skipping) than the rebuild it removes. Mode 2 wins 6 % by
+  moving the flipped-row deltas into the 946-thread-per-world cone kernel and letting the plain Cholesky
+  skip worlds with neither cone rows nor flips.
+- What remains of the premium (mode 2 vs pyramidal, 4.75 ms of 15.64): the cone term itself 2.5 ms
+  (16 %), the Cholesky that worlds with cone rows must run every iteration (+1.0 ms; pyramidal's fused
+  kernel skips worlds with no flips, the "stable-state fast path", which is exact only when every active
+  row is quadratic), the elliptic line search (+0.65 ms: a quad precompute pass per launch and the cone
+  cost evaluations), and the constraint update (+0.13). MuJoCo C's `Lcone` rank-dim updates would replace
+  the full refactorization for cone worlds (≈ 9 rank-1 updates of 43² vs 43³/3: ~35 % less work on the
+  Cholesky share) but need a rank-1 update of the register-resident factor across iterations, which is
+  the Cholesky kernel itself (out of scope here); estimated ≤ 1 ms of the 4.75.
+- Fold into the tiled JᵀDJ build (item 2): with the rebuild at 0.13 ms/launch and the cone term at 0.22
+  ms/launch as a separate per-entry pass, folding the cone term into the 16-row tile loop (two extra
+  small tile matmuls per cone contact per world) is estimated at ≥ 0.5 ms/launch on the G1 (§2.2); not built.
+- Line search (item 3): the elliptic kernel has the same launch count as pyramidal (10 per step); its
+  extra cost is the per-launch quad precompute and the cone evaluations on primary rows; skipping the
+  secondary rows' contact loads measured within noise (kept as `MJW_LS_SKIP_SECONDARY`, on the
+  `metalsim-elliptic2-ls` branch, not merged). MuJoCo's exact-solution shortcut (quadratic-only fast
+  exit) is the stable-state fast path already in the fork; it cannot apply while any row is in the CONE
+  state (non-quadratic cost along the ray).
+- Solver conditioning (item 4): §8.2 (fewer iterations than pyramidal on the same states).
+
+### 8.4 Physics unchanged (measured)
+
+- CPU device (`elliptic_cpu_check.py`, fused path enabled with `MJW_FUSE_H_CHOLESKY_CPU=1`), max |dq| vs
+  `mj_step` over 40 steps: Go2 1.8e-7 … 2.3e-6 rad, SO-101 2.4e-8 … 8.3e-6, humanoid 1.6e-7 … 1.9e-6 at
+  10 steps (chaotic fall after), G1 Menagerie (sparse, unchanged path) 6.7e-8 … 4.3e-7: the same envelope for
+  the rebuild (`=0`), mode 1, mode 2 and mode 2 + zero-row skip (modes 1 and 2 give the same digits).
+- Fork CPU tests (`solver_test`, `forward_test`, `constraint_test`, `--cpu`, fused path on): 242 passed, 10 skipped.
+- Metal, graph replay, 512 worlds × 200 steps vs the unpatched snapshots (`elliptic_check.py`; floor = two
+  instances of the same configuration): mode 1: Go2 1.5e-6 / 2.5e-6 / 5.3e-5 rad at steps 25 / 100 / 200 (floor
+  2.0e-6 / 2.8e-6 / 5.3e-5), G1 sparse 5.5e-6 / 2.9e-2 / 0.61 with 0 / 4.9 / 16.2 % of worlds apart (floor
+  3.9e-6 / 3.4e-2 / 0.63, 0 / 5.3 / 15.8 %: the chaotic falling G1), G1 dense 5.4e-6 / 3.7e-2 / 0.46, 0 / 6.1 /
+  15.0 % (floor 5.5e-6 / 3.4e-2 / 0.62, 0 / 5.3 / 14.3 %); MuJoCo C oracle identical to three digits (Go2
+  3.08e-7 … 9.22e-5; G1 5.91e-8 … 3.48e-6). G1 task model (256 worlds × 100 control steps of 8 substeps,
+  ellip10): within its own floor (the PD-to-random-targets G1 falls; 26.6 % of worlds apart at step 100 for
+  patched-vs-patched and patched-vs-base alike; the base-vs-base floor 16 %). Mode 2 rows: pending
+  (`e2_check_sz*`), fork suite on Metal with mode 2: pending (`e2_pytest_sz`).

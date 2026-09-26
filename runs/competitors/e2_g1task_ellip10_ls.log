@@ -1,0 +1,10 @@
+[gpu_run] e2_ls_g1task start: device utilisation 0% (04:04:46)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   2.2 %
+LABEL g1task_ellip10_ls mjw=/Users/aditya/robosim/upstream/mujoco_warp-ellip2b/mujoco_warp/__init__.py head=a33c731 N=4096 env=
+== g1task elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "g1task", "N": 4096, "mode": "matched", "nv": 43, "nu": 37, "iters": 10, "ls": 20, "build_s": 2.6, "steps_per_s": 1739221, "substeps": 8, "preset": "tau10_impact_hardlimits_ellip10", "finite": true, "base_z_mean": 0.076, "overflow": {"ITERATIONS": 4052, "LS_ITERATIONS": 4096}}
+[gpu_run] e2_ls_g1task end: device utilisation 0% (04:05:15), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   1.2 %
+lock held by e2_ls_models, not e2_ls_g1task; not released

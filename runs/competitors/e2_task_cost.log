@@ -1,0 +1,45 @@
+[gpu_run] e2_task_cost start: device utilisation 0% (04:21:23)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+== stage cost mjw=/Users/aditya/robosim/upstream/mujoco_warp-ellip2c head=b0150ac presets=tau10_impact_hardlimits tau10_impact_hardlimits_ellip10 Sat Sep 26 04:21:26 PDT 2026
+holder: {"name": "e2_task_cost", "kind": "timing", "minutes": 8.0, "pid": 36661, "start": 1790421683.3034701, "queued": 1790421643.2240107, "cmd": "env PRESETS=tau10_impact_hardlimits tau10_impact_hardlimits_ellip10 scripts/diagnostics/competitors/elliptic_fidelity_g1.sh /Users/aditya/robosim/upstream/mujoco_warp-ellip2c cost", "cwd": "/Users/aditya/robosim"}
+gpu_lock status at start 2026-09-26T04:21:27
+holder: {"name": "e2_task_cost", "kind": "timing", "minutes": 8.0, "pid": 36661, "start": 1790421683.3034701, "queued": 1790421643.2240107, "cmd": "env PRESETS=tau10_impact_hardlimits tau10_impact_hardlimits_ellip10 scripts/diagnostics/competitors/elliptic_fidelity_g1.sh /Users/aditya/robosim/upstream/mujoco_warp-ellip2c cost", "cwd": "/Users/aditya/robosim"}
+  waiting [render] il3_transient_trace est 15.0 min, queued 4265 s ago
+  waiting [render] g1_state_dump est 6.0 min, queued 4018 s ago
+  waiting [render] e2_check_inc est 8.0 min, queued 3751 s ago
+  waiting [render] e2_check_inc_g1dense est 6.0 min, queued 3750 s ago
+  waiting [render] e2_check_g1task_base est 6.0 min, queued 3750 s ago
+  waiting [render] e2_check_g1task_inc est 6.0 min, queued 3750 s ago
+  waiting [render] tp26_check est 12.0 min, queued 2562 s ago
+  waiting [render] il3_late_classify est 25.0 min, queued 471 s ago
+  waiting [render] e2_check_sz est 8.0 min, queued 303 s ago
+  waiting [render] e2_check_sz_g1dense est 6.0 min, queued 302 s ago
+  waiting [render] e2_check_sz_g1task est 6.0 min, queued 302 s ago
+  waiting [render] e2_pytest_sz est 25.0 min, queued 302 s ago
+  waiting [train] il3fix2_flat est 70.0 min, queued 469 s ago
+  waiting [train] il3fix2_rough est 80.0 min, queued 467 s ago
+  waiting [low] cl_mjw est 40.0 min, queued 10044 s ago
+  waiting [low] cl_kamino2 est 40.0 min, queued 9977 s ago
+  waiting [low] cl_k3_stress_fourbar est 12.0 min, queued 8105 s ago
+  waiting [low] cl_k3_stress_leg est 12.0 min, queued 8104 s ago
+  waiting [low] cl_k3_bench est 12.0 min, queued 8103 s ago
+  waiting [low] cl_k3_il3 est 12.0 min, queued 8102 s ago
+  waiting [low] cl_k3_example est 12.0 min, queued 8101 s ago
+  waiting [low] cl_k3_stress_leg_5ms est 12.0 min, queued 8100 s ago
+  waiting [low] tp26_tests est 25.0 min, queued 1665 s ago
+  waiting [low] tp26_tests2 est 25.0 min, queued 535 s ago
+
+mujoco_warp from /Users/aditya/robosim/upstream/mujoco_warp-ellip2c/mujoco_warp/__init__.py
+  tau10_impact_hardlimits: overflow {'LS_ITERATIONS': 4096}
+  tau10_impact_hardlimits_ellip10: overflow {'ITERATIONS': 54, 'LS_ITERATIONS': 4096}
+  tau10_impact_hardlimits: overflow {'LS_ITERATIONS': 4096}
+  tau10_impact_hardlimits_ellip10: overflow {'ITERATIONS': 100, 'LS_ITERATIONS': 4096}
+  tau10_impact_hardlimits: overflow {'LS_ITERATIONS': 4096}
+  tau10_impact_hardlimits_ellip10: overflow {'ITERATIONS': 149, 'LS_ITERATIONS': 4096}
+G1 MuJoCo Warp physics only, 4096 worlds, 2.5 ms x 8 substeps per control step, 3 s from standing, 3 interleaved repeats
+  tau10_impact_hardlimits         52.28 ms/control step (min 52.24)      78349 env-steps/s      626794 2.5ms-steps/s  (1.000x tau10_impact_hardlimits)  runs [52.24, 52.28, 52.3]
+  tau10_impact_hardlimits_ellip10    63.49 ms/control step (min 63.48)      64519 env-steps/s      516150 2.5ms-steps/s  (1.214x tau10_impact_hardlimits)  runs [63.5, 63.49, 63.48]
+== stage cost done Sat Sep 26 04:22:22 PDT 2026
+[gpu_run] e2_task_cost end: device utilisation 0% (04:22:23), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   1.8 %
