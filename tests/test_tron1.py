@@ -201,3 +201,21 @@ def test_controller_reset_is_fast_enough_for_the_control_loop():
         t0 = time.perf_counter()
         c.reset()
         assert time.perf_counter() - t0 < 0.005, kind
+
+
+
+def test_tron1_training_model_clamps_torque_at_the_joint():
+    """LimX clamps the total motor torque (robot.xml <motor ctrlrange> +-80 legs / +-40 wheels, URDF effort): the training
+    model's PD actuators are not force-limited; the ceiling is each joint's actuatorfrcrange, so MuJoCo keeps the PD's
+    implicit damping while the torque is clamped. tron1_wf.EFFORT_LIMIT = "actuator" is the archived layout."""
+    import re
+    import numpy as np, mujoco
+    from metalsim.learn import tron1_wf
+    xml = open("assets/tron1/WF_TRON1A/xml/robot.xml").read()
+    ranges = {n: float(hi) for n, lo, hi in re.findall(r'<motor name="(\w+)".*?ctrlrange=.(-?[\d.]+) (-?[\d.]+).', xml)}
+    m = tron1_wf.build_train_model()
+    assert len(ranges) == m.nu == 8
+    for a in range(m.nu):
+        j = m.actuator_trnid[a][0]; nm = mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_JOINT, j)
+        assert not m.actuator_forcelimited[a] and m.jnt_actfrclimited[j], nm
+        np.testing.assert_allclose(m.jnt_actfrcrange[j], [-ranges[nm], ranges[nm]])

@@ -29,7 +29,11 @@ import numpy as np
 from pxr import Gf, Usd, UsdGeom, UsdLux, UsdPhysics, UsdShade, UsdSemantics
 
 
-def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True) -> mujoco.MjSpec:
+EFFORT_LIMIT = "joint"   # where a drive's maxForce goes: "joint" (actfrcrange, default since 2026-09-26) or "actuator" (archived)
+
+
+def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
+             effort_limit: str | None = None) -> mujoco.MjSpec:
     stage = Usd.Stage.Open(path)
     root = stage.GetDefaultPrim() or stage.GetPrimAtPath("/World")
     if lossless and root and root.HasCustomDataKey("mjc:source"):
@@ -37,7 +41,8 @@ def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: 
         base = os.path.dirname(os.path.abspath(path))
         # mesh assets resolve relative to the original MJCF; the importer keeps absolute meshdir
         return spec
-    return convert_stage(stage, base_dir=os.path.dirname(os.path.abspath(path)), drives=drives, visuals=visuals)
+    return convert_stage(stage, base_dir=os.path.dirname(os.path.abspath(path)), drives=drives, visuals=visuals,
+                         effort_limit=effort_limit)
 
 
 def _q_from_gf(q) -> np.ndarray:
@@ -131,7 +136,8 @@ def _accumulate_xform_to(prim, ancestor, scale_units):
     return pos, quat, sw / np.where(sa == 0, 1, sa)
 
 
-def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True, visuals: bool = True) -> mujoco.MjSpec:
+def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True, visuals: bool = True,
+                  effort_limit: str | None = None) -> mujoco.MjSpec:
     """``drives=False`` skips turning UsdPhysics drives into actuators (callers that apply their own
     actuator model, as Isaac Lab's ImplicitActuatorCfg does, add them afterwards)."""
     units = float(UsdGeom.GetStageMetersPerUnit(stage) or 1.0)
@@ -393,7 +399,14 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True, vi
                 act.dyntype = mujoco.mjtDyn.mjDYN_NONE; act.gaintype = mujoco.mjtGain.mjGAIN_FIXED; act.biastype = mujoco.mjtBias.mjBIAS_AFFINE
                 mf = drv.GetMaxForceAttr().Get()
                 if mf is not None and np.isfinite(mf) and mf > 0:
-                    act.forcerange = [-float(mf), float(mf)]; act.forcelimited = mujoco.mjtLimited.mjLIMITED_TRUE
+                    # UsdPhysics DriveAPI maxForce limits the drive's force on the joint (a joint-level clamp in PhysX,
+                    # and Newton maps it to the joint's actuatorfrcrange). On the joint MuJoCo keeps the drive's implicit
+                    # velocity derivative while clamped; as an actuator forcerange it drops it (engine_derivative.c
+                    # mjd_actuator_vel), which is unstable for stiff, light joints (runs/il3/finger_unit.py)
+                    if (effort_limit or EFFORT_LIMIT) == "actuator":
+                        act.forcerange = [-float(mf), float(mf)]; act.forcelimited = mujoco.mjtLimited.mjLIMITED_TRUE
+                    else:
+                        jt.actfrcrange = [-float(mf), float(mf)]; jt.actfrclimited = mujoco.mjtLimited.mjLIMITED_TRUE
                 if jp.HasAttribute("mjc:ctrlrange"):
                     cr = jp.GetAttribute("mjc:ctrlrange").Get(); act.ctrlrange = [float(cr[0]), float(cr[1])]; act.ctrllimited = mujoco.mjtLimited.mjLIMITED_TRUE
                 elif jt.limited == mujoco.mjtLimited.mjLIMITED_TRUE:
