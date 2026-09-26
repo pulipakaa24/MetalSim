@@ -28,7 +28,7 @@ _cur = {}
 
 
 def _opts(**kw):
-    for k in ("njmax", "nconmax", "jacobian", "block_dim", "m_dense_max", "metal_register_cholesky_max"):
+    for k in ("njmax", "nconmax", "jacobian", "block_dim", "m_dense_max", "metal_register_cholesky_max", "solver_iterations", "ls_iterations"):
         if k in _cur:
             kw[k] = _cur[k]
     return BatchSimOptions(**kw)

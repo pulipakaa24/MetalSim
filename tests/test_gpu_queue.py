@@ -61,3 +61,12 @@ def test_ticket_filename_carries_the_pid():
     assert g.holder()["name"] == "t4"          # granted at once (empty queue), ticket consumed
     assert os.listdir(g.Q) == []
     _main("release", "t4", "--pid", str(os.getpid()))
+
+
+def test_alive_treats_permission_error_as_alive(monkeypatch):
+    def deny(pid, sig): raise PermissionError
+    monkeypatch.setattr(g.os, "kill", deny)
+    assert g.alive(12345) is True
+    def gone(pid, sig): raise ProcessLookupError
+    monkeypatch.setattr(g.os, "kill", gone)
+    assert g.alive(12345) is False
