@@ -1,0 +1,551 @@
+diff --git a/metalsim/render/shaders/pathtrace.metal b/metalsim/render/shaders/pathtrace.metal
+index 76f545e..d4d5dc6 100644
+--- a/metalsim/render/shaders/pathtrace.metal
++++ b/metalsim/render/shaders/pathtrace.metal
+@@ -4,7 +4,9 @@
+ // `max_bounces` bounces, next-event estimation for directional lights (shadow rays), BRDF sampling
+ // (Lambert diffuse + GGX specular with Fresnel, same material model and light radiances as tiers
+ // 0/1: MuJoCo diffuse x pi), Russian roulette after 3 bounces, environment radiance = model sky
+-// colour (uniform), emissive materials as area sources through BRDF sampling. Primary-hit depth,
++// colour (uniform) or, with flags bit1, an equirectangular HDR environment map (z up, rotated by
++// env_yaw) that is importance-sampled for next-event estimation and combined with BRDF sampling by
++// the power heuristic; emissive materials as area sources through BRDF sampling. Primary-hit depth,
+ // normal and segmentation are written for annotators. Envs share one instance acceleration
+ // structure and are spatially separated by RTOffset (see rt.metal).
+ #include <metal_stdlib>
+@@ -20,8 +22,11 @@ struct InstanceDesc { packed_float3 col0, col1, col2, col3; uint options, mask,
+ struct PTConsts {
+     uint n_envs, width, height, n_cam;
+     uint n_light, n_slots, spp, max_bounces;
+-    uint frame, tiles_per_row, flags, seed;     // flags bit0: reset accumulation
+-    float stride, exposure, _f0, _f1;
++    uint frame, tiles_per_row, flags, seed;     // flags bit0: reset accumulation, bit1: env map,
++                                                //       bit2: filmic tonemap + sRGB, bit3: no headlight
++    float stride, exposure, env_yaw, env_intensity;
++    uint env_w, env_h, _u0, _u1;                // importance-sampling grid of the env map
++    float light_scale, clamp_lum, _f2, _f3;     // multiplier on the model lights; per-sample luminance cap (0 = off)
+ };
+ struct CamSpec { float4 intrinsics; float4 pos_delta; float4 rot_delta; float4 light; float4 ambient; float4 clear_color; int cam_id, p0, p1, p2; };
+ 
+@@ -102,6 +107,49 @@ inline float3 material_base(Material m, float4 mod, float2 uv, texture2d<float>
+     return base;
+ }
+ 
++// ---- environment map: equirectangular, u = azimuth (atan2(y, x) + yaw), v = polar angle from +z
++inline float2 env_uv(float3 d, float yaw) {
++    float u = atan2(d.y, d.x) / (2.0 * PI) + 0.5 + yaw / (2.0 * PI);
++    return float2(u - floor(u), acos(clamp(d.z, -1.0f, 1.0f)) / PI);
++}
++inline float3 env_dir(float2 uv, float yaw) {
++    float phi = (uv.x - 0.5) * 2.0 * PI - yaw, th = uv.y * PI;
++    return float3(sin(th) * cos(phi), sin(th) * sin(phi), cos(th));
++}
++inline float3 env_radiance(texture2d<float> env, sampler s, float3 d, constant PTConsts& c) {
++    return env.sample(s, env_uv(d, c.env_yaw), level(0.0)).rgb * c.env_intensity;
++}
++// solid-angle pdf of the importance sampler; `cdf` = [marginal (H) | conditional rows (H*W) | density (H*W)]
++inline float env_pdf(float3 d, device const float* cdf, constant PTConsts& c) {
++    float2 uv = env_uv(d, c.env_yaw);
++    uint x = min(uint(uv.x * c.env_w), c.env_w - 1), y = min(uint(uv.y * c.env_h), c.env_h - 1);
++    float st = sin(uv.y * PI);
++    if (st <= 1e-6) return 0.0;
++    return cdf[c.env_h + c.env_h * c.env_w + y * c.env_w + x] / (2.0 * PI * PI * st);
++}
++inline uint upper_bound(device const float* a, uint n, float v) {   // first index with a[i] > v
++    uint lo = 0, hi = n;
++    while (lo < hi) { uint mid = (lo + hi) >> 1; if (a[mid] <= v) lo = mid + 1; else hi = mid; }
++    return min(lo, n - 1);
++}
++inline float3 env_sample(device const float* cdf, constant PTConsts& c, float u1, float u2, thread float& pdf) {
++    uint y = upper_bound(cdf, c.env_h, u1);
++    device const float* row = cdf + c.env_h + y * c.env_w;
++    uint x = upper_bound(row, c.env_w, u2);
++    float r0 = x > 0 ? row[x - 1] : 0.0, w = max(row[x] - r0, 1e-9);
++    float m0 = y > 0 ? cdf[y - 1] : 0.0, mh = max(cdf[y] - m0, 1e-9);
++    float2 uv = float2((float(x) + (u2 - r0) / w) / float(c.env_w), (float(y) + (u1 - m0) / mh) / float(c.env_h));
++    float3 d = env_dir(uv, c.env_yaw);
++    pdf = env_pdf(d, cdf, c);
++    return d;
++}
++inline float3 aces(float3 x) {   // Narkowicz 2015 filmic fit
++    return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0);
++}
++inline float3 to_srgb(float3 x) {
++    return select(1.055 * pow(x, float3(1.0 / 2.4)) - 0.055, 12.92 * x, x <= 0.0031308);
++}
++
+ kernel void path_trace(
+     instance_acceleration_structure accel [[buffer(0)]],
+     device const uint2*     inst_tab   [[buffer(1)]],
+@@ -125,7 +173,10 @@ kernel void path_trace(
+     device float*           out_depth  [[buffer(19)]],   // (n_envs, h, w)
+     device int*             out_seg    [[buffer(20)]],   // (n_envs, h, w) slot+1
+     device float*           out_normal [[buffer(21)]],   // (n_envs, h, w, 3)
++    device const float*     env_cdf    [[buffer(22)]],
++    device float*           out_albedo [[buffer(23)]],   // (n_envs, h, w, 3) primary-hit base colour, spp mean
+     texture2d<float>        atlas      [[texture(0)]],
++    texture2d<float>        envmap     [[texture(1)]],
+     sampler                 samp       [[sampler(0)]],
+     uint3 tid [[thread_position_in_grid]])
+ {
+@@ -139,7 +190,7 @@ kernel void path_trace(
+     float3 env_off = float3(float(e % c.tiles_per_row) * c.stride, float(e / c.tiles_per_row) * c.stride, 0.0);
+     Rng rng; rng.s = hash_u(pix * 7919u + c.frame * 104729u + c.seed);
+     float3 sum = float3(0.0);
+-    float depth0 = 0.0; float3 normal0 = float3(0.0); int seg0 = 0;
++    float depth0 = 0.0; float3 normal0 = float3(0.0); int seg0 = 0; float3 albedo_sum = float3(0.0);
+     for (uint s = 0; s < c.spp; ++s) {
+         float jx = rnd(rng), jy = rnd(rng);
+         float3 dl = float3((float(x) + jx - cs.intrinsics.z) / cs.intrinsics.x, -(float(y) + jy - cs.intrinsics.w) / cs.intrinsics.y, -1.0);
+@@ -147,10 +198,18 @@ kernel void path_trace(
+         float3 o = cpos + env_off;
+         float3 throughput = float3(1.0);
+         float3 radiance = float3(0.0);
++        bool use_env = (c.flags & 2u) != 0u;
++        float prev_pdf = 0.0;   // BRDF-sampling pdf of the ray being traced (0: camera ray, no MIS)
+         for (uint bounce = 0; bounce <= c.max_bounces; ++bounce) {
+             Hit h = trace(accel, o, d, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst);
+             if (!h.ok) {
+-                radiance += throughput * (sp.sky.w > 0.5 ? sp.sky.xyz : cs.clear_color.rgb);
++                if (use_env) {
++                    float w = 1.0;
++                    if (prev_pdf > 0.0) { float pe = env_pdf(d, env_cdf, c); w = prev_pdf * prev_pdf / (prev_pdf * prev_pdf + pe * pe); }
++                    radiance += throughput * env_radiance(envmap, samp, d, c) * w;
++                } else {
++                    radiance += throughput * (sp.sky.w > 0.5 ? sp.sky.xyz : cs.clear_color.rgb);
++                }
+                 break;
+             }
+             Material m = mats[h.slot];
+@@ -161,6 +220,7 @@ kernel void path_trace(
+             float3 f0 = mix(float3(0.08 * specw), base, metallic);
+             float3 N = h.n; float3 V = -d;
+             if (bounce == 0 && s == 0) { depth0 = -dot(h.p - o, R[2]); normal0 = N; seg0 = int(h.slot) + 1; }
++            if (bounce == 0) albedo_sum += base;
+             radiance += throughput * emission * base;
+             // next-event estimation: model lights (directional and point/spot) with shadow rays
+             for (uint i = 0; i < c.n_light; ++i) {
+@@ -178,7 +238,22 @@ kernel void path_trace(
+                 if (NdotL <= 0.0 || att <= 0.0) continue;
+                 Hit sh = trace(accel, h.p + N * 0.001, L, tmax, inst_tab, slot_mesh, meshes, verts, indices, inst);
+                 if (sh.ok) continue;
+-                radiance += throughput * brdf(N, V, L, base, f0, metallic, a2) * NdotL * l.diffuse.xyz * (PI * att);
++                radiance += throughput * brdf(N, V, L, base, f0, metallic, a2) * NdotL * l.diffuse.xyz * (PI * att * c.light_scale);
++            }
++            // pd of the lobe mixture below, needed by the environment MIS weight
++            float pd = clamp((1.0 - metallic) * 0.5 + 0.5 * (1.0 - specw), 0.1, 0.95);
++            if (use_env) {   // next-event estimation on the environment map, MIS against BRDF sampling
++                float pe; float3 L = env_sample(env_cdf, c, rnd(rng), rnd(rng), pe);
++                float NdotL = dot(N, L);
++                if (NdotL > 0.0 && pe > 1e-8) {
++                    Hit sh = trace(accel, h.p + N * 0.001, L, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst);
++                    if (!sh.ok) {
++                        float3 Hm = normalize(L + V);
++                        float pb = pd * NdotL / PI + (1.0 - pd) * D_ggx(max(dot(N, Hm), 0.0), a2) * max(dot(N, Hm), 0.0) / (4.0 * max(dot(V, Hm), 1e-4));
++                        float w = pe * pe / (pe * pe + pb * pb);
++                        radiance += throughput * brdf(N, V, L, base, f0, metallic, a2) * NdotL * env_radiance(envmap, samp, L, c) * (w / pe);
++                    }
++                }
+             }
+             if (cs.light.w > 0.0) {   // per-env DR directional light
+                 float3 L = -normalize(cs.light.xyz);
+@@ -188,11 +263,9 @@ kernel void path_trace(
+                     if (!sh.ok) radiance += throughput * brdf(N, V, L, base, f0, metallic, a2) * NdotL * float3(PI * cs.light.w);
+                 }
+             }
+-            if (bounce == 0 && sp.hl_specular.w > 0.5)   // MuJoCo headlight on the primary hit (view-aligned, unshadowed)
++            if (bounce == 0 && sp.hl_specular.w > 0.5 && (c.flags & 8u) == 0u)   // MuJoCo headlight on the primary hit (view-aligned, unshadowed)
+                 radiance += throughput * brdf(N, V, V, base, f0, metallic, a2) * max(dot(N, V), 0.0) * sp.hl_diffuse.xyz * PI;
+             // sample the next direction: diffuse (cosine) or specular (GGX) lobe
+-            float pd = (1.0 - metallic) * 0.5 + 0.5 * (1.0 - specw);
+-            pd = clamp(pd, 0.1, 0.95);
+             float3 Lnew; float pdf;
+             if (rnd(rng) < pd) {
+                 Lnew = cosine_sample(N, rnd(rng), rnd(rng));
+@@ -216,6 +289,7 @@ kernel void path_trace(
+             float pdf_s = D_ggx(max(dot(N, Hm), 0.0), a2) * max(dot(N, Hm), 0.0) / (4.0 * max(dot(V, Hm), 1e-4));
+             float pdf_mix = pd * pdf_d + (1.0 - pd) * pdf_s;
+             throughput *= brdf(N, V, Lnew, base, f0, metallic, a2) * NdotL / max(pdf_mix, 1e-6);
++            prev_pdf = pdf_mix;
+             if (bounce >= 3) {   // Russian roulette
+                 float q = clamp(max(throughput.x, max(throughput.y, throughput.z)), 0.05, 0.95);
+                 if (rnd(rng) > q) break;
+@@ -223,6 +297,10 @@ kernel void path_trace(
+             }
+             o = h.p + N * 0.001; d = Lnew;
+         }
++        if (c.clamp_lum > 0.0) {   // firefly clamp (biased): rare high-energy paths on diffuse surfaces
++            float l = dot(radiance, float3(0.2126, 0.7152, 0.0722));
++            if (l > c.clamp_lum) radiance *= c.clamp_lum / l;
++        }
+         sum += radiance;
+     }
+     // progressive accumulation
+@@ -231,11 +309,14 @@ kernel void path_trace(
+     accum[a] += sum.x; accum[a + 1] += sum.y; accum[a + 2] += sum.z; accum[a + 3] += float(c.spp);
+     float inv = 1.0 / max(accum[a + 3], 1.0);
+     float3 col = float3(accum[a], accum[a + 1], accum[a + 2]) * inv * c.exposure;
++    if (c.flags & 4u) col = to_srgb(aces(col));
+     out_rgb[pix * 3 + 0] = uchar(clamp(col.x, 0.0f, 1.0f) * 255.0f + 0.5f);
+     out_rgb[pix * 3 + 1] = uchar(clamp(col.y, 0.0f, 1.0f) * 255.0f + 0.5f);
+     out_rgb[pix * 3 + 2] = uchar(clamp(col.z, 0.0f, 1.0f) * 255.0f + 0.5f);
+     if (c.flags & 1u) {
+         out_depth[pix] = depth0; out_seg[pix] = seg0;
+         out_normal[pix * 3] = normal0.x; out_normal[pix * 3 + 1] = normal0.y; out_normal[pix * 3 + 2] = normal0.z;
++        float3 alb = albedo_sum / float(c.spp);
++        out_albedo[pix * 3] = alb.x; out_albedo[pix * 3 + 1] = alb.y; out_albedo[pix * 3 + 2] = alb.z;
+     }
+ }
+diff --git a/metalsim/render/tier2.py b/metalsim/render/tier2.py
+index 9f1d52a..b6805c4 100644
+--- a/metalsim/render/tier2.py
++++ b/metalsim/render/tier2.py
+@@ -6,7 +6,9 @@ generation and validation, not rollouts: cost is spp x bounces rays per pixel.
+ 
+ Validation lives in tests/test_render_tier2.py: analytic Lambertian irradiance under a directional
+ light, white-furnace energy conservation, convergence with sample count, and agreement of the
+-direct-light term with tier 0.
++direct-light term with tier 0. With ``set_environment`` the sky becomes an equirectangular HDR
++image (background and image-based lighting), importance-sampled with MIS; its tests check the
++furnace under a constant map and that importance sampling leaves the estimate unbiased.
+ """
+ from __future__ import annotations
+ 
+@@ -23,9 +25,26 @@ from metalsim.render.tier0 import RenderOutputs
+ from metalsim.sensors.raytrace import RayTracer
+ 
+ 
++def env_sampling_table(hdr, grid=(512, 256)):
++    """Importance-sampling table of an equirectangular map on a (gw, gh) grid: pixel weight
++    luminance x sin(theta); returns ([marginal CDF (gh) | row CDFs (gh*gw) | density over (u, v)], gw, gh)."""
++    import cv2
++    hdr = np.asarray(hdr, np.float32)[..., :3]
++    gw, gh = min(grid[0], hdr.shape[1]), min(grid[1], hdr.shape[0])
++    small = cv2.resize(hdr, (gw, gh), interpolation=cv2.INTER_AREA)
++    lum = small @ np.array([0.2126, 0.7152, 0.0722], np.float32)
++    sin_t = np.sin((np.arange(gh) + 0.5) / gh * np.pi)[:, None]
++    w = np.maximum(lum, 1e-6 * max(float(lum.max()), 1e-6)) * sin_t          # never zero: MIS needs full support
++    row = w.sum(1)
++    marg = np.cumsum(row) / row.sum()
++    cond = np.cumsum(w, 1) / row[:, None]
++    density = w / w.sum() * (gw * gh)                                          # pdf over (u, v) in [0, 1]^2
++    return np.concatenate([marg, cond.ravel(), density.ravel()]).astype(np.float32), gw, gh
++
++
+ class Tier2Renderer:
+     def __init__(self, model, n_envs: int, *, width=256, height=256, camera=None, spp=4, max_bounces=4,
+-                 max_group=3, include_planes=True, decimate_faces=0, exposure=1.0, seed=0,
++                 max_group=3, include_planes=True, decimate_faces=0, exposure=1.0, seed=0, denoise=False,
+                  ctx: MetalContext | None = None, device="metal:0"):
+         import mujoco
+         self.m, self.n, self.tw, self.th = model, n_envs, width, height
+@@ -62,25 +81,36 @@ class Tier2Renderer:
+                                      label="pt_atlas", storage=Metal.MTLStorageModeShared)
+         c.upload_texture(self.atlas_tex, ai)
+         self.samp = c.sampler(linear=True, repeat=True)
+-        self.consts = np.zeros(16, np.uint32)
++        self.consts = np.zeros(24, np.uint32)
+         self.consts[:4] = (n_envs, width, height, max(model.ncam, 1))
+         self.consts[4:8] = (max(model.nlight, 1) if model.nlight else 0, self.G, spp, max_bounces)
+         self.consts[8:12] = (0, self.rt.tpr, 1, seed)
+-        cf = self.consts.view(np.float32); cf[12] = self.rt.stride; cf[13] = exposure
++        cf = self.consts.view(np.float32); cf[12] = self.rt.stride; cf[13] = exposure; cf[15] = 1.0; cf[20] = 1.0
+         self.consts_buf = c.buffer(self.consts.nbytes, self.consts, "pt_consts")
++        self._flags = 0          # bit1 env map, bit2 filmic + sRGB, bit3 headlight off (bit0 = reset, per pass)
++        self._set_env_resources(np.zeros((1, 1, 4), np.float32), np.zeros(3, np.float32))
+         self.spp, self.max_bounces = spp, max_bounces
+         self.frame = 0
+         n, h, w = n_envs, height, width
+         self._accum = wp.zeros((n, h, w, 4), dtype=wp.float32, device=device)
+         self._arrays = {"rgb": wp.zeros((n, h, w, 3), dtype=wp.uint8, device=device), "depth": wp.zeros((n, h, w), dtype=wp.float32, device=device),
+                         "seg": wp.zeros((n, h, w), dtype=wp.int32, device=device), "normal": wp.zeros((n, h, w, 3), dtype=wp.float32, device=device)}
++        self._albedo = wp.zeros((n, h, w, 3), dtype=wp.float32, device=device)
+         wp.synchronize_device(device)
++        self._albedo_view = wm.buffer_of(self._albedo)
+         self._views = {k: wm.buffer_of(a) for k, a in self._arrays.items()}
+         self._accum_view = wm.buffer_of(self._accum)
+         self.out = RenderOutputs(**{k: tb.mps_tensor(a) for k, a in self._arrays.items()})
+         self.t_accum = tb.mps_tensor(self._accum)
+         lib = c.library("pathtrace")
+         self.pipe = c.compute_pipeline(lib, "path_trace")
++        # denoiser (shaders/denoise.metal): demodulate -> 5 a-trous passes -> remodulate + tonemap
++        self.denoise = denoise
++        dl = c.library("denoise")
++        self.p_dn = {k: c.compute_pipeline(dl, k) for k in ("dn_prep", "dn_atrous", "dn_final")}
++        self._irr = [c.buffer(n * h * w * 16, label=f"pt_dn_irr{i}") for i in range(2)]
++        self._dn_hdr = c.buffer(n * h * w * 12, label="pt_dn_hdr")
++        self.dn_params = dict(sigma_n=64.0, sigma_z=0.02, sigma_l=0.25, passes=5)
+         nl = max(model.nlight, 1)
+         self._host_light_xpos = c.buffer(n * nl * 12); self._host_light_xdir = c.buffer(n * nl * 12)
+         self._host_cam_xpos = c.buffer(n * max(model.ncam, 1) * 12); self._host_cam_xmat = c.buffer(n * max(model.ncam, 1) * 36)
+@@ -92,7 +122,7 @@ class Tier2Renderer:
+ 
+     def _encode(self, cb, reset: bool, cam_xpos, cxo, cam_xmat, cmo, light_xpos, lxo, light_xdir, ldo):
+         self.consts[8] = self.frame
+-        self.consts[10] = 1 if reset else 0
++        self.consts[10] = (1 if reset else 0) | self._flags
+         ce = cb.computeCommandEncoder()
+         ce.setComputePipelineState_(self.pipe)
+         rt = self.rt
+@@ -110,11 +140,48 @@ class Tier2Renderer:
+         ce.setBuffer_offset_atIndex_(self._accum_view.buffer, self._accum_view.offset, 17)
+         for i, k in enumerate(("rgb", "depth", "seg", "normal")):
+             v = self._views[k]; ce.setBuffer_offset_atIndex_(v.buffer, v.offset, 18 + i)
+-        ce.setTexture_atIndex_(self.atlas_tex, 0); ce.setSamplerState_atIndex_(self.samp, 0)
++        ce.setBuffer_offset_atIndex_(self._env_cdf, 0, 22)
++        ce.setBuffer_offset_atIndex_(self._albedo_view.buffer, self._albedo_view.offset, 23)
++        ce.setTexture_atIndex_(self.atlas_tex, 0); ce.setTexture_atIndex_(self._env_tex, 1)
++        ce.setSamplerState_atIndex_(self.samp, 0)
+         ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.tw, self.th, self.n), Metal.MTLSize(8, 8, 1))
+         ce.endEncoding()
+         self.frame += 1
+ 
++    def _encode_denoise(self, cb):
++        dp = self.dn_params
++        cf = self.consts.view(np.float32)
++        dc = np.zeros(12, np.uint32); dcf = dc.view(np.float32)
++        dc[:3] = (self.n, self.tw, self.th)
++        dcf[4], dcf[5], dcf[7] = dp["sigma_n"], dp["sigma_z"], cf[13]
++        dc[8] = self._flags
++        grid, tg = Metal.MTLSize(self.tw, self.th, self.n), Metal.MTLSize(8, 8, 1)
++        acc, alb = self._accum_view, self._albedo_view
++        seg, nrm, dep = self._views["seg"], self._views["normal"], self._views["depth"]
++        ce = cb.computeCommandEncoder()
++        ce.setComputePipelineState_(self.p_dn["dn_prep"])
++        ce.setBuffer_offset_atIndex_(acc.buffer, acc.offset, 0); ce.setBuffer_offset_atIndex_(alb.buffer, alb.offset, 1)
++        ce.setBuffer_offset_atIndex_(self._irr[0], 0, 2); ce.setBytes_length_atIndex_(dc.tobytes(), dc.nbytes, 3)
++        ce.dispatchThreads_threadsPerThreadgroup_(grid, tg)
++        src = 0
++        for i in range(dp["passes"]):
++            dc[3] = 1 << i
++            dcf[6] = dp["sigma_l"] * (0.7 ** i)
++            ce.setComputePipelineState_(self.p_dn["dn_atrous"])
++            ce.setBuffer_offset_atIndex_(self._irr[src], 0, 0); ce.setBuffer_offset_atIndex_(self._irr[1 - src], 0, 1)
++            ce.setBuffer_offset_atIndex_(seg.buffer, seg.offset, 2); ce.setBuffer_offset_atIndex_(nrm.buffer, nrm.offset, 3)
++            ce.setBuffer_offset_atIndex_(dep.buffer, dep.offset, 4); ce.setBytes_length_atIndex_(dc.tobytes(), dc.nbytes, 5)
++            ce.dispatchThreads_threadsPerThreadgroup_(grid, tg)
++            src = 1 - src
++        ce.setComputePipelineState_(self.p_dn["dn_final"])
++        rgb = self._views["rgb"]
++        ce.setBuffer_offset_atIndex_(self._irr[src], 0, 0); ce.setBuffer_offset_atIndex_(alb.buffer, alb.offset, 1)
++        ce.setBuffer_offset_atIndex_(acc.buffer, acc.offset, 2); ce.setBuffer_offset_atIndex_(seg.buffer, seg.offset, 3)
++        ce.setBuffer_offset_atIndex_(rgb.buffer, rgb.offset, 4); ce.setBuffer_offset_atIndex_(self._dn_hdr, 0, 5)
++        ce.setBytes_length_atIndex_(dc.tobytes(), dc.nbytes, 6)
++        ce.dispatchThreads_threadsPerThreadgroup_(grid, tg)
++        ce.endEncoding()
++
+     def render(self, sim, after_value=None, reset=True, passes=1) -> int:
+         """GPU path from a BatchSim: refit + rebuild the acceleration structure, then ``passes`` path
+         tracing passes of ``spp`` samples each (progressive; ``reset`` restarts accumulation)."""
+@@ -129,10 +196,75 @@ class Tier2Renderer:
+         lxb, lxo, ldb, ldo = (lx.buffer, lx.offset, ld.buffer, ld.offset) if lx else (self._host_light_xpos, 0, self._host_light_xdir, 0)
+         for p in range(passes):
+             self._encode(cb, reset and p == 0, v["cam_xpos"].buffer, v["cam_xpos"].offset, v["cam_xmat"].buffer, v["cam_xmat"].offset, lxb, lxo, ldb, ldo)
++        if self.denoise:
++            self._encode_denoise(cb)
+         val = self.ctx.signal(cb)
+         self.ctx.commit(cb)
+         return val
+ 
++    # -- environment, output and per-episode scene edits ---------------------------------------------
++
++    def _set_env_resources(self, rgba, cdf):
++        c = self.ctx
++        self._env_tex = c.texture2d(rgba.shape[1], rgba.shape[0], Metal.MTLPixelFormatRGBA32Float, Metal.MTLTextureUsageShaderRead,
++                                    label="pt_envmap", storage=Metal.MTLStorageModeShared)
++        c.upload_texture(self._env_tex, np.ascontiguousarray(rgba, np.float32))
++        self._env_cdf = c.buffer(cdf.nbytes, np.ascontiguousarray(cdf, np.float32), "pt_env_cdf")
++
++    def set_environment(self, hdr, *, yaw=0.0, intensity=1.0, grid=(512, 256), key=None):
++        """Equirectangular HDR environment (H, W, 3) linear radiance, +z up, u = azimuth: the miss
++        radiance for every ray and an importance-sampled light. ``hdr=None`` restores the sky colour.
++        With ``key``, the GPU texture and sampling table are kept and reused for the same key."""
++        if hdr is None:
++            self._flags &= ~2
++            return
++        cache = self.__dict__.setdefault("_env_res", {})
++        if key is not None and key in cache:
++            self._env_tex, self._env_cdf, gw, gh = cache[key]
++        else:
++            hdr = np.asarray(hdr, np.float32)[..., :3]
++            rgba = np.concatenate([hdr, np.ones(hdr.shape[:2] + (1,), np.float32)], -1)
++            cdf, gw, gh = env_sampling_table(hdr, grid)
++            self._set_env_resources(rgba, cdf)
++            if key is not None:
++                cache[key] = (self._env_tex, self._env_cdf, gw, gh)
++        self.consts[16:18] = (gw, gh)
++        self._flags |= 2
++        self.set_environment_pose(yaw, intensity)
++
++    def set_environment_pose(self, yaw=0.0, intensity=1.0):
++        cf = self.consts.view(np.float32)
++        cf[14], cf[15] = yaw, intensity
++
++    def set_output(self, *, filmic=None, headlight=None, light_scale=None, exposure=None, clamp=None):
++        """filmic: ACES tonemap + sRGB encoding (photographic output); headlight: MuJoCo's view-aligned
++        headlight on primary hits; light_scale: multiplier on the model's lights; clamp: cap on each
++        path sample's luminance (removes fireflies at the cost of bias; 0 = off, the default)."""
++        cf = self.consts.view(np.float32)
++        if clamp is not None:
++            cf[21] = clamp
++        if filmic is not None:
++            self._flags = self._flags | 4 if filmic else self._flags & ~4
++        if headlight is not None:
++            self._flags = self._flags & ~8 if headlight else self._flags | 8
++        if light_scale is not None:
++            cf[20] = light_scale
++        if exposure is not None:
++            cf[13] = exposure
++
++    def set_fovy(self, fovy_deg, env=None):
++        """Change the vertical field of view (MuJoCo convention) for all envs or one."""
++        f = 0.5 * self.th / np.tan(np.radians(fovy_deg) / 2)
++        sl = slice(None) if env is None else slice(env, env + 1)
++        self.cam_spec[sl, 0:2] = f
++        self.t_cam_spec.copy_(torch.as_tensor(self.cam_spec))
++        torch.mps.synchronize()
++
++    def set_materials(self, materials):
++        """Replace the (G, 16) material table (layout: SceneTables.MATERIAL_LAYOUT)."""
++        self.tables.materials[:] = materials
++        self.ctx.write_buffer(self.rt.mat_buf, np.ascontiguousarray(self.tables.materials, np.float32))
++
+     def after(self, value):
+         """Order torch's subsequent kernels after the render that signalled ``value``."""
+         tb.wait_event(self.ctx.event, value)
+@@ -167,9 +299,14 @@ class Tier2Renderer:
+         rt._encode_refit_and_build(cb, rt._host_geom_xpos, 0, rt._host_geom_xmat, 0)
+         for p in range(passes):
+             self._encode(cb, reset and p == 0, self._host_cam_xpos, 0, self._host_cam_xmat, 0, self._host_light_xpos, 0, self._host_light_xdir, 0)
++        if self.denoise:
++            self._encode_denoise(cb)
+         c.commit(cb); c.synchronize()
+         out = {k: a.numpy().copy() for k, a in self._arrays.items()}
+         acc = self._accum.numpy()
+         out["hdr"] = acc[..., :3] / np.maximum(acc[..., 3:4], 1.0)
++        out["albedo"] = self._albedo.numpy().copy()
++        if self.denoise:   # "hdr" stays the raw estimate; "rgb" is the denoised, tonemapped image
++            out["hdr_denoised"] = MetalContext.buffer_array(self._dn_hdr, np.float32, (n, self.th, self.tw, 3)).copy()
+         out["samples"] = acc[..., 3].copy()
+         return out
+diff --git a/tests/test_render_tier2.py b/tests/test_render_tier2.py
+index 9e9562d..c4bc629 100644
+--- a/tests/test_render_tier2.py
++++ b/tests/test_render_tier2.py
+@@ -102,6 +102,116 @@ def test_white_furnace_uniform_sky():
+     assert hdr.std() < 0.05
+ 
+ 
++ENV_PLANE = """
++<mujoco>
++  <visual><headlight active="0" ambient="0 0 0"/></visual>
++  <asset><material name="white" rgba="1 1 1 1" specular="0" shininess="0"/></asset>
++  <worldbody>
++    <camera name="cam" pos="0 0 2" xyaxes="1 0 0 0 1 0" fovy="30"/>
++    <geom name="floor" type="plane" size="50 50 0.1" material="white"/>
++  </worldbody>
++</mujoco>
++"""
++
++
++def _env_irradiance_radiance(env):
++    """Outgoing radiance of a white Lambertian, upward-facing plane under an equirectangular map:
++    (1/pi) * sum over upper-hemisphere pixels of L * cos(theta) * d_omega."""
++    h, w = env.shape[:2]
++    th = (np.arange(h) + 0.5) / h * np.pi
++    d_omega = (2 * np.pi / w) * (np.pi / h) * np.sin(th)
++    cos_t = np.clip(np.cos(th), 0, None)
++    return (env * (cos_t * d_omega)[:, None, None]).sum((0, 1)) / np.pi
++
++
++def test_env_map_furnace():
++    """A constant environment map of radiance S behaves like the uniform sky: a white plane reflects S."""
++    model = mujoco.MjModel.from_xml_string(ENV_PLANE)
++    rend = Tier2Renderer(model, 1, width=64, height=64, camera="cam", spp=32, max_bounces=1)
++    rend.set_environment(np.full((64, 128, 3), 0.5, np.float32))
++    hdr = rend.render_host([_fwd(model)], passes=4)["hdr"][0]
++    print(f"env furnace: mean {hdr.mean():.4f} (expected 0.5000), pixel std {hdr.std():.4f}")
++    assert abs(hdr.mean() - 0.5) < 0.01
++
++
++def test_env_map_importance_sampling_unbiased():
++    """Under a map with a small, very bright patch (a window: 0.3 % of the sphere carrying most of the
++    energy) the MIS estimate (env NEE + BRDF sampling) matches the analytic plane radiance at any yaw,
++    and has several times less noise than the same estimator with a uniform sampling table."""
++    model = mujoco.MjModel.from_xml_string(ENV_PLANE)
++    env = np.full((128, 256, 3), 0.05, np.float32)
++    env[36:44, 40:52] = (60.0, 50.0, 40.0)                      # ~45 deg elevation
++    expected = _env_irradiance_radiance(env)
++    for yaw in (0.0, 1.3):
++        rend = Tier2Renderer(model, 1, width=48, height=48, camera="cam", spp=64, max_bounces=1, seed=3)
++        rend.set_environment(env, yaw=yaw)
++        hdr = rend.render_host([_fwd(model)], passes=4)["hdr"][0]
++        mean = hdr.reshape(-1, 3).mean(0)
++        rel_noise = float(hdr[..., 1].std() / hdr[..., 1].mean())
++        print(f"yaw {yaw}: mean {np.round(mean, 4)} expected {np.round(expected, 4)}, per-pixel rel. std {rel_noise:.3f}")
++        assert np.allclose(mean, expected, rtol=0.02)
++    # same map, sampling table of a constant map: still unbiased, much noisier
++    from metalsim.render.tier2 import env_sampling_table
++    flat = Tier2Renderer(model, 1, width=48, height=48, camera="cam", spp=64, max_bounces=1, seed=3)
++    flat.set_environment(env)
++    cdf, _, _ = env_sampling_table(np.ones_like(env))
++    flat._env_cdf = flat.ctx.buffer(cdf.nbytes, cdf, "pt_env_cdf_uniform")
++    hdr_u = flat.render_host([_fwd(model)], passes=4)["hdr"][0]
++    rel_u = float(hdr_u[..., 1].std() / hdr_u[..., 1].mean())
++    print(f"uniform table: mean {np.round(hdr_u.reshape(-1, 3).mean(0), 4)}, rel. std {rel_u:.3f} ({rel_u / rel_noise:.1f}x)")
++    assert np.allclose(hdr_u.reshape(-1, 3).mean(0), expected, rtol=0.05)
++    assert rel_u > 3 * rel_noise
++
++
++DENOISE_SCENE = """
++<mujoco>
++  <visual><headlight active="0" ambient="0 0 0"/></visual>
++  <asset>
++    <texture name="checker" type="2d" builtin="checker" rgb1="0.8 0.8 0.8" rgb2="0.2 0.25 0.3" width="256" height="256"/>
++    <material name="floor" texture="checker" texrepeat="8 8" specular="0.2" shininess="0.3"/>
++  </asset>
++  <worldbody>
++    <camera name="cam" pos="0.6 -0.6 0.5" quat="0.85 0.4 0.15 0.3"/>
++    <geom name="floor" type="plane" size="2 2 0.1" material="floor"/>
++    <body pos="0 0 0.05"><geom name="b1" type="box" size="0.06 0.04 0.05" rgba="0.9 0.2 0.2 1"/></body>
++    <body pos="0.15 0.1 0.05"><geom name="s1" type="sphere" size="0.05" rgba="0.2 0.8 0.2 1"/></body>
++    <body pos="-0.15 -0.1 0.08"><geom name="c1" type="cylinder" size="0.04 0.08" rgba="0.2 0.2 0.9 1"/></body>
++  </worldbody>
++</mujoco>
++"""
++
++
++def test_denoiser_against_reference():
++    """The a-trous denoiser (albedo-demodulated, edge-stopped on geom id / normal / depth / luminance)
++    brings a 16 spp render much closer to a 4096 spp reference of the same frame, without blurring
++    texture: relative RMSE vs the reference, and the checker texture's contrast is kept."""
++    model = mujoco.MjModel.from_xml_string(DENOISE_SCENE)
++    env = np.full((128, 256, 3), 0.3, np.float32)
++    env[20:34, 150:170] = 40.0                                       # a window: hard shadows, noise
++    d = _fwd(model)
++    def render(spp, passes, seed, denoise):
++        r = Tier2Renderer(model, 1, width=128, height=128, camera="cam", spp=spp, max_bounces=3, seed=seed, denoise=denoise)
++        r.set_environment(env)
++        return r.render_host([d], passes=passes)
++    ref = render(128, 32, 7, False)["hdr"][0]
++    out = render(16, 1, 1, True)
++    raw, den = out["hdr"][0], out["hdr_denoised"][0]
++    rel = lambda x: float(np.sqrt(np.mean((x - ref) ** 2)) / np.sqrt(np.mean(ref ** 2)))
++    floor = out["seg"][0] == 1
++    contrast = lambda x: float(np.std(x[floor].mean(-1)))           # checker texture + shading on the floor
++    print(f"relative RMSE vs 4096 spp: raw 16 spp {rel(raw):.3f}, denoised {rel(den):.3f}; "
++          f"floor contrast ref {contrast(ref):.4f} denoised {contrast(den):.4f}")
++    assert rel(den) < 0.4 * rel(raw)
++    assert abs(contrast(den) - contrast(ref)) < 0.1 * contrast(ref)
++    try:
++        import imageio.v2 as iio
++        tm = lambda x: (np.clip(x / (1 + x), 0, 1) ** (1 / 2.2) * 255).astype(np.uint8)
++        os.makedirs(OUT, exist_ok=True)
++        iio.imwrite(os.path.join(OUT, "tier2_denoise.png"), np.concatenate([tm(raw), tm(den), tm(ref)], axis=1))
++    except ImportError:
++        pass
++
++
+ def test_monte_carlo_convergence():
+     """Per-pixel noise between two independent renders falls as 1/sqrt(spp) in an indirectly-lit
+     region (a box on the plane under the sky, 2 bounces)."""
