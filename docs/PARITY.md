@@ -431,6 +431,14 @@ monitor's contact-penetration flags fall from 999 to 95 log points (2 cm thresho
 penetration is 1.64 vs 2.97 cm); the "joint limit violated by > 0.05 rad" flag fires every iteration in
 both runs (soft limits are penalties in Isaac's config too) and is not a difference between them.
 
+**Base-velocity point, confirming run (measured 2026-09-25 late evening, `runs/il3/g1_flat_flatcfg_com.log`):**
+the 2.3.2 ports had measured the base velocity (observation, lin-vel tracking, lin_vel_z) at the pelvis frame
+origin; Isaac's `root_lin_vel_b` is the pelvis COM velocity (`root_com_lin_vel_b`, 7.6 cm away). With the COM
+velocity (now the default, `base_velocity="com"`; "origin" archived) and otherwise the +28.4 settings (default
+contacts, seed 0): **+27.1 / 1000 at iteration 1000** (10.9 / 969 at 300, 19.2 / 991 at 500, 24.6 / 1000 at 750),
+inside the three-seed spread of the origin runs (26.9 ± 1.3) and next to Isaac's +27.3. The headline stands with
+the faithful velocity point.
+
 **Fixed PPO, demonstrated** (`runs/g1_flat_ppowarp_fixed.log`, MuJoCo Warp, 4096 envs, 1000 iterations,
 same config and seed, measured 2026-09-24, 25.3 K env-steps/s including the monitor):
 
@@ -818,7 +826,7 @@ records DomeLights as custom text `usd_dome` (file, intensity, exposure, colour,
 `Tier2Renderer.set_environment_from_model`; `Randomizer.environment` picks a map per episode by key (Isaac's
 Franka-stack dome randomization), GPU resources cached per key. **Measured**: constant-map furnace 0.5 ± 0.01;
 bright-window map (0.3 % of the sphere carrying most of the energy) within 2 % of the analytic plane radiance
-at two yaws, the uniform table [[NOISE]]× noisier; the parity presets without a map render **[[BITWISE]]**
+at two yaws, the uniform table 6.1× noisier; the parity presets without a map render **[[BITWISE]]**
 against the previous commit (`runs/render/envmap/`); cost with / without the map: camera-RL 1024 × 100×100
 4 spp 125.4 / 103.3 ms per 1024-frame batch (host path; +21 %); gallery 1024×768 32 spp 47.2 / 27.3 ms per frame, 676.6 / 343.9 ms at 512 spp (per spp 1.48 / 0.85 ms). Firefly clamp: opt-in only,
 biased (DECISIONS). Gallery: `g1_hdri_tier2.png`. Poly Haven CC0 maps are fetched, not committed.
