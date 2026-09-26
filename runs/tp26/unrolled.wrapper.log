@@ -1,0 +1,52 @@
+[gpu_run] tp26_unrolled start: device utilisation 0% (08:34:53)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   1.3 %
+=== start Sat Sep 26 08:34:56 PDT 2026 metalsim 5d21466 wt warp 2834cf31 mjw f4276b0 power: Now drawing from 'AC Power'
+--- check 08:34:56
+  factor: bitwise | solve: bitwise | solve residual vs dense M 3.3e-06
+  unrolled: factor DIFF max 5.72e-06 | solve on the serial factor: DIFF max 1.22e-04
+  chains (4 levels, 12 chains): factor rel diff vs serial 6.0e-07 (D 2.5e-08) | solve on the serial factor: bitwise | chain factor + chain solve residual vs dense M 4.0e-06
+Go2 menagerie (m_dense_max 0: all sparse): nM 117, levels 8, updates 99, lane pairs 81, sparse dofs 18 of 18
+  factor: bitwise | solve: bitwise | solve residual vs dense M 8.2e-07
+  unrolled: factor DIFF max 9.54e-07 | solve on the serial factor: DIFF max 1.53e-05
+  chains (2 levels, 5 chains): factor rel diff vs serial 1.3e-07 (D 9.3e-08) | solve on the serial factor: bitwise | chain factor + chain solve residual vs dense M 1.2e-06
+humanoid (dm) (m_dense_max 0: all sparse): nM 243, levels 14, updates 216, lane pairs 195, sparse dofs 27 of 27
+  factor: bitwise | solve: bitwise | solve residual vs dense M 5.3e-06
+  unrolled: factor DIFF max 1.14e-05 | solve on the serial factor: DIFF max 2.29e-05
+  chains (3 levels, 6 chains): factor rel diff vs serial 6.2e-07 (D 2.8e-07) | solve on the serial factor: bitwise | chain factor + chain solve residual vs dense M 7.0e-06
+FAILURES
+--- bench 08:35:10
+factor serial : 0.452 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+factor lanes  : 0.570 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+solve serial  : 0.205 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+solve lanes   : 0.265 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+factor chains : 0.645 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+solve chains  : 0.368 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+factor unrolled: 0.297 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+solve unrolled: 0.792 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+--- U1 unrolled 08:35:13
+Traceback (most recent call last):
+    raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
+RuntimeError: Metal error on device metal:0: Cannot synchronize device "Apple M4 Max" during graph capture
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+--- S1 serial 08:35:29
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[S1_serial] N=4096 njmax 144 naconmax 98304 is_sparse False
+[S1_serial] physics only 45.2 ms/step -> 90,657 env-steps/s
+[S1_serial] full env step 67.0 ms -> 61,149 env-steps/s
+[S1_serial] after random-action steps: nefc max 37 mean 14.5; nacon 11349 (2.77/world); overflow {'ITERATIONS': 25, 'LS_ITERATIONS': 3888}
+--- U2 unrolled 08:35:59
+Traceback (most recent call last):
+    raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
+RuntimeError: Metal error on device metal:0: Cannot synchronize device "Apple M4 Max" during graph capture
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+--- S2 serial 08:36:01
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[S2_serial] N=4096 njmax 144 naconmax 98304 is_sparse False
+[S2_serial] physics only 45.2 ms/step -> 90,713 env-steps/s
+[S2_serial] full env step 67.3 ms -> 60,895 env-steps/s
+[S2_serial] after random-action steps: nefc max 39 mean 14.4; nacon 11261 (2.75/world); overflow {'ITERATIONS': 25, 'LS_ITERATIONS': 3891}
+=== end Sat Sep 26 08:36:15 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] tp26_unrolled end: device utilisation 0% (08:36:15), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+lock held by tp26_chol64, not tp26_unrolled; not released
