@@ -404,7 +404,13 @@ porting anything; it needs the Warp backend to expose the ICB commands to a kern
 SIMD groups per world, one column per lane (43 registers instead of 86), the owner's unscaled column and pivot
 exchanged through the tile's own column storage with one threadgroup barrier per column, every lane forming the
 same `column[i] * (1/d)` products the 32-lane form broadcasts (bitwise expected), the register solve run by group
-0 with group 1 idling at the barriers. Bitwise A/B, cost split and the G1 step: `runs/tp26/chol64.wrapper.log`.
+0 with group 1 idling at the barriers. **Measured** (`runs/tp26/chol64.wrapper.log`): bitwise equal to the 32-lane
+form at n = 16..48 (factor and solve); cost per 4096, 32 vs 64 lanes: n = 43 factor 0.989 vs 0.998 ms, solve 0.326 vs
+0.239, factor + solve 1.030 vs 1.054; n = 48: 2.158 vs 2.052; n = 32: 0.200 vs 0.419. No gain at the G1's size: the
+43 threadgroup barriers cost what the halved per-lane work saves. Archived (DECISIONS). The n = 43 factorization
+stays the largest residual; what is left untried is a two-column-per-lane form whose second column starts at row
+32 *and* whose shuffle loop is split per column (the compact layout kept the two-column loop), and a two-world-
+per-threadgroup form to raise resident SIMD groups per core.
 
 Block split (31 body/leg + 12 finger dofs): the finger rows of H couple to their arm chain, the torso and the six
 root dofs, i.e. a full 12 x ~16 off-diagonal block, not low rank; the exact form is the Schur complement, measured
