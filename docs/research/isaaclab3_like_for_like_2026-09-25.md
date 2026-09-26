@@ -618,3 +618,77 @@ Throughput (training loop, env-steps/s):
 * Blow-ups: 34, all at iterations 11–13 (the same early transient as on rough, much smaller on flat); none after that.
   The superseded mixed-preset run had 44, 31 of them after iteration 1000.
 * Throughput 48.9 K env-steps/s median (M4 Max) vs Isaac 59.4 K (Newton) / 47.3 K (PhysX) on the L4.
+
+
+### 6.8 Corrected rough 3.0 run (`il3fix_rough_s0`, 2026-09-26 03:00–04:00)
+
+Same corrected preset; rough_il3 (0.1 m heightfield collision, exact scan), seed 0. Log `runs/il3/il3fix_rough_s0.log`,
+comparison `runs/il3/curves_il3fix_rough.md`.
+
+Isaac Lab 3.0 (newton_mjwarp; rsl_rl 5.4.1, last-100-episode means, 0-based it) vs MetalSim runs/il3/il3fix_rough_s0.log (PPOWarp, episodes finished in the iteration, 1-based it; ±5-iteration mean in brackets)
+| iteration | Isaac newton_mjwarp: length / return / lin track / yaw track / level | MetalSim: length / return / lin track / yaw track / level |
+|---|---|---|
+| 50 | 51 / -4.8 / 0.012 / 0.008 / 0.00 | 49 (49) / -5.1 (-5.0) / 0.011 / 0.007 / 0.00 |
+| 100 | 69 / -4.6 / 0.021 / 0.015 / 0.00 | 59 (60) / -4.6 (-4.6) / 0.018 / 0.012 / 0.00 |
+| 150 | 292 / -6.5 / 0.109 / 0.065 / 0.06 | 235 (245) / -7.1 (-7.1) / 0.069 / 0.051 / 0.00 |
+| 200 | 906 / -5.9 / 0.452 / 0.219 / 0.38 | 906 (924) / -9.3 (-9.2) / 0.404 / 0.214 / 0.18 |
+| 250 | 953 / -0.6 / 0.592 / 0.300 / 1.05 | 920 (937) / -3.9 (-4.1) / 0.548 / 0.262 / 0.78 |
+| 300 | 964 / +3.0 / 0.681 / 0.373 / 1.71 | 977 (974) / +0.3 (+0.1) / 0.662 / 0.323 / 1.47 |
+| 400 | 983 / +7.0 / 0.736 / 0.499 / 2.99 | 939 (969) / +2.4 (+3.0) / 0.694 / 0.407 / 2.87 |
+| 500 | 994 / +8.9 / 0.752 / 0.584 / 4.15 | 960 (969) / +3.5 (+3.6) / 0.695 / 0.468 / 4.01 |
+| 750 | 979 / +8.2 / 0.749 / 0.617 / 5.46 | 969 (969) / +3.4 (+3.4) / 0.688 / 0.540 / 5.47 |
+| 1000 | 973 / +8.9 / 0.762 / 0.657 / 5.48 | 937 (961) / +4.4 (+4.0) / 0.698 / 0.570 / 5.73 |
+| 1250 | 1000 / +11.6 / 0.795 / 0.722 / 5.74 | 970 (971) / +5.9 (+6.4) / 0.730 / 0.627 / 5.85 |
+| 1499 | 989 / +14.5 / 0.811 / 0.808 / 5.80 | 976 (976) / +8.4 (+8.2) / 0.745 / 0.681 / 5.96 |
+
+Per-term at iteration 1000 (Isaac: that iteration's log; MetalSim: ±5-iteration mean of the per-iteration episode means)
+| term | Isaac newton_mjwarp | MetalSim |
+|---|---|---|
+| track_lin_vel_xy_exp | +0.7616 | +0.6977 |
+| track_ang_vel_z_exp | +0.6573 | +0.5700 |
+| feet_air_time | +0.0041 | +0.0043 |
+| feet_slide | -0.0291 | -0.0357 |
+| joint_deviation (hip+arms+fingers+torso) | -0.2482 | -0.2652 |
+| flat_orientation_l2 | -0.0104 | -0.0166 |
+| action_rate_l2 | -0.5641 | -0.6017 |
+| termination_penalty | -0.0131 | -0.0177 |
+| lin_vel_z_l2 | +0.0000 | +0.0000 |
+| ang_vel_xy_l2 | -0.0407 | -0.0465 |
+| dof_torques_l2 | -0.0008 | -0.0008 |
+| dof_acc_l2 | -0.0282 | -0.0690 |
+| dof_pos_limits | -0.0204 | -0.0212 |
+| falls (base_contact fraction of episode ends) | 0.0569 | 0.0883 |
+
+Per-term at iteration 1499 (Isaac: that iteration's log; MetalSim: ±5-iteration mean of the per-iteration episode means)
+| term | Isaac newton_mjwarp | MetalSim |
+|---|---|---|
+| track_lin_vel_xy_exp | +0.8110 | +0.7448 |
+| track_ang_vel_z_exp | +0.8081 | +0.6806 |
+| feet_air_time | +0.0047 | +0.0053 |
+| feet_slide | -0.0270 | -0.0324 |
+| joint_deviation (hip+arms+fingers+torso) | -0.2489 | -0.2589 |
+| flat_orientation_l2 | -0.0101 | -0.0202 |
+| action_rate_l2 | -0.5331 | -0.5744 |
+| termination_penalty | -0.0024 | -0.0138 |
+| lin_vel_z_l2 | +0.0000 | +0.0000 |
+| ang_vel_xy_l2 | -0.0334 | -0.0403 |
+| dof_torques_l2 | -0.0007 | -0.0007 |
+| dof_acc_l2 | -0.0264 | -0.0600 |
+| dof_pos_limits | -0.0210 | -0.0220 |
+| falls (base_contact fraction of episode ends) | 0.0291 | 0.0688 |
+
+Throughput (training loop, env-steps/s):
+  Isaac newton_mjwarp: median 42,039 (L4), total iteration time 58.3 min over 1500 iterations
+  MetalSim: median 38,715 (M4 Max, incl. the monitor), 1500 iterations
+
+
+* **Return at 1499: +8.4 (±5 mean +8.2) vs Isaac Newton +14.5; terrain level 5.96 vs 5.80** (the superseded mixed run:
+  +6.1 / 5.70). The curriculum matches or exceeds Isaac's from iteration 750; the return stays 4.5–6 below from iteration
+  300 on.
+* Per term at 1499 the gap is yaw tracking −0.13 (0.681 vs 0.808), linear tracking −0.07, dof_acc −0.034 (2.3× Isaac's),
+  action rate −0.04, falls (termination −0.011; 6.9 % vs 2.9 % of episode ends), orientation −0.010, feet slide −0.005.
+  That sums to −0.31 per second, the whole gap.
+* Blow-ups 1,010: 823 in the early transient (iterations 10–14) and 187 late (1 at 751–900, 5 at 901–1050, then 41 / 60 / 80
+  per 150 iterations). That is fewer than the mixed run's late 849 but not zero, although the final policy played 500 steps
+  with this preset gave 0 (§6.2). The late ones are rare (≈0.5 % of finished episodes at the end) and still unclassified.
+* Throughput 38.7 K env-steps/s median vs Isaac 42.0 K on the L4.
