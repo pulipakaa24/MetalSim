@@ -1,0 +1,39 @@
+[gpu_run] e2_loop_ab start: device utilisation 0% (05:35:47)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+mujoco_warp: /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/__init__.py 9b4e96a METALSIM_CHANGES.md: elliptic incremental Newton path (a33c731, b895bff, b0150ac)
+== rep 1 recommended 05:35:50
+[recommended rep1] N=4096 njmax 144 naconmax 98304 is_sparse False
+[recommended rep1] physics only 49.1 ms/step -> 83,393 env-steps/s
+[recommended rep1] full env step 73.4 ms -> 55,791 env-steps/s
+[recommended rep1] after random-action steps: nefc max 42 mean 14.5; nacon 11303 (2.76/world); overflow {'ITERATIONS': 23, 'LS_ITERATIONS': 3872}
+[recommended rep1] rollout + inference 73.0 ms/step -> 56,097 env-steps/s
+[recommended rep1] PPO update 148 ms -> full loop 51,715 env-steps/s
+[recommended rep1] SUMMARY physics 83,393 | step 55,791 | rollout 56,097 | loop 51,715  (ms: physics 49.1, step 73.4, rollout/step 73.0, update 148)
+== rep 1 tau10_impact_hardlimits_ellip10 05:36:17
+[tau10_impact_hardlimits_ellip10 rep1] N=4096 njmax 112 naconmax 98304 is_sparse False
+[tau10_impact_hardlimits_ellip10 rep1] physics only 63.2 ms/step -> 64,807 env-steps/s
+[tau10_impact_hardlimits_ellip10 rep1] full env step 101.2 ms -> 40,488 env-steps/s
+[tau10_impact_hardlimits_ellip10 rep1] after random-action steps: nefc max 30 mean 11.6; nacon 11036 (2.69/world); overflow {'ITERATIONS': 663, 'LS_ITERATIONS': 3881}
+[tau10_impact_hardlimits_ellip10 rep1] rollout + inference 96.7 ms/step -> 42,378 env-steps/s
+[tau10_impact_hardlimits_ellip10 rep1] PPO update 147 ms -> full loop 39,857 env-steps/s
+[tau10_impact_hardlimits_ellip10 rep1] SUMMARY physics 64,807 | step 40,488 | rollout 42,378 | loop 39,857  (ms: physics 63.2, step 101.2, rollout/step 96.7, update 147)
+== rep 2 recommended 05:36:51
+[recommended rep2] N=4096 njmax 144 naconmax 98304 is_sparse False
+[recommended rep2] physics only 49.1 ms/step -> 83,423 env-steps/s
+[recommended rep2] full env step 73.5 ms -> 55,760 env-steps/s
+[recommended rep2] after random-action steps: nefc max 42 mean 14.2; nacon 11208 (2.74/world); overflow {'ITERATIONS': 22, 'LS_ITERATIONS': 3854}
+[recommended rep2] rollout + inference 72.9 ms/step -> 56,200 env-steps/s
+[recommended rep2] PPO update 143 ms -> full loop 51,955 env-steps/s
+[recommended rep2] SUMMARY physics 83,423 | step 55,760 | rollout 56,200 | loop 51,955  (ms: physics 49.1, step 73.5, rollout/step 72.9, update 143)
+== rep 2 tau10_impact_hardlimits_ellip10 05:37:17
+[tau10_impact_hardlimits_ellip10 rep2] N=4096 njmax 112 naconmax 98304 is_sparse False
+[tau10_impact_hardlimits_ellip10 rep2] physics only 63.3 ms/step -> 64,729 env-steps/s
+[tau10_impact_hardlimits_ellip10 rep2] full env step 101.5 ms -> 40,358 env-steps/s
+[tau10_impact_hardlimits_ellip10 rep2] after random-action steps: nefc max 32 mean 11.6; nacon 11170 (2.73/world); overflow {'ITERATIONS': 616, 'LS_ITERATIONS': 3853}
+[tau10_impact_hardlimits_ellip10 rep2] rollout + inference 96.9 ms/step -> 42,261 env-steps/s
+[tau10_impact_hardlimits_ellip10 rep2] PPO update 149 ms -> full loop 39,711 env-steps/s
+[tau10_impact_hardlimits_ellip10 rep2] SUMMARY physics 64,729 | step 40,358 | rollout 42,261 | loop 39,711  (ms: physics 63.3, step 101.5, rollout/step 96.9, update 149)
+[gpu_run] e2_loop_ab end: device utilisation 87% (05:37:51), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   1.7 %
+lock held by tp26_chains, not e2_loop_ab; not released
