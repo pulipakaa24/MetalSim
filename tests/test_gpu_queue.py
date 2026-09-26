@@ -35,3 +35,12 @@ def test_acquire_without_cmd_still_works():
     assert g.holder()["name"] == "t2" and g.holder()["cmd"] is None
     _main("release", "t2", "--pid", str(os.getpid()))
     assert g.holder() is None
+
+
+def test_exit_code_recorded_when_a_waiter_freed_the_holder():
+    _sandbox()
+    _main("acquire", "t3", "--kind", "low", "--minutes", "1", "--pid", str(os.getpid()))
+    g._release(force=True)                      # a waiter saw the dead pid first
+    _main("release", "t3", "--pid", str(os.getpid()), "--rc", "3")
+    ev = [json.loads(l) for l in open(g.HIST)]
+    assert [e["ev"] for e in ev] == ["grant", "release", "exit"] and ev[2]["rc"] == 3
