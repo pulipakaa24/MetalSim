@@ -1,0 +1,13 @@
+G1 rough PPO: N=4096 obs_dim 310 act_dim 37 rollout 24 x 12 iterations, engine mjwarp, physics dt 0.0025 (decimation 8), seed 0, reward_cfg rough_isaac, height-scan ray order xy, terrain collision boxes_local, height scan exact, solver_cfg isaaclab3_every_substep_cap20, contact_cfg recommended, base velocity com, feet-slide velocity com
+it    1 steps     98304 sps   19,547 | ep_ret   -6.58 ep_len   12.8 (n=4) | pg 0.071 vf 0.281 kl 0.8336 lr 1.0e-05
+[anomaly] it 1: KL 0.834 > 10x target: stale data or LR too high
+[anomaly] it 1: joint limit violated by 0.18 rad
+[anomaly] it 1: contact penetration 3.9 cm
+[anomaly] it 1: contact force 379396 N > 50x robot weight
+terrain it    1 mean_level 2.4875
+it    2 steps    196608 sps   18,014 | ep_ret   -7.52 ep_len   44.5 (n=85) | pg 0.223 vf 0.093 kl 53.2420 lr 1.0e-05
+[anomaly] it 2: KL 53.242 > 10x target: stale data or LR too high
+[anomaly] it 2: joint limit violated by 0.19 rad
+[anomaly] it 2: contact penetration 3.8 cm
+[anomaly] it 2: contact force 378534 N > 50x robot weight
+terrain it    2 mean_level 2.5078
