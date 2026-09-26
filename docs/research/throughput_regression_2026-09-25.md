@@ -9,7 +9,7 @@ the machine. This note settles it with interleaved back-to-back runs on the mach
 Every number below is measured on this machine through the timing queue (`scripts/gpu_run.sh ... timing`), on AC
 power, with the wrapper's per-process GPU log idle (0 %, no process at or above 1 %) at the start and end of every
 job; logs in `runs/mjw_tp/ab/` and `runs/mjw_tp/*.wrapper.log`, job scripts `runs/mjw_tp/job_ab1.sh`, `job_ab2.sh`,
-`job_cc.sh`, `job_gen.sh`.
+`job_cc.sh`, `job_cc2.sh`, `job_gen.sh`, `job_gen2.sh`.
 
 ## 1. What is actually installed here (a finding in itself)
 
@@ -120,9 +120,26 @@ the preset's owner should know that its solve is not only slower but also not fu
 10 iterations (a fidelity observation, not acted on here: the preset is a PhysX-parity decision and fidelity
 decides). Which part of the preset carries the cost (hard limits vs the 10 ms impact contacts) is in §3.2.
 
-### 3.2 Decomposition (`runs/mjw_tp/cc2.wrapper.log`)
+### 3.2 Decomposition (`runs/mjw_tp/cc2.wrapper.log`, 20:13–20:15, `g1_tp_variants.py --quick`, interleaved)
 
-(filled below)
+| `contact_cfg` | what it sets | physics only | full env step | `solver.solve` / substep | Newton cap hit |
+|---|---|---|---|---|---|
+| `default` (= None) | MuJoCo's contacts and limits (solref 20 ms, solimp 0.9–0.95) | 80,459 | **67,419** (60.8 ms) | 4.18 ms (§3.1) | none |
+| `hardlimits` (two runs) | default contacts + joint limits at solref 5 ms, solimp 0.99–0.999 over 1 mm | 80,324 / 80,456 | **55,737 / 55,698** (73.5 ms) | 5.67 ms | none |
+| `recommended` = `tau10_impact_hardlimits` | hard limits + contacts at 10 ms, impedance 0.9→0.999 over 5 mm | 80,588 | **54,178** (75.6 ms) | 5.71 ms (§3.1) | 22 worlds |
+| `tau10_imp99_hardlimits` (decision row's option d, "1.19×") | hard limits + contacts at 10 ms, impedance 0.99–0.999 | 76,633 | **42,840** (95.6 ms) | – | 733 worlds |
+
+The cost is the hard joint limits: they alone take the step from 60.8 to 73.5 ms (17 % of the 20 %), with the
+solve at 5.67 of the preset's 5.71 ms per substep, and without any Newton cap hits; the 10 ms impact contacts add
+the last 2 ms and the cap hits (22 worlds). The G1 has 37 limited hinges and random actions drive many of them
+into their limits; a limit row with a 5 ms time constant at a 2.5 ms step (2 dt, MuJoCo's documented floor) and
+0.99 impedance is a much stiffer constraint than a contact, so the Newton iterations converge more slowly across
+the batch. The stiffer contact variant (d) shows the same mechanism at full strength: 733 worlds at the cap and a
+1.57× step cost (its decision row measured 1.19× before the fast paths, for the same reason as the 1.02×).
+Nothing here is a code cost: same launches, same kernels; it is the work the constraint problem asks for. A cheaper
+hard-limit formulation with the same limit behaviour (e.g. limits at 5 ms but impedance below 0.99, or a wider
+impedance width) would have to be re-verified against the PhysX recordings by the preset's owner; it is not a
+throughput decision.
 
 ## 4. Generality: where the G1 fast paths apply (task D)
 
