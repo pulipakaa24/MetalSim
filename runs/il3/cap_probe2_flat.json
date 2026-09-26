@@ -1,0 +1,490 @@
+{
+ "terrain": "flat",
+ "contact_cfg": "recommended",
+ "caps": [
+  10,
+  20,
+  40,
+  100
+ ],
+ "points": [
+  {
+   "step": 19,
+   "max_niter_cap100": 14,
+   "worlds_at_cap100": 0,
+   "cap10": {
+    "worlds_hitting_cap": 26,
+    "max_dqpos": 0.011096298694610596,
+    "max_dqvel": 1.228545069694519,
+    "p99_dqvel": 0.0013452529674395919,
+    "median_dqvel": 6.496906280517578e-06,
+    "max_dqvel_in_hitting": 1.1113221645355225,
+    "worlds_dqvel_gt_0.01": 12,
+    "max_dqvel_in_non_hitting": 1.228545069694519
+   },
+   "cap20": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.00542643666267395,
+    "max_dqvel": 2.174997091293335,
+    "p99_dqvel": 0.00137243268545717,
+    "median_dqvel": 6.318092346191406e-06,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 12,
+    "max_dqvel_in_non_hitting": 2.174997091293335
+   },
+   "cap40": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.00823095440864563,
+    "max_dqvel": 5.027951717376709,
+    "p99_dqvel": 0.0013448238605633378,
+    "median_dqvel": 5.7220458984375e-06,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 8,
+    "max_dqvel_in_non_hitting": 5.027951717376709
+   },
+   "cap100": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.0068548694252967834,
+    "max_dqvel": 1.0741996765136719,
+    "p99_dqvel": 0.001280069351196289,
+    "median_dqvel": 7.361173629760742e-06,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 12,
+    "max_dqvel_in_non_hitting": 1.0741996765136719
+   }
+  },
+  {
+   "step": 39,
+   "max_niter_cap100": 13,
+   "worlds_at_cap100": 0,
+   "cap10": {
+    "worlds_hitting_cap": 23,
+    "max_dqpos": 0.02065323293209076,
+    "max_dqvel": 2.9972727298736572,
+    "p99_dqvel": 0.0012397706741467118,
+    "median_dqvel": 2.384185791015625e-07,
+    "max_dqvel_in_hitting": 0.12199342250823975,
+    "worlds_dqvel_gt_0.01": 7,
+    "max_dqvel_in_non_hitting": 2.9972727298736572
+   },
+   "cap20": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.0011279843747615814,
+    "max_dqvel": 0.08608722686767578,
+    "p99_dqvel": 0.0011132002109661698,
+    "median_dqvel": 0.0,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 1,
+    "max_dqvel_in_non_hitting": 0.08608722686767578
+   },
+   "cap40": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.01001797616481781,
+    "max_dqvel": 2.887446165084839,
+    "p99_dqvel": 0.0011969611514359713,
+    "median_dqvel": 0.0,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 6,
+    "max_dqvel_in_non_hitting": 2.887446165084839
+   },
+   "cap100": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.010017603635787964,
+    "max_dqvel": 2.913053035736084,
+    "p99_dqvel": 0.0012697160709649324,
+    "median_dqvel": 0.0,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 3,
+    "max_dqvel_in_non_hitting": 2.913053035736084
+   }
+  },
+  {
+   "step": 59,
+   "max_niter_cap100": 14,
+   "worlds_at_cap100": 0,
+   "cap10": {
+    "worlds_hitting_cap": 31,
+    "max_dqpos": 0.007698133587837219,
+    "max_dqvel": 0.4814836382865906,
+    "p99_dqvel": 0.0007436156156472862,
+    "median_dqvel": 9.5367431640625e-07,
+    "max_dqvel_in_hitting": 0.2081294059753418,
+    "worlds_dqvel_gt_0.01": 10,
+    "max_dqvel_in_non_hitting": 0.4814836382865906
+   },
+   "cap20": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.0075958967208862305,
+    "max_dqvel": 0.7587178945541382,
+    "p99_dqvel": 0.0006707131979055703,
+    "median_dqvel": 9.5367431640625e-07,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 3,
+    "max_dqvel_in_non_hitting": 0.7587178945541382
+   },
+   "cap40": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.007595062255859375,
+    "max_dqvel": 0.4814629554748535,
+    "p99_dqvel": 0.0006553232669830322,
+    "median_dqvel": 9.5367431640625e-07,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 3,
+    "max_dqvel_in_non_hitting": 0.4814629554748535
+   },
+   "cap100": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.0018967092037200928,
+    "max_dqvel": 0.7587035894393921,
+    "p99_dqvel": 0.0006065607303753495,
+    "median_dqvel": 9.5367431640625e-07,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 2,
+    "max_dqvel_in_non_hitting": 0.7587035894393921
+   }
+  },
+  {
+   "step": 79,
+   "max_niter_cap100": 14,
+   "worlds_at_cap100": 0,
+   "cap10": {
+    "worlds_hitting_cap": 27,
+    "max_dqpos": 0.0032241418957710266,
+    "max_dqvel": 0.534456729888916,
+    "p99_dqvel": 0.000608336937148124,
+    "median_dqvel": 1.430511474609375e-06,
+    "max_dqvel_in_hitting": 0.534456729888916,
+    "worlds_dqvel_gt_0.01": 13,
+    "max_dqvel_in_non_hitting": 0.2857375144958496
+   },
+   "cap20": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.0004193335771560669,
+    "max_dqvel": 0.027762413024902344,
+    "p99_dqvel": 0.0004981994861736894,
+    "median_dqvel": 1.430511474609375e-06,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 2,
+    "max_dqvel_in_non_hitting": 0.027762413024902344
+   },
+   "cap40": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.0027361102402210236,
+    "max_dqvel": 1.09503173828125,
+    "p99_dqvel": 0.0005087733152322471,
+    "median_dqvel": 1.430511474609375e-06,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 5,
+    "max_dqvel_in_non_hitting": 1.09503173828125
+   },
+   "cap100": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.0013880878686904907,
+    "max_dqvel": 0.28574228286743164,
+    "p99_dqvel": 0.0005481600528582931,
+    "median_dqvel": 1.430511474609375e-06,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 5,
+    "max_dqvel_in_non_hitting": 0.28574228286743164
+   }
+  },
+  {
+   "step": 99,
+   "max_niter_cap100": 13,
+   "worlds_at_cap100": 0,
+   "cap10": {
+    "worlds_hitting_cap": 27,
+    "max_dqpos": 0.004804298281669617,
+    "max_dqvel": 0.46342718601226807,
+    "p99_dqvel": 0.0005394220352172852,
+    "median_dqvel": 1.1920928955078125e-06,
+    "max_dqvel_in_hitting": 0.06950163841247559,
+    "worlds_dqvel_gt_0.01": 8,
+    "max_dqvel_in_non_hitting": 0.46342718601226807
+   },
+   "cap20": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.0011586546897888184,
+    "max_dqvel": 0.4634585380554199,
+    "p99_dqvel": 0.0005083799478597939,
+    "median_dqvel": 1.1920928955078125e-06,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 2,
+    "max_dqvel_in_non_hitting": 0.4634585380554199
+   },
+   "cap40": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.0012195929884910583,
+    "max_dqvel": 0.10173213481903076,
+    "p99_dqvel": 0.00045993327512405813,
+    "median_dqvel": 9.685754776000977e-07,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 3,
+    "max_dqvel_in_non_hitting": 0.10173213481903076
+   },
+   "cap100": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 3.25813889503479e-05,
+    "max_dqvel": 0.002323150634765625,
+    "p99_dqvel": 0.0004713117959909141,
+    "median_dqvel": 1.1129304766654968e-06,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 0,
+    "max_dqvel_in_non_hitting": 0.002323150634765625
+   }
+  },
+  {
+   "step": 119,
+   "max_niter_cap100": 16,
+   "worlds_at_cap100": 0,
+   "cap10": {
+    "worlds_hitting_cap": 33,
+    "max_dqpos": 0.00251181423664093,
+    "max_dqvel": 0.6775712966918945,
+    "p99_dqvel": 0.000585234141908586,
+    "median_dqvel": 1.6689300537109375e-06,
+    "max_dqvel_in_hitting": 0.3893330693244934,
+    "worlds_dqvel_gt_0.01": 16,
+    "max_dqvel_in_non_hitting": 0.6775712966918945
+   },
+   "cap20": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.0052751898765563965,
+    "max_dqvel": 0.6775345802307129,
+    "p99_dqvel": 0.00047947317943908274,
+    "median_dqvel": 1.430511474609375e-06,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 7,
+    "max_dqvel_in_non_hitting": 0.6775345802307129
+   },
+   "cap40": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.00251181423664093,
+    "max_dqvel": 0.6775708198547363,
+    "p99_dqvel": 0.00044877230538986623,
+    "median_dqvel": 1.430511474609375e-06,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 5,
+    "max_dqvel_in_non_hitting": 0.6775708198547363
+   },
+   "cap100": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.00251181423664093,
+    "max_dqvel": 0.6775288581848145,
+    "p99_dqvel": 0.0004341721651144326,
+    "median_dqvel": 1.430511474609375e-06,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 3,
+    "max_dqvel_in_non_hitting": 0.6775288581848145
+   }
+  },
+  {
+   "step": 139,
+   "max_niter_cap100": 12,
+   "worlds_at_cap100": 0,
+   "cap10": {
+    "worlds_hitting_cap": 31,
+    "max_dqpos": 0.0069626569747924805,
+    "max_dqvel": 1.986851692199707,
+    "p99_dqvel": 0.0006719112279824913,
+    "median_dqvel": 1.430511474609375e-06,
+    "max_dqvel_in_hitting": 0.05160355567932129,
+    "worlds_dqvel_gt_0.01": 10,
+    "max_dqvel_in_non_hitting": 1.986851692199707
+   },
+   "cap20": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.006960064172744751,
+    "max_dqvel": 1.1625690460205078,
+    "p99_dqvel": 0.0005259752506390214,
+    "median_dqvel": 1.430511474609375e-06,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 7,
+    "max_dqvel_in_non_hitting": 1.1625690460205078
+   },
+   "cap40": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.0069626569747924805,
+    "max_dqvel": 1.1626758575439453,
+    "p99_dqvel": 0.0005361080402508378,
+    "median_dqvel": 1.430511474609375e-06,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 8,
+    "max_dqvel_in_non_hitting": 1.1626758575439453
+   },
+   "cap100": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.006961643695831299,
+    "max_dqvel": 1.1626052856445312,
+    "p99_dqvel": 0.0005165338516235352,
+    "median_dqvel": 1.430511474609375e-06,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 6,
+    "max_dqvel_in_non_hitting": 1.1626052856445312
+   }
+  },
+  {
+   "step": 159,
+   "max_niter_cap100": 14,
+   "worlds_at_cap100": 0,
+   "cap10": {
+    "worlds_hitting_cap": 16,
+    "max_dqpos": 0.0027150511741638184,
+    "max_dqvel": 1.0861663818359375,
+    "p99_dqvel": 0.0005453944322653115,
+    "median_dqvel": 1.1920928955078125e-06,
+    "max_dqvel_in_hitting": 0.028652071952819824,
+    "worlds_dqvel_gt_0.01": 6,
+    "max_dqvel_in_non_hitting": 1.0861663818359375
+   },
+   "cap20": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.0027150511741638184,
+    "max_dqvel": 1.0861663818359375,
+    "p99_dqvel": 0.000553397461771965,
+    "median_dqvel": 1.1920928955078125e-06,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 4,
+    "max_dqvel_in_non_hitting": 1.0861663818359375
+   },
+   "cap40": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.0027150511741638184,
+    "max_dqvel": 1.0861663818359375,
+    "p99_dqvel": 0.0005326986429281533,
+    "median_dqvel": 1.1920928955078125e-06,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 5,
+    "max_dqvel_in_non_hitting": 1.0861663818359375
+   },
+   "cap100": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.0020390599966049194,
+    "max_dqvel": 0.5233263969421387,
+    "p99_dqvel": 0.00046616941108368337,
+    "median_dqvel": 1.1920928955078125e-06,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 5,
+    "max_dqvel_in_non_hitting": 0.5233263969421387
+   }
+  },
+  {
+   "step": 179,
+   "max_niter_cap100": 13,
+   "worlds_at_cap100": 0,
+   "cap10": {
+    "worlds_hitting_cap": 22,
+    "max_dqpos": 0.007359407842159271,
+    "max_dqvel": 1.20795476436615,
+    "p99_dqvel": 0.0005270481342449784,
+    "median_dqvel": 1.1995434761047363e-06,
+    "max_dqvel_in_hitting": 0.28054553270339966,
+    "worlds_dqvel_gt_0.01": 7,
+    "max_dqvel_in_non_hitting": 1.20795476436615
+   },
+   "cap20": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.0019125491380691528,
+    "max_dqvel": 0.7646797895431519,
+    "p99_dqvel": 0.0005393266910687089,
+    "median_dqvel": 1.1920928955078125e-06,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 6,
+    "max_dqvel_in_non_hitting": 0.7646797895431519
+   },
+   "cap40": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.0019125491380691528,
+    "max_dqvel": 0.7646797895431519,
+    "p99_dqvel": 0.0005408584838733077,
+    "median_dqvel": 1.1026859283447266e-06,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 6,
+    "max_dqvel_in_non_hitting": 0.7646797895431519
+   },
+   "cap100": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.0013990849256515503,
+    "max_dqvel": 0.5591249465942383,
+    "p99_dqvel": 0.0005271673435345292,
+    "median_dqvel": 1.1920928955078125e-06,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 8,
+    "max_dqvel_in_non_hitting": 0.5591249465942383
+   }
+  },
+  {
+   "step": 199,
+   "max_niter_cap100": 13,
+   "worlds_at_cap100": 0,
+   "cap10": {
+    "worlds_hitting_cap": 24,
+    "max_dqpos": 0.005642339587211609,
+    "max_dqvel": 2.2536683082580566,
+    "p99_dqvel": 0.0006128966924734414,
+    "median_dqvel": 1.430511474609375e-06,
+    "max_dqvel_in_hitting": 0.05808281898498535,
+    "worlds_dqvel_gt_0.01": 11,
+    "max_dqvel_in_non_hitting": 2.2536683082580566
+   },
+   "cap20": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.00563424825668335,
+    "max_dqvel": 2.2536683082580566,
+    "p99_dqvel": 0.0005296945455484092,
+    "median_dqvel": 1.2218952178955078e-06,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 11,
+    "max_dqvel_in_non_hitting": 2.2536683082580566
+   },
+   "cap40": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.005642339587211609,
+    "max_dqvel": 2.2536683082580566,
+    "p99_dqvel": 0.0005113601800985634,
+    "median_dqvel": 1.1920928955078125e-06,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 7,
+    "max_dqvel_in_non_hitting": 2.2536683082580566
+   },
+   "cap100": {
+    "worlds_hitting_cap": 0,
+    "max_dqpos": 0.00563424825668335,
+    "max_dqvel": 2.2536685466766357,
+    "p99_dqvel": 0.0004961967351846397,
+    "median_dqvel": 1.430511474609375e-06,
+    "max_dqvel_in_hitting": null,
+    "worlds_dqvel_gt_0.01": 5,
+    "max_dqvel_in_non_hitting": 2.2536685466766357
+   }
+  }
+ ],
+ "summary_cap10": {
+  "worlds_hitting_cap_mean_per_step": 26.0,
+  "max_dqpos": 0.02065323293209076,
+  "max_dqvel": 2.9972727298736572,
+  "p99_dqvel_max": 0.0013452529674395919,
+  "max_dqvel_in_hitting": 1.1113221645355225
+ },
+ "summary_cap20": {
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "max_dqpos": 0.0075958967208862305,
+  "max_dqvel": 2.2536683082580566,
+  "p99_dqvel_max": 0.00137243268545717,
+  "max_dqvel_in_hitting": 0.0
+ },
+ "summary_cap40": {
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "max_dqpos": 0.01001797616481781,
+  "max_dqvel": 5.027951717376709,
+  "p99_dqvel_max": 0.0013448238605633378,
+  "max_dqvel_in_hitting": 0.0
+ },
+ "summary_cap100": {
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "max_dqpos": 0.010017603635787964,
+  "max_dqvel": 2.913053035736084,
+  "p99_dqvel_max": 0.001280069351196289,
+  "max_dqvel_in_hitting": 0.0
+ }
+}

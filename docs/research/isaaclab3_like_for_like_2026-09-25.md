@@ -437,3 +437,77 @@ Between MetalSim's `flat_il3` / `rough_il3` run and Isaac Lab 3.0's `Isaac-Veloc
 | 2026-09-25 | Preset for the rough like-for-like run | isaaclab3 numerics (soft limits) on the 0.1 m heightfield: +6.1 at 1499 vs Isaac Newton +14.5, level 5.70 vs 5.80, 1,615 blow-ups; hard limits / MuJoCo defaults on the same task: not yet run | kept as run (it is Isaac's configuration); open: the limits-vs-contacts A/B | `solver_cfg="isaaclab3_hardlimits"` or none on `reward_cfg="rough_il3"` |
 | 2026-09-25 | Rough collision surface for the 3.0 Newton reference | exact boxes (2.3.2 rough port, matches PhysX's mesh) vs the 0.1 m heightfield (what Newton rasterizes in 3.0) | heightfield for `rough_il3` | `terrain_collision="boxes_local"` |
 
+
+
+## 6. Follow-ups (2026-09-25 evening – 2026-09-26)
+
+### 6.1 2.3.2 root velocity: the COM default holds the headline
+
+`G1VelocityTask(base_velocity="com")` is now the default on every config (`"origin"` archived). Confirming run
+`runs/il3/g1_flat_flatcfg_com.log`: flat 2.3.2 task, seed 0, 1000 iterations, contact_cfg "default", foot-origin slide
+velocity (the +28.4 run's config apart from the base velocity). Return at iteration 1000 (±5 mean): **+27.1** (+27.2) vs
+the origin seeds +28.4 / 26.3 / 26.0 (26.9 ± 1.3) and Isaac 2.3.2 +27.3. Every milestone is inside the seed spread (+11.1 at
+300, +19.4 at 500, +24.5 at 750); 0 blow-ups; 50.6 K env-steps/s.
+
+### 6.2 Mixed preset and the late rough blow-ups
+
+The superseded il3 runs combined Isaac's limit solref with the recommended preset's limit impedance (banner above). Per-env
+classification (`runs/il3/blowup_probe.py`, trained rough policy, 500 steps × 4096 envs):
+* mixed preset: 29 blow-ups, all finger joints (`*_six/four/one/two/five_joint`), median joint speed 507 rad/s before
+  blowing (55 % > 3× the 37 rad/s limit), median excursion 0.34 rad, penetration < 2 cm, no torso contact before;
+* corrected preset (`isaaclab3_every_substep_cap20`, and cap 100): **0 blow-ups**; flat 0 in both.
+
+Criterion: ours = any |qpos| or |qvel| > 1000 or non-finite after a control step (booked as a fall); Isaac 3.0 terminates
+only on time_out and torso contact > 1 N (`TerminationsCfg`). Isaac's Newton logs show no NaN or overflow messages.
+The iteration count never reached the cap (max 9–15) and there were no overflow flags.
+
+Newton's force-space limit conversion assumes the model's own dmax (0.95); with the preset's recorded impedance the
+per-world rescale after add_base_mass is consistent (§4 item 10).
+
+### 6.3 The early transient (iterations 10–14) is Isaac's contact stiffness on MuJoCo Warp's rough-terrain contacts
+
+Both rough runs blow up in the same deterministic profile (7 / 52 / 246 / 474 / 14 at iterations 10–14). Spawns are clean
+(0 worlds penetrating or within 2 cm; spawn z = sub-terrain origin + 0.74 m, as Isaac). A freshly initialised policy does
+not blow up in any variant (300 steps). 20-iteration trainings per single item (`runs/il3/early_*.log`, seed 0):
+
+| variant (on rough_il3 unless stated) | blow-ups, iterations 1–20 |
+|---|---|
+| isaaclab3_every_substep_cap20 (Isaac's settings) | 804 |
+| + hard joint limits | 681 |
+| + no 2 cm gap | 801 |
+| + cap 100 | 772 |
+| + il3 events off | 702 |
+| + MuJoCo default contact solref (0.02 / 1) and no gap (Isaac's limits and caps kept) | **0** |
+| contact_cfg "default" only (MuJoCo defaults) | **0** |
+| contact_cfg "recommended" only | 2 |
+| rough_isaac task (exact boxes) with Isaac's settings | 0, but 2 GPU timeouts, 379 kN contact forces, KL 34–53: unstable too |
+
+Only the contact solref separates: Isaac's (1.82 ms → 5 ms after refsafe, damping ratio 1.375) on MuJoCo Warp's
+heightfield (and box) contacts. Under it no episode ends for the first ~10 iterations: no torso contacts, value loss rising
+10 → 45, returns about −1.7 per step. The robots are held up and chattering, until the policy's early updates push some
+worlds over. On flat terrain the same settings are stable. Contact counts per foot after 1 s standing (MuJoCo C) are 2–8
+on the heightfield vs 2 on the plane, so contact multiplicity alone is not a demonstrated mechanism. **Mechanism
+unconfirmed**. What it establishes: Isaac's contact stiffness is not transferable to MuJoCo Warp's rough-terrain collision
+(Newton's own collision pipeline, which Isaac uses, is not reproduced; §2.1). The policy side (action statistics) of the
+2.3.2-task comparison could not be taken: that 12-iteration run hit GPU timeouts.
+
+### 6.4 Iteration cap under contact_cfg "recommended"
+
+`runs/il3/cap_probe2_{flat,rough}.json`: 4096 envs, random actions, 10 states each, one control step per cap vs cap 100.
+Cap 10 (the task's default) binds in 26 (flat) / 21.6 (rough) of 4096 worlds per step; 20 and 40 never (max 14–15
+iterations). The state difference to cap 100 is at the noise floor: re-running cap 100 from the reloaded state differs by
+up to 2.9 / 4.5 rad/s in some world, p99 0.0013 / 0.0006 rad/s. Cap 10 gives p99 0.0014 / 0.0006, and the largest
+difference in the worlds that hit it (1.1 / 1.75 rad/s) is below that floor. **The cap of 10 does not change states
+measurably**; raising it is not needed for fidelity. The reload itself is not bit-reproducible (the floor): a separate
+finding.
+
+### 6.5 Re-runs queued
+
+Corrected flat and rough 3.0 runs, 1500 iterations, seed 0, `isaaclab3_every_substep_cap20` (the corrected preset),
+one after the other (`il3fix_flat`, `il3fix_rough`). Rough keeps Isaac's contact solref (the faithful numerics) with the
+early transient documented above. The stable alternative is archived as `isaaclab3_every_substep_cap20_mjcontact`.
+
+| date | decision | options (numbers) | chosen | re-enable |
+|---|---|---|---|---|
+| 2026-09-26 | Contact solref for the rough 3.0 re-run | Isaac's (1.82 ms, 1.375): early transient 804 blow-ups at it 10–14, none after 150, none with the final policy; MuJoCo default (0.02, 1): 0 | Isaac's (fidelity to the reference's numerics; the transient is reported) | `solver_cfg="isaaclab3_every_substep_cap20_mjcontact"` |
+| 2026-09-26 | Iteration cap for contact_cfg "recommended" | 10: binds in ~20–26 of 4096 worlds per step, state difference at the noise floor; 20 / 40: never bind | 10 kept (no measurable effect) | `BatchSimOptions(solver_iterations=20)` |

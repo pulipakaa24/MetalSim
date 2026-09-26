@@ -1,0 +1,94 @@
+G1 rough PPO: N=4096 obs_dim 310 act_dim 37 rollout 24 x 20 iterations, engine mjwarp, physics dt 0.0025 (decimation 8), seed 0, reward_cfg rough_il3, height-scan ray order xy, terrain collision hfield, height scan exact, solver_cfg isaaclab3_every_substep_cap20, contact_cfg recommended, base velocity com, feet-slide velocity com, Isaac Lab 3.0 events False (backend newton_mjwarp), add_base_mass None
+it    1 steps     98304 sps   35,150 | ep_ret    0.00 ep_len    0.0 (n=0) | pg 0.145 vf 13.665 kl 2.3987 lr 1.0e-05
+[anomaly] it 1: KL 2.399 > 10x target: stale data or LR too high
+[anomaly] it 1: joint limit violated by 0.33 rad
+terrain it    1 mean_level 2.4866
+terms it    1 {"track_lin_vel_xy_exp": null, "track_ang_vel_z_exp": null, "feet_air_time": null, "feet_slide": null, "joint_deviation": null, "flat_orientation_l2": null, "action_rate_l2": null, "termination_penalty": null, "lin_vel_z_l2": null, "ang_vel_xy_l2": null, "dof_torques_l2": null, "dof_acc_l2": null, "dof_pos_limits": null, "episodes": 0, "base_contact": null, "pushes": 0}
+it    2 steps    196608 sps   27,026 | ep_ret    0.00 ep_len    0.0 (n=0) | pg 0.005 vf 9.644 kl 0.0126 lr 1.0e-05
+[anomaly] it 2: joint limit violated by 0.30 rad
+terrain it    2 mean_level 2.4866
+terms it    2 {"track_lin_vel_xy_exp": null, "track_ang_vel_z_exp": null, "feet_air_time": null, "feet_slide": null, "joint_deviation": null, "flat_orientation_l2": null, "action_rate_l2": null, "termination_penalty": null, "lin_vel_z_l2": null, "ang_vel_xy_l2": null, "dof_torques_l2": null, "dof_acc_l2": null, "dof_pos_limits": null, "episodes": 0, "base_contact": null, "pushes": 0}
+it    3 steps    294912 sps   28,231 | ep_ret    0.00 ep_len    0.0 (n=0) | pg 0.000 vf 10.325 kl 0.0078 lr 7.6e-05
+[anomaly] it 3: joint limit violated by 0.29 rad
+terrain it    3 mean_level 2.4866
+terms it    3 {"track_lin_vel_xy_exp": null, "track_ang_vel_z_exp": null, "feet_air_time": null, "feet_slide": null, "joint_deviation": null, "flat_orientation_l2": null, "action_rate_l2": null, "termination_penalty": null, "lin_vel_z_l2": null, "ang_vel_xy_l2": null, "dof_torques_l2": null, "dof_acc_l2": null, "dof_pos_limits": null, "episodes": 0, "base_contact": null, "pushes": 0}
+it    4 steps    393216 sps   28,972 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.002 vf 13.611 kl 0.0096 lr 2.6e-04
+[anomaly] it 4: joint limit violated by 0.28 rad
+terrain it    4 mean_level 2.4866
+terms it    4 {"track_lin_vel_xy_exp": null, "track_ang_vel_z_exp": null, "feet_air_time": null, "feet_slide": null, "joint_deviation": null, "flat_orientation_l2": null, "action_rate_l2": null, "termination_penalty": null, "lin_vel_z_l2": null, "ang_vel_xy_l2": null, "dof_torques_l2": null, "dof_acc_l2": null, "dof_pos_limits": null, "episodes": 0, "base_contact": null, "pushes": 0}
+it    5 steps    491520 sps   27,532 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.001 vf 15.694 kl 0.0126 lr 3.8e-04
+[anomaly] it 5: joint limit violated by 0.38 rad
+terrain it    5 mean_level 2.4866
+terms it    5 {"track_lin_vel_xy_exp": null, "track_ang_vel_z_exp": null, "feet_air_time": null, "feet_slide": null, "joint_deviation": null, "flat_orientation_l2": null, "action_rate_l2": null, "termination_penalty": null, "lin_vel_z_l2": null, "ang_vel_xy_l2": null, "dof_torques_l2": null, "dof_acc_l2": null, "dof_pos_limits": null, "episodes": 0, "base_contact": null, "pushes": 0}
+it    6 steps    589824 sps   27,506 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.000 vf 20.002 kl 0.0131 lr 3.8e-04
+[anomaly] it 6: joint limit violated by 0.27 rad
+terrain it    6 mean_level 2.4866
+terms it    6 {"track_lin_vel_xy_exp": null, "track_ang_vel_z_exp": null, "feet_air_time": null, "feet_slide": null, "joint_deviation": null, "flat_orientation_l2": null, "action_rate_l2": null, "termination_penalty": null, "lin_vel_z_l2": null, "ang_vel_xy_l2": null, "dof_torques_l2": null, "dof_acc_l2": null, "dof_pos_limits": null, "episodes": 0, "base_contact": null, "pushes": 0}
+it    7 steps    688128 sps   28,018 | ep_ret    0.00 ep_len    0.0 (n=0) | pg 0.000 vf 25.291 kl 0.0139 lr 3.8e-04
+[anomaly] it 7: joint limit violated by 0.31 rad
+terrain it    7 mean_level 2.4866
+terms it    7 {"track_lin_vel_xy_exp": null, "track_ang_vel_z_exp": null, "feet_air_time": null, "feet_slide": null, "joint_deviation": null, "flat_orientation_l2": null, "action_rate_l2": null, "termination_penalty": null, "lin_vel_z_l2": null, "ang_vel_xy_l2": null, "dof_torques_l2": null, "dof_acc_l2": null, "dof_pos_limits": null, "episodes": 0, "base_contact": null, "pushes": 0}
+it    8 steps    786432 sps   28,047 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.002 vf 32.533 kl 0.0137 lr 3.8e-04
+[anomaly] it 8: joint limit violated by 0.27 rad
+terrain it    8 mean_level 2.4866
+terms it    8 {"track_lin_vel_xy_exp": null, "track_ang_vel_z_exp": null, "feet_air_time": null, "feet_slide": null, "joint_deviation": null, "flat_orientation_l2": null, "action_rate_l2": null, "termination_penalty": null, "lin_vel_z_l2": null, "ang_vel_xy_l2": null, "dof_torques_l2": null, "dof_acc_l2": null, "dof_pos_limits": null, "episodes": 0, "base_contact": null, "pushes": 0}
+it    9 steps    884736 sps   27,527 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.004 vf 43.299 kl 0.0111 lr 3.8e-04
+[anomaly] it 9: joint limit violated by 0.51 rad
+terrain it    9 mean_level 2.4866
+terms it    9 {"track_lin_vel_xy_exp": null, "track_ang_vel_z_exp": null, "feet_air_time": null, "feet_slide": null, "joint_deviation": null, "flat_orientation_l2": null, "action_rate_l2": null, "termination_penalty": null, "lin_vel_z_l2": null, "ang_vel_xy_l2": null, "dof_torques_l2": null, "dof_acc_l2": null, "dof_pos_limits": null, "episodes": 0, "base_contact": null, "pushes": 0}
+it   10 steps    983040 sps   27,646 | ep_ret -501.36 ep_len  221.0 (n=1) | pg -0.001 vf 63.205 kl 0.0155 lr 2.6e-04 | blown 1 dropped 0
+[anomaly] it 10: joint limit violated by 0.42 rad
+terrain it   10 mean_level 2.4868
+terms it   10 {"track_lin_vel_xy_exp": 0.0, "track_ang_vel_z_exp": 0.02088, "feet_air_time": 0.0, "feet_slide": -0.00249, "joint_deviation": -0.17506, "flat_orientation_l2": -0.1137, "action_rate_l2": -0.08398, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -13.34942, "dof_torques_l2": -0.0017, "dof_acc_l2": -11.15999, "dof_pos_limits": -0.0026, "episodes": 1, "base_contact": 1.0, "pushes": 0}
+it   11 steps   1081344 sps   27,877 | ep_ret -369.01 ep_len  252.6 (n=36) | pg 0.000 vf 246.945 kl 0.0162 lr 5.1e-05 | blown 35 dropped 0
+[anomaly] it 11: joint speed 687 rad/s > 3x actuator velocity limit (37.0)
+[anomaly] it 11: joint limit violated by 1.28 rad
+terrain it   11 mean_level 2.4939
+terms it   11 {"track_lin_vel_xy_exp": 0.00042, "track_ang_vel_z_exp": 0.02213, "feet_air_time": 0.0, "feet_slide": -0.00237, "joint_deviation": -0.19751, "flat_orientation_l2": -0.13001, "action_rate_l2": -0.09881, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -13.34981, "dof_torques_l2": -0.00177, "dof_acc_l2": -4.49071, "dof_pos_limits": -0.00202, "episodes": 36, "base_contact": 1.0, "pushes": 0}
+it   12 steps   1179648 sps   27,466 | ep_ret -409.40 ep_len  275.1 (n=202) | pg 0.004 vf 1081.503 kl 0.0164 lr 1.0e-05 | blown 198 dropped 0
+[anomaly] it 12: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 12: joint speed 563 rad/s > 3x actuator velocity limit (37.0)
+[anomaly] it 12: joint limit violated by 2.73 rad
+terrain it   12 mean_level 2.5361
+terms it   12 {"track_lin_vel_xy_exp": 0.00027, "track_ang_vel_z_exp": 0.02397, "feet_air_time": 0.0, "feet_slide": -0.00287, "joint_deviation": -0.21548, "flat_orientation_l2": -0.14167, "action_rate_l2": -0.10773, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -14.7181, "dof_torques_l2": -0.00187, "dof_acc_l2": -5.10424, "dof_pos_limits": -0.00216, "episodes": 202, "base_contact": 1.0, "pushes": 0}
+it   13 steps   1277952 sps   27,093 | ep_ret -252.11 ep_len  301.8 (n=3490) | pg 0.004 vf 2741.682 kl 0.0099 lr 5.1e-05 | blown 452 dropped 0
+[anomaly] it 13: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 13: joint speed 887 rad/s > 3x actuator velocity limit (37.0)
+[anomaly] it 13: joint limit violated by 2.60 rad
+[anomaly] it 13: contact penetration 17.3 cm
+[anomaly] it 13: contact force 112517 N > 50x robot weight
+terrain it   13 mean_level 3.3440
+terms it   13 {"track_lin_vel_xy_exp": 0.0002, "track_ang_vel_z_exp": 0.03245, "feet_air_time": 0.0, "feet_slide": -0.00521, "joint_deviation": -0.23064, "flat_orientation_l2": -0.15383, "action_rate_l2": -0.11795, "termination_penalty": -0.20001, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -10.72207, "dof_torques_l2": -0.00174, "dof_acc_l2": -1.20401, "dof_pos_limits": -0.00248, "episodes": 3490, "base_contact": 1.0, "pushes": 0}
+it   14 steps   1376256 sps   27,068 | ep_ret -122.99 ep_len  171.3 (n=813) | pg -0.002 vf 10.242 kl 0.0115 lr 2.6e-04 | blown 16 dropped 0
+[anomaly] it 14: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 14: joint limit violated by 0.34 rad
+terrain it   14 mean_level 3.3464
+terms it   14 {"track_lin_vel_xy_exp": 0.00312, "track_ang_vel_z_exp": 0.01909, "feet_air_time": 2e-05, "feet_slide": -0.00461, "joint_deviation": -0.12123, "flat_orientation_l2": -0.08503, "action_rate_l2": -0.06722, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -5.29593, "dof_torques_l2": -0.00096, "dof_acc_l2": -0.39502, "dof_pos_limits": -0.00152, "episodes": 813, "base_contact": 1.0, "pushes": 0}
+it   15 steps   1474560 sps   26,764 | ep_ret   -7.60 ep_len   41.5 (n=3119) | pg -0.007 vf 1.516 kl 0.0131 lr 5.8e-04
+[anomaly] it 15: joint limit violated by 0.30 rad
+[anomaly] it 15: contact penetration 8.7 cm
+[anomaly] it 15: contact force 37813 N > 50x robot weight
+terrain it   15 mean_level 2.6533
+terms it   15 {"track_lin_vel_xy_exp": 0.00667, "track_ang_vel_z_exp": 0.00494, "feet_air_time": 3e-05, "feet_slide": -0.00301, "joint_deviation": -0.01087, "flat_orientation_l2": -0.01503, "action_rate_l2": -0.01663, "termination_penalty": -0.20001, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.12569, "dof_torques_l2": -0.00018, "dof_acc_l2": -0.01995, "dof_pos_limits": -0.00038, "episodes": 3119, "base_contact": 1.0, "pushes": 0}
+it   16 steps   1572864 sps   26,381 | ep_ret   -8.70 ep_len   45.6 (n=1938) | pg -0.003 vf 0.562 kl 0.0115 lr 2.6e-04
+[anomaly] it 16: joint limit violated by 0.31 rad
+terrain it   16 mean_level 2.2744
+terms it   16 {"track_lin_vel_xy_exp": 0.00706, "track_ang_vel_z_exp": 0.00535, "feet_air_time": 3e-05, "feet_slide": -0.00331, "joint_deviation": -0.01249, "flat_orientation_l2": -0.01575, "action_rate_l2": -0.01838, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.17186, "dof_torques_l2": -0.0002, "dof_acc_l2": -0.02508, "dof_pos_limits": -0.00042, "episodes": 1938, "base_contact": 1.0, "pushes": 0}
+it   17 steps   1671168 sps   26,392 | ep_ret   -6.55 ep_len   42.9 (n=2482) | pg -0.003 vf 0.450 kl 0.0137 lr 5.8e-04
+[anomaly] it 17: joint limit violated by 0.33 rad
+terrain it   17 mean_level 1.8083
+terms it   17 {"track_lin_vel_xy_exp": 0.00702, "track_ang_vel_z_exp": 0.00519, "feet_air_time": 4e-05, "feet_slide": -0.00331, "joint_deviation": -0.0104, "flat_orientation_l2": -0.01445, "action_rate_l2": -0.0174, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.07486, "dof_torques_l2": -0.00018, "dof_acc_l2": -0.01856, "dof_pos_limits": -0.00039, "episodes": 2482, "base_contact": 1.0, "pushes": 0}
+it   18 steps   1769472 sps   26,241 | ep_ret   -6.80 ep_len   41.9 (n=2380) | pg 0.003 vf 0.314 kl 0.0153 lr 7.6e-05
+[anomaly] it 18: joint limit violated by 0.27 rad
+terrain it   18 mean_level 1.4238
+terms it   18 {"track_lin_vel_xy_exp": 0.00698, "track_ang_vel_z_exp": 0.00513, "feet_air_time": 3e-05, "feet_slide": -0.00318, "joint_deviation": -0.0103, "flat_orientation_l2": -0.01437, "action_rate_l2": -0.01707, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.08688, "dof_torques_l2": -0.00018, "dof_acc_l2": -0.01962, "dof_pos_limits": -0.0004, "episodes": 2380, "base_contact": 1.0, "pushes": 0}
+it   19 steps   1867776 sps   25,920 | ep_ret   -6.19 ep_len   42.2 (n=2288) | pg -0.004 vf 0.195 kl 0.0091 lr 3.8e-04
+[anomaly] it 19: joint limit violated by 0.29 rad
+terrain it   19 mean_level 1.1001
+terms it   19 {"track_lin_vel_xy_exp": 0.00717, "track_ang_vel_z_exp": 0.0051, "feet_air_time": 4e-05, "feet_slide": -0.00323, "joint_deviation": -0.00996, "flat_orientation_l2": -0.01397, "action_rate_l2": -0.01729, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.05862, "dof_torques_l2": -0.00017, "dof_acc_l2": -0.01806, "dof_pos_limits": -0.00041, "episodes": 2288, "base_contact": 1.0, "pushes": 0}
+it   20 steps   1966080 sps   25,912 | ep_ret   -6.46 ep_len   42.3 (n=2369) | pg -0.004 vf 0.129 kl 0.0130 lr 5.8e-04
+[anomaly] it 20: joint limit violated by 0.26 rad
+[anomaly] it 20: contact penetration 2.1 cm
+terrain it   20 mean_level 0.8059
+terms it   20 {"track_lin_vel_xy_exp": 0.00718, "track_ang_vel_z_exp": 0.00509, "feet_air_time": 4e-05, "feet_slide": -0.00327, "joint_deviation": -0.01018, "flat_orientation_l2": -0.01415, "action_rate_l2": -0.01733, "termination_penalty": -0.2, "lin_vel_z_l2": 0.0, "ang_vel_xy_l2": -0.07138, "dof_torques_l2": -0.00018, "dof_acc_l2": -0.01849, "dof_pos_limits": -0.00041, "episodes": 2369, "base_contact": 1.0, "pushes": 0}
+saved policy to runs/il3/ckpt/early_noevents.pt

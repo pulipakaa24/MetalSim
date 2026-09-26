@@ -1,0 +1,147 @@
+== Fri Sep 25 23:48:58 PDT 2026
+holder: {"name": "il3_policy_side", "kind": "train", "minutes": 15.0, "pid": 67621, "start": 1790405337.9466581, "queued": 1790401532.6597466, "cmd": "runs/il3/run_policy_side.sh", "cwd": "/Users/aditya/robosim"}
+  waiting [low] kamino_tests_fork est 40.0 min, queued 31810 s ago
+  waiting [low] kamino_tests_152 est 30.0 min, queued 30981 s ago
+  waiting [low] cl_kamino est 45.0 min, queued 29650 s ago
+  waiting [low] cl_mjw est 40.0 min, queued 29626 s ago
+/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  warnings.warn(
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 26.51 ms  (cached)
+Module _nxn_broadphase__locals__kernel_28decaf1 28decaf load on device 'metal:0' took 19.85 ms  (cached)
+Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_b3132664 b313266 load on device 'metal:0' took 24.32 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_d21969d4 d21969d load on device 'metal:0' took 27.36 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_78310433 7831043 load on device 'metal:0' took 25.30 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_0db2ba1e 0db2ba1 load on device 'metal:0' took 17.54 ms  (cached)
+Module mujoco_warp._src.constraint f5f4518 load on device 'metal:0' took 16.24 ms  (cached)
+Module _friction_dof__locals__kernel_0bb9a331 0bb9a33 load on device 'metal:0' took 16.07 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_914cb5e1 914cb5e load on device 'metal:0' took 16.55 ms  (cached)
+Module _efc_contact_init__locals__kernel_03ee81b4 03ee81b load on device 'metal:0' took 16.17 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_16824443 e86c3ac load on device 'metal:0' took 16.59 ms  (cached)
+Module _efc_contact_update__locals__kernel_89d497ae 89d497a load on device 'metal:0' took 16.38 ms  (cached)
+Module mujoco_warp._src.forward 4772766 load on device 'metal:0' took 22.86 ms  (cached)
+Module mujoco_warp._src.passive 9e93f67 load on device 'metal:0' took 21.43 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_8ed29e9b 8ed29e9 load on device 'metal:0' took 16.22 ms  (cached)
+Module mujoco_warp._src.forward d28e0c7 load on device 'metal:0' took 22.22 ms  (cached)
+Module _qfrc_smooth__locals__kernel_08dfc9ad 08dfc9a load on device 'metal:0' took 16.23 ms  (cached)
+Module mujoco_warp._src.support 040f2c5 load on device 'metal:0' took 16.47 ms  (cached)
+Module _factor_i_sparse_serial__locals__kernel_bbc34dce 0938022 load on device 'metal:0' took 16.94 ms  (cached)
+Module _solve_LD_sparse_serial__locals__kernel_da14e052 352f4b8 load on device 'metal:0' took 16.81 ms  (cached)
+Module _solve_init_dof__locals__kernel_8e985b01 8e985b0 load on device 'metal:0' took 16.35 ms  (cached)
+Module mujoco_warp._src.solver 118abcd load on device 'metal:0' took 17.83 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_7c1132c5 7c1132c load on device 'metal:0' took 16.17 ms  (cached)
+Module mul_m_kernel__locals___mul_m_505d9f1c 505d9f1 load on device 'metal:0' took 16.30 ms  (cached)
+Module _update_constraint_efc__locals__kernel_55fc5219 55fc521 load on device 'metal:0' took 16.55 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_6f502a20 6f502a2 load on device 'metal:0' took 16.19 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_86f1e084 86f1e08 load on device 'metal:0' took 16.01 ms  (cached)
+Module _update_gradient_grad__locals__kernel_e5baa4a1 e5baa4a load on device 'metal:0' took 16.40 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_712c31a5 8925ee6 load on device 'metal:0' took 16.31 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_ad48cc59 0434274 load on device 'metal:0' took 16.34 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_76ff806c bfdf7e9 load on device 'metal:0' took 17.50 ms  (cached)
+Module _update_constraint_efc__locals__kernel_3649f6fe 3649f6f load on device 'metal:0' took 16.57 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_20171f2f 20171f2 load on device 'metal:0' took 16.56 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_67211e0e 67211e0 load on device 'metal:0' took 16.88 ms  (cached)
+Module _update_gradient_grad__locals__kernel_7aee5faa 7aee5fa load on device 'metal:0' took 16.28 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_ff0e6fb9 f5091d7 load on device 'metal:0' took 16.41 ms  (cached)
+Module _solve_done__locals__kernel_d351f953 d351f95 load on device 'metal:0' took 16.21 ms  (cached)
+Module mujoco_warp._src.sensor c2b0248 load on device 'metal:0' took 27.10 ms  (cached)
+Module mujoco_warp._src.derivative 356952f load on device 'metal:0' took 19.11 ms  (cached)
+Module _next_time_builder__locals___next_time_bd97507a bd97507 load on device 'metal:0' took 16.31 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_f05e0f72 f05e0f7 load on device 'metal:0' took 16.23 ms  (cached)
+Module reset_data__locals__reset_M_debb12fa debb12f load on device 'metal:0' took 16.13 ms  (cached)
+Module reset_data__locals__reset_mocap_d5f6a172 d5f6a17 load on device 'metal:0' took 16.45 ms  (cached)
+Module reset_data__locals__reset_contact_10be067b 10be067 load on device 'metal:0' took 16.36 ms  (cached)
+Module reset_data__locals__reset_sleep_4c0bb4a4 4c0bb4a load on device 'metal:0' took 16.86 ms  (cached)
+Module reset_data__locals__reset_nworld_f0ec89aa f0ec89a load on device 'metal:0' took 16.72 ms  (cached)
+Module metalsim.sensors.contact 8b280a6 load on device 'metal:0' took 19.88 ms  (cached)
+Module metalsim.learn.terrain 595c542 load on device 'metal:0' took 18.83 ms  (cached)
+G1 rough PPO: N=4096 obs_dim 310 act_dim 37 rollout 24 x 12 iterations, engine mjwarp, physics dt 0.0025 (decimation 8), seed 0, reward_cfg rough_isaac, height-scan ray order xy, terrain collision boxes_local, height scan exact, solver_cfg isaaclab3_every_substep_cap20, contact_cfg recommended, base velocity com, feet-slide velocity com
+Module __main__ 0bfe64b load on device 'metal:0' took 23.30 ms  (cached)
+Module metalsim.learn.warp_policy a9b40e0 load on device 'metal:0' took 18.03 ms  (cached)
+it    1 steps     98304 sps   19,547 | ep_ret   -6.58 ep_len   12.8 (n=4) | pg 0.071 vf 0.281 kl 0.8336 lr 1.0e-05
+[anomaly] it 1: KL 0.834 > 10x target: stale data or LR too high
+[anomaly] it 1: joint limit violated by 0.18 rad
+[anomaly] it 1: contact penetration 3.9 cm
+[anomaly] it 1: contact force 379396 N > 50x robot weight
+terrain it    1 mean_level 2.4875
+Error: command buffer exited with error status.
+	The Metal Performance Shaders operations encoded on it may not have completed.
+	Error: 
+	(null)
+	Caused GPU Timeout Error (00000002:kIOGPUCommandBufferCallbackErrorTimeout)
+	<AGXG16XFamilyCommandBuffer: 0x723c89f80>
+    label = <none> 
+    device = <AGXG16CDevice: 0x1039b8e70>
+        name = Apple M4 Max 
+    commandQueue = <AGXG16XFamilyCommandQueue: 0x71da4c000>
+        label = <none> 
+        device = <AGXG16CDevice: 0x1039b8e70>
+            name = Apple M4 Max 
+    retainedReferences = 1
+it    2 steps    196608 sps   18,014 | ep_ret   -7.52 ep_len   44.5 (n=85) | pg 0.223 vf 0.093 kl 53.2420 lr 1.0e-05
+[anomaly] it 2: KL 53.242 > 10x target: stale data or LR too high
+[anomaly] it 2: joint limit violated by 0.19 rad
+[anomaly] it 2: contact penetration 3.8 cm
+[anomaly] it 2: contact force 378534 N > 50x robot weight
+terrain it    2 mean_level 2.5078
+Error: command buffer exited with error status.
+	The Metal Performance Shaders operations encoded on it may not have completed.
+	Error: 
+	(null)
+	Caused GPU Timeout Error (00000002:kIOGPUCommandBufferCallbackErrorTimeout)
+	<AGXG16XFamilyCommandBuffer: 0x723c88a80>
+    label = <none> 
+    device = <AGXG16CDevice: 0x1039b8e70>
+        name = Apple M4 Max 
+    commandQueue = <AGXG16XFamilyCommandQueue: 0x71da4c000>
+        label = <none> 
+        device = <AGXG16CDevice: 0x1039b8e70>
+            name = Apple M4 Max 
+    retainedReferences = 1
+Error: command buffer exited with error status.
+	The Metal Performance Shaders operations encoded on it may not have completed.
+	Error: 
+	(null)
+	Ignored (for causing prior/excessive GPU errors) (00000004:kIOGPUCommandBufferCallbackErrorSubmissionsIgnored)
+	<AGXG16XFamilyCommandBuffer: 0x723c88e00>
+    label = <none> 
+    device = <AGXG16CDevice: 0x1039b8e70>
+        name = Apple M4 Max 
+    commandQueue = <AGXG16XFamilyCommandQueue: 0x71da4c000>
+        label = <none> 
+        device = <AGXG16CDevice: 0x1039b8e70>
+            name = Apple M4 Max 
+    retainedReferences = 1
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/aditya/robosim/metalsim/learn/g1_velocity.py", line 1033, in <module>
+    train_g1(n, terrain, int(sys.argv[4]) if len(sys.argv) > 4 else 1500, log_path=sys.argv[5] if len(sys.argv) > 5 else None,
+  File "/Users/aditya/robosim/metalsim/learn/g1_velocity.py", line 1008, in train_g1
+    algo.train(log=log, callback=cb, monitor=mon)
+  File "/Users/aditya/robosim/metalsim/learn/ppo_warp.py", line 295, in train
+    stats = self.update()
+            ^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/metalsim/learn/ppo_warp.py", line 253, in update
+    d = torch.distributions.Normal(mean, self.net.log_std.exp())
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/distributions/normal.py", line 66, in __init__
+    super().__init__(batch_shape, validate_args=validate_args)
+  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/distributions/distribution.py", line 77, in __init__
+    raise ValueError(
+ValueError: Expected parameter loc (Tensor of shape (24576, 37)) of distribution Normal(loc: torch.Size([24576, 37]), scale: torch.Size([24576, 37])) to satisfy the constraint Real(), but found invalid values:
+tensor([[0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        ...,
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.],
+        [0., 0., 0.,  ..., 0., 0., 0.]], device='mps:0',
+       grad_fn=<LinearBackward0>)
+exit 1 Fri Sep 25 23:49:21 PDT 2026
