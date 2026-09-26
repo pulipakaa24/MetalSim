@@ -439,6 +439,24 @@ contacts, seed 0): **+27.1 / 1000 at iteration 1000** (10.9 / 969 at 300, 19.2 /
 inside the three-seed spread of the origin runs (26.9 ± 1.3) and next to Isaac's +27.3. The headline stands with
 the faithful velocity point.
 
+**Elliptic friction cones, confirming run (measured 2026-09-25 night, `runs/il3/g1_flat_flatcfg_ellip10.log`,
+policy `runs/il3/ckpt/g1_flat_flatcfg_ellip10.pt`):** the COM run's settings with `contact_cfg =
+tau10_impact_hardlimits_ellip10` (the recommended preset plus elliptic cones, impratio 10; the cheap cone
+kernel of fork `c301880`, §1.4), seed 0, 1000 iterations. Return / episode length: −5.1 / 83 at iteration 100,
+−5.9 / 926 at 200, 9.8 / 999.5 at 300, 18.5 / 989 at 500, 23.8 / 972 at 750 (23.85 / 1000 at 700), 26.7 / 1000 at 900,
+**+26.31 / 989.9 (n = 40) at 1000**. Next to it, same PPO and seed: +27.1 (COM run, default contacts), +27.85
+(recommended preset), 28.4 / 26.3 / 26.0 (origin-velocity seeds; mean 26.9 ± 1.3), Isaac +27.3. Full episodes
+from iteration 200 as in every other run; no blow-up or non-finite reset in 1000 iterations; anomaly log
+points 2501 vs 3408 (COM run) and 2356 (recommended): the same "terminal-step reward dominates" and
+"joint limit violated by 0.15–0.18 rad" flags as the recommended run (soft limits are penalties in Isaac's
+config), and, like it, none of the contact-penetration flags of the default-contact runs. Throughput inside
+the loop 29.3 K env-steps/s vs 50.6 K (COM run) and 42.2 K (recommended): **1.44× the recommended preset's
+cost in the full PPO loop** (1.42× physics-only, §1.4). Reading: learning is inside the seed spread of the
+pyramidal runs (0.6 below the mean, 1.5 below the recommended run's single seed, above two of the three
+origin seeds), so elliptic cones cost nothing measurable in learning either; the decision between the two
+presets is the physical-fidelity gain (§1.4: drop-torso and hold 20 ms forces 1.08× PhysX's instead of
+1.70× / 1.23×, slide 9 % closer, +7–10 % falls of a PhysX-trained checkpoint) against the 1.44× loop cost.
+
 **Fixed PPO, demonstrated** (`runs/g1_flat_ppowarp_fixed.log`, MuJoCo Warp, 4096 envs, 1000 iterations,
 same config and seed, measured 2026-09-24, 25.3 K env-steps/s including the monitor):
 
@@ -826,7 +844,7 @@ records DomeLights as custom text `usd_dome` (file, intensity, exposure, colour,
 `Tier2Renderer.set_environment_from_model`; `Randomizer.environment` picks a map per episode by key (Isaac's
 Franka-stack dome randomization), GPU resources cached per key. **Measured**: constant-map furnace 0.5 ± 0.01;
 bright-window map (0.3 % of the sphere carrying most of the energy) within 2 % of the analytic plane radiance
-at two yaws, the uniform table 6.1× noisier; the parity presets without a map render **[[BITWISE]]**
+at two yaws, the uniform table 6.1× noisier; the parity presets without a map render **bit-for-bit identical** (`runs/render/envmap/run_before.log`: before = HEAD 98a41c1 in a worktree, after = this change; SHA-256 equal and max |diff| = 0 on all five arrays: G1 hdr / rgb / depth, Cartpole hdr / rgb)**
 against the previous commit (`runs/render/envmap/`); cost with / without the map: camera-RL 1024 × 100×100
 4 spp 125.4 / 103.3 ms per 1024-frame batch (host path; +21 %); gallery 1024×768 32 spp 47.2 / 27.3 ms per frame, 676.6 / 343.9 ms at 512 spp (per spp 1.48 / 0.85 ms). Firefly clamp: opt-in only,
 biased (DECISIONS). Gallery: `g1_hdri_tier2.png`. Poly Haven CC0 maps are fetched, not committed.

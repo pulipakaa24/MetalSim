@@ -77,6 +77,10 @@
     <figcaption><b>g1_tier2_still.png</b> (1024×768). Isaac Lab's G1 asset (<code>g1_minimal.usd</code>) rendered by the tier-2 path tracer at 512 samples per pixel, 4 bounces: the 43 visual meshes (343K faces) and their OmniPBR materials are read from the USD's instanced prims by <code>metalsim.scene.usd_to_mjcf</code>; the physics model underneath is the same one the G1 benchmark uses (three convex colliders, Isaac's actuators). Camera, key light, floor material and sky were added for the picture. Rendered on this machine.</figcaption>
     </figure>
     <figure>
+    <img src="g1_hdri_tier2.png" alt="Path-traced Unitree G1 lit only by an HDR environment map of a room with windows" width="1024" height="768">
+    <figcaption><b>g1_hdri_tier2.png</b> (1024×768). The same G1 lit only by a textured dome light: Poly Haven's CC0 <code>lebombo</code> HDRI (2048×1024, fetched by <code>scripts/fetch_polyhaven_assets.sh</code>, not committed) as the tier-2 environment map, importance-sampled from a 512×256 luminance table and combined with BRDF sampling by multiple importance sampling; OmniPBR materials, RTX display transform, no sun, no headlight, 512 samples per pixel, 4 bounces, no denoiser. The dome is oriented as Kit/RTX orients a USD DomeLight on Isaac's z-up stage (pole +z; <code>docs/PARITY.md</code> §1.7). Script <code>scripts/16_g1_hdri.py</code>. Rendered on this machine.</figcaption>
+    </figure>
+    <figure>
     <video src="cartpole_tier2_policy.mp4" controls loop muted playsinline width="1024" height="1024"></video>
     <figcaption><b>cartpole_tier2_policy.mp4</b> (1024×1024, 5 s at 60 fps). The Cartpole benchmark, driven by the policy trained with Isaac Lab's cartpole PPO config on the Warp rollout path (150 iterations, mean return 288/300): 4 envs path-traced at 512×512, 512 samples per pixel, 3 bounces, so no Monte Carlo grain remains. Materials, camera distance and lighting were set for the video; the benchmark scene keeps Isaac's camera spec. Rendered on this machine.</figcaption>
     </figure>

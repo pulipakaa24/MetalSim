@@ -312,3 +312,96 @@ PSNR/SSIM on a white robot punish at every edge. Tier 0 is unchanged (8.1 dB who
 | denoiser, hero frames | none 44.16 / 28.16; à-trous 42.11 / 28.39; OIDN 45.48 / 28.78 (64 spp); vs 256 spp: 48.4 / 43.8 / 51.4 whole | OIDN (most faithful; +23 ms/frame) | `denoise=None` / `"atrous"` |
 | denoiser, RL batches | none / à-trous 5 / à-trous 3 / OIDN at 1 spp: 29.7 / 31.1 / 30.6 / 31.0 dB vs converged, 11.3 / 24.5 / 20.0 / 116.8 ms per 1024-env batch | no change to the RL default here (owned by the task code); recommendation: spend on spp (4 spp: 36.7 dB at 38.6 ms); à-trous is the batched option when a denoiser is wanted | `denoise="atrous"`, `atrous_iters` |
 | MPSSVGF / MetalFX denoised scaler | not tried: single-image texture APIs, temporal (our frames accumulate progressively); OIDN covered the need | – | – |
+
+## 6. Textured dome light: HDR environment map with importance sampling and MIS (ported 2026-09-25)
+
+Ported from the handoff `docs/HANDOFF_tier2_hdri_envmap.md` (patch on `4e6d663`) onto the restructured
+tier 2. What Isaac has: a `DomeLight` with `inputs:texture:file` is the background and image-based light of
+most Isaac scenes (Isaac Lab's default grid room uses a textureless dome; the Franka stack visuomotor task
+randomizes dome textures per episode). MetalSim had only `dome=(intensity, color)` (uniform radiance).
+
+### 6.1 Research: USD DomeLight semantics and how Kit/RTX orients it (published, cited)
+
+- **Radiance**. UsdLux `LightAPI`: `intensity` "scales the brightness of the light linearly", `exposure`
+  "scales the brightness of the light exponentially as a power of 2", `color` "the color of emitted light, in
+  the rendering color space"; the schema's formula is L = intensity · 2^exposure · color, "a light with
+  intensity 1 and exposure 0 generates pixel [1, 1, 1] with luminance of 1 nit" (`pxr/usd/usdLux/schema.usda`,
+  OpenUSD release). For a textured dome the texture multiplies this: L(ω) = texture(ω) · intensity · 2^exposure
+  · color. `set_environment(hdr, intensity, exposure, color)` applies exactly that (`test_env_map_furnace`: a
+  0.5 map at intensity 2, exposure 1, colour (1, 0.5, 0.25) reads 0.5 · 4 · colour).
+- **Parameterisation**. `inputs:texture:format = latlong` is the equirectangular map; the USD doc string
+  "Latitude as X, longitude as Y" is the schema's (inverted) wording; the `DomeLight` doc defers to the OpenEXR
+  latlong specification: "pixel coordinates map x to longitude, y to latitude; the minimum coordinates have
+  latitude +π/2 and longitude +π, the maximum latitude −π/2 and longitude −π; latitudes correspond to the y
+  direction, and latitude 0 / longitude 0 points into +z" (`schema.usda`, class DomeLight; OpenEXR
+  `ImfEnvmap.h`). So in the light's own frame: pole +y, image centre (u = 0.5) faces +z, u = 0.25 faces +x, the
+  image is what an observer at the centre sees looking outward (no mirroring).
+- **Pole axis**. USD's `DomeLight` "default orientation is such that its top pole is aligned with the world's
+  +Y axis"; on a z-up stage the spec expects an authored rotation (`UsdLuxDomeLight::OrientToStageUpAxis`
+  adds a +90° x-rotation); USD 24.03's `DomeLight_1` adds `inputs:poleAxis` = scene | Y | Z, fallback "scene"
+  = the stage's up axis. **Kit/RTX does not follow the +Y rule**: NVIDIA's own `usd-exchange-samples`
+  (`source/createLights/README.md`) states "Kit/RTX treats the DomeLight environment as Z-up, unlike the
+  OpenUSD +Y pole convention" and "does not currently render this authored DomeLight rotation correctly";
+  Isaac Lab's `spawn_light` (`isaaclab/sim/spawners/lights/lights.py`) authors no rotation on a DomeLight and
+  Isaac's stages are z-up, so in Isaac a latlong map's poles are ±z with no transform. The Omniverse "Lights"
+  documentation adds that the current default is "such that a default camera will be looking at the horizon"
+  (the earlier extra transform Kit applied "has been removed").
+- **Azimuth reference (estimated)**. No NVIDIA document states which world direction the image centre faces
+  on a z-up stage. Adopted: the OpenEXR/USD map taken as z-up by the +90° x-rotation that maps the USD pole
+  +y onto +z, so the image centre (u = 0.5) faces −y, u = 0.25 faces +x, the top row is +z:
+  `u = 0.5 − (atan2(x, −y) − yaw) / 2π`, `v = acos(z) / π`, `yaw` = a rotateZ on the prim. This is the only
+  choice that is a proper rotation of the documented map with the documented pole; a y/z swap would mirror
+  the image. It could not be verified against an RTX frame: the Isaac recordings in `runs/parity*/isaac` were
+  made with a uniform dome on purpose (`record_g1.py`: "lighting that MetalSim can reproduce"), and the VM is
+  stopped. `set_environment(yaw=...)` corrects any azimuth offset once measured; PARITY §1.7 carries the caveat.
+- **Sampling**. PBRT 3rd ed. §12.6 / §14.2.4 (`InfiniteAreaLight`): a 2-D piecewise-constant distribution over
+  the image with weights luminance × sin θ (the Jacobian of the latlong map), solid-angle pdf
+  p(ω) = p(u, v) / (2π² sin θ), next-event estimation from it and the power heuristic (Veach 1997, β = 2)
+  against BSDF sampling. Implemented as in the handoff: `env_sampling_table` (numpy area average onto a
+  512×256 grid, luminance floor 1e-6 × max so every cell has support), two binary searches on the GPU,
+  MIS on both sides (the miss of a BSDF-sampled ray is weighted by p_bsdf² / (p_bsdf² + p_env²); the env NEE by
+  the mirror weight, with the BSDF pdf being main's diffuse/GGX mixture pdf `pd · cos/π + (1 − pd) · D · N·H /
+  4 V·H`, `pd = clamp((1 − metallic)/2 + (1 − specular)/2, 0.1, 0.95)`, computed once and shared).
+- **Denoiser guide**. On a primary miss the albedo guide takes the map's normalised colour (main used the
+  flat `env_rad`), so OIDN / a-trous see the background's structure.
+
+### 6.2 Measurements (all **measured**, 2026-09-25, M4 Max; logs `runs/render/envmap/`)
+
+- **Tests** (`tests/test_render_tier2.py`: 9 passed before the port, 13 after, nothing else changed). `test_env_map_furnace`: a constant map of 0.5 on a white Lambertian plane reads 0.4998
+  (MIS weights sum to one estimator). `test_env_map_importance_sampling_unbiased`: a 0.05 map with a
+  3 % × 5 % window of (60, 50, 40) at ~36° elevation (0.3 % of the sphere carrying most of the energy) matches
+  the analytic plane radiance (0.5566, 0.4721, 0.3876) to 0.1 % at yaw 0 and 1.3 rad (test bound 2 %); the same
+  estimator with a uniform sampling table is unbiased (0.3 %, bound 5 %) but 6.1× noisier per pixel (relative
+  std 0.508 vs 0.083 at 256 spp). `test_env_map_usd_dome_import`: a USD stage
+  with a textured DomeLight (intensity 2, exposure 1, colour (1, 0.5, 0.25), rotateZ 30°) flows through
+  `usd_to_mjcf` (custom text `usd_dome`) into `set_environment_from_model` and renders 0.5 · 4 · colour ·
+  albedo; the RGBE reader round-trips. `test_env_randomizer_and_helpers`: per-episode map selection by key
+  with cached GPU resources, `set_fovy`, `set_materials`, and the opt-in firefly clamp.
+- **Bit-for-bit**: the parity presets (`usd_scene_kwargs` on the G1 parity scene, 2 × 1024×576, 16 spp;
+  `mujoco_scene_kwargs` on Cartpole-RGB, 64 × 100×100, 4 spp) rendered from the previous commit's renderer and
+  from this one, no map set: **bit-for-bit identical** (`runs/render/envmap/run_before.log`: before = HEAD 98a41c1 in a worktree, after = this change; SHA-256 equal and max |diff| = 0 on all five arrays: G1 hdr / rgb / depth, Cartpole hdr / rgb) (`scripts/diagnostics/tier2_envmap_regression.py`,
+  `runs/render/envmap/run_all.log`). Without `FLAG_ENVMAP` the shader consumes no extra random numbers and
+  evaluates the same expressions; `PTConsts` grew from 16 to 28 words.
+- **Cost** (`scripts/diagnostics/tier2_envmap_cost.py`, `timing` queue class, host path with
+  synchronisation, median of timed frames; Poly Haven `lebombo` 2048×1024, table 512×256):
+
+  | configuration | no map: ms / frame | with map: ms / frame | ms per spp (no map / map) | map cost |
+  |---|---|---|---|---|
+  | camera-RL, 1024 envs × 100×100, 4 spp, 2 bounces, physical preset | 103.3 (min 101.8) | 125.4 (124.9) | 25.8 / 31.3 per batch (0.025 / 0.031 per env) | +21 % |
+  | gallery, 1 env × 1024×768, 32 spp, 4 bounces, OmniPBR + RTX transform | 27.3 (26.5) | 47.2 (45.9) | 0.85 / 1.48 | +73 % |
+  | gallery, 512 spp (16 passes of 32) | 343.9 (342.9) | 676.6 (675.7) | 0.67 / 1.32 | +97 % |
+
+  Host path (`render_host`: pose upload, refit, render, synchronise), so the camera-RL row includes the host
+  side of a 1024-world batch (PARITY §1.7's GPU-path figure for the same batch is 38.6 ms); the map's
+  increment is GPU work: +22 ms per 1024-env batch at 4 spp (2 bounces, mostly plane hits: one env shadow ray
+  and two binary searches per bounce), and a near-doubling of the gallery frame, where 4 bounces of a 343K-face
+  robot are traced and every bounce now casts a second shadow ray.
+
+  The map adds one shadow ray and two binary searches per bounce (env NEE) and a texture fetch per miss.
+- **Gallery**: `docs/gallery/g1_hdri_tier2.png` (G1 under `lebombo`, 512 spp, 4 bounces, OmniPBR, RTX
+  display transform, no sun / headlight).
+
+### 6.3 Decisions
+
+See `docs/DECISIONS.md` (2026-09-25 rows): firefly clamp opt-in only (biased); the uniform sampling table
+and the handoff's y-up azimuth convention archived; OpenCV dependency of the table replaced by numpy.

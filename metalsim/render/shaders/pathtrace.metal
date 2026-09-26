@@ -4,7 +4,10 @@
 // `max_bounces` bounces, next-event estimation for directional lights (shadow rays), BRDF sampling
 // (Lambert diffuse + GGX specular with Fresnel, same material model and light radiances as tiers
 // 0/1: MuJoCo diffuse x pi), Russian roulette after 3 bounces, environment radiance = model sky
-// colour (uniform), emissive materials as area sources through BRDF sampling. Primary-hit depth,
+// colour (uniform) or, with FLAG_ENVMAP, an equirectangular HDR environment map (a textured USD
+// DomeLight: pole +z as Kit/RTX orients it, rotated about z by env_yaw) that is importance-sampled
+// for next-event estimation and combined with BRDF sampling by the power heuristic (Veach 1997;
+// PBRT 3rd ed. 14.2.4), emissive materials as area sources through BRDF sampling. Primary-hit depth,
 // normal and segmentation are written for annotators. Envs share one instance acceleration
 // structure and are spatially separated by RTOffset (see rt.metal).
 #include <metal_stdlib>
@@ -22,6 +25,9 @@ struct PTConsts {
     uint n_light, n_slots, spp, max_bounces;
     uint frame, tiles_per_row, flags, seed;     // flags: see FLAG_* below
     float stride, exposure, env_scale, clip_far;   // clip_far: camera far clipping plane (z-depth), 0 = none
+    uint env_w, env_h, _u0, _u1;                // FLAG_ENVMAP: importance-sampling grid of the environment map
+    float env_yaw, clamp_lum, _f0, _f1;         // env_yaw: dome rotation about +z (rad); clamp_lum: per-path luminance cap, 0 = off (biased)
+    float4 env_mul;                             // FLAG_ENVMAP: rgb multiplier on the map (dome intensity * 2^exposure * color)
 };
 struct CamSpec { float4 intrinsics; float4 pos_delta; float4 rot_delta; float4 light; float4 ambient; float4 clear_color; int cam_id, p0, p1, p2; };
 
@@ -34,6 +40,7 @@ constant uint FLAG_MATMODEL = 2u;     // per-material BRDF model from Material.p
 constant uint FLAG_TONEMAP_RTX = 4u;  // RTX default tone mapping (exposure, ACES, sRGB) instead of a linear clamp
 constant uint FLAG_CENTER0 = 16u;     // first sample of the reset pass through the pixel centre (annotators match raster / Isaac)
 constant uint FLAG_AUX = 8u;          // write mean HDR radiance and sample-averaged first-hit albedo / normal (denoiser inputs)
+constant uint FLAG_ENVMAP = 32u;      // equirectangular HDR environment map (texture(1), CDF table buffer(26)) replaces the sky colour
 
 inline float3x3 load_mat33(device const float* p) {
     return float3x3(float3(p[0], p[3], p[6]), float3(p[1], p[4], p[7]), float3(p[2], p[5], p[8]));
@@ -206,6 +213,52 @@ inline float3 material_base(Material m, float4 mod, float2 uv, texture2d<float> 
     return base;
 }
 
+// ---- environment map: equirectangular ("latlong") as Kit/RTX orients a USD DomeLight on a z-up stage.
+// USD/OpenEXR define the map with the pole at +y, u = longitude (u = 0.5 faces +z, u = 0.25 faces +x),
+// v = latitude from the top; Kit/RTX treats the dome as z-up (NVIDIA usd-exchange-samples createLights
+// README), i.e. that map rotated +90 deg about x: pole +z, u = 0.5 faces -y, u = 0.25 faces +x (the azimuth
+// reference is the rotation's consequence, not documented by NVIDIA: docs/PARITY.md 1.7). env_yaw rotates
+// the dome about +z (a rotateZ on the DomeLight prim). lon = atan2(x, -y) in [-pi, pi], u = 0.5 - lon / 2pi.
+inline float2 env_uv(float3 d, float yaw) {
+    float u = 0.5 - (atan2(d.x, -d.y) - yaw) / (2.0 * PI);
+    return float2(u - floor(u), acos(clamp(d.z, -1.0f, 1.0f)) / PI);
+}
+inline float3 env_dir(float2 uv, float yaw) {
+    float lon = (0.5 - uv.x) * 2.0 * PI + yaw, th = uv.y * PI;   // th: polar angle from +z
+    float st = sin(th);
+    return float3(st * sin(lon), -st * cos(lon), cos(th));
+}
+inline float3 env_radiance(texture2d<float> env, sampler s, float3 d, constant PTConsts& c) {
+    return env.sample(s, env_uv(d, c.env_yaw), level(0.0)).rgb * c.env_mul.rgb;
+}
+// solid-angle pdf of the importance sampler: p(omega) = p(u, v) / (2 pi^2 sin theta) (PBRT 3rd ed. 14.2.4);
+// `cdf` = [marginal CDF over rows (H) | per-row conditional CDFs (H*W) | density over (u, v) (H*W)]
+inline float env_pdf(float3 d, device const float* cdf, constant PTConsts& c) {
+    float2 uv = env_uv(d, c.env_yaw);
+    uint x = min(uint(uv.x * c.env_w), c.env_w - 1), y = min(uint(uv.y * c.env_h), c.env_h - 1);
+    float st = sin(uv.y * PI);
+    if (st <= 1e-6) return 0.0;
+    return cdf[c.env_h + c.env_h * c.env_w + y * c.env_w + x] / (2.0 * PI * PI * st);
+}
+inline uint upper_bound(device const float* a, uint n, float v) {   // first index with a[i] > v
+    uint lo = 0, hi = n;
+    while (lo < hi) { uint mid = (lo + hi) >> 1; if (a[mid] <= v) lo = mid + 1; else hi = mid; }
+    return min(lo, n - 1);
+}
+// sample a direction proportionally to the table (row by the marginal CDF, column by that row's CDF,
+// uniform inside the cell), returning its solid-angle pdf
+inline float3 env_sample(device const float* cdf, constant PTConsts& c, float u1, float u2, thread float& pdf) {
+    uint y = upper_bound(cdf, c.env_h, u1);
+    device const float* row = cdf + c.env_h + y * c.env_w;
+    uint x = upper_bound(row, c.env_w, u2);
+    float r0 = x > 0 ? row[x - 1] : 0.0, w = max(row[x] - r0, 1e-9);
+    float m0 = y > 0 ? cdf[y - 1] : 0.0, mh = max(cdf[y] - m0, 1e-9);
+    float2 uv = float2((float(x) + clamp((u2 - r0) / w, 0.0, 1.0)) / float(c.env_w), (float(y) + clamp((u1 - m0) / mh, 0.0, 1.0)) / float(c.env_h));
+    float3 d = env_dir(uv, c.env_yaw);
+    pdf = env_pdf(d, cdf, c);
+    return d;
+}
+
 kernel void path_trace(
     instance_acceleration_structure accel [[buffer(0)]],
     device const uint2*     inst_tab   [[buffer(1)]],
@@ -233,8 +286,11 @@ kernel void path_trace(
     device float*           aux_accum  [[buffer(23)]],   // (n_envs, h, w, 8) albedo sum, normal sum, count (FLAG_AUX)
     device float*           out_albedo [[buffer(24)]],   // (n_envs, h, w, 3) mean first-hit albedo (FLAG_AUX)
     device float*           out_nrm    [[buffer(25)]],   // (n_envs, h, w, 3) mean first-hit normal (FLAG_AUX)
+    device const float*     env_cdf    [[buffer(26)]],   // environment-map sampling table (FLAG_ENVMAP)
     texture2d<float>        atlas      [[texture(0)]],
+    texture2d<float>        envmap     [[texture(1)]],   // equirectangular RGBA32F environment (FLAG_ENVMAP)
     sampler                 samp       [[sampler(0)]],
+    sampler                 env_samp   [[sampler(1)]],   // linear, repeat in u, clamp in v
     uint3 tid [[thread_position_in_grid]])
 {
     uint x = tid.x, y = tid.y, e = tid.z;
@@ -250,6 +306,7 @@ kernel void path_trace(
     float depth0 = 0.0; float3 normal0 = float3(0.0); int seg0 = 0;
     float3 alb_sum = float3(0.0), nrm_sum = float3(0.0);
     bool matmodel = (c.flags & FLAG_MATMODEL) != 0u;
+    bool use_env = (c.flags & FLAG_ENVMAP) != 0u;
     float3 env_rad = (sp.sky.w > 0.5 ? sp.sky.xyz : cs.clear_color.rgb) * c.env_scale;
     for (uint s = 0; s < c.spp; ++s) {
         float jx = rnd(rng), jy = rnd(rng);
@@ -259,12 +316,21 @@ kernel void path_trace(
         float3 o = cpos + env_off;
         float3 throughput = float3(1.0);
         float3 radiance = float3(0.0);
+        float prev_pdf = 0.0;   // BSDF-sampling pdf of the ray being traced (0: camera ray, no MIS on a miss)
         for (uint bounce = 0; bounce <= c.max_bounces; ++bounce) {
             Hit h = trace(accel, o, d, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst);
             if (bounce == 0 && c.clip_far > 0.0 && h.ok && -dot(h.p - o, R[2]) > c.clip_far) h.ok = false;   // beyond the far plane: background
             if (!h.ok) {
-                radiance += throughput * env_rad;
-                if (bounce == 0) { alb_sum += clamp(env_rad / max(max(env_rad.x, max(env_rad.y, env_rad.z)), 1e-6), 0.0, 1.0); nrm_sum += -d; }
+                float3 er = env_rad;
+                if (use_env) {   // map radiance, weighted by the power heuristic against the env NEE that could have sampled it
+                    er = env_radiance(envmap, env_samp, d, c);
+                    if (prev_pdf > 0.0) { float pe = env_pdf(d, env_cdf, c); er *= prev_pdf * prev_pdf / (prev_pdf * prev_pdf + pe * pe); }
+                }
+                radiance += throughput * er;
+                if (bounce == 0) {   // denoiser guide: the background's normalised colour
+                    float3 eg = use_env ? env_radiance(envmap, env_samp, d, c) : env_rad;
+                    alb_sum += clamp(eg / max(max(eg.x, max(eg.y, eg.z)), 1e-6), 0.0, 1.0); nrm_sum += -d;
+                }
                 break;
             }
             Material m = mats[h.slot];
@@ -309,9 +375,23 @@ kernel void path_trace(
             }
             if (bounce == 0 && sp.hl_specular.w > 0.5)   // MuJoCo headlight on the primary hit (view-aligned, unshadowed)
                 radiance += throughput * brdf_any(model, N, V, V, base, f0, specw, metallic, rough, a2) * max(dot(N, V), 0.0) * sp.hl_diffuse.xyz * PI;
-            // sample the next direction: diffuse (cosine) or specular (GGX) lobe
+            // lobe-mixture weight of the BSDF sampler below (also the pdf the environment MIS weights against)
             float pd = (1.0 - metallic) * 0.5 + 0.5 * (1.0 - specw);
             pd = clamp(pd, 0.1, 0.95);
+            if (use_env) {   // next-event estimation on the environment map, MIS (power heuristic) against BSDF sampling
+                float pe; float3 L = env_sample(env_cdf, c, rnd(rng), rnd(rng), pe);
+                float NdotL = dot(N, L);
+                if (NdotL > 0.0 && pe > 1e-8) {
+                    Hit sh = trace(accel, h.p + N * 0.001, L, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst);
+                    if (!sh.ok) {
+                        float3 Hm = normalize(L + V);
+                        float pb = pd * NdotL / PI + (1.0 - pd) * D_ggx(max(dot(N, Hm), 0.0), a2) * max(dot(N, Hm), 0.0) / (4.0 * max(dot(V, Hm), 1e-4));
+                        float w = pe * pe / (pe * pe + pb * pb);
+                        radiance += throughput * brdf_any(model, N, V, L, base, f0, specw, metallic, rough, a2) * NdotL * env_radiance(envmap, env_samp, L, c) * (w / pe);
+                    }
+                }
+            }
+            // sample the next direction: diffuse (cosine) or specular (GGX) lobe
             float3 Lnew; float pdf;
             if (rnd(rng) < pd) {
                 Lnew = cosine_sample(N, rnd(rng), rnd(rng));
@@ -335,12 +415,17 @@ kernel void path_trace(
             float pdf_s = D_ggx(max(dot(N, Hm), 0.0), a2) * max(dot(N, Hm), 0.0) / (4.0 * max(dot(V, Hm), 1e-4));
             float pdf_mix = pd * pdf_d + (1.0 - pd) * pdf_s;
             throughput *= brdf_any(model, N, V, Lnew, base, f0, specw, metallic, rough, a2) * NdotL / max(pdf_mix, 1e-6);
+            prev_pdf = pdf_mix;
             if (bounce >= 3) {   // Russian roulette
                 float q = clamp(max(throughput.x, max(throughput.y, throughput.z)), 0.05, 0.95);
                 if (rnd(rng) > q) break;
                 throughput /= q;
             }
             o = h.p + N * 0.001; d = Lnew;
+        }
+        if (c.clamp_lum > 0.0) {   // opt-in firefly clamp (biased: caps the energy of rare high-contribution paths)
+            float l = dot(radiance, float3(0.2126, 0.7152, 0.0722));
+            if (l > c.clamp_lum) radiance *= c.clamp_lum / l;
         }
         // never let a non-finite path estimate reach the accumulator (fast-math safe: test the exponent bits)
         uint3 bits = as_type<uint3>(radiance);

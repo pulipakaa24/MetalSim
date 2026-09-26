@@ -38,6 +38,7 @@ Three kinds of relationship occur:
 | PyTorch | BSD-3-Clause (and others, per its wheel) | dependency | `metalsim/interop/`, `metalsim/native/torch_metal_bridge.mm`, learners |
 | MLX (Apple) | MIT | not a dependency; one diagnostic script | `scripts/diagnostics/camera_update_profile.py` |
 | imageio-ffmpeg | BSD-2-Clause (the ffmpeg binary it downloads has its own licence) | optional dependency (`parity` extra) | video scripts under `scripts/gallery/` |
+| Poly Haven HDRIs and textures | CC0 1.0 (public domain) | fetched, **not committed** (`.gitignore`); one rendered frame in the gallery | `scripts/fetch_polyhaven_assets.sh` -> `assets/polyhaven/`; `docs/gallery/g1_hdri_tier2.png` |
 | other Python dependencies (numpy, scipy, pyobjc, scikit-image, lpips, flip-evaluator, trimesh, gymnasium, stable-baselines3, onnxruntime, tensordict, pillow, imageio, pytest) | BSD / MIT family | dependencies (`pyproject.toml`) | imported |
 | published algorithms (XPBD, a-trous / SVGF, ACES fit, GGX fit, Philox, stable PD, PPO details) | not applicable (no code copied) | reimplemented from the papers | see "Algorithms from publications" |
 
@@ -213,6 +214,15 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
 - imageio-ffmpeg (BSD-2-Clause): `parity` extra; it downloads an ffmpeg binary under ffmpeg's licence, which is not
   redistributed here.
 - lpips (BSD-2-Clause), flip-evaluator (NVIDIA FLIP, BSD-3-Clause), scikit-image (BSD-3-Clause): `parity` extra.
+
+### Poly Haven assets (environment maps and textures)
+
+- [Poly Haven](https://polyhaven.com) publishes its HDRIs and textures under CC0 1.0 (public domain dedication;
+  [polyhaven.com/license](https://polyhaven.com/license)). `scripts/fetch_polyhaven_assets.sh` downloads 13
+  equirectangular 2k HDRIs and 5 textures into `assets/polyhaven/`, which is git-ignored: nothing is committed,
+  each machine fetches its own copy. They are the environment maps of the tier-2 path tracer's dome-light
+  lighting and of the replicator's per-episode environment randomization. `docs/gallery/g1_hdri_tier2.png` is a
+  frame rendered under one of them (`lebombo`); CC0 requires no attribution, credit is given here anyway.
 
 ### PyTorch and MLX
 

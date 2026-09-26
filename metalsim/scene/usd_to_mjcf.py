@@ -85,6 +85,37 @@ def _world_xform(prim, scale_units):
     return pos, quat, scale
 
 
+def _record_dome_light(spec, prim, base_dir, scale_units):
+    """A DomeLight has no MuJoCo light type; record it as the custom text ``usd_dome`` (JSON) so the tier-2
+    renderer can apply it (``Tier2Renderer.set_environment_from_model``; a textureless dome is the ``dome``
+    kwarg). Fields follow UsdLux LightAPI (radiance = texture x intensity x 2^exposure x color) and DomeLight
+    (``inputs:texture:file`` resolved to a path, ``inputs:texture:format``); ``yaw`` is the prim's world rotation
+    about +z (Kit/RTX keeps a dome's pole on the stage's +z whatever is authored: PARITY 1.7), ``tilt`` how far
+    the authored rotation moves the pole off +z (ignored, reported)."""
+    import json
+    la = UsdLux.LightAPI(prim)
+    val = lambda a, d: (a.Get() if a and a.Get() is not None else d)
+    rec = {"prim": prim.GetPath().pathString, "intensity": float(val(la.GetIntensityAttr(), 1.0)),
+           "exposure": float(val(la.GetExposureAttr(), 0.0)), "color": [float(c) for c in val(la.GetColorAttr(), (1.0, 1.0, 1.0))]}
+    fa = prim.GetAttribute("inputs:texture:file")
+    ap = fa.Get() if fa else None
+    if ap is not None and (ap.resolvedPath or ap.path):
+        path = ap.resolvedPath or ap.path
+        if not os.path.isabs(path):
+            path = os.path.normpath(os.path.join(base_dir, path))
+        rec["file"] = path
+        rec["format"] = str(val(prim.GetAttribute("inputs:texture:format"), "automatic"))
+    pa = prim.GetAttribute("inputs:poleAxis")   # DomeLight_1 (USD 24.03+): scene | Y | Z
+    if pa and pa.Get() is not None:
+        rec["pole_axis"] = str(pa.Get())
+    _, q, _ = _world_xform(prim, scale_units)
+    R = np.zeros(9); mujoco.mju_quat2Mat(R, q); R = R.reshape(3, 3)
+    rec["yaw"] = float(np.arctan2(R[1, 0], R[0, 0]))                 # rotation of the dome's x axis about +z
+    rec["tilt"] = float(np.degrees(np.arccos(np.clip(R[2, 2], -1, 1))))
+    t = spec.add_text(); t.name = "usd_dome"; t.data = json.dumps(rec)
+    return rec
+
+
 def _accumulate_xform_to(prim, ancestor, scale_units):
     """Transform of ``prim`` relative to ``ancestor`` (position, quaternion, scale). ``ancestor`` need
     not be a USD ancestor: articulations exported from URDF (Isaac's assets) keep all links as
@@ -396,6 +427,9 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True, vi
                     cam.sensor_size = [ha / 1000.0, va / 1000.0]; cam.focal_length = [fl / 1000.0, fl / 1000.0]
                 else:
                     cam.fovy = float(np.rad2deg(2 * np.arctan(va / (2 * fl))))
+            continue
+        if prim.IsA(UsdLux.DomeLight) or (hasattr(UsdLux, "DomeLight_1") and prim.IsA(UsdLux.DomeLight_1)):
+            _record_dome_light(spec, prim, base_dir, units)
             continue
         if prim.IsA(UsdLux.DistantLight) or prim.IsA(UsdLux.SphereLight):
             lt = body.add_light(); lt.name = prim.GetPath().name; lt.pos = pos.tolist()

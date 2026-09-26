@@ -352,8 +352,39 @@ checks the MjModel / MjSpec fields and the G1 builder's model: 3 passed). Queued
 `runs/il3/run_train2.sh flat flat tau10_impact_hardlimits_ellip10 none 1000 0 g1_flat_flatcfg_ellip10 com origin`,
 i.e. the queued COM run's command with the contact preset swapped (2.3.2 flat config, base_velocity com,
 feet_slide_velocity origin, seed 0, 1000 iterations, same PPO): log `runs/il3/g1_flat_flatcfg_ellip10.log`,
-stdout `runs/il3/g1_flat_flatcfg_ellip10.stdout`. Comparison targets: +28.4 (default contacts), +27.85
-(`recommended`), and `runs/il3/g1_flat_flatcfg_com.log` (queued ahead of it). Not finished at the time of writing.
+stdout `runs/il3/g1_flat_flatcfg_ellip10.stdout`. Result (measured, finished 2026-09-25 23:30, exit 0, policy `runs/il3/ckpt/g1_flat_flatcfg_ellip10.pt`):
+
+| iteration | elliptic impratio 10 (this run): return / length | COM run, default contacts | recommended preset | origin seeds 0 / 1 / 2 (default contacts) | Isaac PhysX |
+|---|---|---|---|---|---|
+| 100 | −5.1 / 83 | −5.4 / 99 | – | −5.3 / 91 | −6.6 / 200 |
+| 200 | −5.9 / 926 | 0.1 / 999.5 | −2.1 / 956 | 0.7 / 999 | 6.6 / 981 |
+| 300 | 9.8 / 999.5 | 10.9 / 969 | – | 12.1 / 10.8 / 9.8 | 19.2 / 1000 |
+| 500 | 18.5 / 989 | 19.2 / 991 | 19.9 / 1000 | 21.0 / 18.4 / 19.6 | 25.3 / 996 |
+| 750 | 23.8 / 972 (700: 23.85 / 1000) | 24.6 / 1000 | – | 26.3 / 1000 | 26.8 / 988 |
+| 1000 | **26.31 / 989.9 (n = 40)** | 27.11 / 1000 | 27.85 / 1000 | 28.4 / 26.3 / 26.0 (26.9 ± 1.3) | 27.3 / 991 |
+| env-steps/s in the loop | **29.3 K** | 50.6 K | 42.2 K | 25.7 K (older tree) | – |
+
+No blow-up or non-finite reset; anomaly monitor 2501 log points (COM run 3408, recommended 2356): the same
+"terminal-step reward dominates" and 0.15–0.18 rad soft-limit flags as the recommended run, no penetration
+flags (the default-contact runs have them). Learning is inside the seed spread of the pyramidal runs (0.6
+below the three-seed mean, above two of the three origin seeds, 1.5 below the recommended run's single seed),
+so the cone changes nothing measurable in learning at 1000 iterations; its cost in the PPO loop is **1.44×**
+the recommended preset (29.3 vs 42.2 K env-steps/s; 1.42× physics-only).
+
+**Recommendation to the owner (one paragraph).** For the G1 velocity task the most PhysX-faithful contact
+setting we have measured is `tau10_impact_hardlimits_ellip10` (elliptic cones, impratio 10, on the adopted
+impact-only stiffening with hard limits): against Isaac's PhysX recordings it brings the drop-torso and hold
+20 ms mean forces to 1.08× / 1.07× of PhysX's (pyramidal: 1.70× / 1.23×), penetration 1.64 → 1.55 cm, feet_slide
+of Isaac's checkpoint −0.0144 → −0.0131 (Isaac −0.0127), with impulses, limit excursions, transfer distances
+and air time unchanged, and the cone itself is the exact cone PhysX uses (Isaac Lab 3.0's own MuJoCo-Warp G1
+settings pick pyramidal for cost, not fidelity). Against it: falls of a PhysX-trained checkpoint +7–10 %
+(3 seeds, within one seed sd, all genuine topples under forward commands, cause not established), and the
+cost, **1.44× in the full PPO loop** (29.3 vs 42.2 K env-steps/s) with learning at +26.3 vs +27.85 at iteration
+1000, inside the ±1.3 seed spread. So: if the task's purpose is PhysX parity of the contact physics (the
+project's rule), adopt `tau10_impact_hardlimits_ellip10` as the G1 default and pay the 1.44×; if the loop
+throughput headline matters more for this task, keep `tau10_impact_hardlimits` and state elliptic as the
+measured fidelity option. I did not change the default. For the SO-101 grasp the answer is the other way
+(pyramidal creeps least, §4.2); for Menagerie models that declare elliptic cones, keep the model's own.
 
 ### 7.2 The +18 % falls of the PhysX-trained checkpoint under elliptic cones
 
