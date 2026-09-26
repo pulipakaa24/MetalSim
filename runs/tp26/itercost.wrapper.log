@@ -1,0 +1,29 @@
+[gpu_run] tp26_itercost start: device utilisation 0% (04:15:35)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+=== start Sat Sep 26 04:15:38 PDT 2026 metalsim b019854 wt warp 139385a8 mjw 778cf9e power: Now drawing from 'AC Power'
+holder: {"name": "tp26_itercost", "kind": "timing", "minutes": 8.0, "pid": 34051
+--- installed, contact_cfg recommended 04:15:38
+variant {'contact_cfg': 'recommended'}; iterations cap 10, ls 20, njmax 144, naconmax 98304
+state: nefc mean 7.8 max 35, nacon 1.66 per world
+  k | solve ms (graph, per substep) | marginal ms of iteration k | worlds converged before iteration k
+  10 |   6.792 |   0.202 |  4087
+--- worktree, contact_cfg recommended 04:15:49
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+variant {'contact_cfg': 'recommended'}; iterations cap 10, ls 20, njmax 144, naconmax 98304
+state: nefc mean 7.8 max 35, nacon 1.67 per world
+  k | solve ms (graph, per substep) | marginal ms of iteration k | worlds converged before iteration k
+  10 |   6.267 |   0.187 |  4089
+--- installed, contact_cfg null 04:16:32
+variant {'contact_cfg': None}; iterations cap 10, ls 20, njmax 144, naconmax 98304
+state: nefc mean 9.4 max 43, nacon 1.97 per world
+  k | solve ms (graph, per substep) | marginal ms of iteration k | worlds converged before iteration k
+  10 |   5.227 |   0.097 |  4096
+--- worktree, contact_cfg null 04:16:42
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+variant {'contact_cfg': None}; iterations cap 10, ls 20, njmax 144, naconmax 98304
+state: nefc mean 9.4 max 43, nacon 1.97 per world
+  k | solve ms (graph, per substep) | marginal ms of iteration k | worlds converged before iteration k
+  10 |   4.846 |   0.109 |  4096
+=== end Sat Sep 26 04:16:52 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] tp26_itercost end: device utilisation 97% (04:16:52), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %

@@ -1,0 +1,33 @@
+register solve: n/a (not in this Warp)
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module make__locals__k_df71c8ee 3dfe43d load on device 'metal:0' took 398.98 ms  (compiled)
+Module make__locals__k_60879d71 5f87234 load on device 'metal:0' took 443.83 ms  (compiled)
+Module make__locals__k_bc61f3a2 dbb7dce load on device 'metal:0' took 391.83 ms  (compiled)
+Module make__locals__k_8a21884e c3e6915 load on device 'metal:0' took 444.19 ms  (compiled)
+n=32: copy 0.072 ms | factor 0.172 ms | solve 0.161 ms (residual 9.4e-07) | factor+solve 0.265 ms (residual 9.4e-07)  [per launch of 4096, block_dim 32, graph replay]
+Module make__locals__k_01c18067 461dd99 load on device 'metal:0' took 368.89 ms  (compiled)
+Module make__locals__k_60af2bc7 2b3486d load on device 'metal:0' took 449.37 ms  (compiled)
+Module make__locals__k_718ef223 1c3daa6 load on device 'metal:0' took 400.73 ms  (compiled)
+Module make__locals__k_4c939691 6b3027e load on device 'metal:0' took 473.46 ms  (compiled)
+n=33: copy 0.110 ms | factor 0.207 ms | solve 0.225 ms (residual 1.0e-06) | factor+solve 0.307 ms (residual 1.0e-06)  [per launch of 4096, block_dim 32, graph replay]
+Module make__locals__k_9ba84151 95910b5 load on device 'metal:0' took 373.83 ms  (compiled)
+Module make__locals__k_37f95b59 dc7ca9e load on device 'metal:0' took 478.72 ms  (compiled)
+Module make__locals__k_e1b47f33 d05a194 load on device 'metal:0' took 398.26 ms  (compiled)
+Module make__locals__k_fa96c595 94a4acc load on device 'metal:0' took 500.96 ms  (compiled)
+n=40: copy 0.183 ms | factor 0.538 ms | solve 0.420 ms (residual 1.8e-06) | factor+solve 0.821 ms (residual 1.8e-06)  [per launch of 4096, block_dim 32, graph replay]
+Module make__locals__k_92b5dd1d 3ee2d72 load on device 'metal:0' took 370.65 ms  (compiled)
+Module make__locals__k_2538d62a 956fc46 load on device 'metal:0' took 484.44 ms  (compiled)
+Module make__locals__k_9e2a2d30 8f9df37 load on device 'metal:0' took 395.09 ms  (compiled)
+Module make__locals__k_c6a52275 4c68d61 load on device 'metal:0' took 509.56 ms  (compiled)
+n=43: copy 0.245 ms | factor 0.974 ms | solve 0.518 ms (residual 1.6e-06) | factor+solve 1.117 ms (residual 1.6e-06)  [per launch of 4096, block_dim 32, graph replay]
+Module make__locals__k_cbfc8ccd 4eab44b load on device 'metal:0' took 365.40 ms  (compiled)
+Module make__locals__k_9b1ab794 cb33bea load on device 'metal:0' took 501.44 ms  (compiled)
+Module make__locals__k_e160cd6e 459a7ea load on device 'metal:0' took 389.79 ms  (compiled)
+Module make__locals__k_9b1cbfce d62efd4 load on device 'metal:0' took 520.71 ms  (compiled)
+n=48: copy 0.299 ms | factor 1.931 ms | solve 0.779 ms (residual 1.4e-06) | factor+solve 2.606 ms (residual 1.4e-06)  [per launch of 4096, block_dim 32, graph replay]

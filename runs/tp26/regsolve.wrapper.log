@@ -1,0 +1,74 @@
+[gpu_run] tp26_regsolve start: device utilisation 0% (04:05:53)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   1.9 %
+=== start Sat Sep 26 04:05:56 PDT 2026 metalsim 5db7510 warp 4127c481 / wt c44a3f16 mjw fe6fe71 / wt 7245794 power: Now drawing from 'AC Power'
+--- chol parts, register solve off (worktree, knob 0) 04:05:56
+register solve: False
+n=32: copy 0.069 ms | factor 0.170 ms | solve 0.160 ms (residual 9.4e-07) | factor+solve 0.266 ms (residual 9.4e-07)  [per launch of 4096, block_dim 32, graph replay]
+n=43: copy 0.246 ms | factor 1.042 ms | solve 0.516 ms (residual 9.5e-07) | factor+solve 1.146 ms (residual 9.5e-07)  [per launch of 4096, block_dim 32, graph replay]
+n=48: copy 0.300 ms | factor 1.877 ms | solve 0.799 ms (residual 1.1e-06) | factor+solve 2.614 ms (residual 1.1e-06)  [per launch of 4096, block_dim 32, graph replay]
+--- chol parts, register solve on (worktree) 04:06:07
+register solve: True
+n=32: copy 0.062 ms | factor 0.181 ms | solve 0.107 ms (residual 7.9e-07) | factor+solve 0.202 ms (residual 7.9e-07)  [per launch of 4096, block_dim 32, graph replay]
+n=43: copy 0.247 ms | factor 1.046 ms | solve 0.335 ms (residual 1.0e-06) | factor+solve 1.218 ms (residual 1.0e-06)  [per launch of 4096, block_dim 32, graph replay]
+n=48: copy 0.300 ms | factor 1.894 ms | solve 0.527 ms (residual 9.3e-07) | factor+solve 2.340 ms (residual 9.3e-07)  [per launch of 4096, block_dim 32, graph replay]
+--- chol parts, register solve on, compact register layout off (worktree) 04:06:17
+register solve: True
+n=32: copy 0.071 ms | factor 0.170 ms | solve 0.124 ms (residual 7.9e-07) | factor+solve 0.205 ms (residual 7.9e-07)  [per launch of 4096, block_dim 32, graph replay]
+n=43: copy 0.249 ms | factor 0.991 ms | solve 0.337 ms (residual 1.0e-06) | factor+solve 1.037 ms (residual 1.0e-06)  [per launch of 4096, block_dim 32, graph replay]
+n=48: copy 0.300 ms | factor 1.941 ms | solve 0.526 ms (residual 9.3e-07) | factor+solve 2.165 ms (residual 9.3e-07)  [per launch of 4096, block_dim 32, graph replay]
+--- L'DL bench (worktree) 04:06:28
+factor serial : 0.454 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+factor lanes  : 0.801 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+solve serial  : 0.216 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+solve lanes   : 0.310 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+--- I1 installed 04:06:35
+[I1_installed] N=4096 njmax 256 naconmax 131072 is_sparse False
+[I1_installed] physics only 50.2 ms/step -> 81,530 env-steps/s
+[I1_installed] full env step 75.2 ms -> 54,493 env-steps/s
+[I1_installed] after random-action steps: nefc max 39 mean 14.4; nacon 11166 (2.73/world); overflow {'ITERATIONS': 25, 'LS_ITERATIONS': 3894}
+--- S1 solve only 04:06:50
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[S1_regsolve] N=4096 njmax 256 naconmax 131072 is_sparse False
+[S1_regsolve] physics only 50.8 ms/step -> 80,700 env-steps/s
+[S1_regsolve] full env step 75.7 ms -> 54,137 env-steps/s
+[S1_regsolve] after random-action steps: nefc max 44 mean 14.3; nacon 11139 (2.72/world); overflow {'ITERATIONS': 25, 'LS_ITERATIONS': 3855}
+--- L1 ldl lanes only 04:07:38
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[L1_ldl WP_METAL_REGISTER_SOLVE=0] N=4096 njmax 256 naconmax 131072 is_sparse False
+[L1_ldl WP_METAL_REGISTER_SOLVE=0] physics only 57.7 ms/step -> 71,004 env-steps/s
+[L1_ldl WP_METAL_REGISTER_SOLVE=0] full env step 83.6 ms -> 49,012 env-steps/s
+[L1_ldl WP_METAL_REGISTER_SOLVE=0] after random-action steps: nefc max 44 mean 14.6; nacon 11280 (2.75/world); overflow {'ITERATIONS': 25, 'LS_ITERATIONS': 3921}
+--- B1 both 04:08:25
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[B1_both] N=4096 njmax 256 naconmax 131072 is_sparse False
+[B1_both] physics only 57.5 ms/step -> 71,173 env-steps/s
+[B1_both] full env step 82.2 ms -> 49,860 env-steps/s
+[B1_both] after random-action steps: nefc max 40 mean 14.6; nacon 11414 (2.79/world); overflow {'ITERATIONS': 26, 'LS_ITERATIONS': 3899}
+--- I2 installed 04:08:42
+[I2_installed] N=4096 njmax 256 naconmax 131072 is_sparse False
+[I2_installed] physics only 50.2 ms/step -> 81,513 env-steps/s
+[I2_installed] full env step 75.3 ms -> 54,392 env-steps/s
+[I2_installed] after random-action steps: nefc max 38 mean 14.4; nacon 11061 (2.70/world); overflow {'ITERATIONS': 29, 'LS_ITERATIONS': 3887}
+--- S2 solve only 04:08:57
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[S2_regsolve] N=4096 njmax 256 naconmax 131072 is_sparse False
+[S2_regsolve] physics only 50.7 ms/step -> 80,850 env-steps/s
+[S2_regsolve] full env step 75.4 ms -> 54,291 env-steps/s
+[S2_regsolve] after random-action steps: nefc max 44 mean 14.3; nacon 11011 (2.69/world); overflow {'ITERATIONS': 34, 'LS_ITERATIONS': 3874}
+--- L2 ldl lanes only 04:09:12
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[L2_ldl WP_METAL_REGISTER_SOLVE=0] N=4096 njmax 256 naconmax 131072 is_sparse False
+[L2_ldl WP_METAL_REGISTER_SOLVE=0] physics only 57.7 ms/step -> 70,986 env-steps/s
+[L2_ldl WP_METAL_REGISTER_SOLVE=0] full env step 83.7 ms -> 48,965 env-steps/s
+[L2_ldl WP_METAL_REGISTER_SOLVE=0] after random-action steps: nefc max 43 mean 14.2; nacon 0 (0.00/world); overflow {'ITERATIONS': 21, 'LS_ITERATIONS': 3870}
+--- B2 both 04:09:28
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[B2_both] N=4096 njmax 256 naconmax 131072 is_sparse False
+[B2_both] physics only 57.5 ms/step -> 71,286 env-steps/s
+[B2_both] full env step 82.2 ms -> 49,824 env-steps/s
+[B2_both] after random-action steps: nefc max 43 mean 14.3; nacon 11099 (2.71/world); overflow {'ITERATIONS': 24, 'LS_ITERATIONS': 3872}
+=== end Sat Sep 26 04:09:44 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] tp26_regsolve end: device utilisation 100% (04:09:44), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+lock held by tp26_cap, not tp26_regsolve; not released

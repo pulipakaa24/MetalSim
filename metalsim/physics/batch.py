@@ -57,11 +57,16 @@ class _TensorViews:
 class BatchSimOptions:
     substeps: int = 1                 # physics steps per call to step()
     capture: bool = True              # replay a recorded graph
-    nconmax: int | None = None
-    # Constraint rows per world. MuJoCo Warp's default (64) overflows on contact-rich scenes
-    # (condim-6 gripper contacts), and an overflow drops rows nondeterministically, which makes
-    # the elliptic-cone Newton solver produce NaN. 512 covers every scene in the test corpus.
-    njmax: int | None = 512
+    # Contacts per world and constraint rows per world. MuJoCo Warp's default njmax (64) overflows on
+    # contact-rich scenes (condim-6 gripper contacts), and an overflow drops rows nondeterministically, which
+    # makes the elliptic-cone Newton solver produce NaN. 512 covers every scene in the test corpus. "auto" sets
+    # each to the model's provable bound (metalsim.physics.capacity: the pairs MuJoCo Warp tests x the largest
+    # contact count its narrowphase writes per pair type, rows per contact from condim / cone, plus limit,
+    # equality and friction-loss rows); a capacity that cannot be exceeded changes no result and every
+    # capacity-sized launch shrinks with it. "auto" raises for models it cannot bound (heightfields, SDF, flex,
+    # MULTICCD). check_overflow() is the guard: any capacity overflow flag raises.
+    nconmax: int | str | None = None
+    njmax: int | str | None = 512
     solver_iterations: int | None = None
     ls_iterations: int | None = None
     warn_overflow: bool = False       # MuJoCo Warp prints on solver overflow; off for RL loops
@@ -138,12 +143,21 @@ class BatchSim:
                 self.m.opt.graph_conditional = False
             if not self.opt.warn_overflow:
                 self.m.opt.warn_overflow = 0
+            self.capacity_bounds = None
+            nconmax, njmax = self.opt.nconmax, self.opt.njmax
+            if nconmax == "auto" or njmax == "auto":
+                from metalsim.physics import capacity
+                self.capacity_bounds = capacity.bounds(wmodel, self.m)
+                if nconmax == "auto":
+                    nconmax = self.capacity_bounds.nconmax
+                if njmax == "auto":
+                    njmax = self.capacity_bounds.njmax
             if self.opt.solver_iterations is not None:
                 self.m.opt.iterations = self.opt.solver_iterations
             if self.opt.ls_iterations is not None:
                 self.m.opt.ls_iterations = self.opt.ls_iterations
             with _m_layout(self.opt.m_dense_max):
-                self.d = mjw.put_data(wmodel, mjd, nworld=num_envs, nconmax=self.opt.nconmax, njmax=self.opt.njmax)
+                self.d = mjw.put_data(wmodel, mjd, nworld=num_envs, nconmax=nconmax, njmax=njmax)
             self._reset_mask = wp.zeros(num_envs, dtype=wp.bool)
             self._graphs = {}
             self._substep_hooks = []    # launched after every physics substep (inside the step graph)
@@ -244,6 +258,18 @@ class BatchSim:
         ov = self.d.overflow.numpy()
         return {f.name: int(((ov & int(f)) != 0).sum()) for f in mjw.OverflowType if int(f) not in (0, int(mjw.OverflowType.ALL))
                 and ((ov & int(f)) != 0).any()}
+
+    def check_overflow(self) -> dict[str, int]:
+        """The overflow flags (synchronizes), raising RuntimeError on any capacity overflow (NEFC, NARROWPHASE,
+        CCD, ...: rows or contacts were dropped, the physics is wrong from that step on). The solver-cap flags
+        (ITERATIONS, LS_ITERATIONS) are returned, not raised. Call at rollout boundaries."""
+        from metalsim.physics import capacity
+        ov = self.overflow_flags()
+        cap = capacity.capacity_overflows(ov)
+        if cap:
+            raise RuntimeError(f"MuJoCo Warp capacity overflow {cap} (worlds affected): raise njmax / nconmax "
+                               f"(current njmax {self.d.njmax}, naconmax {self.d.naconmax} = {self.d.naconmax // self.n} per world)")
+        return ov
 
     # -- simulation ---------------------------------------------------------------------------------
 

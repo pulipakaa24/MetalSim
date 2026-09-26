@@ -1,0 +1,110 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth 0139344 load on device 'cpu' took 9.44 ms  (cached)
+Module _nxn_broadphase__locals__kernel_13ac863e 02fed0a load on device 'cpu' took 0.58 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_8a5df304 74116a5 load on device 'cpu' took 2689.18 ms  (compiled)
+Module _primitive_narrowphase__locals__primitive_narrowphase_78fb2dbf 7c22c7a load on device 'cpu' took 666.64 ms  (compiled)
+Module mujoco_warp._src.constraint 621fbd0 load on device 'cpu' took 0.74 ms  (cached)
+Module _friction_dof__locals__kernel_71517a5a 025a4b2 load on device 'cpu' took 0.71 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_77544377 3573b80 load on device 'cpu' took 1.06 ms  (cached)
+Module _efc_contact_init__locals__kernel_61c7a354 8ca3923 load on device 'cpu' took 0.30 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_d7afd5bd 5dcb563 load on device 'cpu' took 0.42 ms  (cached)
+Module _efc_contact_update__locals__kernel_a78f94fc 0f1441d load on device 'cpu' took 0.29 ms  (cached)
+Module mujoco_warp._src.forward 88fe384 load on device 'cpu' took 0.67 ms  (cached)
+Module mujoco_warp._src.passive d287a44 load on device 'cpu' took 0.75 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_41a4523d 210cfe4 load on device 'cpu' took 0.51 ms  (cached)
+Module _qfrc_smooth__locals__kernel_5565c635 d7fd775 load on device 'cpu' took 0.49 ms  (cached)
+Module mujoco_warp._src.support 6bd341f load on device 'cpu' took 0.29 ms  (cached)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_c849d179 26cd1a8 load on device 'cpu' took 119.63 ms  (compiled)
+Module _solve_init_dof__locals__kernel_6c9fecda 3e8432c load on device 'cpu' took 0.37 ms  (cached)
+Module mujoco_warp._src.solver fecea56 load on device 'cpu' took 0.82 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_c92100ed f3657e7 load on device 'cpu' took 51.80 ms  (compiled)
+Module mul_m_kernel__locals___mul_m_924d61d1 b219aeb load on device 'cpu' took 0.34 ms  (cached)
+Module _update_constraint_efc__locals__kernel_59b76e16 c854bc1 load on device 'cpu' took 0.33 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_5a6ce8fb da68930 load on device 'cpu' took 0.33 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_563a7193 4d426d1 load on device 'cpu' took 0.29 ms  (cached)
+Module _update_gradient_grad__locals__kernel_a8ff13d7 1a33222 load on device 'cpu' took 0.27 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_12f481bb a7fbdf7 load on device 'cpu' took 182.47 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_2fc8ec32 215b144 load on device 'cpu' took 148.14 ms  (compiled)
+Module _linesearch_iterative_kernel__locals__kernel_91280eb1 17784c1 load on device 'cpu' took 218.12 ms  (compiled)
+Module _update_constraint_efc__locals__kernel_bf65bc4b 0fc57cf load on device 'cpu' took 0.37 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_1a551002 a30bef3 load on device 'cpu' took 0.36 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_65cece82 cb92fcc load on device 'cpu' took 0.34 ms  (cached)
+Module _update_gradient_grad__locals__kernel_e1825747 2c336f9 load on device 'cpu' took 0.26 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_5e9a24c1 fd4f7be load on device 'cpu' took 150.77 ms  (compiled)
+Module _solve_done__locals__kernel_0b0b8060 e35431e load on device 'cpu' took 0.42 ms  (cached)
+Module mujoco_warp._src.sensor 0f3c6f8 load on device 'cpu' took 1.03 ms  (cached)
+Module mujoco_warp._src.derivative b3b46fb load on device 'cpu' took 0.63 ms  (cached)
+Module _next_time_builder__locals___next_time_46990cad 7206cae load on device 'cpu' took 0.58 ms  (cached)
+
+=== default: N=64, 64 substeps (5 s), iterations cap 10; solver_niter mean 2.41 p50 2 p90 4 max 7; at cap 0/4096 (0.0 %); overflow ITERATIONS 0 LS 64 worlds; nefc mean 12.6
+  it | solving % | refactor % | solve-only % | ls_exh % | flips/refactor world: 1 | 2 | 3-4 | 5-8 | 9-16 | >16 | adds | removes
+   1 |     71.8 |      71.8 |         0.0 |     0.0 |   680 |   621 |   753 |   641 |   226 |    19 |  9612 |  1685
+   2 |     42.7 |      42.7 |         0.0 |     0.0 |   642 |   434 |   446 |   217 |    10 |     0 |  2284 |  2129
+   3 |     19.8 |      19.8 |         0.0 |     0.0 |   434 |   246 |   104 |    25 |     0 |     0 |   491 |   919
+   4 |      5.4 |       5.4 |         0.0 |     0.0 |   159 |    41 |    19 |     2 |     0 |     0 |   122 |   192
+   5 |      0.9 |       0.9 |         0.0 |     0.0 |    35 |     1 |     2 |     0 |     0 |     0 |    14 |    29
+   6 |      0.2 |       0.2 |         0.0 |     0.0 |     7 |     1 |     0 |     0 |     0 |     0 |     1 |     8
+   7 |      0.0 |       0.0 |         0.0 |     0.0 |     0 |     0 |     0 |     0 |     0 |     0 |     0 |     0
+   8 |      0.0 |       0.0 |         0.0 |     0.0 |     0 |     0 |     0 |     0 |     0 |     0 |     0 |     0
+   9 |      0.0 |       0.0 |         0.0 |     0.0 |     0 |     0 |     0 |     0 |     0 |     0 |     0 |     0
+  10 |      0.0 |       0.0 |         0.0 |     0.0 |     0 |     0 |     0 |     0 |     0 |     0 |     0 |     0
+  total refactorizations 5765 = 1.41 per world-substep (initial factorization excluded); solve-only 0; flips 12524 adds / 4962 removes over 5765 worlds (mean 3.03 per refactoring world)
+
+=== hardlimits: N=64, 64 substeps (1 s), iterations cap 10; solver_niter mean 2.82 p50 3 p90 5 max 9; at cap 0/4096 (0.0 %); overflow ITERATIONS 0 LS 64 worlds; nefc mean 12.4
+  it | solving % | refactor % | solve-only % | ls_exh % | flips/refactor world: 1 | 2 | 3-4 | 5-8 | 9-16 | >16 | adds | removes
+   1 |     79.0 |      79.0 |         0.0 |     0.0 |  1551 |   563 |   523 |   422 |   161 |    14 |  8165 |   974
+   2 |     55.4 |      54.0 |         0.0 |     0.0 |   815 |   506 |   531 |   312 |    48 |     1 |  4030 |  1995
+   3 |     30.7 |      30.3 |         0.0 |     0.0 |   592 |   330 |   235 |    80 |     3 |     0 |  1321 |  1215
+   4 |     12.4 |      12.4 |         0.0 |     0.0 |   333 |   106 |    54 |    16 |     0 |     0 |   366 |   436
+   5 |      4.0 |       4.0 |         0.0 |     0.0 |   123 |    36 |     5 |     1 |     0 |     0 |    81 |   135
+   6 |      0.8 |       0.8 |         0.0 |     0.0 |    29 |     2 |     1 |     0 |     0 |     0 |    14 |    22
+   7 |      0.2 |       0.2 |         0.0 |     0.0 |     5 |     1 |     1 |     0 |     0 |     0 |     6 |     4
+   8 |      0.0 |       0.0 |         0.0 |     0.0 |     1 |     0 |     0 |     0 |     0 |     0 |     1 |     0
+   9 |      0.0 |       0.0 |         0.0 |     0.0 |     0 |     0 |     0 |     0 |     0 |     0 |     0 |     0
+  10 |      0.0 |       0.0 |         0.0 |     0.0 |     0 |     0 |     0 |     0 |     0 |     0 |     0 |     0
+  total refactorizations 7401 = 1.81 per world-substep (initial factorization excluded); solve-only 0; flips 13984 adds / 4781 removes over 7401 worlds (mean 2.54 per refactoring world)
+
+=== recommended: N=64, 64 substeps (1 s), iterations cap 10; solver_niter mean 2.95 p50 3 p90 5 max 10; at cap 10/4096 (0.2 %); overflow ITERATIONS 1 LS 64 worlds; nefc mean 9.8
+  it | solving % | refactor % | solve-only % | ls_exh % | flips/refactor world: 1 | 2 | 3-4 | 5-8 | 9-16 | >16 | adds | removes
+   1 |     76.4 |      76.4 |         0.0 |     0.0 |  1699 |   614 |   480 |   246 |    85 |     4 |  6162 |   844
+   2 |     53.0 |      51.5 |         0.0 |     0.0 |   865 |   515 |   466 |   228 |    33 |     1 |  3646 |  1540
+   3 |     32.2 |      31.7 |         0.0 |     0.0 |   608 |   327 |   248 |   100 |    14 |     0 |  1822 |  1016
+   4 |     17.7 |      17.5 |         0.0 |     0.0 |   355 |   178 |   139 |    42 |     4 |     0 |   875 |   582
+   5 |      8.9 |       8.8 |         0.0 |     0.0 |   186 |    85 |    63 |    26 |     1 |     0 |   395 |   327
+   6 |      4.5 |       4.5 |         0.0 |     0.0 |   108 |    38 |    29 |     9 |     1 |     0 |   159 |   184
+   7 |      1.8 |       1.8 |         0.0 |     0.0 |    42 |    19 |     7 |     3 |     2 |     0 |    91 |    53
+   8 |      0.7 |       0.7 |         0.0 |     0.0 |    21 |     3 |     3 |     0 |     3 |     0 |    39 |    34
+   9 |      0.2 |       0.2 |         0.0 |     0.0 |     7 |     0 |     2 |     1 |     0 |     0 |     8 |    11
+  10 |      0.0 |       0.0 |         0.0 |     0.0 |     0 |     0 |     0 |     0 |     0 |     0 |     0 |     0
+  total refactorizations 7910 = 1.93 per world-substep (initial factorization excluded); solve-only 0; flips 13197 adds / 4591 removes over 7910 worlds (mean 2.25 per refactoring world)
+Module _linesearch_iterative_kernel__locals__kernel_e82cf69b 04e1c47 load on device 'cpu' took 0.84 ms  (cached)
+
+=== solver:isaaclab3_every_substep_cap20: N=64, 64 substeps (1 s), iterations cap 20; solver_niter mean 2.10 p50 2 p90 4 max 8; at cap 0/4096 (0.0 %); overflow ITERATIONS 0 LS 0 worlds; nefc mean 8.1
+  it | solving % | refactor % | solve-only % | ls_exh % | flips/refactor world: 1 | 2 | 3-4 | 5-8 | 9-16 | >16 | adds | removes
+   1 |     57.9 |      57.9 |         0.0 |     0.0 |   799 |   551 |   563 |   343 |   116 |     1 |  5218 |  1947
+   2 |     31.9 |      31.9 |         0.0 |     0.0 |   549 |   312 |   307 |   129 |     8 |     0 |  1509 |  1503
+   3 |     14.3 |      14.3 |         0.0 |     0.0 |   313 |   154 |    95 |    21 |     1 |     0 |   450 |   618
+   4 |      4.6 |       4.6 |         0.0 |     0.0 |   125 |    42 |    21 |     1 |     0 |     0 |    90 |   196
+   5 |      0.9 |       0.9 |         0.0 |     0.0 |    30 |     3 |     2 |     0 |     0 |     0 |    18 |    25
+   6 |      0.1 |       0.1 |         0.0 |     0.0 |     3 |     2 |     0 |     0 |     0 |     0 |     4 |     3
+   7 |      0.0 |       0.0 |         0.0 |     0.0 |     1 |     0 |     0 |     0 |     0 |     0 |     1 |     0
+   8 |      0.0 |       0.0 |         0.0 |     0.0 |     0 |     0 |     0 |     0 |     0 |     0 |     0 |     0
+   9 |      0.0 |       0.0 |         0.0 |     0.0 |     0 |     0 |     0 |     0 |     0 |     0 |     0 |     0
+  10 |      0.0 |       0.0 |         0.0 |     0.0 |     0 |     0 |     0 |     0 |     0 |     0 |     0 |     0
+  11 |      0.0 |       0.0 |         0.0 |     0.0 |     0 |     0 |     0 |     0 |     0 |     0 |     0 |     0
+  12 |      0.0 |       0.0 |         0.0 |     0.0 |     0 |     0 |     0 |     0 |     0 |     0 |     0 |     0
+  13 |      0.0 |       0.0 |         0.0 |     0.0 |     0 |     0 |     0 |     0 |     0 |     0 |     0 |     0
+  14 |      0.0 |       0.0 |         0.0 |     0.0 |     0 |     0 |     0 |     0 |     0 |     0 |     0 |     0
+  15 |      0.0 |       0.0 |         0.0 |     0.0 |     0 |     0 |     0 |     0 |     0 |     0 |     0 |     0
+  16 |      0.0 |       0.0 |         0.0 |     0.0 |     0 |     0 |     0 |     0 |     0 |     0 |     0 |     0
+  17 |      0.0 |       0.0 |         0.0 |     0.0 |     0 |     0 |     0 |     0 |     0 |     0 |     0 |     0
+  18 |      0.0 |       0.0 |         0.0 |     0.0 |     0 |     0 |     0 |     0 |     0 |     0 |     0 |     0
+  19 |      0.0 |       0.0 |         0.0 |     0.0 |     0 |     0 |     0 |     0 |     0 |     0 |     0 |     0
+  20 |      0.0 |       0.0 |         0.0 |     0.0 |     0 |     0 |     0 |     0 |     0 |     0 |     0 |     0
+  total refactorizations 4492 = 1.10 per world-substep (initial factorization excluded); solve-only 0; flips 7290 adds / 4292 removes over 4492 worlds (mean 2.58 per refactoring world)
