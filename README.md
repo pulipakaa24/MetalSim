@@ -47,7 +47,7 @@ listing its commits, and keeps its upstream licence unchanged. "Head" is the bra
 |---|---|
 | `metalsim/interop` | Warp ↔ Metal ↔ PyTorch MPS: zero-copy tensors over Warp and renderer buffers, cross-queue ordering with shared events, a native bridge (`metalsim/native/torch_metal_bridge.mm`) |
 | `metalsim/physics` | `BatchSim`: batched MuJoCo Warp on Metal with graph replay and per-world model fields; contact-tuning and solver presets; deformables (MuJoCo Warp flex, XPBD cloth and cables, a port of PhysX's particle cloth); the archived Newton XPBD backend |
-| `metalsim/render` | tier 0 raster, tier 1 hybrid ray tracing (shadows, AO, reflections), tier 2 path tracer with OmniPBR / UsdPreviewSurface BRDFs, USD light units, RTX's display transform and Open Image Denoise; RTX-parity presets |
+| `metalsim/render` | tier 0 raster, tier 1 hybrid ray tracing (shadows, AO, reflections), tier 2 path tracer with OmniPBR / UsdPreviewSurface BRDFs, USD light units, textured DomeLight HDR environment maps (importance-sampled, MIS), RTX's display transform and Open Image Denoise; RTX-parity presets |
 | `metalsim/sensors` | lidar (beam divergence, multi-return, intensity), radar-lite and height scan on Metal ray tracing; Isaac Lab's `ContactSensor` as Warp kernels |
 | `metalsim/scene` | USD → MuJoCo loader (lossless and generic UsdPhysics, fixes for NVIDIA asset conventions), MJCF/URDF → USD, MaterialX flattening |
 | `metalsim/replicator` | annotators, randomizers, Isaac Lab event terms, and writers including Replicator's `BasicWriter` layout |
