@@ -411,9 +411,10 @@ Reading:
 ### 7.3 `so101_lift.py` ctrl ordering
 
 Finding corrected: the env is already event-ordered (see §6). Added `tests/test_lift_ctrl_ordering.py`
-(needs Metal; queued as `lift_ordering_test`): (a) per `step()`, the calls are exactly `signal(learner event)`
-→ `sim.wait(learner event, same value)` → physics → `sim.after(v)`, three steps in a row, and the sim's `ctrl`
-equals what `step()` computed; (b) 30 random-action steps with no host sync give the same `qpos` (1e-4) as
+(needs Metal; 2 passed, `runs/competitors/lift_ordering_test4.log`): (a) per `step()`, the learner-event /
+physics calls are exactly `signal(learner event)` → `sim.wait(learner event, same value)` → physics →
+`sim.after(v)` (then the env's second commit before the post-reset forward), three steps in a row, and the sim's
+`ctrl` equals what `step()` computed; (b) 30 random-action steps with no host sync give the same `qpos` (1e-4) as
 stepping with a host sync after every step. (a) fails if `_learner_done()` or `after()` is dropped; (b) fails
 if a stale `ctrl` reached the physics. No change to `metalsim/learn/so101_lift.py`.
 
