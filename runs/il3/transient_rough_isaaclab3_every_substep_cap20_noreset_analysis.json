@@ -1,0 +1,6864 @@
+{
+ "dump": "runs/il3/transient_rough_isaaclab3_every_substep_cap20_noreset.npz",
+ "trace_summary": {
+  "terrain": "rough",
+  "preset": "isaaclab3_every_substep_cap20",
+  "mode": "noreset",
+  "steps": 320,
+  "start": {
+   "root_z_mean": 0.0,
+   "root_xy_absmax": 0.0,
+   "joints_absmax": 0.0,
+   "nacon": 147456,
+   "min_dist": -0.06060592457652092
+  },
+  "blown_total": 1163,
+  "blown_in_first_episode": 1163,
+  "first_episode_falls": 2854,
+  "worlds_never_reset": 79,
+  "first_episode_end_step_median": 306.0
+ },
+ "worlds": [
+  {
+   "env": 72,
+   "step": 209,
+   "first_episode": true,
+   "mass_scale": 1.1936674118041992,
+   "run": {
+    "first_joint_over_3x": [
+     4,
+     "left_hip_pitch_joint"
+    ],
+    "energy_first_last": [
+     34918.95,
+     1954527.17
+    ],
+    "nonfinite": false,
+    "rows": [
+     {
+      "s": 0,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 49.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -57.2,
+      "niter": 1,
+      "energy": 34918.95,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 1,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 78.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -250.9,
+      "niter": 1,
+      "energy": 36259.65,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 2,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 97.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 37788.04,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 3,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 100.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 234.9,
+      "niter": 1,
+      "energy": 39406.33,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 4,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 152.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 39871.54,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 5,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 205.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 38173.91,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 6,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 210.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 34131.84,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 7,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 150.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 41088.94,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 8,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 121.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 35.8,
+      "niter": 1,
+      "energy": 53018.68,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 9,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 129.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 59441.47,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 10,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 195.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 7.0,
+      "niter": 1,
+      "energy": 62284.61,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 11,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 339.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 65696.32,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 12,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 421.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 72237.66,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 13,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_roll_joint",
+      "speed": 156.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 87653.23,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 14,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 175.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 88630.5,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 15,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_knee_joint",
+      "speed": 251.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 89573.2,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 16,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 207.2,
+      "limit_force_on_it": 727.1,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 80279.35,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 17,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 190.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 2,
+      "energy": 87718.97,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 18,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_roll_joint",
+      "speed": 349.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 110462.35,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 19,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_roll_joint",
+      "speed": 289.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 2,
+      "energy": 162487.2,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 20,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_knee_joint",
+      "speed": 341.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 3,
+      "energy": 178980.61,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 21,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 1086.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 238383.87,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 22,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 2324.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 2.8,
+      "niter": 1,
+      "energy": 455128.3,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 23,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 12510.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 2,
+      "energy": 1954527.17,
+      "ncon": 0,
+      "min_dist": 0.0
+     }
+    ]
+   },
+   "default_contacts": {
+    "first_joint_over_3x": [
+     4,
+     "left_hip_pitch_joint"
+    ],
+    "energy_first_last": [
+     34918.95,
+     3105708.28
+    ],
+    "nonfinite": false,
+    "rows": [
+     {
+      "s": 0,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 49.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -57.2,
+      "niter": 1,
+      "energy": 34918.95,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 1,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 78.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -250.9,
+      "niter": 1,
+      "energy": 36259.65,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 2,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 97.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 37788.04,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 3,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 100.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 39406.33,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 4,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 152.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 39883.05,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 5,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 205.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 38196.68,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 6,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 209.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 34171.84,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 7,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 150.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 40980.9,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 8,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 122.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 42.4,
+      "niter": 1,
+      "energy": 52971.22,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 9,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 133.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 59341.42,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 10,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 197.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 13.9,
+      "niter": 1,
+      "energy": 62057.44,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 11,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 335.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 66067.42,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 12,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 406.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 72607.74,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 13,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 188.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 176.0,
+      "niter": 1,
+      "energy": 87445.62,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 14,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 252.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 102364.4,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 15,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 200.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 89111.78,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 16,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 237.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 81810.83,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 17,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 192.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 93411.5,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 18,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_roll_joint",
+      "speed": 317.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 127696.09,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 19,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_shoulder_roll_joint",
+      "speed": 475.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 2,
+      "energy": 195532.36,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 20,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_yaw_joint",
+      "speed": 383.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 269031.11,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 21,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_yaw_joint",
+      "speed": 674.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 338816.5,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 22,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_knee_joint",
+      "speed": 3463.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 877808.96,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 23,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_roll_joint",
+      "speed": 12123.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 2,
+      "energy": 3105708.28,
+      "ncon": 0,
+      "min_dist": 0.0
+     }
+    ]
+   }
+  },
+  {
+   "env": 2021,
+   "step": 214,
+   "first_episode": true,
+   "mass_scale": 1.1886225938796997,
+   "run": {
+    "first_joint_over_3x": [
+     8,
+     "left_hip_roll_joint"
+    ],
+    "energy_first_last": [
+     34660.32,
+     -26.56
+    ],
+    "nonfinite": false,
+    "rows": [
+     {
+      "s": 0,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 61.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -59.3,
+      "niter": 1,
+      "energy": 34660.32,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 1,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 84.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -240.8,
+      "niter": 1,
+      "energy": 36198.96,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 2,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 93.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 37907.58,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 3,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 88.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 3,
+      "energy": 39082.76,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 4,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 88.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 2,
+      "energy": 38969.4,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 5,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 69.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 2,
+      "energy": 38456.93,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 6,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 72.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 39324.07,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 7,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 75.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 42887.3,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 8,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 124.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -76.6,
+      "niter": 1,
+      "energy": 49714.87,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 9,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 183.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 61212.52,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 10,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_knee_joint",
+      "speed": 106.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 55852.35,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 11,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 108.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 197.9,
+      "niter": 1,
+      "energy": 54571.73,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 12,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 102.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 56797.38,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 13,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 82.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -264.2,
+      "niter": 2,
+      "energy": 61709.75,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 14,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 133.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -198.3,
+      "niter": 1,
+      "energy": 68276.79,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 15,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 219.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 79339.85,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 16,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 494.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 109261.36,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 17,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 460.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 2,
+      "energy": 170232.44,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 18,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 803.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -292.9,
+      "niter": 1,
+      "energy": 356174.76,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 19,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_knee_joint",
+      "speed": 1654.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 299981.39,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 20,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 3229.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 4,
+      "energy": 567290.14,
+      "ncon": 1,
+      "min_dist": 0.0131
+     },
+     {
+      "s": 21,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_knee_joint",
+      "speed": 40159.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 4,
+      "energy": 4726589.65,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 22,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_yaw_joint",
+      "speed": 3308514.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 4,
+      "energy": 242214362.88,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 23,
+      "contacts_per_foot": [
+       11,
+       11
+      ],
+      "max_contact_force": 41280.0,
+      "pair": [
+       "ground",
+       "Cube"
+      ],
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 9.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 0.0,
+      "niter": 3,
+      "energy": -26.56,
+      "ncon": 36,
+      "min_dist": -0.0606
+     }
+    ]
+   },
+   "default_contacts": {
+    "first_joint_over_3x": [
+     8,
+     "left_hip_roll_joint"
+    ],
+    "energy_first_last": [
+     34660.32,
+     -26.55
+    ],
+    "nonfinite": false,
+    "rows": [
+     {
+      "s": 0,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 61.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -59.3,
+      "niter": 1,
+      "energy": 34660.32,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 1,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 84.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -240.8,
+      "niter": 1,
+      "energy": 36198.96,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 2,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 93.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 37907.58,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 3,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 88.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 39082.75,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 4,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 88.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 38956.8,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 5,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 69.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 38434.34,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 6,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 72.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 39299.56,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 7,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 75.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 42852.18,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 8,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 123.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -78.8,
+      "niter": 1,
+      "energy": 49642.19,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 9,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 186.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 2,
+      "energy": 61089.31,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 10,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_knee_joint",
+      "speed": 107.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 2,
+      "energy": 55339.71,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 11,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 110.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 203.0,
+      "niter": 2,
+      "energy": 53957.61,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 12,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 114.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 2,
+      "energy": 56332.85,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 13,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 83.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 2,
+      "energy": 61152.83,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 14,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 124.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -172.0,
+      "niter": 1,
+      "energy": 67508.57,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 15,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 216.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 206.7,
+      "niter": 1,
+      "energy": 77691.01,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 16,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 584.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 103771.96,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 17,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 439.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 181123.09,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 18,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 766.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 405415.95,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 19,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 5382.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 698479.29,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 20,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_ankle_pitch_joint",
+      "speed": 33613.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -20.0,
+      "niter": 2,
+      "energy": 11398262.45,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 21,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 2555773.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 3,
+      "energy": 903167208.1,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 22,
+      "contacts_per_foot": [
+       11,
+       10
+      ],
+      "max_contact_force": 3963.7,
+      "pair": [
+       "ground",
+       "right_ankle_roll_link_Cube"
+      ],
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 0.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 0.0,
+      "niter": 3,
+      "energy": -26.56,
+      "ncon": 21,
+      "min_dist": -0.0506
+     },
+     {
+      "s": 23,
+      "contacts_per_foot": [
+       11,
+       10
+      ],
+      "max_contact_force": 3822.6,
+      "pair": [
+       "ground",
+       "right_ankle_roll_link_Cube"
+      ],
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 6.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -149.3,
+      "niter": 3,
+      "energy": -26.55,
+      "ncon": 21,
+      "min_dist": -0.0506
+     }
+    ]
+   }
+  },
+  {
+   "env": 3615,
+   "step": 220,
+   "first_episode": true,
+   "mass_scale": 1.184766173362732,
+   "run": {
+    "first_joint_over_3x": [
+     7,
+     "left_hip_roll_joint"
+    ],
+    "energy_first_last": [
+     37923.06,
+     -26.6
+    ],
+    "nonfinite": false,
+    "rows": [
+     {
+      "s": 0,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 70.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 37923.06,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 1,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 53.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 2,
+      "energy": 37536.42,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 2,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_knee_joint",
+      "speed": 45.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 37609.93,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 3,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_roll_joint",
+      "speed": 45.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 38155.19,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 4,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 45.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -139.5,
+      "niter": 1,
+      "energy": 39327.48,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 5,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 75.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -154.7,
+      "niter": 1,
+      "energy": 41159.14,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 6,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 108.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 43352.51,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 7,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 117.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 46162.68,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 8,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 143.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 297.0,
+      "niter": 1,
+      "energy": 48048.64,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 9,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 151.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 44830.74,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 10,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 127.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 40503.87,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 11,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 159.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 66535.28,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 12,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 169.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 232.0,
+      "niter": 1,
+      "energy": 80242.73,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 13,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 212.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 78090.5,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 14,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 250.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 81615.23,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 15,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 195.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 92787.38,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 16,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 343.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 109316.53,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 17,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 482.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 111035.82,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 18,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_shoulder_roll_joint",
+      "speed": 450.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 128251.1,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 19,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_shoulder_pitch_joint",
+      "speed": 1059.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 232888.13,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 20,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_shoulder_pitch_joint",
+      "speed": 3500.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 487620.59,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 21,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_elbow_pitch_joint",
+      "speed": 14144.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 4,
+      "energy": 1790158.15,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 22,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_shoulder_yaw_joint",
+      "speed": 536139.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 3,
+      "energy": 58622723.65,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 23,
+      "contacts_per_foot": [
+       11,
+       11
+      ],
+      "max_contact_force": 41279.2,
+      "pair": [
+       "ground",
+       "Cube"
+      ],
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 9.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 0.0,
+      "niter": 3,
+      "energy": -26.6,
+      "ncon": 36,
+      "min_dist": -0.0606
+     }
+    ]
+   },
+   "default_contacts": {
+    "first_joint_over_3x": [
+     7,
+     "left_hip_roll_joint"
+    ],
+    "energy_first_last": [
+     37923.06,
+     832213796.71
+    ],
+    "nonfinite": false,
+    "rows": [
+     {
+      "s": 0,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 70.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 37923.06,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 1,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 52.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 37390.18,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 2,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_knee_joint",
+      "speed": 46.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 37443.3,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 3,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_roll_joint",
+      "speed": 42.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 0,
+      "energy": 37982.18,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 4,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 41.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -124.0,
+      "niter": 1,
+      "energy": 39137.13,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 5,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 74.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -151.2,
+      "niter": 1,
+      "energy": 40915.87,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 6,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 107.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 43106.81,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 7,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 117.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 45805.74,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 8,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 163.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 47457.32,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 9,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 184.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 44151.01,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 10,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 147.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 38177.16,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 11,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 176.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 68197.28,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 12,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 185.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 78844.1,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 13,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 183.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 75039.91,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 14,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 223.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 2,
+      "energy": 80196.95,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 15,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 189.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 86401.79,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 16,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 281.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 108038.81,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 17,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 432.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 2,
+      "energy": 112654.73,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 18,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_shoulder_pitch_joint",
+      "speed": 479.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 144631.42,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 19,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_elbow_pitch_joint",
+      "speed": 681.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 168166.59,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 20,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_shoulder_yaw_joint",
+      "speed": 1952.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 240942.51,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 21,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_elbow_pitch_joint",
+      "speed": 13726.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 655460.6,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 22,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_elbow_pitch_joint",
+      "speed": 100472.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 3,
+      "energy": 5010962.83,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 23,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_shoulder_roll_joint",
+      "speed": 14462769.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 5,
+      "energy": 832213796.71,
+      "ncon": 0,
+      "min_dist": 0.0
+     }
+    ]
+   }
+  },
+  {
+   "env": 2141,
+   "step": 232,
+   "first_episode": true,
+   "mass_scale": 1.0766379833221436,
+   "run": {
+    "first_joint_over_3x": [
+     0,
+     "left_hip_pitch_joint"
+    ],
+    "energy_first_last": [
+     36439.59,
+     -27.74
+    ],
+    "nonfinite": false,
+    "rows": [
+     {
+      "s": 0,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 118.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 36439.59,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 1,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 60.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 0,
+      "energy": 38160.98,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 2,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 93.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 0,
+      "energy": 43005.78,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 3,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 98.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -260.0,
+      "niter": 1,
+      "energy": 42671.21,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 4,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 105.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 42240.03,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 5,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 112.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 42684.43,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 6,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 91.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 43385.2,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 7,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 68.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -256.8,
+      "niter": 1,
+      "energy": 44719.53,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 8,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 59.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 46073.54,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 9,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 61.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -58.1,
+      "niter": 1,
+      "energy": 47179.05,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 10,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 139.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 48713.5,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 11,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 183.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 51200.86,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 12,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 161.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 55810.62,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 13,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 132.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 58187.72,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 14,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 161.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 58090.82,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 15,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 163.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 66944.4,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 16,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 225.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 85982.31,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 17,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 398.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 123478.17,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 18,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 1228.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 284662.66,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 19,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_knee_joint",
+      "speed": 1792.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 892007.45,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 20,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_knee_joint",
+      "speed": 6275.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 3,
+      "energy": 2486326.6,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 21,
+      "contacts_per_foot": [
+       1,
+       0
+      ],
+      "max_contact_force": 391588.1,
+      "pair": [
+       "Cube",
+       "torso_link_Cube"
+      ],
+      "fastest_joint": "right_knee_joint",
+      "speed": 32091.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 2,
+      "energy": 12068592.09,
+      "ncon": 1,
+      "min_dist": -0.0404
+     },
+     {
+      "s": 22,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 2295230.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 3,
+      "energy": 543593396.01,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 23,
+      "contacts_per_foot": [
+       11,
+       11
+      ],
+      "max_contact_force": 41256.7,
+      "pair": [
+       "ground",
+       "Cube"
+      ],
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 9.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 0.0,
+      "niter": 3,
+      "energy": -27.74,
+      "ncon": 36,
+      "min_dist": -0.0606
+     }
+    ]
+   },
+   "default_contacts": {
+    "first_joint_over_3x": [
+     0,
+     "left_hip_pitch_joint"
+    ],
+    "energy_first_last": [
+     36439.59,
+     -27.72
+    ],
+    "nonfinite": false,
+    "rows": [
+     {
+      "s": 0,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 123.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 36439.59,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 1,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 65.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 0,
+      "energy": 38097.39,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 2,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 97.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 0,
+      "energy": 43014.43,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 3,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 102.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -279.2,
+      "niter": 1,
+      "energy": 42740.47,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 4,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 112.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 42197.45,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 5,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 123.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 42529.13,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 6,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 95.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 42859.48,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 7,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 68.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -272.4,
+      "niter": 1,
+      "energy": 44055.48,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 8,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 58.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 45297.66,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 9,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 59.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -30.8,
+      "niter": 0,
+      "energy": 46301.64,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 10,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 139.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 47750.23,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 11,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 189.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 50060.71,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 12,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 170.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 54465.18,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 13,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 141.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 57103.03,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 14,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 157.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 56166.76,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 15,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 150.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 62840.61,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 16,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 209.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 75780.04,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 17,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 290.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 104145.14,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 18,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 989.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 167809.13,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 19,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_roll_joint",
+      "speed": 1703.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 749858.08,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 20,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_shoulder_roll_joint",
+      "speed": 9824.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 4044020.83,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 21,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_shoulder_pitch_joint",
+      "speed": 274106.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 2,
+      "energy": 30802366.7,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 22,
+      "contacts_per_foot": [
+       11,
+       10
+      ],
+      "max_contact_force": 3961.5,
+      "pair": [
+       "ground",
+       "right_ankle_roll_link_Cube"
+      ],
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 0.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 0.0,
+      "niter": 3,
+      "energy": -27.74,
+      "ncon": 21,
+      "min_dist": -0.0506
+     },
+     {
+      "s": 23,
+      "contacts_per_foot": [
+       11,
+       10
+      ],
+      "max_contact_force": 3818.8,
+      "pair": [
+       "ground",
+       "right_ankle_roll_link_Cube"
+      ],
+      "fastest_joint": "right_one_joint",
+      "speed": 7.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -76.2,
+      "niter": 3,
+      "energy": -27.72,
+      "ncon": 21,
+      "min_dist": -0.0506
+     }
+    ]
+   }
+  },
+  {
+   "env": 1087,
+   "step": 234,
+   "first_episode": true,
+   "mass_scale": 0.8931306004524231,
+   "run": {
+    "first_joint_over_3x": [
+     13,
+     "left_hip_roll_joint"
+    ],
+    "energy_first_last": [
+     30743.49,
+     1230382.99
+    ],
+    "nonfinite": false,
+    "rows": [
+     {
+      "s": 0,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 78.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 30743.49,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 1,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 58.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 31161.66,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 2,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_knee_joint",
+      "speed": 58.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -98.0,
+      "niter": 1,
+      "energy": 31284.51,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 3,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_knee_joint",
+      "speed": 55.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -170.1,
+      "niter": 1,
+      "energy": 31558.8,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 4,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 52.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 32616.85,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 5,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 89.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 87.8,
+      "niter": 1,
+      "energy": 34677.39,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 6,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 108.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 36886.07,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 7,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 97.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 36722.87,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 8,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 67.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 35471.01,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 9,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 61.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 35082.75,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 10,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 62.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 36352.0,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 11,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_roll_joint",
+      "speed": 70.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 299.5,
+      "niter": 1,
+      "energy": 39366.44,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 12,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 81.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -222.2,
+      "niter": 1,
+      "energy": 43828.92,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 13,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 136.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 48594.35,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 14,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 220.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 53396.7,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 15,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 470.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 2,
+      "energy": 55091.81,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 16,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 267.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 39797.75,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 17,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_knee_joint",
+      "speed": 306.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 100411.52,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 18,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_knee_joint",
+      "speed": 516.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 117410.71,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 19,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_knee_joint",
+      "speed": 434.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 138.6,
+      "niter": 1,
+      "energy": 135746.51,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 20,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 364.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 174829.24,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 21,
+      "contacts_per_foot": [
+       1,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_knee_joint",
+      "speed": 551.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 234.0,
+      "niter": 2,
+      "energy": 254943.16,
+      "ncon": 1,
+      "min_dist": -0.0121
+     },
+     {
+      "s": 22,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 1307.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 486163.09,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 23,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 4770.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 3,
+      "energy": 1230382.99,
+      "ncon": 0,
+      "min_dist": 0.0
+     }
+    ]
+   },
+   "default_contacts": {
+    "first_joint_over_3x": [
+     13,
+     "left_hip_roll_joint"
+    ],
+    "energy_first_last": [
+     30743.49,
+     23844038.43
+    ],
+    "nonfinite": false,
+    "rows": [
+     {
+      "s": 0,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 78.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 30743.49,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 1,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 58.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 31139.44,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 2,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_knee_joint",
+      "speed": 58.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -98.1,
+      "niter": 1,
+      "energy": 31246.45,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 3,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_knee_joint",
+      "speed": 55.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -169.6,
+      "niter": 1,
+      "energy": 31498.24,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 4,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 53.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 32533.6,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 5,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 85.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 87.4,
+      "niter": 1,
+      "energy": 34534.62,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 6,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 104.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 2,
+      "energy": 36466.18,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 7,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 98.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 36497.9,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 8,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 69.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 35292.81,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 9,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 63.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 34863.38,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 10,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 68.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 36050.15,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 11,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_roll_joint",
+      "speed": 74.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 38903.63,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 12,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 75.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -196.7,
+      "niter": 1,
+      "energy": 43273.71,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 13,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 132.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 47732.26,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 14,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 209.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 52532.76,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 15,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 451.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 2,
+      "energy": 55299.97,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 16,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 336.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 40641.48,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 17,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 403.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 98994.68,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 18,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_knee_joint",
+      "speed": 437.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 106482.07,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 19,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 335.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 117838.81,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 20,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_knee_joint",
+      "speed": 628.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 168405.23,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 21,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 1024.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 290575.39,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 22,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_roll_joint",
+      "speed": 5391.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 1555521.03,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 23,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 79551.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 3,
+      "energy": 23844038.43,
+      "ncon": 0,
+      "min_dist": 0.0
+     }
+    ]
+   }
+  },
+  {
+   "env": 3834,
+   "step": 234,
+   "first_episode": true,
+   "mass_scale": 1.2041993141174316,
+   "run": {
+    "first_joint_over_3x": [
+     6,
+     "left_hip_roll_joint"
+    ],
+    "energy_first_last": [
+     32538.31,
+     17092181.94
+    ],
+    "nonfinite": false,
+    "rows": [
+     {
+      "s": 0,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 52.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 143.3,
+      "niter": 2,
+      "energy": 32538.31,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 1,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 55.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 183.2,
+      "niter": 1,
+      "energy": 32889.25,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 2,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 54.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 226.5,
+      "niter": 2,
+      "energy": 33387.24,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 3,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 53.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -52.5,
+      "niter": 0,
+      "energy": 34360.99,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 4,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 85.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -23.5,
+      "niter": 0,
+      "energy": 36227.28,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 5,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 109.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 205.4,
+      "niter": 1,
+      "energy": 38181.41,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 6,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 113.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 38469.45,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 7,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 93.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 37335.61,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 8,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_roll_joint",
+      "speed": 60.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 2,
+      "energy": 36664.65,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 9,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 60.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 44.8,
+      "niter": 1,
+      "energy": 37598.1,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 10,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 82.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -190.7,
+      "niter": 1,
+      "energy": 40102.01,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 11,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 94.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -82.1,
+      "niter": 1,
+      "energy": 43092.17,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 12,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 137.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 46369.23,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 13,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 153.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -11.4,
+      "niter": 1,
+      "energy": 52420.22,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 14,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 252.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 59274.92,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 15,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 371.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 48913.05,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 16,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 301.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 45347.83,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 17,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 250.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 75405.7,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 18,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 430.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 93869.3,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 19,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 807.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 139730.42,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 20,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 770.3,
+      "limit_force_on_it": 1737.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 192038.31,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 21,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 2555.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -255.5,
+      "niter": 1,
+      "energy": 279369.18,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 22,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_knee_joint",
+      "speed": 15699.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 1525956.46,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 23,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_roll_joint",
+      "speed": 83205.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 17092181.94,
+      "ncon": 0,
+      "min_dist": 0.0
+     }
+    ]
+   },
+   "default_contacts": {
+    "first_joint_over_3x": [
+     12,
+     "left_hip_roll_joint"
+    ],
+    "energy_first_last": [
+     32538.31,
+     910133.56
+    ],
+    "nonfinite": false,
+    "rows": [
+     {
+      "s": 0,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 52.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 143.3,
+      "niter": 0,
+      "energy": 32538.31,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 1,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 56.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 185.7,
+      "niter": 1,
+      "energy": 32860.29,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 2,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 57.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 234.0,
+      "niter": 1,
+      "energy": 33431.23,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 3,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 52.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 267.8,
+      "niter": 1,
+      "energy": 34440.69,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 4,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 79.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -14.3,
+      "niter": 1,
+      "energy": 35893.19,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 5,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 106.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 181.1,
+      "niter": 2,
+      "energy": 37252.89,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 6,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 106.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 2,
+      "energy": 37021.67,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 7,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 88.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 35822.12,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 8,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 57.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 35485.96,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 9,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 45.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 96.9,
+      "niter": 1,
+      "energy": 36256.68,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 10,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 68.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -104.3,
+      "niter": 1,
+      "energy": 38266.61,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 11,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 84.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -32.4,
+      "niter": 1,
+      "energy": 40923.15,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 12,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 124.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 44016.64,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 13,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 141.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 49075.75,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 14,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 265.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 54694.71,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 15,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 358.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 46841.42,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 16,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 237.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 32826.51,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 17,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 243.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 78460.76,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 18,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 387.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 86609.92,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 19,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 342.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 108212.25,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 20,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 449.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 135866.11,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 21,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 770.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 189072.97,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 22,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_knee_joint",
+      "speed": 1222.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 303001.79,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 23,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_knee_joint",
+      "speed": 2382.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 910133.56,
+      "ncon": 0,
+      "min_dist": 0.0
+     }
+    ]
+   }
+  },
+  {
+   "env": 3140,
+   "step": 235,
+   "first_episode": true,
+   "mass_scale": 1.2062543630599976,
+   "run": {
+    "first_joint_over_3x": [
+     4,
+     "left_hip_roll_joint"
+    ],
+    "energy_first_last": [
+     32146.31,
+     19.01
+    ],
+    "nonfinite": false,
+    "rows": [
+     {
+      "s": 0,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 35.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -119.5,
+      "niter": 2,
+      "energy": 32146.31,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 1,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 36.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -161.3,
+      "niter": 0,
+      "energy": 33136.08,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 2,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 33.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -33.0,
+      "niter": 0,
+      "energy": 34386.91,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 3,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 74.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -242.6,
+      "niter": 0,
+      "energy": 35795.86,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 4,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 113.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 37108.36,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 5,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 128.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 38323.81,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 6,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 109.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 39428.57,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 7,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 122.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 39380.23,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 8,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 115.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 0,
+      "energy": 38981.81,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 9,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 94.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 41846.68,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 10,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_roll_joint",
+      "speed": 107.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 49328.88,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 11,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 232.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 66542.4,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 12,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 192.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 83139.86,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 13,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_knee_joint",
+      "speed": 218.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 78608.94,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 14,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 280.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 83566.12,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 15,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 330.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 133986.07,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 16,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 725.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 233497.27,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 17,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 1457.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 48.7,
+      "niter": 1,
+      "energy": 473368.92,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 18,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_knee_joint",
+      "speed": 5915.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 1385491.2,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 19,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 40948.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 4,
+      "energy": 6608965.7,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 20,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_ankle_pitch_joint",
+      "speed": 691141.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 20.0,
+      "niter": 4,
+      "energy": 219213273.15,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 21,
+      "contacts_per_foot": [
+       11,
+       11
+      ],
+      "max_contact_force": 41283.5,
+      "pair": [
+       "ground",
+       "Cube"
+      ],
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 9.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 0.0,
+      "niter": 3,
+      "energy": -26.37,
+      "ncon": 36,
+      "min_dist": -0.0606
+     },
+     {
+      "s": 22,
+      "contacts_per_foot": [
+       11,
+       10
+      ],
+      "max_contact_force": 39330.9,
+      "pair": [
+       "ground",
+       "Cube"
+      ],
+      "fastest_joint": "right_ankle_roll_joint",
+      "speed": 61.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 20.0,
+      "niter": 3,
+      "energy": -15.12,
+      "ncon": 21,
+      "min_dist": -0.0619
+     },
+     {
+      "s": 23,
+      "contacts_per_foot": [
+       11,
+       11
+      ],
+      "max_contact_force": 41049.8,
+      "pair": [
+       "ground",
+       "Cube"
+      ],
+      "fastest_joint": "left_ankle_roll_joint",
+      "speed": 36.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -20.0,
+      "niter": 4,
+      "energy": 19.01,
+      "ncon": 36,
+      "min_dist": -0.0627
+     }
+    ]
+   },
+   "default_contacts": {
+    "first_joint_over_3x": [
+     4,
+     "left_hip_roll_joint"
+    ],
+    "energy_first_last": [
+     32146.31,
+     -26.37
+    ],
+    "nonfinite": false,
+    "rows": [
+     {
+      "s": 0,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 35.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -119.5,
+      "niter": 2,
+      "energy": 32146.31,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 1,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 36.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -161.2,
+      "niter": 0,
+      "energy": 33137.78,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 2,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 33.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -33.2,
+      "niter": 0,
+      "energy": 34389.16,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 3,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 74.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -242.7,
+      "niter": 0,
+      "energy": 35798.38,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 4,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 113.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 0,
+      "energy": 37111.02,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 5,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 130.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 0,
+      "energy": 38295.98,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 6,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 111.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 0,
+      "energy": 39350.83,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 7,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 119.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 0,
+      "energy": 39276.36,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 8,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 107.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 0,
+      "energy": 38813.74,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 9,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 97.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 41586.9,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 10,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_roll_joint",
+      "speed": 112.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 48801.98,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 11,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 238.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 64736.84,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 12,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 206.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 84230.32,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 13,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_knee_joint",
+      "speed": 223.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 77873.65,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 14,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 289.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 82076.66,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 15,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 286.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 41.9,
+      "niter": 1,
+      "energy": 127425.4,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 16,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 718.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 213214.08,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 17,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_knee_joint",
+      "speed": 571.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 280433.02,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 18,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 1288.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 461215.92,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 19,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 2024.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 3,
+      "energy": 477347.69,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 20,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_knee_joint",
+      "speed": 6367.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 2,
+      "energy": 1462087.18,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 21,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_yaw_joint",
+      "speed": 31723.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 2,
+      "energy": 6585268.07,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 22,
+      "contacts_per_foot": [
+       1,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_yaw_joint",
+      "speed": 1912052.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 4,
+      "energy": 170738781.14,
+      "ncon": 1,
+      "min_dist": -0.0248
+     },
+     {
+      "s": 23,
+      "contacts_per_foot": [
+       11,
+       10
+      ],
+      "max_contact_force": 3964.0,
+      "pair": [
+       "ground",
+       "right_ankle_roll_link_Cube"
+      ],
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 0.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 0.0,
+      "niter": 3,
+      "energy": -26.37,
+      "ncon": 21,
+      "min_dist": -0.0506
+     }
+    ]
+   }
+  },
+  {
+   "env": 3193,
+   "step": 237,
+   "first_episode": true,
+   "mass_scale": 1.235859751701355,
+   "run": {
+    "first_joint_over_3x": [
+     8,
+     "left_hip_roll_joint"
+    ],
+    "energy_first_last": [
+     33844.43,
+     -0.29
+    ],
+    "nonfinite": false,
+    "rows": [
+     {
+      "s": 0,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 51.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -109.2,
+      "niter": 1,
+      "energy": 33844.43,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 1,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 86.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 34638.37,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 2,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 108.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 35706.57,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 3,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 107.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 37584.17,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 4,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 85.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -95.2,
+      "niter": 0,
+      "energy": 40047.87,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 5,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 86.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -297.6,
+      "niter": 0,
+      "energy": 40463.17,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 6,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 73.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 0,
+      "energy": 39683.44,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 7,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 73.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 0,
+      "energy": 41170.89,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 8,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 131.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 209.5,
+      "niter": 1,
+      "energy": 46278.16,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 9,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 161.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 52004.2,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 10,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 120.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 47881.29,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 11,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_shoulder_roll_joint",
+      "speed": 83.0,
+      "limit_force_on_it": 1589.5,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 48268.15,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 12,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 97.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 52871.91,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 13,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_roll_joint",
+      "speed": 89.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 59214.05,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 14,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 173.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -292.9,
+      "niter": 1,
+      "energy": 65357.27,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 15,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 279.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -140.2,
+      "niter": 1,
+      "energy": 71385.73,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 16,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 808.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 2,
+      "energy": 102540.51,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 17,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_yaw_joint",
+      "speed": 944.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 1,
+      "energy": 247127.66,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 18,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_roll_joint",
+      "speed": 3209.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 737439.03,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 19,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_knee_joint",
+      "speed": 46315.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 2,
+      "energy": 9904762.42,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 20,
+      "contacts_per_foot": [
+       0,
+       1
+      ],
+      "max_contact_force": 6798694.9,
+      "pair": [
+       "right_ankle_roll_link_Cube",
+       "torso_link_Cube"
+      ],
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 840378.6,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 4,
+      "energy": 449305957.46,
+      "ncon": 1,
+      "min_dist": -0.009
+     },
+     {
+      "s": 21,
+      "contacts_per_foot": [
+       11,
+       11
+      ],
+      "max_contact_force": 41289.4,
+      "pair": [
+       "ground",
+       "Cube"
+      ],
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 9.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 0.0,
+      "niter": 3,
+      "energy": -26.06,
+      "ncon": 36,
+      "min_dist": -0.0606
+     },
+     {
+      "s": 22,
+      "contacts_per_foot": [
+       11,
+       10
+      ],
+      "max_contact_force": 39292.5,
+      "pair": [
+       "ground",
+       "Cube"
+      ],
+      "fastest_joint": "right_ankle_roll_joint",
+      "speed": 40.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -0.5,
+      "niter": 2,
+      "energy": -14.78,
+      "ncon": 21,
+      "min_dist": -0.0619
+     },
+     {
+      "s": 23,
+      "contacts_per_foot": [
+       11,
+       10
+      ],
+      "max_contact_force": 43754.3,
+      "pair": [
+       "ground",
+       "right_ankle_roll_link_Cube"
+      ],
+      "fastest_joint": "left_ankle_roll_joint",
+      "speed": 43.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -20.0,
+      "niter": 4,
+      "energy": -0.29,
+      "ncon": 35,
+      "min_dist": -0.0619
+     }
+    ]
+   },
+   "default_contacts": {
+    "first_joint_over_3x": [
+     8,
+     "left_hip_roll_joint"
+    ],
+    "energy_first_last": [
+     33844.43,
+     -20.0
+    ],
+    "nonfinite": false,
+    "rows": [
+     {
+      "s": 0,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 52.2,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -109.2,
+      "niter": 0,
+      "energy": 33844.43,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 1,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 86.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 0,
+      "energy": 34630.57,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 2,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 108.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 0,
+      "energy": 35702.31,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 3,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 107.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 0,
+      "energy": 37582.09,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 4,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 85.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -95.3,
+      "niter": 0,
+      "energy": 40040.97,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 5,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 86.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -297.1,
+      "niter": 0,
+      "energy": 40446.17,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 6,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 73.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 0,
+      "energy": 39665.05,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 7,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 73.0,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 0,
+      "energy": 41146.11,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 8,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 133.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 209.7,
+      "niter": 1,
+      "energy": 46236.76,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 9,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 163.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 52034.95,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 10,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 117.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 1,
+      "energy": 47704.71,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 11,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 84.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 2,
+      "energy": 48155.64,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 12,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 106.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 2,
+      "energy": 53231.74,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 13,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "torso_joint",
+      "speed": 100.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 2,
+      "energy": 59906.37,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 14,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 164.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -264.1,
+      "niter": 1,
+      "energy": 66434.03,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 15,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 292.1,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -33.6,
+      "niter": 0,
+      "energy": 72654.81,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 16,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_pitch_joint",
+      "speed": 951.5,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 2,
+      "energy": 100375.83,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 17,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "left_hip_roll_joint",
+      "speed": 1494.7,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 2,
+      "energy": 246816.65,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 18,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 3078.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 3,
+      "energy": 557456.57,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 19,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_knee_joint",
+      "speed": 13993.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 3,
+      "energy": 3652138.49,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 20,
+      "contacts_per_foot": [
+       0,
+       0
+      ],
+      "max_contact_force": 0.0,
+      "pair": null,
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 185609.3,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 300.0,
+      "niter": 3,
+      "energy": 76793443.72,
+      "ncon": 0,
+      "min_dist": 0.0
+     },
+     {
+      "s": 21,
+      "contacts_per_foot": [
+       11,
+       10
+      ],
+      "max_contact_force": 3964.6,
+      "pair": [
+       "ground",
+       "right_ankle_roll_link_Cube"
+      ],
+      "fastest_joint": "left_hip_yaw_joint",
+      "speed": 0.9,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": 0.0,
+      "niter": 3,
+      "energy": -26.06,
+      "ncon": 21,
+      "min_dist": -0.0506
+     },
+     {
+      "s": 22,
+      "contacts_per_foot": [
+       11,
+       10
+      ],
+      "max_contact_force": 3991.9,
+      "pair": [
+       "ground",
+       "right_ankle_roll_link_Cube"
+      ],
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 7.8,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 3,
+      "energy": -26.05,
+      "ncon": 21,
+      "min_dist": -0.0506
+     },
+     {
+      "s": 23,
+      "contacts_per_foot": [
+       11,
+       10
+      ],
+      "max_contact_force": 4321.2,
+      "pair": [
+       "ground",
+       "right_ankle_roll_link_Cube"
+      ],
+      "fastest_joint": "right_hip_pitch_joint",
+      "speed": 14.4,
+      "limit_force_on_it": 0.0,
+      "actuator_force_on_it": -300.0,
+      "niter": 3,
+      "energy": -20.0,
+      "ncon": 21,
+      "min_dist": -0.0506
+     }
+    ]
+   }
+  }
+ ]
+}
