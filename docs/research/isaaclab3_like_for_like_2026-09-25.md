@@ -831,7 +831,7 @@ A/B (`runs/il3/late_ab.log`, final corrected-rough policy, 1500 steps × 4096 en
 | actuator clamp + hard finger limits | 0 | – | 59 |
 | actuator clamp + hard limits everywhere | 0 | – | 32 |
 | actuator clamp + MuJoCo Warp factorization defaults | 39 | large-finite, fingers | 78 |
-| actuator clamp + contact_cfg default | DEFAULT_PENDING | | |
+| actuator clamp + contact_cfg default (MuJoCo default contacts and limits) | 0 | – | 77 |
 
 The blow-ups were large-finite (|qvel| > 1000), not NaN: Isaac's log has no counter for that and nothing terminates on it.
 The fix (default `effort_limit="joint"`, all G1 configs; also the generic USD loader and the Tron1 training model) is

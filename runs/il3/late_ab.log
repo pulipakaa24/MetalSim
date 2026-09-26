@@ -1,0 +1,928 @@
+== Sat Sep 26 05:43:11 PDT 2026
+holder: {"name": "il3_late_ab", "kind": "train", "minutes": 40.0, "pid": 66564, "start": 1790426590.799396, "queued": 1790422988.917601, "cmd": "runs/il3/run_late_ab.sh", "cwd": "/Users/aditya/robosim"}
+  waiting [low] cl_mjw est 40.0 min, queued 14947 s ago
+  waiting [low] cl_kamino2 est 40.0 min, queued 14880 s ago
+  waiting [low] cl_k3_stress_fourbar est 12.0 min, queued 13009 s ago
+  waiting [low] cl_k3_stress_leg est 12.0 min, queued 13008 s ago
+  waiting [low] cl_k3_bench est 12.0 min, queued 13007 s ago
+  waiting [low] cl_k3_il3 est 12.0 min, queued 13006 s ago
+  waiting [low] cl_k3_example est 12.0 min, queued 13005 s ago
+  waiting [low] cl_k3_stress_leg_5ms est 12.0 min, queued 13004 s ago
+  waiting [low] tp26_tests est 25.0 min, queued 6568 s ago
+  waiting [low] tp26_tests2 est 25.0 min, queued 5438 s ago
+-- isaaclab3_every_substep_cap20+actuatoreffort 05:43:11
+/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  warnings.warn(
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 27.11 ms  (cached)
+Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 18.52 ms  (cached)
+Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_b3132664 b313266 load on device 'metal:0' took 26.05 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_78310433 7831043 load on device 'metal:0' took 26.47 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_0db2ba1e 0db2ba1 load on device 'metal:0' took 19.42 ms  (cached)
+Module mujoco_warp._src.constraint f5f4518 load on device 'metal:0' took 16.74 ms  (cached)
+Module _friction_dof__locals__kernel_0bb9a331 0bb9a33 load on device 'metal:0' took 17.15 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_914cb5e1 914cb5e load on device 'metal:0' took 17.47 ms  (cached)
+Module _efc_contact_init__locals__kernel_03ee81b4 03ee81b load on device 'metal:0' took 16.75 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_16824443 e86c3ac load on device 'metal:0' took 16.79 ms  (cached)
+Module _efc_contact_update__locals__kernel_89d497ae 89d497a load on device 'metal:0' took 17.02 ms  (cached)
+Module mujoco_warp._src.forward 4772766 load on device 'metal:0' took 22.82 ms  (cached)
+Module mujoco_warp._src.passive 9e93f67 load on device 'metal:0' took 22.18 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_8ed29e9b 8ed29e9 load on device 'metal:0' took 17.06 ms  (cached)
+Module mujoco_warp._src.forward d28e0c7 load on device 'metal:0' took 22.91 ms  (cached)
+Module _qfrc_smooth__locals__kernel_08dfc9ad 08dfc9a load on device 'metal:0' took 16.92 ms  (cached)
+Module mujoco_warp._src.support 040f2c5 load on device 'metal:0' took 16.95 ms  (cached)
+Module _factor_i_sparse_serial__locals__kernel_bbc34dce 0938022 load on device 'metal:0' took 17.49 ms  (cached)
+Module _solve_LD_sparse_serial__locals__kernel_da14e052 352f4b8 load on device 'metal:0' took 17.63 ms  (cached)
+Module _solve_init_dof__locals__kernel_8e985b01 8e985b0 load on device 'metal:0' took 16.65 ms  (cached)
+Module mujoco_warp._src.solver f23e090 load on device 'metal:0' took 18.70 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_7c1132c5 7c1132c load on device 'metal:0' took 16.72 ms  (cached)
+Module mul_m_kernel__locals___mul_m_505d9f1c 505d9f1 load on device 'metal:0' took 16.66 ms  (cached)
+Module _update_constraint_efc__locals__kernel_1994cb68 1994cb6 load on device 'metal:0' took 16.89 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_6f502a20 6f502a2 load on device 'metal:0' took 16.63 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_86f1e084 86f1e08 load on device 'metal:0' took 16.63 ms  (cached)
+Module _update_gradient_grad__locals__kernel_e5baa4a1 e5baa4a load on device 'metal:0' took 16.62 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_712c31a5 8925ee6 load on device 'metal:0' took 18.94 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_ad48cc59 0434274 load on device 'metal:0' took 16.60 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_76ff806c bfdf7e9 load on device 'metal:0' took 18.97 ms  (cached)
+Module _update_constraint_efc__locals__kernel_49bd7abe 49bd7ab load on device 'metal:0' took 17.20 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_20171f2f 20171f2 load on device 'metal:0' took 16.74 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_67211e0e 67211e0 load on device 'metal:0' took 16.79 ms  (cached)
+Module _update_gradient_grad__locals__kernel_7aee5faa 7aee5fa load on device 'metal:0' took 16.85 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_821b2aa5 fca3c48 load on device 'metal:0' took 16.90 ms  (cached)
+Module _solve_done__locals__kernel_d351f953 d351f95 load on device 'metal:0' took 16.92 ms  (cached)
+Module mujoco_warp._src.sensor c2b0248 load on device 'metal:0' took 27.49 ms  (cached)
+Module mujoco_warp._src.derivative 356952f load on device 'metal:0' took 19.59 ms  (cached)
+Module _next_time_builder__locals___next_time_bd97507a bd97507 load on device 'metal:0' took 16.80 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_f05e0f72 f05e0f7 load on device 'metal:0' took 16.50 ms  (cached)
+Module reset_data__locals__reset_M_debb12fa debb12f load on device 'metal:0' took 16.54 ms  (cached)
+Module reset_data__locals__reset_mocap_d5f6a172 d5f6a17 load on device 'metal:0' took 16.69 ms  (cached)
+Module reset_data__locals__reset_contact_10be067b 10be067 load on device 'metal:0' took 16.69 ms  (cached)
+Module reset_data__locals__reset_sleep_4c0bb4a4 4c0bb4a load on device 'metal:0' took 16.63 ms  (cached)
+Module reset_data__locals__reset_nworld_f0ec89aa f0ec89a load on device 'metal:0' took 16.60 ms  (cached)
+Module mujoco_warp._src.set_const 40b21c5 load on device 'metal:0' took 25.20 ms  (cached)
+Module metalsim.sensors.contact 8b280a6 load on device 'metal:0' took 19.45 ms  (cached)
+Module metalsim.learn.g1_il3 bd6c6cc load on device 'metal:0' took 18.60 ms  (cached)
+spawn {"worlds_penetrating_at_spawn": 0, "max_spawn_penetration_m": 0.0, "worlds_with_contact_within_gap_at_spawn": 0, "spawn_z_minus_origin_z": 0.7400000095367432}
+Module metalsim.learn.warp_policy d05639d load on device 'metal:0' took 17.85 ms  (cached)
+Module metalsim.learn.terrain 595c542 load on device 'metal:0' took 20.17 ms  (cached)
+Module metalsim.learn.g1_velocity 98312b6 load on device 'metal:0' took 21.91 ms  (cached)
+{
+ "terrain": "rough",
+ "preset": "isaaclab3_every_substep_cap20+actuatoreffort",
+ "ckpt": "runs/il3/ckpt/il3fix_rough_s0.pt",
+ "steps": 1500,
+ "cap": 20,
+ "niter": {
+  "max": 9,
+  "p99.9": 9.0,
+  "substep_worlds_at_cap": 0,
+  "of": 49152000
+ },
+ "overflow": {},
+ "blowups": 41,
+ "spawn": {
+  "worlds_penetrating_at_spawn": 0,
+  "max_spawn_penetration_m": 0.0,
+  "worlds_with_contact_within_gap_at_spawn": 0,
+  "spawn_z_minus_origin_z": 0.7400000095367432
+ },
+ "isaac_style_torso_terminations": 91,
+ "criterion": "blow-up = any |qpos| or |qvel| > 1000 or non-finite after a control step (g1_reward_done); Isaac 3.0 terminates only on time_out and torso contact > 1 N (TerminationsCfg), so every blow-up here is a state Isaac's task would not end by itself",
+ "blowup_levels": [
+  [
+   1,
+   7
+  ],
+  [
+   2,
+   7
+  ],
+  [
+   0,
+   6
+  ],
+  [
+   3,
+   6
+  ],
+  [
+   4,
+   6
+  ],
+  [
+   5,
+   5
+  ],
+  [
+   6,
+   4
+  ]
+ ],
+ "blowup_cols": [
+  [
+   15,
+   4
+  ],
+  [
+   13,
+   4
+  ],
+  [
+   16,
+   4
+  ],
+  [
+   3,
+   4
+  ],
+  [
+   9,
+   3
+  ],
+  [
+   17,
+   3
+  ],
+  [
+   18,
+   2
+  ],
+  [
+   8,
+   2
+  ]
+ ],
+ "base_rate_levels": [
+  [
+   1,
+   712
+  ],
+  [
+   4,
+   705
+  ],
+  [
+   2,
+   700
+  ],
+  [
+   3,
+   673
+  ],
+  [
+   5,
+   560
+  ],
+  [
+   6,
+   478
+  ],
+  [
+   0,
+   264
+  ],
+  [
+   7,
+   4
+  ]
+ ],
+ "mass_scale_blowups_mean": 1.046640067565732,
+ "mass_scale_all_mean": 1.0074822902679443,
+ "mass_scale_blowups_frac_above_1.1": 0.3170731707317073,
+ "mass_scale_all_frac_above_1.1": 0.282958984375,
+ "blowups_within_50_steps_of_push": 0.04878048780487805,
+ "pre_limit_joint": [
+  [
+   "left_six_joint",
+   15
+  ],
+  [
+   "right_four_joint",
+   12
+  ],
+  [
+   "right_six_joint",
+   9
+  ],
+  [
+   "left_four_joint",
+   5
+  ]
+ ],
+ "pre_speed_joint": [
+  [
+   "left_ankle_pitch_joint",
+   8
+  ],
+  [
+   "right_ankle_pitch_joint",
+   7
+  ],
+  [
+   "left_six_joint",
+   4
+  ],
+  [
+   "right_six_joint",
+   3
+  ],
+  [
+   "left_knee_joint",
+   3
+  ],
+  [
+   "right_ankle_roll_joint",
+   3
+  ]
+ ],
+ "blowup_speed_joint": [
+  [
+   "left_six_joint",
+   14
+  ],
+  [
+   "right_four_joint",
+   12
+  ],
+  [
+   "right_six_joint",
+   9
+  ],
+  [
+   "left_four_joint",
+   5
+  ],
+  [
+   "right_zero_joint",
+   1
+  ]
+ ],
+ "pre_limit_excursion": {
+  "median": 0.15759988129138947,
+  "p90": 0.20743960698057373,
+  "max": 1.639076417283308
+ },
+ "pre_joint_speed": {
+  "median": 14.33753776550293,
+  "p90": 49.79304504394531,
+  "max": 663.819580078125
+ },
+ "pre_penetration_m": {
+  "median": 0.002826788928359747,
+  "p90": 0.0046053072437644005,
+  "max": 0.005820035934448242
+ },
+ "frac_pre_speed_over_3x_limit": 0.07317073170731707,
+ "frac_pre_penetration_over_2cm": 0.0,
+ "frac_torso_contact_before": 0.0,
+ "energy_jump_x_median": 0.7093076719262849,
+ "frac_nonfinite": 0.0,
+ "blowups_in_first_50_steps": 1,
+ "frac_blowups_spawned_penetrating": 0.0,
+ "frac_pre_limit_joint_leg": 0.0,
+ "frac_pre_speed_joint_leg": 0.5853658536585366,
+ "frac_nonphysical_before_blowup": 0.07317073170731707,
+ "all_worlds_pushed_within_50_steps": 0.008544921875
+}
+-- isaaclab3_every_substep_cap20 05:51:45
+/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  warnings.warn(
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 27.16 ms  (cached)
+Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 17.84 ms  (cached)
+Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_b3132664 b313266 load on device 'metal:0' took 25.04 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_78310433 7831043 load on device 'metal:0' took 26.56 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_0db2ba1e 0db2ba1 load on device 'metal:0' took 18.19 ms  (cached)
+Module mujoco_warp._src.constraint f5f4518 load on device 'metal:0' took 16.77 ms  (cached)
+Module _friction_dof__locals__kernel_0bb9a331 0bb9a33 load on device 'metal:0' took 17.14 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_914cb5e1 914cb5e load on device 'metal:0' took 17.12 ms  (cached)
+Module _efc_contact_init__locals__kernel_03ee81b4 03ee81b load on device 'metal:0' took 16.75 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_16824443 e86c3ac load on device 'metal:0' took 16.94 ms  (cached)
+Module _efc_contact_update__locals__kernel_89d497ae 89d497a load on device 'metal:0' took 18.28 ms  (cached)
+Module mujoco_warp._src.forward 4772766 load on device 'metal:0' took 23.03 ms  (cached)
+Module mujoco_warp._src.passive 9e93f67 load on device 'metal:0' took 22.37 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_8ed29e9b 8ed29e9 load on device 'metal:0' took 16.82 ms  (cached)
+Module mujoco_warp._src.forward d28e0c7 load on device 'metal:0' took 23.03 ms  (cached)
+Module _qfrc_smooth__locals__kernel_08dfc9ad 08dfc9a load on device 'metal:0' took 16.88 ms  (cached)
+Module mujoco_warp._src.support 040f2c5 load on device 'metal:0' took 17.24 ms  (cached)
+Module _factor_i_sparse_serial__locals__kernel_bbc34dce 0938022 load on device 'metal:0' took 17.60 ms  (cached)
+Module _solve_LD_sparse_serial__locals__kernel_da14e052 352f4b8 load on device 'metal:0' took 17.55 ms  (cached)
+Module _solve_init_dof__locals__kernel_8e985b01 8e985b0 load on device 'metal:0' took 16.81 ms  (cached)
+Module mujoco_warp._src.solver f23e090 load on device 'metal:0' took 18.62 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_7c1132c5 7c1132c load on device 'metal:0' took 16.76 ms  (cached)
+Module mul_m_kernel__locals___mul_m_505d9f1c 505d9f1 load on device 'metal:0' took 17.40 ms  (cached)
+Module _update_constraint_efc__locals__kernel_1994cb68 1994cb6 load on device 'metal:0' took 18.08 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_6f502a20 6f502a2 load on device 'metal:0' took 17.19 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_86f1e084 86f1e08 load on device 'metal:0' took 17.70 ms  (cached)
+Module _update_gradient_grad__locals__kernel_e5baa4a1 e5baa4a load on device 'metal:0' took 17.08 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_712c31a5 8925ee6 load on device 'metal:0' took 16.83 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_ad48cc59 0434274 load on device 'metal:0' took 16.94 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_76ff806c bfdf7e9 load on device 'metal:0' took 19.38 ms  (cached)
+Module _update_constraint_efc__locals__kernel_49bd7abe 49bd7ab load on device 'metal:0' took 17.91 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_20171f2f 20171f2 load on device 'metal:0' took 17.66 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_67211e0e 67211e0 load on device 'metal:0' took 17.97 ms  (cached)
+Module _update_gradient_grad__locals__kernel_7aee5faa 7aee5fa load on device 'metal:0' took 17.09 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_821b2aa5 fca3c48 load on device 'metal:0' took 17.17 ms  (cached)
+Module _solve_done__locals__kernel_d351f953 d351f95 load on device 'metal:0' took 16.99 ms  (cached)
+Module mujoco_warp._src.sensor c2b0248 load on device 'metal:0' took 28.00 ms  (cached)
+Module mujoco_warp._src.derivative 356952f load on device 'metal:0' took 19.80 ms  (cached)
+Module _next_time_builder__locals___next_time_bd97507a bd97507 load on device 'metal:0' took 16.82 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_f05e0f72 f05e0f7 load on device 'metal:0' took 16.89 ms  (cached)
+Module reset_data__locals__reset_M_debb12fa debb12f load on device 'metal:0' took 17.90 ms  (cached)
+Module reset_data__locals__reset_mocap_d5f6a172 d5f6a17 load on device 'metal:0' took 16.86 ms  (cached)
+Module reset_data__locals__reset_contact_10be067b 10be067 load on device 'metal:0' took 17.32 ms  (cached)
+Module reset_data__locals__reset_sleep_4c0bb4a4 4c0bb4a load on device 'metal:0' took 16.87 ms  (cached)
+Module reset_data__locals__reset_nworld_f0ec89aa f0ec89a load on device 'metal:0' took 16.79 ms  (cached)
+Module mujoco_warp._src.set_const 40b21c5 load on device 'metal:0' took 22.76 ms  (cached)
+Module metalsim.sensors.contact 8b280a6 load on device 'metal:0' took 19.68 ms  (cached)
+Module metalsim.learn.g1_il3 bd6c6cc load on device 'metal:0' took 19.15 ms  (cached)
+spawn {"worlds_penetrating_at_spawn": 0, "max_spawn_penetration_m": 0.0, "worlds_with_contact_within_gap_at_spawn": 0, "spawn_z_minus_origin_z": 0.7400000095367432}
+Module metalsim.learn.warp_policy d05639d load on device 'metal:0' took 18.08 ms  (cached)
+Module metalsim.learn.terrain 595c542 load on device 'metal:0' took 18.68 ms  (cached)
+Module metalsim.learn.g1_velocity 98312b6 load on device 'metal:0' took 21.88 ms  (cached)
+{
+ "terrain": "rough",
+ "preset": "isaaclab3_every_substep_cap20",
+ "ckpt": "runs/il3/ckpt/il3fix_rough_s0.pt",
+ "steps": 1500,
+ "cap": 20,
+ "niter": {
+  "max": 9,
+  "p99.9": 9.0,
+  "substep_worlds_at_cap": 0,
+  "of": 49152000
+ },
+ "overflow": {},
+ "blowups": 0,
+ "spawn": {
+  "worlds_penetrating_at_spawn": 0,
+  "max_spawn_penetration_m": 0.0,
+  "worlds_with_contact_within_gap_at_spawn": 0,
+  "spawn_z_minus_origin_z": 0.7400000095367432
+ },
+ "isaac_style_torso_terminations": 49,
+ "criterion": "blow-up = any |qpos| or |qvel| > 1000 or non-finite after a control step (g1_reward_done); Isaac 3.0 terminates only on time_out and torso contact > 1 N (TerminationsCfg), so every blow-up here is a state Isaac's task would not end by itself",
+ "all_worlds_pushed_within_50_steps": 0.0068359375
+}
+-- isaaclab3_every_substep_cap20_hardfingers+actuatoreffort 06:00:18
+/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  warnings.warn(
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 28.89 ms  (cached)
+Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 19.50 ms  (cached)
+Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_b3132664 b313266 load on device 'metal:0' took 24.93 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_78310433 7831043 load on device 'metal:0' took 30.64 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_0db2ba1e 0db2ba1 load on device 'metal:0' took 17.51 ms  (cached)
+Module mujoco_warp._src.constraint f5f4518 load on device 'metal:0' took 16.72 ms  (cached)
+Module _friction_dof__locals__kernel_0bb9a331 0bb9a33 load on device 'metal:0' took 17.05 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_914cb5e1 914cb5e load on device 'metal:0' took 17.00 ms  (cached)
+Module _efc_contact_init__locals__kernel_03ee81b4 03ee81b load on device 'metal:0' took 16.66 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_16824443 e86c3ac load on device 'metal:0' took 17.01 ms  (cached)
+Module _efc_contact_update__locals__kernel_89d497ae 89d497a load on device 'metal:0' took 17.13 ms  (cached)
+Module mujoco_warp._src.forward 4772766 load on device 'metal:0' took 22.92 ms  (cached)
+Module mujoco_warp._src.passive 9e93f67 load on device 'metal:0' took 22.14 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_8ed29e9b 8ed29e9 load on device 'metal:0' took 16.62 ms  (cached)
+Module mujoco_warp._src.forward d28e0c7 load on device 'metal:0' took 22.86 ms  (cached)
+Module _qfrc_smooth__locals__kernel_08dfc9ad 08dfc9a load on device 'metal:0' took 16.67 ms  (cached)
+Module mujoco_warp._src.support 040f2c5 load on device 'metal:0' took 16.97 ms  (cached)
+Module _factor_i_sparse_serial__locals__kernel_bbc34dce 0938022 load on device 'metal:0' took 17.42 ms  (cached)
+Module _solve_LD_sparse_serial__locals__kernel_da14e052 352f4b8 load on device 'metal:0' took 17.57 ms  (cached)
+Module _solve_init_dof__locals__kernel_8e985b01 8e985b0 load on device 'metal:0' took 16.72 ms  (cached)
+Module mujoco_warp._src.solver f23e090 load on device 'metal:0' took 18.61 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_7c1132c5 7c1132c load on device 'metal:0' took 16.77 ms  (cached)
+Module mul_m_kernel__locals___mul_m_505d9f1c 505d9f1 load on device 'metal:0' took 16.84 ms  (cached)
+Module _update_constraint_efc__locals__kernel_1994cb68 1994cb6 load on device 'metal:0' took 17.00 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_6f502a20 6f502a2 load on device 'metal:0' took 16.63 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_86f1e084 86f1e08 load on device 'metal:0' took 16.57 ms  (cached)
+Module _update_gradient_grad__locals__kernel_e5baa4a1 e5baa4a load on device 'metal:0' took 16.65 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_712c31a5 8925ee6 load on device 'metal:0' took 16.73 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_ad48cc59 0434274 load on device 'metal:0' took 16.41 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_76ff806c bfdf7e9 load on device 'metal:0' took 17.91 ms  (cached)
+Module _update_constraint_efc__locals__kernel_49bd7abe 49bd7ab load on device 'metal:0' took 17.21 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_20171f2f 20171f2 load on device 'metal:0' took 16.63 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_67211e0e 67211e0 load on device 'metal:0' took 16.66 ms  (cached)
+Module _update_gradient_grad__locals__kernel_7aee5faa 7aee5fa load on device 'metal:0' took 16.59 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_821b2aa5 fca3c48 load on device 'metal:0' took 16.66 ms  (cached)
+Module _solve_done__locals__kernel_d351f953 d351f95 load on device 'metal:0' took 16.70 ms  (cached)
+Module mujoco_warp._src.sensor c2b0248 load on device 'metal:0' took 27.20 ms  (cached)
+Module mujoco_warp._src.derivative 356952f load on device 'metal:0' took 19.62 ms  (cached)
+Module _next_time_builder__locals___next_time_bd97507a bd97507 load on device 'metal:0' took 16.69 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_f05e0f72 f05e0f7 load on device 'metal:0' took 16.51 ms  (cached)
+Module reset_data__locals__reset_M_debb12fa debb12f load on device 'metal:0' took 16.92 ms  (cached)
+Module reset_data__locals__reset_mocap_d5f6a172 d5f6a17 load on device 'metal:0' took 16.71 ms  (cached)
+Module reset_data__locals__reset_contact_10be067b 10be067 load on device 'metal:0' took 16.77 ms  (cached)
+Module reset_data__locals__reset_sleep_4c0bb4a4 4c0bb4a load on device 'metal:0' took 16.68 ms  (cached)
+Module reset_data__locals__reset_nworld_f0ec89aa f0ec89a load on device 'metal:0' took 16.70 ms  (cached)
+Module mujoco_warp._src.set_const 40b21c5 load on device 'metal:0' took 22.42 ms  (cached)
+Module metalsim.sensors.contact 8b280a6 load on device 'metal:0' took 19.66 ms  (cached)
+Module metalsim.learn.g1_il3 bd6c6cc load on device 'metal:0' took 17.98 ms  (cached)
+spawn {"worlds_penetrating_at_spawn": 0, "max_spawn_penetration_m": 0.0, "worlds_with_contact_within_gap_at_spawn": 0, "spawn_z_minus_origin_z": 0.7400000095367432}
+Module metalsim.learn.warp_policy d05639d load on device 'metal:0' took 17.86 ms  (cached)
+Module metalsim.learn.terrain 595c542 load on device 'metal:0' took 18.40 ms  (cached)
+Module metalsim.learn.g1_velocity 98312b6 load on device 'metal:0' took 21.96 ms  (cached)
+{
+ "terrain": "rough",
+ "preset": "isaaclab3_every_substep_cap20_hardfingers+actuatoreffort",
+ "ckpt": "runs/il3/ckpt/il3fix_rough_s0.pt",
+ "steps": 1500,
+ "cap": 20,
+ "niter": {
+  "max": 14,
+  "p99.9": 12.0,
+  "substep_worlds_at_cap": 0,
+  "of": 49152000
+ },
+ "overflow": {},
+ "blowups": 0,
+ "spawn": {
+  "worlds_penetrating_at_spawn": 0,
+  "max_spawn_penetration_m": 0.0,
+  "worlds_with_contact_within_gap_at_spawn": 0,
+  "spawn_z_minus_origin_z": 0.7400000095367432
+ },
+ "isaac_style_torso_terminations": 59,
+ "criterion": "blow-up = any |qpos| or |qvel| > 1000 or non-finite after a control step (g1_reward_done); Isaac 3.0 terminates only on time_out and torso contact > 1 N (TerminationsCfg), so every blow-up here is a state Isaac's task would not end by itself",
+ "all_worlds_pushed_within_50_steps": 0.0078125
+}
+-- isaaclab3_every_substep_cap20_hardlimits+actuatoreffort 06:09:22
+/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  warnings.warn(
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 26.65 ms  (cached)
+Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 17.64 ms  (cached)
+Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_b3132664 b313266 load on device 'metal:0' took 24.66 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_78310433 7831043 load on device 'metal:0' took 26.26 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_0db2ba1e 0db2ba1 load on device 'metal:0' took 17.75 ms  (cached)
+Module mujoco_warp._src.constraint f5f4518 load on device 'metal:0' took 16.75 ms  (cached)
+Module _friction_dof__locals__kernel_0bb9a331 0bb9a33 load on device 'metal:0' took 18.39 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_914cb5e1 914cb5e load on device 'metal:0' took 17.22 ms  (cached)
+Module _efc_contact_init__locals__kernel_03ee81b4 03ee81b load on device 'metal:0' took 16.91 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_16824443 e86c3ac load on device 'metal:0' took 17.07 ms  (cached)
+Module _efc_contact_update__locals__kernel_89d497ae 89d497a load on device 'metal:0' took 17.02 ms  (cached)
+Module mujoco_warp._src.forward 4772766 load on device 'metal:0' took 22.94 ms  (cached)
+Module mujoco_warp._src.passive 9e93f67 load on device 'metal:0' took 22.73 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_8ed29e9b 8ed29e9 load on device 'metal:0' took 16.66 ms  (cached)
+Module mujoco_warp._src.forward d28e0c7 load on device 'metal:0' took 22.96 ms  (cached)
+Module _qfrc_smooth__locals__kernel_08dfc9ad 08dfc9a load on device 'metal:0' took 16.80 ms  (cached)
+Module mujoco_warp._src.support 040f2c5 load on device 'metal:0' took 17.02 ms  (cached)
+Module _factor_i_sparse_serial__locals__kernel_bbc34dce 0938022 load on device 'metal:0' took 17.52 ms  (cached)
+Module _solve_LD_sparse_serial__locals__kernel_da14e052 352f4b8 load on device 'metal:0' took 17.49 ms  (cached)
+Module _solve_init_dof__locals__kernel_8e985b01 8e985b0 load on device 'metal:0' took 16.83 ms  (cached)
+Module mujoco_warp._src.solver f23e090 load on device 'metal:0' took 18.74 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_7c1132c5 7c1132c load on device 'metal:0' took 16.62 ms  (cached)
+Module mul_m_kernel__locals___mul_m_505d9f1c 505d9f1 load on device 'metal:0' took 16.81 ms  (cached)
+Module _update_constraint_efc__locals__kernel_1994cb68 1994cb6 load on device 'metal:0' took 17.16 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_6f502a20 6f502a2 load on device 'metal:0' took 16.61 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_86f1e084 86f1e08 load on device 'metal:0' took 16.56 ms  (cached)
+Module _update_gradient_grad__locals__kernel_e5baa4a1 e5baa4a load on device 'metal:0' took 16.61 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_712c31a5 8925ee6 load on device 'metal:0' took 16.99 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_ad48cc59 0434274 load on device 'metal:0' took 16.65 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_76ff806c bfdf7e9 load on device 'metal:0' took 17.80 ms  (cached)
+Module _update_constraint_efc__locals__kernel_49bd7abe 49bd7ab load on device 'metal:0' took 17.86 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_20171f2f 20171f2 load on device 'metal:0' took 16.70 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_67211e0e 67211e0 load on device 'metal:0' took 16.70 ms  (cached)
+Module _update_gradient_grad__locals__kernel_7aee5faa 7aee5fa load on device 'metal:0' took 16.69 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_821b2aa5 fca3c48 load on device 'metal:0' took 16.83 ms  (cached)
+Module _solve_done__locals__kernel_d351f953 d351f95 load on device 'metal:0' took 16.76 ms  (cached)
+Module mujoco_warp._src.sensor c2b0248 load on device 'metal:0' took 27.21 ms  (cached)
+Module mujoco_warp._src.derivative 356952f load on device 'metal:0' took 20.66 ms  (cached)
+Module _next_time_builder__locals___next_time_bd97507a bd97507 load on device 'metal:0' took 17.66 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_f05e0f72 f05e0f7 load on device 'metal:0' took 16.75 ms  (cached)
+Module reset_data__locals__reset_M_debb12fa debb12f load on device 'metal:0' took 16.88 ms  (cached)
+Module reset_data__locals__reset_mocap_d5f6a172 d5f6a17 load on device 'metal:0' took 18.05 ms  (cached)
+Module reset_data__locals__reset_contact_10be067b 10be067 load on device 'metal:0' took 17.91 ms  (cached)
+Module reset_data__locals__reset_sleep_4c0bb4a4 4c0bb4a load on device 'metal:0' took 17.10 ms  (cached)
+Module reset_data__locals__reset_nworld_f0ec89aa f0ec89a load on device 'metal:0' took 17.29 ms  (cached)
+Module mujoco_warp._src.set_const 40b21c5 load on device 'metal:0' took 22.30 ms  (cached)
+Module metalsim.sensors.contact 8b280a6 load on device 'metal:0' took 19.17 ms  (cached)
+Module metalsim.learn.g1_il3 bd6c6cc load on device 'metal:0' took 18.32 ms  (cached)
+spawn {"worlds_penetrating_at_spawn": 0, "max_spawn_penetration_m": 0.0, "worlds_with_contact_within_gap_at_spawn": 0, "spawn_z_minus_origin_z": 0.7400000095367432}
+Module metalsim.learn.warp_policy d05639d load on device 'metal:0' took 17.88 ms  (cached)
+Module metalsim.learn.terrain 595c542 load on device 'metal:0' took 18.21 ms  (cached)
+Module metalsim.learn.g1_velocity 98312b6 load on device 'metal:0' took 21.75 ms  (cached)
+{
+ "terrain": "rough",
+ "preset": "isaaclab3_every_substep_cap20_hardlimits+actuatoreffort",
+ "ckpt": "runs/il3/ckpt/il3fix_rough_s0.pt",
+ "steps": 1500,
+ "cap": 20,
+ "niter": {
+  "max": 14,
+  "p99.9": 13.0,
+  "substep_worlds_at_cap": 0,
+  "of": 49152000
+ },
+ "overflow": {},
+ "blowups": 0,
+ "spawn": {
+  "worlds_penetrating_at_spawn": 0,
+  "max_spawn_penetration_m": 0.0,
+  "worlds_with_contact_within_gap_at_spawn": 0,
+  "spawn_z_minus_origin_z": 0.7400000095367432
+ },
+ "isaac_style_torso_terminations": 32,
+ "criterion": "blow-up = any |qpos| or |qvel| > 1000 or non-finite after a control step (g1_reward_done); Isaac 3.0 terminates only on time_out and torso contact > 1 N (TerminationsCfg), so every blow-up here is a state Isaac's task would not end by itself",
+ "all_worlds_pushed_within_50_steps": 0.006103515625
+}
+-- isaaclab3_every_substep_cap20+mjwfactor+actuatoreffort 06:18:25
+/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  warnings.warn(
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth ea5c7c8 load on device 'metal:0' took 29.02 ms  (cached)
+Module _nxn_broadphase__locals__kernel_13ac863e 13ac863 load on device 'metal:0' took 18.91 ms  (cached)
+Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_25e7141b 25e7141 load on device 'metal:0' took 3099.63 ms  (compiled)
+Module ccd_kernel_builder__locals__ccd_kernel_8a5df304 8a5df30 load on device 'metal:0' took 30.04 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_a5bd726a a5bd726 load on device 'metal:0' took 19.08 ms  (cached)
+Module mujoco_warp._src.constraint 2c64b8d load on device 'metal:0' took 16.81 ms  (cached)
+Module _friction_dof__locals__kernel_71517a5a 71517a5 load on device 'metal:0' took 17.73 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_77544377 7754437 load on device 'metal:0' took 17.64 ms  (cached)
+Module _efc_contact_init__locals__kernel_61c7a354 61c7a35 load on device 'metal:0' took 17.39 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_d7afd5bd e96e9eb load on device 'metal:0' took 17.66 ms  (cached)
+Module _efc_contact_update__locals__kernel_a78f94fc a78f94f load on device 'metal:0' took 17.71 ms  (cached)
+Module mujoco_warp._src.forward 64fd1ac load on device 'metal:0' took 23.08 ms  (cached)
+Module mujoco_warp._src.passive 9eecbc5 load on device 'metal:0' took 22.41 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_41a4523d 41a4523 load on device 'metal:0' took 17.21 ms  (cached)
+Module mujoco_warp._src.forward 8644a19 load on device 'metal:0' took 23.40 ms  (cached)
+Module _qfrc_smooth__locals__kernel_5565c635 5565c63 load on device 'metal:0' took 17.10 ms  (cached)
+Module mujoco_warp._src.support 8e2ca55 load on device 'metal:0' took 17.30 ms  (cached)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_c849d179 af018c2 load on device 'metal:0' took 17.57 ms  (cached)
+Module _solve_init_dof__locals__kernel_6c9fecda 6c9fecd load on device 'metal:0' took 17.08 ms  (cached)
+Module mujoco_warp._src.solver ffcfc60 load on device 'metal:0' took 18.61 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_c92100ed c92100e load on device 'metal:0' took 17.68 ms  (cached)
+Module mul_m_kernel__locals___mul_m_924d61d1 924d61d load on device 'metal:0' took 17.31 ms  (cached)
+Module _update_constraint_efc__locals__kernel_3a929826 3a92982 load on device 'metal:0' took 17.36 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_5a6ce8fb 5a6ce8f load on device 'metal:0' took 16.94 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_563a7193 563a719 load on device 'metal:0' took 17.10 ms  (cached)
+Module _update_gradient_grad__locals__kernel_a8ff13d7 a8ff13d load on device 'metal:0' took 17.24 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_3d0778ce b888581 load on device 'metal:0' took 17.19 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_2fc8ec32 e7e5510 load on device 'metal:0' took 17.41 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_e82cf69b 8525b45 load on device 'metal:0' took 18.35 ms  (cached)
+Module _update_constraint_efc__locals__kernel_dc0f60e8 dc0f60e load on device 'metal:0' took 17.38 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_1a551002 1a55100 load on device 'metal:0' took 17.17 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_65cece82 65cece8 load on device 'metal:0' took 17.44 ms  (cached)
+Module _update_gradient_grad__locals__kernel_e1825747 e182574 load on device 'metal:0' took 17.27 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_ace3de5e 72adac0 load on device 'metal:0' took 452.35 ms  (compiled)
+Module _solve_done__locals__kernel_0b0b8060 0b0b806 load on device 'metal:0' took 19.59 ms  (cached)
+Module mujoco_warp._src.sensor 05b20a3 load on device 'metal:0' took 31.51 ms  (cached)
+Module mujoco_warp._src.derivative e042361 load on device 'metal:0' took 21.83 ms  (cached)
+Module _next_time_builder__locals___next_time_46990cad 46990ca load on device 'metal:0' took 18.91 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_23cf7deb 23cf7de load on device 'metal:0' took 18.66 ms  (cached)
+Module reset_data__locals__reset_M_4a6094a4 4a6094a load on device 'metal:0' took 17.78 ms  (cached)
+Module reset_data__locals__reset_mocap_7457a9a8 7457a9a load on device 'metal:0' took 17.25 ms  (cached)
+Module reset_data__locals__reset_contact_51a17304 51a1730 load on device 'metal:0' took 17.23 ms  (cached)
+Module reset_data__locals__reset_sleep_e31fb6d1 e31fb6d load on device 'metal:0' took 18.42 ms  (cached)
+Module reset_data__locals__reset_nworld_881fbae0 881fbae load on device 'metal:0' took 17.36 ms  (cached)
+Module mujoco_warp._src.set_const 2a9e658 load on device 'metal:0' took 23.12 ms  (cached)
+Module _tile_cholesky_factorize_block__locals__kernel_7012a32e f7c5157 load on device 'metal:0' took 406.95 ms  (compiled)
+Module _tile_cholesky_solve_block__locals__kernel_5fab77da 326e253 load on device 'metal:0' took 18.26 ms  (cached)
+Module metalsim.sensors.contact 620b2e7 load on device 'metal:0' took 21.49 ms  (cached)
+Module metalsim.learn.g1_il3 147081f load on device 'metal:0' took 509.99 ms  (compiled)
+spawn {"worlds_penetrating_at_spawn": 0, "max_spawn_penetration_m": 0.0, "worlds_with_contact_within_gap_at_spawn": 0, "spawn_z_minus_origin_z": 0.7400000095367432}
+Module metalsim.learn.warp_policy 0a28ffd load on device 'metal:0' took 475.99 ms  (compiled)
+Module metalsim.learn.terrain 63a40eb load on device 'metal:0' took 19.70 ms  (cached)
+Module metalsim.learn.g1_velocity d5ec13b load on device 'metal:0' took 1082.71 ms  (compiled)
+{
+ "terrain": "rough",
+ "preset": "isaaclab3_every_substep_cap20+mjwfactor+actuatoreffort",
+ "ckpt": "runs/il3/ckpt/il3fix_rough_s0.pt",
+ "steps": 1500,
+ "cap": 20,
+ "niter": {
+  "max": 9,
+  "p99.9": 9.0,
+  "substep_worlds_at_cap": 0,
+  "of": 49152000
+ },
+ "overflow": {},
+ "blowups": 39,
+ "spawn": {
+  "worlds_penetrating_at_spawn": 0,
+  "max_spawn_penetration_m": 0.0,
+  "worlds_with_contact_within_gap_at_spawn": 0,
+  "spawn_z_minus_origin_z": 0.7400000095367432
+ },
+ "isaac_style_torso_terminations": 78,
+ "criterion": "blow-up = any |qpos| or |qvel| > 1000 or non-finite after a control step (g1_reward_done); Isaac 3.0 terminates only on time_out and torso contact > 1 N (TerminationsCfg), so every blow-up here is a state Isaac's task would not end by itself",
+ "blowup_levels": [
+  [
+   0,
+   8
+  ],
+  [
+   5,
+   7
+  ],
+  [
+   1,
+   6
+  ],
+  [
+   3,
+   6
+  ],
+  [
+   6,
+   5
+  ],
+  [
+   2,
+   4
+  ],
+  [
+   4,
+   3
+  ]
+ ],
+ "blowup_cols": [
+  [
+   17,
+   5
+  ],
+  [
+   8,
+   4
+  ],
+  [
+   9,
+   3
+  ],
+  [
+   11,
+   3
+  ],
+  [
+   2,
+   3
+  ],
+  [
+   3,
+   3
+  ],
+  [
+   15,
+   2
+  ],
+  [
+   18,
+   2
+  ]
+ ],
+ "base_rate_levels": [
+  [
+   4,
+   716
+  ],
+  [
+   1,
+   702
+  ],
+  [
+   2,
+   697
+  ],
+  [
+   3,
+   662
+  ],
+  [
+   5,
+   554
+  ],
+  [
+   6,
+   489
+  ],
+  [
+   0,
+   273
+  ],
+  [
+   7,
+   3
+  ]
+ ],
+ "mass_scale_blowups_mean": 1.0396747589111328,
+ "mass_scale_all_mean": 1.0074822902679443,
+ "mass_scale_blowups_frac_above_1.1": 0.358974358974359,
+ "mass_scale_all_frac_above_1.1": 0.282958984375,
+ "blowups_within_50_steps_of_push": 0.05128205128205128,
+ "pre_limit_joint": [
+  [
+   "left_six_joint",
+   13
+  ],
+  [
+   "right_four_joint",
+   11
+  ],
+  [
+   "right_six_joint",
+   10
+  ],
+  [
+   "left_four_joint",
+   4
+  ],
+  [
+   "left_one_joint",
+   1
+  ]
+ ],
+ "pre_speed_joint": [
+  [
+   "right_ankle_pitch_joint",
+   7
+  ],
+  [
+   "right_four_joint",
+   7
+  ],
+  [
+   "left_six_joint",
+   5
+  ],
+  [
+   "left_ankle_roll_joint",
+   4
+  ],
+  [
+   "right_ankle_roll_joint",
+   4
+  ],
+  [
+   "left_ankle_pitch_joint",
+   4
+  ]
+ ],
+ "blowup_speed_joint": [
+  [
+   "left_six_joint",
+   15
+  ],
+  [
+   "right_four_joint",
+   11
+  ],
+  [
+   "right_six_joint",
+   8
+  ],
+  [
+   "left_four_joint",
+   3
+  ],
+  [
+   "right_one_joint",
+   1
+  ],
+  [
+   "left_one_joint",
+   1
+  ]
+ ],
+ "pre_limit_excursion": {
+  "median": 0.14933207631111145,
+  "p90": 0.2556690812110904,
+  "max": 1.7219123840332031
+ },
+ "pre_joint_speed": {
+  "median": 15.20726203918457,
+  "p90": 408.896899414063,
+  "max": 957.0996704101562
+ },
+ "pre_penetration_m": {
+  "median": 0.0026395320892333984,
+  "p90": 0.004301538225263357,
+  "max": 0.00932300090789795
+ },
+ "frac_pre_speed_over_3x_limit": 0.1282051282051282,
+ "frac_pre_penetration_over_2cm": 0.0,
+ "frac_torso_contact_before": 0.0,
+ "energy_jump_x_median": 0.6391574486473753,
+ "frac_nonfinite": 0.0,
+ "blowups_in_first_50_steps": 1,
+ "frac_blowups_spawned_penetrating": 0.0,
+ "frac_pre_limit_joint_leg": 0.0,
+ "frac_pre_speed_joint_leg": 0.5128205128205128,
+ "frac_nonphysical_before_blowup": 0.1282051282051282,
+ "all_worlds_pushed_within_50_steps": 0.00927734375
+}
+-- contact:default+actuatoreffort 06:28:50
+/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  warnings.warn(
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 30.74 ms  (cached)
+Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 20.46 ms  (cached)
+Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_b3132664 b313266 load on device 'metal:0' took 25.19 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_78310433 7831043 load on device 'metal:0' took 27.40 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_0db2ba1e 0db2ba1 load on device 'metal:0' took 17.89 ms  (cached)
+Module mujoco_warp._src.constraint f5f4518 load on device 'metal:0' took 16.58 ms  (cached)
+Module _friction_dof__locals__kernel_0bb9a331 0bb9a33 load on device 'metal:0' took 17.09 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_914cb5e1 914cb5e load on device 'metal:0' took 17.49 ms  (cached)
+Module _efc_contact_init__locals__kernel_03ee81b4 03ee81b load on device 'metal:0' took 17.89 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_16824443 e86c3ac load on device 'metal:0' took 17.20 ms  (cached)
+Module _efc_contact_update__locals__kernel_89d497ae 89d497a load on device 'metal:0' took 18.32 ms  (cached)
+Module mujoco_warp._src.forward 4772766 load on device 'metal:0' took 23.08 ms  (cached)
+Module mujoco_warp._src.passive 9e93f67 load on device 'metal:0' took 23.46 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_8ed29e9b 8ed29e9 load on device 'metal:0' took 17.13 ms  (cached)
+Module mujoco_warp._src.forward d28e0c7 load on device 'metal:0' took 23.27 ms  (cached)
+Module _qfrc_smooth__locals__kernel_08dfc9ad 08dfc9a load on device 'metal:0' took 17.03 ms  (cached)
+Module mujoco_warp._src.support 040f2c5 load on device 'metal:0' took 17.34 ms  (cached)
+Module _factor_i_sparse_serial__locals__kernel_bbc34dce 0938022 load on device 'metal:0' took 17.87 ms  (cached)
+Module _solve_LD_sparse_serial__locals__kernel_da14e052 352f4b8 load on device 'metal:0' took 17.80 ms  (cached)
+Module _solve_init_dof__locals__kernel_8e985b01 8e985b0 load on device 'metal:0' took 16.98 ms  (cached)
+Module mujoco_warp._src.solver f23e090 load on device 'metal:0' took 18.92 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_7c1132c5 7c1132c load on device 'metal:0' took 16.80 ms  (cached)
+Module mul_m_kernel__locals___mul_m_505d9f1c 505d9f1 load on device 'metal:0' took 16.93 ms  (cached)
+Module _update_constraint_efc__locals__kernel_1994cb68 1994cb6 load on device 'metal:0' took 17.16 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_6f502a20 6f502a2 load on device 'metal:0' took 16.77 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_86f1e084 86f1e08 load on device 'metal:0' took 16.70 ms  (cached)
+Module _update_gradient_grad__locals__kernel_e5baa4a1 e5baa4a load on device 'metal:0' took 16.64 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_712c31a5 8925ee6 load on device 'metal:0' took 16.96 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_ad48cc59 0434274 load on device 'metal:0' took 16.92 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_a2a614b4 7ad7e38 load on device 'metal:0' took 18.08 ms  (cached)
+Module _update_constraint_efc__locals__kernel_49bd7abe 49bd7ab load on device 'metal:0' took 17.44 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_20171f2f 20171f2 load on device 'metal:0' took 17.39 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_67211e0e 67211e0 load on device 'metal:0' took 17.13 ms  (cached)
+Module _update_gradient_grad__locals__kernel_7aee5faa 7aee5fa load on device 'metal:0' took 16.84 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_821b2aa5 fca3c48 load on device 'metal:0' took 17.19 ms  (cached)
+Module _solve_done__locals__kernel_d351f953 d351f95 load on device 'metal:0' took 17.37 ms  (cached)
+Module mujoco_warp._src.sensor c2b0248 load on device 'metal:0' took 27.89 ms  (cached)
+Module mujoco_warp._src.derivative 356952f load on device 'metal:0' took 19.81 ms  (cached)
+Module _next_time_builder__locals___next_time_bd97507a bd97507 load on device 'metal:0' took 17.04 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_f05e0f72 f05e0f7 load on device 'metal:0' took 17.02 ms  (cached)
+Module reset_data__locals__reset_M_debb12fa debb12f load on device 'metal:0' took 16.92 ms  (cached)
+Module reset_data__locals__reset_mocap_d5f6a172 d5f6a17 load on device 'metal:0' took 16.65 ms  (cached)
+Module reset_data__locals__reset_contact_10be067b 10be067 load on device 'metal:0' took 16.89 ms  (cached)
+Module reset_data__locals__reset_sleep_4c0bb4a4 4c0bb4a load on device 'metal:0' took 16.83 ms  (cached)
+Module reset_data__locals__reset_nworld_f0ec89aa f0ec89a load on device 'metal:0' took 16.74 ms  (cached)
+Module mujoco_warp._src.set_const 40b21c5 load on device 'metal:0' took 23.59 ms  (cached)
+Module metalsim.sensors.contact 8b280a6 load on device 'metal:0' took 19.27 ms  (cached)
+Module metalsim.learn.g1_il3 bd6c6cc load on device 'metal:0' took 19.31 ms  (cached)
+spawn {"worlds_penetrating_at_spawn": 0, "max_spawn_penetration_m": 0.0, "worlds_with_contact_within_gap_at_spawn": 0, "spawn_z_minus_origin_z": 0.7400000095367432}
+Module metalsim.learn.warp_policy d05639d load on device 'metal:0' took 18.11 ms  (cached)
+Module metalsim.learn.terrain 595c542 load on device 'metal:0' took 18.37 ms  (cached)
+Module metalsim.learn.g1_velocity 98312b6 load on device 'metal:0' took 21.91 ms  (cached)
+{
+ "terrain": "rough",
+ "preset": "contact:default+actuatoreffort",
+ "ckpt": "runs/il3/ckpt/il3fix_rough_s0.pt",
+ "steps": 1500,
+ "cap": 10,
+ "niter": {
+  "max": 10,
+  "p99.9": 9.0,
+  "substep_worlds_at_cap": 1,
+  "of": 49152000
+ },
+ "overflow": {
+  "LS_ITERATIONS": 4095
+ },
+ "blowups": 0,
+ "spawn": {
+  "worlds_penetrating_at_spawn": 0,
+  "max_spawn_penetration_m": 0.0,
+  "worlds_with_contact_within_gap_at_spawn": 0,
+  "spawn_z_minus_origin_z": 0.7400000095367432
+ },
+ "isaac_style_torso_terminations": 77,
+ "criterion": "blow-up = any |qpos| or |qvel| > 1000 or non-finite after a control step (g1_reward_done); Isaac 3.0 terminates only on time_out and torso contact > 1 N (TerminationsCfg), so every blow-up here is a state Isaac's task would not end by itself",
+ "all_worlds_pushed_within_50_steps": 0.00732421875
+}
+exit 0 Sat Sep 26 06:34:41 PDT 2026
