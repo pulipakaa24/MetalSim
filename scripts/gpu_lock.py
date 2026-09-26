@@ -62,10 +62,11 @@ def tickets():
     out.sort(); return out
 
 
-def acquire(name, kind, minutes, pid, cmd=None):
+def acquire(name, kind, minutes, pid, cmd=None, front=False):
     os.makedirs(Q, exist_ok=True)
-    tf = os.path.join(Q, f"{time.time():.3f}_{PRIO[kind]}_{name}.json")
-    json.dump({"name": name, "kind": kind, "minutes": minutes, "pid": pid, "t": time.time(), "cmd": cmd, "cwd": os.getcwd()}, open(tf, "w"))
+    t0 = 0.0 if front else time.time()                 # front: ahead of every waiter of its class (tickets sort by class, then t)
+    tf = os.path.join(Q, f"{t0:.3f}_{PRIO[kind]}_{name}.json")
+    json.dump({"name": name, "kind": kind, "minutes": minutes, "pid": pid, "t": t0, "cmd": cmd, "cwd": os.getcwd()}, open(tf, "w"))
     while True:
         h = holder()
         if h is None:
@@ -85,9 +86,9 @@ def main():
     ap = argparse.ArgumentParser(); ap.add_argument("cmd", choices=["acquire", "release", "status", "setpid"]); ap.add_argument("name", nargs="?")
     ap.add_argument("--kind", default="train", choices=list(PRIO)); ap.add_argument("--minutes", type=float, default=30); ap.add_argument("--pid", type=int, default=os.getppid())
     ap.add_argument("--cmd", dest="job_cmd", default=None, help="the job's command line, recorded for the dashboard"); ap.add_argument("--rc", type=int, default=None, help="exit code, recorded on release")
-    ap.add_argument("--json", action="store_true")
+    ap.add_argument("--json", action="store_true"); ap.add_argument("--front", action="store_true", help="queue ahead of every waiter of the same class (the pause placeholder)")
     a = ap.parse_args()
-    if a.cmd == "acquire": acquire(a.name, a.kind, a.minutes, a.pid, a.job_cmd)
+    if a.cmd == "acquire": acquire(a.name, a.kind, a.minutes, a.pid, a.job_cmd, a.front)
     elif a.cmd == "setpid":                       # the wrapper registers the real job process once spawned
         h = holder()
         if h and h.get("name") == a.name: h["pid"] = a.pid; json.dump(h, open(LOCK, "w"))
