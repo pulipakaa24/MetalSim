@@ -1,4 +1,4 @@
-"""Bitwise check of the MuJoCo Warp fork's lane-parallel sparse L'DL kernels (Metal, one world per SIMD group)
+"""Check of the MuJoCo Warp fork's lane-parallel and chain-parallel sparse L'DL kernels (Metal, one world per SIMD group)
 against the one-world-per-thread serial kernels, on the G1 task model (43 dofs, tree-sparse M) and the
 menagerie Go2 / Panda if present: factor of M and of M - dt*D, solve with random right-hand sides, over random
 states. Run with PYTHONPATH pointing at the fork worktree (both kernels are in it; MJW_METAL_LDL_LANES selects
@@ -83,4 +83,33 @@ for name, m, dense_max in models():
             res = np.abs(np.einsum("wij,wj->wi", Mf, xl.numpy()[:4].astype(np.float64)) - y.numpy()[:4]).max() / np.abs(y.numpy()[:4]).max()
         print(f"  factor: {'bitwise' if fbit else f'DIFF max {fmax:.2e}'} | solve: {'bitwise' if sbit else f'DIFF max {smax:.2e}'} | solve residual vs dense M {res:.1e}")
         ok &= fbit and sbit and (not sparse.all() or res < 1e-4)
+        # chain-parallel kernels: the solve (on the serial factor) must be bitwise; the factor differs by the order in
+        # which chains of one level update a shared ancestor row (float noise)
+        nlc = len(mw.qLD_chain_level_offsets) - 1
+        Lc, Dc = wp.zeros_like(M), wp.zeros((N, m.nv), dtype=float)
+        wp.launch_tiled(SM._factor_i_sparse_chains(nlc, mw.nM), dim=N,
+                        inputs=[mw.M_rownnz, mw.M_rowadr, mw.qLD_chain_rows, mw.qLD_chain_adr, mw.qLD_chain_level_offsets, mw.qLD_updates_bysrc, mw.qLD_src_adr, M],
+                        outputs=[Lc, Dc], block_dim=32)
+        xc = wp.zeros((N, m.nv), dtype=float)
+        wp.launch_tiled(SM._solve_LD_sparse_chains(m.nv, nlc), dim=N,
+                        inputs=[mw.qLD_block_adr, Ls, Ds, mw.qLD_chain_rows, mw.qLD_chain_adr, mw.qLD_chain_level_offsets, mw.qLD_updates_byrow,
+                                mw.qLD_lane_rows, mw.qLD_row_adr, mw.qLD_updates_bysrc, mw.qLD_src_adr, y],
+                        outputs=[xc], block_dim=32)
+        wp.synchronize_device(dev)
+        lc, dc, xc_ = Lc.numpy(), Dc.numpy(), xc.numpy()[:, sparse]
+        frel = np.abs(lc[:, sel] - ls[:, sel]).max() / np.abs(ls[:, sel]).max() if sel.size else 0.0
+        drel = np.abs(dc[:, sparse] - ds[:, sparse]).max() / np.abs(ds[:, sparse]).max() if sparse.any() else 0.0
+        cbit = np.array_equal(xc_, xs_)
+        resc = float("nan")
+        if sparse.all():
+            xcf = wp.zeros((N, m.nv), dtype=float)
+            wp.launch_tiled(SM._solve_LD_sparse_chains(m.nv, nlc), dim=N,
+                            inputs=[mw.qLD_block_adr, Lc, Dc, mw.qLD_chain_rows, mw.qLD_chain_adr, mw.qLD_chain_level_offsets, mw.qLD_updates_byrow,
+                                    mw.qLD_lane_rows, mw.qLD_row_adr, mw.qLD_updates_bysrc, mw.qLD_src_adr, y],
+                            outputs=[xcf], block_dim=32)
+            wp.synchronize_device(dev)
+            resc = np.abs(np.einsum("wij,wj->wi", Mf, xcf.numpy()[:4].astype(np.float64)) - y.numpy()[:4]).max() / np.abs(y.numpy()[:4]).max()
+        print(f"  chains ({nlc} levels, {len(mw.qLD_chain_adr)} chains): factor rel diff vs serial {frel:.1e} (D {drel:.1e}) | solve on the serial factor: "
+              f"{'bitwise' if cbit else f'DIFF max {np.abs(xc_ - xs_).max():.2e}'} | chain factor + chain solve residual vs dense M {resc:.1e}")
+        ok &= cbit and frel < 1e-5 and drel < 1e-5 and (not sparse.all() or resc < 1e-4)
 print("ALL OK" if ok else "FAILURES")

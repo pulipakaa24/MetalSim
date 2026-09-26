@@ -1,0 +1,65 @@
+=== start Sat Sep 26 04:45:34 PDT 2026 metalsim 444b6af wt warp 2869a2f7 mjw dd42c23
+--- unfused (reference) 04:45:34
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+=== variant {'label': 'worktree unfused'}; N=512, 50 control steps, deterministic actions
+njmax 144 naconmax 12288 sparse False
+--- floor: two graph-replay instances of this configuration
+   step    1: qpos max 1.51e-06 median 0.0e+00 | obs max 5.21e-04 | rew max 5.17e-07
+   step    2: qpos max 8.64e-06 median 0.0e+00 | obs max 7.15e-04 | rew max 2.70e-06
+   step    5: qpos max 3.40e-03 median 2.0e-08 | obs max 8.39e-01 | rew max 1.27e-03
+   step   10: qpos max 1.29e-02 median 6.0e-08 | obs max 1.35e+00 | rew max 1.49e-03
+   step   20: qpos max 4.66e-02 median 1.2e-07 | obs max 5.92e+00 | rew max 8.40e-03
+   step   30: qpos max 1.21e-01 median 1.9e-07 | obs max 6.09e+00 | rew max 1.41e-02
+   step   40: qpos max 8.66e-01 median 1.2e-07 | obs max 1.05e+01 | rew max 1.68e-02
+   step   50: qpos max 1.63e+00 median 6.0e-08 | obs max 8.99e+00 | rew max 4.05e+00
+--- graph replay vs eager launches (same configuration)
+   step    1: qpos max 1.41e-06 median 0.0e+00 | obs max 4.07e-04 | rew max 7.85e-07
+   step    2: qpos max 5.10e-06 median 0.0e+00 | obs max 6.14e-04 | rew max 2.78e-06
+   step    5: qpos max 7.34e-05 median 2.0e-08 | obs max 2.10e-03 | rew max 3.29e-06
+   step   10: qpos max 2.43e-02 median 6.0e-08 | obs max 4.88e+00 | rew max 1.44e-03
+   step   20: qpos max 4.66e-02 median 1.2e-07 | obs max 5.06e+00 | rew max 8.40e-03
+   step   30: qpos max 1.21e-01 median 2.2e-07 | obs max 6.09e+00 | rew max 1.14e-02
+   step   40: qpos max 1.67e+00 median 1.3e-07 | obs max 1.05e+01 | rew max 4.01e+00
+   step   50: qpos max 1.67e+00 median 6.6e-08 | obs max 9.41e+00 | rew max 4.05e+00
+capacity replay: nefc max 35 (njmax 144), nacon max 1350 (naconmax 12288); overflow {'ITERATIONS': 31, 'LS_ITERATIONS': 476}
+capacity replay 2: nefc max 35 (njmax 144), nacon max 1351 (naconmax 12288); overflow {'ITERATIONS': 34, 'LS_ITERATIONS': 480}
+capacity eager: nefc max 35 (njmax 144), nacon max 1350 (naconmax 12288); overflow {'ITERATIONS': 35, 'LS_ITERATIONS': 481}
+--- physics protocol vs MuJoCo C (4 worlds: PD hold + fixed random targets; |dq| max / median)
+=== done
+--- fused vs unfused 04:46:14
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+=== variant {'label': 'worktree fused'}; N=512, 50 control steps, deterministic actions
+njmax 144 naconmax 12288 sparse False
+--- floor: two graph-replay instances of this configuration
+   step    1: qpos max 1.85e-06 median 0.0e+00 | obs max 6.60e-04 | rew max 1.08e-06
+   step    2: qpos max 7.85e-06 median 0.0e+00 | obs max 6.17e-04 | rew max 1.55e-06
+   step    5: qpos max 1.08e-03 median 2.2e-08 | obs max 8.40e-02 | rew max 4.78e-05
+   step   10: qpos max 2.43e-02 median 6.0e-08 | obs max 1.16e+00 | rew max 2.92e-04
+   step   20: qpos max 4.20e-02 median 1.2e-07 | obs max 5.06e+00 | rew max 8.40e-03
+   step   30: qpos max 5.69e-02 median 1.8e-07 | obs max 6.09e+00 | rew max 1.14e-02
+   step   40: qpos max 8.66e-01 median 1.2e-07 | obs max 1.05e+01 | rew max 2.21e-02
+   step   50: qpos max 1.80e+00 median 6.0e-08 | obs max 5.39e+00 | rew max 1.72e-02
+--- graph replay vs eager launches (same configuration)
+   step    1: qpos max 8.94e-07 median 0.0e+00 | obs max 3.09e-04 | rew max 3.99e-07
+   step    2: qpos max 8.08e-06 median 0.0e+00 | obs max 6.36e-04 | rew max 1.75e-06
+   step    5: qpos max 1.08e-03 median 1.9e-08 | obs max 5.46e-02 | rew max 1.50e-05
+   step   10: qpos max 1.29e-02 median 6.0e-08 | obs max 9.83e-01 | rew max 4.19e-04
+   step   20: qpos max 4.20e-02 median 1.2e-07 | obs max 5.92e+00 | rew max 2.04e-03
+   step   30: qpos max 7.00e-02 median 1.9e-07 | obs max 3.86e+00 | rew max 6.63e-03
+   step   40: qpos max 5.73e-01 median 1.2e-07 | obs max 6.49e+00 | rew max 7.41e-03
+   step   50: qpos max 1.80e+00 median 6.2e-08 | obs max 1.07e+01 | rew max 4.05e+00
+capacity replay: nefc max 35 (njmax 144), nacon max 1350 (naconmax 12288); overflow {'ITERATIONS': 33, 'LS_ITERATIONS': 478}
+capacity replay 2: nefc max 35 (njmax 144), nacon max 1350 (naconmax 12288); overflow {'ITERATIONS': 32, 'LS_ITERATIONS': 480}
+capacity eager: nefc max 35 (njmax 144), nacon max 1350 (naconmax 12288); overflow {'ITERATIONS': 34, 'LS_ITERATIONS': 478}
+--- physics protocol vs MuJoCo C (4 worlds: PD hold + fixed random targets; |dq| max / median)
+--- this configuration vs reference {"label": "worktree unfused"} (graph replay)
+   step    1: qpos max 1.38e-06 median 0.0e+00 | obs max 2.72e-04 | rew max 6.93e-07
+   step    2: qpos max 8.23e-06 median 0.0e+00 | obs max 9.44e-04 | rew max 2.06e-06
+   step    5: qpos max 1.08e-03 median 2.0e-08 | obs max 2.55e-02 | rew max 1.50e-05
+   step   10: qpos max 2.43e-02 median 6.0e-08 | obs max 1.16e+00 | rew max 4.15e-04
+   step   20: qpos max 4.20e-02 median 1.2e-07 | obs max 5.92e+00 | rew max 8.40e-03
+   step   30: qpos max 9.01e-02 median 2.0e-07 | obs max 6.09e+00 | rew max 1.14e-02
+   step   40: qpos max 5.73e-01 median 1.2e-07 | obs max 5.68e+00 | rew max 2.49e-02
+   step   50: qpos max 1.80e+00 median 6.7e-08 | obs max 1.07e+01 | rew max 4.05e+00
+=== done
+=== end Sat Sep 26 04:46:26 PDT 2026

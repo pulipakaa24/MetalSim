@@ -32,6 +32,9 @@ with wp.ScopedDevice(dev):
         "solve serial": lambda: wp.launch(SM._solve_LD_sparse_serial(m.nv, nlev), dim=N, inputs=[mw.qLD_block_adr, L, D, mw.qLD_all_updates, mw.qLD_level_offsets, y], outputs=[x], block_dim=32),
         "solve lanes": lambda: wp.launch_tiled(SM._solve_LD_sparse_lanes(m.nv, nlev), dim=N, inputs=[mw.qLD_block_adr, L, D, mw.qLD_updates_byrow, mw.qLD_level_offsets, mw.qLD_lane_rows, mw.qLD_lane_row_offsets, y], outputs=[x], block_dim=32),
     }
+    nlc = len(mw.qLD_chain_level_offsets) - 1
+    launches["factor chains"] = lambda: wp.launch_tiled(SM._factor_i_sparse_chains(nlc, mw.nM), dim=N, inputs=[mw.M_rownnz, mw.M_rowadr, mw.qLD_chain_rows, mw.qLD_chain_adr, mw.qLD_chain_level_offsets, mw.qLD_updates_bysrc, mw.qLD_src_adr, M], outputs=[L, D], block_dim=32)
+    launches["solve chains"] = lambda: wp.launch_tiled(SM._solve_LD_sparse_chains(m.nv, nlc), dim=N, inputs=[mw.qLD_block_adr, L, D, mw.qLD_chain_rows, mw.qLD_chain_adr, mw.qLD_chain_level_offsets, mw.qLD_updates_byrow, mw.qLD_lane_rows, mw.qLD_row_adr, mw.qLD_updates_bysrc, mw.qLD_src_adr, y], outputs=[x], block_dim=32)
     for name, fn in launches.items():
         fn(); wp.synchronize_device(dev)
         with wp.ScopedCapture(device=dev) as cap:
