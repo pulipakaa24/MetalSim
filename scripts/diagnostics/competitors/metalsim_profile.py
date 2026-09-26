@@ -8,7 +8,14 @@ from metalsim.physics.batch import BatchSim, BatchSimOptions
 name, N, mode = sys.argv[1], int(sys.argv[2]), sys.argv[3]
 R = ROBOTS[name]
 
+SUB = R.get("substeps", 1)
+
+
 def build(variant="base"):
+    if R.get("builder"):
+        m = R["builder"]()
+        if __import__("os").environ.get('CONE'): m.opt.cone = {'pyramidal': 0, 'elliptic': 1}[__import__("os").environ['CONE']]
+        return m
     spec = mujoco.MjSpec.from_file(R["scene"])
     LIM = force_limits(mujoco.MjModel.from_xml_path(R["scene"])) if R["kp"] is not None else []
     for a, (lo, hi) in zip(spec.actuators, LIM):
@@ -31,7 +38,7 @@ def build(variant="base"):
 def run(m, capture=True):
     home = m.key_qpos[0].copy() if m.nkey else m.qpos0.copy()
     qadr = [m.jnt_qposadr[m.actuator_trnid[i, 0]] for i in range(m.nu)]
-    sim = BatchSim(m, N, options=BatchSimOptions(solver_iterations=10, ls_iterations=20, capture=capture, jacobian=__import__("os").environ.get("JAC"), **({"njmax": int(__import__("os").environ["NJMAX"])} if __import__("os").environ.get("NJMAX") else {})))
+    sim = BatchSim(m, N, options=BatchSimOptions(solver_iterations=10, ls_iterations=20, capture=capture, substeps=SUB, jacobian=__import__("os").environ.get("JAC"), **({"njmax": int(__import__("os").environ["NJMAX"])} if __import__("os").environ.get("NJMAX") else {})))
     sim.set_state(home); sim.forward(); sim.synchronize()
     q_home = torch.tensor(home[qadr], device="mps", dtype=torch.float32)
     g = torch.Generator(device="mps").manual_seed(0)
@@ -63,8 +70,8 @@ else:
     sim.synchronize(); time.sleep(0.2)
     rows = []
     for ln in core.wp_metal_profile_report().decode().strip().splitlines():
-        p = ln.split(None, 3); rows.append((float(p[0]) / 10, int(p[2]) // 10, p[3]))
+        p = ln.split(None, 3); rows.append((float(p[0]) / 10 / SUB, int(p[2]) // 10 // SUB, p[3]))
     tot = sum(r[0] for r in rows)
-    print(f"KERNELS {name} N={N}: {tot:.2f} ms/step GPU (sum of per-dispatch times), {sum(r[1] for r in rows)} dispatches/step")
+    print(f"KERNELS {name} N={N} substeps={SUB} preset={__import__('os').environ.get('G1_PRESET')}: {tot:.2f} ms/physics-step GPU (sum of per-dispatch times), {sum(r[1] for r in rows)} dispatches/step")
     for ms, cnt, k in sorted(rows, reverse=True)[:18]:
         print(f"   {ms:7.3f} ms {100*ms/tot:5.1f}%  x{cnt:3d}  {k[:110]}")

@@ -1,0 +1,13 @@
+[gpu_run] e2_sz_models start: device utilisation 0% (04:19:39)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+LABEL models_sz mjw=/Users/aditya/robosim/upstream/mujoco_warp-ellip2c/mujoco_warp/__init__.py head=b895bff N=4096 env=
+== go2 elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "go2", "N": 4096, "mode": "matched", "nv": 18, "nu": 12, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 607832, "substeps": 1, "preset": null, "finite": true, "base_z_mean": 0.189, "overflow": {"ITERATIONS": 973, "LS_ITERATIONS": 4096}}
+== humanoid elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "humanoid", "N": 4096, "mode": "matched", "nv": 27, "nu": 21, "iters": 10, "ls": 20, "build_s": 1.5, "steps_per_s": 660338, "substeps": 1, "preset": null, "finite": true, "base_z_mean": 0.261, "overflow": {"ITERATIONS": 1950, "LS_ITERATIONS": 4096}}
+== so101 elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "so101", "N": 4096, "mode": "matched", "nv": 12, "nu": 6, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 838682, "substeps": 1, "preset": null, "finite": true, "base_z_mean": 0.458, "overflow": {"ITERATIONS": 1141, "LS_ITERATIONS": 4096}}
+[gpu_run] e2_sz_models end: device utilisation 0% (04:20:12), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   1.9 %
+lock held by tp26_loop, not e2_sz_models; not released

@@ -1,0 +1,23 @@
+[gpu_run] e2_sz_g1task start: device utilisation 0% (04:18:49)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+LABEL g1task_ellip10_sz mjw=/Users/aditya/robosim/upstream/mujoco_warp-ellip2c/mujoco_warp/__init__.py head=b895bff N=4096 env=
+== g1task elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "g1task", "N": 4096, "mode": "matched", "nv": 43, "nu": 37, "iters": 10, "ls": 20, "build_s": 2.3, "steps_per_s": 2182409, "substeps": 8, "preset": "tau10_impact_hardlimits_ellip10", "finite": true, "base_z_mean": 0.076, "overflow": {"ITERATIONS": 4053, "LS_ITERATIONS": 4096}}
+== profile g1task elliptic
+KERNELS g1task N=4096 substeps=8 preset=tau10_impact_hardlimits_ellip10: 15.69 ms/physics-step GPU (sum of per-dispatch times), 226 dispatches/step
+     4.361 ms  27.8%  x 10  _update_gradient_cholesky__locals__kernel_f4bca835_metal_forward
+     2.562 ms  16.3%  x 11  _update_gradient_JTCJ_dense_world2_htot_da424db9_metal_forward
+     1.300 ms   8.3%  x 10  _update_constraint_efc__locals__kernel_91f5d381_metal_forward
+     1.248 ms   8.0%  x  1  _update_gradient_cholesky__locals__kernel_cf59d677_metal_forward
+     1.178 ms   7.5%  x 10  _linesearch_iterative_kernel__locals__kernel_af0e89ee_metal_forward
+     0.947 ms   6.0%  x  2  _factor_i_sparse_serial__locals__kernel_8c1557af_metal_forward
+     0.436 ms   2.8%  x  2  _solve_LD_sparse_serial__locals__kernel_ae6d7fc3_metal_forward
+     0.389 ms   2.5%  x 11  mul_m_kernel__locals___mul_m_9c0838e9_metal_forward
+     0.270 ms   1.7%  x  1  _update_gradient_JTDAJ_dense_tiled__locals__kernel_eb30364f_metal_forward
+     0.266 ms   1.7%  x 11  _update_gradient_JTCJ_cone_list_0a67bc87_metal_forward
+     0.244 ms   1.6%  x  1  ccd_kernel_builder__locals__ccd_kernel_f71f2442_metal_forward
+     0.239 ms   1.5%  x 16  wp_memset
+     0.190 ms   1.2%  x 10  _update_constraint_init_qfrc_constraint_dense__locals__kernel_935a1343_metal_forward
+[gpu_run] e2_sz_g1task end: device utilisation 63% (04:19:37), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+lock held by e2_sz_models, not e2_sz_g1task; not released

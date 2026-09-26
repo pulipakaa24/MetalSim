@@ -24,7 +24,15 @@ R = ROBOTS[name]
 SNAP = sorted(set([1, 2, 4, 10, 25, 50, 100] + [S]))
 
 
+SUB = R.get("substeps", 1)
+
+
 def build():
+    if R.get("builder"):
+        m = R["builder"]()
+        if os.environ.get("CONE"): m.opt.cone = {"pyramidal": 0, "elliptic": 1}[os.environ["CONE"]]
+        m.opt.iterations, m.opt.ls_iterations = 10, 20
+        return m
     spec = mujoco.MjSpec.from_file(R["scene"])
     LIM = force_limits(mujoco.MjModel.from_xml_path(R["scene"])) if R["kp"] is not None else []
     for a, (lo, hi) in zip(spec.actuators, LIM):
@@ -50,7 +58,7 @@ targets = [(home[qadr] + AMP * rng.uniform(-1, 1, (N, m.nu))).astype(np.float32)
 
 class Runner:
     def __init__(self, n):
-        self.sim = BatchSim(m, n, options=BatchSimOptions(solver_iterations=10, ls_iterations=20, jacobian=os.environ.get("JAC"), **({"njmax": int(os.environ["NJMAX"])} if os.environ.get("NJMAX") else {})))
+        self.sim = BatchSim(m, n, options=BatchSimOptions(solver_iterations=10, ls_iterations=20, substeps=SUB, jacobian=os.environ.get("JAC"), **({"njmax": int(os.environ["NJMAX"])} if os.environ.get("NJMAX") else {})))
         self.sim.set_state(home); self.sim.d.ctrl.assign(targets[0][:n]); self.sim.forward(); self.sim.synchronize()
         self.nefc_max = 0; self.nacon_max = 0
 
@@ -90,7 +98,8 @@ def mujoco_c_protocol(sim, T=100):
     for t in range(T):
         d.ctrl[:] = tg[t]
         sim.synchronize(); sim.d.ctrl.assign(np.tile(tg[t], (sim.n, 1)).astype(np.float32))
-        sim.step(); mujoco.mj_step(m, d)
+        sim.step()
+        for _ in range(SUB): mujoco.mj_step(m, d)      # the task model steps 8 substeps per call
         if t + 1 in (1, 2, 4, 12, 25, 50, 100):
             sim.synchronize(); q = sim.d.qpos.numpy().astype(np.float64)
             e = np.abs(q[:4] - d.qpos[None]); out.append((t + 1, float(e.max()), float(np.median(e))))
@@ -98,7 +107,7 @@ def mujoco_c_protocol(sim, T=100):
 
 
 mode = os.environ.get("MJW_JTCJ_MODE", "(default)")
-print(f"=== {name} cone={'elliptic' if m.opt.cone else 'pyramidal'} N={N} S={S} MJW_JTCJ_MODE={mode} mujoco_warp={os.path.dirname(mujoco_warp.__file__)}", flush=True)
+print(f"=== {name} preset={os.environ.get('G1_PRESET')} substeps={SUB} cone={'elliptic' if m.opt.cone else 'pyramidal'} N={N} S={S} MJW_JTCJ_MODE={mode} mujoco_warp={os.path.dirname(mujoco_warp.__file__)}", flush=True)
 ra, rb = Runner(N), Runner(N)
 print(f"njmax {ra.sim.d.njmax} naconmax {ra.sim.d.naconmax} sparse {ra.sim.m.is_sparse} JAC={os.environ.get('JAC')} nv {m.nv} ndof_tri {ra.sim.m.dof_tri_row.size}", flush=True)
 qa, qb = ra.run(S), rb.run(S)
