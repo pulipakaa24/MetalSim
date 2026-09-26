@@ -554,6 +554,8 @@ configuration only and are being re-checked against the flat one. Also, at itera
 run's feet-slide cost was 10× Isaac's (−0.13 vs −0.013; the old `cvel` term, fixed since) and its
 action-rate and joint-deviation costs 1.7× Isaac's.
 
+**Start-state defect (found 2026-09-26).** Every PPOWarp run in this section started each env's first episode from MuJoCo's qpos0 (root at the world origin at z = 0, joints zero, feet 0.75 m below the plane) instead of the task reset: PPOWarp never called `reset_all()` before the first rollout. It affected the first episode only (about the first 10–12 of 1000 iterations). Fixed (`PPOWarpConfig.initial_reset`, default True); the pending 3-seed re-run under the final contact default will supersede these runs.
+
 **Rough terrain, like for like** (0b45075; Isaac's own rsl_rl run of Isaac-Velocity-Rough-G1-v0 on the
 L4, 1500 iterations in 67.3 min at 36.5 K env-steps/s, `runs/parity/isaac/rough/`; ours:
 `reward_cfg="rough_isaac"`, an exact port of G1RoughEnvCfg (the earlier "rough" set had ±1 sideways

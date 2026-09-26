@@ -622,6 +622,13 @@ class G1VelocityTask:
                 from metalsim.learn.terrain import BoxWindow
                 pwf = BoxWindow.FIELDS
             njmax = 256 if terrain_collision in ("hfield", "boxes", "meshes", "boxes_local") else 512   # C's initial set on 0.025 m: 400 rows
+            if terrain == "flat" and not self.il3_events:
+                # flat: the provable bound (metalsim.physics.capacity: 6 collider pairs x <= 4 contacts x 4 pyramidal rows
+                # + 37 limit rows = 133 -> njmax 144, nconmax 24); every capacity-sized launch shrinks with it and no
+                # result changes (no overflow is possible; BatchSim.check_overflow() guards). Measured 2026-09-26:
+                # full env step 75.3 -> 73.5 ms at 4096 (+2.5 %), +3.6 % under the Isaac Lab 3.0 cap-20 preset
+                # (docs/research/throughput_2026-09-26.md). Heightfield / box terrains keep the explicit capacities.
+                njmax, nconmax = "auto", "auto"
             # factorization: BatchSimOptions' defaults (register Cholesky bound 48: the solver Hessian's Cholesky in
             # registers for the 43 dofs; m_dense_max 32: M / M - dt*D of the 43-dof tree by MuJoCo Warp's tree-sparse
             # L'DL; docs/research/mjwarp_throughput_2026-09-25.md, tests/test_g1_fast_factorization.py, runs/fastfact/)
@@ -956,17 +963,18 @@ def benchmark_step(task: G1VelocityTask, num_frames: int = 100, warmup: int = 10
 # lr 1e-3 adaptive (desired KL 0.01), gamma 0.99, lam 0.95, clip 0.2, entropy 0.008, ELU MLP
 # 512-256-128 (rough) / 256-128-128 (flat), init noise std 1.0.
 
-def g1_ppo_config(terrain: str, iterations: int, seed: int = 0):
+def g1_ppo_config(terrain: str, iterations: int, seed: int = 0, initial_reset: bool = True):
     from metalsim.learn.ppo_warp import PPOWarpConfig
     return PPOWarpConfig(iterations=iterations, rollout=24, epochs=5, minibatches=4, lr=1e-3, gamma=0.99, lam=0.95,
                          clip=0.2, ent_coef=0.008, vf_coef=1.0, max_grad_norm=1.0, desired_kl=0.01, seed=seed,
-                         hidden=(512, 256, 128) if terrain != "flat" else (256, 128, 128), log_every=1)
+                         hidden=(512, 256, 128) if terrain != "flat" else (256, 128, 128), log_every=1,
+                         initial_reset=initial_reset)
 
 
 def train_g1(n=4096, terrain="flat", iterations=1500, seed=None, log_path=None, checkpoint=None, physics_dt=PHYSICS_DT,
              engine="mjwarp", newton_iterations=4, newton_dt=0.00125, newton_kw=None, reward_cfg=None, scan_ordering="xy",
              terrain_collision=None, scan_surface=None, solver_cfg=None, il3_events=None, il3_backend="newton_mjwarp",
-             contact_cfg="recommended", base_velocity="com", feet_slide_velocity="com"):
+             contact_cfg="recommended", base_velocity="com", feet_slide_velocity="com", initial_reset=True):
     from metalsim.learn.ppo_warp import PPOWarp
     task = G1VelocityTask(n, terrain=terrain, seed=seed, physics_dt=physics_dt, engine=engine,
                           newton_iterations=newton_iterations, newton_dt=newton_dt, newton_kw=newton_kw, reward_cfg=reward_cfg,
@@ -974,7 +982,7 @@ def train_g1(n=4096, terrain="flat", iterations=1500, seed=None, log_path=None, 
                           solver_cfg=solver_cfg, il3_events=il3_events, il3_backend=il3_backend, contact_cfg=contact_cfg,
                           base_velocity=base_velocity, feet_slide_velocity=feet_slide_velocity)
     seed = task.seed                     # None -> the task's default (42 rough, Isaac's; 0 flat)
-    algo = PPOWarp(task, g1_ppo_config(terrain, iterations, seed))
+    algo = PPOWarp(task, g1_ppo_config(terrain, iterations, seed, initial_reset=initial_reset))
     f = open(log_path, "a") if log_path else None
     def log(msg):
         print(msg, flush=True)
@@ -985,7 +993,7 @@ def train_g1(n=4096, terrain="flat", iterations=1500, seed=None, log_path=None, 
         f"physics dt {task.physics_dt} (decimation {task.decimation}), seed {seed}, reward_cfg {task.reward_cfg}, "
         f"height-scan ray order {task.scanner.ordering if task.scanner is not None else '-'}, terrain collision "
         f"{task.terrain_collision}, height scan {task.scan_surface}, solver_cfg {task.solver_cfg}, contact_cfg {task.contact_cfg}, "
-        f"base velocity {task.base_velocity}, feet-slide velocity {task.feet_slide_velocity}"
+        f"base velocity {task.base_velocity}, feet-slide velocity {task.feet_slide_velocity}, initial reset {initial_reset}"
         + (f", Isaac Lab 3.0 events {task.il3_events} (backend {task.il3_backend}), add_base_mass {task.mass_info}" if task.il3 else ""))
     def save(path, it):
         torch.save({"net": algo.net.state_dict(), "terrain": terrain, "n": n, "iterations": it, "obs_dim": task.obs_dim,
@@ -1018,7 +1026,7 @@ if __name__ == "__main__":
     # optional flags (any position): --engine mjwarp|newton, --newton_it N, --newton_dt S
     opts = {"--engine": "mjwarp", "--newton_it": "4", "--newton_dt": "0.00125", "--newton_limit_margin": "0.15", "--newton_kw": "", "--seed": "0", "--reward_cfg": "", "--scan_ordering": "xy",
             "--terrain_collision": "", "--scan_surface": "", "--solver_cfg": "", "--il3_events": "", "--il3_backend": "newton_mjwarp", "--contact_cfg": "recommended", "--base_velocity": "com",
-            "--feet_slide_velocity": "com"}
+            "--feet_slide_velocity": "com", "--initial_reset": "1"}
     for k in list(opts):
         if k in sys.argv:
             i = sys.argv.index(k); opts[k] = sys.argv[i + 1]; del sys.argv[i:i + 2]
@@ -1037,7 +1045,8 @@ if __name__ == "__main__":
                  terrain_collision=opts["--terrain_collision"] or None, scan_surface=opts["--scan_surface"] or None,
                  solver_cfg=opts["--solver_cfg"] or None, il3_events=(None if opts["--il3_events"] == "" else opts["--il3_events"] in ("1", "true", "True")),
                  il3_backend=opts["--il3_backend"], contact_cfg=opts["--contact_cfg"],
-                 base_velocity=opts["--base_velocity"], feet_slide_velocity=opts["--feet_slide_velocity"], **ekw)
+                 base_velocity=opts["--base_velocity"], feet_slide_velocity=opts["--feet_slide_velocity"],
+                 initial_reset=opts["--initial_reset"] not in ("0", "false", "False"), **ekw)
         sys.exit(0)
     task = G1VelocityTask(n, terrain=terrain, physics_dt=float(sys.argv[3]) if len(sys.argv) > 3 else PHYSICS_DT,
                           reward_cfg=opts["--reward_cfg"] or None, solver_cfg=opts["--solver_cfg"] or None,

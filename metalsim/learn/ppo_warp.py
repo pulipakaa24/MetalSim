@@ -144,6 +144,7 @@ class PPOWarpConfig:
     seed: int = 0
     log_every: int = 10
     bootstrap_timeouts: bool = True     # rsl_rl: r += gamma * V(s) on time-outs (tasks exposing launch_timeouts)
+    initial_reset: bool = True          # task.reset_all() before the first rollout (Isaac/rsl_rl env.reset()); False = archived qpos0 start
 
 
 class PPOWarp:
@@ -283,10 +284,19 @@ class PPOWarp:
         k = cfg.epochs * cfg.minibatches
         return {key: float(val_) / k for key, val_ in stats.items()}
 
+    def prepare(self) -> None:
+        """Before the first rollout: reset every env through the task's own reset (``task.reset_all()``), as Isaac Lab
+        and rsl_rl do (``env.reset()`` before collecting). Without it (``PPOWarpConfig.initial_reset=False``, the behaviour
+        before 2026-09-26) every env's first episode started from the simulator's initial data, for the G1 MuJoCo's
+        qpos0: root at the world origin at z = 0, joints at zero, feet 0.75 m below the ground plane."""
+        if self.cfg.initial_reset and hasattr(self.task, "reset_all"):
+            self.task.reset_all()
+
     def train(self, log=print, callback=None, monitor=None):
         """``callback(it, algo)`` runs after every iteration (checkpoints, curves); ``monitor(it, algo,
         stats, (ep_ret, ep_len, count))`` runs at every log point (metalsim.learn.monitor.AnomalyMonitor)."""
         cfg = self.cfg
+        self.prepare()
         t0 = time.perf_counter(); steps = 0
         hist = []
         for it in range(1, cfg.iterations + 1):
@@ -295,6 +305,9 @@ class PPOWarp:
             stats = self.update()
             if it % cfg.log_every == 0 or it == cfg.iterations:
                 torch.mps.synchronize()
+                sim = getattr(self.task, "sim", None)
+                if hasattr(sim, "check_overflow"):
+                    sim.check_overflow()        # capacity overflow (dropped rows / contacts) raises; never silent
                 ret, length, count = self.task.episode_stats()
                 sps = steps / (time.perf_counter() - t0)
                 hist.append((it, steps, ret, length))
