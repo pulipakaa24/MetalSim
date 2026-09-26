@@ -555,3 +555,25 @@ def test_base_velocity_option_2_3_2_configs(reward_cfg):
             for k in (0, 8):
                 np.testing.assert_allclose(terms[e, k], ref[k], rtol=1e-4, atol=1e-5, err_msg=f"{bv} env {e} term {k}")
     assert G1VelocityTask(2, terrain="flat").base_velocity == "com"
+
+
+@pytest.mark.parametrize("terrain,reward_cfg", [("flat", "flat"), ("flat", "flat_il3"), ("rough", "rough_isaac"), ("rough", "rough_il3")])
+def test_trainer_first_observation_comes_from_the_task_reset(terrain, reward_cfg):
+    """PPOWarp.prepare() (called by train) resets every env through the task before the first rollout, as Isaac Lab's
+    env.reset(): root 0.74 m above the env's terrain origin, xy within 0.5 m of it, joints at the init keyframe, and (3.0
+    configs) push timers U(10, 15) s; the archived initial_reset=False keeps the simulator's initial data (qpos0)."""
+    from metalsim.learn.ppo_warp import PPOWarp
+    from metalsim.learn.g1_velocity import g1_ppo_config
+    n = 256
+    task = G1VelocityTask(n, terrain=terrain, reward_cfg=reward_cfg, physics_dt=0.0025)
+    algo = PPOWarp(task, g1_ppo_config(terrain, 1, 0))
+    algo.prepare(); task.sim.synchronize()
+    q = task.sim.d.qpos.numpy(); o = task.origins.numpy(); key = task.model.key_qpos[0]
+    np.testing.assert_allclose(q[:, 2] - o[:, 2], 0.74, atol=1e-5)
+    assert np.all(np.abs(q[:, :2] - o[:, :2]) <= 0.5 + 1e-5)
+    np.testing.assert_allclose(q[:, 7:], np.tile(key[7:], (n, 1)), atol=1e-6)
+    if task.il3:
+        pl = task.push_left.numpy(); assert pl.min() >= 10.0 and pl.max() <= 15.0
+    t2 = G1VelocityTask(8, terrain="flat", reward_cfg="flat", physics_dt=0.0025)
+    a2 = PPOWarp(t2, g1_ppo_config("flat", 1, 0, initial_reset=False)); a2.prepare(); t2.sim.synchronize()
+    assert np.allclose(t2.sim.d.qpos.numpy()[:, 2], 0.0)                     # qpos0: root at z = 0 (archived start)
