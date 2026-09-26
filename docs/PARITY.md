@@ -958,6 +958,13 @@ of Isaac's curve at every milestone from iteration 200; **rough, seed 0, +13.7 /
 5.80** (46.8 K env-steps/s vs 42.0 K on the L4); 0 blow-ups in any run. Before the fixes the same configuration gave
 flat +24.9 / rough +8.4 with 44 / 1,615 blow-ups. Seeds 0–1 ran on MuJoCo Warp fork 9b4e96a, seed 2 and rough on edae7b7.
 
+**Throughput under the elliptic default (measured 2026-09-26 11:00, fork heads mujoco_warp 0a9de8e / warp 9abceff9,
+`scripts/diagnostics/g1_tp_variants.py 4096`, two interleaved repeats, `runs/tp26/ellip.wrapper.log`):** pyramidal
+`recommended_pyramidal` (cap 10): physics 93,308 / 93,822, env step 62,069 / 62,539, full PPO loop 57,678 / 57,510
+env-steps/s; elliptic `recommended` (impratio 10, cap 20): physics 54,046 / 54,017, env step 36,371 / 36,513, **full
+loop 34,191 / 34,375** (1.68× the loop cost; the physics ratio is 1.73×). The elliptic run leaves 1 of 4096 worlds at
+the iteration cap after random actions (pyramidal at cap 10: 18).
+
 ## 2. Platform capabilities (the workstreams), with the tests behind them
 
 | capability | Isaac | ours | test (assertion) | result | verdict |
