@@ -802,3 +802,40 @@ Throughput (training loop, env-steps/s):
   configurations. The early curve (where the start state acts) is the robust signal: it moved toward Isaac's.
 * Per term at 1499 the gap is yaw tracking (0.671 vs 0.753) and linear tracking (0.921 vs 0.940); detail in
   `runs/il3/curves_il3fix2_flat.md`.
+
+
+### 6.10 Late finger blow-ups: the drive's effort clamp (verdict)
+
+**Verdict: MetalSim put Isaac's effort limit on the actuator (forcerange), where MuJoCo drops the drive's implicit velocity
+damping as soon as the torque saturates. On the fingers (kd/I ≈ 10⁴ s⁻¹, 2.5 ms) that is unstable within 1–3 substeps.
+Newton puts the same limit on the joint (actuatorfrcrange, applied after the actuator sum), where the damping stays
+implicit, so Isaac never blows a finger.**
+
+Sources: MuJoCo C `engine_derivative.c:2416` (mjd_actuator_vel: "skip if force is clamped by forcerange") and MuJoCo Warp
+`_src/derivative.py:133` (fork 9b4e96a) zero a clamped actuator's velocity derivative. `engine_forward.c:998` /
+`forward.py:1595` clamp `qfrc_actuator` by `jnt_actfrcrange` after the sum. Newton writes the G1 as two `<general>`
+actuators per joint (kp and kd) with the ±effort on the joint's actuatorfrcrange (newton_generated.xml). Every other finger
+field is identical (range, limit solref/solimp, armature 0.001, zero damping, friction and margin, kp 40, kd 10); Newton
+applies no joint velocity limit in SolverMuJoCo.
+
+Unit proof (`runs/il3/finger_unit.py`, `test_saturated_finger_keeps_implicit_damping`): left_four_joint driven into its
+limit at 60 rad/s with a target at the limit blows up in 3 substeps with the actuator clamp and stays at 31 rad/s with the
+joint clamp; with a saturated target (−50 rad) the actuator clamp fails in 1 substep at any speed.
+
+A/B (`runs/il3/late_ab.log`, final corrected-rough policy, 1500 steps × 4096 envs, `blowup_probe.py`):
+
+| variant | blow-ups | kind | Isaac-style torso terminations |
+|---|---|---|---|
+| actuator clamp (as trained) | 41 | all large-finite, fingers (left_six 14, right_four 12, right_six 9) | 91 |
+| **joint clamp (Newton's layout)** | **0** | – | 49 |
+| actuator clamp + hard finger limits | 0 | – | 59 |
+| actuator clamp + hard limits everywhere | 0 | – | 32 |
+| actuator clamp + MuJoCo Warp factorization defaults | 39 | large-finite, fingers | 78 |
+| actuator clamp + contact_cfg default | DEFAULT_PENDING | | |
+
+The blow-ups were large-finite (|qvel| > 1000), not NaN: Isaac's log has no counter for that and nothing terminates on it.
+The fix (default `effort_limit="joint"`, all G1 configs; also the generic USD loader and the Tron1 training model) is
+Newton's layout exactly; the archived actuator clamp stays selectable. Test `test_g1_actuator_and_joint_fields_match_newtons_model`
+checks every joint's kp, kd, force limits and armature against newton_generated.xml.
+
+Final runs queued with both fixes (reset start, joint clamp): flat 3.0 seeds 0, 1, 2 and rough 3.0 seed 0, 1500 iterations.
