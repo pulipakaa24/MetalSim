@@ -85,7 +85,7 @@ first four commits plus the graph-capture sort; merged into `metalsim`.
 
 [github.com/pulipakaa24/mujoco_warp](https://github.com/pulipakaa24/mujoco_warp), branch
 [`metalsim`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), head
-[`b630530`](https://github.com/pulipakaa24/mujoco_warp/commit/b63053080fff862d41c502fbffa3a03f799ae3f2) (2026-09-25 evening;
+[`9b4e96a`](https://github.com/pulipakaa24/mujoco_warp/commit/9b4e96a) (2026-09-26;
 the rigid-body results before the elliptic-cone work were produced at
 [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) / code
 [`8fbf965`](https://github.com/pulipakaa24/mujoco_warp/commit/8fbf965acb630aa32573dda802404d519c843a99)). Base: Google
@@ -107,6 +107,8 @@ DeepMind's MuJoCo Warp v3.14.0 (`88af9cc`) plus the Metal device patch by David 
 - Elliptic-cone Newton Hessian on Metal without capacity-sized launches or one-lane groups (`c301880`; modes
   `MJW_JTCJ_MODE=world2|world|contact|capacity`, `MJW_JTDAJ_ELLIPTIC_LANES`): Go2 elliptic 240 K → 580 K physics
   steps/s, the G1 task 11 K → 55 K env-steps/s, physics unchanged to float noise (`docs/research/elliptic_cones_2026-09-25.md`).
+- Elliptic cones on MuJoCo C's incremental Newton structure (`a33c731`, `b895bff`; `MJW_ELLIPTIC_INCREMENTAL=2` default):
+  the G1 task's elliptic premium 1.42× → 1.21× over pyramidal, Go2 / humanoid / SO-101 +4–7 %, physics unchanged.
 - Heightfield plane contacts restricted to meshes; primitives take upstream's GJK/EPA again (`b630530`; the fork's
   plane path missed contacts of primitives on heightfields smaller than the box; `HFIELD_PLANE_CONTACTS_PRIMITIVES=True`
   archives the old form).
