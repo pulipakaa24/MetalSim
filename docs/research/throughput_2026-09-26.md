@@ -493,8 +493,14 @@ changes nothing, hypothesis rejected); the snippet with the **split-loop** step 
 products in the same order) **0.601 / 0.599 ms**. n = 32 (one column per lane, the two steps coincide): tile 0.203,
 snippet 0.145. So the generic step's indexed register arrays are what the Metal compiler handles badly at two
 columns per lane, in the snippet context (4.2 ms) and, milder, in the tile path (1.07 ms); the split form is the
-fix. Warp fork `metalsim-tp`: the split step is now the register Cholesky's default (`warp.config.metal_chol_split`,
-`WP_METAL_CHOL_SPLIT=0` restores the generic step); bitwise A/B, cost split and the G1 step: `runs/tp26/split.wrapper.log`.
+fix in that context only. **On the tile path it is neutral** (`runs/tp26/split.wrapper.log`, 09:48-09:51): bitwise
+equal at n = 16..48; factor 0.971 vs 0.973 ms per 4096 at n = 43, factor + solve 1.038 vs 1.033; G1 step
+65.6-65.8 vs 65.4 ms (interleaved P G P G, inside the noise). The 7x of the snippet context was the snippet's
+generic step compiling badly, not a property of the tile path. Archived off (`WP_METAL_CHOL_SPLIT=1` to select).
+Both round-2 Cholesky items (64 lanes, split loop) and the residency test leave the n = 43 factorization where it
+was: the cost is the register form's shuffle chain itself, on one SIMD group, and no alternative form measured
+today beats it. The G1 step with everything landed (unrolled L'DL factor included) in this job: 65.4-65.8 ms,
+62,272-62,644 env-steps/s.
 
 ### 11.9 Test suites (fork heads mujoco_warp 0a9de8e / f33005f, warp 9df9acee)
 
