@@ -287,15 +287,101 @@ Reading (one seed on each side; MetalSim's three 2.3.2-task seeds spread ±1.3 a
   plus random targets let joints travel far past their limits; the monitor logged "joint limit violated by 0.1 rad"
   warnings through the run. Not seen on Isaac's side (its logs have no such counter).
 * **Throughput**: MetalSim training loop median 42,589 env-steps/s on the M4 Max (incl. the anomaly monitor and the per-term
-  logging sync) vs Isaac 59,405 (Newton) and 47,257 (PhysX) on the L4; 59 vs 41.3 / 52.2 min. Caveat: from ~17:30 a queue
-  bug (below) let other agents' jobs start without the lock, so part of this run may have shared the GPU; the rate is
-  labelled accordingly (it matches the step benchmark of 49.5 K minus the PPO update, so contamination was small).
+  logging sync) vs Isaac 59,405 (Newton) and 47,257 (PhysX) on the L4; 59 vs 41.3 / 52.2 min. Per 100-iteration block the
+  rate falls smoothly from 50.7 K (iterations 1–100, short episodes) to 42.1 K (1401–1500). This run held the lock (its
+  acquire predates the queue bug below), but jobs launched between 17:53 and 18:16 could start without the lock, i.e.
+  during iterations ≈870–1500; the per-block rates show no step there (42.46 K at 801–900, 42.36 K at 901–1000), so the
+  rate is reported as measured with that caveat.
 
 **Queue bug found on the way (fixed, 18:17)**: `scripts/gpu_lock.py` (e10a80c) declared a positional `cmd` and an option
 `--cmd`; the option overwrote the sub-command, so `acquire` printed the status and returned at once and every
-`gpu_run.sh` job started without the lock. Fixed with `dest="job_cmd"`; reported to the coordinator.
+`gpu_run.sh` job launched 17:53–18:16 started without the lock. Fixed with `dest="job_cmd"`; the coordinator kept the fix and
+added `tests/test_gpu_queue.py` (8c208bf). No timing number in this note was taken in that window (bench re-take 16:07).
 
-ROUGH_PENDING
+### 3.2 Rough (measured 2026-09-25, 18:30–19:36)
+
+Run: `runs/il3/run_train.sh rough isaaclab3_every_substep_cap20 1500 0` (`reward_cfg="rough_il3"`: rough_isaac rewards,
+3.0 events, collision on the 0.1 m heightfield as Newton rasterizes it, exact height scan, terrain seed 0 = Isaac's
+`--seed 0`, 512-256-128 policy). Log `runs/il3/train_rough_il3_isaaclab3_every_substep_cap20_s0.log`; the first
+attempt stopped at start-up (`runs/il3/aborted_rough_nconmax.stdout`: Isaac's 2 cm pair gap adds inactive contacts, MuJoCo
+C's initial set on the heightfield is 36 > the 32 slots; the preset now gets 64 on rough). Isaac's side:
+`runs/parity3/isaac/train/train_rough_newton_mjwarp_terms.txt` (Newton only).
+
+Isaac Lab 3.0 (newton_mjwarp; rsl_rl 5.4.1, last-100-episode means, 0-based it) vs MetalSim runs/il3/train_rough_il3_isaaclab3_every_substep_cap20_s0.log (PPOWarp, episodes finished in the iteration, 1-based it; ±5-iteration mean in brackets)
+| iteration | Isaac newton_mjwarp: length / return / lin track / yaw track / level | MetalSim: length / return / lin track / yaw track / level |
+|---|---|---|
+| 50 | 51 / -4.8 / 0.012 / 0.008 / 0.00 | 48 (49) / -5.1 (-5.1) / 0.011 / 0.008 / 0.00 |
+| 100 | 69 / -4.6 / 0.021 / 0.015 / 0.00 | 57 (58) / -4.6 (-4.7) / 0.017 / 0.012 / 0.00 |
+| 150 | 292 / -6.5 / 0.109 / 0.065 / 0.06 | 153 (158) / -5.7 (-5.8) / 0.048 / 0.035 / 0.00 |
+| 200 | 906 / -5.9 / 0.452 / 0.219 / 0.38 | 833 (829) / -9.8 (-9.6) / 0.338 / 0.195 / 0.05 |
+| 250 | 953 / -0.6 / 0.592 / 0.300 / 1.05 | 925 (895) / -7.2 (-7.4) / 0.446 / 0.244 / 0.53 |
+| 300 | 964 / +3.0 / 0.681 / 0.373 / 1.71 | 949 (932) / -3.7 (-3.7) / 0.587 / 0.295 / 1.21 |
+| 400 | 983 / +7.0 / 0.736 / 0.499 / 2.99 | 949 (958) / +0.0 (+0.1) / 0.673 / 0.370 / 2.62 |
+| 500 | 994 / +8.9 / 0.752 / 0.584 / 4.15 | 918 (939) / -0.1 (-0.3) / 0.660 / 0.395 / 3.84 |
+| 750 | 979 / +8.2 / 0.749 / 0.617 / 5.46 | 977 (951) / +1.9 (+1.0) / 0.671 / 0.477 / 5.01 |
+| 1000 | 973 / +8.9 / 0.762 / 0.657 / 5.48 | 962 (964) / +2.3 (+1.7) / 0.694 / 0.518 / 5.41 |
+| 1250 | 1000 / +11.6 / 0.795 / 0.722 / 5.74 | 970 (956) / +3.9 (+3.3) / 0.709 / 0.556 / 5.58 |
+| 1499 | 989 / +14.5 / 0.811 / 0.808 / 5.80 | 997 (974) / +6.1 (+5.4) / 0.747 / 0.604 / 5.70 |
+
+Per-term at iteration 1000 (Isaac: that iteration's log; MetalSim: ±5-iteration mean of the per-iteration episode means)
+| term | Isaac newton_mjwarp | MetalSim |
+|---|---|---|
+| track_lin_vel_xy_exp | +0.7616 | +0.6944 |
+| track_ang_vel_z_exp | +0.6573 | +0.5183 |
+| feet_air_time | +0.0041 | +0.0035 |
+| feet_slide | -0.0291 | -0.0410 |
+| joint_deviation (hip+arms+fingers+torso) | -0.2482 | -0.2714 |
+| flat_orientation_l2 | -0.0104 | -0.0153 |
+| action_rate_l2 | -0.5641 | -0.6350 |
+| termination_penalty | -0.0131 | -0.0172 |
+| lin_vel_z_l2 | +0.0000 | +0.0000 |
+| ang_vel_xy_l2 | -0.0407 | -0.0527 |
+| dof_torques_l2 | -0.0008 | -0.0008 |
+| dof_acc_l2 | -0.0282 | -0.0771 |
+| dof_pos_limits | -0.0204 | -0.0205 |
+| falls (base_contact fraction of episode ends) | 0.0569 | 0.0860 |
+
+Per-term at iteration 1499 (Isaac: that iteration's log; MetalSim: ±5-iteration mean of the per-iteration episode means)
+| term | Isaac newton_mjwarp | MetalSim |
+|---|---|---|
+| track_lin_vel_xy_exp | +0.8110 | +0.7475 |
+| track_ang_vel_z_exp | +0.8081 | +0.6045 |
+| feet_air_time | +0.0047 | +0.0041 |
+| feet_slide | -0.0270 | -0.0386 |
+| joint_deviation (hip+arms+fingers+torso) | -0.2489 | -0.2738 |
+| flat_orientation_l2 | -0.0101 | -0.0148 |
+| action_rate_l2 | -0.5331 | -0.6113 |
+| termination_penalty | -0.0024 | -0.0100 |
+| lin_vel_z_l2 | +0.0000 | +0.0000 |
+| ang_vel_xy_l2 | -0.0334 | -0.0461 |
+| dof_torques_l2 | -0.0007 | -0.0007 |
+| dof_acc_l2 | -0.0264 | -0.0688 |
+| dof_pos_limits | -0.0210 | -0.0221 |
+| falls (base_contact fraction of episode ends) | 0.0291 | 0.0501 |
+
+Throughput (training loop, env-steps/s):
+  Isaac newton_mjwarp: median 42,039 (L4), total iteration time 58.3 min over 1500 iterations
+  MetalSim: median 34,775 (M4 Max, incl. the monitor), 1500 iterations
+
+
+Reading (one seed each):
+* **Return at 1499: +6.1 (±5 mean +5.4) vs Isaac Newton +14.5; terrain level 5.70 vs 5.80.** The curriculum climbs
+  at nearly Isaac's pace (level 1.21 vs 1.71 at 300, 3.84 vs 4.15 at 500, 5.41 vs 5.48 at 1000); the return does not.
+  This is a larger gap than MetalSim's 2.3.2 rough result (+16.4 / +22.6 over two seeds vs Isaac 2.3.2 PhysX +14.1).
+* Per term at 1499 the gap is yaw tracking −0.20 (0.60 vs 0.81), linear tracking −0.06, action rate −0.08, dof_acc −0.04
+  (2.6× Isaac's), joint deviation −0.025, falls (termination −0.008; 5.0 % vs 2.9 % of episode ends), feet slide −0.012,
+  ang_vel_xy −0.013: −0.42 per second, −8.4 over 20 s, the whole gap.
+* **Blow-ups: 1,615 non-finite episodes** (766 in iterations 1–150 while the policy flails, none in 151–600, then rising
+  with the terrain level to ≈230 per 150 iterations, ≈1.5 % of finished episodes at the end), each ending as a fall.
+  The flat run had 44; MetalSim's 2.3.2 rough runs on MuJoCo defaults had none. Together with the 2.6× dof_acc cost and the
+  joint-limit anomaly warnings (0.12–0.20 rad past the limits, every iteration), this points at Isaac's very soft leg
+  limits (time constants up to 0.46 s, damping ratio 0.03) combined with MuJoCo Warp's heightfield contacts on Metal:
+  a MetalSim-side stability problem of this preset on rough terrain, not seen in Isaac's log (which has no such counter).
+  **Not resolved here**; the next measurement is the same run with `isaaclab3_hardlimits`-style limits
+  (`solver_cfg="isaaclab3_hardlimits"`) or the MuJoCo defaults, to separate the limits from the contacts.
+* Throughput: MetalSim 34,775 env-steps/s median (M4 Max) vs Isaac Newton 42,039 (L4); 66 vs 58.3 min. This run
+  started after the queue fix and held the lock throughout.
+
 
 ## 4. Remaining setup differences
 
@@ -325,7 +411,10 @@ Between MetalSim's `flat_il3` / `rough_il3` run and Isaac Lab 3.0's `Isaac-Veloc
 9. **`njmax` / `nconmax`**: Isaac's 95 / 10 (flat) could drop contacts on overflow; MetalSim's buffers do not overflow.
 10. **Joint-limit solref after mass randomization**: re-scaled per world with MetalSim's own `dof_invweight0` ratio;
     Isaac's absolute `dof_invweight0` is not recorded (the nominal per-joint values are).
-11. **2.3.2 ports**: still read the frame-origin root velocity (§1.2); left as they were, flagged in the ledger.
+11. **Rough iteration cap**: the cap-20 probe (0 of 9.8 M substep-worlds above 20) was run on flat terrain only; on the
+    heightfield it is unmeasured.
+12. **Rough stability**: 1,615 blow-ups with Isaac's soft limits on MetalSim's heightfield (§3.2), none reported by Isaac.
+13. **2.3.2 ports**: still read the frame-origin root velocity (§1.2); left as they were, flagged in the ledger.
 
 
 ## 5. Decisions (DECISIONS.md-style rows; options archived behind flags)
@@ -337,5 +426,6 @@ Between MetalSim's `flat_il3` / `rough_il3` run and Isaac Lab 3.0's `Isaac-Veloc
 | 2026-09-25 | Joint limits against Isaac Lab 3.0's Newton reference | hard limits (5 ms, 0.99–0.999): random-protocol max excursion 0.068 rad / 134 steps > 0.01; Isaac's live soft limits (4 ms–0.46 s, ζ 0.03–0.35): 0.216 / 118; Isaac Newton itself 0.227 / 112 | soft (Isaac's recorded values) when the reference is Newton; hard stays the PhysX-reference choice | `solver_cfg="isaaclab3_hardlimits"`, `contact_tuning` presets |
 | 2026-09-25 | Collision once per 5 ms tick | once per tick with witness-point refresh (Newton's fast path) vs every substep: every substep closer on 7 of 11 protocol rows (landing 20 ms force 2187 vs 2979 N, Isaac 2086; drop root-height RMSE 2.2 vs 5.9 mm; random divergence 0.26 vs 0.12 s), cost equal (27.2 K vs 27.5 K) | every substep (Newton's own contact set is not reproduced, so the reuse alone does not help) | `solver_cfg="isaaclab3"` (`collision_every=2`) |
 | 2026-09-25 | Iteration cap for Isaac's numerics on Metal | cap 100 (Isaac's): 27.5 K env-steps/s; cap 20: 50.4 K, states equal to 1.2e-7 when no world exceeds 20 | cap 20 for training, with the probe count of worlds above 20 reported | `solver_cfg="isaaclab3_collide_every_substep"` (cap 100) |
+| 2026-09-25 | Preset for the rough like-for-like run | isaaclab3 numerics (soft limits) on the 0.1 m heightfield: +6.1 at 1499 vs Isaac Newton +14.5, level 5.70 vs 5.80, 1,615 blow-ups; hard limits / MuJoCo defaults on the same task: not yet run | kept as run (it is Isaac's configuration); open: the limits-vs-contacts A/B | `solver_cfg="isaaclab3_hardlimits"` or none on `reward_cfg="rough_il3"` |
 | 2026-09-25 | Rough collision surface for the 3.0 Newton reference | exact boxes (2.3.2 rough port, matches PhysX's mesh) vs the 0.1 m heightfield (what Newton rasterizes in 3.0) | heightfield for `rough_il3` | `terrain_collision="boxes_local"` |
 
