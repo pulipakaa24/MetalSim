@@ -42,13 +42,19 @@ def test_step_signals_and_waits_in_order(monkeypatch):
     for _ in range(3):
         env.step(a)
     env.synchronize()
-    kinds = [k for k, _ in log]
-    per_step = ["signal_learner", "wait_learner", "physics", "after"]
-    assert kinds == per_step * 3, kinds
-    # the learner event is waited on at the value that was just signalled, and the sim's completion value is what torch waits on
-    for i in range(3):
-        s, w = log[4 * i], log[4 * i + 1]
-        assert s[1] == w[1]
+    # step() commits torch's writes twice: before the physics (the ctrl write) and, after resetting the envs that
+    # finished (sim.reset: its own signal / wait on the sim event), before the forward pass (the randomized state);
+    # only the learner-event, physics and after entries are ordered here
+    kinds = [k for k, _ in log if k in ("signal_learner", "wait_learner", "physics")]
+    assert kinds == ["signal_learner", "wait_learner", "physics", "signal_learner", "wait_learner"] * 3, [k for k, _ in log]
+    seq = [(k, v) for k, v in log if k in ("signal_learner", "wait_learner", "physics", "after")]
+    phys = [n for n, (k, _) in enumerate(seq) if k == "physics"]
+    assert len(phys) == 3
+    for n in phys:
+        # the learner event is waited on at the value just signalled, right before the physics, and torch waits on the
+        # physics' completion (after) right after it, i.e. before its next write
+        assert seq[n - 2][0] == "signal_learner" and seq[n - 1][0] == "wait_learner" and seq[n - 2][1] == seq[n - 1][1]
+        assert seq[n + 1][0] == "after"
     # torch's ctrl write is visible to the physics: the sim's ctrl equals what step() computed from the action
     env.synchronize()
     expect = (env.ctrl_lo + 0.5 * (a + 1.0) * (env.ctrl_hi - env.ctrl_lo)).cpu().numpy()
