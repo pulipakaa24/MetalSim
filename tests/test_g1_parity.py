@@ -56,7 +56,8 @@ def _isaac_value(groups, joint, key):
 def test_actuator_gains_match_isaac_implicit_pd(model):
     """Isaac Lab: ImplicitActuatorCfg -> PhysX joint drive tau = kp (q* - q) - kd qd clipped to
     effort_limit_sim, armature added to the joint (source: assets/isaac/g1_asset_cfg.py,
-    G1_MINIMAL_CFG). Ours: MuJoCo affine actuators with gain kp, bias (0, -kp, -kd), forcerange."""
+    G1_MINIMAL_CFG). Ours: MuJoCo affine actuators with gain kp, bias (0, -kp, -kd), the effort limit on the joint's actfrcrange
+    (Newton's layout; the archived effort_limit="actuator" put it on the actuator forcerange)."""
     groups = _isaac_actuator_groups()
     m = model
     assert m.nu == 37
@@ -67,7 +68,7 @@ def test_actuator_gains_match_isaac_implicit_pd(model):
         eff = _isaac_value(groups, name, "effort_limit_sim"); arm = _isaac_value(groups, name, "armature")
         assert m.actuator_gainprm[a][0] == kp, name
         assert m.actuator_biasprm[a][1] == -kp and m.actuator_biasprm[a][2] == -kd, name
-        assert tuple(m.actuator_forcerange[a]) == (-eff, eff) and m.actuator_forcelimited[a], name
+        assert not m.actuator_forcelimited[a] and m.jnt_actfrclimited[j] and tuple(m.jnt_actfrcrange[j]) == (-eff, eff), name
         assert m.dof_armature[m.jnt_dofadr[j]] == arm, name
     # the actuator table in g1_velocity.py is exactly Isaac's grouping (no joint unmatched, no extra)
     joints = [mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_JOINT, j) for j in range(1, m.njnt)]
