@@ -618,3 +618,28 @@ Reading:
 - **Fork test suite on Metal with mode 2 (`e2_pytest_sz`): 1451 passed, 39 skipped, 1 failed** — the
   pre-existing MuJoCo-nightly `test_put_data_nefc_zero_dense` (§7.4); `test_hfield_maxconpair` passes since
   `b630530`.
+
+### 8.5 Newton iteration cap under elliptic cones (measured, `scripts/diagnostics/competitors/cap_probe_ellip.py`, the 3.0 agent's `runs/il3/cap_probe.py` protocol)
+
+Why: the full-loop A/B (§8) left 616–663 of 4096 worlds at the task's cap of 10 Newton iterations per substep
+under ellip10 (22–23 under pyramidal). Protocol: 4096 envs, rollout with cap 100; at 10 checkpoints one control
+step (8 substeps) is re-run from the saved state with cap 10 / 20 / 40 / 100 and compared with the cap-100 run;
+a second cap-100 re-run is the noise floor (MuJoCo Warp's contact order is nondeterministic, so single-world
+maxima are chaotic; the per-world 99th percentile of |Δqvel| and the count of worlds with |Δqvel| > 0.01 are the
+robust measures). `runs/competitors/cap_probe/*.json`.
+
+| states | preset | worlds at cap 10 per step | cap 10: p99 |Δqvel| / worlds > 0.01 / > 0.1 | floor (cap 100 vs cap 100) | cap 20: worlds at cap / p99 / > 0.01 | cap 40 | max iterations needed (cap 100) |
+|---|---|---|---|---|---|---|---|
+| flat, ellip10-trained policy walking (pelvis z 0.69, no falls) | ellip10 | **270** | **0.0074 / 26.1 / 5.5** | 0.0026 / 13.4 / 4.1 | **0 / 0.0025 / 11.5** | 0 / 0.0028 / 13.1 | 13–16 (mean 3.0–4.0) |
+| flat, same policy | recommended (pyramidal) | 14.5 | 0.0010 / 6.7 / 2.7 | 0.0011 / 6.9 / 3.1 | 0 / 0.0010 / 6.8 | 0 / 0.0010 / 6.9 | 10–12 (mean 2.1–3.2) |
+| flat, random actions (robots fall and lie; z 0.08 from step 60) | ellip10 | **546** | **0.112 / 105 / 35** | 0.0016 / 5.7 / – | 3.6 / 0.0015 / 6.0 | 0 / 0.0015 / 6.0 | 20–34 (mean 3.2–4.0) |
+| flat, random actions (3.0 agent's `cap_probe2_flat`) | recommended | 26 | 0.0014 / – | 0.0013 | 0 / 0.0014 | 0 / 0.0013 | 12–16 |
+| rough, random actions | ellip10 | pending (`cap_ellip_rough_rand2`, 2048 envs: the 4096-env run hit `kIOGPUCommandBufferCallbackErrorOutOfMemory`) | | | | | |
+
+Reading: **under elliptic cones cap 10 changes states above the floor**, mildly on walking states (p99 |Δqvel|
+2.8× the floor, twice as many worlds moved by > 0.01 rad/s, 270 worlds per step at the cap) and strongly on
+the lying / thrashing random-action states (p99 70× the floor, 105 worlds per step moved by > 0.01 and 35 by
+> 0.1, 546 worlds at the cap) — where pyramidal at cap 10 is at its floor in both. **Cap 20 is at the floor
+in both elliptic cases** (0–3.6 worlds per step still at the cap, p99 and counts equal to cap 40 / 100), so
+20 is the cap at which elliptic cones no longer change states; the loop cost of cap 20 is measured in
+`e2_loop_cap` (pending) and belongs to the elliptic premium.

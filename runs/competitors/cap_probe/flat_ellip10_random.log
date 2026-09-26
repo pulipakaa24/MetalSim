@@ -1,0 +1,126 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 28.84 ms  (cached)
+Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 17.64 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_78310433 7831043 load on device 'metal:0' took 26.34 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_a5bbb2cb a5bbb2c load on device 'metal:0' took 20.82 ms  (cached)
+Module mujoco_warp._src.constraint f5f4518 load on device 'metal:0' took 16.66 ms  (cached)
+Module _friction_dof__locals__kernel_0bb9a331 0bb9a33 load on device 'metal:0' took 17.01 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_914cb5e1 914cb5e load on device 'metal:0' took 17.25 ms  (cached)
+Module _efc_contact_init__locals__kernel_7bf04e1f 7bf04e1 load on device 'metal:0' took 16.54 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_1364491d 6a9b106 load on device 'metal:0' took 17.27 ms  (cached)
+Module _efc_contact_update__locals__kernel_a5cf4f2b a5cf4f2 load on device 'metal:0' took 17.15 ms  (cached)
+Module mujoco_warp._src.forward 4772766 load on device 'metal:0' took 23.50 ms  (cached)
+Module mujoco_warp._src.passive 9e93f67 load on device 'metal:0' took 24.06 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_8ed29e9b 8ed29e9 load on device 'metal:0' took 17.89 ms  (cached)
+Module mujoco_warp._src.forward d28e0c7 load on device 'metal:0' took 24.18 ms  (cached)
+Module _qfrc_smooth__locals__kernel_08dfc9ad 08dfc9a load on device 'metal:0' took 16.92 ms  (cached)
+Module mujoco_warp._src.support 040f2c5 load on device 'metal:0' took 17.22 ms  (cached)
+Module _factor_i_sparse_serial__locals__kernel_bbc34dce 0938022 load on device 'metal:0' took 19.28 ms  (cached)
+Module _solve_LD_sparse_serial__locals__kernel_da14e052 352f4b8 load on device 'metal:0' took 20.08 ms  (cached)
+Module _solve_init_dof__locals__kernel_8e985b01 8e985b0 load on device 'metal:0' took 17.59 ms  (cached)
+Module mujoco_warp._src.solver f23e090 load on device 'metal:0' took 19.88 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_7c1132c5 7c1132c load on device 'metal:0' took 17.42 ms  (cached)
+Module mul_m_kernel__locals___mul_m_505d9f1c 505d9f1 load on device 'metal:0' took 18.03 ms  (cached)
+Module _update_constraint_efc__locals__kernel_1994cb68 1994cb6 load on device 'metal:0' took 18.77 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_6f502a20 6f502a2 load on device 'metal:0' took 16.80 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_86f1e084 86f1e08 load on device 'metal:0' took 16.68 ms  (cached)
+Module _update_gradient_grad__locals__kernel_e5baa4a1 e5baa4a load on device 'metal:0' took 17.46 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_ddb85d20 55cb272 load on device 'metal:0' took 16.90 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_ad48cc59 0434274 load on device 'metal:0' took 17.30 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_343096c5 47e4e92 load on device 'metal:0' took 19.27 ms  (cached)
+Module _update_constraint_efc__locals__kernel_49bd7abe 49bd7ab load on device 'metal:0' took 17.39 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_20171f2f 20171f2 load on device 'metal:0' took 16.73 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_67211e0e 67211e0 load on device 'metal:0' took 16.82 ms  (cached)
+Module _update_gradient_grad__locals__kernel_7aee5faa 7aee5fa load on device 'metal:0' took 16.75 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_402f034d d6ece9d load on device 'metal:0' took 16.77 ms  (cached)
+Module _solve_done__locals__kernel_d351f953 d351f95 load on device 'metal:0' took 16.97 ms  (cached)
+Module mujoco_warp._src.sensor c2b0248 load on device 'metal:0' took 27.47 ms  (cached)
+Module mujoco_warp._src.derivative 356952f load on device 'metal:0' took 20.10 ms  (cached)
+Module _next_time_builder__locals___next_time_bd97507a bd97507 load on device 'metal:0' took 16.98 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_f05e0f72 f05e0f7 load on device 'metal:0' took 16.70 ms  (cached)
+Module reset_data__locals__reset_M_debb12fa debb12f load on device 'metal:0' took 16.97 ms  (cached)
+Module reset_data__locals__reset_mocap_d5f6a172 d5f6a17 load on device 'metal:0' took 16.74 ms  (cached)
+Module reset_data__locals__reset_contact_10be067b 10be067 load on device 'metal:0' took 16.86 ms  (cached)
+Module reset_data__locals__reset_sleep_4c0bb4a4 4c0bb4a load on device 'metal:0' took 17.80 ms  (cached)
+Module reset_data__locals__reset_nworld_f0ec89aa f0ec89a load on device 'metal:0' took 16.86 ms  (cached)
+Module metalsim.sensors.contact 8b280a6 load on device 'metal:0' took 20.69 ms  (cached)
+Module metalsim.learn.g1_velocity 98312b6 load on device 'metal:0' took 22.91 ms  (cached)
+Module metalsim.learn.warp_policy d05639d load on device 'metal:0' took 18.84 ms  (cached)
+{"step": 19, "max_niter_cap100": 22, "mean_niter_cap100": 3.927398681640625, "worlds_at_cap100": 0, "pelvis_z_mean": 0.7067170143127441, "pelvis_z_below_0.4": 0, "floor": {"max_dqpos": 0.02022843062877655, "max_dqvel": 5.224852561950684, "p99_dqvel": 0.0016383290058001876, "median_dqvel": 1.3172626495361328e-05, "worlds_dqvel_gt_0.01": 12}, "cap10": {"worlds_hitting_cap": 541, "mean_niter": 3.8955078125, "max_dqpos": 0.02056644856929779, "max_dqvel": 5.224852561950684, "p99_dqvel": 0.08736490458250046, "median_dqvel": 1.4990568161010742e-05, "max_dqvel_in_hitting": 3.662593126296997, "worlds_dqvel_gt_0.01": 103, "worlds_dqvel_gt_0.1": 38, "max_dqvel_in_non_hitting": 5.224852561950684}, "cap20": {"worlds_hitting_cap": 4, "mean_niter": 3.929168701171875, "max_dqpos": 0.011743307113647461, "max_dqvel": 3.139153480529785, "p99_dqvel": 0.0014700889587402344, "median_dqvel": 1.1444091796875e-05, "max_dqvel_in_hitting": 0.000446319580078125, "worlds_dqvel_gt_0.01": 13, "worlds_dqvel_gt_0.1": 11, "max_dqvel_in_non_hitting": 3.139153480529785}, "cap40": {"worlds_hitting_cap": 0, "mean_niter": 3.9285888671875, "max_dqpos": 0.01439609844237566, "max_dqvel": 1.6162796020507812, "p99_dqvel": 0.001537621021270752, "median_dqvel": 1.424551010131836e-05, "max_dqvel_in_hitting": null, "worlds_dqvel_gt_0.01": 16, "worlds_dqvel_gt_0.1": 13, "max_dqvel_in_non_hitting": 1.6162796020507812}, "cap100": {"worlds_hitting_cap": 0, "mean_niter": 3.928924560546875, "max_dqpos": 0.020230591297149658, "max_dqvel": 5.224852561950684, "p99_dqvel": 0.0015575408469885588, "median_dqvel": 1.4781951904296875e-05, "max_dqvel_in_hitting": null, "worlds_dqvel_gt_0.01": 16, "worlds_dqvel_gt_0.1": 16, "max_dqvel_in_non_hitting": 5.224852561950684}}
+{"step": 39, "max_niter_cap100": 21, "mean_niter_cap100": 3.1549072265625, "worlds_at_cap100": 0, "pelvis_z_mean": 0.5443590879440308, "pelvis_z_below_0.4": 753, "floor": {"max_dqpos": 0.013101240620017052, "max_dqvel": 0.27486056089401245, "p99_dqvel": 0.00132074358407408, "median_dqvel": 0.0, "worlds_dqvel_gt_0.01": 2}, "cap10": {"worlds_hitting_cap": 294, "mean_niter": 3.13873291015625, "max_dqpos": 0.018524017184972763, "max_dqvel": 2.6077756881713867, "p99_dqvel": 0.01265404187142849, "median_dqvel": 4.76837158203125e-07, "max_dqvel_in_hitting": 2.6077756881713867, "worlds_dqvel_gt_0.01": 49, "worlds_dqvel_gt_0.1": 18, "max_dqvel_in_non_hitting": 2.107795238494873}, "cap20": {"worlds_hitting_cap": 1, "mean_niter": 3.154815673828125, "max_dqpos": 0.005269467830657959, "max_dqvel": 2.107795238494873, "p99_dqvel": 0.0013503789668902755, "median_dqvel": 1.1920928955078125e-07, "max_dqvel_in_hitting": 0.001129150390625, "worlds_dqvel_gt_0.01": 4, "worlds_dqvel_gt_0.1": 4, "max_dqvel_in_non_hitting": 2.107795238494873}, "cap40": {"worlds_hitting_cap": 0, "mean_niter": 3.154754638671875, "max_dqpos": 0.005269467830657959, "max_dqvel": 2.107795238494873, "p99_dqvel": 0.001535606337711215, "median_dqvel": 1.1920928955078125e-07, "max_dqvel_in_hitting": null, "worlds_dqvel_gt_0.01": 3, "worlds_dqvel_gt_0.1": 3, "max_dqvel_in_non_hitting": 2.107795238494873}, "cap100": {"worlds_hitting_cap": 0, "mean_niter": 3.15447998046875, "max_dqpos": 0.005269467830657959, "max_dqvel": 2.107795238494873, "p99_dqvel": 0.0013874620199203491, "median_dqvel": 2.384185791015625e-07, "max_dqvel_in_hitting": null, "worlds_dqvel_gt_0.01": 4, "worlds_dqvel_gt_0.1": 4, "max_dqvel_in_non_hitting": 2.107795238494873}}
+{"step": 59, "max_niter_cap100": 20, "mean_niter_cap100": 3.75225830078125, "worlds_at_cap100": 0, "pelvis_z_mean": 0.18796014785766602, "pelvis_z_below_0.4": 3461, "floor": {"max_dqpos": 0.0011737346649169922, "max_dqvel": 0.19556504487991333, "p99_dqvel": 0.0009843945736065507, "median_dqvel": 1.0728836059570312e-06, "worlds_dqvel_gt_0.01": 2}, "cap10": {"worlds_hitting_cap": 547, "mean_niter": 3.71697998046875, "max_dqpos": 0.02646249532699585, "max_dqvel": 5.223806381225586, "p99_dqvel": 0.07898920774459839, "median_dqvel": 1.1920928955078125e-06, "max_dqvel_in_hitting": 5.223806381225586, "worlds_dqvel_gt_0.01": 108, "worlds_dqvel_gt_0.1": 34, "max_dqvel_in_non_hitting": 0.19547748565673828}, "cap20": {"worlds_hitting_cap": 3, "mean_niter": 3.75201416015625, "max_dqpos": 0.0011725649237632751, "max_dqvel": 0.1958886981010437, "p99_dqvel": 0.000935673713684082, "median_dqvel": 9.5367431640625e-07, "max_dqvel_in_hitting": 8.866190910339355e-05, "worlds_dqvel_gt_0.01": 1, "worlds_dqvel_gt_0.1": 1, "max_dqvel_in_non_hitting": 0.1958886981010437}, "cap40": {"worlds_hitting_cap": 0, "mean_niter": 3.751495361328125, "max_dqpos": 0.001173451542854309, "max_dqvel": 0.19571274518966675, "p99_dqvel": 0.0009143829229287803, "median_dqvel": 9.5367431640625e-07, "max_dqvel_in_hitting": null, "worlds_dqvel_gt_0.01": 3, "worlds_dqvel_gt_0.1": 2, "max_dqvel_in_non_hitting": 0.19571274518966675}, "cap100": {"worlds_hitting_cap": 0, "mean_niter": 3.752593994140625, "max_dqpos": 0.0011737346649169922, "max_dqvel": 0.19558972120285034, "p99_dqvel": 0.0009121179464273155, "median_dqvel": 1.0728836059570312e-06, "max_dqvel_in_hitting": null, "worlds_dqvel_gt_0.01": 3, "worlds_dqvel_gt_0.1": 2, "max_dqvel_in_non_hitting": 0.19558972120285034}}
+{"step": 79, "max_niter_cap100": 22, "mean_niter_cap100": 3.9658203125, "worlds_at_cap100": 0, "pelvis_z_mean": 0.10026451200246811, "pelvis_z_below_0.4": 4017, "floor": {"max_dqpos": 0.0047902315855026245, "max_dqvel": 1.9056869745254517, "p99_dqvel": 0.0011284351348876953, "median_dqvel": 1.9073486328125e-06, "worlds_dqvel_gt_0.01": 9}, "cap10": {"worlds_hitting_cap": 572, "mean_niter": 3.932098388671875, "max_dqpos": 0.022327125072479248, "max_dqvel": 3.820488214492798, "p99_dqvel": 0.11174969375133514, "median_dqvel": 2.2649765014648438e-06, "max_dqvel_in_hitting": 3.820488214492798, "worlds_dqvel_gt_0.01": 126, "worlds_dqvel_gt_0.1": 45, "max_dqvel_in_non_hitting": 1.9056917428970337}, "cap20": {"worlds_hitting_cap": 4, "mean_niter": 3.96600341796875, "max_dqpos": 0.0067474693059921265, "max_dqvel": 0.48190838098526, "p99_dqvel": 0.0009687423589639366, "median_dqvel": 1.9073486328125e-06, "max_dqvel_in_hitting": 0.000400543212890625, "worlds_dqvel_gt_0.01": 6, "worlds_dqvel_gt_0.1": 5, "max_dqvel_in_non_hitting": 0.48190838098526}, "cap40": {"worlds_hitting_cap": 0, "mean_niter": 3.966461181640625, "max_dqpos": 0.00671086460351944, "max_dqvel": 1.9056990146636963, "p99_dqvel": 0.0009534120326861739, "median_dqvel": 1.9073486328125e-06, "max_dqvel_in_hitting": null, "worlds_dqvel_gt_0.01": 7, "worlds_dqvel_gt_0.1": 5, "max_dqvel_in_non_hitting": 1.9056990146636963}, "cap100": {"worlds_hitting_cap": 0, "mean_niter": 3.965301513671875, "max_dqpos": 0.006710857152938843, "max_dqvel": 0.3288179636001587, "p99_dqvel": 0.0010371804237365723, "median_dqvel": 1.9073486328125e-06, "max_dqvel_in_hitting": null, "worlds_dqvel_gt_0.01": 5, "worlds_dqvel_gt_0.1": 2, "max_dqvel_in_non_hitting": 0.3288179636001587}}
+{"step": 99, "max_niter_cap100": 26, "mean_niter_cap100": 3.929840087890625, "worlds_at_cap100": 0, "pelvis_z_mean": 0.08537165820598602, "pelvis_z_below_0.4": 4088, "floor": {"max_dqpos": 0.0027885884046554565, "max_dqvel": 1.1158156394958496, "p99_dqvel": 0.0007363557815551758, "median_dqvel": 1.5497207641601562e-06, "worlds_dqvel_gt_0.01": 4}, "cap10": {"worlds_hitting_cap": 551, "mean_niter": 3.899322509765625, "max_dqpos": 0.024166524410247803, "max_dqvel": 2.213583469390869, "p99_dqvel": 0.08872909843921661, "median_dqvel": 1.9073486328125e-06, "max_dqvel_in_hitting": 2.213583469390869, "worlds_dqvel_gt_0.01": 106, "worlds_dqvel_gt_0.1": 37, "max_dqvel_in_non_hitting": 1.4047424793243408}, "cap20": {"worlds_hitting_cap": 4, "mean_niter": 3.92962646484375, "max_dqpos": 0.005106568336486816, "max_dqvel": 1.4047472476959229, "p99_dqvel": 0.0007761299493722618, "median_dqvel": 1.6689300537109375e-06, "max_dqvel_in_hitting": 0.0936574935913086, "worlds_dqvel_gt_0.01": 6, "worlds_dqvel_gt_0.1": 3, "max_dqvel_in_non_hitting": 1.4047472476959229}, "cap40": {"worlds_hitting_cap": 0, "mean_niter": 3.929901123046875, "max_dqpos": 0.0035120639950037003, "max_dqvel": 1.4047472476959229, "p99_dqvel": 0.0007797718280926347, "median_dqvel": 1.875218003988266e-06, "max_dqvel_in_hitting": null, "worlds_dqvel_gt_0.01": 5, "worlds_dqvel_gt_0.1": 2, "max_dqvel_in_non_hitting": 1.4047472476959229}, "cap100": {"worlds_hitting_cap": 0, "mean_niter": 3.929443359375, "max_dqpos": 0.002788439393043518, "max_dqvel": 1.1158246994018555, "p99_dqvel": 0.0007803320768289268, "median_dqvel": 1.6689300537109375e-06, "max_dqvel_in_hitting": null, "worlds_dqvel_gt_0.01": 5, "worlds_dqvel_gt_0.1": 4, "max_dqvel_in_non_hitting": 1.1158246994018555}}
+{"step": 119, "max_niter_cap100": 26, "mean_niter_cap100": 3.9775390625, "worlds_at_cap100": 0, "pelvis_z_mean": 0.08243314921855927, "pelvis_z_below_0.4": 4096, "floor": {"max_dqpos": 0.004916936159133911, "max_dqvel": 1.9857044219970703, "p99_dqvel": 0.0009914875263348222, "median_dqvel": 1.9073486328125e-06, "worlds_dqvel_gt_0.01": 9}, "cap10": {"worlds_hitting_cap": 602, "mean_niter": 3.944488525390625, "max_dqpos": 0.024053767323493958, "max_dqvel": 2.506809711456299, "p99_dqvel": 0.08757652342319489, "median_dqvel": 1.9073486328125e-06, "max_dqvel_in_hitting": 2.506809711456299, "worlds_dqvel_gt_0.01": 116, "worlds_dqvel_gt_0.1": 41, "max_dqvel_in_non_hitting": 0.44299769401550293}, "cap20": {"worlds_hitting_cap": 4, "mean_niter": 3.9771728515625, "max_dqpos": 0.008516505360603333, "max_dqvel": 1.7305195331573486, "p99_dqvel": 0.0009123086929321289, "median_dqvel": 1.9073486328125e-06, "max_dqvel_in_hitting": 0.25511837005615234, "worlds_dqvel_gt_0.01": 9, "worlds_dqvel_gt_0.1": 5, "max_dqvel_in_non_hitting": 1.7305195331573486}, "cap40": {"worlds_hitting_cap": 0, "mean_niter": 3.97869873046875, "max_dqpos": 0.002885192632675171, "max_dqvel": 1.030165195465088, "p99_dqvel": 0.0008517533424310386, "median_dqvel": 1.9073486328125e-06, "max_dqvel_in_hitting": null, "worlds_dqvel_gt_0.01": 6, "worlds_dqvel_gt_0.1": 3, "max_dqvel_in_non_hitting": 1.030165195465088}, "cap100": {"worlds_hitting_cap": 0, "mean_niter": 3.97772216796875, "max_dqpos": 0.0022510364651679993, "max_dqvel": 0.9007167816162109, "p99_dqvel": 0.0009069442749023438, "median_dqvel": 1.9073486328125e-06, "max_dqvel_in_hitting": null, "worlds_dqvel_gt_0.01": 3, "worlds_dqvel_gt_0.1": 2, "max_dqvel_in_non_hitting": 0.9007167816162109}}
+{"step": 139, "max_niter_cap100": 31, "mean_niter_cap100": 3.988372802734375, "worlds_at_cap100": 0, "pelvis_z_mean": 0.080199234187603, "pelvis_z_below_0.4": 4096, "floor": {"max_dqpos": 0.0035681556910276413, "max_dqvel": 0.7900475859642029, "p99_dqvel": 0.0008371263975277543, "median_dqvel": 1.9073486328125e-06, "worlds_dqvel_gt_0.01": 6}, "cap10": {"worlds_hitting_cap": 599, "mean_niter": 3.957305908203125, "max_dqpos": 0.021121934056282043, "max_dqvel": 3.2825489044189453, "p99_dqvel": 0.08073639869689941, "median_dqvel": 1.9073486328125e-06, "max_dqvel_in_hitting": 3.2825489044189453, "worlds_dqvel_gt_0.01": 114, "worlds_dqvel_gt_0.1": 36, "max_dqvel_in_non_hitting": 0.15589094161987305}, "cap20": {"worlds_hitting_cap": 2, "mean_niter": 3.9886474609375, "max_dqpos": 0.003938049077987671, "max_dqvel": 0.46769392490386963, "p99_dqvel": 0.0007600009557791054, "median_dqvel": 1.9073486328125e-06, "max_dqvel_in_hitting": 0.14538288116455078, "worlds_dqvel_gt_0.01": 3, "worlds_dqvel_gt_0.1": 2, "max_dqvel_in_non_hitting": 0.46769392490386963}, "cap40": {"worlds_hitting_cap": 0, "mean_niter": 3.98785400390625, "max_dqpos": 0.0035684173926711082, "max_dqvel": 0.33353328704833984, "p99_dqvel": 0.0008244395139627159, "median_dqvel": 1.9073486328125e-06, "max_dqvel_in_hitting": null, "worlds_dqvel_gt_0.01": 6, "worlds_dqvel_gt_0.1": 6, "max_dqvel_in_non_hitting": 0.33353328704833984}, "cap100": {"worlds_hitting_cap": 0, "mean_niter": 3.98809814453125, "max_dqpos": 0.0020822472870349884, "max_dqvel": 0.19779539108276367, "p99_dqvel": 0.000967603933531791, "median_dqvel": 1.9073486328125e-06, "max_dqvel_in_hitting": null, "worlds_dqvel_gt_0.01": 3, "worlds_dqvel_gt_0.1": 3, "max_dqvel_in_non_hitting": 0.19779539108276367}}
+{"step": 159, "max_niter_cap100": 21, "mean_niter_cap100": 3.9613037109375, "worlds_at_cap100": 0, "pelvis_z_mean": 0.07940083742141724, "pelvis_z_below_0.4": 4096, "floor": {"max_dqpos": 0.004569500684738159, "max_dqvel": 0.6020879745483398, "p99_dqvel": 0.0009203433874063194, "median_dqvel": 1.6689300537109375e-06, "worlds_dqvel_gt_0.01": 6}, "cap10": {"worlds_hitting_cap": 567, "mean_niter": 3.92938232421875, "max_dqpos": 0.01829083263874054, "max_dqvel": 1.5507698059082031, "p99_dqvel": 0.07197669893503189, "median_dqvel": 1.9073486328125e-06, "max_dqvel_in_hitting": 1.5507698059082031, "worlds_dqvel_gt_0.01": 111, "worlds_dqvel_gt_0.1": 34, "max_dqvel_in_non_hitting": 0.5028095245361328}, "cap20": {"worlds_hitting_cap": 3, "mean_niter": 3.96051025390625, "max_dqpos": 0.004569545388221741, "max_dqvel": 0.6021008491516113, "p99_dqvel": 0.0008707285160198808, "median_dqvel": 1.817941665649414e-06, "max_dqvel_in_hitting": 0.0003033876419067383, "worlds_dqvel_gt_0.01": 5, "worlds_dqvel_gt_0.1": 3, "max_dqvel_in_non_hitting": 0.6021008491516113}, "cap40": {"worlds_hitting_cap": 0, "mean_niter": 3.960662841796875, "max_dqpos": 0.004569455981254578, "max_dqvel": 0.602078914642334, "p99_dqvel": 0.0009373903158120811, "median_dqvel": 1.6689300537109375e-06, "max_dqvel_in_hitting": null, "worlds_dqvel_gt_0.01": 7, "worlds_dqvel_gt_0.1": 7, "max_dqvel_in_non_hitting": 0.602078914642334}, "cap100": {"worlds_hitting_cap": 0, "mean_niter": 3.9598388671875, "max_dqpos": 0.004569545388221741, "max_dqvel": 0.6020994186401367, "p99_dqvel": 0.0010025978554040194, "median_dqvel": 1.6689300537109375e-06, "max_dqvel_in_hitting": null, "worlds_dqvel_gt_0.01": 10, "worlds_dqvel_gt_0.1": 10, "max_dqvel_in_non_hitting": 0.6020994186401367}}
+{"step": 179, "max_niter_cap100": 23, "mean_niter_cap100": 3.9951171875, "worlds_at_cap100": 0, "pelvis_z_mean": 0.07893960922956467, "pelvis_z_below_0.4": 4096, "floor": {"max_dqpos": 0.0008481442928314209, "max_dqvel": 0.13697916269302368, "p99_dqvel": 0.0008255720022134483, "median_dqvel": 1.9073486328125e-06, "worlds_dqvel_gt_0.01": 2}, "cap10": {"worlds_hitting_cap": 587, "mean_niter": 3.963592529296875, "max_dqpos": 0.0203113853931427, "max_dqvel": 1.9399316310882568, "p99_dqvel": 0.07802941650152206, "median_dqvel": 2.1457672119140625e-06, "max_dqvel_in_hitting": 1.9399316310882568, "worlds_dqvel_gt_0.01": 103, "worlds_dqvel_gt_0.1": 37, "max_dqvel_in_non_hitting": 0.13711988925933838}, "cap20": {"worlds_hitting_cap": 5, "mean_niter": 3.9945068359375, "max_dqpos": 0.002924211323261261, "max_dqvel": 0.8377518057823181, "p99_dqvel": 0.0009435295942239463, "median_dqvel": 1.9073486328125e-06, "max_dqvel_in_hitting": 0.14343857765197754, "worlds_dqvel_gt_0.01": 6, "worlds_dqvel_gt_0.1": 4, "max_dqvel_in_non_hitting": 0.8377518057823181}, "cap40": {"worlds_hitting_cap": 0, "mean_niter": 3.99420166015625, "max_dqpos": 0.0021674595773220062, "max_dqvel": 0.8377818465232849, "p99_dqvel": 0.0009354770299978554, "median_dqvel": 1.9073486328125e-06, "max_dqvel_in_hitting": null, "worlds_dqvel_gt_0.01": 2, "worlds_dqvel_gt_0.1": 2, "max_dqvel_in_non_hitting": 0.8377818465232849}, "cap100": {"worlds_hitting_cap": 0, "mean_niter": 3.9951171875, "max_dqpos": 0.0035885199904441833, "max_dqvel": 0.8376824259757996, "p99_dqvel": 0.001051735831424594, "median_dqvel": 1.9073486328125e-06, "max_dqvel_in_hitting": null, "worlds_dqvel_gt_0.01": 6, "worlds_dqvel_gt_0.1": 5, "max_dqvel_in_non_hitting": 0.8376824259757996}}
+{"step": 199, "max_niter_cap100": 34, "mean_niter_cap100": 4.02716064453125, "worlds_at_cap100": 0, "pelvis_z_mean": 0.07794781029224396, "pelvis_z_below_0.4": 4096, "floor": {"max_dqpos": 0.0012679994106292725, "max_dqvel": 0.44128286838531494, "p99_dqvel": 0.000769495964050293, "median_dqvel": 1.9073486328125e-06, "worlds_dqvel_gt_0.01": 5}, "cap10": {"worlds_hitting_cap": 602, "mean_niter": 3.989532470703125, "max_dqpos": 0.01750427857041359, "max_dqvel": 1.0654230117797852, "p99_dqvel": 0.08850230276584625, "median_dqvel": 1.9073486328125e-06, "max_dqvel_in_hitting": 1.0654230117797852, "worlds_dqvel_gt_0.01": 115, "worlds_dqvel_gt_0.1": 32, "max_dqvel_in_non_hitting": 0.5031191110610962}, "cap20": {"worlds_hitting_cap": 6, "mean_niter": 4.02606201171875, "max_dqpos": 0.005928885191679001, "max_dqvel": 0.4411458969116211, "p99_dqvel": 0.0007717370754107833, "median_dqvel": 1.9073486328125e-06, "max_dqvel_in_hitting": 0.09967494010925293, "worlds_dqvel_gt_0.01": 7, "worlds_dqvel_gt_0.1": 2, "max_dqvel_in_non_hitting": 0.4411458969116211}, "cap40": {"worlds_hitting_cap": 0, "mean_niter": 4.026702880859375, "max_dqpos": 0.0031311437487602234, "max_dqvel": 1.2524456977844238, "p99_dqvel": 0.0009037971612997353, "median_dqvel": 1.9073486328125e-06, "max_dqvel_in_hitting": null, "worlds_dqvel_gt_0.01": 5, "worlds_dqvel_gt_0.1": 2, "max_dqvel_in_non_hitting": 1.2524456977844238}, "cap100": {"worlds_hitting_cap": 0, "mean_niter": 4.026336669921875, "max_dqpos": 0.0049426257610321045, "max_dqvel": 0.5031314492225647, "p99_dqvel": 0.0008138984558172524, "median_dqvel": 1.9073486328125e-06, "max_dqvel_in_hitting": null, "worlds_dqvel_gt_0.01": 12, "worlds_dqvel_gt_0.1": 6, "max_dqvel_in_non_hitting": 0.5031314492225647}}
+{
+ "terrain": "flat",
+ "contact_cfg": "tau10_impact_hardlimits_ellip10",
+ "actions": "random",
+ "caps": [
+  10,
+  20,
+  40,
+  100
+ ],
+ "summary_floor": {
+  "max_dqpos": 0.02022843062877655,
+  "max_dqvel": 5.224852561950684,
+  "p99_dqvel": 0.0016383290058001876,
+  "median_dqvel": 1.3172626495361328e-05,
+  "worlds_dqvel_gt_0.01": 5.7
+ },
+ "summary_cap10": {
+  "worlds_hitting_cap_mean_per_step": 546.2,
+  "mean_niter": 3.8366943359375,
+  "max_dqpos": 0.02646249532699585,
+  "max_dqvel": 5.224852561950684,
+  "p99_dqvel_max": 0.11174969375133514,
+  "median_dqvel_max": 1.4990568161010742e-05,
+  "worlds_dqvel_gt_0.01_mean": 105.1,
+  "worlds_dqvel_gt_0.1_mean": 35.2,
+  "max_dqvel_in_hitting": 5.223806381225586
+ },
+ "summary_cap20": {
+  "worlds_hitting_cap_mean_per_step": 3.6,
+  "mean_niter": 3.867852783203125,
+  "max_dqpos": 0.011743307113647461,
+  "max_dqvel": 3.139153480529785,
+  "p99_dqvel_max": 0.0014700889587402344,
+  "median_dqvel_max": 1.1444091796875e-05,
+  "worlds_dqvel_gt_0.01_mean": 6.0,
+  "worlds_dqvel_gt_0.1_mean": 4.0,
+  "max_dqvel_in_hitting": 0.25511837005615234
+ },
+ "summary_cap40": {
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "mean_niter": 3.86793212890625,
+  "max_dqpos": 0.01439609844237566,
+  "max_dqvel": 2.107795238494873,
+  "p99_dqvel_max": 0.001537621021270752,
+  "median_dqvel_max": 1.424551010131836e-05,
+  "worlds_dqvel_gt_0.01_mean": 6.0,
+  "worlds_dqvel_gt_0.1_mean": 4.5,
+  "max_dqvel_in_hitting": 0.0
+ },
+ "summary_cap100": {
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "mean_niter": 3.86778564453125,
+  "max_dqpos": 0.020230591297149658,
+  "max_dqvel": 5.224852561950684,
+  "p99_dqvel_max": 0.0015575408469885588,
+  "median_dqvel_max": 1.4781951904296875e-05,
+  "worlds_dqvel_gt_0.01_mean": 6.7,
+  "worlds_dqvel_gt_0.1_mean": 5.4,
+  "max_dqvel_in_hitting": 0.0
+ }
+}
