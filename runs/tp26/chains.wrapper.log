@@ -1,0 +1,50 @@
+[gpu_run] tp26_chains start: device utilisation 0% (05:37:52)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   1.7 %
+=== start Sat Sep 26 05:37:55 PDT 2026 metalsim 2298375 wt warp e29950ee mjw 4ef3da3 power: Now drawing from 'AC Power'
+--- check 05:37:55
+G1 task (nv 43): nM 434, levels 14, updates 391, lane pairs 353, sparse dofs 43 of 43
+  factor: bitwise | solve: bitwise | solve residual vs dense M 3.3e-06
+  chains (4 levels, 12 chains): factor rel diff vs serial 3.4e+15 (D 2.3e+00) | solve on the serial factor: bitwise | chain factor + chain solve residual vs dense M 2.8e+02
+Go2 menagerie (m_dense_max 0: all sparse): nM 117, levels 8, updates 99, lane pairs 81, sparse dofs 18 of 18
+  factor: bitwise | solve: bitwise | solve residual vs dense M 8.2e-07
+  chains (2 levels, 5 chains): factor rel diff vs serial 1.4e+05 (D 2.2e-01) | solve on the serial factor: bitwise | chain factor + chain solve residual vs dense M 7.9e+00
+humanoid (dm) (m_dense_max 0: all sparse): nM 243, levels 14, updates 216, lane pairs 195, sparse dofs 27 of 27
+  factor: bitwise | solve: bitwise | solve residual vs dense M 5.3e-06
+  chains (3 levels, 6 chains): factor rel diff vs serial 6.2e+05 (D 1.1e-01) | solve on the serial factor: bitwise | chain factor + chain solve residual vs dense M 2.8e+01
+FAILURES
+--- bench 05:38:07
+factor serial : 0.453 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+factor lanes  : 0.572 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+solve serial  : 0.206 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+solve lanes   : 0.266 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+factor chains : 0.646 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+solve chains  : 0.372 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+--- C1 chains 05:38:10
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[C1_chains] N=4096 njmax 144 naconmax 98304 is_sparse False
+[C1_chains] physics only 66.1 ms/step -> 61,927 env-steps/s
+[C1_chains] full env step 90.1 ms -> 45,449 env-steps/s
+[C1_chains] after random-action steps: nefc max 52 mean 4.7; nacon 4483 (1.09/world); overflow {'ITERATIONS': 90, 'LS_ITERATIONS': 2234}
+--- S1 serial 05:38:55
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[S1_serial] N=4096 njmax 144 naconmax 98304 is_sparse False
+[S1_serial] physics only 45.5 ms/step -> 90,106 env-steps/s
+[S1_serial] full env step 67.3 ms -> 60,824 env-steps/s
+[S1_serial] after random-action steps: nefc max 42 mean 14.4; nacon 11133 (2.72/world); overflow {'ITERATIONS': 23, 'LS_ITERATIONS': 3894}
+--- C2 chains 05:39:10
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[C2_chains] N=4096 njmax 144 naconmax 98304 is_sparse False
+[C2_chains] physics only 66.5 ms/step -> 61,607 env-steps/s
+[C2_chains] full env step 90.2 ms -> 45,417 env-steps/s
+[C2_chains] after random-action steps: nefc max 41 mean 4.7; nacon 4407 (1.08/world); overflow {'ITERATIONS': 96, 'LS_ITERATIONS': 2282}
+--- S2 serial 05:39:27
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[S2_serial] N=4096 njmax 144 naconmax 98304 is_sparse False
+[S2_serial] physics only 45.3 ms/step -> 90,325 env-steps/s
+[S2_serial] full env step 67.5 ms -> 60,684 env-steps/s
+[S2_serial] after random-action steps: nefc max 42 mean 14.4; nacon 11242 (2.74/world); overflow {'ITERATIONS': 29, 'LS_ITERATIONS': 3894}
+=== end Sat Sep 26 05:39:41 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] tp26_chains end: device utilisation 0% (05:39:41), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+lock held by tp26_cone, not tp26_chains; not released

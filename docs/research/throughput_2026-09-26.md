@@ -88,6 +88,14 @@ bitwise) 0.57 / 0.27 ms, step 72.7 vs 69.9 ms with the register solve. The per-l
 levels with one to six busy lanes cost more than the 7x shorter dependency chain saves. Kept behind
 `MJW_METAL_LDL_LANES=1` (default off, fork 2026-09-26); the serial one-world-per-thread kernels stay.
 
+A third form, one lane per single-child chain of the dof tree per level (the G1: 12 chains in 4 levels, dependent
+chain 105 updates instead of 391; the solve keeps the serial summation order bitwise, the factor's cross-chain
+updates are atomic as upstream's CUDA `_qLD_acc`; fork cdc4fd4 / e068734, `MJW_METAL_LDL_CHAINS=1`), correct to
+6e-7 relative (`runs/tp26/chains2.wrapper.log`), is also slower: factor 0.65 ms, solve 0.37, G1 step 72.9 vs
+67.2 ms. Three parallel forms lose to the serial kernel: the per-world work is memory-latency bound (391
+dependent updates at ~1 us each), and the SIMD-group forms add barriers while most lanes idle. Left as the
+residual (section 9).
+
 ## 3. Profile under the preset (measured, `runs/tp26/prof.wrapper.log`, 04:04, uncontended: granted 04:03:59, released 04:04:45, next job granted a second later)
 
 Register Cholesky cost split at 4096 matrices, graph replay (`scripts/diagnostics/metal_cholesky_parts.py`, installed Warp):
@@ -126,7 +134,8 @@ narrowphase routine writes per pair type (plane-mesh 4, plane-box 8, capsule pai
 MULTICCD since `multicontact` returns a 4 x 3 witness matrix), rows per contact from condim and the cone, plus
 limit, equality and friction-loss rows; it refuses heightfields, SDFs and flex (their per-pair counts are capped by
 the kernels with an overflow flag, not bounded). G1 flat: 6 pairs x 4 contacts = 24 contacts, 96 + 37 limit rows =
-133 -> `njmax` 144, `nconmax` 24 (the task used 512 / 128). `BatchSimOptions(njmax="auto", nconmax="auto")` applies
+133 -> `njmax` 144, `nconmax` 24 (the flat task ran with 256 / 32: its flat branch takes the heightfield
+capacities; the code says 512 / 128 for other terrains). `BatchSimOptions(njmax="auto", nconmax="auto")` applies
 it; `BatchSim.check_overflow()` raises on any capacity overflow flag and the PPO loop calls it at every log point
 (and `metalsim/learn/monitor.py` now checks MuJoCo Warp's real flag names: it looked for "NCON" / "NACON", which
 do not exist, so capacity overflows were invisible to the anomaly monitor). Tests: `tests/test_capacity.py` (the
@@ -134,7 +143,7 @@ bound holds over 60 random-action steps at 64 envs; a deliberately small capacit
 
 | setting (4096, recommended preset, `--quick`, interleaved D A D A) | physics only | full env step |
 |---|---|---|
-| task capacities njmax 512 (256 padded) / nconmax 128 | 81,534 / 81,520 | 54,385 / 54,340 (75.3 ms) |
+| task capacities njmax 256 / nconmax 32 (the flat task's values: its flat branch takes the heightfield capacities) | 81,534 / 81,520 | 54,385 / 54,340 (75.3 ms) |
 | bound njmax 144 / nconmax 24 | 83,400 / 83,339 | **55,741 / 55,646 (73.5 ms), +2.5 %** |
 | Isaac Lab 3.0 preset (`isaaclab3_every_substep_cap20`), task capacities | 71,803 | 56,301 (72.8 ms) |
 | Isaac Lab 3.0 preset, bound | 74,480 | **58,287 (70.3 ms), +3.6 %** |
@@ -287,8 +296,64 @@ p99 1.4e-3, max 7.1e-3; mode 3 (rank-1 updates) median 2.2e-6, p99 1.7e-3, first
 relative tolerance (1e-6 of the largest local diagonal) that drops the direction: median 2.1e-6, p99 2.0e-3, max 2.1e-2
 (worlds with 1-3 vectors p99 6.2e-3; the per-entry path's own tail is 1.4e-3 / 7.1e-3: these cone Hessians are
 ill-conditioned in float32 on either path). Trajectories mode 3 vs mode 2: |dq| max 1.2e-7 / 3.6e-6 / 3.4e-6 rad
-after 1 / 2 / 3 control steps (mode 2 vs itself on the CPU: 0; the Metal run-to-run floor at step 2 is 8e-6). Metal check and throughput on the G1
+after 1 / 2 / 3 control steps (mode 2 vs itself on the CPU: 0; the Metal run-to-run floor at step 2 is 8e-6).
+Final CPU numbers against a fresh mode-2 reference (`runs/tp26/coneupd_mode3.log`, `coneupd_k12.log`, the first
+reference file was stale): KMAX 6: median 2.3e-6, p99 4.5e-3, max 2.4e-2, trajectories 1.2e-7 / 3.6e-6 / 3.5e-6 rad;
+KMAX 12: p99 8.0e-3, max 9.4e-2 (7-12 vectors p99 3.2e-2); KMAX 0 and a reuse-disabled variant are bitwise
+mode 2 over 160 iteration records (the kernels are exact re-implementations of the per-entry path). Kernel form
+after the first Metal run: a single matrix tile per world (the two-tile form asked 39 KB of threadgroup memory,
+above Metal's 32 KB) prepared by `_cone_update_prepare` (h + cone for worlds above KMAX, h for a refactorization,
+the stored factor for a reuse); the stable-state skip mirrors mode 2's. Metal throughput / check: pending
+(`runs/tp26/cone2.wrapper.log`). Metal check and throughput on the G1
 task (ellip10), Go2, humanoid, SO-101: `runs/tp26/cone.wrapper.log`.
+
+## 9. Before / after, everything landed today (measured, `runs/tp26/final.wrapper.log` and the interleaved A/Bs above)
+
+All at 4096 envs, 2.5 ms x 8, `contact_cfg="recommended"`, `g1_tp_variants.py` (full: physics only, full env step,
+rollout + inference, PPO update, full PPO loop), timing queue, idle GPU logged. "Before" is the day's start
+(`runs/mjw_tp/cc.wrapper.log` R1 / R2, 2026-09-25 evening, the same code as this morning: MetalSim 98a41c1,
+forks fe6fe71 / 4127c48, task capacities njmax 256 / nconmax 32, policy mapping A). "After" is the worktrees
+`metalsim-tp` (register solve, fused per-iteration launches; L'DL lanes / chains, compact layout, rolled form
+and the cone update off) with the capacity bound and the policy mapping D (F1 / F2, 06:40).
+
+| | physics only | full env step | rollout + inference | PPO update | full PPO loop |
+|---|---|---|---|---|---|
+| before (R1 / R2) | 80,982 / 81,008 (50.6 ms) | 54,244 / 54,094 (75.5-75.7 ms) | 54,163 / 53,830 | 149 / 159 ms | 50,055 / 49,509 |
+| after (F1 / F2) | **90,395 / 90,404 (45.3 ms)** | **60,775 / 60,946 (67.2-67.4 ms)** | **61,397 / 61,687 (66.4-66.7 ms)** | 143 / 144 ms | **56,351 / 56,590** |
+| gain | +11.6 % | **+12.4 %** | +14 % | – | **+13.3 %** |
+
+Attribution from the interleaved A/Bs (env step): capacity bound +2.5 % (75.3 -> 73.5 ms), register solve +5.2 %
+(73.5 -> 69.9), fused launches +3.9 % (69.9 -> 67.4); rollout: policy mapping D +2.0 % (74.2 -> 72.8 ms per step
+before the fork changes). The same job's B runs, the installed forks (now 9b4e96a) with njmax 512 / nconmax 128
+forced, measure 84.0-84.6 ms per step (48,441-48,767; loop 48,060-48,147): the capacity-sized launches cost 12 %
+between 256 / 32 and 512 / 128, which is why the bound (144 / 24) and the overflow guard matter beyond the 2.5 %.
+
+Physics identity: section 5b (installed vs worktree within the run-to-run floor; the MuJoCo C protocol identical
+to 0.24 s), the fused launches alone within their own floors, the capacity bound exact by construction, the policy
+mapping bitwise. Learning untouched (no reward, observation, reset or update change).
+
+## 10. Residual list (estimated; what would still pay and what it would cost)
+
+1. The register Cholesky at n = 43: 0.97 ms per 4096 factorizations against 0.17 at n = 32 (5.7x for 2.4x the
+   flops); 2 full launches + the partial later iterations are ~3 ms of the 5.9 ms solve per substep, ~35 % of the
+   step. Not register spill (compact layout) nor instruction fetch (rolled form). Untested: a 64-lane form (two
+   SIMD groups per world, one threadgroup exchange per column). Estimated 5-10 % of the step if it halved.
+2. The sparse L'DL of M (2 factorizations + 2 solves per substep, 1.3 ms, 16 % of the step): three parallel forms
+   lost to the serial one-world-per-thread kernel (sections 2b, 9); the per-world chain is memory-latency bound.
+   Untested: a dense-tile factorization of the 6 x 6 root block plus per-branch serial chains in one thread each
+   with the root updates deferred (no barriers); estimated <= 5 %.
+3. Iterations with few active worlds (5-10 under the preset) cost 0.15-0.23 ms each (5 launches + one world's
+   line search and factor + solve latency): ~1 ms of the 5.9 ms solve; only a shorter per-world latency (1) or
+   fewer launches (fusing the line search's mul_m, ~0.1 ms per substep, 1 %) reach it.
+4. Line search latency (20 bracketing iterations x 3 evaluations over <= 35 rows per world): not measured in
+   isolation; estimated 1-2 % of the step.
+5. The PPO update (8 % of the loop): the adaptive-KL `.item()` (18 ms) and `clip_grad_norm_` (15 ms) change
+   results (options, section 7); the forward/backward (101 ms) is torch MPS compute.
+6. Rough terrain: act() 12.4 -> ~6 ms per step with the policy mapping (7 % of the rough step, estimated from
+   the isolated kernel numbers, not re-measured on the rough loop); the rough capacities (256 / 128) are not
+   model-bounded (section 4c), so no bound can be applied there.
+7. Elliptic cones: the rank-1 cone update (section 8) pending its Metal measurement; the coordinator's estimate
+   is <= 6 % of the elliptic step.
 
 ## 6. Options that change results (reported, not landed)
 

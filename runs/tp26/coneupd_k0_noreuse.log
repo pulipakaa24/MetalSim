@@ -1,0 +1,50 @@
+mujoco_warp /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py; MJW_ELLIPTIC_CONE_UPDATE=1 KMAX=0 mode 2
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth 73ae8f1 load on device 'cpu' took 0.96 ms  (cached)
+Module _nxn_broadphase__locals__kernel_e535da70 fd2cc01 load on device 'cpu' took 0.28 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_0343f146 d447ee3 load on device 'cpu' took 0.33 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_a6c78f28 23d1c71 load on device 'cpu' took 0.39 ms  (cached)
+Module mujoco_warp._src.constraint acf88d4 load on device 'cpu' took 0.27 ms  (cached)
+Module _friction_dof__locals__kernel_62584079 52d3d6c load on device 'cpu' took 0.30 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_9fd6168a 64c76be load on device 'cpu' took 0.25 ms  (cached)
+Module _efc_contact_init__locals__kernel_ca9af5c0 948ca12 load on device 'cpu' took 0.24 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_3667e022 3b41764 load on device 'cpu' took 0.25 ms  (cached)
+Module _efc_contact_update__locals__kernel_e287f753 8a50a7f load on device 'cpu' took 0.27 ms  (cached)
+Module mujoco_warp._src.forward 573deb9 load on device 'cpu' took 0.37 ms  (cached)
+Module mujoco_warp._src.passive f903496 load on device 'cpu' took 0.40 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_43aa012b b993fc9 load on device 'cpu' took 0.27 ms  (cached)
+Module _qfrc_smooth__locals__kernel_af082a54 44b562f load on device 'cpu' took 0.26 ms  (cached)
+Module mujoco_warp._src.support c359b57 load on device 'cpu' took 0.25 ms  (cached)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_e6acff4f 7352558 load on device 'cpu' took 0.22 ms  (cached)
+Module _solve_init_dof__locals__kernel_1f5be41d f9b49e3 load on device 'cpu' took 0.24 ms  (cached)
+Module mujoco_warp._src.solver 084a601 load on device 'cpu' took 0.41 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_a987a78f 9883b52 load on device 'cpu' took 0.26 ms  (cached)
+Module mul_m_kernel__locals___mul_m_e2edc288 aeda5d1 load on device 'cpu' took 0.24 ms  (cached)
+Module _update_constraint_efc__locals__kernel_a848838f 9193d37 load on device 'cpu' took 0.23 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_476b757d bfb9a4a load on device 'cpu' took 0.24 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_cab8e20c 9411c4b load on device 'cpu' took 0.22 ms  (cached)
+Module _update_gradient_grad__locals__kernel_73484c94 39b3752 load on device 'cpu' took 0.23 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_ab3018ec 6692fd2 load on device 'cpu' took 0.24 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_0e78c63a f357d4f load on device 'cpu' took 0.23 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_d221a5c2 02c5cfe load on device 'cpu' took 0.26 ms  (cached)
+Module _update_constraint_efc__locals__kernel_cdad9c3d 0a624e3 load on device 'cpu' took 0.23 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_49be249d ead00eb load on device 'cpu' took 0.22 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_c774b63c e268bb8 load on device 'cpu' took 0.22 ms  (cached)
+Module _update_gradient_grad__locals__kernel_b2adbed6 941b49d load on device 'cpu' took 0.22 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_9585ff44 9324a75 load on device 'cpu' took 0.21 ms  (cached)
+Module _solve_done__locals__kernel_5928f227 171f69f load on device 'cpu' took 0.22 ms  (cached)
+Module mujoco_warp._src.sensor f0e2941 load on device 'cpu' took 0.36 ms  (cached)
+Module mujoco_warp._src.derivative 49434e8 load on device 'cpu' took 0.26 ms  (cached)
+Module _next_time_builder__locals___next_time_789a041b da22e05 load on device 'cpu' took 0.23 ms  (cached)
+1118 iteration solves over 16 worlds x 24 substeps (0 s): search-direction error vs float64 of h + cone term: median 5.39e-06 p99 1.41e-03 max 7.14e-03
+   cone vectors 0-0:  1118 solves, median 5.39e-06 p99 1.41e-03 max 7.14e-03
+   control step 1: |dq| vs reference max 0.00e+00 p99 0.0e+00 median 0.0e+00
+   control step 2: |dq| vs reference max 5.28e-04 p99 1.4e-06 median 0.0e+00
+   control step 3: |dq| vs reference max 1.03e-02 p99 3.0e-03 median 0.0e+00
+   reference search-direction error: median 5.43e-06 p99 1.41e-03 max 7.14e-03
