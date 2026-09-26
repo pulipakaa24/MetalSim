@@ -1,0 +1,52 @@
+[gpu_run] tp26_unrolled2 start: device utilisation 0% (08:40:14)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+=== start Sat Sep 26 08:40:17 PDT 2026 metalsim 72e34dd wt warp 2834cf31 mjw 05ad3f0 power: Now drawing from 'AC Power'
+--- check 08:40:17
+  factor: bitwise | solve: bitwise | solve residual vs dense M 3.3e-06
+  unrolled: factor bitwise | solve on the serial factor: bitwise
+  chains (4 levels, 12 chains): factor rel diff vs serial 6.0e-07 (D 2.5e-08) | solve on the serial factor: bitwise | chain factor + chain solve residual vs dense M 4.0e-06
+Go2 menagerie (m_dense_max 0: all sparse): nM 117, levels 8, updates 99, lane pairs 81, sparse dofs 18 of 18
+  factor: bitwise | solve: bitwise | solve residual vs dense M 8.2e-07
+  unrolled: factor bitwise | solve on the serial factor: bitwise
+  chains (2 levels, 5 chains): factor rel diff vs serial 1.3e-07 (D 9.3e-08) | solve on the serial factor: bitwise | chain factor + chain solve residual vs dense M 1.2e-06
+humanoid (dm) (m_dense_max 0: all sparse): nM 243, levels 14, updates 216, lane pairs 195, sparse dofs 27 of 27
+  factor: bitwise | solve: bitwise | solve residual vs dense M 5.3e-06
+  unrolled: factor bitwise | solve on the serial factor: bitwise
+  chains (3 levels, 6 chains): factor rel diff vs serial 6.2e-07 (D 2.8e-07) | solve on the serial factor: bitwise | chain factor + chain solve residual vs dense M 7.0e-06
+ALL OK
+--- bench 08:40:23
+factor serial : 0.453 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+factor lanes  : 0.570 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+solve serial  : 0.206 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+solve lanes   : 0.266 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+factor chains : 0.645 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+solve chains  : 0.368 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+factor unrolled: 0.314 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+solve unrolled: 0.793 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+--- U1 unrolled 08:40:25
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[U1_unrolled] N=4096 njmax 144 naconmax 98304 is_sparse False
+[U1_unrolled] physics only 43.6 ms/step -> 93,922 env-steps/s
+[U1_unrolled] full env step 66.7 ms -> 61,432 env-steps/s
+[U1_unrolled] after random-action steps: nefc max 40 mean 14.3; nacon 11202 (2.73/world); overflow {'ITERATIONS': 29, 'LS_ITERATIONS': 3864}
+--- S1 serial 08:40:39
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[S1_serial] N=4096 njmax 144 naconmax 98304 is_sparse False
+[S1_serial] physics only 45.2 ms/step -> 90,708 env-steps/s
+[S1_serial] full env step 66.9 ms -> 61,248 env-steps/s
+[S1_serial] after random-action steps: nefc max 46 mean 14.3; nacon 11228 (2.74/world); overflow {'ITERATIONS': 35, 'LS_ITERATIONS': 3879}
+--- U2 unrolled 08:40:53
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[U2_unrolled] N=4096 njmax 144 naconmax 98304 is_sparse False
+[U2_unrolled] physics only 43.6 ms/step -> 93,985 env-steps/s
+[U2_unrolled] full env step 65.4 ms -> 62,657 env-steps/s
+[U2_unrolled] after random-action steps: nefc max 43 mean 14.4; nacon 11264 (2.75/world); overflow {'ITERATIONS': 28, 'LS_ITERATIONS': 3869}
+--- S2 serial 08:41:06
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[S2_serial] N=4096 njmax 144 naconmax 98304 is_sparse False
+[S2_serial] physics only 45.2 ms/step -> 90,618 env-steps/s
+[S2_serial] full env step 67.2 ms -> 60,996 env-steps/s
+[S2_serial] after random-action steps: nefc max 43 mean 14.5; nacon 11280 (2.75/world); overflow {'ITERATIONS': 30, 'LS_ITERATIONS': 3864}
+=== end Sat Sep 26 08:41:19 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] tp26_unrolled2 end: device utilisation 100% (08:41:19), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %

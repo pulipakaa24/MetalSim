@@ -427,9 +427,17 @@ lane j of a 32-lane world holds position j of every row of the factor (43 regist
 emitted as straight-line native code (a `wp.func_native` snippet generated per model layout: 4,087 lines for the
 factor, 1,785 for the solve), each update two `simd_shuffle`s (L[k,i], L[k,k]), one divide, one predicated FMA,
 no barriers, no threadgroup memory, no dynamic indexing; the solve keeps x replicated in every lane. The same
-operations in the same order as the serial kernels: bitwise on the CPU scalar branch (Metal:
-`runs/tp26/unrolled.wrapper.log`). Estimated 0.45 -> ~0.15 ms per factorization and 0.21 -> ~0.05 per solve,
-about 7 ms of the 67 ms step.
+operations in the same order as the serial kernels. Estimated 0.45 -> ~0.15 ms per factorization and 0.21 ->
+~0.05 per solve. **Measured** (`runs/tp26/unrolled.wrapper.log`, `unrolled2.wrapper.log`): the first Metal run
+differed by 5.7e-6 (the Metal compiler contracted the snippet's `a - b*c` into an FMA, which the serial kernel's
+separate `mul` / `sub` calls are not); with `#pragma clang fp contract(off)` the factor and D are **bitwise** the
+serial kernel's on the G1 task, Go2 and the humanoid. Factor 0.453 -> 0.314 ms per 4096 (1.44x, less than the
+estimate: the 782 dependent shuffles are ~30 cycles each, not 10). The unrolled solve, x replicated in every lane,
+is a 782-step dependent shuffle chain with nothing else to overlap: 0.79 vs 0.21 ms, archived
+(`MJW_METAL_LDL_UNROLLED_SOLVE=1`). G1 step A/B (interleaved U S U S, worktrees): physics only 90,618-90,708 ->
+**93,922-93,985 env-steps/s (+3.6 %)**, full env step 60,996-61,248 -> 61,432-62,657 (+1.5 % mean; one pair inside
+the +-1 % step noise). Landed as the Metal default for models with <= 32 entries per row and <= 64 dofs (fork
+05ad3f0; the schedule is built in `put_model`, so no device read happens inside a graph capture).
 
 ### 11.4 Rough loop with everything landed (measured, `runs/tp26/rough2.wrapper.log`, 08:33)
 
