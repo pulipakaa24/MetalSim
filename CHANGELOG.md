@@ -14,6 +14,7 @@ commit order within each area (`git log` for the full messages). Dates are the c
 
 ## Physics (MuJoCo Warp on Metal) and interop
 
+- 09-25 Shared fork checkouts fast-forwarded to the documented heads (mujoco_warp 1791414 -> 07a51a6, warp 9050cb5 -> 4127c48) after the throughput A/B showed them identical for the G1 (flex changes gated on nflex > 0); the local branches had never been advanced
 - 09-22 `b773ae7` orchard: project skeleton and SO-101 lift scene
 - 09-22 `7d64c48` interop: zero-copy MPS tensors over Warp Metal arrays and cross-queue event ordering
 - 09-22 `688a13c` physics: BatchSim on MuJoCo Warp with graph replay and MPS-aliased state; render: native Metal tier-0 renderer
