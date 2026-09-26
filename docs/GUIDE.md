@@ -294,6 +294,10 @@ Classes, granted in this order when the GPU frees up (first come, first served w
 | `train` | training runs |
 | `low` | background work, granted only when nothing else waits |
 
+**Updating the shared fork checkouts.** `scripts/fork_sync.sh` fast-forwards `upstream/mujoco_warp` and
+`upstream/warp-innate` to their `fork/metalsim` heads through the queue (timing class), so the working tree never
+changes under a job that is importing it. Agents work in worktrees and never touch the shared checkouts.
+
 **Live dashboard.** `scripts/gpu_dashboard.sh` starts a local page at http://localhost:8765 (idempotent;
 `--restart` to restart; `python3 scripts/gpu_dashboard.py --watch` is the terminal form, `/json` the
 machine form). It shows the running job with a progress bar, ETA, its log and last lines, the waiting
