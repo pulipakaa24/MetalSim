@@ -441,3 +441,14 @@ physics 63,922-63,969, step 45,217-45,268 at 90.5 ms): physics +8.7 %, step +8.4
 under the preset before (the README's 41.9 K rough loop is the default-contact setting). Rough gains less than flat
 because its physics is 71 % of the step (collision against 96 box slots per world, the 187-ray height scan) and
 its capacities are not model-boundable. The flat loop in the same job: 56,079 (step 60,540), as in section 9.
+
+### 11.5 Camera-RL path (measured, `runs/tp26/camera.wrapper.log`, 08:37-08:40)
+
+Isaac-Cartpole-RGB (1024 envs, tier 0, Isaac's skrl configuration), 458,752 env-steps of training per run
+(34-39 s), landed forks vs the day's starting forks (07a51a6 / f194006a through `PYTHONPATH`), interleaved: after
+13,369 / 12,931 env-steps/s including training, before 12,655 / 11,802. The 4-7 % difference is inside the spread
+of two runs of the same configuration at this length (13,369 vs 12,931; 12,655 vs 11,802) and the physics is
+0.6-0.8 % of this step (the update is 66-70 %, the policy's torch CNN inference 29-34 %; the Warp MLP mapping does not
+apply here), so nothing is claimed for the camera path. No render-side code changed today, so the renderer's
+SHA identity for a given state is unaffected by construction; end-to-end frames differ only through the
+float-noise state differences documented in 5b.

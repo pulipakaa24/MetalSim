@@ -1,0 +1,9 @@
+Cartpole-RGB camera PPO: 1024 envs, tier 0 ( spp -, bounces 2), image-only 100x100, Isaac skrl config
+it    1 steps     65536 sps  11,335 | ret    7.05 len  25.4 succ  0.00 (n=100) | pg -0.007 vf 0.850 kl 0.0098 lr 5.9e-04 | env  0.8%  policy 30.3%  update 68.9%
+it    2 steps    131072 sps  12,113 | ret   14.60 len  36.0 succ  0.00 (n=100) | pg -0.012 vf 0.766 kl 0.0102 lr 1.7e-04 | env  0.7%  policy 32.3%  update 67.0%
+it    3 steps    196608 sps  12,398 | ret   19.73 len  41.5 succ  0.00 (n=100) | pg -0.009 vf 0.783 kl 0.0082 lr 3.0e-03 | env  0.7%  policy 32.9%  update 66.3%
+it    4 steps    262144 sps  12,541 | ret   25.93 len  48.6 succ  0.00 (n=100) | pg -0.007 vf 0.767 kl 0.0094 lr 2.0e-03 | env  0.7%  policy 33.3%  update 66.0%
+it    5 steps    327680 sps  12,613 | ret   24.13 len  47.3 succ  0.00 (n=100) | pg -0.007 vf 0.733 kl 0.0093 lr 2.0e-03 | env  0.7%  policy 33.5%  update 65.8%
+it    6 steps    393216 sps  12,659 | ret   31.69 len  55.5 succ  0.00 (n=100) | pg -0.003 vf 0.705 kl 0.0093 lr 3.0e-03 | env  0.7%  policy 33.5%  update 65.7%
+it    7 steps    458752 sps  12,664 | ret   34.39 len  59.0 succ  0.00 (n=100) | pg -0.001 vf 0.667 kl 0.0091 lr 3.0e-03 | env  0.7%  policy 33.6%  update 65.7%
+done: 458752 steps in 36 s -> 12,655 env-steps/s incl. training; env  0.7%  policy 33.6%  update 65.7%
