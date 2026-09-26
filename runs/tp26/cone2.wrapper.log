@@ -1,0 +1,149 @@
+[gpu_run] tp26_cone2 start: device utilisation 0% (07:36:34)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   1.7 %
+=== start Sat Sep 26 07:36:37 PDT 2026 metalsim a86ff6c wt warp e29950ee mjw a1daf88 power: Now drawing from 'AC Power'
+--- check mode 2 (reference) 07:36:37
+   step  200: qpos max 9.38e-04 median 1.8e-07 | qvel max 1.06e-02 | worlds with |dq| > 1e-3: 0.0 %
+capacity replay: nefc max 54 (njmax 512), nacon max 2394 (naconmax 24576); overflow {'ITERATIONS': 13, 'LS_ITERATIONS': 512}
+capacity replay 2: nefc max 54 (njmax 512), nacon max 2394 (naconmax 24576); overflow {'ITERATIONS': 13, 'LS_ITERATIONS': 512}
+--- MuJoCo C oracle (4 worlds: PD hold + fixed random targets; |dq| max / median)
+   t=0.004s 1.89e-07/4.3e-09  t=0.008s 3.37e-07/1.8e-08  t=0.016s 4.13e-07/4.4e-08  t=0.048s 4.98e-05/2.4e-06  t=0.100s 8.29e-05/1.9e-05  t=0.200s 7.66e-05/1.8e-05  t=0.400s 9.21e-05/2.0e-05
+=== done
+--- check mode 3 vs mode 2 07:36:41
+   t=0.004s 1.89e-07/4.3e-09  t=0.008s 3.37e-07/1.8e-08  t=0.016s 4.13e-07/3.0e-08  t=0.048s 4.99e-05/2.4e-06  t=0.100s 8.29e-05/1.9e-05  t=0.200s 7.66e-05/1.8e-05  t=0.400s 9.25e-05/2.0e-05
+--- this configuration vs reference [go2 (default) JAC=None /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp] (graph replay)
+   step    1: qpos max 3.79e-07 median 0.0e+00 | qvel max 9.48e-05 | worlds with |dq| > 1e-3: 0.0 %
+   step    2: qpos max 6.30e-07 median 0.0e+00 | qvel max 6.27e-05 | worlds with |dq| > 1e-3: 0.0 %
+   step    4: qpos max 9.35e-07 median 0.0e+00 | qvel max 3.43e-05 | worlds with |dq| > 1e-3: 0.0 %
+   step   10: qpos max 1.14e-06 median 3.2e-09 | qvel max 2.98e-05 | worlds with |dq| > 1e-3: 0.0 %
+   step   25: qpos max 1.43e-06 median 4.7e-08 | qvel max 9.85e-05 | worlds with |dq| > 1e-3: 0.0 %
+   step   50: qpos max 1.91e-06 median 8.8e-08 | qvel max 7.40e-05 | worlds with |dq| > 1e-3: 0.0 %
+   step  100: qpos max 2.26e-06 median 1.6e-07 | qvel max 7.84e-05 | worlds with |dq| > 1e-3: 0.0 %
+   step  200: qpos max 9.38e-04 median 1.8e-07 | qvel max 1.06e-02 | worlds with |dq| > 1e-3: 0.0 %
+   reference MuJoCo C oracle: t=0.004s 1.89e-07/4.3e-09  t=0.008s 3.37e-07/1.8e-08  t=0.016s 4.13e-07/4.4e-08  t=0.048s 4.98e-05/2.4e-06  t=0.100s 8.29e-05/1.9e-05  t=0.200s 7.66e-05/1.8e-05  t=0.400s 9.21e-05/2.0e-05
+=== done
+--- bench MJW_ELLIPTIC_CONE_UPDATE=0 07:36:47
+LABEL cone_upd_0 mjw=/Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py head=a1daf88 N=4096 env=MJW_ELLIPTIC_CONE_UPDATE=0 
+== g1task elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "g1task", "N": 4096, "mode": "matched", "nv": 43, "nu": 37, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 2605954, "substeps": 8, "preset": nu
+== go2 elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "go2", "N": 4096, "mode": "matched", "nv": 18, "nu": 12, "iters": 10, "ls": 20, "build_s": 1.6, "steps_per_s": 645681, "substeps": 1, "preset": null, 
+== humanoid elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "humanoid", "N": 4096, "mode": "matched", "nv": 27, "nu": 21, "iters": 10, "ls": 20, "build_s": 5.2, "steps_per_s": 705197, "substeps": 1, "preset": n
+== so101 elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "so101", "N": 4096, "mode": "matched", "nv": 12, "nu": 6, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 868596, "substeps": 1, "preset": null,
+--- bench MJW_ELLIPTIC_CONE_UPDATE=1 07:37:36
+LABEL cone_upd_1 mjw=/Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py head=a1daf88 N=4096 env=MJW_ELLIPTIC_CONE_UPDATE=1 
+== g1task elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "g1task", "N": 4096, "mode": "matched", "nv": 43, "nu": 37, "iters": 10, "ls": 20, "build_s": 7.7, "steps_per_s": 2179718, "substeps": 8, "preset": nu
+== go2 elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "go2", "N": 4096, "mode": "matched", "nv": 18, "nu": 12, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 614588, "substeps": 1, "preset": null, 
+== humanoid elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "humanoid", "N": 4096, "mode": "matched", "nv": 27, "nu": 21, "iters": 10, "ls": 20, "build_s": 3.1, "steps_per_s": 532545, "substeps": 1, "preset": n
+== so101 elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "so101", "N": 4096, "mode": "matched", "nv": 12, "nu": 6, "iters": 10, "ls": 20, "build_s": 2.9, "steps_per_s": 774372, "substeps": 1, "preset": null,
+--- bench MJW_ELLIPTIC_CONE_UPDATE=0 07:38:36
+LABEL cone_upd_0 mjw=/Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py head=a1daf88 N=4096 env=MJW_ELLIPTIC_CONE_UPDATE=0 
+== g1task elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "g1task", "N": 4096, "mode": "matched", "nv": 43, "nu": 37, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 2607089, "substeps": 8, "preset": nu
+== go2 elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "go2", "N": 4096, "mode": "matched", "nv": 18, "nu": 12, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 644409, "substeps": 1, "preset": null, 
+== humanoid elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "humanoid", "N": 4096, "mode": "matched", "nv": 27, "nu": 21, "iters": 10, "ls": 20, "build_s": 1.5, "steps_per_s": 704316, "substeps": 1, "preset": n
+== so101 elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "so101", "N": 4096, "mode": "matched", "nv": 12, "nu": 6, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 866494, "substeps": 1, "preset": null,
+--- bench MJW_ELLIPTIC_CONE_UPDATE=1 07:39:22
+LABEL cone_upd_1 mjw=/Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py head=a1daf88 N=4096 env=MJW_ELLIPTIC_CONE_UPDATE=1 
+== g1task elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "g1task", "N": 4096, "mode": "matched", "nv": 43, "nu": 37, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 2180412, "substeps": 8, "preset": nu
+== go2 elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "go2", "N": 4096, "mode": "matched", "nv": 18, "nu": 12, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 614778, "substeps": 1, "preset": null, 
+== humanoid elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "humanoid", "N": 4096, "mode": "matched", "nv": 27, "nu": 21, "iters": 10, "ls": 20, "build_s": 1.5, "steps_per_s": 533938, "substeps": 1, "preset": n
+== so101 elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "so101", "N": 4096, "mode": "matched", "nv": 12, "nu": 6, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 775107, "substeps": 1, "preset": null,
+--- g1 task ellip10 check, mode 2 (reference) 07:40:13
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+=== variant {'contact_cfg': 'tau10_impact_hardlimits_ellip10', 'label': 'ellip10 mode2'}; N=512, 50 control steps, deterministic actions
+njmax 144 naconmax 12288 sparse False
+--- floor: two graph-replay instances of this configuration
+   step    1: qpos max 6.26e-07 median 0.0e+00 | obs max 2.34e-04 | rew max 2.98e-07
+   step    2: qpos max 5.01e-06 median 0.0e+00 | obs max 5.31e-04 | rew max 2.24e-06
+   step    5: qpos max 5.41e-04 median 1.8e-08 | obs max 9.93e-03 | rew max 2.88e-06
+   step   10: qpos max 6.15e-03 median 6.0e-08 | obs max 4.99e-01 | rew max 1.80e-03
+   step   20: qpos max 2.98e-02 median 1.2e-07 | obs max 3.21e+00 | rew max 2.34e-03
+   step   30: qpos max 6.39e-02 median 1.9e-07 | obs max 6.05e+00 | rew max 7.36e-03
+   step   40: qpos max 6.76e-01 median 1.2e-07 | obs max 7.45e+00 | rew max 4.02e+00
+   step   50: qpos max 8.47e-01 median 6.0e-08 | obs max 1.09e+01 | rew max 3.96e+00
+--- graph replay vs eager launches (same configuration)
+   step    1: qpos max 1.34e-06 median 0.0e+00 | obs max 3.93e-04 | rew max 1.11e-06
+   step    2: qpos max 1.39e-05 median 0.0e+00 | obs max 5.92e-04 | rew max 1.95e-06
+   step    5: qpos max 1.67e-03 median 2.1e-08 | obs max 7.61e-02 | rew max 1.57e-05
+   step   10: qpos max 8.22e-03 median 6.0e-08 | obs max 8.54e-01 | rew max 2.02e-03
+   step   20: qpos max 5.45e-02 median 1.2e-07 | obs max 3.21e+00 | rew max 2.04e-02
+   step   30: qpos max 7.95e-02 median 1.9e-07 | obs max 1.02e+01 | rew max 7.79e-03
+   step   40: qpos max 6.76e-01 median 1.2e-07 | obs max 7.45e+00 | rew max 4.02e+00
+   step   50: qpos max 9.02e-01 median 6.7e-08 | obs max 1.11e+01 | rew max 3.97e+00
+capacity replay: nefc max 35 (njmax 144), nacon max 1360 (naconmax 12288); overflow {'ITERATIONS': 34, 'LS_ITERATIONS': 471}
+capacity replay 2: nefc max 35 (njmax 144), nacon max 1360 (naconmax 12288); overflow {'ITERATIONS': 34, 'LS_ITERATIONS': 472}
+capacity eager: nefc max 35 (njmax 144), nacon max 1360 (naconmax 12288); overflow {'ITERATIONS': 36, 'LS_ITERATIONS': 474}
+--- physics protocol vs MuJoCo C (4 worlds: PD hold + fixed random targets; |dq| max / median)
+   t=0.02s 4.08e-06/1.2e-08  t=0.04s 4.41e-06/2.4e-08  t=0.08s 1.56e-01/1.5e-02  t=0.24s 2.56e-01/4.9e-02  t=0.50s 2.37e-01/6.1e-02  t=1.00s 4.51e-01/1.2e-01
+=== done
+--- g1 task ellip10 check, mode 3 vs mode 2 07:40:24
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+=== variant {'contact_cfg': 'tau10_impact_hardlimits_ellip10', 'label': 'ellip10 mode3'}; N=512, 50 control steps, deterministic actions
+njmax 144 naconmax 12288 sparse False
+--- floor: two graph-replay instances of this configuration
+   step    1: qpos max 2.13e-06 median 0.0e+00 | obs max 5.13e-04 | rew max 6.98e-07
+   step    2: qpos max 8.13e-06 median 0.0e+00 | obs max 7.21e-04 | rew max 1.35e-06
+   step    5: qpos max 3.40e-03 median 2.2e-08 | obs max 8.39e-01 | rew max 1.27e-03
+   step   10: qpos max 1.59e-02 median 6.0e-08 | obs max 3.23e+00 | rew max 2.86e-03
+   step   20: qpos max 5.54e-02 median 1.2e-07 | obs max 3.97e+00 | rew max 2.04e-02
+   step   30: qpos max 9.75e-02 median 2.0e-07 | obs max 3.44e+00 | rew max 1.41e-02
+   step   40: qpos max 1.47e-01 median 1.2e-07 | obs max 1.08e+01 | rew max 8.41e-03
+   step   50: qpos max 8.22e-01 median 6.0e-08 | obs max 9.62e+00 | rew max 2.82e-02
+--- graph replay vs eager launches (same configuration)
+   step    1: qpos max 9.83e-07 median 0.0e+00 | obs max 4.07e-04 | rew max 7.79e-07
+   step    2: qpos max 1.39e-05 median 0.0e+00 | obs max 7.11e-04 | rew max 1.73e-06
+   step    5: qpos max 7.00e-03 median 2.2e-08 | obs max 1.94e-01 | rew max 6.36e-04
+   step   10: qpos max 1.59e-02 median 6.0e-08 | obs max 3.23e+00 | rew max 2.86e-03
+   step   20: qpos max 5.54e-02 median 1.2e-07 | obs max 3.21e+00 | rew max 7.15e-03
+   step   30: qpos max 9.75e-02 median 2.1e-07 | obs max 6.05e+00 | rew max 1.04e-02
+   step   40: qpos max 4.58e-01 median 1.2e-07 | obs max 1.08e+01 | rew max 2.44e-02
+   step   50: qpos max 9.02e-01 median 6.0e-08 | obs max 9.62e+00 | rew max 1.66e-02
+capacity replay: nefc max 35 (njmax 144), nacon max 1359 (naconmax 12288); overflow {'ITERATIONS': 36, 'LS_ITERATIONS': 473}
+capacity replay 2: nefc max 35 (njmax 144), nacon max 1360 (naconmax 12288); overflow {'ITERATIONS': 38, 'LS_ITERATIONS': 474}
+capacity eager: nefc max 35 (njmax 144), nacon max 1358 (naconmax 12288); overflow {'ITERATIONS': 36, 'LS_ITERATIONS': 474}
+--- physics protocol vs MuJoCo C (4 worlds: PD hold + fixed random targets; |dq| max / median)
+   t=0.02s 4.08e-06/1.2e-08  t=0.04s 4.41e-06/2.3e-08  t=0.08s 1.56e-01/1.5e-02  t=0.24s 2.56e-01/4.9e-02  t=0.50s 2.37e-01/6.1e-02  t=1.00s 4.55e-01/1.2e-01
+--- this configuration vs reference {"contact_cfg": "tau10_impact_hardlimits_ellip10", "label": "ellip10 mode2"} (graph replay)
+   step    1: qpos max 8.20e-07 median 0.0e+00 | obs max 3.29e-04 | rew max 3.02e-07
+   step    2: qpos max 3.52e-06 median 0.0e+00 | obs max 5.55e-04 | rew max 2.15e-06
+   step    5: qpos max 3.40e-03 median 2.0e-08 | obs max 8.39e-01 | rew max 1.27e-03
+   step   10: qpos max 1.59e-02 median 6.0e-08 | obs max 3.23e+00 | rew max 2.86e-03
+   step   20: qpos max 5.54e-02 median 1.2e-07 | obs max 3.13e+00 | rew max 2.04e-02
+   step   30: qpos max 9.75e-02 median 2.0e-07 | obs max 1.02e+01 | rew max 1.41e-02
+   step   40: qpos max 6.76e-01 median 1.2e-07 | obs max 7.45e+00 | rew max 4.02e+00
+   step   50: qpos max 9.02e-01 median 6.0e-08 | obs max 1.13e+01 | rew max 3.97e+00
+=== done
+--- profile g1task mode 3 07:40:35
+KERNELS g1task N=4096 substeps=8 preset=None: 15.85 ms/physics-step GPU (sum of per-dispatch times), 243 dispatches/step
+     4.245 ms  26.8%  x 10  _update_gradient_cholesky_cone_update__locals__kernel_1014132f_metal_forward
+     2.361 ms  14.9%  x 11  _cone_update_prepare__locals__kernel_df1b755b_metal_forward
+     1.440 ms   9.1%  x  1  _update_gradient_cholesky_cone_update__locals__kernel_5d987582_metal_forward
+     1.245 ms   7.9%  x 10  _update_constraint_efc__locals__kernel_91f5d381_metal_forward
+     0.969 ms   6.1%  x 10  _linesearch_iterative_kernel__locals__kernel_af0e89ee_metal_forward
+     0.947 ms   6.0%  x  2  _factor_i_sparse_serial__locals__kernel_8c1557af_metal_forward
+     0.564 ms   3.6%  x 11  _cone_vectors__locals__kernel_62b84a46_metal_forward
+     0.437 ms   2.8%  x  2  _solve_LD_sparse_serial__locals__kernel_ae6d7fc3_metal_forward
+     0.383 ms   2.4%  x 11  mul_m_kernel__locals___mul_m_9c0838e9_metal_forward
+     0.274 ms   1.7%  x 22  wp_memset
+     0.268 ms   1.7%  x  1  _update_gradient_JTDAJ_dense_tiled__locals__kernel_eb30364f_metal_forward
+     0.252 ms   1.6%  x  1  ccd_kernel_builder__locals__ccd_kernel_f71f2442_metal_forward
+     0.238 ms   1.5%  x 11  _update_gradient_JTCJ_cone_list_0a67bc87_metal_forward
+=== end Sat Sep 26 07:40:59 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] tp26_cone2 end: device utilisation 68% (07:41:00), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    479 loginwindow                        1.5 %
+lock held by cap_ellip_rough_rand2, not tp26_cone2; not released
