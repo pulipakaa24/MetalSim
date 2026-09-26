@@ -1,0 +1,115 @@
+[gpu_run] mjw_ab_profile start: device utilisation 0% (19:40:56)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+=== start Fri Sep 25 19:40:59 PDT 2026
+holder: {"name": "mjw_ab_profile", "kind": "timing", "minutes": 10.0, "pid": 84338, "start": 1790390456.932481, "queued": 1790390141.687486, "cmd": "bash runs/mjw_tp/job_ab2.sh", "cwd": "/Users/aditya/robosim"}
+  waiting [timing] mjw_generality est 14.0 min, queued 118 s ago
+  waiting [timing] ellip_bench_world est 12.0 min, queued 56 s ago
+  waiting [timing] ellip_bench_contact est 8.0 min, queued 55 s ago
+  waiting [timing] ellip_bench_contact2 est 5.0 min, queued 55 s ago
+  waiting [timing] ellip_bench_contact16 est 5.0 min, queued 54 s ago
+  waiting [render] pytest_full_cull est 8.0 min, queued 4585 s ago
+  waiting [render] ellip_check_base est 8.0 min, queued 57 s ago
+  waiting [render] ellip_check_world est 8.0 min, queued 57 s ago
+  waiting [render] ellip_check_contact est 8.0 min, queued 56 s ago
+  waiting [train] il3_rough_probe500 est 45.0 min, queued 29 s ago
+  waiting [train] g1_flat_flatcfg_com est 50.0 min, queued 1 s ago
+  waiting [low] kamino_tests_fork est 40.0 min, queued 16931 s ago
+  waiting [low] kamino_tests_152 est 30.0 min, queued 16102 s ago
+  waiting [low] cl_kamino est 45.0 min, queued 14771 s ago
+  waiting [low] cl_mjw est 40.0 min, queued 14747 s ago
+--- A1_1791414 19:40:59 power: Now drawing from 'AC Power'
+mjw: /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/__init__.py
+task: terrain flat, reward_cfg flat, obs_dim 123, height scan 0 rays
+=== segment graphs, N=4096, dt 2.5 ms, decimation 8, 20 replays each, synchronized; reset segments with 2% of envs flagged
+  apply_action                                                0.03 ms   dispatches     3 cmdbufs   1 syncs 1
+  physics (substeps + contact-sensor hooks)                  70.07 ms   dispatches  1632 cmdbufs   1 syncs 1
+  reward/done (foot vel, hist max, reward kernel)             0.07 ms   dispatches     3 cmdbufs   1 syncs 1
+  mjw.reset_data (masked)                                     0.13 ms   dispatches     6 cmdbufs   1 syncs 1
+  contact sensor reset                                        0.02 ms   dispatches     1 cmdbufs   1 syncs 1
+  g1_reset (masked)                                           0.02 ms   dispatches     1 cmdbufs   1 syncs 1
+  mjw.kinematics (all worlds)                                 0.13 ms   dispatches     5 cmdbufs   1 syncs 1
+  commands + obs (incl. height scan on rough)                 0.05 ms   dispatches     2 cmdbufs   1 syncs 1
+  sum of segments                                            70.53 ms
+  whole step graph                                           72.98 ms   dispatches  1653 cmdbufs   1 syncs 1  -> 56,127 env-steps/s
+  outside physics: 2.91 ms (4.0% of the step)
+=== one physics substep split (pieces captured separately; they overlap state, so not additive exactly)
+  fwd_position (kinematics, com, crb, factor, collision, make_constraint, transmission)          1.04 ms  dispatches   51
+    of which collision                                                                           0.26 ms  dispatches    6
+  sensor_pos + fwd_velocity + sensor_vel                                                         0.24 ms  dispatches   23
+  fwd_actuation + fwd_acceleration(factorize)                                                    0.78 ms  dispatches    8
+  solver.solve                                                                                   5.69 ms  dispatches  105
+  sensor_acc + integrate (implicitfast)                                                          0.85 ms  dispatches   13
+  mjw.step (whole substep)                                                                       9.41 ms  dispatches  202
+--- B1_07a51a6 19:41:09 power: Now drawing from 'AC Power'
+mjw: /Users/aditya/robosim/upstream/mujoco_warp-07a51a6/mujoco_warp/__init__.py
+task: terrain flat, reward_cfg flat, obs_dim 123, height scan 0 rays
+=== segment graphs, N=4096, dt 2.5 ms, decimation 8, 20 replays each, synchronized; reset segments with 2% of envs flagged
+  apply_action                                                0.03 ms   dispatches     3 cmdbufs   1 syncs 1
+  physics (substeps + contact-sensor hooks)                  69.76 ms   dispatches  1632 cmdbufs   1 syncs 1
+  reward/done (foot vel, hist max, reward kernel)             0.07 ms   dispatches     3 cmdbufs   1 syncs 1
+  mjw.reset_data (masked)                                     0.13 ms   dispatches     6 cmdbufs   1 syncs 1
+  contact sensor reset                                        0.02 ms   dispatches     1 cmdbufs   1 syncs 1
+  g1_reset (masked)                                           0.02 ms   dispatches     1 cmdbufs   1 syncs 1
+  mjw.kinematics (all worlds)                                 0.13 ms   dispatches     5 cmdbufs   1 syncs 1
+  commands + obs (incl. height scan on rough)                 0.05 ms   dispatches     2 cmdbufs   1 syncs 1
+  sum of segments                                            70.23 ms
+  whole step graph                                           73.02 ms   dispatches  1653 cmdbufs   1 syncs 1  -> 56,094 env-steps/s
+  outside physics: 3.26 ms (4.5% of the step)
+=== one physics substep split (pieces captured separately; they overlap state, so not additive exactly)
+  fwd_position (kinematics, com, crb, factor, collision, make_constraint, transmission)          1.04 ms  dispatches   51
+    of which collision                                                                           0.26 ms  dispatches    6
+  sensor_pos + fwd_velocity + sensor_vel                                                         0.23 ms  dispatches   23
+  fwd_actuation + fwd_acceleration(factorize)                                                    0.79 ms  dispatches    8
+  solver.solve                                                                                   5.74 ms  dispatches  105
+  sensor_acc + integrate (implicitfast)                                                          0.84 ms  dispatches   13
+  mjw.step (whole substep)                                                                       9.40 ms  dispatches  202
+--- A2_1791414 19:41:19 power: Now drawing from 'AC Power'
+mjw: /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/__init__.py
+task: terrain flat, reward_cfg flat, obs_dim 123, height scan 0 rays
+=== segment graphs, N=4096, dt 2.5 ms, decimation 8, 20 replays each, synchronized; reset segments with 2% of envs flagged
+  apply_action                                                0.03 ms   dispatches     3 cmdbufs   1 syncs 1
+  physics (substeps + contact-sensor hooks)                  69.78 ms   dispatches  1632 cmdbufs   1 syncs 1
+  reward/done (foot vel, hist max, reward kernel)             0.07 ms   dispatches     3 cmdbufs   1 syncs 1
+  mjw.reset_data (masked)                                     0.14 ms   dispatches     6 cmdbufs   1 syncs 1
+  contact sensor reset                                        0.02 ms   dispatches     1 cmdbufs   1 syncs 1
+  g1_reset (masked)                                           0.02 ms   dispatches     1 cmdbufs   1 syncs 1
+  mjw.kinematics (all worlds)                                 0.13 ms   dispatches     5 cmdbufs   1 syncs 1
+  commands + obs (incl. height scan on rough)                 0.05 ms   dispatches     2 cmdbufs   1 syncs 1
+  sum of segments                                            70.24 ms
+  whole step graph                                           72.89 ms   dispatches  1653 cmdbufs   1 syncs 1  -> 56,194 env-steps/s
+  outside physics: 3.11 ms (4.3% of the step)
+=== one physics substep split (pieces captured separately; they overlap state, so not additive exactly)
+  fwd_position (kinematics, com, crb, factor, collision, make_constraint, transmission)          1.05 ms  dispatches   51
+    of which collision                                                                           0.26 ms  dispatches    6
+  sensor_pos + fwd_velocity + sensor_vel                                                         0.24 ms  dispatches   23
+  fwd_actuation + fwd_acceleration(factorize)                                                    0.79 ms  dispatches    8
+  solver.solve                                                                                   5.72 ms  dispatches  105
+  sensor_acc + integrate (implicitfast)                                                          0.85 ms  dispatches   13
+  mjw.step (whole substep)                                                                       9.41 ms  dispatches  202
+--- B2_07a51a6 19:41:29 power: Now drawing from 'AC Power'
+mjw: /Users/aditya/robosim/upstream/mujoco_warp-07a51a6/mujoco_warp/__init__.py
+task: terrain flat, reward_cfg flat, obs_dim 123, height scan 0 rays
+=== segment graphs, N=4096, dt 2.5 ms, decimation 8, 20 replays each, synchronized; reset segments with 2% of envs flagged
+  apply_action                                                0.04 ms   dispatches     3 cmdbufs   1 syncs 1
+  physics (substeps + contact-sensor hooks)                  69.83 ms   dispatches  1632 cmdbufs   1 syncs 1
+  reward/done (foot vel, hist max, reward kernel)             0.08 ms   dispatches     3 cmdbufs   1 syncs 1
+  mjw.reset_data (masked)                                     0.14 ms   dispatches     6 cmdbufs   1 syncs 1
+  contact sensor reset                                        0.02 ms   dispatches     1 cmdbufs   1 syncs 1
+  g1_reset (masked)                                           0.02 ms   dispatches     1 cmdbufs   1 syncs 1
+  mjw.kinematics (all worlds)                                 0.15 ms   dispatches     5 cmdbufs   1 syncs 1
+  commands + obs (incl. height scan on rough)                 0.05 ms   dispatches     2 cmdbufs   1 syncs 1
+  sum of segments                                            70.32 ms
+  whole step graph                                           73.13 ms   dispatches  1653 cmdbufs   1 syncs 1  -> 56,007 env-steps/s
+  outside physics: 3.31 ms (4.5% of the step)
+=== one physics substep split (pieces captured separately; they overlap state, so not additive exactly)
+  fwd_position (kinematics, com, crb, factor, collision, make_constraint, transmission)          1.04 ms  dispatches   51
+    of which collision                                                                           0.26 ms  dispatches    6
+  sensor_pos + fwd_velocity + sensor_vel                                                         0.24 ms  dispatches   23
+  fwd_actuation + fwd_acceleration(factorize)                                                    0.79 ms  dispatches    8
+  solver.solve                                                                                   5.72 ms  dispatches  105
+  sensor_acc + integrate (implicitfast)                                                          0.85 ms  dispatches   13
+  mjw.step (whole substep)                                                                       9.32 ms  dispatches  202
+=== end Fri Sep 25 19:41:39 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] mjw_ab_profile end: device utilisation 99% (19:41:39), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+lock held by mjw_generality, not mjw_ab_profile; not released

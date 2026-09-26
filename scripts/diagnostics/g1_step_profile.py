@@ -26,7 +26,7 @@ KERNELS = "--kernels" in sys.argv
 REPS = int(sys.argv[sys.argv.index("--reps") + 1]) if "--reps" in sys.argv else 20
 RESET_FRAC = 0.02          # share of envs flagged for reset when the reset segments are timed (early training ~2.5 %)
 
-# optional configuration variant (keys as in g1_tp_variants.py), e.g. MJW_TP_VARIANT='{"m_dense_max":0}'
+# optional configuration variant (keys as in g1_tp_variants.py), e.g. MJW_TP_VARIANT='{"m_dense_max":0}' or '{"contact_cfg":null}'
 VAR = json.loads(os.environ.get("MJW_TP_VARIANT", "{}") or "{}")
 if VAR:
     import metalsim.learn.g1_velocity as _g1v
@@ -39,7 +39,8 @@ if VAR:
         return _BSO(**kw)
     _g1v.BatchSimOptions = _opts
     print(f"variant {VAR}", flush=True)
-task = G1VelocityTask(N, terrain=TERRAIN, physics_dt=DT, reward_cfg=RCFG, seed=0)
+task = G1VelocityTask(N, terrain=TERRAIN, physics_dt=DT, reward_cfg=RCFG, seed=0,
+                      **{k: VAR[k] for k in ("contact_cfg", "solver_cfg") if k in VAR})   # task presets, as in g1_tp_variants.py
 print(f"task: terrain {TERRAIN}, reward_cfg {task.reward_cfg}, obs_dim {task.obs_dim}, height scan {task.n_scan} rays", flush=True)
 task.reset_all()
 dev = task.device
