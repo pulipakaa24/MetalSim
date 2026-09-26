@@ -63,6 +63,9 @@ PUSH_EVERY = int(7.0 / CONTROL_DT)
 RESAMPLE_EVERY = int(5.0 / CONTROL_DT)
 
 
+EFFORT_LIMIT = "joint"      # "joint" (default since 2026-09-26) or "actuator" (archived)
+
+
 def build_train_model():
     """LimX's WF MJCF + our sensor pack (nominal), with the joint PD as affine actuators."""
     from metalsim.tron1.realism import SimParams
@@ -87,8 +90,17 @@ def build_train_model():
             m.actuator_biasprm[i, 1] = -KP
             m.actuator_biasprm[i, 2] = -KD_LEG
         lim = WHEEL_TAU if wheel else LEG_TAU
-        m.actuator_forcelimited[i] = 1
-        m.actuator_forcerange[i] = (-lim, lim)
+        # LimX clamps the total motor torque (MJCF <motor ctrlrange> +-80 / +-40, URDF effort, SDK), i.e. at the joint:
+        # jnt_actfrcrange keeps the PD's implicit damping while clamped (engine_derivative.c drops a clamped actuator's
+        # velocity derivative); EFFORT_LIMIT = "actuator" restores the archived actuator forcerange
+        j = m.actuator_trnid[i][0]
+        if EFFORT_LIMIT == "actuator":
+            m.actuator_forcelimited[i] = 1
+            m.actuator_forcerange[i] = (-lim, lim)
+        else:
+            m.actuator_forcelimited[i] = 0
+            m.jnt_actfrclimited[j] = 1
+            m.jnt_actfrcrange[j] = (-lim, lim)
         m.actuator_ctrllimited[i] = 0
     return m
 

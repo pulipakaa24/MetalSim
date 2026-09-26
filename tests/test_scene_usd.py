@@ -85,7 +85,12 @@ def test_usd_round_trip_to_mujoco(tmp_path):
     # actuator gains survive the per-degree <-> per-radian conversion
     a0 = mujoco.mj_name2id(m0, mujoco.mjtObj.mjOBJ_ACTUATOR, "shoulder_pan"); a1 = mujoco.mj_name2id(m1, mujoco.mjtObj.mjOBJ_ACTUATOR, "shoulder_pan")
     np.testing.assert_allclose(m1.actuator_biasprm[a1][:3], m0.actuator_biasprm[a0][:3], rtol=1e-4)
-    np.testing.assert_allclose(m1.actuator_forcerange[a1], m0.actuator_forcerange[a0], rtol=1e-5)
+    # the drive's maxForce comes back as the joint's actuator force range (UsdPhysics maxForce is a joint-level clamp;
+    # load_usd(effort_limit="joint"), the default since 2026-09-26)
+    if m0.actuator_forcelimited[a0]:
+        j1 = m1.actuator_trnid[a1][0]
+        assert not m1.actuator_forcelimited[a1] and m1.jnt_actfrclimited[j1]
+        np.testing.assert_allclose(m1.jnt_actfrcrange[j1], m0.actuator_forcerange[a0], rtol=1e-5)
 
 
 def test_urdf_import_to_usd(tmp_path):
