@@ -1,0 +1,36 @@
+[gpu_run] tp26_resid start: device utilisation 0% (09:26:38)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+=== start Sat Sep 26 09:26:41 PDT 2026 wt warp 9df9acee mjw f33005f power: Now drawing from 'AC Power'
+--- residency n=43 09:26:41
+n=43: tile path (block_dim 32, one world per threadgroup): 1.065 ms per 4096 factor+solve
+Traceback (most recent call last):
+    raise WarpCodegenError(
+warp._src.codegen.WarpCodegenError: Error while parsing function "k_native" at /Users/aditya/robosim/scripts/diagnostics/metal_cholesky_residency.py:58:
+--- residency n=32 09:26:43
+n=32: tile path (block_dim 32, one world per threadgroup): 0.203 ms per 4096 factor+solve
+Traceback (most recent call last):
+    raise WarpCodegenError(
+warp._src.codegen.WarpCodegenError: Error while parsing function "k_native" at /Users/aditya/robosim/scripts/diagnostics/metal_cholesky_residency.py:58:
+--- L'DL check 09:26:44
+Module _factor_i_sparse_unrolled__locals__kernel_f15dd24f 6e9f1fa load on device 'metal:0' took 435.12 ms  (compiled)
+Module _solve_LD_sparse_unrolled__locals__kernel_be0563f2 1254cfc load on device 'metal:0' took 467.67 ms  (compiled)
+  unrolled: factor bitwise | solve on the serial factor: bitwise
+Module _factor_i_sparse_unrolled__locals__kernel_3bf3bc0e d77f845 load on device 'metal:0' took 370.24 ms  (compiled)
+Module _solve_LD_sparse_unrolled__locals__kernel_d9d2768a 4ad2324 load on device 'metal:0' took 377.56 ms  (compiled)
+  unrolled: factor bitwise | solve on the serial factor: bitwise
+Module _factor_i_sparse_unrolled__locals__kernel_59959252 c284fbf load on device 'metal:0' took 386.60 ms  (compiled)
+Module _solve_LD_sparse_unrolled__locals__kernel_919473b3 6167314 load on device 'metal:0' took 413.82 ms  (compiled)
+  unrolled: factor bitwise | solve on the serial factor: bitwise
+ALL OK
+--- L'DL bench 09:27:13
+Module _factor_i_sparse_serial__locals__kernel_4a9a30d6 34640de load on device 'metal:0' took 17.76 ms  (cached)
+factor serial : 0.453 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+Module _solve_LD_sparse_serial__locals__kernel_f859468c 1037d66 load on device 'metal:0' took 18.00 ms  (cached)
+solve serial  : 0.207 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+Module _factor_i_sparse_unrolled__locals__kernel_f15dd24f 6e9f1fa load on device 'metal:0' took 18.79 ms  (cached)
+factor unrolled: 0.315 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+Module _solve_LD_sparse_unrolled__locals__kernel_be0563f2 1254cfc load on device 'metal:0' took 19.50 ms  (cached)
+solve unrolled: 0.406 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+=== end Sat Sep 26 09:27:16 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] tp26_resid end: device utilisation 0% (09:27:16), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %

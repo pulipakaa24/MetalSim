@@ -460,3 +460,24 @@ of two runs of the same configuration at this length (13,369 vs 12,931; 12,655 v
 apply here), so nothing is claimed for the camera path. No render-side code changed today, so the renderer's
 SHA identity for a given state is unaffected by construction; end-to-end frames differ only through the
 float-noise state differences documented in 5b.
+
+### 11.6 The `test_g1_fast_factorization` failure of 08:41 (not a code regression)
+
+`runs/il3/fullsuite2.log` failed `test_defaults_and_previous_values_reachable` with "`_factor_i_sparse_serial`:
+Warp kernels cannot return values". The test passes at the fork head (worktree, 3 passed, 09:0x). The run had
+imported `mujoco_warp` from the shared checkout at a1daf88 at 08:41; the checkout was fast-forwarded to edae7b7
+at 08:43:13 (reflog) while the run was still compiling kernels (its log shows fresh compiles after that). Warp
+reads a kernel's source from its file at build time, so the 250-line-longer `smooth.py` gave the serial kernel a
+shifted source that ended in the next function's `return kernel`. The archived serial path is intact; the
+shared-checkout rule (no edits while queued jobs import it) applies to fast-forwards too. Per-landing checks now
+include `pytest tests/test_g1_fast_factorization.py` (`runs/tp26/job_tests3.sh`, `job_suite.sh`).
+
+### 11.7 Level-parallel unrolled L'DL solve (measured, archived)
+
+Redesign of the unrolled solve: x distributed over the lanes (lane i mod 32 holds x[i]; 45 registers instead of
+86) and the updates of each tree level emitted interleaved across their distinct targets so the independent chains
+overlap in the in-order pipeline, every target keeping the serial source order (bitwise the serial kernel on the
+G1 task, Go2 and the humanoid; `runs/tp26/resid.wrapper.log`). 0.79 -> 0.41 ms per 4096, still twice the serial
+solve's 0.207 ms: the dependent shuffle chain (782 shuffles, 2 per update, ~30 cycles each) remains longer than one
+thread's memory chain of the serial kernel. Archived (`MJW_METAL_LDL_UNROLLED_SOLVE=1`); the unrolled factor (11.3)
+stays landed.
