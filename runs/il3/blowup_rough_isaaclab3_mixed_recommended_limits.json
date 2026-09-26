@@ -1,0 +1,735 @@
+{
+ "terrain": "rough",
+ "preset": "isaaclab3_mixed_recommended_limits",
+ "ckpt": "runs/il3/ckpt/train_rough_il3_isaaclab3_every_substep_cap20_s0.pt",
+ "steps": 500,
+ "cap": 20,
+ "niter": {
+  "max": 13,
+  "p99.9": 13.0,
+  "substep_worlds_at_cap": 0,
+  "of": 16384000
+ },
+ "overflow": {},
+ "blowups": 29,
+ "isaac_style_torso_terminations": 9,
+ "criterion": "blow-up = any |qpos| or |qvel| > 1000 or non-finite after a control step (g1_reward_done); Isaac 3.0 terminates only on time_out and torso contact > 1 N (TerminationsCfg), so every blow-up here is a state Isaac's task would not end by itself",
+ "blowup_levels": [
+  [
+   3,
+   8
+  ],
+  [
+   2,
+   8
+  ],
+  [
+   4,
+   6
+  ],
+  [
+   0,
+   3
+  ],
+  [
+   5,
+   3
+  ],
+  [
+   1,
+   1
+  ]
+ ],
+ "blowup_cols": [
+  [
+   4,
+   3
+  ],
+  [
+   2,
+   3
+  ],
+  [
+   16,
+   3
+  ],
+  [
+   8,
+   3
+  ],
+  [
+   19,
+   3
+  ],
+  [
+   12,
+   3
+  ],
+  [
+   17,
+   2
+  ],
+  [
+   3,
+   2
+  ]
+ ],
+ "base_rate_levels": [
+  [
+   1,
+   717
+  ],
+  [
+   2,
+   695
+  ],
+  [
+   3,
+   689
+  ],
+  [
+   5,
+   686
+  ],
+  [
+   0,
+   669
+  ],
+  [
+   4,
+   639
+  ],
+  [
+   6,
+   1
+  ]
+ ],
+ "mass_scale_blowups_mean": 0.9942348435007292,
+ "mass_scale_all_mean": 1.0074822902679443,
+ "mass_scale_blowups_frac_above_1.1": 0.2413793103448276,
+ "mass_scale_all_frac_above_1.1": 0.282958984375,
+ "blowups_within_50_steps_of_push": 0.0,
+ "pre_limit_joint": [
+  [
+   "right_six_joint",
+   7
+  ],
+  [
+   "left_four_joint",
+   5
+  ],
+  [
+   "left_six_joint",
+   5
+  ],
+  [
+   "right_four_joint",
+   5
+  ],
+  [
+   "left_one_joint",
+   3
+  ],
+  [
+   "left_two_joint",
+   2
+  ]
+ ],
+ "pre_speed_joint": [
+  [
+   "left_six_joint",
+   6
+  ],
+  [
+   "left_two_joint",
+   5
+  ],
+  [
+   "right_four_joint",
+   5
+  ],
+  [
+   "right_six_joint",
+   3
+  ],
+  [
+   "left_ankle_pitch_joint",
+   3
+  ],
+  [
+   "left_three_joint",
+   2
+  ]
+ ],
+ "blowup_speed_joint": [
+  [
+   "right_six_joint",
+   5
+  ],
+  [
+   "left_one_joint",
+   5
+  ],
+  [
+   "left_four_joint",
+   4
+  ],
+  [
+   "left_five_joint",
+   3
+  ],
+  [
+   "left_six_joint",
+   3
+  ],
+  [
+   "right_five_joint",
+   3
+  ]
+ ],
+ "pre_limit_excursion": {
+  "median": 0.3351687844555493,
+  "p90": 1.7200780283602262,
+  "max": 1.7581549882888794
+ },
+ "pre_joint_speed": {
+  "median": 506.6058349609375,
+  "p90": 822.508642578125,
+  "max": 972.1175537109375
+ },
+ "pre_penetration_m": {
+  "median": 0.0024495243560522795,
+  "p90": 0.004745364189147948,
+  "max": 0.015494252555072308
+ },
+ "frac_pre_speed_over_3x_limit": 0.5517241379310345,
+ "frac_pre_penetration_over_2cm": 0.0,
+ "frac_torso_contact_before": 0.0,
+ "energy_jump_x_median": 0.7794821021635384,
+ "frac_nonphysical_before_blowup": 0.5517241379310345,
+ "events": [
+  {
+   "step": 23,
+   "env": 3505,
+   "level": 0,
+   "col": 17,
+   "mass_scale": 1.1390645503997803,
+   "steps_since_push": 1000023,
+   "pre_limit_excursion": 0.11611124128103256,
+   "pre_limit_joint": "left_four_joint",
+   "pre_joint_speed": 13.01967716217041,
+   "pre_speed_joint": "left_three_joint",
+   "pre_penetration_m": 0.0018086433410644531,
+   "blowup_speed_joint": "left_four_joint",
+   "pre_speed_over_3x_limit": false,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 0.8743829885961645,
+   "torso_contact_before": false
+  },
+  {
+   "step": 50,
+   "env": 974,
+   "level": 0,
+   "col": 4,
+   "mass_scale": 0.9745293855667114,
+   "steps_since_push": 1000050,
+   "pre_limit_excursion": 1.5388843472759839,
+   "pre_limit_joint": "right_six_joint",
+   "pre_joint_speed": 648.99755859375,
+   "pre_speed_joint": "right_six_joint",
+   "pre_penetration_m": 0.00861978530883789,
+   "blowup_speed_joint": "left_five_joint",
+   "pre_speed_over_3x_limit": true,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 2.433392671022362,
+   "torso_contact_before": false
+  },
+  {
+   "step": 62,
+   "env": 2727,
+   "level": 5,
+   "col": 13,
+   "mass_scale": 1.0570793151855469,
+   "steps_since_push": 1000062,
+   "pre_limit_excursion": 0.11562307178974152,
+   "pre_limit_joint": "right_six_joint",
+   "pre_joint_speed": 15.094093322753906,
+   "pre_speed_joint": "right_knee_joint",
+   "pre_penetration_m": 0.003938580397516489,
+   "blowup_speed_joint": "right_six_joint",
+   "pre_speed_over_3x_limit": false,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 0.8328002341358943,
+   "torso_contact_before": false
+  },
+  {
+   "step": 75,
+   "env": 9,
+   "level": 3,
+   "col": 0,
+   "mass_scale": 0.8079161047935486,
+   "steps_since_push": 1000075,
+   "pre_limit_excursion": 0.3351687844555493,
+   "pre_limit_joint": "left_six_joint",
+   "pre_joint_speed": 460.20428466796875,
+   "pre_speed_joint": "left_six_joint",
+   "pre_penetration_m": 0.0017240047454833984,
+   "blowup_speed_joint": "right_two_joint",
+   "pre_speed_over_3x_limit": true,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 0.5544785654167297,
+   "torso_contact_before": false
+  },
+  {
+   "step": 80,
+   "env": 555,
+   "level": 2,
+   "col": 2,
+   "mass_scale": 0.9494844079017639,
+   "steps_since_push": 1000080,
+   "pre_limit_excursion": 0.12306453287601471,
+   "pre_limit_joint": "left_four_joint",
+   "pre_joint_speed": 13.507018089294434,
+   "pre_speed_joint": "left_ankle_roll_joint",
+   "pre_penetration_m": 0.002621889114379883,
+   "blowup_speed_joint": "left_four_joint",
+   "pre_speed_over_3x_limit": false,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 0.5441059671473136,
+   "torso_contact_before": false
+  },
+  {
+   "step": 83,
+   "env": 3391,
+   "level": 2,
+   "col": 16,
+   "mass_scale": 0.9644265174865723,
+   "steps_since_push": 1000083,
+   "pre_limit_excursion": 1.0669636185925122,
+   "pre_limit_joint": "left_two_joint",
+   "pre_joint_speed": 506.6058349609375,
+   "pre_speed_joint": "left_two_joint",
+   "pre_penetration_m": 0.0023337602615356445,
+   "blowup_speed_joint": "left_six_joint",
+   "pre_speed_over_3x_limit": true,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 1.0849482830290536,
+   "torso_contact_before": false
+  },
+  {
+   "step": 92,
+   "env": 1676,
+   "level": 3,
+   "col": 8,
+   "mass_scale": 0.8947207927703857,
+   "steps_since_push": 1000092,
+   "pre_limit_excursion": 0.1234587767717481,
+   "pre_limit_joint": "left_one_joint",
+   "pre_joint_speed": 17.455842971801758,
+   "pre_speed_joint": "left_ankle_pitch_joint",
+   "pre_penetration_m": 0.004581093788146973,
+   "blowup_speed_joint": "left_one_joint",
+   "pre_speed_over_3x_limit": false,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 0.5485578529127636,
+   "torso_contact_before": false
+  },
+  {
+   "step": 143,
+   "env": 1621,
+   "level": 3,
+   "col": 7,
+   "mass_scale": 1.126081943511963,
+   "steps_since_push": 1000143,
+   "pre_limit_excursion": 0.11433346569538116,
+   "pre_limit_joint": "right_six_joint",
+   "pre_joint_speed": 19.601743698120117,
+   "pre_speed_joint": "right_ankle_roll_joint",
+   "pre_penetration_m": 0.0035633444786071777,
+   "blowup_speed_joint": "right_six_joint",
+   "pre_speed_over_3x_limit": false,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 0.5968453512920172,
+   "torso_contact_before": false
+  },
+  {
+   "step": 149,
+   "env": 3641,
+   "level": 4,
+   "col": 17,
+   "mass_scale": 1.0613349676132202,
+   "steps_since_push": 1000149,
+   "pre_limit_excursion": 1.5856640675661207,
+   "pre_limit_joint": "left_one_joint",
+   "pre_joint_speed": 648.3794555664062,
+   "pre_speed_joint": "left_one_joint",
+   "pre_penetration_m": 0.0020863076206296682,
+   "blowup_speed_joint": "left_one_joint",
+   "pre_speed_over_3x_limit": true,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 887.9854217212335,
+   "torso_contact_before": false
+  },
+  {
+   "step": 163,
+   "env": 3898,
+   "level": 2,
+   "col": 19,
+   "mass_scale": 0.9585413336753845,
+   "steps_since_push": 1000163,
+   "pre_limit_excursion": 1.5350024700164795,
+   "pre_limit_joint": "left_two_joint",
+   "pre_joint_speed": 956.2020874023438,
+   "pre_speed_joint": "left_six_joint",
+   "pre_penetration_m": 0.0028285980224609375,
+   "blowup_speed_joint": "right_one_joint",
+   "pre_speed_over_3x_limit": true,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 0.518953534248088,
+   "torso_contact_before": false
+  },
+  {
+   "step": 182,
+   "env": 3331,
+   "level": 4,
+   "col": 16,
+   "mass_scale": 0.9921964406967163,
+   "steps_since_push": 1000182,
+   "pre_limit_excursion": 0.09366760499768556,
+   "pre_limit_joint": "left_five_joint",
+   "pre_joint_speed": 9.97380542755127,
+   "pre_speed_joint": "left_ankle_pitch_joint",
+   "pre_penetration_m": 0.0031643600668758154,
+   "blowup_speed_joint": "left_five_joint",
+   "pre_speed_over_3x_limit": false,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 0.7794821021635384,
+   "torso_contact_before": false
+  },
+  {
+   "step": 206,
+   "env": 628,
+   "level": 5,
+   "col": 3,
+   "mass_scale": 0.8832781314849854,
+   "steps_since_push": 1000206,
+   "pre_limit_excursion": 1.7143679857254028,
+   "pre_limit_joint": "right_four_joint",
+   "pre_joint_speed": 704.6619873046875,
+   "pre_speed_joint": "right_four_joint",
+   "pre_penetration_m": 0.0022597312927246094,
+   "blowup_speed_joint": "right_one_joint",
+   "pre_speed_over_3x_limit": true,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 0.5082376010898283,
+   "torso_contact_before": false
+  },
+  {
+   "step": 225,
+   "env": 808,
+   "level": 4,
+   "col": 3,
+   "mass_scale": 0.9176455736160278,
+   "steps_since_push": 1000225,
+   "pre_limit_excursion": 1.5704662259380933,
+   "pre_limit_joint": "left_six_joint",
+   "pre_joint_speed": 657.4952392578125,
+   "pre_speed_joint": "left_six_joint",
+   "pre_penetration_m": 0.0022263897117227316,
+   "blowup_speed_joint": "left_six_joint",
+   "pre_speed_over_3x_limit": true,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 479.8987304855859,
+   "torso_contact_before": false
+  },
+  {
+   "step": 263,
+   "env": 1659,
+   "level": 5,
+   "col": 8,
+   "mass_scale": 0.968463122844696,
+   "steps_since_push": 1000263,
+   "pre_limit_excursion": 1.742918198899519,
+   "pre_limit_joint": "left_six_joint",
+   "pre_joint_speed": 703.3966674804688,
+   "pre_speed_joint": "left_six_joint",
+   "pre_penetration_m": 0.0026373863220214844,
+   "blowup_speed_joint": "right_two_joint",
+   "pre_speed_over_3x_limit": true,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 1171.3095306055218,
+   "torso_contact_before": false
+  },
+  {
+   "step": 305,
+   "env": 2653,
+   "level": 1,
+   "col": 12,
+   "mass_scale": 1.1560229063034058,
+   "steps_since_push": 1000305,
+   "pre_limit_excursion": 0.09645158052444458,
+   "pre_limit_joint": "left_four_joint",
+   "pre_joint_speed": 11.085801124572754,
+   "pre_speed_joint": "left_two_joint",
+   "pre_penetration_m": 0.0013533222954720259,
+   "blowup_speed_joint": "left_six_joint",
+   "pre_speed_over_3x_limit": false,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 0.6104198014832595,
+   "torso_contact_before": false
+  },
+  {
+   "step": 350,
+   "env": 3827,
+   "level": 4,
+   "col": 18,
+   "mass_scale": 1.0289101600646973,
+   "steps_since_push": 1000350,
+   "pre_limit_excursion": 0.7356740236282349,
+   "pre_limit_joint": "right_four_joint",
+   "pre_joint_speed": 563.6697387695312,
+   "pre_speed_joint": "right_four_joint",
+   "pre_penetration_m": 0.00244885659776628,
+   "blowup_speed_joint": "right_four_joint",
+   "pre_speed_over_3x_limit": true,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 1.5948378387216546,
+   "torso_contact_before": false
+  },
+  {
+   "step": 352,
+   "env": 1722,
+   "level": 3,
+   "col": 8,
+   "mass_scale": 1.1771036386489868,
+   "steps_since_push": 1000352,
+   "pre_limit_excursion": 0.1236986294388771,
+   "pre_limit_joint": "left_four_joint",
+   "pre_joint_speed": 10.976964950561523,
+   "pre_speed_joint": "right_four_joint",
+   "pre_penetration_m": 0.003826737403869629,
+   "blowup_speed_joint": "left_four_joint",
+   "pre_speed_over_3x_limit": false,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 0.44853195927073175,
+   "torso_contact_before": false
+  },
+  {
+   "step": 370,
+   "env": 1979,
+   "level": 0,
+   "col": 9,
+   "mass_scale": 1.0107299089431763,
+   "steps_since_push": 1000370,
+   "pre_limit_excursion": 0.13453916102620367,
+   "pre_limit_joint": "left_one_joint",
+   "pre_joint_speed": 10.609626770019531,
+   "pre_speed_joint": "left_two_joint",
+   "pre_penetration_m": 0.002970457077026367,
+   "blowup_speed_joint": "left_one_joint",
+   "pre_speed_over_3x_limit": false,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 0.5123545408626579,
+   "torso_contact_before": false
+  },
+  {
+   "step": 407,
+   "env": 545,
+   "level": 2,
+   "col": 2,
+   "mass_scale": 0.8620740175247192,
+   "steps_since_push": 1000407,
+   "pre_limit_excursion": 0.09874419122934341,
+   "pre_limit_joint": "right_six_joint",
+   "pre_joint_speed": 15.189002990722656,
+   "pre_speed_joint": "left_ankle_pitch_joint",
+   "pre_penetration_m": 0.0054024457931518555,
+   "blowup_speed_joint": "right_six_joint",
+   "pre_speed_over_3x_limit": false,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 0.36521779966160495,
+   "torso_contact_before": false
+  },
+  {
+   "step": 411,
+   "env": 2021,
+   "level": 2,
+   "col": 9,
+   "mass_scale": 1.1886225938796997,
+   "steps_since_push": 1000411,
+   "pre_limit_excursion": 0.6210766434669495,
+   "pre_limit_joint": "right_four_joint",
+   "pre_joint_speed": 611.947265625,
+   "pre_speed_joint": "right_four_joint",
+   "pre_penetration_m": 0.00040972232818603516,
+   "blowup_speed_joint": "right_six_joint",
+   "pre_speed_over_3x_limit": true,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 0.4296125215629146,
+   "torso_contact_before": false
+  },
+  {
+   "step": 417,
+   "env": 879,
+   "level": 3,
+   "col": 4,
+   "mass_scale": 0.8988268971443176,
+   "steps_since_push": 1000417,
+   "pre_limit_excursion": 1.7581549882888794,
+   "pre_limit_joint": "left_six_joint",
+   "pre_joint_speed": 716.2627563476562,
+   "pre_speed_joint": "left_six_joint",
+   "pre_penetration_m": 0.0043226247653365135,
+   "blowup_speed_joint": "left_one_joint",
+   "pre_speed_over_3x_limit": true,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 1.3381824355596945,
+   "torso_contact_before": false
+  },
+  {
+   "step": 419,
+   "env": 3349,
+   "level": 3,
+   "col": 16,
+   "mass_scale": 1.2388379573822021,
+   "steps_since_push": 1000419,
+   "pre_limit_excursion": 0.14645244181156158,
+   "pre_limit_joint": "left_six_joint",
+   "pre_joint_speed": 856.173583984375,
+   "pre_speed_joint": "left_six_joint",
+   "pre_penetration_m": 0.0017443508841097355,
+   "blowup_speed_joint": "left_five_joint",
+   "pre_speed_over_3x_limit": true,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 939.3080859000286,
+   "torso_contact_before": false
+  },
+  {
+   "step": 427,
+   "env": 1121,
+   "level": 2,
+   "col": 5,
+   "mass_scale": 0.9828059673309326,
+   "steps_since_push": 1000427,
+   "pre_limit_excursion": 1.5762578900616284,
+   "pre_limit_joint": "right_six_joint",
+   "pre_joint_speed": 972.1175537109375,
+   "pre_speed_joint": "right_six_joint",
+   "pre_penetration_m": 0.015494252555072308,
+   "blowup_speed_joint": "right_five_joint",
+   "pre_speed_over_3x_limit": true,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 2.936265876686894,
+   "torso_contact_before": false
+  },
+  {
+   "step": 453,
+   "env": 3975,
+   "level": 3,
+   "col": 19,
+   "mass_scale": 1.1435325145721436,
+   "steps_since_push": 1000453,
+   "pre_limit_excursion": 1.7052503824234009,
+   "pre_limit_joint": "right_four_joint",
+   "pre_joint_speed": 715.8470458984375,
+   "pre_speed_joint": "right_four_joint",
+   "pre_penetration_m": 0.0,
+   "blowup_speed_joint": "right_five_joint",
+   "pre_speed_over_3x_limit": true,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 1.8121058845645892,
+   "torso_contact_before": false
+  },
+  {
+   "step": 455,
+   "env": 2520,
+   "level": 4,
+   "col": 12,
+   "mass_scale": 0.8713575005531311,
+   "steps_since_push": 1000455,
+   "pre_limit_excursion": 0.1025695875287056,
+   "pre_limit_joint": "left_four_joint",
+   "pre_joint_speed": 9.371713638305664,
+   "pre_speed_joint": "left_two_joint",
+   "pre_penetration_m": 0.0019806609489023685,
+   "blowup_speed_joint": "left_four_joint",
+   "pre_speed_over_3x_limit": false,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 0.8090118079683317,
+   "torso_contact_before": false
+  },
+  {
+   "step": 468,
+   "env": 2584,
+   "level": 2,
+   "col": 12,
+   "mass_scale": 0.9210448265075684,
+   "steps_since_push": 1000468,
+   "pre_limit_excursion": 0.1354315663128406,
+   "pre_limit_joint": "left_three_joint",
+   "pre_joint_speed": 8.637788772583008,
+   "pre_speed_joint": "left_three_joint",
+   "pre_penetration_m": 0.0024495243560522795,
+   "blowup_speed_joint": "left_three_joint",
+   "pre_speed_over_3x_limit": false,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 0.7100852963254317,
+   "torso_contact_before": false
+  },
+  {
+   "step": 472,
+   "env": 905,
+   "level": 2,
+   "col": 4,
+   "mass_scale": 0.8138779401779175,
+   "steps_since_push": 1000472,
+   "pre_limit_excursion": 0.1346537470817566,
+   "pre_limit_joint": "right_six_joint",
+   "pre_joint_speed": 11.988847732543945,
+   "pre_speed_joint": "right_two_joint",
+   "pre_penetration_m": 0.0027632713317871094,
+   "blowup_speed_joint": "right_six_joint",
+   "pre_speed_over_3x_limit": false,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 0.323024629001779,
+   "torso_contact_before": false
+  },
+  {
+   "step": 484,
+   "env": 611,
+   "level": 3,
+   "col": 2,
+   "mass_scale": 0.961338996887207,
+   "steps_since_push": 1000484,
+   "pre_limit_excursion": 1.7525817155838013,
+   "pre_limit_joint": "right_six_joint",
+   "pre_joint_speed": 714.971435546875,
+   "pre_speed_joint": "right_six_joint",
+   "pre_penetration_m": 0.002401590347290039,
+   "blowup_speed_joint": "right_five_joint",
+   "pre_speed_over_3x_limit": true,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 0.8825175578145794,
+   "torso_contact_before": false
+  },
+  {
+   "step": 486,
+   "env": 3970,
+   "level": 4,
+   "col": 19,
+   "mass_scale": 0.8829620480537415,
+   "steps_since_push": 1000486,
+   "pre_limit_excursion": 1.0096749067306519,
+   "pre_limit_joint": "right_four_joint",
+   "pre_joint_speed": 814.0924072265625,
+   "pre_speed_joint": "left_two_joint",
+   "pre_penetration_m": 0.0,
+   "blowup_speed_joint": "left_one_joint",
+   "pre_speed_over_3x_limit": true,
+   "pre_penetration_over_2cm": false,
+   "energy_jump_x": 0.7121282899839845,
+   "torso_contact_before": false
+  }
+ ],
+ "all_worlds_pushed_within_50_steps": 0.00537109375
+}
