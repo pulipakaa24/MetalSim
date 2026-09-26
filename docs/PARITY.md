@@ -951,6 +951,13 @@ confirming 2.3.2 flat run is queued.
 
 **Isaac Lab 3.0 like-for-like, fixes found on the way (2026-09-26, research note §6).** (1) Trainer start state: PPOWarp started each env's first episode from MuJoCo's qpos0 (robot embedded in the ground); with Isaac's stiff contacts that ejected robots and caused the iteration 10–14 blow-ups; now reset first like Isaac's `env.reset()`. (2) Drive effort limit: moved from the actuator's forcerange to the joint's actfrcrange as Newton builds Isaac's model, since MuJoCo drops a clamped actuator's implicit damping: late finger blow-ups 41 → 0 with the final rough policy. Flat 3.0 with fix (1): 0 blow-ups, early rise close to Isaac's (+6.5 vs +8.4 at 300); final three-seed flat and one rough run with both fixes are queued.
 
+**Final like-for-like runs with both trainer fixes (initial reset, joint-level effort clamp; measured 2026-09-26,
+`runs/il3/final_flat_il3_s{0,1,2}.log`, `final_rough_il3_s0.log`):** flat, three seeds, +26.8 / +28.4 / +25.7 at
+iteration 1499 (**+27.0 ± 1.4**) vs Isaac Newton / MuJoCo-Warp +27.5 and PhysX +28.9, inside one standard deviation
+of Isaac's curve at every milestone from iteration 200; **rough, seed 0, +13.7 / terrain level 5.99 vs Isaac +14.5 /
+5.80** (46.8 K env-steps/s vs 42.0 K on the L4); 0 blow-ups in any run. Before the fixes the same configuration gave
+flat +24.9 / rough +8.4 with 44 / 1,615 blow-ups. Seeds 0–1 ran on MuJoCo Warp fork 9b4e96a, seed 2 and rough on edae7b7.
+
 ## 2. Platform capabilities (the workstreams), with the tests behind them
 
 | capability | Isaac | ours | test (assertion) | result | verdict |

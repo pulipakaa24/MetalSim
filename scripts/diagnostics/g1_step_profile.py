@@ -33,7 +33,7 @@ if VAR:
     from metalsim.physics.batch import BatchSimOptions as _BSO
 
     def _opts(**kw):
-        for k in ("njmax", "nconmax", "jacobian", "block_dim", "m_dense_max", "metal_register_cholesky_max"):
+        for k in ("njmax", "nconmax", "jacobian", "block_dim", "m_dense_max", "metal_register_cholesky_max", "solver_iterations", "ls_iterations"):
             if k in VAR:
                 kw[k] = VAR[k]
         return _BSO(**kw)

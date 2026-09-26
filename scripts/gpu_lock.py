@@ -31,7 +31,9 @@ PRIO = {"timing": 0, "render": 1, "train": 2, "low": 3}
 
 def alive(pid):
     try: os.kill(pid, 0); return True
-    except OSError: return False
+    except ProcessLookupError: return False
+    except PermissionError: return True      # the process exists; a sandbox denied the signal (a sandboxed status call once deleted every ticket)
+    except OSError: return True
 
 
 def holder():
@@ -67,7 +69,9 @@ def acquire(name, kind, minutes, pid, cmd=None, front=False):
     t0 = 0.0 if front else time.time()                 # front: ahead of every waiter of its class (tickets sort by class, then t)
     tf = os.path.join(Q, f"{t0:.3f}_{PRIO[kind]}_{name}_{pid}.json")   # pid in the name: two tickets of one name can never be confused
     json.dump({"name": name, "kind": kind, "minutes": minutes, "pid": pid, "t": t0, "cmd": cmd, "cwd": os.getcwd()}, open(tf, "w"))
+    ticket = {"name": name, "kind": kind, "minutes": minutes, "pid": pid, "t": t0, "cmd": cmd, "cwd": os.getcwd()}
     while True:
+        if not os.path.exists(tf): json.dump(ticket, open(tf, "w"))      # self-heal: a ticket removed by another process is re-created
         h = holder()
         if h is None:
             q = tickets()
