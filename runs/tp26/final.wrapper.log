@@ -1,0 +1,41 @@
+[gpu_run] tp26_final start: device utilisation 0% (06:39:52)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+=== start Sat Sep 26 06:39:55 PDT 2026 metalsim 557128a installed warp 4127c481 mjw 9b4e96a; wt warp e29950ee mjw e068734 power: Now drawing from 'AC Power'
+--- B1 baseline 06:39:55
+[B1_baseline] N=4096 njmax 512 naconmax 524288 is_sparse False
+[B1_baseline] physics only 53.5 ms/step -> 76,590 env-steps/s
+[B1_baseline] full env step 84.6 ms -> 48,441 env-steps/s
+[B1_baseline] after random-action steps: nefc max 45 mean 14.4; nacon 11144 (2.72/world); overflow {'ITERATIONS': 23, 'LS_ITERATIONS': 3889}
+[B1_baseline] rollout + inference 78.9 ms/step -> 51,940 env-steps/s
+[B1_baseline] PPO update 149 ms -> full loop 48,147 env-steps/s
+[B1_baseline] SUMMARY physics 76,590 | step 48,441 | rollout 51,940 | loop 48,147  (ms: physics 53.5, step 84.6, rollout/step 78.9, update 149)
+--- F1 final 06:40:26
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[F1_final] N=4096 njmax 144 naconmax 98304 is_sparse False
+[F1_final] physics only 45.3 ms/step -> 90,395 env-steps/s
+[F1_final] full env step 67.4 ms -> 60,775 env-steps/s
+[F1_final] after random-action steps: nefc max 42 mean 14.3; nacon 11166 (2.73/world); overflow {'ITERATIONS': 31, 'LS_ITERATIONS': 3847}
+[F1_final] rollout + inference 66.7 ms/step -> 61,397 env-steps/s
+[F1_final] PPO update 143 ms -> full loop 56,351 env-steps/s
+[F1_final] SUMMARY physics 90,395 | step 60,775 | rollout 61,397 | loop 56,351  (ms: physics 45.3, step 67.4, rollout/step 66.7, update 143)
+--- B2 baseline 06:40:50
+[B2_baseline] N=4096 njmax 512 naconmax 524288 is_sparse False
+[B2_baseline] physics only 53.5 ms/step -> 76,590 env-steps/s
+[B2_baseline] full env step 84.0 ms -> 48,767 env-steps/s
+[B2_baseline] after random-action steps: nefc max 37 mean 14.4; nacon 11154 (2.72/world); overflow {'ITERATIONS': 26, 'LS_ITERATIONS': 3871}
+[B2_baseline] rollout + inference 78.9 ms/step -> 51,887 env-steps/s
+[B2_baseline] PPO update 151 ms -> full loop 48,060 env-steps/s
+[B2_baseline] SUMMARY physics 76,590 | step 48,767 | rollout 51,887 | loop 48,060  (ms: physics 53.5, step 84.0, rollout/step 78.9, update 151)
+--- F2 final 06:41:21
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[F2_final] N=4096 njmax 144 naconmax 98304 is_sparse False
+[F2_final] physics only 45.3 ms/step -> 90,404 env-steps/s
+[F2_final] full env step 67.2 ms -> 60,946 env-steps/s
+[F2_final] after random-action steps: nefc max 44 mean 14.4; nacon 11218 (2.74/world); overflow {'ITERATIONS': 27, 'LS_ITERATIONS': 3883}
+[F2_final] rollout + inference 66.4 ms/step -> 61,687 env-steps/s
+[F2_final] PPO update 144 ms -> full loop 56,590 env-steps/s
+[F2_final] SUMMARY physics 90,404 | step 60,946 | rollout 61,687 | loop 56,590  (ms: physics 45.3, step 67.2, rollout/step 66.4, update 144)
+=== end Sat Sep 26 06:41:45 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] tp26_final end: device utilisation 0% (06:41:45), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+lock held by cap_pyr_flat_policy, not tp26_final; not released

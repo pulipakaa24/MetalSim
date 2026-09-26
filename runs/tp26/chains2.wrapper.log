@@ -1,0 +1,49 @@
+[gpu_run] tp26_chains2 start: device utilisation 0% (06:38:44)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+=== start Sat Sep 26 06:38:47 PDT 2026 metalsim 557128a wt warp e29950ee mjw e068734 power: Now drawing from 'AC Power'
+--- check 06:38:47
+G1 task (nv 43): nM 434, levels 14, updates 391, lane pairs 353, sparse dofs 43 of 43
+  factor: bitwise | solve: bitwise | solve residual vs dense M 3.3e-06
+  chains (4 levels, 12 chains): factor rel diff vs serial 6.0e-07 (D 2.5e-08) | solve on the serial factor: bitwise | chain factor + chain solve residual vs dense M 4.0e-06
+Go2 menagerie (m_dense_max 0: all sparse): nM 117, levels 8, updates 99, lane pairs 81, sparse dofs 18 of 18
+  factor: bitwise | solve: bitwise | solve residual vs dense M 8.2e-07
+  chains (2 levels, 5 chains): factor rel diff vs serial 1.3e-07 (D 9.3e-08) | solve on the serial factor: bitwise | chain factor + chain solve residual vs dense M 1.2e-06
+humanoid (dm) (m_dense_max 0: all sparse): nM 243, levels 14, updates 216, lane pairs 195, sparse dofs 27 of 27
+  factor: bitwise | solve: bitwise | solve residual vs dense M 5.3e-06
+  chains (3 levels, 6 chains): factor rel diff vs serial 6.2e-07 (D 2.8e-07) | solve on the serial factor: bitwise | chain factor + chain solve residual vs dense M 7.0e-06
+ALL OK
+--- bench 06:38:51
+factor serial : 0.453 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+factor lanes  : 0.571 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+solve serial  : 0.207 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+solve lanes   : 0.268 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+factor chains : 0.647 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+solve chains  : 0.368 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
+--- C1 chains 06:38:54
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[C1_chains] N=4096 njmax 144 naconmax 98304 is_sparse False
+[C1_chains] physics only 50.9 ms/step -> 80,513 env-steps/s
+[C1_chains] full env step 72.9 ms -> 56,197 env-steps/s
+[C1_chains] after random-action steps: nefc max 41 mean 14.5; nacon 11164 (2.73/world); overflow {'ITERATIONS': 37, 'LS_ITERATIONS': 3914}
+--- S1 serial 06:39:09
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[S1_serial] N=4096 njmax 144 naconmax 98304 is_sparse False
+[S1_serial] physics only 45.3 ms/step -> 90,331 env-steps/s
+[S1_serial] full env step 67.2 ms -> 60,949 env-steps/s
+[S1_serial] after random-action steps: nefc max 43 mean 14.3; nacon 11045 (2.70/world); overflow {'ITERATIONS': 31, 'LS_ITERATIONS': 3897}
+--- C2 chains 06:39:23
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[C2_chains] N=4096 njmax 144 naconmax 98304 is_sparse False
+[C2_chains] physics only 50.9 ms/step -> 80,477 env-steps/s
+[C2_chains] full env step 72.9 ms -> 56,212 env-steps/s
+[C2_chains] after random-action steps: nefc max 44 mean 14.5; nacon 11321 (2.76/world); overflow {'ITERATIONS': 28, 'LS_ITERATIONS': 3880}
+--- S2 serial 06:39:37
+imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+[S2_serial] N=4096 njmax 144 naconmax 98304 is_sparse False
+[S2_serial] physics only 45.3 ms/step -> 90,346 env-steps/s
+[S2_serial] full env step 67.2 ms -> 60,913 env-steps/s
+[S2_serial] after random-action steps: nefc max 44 mean 14.5; nacon 11223 (2.74/world); overflow {'ITERATIONS': 22, 'LS_ITERATIONS': 3895}
+=== end Sat Sep 26 06:39:51 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] tp26_chains2 end: device utilisation 0% (06:39:51), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+lock held by tp26_final, not tp26_chains2; not released

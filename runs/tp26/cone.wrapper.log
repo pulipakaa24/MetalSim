@@ -1,0 +1,88 @@
+[gpu_run] tp26_cone start: device utilisation 0% (05:39:41)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+=== start Sat Sep 26 05:39:44 PDT 2026 metalsim 2298375 wt warp e29950ee mjw 4ef3da3 power: Now drawing from 'AC Power'
+--- check mode 2 (reference) 05:39:44
+   step  200: qpos max nan median nan | qvel max nan | worlds with |dq| > 1e-3: 0.0 %
+capacity replay: nefc max 496 (njmax 512), nacon max 4802 (naconmax 24576); overflow {'NEFC': 11, 'ITERATIONS': 450, 'LS_ITERATIONS': 506}
+capacity replay 2: nefc max 499 (njmax 512), nacon max 4856 (naconmax 24576); overflow {'NEFC': 12, 'ITERATIONS': 455, 'LS_ITERATIONS': 508}
+--- MuJoCo C oracle (4 worlds: PD hold + fixed random targets; |dq| max / median)
+   t=0.004s 4.49e-04/5.0e-05  t=0.008s 1.03e-02/5.7e-04  t=0.016s 2.94e-02/8.5e-04  t=0.048s 2.83e-02/3.9e-03  t=0.100s 1.10e-01/4.1e-03  t=0.200s nan/nan  t=0.400s nan/nan
+=== done
+--- check mode 3 vs mode 2 05:40:38
+   t=0.004s 4.49e-04/5.0e-05  t=0.008s 1.03e-02/5.7e-04  t=0.016s 2.94e-02/8.5e-04  t=0.048s 2.83e-02/3.9e-03  t=0.100s 1.10e-01/4.2e-03  t=0.200s nan/nan  t=0.400s nan/nan
+--- this configuration vs reference [g1 (default) JAC=None /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp] (graph replay)
+   step    1: qpos max 8.34e-07 median 2.3e-13 | qvel max 2.17e-04 | worlds with |dq| > 1e-3: 0.0 %
+   step    2: qpos max 5.28e-03 median 2.2e-11 | qvel max 1.32e+00 | worlds with |dq| > 1e-3: 0.2 %
+   step    4: qpos max 2.64e+02 median 1.2e-09 | qvel max 6.49e+04 | worlds with |dq| > 1e-3: 1.8 %
+   step   10: qpos max nan median nan | qvel max nan | worlds with |dq| > 1e-3: 25.2 %
+   step   25: qpos max nan median nan | qvel max nan | worlds with |dq| > 1e-3: 49.8 %
+   step   50: qpos max nan median nan | qvel max nan | worlds with |dq| > 1e-3: 20.9 %
+   step  100: qpos max nan median nan | qvel max nan | worlds with |dq| > 1e-3: 1.4 %
+   step  200: qpos max nan median nan | qvel max nan | worlds with |dq| > 1e-3: 0.0 %
+   reference MuJoCo C oracle: t=0.004s 4.49e-04/5.0e-05  t=0.008s 1.03e-02/5.7e-04  t=0.016s 2.94e-02/8.5e-04  t=0.048s 2.83e-02/3.9e-03  t=0.100s 1.10e-01/4.1e-03  t=0.200s nan/nan  t=0.400s nan/nan
+=== done
+--- bench MJW_ELLIPTIC_CONE_UPDATE=0 05:40:52
+LABEL cone_upd_0 mjw=/Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py head=4ef3da3 N=4096 env=MJW_ELLIPTIC_CONE_UPDATE=0 
+== g1task elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "g1task", "N": 4096, "mode": "matched", "nv": 43, "nu": 37, "iters": 10, "ls": 20, "build_s": 3.8, "steps_per_s": 3768402, "substeps": 8, "preset": nu
+== go2 elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "go2", "N": 4096, "mode": "matched", "nv": 18, "nu": 12, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 646555, "substeps": 1, "preset": null, 
+== humanoid elliptic
+Traceback (most recent call last):
+ValueError: ParseXML: Error opening file '/Users/aditya/robosim/upstream/mujoco_warp-ellip2/mujoco_warp/test_data/humanoid/humanoid.xml'
+== so101 elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "so101", "N": 4096, "mode": "matched", "nv": 12, "nu": 6, "iters": 10, "ls": 20, "build_s": 10.3, "steps_per_s": 862989, "substeps": 1, "preset": null
+--- bench MJW_ELLIPTIC_CONE_UPDATE=1 05:41:37
+LABEL cone_upd_1 mjw=/Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py head=4ef3da3 N=4096 env=MJW_ELLIPTIC_CONE_UPDATE=1 
+== g1task elliptic
+Traceback (most recent call last):
+RuntimeError: Failed to launch kernel '_update_gradient_cholesky_cone_update__locals__kernel' on device 'metal:0': Kernel requests 39440 bytes of threadgroup memory but device "Apple M4 Max" supports 
+== go2 elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "go2", "N": 4096, "mode": "matched", "nv": 18, "nu": 12, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 579786, "substeps": 1, "preset": null, 
+== humanoid elliptic
+Traceback (most recent call last):
+ValueError: ParseXML: Error opening file '/Users/aditya/robosim/upstream/mujoco_warp-ellip2/mujoco_warp/test_data/humanoid/humanoid.xml'
+== so101 elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "so101", "N": 4096, "mode": "matched", "nv": 12, "nu": 6, "iters": 10, "ls": 20, "build_s": 3.0, "steps_per_s": 775436, "substeps": 1, "preset": null,
+--- bench MJW_ELLIPTIC_CONE_UPDATE=0 05:42:07
+LABEL cone_upd_0 mjw=/Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py head=4ef3da3 N=4096 env=MJW_ELLIPTIC_CONE_UPDATE=0 
+== g1task elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "g1task", "N": 4096, "mode": "matched", "nv": 43, "nu": 37, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 3743366, "substeps": 8, "preset": nu
+== go2 elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "go2", "N": 4096, "mode": "matched", "nv": 18, "nu": 12, "iters": 10, "ls": 20, "build_s": 1.6, "steps_per_s": 645003, "substeps": 1, "preset": null, 
+== humanoid elliptic
+Traceback (most recent call last):
+ValueError: ParseXML: Error opening file '/Users/aditya/robosim/upstream/mujoco_warp-ellip2/mujoco_warp/test_data/humanoid/humanoid.xml'
+== so101 elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "so101", "N": 4096, "mode": "matched", "nv": 12, "nu": 6, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 864220, "substeps": 1, "preset": null,
+--- bench MJW_ELLIPTIC_CONE_UPDATE=1 05:42:41
+LABEL cone_upd_1 mjw=/Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py head=4ef3da3 N=4096 env=MJW_ELLIPTIC_CONE_UPDATE=1 
+== g1task elliptic
+Traceback (most recent call last):
+RuntimeError: Failed to launch kernel '_update_gradient_cholesky_cone_update__locals__kernel' on device 'metal:0': Kernel requests 39440 bytes of threadgroup memory but device "Apple M4 Max" supports 
+== go2 elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "go2", "N": 4096, "mode": "matched", "nv": 18, "nu": 12, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 580347, "substeps": 1, "preset": null, 
+== humanoid elliptic
+Traceback (most recent call last):
+ValueError: ParseXML: Error opening file '/Users/aditya/robosim/upstream/mujoco_warp-ellip2/mujoco_warp/test_data/humanoid/humanoid.xml'
+== so101 elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "so101", "N": 4096, "mode": "matched", "nv": 12, "nu": 6, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 771034, "substeps": 1, "preset": null,
+--- profile g1task mode 3 05:43:06
+Kernel requests 39440 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/scripts/diagnostics/competitors/metalsim_profile.py", line 63, in <module>
+    m = build("base"); sim, resample = run(m, capture=False)
+                                       ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/scripts/diagnostics/competitors/metalsim_profile.py", line 42, in run
+    sim.set_state(home); sim.forward(); sim.synchronize()
+    ^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/metalsim/physics/batch.py", line 328, in set_state
+    self.forward()
+  File "/Users/aditya/robosim/metalsim/physics/batch.py", line 286, in forward
+    self._run("forward")
+  File "/Users/aditya/robosim/metalsim/physics/batch.py", line 223, in _run
+    mjw.forward(self.m, self.d)
+=== end Sat Sep 26 05:43:10 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] tp26_cone end: device utilisation 2% (05:43:10), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+lock held by il3_late_ab, not tp26_cone; not released
