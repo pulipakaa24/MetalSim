@@ -505,4 +505,9 @@ unrolled schedule as a dataclass field, which broke `io_jax_test` (5) and `types
 plain attribute; the JAX-converted model then takes the serial kernel). Warp `test_metal`: 15 passed, 1 failed
 (`test_print_strings_are_per_kernel`), which fails identically on the pre-session fork f194006a (a stdout-capture
 test, not a kernel change). MetalSim: 51 passed (physics / capacity / policy / rollout / fast factorization / G1
-task terms); the whole suite on frozen worktrees: `runs/tp26/suite2.wrapper.log`.
+task terms). On frozen worktrees (per-job checkouts at 0a9de8e / 9df9acee that nothing edits while the jobs run,
+`runs/tp26/suite2.wrapper.log`, 09:43-09:48): **MetalSim whole suite 246 passed, 0 failed** (including
+`test_g1_fast_factorization.py` and `test_g1_parity.py`, whose earlier single failures were the file-changed-during-
+compile race of 11.6, reproduced once more by my own worktree edit during the 09:39 run); **mujoco_warp 1451 passed,
+1 failed (pre-existing), 39 skipped**; Warp `test_metal` 15 passed, 1 pre-existing failure. Rule adopted for the
+remaining jobs: measurement and test jobs import frozen per-job worktrees, never a tree being edited.
