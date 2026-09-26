@@ -1,0 +1,861 @@
+{
+ "terrain": "flat",
+ "contact_cfg": "recommended",
+ "actions": "runs/il3/ckpt/g1_flat_flatcfg_ellip10_it1000.pt",
+ "variant": "lsfloor",
+ "caps": [
+  10,
+  20,
+  40,
+  100
+ ],
+ "points": [
+  {
+   "step": 19,
+   "plain_cap100": {
+    "max_niter": 15,
+    "mean_niter": 3.983642578125,
+    "worlds_at_cap": 0
+   },
+   "pelvis_z_mean": 0.6825399398803711,
+   "pelvis_z_below_0.4": 0,
+   "floor": {
+    "max_dqpos": 0.003183990716934204,
+    "max_dqvel": 0.39764243364334106,
+    "p99_dqvel": 0.0009558796882629395,
+    "median_dqvel": 9.348243474960327e-05,
+    "worlds_dqvel_gt_0.01": 19,
+    "worlds_dqvel_gt_0.1": 7
+   },
+   "plain_cap20": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.983123779296875,
+    "max_niter": 15,
+    "max_dqpos": 0.003184020519256592,
+    "max_dqvel": 0.3975710868835449,
+    "p99_dqvel": 0.0010263293515890837,
+    "median_dqvel": 8.854269981384277e-05,
+    "worlds_dqvel_gt_0.01": 13,
+    "worlds_dqvel_gt_0.1": 4,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap10": {
+    "worlds_hitting_cap": 333,
+    "mean_niter": 3.97003173828125,
+    "max_niter": 10,
+    "max_dqpos": 0.007608860731124878,
+    "max_dqvel": 3.043545722961426,
+    "p99_dqvel": 0.005141922738403082,
+    "median_dqvel": 0.0001043081283569336,
+    "worlds_dqvel_gt_0.01": 30,
+    "worlds_dqvel_gt_0.1": 8,
+    "max_dqvel_in_hitting": 0.3302338123321533
+   },
+   "lsfloor_cap20": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.983489990234375,
+    "max_niter": 15,
+    "max_dqpos": 0.007608860731124878,
+    "max_dqvel": 3.043545722961426,
+    "p99_dqvel": 0.001012736582197249,
+    "median_dqvel": 0.00010075047612190247,
+    "worlds_dqvel_gt_0.01": 18,
+    "worlds_dqvel_gt_0.1": 6,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap40": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.98260498046875,
+    "max_niter": 15,
+    "max_dqpos": 0.007608860731124878,
+    "max_dqvel": 3.043545722961426,
+    "p99_dqvel": 0.0010728358756750822,
+    "median_dqvel": 0.00010216236114501953,
+    "worlds_dqvel_gt_0.01": 20,
+    "worlds_dqvel_gt_0.1": 10,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap100": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.982757568359375,
+    "max_niter": 15,
+    "max_dqpos": 0.007608860731124878,
+    "max_dqvel": 3.043545722961426,
+    "p99_dqvel": 0.0009924412006512284,
+    "median_dqvel": 0.00010628253221511841,
+    "worlds_dqvel_gt_0.01": 14,
+    "worlds_dqvel_gt_0.1": 7,
+    "max_dqvel_in_hitting": null
+   }
+  },
+  {
+   "step": 39,
+   "plain_cap100": {
+    "max_niter": 14,
+    "mean_niter": 3.71612548828125,
+    "worlds_at_cap": 0
+   },
+   "pelvis_z_mean": 0.6863144636154175,
+   "pelvis_z_below_0.4": 0,
+   "floor": {
+    "max_dqpos": 0.0018887631595134735,
+    "max_dqvel": 0.4562322199344635,
+    "p99_dqvel": 0.0011213540565222502,
+    "median_dqvel": 8.649565279483795e-05,
+    "worlds_dqvel_gt_0.01": 13,
+    "worlds_dqvel_gt_0.1": 4
+   },
+   "plain_cap20": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.716644287109375,
+    "max_niter": 14,
+    "max_dqpos": 0.0018887650221586227,
+    "max_dqvel": 0.45623937249183655,
+    "p99_dqvel": 0.0010835409630089998,
+    "median_dqvel": 8.788704872131348e-05,
+    "worlds_dqvel_gt_0.01": 13,
+    "worlds_dqvel_gt_0.1": 4,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap10": {
+    "worlds_hitting_cap": 172,
+    "mean_niter": 3.71148681640625,
+    "max_niter": 10,
+    "max_dqpos": 0.002408444881439209,
+    "max_dqvel": 2.0195374488830566,
+    "p99_dqvel": 0.0016485571395605803,
+    "median_dqvel": 9.678862988948822e-05,
+    "worlds_dqvel_gt_0.01": 17,
+    "worlds_dqvel_gt_0.1": 6,
+    "max_dqvel_in_hitting": 0.364340603351593
+   },
+   "lsfloor_cap20": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.7164306640625,
+    "max_niter": 14,
+    "max_dqpos": 0.002408534288406372,
+    "max_dqvel": 2.0195469856262207,
+    "p99_dqvel": 0.001240372657775879,
+    "median_dqvel": 0.00010000914335250854,
+    "worlds_dqvel_gt_0.01": 16,
+    "worlds_dqvel_gt_0.1": 6,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap40": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.7161865234375,
+    "max_niter": 14,
+    "max_dqpos": 0.013197571039199829,
+    "max_dqvel": 0.456233948469162,
+    "p99_dqvel": 0.0012011431390419602,
+    "median_dqvel": 9.366869926452637e-05,
+    "worlds_dqvel_gt_0.01": 13,
+    "worlds_dqvel_gt_0.1": 7,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap100": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.716766357421875,
+    "max_niter": 14,
+    "max_dqpos": 0.013200581073760986,
+    "max_dqvel": 0.4562393128871918,
+    "p99_dqvel": 0.0011792778968811035,
+    "median_dqvel": 8.996576070785522e-05,
+    "worlds_dqvel_gt_0.01": 16,
+    "worlds_dqvel_gt_0.1": 7,
+    "max_dqvel_in_hitting": null
+   }
+  },
+  {
+   "step": 59,
+   "plain_cap100": {
+    "max_niter": 14,
+    "mean_niter": 3.367095947265625,
+    "worlds_at_cap": 0
+   },
+   "pelvis_z_mean": 0.6897146105766296,
+   "pelvis_z_below_0.4": 0,
+   "floor": {
+    "max_dqpos": 0.0022871047258377075,
+    "max_dqvel": 0.09815293550491333,
+    "p99_dqvel": 0.0011294543510302901,
+    "median_dqvel": 8.955597877502441e-05,
+    "worlds_dqvel_gt_0.01": 10,
+    "worlds_dqvel_gt_0.1": 0
+   },
+   "plain_cap20": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.366668701171875,
+    "max_niter": 14,
+    "max_dqpos": 0.0034651048481464386,
+    "max_dqvel": 0.5430622100830078,
+    "p99_dqvel": 0.0011260450119152665,
+    "median_dqvel": 9.486079216003418e-05,
+    "worlds_dqvel_gt_0.01": 9,
+    "worlds_dqvel_gt_0.1": 1,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap10": {
+    "worlds_hitting_cap": 147,
+    "mean_niter": 3.363311767578125,
+    "max_niter": 10,
+    "max_dqpos": 0.0020337700843811035,
+    "max_dqvel": 0.5054011344909668,
+    "p99_dqvel": 0.0017624497413635254,
+    "median_dqvel": 0.00010585784912109375,
+    "worlds_dqvel_gt_0.01": 18,
+    "worlds_dqvel_gt_0.1": 2,
+    "max_dqvel_in_hitting": 0.0780566930770874
+   },
+   "lsfloor_cap20": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.366241455078125,
+    "max_niter": 14,
+    "max_dqpos": 0.005164943635463715,
+    "max_dqvel": 2.065992832183838,
+    "p99_dqvel": 0.001292061759158969,
+    "median_dqvel": 0.0001074075698852539,
+    "worlds_dqvel_gt_0.01": 12,
+    "worlds_dqvel_gt_0.1": 3,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap40": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.366302490234375,
+    "max_niter": 14,
+    "max_dqpos": 0.0022874027490615845,
+    "max_dqvel": 0.5054011344909668,
+    "p99_dqvel": 0.0011503815185278654,
+    "median_dqvel": 0.00010141357779502869,
+    "worlds_dqvel_gt_0.01": 8,
+    "worlds_dqvel_gt_0.1": 1,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap100": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.366546630859375,
+    "max_niter": 14,
+    "max_dqpos": 0.0022873878479003906,
+    "max_dqvel": 0.5054011344909668,
+    "p99_dqvel": 0.0012045621406286955,
+    "median_dqvel": 0.00010204315185546875,
+    "worlds_dqvel_gt_0.01": 9,
+    "worlds_dqvel_gt_0.1": 1,
+    "max_dqvel_in_hitting": null
+   }
+  },
+  {
+   "step": 79,
+   "plain_cap100": {
+    "max_niter": 16,
+    "mean_niter": 2.99493408203125,
+    "worlds_at_cap": 0
+   },
+   "pelvis_z_mean": 0.6894384622573853,
+   "pelvis_z_below_0.4": 0,
+   "floor": {
+    "max_dqpos": 0.003382474184036255,
+    "max_dqvel": 0.4531517028808594,
+    "p99_dqvel": 0.0012016147375106812,
+    "median_dqvel": 9.769201278686523e-05,
+    "worlds_dqvel_gt_0.01": 14,
+    "worlds_dqvel_gt_0.1": 4
+   },
+   "plain_cap20": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 2.994476318359375,
+    "max_niter": 16,
+    "max_dqpos": 0.001143336296081543,
+    "max_dqvel": 0.45732545852661133,
+    "p99_dqvel": 0.00113002210855484,
+    "median_dqvel": 9.882450103759766e-05,
+    "worlds_dqvel_gt_0.01": 10,
+    "worlds_dqvel_gt_0.1": 3,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap10": {
+    "worlds_hitting_cap": 165,
+    "mean_niter": 2.990631103515625,
+    "max_niter": 10,
+    "max_dqpos": 0.004417747259140015,
+    "max_dqvel": 1.7670352458953857,
+    "p99_dqvel": 0.001917594694532454,
+    "median_dqvel": 0.00010928511619567871,
+    "worlds_dqvel_gt_0.01": 22,
+    "worlds_dqvel_gt_0.1": 7,
+    "max_dqvel_in_hitting": 1.7670352458953857
+   },
+   "lsfloor_cap20": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 2.995147705078125,
+    "max_niter": 16,
+    "max_dqpos": 0.003947630524635315,
+    "max_dqvel": 1.6952242851257324,
+    "p99_dqvel": 0.0013024106156080961,
+    "median_dqvel": 0.0001049041748046875,
+    "worlds_dqvel_gt_0.01": 15,
+    "worlds_dqvel_gt_0.1": 6,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap40": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 2.99432373046875,
+    "max_niter": 16,
+    "max_dqpos": 0.003947630524635315,
+    "max_dqvel": 1.6238007545471191,
+    "p99_dqvel": 0.0013618111843243241,
+    "median_dqvel": 0.00010748207569122314,
+    "worlds_dqvel_gt_0.01": 13,
+    "worlds_dqvel_gt_0.1": 4,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap100": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 2.994354248046875,
+    "max_niter": 16,
+    "max_dqpos": 0.003394871950149536,
+    "max_dqvel": 1.358007550239563,
+    "p99_dqvel": 0.0014535427326336503,
+    "median_dqvel": 0.00010711699724197388,
+    "worlds_dqvel_gt_0.01": 13,
+    "worlds_dqvel_gt_0.1": 5,
+    "max_dqvel_in_hitting": null
+   }
+  },
+  {
+   "step": 99,
+   "plain_cap100": {
+    "max_niter": 16,
+    "mean_niter": 3.306182861328125,
+    "worlds_at_cap": 0
+   },
+   "pelvis_z_mean": 0.6898937821388245,
+   "pelvis_z_below_0.4": 0,
+   "floor": {
+    "max_dqpos": 0.0007825735956430435,
+    "max_dqvel": 0.31299710273742676,
+    "p99_dqvel": 0.0026651143562048674,
+    "median_dqvel": 0.0001044347882270813,
+    "worlds_dqvel_gt_0.01": 6,
+    "worlds_dqvel_gt_0.1": 2
+   },
+   "plain_cap20": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.306549072265625,
+    "max_niter": 14,
+    "max_dqpos": 0.0007823947817087173,
+    "max_dqvel": 0.3129081130027771,
+    "p99_dqvel": 0.002548183547332883,
+    "median_dqvel": 0.00010585784912109375,
+    "worlds_dqvel_gt_0.01": 6,
+    "worlds_dqvel_gt_0.1": 3,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap10": {
+    "worlds_hitting_cap": 219,
+    "mean_niter": 3.299468994140625,
+    "max_niter": 10,
+    "max_dqpos": 0.002547942101955414,
+    "max_dqvel": 0.326652854681015,
+    "p99_dqvel": 0.003725484013557434,
+    "median_dqvel": 0.000122707337141037,
+    "worlds_dqvel_gt_0.01": 22,
+    "worlds_dqvel_gt_0.1": 2,
+    "max_dqvel_in_hitting": 0.17439870536327362
+   },
+   "lsfloor_cap20": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.306243896484375,
+    "max_niter": 16,
+    "max_dqpos": 0.0007254332304000854,
+    "max_dqvel": 0.29017186164855957,
+    "p99_dqvel": 0.002854171907529235,
+    "median_dqvel": 0.00012150406837463379,
+    "worlds_dqvel_gt_0.01": 7,
+    "worlds_dqvel_gt_0.1": 2,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap40": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.3067626953125,
+    "max_niter": 16,
+    "max_dqpos": 0.0007254332304000854,
+    "max_dqvel": 0.2901719808578491,
+    "p99_dqvel": 0.003127510193735361,
+    "median_dqvel": 0.00012159347534179688,
+    "worlds_dqvel_gt_0.01": 9,
+    "worlds_dqvel_gt_0.1": 3,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap100": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.306304931640625,
+    "max_niter": 15,
+    "max_dqpos": 0.0005403719842433929,
+    "max_dqvel": 0.06204621493816376,
+    "p99_dqvel": 0.0029093027114868164,
+    "median_dqvel": 0.00011837482452392578,
+    "worlds_dqvel_gt_0.01": 9,
+    "worlds_dqvel_gt_0.1": 0,
+    "max_dqvel_in_hitting": null
+   }
+  },
+  {
+   "step": 119,
+   "plain_cap100": {
+    "max_niter": 16,
+    "mean_niter": 3.949951171875,
+    "worlds_at_cap": 0
+   },
+   "pelvis_z_mean": 0.6893640756607056,
+   "pelvis_z_below_0.4": 0,
+   "floor": {
+    "max_dqpos": 0.001643449068069458,
+    "max_dqvel": 0.6573169231414795,
+    "p99_dqvel": 0.0029090524185448885,
+    "median_dqvel": 9.85264778137207e-05,
+    "worlds_dqvel_gt_0.01": 11,
+    "worlds_dqvel_gt_0.1": 4
+   },
+   "plain_cap20": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.95111083984375,
+    "max_niter": 16,
+    "max_dqpos": 0.00537601113319397,
+    "max_dqvel": 2.1504335403442383,
+    "p99_dqvel": 0.0021539211738854647,
+    "median_dqvel": 0.00010156631469726562,
+    "worlds_dqvel_gt_0.01": 10,
+    "worlds_dqvel_gt_0.1": 3,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap10": {
+    "worlds_hitting_cap": 384,
+    "mean_niter": 3.936492919921875,
+    "max_niter": 10,
+    "max_dqpos": 0.006262540817260742,
+    "max_dqvel": 2.150434970855713,
+    "p99_dqvel": 0.005992793943732977,
+    "median_dqvel": 0.00011783838272094727,
+    "worlds_dqvel_gt_0.01": 32,
+    "worlds_dqvel_gt_0.1": 9,
+    "max_dqvel_in_hitting": 0.3506808280944824
+   },
+   "lsfloor_cap20": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.950042724609375,
+    "max_niter": 16,
+    "max_dqpos": 0.009909197688102722,
+    "max_dqvel": 2.1504344940185547,
+    "p99_dqvel": 0.002781689167022705,
+    "median_dqvel": 0.00011144578456878662,
+    "worlds_dqvel_gt_0.01": 11,
+    "worlds_dqvel_gt_0.1": 7,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap40": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.950927734375,
+    "max_niter": 16,
+    "max_dqpos": 0.0022667646408081055,
+    "max_dqvel": 0.9072003364562988,
+    "p99_dqvel": 0.0027529834769666195,
+    "median_dqvel": 0.00010879337787628174,
+    "worlds_dqvel_gt_0.01": 14,
+    "worlds_dqvel_gt_0.1": 5,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap100": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.95062255859375,
+    "max_niter": 16,
+    "max_dqpos": 0.0022667646408081055,
+    "max_dqvel": 0.9072000980377197,
+    "p99_dqvel": 0.0026446108240634203,
+    "median_dqvel": 0.00010862201452255249,
+    "worlds_dqvel_gt_0.01": 9,
+    "worlds_dqvel_gt_0.1": 5,
+    "max_dqvel_in_hitting": null
+   }
+  },
+  {
+   "step": 139,
+   "plain_cap100": {
+    "max_niter": 16,
+    "mean_niter": 3.980499267578125,
+    "worlds_at_cap": 0
+   },
+   "pelvis_z_mean": 0.6883760094642639,
+   "pelvis_z_below_0.4": 0,
+   "floor": {
+    "max_dqpos": 0.0043792640790343285,
+    "max_dqvel": 0.40756893157958984,
+    "p99_dqvel": 0.0013152271276339889,
+    "median_dqvel": 9.593367576599121e-05,
+    "worlds_dqvel_gt_0.01": 25,
+    "worlds_dqvel_gt_0.1": 7
+   },
+   "plain_cap20": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.980865478515625,
+    "max_niter": 16,
+    "max_dqpos": 0.003148406744003296,
+    "max_dqvel": 1.2593631744384766,
+    "p99_dqvel": 0.0014776348834857345,
+    "median_dqvel": 9.432435035705566e-05,
+    "worlds_dqvel_gt_0.01": 28,
+    "worlds_dqvel_gt_0.1": 8,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap10": {
+    "worlds_hitting_cap": 385,
+    "mean_niter": 3.96612548828125,
+    "max_niter": 10,
+    "max_dqpos": 0.004379482939839363,
+    "max_dqvel": 0.3127291202545166,
+    "p99_dqvel": 0.011445081792771816,
+    "median_dqvel": 0.0001131296157836914,
+    "worlds_dqvel_gt_0.01": 46,
+    "worlds_dqvel_gt_0.1": 6,
+    "max_dqvel_in_hitting": 0.2597121000289917
+   },
+   "lsfloor_cap20": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.98095703125,
+    "max_niter": 16,
+    "max_dqpos": 0.003148317337036133,
+    "max_dqvel": 1.2593271732330322,
+    "p99_dqvel": 0.0013462305068969727,
+    "median_dqvel": 0.00010482966899871826,
+    "worlds_dqvel_gt_0.01": 21,
+    "worlds_dqvel_gt_0.1": 6,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap40": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.9815673828125,
+    "max_niter": 16,
+    "max_dqpos": 0.0043793050572276115,
+    "max_dqvel": 1.2593538761138916,
+    "p99_dqvel": 0.0013561726082116365,
+    "median_dqvel": 0.00010389089584350586,
+    "worlds_dqvel_gt_0.01": 21,
+    "worlds_dqvel_gt_0.1": 6,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap100": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.980987548828125,
+    "max_niter": 16,
+    "max_dqpos": 0.004379645921289921,
+    "max_dqvel": 0.31272971630096436,
+    "p99_dqvel": 0.001309168292209506,
+    "median_dqvel": 9.47117805480957e-05,
+    "worlds_dqvel_gt_0.01": 18,
+    "worlds_dqvel_gt_0.1": 5,
+    "max_dqvel_in_hitting": null
+   }
+  },
+  {
+   "step": 159,
+   "plain_cap100": {
+    "max_niter": 15,
+    "mean_niter": 3.91009521484375,
+    "worlds_at_cap": 0
+   },
+   "pelvis_z_mean": 0.6873767375946045,
+   "pelvis_z_below_0.4": 0,
+   "floor": {
+    "max_dqpos": 0.0028085261583328247,
+    "max_dqvel": 1.1228617429733276,
+    "p99_dqvel": 0.0010793253313750029,
+    "median_dqvel": 9.988248348236084e-05,
+    "worlds_dqvel_gt_0.01": 15,
+    "worlds_dqvel_gt_0.1": 8
+   },
+   "plain_cap20": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.908233642578125,
+    "max_niter": 15,
+    "max_dqpos": 0.002480338327586651,
+    "max_dqvel": 0.8236474990844727,
+    "p99_dqvel": 0.0010475612943992019,
+    "median_dqvel": 9.924173355102539e-05,
+    "worlds_dqvel_gt_0.01": 12,
+    "worlds_dqvel_gt_0.1": 5,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap10": {
+    "worlds_hitting_cap": 368,
+    "mean_niter": 3.894989013671875,
+    "max_niter": 10,
+    "max_dqpos": 0.0028915032744407654,
+    "max_dqvel": 0.8236937522888184,
+    "p99_dqvel": 0.007881605997681618,
+    "median_dqvel": 0.00010517239570617676,
+    "worlds_dqvel_gt_0.01": 41,
+    "worlds_dqvel_gt_0.1": 13,
+    "max_dqvel_in_hitting": 0.19826316833496094
+   },
+   "lsfloor_cap20": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.908905029296875,
+    "max_niter": 15,
+    "max_dqpos": 0.0011613019742071629,
+    "max_dqvel": 0.34914731979370117,
+    "p99_dqvel": 0.0011371851433068514,
+    "median_dqvel": 0.00011083483695983887,
+    "worlds_dqvel_gt_0.01": 11,
+    "worlds_dqvel_gt_0.1": 4,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap40": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.908447265625,
+    "max_niter": 15,
+    "max_dqpos": 0.0024804621934890747,
+    "max_dqvel": 0.8237342834472656,
+    "p99_dqvel": 0.0010962605010718107,
+    "median_dqvel": 0.0001049041748046875,
+    "worlds_dqvel_gt_0.01": 14,
+    "worlds_dqvel_gt_0.1": 7,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap100": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.90899658203125,
+    "max_niter": 15,
+    "max_dqpos": 0.0026587992906570435,
+    "max_dqvel": 0.8237228393554688,
+    "p99_dqvel": 0.0010657429229468107,
+    "median_dqvel": 0.00010591745376586914,
+    "worlds_dqvel_gt_0.01": 13,
+    "worlds_dqvel_gt_0.1": 7,
+    "max_dqvel_in_hitting": null
+   }
+  },
+  {
+   "step": 179,
+   "plain_cap100": {
+    "max_niter": 16,
+    "mean_niter": 3.786468505859375,
+    "worlds_at_cap": 0
+   },
+   "pelvis_z_mean": 0.6869148015975952,
+   "pelvis_z_below_0.4": 0,
+   "floor": {
+    "max_dqpos": 0.001638907939195633,
+    "max_dqvel": 0.22892773151397705,
+    "p99_dqvel": 0.0010713547235354781,
+    "median_dqvel": 9.697675704956055e-05,
+    "worlds_dqvel_gt_0.01": 14,
+    "worlds_dqvel_gt_0.1": 4
+   },
+   "plain_cap20": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.786285400390625,
+    "max_niter": 16,
+    "max_dqpos": 0.003676682710647583,
+    "max_dqvel": 1.4710530042648315,
+    "p99_dqvel": 0.001163530396297574,
+    "median_dqvel": 9.515881538391113e-05,
+    "worlds_dqvel_gt_0.01": 21,
+    "worlds_dqvel_gt_0.1": 8,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap10": {
+    "worlds_hitting_cap": 324,
+    "mean_niter": 3.778045654296875,
+    "max_niter": 10,
+    "max_dqpos": 0.006235063076019287,
+    "max_dqvel": 0.49936747550964355,
+    "p99_dqvel": 0.002559848828241229,
+    "median_dqvel": 0.00010800361633300781,
+    "worlds_dqvel_gt_0.01": 23,
+    "worlds_dqvel_gt_0.1": 7,
+    "max_dqvel_in_hitting": 0.16227936744689941
+   },
+   "lsfloor_cap20": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.786590576171875,
+    "max_niter": 16,
+    "max_dqpos": 0.0016387328505516052,
+    "max_dqvel": 0.22891086339950562,
+    "p99_dqvel": 0.0012064457405358553,
+    "median_dqvel": 0.00010514259338378906,
+    "worlds_dqvel_gt_0.01": 16,
+    "worlds_dqvel_gt_0.1": 8,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap40": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.786956787109375,
+    "max_niter": 16,
+    "max_dqpos": 0.0016386695206165314,
+    "max_dqvel": 0.5061823725700378,
+    "p99_dqvel": 0.001299738883972168,
+    "median_dqvel": 0.00010526180267333984,
+    "worlds_dqvel_gt_0.01": 13,
+    "worlds_dqvel_gt_0.1": 6,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap100": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.78668212890625,
+    "max_niter": 16,
+    "max_dqpos": 0.001638665795326233,
+    "max_dqvel": 0.2289118766784668,
+    "p99_dqvel": 0.0012313127517700195,
+    "median_dqvel": 0.00010727345943450928,
+    "worlds_dqvel_gt_0.01": 12,
+    "worlds_dqvel_gt_0.1": 4,
+    "max_dqvel_in_hitting": null
+   }
+  },
+  {
+   "step": 199,
+   "plain_cap100": {
+    "max_niter": 14,
+    "mean_niter": 3.24853515625,
+    "worlds_at_cap": 0
+   },
+   "pelvis_z_mean": 0.6864712238311768,
+   "pelvis_z_below_0.4": 0,
+   "floor": {
+    "max_dqpos": 0.007673583924770355,
+    "max_dqvel": 1.1529269218444824,
+    "p99_dqvel": 0.00152759556658566,
+    "median_dqvel": 9.678304195404053e-05,
+    "worlds_dqvel_gt_0.01": 21,
+    "worlds_dqvel_gt_0.1": 7
+   },
+   "plain_cap20": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.2489013671875,
+    "max_niter": 14,
+    "max_dqpos": 0.0076749809086322784,
+    "max_dqvel": 1.1529269218444824,
+    "p99_dqvel": 0.0015431076753884554,
+    "median_dqvel": 9.918212890625e-05,
+    "worlds_dqvel_gt_0.01": 21,
+    "worlds_dqvel_gt_0.1": 7,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap10": {
+    "worlds_hitting_cap": 222,
+    "mean_niter": 3.24481201171875,
+    "max_niter": 10,
+    "max_dqpos": 0.0059817880392074585,
+    "max_dqvel": 0.8643677830696106,
+    "p99_dqvel": 0.002936342265456915,
+    "median_dqvel": 0.00010588765144348145,
+    "worlds_dqvel_gt_0.01": 33,
+    "worlds_dqvel_gt_0.1": 6,
+    "max_dqvel_in_hitting": 0.16294360160827637
+   },
+   "lsfloor_cap20": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.249298095703125,
+    "max_niter": 14,
+    "max_dqpos": 0.0059822723269462585,
+    "max_dqvel": 0.8643674850463867,
+    "p99_dqvel": 0.0015901804435998201,
+    "median_dqvel": 0.00010603666305541992,
+    "worlds_dqvel_gt_0.01": 21,
+    "worlds_dqvel_gt_0.1": 4,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap40": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.248443603515625,
+    "max_niter": 14,
+    "max_dqpos": 0.0059817880392074585,
+    "max_dqvel": 1.1529271602630615,
+    "p99_dqvel": 0.0015617251629009843,
+    "median_dqvel": 0.00010454654693603516,
+    "worlds_dqvel_gt_0.01": 21,
+    "worlds_dqvel_gt_0.1": 4,
+    "max_dqvel_in_hitting": null
+   },
+   "lsfloor_cap100": {
+    "worlds_hitting_cap": 0,
+    "mean_niter": 3.24853515625,
+    "max_niter": 14,
+    "max_dqpos": 0.0059817880392074585,
+    "max_dqvel": 1.1529269218444824,
+    "p99_dqvel": 0.0017461419338360429,
+    "median_dqvel": 0.00010788440704345703,
+    "worlds_dqvel_gt_0.01": 22,
+    "worlds_dqvel_gt_0.1": 5,
+    "max_dqvel_in_hitting": null
+   }
+  }
+ ],
+ "summary_floor": {
+  "p99_dqvel_max": 0.0029090524185448885,
+  "p99_dqvel_mean": 0.0014975972357206047,
+  "median_dqvel_max": 0.0001044347882270813,
+  "max_dqvel": 1.1529269218444824,
+  "worlds_dqvel_gt_0.01_mean": 14.8,
+  "worlds_dqvel_gt_0.1_mean": 4.7
+ },
+ "summary_plain_cap20": {
+  "p99_dqvel_max": 0.002548183547332883,
+  "p99_dqvel_mean": 0.0014299876405857504,
+  "median_dqvel_max": 0.00010585784912109375,
+  "max_dqvel": 2.1504335403442383,
+  "worlds_dqvel_gt_0.01_mean": 14.3,
+  "worlds_dqvel_gt_0.1_mean": 4.6,
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "mean_niter": 3.624285888671875,
+  "max_niter": 16
+ },
+ "summary_lsfloor_cap10": {
+  "p99_dqvel_max": 0.011445081792771816,
+  "p99_dqvel_mean": 0.004501168115530163,
+  "median_dqvel_max": 0.000122707337141037,
+  "max_dqvel": 3.043545722961426,
+  "worlds_dqvel_gt_0.01_mean": 28.4,
+  "worlds_dqvel_gt_0.1_mean": 6.6,
+  "worlds_hitting_cap_mean_per_step": 271.9,
+  "mean_niter": 3.61553955078125,
+  "max_niter": 10
+ },
+ "summary_lsfloor_cap20": {
+  "p99_dqvel_max": 0.002854171907529235,
+  "p99_dqvel_mean": 0.0015763484523631632,
+  "median_dqvel_max": 0.00012150406837463379,
+  "max_dqvel": 3.043545722961426,
+  "worlds_dqvel_gt_0.01_mean": 14.8,
+  "worlds_dqvel_gt_0.1_mean": 5.2,
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "mean_niter": 3.624334716796875,
+  "max_niter": 16
+ },
+ "summary_lsfloor_cap40": {
+  "p99_dqvel_max": 0.003127510193735361,
+  "p99_dqvel_mean": 0.0015980562544427811,
+  "median_dqvel_max": 0.00012159347534179688,
+  "max_dqvel": 3.043545722961426,
+  "worlds_dqvel_gt_0.01_mean": 14.6,
+  "worlds_dqvel_gt_0.1_mean": 5.3,
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "mean_niter": 3.6242523193359375,
+  "max_niter": 16
+ },
+ "summary_lsfloor_cap100": {
+  "p99_dqvel_max": 0.0029093027114868164,
+  "p99_dqvel_mean": 0.0015736103407107294,
+  "median_dqvel_max": 0.00011837482452392578,
+  "max_dqvel": 3.043545722961426,
+  "worlds_dqvel_gt_0.01_mean": 13.5,
+  "worlds_dqvel_gt_0.1_mean": 4.6,
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "mean_niter": 3.62425537109375,
+  "max_niter": 16
+ },
+ "summary_plain_cap100": {
+  "mean_niter": 3.62435302734375,
+  "max_niter": 16
+ }
+}

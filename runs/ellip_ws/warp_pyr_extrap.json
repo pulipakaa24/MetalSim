@@ -1,0 +1,79 @@
+[
+ {
+  "engine": "warp_cpu",
+  "cone": "pyramidal",
+  "impratio": 1.0,
+  "variant": "extrap",
+  "worlds": 128,
+  "substeps": 8,
+  "snapshots": [
+   2,
+   10,
+   30,
+   60,
+   100,
+   150,
+   200,
+   300,
+   399
+  ],
+  "cap": 100,
+  "seconds": 1.4,
+  "niter": {
+   "count": 9216,
+   "mean": 1.9773220486111112,
+   "p50": 2.0,
+   "p90": 4.0,
+   "p99": 6.0,
+   "max": 9,
+   "frac_ge10": 0.0,
+   "frac_ge20": 0.0,
+   "frac_eq0": 0.0,
+   "frac_le2": 0.7490234375
+  },
+  "niter_first_substep": {
+   "count": 1152,
+   "mean": 3.0477430555555554,
+   "p50": 3.0,
+   "p90": 5.0,
+   "p99": 7.0,
+   "max": 9,
+   "frac_ge10": 0.0,
+   "frac_ge20": 0.0,
+   "frac_eq0": 0.0,
+   "frac_le2": 0.4149305555555556
+  },
+  "niter_later_substeps": {
+   "count": 8064,
+   "mean": 1.8244047619047619,
+   "p50": 2.0,
+   "p90": 3.0,
+   "p99": 5.0,
+   "max": 8,
+   "frac_ge10": 0.0,
+   "frac_ge20": 0.0,
+   "frac_eq0": 0.0,
+   "frac_le2": 0.7967509920634921
+  },
+  "cone_rows_at_start_mean": 0.0,
+  "cone_rows_at_start_frac_of_elliptic": 0.0,
+  "elliptic_rows_mean": 0.0,
+  "cone_rows_iter1_mean": 0.0,
+  "worlds_with_cone_rows_iter1_frac": 0.0,
+  "quad_flips_iter1_mean": 2.8289930555555554,
+  "worlds_alive_by_iteration_first_substep": [
+   118.11111111111111,
+   74.88888888888889,
+   39.666666666666664,
+   18.22222222222222,
+   7.333333333333333,
+   2.7777777777777777,
+   1.1428571428571428,
+   0.5,
+   0.0
+  ],
+  "env": {
+   "MJW_FUSE_H_CHOLESKY_CPU": "1"
+  }
+ }
+]

@@ -1,0 +1,124 @@
+=== start Sat Sep 26 12:19:28 PDT 2026 frozen warp 6bceb39d mjw 12cc1e2
+--- policy states 12:19:28
+ "summary_plain_cap20": {
+  "p99_dqvel_max": 0.002548183547332883,
+  "p99_dqvel_mean": 0.0014299876405857504,
+  "median_dqvel_max": 0.00010585784912109375,
+  "max_dqvel": 2.1504335403442383,
+  "worlds_dqvel_gt_0.01_mean": 14.3,
+  "worlds_dqvel_gt_0.1_mean": 4.6,
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "mean_niter": 3.624285888671875,
+  "max_niter": 16
+ },
+ "summary_lsfloor_cap10": {
+  "p99_dqvel_max": 0.011445081792771816,
+  "p99_dqvel_mean": 0.004501168115530163,
+  "median_dqvel_max": 0.000122707337141037,
+  "max_dqvel": 3.043545722961426,
+  "worlds_dqvel_gt_0.01_mean": 28.4,
+  "worlds_dqvel_gt_0.1_mean": 6.6,
+  "worlds_hitting_cap_mean_per_step": 271.9,
+  "mean_niter": 3.61553955078125,
+  "max_niter": 10
+ },
+ "summary_lsfloor_cap20": {
+  "p99_dqvel_max": 0.002854171907529235,
+  "p99_dqvel_mean": 0.0015763484523631632,
+  "median_dqvel_max": 0.00012150406837463379,
+  "max_dqvel": 3.043545722961426,
+  "worlds_dqvel_gt_0.01_mean": 14.8,
+  "worlds_dqvel_gt_0.1_mean": 5.2,
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "mean_niter": 3.624334716796875,
+  "max_niter": 16
+ },
+ "summary_lsfloor_cap40": {
+  "p99_dqvel_max": 0.003127510193735361,
+  "p99_dqvel_mean": 0.0015980562544427811,
+  "median_dqvel_max": 0.00012159347534179688,
+  "max_dqvel": 3.043545722961426,
+  "worlds_dqvel_gt_0.01_mean": 14.6,
+  "worlds_dqvel_gt_0.1_mean": 5.3,
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "mean_niter": 3.6242523193359375,
+  "max_niter": 16
+ },
+ "summary_lsfloor_cap100": {
+  "p99_dqvel_max": 0.0029093027114868164,
+  "p99_dqvel_mean": 0.0015736103407107294,
+  "median_dqvel_max": 0.00011837482452392578,
+  "max_dqvel": 3.043545722961426,
+  "worlds_dqvel_gt_0.01_mean": 13.5,
+  "worlds_dqvel_gt_0.1_mean": 4.6,
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "mean_niter": 3.62425537109375,
+  "max_niter": 16
+ },
+ "summary_plain_cap100": {
+  "mean_niter": 3.62435302734375,
+  "max_niter": 16
+ }
+}
+--- random actions 12:21:03
+ "summary_plain_cap20": {
+  "p99_dqvel_max": 0.0014782905345782638,
+  "p99_dqvel_mean": 0.0010352896235417575,
+  "median_dqvel_max": 1.5348196029663086e-05,
+  "max_dqvel": 3.682417392730713,
+  "worlds_dqvel_gt_0.01_mean": 6.5,
+  "worlds_dqvel_gt_0.1_mean": 5.1,
+  "worlds_hitting_cap_mean_per_step": 3.9,
+  "mean_niter": 3.8631622314453127,
+  "max_niter": 20
+ },
+ "summary_lsfloor_cap10": {
+  "p99_dqvel_max": 0.1306535005569458,
+  "p99_dqvel_mean": 0.08481455966830254,
+  "median_dqvel_max": 7.468461990356445e-05,
+  "max_dqvel": 6.266608238220215,
+  "worlds_dqvel_gt_0.01_mean": 103.5,
+  "worlds_dqvel_gt_0.1_mean": 37.7,
+  "worlds_hitting_cap_mean_per_step": 542.3,
+  "mean_niter": 3.832965087890625,
+  "max_niter": 10
+ },
+ "summary_lsfloor_cap20": {
+  "p99_dqvel_max": 0.00195218320004642,
+  "p99_dqvel_mean": 0.0013116264366544784,
+  "median_dqvel_max": 6.67572021484375e-05,
+  "max_dqvel": 4.023995876312256,
+  "worlds_dqvel_gt_0.01_mean": 9.5,
+  "worlds_dqvel_gt_0.1_mean": 6.3,
+  "worlds_hitting_cap_mean_per_step": 4.2,
+  "mean_niter": 3.8630126953125,
+  "max_niter": 20
+ },
+ "summary_lsfloor_cap40": {
+  "p99_dqvel_max": 0.002437606453895569,
+  "p99_dqvel_mean": 0.0013390672276727856,
+  "median_dqvel_max": 6.628036499023438e-05,
+  "max_dqvel": 4.023995876312256,
+  "worlds_dqvel_gt_0.01_mean": 9.4,
+  "worlds_dqvel_gt_0.1_mean": 7.2,
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "mean_niter": 3.8639862060546877,
+  "max_niter": 27
+ },
+ "summary_lsfloor_cap100": {
+  "p99_dqvel_max": 0.002216637134552002,
+  "p99_dqvel_mean": 0.001322595472447574,
+  "median_dqvel_max": 6.654858589172363e-05,
+  "max_dqvel": 4.023995876312256,
+  "worlds_dqvel_gt_0.01_mean": 8.5,
+  "worlds_dqvel_gt_0.1_mean": 6.4,
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "mean_niter": 3.8633819580078126,
+  "max_niter": 27
+ },
+ "summary_plain_cap100": {
+  "mean_niter": 3.8634979248046877,
+  "max_niter": 27
+ }
+}
+=== end Sat Sep 26 12:22:20 PDT 2026

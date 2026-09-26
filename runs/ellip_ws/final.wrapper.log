@@ -1,0 +1,57 @@
+[gpu_run] ellip_ws_final start: device utilisation 0% (12:03:01)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   2.1 %
+=== start Sat Sep 26 12:03:04 PDT 2026 metalsim b7080fb frozen warp 6bceb39d mjw 433c305 power: Now drawing from 'AC Power'
+--- P1 pyramidal cap 10 12:03:04
+[P1_pyr_cap10] N=4096 njmax 144 naconmax 98304 is_sparse False
+[P1_pyr_cap10] physics only 39.7 ms/step -> 103,167 env-steps/s
+[P1_pyr_cap10] full env step 65.3 ms -> 62,710 env-steps/s
+[P1_pyr_cap10] after random-action steps: nefc max 39 mean 14.6; nacon 11246 (2.75/world); overflow {'ITERATIONS': 25, 'LS_ITERATIONS': 3900}
+[P1_pyr_cap10] rollout + inference 65.3 ms/step -> 62,717 env-steps/s
+[P1_pyr_cap10] PPO update 143 ms -> full loop 57,472 env-steps/s
+[P1_pyr_cap10] SUMMARY physics 103,167 | step 62,710 | rollout 62,717 | loop 57,472  (ms: physics 39.7, step 65.3, rollout/step 65.3, update 143)
+--- E0_1 elliptic ellip10 cap 20 12:03:34
+[E0_1_ellip10_cap20] N=4096 njmax 112 naconmax 98304 is_sparse False
+[E0_1_ellip10_cap20] physics only 47.7 ms/step -> 85,888 env-steps/s
+[E0_1_ellip10_cap20] full env step 98.0 ms -> 41,779 env-steps/s
+[E0_1_ellip10_cap20] after random-action steps: nefc max 33 mean 11.7; nacon 11039 (2.70/world); overflow {'ITERATIONS': 1, 'LS_ITERATIONS': 3883}
+[E0_1_ellip10_cap20] rollout + inference 103.8 ms/step -> 39,461 env-steps/s
+[E0_1_ellip10_cap20] PPO update 144 ms -> full loop 37,303 env-steps/s
+[E0_1_ellip10_cap20] SUMMARY physics 85,888 | step 41,779 | rollout 39,461 | loop 37,303  (ms: physics 47.7, step 98.0, rollout/step 103.8, update 144)
+--- E8_1 elliptic ellip10 cap 20, LS floor 8 12:04:12
+[E8_1_ellip10_cap20_ls8] N=4096 njmax 112 naconmax 98304 is_sparse False
+[E8_1_ellip10_cap20_ls8] physics only 47.7 ms/step -> 85,870 env-steps/s
+[E8_1_ellip10_cap20_ls8] full env step 95.7 ms -> 42,820 env-steps/s
+[E8_1_ellip10_cap20_ls8] after random-action steps: nefc max 29 mean 11.6; nacon 11135 (2.72/world); overflow {'ITERATIONS': 1, 'LS_ITERATIONS': 3458}
+[E8_1_ellip10_cap20_ls8] rollout + inference 101.4 ms/step -> 40,413 env-steps/s
+[E8_1_ellip10_cap20_ls8] PPO update 150 ms -> full loop 38,072 env-steps/s
+[E8_1_ellip10_cap20_ls8] SUMMARY physics 85,870 | step 42,820 | rollout 40,413 | loop 38,072  (ms: physics 47.7, step 95.7, rollout/step 101.4, update 150)
+--- P2 pyramidal cap 10 12:04:46
+[P2_pyr_cap10] N=4096 njmax 144 naconmax 98304 is_sparse False
+[P2_pyr_cap10] physics only 39.9 ms/step -> 102,710 env-steps/s
+[P2_pyr_cap10] full env step 65.3 ms -> 62,683 env-steps/s
+[P2_pyr_cap10] after random-action steps: nefc max 42 mean 14.5; nacon 11236 (2.74/world); overflow {'ITERATIONS': 36, 'LS_ITERATIONS': 3906}
+[P2_pyr_cap10] rollout + inference 65.6 ms/step -> 62,480 env-steps/s
+[P2_pyr_cap10] PPO update 154 ms -> full loop 56,899 env-steps/s
+[P2_pyr_cap10] SUMMARY physics 102,710 | step 62,683 | rollout 62,480 | loop 56,899  (ms: physics 39.9, step 65.3, rollout/step 65.6, update 154)
+--- E0_2 elliptic ellip10 cap 20 12:05:10
+[E0_2_ellip10_cap20] N=4096 njmax 112 naconmax 98304 is_sparse False
+[E0_2_ellip10_cap20] physics only 47.8 ms/step -> 85,692 env-steps/s
+[E0_2_ellip10_cap20] full env step 97.5 ms -> 42,010 env-steps/s
+[E0_2_ellip10_cap20] after random-action steps: nefc max 29 mean 11.7; nacon 11121 (2.72/world); overflow {'ITERATIONS': 1, 'LS_ITERATIONS': 3881}
+[E0_2_ellip10_cap20] rollout + inference 102.7 ms/step -> 39,874 env-steps/s
+[E0_2_ellip10_cap20] PPO update 143 ms -> full loop 37,693 env-steps/s
+[E0_2_ellip10_cap20] SUMMARY physics 85,692 | step 42,010 | rollout 39,874 | loop 37,693  (ms: physics 47.8, step 97.5, rollout/step 102.7, update 143)
+--- E8_2 elliptic ellip10 cap 20, LS floor 8 12:05:44
+[E8_2_ellip10_cap20_ls8] N=4096 njmax 112 naconmax 98304 is_sparse False
+[E8_2_ellip10_cap20_ls8] physics only 47.5 ms/step -> 86,266 env-steps/s
+[E8_2_ellip10_cap20_ls8] full env step 95.0 ms -> 43,094 env-steps/s
+[E8_2_ellip10_cap20_ls8] after random-action steps: nefc max 31 mean 11.8; nacon 11282 (2.75/world); overflow {'LS_ITERATIONS': 3482}
+[E8_2_ellip10_cap20_ls8] rollout + inference 101.2 ms/step -> 40,473 env-steps/s
+[E8_2_ellip10_cap20_ls8] PPO update 144 ms -> full loop 38,207 env-steps/s
+[E8_2_ellip10_cap20_ls8] SUMMARY physics 86,266 | step 43,094 | rollout 40,473 | loop 38,207  (ms: physics 47.5, step 95.0, rollout/step 101.2, update 144)
+=== end Sat Sep 26 12:06:18 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] ellip_ws_final end: device utilisation 0% (12:06:18), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   2.0 %
+lock held by ellip_ws_probe, not ellip_ws_final; not released

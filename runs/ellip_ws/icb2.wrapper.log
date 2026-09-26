@@ -1,0 +1,137 @@
+[gpu_run] ellip_ws_icb2 start: device utilisation 0% (12:00:21)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+=== start Sat Sep 26 12:00:24 PDT 2026 metalsim b7080fb frozen warp 6bceb39d mjw 12cc1e2 power: Now drawing from 'AC Power'
+--- (b) check: early exit off (reference) 12:00:24
+=== variant {'label': 'icb off'}; N=512, 50 control steps, deterministic actions
+njmax 112 naconmax 12288 sparse False
+--- floor: two graph-replay instances of this configuration
+   step    1: qpos max 2.24e-06 median 0.0e+00 | obs max 1.03e-03 | rew max 6.82e-06
+   step    2: qpos max 2.30e-05 median 0.0e+00 | obs max 9.21e-03 | rew max 2.92e-05
+   step    5: qpos max 2.34e-02 median 2.8e-08 | obs max 8.31e-01 | rew max 1.61e-03
+   step   10: qpos max 2.66e-02 median 8.9e-08 | obs max 1.07e+00 | rew max 1.94e-03
+   step   20: qpos max 6.52e-02 median 2.1e-07 | obs max 4.91e+00 | rew max 1.17e-02
+   step   30: qpos max 1.30e-01 median 3.6e-07 | obs max 7.77e+00 | rew max 1.03e-02
+   step   40: qpos max 9.15e-01 median 2.4e-07 | obs max 1.16e+01 | rew max 4.03e+00
+   step   50: qpos max 1.57e+00 median 1.2e-07 | obs max 1.34e+01 | rew max 4.01e+00
+--- graph replay vs eager launches (same configuration)
+   step    1: qpos max 3.43e-06 median 0.0e+00 | obs max 1.37e-03 | rew max 6.73e-06
+   step    2: qpos max 1.31e-05 median 0.0e+00 | obs max 3.83e-03 | rew max 2.44e-05
+   step    5: qpos max 2.33e-03 median 3.0e-08 | obs max 4.46e-01 | rew max 2.27e-04
+   step   10: qpos max 1.54e-02 median 8.9e-08 | obs max 1.60e+00 | rew max 8.94e-04
+   step   20: qpos max 4.96e-02 median 2.2e-07 | obs max 1.21e+01 | rew max 1.17e-02
+   step   30: qpos max 1.36e-01 median 3.6e-07 | obs max 7.77e+00 | rew max 4.28e-02
+   step   40: qpos max 1.52e+00 median 2.4e-07 | obs max 6.93e+00 | rew max 1.71e-02
+   step   50: qpos max 1.57e+00 median 1.2e-07 | obs max 1.34e+01 | rew max 4.01e+00
+capacity replay: nefc max 28 (njmax 112), nacon max 1319 (naconmax 12288); overflow {'ITERATIONS': 11, 'LS_ITERATIONS': 478}
+capacity replay 2: nefc max 28 (njmax 112), nacon max 1318 (naconmax 12288); overflow {'ITERATIONS': 11, 'LS_ITERATIONS': 479}
+capacity eager: nefc max 28 (njmax 112), nacon max 1319 (naconmax 12288); overflow {'ITERATIONS': 9, 'LS_ITERATIONS': 482}
+--- physics protocol vs MuJoCo C (4 worlds: PD hold + fixed random targets; |dq| max / median)
+=== done
+--- (b) check: early exit on vs off 12:00:39
+=== variant {'label': 'icb on'}; N=512, 50 control steps, deterministic actions
+njmax 112 naconmax 12288 sparse False
+--- floor: two graph-replay instances of this configuration
+   step    1: qpos max 1.79e-06 median 0.0e+00 | obs max 5.56e-04 | rew max 4.49e-06
+   step    2: qpos max 5.03e-05 median 0.0e+00 | obs max 9.26e-04 | rew max 4.32e-06
+   step    5: qpos max 2.34e-02 median 3.0e-08 | obs max 8.31e-01 | rew max 3.34e-03
+   step   10: qpos max 2.66e-02 median 8.9e-08 | obs max 2.05e+00 | rew max 3.49e-03
+   step   20: qpos max 6.52e-02 median 2.1e-07 | obs max 4.95e+00 | rew max 8.87e-03
+   step   30: qpos max 3.36e-01 median 3.6e-07 | obs max 1.51e+01 | rew max 1.26e-02
+   step   40: qpos max 9.15e-01 median 2.5e-07 | obs max 1.16e+01 | rew max 4.03e+00
+   step   50: qpos max 1.54e+00 median 1.2e-07 | obs max 1.73e+01 | rew max 3.96e+00
+--- graph replay vs eager launches (same configuration)
+   step    1: qpos max 2.73e-06 median 0.0e+00 | obs max 9.81e-04 | rew max 4.45e-06
+   step    2: qpos max 4.96e-05 median 0.0e+00 | obs max 9.21e-03 | rew max 2.92e-05
+   step    5: qpos max 7.14e-03 median 3.0e-08 | obs max 1.72e-01 | rew max 1.84e-05
+   step   10: qpos max 1.52e-02 median 9.3e-08 | obs max 1.60e+00 | rew max 1.94e-03
+   step   20: qpos max 3.81e-02 median 2.4e-07 | obs max 4.34e+00 | rew max 7.83e-03
+   step   30: qpos max 3.35e-01 median 4.2e-07 | obs max 1.51e+01 | rew max 1.53e-02
+   step   40: qpos max 6.35e-01 median 2.8e-07 | obs max 9.74e+00 | rew max 4.00e+00
+   step   50: qpos max 1.58e+00 median 1.4e-07 | obs max 1.73e+01 | rew max 4.02e+00
+capacity replay: nefc max 28 (njmax 112), nacon max 1318 (naconmax 12288); overflow {'ITERATIONS': 9, 'LS_ITERATIONS': 480}
+capacity replay 2: nefc max 28 (njmax 112), nacon max 1319 (naconmax 12288); overflow {'ITERATIONS': 11, 'LS_ITERATIONS': 481}
+capacity eager: nefc max 28 (njmax 112), nacon max 1318 (naconmax 12288); overflow {'ITERATIONS': 10, 'LS_ITERATIONS': 479}
+--- physics protocol vs MuJoCo C (4 worlds: PD hold + fixed random targets; |dq| max / median)
+--- this configuration vs reference {"label": "icb off"} (graph replay)
+   step    1: qpos max 2.24e-06 median 0.0e+00 | obs max 1.03e-03 | rew max 6.82e-06
+   step    2: qpos max 2.30e-05 median 0.0e+00 | obs max 9.21e-03 | rew max 2.92e-05
+   step    5: qpos max 2.34e-02 median 2.9e-08 | obs max 8.31e-01 | rew max 3.34e-03
+   step   10: qpos max 2.66e-02 median 8.9e-08 | obs max 1.57e+00 | rew max 1.94e-03
+   step   20: qpos max 6.52e-02 median 2.2e-07 | obs max 1.21e+01 | rew max 1.17e-02
+   step   30: qpos max 3.36e-01 median 4.0e-07 | obs max 1.51e+01 | rew max 4.28e-02
+   step   40: qpos max 1.52e+00 median 2.7e-07 | obs max 1.16e+01 | rew max 4.03e+00
+   step   50: qpos max 1.57e+00 median 1.3e-07 | obs max 1.73e+01 | rew max 4.02e+00
+=== done
+--- (c) itercost early exit 0 12:00:53
+state: nefc mean 6.2 max 27, nacon 1.69 per world
+  k | solve ms (graph, per substep) | marginal ms of iteration k | worlds converged before iteration k
+   0 |   1.897 |   1.897 |     0
+   1 |   3.692 |   1.795 |     0
+   2 |   5.274 |   1.582 |   771
+   3 |   6.712 |   1.438 |  1457
+   4 |   7.985 |   1.273 |  1996
+   5 |   8.954 |   0.969 |  2572
+   6 |   9.671 |   0.717 |  3142
+   7 |  10.270 |   0.599 |  3531
+   8 |  10.764 |   0.494 |  3755
+   9 |  11.176 |   0.413 |  3917
+  10 |  11.530 |   0.354 |  4008
+  11 |  11.872 |   0.342 |  4057
+  12 |  12.087 |   0.215 |  4072
+  13 |  12.400 |   0.313 |  4078
+  14 |  12.645 |   0.245 |  4089
+  15 |  12.903 |   0.258 |  4092
+  16 |  13.153 |   0.250 |  4095
+  17 |  13.339 |   0.186 |  4095
+  18 |  13.428 |   0.089 |  4096
+  19 |  13.460 |   0.032 |  4096
+  20 |  13.536 |   0.076 |  4096
+--- (c) itercost early exit 1 12:01:19
+state: nefc mean 6.2 max 27, nacon 1.69 per world
+  k | solve ms (graph, per substep) | marginal ms of iteration k | worlds converged before iteration k
+   0 |   1.890 |   1.890 |     0
+   1 |   3.685 |   1.795 |     0
+   2 |   5.276 |   1.591 |   766
+   3 |   6.738 |   1.462 |  1450
+   4 |   8.042 |   1.304 |  1984
+   5 |   9.024 |   0.982 |  2570
+   6 |   9.765 |   0.741 |  3149
+   7 |  10.392 |   0.627 |  3520
+   8 |  10.835 |   0.444 |  3754
+   9 |  11.288 |   0.453 |  3913
+  10 |  11.628 |   0.340 |  4001
+  11 |  11.972 |   0.344 |  4058
+  12 |  12.199 |   0.227 |  4073
+  13 |  12.469 |   0.270 |  4080
+  14 |  12.809 |   0.340 |  4089
+  15 |  13.048 |   0.239 |  4092
+  16 |  13.295 |   0.247 |  4094
+  17 |  13.540 |   0.245 |  4095
+  18 |  13.504 |  -0.036 |  4096
+  19 |  13.490 |  -0.014 |  4096
+  20 |  13.533 |   0.043 |  4096
+--- (d) quick early exit 0 r1 12:01:45
+[icb0_r1] N=4096 njmax 112 naconmax 98304 is_sparse False
+[icb0_r1] physics only 55.4 ms/step -> 73,919 env-steps/s
+[icb0_r1] full env step 106.0 ms -> 38,630 env-steps/s
+[icb0_r1] after random-action steps: nefc max 28 mean 11.7; nacon 11208 (2.74/world); overflow {'ITERATIONS': 1, 'LS_ITERATIONS': 3869}
+--- (d) quick early exit 1 r1 12:02:05
+[icb1_r1] N=4096 njmax 112 naconmax 98304 is_sparse False
+[icb1_r1] physics only 47.7 ms/step -> 85,943 env-steps/s
+[icb1_r1] full env step 102.7 ms -> 39,870 env-steps/s
+[icb1_r1] after random-action steps: nefc max 34 mean 11.6; nacon 11032 (2.69/world); overflow {'ITERATIONS': 3, 'LS_ITERATIONS': 3872}
+--- (d) quick early exit 0 r2 12:02:23
+[icb0_r2] N=4096 njmax 112 naconmax 98304 is_sparse False
+[icb0_r2] physics only 55.4 ms/step -> 73,879 env-steps/s
+[icb0_r2] full env step 105.6 ms -> 38,771 env-steps/s
+[icb0_r2] after random-action steps: nefc max 30 mean 11.4; nacon 10859 (2.65/world); overflow {'ITERATIONS': 3, 'LS_ITERATIONS': 3871}
+--- (d) quick early exit 1 r2 12:02:43
+[icb1_r2] N=4096 njmax 112 naconmax 98304 is_sparse False
+[icb1_r2] physics only 47.6 ms/step -> 86,036 env-steps/s
+[icb1_r2] full env step 102.9 ms -> 39,824 env-steps/s
+[icb1_r2] after random-action steps: nefc max 29 mean 11.8; nacon 11406 (2.78/world); overflow {'ITERATIONS': 1, 'LS_ITERATIONS': 3861}
+=== end Sat Sep 26 12:03:01 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] ellip_ws_icb2 end: device utilisation 100% (12:03:01), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   2.1 %
+lock held by ellip_ws_final, not ellip_ws_icb2; not released

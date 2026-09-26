@@ -1,0 +1,63 @@
+mujoco_warp /Users/aditya/robosim/upstream/mujoco_warp-ws/mujoco_warp cone pyramidal worlds 256
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth 80584cc load on device 'cpu' took 2480.20 ms  (compiled)
+Module _nxn_broadphase__locals__kernel_c1e6b59f c441222 load on device 'cpu' took 184.04 ms  (compiled)
+Module ccd_kernel_builder__locals__ccd_kernel_b1592c61 5f6dc8f load on device 'cpu' took 1846.10 ms  (compiled)
+Module _primitive_narrowphase__locals__primitive_narrowphase_e2e1f870 3fb426b load on device 'cpu' took 663.59 ms  (compiled)
+Module mujoco_warp._src.constraint 2b9b99a load on device 'cpu' took 45.24 ms  (compiled)
+Module _friction_dof__locals__kernel_f17bf922 fb6e13b load on device 'cpu' took 94.06 ms  (compiled)
+Module _limit_slide_hinge__locals__kernel_1b048e6d 8dfe868 load on device 'cpu' took 99.28 ms  (compiled)
+Module _efc_contact_init__locals__kernel_f7af7d1e f94ff93 load on device 'cpu' took 55.17 ms  (compiled)
+Module _efc_contact_jac_dense__locals__kernel_e1359039 abb51d9 load on device 'cpu' took 324.55 ms  (compiled)
+Module _efc_contact_update__locals__kernel_117735f9 269ed1a load on device 'cpu' took 97.42 ms  (compiled)
+Module mujoco_warp._src.forward f56d70c load on device 'cpu' took 990.94 ms  (compiled)
+Module mujoco_warp._src.passive 101b631 load on device 'cpu' took 855.94 ms  (compiled)
+Module _qfrc_passive_kernel__locals__kernel_d3de994f f6cec86 load on device 'cpu' took 0.23 ms  (cached)
+Module _qfrc_smooth__locals__kernel_7b9c6874 ab1844e load on device 'cpu' took 0.25 ms  (cached)
+Module mujoco_warp._src.support 4bd57db load on device 'cpu' took 115.49 ms  (compiled)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_ce5fd477 f92a725 load on device 'cpu' took 121.26 ms  (compiled)
+Module _solve_init_dof__locals__kernel_20f84bc0 82ab00a load on device 'cpu' took 46.27 ms  (compiled)
+Module _solve_init_efc__locals__kernel_eb62ce52 09a41bb load on device 'cpu' took 46.95 ms  (compiled)
+Module _solve_init_jaref_kernel__locals__kernel_8f5dc2fd 84b5d30 load on device 'cpu' took 52.99 ms  (compiled)
+Module mul_m_kernel__locals___mul_m_8f61e11b 353659b load on device 'cpu' took 75.04 ms  (compiled)
+Module _update_constraint_efc__locals__kernel_bd472c08 03af5c5 load on device 'cpu' took 87.20 ms  (compiled)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_cbce72c3 fd23e89 load on device 'cpu' took 59.13 ms  (compiled)
+Module _update_gradient_zero_grad_dot__locals__kernel_bf78f6e1 d478fe3 load on device 'cpu' took 50.24 ms  (compiled)
+Module _update_gradient_grad__locals__kernel_9d91c038 3888c4a load on device 'cpu' took 51.82 ms  (compiled)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_a16a0457 76ae4d3 load on device 'cpu' took 187.40 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_07b5aee8 2c4d2af load on device 'cpu' took 157.56 ms  (compiled)
+Module _linesearch_iterative_kernel__locals__kernel_94900ed2 9e347f4 load on device 'cpu' took 231.03 ms  (compiled)
+Module mujoco_warp._src.solver 8030923 load on device 'cpu' took 0.53 ms  (cached)
+Module _update_constraint_efc__locals__kernel_0d0b5ab5 459b6a4 load on device 'cpu' took 94.61 ms  (compiled)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_a17a0804 f706d86 load on device 'cpu' took 55.00 ms  (compiled)
+Module _update_gradient_zero_grad_dot__locals__kernel_0439097a 253d2de load on device 'cpu' took 51.93 ms  (compiled)
+Module _update_gradient_grad__locals__kernel_e6036c7a 4f08824 load on device 'cpu' took 51.39 ms  (compiled)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_e783a05a fd50922 load on device 'cpu' took 175.48 ms  (compiled)
+Module _solve_done__locals__kernel_d3130fb8 1f9b6d8 load on device 'cpu' took 55.03 ms  (compiled)
+Module mujoco_warp._src.sensor 9cb2975 load on device 'cpu' took 1528.86 ms  (compiled)
+Module mujoco_warp._src.derivative 7e44f49 load on device 'cpu' took 542.20 ms  (compiled)
+Module _next_time_builder__locals___next_time_a4a5880c 6a09312 load on device 'cpu' took 58.15 ms  (compiled)
+reference ls 100, floor off        niter mean 2.924 >10 0.01 % max 11 | LS at budget   0.0 % of control steps | LS iterations per call mean 6.01, launch max mean 17.3 p50 24 | |dqvel| vs ref: median 0.00e+00 p99 0.00e+00 max 0.00e+00, worlds >1e-3 0 of 2304
+Module _linesearch_iterative_kernel__locals__kernel_afb9ae28 f44c12d load on device 'cpu' took 234.54 ms  (compiled)
+floor: ls 200, floor off           niter mean 2.924 >10 0.01 % max 11 | LS at budget   0.0 % of control steps | LS iterations per call mean 6.01, launch max mean 17.3 p50 24 | |dqvel| vs ref: median 0.00e+00 p99 0.00e+00 max 0.00e+00, worlds >1e-3 0 of 2304
+floor: 1-ulp qvel nudge            niter mean 2.924 >10 0.01 % max 11 | LS at budget   0.0 % of control steps | LS iterations per call mean 6.03, launch max mean 17.3 p50 24 | |dqvel| vs ref: median 6.29e-06 p99 3.05e-04 max 9.06e-02, worlds >1e-3 2 of 2304
+Module _linesearch_iterative_kernel__locals__kernel_13ede607 f657d0c load on device 'cpu' took 228.33 ms  (compiled)
+ls 20, floor off (the task)        niter mean 2.924 >10 0.01 % max 11 | LS at budget  79.1 % of control steps | LS iterations per call mean 5.61, launch max mean 13.4 p50 20 | |dqvel| vs ref: median 1.19e-07 p99 2.04e-04 max 1.82e-02, worlds >1e-3 2 of 2304
+Module _linesearch_iterative_kernel__locals__kernel_c9a64ee7 fb00b35 load on device 'cpu' took 234.69 ms  (compiled)
+ls 20, floor 8 eps                 niter mean 2.925 >10 0.01 % max 11 | LS at budget  22.3 % of control steps | LS iterations per call mean 2.10, launch max mean 10.1 p50 7 | |dqvel| vs ref: median 4.77e-07 p99 2.77e-04 max 9.06e-02, worlds >1e-3 5 of 2304
+Module _linesearch_iterative_kernel__locals__kernel_d07119d4 0a30d5c load on device 'cpu' took 245.37 ms  (compiled)
+ls 100, floor 8 eps                niter mean 2.924 >10 0.01 % max 11 | LS at budget   0.0 % of control steps | LS iterations per call mean 2.13, launch max mean 11.2 p50 7 | |dqvel| vs ref: median 4.77e-07 p99 2.78e-04 max 9.06e-02, worlds >1e-3 5 of 2304
+Module _linesearch_iterative_kernel__locals__kernel_ee1a58cc e0e1471 load on device 'cpu' took 239.02 ms  (compiled)
+ls 20, floor 2 eps                 niter mean 2.924 >10 0.01 % max 11 | LS at budget  44.9 % of control steps | LS iterations per call mean 2.60, launch max mean 11.3 p50 16 | |dqvel| vs ref: median 4.77e-07 p99 2.74e-04 max 6.04e-01, worlds >1e-3 3 of 2304
+Module _linesearch_iterative_kernel__locals__kernel_1d54926a 2fce5ce load on device 'cpu' took 234.79 ms  (compiled)
+ls 100, floor 2 eps                niter mean 2.925 >10 0.01 % max 11 | LS at budget   0.0 % of control steps | LS iterations per call mean 2.70, launch max mean 13.8 p50 14 | |dqvel| vs ref: median 4.77e-07 p99 2.57e-04 max 6.04e-01, worlds >1e-3 3 of 2304
+Module _linesearch_iterative_kernel__locals__kernel_f5c66a6c 7dbd1be load on device 'cpu' took 228.61 ms  (compiled)
+ls 20, floor 32 eps                niter mean 2.924 >10 0.01 % max 11 | LS at budget   2.3 % of control steps | LS iterations per call mean 1.94, launch max mean 9.0 p50 5 | |dqvel| vs ref: median 4.77e-07 p99 2.77e-04 max 9.06e-02, worlds >1e-3 5 of 2304
+Module _linesearch_iterative_kernel__locals__kernel_01b9da8e d10498a load on device 'cpu' took 237.22 ms  (compiled)
+ls 100, floor 32 eps               niter mean 2.924 >10 0.01 % max 11 | LS at budget   0.0 % of control steps | LS iterations per call mean 1.94, launch max mean 9.1 p50 5 | |dqvel| vs ref: median 4.77e-07 p99 2.77e-04 max 9.06e-02, worlds >1e-3 5 of 2304

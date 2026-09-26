@@ -276,8 +276,9 @@ it here. The shipped scripts do this for the G1 and serve as the template:
 ## 3b. The default contact model (and switching it off)
 
 `G1VelocityTask(contact_cfg="recommended")` is elliptic friction cones with impratio 10 and a Newton cap of 20 on the
-impact-stiffened preset (2026-09-26). It is the PhysX-faithful setting and costs 1.6× on the PPO loop against pyramidal
-cones. `contact_cfg="recommended_pyramidal"` restores the previous default, `"default"` MuJoCo's contacts, and every
+impact-stiffened preset (2026-09-26). It is the PhysX-faithful setting and costs 1.5× on the PPO loop against pyramidal
+cones (1.68× before the fused elliptic Newton iteration and the graph-replay early exit of 2026-09-26 afternoon,
+`docs/research/elliptic_warmstart_2026-09-26.md`). `contact_cfg="recommended_pyramidal"` restores the previous default, `"default"` MuJoCo's contacts, and every
 `metalsim.physics.contact_tuning` preset is selectable by name (`--contact_cfg` on the CLI). A `solver_cfg` such as
 `isaaclab3` overrides the cone with Isaac's own settings.
 
