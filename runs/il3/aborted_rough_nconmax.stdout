@@ -1,0 +1,96 @@
+== Fri Sep 25 18:16:07 PDT 2026
+holder: {"name": "newton_vbd_replay", "kind": "low", "minutes": 40.0, "pid": 58993, "start": 1790385333.389673}
+  waiting [low] kamino_tests_fork est 40.0 min, queued 11839 s ago
+  waiting [low] kamino_tests_152 est 30.0 min, queued 11009 s ago
+  waiting [low] cl_kamino est 45.0 min, queued 9678 s ago
+  waiting [low] cl_mjw est 40.0 min, queued 9655 s ago
+/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  warnings.warn(
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 26.54 ms  (cached)
+Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 17.85 ms  (cached)
+Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ba4c21d4 ba4c21d load on device 'metal:0' took 20.05 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_78310433 7831043 load on device 'metal:0' took 26.60 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_0db2ba1e 0db2ba1 load on device 'metal:0' took 19.59 ms  (cached)
+Module mujoco_warp._src.constraint f5f4518 load on device 'metal:0' took 16.69 ms  (cached)
+Module _friction_dof__locals__kernel_0bb9a331 0bb9a33 load on device 'metal:0' took 17.14 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_914cb5e1 914cb5e load on device 'metal:0' took 17.19 ms  (cached)
+Module _efc_contact_init__locals__kernel_03ee81b4 03ee81b load on device 'metal:0' took 16.82 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_16824443 e86c3ac load on device 'metal:0' took 17.00 ms  (cached)
+Module _efc_contact_update__locals__kernel_89d497ae 89d497a load on device 'metal:0' took 17.35 ms  (cached)
+Module mujoco_warp._src.forward 4772766 load on device 'metal:0' took 23.34 ms  (cached)
+Module mujoco_warp._src.passive 9e93f67 load on device 'metal:0' took 22.15 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_8ed29e9b 8ed29e9 load on device 'metal:0' took 17.08 ms  (cached)
+Module mujoco_warp._src.forward d28e0c7 load on device 'metal:0' took 23.14 ms  (cached)
+Module _qfrc_smooth__locals__kernel_08dfc9ad 08dfc9a load on device 'metal:0' took 17.01 ms  (cached)
+Module mujoco_warp._src.support 040f2c5 load on device 'metal:0' took 17.16 ms  (cached)
+Module _factor_i_sparse_serial__locals__kernel_bbc34dce 0938022 load on device 'metal:0' took 17.53 ms  (cached)
+Module _solve_LD_sparse_serial__locals__kernel_da14e052 352f4b8 load on device 'metal:0' took 17.44 ms  (cached)
+Module _solve_init_dof__locals__kernel_8e985b01 8e985b0 load on device 'metal:0' took 16.88 ms  (cached)
+Module mujoco_warp._src.solver 571e089 load on device 'metal:0' took 18.03 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_7c1132c5 7c1132c load on device 'metal:0' took 16.82 ms  (cached)
+Module mul_m_kernel__locals___mul_m_505d9f1c 505d9f1 load on device 'metal:0' took 16.84 ms  (cached)
+Module _update_constraint_efc__locals__kernel_55fc5219 55fc521 load on device 'metal:0' took 16.96 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_6f502a20 6f502a2 load on device 'metal:0' took 17.10 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_86f1e084 86f1e08 load on device 'metal:0' took 16.53 ms  (cached)
+Module _update_gradient_grad__locals__kernel_e5baa4a1 e5baa4a load on device 'metal:0' took 16.82 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_712c31a5 8925ee6 load on device 'metal:0' took 16.75 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_ad48cc59 0434274 load on device 'metal:0' took 16.67 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_76ff806c bfdf7e9 load on device 'metal:0' took 18.78 ms  (cached)
+Module _update_constraint_efc__locals__kernel_3649f6fe 3649f6f load on device 'metal:0' took 17.34 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_20171f2f 20171f2 load on device 'metal:0' took 16.65 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_67211e0e 67211e0 load on device 'metal:0' took 16.72 ms  (cached)
+Module _update_gradient_grad__locals__kernel_7aee5faa 7aee5fa load on device 'metal:0' took 16.63 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_ff0e6fb9 f5091d7 load on device 'metal:0' took 16.83 ms  (cached)
+Module _solve_done__locals__kernel_d351f953 d351f95 load on device 'metal:0' took 16.51 ms  (cached)
+Module mujoco_warp._src.sensor c2b0248 load on device 'metal:0' took 27.22 ms  (cached)
+Module mujoco_warp._src.derivative 356952f load on device 'metal:0' took 19.45 ms  (cached)
+Module _next_time_builder__locals___next_time_bd97507a bd97507 load on device 'metal:0' took 16.63 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_f05e0f72 f05e0f7 load on device 'metal:0' took 16.64 ms  (cached)
+Module reset_data__locals__reset_M_debb12fa debb12f load on device 'metal:0' took 16.83 ms  (cached)
+Module reset_data__locals__reset_mocap_d5f6a172 d5f6a17 load on device 'metal:0' took 16.78 ms  (cached)
+Module reset_data__locals__reset_contact_10be067b 10be067 load on device 'metal:0' took 16.81 ms  (cached)
+Module reset_data__locals__reset_sleep_4c0bb4a4 4c0bb4a load on device 'metal:0' took 16.67 ms  (cached)
+Module reset_data__locals__reset_nworld_f0ec89aa f0ec89a load on device 'metal:0' took 16.77 ms  (cached)
+Module mujoco_warp._src.set_const 40b21c5 load on device 'metal:0' took 21.86 ms  (cached)
+Module metalsim.sensors.contact 8b280a6 load on device 'metal:0' took 21.50 ms  (cached)
+G1 rough PPO: N=4096 obs_dim 310 act_dim 37 rollout 24 x 1500 iterations, engine mjwarp, physics dt 0.0025 (decimation 8), seed 0, reward_cfg rough_il3, height-scan ray order xy, terrain collision hfield, height scan exact, solver_cfg isaaclab3_every_substep_cap20, Isaac Lab 3.0 events True (backend newton_mjwarp), add_base_mass {'body': 'torso_link', 'scale_min': 0.8000494837760925, 'scale_max': 1.2497823238372803, 'dof_invweight0_ratio_range': [0.9505320191383362, 1.0460338592529297], 'limit_timeconst_ratio_range': [0.9787041187018577, 1.0248056023509573]}
+Module metalsim.learn.terrain 595c542 load on device 'metal:0' took 18.40 ms  (cached)
+Module __main__ 0bfe64b load on device 'metal:0' took 994.71 ms  (cached)
+Module metalsim.learn.g1_il3 bd6c6cc load on device 'metal:0' took 18.72 ms  (cached)
+Module metalsim.learn.warp_policy a9b40e0 load on device 'metal:0' took 17.92 ms  (cached)
+it    1 steps     98304 sps   20,006 | ep_ret    0.00 ep_len    0.0 (n=0) | pg 0.126 vf 13.812 kl 2.3337 lr 1.0e-05
+[anomaly] it 1: KL 2.334 > 10x target: stale data or LR too high
+[anomaly] it 1: joint limit violated by 0.33 rad
+terrain it    1 mean_level 2.4866
+terms it    1 {"track_lin_vel_xy_exp": null, "track_ang_vel_z_exp": null, "feet_air_time": null, "feet_slide": null, "joint_deviation": null, "flat_orientation_l2": null, "action_rate_l2": null, "termination_penalty": null, "lin_vel_z_l2": null, "ang_vel_xy_l2": null, "dof_torques_l2": null, "dof_acc_l2": null, "dof_pos_limits": null, "episodes": 0, "base_contact": null, "pushes": 4096}
+it    2 steps    196608 sps   25,100 | ep_ret    0.00 ep_len    0.0 (n=0) | pg 0.002 vf 9.589 kl 0.0094 lr 5.1e-05
+[anomaly] it 2: joint limit violated by 0.32 rad
+terrain it    2 mean_level 2.4866
+terms it    2 {"track_lin_vel_xy_exp": null, "track_ang_vel_z_exp": null, "feet_air_time": null, "feet_slide": null, "joint_deviation": null, "flat_orientation_l2": null, "action_rate_l2": null, "termination_penalty": null, "lin_vel_z_l2": null, "ang_vel_xy_l2": null, "dof_torques_l2": null, "dof_acc_l2": null, "dof_pos_limits": null, "episodes": 0, "base_contact": null, "pushes": 0}
+it    3 steps    294912 sps   27,813 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.003 vf 10.294 kl 0.0082 lr 1.7e-04
+[anomaly] it 3: joint limit violated by 0.30 rad
+terrain it    3 mean_level 2.4866
+terms it    3 {"track_lin_vel_xy_exp": null, "track_ang_vel_z_exp": null, "feet_air_time": null, "feet_slide": null, "joint_deviation": null, "flat_orientation_l2": null, "action_rate_l2": null, "termination_penalty": null, "lin_vel_z_l2": null, "ang_vel_xy_l2": null, "dof_torques_l2": null, "dof_acc_l2": null, "dof_pos_limits": null, "episodes": 0, "base_contact": null, "pushes": 0}
+it    4 steps    393216 sps   29,387 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.002 vf 13.332 kl 0.0109 lr 2.6e-04
+[anomaly] it 4: joint limit violated by 0.32 rad
+terrain it    4 mean_level 2.4866
+terms it    4 {"track_lin_vel_xy_exp": null, "track_ang_vel_z_exp": null, "feet_air_time": null, "feet_slide": null, "joint_deviation": null, "flat_orientation_l2": null, "action_rate_l2": null, "termination_penalty": null, "lin_vel_z_l2": null, "ang_vel_xy_l2": null, "dof_torques_l2": null, "dof_acc_l2": null, "dof_pos_limits": null, "episodes": 0, "base_contact": null, "pushes": 0}
+it    5 steps    491520 sps   30,467 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.002 vf 15.937 kl 0.0138 lr 3.8e-04
+[anomaly] it 5: joint limit violated by 0.41 rad
+terrain it    5 mean_level 2.4866
+terms it    5 {"track_lin_vel_xy_exp": null, "track_ang_vel_z_exp": null, "feet_air_time": null, "feet_slide": null, "joint_deviation": null, "flat_orientation_l2": null, "action_rate_l2": null, "termination_penalty": null, "lin_vel_z_l2": null, "ang_vel_xy_l2": null, "dof_torques_l2": null, "dof_acc_l2": null, "dof_pos_limits": null, "episodes": 0, "base_contact": null, "pushes": 0}
+it    6 steps    589824 sps   31,253 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.003 vf 20.213 kl 0.0128 lr 5.8e-04
+[anomaly] it 6: joint limit violated by 0.27 rad
+terrain it    6 mean_level 2.4866
+terms it    6 {"track_lin_vel_xy_exp": null, "track_ang_vel_z_exp": null, "feet_air_time": null, "feet_slide": null, "joint_deviation": null, "flat_orientation_l2": null, "action_rate_l2": null, "termination_penalty": null, "lin_vel_z_l2": null, "ang_vel_xy_l2": null, "dof_torques_l2": null, "dof_acc_l2": null, "dof_pos_limits": null, "episodes": 0, "base_contact": null, "pushes": 0}
+it    7 steps    688128 sps   31,819 | ep_ret    0.00 ep_len    0.0 (n=0) | pg -0.001 vf 25.668 kl 0.0145 lr 2.6e-04
+[anomaly] it 7: joint limit violated by 0.31 rad
+terrain it    7 mean_level 2.4866
+terms it    7 {"track_lin_vel_xy_exp": null, "track_ang_vel_z_exp": null, "feet_air_time": null, "feet_slide": null, "joint_deviation": null, "flat_orientation_l2": null, "action_rate_l2": null, "termination_penalty": null, "lin_vel_z_l2": null, "ang_vel_xy_l2": null, "dof_torques_l2": null, "dof_acc_l2": null, "dof_pos_limits": null, "episodes": 0, "base_contact": null, "pushes": 0}
