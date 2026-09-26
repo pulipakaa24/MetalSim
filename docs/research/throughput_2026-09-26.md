@@ -517,3 +517,29 @@ task terms). On frozen worktrees (per-job checkouts at 0a9de8e / 9df9acee that n
 compile race of 11.6, reproduced once more by my own worktree edit during the 09:39 run); **mujoco_warp 1451 passed,
 1 failed (pre-existing), 39 skipped**; Warp `test_metal` 15 passed, 1 pre-existing failure. Rule adopted for the
 remaining jobs: measurement and test jobs import frozen per-job worktrees, never a tree being edited.
+
+## 12. Camera-RL round (Isaac-Cartpole-RGB, 1024 envs, tier 0): plan and what the code already does
+
+Assignment: the camera path at 12.9-13.4 K env-steps/s including training (RTX 4090 published 32 K); physics is
+< 1 % of the step. Known split (research note `metal_cnn_update_2026-09-24.md` section 7.5): per iteration of
+65,536 env-steps, update ~3.2 s (64 %), rollout ~1.8 s (35 %: policy inference + rendering), env 0.7 %; the update's
+estimated hardware floor 1.7-2.0 s. Read before profiling:
+
+- Render dispatch (a): `metalsim/render/tier0.py` already batches everything: one Metal command buffer per frame,
+  one per-env parameter dispatch, one instanced render pass over all env tiles of one atlas (background quad +
+  geometry draws instanced over envs), one untile dispatch into the learner's buffer; it waits on the sim's event
+  and signals its own. Per rollout step the host encodes: two `_learner_done` signal / wait pairs (before the
+  physics step and before `forward` + render), `sim.after` (torch waits on the sim event) twice, `rend.after`
+  once, plus the physics graph replay and the render command buffer. So (a) is about the handshakes and command
+  buffers per step, not per-env passes.
+- Rollout (c): `collect()` copies the renderer's NHWC uint8 image into the NCHW rollout buffer every step
+  (`buf_img[t].copy_(img.permute(0, 3, 1, 2))`, 30 MB) and computes `image_mean` per step; episode statistics
+  are gathered once per rollout (one `.cpu()`).
+- Update (b): fast path (compiled minibatch loss with the gather inside the graph, compiled grad-norm clip, fused
+  Adam, the two Metal gradient kernels); per minibatch one `.item()` for the adaptive-KL schedule (128 host waits
+  per update; it changes the lr schedule, so removing it would be an option, not a landing).
+
+Profile first (`scripts/diagnostics/camera_rollout_profile.py`, `runs/tp26/camprof.wrapper.log`): synchronized ms
+per rollout step for the physics step, the render alone, the reset / randomize ops, `env.step()` whole, the NHWC ->
+NCHW copy, `image_mean`, `forward_fast`, the distribution ops, the policy body whole, `collect()` over 64 steps
+(overlap), the interop counters per step, and one `update()`. Landing order follows the payoff.
