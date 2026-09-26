@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: MIT AND BSD-3-Clause
+# MetalSim code, MIT (see LICENSE). Algorithm ported from NVIDIA PhysX 5.6.1's GPU particle-cloth path:
+# Copyright (c) 2008-2025, NVIDIA Corporation, BSD-3-Clause (licenses/BSD-3-Clause-PhysX.txt). See THIRD_PARTY_NOTICES.md.
 """PhysX 5 PBD particle cloth (PhysX 5.6.1, Isaac Sim 5.1) as Warp kernels, batched over worlds, graph-capturable.
 
 A port of the algorithm of PhysX's GPU particle-cloth path (BSD-3; read in upstream/PhysX-5.6.1, see

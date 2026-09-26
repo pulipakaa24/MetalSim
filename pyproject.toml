@@ -1,10 +1,23 @@
 [project]
 name = "metalsim"
 version = "0.0.1"
-description = "MetalSim: Isaac Sim / Isaac Lab parity robotics simulation, native on Apple Silicon (Metal)"
+description = "Isaac Sim / Isaac Lab-parity robot simulation native to Apple silicon: MuJoCo Warp physics on Metal, rendering, sensors, data generation and RL"
 readme = "README.md"
 requires-python = ">=3.12"
-license = { text = "Apache-2.0" }
+license = "MIT"
+license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md", "licenses/*"]
+authors = [{ name = "Aditya Pulipaka", email = "adipu@utexas.edu" }]
+keywords = ["robotics", "simulation", "reinforcement-learning", "apple-silicon", "metal", "mujoco", "isaac-lab"]
+# no "License ::" classifier: PEP 639 replaces it with the `license` expression above (setuptools rejects both)
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Physics",
+]
 dependencies = [
     "numpy",
     "mujoco>=3.14",
@@ -29,8 +42,15 @@ parity = ["imageio", "imageio-ffmpeg", "pillow", "scikit-image", "lpips", "flip-
 # MetalSim fork with the solver fixes goes into a separate environment (scripts/setup_newton.sh).
 newton = ["newton @ git+https://github.com/newton-physics/newton@45458023f24629c1feffb1f336594808f537db14"]
 
+[project.urls]
+Homepage = "https://github.com/pulipakaa24/MetalSim"
+Repository = "https://github.com/pulipakaa24/MetalSim"
+Documentation = "https://github.com/pulipakaa24/MetalSim/blob/main/docs/GUIDE.md"
+Issues = "https://github.com/pulipakaa24/MetalSim/issues"
+Changelog = "https://github.com/pulipakaa24/MetalSim/blob/main/CHANGELOG.md"
+
 [build-system]
-requires = ["setuptools>=64"]
+requires = ["setuptools>=77"]   # PEP 639 license expression and license-files
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]

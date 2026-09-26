@@ -10,6 +10,8 @@ docs/measurements/*.raw
 
 # NVIDIA Isaac assets are fetched, not committed (scripts/fetch_isaac_assets.sh)
 assets/isaac/**/*.usd
+# conversions of NVIDIA's assets (e.g. an MJCF written from g1_minimal.usd) are derived works: keep them local
+assets/isaac/**/*_from_usd.xml
 .venv-flex/
 .venv-*/
 

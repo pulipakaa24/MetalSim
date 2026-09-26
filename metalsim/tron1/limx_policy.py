@@ -1,3 +1,7 @@
+# SPDX-License-Identifier: MIT AND Apache-2.0
+# MetalSim code, MIT (see LICENSE). Ported from LimX Dynamics' tron1-rl-deploy-python (controllers/WheelfootController.py,
+# commit 035e4c9), Apache-2.0 (assets/tron1/LICENSE-rl-deploy-python); changes are listed in the docstring below.
+# See THIRD_PARTY_NOTICES.md.
 """LimX's open-source RL controller for WF_TRON1A, as a baseline in `Tron1Sim`.
 
 A faithful port of `tron1-rl-deploy-python/controllers/WheelfootController.py` (commit 035e4c9,
