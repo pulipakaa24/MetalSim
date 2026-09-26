@@ -600,5 +600,12 @@ Reading:
   15.0 % (floor 5.5e-6 / 3.4e-2 / 0.62, 0 / 5.3 / 14.3 %); MuJoCo C oracle identical to three digits (Go2
   3.08e-7 … 9.22e-5; G1 5.91e-8 … 3.48e-6). G1 task model (256 worlds × 100 control steps of 8 substeps,
   ellip10): within its own floor (the PD-to-random-targets G1 falls; 26.6 % of worlds apart at step 100 for
-  patched-vs-patched and patched-vs-base alike; the base-vs-base floor 16 %). Mode 2 rows: pending
-  (`e2_check_sz*`), fork suite on Metal with mode 2: pending (`e2_pytest_sz`).
+  patched-vs-patched and patched-vs-base alike; the base-vs-base floor 16 %). Mode 2 (`e2_check_sz*`): Go2
+  1.8e-6 / 2.2e-6 / 9.4e-4 vs base (floor 2.0e-6 / 3.2e-6 / 5.2e-5; 0 % of worlds apart), G1 sparse 5.6e-6 /
+  2.8e-2 / 0.61 with 0 / 5.9 / 15.4 % (floor 6.6e-6 / 3.4e-2 / 0.61, 0 / 5.5 / 15.0 %), G1 dense 2.4e-6 / 3.4e-2 /
+  0.62 with 0 / 5.3 / 16.2 % (floor 2.0e-5 / 3.4e-2 / 0.34, 0 / 4.1 / 15.6 %), G1 task 0.8 / 28.1 % (floor 0.8 /
+  26.2 %); oracles identical to three digits (Go2 1.89e-7 … 9.21e-5, G1 5.91e-8 … 3.46e-6; the task-model
+  oracle now steps MuJoCo C 8 times per call: 9.9e-8 at 4 ms, 1.6e-2 at 16 ms as the robot falls).
+- **Fork test suite on Metal with mode 2 (`e2_pytest_sz`): 1451 passed, 39 skipped, 1 failed** — the
+  pre-existing MuJoCo-nightly `test_put_data_nefc_zero_dense` (§7.4); `test_hfield_maxconpair` passes since
+  `b630530`.
