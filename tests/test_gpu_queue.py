@@ -50,6 +50,14 @@ def test_front_ticket_sorts_ahead_of_older_tickets_of_its_class():
     _sandbox()
     os.makedirs(g.Q, exist_ok=True)
     json.dump({"name": "older", "kind": "timing", "minutes": 1, "pid": os.getpid(), "t": 1.0}, open(os.path.join(g.Q, "1.000_0_older.json"), "w"))
-    tf = os.path.join(g.Q, "0.000_0_PAUSE.json")
+    tf = os.path.join(g.Q, f"0.000_0_PAUSE_{os.getpid()}.json")
     json.dump({"name": "PAUSE", "kind": "timing", "minutes": 1, "pid": os.getpid(), "t": 0.0}, open(tf, "w"))
     assert g.tickets()[0][3]["name"] == "PAUSE"
+
+
+def test_ticket_filename_carries_the_pid():
+    _sandbox()
+    _main("acquire", "t4", "--kind", "low", "--minutes", "1", "--pid", str(os.getpid()))
+    assert g.holder()["name"] == "t4"          # granted at once (empty queue), ticket consumed
+    assert os.listdir(g.Q) == []
+    _main("release", "t4", "--pid", str(os.getpid()))
