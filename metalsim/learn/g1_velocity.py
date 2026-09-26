@@ -655,8 +655,9 @@ class G1VelocityTask:
                 pwf = tuple(pwf) + ("body_mass", "body_inertia", "body_subtreemass", "body_invweight0", "dof_invweight0")
                 if self._solver_preset is not None and self._solver_preset.newton_force_space_limits:
                     pwf = pwf + ("jnt_solref",)
-            bso = dict(substeps=self.decimation, njmax=njmax, nconmax=nconmax, solver_iterations=10, ls_iterations=20,
-                       per_world_fields=pwf)
+            ct_iter = contact_tuning.PRESETS[self.contact_cfg].solver_iterations if self.contact_cfg in contact_tuning.PRESETS else None
+            bso = dict(substeps=self.decimation, njmax=njmax, nconmax=nconmax, solver_iterations=10 if ct_iter is None else ct_iter,
+                       ls_iterations=20, per_world_fields=pwf)     # the contact preset's Newton cap (elliptic: 20); a solver_cfg overrides it below
             if self._solver_preset is not None:
                 from metalsim.physics import solver_presets
                 bso = solver_presets.batch_options(self._solver_preset, **bso)

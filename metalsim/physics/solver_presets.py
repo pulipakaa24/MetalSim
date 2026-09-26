@@ -82,13 +82,16 @@ class SolverPreset:
     limit_override: tuple | None = None    # (joint-name regex, solref, solimp) applied last (diagnostic variants)
     effort_limit: str | None = None        # "joint": the effort limit as the joint's actuatorfrcrange (Newton's MJCF) instead of
                                            # the actuator's forcerange (MetalSim's build); same total clamp, different place
+    cone: str | None = None                # "pyramidal" | "elliptic"; Isaac's G1 settings are pyramidal, impratio 1
+    impratio: float | None = None
     collision_every: int = 1               # substeps per collision pass (2 = once per 5 ms tick at 2.5 ms)
     newton_force_space_limits: bool = False   # joint-limit solref follows dof_invweight0 (after mass changes)
     note: str = ""
 
 
 _IL3 = dict(tolerance=1e-6, ls_tolerance=0.01, contact_solref=(0.0018182, 1.375), contact_solimp=(0.9, 0.95, 0.001, 0.5, 2.0),
-            geom_gap=0.01, geom_margin=0.0, limit_solref="isaaclab3_live", newton_force_space_limits=True)
+            geom_gap=0.01, geom_margin=0.0, limit_solref="isaaclab3_live", newton_force_space_limits=True,
+            cone="pyramidal", impratio=1.0)
 PRESETS: dict[str, SolverPreset] = {
     "isaaclab3": SolverPreset(iterations=100, ls_iterations=50, collision_every=2, **_IL3,
                               note="Isaac Lab 3.0-EA newton_mjwarp settings for the G1 (caps 100/50, tolerance 1e-6, "
@@ -145,6 +148,8 @@ def apply(m: mujoco.MjModel, name: str | SolverPreset) -> mujoco.MjModel:
     if p.ls_tolerance is not None: m.opt.ls_tolerance = p.ls_tolerance
     if p.iterations is not None: m.opt.iterations = p.iterations
     if p.ls_iterations is not None: m.opt.ls_iterations = p.ls_iterations
+    if p.cone is not None: m.opt.cone = {"pyramidal": mujoco.mjtCone.mjCONE_PYRAMIDAL, "elliptic": mujoco.mjtCone.mjCONE_ELLIPTIC}[p.cone]
+    if p.impratio is not None: m.opt.impratio = p.impratio
     if p.contact_solref is not None: m.geom_solref[:] = p.contact_solref
     if p.contact_solimp is not None: m.geom_solimp[:] = p.contact_solimp
     if p.geom_gap is not None: m.geom_gap[:] = p.geom_gap

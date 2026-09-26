@@ -273,6 +273,14 @@ it here. The shipped scripts do this for the G1 and serve as the template:
 `metalsim.parity.export_policy` exports a MetalSim checkpoint for playback in Isaac
 (`isaac_side/play_policy.py`).
 
+## 3b. The default contact model (and switching it off)
+
+`G1VelocityTask(contact_cfg="recommended")` is elliptic friction cones with impratio 10 and a Newton cap of 20 on the
+impact-stiffened preset (2026-09-26). It is the PhysX-faithful setting and costs 1.6× on the PPO loop against pyramidal
+cones. `contact_cfg="recommended_pyramidal"` restores the previous default, `"default"` MuJoCo's contacts, and every
+`metalsim.physics.contact_tuning` preset is selectable by name (`--contact_cfg` on the CLI). A `solver_cfg` such as
+`isaaclab3` overrides the cone with Isaac's own settings.
+
 ## 4. The GPU queue
 
 The GPU is one shared resource: a benchmark run next to a training run measures neither. Long or
