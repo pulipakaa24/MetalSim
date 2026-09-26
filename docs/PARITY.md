@@ -121,6 +121,40 @@ Notes that bear on reading these numbers honestly:
   per-thread state; the task now sets 32 contact slots per world (3 colliders × ≤ 4 kept contacts),
   which is also the flat setting.
 
+**Elliptic friction cones (2026-09-25 evening, `docs/research/elliptic_cones_2026-09-25.md`, measured on this
+machine through the timing queue, 4096 worlds, Newton 10 / 20).** MuJoCo Warp's elliptic-cone Newton Hessian
+took two Metal-specific slow paths in the fork (`_update_gradient_JTCJ_dense` launched with
+`dim_block = naconmax`, 33.6 M threads per launch at 4096 Go2 worlds; `_JTDACJ_sparse` with one lane per
+constraint group), fixed in fork commit `c301880` (worktree `upstream/mujoco_warp-ellip`, branch
+`metalsim-elliptic`, pending merge; every previous form kept behind `MJW_JTCJ_MODE` /
+`MJW_JTDAJ_ELLIPTIC_LANES`). Physics steps/s pyramidal / elliptic before / elliptic after (cost after):
+
+| model | pyramidal | elliptic before | elliptic after | cost after (before) |
+|---|---|---|---|---|
+| Go2 Menagerie (nv 18, dense; the model's own cone) | 923,850 | 240,281 | 580,420 | 1.59× (3.84×) |
+| G1 Menagerie (nv 35, `auto` → sparse) | 218,295 | 77,263 | 164,231 | 1.33× (2.83×) |
+| G1 Menagerie, dense Jacobian | 196,519 | 60,731 | 144,348 | 1.36× (3.24×) |
+| SO-101 + box Menagerie (nv 12; own cone, impratio 10) | 1,065,380 | 441,361 | 816,526 | 1.30× (2.41×) |
+| DeepMind humanoid (nv 27) | 958,995 | 143,607 | 640,464 | 1.50× (6.68×) |
+| **G1 task, physics only (43 dofs, 2.5 ms × 8 substeps, `bench_contact_tuning.py`), env-steps/s** | 78,038 (`tau10_impact_hardlimits`) | 11,029 (+ elliptic) | 55,379 (+ elliptic impratio 1); 54,841 (10); 51,062 (100) | 1.41× / 1.42× / 1.53× (7.07×) |
+
+Physics unchanged to float noise (Warp CPU device and Metal vs `mj_step`: identical envelopes for every launch
+form; Metal graph replay of 512 worlds × 200 steps within the run-to-run floor); fork test suite on Metal 1450
+passed / 39 skipped / 2 failed, both failures pre-existing at `07a51a6`. The elliptic premium that remains is structural: the
+elliptic path rebuilds and refactors H every iteration where the pyramidal path uses the fused incremental
+update (research note §2). Fidelity re-check with cheap elliptic cones on the G1 (same protocol as §1.7, on
+top of the adopted `tau10_impact_hardlimits`): impulses within 1–3 % as for every preset; 20 ms mean force
+hold / drop-torso / landing 2536 / 2607 / 2699 N at impratio 1, **2339 / 2379 / 2691 at impratio 10**, 2328 /
+2347 / 2689 at impratio 100 vs pyramidal 2689 / 3729 / 2707 and Isaac 2190 / 2200 / 1996; drop penetration
+1.33 / 1.55 / 1.44 cm vs 1.64; limit excursion 0.002 rad; transfer of Isaac's checkpoints 3.24 / 2.97 / 3.05 m
+(pyramidal 3.25 / 2.99 / 3.05; Isaac 3.19 / 3.02 / 3.11, all within the 4-env spread); Isaac's checkpoint 1000
+played here: feet_slide (COM) −0.0132 / −0.0131 / −0.0131 vs pyramidal −0.0144 (Isaac −0.0127; seed noise
+±0.0006), feet_air_time 0.0376 / 0.0375 / 0.0377 vs 0.0368 (Isaac 0.0446; noise ±0.0005), falls 171 / 168 / 160
+per ~1140 episodes vs 142. Impratio 100 leaves 3600–4080 of 4096 worlds at the 10-iteration cap (impratio 10:
+60–177; pyramidal: 0). So elliptic + impratio 10 brings the drop-torso 20 ms force from 1.70× to 1.08× of
+PhysX's and slide 9 % closer at 1.42× cost, with 18 % more falls of a PhysX-trained checkpoint; the 2026-09-25
+DECISIONS row ("no slide gain, 3.84×") is superseded by the row of the same evening, and the task default is not
+changed here (owner's call; see the research note §4.3).
 
 **Engine comparison at the training setting** (`runs/g1_engine_bench_final.log`, measured 2026-09-24
 21:36–21:40 on AC power, GPU idle at start; the MuJoCo Warp 2.5 ms control row ran at the start and end
