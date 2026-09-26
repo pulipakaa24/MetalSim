@@ -85,7 +85,9 @@ first four commits plus the graph-capture sort; merged into `metalsim`.
 
 [github.com/pulipakaa24/mujoco_warp](https://github.com/pulipakaa24/mujoco_warp), branch
 [`metalsim`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), head
-[`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) (code
+[`b630530`](https://github.com/pulipakaa24/mujoco_warp/commit/b63053080fff862d41c502fbffa3a03f799ae3f2) (2026-09-25 evening;
+the rigid-body results before the elliptic-cone work were produced at
+[`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) / code
 [`8fbf965`](https://github.com/pulipakaa24/mujoco_warp/commit/8fbf965acb630aa32573dda802404d519c843a99)). Base: Google
 DeepMind's MuJoCo Warp v3.14.0 (`88af9cc`) plus the Metal device patch by David Dobas
 ([DavidDobas/mujoco_warp#1](https://github.com/DavidDobas/mujoco_warp/pull/1)), branch
@@ -102,6 +104,12 @@ DeepMind's MuJoCo Warp v3.14.0 (`88af9cc`) plus the Metal device patch by David 
 - Nine flex (deformable) commits that make flex contacts match MuJoCo C: per-pair contact cap and selection,
   box-triangle and cable-capsule contacts, element ids of later flexes, active-layer volume contacts, mesh normals,
   flex equality rows in C's order, device-side sorts on Metal (`b2e9ea5` … `dfa5d30`, merged in `8fbf965`).
+- Elliptic-cone Newton Hessian on Metal without capacity-sized launches or one-lane groups (`c301880`; modes
+  `MJW_JTCJ_MODE=world2|world|contact|capacity`, `MJW_JTDAJ_ELLIPTIC_LANES`): Go2 elliptic 240 K → 580 K physics
+  steps/s, the G1 task 11 K → 55 K env-steps/s, physics unchanged to float noise (`docs/research/elliptic_cones_2026-09-25.md`).
+- Heightfield plane contacts restricted to meshes; primitives take upstream's GJK/EPA again (`b630530`; the fork's
+  plane path missed contacts of primitives on heightfields smaller than the box; `HFIELD_PLANE_CONTACTS_PRIMITIVES=True`
+  archives the old form).
 
 Branch [`metalsim-flex`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-flex), head
 [`fc1d5ee`](https://github.com/pulipakaa24/mujoco_warp/commit/fc1d5eef8f9045309087bc822f36c1c62a7214a2) (code
