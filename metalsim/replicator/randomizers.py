@@ -6,6 +6,8 @@ per-frame `rep.randomizer.materials`/`texture` semantics at dataset rates.
 """
 from __future__ import annotations
 
+import os
+
 import numpy as np
 import torch
 
@@ -98,6 +100,27 @@ class Randomizer:
                     im = small[np.ix_(np.linspace(0, 7, T).astype(int), np.linspace(0, 7, self.r.tw).astype(int))]
                 images.append(im)
         self.r.set_backgrounds(env_ids, images)
+
+    def environment(self, maps, yaw=(0.0, 2 * np.pi), intensity=(1.0, 1.0), exposure=(0.0, 0.0), key=None):
+        """Per-episode HDR environment map (tier 2): pick one of ``maps`` (dict key -> (H, W, 3) array or a file
+        path loaded on first use; a list is keyed by index) by ``key`` or uniformly at random, with a random
+        dome yaw about +z (rad) and USD intensity / exposure ranges. Isaac's dome-light HDR randomization
+        (`Franka stack visuomotor`: one dome texture per episode, shared by the batch); the renderer caches the
+        GPU texture and sampling table per key, so a switch costs no upload after the first. Returns the key."""
+        if not isinstance(maps, dict):
+            maps = dict(enumerate(maps))
+        keys = list(maps.keys())
+        if key is None:
+            key = keys[int(self.rng.integers(0, len(keys)))]
+        hdr = None
+        if key not in self.r._env_res:
+            hdr = maps[key]
+            if isinstance(hdr, (str, bytes, os.PathLike)):
+                from metalsim.render.hdr import load_hdr
+                hdr = load_hdr(os.fspath(hdr))
+        self.r.set_environment(hdr, key=key, yaw=float(self.rng.uniform(*yaw)), intensity=float(self.rng.uniform(*intensity)),
+                               exposure=float(self.rng.uniform(*exposure)))
+        return key
 
     def materials(self, roughness=(0.1, 1.0), metallic=(0.0, 0.3), slots=None):
         """Per-slot PBR parameters (shared across envs); host write of the material table."""

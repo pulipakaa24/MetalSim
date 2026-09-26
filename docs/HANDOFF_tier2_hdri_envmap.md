@@ -1,5 +1,7 @@
 # Handoff: tier 2 HDR environment-map lighting (port onto main)
 
+**Status: ported on main, 2026-09-25** (commit recorded in `CHANGELOG.md` "Rendering"; `git log -- metalsim/render/tier2.py`). What landed: `set_environment` / `env_sampling_table` / `set_environment_pose` with MIS against main's diffuse/GGX mixture pdf, the denoiser guide on a primary miss, the non-finite guard kept, bindings flag 32 / buffer 26 / texture 1 / sampler 1 (`PTConsts` 28 words), both env-map tests plus a USD DomeLight import test and a replicator test (13 passed vs 9 before), `set_fovy`, `set_materials`, opt-in `firefly_clamp` (DECISIONS), the RGBE reader `metalsim/render/hdr.py` (no OpenCV), USD import of DomeLights (`usd_dome` custom text), `Randomizer.environment`, gallery `docs/gallery/g1_hdri_tier2.png`, costs and the dome-orientation research in `docs/research/rendering_vs_rtx_2026-09-25.md` §6 / PARITY §1.7. Convention change from this patch: the dome is oriented as Kit/RTX renders a USD DomeLight on a z-up stage (u = 0.5 faces −y, u = 0.25 faces +x), not `atan2(y, x)`. The superseded items below were not ported.
+
 Branch `tier2-hdri-envmap`, based on `main` at `fbaab25`. It contains no renderer changes yet. It carries
 uncommitted work from an old checkout (base `4e6d663`, 2026-09-23) that `main` does not have, as a
 reference patch plus the pieces that apply as-is. The task is to port the feature onto `main`'s tier 2

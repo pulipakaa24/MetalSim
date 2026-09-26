@@ -155,7 +155,8 @@ The scene layer writes `UsdSemantics.LabelsAPI` "class" labels (body name) on bo
 | `randomize_rigid_body_scale` | none | per-world `geom_size` is batchable, but the renderer's meshes are baked per slot | L (not done) |
 | `randomize_fixed_tendon_parameters`, `reset_nodal_state_uniform` | none | tendons/deformables not in our task set | M (not done) |
 | `randomize_visual_color` | `Randomizer.colors` | Isaac's parameters (`colors` list or r/g/b ranges) | S (done) |
-| `randomize_visual_texture_material`, dome-light HDR randomization | background images, material roughness/metallic | per-env texture selection needs a renderer change (texture index per env/slot) | M (renderer) |
+| dome-light HDR randomization | `Randomizer.environment` (tier 2): one HDR map per episode by key, random yaw / intensity / exposure; GPU texture + sampling table cached per key | Isaac's `Franka stack visuomotor` dome randomization; the map is shared by the batch like Isaac's one dome per stage | S (done 2026-09-25, PARITY §1.7) |
+| `randomize_visual_texture_material` | background images, material roughness/metallic | per-env texture selection needs a renderer change (texture index per env/slot) | M (renderer) |
 | `rep.randomizer.scatter_2d/3d`, `instantiate` | none | pose sampling on surfaces / volumes; object instantiation needs a model rebuild | M (not done) |
 | Replicator graph / triggers (`on_frame`, `on_time`) | Python loop | not needed for batched data generation | n/a |
 | tier 2 (path tracer) id buffer | none | segmentation from the path tracer needs a renderer output; use tier 0 for labels (same geometry) | M (renderer) |

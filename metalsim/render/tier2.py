@@ -29,7 +29,18 @@ Physical (USD / RTX) mode, all off by default (the defaults reproduce the origin
                       metres on the far ground)
   ``denoise``         None | 'oidn' (Open Image Denoise on its Metal device, shared buffers) | 'atrous'
                       (edge-avoiding a-trous on albedo-demodulated radiance, in the render command buffer)
+  ``firefly_clamp``   0 (off, the default and the unbiased estimator) or a luminance cap applied to every path
+                      sample before accumulation: removes fireflies from rare high-energy paths at the cost of a
+                      downward bias on bright indirect light (opt-in; docs/DECISIONS.md)
 See docs/research/rendering_vs_rtx_2026-09-25.md.
+
+Environment map (``set_environment``): an equirectangular HDR image replaces the sky colour as the miss
+radiance and as an importance-sampled light (next-event estimation with multiple importance sampling
+against the BSDF sampler, as PBRT's InfiniteAreaLight). Orientation follows a textured USD DomeLight as
+Kit/RTX renders it on Isaac's z-up stages (pole +z; docs/PARITY.md 1.7); radiance = map x dome intensity x
+2^exposure x color (USD LightAPI). ``set_environment_from_model`` reads the DomeLight that
+``metalsim.scene.usd_to_mjcf`` records in the model's custom text. Tests: a furnace under a constant map and
+an analytic bright-window plane (importance-sampled estimate unbiased within 2 %, uniform table > 3x noisier).
 """
 from __future__ import annotations
 
@@ -46,12 +57,37 @@ from metalsim.render.tier0 import RenderOutputs
 from metalsim.sensors.raytrace import RayTracer
 
 
+def env_sampling_table(hdr, grid=(512, 256)):
+    """Importance-sampling table of an equirectangular map on a (gw, gh) grid (PBRT 3rd ed. 12.6 / 14.2.4,
+    Distribution2D over luminance x sin(theta)): pixel weight = area-averaged luminance x sin(theta), floored
+    so no cell has zero probability (the MIS estimator needs full support). Returns
+    ([marginal CDF over rows (gh) | per-row conditional CDFs (gh*gw) | density over (u, v) in [0,1]^2 (gh*gw)],
+    gw, gh) as float32. The density is the sampler's own (u, v) density, so any grid is unbiased; finer grids
+    only lower the variance."""
+    hdr = np.asarray(hdr, np.float32)[..., :3]
+    H, W = hdr.shape[:2]
+    gw, gh = min(int(grid[0]), W), min(int(grid[1]), H)
+    lum = hdr @ np.array([0.2126, 0.7152, 0.0722], np.float32)
+    # area average onto the grid: block sums along each axis (blocks of floor/ceil(W/gw) pixels)
+    ex = np.linspace(0, W, gw + 1).astype(int); ey = np.linspace(0, H, gh + 1).astype(int)
+    small = np.add.reduceat(np.add.reduceat(lum, ey[:-1], axis=0), ex[:-1], axis=1)
+    small /= np.outer(np.diff(ey), np.diff(ex))
+    sin_t = np.sin((np.arange(gh) + 0.5) / gh * np.pi)[:, None]
+    w = np.maximum(small, 1e-6 * max(float(small.max()), 1e-6)) * sin_t
+    row = w.sum(1)
+    marg = np.cumsum(row) / row.sum()
+    cond = np.cumsum(w, 1) / row[:, None]
+    marg[-1] = 1.0; cond[:, -1] = 1.0
+    density = w / w.sum() * (gw * gh)
+    return np.concatenate([marg, cond.ravel(), density.ravel()]).astype(np.float32), gw, gh
+
+
 class Tier2Renderer:
     def __init__(self, model, n_envs: int, *, width=256, height=256, camera=None, spp=4, max_bounces=4,
                  max_group=3, include_planes=True, decimate_faces=0, exposure=1.0, seed=0,
                  material_model="legacy", usd_lights=None, dome=None, headlight=None, tonemap="linear",
                  denoise=None, denoise_quality="high", atrous_iters=5, aux=False, center_sample=False, clip_far=0.0,
-                 terrain_slots: bool = True, draw_hfields: bool = True,
+                 terrain_slots: bool = True, draw_hfields: bool = True, firefly_clamp=0.0,
                  ctx: MetalContext | None = None, device="metal:0"):
         """``terrain_slots`` / ``draw_hfields``: see ``Tier0Renderer`` (False = the previous behaviour)."""
         import mujoco
@@ -91,6 +127,7 @@ class Tier2Renderer:
                     continue
                 lights[i, 4:7] = float(ul.get("intensity", 1.0)) * np.asarray(ul.get("color", (1, 1, 1)), np.float32)
                 lights[i, 7] = np.deg2rad(float(ul.get("angle_deg", 0.0))) / 2      # angular radius
+        self._dome = None if dome is None else (float(dome[0]), tuple(float(v) for v in dome[1]))
         if dome is not None:
             params[4, :3] = np.asarray(dome[1], np.float32); params[4, 3] = 1.0; env_scale = float(dome[0])
         if headlight is False:
@@ -113,15 +150,25 @@ class Tier2Renderer:
                                      label="pt_atlas", storage=Metal.MTLStorageModeShared)
         c.upload_texture(self.atlas_tex, ai)
         self.samp = c.sampler(linear=True, repeat=True)
-        self.consts = np.zeros(16, np.uint32)
+        # PTConsts (shaders/pathtrace.metal): 16 words as before + [16:18] env grid, [20] env_yaw, [21] clamp_lum, [24:28] env_mul
+        self.consts = np.zeros(28, np.uint32)
         self.consts[:4] = (n_envs, width, height, max(model.ncam, 1))
         self.consts[4:8] = (max(model.nlight, 1) if model.nlight else 0, self.G, spp, max_bounces)
         self.consts[8:12] = (0, self.rt.tpr, 1, seed)
         cf = self.consts.view(np.float32); cf[12] = self.rt.stride; cf[13] = exposure; cf[14] = env_scale; cf[15] = clip_far
+        cf[21] = float(firefly_clamp); cf[24:27] = 1.0
         self.denoise = denoise
         self.aux = bool(aux or denoise)
         self.base_flags = (2 if material_model != "legacy" else 0) | (4 if tonemap == "rtx" else 0) | (8 if self.aux else 0) | (16 if center_sample else 0)
+        self.env_flags = 0            # FLAG_ENVMAP (32) once set_environment has a map
         self.consts_buf = c.buffer(self.consts.nbytes, self.consts, "pt_consts")
+        # environment map resources (placeholders until set_environment; the shader ignores them without FLAG_ENVMAP)
+        self._env_res = {}
+        self._set_env_resources(np.zeros((1, 1, 4), np.float32), np.zeros(3, np.float32))
+        sd = Metal.MTLSamplerDescriptor.new()
+        sd.setMinFilter_(Metal.MTLSamplerMinMagFilterLinear); sd.setMagFilter_(Metal.MTLSamplerMinMagFilterLinear)
+        sd.setSAddressMode_(Metal.MTLSamplerAddressModeRepeat); sd.setTAddressMode_(Metal.MTLSamplerAddressModeClampToEdge)
+        self.env_samp = c.device.newSamplerStateWithDescriptor_(sd)
         self.spp, self.max_bounces = spp, max_bounces
         self.frame = 0
         n, h, w = n_envs, height, width
@@ -178,7 +225,7 @@ class Tier2Renderer:
 
     def _encode(self, cb, reset: bool, cam_xpos, cxo, cam_xmat, cmo, light_xpos, lxo, light_xdir, ldo):
         self.consts[8] = self.frame
-        self.consts[10] = (1 if reset else 0) | self.base_flags
+        self.consts[10] = (1 if reset else 0) | self.base_flags | self.env_flags
         ce = cb.computeCommandEncoder()
         ce.setComputePipelineState_(self.pipe)
         rt = self.rt
@@ -198,7 +245,9 @@ class Tier2Renderer:
             v = self._views[k]; ce.setBuffer_offset_atIndex_(v.buffer, v.offset, 18 + i)
         for i, k in enumerate(("hdr", "aux_accum", "albedo", "nrm")):
             v = self._aux_views[k]; ce.setBuffer_offset_atIndex_(v.buffer, v.offset, 22 + i)
+        ce.setBuffer_offset_atIndex_(self._env_cdf, 0, 26)
         ce.setTexture_atIndex_(self.atlas_tex, 0); ce.setSamplerState_atIndex_(self.samp, 0)
+        ce.setTexture_atIndex_(self._env_tex, 1); ce.setSamplerState_atIndex_(self.env_samp, 1)
         ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.tw, self.th, self.n), Metal.MTLSize(8, 8, 1))
         ce.endEncoding()
         self.frame += 1
@@ -274,6 +323,96 @@ class Tier2Renderer:
         self.colors[:] = colors
         self.t_colors.copy_(torch.as_tensor(np.asarray(colors, np.float32)))
         torch.mps.synchronize()
+
+    # -- environment map and per-episode scene edits --------------------------------------------------
+
+    def _set_env_resources(self, rgba, cdf):
+        c = self.ctx
+        self._env_tex = c.texture2d(rgba.shape[1], rgba.shape[0], Metal.MTLPixelFormatRGBA32Float, Metal.MTLTextureUsageShaderRead,
+                                    label="pt_envmap", storage=Metal.MTLStorageModeShared)
+        c.upload_texture(self._env_tex, np.ascontiguousarray(rgba, np.float32))
+        self._env_cdf = c.buffer(cdf.nbytes, np.ascontiguousarray(cdf, np.float32), "pt_env_cdf")
+
+    def set_environment(self, hdr=None, *, yaw=0.0, intensity=None, exposure=0.0, color=None, grid=(512, 256), key=None):
+        """Equirectangular HDR environment ``hdr`` (H, W, 3) linear radiance: the miss radiance of every ray and
+        an importance-sampled light (a textured USD DomeLight). Orientation as Kit/RTX renders a DomeLight on a
+        z-up stage: pole +z, the image centre (u = 0.5) faces -y, u = 0.25 faces +x; ``yaw`` rotates the dome
+        about +z (rad, a rotateZ on the prim). Radiance = map x ``intensity`` x 2^``exposure`` x ``color``
+        (USD LightAPI); ``intensity`` / ``color`` default to the ``dome`` kwarg's (a DomeLight's intensity and
+        colour apply to its texture) or 1. ``key`` caches the GPU texture and sampling table per map, so a
+        randomizer can switch maps per episode without re-uploading (``hdr`` may then be None for a cached key).
+        ``hdr=None`` without a key restores the sky colour."""
+        if hdr is None and key is None:
+            self.env_flags = 0
+            return
+        if key is not None and key in self._env_res:
+            self._env_tex, self._env_cdf, gw, gh = self._env_res[key]
+        else:
+            if hdr is None:
+                raise KeyError(f"environment map {key!r} is not cached; pass hdr")
+            hdr = np.asarray(hdr, np.float32)[..., :3]
+            rgba = np.concatenate([hdr, np.ones(hdr.shape[:2] + (1,), np.float32)], -1)
+            cdf, gw, gh = env_sampling_table(hdr, grid)
+            self._set_env_resources(rgba, cdf)
+            if key is not None:
+                self._env_res[key] = (self._env_tex, self._env_cdf, gw, gh)
+        self.consts[16:18] = (gw, gh)
+        self.env_flags = 32
+        self.set_environment_pose(yaw, intensity, exposure, color)
+
+    def set_environment_pose(self, yaw=0.0, intensity=None, exposure=0.0, color=None):
+        """Dome rotation about +z (rad) and the USD light scale on the map: intensity x 2^exposure x color
+        (``None``: the ``dome`` kwarg's intensity / colour, else 1)."""
+        cf = self.consts.view(np.float32)
+        cf[20] = float(yaw)
+        if intensity is None:
+            intensity = self._dome[0] if self._dome is not None else 1.0
+        if color is None:
+            color = self._dome[1] if self._dome is not None else (1.0, 1.0, 1.0)
+        cf[24:27] = float(intensity) * 2.0 ** float(exposure) * np.asarray(color, np.float32)
+
+    def set_environment_from_model(self, model, grid=(512, 256)):
+        """Apply the textured USD DomeLight that ``metalsim.scene.usd_to_mjcf`` recorded in the model's custom
+        text ``usd_dome`` (file, intensity, exposure, color, yaw); returns its record or None when the model has
+        none (or the dome has no texture: then the ``dome`` kwarg already carries it)."""
+        import json
+        import mujoco
+        tid = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_TEXT, "usd_dome")
+        if tid < 0:
+            return None
+        adr, size = int(model.text_adr[tid]), int(model.text_size[tid])
+        rec = json.loads(bytes(model.text_data[adr:adr + size]).split(b"\0")[0].decode())
+        if not rec.get("file"):
+            return rec
+        from metalsim.render.hdr import load_hdr
+        key = rec["file"]
+        hdr = None if key in self._env_res else load_hdr(rec["file"])
+        self.set_environment(hdr, yaw=float(rec.get("yaw", 0.0)), intensity=float(rec.get("intensity", 1.0)),
+                             exposure=float(rec.get("exposure", 0.0)), color=tuple(rec.get("color", (1, 1, 1))), grid=grid, key=key)
+        return rec
+
+    def set_firefly_clamp(self, clamp_luminance=0.0):
+        """Opt-in per-path luminance cap (0 = off, unbiased). Biased: see the class docstring / DECISIONS.md."""
+        self.consts.view(np.float32)[21] = float(clamp_luminance)
+
+    def set_fovy(self, fovy_deg, env=None):
+        """Change the vertical field of view (MuJoCo convention) for all envs or one (fx = fy)."""
+        f = 0.5 * self.th / np.tan(np.radians(fovy_deg) / 2)
+        sl = slice(None) if env is None else slice(env, env + 1)
+        self.cam_spec[sl, 0:2] = f
+        self.t_cam_spec.copy_(torch.as_tensor(self.cam_spec))
+        torch.mps.synchronize()
+
+    def set_materials(self, materials):
+        """Replace the (G, 16) material table (layout: SceneTables.MATERIAL_LAYOUT) and rewrite the GPU buffer;
+        the per-slot BRDF model ids of a non-legacy ``material_model`` are kept."""
+        mats = np.asarray(materials, np.float32).reshape(self.G, 16).copy()
+        if self.mat_buf is not None:
+            mats[:, 15] = self.ctx.buffer_array(self.mat_buf, np.float32, (self.G, 16))[:, 15]
+            self.ctx.write_buffer(self.mat_buf, mats)
+        else:
+            self.tables.materials[:] = mats.reshape(self.tables.materials.shape)
+            self.ctx.write_buffer(self.rt.mat_buf, mats)
 
     def render_host(self, datas, passes=1, reset=True, cam_pos=None, cam_quat=None, geom_size=None):
         """Host path from MjData lists (tests/tools); synchronizes; returns numpy outputs. ``geom_size`` (N, ngeom, 3):

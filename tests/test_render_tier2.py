@@ -102,6 +102,166 @@ def test_white_furnace_uniform_sky():
     assert hdr.std() < 0.05
 
 
+ENV_PLANE = """
+<mujoco>
+  <visual><headlight active="0" ambient="0 0 0"/></visual>
+  <asset><material name="white" rgba="1 1 1 1" specular="0" shininess="0"/></asset>
+  <worldbody>
+    <camera name="cam" pos="0 0 2" xyaxes="1 0 0 0 1 0" fovy="30"/>
+    <geom name="floor" type="plane" size="50 50 0.1" material="white"/>
+  </worldbody>
+</mujoco>
+"""
+
+
+def _env_irradiance_radiance(env):
+    """Outgoing radiance of a white Lambertian, upward-facing plane under an equirectangular map (pole +z, v =
+    polar angle / pi): (1/pi) * sum over upper-hemisphere pixels of L * cos(theta) * d_omega."""
+    h, w = env.shape[:2]
+    th = (np.arange(h) + 0.5) / h * np.pi
+    d_omega = (2 * np.pi / w) * (np.pi / h) * np.sin(th)
+    cos_t = np.clip(np.cos(th), 0, None)
+    return (env * (cos_t * d_omega)[:, None, None]).sum((0, 1)) / np.pi
+
+
+def test_env_map_furnace():
+    """A constant environment map of radiance S behaves like the uniform sky: a white plane reflects S
+    (the env NEE + BRDF-sampled miss with MIS weights sum to one estimator of the same integral)."""
+    model = mujoco.MjModel.from_xml_string(ENV_PLANE)
+    rend = Tier2Renderer(model, 1, width=64, height=64, camera="cam", spp=32, max_bounces=1)
+    rend.set_environment(np.full((64, 128, 3), 0.5, np.float32))
+    hdr = rend.render_host([_fwd(model)], passes=4)["hdr"][0]
+    print(f"env furnace: mean {hdr.mean():.4f} (expected 0.5000), pixel std {hdr.std():.4f}")
+    assert abs(hdr.mean() - 0.5) < 0.01
+    # the map's USD light scale: intensity x 2^exposure x color
+    rend.set_environment_pose(0.0, intensity=2.0, exposure=1.0, color=(1.0, 0.5, 0.25))
+    hdr = rend.render_host([_fwd(model)], passes=4)["hdr"][0]
+    assert np.allclose(hdr.reshape(-1, 3).mean(0), 0.5 * 4.0 * np.array([1.0, 0.5, 0.25]), rtol=0.02)
+    # back to the sky colour
+    rend.set_environment(None)
+    hdr = rend.render_host([_fwd(model)], passes=1)["hdr"][0]
+    assert hdr.mean() < 1e-6
+
+
+def test_env_map_importance_sampling_unbiased():
+    """Under a map with a small, very bright patch (a window: 0.3 % of the sphere carrying most of the
+    energy) the MIS estimate (env NEE + BRDF sampling) matches the analytic plane radiance at any yaw,
+    and has several times less noise than the same estimator with a uniform sampling table."""
+    from metalsim.render.tier2 import env_sampling_table
+    model = mujoco.MjModel.from_xml_string(ENV_PLANE)
+    env = np.full((128, 256, 3), 0.05, np.float32)
+    env[36:44, 40:52] = (60.0, 50.0, 40.0)                      # ~45 deg elevation
+    expected = _env_irradiance_radiance(env)
+    for yaw in (0.0, 1.3):
+        rend = Tier2Renderer(model, 1, width=48, height=48, camera="cam", spp=64, max_bounces=1, seed=3)
+        rend.set_environment(env, yaw=yaw)
+        hdr = rend.render_host([_fwd(model)], passes=4)["hdr"][0]
+        mean = hdr.reshape(-1, 3).mean(0)
+        rel_noise = float(hdr[..., 1].std() / hdr[..., 1].mean())
+        print(f"yaw {yaw}: mean {np.round(mean, 4)} expected {np.round(expected, 4)}, per-pixel rel. std {rel_noise:.3f}")
+        assert np.allclose(mean, expected, rtol=0.02)
+    # same map, sampling table of a constant map: still unbiased, much noisier
+    flat = Tier2Renderer(model, 1, width=48, height=48, camera="cam", spp=64, max_bounces=1, seed=3)
+    flat.set_environment(env)
+    cdf, _, _ = env_sampling_table(np.ones_like(env))
+    flat._env_cdf = flat.ctx.buffer(cdf.nbytes, cdf, "pt_env_cdf_uniform")
+    hdr_u = flat.render_host([_fwd(model)], passes=4)["hdr"][0]
+    rel_u = float(hdr_u[..., 1].std() / hdr_u[..., 1].mean())
+    print(f"uniform table: mean {np.round(hdr_u.reshape(-1, 3).mean(0), 4)}, rel. std {rel_u:.3f} ({rel_u / rel_noise:.1f}x)")
+    assert np.allclose(hdr_u.reshape(-1, 3).mean(0), expected, rtol=0.05)
+    assert rel_u > 3 * rel_noise
+
+
+def _write_rgbe(path, rgb):
+    """Minimal Radiance RGBE writer (flat scanlines) for tests."""
+    rgb = np.asarray(rgb, np.float32)
+    m = rgb.max(-1)
+    e = np.where(m > 1e-32, np.floor(np.log2(np.maximum(m, 1e-32))) + 1, 0)
+    scale = np.where(m > 1e-32, 256.0 / np.exp2(e), 0.0)
+    rgbe = np.zeros(rgb.shape[:2] + (4,), np.uint8)
+    rgbe[..., :3] = np.clip(rgb * scale[..., None], 0, 255).astype(np.uint8)
+    rgbe[..., 3] = np.where(m > 1e-32, e + 128, 0).astype(np.uint8)
+    with open(path, "wb") as f:
+        f.write(f"#?RADIANCE\nFORMAT=32-bit_rle_rgbe\n\n-Y {rgb.shape[0]} +X {rgb.shape[1]}\n".encode())
+        f.write(rgbe.tobytes())
+
+
+def test_env_map_usd_dome_import(tmp_path):
+    """A USD DomeLight with inputs:texture:file flows through the importer (custom text ``usd_dome``) to
+    set_environment with USD's light scale (intensity x 2^exposure x color) and the prim's yaw; a furnace under
+    a constant textured dome reads S x that scale, and the RGBE reader reproduces the written values."""
+    pxr = pytest.importorskip("pxr")
+    from pxr import Usd, UsdGeom, UsdLux, UsdPhysics
+    from metalsim.render.hdr import load_hdr
+    from metalsim.scene.usd_to_mjcf import load_usd
+    hdr_path = str(tmp_path / "const.hdr")
+    _write_rgbe(hdr_path, np.full((8, 16, 3), 0.5, np.float32))
+    assert np.allclose(load_hdr(hdr_path), 0.5, rtol=0.01)
+    stage = Usd.Stage.CreateNew(str(tmp_path / "dome.usda"))
+    UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z); UsdGeom.SetStageMetersPerUnit(stage, 1.0)
+    world = UsdGeom.Xform.Define(stage, "/World"); stage.SetDefaultPrim(world.GetPrim())
+    dome = UsdLux.DomeLight.Define(stage, "/World/skyLight")
+    dome.CreateTextureFileAttr("./const.hdr"); dome.CreateTextureFormatAttr("latlong")
+    dome.CreateIntensityAttr(2.0); dome.CreateExposureAttr(1.0); dome.CreateColorAttr((1.0, 0.5, 0.25))
+    UsdGeom.Xformable(dome.GetPrim()).AddRotateZOp().Set(30.0)
+    plane = UsdGeom.Cube.Define(stage, "/World/floor"); plane.CreateSizeAttr(1.0)
+    UsdGeom.Xformable(plane.GetPrim()).AddScaleOp().Set((100.0, 100.0, 0.02))
+    UsdGeom.Xformable(plane.GetPrim()).AddTranslateOp().Set((0.0, 0.0, -0.5))
+    UsdPhysics.CollisionAPI.Apply(plane.GetPrim())
+    cam = UsdGeom.Camera.Define(stage, "/World/cam")
+    UsdGeom.Xformable(cam.GetPrim()).AddTranslateOp().Set((0.0, 0.0, 2.0))   # a USD camera looks down its -z: straight down
+    stage.GetRootLayer().Save()
+    spec = load_usd(str(tmp_path / "dome.usda"))
+    spec.visual.headlight.active = 0
+    mat = spec.add_material(); mat.name = "matte"; mat.rgba = [0.8, 0.8, 0.8, 1.0]; mat.specular = 0.0; mat.shininess = 0.0
+    for g in spec.geoms:
+        g.material = "matte"
+    m = spec.compile()
+    assert m.ntext == 1 and mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_TEXT, 0) == "usd_dome"
+    rend = Tier2Renderer(m, 1, width=32, height=32, camera="cam", spp=32, max_bounces=1, headlight=False)
+    rec = rend.set_environment_from_model(m)
+    print("usd dome record:", rec)
+    assert os.path.realpath(rec["file"]) == os.path.realpath(hdr_path) and rec["format"] == "latlong"
+    assert abs(rec["yaw"] - np.radians(30)) < 1e-6 and rec["tilt"] < 0.01
+    assert rend.env_flags == 32 and np.isclose(rend.consts.view(np.float32)[20], np.radians(30))
+    assert np.allclose(rend.consts.view(np.float32)[24:27], 2.0 * 2.0 * np.array([1.0, 0.5, 0.25]))
+    d = mujoco.MjData(m); mujoco.mj_forward(m, d)
+    hdr = rend.render_host([d], passes=2)["hdr"][0]
+    top = hdr.reshape(-1, 3).mean(0)
+    albedo = m.mat_rgba[m.geom_matid[0], :3]                     # the bound material's colour (0.8)
+    print("usd dome furnace:", top, "expected", 0.5 * 4.0 * np.array([1.0, 0.5, 0.25]) * albedo)
+    assert np.allclose(top, 0.5 * 4.0 * np.array([1.0, 0.5, 0.25]) * albedo, rtol=0.03)
+
+
+def test_env_randomizer_and_helpers():
+    """Replicator: ``Randomizer.environment`` picks a map per episode by key (cached GPU resources, random yaw);
+    the helpers set_fovy / set_materials rewrite what they claim; the opt-in firefly clamp caps a path's
+    luminance (biased by construction: a 0.5 furnace under a 0.2 cap reads 0.2)."""
+    from metalsim.replicator import Randomizer
+    model = mujoco.MjModel.from_xml_string(ENV_PLANE)
+    rend = Tier2Renderer(model, 2, width=32, height=32, camera="cam", spp=8, max_bounces=1)
+    maps = {"a": np.full((16, 32, 3), 0.5, np.float32), "b": np.full((16, 32, 3), (0.1, 0.2, 0.3), np.float32)}
+    rnd = Randomizer(rend, seed=1)
+    keys = [rnd.environment(maps) for _ in range(12)]
+    assert set(keys) == {"a", "b"} and set(rend._env_res) == {"a", "b"} and rend.env_flags == 32
+    assert rnd.environment(maps, key="b") == "b"
+    datas = [_fwd(model), _fwd(model)]
+    hdr = rend.render_host(datas, passes=2)["hdr"]
+    assert np.allclose(hdr.reshape(-1, 3).mean(0), (0.1, 0.2, 0.3), rtol=0.03)
+    assert rnd.environment(maps, key="a") == "a"          # cached: no hdr needed
+    rend.set_firefly_clamp(0.2)
+    hdr = rend.render_host(datas, passes=2)["hdr"]
+    assert abs(hdr.mean() - 0.2) < 0.01
+    rend.set_firefly_clamp(0.0)
+    assert abs(rend.render_host(datas, passes=2)["hdr"].mean() - 0.5) < 0.01
+    rend.set_fovy(60.0, env=1)
+    f = 0.5 * 32 / np.tan(np.radians(30))
+    assert np.isclose(rend.cam_spec[1, 0], f) and np.isclose(rend.t_cam_spec[1, 1].item(), f) and rend.cam_spec[0, 0] != rend.cam_spec[1, 0]
+    mats = rend.tables.materials.reshape(rend.G, 16).copy(); mats[:, :3] = 0.25
+    rend.set_materials(mats)
+    assert abs(rend.render_host(datas, passes=2)["hdr"].mean() - 0.125) < 0.005
+
+
 def test_monte_carlo_convergence():
     """Per-pixel noise between two independent renders falls as 1/sqrt(spp) in an indirectly-lit
     region (a box on the plane under the sky, 2 bounces)."""
