@@ -424,3 +424,14 @@ no barriers, no threadgroup memory, no dynamic indexing; the solve keeps x repli
 operations in the same order as the serial kernels: bitwise on the CPU scalar branch (Metal:
 `runs/tp26/unrolled.wrapper.log`). Estimated 0.45 -> ~0.15 ms per factorization and 0.21 -> ~0.05 per solve,
 about 7 ms of the 67 ms step.
+
+### 11.4 Rough loop with everything landed (measured, `runs/tp26/rough2.wrapper.log`, 08:33)
+
+Rough terrain (boxes_local, recommended preset, task capacities 256 / 128, the installed forks now at the merged
+heads, policy mapping D), full `g1_tp_variants`, two runs: physics only 69,458 / 69,499 (58.9-59.0 ms), full env
+step **49,013 / 49,100 (83.4-83.6 ms)**, rollout + inference 51,380 / 51,420 (79.7 ms per step), PPO update 296-300 ms,
+full PPO loop **44,449 / 44,504**. Against the morning's first rough measurement under the preset (section 5:
+physics 63,922-63,969, step 45,217-45,268 at 90.5 ms): physics +8.7 %, step +8.4 %; the loop had not been measured
+under the preset before (the README's 41.9 K rough loop is the default-contact setting). Rough gains less than flat
+because its physics is 71 % of the step (collision against 96 box slots per world, the 187-ray height scan) and
+its capacities are not model-boundable. The flat loop in the same job: 56,079 (step 60,540), as in section 9.

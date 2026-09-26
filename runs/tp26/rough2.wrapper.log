@@ -1,0 +1,31 @@
+[gpu_run] tp26_rough2 start: device utilisation 0% (08:33:02)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+=== start Sat Sep 26 08:33:05 PDT 2026 metalsim 10b8917 warp e29950ee mjw a1daf88 power: Now drawing from 'AC Power'
+imports /Users/aditya/robosim/upstream/warp-innate/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/__init__.py
+--- rough R1 08:33:06
+[rough1_landed] N=4096 njmax 256 naconmax 524288 is_sparse False
+[rough1_landed] physics only 59.0 ms/step -> 69,458 env-steps/s
+[rough1_landed] full env step 83.6 ms -> 49,013 env-steps/s
+[rough1_landed] after random-action steps: nefc max 40 mean 14.0; nacon 10823 (2.64/world); overflow {'ITERATIONS': 33, 'LS_ITERATIONS': 3864}
+[rough1_landed] rollout + inference 79.7 ms/step -> 51,380 env-steps/s
+[rough1_landed] PPO update 296 ms -> full loop 44,504 env-steps/s
+[rough1_landed] SUMMARY physics 69,458 | step 49,013 | rollout 51,380 | loop 44,504  (ms: physics 59.0, step 83.6, rollout/step 79.7, update 296)
+--- rough R2 08:33:52
+[rough2_landed] N=4096 njmax 256 naconmax 524288 is_sparse False
+[rough2_landed] physics only 58.9 ms/step -> 69,499 env-steps/s
+[rough2_landed] full env step 83.4 ms -> 49,100 env-steps/s
+[rough2_landed] after random-action steps: nefc max 40 mean 14.1; nacon 10825 (2.64/world); overflow {'ITERATIONS': 26, 'LS_ITERATIONS': 3886}
+[rough2_landed] rollout + inference 79.7 ms/step -> 51,420 env-steps/s
+[rough2_landed] PPO update 300 ms -> full loop 44,449 env-steps/s
+[rough2_landed] SUMMARY physics 69,499 | step 49,100 | rollout 51,420 | loop 44,449  (ms: physics 58.9, step 83.4, rollout/step 79.7, update 300)
+--- flat F1 08:34:25
+[flat_landed] N=4096 njmax 144 naconmax 98304 is_sparse False
+[flat_landed] physics only 45.4 ms/step -> 90,271 env-steps/s
+[flat_landed] full env step 67.7 ms -> 60,540 env-steps/s
+[flat_landed] after random-action steps: nefc max 51 mean 14.6; nacon 11313 (2.76/world); overflow {'ITERATIONS': 28, 'LS_ITERATIONS': 3925}
+[flat_landed] rollout + inference 66.8 ms/step -> 61,302 env-steps/s
+[flat_landed] PPO update 149 ms -> full loop 56,079 env-steps/s
+[flat_landed] SUMMARY physics 90,271 | step 60,540 | rollout 61,302 | loop 56,079  (ms: physics 45.4, step 67.7, rollout/step 66.8, update 149)
+=== end Sat Sep 26 08:34:50 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] tp26_rough2 end: device utilisation 96% (08:34:50), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
