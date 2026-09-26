@@ -23,7 +23,7 @@ The evidence, test by test, is in [`docs/PARITY.md`](docs/PARITY.md); open and c
 | G1 flat velocity task, training (Isaac's flat config and PPO settings) | return +28.4 / +26.3 / +26.0 at iteration 1000 (three seeds), full-length episodes by the same iteration; +27.1 with the base velocity at Isaac's point (pelvis COM, the default since 2026-09-25 evening) | Isaac Lab 2.3.2 + PhysX: +27.3 (one seed) | [§1.5](docs/PARITY.md#15-learning-on-the-g1-task) |
 | G1 rough velocity task, training (Isaac's terrain generator, ported exactly) | +16.4 / +22.6 / +19.1 at iteration 1500 (three seeds), terrain level 6.0–6.1 | Isaac Lab 2.3.2 + PhysX: +14.1, level 5.9 (one seed) | [§1.5](docs/PARITY.md#15-learning-on-the-g1-task) |
 | Isaac Lab 3.0-EA G1 tasks (its extra push / mass / reset-velocity events), like-for-like on Isaac's own MuJoCo Warp numerics, both trainer fixes in | **flat, three seeds: +27.0 ± 1.4 at iteration 1499** (26.8 / 28.4 / 25.7), inside one standard deviation of Isaac's Newton run at every milestone from iteration 200 (mean +7.2 / +17.9 / +25.4 at 300 / 500 / 1000 vs +8.4 / +19.6 / +25.9); 0 blow-ups; **rough seed 0: +13.7 at 1499, terrain level 5.99** vs Isaac's +14.5 / 5.80 (was +8.4 with 1,010 blow-ups before the two fixes). Two trainer defects found and fixed on the way (no reset before the first episode; effort clamp placed where a saturated drive loses implicit damping) | flat +27.5 (Newton / MuJoCo Warp, 59.4 K on the L4), +28.9 (PhysX, 47.3 K); rough +14.5, level 5.8 (Newton) at iteration 1499, one seed each | [§1.8](docs/PARITY.md#18-isaac-lab-30-ea-reference-isaac-sim-61-measured-on-the-l4-2026-09-25) |
-| G1 flat throughput, 4096 envs | **with the elliptic default (impratio 10, cap 20): full PPO loop 34.2–34.4 K env-steps/s, env step 36.4–36.5 K, physics alone 54.0 K** (measured 2026-09-26 11:00, current fork heads, two interleaved repeats). With the previous pyramidal default in the same session: loop 57.5–57.7 K, env step 62.1–62.5 K, physics alone 93.3–93.8 K. Rough, pyramidal: env step 49.1 K, loop 44.5 K. The elliptic premium is the price of PhysX's cone on this solver: 1.68× on the loop after the incremental Newton path (was 7× before 2026-09-25); switch back with `contact_cfg="recommended_pyramidal"` | Isaac Lab 3.0 on the L4 (`isaaclab benchmark runtime`, env step alone): 72.0 K with its default Newton / MuJoCo Warp, 45.1 K PhysX; rough 51.2 K / 35.7 K. Isaac Lab 2.3.2 + PhysX on the L4: 45.9 K; RTX 4090: 82 K (published) | [§1.4](docs/PARITY.md#14-throughput-on-the-g1-task-isaacs-protocol-4096-envs), [§1.8](docs/PARITY.md#18-isaac-lab-30-ea-reference-isaac-sim-61-measured-on-the-l4-2026-09-25) |
+| G1 flat throughput, 4096 envs | **with the elliptic default (impratio 10, cap 20): full PPO loop 37.3–37.7 K env-steps/s, env step 41.0 K, physics alone 84.0 K** (measured 2026-09-26 afternoon after the elliptic-path fusion and Metal early exit, two interleaved repeats, `runs/ellip_ws/final.wrapper.log`). Pyramidal (`recommended_pyramidal`) in the same session: loop 56.9–57.5 K, env step 61.3 K, physics 100.5 K. The elliptic premium is 1.53× on the loop; the review (`docs/research/elliptic_cost_review_2026-09-26.md`) shows the rest is inherent to impratio 10 (MuJoCo C needs the same extra iterations). Rough, pyramidal: env step 49.1 K, loop 44.5 K | Isaac Lab 3.0 on the L4 (`isaaclab benchmark runtime`, env step alone): 72.0 K with its default Newton / MuJoCo Warp, 45.1 K PhysX; rough 51.2 K / 35.7 K. Isaac Lab 2.3.2 + PhysX on the L4: 45.9 K; RTX 4090: 82 K (published) | [§1.4](docs/PARITY.md#14-throughput-on-the-g1-task-isaacs-protocol-4096-envs), [§1.8](docs/PARITY.md#18-isaac-lab-30-ea-reference-isaac-sim-61-measured-on-the-l4-2026-09-25) |
 | Rendering vs RTX (G1 scene, identical states) | tier 2 + Open Image Denoise vs RTX path tracer: robot pixels 28.8 dB PSNR / SSIM 0.94, whole frame 45.6 dB | RTX real-time vs RTX path tracer on the robot: 25.9 dB apart | [§1.7](docs/PARITY.md#17-fidelity-protocol-against-isaac-sim-51-on-an-l4-recorded-2026-09-24-physx--rtx) |
 | Physics vs PhysX (same asset, open-loop protocol) | joints within 0.03–0.06 rad through hold and 1 m drop; contact impulses within 1–4 % of Isaac's; **default contacts since 2026-09-26: elliptic friction cones (PhysX's exact cone), impratio 10, Newton cap 20**, on top of the 10 ms impact-stiffened preset with hard joint limits: 20 ms impact forces 1.08× / 1.07× of PhysX's (pyramidal 1.70× / 1.23×), peak drop penetration 1.55 cm, feet slide within noise of Isaac's; learning inside seed spread | Isaac Sim 5.1 PhysX recording; Isaac Sim 6.1 / Isaac Lab 3.0 PhysX reproduces it within 0.002 rad, and 3.0's own MuJoCo Warp sits 0.002–0.005 rad from its PhysX | [§1.7](docs/PARITY.md#17-fidelity-protocol-against-isaac-sim-51-on-an-l4-recorded-2026-09-24-physx--rtx), [§1.8](docs/PARITY.md#18-isaac-lab-30-ea-reference-isaac-sim-61-measured-on-the-l4-2026-09-25) |
 | Deformables (cloth, rope, soft cube) | vs PhysX 5.1: rope period 1.077 vs 1.026 s, soft-cube bounce 0.140 vs 0.135 m, penetration 2.6 vs 1.6 mm (damping fitted); vs Isaac Lab 3.0: soft cube matches PhysX's FEM with PhysX's own parameters, cloth within 7 mm; Newton VBD run on Metal replays 3.0's Newton recording within 1.2 mm over 5 s (same solver, Metal vs CUDA) | Isaac Sim 5.1 and 6.1 recordings | [§2](docs/PARITY.md#2-platform-capabilities-the-workstreams-with-the-tests-behind-them), [GAPS](docs/GAPS.md#open-2026-09-25-evening) |
@@ -38,8 +38,9 @@ ledger. [`docs/STATUS.md`](docs/STATUS.md) is the state against the original pla
 Since 2026-09-26 the G1 task's default contacts are **elliptic friction cones** (the exact Coulomb cone, as PhysX
 uses) with impratio 10 and a Newton iteration cap of 20, on top of the impact-stiffened 10 ms preset with hard joint
 limits (`contact_cfg="recommended"` = `tau10_impact_hardlimits_ellip10`). This is the most PhysX-faithful setting
-measured (impact forces within 8 % of PhysX's instead of 70 %), and it costs **1.7× on the full PPO loop** relative to
-pyramidal cones (34.3 K vs 57.6 K env-steps/s at 4096 envs). The owner chose fidelity over throughput on the reasoning that the M4 Max's compute deficit against an
+measured (impact forces within 8 % of PhysX's instead of 70 %), and it costs **1.5× on the full PPO loop** relative to
+pyramidal cones (37.5 K vs 57.2 K env-steps/s at 4096 envs, after the elliptic-path fusion and Metal early exit; an
+independent review found the remainder inherent to impratio 10, which MuJoCo C shares). The owner chose fidelity over throughput on the reasoning that the M4 Max's compute deficit against an
 L4 is inherent anyway. Known counter-signal: a PhysX-trained checkpoint falls 7–10 % more often under it (within one
 seed's standard deviation; cause not established). To run the previous default, pass
 `contact_cfg="recommended_pyramidal"` (or `--contact_cfg recommended_pyramidal`); `"default"` gives MuJoCo's own
@@ -76,7 +77,7 @@ listing its commits, and keeps its upstream licence unchanged. "Head" is the bra
 
 [github.com/pulipakaa24/warp](https://github.com/pulipakaa24/warp), branch
 [`metalsim`](https://github.com/pulipakaa24/warp/tree/metalsim), head
-[`9abceff9`](https://github.com/pulipakaa24/warp/commit/9abceff9) (2026-09-26; the results before that day's throughput work were
+[`c200d46b`](https://github.com/pulipakaa24/warp/commit/c200d46b) (2026-09-26; the results before that day's throughput work were
 produced at [`4127c48`](https://github.com/pulipakaa24/warp/commit/4127c4818334080de6f3d23aef522e582ff6a2a7), code
 [`f194006`](https://github.com/pulipakaa24/warp/commit/f194006a4cf197fda93633252af81bc3f57f5561)). Base: innate-inc/warp
 `ce15f6b`, NVIDIA Warp with innate-inc's Metal backend. Apache-2.0.
@@ -91,6 +92,8 @@ produced at [`4127c48`](https://github.com/pulipakaa24/warp/commit/4127c48183340
 - Register-tile Cholesky bound configurable, `warp.config.metal_register_cholesky_max` (default 40; MetalSim sets 48,
   which puts the 43-dof G1 on the register path) (`b9557cb`).
 - `nextafterf` in the Metal kernel runtime, bit-exact (Newton VBD) (`9050cb5`).
+- Recorded indirect-command-buffer ranges with a GPU-readable execution range (`wp_metal_capture_range_begin/_end`,
+  `6bceb39d`): exact early exit of captured loops on Metal, the counterpart of CUDA's `capture_while`.
 - Register triangular solves in `tile_cholesky_solve` (`27e63fd1`; solve 0.52 → 0.34 ms at n = 43, +5.2 % env step,
   summation order only); in-place rank-1 Cholesky updates (`e29950ee`); compact register layout and rolled Cholesky
   variants kept off by default (measured slower).
@@ -103,7 +106,7 @@ first four commits plus the graph-capture sort; merged into `metalsim`.
 
 [github.com/pulipakaa24/mujoco_warp](https://github.com/pulipakaa24/mujoco_warp), branch
 [`metalsim`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), head
-[`0a9de8e`](https://github.com/pulipakaa24/mujoco_warp/commit/0a9de8e) (2026-09-26;
+[`063ff98`](https://github.com/pulipakaa24/mujoco_warp/commit/063ff98) (2026-09-26;
 the rigid-body results before the elliptic-cone work were produced at
 [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) / code
 [`8fbf965`](https://github.com/pulipakaa24/mujoco_warp/commit/8fbf965acb630aa32573dda802404d519c843a99)). Base: Google
@@ -132,6 +135,11 @@ DeepMind's MuJoCo Warp v3.14.0 (`88af9cc`) plus the Metal device patch by David 
   slower); the elliptic cone term as rank-1 factor updates kept off (`4ef3da3`, 5–24 % slower).
 - Per-model unrolled register L'DL factorization of M (`f4276b0`, `MJW_METAL_LDL_UNROLLED`, default on): factor 0.453 → 0.314 ms
   per 4096 worlds, physics +3.6 %, bitwise the serial kernel (fp contraction off).
+- Fused per-iteration Newton launch on the elliptic path (11 → 5 launches per iteration, bitwise) and exact per-world
+  early exit in Metal graph replay (`_solve_done` zeroes the remaining iterations' indirect-command-buffer range;
+  `MJW_METAL_ICB_EARLY_EXIT=0` disables) (`433c305`, `21be81b`): elliptic loop premium 1.68× → 1.53×; the
+  line-search noise floor (Genesis #3382's rule) and an extrapolated warm start archived (`MJW_LS_NOISE_FLOOR`,
+  `MJW_WARMSTART_EXTRAP`: both move states beyond the floor on some state classes).
 - Heightfield plane contacts restricted to meshes; primitives take upstream's GJK/EPA again (`b630530`; the fork's
   plane path missed contacts of primitives on heightfields smaller than the box; `HFIELD_PLANE_CONTACTS_PRIMITIVES=True`
   archives the old form).
