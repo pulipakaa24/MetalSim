@@ -1,0 +1,66 @@
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "<frozen runpy>", line 287, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "scripts/diagnostics/g1_tp_variants.py", line 44, in <module>
+    task = G1VelocityTask(N, terrain=os.environ.get("MJW_TP_TERRAIN", "flat"), physics_dt=0.0025,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/metalsim/learn/g1_velocity.py", line 666, in __init__
+    self.sim = BatchSim(m, n, options=BatchSimOptions(**bso))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/metalsim/physics/batch.py", line 165, in __init__
+    self._capture()
+  File "/Users/aditya/robosim/metalsim/physics/batch.py", line 179, in _capture
+    self._launch_substeps()
+  File "/Users/aditya/robosim/metalsim/physics/batch.py", line 190, in _launch_substeps
+    mjw.step(self.m, self.d)
+  File "/Users/aditya/robosim/upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/forward.py", line 1843, in step
+    forward(m, d)
+  File "/Users/aditya/robosim/upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/forward.py", line 1834, in forward
+    solver.solve(m, d)
+  File "/Users/aditya/robosim/upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/solver.py", line 5150, in solve
+    _solve(m, d, ctx)
+  File "/Users/aditya/robosim/upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/solver.py", line 5177, in _solve
+    ctx.icb_ranges = _icb_early_exit_ranges(m)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/solver.py", line 5166, in _icb_early_exit_ranges
+    if not getattr(dev, "is_metal", False) or not hasattr(wp.context, "metal_capture_range_begin"):
+                                                          ^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate-ellip-test/warp/__init__.py", line 633, in __getattr__
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+AttributeError: module 'warp' has no attribute 'context'. Did you mean: 'constant'?
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth c110e7b load on device 'metal:0' took 28.02 ms  (cached)
+Module _nxn_broadphase__locals__kernel_5fda9840 5fda984 load on device 'metal:0' took 18.48 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_741d8432 741d843 load on device 'metal:0' took 28.72 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_d1dc65fe d1dc65f load on device 'metal:0' took 20.92 ms  (cached)
+Module mujoco_warp._src.constraint d0e6f52 load on device 'metal:0' took 17.51 ms  (cached)
+Module _friction_dof__locals__kernel_cd224a52 cd224a5 load on device 'metal:0' took 18.09 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_a5537ecb a5537ec load on device 'metal:0' took 18.19 ms  (cached)
+Module _efc_contact_init__locals__kernel_364c4a0d 364c4a0 load on device 'metal:0' took 17.39 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_4bf82c1f 7b25328 load on device 'metal:0' took 17.55 ms  (cached)
+Module _efc_contact_update__locals__kernel_eb1de06b eb1de06 load on device 'metal:0' took 17.84 ms  (cached)
+Module mujoco_warp._src.forward 1303b17 load on device 'metal:0' took 24.02 ms  (cached)
+Module mujoco_warp._src.passive 44b6426 load on device 'metal:0' took 22.99 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_49bb41e9 49bb41e load on device 'metal:0' took 17.36 ms  (cached)
+Module mujoco_warp._src.forward f1c4502 load on device 'metal:0' took 24.67 ms  (cached)
+Module _qfrc_smooth__locals__kernel_4c42539c 4c42539 load on device 'metal:0' took 17.98 ms  (cached)
+Module mujoco_warp._src.support bc53821 load on device 'metal:0' took 17.31 ms  (cached)
+Module _factor_i_sparse_unrolled__locals__kernel_652f917a bd6d1bc load on device 'metal:0' took 18.15 ms  (cached)
+Module _solve_LD_sparse_serial__locals__kernel_e81d9be0 f1d8e41 load on device 'metal:0' took 17.97 ms  (cached)

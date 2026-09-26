@@ -1,0 +1,106 @@
+[gpu_run] ellip_ws_icb start: device utilisation 0% (11:51:08)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   1.7 %
+=== start Sat Sep 26 11:51:11 PDT 2026 metalsim b7080fb frozen warp 6bceb39d mjw 21be81b power: Now drawing from 'AC Power'
+--- (a) graph capture tests 11:51:11
+s                                                                        [100%]
+1 skipped, 104 deselected in 0.10s
+--- (b) check: early exit off (reference) 11:51:12
+=== variant {'label': 'icb off'}; N=512, 50 control steps, deterministic actions
+njmax 112 naconmax 12288 sparse False
+--- floor: two graph-replay instances of this configuration
+   step    1: qpos max 2.31e-06 median 0.0e+00 | obs max 1.03e-03 | rew max 6.82e-06
+   step    2: qpos max 1.07e-05 median 0.0e+00 | obs max 1.64e-03 | rew max 5.17e-06
+   step    5: qpos max 2.34e-02 median 3.0e-08 | obs max 8.31e-01 | rew max 3.34e-03
+   step   10: qpos max 2.66e-02 median 8.9e-08 | obs max 2.05e+00 | rew max 3.49e-03
+   step   20: qpos max 6.52e-02 median 2.1e-07 | obs max 4.95e+00 | rew max 8.87e-03
+   step   30: qpos max 2.46e-01 median 3.6e-07 | obs max 7.77e+00 | rew max 1.75e-02
+   step   40: qpos max 9.15e-01 median 2.6e-07 | obs max 1.16e+01 | rew max 4.03e+00
+   step   50: qpos max 1.58e+00 median 1.2e-07 | obs max 1.88e+01 | rew max 3.99e+00
+--- graph replay vs eager launches (same configuration)
+   step    1: qpos max 3.74e-06 median 0.0e+00 | obs max 1.18e-03 | rew max 1.97e-06
+   step    2: qpos max 1.39e-05 median 0.0e+00 | obs max 3.84e-03 | rew max 2.30e-05
+   step    5: qpos max 2.34e-02 median 3.0e-08 | obs max 8.31e-01 | rew max 3.34e-03
+   step   10: qpos max 2.66e-02 median 8.9e-08 | obs max 1.07e+00 | rew max 1.94e-03
+   step   20: qpos max 6.52e-02 median 2.1e-07 | obs max 1.21e+01 | rew max 6.72e-03
+   step   30: qpos max 1.30e-01 median 3.8e-07 | obs max 7.77e+00 | rew max 1.59e-02
+   step   40: qpos max 1.52e+00 median 2.9e-07 | obs max 1.16e+01 | rew max 4.03e+00
+   step   50: qpos max 1.34e+00 median 1.2e-07 | obs max 1.88e+01 | rew max 3.99e+00
+capacity replay: nefc max 28 (njmax 112), nacon max 1318 (naconmax 12288); overflow {'ITERATIONS': 9, 'LS_ITERATIONS': 478}
+capacity replay 2: nefc max 28 (njmax 112), nacon max 1319 (naconmax 12288); overflow {'ITERATIONS': 9, 'LS_ITERATIONS': 480}
+capacity eager: nefc max 28 (njmax 112), nacon max 1319 (naconmax 12288); overflow {'ITERATIONS': 10, 'LS_ITERATIONS': 479}
+--- physics protocol vs MuJoCo C (4 worlds: PD hold + fixed random targets; |dq| max / median)
+=== done
+--- (b) check: early exit on vs off 11:51:49
+=== variant {'label': 'icb on'}; N=512, 50 control steps, deterministic actions
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "<frozen runpy>", line 287, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "scripts/diagnostics/g1_tp_check.py", line 140, in <module>
+  File "scripts/diagnostics/g1_tp_check.py", line 43, in make
+  File "/Users/aditya/robosim/metalsim/learn/g1_velocity.py", line 666, in __init__
+  File "/Users/aditya/robosim/metalsim/physics/batch.py", line 165, in __init__
+  File "/Users/aditya/robosim/metalsim/physics/batch.py", line 179, in _capture
+  File "/Users/aditya/robosim/metalsim/physics/batch.py", line 190, in _launch_substeps
+  File "/Users/aditya/robosim/upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "/Users/aditya/robosim/upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/forward.py", line 1843, in step
+  File "/Users/aditya/robosim/upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "/Users/aditya/robosim/upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/forward.py", line 1834, in forward
+  File "/Users/aditya/robosim/upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "/Users/aditya/robosim/upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/solver.py", line 5150, in solve
+  File "/Users/aditya/robosim/upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/solver.py", line 5177, in _solve
+  File "/Users/aditya/robosim/upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/solver.py", line 5166, in _icb_early_exit_ranges
+  File "/Users/aditya/robosim/upstream/warp-innate-ellip-test/warp/__init__.py", line 633, in __getattr__
+AttributeError: module 'warp' has no attribute 'context'. Did you mean: 'constant'?
+--- (c) itercost early exit 0 11:51:51
+state: nefc mean 6.2 max 27, nacon 1.68 per world
+  k | solve ms (graph, per substep) | marginal ms of iteration k | worlds converged before iteration k
+   0 |   1.894 |   1.894 |     0
+   1 |   3.688 |   1.794 |     0
+   2 |   5.272 |   1.584 |   777
+   3 |   6.744 |   1.472 |  1459
+   4 |   8.037 |   1.293 |  1993
+   5 |   9.045 |   1.008 |  2578
+   6 |   9.781 |   0.736 |  3158
+   7 |  10.300 |   0.518 |  3526
+   8 |  10.761 |   0.461 |  3754
+   9 |  11.172 |   0.411 |  3918
+  10 |  11.516 |   0.344 |  4010
+  11 |  11.789 |   0.273 |  4060
+  12 |  12.055 |   0.265 |  4073
+  13 |  12.319 |   0.264 |  4082
+  14 |  12.614 |   0.295 |  4089
+  15 |  12.843 |   0.229 |  4092
+  16 |  13.097 |   0.254 |  4094
+  17 |  13.331 |   0.234 |  4095
+  18 |  13.418 |   0.087 |  4096
+  19 |  13.379 |  -0.039 |  4096
+  20 |  13.443 |   0.064 |  4096
+--- (c) itercost early exit 1 11:52:17
+Traceback (most recent call last):
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+AttributeError: module 'warp' has no attribute 'context'. Did you mean: 'constant'?
+--- (d) quick early exit 0 r1 11:52:20
+[icb0_r1] N=4096 njmax 112 naconmax 98304 is_sparse False
+[icb0_r1] physics only 55.5 ms/step -> 73,857 env-steps/s
+[icb0_r1] full env step 106.0 ms -> 38,629 env-steps/s
+[icb0_r1] after random-action steps: nefc max 34 mean 11.6; nacon 11081 (2.71/world); overflow {'ITERATIONS': 1, 'LS_ITERATIONS': 3885}
+--- (d) quick early exit 1 r1 11:52:39
+Traceback (most recent call last):
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+AttributeError: module 'warp' has no attribute 'context'. Did you mean: 'constant'?
+--- (d) quick early exit 0 r2 11:52:41
+[icb0_r2] N=4096 njmax 112 naconmax 98304 is_sparse False
+[icb0_r2] physics only 55.5 ms/step -> 73,775 env-steps/s
+[icb0_r2] full env step 108.1 ms -> 37,903 env-steps/s
+[icb0_r2] after random-action steps: nefc max 32 mean 11.5; nacon 10952 (2.67/world); overflow {'LS_ITERATIONS': 3841}
+--- (d) quick early exit 1 r2 11:53:01
+Traceback (most recent call last):
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+AttributeError: module 'warp' has no attribute 'context'. Did you mean: 'constant'?
+=== end Sat Sep 26 11:53:03 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] ellip_ws_icb end: device utilisation 0% (11:53:03), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   2.1 %

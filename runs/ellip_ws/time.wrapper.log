@@ -1,0 +1,55 @@
+[gpu_run] ellip_ws_time start: device utilisation 0% (11:31:55)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+=== start Sat Sep 26 11:31:58 PDT 2026 metalsim b7080fb frozen warp 9abceff9 mjw 5d0d165 power: Now drawing from 'AC Power'
+--- U1 unfused 11:31:58
+imports /Users/aditya/robosim/upstream/warp-innate-tp-test/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-ellip-test/mujoco_warp/__init__.py
+[U1_unfused] N=4096 njmax 112 naconmax 98304 is_sparse False
+[U1_unfused] physics only 76.0 ms/step -> 53,900 env-steps/s
+[U1_unfused] full env step 113.1 ms -> 36,208 env-steps/s
+[U1_unfused] after random-action steps: nefc max 33 mean 11.7; nacon 11283 (2.75/world); overflow {'ITERATIONS': 2, 'LS_ITERATIONS': 3874}
+--- F1 fused 11:32:19
+imports /Users/aditya/robosim/upstream/warp-innate-tp-test/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-ellip-test/mujoco_warp/__init__.py
+[F1_fused] N=4096 njmax 112 naconmax 98304 is_sparse False
+[F1_fused] physics only 71.2 ms/step -> 57,543 env-steps/s
+[F1_fused] full env step 109.4 ms -> 37,437 env-steps/s
+[F1_fused] after random-action steps: nefc max 29 mean 11.7; nacon 11167 (2.73/world); overflow {'ITERATIONS': 1, 'LS_ITERATIONS': 3869}
+--- H1 fused+htot 11:32:39
+imports /Users/aditya/robosim/upstream/warp-innate-tp-test/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-ellip-test/mujoco_warp/__init__.py
+[H1_fused_htot] N=4096 njmax 112 naconmax 98304 is_sparse False
+[H1_fused_htot] physics only 55.6 ms/step -> 73,615 env-steps/s
+[H1_fused_htot] full env step 106.2 ms -> 38,586 env-steps/s
+[H1_fused_htot] after random-action steps: nefc max 29 mean 11.8; nacon 0 (0.00/world); overflow {'ITERATIONS': 3, 'LS_ITERATIONS': 3881}
+--- E1 fused+extrap 11:32:59
+imports /Users/aditya/robosim/upstream/warp-innate-tp-test/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-ellip-test/mujoco_warp/__init__.py
+[E1_fused_extrap] N=4096 njmax 112 naconmax 98304 is_sparse False
+[E1_fused_extrap] physics only 67.4 ms/step -> 60,760 env-steps/s
+[E1_fused_extrap] full env step 104.3 ms -> 39,257 env-steps/s
+[E1_fused_extrap] after random-action steps: nefc max 33 mean 11.7; nacon 11314 (2.76/world); overflow {'ITERATIONS': 5, 'LS_ITERATIONS': 3909}
+--- U2 unfused 11:33:18
+imports /Users/aditya/robosim/upstream/warp-innate-tp-test/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-ellip-test/mujoco_warp/__init__.py
+[U2_unfused] N=4096 njmax 112 naconmax 98304 is_sparse False
+[U2_unfused] physics only 76.0 ms/step -> 53,872 env-steps/s
+[U2_unfused] full env step 113.1 ms -> 36,208 env-steps/s
+[U2_unfused] after random-action steps: nefc max 31 mean 11.7; nacon 11214 (2.74/world); overflow {'ITERATIONS': 1, 'LS_ITERATIONS': 3850}
+--- F2 fused 11:33:39
+imports /Users/aditya/robosim/upstream/warp-innate-tp-test/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-ellip-test/mujoco_warp/__init__.py
+[F2_fused] N=4096 njmax 112 naconmax 98304 is_sparse False
+[F2_fused] physics only 70.8 ms/step -> 57,824 env-steps/s
+[F2_fused] full env step 108.8 ms -> 37,638 env-steps/s
+[F2_fused] after random-action steps: nefc max 29 mean 11.7; nacon 11177 (2.73/world); overflow {'ITERATIONS': 1, 'LS_ITERATIONS': 3875}
+--- H2 fused+htot 11:33:59
+imports /Users/aditya/robosim/upstream/warp-innate-tp-test/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-ellip-test/mujoco_warp/__init__.py
+[H2_fused_htot] N=4096 njmax 112 naconmax 98304 is_sparse False
+[H2_fused_htot] physics only 55.4 ms/step -> 73,924 env-steps/s
+[H2_fused_htot] full env step 106.1 ms -> 38,618 env-steps/s
+[H2_fused_htot] after random-action steps: nefc max 29 mean 11.7; nacon 11200 (2.73/world); overflow {'ITERATIONS': 1, 'LS_ITERATIONS': 3867}
+--- E2 fused+extrap 11:34:18
+imports /Users/aditya/robosim/upstream/warp-innate-tp-test/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-ellip-test/mujoco_warp/__init__.py
+[E2_fused_extrap] N=4096 njmax 112 naconmax 98304 is_sparse False
+[E2_fused_extrap] physics only 67.4 ms/step -> 60,783 env-steps/s
+[E2_fused_extrap] full env step 104.4 ms -> 39,241 env-steps/s
+[E2_fused_extrap] after random-action steps: nefc max 33 mean 11.7; nacon 11178 (2.73/world); overflow {'ITERATIONS': 5, 'LS_ITERATIONS': 3912}
+=== end Sat Sep 26 11:34:37 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] ellip_ws_time end: device utilisation 100% (11:34:37), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   2.0 %

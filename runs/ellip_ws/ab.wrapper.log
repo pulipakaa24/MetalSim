@@ -1,0 +1,42 @@
+[gpu_run] ellip_ws_ab start: device utilisation 0% (11:45:31)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+=== start Sat Sep 26 11:45:34 PDT 2026 metalsim b7080fb frozen warp 9abceff9 mjw a00c21f power: Now drawing from 'AC Power'
+--- P1 pyramidal cap 10 11:45:34
+imports /Users/aditya/robosim/upstream/warp-innate-tp-test/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-ellip-test2/mujoco_warp/__init__.py
+[P1_pyr_cap10] N=4096 njmax 144 naconmax 98304 is_sparse False
+[P1_pyr_cap10] physics only 43.8 ms/step -> 93,613 env-steps/s
+[P1_pyr_cap10] full env step 65.6 ms -> 62,460 env-steps/s
+[P1_pyr_cap10] after random-action steps: nefc max 37 mean 14.5; nacon 0 (0.00/world); overflow {'ITERATIONS': 30, 'LS_ITERATIONS': 3911}
+[P1_pyr_cap10] rollout + inference 64.8 ms/step -> 63,201 env-steps/s
+[P1_pyr_cap10] PPO update 153 ms -> full loop 57,526 env-steps/s
+[P1_pyr_cap10] SUMMARY physics 93,613 | step 62,460 | rollout 63,201 | loop 57,526  (ms: physics 43.8, step 65.6, rollout/step 64.8, update 153)
+--- E1 elliptic ellip10 cap 20 11:46:27
+imports /Users/aditya/robosim/upstream/warp-innate-tp-test/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-ellip-test2/mujoco_warp/__init__.py
+[E1_ellip10_cap20] N=4096 njmax 112 naconmax 98304 is_sparse False
+[E1_ellip10_cap20] physics only 55.4 ms/step -> 73,946 env-steps/s
+[E1_ellip10_cap20] full env step 105.7 ms -> 38,765 env-steps/s
+[E1_ellip10_cap20] after random-action steps: nefc max 29 mean 11.7; nacon 11069 (2.70/world); overflow {'ITERATIONS': 1, 'LS_ITERATIONS': 3880}
+[E1_ellip10_cap20] rollout + inference 113.9 ms/step -> 35,976 env-steps/s
+[E1_ellip10_cap20] PPO update 149 ms -> full loop 34,114 env-steps/s
+[E1_ellip10_cap20] SUMMARY physics 73,946 | step 38,765 | rollout 35,976 | loop 34,114  (ms: physics 55.4, step 105.7, rollout/step 113.9, update 149)
+--- P2 pyramidal cap 10 11:47:11
+imports /Users/aditya/robosim/upstream/warp-innate-tp-test/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-ellip-test2/mujoco_warp/__init__.py
+[P2_pyr_cap10] N=4096 njmax 144 naconmax 98304 is_sparse False
+[P2_pyr_cap10] physics only 43.9 ms/step -> 93,392 env-steps/s
+[P2_pyr_cap10] full env step 66.5 ms -> 61,633 env-steps/s
+[P2_pyr_cap10] after random-action steps: nefc max 42 mean 14.4; nacon 11235 (2.74/world); overflow {'ITERATIONS': 24, 'LS_ITERATIONS': 3873}
+[P2_pyr_cap10] rollout + inference 65.0 ms/step -> 62,995 env-steps/s
+[P2_pyr_cap10] PPO update 150 ms -> full loop 57,485 env-steps/s
+[P2_pyr_cap10] SUMMARY physics 93,392 | step 61,633 | rollout 62,995 | loop 57,485  (ms: physics 43.9, step 66.5, rollout/step 65.0, update 150)
+--- E2 elliptic ellip10 cap 20 11:47:35
+imports /Users/aditya/robosim/upstream/warp-innate-tp-test/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-ellip-test2/mujoco_warp/__init__.py
+[E2_ellip10_cap20] N=4096 njmax 112 naconmax 98304 is_sparse False
+[E2_ellip10_cap20] physics only 55.6 ms/step -> 73,653 env-steps/s
+[E2_ellip10_cap20] full env step 105.8 ms -> 38,714 env-steps/s
+[E2_ellip10_cap20] after random-action steps: nefc max 31 mean 11.7; nacon 11205 (2.74/world); overflow {'LS_ITERATIONS': 3882}
+[E2_ellip10_cap20] rollout + inference 112.5 ms/step -> 36,411 env-steps/s
+[E2_ellip10_cap20] PPO update 147 ms -> full loop 34,530 env-steps/s
+[E2_ellip10_cap20] SUMMARY physics 73,653 | step 38,714 | rollout 36,411 | loop 34,530  (ms: physics 55.6, step 105.8, rollout/step 112.5, update 147)
+=== end Sat Sep 26 11:48:12 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] ellip_ws_ab end: device utilisation 91% (11:48:12), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %

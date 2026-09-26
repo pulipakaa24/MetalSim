@@ -1,0 +1,124 @@
+=== start Sat Sep 26 12:15:35 PDT 2026 frozen warp 9abceff9 mjw 5d0d165
+--- policy states 12:15:35
+ "summary_plain_cap20": {
+  "p99_dqvel_max": 0.0025034607388079166,
+  "p99_dqvel_mean": 0.0013508054777048527,
+  "median_dqvel_max": 0.00010666251182556152,
+  "max_dqvel": 2.060448169708252,
+  "worlds_dqvel_gt_0.01_mean": 12.8,
+  "worlds_dqvel_gt_0.1_mean": 4.7,
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "mean_niter": 3.624432373046875,
+  "max_niter": 16
+ },
+ "summary_extrap_cap10": {
+  "p99_dqvel_max": 0.004963265266269445,
+  "p99_dqvel_mean": 0.002744790178257972,
+  "median_dqvel_max": 0.00014701113104820251,
+  "max_dqvel": 1.4703083038330078,
+  "worlds_dqvel_gt_0.01_mean": 21.2,
+  "worlds_dqvel_gt_0.1_mean": 6.5,
+  "worlds_hitting_cap_mean_per_step": 145.0,
+  "mean_niter": 2.8976959228515624,
+  "max_niter": 10
+ },
+ "summary_extrap_cap20": {
+  "p99_dqvel_max": 0.004429674241691828,
+  "p99_dqvel_mean": 0.002266414149198681,
+  "median_dqvel_max": 0.00014495849609375,
+  "max_dqvel": 2.019503116607666,
+  "worlds_dqvel_gt_0.01_mean": 18.9,
+  "worlds_dqvel_gt_0.1_mean": 6.2,
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "mean_niter": 2.9003387451171876,
+  "max_niter": 15
+ },
+ "summary_extrap_cap40": {
+  "p99_dqvel_max": 0.00395540427416563,
+  "p99_dqvel_mean": 0.002306760766077787,
+  "median_dqvel_max": 0.00014847517013549805,
+  "max_dqvel": 2.019507884979248,
+  "worlds_dqvel_gt_0.01_mean": 19.2,
+  "worlds_dqvel_gt_0.1_mean": 7.0,
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "mean_niter": 2.900274658203125,
+  "max_niter": 15
+ },
+ "summary_extrap_cap100": {
+  "p99_dqvel_max": 0.004036056809127331,
+  "p99_dqvel_mean": 0.002120733365882188,
+  "median_dqvel_max": 0.00014167651534080505,
+  "max_dqvel": 2.019503116607666,
+  "worlds_dqvel_gt_0.01_mean": 18.2,
+  "worlds_dqvel_gt_0.1_mean": 6.8,
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "mean_niter": 2.9005859375,
+  "max_niter": 15
+ },
+ "summary_plain_cap100": {
+  "mean_niter": 3.624462890625,
+  "max_niter": 16
+ }
+}
+--- random actions 12:17:40
+ "summary_plain_cap20": {
+  "p99_dqvel_max": 0.0016016245353966951,
+  "p99_dqvel_mean": 0.001027392758987844,
+  "median_dqvel_max": 1.2755393981933594e-05,
+  "max_dqvel": 3.681638240814209,
+  "worlds_dqvel_gt_0.01_mean": 6.7,
+  "worlds_dqvel_gt_0.1_mean": 4.3,
+  "worlds_hitting_cap_mean_per_step": 4.1,
+  "mean_niter": 3.86402587890625,
+  "max_niter": 20
+ },
+ "summary_extrap_cap10": {
+  "p99_dqvel_max": 0.40231844782829285,
+  "p99_dqvel_mean": 0.2791063465178013,
+  "median_dqvel_max": 0.0001010894775390625,
+  "max_dqvel": 4.930059909820557,
+  "worlds_dqvel_gt_0.01_mean": 192.8,
+  "worlds_dqvel_gt_0.1_mean": 83.4,
+  "worlds_hitting_cap_mean_per_step": 659.9,
+  "mean_niter": 3.6846710205078126,
+  "max_niter": 10
+ },
+ "summary_extrap_cap20": {
+  "p99_dqvel_max": 0.003209233283996582,
+  "p99_dqvel_mean": 0.002723648981191218,
+  "median_dqvel_max": 9.179115295410156e-05,
+  "max_dqvel": 4.826889514923096,
+  "worlds_dqvel_gt_0.01_mean": 16.8,
+  "worlds_dqvel_gt_0.1_mean": 10.2,
+  "worlds_hitting_cap_mean_per_step": 9.2,
+  "mean_niter": 3.7348297119140623,
+  "max_niter": 20
+ },
+ "summary_extrap_cap40": {
+  "p99_dqvel_max": 0.0029825896490365267,
+  "p99_dqvel_mean": 0.002485289890319109,
+  "median_dqvel_max": 9.298324584960938e-05,
+  "max_dqvel": 4.164725303649902,
+  "worlds_dqvel_gt_0.01_mean": 13.5,
+  "worlds_dqvel_gt_0.1_mean": 9.2,
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "mean_niter": 3.73533935546875,
+  "max_niter": 35
+ },
+ "summary_extrap_cap100": {
+  "p99_dqvel_max": 0.003084623720496893,
+  "p99_dqvel_mean": 0.002502166875638068,
+  "median_dqvel_max": 9.500980377197266e-05,
+  "max_dqvel": 4.164725303649902,
+  "worlds_dqvel_gt_0.01_mean": 12.9,
+  "worlds_dqvel_gt_0.1_mean": 8.7,
+  "worlds_hitting_cap_mean_per_step": 0.0,
+  "mean_niter": 3.735662841796875,
+  "max_niter": 39
+ },
+ "summary_plain_cap100": {
+  "mean_niter": 3.8639129638671874,
+  "max_niter": 32
+ }
+}
+=== end Sat Sep 26 12:19:25 PDT 2026

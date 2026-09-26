@@ -1,0 +1,85 @@
+[gpu_run] ellip_ws_lanes start: device utilisation 0% (11:48:16)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   2.0 %
+=== start Sat Sep 26 11:48:19 PDT 2026 metalsim b7080fb frozen warp 9abceff9 mjw ca431fc power: Now drawing from 'AC Power'
+--- itercost lanes 64 11:48:19
+state: nefc mean 6.2 max 27, nacon 1.68 per world
+  k | solve ms (graph, per substep) | marginal ms of iteration k | worlds converged before iteration k
+   0 |   1.891 |   1.891 |     0
+   1 |   3.606 |   1.715 |     0
+   2 |   5.111 |   1.505 |   770
+   3 |   6.435 |   1.324 |  1456
+   4 |   7.555 |   1.119 |  1983
+   5 |   8.497 |   0.942 |  2569
+   6 |   9.167 |   0.670 |  3146
+   7 |   9.726 |   0.559 |  3522
+   8 |  10.086 |   0.360 |  3757
+   9 |  10.402 |   0.317 |  3921
+  10 |  10.682 |   0.280 |  4008
+  11 |  10.844 |   0.163 |  4058
+  12 |  11.077 |   0.233 |  4074
+  13 |  11.338 |   0.261 |  4081
+  14 |  11.533 |   0.195 |  4090
+  15 |  11.766 |   0.233 |  4092
+  16 |  11.938 |   0.172 |  4094
+  17 |  12.149 |   0.211 |  4095
+  18 |  12.350 |   0.201 |  4095
+  19 |  12.537 |   0.187 |  4095
+  20 |  12.802 |   0.265 |  4095
+--- itercost lanes 128 11:48:45
+state: nefc mean 6.2 max 27, nacon 1.68 per world
+  k | solve ms (graph, per substep) | marginal ms of iteration k | worlds converged before iteration k
+   0 |   1.890 |   1.890 |     0
+   1 |   3.640 |   1.750 |     0
+   2 |   5.128 |   1.488 |   771
+   3 |   6.482 |   1.354 |  1455
+   4 |   7.572 |   1.090 |  1984
+   5 |   8.723 |   1.151 |  2576
+   6 |   9.319 |   0.596 |  3148
+   7 |   9.669 |   0.350 |  3524
+   8 |  10.346 |   0.677 |  3752
+   9 |  10.434 |   0.089 |  3920
+  10 |  10.570 |   0.136 |  4005
+  11 |  10.810 |   0.240 |  4056
+  12 |  10.936 |   0.126 |  4072
+  13 |  11.152 |   0.216 |  4081
+  14 |  11.349 |   0.196 |  4088
+  15 |  11.513 |   0.165 |  4092
+  16 |  11.728 |   0.215 |  4094
+  17 |  11.878 |   0.150 |  4095
+  18 |  11.993 |   0.115 |  4096
+  19 |  12.056 |   0.063 |  4096
+  20 |  12.188 |   0.131 |  4096
+--- L32 r1 11:49:10
+[lanes32_r1] N=4096 njmax 112 naconmax 98304 is_sparse False
+[lanes32_r1] physics only 55.5 ms/step -> 73,811 env-steps/s
+[lanes32_r1] full env step 106.0 ms -> 38,641 env-steps/s
+[lanes32_r1] after random-action steps: nefc max 31 mean 11.8; nacon 11197 (2.73/world); overflow {'ITERATIONS': 2, 'LS_ITERATIONS': 3878}
+--- L64 r1 11:49:29
+[lanes64_r1] N=4096 njmax 112 naconmax 98304 is_sparse False
+[lanes64_r1] physics only 55.6 ms/step -> 73,669 env-steps/s
+[lanes64_r1] full env step 101.3 ms -> 40,441 env-steps/s
+[lanes64_r1] after random-action steps: nefc max 28 mean 11.6; nacon 11122 (2.72/world); overflow {'ITERATIONS': 2, 'LS_ITERATIONS': 3854}
+--- L128 r1 11:49:48
+[lanes128_r1] N=4096 njmax 112 naconmax 98304 is_sparse False
+[lanes128_r1] physics only 57.0 ms/step -> 71,842 env-steps/s
+[lanes128_r1] full env step 101.0 ms -> 40,554 env-steps/s
+[lanes128_r1] after random-action steps: nefc max 29 mean 11.6; nacon 11123 (2.72/world); overflow {'ITERATIONS': 1, 'LS_ITERATIONS': 3862}
+--- L32 r2 11:50:07
+[lanes32_r2] N=4096 njmax 112 naconmax 98304 is_sparse False
+[lanes32_r2] physics only 55.5 ms/step -> 73,805 env-steps/s
+[lanes32_r2] full env step 105.6 ms -> 38,804 env-steps/s
+[lanes32_r2] after random-action steps: nefc max 30 mean 11.7; nacon 11276 (2.75/world); overflow {'ITERATIONS': 2, 'LS_ITERATIONS': 3866}
+--- L64 r2 11:50:26
+[lanes64_r2] N=4096 njmax 112 naconmax 98304 is_sparse False
+[lanes64_r2] physics only 55.6 ms/step -> 73,614 env-steps/s
+[lanes64_r2] full env step 101.2 ms -> 40,462 env-steps/s
+[lanes64_r2] after random-action steps: nefc max 30 mean 11.8; nacon 11241 (2.74/world); overflow {'ITERATIONS': 1, 'LS_ITERATIONS': 3871}
+--- L128 r2 11:50:44
+[lanes128_r2] N=4096 njmax 112 naconmax 98304 is_sparse False
+[lanes128_r2] physics only 56.9 ms/step -> 72,000 env-steps/s
+[lanes128_r2] full env step 100.8 ms -> 40,653 env-steps/s
+[lanes128_r2] after random-action steps: nefc max 28 mean 11.6; nacon 11128 (2.72/world); overflow {'ITERATIONS': 2, 'LS_ITERATIONS': 3873}
+=== end Sat Sep 26 11:51:03 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] ellip_ws_lanes end: device utilisation 0% (11:51:03), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %

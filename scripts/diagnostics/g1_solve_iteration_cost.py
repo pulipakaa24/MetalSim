@@ -34,7 +34,13 @@ pol = _Pol(); bufs = RolloutBuffers(1, N, task.obs_dim, task.act_dim)
 bufs.rew = wp.zeros((1, N), dtype=float, device=dev); bufs.done = wp.zeros((1, N), dtype=float, device=dev)
 rng = np.random.default_rng(0)
 with wp.ScopedDevice(dev):
-    for k in range(20):
+    if VAR.get("state") == "rollout":
+        # the state after one PPO rollout of the (untrained) Warp policy, as g1_tp_variants' rollout + inference measures
+        from metalsim.learn.g1_velocity import g1_ppo_config
+        from metalsim.learn.ppo_warp import PPOWarp
+        algo = PPOWarp(task, g1_ppo_config(task.terrain_kind, 1)); algo.rollout(); task.sim.synchronize()
+        print("state: after one PPO rollout (untrained policy)", flush=True)
+    for k in range(20 if VAR.get("state") != "rollout" else 0):
         a = wp.array(rng.uniform(-1, 1, (N, task.act_dim)).astype(np.float32), dtype=float, device=dev)
         wp.launch(bump, dim=1, inputs=[pol.step_idx], device=dev)
         task.launch_apply_action(a); task.sim.launch_step(); task.launch_reward_done_reset(pol, bufs); task.launch_obs(pol.step_idx)
@@ -47,10 +53,18 @@ with wp.ScopedDevice(dev):
     cap = int(m.opt.iterations)
     prev = None
     rows = []
+    # extrapolated warm start (MJW_WARMSTART_EXTRAP): the solve advances qacc_ws_prev, so each replayed solve restores it
+    # first (one nworld x nv copy inside the timed graph), otherwise replays 2.. would start from the plain warm start
+    extrap = getattr(S, "_warmstart_extrap", lambda d: False)(d)
+    prev0 = wp.clone(d.qacc_ws_prev) if extrap else None
+    if extrap:
+        print("extrapolated warm start on: qacc_ws_prev restored before every replayed solve", flush=True)
     for k in range(0, min(KMAX, cap) + 1):
         m.opt.iterations = k
         with wp.ScopedCapture(device=dev) as c:
             for _ in range(20):
+                if extrap:
+                    wp.copy(d.qacc_ws_prev, prev0)
                 S.solve(m, d)
         wp.capture_launch(c.graph); task.sim.synchronize()
         ts = []
