@@ -1,0 +1,373 @@
+{
+ "physics": "newton_vbd",
+ "physics_dt": 0.005,
+ "seconds": 5.0,
+ "gravity": [
+  0,
+  0,
+  -9.81
+ ],
+ "isaac_lab": "3.0.0-EA",
+ "scenes": {
+  "cloth": {
+   "size": [
+    1.0,
+    1.0
+   ],
+   "edge_refinement": 21,
+   "z0": 0.5,
+   "box": 0.4,
+   "material": {
+    "density": 1.0,
+    "particle_radius": 0.008,
+    "func": "isaaclab.sim.spawners.materials.physics_materials:spawn_deformable_body_material",
+    "tri_ke": 10000.0,
+    "tri_ka": 10000.0,
+    "tri_kd": 1.5e-06,
+    "edge_ke": 5.0,
+    "edge_kd": 0.01,
+    "_usd_applied_schema": null,
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "newton"
+   },
+   "props": {
+    "_usd_applied_schema": null,
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "newton"
+   }
+  },
+  "rod_n1": {
+   "size": [
+    0.5,
+    0.02,
+    0.02
+   ],
+   "z0": 1.0,
+   "x0": 10.0,
+   "y0": -0.0,
+   "cells_across": "1",
+   "edge_refinement": null,
+   "mesh": "structured hex->6 tets, cell aspect 2.5",
+   "pinned": "-x end, nodes within 0.01 m",
+   "material": {
+    "density": 1.0,
+    "particle_radius": 0.008,
+    "func": "isaaclab.sim.spawners.materials.physics_materials:spawn_deformable_body_material",
+    "k_mu": 100000.0,
+    "k_lambda": 100000.0,
+    "k_damp": 0.0,
+    "_usd_applied_schema": null,
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "newton"
+   },
+   "props": {
+    "_usd_applied_schema": null,
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "newton"
+   },
+   "n_pinned": 4,
+   "pinned_mask_key": "rod_n1_pinned"
+  },
+  "rod_n2": {
+   "size": [
+    0.5,
+    0.02,
+    0.02
+   ],
+   "z0": 1.0,
+   "x0": 10.0,
+   "y0": -2.0,
+   "cells_across": "2",
+   "edge_refinement": null,
+   "mesh": "structured hex->6 tets, cell aspect 2.5",
+   "pinned": "-x end, nodes within 0.01 m",
+   "material": {
+    "density": 1.0,
+    "particle_radius": 0.008,
+    "func": "isaaclab.sim.spawners.materials.physics_materials:spawn_deformable_body_material",
+    "k_mu": 100000.0,
+    "k_lambda": 100000.0,
+    "k_damp": 0.0,
+    "_usd_applied_schema": null,
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "newton"
+   },
+   "props": {
+    "_usd_applied_schema": null,
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "newton"
+   },
+   "n_pinned": 9,
+   "pinned_mask_key": "rod_n2_pinned"
+  },
+  "rod_n4": {
+   "size": [
+    0.5,
+    0.02,
+    0.02
+   ],
+   "z0": 1.0,
+   "x0": 10.0,
+   "y0": -4.0,
+   "cells_across": "4",
+   "edge_refinement": null,
+   "mesh": "structured hex->6 tets, cell aspect 2.5",
+   "pinned": "-x end, nodes within 0.01 m",
+   "material": {
+    "density": 1.0,
+    "particle_radius": 0.008,
+    "func": "isaaclab.sim.spawners.materials.physics_materials:spawn_deformable_body_material",
+    "k_mu": 100000.0,
+    "k_lambda": 100000.0,
+    "k_damp": 0.0,
+    "_usd_applied_schema": null,
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "newton"
+   },
+   "props": {
+    "_usd_applied_schema": null,
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "newton"
+   },
+   "n_pinned": 25,
+   "pinned_mask_key": "rod_n4_pinned"
+  },
+  "rod_n8": {
+   "size": [
+    0.5,
+    0.02,
+    0.02
+   ],
+   "z0": 1.0,
+   "x0": 10.0,
+   "y0": -6.0,
+   "cells_across": "8",
+   "edge_refinement": null,
+   "mesh": "structured hex->6 tets, cell aspect 2.5",
+   "pinned": "-x end, nodes within 0.01 m",
+   "material": {
+    "density": 1.0,
+    "particle_radius": 0.008,
+    "func": "isaaclab.sim.spawners.materials.physics_materials:spawn_deformable_body_material",
+    "k_mu": 100000.0,
+    "k_lambda": 100000.0,
+    "k_damp": 0.0,
+    "_usd_applied_schema": null,
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "newton"
+   },
+   "props": {
+    "_usd_applied_schema": null,
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "newton"
+   },
+   "n_pinned": 81,
+   "pinned_mask_key": "rod_n8_pinned"
+  },
+  "cable": {
+   "length": 0.5,
+   "segments": 20,
+   "z0": 1.0,
+   "x0": 10.0,
+   "y0": 3.0,
+   "pinned": "segment 0 re-posed each step",
+   "material": {
+    "func": "isaaclab.sim.spawners.materials.physics_materials:spawn_deformable_body_material",
+    "thickness": 0.02,
+    "density": 1000.0,
+    "stretch_stiffness": 1000000000.0,
+    "bend_stiffness": 1000000.0,
+    "shear_stiffness": null,
+    "twist_stiffness": null,
+    "_usd_applied_schema": "PhysicsCurvesDeformableMaterialAPI",
+    "_usd_namespace": "physics"
+   }
+  },
+  "cube_n2": {
+   "size": 0.2,
+   "z0": 0.5,
+   "x0": 20.0,
+   "y0": -0.0,
+   "cells_per_edge": "2",
+   "edge_refinement": null,
+   "material": {
+    "density": 1.0,
+    "particle_radius": 0.008,
+    "func": "isaaclab.sim.spawners.materials.physics_materials:spawn_deformable_body_material",
+    "k_mu": 100000.0,
+    "k_lambda": 100000.0,
+    "k_damp": 0.0,
+    "_usd_applied_schema": null,
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "newton"
+   },
+   "props": {
+    "_usd_applied_schema": null,
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "newton"
+   }
+  },
+  "cube_n4": {
+   "size": 0.2,
+   "z0": 0.5,
+   "x0": 20.0,
+   "y0": -2.0,
+   "cells_per_edge": "4",
+   "edge_refinement": null,
+   "material": {
+    "density": 1.0,
+    "particle_radius": 0.008,
+    "func": "isaaclab.sim.spawners.materials.physics_materials:spawn_deformable_body_material",
+    "k_mu": 100000.0,
+    "k_lambda": 100000.0,
+    "k_damp": 0.0,
+    "_usd_applied_schema": null,
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "newton"
+   },
+   "props": {
+    "_usd_applied_schema": null,
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "newton"
+   }
+  },
+  "cube_n8": {
+   "size": 0.2,
+   "z0": 0.5,
+   "x0": 20.0,
+   "y0": -4.0,
+   "cells_per_edge": "8",
+   "edge_refinement": null,
+   "material": {
+    "density": 1.0,
+    "particle_radius": 0.008,
+    "func": "isaaclab.sim.spawners.materials.physics_materials:spawn_deformable_body_material",
+    "k_mu": 100000.0,
+    "k_lambda": 100000.0,
+    "k_damp": 0.0,
+    "_usd_applied_schema": null,
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "newton"
+   },
+   "props": {
+    "_usd_applied_schema": null,
+    "_usd_field_exceptions": "{}",
+    "_usd_namespace": "newton"
+   }
+  }
+ },
+ "errors": {},
+ "physics_cfg": {
+  "class_type": "isaaclab_newton.physics.vbd_manager:NewtonVBDManager",
+  "deterministic": false,
+  "num_substeps": 4,
+  "collision_decimation": 1,
+  "debug_mode": false,
+  "use_cuda_graph": true,
+  "deterministic_mode": "not_guaranteed",
+  "solver_cfg": "{'class_type': 'isaaclab_newton.physics.vbd_manager:NewtonVBDManager', 'solver_type': 'None', 'iterations': 20, 'integrate_with_external_rigid_solver': False, 'particle_enable_self_contact': False, 'particle_self_contact_radius': 0.005, 'particle_self_contact_margin': 0.005, 'particle_collision_detection_interval': -1, 'particle_vertex_contact_buffer_size': 32, 'particle_edge_contact_buffer_size': 64, 'particle_topological_contact_filter_threshold': 2, 'particle_rest_shape_contact_exclusion_radius': 0.0, 'rigid_contact_k_start': 100.0, 'rigid_body_particle_contact_buffer_size': 256}",
+  "soft_contact_cfg": "{'soft_contact_ke': 100000.0, 'soft_contact_kd': 1.0, 'soft_contact_mu': 0.5}",
+  "collision_cfg": null,
+  "default_shape_cfg": "{'margin': 0.0, 'gap': 0.01, 'ke': 2500.0, 'kd': 100.0, 'mu': 1.0}",
+  "load_visual_shapes": null,
+  "bvh_constructor_geometry": "cubql",
+  "bvh_constructor_scene": "sah",
+  "bvh_constructor_gaussian": "cubql"
+ },
+ "ground": {
+  "func": "isaaclab.sim.spawners.from_files.from_files:spawn_ground_plane",
+  "visible": true,
+  "semantic_tags": null,
+  "copy_from_source": true,
+  "spawn_path": null,
+  "usd_path": "https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.1/Isaac/IsaacLab/Environments/Grid/default_ground_plane_checker_v1/default_ground_plane.usda",
+  "color": null,
+  "size": [
+   100.0,
+   100.0
+  ],
+  "physics_material": "{'func': 'isaaclab.sim.spawners.materials.physics_materials:spawn_rigid_body_material', 'static_friction': 0.5, 'dynamic_friction': 0.5, 'restitution': 0.0, 'density': None, '_usd_applied_schema': None, '_usd_field_exceptions': {}, '_usd_namespace': 'physics'}"
+ },
+ "cooked_prims": 44,
+ "wall_s_including_readback": 20.510515451431274,
+ "counts": {
+  "cloth_pos": [
+   1089,
+   3
+  ],
+  "cloth_vel": [
+   1089,
+   3
+  ],
+  "rod_n1_pos": [
+   44,
+   3
+  ],
+  "rod_n1_vel": [
+   44,
+   3
+  ],
+  "rod_n2_pos": [
+   189,
+   3
+  ],
+  "rod_n2_vel": [
+   189,
+   3
+  ],
+  "rod_n4_pos": [
+   1025,
+   3
+  ],
+  "rod_n4_vel": [
+   1025,
+   3
+  ],
+  "rod_n8_pos": [
+   6561,
+   3
+  ],
+  "rod_n8_vel": [
+   6561,
+   3
+  ],
+  "cable_pose": [
+   20,
+   7
+  ],
+  "cable_vel": [
+   20,
+   6
+  ],
+  "cube_n2_pos": [
+   27,
+   3
+  ],
+  "cube_n2_vel": [
+   27,
+   3
+  ],
+  "cube_n4_pos": [
+   125,
+   3
+  ],
+  "cube_n4_vel": [
+   125,
+   3
+  ],
+  "cube_n8_pos": [
+   729,
+   3
+  ],
+  "cube_n8_vel": [
+   729,
+   3
+  ]
+ },
+ "replay": {
+  "device": "metal:0",
+  "newton": "1.5.2",
+  "wall_s": 92.90380995802116,
+  "graph": true
+ }
+}
