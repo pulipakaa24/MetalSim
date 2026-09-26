@@ -43,6 +43,55 @@ def mlp_layer(x: wp.array2d(dtype=float), W: wp.array2d(dtype=float), b: wp.arra
 
 
 @wp.kernel
+def mlp_layer4(x: wp.array2d(dtype=float), W: wp.array2d(dtype=float), b: wp.array(dtype=float),
+               act: int, y: wp.array2d(dtype=float)):
+    """mlp_layer with one thread per (group of 4 outputs, env), envs fastest: a SIMD group reads 4 weight rows once
+    and 32 x rows, each x element feeds 4 accumulators. Every output keeps mlp_layer's sequential dot product over
+    its inputs, so the results are bitwise the same (scripts/diagnostics/warp_policy_cost.py, tests/test_warp_policy.py);
+    measured 1.8x (256-128-128) / 2.0x (512-256-128) faster at 4096 envs on the M4 Max (2026-09-26)."""
+    g, e = wp.tid()
+    n_in = W.shape[1]
+    n_out = W.shape[0]
+    j0 = g * 4
+    s0 = b[j0]; s1 = float(0.0); s2 = float(0.0); s3 = float(0.0)
+    if j0 + 1 < n_out:
+        s1 = b[j0 + 1]
+    if j0 + 2 < n_out:
+        s2 = b[j0 + 2]
+    if j0 + 3 < n_out:
+        s3 = b[j0 + 3]
+    for i in range(n_in):
+        xi = x[e, i]
+        s0 += xi * W[j0, i]
+        if j0 + 1 < n_out:
+            s1 += xi * W[j0 + 1, i]
+        if j0 + 2 < n_out:
+            s2 += xi * W[j0 + 2, i]
+        if j0 + 3 < n_out:
+            s3 += xi * W[j0 + 3, i]
+    if act == 1:
+        s0 = elu(s0); s1 = elu(s1); s2 = elu(s2); s3 = elu(s3)
+    y[e, j0] = s0
+    if j0 + 1 < n_out:
+        y[e, j0 + 1] = s1
+    if j0 + 2 < n_out:
+        y[e, j0 + 2] = s2
+    if j0 + 3 < n_out:
+        y[e, j0 + 3] = s3
+
+
+def launch_layer(x, W, b, act, y, n, device):
+    """One MLP layer y = act(x W^T + b) for n envs (mlp_layer4 mapping; METALSIM_MLP_MAPPING=A for the original)."""
+    if _MLP_MAPPING == "A":
+        wp.launch(mlp_layer, dim=(n, W.shape[0]), inputs=[x, W, b, act, y], device=device)
+    else:
+        wp.launch(mlp_layer4, dim=((W.shape[0] + 3) // 4, n), inputs=[x, W, b, act, y], device=device)
+
+
+_MLP_MAPPING = __import__("os").environ.get("METALSIM_MLP_MAPPING", "D")
+
+
+@wp.kernel
 def sample_gaussian(mean: wp.array2d(dtype=float), log_std: wp.array(dtype=float), seed: int, step_idx: wp.array(dtype=int),
                     action: wp.array2d(dtype=float), logp: wp.array(dtype=float), ctrl_lo: wp.array(dtype=float),
                     ctrl_hi: wp.array(dtype=float), ctrl: wp.array2d(dtype=float)):
@@ -151,11 +200,11 @@ class WarpMLPPolicy:
         and the action/logp/value buffers. All launches go to the Warp queue; nothing syncs."""
         x = obs
         for (W, b, act), y in zip(self.actor_layers, self.actor_act):
-            wp.launch(mlp_layer, dim=(self.n, W.shape[0]), inputs=[x, W, b, act, y], device=self.device)
+            launch_layer(x, W, b, act, y, self.n, self.device)
             x = y
         xc = obs
         for (W, b, act), y in zip(self.critic_layers, self.critic_act):
-            wp.launch(mlp_layer, dim=(self.n, W.shape[0]), inputs=[xc, W, b, act, y], device=self.device)
+            launch_layer(xc, W, b, act, y, self.n, self.device)
             xc = y
         wp.launch(sample_gaussian, dim=self.n,
                   inputs=[self.actor_act[-1], self.log_std, self.seed, self.rng_step, self.action, self.logp,

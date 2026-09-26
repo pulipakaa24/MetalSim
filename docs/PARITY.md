@@ -140,7 +140,14 @@ constraint group), fixed in fork commit `c301880` (worktree `upstream/mujoco_war
 
 Physics unchanged to float noise (Warp CPU device and Metal vs `mj_step`: identical envelopes for every launch
 form; Metal graph replay of 512 worlds × 200 steps within the run-to-run floor); fork test suite on Metal 1450
-passed / 39 skipped / 2 failed, both failures pre-existing at `07a51a6`. The elliptic premium that remains is structural: the
+passed / 39 skipped / 2 failed, both failures pre-existing at `07a51a6`. **2026-09-26 (fork branch
+`metalsim-elliptic2` `b0150ac`, pending merge; research note §8):** MuJoCo C's incremental Newton structure
+for elliptic cones (quadratic Hessian kept across iterations, cone term rebuilt per iteration into a second
+buffer, plain register Cholesky) brings the G1 task's elliptic impratio 10 from 55,379 to **64,519
+env-steps/s physics-only, 1.21× the recommended preset** (was 1.42×; Go2 623 K, humanoid 666 K, SO-101 847 K
+physics steps/s on the Menagerie protocol, +4–7 %). What remains of the premium is the cone term itself
+(16 % of the step), the Cholesky that worlds with cone rows must run every iteration, and the elliptic line
+search; elliptic needs 9 % more Newton iterations than pyramidal on walking states. The elliptic premium that remains is structural: the
 elliptic path rebuilds and refactors H every iteration where the pyramidal path uses the fused incremental
 update (research note §2). Fidelity re-check with cheap elliptic cones on the G1 (same protocol as §1.7, on
 top of the adopted `tau10_impact_hardlimits`): impulses within 1–3 % as for every preset; 20 ms mean force
@@ -229,6 +236,8 @@ timing queue on the M4 Max, idle GPU logged, 4096 envs, 2.5 ms x 8, `contact_cfg
 | change | full env step before -> after | evidence that no result changes |
 |---|---|---|
 | Warp fork: register triangular solve for the Newton Hessian on Metal (`tile_cholesky_solve`, one SIMD group, no barriers) | 55,752-55,795 -> **58,587-58,718 env-steps/s (+5.2 %)** on top of the capacity bound; physics only 83.3 -> 85.5 K | summation order only (1.3-3.4e-7 relative vs the cooperative path); state-difference protocol `runs/tp26/check.wrapper.log` |
+| MuJoCo Warp fork: the five per-iteration Newton launches fused into one 32-lane kernel on Metal (9 -> 5 launches per iteration) | 58,439-58,589 -> **60,762-60,803 env-steps/s (+3.9 %)** on top of the register solve; physics only 85.5-85.9 -> 90.2-90.3 K | per-row / per-dof arithmetic and order unchanged, grad_dot a SIMD sum instead of atomics (float noise as before); state-difference protocol `runs/tp26/check*.wrapper.log` |
+| Warp policy layer kernel: four outputs per thread, envs fastest (`mlp_layer4`) | rollout + inference 55,191-55,197 -> 56,201-56,313; full PPO loop 50,912-50,925 -> **51,877-51,918 (+1.9 %)** (installed forks) | bitwise identical activations, actions, log-probs (`tests/test_warp_policy.py::test_layer_mapping_bitwise`) |
 | G1 flat capacities at the provable bound (njmax 144 / nconmax 24 instead of 512 / 128; `metalsim.physics.capacity`, `BatchSim.check_overflow()` guard) | 54,340-54,385 -> **55,646-55,741 env-steps/s (+2.5 %)**; Isaac Lab 3.0 cap-20 preset 56,301 -> 58,287 (+3.6 %) | no overflow possible below the bound (rows, order and arithmetic unchanged); `tests/test_capacity.py`; overflow raises at every PPO log point |
 | rough terrain under the preset, first measurement | recommended 45,217-45,268 vs `contact_cfg=None` 53,843-53,988 (the README's rough 41.9 K loop number is the None setting) | measurement only |
 

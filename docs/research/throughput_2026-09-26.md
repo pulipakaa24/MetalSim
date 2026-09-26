@@ -157,12 +157,70 @@ equal). The rough step profile's "outside physics 24.9 ms" is the state artifact
 contact-rich states), not task work; the profile's collision-only capture then failed with a Metal out-of-memory
 at naconmax 524288 (a diagnostic-script limitation, noted, not pursued).
 
-## 4b. A/B measurements pending
+## 4b. Marginal cost per Newton iteration (measured, `runs/tp26/itercost2.wrapper.log`, `scripts/diagnostics/g1_solve_iteration_cost.py`)
 
-- `runs/tp26/regsolve.wrapper.log` (done, section 2 below) and `regsolve2.wrapper.log` (rerun after the fixes).
-- `runs/tp26/itercost.wrapper.log`: marginal graph-mode cost per Newton iteration.
-- `runs/tp26/check.wrapper.log`: state-difference protocol, installed vs worktree.
-- `runs/tp26/tests*.wrapper.log`: fork test modules and MetalSim tests.
+`solver.solve` captured with the iteration cap k = 0..10 on one contact-rich state (20 random-action steps; nefc
+mean 7.8 / max 35 under the preset), 20 graph replays each, 4096 envs, bound capacities; installed forks vs the
+worktree (register solve; L'DL lanes off):
+
+| k | converged before k (recommended) | marginal ms, recommended: installed / worktree | converged (null) | marginal ms, null: installed / worktree |
+|---|---|---|---|---|
+| 0 (init: Jaref, Ma, rows, JTDAJ, first factor + solve) | – | 1.62 / 1.50 | – | 1.64 / 1.50 |
+| 1 | 0 | 1.43 / 1.27 | 0 | 1.38 / 1.25 |
+| 2 | 1006 | 1.01 / 0.93 | 1384 | 0.82 / 0.76 |
+| 3 | 2131 | 0.69 / 0.65 | 2613 | 0.46 / 0.42 |
+| 4 | 2882 | 0.50 / 0.42 | 3522 | 0.25 / 0.24 |
+| 5 | 3405 | 0.39 / 0.36 | 3963 | 0.22 / 0.20 |
+| 6 | 3749 | 0.28 / 0.26 | 4083 | 0.10 / 0.13 |
+| 7-10 | 3946-4087 | 0.26, 0.22, 0.22, 0.21 / 0.24, 0.22, 0.21, 0.18 | 4096 | 0.07-0.11 / 0.07-0.10 |
+| total | | 6.82 / 6.24 | | 5.25 / 4.85 |
+
+Reading: an iteration with no active world costs its 9 launches, 0.07-0.11 ms (about 10 us per dispatch in graph
+replay); one with a few active worlds (9-30 of 4096, iterations 8-10 under the preset) costs 0.21 ms: the
+dispatches plus the per-world latency of the line search and the fused factor + solve; iteration 1 (all worlds
+active, all refactorizing) costs 1.43 ms, of which the 4096 factorizations are ~1.0 ms. Under the preset the
+solve is 6.8 vs 5.2 ms here because iterations 4-10 keep 0.2-1.2 K worlds active. The register solve saves 0.58 /
+0.40 ms per substep (8 %). Next levers, in this order: (a) the 9 launches per iteration (fusing the five small
+per-iteration kernels into one launch: 0.4 ms per substep at 10 us a dispatch, section 2c), (b) the per-world
+latency of the n = 43 factorization (the 32 -> 43 cost jump, 0.17 -> 0.97 ms per 4096, is 2.4x the flop ratio;
+not register spill: the compact layout did not help; unresolved), (c) the line-search kernel's latency.
+
+### 2c. Fused per-iteration update launch (MuJoCo Warp fork `metalsim-tp`, in measurement)
+
+`_update_constraint_gradient_fused`: the five launches between the line search and the Hessian update (zero the
+change counters, `_update_constraint_efc`, `qfrc_constraint = J^T force`, `_update_gradient_zero_grad_dot`,
+`_update_gradient_grad`) as one 32-lanes-per-world launch on Metal (dense Jacobian, pyramidal cones, the incremental
+path). Row forces / states and the per-dof sums keep each kernel's arithmetic and order (bitwise); `grad_dot` becomes
+a SIMD-group sum of per-lane partials instead of atomic adds in arbitrary order (float noise, as the atomics were).
+9 -> 5 launches per iteration. Knob `MJW_METAL_FUSE_UPDATE=0`. **Measured** (`runs/tp26/fuse.wrapper.log`, interleaved F U F U,
+4096, recommended, bound capacities, register solve on in both): full env step 69.9-70.1 -> **67.4 ms
+(58,439-58,589 -> 60,762-60,803 env-steps/s, +3.9 %)**, physics only 85.5-85.9 -> 90.2-90.3 K; the solve per substep
+6.24 -> 5.92 ms (iterations 6-10 now 0.15-0.23 ms each, from 0.18-0.26). Landed (fork dd42c23). State-difference
+protocol: `runs/tp26/check*.wrapper.log`.
+
+## 7. The learning loop outside physics (measured, `runs/tp26/loop.wrapper.log`, `loop2.wrapper.log`, 4096 envs)
+
+Warp policy `act()` (actor + critic + sampling) per step: flat (obs 123, 256-128-128) 3.03 ms, rough (obs 310,
+512-256-128) 12.41 ms (14 % of the rough step). The committed layer kernel maps one thread per (env, output),
+outputs fastest (mapping A). Bit-identical alternatives (every output keeps its sequential dot product; only the
+thread-to-work mapping changes; `scripts/diagnostics/warp_policy_cost.py`, all bitwise equal to A):
+
+| actor forward per step | A (env, output) | B (output, env) | C (env, 4 outputs) | **D (4 outputs, env)** |
+|---|---|---|---|---|
+| flat | 1.551 ms | 1.813 | 1.468 | **0.855 (1.8x)** |
+| rough | 6.227 ms | 6.779 | 15.406 | **3.039 (2.0x)** |
+
+D landed as `mlp_layer4` (`metalsim/learn/warp_policy.py`, `METALSIM_MLP_MAPPING=A` restores the original;
+`tests/test_warp_policy.py::test_layer_mapping_bitwise`). **Measured** on the full loop (`runs/tp26/fuse.wrapper.log`,
+installed forks, interleaved D A D A): rollout + inference 74.2 -> 72.7-72.9 ms per step (55,191-55,197 ->
+56,201-56,313 env-steps/s), full PPO loop 50,912-50,925 -> **51,877-51,918 (+1.9 %)**; the step itself unchanged
+(73.6-73.7 ms). Rough (12.4 -> ~6 ms of act() per step) not re-measured.
+
+PPO update (torch on MPS, 5 epochs x 4 minibatches of 24,576 rows, 167 K parameters): 151 ms per iteration, 8 % of
+the loop. Removing the adaptive-KL `.item()` per minibatch (a host sync) saves 18 ms, `clip_grad_norm_` 15 ms
+(no foreach on MPS), the GAE recursion is 0.8 ms, forward + backward 101 ms, Adam ~0. Both removable pieces change
+results (the lr schedule, the clipping), so they are options (each ~1 % of the loop), not changes; the
+forward/backward is compute (torch.compile changes numerics; not tried).
 
 ## 6. Options that change results (reported, not landed)
 

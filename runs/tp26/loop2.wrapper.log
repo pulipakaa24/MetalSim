@@ -1,0 +1,17 @@
+[gpu_run] tp26_loop2 start: device utilisation 0% (04:22:26)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+=== start Sat Sep 26 04:22:29 PDT 2026 metalsim b019854 power: Now drawing from 'AC Power'
+flat: act() (actor (256, 128, 128) + critic + sample) 3.030 ms per step at N=4096
+   actor layers, mapping A: 1.551 ms per forward  (bitwise = A)
+   actor layers, mapping B: 1.813 ms per forward  (bitwise = A)
+   actor layers, mapping C: 1.468 ms per forward  (bitwise = A)
+   actor layers, mapping D: 0.855 ms per forward  (bitwise = A)
+rough: act() (actor (512, 256, 128) + critic + sample) 12.408 ms per step at N=4096
+   actor layers, mapping A: 6.227 ms per forward  (bitwise = A)
+   actor layers, mapping B: 6.779 ms per forward  (bitwise = A)
+   actor layers, mapping C: 15.406 ms per forward  (bitwise = A)
+   actor layers, mapping D: 3.039 ms per forward  (bitwise = A)
+=== end Sat Sep 26 04:22:35 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] tp26_loop2 end: device utilisation 99% (04:22:35), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   2.0 %
