@@ -1,0 +1,50 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth 0139344 load on device 'cpu' took 0.95 ms  (cached)
+Module _nxn_broadphase__locals__kernel_13ac863e 02fed0a load on device 'cpu' took 0.29 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_8a5df304 74116a5 load on device 'cpu' took 0.43 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_78fb2dbf 7c22c7a load on device 'cpu' took 0.43 ms  (cached)
+Module mujoco_warp._src.constraint 621fbd0 load on device 'cpu' took 0.27 ms  (cached)
+Module _friction_dof__locals__kernel_71517a5a 025a4b2 load on device 'cpu' took 0.30 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_77544377 3573b80 load on device 'cpu' took 0.27 ms  (cached)
+Module _efc_contact_init__locals__kernel_61c7a354 8ca3923 load on device 'cpu' took 0.26 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_d7afd5bd 5dcb563 load on device 'cpu' took 0.26 ms  (cached)
+Module _efc_contact_update__locals__kernel_a78f94fc 0f1441d load on device 'cpu' took 0.25 ms  (cached)
+Module mujoco_warp._src.forward 88fe384 load on device 'cpu' took 0.29 ms  (cached)
+Module mujoco_warp._src.passive d287a44 load on device 'cpu' took 0.27 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_41a4523d 210cfe4 load on device 'cpu' took 0.25 ms  (cached)
+Module _qfrc_smooth__locals__kernel_5565c635 d7fd775 load on device 'cpu' took 0.25 ms  (cached)
+Module mujoco_warp._src.support 6bd341f load on device 'cpu' took 0.25 ms  (cached)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_c849d179 26cd1a8 load on device 'cpu' took 0.25 ms  (cached)
+Module _solve_init_dof__locals__kernel_6c9fecda 3e8432c load on device 'cpu' took 0.23 ms  (cached)
+Module mujoco_warp._src.solver fecea56 load on device 'cpu' took 0.29 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_c92100ed f3657e7 load on device 'cpu' took 0.25 ms  (cached)
+Module mul_m_kernel__locals___mul_m_924d61d1 b219aeb load on device 'cpu' took 0.25 ms  (cached)
+Module _update_constraint_efc__locals__kernel_59b76e16 c854bc1 load on device 'cpu' took 0.24 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_5a6ce8fb da68930 load on device 'cpu' took 0.25 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_563a7193 4d426d1 load on device 'cpu' took 0.26 ms  (cached)
+Module _update_gradient_grad__locals__kernel_a8ff13d7 1a33222 load on device 'cpu' took 0.23 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_12f481bb a7fbdf7 load on device 'cpu' took 0.29 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_2fc8ec32 215b144 load on device 'cpu' took 0.25 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_91280eb1 17784c1 load on device 'cpu' took 0.25 ms  (cached)
+Module _update_constraint_efc__locals__kernel_bf65bc4b 0fc57cf load on device 'cpu' took 0.25 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_1a551002 a30bef3 load on device 'cpu' took 0.25 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_65cece82 cb92fcc load on device 'cpu' took 0.24 ms  (cached)
+Module _update_gradient_grad__locals__kernel_e1825747 2c336f9 load on device 'cpu' took 0.23 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_5e9a24c1 fd4f7be load on device 'cpu' took 0.24 ms  (cached)
+Module _solve_done__locals__kernel_0b0b8060 e35431e load on device 'cpu' took 0.24 ms  (cached)
+Module mujoco_warp._src.sensor 0f3c6f8 load on device 'cpu' took 0.34 ms  (cached)
+Module mujoco_warp._src.derivative b3b46fb load on device 'cpu' took 0.31 ms  (cached)
+Module _next_time_builder__locals___next_time_46990cad 7206cae load on device 'cpu' took 0.27 ms  (cached)
+recommended: 2179 (world, iteration) solves, 1388 of them with 1..8 flips, over 16 worlds x 48 substeps (1 s)
+  refactor float32 search-direction error vs float64 (relative): median 8.43e-08 p99 1.07e-05 max 2.80e-05
+  update budget U=   1: over all solves median 9.01e-08 p99 5.93e-05 max 2.33e-04; share of solves refactored: 89 %
+  update budget U=   2: over all solves median 9.74e-08 p99 7.97e-05 max 2.33e-04; share of solves refactored: 81 %
+  update budget U=   4: over all solves median 1.12e-07 p99 1.25e-04 max 2.59e-04; share of solves refactored: 73 %
+  update budget U=   8: over all solves median 1.35e-07 p99 1.91e-04 max 4.80e-04; share of solves refactored: 66 %
+  update budget U= inf: over all solves median 1.46e-07 p99 2.29e-04 max 4.80e-04; share of solves refactored: 63 %

@@ -1,0 +1,75 @@
+[gpu_run] tp26_prof start: device utilisation 0% (04:03:59)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    479 loginwindow                        1.1 %
+=== start Sat Sep 26 04:04:02 PDT 2026 metalsim 5db7510 warp 4127c481 mjw fe6fe71 power: Now drawing from 'AC Power'
+imports /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/__init__.py /Users/aditya/robosim/upstream/warp-innate/warp/__init__.py
+--- cholesky parts 04:04:03
+n=32: copy 0.072 ms | factor 0.172 ms | solve 0.161 ms (residual 9.4e-07) | factor+solve 0.265 ms (residual 9.4e-07)  [per launch of 4096, block_dim 32, graph replay]
+n=33: copy 0.110 ms | factor 0.207 ms | solve 0.225 ms (residual 1.0e-06) | factor+solve 0.307 ms (residual 1.0e-06)  [per launch of 4096, block_dim 32, graph replay]
+n=40: copy 0.183 ms | factor 0.538 ms | solve 0.420 ms (residual 1.8e-06) | factor+solve 0.821 ms (residual 1.8e-06)  [per launch of 4096, block_dim 32, graph replay]
+n=43: copy 0.245 ms | factor 0.974 ms | solve 0.518 ms (residual 1.6e-06) | factor+solve 1.117 ms (residual 1.6e-06)  [per launch of 4096, block_dim 32, graph replay]
+n=48: copy 0.299 ms | factor 1.931 ms | solve 0.779 ms (residual 1.4e-06) | factor+solve 2.606 ms (residual 1.4e-06)  [per launch of 4096, block_dim 32, graph replay]
+--- segments R 04:04:21
+variant {'contact_cfg': 'recommended'}
+task: terrain flat, reward_cfg flat, obs_dim 123, height scan 0 rays
+  physics (substeps + contact-sensor hooks)                  69.77 ms   dispatches  1632 cmdbufs   1 syncs 1
+  sum of segments                                            70.24 ms
+  whole step graph                                           72.94 ms   dispatches  1653 cmdbufs   1 syncs 1  -> 56,159 env-steps/s
+  outside physics: 3.16 ms (4.3% of the step)
+  fwd_position (kinematics, com, crb, factor, collision, make_constraint, transmission)          1.04 ms  dispatches   51
+  sensor_pos + fwd_velocity + sensor_vel                                                         0.23 ms  dispatches   23
+  fwd_actuation + fwd_acceleration(factorize)                                                    0.79 ms  dispatches    8
+  solver.solve                                                                                   5.71 ms  dispatches  105
+  sensor_acc + integrate (implicitfast)                                                          0.84 ms  dispatches   13
+  mjw.step (whole substep)                                                                       9.36 ms  dispatches  202
+--- kernels R 04:04:30
+---   substep: solver.solve: 10.97 ms/step GPU (sum of per-dispatch times)
+      4.658 ms  x 10  _update_gradient_h_incremental_cholesky__locals__kernel_8126df5a_metal_forward
+      2.727 ms  x  1  _update_gradient_cholesky__locals__kernel_cf59d677_metal_forward
+      0.773 ms  x 10  _linesearch_iterative_kernel__locals__kernel_8deb9b8b_metal_forward
+      0.716 ms  x 10  _update_constraint_efc__locals__kernel_afa7fbbf_metal_forward
+      0.670 ms  x  1  _update_gradient_JTDAJ_dense_tiled__locals__kernel_44bf422b_metal_forward
+      0.488 ms  x 11  mul_m_kernel__locals___mul_m_9c0838e9_metal_forward
+      0.223 ms  x 10  _update_constraint_init_qfrc_constraint_dense__locals__kernel_935a1343_metal_forward
+      0.150 ms  x 10  _update_gradient_grad__locals__kernel_7f5e4a38_metal_forward
+      0.136 ms  x  1  _solve_init_jaref_kernel__locals__kernel_1116a354_metal_forward
+      0.113 ms  x  1  _update_constraint_efc__locals__kernel_d88e782a_metal_forward
+      0.063 ms  x  1  _update_constraint_init_qfrc_constraint_dense__locals__kernel_70c42511_metal_forward
+      0.061 ms  x 10  _solve_done__locals__kernel_318c149b_metal_forward
+---   substep: sensor_acc + integrate (implicitfast): 3.28 ms/step GPU (sum of per-dispatch times)
+      1.716 ms  x  1  _factor_i_sparse_serial__locals__kernel_8c1557af_metal_forward
+--- physics (substeps + contact-sensor hooks): 77.72 ms/step GPU (sum of per-dispatch times)
+     24.131 ms  x 80  _update_gradient_h_incremental_cholesky__locals__kernel_8126df5a_metal_forward
+      9.498 ms  x  8  _update_gradient_cholesky__locals__kernel_cf59d677_metal_forward
+      7.602 ms  x 16  _factor_i_sparse_serial__locals__kernel_8c1557af_metal_forward
+      4.900 ms  x 80  _update_constraint_efc__locals__kernel_afa7fbbf_metal_forward
+      4.002 ms  x 80  _linesearch_iterative_kernel__locals__kernel_8deb9b8b_metal_forward
+      3.537 ms  x 16  _solve_LD_sparse_serial__locals__kernel_ae6d7fc3_metal_forward
+--- kernels D 04:04:38
+---   substep: solver.solve: 11.01 ms/step GPU (sum of per-dispatch times)
+      4.145 ms  x 10  _update_gradient_h_incremental_cholesky__locals__kernel_8126df5a_metal_forward
+      2.806 ms  x  1  _update_gradient_cholesky__locals__kernel_cf59d677_metal_forward
+      0.880 ms  x 10  _update_constraint_efc__locals__kernel_afa7fbbf_metal_forward
+      0.748 ms  x  1  _update_gradient_JTDAJ_dense_tiled__locals__kernel_44bf422b_metal_forward
+      0.724 ms  x 10  _linesearch_iterative_kernel__locals__kernel_8deb9b8b_metal_forward
+      0.570 ms  x 11  mul_m_kernel__locals___mul_m_9c0838e9_metal_forward
+      0.240 ms  x 10  _update_constraint_init_qfrc_constraint_dense__locals__kernel_935a1343_metal_forward
+      0.204 ms  x  1  _solve_init_jaref_kernel__locals__kernel_1116a354_metal_forward
+      0.181 ms  x 10  _update_gradient_grad__locals__kernel_7f5e4a38_metal_forward
+      0.117 ms  x  1  _update_constraint_efc__locals__kernel_d88e782a_metal_forward
+      0.086 ms  x 10  _solve_done__locals__kernel_318c149b_metal_forward
+      0.067 ms  x  1  _update_constraint_init_qfrc_constraint_dense__locals__kernel_70c42511_metal_forward
+---   substep: sensor_acc + integrate (implicitfast): 3.88 ms/step GPU (sum of per-dispatch times)
+      2.057 ms  x  1  _factor_i_sparse_serial__locals__kernel_8c1557af_metal_forward
+--- physics (substeps + contact-sensor hooks): 77.28 ms/step GPU (sum of per-dispatch times)
+     19.667 ms  x 80  _update_gradient_h_incremental_cholesky__locals__kernel_8126df5a_metal_forward
+     10.820 ms  x  8  _update_gradient_cholesky__locals__kernel_cf59d677_metal_forward
+      8.274 ms  x 16  _factor_i_sparse_serial__locals__kernel_8c1557af_metal_forward
+      4.896 ms  x 80  _update_constraint_efc__locals__kernel_afa7fbbf_metal_forward
+      3.800 ms  x 16  _solve_LD_sparse_serial__locals__kernel_ae6d7fc3_metal_forward
+      3.477 ms  x 80  _linesearch_iterative_kernel__locals__kernel_8deb9b8b_metal_forward
+=== end Sat Sep 26 04:04:45 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] tp26_prof end: device utilisation 38% (04:04:45), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   1.2 %
+lock held by e2_ls_g1task, not tp26_prof; not released

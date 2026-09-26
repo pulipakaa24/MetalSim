@@ -1,0 +1,39 @@
+[gpu_run] tp26_rough start: device utilisation 0% (04:11:20)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+=== start Sat Sep 26 04:11:23 PDT 2026 metalsim 5db7510 warp 4127c481 mjw fe6fe71 power: Now drawing from 'AC Power'
+--- R1 rough recommended 04:11:23
+[R1_rough_recommended] N=4096 njmax 256 naconmax 524288 is_sparse False
+[R1_rough_recommended] physics only 64.1 ms/step -> 63,922 env-steps/s
+[R1_rough_recommended] full env step 90.5 ms -> 45,268 env-steps/s
+[R1_rough_recommended] after random-action steps: nefc max 45 mean 14.0; nacon 10710 (2.61/world); overflow {'ITERATIONS': 25, 'LS_ITERATIONS': 3860}
+--- N1 rough null 04:11:43
+[N1_rough_null] N=4096 njmax 256 naconmax 524288 is_sparse False
+[N1_rough_null] physics only 63.6 ms/step -> 64,355 env-steps/s
+[N1_rough_null] full env step 76.1 ms -> 53,843 env-steps/s
+[N1_rough_null] after random-action steps: nefc max 47 mean 14.9; nacon 11599 (2.83/world); overflow {'LS_ITERATIONS': 3794}
+--- R2 rough recommended 04:12:01
+[R2_rough_recommended] N=4096 njmax 256 naconmax 524288 is_sparse False
+[R2_rough_recommended] physics only 64.0 ms/step -> 63,969 env-steps/s
+[R2_rough_recommended] full env step 90.6 ms -> 45,217 env-steps/s
+[R2_rough_recommended] after random-action steps: nefc max 52 mean 14.0; nacon 10781 (2.63/world); overflow {'ITERATIONS': 23, 'LS_ITERATIONS': 3869}
+--- N2 rough null 04:12:21
+[N2_rough_null] N=4096 njmax 256 naconmax 524288 is_sparse False
+[N2_rough_null] physics only 63.6 ms/step -> 64,370 env-steps/s
+[N2_rough_null] full env step 75.9 ms -> 53,988 env-steps/s
+[N2_rough_null] after random-action steps: nefc max 46 mean 14.8; nacon 11526 (2.81/world); overflow {'LS_ITERATIONS': 3808}
+--- rough step profile, recommended 04:12:39
+task: terrain rough, reward_cfg rough, obs_dim 310, height scan 187 rays
+  physics (substeps + contact-sensor hooks)                  58.07 ms   dispatches  1640 cmdbufs   1 syncs 1
+    of which height scan (187 rays)                           0.06 ms   dispatches     1 cmdbufs   1 syncs 1
+  sum of segments                                            58.72 ms
+  whole step graph                                           82.99 ms   dispatches  1661 cmdbufs   1 syncs 1  -> 49,357 env-steps/s
+  outside physics: 24.92 ms (30.0% of the step)
+  fwd_position (kinematics, com, crb, factor, collision, make_constraint, transmission)          2.19 ms  dispatches   53
+Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
+Traceback (most recent call last):
+    raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
+RuntimeError: Metal error on device metal:0: Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
+=== end Sat Sep 26 04:12:49 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] tp26_rough end: device utilisation 0% (04:12:49), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   1.9 %

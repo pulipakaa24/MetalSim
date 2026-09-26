@@ -223,6 +223,15 @@ contacts add the rest and the cap hits). The fork's flex merge changes nothing f
 second M4 Max (14-inch) measured the same setting within 2–4 % of this machine, so no hardware effect is visible.
 The headline row keeps its numbers with its setting stated; the README carries both.
 
+**Throughput without fidelity cost, 2026-09-26** (`docs/research/throughput_2026-09-26.md`, `runs/tp26/`; measured through the
+timing queue on the M4 Max, idle GPU logged, 4096 envs, 2.5 ms x 8, `contact_cfg="recommended"`, interleaved A/B):
+
+| change | full env step before -> after | evidence that no result changes |
+|---|---|---|
+| Warp fork: register triangular solve for the Newton Hessian on Metal (`tile_cholesky_solve`, one SIMD group, no barriers) | 55,752-55,795 -> **58,587-58,718 env-steps/s (+5.2 %)** on top of the capacity bound; physics only 83.3 -> 85.5 K | summation order only (1.3-3.4e-7 relative vs the cooperative path); state-difference protocol `runs/tp26/check.wrapper.log` |
+| G1 flat capacities at the provable bound (njmax 144 / nconmax 24 instead of 512 / 128; `metalsim.physics.capacity`, `BatchSim.check_overflow()` guard) | 54,340-54,385 -> **55,646-55,741 env-steps/s (+2.5 %)**; Isaac Lab 3.0 cap-20 preset 56,301 -> 58,287 (+3.6 %) | no overflow possible below the bound (rows, order and arithmetic unchanged); `tests/test_capacity.py`; overflow raises at every PPO log point |
+| rough terrain under the preset, first measurement | recommended 45,217-45,268 vs `contact_cfg=None` 53,843-53,988 (the README's rough 41.9 K loop number is the None setting) | measurement only |
+
 ### 1.5 Learning on the G1 task
 
 **Two defects found by running Isaac's full 1,500 iterations, both now fixed.**

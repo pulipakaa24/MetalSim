@@ -1,0 +1,19 @@
+[gpu_run] tp26_loop start: device utilisation 0% (04:20:13)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   1.5 %
+=== start Sat Sep 26 04:20:16 PDT 2026 metalsim b019854 power: Now drawing from 'AC Power'
+--- warp policy cost 04:20:16
+flat: act() (actor (256, 128, 128) + critic + sample) 3.030 ms per step at N=4096
+rough: act() (actor (512, 256, 128) + critic + sample) 12.411 ms per step at N=4096
+--- ppo update profile 04:20:23
+N=4096, rollout 24, epochs 5 x minibatches 4 (minibatch 24576 rows), net (256, 128, 128), params 167243
+  whole update                                                 150.9 ms
+  without the adaptive-KL .item() per minibatch                133.0 ms
+  without clip_grad_norm_                                      136.1 ms
+  without the optimizer step (Adam)                            151.2 ms
+  1 epoch x 1 minibatch (GAE + one big fwd/bwd + one step)      34.9 ms
+  GAE recursion alone (24 sequential steps)                      0.8 ms
+  forward + backward of the 20 minibatches alone (no clip, no step)   100.6 ms
+=== end Sat Sep 26 04:20:32 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] tp26_loop end: device utilisation 88% (04:20:32), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %

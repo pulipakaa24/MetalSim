@@ -1,0 +1,38 @@
+[gpu_run] tp26_cap start: device utilisation 0% (04:09:45)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   1.7 %
+=== start Sat Sep 26 04:09:48 PDT 2026 metalsim 5db7510 warp 4127c481 mjw fe6fe71 power: Now drawing from 'AC Power'
+--- D1 defaults 04:09:48
+[D1_njmax512_ncon128] N=4096 njmax 256 naconmax 131072 is_sparse False
+[D1_njmax512_ncon128] physics only 50.2 ms/step -> 81,534 env-steps/s
+[D1_njmax512_ncon128] full env step 75.3 ms -> 54,385 env-steps/s
+[D1_njmax512_ncon128] after random-action steps: nefc max 36 mean 14.6; nacon 11345 (2.77/world); overflow {'ITERATIONS': 20, 'LS_ITERATIONS': 3918}
+--- A1 bound 04:10:03
+[A1_njmax144_ncon24] N=4096 njmax 144 naconmax 98304 is_sparse False
+[A1_njmax144_ncon24] physics only 49.1 ms/step -> 83,400 env-steps/s
+[A1_njmax144_ncon24] full env step 73.5 ms -> 55,741 env-steps/s
+[A1_njmax144_ncon24] after random-action steps: nefc max 46 mean 14.4; nacon 11253 (2.75/world); overflow {'ITERATIONS': 25, 'LS_ITERATIONS': 3882}
+--- D2 defaults 04:10:18
+[D2_njmax512_ncon128] N=4096 njmax 256 naconmax 131072 is_sparse False
+[D2_njmax512_ncon128] physics only 50.2 ms/step -> 81,520 env-steps/s
+[D2_njmax512_ncon128] full env step 75.4 ms -> 54,340 env-steps/s
+[D2_njmax512_ncon128] after random-action steps: nefc max 36 mean 14.5; nacon 11343 (2.77/world); overflow {'ITERATIONS': 26, 'LS_ITERATIONS': 3888}
+--- A2 bound 04:10:33
+[A2_njmax144_ncon24] N=4096 njmax 144 naconmax 98304 is_sparse False
+[A2_njmax144_ncon24] physics only 49.1 ms/step -> 83,339 env-steps/s
+[A2_njmax144_ncon24] full env step 73.6 ms -> 55,646 env-steps/s
+[A2_njmax144_ncon24] after random-action steps: nefc max 41 mean 14.5; nacon 11368 (2.78/world); overflow {'ITERATIONS': 30, 'LS_ITERATIONS': 3883}
+--- I1 il3 defaults 04:10:47
+[I1_il3_njmax512] N=4096 njmax 256 naconmax 131072 is_sparse False
+[I1_il3_njmax512] physics only 57.0 ms/step -> 71,803 env-steps/s
+[I1_il3_njmax512] full env step 72.8 ms -> 56,301 env-steps/s
+[I1_il3_njmax512] after random-action steps: nefc max 51 mean 13.3; nacon 10604 (2.59/world); overflow {}
+--- J1 il3 bound 04:11:02
+[J1_il3_njmax144] N=4096 njmax 144 naconmax 98304 is_sparse False
+[J1_il3_njmax144] physics only 55.0 ms/step -> 74,480 env-steps/s
+[J1_il3_njmax144] full env step 70.3 ms -> 58,287 env-steps/s
+[J1_il3_njmax144] after random-action steps: nefc max 42 mean 13.6; nacon 10870 (2.65/world); overflow {}
+=== end Sat Sep 26 04:11:17 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] tp26_cap end: device utilisation 100% (04:11:17), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   2.3 %
