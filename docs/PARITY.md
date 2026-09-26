@@ -945,6 +945,8 @@ are in progress. Also found: the 2.3.2 ports read the pelvis frame-origin veloci
 velocity (`root_lin_vel_*`); the COM velocity is now the default (`base_velocity="origin"` archived), and a
 confirming 2.3.2 flat run is queued.
 
+**Isaac Lab 3.0 like-for-like, fixes found on the way (2026-09-26, research note §6).** (1) Trainer start state: PPOWarp started each env's first episode from MuJoCo's qpos0 (robot embedded in the ground); with Isaac's stiff contacts that ejected robots and caused the iteration 10–14 blow-ups; now reset first like Isaac's `env.reset()`. (2) Drive effort limit: moved from the actuator's forcerange to the joint's actfrcrange as Newton builds Isaac's model, since MuJoCo drops a clamped actuator's implicit damping: late finger blow-ups 41 → 0 with the final rough policy. Flat 3.0 with fix (1): 0 blow-ups, early rise close to Isaac's (+6.5 vs +8.4 at 300); final three-seed flat and one rough run with both fixes are queued.
+
 ## 2. Platform capabilities (the workstreams), with the tests behind them
 
 | capability | Isaac | ours | test (assertion) | result | verdict |
