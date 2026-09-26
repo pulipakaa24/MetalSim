@@ -7,7 +7,7 @@ How a job's progress is found (in this order, all automatic):
   1. its log: every regular file the job's process tree holds open for writing (lsof), newest first;
      the ticket's recorded command line is searched for log paths as a fallback
   2. a counter in the log tail: "it 123", "iter 123", "iteration 123", "epoch 12", "step 123",
-     "123/1500" (also tqdm's "123/1500 ["), "45%"; the total comes from the same line ("it 12/500"),
+     "123/1500" (also tqdm's "123/1500 ["), "progress 45 %" or a tqdm "45%|"; the total comes from the same line ("it 12/500"),
      from the command line (--iters/--iterations/--max_iterations/--epochs/--steps/--frames/--n, or a
      bare integer after a run script's name), or from the largest counter the job has reached so far
   3. otherwise elapsed time against the minutes the job asked for when it queued
@@ -85,7 +85,7 @@ def tail(path, n=40, nbytes=16000):
 # ---------------------------------------------------------------- progress parsing
 CUR = re.compile(r"(?:^|[\s|\[])(?:it|iter|iteration|epoch|step|steps|frame|episode|update)\s*[:=]?\s*(\d+)(?:\s*/\s*(\d+))?", re.I)
 FRAC = re.compile(r"(?<![\d.])(\d+)\s*/\s*(\d+)(?:\s*\[|\s|$)")
-PCT = re.compile(r"(\d{1,3}(?:\.\d+)?)\s*%")
+PCT = re.compile(r"(?:(?:progress|done|complete|completed|finished|rendered|processed)\D{0,12}|\|\s*)(\d{1,3}(?:\.\d+)?)\s*%|(\d{1,3}(?:\.\d+)?)%\|", re.I)   # tqdm bars or "progress 37 %", not "cpu > 40 %"
 TOTAL_FLAGS = re.compile(r"--(?:iters?|iterations|max[_-]iter(?:ations)?|num[_-]iter(?:ations)?|epochs|steps|max[_-]steps|frames|n|num[_-]envs?_steps|updates)[= ](\d+)")
 
 
@@ -108,8 +108,9 @@ def parse_progress(lines, cmd):
         if m and int(m.group(2)) >= int(m.group(1)) > 0:
             cur, tot = int(m.group(1)), int(m.group(2)); return cur, tot, 100.0 * cur / tot, "fraction", "fraction"
         m = PCT.search(line)
-        if m and float(m.group(1)) <= 100:
-            return None, None, float(m.group(1)), "percent", "percent"
+        if m:
+            v = float(m.group(1) or m.group(2))
+            if v <= 100: return None, None, v, "percent", "percent"
     return None, None, None, None, None
 
 
