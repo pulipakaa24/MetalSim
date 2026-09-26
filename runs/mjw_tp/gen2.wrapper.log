@@ -1,0 +1,41 @@
+[gpu_run] mjw_generality2 start: device utilisation 0% (19:58:28)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   1.5 %
+=== start Fri Sep 25 19:58:31 PDT 2026 mjw 1791414 power: Now drawing from 'AC Power'
+== go2 pyramidal kernels
+KERNELS go2 N=4096: 7.99 ms/step GPU (sum of per-dispatch times), 178 dispatches/step
+     1.945 ms  24.4%  x 10  _update_constraint_efc__locals__kernel_afa7fbbf_metal_forward
+     0.615 ms   7.7%  x 10  _update_gradient_h_incremental_cholesky__locals__kernel_92f792f5_metal_forward
+     0.599 ms   7.5%  x  2  _tile_cholesky_factorize_solve_block__locals__kernel_44479549_metal_forward
+     0.553 ms   6.9%  x 10  _linesearch_iterative_kernel__locals__kernel_8deb9b8b_metal_forward
+     0.458 ms   5.7%  x  1  _update_gradient_JTDAJ_dense_tiled__locals__kernel_3e9ade00_metal_forward
+     0.368 ms   4.6%  x  1  _efc_contact_jac_dense__locals__kernel_4179614b_metal_forward
+     0.251 ms   3.1%  x  1  _solve_init_jaref_kernel__locals__kernel_d4dcae8c_metal_forward
+     0.247 ms   3.1%  x  1  _update_gradient_cholesky__locals__kernel_9c3e4676_metal_forward
+     0.245 ms   3.1%  x  1  _update_constraint_efc__locals__kernel_d88e782a_metal_forward
+     0.227 ms   2.8%  x 10  _update_constraint_init_qfrc_constraint_dense__locals__kernel_935a1343_metal_forward
+     0.223 ms   2.8%  x  1  _efc_contact_update__locals__kernel_6f39c81f_metal_forward
+     0.202 ms   2.5%  x 11  mul_m_kernel__locals___mul_m_9c0838e9_metal_forward
+     0.134 ms   1.7%  x 13  wp_memset
+     0.121 ms   1.5%  x  1  _nxn_broadphase__locals__kernel_cb91fd56_metal_forward
+     0.116 ms   1.5%  x  1  ccd_kernel_builder__locals__ccd_kernel_2f8a24c4_metal_forward
+== go2 elliptic kernels
+KERNELS go2 N=4096: 23.96 ms/step GPU (sum of per-dispatch times), 187 dispatches/step
+    19.014 ms  79.4%  x 11  _update_gradient_JTCJ_dense_f52c2ac2_metal_forward
+     1.270 ms   5.3%  x 11  _update_constraint_efc__locals__kernel_d88e782a_metal_forward
+     0.681 ms   2.8%  x 11  _update_gradient_JTDAJ_dense_tiled__locals__kernel_3e9ade00_metal_forward
+     0.632 ms   2.6%  x 10  _linesearch_iterative_kernel__locals__kernel_6a792f2a_metal_forward
+     0.489 ms   2.0%  x 11  _update_gradient_cholesky__locals__kernel_9c3e4676_metal_forward
+     0.256 ms   1.1%  x  2  _tile_cholesky_factorize_solve_block__locals__kernel_44479549_metal_forward
+     0.171 ms   0.7%  x 11  _update_constraint_init_qfrc_constraint_dense__locals__kernel_70c42511_metal_forward
+     0.142 ms   0.6%  x  1  _solve_init_jaref_kernel__locals__kernel_d4dcae8c_metal_forward
+     0.106 ms   0.4%  x 11  mul_m_kernel__locals___mul_m_9c0838e9_metal_forward
+     0.096 ms   0.4%  x  1  _efc_contact_jac_dense__locals__kernel_3dfc3ac0_metal_forward
+     0.072 ms   0.3%  x  1  _efc_contact_update__locals__kernel_488f1e13_metal_forward
+     0.071 ms   0.3%  x 11  _update_gradient_grad__locals__kernel_72941948_metal_forward
+     0.068 ms   0.3%  x  1  ccd_kernel_builder__locals__ccd_kernel_2f8a24c4_metal_forward
+     0.066 ms   0.3%  x 12  wp_memset
+     0.063 ms   0.3%  x  1  _nxn_broadphase__locals__kernel_cb91fd56_metal_forward
+=== end Fri Sep 25 19:58:42 PDT 2026
+[gpu_run] mjw_generality2 end: device utilisation 0% (19:58:42), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %

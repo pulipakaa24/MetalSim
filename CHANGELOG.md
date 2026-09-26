@@ -25,12 +25,14 @@ commit order within each area (`git log` for the full messages). Dates are the c
 - 09-24 `eaa4ce3` MuJoCo Warp fork: plane_convex now reproduces MuJoCo C's contact set (fork metalsim 284dcd1)
 - 09-24 `6d2accb` Contact/limit tuning module and tuned parity replays against Isaac's PhysX recordings
 - 09-24 `11a07c3` plane_convex patch: add the MJW_PLANE_CONVEX=legacy switch (fork metalsim a8e6485); regression test skips under it
+- 09-25 Throughput "regression" settled (`docs/research/throughput_regression_2026-09-25.md`): the flex merge in the MuJoCo Warp fork costs the G1 nothing (interleaved A/B ±0.4 %); the 67.6 K → 54.2 K env step is the task's PhysX-parity contact preset (solver only); README / PARITY §1.4 carry both settings; `g1_tp_variants.py` / `g1_step_profile.py` take `contact_cfg` / `solver_cfg`; `g1_tp_generality.py` prints which fast paths a scene takes (Go2, SO-101, Panda at 4096: elliptic cones fall off the fused Hessian)
 
 ## Rendering
 
 - 09-22 `0656f1f` render: model light list, headlight/ambient model, tiled shadow maps, radiance calibration; fidelity benchmark (PSNR/FLIP)
 - 09-22 `62857e0` render: tier 1 hybrid ray tracing (RT soft shadows, AO, mirror reflections from the fragment stage), skybox colour, Isaac-style lidar spec; bench suite
 - 09-24 `c5aca1f` Parity scene: hide collision geometry in renders (Isaac draws visuals only; the foot collider plates were visible); post-queue video re-render
+- 09-25 Tier 2: HDR equirectangular environment map (textured USD DomeLight) importance-sampled with MIS (`set_environment`, `env_sampling_table`, `metalsim/render/hdr.py` RGBE reader), oriented as Kit/RTX renders a dome on a z-up stage; USD import records DomeLights (`usd_dome` custom text, `set_environment_from_model`); `Randomizer.environment` per-episode map by key; `set_fovy`, `set_materials`, opt-in `firefly_clamp` (biased); parity presets bit-for-bit unchanged without a map; Poly Haven CC0 maps fetched (not committed); gallery `g1_hdri_tier2.png`; handoff `docs/HANDOFF_tier2_hdri_envmap.md` ported
 
 ## Sensors
 

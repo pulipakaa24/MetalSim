@@ -1,0 +1,51 @@
+[gpu_run] mjw_ab_tp start: device utilisation 0% (19:39:00)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+=== start Fri Sep 25 19:39:03 PDT 2026 metalsim 626f54c warp 9050cb54 mjw-A 1791414 mjw-B 07a51a6
+holder: {"name": "mjw_ab_tp", "kind": "timing", "minutes": 12.0, "pid": 85943, "start": 1790390340.844216, "queued": 1790390140.676682, "cmd": "bash runs/mjw_tp/job_ab1.sh", "cwd": "/Users/aditya/robosim"}
+  waiting [timing] mjw_ab_profile est 10.0 min, queued 202 s ago
+  waiting [timing] mjw_generality est 14.0 min, queued 2 s ago
+  waiting [render] pytest_full_cull est 8.0 min, queued 4469 s ago
+  waiting [low] kamino_tests_fork est 40.0 min, queued 16815 s ago
+  waiting [low] kamino_tests_152 est 30.0 min, queued 15986 s ago
+  waiting [low] cl_kamino est 45.0 min, queued 14655 s ago
+  waiting [low] cl_mjw est 40.0 min, queued 14631 s ago
+--- A1_1791414 19:39:03 power: Now drawing from 'AC Power' therm: Note: No thermal warning level has been recorded Note: No performance warning level has been recorded Note: No CPU power status has been recorded 
+mjw: /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/__init__.py
+[A1_1791414] N=4096 njmax 256 naconmax 131072 is_sparse False
+[A1_1791414] physics only 50.5 ms/step -> 81,077 env-steps/s
+[A1_1791414] full env step 75.5 ms -> 54,272 env-steps/s
+[A1_1791414] after random-action steps: nefc max 43 mean 14.4; nacon 11335 (2.77/world); overflow {'ITERATIONS': 26, 'LS_ITERATIONS': 3887}
+[A1_1791414] rollout + inference 75.5 ms/step -> 54,225 env-steps/s
+[A1_1791414] PPO update 152 ms -> full loop 50,022 env-steps/s
+[A1_1791414] SUMMARY physics 81,077 | step 54,272 | rollout 54,225 | loop 50,022  (ms: physics 50.5, step 75.5, rollout/step 75.5, update 152)
+--- B1_07a51a6 19:39:31 power: Now drawing from 'AC Power' therm: Note: No thermal warning level has been recorded Note: No performance warning level has been recorded Note: No CPU power status has been recorded 
+mjw: /Users/aditya/robosim/upstream/mujoco_warp-07a51a6/mujoco_warp/__init__.py
+[B1_07a51a6] N=4096 njmax 256 naconmax 131072 is_sparse False
+[B1_07a51a6] physics only 50.6 ms/step -> 81,014 env-steps/s
+[B1_07a51a6] full env step 75.8 ms -> 54,035 env-steps/s
+[B1_07a51a6] after random-action steps: nefc max 44 mean 14.4; nacon 11272 (2.75/world); overflow {'ITERATIONS': 16, 'LS_ITERATIONS': 3863}
+[B1_07a51a6] rollout + inference 75.8 ms/step -> 54,023 env-steps/s
+[B1_07a51a6] PPO update 149 ms -> full loop 49,937 env-steps/s
+[B1_07a51a6] SUMMARY physics 81,014 | step 54,035 | rollout 54,023 | loop 49,937  (ms: physics 50.6, step 75.8, rollout/step 75.8, update 149)
+--- A2_1791414 19:39:59 power: Now drawing from 'AC Power' therm: Note: No thermal warning level has been recorded Note: No performance warning level has been recorded Note: No CPU power status has been recorded 
+mjw: /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/__init__.py
+[A2_1791414] N=4096 njmax 256 naconmax 131072 is_sparse False
+[A2_1791414] physics only 50.4 ms/step -> 81,287 env-steps/s
+[A2_1791414] full env step 75.7 ms -> 54,077 env-steps/s
+[A2_1791414] after random-action steps: nefc max 43 mean 14.2; nacon 11067 (2.70/world); overflow {'ITERATIONS': 12, 'LS_ITERATIONS': 3877}
+[A2_1791414] rollout + inference 76.1 ms/step -> 53,836 env-steps/s
+[A2_1791414] PPO update 147 ms -> full loop 49,823 env-steps/s
+[A2_1791414] SUMMARY physics 81,287 | step 54,077 | rollout 53,836 | loop 49,823  (ms: physics 50.4, step 75.7, rollout/step 76.1, update 147)
+--- B2_07a51a6 19:40:28 power: Now drawing from 'AC Power' therm: Note: No thermal warning level has been recorded Note: No performance warning level has been recorded Note: No CPU power status has been recorded 
+mjw: /Users/aditya/robosim/upstream/mujoco_warp-07a51a6/mujoco_warp/__init__.py
+[B2_07a51a6] N=4096 njmax 256 naconmax 131072 is_sparse False
+[B2_07a51a6] physics only 50.5 ms/step -> 81,041 env-steps/s
+[B2_07a51a6] full env step 75.6 ms -> 54,169 env-steps/s
+[B2_07a51a6] after random-action steps: nefc max 44 mean 14.5; nacon 11280 (2.75/world); overflow {'ITERATIONS': 22, 'LS_ITERATIONS': 3890}
+[B2_07a51a6] rollout + inference 75.9 ms/step -> 53,990 env-steps/s
+[B2_07a51a6] PPO update 144 ms -> full loop 50,022 env-steps/s
+[B2_07a51a6] SUMMARY physics 81,041 | step 54,169 | rollout 53,990 | loop 50,022  (ms: physics 50.5, step 75.6, rollout/step 75.9, update 144)
+=== end Fri Sep 25 19:40:56 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] mjw_ab_tp end: device utilisation 0% (19:40:56), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+lock held by mjw_ab_profile, not mjw_ab_tp; not released

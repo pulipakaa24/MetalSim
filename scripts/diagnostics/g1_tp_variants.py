@@ -7,6 +7,9 @@ The variant is a JSON object in MJW_TP_VARIANT (default {} = the task as committ
   jacobian              "dense" | "sparse" | "auto" (Warp-side only, BatchSimOptions.jacobian)
   block_dim             {BlockDim field: int}
   no_kin                true: drop the all-world mjw.kinematics after reset (flat task has no reader)
+  contact_cfg           G1VelocityTask contact preset (metalsim.physics.contact_tuning; null = the model's own solref/solimp,
+                        the 2026-09-25 headline setting; the task default is "recommended" = tau10_impact_hardlimits)
+  solver_cfg            G1VelocityTask solver preset (metalsim.physics.solver_presets), e.g. "isaaclab3"
   label                 printed tag
 Warp Metal knobs (WP_METAL_INFLIGHT, WP_METAL_ICB_BATCH, ...) are plain environment variables.
 
@@ -38,7 +41,8 @@ g1v.BatchSimOptions = _opts
 from metalsim.learn.g1_velocity import G1VelocityTask, benchmark_step, g1_ppo_config
 from metalsim.learn.ppo_warp import PPOWarp
 
-task = G1VelocityTask(N, terrain=os.environ.get("MJW_TP_TERRAIN", "flat"), physics_dt=0.0025)
+task = G1VelocityTask(N, terrain=os.environ.get("MJW_TP_TERRAIN", "flat"), physics_dt=0.0025,
+                      **{k: V[k] for k in ("contact_cfg", "solver_cfg") if k in V})
 if V.get("gravcomp_launch"):     # A/B for the MuJoCo Warp fork's no-op gravity-compensation skip
     task.sim.m.has_gravcomp = True
     with wp.ScopedDevice(task.sim.device):

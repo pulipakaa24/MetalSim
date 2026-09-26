@@ -171,6 +171,23 @@ their effect are in DECISIONS.md; the remaining costs, ranked: the 43×43 Choles
 comparison: PhysX vs XPBD is a different solver; Isaac Lab 3.0 itself moves to Newton, so the
 like-for-like number will be Isaac Lab 3.0's, which is not measured here.
 
+**Re-measured 2026-09-25 evening under the task's current defaults** (`docs/research/throughput_regression_2026-09-25.md`,
+`runs/mjw_tp/ab/`, `runs/mjw_tp/cc.wrapper.log`; MetalSim `98a41c1`, Warp fork `9050cb54`, MuJoCo Warp fork `1791414`
+installed and `07a51a6` in a worktree, interleaved through the timing queue, AC power, idle GPU logged at both ends):
+
+| setting (4096 envs, 2.5 ms, flat) | physics only | full env step | rollout + inference | full PPO loop | `solver.solve` per substep | Newton cap hit |
+|---|---|---|---|---|---|---|
+| task default: `contact_cfg="recommended"` (tau10_impact_hardlimits, the PhysX-parity preset, `e3ba79f`) | 80,982–81,287 | **54,094–54,272** | 53,830–54,225 | **49,509–50,055** | 5.69–5.74 ms | 12–28 of 4096 worlds |
+| `contact_cfg=None` (MuJoCo's default contacts and limits: the setting of the headline row above) | 78,023–80,600 | **67,102–67,209** | 61,176–61,366 | **56,154–56,157** | 4.18 ms | none |
+| MuJoCo Warp fork `07a51a6` (flex merge) instead of `1791414`, task default | 81,014–81,041 | 54,035–54,169 | 53,990–54,023 | 49,937–50,022 | 5.72–5.74 ms | 16–22 |
+
+The headline (67.6 K / 56.6 K) reproduces to 0.1 % under its own contact setting; the task's PhysX-parity preset,
+adopted the same day for fidelity, costs 19.5 % of the env step and 11 % of the loop, entirely in the Newton solve
+(harder limit and impact constraints: more worlds unconverged per iteration, ~0.5 % of worlds leaving at the
+10-iteration cap). The fork's flex merge changes nothing for the G1 (±0.4 %, same 1653 dispatches per step), and a
+second M4 Max (14-inch) measured the same setting within 2–4 % of this machine, so no hardware effect is visible.
+The headline row keeps its numbers with its setting stated; the README carries both.
+
 ### 1.5 Learning on the G1 task
 
 **Two defects found by running Isaac's full 1,500 iterations, both now fixed.**
@@ -749,6 +766,27 @@ exposure is a 9 % fit over the documented camera formula, both kept), how MDL we
 (inferred from the frames), and the sun unit (USD documents I, Kit's frames fit π·I; the frames were
 followed). The old renderer remains the default and reproduces its images bit for bit; the parity
 presets select the new path.
+
+**Rendering: textured dome light (HDR environment map), ported 2026-09-25** (`docs/HANDOFF_tier2_hdri_envmap.md`,
+research note §6). A USD `DomeLight` with `inputs:texture:file` (Isaac's backgrounds and image-based lighting)
+is now a tier-2 equirectangular map: the miss radiance of every ray and an importance-sampled light (PBRT's
+InfiniteAreaLight: luminance × sin θ table, solid-angle pdf p(u,v)/(2π² sin θ), next-event estimation with
+the power heuristic against the BSDF sampler on both sides). Semantics follow UsdLux: radiance = texture ×
+intensity × 2^exposure × color (`schema.usda`, LightAPI). Orientation follows what Isaac renders, not the USD
+spec: USD documents the dome pole at +y with the OpenEXR latlong layout (u = longitude, centre faces +z,
+v = latitude from the top), but Kit/RTX "treats the DomeLight environment as Z-up, unlike the OpenUSD +Y pole
+convention" and ignores an authored rotation (NVIDIA `usd-exchange-samples`, createLights README), and Isaac
+Lab's `spawn_light` authors none; so the pole is +z (**published**), and the azimuth is the +90° x-rotation of the
+documented map: image centre faces −y, u = 0.25 faces +x (**estimated**: undocumented, not verifiable here since
+every Isaac recording used a uniform dome; `set_environment(yaw=)` corrects a measured offset). The importer
+records DomeLights as custom text `usd_dome` (file, intensity, exposure, colour, yaw), applied by
+`Tier2Renderer.set_environment_from_model`; `Randomizer.environment` picks a map per episode by key (Isaac's
+Franka-stack dome randomization), GPU resources cached per key. **Measured**: constant-map furnace 0.5 ± 0.01;
+bright-window map (0.3 % of the sphere carrying most of the energy) within 2 % of the analytic plane radiance
+at two yaws, the uniform table [[NOISE]]× noisier; the parity presets without a map render **[[BITWISE]]**
+against the previous commit (`runs/render/envmap/`); cost with / without the map: camera-RL 1024 × 100×100
+4 spp 125.4 / 103.3 ms per 1024-frame batch (host path; +21 %); gallery 1024×768 32 spp 47.2 / 27.3 ms per frame, 676.6 / 343.9 ms at 512 spp (per spp 1.48 / 0.85 ms). Firefly clamp: opt-in only,
+biased (DECISIONS). Gallery: `g1_hdri_tier2.png`. Poly Haven CC0 maps are fetched, not committed.
 
 **Rendering, first comparison** (Isaac RTX vs MetalSim, same state per frame; brightness-matched = MetalSim scaled to
 Isaac's mean, because the engines' light units differ):

@@ -1,0 +1,65 @@
+[gpu_run] mjw_ab_contact start: device utilisation 0% (19:56:23)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    476 WindowServer                       1.1 %
+[gpu_run] gpu_top:   pid  58458 Terminal                           1.0 %
+=== start Fri Sep 25 19:56:26 PDT 2026 metalsim 98a41c1 warp 9050cb54 mjw 1791414 power: Now drawing from 'AC Power'
+holder: {"name": "mjw_ab_contact", "kind": "timing", "minutes": 8.0, "pid": 93700, "start": 1790391383.060832, "queued": 1790390557.3560135, "cmd": "bash runs/mjw_tp/job_cc.sh", "cwd": "/Users/aditya/robosim"}
+  waiting [timing] mjw_generality2 est 4.0 min, queued 733 s ago
+  waiting [timing] ellip_fid_cost est 14.0 min, queued 415 s ago
+--- R1 19:56:26
+[R1_recommended] N=4096 njmax 256 naconmax 131072 is_sparse False
+[R1_recommended] physics only 50.6 ms/step -> 80,982 env-steps/s
+[R1_recommended] full env step 75.5 ms -> 54,244 env-steps/s
+[R1_recommended] after random-action steps: nefc max 45 mean 14.3; nacon 11120 (2.71/world); overflow {'ITERATIONS': 24, 'LS_ITERATIONS': 3885}
+[R1_recommended] rollout + inference 75.6 ms/step -> 54,163 env-steps/s
+[R1_recommended] PPO update 149 ms -> full loop 50,055 env-steps/s
+[R1_recommended] SUMMARY physics 80,982 | step 54,244 | rollout 54,163 | loop 50,055  (ms: physics 50.6, step 75.5, rollout/step 75.6, update 149)
+--- D1 19:56:53
+[D1_no_preset] N=4096 njmax 256 naconmax 131072 is_sparse False
+[D1_no_preset] physics only 50.8 ms/step -> 80,600 env-steps/s
+[D1_no_preset] full env step 60.9 ms -> 67,209 env-steps/s
+[D1_no_preset] after random-action steps: nefc max 42 mean 15.0; nacon 11678 (2.85/world); overflow {'LS_ITERATIONS': 3847}
+[D1_no_preset] rollout + inference 66.7 ms/step -> 61,366 env-steps/s
+[D1_no_preset] PPO update 149 ms -> full loop 56,157 env-steps/s
+[D1_no_preset] SUMMARY physics 80,600 | step 67,209 | rollout 61,366 | loop 56,157  (ms: physics 50.8, step 60.9, rollout/step 66.7, update 149)
+--- R2 19:57:17
+[R2_recommended] N=4096 njmax 256 naconmax 131072 is_sparse False
+[R2_recommended] physics only 50.6 ms/step -> 81,008 env-steps/s
+[R2_recommended] full env step 75.7 ms -> 54,094 env-steps/s
+[R2_recommended] after random-action steps: nefc max 40 mean 14.3; nacon 11235 (2.74/world); overflow {'ITERATIONS': 28, 'LS_ITERATIONS': 3880}
+[R2_recommended] rollout + inference 76.1 ms/step -> 53,830 env-steps/s
+[R2_recommended] PPO update 159 ms -> full loop 49,509 env-steps/s
+[R2_recommended] SUMMARY physics 81,008 | step 54,094 | rollout 53,830 | loop 49,509  (ms: physics 50.6, step 75.7, rollout/step 76.1, update 159)
+--- D2 19:57:44
+[D2_no_preset] N=4096 njmax 256 naconmax 131072 is_sparse False
+[D2_no_preset] physics only 52.5 ms/step -> 78,023 env-steps/s
+[D2_no_preset] full env step 61.0 ms -> 67,102 env-steps/s
+[D2_no_preset] after random-action steps: nefc max 46 mean 15.1; nacon 11762 (2.87/world); overflow {'LS_ITERATIONS': 3859}
+[D2_no_preset] rollout + inference 67.0 ms/step -> 61,176 env-steps/s
+[D2_no_preset] PPO update 144 ms -> full loop 56,154 env-steps/s
+[D2_no_preset] SUMMARY physics 78,023 | step 67,102 | rollout 61,176 | loop 56,154  (ms: physics 52.5, step 61.0, rollout/step 67.0, update 144)
+--- profile R 19:58:09
+variant {'contact_cfg': 'recommended'}
+task: terrain flat, reward_cfg flat, obs_dim 123, height scan 0 rays
+  physics (substeps + contact-sensor hooks)                  69.92 ms   dispatches  1632 cmdbufs   1 syncs 1
+  whole step graph                                           73.14 ms   dispatches  1653 cmdbufs   1 syncs 1  -> 56,006 env-steps/s
+  outside physics: 3.21 ms (4.4% of the step)
+  fwd_position (kinematics, com, crb, factor, collision, make_constraint, transmission)          1.03 ms  dispatches   51
+  fwd_actuation + fwd_acceleration(factorize)                                                    0.79 ms  dispatches    8
+  solver.solve                                                                                   5.71 ms  dispatches  105
+  mjw.step (whole substep)                                                                       9.39 ms  dispatches  202
+--- profile D 19:58:18
+variant {'contact_cfg': None}
+task: terrain flat, reward_cfg flat, obs_dim 123, height scan 0 rays
+  physics (substeps + contact-sensor hooks)                  54.08 ms   dispatches  1632 cmdbufs   1 syncs 1
+  whole step graph                                           58.30 ms   dispatches  1653 cmdbufs   1 syncs 1  -> 70,251 env-steps/s
+  outside physics: 4.22 ms (7.2% of the step)
+  fwd_position (kinematics, com, crb, factor, collision, make_constraint, transmission)          1.06 ms  dispatches   51
+  fwd_actuation + fwd_acceleration(factorize)                                                    0.78 ms  dispatches    8
+  solver.solve                                                                                   4.18 ms  dispatches  105
+  mjw.step (whole substep)                                                                       8.12 ms  dispatches  202
+=== end Fri Sep 25 19:58:26 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] mjw_ab_contact end: device utilisation 100% (19:58:26), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   2.3 %
+lock held by mjw_generality2, not mjw_ab_contact; not released
