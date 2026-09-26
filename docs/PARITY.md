@@ -184,7 +184,8 @@ installed and `07a51a6` in a worktree, interleaved through the timing queue, AC 
 The headline (67.6 K / 56.6 K) reproduces to 0.1 % under its own contact setting; the task's PhysX-parity preset,
 adopted the same day for fidelity, costs 19.5 % of the env step and 11 % of the loop, entirely in the Newton solve
 (harder limit and impact constraints: more worlds unconverged per iteration, ~0.5 % of worlds leaving at the
-10-iteration cap). The fork's flex merge changes nothing for the G1 (±0.4 %, same 1653 dispatches per step), and a
+10-iteration cap; decomposed, the hard joint limits alone are 17 of the 20 %: `contact_cfg="hardlimits"` 55.7 K, no cap hits, and the 10 ms impact
+contacts add the rest and the cap hits). The fork's flex merge changes nothing for the G1 (±0.4 %, same 1653 dispatches per step), and a
 second M4 Max (14-inch) measured the same setting within 2–4 % of this machine, so no hardware effect is visible.
 The headline row keeps its numbers with its setting stated; the README carries both.
 

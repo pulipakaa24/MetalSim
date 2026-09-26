@@ -1,0 +1,40 @@
+[gpu_run] mjw_ab_contact2 start: device utilisation 0% (20:13:54)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   1.8 %
+[gpu_run] gpu_top:   pid    476 WindowServer                       1.1 %
+=== start Fri Sep 25 20:13:56 PDT 2026 metalsim d90298f mjw 1791414 power: Now drawing from 'AC Power'
+--- hardlimits 20:13:56
+[hardlimits] N=4096 njmax 256 naconmax 131072 is_sparse False
+[hardlimits] physics only 51.0 ms/step -> 80,324 env-steps/s
+[hardlimits] full env step 73.5 ms -> 55,737 env-steps/s
+[hardlimits] after random-action steps: nefc max 41 mean 15.0; nacon 11734 (2.86/world); overflow {'LS_ITERATIONS': 3918}
+--- recommended 20:14:11
+[recommended] N=4096 njmax 256 naconmax 131072 is_sparse False
+[recommended] physics only 50.8 ms/step -> 80,588 env-steps/s
+[recommended] full env step 75.6 ms -> 54,178 env-steps/s
+[recommended] after random-action steps: nefc max 44 mean 14.5; nacon 11399 (2.78/world); overflow {'ITERATIONS': 22, 'LS_ITERATIONS': 3871}
+--- tau10_imp99_hardlimits 20:14:26
+[tau10_imp99_hardlimits] N=4096 njmax 256 naconmax 131072 is_sparse False
+[tau10_imp99_hardlimits] physics only 53.4 ms/step -> 76,633 env-steps/s
+[tau10_imp99_hardlimits] full env step 95.6 ms -> 42,840 env-steps/s
+[tau10_imp99_hardlimits] after random-action steps: nefc max 39 mean 13.9; nacon 10714 (2.62/world); overflow {'ITERATIONS': 733, 'LS_ITERATIONS': 3893}
+--- hardlimits 20:14:44
+[hardlimits] N=4096 njmax 256 naconmax 131072 is_sparse False
+[hardlimits] physics only 50.9 ms/step -> 80,456 env-steps/s
+[hardlimits] full env step 73.5 ms -> 55,698 env-steps/s
+[hardlimits] after random-action steps: nefc max 43 mean 14.8; nacon 11698 (2.86/world); overflow {'LS_ITERATIONS': 3864}
+--- default 20:14:59
+[default] N=4096 njmax 256 naconmax 131072 is_sparse False
+[default] physics only 50.9 ms/step -> 80,459 env-steps/s
+[default] full env step 60.8 ms -> 67,419 env-steps/s
+[default] after random-action steps: nefc max 49 mean 15.0; nacon 11782 (2.88/world); overflow {'LS_ITERATIONS': 3828}
+--- profile hardlimits 20:15:12
+variant {'contact_cfg': 'hardlimits'}
+  physics (substeps + contact-sensor hooks)                  67.59 ms   dispatches  1632 cmdbufs   1 syncs 1
+  whole step graph                                           69.68 ms   dispatches  1653 cmdbufs   1 syncs 1  -> 58,780 env-steps/s
+  solver.solve                                                                                   5.67 ms  dispatches  105
+  mjw.step (whole substep)                                                                       9.06 ms  dispatches  202
+=== end Fri Sep 25 20:15:21 PDT 2026
+[gpu_run] mjw_ab_contact2 end: device utilisation 98% (20:15:21), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    476 WindowServer                       2.0 %
