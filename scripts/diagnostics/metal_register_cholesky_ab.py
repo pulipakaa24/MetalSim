@@ -24,6 +24,8 @@ def make(n):
 
 
 dev = "metal:0"; W = 512
+import os
+BD = int(os.environ.get("CHOL_BLOCK_DIM", "32"))
 rng = np.random.default_rng(0)
 out = {}
 for n in (33, 40, 43, 48, 32, 16):
@@ -32,7 +34,7 @@ for n in (33, 40, 43, 48, 32, 16):
     B = rng.standard_normal((W, n)).astype(np.float32)
     a = wp.array(A, dtype=float, device=dev); b = wp.array(B, dtype=float, device=dev)
     f = wp.zeros((W, n, n), dtype=float, device=dev); x = wp.zeros((W, n), dtype=float, device=dev)
-    wp.launch_tiled(make(n), dim=W, inputs=[a, b, f, x], block_dim=32, device=dev); wp.synchronize_device(dev)
+    wp.launch_tiled(make(n), dim=W, inputs=[a, b, f, x], block_dim=BD, device=dev); wp.synchronize_device(dev)
     out[f"f{n}"] = f.numpy(); out[f"x{n}"] = x.numpy()
     ref = np.linalg.solve(A.astype(np.float64), B.astype(np.float64)[:, :, None])[:, :, 0]
     print(f"n={n:2d}: solve vs float64 {np.abs(out[f'x{n}'] - ref).max() / np.abs(ref).max():.1e}; "

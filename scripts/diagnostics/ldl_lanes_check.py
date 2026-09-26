@@ -109,6 +109,17 @@ for name, m, dense_max in models():
                             outputs=[xcf], block_dim=32)
             wp.synchronize_device(dev)
             resc = np.abs(np.einsum("wij,wj->wi", Mf, xcf.numpy()[:4].astype(np.float64)) - y.numpy()[:4]).max() / np.abs(y.numpy()[:4]).max()
+        # unrolled register form (per-model native snippet): factor and solve must be bitwise the serial kernels
+        key = SM._ldl_schedule(mw)
+        Lu, Du = wp.zeros_like(M), wp.zeros((N, m.nv), dtype=float); xu = wp.zeros((N, m.nv), dtype=float)
+        wp.launch_tiled(SM._factor_i_sparse_unrolled(key), dim=N, inputs=[M], outputs=[Lu, Du], block_dim=32)
+        wp.launch_tiled(SM._solve_LD_sparse_unrolled(key), dim=N, inputs=[Ls, Ds, y], outputs=[xu], block_dim=32)
+        wp.synchronize_device(dev)
+        ubit = np.array_equal(Lu.numpy()[:, sel], ls[:, sel]) and np.array_equal(Du.numpy()[:, sparse], ds[:, sparse])
+        usbit = np.array_equal(xu.numpy()[:, sparse], xs_)
+        print(f"  unrolled: factor {'bitwise' if ubit else f'DIFF max {np.abs(Lu.numpy()[:, sel] - ls[:, sel]).max():.2e}'} | solve on the serial factor: "
+              f"{'bitwise' if usbit else f'DIFF max {np.abs(xu.numpy()[:, sparse] - xs_).max():.2e}'}")
+        ok &= ubit and usbit
         print(f"  chains ({nlc} levels, {len(mw.qLD_chain_adr)} chains): factor rel diff vs serial {frel:.1e} (D {drel:.1e}) | solve on the serial factor: "
               f"{'bitwise' if cbit else f'DIFF max {np.abs(xc_ - xs_).max():.2e}'} | chain factor + chain solve residual vs dense M {resc:.1e}")
         ok &= cbit and frel < 1e-5 and drel < 1e-5 and (not sparse.all() or resc < 1e-4)

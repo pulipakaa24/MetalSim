@@ -374,3 +374,53 @@ mapping bitwise. Learning untouched (no reward, observation, reset or update cha
   Estimated gain if it were acceptable: the per-iteration re-factorization (about 1.9 ms of the 4.2 ms solve under
   default contacts, more under the preset) would shrink by roughly the ratio of a rank-1 update (O(n^2), 1-3 per
   refactorizing world) to the factorization (O(n^3 / 3)), i.e. most of it; not measured.
+
+## 11. Round 2 (coordinator list, 2026-09-26 morning)
+
+### 11.1 Persistent per-world iteration loop (estimate, not built yet)
+
+Upstream MuJoCo Warp (and Newton through it) exits early on CUDA with `wp.capture_while` (a conditional graph node
+re-launching `_solver_iteration` while `nsolving > 0`); Warp's Metal backend has no conditional node and MetalSim
+sets `graph_conditional = False`, so all 10 iterations are launched and converged worlds exit per thread. A
+per-world persistent loop is expressible on Metal: one 32-lane kernel per world running `while not done:` over
+the fused iteration body (shared tiles inside data-dependent loops are freed per scope by the fork's arena, and
+MuJoCo Warp already loops tile ops in the JTDAJ kernel). What it can and cannot save, from the measured marginal
+costs (4b): an iteration with no active world costs 0.07-0.10 ms (its 5 launches after the fusion), one with a few
+active worlds 0.15-0.23 ms, so the launch share of the tail (iterations 5-10 under the preset) is ~0.07 ms x 6 =
+0.4 ms per substep, ~3.4 ms per step (5 %); the other ~0.1 ms per iteration is the slowest world's own line
+search + factor + solve latency, which a persistent loop pays just the same (it cannot finish before its slowest
+world's remaining iterations). Cost: porting the pyramidal line search (bracketing over 20 iterations with three
+tile reductions each), `mul_m`, the fused update and the fused H + Cholesky into one kernel body, with the
+Cholesky's 86 registers plus the line-search state resident together (occupancy risk). Estimated gain <= 5 % of
+the step for a large port; deferred behind the per-world-latency items (11.2, 11.3), which also shrink the tail.
+An alternative general mechanism is a GPU-side edit of the replayed indirect command buffer (Metal lets a kernel
+re-encode a `compute_command`'s dispatch size), i.e. a real early exit for every iteration kernel without
+porting anything; it needs the Warp backend to expose the ICB commands to a kernel (not built; estimate the same
+5 % plus the empty-iteration dispatches of the default setting).
+
+### 11.2 The 43-dof register Cholesky: 64-lane form (built, in measurement) and the block split (already measured)
+
+64-lane form (Warp fork `metalsim-tp` 2834cf31, `WP_METAL_CHOL64`; MuJoCo Warp `MJW_METAL_CHOL_LANES=64`): two
+SIMD groups per world, one column per lane (43 registers instead of 86), the owner's unscaled column and pivot
+exchanged through the tile's own column storage with one threadgroup barrier per column, every lane forming the
+same `column[i] * (1/d)` products the 32-lane form broadcasts (bitwise expected), the register solve run by group
+0 with group 1 idling at the barriers. Bitwise A/B, cost split and the G1 step: `runs/tp26/chol64.wrapper.log`.
+
+Block split (31 body/leg + 12 finger dofs): the finger rows of H couple to their arm chain, the torso and the six
+root dofs, i.e. a full 12 x ~16 off-diagonal block, not low rank; the exact form is the Schur complement, measured
+on 2026-09-25 (core 19 + arms 24, tile ops): 1.35 vs 1.11 ms per 4096 solves, rejected (DECISIONS 2026-09-25,
+`scripts/diagnostics/metal_schur_cost.py`). Not repeated.
+
+### 11.3 Sparse L'DL of M: the per-model unrolled register form (built, in measurement)
+
+The estimate that motivated it: the serial kernel's 0.45 ms is 391 dependent updates at ~1 us each (device
+memory round trips per element on one thread with ~3 SIMD groups resident per core); the same dependency chain
+with the factor in registers costs a shuffle-latency per update (~10 ns) if every register index is a compile-time
+constant. Design (MuJoCo Warp fork `metalsim-tp` f4276b0, `MJW_METAL_LDL_UNROLLED`, default on when it measures):
+lane j of a 32-lane world holds position j of every row of the factor (43 registers), the model's update list is
+emitted as straight-line native code (a `wp.func_native` snippet generated per model layout: 4,087 lines for the
+factor, 1,785 for the solve), each update two `simd_shuffle`s (L[k,i], L[k,k]), one divide, one predicated FMA,
+no barriers, no threadgroup memory, no dynamic indexing; the solve keeps x replicated in every lane. The same
+operations in the same order as the serial kernels: bitwise on the CPU scalar branch (Metal:
+`runs/tp26/unrolled.wrapper.log`). Estimated 0.45 -> ~0.15 ms per factorization and 0.21 -> ~0.05 per solve,
+about 7 ms of the 67 ms step.
