@@ -50,6 +50,8 @@ def make(n, mode):
 
 
 dev = "metal:0"; W = 4096; K = 50
+BD = int(os.environ.get("CHOL_BLOCK_DIM", "32"))
+print(f"block_dim {BD}", flush=True)
 sizes = [int(s) for s in sys.argv[1:]] or [32, 43, 48]
 rng = np.random.default_rng(0)
 for n in sizes:
@@ -60,10 +62,10 @@ for n in sizes:
     res = {}
     for mode in ("copy", "factor", "solve", "both"):
         kern = make(n, mode)
-        wp.launch_tiled(kern, dim=W, inputs=[a, b, x, f], block_dim=32, device=dev); wp.synchronize_device(dev)
+        wp.launch_tiled(kern, dim=W, inputs=[a, b, x, f], block_dim=BD, device=dev); wp.synchronize_device(dev)
         with wp.ScopedDevice(dev), wp.ScopedCapture(device=dev) as cap:
             for _ in range(K):
-                wp.launch_tiled(kern, dim=W, inputs=[a, b, x, f], block_dim=32, device=dev)
+                wp.launch_tiled(kern, dim=W, inputs=[a, b, x, f], block_dim=BD, device=dev)
         wp.capture_launch(cap.graph); wp.synchronize_device(dev)
         ts = []
         for _ in range(3):
@@ -74,4 +76,4 @@ for n in sizes:
             res[mode + "_res"] = err
     print(f"n={n:2d}: copy {res['copy']*1e3:.3f} ms | factor {res['factor']*1e3:.3f} ms | solve {res['solve']*1e3:.3f} ms "
           f"(residual {res['solve_res']:.1e}) | factor+solve {res['both']*1e3:.3f} ms (residual {res['both_res']:.1e})  "
-          f"[per launch of {W}, block_dim 32, graph replay]", flush=True)
+          f"[per launch of {W}, block_dim {BD}, graph replay]", flush=True)
