@@ -593,7 +593,7 @@ Reading:
   `metalsim-elliptic2-ls` branch, not merged). MuJoCo's exact-solution shortcut (quadratic-only fast
   exit) is the stable-state fast path already in the fork; it cannot apply while any row is in the CONE
   state (non-quadratic cost along the ray).
-- Solver conditioning (item 4): §8.2 (fewer iterations than pyramidal on the same states).
+- Solver conditioning (item 4): §8.2 and §8.5: 9 % more iterations on walking states with a longer tail; cap 10 changes states above the floor under elliptic cones, cap 20 does not (24 % more loop cost).
 
 ### 8.4 Physics unchanged (measured)
 
@@ -634,12 +634,33 @@ robust measures). `runs/competitors/cap_probe/*.json`.
 | flat, same policy | recommended (pyramidal) | 14.5 | 0.0010 / 6.7 / 2.7 | 0.0011 / 6.9 / 3.1 | 0 / 0.0010 / 6.8 | 0 / 0.0010 / 6.9 | 10–12 (mean 2.1–3.2) |
 | flat, random actions (robots fall and lie; z 0.08 from step 60) | ellip10 | **546** | **0.112 / 105 / 35** | 0.0016 / 5.7 / – | 3.6 / 0.0015 / 6.0 | 0 / 0.0015 / 6.0 | 20–34 (mean 3.2–4.0) |
 | flat, random actions (3.0 agent's `cap_probe2_flat`) | recommended | 26 | 0.0014 / – | 0.0013 | 0 / 0.0014 | 0 / 0.0013 | 12–16 |
-| rough, random actions | ellip10 | pending (`cap_ellip_rough_rand2`, 2048 envs: the 4096-env run hit `kIOGPUCommandBufferCallbackErrorOutOfMemory`) | | | | | |
+| rough, random actions (2048 envs: the 4096-env run hit `kIOGPUCommandBufferCallbackErrorOutOfMemory` next to a training job; 24–76 % of the robots fallen) | ellip10 | **255 (12 %)** | **0.120 / 48.8 / 16.8** | 0.0016 / 6.6 / 4.5 | 1.0 / 0.0012 / 6.6 | 0 / 0.0014 / 5.4 | 19–30 (mean 3.8) |
+| rough, random actions (3.0 agent's `cap_probe2_rough`) | recommended | 21.6 | 0.0006 / – | 0.0006 | 0 / 0.0004 | 0 / 0.0004 | 12–15 |
 
 Reading: **under elliptic cones cap 10 changes states above the floor**, mildly on walking states (p99 |Δqvel|
 2.8× the floor, twice as many worlds moved by > 0.01 rad/s, 270 worlds per step at the cap) and strongly on
 the lying / thrashing random-action states (p99 70× the floor, 105 worlds per step moved by > 0.01 and 35 by
 > 0.1, 546 worlds at the cap) — where pyramidal at cap 10 is at its floor in both. **Cap 20 is at the floor
 in both elliptic cases** (0–3.6 worlds per step still at the cap, p99 and counts equal to cap 40 / 100), so
-20 is the cap at which elliptic cones no longer change states; the loop cost of cap 20 is measured in
-`e2_loop_cap` (pending) and belongs to the elliptic premium.
+20 is the cap at which elliptic cones no longer change states (flat and rough, walking and random). Why
+elliptic needs it: on the same states elliptic converges in 9 % more iterations on average (§8.2) but with a
+much longer tail (max 13–16 walking, 19–34 fallen, against 10–16 for pyramidal), because CONE-state
+contacts make the cost non-quadratic along the Newton ray and the line search takes small steps there.
+
+**Cost of cap 20 on the full loop (measured, `e2_loop_cap.sh` → `g1_tp_variants.py 4096`, two repeats
+interleaved, env-steps/s; `runs/competitors/e2_loop_cap.log`):**
+
+| preset, cap | physics only | full env step | rollout + inference | full PPO loop | loop vs recommended cap 10 |
+|---|---|---|---|---|---|
+| recommended, cap 10 (the task) | 83,411 / 83,318 | 55,776 / 55,806 | 56,127 / 56,287 | 51,828 / 51,865 | 1.00× |
+| recommended, cap 20 | 72,243 / 72,397 | 50,196 / 50,226 | 50,543 / 50,467 | 47,009 / 46,950 | 1.10× (pyramidal does not need it: its cap-10 states are at the floor) |
+| ellip10, cap 10 | 64,839 / 64,839 | 40,469 / 40,584 | 42,529 / 42,539 | 39,972 / 39,956 | 1.30× (states above the floor, §8.5 table) |
+| **ellip10, cap 20** | 52,165 / 52,166 | 34,432 / 34,499 | 33,948 / 33,984 | **32,300 / 32,336** | **1.60×** (1.45× vs pyramidal at the same cap) |
+
+So the elliptic premium that the default decision should carry is **1.60× on the full PPO loop** (1.60×
+physics-only): the cheap kernel's 1.30× at the task's cap of 10, plus the cap of 20 that elliptic cones need
+to stop changing states, which costs another 24 % (elliptic runs its extra iterations on the 7–13 % of worlds
+still iterating past 10; on Metal every launched iteration also drains the converged worlds' kernels). Pyramidal
+at cap 10 is at its floor on every state set, so its number stays 1.00×. A per-world early exit would not
+change this (worlds that need 11–20 iterations are the cost), and the ~1 ms rank-k factor update (§8.3) does
+not shorten the tail.
