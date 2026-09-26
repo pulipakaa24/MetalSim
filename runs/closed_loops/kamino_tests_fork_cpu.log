@@ -1,0 +1,542 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module validate_and_correct_inertia_kernel_fabf4b5a 9ce7e99 load on device 'cpu' took 0.86 ms  (cached)
+Module newton._src.geometry.bvh dd17317 load on device 'cpu' took 0.33 ms  (cached)
+Module newton._src.solvers.kamino._src.core.conversions 69d96db load on device 'cpu' took 0.36 ms  (cached)
+Module newton._src.solvers.kamino._src.core.bodies b4c82fc load on device 'cpu' took 0.26 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.constraints 9e30406 load on device 'cpu' took 0.35 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.jacobians 7c79e11 load on device 'cpu' took 0.35 ms  (cached)
+Module newton._src.sim.articulation 25148e8 load on device 'cpu' took 1.63 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.joints a552e9e load on device 'cpu' took 0.65 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.wrenches 8ee7106 load on device 'cpu' took 0.32 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus 090e62f load on device 'cpu' took 0.28 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.dual ea21ef2 load on device 'cpu' took 0.31 ms  (cached)
+Module newton._src.solvers.kamino._src.geometry.keying 2a5fcb1 load on device 'cpu' took 0.34 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.warmstart 12efca1 load on device 'cpu' took 0.29 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.common 363ff28 load on device 'cpu' took 0.26 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels a110581 load on device 'cpu' took 0.37 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked 0a0823c load on device 'cpu' took 0.26 ms  (cached)
+Module make_desaxce_correction_and_velocity_bias_kernel__locals___compute_desaxce_correction_and_velocity_bias_4e50cf85 6ba955e load on device 'cpu' took 0.26 ms  (cached)
+Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_ab01341a 76b40d5 load on device 'cpu' took 983.45 ms  (compiled)
+Module newton._src.solvers.kamino._src.integrators.euler 7bd8a9f load on device 'cpu' took 0.41 ms  (cached)
+Module newton._src.solvers.kamino._src.core.time b279246 load on device 'cpu' took 0.25 ms  (cached)
+.Module newton._src.solvers.coupled.model_view d783cf3 load on device 'cpu' took 0.83 ms  (cached)
+.Module newton._src.sim.collide a074226 load on device 'cpu' took 343.45 ms  (compiled)
+Module newton._src.geometry.broad_phase_nxn 9e10c12 load on device 'cpu' took 120.56 ms  (compiled)
+Module narrow_phase_primitive_write_contact_False_False_False 313bb9c load on device 'cpu' took 441.18 ms  (compiled)
+Module narrow_phase_gjk_mpr_True_False_write_contact_support_map_lean_post_process_minkowski_only c1ef0e6 load on device 'cpu' took 890.84 ms  (compiled)
+Module newton._src.geometry.narrow_phase ad12186 load on device 'cpu' took 327.88 ms  (compiled)
+Module make_convert_contacts_newton_to_kamino__locals___convert_contacts_newton_to_kamino_470c56e4 3b54a81 load on device 'cpu' took 143.14 ms  (compiled)
+Module newton._src.solvers.kamino._src.geometry.unified abd0aae load on device 'cpu' took 232.18 ms  (compiled)
+Module narrow_phase_primitive__write_contact_unified_kamino_False_False_False e1a2a31 load on device 'cpu' took 516.98 ms  (compiled)
+Module narrow_phase_gjk_mpr_True_False__write_contact_unified_kamino_support_map_accelerated_default e59a3f5 load on device 'cpu' took 1024.67 ms  (compiled)
+Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_cb4296cc 888b843 load on device 'cpu' took 214.23 ms  (compiled)
+.........[38;5;13m[KAMINO][0m[33;20m[2026-09-25 14:58:53,821][solver_kamino_impl.py:295][WARNING]: Falling back to the 'euler' integrator: 'moreau' requires `use_collision_detector=True` to generate contacts at the mid-point.[0m
+[38;5;13m[KAMINO][0m[33;20m[2026-09-25 14:58:54,172][solver_kamino_impl.py:295][WARNING]: Falling back to the 'euler' integrator: 'moreau' requires `use_collision_detector=True` to generate contacts at the mid-point.[0m
+...Module newton._src.solvers.kamino._src.solvers.dvi.kernels 8cccc93 load on device 'cpu' took 453.24 ms  (compiled)
+Module newton._src.solvers.kamino._src.solvers.dvi.sparse_kernels d8713dd load on device 'cpu' took 1400.42 ms  (compiled)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked 55a89f1 load on device 'cpu' took 484.88 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus d4a065b load on device 'cpu' took 191.25 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus b91c8b5 load on device 'cpu' took 211.82 ms  (compiled)
+Module newton._src.solvers.kamino._src.linalg.blas 9b57534 load on device 'cpu' took 197.11 ms  (compiled)
+Module newton._src.solvers.kamino._src.linalg.blas 4295c27 load on device 'cpu' took 209.29 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 932a26f load on device 'cpu' took 220.57 ms  (compiled)
+..
+----------------------------------------------------------------------
+Ran 16 tests in 11.619s
+
+OK
+MODULE test_kamino_body_flags: ran=16 fail=0 err=0 skip=0 (12 s)
+Module newton.tests.kamino.test_kamino_core_joints 4525cfe load on device 'cpu' took 45.00 ms  (compiled)
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.046s
+
+OK
+MODULE test_kamino_core_joints: ran=2 fail=0 err=0 skip=0 (0 s)
+......
+----------------------------------------------------------------------
+Ran 6 tests in 0.000s
+
+OK
+MODULE test_kamino_core_materials: ran=6 fail=0 err=0 skip=0 (0 s)
+.............Module newton._src.solvers.kamino._src.kinematics.resets abeccde load on device 'cpu' took 0.45 ms  (cached)
+............
+----------------------------------------------------------------------
+Ran 25 tests in 0.184s
+
+OK
+MODULE test_kamino_core_model: ran=25 fail=0 err=0 skip=0 (0 s)
+.........Module newton._src.geometry.inertia d60da98 load on device 'cpu' took 0.33 ms  (cached)
+..
+----------------------------------------------------------------------
+Ran 11 tests in 0.002s
+
+OK
+MODULE test_kamino_core_shapes: ran=11 fail=0 err=0 skip=0 (0 s)
+.................................
+----------------------------------------------------------------------
+Ran 33 tests in 0.001s
+
+OK
+MODULE test_kamino_core_types: ran=33 fail=0 err=0 skip=0 (0 s)
+..Module newton._src.solvers.kamino._src.kinematics.limits 14ebbc6 load on device 'cpu' took 0.37 ms  (cached)
+.....Module newton._src.solvers.kamino._src.linalg.factorize.llt_sequential b6293bb load on device 'cpu' took 0.46 ms  (cached)
+.......Module newton.tests.kamino.utils.extract 4cadfa9 load on device 'cpu' took 48.06 ms  (compiled)
+.Module newton._src.solvers.kamino._src.linalg.blas 6833105 load on device 'cpu' took 0.51 ms  (cached)
+.....Module newton._src.solvers.kamino._src.dynamics.delassus 562ee36 load on device 'cpu' took 233.84 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus c20b080 load on device 'cpu' took 249.73 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 158dc56 load on device 'cpu' took 264.53 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus eb21944 load on device 'cpu' took 275.46 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 91d11a7 load on device 'cpu' took 288.88 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus ed67793 load on device 'cpu' took 303.47 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 0546f6d load on device 'cpu' took 320.82 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus eb982f1 load on device 'cpu' took 331.58 ms  (compiled)
+.Module newton._src.solvers.kamino._src.linalg.blas 7934388 load on device 'cpu' took 0.46 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 3237907 load on device 'cpu' took 0.41 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus 2f7781b load on device 'cpu' took 349.54 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 20b2dc5 load on device 'cpu' took 360.95 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 6135873 load on device 'cpu' took 437.94 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus f1febf8 load on device 'cpu' took 472.17 ms  (compiled)
+.Module newton._src.solvers.kamino._src.dynamics.delassus 738b130 load on device 'cpu' took 408.41 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus b7712bc load on device 'cpu' took 411.34 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 284d8c5 load on device 'cpu' took 430.25 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 1f5ec6a load on device 'cpu' took 442.12 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 48f49e6 load on device 'cpu' took 454.17 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 5980ffb load on device 'cpu' took 476.83 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 6b551e0 load on device 'cpu' took 487.78 ms  (compiled)
+.
+----------------------------------------------------------------------
+Ran 23 tests in 10.389s
+
+OK
+MODULE test_kamino_dynamics_delassus: ran=23 fail=0 err=0 skip=0 (10 s)
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.107s
+
+OK
+MODULE test_kamino_dynamics_dual: ran=2 fail=0 err=0 skip=0 (0 s)
+Module newton.tests.kamino.utils.make aad2727 load on device 'cpu' took 103.74 ms  (compiled)
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.495s
+
+OK
+MODULE test_kamino_dynamics_wrenches: ran=4 fail=0 err=0 skip=0 (0 s)
+Module newton._src.solvers.kamino._src.geometry.primitive.broadphase 8d3acda load on device 'cpu' took 0.44 ms  (cached)
+Module newton._src.solvers.kamino._src.geometry.primitive.narrowphase 7102e7d load on device 'cpu' took 0.33 ms  (cached)
+Module newton._src.solvers.kamino._src.geometry.aggregation 4565053 load on device 'cpu' took 0.32 ms  (cached)
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.016s
+
+OK
+MODULE test_kamino_geometry_aggregation: ran=1 fail=0 err=0 skip=0 (0 s)
+.Module newton._src.sim.contacts d7a82d4 load on device 'cpu' took 0.39 ms  (cached)
+Module newton._src.solvers.kamino._src.geometry.contacts 31f7a16 load on device 'cpu' took 0.21 ms  (cached)
+......[38;5;13m[KAMINO][0m[33;20m[2026-09-25 14:59:10,819][contacts.py:1473][WARNING]: Newton `rigid_contact_max` (64) exceeds Kamino `model_max_contacts_host` (3); active contacts may be truncated.[0m
+..Module make_convert_contacts_newton_to_kamino__locals___convert_contacts_newton_to_kamino_87106dda 3101765 load on device 'cpu' took 143.30 ms  (compiled)
+...Module newton.tests.kamino.test_kamino_geometry_contacts fca3247 load on device 'cpu' took 69.91 ms  (compiled)
+..........
+----------------------------------------------------------------------
+Ran 22 tests in 1.913s
+
+OK
+MODULE test_kamino_geometry_contacts: ran=22 fail=0 err=0 skip=0 (2 s)
+..........
+----------------------------------------------------------------------
+Ran 10 tests in 0.083s
+
+OK
+MODULE test_kamino_geometry_detector: ran=10 fail=0 err=0 skip=0 (0 s)
+Module newton.tests.kamino.test_kamino_geometry_keying b1b556a load on device 'cpu' took 54.77 ms  (compiled)
+.Module newton.tests.kamino.test_kamino_geometry_keying f405e4b load on device 'cpu' took 65.11 ms  (compiled)
+.....Module newton.tests.kamino.test_kamino_geometry_keying 56fc204 load on device 'cpu' took 72.85 ms  (compiled)
+.Module newton.tests.kamino.test_kamino_geometry_keying 16039bd load on device 'cpu' took 80.12 ms  (compiled)
+Module newton.tests.kamino.test_kamino_geometry_keying 1bf3a01 load on device 'cpu' took 80.54 ms  (compiled)
+Module newton.tests.kamino.test_kamino_geometry_keying 045a8b0 load on device 'cpu' took 80.81 ms  (compiled)
+Module newton.tests.kamino.test_kamino_geometry_keying c6ef3d9 load on device 'cpu' took 81.65 ms  (compiled)
+.
+----------------------------------------------------------------------
+Ran 8 tests in 0.524s
+
+OK
+MODULE test_kamino_geometry_keying: ran=8 fail=0 err=0 skip=0 (1 s)
+.........Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_35fec141 ec14d59 load on device 'cpu' took 209.09 ms  (compiled)
+....
+----------------------------------------------------------------------
+Ran 13 tests in 0.407s
+
+OK
+MODULE test_kamino_geometry_margin_gap: ran=13 fail=0 err=0 skip=0 (0 s)
+Module newton._src.geometry.contact_reduction_global 573024b load on device 'cpu' took 429.44 ms  (compiled)
+Module mesh_triangle_contacts_to_reducer_kernel_598e78fd 137992e load on device 'cpu' took 1090.98 ms  (compiled)
+Module export_reduced_contacts_write_contact 1c9f3e0 load on device 'cpu' took 232.58 ms  (compiled)
+.ssssssModule export_reduced_contacts__write_contact_unified_kamino 991f8b6 load on device 'cpu' took 242.58 ms  (compiled)
+.....
+----------------------------------------------------------------------
+Ran 12 tests in 2.673s
+
+OK (skipped=6)
+MODULE test_kamino_geometry_mesh_heightfield: ran=12 fail=0 err=0 skip=6 (3 s)
+......................
+----------------------------------------------------------------------
+Ran 22 tests in 1.214s
+
+OK
+MODULE test_kamino_geometry_primitive: ran=22 fail=0 err=0 skip=0 (1 s)
+Module newton._src.geometry.broad_phase_sap ea2792c load on device 'cpu' took 337.59 ms  (compiled)
+.................
+----------------------------------------------------------------------
+Ran 17 tests in 4.438s
+
+OK
+MODULE test_kamino_geometry_unified: ran=17 fail=0 err=0 skip=0 (4 s)
+.Module newton.tests.kamino.test_kamino_gimbal e0f2c9b load on device 'cpu' took 263.85 ms  (compiled)
+.Module newton._src.solvers.kamino._src.solvers.fk.kernels a06780b load on device 'cpu' took 0.48 ms  (cached)
+Module newton._src.solvers.kamino._src.utils.world_equivalence d478939 load on device 'cpu' took 0.38 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.fk.kernels_tile_2d 6090463 load on device 'cpu' took 0.36 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.fk.kernels 4e07739 load on device 'cpu' took 0.49 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.fk.kernels_tile_1d 1540f1a load on device 'cpu' took 149.96 ms  (compiled)
+Module create_eval_min_num_iterations_kernel__locals___eval_min_num_iterations_97c062a0 b0fca93 load on device 'cpu' took 79.85 ms  (compiled)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked_semi_sparse 5fffe61 load on device 'cpu' took 305.30 ms  (compiled)
+.........ssssss
+----------------------------------------------------------------------
+Ran 17 tests in 9.555s
+
+OK (skipped=6)
+MODULE test_kamino_gimbal: ran=17 fail=0 err=0 skip=6 (10 s)
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.015s
+
+OK
+MODULE test_kamino_kinematics_constraints: ran=3 fail=0 err=0 skip=0 (0 s)
+...........................
+----------------------------------------------------------------------
+Ran 27 tests in 1.691s
+
+OK
+MODULE test_kamino_kinematics_jacobians: ran=27 fail=0 err=0 skip=0 (2 s)
+Module newton.tests.kamino.test_kamino_kinematics_joints 20f229e load on device 'cpu' took 102.23 ms  (compiled)
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.138s
+
+OK
+MODULE test_kamino_kinematics_joints: ran=5 fail=0 err=0 skip=0 (0 s)
+..Module newton.tests.kamino.test_kamino_kinematics_limits f156dc7 load on device 'cpu' took 98.77 ms  (compiled)
+.
+----------------------------------------------------------------------
+Ran 3 tests in 0.107s
+
+OK
+MODULE test_kamino_kinematics_limits: ran=3 fail=0 err=0 skip=0 (0 s)
+Module create_eval_min_num_iterations_kernel__locals___eval_min_num_iterations_c3eac833 a500eae load on device 'cpu' took 0.30 ms  (cached)
+Module newton._src.solvers.kamino._src.kinematics.joints b76cc9b load on device 'cpu' took 629.78 ms  (compiled)
+.Module newton._src.solvers.kamino._src.solvers.fk.kernels_tile_1d fd42f42 load on device 'cpu' took 0.34 ms  (cached)
+Module create_eval_min_num_iterations_kernel__locals___eval_min_num_iterations_754bdcff 23db85a load on device 'cpu' took 0.31 ms  (cached)
+....Module create_eval_min_num_iterations_kernel__locals___eval_min_num_iterations_4ef807cf 09fb2ad load on device 'cpu' took 0.41 ms  (cached)
+..
+----------------------------------------------------------------------
+Ran 7 tests in 0.823s
+
+OK
+MODULE test_kamino_kinematics_resets: ran=7 fail=0 err=0 skip=0 (1 s)
+sss
+----------------------------------------------------------------------
+Ran 3 tests in 0.000s
+
+OK (skipped=3)
+MODULE test_kamino_linalg_conjugate_fused: ran=3 fail=0 err=0 skip=3 (0 s)
+.............
+----------------------------------------------------------------------
+Ran 13 tests in 0.001s
+
+OK
+MODULE test_kamino_linalg_core: ran=13 fail=0 err=0 skip=0 (0 s)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked d5149ca load on device 'cpu' took 0.36 ms  (cached)
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.808s
+
+OK
+MODULE test_kamino_linalg_factorize_llt_blocked: ran=4 fail=0 err=0 skip=0 (1 s)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked_semi_sparse b3cac35 load on device 'cpu' took 544.62 ms  (compiled)
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.549s
+
+OK
+MODULE test_kamino_linalg_factorize_llt_blocked_semi_sparse: ran=2 fail=0 err=0 skip=0 (1 s)
+....
+----------------------------------------------------------------------
+Ran 4 tests in 0.002s
+
+OK
+MODULE test_kamino_linalg_factorize_llt_sequential: ran=4 fail=0 err=0 skip=0 (0 s)
+Module newton._src.solvers.kamino._src.linalg.conjugate 8d7ea7e load on device 'cpu' took 0.32 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.conjugate 96744ac load on device 'cpu' took 0.30 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.conjugate 5e99457 load on device 'cpu' took 0.22 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.conjugate 9b91e02 load on device 'cpu' took 0.23 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.conjugate 47c34eb load on device 'cpu' took 0.36 ms  (cached)
+ssModule newton._src.solvers.kamino._src.linalg.conjugate c8a7619 load on device 'cpu' took 0.28 ms  (cached)
+sssss.s.sModule newton._src.solvers.kamino._src.linalg.conjugate 8679f00 load on device 'cpu' took 0.39 ms  (cached)
+..s.sModule newton._src.solvers.kamino._src.linalg.conjugate 650b55b load on device 'cpu' took 0.42 ms  (cached)
+.sss
+----------------------------------------------------------------------
+Ran 20 tests in 0.088s
+
+OK (skipped=14)
+MODULE test_kamino_linalg_solve_cg: ran=20 fail=0 err=0 skip=14 (0 s)
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.518s
+
+OK
+MODULE test_kamino_linalg_solver_llt_blocked: ran=5 fail=0 err=0 skip=0 (1 s)
+.Module rcm_batch_kernels_float32 779b447 load on device 'cpu' took 0.45 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked_rcm 46a8195 load on device 'cpu' took 0.41 ms  (cached)
+......s..Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked_rcm 8366f57 load on device 'cpu' took 899.29 ms  (compiled)
+.Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked_rcm f0f913a load on device 'cpu' took 1349.97 ms  (compiled)
+.s
+----------------------------------------------------------------------
+Ran 13 tests in 2.889s
+
+OK (skipped=2)
+MODULE test_kamino_linalg_solver_llt_blocked_rcm: ran=13 fail=0 err=0 skip=2 (3 s)
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.002s
+
+OK
+MODULE test_kamino_linalg_solver_llt_sequential: ran=5 fail=0 err=0 skip=0 (0 s)
+.........Module newton._src.solvers.kamino._src.linalg.blas ef64981 load on device 'cpu' took 0.47 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 9287200 load on device 'cpu' took 1.91 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas ed47c6e load on device 'cpu' took 0.48 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas fa06052 load on device 'cpu' took 0.50 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 7be68a2 load on device 'cpu' took 0.43 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 69c0bba load on device 'cpu' took 0.46 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas d93da17 load on device 'cpu' took 0.59 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 3f08700 load on device 'cpu' took 0.38 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas d63975d load on device 'cpu' took 0.44 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 44b9044 load on device 'cpu' took 0.44 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas b03b4fb load on device 'cpu' took 0.43 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 201e009 load on device 'cpu' took 0.51 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 017a6c6 load on device 'cpu' took 0.54 ms  (cached)
+..Module newton._src.solvers.kamino._src.linalg.blas 02953e6 load on device 'cpu' took 0.94 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas d476360 load on device 'cpu' took 0.93 ms  (cached)
+.
+----------------------------------------------------------------------
+Ran 12 tests in 2.039s
+
+OK
+MODULE test_kamino_linalg_sparse: ran=12 fail=0 err=0 skip=0 (2 s)
+.Module newton._src.solvers.kamino.examples.rl.example_rl_drlegs d3855b1 load on device 'cpu' took 169.42 ms  (compiled)
+....ssss
+----------------------------------------------------------------------
+Ran 9 tests in 1.881s
+
+OK (skipped=4)
+MODULE test_kamino_rl_onnx: ran=9 fail=0 err=0 skip=4 (2 s)
+s...Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_1162de65 52a16d2 load on device 'cpu' took 210.77 ms  (compiled)
+.Module newton._src.sensors.sensor_imu 76aecc7 load on device 'cpu' took 144.44 ms  (compiled)
+.Module newton._src.solvers.kamino._src.integrators.moreau 6d91685 load on device 'cpu' took 99.44 ms  (compiled)
+...
+----------------------------------------------------------------------
+Ran 9 tests in 1.219s
+
+OK (skipped=1)
+MODULE test_kamino_sensor_imu: ran=9 fail=0 err=0 skip=1 (1 s)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels 2e94027 load on device 'cpu' took 428.33 ms  (compiled)
+Module _make_compute_infnorm_residuals_kernel__locals___compute_infnorm_residuals_5e2afd8d 7900e28 load on device 'cpu' took 158.36 ms  (compiled)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels a110581 load on device 'cpu' took 0.46 ms  (cached)
+Module newton._src.solvers.kamino._src.dynamics.delassus e4d6d61 load on device 'cpu' took 497.40 ms  (compiled)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels 2e94027 load on device 'cpu' took 0.50 ms  (cached)
+.Module newton._src.solvers.kamino._src.solvers.padmm.kernels a110581 load on device 'cpu' took 0.47 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels 2e94027 load on device 'cpu' took 0.34 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels a110581 load on device 'cpu' took 0.47 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels 2e94027 load on device 'cpu' took 0.50 ms  (cached)
+.Module newton._src.solvers.kamino._src.solvers.padmm.kernels a110581 load on device 'cpu' took 0.53 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.metrics 4946bf4 load on device 'cpu' took 397.64 ms  (compiled)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels d1a8e30 load on device 'cpu' took 594.01 ms  (compiled)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels 2e94027 load on device 'cpu' took 0.59 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels d1a8e30 load on device 'cpu' took 0.47 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels a110581 load on device 'cpu' took 0.40 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels d1a8e30 load on device 'cpu' took 0.56 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels 2e94027 load on device 'cpu' took 0.51 ms  (cached)
+.
+----------------------------------------------------------------------
+Ran 3 tests in 14.603s
+
+OK
+MODULE test_kamino_solver_joint_effort_limit: ran=3 fail=0 err=0 skip=0 (15 s)
+.....Module newton._src.solvers.kamino._src.solvers.padmm.kernels a110581 load on device 'cpu' took 0.63 ms  (cached)
+..Module make_desaxce_correction_and_velocity_bias_kernel__locals___compute_desaxce_correction_and_velocity_bias_49f8d609 d97be88 load on device 'cpu' took 62.27 ms  (compiled)
+..........Module newton.tests.kamino.test_kamino_solver_kamino e268bef load on device 'cpu' took 47.21 ms  (compiled)
+.....Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_01ba47a0 7b19c8b load on device 'cpu' took 0.48 ms  (cached)
+.........Module make_desaxce_correction_and_velocity_bias_kernel__locals___compute_desaxce_correction_and_velocity_bias_722b8493 dbf2abb load on device 'cpu' took 68.10 ms  (compiled)
+.
+----------------------------------------------------------------------
+Ran 32 tests in 8.396s
+
+OK
+MODULE test_kamino_solver_kamino: ran=32 fail=0 err=0 skip=0 (8 s)
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.135s
+
+OK
+MODULE test_kamino_solver_kamino_joint_frames: ran=5 fail=0 err=0 skip=0 (0 s)
+....Module newton._src.solvers.kamino._src.solvers.padmm.kernels 2e94027 load on device 'cpu' took 0.52 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels a110581 load on device 'cpu' took 0.52 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels 2e94027 load on device 'cpu' took 0.41 ms  (cached)
+.Module newton._src.solvers.kamino._src.solvers.padmm.kernels a110581 load on device 'cpu' took 0.51 ms  (cached)
+.Module newton._src.solvers.kamino._src.solvers.padmm.kernels 2e94027 load on device 'cpu' took 0.56 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels a110581 load on device 'cpu' took 0.48 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels 2e94027 load on device 'cpu' took 0.41 ms  (cached)
+.Module newton._src.solvers.kamino._src.solvers.padmm.kernels a110581 load on device 'cpu' took 0.42 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels d1a8e30 load on device 'cpu' took 0.50 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels 2e94027 load on device 'cpu' took 0.49 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels d1a8e30 load on device 'cpu' took 0.46 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels a110581 load on device 'cpu' took 0.43 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels d1a8e30 load on device 'cpu' took 0.52 ms  (cached)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels 2e94027 load on device 'cpu' took 0.39 ms  (cached)
+.
+----------------------------------------------------------------------
+Ran 8 tests in 60.337s
+
+OK
+MODULE test_kamino_solver_kamino_joint_friction: ran=8 fail=0 err=0 skip=0 (60 s)
+.....................Module newton._src.solvers.kamino._src.solvers.fk.kernels_tile_1d b550265 load on device 'cpu' took 0.49 ms  (cached)
+........................
+----------------------------------------------------------------------
+Ran 45 tests in 0.771s
+
+OK
+MODULE test_kamino_solver_kamino_notify: ran=45 fail=0 err=0 skip=0 (1 s)
+...........Module newton._src.solvers.kamino._src.solvers.padmm.kernels a110581 load on device 'cpu' took 0.53 ms  (cached)
+.....s.......Module newton.tests.kamino.test_kamino_solvers_dvi 293bcac load on device 'cpu' took 157.12 ms  (compiled)
+..................................s.......sss...ss
+----------------------------------------------------------------------
+Ran 74 tests in 24.572s
+
+OK (skipped=7)
+MODULE test_kamino_solvers_dvi: ran=74 fail=0 err=0 skip=7 (25 s)
+Module newton._src.solvers.kamino._src.solvers.fk.kernels 29d10b4 load on device 'cpu' took 788.81 ms  (compiled)
+Module newton._src.solvers.kamino._src.linalg.sparse_matrix 9cdbec0 load on device 'cpu' took 0.31 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 1c4884e load on device 'cpu' took 0.63 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 52000b7 load on device 'cpu' took 1.02 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 86eaf65 load on device 'cpu' took 0.94 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas 5321120 load on device 'cpu' took 0.74 ms  (cached)
+Module newton._src.solvers.kamino._src.linalg.blas d86a4c6 load on device 'cpu' took 0.59 ms  (cached)
+..Module create_eval_min_num_iterations_kernel__locals___eval_min_num_iterations_deb74d94 65234cb load on device 'cpu' took 0.42 ms  (cached)
+.Cloning https://github.com/newton-physics/newton-assets.git (ref: f8fb7abcbeba2318814a74f3eeb02780ad7925d6)...
+Successfully downloaded folder to: /Users/aditya/Library/Caches/newton/newton-assets_disneyresearch_3bce79b4_f8fb7abc/disneyresearch
+Module newton._src.solvers.kamino._src.solvers.fk.kernels_tile_1d 983a734 load on device 'cpu' took 436.68 ms  (compiled)
+Module create_eval_min_num_iterations_kernel__locals___eval_min_num_iterations_665592db bf896fb load on device 'cpu' took 102.02 ms  (compiled)
+.Module newton._src.solvers.kamino._src.solvers.fk.kernels 3062b55 load on device 'cpu' took 944.27 ms  (compiled)
+Module newton._src.solvers.kamino._src.solvers.fk.kernels_tile_1d 2709165 load on device 'cpu' took 551.37 ms  (compiled)
+Module newton._src.solvers.kamino._src.solvers.fk.kernels 6d70b75 load on device 'cpu' took 1013.49 ms  (compiled)
+.........Module newton._src.solvers.kamino._src.solvers.fk.kernels_tile_1d 48d791c load on device 'cpu' took 581.62 ms  (compiled)
+......
+----------------------------------------------------------------------
+Ran 19 tests in 21.452s
+
+OK
+MODULE test_kamino_solvers_forward_kinematics: ran=19 fail=0 err=0 skip=0 (21 s)
+...Module newton._src.solvers.kamino._src.solvers.padmm.kernels 2e94027 load on device 'cpu' took 0.49 ms  (cached)
+Module _make_compute_infnorm_residuals_kernel__locals___compute_infnorm_residuals_bdb8142a 13d7958 load on device 'cpu' took 147.16 ms  (compiled)
+.Module _make_compute_infnorm_residuals_kernel__locals___compute_infnorm_residuals_5edf14a2 81fada6 load on device 'cpu' took 194.75 ms  (compiled)
+.............
+----------------------------------------------------------------------
+Ran 17 tests in 4.553s
+
+OK
+MODULE test_kamino_solvers_metrics: ran=17 fail=0 err=0 skip=0 (5 s)
+...Module newton._src.solvers.kamino._src.solvers.padmm.kernels a110581 load on device 'cpu' took 0.49 ms  (cached)
+.Module newton._src.solvers.kamino._src.solvers.padmm.kernels 2e94027 load on device 'cpu' took 0.58 ms  (cached)
+..Module newton._src.solvers.kamino._src.solvers.padmm.kernels a110581 load on device 'cpu' took 0.49 ms  (cached)
+...Module newton._src.solvers.kamino._src.solvers.padmm.kernels 2e94027 load on device 'cpu' took 0.46 ms  (cached)
+Module _make_compute_infnorm_residuals_kernel__locals___compute_infnorm_residuals_25190525 63d4198 load on device 'cpu' took 164.68 ms  (compiled)
+.Module newton._src.solvers.kamino._src.solvers.padmm.kernels a110581 load on device 'cpu' took 0.53 ms  (cached)
+Module _make_project_dual_convergence_accel_kernel__locals___project_dual_convergence_accel_1caa3bb7 0e79d3a load on device 'cpu' took 209.08 ms  (compiled)
+...Module newton.tests.kamino.test_kamino_solvers_padmm 28c7faa load on device 'cpu' took 73.88 ms  (compiled)
+Module newton.tests.kamino.test_kamino_solvers_padmm c27c715 load on device 'cpu' took 71.86 ms  (compiled)
+.Module newton.tests.kamino.test_kamino_solvers_padmm 28c7faa load on device 'cpu' took 0.29 ms  (cached)
+Module newton.tests.kamino.test_kamino_solvers_padmm c27c715 load on device 'cpu' took 0.27 ms  (cached)
+Module newton.tests.kamino.test_kamino_solvers_padmm 28c7faa load on device 'cpu' took 0.25 ms  (cached)
+Module newton.tests.kamino.test_kamino_solvers_padmm c27c715 load on device 'cpu' took 0.23 ms  (cached)
+Module newton.tests.kamino.test_kamino_solvers_padmm 28c7faa load on device 'cpu' took 0.22 ms  (cached)
+Module newton.tests.kamino.test_kamino_solvers_padmm c27c715 load on device 'cpu' took 0.21 ms  (cached)
+.
+----------------------------------------------------------------------
+Ran 15 tests in 2.668s
+
+OK
+MODULE test_kamino_solvers_padmm: ran=15 fail=0 err=0 skip=0 (3 s)
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+OK
+MODULE test_kamino_utils_world_equivalence: ran=1 fail=0 err=0 skip=0 (0 s)
+
+=== device cpu, 195 s
+test_kamino_body_flags                                  ran=16 fail=0 err=0 skip=0 (12 s)
+test_kamino_core_joints                                 ran=2 fail=0 err=0 skip=0 (0 s)
+test_kamino_core_materials                              ran=6 fail=0 err=0 skip=0 (0 s)
+test_kamino_core_model                                  ran=25 fail=0 err=0 skip=0 (0 s)
+test_kamino_core_shapes                                 ran=11 fail=0 err=0 skip=0 (0 s)
+test_kamino_core_types                                  ran=33 fail=0 err=0 skip=0 (0 s)
+test_kamino_dynamics_delassus                           ran=23 fail=0 err=0 skip=0 (10 s)
+test_kamino_dynamics_dual                               ran=2 fail=0 err=0 skip=0 (0 s)
+test_kamino_dynamics_wrenches                           ran=4 fail=0 err=0 skip=0 (0 s)
+test_kamino_geometry_aggregation                        ran=1 fail=0 err=0 skip=0 (0 s)
+test_kamino_geometry_contacts                           ran=22 fail=0 err=0 skip=0 (2 s)
+test_kamino_geometry_detector                           ran=10 fail=0 err=0 skip=0 (0 s)
+test_kamino_geometry_keying                             ran=8 fail=0 err=0 skip=0 (1 s)
+test_kamino_geometry_margin_gap                         ran=13 fail=0 err=0 skip=0 (0 s)
+test_kamino_geometry_mesh_heightfield                   ran=12 fail=0 err=0 skip=6 (3 s)
+test_kamino_geometry_primitive                          ran=22 fail=0 err=0 skip=0 (1 s)
+test_kamino_geometry_unified                            ran=17 fail=0 err=0 skip=0 (4 s)
+test_kamino_gimbal                                      ran=17 fail=0 err=0 skip=6 (10 s)
+test_kamino_kinematics_constraints                      ran=3 fail=0 err=0 skip=0 (0 s)
+test_kamino_kinematics_jacobians                        ran=27 fail=0 err=0 skip=0 (2 s)
+test_kamino_kinematics_joints                           ran=5 fail=0 err=0 skip=0 (0 s)
+test_kamino_kinematics_limits                           ran=3 fail=0 err=0 skip=0 (0 s)
+test_kamino_kinematics_resets                           ran=7 fail=0 err=0 skip=0 (1 s)
+test_kamino_linalg_conjugate_fused                      ran=3 fail=0 err=0 skip=3 (0 s)
+test_kamino_linalg_core                                 ran=13 fail=0 err=0 skip=0 (0 s)
+test_kamino_linalg_factorize_llt_blocked                ran=4 fail=0 err=0 skip=0 (1 s)
+test_kamino_linalg_factorize_llt_blocked_semi_sparse    ran=2 fail=0 err=0 skip=0 (1 s)
+test_kamino_linalg_factorize_llt_sequential             ran=4 fail=0 err=0 skip=0 (0 s)
+test_kamino_linalg_solve_cg                             ran=20 fail=0 err=0 skip=14 (0 s)
+test_kamino_linalg_solver_llt_blocked                   ran=5 fail=0 err=0 skip=0 (1 s)
+test_kamino_linalg_solver_llt_blocked_rcm               ran=13 fail=0 err=0 skip=2 (3 s)
+test_kamino_linalg_solver_llt_sequential                ran=5 fail=0 err=0 skip=0 (0 s)
+test_kamino_linalg_sparse                               ran=12 fail=0 err=0 skip=0 (2 s)
+test_kamino_rl_onnx                                     ran=9 fail=0 err=0 skip=4 (2 s)
+test_kamino_sensor_imu                                  ran=9 fail=0 err=0 skip=1 (1 s)
+test_kamino_solver_joint_effort_limit                   ran=3 fail=0 err=0 skip=0 (15 s)
+test_kamino_solver_kamino                               ran=32 fail=0 err=0 skip=0 (8 s)
+test_kamino_solver_kamino_joint_frames                  ran=5 fail=0 err=0 skip=0 (0 s)
+test_kamino_solver_kamino_joint_friction                ran=8 fail=0 err=0 skip=0 (60 s)
+test_kamino_solver_kamino_notify                        ran=45 fail=0 err=0 skip=0 (1 s)
+test_kamino_solvers_dvi                                 ran=74 fail=0 err=0 skip=7 (25 s)
+test_kamino_solvers_forward_kinematics                  ran=19 fail=0 err=0 skip=0 (21 s)
+test_kamino_solvers_metrics                             ran=17 fail=0 err=0 skip=0 (5 s)
+test_kamino_solvers_padmm                               ran=15 fail=0 err=0 skip=0 (3 s)
+test_kamino_utils_world_equivalence                     ran=1 fail=0 err=0 skip=0 (0 s)
+Warning: Kamino per-world contact capacity exceeded. Increase the per-world contact capacity.
+Warning: Kamino per-world contact capacity exceeded. Increase the per-world contact capacity.
+Warning: Kamino per-world contact capacity exceeded. Increase the per-world contact capacity.
+Warning: Kamino per-world contact capacity exceeded. Increase the per-world contact capacity.
+Warning: Kamino per-world contact capacity exceeded. Increase the per-world contact capacity.
+Warning: Kamino per-world contact capacity exceeded. Increase the per-world contact capacity.

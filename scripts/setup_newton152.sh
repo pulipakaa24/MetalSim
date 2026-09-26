@@ -10,7 +10,7 @@ VENV=${1:-.venv-newton152}
   || git clone --branch v1.5.2 --depth 1 https://github.com/newton-physics/newton upstream/newton-1.5.2
 if [ -d upstream/warp-innate ]; then WARP=upstream/warp-innate; else WARP=upstream/warp-metalsim; fi
 [ -x "$VENV/bin/python" ] || uv venv -q "$VENV" --python 3.12
-uv pip install -q --python "$VENV/bin/python" numpy scipy pytest usd-core "mujoco==3.11.0"
+uv pip install -q --python "$VENV/bin/python" numpy scipy pytest usd-core gitpython "newton-usd-schemas==0.5.0" "mujoco==3.11.0"  # gitpython + usd-schemas: Kamino tests (asset download, USD import)
 uv pip install -q --python "$VENV/bin/python" --no-deps "mujoco-warp==3.11.0"
 uv pip install -q --python "$VENV/bin/python" --no-deps -e "$WARP"
 uv pip install -q --python "$VENV/bin/python" --no-deps -e upstream/newton-1.5.2
