@@ -1,0 +1,15 @@
+floor: ls 200              niter mean 3.669 >10 0.42 % max 17 | control steps with an LS at its cap 0.0 % | |dqvel| vs ls100 after 8 substeps: median 0.00e+00 p99 0.00e+00 max 0.00e+00, worlds >1e-3 0 of 2304
+floor: 1-ulp qvel nudge    niter mean 3.669 >10 0.42 % max 17 | control steps with an LS at its cap 0.0 % | |dqvel| vs ls100 after 8 substeps: median 1.28e-05 p99 2.55e-04 max 6.77e-04, worlds >1e-3 0 of 2304
+ls_iterations 5            niter mean 3.650 >10 0.42 % max 14 | control steps with an LS at its cap 100.0 % | |dqvel| vs ls100 after 8 substeps: median 4.46e-06 p99 1.20e+00 max 7.54e+00, worlds >1e-3 427 of 2304
+ls_iterations 10           niter mean 3.666 >10 0.41 % max 14 | control steps with an LS at its cap 95.7 % | |dqvel| vs ls100 after 8 substeps: median 4.77e-07 p99 1.19e-01 max 9.71e-01, worlds >1e-3 41 of 2304
+ls_iterations 15           niter mean 3.669 >10 0.42 % max 17 | control steps with an LS at its cap 88.8 % | |dqvel| vs ls100 after 8 substeps: median 4.77e-07 p99 2.29e-04 max 6.71e-04, worlds >1e-3 0 of 2304
+ls_iterations 20           niter mean 3.669 >10 0.42 % max 17 | control steps with an LS at its cap 83.5 % | |dqvel| vs ls100 after 8 substeps: median 2.38e-07 p99 2.23e-04 max 6.71e-04, worlds >1e-3 0 of 2304
+ls_iterations 30           niter mean 3.669 >10 0.42 % max 17 | control steps with an LS at its cap 9.2 % | |dqvel| vs ls100 after 8 substeps: median 0.00e+00 p99 1.55e-06 max 2.85e-04, worlds >1e-3 0 of 2304
+ls_iterations 50           niter mean 3.669 >10 0.42 % max 17 | control steps with an LS at its cap 0.0 % | |dqvel| vs ls100 after 8 substeps: median 0.00e+00 p99 0.00e+00 max 0.00e+00, worlds >1e-3 0 of 2304
+ls_tolerance 0.1 (ls 20)   niter mean 3.669 >10 0.42 % max 17 | control steps with an LS at its cap 52.8 % | |dqvel| vs ls100 after 8 substeps: median 3.02e-06 p99 2.33e-04 max 6.26e-01, worlds >1e-3 1 of 2304
+tolerance 1e-6 (ls 20)     niter mean 3.669 >10 0.42 % max 17 | control steps with an LS at its cap 83.5 % | |dqvel| vs ls100 after 8 substeps: median 2.38e-07 p99 2.23e-04 max 6.71e-04, worlds >1e-3 0 of 2304
+tolerance 1e-7 (ls 20)     niter mean 3.669 >10 0.42 % max 17 | control steps with an LS at its cap 83.5 % | |dqvel| vs ls100 after 8 substeps: median 2.38e-07 p99 2.23e-04 max 6.71e-04, worlds >1e-3 0 of 2304
+cap 10 (ls 20)             niter mean 3.662 >10 0.00 % max 10 | control steps with an LS at its cap 83.5 % | |dqvel| vs ls100 after 8 substeps: median 2.38e-07 p99 6.68e-04 max 2.98e+00, worlds >1e-3 19 of 2304
+cap 12 (ls 20)             niter mean 3.668 >10 0.42 % max 12 | control steps with an LS at its cap 83.5 % | |dqvel| vs ls100 after 8 substeps: median 2.38e-07 p99 2.24e-04 max 9.14e-02, worlds >1e-3 1 of 2304
+cap 15 (ls 20)             niter mean 3.669 >10 0.42 % max 15 | control steps with an LS at its cap 83.5 % | |dqvel| vs ls100 after 8 substeps: median 2.38e-07 p99 2.24e-04 max 1.30e-03, worlds >1e-3 1 of 2304
+cap 20 (ls 20)             niter mean 3.669 >10 0.42 % max 17 | control steps with an LS at its cap 83.5 % | |dqvel| vs ls100 after 8 substeps: median 2.38e-07 p99 2.23e-04 max 6.71e-04, worlds >1e-3 0 of 2304

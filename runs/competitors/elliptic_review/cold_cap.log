@@ -1,0 +1,32 @@
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+runs/competitors/g1_states/c_ellip10 cone 1 imp 10.0: 64 worlds x 9 states x 8 substeps
+  floor (warm cap100 nudged)   niter mean 2.77 p99 8 max  11 % solves at >=11 0.022 >=13 0.000 >=16 0.000 | |dqvel| vs warm cap100: p99 1.2e-05 max 2.9e-01 >1e-3 1 of 576
+  warm cap 100                 niter mean 2.78 p99 8 max  11 % solves at >=11 0.022 >=13 0.000 >=16 0.000 | |dqvel| vs warm cap100: p99 0.0e+00 max 0.0e+00 >1e-3 0 of 576
+  warm cap 10                  niter mean 2.78 p99 8 max  10 % solves at >=11 0.000 >=13 0.000 >=16 0.000 | |dqvel| vs warm cap100: p99 0.0e+00 max 3.9e-05 >1e-3 0 of 576
+  warm cap 15                  niter mean 2.78 p99 8 max  11 % solves at >=11 0.022 >=13 0.000 >=16 0.000 | |dqvel| vs warm cap100: p99 0.0e+00 max 0.0e+00 >1e-3 0 of 576
+  warm cap 20                  niter mean 2.78 p99 8 max  11 % solves at >=11 0.022 >=13 0.000 >=16 0.000 | |dqvel| vs warm cap100: p99 0.0e+00 max 0.0e+00 >1e-3 0 of 576
+  cold cap 100                 niter mean 4.69 p99 10 max  14 % solves at >=11 0.326 >=13 0.022 >=16 0.000 | |dqvel| vs warm cap100: p99 1.2e-04 max 3.4e-04 >1e-3 0 of 576
+  cold cap 10                  niter mean 4.69 p99 10 max  10 % solves at >=11 0.000 >=13 0.000 >=16 0.000 | |dqvel| vs warm cap100: p99 1.9e-04 max 1.2e-01 >1e-3 3 of 576
+  cold cap 12                  niter mean 4.69 p99 10 max  12 % solves at >=11 0.326 >=13 0.000 >=16 0.000 | |dqvel| vs warm cap100: p99 1.3e-04 max 3.4e-04 >1e-3 0 of 576
+  cold cap 15                  niter mean 4.69 p99 10 max  14 % solves at >=11 0.326 >=13 0.022 >=16 0.000 | |dqvel| vs warm cap100: p99 1.2e-04 max 3.4e-04 >1e-3 0 of 576
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+runs/competitors/g1_states/ellip10 cone 1 imp 10.0: 256 worlds x 9 states x 8 substeps
+  floor (warm cap100 nudged)   niter mean 3.67 p99 10 max  17 % solves at >=11 0.418 >=13 0.043 >=16 0.005 | |dqvel| vs warm cap100: p99 2.6e-04 max 6.6e-04 >1e-3 0 of 2304
+  warm cap 100                 niter mean 3.67 p99 10 max  17 % solves at >=11 0.418 >=13 0.049 >=16 0.005 | |dqvel| vs warm cap100: p99 0.0e+00 max 0.0e+00 >1e-3 0 of 2304
+  warm cap 10                  niter mean 3.66 p99 10 max  10 % solves at >=11 0.000 >=13 0.000 >=16 0.000 | |dqvel| vs warm cap100: p99 5.3e-04 max 3.0e+00 >1e-3 19 of 2304
+  warm cap 15                  niter mean 3.67 p99 10 max  15 % solves at >=11 0.418 >=13 0.049 >=16 0.000 | |dqvel| vs warm cap100: p99 0.0e+00 max 1.3e-03 >1e-3 1 of 2304
+  warm cap 20                  niter mean 3.67 p99 10 max  17 % solves at >=11 0.418 >=13 0.049 >=16 0.005 | |dqvel| vs warm cap100: p99 0.0e+00 max 0.0e+00 >1e-3 0 of 2304
+  cold cap 100                 niter mean 3.87 p99 8 max  13 % solves at >=11 0.065 >=13 0.016 >=16 0.000 | |dqvel| vs warm cap100: p99 3.5e-04 max 2.9e-01 >1e-3 3 of 2304
+  cold cap 10                  niter mean 3.87 p99 8 max  10 % solves at >=11 0.000 >=13 0.000 >=16 0.000 | |dqvel| vs warm cap100: p99 3.7e-04 max 2.9e-01 >1e-3 7 of 2304
+  cold cap 12                  niter mean 3.87 p99 8 max  12 % solves at >=11 0.065 >=13 0.000 >=16 0.000 | |dqvel| vs warm cap100: p99 3.5e-04 max 2.9e-01 >1e-3 4 of 2304
+  cold cap 15                  niter mean 3.87 p99 8 max  13 % solves at >=11 0.065 >=13 0.016 >=16 0.000 | |dqvel| vs warm cap100: p99 3.5e-04 max 2.9e-01 >1e-3 3 of 2304
