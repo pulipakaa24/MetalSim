@@ -21,7 +21,9 @@ def test_counter_with_bare_total_and_anomaly_lines_skipped():
 def test_inline_total_fraction_and_percent():
     assert gd.parse_progress(["iteration 12/500"], "")[:2] == (12, 500)
     assert gd.parse_progress(["frames: 40/200 [00:10<00:40]"], "")[:2] == (40, 200)
-    assert gd.parse_progress(["rendering 37.5% done"], "")[2] == 37.5
+    assert gd.parse_progress(["progress 37.5% of frames"], "")[2] == 37.5
+    assert gd.parse_progress([" 62%|######    | 620/1000"], "")[:2] == (620, 1000)
+    assert gd.parse_progress(["busy processes (cpu > 40 %):"], "")[2] is None      # not a progress line
 
 
 def test_no_signal():
