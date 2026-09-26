@@ -1,0 +1,57 @@
+== stage rec mjw=/Users/aditya/robosim/upstream/mujoco_warp-ellip head=07a51a6 presets=tau10_impact_elliptic_hardlimits tau10_impact_elliptic_imp10_hardlimits tau10_impact_elliptic_imp100_hardlimits Fri Sep 25 20:21:58 PDT 2026
+holder: {"name": "ellip_fid_rec", "kind": "render", "minutes": 25.0, "pid": 4565, "start": 1790392918.801462, "queued": 1790390972.1631856, "cmd": "scripts/diagnostics/competitors/elliptic_fidelity_g1.sh /Users/aditya/robosim/upstream/mujoco_warp-ellip rec", "cwd": "/Users/aditya/robosim"}
+[metalsim] A_hold: 150 steps, final root z [0.05380051 0.0538007  0.0538007  0.0538007 ]
+[metalsim] B_random: 250 steps, final root z [0.10492857 0.1522654  0.13941461 0.15583658]
+[metalsim] C_drop: 150 steps, final root z [0.05380041 0.05380043 0.0538019  0.05380042]
+ },
+ "render": {}
+}
+  step  66  isaac  J/dt      14  sample      16   |  ours  J/dt      40  sample      20
+  step  67  isaac  J/dt      18  sample      20   |  ours  J/dt      19  sample      16
+  step  68  isaac  J/dt    2119  sample     621   |  ours  J/dt      15  sample       0
+  step  69  isaac  J/dt    2200  sample     963   |  ours  J/dt      18  sample      74
+  step  70  isaac  J/dt     694  sample     567   |  ours  J/dt      12  sample      53
+  step  71  isaac  J/dt     439  sample     376   |  ours  J/dt    2607  sample    1258
+  step  72  isaac  J/dt     342  sample     316   |  ours  J/dt    2167  sample     750
+  step  73  isaac  J/dt     491  sample     262   |  ours  J/dt     457  sample     372
+  step  74  isaac  J/dt     252  sample     249   |  ours  J/dt     337  sample     326
+  step  75  isaac  J/dt     250  sample     249   |  ours  J/dt     311  sample     303
+  step  76  isaac  J/dt     256  sample     259   |  ours  J/dt     298  sample     296
+  steps 63-76: impulse isaac 143.1 N s (sensor samples x 20 ms 79.2); ours 130.5 N s (samples x 20 ms 74.5); max J/dt isaac 2200 ours 2607
+[metalsim] A_hold: 150 steps, final root z [0.05473991 0.05473992 0.05473985 0.05473983]
+[metalsim] B_random: 250 steps, final root z [0.15031065 0.16872615 0.13022314 0.1063882 ]
+[metalsim] C_drop: 150 steps, final root z [0.05497689 0.05497687 0.05497685 0.05497685]
+ },
+ "render": {}
+}
+  step  66  isaac  J/dt      14  sample      16   |  ours  J/dt      39  sample      26
+  step  67  isaac  J/dt      18  sample      20   |  ours  J/dt      28  sample      29
+  step  68  isaac  J/dt    2119  sample     621   |  ours  J/dt      10  sample       0
+  step  69  isaac  J/dt    2200  sample     963   |  ours  J/dt      16  sample       0
+  step  70  isaac  J/dt     694  sample     567   |  ours  J/dt      11  sample       0
+  step  71  isaac  J/dt     439  sample     376   |  ours  J/dt    2379  sample    3279
+  step  72  isaac  J/dt     342  sample     316   |  ours  J/dt    2294  sample     818
+  step  73  isaac  J/dt     491  sample     262   |  ours  J/dt     494  sample     407
+  step  74  isaac  J/dt     252  sample     249   |  ours  J/dt     355  sample     328
+  step  75  isaac  J/dt     250  sample     249   |  ours  J/dt     312  sample     304
+  step  76  isaac  J/dt     256  sample     259   |  ours  J/dt     299  sample     298
+  steps 63-76: impulse isaac 143.1 N s (sensor samples x 20 ms 79.2); ours 129.7 N s (samples x 20 ms 113.6); max J/dt isaac 2200 ours 2379
+[metalsim] A_hold: 150 steps, final root z [0.05500016 0.05499963 0.05499963 0.05499936]
+[metalsim] B_random: 250 steps, final root z [0.14151108 0.16470152 0.16201119 0.09836791]
+[metalsim] C_drop: 150 steps, final root z [0.05503925 0.05496047 0.05475863 0.05492818]
+ },
+ "render": {}
+}
+  step  66  isaac  J/dt      14  sample      16   |  ours  J/dt      39  sample      26
+  step  67  isaac  J/dt      18  sample      20   |  ours  J/dt      25  sample      15
+  step  68  isaac  J/dt    2119  sample     621   |  ours  J/dt      14  sample       0
+  step  69  isaac  J/dt    2200  sample     963   |  ours  J/dt      12  sample       0
+  step  70  isaac  J/dt     694  sample     567   |  ours  J/dt      21  sample       0
+  step  71  isaac  J/dt     439  sample     376   |  ours  J/dt    2347  sample    3385
+  step  72  isaac  J/dt     342  sample     316   |  ours  J/dt    2282  sample     853
+  step  73  isaac  J/dt     491  sample     262   |  ours  J/dt     515  sample     554
+  step  74  isaac  J/dt     252  sample     249   |  ours  J/dt     365  sample     332
+  step  75  isaac  J/dt     250  sample     249   |  ours  J/dt     313  sample     304
+  step  76  isaac  J/dt     256  sample     259   |  ours  J/dt     299  sample     298
+  steps 63-76: impulse isaac 143.1 N s (sensor samples x 20 ms 79.2); ours 129.7 N s (samples x 20 ms 119.2); max J/dt isaac 2200 ours 2347
+== stage rec done Fri Sep 25 20:22:55 PDT 2026

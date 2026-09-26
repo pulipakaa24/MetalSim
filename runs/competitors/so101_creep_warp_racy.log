@@ -1,0 +1,24 @@
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/scripts/gpu_lock.py", line 108, in <module>
+    main()
+    ~~~~^^
+  File "/Users/aditya/robosim/scripts/gpu_lock.py", line 90, in main
+    if a.cmd == "acquire": acquire(a.name, a.kind, a.minutes, a.pid, a.job_cmd)
+                           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/scripts/gpu_lock.py", line 70, in acquire
+    h = holder()
+  File "/Users/aditya/robosim/scripts/gpu_lock.py", line 42, in holder
+    _release(force=True); return None
+    ~~~~~~~~^^^^^^^^^^^^
+  File "/Users/aditya/robosim/scripts/gpu_lock.py", line 51, in _release
+    if os.path.exists(p): os.remove(p)
+                          ~~~~~~~~~^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/aditya/robosim/runs/.gpu_lock'
+pyr          cone=0 impratio=  1.0 it=10 solimp0=None: settle rel [4.800000190734863, -1.3799999952316284, 12.739999771118164] mm, box z 0.258; hold: creep 0.81 mm (max 0.82, dropped 0/64) t=[0.32, 0.48, 0.58, 0.67, 0.75, 0.81]; wrist_roll: creep 1.23 mm (max 1.27, dropped 0/64) t=[0.49, 0.81, 0.46, 1.04, 0.54, 1.23]; shoulder_lift: creep 256.63 mm (max 305.82, dropped 64/64) t=[1.57, 2.43, 7.82, 9.32, 44.97, 256.63]
+ell1         cone=1 impratio=  1.0 it=10 solimp0=None: settle rel [1.7000000476837158, -1.3300000429153442, 10.430000305175781] mm, box z 0.256; hold: creep 4.41 mm (max 4.42, dropped 0/64) t=[1.23, 2.17, 2.89, 3.51, 4.03, 4.41]; wrist_roll: creep 4.61 mm (max 4.62, dropped 0/64) t=[1.26, 2.24, 3.0, 3.66, 4.19, 4.61]; shoulder_lift: creep 11.56 mm (max 11.79, dropped 0/64) t=[2.29, 3.62, 5.4, 6.22, 9.65, 11.56]
+ell10        cone=1 impratio= 10.0 it=10 solimp0=None: settle rel [-11.420000076293945, -0.9900000095367432, 8.619999885559082] mm, box z 0.254; hold: creep 5.20 mm (max 5.20, dropped 0/64) t=[0.88, 1.77, 2.64, 3.5, 4.35, 5.2]; wrist_roll: creep 5.74 mm (max 5.75, dropped 0/64) t=[0.98, 1.95, 2.92, 3.87, 4.81, 5.74]; shoulder_lift: creep 11.86 mm (max 11.86, dropped 0/64) t=[2.37, 4.23, 6.63, 8.41, 10.57, 11.86]
+ell100       cone=1 impratio=100.0 it=10 solimp0=None: settle rel [-14.020000457763672, -1.1399999856948853, 8.180000305175781] mm, box z 0.254; hold: creep 0.67 mm (max 0.67, dropped 0/64) t=[0.12, 0.24, 0.35, 0.46, 0.57, 0.67]; wrist_roll: creep 1.16 mm (max 1.16, dropped 0/64) t=[0.2, 0.4, 0.6, 0.79, 0.98, 1.16]; shoulder_lift: creep 7.97 mm (max 7.98, dropped 0/64) t=[1.58, 2.66, 4.33, 5.32, 6.9, 7.97]
+pyr_imp99    cone=0 impratio=  1.0 it=10 solimp0=0.99: settle rel [1.2000000476837158, -0.8299999833106995, 11.180000305175781] mm, box z 0.257; hold: creep 2.06 mm (max 2.08, dropped 0/64) t=[0.78, 1.18, 1.49, 1.73, 1.92, 2.06]; wrist_roll: creep 2.18 mm (max 2.20, dropped 0/64) t=[0.86, 1.25, 1.57, 1.81, 2.01, 2.18]; shoulder_lift: creep 263.50 mm (max 280.08, dropped 64/64) t=[2.81, 8.1, 11.4, 189.27, 257.96, 263.5]
+ell100_imp99 cone=1 impratio=100.0 it=10 solimp0=0.99: settle rel [-14.270000457763672, -0.6899999976158142, 8.850000381469727] mm, box z 0.255; hold: creep 0.30 mm (max 0.32, dropped 0/64) t=[0.05, 0.1, 0.15, 0.2, 0.25, 0.3]; wrist_roll: creep 0.79 mm (max 0.80, dropped 0/64) t=[0.17, 0.3, 0.42, 0.54, 0.67, 0.79]; shoulder_lift: creep 8.37 mm (max 8.43, dropped 0/64) t=[1.68, 2.81, 4.58, 5.6, 7.29, 8.37]
+CREEP_DONE
+lock held by ellip_g1dense_world2, not ellip_so101_creep; not released

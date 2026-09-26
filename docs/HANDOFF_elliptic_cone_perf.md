@@ -1,5 +1,18 @@
 # Handoff: elliptic friction cones are 3–4× slower on Metal (generalizing beyond the G1)
 
+**Status 2026-09-25 (evening): done on this machine.** Reproduced (Go2 3.84×, G1 2.83× sparse / 3.24× dense,
+SO-101 2.41×, DeepMind humanoid 6.68×, MetalSim G1 task 7.07×) and fixed in the fork worktree
+`upstream/mujoco_warp-ellip` (branch `metalsim-elliptic`, commit `c301880`, not merged: awaiting the main
+session's approval): elliptic now costs 1.27–1.59× (G1 task 1.41×). Fix 1 (SM-sized launch) measures within
+3–20 % of the adopted per-world form and is kept as `MJW_JTCJ_MODE=contact`. The G1's slowdown was a second
+fallback (one lane per constraint group in the sparse Hessian assembly), fixed separately. Fixes 3 and 4
+(fold into the tiled build / incremental cone rows) were evaluated and estimated not to pay. Upstream PR draft:
+`scripts/diagnostics/mjwarp_upstream/DRAFT_elliptic_launch.md` (fork branch `elliptic-jtcj-offcuda`, not
+opened). Fidelity re-check with cheap elliptic cones, the audit of every other non-CUDA fallback, and every
+number: `docs/research/elliptic_cones_2026-09-25.md`; rows in PARITY §1.4, GAPS, DECISIONS, CHANGELOG.
+The "also found" item below (G1 physics 84.1 K vs README 81.0 K) was taken up by the throughput agent
+(`docs/research/throughput_regression_2026-09-25.md`).
+
 Branch `perf-elliptic-cone`, based on `main` at `fbaab25`. It contains the findings, the benchmark
 scripts (`scripts/diagnostics/competitors/`) and their logs (`runs/competitors/`). It makes no code
 changes. Everything below was measured on 2026-09-25 on an M4 Max (40-core GPU, 64 GB, on AC power),

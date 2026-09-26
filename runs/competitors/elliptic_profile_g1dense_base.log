@@ -1,0 +1,20 @@
+[gpu_run] ellip_profile_g1dense_base start: device utilisation 0% (20:13:35)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+LABEL profile_g1dense_base mjw=/Users/aditya/robosim/upstream/mujoco_warp-ellip-base/mujoco_warp/__init__.py head=07a51a6 N=4096 env=JAC=dense 
+== profile g1 elliptic
+KERNELS g1 N=4096: 87.99 ms/step GPU (sum of per-dispatch times), 232 dispatches/step
+    69.674 ms  79.2%  x 11  _update_gradient_JTCJ_dense_f52c2ac2_metal_forward
+     3.665 ms   4.2%  x 11  _update_gradient_JTDAJ_dense_tiled__locals__kernel_38d9601f_metal_forward
+     3.540 ms   4.0%  x 11  _update_gradient_cholesky__locals__kernel_04b0b47e_metal_forward
+     2.684 ms   3.1%  x  1  ccd_kernel_builder__locals__ccd_kernel_dec5c867_metal_forward
+     1.804 ms   2.0%  x 10  _linesearch_iterative_kernel__locals__kernel_6a792f2a_metal_forward
+     1.506 ms   1.7%  x 11  _update_constraint_efc__locals__kernel_d88e782a_metal_forward
+     0.754 ms   0.9%  x  2  _factor_i_sparse_serial__locals__kernel_169e9bc9_metal_forward
+     0.637 ms   0.7%  x 11  _update_constraint_init_qfrc_constraint_dense__locals__kernel_70c42511_metal_forward
+     0.348 ms   0.4%  x 11  mul_m_kernel__locals___mul_m_9c0838e9_metal_forward
+     0.336 ms   0.4%  x  2  _solve_LD_sparse_serial__locals__kernel_6b31589e_metal_forward
+     0.290 ms   0.3%  x  1  ccd_kernel_builder__locals__ccd_kernel_f0056382_metal_forward
+     0.247 ms   0.3%  x  1  ccd_kernel_builder__locals__ccd_kernel_f346ae18_metal_forward
+     0.188 ms   0.2%  x  1  _primitive_narrowphase__locals__primitive_narrowphase_71ce95ea_metal_forward
+[gpu_run] ellip_profile_g1dense_base end: device utilisation 94% (20:13:49), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %

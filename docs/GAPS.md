@@ -30,6 +30,7 @@ the Newton-engine evaluation. Evidence for each row is in `PARITY.md`.
 | Soft joint limits | hard-limit preset | limit excursion 0.030 → 0.001 rad at no cost |
 | Foot contact set (`plane_convex`) | fork fix, C-exact set, switchable | landing contact sets 61 → 0 of 691 differ from MuJoCo C |
 | Feet-slide reward term | per-foot velocity kernel on both engines | vs `mj_objectVelocity` to 2e-3 m/s |
+| Elliptic friction cones 2.4–7× slower than pyramidal on Metal (`docs/HANDOFF_elliptic_cone_perf.md`) | fork commit `c301880` (worktree, pending merge): per-world cone-list Hessian term instead of the `naconmax`-sized launch, full-width groups in the sparse assembly; audit of every other non-CUDA fallback in the fork (research note §3) | Go2 240 K → 580 K steps/s, G1 task 11.0 K → 55.4 K env-steps/s (elliptic now 1.3–1.6× pyramidal); physics within float noise; `docs/research/elliptic_cones_2026-09-25.md` |
 | Contact sensing | Isaac ContactSensor semantics as Warp kernels | vs MuJoCo C to 1e-4 N; +0.3 % step cost |
 | Sensor extras (divergence, multi-return, intensity, radar-lite) | `lidar_ext` kernel, `radar.py`, default scan unchanged | tests per feature; costs per option |
 | Exact terrain heights | verbatim port of Isaac Lab v2.3.2's generator | grid-exact vs Isaac's own code; 99.99 % within 1e-5 m of its ray cast |

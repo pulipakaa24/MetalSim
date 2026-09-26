@@ -10,11 +10,14 @@ R = ROBOTS[name]
 
 def build(variant="base"):
     spec = mujoco.MjSpec.from_file(R["scene"])
-    LIM = force_limits(mujoco.MjModel.from_xml_path(R["scene"]))
+    LIM = force_limits(mujoco.MjModel.from_xml_path(R["scene"])) if R["kp"] is not None else []
     for a, (lo, hi) in zip(spec.actuators, LIM):
         a.set_to_position(kp=R["kp"], kv=R["kd"]); a.ctrllimited = mujoco.mjtLimited.mjLIMITED_FALSE
         a.forcelimited = mujoco.mjtLimited.mjLIMITED_TRUE; a.forcerange = [lo, hi]
     spec.option.timestep = DT
+    import os
+    if os.environ.get('CONE'): spec.option.cone = {'pyramidal': mujoco.mjtCone.mjCONE_PYRAMIDAL, 'elliptic': mujoco.mjtCone.mjCONE_ELLIPTIC}[os.environ['CONE']]
+    spec.option.disableflags |= int(mujoco.mjtDisableBit.mjDSBL_MULTICCD)
     for g in spec.geoms:
         g.margin = 0.0
         if g.type == mujoco.mjtGeom.mjGEOM_PLANE: continue
@@ -26,9 +29,9 @@ def build(variant="base"):
     return m
 
 def run(m, capture=True):
-    home = m.key_qpos[0].copy()
+    home = m.key_qpos[0].copy() if m.nkey else m.qpos0.copy()
     qadr = [m.jnt_qposadr[m.actuator_trnid[i, 0]] for i in range(m.nu)]
-    sim = BatchSim(m, N, options=BatchSimOptions(solver_iterations=10, ls_iterations=20, capture=capture))
+    sim = BatchSim(m, N, options=BatchSimOptions(solver_iterations=10, ls_iterations=20, capture=capture, jacobian=__import__("os").environ.get("JAC"), **({"njmax": int(__import__("os").environ["NJMAX"])} if __import__("os").environ.get("NJMAX") else {})))
     sim.set_state(home); sim.forward(); sim.synchronize()
     q_home = torch.tensor(home[qadr], device="mps", dtype=torch.float32)
     g = torch.Generator(device="mps").manual_seed(0)

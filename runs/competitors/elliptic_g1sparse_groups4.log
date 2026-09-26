@@ -1,0 +1,9 @@
+[gpu_run] ellip_g1_groups4 start: device utilisation 0% (20:11:35)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+LABEL g1sparse_groups4 mjw=/Users/aditya/robosim/upstream/mujoco_warp-ellip/mujoco_warp/__init__.py head=07a51a6 N=4096 env=MJW_JTDAJ_GROUPS_PER_WORLD=4 
+== g1 pyramidal
+RESULT {"engine": "metalsim", "cone": 0, "robot": "g1", "N": 4096, "mode": "matched", "nv": 35, "nu": 29, "iters": 10, "ls": 20, "build_s": 1.9, "steps_per_s": 220102, "finite": true, "base_z_mean": 0.084, "overflow": {"ITERATIONS": 259, "LS_ITERATIONS": 4096}}
+== g1 elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "g1", "N": 4096, "mode": "matched", "nv": 35, "nu": 29, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 167131, "finite": true, "base_z_mean": 0.093, "overflow": {"ITERATIONS": 523, "LS_ITERATIONS": 4096}}
+[gpu_run] ellip_g1_groups4 end: device utilisation 100% (20:12:31), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %

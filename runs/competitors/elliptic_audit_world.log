@@ -1,0 +1,45 @@
+[gpu_run] ellip_audit_world start: device utilisation 0% (20:10:29)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  58458 Terminal                           1.7 %
+LABEL audit_world mjw=/Users/aditya/robosim/upstream/mujoco_warp-ellip/mujoco_warp/__init__.py head=07a51a6 N=4096 env=MJW_JTCJ_MODE=world 
+== so101 pyramidal
+RESULT {"engine": "metalsim", "cone": 0, "robot": "so101", "N": 4096, "mode": "matched", "nv": 12, "nu": 6, "iters": 10, "ls": 20, "build_s": 2.3, "steps_per_s": 1069105, "finite": true, "base_z_mean": 0.46, "overflow": {"ITERATIONS": 736, "LS_ITERATIONS": 4096}}
+== so101 elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "so101", "N": 4096, "mode": "matched", "nv": 12, "nu": 6, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 837584, "finite": true, "base_z_mean": 0.458, "overflow": {"ITERATIONS": 1160, "LS_ITERATIONS": 4096}}
+== humanoid pyramidal
+RESULT {"engine": "metalsim", "cone": 0, "robot": "humanoid", "N": 4096, "mode": "matched", "nv": 27, "nu": 21, "iters": 10, "ls": 20, "build_s": 1.5, "steps_per_s": 957410, "finite": true, "base_z_mean": 0.267, "overflow": {"ITERATIONS": 1, "LS_ITERATIONS": 4096}}
+== humanoid elliptic
+RESULT {"engine": "metalsim", "cone": 1, "robot": "humanoid", "N": 4096, "mode": "matched", "nv": 27, "nu": 21, "iters": 10, "ls": 20, "build_s": 1.4, "steps_per_s": 608507, "finite": true, "base_z_mean": 0.263, "overflow": {"ITERATIONS": 2022, "LS_ITERATIONS": 4096}}
+== profile so101 elliptic
+KERNELS so101 N=4096: 8.83 ms/step GPU (sum of per-dispatch times), 199 dispatches/step
+     1.752 ms  19.8%  x 10  _linesearch_iterative_kernel__locals__kernel_6a792f2a_metal_forward
+     1.733 ms  19.6%  x 11  _update_constraint_efc__locals__kernel_d88e782a_metal_forward
+     0.972 ms  11.0%  x 11  _update_gradient_JTCJ_dense_world_657b8cf1_metal_forward
+     0.774 ms   8.8%  x 11  _update_gradient_JTDAJ_dense_tiled__locals__kernel_3cf18602_metal_forward
+     0.678 ms   7.7%  x 11  _update_gradient_cholesky__locals__kernel_1e559246_metal_forward
+     0.631 ms   7.1%  x  1  ccd_kernel_builder__locals__ccd_kernel_7695fdf4_metal_forward
+     0.304 ms   3.4%  x  1  ccd_kernel_builder__locals__ccd_kernel_2f8a24c4_metal_forward
+     0.283 ms   3.2%  x 11  _update_constraint_init_qfrc_constraint_dense__locals__kernel_70c42511_metal_forward
+     0.167 ms   1.9%  x  1  _solve_init_jaref_kernel__locals__kernel_8d9df2f0_metal_forward
+     0.132 ms   1.5%  x  1  _primitive_narrowphase__locals__primitive_narrowphase_4ce79e7f_metal_forward
+     0.122 ms   1.4%  x  1  _efc_contact_jac_dense__locals__kernel_3dfc3ac0_metal_forward
+     0.097 ms   1.1%  x 11  mul_m_kernel__locals___mul_m_9c0838e9_metal_forward
+     0.087 ms   1.0%  x  1  _efc_contact_update__locals__kernel_488f1e13_metal_forward
+== profile humanoid elliptic
+KERNELS humanoid N=4096: 4.72 ms/step GPU (sum of per-dispatch times), 185 dispatches/step
+     1.140 ms  24.2%  x 11  _update_constraint_efc__locals__kernel_d88e782a_metal_forward
+     0.865 ms  18.3%  x 11  _update_gradient_JTCJ_dense_world_657b8cf1_metal_forward
+     0.613 ms  13.0%  x 11  _update_gradient_cholesky__locals__kernel_973bc63b_metal_forward
+     0.403 ms   8.5%  x 11  _update_gradient_JTDAJ_dense_tiled__locals__kernel_7c8911b0_metal_forward
+     0.233 ms   4.9%  x  1  _tile_cholesky_factorize_solve_block__locals__kernel_aaa95a55_metal_forward
+     0.194 ms   4.1%  x 10  _linesearch_iterative_kernel__locals__kernel_6a792f2a_metal_forward
+     0.132 ms   2.8%  x 11  mul_m_kernel__locals___mul_m_9c0838e9_metal_forward
+     0.106 ms   2.2%  x  1  _solve_init_jaref_kernel__locals__kernel_bd040f31_metal_forward
+     0.090 ms   1.9%  x 11  _update_gradient_grad__locals__kernel_72941948_metal_forward
+     0.088 ms   1.9%  x 11  _update_constraint_init_qfrc_constraint_dense__locals__kernel_70c42511_metal_forward
+     0.074 ms   1.6%  x 11  wp_memset
+     0.054 ms   1.1%  x  7  _crb_accumulate_073a11b8_metal_forward
+     0.051 ms   1.1%  x 10  _solve_done__locals__kernel_318c149b_metal_forward
+[gpu_run] ellip_audit_world end: device utilisation 65% (20:11:15), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   1.7 %
