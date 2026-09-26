@@ -131,7 +131,7 @@ their `metalsim` heads (Warp `4127c48`, MuJoCo Warp `07a51a6`) measures:
 A back-to-back run at `1791414` against `07a51a6` on one machine settles it. The logs are in
 `runs/competitors/metalsim_g1_*.log`.
 
-## Other competitor results from the same session (for context)
+## Other competitor results from the same session (for context; full survey in `docs/research/competitors_2026-09-25.md`)
 
 - **Genesis `go2_train.py`** (its own PPO example, 4096 envs, Metal/MPS): 170–171K env-steps/s for the
   full PPO loop, reward rising over 30 iterations. That is Go2, 12 actuators, 2 substeps of 10 ms, no
