@@ -1,0 +1,24 @@
+holder: none
+[gpu_run] vs_mlxcpp3 start: device utilisation 0% (18:56:08)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.7 s: none >= 1 %
+  batched/humanoid/B256           mean=  218555.2 us  stddev= 95425.9  p50=  189646.4  p95=  325092.8  min=  140926.5  max=  325092.8  steps/s=23427  vs_mjc=0.26x  rss=+18.6MB
+  batched/humanoid/B2048 HANG/TIMEOUT (>120 s)
+  batched/humanoid/B4096          mean=  791928.3 us  stddev=171321.1  p50=  710275.2  p95=  988801.2  min=  676708.4  max=  988801.2  steps/s=103444  vs_mjc=1.19x  rss=+26.6MB
+  batched/go2/B256                mean=  125410.1 us  stddev= 92693.6  p50=  127629.6  p95=  216974.1  min=   31626.7  max=  216974.1  steps/s=40826  vs_mjc=1.16x  rss=+13.4MB
+  batched/go2/B2048               mean=  320486.8 us  stddev=260172.8  p50=  202682.0  p95=  618724.5  min=  140053.9  max=  618724.5  steps/s=127806  vs_mjc=3.63x  rss=+19.6MB
+  batched/go2/B4096 HANG/TIMEOUT (>120 s)
+  batched/humanoid/B256           mean=  127695.0 us  stddev= 83485.1  p50=   81097.4  p95=  224077.7  min=   77910.0  max=  224077.7  steps/s=40096  vs_mjc=0.44x  rss=+18.9MB
+  batched/humanoid/B2048 HANG/TIMEOUT (>120 s)
+  batched/humanoid/B4096          mean=  800699.1 us  stddev=169427.9  p50=  709968.9  p95=  996170.3  min=  695958.2  max=  996170.3  steps/s=102311  vs_mjc=1.12x  rss=+31.6MB
+  batched/go2/B256                mean=  123535.3 us  stddev=150753.9  p50=   41366.2  p95=  297521.8  min=   31718.0  max=  297521.8  steps/s=41446  vs_mjc=1.19x  rss=+13.9MB
+  batched/go2/B2048               mean=  325153.9 us  stddev=257232.8  p50=  208029.2  p95=  620105.9  min=  147326.6  max=  620105.9  steps/s=125971  vs_mjc=3.57x  rss=+17.0MB
+  batched/go2/B4096               mean=14398226.1 us  stddev=23683219.8  p50=  816877.7  p95=41745046.2  min=  632754.4  max=41745046.2  steps/s=5690  vs_mjc=0.16x  rss=+1.9MB
+  batched/humanoid/B256           mean=  199049.6 us  stddev= 73814.7  p50=  167124.5  p95=  283453.4  min=  146570.8  max=  283453.4  steps/s=25722  vs_mjc=0.28x  rss=+18.7MB
+  batched/humanoid/B2048 HANG/TIMEOUT (>120 s)
+  batched/humanoid/B4096          mean=  796499.6 us  stddev=179902.2  p50=  700703.0  p95= 1004028.9  min=  684766.9  max= 1004028.9  steps/s=102850  vs_mjc=1.13x  rss=+31.3MB
+  batched/go2/B256                mean=  149972.4 us  stddev=103612.4  p50=  194686.8  p95=  223719.5  min=   31511.1  max=  223719.5  steps/s=34140  vs_mjc=0.95x  rss=+13.7MB
+  batched/go2/B2048               mean=  295477.5 us  stddev=261996.5  p50=  168351.2  p95=  596782.9  min=  121298.5  max=  596782.9  steps/s=138623  vs_mjc=3.93x
+  batched/go2/B4096               mean=  703010.6 us  stddev=101217.6  p50=  670228.8  p95=  816556.1  min=  622247.0  max=  816556.1  steps/s=116527  vs_mjc=3.30x  rss=+1.6MB
+[gpu_run] vs_mlxcpp3 end: device utilisation 99% (19:05:18), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.7 s:
+[gpu_run] gpu_top:   pid    641 NotificationCent                   1.3 %

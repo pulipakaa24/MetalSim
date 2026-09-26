@@ -1,0 +1,14 @@
+holder: none
+[gpu_run] cone_matched start: device utilisation 0% (19:08:16)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.7 s: none >= 1 %
+RESULT {"engine": "metalsim", "cone": 0, "robot": "go2", "N": 4096, "mode": "matched", "nv": 18, "nu": 12, "iters": 10, "ls": 20, "build_s": 2.1, "steps_per_s": 1023772, "finite": true, "base_z_mean": 0.189, "overflow": {"ITERATIONS": 3386, "LS_ITERATIONS": 4096}}
+RESULT {"engine": "genesis", "cone": "pyramidal", "robot": "go2", "N": 4096, "mode": "matched", "nu": 12, "iters": 10, "ls": 20, "build_s": 17.5, "steps_per_s": 1133984, "finite": true, "base_z_mean": 0.188}
+RESULT {"engine": "metalsim", "cone": 0, "robot": "g1", "N": 4096, "mode": "matched", "nv": 35, "nu": 29, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 229447, "finite": true, "base_z_mean": 0.084, "overflow": {"ITERATIONS": 236, "LS_ITERATIONS": 4096}}
+RESULT {"engine": "genesis", "cone": "pyramidal", "robot": "g1", "N": 4096, "mode": "matched", "nu": 29, "iters": 10, "ls": 20, "build_s": 16.5, "steps_per_s": 186542, "finite": true, "base_z_mean": 0.092}
+RESULT {"engine": "metalsim", "cone": 1, "robot": "go2", "N": 4096, "mode": "matched", "nv": 18, "nu": 12, "iters": 10, "ls": 20, "build_s": 1.4, "steps_per_s": 262371, "finite": true, "base_z_mean": 0.189, "overflow": {"ITERATIONS": 983, "LS_ITERATIONS": 4096}}
+RESULT {"engine": "genesis", "cone": "elliptic", "robot": "go2", "N": 4096, "mode": "matched", "nu": 12, "iters": 10, "ls": 20, "build_s": 22.0, "steps_per_s": 507474, "finite": true, "base_z_mean": 0.201}
+RESULT {"engine": "metalsim", "cone": 1, "robot": "g1", "N": 4096, "mode": "matched", "nv": 35, "nu": 29, "iters": 10, "ls": 20, "build_s": 3.8, "steps_per_s": 80024, "finite": true, "base_z_mean": 0.093, "overflow": {"ITERATIONS": 547, "LS_ITERATIONS": 4096}}
+RESULT {"engine": "genesis", "cone": "elliptic", "robot": "g1", "N": 4096, "mode": "matched", "nu": 29, "iters": 10, "ls": 20, "build_s": 20.3, "steps_per_s": 108205, "finite": true, "base_z_mean": 0.111}
+[gpu_run] cone_matched end: device utilisation 0% (19:12:59), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.7 s:
+[gpu_run] gpu_top:   pid   1406 Terminal                           1.0 %
