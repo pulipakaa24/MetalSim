@@ -55,10 +55,10 @@ the Newton-engine evaluation. Evidence for each row is in `PARITY.md`.
 | Hardware validation | none; the endpoint that outranks both simulators | user's Tron1 run; then a hardware protocol (drop, step response, walking distance) as the top-ranked criterion |
 | Breadth | one asset (G1) validated end to end | Tron1 next |
 | Multi-seed rough | seeds 1 and 2 queued | – |
-| Fast-factorization defaults | G1-only; other scenes unverified | verify on cartpole / lift / lidar / Tron1, then make global |
+| Fast-factorization defaults | **closed** (109984b): `metal_register_cholesky_max=48`, `m_dense_max=32` are the global defaults; verified on seven scenes (physics at noise level, throughput ±1 %); 196 tests pass | – |
 | Camera-RL residual | 12.7 K vs 32 K (hardware); untried: Apple's Metal Performance Primitives conv op | low |
 | Robot appearance residual | exposure is a fitted constant 9 % off the documented formula; RTX real-time shortcuts and NVIDIA denoisers not reproducible | low |
-| Renders of the rough task model | show only the heightfield on box cells (boxes live in per-world slots) | low |
+| Renders of the rough task model | **fixed and worse than thought** (56b11c2, d2b9bf4): heightfields were never drawn at all and the box slots were drawn as 2 mm cubes; the renderer now draws MuJoCo's exact heightfield surface and each env's slot boxes (depth along a stair riser matches `mj_ray` to 0.01 mm; gallery `g1_rough_boxes_tier2.png`) | **new cost gap**: tier 0 rasterizes the full 4.8 M-triangle heightfield per env (2.9 s per 1024-env frame; tier 2 188 ms); needs GPU tile culling before rough-terrain camera RL; the true boxes show only inside the physics window |
 | Intermittent `test_ppo_warp_rollout` noise test under GPU load | unverified (the contact-sensor one was a real race, fixed) | reproduce loaded vs idle |
 | Upstreaming the Warp and MuJoCo Warp forks | not proposed; flex commits and patches 0008–0016 carry a co-author trailer the MuJoCo Warp CLA rejects (rewrite on a fresh branch before filing); `UPSTREAM.md` lists the six flex fixes | after the 3.0 reference lands |
 | Newton upstream PRs | #4316–#4318 open, blocked on the EasyCLA signature | user |

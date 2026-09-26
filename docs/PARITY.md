@@ -162,8 +162,11 @@ came from comparing physics-only (robots standing still) with the full step (ran
 contacts). Two thirds of physics was the dense 43×43 Cholesky, which the Warp fork only kept in
 registers up to size 40. Rough terrain: 23.7 K → 41.9 K full loop. With this, the G1 flat training
 loop on the M4 Max (56.6 K) exceeds Isaac Lab 2.3.2 + PhysX on the L4 (45.9 K, measured) and is 0.69×
-NVIDIA's published 4090 number (82 K, reported). Rejected options with their effect are in
-DECISIONS.md; the remaining costs, ranked: the 43×43 Cholesky (1.11 ms per batch vs 0.27 at size
+NVIDIA's published 4090 number (82 K, reported). The two settings are now global defaults (`metal_register_cholesky_max=48`, `m_dense_max=32`, commit 109984b) after
+verification on cartpole, the SO-101 lift scene, lidar navigation, Tron1, Go1 and Panda: physics within
+run-to-run noise of the old defaults (Panda and Tron1 bitwise after the first step), throughput within ±1 %
+on every scene (the `m_dense_max=0` variant cost Tron1 0.6–1.2 % and was not adopted). Rejected options with
+their effect are in DECISIONS.md; the remaining costs, ranked: the 43×43 Cholesky (1.11 ms per batch vs 0.27 at size
 32), the one-thread sparse factorization (~0.5 ms), the Warp MLP inference (~6 ms per step). Caveat for the Isaac
 comparison: PhysX vs XPBD is a different solver; Isaac Lab 3.0 itself moves to Newton, so the
 like-for-like number will be Isaac Lab 3.0's, which is not measured here.
