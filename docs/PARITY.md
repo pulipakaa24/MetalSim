@@ -974,6 +974,12 @@ joint-level effort clamp; seeds 0 / 1 / 2, 1000 iterations):** return / episode 
 anomaly monitor). Against the pyramidal runs (+28.4 / 26.3 / 26.0 origin-velocity, +27.1 COM) the elliptic default is
 inside one seed spread; its seed-to-seed spread is far smaller (0.2 vs 1.3). Test gate: 45 tests passed before each run.
 
+**Isaac-side session of 2026-09-26 (L4, 29 min; `docs/research/isaac_side_session_2026-09-26.md`):** PhysX peak foot
+penetration during the G1 1 m drop is 0.51 mm on Isaac Sim 5.1 (2.08 mm on 6.1), against MetalSim's 1.55 cm under the
+elliptic default: the one contact metric still far from PhysX (impulses and 20 ms forces are within 8 %). Kit's dome-map
+azimuth differs from our shader's by −90° (folded into the USD import path). PhysX closes a four-bar 3–8× tighter than
+MuJoCo's soft constraint but gains 9–20 % energy over 5 s and tracks the exact reference worse.
+
 ## 2. Platform capabilities (the workstreams), with the tests behind them
 
 | capability | Isaac | ours | test (assertion) | result | verdict |
