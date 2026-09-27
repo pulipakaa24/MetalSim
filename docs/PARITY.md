@@ -966,6 +966,14 @@ env-steps/s; elliptic `recommended` (impratio 10, cap 20): physics 54,046 / 54,0
 loop 34,191 / 34,375** (1.68× the loop cost; the physics ratio is 1.73×). The elliptic run leaves 1 of 4096 worlds at
 the iteration cap after random actions (pyramidal at cap 10: 18).
 
+**2.3.2 flat headline under the elliptic default (measured 2026-09-26 13:00–15:20, `runs/ellip_default/g1_flat_ellip_default_s{0,1,2}.log`,
+`contact_cfg="recommended"` = elliptic impratio 10, Newton cap 20, base velocity at the pelvis COM, initial reset,
+joint-level effort clamp; seeds 0 / 1 / 2, 1000 iterations):** return / episode length at 300: 6.4 / 987, 7.2 / 992,
+8.7 / 1000; at 500: 17.4 / 1000, 17.4 / 1000, 17.0 / 1000; at 1000: **26.8 / 1000, 26.9 / 991, 26.6 / 1000 (mean
+26.8 ± 0.2)**; Isaac Lab 2.3.2 + PhysX +27.3 / 991. Loop throughput 29.3–30.0 K env-steps/s (with the training-time
+anomaly monitor). Against the pyramidal runs (+28.4 / 26.3 / 26.0 origin-velocity, +27.1 COM) the elliptic default is
+inside one seed spread; its seed-to-seed spread is far smaller (0.2 vs 1.3). Test gate: 45 tests passed before each run.
+
 ## 2. Platform capabilities (the workstreams), with the tests behind them
 
 | capability | Isaac | ours | test (assertion) | result | verdict |
