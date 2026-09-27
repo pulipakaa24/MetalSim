@@ -980,6 +980,12 @@ elliptic default: the one contact metric still far from PhysX (impulses and 20 m
 azimuth differs from our shader's by −90° (folded into the USD import path). PhysX closes a four-bar 3–8× tighter than
 MuJoCo's soft constraint but gains 9–20 % energy over 5 s and tracks the exact reference worse.
 
+**2.3.2 rough headline under the elliptic default (measured 2026-09-26 19:30–21:07, `runs/ellip_default/g1_rough_ellip_default_s0.log`,
+seed 0, 1500 iterations, `rough_isaac` reward set, both trainer fixes):** return / episode length +4.2 / 948 at 500,
++8.2 / 973 at 1000, **+13.7 / 985 at 1500, terrain level 6.10**; Isaac Lab 2.3.2 + PhysX +14.1 / 5.9; the pyramidal
+default's three seeds gave +16.4 / +22.6 / +19.1 at 6.0–6.1. One seed, so the 3–9 point difference from pyramidal is
+not yet separable from seed spread (the pyramidal seeds spanned 6 points); loop 25.0 K env-steps/s.
+
 ## 2. Platform capabilities (the workstreams), with the tests behind them
 
 | capability | Isaac | ours | test (assertion) | result | verdict |
