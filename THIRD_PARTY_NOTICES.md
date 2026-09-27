@@ -188,9 +188,6 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
   `metalsim/tron1/sdk.py` mirrors the message field names, units and motor order of
   [limxdynamics/limxsdk-lowlevel](https://github.com/limxdynamics/limxsdk-lowlevel) (Apache-2.0) `datatypes.h`.
   The `limxsdk` binaries are not included; `metalsim/tron1/limx_bridge.py` imports them when installed on the robot.
-
-### Learners and RL libraries
-
 - rsl_rl ([leggedrobotics/rsl_rl](https://github.com/leggedrobotics/rsl_rl), `rsl-rl-lib` 3.1.2 on PyPI),
   BSD-3-Clause, copyright ETH Zurich and NVIDIA: optional dependency (`rslrl` extra), imported by
   `metalsim/learn/train_g1_rslrl.py`; `rslrl_adapter.py` implements its `VecEnv` interface.
