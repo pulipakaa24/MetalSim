@@ -87,3 +87,7 @@ published benchmark. Neither is cited as physics parity evidence.
    of PhysX contact reporting with a 3-step history.
 5. MuJoCo/OpenGL light intensities treated as π× radiance so tiers 0–2 match MuJoCo's brightness.
 6. Tier 2 ships without a denoiser; 1 spp rollouts are noisy by design (documented in `PARITY.md`).
+
+## Deferred work items
+
+- **MPM / particles** (Isaac Lab's PhysX particles, Newton's MPM): not started; explicitly deferred by the owner on 2026-09-27 (see GAPS). Start with a research round on the Isaac-side reference and the Newton/Genesis MPM solvers on Metal.
