@@ -795,6 +795,46 @@ new preset (53–116 vs 30–33 per 1000 steps); a policy retrained on the prese
 Rejected with numbers: τ 5 ms (exceeds PhysX's bounded force, doubles chatter), Isaac Lab 3.0's own
 mapping (same), elliptic cones (no slide gain, 3.8× cost), margin = gap (stands 1 cm high).
 
+**Peak contact penetration at impact against PhysX (2026-09-26, `docs/research/penetration_2026-09-26.md`,
+`runs/penetration/`).** The reference is Isaac Sim 5.1 GPU PhysX: `RigidContactView` separations per 5 ms step during
+the G1 1 m drop.
+- PhysX: 0.51 mm peak, 0.08 mm 55 ms later, 0.013 mm settled. Isaac Sim 6.1: 2.08 mm.
+- Same zero in both engines: PhysX reports the raw geometric separation with rest offset 0. Its speculative contact
+  applies 6.5 kN in the step whose pre-solve separation is +1.82 mm, before geometric contact.
+- `record_g1` now records, per substep, the deepest ground contact per foot and torso, and it runs each preset at its
+  own Newton cap (before: cap 10 for every preset).
+- MetalSim default (`recommended`): foot peak **13.25 mm** (12.79 at 5 ms ticks), deterministic across envs and repeats;
+  depth 1.53 mm 55 ms later; 0.25 mm settled. The earlier "1.55 cm" was cap 10 with the torso included.
+
+Sweep of 48 settings on top of the elliptic default. Impulse ratios are 0.97–0.995 and drop limit excursions
+0.0024–0.0040 rad for every setting.
+
+| setting | foot peak, substep / 5 ms tick (mm) | settle (mm) | 20 ms force ÷ PhysX land / drop-torso / hold | 5 ms force within PhysX bounds | closed-loop short contact phases | slide (Isaac −0.0127) | transfer error | cost |
+|---|---|---|---|---|---|---|---|---|
+| PhysX 5.1 | – / 0.51 | 0.013 | 1 / 1 / 1 | – | – | – | – | – |
+| **recommended** | 13.25 / 12.79 | 0.25 | 1.35 / 1.04–1.12 / 1.07 | yes | 36 % | −0.0130 | 0.060 m | 1.00× |
+| τ 7.5 ms (feet-only: same feet) | 11.02 / 11.02 | 0.14 | 1.27 / 1.21–1.23 / 1.08–1.20 | yes | 44 % | −0.0116 | 0.033 m (feet-only) | 1.00× |
+| τ 5 ms (the 2 dt floor) | 8.97 / 8.23 | 0.064 | 1.08 / 1.22 / 1.15 | no (torso +28 %) | 51 % | −0.0103 | 0.047 m | 0.98× |
+| feet-only τ 5 ms | 8.97 / 8.23 | 0.064 | 1.08 / 1.22 / 1.11 | yes | 51 % | −0.0102 | 0.040 m | 0.99× |
+| feet-only τ 5 ms, ζ 2 | 10.01 / 9.96 | 0.25 | 1.11 / 1.66 / 1.12 | yes | 35 % | −0.0096 | 0.037 m | 0.96× |
+| impedance d0 0.95–0.99, width 1–2 mm, dmax 0.9999, impratio 30 | 13.25–13.59 | 0.02–0.25 | 1.33–1.35 / 1.06–1.20 / 1.06–1.09 | yes | – | – | – | – |
+| ground margin 2 / 4 / 6 mm | 6.2 / 5.5 / 7.1 | rests 1.75 / 3.75 / 5.75 mm high | 1.03–1.15 / 1.13–1.67 / 1.09–1.15 | yes | – | – | – | – |
+| τ 2.5 ms @ 1.25 ms step (2× physics) | 2.63 / 2.50 | 0.016 | 0.85 / 1.23 / 1.25 | no | – | – | – | ~2× |
+| prototype speculative contacts (fork worktree, τ 5 ms, gap 10 mm) | 1.56 / 1.56 | 0.064 | 0.76 / 0.99 / 1.11 | torso +4 % | 0.4 % | −0.0137 | **0.117 m** | 1.00× |
+
+Reading:
+- On the stock fork the landing peak cannot go below ~8.4 mm at the 2.5 ms step. A corner gets a constraint row only
+  once it is inside `margin`, so a foot slapping onto its second edge travels a full substep through the plane first.
+- A margin detects early but rests the robot a margin high: MuJoCo centres the spring on dist = margin.
+- Every stock setting that reduces the peak loses one of the default's matches: the slide match (9–25 % below Isaac's
+  at 5–10× the seed noise), closed-loop chatter (τ 5 ms, ζ 1: short contact phases 36 → 51 %), or the torso-impact
+  forces.
+- **The default stays `recommended` (no training run).** The best stock trade-off is feet-only τ 7.5 ms, quantified in
+  the note.
+- The speculative-contact prototype gives a contact inside the ground gap PhysX's bias −(v + dist/h)/h. It reaches
+  PhysX's version spread and PhysX's recovery with 90 % less chatter. It regresses transfer of Isaac's checkpoints
+  (0.117 vs 0.060 m) and is archived as the next step (DECISIONS 2026-09-26).
+
 **The same protocol on Newton XPBD** (`scripts/diagnostics/newton_record_g1.py`, CPU device which
 matches Metal to ~1e-6, `runs/parity/report_newton_{it4_1p25ms,it4_0p625ms}`, measured 2026-09-24,
 Newton commit 45458023 with the angle-wrap clamp; MuJoCo Warp rows repeated for reference):

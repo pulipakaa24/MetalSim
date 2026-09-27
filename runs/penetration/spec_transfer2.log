@@ -1,0 +1,9 @@
+== stage transfer dt=0.0025 mjw=/Users/aditya/robosim/upstream/mujoco_warp-spec@bc83fb0 spec=1 presets=ellip10_tau5_specgap10mm ellip10_specgap10mm ellip10_tau7p5_specgap10mm ellip10_feet_tau5_specgap10mm Sat Sep 26 22:11:36 PDT 2026
+holder: {"name": "pen_spec_transfer2", "kind": "render", "minutes": 4.0, "pid": 89242, "start": 1790485896.816016, "queued": 1790485896.815667, "cmd": "scripts/diagnostics/penetration/sweep.sh transfer ellip10_tau5_specgap10mm ellip10_specgap10mm ellip10_tau7p5_specgap10mm ellip10_feet_tau5_specgap10mm", "cwd": "/Users/aditya/robosim"}
+install: newton {'path': '/Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton', 'url': 'https://github.com/newton-physics/newton', 'commit': '45458023f24629c1feffb1f336594808f537db14', 'editable': False} | warp {'path': '/Users/aditya/robosim/upstream/warp-innate/warp', 'git_head': 'c200d46b', 'git_dirty': False}
+| checkpoint | mjwarp:ellip10_tau5_specgap10mm x [m] / pelvis z [m] | mjwarp:ellip10_specgap10mm x [m] / pelvis z [m] | mjwarp:ellip10_tau7p5_specgap10mm x [m] / pelvis z [m] | mjwarp:ellip10_feet_tau5_specgap10mm x [m] / pelvis z [m] |
+|---|---|---|---|---|
+| Isaac it 500 | 3.32 (3.24-3.36) / 0.624 (0.62-0.63) | 3.31 (3.23-3.33) / 0.622 (0.62-0.63) | 3.32 (3.25-3.35) / 0.624 (0.62-0.63) | 3.32 (3.24-3.36) / 0.624 (0.62-0.63) |
+| Isaac it 1000 | 3.16 (3.12-3.20) / 0.631 (0.62-0.64) | 3.07 (3.02-3.14) / 0.630 (0.62-0.65) | 3.12 (3.08-3.16) / 0.631 (0.62-0.64) | 3.16 (3.12-3.20) / 0.631 (0.62-0.64) |
+| Isaac it 1499 | 3.19 (3.15-3.21) / 0.639 (0.63-0.65) | 3.13 (3.10-3.15) / 0.639 (0.63-0.65) | 3.16 (3.14-3.18) / 0.639 (0.63-0.65) | 3.19 (3.15-3.21) / 0.638 (0.63-0.65) |
+== stage transfer done Sat Sep 26 22:12:55 PDT 2026

@@ -1,0 +1,68 @@
+== stage cap dt=0.0025 mjw=f824af1 presets=recommended ellip10_feet_tau5 ellip10_feet_tau5_dr2 ellip10_feet_tau7p5 Sat Sep 26 21:46:24 PDT 2026
+holder: {"name": "pen_cap", "kind": "render", "minutes": 30.0, "pid": 84855, "start": 1790484384.5251641, "queued": 1790484384.5248628, "cmd": "scripts/diagnostics/penetration/sweep.sh cap recommended ellip10_feet_tau5 ellip10_feet_tau5_dr2 ellip10_feet_tau7p5", "cwd": "/Users/aditya/robosim"}
+  "max_dqvel": 3.6610472202301025,
+  "p99_dqvel_max": 0.001377153443172574,
+  "median_dqvel_max": 1.4930963516235352e-05,
+  "worlds_dqvel_gt_0.01_mean": 5.7,
+  "worlds_dqvel_gt_0.1_mean": 4.2,
+  "max_dqvel_in_hitting": 0.0
+ }
+}
+  "max_dqvel": 3.248277187347412,
+  "p99_dqvel_max": 0.0024005775339901447,
+  "median_dqvel_max": 0.00010175257921218872,
+  "worlds_dqvel_gt_0.01_mean": 12.5,
+  "worlds_dqvel_gt_0.1_mean": 4.1,
+  "max_dqvel_in_hitting": 0.0
+ }
+}
+  "max_dqvel": 5.1578850746154785,
+  "p99_dqvel_max": 0.0031957656610757113,
+  "median_dqvel_max": 2.384185791015625e-06,
+  "worlds_dqvel_gt_0.01_mean": 9.5,
+  "worlds_dqvel_gt_0.1_mean": 6.0,
+  "max_dqvel_in_hitting": 0.0
+ }
+}
+  "max_dqvel": 2.6614255905151367,
+  "p99_dqvel_max": 0.02053920552134514,
+  "median_dqvel_max": 0.00033214688301086426,
+  "worlds_dqvel_gt_0.01_mean": 42.7,
+  "worlds_dqvel_gt_0.1_mean": 14.1,
+  "max_dqvel_in_hitting": 0.0
+ }
+}
+  "max_dqvel": 6.571913719177246,
+  "p99_dqvel_max": 0.001279592514038086,
+  "median_dqvel_max": 3.516674041748047e-06,
+  "worlds_dqvel_gt_0.01_mean": 7.8,
+  "worlds_dqvel_gt_0.1_mean": 5.9,
+  "max_dqvel_in_hitting": 0.0
+ }
+}
+  "max_dqvel": 1.81752347946167,
+  "p99_dqvel_max": 0.0012118935119360685,
+  "median_dqvel_max": 9.506940841674805e-05,
+  "worlds_dqvel_gt_0.01_mean": 7.4,
+  "worlds_dqvel_gt_0.1_mean": 3.9,
+  "max_dqvel_in_hitting": 0.0
+ }
+}
+  "max_dqvel": 4.9283647537231445,
+  "p99_dqvel_max": 0.0019317135447636247,
+  "median_dqvel_max": 5.4836273193359375e-06,
+  "worlds_dqvel_gt_0.01_mean": 7.8,
+  "worlds_dqvel_gt_0.1_mean": 5.5,
+  "max_dqvel_in_hitting": 0.0
+ }
+}
+  "max_dqvel": 2.1374969482421875,
+  "p99_dqvel_max": 0.0043888092041015625,
+  "median_dqvel_max": 0.00015430152416229248,
+  "worlds_dqvel_gt_0.01_mean": 22.8,
+  "worlds_dqvel_gt_0.1_mean": 6.8,
+  "max_dqvel_in_hitting": 0.0
+ }
+}
+scripts/diagnostics/penetration/sweep.sh: line 41: syntax error near unexpected token `;;'
+scripts/diagnostics/penetration/sweep.sh: line 41: `y "$@" 2>&1 | grep -v "$F" ;;'
