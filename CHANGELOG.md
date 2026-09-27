@@ -5,6 +5,7 @@ commit order within each area (`git log` for the full messages). Dates are the c
 
 ## Physics: elliptic-cone premium (2026-09-26, `docs/research/elliptic_warmstart_2026-09-26.md`)
 
+- 09-26 MuJoCo Warp fork `metalsim-rough-ellip` d9ec218 (on `fork/metalsim` f824af1): the convex narrowphase's EPA / multi-contact scratch is allocated once per Data on Metal; graph captures kept one 2.8 GB copy per substep at 4096 worlds, so the G1 rough task at 2.5 ms (8 substeps) overflowed the 55.7 GB GPU working set under the elliptic default (`docs/research/rough_ellip_oom_2026-09-26.md`)
 - 09-26 MuJoCo Warp fork `metalsim-ellip-ws` (5d0d165 … 433c305): the fused per-iteration Newton launch covers elliptic cones (11 -> 5 launches per iteration, 128 lanes per world; bitwise on the CPU device, within the floor on Metal): G1 task ellip10 cap 20 loop 34.3 K -> 37.7 K env-steps/s; Warp fork 6bceb39d + MuJoCo Warp 21be81b: exact per-world early exit of the Newton loop in Metal graph replay through ICB indirect execution ranges (elliptic physics only 55.4 -> 47.7 ms, pyramidal 43.8 -> 39.7); 12cc1e2: line-search derivative noise floor `MJW_LS_NOISE_FLOOR` (Genesis #3382's rule; loop 37.5 K -> 38.1 K); extrapolated warm start `MJW_WARMSTART_EXTRAP` archived (tolerance-level state change, more worlds at the cap). Elliptic loop premium 1.68x -> 1.53x (1.50x with the floor). Scripts: `g1_newton_iters.py`, `ellip_fused_cpu_check.py`, `ls_noise_floor_check.py`, `cap_probe_variant.py`; `g1_solve_iteration_cost.py` rollout state.
 
 ## Install and packaging
