@@ -1,78 +1,46 @@
-# Draft pull request for google-deepmind/mujoco_warp (NOT opened; the owner's CLA and approval are needed)
+# Pull request for google-deepmind/mujoco_warp: ready, NOT opened (blocked on the owner's Google CLA)
 
-Branch: `elliptic-jtcj-offcuda` in the fork (github.com/pulipakaa24/mujoco_warp), one commit on top of upstream
-`main` `cc97eea`, worktree `upstream/mujoco_warp-pr`. No co-author trailer (upstream's CLA check rejects it).
-Measurements below: 2026-09-25, M4 Max (40-core GPU, 64 GB), Warp fork `metalsim` (Metal backend), MuJoCo Warp
-fork `metalsim` `07a51a6` (v3.14.0 + Metal device patch); the same change applies unmodified to `main`.
+Status 2026-09-26. Head: github.com/pulipakaa24/mujoco_warp branch `elliptic-jtcj-offcuda`, commit `6d8e29a`
+(one commit on upstream `main` `cc97eea`, which is still upstream's head; no rebase needed). Author and committer
+`Aditya Pulipaka <adipu@utexas.edu>`, no co-author trailer (upstream AGENTS.md: AI co-authors fail the CLA check).
+Commit message unwrapped per upstream AGENTS.md. Issue filed: https://github.com/google-deepmind/mujoco_warp/issues/1704.
+Worktree: `upstream/mujoco_warp-pr`.
+
+Checks run 2026-09-26 (CPU only; scratch venv from upstream's `uv.lock`: warp-lang 1.15.0, mujoco 3.13.1):
+- `pytest mujoco_warp/_src -q --cpu -n 8`: 1514 passed, 39 skipped, 1 failed
+  (`io_test::test_put_data_nefc_zero_dense`, fails identically on `main` `cc97eea`).
+- CPU timing (`scripts/diagnostics/competitors/elliptic_cpu_time.py 32 100`, Go2, 3 runs each, mujoco 3.14.0):
+  `main` 10.2 / 10.3 / 10.4 ms/step, branch 5.7 / 5.8 / 5.8. (The 12.8 -> 5.8 of 2026-09-25 was on the v3.14.0 fork.)
+- Oracle (`elliptic_cpu_check.py`, 2 worlds, 40 steps vs mj_step): Go2 max |dq| 1.8e-7 .. 2.4e-6 (main 1.8e-7 .. 2.3e-6),
+  G1 sparse 6.7e-8 .. 3.2e-7 on both.
+- Metal numbers are from the v3.14.0-based MetalSim fork (2026-09-25), not re-run (no GPU work in this session).
+
+To open once the CLA shows as signed (the owner runs this; it is the only step left):
+
+```
+gh pr create -R google-deepmind/mujoco_warp --head pulipakaa24:elliptic-jtcj-offcuda --base main \
+  --title "Size the elliptic-cone Hessian launch by world off CUDA" --body-file <the body below>
+```
+
+Then confirm the `cla/google` check is green; if it is red, the commit email (adipu@utexas.edu) or the GitHub
+username is not on the signed CLA.
 
 ---
 
 ## Title
 
-solver: world-major elliptic-cone Hessian term off CUDA (replaces the `dim_block = naconmax` fallback)
+Size the elliptic-cone Hessian launch by world off CUDA
 
-## Summary
+## Body
 
-`_update_gradient` launches the elliptic-cone Hessian term `_update_gradient_JTCJ_dense` as
-`dim=(dim_block, ndof_tri)`. On CUDA `dim_block` is sized from the SM count and each thread loops over contact
-slots in strides of `dim_block`. On every other device the fallback ("fall back for CPU") is
-`dim_block = d.naconmax`: one thread per contact slot per lower-triangle Hessian entry, 11 launches per step
-(one per Newton iteration). The launch scales with the contact *capacity*, not with the contacts that exist:
+Fixes #1704.
 
-- Go2 (Menagerie, `cone="elliptic"`), 4096 worlds, `naconmax` 196,608 (48 per world), 171 Hessian entries:
-  33.6 M threads per launch, of which > 99 % read `nacon` and return (~5 contacts per world exist).
-- Every active thread accumulates into `ctx_h[world, i, j]` with `+=`, which Warp lowers to an atomic add;
-  all contacts of a world contend on the same entries.
+Off CUDA, `_update_gradient` launched the elliptic-cone Hessian term `_update_gradient_JTCJ_dense` with `dim_block = d.naconmax` ("fall back for CPU"), i.e. one thread per contact slot per lower-triangle Hessian entry, once per Newton iteration. The launch scaled with the contact capacity instead of the contacts that exist (Go2 at 4096 worlds: 33.6 M threads per launch, more than 99 % of them returning immediately), and the active threads accumulated into `ctx_h` with atomics.
 
-This PR adds `_update_gradient_JTCJ_dense_world`, launched `dim=(nworld, ndof_tri)` off CUDA: each thread owns
-one (world, Hessian entry), scans its world's constraint rows (`nefc[world]`, so the launch is sized by the
-world count) for elliptic contacts in the CONE state, and writes its entry once. Same arithmetic per contact
-as `_update_gradient_JTCJ_dense` (the same `_elliptic_hessian_entry_from_projections` contraction), no atomics,
-and the contacts of a world are visited in constraint-row order, so the sum is deterministic. The CUDA path is
-unchanged.
+This adds `_update_gradient_JTCJ_dense_world`, launched with `dim=(nworld, ndof_tri)` on devices other than CUDA. Each thread owns one (world, Hessian entry), scans its world's constraint rows for elliptic contacts in the CONE state and writes its entry once. It uses the same `_elliptic_hessian_entry_from_projections` contraction as the contact-major kernel, has no atomics, and sums contacts in constraint-row order, so the result is deterministic. The CUDA path is unchanged.
 
-## Measurements
+On the Warp CPU device, the Go2 from MuJoCo Menagerie with its own `cone="elliptic" impratio="100"`, 32 worlds, Newton 10 iterations and 20 line-search iterations, goes from 10.2-10.4 to 5.7-5.8 ms/step against `main`. On a Metal port of Warp (M4 Max, the same change on v3.14.0) the cone term went from 72 % of the step to about 20 %, and throughput at 4096 worlds went from 240,281 to 553,510 steps/s.
 
-Go2 scene from MuJoCo Menagerie with its own `cone="elliptic" impratio="100"`, position-servo PD to random
-targets, 4 ms step, Newton 10 iterations / 20 line-search iterations, 1000 timed steps after 100 warm-up
-(script: MetalSim `scripts/diagnostics/competitors/metalsim_step.py`; profile: `metalsim_profile.py`).
+`pytest mujoco_warp/_src --cpu` passes except `io_test::test_put_data_nefc_zero_dense`, which fails the same way on `main`. Against `mj_step` on the CPU device with elliptic cones, Go2 (dense Jacobian) and G1 (sparse) stay within the same envelope as `main` over 40 steps (max |dq| 1.8e-7 to 2.4e-6 rad).
 
-| device | before (`dim_block = naconmax`) | after (world-major) |
-|---|---|---|
-| Metal (M4 Max), 4096 worlds, steps/s | 240,281 | 553,510 (2.30×) |
-| Metal, per-kernel GPU time of the cone term, ms/step (11 launches) | 9.71 (72 % of the step; other session's profile, same machine class) | 1.54 (20 %) |
-| Warp CPU device, 32 worlds, ms/step | 12.8 | 5.8 (2.2×) |
-
-Pyramidal cones on the same scene: 923,850 steps/s on Metal, so elliptic cones cost 1.67× after the change
-instead of 3.84×. The G1 (Menagerie, nv 35, MuJoCo Warp's `auto` Jacobian → sparse) does not take this kernel;
-its elliptic slowdown off CUDA has a different cause (one lane per constraint group in `_JTDACJ_sparse`, a
-separate change in the MetalSim fork, not part of this PR).
-
-## Correctness
-
-- `mujoco_warp/_src/solver_test.py` and `forward_test.py` on the CPU device: see the test count in the
-  commit message (run with `pytest --cpu`).
-- Go2 and G1 with elliptic cones vs MuJoCo C (`mj_step`), 2 worlds, PD to random targets on the CPU device:
-  max |dq| 1.8e-7 → 2.4e-6 rad over 40 steps, identical to the previous kernel's envelope
-  (MetalSim `scripts/diagnostics/competitors/elliptic_cpu_check.py`).
-- On Metal, 512 worlds × 200 steps under graph replay against the previous kernel: differences within the
-  run-to-run floor of two instances of the same configuration (MuJoCo Warp orders contacts nondeterministically);
-  the MuJoCo C oracle envelope (4 worlds, 100 steps) unchanged
-  (`scripts/diagnostics/competitors/elliptic_check.py`; numbers in MetalSim `docs/research/elliptic_cones_2026-09-25.md`).
-
-## Notes for reviewers
-
-- The CPU backend also takes the new kernel (measured above; the old fallback was written for it).
-- `wp.tid()` for `dim=(nworld, ndof_tri)` puts consecutive threads on consecutive Hessian entries of one world,
-  so the `efc_J[world, row, dof]` reads of a contact row are contiguous across the triangle's column index.
-- If a backend exposes `Device.sm_count` (Warp's Metal backend reports its GPU core count there), the contact-major
-  kernel with `dim_block = ceil(sm_count * 6 * 256 / ndof_tri)` measures the same as the world-major one on Metal
-  (538,057 vs 553,510 steps/s at factor 6; 483,040 at factor 2; 551,979 at factor 16), so the SM-sized form is
-  not specific to CUDA; the world-major kernel was preferred for the PR because it has no tuning factor, no
-  atomics, and a deterministic sum.
-- The MetalSim fork additionally carries a two-pass form (`MJW_JTCJ_MODE=world2`: one thread per world lists its
-  cone contacts and curvature terms, then the entry threads apply the list; Go2 580,420 and G1-dense 144,348 vs
-  553,510 / 126,568 for the one-pass kernel). It needs three workspace arrays on the solver context, so it is
-  left out of this PR; it can follow if the one-pass form is accepted.
-- The kernel uses `main`'s scale-invariant cone contraction (`bc8ed60`, #1660), so
-  `test_elliptic_hessian_scale_invariance` passes on the CPU for both Jacobian layouts.
+One tradeoff: I also tried the existing contact-major kernel with `dim_block` sized from a core count on the Metal backend, which exposes `Device.sm_count`. It performed about the same as this kernel there (538,057 vs 553,510 steps/s at the CUDA factor of 6). I went with the world-major kernel because it has no tuning factor and no atomics, and its summation order is deterministic.
