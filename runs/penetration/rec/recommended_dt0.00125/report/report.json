@@ -1,0 +1,221 @@
+{
+ "physics": {
+  "A_hold": {
+   "steps": 150,
+   "joint_rmse_rad": {
+    "t0.5s": 0.004921722691506147,
+    "t1s": 0.00225398363545537,
+    "t2s": 0.0150365075096488,
+    "end": 0.013885997235774994,
+    "max": 0.03797358274459839
+   },
+   "divergence_step_0.1rad": 67,
+   "divergence_time_s": 1.34,
+   "root_height": {
+    "isaac_end": 0.05380211025476456,
+    "metalsim_end": 0.0548306442797184,
+    "rmse": 0.01144640613347292
+   },
+   "root_orientation_err_rad": {
+    "mean": 0.012812531553208828,
+    "max": 0.078346386551857
+   },
+   "peak_joint_speed_rad_s": {
+    "isaac": 6.861039161682129,
+    "metalsim": 6.808245658874512
+   },
+   "contact_force_N": {
+    "isaac_mean_total": 302.4049377441406,
+    "metalsim_mean_total": 299.87725830078125,
+    "isaac_peak": 712.2770385742188,
+    "metalsim_peak": 2227.48291015625
+   },
+   "torque_rms_Nm": {
+    "isaac": 5.288428783416748,
+    "metalsim": 5.250599384307861
+   },
+   "penetration_m": {
+    "metalsim_max": 0.012349548749625683,
+    "metalsim_mean_when_in_contact": 0.0005257820594124496,
+    "isaac": null
+   },
+   "limit_excursion_rad": {
+    "isaac_max_ctrl": 0.004741529049704041,
+    "metalsim_max_ctrl": 0.002235034527609314,
+    "isaac_steps_over_0.01": 0,
+    "metalsim_steps_over_0.01": 0,
+    "metalsim_max_substep": 0.0026456713676452637
+   },
+   "contact_momentum": {
+    "whole_run": {
+     "max_20ms_mean_force_N": {
+      "isaac": 2190.356536745075,
+      "metalsim": 2354.916514150905
+     }
+    },
+    "torso": {
+     "steps": [
+      56,
+      90
+     ],
+     "impulse_Ns": {
+      "isaac": 253.64531826700193,
+      "metalsim": 250.69182378523786,
+      "ratio": 0.9883558091986738
+     },
+     "max_20ms_mean_force_N": {
+      "isaac": 2190.356536745075,
+      "metalsim": 2354.916514150905,
+      "ratio": 1.0751293109798328
+     }
+    }
+   },
+   "_note_contact_force_N": "sampled peaks (isaac_peak / metalsim_peak) depend on each sensor's reporting window (Isaac: last 5 ms PhysX step; ours: last 2.5 ms substep); rank on contact_momentum"
+  },
+  "B_random": {
+   "steps": 250,
+   "joint_rmse_rad": {
+    "t0.5s": 0.046795595437288284,
+    "t1s": 0.12724487483501434,
+    "t2s": 0.10644480586051941,
+    "end": 0.0651492103934288,
+    "max": 0.2264680415391922
+   },
+   "divergence_step_0.1rad": 1,
+   "divergence_time_s": 0.02,
+   "root_height": {
+    "isaac_end": 0.14033684134483337,
+    "metalsim_end": 0.18436363339424133,
+    "rmse": 0.11814579367637634
+   },
+   "root_orientation_err_rad": {
+    "mean": 0.7201014161109924,
+    "max": 1.9977229833602905
+   },
+   "peak_joint_speed_rad_s": {
+    "isaac": 32.00001525878906,
+    "metalsim": 45.92665100097656
+   },
+   "contact_force_N": {
+    "isaac_mean_total": 329.4166564941406,
+    "metalsim_mean_total": 410.5560607910156,
+    "isaac_peak": 2847.163330078125,
+    "metalsim_peak": 3498.830810546875
+   },
+   "torque_rms_Nm": {
+    "isaac": 29.949527740478516,
+    "metalsim": 27.54817771911621
+   },
+   "penetration_m": {
+    "metalsim_max": 0.036937955766916275,
+    "metalsim_mean_when_in_contact": 0.008114539086818695,
+    "isaac": null
+   },
+   "limit_excursion_rad": {
+    "isaac_max_ctrl": 0.001549847513316993,
+    "metalsim_max_ctrl": 0.05611317604780197,
+    "isaac_steps_over_0.01": 0,
+    "metalsim_steps_over_0.01": 135,
+    "metalsim_max_substep": 0.061599910259246826
+   },
+   "contact_momentum": {
+    "whole_run": {
+     "max_20ms_mean_force_N": {
+      "isaac": 2483.6350899636177,
+      "metalsim": 3761.729948805599
+     }
+    }
+   },
+   "_note_contact_force_N": "sampled peaks (isaac_peak / metalsim_peak) depend on each sensor's reporting window (Isaac: last 5 ms PhysX step; ours: last 2.5 ms substep); rank on contact_momentum"
+  },
+  "C_drop": {
+   "steps": 150,
+   "joint_rmse_rad": {
+    "t0.5s": 0.007044402416795492,
+    "t1s": 0.014255483634769917,
+    "t2s": 0.016929320991039276,
+    "end": 0.015887415036559105,
+    "max": 0.06263257563114166
+   },
+   "divergence_step_0.1rad": 0,
+   "divergence_time_s": 0.0,
+   "root_height": {
+    "isaac_end": 0.05380271375179291,
+    "metalsim_end": 0.05492536723613739,
+    "rmse": 0.02913782373070717
+   },
+   "root_orientation_err_rad": {
+    "mean": 0.048990365117788315,
+    "max": 0.20050065219402313
+   },
+   "peak_joint_speed_rad_s": {
+    "isaac": 10.601576805114746,
+    "metalsim": 8.949396133422852
+   },
+   "contact_force_N": {
+    "isaac_mean_total": 288.4056701660156,
+    "metalsim_mean_total": 327.9613037109375,
+    "isaac_peak": 1029.7064208984375,
+    "metalsim_peak": 3043.779052734375
+   },
+   "torque_rms_Nm": {
+    "isaac": 6.169229030609131,
+    "metalsim": 5.876568794250488
+   },
+   "penetration_m": {
+    "metalsim_max": 0.013608328066766262,
+    "metalsim_mean_when_in_contact": 0.0005819717771373689,
+    "isaac": null
+   },
+   "limit_excursion_rad": {
+    "isaac_max_ctrl": 0.003954390110800232,
+    "metalsim_max_ctrl": 0.0007097516678070681,
+    "isaac_steps_over_0.01": 0,
+    "metalsim_steps_over_0.01": 0,
+    "metalsim_max_substep": 0.0028058290481567383
+   },
+   "contact_momentum": {
+    "whole_run": {
+     "max_20ms_mean_force_N": {
+      "isaac": 2199.736538351983,
+      "metalsim": 3769.251738417619
+     }
+    },
+    "landing": {
+     "steps": [
+      6,
+      30
+     ],
+     "impulse_Ns": {
+      "isaac": 194.50607058346452,
+      "metalsim": 193.32319440494075,
+      "ratio": 0.9939185642125438
+     },
+     "max_20ms_mean_force_N": {
+      "isaac": 1996.4690885128043,
+      "metalsim": 2652.5159637343468,
+      "ratio": 1.328603572675518
+     }
+    },
+    "torso": {
+     "steps": [
+      56,
+      90
+     ],
+     "impulse_Ns": {
+      "isaac": 245.8360484363796,
+      "metalsim": 239.66863485000943,
+      "ratio": 0.9749124929984943
+     },
+     "max_20ms_mean_force_N": {
+      "isaac": 2199.736538351983,
+      "metalsim": 3769.251738417619,
+      "ratio": 1.7135014456056172
+     }
+    }
+   },
+   "_note_contact_force_N": "sampled peaks (isaac_peak / metalsim_peak) depend on each sensor's reporting window (Isaac: last 5 ms PhysX step; ours: last 2.5 ms substep); rank on contact_momentum"
+  }
+ },
+ "render": {}
+}

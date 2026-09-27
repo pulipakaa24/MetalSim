@@ -1,0 +1,9 @@
+== stage transfer dt=0.0025 mjw=f824af1 presets=ellip10_feet_tau5_dr2 ellip10_feet_tau7p5 ellip10_feet_tau5_dr1p5 Sat Sep 26 21:43:48 PDT 2026
+holder: {"name": "pen_transfer2", "kind": "render", "minutes": 4.0, "pid": 84178, "start": 1790484228.50257, "queued": 1790484228.502198, "cmd": "scripts/diagnostics/penetration/sweep.sh transfer ellip10_feet_tau5_dr2 ellip10_feet_tau7p5 ellip10_feet_tau5_dr1p5", "cwd": "/Users/aditya/robosim"}
+install: newton {'path': '/Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton', 'url': 'https://github.com/newton-physics/newton', 'commit': '45458023f24629c1feffb1f336594808f537db14', 'editable': False} | warp {'path': '/Users/aditya/robosim/upstream/warp-innate/warp', 'git_head': 'c200d46b', 'git_dirty': False}
+| checkpoint | mjwarp:ellip10_feet_tau5_dr2 x [m] / pelvis z [m] | mjwarp:ellip10_feet_tau7p5 x [m] / pelvis z [m] | mjwarp:ellip10_feet_tau5_dr1p5 x [m] / pelvis z [m] |
+|---|---|---|---|
+| Isaac it 500 | 3.26 (3.18-3.32) / 0.622 (0.62-0.63) | 3.24 (3.16-3.28) / 0.625 (0.62-0.63) | 3.28 (3.22-3.33) / 0.625 (0.62-0.63) |
+| Isaac it 1000 | 3.05 (3.02-3.12) / 0.635 (0.62-0.65) | 3.01 (2.97-3.08) / 0.634 (0.62-0.65) | 3.07 (3.05-3.11) / 0.633 (0.62-0.64) |
+| Isaac it 1499 | 3.12 (3.08-3.14) / 0.637 (0.63-0.65) | 3.07 (3.04-3.09) / 0.636 (0.63-0.65) | 3.13 (3.11-3.15) / 0.638 (0.63-0.65) |
+== stage transfer done Sat Sep 26 21:44:49 PDT 2026

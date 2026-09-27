@@ -1,6 +1,6 @@
 """Physics-only throughput of the G1 under each contact/limit tuning (metalsim.physics.contact_tuning),
 MuJoCo Warp, 4096 worlds, 2.5 ms step, 8 substeps per control step (the replay/training setting),
-10 Newton / 20 line-search iterations, nconmax 32, njmax 256. Each timing starts from the standing
+the preset's Newton cap (10 unless the preset sets solver_iterations; before 2026-09-26 always 10) / 20 line-search iterations, nconmax 32, njmax 256. Each timing starts from the standing
 keyframe with the default-pose PD targets and simulates 3 s (150 control steps: the stand, the forward
 fall and the torso contact, as protocol A_hold), graph replay, synchronized; settings interleaved,
 3 repeats, median and min reported. Prints the GPU queue status first.
@@ -38,7 +38,8 @@ def main():
     for nm in names:
         m, _ = build_g1_model("flat", physics_dt=DT)
         contact_tuning.apply(m, nm)
-        sim = BatchSim(m, N, options=BatchSimOptions(substeps=8, njmax=256, nconmax=32, solver_iterations=10, ls_iterations=20))
+        cap = contact_tuning.PRESETS[nm].solver_iterations or 10        # the preset's Newton cap, as G1VelocityTask uses it
+        sim = BatchSim(m, N, options=BatchSimOptions(substeps=8, njmax=256, nconmax=32, solver_iterations=cap, ls_iterations=20))
         q = np.tile(m.key_qpos[0], (N, 1)).astype(np.float32)
         q[:, 0] = (np.arange(N) % 64) * 2.5; q[:, 1] = (np.arange(N) // 64) * 2.5
         ctrl = torch.as_tensor(np.tile(m.key_qpos[0][7:], (N, 1)).astype(np.float32))

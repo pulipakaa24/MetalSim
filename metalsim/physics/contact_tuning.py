@@ -52,6 +52,8 @@ class Tuning:
                                         # Warp collision_core.contact_margin_gap), so margin on the ground alone
                                         # gives every ground pair exactly that margin; MuJoCo Warp rejects
                                         # margin on mesh-mesh pairs with MULTICCD (e.g. foot-foot)
+    geom_contact: tuple | None = None   # ((geom names), solref, solimp, priority): per-geom contact parameters applied after
+                                        # the global ones; the pair takes the higher-priority geom's solref/solimp (MuJoCo mixing)
     note: str = ""
 
 
@@ -163,6 +165,18 @@ def apply(m, tuning: str | Tuning):
     """Apply a preset name or a ``Tuning`` to an MjModel (in place, returned) or MjSpec."""
     t = PRESETS[tuning] if isinstance(tuning, str) else tuning
     set_contacts(m, t.contact_solref, t.contact_solimp, t.margin, t.gap, margin_geoms=t.margin_geoms)
+    if t.geom_contact is not None:
+        names, sr, si, prio = t.geom_contact
+        if isinstance(m, mujoco.MjSpec):
+            set_contacts(m, sr, si, geoms=names)
+            for g in m.geoms:
+                if g.name in names: g.priority = prio
+        else:
+            ids = np.array([mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_GEOM, nm) for nm in names])
+            if (ids < 0).any():
+                raise ValueError(f"geom_contact geoms {names} not all in the model")
+            set_contacts(m, sr, si, geoms=ids)
+            m.geom_priority[ids] = prio
     set_joint_limits(m, t.limit_solref, t.limit_solimp)
     set_solver(m, t.cone, t.impratio, t.solver_iterations)
     if t.friction is not None:
@@ -281,3 +295,88 @@ PRESETS.update({
 # "recommended_pyramidal" (the previous default, tau10_impact_hardlimits) or "default" (MuJoCo's contacts); CLI --contact_cfg.
 PRESETS["recommended_pyramidal"] = PRESETS["tau10_impact_hardlimits"]
 PRESETS["recommended"] = PRESETS["tau10_impact_hardlimits_ellip10"]
+
+# 2026-09-26 penetration sweep (docs/research/penetration_2026-09-26.md): variants of the elliptic default
+# (tau10_impact_hardlimits_ellip10) that try to close the peak-penetration gap to PhysX (G1 1 m drop: PhysX 0.51 mm, ours
+# 1.55 cm). Each changes ONE thing (or the named combination) and keeps elliptic cones, hard limits and the Newton cap 20.
+# Kept as named presets so every measured setting stays reproducible (DECISIONS row 2026-09-26, penetration sweep).
+_E10 = PRESETS["tau10_impact_hardlimits_ellip10"]
+
+
+def _e10(suffix, *, solref=None, solimp=None, margin=None, gap=None, impratio=None, geom_contact=None, note=""):
+    s_imp = list(_E10.contact_solimp)
+    for i, v in (solimp or {}).items():
+        s_imp[i] = v
+    return Tuning(contact_solref=solref or _E10.contact_solref, contact_solimp=tuple(s_imp),
+                  margin=margin if margin is not None else (0.0 if gap is not None else None),
+                  gap=gap if gap is not None else (0.0 if margin is not None else None),
+                  margin_geoms=("ground",) if (margin is not None or gap is not None) else None,
+                  limit_solref=_E10.limit_solref, limit_solimp=_E10.limit_solimp, cone="elliptic",
+                  impratio=impratio or _E10.impratio, solver_iterations=20, geom_contact=geom_contact,
+                  note=f"elliptic default (tau10 impact, ellip10, cap 20, hard limits) with {note or suffix}")
+
+
+_PEN = {
+    # (a) contact time constant (5 ms = the refsafe floor 2 dt at 2.5 ms; 2.5 ms needs dt 1.25 ms)
+    "tau7p5": dict(solref=(0.0075, 1.0), note="contact tau 7.5 ms"),
+    "tau5": dict(solref=(0.005, 1.0), note="contact tau 5 ms"),
+    "tau2p5": dict(solref=(0.0025, 1.0), note="contact tau 2.5 ms (only meaningful at dt <= 1.25 ms)"),
+    # (b) impedance ramp (d0, dmax, width)
+    "d095": dict(solimp={0: 0.95}, note="impedance d0 0.95"),
+    "d099": dict(solimp={0: 0.99}, note="impedance d0 0.99"),
+    "dmax9999": dict(solimp={1: 0.9999}, note="impedance dmax 0.9999"),
+    "w2mm": dict(solimp={2: 0.002}, note="impedance width 2 mm"),
+    "w1mm": dict(solimp={2: 0.001}, note="impedance width 1 mm"),
+    # (c) margin on the ground plane (MuJoCo's activation distance; the constraint acts on dist - margin)
+    "margin2mm": dict(margin=0.002, note="ground margin 2 mm"),
+    "margin4mm": dict(margin=0.004, note="ground margin 4 mm"),
+    "margin6mm": dict(margin=0.006, note="ground margin 6 mm"),
+    # (d) impratio
+    "imp30": dict(impratio=30.0, note="impratio 30"),
+}
+_FEET = ("Cube", "right_ankle_roll_link_Cube")       # the G1 foot colliders (Isaac's asset: left foot's collider is "Cube")
+_PEN.update({
+    # second round, around tau 5 ms (the refsafe floor): damping ratio (lowers the spring, keeps the damper), impedance, cone,
+    # a feet-only variant (torso-ground keeps tau 10 ms), and the margin trade at tau 5 ms
+    "tau6": dict(solref=(0.006, 1.0), note="contact tau 6 ms"),
+    "tau5_dr1p5": dict(solref=(0.005, 1.5), note="contact tau 5 ms, damping ratio 1.5"),
+    "tau5_dr2": dict(solref=(0.005, 2.0), note="contact tau 5 ms, damping ratio 2"),
+    "tau5_d08": dict(solref=(0.005, 1.0), solimp={0: 0.8}, note="contact tau 5 ms, impedance d0 0.8"),
+    "tau5_d095": dict(solref=(0.005, 1.0), solimp={0: 0.95}, note="contact tau 5 ms, impedance d0 0.95"),
+    "tau5_w2mm": dict(solref=(0.005, 1.0), solimp={2: 0.002}, note="contact tau 5 ms, impedance width 2 mm"),
+    "tau5_w10mm": dict(solref=(0.005, 1.0), solimp={2: 0.01}, note="contact tau 5 ms, impedance width 10 mm"),
+    "tau5_dmax9999": dict(solref=(0.005, 1.0), solimp={1: 0.9999}, note="contact tau 5 ms, impedance dmax 0.9999"),
+    "tau5_imp30": dict(solref=(0.005, 1.0), impratio=30.0, note="contact tau 5 ms, impratio 30"),
+    "tau5_margin6mm": dict(solref=(0.005, 1.0), margin=0.006, note="contact tau 5 ms, ground margin 6 mm"),
+    "tau5_margin8mm": dict(solref=(0.005, 1.0), margin=0.008, note="contact tau 5 ms, ground margin 8 mm"),
+    "feet_tau5": dict(geom_contact=(_FEET, (0.005, 1.0), _E10.contact_solimp, 1), note="feet-ground contacts at tau 5 ms (foot geoms priority 1), torso-ground tau 10 ms"),
+    "feet_tau2p5": dict(geom_contact=(_FEET, (0.0025, 1.0), _E10.contact_solimp, 1), note="feet-ground contacts at tau 2.5 ms (foot geoms priority 1; only meaningful at dt <= 1.25 ms), torso-ground tau 10 ms"),
+    "feet_tau5_dr1p5": dict(geom_contact=(_FEET, (0.005, 1.5), _E10.contact_solimp, 1), note="feet-ground contacts at tau 5 ms, damping ratio 1.5 (foot geoms priority 1), torso-ground tau 10 ms"),
+    "feet_tau5_d08": dict(geom_contact=(_FEET, (0.005, 1.0), (0.8,) + tuple(_E10.contact_solimp[1:]), 1), note="feet-ground contacts at tau 5 ms, impedance d0 0.8 (foot geoms priority 1), torso-ground tau 10 ms"),
+    "feet_tau7p5": dict(geom_contact=(_FEET, (0.0075, 1.0), _E10.contact_solimp, 1), note="feet-ground contacts at tau 7.5 ms (foot geoms priority 1), torso-ground tau 10 ms"),
+    # damping ratio below 1 at the floor: tau 5 ms with dampratio 0.5 is b = 1/h, k = 1/h^2 at h = 2.5 ms, i.e. PhysX's
+    # velocity-level bias with Baumgarte factor 1 (resting depth a_u (1 - d) h^2, 4x below tau 5 ms / dampratio 1)
+    "tau5_dr0p5": dict(solref=(0.005, 0.5), note="contact tau 5 ms, damping ratio 0.5"),
+    "tau5_dr0p7": dict(solref=(0.005, 0.7), note="contact tau 5 ms, damping ratio 0.7"),
+    "feet_tau5_dr0p5": dict(geom_contact=(_FEET, (0.005, 0.5), _E10.contact_solimp, 1), note="feet-ground contacts at tau 5 ms, damping ratio 0.5 (foot geoms priority 1), torso-ground tau 10 ms"),
+    "feet_tau5_dr0p7": dict(geom_contact=(_FEET, (0.005, 0.7), _E10.contact_solimp, 1), note="feet-ground contacts at tau 5 ms, damping ratio 0.7 (foot geoms priority 1), torso-ground tau 10 ms"),
+    "feet_tau5_dr2": dict(geom_contact=(_FEET, (0.005, 2.0), _E10.contact_solimp, 1), note="feet-ground contacts at tau 5 ms, damping ratio 2 (foot geoms priority 1), torso-ground tau 10 ms"),
+})
+_PEN.update({
+    # EXPERIMENTAL, need the MuJoCo Warp prototype worktree upstream/mujoco_warp-spec with MJW_SPECULATIVE_GAP=1 (fork f824af1 +
+    # constraint rows for every detected contact): the ground gap then acts as a speculative contact distance (rows with
+    # pos = dist > 0 that push only when the approach would close the gap), the MuJoCo analogue of PhysX's contact offset with
+    # rest offset 0. On the stock fork gap-zone contacts are inactive and these presets equal their base preset.
+    "specgap10mm": dict(gap=0.01, note="ground gap 10 mm as speculative contact distance (prototype fork only)"),
+    "tau5_specgap10mm": dict(solref=(0.005, 1.0), gap=0.01, note="contact tau 5 ms, ground gap 10 mm as speculative contact distance (prototype fork only)"),
+    "tau7p5_specgap10mm": dict(solref=(0.0075, 1.0), gap=0.01, note="contact tau 7.5 ms, ground gap 10 mm as speculative contact distance (prototype fork only)"),
+    "tau5_specgap20mm": dict(solref=(0.005, 1.0), gap=0.02, note="contact tau 5 ms, ground gap 20 mm as speculative contact distance (prototype fork only)"),
+    "feet_tau5_specgap10mm": dict(geom_contact=(_FEET, (0.005, 1.0), _E10.contact_solimp, 1), gap=0.01,
+                                  note="feet-ground tau 5 ms (priority 1), torso-ground tau 10 ms, ground gap 10 mm as speculative contact distance (prototype fork only)"),
+    "tau5_dr0p5_specgap10mm": dict(solref=(0.005, 0.5), gap=0.01, note="contact tau 5 ms, damping ratio 0.5, ground gap 10 mm as speculative contact distance (prototype fork only)"),
+})
+PRESETS.update({f"ellip10_{k}": _e10(k, **v) for k, v in _PEN.items()})
+# Result (measured 2026-09-26, runs/penetration/sweep_table.md): the default's landing foot peak is 13.25 mm (PhysX 0.51); no
+# stock preset goes below ~8.4 mm at 2.5 ms (a corner gets a row only inside margin), and every reduction loses a current match
+# (slide, closed-loop chatter, torso 5 ms force, or a margin-high rest), so "recommended" is unchanged (DECISIONS 2026-09-26).
+# Best stock trade-off: ellip10_feet_tau7p5. The speculative-gap presets need the prototype fork (see above).

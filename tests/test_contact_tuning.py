@@ -50,3 +50,23 @@ def test_elliptic_presets_set_cone_and_impratio():
     assert g1m.opt.cone == mujoco.mjtCone.mjCONE_ELLIPTIC and g1m.opt.impratio == 10.0
     assert np.allclose(g1m.geom_solref, [0.01, 1.0]) and np.allclose(g1m.geom_solimp[:, :3], [0.9, 0.999, 0.005])
     assert np.allclose(g1m.jnt_solref[g1m.jnt_limited.astype(bool)], [0.005, 1.0])
+
+
+def test_penetration_sweep_presets():
+    """2026-09-26 penetration sweep: one change on top of the elliptic default; per-geom (feet-only) contact parameters
+    take priority; margin / gap only on the ground."""
+    base = ct.PRESETS["recommended"]
+    t = ct.PRESETS["ellip10_tau5"]
+    assert t.contact_solref == (0.005, 1.0) and t.contact_solimp == base.contact_solimp and t.cone == "elliptic"
+    assert t.impratio == 10.0 and t.solver_iterations == 20 and t.limit_solref == base.limit_solref
+    assert ct.PRESETS["ellip10_d099"].contact_solimp[0] == 0.99 and ct.PRESETS["ellip10_imp30"].impratio == 30.0
+    m = mujoco.MjModel.from_xml_string(XML)
+    feet = ct.Tuning(contact_solref=(0.01, 1.0), geom_contact=(("a",), (0.005, 1.0), (0.9, 0.999, 0.005, 0.5, 2.0), 1))
+    ct.apply(m, feet)
+    assert m.geom_solref.tolist() == [[0.01, 1.0], [0.005, 1.0], [0.01, 1.0]] and m.geom_priority.tolist() == [0, 1, 0]
+    s = mujoco.MjSpec.from_string(XML); ct.apply(s, feet); m2 = s.compile()
+    assert np.allclose(m2.geom_solref, m.geom_solref) and m2.geom_priority.tolist() == [0, 1, 0]
+    m = mujoco.MjModel.from_xml_string(XML); ct.apply(m, "ellip10_margin4mm")
+    assert m.geom_margin.tolist() == [0.004, 0, 0] and m.geom_gap.tolist() == [0, 0, 0]
+    m = mujoco.MjModel.from_xml_string(XML); ct.apply(m, "ellip10_specgap10mm")
+    assert m.geom_margin.tolist() == [0, 0, 0] and m.geom_gap.tolist() == [0.01, 0, 0]

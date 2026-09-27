@@ -33,6 +33,42 @@ def _substep_penetration(nacon: wp.array(dtype=int), dist: wp.array(dtype=float)
 
 
 @wp.kernel
+def _substep_body_dist(ctr: wp.array(dtype=int), nacon: wp.array(dtype=int), dist: wp.array(dtype=float), geom: wp.array(dtype=wp.vec2i),
+                       worldid: wp.array(dtype=int), gcls: wp.array(dtype=int), ground: int, out: wp.array3d(dtype=float)):
+    """Signed distance of the deepest ground contact per body class (left foot, right foot, torso) in this substep: every
+    detected contact (positive = inside the margin, as PhysX reports contacts inside its contact offset). The contacts of
+    substep s come from the pose at its start (= end of substep s-1), like PhysX's contacts of step k (pose after k-1)."""
+    c = wp.tid()
+    if c >= nacon[0]:
+        return
+    g0 = geom[c][0]; g1 = geom[c][1]; k = int(-1)
+    if g0 == ground:
+        k = gcls[g1]
+    elif g1 == ground:
+        k = gcls[g0]
+    if k < 0:
+        return
+    wp.atomic_min(out, ctr[0], worldid[c], k, dist[c])
+
+
+@wp.kernel
+def _substep_force_niter(ctr: wp.array(dtype=int), net: wp.array3d(dtype=float), rows: wp.array(dtype=int), niter: wp.array(dtype=int),
+                         fout: wp.array3d(dtype=float), nout: wp.array2d(dtype=int)):
+    w, k = wp.tid()
+    s = ctr[0]
+    r = rows[k]
+    if r >= 0:
+        fout[s, w, k] = wp.sqrt(net[w, r, 0] * net[w, r, 0] + net[w, r, 1] * net[w, r, 1] + net[w, r, 2] * net[w, r, 2])
+    if k == 0:
+        nout[s, w] = niter[w]
+
+
+@wp.kernel
+def _bump_ctr(ctr: wp.array(dtype=int)):
+    ctr[0] = ctr[0] + 1
+
+
+@wp.kernel
 def _substep_limit_excursion(qpos: wp.array2d(dtype=float), adr: wp.array(dtype=int), lo: wp.array(dtype=float),
                              hi: wp.array(dtype=float), exc: wp.array(dtype=float)):
     w, j = wp.tid()
@@ -81,6 +117,8 @@ def main():
     ap.add_argument("--solver_cfg", default=None, choices=sorted(solver_presets.PRESETS),
                     help="metalsim.physics.solver_presets preset (e.g. isaaclab3: Isaac Lab 3.0's own MuJoCo Warp settings), "
                          "applied after --contact_tuning")
+    ap.add_argument("--solver_iterations", type=int, default=None,
+                    help="Newton iteration cap (default: the contact preset's solver_iterations, else 10, as G1VelocityTask)")
     ap.add_argument("--no_render", action="store_true", help="physics only (no tier 2 / tier 0 frames)")
     ap.add_argument("--tier2_mode", default="rtx", help="tier-2 preset of metalsim.render.rtx_parity: rtx (the RTX-parity default), "
                     "legacy (MuJoCo-unit lights, linear clamp: the renderer before 2026-09-25), or any preset name")
@@ -102,7 +140,8 @@ def main():
     act_of_joint = {mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_JOINT, m.actuator_trnid[i][0]): i for i in range(m.nu)}
     act_isaac = np.array([act_of_joint[n] for n in isaac_joints])
     n = a.num_envs; dec = int(round(meta["control_dt"] / a.physics_dt))
-    bso = dict(substeps=dec, njmax=256, nconmax=32, solver_iterations=10, ls_iterations=20)
+    cap = a.solver_iterations or contact_tuning.PRESETS[a.contact_tuning].solver_iterations or 10
+    bso = dict(substeps=dec, njmax=256, nconmax=32, solver_iterations=cap, ls_iterations=20)
     if a.solver_cfg:
         bso = solver_presets.batch_options(a.solver_cfg, **bso)
     sim = BatchSim(m, n, options=BatchSimOptions(**bso))
@@ -125,9 +164,24 @@ def main():
     lim_lo = wp.array(np.array([m.jnt_range[j][0] for j in lim], np.float32), dtype=float, device=dev)
     lim_hi = wp.array(np.array([m.jnt_range[j][1] for j in lim], np.float32), dtype=float, device=dev)
     pen = wp.zeros(n, dtype=float, device=dev); exc = wp.zeros(n, dtype=float, device=dev)
+    # per-substep, per body class (left foot, right foot, torso): deepest ground-contact signed distance, |net normal force|,
+    # and the Newton iterations used (for the like-for-like penetration profile against PhysX's per-5 ms recording)
+    cls_bodies = ("left_ankle_roll_link", "right_ankle_roll_link", "torso_link")
+    gcls_np = np.full(m.ngeom, -1, np.int32)
+    for k_, nm in enumerate(cls_bodies):
+        gcls_np[m.geom_bodyid == mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, nm)] = k_
+    ground_id = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_GEOM, "ground")
+    gcls = wp.array(gcls_np, dtype=int, device=dev)
+    ctr = wp.zeros(1, dtype=int, device=dev)
+    sub_dist = wp.zeros((dec, n, 3), dtype=float, device=dev); sub_f = wp.zeros((dec, n, 3), dtype=float, device=dev)
+    sub_it = wp.zeros((dec, n), dtype=int, device=dev)
+    rows = wp.array(np.array([cs_index.get(nm, -1) for nm in cls_bodies], np.int32), dtype=int, device=dev)
     def _hook():
         wp.launch(_substep_penetration, dim=sim.d.naconmax, device=dev, inputs=[sim.d.nacon, sim.d.contact.dist, sim.d.contact.worldid, sim.d.contact.efc_address, pen])
         wp.launch(_substep_limit_excursion, dim=(n, len(lim)), device=dev, inputs=[sim.d.qpos, lim_adr, lim_lo, lim_hi, exc])
+        wp.launch(_substep_body_dist, dim=sim.d.naconmax, device=dev, inputs=[ctr, sim.d.nacon, sim.d.contact.dist, sim.d.contact.geom, sim.d.contact.worldid, gcls, ground_id, sub_dist])
+        wp.launch(_substep_force_niter, dim=(n, 3), device=dev, inputs=[ctr, csens._net, rows, sim.d.solver_niter, sub_f, sub_it])
+        wp.launch(_bump_ctr, dim=1, device=dev, inputs=[ctr])
     sim.add_substep_hook(_hook)
     default = m.key_qpos[0].copy()
     bid = lambda nm: mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, nm)
@@ -138,7 +192,7 @@ def main():
     jr = {mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_JOINT, j): (m.jnt_range[j].tolist() if m.jnt_limited[j] else None) for j in range(1, m.njnt)}
     json.dump({"our_joints": our_joints, "isaac_joints": isaac_joints, "physics_dt": a.physics_dt, "decimation": dec,
                "contact_tuning": a.contact_tuning, "tuning": repr(contact_tuning.PRESETS[a.contact_tuning]),
-               "solver_cfg": a.solver_cfg, "solver_preset": repr(solver_presets.PRESETS[a.solver_cfg]) if a.solver_cfg else None,
+               "solver_cfg": a.solver_cfg, "solver_iterations": cap, "substep_bodies": list(cls_bodies), "solver_preset": repr(solver_presets.PRESETS[a.solver_cfg]) if a.solver_cfg else None,
                "joint_range_isaac_order": [jr[nm] for nm in isaac_joints], "contact": "ContactSensor net normal force (Isaac net_forces_w)"},
               open(os.path.join(a.out, "meta.json"), "w"), indent=1)
     for tag, (T, act_fn, drop_z) in protocols.items():
@@ -146,12 +200,13 @@ def main():
         if drop_z is not None: q[:, 2] = drop_z
         sim.set_state(q, np.zeros((n, m.nv), np.float32)); v = sim.forward(); sim.after(v); sim.synchronize()
         rec = {k: [] for k in ("joint_pos", "joint_vel", "root_pos", "root_quat", "root_lin_vel_b", "root_ang_vel_b", "torque", "contact",
-                               "contact_touch", "penetration", "limit_excursion", "solver_niter")}
+                               "contact_touch", "penetration", "limit_excursion", "solver_niter",
+                               "sub_dist", "sub_force", "sub_niter")}
         for t in range(T):
             a_isaac = act_fn(t)                                              # (n, nj) in Isaac joint order
             ctrl = np.tile(default[7:], (n, 1)).astype(np.float32)
             ctrl[:, act_isaac] = default[7:][act_isaac] + ACTION_SCALE * a_isaac
-            sim.t.ctrl.copy_(torch.as_tensor(ctrl)); pen.zero_(); exc.zero_(); sim.synchronize()
+            sim.t.ctrl.copy_(torch.as_tensor(ctrl)); pen.zero_(); exc.zero_(); ctr.zero_(); sub_dist.fill_(1.0); sim.synchronize()
             vs = sim.step(); sim.synchronize()
             qp = sim.d.qpos.numpy(); qv = sim.d.qvel.numpy(); tau = sim.d.qfrc_actuator.numpy(); sd = sim.d.sensordata.numpy()
             Rm = np.zeros((n, 9)); [mujoco.mju_quat2Mat(Rm[e], qp[e, 3:7]) for e in range(n)]
@@ -168,6 +223,8 @@ def main():
             rec["contact"].append(cf); rec["contact_touch"].append(ct_)
             rec["penetration"].append(np.maximum(pen.numpy(), 0.0)); rec["limit_excursion"].append(np.maximum(exc.numpy(), 0.0))
             rec["solver_niter"].append(sim.d.solver_niter.numpy().copy())     # last substep, as Isaac's recording
+            sd_ = sub_dist.numpy(); sd_[sd_ >= 1.0] = np.nan                   # no ground contact of that body in that substep
+            rec["sub_dist"].append(sd_); rec["sub_force"].append(sub_f.numpy().copy()); rec["sub_niter"].append(sub_it.numpy().copy())
             if not a.no_render and t % a.frame_every == 0:
                 vr = rend2.render(sim, vs, passes=8); rend2.wait_sim_after_render(sim, vr); rend2.after(vr); torch.mps.synchronize()
                 iio.imwrite(os.path.join(a.out, f"{tag}_{t:04d}_rgb.png"), rend2.out.rgb[0].cpu().numpy()); np.save(os.path.join(a.out, f"{tag}_{t:04d}_depth.npy"), rend2.out.depth[0].cpu().numpy())
