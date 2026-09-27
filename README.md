@@ -100,7 +100,7 @@ first four commits plus the graph-capture sort; merged into `metalsim`.
 
 [github.com/pulipakaa24/mujoco_warp](https://github.com/pulipakaa24/mujoco_warp), branch
 [`metalsim`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), head
-[`063ff98`](https://github.com/pulipakaa24/mujoco_warp/commit/063ff98) (2026-09-26;
+[`f824af1`](https://github.com/pulipakaa24/mujoco_warp/commit/f824af1) (2026-09-26;
 the rigid-body results before the elliptic-cone work were produced at
 [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) / code
 [`8fbf965`](https://github.com/pulipakaa24/mujoco_warp/commit/8fbf965acb630aa32573dda802404d519c843a99)). Base: Google
@@ -134,6 +134,10 @@ DeepMind's MuJoCo Warp v3.14.0 (`88af9cc`) plus the Metal device patch by David 
   `MJW_METAL_ICB_EARLY_EXIT=0` disables) (`433c305`, `21be81b`): elliptic loop premium 1.68× → 1.53×; the
   line-search noise floor (Genesis #3382's rule) and an extrapolated warm start archived (`MJW_LS_NOISE_FLOOR`,
   `MJW_WARMSTART_EXTRAP`: both move states beyond the floor on some state classes).
+- Metal: the convex narrowphase's per-call scratch buffers allocated once per `Data` and reused (`d9ec218`;
+  `MJW_METAL_CCD_SCRATCH_CACHE=0` restores per-call allocation): a captured 8-substep step graph had retained eight
+  copies (about 25 GB at 4096 rough-terrain worlds, doubled during re-capture), which failed the rough elliptic
+  training at start-up; no result change.
 - Heightfield plane contacts restricted to meshes; primitives take upstream's GJK/EPA again (`b630530`; the fork's
   plane path missed contacts of primitives on heightfields smaller than the box; `HFIELD_PLANE_CONTACTS_PRIMITIVES=True`
   archives the old form).
