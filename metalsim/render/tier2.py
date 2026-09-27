@@ -394,7 +394,7 @@ class Tier2Renderer:
         from metalsim.render.hdr import load_hdr
         key = rec["file"]
         hdr = None if key in self._env_res else load_hdr(rec["file"])
-        self.set_environment(hdr, yaw=float(rec.get("yaw" + KIT_DOME_AZIMUTH, 0.0)), intensity=float(rec.get("intensity", 1.0)),
+        self.set_environment(hdr, yaw=float(rec.get("yaw", 0.0)) + KIT_DOME_AZIMUTH, intensity=float(rec.get("intensity", 1.0)),
                              exposure=float(rec.get("exposure", 0.0)), color=tuple(rec.get("color", (1, 1, 1))), grid=grid, key=key)
         return rec
 
