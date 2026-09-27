@@ -44,6 +44,7 @@ an analytic bright-window plane (importance-sampled estimate unbiased within 2 %
 """
 from __future__ import annotations
 
+import math
 import numpy as np
 import torch
 import warp as wp
@@ -81,6 +82,12 @@ def env_sampling_table(hdr, grid=(512, 256)):
     density = w / w.sum() * (gw * gh)
     return np.concatenate([marg, cond.ravel(), density.ravel()]).astype(np.float32), gw, gh
 
+
+# Kit/RTX maps an equirectangular DomeLight with pole +z and the image centre (u = 0.5) facing -x (measured on Isaac Sim
+# 5.1 and 6.1 path-traced frames with marked maps, 2026-09-26, docs/research/isaac_side_session_2026-09-26.md); our shader's
+# centre faces -y, so stages authored for Kit get this constant added to their dome yaw. The direct set_environment() API
+# keeps the shader's own convention (its tests are written against it).
+KIT_DOME_AZIMUTH = -math.pi / 2
 
 class Tier2Renderer:
     def __init__(self, model, n_envs: int, *, width=256, height=256, camera=None, spp=4, max_bounces=4,
@@ -387,7 +394,7 @@ class Tier2Renderer:
         from metalsim.render.hdr import load_hdr
         key = rec["file"]
         hdr = None if key in self._env_res else load_hdr(rec["file"])
-        self.set_environment(hdr, yaw=float(rec.get("yaw", 0.0)), intensity=float(rec.get("intensity", 1.0)),
+        self.set_environment(hdr, yaw=float(rec.get("yaw" + KIT_DOME_AZIMUTH, 0.0)), intensity=float(rec.get("intensity", 1.0)),
                              exposure=float(rec.get("exposure", 0.0)), color=tuple(rec.get("color", (1, 1, 1))), grid=grid, key=key)
         return rec
 
