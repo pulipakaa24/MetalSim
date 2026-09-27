@@ -835,6 +835,28 @@ Reading:
   PhysX's version spread and PhysX's recovery with 90 % less chatter. It regresses transfer of Isaac's checkpoints
   (0.117 vs 0.060 m) and is archived as the next step (DECISIONS 2026-09-26).
 
+**Speculative contacts followed to a decision (2026-09-27, `docs/research/speculative_contacts_2026-09-27.md`,
+`runs/speculative/`).**
+- The prototype's over-travel is not caused by the contact rule.
+  - Against Isaac's own play recordings, the G1 steps 3.4–5.9 % faster than in PhysX under **every** contact model
+    (3.72–3.79 vs 3.60 Hz at checkpoint 1000).
+  - The default's stride is 5–9 % short, which cancels this in x travelled.
+  - Speculative rows make the stride PhysX's (0.110 vs 0.1096 m) and so expose the cadence excess.
+  - Controls: inert rows reproduce the base preset (constraint count ruled out), and the policy sees no contact
+    quantity.
+- Two defects of the prototype were found and fixed on the fork branch (27f1fcd; head e636feb):
+  - MuJoCo's soft elliptic cone pushed and braked bodies skimming inside the gap (119 N on a box 2 mm above the plane;
+    PhysX bounds friction by the normal impulse);
+  - the friction-row impedance was inconsistent with the normal row's, which made MuJoCo Warp leave a MuJoCo C
+    reference of the rule at 1 s.
+- The corrected rule:
+  - tracks its C reference at the stock floor, and is bitwise inert at gap 0;
+  - gets the drop-torso 5 ms force within PhysX's bound (5.0 kN);
+  - loses the slide match (−0.0111 vs Isaac −0.0127) and brings back 16 % short contact phases;
+  - raises the cap-probe floor 10–20× and costs 1.20×.
+- The default stays `recommended`. The rule stays archived, and no training run was queued. The open item is the
+  cadence gap, which is not a contact property.
+
 **The same protocol on Newton XPBD** (`scripts/diagnostics/newton_record_g1.py`, CPU device which
 matches Metal to ~1e-6, `runs/parity/report_newton_{it4_1p25ms,it4_0p625ms}`, measured 2026-09-24,
 Newton commit 45458023 with the angle-wrap clamp; MuJoCo Warp rows repeated for reference):

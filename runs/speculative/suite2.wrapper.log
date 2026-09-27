@@ -1,0 +1,15 @@
+=== start Sun Sep 27 02:38:27 PDT 2026 warp c200d46b mjw e636feb
+--- no switch 02:38:27
+FAILED mujoco_warp/_src/io_test.py::IOTest::test_put_data_nefc_zero_dense - A...
+1 failed, 1451 passed, 39 skipped, 28 warnings, 8 subtests passed in 109.96s (0:01:49)
+--- MJW_SPECULATIVE_GAP=1 02:40:20
+FAILED mujoco_warp/_src/collision_driver_test.py::CollisionTest::test_ccd_margin_dist
+FAILED mujoco_warp/_src/constraint_test.py::ConstraintTest::test_efc_address_inactive_contacts
+FAILED mujoco_warp/_src/io_test.py::IOTest::test_put_data_nefc_zero_dense - A...
+3 failed, 1449 passed, 39 skipped, 28 warnings, 8 subtests passed in 112.51s (0:01:52)
+--- MJW_SPECULATIVE_GAP=1 MJW_SPEC_FRICTION=live MJW_SPEC_FRICIMP=d0 02:42:15
+FAILED mujoco_warp/_src/collision_driver_test.py::CollisionTest::test_ccd_margin_dist
+FAILED mujoco_warp/_src/constraint_test.py::ConstraintTest::test_efc_address_inactive_contacts
+FAILED mujoco_warp/_src/io_test.py::IOTest::test_put_data_nefc_zero_dense - A...
+3 failed, 1449 passed, 39 skipped, 28 warnings, 8 subtests passed in 66.65s (0:01:06)
+=== end Sun Sep 27 02:43:24 PDT 2026
