@@ -1,0 +1,39 @@
+cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or directory
+[INFO][AppLauncher]: Using device: cuda:0
+[INFO][AppLauncher]: Loading experience file: /home/aditya_nianticspatial_com/IsaacLab/apps/isaaclab.python.headless.kit
+[fourbar] wrote /home/aditya_nianticspatial_com/parity3/fourbar_il2/gpu_dt0.0025/fourbar.usda C = [0.22148227201945095, 0.0, 0.23734988180484207]
+
+[36m======================================================================================[0m
+[36m[1m[INFO][IsaacLab]: Logging to file: /tmp/isaaclab/logs/isaaclab_2026-09-27_02-22-01.log[0m
+[36m======================================================================================[0m
+
+[33m02:22:01 [simulation_context.py] WARNING: The `enable_external_forces_every_iteration` parameter in the PhysxCfg is set to False. If you are experiencing noisy velocities, consider enabling this flag. You may need to slightly increase the number of velocity iterations (setting it to 1 or 2 rather than 0), together with this flag, to improve the accuracy of velocity updates.[0m
+[fourbar] bodies ['ground', 'crank', 'rocker', 'coupler'] joints ['crank', 'rocker', 'coupler'] fixed base True
+[fourbar] summary {"dt": 0.0025, "T": 5.0, "device": "cuda:0", "solver": "TGS", "pos_iters": 8, "vel_iters": 4, "body_order_ang": ["crank", "coupler", "rocker"], "closure_gap_max_m": 0.0001535487468755588, "closure_gap_mean_m": 3.6393938872835415e-05, "closure_gap_final_m": 0.0001003021400478814, "max_abs_y_m": 2.21719709259105e-08, "wall_s": 5.416747331619263, "C": [0.22148227201945095, 0.0, 0.23734988180484207], "crank_final_rad": -1.4119184008365573, "isaaclab": "2.3.x", "usd": "fourbar.usda"}
+Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260927_022154.log
+2026-09-27T02:21:54Z [149ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
+2026-09-27T02:21:55Z [616ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
+2026-09-27T02:21:55Z [904ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
+2026-09-27T02:21:55Z [918ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.178.04    | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA L4                        | Yes: 0 |     | 23034   MB | 10de      | 0          |
+|     |                                  |        |     |            | 27b8      | 12243178.. |
+|     |                                  |        |     |            | 0         |            |
+|=============================================================================================|
+| OS: 24.04.5 LTS (Noble Numbat) ubuntu, Version: 24.04.5, Kernel: 7.0.0-1011-gcp
+| Processor: Intel(R) Xeon(R) CPU @ 2.20GHz
+| Cores: 8 | Logical Cores: 16
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 64293 | Free Memory: 61892
+| Total Page/Swap (MB): 0 | Free Page/Swap: 0
+|---------------------------------------------------------------------------------------------|
+2026-09-27T02:22:01Z [6,415ms] [Warning] [gpu.foundation.plugin] ECC is enabled on physical device 0
+exit 0

@@ -1,0 +1,26 @@
+{
+ "dt": 0.0025,
+ "T": 5.0,
+ "device": "cuda:0",
+ "solver": "TGS",
+ "pos_iters": 8,
+ "vel_iters": 4,
+ "body_order_ang": [
+  "crank",
+  "coupler",
+  "rocker"
+ ],
+ "closure_gap_max_m": 0.0001535487468755588,
+ "closure_gap_mean_m": 3.6393938872835415e-05,
+ "closure_gap_final_m": 0.0001003021400478814,
+ "max_abs_y_m": 2.21719709259105e-08,
+ "wall_s": 5.416747331619263,
+ "C": [
+  0.22148227201945095,
+  0.0,
+  0.23734988180484207
+ ],
+ "crank_final_rad": -1.4119184008365573,
+ "isaaclab": "2.3.x",
+ "usd": "fourbar.usda"
+}

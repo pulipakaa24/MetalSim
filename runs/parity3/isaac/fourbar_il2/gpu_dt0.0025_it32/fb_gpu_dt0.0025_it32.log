@@ -1,0 +1,13 @@
+cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or directory
+[INFO][AppLauncher]: Using device: cuda:0
+[INFO][AppLauncher]: Loading experience file: /home/aditya_nianticspatial_com/IsaacLab/apps/isaaclab.python.headless.kit
+[fourbar] wrote /home/aditya_nianticspatial_com/parity3/fourbar_il2/gpu_dt0.0025_it32/fourbar.usda C = [0.22148227201945095, 0.0, 0.23734988180484207]
+
+[36m======================================================================================[0m
+[36m[1m[INFO][IsaacLab]: Logging to file: /tmp/isaaclab/logs/isaaclab_2026-09-27_02-29-33.log[0m
+[36m======================================================================================[0m
+
+[33m02:29:33 [simulation_context.py] WARNING: The `enable_external_forces_every_iteration` parameter in the PhysxCfg is set to False. If you are experiencing noisy velocities, consider enabling this flag. You may need to slightly increase the number of velocity iterations (setting it to 1 or 2 rather than 0), together with this flag, to improve the accuracy of velocity updates.[0m
+[fourbar] bodies ['ground', 'crank', 'rocker', 'coupler'] joints ['crank', 'rocker', 'coupler'] fixed base True
+[fourbar] summary {"dt": 0.0025, "T": 5.0, "device": "cuda:0", "solver": "TGS", "pos_iters": 32, "vel_iters": 4, "body_order_ang": ["crank", "coupler", "rocker"], "closure_gap_max_m": 0.00014346438054071756, "closure_gap_mean_m": 3.484774274051494e-05, "closure_gap_final_m": 9.700621331500136e-05, "max_abs_y_m": 2.2171906977064282e-08, "wall_s": 6.938365459442139, "C": [0.22148227201945095, 0.0, 0.23734988180484207], "crank_final_rad": -1.4100930408703243, "isaaclab": "2.3.x", "usd": "fourbar.usda"}
+exit 0
