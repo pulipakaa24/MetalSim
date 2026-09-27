@@ -188,7 +188,7 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
   `metalsim/tron1/sdk.py` mirrors the message field names, units and motor order of
   [limxdynamics/limxsdk-lowlevel](https://github.com/limxdynamics/limxsdk-lowlevel) (Apache-2.0) `datatypes.h`.
   The `limxsdk` binaries are not included; `metalsim/tron1/limx_bridge.py` imports them when installed on the robot.
-- Scene heightfields derived from scans of physical spaces are not distributed (removed from the tree on 2026-09-26; `assets/tron1/scenes_local/` is git-ignored). Earlier public commits (f3d5859 to that date) carried `assets/tron1/scenes/spatial_station.npz`, a 562 x 596 heightfield computed by `metalsim/tron1/scene.py` from a
+- `assets/tron1/scenes/spatial_station.npz` (provenance confirmed by the owner on 2026-09-26: a mesh scan of a public part of the owner's office space; only this derived heightfield is distributed, under the repository's MIT licence) is a 562 x 596 heightfield computed by `metalsim/tron1/scene.py` from a
   scanned mesh (`spatial_station.ply`, not committed) of a physical space. The repository does not record who made
   the scan; see "Items for the author to confirm" below.
 
@@ -259,7 +259,7 @@ No USD, MDL, Omniverse, PhysX or other NVIDIA binary file appears anywhere in th
 
 ## Items for the author to confirm
 
-- `assets/tron1/scenes/spatial_station.npz`: confirm the source scan (`spatial_station.ply`, `Spatial-Station.spz`)
+- `assets/tron1/scenes/spatial_station.npz`: source scan confirmed by the owner on 2026-09-26 (see above)
   is yours or licensed for redistribution. The heightfield keeps only floor and obstacle heights at 5 cm, no colour
   or texture; if the scan is someone else's, remove the file (and consider it in the history question above).
 - `metalsim/replicator/basic_writer.py` and the OmniPBR BRDF were written from NVIDIA's documentation and observed

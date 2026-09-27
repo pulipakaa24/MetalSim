@@ -71,7 +71,7 @@ the Newton-engine evaluation. Evidence for each row is in `PARITY.md`.
 | Upstreaming the Warp and MuJoCo Warp forks | elliptic launch fix drafted as a PR (no trailer); flex commits and the older fork commits carry a co-author trailer the MuJoCo Warp CLA rejects (rewrite on a fresh branch before filing); `UPSTREAM.md` lists the seven flex items; two fork test failures: one fixed (`b630530`, heightfield primitives), one is a MuJoCo-version dependence in upstream's test | user's CLA; file after the 3.0 re-runs land |
 | Newton upstream PRs | #4316–#4318 open, awaiting the EasyCLA signature and maintainer review | user |
 | Isaac features not covered | MPM / particles deferred by the user until the current efforts land; ROS 2 bridge not needed | – |
-| Licensing / IP | MIT + THIRD_PARTY_NOTICES landed; open items for the user: `spatial_station.npz` provenance, the G1 MJCF conversion still in public history (`1359a52`), stray untracked `m/` and `guest@…` directories | user |
+| Licensing / IP | MIT + THIRD_PARTY_NOTICES landed; open items for the user: the G1 MJCF conversion still in public history (`1359a52`), stray untracked `m/` and `guest@…` directories | user |
 
 ## Ledger of 2026-09-25 rows (kept for traceability)
 
