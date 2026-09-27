@@ -1,0 +1,163 @@
+#usda 1.0
+(
+    defaultPrim = "fourbar"
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "fourbar" (
+    prepend apiSchemas = ["PhysicsArticulationRootAPI", "PhysxArticulationAPI"]
+)
+{
+    bool physxArticulation:enabledSelfCollisions = 0
+    float physxArticulation:sleepThreshold = 0
+    int physxArticulation:solverPositionIterationCount = 32
+    int physxArticulation:solverVelocityIterationCount = 4
+    float physxArticulation:stabilizationThreshold = 0
+
+    def Xform "ground" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysxRigidBodyAPI"]
+    )
+    {
+        point3f physics:centerOfMass = (0, 0, 0)
+        float3 physics:diagonalInertia = (0.001, 0.001, 0.001)
+        float physics:mass = 1
+        quatf physics:principalAxes = (1, 0, 0, 0)
+        float physxRigidBody:angularDamping = 0
+        float physxRigidBody:linearDamping = 0
+        float physxRigidBody:maxAngularVelocity = 10000000
+        float physxRigidBody:maxLinearVelocity = 10000000
+        float physxRigidBody:sleepThreshold = 0
+        float physxRigidBody:stabilizationThreshold = 0
+        quatf xformOp:orient = (1, 0, 0, 0)
+        double3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
+    }
+
+    def Xform "crank" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysxRigidBodyAPI"]
+    )
+    {
+        point3f physics:centerOfMass = (0.05, 0, 0)
+        float3 physics:diagonalInertia = (0.00001, 0.00017166667, 0.00017166667)
+        float physics:mass = 0.2
+        quatf physics:principalAxes = (1, 0, 0, 0)
+        float physxRigidBody:angularDamping = 0
+        float physxRigidBody:linearDamping = 0
+        float physxRigidBody:maxAngularVelocity = 10000000
+        float physxRigidBody:maxLinearVelocity = 10000000
+        float physxRigidBody:sleepThreshold = 0
+        float physxRigidBody:stabilizationThreshold = 0
+        quatf xformOp:orient = (0.9848077, 0, 0.17364818, 0)
+        double3 xformOp:translate = (0, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
+    }
+
+    def Xform "coupler" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysxRigidBodyAPI"]
+    )
+    {
+        point3f physics:centerOfMass = (0.15, 0, 0)
+        float3 physics:diagonalInertia = (0.00003, 0.004515, 0.004515)
+        float physics:mass = 0.6
+        quatf physics:principalAxes = (1, 0, 0, 0)
+        float physxRigidBody:angularDamping = 0
+        float physxRigidBody:linearDamping = 0
+        float physxRigidBody:maxAngularVelocity = 10000000
+        float physxRigidBody:maxLinearVelocity = 10000000
+        float physxRigidBody:sleepThreshold = 0
+        float physxRigidBody:stabilizationThreshold = 0
+        quatf xformOp:orient = (0.84411, 0, -0.53617007, 0)
+        double3 xformOp:translate = (0.09396926207859085, 0, -0.03420201433256687)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
+    }
+
+    def Xform "rocker" (
+        prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI", "PhysxRigidBodyAPI"]
+    )
+    {
+        point3f physics:centerOfMass = (0.125, 0, 0)
+        float3 physics:diagonalInertia = (0.000025, 0.0026166667, 0.0026166667)
+        float physics:mass = 0.5
+        quatf physics:principalAxes = (1, 0, 0, 0)
+        float physxRigidBody:angularDamping = 0
+        float physxRigidBody:linearDamping = 0
+        float physxRigidBody:maxAngularVelocity = 10000000
+        float physxRigidBody:maxLinearVelocity = 10000000
+        float physxRigidBody:sleepThreshold = 0
+        float physxRigidBody:stabilizationThreshold = 0
+        quatf xformOp:orient = (0.5856317, 0, -0.8105772, 0)
+        double3 xformOp:translate = (0.3, 0, 0)
+        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient"]
+    }
+
+    def "joints"
+    {
+        def PhysicsFixedJoint "world_fixed"
+        {
+            rel physics:body1 = </fourbar/ground>
+        }
+
+        def PhysicsRevoluteJoint "crank" (
+            prepend apiSchemas = ["PhysxJointAPI"]
+        )
+        {
+            uniform token physics:axis = "Y"
+            rel physics:body0 = </fourbar/ground>
+            rel physics:body1 = </fourbar/crank>
+            point3f physics:localPos0 = (0, 0, 0)
+            point3f physics:localPos1 = (0, 0, 0)
+            quatf physics:localRot0 = (1, 0, 0, 0)
+            quatf physics:localRot1 = (0.9848077, 0, -0.17364818, 0)
+            float physxJoint:jointFriction = 0
+            float physxJoint:maxJointVelocity = 1000000
+        }
+
+        def PhysicsRevoluteJoint "coupler" (
+            prepend apiSchemas = ["PhysxJointAPI"]
+        )
+        {
+            uniform token physics:axis = "Y"
+            rel physics:body0 = </fourbar/crank>
+            rel physics:body1 = </fourbar/coupler>
+            point3f physics:localPos0 = (0.1, 0, 0)
+            point3f physics:localPos1 = (0, 0, 0)
+            quatf physics:localRot0 = (0.9848077, 0, -0.17364818, 0)
+            quatf physics:localRot1 = (0.84411, 0, 0.53617007, 0)
+            float physxJoint:jointFriction = 0
+            float physxJoint:maxJointVelocity = 1000000
+        }
+
+        def PhysicsRevoluteJoint "rocker" (
+            prepend apiSchemas = ["PhysxJointAPI"]
+        )
+        {
+            uniform token physics:axis = "Y"
+            rel physics:body0 = </fourbar/ground>
+            rel physics:body1 = </fourbar/rocker>
+            point3f physics:localPos0 = (0.3, 0, 0)
+            point3f physics:localPos1 = (0, 0, 0)
+            quatf physics:localRot0 = (1, 0, 0, 0)
+            quatf physics:localRot1 = (0.5856317, 0, 0.8105772, 0)
+            float physxJoint:jointFriction = 0
+            float physxJoint:maxJointVelocity = 1000000
+        }
+
+        def PhysicsRevoluteJoint "loop0" (
+            prepend apiSchemas = ["PhysxJointAPI"]
+        )
+        {
+            uniform token physics:axis = "Y"
+            rel physics:body0 = </fourbar/coupler>
+            rel physics:body1 = </fourbar/rocker>
+            uniform bool physics:excludeFromArticulation = 1
+            point3f physics:localPos0 = (0.3, 0, 0)
+            point3f physics:localPos1 = (0.25, 0, -1.3877788e-17)
+            quatf physics:localRot0 = (0.84411, 0, 0.53617007, 0)
+            quatf physics:localRot1 = (0.5856317, 0, 0.8105772, 0)
+            float physxJoint:jointFriction = 0
+            float physxJoint:maxJointVelocity = 1000000
+        }
+    }
+}
+
