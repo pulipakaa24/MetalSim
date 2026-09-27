@@ -35,18 +35,12 @@ ledger. [`docs/STATUS.md`](docs/STATUS.md) is the state against the original pla
 
 ## Default contact model and how to switch it off
 
-Since 2026-09-26 the G1 task's default contacts are **elliptic friction cones** (the exact Coulomb cone, as PhysX
-uses) with impratio 10 and a Newton iteration cap of 20, on top of the impact-stiffened 10 ms preset with hard joint
-limits (`contact_cfg="recommended"` = `tau10_impact_hardlimits_ellip10`). This is the most PhysX-faithful setting
-measured (impact forces within 8 % of PhysX's instead of 70 %), and it costs **1.5× on the full PPO loop** relative to
-pyramidal cones (37.5 K vs 57.2 K env-steps/s at 4096 envs, after the elliptic-path fusion and Metal early exit; an
-independent review found the remainder inherent to impratio 10, which MuJoCo C shares). The owner chose fidelity over throughput on the reasoning that the M4 Max's compute deficit against an
-L4 is inherent anyway. Known counter-signal: a PhysX-trained checkpoint falls 7–10 % more often under it (within one
-seed's standard deviation; cause not established). To run the previous default, pass
-`contact_cfg="recommended_pyramidal"` (or `--contact_cfg recommended_pyramidal`); `"default"` gives MuJoCo's own
-contacts. Every number in this README names the setting it was measured under. Comparisons against Isaac Lab 3.0's
-Newton / MuJoCo Warp backend use `solver_cfg="isaaclab3*"`, which imposes Isaac's own pyramidal cone regardless of the
-contact preset.
+The G1 task's default contacts (`contact_cfg="recommended"`) are elliptic friction cones, impratio 10, Newton cap 20,
+on the impact-stiffened 10 ms preset with hard joint limits: impact forces within 8 % of PhysX's (pyramidal: 70 %), at
+1.5× the pyramidal cost on the full PPO loop (37.5 K vs 57.2 K env-steps/s at 4096 envs). Known counter-signal: a
+PhysX-trained checkpoint falls 7–10 % more often under it (within one seed's standard deviation). To switch:
+`contact_cfg="recommended_pyramidal"` (the previous default) or `"default"` (MuJoCo's contacts); on the CLI,
+`--contact_cfg`. Isaac Lab 3.0 comparisons (`solver_cfg="isaaclab3*"`) impose Isaac's own pyramidal cone regardless.
 
 ## What was built where
 
