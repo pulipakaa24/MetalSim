@@ -1,0 +1,25 @@
+[gpu_run] spec_cost start: device utilisation 0% (02:10:46)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  22365 Google Chrome He                   1.8 %
+== stage cost dt=0.0025 mjw=/Users/aditya/robosim/upstream/mujoco_warp-spec-d99186b@d99186b spec=1 presets=recommended ellip10_tau5_specgap10mm ellip10_tau5 Sun Sep 27 02:10:49 PDT 2026
+holder: {"name": "spec_cost", "kind": "timing", "minutes": 4.0, "pid": 23841, "start": 1790500246.0872278, "queued": 1790500246.0868506, "cmd": "runs/speculative/job_cost.sh", "cwd": "/Users/aditya/robosim"}
+gpu_lock status at start 2026-09-27T02:10:50
+holder: {"name": "spec_cost", "kind": "timing", "minutes": 4.0, "pid": 23841, "start": 1790500246.0872278, "queued": 1790500246.0868506, "cmd": "runs/speculative/job_cost.sh", "cwd": "/Users/aditya/robosim"}
+
+mujoco_warp from /Users/aditya/robosim/upstream/mujoco_warp-spec-d99186b/mujoco_warp/__init__.py
+  recommended: overflow {'LS_ITERATIONS': 4096}
+  ellip10_tau5_specgap10mm: overflow {'LS_ITERATIONS': 4096}
+  ellip10_tau5: overflow {'LS_ITERATIONS': 4096}
+  recommended: overflow {'LS_ITERATIONS': 4096}
+  ellip10_tau5_specgap10mm: overflow {'LS_ITERATIONS': 4096}
+  ellip10_tau5: overflow {'LS_ITERATIONS': 4096}
+  recommended: overflow {'LS_ITERATIONS': 4096}
+  ellip10_tau5_specgap10mm: overflow {'LS_ITERATIONS': 4096}
+  ellip10_tau5: overflow {'LS_ITERATIONS': 4096}
+G1 MuJoCo Warp physics only, 4096 worlds, 2.5 ms x 8 substeps per control step, 3 s from standing, 3 interleaved repeats
+  recommended                     46.70 ms/control step (min 46.61)      87711 env-steps/s      701689 2.5ms-steps/s  (1.000x recommended)  runs [46.61, 46.7, 46.71]
+  ellip10_tau5_specgap10mm        56.02 ms/control step (min 55.98)      73116 env-steps/s      584931 2.5ms-steps/s  (1.200x recommended)  runs [55.98, 56.02, 56.08]
+  ellip10_tau5                    45.67 ms/control step (min 45.60)      89695 env-steps/s      717561 2.5ms-steps/s  (0.978x recommended)  runs [45.67, 45.6, 45.71]
+== stage cost done Sun Sep 27 02:12:00 PDT 2026
+[gpu_run] spec_cost end: device utilisation 100% (02:12:00), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
