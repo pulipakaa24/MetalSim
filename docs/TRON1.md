@@ -34,7 +34,7 @@ filtering on the master).
 | `tests/test_tron1.py` | 10 tests |
 
 Live viewer: `.venv/bin/mjpython -m metalsim.tron1.view [--controller classical|limx]
-[--params ideal|nominal|random] [--scene assets/tron1/scenes/spatial_station.npz]`. Arrows drive,
+[--params ideal|nominal|random] [--scene assets/tron1/scenes_local/<scene>.npz]`. Arrows drive,
 space stops, O / P shove forward / sideways, R resets and reloads the controller code.
 
 ## Realism layer (what LimX's own MuJoCo sim does not have)
@@ -146,7 +146,7 @@ in Developer Mode and log a damping-only joint sweep and a free wheel spin-down.
 
 `~/Downloads/spatial_station.ply` is a colored mesh (18.9 M vertices, 37.4 M faces, metres, +y up);
 `Spatial-Station.spz` is a Gaussian splat (8.8 M splats), visual only, not used yet.
-`assets/tron1/scenes/spatial_station.npz`: 562 x 596 height field at 5 cm, a flat floor (plane
+`assets/tron1/scenes_local/spatial_station.npz` (local only, not distributed: it is derived from a scan of a physical space; regenerate it with `metalsim.tron1.scene` from the scan): 562 x 596 height field at 5 cm, a flat floor (plane
 fit residual 1.1 cm) plus obstacles 4 cm-1.3 m above the local floor; unscanned space is walled.
 Open question: one corner's floor is 0.3-0.5 m lower in the scan while its ceiling is not; that
 is either a real sunken area or glossy-floor artefacts. `floor="scan"` keeps it if it is real.

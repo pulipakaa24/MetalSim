@@ -188,7 +188,7 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
   `metalsim/tron1/sdk.py` mirrors the message field names, units and motor order of
   [limxdynamics/limxsdk-lowlevel](https://github.com/limxdynamics/limxsdk-lowlevel) (Apache-2.0) `datatypes.h`.
   The `limxsdk` binaries are not included; `metalsim/tron1/limx_bridge.py` imports them when installed on the robot.
-- `assets/tron1/scenes/spatial_station.npz` is a 562 x 596 heightfield computed by `metalsim/tron1/scene.py` from a
+- Scene heightfields derived from scans of physical spaces are not distributed (removed from the tree on 2026-09-26; `assets/tron1/scenes_local/` is git-ignored). Earlier public commits (f3d5859 to that date) carried `assets/tron1/scenes/spatial_station.npz`, a 562 x 596 heightfield computed by `metalsim/tron1/scene.py` from a
   scanned mesh (`spatial_station.ply`, not committed) of a physical space. The repository does not record who made
   the scan; see "Items for the author to confirm" below.
 

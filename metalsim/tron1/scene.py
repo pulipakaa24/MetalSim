@@ -1,6 +1,6 @@
 """Collision terrain for TRON1 from a scanned space (colored triangle-mesh PLY).
 
-    .venv/bin/python -m metalsim.tron1.scene ~/Downloads/spatial_station.ply assets/tron1/scenes/spatial_station.npz
+    .venv/bin/python -m metalsim.tron1.scene ~/Downloads/spatial_station.ply assets/tron1/scenes_local/spatial_station.npz
 
 The scan (`spatial_station.ply`: 18.9 M vertices, 37.4 M faces, metres, +y up) becomes a MuJoCo
 height field in a z-up world, (x, y, z)_world = (x, -z, y)_scan:
