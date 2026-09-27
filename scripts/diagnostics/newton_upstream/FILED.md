@@ -34,3 +34,10 @@ Related existing issue: #2933 (same missing multiplier accumulation for springs 
 - The fork's `metalsim` branch (90e23324, installed in .venv-newtonfork) is unchanged by this; it additionally
   defaults to `joint_drive_mode="pd"` and carries the MetalSim-specific options. It does NOT contain PR 1's
   small-swing rescale fix (only matters for the compliance drive, which MetalSim does not use).
+
+## Status 2026-09-26
+
+All six still open. EasyCLA still fails on #4316-#4318 ("Missing CLA Authorization"); the external-PR workflows wait
+for a maintainer's manual approval. No human review yet; CodeRabbit left 6 actionable comments and 2 nitpicks, all
+valid. Fixes are prepared locally (branches `review/*` in `upstream/newton`, not pushed; #4318 would need a force push
+because it is stacked). Details, EasyCLA steps for the owner and draft replies: `REVIEW_2026-09-26.md`.
