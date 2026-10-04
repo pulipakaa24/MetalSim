@@ -49,3 +49,14 @@ Then open the PR (command in `DRAFT_elliptic_launch.md`) and check that `cla/goo
 
 A PR per flex fix would need the flex commits re-cut without the Claude co-author trailer (UPSTREAM.md pre-filing
 step), plus the Google CLA. Not done: the maintainers may prefer their own fixes (and #1668 is reshaping item 3).
+
+## 2026-10-03 follow-up on #1704
+
+Maintainer thowell asked (2026-09-29) whether upstream PR #1715 (`dim_block = 1`, `nblocks_perblock = naconmax` in the
+non-CUDA branch) addresses the issue. Measured on the Warp CPU device, Menagerie Go2 (own elliptic cone, impratio 100),
+32 worlds, Newton 10 / 20, 3 x 200 steps, two interleaved repeats, M4 Max on AC in high-power mode:
+`main` fb8c7b0 19.0-19.3 / 29.2-30.4 ms/step (first block / later blocks, the robot falls and contacts grow),
+PR #1715 e2a9d76 7.3-7.4 / 9.9-10.2, our branch `elliptic-jtcj-offcuda` 6d8e29a 7.3-7.4 / 10.0-10.4.
+The two are equal on the CPU, so #1715 covers the upstream case and our PR is not needed there. On a GPU device without
+CUDA (our Metal fork) #1715's form would run every contact through `ntri` threads; the fork keeps its per-world kernel.
+No PR was opened from this account (blocked on the CLA, and now superseded for this issue).
