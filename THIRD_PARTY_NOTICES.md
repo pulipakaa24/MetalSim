@@ -188,7 +188,7 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
   `metalsim/tron1/sdk.py` mirrors the message field names, units and motor order of
   [limxdynamics/limxsdk-lowlevel](https://github.com/limxdynamics/limxsdk-lowlevel) (Apache-2.0) `datatypes.h`.
   The `limxsdk` binaries are not included; `metalsim/tron1/limx_bridge.py` imports them when installed on the robot.
-- `assets/tron1/scenes/spatial_station.npz`: a 562 x 596 heightfield of floor heights at 5 cm, computed by `metalsim/tron1/scene.py` from a mesh scan of a part of the owner's office space (the scan itself is not distributed). Geometry measured from a physical space carries little or no copyright of its own (Meshwerks v. Toyota, 10th Cir. 2008); the file is distributed here under the repository's MIT licence.
+- Scene heightfields derived from scans of real spaces are not distributed (removed from the tree 2026-10-07; `assets/tron1/scenes_local/` is git-ignored and regenerated from a scan with `metalsim/tron1/scene.py`). Earlier public commits carried `assets/tron1/scenes/spatial_station.npz`, a 562 x 596 floor-height grid at 5 cm derived from a mesh scan of part of the owner's office; measured geometry of a physical space carries little or no copyright of its own (Meshwerks v. Toyota, 10th Cir. 2008).
 - rsl_rl ([leggedrobotics/rsl_rl](https://github.com/leggedrobotics/rsl_rl), `rsl-rl-lib` 3.1.2 on PyPI),
   BSD-3-Clause, copyright ETH Zurich and NVIDIA: optional dependency (`rslrl` extra), imported by
   `metalsim/learn/train_g1_rslrl.py`; `rslrl_adapter.py` implements its `VecEnv` interface.
