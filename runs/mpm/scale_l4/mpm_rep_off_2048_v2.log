@@ -1,0 +1,74 @@
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+/home/<user>/parity3_scripts/mpm/scale/scale_pour.py:236: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+  model = scene.finalize(device=DEV)
+{
+ "argv": [
+  "--device",
+  "cuda:0",
+  "--json",
+  "/home/<user>/parity3/scale_l4/mpm_rep_off_2048_v2.json",
+  "--part",
+  "mpm",
+  "--worlds",
+  "2048",
+  "--mode",
+  "eager",
+  "--steps",
+  "4",
+  "--repeat-check"
+ ],
+ "device": "cuda:0",
+ "device_name": "NVIDIA L4",
+ "warp": "1.16.0",
+ "newton": "1.5.2",
+ "worlds": 2048,
+ "temporary_store": true,
+ "part": "mpm",
+ "mode": "eager",
+ "grid": "sparse",
+ "accumulate": "native",
+ "loop": "native",
+ "particles": 1505280,
+ "bodies": 4096,
+ "colliders": 6144,
+ "build_s": 10.291779529999985,
+ "solver_init_s": 8.236878304999664,
+ "max_active_cell_count": 2097152,
+ "warmup_steps": 288,
+ "warmup_s": 106.51592580499982,
+ "step_ms": {
+  "median": 399.4254164999802,
+  "mean": 399.82787849999113,
+  "min": 397.94062500004657,
+  "max": 402.52005599995755
+ },
+ "step_ms_all": [
+  398.695513000348,
+  397.94062500004657,
+  400.1553199996124,
+  402.52005599995755
+ ],
+ "step_ms_pipelined": 378.64002474998415,
+ "iterations_last4": [
+  25,
+  25,
+  25,
+  25
+ ],
+ "res_l2_last4": [
+  0.0037429591175168753,
+  0.004559434484690428,
+  0.004996678326278925,
+  0.004883937072008848
+ ],
+ "occupied_cells_per_world": 77.80615234375,
+ "velocity_nodes": 16777216,
+ "strain_nodes": 2097152,
+ "collider_nodes": 1505280,
+ "repeat_check": {
+  "bitwise_equal": true,
+  "max_abs_diff": 0.0,
+  "worlds_differing": 0
+ },
+ "maxrss_mb": 3025.01953125
+}

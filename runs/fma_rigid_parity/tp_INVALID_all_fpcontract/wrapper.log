@@ -1,0 +1,107 @@
+[gpu_run] fma_tp_ab start: device utilisation 1% (00:34:24)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 2.0 s:
+[gpu_run] gpu_top:   pid  70632 Google Chrome He                   1.6 %
+/private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/rigid_fma/tp_job.sh: line 6: declare: -A: invalid option
+declare: usage: declare [-afFirtx] [-p] [name[=value] ...]
+=== start Sun Oct 11 00:34:27 PDT 2026 power: Now drawing from 'AC Power'
+=== warm done 00:37:17
+--- B1 flat 00:37:17
+[B1_flat] N=4096 njmax 112 naconmax 98304 is_sparse False
+[B1_flat] physics only 47.2 ms/step -> 86,798 env-steps/s
+[B1_flat] full env step 94.1 ms -> 43,511 env-steps/s
+[B1_flat] after random-action steps: nefc max 31 mean 11.7; nacon 11180 (2.73/world); overflow {'ITERATIONS': 2, 'LS_ITERATIONS': 3880}
+[B1_flat] rollout + inference 101.0 ms/step -> 40,559 env-steps/s
+[B1_flat] PPO update 149 ms -> full loop 38,217 env-steps/s
+[B1_flat] SUMMARY physics 86,798 | step 43,511 | rollout 40,559 | loop 38,217  (ms: physics 47.2, step 94.1, rollout/step 101.0, update 149)
+--- C1 flat 00:37:51
+[C1_flat] N=4096 njmax 112 naconmax 98304 is_sparse False
+[C1_flat] physics only 47.1 ms/step -> 87,002 env-steps/s
+[C1_flat] full env step 94.3 ms -> 43,426 env-steps/s
+[C1_flat] after random-action steps: nefc max 30 mean 11.7; nacon 11141 (2.72/world); overflow {'ITERATIONS': 1, 'LS_ITERATIONS': 3888}
+[C1_flat] rollout + inference 101.1 ms/step -> 40,516 env-steps/s
+[C1_flat] PPO update 143 ms -> full loop 38,261 env-steps/s
+[C1_flat] SUMMARY physics 87,002 | step 43,426 | rollout 40,516 | loop 38,261  (ms: physics 47.1, step 94.3, rollout/step 101.1, update 143)
+--- F1 flat 00:38:24
+[F1_flat] N=4096 njmax 112 naconmax 98304 is_sparse False
+[F1_flat] physics only 47.1 ms/step -> 87,048 env-steps/s
+[F1_flat] full env step 94.5 ms -> 43,360 env-steps/s
+[F1_flat] after random-action steps: nefc max 29 mean 11.8; nacon 11277 (2.75/world); overflow {'LS_ITERATIONS': 3900}
+[F1_flat] rollout + inference 101.0 ms/step -> 40,572 env-steps/s
+[F1_flat] PPO update 142 ms -> full loop 38,331 env-steps/s
+[F1_flat] SUMMARY physics 87,048 | step 43,360 | rollout 40,572 | loop 38,331  (ms: physics 47.1, step 94.5, rollout/step 101.0, update 142)
+--- B1 rough 00:38:57
+[B1_rough] N=4096 njmax 256 naconmax 524288 is_sparse False
+[B1_rough] physics only 70.6 ms/step -> 58,012 env-steps/s
+[B1_rough] full env step 105.5 ms -> 38,818 env-steps/s
+[B1_rough] after random-action steps: nefc max 30 mean 11.4; nacon 10702 (2.61/world); overflow {'ITERATIONS': 3, 'LS_ITERATIONS': 3862}
+[B1_rough] rollout + inference 114.6 ms/step -> 35,732 env-steps/s
+[B1_rough] PPO update 304 ms -> full loop 32,181 env-steps/s
+[B1_rough] SUMMARY physics 58,012 | step 38,818 | rollout 35,732 | loop 32,181  (ms: physics 70.6, step 105.5, rollout/step 114.6, update 304)
+--- C1 rough 00:39:37
+[C1_rough] N=4096 njmax 256 naconmax 524288 is_sparse False
+[C1_rough] physics only 70.6 ms/step -> 57,994 env-steps/s
+[C1_rough] full env step 105.4 ms -> 38,876 env-steps/s
+[C1_rough] after random-action steps: nefc max 30 mean 11.4; nacon 10759 (2.63/world); overflow {'ITERATIONS': 1, 'LS_ITERATIONS': 3859}
+[C1_rough] rollout + inference 114.9 ms/step -> 35,635 env-steps/s
+[C1_rough] PPO update 297 ms -> full loop 32,173 env-steps/s
+[C1_rough] SUMMARY physics 57,994 | step 38,876 | rollout 35,635 | loop 32,173  (ms: physics 70.6, step 105.4, rollout/step 114.9, update 297)
+--- F1 rough 00:40:17
+[F1_rough] N=4096 njmax 256 naconmax 524288 is_sparse False
+[F1_rough] physics only 70.7 ms/step -> 57,937 env-steps/s
+[F1_rough] full env step 105.6 ms -> 38,802 env-steps/s
+[F1_rough] after random-action steps: nefc max 28 mean 11.4; nacon 10792 (2.63/world); overflow {'ITERATIONS': 2, 'LS_ITERATIONS': 3878}
+[F1_rough] rollout + inference 114.7 ms/step -> 35,717 env-steps/s
+[F1_rough] PPO update 298 ms -> full loop 32,226 env-steps/s
+[F1_rough] SUMMARY physics 57,937 | step 38,802 | rollout 35,717 | loop 32,226  (ms: physics 70.7, step 105.6, rollout/step 114.7, update 298)
+--- B2 flat 00:40:57
+[B2_flat] N=4096 njmax 112 naconmax 98304 is_sparse False
+[B2_flat] physics only 47.1 ms/step -> 86,958 env-steps/s
+[B2_flat] full env step 93.7 ms -> 43,717 env-steps/s
+[B2_flat] after random-action steps: nefc max 29 mean 11.8; nacon 11254 (2.75/world); overflow {'ITERATIONS': 1, 'LS_ITERATIONS': 3899}
+[B2_flat] rollout + inference 101.4 ms/step -> 40,408 env-steps/s
+[B2_flat] PPO update 151 ms -> full loop 38,050 env-steps/s
+[B2_flat] SUMMARY physics 86,958 | step 43,717 | rollout 40,408 | loop 38,050  (ms: physics 47.1, step 93.7, rollout/step 101.4, update 151)
+--- C2 flat 00:41:30
+[C2_flat] N=4096 njmax 112 naconmax 98304 is_sparse False
+[C2_flat] physics only 47.2 ms/step -> 86,737 env-steps/s
+[C2_flat] full env step 94.3 ms -> 43,445 env-steps/s
+[C2_flat] after random-action steps: nefc max 29 mean 11.7; nacon 11173 (2.73/world); overflow {'ITERATIONS': 1, 'LS_ITERATIONS': 3870}
+[C2_flat] rollout + inference 101.2 ms/step -> 40,477 env-steps/s
+[C2_flat] PPO update 150 ms -> full loop 38,123 env-steps/s
+[C2_flat] SUMMARY physics 86,737 | step 43,445 | rollout 40,477 | loop 38,123  (ms: physics 47.2, step 94.3, rollout/step 101.2, update 150)
+--- F2 flat 00:42:03
+[F2_flat] N=4096 njmax 112 naconmax 98304 is_sparse False
+[F2_flat] physics only 47.0 ms/step -> 87,081 env-steps/s
+[F2_flat] full env step 94.3 ms -> 43,419 env-steps/s
+[F2_flat] after random-action steps: nefc max 31 mean 11.6; nacon 11139 (2.72/world); overflow {'LS_ITERATIONS': 3865}
+[F2_flat] rollout + inference 100.9 ms/step -> 40,605 env-steps/s
+[F2_flat] PPO update 141 ms -> full loop 38,372 env-steps/s
+[F2_flat] SUMMARY physics 87,081 | step 43,419 | rollout 40,605 | loop 38,372  (ms: physics 47.0, step 94.3, rollout/step 100.9, update 141)
+--- B2 rough 00:42:36
+[B2_rough] N=4096 njmax 256 naconmax 524288 is_sparse False
+[B2_rough] physics only 70.6 ms/step -> 58,017 env-steps/s
+[B2_rough] full env step 106.0 ms -> 38,624 env-steps/s
+[B2_rough] after random-action steps: nefc max 39 mean 11.5; nacon 10887 (2.66/world); overflow {'ITERATIONS': 1, 'LS_ITERATIONS': 3881}
+[B2_rough] rollout + inference 114.6 ms/step -> 35,735 env-steps/s
+[B2_rough] PPO update 297 ms -> full loop 32,258 env-steps/s
+[B2_rough] SUMMARY physics 58,017 | step 38,624 | rollout 35,735 | loop 32,258  (ms: physics 70.6, step 106.0, rollout/step 114.6, update 297)
+--- C2 rough 00:43:16
+[C2_rough] N=4096 njmax 256 naconmax 524288 is_sparse False
+[C2_rough] physics only 70.7 ms/step -> 57,909 env-steps/s
+[C2_rough] full env step 105.7 ms -> 38,734 env-steps/s
+[C2_rough] after random-action steps: nefc max 29 mean 11.3; nacon 10683 (2.61/world); overflow {'ITERATIONS': 2, 'LS_ITERATIONS': 3860}
+[C2_rough] rollout + inference 114.6 ms/step -> 35,742 env-steps/s
+[C2_rough] PPO update 298 ms -> full loop 32,247 env-steps/s
+[C2_rough] SUMMARY physics 57,909 | step 38,734 | rollout 35,742 | loop 32,247  (ms: physics 70.7, step 105.7, rollout/step 114.6, update 298)
+--- F2 rough 00:43:55
+[F2_rough] N=4096 njmax 256 naconmax 524288 is_sparse False
+[F2_rough] physics only 70.7 ms/step -> 57,920 env-steps/s
+[F2_rough] full env step 105.9 ms -> 38,666 env-steps/s
+[F2_rough] after random-action steps: nefc max 28 mean 11.5; nacon 10875 (2.66/world); overflow {'ITERATIONS': 2, 'LS_ITERATIONS': 3857}
+[F2_rough] rollout + inference 114.6 ms/step -> 35,751 env-steps/s
+[F2_rough] PPO update 296 ms -> full loop 32,276 env-steps/s
+[F2_rough] SUMMARY physics 57,920 | step 38,666 | rollout 35,751 | loop 32,276  (ms: physics 70.7, step 105.9, rollout/step 114.6, update 296)
+=== end Sun Oct 11 00:44:35 PDT 2026 power: Now drawing from 'AC Power'
+[gpu_run] fma_tp_ab end: device utilisation 98% (00:44:35), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  70632 Google Chrome He                   2.4 %

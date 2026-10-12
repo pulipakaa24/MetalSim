@@ -1,0 +1,84 @@
+......F                                                                  [100%]
+=================================== FAILURES ===================================
+________________________ test_rough_task_runs_on_newton ________________________
+
+    def test_rough_task_runs_on_newton():
+        """The rough task (heightfield, height scan, curriculum) steps on Newton; the torso pose the height
+        scanner reads is MuJoCo's for the same state."""
+        from metalsim.learn.g1_velocity import benchmark_step
+        n = 8
+>       task = G1VelocityTask(n, terrain="rough", seed=0, **NEWTON)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_g1_newton_engine.py:182: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/learn/g1_velocity.py:626: in __init__
+    self.sim = NewtonSim(m, n, iterations=newton_iterations, dt=newton_dt, control_dt=CONTROL_DT, device=device,
+metalsim/physics/newton_backend.py:659: in __init__
+    self.contacts = self.pipeline.contacts(); self.pipeline.collide(self.s0, self.contacts)
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/newton/_src/sim/collide.py:2409: in collide
+    self.narrow_phase.launch_custom_write(
+.venv/lib/python3.12/site-packages/newton/_src/geometry/narrow_phase.py:3185: in launch_custom_write
+    wp.launch(
+.claude/worktrees/agent-acdd938690dabdae8/upstream/warp-i2/warp/_src/context.py:12638: in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint, dim_limit=dim_limit)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+kernel = <warp._src.context.Kernel object at 0x1130e8890>
+hooks = <warp._src.context.KernelHooks object at 0x3cdfea6f0>
+params = [<warp._src.types.launch_bounds_1d_t object at 0x3cdf455d0>, <warp._src.codegen.Struct.__init__.<locals>.StructType ob...at 0x16702c250>, <warp._src.types.array_t object at 0x16702c2d0>, <warp._src.types.array_t object at 0x1656ee850>, ...]
+device = 'metal:0', block_dim = 128, adjoint = False, dim_limit = None
+det_args = None
+
+    def invoke_metal(
+        kernel,
+        hooks,
+        params: Sequence[Any],
+        device: Device,
+        block_dim: int,
+        adjoint: bool = False,
+        dim_limit: warp.array | None = None,
+        det_args=None,
+    ):
+        """Dispatch a forward or backward kernel on a Metal device.
+    
+        With ``dim_limit`` (a forward launch), only the threadgroups holding tasks whose leading index is below
+        ``dim_limit[0]`` run (see :func:`warp.launch`).
+    
+        ``det_args`` carries the deterministic-mode buffers of kernels with deterministic lowering
+        (``warp._src.metal_deterministic``).
+        """
+        if hooks.metal_unsupported:
+            detail = ""
+            if "int64)" in hooks.metal_unsupported:
+                detail = (
+                    ". Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit "
+                    "atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; "
+                    "use 32-bit atomics (e.g. on one half of the value) instead"
+                )
+>           raise RuntimeError(
+                f"Kernel '{kernel.key}' uses builtins that are not supported on Metal yet: {hooks.metal_unsupported}"
+                + detail
+            )
+E           RuntimeError: Kernel 'reduce_buffered_contacts_kernel' uses builtins that are not supported on Metal yet: atomic_cas(uint64). Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; use 32-bit atomics (e.g. on one half of the value) instead
+
+.claude/worktrees/agent-acdd938690dabdae8/upstream/warp-i2/warp/_src/context.py:11546: RuntimeError
+----------------------------- Captured stdout call -----------------------------
+Module newton._src.geometry.narrow_phase ad886e8 load on device 'metal:0' took 743.91 ms  (compiled)
+Module newton._src.geometry.contact_reduction_global 150b7cd load on device 'metal:0' took 1020.03 ms  (compiled)
+Module mesh_triangle_contacts_to_reducer_kernel_c313a0c0 9748bc1 load on device 'metal:0' took 2466.61 ms  (compiled)
+Module newton._src.geometry.contact_reduction_global 5b7c0f8 load on device 'metal:0' took 1015.82 ms  (compiled)
+=============================== warnings summary ===============================
+tests/test_g1_newton_engine.py::test_graph_replay_matches_eager
+  /Users/aditya/robosim/metalsim/learn/g1_velocity.py:980: RuntimeWarning: Mean of empty slice
+    return {"num_envs": n, "frames": num_frames, "mean_step_ms": t_ns.mean() / 1e6, "fps_isaac_style": n / (t_ns.mean() / 1e9)}
+
+tests/test_g1_newton_engine.py::test_graph_replay_matches_eager
+  /Users/aditya/robosim/.venv/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+    ret = ret.dtype.type(ret / rcount)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_g1_newton_engine.py::test_rough_task_runs_on_newton - Runti...
+1 failed, 6 passed, 2 warnings in 82.74s (0:01:22)

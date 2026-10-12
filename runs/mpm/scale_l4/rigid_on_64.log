@@ -1,0 +1,95 @@
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+/home/<user>/parity3_scripts/mpm/scale/scale_pour.py:236: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+  model = scene.finalize(device=DEV)
+Traceback (most recent call last):
+  File "/home/<user>/parity3_scripts/mpm/scale/scale_pour.py", line 911, in <module>
+    {"mpm": run_mpm, "rigid": run_rigid, "ordered": run_ordered, "bodyforce": run_bodyforce}[args.part]()
+  File "/home/<user>/parity3_scripts/mpm/scale/scale_pour.py", line 677, in run_rigid
+    tick()
+  File "/home/<user>/parity3_scripts/mpm/scale/scale_pour.py", line 674, in tick
+    substep()
+  File "/home/<user>/parity3_scripts/mpm/scale/scale_pour.py", line 668, in substep
+    solver.step(st["a"], st["b"], control, contacts, RIGID_DT)
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/utils/benchmark.py", line 138, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/mujoco/solver_mujoco.py", line 3848, in step
+    self._mujoco_warp_step()
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/utils/benchmark.py", line 138, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/mujoco/solver_mujoco.py", line 3826, in _mujoco_warp_step
+    self._mujoco_warp.step(self.mjw_model, self.mjw_data)
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/warp_util.py", line 97, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/forward.py", line 1366, in step
+    forward(m, d)
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/warp_util.py", line 97, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/forward.py", line 1360, in forward
+    sensor.sensor_acc(m, d)
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/warp_util.py", line 97, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/sensor.py", line 2542, in sensor_acc
+    wp.launch(
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/context.py", line 10596, in launch
+    module_exec = kernel.module.load(device, block_dim)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/context.py", line 4154, in load
+    raise e
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/context.py", line 4151, in load
+    compiled = self._compile(device, module_dir, output_name, output_arch, options=options)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/context.py", line 3930, in _compile
+    source_str, source_code_ext, meta, ltoir_values, fatbin_values = self._run_codegen(options, is_cpu)
+                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/codegen.py", line 1568, in locked_call
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/context.py", line 3800, in _run_codegen
+    builder = ModuleBuilder(
+              ^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/context.py", line 2785, in __init__
+    self.build_kernel(kernel)
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/context.py", line 2887, in build_kernel
+    kernel.adj.build(self)
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/codegen.py", line 1568, in locked_call
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/codegen.py", line 2042, in build
+    raise type(original_exc)(*new_args).with_traceback(original_exc.__traceback__) from None
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/codegen.py", line 2023, in build
+    adj.eval(adj.tree.body[0])
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/codegen.py", line 5822, in eval
+    return emit_node(adj, node)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/codegen.py", line 3181, in emit_FunctionDef
+    adj.eval(f)
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/codegen.py", line 5822, in eval
+    return emit_node(adj, node)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/codegen.py", line 3847, in emit_For
+    adj.eval(s)
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/codegen.py", line 5822, in eval
+    return emit_node(adj, node)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/codegen.py", line 3866, in emit_Expr
+    return adj.emit_Call(node.value, return_value_used=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/codegen.py", line 4227, in emit_Call
+    out = adj.add_call(
+          ^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/codegen.py", line 2667, in add_call
+    det_output = adj.deterministic.emit_atomic_call(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/deterministic.py", line 434, in emit_atomic_call
+    return emit_deterministic_atomic(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/deterministic.py", line 1295, in emit_deterministic_atomic
+    raise WarpCodegenError(str(e)) from e
+warp._src.codegen.WarpCodegenError: Error while parsing function "_sensor_tactile" at /home/<user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/sensor.py:2307:
+    wp.atomic_add(sensordata_out, worldid, sensor_adr[sensor_id] + 1 * dim + vertid, forceT[1])
+;Deterministic mode does not support mixing 'max' and 'add' reductions on array 'sensordata_out' in the same function or kernel.

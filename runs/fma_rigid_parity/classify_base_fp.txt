@@ -1,0 +1,482 @@
+locals: 5039 identical in all 4 runs, 162 TREE-induced (stable within each tree), 332 run-to-run noise
+tests with TREE-induced differences: 43; tests with run-to-run noise: 69
+noise tests:
+  tests/test_deformable.py::test_mjw_flex_contact_trajectory_matches_mujoco_c
+  tests/test_deformable.py::test_mjw_flex_energy_bounded_2s
+  tests/test_deformable.py::test_mjw_flex_free_fall_matches_mujoco_c
+  tests/test_deformable.py::test_mjw_flex_graph_replay_equals_eager
+  tests/test_deformable.py::test_mjw_flex_one_step_matches_mujoco_c_in_contact
+  tests/test_deformable.py::test_xpbd_drape_agrees_with_mjw_flex
+  tests/test_deformable.py::test_xpbd_energy_strain_penetration_2s
+  tests/test_g1_fast_factorization.py::test_first_steps_match_mujoco_c
+  tests/test_g1_newton_engine.py::test_graph_replay_matches_eager
+  tests/test_g1_newton_engine.py::test_rough_task_runs_on_newton
+  tests/test_g1_newton_engine.py::test_touch_signals_are_contact_forces_and_fall_is_terminated
+  tests/test_g1_task_terms.py::test_base_velocity_option_2_3_2_configs[flat]
+  tests/test_g1_task_terms.py::test_base_velocity_option_2_3_2_configs[rough]
+  tests/test_g1_task_terms.py::test_base_velocity_option_2_3_2_configs[rough_isaac]
+  tests/test_g1_task_terms.py::test_contact_sensor_flags_match_touch_sites
+  tests/test_g1_task_terms.py::test_feet_slide_velocity_is_the_foot_body_world_velocity[mjwarp]
+  tests/test_g1_task_terms.py::test_feet_slide_velocity_is_the_foot_body_world_velocity[newton]
+  tests/test_g1_task_terms.py::test_flat_commands_and_contact_history_termination[mjwarp]
+  tests/test_g1_task_terms.py::test_il3_add_base_mass_distribution_and_constants[None]
+  tests/test_g1_task_terms.py::test_il3_add_base_mass_distribution_and_constants[isaaclab3]
+  tests/test_g1_task_terms.py::test_il3_base_lin_vel_is_the_root_com_velocity
+  tests/test_g1_task_terms.py::test_il3_contact_sensor_ticks
+  tests/test_g1_task_terms.py::test_il3_reward_terms_match_isaac_formulas[flat_il3]
+  tests/test_g1_task_terms.py::test_il3_reward_terms_match_isaac_formulas[rough_il3]
+  tests/test_g1_task_terms.py::test_reward_terms_match_isaac_formulas[mjwarp]
+  tests/test_g1_task_terms.py::test_reward_terms_match_isaac_formulas[newton]
+  tests/test_g1_task_terms.py::test_rough_isaac_reward_set_matches_isaac_formulas
+  tests/test_g1_task_terms.py::test_rough_reward_set_unchanged
+  tests/test_gpu_queue.py::test_acquire_with_cmd_takes_the_lock_and_records_the_command
+  tests/test_gpu_queue.py::test_exit_code_recorded_when_a_waiter_freed_the_holder
+  tests/test_gpu_queue.py::test_front_ticket_sorts_ahead_of_older_tickets_of_its_class
+  tests/test_interop.py::test_handles
+  tests/test_interop.py::test_ping_pong_round_trip
+  tests/test_interop.py::test_torch_buffer_readable_by_warp
+  tests/test_interop.py::test_wait_blocks_torch_until_signaled
+  tests/test_interop.py::test_wait_blocks_warp_until_signaled
+  tests/test_lidar_nav.py::test_scan_matches_mj_ray_and_env_runs
+  tests/test_lift_ctrl_ordering.py::test_step_matches_host_synchronized_stepping
+  tests/test_lift_env.py::test_lift_env_runs_and_resets
+  tests/test_lift_env.py::test_lift_env_throughput
+  tests/test_materialx.py::test_mtlx_document_flattens
+  tests/test_materialx.py::test_tier0_render_albedo
+  tests/test_materialx.py::test_usd_scene_binds_mtlx
+  tests/test_physics.py::test_one_step_parity_vs_mujoco_c[g1]
+  tests/test_physics.py::test_one_step_parity_vs_mujoco_c[go1]
+  tests/test_physics.py::test_step_does_not_block_host
+  tests/test_ppo_warp_rollout.py::test_noise_fresh_each_rollout_and_no_phantom_action
+  tests/test_ppo_warp_rollout.py::test_rslrl_adapter_contract
+  tests/test_ppo_warp_rollout.py::test_stored_logp_matches_torch
+  tests/test_render_textures.py::test_basis_transcodes_are_exact
+  tests/test_render_textures.py::test_file_orientation_conventions
+  tests/test_render_textures.py::test_ktx2_standard_orientation
+  tests/test_render_textures.py::test_no_texture_count_limit
+  tests/test_render_textures.py::test_wrap_modes
+  tests/test_render_tier0.py::test_gpu_path_with_batchsim_no_host_sync
+  tests/test_render_tier2.py::test_env_map_usd_dome_import
+  tests/test_replicator.py::test_randomize_annotate_write
+  tests/test_scene_usd.py::test_so101_import
+  tests/test_scene_usd.py::test_urdf_import_to_usd
+  tests/test_scene_usd.py::test_usd_round_trip_to_mujoco
+  tests/test_sensors_contact.py::test_g1_landing_vs_mujoco_c
+  tests/test_sensors_contact.py::test_stack_sign_history_filter_and_graph
+  tests/test_sensors_rt.py::test_gpu_path_ordering_with_sim
+  tests/test_sensors_state.py::test_imu_and_contact_sensors_as_tensors
+  tests/test_solver_presets.py::test_iteration_cap_only_changes_worlds_that_reach_it
+  tests/test_solver_presets.py::test_once_per_tick_collision_step_is_stable_and_close
+  tests/test_terrain.py::test_g1_rough_task_runs
+  tests/test_tron1.py::test_controller_reset_is_fast_enough_for_the_control_loop
+  tests/test_warp_policy.py::test_rollout_without_torch_launches
+
+# tests/test_deformable.py::test_mjw_flex_free_fall_matches_mujoco_c  (1 locals)
+   v                              base: [4, 112, 3] max=0.3805452 mean=0.1393484 min=-0.18 nf=0
+                                  cand: [4, 112, 3] max=0.3805452 mean=0.1393484 min=-0.18 nf=0
+
+# tests/test_deformable.py::test_xpbd_drape_agrees_with_mjw_flex  (1 locals)
+   xb                             base: [100, 3] max=0.305 mean=0.09732969 min=-0.1742493 nf=0
+                                  cand: [100, 3] max=0.305 mean=0.09735265 min=-0.1742479 nf=0
+
+# tests/test_deformable.py::test_xpbd_energy_strain_penetration_2s  (1 locals)
+   x                              base: [64, 112, 3] max=0.3312444 mean=0.1014533 min=-0.2092137 nf=0
+                                  cand: [64, 112, 3] max=0.3312444 mean=0.1014649 min=-0.2044292 nf=0
+
+# tests/test_g1_newton_engine.py::test_reset_restores_default_state  (2 locals)
+   q                              base: [4, 44] max=1.704037 mean=0.08716729 min=-1.666297 nf=0
+                                  cand: [4, 44] max=1.704037 mean=0.08716729 min=-1.666297 nf=0
+   v                              base: [4, 43] max=0 mean=0 min=-0 nf=0
+                                  cand: [4, 43] max=0 mean=0 min=-0 nf=0
+
+# tests/test_g1_newton_engine.py::test_state_conventions_match_mujoco  (4 locals)
+   bq                             base: [3, 38, 7] max=1.943744 mean=0.2661516 min=-1.156238 nf=0
+                                  cand: [3, 38, 7] max=1.943744 mean=0.2661516 min=-1.156238 nf=0
+   bqd                            base: [3, 38, 6] max=2.597865 mean=0.3875623 min=-2.131345 nf=0
+                                  cand: [3, 38, 6] max=2.597865 mean=0.3875623 min=-2.131345 nf=0
+   x                              base: [7] max=0.3645756 mean=-0.1985089 min=-0.6770731 nf=0
+                                  cand: [7] max=0.3645756 mean=-0.1985089 min=-0.6770731 nf=0
+   v_nw                           base: [3] max=0.7478827 mean=0.112448 min=-0.6666946 nf=0
+                                  cand: [3] max=0.7478827 mean=0.1124479 min=-0.6666946 nf=0
+
+# tests/test_g1_parity.py::test_warp_matches_mujoco_c_under_pd_hold  (3 locals)
+   q                              base: [4, 44] max=1.000156 mean=0.1043298 min=-1.000156 nf=0
+                                  cand: [4, 44] max=1.000156 mean=0.1043288 min=-1.000156 nf=0
+   e                              base: [4, 44] max=6.34801e-06 mean=5.118418e-07 min=6.697086e-12 nf=0
+                                  cand: [4, 44] max=5.543347e-06 mean=5.00236e-07 min=2.005056e-12 nf=0
+   err                            base: 6.34801e-06
+                                  cand: 5.543347e-06
+
+# tests/test_g1_task_terms.py::test_base_velocity_option_2_3_2_configs[flat]  (1 locals)
+   ref.2                          base: 0
+                                  cand: 0.00375
+
+# tests/test_g1_task_terms.py::test_il3_add_base_mass_distribution_and_constants[isaaclab3]  (1 locals)
+   sr                             base: [38, 2] max=1 mean=0.154139 min=0.00404 nf=0
+                                  cand: [38, 2] max=1 mean=0.154139 min=0.00404 nf=0
+
+# tests/test_g1_task_terms.py::test_il3_push_robot_interval_and_velocity  (6 locals)
+   v0                             base: [4096, 43] max=0.6770563 mean=-0.000304827 min=-0.7001232 nf=0
+                                  cand: [4096, 43] max=0.6770563 mean=-0.000304827 min=-0.7001232 nf=0
+   v1                             base: [4096, 43] max=1.003985 mean=-0.0002692261 min=-0.9758874 nf=0
+                                  cand: [4096, 43] max=1.003985 mean=-0.0002692261 min=-0.9758874 nf=0
+   w0                             base: [3] max=0.2125586 mean=0.1529961 min=0.04978549 nf=0
+                                  cand: [3] max=0.2125586 mean=0.1529961 min=0.04978549 nf=0
+   c0                             base: [3] max=0.4434769 mean=0.3765873 min=0.313885 nf=0
+                                  cand: [3] max=0.4434769 mean=0.3765873 min=0.313885 nf=0
+   w1                             base: [3] max=0.2125586 mean=0.1529961 min=0.04978549 nf=0
+                                  cand: [3] max=0.2125586 mean=0.1529961 min=0.04978549 nf=0
+   c1                             base: [3] max=0.7745743 mean=0.4789614 min=0.313885 nf=0
+                                  cand: [3] max=0.7745743 mean=0.4789614 min=0.313885 nf=0
+
+# tests/test_g1_task_terms.py::test_il3_reset_root_state_distribution_and_application  (3 locals)
+   qvel                           base: [4096, 43] max=0.7015576 mean=0.0002172232 min=-0.6904417 nf=0
+                                  cand: [4096, 43] max=0.7015576 mean=0.0002172232 min=-0.6904418 nf=0
+   W                              base: [4096, 3] max=0.4999286 mean=0.003917914 min=-0.4999807 nf=0
+                                  cand: [4096, 3] max=0.4999286 mean=0.003917914 min=-0.4999807 nf=0
+   V                              base: [4096, 3] max=0.4999806 mean=-0.0003604482 min=-0.499992 nf=0
+                                  cand: [4096, 3] max=0.4999806 mean=-0.0003604482 min=-0.499992 nf=0
+
+# tests/test_g1_task_terms.py::test_reward_terms_match_isaac_formulas[newton]  (1 locals)
+   ref.6                          base: -0.1410232
+                                  cand: -0.1304294
+
+# tests/test_lift_env.py::test_lift_env_runs_and_resets  (11 locals)
+   img0                           base: [32, 128, 128, 3] max=255 mean=128.5074 min=0 nf=0
+                                  cand: [32, 128, 128, 3] max=255 mean=128.5075 min=0 nf=0
+   rewards[0]                     base: [32] max=0.00873059 mean=0.004141614 min=0.001287878 nf=0
+                                  cand: [32] max=0.00873059 mean=0.004142473 min=0.001287878 nf=0
+   rewards[1]                     base: [32] max=0.008432567 mean=0.004192896 min=0.001324177 nf=0
+                                  cand: [32] max=0.008432567 mean=0.004193358 min=0.001324177 nf=0
+   rewards[2]                     base: [32] max=0.01006848 mean=0.004487574 min=0.001365781 nf=0
+                                  cand: [32] max=0.01006848 mean=0.004487809 min=0.001365721 nf=0
+   rewards[9]                     base: [32] max=0.06036425 mean=0.01077323 min=0.0008034706 nf=0
+                                  cand: [32] max=0.06036425 mean=0.01077324 min=0.0008034706 nf=0
+   rewards[10]                    base: [32] max=0.07579637 mean=0.01263109 min=0.0006420612 nf=0
+                                  cand: [32] max=0.07579643 mean=0.01263109 min=0.0006420612 nf=0
+   rewards[40]                    base: [32] max=0.01418126 mean=0.004229125 min=0.001740098 nf=0
+                                  cand: [32] max=0.01418126 mean=0.004230034 min=0.001740098 nf=0
+   rewards[41]                    base: [32] max=0.01604778 mean=0.004581913 min=0.001690447 nf=0
+                                  cand: [32] max=0.01604778 mean=0.004582357 min=0.001690447 nf=0
+   rewards[43]                    base: [32] max=0.02678221 mean=0.006004672 min=0.001313686 nf=0
+                                  cand: [32] max=0.02678227 mean=0.006004773 min=0.001313686 nf=0
+   rewards[44]                    base: [32] max=0.03155231 mean=0.00706118 min=0.001232147 nf=0
+                                  cand: [32] max=0.0315522 mean=0.007061213 min=0.001232147 nf=0
+   rew                            base: [32] max=0.03155231 mean=0.00706118 min=0.001232147 nf=0
+                                  cand: [32] max=0.0315522 mean=0.007061213 min=0.001232147 nf=0
+
+# tests/test_physics.py::test_one_step_parity_vs_mujoco_c[g1]  (1 locals)
+   worst_v                        base: 5.610932e-06
+                                  cand: 4.4621e-06
+
+# tests/test_physics.py::test_one_step_parity_vs_mujoco_c[go1]  (1 locals)
+   worst_v                        base: 5.287178e-05
+                                  cand: 5.31698e-05
+
+# tests/test_physics.py::test_one_step_parity_vs_mujoco_c[panda]  (3 locals)
+   q_gpu                          base: [8, 9] max=1.842018 mean=0.01930664 min=-1.952124 nf=0
+                                  cand: [8, 9] max=1.842018 mean=0.01930664 min=-1.952124 nf=0
+   v_gpu                          base: [8, 9] max=6.808709 mean=0.1875427 min=-7.154202 nf=0
+                                  cand: [8, 9] max=6.808709 mean=0.1875427 min=-7.154202 nf=0
+   worst_v                        base: 4.915813e-07
+                                  cand: 1.309208e-06
+
+# tests/test_physics.py::test_one_step_parity_vs_mujoco_c[so101_lift]  (2 locals)
+   q_gpu                          base: [8, 13] max=1 mean=0.1895079 min=-0.2311712 nf=0
+                                  cand: [8, 13] max=1 mean=0.1895079 min=-0.2311712 nf=0
+   v_gpu                          base: [8, 12] max=2.585463 mean=0.04315212 min=-2.850236 nf=0
+                                  cand: [8, 12] max=2.585463 mean=0.04315213 min=-2.850236 nf=0
+
+# tests/test_physics.py::test_per_world_model_fields  (1 locals)
+   v                              base: [8] max=0.3999998 mean=0.1358928 min=0.04999997 nf=0
+                                  cand: [8] max=0.3999998 mean=0.1358928 min=0.04999997 nf=0
+
+# tests/test_physics.py::test_reset_and_forward_ordering  (3 locals)
+   q                              base: [16, 13] max=1 mean=0.1138506 min=-3.365991e-07 nf=0
+                                  cand: [16, 13] max=1 mean=0.1138506 min=-3.365989e-07 nf=0
+   qn                             base: [16, 13] max=1 mean=0.1138506 min=-3.365991e-07 nf=0
+                                  cand: [16, 13] max=1 mean=0.1138506 min=-3.365989e-07 nf=0
+   xpos                           base: [16, 10, 3] max=0.316664 mean=0.08570682 min=-0.1221215 nf=0
+                                  cand: [16, 10, 3] max=0.316664 mean=0.08570682 min=-0.1221215 nf=0
+
+# tests/test_physics.py::test_trajectory_parity_so101_arm_joints  (3 locals)
+   got                            base: [200, 13] max=1 mean=0.1276795 min=-0.1945307 nf=0
+                                  cand: [200, 13] max=1 mean=0.1276795 min=-0.1945307 nf=0
+   err                            base: [200, 6] max=3.20251e-07 mean=7.170913e-08 min=1.89797e-11 nf=0
+                                  cand: [200, 6] max=3.446679e-07 mean=5.183455e-08 min=3.785611e-12 nf=0
+   q_all                          base: [4, 13] max=1 mean=0.1246142 min=-0.1745309 nf=0
+                                  cand: [4, 13] max=1 mean=0.1246141 min=-0.1745309 nf=0
+
+# tests/test_physx_cloth.py::test_dropped_cloth_against_xpbd  (2 locals)
+   xa                             base: [441, 3] max=0.4050001 mean=0.06857875 min=-0.3633865 nf=0
+                                  cand: [441, 3] max=0.4050001 mean=0.06857505 min=-0.3637973 nf=0
+   xb                             base: [441, 3] max=0.4072462 mean=0.08041937 min=-0.3347853 nf=0
+                                  cand: [441, 3] max=0.4061385 mean=0.08005705 min=-0.3352349 nf=0
+
+# tests/test_physx_cloth.py::test_dropped_cloth_rests_at_physx_offsets  (3 locals)
+   x                              base: [4, 441, 3] max=0.4343578 mean=0.08192523 min=-0.390237 nf=0
+                                  cand: [4, 441, 3] max=0.4343549 mean=0.08173745 min=-0.3891804 nf=0
+   z                              base: [4, 441] max=0.4343578 mean=0.2485732 min=0.02499379 nf=0
+                                  cand: [4, 441] max=0.4343549 mean=0.2484808 min=0.02499382 nf=0
+   ztop                           base: [144] max=0.4314968 mean=0.4254697 min=0.4249999 nf=0
+                                  cand: [144] max=0.4314934 mean=0.4254692 min=0.4249999 nf=0
+
+# tests/test_physx_cloth.py::test_hanging_cloth_against_xpbd  (2 locals)
+   xa                             base: [441, 3] max=1.5 mean=0.3301705 min=-0.5 nf=0
+                                  cand: [441, 3] max=1.5 mean=0.3301728 min=-0.5 nf=0
+   xb                             base: [441, 3] max=1.5 mean=0.3334612 min=-0.5 nf=0
+                                  cand: [441, 3] max=1.5 mean=0.3334745 min=-0.5 nf=0
+
+# tests/test_ppo_warp_rollout.py::test_noise_fresh_each_rollout_and_no_phantom_action  (1 locals)
+   corr                           base: 0.04684835
+                                  cand: 0.04684835
+
+# tests/test_radar_lite.py::test_radial_velocity_matches_mujoco  (3 locals)
+   o.radial_velocity              base: [2, 1024] max=2.054691 mean=-0.2517639 min=-3.968819 nf=0
+                                  cand: [2, 1024] max=2.054691 mean=-0.2517639 min=-3.968819 nf=0
+   err                            base: [260] max=3.528097e-07 mean=5.573586e-08 min=3.68488e-11 nf=0
+                                  cand: [260] max=3.528097e-07 mean=6.213224e-08 min=3.023659e-11 nf=0
+   noisy.radial_velocity          base: [2, 1024] max=2.054691 mean=-0.2517639 min=-3.968819 nf=0
+                                  cand: [2, 1024] max=2.054691 mean=-0.2517639 min=-3.968819 nf=0
+
+# tests/test_render_splat.py::test_gpu_path_matches_host_path_and_composites  (3 locals)
+   gpu.depth                      base: [5, 64, 96] max=3.864585 mean=0.9733259 min=0 nf=0
+                                  cand: [5, 64, 96] max=3.864585 mean=0.9733259 min=0 nf=0
+   mat                            base: [5, 3, 3] max=0.9999999 mean=0.1111111 min=-0.9999999 nf=0
+                                  cand: [5, 3, 3] max=0.9999999 mean=0.1111111 min=-0.9999999 nf=0
+   host.depth                     base: [5, 64, 96] max=3.864585 mean=0.9733259 min=0 nf=0
+                                  cand: [5, 64, 96] max=3.864585 mean=0.9733259 min=0 nf=0
+
+# tests/test_render_terrain_slots.py::test_hfield_tile_culling_is_pixel_exact[oblique]  (2 locals)
+   out.True.depth                 base: [96, 96] max=9.9855 mean=2.123922 min=0 nf=0
+                                  cand: [96, 96] max=9.9855 mean=2.123925 min=0 nf=0
+   out.False.depth                base: [96, 96] max=9.9855 mean=2.123922 min=0 nf=0
+                                  cand: [96, 96] max=9.9855 mean=2.123925 min=0 nf=0
+
+# tests/test_render_tier0.py::test_gpu_path_with_batchsim_no_host_sync  (19 locals)
+   means[0]                       base: [] max=89.16177 mean=89.16177 min=89.16177 nf=0
+                                  cand: [] max=89.16195 mean=89.16195 min=89.16195 nf=0
+   means[1]                       base: [] max=89.16831 mean=89.16831 min=89.16831 nf=0
+                                  cand: [] max=89.16846 mean=89.16846 min=89.16846 nf=0
+   means[2]                       base: [] max=89.24612 mean=89.24612 min=89.24612 nf=0
+                                  cand: [] max=89.24625 mean=89.24625 min=89.24625 nf=0
+   means[3]                       base: [] max=89.0584 mean=89.0584 min=89.0584 nf=0
+                                  cand: [] max=89.05859 mean=89.05859 min=89.05859 nf=0
+   means[4]                       base: [] max=89.09354 mean=89.09354 min=89.09354 nf=0
+                                  cand: [] max=89.09367 mean=89.09367 min=89.09367 nf=0
+   means[5]                       base: [] max=88.91584 mean=88.91584 min=88.91584 nf=0
+                                  cand: [] max=88.91614 mean=88.91614 min=88.91614 nf=0
+   means[6]                       base: [] max=88.71383 mean=88.71383 min=88.71383 nf=0
+                                  cand: [] max=88.71397 mean=88.71397 min=88.71397 nf=0
+   means[7]                       base: [] max=88.70886 mean=88.70886 min=88.70886 nf=0
+                                  cand: [] max=88.6991 mean=88.6991 min=88.6991 nf=0
+   means[8]                       base: [] max=88.76224 mean=88.76224 min=88.76224 nf=0
+                                  cand: [] max=88.76244 mean=88.76244 min=88.76244 nf=0
+   means[9]                       base: [] max=88.66996 mean=88.66996 min=88.66996 nf=0
+                                  cand: [] max=88.67001 mean=88.67001 min=88.67001 nf=0
+   means[10]                      base: [] max=88.61234 mean=88.61234 min=88.61234 nf=0
+                                  cand: [] max=88.6127 mean=88.6127 min=88.6127 nf=0
+   means[11]                      base: [] max=88.59007 mean=88.59007 min=88.59007 nf=0
+                                  cand: [] max=88.5902 mean=88.5902 min=88.5902 nf=0
+   means[12]                      base: [] max=88.8443 mean=88.8443 min=88.8443 nf=0
+                                  cand: [] max=88.84447 mean=88.84447 min=88.84447 nf=0
+   means[14]                      base: [] max=88.9491 mean=88.9491 min=88.9491 nf=0
+                                  cand: [] max=88.94933 mean=88.94933 min=88.94933 nf=0
+   means[15]                      base: [] max=89.08858 mean=89.08858 min=89.08858 nf=0
+                                  cand: [] max=89.08875 mean=89.08875 min=89.08875 nf=0
+   means[16]                      base: [] max=89.31033 mean=89.31033 min=89.31033 nf=0
+                                  cand: [] max=89.31049 mean=89.31049 min=89.31049 nf=0
+   means[17]                      base: [] max=89.20554 mean=89.20554 min=89.20554 nf=0
+                                  cand: [] max=89.2057 mean=89.2057 min=89.2057 nf=0
+   means[18]                      base: [] max=88.97732 mean=88.97732 min=88.97732 nf=0
+                                  cand: [] max=88.97749 mean=88.97749 min=88.97749 nf=0
+   means[19]                      base: [] max=89.13007 mean=89.13007 min=89.13007 nf=0
+                                  cand: [] max=89.13029 mean=89.13029 min=89.13029 nf=0
+
+# tests/test_render_tier2.py::test_cartpole_rgb_rollout_tier2  (6 locals)
+   obs.image                      base: [32, 100, 100, 3] max=184 mean=92.38634 min=13 nf=0
+                                  cand: [32, 100, 100, 3] max=184 mean=92.38628 min=13 nf=0
+   obs.state                      base: [32, 4] max=8.210265 mean=-0.05507748 min=-9.160866 nf=0
+                                  cand: [32, 4] max=8.210266 mean=-0.05507759 min=-9.160865 nf=0
+   obs.qpos                       base: [32, 4] max=8.210265 mean=-0.05507748 min=-9.160866 nf=0
+                                  cand: [32, 4] max=8.210266 mean=-0.05507759 min=-9.160865 nf=0
+   r                              base: [32] max=0.9902122 mean=0.4371223 min=-1.396576 nf=0
+                                  cand: [32] max=0.9902122 mean=0.4371222 min=-1.396576 nf=0
+   info.episode_reward            base: [32] max=29.55957 mean=15.95112 min=3.750854 nf=0
+                                  cand: [32] max=29.55957 mean=15.95112 min=3.750854 nf=0
+   img                            base: [32, 100, 100, 3] max=184 mean=92.38634 min=13 nf=0
+                                  cand: [32, 100, 100, 3] max=184 mean=92.38628 min=13 nf=0
+
+# tests/test_render_tier2.py::test_physical_preset_batch_is_finite  (7 locals)
+   obs.image                      base: [1024, 100, 100, 3] max=186 mean=92.40469 min=1 nf=0
+                                  cand: [1024, 100, 100, 3] max=186 mean=92.4041 min=1 nf=0
+   obs.state                      base: [1024, 4] max=11.65259 mean=0.01391123 min=-11.64838 nf=0
+                                  cand: [1024, 4] max=11.65259 mean=0.01391123 min=-11.64838 nf=0
+   obs.qpos                       base: [1024, 4] max=11.65259 mean=0.01391123 min=-11.64838 nf=0
+                                  cand: [1024, 4] max=11.65259 mean=0.01391123 min=-11.64838 nf=0
+   r                              base: [1024] max=0.9964535 mean=0.7462494 min=-1.168929 nf=0
+                                  cand: [1024] max=0.9964535 mean=0.7462494 min=-1.168929 nf=0
+   info.episode_reward            base: [1024] max=9.89439 mean=8.900133 min=1.563253 nf=0
+                                  cand: [1024] max=9.89439 mean=8.900133 min=1.563253 nf=0
+   acc                            base: [1024, 100, 100, 4] max=5.571298 mean=2.102117 min=0.02790069 nf=0
+                                  cand: [1024, 100, 100, 4] max=5.571297 mean=2.102105 min=0.02790069 nf=0
+   img                            base: [1024, 100, 100, 3] max=186 mean=92.40469 min=1 nf=0
+                                  cand: [1024, 100, 100, 3] max=186 mean=92.4041 min=1 nf=0
+
+# tests/test_replicator.py::test_randomize_annotate_write  (5 locals)
+   rgb                            base: [8, 128, 128, 3] max=255 mean=46.94249 min=0 nf=0
+                                  cand: [8, 128, 128, 3] max=255 mean=46.94283 min=0 nf=0
+   boxes3d                        base: [8, 20, 10] max=1e+10 mean=1e+08 min=-5e+09 nf=0
+                                  cand: [8, 20, 10] max=1e+10 mean=1e+08 min=-5e+09 nf=0
+   cam.rotation                   base: [8, 3, 3] max=0.8419284 mean=0.2969584 min=-0.7082115 nf=0
+                                  cand: [8, 3, 3] max=0.8419284 mean=0.2969584 min=-0.7082115 nf=0
+   r                              base: [8, 128, 128, 3] max=255 mean=46.94249 min=0 nf=0
+                                  cand: [8, 128, 128, 3] max=255 mean=46.94283 min=0 nf=0
+   bb                             base: [8, 20, 10] max=1e+10 mean=1e+08 min=-5e+09 nf=0
+                                  cand: [8, 20, 10] max=1e+10 mean=1e+08 min=-5e+09 nf=0
+
+# tests/test_replicator_annotators.py::test_basic_writer_layout[warp]  (1 locals)
+   pcl                            base: [735, 3] max=0.6112961 mean=0.1139656 min=-0.4686662 nf=0
+                                  cand: [735, 3] max=0.6112963 mean=0.1139656 min=-0.4686662 nf=0
+
+# tests/test_replicator_annotators.py::test_depth_normals_pointcloud[warp]  (7 locals)
+   nd                             base: [2, 96, 96, 4] max=1 mean=0.2320407 min=-1 nf=0
+                                  cand: [2, 96, 96, 4] max=1 mean=0.2320407 min=-1 nf=0
+   pc.points                      base: [2, 96, 96, 3] max=0.7995805 mean=-0.02223215 min=-0.7996994 nf=0
+                                  cand: [2, 96, 96, 3] max=0.7995805 mean=-0.02223215 min=-0.7996994 nf=0
+   pts                            base: [2, 96, 96, 3] max=0.7995805 mean=-0.02223215 min=-0.7996994 nf=0
+                                  cand: [2, 96, 96, 3] max=0.7995805 mean=-0.02223215 min=-0.7996994 nf=0
+   errs_nd[0]                     base: [3899] max=0.000845728 mean=8.999025e-05 min=0 nf=0
+                                  cand: [3899] max=0.000845728 mean=0.0001206504 min=0 nf=0
+   errs_nd[1]                     base: [3909] max=0.000690534 mean=9.27518e-05 min=0 nf=0
+                                  cand: [3909] max=0.000690534 mean=0.0001208133 min=0 nf=0
+   ang                            base: [3909] max=0.000690534 mean=9.27518e-05 min=0 nf=0
+                                  cand: [3909] max=0.000690534 mean=0.0001208133 min=0 nf=0
+   a                              base: [7808] max=0.000845728 mean=9.137279e-05 min=0 nf=0
+                                  cand: [7808] max=0.000845728 mean=0.0001207319 min=0 nf=0
+
+# tests/test_replicator_annotators.py::test_event_external_wrench_body_frame  (3 locals)
+   x                              base: [64, 4, 6] max=2.728915 mean=0.1089012 min=-2.652913 nf=0
+                                  cand: [64, 4, 6] max=2.728914 mean=0.1089012 min=-2.652913 nf=0
+   R                              base: [64, 4, 3, 3] max=1 mean=0.1813661 min=-0.9999064 nf=0
+                                  cand: [64, 4, 3, 3] max=1 mean=0.1813661 min=-0.9999065 nf=0
+   want                           base: [64, 3] max=2.728915 mean=0.8712098 min=-2.652913 nf=0
+                                  cand: [64, 3] max=2.728914 mean=0.8712098 min=-2.652913 nf=0
+
+# tests/test_replicator_annotators.py::test_event_reset_root_velocity_is_com_velocity  (1 locals)
+   lin                            base: [3] max=0.3 mean=0.06666667 min=-0.2 nf=0
+                                  cand: [3] max=0.3 mean=0.06666667 min=-0.2 nf=0
+
+# tests/test_replicator_annotators.py::test_motion_vectors_exact[warp]  (1 locals)
+   mv                             base: [2, 96, 96, 4] max=1 mean=0.119391 min=-2.744335 nf=0
+                                  cand: [2, 96, 96, 4] max=1 mean=0.1193911 min=-2.744335 nf=0
+
+# tests/test_sensors_contact.py::test_g1_landing_vs_mujoco_c  (2 locals)
+   ref                            base: [3, 3] max=136.6133 mean=39.27062 min=-0.8234115 nf=0
+                                  cand: [3, 3] max=136.6147 mean=39.27099 min=-0.8234505 nf=0
+   tot                            base: 270.7037
+                                  cand: 270.7063
+
+# tests/test_sensors_rt.py::test_gpu_path_ordering_with_sim  (5 locals)
+   ranges[2]                      base: [16, 64] max=1.758759 mean=1.551791 min=0.6750353 nf=0
+                                  cand: [16, 64] max=1.758759 mean=1.551791 min=0.6750353 nf=0
+   ranges[3]                      base: [16, 64] max=1.756191 mean=1.549725 min=0.6750354 nf=0
+                                  cand: [16, 64] max=1.756191 mean=1.549725 min=0.6750354 nf=0
+   ranges[4]                      base: [16, 64] max=1.752834 mean=1.547023 min=0.6750354 nf=0
+                                  cand: [16, 64] max=1.752834 mean=1.547023 min=0.6750354 nf=0
+   ranges[6]                      base: [16, 64] max=1.743748 mean=1.539708 min=0.6750354 nf=0
+                                  cand: [16, 64] max=1.743748 mean=1.539708 min=0.6750354 nf=0
+   ranges[8]                      base: [16, 64] max=1.731502 mean=1.529849 min=0.6750354 nf=0
+                                  cand: [16, 64] max=1.731502 mean=1.529849 min=0.6750354 nf=0
+
+# tests/test_solver_presets.py::test_once_per_tick_contacts_follow_the_bodies  (11 locals)
+   la                             base: [256, 3] max=0.1506059 mean=0.001342973 min=-0.1506059 nf=0
+                                  cand: [256, 3] max=0.1506059 mean=0.001342973 min=-0.1506059 nf=0
+   lb                             base: [256, 3] max=0.1374717 mean=6.221025e-05 min=-0.0656376 nf=0
+                                  cand: [256, 3] max=0.1374717 mean=6.221002e-05 min=-0.06563757 nf=0
+   ref.dist                       base: [32] max=-0.00324726 mean=-0.004613813 min=-0.00604068 nf=0
+                                  cand: [32] max=-0.003247228 mean=-0.004613768 min=-0.006040644 nf=0
+   ref.pos                        base: [32, 3] max=0.1532202 mean=0.01013485 min=-0.150329 nf=0
+                                  cand: [32, 3] max=0.1532202 mean=0.01013486 min=-0.150329 nf=0
+   xp                             base: [4, 45, 3] max=0.990315 mean=0.1985929 min=-0.248921 nf=0
+                                  cand: [4, 45, 3] max=0.990315 mean=0.1985929 min=-0.248921 nf=0
+   xm                             base: [4, 45, 3, 3] max=1 mean=0.2584063 min=-0.9933641 nf=0
+                                  cand: [4, 45, 3, 3] max=1 mean=0.2584063 min=-0.993364 nf=0
+   lbn                            base: [32, 3] max=0.1374717 mean=0.000497682 min=-0.0656376 nf=0
+                                  cand: [32, 3] max=0.1374717 mean=0.0004976802 min=-0.06563757 nf=0
+   pr                             base: [32, 3] max=0.1558344 mean=0.009525925 min=-0.1500521 nf=0
+                                  cand: [32, 3] max=0.1558344 mean=0.009525935 min=-0.1500521 nf=0
+   fresh.dist                     base: [32] max=-0.003247251 mean=-0.004613804 min=-0.00604067 nf=0
+                                  cand: [32] max=-0.003247219 mean=-0.004613764 min=-0.006040644 nf=0
+   fresh.pos                      base: [32, 3] max=0.1558344 mean=0.01029489 min=-0.1500521 nf=0
+                                  cand: [32, 3] max=0.1558344 mean=0.0102949 min=-0.1500521 nf=0
+   pf                             base: [32, 3] max=0.1558344 mean=0.009525922 min=-0.1500521 nf=0
+                                  cand: [32, 3] max=0.1558344 mean=0.009525935 min=-0.1500521 nf=0
+
+# tests/test_terrain.py::test_height_scan_matches_mj_ray  (2 locals)
+   ours                           base: [8, 187] max=0.3800001 mean=0.3048069 min=0.3 nf=0
+                                  cand: [8, 187] max=0.3800001 mean=0.3048069 min=0.3 nf=0
+   worst                          base: [1496] max=0.9100007 mean=0.004586141 min=0 nf=0
+                                  cand: [1496] max=0.9100007 mean=0.004586141 min=0 nf=0
+
+# tests/test_terrain.py::test_hfield_mesh_contacts_match_mujoco_c  (5 locals)
+   worst_normal                   base: 0.9128595
+                                  cand: 0.9128734
+   worst_pen                      base: 0.004160881
+                                  cand: 0.004160762
+   fr                             base: [30, 3, 3] max=1 mean=0.1024203 min=-1 nf=0
+                                  cand: [30, 3, 3] max=1 mean=0.1024205 min=-1 nf=0
+   dist                           base: [30] max=-0.0001924731 mean=-0.0002879986 min=-0.0005210069 nf=0
+                                  cand: [30] max=-0.000195469 mean=-0.0002879946 min=-0.0005204272 nf=0
+   ours                           base: [4] max=0.7086533 mean=0.698889 min=0.6695971 nf=0
+                                  cand: [4] max=0.7086535 mean=0.6988894 min=0.6695976 nf=0
+
+# tests/test_warp_policy.py::test_layer_mapping_bitwise  (17 locals)
+   ctrl                           base: [512, 1] max=1 mean=-0.1337275 min=-1 nf=0
+                                  cand: [512, 1] max=1 mean=-0.1337275 min=-1 nf=0
+   outs.A[0]                      base: [512, 32] max=2.504591 mean=0.1164433 min=-0.9341125 nf=0
+                                  cand: [512, 32] max=2.504591 mean=0.1164433 min=-0.9341125 nf=0
+   outs.A[1]                      base: [512, 32] max=1.368572 mean=0.06092129 min=-0.7572688 nf=0
+                                  cand: [512, 32] max=1.368572 mean=0.06092129 min=-0.7572688 nf=0
+   outs.A[2]                      base: [512, 1] max=0.01686652 mean=-0.2346706 min=-0.6654158 nf=0
+                                  cand: [512, 1] max=0.01686651 mean=-0.2346706 min=-0.6654158 nf=0
+   outs.A[3]                      base: [512, 32] max=2.37734 mean=0.01443764 min=-0.9420964 nf=0
+                                  cand: [512, 32] max=2.37734 mean=0.01443764 min=-0.9420964 nf=0
+   outs.A[4]                      base: [512, 32] max=1.425524 mean=0.001668581 min=-0.7925902 nf=0
+                                  cand: [512, 32] max=1.425523 mean=0.00166858 min=-0.7925902 nf=0
+   outs.A[5]                      base: [512, 1] max=0.4842334 mean=0.08032016 min=-0.3689951 nf=0
+                                  cand: [512, 1] max=0.4842332 mean=0.08032016 min=-0.3689951 nf=0
+   outs.A[6]                      base: [512, 1] max=1.975977 mean=-0.223261 min=-2.868421 nf=0
+                                  cand: [512, 1] max=1.975977 mean=-0.223261 min=-2.868421 nf=0
+   outs.A[7]                      base: [512, 1] max=1 mean=-0.1337275 min=-1 nf=0
+                                  cand: [512, 1] max=1 mean=-0.1337275 min=-1 nf=0
+   outs.D[0]                      base: [512, 32] max=2.504591 mean=0.1164433 min=-0.9341125 nf=0
+                                  cand: [512, 32] max=2.504591 mean=0.1164433 min=-0.9341125 nf=0
+   outs.D[1]                      base: [512, 32] max=1.368572 mean=0.06092129 min=-0.7572688 nf=0
+                                  cand: [512, 32] max=1.368572 mean=0.06092129 min=-0.7572688 nf=0
+   outs.D[2]                      base: [512, 1] max=0.01686652 mean=-0.2346706 min=-0.6654158 nf=0
+                                  cand: [512, 1] max=0.01686651 mean=-0.2346706 min=-0.6654158 nf=0
+   outs.D[3]                      base: [512, 32] max=2.37734 mean=0.01443764 min=-0.9420964 nf=0
+                                  cand: [512, 32] max=2.37734 mean=0.01443764 min=-0.9420964 nf=0
+   outs.D[4]                      base: [512, 32] max=1.425524 mean=0.001668581 min=-0.7925902 nf=0
+                                  cand: [512, 32] max=1.425523 mean=0.00166858 min=-0.7925902 nf=0
+   outs.D[5]                      base: [512, 1] max=0.4842334 mean=0.08032016 min=-0.3689951 nf=0
+                                  cand: [512, 1] max=0.4842332 mean=0.08032016 min=-0.3689951 nf=0
+   outs.D[6]                      base: [512, 1] max=1.975977 mean=-0.223261 min=-2.868421 nf=0
+                                  cand: [512, 1] max=1.975977 mean=-0.223261 min=-2.868421 nf=0
+   outs.D[7]                      base: [512, 1] max=1 mean=-0.1337275 min=-1 nf=0
+                                  cand: [512, 1] max=1 mean=-0.1337275 min=-1 nf=0
+
+# tests/test_warp_policy.py::test_parity_with_torch_and_shared_weights  (2 locals)
+   ctrl                           base: [256, 1] max=1 mean=-0.0253328 min=-1 nf=0
+                                  cand: [256, 1] max=1 mean=-0.0253328 min=-1 nf=0
+   a                              base: [256, 1] max=2.081774 mean=-0.1231108 min=-2.61851 nf=0
+                                  cand: [256, 1] max=2.081774 mean=-0.1231108 min=-2.61851 nf=0
+
+# tests/test_warp_policy.py::test_rollout_without_torch_launches  (3 locals)
+   obs                            base: [1024, 4] max=70.99091 mean=-2.315586 min=-45.63057 nf=0
+                                  cand: [1024, 4] max=70.99098 mean=-2.315588 min=-45.63049 nf=0
+   t_obs                          base: [64, 1024, 4] max=70.99091 mean=-1.182085 min=-45.63057 nf=0
+                                  cand: [64, 1024, 4] max=70.99098 mean=-1.182085 min=-45.63049 nf=0
+   t_act                          base: [64, 1024, 1] max=4.57447 mean=0.1838513 min=-4.208789 nf=0
+                                  cand: [64, 1024, 1] max=4.574471 mean=0.1838513 min=-4.208789 nf=0

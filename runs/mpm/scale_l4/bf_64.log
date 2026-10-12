@@ -1,0 +1,28 @@
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+{
+ "argv": [
+  "--device",
+  "cuda:0",
+  "--json",
+  "/home/<user>/parity3/scale_l4/bf_64.json",
+  "--part",
+  "bodyforce",
+  "--worlds",
+  "64"
+ ],
+ "device": "cuda:0",
+ "device_name": "NVIDIA L4",
+ "warp": "1.16.0",
+ "newton": "1.5.2",
+ "worlds": 64,
+ "part": "bodyforce",
+ "nodes": 102400,
+ "bodies": 128,
+ "atomic_ms": 0.09168850010610186,
+ "segmented_ms": 1.0205044999338497,
+ "atomic_vs_segmented_maxdiff": 0.03515625,
+ "chunked_work_items": 13107200,
+ "chunked_ms": 0.42408500007695693,
+ "chunked_vs_segmented_maxdiff": 0.02978515625,
+ "maxrss_mb": 420.6640625
+}

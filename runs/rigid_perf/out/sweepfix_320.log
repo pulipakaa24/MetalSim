@@ -1,0 +1,126 @@
+/Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/metalsim/physics/mpm/probes/scale_pour.py:241: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+  model = scene.finalize(device=DEV)
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/runs/rigid_perf/kcache/kc_hangfix/1.18.0.dev20260917
+Module newton._src.geometry.inertia 0fe97dd load on device 'metal:0' took 23.24 ms  (cached)
+Module validate_and_correct_inertia_kernel_bea299a6 bea299a load on device 'metal:0' took 24.20 ms  (cached)
+Module newton._src.geometry.bvh fcf7383 load on device 'metal:0' took 24.15 ms  (cached)
+Module newton._src.solvers.mujoco.kernels 2aaa6ac load on device 'metal:0' took 48.52 ms  (cached)
+Module repeat_array_kernel_702a7150 0e2dc9c load on device 'metal:0' took 22.44 ms  (cached)
+Module repeat_array_kernel_702a7150 815f0f2 load on device 'metal:0' took 22.14 ms  (cached)
+Module repeat_array_kernel_702a7150 1d08dd7 load on device 'metal:0' took 22.60 ms  (cached)
+Module repeat_array_kernel_702a7150 649a040 load on device 'metal:0' took 22.44 ms  (cached)
+Module repeat_array_kernel_702a7150 d233b0f load on device 'metal:0' took 22.16 ms  (cached)
+Module repeat_array_kernel_702a7150 21a009f load on device 'metal:0' took 22.15 ms  (cached)
+Module repeat_array_kernel_702a7150 f907360 load on device 'metal:0' took 22.51 ms  (cached)
+Module repeat_array_kernel_702a7150 9db5fd1 load on device 'metal:0' took 22.42 ms  (cached)
+Module mujoco_warp._src.io 345defc load on device 'metal:0' took 29.43 ms  (cached)
+Module mujoco_warp._src.smooth 561aaee load on device 'metal:0' took 35.94 ms  (cached)
+Module _small_cholesky_factorize_block__locals__kernel_d034e4aa 9b18383 load on device 'metal:0' took 25.09 ms  (cached)
+Module _tile_cholesky_factorize_block__locals__kernel_194c9a3a df6059a load on device 'metal:0' took 22.02 ms  (cached)
+Module _small_cholesky_solve_block__locals__kernel_85b20c1c 35b7d36 load on device 'metal:0' took 24.11 ms  (cached)
+Module _tile_cholesky_solve_block__locals__kernel_64ffc9b6 bb6d20e load on device 'metal:0' took 25.92 ms  (cached)
+Module newton._src.sim.articulation b1f6c8f load on device 'metal:0' took 36.87 ms  (cached)
+Module newton._src.sim.collide 2e554f9 load on device 'metal:0' took 23.87 ms  (cached)
+Module newton._src.geometry.broad_phase_nxn 4a7fec5 load on device 'metal:0' took 23.28 ms  (cached)
+Module narrow_phase_primitive_write_contact f3dd715 load on device 'metal:0' took 25.82 ms  (cached)
+Module narrow_phase_gjk_mpr_True_write_contact_support_map_lean_post_process_minkowski_only 90748dd load on device 'metal:0' took 30.33 ms  (cached)
+Module newton._src.geometry.narrow_phase c873af8 load on device 'metal:0' took 24.77 ms  (cached)
+Module newton._src.geometry.contact_reduction_global 85622f1 load on device 'metal:0' took 23.68 ms  (cached)
+Module newton._src.geometry.narrow_phase 2426fab load on device 'metal:0' took 24.95 ms  (cached)
+Module newton._src.geometry.sdf_contact f2ae734 load on device 'metal:0' took 22.48 ms  (cached)
+Module narrow_phase_mesh_plane_write_contact_to_reducer_True 46ddd3c load on device 'metal:0' took 22.64 ms  (cached)
+Module mesh_triangle_contacts_to_reducer_kernel_7f497eb1 04081dd load on device 'metal:0' took 30.24 ms  (cached)
+Module newton._src.geometry.contact_reduction_global b843aad load on device 'metal:0' took 23.86 ms  (cached)
+Module sdf_contact_write_contact_to_reducer_False_True bb65580 load on device 'metal:0' took 27.32 ms  (cached)
+Module export_reduced_contacts_write_contact c319e70 load on device 'metal:0' took 23.22 ms  (cached)
+Module mujoco_warp._src.constraint cae2216 load on device 'metal:0' took 22.82 ms  (cached)
+Module _equality_joint__locals__kernel_a87c48f0 a87c48f load on device 'metal:0' took 22.73 ms  (cached)
+Module _friction_dof__locals__kernel_b90a8bb0 b90a8bb load on device 'metal:0' took 22.59 ms  (cached)
+Module _friction_tendon__locals__kernel_bf418e6c bf418e6 load on device 'metal:0' took 22.70 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_a2ae52bd a2ae52b load on device 'metal:0' took 22.66 ms  (cached)
+Module _efc_contact_init__locals__kernel_27358d96 27358d9 load on device 'metal:0' took 22.27 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_5502dc00 ebea527 load on device 'metal:0' took 22.79 ms  (cached)
+Module _efc_contact_update__locals__kernel_e6db2566 e6db256 load on device 'metal:0' took 22.56 ms  (cached)
+Module mujoco_warp._src.forward ff231f2 load on device 'metal:0' took 25.54 ms  (cached)
+Module mujoco_warp._src.forward 90c0bc3 load on device 'metal:0' took 25.27 ms  (cached)
+Module mujoco_warp._src.passive 7cfe4b2 load on device 'metal:0' took 28.83 ms  (cached)
+Module _qfrc_smooth__locals__kernel_4b25e77e 4b25e77 load on device 'metal:0' took 21.99 ms  (cached)
+Module mujoco_warp._src.support a610d77 load on device 'metal:0' took 22.24 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_4fab0d26 9013c3a load on device 'metal:0' took 23.30 ms  (cached)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_7c110e58 61bbcd0 load on device 'metal:0' took 22.34 ms  (cached)
+Module _solve_init_dof__locals__kernel_e812c665 e812c66 load on device 'metal:0' took 22.31 ms  (cached)
+Module mujoco_warp._src.solver 833d92c load on device 'metal:0' took 25.24 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_b9b00fe0 b9b00fe load on device 'metal:0' took 22.45 ms  (cached)
+Module mul_m_kernel__locals___mul_m_b8f48c9b b8f48c9 load on device 'metal:0' took 22.39 ms  (cached)
+Module _update_constraint_efc__locals__kernel_9791a747 9791a74 load on device 'metal:0' took 22.72 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_48870a9c 48870a9 load on device 'metal:0' took 22.19 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_b8af9364 b8af936 load on device 'metal:0' took 22.48 ms  (cached)
+Module _update_gradient_grad__locals__kernel_90ad7a97 90ad7a9 load on device 'metal:0' took 22.27 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_2172ba12 1685adc load on device 'metal:0' took 22.36 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_d37924c4 e8241d3 load on device 'metal:0' took 22.67 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_5e908fdb 35c26ff load on device 'metal:0' took 23.84 ms  (cached)
+Module _update_constraint_efc__locals__kernel_180f62ed 180f62e load on device 'metal:0' took 22.36 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_a0f1a0f7 a0f1a0f load on device 'metal:0' took 22.13 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_c69b45b6 c69b45b load on device 'metal:0' took 22.26 ms  (cached)
+Module _update_gradient_grad__locals__kernel_1dcf4b69 1dcf4b6 load on device 'metal:0' took 22.34 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_90ac8833 4fa738b load on device 'metal:0' took 22.41 ms  (cached)
+Module mujoco_warp._src.sensor 58ee4de load on device 'metal:0' took 36.05 ms  (cached)
+Module mujoco_warp._src.derivative 63cf184 load on device 'metal:0' took 25.47 ms  (cached)
+Module _next_time_builder__locals___next_time_d112fcc4 d112fcc load on device 'metal:0' took 22.10 ms  (cached)
+{
+ "argv": [
+  "--part",
+  "rigid",
+  "--device",
+  "metal:0",
+  "--worlds",
+  "2048",
+  "--max-triangle-pairs",
+  "8388608",
+  "--warmup",
+  "3",
+  "--kprof",
+  "collide",
+  "--kprof-ticks",
+  "20",
+  "--json",
+  "/Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/runs/rigid_perf/out/sweepfix_320.json"
+ ],
+ "device": "metal:0",
+ "device_name": "Apple M4 Max",
+ "warp": "1.18.0.dev20260917",
+ "newton": "1.5.2",
+ "worlds": 2048,
+ "part": "rigid",
+ "det": "off",
+ "pipeline_det": false,
+ "mode": "eager",
+ "max_triangle_pairs": 8388608,
+ "bodies": 26624,
+ "shapes": 188417,
+ "joints": 26624,
+ "dofs": 43008,
+ "build_s": 0.980594167000163,
+ "solver_init_s": 1.7346707080005217,
+ "rigid_contact_max": 14053376,
+ "kprof": {
+  "phase": "collide",
+  "reps": 20,
+  "wall_ms_per_rep": 70.79551669999091,
+  "profiling": false,
+  "per_rep_counters": {
+   "host_waits": 0.05,
+   "command_buffers": 0.25,
+   "host_ops": 0.0,
+   "dispatches": 29.0
+  }
+ },
+ "rigid_contacts": 81920,
+ "maxrss_mb": 3335.1875
+}

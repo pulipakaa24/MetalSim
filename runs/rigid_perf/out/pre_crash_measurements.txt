@@ -1,0 +1,19 @@
+Measurements made before the 2026-10-11 crash (raw files were in the wiped scratchpad). Metal M4 Max, 2048 worlds,
+--max-triangle-pairs 8388608, det off, scale_pour --kprof (warmup 3 ticks, contacts 81,920). ms per rep; captured rep = 2 ticks.
+
+base (integrated trees)          collide 178.9 | substep 7.61 | tick 207.7 | captured 425.0/2 = 212.5 per tick
+  profile collide: mesh_sdf_collision_global_reduce 109.4, narrow_phase_find_mesh_triangle_overlaps 65.0,
+                   mesh_triangle_contacts_to_reducer 1.74, mesh_plane_contacts 1.63, reduce_buffered 0.44, rest <0.25 each
+  profile substep: GPU 2.9 ms total (140 launches), wall 7.5; host waits 2.17 per substep
+  counters captured (2 ticks): host_waits 12.3, command_buffers 18.3, host_ops 6 (capture_while per substep), dispatches 902
+NP_EXP_MESH_BLOCKS=160 (launch only)  collide 147.5 (mesh-mesh 77.1), tick 171.2, captured 352.7/2
+new = de978b55 (per-thread midphase + sm_count*4 blocks)
+                                 collide 81.8 (mesh-mesh 75.4, midphase 0.26) | substep 9.74 | tick 103.1 | captured 173.5/2 = 86.8
+Launch sweep before the barrier fix (collide wall): 64 -> 175.2, 160 -> 134.4, 320 -> 132.7, 640 -> 133.0, 1280 -> GPU hang
+Standard probe, base, --mode capture --steps 10 --count: collide 199.9, substep 7.89, tick 259.3, tick_captured 444.4,
+  contacts 296,639 (end of run), 452 wp.launch / 371 Metal dispatches per eager tick.
+  The same run on de978b55 hung the GPU (pid 90347, waitUntilCompleted for >850 s at 15:10; Mac panicked 16:56).
+
+L4 (CUDA, nsys, same kprof points): collide 90.5 (mesh-mesh 87.7, midphase 0.40), substep 8.95 (GPU 1.36),
+  tick 110.3, captured 194.3/2 = 97.1. det on (MJW RUN_TO_RUN) at 2048 fails on the L4: 8.4 GB allocation.
+  Raw: runs/rigid_perf/l4/rigid_kprof/

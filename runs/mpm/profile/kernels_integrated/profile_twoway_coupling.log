@@ -1,0 +1,199 @@
+[gpu_run] kprof_twoway_coupling start: device utilisation 0% (12:49:00)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module validate_and_correct_inertia_kernel_bea299a6 bea299a load on device 'metal:0' took 86.77 ms  (compiled)
+Module newton._src.geometry.bvh 5c0f9c6 load on device 'metal:0' took 24.32 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_model 5bce801 load on device 'metal:0' took 23.84 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels 1acecf1 load on device 'metal:0' took 24.33 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.mark_active_cells_c8efd7aa ffd1767 load on device 'metal:0' took 86.17 ms  (compiled)
+Module warp.fem.utils fbb7f75 load on device 'metal:0' took 23.86 ms  (cached)
+Module warp._src.fem.quadrature.pic_quadrature.dyn.bin_particles_92961d5a 2d09f41 load on device 'metal:0' took 100.03 ms  (compiled)
+Module warp._src.fem.quadrature.pic_quadrature.dyn.finalize_cell_particle_data_a1f6a656 191acf8 load on device 'metal:0' took 82.61 ms  (compiled)
+Module warp._src.fem.space.partition.dyn.node_category_from_cells_kernel_9b32ebc7 8a3d8d9 load on device 'metal:0' took 81.44 ms  (compiled)
+Module warp.fem.space.partition 19590fa load on device 'metal:0' took 22.49 ms  (cached)
+Module warp.fem.space.restriction 5e8418f load on device 'metal:0' took 21.65 ms  (cached)
+Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_7d88edf9 c07cc03 load on device 'metal:0' took 80.07 ms  (compiled)
+Module warp._src.fem.space.partition.dyn.node_category_from_cells_kernel_52cd6274 0bc0ab6 load on device 'metal:0' took 88.65 ms  (compiled)
+Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_965050a0 72b0a63 load on device 'metal:0' took 87.77 ms  (compiled)
+Module warp._src.fem.space.partition.dyn.node_category_from_cells_kernel_453759b7 df4131d load on device 'metal:0' took 80.93 ms  (compiled)
+Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_7a30481c 5120978 load on device 'metal:0' took 80.32 ms  (compiled)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.dyn.cell_color_251cbc29 5d4de94 load on device 'metal:0' took 79.23 ms  (compiled)
+Module newton._src.solvers.mujoco.kernels 2da77a6 load on device 'metal:0' took 4677.70 ms  (compiled)
+Module mujoco_warp._src.io 19a9eec load on device 'metal:0' took 1165.88 ms  (compiled)
+Module mujoco_warp._src.smooth 38fa883 load on device 'metal:0' took 420.58 ms  (compiled)
+Module _small_cholesky_factorize_block__locals__kernel_626bd356 bd9be32 load on device 'metal:0' took 421.89 ms  (compiled)
+Module _small_cholesky_solve_block__locals__kernel_7122b86f 8de0d65 load on device 'metal:0' took 391.11 ms  (compiled)
+Module newton._src.viewer.kernels 502fbf1 load on device 'metal:0' took 28.50 ms  (cached)
+Module newton._src.sim.articulation 8da40c0 load on device 'metal:0' took 213.81 ms  (compiled)
+Module map_mul e8cebf2 load on device 'metal:0' took 75.62 ms  (compiled)
+Module newton.examples.mpm.example_mpm_twoway_coupling cee6d31 load on device 'metal:0' took 536.93 ms  (compiled)
+Module newton._src.sim.collide 4347aec load on device 'metal:0' took 558.47 ms  (compiled)
+Module newton._src.geometry.broad_phase_nxn 2f7b93b load on device 'metal:0' took 406.64 ms  (compiled)
+Module narrow_phase_primitive_write_contact d9eedcc load on device 'metal:0' took 1711.14 ms  (compiled)
+Module narrow_phase_gjk_mpr_True_write_contact_support_map_lean_post_process_minkowski_only c4164e4 load on device 'metal:0' took 1639.45 ms  (compiled)
+Module newton._src.geometry.narrow_phase 8ccf091 load on device 'metal:0' took 660.73 ms  (compiled)
+Module newton._src.geometry.contact_sort 58b979a load on device 'metal:0' took 513.54 ms  (compiled)
+Module mujoco_warp._src.constraint 6f864ad load on device 'metal:0' took 80.22 ms  (compiled)
+Module _friction_dof__locals__kernel_ed8da615 ed8da61 load on device 'metal:0' took 426.45 ms  (compiled)
+Module _efc_contact_init__locals__kernel_a657ea26 a657ea2 load on device 'metal:0' took 404.54 ms  (compiled)
+Module _efc_contact_jac_sparse__locals__kernel_a7c1e680 a7c1e68 load on device 'metal:0' took 419.28 ms  (compiled)
+Module _efc_contact_update__locals__kernel_85dab4d7 85dab4d load on device 'metal:0' took 84.70 ms  (compiled)
+Module mujoco_warp._src.passive cc2ac97 load on device 'metal:0' took 263.65 ms  (compiled)
+Module _qfrc_smooth__locals__kernel_7052dddf 7052ddd load on device 'metal:0' took 76.84 ms  (compiled)
+Module mujoco_warp._src.support 93b1688 load on device 'metal:0' took 84.32 ms  (compiled)
+Module _small_cholesky_factorize_solve_block__locals__kernel_963b4d39 f065287 load on device 'metal:0' took 473.61 ms  (compiled)
+Module _solve_init_dof__locals__kernel_c15f1115 c15f111 load on device 'metal:0' took 382.95 ms  (compiled)
+Module mujoco_warp._src.solver 3dc4cda load on device 'metal:0' took 669.95 ms  (compiled)
+Module _solve_init_jaref_kernel__locals__kernel_bd56a957 bd56a95 load on device 'metal:0' took 379.02 ms  (compiled)
+Module mul_m_kernel__locals___mul_m_0fe09cc1 0fe09cc load on device 'metal:0' took 386.15 ms  (compiled)
+Module _update_constraint_efc__locals__kernel_45c59c39 45c59c3 load on device 'metal:0' took 397.13 ms  (compiled)
+Module _update_constraint_init_qfrc_constraint_sparse__locals__kernel_63e096d0 63e096d load on device 'metal:0' took 373.18 ms  (compiled)
+Module _update_gradient_zero_grad_dot__locals__kernel_6fe3a023 6fe3a02 load on device 'metal:0' took 364.17 ms  (compiled)
+Module _update_gradient_grad__locals__kernel_6dd5eb86 6dd5eb8 load on device 'metal:0' took 75.75 ms  (compiled)
+Module _update_gradient_init_h_sparse__locals__kernel_80328b6c 80328b6 load on device 'metal:0' took 361.71 ms  (compiled)
+Module _JTDAJ_sparse__locals__kernel_8306fef3 600b32f load on device 'metal:0' took 382.40 ms  (compiled)
+Module _update_gradient_cholesky_blocked__locals__kernel_97cb68f4 4ed8a21 load on device 'metal:0' took 546.47 ms  (compiled)
+Module _linesearch_jv_fused_kernel__locals__kernel_89db93a2 89db93a load on device 'metal:0' took 400.30 ms  (compiled)
+Module _linesearch_iterative_kernel__locals__kernel_a88a7b81 1a8591e load on device 'metal:0' took 594.10 ms  (compiled)
+Module _update_constraint_efc__locals__kernel_cd2436d6 cd2436d load on device 'metal:0' took 425.95 ms  (compiled)
+Module _update_gradient_zero_grad_dot__locals__kernel_e456e9c5 e456e9c load on device 'metal:0' took 386.73 ms  (compiled)
+Module _update_gradient_grad__locals__kernel_d6e5d1bf d6e5d1b load on device 'metal:0' took 390.66 ms  (compiled)
+Module _update_gradient_h_incremental_sparse__locals__kernel_7326c0ee 7326c0e load on device 'metal:0' took 394.73 ms  (compiled)
+Module _update_gradient_cholesky_blocked_skip_unchanged__locals__kernel_370c533a b0ab1bb load on device 'metal:0' took 582.02 ms  (compiled)
+Module mujoco_warp._src.sensor 1274f7d load on device 'metal:0' took 2130.66 ms  (compiled)
+Module mujoco_warp._src.derivative 27cd541 load on device 'metal:0' took 964.40 ms  (compiled)
+Module mujoco_warp._src.forward 339d18f load on device 'metal:0' took 163.27 ms  (compiled)
+Module _next_time_builder__locals___next_time_698e0006 698e000 load on device 'metal:0' took 394.87 ms  (compiled)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.integrate_fraction_490616ce 5d2bef6 load on device 'metal:0' took 112.93 ms  (compiled)
+Module newton._src.solvers.implicit_mpm.rasterized_collisions.world_position_4da1855f 2682312 load on device 'metal:0' took 124.76 ms  (compiled)
+Module newton._src.solvers.implicit_mpm.rasterized_collisions d936e23 load on device 'metal:0' took 29.37 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.collision_weight_field_d57e3b7c 38bbe1d load on device 'metal:0' took 122.05 ms  (compiled)
+Module warp._src.metal_sparse 2d64675 load on device 'metal:0' took 425.59 ms  (compiled)
+Module warp._src.metal_sparse d28890b load on device 'metal:0' took 424.22 ms  (compiled)
+Module warp._src.metal_sparse 35adc19 load on device 'metal:0' took 421.00 ms  (compiled)
+Module warp._src.metal_sparse da956e8 load on device 'metal:0' took 427.78 ms  (compiled)
+Module _bsr_accumulate_triplet_values_c6c408db 346cfc6 load on device 'metal:0' took 23.30 ms  (cached)
+Module warp._src.fem.quadrature.quadrature.dyn.quadrature_point_element_indices_c118c3aa 5791a1c load on device 'metal:0' took 83.20 ms  (compiled)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.integrate_velocity_81ab65a8 589ec87 load on device 'metal:0' took 89.16 ms  (compiled)
+Module warp._src.fem.field.virtual.dyn.dispatch_linear_kernel_fn_2e9eccdc e8bcb7d load on device 'metal:0' took 100.17 ms  (compiled)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.integrate_velocity_apic_e9b2c82e d3b39f4 load on device 'metal:0' took 102.73 ms  (compiled)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.integrate_mass_2ed4527c 02ff900 load on device 'metal:0' took 90.86 ms  (compiled)
+Module warp._src.fem.field.virtual.dyn.dispatch_linear_kernel_fn_d696e028 46f1c41 load on device 'metal:0' took 99.48 ms  (compiled)
+Module warp._src.metal_sparse 62550fb load on device 'metal:0' took 444.76 ms  (compiled)
+Module warp._src.metal_sparse b797727 load on device 'metal:0' took 443.11 ms  (compiled)
+Module warp._src.metal_sparse 83a6575 load on device 'metal:0' took 431.69 ms  (compiled)
+Module warp._src.metal_sparse 373d31d load on device 'metal:0' took 435.83 ms  (compiled)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.integrate_yield_parameters_5acc6722 4a76ccc load on device 'metal:0' took 88.44 ms  (compiled)
+Module warp._src.fem.field.virtual.dyn.dispatch_linear_kernel_fn_cbebd830 144655f load on device 'metal:0' took 92.18 ms  (compiled)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.integrate_active_fraction_3c9e7760 133f148 load on device 'metal:0' took 85.01 ms  (compiled)
+Module warp._src.fem.field.virtual.dyn.dispatch_linear_kernel_fn_be05bfcd 2c090dc load on device 'metal:0' took 87.29 ms  (compiled)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.strain_delta_form_a2d745e4 453a89d load on device 'metal:0' took 87.07 ms  (compiled)
+Module warp._src.fem.field.virtual.dyn.dispatch_bilinear_kernel_fn_52b75860 396ffee load on device 'metal:0' took 107.55 ms  (compiled)
+Module warp.fem.integrate 25ae790 load on device 'metal:0' took 381.87 ms  (compiled)
+Module warp.fem.integrate._identity_field_67b91059 2824b6e load on device 'metal:0' took 131.79 ms  (compiled)
+Module warp.fem.integrate._identity_field_368af30d 8e969b5 load on device 'metal:0' took 113.70 ms  (compiled)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.mass_form_6de81120 8b27a49 load on device 'metal:0' took 87.07 ms  (compiled)
+Module warp._src.fem.field.virtual.dyn.dispatch_bilinear_kernel_fn_f5700920 e96703f load on device 'metal:0' took 89.98 ms  (compiled)
+Module warp.sparse 4cab606 load on device 'metal:0' took 25.08 ms  (cached)
+Module _bsr_assign_copy_blocks_f139d8ef 9dd15cd load on device 'metal:0' took 23.79 ms  (cached)
+Module compute_eigenvalues_505555fb a7c7472 load on device 'metal:0' took 25.87 ms  (cached)
+Module inverse_scale_vector_29960e23 635da50 load on device 'metal:0' took 24.37 ms  (cached)
+Module newton._src.solvers.implicit_mpm.contact_solver_kernels b6d0572 load on device 'metal:0' took 24.00 ms  (cached)
+Module warp._src.metal_sparse 81b28c5 load on device 'metal:0' took 447.82 ms  (compiled)
+Module warp._src.metal_sparse e661772 load on device 'metal:0' took 471.70 ms  (compiled)
+Module _bsr_transpose_values_9b50b938 69aac14 load on device 'metal:0' took 24.38 ms  (cached)
+Module make_bsr_mv_kernel__locals__bsr_mv_kernel_8e378c32 8b3fbe5 load on device 'metal:0' took 401.80 ms  (compiled)
+Module newton._src.solvers.implicit_mpm.rheology_solver_kernels fbf4884 load on device 'metal:0' took 28.14 ms  (cached)
+Module newton._src.solvers.implicit_mpm.solve_rheology 7340d14 load on device 'metal:0' took 25.66 ms  (cached)
+Module newton._src.solvers.implicit_mpm.rheology_solver_kernels 4bab20f load on device 'metal:0' took 27.45 ms  (cached)
+Module newton._src.solvers.implicit_mpm.rheology_solver_kernels.dyn.gs_solve_kernel_impl_ba42a0de ce62480 load on device 'metal:0' took 25.58 ms  (cached)
+Module newton._src.solvers.implicit_mpm.solve_rheology 3dd82d8 load on device 'metal:0' took 25.52 ms  (cached)
+Module scatter_field_dof_values_de0cc3c1 508a88e load on device 'metal:0' took 23.85 ms  (cached)
+Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_16b56c40 8e135ff load on device 'metal:0' took 82.57 ms  (compiled)
+Module warp.fem.integrate._identity_field_958a4245 a5bfe52 load on device 'metal:0' took 105.68 ms  (compiled)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_414fc3f8 52812d1 load on device 'metal:0' took 111.25 ms  (compiled)
+Module __main__ d7b4df7 load on device 'metal:0' took 24.56 ms  (cached)
+{
+ "scene": "example:mpm_twoway_coupling",
+ "mode": "profile",
+ "set": {},
+ "frames": 6,
+ "particles": 0,
+ "wall_ms": [
+  79.57724999869242,
+  79.64750000974163,
+  79.03458294458687,
+  79.58850002614781,
+  78.73679202748463,
+  79.25933296792209
+ ],
+ "wall_median_ms": 79.41829148330726,
+ "iterations": [
+  50,
+  50,
+  50,
+  50,
+  50,
+  50
+ ],
+ "iterations_per_frame": 50.0,
+ "per_frame_counters": {
+  "host_waits": 20.0,
+  "command_buffers": 1983.0,
+  "host_ops": 0.0,
+  "dispatches_encoded": 1852.0
+ },
+ "kernel_total_ms_per_frame": 42.73716666666667,
+ "launches_per_frame": 1983.0,
+ "empty_cb_us_dim1": 2.4865,
+ "empty_cb_us_dim5120": 2.6205
+}
+    7.106 ms    400.0  gs_solve_kernel_impl_ba42a0de_aeb47b9b_metal_forward
+    5.406 ms    102.0  make_bsr_mv_kernel__locals__bsr_mv_kernel_b10c6805_metal_forward
+    2.741 ms      4.0  compute_body_forces_lanes_7e782f8e_metal_forward
+    2.092 ms     47.0  sort_scatter_k8_v4
+    1.711 ms     50.0  solve_subgrid_friction_42405d68_metal_forward
+    1.557 ms     70.0  sort_scatter_k4_v4
+    1.089 ms     21.0  wp_memtile
+    0.998 ms      8.0  _prepare_node_sort_kernel_afbdd00f_metal_forward
+    0.982 ms     90.0  wp_memset
+    0.916 ms     51.0  apply_subgrid_impulse_fe96c186_metal_forward
+    0.838 ms     47.0  sort_upsweep_k8
+    0.794 ms      3.0  NodePartition___scatter_partition_indices_acde3760_metal_forward
+    0.794 ms     70.0  sort_upsweep_k4
+    0.769 ms      1.0  integrate_velocity_apic_e9b2c82e_1cbb5049_metal_forward
+    0.682 ms    117.0  sort_scan_tiles
+    0.649 ms      1.0  collision_weight_field_d57e3b7c_c0dcfc69_metal_forward
+    0.625 ms     40.0  sort_copy
+    0.624 ms      4.0  _update_gradient_cholesky_blocked__locals__kernel_7223b709_metal_forward
+    0.546 ms      4.0  _update_gradient_cholesky_blocked_skip_unchanged__locals__kernel_45fd57e7_metal_forward
+    0.471 ms      4.0  create_narrow_phase_kernel_gjk_mpr__locals__narrow_phase_kernel_gjk_mpr_da3ef1c3_metal_forward
+    0.438 ms      9.0  rle_lengths
+    0.346 ms     76.0  det_scatter_finalize
+    0.337 ms      2.0  _triplet_keys_u64_33bf8cc7_metal_forward
+    0.331 ms      2.0  _segment_heads_0501b94f_metal_forward
+    0.330 ms      2.0  _triplet_segments_e6937fe1_metal_forward
+    0.309 ms      1.0  _transpose_columns_e84b5601_metal_forward
+    0.289 ms     13.0  sort_diff_k4
+    0.252 ms      1.0  _transpose_keys_u64_2133bb01_metal_forward
+    0.247 ms      4.0  _triplet_keys_u32_8822c4ec_metal_forward
+    0.245 ms      8.0  convert_newton_contacts_to_mjwarp_kernel_2edc37a4_metal_forward
+    0.244 ms      1.0  _bsr_transpose_values_a814354d_metal_forward
+    0.222 ms      4.0  _triplet_segments_2787cf31_metal_forward
+    0.221 ms      1.0  strain_delta_form_a2d745e4_05726bc9_metal_forward
+    0.204 ms      4.0  _segment_heads_19f058c5_metal_forward
+    0.202 ms      1.0  advect_particles_414fc3f8_911fd981_metal_forward
+    0.199 ms      8.0  _scatter_node_counts_654d0eae_metal_forward
+    0.199 ms      4.0  SpaceRestriction___split_vertex_element_index_d19d2c20_metal_forward
+    0.186 ms      1.0  _identity_field_958a4245_ba134a9c_metal_forward
+    0.185 ms      9.0  rle_count
+    0.184 ms     15.0  scan_reduce_i4
+[gpu_run] kprof_twoway_coupling end: device utilisation 0% (12:49:43), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid  70632 Google Chrome He                   2.1 %

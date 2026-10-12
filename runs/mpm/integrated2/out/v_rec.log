@@ -1,0 +1,31 @@
+skip F_granular
+skip F_multi_material
+skip F_twoway
+skip F_anymal
+skip F_plate_drag
+skip F_column_a2
+skip F_granular
+N F_multi_material exit 0 done: 60 frames, 178669 particles, 22.28 s, iters mean 225.16666666666666 max 250, init 016c0f04552b
+N F_twoway exit 0 done: 100 frames, 453871 particles, 23.81 s, iters mean 50.0 max 50, init bda7429fa80ec537f605e4c233
+N F_anymal exit 0 done: 50 frames, 486416 particles, 11.45 s, iters mean 50.0 max 50, init c604d945d3dd10b97e4b5496235
+N F_plate_drag exit 0 done: 195 frames, 278846 particles, 25.05 s, iters mean 250.0 max 250, init cf0bd4947aa8d068644ef725
+N F_column_a2 exit 0 done: 180 frames, 1728 particles, 21.37 s, iters mean 76.58333333333333 max 250, init a960bdec033f43
+F_anymal                 BITWISE EQUAL
+F_column_a2              BITWISE EQUAL
+F_granular               BITWISE EQUAL
+F_multi_material         BITWISE EQUAL
+F_plate_drag             BITWISE EQUAL
+F_twoway                 BITWISE EQUAL
+N2 F_granular exit 0 done: 60 frames, 226981 particles, 15.58 s, iters mean 247.33333333333334 max 250, init d928775a82cf
+N2 F_multi_material exit 0 done: 60 frames, 178669 particles, 4.58 s, iters mean 225.16666666666666 max 250, init 016c0f04552ba
+N2 F_twoway exit 0 done: 100 frames, 453871 particles, 18.51 s, iters mean 50.0 max 50, init bda7429fa80ec537f605e4c233
+N2 F_anymal exit 0 done: 50 frames, 486416 particles, 9.54 s, iters mean 50.0 max 50, init c604d945d3dd10b97e4b5496235a
+N2 F_plate_drag exit 0 done: 195 frames, 278846 particles, 8.79 s, iters mean 250.0 max 250, init cf0bd4947aa8d068644ef7256
+N2 F_column_a2 exit 0 done: 180 frames, 1728 particles, 5.11 s, iters mean 76.58333333333333 max 250, init a960bdec033f435
+F_anymal                 BITWISE EQUAL
+F_column_a2              BITWISE EQUAL
+F_granular               BITWISE EQUAL
+F_multi_material         BITWISE EQUAL
+F_plate_drag             BITWISE EQUAL
+F_twoway                 BITWISE EQUAL
+end 20:33:55

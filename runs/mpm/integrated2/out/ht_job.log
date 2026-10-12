@@ -1,0 +1,29 @@
+[gpu_run] a2_ht start: device utilisation 100% (18:18:12)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 100 %; per-process GPU time over 1.8 s: none >= 1 %
+== 64 envs, contact buffer 16384: record (fixed), replay identical states x2
+warp /Users/aditya/robosim/upstream/warp-innate/warp/__init__.py newton /Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/newton-rigid/newton/__init__.py table 262144 rigid_contact_max 16384
+SUMMARY per collide: {'contacts': 1810.06, 'active': 1564.58, 'dup_listed': 0.0, 'distinct_keys': 1564.58, 'dup_keys': 0.0, 'unlisted': 0.0, 'calls': 480}
+-- stock
+warp /Users/aditya/robosim/upstream/warp-innate/warp/__init__.py newton /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/__init__.py table 262144 rigid_contact_max 16384
+SUMMARY per collide: {'contacts': 1812.76, 'active': 20676.93, 'dup_listed': 19114.44, 'distinct_keys': 1557.51, 'dup_keys': 4.98, 'unlisted': 0.0, 'calls': 960}
+-- fixed
+warp /Users/aditya/robosim/upstream/warp-innate/warp/__init__.py newton /Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/newton-rigid/newton/__init__.py table 262144 rigid_contact_max 16384
+SUMMARY per collide: {'contacts': 1810.12, 'active': 1564.58, 'dup_listed': 0.0, 'distinct_keys': 1564.58, 'dup_keys': 0.0, 'unlisted': 0.0, 'calls': 960}
+-- fixed, final Warp
+warp /Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/warp-i2/warp/__init__.py newton /Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/newton-rigid/newton/__init__.py table 262144 rigid_contact_max 16384
+SUMMARY per collide: {'contacts': 1800.1, 'active': 1564.94, 'dup_listed': 0.0, 'distinct_keys': 1564.94, 'dup_keys': 0.0, 'unlisted': 0.0, 'calls': 480}
+== 64 envs, default contact buffer, free run
+warp /Users/aditya/robosim/upstream/warp-innate/warp/__init__.py newton /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/__init__.py table 262144 rigid_contact_max 1000
+SUMMARY per collide: {'contacts': 1777.99, 'active': 20413.28, 'dup_listed': 18851.88, 'distinct_keys': 1556.64, 'dup_keys': 4.76, 'unlisted': 0.0, 'calls': 480}
+warp /Users/aditya/robosim/upstream/warp-innate/warp/__init__.py newton /Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/newton-rigid/newton/__init__.py table 262144 rigid_contact_max 1000
+SUMMARY per collide: {'contacts': 1769.03, 'active': 1574.2, 'dup_listed': 0.0, 'distinct_keys': 1574.2, 'dup_keys': 0.0, 'unlisted': 0.0, 'calls': 480}
+== 4096 envs, default contact buffer, 3 control steps (48 collides)
+warp /Users/aditya/robosim/upstream/warp-innate/warp/__init__.py newton /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/__init__.py table 262144 rigid_contact_max 61440
+SUMMARY per collide: {'contacts': 30816.73, 'active': 246620.42, 'dup_listed': 221262.96, 'distinct_keys': 118019.98, 'dup_keys': 11131.77, 'unlisted': 103795.0, 'calls': 48}
+warp /Users/aditya/robosim/upstream/warp-innate/warp/__init__.py newton /Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/newton-rigid/newton/__init__.py table 262144 rigid_contact_max 61440
+SUMMARY per collide: {'contacts': 121721.23, 'active': 102699.5, 'dup_listed': 0.0, 'distinct_keys': 102699.5, 'dup_keys': 0.0, 'unlisted': 0.0, 'calls': 48}
+== final Warp + stock Newton (expected to raise)
+    raise RuntimeError(
+RuntimeError: Kernel 'reduce_buffered_contacts_kernel' uses builtins that are not supported on Metal yet: atomic_cas(uint64). Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit at
+[gpu_run] a2_ht end: device utilisation 100% (18:20:23), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 100 %; per-process GPU time over 1.8 s: none >= 1 %

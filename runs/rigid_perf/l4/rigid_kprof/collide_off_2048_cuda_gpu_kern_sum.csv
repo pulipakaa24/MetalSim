@@ -1,0 +1,20 @@
+Time (%),Total Time (ns),Instances,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Name
+96.3,350681136,4,87670284.0,87896399.5,86400509,88487828,897675.6,create_narrow_phase_process_mesh_mesh_contacts_kernel__locals__mesh_sdf_collision_global_reduce_kernel_bbbe9a99_cuda_kernel_forward
+1.4,5001821,4,1250455.3,1252167.5,1235719,1261767,12927.6,mesh_triangle_contacts_to_reducer_kernel_e39fb65e_cuda_kernel_forward
+0.8,3094916,4,773729.0,772977.0,771249,777713,2784.1,create_narrow_phase_process_mesh_plane_contacts_kernel__locals__narrow_phase_process_mesh_plane_contacts_reduce_kernel_7b0dcd62_cuda_kernel_forward
+0.4,1585601,4,396400.3,396856.0,393337,398552,2429.4,narrow_phase_find_mesh_triangle_overlaps_kernel_a2e50854_cuda_kernel_forward
+0.2,789104,4,197276.0,197164.0,194972,199804,2614.7,create_export_reduced_contacts_kernel__locals__export_reduced_contacts_kernel_5ba2e084_cuda_kernel_forward
+0.2,743826,4,185956.5,186620.5,183452,187133,1688.9,reduce_buffered_contacts_kernel_088d1a40_cuda_kernel_forward
+0.2,647956,4,161989.0,158989.0,156701,173277,7602.5,_clear_active_kernel_4660aa1f_cuda_kernel_forward
+0.2,567445,4,141861.3,141613.5,140061,144157,1714.5,create_narrow_phase_kernel_gjk_mpr__locals__narrow_phase_kernel_gjk_mpr_da3ef1c3_cuda_kernel_forward
+0.1,375801,4,93950.3,96942.0,82399,99518,7811.0,compute_shape_aabbs_fcbde74c_cuda_kernel_forward
+0.1,239035,4,59758.8,57886.5,57343,65919,4131.1,create_narrow_phase_primitive_kernel__locals__narrow_phase_primitive_kernel_81a38a1a_cuda_kernel_forward
+0.1,206236,4,51559.0,47151.0,46879,65055,8998.3,_nxn_broadphase_precomputed_pairs_8be4a3a3_cuda_kernel_forward
+0.0,86687,4,21671.8,21615.5,21120,22336,571.1,compute_mesh_plane_vert_counts_1af7aff4_cuda_kernel_forward
+0.0,82975,8,10371.9,10144.0,8192,12928,2077.4,compute_block_counts_from_weights_89c44be4_cuda_kernel_forward
+0.0,81372,8,10171.5,10255.5,8575,11680,1409.2,"void cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::DeviceScanKernel<cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::detail::scan::policy_hub<int, int, int, unsigned int, cuda::std::__4::plus<void>>::Policy1000, <unnamed>::cub_strided_iterator<const int>, <unnamed>::cub_strided_iterator<int>, cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::ScanTileState<int, (bool)1>, cuda::std::__4::plus<void>, cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::NullType, unsigned int, int, (bool)0>(T2, T3, T4, int, T5, T6, T7)"
+0.0,71870,8,8983.8,9136.0,8095,10048,734.2,"void cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::DeviceScanKernel<cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::detail::scan::policy_hub<int, int, int, unsigned int, cuda::std::__4::plus<void>>::Policy1000, <unnamed>::cub_strided_iterator<const int>, <unnamed>::cub_strided_iterator<int>, cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::ScanTileState<int, (bool)1>, cuda::std::__4::plus<void>, cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::detail::InputValue<int, int *>, unsigned int, int, (bool)0>(T2, T3, T4, int, T5, T6, T7)"
+0.0,33184,4,8296.0,8272.0,8256,8384,60.6,compute_mesh_mesh_edge_counts_a604ae33_cuda_kernel_forward
+0.0,20800,16,1300.0,1024.0,992,2816,596.6,"void cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::DeviceScanInitKernel<cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::ScanTileState<int, (bool)1>>(T1, int)"
+0.0,14240,4,3560.0,3520.0,3456,3744,129.0,verify_narrow_phase_buffers_c234c2df_cuda_kernel_forward
+0.0,4128,4,1032.0,1024.0,1024,1056,16.0,_zero_active_count_kernel_de41732d_cuda_kernel_forward

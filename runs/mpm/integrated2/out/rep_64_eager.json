@@ -1,0 +1,69 @@
+{
+ "argv": [
+  "--part",
+  "rigid",
+  "--device",
+  "metal:0",
+  "--worlds",
+  "64",
+  "--det",
+  "on",
+  "--pipeline-det",
+  "--max-triangle-pairs",
+  "8388608",
+  "--mode",
+  "eager",
+  "--steps",
+  "3",
+  "--warmup",
+  "2",
+  "--repeat-check",
+  "--json",
+  "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/runs/a2/out/rep_64_eager.json"
+ ],
+ "device": "metal:0",
+ "device_name": "Apple M4 Max",
+ "warp": "1.18.0.dev20260917",
+ "newton": "1.5.2",
+ "worlds": 64,
+ "part": "rigid",
+ "det": "on",
+ "pipeline_det": true,
+ "mode": "eager",
+ "max_triangle_pairs": 8388608,
+ "bodies": 832,
+ "shapes": 5889,
+ "joints": 832,
+ "dofs": 1344,
+ "build_s": 1.3167990410001948,
+ "solver_init_s": 18.56398733399874,
+ "rigid_contact_max": 439168,
+ "collide_ms": {
+  "median": 8.332708999660099,
+  "mean": 8.249222333688522,
+  "min": 8.046458000535495,
+  "max": 8.368500000869972
+ },
+ "substep_ms": {
+  "median": 5.1934160001110286,
+  "mean": 5.133083333324369,
+  "min": 4.776416999447974,
+  "max": 5.429417000414105
+ },
+ "tick_ms": {
+  "median": 21.685707999495207,
+  "mean": 54.98465266706868,
+  "min": 20.14758300174435,
+  "max": 123.12066699996649
+ },
+ "rigid_contacts": 2560,
+ "nefc_mean": 81.0,
+ "finite": true,
+ "repeat_check": {
+  "bitwise_equal": true,
+  "max_abs_diff": 0.0,
+  "worlds_differing": 0,
+  "finite": true
+ },
+ "maxrss_mb": 947.0
+}
