@@ -5,7 +5,11 @@
 //
 // Instance transforms are read straight from the physics state (MuJoCo Warp geom_xpos / geom_xmat
 // in unified memory): there is no host pack step. Cameras and lights come from cam_xpos / cam_xmat /
-// light_xpos / light_xdir with optional per-env deltas (domain randomization).
+// light_xpos / light_xdir with optional per-env deltas (domain randomization). Light records and instance colours
+// are per env (metalsim.render.model_sync: MuJoCo Warp's per-world light_* / geom_rgba / mat_rgba fields).
+// Depth: reversed z by default (near -> 1, far -> 0, compare greater, clear 0; ClipParams.z = 1), which keeps float32
+// depth precision relative (~1e-7 x distance) out to any far plane; ClipParams.z = 0 is the previous convention.
+// Infinite planes are a disc of octagon rings re-centred under each env's camera in the vertex stage (plane_adjust).
 #include <metal_stdlib>
 using namespace metal;
 
@@ -109,9 +113,11 @@ kernel void build_env_params(
     device const Light*      lights     [[buffer(5)]],
     device const float*      light_xdir [[buffer(6)]],   // (n_envs, n_light, 3)
     constant SceneParams&    sp         [[buffer(7)]],
+    constant float4&         clip       [[buffer(8)]],   // near, far (m), reversed z (1/0), 0
     uint e [[thread_position_in_grid]])
 {
     if (e >= c.n_envs) return;
+    lights += e * c.n_light;            // this env's light records
     CameraSpec cs = cams[e];
     uint ci = uint(max(cs.cam_id, 0));
     device const float* xp = cam_xpos + (e * c.n_cam + ci) * 3;
@@ -122,10 +128,13 @@ kernel void build_env_params(
     float4x4 V = float4x4(float4(Rt[0], 0), float4(Rt[1], 0), float4(Rt[2], 0), float4(-(Rt * pos), 1));
     float fx = cs.intrinsics.x, fy = cs.intrinsics.y, cx = cs.intrinsics.z, cy = cs.intrinsics.w;
     float w = float(c.tile_w), h = float(c.tile_h);
-    float n = 0.01, f = 10.0;
+    float n = clip.x, f = clip.y;
+    // standard: depth = (f/(n-f) z + nf/(n-f)) / -z  (n -> 0, f -> 1); reversed: n/(f-n), nf/(f-n) (n -> 1, f -> 0)
+    float p22 = clip.z > 0.5 ? n / (f - n) : f / (n - f);
+    float p23 = clip.z > 0.5 ? n * f / (f - n) : n * f / (n - f);
     float4x4 P = float4x4(
         float4(2*fx/w, 0, 0, 0), float4(0, 2*fy/h, 0, 0),
-        float4(1 - 2*cx/w, 2*cy/h - 1, f/(n - f), -1), float4(0, 0, n*f/(n - f), 0));
+        float4(1 - 2*cx/w, 2*cy/h - 1, p22, -1), float4(0, 0, p23, 0));
     EnvParams p;
     p.view_proj = P * V;
     float sx = float(c.tile_w) / float(c.atlas_w), sy = float(c.tile_h) / float(c.atlas_h);
@@ -212,7 +221,30 @@ inline void slot_world(uint env, uint slot, device const int* slot_geom,
     device const float* xp = geom_xpos + gi * 3;
     float3x3 R = load_mat33(geom_xmat + gi * 9);
     p = R * pos_l + float3(xp[0], xp[1], xp[2]);
-    n = R * nrm_l;
+    // R may carry a per-world size scale (metalsim.render.sized: R diag(s)): normals by its inverse transpose
+    float3 s2 = float3(dot(R[0], R[0]), dot(R[1], R[1]), dot(R[2], R[2]));
+    n = R * (nrm_l / max(s2, float3(1e-20)));
+}
+
+// Infinite plane slots (plane[2 slot].x = 1; scene_tables plane_ring): the disc mesh is translated in the plane's
+// frame to sit under the env's camera (each axis clamped to a finite half-size of a mixed plane) and its texture
+// coordinates follow MuJoCo's plane mapping of the translated local position (plane[2 slot + 1]).
+inline void plane_adjust(uint env, uint slot, device const float4* plane, device const int* slot_geom,
+                         device const float* geom_xpos, device const float* geom_xmat, constant Consts& c, float3 cam,
+                         thread float3& pos_l, thread float2& uv)
+{
+    float4 pi = plane[slot * 2];
+    if (pi.x < 0.5) return;
+    uint gi = env * c.n_geoms + uint(slot_geom[slot]);
+    device const float* xp = geom_xpos + gi * 3;
+    float3x3 R = load_mat33(geom_xmat + gi * 9);
+    float3 cl = transpose(R) * (cam - float3(xp[0], xp[1], xp[2]));
+    float2 q = pos_l.xy + cl.xy;
+    if (pi.y > 0.0) q.x = clamp(q.x, -pi.y, pi.y);
+    if (pi.z > 0.0) q.y = clamp(q.y, -pi.z, pi.z);
+    pos_l = float3(q, 0.0);
+    float4 tm = plane[slot * 2 + 1];
+    uv = float2(q.x * tm.x + tm.y, q.y * tm.z + tm.w);
 }
 
 inline void instance_world(uint inst, device const uint2* inst_tab, device const int* slot_geom,
@@ -240,16 +272,21 @@ vertex VSOut geom_vs(
     device const float*     geom_xpos [[buffer(4)]],
     device const float*     geom_xmat [[buffer(5)]],
     device const float4*    per_inst  [[buffer(6)]],
-    constant Consts&        c         [[buffer(7)]])
+    constant Consts&        c         [[buffer(7)]],
+    device const float4*    plane     [[buffer(12)]])
 {
-    float3 p, n; uint env, slot;
-    instance_world(inst, inst_tab, slot_geom, geom_xpos, geom_xmat, c, in.pos, in.normal, p, n, env, slot);
+    uint2 pair = inst_tab[inst];
+    uint env = pair.x, slot = pair.y;
     EnvParams e = envs[env];
+    float3 pos_l = in.pos; float2 uv = in.uv;
+    plane_adjust(env, slot, plane, slot_geom, geom_xpos, geom_xmat, c, e.cam_pos.xyz, pos_l, uv);
+    float3 p, n;
+    slot_world(env, slot, slot_geom, geom_xpos, geom_xmat, c, pos_l, in.normal, p, n);
     float4 clip = tile_clip(e.view_proj * float4(p, 1.0), e.tile);
     VSOut o;
     o.clip = clip;
     clip_to_tile(o.clip_distance, clip, e.tile);
-    o.world_pos = p; o.normal_w = n; o.uv = in.uv; o.env = env; o.slot = slot; o.local_pos = in.pos;
+    o.world_pos = p; o.normal_w = n; o.uv = uv; o.env = env; o.slot = slot; o.local_pos = pos_l;
     return o;
 }
 
@@ -346,11 +383,16 @@ vertex ShadowOut shadow_vs(
     device const float*     geom_xpos [[buffer(4)]],
     device const float*     geom_xmat [[buffer(5)]],
     device const float4*    per_inst  [[buffer(6)]],
-    constant Consts&        c         [[buffer(7)]])
+    constant Consts&        c         [[buffer(7)]],
+    device const float4*    plane     [[buffer(12)]])
 {
-    float3 p, n; uint env, slot;
-    instance_world(inst, inst_tab, slot_geom, geom_xpos, geom_xmat, c, in.pos, in.normal, p, n, env, slot);
+    uint2 pair = inst_tab[inst];
+    uint env = pair.x, slot = pair.y;
     EnvParams e = envs[env];
+    float3 pos_l = in.pos; float2 uv = in.uv;
+    plane_adjust(env, slot, plane, slot_geom, geom_xpos, geom_xmat, c, e.cam_pos.xyz, pos_l, uv);
+    float3 p, n;
+    slot_world(env, slot, slot_geom, geom_xpos, geom_xmat, c, pos_l, in.normal, p, n);
     float4 clip = tile_clip(e.light_vp * float4(p, 1.0), e.shadow_tile);
     ShadowOut o;
     o.clip = clip;
@@ -450,7 +492,7 @@ kernel void build_shadow_views(
         float far = max(length(Lpos - sp.bounds.xyz) + 2.0 * r, 0.1);
         float near = max(far * 1e-4, 1e-3);
         if (vl.z == 2) {      // spot: the cone
-            float fov = min(2.0 * lights[i].kind.z, 170.0) * PI / 180.0;
+            float fov = min(2.0 * lights[e * c.n_light + i].kind.z, 170.0) * PI / 180.0;
             sv.vp = look_vp(Lpos, Ldir, float3(0, 0, 1), persp(fov, near, far));
             sv.info = float4(float(i), -1.0, 1.0, far);
         } else {              // point: cube face vl.y
@@ -598,7 +640,7 @@ fragment FSOut geom_fs(
     float3 direct = float3(0.0);
     uint nl = uint(e.misc.y);
     for (uint i = 0; i < nl; ++i) {
-        Light l = lights[i];
+        Light l = lights[in.env * c.n_light + i];
         device const float* lp = light_xpos + (in.env * c.n_light + i) * 3;
         device const float* ld = light_xdir + (in.env * c.n_light + i) * 3;
         float3 Lpos = float3(lp[0], lp[1], lp[2]);
@@ -840,6 +882,7 @@ kernel void untile(
     device const EnvParams* envs [[buffer(5)]],
     constant Consts& c         [[buffer(6)]],
     constant uint4& outputs    [[buffer(7)]],
+    constant float4& clip      [[buffer(8)]],
     uint3 tid [[thread_position_in_grid]])
 {
     uint x = tid.x, y = tid.y, e = tid.z;
@@ -856,7 +899,10 @@ kernel void untile(
     if (outputs.y) {
         float z = depth.read(uint2(ax, ay)).r;
         float n = envs[e].cam_pos.w, f = envs[e].cam_fwd.w;
-        out_depth[pix] = (z >= 1.0f) ? 0.0f : n * f / (f - z * (f - n));
+        if (clip.z > 0.5)       // reversed: z = n (f - d) / (d (f - n)) -> d = n f / (z (f - n) + n); background 0
+            out_depth[pix] = (z <= 0.0f) ? 0.0f : n * f / (z * (f - n) + n);
+        else
+            out_depth[pix] = (z >= 1.0f) ? 0.0f : n * f / (f - z * (f - n));
     }
     if (outputs.z) {
         uint s = seg.read(uint2(ax, ay)).r;
@@ -880,7 +926,9 @@ kernel void untile(
 #include <metal_raytracing>
 using namespace metal::raytracing;
 
-struct RTOffset { uint tiles_per_row; float stride; uint n_samples; uint _pad; };
+// limit: a ray of env e must end within `limit` of the env's origin (beyond, another env's geometry or ground disc may
+// be hit: sensors/raytrace.py RayTracer.ray_limit); fragments past it get no ray-traced shadow / occlusion / reflection
+struct RTOffset { uint tiles_per_row; float stride; uint n_samples; float limit; };
 struct MeshInfoT { uint i_off, i_count, _p0, _p1; };
 struct InstanceDescT { packed_float3 col0, col1, col2, col3; uint options, mask, if_table_offset, as_index; };
 
@@ -940,6 +988,7 @@ fragment FSOut geom_fs_rt(
     float a2 = rough * rough * rough * rough;
     float3 f0 = mix(float3(0.08 * specw), base, metallic);
     float3 P = in.world_pos + rt_env_offset(in.env, ro) + N * 0.002;
+    float reach = ro.limit - length(in.world_pos) - 0.01;      // longest ray that stays inside this env's region
     uint seed = hash_u(uint(in.clip.x) * 1973u + uint(in.clip.y) * 9277u + in.env * 26699u);
     uint ns = max(ro.n_samples, 1u);
     float3 tx = ortho_basis_x(N), ty = cross(N, tx);
@@ -956,12 +1005,12 @@ fragment FSOut geom_fs_rt(
             float u = hash_f(seed + s * 7919u), v = hash_f(seed + s * 104729u + 17u);
             float rr = 0.012 * sqrt(u), ph = 6.2831853 * v;   // ~0.7 deg angular radius
             float3 d = normalize(L + lx * (rr * cos(ph)) + ly * (rr * sin(ph)));
-            occ += occluded(accel, P, d, 100.0) ? 1.0 : 0.0;
+            occ += (reach > 0.0 && occluded(accel, P, d, min(100.0f, reach))) ? 1.0 : 0.0;
         }
         return 1.0 - occ / float(ns);
     };
     for (uint i = 0; i < nl; ++i) {
-        Light l = lights[i];
+        Light l = lights[in.env * c.n_light + i];
         device const float* lp = light_xpos + (in.env * c.n_light + i) * 3;
         device const float* ld = light_xdir + (in.env * c.n_light + i) * 3;
         float3 Lpos = float3(lp[0], lp[1], lp[2]);
@@ -1000,7 +1049,7 @@ fragment FSOut geom_fs_rt(
         float u = hash_f(seed + s * 6151u + 3u), v = hash_f(seed + s * 12289u + 5u);
         float rr = sqrt(u), ph = 6.2831853 * v;
         float3 d = tx * (rr * cos(ph)) + ty * (rr * sin(ph)) + N * sqrt(max(1.0 - u, 0.0));
-        ao_occ += occluded(accel, P, d, 0.5) ? 1.0 : 0.0;
+        ao_occ += (reach > 0.5 && occluded(accel, P, d, 0.5)) ? 1.0 : 0.0;
     }
     float ao = 1.0 - 0.5 * ao_occ / float(ns);
     float3 color = direct + e.ambient.rgb * base * ao + emission * base;
@@ -1009,7 +1058,7 @@ fragment FSOut geom_fs_rt(
     float refl = max(m.par.w, metallic * (1.0 - rough));
     if (refl > 0.01) {
         float3 Rd = reflect(-V, N);
-        ray r(P, Rd, 0.001, 50.0);
+        ray r(P, Rd, 0.001, clamp(reach, 0.002f, 50.0f));
         intersector<triangle_data, instancing> isect;
         intersection_result<triangle_data, instancing> res = isect.intersect(r, accel);
         float3 rc = sp.sky_info.y > 0.5 ? sky_color(atlas, samp, sp.sky_rect, sp.sky_info, Rd)
@@ -1025,7 +1074,7 @@ fragment FSOut geom_fs_rt(
             float3 n2 = normalize(float3(verts[i0*8+3], verts[i0*8+4], verts[i0*8+5]) * w0 + float3(verts[i1*8+3], verts[i1*8+4], verts[i1*8+5]) * bc.x + float3(verts[i2*8+3], verts[i2*8+4], verts[i2*8+5]) * bc.y);
             InstanceDescT id2 = inst[res.instance_id];       // rigid instance: rotation columns
             float3x3 R2 = float3x3(float3(id2.col0), float3(id2.col1), float3(id2.col2));
-            n2 = normalize(R2 * n2);
+            n2 = normalize(R2 * (n2 / max(float3(dot(R2[0], R2[0]), dot(R2[1], R2[1]), dot(R2[2], R2[2])), float3(1e-20))));
             if (dot(n2, Rd) > 0.0) n2 = -n2;
             Material m2 = mats[slot2];
             float4 mod2 = per_inst[in.env * c.n_slots + slot2];
@@ -1035,7 +1084,7 @@ fragment FSOut geom_fs_rt(
             float3 V2 = -Rd;
             float3 d2 = float3(0.0);
             for (uint i = 0; i < nl; ++i) {
-                Light l = lights[i];
+                Light l = lights[in.env * c.n_light + i];
                 device const float* ld = light_xdir + (in.env * c.n_light + i) * 3;
                 if (l.kind.x != 0.0) continue;
                 float3 L = -normalize(float3(ld[0], ld[1], ld[2]));

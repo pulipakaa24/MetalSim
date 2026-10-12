@@ -72,6 +72,64 @@ def _ellipsoid(size, n_lat=12, n_lon=24):
     return sph * np.asarray(size), uv
 
 
+def _octagon_rings(apothem: float, inner: float = 0.25):
+    """(F,3,3) triangle soup of a z = 0 disc: concentric regular octagons whose apothems double from ``inner`` to
+    ``apothem`` (an infinite plane's drawn extent). Triangles stay small where the camera is (the raster translates
+    the disc under the camera), so interpolated positions and texture coordinates keep float32 precision near the
+    viewer whatever the far distance; ~16 triangles per doubling (170 for a 1e6 m disc). Counter-clockwise from +z."""
+    radii = [min(inner, apothem)]
+    while radii[-1] < apothem:
+        radii.append(min(2.0 * radii[-1], apothem))
+    ang = (np.arange(8) + 0.5) * (np.pi / 4)
+    ring = np.stack([np.cos(ang), np.sin(ang), np.zeros(8)], 1) / np.cos(np.pi / 8)     # unit apothem
+    tris = []
+    p = ring * radii[0]
+    for k in range(8):
+        tris.append([[0.0, 0.0, 0.0], p[k], p[(k + 1) % 8]])
+    for a0, a1 in zip(radii[:-1], radii[1:]):
+        q0, q1 = ring * a0, ring * a1
+        for k in range(8):
+            k1 = (k + 1) % 8
+            tris += [[q0[k], q1[k], q1[k1]], [q0[k], q1[k1], q0[k1]]]
+    return np.asarray(tris, np.float64)
+
+
+def plane_uv_affine(size, appearance: str, texrepeat=(1.0, 1.0), texuniform: bool = False):
+    """Texture coordinates of a plane disc vertex as an affine map of its plane-local (x, y), plus the material repeat
+    the legacy tables need: (u_scale, u_add, v_scale, v_add, rep_u, rep_v). "mujoco" appearance: MuJoCo's makePlane
+    coordinates (``builtin_geoms.primitive``: finite u = (x + s) / 2s, v = 1 - (y + s) / 2s; infinite u = x / 2,
+    v = -y / 2), the material's scale and offset applied as for any plane (``material_uv_transform``; the repeat
+    returned is unused). "legacy": ``plane_texture_map`` for the legacy atlas."""
+    if appearance != "mujoco":
+        return plane_texture_map(size, texrepeat, texuniform)
+    sx, sy = float(size[0]), float(size[1])
+    us, ua = (1.0 / (2.0 * sx), 0.5) if sx > 0 else (0.5, 0.0)
+    vs, va = (-1.0 / (2.0 * sy), 0.5) if sy > 0 else (-0.5, 0.0)
+    return us, ua, vs, va, 1.0, 1.0
+
+
+def plane_texture_map(size, texrepeat, texuniform: bool):
+    """MuJoCo's plane texture coordinates (render_context.c; MuJoCo Warp ``_texture_plane``) as an affine map of the
+    plane-local (x, y) for this renderer's convention (fragment: ``fract(uv * par.xy)``, atlas rows top-down):
+    returns (u_scale, u_add, v_scale, v_add, rep_u, rep_v) with uv = (x * u_scale + u_add, y * v_scale + v_add) and
+    rep = par.xy. Per axis: infinite (size <= 0) u = x / 2 at ``texrepeat``; finite u = (x + s) / 2s at ``texrepeat``,
+    times s with ``texuniform``; MuJoCo's -0.5 offset (applied when either axis is infinite) shifts by half a tile.
+    The v axis is mirrored (MuJoCo's v = (s - y) / 2s, our atlas is stored bottom-up)."""
+    sx, sy = float(size[0]), float(size[1])
+    rx, ry = float(texrepeat[0]), float(texrepeat[1])
+    off = -0.5 if (sx <= 0 or sy <= 0) else 0.0
+    rep_u = rx * sx if (sx > 0 and texuniform) else rx
+    rep_v = ry * sy if (sy > 0 and texuniform) else ry
+    ru, rv = (r if abs(r) > 1e-9 else 1.0 for r in (rep_u, rep_v))
+    # u axis: MuJoCo coordinate u * rep + off; ours uv.x * rep -> uv.x = u + off / rep
+    u_scale, u_add = (1.0 / (2.0 * sx), 0.5) if sx > 0 else (0.5, 0.0)
+    u_add += off / ru
+    # v axis: MuJoCo v = (s - y) / 2s or -y / 2; ours samples 1 - fract(v * rep + off): uv.y = -v - off / rep
+    v_scale, v_add = (1.0 / (2.0 * sy), -0.5) if sy > 0 else (0.5, 0.0)
+    v_add -= off / rv
+    return u_scale, u_add, v_scale, v_add, rep_u, rep_v
+
+
 def _tris_to_indexed(tri, uv=None, smooth=True):
     """(F,3,3) triangle soup -> indexed vertices with smooth (or flat) normals and UVs."""
     flat = tri.reshape(-1, 3)
@@ -250,13 +308,16 @@ class CameraIntrinsics:
         """Uses `sensorsize`/`focal`/`principal` when authored (Isaac-style physical camera),
         else `fovy` (MuJoCo's default)."""
         sensorsize = m.cam_sensorsize[cam]
-        if sensorsize[0] > 0 and sensorsize[1] > 0:
+        if sensorsize[1] > 0:                          # MuJoCo's test (mjv_cameraFrustum)
             focal = m.cam_intrinsic[cam][:2]           # focal length (m)
             principal = m.cam_intrinsic[cam][2:4]      # principal point offset (m)
             fx = focal[0] / sensorsize[0] * width
             fy = focal[1] / sensorsize[1] * height
-            cx = width / 2 + principal[0] / sensorsize[0] * width
-            cy = height / 2 + principal[1] / sensorsize[1] * height
+            # MuJoCo's frustum (engine_vis_visualize.c getFrustum, render_gl3.c glFrustum): left / right extents
+            # (s/2 -+ p) / f, top / bottom (s/2 -+ p) / f, so the optical axis sits at W/2 - p_x W/s_x and, rows down,
+            # H/2 - p_y H/s_y (it was + before 2026-10-12: offset principal points were mirrored)
+            cx = width / 2 - principal[0] / sensorsize[0] * width
+            cy = height / 2 - principal[1] / sensorsize[1] * height
         else:
             fovy = np.deg2rad(m.cam_fovy[cam])
             fy = height / (2 * np.tan(fovy / 2))
@@ -347,6 +408,12 @@ class SceneTables:
     # transparency: slots MuJoCo draws blended (alpha < 0.995) and the draws of the remaining (opaque) instances
     transparent: np.ndarray = None    # (G,) bool
     draws_opaque: list = None         # as ``draws``, each mesh's opaque instances only (they come first in its range)
+    # infinite planes drawn as a disc centred under the camera (build_scene_tables(plane_ring=...)): per slot
+    # flag, size x, size y, 0 | u_scale, u_add, v_scale, v_add (uv = local xy * scale + add; plane_uv_affine)
+    plane: np.ndarray = None    # (G, 8) float32 (extra slots: 0)
+    # per-world sizes: SIZE_* per slot (0 = mesh baked at the compiled size) and the compiled scale of the slot's mesh
+    size_mode: np.ndarray = None    # (G,) int32
+    slot_scale: np.ndarray = None   # (G, 3) float32
 
     # material extension block (float4 x 2), read with the material by every renderer:
     # 0: uv offset xy (added after the texrepeat scale), texture kind (0 2D, 1 cube), sRGB texture (1: decode to linear)
@@ -379,6 +446,14 @@ class SceneTables:
     def slot_seg_ids(self) -> np.ndarray:
         """(G,) the id segmentation writes per slot in geom mode: geom + 1, extras ngeom + 1 + j."""
         return self.semantic[:, 0].astype(np.int64) + 1
+
+    def geom_size_modes(self, ngeom: int) -> np.ndarray:
+        """(ngeom,) SIZE_* per model geom (0 for geoms not drawn or baked)."""
+        out = np.zeros(max(ngeom, 1), np.int32)
+        if self.size_mode is not None:
+            k = len(self.geoms)
+            out[np.asarray(self.geoms, np.int64)] = self.size_mode[:k]
+        return out
 
     # material block layout (float4 x 4)
     # 0: rgba (base color); 1: metallic, roughness, specular, emission; 2: atlas u0,v0,du,dv;
@@ -449,6 +524,30 @@ def _decimate(v, f, target_faces):
     return best
 
 
+# per-world size modes (SceneTables.size_mode; metalsim.render.sized folds the scale into a copy of geom_xmat)
+SIZE_BAKED, SIZE_DIAG, SIZE_SPHERE, SIZE_CYLINDER, SIZE_CAPSULE, SIZE_PLANE = 0, 1, 2, 3, 4, 5
+
+
+def size_scale(mode: int, size, size0) -> np.ndarray:
+    """Scale of the slot's mesh for MuJoCo ``geom_size`` ``size`` (``size0``: the compiled size the capsule mesh was
+    built at). Unit meshes: box / ellipsoid diag(size), sphere r, cylinder (r, r, h), plane (sx, sy, 1). A capsule
+    keeps its compiled mesh scaled by (r / r0, r / r0, (h + r) / (h0 + r0)): radius and total length exact, the caps
+    squashed when the radius-to-length ratio changes (exact for a uniform scale)."""
+    s = np.asarray(size, np.float64)
+    if mode == SIZE_DIAG:
+        return s[:3].astype(np.float32)
+    if mode == SIZE_SPHERE:
+        return np.full(3, s[0], np.float32)
+    if mode == SIZE_CYLINDER:
+        return np.array([s[0], s[0], s[1]], np.float32)
+    if mode == SIZE_PLANE:
+        return np.array([s[0], s[1], 1.0], np.float32)
+    if mode == SIZE_CAPSULE:
+        r0, h0 = float(size0[0]), float(size0[1])
+        return np.array([s[0] / r0, s[0] / r0, (s[1] + s[0]) / (h0 + r0)], np.float32)
+    return np.ones(3, np.float32)
+
+
 SIZED_GEOM_PREFIX = "tslot"      # metalsim.learn.terrain: BoxWindow's per-world terrain box slots ("boxes_local")
 
 
@@ -486,10 +585,45 @@ def hfield_mesh(m: mujoco.MjModel, hid: int):
     return verts, normals, uvs, idx
 
 
+def hfield_sides(m: mujoco.MjModel, hid: int, v_base: int):
+    """MuJoCo's heightfield sides and base (the solid MuJoCo draws and collides with: the top surface over a box down
+    to z = -size[3]): one vertical quad per boundary cell edge from the top profile down to the base, and the base
+    rectangle facing -z. Flat outward normals; UVs over the extent as the top. Vertices are new (indices offset by
+    ``v_base``), appended after the top grid so the grid keeps its row-major layout. Returns (verts, normals, uvs, idx)."""
+    nrow, ncol = int(m.hfield_nrow[hid]), int(m.hfield_ncol[hid])
+    sx, sy, sz, sb = (float(v) for v in m.hfield_size[hid])
+    adr = int(m.hfield_adr[hid])
+    Z = m.hfield_data[adr:adr + nrow * ncol].astype(np.float64).reshape(nrow, ncol) * sz
+    xs = np.linspace(-sx, sx, ncol); ys = np.linspace(-sy, sy, nrow)
+    edges = [  # (x, y, z) along the boundary, outward normal
+        (xs, np.full(ncol, -sy), Z[0, :], (0.0, -1.0, 0.0)),
+        (np.full(nrow, sx), ys, Z[:, -1], (1.0, 0.0, 0.0)),
+        (xs, np.full(ncol, sy), Z[-1, :], (0.0, 1.0, 0.0)),
+        (np.full(nrow, -sx), ys, Z[:, 0], (-1.0, 0.0, 0.0)),
+    ]
+    V, N, I = [], [], []
+    n = 0
+    for x, y, z, nrm in edges:
+        k = len(x)
+        top = np.stack([x, y, z], 1); bot = np.stack([x, y, np.full(k, -sb)], 1)
+        V += [top, bot]; N.append(np.tile(nrm, (2 * k, 1)))
+        i = np.arange(k - 1)
+        t0, t1, b0, b1 = n + i, n + i + 1, n + k + i, n + k + i + 1
+        I += [np.stack([t0, b0, b1], 1), np.stack([t0, b1, t1], 1)]
+        n += 2 * k
+    base = np.array([[-sx, -sy, -sb], [sx, -sy, -sb], [sx, sy, -sb], [-sx, sy, -sb]])
+    V.append(base); N.append(np.tile((0.0, 0.0, -1.0), (4, 1)))
+    I.append(np.array([[n, n + 2, n + 1], [n, n + 3, n + 2]]))
+    verts = np.concatenate(V); normals = np.concatenate(N)
+    uvs = np.stack([(verts[:, 0] + sx) / max(2 * sx, 1e-9), (verts[:, 1] + sy) / max(2 * sy, 1e-9)], 1)
+    return verts, normals, uvs, (np.concatenate(I) + v_base).astype(np.uint32)
+
+
 def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, include_planes: bool = True,
                        plane_extent: float = 5.0, smooth: bool = True, decimate_faces: int = 0,
                        sized_geoms="auto", draw_hfields: bool = True, appearance: str = "mujoco",
-                       visual=False, deformables=()) -> SceneTables:
+                       visual=False, deformables=(), plane_ring: float | None = None,
+                       hfield_skirts: bool = True, per_world_size: bool = False) -> SceneTables:
     """``decimate_faces``: per-mesh triangle budget for a level of detail (0 = undecimated).
 
     ``sized_geoms``: box geoms drawn as a unit box scaled at render time by the per-world ``geom_size`` (the renderer
@@ -504,14 +638,40 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
 
     ``visual``: the non-geom objects MuJoCo's renderer draws (sites, flexes, skins, spatial tendons; see
     ``metalsim.render.extras``) under this ``mujoco.MjvOption`` (None: MuJoCo's default option), False: geoms only.
-    ``deformables``: user ``extras.DeformableMesh`` objects (XPBD / PhysX-port cloth, any per-env vertex array)."""
+    ``deformables``: user ``extras.DeformableMesh`` objects (XPBD / PhysX-port cloth, any per-env vertex array).
+    ``hfield_skirts``: also MuJoCo's sides and base of each heightfield (False: top surface only, the previous behaviour).
+    ``plane_ring``: infinite planes (a size <= 0) as a disc of octagon rings of this apothem (m) with MuJoCo's plane
+    texture coordinates (``plane_uv_affine``), recorded in ``plane`` for the raster to centre under the camera; None =
+    the previous behaviour (a 2 ``plane_extent`` square).
+    ``per_world_size``: every primitive (box, sphere, ellipsoid, cylinder, capsule, finite plane) drawn from a unit
+    mesh scaled at render time by the per-world ``geom_size`` (``size_mode``; see ``metalsim.render.sized``); False =
+    only the terrain slots."""
     if appearance not in ("mujoco", "legacy"):
         raise ValueError(f"appearance must be 'mujoco' or 'legacy', got {appearance!r}")
     if isinstance(sized_geoms, str):
         sized_geoms = per_world_size_geoms(m) if sized_geoms == "auto" else ()
     sized_set = {int(g) for g in sized_geoms}
+    G_ = mujoco.mjtGeom
+    unit_types = {int(G_.mjGEOM_BOX): SIZE_DIAG, int(G_.mjGEOM_ELLIPSOID): SIZE_DIAG, int(G_.mjGEOM_SPHERE): SIZE_SPHERE,
+                  int(G_.mjGEOM_CYLINDER): SIZE_CYLINDER, int(G_.mjGEOM_PLANE): SIZE_PLANE}
+
+    def is_inf_plane(g):
+        return int(m.geom_type[g]) == int(G_.mjGEOM_PLANE) and (m.geom_size[g][0] <= 0 or m.geom_size[g][1] <= 0)
+
+    slot_like = set(per_world_size_geoms(m)) - sized_set     # terrain slots left out (terrain_slots=False): baked
+
+    def size_mode_of(g):
+        if g in sized_set:
+            return SIZE_DIAG
+        if not per_world_size or is_inf_plane(g) or g in slot_like:
+            return SIZE_BAKED
+        t = int(m.geom_type[g])
+        if t == int(G_.mjGEOM_CAPSULE):
+            return SIZE_CAPSULE
+        return unit_types.get(t, SIZE_BAKED)
+    plane_rows = {}
     mesh_cache = {}
-    meshes, geoms, geom_mesh = [], [], []
+    meshes, geoms, geom_mesh, modes = [], [], [], []
     all_v, all_n, all_uv, all_i = [], [], [], []
     v_off = i_off = 0
     atlas = TextureAtlas.build(m) if appearance == "mujoco" else TextureAtlas.build_legacy(m)
@@ -605,24 +765,52 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
                 continue
             key = ("hfield", int(m.geom_dataid[g]))
             if key not in mesh_cache:
-                verts, normals, uvs, idx = hfield_mesh(m, int(m.geom_dataid[g]))
+                hid = int(m.geom_dataid[g])
+                verts, normals, uvs, idx = hfield_mesh(m, hid)
+                idx = idx.reshape(-1) + v_off
+                top_count = int(idx.size)
+                if hfield_skirts:
+                    sv, sn, suv, sidx = hfield_sides(m, hid, v_off + len(verts))
+                    verts = np.concatenate([verts, sv]); normals = np.concatenate([normals, sn]); uvs = np.concatenate([uvs, suv])
+                    idx = np.concatenate([idx, sidx.reshape(-1)])
                 if appearance == "mujoco":
                     uvs = bg.texgen_uv(verts)         # MuJoCo's object-linear mapping (scale / offset per material)
                 mesh_cache[key] = len(meshes)
+                # row-major (nrow, ncol) top grid from v_off, then the sides / base (indices from i_off + top_count)
                 meshes.append({"i_off": i_off, "i_count": int(idx.size), "radius": float(np.linalg.norm(verts, axis=1).max()),
-                               "v_off": v_off, "hfield": int(m.geom_dataid[g])})   # row-major (nrow, ncol) grid from v_off
+                               "v_off": v_off, "hfield": hid, "top_count": top_count})
                 all_v.append(verts); all_n.append(normals); all_uv.append(uvs)
-                all_i.append(idx.reshape(-1) + v_off)
+                all_i.append(idx)
                 v_off += len(verts); i_off += idx.size
-            geom_mesh.append(mesh_cache[key]); geoms.append(g)
+            geom_mesh.append(mesh_cache[key]); geoms.append(g); modes.append(SIZE_BAKED)
             continue
         is_mesh = t == mujoco.mjtGeom.mjGEOM_MESH or (appearance == "mujoco" and t == mujoco.mjtGeom.mjGEOM_SDF)
-        if g in sized_set:
+        mode = size_mode_of(g)
+        unit = mode in (SIZE_DIAG, SIZE_SPHERE, SIZE_CYLINDER, SIZE_PLANE)
+        ring = plane_ring is not None and is_inf_plane(g)
+        if ring:
+            mat = int(m.geom_matid[g])
+            rep = m.mat_texrepeat[mat] if mat >= 0 else (1.0, 1.0)
+            uni = bool(m.mat_texuniform[mat]) if mat >= 0 else False
+            tex = plane_uv_affine(m.geom_size[g], appearance, rep, uni)
+            plane_rows[len(geoms)] = (float(m.geom_size[g][0]), float(m.geom_size[g][1])) + tex
+            key = ("plane_ring",) + tuple(np.round(plane_rows[len(geoms)], 9))
+        elif unit:
             key = ("unit", t)
         else:
             key = ("mesh", int(m.geom_dataid[g])) if is_mesh else (t, tuple(np.round(m.geom_size[g], 6)))
         if key not in mesh_cache:
-            tri, uv, nrm = geom_tris(g, unit=g in sized_set)
+            if ring:
+                sx, sy, us, ua, vs, va = plane_rows[len(geoms)][:6]
+                tri = _octagon_rings(plane_ring)
+                if sx > 0:                              # a finite axis of a mixed plane: clamp (degenerate triangles)
+                    tri[..., 0] = np.clip(tri[..., 0], -sx, sx)
+                if sy > 0:
+                    tri[..., 1] = np.clip(tri[..., 1], -sy, sy)
+                uv = np.stack([tri[..., 0] * us + ua, tri[..., 1] * vs + va], -1)
+                nrm = None
+            else:
+                tri, uv, nrm = geom_tris(g, unit=unit)
             if tri is None:
                 continue
             if nrm is not None:
@@ -638,10 +826,10 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
             all_i.append(idx.reshape(-1) + v_off)
             v_off += len(verts)
             i_off += idx.size
-        elif geom_tris(g)[0] is None:
+        elif not ring and geom_tris(g)[0] is None:
             continue
         geom_mesh.append(mesh_cache[key])
-        geoms.append(g)
+        geoms.append(g); modes.append(mode)
     if not geoms:
         from metalsim.render import extras as _extras
         if not _extras.collect(m, n_envs, atlas, visual, deformables, smooth)["extras"]:
@@ -732,6 +920,8 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
                 mats[slot, 14] = 1.0
         else:
             mats[slot, 4:8] = (0.0, 0.6, 0.5, 0.0)
+        if slot in plane_rows and mats[slot, 14] > 0.5 and appearance != "mujoco":   # legacy: plane_texture_map's repeat
+            mats[slot, 12:14] = plane_rows[slot][6:8]
         body = int(m.geom_bodyid[g])
         semantic[slot] = (g, body, int(m.body_rootid[body]), int(m.geom_group[g]))
         static[slot] = body == 0
@@ -759,13 +949,26 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
         lo = np.min([d.geom_xpos[g] - m.geom_rbound[g] for g in keep], axis=0)
         hi = np.max([d.geom_xpos[g] + m.geom_rbound[g] for g in keep], axis=0)
         params[0, :3] = 0.5 * (lo + hi); params[0, 3] = max(float(0.5 * (hi - lo).max()), 0.1)
+    plane = np.zeros((G, 8), np.float32)
+    for slot, row in plane_rows.items():
+        plane[slot] = (1.0, row[0], row[1], 0.0) + tuple(row[2:6])
+    size_mode = np.asarray(modes, np.int32)
+    slot_scale = np.ones((G, 3), np.float32)       # compiled scale of each slot's mesh (unit meshes; see size_scale)
+    for slot, g in enumerate(geoms):
+        slot_scale[slot] = size_scale(int(size_mode[slot]), m.geom_size[g], m.geom_size[g])
     tables = SceneTables(vertices=inter, indices=indices, meshes=meshes, geoms=geoms, geom_mesh=geom_mesh,
                          draws=draws, inst_table=inst_table, materials=mats, atlas=atlas, semantic=semantic,
                          static_geom=static, lights=build_lights(m), params=params, n_envs=n_envs, G=G,
-                         sized=sized, material_ext=ext, transparent=transparent, draws_opaque=draws_opaque, n_geom_slots=G)
+                         sized=sized, material_ext=ext, transparent=transparent, draws_opaque=draws_opaque, n_geom_slots=G,
+                         plane=plane, size_mode=size_mode, slot_scale=slot_scale)
     if visual is not False or deformables:
         from metalsim.render import extras as _extras
         _extras.extend_tables(tables, m, n_envs, visual, deformables, smooth)
+        Gx = tables.G                              # extra slots: no plane disc, baked, unit scale
+        if Gx > G:
+            tables.plane = np.concatenate([plane, np.zeros((Gx - G, 8), np.float32)])
+            tables.size_mode = np.concatenate([size_mode, np.zeros(Gx - G, np.int32)])
+            tables.slot_scale = np.concatenate([slot_scale, np.ones((Gx - G, 3), np.float32)])
     return tables
 
 

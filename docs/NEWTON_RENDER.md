@@ -59,7 +59,7 @@ Notes on the Newton twin:
 - `stat.center` / `stat.extent` are recomputed from the initial state of env 0. The compiled values see every geom
   at its body origin, and they set the shadow-map bounds and the ray tracer's env stride.
 - Colour comes from `Model.shape_color` and opacity from `Model.shape_opacity` (Newton ≥ 1.6), else from the mesh's
-  colour. Textures, roughness and metallic of Newton meshes are not carried (§4).
+  colour. Mesh UVs, textures, roughness and metallic become a twin material (2026-10-12).
 
 **MJCF twin** (`twin=mj_model`). The MJCF the Newton model was imported from, with its geoms, materials, textures,
 lights, cameras and sites:
@@ -87,7 +87,7 @@ Env `e` draws world `e`'s shapes plus the global shapes. This is Isaac Lab 3.0's
 and world -1 (`isaaclab_newton` renderer, Newton's `SensorTiledCamera` BVH groups).
 - **Homogeneous worlds** (same shapes in the same order, per-world transforms may differ; what `replicate` and
   Isaac Lab's cloner produce): the twin holds one world. Per-world shape transforms and bodies come from the tables.
-  Per-world colours are available through `src.per_env_colors(renderer)` → `renderer.set_colors`.
+  Per-world colours and scales are read every frame (RENDER_COVERAGE §3c); `src.per_env_colors` is kept but returns ones.
 - **Heterogeneous worlds**: the twin holds every world's shapes, and env `e` hides the others. The cost grows with
   the number of worlds, and a warning says so (`test_heterogeneous_worlds_each_env_sees_its_own`).
 - **Env frame.** Poses are written relative to an env origin, `env_origins="auto"`: each world's mean initial
@@ -223,7 +223,7 @@ Isaac Lab 3.0 renders Newton scenes in two ways (source: `upstream/IsaacLab3`, I
 | Gaussians | partly (Warp renderer) | not drawn (and out of scope: no splats) |
 | cloth / soft bodies | `tri_indices` over `particle_q`, one mesh per world; the mesh refit breaks CUDA-graph capture | the same triangles through the dynamic-mesh path (raster, refit BLAS, tier 2); the gather kernel is graph-capturable |
 | particles | spheres at `particle_radius` (Warp); RTX via Fabric points | particle renderer grains (round, one per particle by default) |
-| colours / materials | `shape_color` (from USD `displayColor` / OmniPBR diffuse), mesh base-colour textures; Lambert + hemispheric ambient + one default light, shadows off (Warp). Full MDL in RTX | Newton twin: `shape_color` / opacity, MetalSim PBR shading, MJCF-style lights with shadows. MJCF twin: the MJCF's materials and textures. Newton mesh textures not carried |
+| colours / materials | `shape_color` (from USD `displayColor` / OmniPBR diffuse), mesh base-colour textures; Lambert + hemispheric ambient + one default light, shadows off (Warp). Full MDL in RTX | Newton twin: `shape_color` / opacity, MetalSim PBR shading, MJCF-style lights with shadows. MJCF twin: the MJCF's materials and textures. Newton mesh textures, UVs, roughness and metallic carried (2026-10-12) |
 | cameras | one per world, world-frame poses, Isaac "world" / ROS conventions; Warp renderer takes only a vertical FOV from `fy` | MuJoCo pinhole (-Z forward), fixed in the env frame or body-mounted; `fovy` or physical intrinsics with principal offset |
 | depth | Warp: Euclidean ray distance converted to image-plane depth; miss = 0 (RTX: inf) | z-depth; background 0 in the raw buffer, inf through `replicator/isaac.py` (as RTX) |
 | segmentation | Isaac Lab remaps shape ids to label-based instance / semantic ids; particles and cloth are UNLABELLED | slot / geom / body ids of the twin; `src.shape_of_geom()` maps geoms to Newton shape indices per env; annotators use twin body names; cloth = extra object id (`ngeom + 1 + j`), particles = grain id |
@@ -231,12 +231,14 @@ Isaac Lab 3.0 renders Newton scenes in two ways (source: `upstream/IsaacLab3`, I
 
 ## 5. Limits and follow-ups
 
-- **Shape tables are built once.** Runtime changes to `Model.shape_transform`, `shape_scale` or `shape_color` are not
-  seen: build a new source, or use `renderer.set_colors` for colour. Isaac Lab's scale randomization therefore does
-  not show; the MuJoCo path has the same gap (RENDER_COVERAGE #12).
-- **Appearance of the Newton twin:** colour and opacity only; the renderers still draw everything opaque
-  (RENDER_COVERAGE #6). Newton mesh textures, roughness and metallic could map to an MjSpec material and texture;
-  they are left to the appearance workstream.
+- **Per-world scale and colour are read every frame** (twin "newton", 2026-10-12, RENDER_COVERAGE §3c): the pose kernel
+  folds each world's `Model.shape_scale` (relative to the compiled, world-0 scale) into the geom frames, and
+  `render_fields.geom_rgba` carries each world's `shape_color` / `shape_opacity` to the renderers' model sync. A capsule
+  keeps its compiled cap shape (radius and length exact); a non-uniform scale of a recentred mesh shades with
+  approximate normals. Runtime changes to `Model.shape_transform` are still not seen (build a new source). MJCF twins
+  keep the MJCF's appearance.
+- **Appearance of the Newton twin:** colour, opacity, and for meshes the UVs (with `texture_transform`), texture,
+  roughness and metallic (an MjSpec material and texture). Everything is still drawn opaque (RENDER_COVERAGE #6).
 - **MJCF twin limits:**
   - Cameras in `track` / `targetbody` modes are drawn as fixed in their body frame (warning).
   - Extra `Camera` / `Light` objects are refused; add them to the MJCF.

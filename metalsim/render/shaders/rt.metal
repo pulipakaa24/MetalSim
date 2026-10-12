@@ -8,6 +8,7 @@
 #include <metal_raytracing>
 using namespace metal;
 using namespace metal::raytracing;
+#include "lens.h"
 
 struct RTConsts {
     uint n_envs, n_geoms, n_slots, tiles_per_row;
@@ -77,7 +78,9 @@ inline float3 tri_normal(uint mesh, uint prim, device const MeshInfo* meshes, de
     float3 a = float3(verts[indices[base] * 8], verts[indices[base] * 8 + 1], verts[indices[base] * 8 + 2]);
     float3 b = float3(verts[indices[base + 1] * 8], verts[indices[base + 1] * 8 + 1], verts[indices[base + 1] * 8 + 2]);
     float3 cc = float3(verts[indices[base + 2] * 8], verts[indices[base + 2] * 8 + 1], verts[indices[base + 2] * 8 + 2]);
-    return normalize(R * cross(b - a, cc - a));
+    // R may carry a per-world size scale (R diag(s), metalsim.render.sized): the inverse transpose keeps the normal
+    float3 s2 = float3(dot(R[0], R[0]), dot(R[1], R[1]), dot(R[2], R[2]));
+    return normalize(R * (cross(b - a, cc - a) / max(s2, float3(1e-20))));
 }
 
 // Lidar: one thread per (env, beam). Beams: (azimuth, elevation) in the sensor site frame, MuJoCo
@@ -147,6 +150,7 @@ kernel void raycast_depth(
     constant uint4&         dims       [[buffer(4)]],   // width, height, n_cam, cam_id
     constant RTConsts&      c          [[buffer(5)]],
     device float*           out_depth  [[buffer(6)]],   // (n_envs, h, w) distance to image plane
+    constant LensParams&    lens       [[buffer(7)]],   // lens model (lens.h; 0 = pinhole from `intrinsics`)
     uint3 tid [[thread_position_in_grid]])
 {
     uint x = tid.x, y = tid.y, e = tid.z;
@@ -156,7 +160,9 @@ kernel void raycast_depth(
     float3 origin = float3(cam_xpos[ci * 3], cam_xpos[ci * 3 + 1], cam_xpos[ci * 3 + 2]);
     float3x3 R = load_mat33(cam_xmat + ci * 9);
     // camera looks along -Z, +Y up; pixel (x+0.5, y+0.5) with y down
-    float3 dl = float3((float(x) + 0.5 - intrinsics.z) / intrinsics.x, -(float(y) + 0.5 - intrinsics.w) / intrinsics.y, -1.0);
+    float3 dl;
+    uint o0 = (e * h + y) * w + x;
+    if (!lens_ray(lens, float(x) + 0.5, float(y) + 0.5, float(w), float(h), intrinsics, dl)) { out_depth[o0] = 0.0; return; }
     float3 dir = normalize(R * dl);
     ray r(origin + env_offset(e, c), dir, 0.001, c.max_range);
     intersector<triangle_data, instancing> isect;
