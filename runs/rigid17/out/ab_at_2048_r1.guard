@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/scripts/gpu_lock.py", line 163, in <module>
+    main()
+    ~~~~^^
+  File "/Users/aditya/robosim/scripts/gpu_lock.py", line 136, in main
+    if a.cmd == "acquire": acquire(a.name, a.kind, a.minutes, a.pid, a.job_cmd, a.front)
+                           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/scripts/gpu_lock.py", line 118, in acquire
+    q = tickets()
+  File "/Users/aditya/robosim/scripts/gpu_lock.py", line 89, in tickets
+    if t.get("pid") and not alive(t["pid"]): os.remove(os.path.join(Q, f)); continue
+                                             ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/aditya/robosim/runs/gpu_queue/1791792912.966_0_r17_ab_at_2048_r1_27680.json'
