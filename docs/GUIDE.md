@@ -94,13 +94,13 @@ throughput ones; identical tree to the merge `8fbf965`) are in `patches/mujoco_w
 `88af9cc`, `git am` those patches and `pip install -e` the checkout.
 
 **Newton** ([pulipakaa24/newton](https://github.com/pulipakaa24/newton), branch `metalsim`, pinned commit
-`fe7f5bd` = XPBD code `90e2332` plus the Metal HashTable fix). Only needed for the experimental Newton XPBD engine. The fork fixes XPBD solver defects
+`9f31739` = XPBD code `90e2332` plus the Metal fixes: HashTable, 64-bit atomics, mesh-SDF barrier, collision launches). Only needed for the experimental Newton XPBD engine. The fork fixes XPBD solver defects
 found while validating it (revolute angle wrap at ±π, inconsistent joint relaxation,
 iteration-dependent drive stiffness, and others; the upstream issues and pull requests are listed in
 `scripts/diagnostics/newton_upstream/FILED.md`). `scripts/setup_newton.sh` installs it into a separate
 environment, `.venv-newtonfork`, and shares the Warp checkout with `.venv`. The `newton` extra instead
 installs upstream Newton at `45458023`, the commit the validation runs used, without the XPBD fixes but with the
-Metal HashTable fix the current Warp fork needs (branch `metalsim-hashtable-metal`, `24fb536`). Branch
+Metal fixes the current Warp fork needs (branch `metalsim-hashtable-metal`, `a4be360`). Branch
 `metalsim-1.5.2` (Newton 1.5.2 for MPM) is installed by `scripts/setup_newton152.sh`.
 
 The older single-file patches in `patches/` (`warp-innate-metal-pending-frees.patch`,
