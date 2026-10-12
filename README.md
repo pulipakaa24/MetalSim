@@ -229,11 +229,12 @@ Recordings, logs and benchmark JSON are under `runs/parity/`, `runs/parity3/` an
 
 ## Install
 
-Apple silicon Mac, macOS with the Xcode Command Line Tools, Python 3.12 or newer:
+Apple silicon Mac, macOS with the Xcode Command Line Tools, Python 3.12 or newer (macOS's own `python3` is 3.9: use
+python.org's, Homebrew's or `uv python install 3.12`), [uv](https://docs.astral.sh/uv/) for the optional environments:
 
 ```
 git clone https://github.com/pulipakaa24/MetalSim && cd MetalSim
-python3 -m venv .venv && source .venv/bin/activate
+python3.12 -m venv .venv && source .venv/bin/activate     # uv only: $(uv python find 3.12) -m venv .venv
 pip install -e ".[test]"
 scripts/setup_warp.sh
 pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@metalsim#egg=mujoco-warp"

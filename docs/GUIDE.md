@@ -8,13 +8,15 @@ guide links to it and does not repeat its numbers.
 
 Requirements: an Apple Silicon Mac (developed and measured on an M4 Max), macOS with the Xcode
 Command Line Tools (`xcode-select --install`; the full Xcode app is not needed), Python 3.12 or newer
-(developed on 3.12, the install is also tested on 3.14), git and about 5 GB of disk.
+(developed on 3.12, the install is also tested on 3.14; macOS's own `/usr/bin/python3` is 3.9, so install one from
+python.org, Homebrew or `uv python install 3.12`), git, [uv](https://docs.astral.sh/uv/) for the optional environments
+built by `scripts/setup_newton152.sh` and `scripts/setup_newton.sh`, and about 5 GB of disk.
 
 ## 1. Install
 
 ```
 git clone https://github.com/pulipakaa24/MetalSim && cd MetalSim
-python3 -m venv .venv && source .venv/bin/activate
+python3.12 -m venv .venv && source .venv/bin/activate     # uv only: $(uv python find 3.12) -m venv .venv
 pip install -e ".[test]"
 scripts/setup_warp.sh
 pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@metalsim#egg=mujoco-warp"
