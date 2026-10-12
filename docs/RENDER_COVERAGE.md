@@ -395,10 +395,25 @@ structure work (vertex generation, 1024 refits, instance structure) is 2.4 ms. R
 How the ray-traced cost came down (T2, 1024 envs): one structure over all envs with the grid offset baked in 110 ms →
 blocks of 12 envs 88 → one structure per (object, env) in its own frame 13.0 → one per env with a geometry per object
 10.2 (static twin 9.9).
+The 10:20 GPU wedge on this Mac (2026-10-12) happened while the old per-block structures, with the grid offsets baked in
+(coordinates up to ~3.3 km, 258 structures at 1024 envs), were refitting in tier 1; that pattern is removed (per-env
+structures in their own frame).
 
 Tendon-driven hand (Menagerie Tetheria Aero hand, 20 spatial tendons of 1 mm): with MuJoCo's tessellation (28 slices, 8
 rings per cap: 118 K triangles per env) at 256 envs T0 16.9 → 26.1, T1 10.5 → 38.5, depth camera 0.53 → 26.1, T2
 5.7 → 31.4. These tendons are under a pixel wide; `tube_slices=8, cap_stacks=2` (8.4 K triangles per env) gives
 T0 17.0 → 17.9, T1 10.6 → 13.6, depth 0.54 → 4.15, T2 5.7 → 9.5 at 256 envs and T0 66.8 → 69.4, T1 43.5 → 58.3,
-depth 1.54 → 15.1, T2 26.3 → 40.5 at 1024. The default stays MuJoCo's tessellation (silhouettes as MuJoCo's); the
-tessellation is a renderer argument.
+depth 1.54 → 15.1, T2 26.3 → 40.5 at 1024. `tube_slices` / `cap_stacks` still force one tessellation for every tube.
+
+**Adaptive tube tessellation (rendering only; physics never sees it).** By default each tube object (tendon, cable
+edges, flex vertex spheres) gets its tessellation from its projected width for the camera or sensor that renders it
+(`dynamic_mesh.tube_tessellation`): the closest distance from the camera (or, for a sensor, from any model camera or
+site) at the initial state, halved as a margin. At 3 px or wider: MuJoCo's (28 slices, 8 rings per cap), so close-ups
+match MuJoCo's silhouette; 0.5–3 px: 20 slices, 4 rings (mean silhouette width 0.996 of the circle's, worst orientation
+0.988, whatever the pixel size); under 0.5 px: 8 slices, 2 rings. `make_lidar` / `make_depth_camera` warn when a sensor
+is finer than its tracer's tessellation was chosen for (`RayTracer(tube_resolution=...)`). Tests: a close-up gets full
+tessellation (coverage as before), tendons 9 m away (12–16 px, 1 px wide) 20 slices, covering every MuJoCo pixel MuJoCo's tessellation covers at that view
+(all but one end pixel of one tendon, which 28 and 64 slices miss too), 40 m 8.
+Aero hand at 64 px (picks 20 slices, 42 K triangles per env): 256 envs T0 16.8 → 20.2, T1 10.6 → 20.5, depth
+0.53 → 10.7, T2 5.65 → 16.0; 1024 envs T0 66.2 → 79.3, T1 44.4 → 87.0, depth 1.51 → 40.6, T2 26.5 → 66.4. At 256 px,
+256 envs: T0 19.4 → 23.0, T1 43.3 → 67.0, depth 3.0 → 13.5, T2 72.9 → 85.6.

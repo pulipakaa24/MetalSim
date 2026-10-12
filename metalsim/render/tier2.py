@@ -118,11 +118,17 @@ class Tier2Renderer:
         self.m, self.n, self.tw, self.th = model, n_envs, width, height
         self.device = device
         self.ctx = ctx or MetalContext(device)
+        cam0 = 0 if camera is None else (mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_CAMERA, camera) if isinstance(camera, str) else int(camera))
+        tube_view = None
+        if not (tube_slices or cap_stacks) and model.ncam:          # tube tessellation for this camera (rendering only)
+            from metalsim.render.dynamic_mesh import camera_view
+            ci = CameraIntrinsics.from_model(model, cam0, width, height)
+            tube_view = camera_view(model, cam0, max(ci.fx, ci.fy))
         self.rt = RayTracer(model, n_envs, max_range=1000.0, max_group=max_group, include_planes=include_planes,
                             decimate_faces=decimate_faces, terrain_slots=terrain_slots, draw_hfields=draw_hfields,
                             appearance=appearance,
                             visual=mujoco.MjvOption() if visual is None else visual, deformables=deformables,
-                            tube_slices=tube_slices, cap_stacks=cap_stacks,
+                            tube_slices=tube_slices, cap_stacks=cap_stacks, tube_view=tube_view,
                             dyn_rebuild_every=dyn_rebuild_every, ctx=self.ctx, device=device)
 
         self.tables = self.rt.tables

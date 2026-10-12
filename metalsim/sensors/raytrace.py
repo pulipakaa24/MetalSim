@@ -31,6 +31,7 @@ class RayTracer:
     def __init__(self, model, n_envs: int, *, max_range: float = 10.0, max_group=3, include_planes=True,
                  decimate_faces: int = 0, terrain_slots: bool = True, draw_hfields: bool = True,
                  appearance: str = "mujoco", visual=None, deformables=(), tube_slices=None, cap_stacks=None,
+                 tube_view=None, tube_resolution=None,
                  dyn_rebuild_every: int = 32, ctx: MetalContext | None = None,
                  device="metal:0"):
         """``terrain_slots`` / ``draw_hfields`` / ``appearance``: see ``Tier0Renderer`` (False / "legacy" = the
@@ -40,7 +41,13 @@ class RayTracer:
         (sites, flexes, skins, spatial tendons) and user deformable meshes; see ``Tier0Renderer``. Each dynamic object
         has one primitive acceleration structure per env, in the env's own frame and placed by its instance's translation
         as the rigid meshes are, refit each frame after the vertices are regenerated and rebuilt every
-        ``dyn_rebuild_every`` frames (1: every frame, 0: refit only after the first build)."""
+        ``dyn_rebuild_every`` frames (1: every frame, 0: refit only after the first build).
+
+        Tube tessellation (tendons, cable edges; rendering only): MuJoCo's by default. ``tube_view`` = (viewpoints (K, 3),
+        angular resolution in rad) adapts it per tube to its projected size (``dynamic_mesh.tube_tessellation``; the
+        cameras built on a tracer pass theirs). ``tube_resolution``: a sensor's angular resolution (the depth camera's
+        pixel, the lidar's beam spacing), seen from the model's cameras and sites; ``make_lidar`` / ``make_depth_camera``
+        warn when a sensor is finer than the tessellation was chosen for."""
         self.m = model
         self.n = n_envs
         self.device = device
@@ -90,8 +97,17 @@ class RayTracer:
             # instanced meshes; one structure per object and env made the per-frame refits host-bound.) A hit's slot is
             # the instance's first slot + its geometry index, its mesh the instance's structure index + the geometry
             # index: the env structure is listed once per object in the instanced-structure list.
+            from metalsim.render.dynamic_mesh import tube_tessellation, model_viewpoints
+            self.tube_resolution = None
+            lod = None
+            if tube_view is None and tube_resolution is not None:
+                tube_view = (model_viewpoints(model), float(tube_resolution))
+            if tube_view is not None and not (tube_slices or cap_stacks):
+                self.tube_resolution = float(tube_view[1])
+                lod = tube_tessellation(model, t, tube_view[0], self.tube_resolution)
+            self.tube_lod = lod
             self.dyn = DynamicMeshes(self.ctx, model, t, n_envs, tpr=self.tpr, stride=0.0, rbase=nv_static,
-                                     vbuf=False, tube_slices=tube_slices, cap_stacks=cap_stacks)
+                                     vbuf=False, tube_slices=tube_slices, cap_stacks=cap_stacks, tube_lod=lod)
             exp = self.dyn.expanded_indices()
             verts = np.zeros((nv_static + self.dyn.n_records, 8), np.float32)
             verts[:nv_static] = t.vertices
@@ -353,8 +369,17 @@ class RayTracer:
 
     # -- sensors ------------------------------------------------------------------------------------
 
+    def _check_tube_resolution(self, res, what):
+        r = getattr(self, "tube_resolution", None)
+        if r is not None and res < r / 1.5:
+            import warnings
+            warnings.warn(f"{what}: angular resolution {res:.3g} rad is finer than the {r:.3g} rad the tube tessellation "
+                          f"was chosen for; build the RayTracer with tube_resolution={res:.3g}")
+
     def make_lidar(self, site: str | int, azimuths: np.ndarray, elevations: np.ndarray, **extras):
         """``extras``: beam divergence / multi-return / reflectance options of ``Lidar``."""
+        from metalsim.render.dynamic_mesh import beam_resolution
+        self._check_tube_resolution(beam_resolution(azimuths, elevations), "lidar")
         return Lidar(self, site, azimuths, elevations, **extras)
 
     def default_slot_reflectance(self) -> np.ndarray:
@@ -385,6 +410,10 @@ class RayTracer:
         return refl
 
     def make_depth_camera(self, camera: str | int, width: int, height: int):
+        import mujoco
+        cam = mujoco.mj_name2id(self.m, mujoco.mjtObj.mjOBJ_CAMERA, camera) if isinstance(camera, str) else int(camera)
+        ci = CameraIntrinsics.from_model(self.m, cam, width, height)
+        self._check_tube_resolution(1.0 / max(ci.fx, ci.fy), "depth camera")
         return RayDepthCamera(self, camera, width, height)
 
     # -- frame drivers -------------------------------------------------------------------------------
