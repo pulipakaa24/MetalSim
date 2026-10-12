@@ -1,0 +1,14 @@
+[gpu_run] mpmstep_tests start: device utilisation 0% (13:40:46)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+util at start 0 13:40:49
+warp.tests.test_metal_sparse rc=0 OK
+warp.tests.test_metal_bounded_launch rc=0 OK
+warp.tests.test_sparse rc=1 FAILED (errors=1, skipped=33)
+warp.tests.test_metal_primitives rc=0 OK
+warp.tests.fem.test_fem_multi_env rc=0 OK (skipped=1)
+warp.tests.fem.test_fem_integrate rc=0 OK (skipped=8)
+warp.tests.fem.test_fem_quadrature rc=0 OK (skipped=4)
+test_mpm rc=0 14 passed, 1 xfailed in 111.87s (0:01:51)
+end 13:45:42
+[gpu_run] mpmstep_tests end: device utilisation 0% (13:45:42), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %

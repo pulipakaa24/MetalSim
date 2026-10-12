@@ -1,9 +1,9 @@
 diff --git a/METALSIM_CHANGES.md b/METALSIM_CHANGES.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..8669a18251b2e31e10b300041726f523bdd923c4
+index 0000000000000000000000000000000000000000..dec1af2b72f46f963cfe057437578335d057d438
 --- /dev/null
 +++ b/METALSIM_CHANGES.md
-@@ -0,0 +1,51 @@
+@@ -0,0 +1,54 @@
 +# MetalSim changes on this branch (`metalsim-1.5.2`)
 +
 +Newton 1.5.2, the version Isaac Lab 3.0-EA pins, made to run on Apple silicon (Metal) with CUDA's semantics for
@@ -47,7 +47,10 @@ index 0000000000000000000000000000000000000000..8669a18251b2e31e10b300041726f523
 +| `35791a07` | `METALSIM_CHANGES.md`. |
 +| `3813cbba` | Kamino metric argmax keys (63-bit) without 64-bit exchange on Metal (the Warp fork refuses it at launch, so the EoM / kinematics / joint / limit metric kernels did not run there): per-thread key scratch, per-world 64-bit max of (value rank, ~thread), a finalize launch per metric kernel; the key of the maximum, lowest thread on ties. CPU / CUDA keep the exchange. Same protocol as on `metalsim` (1.7). |
 +| `e0c7c82e` | HashTable's Metal claim loop bounded (probes plus 65,536 passes, then -1 as for a full table, counted in `ht_insert_failures`): Apple GPUs give no forward-progress guarantee, so no thread may wait without bound for a claimant. |
-+| this commit | `METALSIM_CHANGES.md` rows for `3813cbba` and `e0c7c82e`. |
++| `c0427fc7` | `METALSIM_CHANGES.md` rows for `3813cbba` and `e0c7c82e`. |
++| `27415f95` | Metal: the rigidity operator (`J`, `IJtm`) is assembled from its kept triplet slots only (moved to the front in slot order, count passed to `bsr_set_from_triplets`; the stable sort orders them as before, so the matrices are the same). Franka-Pour MPM at 2,048 worlds: collider compliance 6.4 -> 3.1 ms of GPU time per step; bitwise. `NEWTON_METAL_RIGIDITY_COMPACT=0` restores the full assembly. |
++| `80e79684` | Metal: in the rheology loop the two rigidity products run only on the rows with blocks (listed on the device, launch bounded by the list length with an in-kernel guard): an empty row's result is a fixed point once the initial guess applied the full product, so every value is the same. From 8,192 rows (`NEWTON_METAL_LISTED_ROWS_MIN`); `NEWTON_METAL_LISTED_ROWS_MV=0` restores the full products. Franka-Pour 2,048 worlds: 8.8 -> 2.6 ms of GPU time per step; bitwise (1 / 64 / 2,048 worlds, eager and captured). |
++| this commit | `METALSIM_CHANGES.md` rows for `27415f95` and `80e79684`. With the Warp fork's `8631b6b0` and `fddebdbd`: Franka-Pour MPM captured step at 2,048 worlds 90.5-91.2 -> 78.9-79.0 ms, Franka-Pour policy step (2,048 envs, M4 Max) 2.06 -> 1.81 s. |
 +
 +`c0a98819` … `ddb015b9` were written on top of `eac15793` (as `de978b55`, `7beedf43`, `0013572a`, `ced01724`) and
 +cherry-picked onto `c1ab1cdc` unchanged; the resulting tree is the union of both lines.
@@ -1280,6 +1283,102 @@ index b01de0697db6066a3cab051e91b312783338f83e..51359dabef27db27b69aa0c06624727b
                  wp.tile_scatter_masked(progress, 0, edge_start, t == 0)
  
                  sdf_is_heightfield = sdf_is_hfield
+diff --git a/newton/_src/solvers/implicit_mpm/rasterized_collisions.py b/newton/_src/solvers/implicit_mpm/rasterized_collisions.py
+index bdf0d5b8b6ccd087647cd8df7d7cb0800dbc68db..2ddbfcfc805db053899f975e5e18a912cac5e46d 100644
+--- a/newton/_src/solvers/implicit_mpm/rasterized_collisions.py
++++ b/newton/_src/solvers/implicit_mpm/rasterized_collisions.py
+@@ -1,6 +1,8 @@
+ # SPDX-FileCopyrightText: Copyright (c) 2025 The Newton Developers
+ # SPDX-License-Identifier: Apache-2.0
+ 
++import os
++
+ import warp as wp
+ import warp.fem as fem
+ import warp.sparse as wps
+@@ -857,6 +859,11 @@ def build_rigidity_operator(
+         ],
+     )
+ 
++    if getattr(J_rows.device, "is_metal", False) and os.environ.get("NEWTON_METAL_RIGIDITY_COMPACT", "1") != "0":
++        return _rigidity_matrices_compacted(
++            vel_node_count, particle_block_offset + deformable_vertex_count, J_rows, J_cols, J_values, IJtm_values
++        )
++
+     J = wps.bsr_from_triplets(
+         rows_of_blocks=vel_node_count,
+         cols_of_blocks=particle_block_offset + deformable_vertex_count,
+@@ -874,3 +881,70 @@ def build_rigidity_operator(
+     )
+ 
+     return J, IJtm
++
++
++@wp.kernel
++def _triplet_slot_valid(rows: wp.array[int], cols: wp.array[int], valid: wp.array[int]):
++    i = wp.tid()
++    valid[i] = wp.where(rows[i] >= 0 and cols[i] >= 0, 1, 0)
++
++
++@wp.kernel
++def _compact_triplet_slots(
++    rows: wp.array[int],
++    cols: wp.array[int],
++    J_values: wp.array[wp.mat33],
++    IJtm_values: wp.array[wp.mat33],
++    position: wp.array[int],
++    rows_out: wp.array[int],
++    cols_out: wp.array[int],
++    J_values_out: wp.array[wp.mat33],
++    IJtm_values_out: wp.array[wp.mat33],
++    count: wp.array[int],
++):
++    i = wp.tid()
++    n = rows.shape[0]
++    if i == n - 1:
++        count[0] = position[i] + wp.where(rows[i] >= 0 and cols[i] >= 0, 1, 0)
++    if rows[i] >= 0 and cols[i] >= 0:
++        k = position[i]
++        rows_out[k] = rows[i]
++        cols_out[k] = cols[i]
++        J_values_out[k] = J_values[i]
++        IJtm_values_out[k] = IJtm_values[i]
++
++
++def _rigidity_matrices_compacted(row_blocks, col_blocks, J_rows, J_cols, J_values, IJtm_values):
++    """``J`` and ``IJtm`` as :func:`build_rigidity_operator` assembles them, from the kept triplets only.
++
++    Most slots are empty (nodes away from dynamic colliders). The kept ones are moved to the front in slot order and
++    their count is passed to the assembly, whose stable sort then orders only those: every kept triplet keeps its
++    rank among the kept ones, so offsets, columns and values are the same as from the full triplet arrays (empty
++    slots map to the sentinel key there and are dropped).
++    """
++    from warp.utils import array_scan  # noqa: PLC0415
++
++    n = J_rows.shape[0]
++    device = J_rows.device
++    valid = wp.empty(n, dtype=int, device=device)
++    position = wp.empty(n, dtype=int, device=device)
++    rows_c = wp.empty(n, dtype=int, device=device)
++    cols_c = wp.empty(n, dtype=int, device=device)
++    J_values_c = wp.empty(n, dtype=wp.mat33, device=device)
++    IJtm_values_c = wp.empty(n, dtype=wp.mat33, device=device)
++    count = wp.zeros(1, dtype=int, device=device)
++    if n > 0:
++        wp.launch(_triplet_slot_valid, dim=n, inputs=[J_rows, J_cols, valid], device=device)
++        array_scan(valid, position, inclusive=False)
++        wp.launch(
++            _compact_triplet_slots,
++            dim=n,
++            inputs=[J_rows, J_cols, J_values, IJtm_values, position, rows_c, cols_c, J_values_c, IJtm_values_c, count],
++            device=device,
++        )
++
++    J = wps.bsr_zeros(row_blocks, col_blocks, block_type=wp.mat33, device=device)
++    wps.bsr_set_from_triplets(J, rows_c, cols_c, J_values_c, count=count)
++    IJtm = wps.bsr_zeros(col_blocks, row_blocks, block_type=wp.mat33, device=device)
++    wps.bsr_set_from_triplets(IJtm, cols_c, rows_c, IJtm_values_c, count=count)
++    return J, IJtm
 diff --git a/newton/_src/solvers/implicit_mpm/rheology_solver_kernels.py b/newton/_src/solvers/implicit_mpm/rheology_solver_kernels.py
 index 9330d064705e1a0ec7dbc8bd12c0bb55772cd392..1314afa7d78808f721a4a2c710ddfb7a20db13fd 100644
 --- a/newton/_src/solvers/implicit_mpm/rheology_solver_kernels.py
@@ -1320,7 +1419,7 @@ index 9330d064705e1a0ec7dbc8bd12c0bb55772cd392..1314afa7d78808f721a4a2c710ddfb7a
          color: int,
          launch_dim: int,
 diff --git a/newton/_src/solvers/implicit_mpm/solve_rheology.py b/newton/_src/solvers/implicit_mpm/solve_rheology.py
-index 4d539fa44eaf74ede90898f11b714ea25eb890be..6c33da2147f5b2161588a93138f62654227728c3 100644
+index 4d539fa44eaf74ede90898f11b714ea25eb890be..cc8089876ef40859863e3478464bb3af8ac72964 100644
 --- a/newton/_src/solvers/implicit_mpm/solve_rheology.py
 +++ b/newton/_src/solvers/implicit_mpm/solve_rheology.py
 @@ -4,6 +4,7 @@
@@ -1331,7 +1430,15 @@ index 4d539fa44eaf74ede90898f11b714ea25eb890be..6c33da2147f5b2161588a93138f62654
  import math
  from collections.abc import Sequence
  from dataclasses import dataclass
-@@ -58,6 +59,30 @@ from .rheology_solver_kernels import (
+@@ -15,6 +16,7 @@ import warp.fem as fem
+ import warp.sparse as sp
+ from warp.fem.linalg import array_axpy
+ from warp.optim.linear import LinearOperator, cg, cr, gmres
++from warp._src.sparse import _bsr_row_end
+ 
+ from .contact_solver_kernels import (
+     apply_nodal_impulse_warmstart,
+@@ -58,6 +60,30 @@ from .rheology_solver_kernels import (
  _TILED_SUM_BLOCK_DIM = 512
  _STRESS_DOF_COUNT = 6
  
@@ -1362,7 +1469,7 @@ index 4d539fa44eaf74ede90898f11b714ea25eb890be..6c33da2147f5b2161588a93138f62654
  
  @wp.kernel
  def _tiled_sum_kernel(
-@@ -131,6 +156,16 @@ def _scale_linear_system_by_environment(
+@@ -131,6 +157,16 @@ def _scale_linear_system_by_environment(
          solution[i] = factor * solution[i]
  
  
@@ -1379,7 +1486,7 @@ index 4d539fa44eaf74ede90898f11b714ea25eb890be..6c33da2147f5b2161588a93138f62654
  class ArraySquaredNorm:
      """Utility to compute squared L2 norm of a large array via tiled reductions."""
  
-@@ -146,7 +181,8 @@ class ArraySquaredNorm:
+@@ -146,7 +182,8 @@ class ArraySquaredNorm:
          self.batch_sum_launch = None
  
          if batch_offsets is not None:
@@ -1389,7 +1496,140 @@ index 4d539fa44eaf74ede90898f11b714ea25eb890be..6c33da2147f5b2161588a93138f62654
                  self.tile_size = 1
  
              batch_count = batch_offsets.shape[0] - 1
-@@ -333,6 +369,9 @@ class MomentumData:
+@@ -306,6 +343,132 @@ def apply_rigidity_operator(rigidity_operator, delta_collider_impulse, collider_
+     sp.bsr_mv(J, x=delta_body_qd, y=collider_velocity, alpha=1.0, beta=1.0)
+ 
+ 
++@wp.kernel
++def _bsr_nonempty_row_flags(offsets: wp.array[int], row_counts: wp.array[int], flags: wp.array[int]):
++    row = wp.tid()
++    flags[row] = wp.where(_bsr_row_end(offsets, row_counts, row) > offsets[row], 1, 0)
++
++
++@wp.kernel
++def _bsr_compact_rows(flags: wp.array[int], positions: wp.array[int], rows: wp.array[int], count: wp.array[int]):
++    row = wp.tid()
++    if flags[row] != 0:
++        rows[positions[row]] = row
++    if row == flags.shape[0] - 1:
++        count[0] = positions[row] + flags[row]
++
++
++@wp.kernel
++def _bsr_mv_listed_rows(
++    alpha: float,
++    A_offsets: wp.array[int],
++    A_row_counts: wp.array[int],
++    A_columns: wp.array[int],
++    A_values: wp.array3d[float],
++    x: wp.array[float],
++    beta: float,
++    y: wp.array[float],
++    rows: wp.array[int],
++    row_count: wp.array[int],
++):
++    # warp.sparse's bsr_mv_kernel (the form bsr_mv launches off CUDA) for the listed rows, 3 block columns
++    k, subrow = wp.tid()
++    if k >= row_count[0]:  # the bounded launch may still run the rest of its last threadgroup
++        return
++    row = rows[k]
++
++    block_rows = A_values.shape[1]
++
++    yi = row * block_rows + subrow
++
++    scalar_zero = float(0)
++    v = scalar_zero
++
++    if alpha != scalar_zero:
++        beg = A_offsets[row]
++        end = _bsr_row_end(A_offsets, A_row_counts, row)
++        for block in range(beg, end):
++            xs = A_columns[block] * 3
++            for col in range(wp.static(3)):
++                v += A_values[block, subrow, col] * x[xs + col]
++        v *= alpha
++
++    if beta != scalar_zero:
++        v += beta * y[yi]
++
++    y[yi] = v
++
++
++class _ListedRowsMv:
++    """``y = alpha * A @ x + beta * y`` on the rows of ``A`` that hold blocks, as ``warp.sparse.bsr_mv`` computes them
++    off CUDA (same kernel body, same block and column order).
++
++    Used inside the rheology loop after one full product: an empty row ``r`` sets ``y[r]`` to ``beta * y[r]`` plus
++    a zero (``0.0 + y[r]`` with ``beta = 1``, ``-0.0`` with ``alpha = -1, beta = 0``), which is idempotent once applied,
++    so skipping the empty rows in the later products leaves every value bit for bit as the full product would. The
++    row list and its length are built on the device; the launch is bounded by that length.
++    """
++
++    def __init__(self, A: sp.BsrMatrix, x: wp.array, y: wp.array, alpha: float, beta: float):
++        from warp._src.sparse import _vec_array_view  # noqa: PLC0415
++        from warp.utils import array_scan  # noqa: PLC0415
++
++        device = A.values.device
++        self.A = A
++        self.alpha = A.scalar_type(alpha)
++        self.beta = A.scalar_type(beta)
++        self.x = _vec_array_view(x, A.scalar_type, expected_scalar_count=A.ncol * A.block_shape[1])
++        self.y = _vec_array_view(y, A.scalar_type, expected_scalar_count=A.nrow * A.block_shape[0])
++        nrow = A.nrow
++        self.rows = wp.empty(max(nrow, 1), dtype=int, device=device)
++        self.count = wp.zeros(1, dtype=int, device=device)
++        if nrow > 0:
++            flags = wp.empty(nrow, dtype=int, device=device)
++            positions = wp.empty(nrow, dtype=int, device=device)
++            wp.launch(_bsr_nonempty_row_flags, dim=nrow, inputs=[A.offsets, A.row_counts, flags], device=device)
++            array_scan(flags, positions, inclusive=False)
++            wp.launch(_bsr_compact_rows, dim=nrow, inputs=[flags, positions, self.rows, self.count], device=device)
++        self.device = device
++
++    def launch(self):
++        A = self.A
++        if A.nrow == 0:
++            return
++        wp.launch(
++            _bsr_mv_listed_rows,
++            dim=(A.nrow, A.block_shape[0]),
++            inputs=[
++                self.alpha,
++                A.offsets,
++                A.row_counts,
++                A.columns,
++                A.scalar_values,
++                self.x,
++                self.beta,
++                self.y,
++                self.rows,
++                self.count,
++            ],
++            device=self.device,
++            dim_limit=self.count,
++        )
++
++
++def _listed_rows_mv_supported(A: sp.BsrMatrix) -> bool:
++    """Metal (where ``bsr_mv`` runs the non-tiled kernel) with bounded launches, 3-column blocks, and enough rows
++    for the row list to pay for its extra dispatches (``NEWTON_METAL_LISTED_ROWS_MIN``, default 8,192 rows; one
++    Franka-Pour world has 735 collider nodes); not on ``NEWTON_METAL_LISTED_ROWS_MV=0``."""
++    import os  # noqa: PLC0415
++
++    return (
++        _LAUNCH_HAS_DIM_LIMIT
++        and getattr(A.values.device, "is_metal", False)
++        and A.block_shape[1] == 3
++        and os.environ.get("NEWTON_METAL_LISTED_ROWS_MV", "1") != "0"
++        and A.nrow >= int(os.environ.get("NEWTON_METAL_LISTED_ROWS_MIN", "8192"))
++    )
++
++
+ class _ScopedDisableGC:
+     """Context manager to disable automatic garbage collection during graph capture.
+     Avoids capturing deallocations of arrays exterior to the capture scope.
+@@ -333,6 +496,9 @@ class MomentumData:
  
      inv_volume: wp.array
      velocity: wp.array[wp.vec3]
@@ -1399,7 +1639,7 @@ index 4d539fa44eaf74ede90898f11b714ea25eb890be..6c33da2147f5b2161588a93138f62654
  
  
  @dataclass
-@@ -385,6 +424,9 @@ class RheologyData:
+@@ -385,6 +551,9 @@ class RheologyData:
      has_dilatancy: bool = False
      strain_velocity_node_count: int = -1
  
@@ -1409,7 +1649,7 @@ index 4d539fa44eaf74ede90898f11b714ea25eb890be..6c33da2147f5b2161588a93138f62654
  
  @dataclass
  class CollisionData:
-@@ -492,6 +534,7 @@ class _DelassusOperator:
+@@ -492,6 +661,7 @@ class _DelassusOperator:
                      1,
                  ],
                  outputs=[mult],
@@ -1417,7 +1657,7 @@ index 4d539fa44eaf74ede90898f11b714ea25eb890be..6c33da2147f5b2161588a93138f62654
              )
          else:
              # GS mode: empty arrays → multiplicity of 1
-@@ -502,6 +545,7 @@ class _DelassusOperator:
+@@ -502,6 +672,7 @@ class _DelassusOperator:
          wp.launch(
              kernel=compute_delassus_diagonal,
              dim=self.size,
@@ -1425,7 +1665,7 @@ index 4d539fa44eaf74ede90898f11b714ea25eb890be..6c33da2147f5b2161588a93138f62654
              inputs=[
                  self.rheology.strain_mat.offsets,
                  self.rheology.strain_mat.columns,
-@@ -533,6 +577,7 @@ class _DelassusOperator:
+@@ -533,6 +704,7 @@ class _DelassusOperator:
          wp.launch(
              kernel=preprocess_stress_and_strain,
              dim=self.size,
@@ -1433,7 +1673,7 @@ index 4d539fa44eaf74ede90898f11b714ea25eb890be..6c33da2147f5b2161588a93138f62654
              inputs=[
                  self.rheology.unilateral_strain_offset,
                  self.rheology.elastic_strain_delta,
-@@ -553,6 +598,7 @@ class _DelassusOperator:
+@@ -553,6 +725,7 @@ class _DelassusOperator:
          return wp.launch(
              kernel=apply_stress_delta_jacobi,
              dim=self.momentum.velocity.shape[0],
@@ -1441,7 +1681,7 @@ index 4d539fa44eaf74ede90898f11b714ea25eb890be..6c33da2147f5b2161588a93138f62654
              inputs=[
                  self.rheology.transposed_strain_mat.offsets,
                  self.rheology.transposed_strain_mat.columns,
-@@ -597,6 +643,7 @@ class _DelassusOperator:
+@@ -597,6 +770,7 @@ class _DelassusOperator:
          wp.launch(
              kernel=postprocess_stress_and_strain,
              dim=self.size,
@@ -1449,7 +1689,7 @@ index 4d539fa44eaf74ede90898f11b714ea25eb890be..6c33da2147f5b2161588a93138f62654
              inputs=[
                  self.rheology.compliance_mat.offsets,
                  self.rheology.compliance_mat.columns,
-@@ -645,6 +692,7 @@ class _RheologySolver:
+@@ -645,6 +819,7 @@ class _RheologySolver:
          self._evaluate_strain_residual_launch = wp.launch(
              kernel=evaluate_strain_residual,
              dim=self.size,
@@ -1457,7 +1697,7 @@ index 4d539fa44eaf74ede90898f11b714ea25eb890be..6c33da2147f5b2161588a93138f62654
              inputs=[
                  self.delta_stress,
                  self.delassus_operator.delassus_diagonal,
-@@ -688,10 +736,7 @@ class _GaussSeidelSolver(_RheologySolver):
+@@ -688,10 +863,7 @@ class _GaussSeidelSolver(_RheologySolver):
  
          self.color_count = self.rheology.color_offsets.shape[0] - 1
  
@@ -1469,7 +1709,7 @@ index 4d539fa44eaf74ede90898f11b714ea25eb890be..6c33da2147f5b2161588a93138f62654
          color_block_dim = 64
          color_launch_dim = color_block_count * color_block_dim
  
-@@ -887,10 +932,7 @@ class _ReorderedGaussSeidelSolver(_RheologySolver):
+@@ -887,10 +1059,7 @@ class _ReorderedGaussSeidelSolver(_RheologySolver):
  
          # ── Launch config ────────────────────────────────────────────────
  
@@ -1481,7 +1721,7 @@ index 4d539fa44eaf74ede90898f11b714ea25eb890be..6c33da2147f5b2161588a93138f62654
          color_block_dim = 64
          color_launch_dim = color_block_count * color_block_dim
  
-@@ -1130,10 +1172,7 @@ class _BatchedGaussSeidelSolver(_RheologySolver):
+@@ -1130,10 +1299,7 @@ class _BatchedGaussSeidelSolver(_RheologySolver):
  
          # ── Launch config ────────────────────────────────────────────────
  
@@ -1493,7 +1733,7 @@ index 4d539fa44eaf74ede90898f11b714ea25eb890be..6c33da2147f5b2161588a93138f62654
          color_block_dim = 64
          color_launch_dim = color_block_count * color_block_dim
  
-@@ -1337,6 +1376,7 @@ class _JacobiSolver(_RheologySolver):
+@@ -1337,6 +1503,7 @@ class _JacobiSolver(_RheologySolver):
          self.solve_local_launch = wp.launch(
              kernel=jacobi_kernel,
              dim=self.size,
@@ -1501,7 +1741,7 @@ index 4d539fa44eaf74ede90898f11b714ea25eb890be..6c33da2147f5b2161588a93138f62654
              inputs=[
                  self.rheology.yield_params,
                  self.rheology.strain_node_volume,
-@@ -1375,7 +1415,11 @@ class _JacobiSolver(_RheologySolver):
+@@ -1375,7 +1542,11 @@ class _JacobiSolver(_RheologySolver):
          self.solve_local_launch.launch()
          # Add jacobi delta
          self.apply_stress_launch.launch()
@@ -1514,7 +1754,7 @@ index 4d539fa44eaf74ede90898f11b714ea25eb890be..6c33da2147f5b2161588a93138f62654
  
  
  _ITERATIVE_LINEAR_SOLVERS = {
-@@ -1498,7 +1542,8 @@ class _LinearSolver:
+@@ -1498,7 +1669,8 @@ class _LinearSolver:
  
      def _scale_batched_system(self, tolerance_scales: wp.array[float], inverse: bool):
          environment_offsets = self.rheology.strain_environment_offsets
@@ -1524,7 +1764,48 @@ index 4d539fa44eaf74ede90898f11b714ea25eb890be..6c33da2147f5b2161588a93138f62654
          wp.launch(
              _scale_linear_system_by_environment,
              dim=(tolerance_scales.shape[0], block_dim),
-@@ -1715,6 +1760,7 @@ class _SubgridContactSolver(_ContactSolver):
+@@ -1594,9 +1766,15 @@ class _ContactSolver:
+         self.collider_inv_mass = fem.borrow_temporary_like(self.collision.collider_friction, temporary_store)
+ 
+         # Setup rigidity correction
++        self._iteration_rigidity = None
+         if self.collision.rigidity_operator is not None:
+             J, IJtm = self.collision.rigidity_operator
+             self.delta_body_qd = fem.borrow_temporary(temporary_store, shape=J.shape[1], dtype=float)
++            if _listed_rows_mv_supported(J) and IJtm.block_shape[1] == 3:
++                self._iteration_rigidity = (
++                    _ListedRowsMv(IJtm, self.delta_impulse, self.delta_body_qd, alpha=-1.0, beta=0.0),
++                    _ListedRowsMv(J, self.delta_body_qd, self.collision.collider_velocities, alpha=1.0, beta=1.0),
++                )
+ 
+             wp.launch(
+                 compute_collider_inv_mass,
+@@ -1632,6 +1810,15 @@ class _ContactSolver:
+                 self.delta_body_qd,
+             )
+ 
++    def apply_rigidity_operator_in_loop(self):
++        """:meth:`apply_rigidity_operator` after the initial guess has applied it once: the empty rows' results
++        are then fixed points (see :class:`_ListedRowsMv`), so only the rows with blocks are recomputed."""
++        if self._iteration_rigidity is None:
++            self.apply_rigidity_operator()
++            return
++        for mv in self._iteration_rigidity:
++            mv.launch()
++
+ 
+ class _NodalContactSolver(_ContactSolver):
+     def __init__(
+@@ -1679,7 +1866,7 @@ class _NodalContactSolver(_ContactSolver):
+ 
+     def solve(self):
+         self.solve_collider_launch.launch()
+-        self.apply_rigidity_operator()
++        self.apply_rigidity_operator_in_loop()
+ 
+ 
+ class _SubgridContactSolver(_ContactSolver):
+@@ -1715,6 +1902,7 @@ class _SubgridContactSolver(_ContactSolver):
          self.apply_collider_impulse_launch = wp.launch(
              apply_subgrid_impulse,
              dim=self.momentum.velocity.shape[0],
@@ -1532,6 +1813,15 @@ index 4d539fa44eaf74ede90898f11b714ea25eb890be..6c33da2147f5b2161588a93138f62654
              inputs=[
                  self.collision.transposed_collider_mat.offsets,
                  self.collision.transposed_collider_mat.columns,
+@@ -1763,7 +1951,7 @@ class _SubgridContactSolver(_ContactSolver):
+     def solve(self):
+         self.solve_collider_launch.launch()
+         self.apply_collider_impulse_launch.launch()
+-        self.apply_rigidity_operator()
++        self.apply_rigidity_operator_in_loop()
+ 
+     def release(self):
+         self.collider_delassus_diagonal.release()
 diff --git a/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py b/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py
 index f99cf1b8cc310443ba607e778e51976bf98b7266..2f7157f91b285712ca359c93fd31f82ac465e173 100644
 --- a/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py

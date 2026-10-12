@@ -1,0 +1,43 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module warp._src.metal_sparse 7e77140 load on device 'metal:0' took 433.77 ms  (cached)
+Module warp._src.metal_sparse 3714f8b load on device 'metal:0' took 376.10 ms  (cached)
+Module warp._src.metal_sparse 21d0e7d load on device 'metal:0' took 365.70 ms  (cached)
+Module warp._src.metal_sparse 43e7503 load on device 'metal:0' took 370.59 ms  (cached)
+Module _bsr_accumulate_triplet_values_ca6c8ef6 ac7189d load on device 'metal:0' took 355.67 ms  (cached)
+Module warp._src.metal_sparse 808619f load on device 'metal:0' took 379.11 ms  (cached)
+Module warp._src.metal_sparse 4cc22c6 load on device 'metal:0' took 385.79 ms  (cached)
+Module warp._src.metal_sparse dd04d03 load on device 'metal:0' took 393.25 ms  (cached)
+Module warp._src.metal_sparse f0d597f load on device 'metal:0' took 413.11 ms  (cached)
+Module warp._src.metal_sparse 8418e0b load on device 'metal:0' took 403.73 ms  (cached)
+warm-up                            n=       4 nnz=       4 equal=True
+row-ordered small                  n=    8000 nnz=    7997 equal=True
+row-ordered+discards+dups small    n=    8000 nnz=    5859 equal=True
+row-ordered with count small       n=    8000 nnz=    3895 equal=True
+shuffled small                     n=    8000 nnz=    7994 equal=True
+Module warp._src.metal_sparse 3442960 load on device 'metal:0' took 416.14 ms  (cached)
+Module warp._src.metal_sparse 132e542 load on device 'metal:0' took 419.59 ms  (cached)
+Module warp._src.metal_sparse 0540ac2 load on device 'metal:0' took 417.00 ms  (cached)
+Module warp._src.metal_sparse c8a2d4a load on device 'metal:0' took 419.19 ms  (cached)
+Module warp._src.metal_sparse ce26397 load on device 'metal:0' took 428.37 ms  (cached)
+Module warp._src.metal_sparse 875749b load on device 'metal:0' took 429.65 ms  (cached)
+Module warp._src.metal_sparse 036142d load on device 'metal:0' took 443.74 ms  (cached)
+Module warp._src.metal_sparse f0c1f5a load on device 'metal:0' took 441.36 ms  (cached)
+Module warp._src.metal_sparse 7bafaa5 load on device 'metal:0' took 455.20 ms  (cached)
+row-ordered fem-like 1.6M          n= 1600000 nnz= 1599987 equal=True
+row-ordered+discards+dups fem-like 1.6M n= 1600000 nnz= 1174986 equal=True
+row-ordered with count fem-like 1.6M n= 1600000 nnz=  783537 equal=True
+shuffled fem-like 1.6M             n= 1600000 nnz= 1599982 equal=True
+row-ordered pic27-like             n= 1350000 nnz= 1349814 equal=True
+row-ordered+discards+dups pic27-like n= 1350000 nnz=  983261 equal=True
+row-ordered with count pic27-like  n= 1350000 nnz=  655693 equal=True
+shuffled pic27-like                n= 1350000 nnz= 1349843 equal=True
+one out-of-order row               n=   40000 nnz=   39984 equal=True
+long run                           n=    4196 nnz=    4185 equal=True
+split run                          n=       7 nnz=       6 equal=True
+ALL EQUAL
