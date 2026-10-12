@@ -6,7 +6,8 @@ ray-traced depth camera, then measures per object (MuJoCo segmentation mask = th
 
 * ``rgb``: fraction of the reference mask where MetalSim's RGB is not the clear colour,
 * ``depth``: fraction of the mask with a depth value > 0, and the median |depth - MuJoCo depth| there,
-* ``seg``: fraction of the mask whose MetalSim id (geom mode) is the object's geom (geoms) or any id (non-geoms).
+* ``seg``: fraction of the mask whose MetalSim id (geom mode) is the object's own id: geom + 1 for geoms,
+  ``ngeom + 1 + j`` for the j-th extra object (sites, flexes, skins, tendons; ``tables.extras``), and any id.
 
 Plus targeted probes (transparency, far plane, infinite plane, textures, lights > 8, spot/point shadows, mesh normals,
 skybox). Prints one JSON object per probe and writes everything to ``--out`` (JSON) and contact sheets (PNG).
@@ -51,11 +52,12 @@ def ours(m, d, which, w=W, h=H, **kw):
         r = Tier0Renderer(m, 1, width=w, height=h, camera="cam", outputs=("rgb", "depth", "seg"), seg_mode=SEG_GEOM,
                           tier=0 if which == "tier0" else 1, **kw)
         o = r.render_host([d])
-        return {"rgb": o["rgb"][0], "depth": o["depth"][0], "seg": o["seg"][0]}
+        return {"rgb": o["rgb"][0], "depth": o["depth"][0], "seg": o["seg"][0], "extras": getattr(r.tables, "extras", [])}
     if which == "tier2":
         r = Tier2Renderer(m, 1, width=w, height=h, camera="cam", spp=16, max_bounces=2, center_sample=True, **kw)
         o = r.render_host([d], passes=2)
-        return {"rgb": o["rgb"][0], "depth": o["depth"][0], "seg": o["seg"][0], "geoms": r.tables.geoms}
+        ids = r.tables.slot_seg_ids() if hasattr(r.tables, "slot_seg_ids") else np.asarray(r.tables.geoms) + 1
+        return {"rgb": o["rgb"][0], "depth": o["depth"][0], "seg": o["seg"][0], "slot_ids": ids, "extras": getattr(r.tables, "extras", [])}
     if which == "raydepth":
         rt = RayTracer(m, 1, max_range=100.0)
         cam = rt.make_depth_camera("cam", w, h)
@@ -64,8 +66,9 @@ def ours(m, d, which, w=W, h=H, **kw):
     raise ValueError(which)
 
 
-def coverage(mask, o, ref_depth, geom_id=None, tier2_geoms=None):
-    """Per-object coverage of one MetalSim output against the reference mask."""
+def coverage(mask, o, ref_depth, seg_id=None, slot_ids=None):
+    """Per-object coverage of one MetalSim output against the reference mask; ``seg_id``: the object's id in a geom-mode
+    segmentation buffer (None: only "any id" is measured); ``slot_ids``: tier 2's slot -> id table."""
     n = int(mask.sum())
     res = {"px": n}
     if n == 0:
@@ -80,12 +83,12 @@ def coverage(mask, o, ref_depth, geom_id=None, tier2_geoms=None):
             res["depth_err_med_m"] = round(float(np.median(np.abs(dv[ok] - ref_depth[mask][ok]))), 4)
     if "seg" in o:
         s = o["seg"][mask]
-        if tier2_geoms is not None:      # tier 2 writes slot + 1: map to geom + 1
-            lut = np.concatenate([[0], np.asarray(tier2_geoms) + 1])
+        if slot_ids is not None:         # tier 2 writes slot + 1: map to the geom-mode id
+            lut = np.concatenate([[0], np.asarray(slot_ids)])
             s = lut[s]
         res["seg_any"] = round(float((s > 0).mean()), 3)
-        if geom_id is not None:
-            res["seg_correct"] = round(float((s == geom_id + 1).mean()), 3)
+        if seg_id is not None:
+            res["seg_correct"] = round(float((s == seg_id).mean()), 3)
     return res
 
 
@@ -104,8 +107,13 @@ def object_audit(xml, name, objects, renderers=("tier0", "tier1", "tier2", "rayd
         if isinstance(oid, str):
             oid = mujoco.mj_name2id(m, otype, oid)
         mask = (seg[..., 0] == oid) & (seg[..., 1] == int(otype))
-        gid = oid if otype == mujoco.mjtObj.mjOBJ_GEOM else None
-        res["objects"][label] = {r: coverage(mask, o, rdep, gid, o.get("geoms")) for r, o in outs.items()}
+
+        def sid(o):
+            if otype == mujoco.mjtObj.mjOBJ_GEOM:
+                return oid + 1
+            hit = [e["seg_id"] for e in o.get("extras", []) if e["objtype"] == int(otype) and e["objid"] == oid]
+            return hit[0] if hit else None
+        res["objects"][label] = {r: coverage(mask, o, rdep, sid(o) if r != "raydepth" else None, o.get("slot_ids")) for r, o in outs.items()}
     return res, m, d, outs
 
 
@@ -148,7 +156,7 @@ NONGEOM = f"""
     <body name="t1" pos="-0.45 0 1.2"><site name="ta" size="0.005" rgba="0 0 0 0"/></body>
     <body name="t2" pos="-0.25 0 0.75"><site name="tb" size="0.005" rgba="0 0 0 0"/></body>
     <body name="bone" pos="1.0 0 1.0"/>
-    <flexcomp name="cable" type="grid" count="8 1 1" spacing="0.05 0.05 0.05" pos="0.0 0 1.2" dim="1" radius="0.02"
+    <flexcomp name="cable" type="grid" count="8 1 1" spacing="0.05 0.05 0.05" pos="0.0 0 0.45" dim="1" radius="0.02"
               rgba="0.95 0.6 0.2 1"><edge equality="true"/></flexcomp>
     <flexcomp name="cloth" type="grid" count="7 7 1" spacing="0.04 0.04 0.04" pos="0.15 0 0.75" euler="90 0 0" dim="2"
               radius="0.005" rgba="0.2 0.5 0.9 1"><edge equality="true"/></flexcomp>
@@ -280,7 +288,7 @@ def transparency_probe():
         o = ours(m, d, r)
         segv = o["seg"][mask]
         if r == "tier2":
-            segv = np.concatenate([[0], np.asarray(o["geoms"]) + 1])[segv]
+            segv = np.concatenate([[0], np.asarray(o["slot_ids"])])[segv]
         res[r] = {"mean_rgb": [round(float(x)) for x in o["rgb"][mask].astype(np.float32).mean(0)],
                   "seg_is_glass": round(float((segv == mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_GEOM, "glass") + 1).mean()), 3),
                   "depth_median_m": round(float(np.median(o["depth"][mask])), 3)}
@@ -299,7 +307,7 @@ def far_probe():
     for g in range(m.ngeom):
         name = mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_GEOM, g)
         mask = (seg[..., 0] == g) & (seg[..., 1] == int(mujoco.mjtObj.mjOBJ_GEOM))
-        row = {r: coverage(mask, o, rdep, g, o.get("geoms")) for r, o in outs.items()}
+        row = {r: coverage(mask, o, rdep, g + 1 if r != "raydepth" else None, o.get("slot_ids")) for r, o in outs.items()}
         if mask.any():
             row["ref_depth_range_m"] = [round(float(rdep[mask].min()), 2), round(float(rdep[mask].max()), 2)]
         res["objects"][name] = row
