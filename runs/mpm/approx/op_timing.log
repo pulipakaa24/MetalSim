@@ -1,0 +1,29 @@
+[gpu_run] approx_optiming start: device utilisation 100% (19:07:12)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 100 %; per-process GPU time over 1.8 s: none >= 1 %
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/robosim/.claude/worktrees/agent-ae8661f0d09092d4b/runs/mpm/approx/kcache/1.18.0.dev20260917
+Module make__locals__k_41132ea5 41132ea load on device 'metal:0' took 376.71 ms  (compiled)
+baseline fma              0.345 ms    1.284 ps/thread-op
+Module make__locals__k_66138f4b 66138f4 load on device 'metal:0' took 354.85 ms  (compiled)
+div precise               0.998 ms    3.718 ps/thread-op
+Module make__locals__k_c82f4e0b c82f4e0 load on device 'metal:0' took 356.11 ms  (compiled)
+div fast::divide          0.355 ms    1.321 ps/thread-op
+Module make__locals__k_a24a370b a24a370 load on device 'metal:0' took 360.19 ms  (compiled)
+div cuda emulation        3.186 ms   11.868 ps/thread-op
+Module make__locals__k_c1512fde c1512fd load on device 'metal:0' took 360.01 ms  (compiled)
+div cuda emulation v2     2.897 ms   10.791 ps/thread-op
+Module make__locals__k_d67cc6f0 d67cc6f load on device 'metal:0' took 358.72 ms  (compiled)
+sqrt precise              0.731 ms    2.722 ps/thread-op
+Module make__locals__k_b5faed13 b5faed1 load on device 'metal:0' took 359.27 ms  (compiled)
+sqrt fast::sqrt           0.335 ms    1.248 ps/thread-op
+Module make__locals__k_32fb6194 32fb619 load on device 'metal:0' took 358.94 ms  (compiled)
+sqrt cuda emulation       4.380 ms   16.316 ps/thread-op
+Module make__locals__k_63093452 6309345 load on device 'metal:0' took 366.37 ms  (compiled)
+sqrt cuda emulation v2    3.656 ms   13.620 ps/thread-op
+[gpu_run] approx_optiming end: device utilisation 100% (19:07:19), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 100 %; per-process GPU time over 1.8 s: none >= 1 %

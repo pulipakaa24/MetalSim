@@ -1,0 +1,18 @@
+cuda x/3=1.0000 x/0.1=1.0000 x/z+y/z=1.0000 x/sqrt|y|=1.0000 length=1.0000 normalize[0]=1.0000 normalize[2]=1.0000 cw_div[0]=1.0000 cw_div[1]=1.0000 (v/z)[1]=1.0000 1/x=1.0000 (x*y)/z=1.0000 x/(y+z)=1.0000 sqrt(xx+yy)=1.0000 2x/z=1.0000 x/z-y/z=1.0000
+relaxed x/3=1.0000 x/0.1=1.0000 x/z+y/z=0.8812 x/sqrt|y|=0.7095 length=0.6641 normalize[0]=0.7055 normalize[2]=0.7056 cw_div[0]=0.8746 cw_div[1]=0.8748 (v/z)[1]=0.8745 1/x=0.8613 (x*y)/z=0.8746 x/(y+z)=0.8747 sqrt(xx+yy)=0.6673 2x/z=0.8746 x/z-y/z=0.8813
+off x/3=0.6670 x/0.1=0.8499 x/z+y/z=0.6998 x/sqrt|y|=0.6133 length=0.8328 normalize[0]=0.5854 normalize[2]=0.5845 cw_div[0]=0.7020 cw_div[1]=0.7029 (v/z)[1]=0.7026 1/x=0.8686 (x*y)/z=0.7028 x/(y+z)=0.7071 sqrt(xx+yy)=0.8394 2x/z=0.7020 x/z-y/z=0.6998
+----------------------------------------------------------------------
+Ran 2 tests in 1.413s
+
+OK
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/robosim/.claude/worktrees/agent-ae8661f0d09092d4b/runs/mpm/approx/kcache/1.18.0.dev20260917
+Module TestMetal___fast_math_ops__locals__ops_4e39a009 4e39a00 load on device 'metal:0' took 420.59 ms  (compiled)
+Module TestMetal___fast_math_ops__locals__ops_c5e44533 c5e4453 load on device 'metal:0' took 80.34 ms  (compiled)
+Module TestMetal___fast_math_ops__locals__ops_511b375a 511b375 load on device 'metal:0' took 393.49 ms  (compiled)
+Module TestMetal___fast_math_ops__locals__ops_2642c426 2642c42 load on device 'metal:0' took 400.82 ms  (compiled)

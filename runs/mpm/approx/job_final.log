@@ -1,0 +1,23 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/robosim/.claude/worktrees/agent-ae8661f0d09092d4b/runs/mpm/approx/kcache/1.18.0.dev20260917
+Module make_unary_kernel__locals__k_a9e07c38 a9e07c3 load on device 'metal:0' took 378.12 ms  (compiled)
+rcp    cuda emulation (wp_cuda_rcp) eq_cuda 1.000000 eq_cr 0.8679 {0: 1.0}
+Module make_unary_kernel__locals__k_2d8a6a35 2d8a6a3 load on device 'metal:0' took 352.99 ms  (compiled)
+sqrt   cuda emulation (wp_cuda_sqrt) eq_cuda 1.000000 eq_cr 0.8313 {0: 1.0}
+Module make_div_kernel__locals__k_b4ad8e6d b4ad8e6 load on device 'metal:0' took 357.18 ms  (compiled)
+div    cuda emulation (wp_cuda_div) eq_cuda 1.000000 eq_cr 0.7024 {0: 1.0}
+rcp cuda {'eq_cr': 0.8678538799285889, 'ulp_vs_cr': {-1: 0.04467, 0: 0.867854, 1: 0.087476}}
+sqrt cuda {'eq_cr': 0.8313305974006653, 'ulp_vs_cr': {-1: 0.155121, 0: 0.831331, 1: 0.013548}}
+div cuda {'eq_cr': 0.7023630142211914}
+cuda x/3=1.0000 x/0.1=1.0000 x/z+y/z=1.0000 x/sqrt|y|=1.0000 length=1.0000 normalize[0]=1.0000 normalize[2]=1.0000 cw_div[0]=1.0000 cw_div[1]=1.0000 (v/z)[1]=1.0000 1/x=1.0000 (x*y)/z=1.0000 x/(y+z)=1.0000 sqrt(xx+yy)=1.0000 2x/z=1.0000 x/z-y/z=1.0000
+relaxed x/3=1.0000 x/0.1=1.0000 x/z+y/z=0.8812 x/sqrt|y|=0.7095 length=0.6641 normalize[0]=0.7055 normalize[2]=0.7056 cw_div[0]=0.8746 cw_div[1]=0.8748 (v/z)[1]=0.8745 1/x=0.8613 (x*y)/z=0.8746 x/(y+z)=0.8747 sqrt(xx+yy)=0.6673 2x/z=0.8746 x/z-y/z=0.8813
+off x/3=0.6670 x/0.1=0.8499 x/z+y/z=0.6998 x/sqrt|y|=0.6133 length=0.8328 normalize[0]=0.5854 normalize[2]=0.5845 cw_div[0]=0.7020 cw_div[1]=0.7029 (v/z)[1]=0.7026 1/x=0.8686 (x*y)/z=0.7028 x/(y+z)=0.7071 sqrt(xx+yy)=0.8394 2x/z=0.7020 x/z-y/z=0.6998
+Module TestMetal___fast_math_ops__locals__ops_96162fcf 96162fc load on device 'metal:0' took 419.56 ms  (compiled)
+Module TestMetal___fast_math_ops__locals__ops_9c6df607 9c6df60 load on device 'metal:0' took 77.28 ms  (compiled)
+Module TestMetal___fast_math_ops__locals__ops_f4cb8f07 f4cb8f0 load on device 'metal:0' took 370.07 ms  (compiled)
+Module TestMetal___fast_math_ops__locals__ops_f8b9db7f f8b9db7 load on device 'metal:0' took 373.11 ms  (compiled)

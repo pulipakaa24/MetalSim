@@ -1,0 +1,35 @@
+{
+ "scene": "example:mpm_anymal",
+ "set": {
+  "capture": true
+ },
+ "frames": 3,
+ "warmup": 5,
+ "ms_median": 48.192042000664514,
+ "ms_mean": 48.67466666716306,
+ "ms_p10": 47.0869747998222,
+ "ms_p90": 50.45540840110334,
+ "wall_ms": [
+  51.02125000121305,
+  46.81070799961162,
+  48.192042000664514
+ ],
+ "per_frame_counters": {
+  "host_waits": 19.0,
+  "command_buffers": 26.0,
+  "host_ops": 4.0,
+  "dispatches_encoded": 2156.0
+ },
+ "warp": "/Users/aditya/robosim/.claude/worktrees/agent-ae8661f0d09092d4b/_forks/warp/warp/__init__.py",
+ "compat": {
+  "accumulate": "float32",
+  "loop": "cuda",
+  "chunk_graph": true,
+  "fused": false,
+  "fused_max_color_blocks": 1073741824,
+  "simd": false,
+  "gpu_exit": true,
+  "rigid_deterministic": true,
+  "metal_fast_math": "relaxed"
+ }
+}
