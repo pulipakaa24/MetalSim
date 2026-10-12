@@ -108,18 +108,22 @@ class TextureAtlas:
         heights = [int(m.tex_height[t]) for t in range(m.ntex)]
         aw = max(widths[t] for t in usable) + 2 * pad
         order = sorted(usable, key=lambda t: -heights[t])
-        x = y = shelf_h = 0
-        pos = {}
-        for t in order:
-            w, h = widths[t] + 2 * pad, heights[t] + 2 * pad
-            if x + w > aw:
-                y += shelf_h
-                x = 0
-                shelf_h = 0
-            pos[t] = (x + pad, y + pad)
-            x += w
-            shelf_h = max(shelf_h, h)
-        ah = y + shelf_h
+        while True:   # shelf packing; widened only when the column would exceed Metal's 16384-px texture limit
+            x = y = shelf_h = 0
+            pos = {}
+            for t in order:
+                w, h = widths[t] + 2 * pad, heights[t] + 2 * pad
+                if x + w > aw:
+                    y += shelf_h
+                    x = 0
+                    shelf_h = 0
+                pos[t] = (x + pad, y + pad)
+                x += w
+                shelf_h = max(shelf_h, h)
+            ah = y + shelf_h
+            if ah <= 16384 or aw * 2 > 16384:
+                break
+            aw *= 2
         img = np.zeros((ah, aw, 4), np.uint8)
         img[..., 3] = 255
         rects = {}

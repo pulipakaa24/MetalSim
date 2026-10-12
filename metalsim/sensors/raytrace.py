@@ -137,9 +137,17 @@ class RayTracer:
         return self.sized.encode(cb, gm_buf, gm_off, sim.m.geom_size)
 
     def _encode_refit_and_build(self, cb, geom_xpos, gx_off, geom_xmat, gm_off):
+        self._encode_refit(cb, geom_xpos, gx_off, geom_xmat, gm_off)
+        ae = cb.accelerationStructureCommandEncoder()
+        ae.buildAccelerationStructure_descriptor_scratchBuffer_scratchBufferOffset_(self.inst_as, self.inst_desc_obj, self.inst_scratch, 0)
+        ae.endEncoding()
+
+    def _encode_refit(self, cb, geom_xpos, gx_off, geom_xmat, gm_off, inst_desc=None):
+        """Scene instance descriptors from the physics state into ``inst_desc`` (default: this tracer's own buffer;
+        the particle renderer passes a larger buffer whose tail holds grain instances, metalsim/render/particles.py)."""
         ce = cb.computeCommandEncoder()
         ce.setComputePipelineState_(self.p_refit)
-        ce.setBuffer_offset_atIndex_(self.inst_desc, 0, 0)
+        ce.setBuffer_offset_atIndex_(inst_desc if inst_desc is not None else self.inst_desc, 0, 0)
         ce.setBuffer_offset_atIndex_(self.inst_tab, 0, 1)
         ce.setBuffer_offset_atIndex_(self.slot_geom, 0, 2)
         ce.setBuffer_offset_atIndex_(self.slot_mesh, 0, 3)
@@ -148,9 +156,6 @@ class RayTracer:
         ce.setBuffer_offset_atIndex_(self.consts_buf, 0, 6)
         ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n_inst, 1, 1), Metal.MTLSize(64, 1, 1))
         ce.endEncoding()
-        ae = cb.accelerationStructureCommandEncoder()
-        ae.buildAccelerationStructure_descriptor_scratchBuffer_scratchBufferOffset_(self.inst_as, self.inst_desc_obj, self.inst_scratch, 0)
-        ae.endEncoding()
 
     def _use_resources(self, ce):
         ce.useResource_usage_(self.inst_as, Metal.MTLResourceUsageRead)
