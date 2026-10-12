@@ -94,7 +94,11 @@ def bench(scene, n, frames, res, renderers):
                 r = Tier2Renderer(m, n, width=res, height=res, camera="cam", spp=1, max_bounces=1, visual=vis, **EKW)
                 fn = lambda: r.render(sim)
             else:
-                r = RayTracer(m, n, max_range=20.0, visual=mujoco.MjvOption() if vis is None else vis, **EKW)
+                from metalsim.render.dynamic_mesh import camera_view
+                from metalsim.render.scene_tables import CameraIntrinsics
+                ci = CameraIntrinsics.from_model(m, mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_CAMERA, "cam"), res, res)
+                tv = None if (EKW.get("tube_slices") or EKW.get("cap_stacks")) else camera_view(m, mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_CAMERA, "cam"), ci.fy)
+                r = RayTracer(m, n, max_range=20.0, visual=mujoco.MjvOption() if vis is None else vis, tube_view=tv, **EKW)
                 cam = r.make_depth_camera("cam", res, res)
                 fn = lambda: r.trace(sim, [cam])
             row[label] = round(timed(fn, frames, r.ctx.synchronize), 3)

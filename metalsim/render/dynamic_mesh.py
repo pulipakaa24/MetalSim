@@ -95,13 +95,19 @@ def _boundary_edges(tris):
 class _Plan:
     """Host tables of the generation (built once)."""
 
-    def __init__(self, m, tables, tube_slices=None, cap_stacks=None):
+    def __init__(self, m, tables, tube_slices=None, cap_stacks=None, tube_lod=None):
+        """``tube_slices`` / ``cap_stacks``: one tessellation for every tube; else per tube object ``tube_lod``
+        ({slot: (slices, stacks)}, ``tube_tessellation``); else MuJoCo's ``vis.quality``."""
         self.m = m
         vis = tables.vis or {}
-        nslice = int(tube_slices or m.vis.quality.numslices)
-        nstack_half = int(cap_stacks or max(m.vis.quality.numstacks // 2, 1))
+        self.full = (int(m.vis.quality.numslices), max(int(m.vis.quality.numstacks) // 2, 1))
+        nslice = int(tube_slices or self.full[0])
+        nstack_half = int(cap_stacks or self.full[1])
+        self.fixed = (nslice, nstack_half) if (tube_slices or cap_stacks) else None
+        self.tube_lod = dict(tube_lod or {})
         self.cyl_t = _cylinder_template(nslice)
         self.cap_t = _capsule_template(nslice, nstack_half)
+        self._templates = {}
         self.blocks = []          # (kind, key, p_off, n): position sources
         self.ptot = 0
         self.nent, self.flist, self.faces = [], [], []
@@ -111,7 +117,6 @@ class _Plan:
         self.rtot = 0
         self.tmpl = []            # template vertices (float4): cylinder then capsule
         self.tmpl_off = {}
-        self._add_template("cyl", self.cyl_t[0]); self._add_template("cap", self.cap_t[0])
         flex_dyn = [d for d in tables.dyn if d["kind"] == "flex"]
         if flex_dyn:
             self.blocks.append(("flex", None, 0, int(m.nflexvert)))
@@ -131,9 +136,15 @@ class _Plan:
 
     # -- helpers ---------------------------------------------------------------------------------------------------
 
-    def _add_template(self, name, V):
-        self.tmpl_off[name] = len(self.tmpl)
-        self.tmpl.extend(V.tolist())
+    def _template(self, kind, slot):
+        """(V, F, offset in the template table) of the tube template of this object's tessellation."""
+        ns, nk = self.fixed or self.tube_lod.get(slot, self.full)
+        key = (kind, int(ns), int(nk))
+        if key not in self._templates:
+            V, F = _cylinder_template(int(ns)) if kind == "cyl" else _capsule_template(int(ns), int(nk))
+            self._templates[key] = (V, F, len(self.tmpl))
+            self.tmpl.extend(V.tolist())
+        return self._templates[key]
 
     def _object(self, slot):
         ob = {"slot": slot, "nvert": 0, "tris": []}
@@ -192,9 +203,8 @@ class _Plan:
                                         for p, s, ii in ((b, -1, i1), (a, 1, i0), (a, -1, i0))))
 
     def _tube(self, ob, kind, mode, a, b, r):
-        V, F = self.cyl_t if kind == "cyl" else self.cap_t
+        V, F, t0 = self._template(kind, ob["slot"])
         base = ob["nvert"]
-        t0 = self.tmpl_off[kind]
         for tv in range(len(V)):
             self.trec.append([mode, a, b, t0 + tv, base + tv, 0, len(self.objects) - 1, 0, r])
         ob["nvert"] += len(V)
@@ -444,6 +454,83 @@ def emulate(plan: _Plan, n_envs: int, src: dict) -> np.ndarray:
     return out[:plan.rtot]
 
 
+def model_viewpoints(m, data=None):
+    """(K, 3) positions sensors may look from at the initial state: every camera and site."""
+    import mujoco
+    d = data
+    if d is None:
+        d = mujoco.MjData(m)
+        if m.nkey:
+            mujoco.mj_resetDataKeyframe(m, d, 0)
+        mujoco.mj_forward(m, d)
+    return np.concatenate([np.asarray(d.cam_xpos).reshape(-1, 3), np.asarray(d.site_xpos).reshape(-1, 3)])
+
+
+def camera_view(m, cam, fy):
+    """(viewpoints, resolution) of a model camera rendered with focal length ``fy`` pixels."""
+    import mujoco
+    d = mujoco.MjData(m)
+    if m.nkey:
+        mujoco.mj_resetDataKeyframe(m, d, 0)
+    mujoco.mj_forward(m, d)
+    return np.asarray(d.cam_xpos[cam]).reshape(1, 3), 1.0 / float(fy)
+
+
+def beam_resolution(azimuths, elevations):
+    """Smallest angular spacing between a lidar's distinct beam azimuths / elevations (rad)."""
+    out = np.inf
+    for a in (azimuths, elevations):
+        u = np.unique(np.round(np.asarray(a, np.float64).ravel(), 9))
+        if len(u) > 1:
+            out = min(out, float(np.diff(u).min()))
+    return out
+
+
+def tube_tessellation(m, tables, viewpoints, resolution, *, full_px=3.0, subpixel_px=0.5, margin=2.0, data=None):
+    """Tessellation of each tube object (tendons, flex edge cylinders, flex vertex spheres) for a camera or sensor
+    (rendering only; nothing here touches physics): ``viewpoints`` (K, 3) world positions it looks from, ``resolution``
+    its angular size of one pixel or beam (rad). A tube's projected width is 2 r / (d resolution) with d its closest
+    distance to any viewpoint at the model's initial state (key frame 0, else qpos0) divided by ``margin`` (it may come
+    that much closer). At ``full_px`` pixels or more: MuJoCo's tessellation (``vis.quality``); thinner: 20 slices and
+    4 rings per cap; under ``subpixel_px``: 8 slices and 2 rings. Pixel centres sample a tube's width uniformly, so the
+    coverage an n-gon loses is relative, not absolute: its mean silhouette width is (n / pi) sin(pi / n) of the circle's
+    (n = 20: 0.996, worst orientation cos(pi / n) = 0.988) whatever the pixel size; under half a pixel the tube's own
+    silhouette is sampling noise. Returns {slot: (slices, rings per cap)}."""
+    import mujoco
+    full = (int(m.vis.quality.numslices), max(int(m.vis.quality.numstacks) // 2, 1))
+    d = data
+    if d is None:
+        d = mujoco.MjData(m)
+        if m.nkey:
+            mujoco.mj_resetDataKeyframe(m, d, 0)
+        mujoco.mj_forward(m, d)
+    vp = np.asarray(viewpoints, np.float64).reshape(-1, 3)
+    out = {}
+    for dd in tables.dyn:
+        if dd["kind"] == "tendon":
+            i = dd["id"]
+            a, n = int(d.ten_wrapadr[i]), int(d.ten_wrapnum[i])
+            pts = np.asarray(d.wrap_xpos).reshape(-1, 3)[a:a + n]
+            r = float(m.tendon_width[i])
+        elif dd["kind"] == "flex" and dd.get("lines"):
+            f = dd["id"]
+            pts = d.flexvert_xpos[m.flex_vertadr[f]: m.flex_vertadr[f] + m.flex_vertnum[f]]
+            r = float(m.flex_radius[f])
+        else:
+            continue
+        if len(pts) == 0 or not len(vp) or resolution is None:
+            out[dd["slot"]] = full
+            continue
+        dist = max(float(np.min(np.linalg.norm(pts[:, None, :] - vp[None, :, :], axis=-1))) / margin, 1e-6)
+        r_px = r / (dist * float(resolution))
+        if 2.0 * r_px >= full_px:
+            out[dd["slot"]] = full
+            continue
+        lod = (20, 4) if 2.0 * r_px >= subpixel_px else (8, 2)
+        out[dd["slot"]] = (min(lod[0], full[0]), min(lod[1], full[1]))
+    return out
+
+
 class DynamicMeshes:
     """Per-env vertex records of the dynamic slots, generated on the GPU each frame.
 
@@ -452,10 +539,11 @@ class DynamicMeshes:
     positions; 0 for a raster-only renderer). ``tube_slices`` / ``cap_stacks``: tessellation of the cylinders, capsules
     and spheres (default MuJoCo's ``vis.quality.numslices`` and ``numstacks / 2``)."""
 
-    def __init__(self, ctx, model, tables, n_envs, *, tpr=1, stride=0.0, vbuf=None, rbase=0, tube_slices=None, cap_stacks=None):
+    def __init__(self, ctx, model, tables, n_envs, *, tpr=1, stride=0.0, vbuf=None, rbase=0, tube_slices=None, cap_stacks=None,
+                 tube_lod=None):
         self.ctx, self.m, self.t, self.n = ctx, model, tables, n_envs
         self.tpr, self.stride = int(tpr), float(stride)
-        plan = _Plan(model, tables, tube_slices, cap_stacks)
+        plan = _Plan(model, tables, tube_slices, cap_stacks, tube_lod)
         plan.finalize(n_envs)
         plan.validate(n_envs)
         self.plan = plan

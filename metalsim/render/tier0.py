@@ -83,7 +83,9 @@ class Tier0Renderer:
         (``metalsim.render.extras``). ``deformables``: user ``extras.DeformableMesh`` objects (XPBD / PhysX-port cloth
         or any (N, V, 3) vertex array; pass the arrays as ``render(..., sources={name: array})``). The deforming ones are
         regenerated on the GPU each frame (``metalsim.render.dynamic_mesh``); ``tube_slices`` / ``cap_stacks`` set the
-        cylinder / capsule tessellation (default MuJoCo's ``vis.quality``). Segmentation ids of the extra objects in
+        cylinder / capsule tessellation of every tube (default: adaptive per tube to its projected width in this camera,
+        ``dynamic_mesh.tube_tessellation``: MuJoCo's ``vis.quality`` at 3 px or more, 20 slices below, 8 under half a
+        pixel; rendering only, physics never sees it). Segmentation ids of the extra objects in
         geom mode: ``ngeom + 1 + j`` (``tables.extras[j]["seg_id"]``)."""
         self.m = model
         self.tier = tier
@@ -142,6 +144,9 @@ class Tier0Renderer:
             raise ValueError("model has no cameras")
         self.cam_id = cam_id
         self.intrinsics = CameraIntrinsics.from_model(model, cam_id, width, height)
+        if self.tables.dyn and not (tube_slices or cap_stacks):     # tube tessellation for this camera (rendering only)
+            from metalsim.render.dynamic_mesh import camera_view
+            self._extras_kw["tube_view"] = camera_view(model, cam_id, max(self.intrinsics.fx, self.intrinsics.fy))
         self._build_resources()
         self._build_hfield_tiles()
         self._build_pipelines()
@@ -163,8 +168,12 @@ class Tier0Renderer:
         self.dyn, self.pose, self._dyn_src = None, None, None
         if self.tables.dyn:
             from metalsim.render.dynamic_mesh import DynamicMeshes
+            lod = None
+            if self.rt is None and "tube_view" in self._extras_kw:
+                from metalsim.render.dynamic_mesh import tube_tessellation
+                lod = tube_tessellation(model, self.tables, *self._extras_kw["tube_view"])
             self.dyn = self.rt.dyn if self.rt is not None else DynamicMeshes(self.ctx, model, self.tables, n_envs, tube_slices=tube_slices,
-                                                                             cap_stacks=cap_stacks)
+                                                                             cap_stacks=cap_stacks, tube_lod=lod)
         if self.tables.site_ids:
             from metalsim.render.dynamic_mesh import PoseGather
             self.pose = PoseGather(self.ctx, model, self.tables, n_envs)

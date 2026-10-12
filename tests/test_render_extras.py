@@ -19,7 +19,7 @@ import pytest
 import warp as wp
 
 from metalsim.render.extras import DeformableMesh
-from metalsim.render.scene_tables import build_scene_tables
+from metalsim.render.scene_tables import build_scene_tables, CameraIntrinsics
 from metalsim.render.tier0 import Tier0Renderer, SEG_GEOM, SEG_BODY
 from metalsim.render.tier2 import Tier2Renderer
 from metalsim.sensors.raytrace import RayTracer
@@ -119,6 +119,11 @@ def _render(m, datas, which, **kw):
         o = r.render_host(datas, passes=2, sources=src)
         o["seg"] = np.concatenate([[0], r.tables.slot_seg_ids()])[o["seg"]]
         return r, o
+    if "tube_view" not in kw:          # the depth camera's position and pixel angle (tube tessellation for this sensor)
+        from metalsim.render.dynamic_mesh import camera_view
+        cam = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_CAMERA, "cam")
+        ci = CameraIntrinsics.from_model(m, cam, W, H)
+        kw["tube_view"] = camera_view(m, cam, max(ci.fx, ci.fy))
     if "visual" not in kw:      # the sensor default leaves sites out (mj_ray skips them); compare everything MuJoCo draws
         assert not any(e["kind"] == "site" for e in RayTracer(m, 1, max_range=1.0).tables.extras)
         kw["visual"] = mujoco.MjvOption()
@@ -337,7 +342,7 @@ def test_gpu_generation_matches_reference(xml):
     rt = RayTracer(m, 3, max_range=5.0)
     cam = rt.make_depth_camera("cam", 16, 12)
     rt.trace_host(datas, [cam])
-    np.testing.assert_allclose(rt.dyn.records(), ref, atol=5e-5)   # env frame; the instances carry the grid offset
+    np.testing.assert_allclose(rt.dyn.records(), emulate(rt.dyn.plan, 3, _host_sources(m, datas)), atol=5e-5)   # env frame
 
 
 # ------------------------------------------------------------------------------------------------------------------
@@ -622,3 +627,55 @@ def test_dynamic_meshes_and_particle_grains_share_the_tier2_structure():
     assert grains.sum() > 20
     o["seg"] = np.concatenate([[0], r.tables.slot_seg_ids(), [-1]])[o["seg"]]
     _assert_covered(_coverage(m, d, o, 0, r.tables))
+
+
+def test_tube_tessellation_follows_projected_size():
+    """CPU: tubes far from the camera (a fraction of a pixel wide) get fewer slices, close ones MuJoCo's tessellation;
+    the choice reads only the model and an MjData of its initial state (rendering only, no physics state is written)."""
+    from metalsim.render.dynamic_mesh import tube_tessellation, _Plan
+    m, d = _forward(WRAP)
+    t = build_scene_tables(m, 1, visual=None)
+    full = (int(m.vis.quality.numslices), int(m.vis.quality.numstacks) // 2)
+    near = tube_tessellation(m, t, np.array([[0.8, -0.3, 1.0]]), 1.0 / 500)
+    far = tube_tessellation(m, t, np.array([[0.0, -40.0, 1.0]]), 1.0 / 145)
+    assert all(v == full for v in near.values())
+    assert all(6 <= v[0] < full[0] for v in far.values())
+    q0 = d.qpos.copy(); tl = d.ten_length.copy()
+    tube_tessellation(m, t, np.array([[0.0, -40.0, 1.0]]), 1.0 / 145, data=d)
+    assert np.array_equal(q0, d.qpos) and np.array_equal(tl, d.ten_length)
+    p = _Plan(m, t, tube_lod=far); p.finalize(1)
+    pf = _Plan(m, t); pf.finalize(1)
+    assert sum(len(o["tris"]) for o in p.objects) < 0.3 * sum(len(o["tris"]) for o in pf.objects)
+
+
+@needs_metal
+@pytest.mark.parametrize("which", ["tier0", "tier1", "tier2", "raydepth"])
+def test_adaptive_tubes_close_up_and_far(which):
+    """Coverage of MuJoCo's tendons with the adaptive tessellation: a close-up (MuJoCo's full tessellation must be chosen;
+    >= 0.99), a distant view (tubes 1-3 px: 20 slices; covers every MuJoCo pixel that MuJoCo's tessellation covers at
+    the same view: there the tendons are 12-16 px and one end pixel of wrap_cyl is missed by every tessellation, 28 or
+    64 slices alike, so an absolute threshold would test the end pixel, not the tessellation), and a sub-pixel view
+    (8 slices; MuJoCo's own silhouette is sampling noise there: tier and pixels only)."""
+    full = None
+    for cam, expect in (('<camera name="cam" pos="0.8 -0.45 1.0" xyaxes="1 0 0 0 0 1" fovy="60"/>', "full"),
+                        ('<camera name="cam" pos="0 -9 0.95" xyaxes="1 0 0 0 0 1" fovy="30"/>', 20),
+                        ('<camera name="cam" pos="0 -40 0.95" xyaxes="1 0 0 0 0 1" fovy="30"/>', 8)):
+        m, d = _forward(WRAP.replace(CAM, cam))
+        full = int(m.vis.quality.numslices)
+        r, o = _render(m, [d], which)
+        dyn = getattr(r, "dyn", None) or r.rt.dyn
+        slices = {k[1] for k in dyn.plan._templates}
+        assert slices == {full if expect == "full" else expect}, (cam, slices)
+        cov = _coverage(m, d, o, 0, r.tables)
+        print(which, expect, {k: v for k, v in cov.items() if v["px"]})
+        if expect == "full":
+            _assert_covered(cov, thresh=THRESH, min_px=8)
+        elif expect == 20:
+            rf, of = _render(m, [d], which, tube_slices=full, cap_stacks=max(int(m.vis.quality.numstacks) // 2, 1))
+            covf = _coverage(m, d, of, 0, rf.tables)
+            print(which, "full at the same view", {k: v for k, v in covf.items() if v["px"]})
+            for k, v in cov.items():
+                for q in ("rgb", "depth", "seg"):
+                    if q in v:
+                        assert v[q] >= covf[k][q], (k, q, v, covf[k])
+                assert v["px"] < 8 or min(v[q] for q in ("rgb", "depth", "seg") if q in v) >= 0.9, (k, v)
