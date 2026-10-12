@@ -627,6 +627,48 @@ Cost: no measurable change. multi_material ms/frame with `metal_cuda_libm` on vs
 repetitions each (`runs/mpm/closeout/speed/`; the device was not idle at the start of these timing jobs, so the
 spread is ~+-3 ms).
 
+## 8f. The Franka-Pour MPM step at 2,048 worlds (2026-10-12)
+
+Research and every number: `research_notes/Metal MPM speed and scalable determinism/mpm_step_at_scale.md`; logs and
+JSON: `runs/mpm/step_at_scale/`. Tools: `probes/section_kprof.py` (per-section, per-kernel GPU time, eager, every
+dispatch attributed), `probes/pour_occupancy.py` (does the grid occupancy repeat?), `probes/first_launch.py` (first
+launches of changed kernels with a host-side completion timeout).
+
+Profile at 2,048 worlds (base: Warp `43ffc6dd`, Newton `c0427fc7`; ms of GPU time per step, about 108 in all): strain
+solve 34.1 (rigidity products 8.8, transposes 9.1), scratchpad 16.1, grid rebuild 15.3, collider rasterization 14.4
+(collider-matrix sort ~6), unconstrained velocity 8.9 (APIC generic integrate 5.5), strain matrix 6.5, collider
+compliance 6.4.
+
+Adopted, each bitwise (particle state and every `state.mpm` array hashed every 10 steps over 320 steps at 1 / 64 /
+2,048 worlds, eager and captured):
+
+| change | where | GPU ms per step at 2,048 worlds |
+|---|---|---|
+| rigidity operator assembled from its kept triplet slots only | Newton `27415f95` | collider compliance 6.4 -> 3.1 |
+| rigidity products in the loop on non-empty rows only (empty rows are fixed points after the initial guess; from 8,192 rows) | Newton `80e79684` | 8.8 -> 2.6 |
+| compact Metal transposes stop at the stored blocks | Warp `8631b6b0` | 9.1 -> 4.9 |
+| node-index compression skips the ignored tail | Warp `fddebdbd` | 5.9 -> 1.4 |
+
+Captured ms per MPM step, base vs all four, two interleaved rounds: 1 world 3.96 / 3.84 vs 4.00 / 3.99; 64 worlds
+8.00 / 7.75 vs 7.87 / 7.46; 256 worlds 15.40 / 15.53 vs 14.19 / 14.16; 1,024 worlds 45.97 / 46.77 vs 41.38 / 41.07;
+**2,048 worlds 91.16 / 90.50 vs 78.95 / 78.88**. Franka-Pour policy step (`franka_pour_ppo bench --mode step`, 2,048
+envs, this Mac): 2.06 -> 1.81 s. `tests/test_mpm.py` 14 passed, 1 xfailed.
+
+Evaluated and not adopted (all bitwise; `runs/mpm/step_at_scale/rejected/`): reusing the grid when the occupancy
+repeats (it never does: 0 of 199 consecutive steps keep the (world, cell) set at 64 or 2,048 worlds, ~46 % of the
+worlds change cells every step); the whole Jacobi iteration fused per world (one threadgroup per environment,
+barriers between passes; faster at 64 worlds, 7.71 -> 7.05 ms, slower from 256 on, 92.1 -> 105.2 ms at 2,048); all
+of a node's dofs in one thread for the generic APIC integrate (no change); a row-ordered presort instead of the radix
+sort for fem's triplets (79.2 -> 85.8 ms).
+
+Pins: Newton `metalsim-1.5.2` is pinned at `3fd1f052` (the two Newton commits). The Warp commits are on the fork's
+`metalsim` (`3342e5d8`), on top of `41b7bc45`, which faults on a one-world captured Franka-Pour step (base tree too);
+the Warp pin stays at `43ffc6dd` until that is fixed. What a fresh setup gets now (Warp `43ffc6dd`, Newton `3fd1f052`) is verified on its own: bitwise against the base at 1 / 64 / 2,048 worlds, eager and captured; `tests/test_mpm.py` 14 passed, 1 xfailed; captured ms per step at 1 / 64 / 256 / 1,024 / 2,048 worlds 3.81 / 7.58 / 15.53 / 46.45 / 90.61 (base) vs 3.78 / 8.07 / 15.15 / 44.15 / 84.41, second round 3.94 / 7.76 / 15.35 / 46.00 / 90.54 vs 3.82 / 7.73 / 14.80 / 43.58 / 84.97.
+
+`warp.config.metal_cuda_libm` (Warp `43ffc6dd`, default on) costs nothing measurable: on vs off, three interleaved
+runs each, twice: granular 40.5 vs 40.7 ms/frame, multi_material 50.6 vs 50.7, Franka-Pour 2,048 worlds 90.6 vs 90.7
+ms per captured step (`runs/mpm/step_at_scale/libm/`).
+
 ## 9. Running
 
 ```
@@ -651,14 +693,14 @@ Everything above runs from a clone of MetalSim plus the three forks; nothing dep
 
 ```
 # after the install of README / docs/GUIDE.md (.venv, scripts/setup_warp.sh, the MuJoCo Warp fork):
-scripts/setup_newton152.sh          # .venv-newton152: Newton fork metalsim-1.5.2 @c0427fc7, shared Warp fork @43ffc6dd
+scripts/setup_newton152.sh          # .venv-newton152: Newton fork metalsim-1.5.2 @3fd1f052, shared Warp fork @43ffc6dd
 scripts/gpu_run.sh test_mpm check 15 -- .venv-newton152/bin/python -m pytest tests/test_mpm.py   # 14 passed, 1 xfailed
 ```
 
 | what | where it lives | how a fresh setup gets it |
 |---|---|---|
 | Warp changes | pulipakaa24/warp `metalsim`, pinned `43ffc6dd` | `scripts/setup_warp.sh` (fallback: innate-inc/warp `ce15f6bb` + `patches/warp/metalsim-43ffc6dd.diff`) |
-| Newton changes (MPM, Franka-Pour rigid) | pulipakaa24/newton `metalsim-1.5.2`, pinned `c0427fc7` | `scripts/setup_newton152.sh` (fallback: v1.5.2 + `patches/newton/metalsim-1.5.2-c0427fc7.diff`) |
+| Newton changes (MPM, Franka-Pour rigid) | pulipakaa24/newton `metalsim-1.5.2`, pinned `3fd1f052` | `scripts/setup_newton152.sh` (fallback: v1.5.2 + `patches/newton/metalsim-1.5.2-3fd1f052.diff`) |
 | Newton 1.7 Metal fixes for the rigid stack | pulipakaa24/newton `metalsim-hashtable-metal` `a4be3604` (`.venv`'s `newton` extra) and `metalsim` `9f317390` (`.venv-newtonfork`) | `pip install -e ".[newton]"`, `scripts/setup_newton.sh` |
 | compat layer, scenes, probes, tests, Isaac-side recorders | this repository | the clone |
 | logs, JSON, reports of every run | `runs/mpm/`, `runs/parity/isaaclab3_mpm*/`, `runs/rigid_perf/`, `runs/fma_rigid_parity/` | the clone |
