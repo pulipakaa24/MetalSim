@@ -37,4 +37,5 @@ uv pip install -q --python "$VENV/bin/python" -r "$HERE/requirements-newton152.t
 uv pip install -q --python "$VENV/bin/python" --no-deps "mujoco-warp==3.11.0" "warp-nn==0.3.0"   # warp-nn: example_mpm_anymal's ONNX policy
 uv pip install -q --python "$VENV/bin/python" --no-deps -e "$WARP"
 uv pip install -q --python "$VENV/bin/python" --no-deps -e "$DIR"
+uv pip install -q --python "$VENV/bin/python" --no-deps -e "$HERE/.."     # metalsim itself: the MPM probes run as scripts / subprocesses
 "$VENV/bin/python" -c "import warp as wp; wp.config.quiet=True; import newton, mujoco_warp, importlib.metadata as m; print('newton', m.version('newton'), newton.__file__, 'mujoco-warp', m.version('mujoco-warp'), 'warp', wp.__version__, wp.__file__)"
