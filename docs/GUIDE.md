@@ -361,6 +361,19 @@ python -m metalsim.learn.g1_preflight --envs 1024 --engine newton --newton_it 4 
 The decision and the measurements behind it are in `GAPS.md` ("Newton XPBD: archived") and
 [`PARITY.md` §2.1](PARITY.md#21-contact-model-what-mujoco-can-do-and-newton-xpbd-on-metal-measured-2026-09-24-newton-xpbd-archived-as-experimental-on-2026-09-25-see-gapsmd).
 
+**Cameras on Newton scenes.** `metalsim.render.newton_bridge.NewtonRenderSource(model)` turns any Newton model into
+the `sim` argument of the renderers (tiers 0/1/2), the ray-traced sensors and the annotators:
+
+- It compiles a render twin from the Newton shapes, or uses the source MJCF with `twin=mj_model` for the
+  MuJoCo-via-Newton path.
+- Each frame, `update(state)` writes the poses from `State.body_q` on the GPU. Each env sees its own world plus the
+  global shapes.
+- Cloth, soft-body surfaces and particles go through the dynamic-mesh and particle paths:
+  `renderer_kwargs()`, `sources`, `attach_particles`.
+
+Design, coverage against the MuJoCo path, cost and the differences from Isaac Lab 3.0 are in
+[`NEWTON_RENDER.md`](NEWTON_RENDER.md).
+
 ## 6. Throughput vs fidelity
 
 The knobs below trade speed for accuracy. The measured cost of each is in the linked place; where a
