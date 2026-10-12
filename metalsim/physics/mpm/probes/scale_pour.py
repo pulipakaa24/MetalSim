@@ -80,6 +80,8 @@ ap.add_argument("--cells-per-world", type=int, default=0,
 ap.add_argument("--no-tstore", action="store_true",
                 help="mpm: no fem.TemporaryStore (Isaac Lab passes TemporaryStore(): NewtonMPMManager._create_solver, "
                      "also for coupler entries; without it every step reallocates its capacity-sized temporaries)")
+ap.add_argument("--metal-fast-math", choices=["off", "cuda", "relaxed"],
+                help="mpm: Metal form of fast_math modules (newton_compat.install(metal_fast_math=...)); default: install's")
 ap.add_argument("--json")
 ap.add_argument("--kprof", default=None, choices=["collide", "substep", "tick", "captured"],
                 help="rigid: per-kernel profile of K ticks of this phase (Metal: run with WP_METAL_PROFILE=1; CUDA: "
@@ -87,6 +89,7 @@ ap.add_argument("--kprof", default=None, choices=["collide", "substep", "tick", 
 ap.add_argument("--kprof-ticks", type=int, default=4)
 ap.add_argument("--dump", default=None, help="rigid --repeat-check: save final body_q / contact counts of each run (npz)")
 args = ap.parse_args()
+FAST_MATH = {"metal_fast_math": args.metal_fast_math} if args.metal_fast_math else {}
 
 import warp as wp  # noqa: E402
 
@@ -426,7 +429,7 @@ def run_mpm():
     loop = "native" if DEV.is_cuda else "cuda"
     newton_compat.install(accumulate=accumulate, loop=loop, log=False,
                           chunk_graph=args.mode in ("chunk", "gpuexit", "capture") and IS_METAL,
-                          gpu_exit=args.mode in ("gpuexit", "capture") and IS_METAL)
+                          gpu_exit=args.mode in ("gpuexit", "capture") and IS_METAL, **FAST_MATH)
     if IS_METAL and args.grid == "sparse":
         import inspect
 
@@ -569,7 +572,7 @@ def run_mpm():
 
         # iteration count of the last solves (one logged solve, outside the timed loop)
         newton_compat.install(accumulate=accumulate, loop="cuda", log=True,
-                              chunk_graph=IS_METAL and args.mode != "eager", gpu_exit=False)
+                              chunk_graph=IS_METAL and args.mode != "eager", gpu_exit=False, **FAST_MATH)
         for _ in range(4):
             step()
             clock["t"] += MPM_DT
@@ -578,7 +581,7 @@ def run_mpm():
         RESULT["res_l2_last4"] = log["res_l2"].tolist()
         newton_compat.install(accumulate=accumulate, loop=loop, log=False,
                               chunk_graph=args.mode in ("chunk", "gpuexit", "capture") and IS_METAL,
-                              gpu_exit=args.mode in ("gpuexit", "capture") and IS_METAL)
+                              gpu_exit=args.mode in ("gpuexit", "capture") and IS_METAL, **FAST_MATH)
 
         if args.sections:
             solver.enable_timers = True
