@@ -37,7 +37,12 @@ if [ ! -x "$VENV/bin/python" ]; then
     uv pip install -q --python "$VENV/bin/python" numpy "mujoco>=3.14" "torch>=2.14" usd-core newton-usd-schemas
   fi
   uv pip install -q --python "$VENV/bin/python" --no-deps -e "$WARP"
-  [ -d upstream/mujoco_warp ] && uv pip install -q --python "$VENV/bin/python" --no-deps -e upstream/mujoco_warp
+  # the MuJoCo Warp fork checkout .venv uses (upstream/mujoco_warp on the original machine; README's pip install puts
+  # it in .venv/src/mujoco-warp)
+  MJW=upstream/mujoco_warp
+  [ -d "$MJW" ] || MJW=$(.venv/bin/python -c "import mujoco_warp, os; print(os.path.dirname(os.path.dirname(mujoco_warp.__file__)))" 2>/dev/null || true)
+  if [ -n "$MJW" ] && [ -d "$MJW" ]; then uv pip install -q --python "$VENV/bin/python" --no-deps -e "$MJW"
+  else echo "warning: no MuJoCo Warp fork checkout found; $VENV has no mujoco_warp"; fi
   uv pip install -q --python "$VENV/bin/python" --no-deps -e ".[test]"
 fi
 uv pip install -q --python "$VENV/bin/python" --no-deps -e "$DIR"
