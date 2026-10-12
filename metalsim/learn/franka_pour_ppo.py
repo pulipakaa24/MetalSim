@@ -234,13 +234,26 @@ class PourPPO:
         return {key: v / k for key, v in stats.items()}
 
     # -- checkpoints --------------------------------------------------------------------------------------------
+    _SAMPLER_TENSORS = ("_success_rates", "_success_history", "_history_pointers", "_history_sizes",
+                        "_history_success_counts", "_uniform_order")
+
     def state_dict(self):
+        """Learner state for a resume: networks, Adam moments, iteration / step counters, the curriculum sampler
+        (outcome rings, rates, cyclic-replay order, cursor and credit), the RNG states (torch CPU / MPS, the env's
+        sampler generator) and rsl_rl's 100-episode logger buffers. Not saved: the physics state of the worlds; a
+        resume starts every env from a freshly sampled dataset row (episodes in flight at the pause are dropped
+        without a curriculum outcome), so a resumed run is a faithful continuation of the learner, not bitwise of
+        the trajectory."""
         s = self.env.curriculum._sampler
-        return {"actor_state_dict": self.actor.state_dict(), "critic_state_dict": self.critic.state_dict(),
-                "optimizer_state_dict": self.optimizer.state_dict(), "iter": self.it, "total_steps": self.total_steps,
-                "cfg": asdict(self.cfg),
-                "sampler": {k: getattr(s, k).cpu() for k in ("_success_rates", "_success_history", "_history_pointers",
-                                                             "_history_sizes", "_history_success_counts")}}
+        d = {"actor_state_dict": self.actor.state_dict(), "critic_state_dict": self.critic.state_dict(),
+             "optimizer_state_dict": self.optimizer.state_dict(), "iter": self.it, "total_steps": self.total_steps,
+             "cfg": asdict(self.cfg), "sampler": {k: getattr(s, k).cpu() for k in self._SAMPLER_TENSORS},
+             "sampler_scalars": {"_uniform_cursor": s._uniform_cursor, "_uniform_credit": s._uniform_credit},
+             "rng": {"torch_cpu": torch.get_rng_state(), "env_generator": self.env.generator.get_state()},
+             "logger": {"rewbuffer": list(self.rewbuffer), "lenbuffer": list(self.lenbuffer)}}
+        if self.device.type == "mps":
+            d["rng"]["torch_mps"] = torch.mps.get_rng_state()
+        return d
 
     def load_state_dict(self, d):
         self.actor.load_state_dict(d["actor_state_dict"])
@@ -250,6 +263,17 @@ class PourPPO:
         s = self.env.curriculum._sampler
         for k, v in d.get("sampler", {}).items():
             getattr(s, k).copy_(v.to(getattr(s, k).device))
+        for k, v in d.get("sampler_scalars", {}).items():
+            setattr(s, k, v)
+        rng = d.get("rng", {})
+        if "torch_cpu" in rng:
+            torch.set_rng_state(rng["torch_cpu"])
+        if "env_generator" in rng:
+            self.env.generator.set_state(rng["env_generator"])
+        if "torch_mps" in rng and self.device.type == "mps":
+            torch.mps.set_rng_state(rng["torch_mps"])
+        self.rewbuffer.extend(d.get("logger", {}).get("rewbuffer", []))
+        self.lenbuffer.extend(d.get("logger", {}).get("lenbuffer", []))
 
     # -- training loop (OnPolicyRunner.learn) -------------------------------------------------------------------
     def train(self, iterations: int, out_dir: str | None = None, log=print):
@@ -294,9 +318,14 @@ class PourPPO:
                 f"{(sr if sr is not None else float('nan')):.3f} succ_term {rec['extras'].get('Episode_Termination/success', 0):.3f} "
                 f"| v {losses['value']:.4f} s {losses['surrogate']:.4f} ent {losses['entropy']:.3f} kl {losses['kl']:.4f} "
                 f"std {rec['mean_std']:.3f} | {t1 - t0:.1f}+{t2 - t1:.1f} s")
-            if out_dir and (it % cfg.save_interval == 0 or it == start_it + iterations - 1):
+            stop = bool(out_dir) and os.path.exists(os.path.join(out_dir, "STOP"))
+            if out_dir and (it % cfg.save_interval == 0 or it == start_it + iterations - 1 or stop):
                 torch.save(self.state_dict(), os.path.join(out_dir, f"model_{it}.pt"))
                 torch.save(self.state_dict(), os.path.join(out_dir, "model_last.pt"))
+            if stop:      # clean pause: `touch <out>/STOP`; resume with --resume <out>/model_last.pt
+                os.remove(os.path.join(out_dir, "STOP"))
+                log(f"paused after iteration {it} (STOP file); checkpoint {out_dir}/model_last.pt")
+                break
         if logf:
             logf.close()
         return (self.total_steps - steps0) / (time.perf_counter() - t_start)
@@ -358,7 +387,7 @@ def train(args):
     env = _make_env(args)
     ppo = PourPPO(env, PourPPOConfig(seed=args.seed, max_iterations=args.iterations))
     if args.resume and os.path.exists(args.resume):
-        ppo.load_state_dict(torch.load(args.resume, map_location="mps", weights_only=False))
+        ppo.load_state_dict(torch.load(args.resume, map_location="cpu", weights_only=False))
         print(f"resumed from {args.resume} at iteration {ppo.it}", flush=True)
     os.makedirs(args.out, exist_ok=True)
     with open(os.path.join(args.out, "config.json"), "w") as f:
