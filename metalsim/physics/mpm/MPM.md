@@ -511,9 +511,10 @@ end to end: Isaac's own assets (Franka USD, cups, table, the 20,000-row reset da
   device_args=None)`; rigid determinism configurable (`PourPhysicsConfig.rigid_deterministic`, default off as Isaac's
   `NewtonCfg.deterministic_mode`).
 * Capture: one graph per `sim.step` (collide + 2 coupled steps: 6 MuJoCo + 4 MPM solves), as Isaac's
-  `_simulate_physics_only`; the arm-target kernel runs between replays. A single graph per policy step (4 sim steps)
-  replays NaN joint state at 2,048 worlds on Warp `152808b7` and is correct at 1,024: open issue (reproducer:
-  `PourPhysicsConfig(capture_unit="policy")` at 2,048 worlds).
+  `_simulate_physics_only`; the arm-target kernel runs between replays. A single graph per policy step (4 sim steps,
+  `PourPhysicsConfig(capture_unit="policy")`) replayed NaN joint state at 2,048 worlds on Warp `152808b7` / `43ffc6dd`.
+  It was correct at 1,024 worlds. Fixed in Warp `41b7bc45`: the capture held every step's temporaries (70.7 GB, past
+  the 55.7 GB working set). Now 37.4 GB and finite at 2,048 worlds; see section 8f on `metalsim-mpm`.
 * Per policy step at 2,048 worlds (M4 Max): about 2 s (step only); the L4 cannot hold Isaac's own task at 2,048 envs
   (CUDA out of memory creating the graph, and out of memory eager), so the matched comparison is at 1,024 envs (§1b.4).
 * Upstream observation (code reading, same in Isaac and here): the proxy wrench harvest uses only the last MPM

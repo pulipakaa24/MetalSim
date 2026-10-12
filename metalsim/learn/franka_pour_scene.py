@@ -701,8 +701,9 @@ class PourPhysicsConfig:
     max_triangle_pairs: int | None = None
     capture: bool = True                    # replay captured graphs (Isaac: use_cuda_graph=True)
     # "sim": one graph per sim.step (Isaac's boundary, newton_manager.py _simulate_physics_only) with the action
-    # kernel launched between replays; "policy": one graph per policy step (4 sim steps + actions). The policy-step
-    # graph replays NaN at 2,048 worlds on the pinned Warp fork (fine at 1,024; open issue), so "sim" is the default.
+    # kernel launched between replays; "policy": one graph per policy step (4 sim steps + actions). "sim" is the
+    # default because it is Isaac's granularity. "policy" works from Warp 41b7bc45 on: before that, the graph held every
+    # step's temporaries (70.7 GB at 2,048 worlds, past the working set) and replayed NaN; now 37.4 GB (MPM.md 8f).
     capture_unit: str = "sim"
     disable_hand_hull: bool = True
 
