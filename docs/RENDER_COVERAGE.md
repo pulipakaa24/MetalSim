@@ -62,12 +62,12 @@ Measured coverage of the reference silhouette is shown as rgb / depth / seg.
 | **infinite plane** (`size="0 0"`, every locomotion floor) | ◐ | ◐ | ◐ | ◐ | ◐ | Drawn as a 10 × 10 m square (`plane_extent=5`). The ground covers only 0.369 of MuJoCo's ground pixels, so the horizon shows a visible edge. |
 | hfield | ◐ | ◐ | ◐ | ◐ | ◐ | 0.85 / 0.85 / 0.85. The top surface is exact (depth error 0). MuJoCo's side skirts and base are not drawn. |
 | SDF geom (`type="sdf"`, plugin or mesh SDF) | ✅ | ✅ | ✅ | ✅ | ✅ | **Fixed 2026-10 (B)**: drawn from its mesh as MuJoCo does. Was 0.0 / 0.0 / 0.0; now 1.0 / 1.0 / 1.0 in T0, T2 and the ray-traced depth camera, depth error 0. |
-| **sites** (group 0–2, visible in MuJoCo by default) | ❌ | ❌ | ❌ | ❌ | ❌ | 0.0 for sphere and box sites |
-| **spatial tendon** with `width` (cables, wires, MuJoCo tendon-driven hands) | ❌ | ❌ | ❌ | ❌ | ❌ | 0.0 |
-| **flex 2D (cloth)** | ❌ | ❌ | ❌ | ❌ | ❌ | 0.0 (277 px in MuJoCo) |
-| **flex 3D (soft volume)** | ❌ | ❌ | ❌ | ❌ | ❌ | 0.0 (152 px in MuJoCo) |
-| flex 1D (cable) | ❌ (code) | ❌ | ❌ | ❌ | ❌ | MuJoCo's own renderer drew 0 px for the cable under default visual flags, so it is not measurable here. No MetalSim code reads `flexvert_xpos`. |
-| **skin** (bone-skinned mesh) | ❌ | ❌ | ❌ | ❌ | ❌ | 0.0 (236 px in MuJoCo) |
+| sites (group 0–2, visible in MuJoCo by default) | ✅ | ✅ | ✅ | n/a (by design) | ✅ | **fixed (workstream A, §5)**: 0.993–1.0 / 0.993–1.0 / 0.993–1.0, depth error ≤ 0.4 mm (was 0.0). Instanced slots posed from `site_xpos` / `site_xmat`. The ray-traced sensors leave sites out by default, as `mj_ray` does (a lidar's own mounting site would occlude every beam); `visual=mujoco.MjvOption()` includes them. Isaac draws no sites. |
+| spatial tendon with `width` (cables, wires, MuJoCo tendon-driven hands) | ✅ | ✅ | ✅ | ✅ | ✅ | **fixed (workstream A, §5)**: 1.0 / 1.0 / 1.0, depth error 0 (was 0.0); tendons wrapping a cylinder, a sphere and across a pulley in §5. Capsules per wrap segment (MuJoCo's tessellation, half width inside a wrapping geom, none across a pulley). Not reproduced: MuJoCo's catenary for a slack two-site spring tendon and the limit-impedance recolouring of default-grey tendons. Isaac draws no tendon geometry. |
+| flex 2D (cloth) | ✅ | ✅ | ✅ | ✅ | ✅ | **fixed (workstream A, §5)**: 1.0 / 1.0 / 1.0 of 277 px, depth error ≤ 0.1 mm (was 0.0). MuJoCo's skin: smoothed surface ±radius, sides closed. |
+| flex 3D (soft volume) | ✅ | ✅ | ✅ | ✅ | ✅ | **fixed (workstream A, §5)**: 1.0 / 1.0 / 1.0 of 152 px, depth error 0 (was 0.0). Shell offset by +radius (flat-shaded when `flatskin`). |
+| flex 1D (cable) | ✅ | ✅ | ✅ | ✅ | ✅ | **fixed (workstream A, §5)**: open cylinders per edge (`mjVIS_FLEXEDGE`). The first audit's cable sat just above the image (0 px in MuJoCo too); moved mid-image it is 1.0 / 1.0 / 1.0 in every renderer. |
+| skin (bone-skinned mesh) | ✅ | ✅ | ✅ | ✅ | ✅ | **fixed (workstream A, §5)**: 1.0 / 1.0 / 1.0 of 236 px, depth error 0 (was 0.0). Linear blend skinning, area-weighted normals, `inflate`. |
 | transparency (`rgba` alpha < 1, material opacity, USD `opacity`) | ✅ | ✅ | ✅ | ◐ (opaque) | ✅ | **Fixed 2026-10 (B)**. T0/T1 blend as MuJoCo does: objects sorted per env, drawn front-to-back then back-to-front, back faces culled. T2 treats alpha as presence, like a USD opacity in Isaac's path tracer. Red box behind 25 % blue glass, colour change the glass makes over the box: MuJoCo (−64, 0, +65); T0/T1 before (−146, 0, +146), after (−64, 0, +64); T2 before (−122, 0, +125), after (−53, 0, +53). Annotations default to MuJoCo's: segmentation and depth of the glass (1.904 m, equal to MuJoCo). `transparent_ids="behind"` gives Isaac RTX Real-Time's opacity behaviour (seg / depth from what is behind). Lidar and depth camera still treat it as opaque. |
 | **geometry beyond 10 m** | ❌ | ❌ | ✅ | ✅ (range-limited) | T0: ❌ | T0/T1 far plane is fixed at 10 m in the shader. Boxes at 14 m and 38–41 m: T0/T1 0.0 / 0.0 / 0.0, T2 and RT 1.0. WIP `far=` in the main checkout fixes this. |
 | geom groups ≥ 3 hidden | ✅ | ✅ | ✅ | ✅ | ✅ | Matches MuJoCo's default `geomgroup` |
@@ -109,12 +109,12 @@ Measured coverage of the reference silhouette is shown as rgb / depth / seg.
 
 | simulated thing | where it is simulated | renderer status | evidence |
 |---|---|---|---|
-| MuJoCo Warp flex cloth / cable / soft volume | `physics/deformable.py`, `tests/test_deformable.py` | ❌ in every renderer and sensor | Measured above. The vertex bodies carry no geoms, and the renderer does not read `flexvert_xpos`. |
-| MetalSim XPBD cloth / rope (the default cloth and rope engine per PARITY) | `physics/deformable.py` | ❌ | Code: vertex tensors only; no renderer accepts per-frame vertices (vertex buffers and BLASes are built once) |
-| PhysX-port particle cloth | `physics/physx_cloth.py`, `tests/test_physx_cloth.py` | ❌ | Code: same as above |
+| MuJoCo Warp flex cloth / cable / soft volume | `physics/deformable.py`, `tests/test_deformable.py` | ✅ every renderer and sensor (workstream A) | GPU path from `DeformableSim` / `BatchSim` buffers: 4 randomized worlds after 40 steps, every env ≥ 0.99 rgb / depth / seg against MuJoCo's renderer at the same vertices (`test_gpu_path_mujoco_warp_flex`). |
+| MetalSim XPBD cloth / rope (the default cloth and rope engine per PARITY) | `physics/deformable.py` | ✅ (workstream A) | `render(xpbd, sources={"flexvert_xpos": xpbd.x})`: drawn as MuJoCo draws the model's flexes; 3 worlds ≥ 0.99 (`test_gpu_path_xpbd_and_physx_cloth`) |
+| PhysX-port particle cloth | `physics/physx_cloth.py`, `tests/test_physx_cloth.py` | ✅ (workstream A) | `extras.DeformableMesh(name, tris, nvert, radius=...)` with `sources={name: sim.x}`; 3 worlds ≥ 0.99 in T0 / T1 / T2 / RT. Isaac draws PhysX cloth as its zero-thickness mesh (`radius=0`). |
 | Newton models (G1 XPBD, VBD cloth / soft / rods, coupled proxy) | `physics/newton_backend.py` | ✅ rigid shapes in T0 / T1 / T2 / RT / Ann through `render/newton_bridge.py` (2026-10-12, [NEWTON_RENDER.md](NEWTON_RENDER.md)); cloth / soft-body surfaces and free particles ✅ once the dynamic-mesh and particle paths land (verified on merges of their WIP branches) | Measured: per-body silhouette coverage 1.0 (Menagerie Panda 0.986: z-fighting between coincident links, the same with the MJCF twin), depth p99 ≤ 0.97 mm (T0) and ≤ 0.1 mm (RT) against the same MJCF through the MuJoCo path; batched and spaced worlds. Before: no Newton `State` → renderer path. |
 | Newton MPM particles (sand, fluids, Franka pour) | `physics/mpm/` | ❌ now; **in progress elsewhere** (`metalsim-particle-render`) | Code |
-| Replicator motion vectors / 3D boxes / point cloud of deformables | `replicator/isaac.py` | ❌ | State-derived from geom poses and the renderer id buffer |
+| Replicator motion vectors / 3D boxes / point cloud of deformables | `replicator/isaac.py` | ◐ | RGB / depth / segmentation / instance ids ✅ (extras are unlabelled instances with their own `instance_id`); motion vectors and 3D boxes stay geom-pose based (a deformable gets no motion vector and no 3D box) |
 
 ### 1d. USD import (`scene/usd_to_mjcf.py`) visual coverage
 
@@ -156,14 +156,14 @@ Effort is engineering days for one person including tests, assuming the existing
 
 | # | gap | Isaac (RTX / Kit) | fix | effort | priority |
 |---|---|---|---|---|---|
-| 1 | **Deformables invisible** (flex cloth / soft / cable, XPBD cloth and rope, PhysX-port cloth) | Deformable bodies and cloth render as meshes skinned to simulation nodes (RTX); they appear in RGB, depth and segmentation | Add a dynamic-mesh slot class. Per frame, a compute kernel writes vertices and normals from `flexvert_xpos` (or any (N, V, 3) tensor) into a per-env vertex buffer. The raster draws it non-instanced; T1/T2/RT refit a per-env BLAS (`MTLAccelerationStructure` refit). Flex 2D gives triangles directly, 3D gives the surface faces (`flex_shell`), 1D gives capsules or tubes. Gets one seg id per flex. | 4–6 (raster 2, BLAS refit 2, tests 1–2) | **P0**: deformable manipulation from pixels is impossible today |
+| 1 | **Deformables invisible** (flex cloth / soft / cable, XPBD cloth and rope, PhysX-port cloth). **Done 2026-10-12** (§5) | Deformable bodies and cloth render as meshes skinned to simulation nodes (RTX); they appear in RGB, depth and segmentation | Add a dynamic-mesh slot class. Per frame, a compute kernel writes vertices and normals from `flexvert_xpos` (or any (N, V, 3) tensor) into a per-env vertex buffer. The raster draws it non-instanced; T1/T2/RT refit a per-env BLAS (`MTLAccelerationStructure` refit). Flex 2D gives triangles directly, 3D gives the surface faces (`flex_shell`), 1D gives capsules or tubes. Gets one seg id per flex. | 4–6 (raster 2, BLAS refit 2, tests 1–2) | **P0**: deformable manipulation from pixels is impossible today |
 | 2 | **Newton models not renderable** (rigid and deformable). **Done 2026-10-12** ([NEWTON_RENDER.md](NEWTON_RENDER.md)) | Isaac Lab 3.0 renders Newton scenes through RTX (`body_q` / `particle_q` written to Fabric) or Newton's Warp `SensorTiledCamera` (own world + world -1 per camera) | `newton_bridge.NewtonRenderSource`: a render-twin `MjModel` (from the Newton shapes, or the source MJCF) plus graph-captured Warp kernels that write its pose buffers from `State.body_q` per world. Cloth / soft surfaces → gap 1's dynamic-mesh path; free particles → the particle renderer | done (rigid); deformables via #1 and the particle path | **P0** for the Newton path; P1 overall |
 | 3 | **Mesh normals smoothed across hard edges** | Uses authored normals, or face normals split at sharp edges | Use `mesh_normal` (MuJoCo's own per-vertex normals with its smoothing rule) or split vertices at a crease angle in `_tris_to_indexed`; read USD `normals` in the importer | 0.5–1 | **P0**: every CAD robot and object is shaded wrong (spread 43.7 vs 2.9), which is a sim-to-real appearance gap on every frame |
 | 4 | **Infinite plane drawn as 10 × 10 m** | `GroundPlaneCfg`: 100 m (default) plane; the horizon is visible | Size planes to the camera far plane (or a large default) in the raster. In the RT, an infinite plane conflicts with the per-env spatial offset (`stride`), so use a separate per-env analytic plane test in the shaders, or clip to the stride. | 1–2 | **P0** for locomotion / navigation cameras, P2 for tabletop |
 | 5 | **T0/T1 10 m far plane** | Camera `clipping_range` default (0.01, 1e6)/(0.1, 1e5) | **WIP in the main checkout** (`far=`). Still to do: T1's 50 m and T2's 1000 m ray ranges, the splat composite far plane, and depth precision (TEXTURES.md "Far plane") | 0.5 (land the WIP) | **P0** for outdoor / nav; P2 tabletop |
 | 6 | **Transparency / opacity** | RTX: OmniGlass refraction, opacity cutout, alpha blending; depth and segmentation of transparent objects configurable | T0: sorted alpha-blend pass for alpha < 1 (order-independent transparency or per-object sort), seg / depth from opaque only or configurable. T2: `any_hit` alpha test + a dielectric BTDF. Importer: keep opacity. | 2 (T0 blend + cutout), +2 (T2 glass) | **P1**: glassware, bottles and windows are common in manipulation datasets |
-| 7 | **Sites and tendons invisible** | n/a for sites (no USD equivalent); tendons become visual cables/meshes authored by the asset | Optional: draw sites (opt-in group flag) as primitives. Draw spatial tendons as per-frame capsule chains from `ten_wrapadr` / `wrap_xpos` (dynamic instances, gap 1 infrastructure). | 1 (sites), 2 (tendons) | P1 for tendon-driven hands and cable tasks; P2 for sites (MuJoCo-visual parity only) |
-| 8 | **Skins invisible** | Skinned meshes (UsdSkel) render | Linear blend skinning kernel into the dynamic-mesh path (#1) | 1 on top of #1 | P2 (rare in robot models; composite cables and older flexcomps) |
+| 7 | **Sites and tendons invisible**. **Done 2026-10-12** (§5; sites on by default as in MuJoCo, off in the ray-traced sensors) | n/a for sites (no USD equivalent); tendons become visual cables/meshes authored by the asset | Optional: draw sites (opt-in group flag) as primitives. Draw spatial tendons as per-frame capsule chains from `ten_wrapadr` / `wrap_xpos` (dynamic instances, gap 1 infrastructure). | 1 (sites), 2 (tendons) | P1 for tendon-driven hands and cable tasks; P2 for sites (MuJoCo-visual parity only) |
+| 8 | **Skins invisible**. **Done 2026-10-12** (§5) | Skinned meshes (UsdSkel) render | Linear blend skinning kernel into the dynamic-mesh path (#1) | 1 on top of #1 | P2 (rare in robot models; composite cables and older flexcomps) |
 | 9 | **SDF geoms invisible** | n/a (USD has meshes; SDF is a collision representation) | Draw the SDF's mesh asset (`geom_dataid` → mesh, as MuJoCo does) | 0.5 | P1: anything using SDF plugins (gears, nuts and bolts) is invisible |
 | 10 | **Spot / point-light shadows in T0/T1** | All lights cast shadows in RTX | T1: ray-traced shadow for every light (the loop already exists, gate on `castshadow`). T0: cube or spot shadow maps per light, or route shadowed lights to T1. | 0.5 (T1), 3 (T0 maps) | P1: indoor / spot-lit scenes |
 | 11 | **Texture mapping errors** (vertical flip on mesh UVs, no UVs on cylinder / capsule, sphere phase, cube textures) | Asset UVs used as authored; MDL projections | Flip V in the atlas path (with a regression image), MuJoCo-style generated coordinates for primitives, cube-map sampling (`texturecube`) for `type="cube"` | 1.5 | P1: textured objects and DR textures look wrong; mirrored decals and labels |
@@ -181,7 +181,7 @@ Effort is engineering days for one person including tests, assuming the existing
 
 | rank | fix | effort (days) | why first |
 |---|---|---|---|
-| 1 | Dynamic-mesh path for flex / XPBD / PhysX-port cloth (#1), with skins (#8) and tendons (#7) on the same infrastructure | 4–6 (+1 skins, +2 tendons) | A whole simulated category, which PARITY claims at parity with Isaac's deformables, is invisible to cameras |
+| 1 | Dynamic-mesh path for flex / XPBD / PhysX-port cloth (#1), with skins (#8) and tendons (#7) on the same infrastructure: **done 2026-10-12** (§5) | 4–6 (+1 skins, +2 tendons) estimated; done in about 4.5 hours | A whole simulated category, which PARITY claims at parity with Isaac's deformables, is invisible to cameras |
 | 2 | Mesh normals (#3): **done 2026-10 (§3b)** | 0.5–1 | Wrong on every frame of every mesh robot; cheapest high-impact fix |
 | 3 | Land the far-plane WIP (#5) and make the infinite plane infinite (#4) | 1.5–2.5 | Locomotion and navigation cameras see a 10 m world with a floor edge |
 | 4 | Newton → renderer adapter (#2): **done 2026-10-12** (`render/newton_bridge.py`) | 2–3 | Without it the Newton backend has no camera at all |
@@ -259,3 +259,63 @@ scripts/gpu_run.sh render_coverage check 10 -- .venv/bin/python scripts/diagnost
   to `--out`.
 - All probe scenes are synthetic MJCF built inside the script.
 - No splat scene or other external asset is used.
+
+## 5. Deformables, cables, tendons, skins and sites (workstream A, 2026-10-12)
+
+**What is drawn.** Every renderer and sensor now draws the non-geom objects MuJoCo's own renderer draws, under an
+`mujoco.MjvOption` (`visual=`; default MuJoCo's default option, `visual=False` geoms only), with MuJoCo's geometry
+(`mjv_updateActiveFlex`, `mjv_updateActiveSkin`, `addSpatialTendonGeoms`, `render_gl3.c`):
+
+| object | geometry (as MuJoCo) | T0 | T1 | T2 | RT | Ann |
+|---|---|---|---|---|---|---|
+| site (visible groups) | its primitive, posed by `site_xpos` / `site_xmat` | 0.993–1.0 | 0.993–1.0 | 0.993–1.0 | off by default (as `mj_ray`) | ✅ |
+| flex 2D (cloth) | smoothed surface ±radius, sides closed (`flatskin`: face normals) | 1.0 | 1.0 | 1.0 | 1.0 | ✅ |
+| flex 3D (soft volume) | shell offset +radius | 1.0 | 1.0 | 1.0 | 1.0 | ✅ |
+| flex 1D (cable); any flex with `mjVIS_FLEXEDGE` and no skin | open cylinder per edge; spheres with `mjVIS_FLEXVERT`; `mjVIS_FLEXFACE`: flat offset faces | 1.0 | 1.0 | 1.0 | 1.0 | ✅ |
+| skin | linear blend skinning, area-weighted normals, `inflate` | 1.0 | 1.0 | 1.0 | 1.0 | ✅ |
+| spatial tendon | capsule per wrap segment, half width inside a wrapping geom, none across a pulley | 1.0 (straight); 0.95–1.0 wrapping / pulley | same | 1.0 | 1.0 | ✅ |
+| user `DeformableMesh` (XPBD, PhysX-port cloth, Newton cloth via the bridge) | the surface (radius 0) or a 2D flex skin | ≥ 0.99 | ≥ 0.99 | ≥ 0.99 | ≥ 0.99 | ✅ |
+
+Coverage is rgb / depth / segmentation of MuJoCo's silhouette (all three equal unless noted), depth error ≤ 0.4 mm,
+160×120. Sources: `scripts/diagnostics/render_coverage_audit.py` (non-geom probe) and `tests/test_render_extras.py`
+(deformed states: MuJoCo C stepped, MuJoCo Warp `DeformableSim` / `BatchSim` on the GPU path, `XPBDSim`,
+`PhysXClothSim`; three envs in different states per render). The geometry itself is checked on the CPU against
+`mjv_updateScene` (flex faces and normals, skin vertices and normals, tendon capsules, edge cylinders) to 2e-5 m, and
+the Metal kernels against a NumPy reference of them.
+
+The 0.95 for wrapping / pulley tendons is the rasterizer, not the geometry: those tendons are 1.5–2 px wide, and a
+pixel-centre test of the same triangles on the CPU covers all of MuJoCo's pixels, but 6 of the pulley's 120 lie less
+than 1/256 px inside any triangle (edge-on slivers at the silhouette), below the raster's sub-pixel precision. The
+ray-traced paths cover them. Also seen: in the top ~5 rows of an image MetalSim and MuJoCo disagree by about one row for
+every object, geoms included (a 2 cm capsule geom in rows 1–4: T0 0.54, T2 0.77; mid-image 1.0), a camera-model
+difference outside this work (the first audit's cable sat there).
+
+**How.** `metalsim/render/extras.py` adds the objects to the scene tables after the geoms (slots `G0 …`; segmentation
+id `ngeom + 1 + j` in geom mode). Sites are ordinary instanced slots whose pose rows follow the geom rows (a gather
+kernel appends `site_xpos` / `site_xmat`). Flexes, skins, tendons and user meshes are dynamic slots:
+`metalsim/render/dynamic_mesh.py` generates their vertex records (position, normal, uv) for every env in five compute
+dispatches per frame (copy the simulator's vertices, skinning, vertex normals from host-built adjacency, surface
+records, tube records from a template), all loops bounded by validated tables. The raster draws each object with one
+instanced draw (instance = env); the ray tracers keep one primitive acceleration structure per object holding every
+env's triangles (env-grid offset baked in), refit each frame and rebuilt every 32 frames, with one identity instance in
+the instance structure after the rigid ones; the particle renderer's grain instances follow those
+(`RayTracer.n_inst` / `prim_as` include them). No shader that existed before changed: the dynamic records use the static
+vertex layout, so hits on them resolve through the same `inst_tab` / `slot_mesh` / `mesh_info` lookups.
+
+**Unchanged when absent.** Scenes without visible sites / flexes / skins / tendons render byte-identically: 87 of 92
+outputs identical on six scenes (prims, textured heightfield, SO-101, Panda, Shadow hand, Go2) against the previous
+integration-branch commit, every renderer and the depth camera; the five differing outputs were the Go2 lidar hitting
+the lidar's own `imu` site, since fixed by leaving sites out of the sensors (`scripts/diagnostics/render_identity_check.py`;
+`test_scenes_without_extras_are_byte_identical`). Go2's camera images were identical (its site is inside the body).
+
+**Isaac / RTX.** Isaac renders deformables (PhysX FEM / particle cloth, Newton cloth) as the simulated mesh itself:
+zero thickness, two-sided, no ±radius skin (`DeformableMesh(radius=0)` reproduces that; MuJoCo's skin adds 2 × radius,
+1 px or less at usual distances). Sites, MJCF tendons and MJCF skins have no rendered counterpart in Isaac: the MJCF
+importer has site and tendon primitives (`AddTendons`, site prims) but they carry no render geometry, and skins are not
+imported; drawing them is MuJoCo-viewer parity, switchable per group with `visual=`. Isaac's instance segmentation
+labels a deformable by its prim; here it is an unlabelled instance with its own `instance_id`
+(`/World/<kind>/<name>`).
+
+**Not done.** MuJoCo's catenary for a slack two-site spring tendon and the limit-impedance recolouring of default-grey
+tendons; motion vectors and 3D boxes of deformables (annotators stay geom-pose based); flex / skin textures use the
+first texture coordinate of each vertex (seams with different coordinates per element are not split).

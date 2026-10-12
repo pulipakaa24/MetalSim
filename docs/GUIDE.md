@@ -166,6 +166,29 @@ python -m metalsim.learn.cartpole_rgb 1024      # rollout throughput per render 
 `--tier` selects the renderer (0 raster, 1 hybrid ray tracing, 2 path tracing; `--spp` and
 `--bounces` for tier 2), `--checkpoint out.pt` saves the policy, `--seed` sets the seed.
 
+### Cameras on cloth, cables, tendons, skins and sites
+
+Every renderer and ray-traced sensor draws what MuJoCo's own renderer draws besides geoms, under MuJoCo's default
+`mjvOption`: sites in the visible groups, flexes (cloth and soft volumes as their skin offset by the flex radius,
+cables as edge cylinders), skins and spatial tendons (`metalsim/render/extras.py`). Their vertices are generated on
+the GPU each frame from the simulation state, per env (`metalsim/render/dynamic_mesh.py`), so nothing extra is needed
+for a MuJoCo Warp flex scene (`BatchSim`, `DeformableSim`). Other simulators pass their vertex arrays:
+
+```python
+from metalsim.render.extras import DeformableMesh
+r = Tier0Renderer(flex_model, n, camera="cam", outputs=("rgb", "depth", "seg"))
+r.render(xpbd, sources={"flexvert_xpos": xpbd.x})            # XPBDSim: the model's flexes, XPBD's vertices
+cloth = DeformableMesh("cloth", mesh.tris, len(mesh.x), rgba=(0.2, 0.5, 0.9, 1))
+r = Tier0Renderer(model, n, camera="cam", deformables=[cloth])
+r.render(sim, sources={"cloth": physx_cloth.x})              # PhysXClothSim (or any (N, V, 3) Warp array)
+```
+
+A simulator without an event (`DeformableSim`, `XPBDSim`, `PhysXClothSim`) is synchronized by the caller before the
+render. `visual=` takes an `mujoco.MjvOption` (groups and flags as in MuJoCo's viewer); `visual=False` draws geoms
+only, as before. In segmentation (geom mode) the j-th extra object has id `ngeom + 1 + j` (`r.tables.extras`); the
+Isaac-style annotators report them as unlabelled instances with their own `instance_id`. Isaac does not draw MuJoCo
+sites, tendons or skins (docs/RENDER_COVERAGE.md §5).
+
 ### Lidar navigation
 
 A MetalSim task (Isaac Lab has no lidar RL benchmark): a wheeled base reaches a goal among random
