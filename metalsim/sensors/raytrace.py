@@ -30,19 +30,35 @@ from metalsim.render.scene_tables import CameraIntrinsics, build_scene_tables
 class RayTracer:
     def __init__(self, model, n_envs: int, *, max_range: float = 10.0, max_group=3, include_planes=True,
                  decimate_faces: int = 0, terrain_slots: bool = True, draw_hfields: bool = True,
-                 appearance: str = "mujoco", ctx: MetalContext | None = None, device="metal:0"):
+                 appearance: str = "mujoco", visual=None, deformables=(), tube_slices=None, cap_stacks=None,
+                 dyn_rebuild_every: int = 32, ctx: MetalContext | None = None, device="metal:0"):
         """``terrain_slots`` / ``draw_hfields`` / ``appearance``: see ``Tier0Renderer`` (False / "legacy" = the
-        previous behaviour)."""
+        previous behaviour).
+
+        ``visual`` / ``deformables`` / ``tube_slices`` / ``cap_stacks``: the non-geom objects MuJoCo's renderer draws
+        (sites, flexes, skins, spatial tendons) and user deformable meshes; see ``Tier0Renderer``. Each dynamic object
+        has one primitive acceleration structure holding every env's triangles (positions offset by the env grid),
+        refit each frame after its vertices are regenerated and rebuilt every ``dyn_rebuild_every`` frames (1: every
+        frame; 0: refit only, after the first build)."""
         self.m = model
         self.n = n_envs
         self.device = device
         self.ctx = ctx or MetalContext(device)
         if not self.ctx.device.supportsRaytracing():
             raise RuntimeError("this GPU has no Metal ray tracing support")
+        if visual is None:
+            # a sensor's default: what MuJoCo draws except sites (visual markers, not surfaces: mj_ray and MuJoCo's
+            # rangefinder skip them, and a lidar's own mounting site would occlude every beam). The cameras built on this
+            # ray tracer (tier 1 / tier 2) pass MuJoCo's full default option.
+            import mujoco
+            visual = mujoco.MjvOption()
+            visual.sitegroup[:] = 0
         self.tables = build_scene_tables(model, n_envs, max_group=max_group, include_planes=include_planes,
                                          decimate_faces=decimate_faces, sized_geoms="auto" if terrain_slots else (),
-                                         draw_hfields=draw_hfields, appearance=appearance)
+                                         draw_hfields=draw_hfields, appearance=appearance,
+                                         visual=visual, deformables=deformables)
         t = self.tables
+        self.visual = visual
         self.sized = None
         if t.sized.any():
             from metalsim.render.sized import SizedGeoms
@@ -53,13 +69,41 @@ class RayTracer:
         self.max_range = max_range
         self.stride = 2.0 * (extent + max_range) + 1.0
         c = self.ctx
-        self.vbuf = c.buffer(t.vertices.nbytes, t.vertices, "rt_vertices")
-        self.ibuf = c.buffer(t.indices.nbytes, t.indices, "rt_indices")
-        self.inst_tab = c.buffer(t.inst_table.nbytes, t.inst_table, "rt_inst_tab")
-        self.slot_geom = c.buffer(4 * self.G, np.asarray(t.geoms, np.int32), "rt_slot_geom")
-        self.slot_mesh = c.buffer(4 * self.G, np.asarray(t.geom_mesh, np.int32), "rt_slot_mesh")
-        mi = np.zeros((len(t.meshes), 4), np.uint32)
-        for k, mesh in enumerate(t.meshes):
+        # non-geom objects (metalsim.render.extras): sites are instanced slots posed from extra pose rows; each dynamic
+        # object (flex, skin, tendon, user mesh) has its records after the static vertices, its every-env triangles
+        # after the static indices, a mesh entry, and one identity instance
+        self.dyn, self.pose, self._dyn_src = None, None, None
+        self._dyn_frames, self.dyn_rebuild_every = 0, int(dyn_rebuild_every)
+        inst_tab, mesh_list = t.inst_table, list(t.meshes)
+        verts, inds = t.vertices, t.indices
+        n_inst_slots = len(t.instanced_slot_pose())
+        slot_mesh = np.full(self.G, -1, np.int64)
+        slot_mesh[:n_inst_slots] = t.geom_mesh if t.slot_mesh_inst is None else t.slot_mesh_inst
+        if t.dyn:
+            from metalsim.render.dynamic_mesh import DynamicMeshes
+            nv_static = len(t.vertices)
+            self.dyn = DynamicMeshes(self.ctx, model, t, n_envs, tpr=self.tpr, stride=self.stride, rbase=nv_static,
+                                     vbuf=False, tube_slices=tube_slices, cap_stacks=cap_stacks)
+            exp = self.dyn.expanded_indices()
+            verts = np.zeros((nv_static + self.dyn.n_records, 8), np.float32)
+            verts[:nv_static] = t.vertices
+            i_off = len(t.indices)
+            for k, (ob, ix) in enumerate(zip(self.dyn.objects, exp)):
+                slot_mesh[ob["slot"]] = len(mesh_list)
+                mesh_list.append({"i_off": i_off, "i_count": int(ix.size), "dynamic": k})
+                i_off += ix.size
+            inds = np.concatenate([t.indices] + exp).astype(np.uint32)
+            inst_tab = np.concatenate([t.inst_table, np.array([[0, ob["slot"]] for ob in self.dyn.objects], np.uint32)])
+        self.vbuf = c.buffer(verts.nbytes, verts, "rt_vertices")
+        if self.dyn is not None:
+            self.dyn.vbuf = self.vbuf
+        self.ibuf = c.buffer(inds.nbytes, inds, "rt_indices")
+        self.inst_tab = c.buffer(inst_tab.nbytes, inst_tab, "rt_inst_tab")
+        self.slot_geom = c.buffer(4 * self.G, t.instanced_slot_pose(), "rt_slot_geom")
+        self.slot_mesh = c.buffer(4 * self.G, slot_mesh.astype(np.int32), "rt_slot_mesh")
+        self.meshes_all = mesh_list
+        mi = np.zeros((len(mesh_list), 4), np.uint32)
+        for k, mesh in enumerate(mesh_list):
             mi[k, 0] = mesh["i_off"]; mi[k, 1] = mesh["i_count"]
         self.mesh_info = c.buffer(mi.nbytes, mi, "rt_mesh_info")
         # material table (G x 16) followed by the MaterialExt table (G x 8; scene_tables.MATERIAL_EXT_LAYOUT), as the
@@ -67,10 +111,14 @@ class RayTracer:
         mext = t.material_ext if t.material_ext is not None else np.zeros((self.G, 8), np.float32)
         mt = np.concatenate([np.asarray(t.materials, np.float32).reshape(-1), np.asarray(mext, np.float32).reshape(-1)])
         self.mat_buf = c.buffer(mt.nbytes, mt, "rt_materials")
-        self.n_inst = len(t.inst_table)
+        self.n_inst_static = len(t.inst_table)     # instances refit from the pose rows (geoms, then sites)
+        self.n_inst = len(inst_tab)                # + one identity instance per dynamic object (the scene's instances)
         self.inst_desc = c.buffer(64 * self.n_inst, label="rt_instance_descriptors")
         self.consts = np.zeros(12, np.uint32)
-        self.consts[:4] = (self.n, model.ngeom, self.G, self.tpr)
+        self.consts[:4] = (self.n, t.pose_rows(model), n_inst_slots, self.tpr)
+        if t.site_ids:
+            from metalsim.render.dynamic_mesh import PoseGather
+            self.pose = PoseGather(self.ctx, model, t, n_envs)
         self.consts_f = self.consts.view(np.float32)
         self.consts_f[4] = self.stride; self.consts_f[5] = max_range
         self.consts[7] = max(model.nsite, 1)
@@ -83,8 +131,9 @@ class RayTracer:
         self._build_primitive_structures()
         self._alloc_instance_structure()
         self.event = self.ctx.event
-        self._host_geom_xpos = c.buffer(self.n * model.ngeom * 12, label="rt_host_geom_xpos")
-        self._host_geom_xmat = c.buffer(self.n * model.ngeom * 36, label="rt_host_geom_xmat")
+        rows = t.pose_rows(model)
+        self._host_geom_xpos = c.buffer(self.n * rows * 12, label="rt_host_geom_xpos")
+        self._host_geom_xmat = c.buffer(self.n * rows * 36, label="rt_host_geom_xmat")
         self._host_site_xpos = c.buffer(self.n * max(model.nsite, 1) * 12, label="rt_host_site_xpos")
         self._host_site_xmat = c.buffer(self.n * max(model.nsite, 1) * 36, label="rt_host_site_xmat")
         self._host_cam_xpos = c.buffer(self.n * max(model.ncam, 1) * 12, label="rt_host_cam_xpos")
@@ -120,6 +169,50 @@ class RayTracer:
         cb.commit(); cb.waitUntilCompleted()
         if cb.error() is not None:
             raise RuntimeError(f"primitive acceleration structure build failed: {cb.error()}")
+        self._build_dynamic_structures()
+
+    def _build_dynamic_structures(self):
+        """One primitive structure per dynamic object over every env's triangles, built on the first frame, then refit
+        (and rebuilt every ``dyn_rebuild_every`` frames) after the vertices are regenerated."""
+        self.dyn_as, self.dyn_desc = [], []
+        if self.dyn is None:
+            return
+        c = self.ctx
+        scratch = 16
+        for mesh in self.meshes_all[len(self.tables.meshes):]:
+            g = Metal.MTLAccelerationStructureTriangleGeometryDescriptor.new()
+            g.setVertexBuffer_(self.vbuf); g.setVertexBufferOffset_(0); g.setVertexStride_(32)
+            g.setVertexFormat_(Metal.MTLAttributeFormatFloat3)
+            g.setIndexBuffer_(self.ibuf); g.setIndexBufferOffset_(int(mesh["i_off"]) * 4)
+            g.setIndexType_(Metal.MTLIndexTypeUInt32)
+            g.setTriangleCount_(int(mesh["i_count"]) // 3)
+            g.setOpaque_(True)
+            d = Metal.MTLPrimitiveAccelerationStructureDescriptor.new()
+            d.setGeometryDescriptors_([g])
+            d.setUsage_(Metal.MTLAccelerationStructureUsageRefit)
+            s = c.device.accelerationStructureSizesWithDescriptor_(d)
+            scratch = max(scratch, int(s.buildScratchBufferSize), int(s.refitScratchBufferSize))
+            self.dyn_desc.append(d)
+            self.dyn_as.append(c.device.newAccelerationStructureWithSize_(s.accelerationStructureSize))
+        self.dyn_scratch_stride = (scratch + 255) // 256 * 256      # one scratch region per structure (no sharing)
+        self.dyn_scratch = c.buffer(self.dyn_scratch_stride * len(self.dyn_as), label="rt_dyn_scratch")
+        self.prim_as = list(self.prim_as) + list(self.dyn_as)   # one list for the instance structure (particles.py appends grains)
+        self._dyn_built = False
+
+    def _encode_dynamic(self, cb, src):
+        """Regenerate the dynamic objects' vertices from ``src``, then rebuild or refit their structures."""
+        self.dyn.encode(cb, src)
+        rebuild = (not self._dyn_built) or (self.dyn_rebuild_every > 0 and self._dyn_frames % self.dyn_rebuild_every == 0)
+        ae = cb.accelerationStructureCommandEncoder()
+        for k, (a, d) in enumerate(zip(self.dyn_as, self.dyn_desc)):
+            off = k * self.dyn_scratch_stride
+            if rebuild:
+                ae.buildAccelerationStructure_descriptor_scratchBuffer_scratchBufferOffset_(a, d, self.dyn_scratch, off)
+            else:
+                ae.refitAccelerationStructure_descriptor_destination_scratchBuffer_scratchBufferOffset_(a, d, None, self.dyn_scratch, off)
+        ae.endEncoding()
+        self._dyn_built = True
+        self._dyn_frames += 1
 
     def _alloc_instance_structure(self):
         c = self.ctx
@@ -134,12 +227,38 @@ class RayTracer:
         s = c.device.accelerationStructureSizesWithDescriptor_(d)
         self.inst_as = c.device.newAccelerationStructureWithSize_(s.accelerationStructureSize)
         self.inst_scratch = c.buffer(max(int(s.buildScratchBufferSize), 16), label="rt_inst_scratch")
+        if self.n_inst > self.n_inst_static:   # dynamic objects: identity instances (positions already in the env grid)
+            desc = np.zeros((self.n_inst - self.n_inst_static, 16), np.uint32)
+            f = desc.view(np.float32)
+            f[:, 0] = f[:, 4] = f[:, 8] = 1.0                 # rotation columns (1,0,0), (0,1,0), (0,0,1); translation 0
+            desc[:, 12] = 4                                   # opaque
+            desc[:, 13] = 0xFFFFFFFF
+            desc[:, 15] = len(self.tables.meshes) + np.arange(len(desc))   # after the static meshes in prim_as
+            c.write_buffer(self.inst_desc, desc, offset=64 * self.n_inst_static)
 
     def encode_geom_xmat(self, cb, sim, gm_buf, gm_off):
         """The geom_xmat to refit from: the physics buffer, or its copy with the per-world slot sizes folded in."""
         if self.sized is None:
             return gm_buf, gm_off
         return self.sized.encode(cb, gm_buf, gm_off, sim.m.geom_size)
+
+    def encode_pose(self, cb, sim, gx_buf, gx_off, gm_buf, gm_off):
+        """The pose rows to refit from: the geoms' (as given), then the drawn sites' when the scene has site slots."""
+        if self.pose is None:
+            return gx_buf, gx_off, gm_buf, gm_off
+        sx, sm = wm.buffer_of(sim.d.site_xpos), wm.buffer_of(sim.d.site_xmat)
+        (xb, xo), (mb, mo) = self.pose.encode(cb, (gx_buf, gx_off), (gm_buf, gm_off), (sx.buffer, sx.offset), (sm.buffer, sm.offset))
+        return xb, xo, mb, mo
+
+    def set_sources(self, sim=None, sources=None, datas=None):
+        """Bind the per-frame sources of the dynamic objects: from a MuJoCo Warp ``sim`` (its ``d``) or, on the host
+        path, from ``datas`` (MjData list); ``sources``: {name: array} overrides (``flexvert_xpos`` from another
+        simulator, e.g. ``XPBDSim.x``; one (N, V, 3) array per ``DeformableMesh``)."""
+        if self.dyn is None:
+            if sources:
+                raise ValueError("this scene has no dynamic objects")
+            return
+        self._dyn_src = self.dyn.write_host(datas, sources) if datas is not None else self.dyn.sources_from_sim(sim.d, sources)
 
     def _encode_refit_and_build(self, cb, geom_xpos, gx_off, geom_xmat, gm_off):
         self._encode_refit(cb, geom_xpos, gx_off, geom_xmat, gm_off)
@@ -149,7 +268,18 @@ class RayTracer:
 
     def _encode_refit(self, cb, geom_xpos, gx_off, geom_xmat, gm_off, inst_desc=None):
         """Scene instance descriptors from the physics state into ``inst_desc`` (default: this tracer's own buffer;
-        the particle renderer passes a larger buffer whose tail holds grain instances, metalsim/render/particles.py)."""
+        the particle renderer passes a larger buffer whose tail holds grain instances, metalsim/render/particles.py).
+        The scene instances are the ``n_inst_static`` rigid ones (geoms, sites) refit here, then one identity instance
+        per dynamic object (``n_inst`` in all), whose vertices are regenerated and structures refit first."""
+        if self.dyn is not None:
+            if self._dyn_src is None:
+                raise ValueError("dynamic objects need their sources (set_sources; render / trace call it)")
+            self._encode_dynamic(cb, self._dyn_src)
+            if inst_desc is not None and inst_desc is not self.inst_desc:     # the dynamic objects' identity instances
+                be = cb.blitCommandEncoder()
+                be.copyFromBuffer_sourceOffset_toBuffer_destinationOffset_size_(
+                    self.inst_desc, 64 * self.n_inst_static, inst_desc, 64 * self.n_inst_static, 64 * (self.n_inst - self.n_inst_static))
+                be.endEncoding()
         ce = cb.computeCommandEncoder()
         ce.setComputePipelineState_(self.p_refit)
         ce.setBuffer_offset_atIndex_(inst_desc if inst_desc is not None else self.inst_desc, 0, 0)
@@ -159,12 +289,12 @@ class RayTracer:
         ce.setBuffer_offset_atIndex_(geom_xpos, gx_off, 4)
         ce.setBuffer_offset_atIndex_(geom_xmat, gm_off, 5)
         ce.setBuffer_offset_atIndex_(self.consts_buf, 0, 6)
-        ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n_inst, 1, 1), Metal.MTLSize(64, 1, 1))
+        ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n_inst_static, 1, 1), Metal.MTLSize(64, 1, 1))
         ce.endEncoding()
 
     def _use_resources(self, ce):
         ce.useResource_usage_(self.inst_as, Metal.MTLResourceUsageRead)
-        for a in self.prim_as:
+        for a in self.prim_as:              # static meshes, then the dynamic objects' structures
             ce.useResource_usage_(a, Metal.MTLResourceUsageRead)
 
     # -- sensors ------------------------------------------------------------------------------------
@@ -188,43 +318,57 @@ class RayTracer:
         geoms = np.asarray(self.tables.geoms)
         if isinstance(reflectance, dict):
             names = [mujoco.mj_id2name(self.m, mujoco.mjtObj.mjOBJ_GEOM, int(g)) or "" for g in geoms]
+            names += [e["name"] or "" for e in self.tables.extras]     # extra slots (sites, flexes, ...) follow the geoms
             for key, val in reflectance.items():
                 hit = [k for k, nm in enumerate(names) if nm == key or re.fullmatch(key, nm)]
                 if not hit:
                     raise ValueError(f"no traced geom matches {key!r}")
                 refl[hit] = val
             return refl
-        return np.asarray(reflectance, np.float32)[geoms]
+        if len(geoms) == self.G:
+            return np.asarray(reflectance, np.float32)[geoms]
+        refl[:len(geoms)] = np.asarray(reflectance, np.float32)[geoms]
+        return refl
 
     def make_depth_camera(self, camera: str | int, width: int, height: int):
         return RayDepthCamera(self, camera, width, height)
 
     # -- frame drivers -------------------------------------------------------------------------------
 
-    def trace(self, sim, sensors, after_value: int | None = None) -> int:
+    def trace(self, sim, sensors, after_value: int | None = None, sources=None) -> int:
         """GPU path: refit + rebuild from ``sim`` state, then run each sensor's kernel. Waits for the
-        sim event, signals the context event; returns the value."""
+        sim event, signals the context event; returns the value. ``sources``: see ``set_sources`` (a ``sim``
+        without an event, e.g. ``DeformableSim`` / ``XPBDSim``, must be synchronized by the caller)."""
         import mujoco  # noqa
-        if after_value is None:
-            after_value = sim.event.value
+        ev = getattr(sim, "event", None)
+        if after_value is None and ev is not None:
+            after_value = ev.value
         gx, gm = wm.buffer_of(sim.d.geom_xpos), wm.buffer_of(sim.d.geom_xmat)
+        self.set_sources(sim, sources)
         cb = self.ctx.command_buffer()
-        self.ctx.wait_for(cb, sim.event, after_value)
+        if ev is not None:
+            self.ctx.wait_for(cb, ev, after_value)
         gm_buf, gm_off = self.encode_geom_xmat(cb, sim, gm.buffer, gm.offset)
-        self._encode_refit_and_build(cb, gx.buffer, gx.offset, gm_buf, gm_off)
+        gx_buf, gx_off, gm_buf, gm_off = self.encode_pose(cb, sim, gx.buffer, gx.offset, gm_buf, gm_off)
+        self._encode_refit_and_build(cb, gx_buf, gx_off, gm_buf, gm_off)
         for s in sensors:
             s.encode(cb, sim=sim)
         v = self.ctx.signal(cb)
         self.ctx.commit(cb)
         return v
 
-    def trace_host(self, datas, sensors):
-        """Host path from ``mujoco.MjData`` lists (tests/tools); synchronizes."""
+    def trace_host(self, datas, sensors, sources=None):
+        """Host path from ``mujoco.MjData`` lists (tests/tools); synchronizes. ``sources``: see ``set_sources``."""
         n, ng, ns, nc = self.n, self.m.ngeom, max(self.m.nsite, 1), max(self.m.ncam, 1)
         c = self.ctx
-        c.write_buffer(self._host_geom_xpos, np.stack([d.geom_xpos for d in datas]).astype(np.float32).reshape(n, ng, 3))
+        gx = np.stack([d.geom_xpos for d in datas]).astype(np.float32).reshape(n, ng, 3)
         gm = np.stack([d.geom_xmat for d in datas]).astype(np.float32).reshape(n, ng, 9)
-        c.write_buffer(self._host_geom_xmat, self.sized.scale_host(gm).astype(np.float32) if self.sized is not None else gm)
+        gm = self.sized.scale_host(gm).astype(np.float32) if self.sized is not None else gm
+        if self.pose is not None:
+            gx, gm = self.pose.host(gx, gm, datas)
+        c.write_buffer(self._host_geom_xpos, gx)
+        c.write_buffer(self._host_geom_xmat, gm)
+        self.set_sources(sources=sources, datas=datas)
         if self.m.nsite:
             c.write_buffer(self._host_site_xpos, np.stack([d.site_xpos for d in datas]).astype(np.float32).reshape(n, ns, 3))
             c.write_buffer(self._host_site_xmat, np.stack([d.site_xmat for d in datas]).astype(np.float32).reshape(n, ns, 9))

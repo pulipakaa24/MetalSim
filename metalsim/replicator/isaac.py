@@ -114,20 +114,27 @@ class IsaacAnnotators:
         E = len(self.sem.entities)
         self.E = E
         ent_sem, self.id_to_labels = self.sem.semantic_table(semantic_types)
-        # raw id-buffer value -> geom (-1 background)
+        # raw id-buffer value -> geom (-1 background). Extra objects (sites, flexes, skins, tendons, deformable meshes;
+        # metalsim.render.extras) have ids ngeom + j: no geom (no rigid motion), UNLABELLED in the instance and semantic
+        # buffers (as an unlabelled prim in Isaac), their own id in instance_id_segmentation.
+        nx = len(getattr(t, "extras", None) or [])
         if self.seg_mode == SEG_SLOT:
-            raw_geom = np.concatenate([[-1], self.slot_geom])
+            raw_id = np.concatenate([[-1], self.slot_geom])
         else:
-            raw_geom = np.arange(-1, m.ngeom)
+            raw_id = np.arange(-1, m.ngeom + nx)
+        is_extra = raw_id >= m.ngeom
+        raw_geom = np.where(is_extra, -1, raw_id)
         ge = self.sem.geom_entity
         raw_ent = np.array([-1 if g < 0 else ge[g] for g in raw_geom], np.int64)          # -1 background/unlabelled
         # instance ids: 0 background, 1 unlabelled, entity k -> k + 2
         raw_inst = np.where(raw_geom < 0, BACKGROUND, np.where(raw_ent < 0, UNLABELLED, raw_ent + 2))
         raw_semid = np.where(raw_geom < 0, BACKGROUND, np.where(raw_ent < 0, UNLABELLED, ent_sem[np.maximum(raw_ent, 0)] if E else UNLABELLED))
+        raw_inst = np.where(is_extra, UNLABELLED, raw_inst)
+        raw_semid = np.where(is_extra, UNLABELLED, raw_semid)
         self.lut_geom = torch.as_tensor(raw_geom, device=self.dev)
         self.lut_inst = torch.as_tensor(raw_inst, dtype=torch.int32, device=self.dev)
         self.lut_sem = torch.as_tensor(raw_semid, dtype=torch.int32, device=self.dev)
-        self.lut_iid = torch.as_tensor(raw_geom + 1, dtype=torch.int32, device=self.dev)   # instance_id: geom + 1
+        self.lut_iid = torch.as_tensor(raw_id + 1, dtype=torch.int32, device=self.dev)    # instance_id: geom + 1 (extras: ngeom + 1 + j)
         self.ent_sem = torch.as_tensor(ent_sem, dtype=torch.int64, device=self.dev)
         self.ent_body = torch.as_tensor([e.body for e in self.sem.entities], dtype=torch.long, device=self.dev)
         self.inst_to_path = {"0": "BACKGROUND", "1": "UNLABELLED"}
@@ -137,7 +144,10 @@ class IsaacAnnotators:
             self.inst_to_sem[str(k + 2)] = {t_: v for t_, v in e.labels.items() if t_ in semantic_types}
         self.iid_to_path = {"0": "BACKGROUND"}
         for g in (raw_geom[1:] if self.seg_mode == SEG_SLOT else range(m.ngeom)):
-            self.iid_to_path[str(int(g) + 1)] = self.sem.geom_paths[int(g)]
+            if g >= 0:
+                self.iid_to_path[str(int(g) + 1)] = self.sem.geom_paths[int(g)]
+        for ex in getattr(t, "extras", None) or []:
+            self.iid_to_path[str(int(ex["seg_id"]))] = f"/World/{ex['kind']}/{ex['name'] or ex['seg_id']}"
         self._local_extents = self._entity_local_extents()
         self._slot_verts = None
         # pixel-centre grid
@@ -345,6 +355,8 @@ class IsaacAnnotators:
             t = self.r.tables
             vs, gs, es = [], [], []
             for slot, g in enumerate(self.slot_geom):
+                if g >= self.m.ngeom:       # extra objects (unlabelled)
+                    continue
                 e = self.sem.geom_entity[g]
                 if e < 0:
                     continue
@@ -442,7 +454,7 @@ class IsaacAnnotators:
         if self._occ is None:
             r = self.r
             pr = Tier0Renderer(self.m, self.n, width=self.W, height=self.H, camera=r.cam_id, outputs=("seg",), seg_mode=SEG_GEOM,
-                               shadows=False, decimate_faces=getattr(self, "decimate_faces", 0), ctx=r.ctx)
+                               shadows=False, decimate_faces=getattr(self, "decimate_faces", 0), visual=False, ctx=r.ctx)
             ng, nc = self.m.ngeom, max(self.m.ncam, 1)
 
             class _D:
