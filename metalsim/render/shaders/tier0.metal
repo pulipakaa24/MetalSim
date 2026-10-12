@@ -70,6 +70,11 @@ struct Semantic { int geom, body, root, group; };
 
 #include "appearance.h"
 
+// corner-attribute layout (see corner_fetch below)
+constant bool corner_fc [[function_constant(0)]];
+constant bool CORNER_ATTRS = is_function_constant_defined(corner_fc) ? corner_fc : false;
+struct CornerAttr { float4 a; float4 b; };   // a: normal xyz, u | b: v
+
 struct Consts {
     uint n_envs, n_geoms, n_slots, tiles_per_row;
     uint tile_w, tile_h, atlas_w, atlas_h;
@@ -306,7 +311,8 @@ vertex VSOut trans_vs(
     constant TransConsts&    tc        [[buffer(8)]],
     device const MeshRange*  meshes    [[buffer(9)]],
     device const uint*       indices   [[buffer(10)]],
-    constant uint&           reverse   [[buffer(11)]])
+    constant uint&           reverse   [[buffer(11)]],
+    device const CornerAttr* corners   [[buffer(12)]])
 {
     uint r = inst / c.n_envs, env = inst - r * c.n_envs;
     if (reverse) r = tc.n_trans - 1 - r;
@@ -322,13 +328,64 @@ vertex VSOut trans_vs(
     uint vi = indices[mr.i_off + vid];
     device const float* v = verts + vi * 8;
     float3 pos = float3(v[0], v[1], v[2]), nrm = float3(v[3], v[4], v[5]);
+    float2 tuv = float2(v[6], v[7]);
+    if (CORNER_ATTRS) { CornerAttr ca = corners[mr.i_off + vid]; nrm = ca.a.xyz; tuv = float2(ca.a.w, ca.b.x); }
     float3 p, n;
     slot_world(env, slot, slot_geom, geom_xpos, geom_xmat, c, pos, nrm, p, n);
     EnvParams e = envs[env];
     float4 clip = tile_clip(e.view_proj * float4(p, 1.0), e.tile);
     o.clip = clip;
     clip_to_tile(o.clip_distance, clip, e.tile);
-    o.world_pos = p; o.normal_w = n; o.uv = float2(v[6], v[7]); o.env = env; o.slot = slot; o.local_pos = pos;
+    o.world_pos = p; o.normal_w = n; o.uv = tuv; o.env = env; o.slot = slot; o.local_pos = pos;
+    return o;
+}
+
+
+// -------------------------------------------------------------------------------------------------
+// Corner attributes (Tier0Renderer(normals="corner_fs" / "corner_vs")): vertices are shared by position and each
+// triangle corner's normal / uv lives in a per-corner table in index order (scene_tables corner_attributes), so a hard
+// edge does not duplicate vertices. corner_fs: the fragment stage reads the triangle's three corners by primitive_id
+// and blends them with the hardware's perspective-correct barycentrics (what the rasterizer's own interpolation of
+// per-vertex attributes computes). corner_vs: a non-indexed draw pulls position and corner attributes per corner.
+
+inline FSIn corner_fetch(FSIn in, uint prim, float3 bary, device const CornerAttr* corners, device const uint* slot_ibase,
+                         device const Semantic* sem, device const float* geom_xmat, constant Consts& c)
+{
+    uint ib = slot_ibase[in.slot];
+    if (ib == 0xFFFFFFFFu) return in;              // a slot outside the corner table (sites, extras)
+    uint b = ib + prim * 3u;
+    CornerAttr c0 = corners[b], c1 = corners[b + 1], c2 = corners[b + 2];
+    float3 n = c0.a.xyz * bary.x + c1.a.xyz * bary.y + c2.a.xyz * bary.z;
+    in.uv = float2(c0.a.w, c0.b.x) * bary.x + float2(c1.a.w, c1.b.x) * bary.y + float2(c2.a.w, c2.b.x) * bary.z;
+    float3x3 R = load_mat33(geom_xmat + (in.env * c.n_geoms + uint(sem[in.slot].geom)) * 9);
+    in.normal_w = R * n;
+    return in;
+}
+
+vertex VSOut geom_vs_pull(
+    uint vid [[vertex_id]],                       // global corner index (vertexStart = the mesh's first index)
+    uint inst [[instance_id]],
+    device const float*      verts     [[buffer(0)]],
+    device const EnvParams*  envs      [[buffer(1)]],
+    device const uint2*      inst_tab  [[buffer(2)]],
+    device const int*        slot_geom [[buffer(3)]],
+    device const float*      geom_xpos [[buffer(4)]],
+    device const float*      geom_xmat [[buffer(5)]],
+    constant Consts&         c         [[buffer(7)]],
+    device const uint*       indices   [[buffer(8)]],
+    device const CornerAttr* corners   [[buffer(9)]])
+{
+    device const float* v = verts + indices[vid] * 8;
+    CornerAttr ca = corners[vid];
+    float3 p, n; uint env, slot;
+    float3 pos = float3(v[0], v[1], v[2]);
+    instance_world(inst, inst_tab, slot_geom, geom_xpos, geom_xmat, c, pos, ca.a.xyz, p, n, env, slot);
+    EnvParams e = envs[env];
+    float4 clip = tile_clip(e.view_proj * float4(p, 1.0), e.tile);
+    VSOut o;
+    o.clip = clip;
+    clip_to_tile(o.clip_distance, clip, e.tile);
+    o.world_pos = p; o.normal_w = n; o.uv = float2(ca.a.w, ca.b.x); o.env = env; o.slot = slot; o.local_pos = pos;
     return o;
 }
 
@@ -549,8 +606,66 @@ inline float extra_shadow(depth2d_array<float> smaps, sampler ss, device const S
     return smaps.sample_compare(ss, auv, v, ref);
 }
 
+// Per-env culling of the extra shadow views (Tier0Renderer(shadow_cull=True)): an instance is drawn into view v only
+// when its bounding sphere (geom_xpos, rbound) meets v's frustum. One thread per (view, instance) appends the
+// instance to its mesh's region of view v's list and bumps that draw's indirect instance count; shadow_view_vs reads
+// the compacted list as its instance table. Conservative (sphere vs the six planes), so the maps are unchanged.
+struct SvDraw { uint i_off, i_count, first, _p; };            // one per shadow draw (mesh)
+
+kernel void shadow_cull_reset(
+    device uint*           args   [[buffer(0)]],   // (n_views, n_draws, 5) MTLDrawIndexedPrimitivesIndirectArguments
+    device const SvDraw*   draws  [[buffer(1)]],
+    constant uint4&        k      [[buffer(2)]],   // n_views, n_draws, n_inst (list stride per view)
+    uint i [[thread_position_in_grid]])
+{
+    if (i >= k.x * k.y) return;
+    uint v = i / k.y, d = i - v * k.y;
+    device uint* a = args + i * 5;
+    a[0] = draws[d].i_count; a[1] = 0u; a[2] = draws[d].i_off; a[3] = 0u; a[4] = v * k.z + draws[d].first;
+}
+
+kernel void shadow_cull(
+    device const ShadowView* views     [[buffer(0)]],   // (n_envs, n_views)
+    device const uint2*      inst_tab  [[buffer(1)]],
+    device const int*        inst_draw [[buffer(2)]],   // per instance: shadow draw index, -1 not drawn
+    device const int*        slot_geom [[buffer(3)]],
+    device const float*      geom_xpos [[buffer(4)]],
+    device const float*      slot_rb   [[buffer(5)]],   // bounding radius per slot
+    constant Consts&         c         [[buffer(6)]],
+    constant uint4&          k         [[buffer(7)]],
+    device atomic_uint*      args      [[buffer(8)]],
+    device uint2*            list      [[buffer(9)]],   // (n_views, n_inst)
+    device const SvDraw*     draws     [[buffer(10)]],
+    uint tid [[thread_position_in_grid]])
+{
+    uint n_inst = k.z;
+    if (tid >= k.x * n_inst) return;
+    uint v = tid / n_inst, i = tid - v * n_inst;
+    int d = inst_draw[i];
+    if (d < 0) return;
+    uint2 pr = inst_tab[i];
+    device const float* xp = geom_xpos + (pr.x * c.n_geoms + uint(slot_geom[pr.y])) * 3;
+    float4 p = float4(xp[0], xp[1], xp[2], 1.0);
+    float r = slot_rb[pr.y];
+    float4x4 M = views[pr.x * c.n_shadow_views + v].vp;
+    float4 r0 = float4(M[0][0], M[1][0], M[2][0], M[3][0]), r1 = float4(M[0][1], M[1][1], M[2][1], M[3][1]);
+    float4 r2 = float4(M[0][2], M[1][2], M[2][2], M[3][2]), r3 = float4(M[0][3], M[1][3], M[2][3], M[3][3]);
+    float4 pl[6] = { r3 + r0, r3 - r0, r3 + r1, r3 - r1, r2, r3 - r2 };
+    for (uint q = 0; q < 6; ++q) {
+        float len = length(pl[q].xyz);
+        if (len > 0.0 && dot(pl[q], p) / len < -r) return;     // fully outside one plane
+    }
+    uint slot_in_draw = atomic_fetch_add_explicit(args + (v * k.y + uint(d)) * 5 + 1, 1u, memory_order_relaxed);
+    list[v * n_inst + draws[d].first + slot_in_draw] = pr;
+}
+
 fragment FSOut geom_fs(
-    FSIn in [[stage_in]],
+    FSIn in0 [[stage_in]],
+    uint prim [[primitive_id]],
+    float3 bary [[barycentric_coord]],
+    device const CornerAttr* corners   [[buffer(21)]],
+    device const uint*       slot_ibase [[buffer(22)]],
+    device const float*      geom_xmat [[buffer(23)]],
     device const EnvParams* envs       [[buffer(1)]],
     device const Material*  mats       [[buffer(2)]],
     device const Semantic*  sem        [[buffer(3)]],
@@ -569,6 +684,7 @@ fragment FSOut geom_fs(
     device const int4*       light_sv  [[buffer(20)]],
     depth2d_array<float>     smaps     [[texture(3)]])
 {
+    FSIn in = CORNER_ATTRS ? corner_fetch(in0, prim, bary, corners, slot_ibase, sem, geom_xmat, c) : in0;
     EnvParams e = envs[in.env];
     Material m = mats[in.slot];
     float4 mod = per_inst[in.env * c.n_slots + in.slot];
@@ -904,7 +1020,12 @@ inline bool occluded(instance_acceleration_structure accel, float3 origin, float
 }
 
 fragment FSOut geom_fs_rt(
-    FSIn in [[stage_in]],
+    FSIn in0 [[stage_in]],
+    uint prim [[primitive_id]],
+    float3 bary [[barycentric_coord]],
+    device const CornerAttr* corners   [[buffer(21)]],
+    device const uint*       slot_ibase [[buffer(22)]],
+    device const float*      geom_xmat [[buffer(23)]],
     device const EnvParams* envs       [[buffer(1)]],
     device const Material*  mats       [[buffer(2)]],
     device const Semantic*  sem        [[buffer(3)]],
@@ -926,6 +1047,7 @@ fragment FSOut geom_fs_rt(
     texture2d<float>        atlas      [[texture(0)]],
     sampler                 samp       [[sampler(0)]])
 {
+    FSIn in = CORNER_ATTRS ? corner_fetch(in0, prim, bary, corners, slot_ibase, sem, geom_xmat, c) : in0;
     EnvParams e = envs[in.env];
     Material m = mats[in.slot];
     float4 mod = per_inst[in.env * c.n_slots + in.slot];

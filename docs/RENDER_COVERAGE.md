@@ -227,23 +227,70 @@ This workstream fixed gaps #3, #6, #9, #10, #11, #15 and #16 (lights), measured 
 - A capsule's cube-map coordinates use one scale for the whole capsule; MuJoCo's hemispheres differ slightly.
 - Planes seen from behind are not made more transparent, as MuJoCo does.
 
-**Cost** (`render_appearance_cost.py`; M4 Max; 128×128; best of 3×10 frames): **preliminary, measured as a contended `check` job.** The timing queue was deadlocked: waiters running an older `gpu_lock.py` were waiting behind newer ones. Up to 3 jobs shared the GPU. Before and after were rendered back to back, so their ratio is indicative.
+**Cost.**
+- **Setup:** `scripts/diagnostics/render_appearance_cost.py`; M4 Max, exclusive `timing` job, 2026-10-12 08:08 after the reboot; render only, 128×128, best of 3×10 frames; raw rows in `docs/measurements/render_appearance_cost.jsonl`.
+- **Configurations:**
+  - **before:** `appearance="legacy"`, `transparency=False`, `shadow_lights="caster"`, `max_lights=8`, `skybox=False`.
+  - **split:** the fixes with the split-vertex layout and no shadow-view culling (the first version).
+  - **corner_vs:** vertex pulling.
+  - **after:** the defaults, `normal_layout="corner_fs"` and `shadow_cull=True`.
 
-| scene | renderer, envs | before ms (env-frames/s) | after ms (env-frames/s) | why |
+| scene | renderer, envs | before | split | corner_vs | after (default) | note |
+|---|---|---|---|---|---|---|
+| SO-101 box task, full meshes | T0, 1024 | 142.1 ms | 271.0 | 256.6 | **141.9** | vertices 162,026 → 618,831 (split) → 161,927 (shared) |
+| SO-101, decimated to 3000 faces per mesh (the lift task's training setting) | T0, 1024 | 19.19 ms | 27.96 | 33.87 | **19.18** | |
+| G1 rough terrain, head camera (the G1 task's camera path) | T0, 1024 | 34.69 ms | 34.43 | 34.34 | **34.32** | no change |
+| Franka Panda | T0, 1024 | 53.97 ms | 175.2 | 109.9 | **78.8** | +1 shadow pass for its shadow-casting spot light; culling 78.4 vs 78.8 (the cone covers the robot) |
+| point + spot light probe | T0, 1024 | 2.51 ms | 3.88 | 3.06 | **3.33** | 7 extra shadow views; culling 4.16 → 3.33 |
+| glass pane | T0, 1024 | 2.09 ms | 1.95 | 2.11 | **2.47** | transparent pass |
+| SO-101 / SO-101 decimated / Panda | T1, 256 | 44.4 / 21.5 / 22.3 ms | | | **43.9 / 21.2 / 22.1** | |
+| glass pane / point + spot | T1, 256 | 1.00 / 1.62 ms | | | **1.98 / 1.65** | transparent pass |
+| SO-101 / Panda | T2, 64 (4 spp, 2 bounces) | 18.6 / 22.2 ms | | | **18.7 / 22.5** | |
+| glass pane | T2, 64 | 1.71 ms | | | **8.48** | presence through the pane, attenuated shadow rays; the before path drew it opaque |
+
+**Result.** With `corner_fs`, correct hard-edge normals cost nothing measurable: SO-101 full meshes 141.9 vs 142.1 ms, decimated 19.18 vs 19.19 ms. The remaining additions are features that were missing before:
+- Panda's spot-light shadow pass, +25 ms at 1024 envs.
+- The transparent passes on scenes that have transparent geoms.
+
+**Shadow-view culling.** Per env, against each view's frustum. It pays where the views see a fraction of the scene (point lights: 4.16 → 3.33 ms) and is neutral otherwise. The Panda spot cone covers the whole robot, so its shadow pass has nothing to cull.
+
+**Tier-1 Panda kernels, run alone first after the reboot.** Exclusive `timing` job under `watchdog_run.py` (60 s stall limit), as the coordinator asked, because the contended run had been on Panda tier 1 when the GPU hung. Tier 1 at 1, 4, 64 and 256 envs, legacy and default settings: every launch returned (≤ 0.41 s), no stall.
+
+Every loop added to the shaders is bounded:
+- `sort_transparent`: at most 64 objects.
+- `transmit`: 8 surfaces.
+- Presence passes: 16.
+- The `shadow_cull` plane test.
+
+**Hard-edge normals without duplicated vertices** (`Tier0Renderer(normal_layout=...)`, default `"corner_fs"`). The first version's slowdown (the split column above) came from the split-vertex layout: one vertex per distinct (position, normal, uv), so hard edges quadrupled SO-101's vertices (162 K → 619 K) and the raster is vertex-bound. Two alternatives keep vertices shared by position and store each triangle corner's normal / uv in a per-corner table in index order (`scene_tables` `corner_attributes`):
+
+- **`corner_fs`.** The fragment stage reads the triangle's three corners by `primitive_id` and blends them with the hardware's perspective-correct `barycentric_coord`, then rotates by the geom's `geom_xmat`. This is a function-constant specialization of `geom_fs` / `geom_fs_rt`.
+- **`corner_vs`.** A non-indexed draw: the vertex stage pulls the position by index and the normal / uv per corner (`geom_vs_pull`).
+
+Height-field tiles keep their vertex normals. The transparent pass pulls the corner table in `trans_vs`. Shadow passes need positions only, and now draw the shared ones.
+
+**Measured on the 14-inch M4 Max** (`scripts/diagnostics/render_normal_layout.py`, check job; ratios, not headline timings; 256 envs, 128×128, render only; the exclusive numbers are in the cost table above):
+
+| scene | `split` | `corner_fs` | `corner_vs` | vertices (split → shared) |
 |---|---|---|---|---|
-| SO-101 box task, full-resolution meshes | T0, 1024 | 152 (6,737) | 297 (3,450) | Vertices 162 K → 619 K: hard edges split the corners, the same count MuJoCo uploads. Indices are unchanged (975 K per env), so the raster is vertex-bound. |
-| SO-101 | T1, 256 | 62 (4,103) | 80 (3,200) | same |
-| SO-101 | T2, 64 (4 spp, 2 bounces) | 104 (615) | 95 (673) | No measurable change (ray tracing does not depend on the vertex count). |
-| Franka Panda (Menagerie) | T0, 1024 | 68 (15,059) | 193 (5,300) | The shadow-casting spot light gets its own shadow pass; vertices 69 K → 396 K |
+| SO-101, full meshes | 71.5 ms | **33.2 ms** (2.15×) | 67.9 ms | 618,831 → 161,927 |
+| Franka Panda | 45.7 ms | **20.2 ms** (2.26×) | 28.7 ms | 395,565 → 69,358 |
 
-Not measured yet:
-- SO-101 decimated to 3000 faces per mesh. This is the lift task's training setting, `LiftConfig.decimate_faces`; its vertex counts are far smaller.
-- G1 rough-terrain head camera. It has no meshes with hard edges in its collision set and one directional light, so no extra shadow pass.
-- Exclusive timings.
+`corner_vs` runs the vertex stage once per corner (975 K for SO-101), which loses most of the gain on Apple's GPU. `corner_fs` keeps post-transform reuse, and its three extra corner reads per fragment cost less than the vertex work they replace.
 
-The second run stalled on Panda tier 1 and the watchdog killed it at 1500 s. That was during the window when this Mac's GPU hung (02:34; the coordinator attributes the hang to another agent's kernel). The stall is not explained yet.
+**Equivalence** against `split` (SO-101, Panda, glass, mesh box, point + spot shadows, textures; tier 0 and tier 1; rgb, depth, segmentation, normals):
+
+| variant | rgb | depth / segmentation | normal output |
+|---|---|---|---|
+| `corner_vs` | bit-identical | bit-identical | bit-identical |
+| `corner_fs` | ≤ 1 level on 0.18 % of SO-101 pixels; ≤ 2 levels on 0.07 % of Panda's; identical on the probes | bit-identical | within 5e-4, the 16-bit target's rounding |
+
+The `corner_fs` differences come from blending the corner normals in the fragment stage rather than interpolating the rotated vertex normals.
+
+**Culling the extra shadow views** (`shadow_cull=True`, default): each extra shadow view draws only the instances whose bounding sphere meets its frustum, per env. A reset and a cull kernel build compacted per-view instance lists; the draws are indirect. The result is bit-identical in every scene above. Panda's spot cone covers the whole robot, so its time is unchanged (20.2 vs 20.2 ms). The saving is for point lights (six faces) and narrow spots.
 
 **Speed levers:**
+- `normal_layout="corner_fs"` (default).
 - `decimate_faces` (LOD normals use the same MuJoCo rule).
 - `shadow_lights="caster"`.
 - `appearance="legacy"`, the old tables and old cost.

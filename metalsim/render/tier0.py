@@ -43,8 +43,8 @@ class Tier0Renderer:
                  decimate_faces: int = 0, shadows: bool = True, tier: int = 0, rt_samples: int = 4,
                  terrain_slots: bool = True, draw_hfields: bool = True, hfield_cull: bool = True, hfield_tile: int = 16,
                  appearance: str = "mujoco", skybox: bool = True, shadow_lights: str = "all", max_lights: int | None = None,
-                 transparency: bool = True, transparent_ids: str = "surface",
-                 visual=None, deformables=(), tube_slices=None, cap_stacks=None,
+                 transparency: bool = True, transparent_ids: str = "surface", normal_layout: str = "corner_fs",
+                 shadow_cull: bool = True, visual=None, deformables=(), tube_slices=None, cap_stacks=None,
                  ctx: MetalContext | None = None, device="metal:0"):
         """tier 0: raster + shadow maps. tier 1: raster G-buffer with ray-traced shadows, ambient
         occlusion and mirror reflections from the fragment stage (Metal hardware ray tracing).
@@ -98,6 +98,10 @@ class Tier0Renderer:
             raise ValueError(f"transparent_ids must be 'surface', 'behind' or 'mujoco', got {transparent_ids!r}")
         self.transparent_ids = "surface" if transparent_ids == "mujoco" else transparent_ids
         self.transparency = transparency
+        if normal_layout not in ("split", "corner_fs", "corner_vs"):
+            raise ValueError(f"normal_layout must be 'split', 'corner_fs' or 'corner_vs', got {normal_layout!r}")
+        self.normal_layout = normal_layout
+        self.shadow_cull = shadow_cull
         self.rt = None
         self.n = n_envs
         self.tw, self.th = width, height
@@ -109,7 +113,8 @@ class Tier0Renderer:
         self.tables: SceneTables = build_scene_tables(model, n_envs, max_group=max_group, include_planes=include_planes,
                                                       decimate_faces=decimate_faces, sized_geoms="auto" if terrain_slots else (),
                                                       draw_hfields=draw_hfields, appearance=appearance,
-                                                      visual=visual, deformables=deformables)
+                                                      visual=visual, deformables=deformables,
+                                                      corner_attributes=normal_layout != "split")
         self.G = self.tables.G
         self._extras_kw = dict(visual=mujoco.MjvOption() if visual is None else visual, deformables=deformables,
                                tube_slices=tube_slices, cap_stacks=cap_stacks)   # the camera default: everything MuJoCo draws
@@ -176,6 +181,15 @@ class Tier0Renderer:
         self.mat_buf = c.buffer(t.materials.nbytes, t.materials, "materials")
         mext = t.material_ext if t.material_ext is not None else np.zeros((self.G, 8), np.float32)
         self.mat_ext_buf = c.buffer(mext.nbytes, np.ascontiguousarray(mext, np.float32), "material_ext")
+        # corner attributes (normal_layout != "split"): per-index normal / uv table and each slot's first index
+        if t.corners is not None:
+            self.corner_buf = (c.buffer(t.corners.nbytes, t.corners, "corner_attrs") if len(t.corners)
+                               else c.buffer(32, label="corner_attrs"))      # extras-only scene: no geom corners
+            ib = np.full(self.G, 0xFFFFFFFF, np.uint32)     # extra slots (sites, deformables): their own vertex normals
+            ib[:len(t.geom_mesh)] = [t.meshes[int(k)]["i_off"] for k in t.geom_mesh]
+            self.slot_ibase_buf = c.buffer(ib.nbytes, ib, "slot_index_base")
+        else:
+            self.corner_buf = self.slot_ibase_buf = self.mat_buf      # bound, never read
         self.sem_buf = c.buffer(t.semantic.nbytes, t.semantic, "semantic")
         self.env_buf = c.buffer(self.n * (2 * 64 + 9 * 16), label="env_params")
         # per-env camera spec (host-written); defaults: model camera, no delta, white light from above
@@ -272,6 +286,31 @@ class Tier0Renderer:
         self.trans_consts_buf = c.buffer(16, np.array([self.n_trans, self.trans_max_index, 0, 0], np.uint32), "trans_consts")
         self.trans_order_buf = c.buffer(4 * self.n * self.n_trans, label="trans_order")
 
+    def _build_shadow_cull(self):
+        """Per-env frustum culling of the extra shadow views (tier0.metal shadow_cull): per-instance draw index,
+        per-slot bounding radius, indirect arguments (n_views x n_draws) and compacted instance lists."""
+        self.sv_cull = bool(self.shadow_cull and getattr(self, "n_views", 0))
+        if not self.sv_cull:
+            return
+        c, t, m = self.ctx, self.tables, self.m
+        n_inst = len(t.inst_table)
+        idraw = np.full(n_inst, -1, np.int32)
+        sd = np.zeros((len(self._shadow_draws), 4), np.uint32)
+        for k, (i_off, i_count, first, count) in enumerate(self._shadow_draws):
+            idraw[first:first + count] = k
+            sd[k, :3] = (i_off, i_count, first)
+        rb = np.full(self.G, 1e6, np.float32)          # extra slots (sites, ...): never culled
+        rb[:len(t.geoms)] = [1e6 if (t.sized is not None and t.sized[s_]) else float(m.geom_rbound[g]) * 1.0001 + 1e-4
+                             for s_, g in enumerate(t.geoms)]
+        self.sv_ndraw = len(self._shadow_draws)
+        self.sv_kc = np.array([self.n_views, self.sv_ndraw, n_inst, 0], np.uint32)
+        self.sv_inst_draw = c.buffer(idraw.nbytes, idraw, "sv_inst_draw")
+        self.sv_draws = c.buffer(sd.nbytes, sd, "sv_draws")
+        self.sv_rb = c.buffer(rb.nbytes, rb, "sv_rbound")
+        self.sv_args = c.buffer(self.n_views * self.sv_ndraw * 20, label="sv_args")
+        self.sv_list = c.buffer(self.n_views * n_inst * 8, label="sv_list")
+        self.sv_n_inst = n_inst
+
     def _build_shadow_views(self):
         """Extra shadow views (tier0.metal build_shadow_views): one per shadow-casting model light other than the
         caster (the first shadow-casting directional light), six for a point light."""
@@ -310,6 +349,7 @@ class Tier0Renderer:
         src = t.draws_opaque if (self.n_trans and t.draws_opaque is not None) else t.draws
         self._draws = [d for k, d in enumerate(src) if not (self.hfield_cull and k in hf_mesh) and d[3] > 0]
         self._shadow_draws = [d for k, d in enumerate(t.draws) if not (self.hfield_cull and k in hf_mesh)]   # all geoms cast
+        self._build_shadow_cull()
         self.n_tiles = 0
         if not self.hfield_cull:
             return
@@ -373,10 +413,22 @@ class Tier0Renderer:
         lay = vd.layouts().objectAtIndexedSubscript_(0)
         lay.setStride_(32); lay.setStepFunction_(Metal.MTLVertexStepFunctionPerVertex)
 
-        def make(vs, fs, depth_write, depth_cmp, with_vd):
+        def fn(name, corner=False):
+            """Function specialized on tier0.metal's corner_fc constant (every function is, so all can be built)."""
+            cv = Metal.MTLFunctionConstantValues.new()
+            import ctypes
+            v = ctypes.c_bool(bool(corner))            # PyObjC takes the value's address for the void* argument
+            cv.setConstantValue_type_atIndex_(ctypes.addressof(v), Metal.MTLDataTypeBool, 0)
+            f, err = lib.newFunctionWithName_constantValues_error_(name, cv, None)
+            if f is None:
+                raise RuntimeError(f"function {name}: {err}")
+            return f
+        self._fn = fn
+
+        def make(vs, fs, depth_write, depth_cmp, with_vd, vs_corner=False, fs_corner=False):
             d = Metal.MTLRenderPipelineDescriptor.new()
-            d.setVertexFunction_(lib.newFunctionWithName_(vs))
-            d.setFragmentFunction_(lib.newFunctionWithName_(fs))
+            d.setVertexFunction_(fn(vs, vs_corner))
+            d.setFragmentFunction_(fn(fs, fs_corner))
             if with_vd:
                 d.setVertexDescriptor_(vd)
             ca = d.colorAttachments()
@@ -390,10 +442,15 @@ class Tier0Renderer:
             ds.setDepthCompareFunction_(depth_cmp)
             return p, c.device.newDepthStencilStateWithDescriptor_(ds)
 
-        self.geo_pipe, self.geo_ds = make("geom_vs", "geom_fs_rt" if self.tier >= 1 else "geom_fs", True, Metal.MTLCompareFunctionLess, True)
+        gfs = "geom_fs_rt" if self.tier >= 1 else "geom_fs"
+        if self.normal_layout == "corner_vs":          # vertex pulling: position by index, normal / uv by corner
+            self.geo_pipe, self.geo_ds = make("geom_vs_pull", gfs, True, Metal.MTLCompareFunctionLess, False)
+        else:
+            self.geo_pipe, self.geo_ds = make("geom_vs", gfs, True, Metal.MTLCompareFunctionLess, True,
+                                              fs_corner=self.normal_layout == "corner_fs")
         self.bg_pipe, self.bg_ds = make("bg_vs", "bg_fs", False, Metal.MTLCompareFunctionAlways, False)
         d = Metal.MTLRenderPipelineDescriptor.new()
-        d.setVertexFunction_(lib.newFunctionWithName_("shadow_vs"))
+        d.setVertexFunction_(fn("shadow_vs"))
         d.setVertexDescriptor_(vd)
         d.setDepthAttachmentPixelFormat_(Metal.MTLPixelFormatDepth32Float)
         self.shadow_pipe = c.render_pipeline(d)
@@ -401,8 +458,8 @@ class Tier0Renderer:
         if self.n_trans:
             self.p_sort_trans = c.compute_pipeline(lib, "sort_transparent")
             d = Metal.MTLRenderPipelineDescriptor.new()
-            d.setVertexFunction_(lib.newFunctionWithName_("trans_vs"))
-            d.setFragmentFunction_(lib.newFunctionWithName_("geom_fs_rt" if self.tier >= 1 else "geom_fs"))
+            d.setVertexFunction_(fn("trans_vs", self.normal_layout != "split"))   # pulls corner normals itself
+            d.setFragmentFunction_(fn("geom_fs_rt" if self.tier >= 1 else "geom_fs"))
             ca = d.colorAttachments()
             a0 = ca.objectAtIndexedSubscript_(0)
             a0.setPixelFormat_(Metal.MTLPixelFormatRGBA8Unorm)
@@ -427,28 +484,31 @@ class Tier0Renderer:
             self.trans_ds = dss
         if self.n_views:
             d = Metal.MTLRenderPipelineDescriptor.new()
-            d.setVertexFunction_(lib.newFunctionWithName_("shadow_view_vs"))
-            d.setFragmentFunction_(lib.newFunctionWithName_("shadow_view_fs"))
+            d.setVertexFunction_(fn("shadow_view_vs"))
+            d.setFragmentFunction_(fn("shadow_view_fs"))
             d.setVertexDescriptor_(vd)
             d.setDepthAttachmentPixelFormat_(Metal.MTLPixelFormatDepth32Float)
             self.sview_pipe = c.render_pipeline(d)
             self.p_sviews = c.compute_pipeline(lib, "build_shadow_views")
+            if self.sv_cull:
+                self.p_sv_reset = c.compute_pipeline(lib, "shadow_cull_reset")
+                self.p_sv_cull = c.compute_pipeline(lib, "shadow_cull")
             if self.tables.dyn:
                 d = Metal.MTLRenderPipelineDescriptor.new()
-                d.setVertexFunction_(lib.newFunctionWithName_("dyn_shadow_view_vs"))
-                d.setFragmentFunction_(lib.newFunctionWithName_("shadow_view_fs"))
+                d.setVertexFunction_(fn("dyn_shadow_view_vs"))
+                d.setFragmentFunction_(fn("shadow_view_fs"))
                 d.setDepthAttachmentPixelFormat_(Metal.MTLPixelFormatDepth32Float)
                 self.dyn_sview_pipe = c.render_pipeline(d)
         if self.tables.dyn:
             self.dyn_pipe, _ = make("dyn_vs", "geom_fs_rt" if self.tier >= 1 else "geom_fs", True, Metal.MTLCompareFunctionLess, False)
             d = Metal.MTLRenderPipelineDescriptor.new()
-            d.setVertexFunction_(lib.newFunctionWithName_("dyn_shadow_vs"))
+            d.setVertexFunction_(fn("dyn_shadow_vs"))
             d.setDepthAttachmentPixelFormat_(Metal.MTLPixelFormatDepth32Float)
             self.dyn_shadow_pipe = c.render_pipeline(d)
         if self.hfield_cull:
             self.hf_pipe, _ = make("hf_tile_vs", "geom_fs_rt" if self.tier >= 1 else "geom_fs", True, Metal.MTLCompareFunctionLess, False)
             d = Metal.MTLRenderPipelineDescriptor.new()
-            d.setVertexFunction_(lib.newFunctionWithName_("hf_tile_shadow_vs"))
+            d.setVertexFunction_(fn("hf_tile_shadow_vs"))
             d.setDepthAttachmentPixelFormat_(Metal.MTLPixelFormatDepth32Float)
             self.hf_shadow_pipe = c.render_pipeline(d)
             self.p_hf_reset = c.compute_pipeline(lib, "hf_cull_reset")
@@ -625,6 +685,26 @@ class Tier0Renderer:
             ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n * self.n_views, 1, 1),
                                                       Metal.MTLSize(min(self.n * self.n_views, 64), 1, 1))
             ce.endEncoding()
+            if self.sv_cull:     # per-env, per-view instance lists (frustum vs bounding sphere)
+                kb = self.sv_kc.tobytes()
+                ce = cb.computeCommandEncoder()
+                ce.setComputePipelineState_(self.p_sv_reset)
+                ce.setBuffer_offset_atIndex_(self.sv_args, 0, 0); ce.setBuffer_offset_atIndex_(self.sv_draws, 0, 1)
+                ce.setBytes_length_atIndex_(kb, 16, 2)
+                nr = self.n_views * self.sv_ndraw
+                ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(nr, 1, 1), Metal.MTLSize(min(nr, 64), 1, 1))
+                ce.endEncoding()
+                ce = cb.computeCommandEncoder()
+                ce.setComputePipelineState_(self.p_sv_cull)
+                for i, (b, o) in enumerate(((self.sviews_buf, 0), (self.inst_buf, 0), (self.sv_inst_draw, 0), (self.slot_geom, 0),
+                                            (geom_xpos, geom_xpos_off), (self.sv_rb, 0), (self.consts_buf, 0))):
+                    ce.setBuffer_offset_atIndex_(b, o, i)
+                ce.setBytes_length_atIndex_(kb, 16, 7)
+                ce.setBuffer_offset_atIndex_(self.sv_args, 0, 8); ce.setBuffer_offset_atIndex_(self.sv_list, 0, 9)
+                ce.setBuffer_offset_atIndex_(self.sv_draws, 0, 10)
+                nt = self.n_views * self.sv_n_inst
+                ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(nt, 1, 1), Metal.MTLSize(min(nt, 256), 1, 1))
+                ce.endEncoding()
             for v in range(self.n_views):
                 sp = Metal.MTLRenderPassDescriptor.new()
                 da = sp.depthAttachment()
@@ -645,9 +725,15 @@ class Tier0Renderer:
                 se.setFragmentBuffer_offset_atIndex_(self.consts_buf, 0, 7)
                 se.setFragmentBytes_length_atIndex_(vb, 4, 8)
                 se.setFragmentBuffer_offset_atIndex_(light_xpos, light_xpos_off, 9)
-                for i_off, i_count, first, count in self._shadow_draws:
-                    se.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_instanceCount_baseVertex_baseInstance_(
-                        Metal.MTLPrimitiveTypeTriangle, i_count, Metal.MTLIndexTypeUInt32, self.ibuf, i_off * 4, count, 0, first)
+                if self.sv_cull:
+                    se.setVertexBuffer_offset_atIndex_(self.sv_list, 0, 2)      # baseInstance in the args indexes view v's list
+                    for d in range(self.sv_ndraw):
+                        se.drawIndexedPrimitives_indexType_indexBuffer_indexBufferOffset_indirectBuffer_indirectBufferOffset_(
+                            Metal.MTLPrimitiveTypeTriangle, Metal.MTLIndexTypeUInt32, self.ibuf, 0, self.sv_args, (v * self.sv_ndraw + d) * 20)
+                else:
+                    for i_off, i_count, first, count in self._shadow_draws:
+                        se.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_instanceCount_baseVertex_baseInstance_(
+                            Metal.MTLPrimitiveTypeTriangle, i_count, Metal.MTLIndexTypeUInt32, self.ibuf, i_off * 4, count, 0, first)
                 if self.dyn is not None:            # deformables, tendons and skins cast every light's shadow too
                     se.setRenderPipelineState_(self.dyn_sview_pipe)
                     self._draw_dyn(se)
@@ -705,6 +791,9 @@ class Tier0Renderer:
         re.setFragmentBuffer_offset_atIndex_(self.mat_ext_buf, 0, 18)
         re.setFragmentBuffer_offset_atIndex_(self.sviews_buf, 0, 19)
         re.setFragmentBuffer_offset_atIndex_(self.light_sv_buf, 0, 20)
+        re.setFragmentBuffer_offset_atIndex_(self.corner_buf, 0, 21)
+        re.setFragmentBuffer_offset_atIndex_(self.slot_ibase_buf, 0, 22)
+        re.setFragmentBuffer_offset_atIndex_(geom_xmat, geom_xmat_off, 23)
         re.setFragmentTexture_atIndex_(self.smaps_tex, 3)
         re.setFragmentTexture_atIndex_(self.atlas_tex, 0)
         re.setFragmentTexture_atIndex_(self.shadow_tex, 2)
@@ -723,9 +812,16 @@ class Tier0Renderer:
             re.setFragmentBuffer_offset_atIndex_(rt.vbuf, 0, 15)
             re.setFragmentBuffer_offset_atIndex_(rt.ibuf, 0, 16)
             re.setFragmentBuffer_offset_atIndex_(rt.inst_desc, 0, 17)
-        for i_off, i_count, first, count in self._draws:
-            re.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_instanceCount_baseVertex_baseInstance_(
-                Metal.MTLPrimitiveTypeTriangle, i_count, Metal.MTLIndexTypeUInt32, self.ibuf, i_off * 4, count, 0, first)
+        if self.normal_layout == "corner_vs":
+            re.setVertexBuffer_offset_atIndex_(self.ibuf, 0, 8)
+            re.setVertexBuffer_offset_atIndex_(self.corner_buf, 0, 9)
+            for i_off, i_count, first, count in self._draws:
+                re.drawPrimitives_vertexStart_vertexCount_instanceCount_baseInstance_(
+                    Metal.MTLPrimitiveTypeTriangle, i_off, i_count, count, first)
+        else:
+            for i_off, i_count, first, count in self._draws:
+                re.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_instanceCount_baseVertex_baseInstance_(
+                    Metal.MTLPrimitiveTypeTriangle, i_count, Metal.MTLIndexTypeUInt32, self.ibuf, i_off * 4, count, 0, first)
         if self.hfield_cull:
             re.setRenderPipelineState_(self.hf_pipe)
             self._bind_hf(re, self.hf_vis)
@@ -755,6 +851,7 @@ class Tier0Renderer:
                                         (self.consts_buf, 0), (self.trans_consts_buf, 0), (self.mesh_range_buf, 0),
                                         (self.ibuf, 0))):
                 re.setVertexBuffer_offset_atIndex_(b, o, i)
+            re.setVertexBuffer_offset_atIndex_(self.corner_buf, 0, 12)
             for rev in (0, 1):
                 re.setDepthStencilState_(self.trans_ds[rev])
                 re.setVertexBytes_length_atIndex_(np.array([rev], np.uint32).tobytes(), 4, 11)
