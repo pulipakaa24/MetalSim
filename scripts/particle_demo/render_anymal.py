@@ -49,7 +49,8 @@ ap.add_argument("--flip-mesh-v", type=int, default=1, help="1: mirror mesh UVs (
 ap.add_argument("--cam-eye", type=float, nargs=3, default=None, help="debug camera position (with --cam-target)")
 ap.add_argument("--cam-target", type=float, nargs=3, default=None)
 ap.add_argument("--ground-z", type=float, default=0.098, help="render-only ground plane height (just under the bed top)")
-ap.add_argument("--ground-albedo", type=float, default=0.2, help="ground plane albedo relative to the grain palette mean")
+ap.add_argument("--ground-albedo", type=float, default=0.68,
+                help="ground plane albedo relative to the grain palette mean (0.68: matches the grain field's radiance)")
 ap.add_argument("--decor-overlap", type=float, default=0.18)
 ap.add_argument("--decor-falloff", type=float, default=1.2, help="width of the decoration's thinning border [m]")
 ap.add_argument("--decor", type=float, nargs=4, default=[-2.6, -2.5, 2.6, 6.0],
@@ -94,7 +95,7 @@ for l in list(spec.lights):
     spec.delete(l)
 tex = spec.add_texture(name="sand_ground", type=mujoco.mjtTexture.mjTEXTURE_2D, file=sand_tex)
 img = iio.imread(sand_tex)[..., :3].astype(np.float32) / 255.0
-tex_mean = (img ** 2.2).reshape(-1, 3).mean(0)      # linear mean albedo of the texture
+tex_mean = img.reshape(-1, 3).mean(0)      # the atlas reads texture bytes as linear values (no sRGB decode)
 grain_mat = GrainMaterial()
 pal = np.array([p[:3] for p in grain_mat.palette]); w = np.array([p[3] for p in grain_mat.palette])
 grain_mean = (pal * w[:, None]).sum(0) / w.sum()
@@ -102,8 +103,14 @@ tint = np.clip(a.ground_albedo * grain_mean / tex_mean, 0, 1)
 mat = spec.add_material(name="sand_ground", texrepeat=[0.8, 0.8], texuniform=True,
                         rgba=[float(tint[0]), float(tint[1]), float(tint[2]), 1.0], specular=0.0, shininess=0.0)
 mat.textures[mujoco.mjtTextureRole.mjTEXROLE_RGB] = "sand_ground"
-spec.worldbody.add_geom(name="ground", type=mujoco.mjtGeom.mjGEOM_PLANE, size=[60, 60, 0.1], pos=[0, 0, a.ground_z],
-                         material="sand_ground")
+# the ground: four finite planes around the robot's path (the bed interior minus --decor-overlap), so footprints show
+# the bed's own sand, never the raised plane; their edges lie under the decoration grains
+bx0_, by0_, _, bx1_, by1_, _ = meta["bed"]
+hx0, hx1, hy0, hy1 = bx0_ + a.decor_overlap, bx1_ - a.decor_overlap, by0_ + a.decor_overlap, by1_ - a.decor_overlap
+for nm, (x0, x1, y0, y1) in {"ground_l": (-60, hx0, -60, 60), "ground_r": (hx1, 60, -60, 60),
+                              "ground_b": (hx0, hx1, -60, hy0), "ground_f": (hx0, hx1, hy1, 60)}.items():
+    spec.worldbody.add_geom(name=nm, type=mujoco.mjtGeom.mjGEOM_PLANE, size=[(x1 - x0) / 2, (y1 - y0) / 2, 0.1],
+                            pos=[(x0 + x1) / 2, (y0 + y1) / 2, a.ground_z], material="sand_ground")
 sd = sun["direction"]
 spec.worldbody.add_light(name="sun", type=mujoco.mjtLightType.mjLIGHT_DIRECTIONAL, pos=[0, 0, 10], dir=list(-sd),
                          diffuse=[1, 1, 1], specular=[0, 0, 0], ambient=[0, 0, 0], castshadow=True)
@@ -258,12 +265,15 @@ if any(a.decor):
 
 # ---- renderer ----
 radius_grain = p_radius / a.grains ** (1 / 3) * a.grain_scale
+print(f"[render] stage: building the renderer ({model.ngeom} geoms, {model.ntex} textures)", flush=True)
 r = Tier2Renderer(model, 1, width=a.width, height=a.height, camera="cine", spp=a.spp, max_bounces=a.bounces,
                   material_model="omnipbr", headlight=False, tonemap="rtx", exposure=1.0,
                   usd_lights=[{"intensity": 1.0, "color": tuple(sun["irradiance"] / np.pi),
                                "angle_deg": 2 * np.rad2deg(max(sun["angular_radius"], 0.0047))}],
                   denoise=a.denoise, aux=True, center_sample=False)
+print("[render] stage: renderer built; environment map", flush=True)
 r.set_environment(sky, yaw=yaw)
+print("[render] stage: environment set", flush=True)
 # robot materials: painted / plastic shells with a clear-coat gloss (Menagerie leaves specular 0)
 mats = r.tables.materials.reshape(r.G, 16).copy()
 for slot, g in enumerate(r.tables.geoms):
@@ -292,6 +302,8 @@ for k in rng_frames:
     P = np.concatenate([Ps, decor])
     r.set_particles(P, radius=p_radius, grains_per_particle=a.grains, grain_radius=radius_grain, ids=ids)
     eye, q = camera(k, t)
+    if k == rng_frames[0]:
+        print(f"[render] stage: first frame ({len(P)} particles)", flush=True)
     out = r.render_host([data], passes=a.passes, cam_pos=eye[None], cam_quat=q[None], chunk=4)
     hdr_img = out["hdr_denoised"][0] if "hdr_denoised" in out else out["hdr"][0]
     if exposure <= 0:   # automatic: the median scene luminance to 0.2 before the ACES curve

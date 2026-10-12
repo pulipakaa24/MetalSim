@@ -69,9 +69,10 @@ def test_grain_meshes_unit_volume():
 def test_single_grain_coverage_and_irradiance():
     """One spherical grain seen from above under a directional light along the view axis.
 
-    Coverage: grain pixels = projected disk area pi r^2 / pixel area (within 2 %; the polyhedron is inscribed).
-    Radiance: a Lambertian sphere lit head-on, seen head-on, has mean radiance over its disk
-    rho * E / pi * <cos> with <cos> = 2/3 (E = pi * diffuse, the stack's convention), within 2 %."""
+    Coverage: grain pixels = the sphere's silhouette area / pixel area (within 2 %).
+    Radiance: a Lambertian sphere lit along the view axis: each pixel's radiance is rho * E / pi * cos(theta) at the
+    point its ray hits the true sphere (E = pi * diffuse, the stack's convention); the mean over the interior pixels
+    matches within 2 %."""
     L, rho, r, fovy, W = 0.7, 0.6, 0.05, 20.0, 256
     m = mujoco.MjModel.from_xml_string(TOPDOWN.format(L=L, fovy=fovy))
     rt = Tier2Renderer(m, 1, width=W, height=W, spp=16, max_bounces=1, headlight=False)
@@ -88,12 +89,18 @@ def test_single_grain_coverage_and_irradiance():
     assert abs(grain.sum() / expect - 1) < 0.02, (grain.sum(), expect)
     hdr = out["hdr"][0][..., 0]
     yy, xx = np.mgrid[0:W, 0:W]
+    # analytic radiance per pixel centre: perspective ray from (0, 0, d) against the sphere of radius r at the origin
+    f = 0.5 * W / np.tan(np.radians(fovy) / 2)
+    dx, dy = (xx + 0.5 - W / 2) / f, -(yy + 0.5 - W / 2) / f
+    dirs = np.stack([dx, dy, -np.ones_like(dx)], -1); dirs /= np.linalg.norm(dirs, axis=-1, keepdims=True)
+    o = np.array([0.0, 0.0, d])
+    b = dirs @ o; disc = b * b - (o @ o - r * r)
+    hit = disc > 0
+    tt = -b - np.sqrt(np.where(hit, disc, 0))
+    nz = (o[2] + tt * dirs[..., 2]) / r
+    ana = np.where(hit, rho * L * np.clip(nz, 0, None), 0.0)
     inner = (np.hypot(xx + 0.5 - W / 2, yy + 0.5 - W / 2) < 0.95 * np.sqrt(expect / np.pi))   # skip the edge pixels
-    # analytic mean over the inner disk of radius a*R: cos = sqrt(1 - s^2), mean over s < a: 2/3 (1 - (1 - a^2)^1.5) / a^2
-    a = 0.95
-    mean_cos = 2 / 3 * (1 - (1 - a * a) ** 1.5) / (a * a)
-    analytic = rho * L * mean_cos
-    assert abs(hdr[inner].mean() / analytic - 1) < 0.02, (hdr[inner].mean(), analytic)
+    assert abs(hdr[inner].mean() / ana[inner].mean() - 1) < 0.02, (hdr[inner].mean(), ana[inner].mean())
     outer = np.hypot(xx + 0.5 - W / 2, yy + 0.5 - W / 2) > 1.05 * np.sqrt(expect / np.pi) + 1
     assert np.all(hdr[outer] == 0)            # black sky, no other geometry in view
 
@@ -147,7 +154,9 @@ def test_batched_envs_and_isolation():
     assert g[0].sum() > 100 and g[1].sum() > 100 and g[2].sum() == 0
     cx = [np.nonzero(g[e])[1].mean() for e in (0, 1)]
     assert cx[0] != pytest.approx(cx[1], abs=3)
-    assert np.array_equal(g[0], g[3])          # identical geometry in env 0 and env 3 (separate tiles of one structure)
+    # env 3 holds env 0's particles ~2.8 km away in the shared structure: same grains up to float32 position rounding
+    iou = (g[0] & g[3]).sum() / (g[0] | g[3]).sum()
+    assert iou > 0.97, iou
 
 
 def test_determinism():

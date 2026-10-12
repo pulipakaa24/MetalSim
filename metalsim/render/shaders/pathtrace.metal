@@ -368,7 +368,10 @@ kernel void path_trace(
                 break;
             }
             Material m; float4 mod; float eps = 0.001;   // eps: offset of rays leaving this surface
-            if (h.grain) { m = grain_material(g_mat, g_keys[h.gid]); mod = float4(1.0); eps = c.grain_eps; tmin = c.grain_eps; }
+            if (h.grain) {   // mm-sized grains: a small offset, but at least ~8 ulp of the position (far envs sit km away)
+                m = grain_material(g_mat, g_keys[h.gid]); mod = float4(1.0);
+                eps = max(c.grain_eps, 1e-6 * max(fabs(h.p.x), max(fabs(h.p.y), fabs(h.p.z)))); tmin = eps;
+            }
             else { m = mats[h.slot]; mod = per_inst[e * c.n_slots + h.slot]; tmin = 0.0005; }
             float3 base = material_base(m, mod, h.uv, atlas, samp);
             float metallic = m.mrse.x, rough = max(m.mrse.y, 0.03), specw = m.mrse.z, emission = m.mrse.w;
