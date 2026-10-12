@@ -43,7 +43,8 @@ parity = ["imageio", "imageio-ffmpeg", "pillow", "scikit-image", "lpips", "flip-
 # metalsim-hashtable-metal; the same change as patches/newton/metalsim-hashtable-metal-24fb5367.diff on 45458023).
 # The MetalSim fork with the solver fixes goes into a separate environment (scripts/setup_newton.sh), Newton 1.5.2
 # for MPM into .venv-newton152 (scripts/setup_newton152.sh).
-newton = ["newton @ git+https://github.com/pulipakaa24/newton@24fb53679efbb45de4bc08a1631759789ee9db2e"]
+newton = ["newton @ git+https://github.com/pulipakaa24/newton@24fb53679efbb45de4bc08a1631759789ee9db2e",
+          "newton-usd-schemas==0.5.0"]   # Newton's USD importer (the G1 Newton-engine task loads the USD asset)
 
 [project.urls]
 Homepage = "https://github.com/pulipakaa24/MetalSim"
