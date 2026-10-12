@@ -15,6 +15,8 @@ from dataclasses import dataclass, field
 import mujoco
 import numpy as np
 
+from metalsim.render import builtin_geoms as bg
+
 _BOX_FACES = np.array([
     [[1, -1, -1], [1, 1, -1], [1, 1, 1]], [[1, -1, -1], [1, 1, 1], [1, -1, 1]],
     [[-1, -1, -1], [-1, 1, 1], [-1, 1, -1]], [[-1, -1, -1], [-1, -1, 1], [-1, 1, 1]],
@@ -91,19 +93,103 @@ def _tris_to_indexed(tri, uv=None, smooth=True):
     return verts, normals, uvs, idx
 
 
+def geom_rgba(m: mujoco.MjModel, g: int) -> np.ndarray:
+    """Colour MuJoCo draws geom ``g`` with (``setMaterial`` in mjv_updateScene): the material's rgba, unless the geom's
+    own rgba differs from the default (0.5, 0.5, 0.5, 1) or there is no material."""
+    mat = int(m.geom_matid[g])
+    rgba = np.asarray(m.geom_rgba[g], np.float32)
+    if mat >= 0 and np.array_equal(rgba, np.array([0.5, 0.5, 0.5, 1.0], np.float32)):
+        return np.asarray(m.mat_rgba[mat], np.float32).copy()
+    return rgba.copy()
+
+
+def _tris_to_indexed_normals(tri, uv, nrm):
+    """(F,3,3) triangles with per-corner uv (F,3,2) and normals (F,3,3) -> indexed vertices; corners merge only
+    when position, uv and normal all agree (hard edges stay split)."""
+    flat = tri.reshape(-1, 3)
+    uv_flat = np.zeros((len(flat), 2)) if uv is None else uv.reshape(-1, 2)
+    n_flat = nrm.reshape(-1, 3)
+    key = np.round(np.concatenate([flat, uv_flat, n_flat], axis=1), 6)
+    _, first, inverse = np.unique(key, axis=0, return_index=True, return_inverse=True)
+    idx = inverse.reshape(-1, 3).astype(np.uint32)
+    normals = n_flat[first]
+    normals = normals / np.maximum(np.linalg.norm(normals, axis=1, keepdims=True), 1e-12)
+    return flat[first], normals, uv_flat[first], idx
+
+
 @dataclass
 class TextureAtlas:
+    """Every model texture (2D, cube, skybox) packed into one RGBA8 image.
+
+    Convention (MuJoCo's, kept for any texture backend): rows are stored as in ``tex_data``, so texture coordinate
+    t = 0 is the first row of ``tex_data`` (the top of the image file; MuJoCo's OBJ loader stores 1 - v), exactly as
+    MuJoCo uploads it to OpenGL. Cube and skybox textures keep their face strip (+X, -X, +Y, -Y, +Z, -Z stacked
+    vertically, or one square face used for all six). Each texture is padded by one texel that wraps around (the 2D
+    textures repeat), so bilinear filtering at a tile edge reads the opposite edge rather than black."""
     image: np.ndarray                      # (H, W, 4) uint8
     rects: dict = field(default_factory=dict)  # texid -> (u0, v0, du, dv)
+    info: dict = field(default_factory=dict)   # texid -> (kind 0 2D / 1 cube / 2 skybox, faces 1 or 6, srgb 0 / 1)
+
+    @staticmethod
+    def texture_info(m: mujoco.MjModel, t: int):
+        kind = {int(mujoco.mjtTexture.mjTEXTURE_2D): 0, int(mujoco.mjtTexture.mjTEXTURE_CUBE): 1,
+                int(mujoco.mjtTexture.mjTEXTURE_SKYBOX): 2}.get(int(m.tex_type[t]), 0)
+        w, h = int(m.tex_width[t]), int(m.tex_height[t])
+        faces = 6 if (kind > 0 and h == 6 * w) else 1
+        srgb = 1 if (hasattr(m, "tex_colorspace") and int(m.tex_colorspace[t]) == int(mujoco.mjtColorSpace.mjCOLORSPACE_SRGB)) else 0
+        return kind, faces, srgb
 
     @classmethod
     def build(cls, m: mujoco.MjModel):
         if m.ntex == 0:
-            return cls(np.full((4, 4, 4), 255, np.uint8), {})
+            return cls(np.full((4, 4, 4), 255, np.uint8), {}, {})
+        pad = 1
+        usable = [t for t in range(m.ntex) if int(m.tex_nchannel[t]) in (1, 3, 4)]
+        if not usable:
+            return cls(np.full((4, 4, 4), 255, np.uint8), {}, {})
+        widths = [int(m.tex_width[t]) for t in range(m.ntex)]
+        heights = [int(m.tex_height[t]) for t in range(m.ntex)]
+        aw = max(widths[t] for t in usable) + 2 * pad
+        order = sorted(usable, key=lambda t: -heights[t])
+        x = y = shelf_h = 0
+        pos = {}
+        for t in order:
+            w, h = widths[t] + 2 * pad, heights[t] + 2 * pad
+            if x + w > aw:
+                y += shelf_h
+                x = 0
+                shelf_h = 0
+            pos[t] = (x + pad, y + pad)
+            x += w
+            shelf_h = max(shelf_h, h)
+        ah = y + shelf_h
+        img = np.zeros((ah, aw, 4), np.uint8)
+        img[..., 3] = 255
+        rects, info = {}, {}
+        for t in usable:
+            w, h = widths[t], heights[t]
+            nc = int(m.tex_nchannel[t])
+            adr = int(m.tex_adr[t])
+            data = m.tex_data[adr:adr + w * h * nc].reshape(h, w, nc)
+            rgba = np.empty((h, w, 4), np.uint8)
+            rgba[..., :3] = data[..., :3] if nc >= 3 else data[..., :1]
+            rgba[..., 3] = data[..., 3] if nc == 4 else 255
+            px, py = pos[t]
+            # one texel of wrap-around padding on every side (np.pad 'wrap')
+            img[py - pad:py + h + pad, px - pad:px + w + pad] = np.pad(rgba, ((pad, pad), (pad, pad), (0, 0)), mode="wrap")
+            rects[t] = (px / aw, py / ah, w / aw, h / ah)
+            info[t] = cls.texture_info(m, t)
+        return cls(img, rects, info)
+
+    @classmethod
+    def build_legacy(cls, m: mujoco.MjModel):
+        """The atlas before 2026-10 (appearance="legacy"): rows flipped, black padding, no skybox."""
+        if m.ntex == 0:
+            return cls(np.full((4, 4, 4), 255, np.uint8), {}, {})
         pad = 1
         usable = [t for t in range(m.ntex) if int(m.tex_type[t]) != int(mujoco.mjtTexture.mjTEXTURE_SKYBOX)]
         if not usable:
-            return cls(np.full((4, 4, 4), 255, np.uint8), {})
+            return cls(np.full((4, 4, 4), 255, np.uint8), {}, {})
         widths = [int(m.tex_width[t]) for t in range(m.ntex)]
         heights = [int(m.tex_height[t]) for t in range(m.ntex)]
         aw = max(widths[t] for t in usable) + 2 * pad
@@ -127,19 +213,24 @@ class TextureAtlas:
         img = np.zeros((ah, aw, 4), np.uint8)
         img[..., 3] = 255
         rects = {}
-        for t in range(m.ntex):
-            if int(m.tex_type[t]) == int(mujoco.mjtTexture.mjTEXTURE_SKYBOX):
-                continue  # environment maps are handled separately, not atlased
+        for t in usable:
             w, h = widths[t], heights[t]
             nc = int(m.tex_nchannel[t])
             adr = int(m.tex_adr[t])
             data = m.tex_data[adr:adr + w * h * nc].reshape(h, w, nc)
             px, py = pos[t]
-            img[py:py + h, px:px + w, :3] = data[::-1, :, :3]   # MuJoCo rows are bottom-up
+            img[py:py + h, px:px + w, :3] = data[::-1, :, :3]
             if nc == 4:
                 img[py:py + h, px:px + w, 3] = data[::-1, :, 3]
             rects[t] = (px / aw, py / ah, w / aw, h / ah)
-        return cls(img, rects)
+        return cls(img, rects, {t: cls.texture_info(m, t) for t in rects})
+
+    def skybox(self, m: mujoco.MjModel):
+        """(texid, rect, faces) of the first skybox texture (the one MuJoCo draws), or None."""
+        for t in range(m.ntex):
+            if int(m.tex_type[t]) == int(mujoco.mjtTexture.mjTEXTURE_SKYBOX) and t in self.rects:
+                return t, self.rects[t], self.info[t][1]
+        return None
 
 
 @dataclass
@@ -204,10 +295,14 @@ def build_lights(m: mujoco.MjModel) -> np.ndarray:
     return L
 
 
-def scene_params(m: mujoco.MjModel) -> np.ndarray:
-    """(5, 4) float32: bounds center+radius | headlight ambient | headlight diffuse | headlight specular + active | sky colour + present."""
+def scene_params(m: mujoco.MjModel, atlas: TextureAtlas | None = None) -> np.ndarray:
+    """(7, 4) float32: bounds center+radius | headlight ambient | headlight diffuse | headlight specular + active |
+    sky colour + present | skybox atlas rect (u0, v0, du, dv) | skybox (faces, drawn, 0, 0).
+
+    Rows 0-4 are the original layout. Rows 5-6 (with ``atlas``) let the renderers draw MuJoCo's skybox as its cube
+    map (the first skybox texture, as ``mjr_render``): direction d maps to cube coordinates (d.x, d.z, -d.y)."""
     hl = m.vis.headlight
-    P = np.zeros((5, 4), np.float32)
+    P = np.zeros((7, 4), np.float32)
     P[0, :3] = m.stat.center; P[0, 3] = max(float(m.stat.extent), 0.1)
     P[1, :3] = hl.ambient; P[2, :3] = hl.diffuse; P[3, :3] = hl.specular; P[3, 3] = float(hl.active)
     # sky: mean colour of the skybox texture (reflection misses and default background), w = present
@@ -218,6 +313,9 @@ def scene_params(m: mujoco.MjModel) -> np.ndarray:
             img = m.tex_data[adr:adr + w * h * nc].reshape(h, w, nc)[:, :, :3].astype(np.float32) / 255.0
             P[4, :3] = img.mean(axis=(0, 1)); P[4, 3] = 1.0
             break
+    sky = atlas.skybox(m) if atlas is not None else None
+    if sky is not None:
+        P[5] = sky[1]; P[6, 0] = float(sky[2]); P[6, 1] = 1.0
     return P
 
 
@@ -244,6 +342,16 @@ class SceneTables:
     G: int
     # slots drawn as a unit primitive scaled by the per-world geom_size at render time (see build_scene_tables)
     sized: np.ndarray = None    # (G,) bool
+    # per-slot texture mapping beyond the material block (see MATERIAL_EXT_LAYOUT); None = all zero
+    material_ext: np.ndarray = None   # (G, 8) float32
+    # transparency: slots MuJoCo draws blended (alpha < 0.995) and the draws of the remaining (opaque) instances
+    transparent: np.ndarray = None    # (G,) bool
+    draws_opaque: list = None         # as ``draws``, each mesh's opaque instances only (they come first in its range)
+
+    # material extension block (float4 x 2), read with the material by every renderer:
+    # 0: uv offset xy (added after the texrepeat scale), texture kind (0 2D, 1 cube), sRGB texture (1: decode to linear)
+    # 1: cube object scale xyz (geom-frame position -> MuJoCo's cube-map object coordinates), cube faces (1 or 6)
+    MATERIAL_EXT_LAYOUT = ("uvoffset_kind_srgb", "cubescale_faces")
 
     def sized_geom_ids(self) -> list:
         return [g for g, f in zip(self.geoms, self.sized) if f] if self.sized is not None else []
@@ -356,14 +464,20 @@ def hfield_mesh(m: mujoco.MjModel, hid: int):
 
 def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, include_planes: bool = True,
                        plane_extent: float = 5.0, smooth: bool = True, decimate_faces: int = 0,
-                       sized_geoms="auto", draw_hfields: bool = True) -> SceneTables:
+                       sized_geoms="auto", draw_hfields: bool = True, appearance: str = "mujoco") -> SceneTables:
     """``decimate_faces``: per-mesh triangle budget for a level of detail (0 = undecimated).
 
     ``sized_geoms``: box geoms drawn as a unit box scaled at render time by the per-world ``geom_size`` (the renderer
     reads MuJoCo Warp's ``Model.geom_size``); "auto" = ``per_world_size_geoms(m)`` (the rough terrain's box slots),
     () = the previous behaviour (every box baked at its compiled size; the slots then drew as 2 mm cubes). Their
     material is the terrain heightfield's (the first drawn hfield geom), when the model has one.
-    ``draw_hfields``: heightfield geoms as their exact top surface (False: skipped, the previous behaviour)."""
+    ``draw_hfields``: heightfield geoms as their exact top surface (False: skipped, the previous behaviour).
+    ``appearance``: "mujoco" (default) draws what MuJoCo's renderer draws (``metalsim.render.builtin_geoms``): its
+    primitive tessellations, normals and texture coordinates, mesh normals with hard edges kept, SDF geoms from their
+    mesh, cube textures, the skybox, and geom rgba resolved against the material as ``mjv_updateScene`` does;
+    "legacy" = the tables before 2026-10 (smooth-averaged mesh normals, own UVs, image rows flipped), for comparison."""
+    if appearance not in ("mujoco", "legacy"):
+        raise ValueError(f"appearance must be 'mujoco' or 'legacy', got {appearance!r}")
     if isinstance(sized_geoms, str):
         sized_geoms = per_world_size_geoms(m) if sized_geoms == "auto" else ()
     sized_set = {int(g) for g in sized_geoms}
@@ -371,9 +485,38 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
     meshes, geoms, geom_mesh = [], [], []
     all_v, all_n, all_uv, all_i = [], [], [], []
     v_off = i_off = 0
-    atlas = TextureAtlas.build(m)
+    atlas = TextureAtlas.build(m) if appearance == "mujoco" else TextureAtlas.build_legacy(m)
+
+    def geom_tris_mujoco(g, unit=False):
+        """(positions, uv, normals) per corner, as MuJoCo's renderer draws geom g (metalsim.render.builtin_geoms)."""
+        t = int(m.geom_type[g])
+        size = np.ones(3) if unit else m.geom_size[g]
+        if t in (mujoco.mjtGeom.mjGEOM_MESH, mujoco.mjtGeom.mjGEOM_SDF):
+            mid = int(m.geom_dataid[g])
+            if mid < 0:
+                return None, None, None
+            P, U, N = bg.mesh_triangles(m, mid)
+            if decimate_faces and len(P) > decimate_faces:
+                va, vn = int(m.mesh_vertadr[mid]), int(m.mesh_vertnum[mid])
+                fa, fn = int(m.mesh_faceadr[mid]), int(m.mesh_facenum[mid])
+                v_d, f_d = _decimate(m.mesh_vert[va:va + vn].astype(np.float64), m.mesh_face[fa:fa + fn].astype(np.int64),
+                                     decimate_faces)
+                P, U, N = v_d[f_d], None, bg.mujoco_vertex_normals(v_d, f_d)
+            if U is None:
+                U = bg.texgen_uv(P)
+            return P, U, N
+        if t == mujoco.mjtGeom.mjGEOM_BOX and unit:
+            return bg.primitive(m, t, np.ones(3), plane_extent)
+        out = bg.primitive(m, t, size, plane_extent)
+        return (None, None, None) if out is None else out
 
     def geom_tris(g, unit=False):
+        if appearance == "mujoco":
+            return geom_tris_mujoco(g, unit)
+        tri, uv = geom_tris_legacy(g, unit)
+        return tri, uv, None
+
+    def geom_tris_legacy(g, unit=False):
         t = int(m.geom_type[g])
         size = np.ones(3) if unit else m.geom_size[g]
         if t == mujoco.mjtGeom.mjGEOM_MESH:
@@ -423,7 +566,10 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
         t = int(m.geom_type[g])
         if t == mujoco.mjtGeom.mjGEOM_PLANE and not include_planes:
             continue
-        if m.geom_rgba[g][3] == 0.0 and int(m.geom_matid[g]) < 0:
+        if appearance == "mujoco":
+            if geom_rgba(m, g)[3] == 0.0:       # mjv_updateScene skips geoms whose (material-resolved) alpha is 0
+                continue
+        elif m.geom_rgba[g][3] == 0.0 and int(m.geom_matid[g]) < 0:
             continue
         if t == mujoco.mjtGeom.mjGEOM_HFIELD:
             if not draw_hfields:
@@ -431,6 +577,8 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
             key = ("hfield", int(m.geom_dataid[g]))
             if key not in mesh_cache:
                 verts, normals, uvs, idx = hfield_mesh(m, int(m.geom_dataid[g]))
+                if appearance == "mujoco":
+                    uvs = bg.texgen_uv(verts)         # MuJoCo's object-linear mapping (scale / offset per material)
                 mesh_cache[key] = len(meshes)
                 meshes.append({"i_off": i_off, "i_count": int(idx.size), "radius": float(np.linalg.norm(verts, axis=1).max()),
                                "v_off": v_off, "hfield": int(m.geom_dataid[g])})   # row-major (nrow, ncol) grid from v_off
@@ -439,17 +587,21 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
                 v_off += len(verts); i_off += idx.size
             geom_mesh.append(mesh_cache[key]); geoms.append(g)
             continue
+        is_mesh = t == mujoco.mjtGeom.mjGEOM_MESH or (appearance == "mujoco" and t == mujoco.mjtGeom.mjGEOM_SDF)
         if g in sized_set:
             key = ("unit", t)
         else:
-            key = ("mesh", int(m.geom_dataid[g])) if t == mujoco.mjtGeom.mjGEOM_MESH else (t, tuple(np.round(m.geom_size[g], 6)))
+            key = ("mesh", int(m.geom_dataid[g])) if is_mesh else (t, tuple(np.round(m.geom_size[g], 6)))
         if key not in mesh_cache:
-            tri, uv = geom_tris(g, unit=g in sized_set)
+            tri, uv, nrm = geom_tris(g, unit=g in sized_set)
             if tri is None:
                 continue
-            verts, normals, uvs, idx = _tris_to_indexed(tri, uv, smooth=smooth and t == mujoco.mjtGeom.mjGEOM_MESH
-                                                        or t in (mujoco.mjtGeom.mjGEOM_SPHERE, mujoco.mjtGeom.mjGEOM_CAPSULE,
-                                                                 mujoco.mjtGeom.mjGEOM_ELLIPSOID))
+            if nrm is not None:
+                verts, normals, uvs, idx = _tris_to_indexed_normals(tri, uv, nrm)
+            else:
+                verts, normals, uvs, idx = _tris_to_indexed(tri, uv, smooth=smooth and t == mujoco.mjtGeom.mjGEOM_MESH
+                                                            or t in (mujoco.mjtGeom.mjGEOM_SPHERE, mujoco.mjtGeom.mjGEOM_CAPSULE,
+                                                                     mujoco.mjtGeom.mjGEOM_ELLIPSOID))
             mesh_cache[key] = len(meshes)
             meshes.append({"i_off": i_off, "i_count": int(idx.size),
                            "radius": float(np.linalg.norm(verts, axis=1).max())})
@@ -472,23 +624,35 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
     inter[:, 6:8] = np.concatenate(all_uv).astype(np.float32)
     indices = np.concatenate(all_i).astype(np.uint32)
 
-    draws, table = [], []
-    first = 0
     geom_mesh = np.asarray(geom_mesh)
+    # transparent slots (MuJoCo: rgba alpha < 0.995 after the material, mjr_render's test); decided from the geoms'
+    # colours here, the instance table below lists each mesh's opaque slots first
+    alpha = np.array([(geom_rgba(m, g) if appearance == "mujoco" else
+                       (m.mat_rgba[int(m.geom_matid[g])] if int(m.geom_matid[g]) >= 0 else m.geom_rgba[g]))[3] for g in geoms])
+    transparent = (alpha < 0.995) & np.array([g not in sized_set and int(m.geom_type[g]) != int(mujoco.mjtGeom.mjGEOM_HFIELD)
+                                              for g in geoms], bool)   # heightfields stay opaque (tile path)
+    draws, draws_opaque, table = [], [], []
+    first = 0
     for mi in range(len(meshes)):
         slots = np.flatnonzero(geom_mesh == mi)
+        slots = np.concatenate([slots[~transparent[slots]], slots[transparent[slots]]])
         pairs = [(e, int(s)) for s in slots for e in range(n_envs)]
         table.extend(pairs)
         draws.append((meshes[mi]["i_off"], meshes[mi]["i_count"], first, len(pairs)))
+        n_op = int((~transparent[slots]).sum()) * n_envs       # may be 0: entries stay aligned with ``draws``
+        draws_opaque.append((meshes[mi]["i_off"], meshes[mi]["i_count"], first, n_op))
         first += len(pairs)
     inst_table = np.asarray(table, np.uint32).reshape(-1, 2)
 
     mats = np.zeros((G, 16), np.float32)
     semantic = np.zeros((G, 4), np.int32)
     static = np.zeros(G, bool)
+    ext = np.zeros((G, 8), np.float32)
+    ext[:, 4:7] = 1.0; ext[:, 7] = 1.0
     for slot, g in enumerate(geoms):
         mat = int(m.geom_matid[g])
-        rgba = m.mat_rgba[mat] if mat >= 0 else m.geom_rgba[g]
+        rgba = (geom_rgba(m, g) if appearance == "mujoco" else
+                m.mat_rgba[mat] if mat >= 0 else m.geom_rgba[g])
         mats[slot, 0:4] = rgba
         if mat >= 0:
             # MuJoCo leaves metallic/roughness at -1 when unset; derive roughness from shininess then
@@ -505,7 +669,21 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
             if m.ntex:
                 roles = np.asarray(m.mat_texid[mat]).reshape(-1)
                 texid = int(roles[1]) if len(roles) > 1 else int(roles[0])   # mjTEXROLE_RGB
-            if texid >= 0 and texid in atlas.rects:
+            if texid >= 0 and texid in atlas.rects and appearance == "mujoco":
+                kind, faces, srgb = atlas.info[texid]
+                mats[slot, 8:12] = atlas.rects[texid]
+                mats[slot, 14] = 1.0
+                if kind == 0:
+                    scl, off = bg.material_uv_transform(m, g, mat)
+                    mats[slot, 12:14] = scl
+                    ext[slot, 0:2] = off
+                else:                                   # cube (a skybox texture on a geom maps as a cube too)
+                    mats[slot, 12:14] = 1.0
+                    ext[slot, 2] = 1.0
+                    ext[slot, 4:7] = bg.cube_scale(m, g, mat)
+                    ext[slot, 7] = float(faces)
+                ext[slot, 3] = float(srgb) if kind == 0 else 0.0     # MuJoCo uploads cube maps as plain RGB
+            elif texid >= 0 and texid in atlas.rects:
                 mats[slot, 8:12] = atlas.rects[texid]
                 mats[slot, 12:14] = m.mat_texrepeat[mat]
                 if m.mat_texuniform[mat]:
@@ -537,7 +715,9 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
             tm[0:3] *= px.reshape(-1, 3).mean(0) / 255.0
         tm[12:15] = (1.0, 1.0, 0.0)
         mats[sized] = tm
-    params = scene_params(m)
+    if sized.any():
+        ext[sized] = (0, 0, 0, 0, 1, 1, 1, 1)
+    params = scene_params(m, atlas if appearance == "mujoco" else None)
     if sized.any():
         # MuJoCo's stat.center / extent include the slots parked 1 km under the terrain (1115 m instead of ~117 m for
         # Isaac's rough terrain), which scaled tier 0's per-env shadow map to 11.6 m texels. Renderer bounds: the
@@ -550,7 +730,7 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
     return SceneTables(vertices=inter, indices=indices, meshes=meshes, geoms=geoms, geom_mesh=geom_mesh,
                        draws=draws, inst_table=inst_table, materials=mats, atlas=atlas, semantic=semantic,
                        static_geom=static, lights=build_lights(m), params=params, n_envs=n_envs, G=G,
-                       sized=sized)
+                       sized=sized, material_ext=ext, transparent=transparent, draws_opaque=draws_opaque)
 
 
 def quats_to_mats(q: np.ndarray) -> np.ndarray:

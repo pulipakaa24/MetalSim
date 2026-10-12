@@ -42,6 +42,8 @@ class Tier0Renderer:
                  max_group=3, include_planes=True, backgrounds=False, outputs=("rgb",), seg_mode=SEG_SLOT,
                  decimate_faces: int = 0, shadows: bool = True, tier: int = 0, rt_samples: int = 4,
                  terrain_slots: bool = True, draw_hfields: bool = True, hfield_cull: bool = True, hfield_tile: int = 16,
+                 appearance: str = "mujoco", skybox: bool = True, shadow_lights: str = "all", max_lights: int | None = None,
+                 transparency: bool = True, transparent_ids: str = "surface",
                  ctx: MetalContext | None = None, device="metal:0"):
         """tier 0: raster + shadow maps. tier 1: raster G-buffer with ray-traced shadows, ambient
         occlusion and mirror reflections from the fragment stage (Metal hardware ray tracing).
@@ -51,11 +53,41 @@ class Tier0Renderer:
         2 mm size). ``draw_hfields``: heightfields as their exact surface (False = not drawn, the previous behaviour).
         ``hfield_cull``: heightfields drawn as ``hfield_tile`` x ``hfield_tile``-cell tiles culled per env on the GPU
         against the env's view frustum (and, for the shadow pass, the frustum swept toward the shadow caster); False =
-        every triangle once per env (the full rasterization path)."""
+        every triangle once per env (the full rasterization path).
+
+        ``appearance``: "mujoco" (default) draws geometry, normals and textures as MuJoCo's renderer does
+        (``scene_tables.build_scene_tables``); "legacy" = the tables before 2026-10. ``skybox``: draw the model's skybox
+        texture as the background (MuJoCo's cube mapping) where no background image is set; ``set_clear_color`` turns it
+        off.
+
+        ``shadow_lights``: "all" (default): every model light with ``castshadow`` casts shadows; tier 0 renders a shadow
+        map per extra light (directional: orthographic, spot: the cone, point: six cube faces) besides the caster's,
+        tier 1 traces a shadow ray to each. "caster" = the previous behaviour (only the domain-randomization light or the
+        first shadow-casting directional light). Heightfields drawn with ``hfield_cull`` cast only the caster's shadow
+        in tier 0 (tier 1 traces them). ``max_lights``: lights shaded per fragment; None (default) = all model lights,
+        as Isaac / RTX (no light limit); 8 = MuJoCo's effective cap (fixed-function OpenGL lights GL_LIGHT0..7).
+
+        ``transparency``: geoms whose (material-resolved) rgba alpha is below 0.995 are blended over what is behind
+        them as MuJoCo draws them (sorted per env by distance, front-to-back then back-to-front, back faces culled, no
+        depth write; see tier0.metal sort_transparent); False = drawn opaque (the previous behaviour). They still cast
+        full shadows (as in MuJoCo). ``transparent_ids`` (annotations of a pixel covered by a transparent geom):
+        "surface" (default; "mujoco" is an alias): segmentation, depth and normal of the transparent surface, as
+        ``mujoco.Renderer``'s segmentation and depth images (measured: depth on the glass) and Isaac's depth on glass;
+        "behind": all three from what is behind it (Isaac Sim's RTX Real-Time drops partially opaque objects from depth
+        and segmentation). The colour pass itself writes no depth on the first (front-to-back) blend, as MuJoCo."""
         self.m = model
         self.tier = tier
         self.rt_samples = rt_samples
         self.shadows = shadows and tier == 0
+        if shadow_lights not in ("all", "caster"):
+            raise ValueError(f"shadow_lights must be 'all' or 'caster', got {shadow_lights!r}")
+        self.shadow_lights = shadow_lights
+        self.max_lights = max_lights
+        self._skybox_req = skybox
+        if transparent_ids not in ("mujoco", "behind", "surface"):
+            raise ValueError(f"transparent_ids must be 'surface', 'behind' or 'mujoco', got {transparent_ids!r}")
+        self.transparent_ids = "surface" if transparent_ids == "mujoco" else transparent_ids
+        self.transparency = transparency
         self.rt = None
         self.n = n_envs
         self.tw, self.th = width, height
@@ -66,7 +98,7 @@ class Tier0Renderer:
         self.device = device
         self.tables: SceneTables = build_scene_tables(model, n_envs, max_group=max_group, include_planes=include_planes,
                                                       decimate_faces=decimate_faces, sized_geoms="auto" if terrain_slots else (),
-                                                      draw_hfields=draw_hfields)
+                                                      draw_hfields=draw_hfields, appearance=appearance)
         self.G = self.tables.G
         hf_tris = sum(self.tables.meshes[k]["i_count"] // 3 for g, k in zip(self.tables.geoms, self.tables.geom_mesh)
                       if int(model.geom_type[g]) == int(mujoco.mjtGeom.mjGEOM_HFIELD))
@@ -105,7 +137,7 @@ class Tier0Renderer:
             from metalsim.sensors.raytrace import RayTracer
             self.rt = RayTracer(model, n_envs, max_range=50.0, max_group=max_group, include_planes=include_planes,
                                 decimate_faces=decimate_faces, terrain_slots=terrain_slots, draw_hfields=draw_hfields,
-                                ctx=self.ctx, device=device)
+                                appearance=appearance, ctx=self.ctx, device=device)
             ro = np.zeros(4, np.uint32); ro[0] = self.rt.tpr; ro.view(np.float32)[1] = self.rt.stride; ro[2] = rt_samples
             self.rt_offset_buf = self.ctx.buffer(16, ro, "rt_offset")
 
@@ -118,6 +150,8 @@ class Tier0Renderer:
         self.inst_buf = c.buffer(t.inst_table.nbytes, t.inst_table, "instances")
         self.slot_geom = c.buffer(4 * self.G, np.asarray(t.geoms, np.int32), "slot_geom")
         self.mat_buf = c.buffer(t.materials.nbytes, t.materials, "materials")
+        mext = t.material_ext if t.material_ext is not None else np.zeros((self.G, 8), np.float32)
+        self.mat_ext_buf = c.buffer(mext.nbytes, np.ascontiguousarray(mext, np.float32), "material_ext")
         self.sem_buf = c.buffer(t.semantic.nbytes, t.semantic, "semantic")
         self.env_buf = c.buffer(self.n * (2 * 64 + 9 * 16), label="env_params")
         # per-env camera spec (host-written); defaults: model camera, no delta, white light from above
@@ -151,10 +185,14 @@ class Tier0Renderer:
         self.saw = self.tpr * self.sw
         self.sah = int(np.ceil(self.n / self.tpr)) * self.sh
         # consts
-        flags = (1 if self.use_bg else 0) | (2 if self.shadows else 0)
+        self.skybox = bool(self._skybox_req and t.params.shape[0] > 6 and t.params[6, 1] > 0.5)
+        self._build_shadow_views()
+        self._build_transparency()
+        flags = ((1 if self.use_bg else 0) | (2 if self.shadows else 0) | (4 if self.skybox else 0)
+                 | (8 if self.shadows and self.n_views else 0))
         self.consts = np.array([self.n, self.m.ngeom, self.G, self.tpr, self.tw, self.th, self.aw, self.ah,
                                 max(self.m.ncam, 1), self.bg_layers, flags, max(self.n_light, 1),
-                                self.sw, self.sh, self.saw, self.sah], np.uint32)
+                                self.sw, self.sh, self.saw, self.sah, self.n_views, 0, 0, 0], np.uint32)
         self.consts_buf = c.buffer(self.consts.nbytes, self.consts, "consts")
         # textures
         ai = t.atlas.image
@@ -190,11 +228,64 @@ class Tier0Renderer:
             lp[:, i] = self.m.light_pos[i]; ld[:, i] = self.m.light_dir[i]
         c.write_buffer(self._host_light_xpos, lp); c.write_buffer(self._host_light_xdir, ld)
 
+    def _build_transparency(self):
+        """Transparent slots, their bounding radii (planes -1: sorted last), mesh ranges for vertex pulling."""
+        c, t, m = self.ctx, self.tables, self.m
+        tr = np.flatnonzero(t.transparent) if (self.transparency and t.transparent is not None) else np.zeros(0, int)
+        self.n_trans = len(tr)
+        if not self.n_trans:
+            return
+        rb = np.array([-1.0 if int(m.geom_type[t.geoms[s_]]) == int(mujoco.mjtGeom.mjGEOM_PLANE) else float(m.geom_rbound[t.geoms[s_]])
+                       for s_ in tr], np.float32)
+        self.trans_slot_buf = c.buffer(4 * self.n_trans, tr.astype(np.int32), "trans_slots")
+        self.trans_rb_buf = c.buffer(4 * self.n_trans, rb, "trans_rbound")
+        self.slot_mesh_buf = c.buffer(4 * self.G, np.asarray(t.geom_mesh, np.int32), "slot_mesh")
+        mr = np.zeros((len(t.meshes), 4), np.uint32)
+        for k, mesh in enumerate(t.meshes):
+            mr[k, 0], mr[k, 1] = mesh["i_off"], mesh["i_count"]
+        self.mesh_range_buf = c.buffer(mr.nbytes, mr, "mesh_ranges")
+        self.trans_max_index = int(max(t.meshes[int(t.geom_mesh[s_])]["i_count"] for s_ in tr))
+        self.trans_consts_buf = c.buffer(16, np.array([self.n_trans, self.trans_max_index, 0, 0], np.uint32), "trans_consts")
+        self.trans_order_buf = c.buffer(4 * self.n * self.n_trans, label="trans_order")
+
+    def _build_shadow_views(self):
+        """Extra shadow views (tier0.metal build_shadow_views): one per shadow-casting model light other than the
+        caster (the first shadow-casting directional light), six for a point light."""
+        c, L = self.ctx, self.tables.lights
+        nl = max(self.n_light, 1)
+        light_sv = np.full((nl, 4), -1, np.int32)
+        views = []
+        if self.shadows and self.shadow_lights == "all":
+            cap = self.n_light if self.max_lights is None else min(self.n_light, int(self.max_lights))
+            first_dir = next((i for i in range(cap) if L[i, 0] == 0 and L[i, 1] > 0.5), -1)
+            for i in range(cap):
+                if L[i, 1] <= 0.5 or i == first_dir:
+                    continue
+                kind = int(L[i, 0])
+                nv = 6 if kind == 1 else 1
+                light_sv[i] = (len(views), nv, kind, 0)
+                views += [(i, f if kind == 1 else -1, kind, 0) for f in range(nv)]
+        self.n_views = len(views)
+        vl = np.asarray(views if views else [(0, -1, 0, 0)], np.int32)
+        self.view_light_buf = c.buffer(vl.nbytes, vl, "shadow_view_light")
+        self.light_sv_buf = c.buffer(light_sv.nbytes, light_sv, "light_shadow_views")
+        self.sviews_buf = c.buffer(max(self.n * self.n_views, 1) * 80, label="shadow_views")
+        d = Metal.MTLTextureDescriptor.texture2DDescriptorWithPixelFormat_width_height_mipmapped_(
+            Metal.MTLPixelFormatDepth32Float, self.saw if self.n_views else 1, self.sah if self.n_views else 1, False)
+        d.setTextureType_(Metal.MTLTextureType2DArray)
+        d.setArrayLength_(max(self.n_views, 1))
+        d.setUsage_(Metal.MTLTextureUsageRenderTarget | Metal.MTLTextureUsageShaderRead)
+        d.setStorageMode_(Metal.MTLStorageModePrivate)
+        self.smaps_tex = c.device.newTextureWithDescriptor_(d)
+        self.smaps_tex.setLabel_("extra_shadow_maps")
+
     def _build_hfield_tiles(self):
         """Tile tables for GPU culling of heightfields (see hf_cull in tier0.metal)."""
         t, m, T = self.tables, self.m, self.hfield_tile
         hf_mesh = {k for k, mesh in enumerate(t.meshes) if "hfield" in mesh}
-        self._draws = [d for k, d in enumerate(t.draws) if not (self.hfield_cull and k in hf_mesh)]
+        src = t.draws_opaque if (self.n_trans and t.draws_opaque is not None) else t.draws
+        self._draws = [d for k, d in enumerate(src) if not (self.hfield_cull and k in hf_mesh) and d[3] > 0]
+        self._shadow_draws = [d for k, d in enumerate(t.draws) if not (self.hfield_cull and k in hf_mesh)]   # all geoms cast
         self.n_tiles = 0
         if not self.hfield_cull:
             return
@@ -247,7 +338,7 @@ class Tier0Renderer:
 
     def _build_pipelines(self):
         c = self.ctx
-        lib = c.library("tier0")
+        lib = c.library("tier0", None if self.max_lights is None else {"MAX_LIGHTS": int(self.max_lights)})
         self.p_env = c.compute_pipeline(lib, "build_env_params")
         self.p_untile = c.compute_pipeline(lib, "untile")
         vd = Metal.MTLVertexDescriptor.new()
@@ -283,6 +374,41 @@ class Tier0Renderer:
         d.setDepthAttachmentPixelFormat_(Metal.MTLPixelFormatDepth32Float)
         self.shadow_pipe = c.render_pipeline(d)
         self.shadow_ds = self.geo_ds
+        if self.n_trans:
+            self.p_sort_trans = c.compute_pipeline(lib, "sort_transparent")
+            d = Metal.MTLRenderPipelineDescriptor.new()
+            d.setVertexFunction_(lib.newFunctionWithName_("trans_vs"))
+            d.setFragmentFunction_(lib.newFunctionWithName_("geom_fs_rt" if self.tier >= 1 else "geom_fs"))
+            ca = d.colorAttachments()
+            a0 = ca.objectAtIndexedSubscript_(0)
+            a0.setPixelFormat_(Metal.MTLPixelFormatRGBA8Unorm)
+            a0.setBlendingEnabled_(True)
+            a0.setRgbBlendOperation_(Metal.MTLBlendOperationAdd); a0.setAlphaBlendOperation_(Metal.MTLBlendOperationAdd)
+            a0.setSourceRGBBlendFactor_(Metal.MTLBlendFactorSourceAlpha)
+            a0.setDestinationRGBBlendFactor_(Metal.MTLBlendFactorOneMinusSourceAlpha)
+            a0.setSourceAlphaBlendFactor_(Metal.MTLBlendFactorZero); a0.setDestinationAlphaBlendFactor_(Metal.MTLBlendFactorOne)
+            ids = self.transparent_ids != "behind"
+            for k, fmt in ((1, Metal.MTLPixelFormatR32Uint), (2, Metal.MTLPixelFormatRGBA16Float)):
+                ak = ca.objectAtIndexedSubscript_(k)
+                ak.setPixelFormat_(fmt)
+                ak.setWriteMask_(Metal.MTLColorWriteMaskAll if ids else Metal.MTLColorWriteMaskNone)
+            d.setDepthAttachmentPixelFormat_(Metal.MTLPixelFormatDepth32Float)
+            self.trans_pipe = c.render_pipeline(d)
+            dss = []
+            for write in (False, self.transparent_ids == "surface"):     # pass 1 never writes depth; pass 2 for "surface"
+                ds = Metal.MTLDepthStencilDescriptor.new()
+                ds.setDepthWriteEnabled_(write)
+                ds.setDepthCompareFunction_(Metal.MTLCompareFunctionLess)
+                dss.append(c.device.newDepthStencilStateWithDescriptor_(ds))
+            self.trans_ds = dss
+        if self.n_views:
+            d = Metal.MTLRenderPipelineDescriptor.new()
+            d.setVertexFunction_(lib.newFunctionWithName_("shadow_view_vs"))
+            d.setFragmentFunction_(lib.newFunctionWithName_("shadow_view_fs"))
+            d.setVertexDescriptor_(vd)
+            d.setDepthAttachmentPixelFormat_(Metal.MTLPixelFormatDepth32Float)
+            self.sview_pipe = c.render_pipeline(d)
+            self.p_sviews = c.compute_pipeline(lib, "build_shadow_views")
         if self.hfield_cull:
             self.hf_pipe, _ = make("hf_tile_vs", "geom_fs_rt" if self.tier >= 1 else "geom_fs", True, Metal.MTLCompareFunctionLess, False)
             d = Metal.MTLRenderPipelineDescriptor.new()
@@ -336,7 +462,10 @@ class Tier0Renderer:
         self._sync_cam_spec()
 
     def set_clear_color(self, rgb: np.ndarray):
+        """Per-env background colour; replaces the skybox (as a background colour randomization expects)."""
         self.cam_spec[:, 20:23] = np.asarray(rgb, np.float32)
+        self.consts[10] &= ~np.uint32(4)
+        self.ctx.write_buffer(self.consts_buf, self.consts)
         self._sync_cam_spec()
 
     def set_camera_delta(self, pos_delta: np.ndarray | None = None, quat_delta: np.ndarray | None = None):
@@ -357,7 +486,7 @@ class Tier0Renderer:
 
     def set_backgrounds(self, env_ids, images):
         self.use_bg = True
-        self.consts[10] = 1
+        self.consts[10] |= 1                 # keep the shadow / skybox bits
         self.ctx.write_buffer(self.consts_buf, self.consts)
         self.cam_spec[:, 19] = 1.0
         self._sync_cam_spec()
@@ -385,6 +514,16 @@ class Tier0Renderer:
         ce.setBuffer_offset_atIndex_(self.params_buf, 0, 7)
         ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n, 1, 1), Metal.MTLSize(min(self.n, 64), 1, 1))
         ce.endEncoding()
+        # 1a'. transparent geoms: per-env order by camera distance (sort_transparent)
+        if self.n_trans:
+            ce = cb.computeCommandEncoder()
+            ce.setComputePipelineState_(self.p_sort_trans)
+            for i, (b, o) in enumerate(((self.env_buf, 0), (self.trans_slot_buf, 0), (self.trans_rb_buf, 0), (self.slot_geom, 0),
+                                        (geom_xpos, geom_xpos_off), (self.consts_buf, 0), (self.trans_consts_buf, 0),
+                                        (self.trans_order_buf, 0))):
+                ce.setBuffer_offset_atIndex_(b, o, i)
+            ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n, 1, 1), Metal.MTLSize(min(self.n, 64), 1, 1))
+            ce.endEncoding()
         # 1a. heightfield tiles: per-env visible lists and indirect draw arguments (serial dispatches)
         if self.hfield_cull:
             ce = cb.computeCommandEncoder()
@@ -420,7 +559,7 @@ class Tier0Renderer:
             se.setVertexBuffer_offset_atIndex_(geom_xmat, geom_xmat_off, 5)
             se.setVertexBuffer_offset_atIndex_(self.color_buf, 0, 6)
             se.setVertexBuffer_offset_atIndex_(self.consts_buf, 0, 7)
-            for i_off, i_count, first, count in self._draws:
+            for i_off, i_count, first, count in self._shadow_draws:
                 se.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_instanceCount_baseVertex_baseInstance_(
                     Metal.MTLPrimitiveTypeTriangle, i_count, Metal.MTLIndexTypeUInt32, self.ibuf, i_off * 4, count, 0, first)
             if self.hfield_cull:
@@ -431,6 +570,41 @@ class Tier0Renderer:
             if grains is not None:
                 grains.draw_shadow(se)
             se.endEncoding()
+        # 1b'. extra shadow views (spot / point / further directional lights): matrices, then one depth pass each
+        if self.shadows and self.n_views:
+            ce = cb.computeCommandEncoder()
+            ce.setComputePipelineState_(self.p_sviews)
+            for i, (b, o) in enumerate(((self.sviews_buf, 0), (self.view_light_buf, 0), (self.light_buf, 0),
+                                        (light_xpos, light_xpos_off), (light_xdir, light_xdir_off), (self.consts_buf, 0),
+                                        (self.params_buf, 0))):
+                ce.setBuffer_offset_atIndex_(b, o, i)
+            ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n * self.n_views, 1, 1),
+                                                      Metal.MTLSize(min(self.n * self.n_views, 64), 1, 1))
+            ce.endEncoding()
+            for v in range(self.n_views):
+                sp = Metal.MTLRenderPassDescriptor.new()
+                da = sp.depthAttachment()
+                da.setTexture_(self.smaps_tex); da.setSlice_(v); da.setLoadAction_(Metal.MTLLoadActionClear)
+                da.setStoreAction_(Metal.MTLStoreActionStore); da.setClearDepth_(1.0)
+                se = cb.renderCommandEncoderWithDescriptor_(sp)
+                se.setRenderPipelineState_(self.sview_pipe)
+                se.setDepthStencilState_(self.shadow_ds)
+                se.setCullMode_(Metal.MTLCullModeNone)
+                se.setDepthBias_slopeScale_clamp_(2.0, 2.0, 0.02)
+                for i, (b, o) in enumerate(((self.vbuf, 0), (self.env_buf, 0), (self.inst_buf, 0), (self.slot_geom, 0),
+                                            (geom_xpos, geom_xpos_off), (geom_xmat, geom_xmat_off), (self.sviews_buf, 0),
+                                            (self.consts_buf, 0))):
+                    se.setVertexBuffer_offset_atIndex_(b, o, i)
+                vb = np.array([v], np.uint32).tobytes()
+                se.setVertexBytes_length_atIndex_(vb, 4, 8)
+                se.setFragmentBuffer_offset_atIndex_(self.sviews_buf, 0, 6)
+                se.setFragmentBuffer_offset_atIndex_(self.consts_buf, 0, 7)
+                se.setFragmentBytes_length_atIndex_(vb, 4, 8)
+                se.setFragmentBuffer_offset_atIndex_(light_xpos, light_xpos_off, 9)
+                for i_off, i_count, first, count in self._shadow_draws:
+                    se.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_instanceCount_baseVertex_baseInstance_(
+                        Metal.MTLPrimitiveTypeTriangle, i_count, Metal.MTLIndexTypeUInt32, self.ibuf, i_off * 4, count, 0, first)
+                se.endEncoding()
         # 1c. tier 1: refit instance descriptors from the same physics buffers and rebuild the instance AS
         if self.rt is not None:
             self.rt._encode_refit_and_build(cb, geom_xpos, geom_xpos_off, geom_xmat, geom_xmat_off)
@@ -458,6 +632,8 @@ class Tier0Renderer:
         re.setFragmentBuffer_offset_atIndex_(self.consts_buf, 0, 5)
         re.setFragmentTexture_atIndex_(self.bg_tex, 1)
         re.setFragmentSamplerState_atIndex_(self.samp_bg, 0)
+        re.setFragmentBuffer_offset_atIndex_(self.params_buf, 0, 9)
+        re.setFragmentTexture_atIndex_(self.atlas_tex, 0)
         re.drawPrimitives_vertexStart_vertexCount_instanceCount_(Metal.MTLPrimitiveTypeTriangle, 0, 6, self.n)
         # geometry
         re.setRenderPipelineState_(self.geo_pipe)
@@ -479,6 +655,10 @@ class Tier0Renderer:
         re.setFragmentBuffer_offset_atIndex_(light_xpos, light_xpos_off, 7)
         re.setFragmentBuffer_offset_atIndex_(light_xdir, light_xdir_off, 8)
         re.setFragmentBuffer_offset_atIndex_(self.params_buf, 0, 9)
+        re.setFragmentBuffer_offset_atIndex_(self.mat_ext_buf, 0, 18)
+        re.setFragmentBuffer_offset_atIndex_(self.sviews_buf, 0, 19)
+        re.setFragmentBuffer_offset_atIndex_(self.light_sv_buf, 0, 20)
+        re.setFragmentTexture_atIndex_(self.smaps_tex, 3)
         re.setFragmentTexture_atIndex_(self.atlas_tex, 0)
         re.setFragmentTexture_atIndex_(self.shadow_tex, 2)
         re.setFragmentSamplerState_atIndex_(self.samp, 0)
@@ -506,6 +686,30 @@ class Tier0Renderer:
                 Metal.MTLPrimitiveTypeTriangle, Metal.MTLIndexTypeUInt32, self.hf_ibuf, 0, self.hf_args, 0)
         if grains is not None:
             grains.draw(re, light_xpos, light_xpos_off, light_xdir, light_xdir_off)
+        if self.n_trans:          # transparent geoms last: front to back, then back to front (MuJoCo's mjr_render)
+            if grains is not None:     # the grain pass rebinds fragment buffers the geom fragment shaders read
+                re.setFragmentBuffer_offset_atIndex_(self.mat_buf, 0, 2)
+                re.setFragmentBuffer_offset_atIndex_(self.sem_buf, 0, 3)
+                re.setFragmentBuffer_offset_atIndex_(self.color_buf, 0, 4)
+                re.setFragmentTexture_atIndex_(self.atlas_tex, 0)
+                re.setFragmentSamplerState_atIndex_(self.samp, 0)
+                re.setFragmentSamplerState_atIndex_(self.samp_shadow, 1)
+                if self.rt is not None:
+                    re.setFragmentAccelerationStructure_atBufferIndex_(self.rt.inst_as, 10)
+                    re.setFragmentBuffer_offset_atIndex_(self.rt_offset_buf, 0, 11)
+            re.setRenderPipelineState_(self.trans_pipe)
+            re.setFrontFacingWinding_(Metal.MTLWindingCounterClockwise)
+            re.setCullMode_(Metal.MTLCullModeBack)
+            for i, (b, o) in enumerate(((self.vbuf, 0), (self.env_buf, 0), (self.trans_order_buf, 0), (self.slot_geom, 0),
+                                        (geom_xpos, geom_xpos_off), (geom_xmat, geom_xmat_off), (self.slot_mesh_buf, 0),
+                                        (self.consts_buf, 0), (self.trans_consts_buf, 0), (self.mesh_range_buf, 0),
+                                        (self.ibuf, 0))):
+                re.setVertexBuffer_offset_atIndex_(b, o, i)
+            for rev in (0, 1):
+                re.setDepthStencilState_(self.trans_ds[rev])
+                re.setVertexBytes_length_atIndex_(np.array([rev], np.uint32).tobytes(), 4, 11)
+                re.drawPrimitives_vertexStart_vertexCount_instanceCount_(Metal.MTLPrimitiveTypeTriangle, 0, self.trans_max_index,
+                                                                         self.n_trans * self.n)
         re.endEncoding()
         # 3. untile into learner buffers
         ue = cb.computeCommandEncoder()

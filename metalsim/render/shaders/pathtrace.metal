@@ -17,7 +17,9 @@ using namespace metal::raytracing;
 
 struct Material { float4 rgba; float4 mrse; float4 rect; float4 par; };
 struct Light { float4 kind; float4 diffuse; float4 specular; float4 ambient; float4 atten; };
-struct SceneParams { float4 bounds; float4 hl_ambient; float4 hl_diffuse; float4 hl_specular; float4 sky; };
+struct SceneParams { float4 bounds; float4 hl_ambient; float4 hl_diffuse; float4 hl_specular; float4 sky;
+                     float4 sky_rect; float4 sky_info; };   // skybox cube in the atlas; sky_info: faces, drawn
+#include "appearance.h"
 struct MeshInfo { uint i_off, i_count, _p0, _p1; };
 struct InstanceDesc { packed_float3 col0, col1, col2, col3; uint options, mask, if_table_offset, as_index; };
 struct PTConsts {
@@ -27,8 +29,9 @@ struct PTConsts {
     float stride, exposure, env_scale, clip_far;   // clip_far: camera far clipping plane (z-depth), 0 = none
     uint env_w, env_h, grain_inst0, grain_as0;  // FLAG_ENVMAP: importance-sampling grid of the environment map; FLAG_GRAINS: first grain
                                                 // instance and first grain mesh in the instanced-structure list (particles.py)
-    float env_yaw, clamp_lum, grain_eps, _f1;   // env_yaw: dome rotation about +z (rad); clamp_lum: per-path luminance cap, 0 = off (biased);
-                                                // grain_eps: ray offset off a grain surface [m] (grains are mm-sized; scene hits use 1 mm)
+    float env_yaw, clamp_lum, grain_eps; uint trans_ids;   // env_yaw: dome rotation about +z (rad); clamp_lum: per-path luminance cap, 0 = off (biased);
+                                                // grain_eps: ray offset off a grain surface [m] (grains are mm-sized; scene hits use 1 mm);
+                                                // trans_ids: annotations under transparent geoms (0 surface, 1 behind)
     float4 env_mul;                             // FLAG_ENVMAP: rgb multiplier on the map (dome intensity * 2^exposure * color)
 };
 struct CamSpec { float4 intrinsics; float4 pos_delta; float4 rot_delta; float4 light; float4 ambient; float4 clear_color; int cam_id, p0, p1, p2; };
@@ -182,7 +185,7 @@ inline float3 sample_cone(float3 axis, float ang, float u, float v) {
     return normalize(t * (st * cos(ph)) + b * (st * sin(ph)) + axis * ct);
 }
 
-struct Hit { bool ok; float t; float3 p; float3 n; float2 uv; uint slot; bool grain; uint gid; };
+struct Hit { bool ok; float t; float3 p; float3 n; float2 uv; uint slot; bool grain; uint gid; float3 lp; };   // lp: geom-frame position
 // render-grain geometry (FLAG_GRAINS): instances >= inst0 are grains, instancing grain mesh (as_index - as0)
 struct GrainGeo { device const float* verts; device const uint* indices; device const MeshInfo* meshes; uint inst0, as0; };
 
@@ -211,6 +214,8 @@ inline Hit trace(instance_acceleration_structure accel, float3 o, float3 d, floa
     float3 n1 = float3(verts[i1*8+3], verts[i1*8+4], verts[i1*8+5]);
     float3 n2 = float3(verts[i2*8+3], verts[i2*8+4], verts[i2*8+5]);
     float2 uv = float2(verts[i0*8+6], verts[i0*8+7]) * w0 + float2(verts[i1*8+6], verts[i1*8+7]) * bc.x + float2(verts[i2*8+6], verts[i2*8+7]) * bc.y;
+    h.lp = float3(verts[i0*8], verts[i0*8+1], verts[i0*8+2]) * w0 + float3(verts[i1*8], verts[i1*8+1], verts[i1*8+2]) * bc.x
+         + float3(verts[i2*8], verts[i2*8+1], verts[i2*8+2]) * bc.y;
     InstanceDesc id = inst[res.instance_id];
     float3x3 R = float3x3(float3(id.col0), float3(id.col1), float3(id.col2));
     float3 n = normalize(R * (n0 * w0 + n1 * bc.x + n2 * bc.y));
@@ -234,10 +239,42 @@ inline Material grain_material(device const GrainMat& g, uint key) {
     return m;
 }
 
+// Partial transparency (material-resolved rgba alpha < 1) is surface presence, as a USD opacity in Isaac's path
+// tracer (and RTX Real-Time 2.0's fractional cutout opacity): a ray meets the surface with probability alpha and
+// otherwise continues unchanged; shadow rays carry the product of (1 - alpha) over the partially transparent surfaces
+// they cross (an opaque one stops them). Up to TRANSMIT_MAX surfaces per ray.
+constant uint TRANSMIT_MAX = 8u;
+inline float surface_alpha(device const Material* mats, device const float4* per_inst, uint e, uint n_slots, uint slot) {
+    return mats[slot].rgba.a * per_inst[e * n_slots + slot].a;
+}
+inline float transmit(instance_acceleration_structure accel, float3 o, float3 d, float tmax,
+                      device const uint2* inst_tab, device const int* slot_mesh, device const MeshInfo* meshes,
+                      device const float* verts, device const uint* indices, device const InstanceDesc* inst,
+                      GrainGeo gg, float tmin, device const Material* mats, device const float4* per_inst, uint e, uint n_slots)
+{
+    float T = 1.0;
+    for (uint k = 0; k < TRANSMIT_MAX; ++k) {
+        Hit h = trace(accel, o, d, tmax, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, k == 0 ? tmin : 0.0005);
+        if (!h.ok) return T;
+        if (h.grain) return 0.0;                 // grains are opaque
+        float a = surface_alpha(mats, per_inst, e, n_slots, h.slot);
+        if (a >= 0.995) return 0.0;
+        T *= 1.0 - a;
+        o = h.p; tmax -= h.t;
+        if (tmax <= 0.0005) return T;
+    }
+    return T;
+}
+
 inline float3 material_base(Material m, float4 mod, float2 uv, texture2d<float> atlas, sampler samp) {
     float3 base = m.rgba.rgb * mod.rgb;
     if (m.par.z > 0.5) base *= atlas.sample(samp, m.rect.xy + fract(uv * m.par.xy) * m.rect.zw, level(0.0)).rgb;
     return base;
+}
+// with the material extension (MuJoCo's texture mapping: offsets, cube maps, sRGB; shaders/appearance.h)
+inline float4 material_base_ext(Material m, MaterialExt x, float4 mod, float2 uv, float3 lp, texture2d<float> atlas, sampler samp) {
+    float4 t = material_tex(m.rect, m.par, x, uv, lp, atlas, samp);
+    return float4(m.rgba.rgb * mod.rgb * t.rgb, m.rgba.a * mod.a * t.a);
 }
 
 // ---- environment map: equirectangular ("latlong") as Kit/RTX orients a USD DomeLight on a z-up stage.
@@ -327,6 +364,8 @@ kernel void path_trace(
     uint x = tid.x, y = tid.y, e = tid.z;
     if (x >= c.width || y >= c.height || e >= c.n_envs) return;
     uint pix = (e * c.height + y) * c.width + x;
+    // per-slot texture mapping (scene_tables.MATERIAL_EXT_LAYOUT): appended to the material table (G x 16 floats, then G x 8)
+    device const MaterialExt* mext = (device const MaterialExt*)(mats + c.n_slots);
     CamSpec cs = cams[e];
     uint ci = e * c.n_cam + uint(max(cs.cam_id, 0));
     float3 cpos = float3(cam_xpos[ci * 3], cam_xpos[ci * 3 + 1], cam_xpos[ci * 3 + 2]) + cs.pos_delta.xyz;
@@ -341,6 +380,7 @@ kernel void path_trace(
     float3 env_rad = (sp.sky.w > 0.5 ? sp.sky.xyz : cs.clear_color.rgb) * c.env_scale;
     GrainGeo gg; gg.verts = g_verts; gg.indices = g_indices; gg.meshes = g_mat.mesh;
     gg.inst0 = (c.flags & FLAG_GRAINS) ? c.grain_inst0 : 0xFFFFFFFFu; gg.as0 = c.grain_as0;
+    bool sky_tex = !use_env && sp.sky_info.y > 0.5;     // MuJoCo skybox as a directional environment (cube map)
     for (uint s = 0; s < c.spp; ++s) {
         float jx = rnd(rng), jy = rnd(rng);
         if (s == 0u && (c.flags & FLAG_CENTER0) && (c.flags & FLAG_RESET)) { jx = 0.5; jy = 0.5; }   // annotator sample at the pixel centre (1 of spp*passes)
@@ -351,35 +391,60 @@ kernel void path_trace(
         float3 radiance = float3(0.0);
         float prev_pdf = 0.0;   // BSDF-sampling pdf of the ray being traced (0: camera ray, no MIS on a miss)
         float tmin = 0.0005;     // ray start distance: 0.5 mm, or grain_eps leaving a grain
+        uint passes = 0;        // transparent surfaces passed through (presence), not counted as bounces
         for (uint bounce = 0; bounce <= c.max_bounces; ++bounce) {
             Hit h = trace(accel, o, d, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin);
             if (bounce == 0 && c.clip_far > 0.0 && h.ok && -dot(h.p - o, R[2]) > c.clip_far) h.ok = false;   // beyond the far plane: background
             if (!h.ok) {
-                float3 er = env_rad;
+                float3 er = sky_tex ? sky_color(atlas, samp, sp.sky_rect, sp.sky_info, d) * c.env_scale : env_rad;
                 if (use_env) {   // map radiance, weighted by the power heuristic against the env NEE that could have sampled it
                     er = env_radiance(envmap, env_samp, d, c);
                     if (prev_pdf > 0.0) { float pe = env_pdf(d, env_cdf, c); er *= prev_pdf * prev_pdf / (prev_pdf * prev_pdf + pe * pe); }
                 }
                 radiance += throughput * er;
                 if (bounce == 0) {   // denoiser guide: the background's normalised colour
-                    float3 eg = use_env ? env_radiance(envmap, env_samp, d, c) : env_rad;
+                    float3 eg = use_env ? env_radiance(envmap, env_samp, d, c) : er;
                     alb_sum += clamp(eg / max(max(eg.x, max(eg.y, eg.z)), 1e-6), 0.0, 1.0); nrm_sum += -d;
                 }
                 break;
             }
             Material m; float4 mod; float eps = 0.001;   // eps: offset of rays leaving this surface
+            float4 base4;
             if (h.grain) {   // mm-sized grains: a small offset, but at least ~8 ulp of the position (far envs sit km away)
                 m = grain_material(g_mat, g_keys[h.gid]); mod = float4(1.0);
                 eps = max(c.grain_eps, 1e-6 * max(fabs(h.p.x), max(fabs(h.p.y), fabs(h.p.z)))); tmin = eps;
+                base4 = float4(material_base(m, mod, h.uv, atlas, samp), 1.0);
             }
-            else { m = mats[h.slot]; mod = per_inst[e * c.n_slots + h.slot]; tmin = 0.0005; }
-            float3 base = material_base(m, mod, h.uv, atlas, samp);
+            else {
+                m = mats[h.slot]; mod = per_inst[e * c.n_slots + h.slot]; tmin = 0.0005;
+                base4 = material_base_ext(m, mext[h.slot], mod, h.uv, h.lp, atlas, samp);
+            }
+            float3 base = base4.rgb;
+            if (bounce == 0 && s == 0 && passes == 0) {   // annotations of the primary ray (see PTConsts.trans_ids)
+                depth0 = -dot(h.p - o, R[2]); normal0 = h.n; seg0 = h.grain ? int(c.n_slots) + 1 : int(h.slot) + 1;
+                if (!h.grain && m.rgba.a * mod.a < 0.995 && c.trans_ids == 1u) {    // "behind": the first opaque surface
+                    float3 ob = h.p; float zb = 0.0; float3 nb = float3(0.0); int sb = 0;
+                    for (uint k = 0; k < TRANSMIT_MAX; ++k) {
+                        Hit hb = trace(accel, ob, d, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, 0.0005);
+                        if (!hb.ok) break;
+                        if (hb.grain || surface_alpha(mats, per_inst, e, c.n_slots, hb.slot) >= 0.995) {
+                            zb = -dot(hb.p - o, R[2]); nb = hb.n; sb = hb.grain ? int(c.n_slots) + 1 : int(hb.slot) + 1; break;
+                        }
+                        ob = hb.p;
+                    }
+                    depth0 = (c.clip_far > 0.0 && zb > c.clip_far) ? 0.0 : zb;
+                    normal0 = nb; seg0 = (depth0 > 0.0) ? sb : 0;
+                }
+            }
+            if (base4.a < 0.995 && passes < 16u && rnd(rng) >= base4.a) {   // presence: the ray passes this surface
+                ++passes; o = h.p; --bounce;            // (unsigned wrap at bounce 0 is undone by the loop's ++)
+                continue;
+            }
             float metallic = m.mrse.x, rough = max(m.mrse.y, 0.03), specw = m.mrse.z, emission = m.mrse.w;
             float a2 = rough * rough * rough * rough;
             float3 f0 = mix(float3(0.08 * specw), base, metallic);
             float3 N = h.n; float3 V = -d;
             uint model = matmodel ? uint(m.par.w + 0.5) : 0u;
-            if (bounce == 0 && s == 0) { depth0 = -dot(h.p - o, R[2]); normal0 = N; seg0 = h.grain ? int(c.n_slots) + 1 : int(h.slot) + 1; }
             if (bounce == 0) { alb_sum += base; nrm_sum += N; }
             radiance += throughput * emission * base;
             // next-event estimation: model lights (directional and point/spot) with shadow rays
@@ -399,16 +464,16 @@ kernel void path_trace(
                 }
                 float NdotL = dot(N, L);
                 if (NdotL <= 0.0 || att <= 0.0) continue;
-                Hit sh = trace(accel, h.p + N * eps, L, tmax, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin);
-                if (sh.ok) continue;
-                radiance += throughput * brdf_any(model, N, V, L, base, f0, specw, metallic, rough, a2) * NdotL * l.diffuse.xyz * (PI * att);
+                float tr = transmit(accel, h.p + N * eps, L, tmax, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin, mats, per_inst, e, c.n_slots);
+                if (tr <= 0.0) continue;
+                radiance += throughput * brdf_any(model, N, V, L, base, f0, specw, metallic, rough, a2) * NdotL * l.diffuse.xyz * (PI * att * tr);
             }
             if (cs.light.w > 0.0) {   // per-env DR directional light
                 float3 L = -normalize(cs.light.xyz);
                 float NdotL = dot(N, L);
                 if (NdotL > 0.0) {
-                    Hit sh = trace(accel, h.p + N * eps, L, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin);
-                    if (!sh.ok) radiance += throughput * brdf_any(model, N, V, L, base, f0, specw, metallic, rough, a2) * NdotL * float3(PI * cs.light.w);
+                    float tr = transmit(accel, h.p + N * eps, L, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin, mats, per_inst, e, c.n_slots);
+                    if (tr > 0.0) radiance += throughput * brdf_any(model, N, V, L, base, f0, specw, metallic, rough, a2) * NdotL * float3(PI * cs.light.w * tr);
                 }
             }
             if (bounce == 0 && sp.hl_specular.w > 0.5)   // MuJoCo headlight on the primary hit (view-aligned, unshadowed)
@@ -420,12 +485,12 @@ kernel void path_trace(
                 float pe; float3 L = env_sample(env_cdf, c, rnd(rng), rnd(rng), pe);
                 float NdotL = dot(N, L);
                 if (NdotL > 0.0 && pe > 1e-8) {
-                    Hit sh = trace(accel, h.p + N * eps, L, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin);
-                    if (!sh.ok) {
+                    float tr = transmit(accel, h.p + N * eps, L, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin, mats, per_inst, e, c.n_slots);
+                    if (tr > 0.0) {
                         float3 Hm = normalize(L + V);
                         float pb = pd * NdotL / PI + (1.0 - pd) * D_ggx(max(dot(N, Hm), 0.0), a2) * max(dot(N, Hm), 0.0) / (4.0 * max(dot(V, Hm), 1e-4));
                         float w = pe * pe / (pe * pe + pb * pb);
-                        radiance += throughput * brdf_any(model, N, V, L, base, f0, specw, metallic, rough, a2) * NdotL * env_radiance(envmap, env_samp, L, c) * (w / pe);
+                        radiance += throughput * brdf_any(model, N, V, L, base, f0, specw, metallic, rough, a2) * NdotL * env_radiance(envmap, env_samp, L, c) * (w / pe * tr);
                     }
                 }
             }

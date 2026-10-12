@@ -99,15 +99,25 @@ class Tier2Renderer:
                  material_model="legacy", usd_lights=None, dome=None, headlight=None, tonemap="linear",
                  denoise=None, denoise_quality="high", atrous_iters=5, aux=False, center_sample=False, clip_far=0.0,
                  terrain_slots: bool = True, draw_hfields: bool = True, firefly_clamp=0.0,
+                 appearance: str = "mujoco", skybox: bool = True, transparency: bool = True, transparent_ids: str = "surface",
                  ctx: MetalContext | None = None, device="metal:0"):
-        """``terrain_slots`` / ``draw_hfields``: see ``Tier0Renderer`` (False = the previous behaviour)."""
+        """``terrain_slots`` / ``draw_hfields`` / ``appearance``: see ``Tier0Renderer`` (False / "legacy" = the
+        previous behaviour). ``skybox``: the model's skybox texture is the environment (camera background and the
+        radiance of every escaping ray, MuJoCo's cube mapping, unlit texel values x env scale) instead of its mean
+        colour; a ``dome`` or ``set_environment`` map replaces it.
+
+        ``transparency``: a geom's (material-resolved) rgba alpha < 1 is surface presence, as a USD opacity in Isaac's
+        path tracer: rays meet it with probability alpha and otherwise pass unchanged, shadow rays are attenuated by
+        (1 - alpha) per surface (pathtrace.metal ``transmit``); False = every geom opaque (the previous behaviour).
+        ``transparent_ids``: annotations of pixels whose first surface is transparent, as ``Tier0Renderer``: "surface"
+        (default, MuJoCo's; "mujoco" is an alias) or "behind" (the first opaque surface behind it)."""
         import mujoco
         self.m, self.n, self.tw, self.th = model, n_envs, width, height
         self.device = device
         self.ctx = ctx or MetalContext(device)
         self.rt = RayTracer(model, n_envs, max_range=1000.0, max_group=max_group, include_planes=include_planes,
                             decimate_faces=decimate_faces, terrain_slots=terrain_slots, draw_hfields=draw_hfields,
-                            ctx=self.ctx, device=device)
+                            appearance=appearance, ctx=self.ctx, device=device)
         self.tables = self.rt.tables
         self.G = self.tables.G
         cam_id = 0 if camera is None else (mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_CAMERA, camera) if isinstance(camera, str) else int(camera))
@@ -141,6 +151,11 @@ class Tier2Renderer:
         self._dome = None if dome is None else (float(dome[0]), tuple(float(v) for v in dome[1]))
         if dome is not None:
             params[4, :3] = np.asarray(dome[1], np.float32); params[4, 3] = 1.0; env_scale = float(dome[0])
+        if transparent_ids not in ("mujoco", "behind", "surface"):
+            raise ValueError(f"transparent_ids must be 'surface', 'behind' or 'mujoco', got {transparent_ids!r}")
+        self.transparency = transparency
+        if (dome is not None or not skybox) and params.shape[0] > 6:
+            params[6, 1] = 0.0                # the skybox texture is not drawn (uniform dome / sky colour)
         if headlight is False:
             params[3, 3] = 0.0
         self.light_buf = c.buffer(lights.nbytes, lights, "pt_lights")
@@ -155,7 +170,15 @@ class Tier2Renderer:
             for slot, g in enumerate(t.geoms):
                 nm = mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_GEOM, g)
                 mats[slot, 15] = ids[spec_.get(nm, spec_.get(None, "legacy"))]
+            if not transparency:
+                mats[:, 3] = 1.0
+            mats = self._with_ext(mats)
             self.mat_buf = c.buffer(mats.nbytes, mats, "pt_materials")
+        elif not transparency:
+            mats = t.materials.copy().reshape(self.G, 16)
+            mats[:, 3] = 1.0
+            mats = self._with_ext(mats)
+            self._opaque_mat_buf = c.buffer(mats.nbytes, mats, "pt_materials_opaque")
         ai = t.atlas.image
         self.atlas_tex = c.texture2d(ai.shape[1], ai.shape[0], Metal.MTLPixelFormatRGBA8Unorm, Metal.MTLTextureUsageShaderRead,
                                      label="pt_atlas", storage=Metal.MTLStorageModeShared)
@@ -168,6 +191,7 @@ class Tier2Renderer:
         self.consts[8:12] = (0, self.rt.tpr, 1, seed)
         cf = self.consts.view(np.float32); cf[12] = self.rt.stride; cf[13] = exposure; cf[14] = env_scale; cf[15] = clip_far
         cf[21] = float(firefly_clamp); cf[24:27] = 1.0
+        self.consts[23] = {"mujoco": 0, "surface": 0, "behind": 1}[transparent_ids]   # PTConsts.trans_ids
         self.denoise = denoise
         self.aux = bool(aux or denoise)
         self.base_flags = (2 if material_model != "legacy" else 0) | (4 if tonemap == "rtx" else 0) | (8 if self.aux else 0) | (16 if center_sample else 0)
@@ -280,6 +304,11 @@ class Tier2Renderer:
         else:
             self._ias.encode(cb, gx, gxo, gm, gmo)
 
+    def _with_ext(self, mats):
+        """(G, 16) material table followed by the (G, 8) MaterialExt table, the layout path_trace reads."""
+        ext = self.tables.material_ext if self.tables.material_ext is not None else np.zeros((self.G, 8), np.float32)
+        return np.concatenate([np.asarray(mats, np.float32).reshape(-1), np.asarray(ext, np.float32).reshape(-1)])
+
     def _encode(self, cb, reset: bool, cam_xpos, cxo, cam_xmat, cmo, light_xpos, lxo, light_xdir, ldo):
         self.consts[8] = self.frame
         grains = self.grains is not None and self.grains.n_grains > 0
@@ -296,7 +325,8 @@ class Tier2Renderer:
         ce.setBuffer_offset_atIndex_(rt.inst_tab, 0, 1); ce.setBuffer_offset_atIndex_(rt.slot_mesh, 0, 2)
         ce.setBuffer_offset_atIndex_(rt.mesh_info, 0, 3); ce.setBuffer_offset_atIndex_(rt.vbuf, 0, 4)
         ce.setBuffer_offset_atIndex_(rt.ibuf, 0, 5); ce.setBuffer_offset_atIndex_(self._ias.inst_desc if grains else rt.inst_desc, 0, 6)
-        ce.setBuffer_offset_atIndex_(self.mat_buf or rt.mat_buf, 0, 7); ce.setBuffer_offset_atIndex_(self.color_buf, 0, 8)
+        ce.setBuffer_offset_atIndex_(self.mat_buf or getattr(self, "_opaque_mat_buf", None) or rt.mat_buf, 0, 7)   # + MaterialExt tail
+        ce.setBuffer_offset_atIndex_(self.color_buf, 0, 8)
         ce.setBuffer_offset_atIndex_(self.light_buf, 0, 9)
         ce.setBuffer_offset_atIndex_(light_xpos, lxo, 10); ce.setBuffer_offset_atIndex_(light_xdir, ldo, 11)
         ce.setBuffer_offset_atIndex_(self.params_buf, 0, 12); ce.setBuffer_offset_atIndex_(self.cam_buf, 0, 13)
@@ -472,6 +502,14 @@ class Tier2Renderer:
         """Replace the (G, 16) material table (layout: SceneTables.MATERIAL_LAYOUT) and rewrite the GPU buffer;
         the per-slot BRDF model ids of a non-legacy ``material_model`` are kept."""
         mats = np.asarray(materials, np.float32).reshape(self.G, 16).copy()
+        if getattr(self, "_opaque_mat_buf", None) is not None:
+            self.tables.materials[:] = mats.reshape(self.tables.materials.shape)
+            self.ctx.write_buffer(self.rt.mat_buf, mats)
+            mats = mats.copy(); mats[:, 3] = 1.0
+            self.ctx.write_buffer(self._opaque_mat_buf, mats)
+            return
+        if not self.transparency:
+            mats[:, 3] = 1.0
         if self.mat_buf is not None:
             mats[:, 15] = self.ctx.buffer_array(self.mat_buf, np.float32, (self.G, 16))[:, 15]
             self.ctx.write_buffer(self.mat_buf, mats)
