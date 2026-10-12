@@ -45,7 +45,9 @@ ap.add_argument("--skip-existing", action="store_true")
 ap.add_argument("--surface-depth", type=float, default=0.0,
                 help="draw only bed particles within this depth [m] of their local surface (0 = all); grains keep their "
                      "identity through the renderer's stable ids, so more grains per particle fit in memory")
-ap.add_argument("--flip-mesh-v", type=int, default=1, help="1: mirror mesh UVs (atlas convention workaround)")
+ap.add_argument("--flip-mesh-v", type=int, default=0,
+                help="1: mirror mesh UVs (only for renderers before the 2026-10 atlas fix, RENDER_COVERAGE item 11; the "
+                     "demo clip of 2026-10-12 was rendered that way)")
 ap.add_argument("--cam-eye", type=float, nargs=3, default=None, help="debug camera position (with --cam-target)")
 ap.add_argument("--cam-target", type=float, nargs=3, default=None)
 ap.add_argument("--ground-z", type=float, default=0.098, help="render-only ground plane height (just under the bed top)")
@@ -95,7 +97,10 @@ for l in list(spec.lights):
     spec.delete(l)
 tex = spec.add_texture(name="sand_ground", type=mujoco.mjtTexture.mjTEXTURE_2D, file=sand_tex)
 img = iio.imread(sand_tex)[..., :3].astype(np.float32) / 255.0
-tex_mean = img.reshape(-1, 3).mean(0)      # the atlas reads texture bytes as linear values (no sRGB decode)
+# the texture's mean albedo as the renderer samples it: sRGB-decoded since the 2026-10 atlas fix (before it the bytes
+# were read as linear values; the 2026-10-12 clip used that, with the same resulting plane albedo)
+srgb_decode = not a.flip_mesh_v
+tex_mean = ((img ** 2.2) if srgb_decode else img).reshape(-1, 3).mean(0)
 grain_mat = GrainMaterial()
 pal = np.array([p[:3] for p in grain_mat.palette]); w = np.array([p[3] for p in grain_mat.palette])
 grain_mean = (pal * w[:, None]).sum(0) / w.sum()
@@ -117,8 +122,8 @@ spec.worldbody.add_light(name="sun", type=mujoco.mjtLightType.mjLIGHT_DIRECTIONA
 spec.worldbody.add_camera(name="cine", pos=[3, 0, 1], fovy=a.fovy)
 model = spec.compile()
 if a.flip_mesh_v:
-    # metalsim's texture atlas samples mesh UVs vertically mirrored relative to MuJoCo (docs/RENDER_COVERAGE.md
-    # item 11, fixed on metalsim-render-fix); undo it here so the Menagerie textures land where MuJoCo puts them
+    # renderers before the 2026-10 atlas fix sampled mesh UVs vertically mirrored relative to MuJoCo
+    # (docs/RENDER_COVERAGE.md item 11); --flip-mesh-v 1 undoes that for them
     model.mesh_texcoord[:, 1] = 1.0 - model.mesh_texcoord[:, 1]
 data = mujoco.MjData(model)
 mujoco.mj_forward(model, data)

@@ -64,7 +64,9 @@ Outputs: grains appear in RGB, depth and normals like any geometry; segmentation
 | GPU input | Warp array input renders the same image as numpy |
 | tier 0 | grain segmentation agrees with tier 2 (IoU > 0.9), palette colour, per-env |
 
-RESULTS_PLACEHOLDER
+Measured (M4 Max, 2026-10-12): instance scaling in a 64 x 64 frame, 2 envs: 2,000 grains 0.4 MiB / 3 ms,
+160,000 grains 34 MiB / 19 ms, 1.6 M grains 338 MiB / 105 ms per frame (structure build included). At demo scale:
+25.1 M grains, a 5.2 GB instance structure; no instance-count limit was hit (Apple documents none).
 
 ## Demo: ANYmal C on MPM sand
 
@@ -75,7 +77,11 @@ split into an analytic sun disk (`hdr.extract_sun`: no fireflies from BSDF-sampl
 HDRI sun), decoration grains around the bed on a sand-textured ground plane, OIDN, ACES. `watchdog.py` kills a
 stalled or overrunning job.
 
-DEMO_PLACEHOLDER
+Result (2026-10-12, 14-inch M4 Max): 669,372 sand particles (46 ms per simulated frame) plus 261,061 decoration
+particles, 27 grains each = 25.1 M grain instances; 1920 x 1080, 128 spp (32 passes x 4), 5 bounces, OIDN: 10.4 s per
+frame median (12.1 s max), the 240-frame clip in 43 minutes; stills at 256 spp 16-21 s. Credits: Menagerie
+`anybotics_anymal_c` (BSD-3), Poly Haven `goegap` HDRI and `coast_sand_01` texture (CC0), Newton 1.5.2
+`example_mpm_anymal` and its walking policy (Apache-2.0).
 
 ## Limits and next steps
 
@@ -85,5 +91,5 @@ DEMO_PLACEHOLDER
 - Memory: ~270 B per grain (structure + descriptor); 22 M grains = 6 GB.
 - Tier 1 (hybrid) draws grains with tier-0 shading and no ray-traced shadows on them; the grains are not in tier 1's
   ray-tracing structure.
-- Mesh textures through the atlas are vertically mirrored (pre-existing, `docs/RENDER_COVERAGE.md` item 11); the demo
-  flips the Menagerie UVs until the atlas fix lands.
+- The 2026-10-12 demo clip was rendered before the atlas fix (RENDER_COVERAGE item 11) with `--flip-mesh-v 1`; on
+  the current renderer the default (0) is right.
