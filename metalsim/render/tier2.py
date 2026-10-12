@@ -34,6 +34,10 @@ Physical (USD / RTX) mode, all off by default (the defaults reproduce the origin
                       downward bias on bright indirect light (opt-in; docs/DECISIONS.md)
 See docs/research/rendering_vs_rtx_2026-09-25.md.
 
+Particles (``set_particles``): simulated particles (MPM sand, ...) drawn as render grains, instances of a few small
+irregular grain meshes in the same instance acceleration structure as the scene, rebuilt from the particle buffer on
+the GPU every frame, with a per-grain albedo palette (metalsim/render/particles.py, PARTICLES.md).
+
 Environment map (``set_environment``): an equirectangular HDR image replaces the sky colour as the miss
 radiance and as an importance-sampled light (next-event estimation with multiple importance sampling
 against the BSDF sampler, as PBRT's InfiniteAreaLight). Orientation follows a textured USD DomeLight as
@@ -229,18 +233,65 @@ class Tier2Renderer:
             lp[:, i] = model.light_pos[i]; ld[:, i] = model.light_dir[i]
         c.write_buffer(self._host_light_xpos, lp); c.write_buffer(self._host_light_xdir, ld)
         self.event = self.ctx.event
+        self.grains = None            # GrainField once set_particles is called (metalsim/render/particles.py)
+        self._ias = None
+        self._grain_dummy = c.buffer(176, label="pt_grain_placeholder")
+
+    # -- particles (render grains) ----------------------------------------------------------------------
+
+    def set_particles(self, positions, radius=None, material=None, *, grains_per_particle=8, grain_radius=None,
+                      radius_jitter=0.3, n_meshes=4, seed=0, cull_z=-np.inf, grain_eps=None):
+        """Draw particles as render grains (granular media: MPM sand, ...). ``positions``: (n_envs, P, 3) or (P, 3)
+        numpy [m], or a Warp array on the Metal device (bound directly each frame: the GPU path). ``radius``: the
+        particle radius [m] (half the particle spacing): each particle's grains are spread over its cube of half side
+        ``radius``. ``grain_radius``: volume-equivalent grain radius [m] (default ``radius / grains_per_particle^(1/3)``,
+        about touching grains). ``material``: ``particles.GrainMaterial`` (default sand). ``positions=None`` removes
+        the particles. Later calls with the same particle count only replace the positions (or material); other
+        arguments apply on the first call or when ``radius`` / ``grains_per_particle`` change."""
+        from metalsim.render.particles import GrainField, InstanceStructure
+        if positions is None:
+            self.grains, self._ias = None, None
+            return
+        g = self.grains
+        if g is None or (radius is not None and float(radius) != g.offset) or int(grains_per_particle) != g.k:
+            if radius is None:
+                raise ValueError("set_particles: radius is required the first time")
+            gr = grain_radius if grain_radius is not None else float(radius) / float(grains_per_particle) ** (1 / 3)
+            g = GrainField(self.ctx, self.n, grains_per_particle=grains_per_particle, radius=gr,
+                           radius_jitter=radius_jitter, offset=float(radius), n_meshes=n_meshes, material=material,
+                           seed=seed, cull_z=cull_z)
+            self.grains, self._ias = g, InstanceStructure(self.rt, g)
+        elif material is not None:
+            g.set_material(material)
+        g.cull_z = float(cull_z)
+        g.set_positions(positions)
+        cf = self.consts.view(np.float32)
+        self.consts[18:20] = (self.rt.n_inst, len(self.rt.prim_as))
+        cf[22] = grain_eps if grain_eps is not None else max(0.01 * g.radius, 1e-5)
+
+    def _encode_scene(self, cb, gx, gxo, gm, gmo):
+        """Refit the scene instances (and with particles: write the grain instances) and build the structure."""
+        if self.grains is None or self.grains.n_grains == 0:
+            self.rt._encode_refit_and_build(cb, gx, gxo, gm, gmo)
+        else:
+            self._ias.encode(cb, gx, gxo, gm, gmo)
 
     def _encode(self, cb, reset: bool, cam_xpos, cxo, cam_xmat, cmo, light_xpos, lxo, light_xdir, ldo):
         self.consts[8] = self.frame
-        self.consts[10] = (1 if reset else 0) | self.base_flags | self.env_flags
+        grains = self.grains is not None and self.grains.n_grains > 0
+        self.consts[10] = (1 if reset else 0) | self.base_flags | self.env_flags | (64 if grains else 0)
         ce = cb.computeCommandEncoder()
         ce.setComputePipelineState_(self.pipe)
         rt = self.rt
-        rt._use_resources(ce)
-        ce.setAccelerationStructure_atBufferIndex_(rt.inst_as, 0)
+        if grains:
+            self._ias.use_resources(ce)
+            ce.setAccelerationStructure_atBufferIndex_(self._ias.inst_as, 0)
+        else:
+            rt._use_resources(ce)
+            ce.setAccelerationStructure_atBufferIndex_(rt.inst_as, 0)
         ce.setBuffer_offset_atIndex_(rt.inst_tab, 0, 1); ce.setBuffer_offset_atIndex_(rt.slot_mesh, 0, 2)
         ce.setBuffer_offset_atIndex_(rt.mesh_info, 0, 3); ce.setBuffer_offset_atIndex_(rt.vbuf, 0, 4)
-        ce.setBuffer_offset_atIndex_(rt.ibuf, 0, 5); ce.setBuffer_offset_atIndex_(rt.inst_desc, 0, 6)
+        ce.setBuffer_offset_atIndex_(rt.ibuf, 0, 5); ce.setBuffer_offset_atIndex_(self._ias.inst_desc if grains else rt.inst_desc, 0, 6)
         ce.setBuffer_offset_atIndex_(self.mat_buf or rt.mat_buf, 0, 7); ce.setBuffer_offset_atIndex_(self.color_buf, 0, 8)
         ce.setBuffer_offset_atIndex_(self.light_buf, 0, 9)
         ce.setBuffer_offset_atIndex_(light_xpos, lxo, 10); ce.setBuffer_offset_atIndex_(light_xdir, ldo, 11)
@@ -253,6 +304,9 @@ class Tier2Renderer:
         for i, k in enumerate(("hdr", "aux_accum", "albedo", "nrm")):
             v = self._aux_views[k]; ce.setBuffer_offset_atIndex_(v.buffer, v.offset, 22 + i)
         ce.setBuffer_offset_atIndex_(self._env_cdf, 0, 26)
+        g = self.grains if grains else None
+        for i, b in enumerate((g.vbuf, g.ibuf, g.mesh_info, g.mat_buf) if g else (self._grain_dummy,) * 4):
+            ce.setBuffer_offset_atIndex_(b, 0, 27 + i)
         ce.setTexture_atIndex_(self.atlas_tex, 0); ce.setSamplerState_atIndex_(self.samp, 0)
         ce.setTexture_atIndex_(self._env_tex, 1); ce.setSamplerState_atIndex_(self.env_samp, 1)
         ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.tw, self.th, self.n), Metal.MTLSize(8, 8, 1))
@@ -308,7 +362,7 @@ class Tier2Renderer:
         cb = self.ctx.command_buffer()
         self.ctx.wait_for(cb, sim.event, after_value)
         gm_buf, gm_off = self.rt.encode_geom_xmat(cb, sim, v["geom_xmat"].buffer, v["geom_xmat"].offset)
-        self.rt._encode_refit_and_build(cb, v["geom_xpos"].buffer, v["geom_xpos"].offset, gm_buf, gm_off)
+        self._encode_scene(cb, v["geom_xpos"].buffer, v["geom_xpos"].offset, gm_buf, gm_off)
         lx = v.get("light_xpos"); ld = v.get("light_xdir")
         lxb, lxo, ldb, ldo = (lx.buffer, lx.offset, ld.buffer, ld.offset) if lx else (self._host_light_xpos, 0, self._host_light_xdir, 0)
         for p in range(passes):
@@ -421,9 +475,10 @@ class Tier2Renderer:
             self.tables.materials[:] = mats.reshape(self.tables.materials.shape)
             self.ctx.write_buffer(self.rt.mat_buf, mats)
 
-    def render_host(self, datas, passes=1, reset=True, cam_pos=None, cam_quat=None, geom_size=None):
+    def render_host(self, datas, passes=1, reset=True, cam_pos=None, cam_quat=None, geom_size=None, chunk=None):
         """Host path from MjData lists (tests/tools); synchronizes; returns numpy outputs. ``geom_size`` (N, ngeom, 3):
-        per-world sizes of the terrain slots (default the model's)."""
+        per-world sizes of the terrain slots (default the model's). ``chunk``: commit and wait every ``chunk`` passes
+        (long offline renders: bounded command buffers; same result)."""
         from metalsim.render.scene_tables import quats_to_mats
         n, ng, nc, nl = self.n, self.m.ngeom, max(self.m.ncam, 1), max(self.m.nlight, 1)
         c = self.ctx; rt = self.rt
@@ -443,8 +498,10 @@ class Tier2Renderer:
             c.write_buffer(self._host_light_xpos, np.stack([d.light_xpos for d in datas]).astype(np.float32).reshape(n, nl, 3))
             c.write_buffer(self._host_light_xdir, np.stack([d.light_xdir for d in datas]).astype(np.float32).reshape(n, nl, 3))
         cb = c.command_buffer()
-        rt._encode_refit_and_build(cb, rt._host_geom_xpos, 0, rt._host_geom_xmat, 0)
+        self._encode_scene(cb, rt._host_geom_xpos, 0, rt._host_geom_xmat, 0)
         for p in range(passes):
+            if chunk and p and p % int(chunk) == 0:
+                c.commit(cb); c.synchronize(); cb = c.command_buffer()
             self._encode(cb, reset and p == 0, self._host_cam_xpos, 0, self._host_cam_xmat, 0, self._host_light_xpos, 0, self._host_light_xdir, 0)
         cb = self._postprocess(cb)
         c.commit(cb); c.synchronize()
