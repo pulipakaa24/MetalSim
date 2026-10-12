@@ -109,7 +109,8 @@ class Radar:
         self.site_body = int(m.site_bodyid[self.site])
         self._beams = wp.array(self.lidar.beams, dtype=wp.vec2, device=dev)
         self._omega = wp.array(omega, dtype=float, device=dev)
-        self._slot_body = wp.array(m.geom_bodyid[geoms].astype(np.int32), dtype=int, device=dev)
+        slot_body = rt.tables.semantic[:, 1] if rt.tables.extras else m.geom_bodyid[geoms]   # extra slots: their body
+        self._slot_body = wp.array(slot_body.astype(np.int32), dtype=int, device=dev)
         self._slot_refl = wp.array(refl.astype(np.float32), dtype=float, device=dev)
         self._rootid = wp.array(m.body_rootid.astype(np.int32), dtype=int, device=dev)
         self.rcs_min_dbsm = float(rcs_min_dbsm)

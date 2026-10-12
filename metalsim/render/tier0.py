@@ -44,6 +44,7 @@ class Tier0Renderer:
                  terrain_slots: bool = True, draw_hfields: bool = True, hfield_cull: bool = True, hfield_tile: int = 16,
                  appearance: str = "mujoco", skybox: bool = True, shadow_lights: str = "all", max_lights: int | None = None,
                  transparency: bool = True, transparent_ids: str = "surface",
+                 visual=None, deformables=(), tube_slices=None, cap_stacks=None,
                  ctx: MetalContext | None = None, device="metal:0"):
         """tier 0: raster + shadow maps. tier 1: raster G-buffer with ray-traced shadows, ambient
         occlusion and mirror reflections from the fragment stage (Metal hardware ray tracing).
@@ -74,7 +75,16 @@ class Tier0Renderer:
         "surface" (default; "mujoco" is an alias): segmentation, depth and normal of the transparent surface, as
         ``mujoco.Renderer``'s segmentation and depth images (measured: depth on the glass) and Isaac's depth on glass;
         "behind": all three from what is behind it (Isaac Sim's RTX Real-Time drops partially opaque objects from depth
-        and segmentation). The colour pass itself writes no depth on the first (front-to-back) blend, as MuJoCo."""
+        and segmentation). The colour pass itself writes no depth on the first (front-to-back) blend, as MuJoCo.
+
+        ``visual``: the non-geom objects MuJoCo's own renderer draws, under this ``mujoco.MjvOption`` (None: MuJoCo's
+        default option, i.e. what ``mujoco.Renderer`` shows; False: geoms only): sites in the visible site groups,
+        flexes (cloth / soft volumes as their offset skin, cables as edge cylinders), skins and spatial tendons
+        (``metalsim.render.extras``). ``deformables``: user ``extras.DeformableMesh`` objects (XPBD / PhysX-port cloth
+        or any (N, V, 3) vertex array; pass the arrays as ``render(..., sources={name: array})``). The deforming ones are
+        regenerated on the GPU each frame (``metalsim.render.dynamic_mesh``); ``tube_slices`` / ``cap_stacks`` set the
+        cylinder / capsule tessellation (default MuJoCo's ``vis.quality``). Segmentation ids of the extra objects in
+        geom mode: ``ngeom + 1 + j`` (``tables.extras[j]["seg_id"]``)."""
         self.m = model
         self.tier = tier
         self.rt_samples = rt_samples
@@ -98,8 +108,11 @@ class Tier0Renderer:
         self.device = device
         self.tables: SceneTables = build_scene_tables(model, n_envs, max_group=max_group, include_planes=include_planes,
                                                       decimate_faces=decimate_faces, sized_geoms="auto" if terrain_slots else (),
-                                                      draw_hfields=draw_hfields, appearance=appearance)
+                                                      draw_hfields=draw_hfields, appearance=appearance,
+                                                      visual=visual, deformables=deformables)
         self.G = self.tables.G
+        self._extras_kw = dict(visual=mujoco.MjvOption() if visual is None else visual, deformables=deformables,
+                               tube_slices=tube_slices, cap_stacks=cap_stacks)   # the camera default: everything MuJoCo draws
         hf_tris = sum(self.tables.meshes[k]["i_count"] // 3 for g, k in zip(self.tables.geoms, self.tables.geom_mesh)
                       if int(model.geom_type[g]) == int(mujoco.mjtGeom.mjGEOM_HFIELD))
         self.hfield_cull, self.hfield_tile = bool(hfield_cull and hf_tris), int(hfield_tile)
@@ -137,9 +150,19 @@ class Tier0Renderer:
             from metalsim.sensors.raytrace import RayTracer
             self.rt = RayTracer(model, n_envs, max_range=50.0, max_group=max_group, include_planes=include_planes,
                                 decimate_faces=decimate_faces, terrain_slots=terrain_slots, draw_hfields=draw_hfields,
-                                appearance=appearance, ctx=self.ctx, device=device)
+                                appearance=appearance, ctx=self.ctx, device=device, **self._extras_kw)
             ro = np.zeros(4, np.uint32); ro[0] = self.rt.tpr; ro.view(np.float32)[1] = self.rt.stride; ro[2] = rt_samples
             self.rt_offset_buf = self.ctx.buffer(16, ro, "rt_offset")
+        # extra objects: pose rows of the site slots; vertices of the dynamic slots (shared with the ray tracer at tier 1,
+        # whose records carry the env grid offset that dyn_vs subtracts)
+        self.dyn, self.pose, self._dyn_src = None, None, None
+        if self.tables.dyn:
+            from metalsim.render.dynamic_mesh import DynamicMeshes
+            self.dyn = self.rt.dyn if self.rt is not None else DynamicMeshes(self.ctx, model, self.tables, n_envs, tube_slices=tube_slices,
+                                                                             cap_stacks=cap_stacks)
+        if self.tables.site_ids:
+            from metalsim.render.dynamic_mesh import PoseGather
+            self.pose = PoseGather(self.ctx, model, self.tables, n_envs)
 
     # -- resources --------------------------------------------------------------------------------
 
@@ -148,7 +171,8 @@ class Tier0Renderer:
         self.vbuf = c.buffer(t.vertices.nbytes, t.vertices, "vertices")
         self.ibuf = c.buffer(t.indices.nbytes, t.indices, "indices")
         self.inst_buf = c.buffer(t.inst_table.nbytes, t.inst_table, "instances")
-        self.slot_geom = c.buffer(4 * self.G, np.asarray(t.geoms, np.int32), "slot_geom")
+        self.slot_geom = c.buffer(4 * self.G, t.instanced_slot_pose(), "slot_geom")
+        self.pose_rows = t.pose_rows(self.m)        # geom pose rows per env, then the drawn sites'
         self.mat_buf = c.buffer(t.materials.nbytes, t.materials, "materials")
         mext = t.material_ext if t.material_ext is not None else np.zeros((self.G, 8), np.float32)
         self.mat_ext_buf = c.buffer(mext.nbytes, np.ascontiguousarray(mext, np.float32), "material_ext")
@@ -190,7 +214,7 @@ class Tier0Renderer:
         self._build_transparency()
         flags = ((1 if self.use_bg else 0) | (2 if self.shadows else 0) | (4 if self.skybox else 0)
                  | (8 if self.shadows and self.n_views else 0))
-        self.consts = np.array([self.n, self.m.ngeom, self.G, self.tpr, self.tw, self.th, self.aw, self.ah,
+        self.consts = np.array([self.n, self.pose_rows, self.G, self.tpr, self.tw, self.th, self.aw, self.ah,
                                 max(self.m.ncam, 1), self.bg_layers, flags, max(self.n_light, 1),
                                 self.sw, self.sh, self.saw, self.sah, self.n_views, 0, 0, 0], np.uint32)
         self.consts_buf = c.buffer(self.consts.nbytes, self.consts, "consts")
@@ -217,8 +241,8 @@ class Tier0Renderer:
         # host-path camera buffers (cam_xpos/cam_xmat) and geom buffers are bound from the sim in the GPU path
         self._host_cam_xpos = c.buffer(self.n * max(self.m.ncam, 1) * 12, label="host_cam_xpos")
         self._host_cam_xmat = c.buffer(self.n * max(self.m.ncam, 1) * 36, label="host_cam_xmat")
-        self._host_geom_xpos = c.buffer(self.n * self.m.ngeom * 12, label="host_geom_xpos")
-        self._host_geom_xmat = c.buffer(self.n * self.m.ngeom * 36, label="host_geom_xmat")
+        self._host_geom_xpos = c.buffer(self.n * self.pose_rows * 12, label="host_geom_xpos")
+        self._host_geom_xmat = c.buffer(self.n * self.pose_rows * 36, label="host_geom_xmat")
         nl = max(self.n_light, 1)
         self._host_light_xpos = c.buffer(self.n * nl * 12, label="host_light_xpos")
         self._host_light_xdir = c.buffer(self.n * nl * 12, label="host_light_xdir")
@@ -409,6 +433,18 @@ class Tier0Renderer:
             d.setDepthAttachmentPixelFormat_(Metal.MTLPixelFormatDepth32Float)
             self.sview_pipe = c.render_pipeline(d)
             self.p_sviews = c.compute_pipeline(lib, "build_shadow_views")
+            if self.tables.dyn:
+                d = Metal.MTLRenderPipelineDescriptor.new()
+                d.setVertexFunction_(lib.newFunctionWithName_("dyn_shadow_view_vs"))
+                d.setFragmentFunction_(lib.newFunctionWithName_("shadow_view_fs"))
+                d.setDepthAttachmentPixelFormat_(Metal.MTLPixelFormatDepth32Float)
+                self.dyn_sview_pipe = c.render_pipeline(d)
+        if self.tables.dyn:
+            self.dyn_pipe, _ = make("dyn_vs", "geom_fs_rt" if self.tier >= 1 else "geom_fs", True, Metal.MTLCompareFunctionLess, False)
+            d = Metal.MTLRenderPipelineDescriptor.new()
+            d.setVertexFunction_(lib.newFunctionWithName_("dyn_shadow_vs"))
+            d.setDepthAttachmentPixelFormat_(Metal.MTLPixelFormatDepth32Float)
+            self.dyn_shadow_pipe = c.render_pipeline(d)
         if self.hfield_cull:
             self.hf_pipe, _ = make("hf_tile_vs", "geom_fs_rt" if self.tier >= 1 else "geom_fs", True, Metal.MTLCompareFunctionLess, False)
             d = Metal.MTLRenderPipelineDescriptor.new()
@@ -514,6 +550,11 @@ class Tier0Renderer:
         ce.setBuffer_offset_atIndex_(self.params_buf, 0, 7)
         ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n, 1, 1), Metal.MTLSize(min(self.n, 64), 1, 1))
         ce.endEncoding()
+        # 1-. dynamic slots' vertices (tier 1: generated with the ray tracer's structures in step 1c)
+        if self.dyn is not None and self.rt is None:
+            if self._dyn_src is None:
+                raise ValueError("dynamic objects need their sources (render / render_host bind them)")
+            self.dyn.encode(cb, self._dyn_src)
         # 1a'. transparent geoms: per-env order by camera distance (sort_transparent)
         if self.n_trans:
             ce = cb.computeCommandEncoder()
@@ -567,6 +608,9 @@ class Tier0Renderer:
                 self._bind_hf(se, self.hf_svis)
                 se.drawIndexedPrimitives_indexType_indexBuffer_indexBufferOffset_indirectBuffer_indirectBufferOffset_(
                     Metal.MTLPrimitiveTypeTriangle, Metal.MTLIndexTypeUInt32, self.hf_ibuf, 0, self.hf_args, 32)
+            if self.dyn is not None:
+                se.setRenderPipelineState_(self.dyn_shadow_pipe)
+                self._draw_dyn(se)
             if grains is not None:
                 grains.draw_shadow(se)
             se.endEncoding()
@@ -604,6 +648,9 @@ class Tier0Renderer:
                 for i_off, i_count, first, count in self._shadow_draws:
                     se.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_instanceCount_baseVertex_baseInstance_(
                         Metal.MTLPrimitiveTypeTriangle, i_count, Metal.MTLIndexTypeUInt32, self.ibuf, i_off * 4, count, 0, first)
+                if self.dyn is not None:            # deformables, tendons and skins cast every light's shadow too
+                    se.setRenderPipelineState_(self.dyn_sview_pipe)
+                    self._draw_dyn(se)
                 se.endEncoding()
         # 1c. tier 1: refit instance descriptors from the same physics buffers and rebuild the instance AS
         if self.rt is not None:
@@ -684,6 +731,9 @@ class Tier0Renderer:
             self._bind_hf(re, self.hf_vis)
             re.drawIndexedPrimitives_indexType_indexBuffer_indexBufferOffset_indirectBuffer_indirectBufferOffset_(
                 Metal.MTLPrimitiveTypeTriangle, Metal.MTLIndexTypeUInt32, self.hf_ibuf, 0, self.hf_args, 0)
+        if self.dyn is not None:
+            re.setRenderPipelineState_(self.dyn_pipe)
+            self._draw_dyn(re)
         if grains is not None:
             grains.draw(re, light_xpos, light_xpos_off, light_xdir, light_xdir_off)
         if self.n_trans:          # transparent geoms last: front to back, then back to front (MuJoCo's mjr_render)
@@ -729,6 +779,21 @@ class Tier0Renderer:
         ue.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.tw, self.th, self.n), Metal.MTLSize(16, 16, 1))
         ue.endEncoding()
 
+    def _draw_dyn(self, enc):
+        """One draw per dynamic object (instance = env) from its generated records; buffer 1 (env params) stays bound."""
+        dyn = self.dyn
+        enc.setVertexBuffer_offset_atIndex_(dyn.vbuf, 0, 0)
+        enc.setVertexBuffer_offset_atIndex_(self.env_buf, 0, 1)
+        for i_off, i_count, rbase, nvert, slot in dyn.draws:
+            if not i_count:
+                continue
+            dd = np.zeros(8, np.uint32)
+            dd[:4] = (rbase, nvert, slot, dyn.tpr)
+            dd.view(np.float32)[4] = dyn.stride
+            enc.setVertexBytes_length_atIndex_(dd.tobytes(), dd.nbytes, 2)
+            enc.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_instanceCount_baseVertex_baseInstance_(
+                Metal.MTLPrimitiveTypeTriangle, i_count, Metal.MTLIndexTypeUInt32, dyn.local_ibuf, i_off * 4, self.n, 0, 0)
+
     def _bind_hf(self, enc, vis):
         """Vertex buffers of the tile draw (1, 3, 4, 5, 7 stay bound from the preceding draws)."""
         enc.setVertexBuffer_offset_atIndex_(self.vbuf, 0, 0)
@@ -760,21 +825,43 @@ class Tier0Renderer:
         f.set_positions(positions)
         f.set_ids(ids)
 
-    def render(self, sim, after_value: int | None = None) -> int:
+    def _set_sources(self, sim=None, sources=None, datas=None):
+        """Per-frame sources of the dynamic slots (see ``RayTracer.set_sources``)."""
+        if self.rt is not None:
+            self.rt.set_sources(sim, sources, datas)
+        elif self.dyn is not None:
+            self._dyn_src = self.dyn.write_host(datas, sources) if datas is not None else self.dyn.sources_from_sim(sim.d, sources)
+        elif sources:
+            raise ValueError("this scene has no dynamic objects")
+
+    def render(self, sim, after_value: int | None = None, sources=None) -> int:
         """GPU path: render the current physics state of ``sim`` (a BatchSim). Waits for
         ``sim.event >= after_value`` (default: the latest value), signals ``self.ctx.event``;
-        returns that value. Nothing synchronizes the host."""
-        if after_value is None:
-            after_value = sim.event.value
+        returns that value. Nothing synchronizes the host.
+
+        ``sources``: per-frame vertex arrays of the dynamic objects that do not come from ``sim.d``: ``flexvert_xpos``
+        from another flex simulator (``XPBDSim.x``) and one (N, V, 3) Warp array per user ``DeformableMesh``
+        (``PhysXClothSim.x``). A ``sim`` without an ``event`` (``DeformableSim``, ``XPBDSim``) must be synchronized by
+        the caller before the render."""
+        ev = getattr(sim, "event", None)
+        if after_value is None and ev is not None:
+            after_value = ev.value
         names = ["geom_xpos", "geom_xmat", "cam_xpos", "cam_xmat"] + (["light_xpos", "light_xdir"] if self.n_light else [])
         views = {name: wm.buffer_of(getattr(sim.d, name)) for name in names}
+        self._set_sources(sim, sources)
         cb = self.ctx.command_buffer()
-        self.ctx.wait_for(cb, sim.event, after_value)
+        if ev is not None:
+            self.ctx.wait_for(cb, ev, after_value)
         lx = views.get("light_xpos"); ld = views.get("light_xdir")
         gm_buf, gm_off = views["geom_xmat"].buffer, views["geom_xmat"].offset
         if self.sized is not None:          # per-world slot sizes folded into a copy of geom_xmat
             gm_buf, gm_off = self.sized.encode(cb, gm_buf, gm_off, sim.m.geom_size)
-        self._encode(cb, views["geom_xpos"].buffer, views["geom_xpos"].offset, gm_buf,
+        gx_buf, gx_off = views["geom_xpos"].buffer, views["geom_xpos"].offset
+        if self.pose is not None:           # site slots: their pose rows after the geoms'
+            sx, sm = wm.buffer_of(sim.d.site_xpos), wm.buffer_of(sim.d.site_xmat)
+            (gx_buf, gx_off), (gm_buf, gm_off) = self.pose.encode(cb, (gx_buf, gx_off), (gm_buf, gm_off),
+                                                                  (sx.buffer, sx.offset), (sm.buffer, sm.offset))
+        self._encode(cb, gx_buf, gx_off, gm_buf,
                      gm_off, views["cam_xpos"].buffer, views["cam_xpos"].offset,
                      views["cam_xmat"].buffer, views["cam_xmat"].offset,
                      lx.buffer if lx else None, lx.offset if lx else 0, ld.buffer if ld else None, ld.offset if ld else 0)
@@ -793,15 +880,19 @@ class Tier0Renderer:
 
     # -- host path (tests, tools): render from MjData ------------------------------------------------
 
-    def render_host(self, datas, cam_pos=None, cam_quat=None, geom_size=None):
+    def render_host(self, datas, cam_pos=None, cam_quat=None, geom_size=None, sources=None):
         """Render from a list of N ``mujoco.MjData`` (mj_forward'd). Optional per-env camera pose
         overrides ``(N,3)``/``(N,4)`` replace the model camera; ``geom_size`` (N, ngeom, 3): per-world sizes of the
-        terrain slots (default the model's). Synchronizes; returns numpy outputs."""
+        terrain slots (default the model's); ``sources``: as ``render`` (numpy (N, V, 3) arrays). Synchronizes;
+        returns numpy outputs."""
         n, ng, nc = self.n, self.m.ngeom, max(self.m.ncam, 1)
         gx = np.stack([d.geom_xpos for d in datas]).astype(np.float32).reshape(n, ng, 3)
         gm = np.stack([d.geom_xmat for d in datas]).astype(np.float32).reshape(n, ng, 9)
         if self.sized is not None:
             gm = self.sized.scale_host(gm, geom_size).astype(np.float32)
+        if self.pose is not None:
+            gx, gm = self.pose.host(gx, gm, datas)
+        self._set_sources(sources=sources, datas=datas)
         if cam_pos is not None:
             cx = np.zeros((n, nc, 3), np.float32); cm = np.zeros((n, nc, 9), np.float32)
             cx[:, self.cam_id] = cam_pos

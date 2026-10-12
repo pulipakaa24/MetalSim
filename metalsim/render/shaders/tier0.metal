@@ -1053,3 +1053,63 @@ fragment FSOut geom_fs_rt(
     o.normal = float4(N, 1.0);
     return o;
 }
+
+// =================================================================================================
+// Dynamic slots (metalsim.render.dynamic_mesh): flexes, skins, spatial tendons and user deformable meshes. Their
+// vertex records (position, normal, uv; world frame plus the ray tracer's env grid offset when there is one) are
+// generated per env each frame; one draw per object, instance = env, local indices. Fragments go through geom_fs /
+// geom_fs_rt like every geom.
+struct DynDraw { uint rbase, vstride, slot, tpr; float stride, _a, _b, _c; };
+
+inline float3 dyn_record(device const float* rec, uint vid, uint env, constant DynDraw& dd, thread float3& n, thread float2& uv) {
+    device const float* r = rec + (dd.rbase + env * dd.vstride + vid) * 8;
+    n = float3(r[3], r[4], r[5]); uv = float2(r[6], r[7]);
+    float3 off = dd.stride == 0.0f ? float3(0.0) : float3(float(env % dd.tpr) * dd.stride, float(env / dd.tpr) * dd.stride, 0.0);
+    return float3(r[0], r[1], r[2]) - off;
+}
+
+vertex VSOut dyn_vs(uint vid [[vertex_id]], uint env [[instance_id]],
+                    device const float* rec [[buffer(0)]], device const EnvParams* envs [[buffer(1)]],
+                    constant DynDraw& dd [[buffer(2)]])
+{
+    float3 n; float2 uv;
+    float3 p = dyn_record(rec, vid, env, dd, n, uv);
+    EnvParams e = envs[env];
+    float4 clip = tile_clip(e.view_proj * float4(p, 1.0), e.tile);
+    VSOut o;
+    o.clip = clip;
+    clip_to_tile(o.clip_distance, clip, e.tile);
+    o.world_pos = p; o.normal_w = n; o.uv = uv; o.env = env; o.slot = dd.slot;
+    return o;
+}
+
+vertex ShadowOut dyn_shadow_vs(uint vid [[vertex_id]], uint env [[instance_id]],
+                               device const float* rec [[buffer(0)]], device const EnvParams* envs [[buffer(1)]],
+                               constant DynDraw& dd [[buffer(2)]])
+{
+    float3 n; float2 uv;
+    float3 p = dyn_record(rec, vid, env, dd, n, uv);
+    EnvParams e = envs[env];
+    float4 clip = tile_clip(e.light_vp * float4(p, 1.0), e.shadow_tile);
+    ShadowOut o;
+    o.clip = clip;
+    clip_to_tile(o.clip_distance, clip, e.shadow_tile);
+    return o;
+}
+
+vertex ShadowViewOut dyn_shadow_view_vs(uint vid [[vertex_id]], uint env [[instance_id]],
+                                        device const float* rec [[buffer(0)]], device const EnvParams* envs [[buffer(1)]],
+                                        constant DynDraw& dd [[buffer(2)]], device const ShadowView* views [[buffer(6)]],
+                                        constant Consts& c [[buffer(7)]], constant uint& view [[buffer(8)]])
+{   // the dynamic slots in the extra lights' shadow maps (shadow_view_vs for generated records)
+    float3 n; float2 uv;
+    float3 p = dyn_record(rec, vid, env, dd, n, uv);
+    EnvParams e = envs[env];
+    ShadowView sv = views[env * c.n_shadow_views + view];
+    float4 clip = tile_clip(sv.vp * float4(p, 1.0), e.shadow_tile);
+    ShadowViewOut o;
+    o.clip = clip;
+    clip_to_tile(o.clip_distance, clip, e.shadow_tile);
+    o.world_pos = p; o.env = env;
+    return o;
+}

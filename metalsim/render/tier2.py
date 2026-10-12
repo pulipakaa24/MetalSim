@@ -100,6 +100,7 @@ class Tier2Renderer:
                  denoise=None, denoise_quality="high", atrous_iters=5, aux=False, center_sample=False, clip_far=0.0,
                  terrain_slots: bool = True, draw_hfields: bool = True, firefly_clamp=0.0,
                  appearance: str = "mujoco", skybox: bool = True, transparency: bool = True, transparent_ids: str = "surface",
+                 visual=None, deformables=(), tube_slices=None, cap_stacks=None, dyn_rebuild_every: int = 32,
                  ctx: MetalContext | None = None, device="metal:0"):
         """``terrain_slots`` / ``draw_hfields`` / ``appearance``: see ``Tier0Renderer`` (False / "legacy" = the
         previous behaviour). ``skybox``: the model's skybox texture is the environment (camera background and the
@@ -110,14 +111,20 @@ class Tier2Renderer:
         path tracer: rays meet it with probability alpha and otherwise pass unchanged, shadow rays are attenuated by
         (1 - alpha) per surface (pathtrace.metal ``transmit``); False = every geom opaque (the previous behaviour).
         ``transparent_ids``: annotations of pixels whose first surface is transparent, as ``Tier0Renderer``: "surface"
-        (default, MuJoCo's; "mujoco" is an alias) or "behind" (the first opaque surface behind it)."""
+        (default, MuJoCo's; "mujoco" is an alias) or "behind" (the first opaque surface behind it).
+        ``visual`` / ``deformables`` / ``tube_slices`` / ``cap_stacks``: sites, flexes, skins, spatial tendons and user
+        deformable meshes, see ``Tier0Renderer``; ``dyn_rebuild_every``: see ``RayTracer``."""
         import mujoco
         self.m, self.n, self.tw, self.th = model, n_envs, width, height
         self.device = device
         self.ctx = ctx or MetalContext(device)
         self.rt = RayTracer(model, n_envs, max_range=1000.0, max_group=max_group, include_planes=include_planes,
                             decimate_faces=decimate_faces, terrain_slots=terrain_slots, draw_hfields=draw_hfields,
-                            appearance=appearance, ctx=self.ctx, device=device)
+                            appearance=appearance,
+                            visual=mujoco.MjvOption() if visual is None else visual, deformables=deformables,
+                            tube_slices=tube_slices, cap_stacks=cap_stacks,
+                            dyn_rebuild_every=dyn_rebuild_every, ctx=self.ctx, device=device)
+
         self.tables = self.rt.tables
         self.G = self.tables.G
         cam_id = 0 if camera is None else (mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_CAMERA, camera) if isinstance(camera, str) else int(camera))
@@ -170,6 +177,8 @@ class Tier2Renderer:
             for slot, g in enumerate(t.geoms):
                 nm = mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_GEOM, g)
                 mats[slot, 15] = ids[spec_.get(nm, spec_.get(None, "legacy"))]
+            for j, ex in enumerate(t.extras):    # extra slots (sites, flexes, ...) by their own name
+                mats[len(t.geoms) + j, 15] = ids[spec_.get(ex["name"], spec_.get(None, "legacy"))]
             if not transparency:
                 mats[:, 3] = 1.0
             mats = self._with_ext(mats)
@@ -386,17 +395,22 @@ class Tier2Renderer:
             cb2 = self.ctx.command_buffer(); self._encode_tonemap(cb2); return cb2
         return cb
 
-    def render(self, sim, after_value=None, reset=True, passes=1) -> int:
+    def render(self, sim, after_value=None, reset=True, passes=1, sources=None) -> int:
         """GPU path from a BatchSim: refit + rebuild the acceleration structure, then ``passes`` path
-        tracing passes of ``spp`` samples each (progressive; ``reset`` restarts accumulation)."""
-        if after_value is None:
-            after_value = sim.event.value
+        tracing passes of ``spp`` samples each (progressive; ``reset`` restarts accumulation).
+        ``sources``: vertex arrays of the dynamic objects not in ``sim.d`` (see ``Tier0Renderer.render``)."""
+        ev = getattr(sim, "event", None)
+        if after_value is None and ev is not None:
+            after_value = ev.value
         names = ["geom_xpos", "geom_xmat", "cam_xpos", "cam_xmat"] + (["light_xpos", "light_xdir"] if self.m.nlight else [])
         v = {k: wm.buffer_of(getattr(sim.d, k)) for k in names}
+        self.rt.set_sources(sim, sources)
         cb = self.ctx.command_buffer()
-        self.ctx.wait_for(cb, sim.event, after_value)
+        if ev is not None:
+            self.ctx.wait_for(cb, ev, after_value)
         gm_buf, gm_off = self.rt.encode_geom_xmat(cb, sim, v["geom_xmat"].buffer, v["geom_xmat"].offset)
-        self._encode_scene(cb, v["geom_xpos"].buffer, v["geom_xpos"].offset, gm_buf, gm_off)
+        gx_buf, gx_off, gm_buf, gm_off = self.rt.encode_pose(cb, sim, v["geom_xpos"].buffer, v["geom_xpos"].offset, gm_buf, gm_off)
+        self._encode_scene(cb, gx_buf, gx_off, gm_buf, gm_off)
         lx = v.get("light_xpos"); ld = v.get("light_xdir")
         lxb, lxo, ldb, ldo = (lx.buffer, lx.offset, ld.buffer, ld.offset) if lx else (self._host_light_xpos, 0, self._host_light_xdir, 0)
         for p in range(passes):
@@ -517,18 +531,22 @@ class Tier2Renderer:
             self.tables.materials[:] = mats.reshape(self.tables.materials.shape)
             self.ctx.write_buffer(self.rt.mat_buf, mats)
 
-    def render_host(self, datas, passes=1, reset=True, cam_pos=None, cam_quat=None, geom_size=None, chunk=None):
+    def render_host(self, datas, passes=1, reset=True, cam_pos=None, cam_quat=None, geom_size=None, chunk=None, sources=None):
         """Host path from MjData lists (tests/tools); synchronizes; returns numpy outputs. ``geom_size`` (N, ngeom, 3):
         per-world sizes of the terrain slots (default the model's). ``chunk``: commit and wait every ``chunk`` passes
-        (long offline renders: bounded command buffers; same result)."""
+        (long offline renders: bounded command buffers; same result). ``sources``: as ``render`` (numpy arrays)."""
         from metalsim.render.scene_tables import quats_to_mats
         n, ng, nc, nl = self.n, self.m.ngeom, max(self.m.ncam, 1), max(self.m.nlight, 1)
         c = self.ctx; rt = self.rt
-        c.write_buffer(rt._host_geom_xpos, np.stack([d.geom_xpos for d in datas]).astype(np.float32).reshape(n, ng, 3))
+        gx = np.stack([d.geom_xpos for d in datas]).astype(np.float32).reshape(n, ng, 3)
         gm = np.stack([d.geom_xmat for d in datas]).astype(np.float32).reshape(n, ng, 9)
         if rt.sized is not None:
             gm = rt.sized.scale_host(gm, geom_size).astype(np.float32)
+        if rt.pose is not None:
+            gx, gm = rt.pose.host(gx, gm, datas)
+        c.write_buffer(rt._host_geom_xpos, gx)
         c.write_buffer(rt._host_geom_xmat, gm)
+        rt.set_sources(sources=sources, datas=datas)
         if cam_pos is not None:
             cx = np.zeros((n, nc, 3), np.float32); cm = np.zeros((n, nc, 9), np.float32)
             cx[:, self.cam_id] = cam_pos; cm[:, self.cam_id] = quats_to_mats(np.asarray(cam_quat, np.float64)).reshape(n, 9)

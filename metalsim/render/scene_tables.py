@@ -352,9 +352,33 @@ class SceneTables:
     # 0: uv offset xy (added after the texrepeat scale), texture kind (0 2D, 1 cube), sRGB texture (1: decode to linear)
     # 1: cube object scale xyz (geom-frame position -> MuJoCo's cube-map object coordinates), cube faces (1 or 6)
     MATERIAL_EXT_LAYOUT = ("uvoffset_kind_srgb", "cubescale_faces")
+    # non-geom objects MuJoCo's renderer draws (metalsim.render.extras): slots G0 = len(geoms) .. G - 1, sites first.
+    # With extras, G counts every slot; ``geoms`` / ``geom_mesh`` / ``draws`` / ``inst_table`` keep their meaning for the
+    # geom slots, sites add instanced slots (pose rows ngeom + k), dynamic objects (flex, skin, tendon, user meshes) are
+    # drawn from GPU-generated vertices (metalsim.render.dynamic_mesh).
+    extras: list = field(default_factory=list)      # per extra slot: kind, objtype, objid, name, seg_id (geom seg mode)
+    vis: dict = field(default_factory=dict)         # flex visual flags of the mjvOption used
+    n_geom_slots: int = 0
+    site_ids: list = field(default_factory=list)    # model site id per site slot
+    n_pose: int = 0                                 # pose rows per env (ngeom + drawn sites); 0 = ngeom
+    slot_pose: np.ndarray = None                    # (instanced slots,) pose row per slot; None = geoms
+    slot_mesh_inst: np.ndarray = None               # (instanced slots,) mesh per slot; None = geom_mesh
+    dyn: list = field(default_factory=list)         # dynamic objects (kind, id, slot, ...)
 
     def sized_geom_ids(self) -> list:
         return [g for g, f in zip(self.geoms, self.sized) if f] if self.sized is not None else []
+
+    def pose_rows(self, m) -> int:
+        """Pose rows per env the renderer reads (geom_xpos / geom_xmat, then the drawn sites')."""
+        return self.n_pose or m.ngeom
+
+    def instanced_slot_pose(self) -> np.ndarray:
+        """(instanced slots,) int32 pose row per instanced slot (geoms, then sites)."""
+        return np.asarray(self.geoms if self.slot_pose is None else self.slot_pose, np.int32)
+
+    def slot_seg_ids(self) -> np.ndarray:
+        """(G,) the id segmentation writes per slot in geom mode: geom + 1, extras ngeom + 1 + j."""
+        return self.semantic[:, 0].astype(np.int64) + 1
 
     # material block layout (float4 x 4)
     # 0: rgba (base color); 1: metallic, roughness, specular, emission; 2: atlas u0,v0,du,dv;
@@ -464,7 +488,8 @@ def hfield_mesh(m: mujoco.MjModel, hid: int):
 
 def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, include_planes: bool = True,
                        plane_extent: float = 5.0, smooth: bool = True, decimate_faces: int = 0,
-                       sized_geoms="auto", draw_hfields: bool = True, appearance: str = "mujoco") -> SceneTables:
+                       sized_geoms="auto", draw_hfields: bool = True, appearance: str = "mujoco",
+                       visual=False, deformables=()) -> SceneTables:
     """``decimate_faces``: per-mesh triangle budget for a level of detail (0 = undecimated).
 
     ``sized_geoms``: box geoms drawn as a unit box scaled at render time by the per-world ``geom_size`` (the renderer
@@ -475,7 +500,11 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
     ``appearance``: "mujoco" (default) draws what MuJoCo's renderer draws (``metalsim.render.builtin_geoms``): its
     primitive tessellations, normals and texture coordinates, mesh normals with hard edges kept, SDF geoms from their
     mesh, cube textures, the skybox, and geom rgba resolved against the material as ``mjv_updateScene`` does;
-    "legacy" = the tables before 2026-10 (smooth-averaged mesh normals, own UVs, image rows flipped), for comparison."""
+    "legacy" = the tables before 2026-10 (smooth-averaged mesh normals, own UVs, image rows flipped), for comparison.
+
+    ``visual``: the non-geom objects MuJoCo's renderer draws (sites, flexes, skins, spatial tendons; see
+    ``metalsim.render.extras``) under this ``mujoco.MjvOption`` (None: MuJoCo's default option), False: geoms only.
+    ``deformables``: user ``extras.DeformableMesh`` objects (XPBD / PhysX-port cloth, any per-env vertex array)."""
     if appearance not in ("mujoco", "legacy"):
         raise ValueError(f"appearance must be 'mujoco' or 'legacy', got {appearance!r}")
     if isinstance(sized_geoms, str):
@@ -614,7 +643,10 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
         geom_mesh.append(mesh_cache[key])
         geoms.append(g)
     if not geoms:
-        raise ValueError("no drawable geoms (check max_group / include_planes)")
+        from metalsim.render import extras as _extras
+        if not _extras.collect(m, n_envs, atlas, visual, deformables, smooth)["extras"]:
+            raise ValueError("no drawable geoms (check max_group / include_planes)")
+        all_v, all_n, all_uv, all_i = [np.zeros((0, 3))], [np.zeros((0, 3))], [np.zeros((0, 2))], [np.zeros(0, np.uint32)]
 
     G = len(geoms)
     verts = np.concatenate(all_v).astype(np.float32)
@@ -727,10 +759,14 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
         lo = np.min([d.geom_xpos[g] - m.geom_rbound[g] for g in keep], axis=0)
         hi = np.max([d.geom_xpos[g] + m.geom_rbound[g] for g in keep], axis=0)
         params[0, :3] = 0.5 * (lo + hi); params[0, 3] = max(float(0.5 * (hi - lo).max()), 0.1)
-    return SceneTables(vertices=inter, indices=indices, meshes=meshes, geoms=geoms, geom_mesh=geom_mesh,
-                       draws=draws, inst_table=inst_table, materials=mats, atlas=atlas, semantic=semantic,
-                       static_geom=static, lights=build_lights(m), params=params, n_envs=n_envs, G=G,
-                       sized=sized, material_ext=ext, transparent=transparent, draws_opaque=draws_opaque)
+    tables = SceneTables(vertices=inter, indices=indices, meshes=meshes, geoms=geoms, geom_mesh=geom_mesh,
+                         draws=draws, inst_table=inst_table, materials=mats, atlas=atlas, semantic=semantic,
+                         static_geom=static, lights=build_lights(m), params=params, n_envs=n_envs, G=G,
+                         sized=sized, material_ext=ext, transparent=transparent, draws_opaque=draws_opaque, n_geom_slots=G)
+    if visual is not False or deformables:
+        from metalsim.render import extras as _extras
+        _extras.extend_tables(tables, m, n_envs, visual, deformables, smooth)
+    return tables
 
 
 def quats_to_mats(q: np.ndarray) -> np.ndarray:
