@@ -1098,8 +1098,8 @@ env-steps/s; one policy step = 4 collides, 24 MuJoCo solves, 16 MPM solves. Iter
 
 | measurement | M4 Max, this Mac (timing class) | M4 Max, 14-inch (training loop) | Isaac Lab 3.0-EA on the L4 (measured) |
 |---|---|---|---|
-| 2,048 envs (the README's), step only, uniform random actions | **964** (2.125 s / step; `runs/franka_pour/bench_mac_2048_step.json`) | – | **does not fit**: CUDA out of memory creating the step graph, and out of memory eager (`use_cuda_graph=false`) on the L4's 24 GB (`runs/parity/isaaclab3_pour/train_2048*.log`) |
-| 2,048 envs, rollout + policy inference | 962 (`bench_mac_2048_rollout.json`) | 1,075 (collection 182.6 s per iteration, median of 51) | – |
+| 2,048 envs (the README's), step only, uniform random actions | **986** (2.077 s / step, idle device, `bench_mac2_2048_step.json`; 964 in a first run with the idle check reading 100 %, `bench_mac_2048_step.json`) | – | **does not fit**: CUDA out of memory creating the step graph, and out of memory eager (`use_cuda_graph=false`) on the L4's 24 GB (`runs/parity/isaaclab3_pour/train_2048*.log`) |
+| 2,048 envs, rollout + policy inference | 999 (idle device, `bench_mac2_2048_rollout.json`; 962 first run) | 1,075 (collection 182.6 s per iteration, median of 51) | – |
 | 2,048 envs, full PPO loop (rollout + 5 x 4 minibatch update) | 923 (one iteration after one warm-up; `bench_mac_2048_ppo.json`) | **1,072** median (1,055-1,149) over iterations 1-51; update 0.71 s of 183 s | – |
 | 1,024 envs, rollout + inference / full PPO loop | ~1,029 physics only (0.995 s / step, a check-class smoke run, not timing class) | **1,040 / 1,037** (collection 94.5 s, update 0.35 s; median of 59 iterations) | **317** / 317 (collection 309-314 s per 96 steps, update 0.2 s; Isaac's own task with the asset patch, rsl_rl's log) |
 
