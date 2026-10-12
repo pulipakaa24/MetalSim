@@ -363,3 +363,38 @@ def test_cloth_and_soft_surfaces_on_the_dynamic_mesh_path():
         rhit = both & (rdepth[e] > 0)
         assert rhit.sum() >= 0.99 * both.sum()
         assert np.median(np.abs(rdepth[e][rhit] - ref["depth"][0][rhit])) < 1e-3
+
+
+def test_free_particles_on_the_particle_path():
+    """Particles in no triangle (``particle_q``) through the particle renderer (``set_particles``, bound to the
+    bridge's per-env buffer), per env, against MuJoCo spheres of the particle radius at the same positions."""
+    if not hasattr(Tier0Renderer, "set_particles"):
+        pytest.skip("particle renderer (metalsim.render.particles) not installed")
+    n = 2
+    model = _cloth_model(n)
+    state = model.state()
+    q = state.particle_q.numpy()
+    q[model.particle_world.numpy() == 1, 2] += 0.04
+    state.particle_q.assign(q)
+    cam = Camera(pos=(-0.1, -0.25, 0.45), lookat=(-0.24, 0.26, 0.05))
+    src = NewtonRenderSource(model, cameras=[cam], lights=[], deformables=True)
+    assert src._free_idx.shape == (n, 9) and abs(src.particle_radius - 0.025) < 1e-6
+    r = Tier0Renderer(src.m, n, width=W, height=H, camera=0, outputs=("depth", "seg"), seg_mode=SEG_GEOM)
+    src.attach_particles(r)
+    r.render(src, src.update(state)); r.ctx.synchronize()
+    got = {k: a.numpy() for k, a in r._out_arrays.items()}
+    for e in range(n):
+        spec = mujoco.MjSpec()
+        for p in q[src._free_idx[e]] - src.origins[e]:
+            spec.worldbody.add_geom(type=mujoco.mjtGeom.mjGEOM_SPHERE, size=[0.025, 0, 0], pos=list(p), contype=0, conaffinity=0)
+        spec.worldbody.add_camera(name="cam", pos=list(cam.pos), quat=list(lookat_quat(cam.pos, cam.lookat)), fovy=45.0)
+        mm = spec.compile()
+        d = mujoco.MjData(mm); mujoco.mj_forward(mm, d)
+        ref = Tier0Renderer(mm, 1, width=W, height=H, camera="cam", outputs=("depth", "seg"), seg_mode=SEG_GEOM).render_host([d])
+        pr = ref["seg"][0] > 0
+        pg = got["seg"][e] == src.m.ngeom + 1                            # grains: geom id ngeom (+1)
+        assert pr.sum() > 300
+        iou = (pr & pg).sum() / (pr | pg).sum()
+        assert iou >= 0.95, (e, iou)                                    # icosphere grain vs MuJoCo's UV sphere
+        both = pr & pg
+        assert np.median(np.abs(got["depth"][e][both] - ref["depth"][0][both])) < 2e-3
