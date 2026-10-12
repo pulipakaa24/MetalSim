@@ -1101,7 +1101,7 @@ env-steps/s; one policy step = 4 collides, 24 MuJoCo solves, 16 MPM solves. Iter
 | 2,048 envs (the README's), step only, uniform random actions | **964** (2.125 s / step; `runs/franka_pour/bench_mac_2048_step.json`) | – | **does not fit**: CUDA out of memory creating the step graph, and out of memory eager (`use_cuda_graph=false`) on the L4's 24 GB (`runs/parity/isaaclab3_pour/train_2048*.log`) |
 | 2,048 envs, rollout + policy inference | 962 (`bench_mac_2048_rollout.json`) | 1,075 (collection 182.6 s per iteration, median of 51) | – |
 | 2,048 envs, full PPO loop (rollout + 5 x 4 minibatch update) | 923 (one iteration after one warm-up; `bench_mac_2048_ppo.json`) | **1,072** median (1,055-1,149) over iterations 1-51; update 0.71 s of 183 s | – |
-| 1,024 envs, rollout + inference / full PPO loop | ~1,029 physics only (0.995 s / step, a check-class smoke run, not timing class) | – | **317** / 317 (collection 309-314 s per 96 steps, update 0.2 s; Isaac's own task with the asset patch, rsl_rl's log) |
+| 1,024 envs, rollout + inference / full PPO loop | ~1,029 physics only (0.995 s / step, a check-class smoke run, not timing class) | **1,040 / 1,037** (collection 94.5 s, update 0.35 s; median of 59 iterations) | **317** / 317 (collection 309-314 s per 96 steps, update 0.2 s; Isaac's own task with the asset patch, rsl_rl's log) |
 
 Reading: the step is the cost (the PPO update is 0.4 % of an iteration, inference under 0.3 %); at 1,024 envs the M4
 Max runs the task about 3.2x the L4's rate, and only the M4 Max (64 GB unified memory) holds the README's 2,048 envs.
@@ -1114,7 +1114,37 @@ take about 6.4 days at 1,072 env-steps/s (Isaac on an L4 cannot run them at 2,04
 
 ### 1b.5 Learning
 
-FRANKA_POUR_LEARNING_TABLE
+Isaac publishes no curve for this task (README, task source, docs at `ae37b028`); the README only gives the launch
+(`--num_envs 2048 --max_iterations 3000`). The reference is therefore measured: Isaac's own task (with the asset patch
+of §1b.1) trained on the L4 at **1,024 envs** (the most the L4 holds), 60 iterations, seed 0, against ours at the
+same env count, iterations and seed on the 14-inch M4 Max. Metric: Isaac's logged `Episode_Termination/success` (the
+README's "terminal particle transfer" success: fraction of envs whose last finished episode ended in success, averaged
+over the iteration's steps), mean reward and episode length over the last 100 episodes (rsl_rl). Logs:
+`runs/parity/isaaclab3_pour/train_1024_curve.log`, `runs/franka_pour/logs/m414_1024_log.jsonl`, side by side in
+`runs/franka_pour/logs/matched_1024_curves.json` (`python -m metalsim.learn.franka_pour_curve`).
+
+| iterations (1,024 envs) | ours: success / reward / length | Isaac on the L4: success / reward / length |
+|---|---|---|
+| 0-9 | 0.124 / 0.37 / 126 | 0.091 / 0.15 / 116 |
+| 10-19 | 0.221 / 0.57 / 177 | 0.228 / 0.83 / 172 |
+| 20-29 | 0.274 / 1.12 / 161 | 0.309 / 1.35 / 153 |
+| 30-39 | 0.300 / 1.16 / 166 | 0.373 / 1.57 / 153 |
+| 40-49 | 0.310 / 1.42 / 164 | 0.414 / 1.83 / 147 |
+| 50-59 | 0.348 / 1.37 / 163 | 0.436 / 1.78 / 148 |
+| throughput (full loop) | **1,037 env-steps/s** (collection 94.5 s, update 0.35 s per iteration) | **317 env-steps/s** (collection 314 s, update 0.2 s) |
+
+Verdict: **partial**. Both learn the task from the same reset curriculum along the same early trajectory (iterations
+0-19 agree within the noise; the curriculum's concentration metrics evolve alike: effective pool 0.004-0.02, top-1 %
+mass 0.27-0.48 over the first ~20k episodes on both), but from iteration ~25 Isaac's success rate pulls ahead and is
+0.09 higher over iterations 50-59 (0.436 vs 0.348), with shorter episodes. One seed per side, and Isaac is not
+repeatable run to run here (two seed-0 L4 runs differ at iteration 0: reward +0.26 vs -0.46, `train_1024.log` vs
+`train_1024_curve.log`), so the gap is not yet separated from seed spread; seeds on both sides and a per-row outcome
+comparison on fixed reset rows are the next step. Not a cause, by construction: the asset composition, the task terms
+(§1b.2 tests), the solver configuration (§1b.1).
+
+The README-scale run (2,048 envs, 14-inch, `runs/franka_pour/logs/m414_2048_log.jsonl`; capped at 300 iterations =
+59M steps, about 15 h, instead of Isaac's 3,000 = 6.4 days): success 0.039 at iteration 0, 0.23 at 10, 0.33 at 20,
+0.33-0.36 from 25 to 82 (latest at writing); see the final report for the value at 300.
 
 ## 2. Platform capabilities (the workstreams), with the tests behind them
 
