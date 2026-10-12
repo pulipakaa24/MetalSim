@@ -71,7 +71,7 @@ listing its commits, and keeps its upstream licence unchanged. "Head" is the bra
 
 [github.com/pulipakaa24/warp](https://github.com/pulipakaa24/warp), branch
 [`metalsim`](https://github.com/pulipakaa24/warp/tree/metalsim), head
-[`152808b7`](https://github.com/pulipakaa24/warp/commit/152808b7e33ce08fcc17c898c5ce11d567d60795) (2026-10-11, pinned by
+[`43ffc6dd`](https://github.com/pulipakaa24/warp/commit/43ffc6dd544ccaa8ae18772ba67b0d292bf01371) (2026-10-12, pinned by
 `scripts/setup_warp.sh`; the rigid-body results through 2026-09-26 were produced at
 [`c200d46b`](https://github.com/pulipakaa24/warp/commit/c200d46b), those before that day's throughput work at [`4127c48`](https://github.com/pulipakaa24/warp/commit/4127c4818334080de6f3d23aef522e582ff6a2a7), code
 [`f194006`](https://github.com/pulipakaa24/warp/commit/f194006a4cf197fda93633252af81bc3f57f5561)). Base: innate-inc/warp
@@ -99,6 +99,11 @@ listing its commits, and keeps its upstream licence unchanged. "Head" is the bra
   (`wp.launch(..., dim_limit=)`), GPU indexed copies, per-kernel argument address space, batched graph replays,
   64-bit atomics Metal cannot make atomic refused at launch, and `fast_math` forms (`warp.config.metal_fast_math`:
   `"off"` by default, `"cuda"` bit for bit CUDA's `--use_fast_math`, `"relaxed"`).
+- MPM parity close-out (2026-10-12, `3c4e251e..43ffc6dd`; MPM.md section 8d):
+  - warp.fem's dispatched assembly takes CUDA's tiling choice on Metal (particle-to-grid sums in CUDA's order).
+  - `warp.config.metal_cuda_libm` (default on): `log` / `exp` / `sinh` and the `rsqrt` of `svd3` / `eig3` compute
+    CUDA's results, equal to an L4 on all 2^32 inputs.
+  - The rigid suite has the same five known failures with the option off and on (`runs/fma_rigid_parity/closeout_*`).
 
 Branch [`metalsim-flex`](https://github.com/pulipakaa24/warp/tree/metalsim-flex), head
 [`01ccf4a`](https://github.com/pulipakaa24/warp/commit/01ccf4ad687c0ebcdee139ee1131fbe2ad97bf51) (code `9dcb140`): the

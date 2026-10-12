@@ -1,0 +1,24 @@
+[gpu_run] cl_rigid2 start: device utilisation 0% (08:25:40)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
+== metal_cuda_libm off, run 1
+so101_lift 574dc616bcd31ddd finite True
+panda cb0d35907e53a220 finite True
+go1 dbd0fc7aa9c1fbc1 finite True
+g1 8b0bb972f4f6e97c finite True
+== metal_cuda_libm on, run 1
+so101_lift caf1ab1510303f37 finite True
+panda cea02ca0b8c5402d finite True
+go1 dcfae0750d3f1714 finite True
+g1 41a975df9e7bd0cd finite True
+== metal_cuda_libm off, run 2
+so101_lift 0291f6af52c3bd9e finite True
+panda 616a01f3b5bfcfe8 finite True
+go1 872642199a3eb90b finite True
+g1 6fc30aac1f907603 finite True
+== metal_cuda_libm on, run 2
+so101_lift b37ccc65cd53bedc finite True
+panda 4b7bcf823a09896a finite True
+go1 fce6834b4a8ed5fa finite True
+g1 a0bb2b1246111a2a finite True
+[gpu_run] cl_rigid2 end: device utilisation 66% (08:31:32), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
