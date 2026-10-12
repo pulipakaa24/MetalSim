@@ -244,7 +244,7 @@ git clone https://github.com/pulipakaa24/MetalSim && cd MetalSim
 python3.12 -m venv .venv && source .venv/bin/activate     # uv only: $(uv python find 3.12) -m venv .venv
 pip install -e ".[test]"
 scripts/setup_warp.sh
-pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@cf0f8adc8f99f0c559cf8580cb667952e473bd07#egg=mujoco-warp"
+pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@cf0f8adc8f99f0c559cf8580cb667952e473bd07#egg=mujoco-warp" "mujoco>=3.14,<3.15"
 scripts/fetch_isaac_assets.sh              # NVIDIA's g1_minimal.usd, fetched from NVIDIA, not redistributed
 pytest tests -q
 scripts/setup_newton152.sh                 # optional: MPM (.venv-newton152; tests/test_mpm.py runs there)
@@ -254,6 +254,8 @@ The MuJoCo Warp commit is pinned (the head of the fork's branch `metalsim` on 20
 `scripts/setup_warp.sh` and Newton's in `pyproject.toml`. Without access to the fork: clone
 google-deepmind/mujoco_warp, `git checkout 88af9cc` (v3.14.0), `git apply` MetalSim's
 `patches/mujoco_warp/metalsim-cf0f8ad.diff` (the whole branch as one diff) and `pip install -e` that checkout.
+The `mujoco<3.15` on that line keeps pip from moving MuJoCo past 3.14: the fork reads `MjModel.flex_internal`,
+which 3.15 removed (the fork alone asks only `mujoco>=3.12`, and its uv index offers 3.15 nightlies).
 
 Optional extras, first runs, bringing your own robot, the GPU job queue and the throughput / fidelity knobs are in
 the user guide, [`docs/GUIDE.md`](docs/GUIDE.md). What landed when is in [`CHANGELOG.md`](CHANGELOG.md).
