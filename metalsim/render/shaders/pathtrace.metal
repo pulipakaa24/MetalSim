@@ -222,9 +222,9 @@ inline Hit trace(instance_acceleration_structure accel, float3 o, float3 d, floa
 
 // render-grain material (particles.GrainMaterial.pack): a palette entry picked by the grain's hash with the
 // cumulative weights, a brightness jitter, shared roughness / specular / metallic and BRDF model
-struct GrainMat { float4 pal[8]; float4 p0; float4 mrse; float4 p1; };
-inline Material grain_material(constant GrainMat& g, uint gid) {
-    uint hh = hash_u(gid * 0x9E3779B1u + 0x85EBCA6Bu);
+struct GrainMat { float4 pal[8]; float4 p0; float4 mrse; float4 p1; MeshInfo mesh[8]; };   // particles.GrainField.mat_buf
+inline Material grain_material(device const GrainMat& g, uint key) {
+    uint hh = hash_u(key * 0x9E3779B1u + 0x85EBCA6Bu);
     float u = float(hh & 0xFFFFu) / 65536.0, v = float(hh >> 16) / 65536.0;
     uint n = clamp(uint(g.p0.x), 1u, 8u), k = 0;
     while (k + 1 < n && u > g.pal[k].w) ++k;
@@ -316,8 +316,8 @@ kernel void path_trace(
     device const float*     env_cdf    [[buffer(26)]],   // environment-map sampling table (FLAG_ENVMAP)
     device const float*     g_verts    [[buffer(27)]],   // FLAG_GRAINS: grain mesh vertices (8 floats each, as verts)
     device const uint*      g_indices  [[buffer(28)]],   // FLAG_GRAINS: grain mesh indices
-    device const MeshInfo*  g_meshes   [[buffer(29)]],   // FLAG_GRAINS: grain mesh index ranges
-    constant GrainMat&      g_mat      [[buffer(30)]],   // FLAG_GRAINS: grain material
+    device const uint*      g_keys     [[buffer(29)]],   // FLAG_GRAINS: per-grain identity key (colour hash)
+    device const GrainMat&  g_mat      [[buffer(30)]],   // FLAG_GRAINS: grain material + grain mesh index ranges
     texture2d<float>        atlas      [[texture(0)]],
     texture2d<float>        envmap     [[texture(1)]],   // equirectangular RGBA32F environment (FLAG_ENVMAP)
     sampler                 samp       [[sampler(0)]],
@@ -339,7 +339,7 @@ kernel void path_trace(
     bool matmodel = (c.flags & FLAG_MATMODEL) != 0u;
     bool use_env = (c.flags & FLAG_ENVMAP) != 0u;
     float3 env_rad = (sp.sky.w > 0.5 ? sp.sky.xyz : cs.clear_color.rgb) * c.env_scale;
-    GrainGeo gg; gg.verts = g_verts; gg.indices = g_indices; gg.meshes = g_meshes;
+    GrainGeo gg; gg.verts = g_verts; gg.indices = g_indices; gg.meshes = g_mat.mesh;
     gg.inst0 = (c.flags & FLAG_GRAINS) ? c.grain_inst0 : 0xFFFFFFFFu; gg.as0 = c.grain_as0;
     for (uint s = 0; s < c.spp; ++s) {
         float jx = rnd(rng), jy = rnd(rng);
@@ -368,7 +368,7 @@ kernel void path_trace(
                 break;
             }
             Material m; float4 mod; float eps = 0.001;   // eps: offset of rays leaving this surface
-            if (h.grain) { m = grain_material(g_mat, h.gid); mod = float4(1.0); eps = c.grain_eps; tmin = c.grain_eps; }
+            if (h.grain) { m = grain_material(g_mat, g_keys[h.gid]); mod = float4(1.0); eps = c.grain_eps; tmin = c.grain_eps; }
             else { m = mats[h.slot]; mod = per_inst[e * c.n_slots + h.slot]; tmin = 0.0005; }
             float3 base = material_base(m, mod, h.uv, atlas, samp);
             float metallic = m.mrse.x, rough = max(m.mrse.y, 0.03), specw = m.mrse.z, emission = m.mrse.w;

@@ -4,7 +4,7 @@
 // instance of one of a few small irregular grain meshes (own primitive acceleration structures), placed at the particle
 // position plus a fixed random offset inside the particle's cube (half side `offset`, the sampling of Newton's
 // sample_render_grains), with a random rotation, a random mesh and a random scale around `radius`. Every random number
-// is a hash of (particle index, grain index, seed): a grain keeps its shape, offset, orientation and colour from frame
+// is a hash of (particle index or its stable id, grain index, seed): a grain keeps its shape, offset, orientation and colour from frame
 // to frame (no flicker), and two runs build the same instances bit for bit. Non-finite particle positions and particles
 // below `cull_z` get mask 0 (never intersected).
 #include <metal_stdlib>
@@ -22,7 +22,8 @@ struct GrainConsts {
     uint n_envs, n_particles, k_per, n_meshes;   // particles per env, grains per particle, grain meshes
     uint as_base, tiles_per_row, seed, inst_base; // first grain mesh's index in the instanced-structure list; env grid; first grain instance
     float stride, radius, radius_jitter, offset;  // env grid spacing; grain radius (volume-equivalent) and relative jitter; offset half side
-    float cull_z, _f0, _f1, _f2;                  // particles with z < cull_z get no grains (mask 0); -inf = none
+    float cull_z;                                 // particles with z < cull_z get no grains (mask 0); -inf = none
+    uint has_ids, _u0, _u1;                       // has_ids: grain identity from ids[] (stable ids of a compacted particle set)
 };
 
 inline uint hash_u(uint x) { x ^= x >> 16; x *= 0x7feb352du; x ^= x >> 15; x *= 0x846ca68bu; x ^= x >> 16; return x; }
@@ -42,6 +43,8 @@ kernel void grain_instances(
     device InstanceDesc*    inst [[buffer(0)]],   // the renderer's instance descriptors; grains from c.inst_base
     device const float*     pos  [[buffer(1)]],   // (n_envs, n_particles, 3) particle positions [m]
     constant GrainConsts&   c    [[buffer(2)]],
+    device const uint*      ids  [[buffer(3)]],   // (n_envs, n_particles) stable particle ids (c.has_ids)
+    device uint*            keys [[buffer(4)]],   // per grain: its identity key (the renderers' per-grain colour hash)
     uint i [[thread_position_in_grid]])
 {
     uint per_env = c.n_particles * c.k_per;
@@ -49,7 +52,8 @@ kernel void grain_instances(
     uint e = i / per_env, pk = i - e * per_env, p = pk / c.k_per;
     uint pi = (e * c.n_particles + p) * 3;
     float3 x = float3(pos[pi], pos[pi + 1], pos[pi + 2]);
-    uint s = hash_u(pk * 0x9E3779B1u ^ hash_u(c.seed + 0x632BE5ABu));
+    uint key = c.has_ids ? ids[e * c.n_particles + p] * c.k_per + (pk - p * c.k_per) : pk;
+    uint s = hash_u(key * 0x9E3779B1u ^ hash_u(c.seed + 0x632BE5ABu));
     float3 off = float3(u01(s), u01(s), u01(s)) * 2.0 - 1.0;
     float scale = c.radius * (1.0 + c.radius_jitter * (2.0 * u01(s) - 1.0));
     uint mesh = min(uint(u01(s) * float(c.n_meshes)), c.n_meshes - 1);
@@ -65,4 +69,5 @@ kernel void grain_instances(
     d.if_table_offset = 0;
     d.as_index = c.as_base + mesh;
     inst[c.inst_base + i] = d;
+    keys[i] = key;
 }

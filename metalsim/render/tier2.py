@@ -235,18 +235,21 @@ class Tier2Renderer:
         self.event = self.ctx.event
         self.grains = None            # GrainField once set_particles is called (metalsim/render/particles.py)
         self._ias = None
-        self._grain_dummy = c.buffer(176, label="pt_grain_placeholder")
+        self._grain_dummy = c.buffer(304, label="pt_grain_placeholder")
 
     # -- particles (render grains) ----------------------------------------------------------------------
 
     def set_particles(self, positions, radius=None, material=None, *, grains_per_particle=8, grain_radius=None,
-                      radius_jitter=0.3, n_meshes=4, seed=0, grain_shape=None, cull_z=-np.inf, grain_eps=None):
+                      radius_jitter=0.3, n_meshes=4, seed=0, grain_shape=None, ids=None, cull_z=-np.inf, grain_eps=None):
         """Draw particles as render grains (granular media: MPM sand, ...). ``positions``: (n_envs, P, 3) or (P, 3)
         numpy [m], or a Warp array on the Metal device (bound directly each frame: the GPU path). ``radius``: the
         particle radius [m] (half the particle spacing): each particle's grains are spread over its cube of half side
         ``radius``. ``grain_radius``: volume-equivalent grain radius [m] (default ``radius / grains_per_particle^(1/3)``,
         about touching grains). ``material``: ``particles.GrainMaterial`` (default sand). ``positions=None`` removes
-        the particles. Later calls with the same particle count only replace the positions (or material); other
+        the particles. ``grain_shape``: ``particles.grain_meshes`` options (irregularity, elongation, subdiv);
+        ``cull_z``: particles below it get no grains; non-finite positions are culled. ``ids``: stable particle
+        ids ((n_envs, P) or (P,) uint32) when the particle set is culled or reordered between frames (grains hash the id). Later calls with the same
+        radius and grains_per_particle only replace the positions (or material); other
         arguments apply on the first call or when ``radius`` / ``grains_per_particle`` change."""
         from metalsim.render.particles import GrainField, InstanceStructure
         if positions is None:
@@ -265,6 +268,7 @@ class Tier2Renderer:
             g.set_material(material)
         g.cull_z = float(cull_z)
         g.set_positions(positions)
+        g.set_ids(ids)
         cf = self.consts.view(np.float32)
         self.consts[18:20] = (self.rt.n_inst, len(self.rt.prim_as))
         cf[22] = grain_eps if grain_eps is not None else max(0.01 * g.radius, 1e-5)
@@ -305,7 +309,7 @@ class Tier2Renderer:
             v = self._aux_views[k]; ce.setBuffer_offset_atIndex_(v.buffer, v.offset, 22 + i)
         ce.setBuffer_offset_atIndex_(self._env_cdf, 0, 26)
         g = self.grains if grains else None
-        for i, b in enumerate((g.vbuf, g.ibuf, g.mesh_info, g.mat_buf) if g else (self._grain_dummy,) * 4):
+        for i, b in enumerate((g.vbuf, g.ibuf, g.keys, g.mat_buf) if g else (self._grain_dummy,) * 4):
             ce.setBuffer_offset_atIndex_(b, 0, 27 + i)
         ce.setTexture_atIndex_(self.atlas_tex, 0); ce.setSamplerState_atIndex_(self.samp, 0)
         ce.setTexture_atIndex_(self._env_tex, 1); ce.setSamplerState_atIndex_(self.env_samp, 1)

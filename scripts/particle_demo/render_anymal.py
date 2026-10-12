@@ -42,6 +42,9 @@ ap.add_argument("--fovy", type=float, default=32.0)
 ap.add_argument("--camera", default="track", help="track | still-a | still-b | still-c")
 ap.add_argument("--save-hdr", action="store_true")
 ap.add_argument("--skip-existing", action="store_true")
+ap.add_argument("--surface-depth", type=float, default=0.0,
+                help="draw only bed particles within this depth [m] of their local surface (0 = all); grains keep their "
+                     "identity through the renderer's stable ids, so more grains per particle fit in memory")
 ap.add_argument("--flip-mesh-v", type=int, default=1, help="1: mirror mesh UVs (atlas convention workaround)")
 ap.add_argument("--cam-eye", type=float, nargs=3, default=None, help="debug camera position (with --cam-target)")
 ap.add_argument("--cam-target", type=float, nargs=3, default=None)
@@ -171,6 +174,20 @@ def particles(t):
     return (1 - al) * p0 + al * p1
 
 
+def surface_keep(P, depth, cell=0.01):
+    """Particles within ``depth`` of the local sand surface: the surface height of a 1 cm column is its highest
+    particle; a particle is kept if it is above the lowest surface of its 3 x 3 neighbourhood minus ``depth`` (so the
+    walls of footprints stay drawn)."""
+    lo = P[:, :2].min(0)
+    ij = np.floor((P[:, :2] - lo) / cell).astype(np.int64) + 1
+    nx, ny = ij.max(0) + 2
+    top = np.full((nx, ny), -np.inf, np.float32)
+    np.maximum.at(top, (ij[:, 0], ij[:, 1]), P[:, 2])
+    pad = np.pad(top, 1, constant_values=np.inf)
+    low = np.min([pad[1 + dx:nx + 1 + dx, 1 + dy:ny + 1 + dy] for dx in (-1, 0, 1) for dy in (-1, 0, 1)], 0)
+    return P[:, 2] >= low[ij[:, 0], ij[:, 1]] - depth
+
+
 def set_geoms(t):
     poses = body_poses(t)
     for g in range(model.ngeom):
@@ -266,8 +283,14 @@ for k in rng_frames:
         continue
     tf = time.time()
     set_geoms(t)
-    P = np.concatenate([particles(t), decor])
-    r.set_particles(P, radius=p_radius, grains_per_particle=a.grains, grain_radius=radius_grain)
+    Ps = particles(t)
+    ids = None
+    if a.surface_depth > 0:
+        keep = surface_keep(Ps, a.surface_depth)
+        ids = np.concatenate([np.nonzero(keep)[0], len(Ps) + np.arange(len(decor))]).astype(np.uint32)
+        Ps = Ps[keep]
+    P = np.concatenate([Ps, decor])
+    r.set_particles(P, radius=p_radius, grains_per_particle=a.grains, grain_radius=radius_grain, ids=ids)
     eye, q = camera(k, t)
     out = r.render_host([data], passes=a.passes, cam_pos=eye[None], cam_quat=q[None], chunk=4)
     hdr_img = out["hdr_denoised"][0] if "hdr_denoised" in out else out["hdr"][0]
