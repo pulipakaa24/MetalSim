@@ -1,0 +1,270 @@
+[INFO]: Parsing configuration from: isaaclab_tasks.contrib.franka_pour.pour_env_cfg:FrankaPourResetDatasetEnvCfg
+[INFO]: Parsing configuration from: isaaclab_tasks.contrib.franka_pour.config.franka.agents.rsl_rl_ppo_cfg:FrankaPourResetDatasetPPORunnerCfg
+
+╭─ Isaac Lab · train ────────────────────────────╮      Welcome to Isaac Lab!
+│ Task          IsaacContrib-Franka-Pour         │
+│ Workflow      manager-based                    │             \   /
+│ RL library    rsl_rl                           │           .-------.
+│ Physics       newton_couplerproxycfg           │           | o   o |
+│ Renderer      n/a (no camera sensors)          │           |   _   |
+│ Visualizer    none (headless)                  │           '-------'
+│ Device        cuda:0                           │
+│ Environments  2048                             │
+╰────────────────────────────────────────────────╯
+
+[1/3] Launching simulation
+[INFO] Logging experiment in directory: /home/<user>/IsaacLab3/logs/rsl_rl/franka_pour
+Exact experiment name requested from command line: 2026-10-12_07-27-27
+[2/3] Creating environment
+I: Initializing Version 2.72.3-release.7151+gl.5390bed9
+I: Client ID: V2QRWYL0
+I: Not using Hub: Hub not found
+I: Successfully created S3 provider for https://omniverse-content-production.s3-us-west-2.amazonaws.com
+I: Using CloudFront http://dcb18d6mfegct.cloudfront.net/, List = No
+Serving remote assets from the local cache under '/tmp'. Each copy is checked against the server before use; delete the directory to force a full re-download.
+/home/<user>/IsaacLab3/source/isaaclab_newton/isaaclab_newton/cloner/replicate.py:141: FutureWarning: Newton shape color replacement is enabled; this workaround will be deprecated in a future release.
+  replace_newton_builder_shape_colors(builder, stage)
+/home/<user>/IsaacLab3/source/isaaclab_newton/isaaclab_newton/cloner/newton_clone_utils.py:158: FutureWarning: Newton shape color replacement is enabled; this workaround will be deprecated in a future release.
+  replace_newton_builder_shape_colors(builder, stage)
+Failed to get root com velocity. If the articulation is fixed, this is expected. Setting root com velocity to zeros.
+[INFO]: Base environment:
+	Environment device    : cuda:0
+	Environment seed      : 0
+	Physics step-size     : 0.008333333333333333
+	Rendering step-size   : 0.03333333333333333
+	Environment step-size : 0.03333333333333333
+[INFO]: Time taken for scene creation Last: 25.172770 s, Mean: 25.172770 s, Std: 0.000000 s, N: 1
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 2048
+	Environment spacing   : 2.5
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : []
+	Replicate physics     : True
+Finalize builder took: Last: 10.314822 s, Mean: 10.314822 s, Std: 0.000000 s, N: 1
+Initialize solver took: Last: 34.139888 s, Mean: 34.139888 s, Std: 0.000000 s, N: 1
+CUDA graph took: Last: 0.000039 s, Mean: 0.000039 s, Std: 0.000000 s, N: 1
+[INFO]: Time taken for simulation start Last: 48.636788 s, Mean: 48.636788 s, Std: 0.000000 s, N: 1
+[INFO] Command Manager:  <CommandManager> contains 0 active terms.
++----------------------+
+| Active Command Terms |
++-------+------+-------+
+| Index | Name |  Type |
++-------+------+-------+
++-------+------+-------+
+
+[INFO] Event Manager:  <EventManager> contains 1 active terms.
++-------------------------------------+
+| Active Event Terms in Mode: 'reset' |
++------------+------------------------+
+|   Index    | Name                   |
++------------+------------------------+
+|     0      | reset_scene            |
++------------+------------------------+
+
+[INFO] Recorder Manager:  <RecorderManager> contains 0 active terms.
++-----------------------+
+| Active Recorder Terms |
++------------+----------+
+|   Index    | Name     |
++------------+----------+
++------------+----------+
+
+[INFO] Action Manager:  <ActionManager> contains 2 active terms.
++------------------------------------+
+|   Active Action Terms (shape: 8)   |
++-------+----------------+-----------+
+| Index | Name           | Dimension |
++-------+----------------+-----------+
+|   0   | arm_action     |         7 |
+|   1   | gripper_action |         1 |
++-------+----------------+-----------+
+
+[INFO] Observation Manager: <ObservationManager> contains 3 groups.
++------------------------------------------------------------+
+| Active Observation Terms in Group: 'policy' (shape: (62,)) |
++---------+--------------------------------------+-----------+
+|  Index  | Name                                 |   Shape   |
++---------+--------------------------------------+-----------+
+|    0    | arm_q                                |    (7,)   |
+|    1    | arm_qd                               |    (7,)   |
+|    2    | time_remaining                       |    (1,)   |
+|    3    | pour_target_fraction                 |    (1,)   |
+|    4    | tcp_pose                             |    (7,)   |
+|    5    | cup_pose                             |    (7,)   |
+|    6    | target_pose                          |    (7,)   |
+|    7    | tcp_to_grasp_position_c              |    (3,)   |
+|    8    | grasp_to_tcp_quat                    |    (4,)   |
+|    9    | target_position_c                    |    (3,)   |
+|    10   | finger_position                      |    (2,)   |
+|    11   | finger_velocity                      |    (2,)   |
+|    12   | gripper_target                       |    (1,)   |
+|    13   | gripper_contact                      |    (2,)   |
+|    14   | last_action                          |    (8,)   |
++---------+--------------------------------------+-----------+
++-----------------------------------------------------------+
+| Active Observation Terms in Group: 'media' (shape: (22,)) |
++----------+------------------------------------+-----------+
+|  Index   | Name                               |   Shape   |
++----------+------------------------------------+-----------+
+|    0     | cup_velocity                       |    (6,)   |
+|    1     | particle_fractions                 |    (3,)   |
+|    2     | particle_source_state              |    (6,)   |
+|    3     | particle_transfer                  |    (7,)   |
++----------+------------------------------------+-----------+
++---------------------------------------------------------------+
+| Active Observation Terms in Group: 'privileged' (shape: (2,)) |
++------------+-----------------------------------+--------------+
+|   Index    | Name                              |    Shape     |
++------------+-----------------------------------+--------------+
+|     0      | success_dwell                     |     (1,)     |
+|     1      | lost_grasp_dwell                  |     (1,)     |
++------------+-----------------------------------+--------------+
+
+[INFO] Termination Manager:  <TerminationManager> contains 9 active terms.
++----------------------------------------------+
+|           Active Termination Terms           |
++-------+---------------------------+----------+
+| Index | Name                      | Time Out |
++-------+---------------------------+----------+
+|   0   | failure                   |  False   |
+|   1   | extreme_rigid_state       |  False   |
+|   2   | source_receiver_overlap   |  False   |
+|   3   | lost_grasp                |  False   |
+|   4   | spill                     |  False   |
+|   5   | particle_out_of_bounds    |  False   |
+|   6   | success                   |  False   |
+|   7   | learning_progress_context |  False   |
+|   8   | time_out                  |   True   |
++-------+---------------------------+----------+
+
+[INFO] Reward Manager:  <RewardManager> contains 4 active terms.
++------------------------------------+
+|        Active Reward Terms         |
++-------+------------------+---------+
+| Index | Name             |  Weight |
++-------+------------------+---------+
+|   0   | success          |     5.0 |
+|   1   | action_magnitude | -0.0001 |
+|   2   | action_rate      | -0.0001 |
+|   3   | failure          |    -1.0 |
++-------+------------------+---------+
+
+[INFO] Curriculum Manager:  <CurriculumManager> contains 1 active terms.
++-------------------------+
+| Active Curriculum Terms |
++-------+-----------------+
+| Index | Name            |
++-------+-----------------+
+|   0   | reset_dataset   |
++-------+-----------------+
+
+[INFO]: Completed setting up the environment...
+[3/3] Preparing agent
+Warp CUDA error 2: out of memory (in function wp_cuda_graph_create_exec, /builds/omniverse/warp/warp/native/warp.cu:3657)
+Traceback (most recent call last):
+  File "/home/<user>/IsaacLab3/source/isaaclab/isaaclab/app/sim_launcher.py", line 582, in launch_simulation
+    yield physics_cfg
+  File "/home/<user>/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/backends/train_rsl_rl.py", line 236, in _run
+    runner.learn(
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/rsl_rl/runners/on_policy_runner.py", line 87, in learn
+    obs, rewards, dones, extras = self.env.step(actions.to(self.env.device))
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/IsaacLab3/source/isaaclab_rl/isaaclab_rl/rsl_rl/vecenv_wrapper.py", line 181, in step
+    obs_dict, rew, terminated, truncated, extras = self.env.step(actions)
+                                                   ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/gymnasium/wrappers/common.py", line 392, in step
+    return super().step(action)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/gymnasium/core.py", line 327, in step
+    return self.env.step(action)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/IsaacLab3/source/isaaclab/isaaclab/envs/manager_based_rl_env.py", line 236, in step
+    self.sim.step(render=False)
+  File "/home/<user>/IsaacLab3/source/isaaclab/isaaclab/sim/simulation_context.py", line 793, in step
+    self.physics_manager.step()
+  File "/home/<user>/IsaacLab3/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py", line 1070, in step
+    wp.capture_launch(cls._graph)
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/context.py", line 12688, in capture_launch
+    raise RuntimeError(f"Graph creation error: {runtime.get_error_string()}")
+RuntimeError: Graph creation error: Warp CUDA error 2: out of memory (in function wp_cuda_graph_create_exec, /builds/omniverse/warp/warp/native/warp.cu:3657)
+--------------------------------------------------------------------------------
+Resolved observation sets: 
+	 actor :  ['policy', 'media']
+	 critic :  ['policy', 'media', 'privileged']
+--------------------------------------------------------------------------------
+Actor Model: MLPModel(
+  (obs_normalizer): Identity()
+  (distribution): HeteroscedasticGaussianDistribution()
+  (mlp): MLP(
+    (0): Linear(in_features=84, out_features=512, bias=True)
+    (1): ELU(alpha=1.0)
+    (2): Linear(in_features=512, out_features=256, bias=True)
+    (3): ELU(alpha=1.0)
+    (4): Linear(in_features=256, out_features=128, bias=True)
+    (5): ELU(alpha=1.0)
+    (6): Linear(in_features=128, out_features=64, bias=True)
+    (7): ELU(alpha=1.0)
+    (8): Linear(in_features=64, out_features=16, bias=True)
+    (9): Unflatten(dim=-1, unflattened_size=[2, 8])
+  )
+)
+Critic Model: MLPModel(
+  (obs_normalizer): Identity()
+  (mlp): MLP(
+    (0): Linear(in_features=86, out_features=512, bias=True)
+    (1): ELU(alpha=1.0)
+    (2): Linear(in_features=512, out_features=256, bias=True)
+    (3): ELU(alpha=1.0)
+    (4): Linear(in_features=256, out_features=128, bias=True)
+    (5): ELU(alpha=1.0)
+    (6): Linear(in_features=128, out_features=64, bias=True)
+    (7): ELU(alpha=1.0)
+    (8): Linear(in_features=64, out_features=1, bias=True)
+  )
+)
+Could not find git repository in /home/<user>/env_isaaclab3/lib/python3.12/site-packages/rsl_rl/__init__.py. Skipping.
+Storing git diff for 'IsaacLab3' in: /home/<user>/IsaacLab3/logs/rsl_rl/franka_pour/2026-10-12_07-27-27_l4_2048/git/IsaacLab3.diff
+CUDA graph took: Last: 3.494361 s, Mean: 1.747200 s, Std: 2.470859 s, N: 2
+Traceback (most recent call last):
+  File "/home/<user>/env_isaaclab3/bin/isaaclab", line 10, in <module>
+    sys.exit(cli())
+             ^^^^^
+  File "/home/<user>/IsaacLab3/source/isaaclab/isaaclab/cli/__init__.py", line 161, in cli
+    subcommands[sys.argv[1]](sys.argv[2:])
+  File "/home/<user>/IsaacLab3/source/isaaclab/isaaclab/cli/__init__.py", line 53, in train
+    _exit_on_error(run_train_cli(args))
+                   ^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/dispatch.py", line 47, in run_train_cli
+    return run_cli("train", argv)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/dispatch.py", line 136, in run_cli
+    status = _run_backend(backends[selected.rl_library], backend_argv, run_as_script=action == "play")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/dispatch.py", line 174, in _run_backend
+    return runner(argv)
+           ^^^^^^^^^^^^
+  File "/home/<user>/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/backends/train_rsl_rl.py", line 117, in run
+    _run(args_cli)
+  File "/home/<user>/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/backends/train_rsl_rl.py", line 236, in _run
+    runner.learn(
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/rsl_rl/runners/on_policy_runner.py", line 87, in learn
+    obs, rewards, dones, extras = self.env.step(actions.to(self.env.device))
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/IsaacLab3/source/isaaclab_rl/isaaclab_rl/rsl_rl/vecenv_wrapper.py", line 181, in step
+    obs_dict, rew, terminated, truncated, extras = self.env.step(actions)
+                                                   ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/gymnasium/wrappers/common.py", line 392, in step
+    return super().step(action)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/gymnasium/core.py", line 327, in step
+    return self.env.step(action)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/IsaacLab3/source/isaaclab/isaaclab/envs/manager_based_rl_env.py", line 236, in step
+    self.sim.step(render=False)
+  File "/home/<user>/IsaacLab3/source/isaaclab/isaaclab/sim/simulation_context.py", line 793, in step
+    self.physics_manager.step()
+  File "/home/<user>/IsaacLab3/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py", line 1070, in step
+    wp.capture_launch(cls._graph)
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/context.py", line 12688, in capture_launch
+    raise RuntimeError(f"Graph creation error: {runtime.get_error_string()}")
+RuntimeError: Graph creation error: Warp CUDA error 2: out of memory (in function wp_cuda_graph_create_exec, /builds/omniverse/warp/warp/native/warp.cu:3657)
