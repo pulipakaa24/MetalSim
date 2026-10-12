@@ -117,3 +117,8 @@ NVIDIA L4, 580.178.04
 + t0=1791793554
 + case $S in
 + timeout 21600 isaaclab train --rl_library rsl_rl --task IsaacContrib-Franka-Pour --num_envs 1024 --max_iterations 60 --seed 0 --run_name l4_1024_curve --viz none
+++ date +%s
++ echo 'train exit 0 in 18873 s'
+train exit 0 in 18873 s
++ touch /home/<user>/parity3/pour/STAGE_POUR_DONE
++ git apply -R /home/<user>/parity3_scripts/franka_pour_published_asset.patch
