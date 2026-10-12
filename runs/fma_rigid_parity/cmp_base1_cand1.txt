@@ -1,0 +1,1145 @@
+== outcomes
+277 tests, 0 outcome differences
+base1 {'passed': 273, 'failed': 4}
+cand1 {'passed': 273, 'failed': 4}
+== locals differing (vs first run)
+
+# tests/test_deformable.py::test_mjw_flex_contact_trajectory_matches_mujoco_c  (1 differing locals)
+   x                            base1: [2, 112, 3] float32 max=0.30201876 mean=0.10550018 min=-0.1805549 nf=0
+                                cand1: [2, 112, 3] float32 max=0.30201879 mean=0.10550017 min=-0.1805549 nf=0
+
+# tests/test_deformable.py::test_mjw_flex_energy_bounded_2s  (6 differing locals)
+   e0                           base1: [64] float32 max=1.12308061 mean=1.10227251 min=1.07909989 nf=0
+                                cand1: [64] float32 max=1.12308073 mean=1.10227246 min=1.07910013 nf=0
+   emax                         base1: [64] float32 max=1.12308061 mean=1.10227251 min=1.07909989 nf=0
+                                cand1: [64] float32 max=1.12308073 mean=1.10227246 min=1.07910013 nf=0
+   e                            base1: [64] float32 max=0.57185709 mean=0.55123871 min=0.52043324 nf=0
+                                cand1: [64] float32 max=0.57203000 mean=0.55146239 min=0.52107518 nf=0
+   x                            base1: [64, 112, 3] float32 max=0.33124443 mean=0.09805272 min=-0.2037284 nf=0
+                                cand1: [64, 112, 3] float32 max=0.33124443 mean=0.09814041 min=-0.2031198 nf=0
+   ke                           base1: [64] float32 max=0.00062661 mean=0.00024807 min=5.26938601 nf=0
+                                cand1: [64] float32 max=0.00054822 mean=0.00023058 min=4.48333194 nf=0
+   cloth                        base1: [64, 100, 3] float32 max=0.30608075 mean=0.09335157 min=-0.2037284 nf=0
+                                cand1: [64, 100, 3] float32 max=0.30860978 mean=0.09344978 min=-0.2031198 nf=0
+
+# tests/test_deformable.py::test_mjw_flex_free_fall_matches_mujoco_c  (2 differing locals)
+   v                            base1: [4, 112, 3] float32 max=0.38054519 mean=0.13934839 min=-0.1800000 nf=0
+                                cand1: [4, 112, 3] float32 max=0.38054516 mean=0.13934839 min=-0.1800000 nf=0
+   e                            base1: [4, 2] float32 max=0.90876311 mean=0.53813090 min=0.16749885 nf=0
+                                cand1: [4, 2] float32 max=0.90876299 mean=0.53813099 min=0.16749911 nf=0
+
+# tests/test_deformable.py::test_mjw_flex_graph_replay_equals_eager  (2 differing locals)
+   ab                           base1: 0.044795095920562744
+                                cand1: 0.026897398754954338
+   bc                           base1: 0.03602156043052673
+                                cand1: 0.03597981482744217
+
+# tests/test_deformable.py::test_mjw_flex_one_step_matches_mujoco_c_in_contact  (24 differing locals)
+   errs[0]                      base1: 1.2329957734399759e-05
+                                cand1: 9.824700008684122e-06
+   errs[1]                      base1: 2.7505420253925994e-05
+                                cand1: 2.7192495868855193e-05
+   errs[2]                      base1: 2.4189521846351703e-05
+                                cand1: 2.7408172664222796e-05
+   errs[3]                      base1: 3.919022120957294e-05
+                                cand1: 3.9339232821511416e-05
+   errs[4]                      base1: 5.4297083974128024e-05
+                                cand1: 5.431198513532187e-05
+   errs[5]                      base1: 2.4147505548299808e-05
+                                cand1: 1.5027994897665042e-05
+   errs[6]                      base1: 2.202494091013696e-05
+                                cand1: 2.273088342169549e-05
+   errs[7]                      base1: 2.4470719168558433e-05
+                                cand1: 2.432729549206765e-05
+   errs[8]                      base1: 2.0897933617966546e-05
+                                cand1: 1.9769170657532587e-05
+   errs[9]                      base1: 1.8234843972505382e-05
+                                cand1: 1.328579581099873e-05
+   errs[10]                     base1: 1.642423478627475e-05
+                                cand1: 1.7895208271775237e-05
+   errs[11]                     base1: 2.5088949058501425e-05
+                                cand1: 2.575763866707534e-05
+   errs[12]                     base1: 1.6465630603723142e-05
+                                cand1: 1.700330931949607e-05
+   errs[13]                     base1: 1.5720577179828554e-05
+                                cand1: 1.584723704997626e-05
+   errs[14]                     base1: 2.551364478700635e-05
+                                cand1: 2.5964404913120243e-05
+   errs[15]                     base1: 1.8363689899519864e-05
+                                cand1: 1.8505250930861417e-05
+   errs[16]                     base1: 1.8581518390820007e-05
+                                cand1: 1.866347477738617e-05
+   errs[17]                     base1: 0.0003779958330759822
+                                cand1: 0.008970988143396919
+   errs[18]                     base1: 3.4078645530455365e-05
+                                cand1: 3.310261947225834e-05
+   errs[19]                     base1: 1.6892473859914103e-05
+                                cand1: 1.89323847046125e-05
+   errs[20]                     base1: 2.073181988588267e-05
+                                cand1: 2.1286888140353497e-05
+   errs[21]                     base1: 1.95413046354051e-05
+                                cand1: 1.9567381667494332e-05
+   errs[22]                     base1: 2.965926194483496e-05
+                                cand1: 2.9823262938953355e-05
+   errs[23]                     base1: 0.0016834650624491369
+                                cand1: 0.0016823486395128166
+
+# tests/test_deformable.py::test_xpbd_drape_agrees_with_mjw_flex  (3 differing locals)
+   xa                           base1: [100, 3] float32 max=0.30487281 mean=0.09665477 min=-0.1750021 nf=0
+                                cand1: [100, 3] float32 max=0.30496829 mean=0.09686911 min=-0.1749654 nf=0
+   xb                           base1: [100, 3] float32 max=0.30500000 mean=0.09732968 min=-0.1742492 nf=0
+                                cand1: [100, 3] float32 max=0.30500000 mean=0.09735265 min=-0.1742479 nf=0
+   centre                       base1: 55
+                                cand1: 54
+
+# tests/test_deformable.py::test_xpbd_energy_strain_penetration_2s  (4 differing locals)
+   e0                           base1: [64] float32 max=1.12307476 mean=1.10226721 min=1.07909488 nf=0
+                                cand1: [64] float32 max=1.12307476 mean=1.10226720 min=1.07909512 nf=0
+   emax                         base1: [64] float32 max=1.12307476 mean=1.10226721 min=1.07909488 nf=0
+                                cand1: [64] float32 max=1.12307476 mean=1.10226720 min=1.07909512 nf=0
+   e                            base1: [64] float32 max=0.57682061 mean=0.56882841 min=0.55945932 nf=0
+                                cand1: [64] float32 max=0.57681888 mean=0.56883074 min=0.55941611 nf=0
+   x                            base1: [64, 112, 3] float32 max=0.33124443 mean=0.10145326 min=-0.2092137 nf=0
+                                cand1: [64, 112, 3] float32 max=0.33124443 mean=0.10146491 min=-0.2044291 nf=0
+
+# tests/test_g1_fast_factorization.py::test_first_steps_match_mujoco_c  (1 differing locals)
+   q                            base1: [4, 44] float64 max=0.99982464 mean=0.09490001 min=-0.9962686 nf=0
+                                cand1: [4, 44] float64 max=0.99982464 mean=0.09490001 min=-0.9962686 nf=0
+
+# tests/test_g1_newton_engine.py::test_graph_replay_matches_eager  (2 differing locals)
+   out[0]                       base1: [4, 44] float32 max=1.41621518 mean=0.07959791 min=-1.6961157 nf=0
+                                cand1: [4, 44] float32 max=1.41621589 mean=0.07959812 min=-1.6961166 nf=0
+   out[1]                       base1: [4, 44] float32 max=1.41621530 mean=0.07959798 min=-1.6961164 nf=0
+                                cand1: [4, 44] float32 max=1.41621506 mean=0.07959787 min=-1.6961163 nf=0
+
+# tests/test_g1_newton_engine.py::test_reset_restores_default_state  (2 differing locals)
+   q                            base1: [4, 44] float32 max=1.70403659 mean=0.08716729 min=-1.6662969 nf=0
+                                cand1: [4, 44] float32 max=1.70403659 mean=0.08716729 min=-1.6662969 nf=0
+   v                            base1: [4, 43] float32 max=0.0 mean=0.0 min=-0.0 nf=0
+                                cand1: [4, 43] float32 max=0.0 mean=0.0 min=-0.0 nf=0
+
+# tests/test_g1_newton_engine.py::test_rough_task_runs_on_newton  (5 differing locals)
+   obs                          base1: [8, 310] float32 max=4.33487796 mean=0.09633309 min=-4.1492452 nf=0
+                                cand1: [8, 310] float32 max=4.33775663 mean=0.09629973 min=-4.1629190 nf=0
+   q                            base1: [8, 44] float32 max=60.4617958 mean=-0.6106625 min=-76.071823 nf=0
+                                cand1: [8, 44] float32 max=60.4617881 mean=-0.6106680 min=-76.071884 nf=0
+   scan                         base1: [8, 187] float32 max=0.38338181 mean=0.15550197 min=-0.0494972 nf=0
+                                cand1: [8, 187] float32 max=0.38338443 mean=0.15550041 min=-0.0494960 nf=0
+   xp                           base1: [8, 45, 3] float32 max=60.4617958 mean=-0.2249063 min=-76.071823 nf=0
+                                cand1: [8, 45, 3] float32 max=60.4617881 mean=-0.2249063 min=-76.071884 nf=0
+   xm                           base1: [8, 45, 3, 3] float32 max=0.99309003 mean=0.00249345 min=-0.9295582 nf=0
+                                cand1: [8, 45, 3, 3] float32 max=0.99309021 mean=0.00249306 min=-0.9294090 nf=0
+
+# tests/test_g1_newton_engine.py::test_state_conventions_match_mujoco  (4 differing locals)
+   bq                           base1: [3, 38, 7] float32 max=1.94374430 mean=0.26615158 min=-1.1562378 nf=0
+                                cand1: [3, 38, 7] float32 max=1.94374430 mean=0.26615157 min=-1.1562378 nf=0
+   bqd                          base1: [3, 38, 6] float32 max=2.59786510 mean=0.38756231 min=-2.1313445 nf=0
+                                cand1: [3, 38, 6] float32 max=2.59786510 mean=0.38756231 min=-2.1313445 nf=0
+   x                            base1: [7] float32 max=0.36457562 mean=-0.1985088 min=-0.6770731 nf=0
+                                cand1: [7] float32 max=0.36457562 mean=-0.1985088 min=-0.6770731 nf=0
+   v_nw                         base1: [3] float32 max=0.74788272 mean=0.11244796 min=-0.6666945 nf=0
+                                cand1: [3] float32 max=0.74788272 mean=0.11244794 min=-0.6666946 nf=0
+
+# tests/test_g1_newton_engine.py::test_touch_signals_are_contact_forces_and_fall_is_terminated  (7 differing locals)
+   sd                           base1: [4, 3] float32 max=128.994552 mean=85.7182858 min=0.0 nf=0
+                                cand1: [4, 3] float32 max=128.976394 mean=85.7177035 min=0.0 nf=0
+   feet                         base1: [4] float32 max=257.181152 mean=257.154853 min=257.142456 nf=0
+                                cand1: [4] float32 max=257.167358 mean=257.153106 min=257.140625 nf=0
+   term_r[0]                    base1: -4.100109577178955
+                                cand1: -4.100101947784424
+   term_r[1]                    base1: -4.102178573608398
+                                cand1: -4.10216760635376
+   term_r[2]                    base1: -4.104747295379639
+                                cand1: -4.104756832122803
+   term_r[3]                    base1: -4.104701042175293
+                                cand1: -4.104700088500977
+   r                            base1: [4] float32 max=0.02055578 mean=0.01648155 min=0.01194100 nf=0
+                                cand1: [4] float32 max=0.02055690 mean=0.01647962 min=0.01194086 nf=0
+
+# tests/test_g1_parity.py::test_warp_matches_mujoco_c_under_pd_hold  (3 differing locals)
+   q                            base1: [4, 44] float64 max=1.00015568 mean=0.10432975 min=-1.0001558 nf=0
+                                cand1: [4, 44] float64 max=1.00015568 mean=0.10432875 min=-1.0001558 nf=0
+   e                            base1: [4, 44] float64 max=6.34800953 mean=5.11841762 min=6.69708556 nf=0
+                                cand1: [4, 44] float64 max=5.54334683 mean=5.00236046 min=2.00505632 nf=0
+   err                          base1: 6.3480095385815005e-06
+                                cand1: 5.543346834113727e-06
+
+# tests/test_g1_task_terms.py::test_base_velocity_option_2_3_2_configs[flat]  (9 differing locals)
+   terms                        base1: [8, 13] float32 max=0.67667716 mean=-0.0856326 min=-2.3870122 nf=0
+                                cand1: [8, 13] float32 max=0.67667829 mean=-0.0856323 min=-2.3870160 nf=0
+   ref.0                        base1: 0.145266592502594
+                                cand1: 0.14528392255306244
+   ref.3                        base1: -0.18636898696422577
+                                cand1: -0.1863706409931183
+   ref.4                        base1: -0.19359925389289856
+                                cand1: -0.19359871745109558
+   ref.5                        base1: -0.006724829284335168
+                                cand1: -0.006723743585214104
+   ref.8                        base1: -0.003935405518859625
+                                cand1: -0.003936234395951033
+   ref.9                        base1: -0.2677328586578369
+                                cand1: -0.26772525906562805
+   ref.10                       base1: -0.06686408072710037
+                                cand1: -0.06686393916606903
+   ref.11                       base1: -0.03878379240632057
+                                cand1: -0.038784101605415344
+
+# tests/test_g1_task_terms.py::test_base_velocity_option_2_3_2_configs[rough]  (10 differing locals)
+   terms                        base1: [8, 13] float32 max=0.63978838 mean=-0.0721958 min=-1.5460515 nf=0
+                                cand1: [8, 13] float32 max=1.48582601 mean=-0.0613005 min=-2.2743871 nf=0
+   ref.0                        base1: 0.06810063123703003
+                                cand1: 0.007512702606618404
+   ref.1                        base1: 0.0
+                                cand1: 1.485826015472412
+   ref.3                        base1: -0.10801590979099274
+                                cand1: -0.09086674451828003
+   ref.4                        base1: -0.21720463037490845
+                                cand1: -0.23890911042690277
+   ref.5                        base1: -0.02813515852812004
+                                cand1: -0.016936528588087377
+   ref.6                        base1: -0.135639026761055
+                                cand1: -0.12973345816135406
+   ref.9                        base1: -0.9104136824607849
+                                cand1: -0.8975206613540649
+   ref.10                       base1: -0.001660530804656446
+                                cand1: -0.003024327103048563
+   ref.11                       base1: -0.12456905096769333
+                                cand1: -0.02795541100203991
+
+# tests/test_g1_task_terms.py::test_base_velocity_option_2_3_2_configs[rough_isaac]  (8 differing locals)
+   terms                        base1: [8, 13] float32 max=1.86649703 mean=-0.0381738 min=-2.2097303 nf=0
+                                cand1: [8, 13] float32 max=1.99897289 mean=-0.0139165 min=-1.9311809 nf=0
+   ref.0                        base1: 0.029857337474822998
+                                cand1: 0.027689741924405098
+   ref.1                        base1: 0.03579805791378021
+                                cand1: 1.9309347867965698
+   ref.4                        base1: -0.2541142702102661
+                                cand1: -0.2149112969636917
+   ref.5                        base1: -0.09153242085642632
+                                cand1: -0.07178758638148985
+   ref.9                        base1: -0.2928767800331116
+                                cand1: -0.09900708496570587
+   ref.10                       base1: -0.0033291741274297237
+                                cand1: -0.0032983790151774883
+   ref.11                       base1: -0.1034114733338356
+                                cand1: -0.09596364200115204
+
+# tests/test_g1_task_terms.py::test_contact_sensor_flags_match_touch_sites  (8 differing locals)
+   seen_air                     base1: 909
+                                cand1: 912
+   seen_contact                 base1: 11891
+                                cand1: 11888
+   cs.net_forces_w              base1: [64, 3, 3] float32 max=189.974029 mean=35.2050665 min=0.0 nf=0
+                                cand1: [64, 3, 3] float32 max=189.963348 mean=35.2062622 min=0.0 nf=0
+   cs.net_forces_w_history      base1: [64, 3, 3, 3] float32 max=189.989471 mean=35.2068176 min=0.0 nf=0
+                                cand1: [64, 3, 3, 3] float32 max=189.990661 mean=35.2081616 min=0.0 nf=0
+   cs.last_air_time             base1: [64, 3] float32 max=0.01499999 mean=0.01122395 min=0.00999999 nf=0
+                                cand1: [64, 3] float32 max=0.01499999 mean=0.01124999 min=0.00999999 nf=0
+   cs.current_contact_time      base1: [64, 3] float32 max=0.62999957 mean=0.60890584 min=0.58499962 nf=0
+                                cand1: [64, 3] float32 max=0.62999957 mean=0.60916626 min=0.58499962 nf=0
+   cs.last_contact_time         base1: [64, 3] float32 max=0.04499999 mean=0.03054687 min=0.01499999 nf=0
+                                cand1: [64, 3] float32 max=0.04499999 mean=0.03041666 min=0.01499999 nf=0
+   sd                           base1: [64, 3] float32 max=189.974029 mean=105.615199 min=63.2813415 nf=0
+                                cand1: [64, 3] float32 max=189.963348 mean=105.618786 min=63.2773056 nf=0
+
+# tests/test_g1_task_terms.py::test_feet_slide_velocity_is_the_foot_body_world_velocity[mjwarp]  (4 differing locals)
+   qpos                         base1: [4, 44] float64 max=1.58591508 mean=0.08863300 min=-1.4254763 nf=0
+                                cand1: [4, 44] float64 max=1.57907533 mean=0.08543077 min=-1.4297062 nf=0
+   qvel                         base1: [4, 43] float64 max=1.79189693 mean=-0.0151101 min=-1.5978038 nf=0
+                                cand1: [4, 43] float64 max=2.14236664 mean=-0.0356872 min=-2.6760017 nf=0
+   fv                           base1: [4, 2, 3] float32 max=0.07185616 mean=-0.0112295 min=-0.4291234 nf=0
+                                cand1: [4, 2, 3] float32 max=0.44570505 mean=-0.1728052 min=-2.9646563 nf=0
+   v6                           base1: [6] float64 max=0.02449572 mean=-0.0982845 min=-0.4540167 nf=0
+                                cand1: [6] float64 max=0.06212027 mean=0.01015881 min=-0.0075602 nf=0
+
+# tests/test_g1_task_terms.py::test_feet_slide_velocity_is_the_foot_body_world_velocity[newton]  (4 differing locals)
+   qpos                         base1: [4, 44] float64 max=1.56933701 mean=0.10112879 min=-1.4294611 nf=0
+                                cand1: [4, 44] float64 max=1.54875171 mean=0.09387812 min=-1.4273235 nf=0
+   qvel                         base1: [4, 43] float64 max=4.89555168 mean=0.06838110 min=-3.1895577 nf=0
+                                cand1: [4, 43] float64 max=6.20972776 mean=0.07044114 min=-3.5742430 nf=0
+   fv                           base1: [4, 2, 3] float32 max=1.97080886 mean=0.12939029 min=-0.3198053 nf=0
+                                cand1: [4, 2, 3] float32 max=2.23337626 mean=0.12717172 min=-0.8124769 nf=0
+   v6                           base1: [6] float64 max=0.96163773 mean=0.22594595 min=-0.1229034 nf=0
+                                cand1: [6] float64 max=0.46097913 mean=0.09940788 min=-0.1458216 nf=0
+
+# tests/test_g1_task_terms.py::test_flat_commands_and_contact_history_termination[mjwarp]  (2 differing locals)
+   h                            base1: [256] float32 max=10747.8798 mean=157.622605 min=0.0 nf=0
+                                cand1: [256] float32 max=10704.2216 mean=120.683315 min=0.0 nf=0
+   term                         base1: [256] float32 max=0.0 mean=-3.90625 min=-200.0 nf=0
+                                cand1: [256] float32 max=0.0 mean=-3.125 min=-200.0 nf=0
+
+# tests/test_g1_task_terms.py::test_il3_add_base_mass_distribution_and_constants[None]  (3 differing locals)
+   sub                          base1: [4096, 45] float32 max=33.8235397 mean=3.25798447 min=9.99999997 nf=0
+                                cand1: [4096, 45] float32 max=33.8235397 mean=3.25798447 min=9.99999997 nf=0
+   inv_d                        base1: [4096, 43] float32 max=990.939575 mean=327.326656 min=0.05081049 nf=0
+                                cand1: [4096, 43] float32 max=990.939453 mean=327.326658 min=0.05081050 nf=0
+   inv_b                        base1: [4096, 45, 2] float32 max=977.519714 mean=96.9658682 min=0.0 nf=0
+                                cand1: [4096, 45, 2] float32 max=977.519531 mean=96.9658694 min=0.0 nf=0
+
+# tests/test_g1_task_terms.py::test_il3_add_base_mass_distribution_and_constants[isaaclab3]  (4 differing locals)
+   sub                          base1: [4096, 45] float32 max=33.8235397 mean=3.25798447 min=9.99999997 nf=0
+                                cand1: [4096, 45] float32 max=33.8235397 mean=3.25798447 min=9.99999997 nf=0
+   inv_d                        base1: [4096, 43] float32 max=990.939575 mean=327.326655 min=0.05081049 nf=0
+                                cand1: [4096, 43] float32 max=990.939453 mean=327.326658 min=0.05081050 nf=0
+   inv_b                        base1: [4096, 45, 2] float32 max=977.519714 mean=96.9658682 min=0.0 nf=0
+                                cand1: [4096, 45, 2] float32 max=977.519531 mean=96.9658693 min=0.0 nf=0
+   sr                           base1: [38, 2] float32 max=1.0 mean=0.15413898 min=0.00404000 nf=0
+                                cand1: [38, 2] float32 max=1.0 mean=0.15413897 min=0.00403999 nf=0
+
+# tests/test_g1_task_terms.py::test_il3_base_lin_vel_is_the_root_com_velocity  (7 differing locals)
+   qpos                         base1: [16, 44] float64 max=4.11526441 mean=0.09708619 min=-4.2042374 nf=0
+                                cand1: [16, 44] float64 max=4.12010955 mean=0.09685136 min=-4.2055706 nf=0
+   qvel                         base1: [16, 43] float64 max=6.49168682 mean=0.00681054 min=-7.2027058 nf=0
+                                cand1: [16, 43] float64 max=6.49203109 mean=-0.0005388 min=-6.9144101 nf=0
+   obs                          base1: [16, 123] float32 max=6.58526134 mean=0.01870037 min=-6.4161958 nf=0
+                                cand1: [16, 123] float32 max=6.29064130 mean=0.01583204 min=-6.8760108 nf=0
+   far                          base1: 15
+                                cand1: 16
+   w_w                          base1: [3] float64 max=-0.2630346 mean=-1.1167155 min=-1.8420130 nf=0
+                                cand1: [3] float64 max=0.36770570 mean=-0.6524115 min=-1.7231174 nf=0
+   v_com                        base1: [3] float64 max=-0.1160710 mean=-0.1900413 min=-0.2957546 nf=0
+                                cand1: [3] float64 max=0.20793041 mean=-0.0478305 min=-0.3791462 nf=0
+   v_b                          base1: [3] float64 max=0.14210030 mean=-0.1009668 min=-0.2807942 nf=0
+                                cand1: [3] float64 max=-0.0128263 mean=-0.2035825 min=-0.3654293 nf=0
+
+# tests/test_g1_task_terms.py::test_il3_contact_sensor_ticks  (2 differing locals)
+   c.net_forces_w               base1: [64, 3, 3] float32 max=159.918457 mean=35.3071107 min=0.0 nf=0
+                                cand1: [64, 3, 3] float32 max=159.913146 mean=35.3074970 min=0.0 nf=0
+   c.net_forces_w_history       base1: [64, 3, 3, 3] float32 max=160.439697 mean=35.3693341 min=0.0 nf=0
+                                cand1: [64, 3, 3, 3] float32 max=160.440460 mean=35.3693299 min=0.0 nf=0
+
+# tests/test_g1_task_terms.py::test_il3_push_robot_interval_and_velocity  (6 differing locals)
+   v0                           base1: [4096, 43] float64 max=0.67705631 mean=-0.0003048 min=-0.7001231 nf=0
+                                cand1: [4096, 43] float64 max=0.67705631 mean=-0.0003048 min=-0.7001231 nf=0
+   v1                           base1: [4096, 43] float64 max=1.00398492 mean=-0.0002692 min=-0.9758874 nf=0
+                                cand1: [4096, 43] float64 max=1.00398492 mean=-0.0002692 min=-0.9758874 nf=0
+   w0                           base1: [3] float64 max=0.21255862 mean=0.15299612 min=0.04978548 nf=0
+                                cand1: [3] float64 max=0.21255862 mean=0.15299612 min=0.04978549 nf=0
+   c0                           base1: [3] float64 max=0.44347690 mean=0.37658725 min=0.31388497 nf=0
+                                cand1: [3] float64 max=0.44347691 mean=0.37658725 min=0.31388497 nf=0
+   w1                           base1: [3] float64 max=0.21255862 mean=0.15299612 min=0.04978548 nf=0
+                                cand1: [3] float64 max=0.21255862 mean=0.15299612 min=0.04978549 nf=0
+   c1                           base1: [3] float64 max=0.77457427 mean=0.47896136 min=0.31388497 nf=0
+                                cand1: [3] float64 max=0.77457427 mean=0.47896137 min=0.31388497 nf=0
+
+# tests/test_g1_task_terms.py::test_il3_reset_root_state_distribution_and_application  (3 differing locals)
+   qvel                         base1: [4096, 43] float64 max=0.70155757 mean=0.00021722 min=-0.6904417 nf=0
+                                cand1: [4096, 43] float64 max=0.70155757 mean=0.00021722 min=-0.6904417 nf=0
+   W                            base1: [4096, 3] float64 max=0.49992858 mean=0.00391791 min=-0.4999807 nf=0
+                                cand1: [4096, 3] float64 max=0.49992861 mean=0.00391791 min=-0.4999807 nf=0
+   V                            base1: [4096, 3] float64 max=0.49998062 mean=-0.0003604 min=-0.4999920 nf=0
+                                cand1: [4096, 3] float64 max=0.49998062 mean=-0.0003604 min=-0.4999920 nf=0
+
+# tests/test_g1_task_terms.py::test_il3_reward_terms_match_isaac_formulas[flat_il3]  (12 differing locals)
+   terms                        base1: [8, 13] float32 max=0.77249890 mean=-0.0564237 min=-1.1747286 nf=0
+                                cand1: [8, 13] float32 max=0.70227551 mean=-0.0909142 min=-1.3633493 nf=0
+   ref.0                        base1: 0.7724988801544683
+                                cand1: 0.16697795229805706
+   ref.1                        base1: 0.35159873962402344
+                                cand1: 0.0
+   ref.2                        base1: 0.014999999664723873
+                                cand1: 0.007499999832361937
+   ref.3                        base1: -0.05398859456181526
+                                cand1: -0.2465457320213318
+   ref.4                        base1: -0.2763884663581848
+                                cand1: -0.2268182337284088
+   ref.5                        base1: -0.09121800416579462
+                                cand1: -0.004257271963401824
+   ref.6                        base1: -0.10848966240882874
+                                cand1: -0.1161641776561737
+   ref.8                        base1: -0.022845071609817996
+                                cand1: -1.6159050874963146e-05
+   ref.9                        base1: -0.5553976893424988
+                                cand1: -1.0294809341430664
+   ref.10                       base1: -0.008037681691348553
+                                cand1: -0.0328109934926033
+   ref.11                       base1: -1.1747286319732666
+                                cand1: -0.058858975768089294
+
+# tests/test_g1_task_terms.py::test_il3_reward_terms_match_isaac_formulas[rough_il3]  (10 differing locals)
+   terms                        base1: [8, 13] float32 max=0.72337007 mean=-0.0498184 min=-1.1551649 nf=0
+                                cand1: [8, 13] float32 max=0.72337114 mean=-0.0498516 min=-1.1551703 nf=0
+   ref.0                        base1: 0.29724818703643174
+                                cand1: 0.2972108463464639
+   ref.3                        base1: -0.08776213973760605
+                                cand1: -0.0877639576792717
+   ref.4                        base1: -0.27966275811195374
+                                cand1: -0.283042311668396
+   ref.5                        base1: -0.1642399787881148
+                                cand1: -0.16424470105926048
+   ref.9                        base1: -0.3155600428581238
+                                cand1: -0.31556716561317444
+   ref.10                       base1: -0.006286220625042915
+                                cand1: -0.006286292336881161
+   ref.11                       base1: -0.12203197181224823
+                                cand1: -0.12203481793403625
+   ref.12                       base1: -0.04728843676211847
+                                cand1: -0.04729111897113336
+   v                            base1: -0.04728843676211847
+                                cand1: -0.04729111897113336
+
+# tests/test_g1_task_terms.py::test_reward_terms_match_isaac_formulas[mjwarp]  (10 differing locals)
+   terms                        base1: [8, 13] float32 max=0.89569872 mean=-0.0378805 min=-0.5644604 nf=0
+                                cand1: [8, 13] float32 max=0.89343446 mean=-0.0284693 min=-0.6239734 nf=0
+   ref.0                        base1: 0.0377743056243997
+                                cand1: 0.03781489527026493
+   ref.2                        base1: 0.0037499999161809683
+                                cand1: 0.011249999515712261
+   ref.3                        base1: -0.09423333406448364
+                                cand1: -0.07268841564655304
+   ref.4                        base1: -0.2349688708782196
+                                cand1: -0.23163434863090515
+   ref.5                        base1: -0.002084622573849587
+                                cand1: -0.00721637001992094
+   ref.8                        base1: -0.014353973779017808
+                                cand1: -0.019786724277348396
+   ref.9                        base1: -0.5644604563713074
+                                cand1: -0.43267640471458435
+   ref.10                       base1: -0.024102946743369102
+                                cand1: -0.015949752181768417
+   ref.11                       base1: -0.05485766753554344
+                                cand1: -0.04423421993851662
+
+# tests/test_g1_task_terms.py::test_reward_terms_match_isaac_formulas[newton]  (8 differing locals)
+   terms                        base1: [8, 13] float32 max=0.92688834 mean=-0.0985980 min=-4.6851844 nf=0
+                                cand1: [8, 13] float32 max=0.92685323 mean=-0.0985966 min=-4.6848273 nf=0
+   ref.0                        base1: 0.6383750246255185
+                                cand1: 0.6383791107987347
+   ref.4                        base1: -0.23705051839351654
+                                cand1: -0.23704975843429565
+   ref.5                        base1: -0.0624376312094066
+                                cand1: -0.06243723323246986
+   ref.8                        base1: -0.016579861309126986
+                                cand1: -0.016591434309331164
+   ref.9                        base1: -1.6592501401901245
+                                cand1: -1.659164309501648
+   ref.10                       base1: -0.0305411946028471
+                                cand1: -0.030540816485881805
+   ref.11                       base1: -0.07607575505971909
+                                cand1: -0.07606043666601181
+
+# tests/test_g1_task_terms.py::test_rough_isaac_reward_set_matches_isaac_formulas  (9 differing locals)
+   terms                        base1: [8, 13] float32 max=1.40382266 mean=-0.0406184 min=-1.7032520 nf=0
+                                cand1: [8, 13] float32 max=1.40381157 mean=-0.0406133 min=-1.7032569 nf=0
+   ref.0                        base1: 0.04939779114290504
+                                cand1: 0.049386771236051855
+   ref.1                        base1: 0.9319454431533813
+                                cand1: 0.9323344230651855
+   ref.3                        base1: -0.08600389212369919
+                                cand1: -0.08600126951932907
+   ref.4                        base1: -0.2555638551712036
+                                cand1: -0.25540828704833984
+   ref.5                        base1: -0.0863376659039965
+                                cand1: -0.08633733564318735
+   ref.9                        base1: -0.10186239331960678
+                                cand1: -0.10184933245182037
+   ref.10                       base1: -0.001784202759154141
+                                cand1: -0.0017841084627434611
+   ref.11                       base1: -0.04256471246480942
+                                cand1: -0.04256577044725418
+
+# tests/test_g1_task_terms.py::test_rough_reward_set_unchanged  (7 differing locals)
+   terms                        base1: [8, 13] float32 max=1.85551142 mean=-0.0239447 min=-0.7687262 nf=0
+                                cand1: [8, 13] float32 max=0.34269270 mean=-0.0480773 min=-1.3201612 nf=0
+   ref.0                        base1: 0.33854420849955963
+                                cand1: 0.32331388745469386
+   ref.4                        base1: -0.2058677077293396
+                                cand1: -0.21337458491325378
+   ref.5                        base1: -0.038811483343841824
+                                cand1: -0.03917688219356741
+   ref.9                        base1: -0.7048384547233582
+                                cand1: -0.49719810485839844
+   ref.10                       base1: -0.0009452796075493097
+                                cand1: -0.000992296845652163
+   ref.11                       base1: -0.05155310034751892
+                                cand1: -0.058277472853660583
+
+# tests/test_gpu_queue.py::test_acquire_with_cmd_takes_the_lock_and_records_the_command  (6 differing locals)
+   h.pid                        base1: 48741
+                                cand1: 51408
+   h.start                      base1: 1791700397.494554
+                                cand1: 1791701188.072781
+   h.queued                     base1: 1791700397.494246
+                                cand1: 1791701188.0725467
+   ev[0].t                      base1: 1791700397.4947772
+                                cand1: 1791701188.0729668
+   ev[1].t                      base1: 1791700397.495415
+                                cand1: 1791701188.073499
+   ev[1].start                  base1: 1791700397.494554
+                                cand1: 1791701188.072781
+
+# tests/test_gpu_queue.py::test_exit_code_recorded_when_a_waiter_freed_the_holder  (4 differing locals)
+   ev[0].t                      base1: 1791700397.5003672
+                                cand1: 1791701188.0776992
+   ev[1].t                      base1: 1791700397.5005922
+                                cand1: 1791701188.077875
+   ev[1].start                  base1: 1791700397.500169
+                                cand1: 1791701188.07752
+   ev[2].t                      base1: 1791700397.500971
+                                cand1: 1791701188.078229
+
+# tests/test_gpu_queue.py::test_front_ticket_sorts_ahead_of_older_tickets_of_its_class  (1 differing locals)
+   tf                           base1: '/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/tmp7nk9iwl7/q/0.000_0_PAUSE_48
+                                cand1: '/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/tmpanz06dio/q/0.000_0_PAUSE_51
+
+# tests/test_interop.py::test_handles  (1 differing locals)
+   tdev                         base1: 4389509920
+                                cand1: 4325229408
+
+# tests/test_interop.py::test_ping_pong_round_trip  (2 differing locals)
+   t0                           base1: 335373.840530833
+                                cand1: 336164.428725583
+   dt                           base1: 0.15977770800236613
+                                cand1: 0.10605279199080542
+
+# tests/test_interop.py::test_torch_buffer_readable_by_warp  (2 differing locals)
+   buf                          base1: 50883644928
+                                cand1: 45593599424
+   buf2                         base1: 50883644928
+                                cand1: 45593599424
+
+# tests/test_interop.py::test_wait_blocks_torch_until_signaled  (1 differing locals)
+   t0                           base1: 335372.840810625
+                                cand1: 336163.401473083
+
+# tests/test_interop.py::test_wait_blocks_warp_until_signaled  (1 differing locals)
+   t0                           base1: 335373.36802775
+                                cand1: 336163.928333958
+
+# tests/test_lidar_nav.py::test_scan_matches_mj_ray_and_env_runs  (3 differing locals)
+   obs                          base1: [32, 68] float32 max=1.0 mean=0.83057889 min=-0.8290121 nf=0
+                                cand1: [32, 68] float32 max=1.0 mean=0.83057885 min=-0.8290121 nf=0
+   rew                          base1: [32] float32 max=0.34031116 mean=-0.0260236 min=-0.3725661 nf=0
+                                cand1: [32] float32 max=0.34031116 mean=-0.0260235 min=-0.3725661 nf=0
+   info.episode_reward          base1: [32] float32 max=2.87507224 mean=0.09508304 min=-2.9340865 nf=0
+                                cand1: [32] float32 max=2.87507224 mean=0.09508192 min=-2.9340865 nf=0
+
+# tests/test_lift_ctrl_ordering.py::test_step_matches_host_synchronized_stepping  (2 differing locals)
+   qa                           base1: [8, 13] float32 max=1.22313177 mean=0.15869989 min=-0.9998304 nf=0
+                                cand1: [8, 13] float32 max=1.22313177 mean=0.15869989 min=-0.9998304 nf=0
+   qb                           base1: [8, 13] float32 max=1.22313177 mean=0.15869989 min=-0.9998304 nf=0
+                                cand1: [8, 13] float32 max=1.22313177 mean=0.15869990 min=-0.9998304 nf=0
+
+# tests/test_lift_env.py::test_lift_env_runs_and_resets  (52 differing locals)
+   obs.image                    base1: [32, 128, 128, 3] uint8 max=255.0 mean=129.084756 min=0.0 nf=0
+                                cand1: [32, 128, 128, 3] uint8 max=255.0 mean=129.084701 min=0.0 nf=0
+   obs.qpos                     base1: [32, 6] float32 max=0.35720646 mean=0.05047058 min=-0.2942186 nf=0
+                                cand1: [32, 6] float32 max=0.35720646 mean=0.05047058 min=-0.2942186 nf=0
+   img0                         base1: [32, 128, 128, 3] uint8 max=255.0 mean=128.507389 min=0.0 nf=0
+                                cand1: [32, 128, 128, 3] uint8 max=255.0 mean=128.507495 min=0.0 nf=0
+   rewards[0]                   base1: [32] float32 max=0.00873059 mean=0.00414161 min=0.00128787 nf=0
+                                cand1: [32] float32 max=0.00873059 mean=0.00414247 min=0.00128787 nf=0
+   rewards[1]                   base1: [32] float32 max=0.00843256 mean=0.00419289 min=0.00132417 nf=0
+                                cand1: [32] float32 max=0.00843256 mean=0.00419335 min=0.00132417 nf=0
+   rewards[2]                   base1: [32] float32 max=0.01006847 mean=0.00448757 min=0.00136578 nf=0
+                                cand1: [32] float32 max=0.01006847 mean=0.00448780 min=0.00136572 nf=0
+   rewards[3]                   base1: [32] float32 max=0.01264464 mean=0.00485365 min=0.00124186 nf=0
+                                cand1: [32] float32 max=0.01264458 mean=0.00485377 min=0.00124186 nf=0
+   rewards[4]                   base1: [32] float32 max=0.01637762 mean=0.00533917 min=0.00116097 nf=0
+                                cand1: [32] float32 max=0.01637762 mean=0.00533923 min=0.00116097 nf=0
+   rewards[5]                   base1: [32] float32 max=0.02111583 mean=0.00589562 min=0.00121194 nf=0
+                                cand1: [32] float32 max=0.02111583 mean=0.00589566 min=0.00121194 nf=0
+   rewards[6]                   base1: [32] float32 max=0.02686864 mean=0.00661812 min=0.00106966 nf=0
+                                cand1: [32] float32 max=0.02686864 mean=0.00661813 min=0.00106966 nf=0
+   rewards[7]                   base1: [32] float32 max=0.03432047 mean=0.00768245 min=0.00097882 nf=0
+                                cand1: [32] float32 max=0.03432053 mean=0.00768246 min=0.00097882 nf=0
+   rewards[8]                   base1: [32] float32 max=0.04563051 mean=0.00907030 min=0.00092071 nf=0
+                                cand1: [32] float32 max=0.04563057 mean=0.00907030 min=0.00092071 nf=0
+   rewards[9]                   base1: [32] float32 max=0.06036424 mean=0.01077323 min=0.00080347 nf=0
+                                cand1: [32] float32 max=0.06036424 mean=0.01077323 min=0.00080347 nf=0
+   rewards[10]                  base1: [32] float32 max=0.07579636 mean=0.01263109 min=0.00064206 nf=0
+                                cand1: [32] float32 max=0.07579642 mean=0.01263108 min=0.00064206 nf=0
+   rewards[11]                  base1: [32] float32 max=0.08007574 mean=0.01352181 min=0.00049299 nf=0
+                                cand1: [32] float32 max=0.08007574 mean=0.01352181 min=0.00049299 nf=0
+   rewards[12]                  base1: [32] float32 max=0.07765156 mean=0.01383026 min=0.00040537 nf=0
+                                cand1: [32] float32 max=0.07765144 mean=0.01383026 min=0.00040537 nf=0
+   rewards[13]                  base1: [32] float32 max=0.06775361 mean=0.01392417 min=0.00037157 nf=0
+                                cand1: [32] float32 max=0.06775361 mean=0.01392416 min=0.00037157 nf=0
+   rewards[14]                  base1: [32] float32 max=0.06053960 mean=0.01417347 min=0.00037437 nf=0
+                                cand1: [32] float32 max=0.06053960 mean=0.01417346 min=0.00037431 nf=0
+   rewards[15]                  base1: [32] float32 max=0.05752503 mean=0.01399016 min=0.00040179 nf=0
+                                cand1: [32] float32 max=0.05752491 mean=0.01399016 min=0.00040179 nf=0
+   rewards[16]                  base1: [32] float32 max=0.06223434 mean=0.01425202 min=0.00044149 nf=0
+                                cand1: [32] float32 max=0.06223434 mean=0.01425202 min=0.00044149 nf=0
+   rewards[17]                  base1: [32] float32 max=0.07178115 mean=0.01441596 min=0.00046455 nf=0
+                                cand1: [32] float32 max=0.07178115 mean=0.01441596 min=0.00046455 nf=0
+   rewards[18]                  base1: [32] float32 max=0.08338671 mean=0.01443438 min=0.00053292 nf=0
+                                cand1: [32] float32 max=0.08338665 mean=0.01443438 min=0.00053292 nf=0
+   rewards[19]                  base1: [32] float32 max=0.09349554 mean=0.01445887 min=0.00066369 nf=0
+                                cand1: [32] float32 max=0.09349542 mean=0.01445888 min=0.00066369 nf=0
+   rewards[20]                  base1: [32] float32 max=0.09549283 mean=0.01460378 min=0.00080811 nf=0
+                                cand1: [32] float32 max=0.09549289 mean=0.01460378 min=0.00080817 nf=0
+   rewards[21]                  base1: [32] float32 max=0.09122347 mean=0.01460620 min=0.00097233 nf=0
+                                cand1: [32] float32 max=0.09122359 mean=0.01460622 min=0.00097233 nf=0
+   rewards[22]                  base1: [32] float32 max=0.08473193 mean=0.01464689 min=0.00100368 nf=0
+                                cand1: [32] float32 max=0.08473211 mean=0.01464690 min=0.00100374 nf=0
+   rewards[23]                  base1: [32] float32 max=0.07520431 mean=0.01517745 min=0.00090950 nf=0
+                                cand1: [32] float32 max=0.07520437 mean=0.01517745 min=0.00090950 nf=0
+   rewards[24]                  base1: [32] float32 max=0.06779807 mean=0.01606659 min=0.00072872 nf=0
+                                cand1: [32] float32 max=0.06779825 mean=0.01606661 min=0.00072878 nf=0
+   rewards[25]                  base1: [32] float32 max=0.08761596 mean=0.01681972 min=0.00058412 nf=0
+                                cand1: [32] float32 max=0.08761602 mean=0.01681974 min=0.00058406 nf=0
+   rewards[26]                  base1: [32] float32 max=0.08959168 mean=0.01734545 min=0.00049442 nf=0
+                                cand1: [32] float32 max=0.08959186 mean=0.01734546 min=0.00049442 nf=0
+   rewards[27]                  base1: [32] float32 max=0.08421480 mean=0.01747575 min=0.00045806 nf=0
+                                cand1: [32] float32 max=0.08421504 mean=0.01747577 min=0.00045806 nf=0
+   rewards[28]                  base1: [32] float32 max=0.09187656 mean=0.01773533 min=0.00043714 nf=0
+                                cand1: [32] float32 max=0.09187668 mean=0.01773534 min=0.00043720 nf=0
+   rewards[29]                  base1: [32] float32 max=0.09723401 mean=0.01762988 min=0.00044018 nf=0
+                                cand1: [32] float32 max=0.09723418 mean=0.01762990 min=0.00044023 nf=0
+   rewards[30]                  base1: [32] float32 max=0.10327172 mean=0.01697014 min=0.00047814 nf=0
+                                cand1: [32] float32 max=0.10327184 mean=0.01697015 min=0.00047814 nf=0
+   rewards[31]                  base1: [32] float32 max=0.11009985 mean=0.01624918 min=0.00051778 nf=0
+                                cand1: [32] float32 max=0.11009985 mean=0.01624919 min=0.00051778 nf=0
+   rewards[32]                  base1: [32] float32 max=0.13219219 mean=0.01607751 min=0.00056225 nf=0
+                                cand1: [32] float32 max=0.13219219 mean=0.01607752 min=0.00056219 nf=0
+   rewards[33]                  base1: [32] float32 max=0.14383643 mean=0.01609299 min=0.00062781 nf=0
+                                cand1: [32] float32 max=0.14383655 mean=0.01609298 min=0.00062781 nf=0
+   rewards[34]                  base1: [32] float32 max=0.13821947 mean=0.01639577 min=0.00067567 nf=0
+                                cand1: [32] float32 max=0.13821947 mean=0.01639577 min=0.00067567 nf=0
+   rewards[35]                  base1: [32] float32 max=0.11837506 mean=0.01665811 min=0.00059342 nf=0
+                                cand1: [32] float32 max=0.11837494 mean=0.01665808 min=0.00059342 nf=0
+   rewards[36]                  base1: [32] float32 max=0.10621476 mean=0.01738675 min=0.00057691 nf=0
+                                cand1: [32] float32 max=0.10621476 mean=0.01738676 min=0.00057691 nf=0
+
+# tests/test_lift_env.py::test_lift_env_throughput  (2 differing locals)
+   t0                           base1: 335403.745337791
+                                cand1: 336195.361149
+   dt                           base1: 1.0820464590215124
+                                cand1: 1.050443375017494
+
+# tests/test_materialx.py::test_mtlx_document_flattens  (2 differing locals)
+   path                         base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+                                cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+   _                            base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+                                cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+
+# tests/test_materialx.py::test_tier0_render_albedo  (2 differing locals)
+   _                            base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+                                cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+   scene                        base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+                                cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+
+# tests/test_materialx.py::test_usd_scene_binds_mtlx  (2 differing locals)
+   _                            base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+                                cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+   scene                        base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+                                cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+
+# tests/test_physics.py::test_one_step_parity_vs_mujoco_c[g1]  (3 differing locals)
+   q_gpu                        base1: [8, 36] float32 max=1.77359247 mean=0.13879022 min=-1.6363168 nf=0
+                                cand1: [8, 36] float32 max=1.77359247 mean=0.13879022 min=-1.6363168 nf=0
+   v_gpu                        base1: [8, 35] float32 max=27.0814018 mean=-0.3425663 min=-29.754838 nf=0
+                                cand1: [8, 35] float32 max=27.0813999 mean=-0.3425663 min=-29.754838 nf=0
+   worst_v                      base1: 5.610932495514476e-06
+                                cand1: 4.462100118729495e-06
+
+# tests/test_physics.py::test_one_step_parity_vs_mujoco_c[go1]  (3 differing locals)
+   q_gpu                        base1: [8, 19] float32 max=2.40840053 mean=0.04614635 min=-2.3119201 nf=0
+                                cand1: [8, 19] float32 max=2.40840053 mean=0.04614635 min=-2.3119201 nf=0
+   v_gpu                        base1: [8, 18] float32 max=12.1386890 mean=0.49138690 min=-16.451877 nf=0
+                                cand1: [8, 18] float32 max=12.1386890 mean=0.49138682 min=-16.451877 nf=0
+   worst_v                      base1: 5.287177671253751e-05
+                                cand1: 5.3169799936414464e-05
+
+# tests/test_physics.py::test_one_step_parity_vs_mujoco_c[panda]  (3 differing locals)
+   q_gpu                        base1: [8, 9] float32 max=1.84201765 mean=0.01930664 min=-1.9521235 nf=0
+                                cand1: [8, 9] float32 max=1.84201765 mean=0.01930664 min=-1.9521235 nf=0
+   v_gpu                        base1: [8, 9] float32 max=6.80870914 mean=0.18754268 min=-7.1542015 nf=0
+                                cand1: [8, 9] float32 max=6.80870914 mean=0.18754265 min=-7.1542019 nf=0
+   worst_v                      base1: 4.915813383021828e-07
+                                cand1: 1.3092082635779434e-06
+
+# tests/test_physics.py::test_one_step_parity_vs_mujoco_c[so101_lift]  (2 differing locals)
+   q_gpu                        base1: [8, 13] float32 max=1.0 mean=0.18950789 min=-0.2311712 nf=0
+                                cand1: [8, 13] float32 max=1.0 mean=0.18950789 min=-0.2311712 nf=0
+   v_gpu                        base1: [8, 12] float32 max=2.58546304 mean=0.04315212 min=-2.8502364 nf=0
+                                cand1: [8, 12] float32 max=2.58546328 mean=0.04315212 min=-2.8502364 nf=0
+
+# tests/test_physics.py::test_per_world_model_fields  (1 differing locals)
+   v                            base1: [8] float32 max=0.39999976 mean=0.13589280 min=0.04999997 nf=0
+                                cand1: [8] float32 max=0.39999976 mean=0.13589280 min=0.04999997 nf=0
+
+# tests/test_physics.py::test_reset_and_forward_ordering  (3 differing locals)
+   q                            base1: [16, 13] float32 max=1.0 mean=0.11385056 min=-3.3659910 nf=0
+                                cand1: [16, 13] float32 max=1.0 mean=0.11385056 min=-3.3659890 nf=0
+   qn                           base1: [16, 13] float32 max=1.0 mean=0.11385056 min=-3.3659910 nf=0
+                                cand1: [16, 13] float32 max=1.0 mean=0.11385056 min=-3.3659890 nf=0
+   xpos                         base1: [16, 10, 3] float32 max=0.31666404 mean=0.08570681 min=-0.1221215 nf=0
+                                cand1: [16, 10, 3] float32 max=0.31666404 mean=0.08570681 min=-0.1221215 nf=0
+
+# tests/test_physics.py::test_step_does_not_block_host  (11 differing locals)
+   times.64[0]                  base1: 4.751041706185788e-05
+                                cand1: 4.679508371433864e-05
+   times.64[1]                  base1: 0.003476545166146631
+                                cand1: 0.0031836388322214284
+   times.2048[0]                base1: 3.832983202300966e-05
+                                cand1: 3.651041576328377e-05
+   times.2048[1]                base1: 0.004742659749657226
+                                cand1: 0.004761392333117935
+   t0                           base1: 335438.139385833
+                                cand1: 336230.057237958
+   _                            base1: 0.003476545166146631
+                                cand1: 0.0031836388322214284
+   host                         base1: 3.832983202300966e-05
+                                cand1: 3.651041576328377e-05
+   total                        base1: 0.004742659749657226
+                                cand1: 0.004761392333117935
+   host_small                   base1: 4.751041706185788e-05
+                                cand1: 4.679508371433864e-05
+   host_big                     base1: 3.832983202300966e-05
+                                cand1: 3.651041576328377e-05
+   total_big                    base1: 0.004742659749657226
+                                cand1: 0.004761392333117935
+
+# tests/test_physics.py::test_trajectory_parity_so101_arm_joints  (3 differing locals)
+   got                          base1: [200, 13] float64 max=1.0 mean=0.12767950 min=-0.1945306 nf=0
+                                cand1: [200, 13] float64 max=1.0 mean=0.12767948 min=-0.1945306 nf=0
+   err                          base1: [200, 6] float64 max=3.20251000 mean=7.17091349 min=1.89797006 nf=0
+                                cand1: [200, 6] float64 max=3.44667887 mean=5.18345471 min=3.78561071 nf=0
+   q_all                        base1: [4, 13] float32 max=1.0 mean=0.12461417 min=-0.1745309 nf=0
+                                cand1: [4, 13] float32 max=1.0 mean=0.12461414 min=-0.1745309 nf=0
+
+# tests/test_physx_cloth.py::test_dropped_cloth_against_xpbd  (2 differing locals)
+   xa                           base1: [441, 3] float32 max=0.40500009 mean=0.06857874 min=-0.3633865 nf=0
+                                cand1: [441, 3] float32 max=0.40500009 mean=0.06857505 min=-0.3637973 nf=0
+   xb                           base1: [441, 3] float32 max=0.40724623 mean=0.08041936 min=-0.3347852 nf=0
+                                cand1: [441, 3] float32 max=0.40613847 mean=0.08005704 min=-0.3352349 nf=0
+
+# tests/test_physx_cloth.py::test_dropped_cloth_rests_at_physx_offsets  (3 differing locals)
+   x                            base1: [4, 441, 3] float32 max=0.43435779 mean=0.08192523 min=-0.3902369 nf=0
+                                cand1: [4, 441, 3] float32 max=0.43435493 mean=0.08173745 min=-0.3891804 nf=0
+   z                            base1: [4, 441] float32 max=0.43435779 mean=0.24857319 min=0.02499378 nf=0
+                                cand1: [4, 441] float32 max=0.43435493 mean=0.24848082 min=0.02499382 nf=0
+   ztop                         base1: [144] float32 max=0.43149682 mean=0.42546972 min=0.42499986 nf=0
+                                cand1: [144] float32 max=0.43149343 mean=0.42546924 min=0.42499986 nf=0
+
+# tests/test_physx_cloth.py::test_hanging_cloth_against_xpbd  (2 differing locals)
+   xa                           base1: [441, 3] float32 max=1.5 mean=0.33017052 min=-0.5 nf=0
+                                cand1: [441, 3] float32 max=1.5 mean=0.33017282 min=-0.5 nf=0
+   xb                           base1: [441, 3] float32 max=1.5 mean=0.33346119 min=-0.5 nf=0
+                                cand1: [441, 3] float32 max=1.5 mean=0.33347449 min=-0.5 nf=0
+
+# tests/test_ppo_warp_rollout.py::test_noise_fresh_each_rollout_and_no_phantom_action  (7 differing locals)
+   z0                           base1: [24, 64, 37] float32 max=3.93380522 mean=-0.0026303 min=-4.3307003 nf=0
+                                cand1: [24, 64, 37] float32 max=3.93380522 mean=-0.0026303 min=-4.3307003 nf=0
+   o0                           base1: [24, 64, 123] float32 max=66.5689926 mean=0.00705610 min=-73.134490 nf=0
+                                cand1: [24, 64, 123] float32 max=66.5702133 mean=0.00704163 min=-73.064979 nf=0
+   a0                           base1: [24, 64, 37] float32 max=4.35571908 mean=0.03060740 min=-4.1688885 nf=0
+                                cand1: [24, 64, 37] float32 max=4.35569620 mean=0.03059437 min=-4.1688899 nf=0
+   z1                           base1: [24, 64, 37] float32 max=4.10862064 mean=0.00607117 min=-4.2215867 nf=0
+                                cand1: [24, 64, 37] float32 max=4.10862064 mean=0.00607117 min=-4.2215867 nf=0
+   o1                           base1: [24, 64, 123] float32 max=46.9235839 mean=0.00655543 min=-55.095951 nf=0
+                                cand1: [24, 64, 123] float32 max=46.9232139 mean=0.00680400 min=-55.093662 nf=0
+   a1                           base1: [24, 64, 37] float32 max=4.39208602 mean=0.04254650 min=-4.3701744 nf=0
+                                cand1: [24, 64, 37] float32 max=4.39163732 mean=0.04255962 min=-4.3598666 nf=0
+   corr                         base1: 0.046848345547914505
+                                cand1: 0.0468483567237854
+
+# tests/test_ppo_warp_rollout.py::test_rslrl_adapter_contract  (1 differing locals)
+   rew                          base1: [32] float32 max=0.03662691 mean=0.01413268 min=4.16845432 nf=0
+                                cand1: [32] float32 max=0.03662691 mean=0.01413268 min=4.16846924 nf=0
+
+# tests/test_ppo_warp_rollout.py::test_stored_logp_matches_torch  (1 differing locals)
+   lp                           base1: [24, 64] float32 max=-40.354049 mean=-52.355034 min=-66.933044 nf=0
+                                cand1: [24, 64] float32 max=-40.354049 mean=-52.355034 min=-66.933044 nf=0
+
+# tests/test_radar_lite.py::test_radial_velocity_matches_mujoco  (3 differing locals)
+   o.radial_velocity            base1: [2, 1024] float32 max=2.05469131 mean=-0.2517638 min=-3.9688189 nf=0
+                                cand1: [2, 1024] float32 max=2.05469107 mean=-0.2517638 min=-3.9688189 nf=0
+   err                          base1: [260] float64 max=3.52809718 mean=5.57358565 min=3.68488017 nf=0
+                                cand1: [260] float64 max=3.52809718 mean=6.21322377 min=3.02365910 nf=0
+   noisy.radial_velocity        base1: [2, 1024] float32 max=2.05469131 mean=-0.2517638 min=-3.9688189 nf=0
+                                cand1: [2, 1024] float32 max=2.05469107 mean=-0.2517638 min=-3.9688189 nf=0
+
+# tests/test_render_splat.py::test_gpu_path_matches_host_path_and_composites  (3 differing locals)
+   gpu.depth                    base1: [5, 64, 96] float32 max=3.86458492 mean=0.97332590 min=0.0 nf=0
+                                cand1: [5, 64, 96] float32 max=3.86458468 mean=0.97332590 min=0.0 nf=0
+   mat                          base1: [5, 3, 3] float32 max=0.99999994 mean=0.11111110 min=-0.9999999 nf=0
+                                cand1: [5, 3, 3] float32 max=0.99999994 mean=0.11111110 min=-0.9999999 nf=0
+   host.depth                   base1: [5, 64, 96] float32 max=3.86458492 mean=0.97332590 min=0.0 nf=0
+                                cand1: [5, 64, 96] float32 max=3.86458468 mean=0.97332590 min=0.0 nf=0
+
+# tests/test_render_terrain_slots.py::test_hfield_tile_culling_is_pixel_exact[oblique]  (2 differing locals)
+   out.True.depth               base1: [96, 96] float32 max=9.98550033 mean=2.12392172 min=0.0 nf=0
+                                cand1: [96, 96] float32 max=9.98550033 mean=2.12392511 min=0.0 nf=0
+   out.False.depth              base1: [96, 96] float32 max=9.98550033 mean=2.12392172 min=0.0 nf=0
+                                cand1: [96, 96] float32 max=9.98550033 mean=2.12392511 min=0.0 nf=0
+
+# tests/test_render_textures.py::test_basis_transcodes_are_exact  (2 differing locals)
+   src                          base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+                                cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+   out                          base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+                                cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+
+# tests/test_render_textures.py::test_file_orientation_conventions  (1 differing locals)
+   png                          base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+                                cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+
+# tests/test_render_textures.py::test_ktx2_standard_orientation  (2 differing locals)
+   png                          base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+                                cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+   k                            base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+                                cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+
+# tests/test_render_textures.py::test_no_texture_count_limit  (1 differing locals)
+   st.build_s                   base1: 0.086
+                                cand1: 0.081
+
+# tests/test_render_textures.py::test_wrap_modes  (1 differing locals)
+   png                          base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+                                cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+
+# tests/test_render_tier0.py::test_gpu_path_with_batchsim_no_host_sync  (21 differing locals)
+   means[0]                     base1: [] float32 max=89.1617660 mean=89.1617660 min=89.1617660 nf=0
+                                cand1: [] float32 max=89.1619491 mean=89.1619491 min=89.1619491 nf=0
+   means[1]                     base1: [] float32 max=89.1683120 mean=89.1683120 min=89.1683120 nf=0
+                                cand1: [] float32 max=89.1684570 mean=89.1684570 min=89.1684570 nf=0
+   means[2]                     base1: [] float32 max=89.2461242 mean=89.2461242 min=89.2461242 nf=0
+                                cand1: [] float32 max=89.2462539 mean=89.2462539 min=89.2462539 nf=0
+   means[3]                     base1: [] float32 max=89.0584030 mean=89.0584030 min=89.0584030 nf=0
+                                cand1: [] float32 max=89.0585937 mean=89.0585937 min=89.0585937 nf=0
+   means[4]                     base1: [] float32 max=89.0935363 mean=89.0935363 min=89.0935363 nf=0
+                                cand1: [] float32 max=89.0936660 mean=89.0936660 min=89.0936660 nf=0
+   means[5]                     base1: [] float32 max=88.9158401 mean=88.9158401 min=88.9158401 nf=0
+                                cand1: [] float32 max=88.9161376 mean=88.9161376 min=88.9161376 nf=0
+   means[6]                     base1: [] float32 max=88.7138290 mean=88.7138290 min=88.7138290 nf=0
+                                cand1: [] float32 max=88.7139663 mean=88.7139663 min=88.7139663 nf=0
+   means[7]                     base1: [] float32 max=88.7088623 mean=88.7088623 min=88.7088623 nf=0
+                                cand1: [] float32 max=88.6990966 mean=88.6990966 min=88.6990966 nf=0
+   means[8]                     base1: [] float32 max=88.7622375 mean=88.7622375 min=88.7622375 nf=0
+                                cand1: [] float32 max=88.7624282 mean=88.7624282 min=88.7624282 nf=0
+   means[9]                     base1: [] float32 max=88.6699600 mean=88.6699600 min=88.6699600 nf=0
+                                cand1: [] float32 max=88.6700057 mean=88.6700057 min=88.6700057 nf=0
+   means[10]                    base1: [] float32 max=88.6123352 mean=88.6123352 min=88.6123352 nf=0
+                                cand1: [] float32 max=88.6127014 mean=88.6127014 min=88.6127014 nf=0
+   means[11]                    base1: [] float32 max=88.5900650 mean=88.5900650 min=88.5900650 nf=0
+                                cand1: [] float32 max=88.5902023 mean=88.5902023 min=88.5902023 nf=0
+   means[12]                    base1: [] float32 max=88.8442993 mean=88.8442993 min=88.8442993 nf=0
+                                cand1: [] float32 max=88.8444747 mean=88.8444747 min=88.8444747 nf=0
+   means[13]                    base1: [] float32 max=88.9150314 mean=88.9150314 min=88.9150314 nf=0
+                                cand1: [] float32 max=88.9150390 mean=88.9150390 min=88.9150390 nf=0
+   means[14]                    base1: [] float32 max=88.9490966 mean=88.9490966 min=88.9490966 nf=0
+                                cand1: [] float32 max=88.9493331 mean=88.9493331 min=88.9493331 nf=0
+   means[15]                    base1: [] float32 max=89.0885848 mean=89.0885848 min=89.0885848 nf=0
+                                cand1: [] float32 max=89.0887527 mean=89.0887527 min=89.0887527 nf=0
+   means[16]                    base1: [] float32 max=89.3103256 mean=89.3103256 min=89.3103256 nf=0
+                                cand1: [] float32 max=89.3104858 mean=89.3104858 min=89.3104858 nf=0
+   means[17]                    base1: [] float32 max=89.2055435 mean=89.2055435 min=89.2055435 nf=0
+                                cand1: [] float32 max=89.2057189 mean=89.2057189 min=89.2057189 nf=0
+   means[18]                    base1: [] float32 max=88.9773178 mean=88.9773178 min=88.9773178 nf=0
+                                cand1: [] float32 max=88.9774856 mean=88.9774856 min=88.9774856 nf=0
+   means[19]                    base1: [] float32 max=89.1300659 mean=89.1300659 min=89.1300659 nf=0
+                                cand1: [] float32 max=89.1302871 mean=89.1302871 min=89.1302871 nf=0
+   m                            base1: [20] float32 max=89.3103256 mean=88.9560768 min=88.5900650 nf=0
+                                cand1: [20] float32 max=89.3104858 mean=88.9557518 min=88.5902023 nf=0
+
+# tests/test_render_tier2.py::test_cartpole_rgb_rollout_tier2  (6 differing locals)
+   obs.image                    base1: [32, 100, 100, 3] uint8 max=184.0 mean=92.3863447 min=13.0 nf=0
+                                cand1: [32, 100, 100, 3] uint8 max=184.0 mean=92.3862802 min=13.0 nf=0
+   obs.state                    base1: [32, 4] float32 max=8.21026515 mean=-0.0550774 min=-9.1608657 nf=0
+                                cand1: [32, 4] float32 max=8.21026611 mean=-0.0550775 min=-9.1608648 nf=0
+   obs.qpos                     base1: [32, 4] float32 max=8.21026515 mean=-0.0550774 min=-9.1608657 nf=0
+                                cand1: [32, 4] float32 max=8.21026611 mean=-0.0550775 min=-9.1608648 nf=0
+   r                            base1: [32] float32 max=0.99021220 mean=0.43712230 min=-1.3965760 nf=0
+                                cand1: [32] float32 max=0.99021220 mean=0.43712224 min=-1.3965755 nf=0
+   info.episode_reward          base1: [32] float32 max=29.5595703 mean=15.9511170 min=3.75085425 nf=0
+                                cand1: [32] float32 max=29.5595703 mean=15.9511158 min=3.75085425 nf=0
+   img                          base1: [32, 100, 100, 3] uint8 max=184.0 mean=92.3863447 min=13.0 nf=0
+                                cand1: [32, 100, 100, 3] uint8 max=184.0 mean=92.3862802 min=13.0 nf=0
+
+# tests/test_render_tier2.py::test_env_map_usd_dome_import  (2 differing locals)
+   hdr_path                     base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+                                cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+   rec.file                     base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+                                cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+
+# tests/test_render_tier2.py::test_physical_preset_batch_is_finite  (7 differing locals)
+   obs.image                    base1: [1024, 100, 100, 3] uint8 max=186.0 mean=92.4046912 min=1.0 nf=0
+                                cand1: [1024, 100, 100, 3] uint8 max=186.0 mean=92.4041026 min=1.0 nf=0
+   obs.state                    base1: [1024, 4] float32 max=11.6525917 mean=0.01391122 min=-11.648378 nf=0
+                                cand1: [1024, 4] float32 max=11.6525917 mean=0.01391123 min=-11.648377 nf=0
+   obs.qpos                     base1: [1024, 4] float32 max=11.6525917 mean=0.01391122 min=-11.648378 nf=0
+                                cand1: [1024, 4] float32 max=11.6525917 mean=0.01391123 min=-11.648377 nf=0
+   r                            base1: [1024] float32 max=0.99645346 mean=0.74624940 min=-1.1689287 nf=0
+                                cand1: [1024] float32 max=0.99645346 mean=0.74624940 min=-1.1689287 nf=0
+   info.episode_reward          base1: [1024] float32 max=9.89439010 mean=8.90013335 min=1.56325328 nf=0
+                                cand1: [1024] float32 max=9.89439010 mean=8.90013335 min=1.56325328 nf=0
+   acc                          base1: [1024, 100, 100, 4] float32 max=5.57129812 mean=2.10211671 min=0.02790069 nf=0
+                                cand1: [1024, 100, 100, 4] float32 max=5.57129669 mean=2.10210517 min=0.02790069 nf=0
+   img                          base1: [1024, 100, 100, 3] float32 max=186.0 mean=92.4046912 min=1.0 nf=0
+                                cand1: [1024, 100, 100, 3] float32 max=186.0 mean=92.4041026 min=1.0 nf=0
+
+# tests/test_replicator.py::test_randomize_annotate_write  (6 differing locals)
+   rgb                          base1: [8, 128, 128, 3] uint8 max=255.0 mean=46.9424947 min=0.0 nf=0
+                                cand1: [8, 128, 128, 3] uint8 max=255.0 mean=46.9428329 min=0.0 nf=0
+   boxes3d                      base1: [8, 20, 10] float32 max=1000000000 mean=100000000. min=-500000000 nf=0
+                                cand1: [8, 20, 10] float32 max=1000000000 mean=100000000. min=-500000000 nf=0
+   cam.rotation                 base1: [8, 3, 3] float32 max=0.84192842 mean=0.29695837 min=-0.7082114 nf=0
+                                cand1: [8, 3, 3] float32 max=0.84192842 mean=0.29695837 min=-0.7082114 nf=0
+   r                            base1: [8, 128, 128, 3] uint8 max=255.0 mean=46.9424947 min=0.0 nf=0
+                                cand1: [8, 128, 128, 3] uint8 max=255.0 mean=46.9428329 min=0.0 nf=0
+   bb                           base1: [8, 20, 10] float32 max=1000000000 mean=100000000. min=-500000000 nf=0
+                                cand1: [8, 20, 10] float32 max=1000000000 mean=100000000. min=-500000000 nf=0
+   out                          base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+                                cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+
+# tests/test_replicator_annotators.py::test_basic_writer_layout[warp]  (1 differing locals)
+   pcl                          base1: [735, 3] float32 max=0.61129605 mean=0.11396558 min=-0.4686662 nf=0
+                                cand1: [735, 3] float32 max=0.61129629 mean=0.11396558 min=-0.4686662 nf=0
+
+# tests/test_replicator_annotators.py::test_depth_normals_pointcloud[warp]  (7 differing locals)
+   nd                           base1: [2, 96, 96, 4] float32 max=1.00000011 mean=0.23204073 min=-1.0 nf=0
+                                cand1: [2, 96, 96, 4] float32 max=1.00000011 mean=0.23204073 min=-1.0000001 nf=0
+   pc.points                    base1: [2, 96, 96, 3] float32 max=0.79958045 mean=-0.0222321 min=-0.7996994 nf=0
+                                cand1: [2, 96, 96, 3] float32 max=0.79958045 mean=-0.0222321 min=-0.7996994 nf=0
+   pts                          base1: [2, 96, 96, 3] float32 max=0.79958045 mean=-0.0222321 min=-0.7996994 nf=0
+                                cand1: [2, 96, 96, 3] float32 max=0.79958045 mean=-0.0222321 min=-0.7996994 nf=0
+   errs_nd[0]                   base1: [3899] float64 max=0.00084572 mean=8.99902487 min=0.0 nf=0
+                                cand1: [3899] float64 max=0.00084572 mean=0.00012065 min=0.0 nf=0
+   errs_nd[1]                   base1: [3909] float64 max=0.00069053 mean=9.27518039 min=0.0 nf=0
+                                cand1: [3909] float64 max=0.00069053 mean=0.00012081 min=0.0 nf=0
+   ang                          base1: [3909] float64 max=0.00069053 mean=9.27518039 min=0.0 nf=0
+                                cand1: [3909] float64 max=0.00069053 mean=0.00012081 min=0.0 nf=0
+   a                            base1: [7808] float64 max=0.00084572 mean=9.13727947 min=0.0 nf=0
+                                cand1: [7808] float64 max=0.00084572 mean=0.00012073 min=0.0 nf=0
+
+# tests/test_replicator_annotators.py::test_event_external_wrench_body_frame  (3 differing locals)
+   x                            base1: [64, 4, 6] float32 max=2.72891473 mean=0.10890122 min=-2.6529130 nf=0
+                                cand1: [64, 4, 6] float32 max=2.72891426 mean=0.10890122 min=-2.6529128 nf=0
+   R                            base1: [64, 4, 3, 3] float32 max=1.0 mean=0.18136612 min=-0.9999063 nf=0
+                                cand1: [64, 4, 3, 3] float32 max=1.0 mean=0.18136612 min=-0.9999064 nf=0
+   want                         base1: [64, 3] float64 max=2.72891455 mean=0.87120981 min=-2.6529129 nf=0
+                                cand1: [64, 3] float64 max=2.72891405 mean=0.87120979 min=-2.6529127 nf=0
+
+# tests/test_replicator_annotators.py::test_event_reset_root_velocity_is_com_velocity  (1 differing locals)
+   lin                          base1: [3] float64 max=0.30000001 mean=0.06666666 min=-0.2000000 nf=0
+                                cand1: [3] float64 max=0.30000001 mean=0.06666666 min=-0.2000000 nf=0
+
+# tests/test_replicator_annotators.py::test_motion_vectors_exact[warp]  (1 differing locals)
+   mv                           base1: [2, 96, 96, 4] float32 max=1.0 mean=0.11939104 min=-2.7443351 nf=0
+                                cand1: [2, 96, 96, 4] float32 max=1.0 mean=0.11939107 min=-2.7443351 nf=0
+
+# tests/test_scene_usd.py::test_so101_import  (1 differing locals)
+   out                          base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+                                cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+
+# tests/test_scene_usd.py::test_urdf_import_to_usd  (1 differing locals)
+   out                          base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+                                cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+
+# tests/test_scene_usd.py::test_usd_round_trip_to_mujoco  (1 differing locals)
+   out                          base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+                                cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytes
+
+# tests/test_sensors_contact.py::test_g1_landing_vs_mujoco_c  (10 differing locals)
+   agg_err                      base1: 8.392333984375e-05
+                                cand1: 7.05718994140625e-05
+   rel_same                     base1: [691] float64 max=9.16294369 mean=8.63682867 min=4.25483859 nf=0
+                                cand1: [691] float64 max=0.00010305 mean=8.76143911 min=5.35153559 nf=0
+   ot.net_forces_w              base1: [4, 3, 3] float32 max=162.477218 mean=41.4489308 min=-0.8951568 nf=0
+                                cand1: [4, 3, 3] float32 max=162.480987 mean=41.4492233 min=-0.8952693 nf=0
+   ot.net_forces_w_history      base1: [4, 3, 3, 3] float32 max=176.225372 mean=42.7106630 min=-0.9427146 nf=0
+                                cand1: [4, 3, 3, 3] float32 max=176.223937 mean=42.7108826 min=-0.9428195 nf=0
+   ot.force_matrix_w            base1: [4, 3, 1, 3] float32 max=162.477218 mean=41.4489308 min=-0.8951568 nf=0
+                                cand1: [4, 3, 1, 3] float32 max=162.480987 mean=41.4492233 min=-0.8952693 nf=0
+   ot.force_matrix_w_history    base1: [4, 3, 3, 1, 3] float32 max=176.225372 mean=42.7106630 min=-0.9427146 nf=0
+                                cand1: [4, 3, 3, 1, 3] float32 max=176.223937 mean=42.7108826 min=-0.9428195 nf=0
+   on.net_forces_w              base1: [4, 3, 3] float32 max=162.477218 mean=32.3096839 min=0.0 nf=0
+                                cand1: [4, 3, 3] float32 max=162.480987 mean=32.3098979 min=0.0 nf=0
+   on.net_forces_w_history      base1: [4, 1, 3, 3] float32 max=162.477218 mean=32.3096839 min=0.0 nf=0
+                                cand1: [4, 1, 3, 3] float32 max=162.480987 mean=32.3098979 min=0.0 nf=0
+   ref                          base1: [3, 3] float64 max=136.613349 mean=39.2706153 min=-0.8234115 nf=0
+                                cand1: [3, 3] float64 max=136.614720 mean=39.2709930 min=-0.8234504 nf=0
+   tot                          base1: 270.70374249900743
+                                cand1: 270.70634948753684
+
+# tests/test_sensors_contact.py::test_stack_sign_history_filter_and_graph  (14 differing locals)
+   hist_ref[0]                  base1: [8, 2, 3] float32 max=19.6200027 mean=4.90500066 min=-9.5367431 nf=0
+                                cand1: [8, 2, 3] float32 max=19.6199989 mean=4.90500110 min=-3.5762786 nf=0
+   hist_ref[1]                  base1: [8, 2, 3] float32 max=19.6200027 mean=4.90500031 min=-1.4901161 nf=0
+                                cand1: [8, 2, 3] float32 max=19.6199989 mean=4.90500048 min=-2.3841857 nf=0
+   hist_ref[2]                  base1: [8, 2, 3] float32 max=19.6200065 mean=4.90500054 min=-1.1920928 nf=0
+                                cand1: [8, 2, 3] float32 max=19.6199989 mean=4.90500040 min=-5.9604644 nf=0
+   o.net_forces_w               base1: [8, 2, 3] float32 max=19.6200065 mean=4.90500054 min=-1.1920928 nf=0
+                                cand1: [8, 2, 3] float32 max=19.6199989 mean=4.90500040 min=-5.9604644 nf=0
+   o.net_forces_w_history       base1: [8, 3, 2, 3] float32 max=19.6200065 mean=4.90500051 min=-1.4901161 nf=0
+                                cand1: [8, 3, 2, 3] float32 max=19.6199989 mean=4.90500066 min=-3.5762786 nf=0
+   o.force_matrix_w             base1: [8, 2, 2, 3] float32 max=29.4300041 mean=1.63500019 min=-9.8100004 nf=0
+                                cand1: [8, 2, 2, 3] float32 max=29.4300003 mean=1.63499998 min=-9.8100004 nf=0
+   o.force_matrix_w_history     base1: [8, 3, 2, 2, 3] float32 max=29.4300041 mean=1.63500017 min=-9.8100013 nf=0
+                                cand1: [8, 3, 2, 2, 3] float32 max=29.4300003 mean=1.63499994 min=-9.8100013 nf=0
+   net                          base1: [8, 2, 3] float32 max=19.6200065 mean=4.90500054 min=-1.1920928 nf=0
+                                cand1: [8, 2, 3] float32 max=19.6199989 mean=4.90500040 min=-5.9604644 nf=0
+   mat                          base1: [8, 2, 2, 3] float32 max=29.4300041 mean=1.63500019 min=-9.8100004 nf=0
+                                cand1: [8, 2, 2, 3] float32 max=29.4300003 mean=1.63499998 min=-9.8100004 nf=0
+   h                            base1: [8, 3, 2, 3] float32 max=19.6200065 mean=4.90500051 min=-1.4901161 nf=0
+                                cand1: [8, 3, 2, 3] float32 max=19.6199989 mean=4.90500066 min=-3.5762786 nf=0
+   o2.net_forces_w              base1: [8, 2, 3] float32 max=19.6200065 mean=3.06562516 min=-1.1920928 nf=0
+                                cand1: [8, 2, 3] float32 max=19.6199989 mean=3.06562525 min=-5.9604644 nf=0
+   o2.net_forces_w_history      base1: [8, 3, 2, 3] float32 max=19.6200065 mean=3.06562527 min=-1.4901161 nf=0
+                                cand1: [8, 3, 2, 3] float32 max=19.6199989 mean=3.06562541 min=-3.5762786 nf=0
+   o2.force_matrix_w            base1: [8, 2, 2, 3] float32 max=29.4300041 mean=1.02187507 min=-9.8100004 nf=0
+                                cand1: [8, 2, 2, 3] float32 max=29.4300003 mean=1.02187498 min=-9.8100004 nf=0
+   o2.force_matrix_w_history    base1: [8, 3, 2, 2, 3] float32 max=29.4300041 mean=1.02187507 min=-9.8100013 nf=0
+                                cand1: [8, 3, 2, 2, 3] float32 max=29.4300003 mean=1.02187496 min=-9.8100013 nf=0
+
+# tests/test_sensors_rt.py::test_gpu_path_ordering_with_sim  (9 differing locals)
+   ranges[2]                    base1: [16, 64] float32 max=1.75875914 mean=1.55179060 min=0.67503529 nf=0
+                                cand1: [16, 64] float32 max=1.75875914 mean=1.55179060 min=0.67503529 nf=0
+   ranges[3]                    base1: [16, 64] float32 max=1.75619149 mean=1.54972475 min=0.67503535 nf=0
+                                cand1: [16, 64] float32 max=1.75619149 mean=1.54972475 min=0.67503535 nf=0
+   ranges[4]                    base1: [16, 64] float32 max=1.75283384 mean=1.54702251 min=0.67503541 nf=0
+                                cand1: [16, 64] float32 max=1.75283384 mean=1.54702250 min=0.67503535 nf=0
+   ranges[5]                    base1: [16, 64] float32 max=1.74868595 mean=1.54368370 min=0.67503535 nf=0
+                                cand1: [16, 64] float32 max=1.74868595 mean=1.54368370 min=0.67503535 nf=0
+   ranges[6]                    base1: [16, 64] float32 max=1.74374818 mean=1.53970846 min=0.67503535 nf=0
+                                cand1: [16, 64] float32 max=1.74374818 mean=1.53970846 min=0.67503529 nf=0
+   ranges[7]                    base1: [16, 64] float32 max=1.73802018 mean=1.53509683 min=0.67503541 nf=0
+                                cand1: [16, 64] float32 max=1.73802018 mean=1.53509683 min=0.67503541 nf=0
+   ranges[8]                    base1: [16, 64] float32 max=1.73150241 mean=1.52984890 min=0.67503535 nf=0
+                                cand1: [16, 64] float32 max=1.73150241 mean=1.52984890 min=0.67503535 nf=0
+   ranges[9]                    base1: [16, 64] float32 max=1.72419428 mean=1.52396455 min=0.67503529 nf=0
+                                cand1: [16, 64] float32 max=1.72419428 mean=1.52396455 min=0.67503529 nf=0
+   r                            base1: [10, 16, 64] float32 max=1.76152431 mean=1.54280721 min=0.67503529 nf=0
+                                cand1: [10, 16, 64] float32 max=1.76152431 mean=1.54280721 min=0.67503529 nf=0
+
+# tests/test_sensors_state.py::test_imu_and_contact_sensors_as_tensors  (4 differing locals)
+   sd                           base1: [16, 11] float32 max=9.81000137 mean=1.87454560 min=-2.0658130 nf=0
+                                cand1: [16, 11] float32 max=9.81000137 mean=1.87454563 min=-8.9736886 nf=0
+   v                            base1: [16, 11] float32 max=9.81000137 mean=1.87454560 min=-2.0658130 nf=0
+                                cand1: [16, 11] float32 max=9.81000137 mean=1.87454563 min=-8.9736886 nf=0
+   acc_rest                     base1: [16, 3] float32 max=9.81000041 mean=3.27000007 min=-2.0658130 nf=0
+                                cand1: [16, 3] float32 max=9.81000041 mean=3.27000019 min=-8.9736886 nf=0
+   cf                           base1: [16, 2, 6] float32 max=9.81000137 mean=0.81750011 min=-1.7881393 nf=0
+                                cand1: [16, 2, 6] float32 max=9.81000137 mean=0.81750011 min=-1.1920928 nf=0
+
+# tests/test_solver_presets.py::test_iteration_cap_only_changes_worlds_that_reach_it  (2 differing locals)
+   res.isaaclab3[0]             base1: [4, 44] float32 max=0.99996334 mean=0.06584966 min=-0.4477802 nf=0
+                                cand1: [4, 44] float32 max=0.99996334 mean=0.06584965 min=-0.4477802 nf=0
+   res.isaaclab3_cap20[0]       base1: [4, 44] float32 max=0.99996328 mean=0.06584966 min=-0.4477802 nf=0
+                                cand1: [4, 44] float32 max=0.99996334 mean=0.06584965 min=-0.4477802 nf=0
+
+# tests/test_solver_presets.py::test_once_per_tick_collision_step_is_stable_and_close  (3 differing locals)
+   out.isaaclab3                base1: [4] float32 max=0.75257450 mean=0.75257450 min=0.75257450 nf=0
+                                cand1: [4] float32 max=0.75257456 mean=0.75257453 min=0.75257450 nf=0
+   out.isaaclab3_collide_every_substep base1: [4] float32 max=0.75252544 mean=0.75252540 min=0.75252538 nf=0
+                                cand1: [4] float32 max=0.75252544 mean=0.75252540 min=0.75252538 nf=0
+   qp                           base1: [4, 44] float32 max=0.99999320 mean=0.05063280 min=-0.1341141 nf=0
+                                cand1: [4, 44] float32 max=0.99999320 mean=0.05063279 min=-0.1341141 nf=0
+
+# tests/test_solver_presets.py::test_once_per_tick_contacts_follow_the_bodies  (11 differing locals)
+   la                           base1: [256, 3] float32 max=0.15060593 mean=0.00134297 min=-0.1506059 nf=0
+                                cand1: [256, 3] float32 max=0.15060593 mean=0.00134297 min=-0.1506059 nf=0
+   lb                           base1: [256, 3] float32 max=0.13747172 mean=6.22102525 min=-0.0656375 nf=0
+                                cand1: [256, 3] float32 max=0.13747167 mean=6.22100196 min=-0.0656375 nf=0
+   ref.dist                     base1: [32] float32 max=-0.0032472 mean=-0.0046138 min=-0.0060406 nf=0
+                                cand1: [32] float32 max=-0.0032472 mean=-0.0046137 min=-0.0060406 nf=0
+   ref.pos                      base1: [32, 3] float32 max=0.15322017 mean=0.01013485 min=-0.1503290 nf=0
+                                cand1: [32, 3] float32 max=0.15322016 mean=0.01013486 min=-0.1503290 nf=0
+   xp                           base1: [4, 45, 3] float32 max=0.99031502 mean=0.19859288 min=-0.2489210 nf=0
+                                cand1: [4, 45, 3] float32 max=0.99031502 mean=0.19859288 min=-0.2489210 nf=0
+   xm                           base1: [4, 45, 3, 3] float32 max=1.0 mean=0.25840632 min=-0.9933640 nf=0
+                                cand1: [4, 45, 3, 3] float32 max=1.0 mean=0.25840632 min=-0.9933640 nf=0
+   lbn                          base1: [32, 3] float32 max=0.13747172 mean=0.00049768 min=-0.0656375 nf=0
+                                cand1: [32, 3] float32 max=0.13747167 mean=0.00049768 min=-0.0656375 nf=0
+   pr                           base1: [32, 3] float32 max=0.15583440 mean=0.00952592 min=-0.1500521 nf=0
+                                cand1: [32, 3] float32 max=0.15583439 mean=0.00952593 min=-0.1500521 nf=0
+   fresh.dist                   base1: [32] float32 max=-0.0032472 mean=-0.0046138 min=-0.0060406 nf=0
+                                cand1: [32] float32 max=-0.0032472 mean=-0.0046137 min=-0.0060406 nf=0
+   fresh.pos                    base1: [32, 3] float32 max=0.15583439 mean=0.01029488 min=-0.1500521 nf=0
+                                cand1: [32, 3] float32 max=0.15583439 mean=0.01029489 min=-0.1500521 nf=0
+   pf                           base1: [32, 3] float32 max=0.15583439 mean=0.00952592 min=-0.1500521 nf=0
+                                cand1: [32, 3] float32 max=0.15583439 mean=0.00952593 min=-0.1500521 nf=0
+
+# tests/test_terrain.py::test_g1_rough_task_runs  (5 differing locals)
+   r.mean_step_ms               base1: 0.0746457
+                                cand1: 0.0732875
+   r.fps_isaac_style            base1: 214345.90338090473
+                                cand1: 218318.2670987549
+   obs                          base1: [16, 310] float32 max=4.56964206 mean=0.10596374 min=-3.0854980 nf=0
+                                cand1: [16, 310] float32 max=4.66812610 mean=0.10661010 min=-3.0854363 nf=0
+   q                            base1: [16, 44] float32 max=68.1838531 mean=-0.3012270 min=-76.477577 nf=0
+                                cand1: [16, 44] float32 max=68.1838531 mean=-0.3012844 min=-76.477577 nf=0
+   scan                         base1: [16, 187] float32 max=0.47076192 mean=0.18625920 min=-0.0524193 nf=0
+                                cand1: [16, 187] float32 max=0.47076192 mean=0.18615966 min=-0.0524193 nf=0
+
+# tests/test_terrain.py::test_height_scan_matches_mj_ray  (2 differing locals)
+   ours                         base1: [8, 187] float32 max=0.38000005 mean=0.30480694 min=0.30000001 nf=0
+                                cand1: [8, 187] float32 max=0.38000005 mean=0.30480694 min=0.30000001 nf=0
+   worst                        base1: [1496] float32 max=0.91000074 mean=0.00458614 min=0.0 nf=0
+                                cand1: [1496] float32 max=0.91000074 mean=0.00458614 min=0.0 nf=0
+
+# tests/test_terrain.py::test_hfield_mesh_contacts_match_mujoco_c  (5 differing locals)
+   worst_normal                 base1: 0.9128594994544983
+                                cand1: 0.912873387336731
+   worst_pen                    base1: 0.004160881042480469
+                                cand1: 0.004160761833190918
+   fr                           base1: [30, 3, 3] float32 max=1.0 mean=0.10242031 min=-1.0 nf=0
+                                cand1: [30, 3, 3] float32 max=1.0 mean=0.10242048 min=-1.0 nf=0
+   dist                         base1: [30] float32 max=-0.0001924 mean=-0.0002879 min=-0.0005210 nf=0
+                                cand1: [30] float32 max=-0.0001954 mean=-0.0002879 min=-0.0005204 nf=0
+   ours                         base1: [4] float32 max=0.70865327 mean=0.69888898 min=0.66959708 nf=0
+                                cand1: [4] float32 max=0.70865345 mean=0.69888935 min=0.66959756 nf=0
+
+# tests/test_tron1.py::test_controller_reset_is_fast_enough_for_the_control_loop  (1 differing locals)
+   t0                           base1: 335558.97959675
+                                cand1: 336351.90794475
+
+# tests/test_warp_policy.py::test_layer_mapping_bitwise  (17 differing locals)
+   ctrl                         base1: [512, 1] float32 max=1.0 mean=-0.1337275 min=-1.0 nf=0
+                                cand1: [512, 1] float32 max=1.0 mean=-0.1337275 min=-1.0 nf=0
+   outs.A[0]                    base1: [512, 32] float32 max=2.50459122 mean=0.11644327 min=-0.9341124 nf=0
+                                cand1: [512, 32] float32 max=2.50459122 mean=0.11644327 min=-0.9341124 nf=0
+   outs.A[1]                    base1: [512, 32] float32 max=1.36857151 mean=0.06092128 min=-0.7572687 nf=0
+                                cand1: [512, 32] float32 max=1.36857151 mean=0.06092128 min=-0.7572687 nf=0
+   outs.A[2]                    base1: [512, 1] float32 max=0.01686652 mean=-0.2346706 min=-0.6654157 nf=0
+                                cand1: [512, 1] float32 max=0.01686650 mean=-0.2346706 min=-0.6654157 nf=0
+   outs.A[3]                    base1: [512, 32] float32 max=2.37734031 mean=0.01443763 min=-0.9420963 nf=0
+                                cand1: [512, 32] float32 max=2.37734031 mean=0.01443763 min=-0.9420963 nf=0
+   outs.A[4]                    base1: [512, 32] float32 max=1.42552351 mean=0.00166858 min=-0.7925902 nf=0
+                                cand1: [512, 32] float32 max=1.42552340 mean=0.00166858 min=-0.7925902 nf=0
+   outs.A[5]                    base1: [512, 1] float32 max=0.48423337 mean=0.08032016 min=-0.3689951 nf=0
+                                cand1: [512, 1] float32 max=0.48423323 mean=0.08032016 min=-0.3689951 nf=0
+   outs.A[6]                    base1: [512, 1] float32 max=1.97597742 mean=-0.2232610 min=-2.8684208 nf=0
+                                cand1: [512, 1] float32 max=1.97597742 mean=-0.2232610 min=-2.8684208 nf=0
+   outs.A[7]                    base1: [512, 1] float32 max=1.0 mean=-0.1337275 min=-1.0 nf=0
+                                cand1: [512, 1] float32 max=1.0 mean=-0.1337275 min=-1.0 nf=0
+   outs.D[0]                    base1: [512, 32] float32 max=2.50459122 mean=0.11644327 min=-0.9341124 nf=0
+                                cand1: [512, 32] float32 max=2.50459122 mean=0.11644327 min=-0.9341124 nf=0
+   outs.D[1]                    base1: [512, 32] float32 max=1.36857151 mean=0.06092128 min=-0.7572687 nf=0
+                                cand1: [512, 32] float32 max=1.36857151 mean=0.06092128 min=-0.7572687 nf=0
+   outs.D[2]                    base1: [512, 1] float32 max=0.01686652 mean=-0.2346706 min=-0.6654157 nf=0
+                                cand1: [512, 1] float32 max=0.01686650 mean=-0.2346706 min=-0.6654157 nf=0
+   outs.D[3]                    base1: [512, 32] float32 max=2.37734031 mean=0.01443763 min=-0.9420963 nf=0
+                                cand1: [512, 32] float32 max=2.37734031 mean=0.01443763 min=-0.9420963 nf=0
+   outs.D[4]                    base1: [512, 32] float32 max=1.42552351 mean=0.00166858 min=-0.7925902 nf=0
+                                cand1: [512, 32] float32 max=1.42552340 mean=0.00166858 min=-0.7925902 nf=0
+   outs.D[5]                    base1: [512, 1] float32 max=0.48423337 mean=0.08032016 min=-0.3689951 nf=0
+                                cand1: [512, 1] float32 max=0.48423323 mean=0.08032016 min=-0.3689951 nf=0
+   outs.D[6]                    base1: [512, 1] float32 max=1.97597742 mean=-0.2232610 min=-2.8684208 nf=0
+                                cand1: [512, 1] float32 max=1.97597742 mean=-0.2232610 min=-2.8684208 nf=0
+   outs.D[7]                    base1: [512, 1] float32 max=1.0 mean=-0.1337275 min=-1.0 nf=0
+                                cand1: [512, 1] float32 max=1.0 mean=-0.1337275 min=-1.0 nf=0
+
+# tests/test_warp_policy.py::test_parity_with_torch_and_shared_weights  (2 differing locals)
+   ctrl                         base1: [256, 1] float32 max=1.0 mean=-0.0253328 min=-1.0 nf=0
+                                cand1: [256, 1] float32 max=1.0 mean=-0.0253328 min=-1.0 nf=0
+   a                            base1: [256, 1] float32 max=2.08177351 mean=-0.1231108 min=-2.6185095 nf=0
+                                cand1: [256, 1] float32 max=2.08177351 mean=-0.1231108 min=-2.6185095 nf=0
+
+# tests/test_warp_policy.py::test_rollout_without_torch_launches  (6 differing locals)
+   obs                          base1: [1024, 4] float32 max=70.9909057 mean=-2.3155864 min=-45.630573 nf=0
+                                cand1: [1024, 4] float32 max=70.9909820 mean=-2.3155876 min=-45.630493 nf=0
+   t0                           base1: 335560.221359833
+                                cand1: 336353.081650208
+   host                         base1: 0.0023918329970911145
+                                cand1: 0.0017087500309571624
+   total                        base1: 0.1492335829534568
+                                cand1: 0.15919691702583805
+   t_obs                        base1: [64, 1024, 4] float32 max=70.9909057 mean=-1.1820852 min=-45.630573 nf=0
+                                cand1: [64, 1024, 4] float32 max=70.9909820 mean=-1.1820854 min=-45.630493 nf=0
+   t_act                        base1: [64, 1024, 1] float32 max=4.57447004 mean=0.18385133 min=-4.2087888 nf=0
+                                cand1: [64, 1024, 1] float32 max=4.57447052 mean=0.18385133 min=-4.2087893 nf=0
+
+161 tests with all captured locals bitwise equal, 97 with differences

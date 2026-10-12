@@ -1,0 +1,562 @@
+{
+ "scene": "example:mpm_multi_material",
+ "mode": "profile",
+ "set": {},
+ "frames": 6,
+ "particles": 178669,
+ "wall_ms": [
+  26.206125039607286,
+  71.00962498225272,
+  36.02933301590383,
+  27.320833003614098,
+  65.25204097852111,
+  34.09841697430238
+ ],
+ "wall_median_ms": 35.063874995103106,
+ "iterations": [
+  35,
+  250,
+  100,
+  40,
+  250,
+  90
+ ],
+ "iterations_per_frame": 127.5,
+ "per_frame_counters": {
+  "host_waits": 32.333333333333336,
+  "command_buffers": 2007.0,
+  "host_ops": 0.0,
+  "dispatches_encoded": 1967.0
+ },
+ "kernels": [
+  {
+   "kernel": "gs_solve_kernel_impl_2443acb6_74526572_metal_forward",
+   "ms_per_frame": 19.132833333333334,
+   "launches_per_frame": 1020.0
+  },
+  {
+   "kernel": "solve_subgrid_friction_42405d68_metal_forward",
+   "ms_per_frame": 0.7903333333333333,
+   "launches_per_frame": 127.5
+  },
+  {
+   "kernel": "apply_subgrid_impulse_fe96c186_metal_forward",
+   "ms_per_frame": 0.6928333333333333,
+   "launches_per_frame": 128.5
+  },
+  {
+   "kernel": "collision_weight_field_c693d395_badcfb3a_metal_forward",
+   "ms_per_frame": 0.6916666666666668,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "integrate_velocity_apic_be0fe0d8_90a67deb_metal_forward",
+   "ms_per_frame": 0.6178333333333333,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "sort_scan_tiles",
+   "ms_per_frame": 0.5118333333333334,
+   "launches_per_frame": 92.0
+  },
+  {
+   "kernel": "_tiled_sum_kernel_7e4c592f_metal_forward",
+   "ms_per_frame": 0.4726666666666666,
+   "launches_per_frame": 51.0
+  },
+  {
+   "kernel": "sort_scatter_k4_v4",
+   "ms_per_frame": 0.4583333333333333,
+   "launches_per_frame": 44.0
+  },
+  {
+   "kernel": "vb_sort_scatter_keys",
+   "ms_per_frame": 0.41383333333333333,
+   "launches_per_frame": 48.0
+  },
+  {
+   "kernel": "sort_upsweep_k8",
+   "ms_per_frame": 0.3575,
+   "launches_per_frame": 48.0
+  },
+  {
+   "kernel": "sort_upsweep_k4",
+   "ms_per_frame": 0.3295,
+   "launches_per_frame": 44.0
+  },
+  {
+   "kernel": "advect_particles_ee39ae6e_e2478477_metal_forward",
+   "ms_per_frame": 0.248,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_identity_field_5aa7aedd_e7cd67d4_metal_forward",
+   "ms_per_frame": 0.2071666666666667,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "wp_memset",
+   "ms_per_frame": 0.19383333333333333,
+   "launches_per_frame": 35.0
+  },
+  {
+   "kernel": "update_particle_strains_4a8baf02_9b11b437_metal_forward",
+   "ms_per_frame": 0.16466666666666666,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "sort_copy",
+   "ms_per_frame": 0.13999999999999999,
+   "launches_per_frame": 34.0
+  },
+  {
+   "kernel": "evaluate_strain_residual_545e9767_metal_forward",
+   "ms_per_frame": 0.11516666666666665,
+   "launches_per_frame": 25.5
+  },
+  {
+   "kernel": "vb_world_bbox",
+   "ms_per_frame": 0.10616666666666667,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "strain_delta_form_4b7be0f1_f9127327_metal_forward",
+   "ms_per_frame": 0.10516666666666667,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "dispatch_linear_kernel_fn_5ed8a0e3_a5a40bf6_metal_forward",
+   "ms_per_frame": 0.09883333333333333,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "compute_delassus_diagonal_5fc0bd53_metal_forward",
+   "ms_per_frame": 0.09583333333333333,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "sort_plan",
+   "ms_per_frame": 0.08683333333333333,
+   "launches_per_frame": 17.0
+  },
+  {
+   "kernel": "update_condition_98290a4b_metal_forward",
+   "ms_per_frame": 0.0825,
+   "launches_per_frame": 25.5
+  },
+  {
+   "kernel": "dispatch_linear_kernel_fn_c32cf128_92d82e5f_metal_forward",
+   "ms_per_frame": 0.082,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "scan_spine_i4",
+   "ms_per_frame": 0.08,
+   "launches_per_frame": 30.0
+  },
+  {
+   "kernel": "integrate_yield_parameters_23fd5ee0_e471df67_metal_forward",
+   "ms_per_frame": 0.075,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "wp_memtile",
+   "ms_per_frame": 0.071,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "apply_stress_gs_d6f9fcd1_metal_forward",
+   "ms_per_frame": 0.063,
+   "launches_per_frame": 8.0
+  },
+  {
+   "kernel": "sort_diff_k4",
+   "ms_per_frame": 0.06033333333333333,
+   "launches_per_frame": 11.0
+  },
+  {
+   "kernel": "scan_down_i4",
+   "ms_per_frame": 0.05883333333333333,
+   "launches_per_frame": 12.0
+  },
+  {
+   "kernel": "dispatch_bilinear_kernel_fn_a19864b3_6133904f_metal_forward",
+   "ms_per_frame": 0.05566666666666667,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "vb_unique_scatter",
+   "ms_per_frame": 0.0555,
+   "launches_per_frame": 6.0
+  },
+  {
+   "kernel": "fill_element_node_indices_9775d3a0_63f21500_metal_forward",
+   "ms_per_frame": 0.05466666666666667,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "scan_reduce_i4",
+   "ms_per_frame": 0.05316666666666667,
+   "launches_per_frame": 12.0
+  },
+  {
+   "kernel": "vb_init_grid",
+   "ms_per_frame": 0.048666666666666664,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "vb_unique_count",
+   "ms_per_frame": 0.04766666666666666,
+   "launches_per_frame": 6.0
+  },
+  {
+   "kernel": "integrate_velocity_25c50f2e_e3125281_metal_forward",
+   "ms_per_frame": 0.0405,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_triplet_keys_u32_8822c4ec_metal_forward",
+   "ms_per_frame": 0.03966666666666666,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_prepare_node_sort_kernel_afbdd00f_metal_forward",
+   "ms_per_frame": 0.03866666666666667,
+   "launches_per_frame": 5.0
+  },
+  {
+   "kernel": "project_outside_collider_1efe8a84_metal_forward",
+   "ms_per_frame": 0.0375,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_triplet_segments_2787cf31_metal_forward",
+   "ms_per_frame": 0.036166666666666666,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "sort_diff_clear",
+   "ms_per_frame": 0.034999999999999996,
+   "launches_per_frame": 17.0
+  },
+  {
+   "kernel": "sort_diff_k8",
+   "ms_per_frame": 0.034499999999999996,
+   "launches_per_frame": 6.0
+  },
+  {
+   "kernel": "vb_zero",
+   "ms_per_frame": 0.034166666666666665,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "_segment_heads_19f058c5_metal_forward",
+   "ms_per_frame": 0.033999999999999996,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "postprocess_stress_and_strain_8653b339_metal_forward",
+   "ms_per_frame": 0.03266666666666667,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "rasterize_collider_kernel_dc8fb173_metal_forward",
+   "ms_per_frame": 0.032,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_triplet_row_offsets_8c3a57ec_metal_forward",
+   "ms_per_frame": 0.03,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "vb_emit_hierarchy_keys",
+   "ms_per_frame": 0.0295,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "vb_set_active_voxels",
+   "ms_per_frame": 0.028666666666666663,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "vb_emit_upper_keys",
+   "ms_per_frame": 0.02816666666666667,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "rle_scatter",
+   "ms_per_frame": 0.027833333333333335,
+   "launches_per_frame": 6.0
+  },
+  {
+   "kernel": "rle_count",
+   "ms_per_frame": 0.02716666666666667,
+   "launches_per_frame": 6.0
+  },
+  {
+   "kernel": "dispatch_linear_kernel_fn_bb059afa_1fd1c03f_metal_forward",
+   "ms_per_frame": 0.02666666666666667,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "SpaceRestriction___split_vertex_element_index_d19d2c20_metal_forward",
+   "ms_per_frame": 0.0265,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_identity_field_ccd5b777_0a8d1312_metal_forward",
+   "ms_per_frame": 0.026,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "rle_lengths",
+   "ms_per_frame": 0.025666666666666667,
+   "launches_per_frame": 6.0
+  },
+  {
+   "kernel": "_bsr_accumulate_triplet_values_3b93b6b5_metal_forward",
+   "ms_per_frame": 0.0255,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "bin_particles_fabe9e76_b5f2419e_metal_forward",
+   "ms_per_frame": 0.023499999999999997,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_scatter_node_counts_654d0eae_metal_forward",
+   "ms_per_frame": 0.022000000000000002,
+   "launches_per_frame": 5.0
+  },
+  {
+   "kernel": "_transpose_keys_u32_6f34d5ba_metal_forward",
+   "ms_per_frame": 0.0205,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "fill_element_node_indices_60813d26_02ffbf43_metal_forward",
+   "ms_per_frame": 0.019666666666666666,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_transpose_columns_ad485bf4_metal_forward",
+   "ms_per_frame": 0.019666666666666666,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_bsr_transpose_values_a814354d_metal_forward",
+   "ms_per_frame": 0.019333333333333334,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "vb_finalize_onindex_leaves",
+   "ms_per_frame": 0.017666666666666667,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "finalize_cell_particle_data_328a4fcc_c02ddfdc_metal_forward",
+   "ms_per_frame": 0.016833333333333336,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "wp_memcpy",
+   "ms_per_frame": 0.016,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "wp_bounded_prep",
+   "ms_per_frame": 0.015333333333333332,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "vb_build_leaf",
+   "ms_per_frame": 0.015,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "integrate_mass_1d2858d7_f16c7ef5_metal_forward",
+   "ms_per_frame": 0.014833333333333332,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "mass_form_1d9bf5d4_9a5925e7_metal_forward",
+   "ms_per_frame": 0.014666666666666666,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "dispatch_linear_kernel_fn_2eaf6051_74f951ca_metal_forward",
+   "ms_per_frame": 0.014333333333333332,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "integrate_active_fraction_faca10d4_796b5740_metal_forward",
+   "ms_per_frame": 0.014166666666666668,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "vb_propagate_leaf_bboxes",
+   "ms_per_frame": 0.014,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "integrate_fraction_6e6aca1e_23eefbc2_metal_forward",
+   "ms_per_frame": 0.014,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "vb_build_lower",
+   "ms_per_frame": 0.013833333333333335,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "vb_build_upper",
+   "ms_per_frame": 0.012333333333333333,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "dispatch_bilinear_kernel_fn_52958eaa_0358e08c_metal_forward",
+   "ms_per_frame": 0.011999999999999999,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "world_position_e075bb6d_008729b7_metal_forward",
+   "ms_per_frame": 0.011833333333333333,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "vb_propagate_lower_bboxes",
+   "ms_per_frame": 0.011166666666666667,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "_bsr_assign_copy_blocks_efac61cd_metal_forward",
+   "ms_per_frame": 0.010166666666666666,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "vb_reset_bboxes",
+   "ms_per_frame": 0.009333333333333334,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "vb_get_voxels",
+   "ms_per_frame": 0.009166666666666667,
+   "launches_per_frame": 2.0
+  },
+  {
+   "kernel": "vb_propagate_upper_bboxes",
+   "ms_per_frame": 0.009,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "vb_finalize_counts",
+   "ms_per_frame": 0.008499999999999999,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "_transpose_offsets_fcd71ee6_metal_forward",
+   "ms_per_frame": 0.008499999999999999,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_identity_field_53a45b43_3f24d455_metal_forward",
+   "ms_per_frame": 0.007666666666666666,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "quadrature_point_element_indices_e3cfaaea_ccac3a62_metal_forward",
+   "ms_per_frame": 0.007666666666666666,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_bsr_assign_list_blocks_156045b1_metal_forward",
+   "ms_per_frame": 0.0075,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_cell_node_indices_96e40ac2_metal_forward",
+   "ms_per_frame": 0.0065,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "apply_subgrid_impulse_warmstart_8cb56a7c_metal_forward",
+   "ms_per_frame": 0.0065,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "fill_element_node_indices_8688d243_304c6557_metal_forward",
+   "ms_per_frame": 0.006166666666666667,
+   "launches_per_frame": 2.0
+  },
+  {
+   "kernel": "_cell_edge_indices_b4604a4d_metal_forward",
+   "ms_per_frame": 0.005833333333333334,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "cell_color_e837866a_16b0327a_metal_forward",
+   "ms_per_frame": 0.005833333333333334,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "compute_collider_delassus_diagonal_f1529e24_metal_forward",
+   "ms_per_frame": 0.005666666666666667,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "compute_eigenvalues_398d95c6_metal_forward",
+   "ms_per_frame": 0.0055000000000000005,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "scatter_field_dof_values_77fae76d_metal_forward",
+   "ms_per_frame": 0.005333333333333333,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "inverse_scale_sym_tensor_87098362_metal_forward",
+   "ms_per_frame": 0.005333333333333333,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "preprocess_stress_and_strain_41a99b60_metal_forward",
+   "ms_per_frame": 0.005166666666666667,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "array_copy",
+   "ms_per_frame": 0.005166666666666667,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "inverse_scale_vector_be470fd2_metal_forward",
+   "ms_per_frame": 0.005,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "WholeSpacePartition___iota_kernel_53df5652_metal_forward",
+   "ms_per_frame": 0.004166666666666667,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "free_velocity_05f582f0_metal_forward",
+   "ms_per_frame": 0.004,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "compute_color_offsets_a5c4efbd_metal_forward",
+   "ms_per_frame": 0.0036666666666666666,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "fill_uniform_color_block_indices_d688ca40_metal_forward",
+   "ms_per_frame": 0.0036666666666666666,
+   "launches_per_frame": 1.0
+  }
+ ],
+ "kernel_total_ms_per_frame": 28.129,
+ "launches_per_frame": 2007.0,
+ "empty_cb_us_dim1": 2.557,
+ "empty_cb_us_dim5120": 2.557
+}

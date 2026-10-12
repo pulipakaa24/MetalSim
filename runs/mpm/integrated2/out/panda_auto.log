@@ -1,0 +1,49 @@
+warp /Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/warp-i2/warp/__init__.py device_args auto
+Failed to create Metal pipeline for kernel "_tendon_dot_62db264d_metal_forward": Compilation failed due to an interrupted connection: XPC_ERROR_CONNECTION_INTERRUPTED. This error occurred after multiple retries.
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/runs/a2/kc/panda_auto/1.18.0.dev20260917
+Module mujoco_warp._src.smooth 938d6f1 load on device 'metal:0' took 2131.61 ms  (compiled)
+Module _nxn_broadphase__locals__kernel_e48fdb49 e48fdb4 load on device 'metal:0' took 536.98 ms  (compiled)
+Module ccd_kernel_builder__locals__ccd_kernel_a74e2afa 4fb2acc load on device 'metal:0' took 2704.06 ms  (compiled)
+Module ccd_kernel_builder__locals__ccd_kernel_41d1af43 f189c57 load on device 'metal:0' took 2763.59 ms  (compiled)
+Module ccd_kernel_builder__locals__ccd_kernel_3bf75a08 7bc7e6f load on device 'metal:0' took 2831.71 ms  (compiled)
+Module _primitive_narrowphase__locals__primitive_narrowphase_0628147f 0628147 load on device 'metal:0' took 565.50 ms  (compiled)
+Module mujoco_warp._src.constraint 414179c load on device 'metal:0' took 379.60 ms  (compiled)
+Module _equality_joint__locals__kernel_70fd4f3b 70fd4f3 load on device 'metal:0' took 440.97 ms  (compiled)
+Module _friction_dof__locals__kernel_81f8b666 81f8b66 load on device 'metal:0' took 419.61 ms  (compiled)
+Module _friction_tendon__locals__kernel_4c299108 4c29910 load on device 'metal:0' took 424.85 ms  (compiled)
+Module _limit_slide_hinge__locals__kernel_4ba5abf7 4ba5abf load on device 'metal:0' took 425.85 ms  (compiled)
+Module _efc_contact_init__locals__kernel_d7045540 d704554 load on device 'metal:0' took 389.06 ms  (compiled)
+Module _efc_contact_jac_dense__locals__kernel_fb1cdee7 73690dd load on device 'metal:0' took 462.00 ms  (compiled)
+Module _efc_contact_update__locals__kernel_8ec74d40 8ec74d4 load on device 'metal:0' took 428.14 ms  (compiled)
+Module mujoco_warp._src.forward dafc469 load on device 'metal:0' took 710.59 ms  (compiled)
+Module mujoco_warp._src.forward 1a5f169 load on device 'metal:0' took 704.50 ms  (compiled)
+Module mujoco_warp._src.passive 9bac41a load on device 'metal:0' took 1246.80 ms  (compiled)
+Module _qfrc_smooth__locals__kernel_10dae00b 10dae00 load on device 'metal:0' took 393.26 ms  (compiled)
+Module mujoco_warp._src.support 13e34b1 load on device 'metal:0' took 446.24 ms  (compiled)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_d9525744 86c0ae7 load on device 'metal:0' took 441.93 ms  (compiled)
+Module _solve_init_dof__locals__kernel_6af9c1f9 6af9c1f load on device 'metal:0' took 380.98 ms  (compiled)
+Module mujoco_warp._src.solver f71c4ef load on device 'metal:0' took 688.24 ms  (compiled)
+Module _solve_init_jaref_kernel__locals__kernel_e01f2d8e e01f2d8 load on device 'metal:0' took 388.70 ms  (compiled)
+Module mul_m_kernel__locals___mul_m_117b6d21 117b6d2 load on device 'metal:0' took 398.52 ms  (compiled)
+Module _update_constraint_efc__locals__kernel_15384de2 15384de load on device 'metal:0' took 420.96 ms  (compiled)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_1c56d441 1c56d44 load on device 'metal:0' took 384.17 ms  (compiled)
+Module _update_gradient_zero_grad_dot__locals__kernel_7739fa13 7739fa1 load on device 'metal:0' took 381.86 ms  (compiled)
+Module _update_gradient_grad__locals__kernel_fa113a64 fa113a6 load on device 'metal:0' took 380.88 ms  (compiled)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_6f93452d 0a8639c load on device 'metal:0' took 468.45 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_f3574460 9dd1e16 load on device 'metal:0' took 476.70 ms  (compiled)
+Module _linesearch_iterative_kernel__locals__kernel_4d7740ad c53f102 load on device 'metal:0' took 531.09 ms  (compiled)
+Module _update_constraint_efc__locals__kernel_8645be6c 8645be6 load on device 'metal:0' took 422.23 ms  (compiled)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_bab19832 bab1983 load on device 'metal:0' took 391.82 ms  (compiled)
+Module _update_gradient_zero_grad_dot__locals__kernel_b91471a7 b91471a load on device 'metal:0' took 385.28 ms  (compiled)
+Module _update_gradient_grad__locals__kernel_6651daf8 6651daf load on device 'metal:0' took 381.80 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_d823c973 c297cc2 load on device 'metal:0' took 474.69 ms  (compiled)
+Module mujoco_warp._src.sensor f66cf02 load on device 'metal:0' took 2245.46 ms  (compiled)
+Module mujoco_warp._src.derivative 46d9e5d load on device 'metal:0' took 958.03 ms  (compiled)
+Module _next_time_builder__locals___next_time_b14c0163 b14c016 load on device 'metal:0' took 391.06 ms  (compiled)
+RESULT ok

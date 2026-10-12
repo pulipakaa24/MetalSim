@@ -1,0 +1,173 @@
+++ command -v nsys
++ NSYS=/usr/local/bin/nsys
++ nvidia-smi --query-gpu=name,driver_version,clocks.sm,clocks.max.sm --format=csv
+name, driver_version, clocks.current.sm [MHz], clocks.max.sm [MHz]
+NVIDIA L4, 580.178.04, 210 MHz, 2040 MHz
++ python /home/<vm-user>/parity3_scripts/mpm/l4_kernel_profile.py --chain --json /home/<vm-user>/parity3/mpm_kprof/chain.json
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+threads    64: eager  23.01 us/launch, graph   0.98 us/node
+threads  1024: eager  23.15 us/launch, graph   1.03 us/node
+threads  5120: eager  23.41 us/launch, graph   1.13 us/node
++ for ex in granular twoway_coupling multi_material anymal
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ python /home/<vm-user>/parity3_scripts/mpm/l4_kernel_profile.py example:mpm_granular --frames 8 --json /home/<vm-user>/parity3/mpm_kprof/timing_granular.json
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+{"scene": "example:mpm_granular", "frames": 8, "wall_ms": [33.82249500009493, 28.945928999746684, 31.05658799995581, 32.27205200073513, 30.91872200002399, 33.130172000710445, 32.44793599969853, 32.56595799939532], "wall_median_ms": 32.35999400021683}
++ /usr/local/bin/nsys profile -t cuda,nvtx --cuda-graph-trace=node --capture-range=cudaProfilerApi --capture-range-end=stop --force-overwrite true -o /home/<vm-user>/parity3/mpm_kprof/granular python /home/<vm-user>/parity3_scripts/mpm/l4_kernel_profile.py example:mpm_granular --frames 4
+WARNING: The version of the system or its configuration does not allow enabling CPU profiling:
+- CPU IP/backtrace sampling will be disabled.
+- CPU context switch tracing will be disabled.
+Try the 'nsys status --environment' command to learn more.
+
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+Capture range started in the application.
+Capture range ended in the application.
+Generating '/tmp/nsys-report-cbc4.qdstrm'
+[1/1] [0%                          ] granular.nsys-repProcessing events...
+[1/1] [0%                          ] granular.nsys-rep[1/1] [=========45%                ] granular.nsys-rep[1/1] [===========51%              ] granular.nsys-rep[1/1] [========================100%] granular.nsys-rep[1/1] [========================100%] granular.nsys-rep
+{"scene": "example:mpm_granular", "frames": 4, "wall_ms": [47.16911200011964, 38.462263999463175, 40.36890600036713, 41.94488899975113], "wall_median_ms": 41.15689750005913}
+Generated:
+	/home/<vm-user>/parity3/mpm_kprof/granular.nsys-rep
++ /usr/local/bin/nsys stats -r cuda_gpu_kern_sum,cuda_gpu_trace -f csv --force-export true -o /home/<vm-user>/parity3/mpm_kprof/granular /home/<vm-user>/parity3/mpm_kprof/granular.nsys-rep
+Generating SQLite file /home/<vm-user>/parity3/mpm_kprof/granular.sqlite from /home/<vm-user>/parity3/mpm_kprof/granular.nsys-rep
+Processing [/home/<vm-user>/parity3/mpm_kprof/granular.sqlite] with [/opt/nvidia/nsight-systems/2026.1.3/target-linux-x64/reports/cuda_gpu_kern_sum.py] to [/home/<vm-user>/parity3/mpm_kprof/granular_cuda_gpu_kern_sum.csv]... PROCESSED
+
+Processing [/home/<vm-user>/parity3/mpm_kprof/granular.sqlite] with [/opt/nvidia/nsight-systems/2026.1.3/target-linux-x64/reports/cuda_gpu_trace.py] to [/home/<vm-user>/parity3/mpm_kprof/granular_cuda_gpu_trace.csv]... PROCESSED
+
++ for ex in granular twoway_coupling multi_material anymal
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ python /home/<vm-user>/parity3_scripts/mpm/l4_kernel_profile.py example:mpm_twoway_coupling --frames 8 --json /home/<vm-user>/parity3/mpm_kprof/timing_twoway_coupling.json
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+{"scene": "example:mpm_twoway_coupling", "frames": 8, "wall_ms": [69.12945300064166, 70.02209699930972, 69.9041819998456, 68.59808399985923, 70.8290409993424, 67.99886299995705, 68.3331320005891, 67.6454049998938], "wall_median_ms": 68.86376850025044}
++ /usr/local/bin/nsys profile -t cuda,nvtx --cuda-graph-trace=node --capture-range=cudaProfilerApi --capture-range-end=stop --force-overwrite true -o /home/<vm-user>/parity3/mpm_kprof/twoway_coupling python /home/<vm-user>/parity3_scripts/mpm/l4_kernel_profile.py example:mpm_twoway_coupling --frames 4
+WARNING: The version of the system or its configuration does not allow enabling CPU profiling:
+- CPU IP/backtrace sampling will be disabled.
+- CPU context switch tracing will be disabled.
+Try the 'nsys status --environment' command to learn more.
+
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+Capture range started in the application.
+Capture range ended in the application.
+Generating '/tmp/nsys-report-9673.qdstrm'
+[1/1] [0%                          ] twoway_coupling.nsys-repProcessing events...
+[1/1] [0%                          ] twoway_coupling.nsys-rep[1/1] [===========52%              ] twoway_coupling.nsys-rep[1/1] [========================100%] twoway_coupling.nsys-rep[1/1] [========================100%] twoway_coupling.nsys-rep
+{"scene": "example:mpm_twoway_coupling", "frames": 4, "wall_ms": [78.94222799950512, 77.49326599969208, 77.40967800054932, 75.84220599983382], "wall_median_ms": 77.4514720001207}
+Generated:
+	/home/<vm-user>/parity3/mpm_kprof/twoway_coupling.nsys-rep
++ /usr/local/bin/nsys stats -r cuda_gpu_kern_sum,cuda_gpu_trace -f csv --force-export true -o /home/<vm-user>/parity3/mpm_kprof/twoway_coupling /home/<vm-user>/parity3/mpm_kprof/twoway_coupling.nsys-rep
+Generating SQLite file /home/<vm-user>/parity3/mpm_kprof/twoway_coupling.sqlite from /home/<vm-user>/parity3/mpm_kprof/twoway_coupling.nsys-rep
+Processing [/home/<vm-user>/parity3/mpm_kprof/twoway_coupling.sqlite] with [/opt/nvidia/nsight-systems/2026.1.3/target-linux-x64/reports/cuda_gpu_kern_sum.py] to [/home/<vm-user>/parity3/mpm_kprof/twoway_coupling_cuda_gpu_kern_sum.csv]... PROCESSED
+
+Processing [/home/<vm-user>/parity3/mpm_kprof/twoway_coupling.sqlite] with [/opt/nvidia/nsight-systems/2026.1.3/target-linux-x64/reports/cuda_gpu_trace.py] to [/home/<vm-user>/parity3/mpm_kprof/twoway_coupling_cuda_gpu_trace.csv]... PROCESSED
+
++ for ex in granular twoway_coupling multi_material anymal
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ python /home/<vm-user>/parity3_scripts/mpm/l4_kernel_profile.py example:mpm_multi_material --frames 8 --json /home/<vm-user>/parity3/mpm_kprof/timing_multi_material.json
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+{"scene": "example:mpm_multi_material", "frames": 8, "wall_ms": [19.706211000084295, 33.74227499989502, 24.1185469994889, 19.62865600035002, 33.32255700024689, 23.399798999889754, 33.47448599924974, 31.11961800004792], "wall_median_ms": 27.61908249976841}
++ /usr/local/bin/nsys profile -t cuda,nvtx --cuda-graph-trace=node --capture-range=cudaProfilerApi --capture-range-end=stop --force-overwrite true -o /home/<vm-user>/parity3/mpm_kprof/multi_material python /home/<vm-user>/parity3_scripts/mpm/l4_kernel_profile.py example:mpm_multi_material --frames 4
+WARNING: The version of the system or its configuration does not allow enabling CPU profiling:
+- CPU IP/backtrace sampling will be disabled.
+- CPU context switch tracing will be disabled.
+Try the 'nsys status --environment' command to learn more.
+
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+Capture range started in the application.
+Capture range ended in the application.
+Generating '/tmp/nsys-report-44e1.qdstrm'
+[1/1] [0%                          ] multi_material.nsys-repProcessing events...
+[1/1] [0%                          ] multi_material.nsys-rep[1/1] [===========52%              ] multi_material.nsys-rep[1/1] [========================100%] multi_material.nsys-rep[1/1] [========================100%] multi_material.nsys-rep
+{"scene": "example:mpm_multi_material", "frames": 4, "wall_ms": [27.5687809998999, 44.795875000090746, 31.29936799996358, 26.263611000103992], "wall_median_ms": 29.43407449993174}
+Generated:
+	/home/<vm-user>/parity3/mpm_kprof/multi_material.nsys-rep
++ /usr/local/bin/nsys stats -r cuda_gpu_kern_sum,cuda_gpu_trace -f csv --force-export true -o /home/<vm-user>/parity3/mpm_kprof/multi_material /home/<vm-user>/parity3/mpm_kprof/multi_material.nsys-rep
+Generating SQLite file /home/<vm-user>/parity3/mpm_kprof/multi_material.sqlite from /home/<vm-user>/parity3/mpm_kprof/multi_material.nsys-rep
+Processing [/home/<vm-user>/parity3/mpm_kprof/multi_material.sqlite] with [/opt/nvidia/nsight-systems/2026.1.3/target-linux-x64/reports/cuda_gpu_kern_sum.py] to [/home/<vm-user>/parity3/mpm_kprof/multi_material_cuda_gpu_kern_sum.csv]... PROCESSED
+
+Processing [/home/<vm-user>/parity3/mpm_kprof/multi_material.sqlite] with [/opt/nvidia/nsight-systems/2026.1.3/target-linux-x64/reports/cuda_gpu_trace.py] to [/home/<vm-user>/parity3/mpm_kprof/multi_material_cuda_gpu_trace.csv]... PROCESSED
+
++ for ex in granular twoway_coupling multi_material anymal
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ python /home/<vm-user>/parity3_scripts/mpm/l4_kernel_profile.py example:mpm_anymal --frames 8 --json /home/<vm-user>/parity3/mpm_kprof/timing_anymal.json
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+{"scene": "example:mpm_anymal", "frames": 8, "wall_ms": [60.71109099957539, 57.50395299946831, 58.92404899987014, 55.84085700047581, 57.4351220002427, 54.568954999922425, 54.78804599988507, 53.72305699984281], "wall_median_ms": 56.637989500359254}
++ /usr/local/bin/nsys profile -t cuda,nvtx --cuda-graph-trace=node --capture-range=cudaProfilerApi --capture-range-end=stop --force-overwrite true -o /home/<vm-user>/parity3/mpm_kprof/anymal python /home/<vm-user>/parity3_scripts/mpm/l4_kernel_profile.py example:mpm_anymal --frames 4
+WARNING: The version of the system or its configuration does not allow enabling CPU profiling:
+- CPU IP/backtrace sampling will be disabled.
+- CPU context switch tracing will be disabled.
+Try the 'nsys status --environment' command to learn more.
+
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+Capture range started in the application.
+Capture range ended in the application.
+Generating '/tmp/nsys-report-accb.qdstrm'
+[1/1] [0%                          ] anymal.nsys-repProcessing events...
+[1/1] [0%                          ] anymal.nsys-rep[1/1] [==========49%               ] anymal.nsys-rep[1/1] [===========51%              ] anymal.nsys-rep[1/1] [========================100%] anymal.nsys-rep[1/1] [========================100%] anymal.nsys-rep
+{"scene": "example:mpm_anymal", "frames": 4, "wall_ms": [75.26222900014545, 69.47223899987875, 71.61697799983813, 68.40428399937082], "wall_median_ms": 70.54460849985844}
+Generated:
+	/home/<vm-user>/parity3/mpm_kprof/anymal.nsys-rep
++ /usr/local/bin/nsys stats -r cuda_gpu_kern_sum,cuda_gpu_trace -f csv --force-export true -o /home/<vm-user>/parity3/mpm_kprof/anymal /home/<vm-user>/parity3/mpm_kprof/anymal.nsys-rep
+Generating SQLite file /home/<vm-user>/parity3/mpm_kprof/anymal.sqlite from /home/<vm-user>/parity3/mpm_kprof/anymal.nsys-rep
+Processing [/home/<vm-user>/parity3/mpm_kprof/anymal.sqlite] with [/opt/nvidia/nsight-systems/2026.1.3/target-linux-x64/reports/cuda_gpu_kern_sum.py] to [/home/<vm-user>/parity3/mpm_kprof/anymal_cuda_gpu_kern_sum.csv]... PROCESSED
+
+Processing [/home/<vm-user>/parity3/mpm_kprof/anymal.sqlite] with [/opt/nvidia/nsight-systems/2026.1.3/target-linux-x64/reports/cuda_gpu_trace.py] to [/home/<vm-user>/parity3/mpm_kprof/anymal_cuda_gpu_trace.csv]... PROCESSED
+
++ for ex in twoway_coupling anymal
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ python /home/<vm-user>/parity3_scripts/mpm/l4_kernel_profile.py example:mpm_twoway_coupling --frames 8 --set capture=true --json /home/<vm-user>/parity3/mpm_kprof/timing_twoway_coupling_capture.json
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+{"scene": "example:mpm_twoway_coupling", "frames": 8, "wall_ms": [29.80284400018718, 29.84937000019272, 29.700781000428833, 29.59714300050109, 29.961260000163747, 29.71315700051491, 29.695647000153258, 29.713713999626634], "wall_median_ms": 29.713435500070773}
++ /usr/local/bin/nsys profile -t cuda --cuda-graph-trace=node --capture-range=cudaProfilerApi --capture-range-end=stop --force-overwrite true -o /home/<vm-user>/parity3/mpm_kprof/twoway_coupling_capture python /home/<vm-user>/parity3_scripts/mpm/l4_kernel_profile.py example:mpm_twoway_coupling --frames 4 --set capture=true
+WARNING: The version of the system or its configuration does not allow enabling CPU profiling:
+- CPU IP/backtrace sampling will be disabled.
+- CPU context switch tracing will be disabled.
+Try the 'nsys status --environment' command to learn more.
+
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+Capture range started in the application.
+Capture range ended in the application.
+Generating '/tmp/nsys-report-3b93.qdstrm'
+[1/1] [0%                          ] twoway_coupling_capture.nsys-repProcessing events...
+[1/1] [0%                          ] twoway_coupling_capture.nsys-rep[1/1] [6%                          ] twoway_coupling_capture.nsys-rep[1/1] [===========53%              ] twoway_coupling_capture.nsys-rep[1/1] [========================100%] twoway_coupling_capture.nsys-rep[1/1] [========================100%] twoway_coupling_capture.nsys-rep
+{"scene": "example:mpm_twoway_coupling", "frames": 4, "wall_ms": [32.10281700012274, 32.11995699984982, 32.05333799996879, 31.891478000034112], "wall_median_ms": 32.078077500045765}
+Generated:
+	/home/<vm-user>/parity3/mpm_kprof/twoway_coupling_capture.nsys-rep
++ /usr/local/bin/nsys stats -r cuda_gpu_kern_sum,cuda_gpu_trace -f csv --force-export true -o /home/<vm-user>/parity3/mpm_kprof/twoway_coupling_capture /home/<vm-user>/parity3/mpm_kprof/twoway_coupling_capture.nsys-rep
+Generating SQLite file /home/<vm-user>/parity3/mpm_kprof/twoway_coupling_capture.sqlite from /home/<vm-user>/parity3/mpm_kprof/twoway_coupling_capture.nsys-rep
+Processing [/home/<vm-user>/parity3/mpm_kprof/twoway_coupling_capture.sqlite] with [/opt/nvidia/nsight-systems/2026.1.3/target-linux-x64/reports/cuda_gpu_kern_sum.py] to [/home/<vm-user>/parity3/mpm_kprof/twoway_coupling_capture_cuda_gpu_kern_sum.csv]... PROCESSED
+
+Processing [/home/<vm-user>/parity3/mpm_kprof/twoway_coupling_capture.sqlite] with [/opt/nvidia/nsight-systems/2026.1.3/target-linux-x64/reports/cuda_gpu_trace.py] to [/home/<vm-user>/parity3/mpm_kprof/twoway_coupling_capture_cuda_gpu_trace.csv]... PROCESSED
+
++ for ex in twoway_coupling anymal
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ python /home/<vm-user>/parity3_scripts/mpm/l4_kernel_profile.py example:mpm_anymal --frames 8 --set capture=true --json /home/<vm-user>/parity3/mpm_kprof/timing_anymal_capture.json
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+{"scene": "example:mpm_anymal", "frames": 8, "wall_ms": [25.55694999955449, 23.215600999719754, 22.959776999414316, 23.639098999410635, 23.210272999676818, 22.580781999749888, 24.242491999757476, 22.99065800070821], "wall_median_ms": 23.212936999698286}
++ /usr/local/bin/nsys profile -t cuda --cuda-graph-trace=node --capture-range=cudaProfilerApi --capture-range-end=stop --force-overwrite true -o /home/<vm-user>/parity3/mpm_kprof/anymal_capture python /home/<vm-user>/parity3_scripts/mpm/l4_kernel_profile.py example:mpm_anymal --frames 4 --set capture=true
+WARNING: The version of the system or its configuration does not allow enabling CPU profiling:
+- CPU IP/backtrace sampling will be disabled.
+- CPU context switch tracing will be disabled.
+Try the 'nsys status --environment' command to learn more.
+
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+Capture range started in the application.
+Capture range ended in the application.
+Generating '/tmp/nsys-report-7166.qdstrm'
+[1/1] [0%                          ] anymal_capture.nsys-repProcessing events...
+[1/1] [0%                          ] anymal_capture.nsys-rep[1/1] [===========52%              ] anymal_capture.nsys-rep[1/1] [========================100%] anymal_capture.nsys-rep[1/1] [========================100%] anymal_capture.nsys-rep
+{"scene": "example:mpm_anymal", "frames": 4, "wall_ms": [32.296796000082395, 28.618895999898086, 28.382454999700713, 29.016552999564738], "wall_median_ms": 28.817724499731412}
+Generated:
+	/home/<vm-user>/parity3/mpm_kprof/anymal_capture.nsys-rep
++ /usr/local/bin/nsys stats -r cuda_gpu_kern_sum,cuda_gpu_trace -f csv --force-export true -o /home/<vm-user>/parity3/mpm_kprof/anymal_capture /home/<vm-user>/parity3/mpm_kprof/anymal_capture.nsys-rep
+Generating SQLite file /home/<vm-user>/parity3/mpm_kprof/anymal_capture.sqlite from /home/<vm-user>/parity3/mpm_kprof/anymal_capture.nsys-rep
+Processing [/home/<vm-user>/parity3/mpm_kprof/anymal_capture.sqlite] with [/opt/nvidia/nsight-systems/2026.1.3/target-linux-x64/reports/cuda_gpu_kern_sum.py] to [/home/<vm-user>/parity3/mpm_kprof/anymal_capture_cuda_gpu_kern_sum.csv]... PROCESSED
+
+Processing [/home/<vm-user>/parity3/mpm_kprof/anymal_capture.sqlite] with [/opt/nvidia/nsight-systems/2026.1.3/target-linux-x64/reports/cuda_gpu_trace.py] to [/home/<vm-user>/parity3/mpm_kprof/anymal_capture_cuda_gpu_trace.csv]... PROCESSED
+
++ tar czf /home/<vm-user>/parity3/mpm_kprof.tgz '--exclude=*.sqlite' -C /home/<vm-user>/parity3 mpm_kprof

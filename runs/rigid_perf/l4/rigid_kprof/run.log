@@ -1,0 +1,111 @@
++ export PANDA_XML=/home/<vm-user>/parity3_scripts/mpm/scale/franka_emika_panda/panda.xml
++ PANDA_XML=/home/<vm-user>/parity3_scripts/mpm/scale/franka_emika_panda/panda.xml
+++ command -v nsys
++ NSYS=/usr/local/bin/nsys
++ nvidia-smi --query-gpu=name,driver_version,clocks.sm,clocks.max.sm --format=csv
+name, driver_version, clocks.current.sm [MHz], clocks.max.sm [MHz]
+NVIDIA L4, 580.178.04, 210 MHz, 2040 MHz
++ W=2048
++ for det in off on
++ for ph in collide substep tick captured
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ id=collide_off_2048
++ python /home/<vm-user>/parity3_scripts/mpm/scale/scale_pour_k.py --part rigid --device cuda:0 --worlds 2048 --max-triangle-pairs 8388608 --det off --warmup 3 --kprof collide --kprof-ticks 4 --json /home/<vm-user>/parity3/rigid_kprof/wall_collide_off_2048.json
++ /usr/local/bin/nsys profile -t cuda,nvtx --cuda-graph-trace=node --capture-range=cudaProfilerApi --capture-range-end=stop --force-overwrite true -o /home/<vm-user>/parity3/rigid_kprof/collide_off_2048 python /home/<vm-user>/parity3_scripts/mpm/scale/scale_pour_k.py --part rigid --device cuda:0 --worlds 2048 --max-triangle-pairs 8388608 --det off --warmup 3 --kprof collide --kprof-ticks 4 --json /home/<vm-user>/parity3/rigid_kprof/nsys_collide_off_2048.json
++ /usr/local/bin/nsys stats -r cuda_gpu_kern_sum,cuda_gpu_mem_time_sum,cuda_gpu_mem_size_sum -f csv --force-export true -o /home/<vm-user>/parity3/rigid_kprof/collide_off_2048 /home/<vm-user>/parity3/rigid_kprof/collide_off_2048.nsys-rep
+Generating SQLite file /home/<vm-user>/parity3/rigid_kprof/collide_off_2048.sqlite from /home/<vm-user>/parity3/rigid_kprof/collide_off_2048.nsys-rep
+Processing [/home/<vm-user>/parity3/rigid_kprof/collide_off_2048.sqlite] with [/opt/nvidia/nsight-systems/2026.1.3/target-linux-x64/reports/cuda_gpu_kern_sum.py] to [/home/<vm-user>/parity3/rigid_kprof/collide_off_2048_cuda_gpu_kern_sum.csv]... PROCESSED
+
+Processing [/home/<vm-user>/parity3/rigid_kprof/collide_off_2048.sqlite] with [/opt/nvidia/nsight-systems/2026.1.3/target-linux-x64/reports/cuda_gpu_mem_time_sum.py] to [/home/<vm-user>/parity3/rigid_kprof/collide_off_2048_cuda_gpu_mem_time_sum.csv]... PROCESSED
+
+Processing [/home/<vm-user>/parity3/rigid_kprof/collide_off_2048.sqlite] with [/opt/nvidia/nsight-systems/2026.1.3/target-linux-x64/reports/cuda_gpu_mem_size_sum.py] to [/home/<vm-user>/parity3/rigid_kprof/collide_off_2048_cuda_gpu_mem_size_sum.csv]... PROCESSED
+
++ for ph in collide substep tick captured
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ id=substep_off_2048
++ python /home/<vm-user>/parity3_scripts/mpm/scale/scale_pour_k.py --part rigid --device cuda:0 --worlds 2048 --max-triangle-pairs 8388608 --det off --warmup 3 --kprof substep --kprof-ticks 4 --json /home/<vm-user>/parity3/rigid_kprof/wall_substep_off_2048.json
++ /usr/local/bin/nsys profile -t cuda,nvtx --cuda-graph-trace=node --capture-range=cudaProfilerApi --capture-range-end=stop --force-overwrite true -o /home/<vm-user>/parity3/rigid_kprof/substep_off_2048 python /home/<vm-user>/parity3_scripts/mpm/scale/scale_pour_k.py --part rigid --device cuda:0 --worlds 2048 --max-triangle-pairs 8388608 --det off --warmup 3 --kprof substep --kprof-ticks 4 --json /home/<vm-user>/parity3/rigid_kprof/nsys_substep_off_2048.json
++ /usr/local/bin/nsys stats -r cuda_gpu_kern_sum,cuda_gpu_mem_time_sum,cuda_gpu_mem_size_sum -f csv --force-export true -o /home/<vm-user>/parity3/rigid_kprof/substep_off_2048 /home/<vm-user>/parity3/rigid_kprof/substep_off_2048.nsys-rep
+Generating SQLite file /home/<vm-user>/parity3/rigid_kprof/substep_off_2048.sqlite from /home/<vm-user>/parity3/rigid_kprof/substep_off_2048.nsys-rep
+Processing [/home/<vm-user>/parity3/rigid_kprof/substep_off_2048.sqlite] with [/opt/nvidia/nsight-systems/2026.1.3/target-linux-x64/reports/cuda_gpu_kern_sum.py] to [/home/<vm-user>/parity3/rigid_kprof/substep_off_2048_cuda_gpu_kern_sum.csv]... PROCESSED
+
+Processing [/home/<vm-user>/parity3/rigid_kprof/substep_off_2048.sqlite] with [/opt/nvidia/nsight-systems/2026.1.3/target-linux-x64/reports/cuda_gpu_mem_time_sum.py] to [/home/<vm-user>/parity3/rigid_kprof/substep_off_2048_cuda_gpu_mem_time_sum.csv]... PROCESSED
+
+Processing [/home/<vm-user>/parity3/rigid_kprof/substep_off_2048.sqlite] with [/opt/nvidia/nsight-systems/2026.1.3/target-linux-x64/reports/cuda_gpu_mem_size_sum.py] to [/home/<vm-user>/parity3/rigid_kprof/substep_off_2048_cuda_gpu_mem_size_sum.csv]... PROCESSED
+
++ for ph in collide substep tick captured
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ id=tick_off_2048
++ python /home/<vm-user>/parity3_scripts/mpm/scale/scale_pour_k.py --part rigid --device cuda:0 --worlds 2048 --max-triangle-pairs 8388608 --det off --warmup 3 --kprof tick --kprof-ticks 4 --json /home/<vm-user>/parity3/rigid_kprof/wall_tick_off_2048.json
++ /usr/local/bin/nsys profile -t cuda,nvtx --cuda-graph-trace=node --capture-range=cudaProfilerApi --capture-range-end=stop --force-overwrite true -o /home/<vm-user>/parity3/rigid_kprof/tick_off_2048 python /home/<vm-user>/parity3_scripts/mpm/scale/scale_pour_k.py --part rigid --device cuda:0 --worlds 2048 --max-triangle-pairs 8388608 --det off --warmup 3 --kprof tick --kprof-ticks 4 --json /home/<vm-user>/parity3/rigid_kprof/nsys_tick_off_2048.json
++ /usr/local/bin/nsys stats -r cuda_gpu_kern_sum,cuda_gpu_mem_time_sum,cuda_gpu_mem_size_sum -f csv --force-export true -o /home/<vm-user>/parity3/rigid_kprof/tick_off_2048 /home/<vm-user>/parity3/rigid_kprof/tick_off_2048.nsys-rep
+Generating SQLite file /home/<vm-user>/parity3/rigid_kprof/tick_off_2048.sqlite from /home/<vm-user>/parity3/rigid_kprof/tick_off_2048.nsys-rep
+Processing [/home/<vm-user>/parity3/rigid_kprof/tick_off_2048.sqlite] with [/opt/nvidia/nsight-systems/2026.1.3/target-linux-x64/reports/cuda_gpu_kern_sum.py] to [/home/<vm-user>/parity3/rigid_kprof/tick_off_2048_cuda_gpu_kern_sum.csv]... PROCESSED
+
+Processing [/home/<vm-user>/parity3/rigid_kprof/tick_off_2048.sqlite] with [/opt/nvidia/nsight-systems/2026.1.3/target-linux-x64/reports/cuda_gpu_mem_time_sum.py] to [/home/<vm-user>/parity3/rigid_kprof/tick_off_2048_cuda_gpu_mem_time_sum.csv]... PROCESSED
+
+Processing [/home/<vm-user>/parity3/rigid_kprof/tick_off_2048.sqlite] with [/opt/nvidia/nsight-systems/2026.1.3/target-linux-x64/reports/cuda_gpu_mem_size_sum.py] to [/home/<vm-user>/parity3/rigid_kprof/tick_off_2048_cuda_gpu_mem_size_sum.csv]... PROCESSED
+
++ for ph in collide substep tick captured
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ id=captured_off_2048
++ python /home/<vm-user>/parity3_scripts/mpm/scale/scale_pour_k.py --part rigid --device cuda:0 --worlds 2048 --max-triangle-pairs 8388608 --det off --warmup 3 --kprof captured --kprof-ticks 4 --json /home/<vm-user>/parity3/rigid_kprof/wall_captured_off_2048.json
++ /usr/local/bin/nsys profile -t cuda,nvtx --cuda-graph-trace=node --capture-range=cudaProfilerApi --capture-range-end=stop --force-overwrite true -o /home/<vm-user>/parity3/rigid_kprof/captured_off_2048 python /home/<vm-user>/parity3_scripts/mpm/scale/scale_pour_k.py --part rigid --device cuda:0 --worlds 2048 --max-triangle-pairs 8388608 --det off --warmup 3 --kprof captured --kprof-ticks 4 --json /home/<vm-user>/parity3/rigid_kprof/nsys_captured_off_2048.json
++ /usr/local/bin/nsys stats -r cuda_gpu_kern_sum,cuda_gpu_mem_time_sum,cuda_gpu_mem_size_sum -f csv --force-export true -o /home/<vm-user>/parity3/rigid_kprof/captured_off_2048 /home/<vm-user>/parity3/rigid_kprof/captured_off_2048.nsys-rep
+Generating SQLite file /home/<vm-user>/parity3/rigid_kprof/captured_off_2048.sqlite from /home/<vm-user>/parity3/rigid_kprof/captured_off_2048.nsys-rep
+Processing [/home/<vm-user>/parity3/rigid_kprof/captured_off_2048.sqlite] with [/opt/nvidia/nsight-systems/2026.1.3/target-linux-x64/reports/cuda_gpu_kern_sum.py] to [/home/<vm-user>/parity3/rigid_kprof/captured_off_2048_cuda_gpu_kern_sum.csv]... PROCESSED
+
+Processing [/home/<vm-user>/parity3/rigid_kprof/captured_off_2048.sqlite] with [/opt/nvidia/nsight-systems/2026.1.3/target-linux-x64/reports/cuda_gpu_mem_time_sum.py] to [/home/<vm-user>/parity3/rigid_kprof/captured_off_2048_cuda_gpu_mem_time_sum.csv]... PROCESSED
+
+Processing [/home/<vm-user>/parity3/rigid_kprof/captured_off_2048.sqlite] with [/opt/nvidia/nsight-systems/2026.1.3/target-linux-x64/reports/cuda_gpu_mem_size_sum.py] to [/home/<vm-user>/parity3/rigid_kprof/captured_off_2048_cuda_gpu_mem_size_sum.csv]... PROCESSED
+
++ for det in off on
++ for ph in collide substep tick captured
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ id=collide_on_2048
++ python /home/<vm-user>/parity3_scripts/mpm/scale/scale_pour_k.py --part rigid --device cuda:0 --worlds 2048 --max-triangle-pairs 8388608 --det on --warmup 3 --kprof collide --kprof-ticks 4 --json /home/<vm-user>/parity3/rigid_kprof/wall_collide_on_2048.json
++ /usr/local/bin/nsys profile -t cuda,nvtx --cuda-graph-trace=node --capture-range=cudaProfilerApi --capture-range-end=stop --force-overwrite true -o /home/<vm-user>/parity3/rigid_kprof/collide_on_2048 python /home/<vm-user>/parity3_scripts/mpm/scale/scale_pour_k.py --part rigid --device cuda:0 --worlds 2048 --max-triangle-pairs 8388608 --det on --warmup 3 --kprof collide --kprof-ticks 4 --json /home/<vm-user>/parity3/rigid_kprof/nsys_collide_on_2048.json
++ /usr/local/bin/nsys stats -r cuda_gpu_kern_sum,cuda_gpu_mem_time_sum,cuda_gpu_mem_size_sum -f csv --force-export true -o /home/<vm-user>/parity3/rigid_kprof/collide_on_2048 /home/<vm-user>/parity3/rigid_kprof/collide_on_2048.nsys-rep
+ERROR: Specified input file (/home/<vm-user>/parity3/rigid_kprof/collide_on_2048.nsys-rep) does not exist.
+
+usage: nsys stats [<args>] <input-file>
+Try 'nsys stats --help' for more information.
++ for ph in collide substep tick captured
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ id=substep_on_2048
++ python /home/<vm-user>/parity3_scripts/mpm/scale/scale_pour_k.py --part rigid --device cuda:0 --worlds 2048 --max-triangle-pairs 8388608 --det on --warmup 3 --kprof substep --kprof-ticks 4 --json /home/<vm-user>/parity3/rigid_kprof/wall_substep_on_2048.json
++ /usr/local/bin/nsys profile -t cuda,nvtx --cuda-graph-trace=node --capture-range=cudaProfilerApi --capture-range-end=stop --force-overwrite true -o /home/<vm-user>/parity3/rigid_kprof/substep_on_2048 python /home/<vm-user>/parity3_scripts/mpm/scale/scale_pour_k.py --part rigid --device cuda:0 --worlds 2048 --max-triangle-pairs 8388608 --det on --warmup 3 --kprof substep --kprof-ticks 4 --json /home/<vm-user>/parity3/rigid_kprof/nsys_substep_on_2048.json
++ /usr/local/bin/nsys stats -r cuda_gpu_kern_sum,cuda_gpu_mem_time_sum,cuda_gpu_mem_size_sum -f csv --force-export true -o /home/<vm-user>/parity3/rigid_kprof/substep_on_2048 /home/<vm-user>/parity3/rigid_kprof/substep_on_2048.nsys-rep
+ERROR: Specified input file (/home/<vm-user>/parity3/rigid_kprof/substep_on_2048.nsys-rep) does not exist.
+
+usage: nsys stats [<args>] <input-file>
+Try 'nsys stats --help' for more information.
++ for ph in collide substep tick captured
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ id=tick_on_2048
++ python /home/<vm-user>/parity3_scripts/mpm/scale/scale_pour_k.py --part rigid --device cuda:0 --worlds 2048 --max-triangle-pairs 8388608 --det on --warmup 3 --kprof tick --kprof-ticks 4 --json /home/<vm-user>/parity3/rigid_kprof/wall_tick_on_2048.json
++ /usr/local/bin/nsys profile -t cuda,nvtx --cuda-graph-trace=node --capture-range=cudaProfilerApi --capture-range-end=stop --force-overwrite true -o /home/<vm-user>/parity3/rigid_kprof/tick_on_2048 python /home/<vm-user>/parity3_scripts/mpm/scale/scale_pour_k.py --part rigid --device cuda:0 --worlds 2048 --max-triangle-pairs 8388608 --det on --warmup 3 --kprof tick --kprof-ticks 4 --json /home/<vm-user>/parity3/rigid_kprof/nsys_tick_on_2048.json
++ /usr/local/bin/nsys stats -r cuda_gpu_kern_sum,cuda_gpu_mem_time_sum,cuda_gpu_mem_size_sum -f csv --force-export true -o /home/<vm-user>/parity3/rigid_kprof/tick_on_2048 /home/<vm-user>/parity3/rigid_kprof/tick_on_2048.nsys-rep
+ERROR: Specified input file (/home/<vm-user>/parity3/rigid_kprof/tick_on_2048.nsys-rep) does not exist.
+
+usage: nsys stats [<args>] <input-file>
+Try 'nsys stats --help' for more information.
++ for ph in collide substep tick captured
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ id=captured_on_2048
++ python /home/<vm-user>/parity3_scripts/mpm/scale/scale_pour_k.py --part rigid --device cuda:0 --worlds 2048 --max-triangle-pairs 8388608 --det on --warmup 3 --kprof captured --kprof-ticks 4 --json /home/<vm-user>/parity3/rigid_kprof/wall_captured_on_2048.json
++ /usr/local/bin/nsys profile -t cuda,nvtx --cuda-graph-trace=node --capture-range=cudaProfilerApi --capture-range-end=stop --force-overwrite true -o /home/<vm-user>/parity3/rigid_kprof/captured_on_2048 python /home/<vm-user>/parity3_scripts/mpm/scale/scale_pour_k.py --part rigid --device cuda:0 --worlds 2048 --max-triangle-pairs 8388608 --det on --warmup 3 --kprof captured --kprof-ticks 4 --json /home/<vm-user>/parity3/rigid_kprof/nsys_captured_on_2048.json
++ /usr/local/bin/nsys stats -r cuda_gpu_kern_sum,cuda_gpu_mem_time_sum,cuda_gpu_mem_size_sum -f csv --force-export true -o /home/<vm-user>/parity3/rigid_kprof/captured_on_2048 /home/<vm-user>/parity3/rigid_kprof/captured_on_2048.nsys-rep
+ERROR: Specified input file (/home/<vm-user>/parity3/rigid_kprof/captured_on_2048.nsys-rep) does not exist.
+
+usage: nsys stats [<args>] <input-file>
+Try 'nsys stats --help' for more information.
++ tar czf /home/<vm-user>/parity3/rigid_kprof.tgz '--exclude=*.sqlite' '--exclude=*.nsys-rep' -C /home/<vm-user>/parity3 rigid_kprof

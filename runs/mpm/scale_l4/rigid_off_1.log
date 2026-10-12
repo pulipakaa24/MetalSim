@@ -1,0 +1,73 @@
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+/home/<vm-user>/parity3_scripts/mpm/scale/scale_pour.py:236: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+  model = scene.finalize(device=DEV)
+{
+ "argv": [
+  "--device",
+  "cuda:0",
+  "--json",
+  "/home/<vm-user>/parity3/scale_l4/rigid_off_1.json",
+  "--part",
+  "rigid",
+  "--worlds",
+  "1",
+  "--mode",
+  "capture",
+  "--steps",
+  "15",
+  "--count"
+ ],
+ "device": "cuda:0",
+ "device_name": "NVIDIA L4",
+ "warp": "1.16.0",
+ "newton": "1.5.2",
+ "worlds": 1,
+ "part": "rigid",
+ "det": "off",
+ "pipeline_det": false,
+ "mode": "capture",
+ "max_triangle_pairs": null,
+ "bodies": 13,
+ "shapes": 93,
+ "joints": 13,
+ "dofs": 21,
+ "build_s": 0.13897330000008878,
+ "solver_init_s": 4.932622694999964,
+ "rigid_contact_max": 6862,
+ "per_tick_counts_eager": {
+  "wp.launch": 452.0,
+  "wp.synchronize_stream": 6.0,
+  "host sync sites": {
+   "solver.py:3992:_solve <- solver.py:3952:solve <- warp_util.py:97:wrapper": 6.0
+  }
+ },
+ "collide_ms": {
+  "median": 2.01061200004915,
+  "mean": 2.023921133362213,
+  "min": 1.9965910000792064,
+  "max": 2.150760000176888
+ },
+ "substep_ms": {
+  "median": 8.157013000072766,
+  "mean": 8.383093799996763,
+  "min": 8.038145999989865,
+  "max": 10.829629999989265
+ },
+ "tick_ms": {
+  "median": 27.592103999950268,
+  "mean": 27.90455066663829,
+  "min": 25.67180500000177,
+  "max": 31.534262000150193
+ },
+ "capture": "ok",
+ "tick_ms_captured": {
+  "median": 2.0887485000002926,
+  "mean": 2.2893947999743127,
+  "min": 1.8565085000545878,
+  "max": 4.537342499929764
+ },
+ "rigid_contacts": 204,
+ "nefc_mean": 97.0,
+ "finite": true,
+ "maxrss_mb": 928.8671875
+}

@@ -1,0 +1,2927 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/rigid_fma/cache_warp-innate-integrated/1.18.0.dev20260917
+WARP /Users/aditya/robosim/upstream/warp-innate-integrated/warp/__init__.py /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/rigid_fma/cache_warp-innate-integrated/1.18.0.dev20260917
+......FFF........................F...................................... [ 25%]
+...............................................F........................ [ 51%]
+......................................F................................. [ 77%]
+.............................................................            [100%]
+=================================== FAILURES ===================================
+________________ test_g1_flat_bounds_hold_under_random_actions _________________
+
+    def test_g1_flat_bounds_hold_under_random_actions():
+        task = _g1(64, njmax="auto", nconmax="auto")
+        b = task.sim.capacity_bounds
+        assert b is not None
+        # 3 colliders (two feet, torso) against the plane at <= 4 each, 3 mesh-mesh pairs at <= 4 (MULTICCD), 37 limited hinges
+        assert (b.ncon, b.nlimit, b.neq_rows, b.nfriction) == (24, 37, 0, 0)
+>       assert b.nefc == 37 + 24 * 4 and task.sim.d.njmax == b.njmax == 144 and task.sim.d.naconmax == 24 * 64
+E       assert (109 == (37 + (24 * 4)))
+E        +  where 109 = Bounds(ncon=24, nefc=109, nlimit=37, neq_rows=0, nfriction=0, pairs=((0, 1, 4, 3), (0, 2, 4, 3), (0, 3, 4, 3), (1, 2, 4, 3), (1, 3, 4, 3), (2, 3, 4, 3))).nefc
+
+tests/test_capacity.py:58: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Module mujoco_warp._src.smooth 0013a15 load on device 'metal:0' took 2058.18 ms  (compiled)
+Module _nxn_broadphase__locals__kernel_01b2c5c3 01b2c5c load on device 'metal:0' took 523.60 ms  (compiled)
+Module ccd_kernel_builder__locals__ccd_kernel_b49bbe35 b49bbe3 load on device 'metal:0' took 2935.71 ms  (compiled)
+Module _primitive_narrowphase__locals__primitive_narrowphase_6de3b037 6de3b03 load on device 'metal:0' took 875.16 ms  (compiled)
+Module mujoco_warp._src.constraint 9c8d860 load on device 'metal:0' took 383.30 ms  (compiled)
+Module _friction_dof__locals__kernel_0653e6db 0653e6d load on device 'metal:0' took 409.26 ms  (compiled)
+Module _limit_slide_hinge__locals__kernel_b7186e16 b7186e1 load on device 'metal:0' took 413.35 ms  (compiled)
+Module _efc_contact_init__locals__kernel_38708462 3870846 load on device 'metal:0' took 375.90 ms  (compiled)
+Module _efc_contact_jac_dense__locals__kernel_9b00bb44 898d395 load on device 'metal:0' took 460.11 ms  (compiled)
+Module _efc_contact_update__locals__kernel_8f3e2fdc 8f3e2fd load on device 'metal:0' took 413.37 ms  (compiled)
+Module mujoco_warp._src.forward 7e4f1b9 load on device 'metal:0' took 1459.20 ms  (compiled)
+Module mujoco_warp._src.passive e3c4040 load on device 'metal:0' took 1260.47 ms  (compiled)
+Module _qfrc_passive_kernel__locals__kernel_c7aeef07 c7aeef0 load on device 'metal:0' took 365.71 ms  (compiled)
+Module mujoco_warp._src.forward 139e214 load on device 'metal:0' took 1487.15 ms  (compiled)
+Module _qfrc_smooth__locals__kernel_0ec120f1 0ec120f load on device 'metal:0' took 375.42 ms  (compiled)
+Module mujoco_warp._src.support b7ccfe3 load on device 'metal:0' took 440.65 ms  (compiled)
+Module _factor_i_sparse_unrolled__locals__kernel_532dc138 4498b90 load on device 'metal:0' took 445.58 ms  (compiled)
+Module _solve_LD_sparse_serial__locals__kernel_af56dcd0 67dbba6 load on device 'metal:0' took 476.53 ms  (compiled)
+Module _solve_init_dof__locals__kernel_26e2a7ba 26e2a7b load on device 'metal:0' took 373.96 ms  (compiled)
+Module _solve_init_efc__locals__kernel_de9f920b de9f920 load on device 'metal:0' took 375.33 ms  (compiled)
+Module _solve_init_jaref_kernel__locals__kernel_39a2452b 39a2452 load on device 'metal:0' took 390.98 ms  (compiled)
+Module mul_m_kernel__locals___mul_m_41848a54 41848a5 load on device 'metal:0' took 387.65 ms  (compiled)
+Module _update_constraint_efc__locals__kernel_18ce639d 18ce639 load on device 'metal:0' took 406.66 ms  (compiled)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_0bf3e5c3 0bf3e5c load on device 'metal:0' took 371.22 ms  (compiled)
+Module _update_gradient_zero_grad_dot__locals__kernel_3b1a23bd 3b1a23b load on device 'metal:0' took 364.88 ms  (compiled)
+Module _update_gradient_grad__locals__kernel_b00ce470 b00ce47 load on device 'metal:0' took 375.54 ms  (compiled)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_b68892b5 ddcd77f load on device 'metal:0' took 453.20 ms  (compiled)
+Module mujoco_warp._src.solver b8326d5 load on device 'metal:0' took 576.43 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_49d69a43 2c21d80 load on device 'metal:0' took 673.98 ms  (compiled)
+Module _linesearch_iterative_kernel__locals__kernel_20363347 682d8a6 load on device 'metal:0' took 750.63 ms  (compiled)
+Module _update_constraint_gradient_fused__locals__kernel_207e2b22 036e4c2 load on device 'metal:0' took 503.44 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_b9428c11 9c0b697 load on device 'metal:0' took 691.01 ms  (compiled)
+Module _solve_done__locals__kernel_a226f05d a226f05 load on device 'metal:0' took 377.91 ms  (compiled)
+Module mujoco_warp._src.sensor 016e668 load on device 'metal:0' took 1956.59 ms  (compiled)
+Module mujoco_warp._src.derivative 8666b4e load on device 'metal:0' took 896.11 ms  (compiled)
+Module _next_time_builder__locals___next_time_74ff8a63 74ff8a6 load on device 'metal:0' took 368.05 ms  (compiled)
+Module reset_data__locals__reset_xfrc_applied_ee908bbb ee908bb load on device 'metal:0' took 370.44 ms  (compiled)
+Module reset_data__locals__reset_M_875d3525 875d352 load on device 'metal:0' took 380.20 ms  (compiled)
+Module reset_data__locals__reset_mocap_f897047f f897047 load on device 'metal:0' took 386.62 ms  (compiled)
+Module reset_data__locals__reset_contact_ba9ea68c ba9ea68 load on device 'metal:0' took 399.20 ms  (compiled)
+Module reset_data__locals__reset_sleep_ec690ced ec690ce load on device 'metal:0' took 368.53 ms  (compiled)
+Module reset_data__locals__reset_nworld_2cf992b6 2cf992b load on device 'metal:0' took 385.70 ms  (compiled)
+Module metalsim.sensors.contact fa5735a load on device 'metal:0' took 730.44 ms  (compiled)
+Module metalsim.learn.g1_velocity 361a339 load on device 'metal:0' took 1094.90 ms  (compiled)
+Module _solve_init_efc__locals__kernel_2ebc3b82 2ebc3b8 load on device 'metal:0' took 365.85 ms  (compiled)
+Module _solve_done__locals__kernel_0e1e1718 0e1e171 load on device 'metal:0' took 376.46 ms  (compiled)
+___________________ test_g1_flat_task_defaults_to_the_bound ____________________
+
+    def test_g1_flat_task_defaults_to_the_bound():
+        task = _g1(16)          # no overrides: the task's own capacities on flat terrain
+>       assert task.sim.capacity_bounds is not None and task.sim.d.njmax == 144 and task.sim.d.naconmax == 24 * 16
+E       assert (Bounds(ncon=24, nefc=109, nlimit=37, neq_rows=0, nfriction=0, pairs=((0, 1, 4, 3), (0, 2, 4, 3), (0, 3, 4, 3), (1, 2, 4, 3), (1, 3, 4, 3), (2, 3, 4, 3))) is not None and 112 == 144)
+E        +  where Bounds(ncon=24, nefc=109, nlimit=37, neq_rows=0, nfriction=0, pairs=((0, 1, 4, 3), (0, 2, 4, 3), (0, 3, 4, 3), (1, 2, 4, 3), (1, 3, 4, 3), (2, 3, 4, 3))) = <metalsim.physics.batch.BatchSim object at 0x133a7e540>.capacity_bounds
+E        +    where <metalsim.physics.batch.BatchSim object at 0x133a7e540> = <metalsim.learn.g1_velocity.G1VelocityTask object at 0x177ca3140>.sim
+E        +  and   112 = Data(solver_niter=array(shape=(16,), dtype=int32), ne=array(shape=(16,), dtype=int32), nf=array(shape=(16,), dtype=int...0), dtype=quatf), qacc_ws_prev=array(shape=(16, 43), dtype=float32), qacc_ws_last=array(shape=(16, 43), dtype=float32)).njmax
+E        +    where Data(solver_niter=array(shape=(16,), dtype=int32), ne=array(shape=(16,), dtype=int32), nf=array(shape=(16,), dtype=int...0), dtype=quatf), qacc_ws_prev=array(shape=(16, 43), dtype=float32), qacc_ws_last=array(shape=(16, 43), dtype=float32)) = <metalsim.physics.batch.BatchSim object at 0x133a7e540>.d
+E        +      where <metalsim.physics.batch.BatchSim object at 0x133a7e540> = <metalsim.learn.g1_velocity.G1VelocityTask object at 0x177ca3140>.sim
+
+tests/test_capacity.py:67: AssertionError
+__________________ test_check_overflow_raises_on_dropped_rows __________________
+
+    def test_check_overflow_raises_on_dropped_rows():
+        task = _g1(64, njmax=32, nconmax=24)   # the build pose needs 32 rows (8 foot contacts); random actions drive limits and contacts past it
+        _random_steps(task, 100)
+>       with pytest.raises(RuntimeError, match="capacity overflow"):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE RuntimeError
+
+tests/test_capacity.py:73: Failed
+----------------------------- Captured stdout call -----------------------------
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_13c977a3 fa9d892 load on device 'metal:0' took 463.55 ms  (compiled)
+Module metalsim.learn.warp_policy aa23b94 load on device 'metal:0' took 488.18 ms  (compiled)
+________________________ test_rough_task_runs_on_newton ________________________
+
+    def test_rough_task_runs_on_newton():
+        """The rough task (heightfield, height scan, curriculum) steps on Newton; the torso pose the height
+        scanner reads is MuJoCo's for the same state."""
+        from metalsim.learn.g1_velocity import benchmark_step
+        n = 8
+>       task = G1VelocityTask(n, terrain="rough", seed=0, **NEWTON)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_g1_newton_engine.py:182: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/learn/g1_velocity.py:626: in __init__
+    self.sim = NewtonSim(m, n, iterations=newton_iterations, dt=newton_dt, control_dt=CONTROL_DT, device=device,
+metalsim/physics/newton_backend.py:659: in __init__
+    self.contacts = self.pipeline.contacts(); self.pipeline.collide(self.s0, self.contacts)
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/newton/_src/sim/collide.py:2409: in collide
+    self.narrow_phase.launch_custom_write(
+.venv/lib/python3.12/site-packages/newton/_src/geometry/narrow_phase.py:3185: in launch_custom_write
+    wp.launch(
+upstream/warp-innate-integrated/warp/_src/context.py:12565: in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint, dim_limit=dim_limit)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+kernel = <warp._src.context.Kernel object at 0x121b5b080>
+hooks = <warp._src.context.KernelHooks object at 0x1793cbe30>
+params = [<warp._src.types.launch_bounds_1d_t object at 0x3c428cad0>, <warp._src.codegen.Struct.__init__.<locals>.StructType ob...at 0x17934a6d0>, <warp._src.types.array_t object at 0x17934a750>, <warp._src.types.array_t object at 0x3c429e2d0>, ...]
+device = 'metal:0', block_dim = 128, adjoint = False, dim_limit = None
+det_args = None
+
+    def invoke_metal(
+        kernel,
+        hooks,
+        params: Sequence[Any],
+        device: Device,
+        block_dim: int,
+        adjoint: bool = False,
+        dim_limit: warp.array | None = None,
+        det_args=None,
+    ):
+        """Dispatch a forward or backward kernel on a Metal device.
+    
+        With ``dim_limit`` (a forward launch), only the threadgroups holding tasks whose leading index is below
+        ``dim_limit[0]`` run (see :func:`warp.launch`).
+    
+        ``det_args`` carries the deterministic-mode buffers of kernels with deterministic lowering
+        (``warp._src.metal_deterministic``).
+        """
+        if hooks.metal_unsupported:
+            detail = ""
+            if "int64)" in hooks.metal_unsupported:
+                detail = (
+                    ". Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit "
+                    "atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; "
+                    "use 32-bit atomics (e.g. on one half of the value) instead"
+                )
+>           raise RuntimeError(
+                f"Kernel '{kernel.key}' uses builtins that are not supported on Metal yet: {hooks.metal_unsupported}"
+                + detail
+            )
+E           RuntimeError: Kernel 'reduce_buffered_contacts_kernel' uses builtins that are not supported on Metal yet: atomic_cas(uint64). Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; use 32-bit atomics (e.g. on one half of the value) instead
+
+upstream/warp-innate-integrated/warp/_src/context.py:11473: RuntimeError
+----------------------------- Captured stdout call -----------------------------
+Module newton._src.geometry.narrow_phase a046df0 load on device 'metal:0' took 774.86 ms  (compiled)
+Module newton._src.geometry.contact_reduction_global c115ee8 load on device 'metal:0' took 1004.81 ms  (compiled)
+Module mesh_triangle_contacts_to_reducer_kernel_a070aa5c dddc751 load on device 'metal:0' took 2573.13 ms  (compiled)
+Module newton._src.geometry.contact_reduction_global 8e0a2b3 load on device 'metal:0' took 938.42 ms  (compiled)
+___________________ test_one_step_parity_vs_mujoco_c[panda] ____________________
+
+name = 'panda'
+path = '/Users/aditya/robosim/upstream/mujoco_menagerie/franka_emika_panda/scene.xml'
+tol = 0.005
+
+    @pytest.mark.parametrize("name,path,tol", ROBOTS, ids=[r[0] for r in ROBOTS])
+    def test_one_step_parity_vs_mujoco_c(name, path, tol):
+        if not os.path.exists(path):
+            pytest.skip(f"missing {path}")
+        model = mujoco.MjModel.from_xml_path(path)
+        n = 8
+        states, ctrls = _cpu_states(model, n, seed=1)
+        sim = BatchSim(model, n, options=BatchSimOptions(capture=False))
+        # load the n states into the n worlds, step once on Metal
+        sim.synchronize()
+        qpos = sim.d.qpos.numpy(); qvel = sim.d.qvel.numpy(); ctrl = sim.d.ctrl.numpy()
+        act = sim.d.act.numpy() if model.na else None
+        for w, (q, v, a) in enumerate(states):
+            qpos[w], qvel[w], ctrl[w] = q, v, ctrls[w]
+            if model.na:
+                act[w] = a
+        sim.d.qpos.assign(qpos); sim.d.qvel.assign(qvel); sim.d.ctrl.assign(ctrl)
+        if model.na:
+            sim.d.act.assign(act)
+>       sim.forward()
+
+tests/test_physics.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/physics/batch.py:286: in forward
+    self._run("forward")
+metalsim/physics/batch.py:223: in _run
+    mjw.forward(self.m, self.d)
+upstream/mujoco_warp/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp/mujoco_warp/_src/forward.py:1824: in forward
+    fwd_velocity(m, d)
+upstream/mujoco_warp/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp/mujoco_warp/_src/forward.py:1196: in fwd_velocity
+    smooth.tendon_bias(m, d, d.qfrc_bias)
+upstream/mujoco_warp/mujoco_warp/_src/warp_util.py:123: in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+upstream/mujoco_warp/mujoco_warp/_src/smooth.py:2974: in tendon_bias
+    wp.launch(
+upstream/warp-innate-integrated/warp/_src/context.py:12443: in launch
+    hooks = module_exec.get_kernel_hooks(kernel)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <warp._src.context.ModuleExec object at 0x133bba900>
+kernel = <warp._src.context.Kernel object at 0x117292090>
+
+    def get_kernel_hooks(self, kernel) -> KernelHooks:
+        # Key by the mangled name (compiled-symbol identity), not kernel.adj, which pinned one
+        # Adjoint per closure-recreated kernel -- a leak the live-kernel WeakSet can't reclaim.
+        # Keep symbol identity tied to this executable, even if another variant
+        # has changed the shared Kernel.hash. New equivalent kernels can reuse it.
+        name = self.get_kernel_mangled_name(kernel)
+    
+        hooks = self.kernel_hooks.get(name)
+        if hooks is not None:
+            return hooks
+    
+        options = kernel.module.options | kernel.options
+    
+        if self.device.is_cuda:
+            if options.get("entry_point_abi", "warp") != "warp":
+                raise RuntimeError(
+                    f"Kernel '{kernel.key}' uses entry_point_abi='{options['entry_point_abi']}' and cannot be launched with wp.launch()."
+                )
+    
+            forward_name = warp._src.codegen.cuda_kernel_forward_name(kernel, name=name)
+            forward_kernel = runtime.core.wp_cuda_get_kernel(
+                self.device.context, self.handle, forward_name.encode("utf-8")
+            )
+    
+            if options["enable_backward"]:
+                backward_name = warp._src.codegen.cuda_kernel_backward_name(kernel, name=name)
+                backward_kernel = runtime.core.wp_cuda_get_kernel(
+                    self.device.context, self.handle, backward_name.encode("utf-8")
+                )
+            else:
+                backward_kernel = None
+    
+            # look up the required shared memory size for each kernel from module metadata
+            forward_smem_bytes = self.meta[forward_name + "_smem_bytes"]
+            backward_smem_bytes = self.meta[backward_name + "_smem_bytes"] if options["enable_backward"] else 0
+    
+            # configure kernels maximum shared memory size
+            max_smem_bytes = self.device.max_shared_memory_per_block
+    
+            def configure_smem(kernel_func, direction: str, requested: int) -> str | None:
+                """Configure dynamic shared memory, warning and returning a shortfall clause on failure."""
+                if runtime.core.wp_cuda_configure_kernel_shared_memory(kernel_func, requested):
+                    return None
+    
+                static_smem_bytes = runtime.core.wp_cuda_get_kernel_static_shared_memory(
+                    self.device.context, kernel_func
+                )
+                shortfall = _smem_shortfall_clause(self.block_dim, requested, static_smem_bytes, max_smem_bytes)
+                if shortfall is None:
+                    # The driver rejected the request for some reason other than overflow, or the
+                    # static size is unknown, so there is no budget to report.
+                    log_warning(
+                        f"Failed to configure {requested} bytes of dynamic shared memory for kernel "
+                        f"'{kernel.key}' ({direction}) on {self.device.alias}."
+                    )
+                    return None
+    
+                log_warning(
+                    f"Failed to configure dynamic shared memory for kernel '{kernel.key}' ({direction}) on "
+                    f"{self.device.alias}: requests {requested} bytes, {shortfall}."
+                )
+                return shortfall
+    
+            forward_smem_shortfall = configure_smem(forward_kernel, "forward", forward_smem_bytes)
+            backward_smem_shortfall = (
+                configure_smem(backward_kernel, "backward", backward_smem_bytes) if options["enable_backward"] else None
+            )
+    
+            # Resolve the effective cluster_dim once here (cached on the hooks)
+            # and configure the cluster attribute on the loaded CUfunction(s).
+            # status: "active" configures the attribute, "ignored" stays
+            # unclustered, "dropped" raises; see _cluster_dim_target_status.
+            effective_cluster_dim = 1
+            cluster_dim = _normalize_cluster_dim(options.get("cluster_dim", 1))
+            if cluster_dim != 1:
+                # Classify against the target the loaded binary was compiled for,
+                # frozen on this ModuleExec at load time. Re-reading the global
+                # config here would misclassify an already-loaded module if the
+                # config changed between load and first launch.
+                compile_arch = self.compile_arch
+                status = _cluster_dim_target_status(self.device.arch, compile_arch)
+                if status == "dropped":
+                    raise RuntimeError(
+                        f"Kernel {forward_name!r} requests cluster_dim={cluster_dim} on {self.device.alias} "
+                        f"(sm_{self.device.arch}), but the module was compiled for sm_{compile_arch}, where "
+                        f"thread block clusters are unavailable and the cluster attribute is dropped. Raise "
+                        f"warp.config.ptx_target_arch to >= 90 or build CUBIN for this device to use "
+                        f"clustering, or remove cluster_dim."
+                    )
+                if status == "active":
+                    effective_cluster_dim = cluster_dim
+                    if not runtime.core.wp_cuda_set_kernel_cluster_attrs(forward_kernel, cluster_dim, 1, 1):
+                        log_warning(
+                            f"Failed to set cluster attributes on {forward_name} for "
+                            f"cluster_dim={cluster_dim}; launches may fail on this device"
+                        )
+                    if options["enable_backward"] and not runtime.core.wp_cuda_set_kernel_cluster_attrs(
+                        backward_kernel, cluster_dim, 1, 1
+                    ):
+                        log_warning(
+                            f"Failed to set cluster attributes on {backward_name} for "
+                            f"cluster_dim={cluster_dim}; launches may fail on this device"
+                        )
+    
+            hooks = KernelHooks(
+                forward_kernel,
+                backward_kernel,
+                forward_smem_bytes,
+                backward_smem_bytes,
+                cluster_dim=effective_cluster_dim,
+                det_launch_meta=self.det_launch_meta_map.get(name),
+                forward_smem_shortfall=forward_smem_shortfall,
+                backward_smem_shortfall=backward_smem_shortfall,
+            )
+    
+        elif self.device.is_metal:
+            unsupported = self.metal_unsupported.get(name)
+            forward = (
+                None
+                if unsupported
+                else runtime.core.wp_metal_get_kernel(self.handle, (name + "_metal_forward").encode("utf-8"))
+            )
+            if not forward and not unsupported:
+>               raise RuntimeError(
+                    f"Failed to load kernel '{kernel.key}' on device '{self.device}': {runtime.get_error_string()}"
+                )
+E               RuntimeError: Failed to load kernel '_tendon_dot' on device 'metal:0': Failed to create Metal pipeline for kernel "_tendon_dot_62db264d_metal_forward": Compilation failed due to an interrupted connection: XPC_ERROR_CONNECTION_INTERRUPTED. This error occurred after multiple retries.
+
+upstream/warp-innate-integrated/warp/_src/context.py:4046: RuntimeError
+----------------------------- Captured stdout call -----------------------------
+Module _equality_joint__locals__kernel_fa5d9367 fa5d936 load on device 'metal:0' took 448.37 ms  (compiled)
+Module _friction_tendon__locals__kernel_f284afdb f284afd load on device 'metal:0' took 419.48 ms  (compiled)
+----------------------------- Captured stderr call -----------------------------
+Failed to create Metal pipeline for kernel "_tendon_dot_62db264d_metal_forward": Compilation failed due to an interrupted connection: XPC_ERROR_CONNECTION_INTERRUPTED. This error occurred after multiple retries.
+_________________________ test_env_map_usd_dome_import _________________________
+
+tmp_path = PosixPath('/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_env_map_usd_dome_import0')
+
+    def test_env_map_usd_dome_import(tmp_path):
+        """A USD DomeLight with inputs:texture:file flows through the importer (custom text ``usd_dome``) to
+        set_environment with USD's light scale (intensity x 2^exposure x color) and the prim's yaw; a furnace under
+        a constant textured dome reads S x that scale, and the RGBE reader reproduces the written values."""
+        pxr = pytest.importorskip("pxr")
+        from pxr import Usd, UsdGeom, UsdLux, UsdPhysics
+        from metalsim.render.hdr import load_hdr
+        from metalsim.scene.usd_to_mjcf import load_usd
+        hdr_path = str(tmp_path / "const.hdr")
+        _write_rgbe(hdr_path, np.full((8, 16, 3), 0.5, np.float32))
+        assert np.allclose(load_hdr(hdr_path), 0.5, rtol=0.01)
+        stage = Usd.Stage.CreateNew(str(tmp_path / "dome.usda"))
+        UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z); UsdGeom.SetStageMetersPerUnit(stage, 1.0)
+        world = UsdGeom.Xform.Define(stage, "/World"); stage.SetDefaultPrim(world.GetPrim())
+        dome = UsdLux.DomeLight.Define(stage, "/World/skyLight")
+        dome.CreateTextureFileAttr("./const.hdr"); dome.CreateTextureFormatAttr("latlong")
+        dome.CreateIntensityAttr(2.0); dome.CreateExposureAttr(1.0); dome.CreateColorAttr((1.0, 0.5, 0.25))
+        UsdGeom.Xformable(dome.GetPrim()).AddRotateZOp().Set(30.0)
+        plane = UsdGeom.Cube.Define(stage, "/World/floor"); plane.CreateSizeAttr(1.0)
+        UsdGeom.Xformable(plane.GetPrim()).AddScaleOp().Set((100.0, 100.0, 0.02))
+        UsdGeom.Xformable(plane.GetPrim()).AddTranslateOp().Set((0.0, 0.0, -0.5))
+        UsdPhysics.CollisionAPI.Apply(plane.GetPrim())
+        cam = UsdGeom.Camera.Define(stage, "/World/cam")
+        UsdGeom.Xformable(cam.GetPrim()).AddTranslateOp().Set((0.0, 0.0, 2.0))   # a USD camera looks down its -z: straight down
+        stage.GetRootLayer().Save()
+        spec = load_usd(str(tmp_path / "dome.usda"))
+        spec.visual.headlight.active = 0
+        mat = spec.add_material(); mat.name = "matte"; mat.rgba = [0.8, 0.8, 0.8, 1.0]; mat.specular = 0.0; mat.shininess = 0.0
+        for g in spec.geoms:
+            g.material = "matte"
+        m = spec.compile()
+        assert m.ntext == 1 and mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_TEXT, 0) == "usd_dome"
+        rend = Tier2Renderer(m, 1, width=32, height=32, camera="cam", spp=32, max_bounces=1, headlight=False)
+        rec = rend.set_environment_from_model(m)
+        print("usd dome record:", rec)
+        assert os.path.realpath(rec["file"]) == os.path.realpath(hdr_path) and rec["format"] == "latlong"
+        assert abs(rec["yaw"] - np.radians(30)) < 1e-6 and rec["tilt"] < 0.01
+>       assert rend.env_flags == 32 and np.isclose(rend.consts.view(np.float32)[20], np.radians(30))
+E       AssertionError: assert (32 == 32 and np.False_)
+E        +  where 32 = <metalsim.render.tier2.Tier2Renderer object at 0x3c3221a30>.env_flags
+E        +  and   np.False_ = <function isclose at 0x109b66cf0>(np.float32(-1.0471976), np.float64(0.5235987755982988))
+E        +    where <function isclose at 0x109b66cf0> = np.isclose
+E        +    and   np.float64(0.5235987755982988) = <ufunc 'radians'>(30)
+E        +      where <ufunc 'radians'> = np.radians
+
+tests/test_render_tier2.py:226: AssertionError
+----------------------------- Captured stdout call -----------------------------
+usd dome record: {'prim': '/World/skyLight', 'intensity': 2.0, 'exposure': 1.0, 'color': [1.0, 0.5, 0.25], 'file': '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_env_map_usd_dome_import0/const.hdr', 'format': 'latlong', 'yaw': 0.5235987755982987, 'tilt': 0.0001620618913188485}
+=============================== warnings summary ===============================
+tests/test_g1_newton_engine.py::test_graph_replay_matches_eager
+  /Users/aditya/robosim/metalsim/learn/g1_velocity.py:980: RuntimeWarning: Mean of empty slice
+    return {"num_envs": n, "frames": num_frames, "mean_step_ms": t_ns.mean() / 1e6, "fps_isaac_style": n / (t_ns.mean() / 1e9)}
+
+tests/test_g1_newton_engine.py::test_graph_replay_matches_eager
+  /Users/aditya/robosim/.venv/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+    ret = ret.dtype.type(ret / rcount)
+
+tests/test_g1_task_terms.py::test_rough_terrain_seed_and_isaac_env_assignment
+tests/test_g1_task_terms.py::test_il3_rough_defaults
+tests/test_g1_task_terms.py::test_trainer_first_observation_comes_from_the_task_reset[rough-rough_isaac]
+tests/test_g1_task_terms.py::test_trainer_first_observation_comes_from_the_task_reset[rough-rough_il3]
+tests/test_terrain.py::test_g1_rough_task_runs
+tests/test_terrain.py::test_hfield_mesh_contacts_match_mujoco_c
+tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[boxes]
+tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[meshes]
+tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[boxes_local]
+  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+tests/test_physics.py::test_one_step_parity_vs_mujoco_c[go1]
+tests/test_render_tier2.py::test_gpu_path_from_batchsim_matches_host
+tests/test_sensors_rt.py::test_gpu_path_ordering_with_sim
+  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+==================================== PASSES ====================================
+_______________ test_fast_update_matches_plain[0-True-100-False] _______________
+----------------------------- Captured stdout call -----------------------------
+log_std: fast 3e-08 torch 3e-08; cnn.conv.0.weight: fast 4e-04 torch 4e-04; cnn.conv.0.bias: fast 5e-04 torch 5e-04; cnn.conv.2.weight: fast 8e-07 torch 2e-04; cnn.conv.2.bias: fast 5e-07 torch 1e-04; cnn.conv.4.weight: fast 1e-06 torch 9e-07; cnn.conv.4.bias: fast 7e-07 torch 5e-07; cnn.fc.0.weight: fast 9e-07 torch 9e-07; cnn.fc.0.bias: fast 5e-07 torch 6e-07; pi.weight: fast 3e-06 torch 3e-06; pi.bias: fast 2e-07 torch 8e-08; v.weight: fast 4e-06 torch 4e-06; v.bias: fast 2e-07 torch 3e-07
+------------------------------ Captured log call -------------------------------
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:structured.py:28 
+DEBUG    torch.__trace:structured.py:28 
+DEBUG    torch.__trace:structured.py:28 
+DEBUG    torch.__trace:structured.py:28 
+DEBUG    torch.__trace:structured.py:28 
+DEBUG    torch.__trace:structured.py:28 
+DEBUG    torch.__trace:structured.py:28 
+DEBUG    torch.__trace:structured.py:28 
+DEBUG    torch.__trace:structured.py:28 
+DEBUG    torch.__trace:structured.py:28 
+DEBUG    torch.__trace:structured.py:28 
+DEBUG    torch.__trace:convert_frame.py:304 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:output_graph.py:2942 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:aot_autograd_result.py:405 
+DEBUG    torch.__trace:aot_autograd_result.py:415 
+DEBUG    torch.__trace:aot_autograd_result.py:435 
+DEBUG    torch.__trace:aot_autograd_result.py:445 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codecache.py:2148 
+DEBUG    torch.__trace:codecache.py:2156 
+DEBUG    torch.__trace:codecache.py:2160 
+DEBUG    torch.__trace:codecache.py:2168 
+DEBUG    torch.__trace:codecache.py:2176 
+DEBUG    torch.__trace:aot_autograd_result.py:217 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codecache.py:2148 
+DEBUG    torch.__trace:codecache.py:2156 
+DEBUG    torch.__trace:codecache.py:2160 
+DEBUG    torch.__trace:codecache.py:2168 
+DEBUG    torch.__trace:codecache.py:2176 
+DEBUG    torch.__trace:aot_autograd_result.py:217 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:utils.py:2402 
+DEBUG    torch.__trace:autograd_cache.py:1200 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:guards.py:4769 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2022 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:guards.py:5625 
+DEBUG    torch.__trace:convert_frame.py:304 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:output_graph.py:2942 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:aot_autograd_result.py:405 
+DEBUG    torch.__trace:aot_autograd_result.py:415 
+DEBUG    torch.__trace:aot_autograd_result.py:435 
+DEBUG    torch.__trace:aot_autograd_result.py:445 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codecache.py:2148 
+DEBUG    torch.__trace:codecache.py:2156 
+DEBUG    torch.__trace:codecache.py:2160 
+DEBUG    torch.__trace:codecache.py:2168 
+DEBUG    torch.__trace:codecache.py:2176 
+DEBUG    torch.__trace:aot_autograd_result.py:217 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codecache.py:2148 
+DEBUG    torch.__trace:codecache.py:2156 
+DEBUG    torch.__trace:codecache.py:2160 
+DEBUG    torch.__trace:codecache.py:2168 
+DEBUG    torch.__trace:codecache.py:2176 
+DEBUG    torch.__trace:aot_autograd_result.py:217 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:utils.py:2402 
+DEBUG    torch.__trace:autograd_cache.py:1200 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:guards.py:4769 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2022 
+DEBUG    torch.__trace:utils.py:2363
+_______________ test_fast_update_matches_plain[0-True-100-True] ________________
+----------------------------- Captured stdout call -----------------------------
+log_std: fast 9e-08 torch 3e-08; cnn.conv.0.weight: fast 4e-04 torch 4e-04; cnn.conv.0.bias: fast 5e-04 torch 5e-04; cnn.conv.2.weight: fast 8e-07 torch 2e-04; cnn.conv.2.bias: fast 7e-07 torch 1e-04; cnn.conv.4.weight: fast 1e-06 torch 9e-07; cnn.conv.4.bias: fast 7e-07 torch 5e-07; cnn.fc.0.weight: fast 9e-07 torch 9e-07; cnn.fc.0.bias: fast 6e-07 torch 6e-07; pi.weight: fast 3e-06 torch 3e-06; pi.bias: fast 8e-08 torch 8e-08; v.weight: fast 3e-06 torch 4e-06; v.bias: fast 1e-07 torch 3e-07
+------------------------------ Captured log call -------------------------------
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:guards.py:5625 
+DEBUG    torch.__trace:convert_frame.py:304 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:output_graph.py:2942 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2402 
+DEBUG    torch.__trace:autograd_cache.py:1200 
+DEBUG    torch.__trace:compile_fx.py:2841 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:compile_fx.py:2872 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:graph_compile.py:1820 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:graph_compile.py:1841 
+DEBUG    torch.__trace:graph_compile.py:1891 
+DEBUG    torch.__trace:graph_compile.py:1909 
+DEBUG    torch.__trace:graph_compile.py:1913 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codecache.py:2148 
+DEBUG    torch.__trace:codecache.py:2156 
+DEBUG    torch.__trace:codecache.py:2160 
+DEBUG    torch.__trace:codecache.py:2168 
+DEBUG    torch.__trace:codecache.py:2176 
+DEBUG    torch.__trace:utils.py:2402 
+DEBUG    torch.__trace:compile_fx.py:1272 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:guards.py:4769 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2022 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codecache.py:2148 
+DEBUG    torch.__trace:codecache.py:2156 
+DEBUG    torch.__trace:codecache.py:2160 
+DEBUG    torch.__trace:codecache.py:2168 
+DEBUG    torch.__trace:codecache.py:2176 
+DEBUG    torch.__trace:utils.py:2402 
+DEBUG    torch.__trace:compile_fx.py:1272 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2022 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:guards.py:5625 
+DEBUG    torch.__trace:convert_frame.py:304 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:output_graph.py:2942 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2402 
+DEBUG    torch.__trace:autograd_cache.py:1200 
+DEBUG    torch.__trace:compile_fx.py:2841 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:compile_fx.py:2872 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:graph_compile.py:1820 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:graph_compile.py:1841 
+DEBUG    torch.__trace:graph_compile.py:1891 
+DEBUG    torch.__trace:graph_compile.py:1909 
+DEBUG    torch.__trace:graph_compile.py:1913 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codecache.py:2148 
+DEBUG    torch.__trace:codecache.py:2156 
+DEBUG    torch.__trace:codecache.py:2160 
+DEBUG    torch.__trace:codecache.py:2168 
+DEBUG    torch.__trace:codecache.py:2176 
+DEBUG    torch.__trace:utils.py:2402 
+DEBUG    torch.__trace:compile_fx.py:1272 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:guards.py:4769 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2022 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codecache.py:2148 
+DEBUG    torch.__trace:codecache.py:2156 
+DEBUG    torch.__trace:codecache.py:2160 
+DEBUG    torch.__trace:codecache.py:2168 
+DEBUG    torch.__trace:codecache.py:2176 
+DEBUG    torch.__trace:utils.py:2402 
+DEBUG    torch.__trace:compile_fx.py:1272 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2022
+______________ test_fast_update_matches_plain[4-False-100-False] _______________
+----------------------------- Captured stdout call -----------------------------
+log_std: fast 8e-08 torch 9e-09; cnn.conv.0.weight: fast 2e-06 torch 2e-06; cnn.conv.0.bias: fast 7e-07 torch 6e-07; cnn.conv.2.weight: fast 2e-06 torch 2e-06; cnn.conv.2.bias: fast 9e-07 torch 1e-06; cnn.conv.4.weight: fast 9e-07 torch 1e-06; cnn.conv.4.bias: fast 6e-07 torch 6e-07; cnn.fc.0.weight: fast 1e-06 torch 1e-06; cnn.fc.0.bias: fast 6e-07 torch 6e-07; qpos.0.weight: fast 3e-07 torch 3e-07; qpos.0.bias: fast 4e-07 torch 3e-07; pi.0.weight: fast 7e-07 torch 7e-07; pi.0.bias: fast 4e-07 torch 4e-07; pi.2.weight: fast 3e-07 torch 3e-07; pi.2.bias: fast 2e-07 torch 2e-07; v.0.weight: fast 4e-07 torch 4e-07; v.0.bias: fast 2e-07 torch 2e-07; v.2.weight: fast 3e-07 torch 3e-07; v.2.bias: fast 7e-08 torch 1e-07
+------------------------------ Captured log call -------------------------------
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:guards.py:5625 
+DEBUG    torch.__trace:convert_frame.py:304 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:output_graph.py:2942 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:aot_autograd_result.py:405 
+DEBUG    torch.__trace:aot_autograd_result.py:415 
+DEBUG    torch.__trace:aot_autograd_result.py:435 
+DEBUG    torch.__trace:aot_autograd_result.py:445 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codecache.py:2148 
+DEBUG    torch.__trace:codecache.py:2156 
+DEBUG    torch.__trace:codecache.py:2160 
+DEBUG    torch.__trace:codecache.py:2168 
+DEBUG    torch.__trace:codecache.py:2176 
+DEBUG    torch.__trace:aot_autograd_result.py:217 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codecache.py:2148 
+DEBUG    torch.__trace:codecache.py:2156 
+DEBUG    torch.__trace:codecache.py:2160 
+DEBUG    torch.__trace:codecache.py:2168 
+DEBUG    torch.__trace:codecache.py:2176 
+DEBUG    torch.__trace:aot_autograd_result.py:217 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:utils.py:2402 
+DEBUG    torch.__trace:autograd_cache.py:1200 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:guards.py:4769 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2022 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:guards.py:5625 
+DEBUG    torch.__trace:convert_frame.py:304 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:output_graph.py:2942 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:aot_autograd_result.py:405 
+DEBUG    torch.__trace:aot_autograd_result.py:415 
+DEBUG    torch.__trace:aot_autograd_result.py:435 
+DEBUG    torch.__trace:aot_autograd_result.py:445 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codecache.py:2148 
+DEBUG    torch.__trace:codecache.py:2156 
+DEBUG    torch.__trace:codecache.py:2160 
+DEBUG    torch.__trace:codecache.py:2168 
+DEBUG    torch.__trace:codecache.py:2176 
+DEBUG    torch.__trace:aot_autograd_result.py:217 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codecache.py:2148 
+DEBUG    torch.__trace:codecache.py:2156 
+DEBUG    torch.__trace:codecache.py:2160 
+DEBUG    torch.__trace:codecache.py:2168 
+DEBUG    torch.__trace:codecache.py:2176 
+DEBUG    torch.__trace:aot_autograd_result.py:217 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:utils.py:2402 
+DEBUG    torch.__trace:autograd_cache.py:1200 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:guards.py:4769 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2022 
+DEBUG    torch.__trace:utils.py:2363
+_______________ test_fast_update_matches_plain[4-False-100-True] _______________
+----------------------------- Captured stdout call -----------------------------
+log_std: fast 8e-08 torch 9e-09; cnn.conv.0.weight: fast 1e-06 torch 2e-06; cnn.conv.0.bias: fast 7e-07 torch 6e-07; cnn.conv.2.weight: fast 1e-06 torch 2e-06; cnn.conv.2.bias: fast 8e-07 torch 1e-06; cnn.conv.4.weight: fast 9e-07 torch 1e-06; cnn.conv.4.bias: fast 6e-07 torch 6e-07; cnn.fc.0.weight: fast 1e-06 torch 1e-06; cnn.fc.0.bias: fast 7e-07 torch 6e-07; qpos.0.weight: fast 3e-07 torch 3e-07; qpos.0.bias: fast 2e-07 torch 3e-07; pi.0.weight: fast 6e-07 torch 7e-07; pi.0.bias: fast 3e-07 torch 4e-07; pi.2.weight: fast 4e-07 torch 3e-07; pi.2.bias: fast 9e-08 torch 2e-07; v.0.weight: fast 4e-07 torch 4e-07; v.0.bias: fast 2e-07 torch 2e-07; v.2.weight: fast 3e-07 torch 3e-07; v.2.bias: fast 2e-08 torch 1e-07
+------------------------------ Captured log call -------------------------------
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:guards.py:5625 
+DEBUG    torch.__trace:convert_frame.py:304 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:output_graph.py:2942 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2402 
+DEBUG    torch.__trace:autograd_cache.py:1200 
+DEBUG    torch.__trace:compile_fx.py:2841 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:compile_fx.py:2872 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:graph_compile.py:1820 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:graph_compile.py:1841 
+DEBUG    torch.__trace:graph_compile.py:1891 
+DEBUG    torch.__trace:graph_compile.py:1909 
+DEBUG    torch.__trace:graph_compile.py:1913 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codecache.py:2148 
+DEBUG    torch.__trace:codecache.py:2156 
+DEBUG    torch.__trace:codecache.py:2160 
+DEBUG    torch.__trace:codecache.py:2168 
+DEBUG    torch.__trace:codecache.py:2176 
+DEBUG    torch.__trace:utils.py:2402 
+DEBUG    torch.__trace:compile_fx.py:1272 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:guards.py:4769 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2022 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codecache.py:2148 
+DEBUG    torch.__trace:codecache.py:2156 
+DEBUG    torch.__trace:codecache.py:2160 
+DEBUG    torch.__trace:codecache.py:2168 
+DEBUG    torch.__trace:codecache.py:2176 
+DEBUG    torch.__trace:utils.py:2402 
+DEBUG    torch.__trace:compile_fx.py:1272 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2022 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:guards.py:5625 
+DEBUG    torch.__trace:convert_frame.py:304 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:output_graph.py:2942 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2402 
+DEBUG    torch.__trace:autograd_cache.py:1200 
+DEBUG    torch.__trace:compile_fx.py:2841 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:compile_fx.py:2872 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:graph_compile.py:1820 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:graph_compile.py:1841 
+DEBUG    torch.__trace:graph_compile.py:1891 
+DEBUG    torch.__trace:graph_compile.py:1909 
+DEBUG    torch.__trace:graph_compile.py:1913 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codecache.py:2148 
+DEBUG    torch.__trace:codecache.py:2156 
+DEBUG    torch.__trace:codecache.py:2160 
+DEBUG    torch.__trace:codecache.py:2168 
+DEBUG    torch.__trace:codecache.py:2176 
+DEBUG    torch.__trace:utils.py:2402 
+DEBUG    torch.__trace:compile_fx.py:1272 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:guards.py:4769 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2022 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codecache.py:2148 
+DEBUG    torch.__trace:codecache.py:2156 
+DEBUG    torch.__trace:codecache.py:2160 
+DEBUG    torch.__trace:codecache.py:2168 
+DEBUG    torch.__trace:codecache.py:2176 
+DEBUG    torch.__trace:utils.py:2402 
+DEBUG    torch.__trace:compile_fx.py:1272 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2022
+_______________ test_fast_update_matches_plain[4-True-64-False] ________________
+----------------------------- Captured stdout call -----------------------------
+log_std: fast 2e-07 torch 2e-07; cnn.conv.0.weight: fast 8e-07 torch 9e-07; cnn.conv.0.bias: fast 7e-07 torch 6e-07; cnn.conv.2.weight: fast 6e-07 torch 7e-07; cnn.conv.2.bias: fast 4e-07 torch 5e-07; cnn.conv.4.weight: fast 6e-07 torch 7e-07; cnn.conv.4.bias: fast 5e-07 torch 6e-07; cnn.fc.0.weight: fast 7e-07 torch 6e-07; cnn.fc.0.bias: fast 4e-07 torch 4e-07; qpos.0.weight: fast 2e-07 torch 2e-07; qpos.0.bias: fast 2e-07 torch 2e-07; pi.0.weight: fast 6e-07 torch 5e-07; pi.0.bias: fast 3e-07 torch 3e-07; pi.2.weight: fast 5e-07 torch 5e-07; pi.2.bias: fast 2e-07 torch 2e-07; v.0.weight: fast 5e-07 torch 4e-07; v.0.bias: fast 2e-07 torch 1e-07; v.2.weight: fast 3e-07 torch 4e-07; v.2.bias: fast 6e-08 torch 6e-08
+----------------------------- Captured stderr call -----------------------------
+W1011 06:04:51.961000 84178 .venv/lib/python3.12/site-packages/torch/_dynamo/convert_frame.py:2008] [0/8] torch._dynamo hit config.recompile_limit (8)
+W1011 06:04:51.961000 84178 .venv/lib/python3.12/site-packages/torch/_dynamo/convert_frame.py:2008] [0/8]    function: '_mb_loss' (/Users/aditya/robosim/metalsim/learn/ppo.py:279)
+W1011 06:04:51.961000 84178 .venv/lib/python3.12/site-packages/torch/_dynamo/convert_frame.py:2008] [0/8]    last reason: 0/7: expected type of 'idx' to be <class 'torch.Tensor'>, but found <class 'NoneType'>
+W1011 06:04:51.961000 84178 .venv/lib/python3.12/site-packages/torch/_dynamo/convert_frame.py:2008] [0/8] To log all recompilation reasons, use TORCH_LOGS="recompiles".
+W1011 06:04:51.961000 84178 .venv/lib/python3.12/site-packages/torch/_dynamo/convert_frame.py:2008] [0/8] To diagnose recompilation issues, see https://docs.pytorch.org/docs/main/user_guide/torch_compiler/compile/programming_model.recompilation.html
+------------------------------ Captured log call -------------------------------
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:guards.py:5625 
+WARNING  torch._dynamo.convert_frame:convert_frame.py:2008 torch._dynamo hit config.recompile_limit (8)
+   function: '_mb_loss' (/Users/aditya/robosim/metalsim/learn/ppo.py:279)
+   last reason: 0/7: expected type of 'idx' to be <class 'torch.Tensor'>, but found <class 'NoneType'>
+To log all recompilation reasons, use TORCH_LOGS="recompiles".
+To diagnose recompilation issues, see https://docs.pytorch.org/docs/main/user_guide/torch_compiler/compile/programming_model.recompilation.html
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2022 
+DEBUG    torch.__trace:utils.py:2363
+________________ test_fast_update_matches_plain[4-True-64-True] ________________
+----------------------------- Captured stdout call -----------------------------
+log_std: fast 2e-07 torch 2e-07; cnn.conv.0.weight: fast 8e-07 torch 9e-07; cnn.conv.0.bias: fast 7e-07 torch 6e-07; cnn.conv.2.weight: fast 6e-07 torch 7e-07; cnn.conv.2.bias: fast 4e-07 torch 5e-07; cnn.conv.4.weight: fast 6e-07 torch 7e-07; cnn.conv.4.bias: fast 5e-07 torch 6e-07; cnn.fc.0.weight: fast 7e-07 torch 6e-07; cnn.fc.0.bias: fast 4e-07 torch 4e-07; qpos.0.weight: fast 2e-07 torch 2e-07; qpos.0.bias: fast 2e-07 torch 2e-07; pi.0.weight: fast 6e-07 torch 5e-07; pi.0.bias: fast 3e-07 torch 3e-07; pi.2.weight: fast 5e-07 torch 5e-07; pi.2.bias: fast 2e-07 torch 2e-07; v.0.weight: fast 5e-07 torch 4e-07; v.0.bias: fast 2e-07 torch 1e-07; v.2.weight: fast 3e-07 torch 4e-07; v.2.bias: fast 6e-08 torch 6e-08
+___________________ test_mjw_flex_free_fall_matches_mujoco_c ___________________
+----------------------------- Captured stdout call -----------------------------
+Module mujoco_warp._src.collision_flex bb248e3 load on device 'metal:0' took 561.90 ms  (compiled)
+Module mujoco_warp._src.collision_core bf918af load on device 'metal:0' took 384.43 ms  (compiled)
+Module _flex_plane_narrowphase__locals__kernel_eea410f3 eea410f load on device 'metal:0' took 415.00 ms  (compiled)
+Module _flex_geom_vertex_narrowphase_detect__locals__kernel_82438214 8243821 load on device 'metal:0' took 733.17 ms  (compiled)
+Module _flex_narrowphase_elem_detect__locals__kernel_9ad4653f 9ad4653 load on device 'metal:0' took 3799.58 ms  (compiled)
+Module _populate_group_starts__locals__kernel_1478dab4 1478dab load on device 'metal:0' took 372.46 ms  (compiled)
+Module _serial_fps__locals__kernel_eb18eb3c eb18eb3 load on device 'metal:0' took 387.77 ms  (compiled)
+Module _write_filtered_contacts__locals__kernel_cd45dcff cd45dcf load on device 'metal:0' took 476.99 ms  (compiled)
+Module _flex_sap_sweep__locals__kernel_c3378ae1 c3378ae load on device 'metal:0' took 577.93 ms  (compiled)
+Module _flex_narrowphase__locals__kernel_1ef7ed65 1ef7ed6 load on device 'metal:0' took 2899.71 ms  (compiled)
+Module _flex_sap_sweep__locals__kernel_a2865b8a a2865b8 load on device 'metal:0' took 592.48 ms  (compiled)
+Module _equality_flex_reserve_58f6e047 2129a3d load on device 'metal:0' took 378.82 ms  (compiled)
+Module _equality_flex__locals__kernel_aadc46a2 aadc46a load on device 'metal:0' took 430.93 ms  (compiled)
+Module _friction_dof__locals__kernel_8767f192 8767f19 load on device 'metal:0' took 419.02 ms  (compiled)
+Module _efc_contact_init_flex__locals__kernel_c92207cf c92207c load on device 'metal:0' took 1541.75 ms  (compiled)
+Module _efc_contact_jac_sparse_flex__locals__kernel_572f88b2 572f88b load on device 'metal:0' took 1631.07 ms  (compiled)
+Module _efc_contact_update_flex__locals__kernel_687cda9d 687cda9 load on device 'metal:0' took 1255.78 ms  (compiled)
+Module mul_m_kernel__locals___mul_m_603475e1 603475e load on device 'metal:0' took 380.68 ms  (compiled)
+Module _energy_vel_kinetic__locals__energy_vel_kinetic_be663efc bb986db load on device 'metal:0' took 380.90 ms  (compiled)
+Module _small_cholesky_factorize_solve_block__locals__kernel_53b89f5f adedd43 load on device 'metal:0' took 406.63 ms  (compiled)
+Module _solve_init_dof__locals__kernel_0b2b5eb2 0b2b5eb load on device 'metal:0' took 362.94 ms  (compiled)
+Module _solve_init_jaref_kernel__locals__kernel_84b0ba2b 84b0ba2 load on device 'metal:0' took 378.24 ms  (compiled)
+Module _update_constraint_init_qfrc_constraint_sparse__locals__kernel_6cd586b9 6cd586b load on device 'metal:0' took 390.63 ms  (compiled)
+Module _small_cholesky_solve_block__locals__kernel_5a2a4a49 bd91590 load on device 'metal:0' took 383.01 ms  (compiled)
+Module _linesearch_jv_fused_kernel__locals__kernel_d875d776 d875d77 load on device 'metal:0' took 384.45 ms  (compiled)
+Module _linesearch_iterative_kernel__locals__kernel_fad1e416 c6feaf2 load on device 'metal:0' took 578.31 ms  (compiled)
+Module _solve_beta_finalize_tiled__locals__kernel_03ec606a 03ec606 load on device 'metal:0' took 407.40 ms  (compiled)
+______________ test_mjw_flex_contact_trajectory_matches_mujoco_c _______________
+----------------------------- Captured stdout call -----------------------------
+Module _linesearch_iterative_kernel__locals__kernel_1c43cff7 f9970e5 load on device 'metal:0' took 563.31 ms  (compiled)
+___________________ test_mjw_flex_graph_replay_equals_eager ____________________
+----------------------------- Captured stdout call -----------------------------
+graph-vs-eager 3.45e-02, eager-vs-eager 3.31e-02 after 150 steps
+__________________________ test_xpbd_metal_equals_cpu __________________________
+----------------------------- Captured stdout call -----------------------------
+Module metalsim.physics.deformable 48a4e14 load on device 'metal:0' took 829.95 ms  (compiled)
+Module metalsim.physics.deformable b5b8ba2 load on device 'cpu' took 1221.63 ms  (compiled)
+___________________________ test_g1_cloth_scenes_run ___________________________
+----------------------------- Captured stdout call -----------------------------
+Module _limit_slide_hinge__locals__kernel_7e2c76b9 7e2c76b load on device 'metal:0' took 422.30 ms  (compiled)
+Module _energy_vel_kinetic__locals__energy_vel_kinetic_f2a435ad 8c106e7 load on device 'metal:0' took 405.49 ms  (compiled)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_dd3e21c5 79acf89 load on device 'metal:0' took 673.17 ms  (compiled)
+Module _solve_init_jaref_kernel__locals__kernel_1cd1699a 1cd1699 load on device 'metal:0' took 387.23 ms  (compiled)
+Module _tile_cholesky_solve_block__locals__kernel_d557fc74 50de68c load on device 'metal:0' took 534.24 ms  (compiled)
+Module _linesearch_jv_fused_kernel__locals__kernel_facc97bd facc97b load on device 'metal:0' took 381.06 ms  (compiled)
+Module _linesearch_iterative_kernel__locals__kernel_fad1e416 fad1e41 load on device 'metal:0' took 583.43 ms  (compiled)
+Module _efc_contact_init__locals__kernel_4baba8bd 4baba8b load on device 'metal:0' took 394.87 ms  (compiled)
+Module _efc_contact_jac_dense__locals__kernel_2b08b5a1 8d493f1 load on device 'metal:0' took 472.32 ms  (compiled)
+Module _efc_contact_update__locals__kernel_2a8fa59a 2a8fa59 load on device 'metal:0' took 406.79 ms  (compiled)
+Module _energy_vel_kinetic__locals__energy_vel_kinetic_d1430cf2 48ef657 load on device 'metal:0' took 389.32 ms  (compiled)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_8929db60 f0fcb2d load on device 'metal:0' took 456.37 ms  (compiled)
+Module _linesearch_iterative_kernel__locals__kernel_28e46ec1 e353f29 load on device 'metal:0' took 582.01 ms  (compiled)
+Module _update_constraint_gradient_fused__locals__kernel_ac065234 8787f61 load on device 'metal:0' took 414.24 ms  (compiled)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_8ffb0c34 974023c load on device 'metal:0' took 683.86 ms  (compiled)
+_________________ test_defaults_and_previous_values_reachable __________________
+----------------------------- Captured stdout call -----------------------------
+Module ccd_kernel_builder__locals__ccd_kernel_0b8f3951 0b8f395 load on device 'metal:0' took 2295.98 ms  (compiled)
+Module ccd_kernel_builder__locals__ccd_kernel_ad1299ed ad1299e load on device 'metal:0' took 2267.09 ms  (compiled)
+Module ccd_kernel_builder__locals__ccd_kernel_0a1d5596 0a1d559 load on device 'metal:0' took 2261.04 ms  (compiled)
+Module ccd_kernel_builder__locals__ccd_kernel_17fdb8dc 17fdb8d load on device 'metal:0' took 2646.83 ms  (compiled)
+Module ccd_kernel_builder__locals__ccd_kernel_7bd0ac1a 7bd0ac1 load on device 'metal:0' took 2706.53 ms  (compiled)
+Module _primitive_narrowphase__locals__primitive_narrowphase_17e301b2 17e301b load on device 'metal:0' took 1214.66 ms  (compiled)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_4472d4b2 b187a35 load on device 'metal:0' took 445.74 ms  (compiled)
+Module _solve_init_jaref_kernel__locals__kernel_b6fa4b15 b6fa4b1 load on device 'metal:0' took 377.64 ms  (compiled)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_1d5ae3d2 ba33da1 load on device 'metal:0' took 436.19 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_bc29e4b2 41a8fbe load on device 'metal:0' took 455.46 ms  (compiled)
+Module _update_constraint_gradient_fused__locals__kernel_c358497f 013afed load on device 'metal:0' took 414.20 ms  (compiled)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_2cac7588 14f1153 load on device 'metal:0' took 474.52 ms  (compiled)
+Module mujoco_warp._src.solver cf32204 load on device 'metal:0' took 584.43 ms  (compiled)
+Module reset_data__locals__reset_xfrc_applied_e4485053 e448505 load on device 'metal:0' took 381.60 ms  (compiled)
+Module reset_data__locals__reset_M_7fa4d0ac 7fa4d0a load on device 'metal:0' took 372.07 ms  (compiled)
+Module reset_data__locals__reset_mocap_09f2ad17 09f2ad1 load on device 'metal:0' took 384.87 ms  (compiled)
+Module reset_data__locals__reset_contact_47d8852a 47d8852 load on device 'metal:0' took 387.44 ms  (compiled)
+Module reset_data__locals__reset_sleep_910ffb22 910ffb2 load on device 'metal:0' took 368.85 ms  (compiled)
+Module reset_data__locals__reset_nworld_cf70174f cf70174 load on device 'metal:0' took 384.74 ms  (compiled)
+Module _factor_i_sparse_unrolled__locals__kernel_a095c5ad 91f5f28 load on device 'metal:0' took 384.66 ms  (compiled)
+Module _solve_LD_sparse_serial__locals__kernel_afbb3432 0fd1251 load on device 'metal:0' took 471.58 ms  (compiled)
+________________ test_policy_interface_identical_across_engines ________________
+----------------------------- Captured stdout call -----------------------------
+Module newton._src.geometry.inertia 8760854 load on device 'metal:0' took 735.64 ms  (compiled)
+Module validate_and_correct_inertia_kernel_26a15b93 26a15b9 load on device 'metal:0' took 411.21 ms  (compiled)
+Module newton._src.geometry.bvh 24d6d66 load on device 'metal:0' took 599.18 ms  (compiled)
+Module newton._src.solvers.solver 4a8abff load on device 'metal:0' took 582.10 ms  (compiled)
+Module newton._src.sim.articulation 67a3dae load on device 'metal:0' took 5104.08 ms  (compiled)
+Module newton._src.sim.collide 9fd02a4 load on device 'metal:0' took 641.08 ms  (compiled)
+Module newton._src.geometry.broad_phase_nxn 135afcd load on device 'metal:0' took 438.50 ms  (compiled)
+Module narrow_phase_primitive_write_contact_False_False_False ec4d248 load on device 'metal:0' took 1940.90 ms  (compiled)
+Module newton._src.geometry.narrow_phase 81ab460 load on device 'metal:0' took 721.21 ms  (compiled)
+_____________________ test_state_conventions_match_mujoco ______________________
+----------------------------- Captured stdout call -----------------------------
+Module metalsim.physics.newton_backend 73aa35f load on device 'metal:0' took 1050.47 ms  (compiled)
+_________ test_touch_signals_are_contact_forces_and_fall_is_terminated _________
+----------------------------- Captured stdout call -----------------------------
+Module newton._src.solvers.xpbd.kernels 226533f load on device 'metal:0' took 8368.42 ms  (compiled)
+________________ test_newton_heightfield_surface_matches_mujoco ________________
+----------------------------- Captured stdout call -----------------------------
+Module validate_and_correct_inertia_kernel_26a15b93 e0fed24 load on device 'cpu' took 107.49 ms  (compiled)
+Module newton._src.geometry.bvh fe6524f load on device 'cpu' took 235.82 ms  (compiled)
+Module newton._src.solvers.solver 200a987 load on device 'cpu' took 268.37 ms  (compiled)
+Module newton._src.sim.collide 13296ac load on device 'cpu' took 251.45 ms  (compiled)
+Module newton._src.geometry.broad_phase_nxn e4f7e51 load on device 'cpu' took 127.10 ms  (compiled)
+Module narrow_phase_primitive_write_contact_False_False_False 2493b05 load on device 'cpu' took 460.88 ms  (compiled)
+Module newton._src.geometry.narrow_phase 2dc9d8c load on device 'cpu' took 344.19 ms  (compiled)
+Module newton._src.geometry.contact_reduction_global bcaf4e5 load on device 'cpu' took 406.24 ms  (compiled)
+Module mesh_triangle_contacts_to_reducer_kernel_a070aa5c dd05dfa load on device 'cpu' took 1067.88 ms  (compiled)
+Module export_reduced_contacts_write_contact 5d356f8 load on device 'cpu' took 224.15 ms  (compiled)
+Module newton._src.solvers.xpbd.kernels 34316e3 load on device 'cpu' took 4614.21 ms  (compiled)
+_____________________ test_joint_frames_and_axes_match_usd _____________________
+----------------------------- Captured stdout call -----------------------------
+37 revolute joints (2 non-zero in the authored pose): worst anchor error 5.55e-07 m, worst axis error 2.41e-06
+___________________ test_warp_matches_mujoco_c_under_pd_hold ___________________
+----------------------------- Captured stdout call -----------------------------
+after 0.5 s (landing from 5 cm, 8 contacts): pelvis z ours 0.7087 mujoco 0.7087; |dq| max 5.54e-06 median 8.0e-08 over 4 worlds
+after 2 s: pelvis z ours [0.054 0.054 0.054 0.054] mujoco 0.054
+_______________ test_rough_terrain_seed_and_isaac_env_assignment _______________
+----------------------------- Captured stdout call -----------------------------
+Module _nxn_broadphase__locals__kernel_5976c85b 5976c85 load on device 'metal:0' took 517.25 ms  (compiled)
+Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_9e913c53 9e913c5 load on device 'metal:0' took 3271.21 ms  (compiled)
+Module ccd_kernel_builder__locals__ccd_kernel_f48e6924 f48e692 load on device 'metal:0' took 2965.73 ms  (compiled)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_88d45c64 7a33163 load on device 'metal:0' took 461.95 ms  (compiled)
+Module metalsim.learn.terrain 026434c load on device 'metal:0' took 556.51 ms  (compiled)
+_____________ test_il3_reward_terms_match_isaac_formulas[flat_il3] _____________
+----------------------------- Captured stdout call -----------------------------
+Module mujoco_warp._src.set_const 296e10f load on device 'metal:0' took 995.35 ms  (compiled)
+Module metalsim.learn.g1_il3 e51de11 load on device 'metal:0' took 518.34 ms  (compiled)
+_________ test_il3_add_base_mass_distribution_and_constants[isaaclab3] _________
+----------------------------- Captured stdout call -----------------------------
+Module _linesearch_iterative_kernel__locals__kernel_65cebf8c ec6c776 load on device 'metal:0' took 613.03 ms  (compiled)
+Module mujoco_warp._src.solver b8326d5 load on device 'metal:0' took 27.33 ms  (cached)
+Module metalsim.physics.solver_presets ce786ee load on device 'metal:0' took 525.64 ms  (compiled)
+___________ test_default_task_carries_the_recommended_contact_preset ___________
+----------------------------- Captured stdout call -----------------------------
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_bcf2c7e2 4b1c3b1 load on device 'metal:0' took 487.79 ms  (compiled)
+_ test_trainer_first_observation_comes_from_the_task_reset[rough-rough_isaac] __
+----------------------------- Captured stdout call -----------------------------
+Module _nxn_broadphase__locals__kernel_8181025e 8181025 load on device 'metal:0' took 547.82 ms  (compiled)
+_________________________________ test_handles _________________________________
+----------------------------- Captured stdout call -----------------------------
+warp device 4371362432 torch device 4371362432 same object: True
+__________________________ test_zero_copy_alias[blob] __________________________
+----------------------------- Captured stdout call -----------------------------
+Module test_interop fed3d71 load on device 'metal:0' took 400.68 ms  (compiled)
+__________________________ test_ping_pong_round_trip ___________________________
+----------------------------- Captured stdout call -----------------------------
+round trip: 0.522 ms/step host time, 1916 steps/s
+____________________ test_scan_matches_mj_ray_and_env_runs _____________________
+----------------------------- Captured stdout call -----------------------------
+Module ccd_kernel_builder__locals__ccd_kernel_8adbf6b2 8adbf6b load on device 'metal:0' took 2867.88 ms  (compiled)
+Module _friction_dof__locals__kernel_aea15d23 aea15d2 load on device 'metal:0' took 404.80 ms  (compiled)
+Module _efc_contact_init__locals__kernel_bf954552 bf95455 load on device 'metal:0' took 384.47 ms  (compiled)
+Module _efc_contact_jac_sparse__locals__kernel_bf8a79de bf8a79d load on device 'metal:0' took 423.37 ms  (compiled)
+Module _small_cholesky_factorize_solve_block__locals__kernel_bd59e3d8 407785b load on device 'metal:0' took 393.96 ms  (compiled)
+Module _small_cholesky_factorize_solve_block__locals__kernel_1988e295 c549d6a load on device 'metal:0' took 480.25 ms  (compiled)
+Module _solve_init_jaref_kernel__locals__kernel_85ecb543 85ecb54 load on device 'metal:0' took 375.76 ms  (compiled)
+Module _update_gradient_init_h_sparse__locals__kernel_0c92be1c 0c92be1 load on device 'metal:0' took 367.16 ms  (compiled)
+Module _JTDACJ_sparse__locals__kernel_bb048c7d 5e2bfda load on device 'metal:0' took 395.90 ms  (compiled)
+Module _update_gradient_cholesky_blocked__locals__kernel_2f7bdbe1 49d7339 load on device 'metal:0' took 567.04 ms  (compiled)
+Module _linesearch_jv_fused_kernel__locals__kernel_c26dca43 c26dca4 load on device 'metal:0' took 370.11 ms  (compiled)
+Module _linesearch_iterative_kernel__locals__kernel_4f6c3593 838feb9 load on device 'metal:0' took 569.04 ms  (compiled)
+Module _update_constraint_efc__locals__kernel_45a4d493 45a4d49 load on device 'metal:0' took 411.91 ms  (compiled)
+Module _update_gradient_zero_grad_dot__locals__kernel_965f86e6 965f86e load on device 'metal:0' took 373.94 ms  (compiled)
+Module _update_gradient_grad__locals__kernel_fa53166f fa53166 load on device 'metal:0' took 375.52 ms  (compiled)
+Module _update_gradient_h_incremental_sparse__locals__kernel_bece5d18 bece5d1 load on device 'metal:0' took 392.39 ms  (compiled)
+Module _update_gradient_cholesky_blocked_skip_unchanged__locals__kernel_de959702 130d790 load on device 'metal:0' took 614.66 ms  (compiled)
+_____________________ test_step_signals_and_waits_in_order _____________________
+----------------------------- Captured stdout call -----------------------------
+Module _primitive_narrowphase__locals__primitive_narrowphase_08fb0335 08fb033 load on device 'metal:0' took 1645.01 ms  (compiled)
+Module _solve_init_jaref_kernel__locals__kernel_e572da16 e572da1 load on device 'metal:0' took 380.46 ms  (compiled)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_970ad6e8 ca872d7 load on device 'metal:0' took 452.51 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_40045524 1cba159 load on device 'metal:0' took 471.05 ms  (compiled)
+Module _update_constraint_gradient_fused__locals__kernel_fbd1c13b c80ca7d load on device 'metal:0' took 518.62 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_de7defcc fb74805 load on device 'metal:0' took 466.51 ms  (compiled)
+________________________ test_lift_env_runs_and_resets _________________________
+----------------------------- Captured stdout call -----------------------------
+Module _small_cholesky_factorize_block__locals__kernel_355a9b85 7ee5c88 load on device 'metal:0' took 430.96 ms  (compiled)
+Module _small_cholesky_solve_block__locals__kernel_d06ab0bf 94ff337 load on device 'metal:0' took 394.46 ms  (compiled)
+___________________________ test_lift_env_throughput ___________________________
+----------------------------- Captured stdout call -----------------------------
+SO-101 lift env (physics 4 substeps + render 128px + reward/reset on MPS), N=64: 5,585 env-steps/s
+__________________________ test_usd_scene_binds_mtlx ___________________________
+----------------------------- Captured stderr call -----------------------------
+Warning: in _ReportErrors at line 3315 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp -- In </World/Looks/Green>: Could not open asset @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_usd_scene_binds_mtlx0/mats.mtlx@ for reference introduced by @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_usd_scene_binds_mtlx0/scene.usda@</World/Looks/Green> -- Cannot determine file format for @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_usd_scene_binds_mtlx0/mats.mtlx:SDF_FORMAT_ARGS:target=usd@. (instantiating stage on stage @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_usd_scene_binds_mtlx0/scene.usda@ <0xb1364a300>)
+Warning: in _ReportErrors at line 3315 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp -- In </World/Looks/MX>: Could not open asset @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_usd_scene_binds_mtlx0/mats.mtlx@ for reference introduced by @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_usd_scene_binds_mtlx0/scene.usda@</World/Looks/MX> -- Cannot determine file format for @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_usd_scene_binds_mtlx0/mats.mtlx:SDF_FORMAT_ARGS:target=usd@. (instantiating stage on stage @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_usd_scene_binds_mtlx0/scene.usda@ <0xb1364a300>)
+Warning: in _ReportErrors at line 3315 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp -- In </World/Looks/MX>: Could not open asset @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_usd_scene_binds_mtlx0/mats.mtlx@ for reference introduced by @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_usd_scene_binds_mtlx0/scene.usda@</World/Looks/MX> -- Cannot determine file format for @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_usd_scene_binds_mtlx0/mats.mtlx:SDF_FORMAT_ARGS:target=usd@. (recomposing stage on stage @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_usd_scene_binds_mtlx0/scene.usda@ <0xb1364a300>)
+Warning: in _ReportErrors at line 3315 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp -- In </World/Looks/Green>: Could not open asset @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_usd_scene_binds_mtlx0/mats.mtlx@ for reference introduced by @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_usd_scene_binds_mtlx0/scene.usda@</World/Looks/Green> -- Cannot determine file format for @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_usd_scene_binds_mtlx0/mats.mtlx:SDF_FORMAT_ARGS:target=usd@. (recomposing stage on stage @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_usd_scene_binds_mtlx0/scene.usda@ <0xb1364a300>)
+___________________________ test_tier0_render_albedo ___________________________
+----------------------------- Captured stdout call -----------------------------
+tex [186.5 145.5 162.5] [186.5 145.5 162.5]
+green [ 58.6 214.9  90. ] [ 58.6 214.9  90. ]
+prev [118.8 138.7 158.6] [118.8 138.7 158.6]
+inline [ 92.  128.4 255. ] [ 92.  128.4 255. ]
+----------------------------- Captured stderr call -----------------------------
+Warning: in _ReportErrors at line 3315 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp -- In </World/Looks/Green>: Could not open asset @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_tier0_render_albedo0/mats.mtlx@ for reference introduced by @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_tier0_render_albedo0/scene.usda@</World/Looks/Green> -- Cannot determine file format for @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_tier0_render_albedo0/mats.mtlx:SDF_FORMAT_ARGS:target=usd@. (instantiating stage on stage @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_tier0_render_albedo0/scene.usda@ <0xb1364a300>)
+Warning: in _ReportErrors at line 3315 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp -- In </World/Looks/MX>: Could not open asset @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_tier0_render_albedo0/mats.mtlx@ for reference introduced by @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_tier0_render_albedo0/scene.usda@</World/Looks/MX> -- Cannot determine file format for @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_tier0_render_albedo0/mats.mtlx:SDF_FORMAT_ARGS:target=usd@. (instantiating stage on stage @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_tier0_render_albedo0/scene.usda@ <0xb1364a300>)
+Warning: in _ReportErrors at line 3315 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp -- In </World/Looks/MX>: Could not open asset @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_tier0_render_albedo0/mats.mtlx@ for reference introduced by @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_tier0_render_albedo0/scene.usda@</World/Looks/MX> -- Cannot determine file format for @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_tier0_render_albedo0/mats.mtlx:SDF_FORMAT_ARGS:target=usd@. (recomposing stage on stage @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_tier0_render_albedo0/scene.usda@ <0xb1364a300>)
+Warning: in _ReportErrors at line 3315 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp -- In </World/Looks/Green>: Could not open asset @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_tier0_render_albedo0/mats.mtlx@ for reference introduced by @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_tier0_render_albedo0/scene.usda@</World/Looks/Green> -- Cannot determine file format for @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_tier0_render_albedo0/mats.mtlx:SDF_FORMAT_ARGS:target=usd@. (recomposing stage on stage @/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-66/test_tier0_render_albedo0/scene.usda@ <0xb1364a300>)
+________________________ test_functions_all_grads_match ________________________
+------------------------------ Captured log call -------------------------------
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:structured.py:28 
+DEBUG    torch.__trace:convert_frame.py:304 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:output_graph.py:2942 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2402 
+DEBUG    torch.__trace:autograd_cache.py:1200 
+DEBUG    torch.__trace:compile_fx.py:2841 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:compile_fx.py:2872 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:graph_compile.py:1820 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:graph_compile.py:1841 
+DEBUG    torch.__trace:graph_compile.py:1891 
+DEBUG    torch.__trace:graph_compile.py:1909 
+DEBUG    torch.__trace:graph_compile.py:1913 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codecache.py:2148 
+DEBUG    torch.__trace:codecache.py:2156 
+DEBUG    torch.__trace:codecache.py:2160 
+DEBUG    torch.__trace:codecache.py:2168 
+DEBUG    torch.__trace:codecache.py:2176 
+DEBUG    torch.__trace:utils.py:2402 
+DEBUG    torch.__trace:compile_fx.py:1272 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:guards.py:4769 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2022 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codecache.py:2148 
+DEBUG    torch.__trace:codecache.py:2156 
+DEBUG    torch.__trace:codecache.py:2160 
+DEBUG    torch.__trace:codecache.py:2168 
+DEBUG    torch.__trace:codecache.py:2176 
+DEBUG    torch.__trace:utils.py:2402 
+DEBUG    torch.__trace:compile_fx.py:1272 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2022
+_____________________ test_conv3_function_all_grads_match ______________________
+------------------------------ Captured log call -------------------------------
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:convert_frame.py:304 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:meta_utils.py:298 
+DEBUG    torch.__trace:meta_utils.py:537 
+DEBUG    torch.__trace:meta_utils.py:2385 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:output_graph.py:2942 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2402 
+DEBUG    torch.__trace:autograd_cache.py:1200 
+DEBUG    torch.__trace:compile_fx.py:2841 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:compile_fx.py:2872 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:graph_compile.py:1820 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:graph_compile.py:1841 
+DEBUG    torch.__trace:graph_compile.py:1891 
+DEBUG    torch.__trace:graph_compile.py:1909 
+DEBUG    torch.__trace:graph_compile.py:1913 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codecache.py:2148 
+DEBUG    torch.__trace:codecache.py:2156 
+DEBUG    torch.__trace:codecache.py:2160 
+DEBUG    torch.__trace:codecache.py:2168 
+DEBUG    torch.__trace:codecache.py:2176 
+DEBUG    torch.__trace:utils.py:2402 
+DEBUG    torch.__trace:compile_fx.py:1272 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:codegen.py:200 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:guards.py:4769 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2022 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:codecache.py:2148 
+DEBUG    torch.__trace:codecache.py:2156 
+DEBUG    torch.__trace:codecache.py:2160 
+DEBUG    torch.__trace:codecache.py:2168 
+DEBUG    torch.__trace:codecache.py:2176 
+DEBUG    torch.__trace:utils.py:2402 
+DEBUG    torch.__trace:compile_fx.py:1272 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2363 
+DEBUG    torch.__trace:utils.py:2022
+_________________ test_one_step_parity_vs_mujoco_c[so101_lift] _________________
+----------------------------- Captured stdout call -----------------------------
+so101_lift: nq=13 nv=12 one-step max |dqpos|=4.95e-08 max |dqvel|=1.95e-07
+____________________ test_one_step_parity_vs_mujoco_c[go1] _____________________
+----------------------------- Captured stdout call -----------------------------
+Module ccd_kernel_builder__locals__ccd_kernel_72e98bfe 72e98bf load on device 'metal:0' took 2313.05 ms  (compiled)
+Module _primitive_narrowphase__locals__primitive_narrowphase_ec88814c ec88814 load on device 'metal:0' took 1938.18 ms  (compiled)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_ddb3e832 fd4c100 load on device 'metal:0' took 468.56 ms  (compiled)
+Module _solve_init_jaref_kernel__locals__kernel_c1b82823 c1b8282 load on device 'metal:0' took 378.11 ms  (compiled)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_4d77f852 f9514a9 load on device 'metal:0' took 446.91 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_a90efa30 341ed94 load on device 'metal:0' took 503.57 ms  (compiled)
+Module _linesearch_iterative_kernel__locals__kernel_1d078d37 7316923 load on device 'metal:0' took 731.63 ms  (compiled)
+Module _update_constraint_gradient_fused__locals__kernel_e071397e dfd0e11 load on device 'metal:0' took 507.38 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_4c38399a 4afc3d1 load on device 'metal:0' took 481.48 ms  (compiled)
+go1: nq=19 nv=18 one-step max |dqpos|=1.47e-07 max |dqvel|=5.32e-05
+_____________________ test_one_step_parity_vs_mujoco_c[g1] _____________________
+----------------------------- Captured stdout call -----------------------------
+Module ccd_kernel_builder__locals__ccd_kernel_943ab120 943ab12 load on device 'metal:0' took 2392.42 ms  (compiled)
+Module ccd_kernel_builder__locals__ccd_kernel_c57108ec c57108e load on device 'metal:0' took 2818.78 ms  (compiled)
+Module _limit_slide_hinge__locals__kernel_e40315bb e40315b load on device 'metal:0' took 415.29 ms  (compiled)
+Module _factor_i_sparse_unrolled__locals__kernel_89bf9c35 5599f6a load on device 'metal:0' took 423.78 ms  (compiled)
+Module _solve_LD_sparse_serial__locals__kernel_66224926 4cd152e load on device 'metal:0' took 494.80 ms  (compiled)
+Module _solve_init_jaref_kernel__locals__kernel_6d6dc6c4 6d6dc6c load on device 'metal:0' took 376.74 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_f398999a d3b5356 load on device 'metal:0' took 613.57 ms  (compiled)
+Module _linesearch_jv_fused_kernel__locals__kernel_5f950542 5f95054 load on device 'metal:0' took 384.39 ms  (compiled)
+Module _linesearch_iterative_kernel__locals__kernel_42ff014c 7bf66cf load on device 'metal:0' took 574.99 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_12843192 896172e load on device 'metal:0' took 600.50 ms  (compiled)
+g1: nq=36 nv=35 one-step max |dqpos|=1.13e-07 max |dqvel|=4.94e-06
+___________________ test_trajectory_parity_so101_arm_joints ____________________
+----------------------------- Captured stdout call -----------------------------
+SO-101 arm joints over 200 steps: max |dq| = 3.45e-07, final = 3.45e-07
+________________________ test_step_does_not_block_host _________________________
+----------------------------- Captured stdout call -----------------------------
+N=64: host 0.040 ms/step, wall incl. GPU 3.141 ms/step -> 81,497 physics steps/s; per step: 616 dispatches, 1.1 command buffers, 0.0 host ops, 0.00 syncs
+N=2048: host 0.030 ms/step, wall incl. GPU 6.809 ms/step -> 1,203,150 physics steps/s; per step: 616 dispatches, 1.1 command buffers, 0.0 host ops, 0.00 syncs
+_________________________ test_per_world_model_fields __________________________
+----------------------------- Captured stdout call -----------------------------
+Module _solve_init_jaref_kernel__locals__kernel_e240ac7b e240ac7 load on device 'metal:0' took 381.76 ms  (compiled)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_c5ebdebd 26e7d36 load on device 'metal:0' took 464.83 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_73c58da4 c4e8402 load on device 'metal:0' took 444.90 ms  (compiled)
+Module _update_constraint_gradient_fused__locals__kernel_c7abc2fb 7599770 load on device 'metal:0' took 420.89 ms  (compiled)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_e35c2eb8 9990a67 load on device 'metal:0' took 479.40 ms  (compiled)
+__________________ test_dropped_cloth_rests_at_physx_offsets ___________________
+----------------------------- Captured stdout call -----------------------------
+Module metalsim.physics.physx_cloth bfe17a9 load on device 'metal:0' took 845.70 ms  (compiled)
+_________________ test_metal_equals_cpu_and_graph_equals_eager _________________
+----------------------------- Captured stdout call -----------------------------
+Module metalsim.physics.physx_cloth 38c67e1 load on device 'cpu' took 572.40 ms  (compiled)
+_____________________ test_tilted_cube_gets_c_contact_set ______________________
+----------------------------- Captured stdout call -----------------------------
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_51429ba0 cb91a72 load on device 'metal:0' took 452.91 ms  (compiled)
+_____________________ test_radial_velocity_matches_mujoco ______________________
+---------------------------- Captured stdout setup -----------------------------
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_8c284a80 47550c5 load on device 'metal:0' took 473.59 ms  (compiled)
+Module _update_constraint_gradient_fused__locals__kernel_8801dc1c 251b270 load on device 'metal:0' took 431.94 ms  (compiled)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_5b9ef159 9db85d7 load on device 'metal:0' took 493.86 ms  (compiled)
+----------------------------- Captured stdout call -----------------------------
+Module metalsim.sensors.radar 8655906 load on device 'metal:0' took 482.06 ms  (compiled)
+world 0: 260 detections, |vr - mujoco| max 4.78e-07 m/s, vr range [-3.97, -1.43]
+world 1: 260 detections, |vr - mujoco| max 3.53e-07 m/s, vr range [-0.59, 2.05]
+______________________ test_rcs_plate_sums_to_lambertian _______________________
+----------------------------- Captured stdout call -----------------------------
+plate: 5364 rays, sum sigma 0.9542 m^2 vs 4 rho A 0.9600
+________________ test_gpu_path_matches_host_path_and_composites ________________
+----------------------------- Captured stdout call -----------------------------
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_72b55566 ab71286 load on device 'metal:0' took 464.65 ms  (compiled)
+_____________________ test_slot_boxes_render_the_stairs[0] _____________________
+----------------------------- Captured stdout call -----------------------------
+tier 0: |new - C(boxes)| median 0.01 mm, <1 cm 1.000; |old - C(hfield only)| median 0.01 mm; |old - C(boxes)| median 215.1 mm
+_____________________ test_slot_boxes_render_the_stairs[2] _____________________
+----------------------------- Captured stdout call -----------------------------
+tier 2: |new - C(boxes)| median 0.00 mm, <1 cm 1.000; |old - C(hfield only)| median 0.00 mm; |old - C(boxes)| median 215.1 mm
+________________ test_hfield_tile_culling_is_pixel_exact[down] _________________
+----------------------------- Captured stdout call -----------------------------
+down: tiles drawn 4 (shadow pass 66) of 9375
+_______________ test_hfield_tile_culling_is_pixel_exact[oblique] _______________
+----------------------------- Captured stdout call -----------------------------
+oblique: tiles drawn 48 (shadow pass 168) of 9375
+______________________ test_native_texture_pattern_parity ______________________
+----------------------------- Captured stdout call -----------------------------
+pattern correlation native 0.9961 atlas 0.9939
+_______________________________ test_wrap_modes ________________________________
+----------------------------- Captured stdout call -----------------------------
+down-jumps per wrap mode {'repeat': 3, 'mirror': 0, 'clamp': 0}
+__________________________ test_mips_reduce_aliasing ___________________________
+----------------------------- Captured stdout call -----------------------------
+RMSE vs 4x4 supersampled {'native': 6.65336811558583, 'native_nomip': 38.77724260460664, 'atlas': 42.63377078331238}
+_____________ test_silhouette_and_depth_and_seg_parity_primitives ______________
+----------------------------- Captured stdout call -----------------------------
+silhouette IoU [0.9971 0.9967 0.996  0.9939] depth median err (m) [7.0e-05 1.1e-04 1.4e-04 1.4e-04] seg IoU min 0.9871
+----------------------------- Captured stderr call -----------------------------
+WARNING: ARB_clip_control unavailable while mjDEPTH_ZEROFAR requested, depth accuracy will be limited
+
+_________________________ test_texture_pattern_parity __________________________
+----------------------------- Captured stdout call -----------------------------
+texture pattern correlation 0.9939
+_________________________ test_batch_and_so101_visual __________________________
+----------------------------- Captured stdout call -----------------------------
+SO-101 silhouette IoU vs mujoco.Renderer (env 0): 1.0
+___________________ test_gpu_path_with_batchsim_no_host_sync ___________________
+----------------------------- Captured stdout call -----------------------------
+per-step mean intensity: [89.16 89.17 89.25 89.06 89.09] ...
+________________________ test_lambertian_plane_analytic ________________________
+----------------------------- Captured stdout call -----------------------------
+bounces 0: mean 0.4000 (expected 0.4000), pixel std 0.0000
+bounces 3: mean 0.4000 (expected 0.4000), pixel std 0.0000
+________________________ test_white_furnace_uniform_sky ________________________
+----------------------------- Captured stdout call -----------------------------
+furnace: mean 0.4979 (expected 0.5000), pixel std 0.0072
+_____________________________ test_env_map_furnace _____________________________
+----------------------------- Captured stdout call -----------------------------
+env furnace: mean 0.4998 (expected 0.5000), pixel std 0.0132
+__________________ test_env_map_importance_sampling_unbiased ___________________
+----------------------------- Captured stdout call -----------------------------
+yaw 0.0: mean [0.5573 0.4727 0.3881] expected [0.5566 0.4721 0.3876], per-pixel rel. std 0.084
+yaw 1.3: mean [0.5567 0.4722 0.3876] expected [0.5566 0.4721 0.3876], per-pixel rel. std 0.083
+uniform table: mean [0.5582 0.4735 0.3887], rel. std 0.508 (6.1x)
+_________________________ test_monte_carlo_convergence _________________________
+----------------------------- Captured stdout call -----------------------------
+noise rms: spp 4 -> 0.0172, spp 64 -> 0.0043, ratio 4.05 (ideal 4.0)
+_______________________ test_direct_light_matches_tier0 ________________________
+----------------------------- Captured stdout call -----------------------------
+tier 2 (direct only) vs tier 0 PSNR: [43.68 43.67 45.08] depth median 0.0009199083 seg IoU 1.0
+___________________ test_gpu_path_from_batchsim_matches_host ___________________
+----------------------------- Captured stdout call -----------------------------
+Module _solve_init_jaref_kernel__locals__kernel_fd96c071 fd96c07 load on device 'metal:0' took 373.70 ms  (compiled)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_41fc34e4 d626a84 load on device 'metal:0' took 455.17 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_125db53a be62111 load on device 'metal:0' took 493.98 ms  (compiled)
+Module _update_constraint_gradient_fused__locals__kernel_39bc6104 124941b load on device 'metal:0' took 437.82 ms  (compiled)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_4bd4247a e558bff load on device 'metal:0' took 510.92 ms  (compiled)
+_______________________ test_cartpole_rgb_rollout_tier2 ________________________
+----------------------------- Captured stdout call -----------------------------
+Module _solve_init_jaref_kernel__locals__kernel_84520ead 84520ea load on device 'metal:0' took 377.89 ms  (compiled)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_c515833f 50cf824 load on device 'metal:0' took 459.86 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_663abb4b e10d022 load on device 'metal:0' took 443.07 ms  (compiled)
+Module _update_constraint_gradient_fused__locals__kernel_75af2e1c 39be393 load on device 'metal:0' took 423.59 ms  (compiled)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_a41b88d2 b802588 load on device 'metal:0' took 454.82 ms  (compiled)
+_________________ test_usd_units_lambertian_sun_disk_and_dome __________________
+----------------------------- Captured stdout call -----------------------------
+usd sun: mean 2399.99 (expected 2400)
+usd dome furnace: [299.93527 319.93063 359.9223 ] expected [300. 320. 360.]
+__________________ test_rtx_tonemap_and_denoisers_on_furnace ___________________
+----------------------------- Captured stdout call -----------------------------
+atrous: mean 319.3 -> 322.1, std 26.4 -> 0.5
+oidn: mean 319.3 -> 318.8, std 26.4 -> 3.5
+___________________ test_bbox_2d_tight_and_loose_exact[warp] ___________________
+----------------------------- Captured stdout call -----------------------------
+Module metalsim.replicator.kernels 78ea004 load on device 'metal:0' took 793.38 ms  (compiled)
+_______________________ test_event_reset_root_and_joints _______________________
+---------------------------- Captured stdout setup -----------------------------
+Module _tile_cholesky_factorize_solve_block__locals__kernel_9163afa8 0ad3c02 load on device 'metal:0' took 438.67 ms  (compiled)
+Module _solve_init_jaref_kernel__locals__kernel_a6f449d9 a6f449d load on device 'metal:0' took 377.21 ms  (compiled)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_c2db9937 5f5a546 load on device 'metal:0' took 469.00 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_25423004 7ac35a2 load on device 'metal:0' took 445.48 ms  (compiled)
+Module _update_constraint_gradient_fused__locals__kernel_7aa44ba0 8f3ed7e load on device 'metal:0' took 432.76 ms  (compiled)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_1542911a 2f44842 load on device 'metal:0' took 466.88 ms  (compiled)
+________________________ test_event_model_randomization ________________________
+----------------------------- Captured stdout call -----------------------------
+Module _tile_cholesky_factorize_block__locals__kernel_af6a3d65 f459dba load on device 'metal:0' took 420.18 ms  (compiled)
+Module _tile_cholesky_solve_block__locals__kernel_187e73d3 7ee8033 load on device 'metal:0' took 416.28 ms  (compiled)
+____________________ test_event_external_wrench_body_frame _____________________
+----------------------------- Captured stdout call -----------------------------
+Module metalsim.replicator.events 82988a1 load on device 'metal:0' took 412.27 ms  (compiled)
+___________________ test_stack_sign_history_filter_and_graph ___________________
+----------------------------- Captured stdout call -----------------------------
+Module ccd_kernel_builder__locals__ccd_kernel_25a07c1c 25a07c1 load on device 'metal:0' took 2804.00 ms  (compiled)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_db22bb22 52751b9 load on device 'metal:0' took 453.61 ms  (compiled)
+_____________________ test_air_time_matches_isaac_formulas _____________________
+----------------------------- Captured stdout call -----------------------------
+Module _small_cholesky_factorize_solve_block__locals__kernel_04b3a063 b308dc0 load on device 'metal:0' took 378.64 ms  (compiled)
+Module _solve_init_jaref_kernel__locals__kernel_da4221b4 da4221b load on device 'metal:0' took 370.57 ms  (compiled)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_fca24fb6 e05e0b2 load on device 'metal:0' took 452.80 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_1ab96000 29ab216 load on device 'metal:0' took 435.41 ms  (compiled)
+Module _update_constraint_gradient_fused__locals__kernel_1f30128f e047c79 load on device 'metal:0' took 429.15 ms  (compiled)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_02a86903 5be06b4 load on device 'metal:0' took 444.22 ms  (compiled)
+_________________________ test_g1_landing_vs_mujoco_c __________________________
+----------------------------- Captured stdout call -----------------------------
+G1 landing: 691 world-steps in contact; reduction vs C on the same contacts max 6.96e-05 N; independent C forward, same contact set (691): total rel err median 8.3e-06 max 1.0e-04; different contact set: 0
+___________________________ test_lidar_vs_mujoco_ray ___________________________
+----------------------------- Captured stdout call -----------------------------
+lidar: 1625 beams compared over 4 envs; worst |dr| 1.9412 m
+______________________ test_raycast_depth_vs_raster_depth ______________________
+----------------------------- Captured stdout call -----------------------------
+ray vs raster depth: coverage agreement 1.0000, median |dz| 0.00000 m, 99th pct 0.0001 m
+_______________________ test_gpu_path_ordering_with_sim ________________________
+----------------------------- Captured stdout call -----------------------------
+Module _solve_init_jaref_kernel__locals__kernel_f72a083a f72a083 load on device 'metal:0' took 379.48 ms  (compiled)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_8e9482f4 74a4dee load on device 'metal:0' took 449.87 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_84437b92 074d1cb load on device 'metal:0' took 539.85 ms  (compiled)
+Module _update_constraint_gradient_fused__locals__kernel_f50ccc15 14586cc load on device 'metal:0' took 442.18 ms  (compiled)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_0cb68fdc 7ad91be load on device 'metal:0' took 557.28 ms  (compiled)
+_______________________ test_height_scan_matches_mj_ray ________________________
+----------------------------- Captured stdout call -----------------------------
+height scan vs mj_ray over 1496 rays: median 0.0000 m, 99th pct 0.0000 m, max 0.9100
+___________________________ test_g1_rough_task_runs ____________________________
+----------------------------- Captured stdout call -----------------------------
+Module _nxn_broadphase__locals__kernel_5812cd12 5812cd1 load on device 'metal:0' took 537.02 ms  (compiled)
+___________________ test_hfield_mesh_contacts_match_mujoco_c ___________________
+----------------------------- Captured stdout call -----------------------------
+hfield contacts over 0.5 s: min normal z 0.913, max penetration 0.0042 m (MuJoCo C: 0.0046); pelvis z ours [0.709 0.709 0.709 0.67 ] vs C [0.709 0.709 0.71  0.673]
+________________________ test_isaac_rough_terrain_exact ________________________
+----------------------------- Captured stdout call -----------------------------
+Module test_terrain 0b21ca1 load on device 'cpu' took 119.12 ms  (compiled)
+Isaac ray cast vs ours at 2403201 grid points: 0.9999 within 1e-5 m (max 4.8e-06 off walls); 359 differ, all on walls: True
+______________ test_height_scan_ray_order_matches_isaac_recording ______________
+----------------------------- Captured stdout call -----------------------------
+Module metalsim.learn.terrain 290fc16 load on device 'cpu' took 285.41 ms  (compiled)
+________________ test_terrain_collision_surfaces_vs_isaac_mesh _________________
+----------------------------- Captured stdout call -----------------------------
+pyramid_stairs: hfield mean 0.0123 p99 0.162 max 0.225 m; boxes max 4.7e-06 m
+pyramid_stairs_inv: hfield mean 0.0122 p99 0.168 max 0.219 m; boxes max 4.7e-06 m
+boxes: hfield mean 0.0106 p99 0.121 max 0.256 m; boxes max 4.7e-06 m
+_________________ test_exact_height_scan_matches_isaac_raycast _________________
+----------------------------- Captured stdout call -----------------------------
+box-built cells, 67507 rays: exact scan max 4.8e-06 m, >1 mm 0.00000; grid scan mean 0.0171 p99 0.177 max 0.321 m
+________________ test_step_edge_contacts_match_mujoco_c[boxes] _________________
+----------------------------- Captured stdout call -----------------------------
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_c7d3ad3a 920dd43 load on device 'metal:0' took 460.52 ms  (compiled)
+{'mode': 'boxes', 'geometry': {'x_riser': -10.8, 'z_low': -0.7705768144138987, 'z_high': -0.6604944123547702, 'y': -44.0}, 'C': {'stub_toe_x_max_minus_riser': 0.005023150120662123, 'stub_sole_rise': 0.0029386875000000368, 'stub_min_abs_normal_z': 0.0, 'stub_final_x': -10.938304589127505, 'stub_final_z': -0.7362099616174511, 'edge_final_x': -10.815629027304269, 'edge_final_z': -0.6261746757200266, 'edge_final_quat': [1.0, -0.0, -0.0003, 0.0]}, 'warp': {'stub_toe_x_max_minus_riser': 0.006998330904142591, 'stub_sole_rise': 0.0029386701448126384, 'stub_min_abs_normal_z': 0.0, 'stub_final_x': -10.937747955322266, 'stub_final_z': -0.736210286617279, 'edge_final_x': -10.815620422363281, 'edge_final_z': -0.6261749267578125, 'edge_final_quat': [1.0, 0.0, -0.0003000000142492354, 0.0]}, 'warp_vs_C_pos_max': 0.001975180783480468, 'warp_vs_C_pos_final': [0.0005566339001172065, 8.608602056376781e-06]}
+________________ test_step_edge_contacts_match_mujoco_c[meshes] ________________
+----------------------------- Captured stdout call -----------------------------
+{'mode': 'meshes', 'geometry': {'x_riser': -10.8, 'z_low': -0.7705768144138987, 'z_high': -0.6604944123547702, 'y': -44.0}, 'C': {'stub_toe_x_max_minus_riser': 0.005023148603653382, 'stub_sole_rise': 0.0029386875000000368, 'stub_min_abs_normal_z': 0.0, 'stub_final_x': -10.938304596018812, 'stub_final_z': -0.7362099612342896, 'edge_final_x': -10.81562902730022, 'edge_final_z': -0.6261746753270472, 'edge_final_quat': [1.0, 0.0, -0.0003, 0.0]}, 'warp': {'stub_toe_x_max_minus_riser': 0.006998330904142591, 'stub_sole_rise': 0.0029386701448126384, 'stub_min_abs_normal_z': 0.0, 'stub_final_x': -10.937747955322266, 'stub_final_z': -0.736210286617279, 'edge_final_x': -10.815620422363281, 'edge_final_z': -0.6261749267578125, 'edge_final_quat': [1.0, 0.0, -0.0003000000142492354, 0.0]}, 'warp_vs_C_pos_max': 0.001975182300489209, 'warp_vs_C_pos_final': [0.0005566407916469567, 8.608609478528593e-06]}
+_____________ test_step_edge_contacts_match_mujoco_c[boxes_local] ______________
+----------------------------- Captured stdout call -----------------------------
+Module _nxn_broadphase__locals__kernel_33e0b839 33e0b83 load on device 'metal:0' took 543.04 ms  (compiled)
+{'mode': 'boxes_local', 'geometry': {'x_riser': -10.8, 'z_low': -0.7705768144138987, 'z_high': -0.6604944123547702, 'y': -44.0}, 'C': {'stub_toe_x_max_minus_riser': 0.005023150120662123, 'stub_sole_rise': 0.0029386875000000368, 'stub_min_abs_normal_z': 0.0, 'stub_final_x': -10.938304589127505, 'stub_final_z': -0.7362099616174511, 'edge_final_x': -10.815629027304269, 'edge_final_z': -0.6261746757200266, 'edge_final_quat': [1.0, -0.0, -0.0003, 0.0]}, 'warp': {'stub_toe_x_max_minus_riser': 0.006998330904142591, 'stub_sole_rise': 0.0029386701448126384, 'stub_min_abs_normal_z': 0.0, 'stub_final_x': -10.937747955322266, 'stub_final_z': -0.736210286617279, 'edge_final_x': -10.815620422363281, 'edge_final_z': -0.6261749267578125, 'edge_final_quat': [1.0, 0.0, -0.0003000000142492354, 0.0]}, 'warp_vs_C_pos_max': 0.001975180783480468, 'warp_vs_C_pos_final': [0.0005566339001172065, 8.608602056376781e-06]}
+_______________________ test_bridge_procedure_and_safety _______________________
+----------------------------- Captured stdout call -----------------------------
+[bridge] buttons held: △ triangle (top) + L1
+[bridge] DAMP -> STAND: L1 + △ triangle
+[bridge] buttons held: ✕ cross (bottom) + L1
+[bridge] STAND -> BALANCE: L1 + ✕ cross
+[bridge] buttons held: □ square (left) + L1
+[bridge] !!!!!!!! BALANCE -> DAMP: L1 + □ square
+[bridge] buttons held: △ triangle (top) + L1
+[bridge] refusing STAND: calibration code -1 (hang the robot, L1 + R1)
+[bridge] DAMP -> STAND: L1 + △ triangle
+[bridge] buttons held: ✕ cross (bottom) + L1
+[bridge] L1 + ✕ ignored: stand-up still running (1.0 / 3 s)
+[bridge] STAND -> BALANCE: L1 + ✕ cross
+[bridge] !!!!!!!! BALANCE -> DAMP: stale data (state 200 ms, imu 0 ms)
+____________________ test_bridge_runs_limx_policy_with_hold ____________________
+----------------------------- Captured stdout call -----------------------------
+[bridge] buttons held: △ triangle (top) + L1
+[bridge] DAMP -> STAND: L1 + △ triangle
+[bridge] buttons held: ✕ cross (bottom) + L1
+[bridge] STAND -> BALANCE: L1 + ✕ cross
+[bridge] buttons held: □ square (left) + L1
+[bridge] !!!!!!!! BALANCE -> DAMP: L1 + □ square
+_____________________ test_rollout_without_torch_launches ______________________
+----------------------------- Captured stdout call -----------------------------
+Module _linesearch_iterative_kernel__locals__kernel_ae19c21a 19e95b4 load on device 'metal:0' took 578.54 ms  (compiled)
+Module test_warp_policy 4666396 load on device 'metal:0' took 371.09 ms  (compiled)
+rollout of 64 steps x 1024 envs as 64 graph replays: 493,985 env-steps/s, host 0.018 ms/step, 269 dispatches/step, 0 torch launches per step
+=========================== short test summary info ============================
+PASSED tests/test_camera_update_fast.py::test_fast_update_matches_plain[0-True-100-False]
+PASSED tests/test_camera_update_fast.py::test_fast_update_matches_plain[0-True-100-True]
+PASSED tests/test_camera_update_fast.py::test_fast_update_matches_plain[4-False-100-False]
+PASSED tests/test_camera_update_fast.py::test_fast_update_matches_plain[4-False-100-True]
+PASSED tests/test_camera_update_fast.py::test_fast_update_matches_plain[4-True-64-False]
+PASSED tests/test_camera_update_fast.py::test_fast_update_matches_plain[4-True-64-True]
+PASSED tests/test_capacity.py::test_bounds_refuse_unbounded_models
+PASSED tests/test_contact_tuning.py::test_presets_on_model_and_spec
+PASSED tests/test_contact_tuning.py::test_g1_builder_context_restores
+PASSED tests/test_contact_tuning.py::test_elliptic_presets_set_cone_and_impratio
+PASSED tests/test_contact_tuning.py::test_penetration_sweep_presets
+PASSED tests/test_deformable.py::test_mjw_flex_free_fall_matches_mujoco_c
+PASSED tests/test_deformable.py::test_mjw_flex_contact_trajectory_matches_mujoco_c
+PASSED tests/test_deformable.py::test_mjw_flex_one_step_matches_mujoco_c_in_contact
+PASSED tests/test_deformable.py::test_mjw_flex_energy_bounded_2s
+PASSED tests/test_deformable.py::test_mjw_flex_graph_replay_equals_eager
+PASSED tests/test_deformable.py::test_xpbd_metal_equals_cpu
+PASSED tests/test_deformable.py::test_xpbd_graph_replay_equals_eager
+PASSED tests/test_deformable.py::test_xpbd_energy_strain_penetration_2s
+PASSED tests/test_deformable.py::test_xpbd_drape_agrees_with_mjw_flex
+PASSED tests/test_deformable.py::test_g1_cloth_scenes_run
+PASSED tests/test_g1_fast_factorization.py::test_task_uses_the_fast_factorization
+PASSED tests/test_g1_fast_factorization.py::test_first_steps_match_mujoco_c
+PASSED tests/test_g1_fast_factorization.py::test_defaults_and_previous_values_reachable
+PASSED tests/test_g1_newton_engine.py::test_policy_interface_identical_across_engines
+PASSED tests/test_g1_newton_engine.py::test_state_conventions_match_mujoco
+PASSED tests/test_g1_newton_engine.py::test_touch_signals_are_contact_forces_and_fall_is_terminated
+PASSED tests/test_g1_newton_engine.py::test_reset_restores_default_state
+PASSED tests/test_g1_newton_engine.py::test_graph_replay_matches_eager
+PASSED tests/test_g1_newton_engine.py::test_newton_heightfield_surface_matches_mujoco
+PASSED tests/test_g1_parity.py::test_actuator_gains_match_isaac_implicit_pd
+PASSED tests/test_g1_parity.py::test_joint_frames_and_axes_match_usd
+PASSED tests/test_g1_parity.py::test_mass_properties_match_usd
+PASSED tests/test_g1_parity.py::test_scene_settings_match_isaac
+PASSED tests/test_g1_parity.py::test_collision_set_matches_usd
+PASSED tests/test_g1_parity.py::test_warp_matches_mujoco_c_under_pd_hold
+PASSED tests/test_g1_task_terms.py::test_reward_terms_match_isaac_formulas[mjwarp]
+PASSED tests/test_g1_task_terms.py::test_reward_terms_match_isaac_formulas[newton]
+PASSED tests/test_g1_task_terms.py::test_rough_reward_set_unchanged
+PASSED tests/test_g1_task_terms.py::test_rough_isaac_reward_set_matches_isaac_formulas
+PASSED tests/test_g1_task_terms.py::test_flat_commands_and_contact_history_termination[mjwarp]
+PASSED tests/test_g1_task_terms.py::test_flat_commands_and_contact_history_termination[newton]
+PASSED tests/test_g1_task_terms.py::test_observation_layout_and_action_mapping[mjwarp]
+PASSED tests/test_g1_task_terms.py::test_observation_layout_and_action_mapping[newton]
+PASSED tests/test_g1_task_terms.py::test_feet_slide_velocity_is_the_foot_body_world_velocity[mjwarp]
+PASSED tests/test_g1_task_terms.py::test_feet_slide_velocity_is_the_foot_body_world_velocity[newton]
+PASSED tests/test_g1_task_terms.py::test_contact_sensor_flags_match_touch_sites
+PASSED tests/test_g1_task_terms.py::test_rough_terrain_seed_and_isaac_env_assignment
+PASSED tests/test_g1_task_terms.py::test_il3_reward_terms_match_isaac_formulas[flat_il3]
+PASSED tests/test_g1_task_terms.py::test_il3_reward_terms_match_isaac_formulas[rough_il3]
+PASSED tests/test_g1_task_terms.py::test_il3_base_lin_vel_is_the_root_com_velocity
+PASSED tests/test_g1_task_terms.py::test_il3_reset_root_state_distribution_and_application
+PASSED tests/test_g1_task_terms.py::test_il3_push_robot_interval_and_velocity
+PASSED tests/test_g1_task_terms.py::test_il3_add_base_mass_distribution_and_constants[None]
+PASSED tests/test_g1_task_terms.py::test_il3_add_base_mass_distribution_and_constants[isaaclab3]
+PASSED tests/test_g1_task_terms.py::test_il3_contact_sensor_ticks
+PASSED tests/test_g1_task_terms.py::test_il3_rough_defaults
+PASSED tests/test_g1_task_terms.py::test_default_task_carries_the_recommended_contact_preset
+PASSED tests/test_g1_task_terms.py::test_base_velocity_option_2_3_2_configs[flat]
+PASSED tests/test_g1_task_terms.py::test_base_velocity_option_2_3_2_configs[rough]
+PASSED tests/test_g1_task_terms.py::test_base_velocity_option_2_3_2_configs[rough_isaac]
+PASSED tests/test_g1_task_terms.py::test_trainer_first_observation_comes_from_the_task_reset[flat-flat]
+PASSED tests/test_g1_task_terms.py::test_trainer_first_observation_comes_from_the_task_reset[flat-flat_il3]
+PASSED tests/test_g1_task_terms.py::test_trainer_first_observation_comes_from_the_task_reset[rough-rough_isaac]
+PASSED tests/test_g1_task_terms.py::test_trainer_first_observation_comes_from_the_task_reset[rough-rough_il3]
+PASSED tests/test_g1_task_terms.py::test_isaaclab3_solver_preset_owns_the_cone
+PASSED tests/test_gpu_dashboard.py::test_counter_with_total_from_cli
+PASSED tests/test_gpu_dashboard.py::test_counter_with_bare_total_and_anomaly_lines_skipped
+PASSED tests/test_gpu_dashboard.py::test_inline_total_fraction_and_percent
+PASSED tests/test_gpu_dashboard.py::test_no_signal
+PASSED tests/test_gpu_dashboard.py::test_rate_and_eta
+PASSED tests/test_gpu_dashboard.py::test_counter_reset_counts_a_new_stage
+PASSED tests/test_gpu_queue.py::test_acquire_with_cmd_takes_the_lock_and_records_the_command
+PASSED tests/test_gpu_queue.py::test_acquire_without_cmd_still_works
+PASSED tests/test_gpu_queue.py::test_exit_code_recorded_when_a_waiter_freed_the_holder
+PASSED tests/test_gpu_queue.py::test_front_ticket_sorts_ahead_of_older_tickets_of_its_class
+PASSED tests/test_gpu_queue.py::test_ticket_filename_carries_the_pid
+PASSED tests/test_gpu_queue.py::test_alive_treats_permission_error_as_alive
+PASSED tests/test_interop.py::test_handles
+PASSED tests/test_interop.py::test_zero_copy_alias[blob]
+PASSED tests/test_interop.py::test_zero_copy_alias[dlpack]
+PASSED tests/test_interop.py::test_vec_dtype_and_2d
+PASSED tests/test_interop.py::test_tensor_keeps_array_alive
+PASSED tests/test_interop.py::test_torch_buffer_readable_by_warp
+PASSED tests/test_interop.py::test_wait_blocks_torch_until_signaled
+PASSED tests/test_interop.py::test_wait_blocks_warp_until_signaled
+PASSED tests/test_interop.py::test_event_ordering_warp_to_torch
+PASSED tests/test_interop.py::test_event_ordering_torch_to_warp
+PASSED tests/test_interop.py::test_ping_pong_round_trip
+PASSED tests/test_lidar_extras.py::test_divergence_mixed_pixel_at_edge
+PASSED tests/test_lidar_extras.py::test_multi_return_thin_pole_in_front_of_wall
+PASSED tests/test_lidar_extras.py::test_reflectance_table_and_default_equivalence
+PASSED tests/test_lidar_extras.py::test_spot_pattern
+PASSED tests/test_lidar_nav.py::test_scan_matches_mj_ray_and_env_runs
+PASSED tests/test_lift_ctrl_ordering.py::test_step_signals_and_waits_in_order
+PASSED tests/test_lift_ctrl_ordering.py::test_step_matches_host_synchronized_stepping
+PASSED tests/test_lift_env.py::test_lift_env_runs_and_resets
+PASSED tests/test_lift_env.py::test_lift_env_throughput
+PASSED tests/test_materialx.py::test_mtlx_document_flattens
+PASSED tests/test_materialx.py::test_usd_scene_binds_mtlx
+PASSED tests/test_materialx.py::test_non_materialx_stage_untouched
+PASSED tests/test_materialx.py::test_tier0_render_albedo
+PASSED tests/test_metal_conv.py::test_conv1_weight_grad[2048-True]
+PASSED tests/test_metal_conv.py::test_conv1_weight_grad[37-False]
+PASSED tests/test_metal_conv.py::test_conv2_input_grad[2048]
+PASSED tests/test_metal_conv.py::test_conv2_input_grad[37]
+PASSED tests/test_metal_conv.py::test_functions_all_grads_match
+PASSED tests/test_metal_conv.py::test_conv2_weight_grad[2048]
+PASSED tests/test_metal_conv.py::test_conv2_weight_grad[37]
+PASSED tests/test_metal_conv.py::test_conv3_weight_grad[2048]
+PASSED tests/test_metal_conv.py::test_conv3_weight_grad[37]
+PASSED tests/test_metal_conv.py::test_conv3_function_all_grads_match
+PASSED tests/test_metal_conv.py::test_conv1_forward[2048-True]
+PASSED tests/test_metal_conv.py::test_conv1_forward[37-False]
+PASSED tests/test_physics.py::test_one_step_parity_vs_mujoco_c[so101_lift]
+PASSED tests/test_physics.py::test_one_step_parity_vs_mujoco_c[go1]
+PASSED tests/test_physics.py::test_one_step_parity_vs_mujoco_c[g1]
+PASSED tests/test_physics.py::test_trajectory_parity_so101_arm_joints
+PASSED tests/test_physics.py::test_step_does_not_block_host
+PASSED tests/test_physics.py::test_reset_and_forward_ordering
+PASSED tests/test_physics.py::test_per_world_model_fields
+PASSED tests/test_physx_cloth.py::test_cooker_reproduces_snippet_springs
+PASSED tests/test_physx_cloth.py::test_partition_invariants
+PASSED tests/test_physx_cloth.py::test_dropped_cloth_rests_at_physx_offsets
+PASSED tests/test_physx_cloth.py::test_contacts_follow_contact_offset
+PASSED tests/test_physx_cloth.py::test_hanging_cloth_against_xpbd
+PASSED tests/test_physx_cloth.py::test_dropped_cloth_against_xpbd
+PASSED tests/test_physx_cloth.py::test_metal_equals_cpu_and_graph_equals_eager
+PASSED tests/test_plane_convex_contacts.py::test_tilted_cube_gets_c_contact_set
+PASSED tests/test_plane_convex_contacts.py::test_speculative_margin_contacts
+PASSED tests/test_plane_convex_contacts.py::test_polygon_face_pruned_to_max_area_quad
+PASSED tests/test_ppo_warp_rollout.py::test_noise_fresh_each_rollout_and_no_phantom_action
+PASSED tests/test_ppo_warp_rollout.py::test_stored_logp_matches_torch
+PASSED tests/test_ppo_warp_rollout.py::test_timeouts_flagged
+PASSED tests/test_ppo_warp_rollout.py::test_rslrl_adapter_contract
+PASSED tests/test_radar_lite.py::test_radial_velocity_matches_mujoco
+PASSED tests/test_radar_lite.py::test_rcs_plate_sums_to_lambertian
+PASSED tests/test_render_splat.py::test_metal_matches_reference[3-True-False-0]
+PASSED tests/test_render_splat.py::test_metal_matches_reference[1-False-False-1]
+PASSED tests/test_render_splat.py::test_metal_matches_reference[0-True-True-2]
+PASSED tests/test_render_splat.py::test_metal_matches_reference[2-False-True-3]
+PASSED tests/test_render_splat.py::test_batching_subbatches_and_determinism
+PASSED tests/test_render_splat.py::test_capacity_growth
+PASSED tests/test_render_splat.py::test_single_gaussian_analytic
+PASSED tests/test_render_splat.py::test_spz_ply_splat_decoders
+PASSED tests/test_render_splat.py::test_prepare_transform_crop_and_cache
+PASSED tests/test_render_splat.py::test_mesh_composite_occlusion
+PASSED tests/test_render_splat.py::test_gpu_path_matches_host_path_and_composites
+PASSED tests/test_render_splat.py::test_blend_variants_bit_identical
+PASSED tests/test_render_splat.py::test_supersplat_compressed_ply
+PASSED tests/test_render_splat_nurec.py::test_msgpack_tree_types
+PASSED tests/test_render_splat_nurec.py::test_nurec_round_trip[16-3]
+PASSED tests/test_render_splat_nurec.py::test_nurec_round_trip[32-1]
+PASSED tests/test_render_splat_nurec.py::test_nurec_rejects_unsupported_activation
+PASSED tests/test_render_splat_nurec.py::test_load_scene_prepared_npz_and_eps2d_hint
+PASSED tests/test_render_splat_nurec.py::test_3dgut_reference_kernel
+PASSED tests/test_render_terrain_slots.py::test_reference_row_crosses_risers
+PASSED tests/test_render_terrain_slots.py::test_slot_boxes_render_the_stairs[0]
+PASSED tests/test_render_terrain_slots.py::test_slot_boxes_render_the_stairs[2]
+PASSED tests/test_render_terrain_slots.py::test_hfield_tile_culling_is_pixel_exact[down]
+PASSED tests/test_render_terrain_slots.py::test_hfield_tile_culling_is_pixel_exact[oblique]
+PASSED tests/test_render_textures.py::test_native_texture_pattern_parity
+PASSED tests/test_render_textures.py::test_file_orientation_conventions
+PASSED tests/test_render_textures.py::test_ktx2_standard_orientation
+PASSED tests/test_render_textures.py::test_wrap_modes
+PASSED tests/test_render_textures.py::test_no_texture_count_limit
+PASSED tests/test_render_textures.py::test_basis_transcodes_are_exact
+PASSED tests/test_render_textures.py::test_mips_reduce_aliasing
+PASSED tests/test_render_textures.py::test_far_plane
+PASSED tests/test_render_tier0.py::test_silhouette_and_depth_and_seg_parity_primitives
+PASSED tests/test_render_tier0.py::test_texture_pattern_parity
+PASSED tests/test_render_tier0.py::test_batch_and_so101_visual
+PASSED tests/test_render_tier0.py::test_gpu_path_with_batchsim_no_host_sync
+PASSED tests/test_render_tier2.py::test_lambertian_plane_analytic
+PASSED tests/test_render_tier2.py::test_white_furnace_uniform_sky
+PASSED tests/test_render_tier2.py::test_env_map_furnace
+PASSED tests/test_render_tier2.py::test_env_map_importance_sampling_unbiased
+PASSED tests/test_render_tier2.py::test_env_randomizer_and_helpers
+PASSED tests/test_render_tier2.py::test_monte_carlo_convergence
+PASSED tests/test_render_tier2.py::test_direct_light_matches_tier0
+PASSED tests/test_render_tier2.py::test_gpu_path_from_batchsim_matches_host
+PASSED tests/test_render_tier2.py::test_cartpole_rgb_rollout_tier2
+PASSED tests/test_render_tier2.py::test_usd_units_lambertian_sun_disk_and_dome
+PASSED tests/test_render_tier2.py::test_rtx_tonemap_and_denoisers_on_furnace
+PASSED tests/test_render_tier2.py::test_physical_preset_batch_is_finite
+PASSED tests/test_replicator.py::test_randomize_annotate_write
+PASSED tests/test_replicator_annotators.py::test_segmentation_exact[warp]
+PASSED tests/test_replicator_annotators.py::test_bbox_2d_tight_and_loose_exact[warp]
+PASSED tests/test_replicator_annotators.py::test_bbox_2d_loose_projected_vertices[warp]
+PASSED tests/test_replicator_annotators.py::test_bbox_3d_exact[warp]
+PASSED tests/test_replicator_annotators.py::test_depth_normals_pointcloud[warp]
+PASSED tests/test_replicator_annotators.py::test_motion_vectors_exact[warp]
+PASSED tests/test_replicator_annotators.py::test_camera_params_project[warp]
+PASSED tests/test_replicator_annotators.py::test_basic_writer_layout[warp]
+PASSED tests/test_replicator_annotators.py::test_segmentation_exact[torch]
+PASSED tests/test_replicator_annotators.py::test_bbox_2d_tight_and_loose_exact[torch]
+PASSED tests/test_replicator_annotators.py::test_bbox_2d_loose_projected_vertices[torch]
+PASSED tests/test_replicator_annotators.py::test_bbox_3d_exact[torch]
+PASSED tests/test_replicator_annotators.py::test_depth_normals_pointcloud[torch]
+PASSED tests/test_replicator_annotators.py::test_motion_vectors_exact[torch]
+PASSED tests/test_replicator_annotators.py::test_camera_params_project[torch]
+PASSED tests/test_replicator_annotators.py::test_basic_writer_layout[torch]
+PASSED tests/test_replicator_annotators.py::test_semantics_from_usd
+PASSED tests/test_replicator_annotators.py::test_event_reset_root_and_joints
+PASSED tests/test_replicator_annotators.py::test_event_push_adds_com_velocity
+PASSED tests/test_replicator_annotators.py::test_event_model_randomization
+PASSED tests/test_replicator_annotators.py::test_event_external_wrench_body_frame
+PASSED tests/test_replicator_annotators.py::test_event_manager_interval_timers
+PASSED tests/test_replicator_annotators.py::test_event_reset_root_velocity_is_com_velocity
+PASSED tests/test_scene_usd.py::test_so101_import
+PASSED tests/test_scene_usd.py::test_usd_round_trip_to_mujoco
+PASSED tests/test_scene_usd.py::test_urdf_import_to_usd
+PASSED tests/test_sensors_contact.py::test_stack_sign_history_filter_and_graph
+PASSED tests/test_sensors_contact.py::test_air_time_matches_isaac_formulas
+PASSED tests/test_sensors_contact.py::test_g1_landing_vs_mujoco_c
+PASSED tests/test_sensors_rt.py::test_lidar_vs_mujoco_ray
+PASSED tests/test_sensors_rt.py::test_raycast_depth_vs_raster_depth
+PASSED tests/test_sensors_rt.py::test_gpu_path_ordering_with_sim
+PASSED tests/test_sensors_state.py::test_imu_and_contact_sensors_as_tensors
+PASSED tests/test_solver_presets.py::test_isaaclab3_model_fields_match_the_recording
+PASSED tests/test_solver_presets.py::test_once_per_tick_contacts_follow_the_bodies
+PASSED tests/test_solver_presets.py::test_once_per_tick_collision_step_is_stable_and_close
+PASSED tests/test_solver_presets.py::test_iteration_cap_only_changes_worlds_that_reach_it
+PASSED tests/test_solver_presets.py::test_effective_model_fields_per_preset_combination[default-None]
+PASSED tests/test_solver_presets.py::test_effective_model_fields_per_preset_combination[recommended-None]
+PASSED tests/test_solver_presets.py::test_effective_model_fields_per_preset_combination[recommended-isaaclab3]
+PASSED tests/test_solver_presets.py::test_effective_model_fields_per_preset_combination[recommended-isaaclab3_every_substep_cap20]
+PASSED tests/test_solver_presets.py::test_effective_model_fields_per_preset_combination[recommended-isaaclab3_hardlimits]
+PASSED tests/test_solver_presets.py::test_effective_model_fields_per_preset_combination[default-isaaclab3]
+PASSED tests/test_solver_presets.py::test_g1_actuator_and_joint_fields_match_newtons_model
+PASSED tests/test_solver_presets.py::test_saturated_finger_keeps_implicit_damping
+PASSED tests/test_terrain.py::test_terrain_layout
+PASSED tests/test_terrain.py::test_height_scan_matches_mj_ray
+PASSED tests/test_terrain.py::test_g1_rough_task_runs
+PASSED tests/test_terrain.py::test_hfield_mesh_contacts_match_mujoco_c
+PASSED tests/test_terrain.py::test_isaac_rough_terrain_exact
+PASSED tests/test_terrain.py::test_torch_cuda_uniform_reproduction
+PASSED tests/test_terrain.py::test_isaac_sub_terrain_exact[pyramid_stairs]
+PASSED tests/test_terrain.py::test_isaac_sub_terrain_exact[pyramid_stairs_inv]
+PASSED tests/test_terrain.py::test_isaac_sub_terrain_exact[boxes]
+PASSED tests/test_terrain.py::test_isaac_sub_terrain_exact[random_rough]
+PASSED tests/test_terrain.py::test_isaac_sub_terrain_exact[hf_pyramid_slope]
+PASSED tests/test_terrain.py::test_isaac_sub_terrain_exact[hf_pyramid_slope_inv]
+PASSED tests/test_terrain.py::test_isaac_sub_terrain_exact[hf_pyramid_stairs]
+PASSED tests/test_terrain.py::test_isaac_sub_terrain_exact[hf_pyramid_stairs_inv]
+PASSED tests/test_terrain.py::test_isaac_sub_terrain_exact[hf_discrete_obstacles]
+PASSED tests/test_terrain.py::test_height_scan_ray_order_matches_isaac_recording
+PASSED tests/test_terrain.py::test_terrain_collision_surfaces_vs_isaac_mesh
+PASSED tests/test_terrain.py::test_exact_height_scan_matches_isaac_raycast
+PASSED tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[boxes]
+PASSED tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[meshes]
+PASSED tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[boxes_local]
+PASSED tests/test_tron1.py::test_model_matches_limx_description
+PASSED tests/test_tron1.py::test_ideal_sensing_is_exact_and_mode0_law
+PASSED tests/test_tron1.py::test_sensor_pack_live_change_and_belief
+PASSED tests/test_tron1.py::test_command_latency
+PASSED tests/test_tron1.py::test_encoder_quantization_and_velocity_from_differences
+PASSED tests/test_tron1.py::test_torque_speed_envelope_limits_motoring_only
+PASSED tests/test_tron1.py::test_stance_ik_and_lqr
+PASSED tests/test_tron1.py::test_classical_holds_position_and_survives_shoves
+PASSED tests/test_tron1.py::test_classical_tracks_velocity_while_turning
+PASSED tests/test_tron1.py::test_limx_policy_balances_in_nominal_sim
+PASSED tests/test_tron1.py::test_scan_terrain_attaches_and_supports_robot
+PASSED tests/test_tron1.py::test_bridge_procedure_and_safety
+PASSED tests/test_tron1.py::test_stock_hold_stops_policy_drift_and_yields_to_operator
+PASSED tests/test_tron1.py::test_bridge_runs_limx_policy_with_hold
+PASSED tests/test_tron1.py::test_controller_reset_is_fast_enough_for_the_control_loop
+PASSED tests/test_tron1.py::test_tron1_training_model_clamps_torque_at_the_joint
+PASSED tests/test_warp_policy.py::test_parity_with_torch_and_shared_weights
+PASSED tests/test_warp_policy.py::test_rollout_without_torch_launches
+PASSED tests/test_warp_policy.py::test_layer_mapping_bitwise
+FAILED tests/test_capacity.py::test_g1_flat_bounds_hold_under_random_actions
+FAILED tests/test_capacity.py::test_g1_flat_task_defaults_to_the_bound - asse...
+FAILED tests/test_capacity.py::test_check_overflow_raises_on_dropped_rows - F...
+FAILED tests/test_g1_newton_engine.py::test_rough_task_runs_on_newton - Runti...
+FAILED tests/test_physics.py::test_one_step_parity_vs_mujoco_c[panda] - Runti...
+FAILED tests/test_render_tier2.py::test_env_map_usd_dome_import - AssertionEr...
+6 failed, 271 passed, 14 warnings in 436.48s (0:07:16)

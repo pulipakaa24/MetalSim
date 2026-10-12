@@ -1,0 +1,59 @@
+WARNING: The version of the system or its configuration does not allow enabling CPU profiling:
+- CPU IP/backtrace sampling will be disabled.
+- CPU context switch tracing will be disabled.
+Try the 'nsys status --environment' command to learn more.
+
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+/home/<vm-user>/parity3_scripts/mpm/scale/scale_pour_k.py:241: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+  model = scene.finalize(device=DEV)
+Capture range started in the application.
+Capture range ended in the application.
+Generating '/tmp/nsys-report-bfdd.qdstrm'
+[1/1] [0%                          ] tick.nsys-repProcessing events...
+[1/1] [0%                          ] tick.nsys-rep[1/1] [9%                          ] tick.nsys-rep[1/1] [============54%             ] tick.nsys-rep[1/1] [========================100%] tick.nsys-rep[1/1] [========================100%] tick.nsys-rep
+{
+ "argv": [
+  "--part",
+  "rigid",
+  "--device",
+  "cuda:0",
+  "--worlds",
+  "2048",
+  "--max-triangle-pairs",
+  "8388608",
+  "--warmup",
+  "70",
+  "--kprof",
+  "tick",
+  "--kprof-ticks",
+  "4",
+  "--json",
+  "/home/<vm-user>/parity3/rigid_late/nsys_tick.json"
+ ],
+ "device": "cuda:0",
+ "device_name": "NVIDIA L4",
+ "warp": "1.16.0",
+ "newton": "1.5.2",
+ "worlds": 2048,
+ "part": "rigid",
+ "det": "off",
+ "pipeline_det": false,
+ "mode": "eager",
+ "max_triangle_pairs": 8388608,
+ "bodies": 26624,
+ "shapes": 188417,
+ "joints": 26624,
+ "dofs": 43008,
+ "build_s": 3.447027641999995,
+ "solver_init_s": 5.377241502999993,
+ "rigid_contact_max": 14053376,
+ "kprof": {
+  "phase": "tick",
+  "reps": 4,
+  "wall_ms_per_rep": 156.88764524999854
+ },
+ "rigid_contacts": 423484,
+ "maxrss_mb": 2997.13671875
+}
+Generated:
+	/home/<vm-user>/parity3/rigid_late/tick.nsys-rep

@@ -1,0 +1,548 @@
+{
+ "scene": "example:mpm_multi_material",
+ "mode": "profile",
+ "set": {},
+ "frames": 4,
+ "particles": 178669,
+ "wall_ms": [
+  26.337374991271645,
+  85.5062500340864,
+  41.03616700740531,
+  27.018750028219074
+ ],
+ "wall_median_ms": 34.02745851781219,
+ "iterations": [
+  35,
+  250,
+  95,
+  45
+ ],
+ "iterations_per_frame": 106.25,
+ "per_frame_counters": {
+  "host_waits": 28.25,
+  "command_buffers": 1773.5,
+  "host_ops": 0.0,
+  "dispatches_encoded": 1733.5
+ },
+ "kernels": [
+  {
+   "kernel": "gs_solve_kernel_impl_2443acb6_74526572_metal_forward",
+   "ms_per_frame": 23.67775,
+   "launches_per_frame": 850.0
+  },
+  {
+   "kernel": "solve_subgrid_friction_42405d68_metal_forward",
+   "ms_per_frame": 0.73525,
+   "launches_per_frame": 106.25
+  },
+  {
+   "kernel": "collision_weight_field_8c7a1ed7_41b7aabf_metal_forward",
+   "ms_per_frame": 0.59575,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "apply_subgrid_impulse_fe96c186_metal_forward",
+   "ms_per_frame": 0.54975,
+   "launches_per_frame": 107.25
+  },
+  {
+   "kernel": "sort_scan_tiles",
+   "ms_per_frame": 0.48975,
+   "launches_per_frame": 92.0
+  },
+  {
+   "kernel": "sort_scatter_k4_v4",
+   "ms_per_frame": 0.444,
+   "launches_per_frame": 44.0
+  },
+  {
+   "kernel": "vb_sort_scatter_keys",
+   "ms_per_frame": 0.405,
+   "launches_per_frame": 48.0
+  },
+  {
+   "kernel": "_tiled_sum_kernel_7e4c592f_metal_forward",
+   "ms_per_frame": 0.35675,
+   "launches_per_frame": 42.5
+  },
+  {
+   "kernel": "sort_upsweep_k8",
+   "ms_per_frame": 0.33825,
+   "launches_per_frame": 48.0
+  },
+  {
+   "kernel": "sort_upsweep_k4",
+   "ms_per_frame": 0.30625,
+   "launches_per_frame": 44.0
+  },
+  {
+   "kernel": "integrate_velocity_apic_f3293501_ae593713_metal_forward",
+   "ms_per_frame": 0.25075,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "advect_particles_596b947a_dc0ccb2a_metal_forward",
+   "ms_per_frame": 0.223,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "wp_memset",
+   "ms_per_frame": 0.183,
+   "launches_per_frame": 35.0
+  },
+  {
+   "kernel": "_identity_field_b5aa3f34_076484b3_metal_forward",
+   "ms_per_frame": 0.1825,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "update_particle_strains_281f1245_cb2fe334_metal_forward",
+   "ms_per_frame": 0.15175,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "sort_copy",
+   "ms_per_frame": 0.1385,
+   "launches_per_frame": 34.0
+  },
+  {
+   "kernel": "vb_world_bbox",
+   "ms_per_frame": 0.1035,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "evaluate_strain_residual_545e9767_metal_forward",
+   "ms_per_frame": 0.093,
+   "launches_per_frame": 21.25
+  },
+  {
+   "kernel": "strain_delta_form_1ed6c957_4257fa41_metal_forward",
+   "ms_per_frame": 0.09025,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "dispatch_linear_kernel_fn_5ed8a0e3_a5a40bf6_metal_forward",
+   "ms_per_frame": 0.0895,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "sort_plan",
+   "ms_per_frame": 0.08725,
+   "launches_per_frame": 17.0
+  },
+  {
+   "kernel": "compute_delassus_diagonal_5fc0bd53_metal_forward",
+   "ms_per_frame": 0.08325,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "scan_spine_i4",
+   "ms_per_frame": 0.0775,
+   "launches_per_frame": 30.0
+  },
+  {
+   "kernel": "dispatch_linear_kernel_fn_c32cf128_92d82e5f_metal_forward",
+   "ms_per_frame": 0.0755,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "integrate_yield_parameters_3f58505e_c1f5b01b_metal_forward",
+   "ms_per_frame": 0.07075,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "wp_memtile",
+   "ms_per_frame": 0.06525,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "sort_diff_k4",
+   "ms_per_frame": 0.06025,
+   "launches_per_frame": 11.0
+  },
+  {
+   "kernel": "apply_stress_gs_d6f9fcd1_metal_forward",
+   "ms_per_frame": 0.05925,
+   "launches_per_frame": 8.0
+  },
+  {
+   "kernel": "update_condition_98290a4b_metal_forward",
+   "ms_per_frame": 0.05875,
+   "launches_per_frame": 21.25
+  },
+  {
+   "kernel": "scan_down_i4",
+   "ms_per_frame": 0.0575,
+   "launches_per_frame": 12.0
+  },
+  {
+   "kernel": "vb_unique_scatter",
+   "ms_per_frame": 0.054,
+   "launches_per_frame": 6.0
+  },
+  {
+   "kernel": "dispatch_bilinear_kernel_fn_a19864b3_6133904f_metal_forward",
+   "ms_per_frame": 0.052,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "fill_element_node_indices_9775d3a0_63f21500_metal_forward",
+   "ms_per_frame": 0.05125,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "scan_reduce_i4",
+   "ms_per_frame": 0.05075,
+   "launches_per_frame": 12.0
+  },
+  {
+   "kernel": "vb_unique_count",
+   "ms_per_frame": 0.04625,
+   "launches_per_frame": 6.0
+  },
+  {
+   "kernel": "vb_init_grid",
+   "ms_per_frame": 0.046,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "_triplet_keys_u32_8822c4ec_metal_forward",
+   "ms_per_frame": 0.03875,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "integrate_velocity_c4bcdf34_263e448a_metal_forward",
+   "ms_per_frame": 0.03875,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "project_outside_collider_1efe8a84_metal_forward",
+   "ms_per_frame": 0.038,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_bsr_accumulate_triplet_values_3b93b6b5_metal_forward",
+   "ms_per_frame": 0.03525,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "_prepare_node_sort_kernel_e713f0c4_metal_forward",
+   "ms_per_frame": 0.03475,
+   "launches_per_frame": 5.0
+  },
+  {
+   "kernel": "rasterize_collider_kernel_dc8fb173_metal_forward",
+   "ms_per_frame": 0.0345,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "sort_diff_k8",
+   "ms_per_frame": 0.03425,
+   "launches_per_frame": 6.0
+  },
+  {
+   "kernel": "_triplet_segments_2787cf31_metal_forward",
+   "ms_per_frame": 0.034,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "sort_diff_clear",
+   "ms_per_frame": 0.03375,
+   "launches_per_frame": 17.0
+  },
+  {
+   "kernel": "postprocess_stress_and_strain_8653b339_metal_forward",
+   "ms_per_frame": 0.03275,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "vb_zero",
+   "ms_per_frame": 0.03075,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "_segment_heads_19f058c5_metal_forward",
+   "ms_per_frame": 0.03,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "vb_emit_hierarchy_keys",
+   "ms_per_frame": 0.029,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "vb_emit_upper_keys",
+   "ms_per_frame": 0.02775,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "rle_scatter",
+   "ms_per_frame": 0.0275,
+   "launches_per_frame": 6.0
+  },
+  {
+   "kernel": "vb_set_active_voxels",
+   "ms_per_frame": 0.02725,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "_triplet_row_offsets_8c3a57ec_metal_forward",
+   "ms_per_frame": 0.027,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "rle_count",
+   "ms_per_frame": 0.02575,
+   "launches_per_frame": 6.0
+  },
+  {
+   "kernel": "dispatch_linear_kernel_fn_bb059afa_1fd1c03f_metal_forward",
+   "ms_per_frame": 0.02475,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "SpaceRestriction___split_vertex_element_index_d19d2c20_metal_forward",
+   "ms_per_frame": 0.0245,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "rle_lengths",
+   "ms_per_frame": 0.024,
+   "launches_per_frame": 6.0
+  },
+  {
+   "kernel": "_identity_field_a98e1c46_d9bd6773_metal_forward",
+   "ms_per_frame": 0.024,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "bin_particles_fabe9e76_b5f2419e_metal_forward",
+   "ms_per_frame": 0.02225,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_transpose_keys_u32_6f34d5ba_metal_forward",
+   "ms_per_frame": 0.01925,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_scatter_node_counts_654d0eae_metal_forward",
+   "ms_per_frame": 0.01825,
+   "launches_per_frame": 5.0
+  },
+  {
+   "kernel": "_transpose_columns_ad485bf4_metal_forward",
+   "ms_per_frame": 0.01825,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "fill_element_node_indices_60813d26_02ffbf43_metal_forward",
+   "ms_per_frame": 0.01825,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_bsr_transpose_values_a814354d_metal_forward",
+   "ms_per_frame": 0.01775,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "vb_finalize_onindex_leaves",
+   "ms_per_frame": 0.01675,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "finalize_cell_particle_data_328a4fcc_c02ddfdc_metal_forward",
+   "ms_per_frame": 0.01625,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "wp_memcpy",
+   "ms_per_frame": 0.01625,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "vb_build_leaf",
+   "ms_per_frame": 0.01475,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "vb_propagate_leaf_bboxes",
+   "ms_per_frame": 0.01425,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "integrate_mass_e0aa1553_face63c7_metal_forward",
+   "ms_per_frame": 0.014,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "vb_build_lower",
+   "ms_per_frame": 0.01375,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "mass_form_a4cb3211_26a40e3e_metal_forward",
+   "ms_per_frame": 0.0135,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "integrate_active_fraction_8a943061_6051d216_metal_forward",
+   "ms_per_frame": 0.01325,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "dispatch_linear_kernel_fn_2eaf6051_74f951ca_metal_forward",
+   "ms_per_frame": 0.01225,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "world_position_33f2b610_be45d6bb_metal_forward",
+   "ms_per_frame": 0.012,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "vb_build_upper",
+   "ms_per_frame": 0.01175,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "integrate_fraction_363c20d7_062a4311_metal_forward",
+   "ms_per_frame": 0.0115,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "dispatch_bilinear_kernel_fn_52958eaa_0358e08c_metal_forward",
+   "ms_per_frame": 0.0115,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "vb_propagate_lower_bboxes",
+   "ms_per_frame": 0.01125,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "_bsr_assign_copy_blocks_efac61cd_metal_forward",
+   "ms_per_frame": 0.00925,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "vb_get_voxels",
+   "ms_per_frame": 0.00925,
+   "launches_per_frame": 2.0
+  },
+  {
+   "kernel": "vb_reset_bboxes",
+   "ms_per_frame": 0.009,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "vb_propagate_upper_bboxes",
+   "ms_per_frame": 0.00875,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "vb_finalize_counts",
+   "ms_per_frame": 0.008,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "_transpose_offsets_fcd71ee6_metal_forward",
+   "ms_per_frame": 0.0075,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_bsr_assign_list_blocks_156045b1_metal_forward",
+   "ms_per_frame": 0.00725,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_identity_field_15c95b83_9908e61c_metal_forward",
+   "ms_per_frame": 0.00725,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "quadrature_point_element_indices_e3cfaaea_ccac3a62_metal_forward",
+   "ms_per_frame": 0.0065,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "apply_subgrid_impulse_warmstart_8cb56a7c_metal_forward",
+   "ms_per_frame": 0.00575,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_cell_node_indices_96e40ac2_metal_forward",
+   "ms_per_frame": 0.0055,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "fill_element_node_indices_8688d243_304c6557_metal_forward",
+   "ms_per_frame": 0.0055,
+   "launches_per_frame": 2.0
+  },
+  {
+   "kernel": "compute_collider_delassus_diagonal_f1529e24_metal_forward",
+   "ms_per_frame": 0.00525,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "cell_color_e837866a_16b0327a_metal_forward",
+   "ms_per_frame": 0.00525,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_cell_edge_indices_b4604a4d_metal_forward",
+   "ms_per_frame": 0.005,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "compute_eigenvalues_398d95c6_metal_forward",
+   "ms_per_frame": 0.00475,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "scatter_field_dof_values_77fae76d_metal_forward",
+   "ms_per_frame": 0.0045,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "preprocess_stress_and_strain_41a99b60_metal_forward",
+   "ms_per_frame": 0.0045,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "inverse_scale_sym_tensor_87098362_metal_forward",
+   "ms_per_frame": 0.00425,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "inverse_scale_vector_be470fd2_metal_forward",
+   "ms_per_frame": 0.00425,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "WholeSpacePartition___iota_kernel_53df5652_metal_forward",
+   "ms_per_frame": 0.00375,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "free_velocity_05f582f0_metal_forward",
+   "ms_per_frame": 0.00325,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "compute_color_offsets_a5c4efbd_metal_forward",
+   "ms_per_frame": 0.00325,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "fill_uniform_color_block_indices_d688ca40_metal_forward",
+   "ms_per_frame": 0.00275,
+   "launches_per_frame": 1.0
+  }
+ ],
+ "kernel_total_ms_per_frame": 31.534,
+ "launches_per_frame": 1773.5,
+ "empty_cb_us_dim1": 2.4035,
+ "empty_cb_us_dim5120": 2.504
+}

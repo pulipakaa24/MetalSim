@@ -1,0 +1,88 @@
+locals: 5189 identical in all 4 runs, 4 TREE-induced (stable within each tree), 340 run-to-run noise
+tests with TREE-induced differences: 4; tests with run-to-run noise: 69
+noise tests:
+  tests/test_deformable.py::test_mjw_flex_contact_trajectory_matches_mujoco_c
+  tests/test_deformable.py::test_mjw_flex_energy_bounded_2s
+  tests/test_deformable.py::test_mjw_flex_free_fall_matches_mujoco_c
+  tests/test_deformable.py::test_mjw_flex_graph_replay_equals_eager
+  tests/test_deformable.py::test_mjw_flex_one_step_matches_mujoco_c_in_contact
+  tests/test_deformable.py::test_xpbd_drape_agrees_with_mjw_flex
+  tests/test_deformable.py::test_xpbd_energy_strain_penetration_2s
+  tests/test_g1_fast_factorization.py::test_first_steps_match_mujoco_c
+  tests/test_g1_newton_engine.py::test_graph_replay_matches_eager
+  tests/test_g1_newton_engine.py::test_rough_task_runs_on_newton
+  tests/test_g1_newton_engine.py::test_touch_signals_are_contact_forces_and_fall_is_terminated
+  tests/test_g1_task_terms.py::test_base_velocity_option_2_3_2_configs[flat]
+  tests/test_g1_task_terms.py::test_base_velocity_option_2_3_2_configs[rough]
+  tests/test_g1_task_terms.py::test_base_velocity_option_2_3_2_configs[rough_isaac]
+  tests/test_g1_task_terms.py::test_contact_sensor_flags_match_touch_sites
+  tests/test_g1_task_terms.py::test_feet_slide_velocity_is_the_foot_body_world_velocity[mjwarp]
+  tests/test_g1_task_terms.py::test_feet_slide_velocity_is_the_foot_body_world_velocity[newton]
+  tests/test_g1_task_terms.py::test_flat_commands_and_contact_history_termination[mjwarp]
+  tests/test_g1_task_terms.py::test_il3_add_base_mass_distribution_and_constants[None]
+  tests/test_g1_task_terms.py::test_il3_add_base_mass_distribution_and_constants[isaaclab3]
+  tests/test_g1_task_terms.py::test_il3_base_lin_vel_is_the_root_com_velocity
+  tests/test_g1_task_terms.py::test_il3_contact_sensor_ticks
+  tests/test_g1_task_terms.py::test_il3_reward_terms_match_isaac_formulas[flat_il3]
+  tests/test_g1_task_terms.py::test_il3_reward_terms_match_isaac_formulas[rough_il3]
+  tests/test_g1_task_terms.py::test_reward_terms_match_isaac_formulas[mjwarp]
+  tests/test_g1_task_terms.py::test_reward_terms_match_isaac_formulas[newton]
+  tests/test_g1_task_terms.py::test_rough_isaac_reward_set_matches_isaac_formulas
+  tests/test_g1_task_terms.py::test_rough_reward_set_unchanged
+  tests/test_gpu_queue.py::test_acquire_with_cmd_takes_the_lock_and_records_the_command
+  tests/test_gpu_queue.py::test_exit_code_recorded_when_a_waiter_freed_the_holder
+  tests/test_gpu_queue.py::test_front_ticket_sorts_ahead_of_older_tickets_of_its_class
+  tests/test_interop.py::test_handles
+  tests/test_interop.py::test_ping_pong_round_trip
+  tests/test_interop.py::test_torch_buffer_readable_by_warp
+  tests/test_interop.py::test_wait_blocks_torch_until_signaled
+  tests/test_interop.py::test_wait_blocks_warp_until_signaled
+  tests/test_lidar_nav.py::test_scan_matches_mj_ray_and_env_runs
+  tests/test_lift_ctrl_ordering.py::test_step_matches_host_synchronized_stepping
+  tests/test_lift_env.py::test_lift_env_runs_and_resets
+  tests/test_lift_env.py::test_lift_env_throughput
+  tests/test_materialx.py::test_mtlx_document_flattens
+  tests/test_materialx.py::test_tier0_render_albedo
+  tests/test_materialx.py::test_usd_scene_binds_mtlx
+  tests/test_physics.py::test_one_step_parity_vs_mujoco_c[g1]
+  tests/test_physics.py::test_one_step_parity_vs_mujoco_c[go1]
+  tests/test_physics.py::test_step_does_not_block_host
+  tests/test_ppo_warp_rollout.py::test_noise_fresh_each_rollout_and_no_phantom_action
+  tests/test_ppo_warp_rollout.py::test_rslrl_adapter_contract
+  tests/test_ppo_warp_rollout.py::test_stored_logp_matches_torch
+  tests/test_render_textures.py::test_basis_transcodes_are_exact
+  tests/test_render_textures.py::test_file_orientation_conventions
+  tests/test_render_textures.py::test_ktx2_standard_orientation
+  tests/test_render_textures.py::test_no_texture_count_limit
+  tests/test_render_textures.py::test_wrap_modes
+  tests/test_render_tier0.py::test_gpu_path_with_batchsim_no_host_sync
+  tests/test_render_tier2.py::test_env_map_usd_dome_import
+  tests/test_replicator.py::test_randomize_annotate_write
+  tests/test_scene_usd.py::test_so101_import
+  tests/test_scene_usd.py::test_urdf_import_to_usd
+  tests/test_scene_usd.py::test_usd_round_trip_to_mujoco
+  tests/test_sensors_contact.py::test_g1_landing_vs_mujoco_c
+  tests/test_sensors_contact.py::test_stack_sign_history_filter_and_graph
+  tests/test_sensors_rt.py::test_gpu_path_ordering_with_sim
+  tests/test_sensors_state.py::test_imu_and_contact_sensors_as_tensors
+  tests/test_solver_presets.py::test_iteration_cap_only_changes_worlds_that_reach_it
+  tests/test_solver_presets.py::test_once_per_tick_collision_step_is_stable_and_close
+  tests/test_terrain.py::test_g1_rough_task_runs
+  tests/test_tron1.py::test_controller_reset_is_fast_enough_for_the_control_loop
+  tests/test_warp_policy.py::test_rollout_without_torch_launches
+
+# tests/test_g1_task_terms.py::test_base_velocity_option_2_3_2_configs[flat]  (1 locals)
+   ref.2                          base: 0.00375
+                                  cand: 0
+
+# tests/test_g1_task_terms.py::test_reward_terms_match_isaac_formulas[newton]  (1 locals)
+   ref.6                          base: -0.1304294
+                                  cand: -0.1410232
+
+# tests/test_lift_env.py::test_lift_env_runs_and_resets  (1 locals)
+   rewards[0]                     base: [32] max=0.00873059 mean=0.004142473 min=0.001287878 nf=0
+                                  cand: [32] max=0.00873059 mean=0.004142471 min=0.001287878 nf=0
+
+# tests/test_solver_presets.py::test_once_per_tick_collision_step_is_stable_and_close  (1 locals)
+   out.isaaclab3                  base: [4] max=0.7525746 mean=0.7525745 min=0.7525745 nf=0
+                                  cand: [4] max=0.7525746 mean=0.7525745 min=0.7525745 nf=0

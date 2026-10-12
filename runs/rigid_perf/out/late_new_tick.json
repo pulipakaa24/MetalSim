@@ -1,0 +1,51 @@
+{
+ "argv": [
+  "--part",
+  "rigid",
+  "--device",
+  "metal:0",
+  "--worlds",
+  "2048",
+  "--max-triangle-pairs",
+  "8388608",
+  "--warmup",
+  "70",
+  "--kprof",
+  "tick",
+  "--kprof-ticks",
+  "6",
+  "--json",
+  "/Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/runs/rigid_perf/out/late_new_tick.json"
+ ],
+ "device": "metal:0",
+ "device_name": "Apple M4 Max",
+ "warp": "1.18.0.dev20260917",
+ "newton": "1.5.2",
+ "worlds": 2048,
+ "part": "rigid",
+ "det": "off",
+ "pipeline_det": false,
+ "mode": "eager",
+ "max_triangle_pairs": 8388608,
+ "bodies": 26624,
+ "shapes": 188417,
+ "joints": 26624,
+ "dofs": 43008,
+ "build_s": 1.5621482919996197,
+ "solver_init_s": 6.070481166998434,
+ "rigid_contact_max": 14053376,
+ "kprof": {
+  "phase": "tick",
+  "reps": 6,
+  "wall_ms_per_rep": 129.1237221666961,
+  "profiling": false,
+  "per_rep_counters": {
+   "host_waits": 20.333333333333332,
+   "command_buffers": 23.333333333333332,
+   "host_ops": 0.0,
+   "dispatches": 524.6666666666666
+  }
+ },
+ "rigid_contacts": 417436,
+ "maxrss_mb": 3382.609375
+}

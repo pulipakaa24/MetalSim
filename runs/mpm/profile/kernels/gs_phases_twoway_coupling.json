@@ -1,0 +1,58 @@
+{
+ "colors": 8,
+ "color_blocks": [
+  2628,
+  2604,
+  2631,
+  2601,
+  2619,
+  2600,
+  2625,
+  2603
+ ],
+ "strain_nodes_per_color": [
+  2628,
+  2604,
+  2631,
+  2601,
+  2619,
+  2600,
+  2625,
+  2603
+ ],
+ "strain_nodes": 32768,
+ "velocity_nodes": 262144,
+ "strain_nnz_per_node": 5.105224609375,
+ "flags": [
+  0,
+  0,
+  0,
+  8,
+  1
+ ],
+ "sm_count": 40,
+ "us_per_color_pass": {
+  "newton": 17.98697812773753,
+  "empty": 2.3906234673631843,
+  "index_small": 3.1985030545911286,
+  "index_small_offsets": 3.557421950972639,
+  "full": 19.785806216532364,
+  "full_fast": 16.676299856044352,
+  "index": 11.48554683823022,
+  "gather": 13.750129801337607,
+  "gather_solve": 18.26158750191098,
+  "gather_solve_fast": 14.589712554879952,
+  "solve": 16.594921726209577,
+  "solve_fast": 13.428384409053251,
+  "scatter": 13.463281175063457,
+  "full_bd32_blocks80": 29.894271938246675,
+  "full_bd32_blocks160": 19.336262539582094,
+  "full_bd64_blocks160": 19.787237397395074,
+  "full_bd128_blocks40": 20.236199998180382,
+  "full_bd64_blocks40": 30.97102971878485,
+  "full_bd32_blocks320": 19.42194057846791,
+  "contact_solve_per_iteration": 97.90572976271505
+ },
+ "fast_rewrites": 1,
+ "scene": "example:mpm_twoway_coupling"
+}

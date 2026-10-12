@@ -1,0 +1,76 @@
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+/home/<vm-user>/parity3_scripts/mpm/scale/scale_pour.py:236: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+  model = scene.finalize(device=DEV)
+{
+ "argv": [
+  "--device",
+  "cuda:0",
+  "--json",
+  "/home/<vm-user>/parity3/scale_l4/mpm_cap_1.json",
+  "--part",
+  "mpm",
+  "--worlds",
+  "1",
+  "--mode",
+  "capture",
+  "--steps",
+  "10"
+ ],
+ "device": "cuda:0",
+ "device_name": "NVIDIA L4",
+ "warp": "1.16.0",
+ "newton": "1.5.2",
+ "worlds": 1,
+ "temporary_store": true,
+ "part": "mpm",
+ "mode": "capture",
+ "grid": "sparse",
+ "accumulate": "native",
+ "loop": "native",
+ "particles": 735,
+ "bodies": 2,
+ "colliders": 3,
+ "build_s": 0.0360482820000243,
+ "solver_init_s": 0.46379681899998104,
+ "max_active_cell_count": 1024,
+ "warmup_steps": 288,
+ "warmup_s": 6.591142402999935,
+ "capture": "ok",
+ "step_ms": {
+  "median": 2.375747999963096,
+  "mean": 2.791302499986159,
+  "min": 2.3667049999858136,
+  "max": 6.510395999953289
+ },
+ "step_ms_all": [
+  6.510395999953289,
+  2.3667049999858136,
+  2.3806100000456354,
+  2.375055000015891,
+  2.376124999955209,
+  2.3753709999709827,
+  2.371062999941387,
+  2.392854000049738,
+  2.3933290000286433,
+  2.371516999915002
+ ],
+ "step_ms_pipelined": 2.357266299998173,
+ "grid_status": "ok",
+ "iterations_last4": [
+  25,
+  25,
+  25,
+  25
+ ],
+ "res_l2_last4": [
+  0.0001773233962012455,
+  0.0001105297269532457,
+  3.187396578141488e-05,
+  5.7803223171504214e-05
+ ],
+ "occupied_cells_per_world": 134.0,
+ "velocity_nodes": 8192,
+ "strain_nodes": 1024,
+ "collider_nodes": 735,
+ "maxrss_mb": 547.1875
+}

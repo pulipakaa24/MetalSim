@@ -1,0 +1,695 @@
+/Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/metalsim/physics/mpm/probes/scale_pour.py:241: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+  model = scene.finalize(device=DEV)
+  333.573 ms      1.0  narrow_phase_find_mesh_triangle_overlaps_kernel_a2e50854_metal_forward
+  110.742 ms      1.0  create_narrow_phase_process_mesh_mesh_contacts_kernel__locals__mesh_sdf_collision_global_reduce_kernel_154089e
+   25.937 ms      1.0  mesh_triangle_contacts_to_reducer_kernel_e39fb65e_metal_forward
+    5.219 ms     19.5  _update_constraint_efc__locals__kernel_a4bbf43e_metal_forward
+    3.629 ms      1.0  reduce_buffered_contacts_kernel_18600803_metal_forward
+    1.669 ms      1.0  create_narrow_phase_process_mesh_plane_contacts_kernel__locals__narrow_phase_process_mesh_plane_contacts_reduc
+    1.025 ms     19.5  _linesearch_iterative_kernel__locals__kernel_cdd7fc06_metal_forward
+    1.001 ms     19.5  _update_gradient_cholesky__locals__kernel_1afc30e6_metal_forward
+    0.896 ms      1.0  _clear_active_kernel_4660aa1f_metal_forward
+    0.874 ms      3.0  _solve_init_jaref_kernel__locals__kernel_c55aacd8_metal_forward
+    0.874 ms      1.0  create_narrow_phase_kernel_gjk_mpr__locals__narrow_phase_kernel_gjk_mpr_da3ef1c3_metal_forward
+    0.855 ms      3.0  _update_constraint_efc__locals__kernel_9c16a648_metal_forward
+    0.809 ms     19.5  _update_gradient_h_incremental_9c0c45bc_metal_forward
+    0.685 ms      1.0  create_export_reduced_contacts_kernel__locals__export_reduced_contacts_kernel_49cb6a3d_metal_forward
+    0.600 ms      3.0  _efc_contact_update__locals__kernel_2d4d3d06_metal_forward
+    0.529 ms      3.0  convert_newton_contacts_to_mjwarp_kernel_2edc37a4_metal_forward
+    0.511 ms      3.0  _update_gradient_cholesky__locals__kernel_8033196e_metal_forward
+    0.459 ms     53.0  wp_memset
+    0.427 ms      3.0  _update_gradient_JTDAJ_dense_tiled__locals__kernel_e55ae25a_metal_forward
+    0.406 ms      3.0  _efc_contact_jac_dense__locals__kernel_209c10d2_metal_forward
+    0.366 ms     19.5  _update_constraint_init_qfrc_constraint_dense__locals__kernel_d55fc7a6_metal_forward
+    0.247 ms      9.0  wp_memtile
+    0.196 ms     33.0  _crb_accumulate_073a11b8_metal_forward
+    0.181 ms     33.0  _cfrc_backward_72237d38_metal_forward
+    0.172 ms     33.0  _subtree_com_acc_350f0560_metal_forward
+    0.165 ms     22.5  mul_m_kernel__locals___mul_m_ff3bc617_metal_forward
+    0.164 ms      1.0  create_narrow_phase_primitive_kernel__locals__narrow_phase_primitive_kernel_81a38a1a_metal_forward
+    0.156 ms      3.0  _preprocess_tactile_contacts_0f2dba1d_metal_forward
+    0.151 ms      6.0  _tile_cholesky_factorize_solve_block__locals__kernel_86a93633_metal_forward
+    0.144 ms      3.0  _efc_contact_init__locals__kernel_6b0e3be3_metal_forward
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/runs/rigid_perf/kcache/kc_base/1.18.0.dev20260917
+Module newton._src.geometry.inertia 0fe97dd load on device 'metal:0' took 643.19 ms  (cached)
+Module validate_and_correct_inertia_kernel_bea299a6 bea299a load on device 'metal:0' took 22.66 ms  (cached)
+Module newton._src.geometry.bvh fcf7383 load on device 'metal:0' took 472.23 ms  (cached)
+Module newton._src.solvers.mujoco.kernels 2aaa6ac load on device 'metal:0' took 3106.91 ms  (cached)
+Module repeat_array_kernel_702a7150 0e2dc9c load on device 'metal:0' took 23.24 ms  (cached)
+Module repeat_array_kernel_702a7150 815f0f2 load on device 'metal:0' took 22.00 ms  (cached)
+Module repeat_array_kernel_702a7150 1d08dd7 load on device 'metal:0' took 21.95 ms  (cached)
+Module repeat_array_kernel_702a7150 649a040 load on device 'metal:0' took 22.43 ms  (cached)
+Module repeat_array_kernel_702a7150 d233b0f load on device 'metal:0' took 22.18 ms  (cached)
+Module repeat_array_kernel_702a7150 21a009f load on device 'metal:0' took 22.05 ms  (cached)
+Module repeat_array_kernel_702a7150 f907360 load on device 'metal:0' took 22.31 ms  (cached)
+Module repeat_array_kernel_702a7150 9db5fd1 load on device 'metal:0' took 22.27 ms  (cached)
+Module mujoco_warp._src.io 345defc load on device 'metal:0' took 890.01 ms  (cached)
+Module mujoco_warp._src.smooth 561aaee load on device 'metal:0' took 1473.55 ms  (cached)
+Module _small_cholesky_factorize_block__locals__kernel_d034e4aa 9b18383 load on device 'metal:0' took 22.90 ms  (cached)
+Module _tile_cholesky_factorize_block__locals__kernel_194c9a3a df6059a load on device 'metal:0' took 22.39 ms  (cached)
+Module _small_cholesky_solve_block__locals__kernel_85b20c1c 35b7d36 load on device 'metal:0' took 319.84 ms  (cached)
+Module _tile_cholesky_solve_block__locals__kernel_64ffc9b6 bb6d20e load on device 'metal:0' took 22.82 ms  (cached)
+Module newton._src.sim.articulation b1f6c8f load on device 'metal:0' took 4672.29 ms  (cached)
+Module newton._src.sim.collide 2e554f9 load on device 'metal:0' took 462.82 ms  (cached)
+Module newton._src.geometry.broad_phase_nxn 4a7fec5 load on device 'metal:0' took 338.07 ms  (cached)
+Module narrow_phase_primitive_write_contact f3dd715 load on device 'metal:0' took 1501.56 ms  (cached)
+Module narrow_phase_gjk_mpr_True_write_contact_support_map_lean_post_process_minkowski_only 90748dd load on device 'metal:0' took 1328.08 ms  (cached)
+Module newton._src.geometry.narrow_phase 54fa3b2 load on device 'metal:0' took 537.83 ms  (cached)
+Module newton._src.geometry.contact_reduction_global 85622f1 load on device 'metal:0' took 444.14 ms  (cached)
+Module newton._src.geometry.narrow_phase 97c9c47 load on device 'metal:0' took 540.70 ms  (cached)
+Module newton._src.geometry.sdf_contact f2ae734 load on device 'metal:0' took 317.83 ms  (cached)
+Module narrow_phase_mesh_plane_write_contact_to_reducer_True 46ddd3c load on device 'metal:0' took 388.68 ms  (cached)
+Module mesh_triangle_contacts_to_reducer_kernel_7f497eb1 04081dd load on device 'metal:0' took 1928.41 ms  (cached)
+Module newton._src.geometry.contact_reduction_global b843aad load on device 'metal:0' took 443.45 ms  (cached)
+Module sdf_contact_write_contact_to_reducer_False_True 7455f5f load on device 'metal:0' took 958.61 ms  (cached)
+Module export_reduced_contacts_write_contact c319e70 load on device 'metal:0' took 404.17 ms  (cached)
+Module mujoco_warp._src.constraint cae2216 load on device 'metal:0' took 22.57 ms  (cached)
+Module _equality_joint__locals__kernel_a87c48f0 a87c48f load on device 'metal:0' took 342.77 ms  (cached)
+Module _friction_dof__locals__kernel_b90a8bb0 b90a8bb load on device 'metal:0' took 331.00 ms  (cached)
+Module _friction_tendon__locals__kernel_bf418e6c bf418e6 load on device 'metal:0' took 335.55 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_a2ae52bd a2ae52b load on device 'metal:0' took 336.40 ms  (cached)
+Module _efc_contact_init__locals__kernel_27358d96 27358d9 load on device 'metal:0' took 21.57 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_5502dc00 ebea527 load on device 'metal:0' took 387.10 ms  (cached)
+Module _efc_contact_update__locals__kernel_e6db2566 e6db256 load on device 'metal:0' took 330.81 ms  (cached)
+Module mujoco_warp._src.forward ff231f2 load on device 'metal:0' took 511.93 ms  (cached)
+Module mujoco_warp._src.forward 90c0bc3 load on device 'metal:0' took 517.35 ms  (cached)
+Module mujoco_warp._src.passive 7cfe4b2 load on device 'metal:0' took 884.10 ms  (cached)
+Module _qfrc_smooth__locals__kernel_4b25e77e 4b25e77 load on device 'metal:0' took 23.69 ms  (cached)
+Module mujoco_warp._src.support a610d77 load on device 'metal:0' took 355.04 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_4fab0d26 9013c3a load on device 'metal:0' took 23.11 ms  (cached)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_7c110e58 61bbcd0 load on device 'metal:0' took 21.95 ms  (cached)
+Module _solve_init_dof__locals__kernel_e812c665 e812c66 load on device 'metal:0' took 21.97 ms  (cached)
+Module mujoco_warp._src.solver 833d92c load on device 'metal:0' took 524.81 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_b9b00fe0 b9b00fe load on device 'metal:0' took 22.08 ms  (cached)
+Module mul_m_kernel__locals___mul_m_b8f48c9b b8f48c9 load on device 'metal:0' took 22.25 ms  (cached)
+Module _update_constraint_efc__locals__kernel_9791a747 9791a74 load on device 'metal:0' took 336.99 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_48870a9c 48870a9 load on device 'metal:0' took 22.83 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_b8af9364 b8af936 load on device 'metal:0' took 22.06 ms  (cached)
+Module _update_gradient_grad__locals__kernel_90ad7a97 90ad7a9 load on device 'metal:0' took 22.03 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_2172ba12 1685adc load on device 'metal:0' took 394.74 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_d37924c4 e8241d3 load on device 'metal:0' took 484.71 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_5e908fdb 35c26ff load on device 'metal:0' took 462.22 ms  (cached)
+Module _update_constraint_efc__locals__kernel_180f62ed 180f62e load on device 'metal:0' took 332.90 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_a0f1a0f7 a0f1a0f load on device 'metal:0' took 22.25 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_c69b45b6 c69b45b load on device 'metal:0' took 306.60 ms  (cached)
+Module _update_gradient_grad__locals__kernel_1dcf4b69 1dcf4b6 load on device 'metal:0' took 305.97 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_90ac8833 4fa738b load on device 'metal:0' took 484.46 ms  (cached)
+Module mujoco_warp._src.sensor 58ee4de load on device 'metal:0' took 1590.65 ms  (cached)
+Module mujoco_warp._src.derivative 63cf184 load on device 'metal:0' took 724.38 ms  (cached)
+Module _next_time_builder__locals___next_time_d112fcc4 d112fcc load on device 'metal:0' took 309.78 ms  (cached)
+{
+ "argv": [
+  "--part",
+  "rigid",
+  "--device",
+  "metal:0",
+  "--worlds",
+  "2048",
+  "--max-triangle-pairs",
+  "8388608",
+  "--warmup",
+  "70",
+  "--kprof",
+  "tick",
+  "--kprof-ticks",
+  "4",
+  "--json",
+  "/Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/runs/rigid_perf/out/late_base_prof.json"
+ ],
+ "device": "metal:0",
+ "device_name": "Apple M4 Max",
+ "warp": "1.18.0.dev20260917",
+ "newton": "1.5.2",
+ "worlds": 2048,
+ "part": "rigid",
+ "det": "off",
+ "pipeline_det": false,
+ "mode": "eager",
+ "max_triangle_pairs": 8388608,
+ "bodies": 26624,
+ "shapes": 188417,
+ "joints": 26624,
+ "dofs": 43008,
+ "build_s": 1.4130648749996908,
+ "solver_init_s": 7.383006792000742,
+ "rigid_contact_max": 14053376,
+ "kprof": {
+  "phase": "tick",
+  "reps": 4,
+  "wall_ms_per_rep": 512.161062499672,
+  "profiling": true,
+  "per_rep_counters": {
+   "host_waits": 22.75,
+   "command_buffers": 616.0,
+   "host_ops": 0.0,
+   "dispatches": 548.0
+  },
+  "kernels": [
+   {
+    "kernel": "narrow_phase_find_mesh_triangle_overlaps_kernel_a2e50854_metal_forward",
+    "ms": 333.573,
+    "launches": 1.0
+   },
+   {
+    "kernel": "create_narrow_phase_process_mesh_mesh_contacts_kernel__locals__mesh_sdf_collision_global_reduce_kernel_154089ea_metal_forward",
+    "ms": 110.74225,
+    "launches": 1.0
+   },
+   {
+    "kernel": "mesh_triangle_contacts_to_reducer_kernel_e39fb65e_metal_forward",
+    "ms": 25.93725,
+    "launches": 1.0
+   },
+   {
+    "kernel": "_update_constraint_efc__locals__kernel_a4bbf43e_metal_forward",
+    "ms": 5.21925,
+    "launches": 19.5
+   },
+   {
+    "kernel": "reduce_buffered_contacts_kernel_18600803_metal_forward",
+    "ms": 3.629,
+    "launches": 1.0
+   },
+   {
+    "kernel": "create_narrow_phase_process_mesh_plane_contacts_kernel__locals__narrow_phase_process_mesh_plane_contacts_reduce_kernel_7b0dcd62_metal_forward",
+    "ms": 1.669,
+    "launches": 1.0
+   },
+   {
+    "kernel": "_linesearch_iterative_kernel__locals__kernel_cdd7fc06_metal_forward",
+    "ms": 1.025,
+    "launches": 19.5
+   },
+   {
+    "kernel": "_update_gradient_cholesky__locals__kernel_1afc30e6_metal_forward",
+    "ms": 1.00125,
+    "launches": 19.5
+   },
+   {
+    "kernel": "_clear_active_kernel_4660aa1f_metal_forward",
+    "ms": 0.89575,
+    "launches": 1.0
+   },
+   {
+    "kernel": "_solve_init_jaref_kernel__locals__kernel_c55aacd8_metal_forward",
+    "ms": 0.87425,
+    "launches": 3.0
+   },
+   {
+    "kernel": "create_narrow_phase_kernel_gjk_mpr__locals__narrow_phase_kernel_gjk_mpr_da3ef1c3_metal_forward",
+    "ms": 0.874,
+    "launches": 1.0
+   },
+   {
+    "kernel": "_update_constraint_efc__locals__kernel_9c16a648_metal_forward",
+    "ms": 0.85525,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_update_gradient_h_incremental_9c0c45bc_metal_forward",
+    "ms": 0.80925,
+    "launches": 19.5
+   },
+   {
+    "kernel": "create_export_reduced_contacts_kernel__locals__export_reduced_contacts_kernel_49cb6a3d_metal_forward",
+    "ms": 0.685,
+    "launches": 1.0
+   },
+   {
+    "kernel": "_efc_contact_update__locals__kernel_2d4d3d06_metal_forward",
+    "ms": 0.5995,
+    "launches": 3.0
+   },
+   {
+    "kernel": "convert_newton_contacts_to_mjwarp_kernel_2edc37a4_metal_forward",
+    "ms": 0.52925,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_update_gradient_cholesky__locals__kernel_8033196e_metal_forward",
+    "ms": 0.51075,
+    "launches": 3.0
+   },
+   {
+    "kernel": "wp_memset",
+    "ms": 0.459,
+    "launches": 53.0
+   },
+   {
+    "kernel": "_update_gradient_JTDAJ_dense_tiled__locals__kernel_e55ae25a_metal_forward",
+    "ms": 0.4275,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_efc_contact_jac_dense__locals__kernel_209c10d2_metal_forward",
+    "ms": 0.406,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_update_constraint_init_qfrc_constraint_dense__locals__kernel_d55fc7a6_metal_forward",
+    "ms": 0.3665,
+    "launches": 19.5
+   },
+   {
+    "kernel": "wp_memtile",
+    "ms": 0.2475,
+    "launches": 9.0
+   },
+   {
+    "kernel": "_crb_accumulate_073a11b8_metal_forward",
+    "ms": 0.196,
+    "launches": 33.0
+   },
+   {
+    "kernel": "_cfrc_backward_72237d38_metal_forward",
+    "ms": 0.18125,
+    "launches": 33.0
+   },
+   {
+    "kernel": "_subtree_com_acc_350f0560_metal_forward",
+    "ms": 0.17225,
+    "launches": 33.0
+   },
+   {
+    "kernel": "mul_m_kernel__locals___mul_m_ff3bc617_metal_forward",
+    "ms": 0.1645,
+    "launches": 22.5
+   },
+   {
+    "kernel": "create_narrow_phase_primitive_kernel__locals__narrow_phase_primitive_kernel_81a38a1a_metal_forward",
+    "ms": 0.1635,
+    "launches": 1.0
+   },
+   {
+    "kernel": "_preprocess_tactile_contacts_0f2dba1d_metal_forward",
+    "ms": 0.15575,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_tile_cholesky_factorize_solve_block__locals__kernel_86a93633_metal_forward",
+    "ms": 0.15125,
+    "launches": 6.0
+   },
+   {
+    "kernel": "_efc_contact_init__locals__kernel_6b0e3be3_metal_forward",
+    "ms": 0.144,
+    "launches": 3.0
+   },
+   {
+    "kernel": "compute_block_counts_from_weights_89c44be4_metal_forward",
+    "ms": 0.142,
+    "launches": 2.0
+   },
+   {
+    "kernel": "_kinematics_branch_95f8028e_metal_forward",
+    "ms": 0.13275,
+    "launches": 3.0
+   },
+   {
+    "kernel": "eval_articulation_fk_6c60ba16_metal_forward",
+    "ms": 0.1135,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_solve_done_c8485047_metal_forward",
+    "ms": 0.11075,
+    "launches": 19.5
+   },
+   {
+    "kernel": "_small_cholesky_factorize_solve_block__locals__kernel_35b90ab6_metal_forward",
+    "ms": 0.11,
+    "launches": 6.0
+   },
+   {
+    "kernel": "_update_gradient_grad__locals__kernel_e00be912_metal_forward",
+    "ms": 0.109,
+    "launches": 19.5
+   },
+   {
+    "kernel": "_update_gradient_zero_grad_dot__locals__kernel_f84af473_metal_forward",
+    "ms": 0.0995,
+    "launches": 19.5
+   },
+   {
+    "kernel": "_gravity_force_7c63ac28_metal_forward",
+    "ms": 0.09375,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_update_constraint_init_qfrc_constraint_dense__locals__kernel_4d31aa3f_metal_forward",
+    "ms": 0.08,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_actuator_force_311863ad_metal_forward",
+    "ms": 0.0755,
+    "launches": 3.0
+   },
+   {
+    "kernel": "scan_reduce_i4",
+    "ms": 0.07125,
+    "launches": 4.0
+   },
+   {
+    "kernel": "_nxn_broadphase_precomputed_pairs_8be4a3a3_metal_forward",
+    "ms": 0.07025,
+    "launches": 1.0
+   },
+   {
+    "kernel": "_equality_joint__locals__kernel_98acb280_metal_forward",
+    "ms": 0.06675,
+    "launches": 3.0
+   },
+   {
+    "kernel": "compute_shape_aabbs_fcbde74c_metal_forward",
+    "ms": 0.0575,
+    "launches": 1.0
+   },
+   {
+    "kernel": "_comvel_branch_0f933c58_metal_forward",
+    "ms": 0.056,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_transmission_1c4157e8_metal_forward",
+    "ms": 0.05525,
+    "launches": 3.0
+   },
+   {
+    "kernel": "compute_mesh_mesh_edge_counts_a604ae33_metal_forward",
+    "ms": 0.05525,
+    "launches": 1.0
+   },
+   {
+    "kernel": "compute_mesh_plane_vert_counts_1af7aff4_metal_forward",
+    "ms": 0.054,
+    "launches": 1.0
+   },
+   {
+    "kernel": "convert_mj_coords_to_warp_kernel_55623290_metal_forward",
+    "ms": 0.05225,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_zero_change_counters_939878a2_metal_forward",
+    "ms": 0.04825,
+    "launches": 19.5
+   },
+   {
+    "kernel": "scan_down_i4",
+    "ms": 0.04675,
+    "launches": 4.0
+   },
+   {
+    "kernel": "_geom_local_to_global_e28b714c_metal_forward",
+    "ms": 0.04575,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_qderiv_actuator_passive_6cbfee2a_metal_forward",
+    "ms": 0.04325,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_qderiv_tendon_damping_ec990995_metal_forward",
+    "ms": 0.03975,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_cacc_branch_ffe1d6c4_metal_forward",
+    "ms": 0.03825,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_M_13671fca_metal_forward",
+    "ms": 0.03675,
+    "launches": 3.0
+   },
+   {
+    "kernel": "convert_warp_coords_to_mj_kernel_87f98e23_metal_forward",
+    "ms": 0.03625,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_qderiv_actuator_passive_vel_cc1a6654_metal_forward",
+    "ms": 0.03375,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_spring_damper_dof_passive_7b46d40c_metal_forward",
+    "ms": 0.0335,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_apply_ft_1667a928_metal_forward",
+    "ms": 0.03025,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_next_position_1c101e8d_metal_forward",
+    "ms": 0.0275,
+    "launches": 3.0
+   },
+   {
+    "kernel": "wp_memcpy",
+    "ms": 0.02725,
+    "launches": 6.0
+   },
+   {
+    "kernel": "_limit_slide_hinge__locals__kernel_f6df994e_metal_forward",
+    "ms": 0.02725,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_cfrc_3922b605_metal_forward",
+    "ms": 0.02675,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_subtree_com_init_002b02fd_metal_forward",
+    "ms": 0.02675,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_friction_dof__locals__kernel_b5c3d339_metal_forward",
+    "ms": 0.02625,
+    "launches": 3.0
+   },
+   {
+    "kernel": "apply_mjc_body_f_kernel_959969cf_metal_forward",
+    "ms": 0.0255,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_friction_tendon__locals__kernel_a4e4ea26_metal_forward",
+    "ms": 0.0245,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_cdof_3e73eb78_metal_forward",
+    "ms": 0.02375,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_compute_body_inertial_frames_d3bdd81a_metal_forward",
+    "ms": 0.0235,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_cinert_1261260c_metal_forward",
+    "ms": 0.0235,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_spring_damper_tendon_passive_d76f76d8_metal_forward",
+    "ms": 0.023,
+    "launches": 3.0
+   },
+   {
+    "kernel": "apply_mjc_qfrc_kernel_173e90ee_metal_forward",
+    "ms": 0.02275,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_qderiv_actuator_passive_actuation_sparse_9edf10e9_metal_forward",
+    "ms": 0.02225,
+    "launches": 3.0
+   },
+   {
+    "kernel": "apply_mjc_control_kernel_af10f051_metal_forward",
+    "ms": 0.0205,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_tendon_dot_62db264d_metal_forward",
+    "ms": 0.01975,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_joint_tendon_35c34b14_metal_forward",
+    "ms": 0.0195,
+    "launches": 3.0
+   },
+   {
+    "kernel": "scan_spine_i4",
+    "ms": 0.019,
+    "launches": 4.0
+   },
+   {
+    "kernel": "_next_activation_4a03322b_metal_forward",
+    "ms": 0.019,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_actuator_velocity_00a052f5_metal_forward",
+    "ms": 0.01875,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_update_gradient_grad__locals__kernel_230cc1c2_metal_forward",
+    "ms": 0.01875,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_next_time_builder__locals___next_time_9e67d474_metal_forward",
+    "ms": 0.0185,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_qfrc_actuator_gravcomp_limits_a91eb6a0_metal_forward",
+    "ms": 0.0175,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_qfrc_passive_ccf6028a_metal_forward",
+    "ms": 0.017,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_qfrc_bias_4085b6de_metal_forward",
+    "ms": 0.01575,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_tendon_velocity_ca816a63_metal_forward",
+    "ms": 0.01575,
+    "launches": 3.0
+   },
+   {
+    "kernel": "apply_mjc_free_joint_f_to_body_f_kernel_376acabe_metal_forward",
+    "ms": 0.01575,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_qfrc_actuator_6de5c51c_metal_forward",
+    "ms": 0.0155,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_qfrc_smooth__locals__kernel_33de72f1_metal_forward",
+    "ms": 0.01525,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_tendon_armature_0d777ffa_metal_forward",
+    "ms": 0.015,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_subtree_div_0ef57c26_metal_forward",
+    "ms": 0.01475,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_compute_body_matrices_27760750_metal_forward",
+    "ms": 0.01425,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_qfrc_constraint_from_grad_4e7e88b1_metal_forward",
+    "ms": 0.014,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_next_velocity_d66c2f53_metal_forward",
+    "ms": 0.014,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_tendon_bias_qfrc_2ae21571_metal_forward",
+    "ms": 0.0135,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_solve_init_dof__locals__kernel_70bb5915_metal_forward",
+    "ms": 0.0135,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_tendon_actuator_force_clamp_fd85b13d_metal_forward",
+    "ms": 0.01325,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_tendon_bias_coef_2556dfce_metal_forward",
+    "ms": 0.01275,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_tendon_actuator_force_2da6552b_metal_forward",
+    "ms": 0.012,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_update_gradient_zero_grad_dot__locals__kernel_c1c72bbd_metal_forward",
+    "ms": 0.01075,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_snapshot_nacon_count_b40012cc_metal_forward",
+    "ms": 0.0105,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_cacc_world_6ec26fdb_metal_forward",
+    "ms": 0.0105,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_comvel_root_15820f35_metal_forward",
+    "ms": 0.01025,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_zero_constraint_counts_82d999b9_metal_forward",
+    "ms": 0.0095,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_solve_init_efc_a1db7ec5_metal_forward",
+    "ms": 0.00775,
+    "launches": 3.0
+   },
+   {
+    "kernel": "_zero_active_count_kernel_de41732d_metal_forward",
+    "ms": 0.00775,
+    "launches": 1.0
+   },
+   {
+    "kernel": "verify_narrow_phase_buffers_c234c2df_metal_forward",
+    "ms": 0.00625,
+    "launches": 1.0
+   }
+  ],
+  "kernel_total_ms": 495.52875,
+  "launches": 616.0
+ },
+ "rigid_contacts": 422615,
+ "maxrss_mb": 3307.34375
+}

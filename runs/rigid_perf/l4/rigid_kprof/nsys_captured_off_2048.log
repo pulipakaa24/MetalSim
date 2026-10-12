@@ -1,0 +1,61 @@
+WARNING: The version of the system or its configuration does not allow enabling CPU profiling:
+- CPU IP/backtrace sampling will be disabled.
+- CPU context switch tracing will be disabled.
+Try the 'nsys status --environment' command to learn more.
+
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+/home/<vm-user>/parity3_scripts/mpm/scale/scale_pour_k.py:241: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+  model = scene.finalize(device=DEV)
+Capture range started in the application.
+Capture range ended in the application.
+Generating '/tmp/nsys-report-d1c8.qdstrm'
+[1/1] [0%                          ] captured_off_2048.nsys-repProcessing events...
+[1/1] [0%                          ] captured_off_2048.nsys-rep[1/1] [=========44%                ] captured_off_2048.nsys-rep[1/1] [==========49%               ] captured_off_2048.nsys-rep[1/1] [============55%             ] captured_off_2048.nsys-rep[1/1] [========================100%] captured_off_2048.nsys-rep[1/1] [========================100%] captured_off_2048.nsys-rep
+{
+ "argv": [
+  "--part",
+  "rigid",
+  "--device",
+  "cuda:0",
+  "--worlds",
+  "2048",
+  "--max-triangle-pairs",
+  "8388608",
+  "--det",
+  "off",
+  "--warmup",
+  "3",
+  "--kprof",
+  "captured",
+  "--kprof-ticks",
+  "4",
+  "--json",
+  "/home/<vm-user>/parity3/rigid_kprof/nsys_captured_off_2048.json"
+ ],
+ "device": "cuda:0",
+ "device_name": "NVIDIA L4",
+ "warp": "1.16.0",
+ "newton": "1.5.2",
+ "worlds": 2048,
+ "part": "rigid",
+ "det": "off",
+ "pipeline_det": false,
+ "mode": "eager",
+ "max_triangle_pairs": 8388608,
+ "bodies": 26624,
+ "shapes": 188417,
+ "joints": 26624,
+ "dofs": 43008,
+ "build_s": 3.3756661890000146,
+ "solver_init_s": 5.107804852000015,
+ "rigid_contact_max": 14053376,
+ "kprof": {
+  "phase": "captured",
+  "reps": 2,
+  "wall_ms_per_rep": 194.91238350002504
+ },
+ "rigid_contacts": 81920,
+ "maxrss_mb": 2983.91796875
+}
+Generated:
+	/home/<vm-user>/parity3/rigid_kprof/captured_off_2048.nsys-rep

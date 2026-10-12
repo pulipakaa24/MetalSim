@@ -1,0 +1,96 @@
+{
+ "scene": "example:mpm_viscous",
+ "scene_kwargs": {
+  "seconds": 0.05
+ },
+ "info": {
+  "scene": "example:mpm_viscous",
+  "args": {
+   "device": null,
+   "viewer": "gl",
+   "rerun_address": null,
+   "output_path": "output.usd",
+   "num_frames": 100,
+   "render_fps": null,
+   "headless": false,
+   "test": false,
+   "quiet": false,
+   "paused": false,
+   "benchmark": false,
+   "warp_config": [],
+   "realtime": false,
+   "funnel_aperture": 0.02,
+   "funnel_top_radius": 0.05,
+   "funnel_height": 0.2,
+   "funnel_offset_z": 0.2,
+   "gravity": [
+    0,
+    0,
+    -10
+   ],
+   "fps": 240.0,
+   "substeps": 1,
+   "density": 1000.0,
+   "viscosity": 50.0,
+   "tensile_yield_ratio": 1.0,
+   "friction": 0.0,
+   "ground_friction": 0.5,
+   "funnel_friction": 0.0,
+   "solver": "auto",
+   "max_iterations": 250,
+   "tolerance": 1e-06,
+   "voxel_size": 0.005,
+   "strain_basis": "P0",
+   "velocity_basis": "Q1",
+   "collider_basis": "S2"
+  },
+  "particle_count": 100190
+ },
+ "device": "metal:0",
+ "device_name": "Apple M4 Max",
+ "compat": {
+  "accumulate": "float32",
+  "loop": "cuda"
+ },
+ "stride": 1,
+ "frames": 12,
+ "frame_dt": 0.004166666666666667,
+ "init_md5": "56ba815e6ffb75910a83ea64feeb4ff2",
+ "particle_count": 100190,
+ "wall_s": [
+  4.195322250016034,
+  0.2565994999895338,
+  0.22719037500792183,
+  0.23076587499235757,
+  0.23358370800269768,
+  0.21959241697913967,
+  0.2245551669911947,
+  0.22590933297760785,
+  0.2269533750077244,
+  0.22674816599464975,
+  0.22381858300650492,
+  0.2266710829862859
+ ],
+ "wall_total_s": 6.717709831951652,
+ "iterations_mean": 250.0,
+ "iterations_max": 250,
+ "res_l2_max": 0.0010658585233613849,
+ "versions": {
+  "newton": "1.5.2",
+  "warp": "1.18.0.dev20260917",
+  "numpy": "2.5.3",
+  "python": "3.12.14",
+  "platform": "macOS-26.7.1-arm64-arm-64bit"
+ },
+ "argv": [
+  "metalsim/parity/isaac_side/record_mpm.py",
+  "--scene",
+  "example:mpm_viscous",
+  "--seconds",
+  "0.05",
+  "--device",
+  "metal:0",
+  "--out",
+  "runs/mpm/smoke/mpm_viscous"
+ ]
+}

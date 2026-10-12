@@ -1,0 +1,1768 @@
+
+# tests/test_deformable.py::test_mjw_flex_contact_trajectory_matches_mujoco_c
+  x
+     base1: [2, 112, 3] max=0.3020188 mean=0.1055002 min=-0.1805549 nf=0
+     base2: [2, 112, 3] max=0.3020188 mean=0.1055002 min=-0.1805549 nf=0
+     cand1: [2, 112, 3] max=0.3020188 mean=0.1055002 min=-0.1805549 nf=0
+     cand2: [2, 112, 3] max=0.3020188 mean=0.1055002 min=-0.1805549 nf=0
+
+# tests/test_deformable.py::test_mjw_flex_energy_bounded_2s
+  e0
+     base1: [64] max=1.123081 mean=1.102273 min=1.0791 nf=0
+     base2: [64] max=1.123081 mean=1.102272 min=1.0791 nf=0
+     cand1: [64] max=1.123081 mean=1.102272 min=1.0791 nf=0
+     cand2: [64] max=1.123081 mean=1.102272 min=1.0791 nf=0
+  emax
+     base1: [64] max=1.123081 mean=1.102273 min=1.0791 nf=0
+     base2: [64] max=1.123081 mean=1.102272 min=1.0791 nf=0
+     cand1: [64] max=1.123081 mean=1.102272 min=1.0791 nf=0
+     cand2: [64] max=1.123081 mean=1.102272 min=1.0791 nf=0
+  e
+     base1: [64] max=0.5718571 mean=0.5512387 min=0.5204332 nf=0
+     base2: [64] max=0.5721666 mean=0.551444 min=0.5201069 nf=0
+     cand1: [64] max=0.57203 mean=0.5514624 min=0.5210752 nf=0
+     cand2: [64] max=0.5717367 mean=0.5515964 min=0.5214609 nf=0
+  x
+     base1: [64, 112, 3] max=0.3312444 mean=0.09805272 min=-0.2037285 nf=0
+     base2: [64, 112, 3] max=0.3312444 mean=0.09815405 min=-0.2050897 nf=0
+     cand1: [64, 112, 3] max=0.3312444 mean=0.09814041 min=-0.2031198 nf=0
+     cand2: [64, 112, 3] max=0.3312444 mean=0.09806506 min=-0.2033824 nf=0
+  ke
+     base1: [64] max=0.0006266129 mean=0.0002480724 min=5.269386e-05 nf=0
+     base2: [64] max=0.0005767057 mean=0.0002197113 min=4.697937e-05 nf=0
+     cand1: [64] max=0.0005482268 mean=0.0002305887 min=4.483332e-05 nf=0
+     cand2: [64] max=0.0006585622 mean=0.0002133028 min=5.400541e-05 nf=0
+  cloth
+     base1: [64, 100, 3] max=0.3060808 mean=0.09335157 min=-0.2037285 nf=0
+     base2: [64, 100, 3] max=0.3076665 mean=0.09346506 min=-0.2050897 nf=0
+     cand1: [64, 100, 3] max=0.3086098 mean=0.09344978 min=-0.2031198 nf=0
+     cand2: [64, 100, 3] max=0.3069592 mean=0.09336539 min=-0.2033824 nf=0
+
+# tests/test_deformable.py::test_mjw_flex_free_fall_matches_mujoco_c
+  e
+     base1: [4, 2] max=0.9087631 mean=0.5381309 min=0.1674989 nf=0
+     base2: [4, 2] max=0.9087631 mean=0.5381309 min=0.1674989 nf=0
+     cand1: [4, 2] max=0.908763 mean=0.538131 min=0.1674991 nf=0
+     cand2: [4, 2] max=0.9087631 mean=0.538131 min=0.1674991 nf=0
+
+# tests/test_deformable.py::test_mjw_flex_graph_replay_equals_eager
+  free
+     base1: 7.105427e-15
+     base2: 6.217249e-15
+     cand1: 7.105427e-15
+     cand2: 5.329071e-15
+  ab
+     base1: 0.0447951
+     base2: 0.03671572
+     cand1: 0.0268974
+     cand2: 0.03906839
+  bc
+     base1: 0.03602156
+     base2: 0.04196762
+     cand1: 0.03597981
+     cand2: 0.06007886
+
+# tests/test_deformable.py::test_mjw_flex_one_step_matches_mujoco_c_in_contact
+  errs[0]
+     base1: 1.232996e-05
+     base2: 1.235155e-05
+     cand1: 9.8247e-06
+     cand2: 9.199783e-06
+  errs[1]
+     base1: 2.750542e-05
+     base2: 2.842929e-05
+     cand1: 2.71925e-05
+     cand2: 2.878692e-05
+  errs[2]
+     base1: 2.418952e-05
+     base2: 2.421932e-05
+     cand1: 2.740817e-05
+     cand2: 2.860027e-05
+  errs[3]
+     base1: 3.919022e-05
+     base2: 3.954785e-05
+     cand1: 3.933923e-05
+     cand2: 3.856437e-05
+  errs[4]
+     base1: 5.429708e-05
+     base2: 5.423748e-05
+     cand1: 5.431199e-05
+     cand2: 5.413317e-05
+  errs[5]
+     base1: 2.414751e-05
+     base2: 2.459454e-05
+     cand1: 1.502799e-05
+     cand2: 1.493859e-05
+  errs[6]
+     base1: 2.202494e-05
+     base2: 2.19374e-05
+     cand1: 2.273088e-05
+     cand2: 2.267128e-05
+  errs[7]
+     base1: 2.447072e-05
+     base2: 2.456944e-05
+     cand1: 2.43273e-05
+     cand2: 2.444837e-05
+  errs[8]
+     base1: 2.089793e-05
+     base2: 2.220179e-05
+     cand1: 1.976917e-05
+     cand2: 1.943017e-05
+  errs[9]
+     base1: 1.823484e-05
+     base2: 1.822367e-05
+     cand1: 1.32858e-05
+     cand2: 1.422643e-05
+  errs[10]
+     base1: 1.642423e-05
+     base2: 1.646149e-05
+     cand1: 1.789521e-05
+     cand2: 1.631382e-05
+  errs[11]
+     base1: 2.508895e-05
+     base2: 2.665916e-05
+     cand1: 2.575764e-05
+     cand2: 3.036582e-05
+  errs[12]
+     base1: 1.646563e-05
+     base2: 1.642541e-05
+     cand1: 1.700331e-05
+     cand2: 1.651359e-05
+  errs[13]
+     base1: 1.572058e-05
+     base2: 1.582489e-05
+     cand1: 1.584724e-05
+     cand2: 1.523629e-05
+  errs[14]
+     base1: 2.551364e-05
+     base2: 2.575579e-05
+     cand1: 2.59644e-05
+     cand2: 2.597186e-05
+  errs[15]
+     base1: 1.836369e-05
+     base2: 1.881818e-05
+     cand1: 1.850525e-05
+     cand2: 1.437018e-05
+  errs[16]
+     base1: 1.858152e-05
+     base2: 1.858897e-05
+     cand1: 1.866347e-05
+     cand2: 1.858152e-05
+  errs[17]
+     base1: 0.0003779958
+     base2: 0.0003781132
+     cand1: 0.008970988
+     cand2: 0.008971243
+  errs[18]
+     base1: 3.407865e-05
+     base2: 3.449588e-05
+     cand1: 3.310262e-05
+     cand2: 3.312497e-05
+  errs[19]
+     base1: 1.689247e-05
+     base2: 1.698188e-05
+     cand1: 1.893238e-05
+     cand2: 1.893495e-05
+  errs[20]
+     base1: 2.073182e-05
+     base2: 2.128037e-05
+     cand1: 2.128689e-05
+     cand2: 2.054183e-05
+  errs[21]
+     base1: 1.95413e-05
+     base2: 1.952268e-05
+     cand1: 1.956738e-05
+     cand2: 1.944445e-05
+  errs[22]
+     base1: 2.965926e-05
+     base2: 2.965478e-05
+     cand1: 2.982326e-05
+     cand2: 2.983155e-05
+  errs[23]
+     base1: 0.001683465
+     base2: 0.001683477
+     cand1: 0.001682349
+     cand2: 0.00168347
+
+# tests/test_deformable.py::test_xpbd_drape_agrees_with_mjw_flex
+  xa
+     base1: [100, 3] max=0.3048728 mean=0.09665477 min=-0.1750022 nf=0
+     base2: [100, 3] max=0.3049888 mean=0.09705821 min=-0.1758802 nf=0
+     cand1: [100, 3] max=0.3049683 mean=0.09686911 min=-0.1749655 nf=0
+     cand2: [100, 3] max=0.3048889 mean=0.09621043 min=-0.1756329 nf=0
+  centre
+     base1: 55
+     base2: 54
+     cand1: 54
+     cand2: 55
+
+# tests/test_deformable.py::test_xpbd_energy_strain_penetration_2s
+  e0
+     base1: [64] max=1.123075 mean=1.102267 min=1.079095 nf=0
+     base2: [64] max=1.123075 mean=1.102267 min=1.079094 nf=0
+     cand1: [64] max=1.123075 mean=1.102267 min=1.079095 nf=0
+     cand2: [64] max=1.123075 mean=1.102267 min=1.079094 nf=0
+  emax
+     base1: [64] max=1.123075 mean=1.102267 min=1.079095 nf=0
+     base2: [64] max=1.123075 mean=1.102267 min=1.079094 nf=0
+     cand1: [64] max=1.123075 mean=1.102267 min=1.079095 nf=0
+     cand2: [64] max=1.123075 mean=1.102267 min=1.079094 nf=0
+  e
+     base1: [64] max=0.5768206 mean=0.5688284 min=0.5594593 nf=0
+     base2: [64] max=0.5768202 mean=0.5688284 min=0.5594594 nf=0
+     cand1: [64] max=0.5768189 mean=0.5688307 min=0.5594161 nf=0
+     cand2: [64] max=0.5768191 mean=0.5688309 min=0.5594162 nf=0
+
+# tests/test_g1_fast_factorization.py::test_first_steps_match_mujoco_c
+  q
+     base1: [4, 44] max=0.9998246 mean=0.09490002 min=-0.9962687 nf=0
+     base2: [4, 44] max=0.9998246 mean=0.09490002 min=-0.9962687 nf=0
+     cand1: [4, 44] max=0.9998246 mean=0.09490002 min=-0.9962687 nf=0
+     cand2: [4, 44] max=0.9998246 mean=0.09490002 min=-0.9962687 nf=0
+
+# tests/test_g1_newton_engine.py::test_graph_replay_matches_eager
+  out[0]
+     base1: [4, 44] max=1.416215 mean=0.07959792 min=-1.696116 nf=0
+     base2: [4, 44] max=1.416215 mean=0.079598 min=-1.696116 nf=0
+     cand1: [4, 44] max=1.416216 mean=0.07959813 min=-1.696117 nf=0
+     cand2: [4, 44] max=1.416216 mean=0.07959798 min=-1.696116 nf=0
+  out[1]
+     base1: [4, 44] max=1.416215 mean=0.07959799 min=-1.696116 nf=0
+     base2: [4, 44] max=1.416215 mean=0.07959787 min=-1.696116 nf=0
+     cand1: [4, 44] max=1.416215 mean=0.07959788 min=-1.696116 nf=0
+     cand2: [4, 44] max=1.416216 mean=0.07959795 min=-1.696116 nf=0
+
+# tests/test_g1_newton_engine.py::test_rough_task_runs_on_newton
+  obs
+     base1: [8, 310] max=4.334878 mean=0.0963331 min=-4.149245 nf=0
+     base2: [8, 310] max=4.840881 mean=0.09491038 min=-5.092795 nf=0
+     cand1: [8, 310] max=4.337757 mean=0.09629973 min=-4.162919 nf=0
+     cand2: [8, 310] max=4.33916 mean=0.09627424 min=-4.139974 nf=0
+  q
+     base1: [8, 44] max=60.4618 mean=-0.6106625 min=-76.07182 nf=0
+     base2: [8, 44] max=60.46063 mean=-0.6125198 min=-76.07809 nf=0
+     cand1: [8, 44] max=60.46179 mean=-0.6106681 min=-76.07188 nf=0
+     cand2: [8, 44] max=60.46177 mean=-0.6106704 min=-76.07184 nf=0
+  scan
+     base1: [8, 187] max=0.3833818 mean=0.155502 min=-0.04949722 nf=0
+     base2: [8, 187] max=0.3525767 mean=0.1564881 min=-0.05211691 nf=0
+     cand1: [8, 187] max=0.3833844 mean=0.1555004 min=-0.04949603 nf=0
+     cand2: [8, 187] max=0.3833817 mean=0.1554867 min=-0.04950199 nf=0
+  xp
+     base1: [8, 45, 3] max=60.4618 mean=-0.2249063 min=-76.07182 nf=0
+     base2: [8, 45, 3] max=60.46063 mean=-0.2249576 min=-76.07809 nf=0
+     cand1: [8, 45, 3] max=60.46179 mean=-0.2249064 min=-76.07188 nf=0
+     cand2: [8, 45, 3] max=60.46177 mean=-0.2249064 min=-76.07184 nf=0
+  xm
+     base1: [8, 45, 3, 3] max=0.99309 mean=0.002493453 min=-0.9295583 nf=0
+     base2: [8, 45, 3, 3] max=0.9982902 mean=0.002462901 min=-0.9396511 nf=0
+     cand1: [8, 45, 3, 3] max=0.9930902 mean=0.002493065 min=-0.9294091 nf=0
+     cand2: [8, 45, 3, 3] max=0.9930907 mean=0.002493122 min=-0.9295127 nf=0
+
+# tests/test_g1_newton_engine.py::test_touch_signals_are_contact_forces_and_fall_is_terminated
+  sd
+     base1: [4, 3] max=128.9946 mean=85.71829 min=0 nf=0
+     base2: [4, 3] max=128.9911 mean=85.71602 min=0 nf=0
+     cand1: [4, 3] max=128.9764 mean=85.7177 min=0 nf=0
+     cand2: [4, 3] max=128.9865 mean=85.71898 min=0 nf=0
+  feet
+     base1: [4] max=257.1812 mean=257.1549 min=257.1425 nf=0
+     base2: [4] max=257.1613 mean=257.148 min=257.1351 nf=0
+     cand1: [4] max=257.1674 mean=257.1531 min=257.1406 nf=0
+     cand2: [4] max=257.1627 mean=257.1569 min=257.143 nf=0
+  term_r[0]
+     base1: -4.10011
+     base2: -4.100085
+     cand1: -4.100102
+     cand2: -4.100106
+  term_r[1]
+     base1: -4.102179
+     base2: -4.102162
+     cand1: -4.102168
+     cand2: -4.102184
+  term_r[2]
+     base1: -4.104747
+     base2: -4.104751
+     cand1: -4.104757
+     cand2: -4.10477
+  term_r[3]
+     base1: -4.104701
+     base2: -4.1047
+     cand1: -4.1047
+     cand2: -4.104707
+  r
+     base1: [4] max=0.02055578 mean=0.01648155 min=0.01194101 nf=0
+     base2: [4] max=0.02056462 mean=0.01647852 min=0.01193858 nf=0
+     cand1: [4] max=0.0205569 mean=0.01647963 min=0.01194086 nf=0
+     cand2: [4] max=0.02057065 mean=0.01648504 min=0.01194031 nf=0
+
+# tests/test_g1_task_terms.py::test_base_velocity_option_2_3_2_configs[flat]
+  terms
+     base1: [8, 13] max=0.6766772 mean=-0.08563264 min=-2.387012 nf=0
+     base2: [8, 13] max=0.6766772 mean=-0.08563254 min=-2.387012 nf=0
+     cand1: [8, 13] max=0.6766783 mean=-0.08563231 min=-2.387016 nf=0
+     cand2: [8, 13] max=0.6766783 mean=-0.08563264 min=-2.387016 nf=0
+  ref.0
+     base1: 0.1452666
+     base2: 0.1452692
+     cand1: 0.1452839
+     cand2: 0.1452562
+  ref.3
+     base1: -0.186369
+     base2: -0.186369
+     cand1: -0.1863706
+     cand2: -0.1863706
+  ref.4
+     base1: -0.1935993
+     base2: -0.1935991
+     cand1: -0.1935987
+     cand2: -0.1935991
+  ref.5
+     base1: -0.006724829
+     base2: -0.006725109
+     cand1: -0.006723744
+     cand2: -0.006725886
+  ref.8
+     base1: -0.003935406
+     base2: -0.003935184
+     cand1: -0.003936234
+     cand2: -0.003935415
+  ref.9
+     base1: -0.2677329
+     base2: -0.2677354
+     cand1: -0.2677253
+     cand2: -0.2677331
+  ref.10
+     base1: -0.06686408
+     base2: -0.06686395
+     cand1: -0.06686394
+     cand2: -0.06686246
+  ref.11
+     base1: -0.03878379
+     base2: -0.03878263
+     cand1: -0.0387841
+     cand2: -0.03878136
+
+# tests/test_g1_task_terms.py::test_base_velocity_option_2_3_2_configs[rough]
+  terms
+     base1: [8, 13] max=0.6397884 mean=-0.07219589 min=-1.546052 nf=0
+     base2: [8, 13] max=1.486022 mean=-0.06130539 min=-2.274685 nf=0
+     cand1: [8, 13] max=1.485826 mean=-0.0613005 min=-2.274387 nf=0
+     cand2: [8, 13] max=1.485831 mean=-0.06130013 min=-2.274366 nf=0
+  ref.0
+     base1: 0.06810063
+     base2: 0.007511782
+     cand1: 0.007512703
+     cand2: 0.007512738
+  ref.1
+     base1: 0
+     base2: 1.486022
+     cand1: 1.485826
+     cand2: 1.485831
+  ref.3
+     base1: -0.1080159
+     base2: -0.09086492
+     cand1: -0.09086674
+     cand2: -0.09086587
+  ref.4
+     base1: -0.2172046
+     base2: -0.2389095
+     cand1: -0.2389091
+     cand2: -0.2389096
+  ref.5
+     base1: -0.02813516
+     base2: -0.01693906
+     cand1: -0.01693653
+     cand2: -0.01693656
+  ref.6
+     base1: -0.135639
+     base2: -0.1297335
+     cand1: -0.1297335
+     cand2: -0.1297335
+  ref.9
+     base1: -0.9104137
+     base2: -0.8975094
+     cand1: -0.8975207
+     cand2: -0.8975224
+  ref.10
+     base1: -0.001660531
+     base2: -0.003024386
+     cand1: -0.003024327
+     cand2: -0.003024327
+  ref.11
+     base1: -0.1245691
+     base2: -0.02795548
+     cand1: -0.02795541
+     cand2: -0.02795506
+
+# tests/test_g1_task_terms.py::test_base_velocity_option_2_3_2_configs[rough_isaac]
+  terms
+     base1: [8, 13] max=1.866497 mean=-0.03817384 min=-2.20973 nf=0
+     base2: [8, 13] max=1.616025 mean=-0.04369004 min=-1.803629 nf=0
+     cand1: [8, 13] max=1.998973 mean=-0.01391657 min=-1.931181 nf=0
+     cand2: [8, 13] max=1.999958 mean=0.00149769 min=-1.660406 nf=0
+  ref.0
+     base1: 0.02985734
+     base2: 0.02074426
+     cand1: 0.02768974
+     cand2: 0.02548054
+  ref.1
+     base1: 0.03579806
+     base2: 0.1333687
+     cand1: 1.930935
+     cand2: 1.111012
+  ref.4
+     base1: -0.2541143
+     base2: -0.2660801
+     cand1: -0.2149113
+     cand2: -0.2247569
+  ref.5
+     base1: -0.09153242
+     base2: -0.07941231
+     cand1: -0.07178759
+     cand2: -0.07645484
+  ref.9
+     base1: -0.2928768
+     base2: -0.3946964
+     cand1: -0.09900708
+     cand2: -0.127072
+  ref.10
+     base1: -0.003329174
+     base2: -0.003128491
+     cand1: -0.003298379
+     cand2: -0.003271548
+  ref.11
+     base1: -0.1034115
+     base2: -0.1001111
+     cand1: -0.09596364
+     cand2: -0.09556945
+
+# tests/test_g1_task_terms.py::test_contact_sensor_flags_match_touch_sites
+  seen_air
+     base1: 909
+     base2: 906
+     cand1: 912
+     cand2: 912
+  seen_contact
+     base1: 11891
+     base2: 11894
+     cand1: 11888
+     cand2: 11888
+  cs.net_forces_w
+     base1: [64, 3, 3] max=189.974 mean=35.20507 min=0 nf=0
+     base2: [64, 3, 3] max=189.9637 mean=35.20379 min=0 nf=0
+     cand1: [64, 3, 3] max=189.9633 mean=35.20626 min=0 nf=0
+     cand2: [64, 3, 3] max=189.9557 mean=35.20635 min=0 nf=0
+  cs.net_forces_w_history
+     base1: [64, 3, 3, 3] max=189.9895 mean=35.20682 min=0 nf=0
+     base2: [64, 3, 3, 3] max=190.0184 mean=35.20562 min=0 nf=0
+     cand1: [64, 3, 3, 3] max=189.9907 mean=35.20816 min=0 nf=0
+     cand2: [64, 3, 3, 3] max=189.9615 mean=35.20817 min=0 nf=0
+  cs.last_air_time
+     base1: [64, 3] max=0.015 mean=0.01122396 min=0.01 nf=0
+     base2: [64, 3] max=0.015 mean=0.01119792 min=0.01 nf=0
+     cand1: [64, 3] max=0.015 mean=0.01125 min=0.01 nf=0
+     cand2: [64, 3] max=0.015 mean=0.01125 min=0.01 nf=0
+  cs.current_contact_time
+     base1: [64, 3] max=0.6299996 mean=0.6089058 min=0.5849996 nf=0
+     base2: [64, 3] max=0.6299996 mean=0.6086454 min=0.5849996 nf=0
+     cand1: [64, 3] max=0.6299996 mean=0.6091663 min=0.5849996 nf=0
+     cand2: [64, 3] max=0.6299996 mean=0.6091663 min=0.5849996 nf=0
+  cs.last_contact_time
+     base1: [64, 3] max=0.04499999 mean=0.03054687 min=0.015 nf=0
+     base2: [64, 3] max=0.04499999 mean=0.03067708 min=0.015 nf=0
+     cand1: [64, 3] max=0.04499999 mean=0.03041666 min=0.015 nf=0
+     cand2: [64, 3] max=0.04499999 mean=0.03041666 min=0.015 nf=0
+  sd
+     base1: [64, 3] max=189.974 mean=105.6152 min=63.28134 nf=0
+     base2: [64, 3] max=189.9637 mean=105.6114 min=63.28561 nf=0
+     cand1: [64, 3] max=189.9633 mean=105.6188 min=63.27731 nf=0
+     cand2: [64, 3] max=189.9557 mean=105.619 min=63.28247 nf=0
+
+# tests/test_g1_task_terms.py::test_feet_slide_velocity_is_the_foot_body_world_velocity[mjwarp]
+  qpos
+     base1: [4, 44] max=1.585915 mean=0.08863301 min=-1.425476 nf=0
+     base2: [4, 44] max=1.58547 mean=0.08679067 min=-1.427935 nf=0
+     cand1: [4, 44] max=1.579075 mean=0.08543077 min=-1.429706 nf=0
+     cand2: [4, 44] max=1.585915 mean=0.088633 min=-1.425476 nf=0
+  qvel
+     base1: [4, 43] max=1.791897 mean=-0.01511013 min=-1.597804 nf=0
+     base2: [4, 43] max=3.757905 mean=0.01980311 min=-2.147142 nf=0
+     cand1: [4, 43] max=2.142367 mean=-0.03568726 min=-2.676002 nf=0
+     cand2: [4, 43] max=1.791893 mean=-0.01511065 min=-1.597791 nf=0
+  fv
+     base1: [4, 2, 3] max=0.07185616 mean=-0.01122959 min=-0.4291234 nf=0
+     base2: [4, 2, 3] max=0.09403235 mean=-0.06655527 min=-1.085173 nf=0
+     cand1: [4, 2, 3] max=0.4457051 mean=-0.1728052 min=-2.964656 nf=0
+     cand2: [4, 2, 3] max=0.07185554 mean=-0.01122942 min=-0.4291227 nf=0
+  v6
+     base1: [6] max=0.02449572 mean=-0.09828456 min=-0.4540168 nf=0
+     base2: [6] max=0.003796606 mean=-0.08152629 min=-0.2694109 nf=0
+     cand1: [6] max=0.06212028 mean=0.01015881 min=-0.007560261 nf=0
+     cand2: [6] max=0.02449425 mean=-0.09828182 min=-0.4540055 nf=0
+
+# tests/test_g1_task_terms.py::test_feet_slide_velocity_is_the_foot_body_world_velocity[newton]
+  qpos
+     base1: [4, 44] max=1.569337 mean=0.1011288 min=-1.429461 nf=0
+     base2: [4, 44] max=1.558344 mean=0.09335605 min=-1.428347 nf=0
+     cand1: [4, 44] max=1.548752 mean=0.09387812 min=-1.427324 nf=0
+     cand2: [4, 44] max=1.590503 mean=0.1046243 min=-1.420618 nf=0
+  qvel
+     base1: [4, 43] max=4.895552 mean=0.0683811 min=-3.189558 nf=0
+     base2: [4, 43] max=4.502557 mean=0.1133821 min=-2.943024 nf=0
+     cand1: [4, 43] max=6.209728 mean=0.07044114 min=-3.574243 nf=0
+     cand2: [4, 43] max=3.092797 mean=0.106715 min=-2.518464 nf=0
+  fv
+     base1: [4, 2, 3] max=1.970809 mean=0.1293903 min=-0.3198054 nf=0
+     base2: [4, 2, 3] max=1.533515 mean=0.112964 min=-0.9665814 nf=0
+     cand1: [4, 2, 3] max=2.233376 mean=0.1271717 min=-0.8124769 nf=0
+     cand2: [4, 2, 3] max=0.5034348 mean=0.001470502 min=-0.360561 nf=0
+  v6
+     base1: [6] max=0.9616377 mean=0.225946 min=-0.1229035 nf=0
+     base2: [6] max=0.285908 mean=0.06402186 min=-0.06566163 nf=0
+     cand1: [6] max=0.4609791 mean=0.09940788 min=-0.1458217 nf=0
+     cand2: [6] max=0.1751889 mean=-0.0669591 min=-0.286364 nf=0
+
+# tests/test_g1_task_terms.py::test_flat_commands_and_contact_history_termination[mjwarp]
+  fired
+     base1: 389
+     base2: 387
+     cand1: 389
+     cand2: 388
+  h
+     base1: [256] max=10747.88 mean=157.6226 min=0 nf=0
+     base2: [256] max=10722.99 mean=120.752 min=0 nf=0
+     cand1: [256] max=10704.22 mean=120.6833 min=0 nf=0
+     cand2: [256] max=10752.18 mean=120.8838 min=0 nf=0
+  term
+     base1: [256] max=0 mean=-3.90625 min=-200 nf=0
+     base2: [256] max=0 mean=-3.125 min=-200 nf=0
+     cand1: [256] max=0 mean=-3.125 min=-200 nf=0
+     cand2: [256] max=0 mean=-3.125 min=-200 nf=0
+
+# tests/test_g1_task_terms.py::test_il3_add_base_mass_distribution_and_constants[None]
+  sub
+     base1: [4096, 45] max=33.82354 mean=3.257984 min=1e-06 nf=0
+     base2: [4096, 45] max=33.82354 mean=3.257984 min=1e-06 nf=0
+     cand1: [4096, 45] max=33.82354 mean=3.257984 min=1e-06 nf=0
+     cand2: [4096, 45] max=33.82354 mean=3.257984 min=1e-06 nf=0
+  inv_d
+     base1: [4096, 43] max=990.9396 mean=327.3267 min=0.0508105 nf=0
+     base2: [4096, 43] max=990.9396 mean=327.3267 min=0.0508105 nf=0
+     cand1: [4096, 43] max=990.9395 mean=327.3267 min=0.0508105 nf=0
+     cand2: [4096, 43] max=990.9395 mean=327.3267 min=0.0508105 nf=0
+  inv_b
+     base1: [4096, 45, 2] max=977.5197 mean=96.96587 min=0 nf=0
+     base2: [4096, 45, 2] max=977.5197 mean=96.96587 min=0 nf=0
+     cand1: [4096, 45, 2] max=977.5195 mean=96.96587 min=0 nf=0
+     cand2: [4096, 45, 2] max=977.5195 mean=96.96587 min=0 nf=0
+
+# tests/test_g1_task_terms.py::test_il3_add_base_mass_distribution_and_constants[isaaclab3]
+  sub
+     base1: [4096, 45] max=33.82354 mean=3.257984 min=1e-06 nf=0
+     base2: [4096, 45] max=33.82354 mean=3.257984 min=1e-06 nf=0
+     cand1: [4096, 45] max=33.82354 mean=3.257984 min=1e-06 nf=0
+     cand2: [4096, 45] max=33.82354 mean=3.257984 min=1e-06 nf=0
+  inv_d
+     base1: [4096, 43] max=990.9396 mean=327.3267 min=0.0508105 nf=0
+     base2: [4096, 43] max=990.9396 mean=327.3267 min=0.0508105 nf=0
+     cand1: [4096, 43] max=990.9395 mean=327.3267 min=0.0508105 nf=0
+     cand2: [4096, 43] max=990.9395 mean=327.3267 min=0.0508105 nf=0
+  inv_b
+     base1: [4096, 45, 2] max=977.5197 mean=96.96587 min=0 nf=0
+     base2: [4096, 45, 2] max=977.5197 mean=96.96587 min=0 nf=0
+     cand1: [4096, 45, 2] max=977.5195 mean=96.96587 min=0 nf=0
+     cand2: [4096, 45, 2] max=977.5195 mean=96.96587 min=0 nf=0
+
+# tests/test_g1_task_terms.py::test_il3_base_lin_vel_is_the_root_com_velocity
+  qpos
+     base1: [16, 44] max=4.115264 mean=0.0970862 min=-4.204237 nf=0
+     base2: [16, 44] max=4.117841 mean=0.09750497 min=-4.210189 nf=0
+     cand1: [16, 44] max=4.12011 mean=0.09685136 min=-4.205571 nf=0
+     cand2: [16, 44] max=4.117841 mean=0.09750496 min=-4.210189 nf=0
+  qvel
+     base1: [16, 43] max=6.491687 mean=0.006810547 min=-7.202706 nf=0
+     base2: [16, 43] max=8.698515 mean=-0.04276992 min=-8.004194 nf=0
+     cand1: [16, 43] max=6.492031 mean=-0.0005388164 min=-6.91441 nf=0
+     cand2: [16, 43] max=8.698513 mean=-0.04277044 min=-8.004182 nf=0
+  obs
+     base1: [16, 123] max=6.585261 mean=0.01870038 min=-6.416196 nf=0
+     base2: [16, 123] max=9.759154 mean=0.002126652 min=-6.736766 nf=0
+     cand1: [16, 123] max=6.290641 mean=0.01583204 min=-6.876011 nf=0
+     cand2: [16, 123] max=9.759152 mean=0.002126468 min=-6.736754 nf=0
+  far
+     base1: 15
+     base2: 15
+     cand1: 16
+     cand2: 15
+  w_w
+     base1: [3] max=-0.2630346 mean=-1.116716 min=-1.842013 nf=0
+     base2: [3] max=0.9171253 mean=-0.0170373 min=-1.173044 nf=0
+     cand1: [3] max=0.3677057 mean=-0.6524115 min=-1.723117 nf=0
+     cand2: [3] max=0.9171225 mean=-0.01703258 min=-1.173039 nf=0
+  v_com
+     base1: [3] max=-0.1160711 mean=-0.1900414 min=-0.2957547 nf=0
+     base2: [3] max=0.3046889 mean=-0.03456472 min=-0.4177344 nf=0
+     cand1: [3] max=0.2079304 mean=-0.04783055 min=-0.3791463 nf=0
+     cand2: [3] max=0.3046889 mean=-0.03456512 min=-0.4177348 nf=0
+  v_b
+     base1: [3] max=0.1421003 mean=-0.1009668 min=-0.2807943 nf=0
+     base2: [3] max=0.03397225 mean=-0.229139 min=-0.4157835 nf=0
+     cand1: [3] max=-0.01282634 mean=-0.2035825 min=-0.3654294 nf=0
+     cand2: [3] max=0.03397157 mean=-0.2291393 min=-0.4157838 nf=0
+
+# tests/test_g1_task_terms.py::test_il3_contact_sensor_ticks
+  c.net_forces_w
+     base1: [64, 3, 3] max=159.9185 mean=35.30711 min=0 nf=0
+     base2: [64, 3, 3] max=159.9072 mean=35.30712 min=0 nf=0
+     cand1: [64, 3, 3] max=159.9131 mean=35.3075 min=0 nf=0
+     cand2: [64, 3, 3] max=159.92 mean=35.30727 min=0 nf=0
+  c.net_forces_w_history
+     base1: [64, 3, 3, 3] max=160.4397 mean=35.36933 min=0 nf=0
+     base2: [64, 3, 3, 3] max=160.438 mean=35.36914 min=0 nf=0
+     cand1: [64, 3, 3, 3] max=160.4405 mean=35.36933 min=0 nf=0
+     cand2: [64, 3, 3, 3] max=160.4301 mean=35.36919 min=0 nf=0
+
+# tests/test_g1_task_terms.py::test_il3_reward_terms_match_isaac_formulas[flat_il3]
+  terms
+     base1: [8, 13] max=0.7724989 mean=-0.05642372 min=-1.174729 nf=0
+     base2: [8, 13] max=0.7734302 mean=-0.05613509 min=-1.236869 nf=0
+     cand1: [8, 13] max=0.7022755 mean=-0.09091425 min=-1.363349 nf=0
+     cand2: [8, 13] max=0.5634508 mean=-0.05532679 min=-0.8167682 nf=0
+  ref.0
+     base1: 0.7724989
+     base2: 0.7734302
+     cand1: 0.166978
+     cand2: 0.5634507
+  ref.1
+     base1: 0.3515987
+     base2: 0.294445
+     cand1: 0
+     cand2: 2.687032e-12
+  ref.2
+     base1: 0.015
+     base2: 0.01125
+     cand1: 0.0075
+     cand2: 0.01125
+  ref.3
+     base1: -0.05398859
+     base2: -0.04726669
+     cand1: -0.2465457
+     cand2: -0.1040499
+  ref.4
+     base1: -0.2763885
+     base2: -0.2900254
+     cand1: -0.2268182
+     cand2: -0.2908314
+  ref.5
+     base1: -0.091218
+     base2: -0.08982572
+     cand1: -0.004257272
+     cand2: -0.08608582
+  ref.6
+     base1: -0.1084897
+     base2: -0.1084897
+     cand1: -0.1161642
+     cand2: -0.1084897
+  ref.8
+     base1: -0.02284507
+     base2: -0.02704465
+     cand1: -1.615905e-05
+     cand2: -5.849652e-05
+  ref.9
+     base1: -0.5553977
+     base2: -0.5613977
+     cand1: -1.029481
+     cand2: -0.4356459
+  ref.10
+     base1: -0.008037682
+     base2: -0.007948475
+     cand1: -0.03281099
+     cand2: -0.01398571
+  ref.11
+     base1: -1.174729
+     base2: -1.23687
+     cand1: -0.05885898
+     cand2: -0.1010821
+
+# tests/test_g1_task_terms.py::test_il3_reward_terms_match_isaac_formulas[rough_il3]
+  terms
+     base1: [8, 13] max=0.7233701 mean=-0.0498185 min=-1.155165 nf=0
+     base2: [8, 13] max=1.15519 mean=-0.04877159 min=-1.277891 nf=0
+     cand1: [8, 13] max=0.7233711 mean=-0.04985168 min=-1.15517 nf=0
+     cand2: [8, 13] max=0.8625057 mean=-0.05020329 min=-1.090591 nf=0
+  ref.0
+     base1: 0.2972482
+     base2: 0.235266
+     cand1: 0.2972108
+     cand2: 0.1735241
+  ref.2
+     base1: 0.00125
+     base2: 0.00125
+     cand1: 0.00125
+     cand2: 0
+  ref.3
+     base1: -0.08776214
+     base2: -0.13909
+     cand1: -0.08776396
+     cand2: -0.1047158
+  ref.4
+     base1: -0.2796628
+     base2: -0.285218
+     cand1: -0.2830423
+     cand2: -0.2846244
+  ref.5
+     base1: -0.16424
+     base2: -0.1875813
+     cand1: -0.1642447
+     cand2: -0.1753604
+  ref.9
+     base1: -0.31556
+     base2: -0.4670045
+     cand1: -0.3155672
+     cand2: -0.4876352
+  ref.10
+     base1: -0.006286221
+     base2: -0.005737444
+     cand1: -0.006286292
+     cand2: -0.006170887
+  ref.11
+     base1: -0.122032
+     base2: -0.1469523
+     cand1: -0.1220348
+     cand2: -0.1318417
+  ref.12
+     base1: -0.04728844
+     base2: -0
+     cand1: -0.04729112
+     cand2: -0
+  v
+     base1: -0.04728844
+     base2: -0
+     cand1: -0.04729112
+     cand2: -0
+
+# tests/test_g1_task_terms.py::test_reward_terms_match_isaac_formulas[mjwarp]
+  terms
+     base1: [8, 13] max=0.8956987 mean=-0.03788052 min=-0.5644605 nf=0
+     base2: [8, 13] max=0.893434 mean=-0.02759416 min=-0.6239734 nf=0
+     cand1: [8, 13] max=0.8934345 mean=-0.0284694 min=-0.6239734 nf=0
+     cand2: [8, 13] max=0.8934339 mean=-0.02759417 min=-0.6239738 nf=0
+  ref.0
+     base1: 0.03777431
+     base2: 0.03781494
+     cand1: 0.0378149
+     cand2: 0.03781471
+  ref.2
+     base1: 0.00375
+     base2: 0.01125
+     cand1: 0.01125
+     cand2: 0.01125
+  ref.3
+     base1: -0.09423333
+     base2: -0.07268827
+     cand1: -0.07268842
+     cand2: -0.07268862
+  ref.4
+     base1: -0.2349689
+     base2: -0.2316344
+     cand1: -0.2316343
+     cand2: -0.2316344
+  ref.5
+     base1: -0.002084623
+     base2: -0.007216501
+     cand1: -0.00721637
+     cand2: -0.007216417
+  ref.8
+     base1: -0.01435397
+     base2: -0.01978683
+     cand1: -0.01978672
+     cand2: -0.01978676
+  ref.9
+     base1: -0.5644605
+     base2: -0.4326766
+     cand1: -0.4326764
+     cand2: -0.4326772
+  ref.10
+     base1: -0.02410295
+     base2: -0.01594972
+     cand1: -0.01594975
+     cand2: -0.01594973
+  ref.11
+     base1: -0.05485767
+     base2: -0.04423478
+     cand1: -0.04423422
+     cand2: -0.04423399
+
+# tests/test_g1_task_terms.py::test_reward_terms_match_isaac_formulas[newton]
+  terms
+     base1: [8, 13] max=0.9268883 mean=-0.09859805 min=-4.685184 nf=0
+     base2: [8, 13] max=0.9268883 mean=-0.09860733 min=-4.685083 nf=0
+     cand1: [8, 13] max=0.9268532 mean=-0.0985967 min=-4.684827 nf=0
+     cand2: [8, 13] max=0.9209653 mean=-0.09274294 min=-3.525654 nf=0
+  ref.0
+     base1: 0.638375
+     base2: 0.638375
+     cand1: 0.6383791
+     cand2: 0.3698453
+  ref.2
+     base1: 0
+     base2: 0
+     cand1: 0
+     cand2: 0.015
+  ref.3
+     base1: 0
+     base2: 0
+     cand1: 0
+     cand2: -0.01764121
+  ref.4
+     base1: -0.2370505
+     base2: -0.2370505
+     cand1: -0.2370498
+     cand2: -0.2132034
+  ref.5
+     base1: -0.06243763
+     base2: -0.06243763
+     cand1: -0.06243723
+     cand2: -0.04435028
+  ref.8
+     base1: -0.01657986
+     base2: -0.01657986
+     cand1: -0.01659143
+     cand2: -0.01206024
+  ref.9
+     base1: -1.65925
+     base2: -1.65925
+     cand1: -1.659164
+     cand2: -1.286491
+  ref.10
+     base1: -0.03054119
+     base2: -0.03054119
+     cand1: -0.03054082
+     cand2: -0.02825252
+  ref.11
+     base1: -0.07607576
+     base2: -0.07607576
+     cand1: -0.07606044
+     cand2: -0.1046654
+
+# tests/test_g1_task_terms.py::test_rough_isaac_reward_set_matches_isaac_formulas
+  terms
+     base1: [8, 13] max=1.403823 mean=-0.04061848 min=-1.703252 nf=0
+     base2: [8, 13] max=1.403802 mean=-0.04062022 min=-1.703252 nf=0
+     cand1: [8, 13] max=1.403812 mean=-0.04061336 min=-1.703257 nf=0
+     cand2: [8, 13] max=1.998865 mean=-0.0312067 min=-1.506959 nf=0
+  ref.0
+     base1: 0.04939779
+     base2: 0.0493973
+     cand1: 0.04938677
+     cand2: 0.04472042
+  ref.1
+     base1: 0.9319454
+     base2: 0.9317641
+     cand1: 0.9323344
+     cand2: 1.885252
+  ref.2
+     base1: 0.00375
+     base2: 0.00375
+     cand1: 0.00375
+     cand2: 0.00125
+  ref.3
+     base1: -0.08600389
+     base2: -0.08600415
+     cand1: -0.08600127
+     cand2: -0.3635945
+  ref.4
+     base1: -0.2555639
+     base2: -0.2555667
+     cand1: -0.2554083
+     cand2: -0.2797423
+  ref.5
+     base1: -0.08633767
+     base2: -0.08633677
+     cand1: -0.08633734
+     cand2: -0.09666995
+  ref.9
+     base1: -0.1018624
+     base2: -0.1018463
+     cand1: -0.1018493
+     cand2: -0.04812331
+  ref.10
+     base1: -0.001784203
+     base2: -0.00178415
+     cand1: -0.001784108
+     cand2: -0.0003533986
+  ref.11
+     base1: -0.04256471
+     base2: -0.04256256
+     cand1: -0.04256577
+     cand2: -0.9003426
+
+# tests/test_g1_task_terms.py::test_rough_reward_set_unchanged
+  terms
+     base1: [8, 13] max=1.855511 mean=-0.02394479 min=-0.7687263 nf=0
+     base2: [8, 13] max=0.3840733 mean=-0.04744297 min=-1.125229 nf=0
+     cand1: [8, 13] max=0.3426927 mean=-0.04807731 min=-1.320161 nf=0
+     cand2: [8, 13] max=1.855517 mean=-0.0239809 min=-0.7687265 nf=0
+  ref.0
+     base1: 0.3385442
+     base2: 0.317992
+     cand1: 0.3233139
+     cand2: 0.3385519
+  ref.4
+     base1: -0.2058677
+     base2: -0.2013149
+     cand1: -0.2133746
+     cand2: -0.2058677
+  ref.5
+     base1: -0.03881148
+     base2: -0.03896003
+     cand1: -0.03917688
+     cand2: -0.03881129
+  ref.9
+     base1: -0.7048385
+     base2: -0.4962427
+     cand1: -0.4971981
+     cand2: -0.7048359
+  ref.10
+     base1: -0.0009452796
+     base2: -0.0009938719
+     cand1: -0.0009922968
+     cand2: -0.0009452851
+  ref.11
+     base1: -0.0515531
+     base2: -0.05859385
+     cand1: -0.05827747
+     cand2: -0.05155297
+
+# tests/test_gpu_queue.py::test_acquire_with_cmd_takes_the_lock_and_records_the_command
+  h.pid
+     base1: 48741
+     base2: 52690
+     cand1: 51408
+     cand2: 53555
+  h.start
+     base1: 1.7917e+09
+     base2: 1.791702e+09
+     cand1: 1.791701e+09
+     cand2: 1.791702e+09
+  h.queued
+     base1: 1.7917e+09
+     base2: 1.791702e+09
+     cand1: 1.791701e+09
+     cand2: 1.791702e+09
+  ev[0].t
+     base1: 1.7917e+09
+     base2: 1.791702e+09
+     cand1: 1.791701e+09
+     cand2: 1.791702e+09
+  ev[1].t
+     base1: 1.7917e+09
+     base2: 1.791702e+09
+     cand1: 1.791701e+09
+     cand2: 1.791702e+09
+  ev[1].start
+     base1: 1.7917e+09
+     base2: 1.791702e+09
+     cand1: 1.791701e+09
+     cand2: 1.791702e+09
+
+# tests/test_gpu_queue.py::test_exit_code_recorded_when_a_waiter_freed_the_holder
+  ev[0].t
+     base1: 1.7917e+09
+     base2: 1.791702e+09
+     cand1: 1.791701e+09
+     cand2: 1.791702e+09
+  ev[1].t
+     base1: 1.7917e+09
+     base2: 1.791702e+09
+     cand1: 1.791701e+09
+     cand2: 1.791702e+09
+  ev[1].start
+     base1: 1.7917e+09
+     base2: 1.791702e+09
+     cand1: 1.791701e+09
+     cand2: 1.791702e+09
+  ev[2].t
+     base1: 1.7917e+09
+     base2: 1.791702e+09
+     cand1: 1.791701e+09
+     cand2: 1.791702e+09
+
+# tests/test_gpu_queue.py::test_front_ticket_sorts_ahead_of_older_tickets_of_its_class
+  tf
+     base1: '/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/tmp7nk9iwl7/q/0.000_0_PAUSE_48741.json'
+     base2: '/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/tmpbk_drqq1/q/0.000_0_PAUSE_52690.json'
+     cand1: '/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/tmpanz06dio/q/0.000_0_PAUSE_51408.json'
+     cand2: '/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/tmpyx_0ym8i/q/0.000_0_PAUSE_53555.json'
+
+# tests/test_interop.py::test_handles
+  tdev
+     base1: 4389509920
+     base2: 4325850496
+     cand1: 4325229408
+     cand2: 4363061152
+
+# tests/test_interop.py::test_ping_pong_round_trip
+  t0
+     base1: 335373.8
+     base2: 336485.2
+     cand1: 336164.4
+     cand2: 336771.8
+  dt
+     base1: 0.1597777
+     base2: 0.1087108
+     cand1: 0.1060528
+     cand2: 0.105312
+
+# tests/test_interop.py::test_torch_buffer_readable_by_warp
+  buf
+     base1: 50883644928
+     base2: 45867835712
+     cand1: 45593599424
+     cand2: 33054514624
+  buf2
+     base1: 50883644928
+     base2: 45867835712
+     cand1: 45593599424
+     cand2: 33054514624
+
+# tests/test_interop.py::test_wait_blocks_torch_until_signaled
+  t0
+     base1: 335372.8
+     base2: 336484.2
+     cand1: 336163.4
+     cand2: 336770.8
+
+# tests/test_interop.py::test_wait_blocks_warp_until_signaled
+  t0
+     base1: 335373.4
+     base2: 336484.7
+     cand1: 336163.9
+     cand2: 336771.3
+
+# tests/test_lidar_nav.py::test_scan_matches_mj_ray_and_env_runs
+  obs
+     base1: [32, 68] max=1 mean=0.8305789 min=-0.8290122 nf=0
+     base2: [32, 68] max=1 mean=0.8305016 min=-0.8290122 nf=0
+     cand1: [32, 68] max=1 mean=0.8305789 min=-0.8290122 nf=0
+     cand2: [32, 68] max=1 mean=0.8309741 min=-0.8290122 nf=0
+  rew
+     base1: [32] max=0.3403112 mean=-0.02602366 min=-0.3725662 nf=0
+     base2: [32] max=0.3403112 mean=-0.02602374 min=-0.3725662 nf=0
+     cand1: [32] max=0.3403112 mean=-0.02602351 min=-0.3725662 nf=0
+     cand2: [32] max=0.3403112 mean=-0.02602366 min=-0.3725662 nf=0
+  info.episode_reward
+     base1: [32] max=2.875072 mean=0.09508305 min=-2.934087 nf=0
+     base2: [32] max=2.875072 mean=0.09508305 min=-2.934087 nf=0
+     cand1: [32] max=2.875072 mean=0.09508193 min=-2.934087 nf=0
+     cand2: [32] max=2.875072 mean=0.09508215 min=-2.934087 nf=0
+
+# tests/test_lift_ctrl_ordering.py::test_step_matches_host_synchronized_stepping
+  qa
+     base1: [8, 13] max=1.223132 mean=0.1586999 min=-0.9998305 nf=0
+     base2: [8, 13] max=1.223132 mean=0.1586999 min=-0.9998305 nf=0
+     cand1: [8, 13] max=1.223132 mean=0.1586999 min=-0.9998305 nf=0
+     cand2: [8, 13] max=1.223132 mean=0.1586999 min=-0.9998305 nf=0
+  qb
+     base1: [8, 13] max=1.223132 mean=0.1586999 min=-0.9998305 nf=0
+     base2: [8, 13] max=1.223132 mean=0.1586999 min=-0.9998305 nf=0
+     cand1: [8, 13] max=1.223132 mean=0.1586999 min=-0.9998305 nf=0
+     cand2: [8, 13] max=1.223132 mean=0.1586999 min=-0.9998305 nf=0
+
+# tests/test_lift_env.py::test_lift_env_runs_and_resets
+  obs.image
+     base1: [32, 128, 128, 3] max=255 mean=129.0848 min=0 nf=0
+     base2: [32, 128, 128, 3] max=255 mean=129.0848 min=0 nf=0
+     cand1: [32, 128, 128, 3] max=255 mean=129.0847 min=0 nf=0
+     cand2: [32, 128, 128, 3] max=255 mean=129.0847 min=0 nf=0
+  obs.qpos
+     base1: [32, 6] max=0.3572065 mean=0.05047059 min=-0.2942187 nf=0
+     base2: [32, 6] max=0.3572065 mean=0.05047059 min=-0.2942187 nf=0
+     cand1: [32, 6] max=0.3572065 mean=0.05047059 min=-0.2942187 nf=0
+     cand2: [32, 6] max=0.3572065 mean=0.05047059 min=-0.2942187 nf=0
+  rewards[3]
+     base1: [32] max=0.01264465 mean=0.004853658 min=0.001241863 nf=0
+     base2: [32] max=0.01264465 mean=0.00485366 min=0.001241863 nf=0
+     cand1: [32] max=0.01264459 mean=0.004853776 min=0.001241863 nf=0
+     cand2: [32] max=0.01264459 mean=0.004853776 min=0.001241863 nf=0
+  rewards[4]
+     base1: [32] max=0.01637763 mean=0.005339179 min=0.001160979 nf=0
+     base2: [32] max=0.01637763 mean=0.005339183 min=0.001160979 nf=0
+     cand1: [32] max=0.01637763 mean=0.005339231 min=0.001160979 nf=0
+     cand2: [32] max=0.01637763 mean=0.005339233 min=0.001160979 nf=0
+  rewards[5]
+     base1: [32] max=0.02111584 mean=0.00589563 min=0.001211941 nf=0
+     base2: [32] max=0.02111584 mean=0.00589563 min=0.001211941 nf=0
+     cand1: [32] max=0.02111584 mean=0.005895661 min=0.001211941 nf=0
+     cand2: [32] max=0.02111584 mean=0.005895661 min=0.001211941 nf=0
+  rewards[6]
+     base1: [32] max=0.02686864 mean=0.006618127 min=0.001069665 nf=0
+     base2: [32] max=0.02686864 mean=0.006618125 min=0.001069665 nf=0
+     cand1: [32] max=0.02686864 mean=0.006618135 min=0.001069665 nf=0
+     cand2: [32] max=0.02686864 mean=0.006618135 min=0.001069665 nf=0
+  rewards[7]
+     base1: [32] max=0.03432047 mean=0.007682452 min=0.0009788275 nf=0
+     base2: [32] max=0.03432047 mean=0.007682454 min=0.0009788275 nf=0
+     cand1: [32] max=0.03432053 mean=0.007682461 min=0.0009788275 nf=0
+     cand2: [32] max=0.03432053 mean=0.007682459 min=0.0009788275 nf=0
+  rewards[8]
+     base1: [32] max=0.04563051 mean=0.009070303 min=0.0009207129 nf=0
+     base2: [32] max=0.04563051 mean=0.009070303 min=0.0009207129 nf=0
+     cand1: [32] max=0.04563057 mean=0.009070301 min=0.0009207129 nf=0
+     cand2: [32] max=0.04563057 mean=0.009070307 min=0.0009207129 nf=0
+  rewards[9]
+     base1: [32] max=0.06036425 mean=0.01077323 min=0.0008034706 nf=0
+     base2: [32] max=0.06036425 mean=0.01077323 min=0.0008034706 nf=0
+     cand1: [32] max=0.06036425 mean=0.01077324 min=0.0008034706 nf=0
+     cand2: [32] max=0.06036425 mean=0.01077324 min=0.0008034706 nf=0
+  rewards[10]
+     base1: [32] max=0.07579637 mean=0.01263109 min=0.0006420612 nf=0
+     base2: [32] max=0.07579637 mean=0.01263109 min=0.0006420612 nf=0
+     cand1: [32] max=0.07579643 mean=0.01263109 min=0.0006420612 nf=0
+     cand2: [32] max=0.07579643 mean=0.01263109 min=0.0006420612 nf=0
+  rewards[13]
+     base1: [32] max=0.06775361 mean=0.01392417 min=0.0003715754 nf=0
+     base2: [32] max=0.06775361 mean=0.01392417 min=0.0003715754 nf=0
+     cand1: [32] max=0.06775361 mean=0.01392416 min=0.0003715754 nf=0
+     cand2: [32] max=0.06775361 mean=0.01392417 min=0.0003715754 nf=0
+  rewards[14]
+     base1: [32] max=0.0605396 mean=0.01417347 min=0.0003743768 nf=0
+     base2: [32] max=0.0605396 mean=0.01417347 min=0.0003743768 nf=0
+     cand1: [32] max=0.0605396 mean=0.01417346 min=0.0003743172 nf=0
+     cand2: [32] max=0.0605396 mean=0.01417346 min=0.0003743172 nf=0
+  rewards[15]
+     base1: [32] max=0.05752504 mean=0.01399017 min=0.0004017949 nf=0
+     base2: [32] max=0.05752504 mean=0.01399016 min=0.0004017949 nf=0
+     cand1: [32] max=0.05752492 mean=0.01399016 min=0.0004017949 nf=0
+     cand2: [32] max=0.05752492 mean=0.01399016 min=0.0004017949 nf=0
+  rewards[16]
+     base1: [32] max=0.06223434 mean=0.01425203 min=0.0004414916 nf=0
+     base2: [32] max=0.06223434 mean=0.01425203 min=0.0004414916 nf=0
+     cand1: [32] max=0.06223434 mean=0.01425202 min=0.0004414916 nf=0
+     cand2: [32] max=0.06223434 mean=0.01425202 min=0.0004414916 nf=0
+  rewards[17]
+     base1: [32] max=0.07178116 mean=0.01441597 min=0.0004645586 nf=0
+     base2: [32] max=0.07178116 mean=0.01441596 min=0.0004645586 nf=0
+     cand1: [32] max=0.07178116 mean=0.01441597 min=0.0004645586 nf=0
+     cand2: [32] max=0.07178116 mean=0.01441597 min=0.0004645586 nf=0
+  rewards[18]
+     base1: [32] max=0.08338672 mean=0.01443439 min=0.0005329251 nf=0
+     base2: [32] max=0.08338672 mean=0.01443438 min=0.0005329251 nf=0
+     cand1: [32] max=0.08338666 mean=0.01443439 min=0.0005329251 nf=0
+     cand2: [32] max=0.08338666 mean=0.01443439 min=0.0005329251 nf=0
+  rewards[19]
+     base1: [32] max=0.09349555 mean=0.01445887 min=0.0006636977 nf=0
+     base2: [32] max=0.09349555 mean=0.01445888 min=0.0006636977 nf=0
+     cand1: [32] max=0.09349543 mean=0.01445888 min=0.0006636977 nf=0
+     cand2: [32] max=0.09349543 mean=0.01445887 min=0.0006636977 nf=0
+  rewards[20]
+     base1: [32] max=0.09549284 mean=0.01460378 min=0.0008081198 nf=0
+     base2: [32] max=0.09549284 mean=0.01460377 min=0.0008081198 nf=0
+     cand1: [32] max=0.0954929 mean=0.01460379 min=0.0008081794 nf=0
+     cand2: [32] max=0.0954929 mean=0.01460379 min=0.0008081794 nf=0
+  rewards[21]
+     base1: [32] max=0.09122348 mean=0.0146062 min=0.0009723306 nf=0
+     base2: [32] max=0.09122348 mean=0.01460621 min=0.0009723306 nf=0
+     cand1: [32] max=0.0912236 mean=0.01460622 min=0.0009723306 nf=0
+     cand2: [32] max=0.0912236 mean=0.01460622 min=0.0009723306 nf=0
+  rewards[22]
+     base1: [32] max=0.08473194 mean=0.0146469 min=0.001003683 nf=0
+     base2: [32] max=0.08473194 mean=0.0146469 min=0.001003683 nf=0
+     cand1: [32] max=0.08473212 mean=0.0146469 min=0.001003742 nf=0
+     cand2: [32] max=0.08473212 mean=0.0146469 min=0.001003742 nf=0
+  rewards[23]
+     base1: [32] max=0.07520431 mean=0.01517745 min=0.0009095073 nf=0
+     base2: [32] max=0.07520431 mean=0.01517746 min=0.0009095073 nf=0
+     cand1: [32] max=0.07520437 mean=0.01517746 min=0.0009095073 nf=0
+     cand2: [32] max=0.07520437 mean=0.01517746 min=0.0009095073 nf=0
+  rewards[24]
+     base1: [32] max=0.06779808 mean=0.0160666 min=0.0007287264 nf=0
+     base2: [32] max=0.06779808 mean=0.0160666 min=0.0007287264 nf=0
+     cand1: [32] max=0.06779826 mean=0.01606661 min=0.000728786 nf=0
+     cand2: [32] max=0.06779826 mean=0.01606661 min=0.000728786 nf=0
+  rewards[25]
+     base1: [32] max=0.08761597 mean=0.01681973 min=0.0005841255 nf=0
+     base2: [32] max=0.08761579 mean=0.01681973 min=0.0005841255 nf=0
+     cand1: [32] max=0.08761603 mean=0.01681974 min=0.0005840659 nf=0
+     cand2: [32] max=0.08761603 mean=0.01681974 min=0.0005840659 nf=0
+  rewards[26]
+     base1: [32] max=0.08959168 mean=0.01734545 min=0.0004944205 nf=0
+     base2: [32] max=0.08959168 mean=0.01734545 min=0.0004944205 nf=0
+     cand1: [32] max=0.08959186 mean=0.01734547 min=0.0004944205 nf=0
+     cand2: [32] max=0.08959186 mean=0.01734547 min=0.0004944205 nf=0
+  rewards[27]
+     base1: [32] max=0.08421481 mean=0.01747575 min=0.0004580617 nf=0
+     base2: [32] max=0.08421481 mean=0.01747576 min=0.0004580617 nf=0
+     cand1: [32] max=0.08421504 mean=0.01747577 min=0.0004580617 nf=0
+     cand2: [32] max=0.08421499 mean=0.01747576 min=0.0004580617 nf=0
+  rewards[28]
+     base1: [32] max=0.09187657 mean=0.01773534 min=0.0004371405 nf=0
+     base2: [32] max=0.09187657 mean=0.01773535 min=0.0004371405 nf=0
+     cand1: [32] max=0.09187669 mean=0.01773535 min=0.0004372001 nf=0
+     cand2: [32] max=0.09187675 mean=0.01773534 min=0.0004371405 nf=0
+  rewards[29]
+     base1: [32] max=0.09723401 mean=0.01762988 min=0.0004401803 nf=0
+     base2: [32] max=0.09723389 mean=0.01762988 min=0.0004401803 nf=0
+     cand1: [32] max=0.09723419 mean=0.01762991 min=0.0004402399 nf=0
+     cand2: [32] max=0.09723407 mean=0.01762989 min=0.0004402399 nf=0
+  rewards[30]
+     base1: [32] max=0.1032717 mean=0.01697015 min=0.0004781485 nf=0
+     base2: [32] max=0.1032717 mean=0.01697014 min=0.0004781485 nf=0
+     cand1: [32] max=0.1032718 mean=0.01697016 min=0.0004781485 nf=0
+     cand2: [32] max=0.1032718 mean=0.01697015 min=0.0004781485 nf=0
+  rewards[31]
+     base1: [32] max=0.1100999 mean=0.01624919 min=0.0005177855 nf=0
+     base2: [32] max=0.1100999 mean=0.01624919 min=0.0005177855 nf=0
+     cand1: [32] max=0.1100999 mean=0.01624919 min=0.0005177855 nf=0
+     cand2: [32] max=0.1100999 mean=0.01624919 min=0.0005177855 nf=0
+  rewards[32]
+     base1: [32] max=0.1321922 mean=0.01607752 min=0.0005622506 nf=0
+     base2: [32] max=0.1321922 mean=0.01607753 min=0.0005622506 nf=0
+     cand1: [32] max=0.1321922 mean=0.01607752 min=0.000562191 nf=0
+     cand2: [32] max=0.1321922 mean=0.01607752 min=0.0005622506 nf=0
+
+# tests/test_lift_env.py::test_lift_env_throughput
+  t0
+     base1: 335403.7
+     base2: 336508.7
+     cand1: 336195.4
+     cand2: 336795.4
+  dt
+     base1: 1.082046
+     base2: 1.040339
+     cand1: 1.050443
+     cand2: 1.165576
+
+# tests/test_materialx.py::test_mtlx_document_flattens
+  path
+     base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-59/test_
+     base2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-61/test_
+     cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-60/test_
+     cand2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-62/test_
+  _
+     base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-59/test_
+     base2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-61/test_
+     cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-60/test_
+     cand2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-62/test_
+
+# tests/test_materialx.py::test_tier0_render_albedo
+  _
+     base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-59/test_
+     base2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-61/test_
+     cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-60/test_
+     cand2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-62/test_
+  scene
+     base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-59/test_
+     base2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-61/test_
+     cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-60/test_
+     cand2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-62/test_
+
+# tests/test_materialx.py::test_usd_scene_binds_mtlx
+  _
+     base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-59/test_
+     base2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-61/test_
+     cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-60/test_
+     cand2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-62/test_
+  scene
+     base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-59/test_
+     base2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-61/test_
+     cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-60/test_
+     cand2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-62/test_
+
+# tests/test_physics.py::test_one_step_parity_vs_mujoco_c[g1]
+  q_gpu
+     base1: [8, 36] max=1.773592 mean=0.1387902 min=-1.636317 nf=0
+     base2: [8, 36] max=1.773592 mean=0.1387902 min=-1.636317 nf=0
+     cand1: [8, 36] max=1.773592 mean=0.1387902 min=-1.636317 nf=0
+     cand2: [8, 36] max=1.773592 mean=0.1387902 min=-1.636317 nf=0
+  v_gpu
+     base1: [8, 35] max=27.0814 mean=-0.3425664 min=-29.75484 nf=0
+     base2: [8, 35] max=27.0814 mean=-0.3425664 min=-29.75484 nf=0
+     cand1: [8, 35] max=27.0814 mean=-0.3425663 min=-29.75484 nf=0
+     cand2: [8, 35] max=27.0814 mean=-0.3425663 min=-29.75484 nf=0
+
+# tests/test_physics.py::test_one_step_parity_vs_mujoco_c[go1]
+  q_gpu
+     base1: [8, 19] max=2.408401 mean=0.04614636 min=-2.31192 nf=0
+     base2: [8, 19] max=2.408401 mean=0.04614636 min=-2.31192 nf=0
+     cand1: [8, 19] max=2.408401 mean=0.04614636 min=-2.31192 nf=0
+     cand2: [8, 19] max=2.408401 mean=0.04614636 min=-2.31192 nf=0
+  v_gpu
+     base1: [8, 18] max=12.13869 mean=0.4913869 min=-16.45188 nf=0
+     base2: [8, 18] max=12.13869 mean=0.4913869 min=-16.45188 nf=0
+     cand1: [8, 18] max=12.13869 mean=0.4913868 min=-16.45188 nf=0
+     cand2: [8, 18] max=12.13869 mean=0.4913868 min=-16.45188 nf=0
+
+# tests/test_physics.py::test_step_does_not_block_host
+  times.64[0]
+     base1: 4.751042e-05
+     base2: 4.345833e-05
+     cand1: 4.679508e-05
+     cand2: 4.5184e-05
+  times.64[1]
+     base1: 0.003476545
+     base2: 0.002933781
+     cand1: 0.003183639
+     cand2: 0.002885788
+  times.2048[0]
+     base1: 3.832983e-05
+     base2: 3.909033e-05
+     cand1: 3.651042e-05
+     cand2: 3.845483e-05
+  times.2048[1]
+     base1: 0.00474266
+     base2: 0.004747819
+     cand1: 0.004761392
+     cand2: 0.004763816
+  t0
+     base1: 335438.1
+     base2: 336530.9
+     cand1: 336230.1
+     cand2: 336818.9
+  _
+     base1: 0.003476545
+     base2: 0.002933781
+     cand1: 0.003183639
+     cand2: 0.002885788
+  host
+     base1: 3.832983e-05
+     base2: 3.909033e-05
+     cand1: 3.651042e-05
+     cand2: 3.845483e-05
+  total
+     base1: 0.00474266
+     base2: 0.004747819
+     cand1: 0.004761392
+     cand2: 0.004763816
+  host_small
+     base1: 4.751042e-05
+     base2: 4.345833e-05
+     cand1: 4.679508e-05
+     cand2: 4.5184e-05
+  host_big
+     base1: 3.832983e-05
+     base2: 3.909033e-05
+     cand1: 3.651042e-05
+     cand2: 3.845483e-05
+  total_big
+     base1: 0.00474266
+     base2: 0.004747819
+     cand1: 0.004761392
+     cand2: 0.004763816
+
+# tests/test_ppo_warp_rollout.py::test_noise_fresh_each_rollout_and_no_phantom_action
+  z0
+     base1: [24, 64, 37] max=3.933805 mean=-0.002630349 min=-4.3307 nf=0
+     base2: [24, 64, 37] max=3.933805 mean=-0.002630348 min=-4.3307 nf=0
+     cand1: [24, 64, 37] max=3.933805 mean=-0.002630349 min=-4.3307 nf=0
+     cand2: [24, 64, 37] max=3.933805 mean=-0.002630349 min=-4.3307 nf=0
+  o0
+     base1: [24, 64, 123] max=66.56899 mean=0.007056101 min=-73.13449 nf=0
+     base2: [24, 64, 123] max=66.57029 mean=0.007058022 min=-73.08813 nf=0
+     cand1: [24, 64, 123] max=66.57021 mean=0.007041636 min=-73.06498 nf=0
+     cand2: [24, 64, 123] max=66.57017 mean=0.007016555 min=-73.06493 nf=0
+  a0
+     base1: [24, 64, 37] max=4.355719 mean=0.0306074 min=-4.168889 nf=0
+     base2: [24, 64, 37] max=4.35569 mean=0.03060856 min=-4.168889 nf=0
+     cand1: [24, 64, 37] max=4.355696 mean=0.03059438 min=-4.16889 nf=0
+     cand2: [24, 64, 37] max=4.355682 mean=0.03060386 min=-4.168889 nf=0
+  z1
+     base1: [24, 64, 37] max=4.108621 mean=0.006071176 min=-4.221587 nf=0
+     base2: [24, 64, 37] max=4.10862 mean=0.006071175 min=-4.221587 nf=0
+     cand1: [24, 64, 37] max=4.108621 mean=0.006071176 min=-4.221587 nf=0
+     cand2: [24, 64, 37] max=4.108621 mean=0.006071176 min=-4.221587 nf=0
+  o1
+     base1: [24, 64, 123] max=46.92358 mean=0.006555435 min=-55.09595 nf=0
+     base2: [24, 64, 123] max=46.92303 mean=0.006435851 min=-55.096 nf=0
+     cand1: [24, 64, 123] max=46.92321 mean=0.006804003 min=-55.09366 nf=0
+     cand2: [24, 64, 123] max=46.92294 mean=0.006898534 min=-55.09621 nf=0
+  a1
+     base1: [24, 64, 37] max=4.392086 mean=0.04254651 min=-4.370174 nf=0
+     base2: [24, 64, 37] max=4.391629 mean=0.0425654 min=-4.360131 nf=0
+     cand1: [24, 64, 37] max=4.391637 mean=0.04255963 min=-4.359867 nf=0
+     cand2: [24, 64, 37] max=4.391633 mean=0.0425776 min=-4.355598 nf=0
+  corr
+     base1: 0.04684835
+     base2: 0.04684835
+     cand1: 0.04684836
+     cand2: 0.04684835
+
+# tests/test_ppo_warp_rollout.py::test_rslrl_adapter_contract
+  rew
+     base1: [32] max=0.03662692 mean=0.01413269 min=4.168454e-05 nf=0
+     base2: [32] max=0.03662692 mean=0.01413269 min=4.168462e-05 nf=0
+     cand1: [32] max=0.03662692 mean=0.01413269 min=4.168469e-05 nf=0
+     cand2: [32] max=0.03662692 mean=0.01413269 min=4.168458e-05 nf=0
+
+# tests/test_ppo_warp_rollout.py::test_stored_logp_matches_torch
+  lp
+     base1: [24, 64] max=-40.35405 mean=-52.35503 min=-66.93304 nf=0
+     base2: [24, 64] max=-40.35405 mean=-52.35503 min=-66.93304 nf=0
+     cand1: [24, 64] max=-40.35405 mean=-52.35503 min=-66.93304 nf=0
+     cand2: [24, 64] max=-40.35405 mean=-52.35503 min=-66.93304 nf=0
+
+# tests/test_render_textures.py::test_basis_transcodes_are_exact
+  src
+     base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-59/test_
+     base2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-61/test_
+     cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-60/test_
+     cand2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-62/test_
+  out
+     base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-59/test_
+     base2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-61/test_
+     cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-60/test_
+     cand2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-62/test_
+
+# tests/test_render_textures.py::test_file_orientation_conventions
+  png
+     base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-59/test_
+     base2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-61/test_
+     cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-60/test_
+     cand2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-62/test_
+
+# tests/test_render_textures.py::test_ktx2_standard_orientation
+  png
+     base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-59/test_
+     base2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-61/test_
+     cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-60/test_
+     cand2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-62/test_
+  k
+     base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-59/test_
+     base2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-61/test_
+     cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-60/test_
+     cand2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-62/test_
+
+# tests/test_render_textures.py::test_no_texture_count_limit
+  st.build_s
+     base1: 0.086
+     base2: 0.088
+     cand1: 0.081
+     cand2: 0.085
+
+# tests/test_render_textures.py::test_wrap_modes
+  png
+     base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-59/test_
+     base2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-61/test_
+     cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-60/test_
+     cand2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-62/test_
+
+# tests/test_render_tier0.py::test_gpu_path_with_batchsim_no_host_sync
+  means[8]
+     base1: [] max=88.76224 mean=88.76224 min=88.76224 nf=0
+     base2: [] max=88.76224 mean=88.76224 min=88.76224 nf=0
+     cand1: [] max=88.76243 mean=88.76243 min=88.76243 nf=0
+     cand2: [] max=88.76244 mean=88.76244 min=88.76244 nf=0
+  means[13]
+     base1: [] max=88.91503 mean=88.91503 min=88.91503 nf=0
+     base2: [] max=88.91502 mean=88.91502 min=88.91502 nf=0
+     cand1: [] max=88.91504 mean=88.91504 min=88.91504 nf=0
+     cand2: [] max=88.91504 mean=88.91504 min=88.91504 nf=0
+  means[17]
+     base1: [] max=89.20554 mean=89.20554 min=89.20554 nf=0
+     base2: [] max=89.20554 mean=89.20554 min=89.20554 nf=0
+     cand1: [] max=89.20572 mean=89.20572 min=89.20572 nf=0
+     cand2: [] max=89.20571 mean=89.20571 min=89.20571 nf=0
+  m
+     base1: [20] max=89.31033 mean=88.95608 min=88.59007 nf=0
+     base2: [20] max=89.31033 mean=88.95608 min=88.59007 nf=0
+     cand1: [20] max=89.31049 mean=88.95575 min=88.5902 nf=0
+     cand2: [20] max=89.31049 mean=88.95575 min=88.5902 nf=0
+
+# tests/test_render_tier2.py::test_env_map_usd_dome_import
+  hdr_path
+     base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-59/test_
+     base2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-61/test_
+     cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-60/test_
+     cand2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-62/test_
+  rec.file
+     base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-59/test_
+     base2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-61/test_
+     cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-60/test_
+     cand2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-62/test_
+
+# tests/test_replicator.py::test_randomize_annotate_write
+  out
+     base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-59/test_
+     base2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-61/test_
+     cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-60/test_
+     cand2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-62/test_
+
+# tests/test_scene_usd.py::test_so101_import
+  out
+     base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-59/test_
+     base2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-61/test_
+     cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-60/test_
+     cand2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-62/test_
+
+# tests/test_scene_usd.py::test_urdf_import_to_usd
+  out
+     base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-59/test_
+     base2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-61/test_
+     cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-60/test_
+     cand2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-62/test_
+
+# tests/test_scene_usd.py::test_usd_round_trip_to_mujoco
+  out
+     base1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-59/test_
+     base2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-61/test_
+     cand1: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-60/test_
+     cand2: '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-62/test_
+
+# tests/test_sensors_contact.py::test_g1_landing_vs_mujoco_c
+  agg_err
+     base1: 8.392334e-05
+     base2: 8.392334e-05
+     cand1: 7.05719e-05
+     cand2: 6.961823e-05
+  rel_same
+     base1: [691] max=9.162944e-05 mean=8.636829e-06 min=4.254839e-09 nf=0
+     base2: [691] max=9.162944e-05 mean=8.636829e-06 min=4.254839e-09 nf=0
+     cand1: [691] max=0.000103058 mean=8.761439e-06 min=5.351536e-08 nf=0
+     cand2: [691] max=0.0001001417 mean=8.800374e-06 min=1.863711e-08 nf=0
+  ot.net_forces_w
+     base1: [4, 3, 3] max=162.4772 mean=41.44893 min=-0.8951569 nf=0
+     base2: [4, 3, 3] max=162.4772 mean=41.44893 min=-0.8951569 nf=0
+     cand1: [4, 3, 3] max=162.481 mean=41.44922 min=-0.8952694 nf=0
+     cand2: [4, 3, 3] max=162.4809 mean=41.44924 min=-0.8952694 nf=0
+  ot.net_forces_w_history
+     base1: [4, 3, 3, 3] max=176.2254 mean=42.71066 min=-0.9427147 nf=0
+     base2: [4, 3, 3, 3] max=176.2254 mean=42.71066 min=-0.9427147 nf=0
+     cand1: [4, 3, 3, 3] max=176.2239 mean=42.71088 min=-0.9428196 nf=0
+     cand2: [4, 3, 3, 3] max=176.224 mean=42.71085 min=-0.9428196 nf=0
+  ot.force_matrix_w
+     base1: [4, 3, 1, 3] max=162.4772 mean=41.44893 min=-0.8951569 nf=0
+     base2: [4, 3, 1, 3] max=162.4772 mean=41.44893 min=-0.8951569 nf=0
+     cand1: [4, 3, 1, 3] max=162.481 mean=41.44922 min=-0.8952694 nf=0
+     cand2: [4, 3, 1, 3] max=162.4809 mean=41.44924 min=-0.8952694 nf=0
+  ot.force_matrix_w_history
+     base1: [4, 3, 3, 1, 3] max=176.2254 mean=42.71066 min=-0.9427147 nf=0
+     base2: [4, 3, 3, 1, 3] max=176.2254 mean=42.71066 min=-0.9427147 nf=0
+     cand1: [4, 3, 3, 1, 3] max=176.2239 mean=42.71088 min=-0.9428196 nf=0
+     cand2: [4, 3, 3, 1, 3] max=176.224 mean=42.71085 min=-0.9428196 nf=0
+  on.net_forces_w
+     base1: [4, 3, 3] max=162.4772 mean=32.30968 min=0 nf=0
+     base2: [4, 3, 3] max=162.4772 mean=32.30968 min=0 nf=0
+     cand1: [4, 3, 3] max=162.481 mean=32.3099 min=0 nf=0
+     cand2: [4, 3, 3] max=162.4809 mean=32.30992 min=0 nf=0
+  on.net_forces_w_history
+     base1: [4, 1, 3, 3] max=162.4772 mean=32.30968 min=0 nf=0
+     base2: [4, 1, 3, 3] max=162.4772 mean=32.30968 min=0 nf=0
+     cand1: [4, 1, 3, 3] max=162.481 mean=32.3099 min=0 nf=0
+     cand2: [4, 1, 3, 3] max=162.4809 mean=32.30992 min=0 nf=0
+
+# tests/test_sensors_contact.py::test_stack_sign_history_filter_and_graph
+  hist_ref[0]
+     base1: [8, 2, 3] max=19.62 mean=4.905001 min=-9.536743e-07 nf=0
+     base2: [8, 2, 3] max=19.62 mean=4.905 min=-1.66893e-06 nf=0
+     cand1: [8, 2, 3] max=19.62 mean=4.905001 min=-3.576279e-07 nf=0
+     cand2: [8, 2, 3] max=19.62 mean=4.905001 min=-3.576279e-07 nf=0
+  hist_ref[1]
+     base1: [8, 2, 3] max=19.62 mean=4.905 min=-1.490116e-06 nf=0
+     base2: [8, 2, 3] max=19.62 mean=4.905 min=-1.370907e-06 nf=0
+     cand1: [8, 2, 3] max=19.62 mean=4.905 min=-2.384186e-07 nf=0
+     cand2: [8, 2, 3] max=19.62001 mean=4.905001 min=-1.609325e-06 nf=0
+  hist_ref[2]
+     base1: [8, 2, 3] max=19.62001 mean=4.905001 min=-1.192093e-06 nf=0
+     base2: [8, 2, 3] max=19.62 mean=4.905 min=-1.251698e-06 nf=0
+     cand1: [8, 2, 3] max=19.62 mean=4.905 min=-5.960464e-08 nf=0
+     cand2: [8, 2, 3] max=19.62 mean=4.905001 min=-2.324581e-06 nf=0
+  o.net_forces_w
+     base1: [8, 2, 3] max=19.62001 mean=4.905001 min=-1.192093e-06 nf=0
+     base2: [8, 2, 3] max=19.62 mean=4.905 min=-1.251698e-06 nf=0
+     cand1: [8, 2, 3] max=19.62 mean=4.905 min=-5.960464e-08 nf=0
+     cand2: [8, 2, 3] max=19.62 mean=4.905001 min=-2.324581e-06 nf=0
+  o.net_forces_w_history
+     base1: [8, 3, 2, 3] max=19.62001 mean=4.905001 min=-1.490116e-06 nf=0
+     base2: [8, 3, 2, 3] max=19.62 mean=4.905 min=-1.66893e-06 nf=0
+     cand1: [8, 3, 2, 3] max=19.62 mean=4.905001 min=-3.576279e-07 nf=0
+     cand2: [8, 3, 2, 3] max=19.62001 mean=4.905001 min=-2.324581e-06 nf=0
+  o.force_matrix_w
+     base1: [8, 2, 2, 3] max=29.43 mean=1.635 min=-9.81 nf=0
+     base2: [8, 2, 2, 3] max=29.43 mean=1.635 min=-9.810001 nf=0
+     cand1: [8, 2, 2, 3] max=29.43 mean=1.635 min=-9.81 nf=0
+     cand2: [8, 2, 2, 3] max=29.43 mean=1.635 min=-9.809999 nf=0
+  o.force_matrix_w_history
+     base1: [8, 3, 2, 2, 3] max=29.43 mean=1.635 min=-9.810001 nf=0
+     base2: [8, 3, 2, 2, 3] max=29.43 mean=1.635 min=-9.810001 nf=0
+     cand1: [8, 3, 2, 2, 3] max=29.43 mean=1.635 min=-9.810001 nf=0
+     cand2: [8, 3, 2, 2, 3] max=29.43 mean=1.635 min=-9.810001 nf=0
+  net
+     base1: [8, 2, 3] max=19.62001 mean=4.905001 min=-1.192093e-06 nf=0
+     base2: [8, 2, 3] max=19.62 mean=4.905 min=-1.251698e-06 nf=0
+     cand1: [8, 2, 3] max=19.62 mean=4.905 min=-5.960464e-08 nf=0
+     cand2: [8, 2, 3] max=19.62 mean=4.905001 min=-2.324581e-06 nf=0
+  mat
+     base1: [8, 2, 2, 3] max=29.43 mean=1.635 min=-9.81 nf=0
+     base2: [8, 2, 2, 3] max=29.43 mean=1.635 min=-9.810001 nf=0
+     cand1: [8, 2, 2, 3] max=29.43 mean=1.635 min=-9.81 nf=0
+     cand2: [8, 2, 2, 3] max=29.43 mean=1.635 min=-9.809999 nf=0
+  h
+     base1: [8, 3, 2, 3] max=19.62001 mean=4.905001 min=-1.490116e-06 nf=0
+     base2: [8, 3, 2, 3] max=19.62 mean=4.905 min=-1.66893e-06 nf=0
+     cand1: [8, 3, 2, 3] max=19.62 mean=4.905001 min=-3.576279e-07 nf=0
+     cand2: [8, 3, 2, 3] max=19.62001 mean=4.905001 min=-2.324581e-06 nf=0
+  o2.net_forces_w
+     base1: [8, 2, 3] max=19.62001 mean=3.065625 min=-1.192093e-06 nf=0
+     base2: [8, 2, 3] max=19.62 mean=3.065625 min=-1.251698e-06 nf=0
+     cand1: [8, 2, 3] max=19.62 mean=3.065625 min=-5.960464e-08 nf=0
+     cand2: [8, 2, 3] max=19.62 mean=3.065625 min=-2.324581e-06 nf=0
+  o2.net_forces_w_history
+     base1: [8, 3, 2, 3] max=19.62001 mean=3.065625 min=-1.490116e-06 nf=0
+     base2: [8, 3, 2, 3] max=19.62 mean=3.065625 min=-1.66893e-06 nf=0
+     cand1: [8, 3, 2, 3] max=19.62 mean=3.065625 min=-3.576279e-07 nf=0
+     cand2: [8, 3, 2, 3] max=19.62001 mean=3.065626 min=-2.324581e-06 nf=0
+  o2.force_matrix_w
+     base1: [8, 2, 2, 3] max=29.43 mean=1.021875 min=-9.81 nf=0
+     base2: [8, 2, 2, 3] max=29.43 mean=1.021875 min=-9.810001 nf=0
+     cand1: [8, 2, 2, 3] max=29.43 mean=1.021875 min=-9.81 nf=0
+     cand2: [8, 2, 2, 3] max=29.43 mean=1.021875 min=-9.809999 nf=0
+  o2.force_matrix_w_history
+     base1: [8, 3, 2, 2, 3] max=29.43 mean=1.021875 min=-9.810001 nf=0
+     base2: [8, 3, 2, 2, 3] max=29.43 mean=1.021875 min=-9.810001 nf=0
+     cand1: [8, 3, 2, 2, 3] max=29.43 mean=1.021875 min=-9.810001 nf=0
+     cand2: [8, 3, 2, 2, 3] max=29.43 mean=1.021875 min=-9.810001 nf=0
+
+# tests/test_sensors_rt.py::test_gpu_path_ordering_with_sim
+  ranges[4]
+     base1: [16, 64] max=1.752834 mean=1.547023 min=0.6750354 nf=0
+     base2: [16, 64] max=1.752834 mean=1.547023 min=0.6750354 nf=0
+     cand1: [16, 64] max=1.752834 mean=1.547023 min=0.6750354 nf=0
+     cand2: [16, 64] max=1.752834 mean=1.547023 min=0.6750354 nf=0
+  ranges[5]
+     base1: [16, 64] max=1.748686 mean=1.543684 min=0.6750354 nf=0
+     base2: [16, 64] max=1.748686 mean=1.543684 min=0.6750354 nf=0
+     cand1: [16, 64] max=1.748686 mean=1.543684 min=0.6750354 nf=0
+     cand2: [16, 64] max=1.748686 mean=1.543684 min=0.6750354 nf=0
+  ranges[6]
+     base1: [16, 64] max=1.743748 mean=1.539708 min=0.6750354 nf=0
+     base2: [16, 64] max=1.743748 mean=1.539708 min=0.6750354 nf=0
+     cand1: [16, 64] max=1.743748 mean=1.539708 min=0.6750353 nf=0
+     cand2: [16, 64] max=1.743748 mean=1.539708 min=0.6750354 nf=0
+  ranges[7]
+     base1: [16, 64] max=1.73802 mean=1.535097 min=0.6750354 nf=0
+     base2: [16, 64] max=1.73802 mean=1.535097 min=0.6750354 nf=0
+     cand1: [16, 64] max=1.73802 mean=1.535097 min=0.6750354 nf=0
+     cand2: [16, 64] max=1.73802 mean=1.535097 min=0.6750354 nf=0
+  ranges[8]
+     base1: [16, 64] max=1.731502 mean=1.529849 min=0.6750354 nf=0
+     base2: [16, 64] max=1.731502 mean=1.529849 min=0.6750354 nf=0
+     cand1: [16, 64] max=1.731502 mean=1.529849 min=0.6750354 nf=0
+     cand2: [16, 64] max=1.731502 mean=1.529849 min=0.6750354 nf=0
+  ranges[9]
+     base1: [16, 64] max=1.724194 mean=1.523965 min=0.6750353 nf=0
+     base2: [16, 64] max=1.724194 mean=1.523965 min=0.6750353 nf=0
+     cand1: [16, 64] max=1.724194 mean=1.523965 min=0.6750353 nf=0
+     cand2: [16, 64] max=1.724194 mean=1.523965 min=0.6750353 nf=0
+  r
+     base1: [10, 16, 64] max=1.761524 mean=1.542807 min=0.6750353 nf=0
+     base2: [10, 16, 64] max=1.761524 mean=1.542807 min=0.6750353 nf=0
+     cand1: [10, 16, 64] max=1.761524 mean=1.542807 min=0.6750353 nf=0
+     cand2: [10, 16, 64] max=1.761524 mean=1.542807 min=0.6750353 nf=0
+
+# tests/test_sensors_state.py::test_imu_and_contact_sensors_as_tensors
+  sd
+     base1: [16, 11] max=9.810001 mean=1.874546 min=-2.065813e-07 nf=0
+     base2: [16, 11] max=9.810001 mean=1.874546 min=-8.572366e-08 nf=0
+     cand1: [16, 11] max=9.810001 mean=1.874546 min=-8.973689e-08 nf=0
+     cand2: [16, 11] max=9.81 mean=1.874546 min=-9.013284e-08 nf=0
+  v
+     base1: [16, 11] max=9.810001 mean=1.874546 min=-2.065813e-07 nf=0
+     base2: [16, 11] max=9.810001 mean=1.874546 min=-8.572366e-08 nf=0
+     cand1: [16, 11] max=9.810001 mean=1.874546 min=-8.973689e-08 nf=0
+     cand2: [16, 11] max=9.81 mean=1.874546 min=-9.013284e-08 nf=0
+  acc_rest
+     base1: [16, 3] max=9.81 mean=3.27 min=-2.065813e-07 nf=0
+     base2: [16, 3] max=9.81 mean=3.27 min=-8.572366e-08 nf=0
+     cand1: [16, 3] max=9.81 mean=3.27 min=-8.973689e-08 nf=0
+     cand2: [16, 3] max=9.81 mean=3.27 min=-9.013284e-08 nf=0
+  touch
+     base1: [16] max=9.810001 mean=9.810001 min=9.810001 nf=0
+     base2: [16] max=9.810001 mean=9.810001 min=9.810001 nf=0
+     cand1: [16] max=9.810001 mean=9.810001 min=9.810001 nf=0
+     cand2: [16] max=9.81 mean=9.81 min=9.81 nf=0
+  cf
+     base1: [16, 2, 6] max=9.810001 mean=0.8175001 min=-1.788139e-07 nf=0
+     base2: [16, 2, 6] max=9.810001 mean=0.8175001 min=-1.788139e-07 nf=0
+     cand1: [16, 2, 6] max=9.810001 mean=0.8175001 min=-1.192093e-07 nf=0
+     cand2: [16, 2, 6] max=9.81 mean=0.8175 min=0 nf=0
+
+# tests/test_solver_presets.py::test_iteration_cap_only_changes_worlds_that_reach_it
+  res.isaaclab3[0]
+     base1: [4, 44] max=0.9999633 mean=0.06584966 min=-0.4477803 nf=0
+     base2: [4, 44] max=0.9999633 mean=0.06584966 min=-0.4477803 nf=0
+     cand1: [4, 44] max=0.9999633 mean=0.06584966 min=-0.4477803 nf=0
+     cand2: [4, 44] max=0.9999633 mean=0.06584966 min=-0.4477803 nf=0
+  res.isaaclab3_cap20[0]
+     base1: [4, 44] max=0.9999633 mean=0.06584966 min=-0.4477803 nf=0
+     base2: [4, 44] max=0.9999633 mean=0.06584966 min=-0.4477803 nf=0
+     cand1: [4, 44] max=0.9999633 mean=0.06584966 min=-0.4477803 nf=0
+     cand2: [4, 44] max=0.9999633 mean=0.06584966 min=-0.4477803 nf=0
+
+# tests/test_solver_presets.py::test_once_per_tick_collision_step_is_stable_and_close
+  out.isaaclab3
+     base1: [4] max=0.7525745 mean=0.7525745 min=0.7525745 nf=0
+     base2: [4] max=0.7525746 mean=0.7525745 min=0.7525745 nf=0
+     cand1: [4] max=0.7525746 mean=0.7525745 min=0.7525745 nf=0
+     cand2: [4] max=0.7525746 mean=0.7525745 min=0.7525745 nf=0
+  out.isaaclab3_collide_every_substep
+     base1: [4] max=0.7525254 mean=0.7525254 min=0.7525254 nf=0
+     base2: [4] max=0.7525254 mean=0.7525254 min=0.7525254 nf=0
+     cand1: [4] max=0.7525254 mean=0.7525254 min=0.7525254 nf=0
+     cand2: [4] max=0.7525254 mean=0.7525254 min=0.7525254 nf=0
+  qp
+     base1: [4, 44] max=0.9999932 mean=0.0506328 min=-0.1341142 nf=0
+     base2: [4, 44] max=0.9999932 mean=0.0506328 min=-0.1341142 nf=0
+     cand1: [4, 44] max=0.9999932 mean=0.05063279 min=-0.1341142 nf=0
+     cand2: [4, 44] max=0.9999932 mean=0.05063279 min=-0.1341142 nf=0
+
+# tests/test_terrain.py::test_g1_rough_task_runs
+  r.mean_step_ms
+     base1: 0.0746457
+     base2: 0.0727375
+     cand1: 0.0732875
+     cand2: 0.0819999
+  r.fps_isaac_style
+     base1: 214345.9
+     base2: 219969.1
+     cand1: 218318.3
+     cand2: 195122.2
+  obs
+     base1: [16, 310] max=4.569642 mean=0.1059637 min=-3.085498 nf=0
+     base2: [16, 310] max=3.478403 mean=0.1045394 min=-4.147282 nf=0
+     cand1: [16, 310] max=4.668126 mean=0.1066101 min=-3.085436 nf=0
+     cand2: [16, 310] max=3.111298 mean=0.1052478 min=-3.223455 nf=0
+  q
+     base1: [16, 44] max=68.18385 mean=-0.3012271 min=-76.47758 nf=0
+     base2: [16, 44] max=68.13411 mean=-0.3044279 min=-76.46255 nf=0
+     cand1: [16, 44] max=68.18385 mean=-0.3012845 min=-76.47758 nf=0
+     cand2: [16, 44] max=68.18346 mean=-0.3010258 min=-76.47752 nf=0
+  scan
+     base1: [16, 187] max=0.4707619 mean=0.1862592 min=-0.05241934 nf=0
+     base2: [16, 187] max=0.4718603 mean=0.1831434 min=-0.1139606 nf=0
+     cand1: [16, 187] max=0.4707619 mean=0.1861597 min=-0.05241934 nf=0
+     cand2: [16, 187] max=0.4708513 mean=0.1869275 min=-0.05241934 nf=0
+
+# tests/test_tron1.py::test_controller_reset_is_fast_enough_for_the_control_loop
+  t0
+     base1: 335559
+     base2: 336641.9
+     cand1: 336351.9
+     cand2: 336932.5
+
+# tests/test_warp_policy.py::test_rollout_without_torch_launches
+  t0
+     base1: 335560.2
+     base2: 336642.9
+     cand1: 336353.1
+     cand2: 336933.5
+  host
+     base1: 0.002391833
+     base2: 0.001907333
+     cand1: 0.00170875
+     cand2: 0.001815292
+  total
+     base1: 0.1492336
+     base2: 0.1522415
+     cand1: 0.1591969
+     cand2: 0.1540143

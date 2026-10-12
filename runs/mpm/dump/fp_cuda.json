@@ -1,0 +1,43 @@
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+{
+ "device": "cuda:0",
+ "warp": "1.16.0",
+ "precise.madd": {
+  "md5": "58054de902de",
+  "eq_separate": 1.52587890625e-05,
+  "eq_fma": 1.0
+ },
+ "precise.dot3": {
+  "md5": "5a161864469a"
+ },
+ "precise.div": {
+  "md5": "bd48eb3d6e0e",
+  "eq_correctly_rounded": 1.0
+ },
+ "precise.sqrt": {
+  "md5": "c12bd388a9b8",
+  "eq_correctly_rounded": 1.0
+ },
+ "precise.norm": {
+  "md5": "34424d888be3"
+ },
+ "fast.madd": {
+  "md5": "58054de902de",
+  "eq_separate": 1.52587890625e-05,
+  "eq_fma": 1.0
+ },
+ "fast.dot3": {
+  "md5": "5a161864469a"
+ },
+ "fast.div": {
+  "md5": "c1513cd02e96",
+  "eq_correctly_rounded": 0.7139892578125
+ },
+ "fast.sqrt": {
+  "md5": "cc5c601a9361",
+  "eq_correctly_rounded": 0.8332977294921875
+ },
+ "fast.norm": {
+  "md5": "d4e89a50d086"
+ }
+}

@@ -1,0 +1,70 @@
+{
+ "argv": [
+  "--device",
+  "cuda:0",
+  "--json",
+  "/home/<vm-user>/parity3/scale_l4/rigid_off_256.json",
+  "--part",
+  "rigid",
+  "--worlds",
+  "256",
+  "--mode",
+  "capture",
+  "--steps",
+  "15",
+  "--count"
+ ],
+ "device": "cuda:0",
+ "device_name": "NVIDIA L4",
+ "warp": "1.16.0",
+ "newton": "1.5.2",
+ "worlds": 256,
+ "part": "rigid",
+ "det": "off",
+ "pipeline_det": false,
+ "mode": "capture",
+ "max_triangle_pairs": null,
+ "bodies": 3328,
+ "shapes": 23553,
+ "joints": 3328,
+ "dofs": 5376,
+ "build_s": 0.45745614700012993,
+ "solver_init_s": 2.0784028580001177,
+ "rigid_contact_max": 1756672,
+ "per_tick_counts_eager": {
+  "wp.launch": 452.0,
+  "wp.synchronize_stream": 6.0,
+  "host sync sites": {
+   "solver.py:3992:_solve <- solver.py:3952:solve <- warp_util.py:97:wrapper": 6.0
+  }
+ },
+ "collide_ms": {
+  "median": 15.106533000107447,
+  "mean": 15.217850799990629,
+  "min": 14.561853000031988,
+  "max": 15.868606000140062
+ },
+ "substep_ms": {
+  "median": 8.111313000199516,
+  "mean": 8.334907533359607,
+  "min": 8.004049999954077,
+  "max": 9.849798999994164
+ },
+ "tick_ms": {
+  "median": 32.37510200006,
+  "mean": 33.54265326670429,
+  "min": 29.82391400018969,
+  "max": 37.96199100020203
+ },
+ "capture": "ok",
+ "tick_ms_captured": {
+  "median": 13.817226500009383,
+  "mean": 14.240027400001054,
+  "min": 12.3308624999936,
+  "max": 17.262870500076133
+ },
+ "rigid_contacts": 51988,
+ "nefc_mean": 97.109375,
+ "finite": true,
+ "maxrss_mb": 872.32421875
+}
