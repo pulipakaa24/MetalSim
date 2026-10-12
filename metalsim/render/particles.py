@@ -109,13 +109,15 @@ class GrainField:
 
     def __init__(self, ctx, n_envs: int, *, grains_per_particle: int = 8, radius: float = 0.002,
                  radius_jitter: float = 0.3, offset: float = 0.005, n_meshes: int = 4, subdiv: int = 1,
-                 material: GrainMaterial | None = None, seed: int = 0, cull_z: float = -np.inf):
+                 material: GrainMaterial | None = None, seed: int = 0, cull_z: float = -np.inf, shape: dict | None = None):
+        """``shape``: grain_meshes keyword arguments (irregularity, elongation; ``subdiv`` / ``n_meshes`` as given)."""
         self.ctx, self.n_envs = ctx, n_envs
         self.k = int(grains_per_particle)
         self.radius, self.radius_jitter, self.offset = float(radius), float(radius_jitter), float(offset)
         self.seed, self.cull_z = int(seed), float(cull_z)
         self.material = material or SAND
-        meshes = grain_meshes(n_meshes, subdiv, seed=seed)
+        sh = dict(shape or {})
+        meshes = grain_meshes(n_meshes, sh.pop("subdiv", subdiv), seed=seed, **sh)
         verts = np.concatenate([m[0] for m in meshes])
         idx, info, v0, i0 = [], np.zeros((len(meshes), 4), np.uint32), 0, 0
         for k, (vv, ii) in enumerate(meshes):
@@ -262,3 +264,95 @@ class InstanceStructure:
         for a in self.rt.prim_as:
             ce.useResource_usage_(a, Metal.MTLResourceUsageRead)
         self.field.use_resources(ce)
+
+
+class GrainRaster:
+    """Tier-0 (raster) drawing of a GrainField: grain instances written by the same kernel (no env offset: every env
+    renders in its own tile), drawn as one instanced draw in tier 0's shadow and geometry passes with
+    ``shaders/particles_tier0.metal`` compiled appended to ``tier0.metal`` (tier 0's structs, shading and attachments).
+    Grains get segmentation id ``n_slots + 1`` (slot mode), geom ``ngeom`` / body ``nbody`` (geom / body modes): the
+    renderer's semantic table is extended by that one entry."""
+
+    def __init__(self, r0, field: GrainField):
+        from metalsim.render.metal_context import SHADER_DIR
+        self.r0, self.field = r0, field
+        c = r0.ctx
+        src = (SHADER_DIR / "tier0.metal").read_text() + "\n" + (SHADER_DIR / "particles_tier0.metal").read_text()
+        opts = Metal.MTLCompileOptions.new(); opts.setFastMathEnabled_(True)
+        lib, err = c.device.newLibraryWithSource_options_error_(src, opts, None)
+        if lib is None:
+            raise RuntimeError(f"Metal compile failed for particles_tier0: {err}")
+        d = Metal.MTLRenderPipelineDescriptor.new()
+        d.setVertexFunction_(lib.newFunctionWithName_("grain_vs")); d.setFragmentFunction_(lib.newFunctionWithName_("grain_fs"))
+        ca = d.colorAttachments()
+        ca.objectAtIndexedSubscript_(0).setPixelFormat_(Metal.MTLPixelFormatRGBA8Unorm)
+        ca.objectAtIndexedSubscript_(1).setPixelFormat_(Metal.MTLPixelFormatR32Uint)
+        ca.objectAtIndexedSubscript_(2).setPixelFormat_(Metal.MTLPixelFormatRGBA16Float)
+        d.setDepthAttachmentPixelFormat_(Metal.MTLPixelFormatDepth32Float)
+        self.pipe = c.render_pipeline(d)
+        d = Metal.MTLRenderPipelineDescriptor.new()
+        d.setVertexFunction_(lib.newFunctionWithName_("grain_shadow_vs"))
+        d.setDepthAttachmentPixelFormat_(Metal.MTLPixelFormatDepth32Float)
+        self.shadow_pipe = c.render_pipeline(d)
+        self.inst_desc, self.capacity = None, 0
+        # semantic table + 1 entry for the grains (untile reads sem[seg - 1])
+        sem = c.buffer_array(r0.sem_buf, np.int32, (r0.G, 4)).copy()
+        m = r0.m
+        sem = np.concatenate([sem, np.array([[m.ngeom, m.nbody, m.nbody, 0]], np.int32)])
+        r0.sem_buf = c.buffer(sem.nbytes, sem, "sem_with_grains")
+        self.rebind(field)
+
+    def rebind(self, field: GrainField):
+        """Same pipelines and semantic entry, another grain field (new radius / grains per particle)."""
+        self.field = field
+        self.inst_desc, self.capacity = None, 0
+        info = self.r0.ctx.buffer_array(field.mesh_info, np.uint32, (field.n_meshes, 4))
+        self.i_count = int(info[0, 1])
+        self.verts_per_mesh = int(field.vbuf.length() // 32 // field.n_meshes)
+        return self
+
+    def encode_instances(self, cb):
+        f = self.field
+        if f.n_grains > self.capacity:
+            self.capacity = f.n_grains
+            self.inst_desc = self.r0.ctx.buffer(64 * f.n_grains, label="t0_grain_instances")
+        f.encode_instances(cb, self.inst_desc, 0, 0, 1, 0.0)
+
+    def _bind(self, enc):
+        f, r0 = self.field, self.r0
+        k = np.array([f.n_particles * f.k, self.verts_per_mesh, 0, r0.G + 1], np.uint32)
+        enc.setVertexBuffer_offset_atIndex_(f.vbuf, 0, 0)
+        enc.setVertexBuffer_offset_atIndex_(r0.env_buf, 0, 1)
+        enc.setVertexBuffer_offset_atIndex_(self.inst_desc, 0, 2)
+        enc.setVertexBytes_length_atIndex_(k.tobytes(), k.nbytes, 3)
+        return k
+
+    def _draw(self, enc):
+        enc.drawIndexedPrimitives_indexCount_indexType_indexBuffer_indexBufferOffset_instanceCount_baseVertex_baseInstance_(
+            Metal.MTLPrimitiveTypeTriangle, self.i_count, Metal.MTLIndexTypeUInt32, self.field.ibuf, 0, self.field.n_grains, 0, 0)
+
+    def draw_shadow(self, se):
+        if self.field.n_grains == 0:
+            return
+        se.setRenderPipelineState_(self.shadow_pipe)
+        self._bind(se)
+        self._draw(se)
+
+    def draw(self, re, light_xpos, light_xpos_off, light_xdir, light_xdir_off):
+        if self.field.n_grains == 0:
+            return
+        r0 = self.r0
+        re.setRenderPipelineState_(self.pipe)
+        re.setDepthStencilState_(r0.geo_ds)
+        k = self._bind(re)
+        re.setFragmentBuffer_offset_atIndex_(r0.env_buf, 0, 1)
+        re.setFragmentBuffer_offset_atIndex_(self.field.mat_buf, 0, 2)
+        re.setFragmentBytes_length_atIndex_(k.tobytes(), k.nbytes, 3)
+        re.setFragmentBuffer_offset_atIndex_(r0.consts_buf, 0, 5)
+        re.setFragmentBuffer_offset_atIndex_(r0.light_buf, 0, 6)
+        re.setFragmentBuffer_offset_atIndex_(light_xpos, light_xpos_off, 7)
+        re.setFragmentBuffer_offset_atIndex_(light_xdir, light_xdir_off, 8)
+        re.setFragmentBuffer_offset_atIndex_(r0.params_buf, 0, 9)
+        re.setFragmentTexture_atIndex_(r0.shadow_tex, 2)
+        re.setFragmentSamplerState_atIndex_(r0.samp_shadow, 1)
+        self._draw(re)

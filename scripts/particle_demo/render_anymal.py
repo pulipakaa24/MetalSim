@@ -36,14 +36,20 @@ ap.add_argument("--grain-scale", type=float, default=1.2, help="grain radius rel
 ap.add_argument("--hdri", default=None)
 ap.add_argument("--hdri-yaw", type=float, default=106.0, help="dome rotation about +z [deg] (106: sun 75 deg to the right of the tracking camera)")
 ap.add_argument("--sand-tex", default=None)
-ap.add_argument("--exposure", type=float, default=0.0, help="linear exposure; 0 = automatic from the first frame")
+ap.add_argument("--exposure", type=float, default=0.17, help="linear exposure; 0 = automatic from the first frame")
 ap.add_argument("--denoise", default="oidn")
 ap.add_argument("--fovy", type=float, default=32.0)
 ap.add_argument("--camera", default="track", help="track | still-a | still-b | still-c")
 ap.add_argument("--save-hdr", action="store_true")
+ap.add_argument("--skip-existing", action="store_true")
+ap.add_argument("--flip-mesh-v", type=int, default=1, help="1: mirror mesh UVs (atlas convention workaround)")
+ap.add_argument("--cam-eye", type=float, nargs=3, default=None, help="debug camera position (with --cam-target)")
+ap.add_argument("--cam-target", type=float, nargs=3, default=None)
 ap.add_argument("--ground-z", type=float, default=0.098, help="render-only ground plane height (just under the bed top)")
-ap.add_argument("--ground-albedo", type=float, default=0.35, help="ground plane albedo relative to the grain palette mean")
-ap.add_argument("--decor", type=float, nargs=4, default=[-1.8, -1.5, 1.8, 5.3],
+ap.add_argument("--ground-albedo", type=float, default=0.2, help="ground plane albedo relative to the grain palette mean")
+ap.add_argument("--decor-overlap", type=float, default=0.18)
+ap.add_argument("--decor-falloff", type=float, default=1.2, help="width of the decoration's thinning border [m]")
+ap.add_argument("--decor", type=float, nargs=4, default=[-2.6, -2.5, 2.6, 6.0],
                 help="static decoration grains (one layer on the ground plane, outside the bed): x0 y0 x1 y1; 0 0 0 0 = none")
 a = ap.parse_args()
 
@@ -91,7 +97,7 @@ pal = np.array([p[:3] for p in grain_mat.palette]); w = np.array([p[3] for p in 
 grain_mean = (pal * w[:, None]).sum(0) / w.sum()
 tint = np.clip(a.ground_albedo * grain_mean / tex_mean, 0, 1)
 mat = spec.add_material(name="sand_ground", texrepeat=[0.8, 0.8], texuniform=True,
-                        rgba=[float(tint[0]), float(tint[1]), float(tint[2]), 1.0], specular=0.5, shininess=0.15)
+                        rgba=[float(tint[0]), float(tint[1]), float(tint[2]), 1.0], specular=0.0, shininess=0.0)
 mat.textures[mujoco.mjtTextureRole.mjTEXROLE_RGB] = "sand_ground"
 spec.worldbody.add_geom(name="ground", type=mujoco.mjtGeom.mjGEOM_PLANE, size=[60, 60, 0.1], pos=[0, 0, a.ground_z],
                          material="sand_ground")
@@ -100,6 +106,10 @@ spec.worldbody.add_light(name="sun", type=mujoco.mjtLightType.mjLIGHT_DIRECTIONA
                          diffuse=[1, 1, 1], specular=[0, 0, 0], ambient=[0, 0, 0], castshadow=True)
 spec.worldbody.add_camera(name="cine", pos=[3, 0, 1], fovy=a.fovy)
 model = spec.compile()
+if a.flip_mesh_v:
+    # metalsim's texture atlas samples mesh UVs vertically mirrored relative to MuJoCo (docs/RENDER_COVERAGE.md
+    # item 11, fixed on metalsim-render-fix); undo it here so the Menagerie textures land where MuJoCo puts them
+    model.mesh_texcoord[:, 1] = 1.0 - model.mesh_texcoord[:, 1]
 data = mujoco.MjData(model)
 mujoco.mj_forward(model, data)
 
@@ -137,13 +147,27 @@ def body_poses(t):
     return out
 
 
+def load_frame(i, wait_s=900.0):
+    """A recorded particle frame; waits (up to ``wait_s``) for one still being copied in."""
+    path = os.path.join(a.sim, f"particles_{i:05d}.npy")
+    t0 = time.time()
+    while True:
+        try:
+            return np.load(path)
+        except (FileNotFoundError, ValueError, EOFError):
+            if time.time() - t0 > wait_s:
+                raise
+            print(f"[render] waiting for {path}", flush=True)
+            time.sleep(10)
+
+
 def particles(t):
     f = min(max(t / dt, 0.0), n_sim - 1.0001)
     i0 = int(f); al = np.float32(f - i0)
-    p0 = np.load(os.path.join(a.sim, f"particles_{i0:05d}.npy"))
+    p0 = load_frame(i0)
     if al < 1e-6:
         return p0
-    p1 = np.load(os.path.join(a.sim, f"particles_{i0 + 1:05d}.npy"))
+    p1 = load_frame(i0 + 1)
     return (1 - al) * p0 + al * p1
 
 
@@ -175,6 +199,8 @@ def look_at(eye, target, up=(0, 0, 1)):
 
 
 def camera(k, t):
+    if a.cam_eye is not None:
+        return np.array(a.cam_eye), look_at(np.array(a.cam_eye), a.cam_target, up=(0, 1, 0) if abs(a.cam_eye[0] - a.cam_target[0]) + abs(a.cam_eye[1] - a.cam_target[1]) < 1e-6 else (0, 0, 1))
     """Slow tracking shot: a 3/4 front view orbiting 25 degrees over the clip and easing in."""
     yc = float(np.polyval(coef, t))
     s = k / 240.0
@@ -193,7 +219,7 @@ def camera(k, t):
 
 
 # ---- decoration grains: one static particle layer on the raised ground plane around the bed (render only), thinning
-# out over its outer 0.5 m so the grain field fades into the textured plane ----
+# out over its outer --decor-falloff so the grain field fades into the textured plane ----
 decor = np.zeros((0, 3), np.float32)
 if any(a.decor):
     x0, y0, x1, y1 = a.decor
@@ -202,10 +228,12 @@ if any(a.decor):
     rs = np.random.default_rng(7)
     pts = np.stack([gx.ravel(), gy.ravel()], 1) + rs.uniform(-0.5, 0.5, (gx.size, 2)) * sp
     bx0, by0, _, bx1, by1, _ = meta["bed"]
-    m_ = 0.06    # the bed's edges slump below the plane: decoration overlaps the outer 6 cm of the bed
+    # the bed's edges settle below the plane over ~15-20 cm: decoration overlaps that band (where the bed surface is
+    # above the plane, the decoration grains are buried in it); the robot's path stays clear of it
+    m_ = a.decor_overlap
     inside = (pts[:, 0] > bx0 + m_) & (pts[:, 0] < bx1 - m_) & (pts[:, 1] > by0 + m_) & (pts[:, 1] < by1 - m_)
     edge = np.minimum.reduce([pts[:, 0] - x0, x1 - pts[:, 0], pts[:, 1] - y0, y1 - pts[:, 1]])
-    keep = ~inside & (rs.uniform(0, 1, len(pts)) < np.clip(edge / 0.5, 0, 1))
+    keep = ~inside & (rs.uniform(0, 1, len(pts)) < np.clip(edge / a.decor_falloff, 0, 1))
     pts = pts[keep]
     z = a.ground_z + rs.uniform(0.0, 0.6, len(pts)) * p_radius
     decor = np.concatenate([pts, z[:, None]], 1).astype(np.float32)
@@ -233,6 +261,9 @@ stats = dict(args=vars(a), sun={k: (v.tolist() if hasattr(v, "tolist") else v) f
 exposure = a.exposure
 for k in rng_frames:
     t = a.t0 + k / a.fps
+    name = f"frame_{k:04d}.png" if a.camera == "track" else f"{a.camera}_{k:04d}.png"
+    if a.skip_existing and os.path.exists(os.path.join(a.out, name)):
+        continue
     tf = time.time()
     set_geoms(t)
     P = np.concatenate([particles(t), decor])
@@ -248,7 +279,6 @@ for k in rng_frames:
     x = np.clip(x * (2.51 * x + 0.03) / (x * (2.43 * x + 0.59) + 0.14), 0, 1)
     x = np.where(x <= 0.0031308, 12.92 * x, 1.055 * np.power(x, 1 / 2.4) - 0.055)
     rgb = (np.clip(x, 0, 1) * 255 + 0.5).astype(np.uint8)
-    name = f"frame_{k:04d}.png" if a.camera == "track" else f"{a.camera}_{k:04d}.png"
     iio.imwrite(os.path.join(a.out, name), rgb)
     if a.save_hdr:
         np.save(os.path.join(a.out, name.replace(".png", "_hdr.npy")), hdr_img.astype(np.float16))
@@ -257,5 +287,5 @@ for k in rng_frames:
               instances=int(r._ias.n_total), ias_mib=r._ias.as_bytes / 2**20, spp=a.passes * a.spp)
     stats["frames"].append(st)
     stats["exposure"] = exposure
-    json.dump(stats, open(os.path.join(a.out, f"stats_{a.camera}.json"), "w"), indent=1)
+    json.dump(stats, open(os.path.join(a.out, f"stats_{a.camera}_{frames[0]}.json"), "w"), indent=1)
     print(f"[render] {name} t={t:.3f}s {el:.1f}s grains={st['grains']} ias={st['ias_mib']:.0f}MiB", flush=True)

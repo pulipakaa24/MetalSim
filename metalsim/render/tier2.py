@@ -240,7 +240,7 @@ class Tier2Renderer:
     # -- particles (render grains) ----------------------------------------------------------------------
 
     def set_particles(self, positions, radius=None, material=None, *, grains_per_particle=8, grain_radius=None,
-                      radius_jitter=0.3, n_meshes=4, seed=0, cull_z=-np.inf, grain_eps=None):
+                      radius_jitter=0.3, n_meshes=4, seed=0, grain_shape=None, cull_z=-np.inf, grain_eps=None):
         """Draw particles as render grains (granular media: MPM sand, ...). ``positions``: (n_envs, P, 3) or (P, 3)
         numpy [m], or a Warp array on the Metal device (bound directly each frame: the GPU path). ``radius``: the
         particle radius [m] (half the particle spacing): each particle's grains are spread over its cube of half side
@@ -259,7 +259,7 @@ class Tier2Renderer:
             gr = grain_radius if grain_radius is not None else float(radius) / float(grains_per_particle) ** (1 / 3)
             g = GrainField(self.ctx, self.n, grains_per_particle=grains_per_particle, radius=gr,
                            radius_jitter=radius_jitter, offset=float(radius), n_meshes=n_meshes, material=material,
-                           seed=seed, cull_z=cull_z)
+                           seed=seed, cull_z=cull_z, shape=grain_shape)
             self.grains, self._ias = g, InstanceStructure(self.rt, g)
         elif material is not None:
             g.set_material(material)

@@ -398,6 +398,9 @@ class Tier0Renderer:
                 ce.setBuffer_offset_atIndex_(b, o, i)
             ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n * self.n_tiles, 1, 1), Metal.MTLSize(256, 1, 1))
             ce.endEncoding()
+        grains = getattr(self, "_grain_raster", None)     # particles (set_particles, metalsim/render/particles.py)
+        if grains is not None:
+            grains.encode_instances(cb)
         # 1b. shadow pass: depth from the caster light into the shadow atlas
         if self.shadows:
             sp = Metal.MTLRenderPassDescriptor.new()
@@ -425,6 +428,8 @@ class Tier0Renderer:
                 self._bind_hf(se, self.hf_svis)
                 se.drawIndexedPrimitives_indexType_indexBuffer_indexBufferOffset_indirectBuffer_indirectBufferOffset_(
                     Metal.MTLPrimitiveTypeTriangle, Metal.MTLIndexTypeUInt32, self.hf_ibuf, 0, self.hf_args, 32)
+            if grains is not None:
+                grains.draw_shadow(se)
             se.endEncoding()
         # 1c. tier 1: refit instance descriptors from the same physics buffers and rebuild the instance AS
         if self.rt is not None:
@@ -499,6 +504,8 @@ class Tier0Renderer:
             self._bind_hf(re, self.hf_vis)
             re.drawIndexedPrimitives_indexType_indexBuffer_indexBufferOffset_indirectBuffer_indirectBufferOffset_(
                 Metal.MTLPrimitiveTypeTriangle, Metal.MTLIndexTypeUInt32, self.hf_ibuf, 0, self.hf_args, 0)
+        if grains is not None:
+            grains.draw(re, light_xpos, light_xpos_off, light_xdir, light_xdir_off)
         re.endEncoding()
         # 3. untile into learner buffers
         ue = cb.computeCommandEncoder()
@@ -524,6 +531,29 @@ class Tier0Renderer:
         enc.setVertexBuffer_offset_atIndex_(vis, 0, 2)
         enc.setVertexBuffer_offset_atIndex_(self.hf_tiles, 0, 6)
         enc.setVertexBuffer_offset_atIndex_(self.hf_cc, 0, 8)
+
+    def set_particles(self, positions, radius=None, material=None, *, grains_per_particle=8, grain_radius=None,
+                      radius_jitter=0.3, n_meshes=4, seed=0, grain_shape=None, cull_z=float("-inf")):
+        """Draw particles as render grains, as ``Tier2Renderer.set_particles`` (same arguments, same grains and
+        per-grain colours; metalsim/render/particles.py, PARTICLES.md). Tier-0 shading; with ``tier=1`` the grains
+        are lit without shadows. ``positions=None`` removes them."""
+        from metalsim.render.particles import GrainField, GrainRaster
+        if positions is None:
+            self._grain_raster = None
+            return
+        gr = getattr(self, "_grain_raster", None)
+        f = gr.field if gr is not None else None
+        if f is None or (radius is not None and float(radius) != f.offset) or int(grains_per_particle) != f.k:
+            if radius is None:
+                raise ValueError("set_particles: radius is required the first time")
+            g_r = grain_radius if grain_radius is not None else float(radius) / float(grains_per_particle) ** (1 / 3)
+            f = GrainField(self.ctx, self.n, grains_per_particle=grains_per_particle, radius=g_r, radius_jitter=radius_jitter,
+                           offset=float(radius), n_meshes=n_meshes, material=material, seed=seed, cull_z=cull_z, shape=grain_shape)
+            self._grain_raster = GrainRaster(self, f) if gr is None else gr.rebind(f)
+        elif material is not None:
+            f.set_material(material)
+        f.cull_z = float(cull_z)
+        f.set_positions(positions)
 
     def render(self, sim, after_value: int | None = None) -> int:
         """GPU path: render the current physics state of ``sim`` (a BatchSim). Waits for
