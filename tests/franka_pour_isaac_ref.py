@@ -103,7 +103,9 @@ def isaac():
                           ("joint_pos_rel", "joint_vel_rel", "last_action")),
                          (os.path.join(IL, "isaaclab", "isaaclab", "envs", "mdp", "rewards.py"),
                           ("action_l2", "action_rate_l2"))):
-        generic.update(_extract_functions(fname, names, {"torch": torch}))
+        # default-argument stand-in: the test passes the resolved asset_cfg explicitly
+        stub_entity = lambda name, **kw: types.SimpleNamespace(name=name, joint_ids=slice(None), **kw)  # noqa: E731
+        generic.update(_extract_functions(fname, names, {"torch": torch, "SceneEntityCfg": stub_entity}))
     env_methods = _extract_methods(os.path.join(TASK, "pour_env.py"), "FrankaPourEnv",
                                    ("_pose_w_to_e", "cup_pose_e", "target_pose_e", "tcp_pose_e", "cup_grasp_point_e",
                                     "gripper_width", "particle_pos_e", "_particle_region_masks"),
