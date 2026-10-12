@@ -30,8 +30,9 @@ from metalsim.render.scene_tables import CameraIntrinsics, build_scene_tables
 class RayTracer:
     def __init__(self, model, n_envs: int, *, max_range: float = 10.0, max_group=3, include_planes=True,
                  decimate_faces: int = 0, terrain_slots: bool = True, draw_hfields: bool = True,
-                 ctx: MetalContext | None = None, device="metal:0"):
-        """``terrain_slots`` / ``draw_hfields``: see ``Tier0Renderer`` (False = the previous behaviour)."""
+                 appearance: str = "mujoco", ctx: MetalContext | None = None, device="metal:0"):
+        """``terrain_slots`` / ``draw_hfields`` / ``appearance``: see ``Tier0Renderer`` (False / "legacy" = the
+        previous behaviour)."""
         self.m = model
         self.n = n_envs
         self.device = device
@@ -40,7 +41,7 @@ class RayTracer:
             raise RuntimeError("this GPU has no Metal ray tracing support")
         self.tables = build_scene_tables(model, n_envs, max_group=max_group, include_planes=include_planes,
                                          decimate_faces=decimate_faces, sized_geoms="auto" if terrain_slots else (),
-                                         draw_hfields=draw_hfields)
+                                         draw_hfields=draw_hfields, appearance=appearance)
         t = self.tables
         self.sized = None
         if t.sized.any():
@@ -61,7 +62,11 @@ class RayTracer:
         for k, mesh in enumerate(t.meshes):
             mi[k, 0] = mesh["i_off"]; mi[k, 1] = mesh["i_count"]
         self.mesh_info = c.buffer(mi.nbytes, mi, "rt_mesh_info")
-        self.mat_buf = c.buffer(t.materials.nbytes, t.materials, "rt_materials")
+        # material table (G x 16) followed by the MaterialExt table (G x 8; scene_tables.MATERIAL_EXT_LAYOUT), as the
+        # path tracer reads it; kernels that index the material table alone are unaffected by the tail
+        mext = t.material_ext if t.material_ext is not None else np.zeros((self.G, 8), np.float32)
+        mt = np.concatenate([np.asarray(t.materials, np.float32).reshape(-1), np.asarray(mext, np.float32).reshape(-1)])
+        self.mat_buf = c.buffer(mt.nbytes, mt, "rt_materials")
         self.n_inst = len(t.inst_table)
         self.inst_desc = c.buffer(64 * self.n_inst, label="rt_instance_descriptors")
         self.consts = np.zeros(12, np.uint32)

@@ -61,32 +61,32 @@ Measured coverage of the reference silhouette is shown as rgb / depth / seg.
 | finite plane | ✅ | ✅ | ✅ | ✅ | ✅ | 1.0 / 1.0 / 1.0 |
 | **infinite plane** (`size="0 0"`, every locomotion floor) | ◐ | ◐ | ◐ | ◐ | ◐ | Drawn as a 10 × 10 m square (`plane_extent=5`). The ground covers only 0.369 of MuJoCo's ground pixels, so the horizon shows a visible edge. |
 | hfield | ◐ | ◐ | ◐ | ◐ | ◐ | 0.85 / 0.85 / 0.85. The top surface is exact (depth error 0). MuJoCo's side skirts and base are not drawn. |
-| **SDF geom** (`type="sdf"`, plugin or mesh SDF) | ❌ | ❌ | ❌ | ❌ | ❌ | 0.0 / 0.0 / 0.0. `geom_tris` returns `None` and the slot is silently skipped. |
+| SDF geom (`type="sdf"`, plugin or mesh SDF) | ✅ | ✅ | ✅ | ✅ | ✅ | **Fixed 2026-10 (B)**: drawn from its mesh as MuJoCo does. Was 0.0 / 0.0 / 0.0; now 1.0 / 1.0 / 1.0 in T0, T2 and the ray-traced depth camera, depth error 0. |
 | **sites** (group 0–2, visible in MuJoCo by default) | ❌ | ❌ | ❌ | ❌ | ❌ | 0.0 for sphere and box sites |
 | **spatial tendon** with `width` (cables, wires, MuJoCo tendon-driven hands) | ❌ | ❌ | ❌ | ❌ | ❌ | 0.0 |
 | **flex 2D (cloth)** | ❌ | ❌ | ❌ | ❌ | ❌ | 0.0 (277 px in MuJoCo) |
 | **flex 3D (soft volume)** | ❌ | ❌ | ❌ | ❌ | ❌ | 0.0 (152 px in MuJoCo) |
 | flex 1D (cable) | ❌ (code) | ❌ | ❌ | ❌ | ❌ | MuJoCo's own renderer drew 0 px for the cable under default visual flags, so it is not measurable here. No MetalSim code reads `flexvert_xpos`. |
 | **skin** (bone-skinned mesh) | ❌ | ❌ | ❌ | ❌ | ❌ | 0.0 (236 px in MuJoCo) |
-| **transparency** (`rgba` alpha < 1, material opacity, USD `opacity`) | ◐ | ◐ | ◐ | ◐ | ◐ | Drawn opaque. A red box behind 25 %-alpha blue glass is MuJoCo mean RGB (141, 59, 124) vs T0 (25, 25, 172) and T2 (23, 23, 147). Segmentation is 100 % glass and depth stops at the glass. |
+| transparency (`rgba` alpha < 1, material opacity, USD `opacity`) | ✅ | ✅ | ✅ | ◐ (opaque) | ✅ | **Fixed 2026-10 (B)**. T0/T1 blend as MuJoCo does: objects sorted per env, drawn front-to-back then back-to-front, back faces culled. T2 treats alpha as presence, like a USD opacity in Isaac's path tracer. Red box behind 25 % blue glass, colour change the glass makes over the box: MuJoCo (−64, 0, +65); T0/T1 before (−146, 0, +146), after (−64, 0, +64); T2 before (−122, 0, +125), after (−53, 0, +53). Annotations default to MuJoCo's: segmentation and depth of the glass (1.904 m, equal to MuJoCo). `transparent_ids="behind"` gives Isaac RTX Real-Time's opacity behaviour (seg / depth from what is behind). Lidar and depth camera still treat it as opaque. |
 | **geometry beyond 10 m** | ❌ | ❌ | ✅ | ✅ (range-limited) | T0: ❌ | T0/T1 far plane is fixed at 10 m in the shader. Boxes at 14 m and 38–41 m: T0/T1 0.0 / 0.0 / 0.0, T2 and RT 1.0. WIP `far=` in the main checkout fixes this. |
 | geom groups ≥ 3 hidden | ✅ | ✅ | ✅ | ✅ | ✅ | Matches MuJoCo's default `geomgroup` |
 | `geom_rgba` / `mat_rgba` | ✅ | ✅ | ✅ | n/a | ✅ | |
 | emission | ✅ | ✅ | ✅ (not sampled as a light) | n/a | | |
-| **mesh normals** (hard edges of CAD / OBJ / STL meshes) | ◐ | ◐ | ◐ | n/a | normals annotator ◐ | Smooth normals are averaged across every edge, and `mesh_normal` is ignored. On a box written as a mesh, the luminance spread inside the object is 43.7 (T0) and 43.5 (T2) vs 2.9 in MuJoCo; the primitive box gives 1.4 / 4.2 / 3.1. Every robot link mesh with sharp edges is shaded as if rounded. |
-| 2D texture on box / plane / hfield / mesh with UVs | ◐ | ◐ | ◐ | n/a | | Box with checker: correlation 0.86 (T0) and 0.91 (T2) vs MuJoCo. Atlas path: no mips, so it aliases at distance (TEXTURES.md). |
-| **mesh UV orientation** | ◐ | ◐ | ◐ | n/a | | Image vertically mirrored relative to MuJoCo / OBJ / glTF. On an asymmetric image, MuJoCo shows blue at the top and red at the bottom; T0 and T2 show red at the top. This is pre-existing (TEXTURES.md). The WIP native path has `flip_y=True`; the atlas path is unchanged. |
-| **2D texture on cylinder / capsule** | ❌ | ❌ | ❌ | n/a | | No UVs are generated, so the geom shows one texel (the texture is not visible). Luminance std 0.0–9 vs 82–91 in MuJoCo; mean colour 6 vs 140. |
-| 2D texture on sphere / ellipsoid | ◐ | ◐ | ◐ | n/a | | Different parameterisation from MuJoCo's: correlation −0.94 (T0) and −0.97 (T2), i.e. the checker is in opposite phase |
-| **cube texture** (`type="cube"`) on box / sphere | ◐ | ◐ | ◐ | n/a | | The whole 6-face strip is sampled with per-face UVs: correlation 0.08 / 0.06 |
+| mesh normals (hard edges of CAD / OBJ / STL meshes) | ✅ | ✅ | ✅ | n/a | normals annotator ✅ | **Fixed 2026-10 (B)**: compiled `mesh_normal` / `mesh_facenormal`, and on meshes without UVs a corner more than ~37° (dot < 0.8) off its face takes the face normal (`mjr_uploadMesh`). Mesh-box luminance std: before 43.7 (T0) / 43.5 (T2), after 1.1 / 3.1, MuJoCo 2.9; MAD vs MuJoCo 37.4 → 1.3 (T0). |
+| 2D texture on box / plane / hfield / mesh with UVs | ✅ | ✅ | ✅ | n/a | | MuJoCo's coordinates (box faces, plane, object-linear mapping for meshes without UVs and heightfields), `texrepeat` / `texuniform` as `settexture`; sRGB textures decoded as MuJoCo's GL_SRGB8. Box checker corr 0.866 (T0) / 0.909 (T2), unchanged: MuJoCo samples with mipmaps, the atlas has none. |
+| mesh UV orientation | ✅ | ✅ | ✅ | n/a | | **Fixed 2026-10 (B)**: the atlas stores `tex_data` rows unflipped, so t = 0 is the first row, as MuJoCo uploads it (its OBJ loader stores 1 − v). The USD importer now writes `1 − t` for `st`. MuJoCo top/bottom blue/red, T0 and T2 now blue/red (were red/blue); T0 corr 0.50 → 0.90. |
+| 2D texture on cylinder / capsule | ✅ | ✅ | ✅ | n/a | | **Fixed 2026-10 (B)**: MuJoCo's builtin cylinder / disk / half-sphere coordinates. Corr vs MuJoCo: cylinder — / 0.03 → 0.93 / 0.95, capsule 0.03 / 0.005 → 0.93 / 0.95 (T0 / T2). |
+| 2D texture on sphere / ellipsoid | ✅ | ✅ | ✅ | n/a | | **Fixed 2026-10 (B)**: MuJoCo's sphere tessellation and coordinates (`vis.quality`). Corr −0.94 / −0.97 → 0.95 / 0.97 |
+| cube texture (`type="cube"`) on box / sphere | ✅ | ✅ | ✅ | n/a | | **Fixed 2026-10 (B)**: OpenGL cube-map lookup of MuJoCo's object coordinates, with one face or a 6-face strip. Corr 0.08 / 0.06 → 0.97 / 0.98 |
 | texture roles other than RGB (normal, roughness, metallic, ORM, emissive, opacity layers) | ❌ | ❌ | ❌ | n/a | | Only `mat_texid[mjTEXROLE_RGB]` is read (code) |
 | `texuniform`, `texrepeat` | ✅ | ✅ | ✅ | | | Code, plus `test_texture_pattern_parity` corr 0.996 |
-| **skybox** | ◐ | ◐ | ◐ | n/a | | Replaced by its mean colour: background luminance std 0.8 (T0) and 2.8 (T2) vs 17.8 (MuJoCo gradient). T2 has a real equirectangular environment map, but only via `set_environment` or a USD DomeLight, not from an MJCF skybox. |
+| skybox | ✅ | ✅ | ✅ | n/a | | **Fixed 2026-10 (B)**: the first skybox texture is drawn as MuJoCo's cube map of the view direction (d.x, d.z, −d.y). In T0 it is the background; in T1 it is also what reflections miss into. In T2 it is the radiance of every escaping ray, so it lights the scene; a `dome` or `set_environment` replaces it. Background luminance std 0.8 / 2.8 → 17.8 / 18.3 (MuJoCo 17.8), corr 0.996 / 0.988, MAD 0.1 / 0.2. `set_clear_color` turns it off. Not drawn: MuJoCo's haze over infinite planes. |
 | directional / point / spot lights moving with bodies | ✅ | ✅ | ✅ | n/a | | `light_xpos` / `light_xdir` per world |
-| more than 8 lights | ◐ | ◐ | ✅ | n/a | | `MAX_LIGHTS 8`: lights 9 and 10 leave their patches black in T0 (0.0 / 0.0). T2 lights all 10 (42.4 / 42.4). MuJoCo's own renderer also stops at 8. |
-| **spot-light shadows** | ❌ | ❌ | ✅ | n/a | | Shadowed / unshadowed floor luminance under a plate: MuJoCo 0.00, T0 1.04, T1 1.04 (no shadow), T2 0.03. T0/T1 shadow only the first shadow-casting *directional* light. |
-| point-light shadows | ❌ | ❌ | ✅ | n/a | | T0 1.02, T1 1.02, T2 0.035. MuJoCo draws none either (1.0), but Isaac RTX does. |
-| directional shadows | ✅ (one caster) | ✅ (one caster) | ✅ | | | 0.052 / 0.049 / 0.041 vs MuJoCo 0.0 |
+| more than 8 lights | ✅ | ✅ | ✅ | n/a | | **Decided 2026-10 (B): every light, as Isaac / RTX** (no light limit). MuJoCo's fixed-function GL path stops at 8. Patches 9 and 10: T0 0.0 / 0.0 → 42.8 / 42.6 (T2 42.4 / 42.4). `Tier0Renderer(max_lights=8)` restores MuJoCo's cap. MuJoCo also lights only directional and spot lights; we also light point lights. |
+| spot-light shadows | ✅ | ✅ | ✅ | n/a | | **Fixed 2026-10 (B)**. T0 renders a perspective shadow map per shadow-casting spot light, over the full cone; MuJoCo covers cutoff × shadowscale. T1 traces a ray to the light. Plate shadow ratio: MuJoCo 0.00; T0 1.04 → 0.054; T1 1.04 → 0.052; T2 0.033. Spot + directional together: MuJoCo 0.20, T0 0.81 → 0.21. |
+| point-light shadows | ✅ | ✅ | ✅ | n/a | | **Fixed 2026-10 (B)**: T0 renders six 90° cube faces per point light; T1 traces a ray. T0 1.02 → 0.053, T1 1.02 → 0.051, T2 0.035. MuJoCo does not light point lights at all; Isaac RTX shadows them. |
+| directional shadows | ✅ (every caster) | ✅ (every caster) | ✅ | | | 0.052 / 0.049 / 0.041 vs MuJoCo 0.0 (unchanged). Every further shadow-casting directional light now gets its own map in T0 and its own soft ray in T1. With a DR light on, the first model directional light stays unshadowed, as before. |
 | image lights (`mjLIGHT_IMAGE`) | ◐ | ◐ | ◐ | | | Mapped to directional (`build_lights`, code) |
 | area lights (USD Rect / Disk / Cylinder, SphereLight radius) | ❌ | ❌ | ❌ | | | The importer drops Rect, Disk and Cylinder lights. A SphereLight becomes a point light with no radius, so shadows are hard. |
 | debug visuals (joints, contacts, COM, inertia, equality constraints, perturbations) | n/a | n/a | n/a | | | Not camera content in Isaac either |
@@ -182,17 +182,72 @@ Effort is engineering days for one person including tests, assuming the existing
 | rank | fix | effort (days) | why first |
 |---|---|---|---|
 | 1 | Dynamic-mesh path for flex / XPBD / PhysX-port cloth (#1), with skins (#8) and tendons (#7) on the same infrastructure | 4–6 (+1 skins, +2 tendons) | A whole simulated category, which PARITY claims at parity with Isaac's deformables, is invisible to cameras |
-| 2 | Mesh normals (#3) | 0.5–1 | Wrong on every frame of every mesh robot; cheapest high-impact fix |
+| 2 | Mesh normals (#3): **done 2026-10 (§3b)** | 0.5–1 | Wrong on every frame of every mesh robot; cheapest high-impact fix |
 | 3 | Land the far-plane WIP (#5) and make the infinite plane infinite (#4) | 1.5–2.5 | Locomotion and navigation cameras see a 10 m world with a floor edge |
 | 4 | Newton → renderer adapter (#2): **done 2026-10-12** (`render/newton_bridge.py`) | 2–3 | Without it the Newton backend has no camera at all |
-| 5 | SDF geoms (#9) | 0.5 | Silently invisible objects |
-| 6 | Texture mapping fixes (#11) | 1.5 | Mirrored and missing textures on common primitives |
+| 5 | SDF geoms (#9): **done 2026-10 (§3b)** | 0.5 | Silently invisible objects |
+| 6 | Texture mapping fixes (#11): **done 2026-10 (§3b)** | 1.5 | Mirrored and missing textures on common primitives |
 | 7 | Per-world size DR (#12) | 1 | Randomized sizes invisible to the policy |
-| 8 | Transparency (#6) | 2–4 | Glass / plastic objects |
-| 9 | Spot / point shadows in T1 / T0 (#10) | 0.5–3 | Indoor lighting cues |
+| 8 | Transparency (#6): **done 2026-10 (§3b)** | 2–4 | Glass / plastic objects |
+| 9 | Spot / point shadows in T1 / T0 (#10): **done 2026-10 (§3b)** | 0.5–3 | Indoor lighting cues |
 | 10 | The P2 items (#13–#18) | ~10 total | Fidelity |
 
 MPM particle rendering (#19) is not ranked: it is being built by another agent.
+
+## 3b. Static-appearance fixes (2026-10, workstream B)
+
+This workstream fixed gaps #3, #6, #9, #10, #11, #15 and #16 (lights), measured against `mujoco.Renderer`.
+
+- **Reference.** MuJoCo 3.14.0's own renderer source:
+  - `render_context.c`: `mjr_uploadMesh`, `makePlane`, `sphere`, `halfSphere`, `cylinder`, `disk`, the box list, `mjr_uploadTexture`.
+  - `render_gl3.c`: `settexture`, `mjr_render`'s transparent and skybox passes, `isSupportedLight`.
+  - `engine_vis_visualize.c`: `setMaterial`, `mjv_initGeom`.
+- **Isaac / RTX behaviour** comes from NVIDIA's RTX renderer and Replicator docs, forum answers, Isaac Lab issues #2956 and #3847, and the UsdLux / UsdGeom / UsdPreviewSurface specs.
+- **Measurements:**
+  - Before/after numbers: `scripts/diagnostics/render_appearance_parity.py`, written to `docs/measurements/render_appearance.json`.
+  - Tests: `tests/test_render_appearance.py`.
+  - Cost: `scripts/diagnostics/render_appearance_cost.py`.
+- **Legacy path.** `appearance="legacy"` (on `Tier0Renderer`, `Tier2Renderer`, `RayTracer` and `build_scene_tables`) rebuilds the old tables for comparison. The old behaviour of each feature has its own switch: `transparency=False`, `shadow_lights="caster"`, `max_lights=8`, `skybox=False`.
+
+| item | what changed | MuJoCo | Isaac / RTX | where MetalSim follows which |
+|---|---|---|---|---|
+| mesh normals | Uses MuJoCo's compiled normals and its 0.8 dot rule, which keeps hard edges (`builtin_geoms.mesh_triangles`). Decimated LODs use `MakeNormal` plus the same rule. | the rule | Authored `normals` on a polygonal (`subdivisionScheme = none`) mesh; Isaac Lab's spawners author `bilinear` and no normals. A mesh with the catmullClark default ignores its normals. | MuJoCo |
+| SDF geoms | Drawn from `geom_dataid`'s mesh in every renderer and in the RT structures | the same | n/a (an SDF is a collision representation) | MuJoCo |
+| geom colour | rgba resolved as `setMaterial`: the geom's own rgba wins unless it is the default (0.5, 0.5, 0.5, 1). Geoms whose resolved alpha is 0 are skipped. Previously the material always won. | the same | n/a | MuJoCo |
+| texture coordinates | Primitives use MuJoCo's tessellation (`vis.quality`) and coordinates. Meshes without UVs and heightfields use the object-linear mapping. `texrepeat` / `texuniform` follow `settexture`. Atlas rows are unflipped. sRGB 2D textures are decoded. The atlas pads with wrapped texels instead of black. | the same | Authored `st` with (0, 0) at the image's lower left. The importer now writes 1 − t, the same as MuJoCo's OBJ loader. | MuJoCo; one convention for any later texture backend: t = 0 is the first `tex_data` row |
+| cube textures | OpenGL cube-map lookup (one face, or a 6-face strip) of MuJoCo's object coordinates | the same | n/a (MDL projections) | MuJoCo |
+| skybox | Cube map of the view direction: T0 background, T1 reflection misses, T2 environment radiance | Unlit background; also haze over infinite planes, which is not ported | The dome light is both background and light | T0 / T1 MuJoCo; T2 lights the scene with it, as a dome |
+| transparency | T0/T1: per-env object sort (`sort_transparent`), back faces culled, blended front-to-back then back-to-front. The draws are rank-major instanced and pull vertices, so two draws cover every env. T2: presence sampling, and shadow rays carry ∏(1 − α). | Blended as described. Depth and segmentation come from the glass surface; on this probe `mujoco.Renderer`'s depth is 1.904 m, at the glass. Shadows are cast in full. | Real-Time (Isaac Sim ≤ 5): opacity below 1 is cut out, so the object is gone from RGB, depth and segmentation while its shadow stays (fractional cutout is off by default). Path tracer and Real-Time 2.0: stochastic presence. Glass: depth on the glass. | Colour: T0/T1 MuJoCo, T2 Isaac's path tracer. Annotations: MuJoCo by default; `transparent_ids="behind"` gives Isaac Real-Time's opacity behaviour. |
+| lights | Every light is lit (`MAX_LIGHTS` compile-time cap, default 2^20) | 8 in practice (fixed-function GL); directional and spot only | No documented limit; sampled direct lighting for thousands of lights | Isaac. `max_lights=8` gives MuJoCo's cap. |
+| shadows | Every `castshadow` light. T0 renders extra depth layers in the caster's per-env tile layout: orthographic for directional, the cone for spot, 6 faces for point; spot and point layers store linear distance. T1 traces one ray per light. | Directional and spot lights, shadow maps, spot cone × `shadowscale` | Every light casts shadows by default (`shadow:enable` falls back to true) | Isaac for point lights; both for spot and directional |
+
+**Limits:**
+- Heightfields drawn by the culled tile path (`hfield_cull`, the default) cast only the caster's shadow in T0. T1 and T2 trace them.
+- Lidar and the ray-traced depth camera still treat transparent geoms as opaque.
+- A capsule's cube-map coordinates use one scale for the whole capsule; MuJoCo's hemispheres differ slightly.
+- Planes seen from behind are not made more transparent, as MuJoCo does.
+
+**Cost** (`render_appearance_cost.py`; M4 Max; 128×128; best of 3×10 frames): **preliminary, measured as a contended `check` job.** The timing queue was deadlocked: waiters running an older `gpu_lock.py` were waiting behind newer ones. Up to 3 jobs shared the GPU. Before and after were rendered back to back, so their ratio is indicative.
+
+| scene | renderer, envs | before ms (env-frames/s) | after ms (env-frames/s) | why |
+|---|---|---|---|---|
+| SO-101 box task, full-resolution meshes | T0, 1024 | 152 (6,737) | 297 (3,450) | Vertices 162 K → 619 K: hard edges split the corners, the same count MuJoCo uploads. Indices are unchanged (975 K per env), so the raster is vertex-bound. |
+| SO-101 | T1, 256 | 62 (4,103) | 80 (3,200) | same |
+| SO-101 | T2, 64 (4 spp, 2 bounces) | 104 (615) | 95 (673) | No measurable change (ray tracing does not depend on the vertex count). |
+| Franka Panda (Menagerie) | T0, 1024 | 68 (15,059) | 193 (5,300) | The shadow-casting spot light gets its own shadow pass; vertices 69 K → 396 K |
+
+Not measured yet:
+- SO-101 decimated to 3000 faces per mesh. This is the lift task's training setting, `LiftConfig.decimate_faces`; its vertex counts are far smaller.
+- G1 rough-terrain head camera. It has no meshes with hard edges in its collision set and one directional light, so no extra shadow pass.
+- Exclusive timings.
+
+The second run stalled on Panda tier 1 and the watchdog killed it at 1500 s. That was during the window when this Mac's GPU hung (02:34; the coordinator attributes the hang to another agent's kernel). The stall is not explained yet.
+
+**Speed levers:**
+- `decimate_faces` (LOD normals use the same MuJoCo rule).
+- `shadow_lights="caster"`.
+- `appearance="legacy"`, the old tables and old cost.
+
 
 ## 4. Reproduce
 

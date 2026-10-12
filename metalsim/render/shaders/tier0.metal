@@ -9,7 +9,12 @@
 #include <metal_stdlib>
 using namespace metal;
 
-#define MAX_LIGHTS 8
+// Lights lit per fragment: every model light by default (Isaac / RTX has no light limit); Tier0Renderer(max_lights=8)
+// compiles the variant with MuJoCo's effective cap (its fixed-function OpenGL path lights GL_LIGHT0..7). The value is
+// also the DR light's caster sentinel.
+#ifndef MAX_LIGHTS
+#define MAX_LIGHTS 1048576
+#endif
 
 struct EnvParams {            // built on the GPU by build_env_params
     float4x4 view_proj;
@@ -50,6 +55,8 @@ struct SceneParams {          // 5 x float4
     float4 hl_diffuse;
     float4 hl_specular;       // w = headlight active
     float4 sky;               // mean skybox colour, w = skybox present
+    float4 sky_rect;          // skybox cube texture in the atlas (u0, v0, du, dv)
+    float4 sky_info;          // x faces (1 or 6), y = 1 when the skybox texture is drawn
 };
 
 struct Material {
@@ -61,11 +68,14 @@ struct Material {
 
 struct Semantic { int geom, body, root, group; };
 
+#include "appearance.h"
+
 struct Consts {
     uint n_envs, n_geoms, n_slots, tiles_per_row;
     uint tile_w, tile_h, atlas_w, atlas_h;
-    uint n_cam, bg_layers, flags, n_light;      // flags bit0: draw backgrounds, bit1: shadows
+    uint n_cam, bg_layers, flags, n_light;      // flags bit0: backgrounds, bit1: shadows, bit2: skybox, bit3: extra shadow views
     uint shadow_w, shadow_h, shadow_atlas_w, shadow_atlas_h;
+    uint n_shadow_views, _c0, _c1, _c2;             // extra shadow views (flags bit3), see build_shadow_views
 };
 
 // -------------------------------------------------------------------------------------------------
@@ -180,6 +190,7 @@ struct VSOut {
     float2 uv;
     uint   env  [[flat]];
     uint   slot [[flat]];
+    float3 local_pos;         // geom-frame position (cube-map texture coordinates)
 };
 
 struct FSIn {
@@ -189,6 +200,7 @@ struct FSIn {
     float2 uv;
     uint   env  [[flat]];
     uint   slot [[flat]];
+    float3 local_pos;         // geom-frame position (cube-map texture coordinates)
 };
 
 inline void slot_world(uint env, uint slot, device const int* slot_geom,
@@ -237,7 +249,86 @@ vertex VSOut geom_vs(
     VSOut o;
     o.clip = clip;
     clip_to_tile(o.clip_distance, clip, e.tile);
-    o.world_pos = p; o.normal_w = n; o.uv = in.uv; o.env = env; o.slot = slot;
+    o.world_pos = p; o.normal_w = n; o.uv = in.uv; o.env = env; o.slot = slot; o.local_pos = in.pos;
+    return o;
+}
+
+// -------------------------------------------------------------------------------------------------
+// Transparent geoms (material-resolved rgba alpha < 0.995, MuJoCo's test): drawn after every opaque geom, as MuJoCo's
+// mjr_render does: no depth write (depth = what is behind), blending src-alpha / one-minus-src-alpha, back faces
+// culled, objects sorted per env by camera distance minus bounding radius (planes last), drawn front to back and then
+// back to front. One draw per pass covers every env: instance r * n_envs + e is env e's rank-r object (rank-major, so
+// the hardware's in-order blending follows the sort), and the vertex shader pulls that object's mesh by vertex id
+// (the vertex count is the largest transparent mesh's index count; ids past a smaller mesh's count are degenerate).
+
+struct TransConsts { uint n_trans, max_index, _p0, _p1; };
+struct MeshRange { uint i_off, i_count, _p0, _p1; };
+
+kernel void sort_transparent(
+    device const EnvParams*  envs        [[buffer(0)]],
+    device const int*        trans_slot  [[buffer(1)]],   // (T,) slot of each transparent geom
+    device const float*      trans_rb    [[buffer(2)]],   // (T,) bounding radius, < 0 for planes (always last)
+    device const int*        slot_geom   [[buffer(3)]],
+    device const float*      geom_xpos   [[buffer(4)]],
+    constant Consts&         c           [[buffer(5)]],
+    constant TransConsts&    tc          [[buffer(6)]],
+    device uint*             order       [[buffer(7)]],   // (n_envs, T) slots by increasing distance
+    uint e [[thread_position_in_grid]])
+{
+    if (e >= c.n_envs) return;
+    float3 cam = envs[e].cam_pos.xyz;
+    uint T = tc.n_trans;
+    device uint* o = order + e * T;
+    float dist[64];
+    uint n = min(T, 64u);
+    for (uint k = 0; k < n; ++k) {
+        uint slot = uint(trans_slot[k]);
+        device const float* xp = geom_xpos + (e * c.n_geoms + uint(slot_geom[slot])) * 3;
+        float d = trans_rb[k] < 0.0 ? 1e10 : length(float3(xp[0], xp[1], xp[2]) - cam) - trans_rb[k];
+        uint j = k;                              // insertion sort (T is small)
+        while (j > 0 && dist[j - 1] > d) { dist[j] = dist[j - 1]; o[j] = o[j - 1]; --j; }
+        dist[j] = d; o[j] = slot;
+    }
+    for (uint k = n; k < T; ++k) o[k] = uint(trans_slot[k]);   // beyond 64: unsorted, drawn last
+}
+
+vertex VSOut trans_vs(
+    uint vid [[vertex_id]],
+    uint inst [[instance_id]],
+    device const float*      verts     [[buffer(0)]],
+    device const EnvParams*  envs      [[buffer(1)]],
+    device const uint*       order     [[buffer(2)]],
+    device const int*        slot_geom [[buffer(3)]],
+    device const float*      geom_xpos [[buffer(4)]],
+    device const float*      geom_xmat [[buffer(5)]],
+    device const int*        slot_mesh [[buffer(6)]],
+    constant Consts&         c         [[buffer(7)]],
+    constant TransConsts&    tc        [[buffer(8)]],
+    device const MeshRange*  meshes    [[buffer(9)]],
+    device const uint*       indices   [[buffer(10)]],
+    constant uint&           reverse   [[buffer(11)]])
+{
+    uint r = inst / c.n_envs, env = inst - r * c.n_envs;
+    if (reverse) r = tc.n_trans - 1 - r;
+    uint slot = order[env * tc.n_trans + r];
+    MeshRange mr = meshes[slot_mesh[slot]];
+    VSOut o;
+    if (vid >= mr.i_count) {                     // past this object's mesh: a degenerate (culled) triangle
+        o.clip = float4(0.0, 0.0, 2.0, 1.0);
+        for (uint k = 0; k < 4; ++k) o.clip_distance[k] = -1.0;
+        o.world_pos = float3(0.0); o.normal_w = float3(0, 0, 1); o.uv = float2(0.0); o.env = env; o.slot = slot; o.local_pos = float3(0.0);
+        return o;
+    }
+    uint vi = indices[mr.i_off + vid];
+    device const float* v = verts + vi * 8;
+    float3 pos = float3(v[0], v[1], v[2]), nrm = float3(v[3], v[4], v[5]);
+    float3 p, n;
+    slot_world(env, slot, slot_geom, geom_xpos, geom_xmat, c, pos, nrm, p, n);
+    EnvParams e = envs[env];
+    float4 clip = tile_clip(e.view_proj * float4(p, 1.0), e.tile);
+    o.clip = clip;
+    clip_to_tile(o.clip_distance, clip, e.tile);
+    o.world_pos = p; o.normal_w = n; o.uv = float2(v[6], v[7]); o.env = env; o.slot = slot; o.local_pos = pos;
     return o;
 }
 
@@ -299,6 +390,165 @@ inline float3 shade_light(float3 N, float3 V, float3 L, float3 rad, float3 base,
     return (kd * base / PI + spec) * NdotL * rad;
 }
 
+// -------------------------------------------------------------------------------------------------
+// Extra shadow views (Tier0Renderer(shadow_lights="all")): every shadow-casting model light other than the legacy
+// caster above gets its own shadow map, a layer of `smaps` with the same per-env tile layout as the caster's atlas:
+// directional = orthographic around the scene bounds (as the caster), spot = perspective over the cone (full cone
+// angle, capped at 170 deg; MuJoCo covers cutoff x shadowscale), point = six 90-degree cube faces (Isaac / RTX shadow
+// point lights; MuJoCo's classic renderer does not light point lights at all). Spot / point layers store the linear
+// distance to the light over the view's far distance, so one bias works at every depth.
+
+struct ShadowView { float4x4 vp; float4 info; };   // info: x light, y face (-1 not a cube face), z perspective (1/0), w far
+// per model light (light_sv): x first view (-1 none), y views (1 or 6), z kind (0 dir, 1 point, 2 spot)
+
+inline float4x4 look_vp(float3 eye, float3 fwd, float3 up_hint, float4x4 P) {
+    float3 f = normalize(fwd);
+    float3 up = fabs(dot(f, up_hint)) < 0.99 ? up_hint : (fabs(f.z) < 0.99 ? float3(0, 0, 1) : float3(1, 0, 0));
+    float3 r = normalize(cross(f, up));
+    float3 u = cross(r, f);
+    float3x3 B = float3x3(r, u, -f);
+    float3x3 Bt = transpose(B);
+    float4x4 V = float4x4(float4(Bt[0], 0), float4(Bt[1], 0), float4(Bt[2], 0), float4(-(Bt * eye), 1));
+    return P * V;
+}
+
+inline float4x4 persp(float fov, float n, float f) {
+    float k = 1.0 / tan(0.5 * fov);
+    return float4x4(float4(k, 0, 0, 0), float4(0, k, 0, 0), float4(0, 0, f / (n - f), -1), float4(0, 0, n * f / (n - f), 0));
+}
+
+constant float3 CUBE_FWD[6] = { float3(1, 0, 0), float3(-1, 0, 0), float3(0, 1, 0), float3(0, -1, 0), float3(0, 0, 1), float3(0, 0, -1) };
+constant float3 CUBE_UP[6]  = { float3(0, 0, 1), float3(0, 0, 1), float3(0, 0, 1), float3(0, 0, 1), float3(0, 1, 0), float3(0, 1, 0) };
+
+kernel void build_shadow_views(
+    device ShadowView*       views      [[buffer(0)]],   // (n_envs, n_views)
+    device const int4*       view_light [[buffer(1)]],   // per view: light, face, kind (0 dir, 1 point, 2 spot)
+    device const Light*      lights     [[buffer(2)]],
+    device const float*      light_xpos [[buffer(3)]],
+    device const float*      light_xdir [[buffer(4)]],
+    constant Consts&         c          [[buffer(5)]],
+    constant SceneParams&    sp         [[buffer(6)]],
+    uint tid [[thread_position_in_grid]])
+{
+    uint n_views = c.n_shadow_views;
+    if (tid >= c.n_envs * n_views) return;
+    uint e = tid / n_views, v = tid - e * n_views;
+    int4 vl = view_light[v];
+    uint i = uint(vl.x);
+    device const float* lp = light_xpos + (e * c.n_light + i) * 3;
+    device const float* ld = light_xdir + (e * c.n_light + i) * 3;
+    float3 Lpos = float3(lp[0], lp[1], lp[2]), Ldir = normalize(float3(ld[0], ld[1], ld[2]));
+    float r = sp.bounds.w;
+    ShadowView sv;
+    if (vl.z == 0) {          // directional: orthographic around the scene bounds (the caster's construction)
+        float3 eye = sp.bounds.xyz - Ldir * (r * 2.0);
+        float zn = 0.01, zf = r * 4.0;
+        float4x4 LP = float4x4(float4(1/r, 0, 0, 0), float4(0, 1/r, 0, 0), float4(0, 0, -1/(zf - zn), 0), float4(0, 0, -zn/(zf - zn), 1));
+        sv.vp = look_vp(eye, Ldir, float3(0, 0, 1), LP);
+        sv.info = float4(float(i), -1.0, 0.0, zf);
+    } else {
+        float far = max(length(Lpos - sp.bounds.xyz) + 2.0 * r, 0.1);
+        float near = max(far * 1e-4, 1e-3);
+        if (vl.z == 2) {      // spot: the cone
+            float fov = min(2.0 * lights[i].kind.z, 170.0) * PI / 180.0;
+            sv.vp = look_vp(Lpos, Ldir, float3(0, 0, 1), persp(fov, near, far));
+            sv.info = float4(float(i), -1.0, 1.0, far);
+        } else {              // point: cube face vl.y
+            uint f = uint(vl.y);
+            sv.vp = look_vp(Lpos, CUBE_FWD[f], CUBE_UP[f], persp(0.5 * PI, near, far));
+            sv.info = float4(float(i), float(f), 1.0, far);
+        }
+    }
+    views[tid] = sv;
+}
+
+struct ShadowViewOut {
+    float4 clip [[position]];
+    float  clip_distance [[clip_distance]] [4];
+    float3 world_pos;
+    uint   env [[flat]];
+};
+
+vertex ShadowViewOut shadow_view_vs(
+    VSIn in [[stage_in]],
+    uint inst [[instance_id]],
+    device const EnvParams*  envs      [[buffer(1)]],
+    device const uint2*      inst_tab  [[buffer(2)]],
+    device const int*        slot_geom [[buffer(3)]],
+    device const float*      geom_xpos [[buffer(4)]],
+    device const float*      geom_xmat [[buffer(5)]],
+    device const ShadowView* views     [[buffer(6)]],
+    constant Consts&         c         [[buffer(7)]],
+    constant uint&           view      [[buffer(8)]])
+{
+    float3 p, n; uint env, slot;
+    instance_world(inst, inst_tab, slot_geom, geom_xpos, geom_xmat, c, in.pos, in.normal, p, n, env, slot);
+    EnvParams e = envs[env];
+    ShadowView sv = views[env * c.n_shadow_views + view];
+    float4 clip = tile_clip(sv.vp * float4(p, 1.0), e.shadow_tile);
+    ShadowViewOut o;
+    o.clip = clip;
+    clip_to_tile(o.clip_distance, clip, e.shadow_tile);
+    o.world_pos = p; o.env = env;
+    return o;
+}
+
+struct ShadowDepthOut { float depth [[depth(any)]]; };
+struct ShadowViewIn {
+    float4 clip [[position]];
+    float3 world_pos;
+    uint   env [[flat]];
+};
+
+fragment ShadowDepthOut shadow_view_fs(
+    ShadowViewIn in [[stage_in]],
+    device const ShadowView* views      [[buffer(6)]],
+    constant Consts&         c          [[buffer(7)]],
+    constant uint&           view       [[buffer(8)]],
+    device const float*      light_xpos [[buffer(9)]])
+{
+    ShadowView sv = views[in.env * c.n_shadow_views + view];
+    ShadowDepthOut o;
+    if (sv.info.z > 0.5) {   // perspective views store the linear distance to the light
+        device const float* lp = light_xpos + (in.env * c.n_light + uint(sv.info.x)) * 3;
+        o.depth = saturate(length(in.world_pos - float3(lp[0], lp[1], lp[2])) / sv.info.w);
+    } else {
+        o.depth = in.clip.z;
+    }
+    return o;
+}
+
+// visibility of world point `wp` from light lsv (fragment of env `env`): 1 lit, 0 shadowed (2x2 hardware-filtered)
+inline float extra_shadow(depth2d_array<float> smaps, sampler ss, device const ShadowView* sviews, int4 lsv, uint env,
+                          constant Consts& c, float4 tile, float3 wp, float3 Lpos, float3 N, float3 L)
+{
+    uint v = uint(lsv.x);
+    if (lsv.y == 6) {        // point light: the cube face the point lies in
+        float3 d = wp - Lpos, a = fabs(d);
+        uint f = (a.x >= a.y && a.x >= a.z) ? (d.x >= 0 ? 0u : 1u) : (a.y >= a.z ? (d.y >= 0 ? 2u : 3u) : (d.z >= 0 ? 4u : 5u));
+        v += f;
+    }
+    ShadowView sv = sviews[env * c.n_shadow_views + v];
+    float4 lc = sv.vp * float4(wp, 1.0);
+    if (lc.w <= 0.0) return 1.0;
+    float2 ndc = lc.xy / lc.w;
+    float2 uv = float2(ndc.x * 0.5 + 0.5, 0.5 - ndc.y * 0.5);
+    if (any(uv < 0.0) || any(uv > 1.0)) return 1.0;
+    float2 st = float2(tile.x * 0.5 + 0.5, 0.5 - tile.y * 0.5);
+    float2 auv = st + (uv - 0.5) * tile.zw;
+    float cosl = saturate(dot(N, L));
+    float ref;
+    if (sv.info.z > 0.5) {   // texel footprint at this distance x slope, plus 4 mm
+        float dist = length(wp - Lpos);
+        float texel = 2.0 * dist / float(c.shadow_w);   // a 90-degree view's texel at this distance
+        float bias = 0.004 + 1.5 * texel * sqrt(max(1.0 - cosl * cosl, 0.0)) / max(cosl, 0.2);
+        ref = (dist - bias) / sv.info.w;
+    } else {
+        ref = lc.z - 0.0015;
+    }
+    return smaps.sample_compare(ss, auv, v, ref);
+}
+
 fragment FSOut geom_fs(
     FSIn in [[stage_in]],
     device const EnvParams* envs       [[buffer(1)]],
@@ -313,17 +563,18 @@ fragment FSOut geom_fs(
     texture2d<float>        atlas      [[texture(0)]],
     depth2d<float>          shadow     [[texture(2)]],
     sampler                 samp       [[sampler(0)]],
-    sampler                 shadow_samp [[sampler(1)]])
+    sampler                 shadow_samp [[sampler(1)]],
+    device const MaterialExt* mext     [[buffer(18)]],
+    device const ShadowView* sviews    [[buffer(19)]],
+    device const int4*       light_sv  [[buffer(20)]],
+    depth2d_array<float>     smaps     [[texture(3)]])
 {
     EnvParams e = envs[in.env];
     Material m = mats[in.slot];
     float4 mod = per_inst[in.env * c.n_slots + in.slot];
     float3 base = m.rgba.rgb * mod.rgb;
-    if (m.par.z > 0.5) {
-        float2 tuv = fract(in.uv * m.par.xy);
-        float2 auv = m.rect.xy + tuv * m.rect.zw;
-        base *= atlas.sample(samp, auv).rgb;
-    }
+    float4 texc = material_tex(m.rect, m.par, mext[in.slot], in.uv, in.local_pos, atlas, samp);
+    base *= texc.rgb;
     float metallic = m.mrse.x, rough = max(m.mrse.y, 0.03), specw = m.mrse.z, emission = m.mrse.w;
     float3 N = normalize(in.normal_w);
     float3 V = normalize(e.cam_pos.xyz - in.world_pos);
@@ -366,6 +617,9 @@ fragment FSOut geom_fs(
         // MuJoCo/OpenGL light "diffuse" values are unnormalized: a head-on Lambertian surface returns
         // albedo * diffuse. With the energy-conserving BRDF (albedo / pi) that means radiance = pi * diffuse.
         float s = (int(i) == caster) ? vis : 1.0;
+        int4 lsv = light_sv[i];
+        if ((c.flags & 8u) && lsv.x >= 0 && int(i) != caster && att > 0.0)   // own shadow view(s): spot, point, other directional
+            s = extra_shadow(smaps, shadow_samp, sviews, lsv, in.env, c, e.shadow_tile, in.world_pos, Lpos, N, L);
         direct += shade_light(N, V, L, l.diffuse.xyz * (PI * att), base, f0, metallic, a2, NdotV) * s;
     }
     if (e.dr_light.w > 0.0) {
@@ -376,7 +630,7 @@ fragment FSOut geom_fs(
         direct += shade_light(N, V, V, sp.hl_diffuse.xyz * PI, base, f0, metallic, a2, NdotV);
     float3 color = direct + e.ambient.rgb * base + emission * base;   // flat ambient, as MuJoCo
     FSOut o;
-    o.color = float4(color, 1.0);
+    o.color = float4(color, m.rgba.a * mod.a * texc.a);   // alpha: used by the transparent pass only
     o.seg = in.slot + 1u;
     o.normal = float4(N, 1.0);
     return o;
@@ -507,7 +761,7 @@ vertex VSOut hf_tile_vs(
     VSOut o;
     o.clip = clip;
     clip_to_tile(o.clip_distance, clip, e.tile);
-    o.world_pos = p; o.normal_w = n; o.uv = uv; o.env = env; o.slot = slot;
+    o.world_pos = p; o.normal_w = n; o.uv = uv; o.env = env; o.slot = slot; o.local_pos = pos;
     return o;
 }
 
@@ -550,12 +804,19 @@ vertex BGOut bg_vs(uint vid [[vertex_id]], uint env [[instance_id]], device cons
 }
 
 fragment FSOut bg_fs(BGOut in [[stage_in]], device const EnvParams* envs [[buffer(1)]], constant Consts& c [[buffer(5)]],
-                     texture2d_array<float> bg [[texture(1)]], sampler samp [[sampler(0)]])
+                     texture2d_array<float> bg [[texture(1)]], sampler samp [[sampler(0)]],
+                     constant SceneParams& sp [[buffer(9)]], texture2d<float> atlas [[texture(0)]])
 {
     EnvParams e = envs[in.env];
     FSOut o;
     if (e.ambient.w > 0.5 && (c.flags & 1u))
         o.color = float4(bg.sample(samp, in.uv, in.env % c.bg_layers).rgb, 1.0);
+    else if ((c.flags & 4u) && sp.sky_info.y > 0.5) {   // MuJoCo skybox: cube map of the view direction
+        float4 ndc = float4(in.uv.x * 2.0 - 1.0, 1.0 - in.uv.y * 2.0, 1.0, 1.0);
+        float4 wp = inverse4(e.view_proj) * ndc;
+        float3 d = normalize(wp.xyz / wp.w - e.cam_pos.xyz);
+        o.color = float4(sky_color(atlas, samp, sp.sky_rect, sp.sky_info, d), 1.0);
+    }
     else
         o.color = e.clear_color;
     o.seg = 0u;
@@ -661,6 +922,7 @@ fragment FSOut geom_fs_rt(
     device const float*     verts      [[buffer(15)]],
     device const uint*      indices    [[buffer(16)]],
     device const InstanceDescT* inst   [[buffer(17)]],
+    device const MaterialExt* mext     [[buffer(18)]],
     texture2d<float>        atlas      [[texture(0)]],
     sampler                 samp       [[sampler(0)]])
 {
@@ -668,10 +930,8 @@ fragment FSOut geom_fs_rt(
     Material m = mats[in.slot];
     float4 mod = per_inst[in.env * c.n_slots + in.slot];
     float3 base = m.rgba.rgb * mod.rgb;
-    if (m.par.z > 0.5) {
-        float2 tuv = fract(in.uv * m.par.xy);
-        base *= atlas.sample(samp, m.rect.xy + tuv * m.rect.zw).rgb;
-    }
+    float4 texc = material_tex(m.rect, m.par, mext[in.slot], in.uv, in.local_pos, atlas, samp);
+    base *= texc.rgb;
     float metallic = m.mrse.x, rough = max(m.mrse.y, 0.03), specw = m.mrse.z, emission = m.mrse.w;
     float3 N = normalize(in.normal_w);
     float3 V = normalize(e.cam_pos.xyz - in.world_pos);
@@ -717,6 +977,14 @@ fragment FSOut geom_fs_rt(
             }
         }
         float s = shadow_term(L, int(i) == caster);
+        if (int(i) != caster && l.kind.y > 0.5 && att > 0.0 && dot(N, L) > 0.0) {   // every other shadow-casting light
+            if (l.kind.x == 0.0) s = shadow_term(L, true);
+            else {          // point / spot: one ray to the light position (hard shadow)
+                float3 to = Lpos + rt_env_offset(in.env, ro) - P;
+                float dl = length(to);
+                s = (dl > 0.003 && occluded(accel, P, to / dl, dl - 0.002)) ? 0.0 : 1.0;   // tmax > tmin always
+            }
+        }
         direct += shade_light(N, V, L, l.diffuse.xyz * (PI * att), base, f0, metallic, a2, NdotV) * s;
     }
     if (e.dr_light.w > 0.0) {
@@ -744,7 +1012,8 @@ fragment FSOut geom_fs_rt(
         ray r(P, Rd, 0.001, 50.0);
         intersector<triangle_data, instancing> isect;
         intersection_result<triangle_data, instancing> res = isect.intersect(r, accel);
-        float3 rc = sp.sky.w > 0.5 ? sp.sky.xyz : e.clear_color.rgb;
+        float3 rc = sp.sky_info.y > 0.5 ? sky_color(atlas, samp, sp.sky_rect, sp.sky_info, Rd)
+                  : sp.sky.w > 0.5 ? sp.sky.xyz : e.clear_color.rgb;
         if (res.type != intersection_type::none) {
             uint slot2 = inst_tab[res.instance_id].y;
             uint mesh2 = uint(slot_mesh[slot2]);
@@ -761,7 +1030,8 @@ fragment FSOut geom_fs_rt(
             Material m2 = mats[slot2];
             float4 mod2 = per_inst[in.env * c.n_slots + slot2];
             float3 base2 = m2.rgba.rgb * mod2.rgb;
-            if (m2.par.z > 0.5) base2 *= atlas.sample(samp, m2.rect.xy + fract(uv2 * m2.par.xy) * m2.rect.zw).rgb;
+            float3 lp2 = transpose(R2) * (P + Rd * res.distance - float3(id2.col3));   // hit in the geom frame
+            base2 *= material_tex(m2.rect, m2.par, mext[slot2], uv2, lp2, atlas, samp).rgb;
             float3 V2 = -Rd;
             float3 d2 = float3(0.0);
             for (uint i = 0; i < nl; ++i) {
@@ -778,7 +1048,7 @@ fragment FSOut geom_fs_rt(
         color = mix(color, rc, refl);   // MuJoCo blends a constant reflectance
     }
     FSOut o;
-    o.color = float4(color, 1.0);
+    o.color = float4(color, m.rgba.a * mod.a * texc.a);   // alpha: used by the transparent pass only
     o.seg = in.slot + 1u;
     o.normal = float4(N, 1.0);
     return o;

@@ -23,6 +23,21 @@ SHADER_DIR = Path(__file__).resolve().parent / "shaders"
 # it is not applied.
 
 
+def _inline_includes(src: str, depth: int = 0) -> str:
+    """Replace ``#include "name.h"`` lines with shaders/name.h (sources are compiled from strings, so the Metal
+    compiler has no include path); each header is inlined once."""
+    import re
+    seen = set()
+
+    def sub(mt):
+        nm = mt.group(1)
+        if nm in seen or depth > 4:
+            return ""
+        seen.add(nm)
+        return _inline_includes((SHADER_DIR / nm).read_text(), depth + 1)
+    return re.sub(r'^\s*#include\s+"([A-Za-z0-9_./-]+\.h)"\s*$', sub, src, flags=re.M)
+
+
 class MetalContext:
     def __init__(self, device="metal:0"):
         self.warp_device = device
@@ -40,7 +55,7 @@ class MetalContext:
         key = (name, tuple(sorted((defines or {}).items())))
         lib = self._libraries.get(key)
         if lib is None:
-            src = (SHADER_DIR / f"{name}.metal").read_text()
+            src = _inline_includes((SHADER_DIR / f"{name}.metal").read_text())
             if defines:
                 src = "".join(f"#define {k} {v}\n" for k, v in defines.items()) + src
             opts = Metal.MTLCompileOptions.new()

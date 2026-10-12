@@ -505,6 +505,7 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True, vi
                 pv = UsdGeom.PrimvarsAPI(prim).GetPrimvar("st")
                 if pv and pv.HasValue() and pv.GetInterpolation() == UsdGeom.Tokens.faceVarying and all(counts == 3):
                     uv = np.array(pv.Get(), np.float64)
+                    uv[:, 1] = 1.0 - uv[:, 1]    # USD st has t = 0 at the image bottom; MuJoCo t = 0 is the first row (top), as its OBJ loader's 1 - v
                     mm.usertexcoord = uv.reshape(-1).tolist()
                     mm.userfacetexcoord = np.arange(len(uv), dtype=np.int32).tolist()
                 mesh_names[prim.GetPath()] = mm.name; mname = mm.name
