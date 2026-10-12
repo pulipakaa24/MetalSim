@@ -15,6 +15,9 @@ exec >> $OUT/pour/stage_pour.log 2>&1
 set -x
 STAGES=${STAGES:-"smoke bench"}
 ITERS=${ITERS:-3}
+NUM=${NUM:-2048}            # train: env count (2048 = the README's; it does not fit the L4's 24 GB with CUDA graphs)
+EXTRA=${EXTRA:-}            # train: Hydra overrides, e.g. env.sim.physics.use_cuda_graph=false
+TAG=${TAG:-}
 P=$HOME/parity3_scripts/franka_pour_published_asset.patch
 git apply --check $P && git apply $P || { echo "patch did not apply"; exit 1; }
 trap 'git apply -R $P' EXIT
@@ -27,8 +30,8 @@ for S in $STAGES; do
     bench) timeout 5400 isaaclab benchmark runtime --task IsaacContrib-Franka-Pour --num_envs 2048 --num_steps 20 \
              --warmup_steps 3 --seed 0 --visualizer none --benchmark_formatter json,summary \
              --output_path $OUT/pour/bench_2048 > $OUT/pour/bench_2048.log 2>&1 ;;
-    train) timeout 21600 isaaclab train --rl_library rsl_rl --task IsaacContrib-Franka-Pour --num_envs 2048 \
-             --max_iterations $ITERS --seed 0 --run_name l4_2048 --viz none > $OUT/pour/train_2048.log 2>&1 ;;
+    train) timeout 21600 isaaclab train --rl_library rsl_rl --task IsaacContrib-Franka-Pour --num_envs $NUM \
+             --max_iterations $ITERS --seed 0 --run_name l4_${NUM}$TAG --viz none $EXTRA > $OUT/pour/train_${NUM}$TAG.log 2>&1 ;;
   esac
   echo "$S exit $? in $(( $(date +%s) - t0 )) s"
 done
