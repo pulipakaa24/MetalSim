@@ -79,6 +79,13 @@ def main() -> int:
     a = ap.parse_args()
     cmd = a.cmd[1:] if a.cmd and a.cmd[0] == "--" else a.cmd
     proc = subprocess.Popen(cmd, cwd=a.cwd)
+
+    def forward(signum, _frame):     # the queue wrapper stops a job by signalling this process: stop the tree too
+        _kill(_tree(proc.pid))
+        sys.exit(128 + signum)
+
+    for sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):
+        signal.signal(sig, forward)
     t0 = last_progress = time.time()
     last_cpu = -1.0
     reason = None
