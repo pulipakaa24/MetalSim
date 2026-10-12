@@ -47,6 +47,10 @@ TEXTURED = """<mujoco><asset>
 
 def scenes():
     out = [("prims", mujoco.MjModel.from_xml_string(PRIMS)), ("textured_hfield", mujoco.MjModel.from_xml_string(TEXTURED))]
+    if os.environ.get("IDENTITY_EXTRAS"):       # a scene with flexes, a skin, tendons and sites (tests/test_render_extras.py)
+        sys.path.insert(0, os.path.join(ROOT, "tests"))
+        from test_render_extras import EXTRAS, DRAPE
+        out += [("extras", mujoco.MjModel.from_xml_string(EXTRAS)), ("drape", mujoco.MjModel.from_xml_string(DRAPE))]
     so = os.path.join(ROOT, "assets", "so101", "scene_box_rl.xml")
     if os.path.exists(so):
         out.append(("so101", mujoco.MjModel.from_xml_path(so)))
@@ -112,7 +116,8 @@ def compare(a_path, b_path):
             res[k] = "identical"
         else:
             diff = (x != y).reshape(x.shape[0], -1).mean() if x.shape == y.shape else float("nan")
-            res[k] = f"DIFFERENT ({diff:.4f} of values)"
+            mx = float(np.abs(x.astype(np.float64) - y.astype(np.float64)).max()) if x.shape == y.shape else float("nan")
+            res[k] = f"DIFFERENT ({diff:.4f} of values, max abs difference {mx:.3g})"
     for k, v in res.items():
         print(f"{k}: {v}")
     n_same = sum(v == "identical" for v in res.values())

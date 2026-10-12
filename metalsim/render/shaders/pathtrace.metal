@@ -205,8 +205,8 @@ inline Hit trace(instance_acceleration_structure accel, float3 o, float3 d, floa
         b = gg.meshes[inst[res.instance_id].as_index - gg.as0].i_off + res.primitive_id * 3;
         verts = gg.verts; indices = gg.indices;
     } else {
-        slot = inst_tab[res.instance_id].y;
-        b = meshes[inst[res.instance_id].as_index].i_off + res.primitive_id * 3;   // the instanced structure is the mesh (static: = slot_mesh[slot]; dynamic: per env block)
+        slot = inst_tab[res.instance_id].y + res.geometry_id;   // geometry: 0 for geoms; the object within a dynamic env structure
+        b = meshes[inst[res.instance_id].as_index + res.geometry_id].i_off + res.primitive_id * 3;   // mesh: = slot_mesh[slot] for geoms
     }
     uint i0 = indices[b], i1 = indices[b + 1], i2 = indices[b + 2];
     float2 bc = res.triangle_barycentric_coord; float w0 = 1.0 - bc.x - bc.y;

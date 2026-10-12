@@ -291,8 +291,10 @@ class InstanceStructure:
 
     def use_resources(self, ce):
         ce.useResource_usage_(self.inst_as, Metal.MTLResourceUsageRead)
-        for a in self.rt.prim_as:
+        for a in getattr(self.rt, "prim_as_unique", self.rt.prim_as):   # each structure once
             ce.useResource_usage_(a, Metal.MTLResourceUsageRead)
+        if getattr(self.rt, "dyn_as", None):                            # the dynamic objects' structures: their heap
+            ce.useHeap_(self.rt.dyn_heap)
         self.field.use_resources(ce)
 
 
