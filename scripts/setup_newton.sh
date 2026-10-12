@@ -36,7 +36,7 @@ if [ ! -f "$VENV/.metalsim_deps" ]; then
     .venv/bin/python -m pip freeze | grep -v '^-e\|^newton @\|^newton-physics\|^warp' > "$VENV/requirements.txt"
     uv pip install -q --python "$VENV/bin/python" -r "$VENV/requirements.txt"
   else
-    uv pip install -q --python "$VENV/bin/python" numpy "mujoco>=3.14" "torch>=2.14" usd-core newton-usd-schemas
+    uv pip install -q --python "$VENV/bin/python" numpy "mujoco>=3.14,<3.15" "torch>=2.14" ninja usd-core newton-usd-schemas
   fi
   uv pip install -q --python "$VENV/bin/python" --no-deps -e "$WARP"
   # the MuJoCo Warp fork checkout .venv uses (upstream/mujoco_warp on the original machine; README's pip install puts

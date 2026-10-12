@@ -20,7 +20,7 @@ classifiers = [
 ]
 dependencies = [
     "numpy",
-    "mujoco>=3.14",
+    "mujoco>=3.14,<3.15",   # the MuJoCo Warp fork (3.14) reads MjModel.flex_internal, which mujoco 3.15 removed
     "warp-lang",   # replaced by the MetalSim fork of Warp: scripts/setup_warp.sh (pulipakaa24/warp, pinned commit of branch metalsim)
     "torch>=2.14",
     "pyobjc-framework-Metal",
@@ -28,6 +28,7 @@ dependencies = [
     "pyobjc-framework-Cocoa",
     "usd-core",    # pxr: the USD scene layer (metalsim.scene), imported by the G1 task
     "scipy",       # Isaac's rough-terrain generator (metalsim.learn.isaac_terrain)
+    "ninja",       # torch.utils.cpp_extension builds the Metal interop bridge (metalsim_torch_metal_bridge) with it
 ]
 
 [project.optional-dependencies]
