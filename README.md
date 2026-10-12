@@ -99,7 +99,7 @@ listing its commits, and keeps its upstream licence unchanged. "Head" is the bra
   (`wp.launch(..., dim_limit=)`), GPU indexed copies, per-kernel argument address space, batched graph replays,
   64-bit atomics Metal cannot make atomic refused at launch, and `fast_math` forms (`warp.config.metal_fast_math`:
   `"off"` by default, `"cuda"` bit for bit CUDA's `--use_fast_math`, `"relaxed"`).
-- MPM parity close-out (2026-10-12, `3c4e251e..43ffc6dd`; MPM.md section 8d):
+- MPM parity close-out (2026-10-12, `3c4e251e..43ffc6dd`; MPM.md section 8e):
   - warp.fem's dispatched assembly takes CUDA's tiling choice on Metal (particle-to-grid sums in CUDA's order).
   - `warp.config.metal_cuda_libm` (default on): `log` / `exp` / `sinh` and the `rsqrt` of `svd3` / `eig3` compute
     CUDA's results, equal to an L4 on all 2^32 inputs.
