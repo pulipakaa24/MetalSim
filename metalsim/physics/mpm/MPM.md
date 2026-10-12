@@ -524,7 +524,7 @@ Everything above runs from a clone of MetalSim plus the three forks; nothing dep
 ```
 # after the install of README / docs/GUIDE.md (.venv, scripts/setup_warp.sh, the MuJoCo Warp fork):
 scripts/setup_newton152.sh          # .venv-newton152: Newton fork metalsim-1.5.2 @35791a07, shared Warp fork @152808b7
-scripts/gpu_run.sh test_mpm check 15 -- .venv-newton152/bin/python -m pytest tests/test_mpm.py   # 15 passed, 1 xfailed
+scripts/gpu_run.sh test_mpm check 15 -- .venv-newton152/bin/python -m pytest tests/test_mpm.py   # 14 passed, 1 xfailed
 ```
 
 | what | where it lives | how a fresh setup gets it |
