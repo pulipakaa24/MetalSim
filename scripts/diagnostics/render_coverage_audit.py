@@ -57,7 +57,8 @@ def ours(m, d, which, w=W, h=H, **kw):
         r = Tier2Renderer(m, 1, width=w, height=h, camera="cam", spp=16, max_bounces=2, center_sample=True, **kw)
         o = r.render_host([d], passes=2)
         ids = r.tables.slot_seg_ids() if hasattr(r.tables, "slot_seg_ids") else np.asarray(r.tables.geoms) + 1
-        return {"rgb": o["rgb"][0], "depth": o["depth"][0], "seg": o["seg"][0], "slot_ids": ids, "extras": getattr(r.tables, "extras", [])}
+        return {"rgb": o["rgb"][0], "depth": o["depth"][0], "seg": o["seg"][0], "slot_ids": ids, "geoms": r.tables.geoms,
+                "extras": getattr(r.tables, "extras", [])}
     if which == "raydepth":
         rt = RayTracer(m, 1, max_range=100.0)
         cam = rt.make_depth_camera("cam", w, h)
@@ -66,9 +67,14 @@ def ours(m, d, which, w=W, h=H, **kw):
     raise ValueError(which)
 
 
-def coverage(mask, o, ref_depth, seg_id=None, slot_ids=None):
-    """Per-object coverage of one MetalSim output against the reference mask; ``seg_id``: the object's id in a geom-mode
-    segmentation buffer (None: only "any id" is measured); ``slot_ids``: tier 2's slot -> id table."""
+def coverage(mask, o, ref_depth, geom_id=None, tier2_geoms=None, *, seg_id=None, slot_ids=None):
+    """Per-object coverage of one MetalSim output against the reference mask. The object's id in a geom-mode
+    segmentation buffer: ``seg_id``, or ``geom_id + 1`` for a geom (None: only "any id" is measured); tier 2 writes
+    slots: ``slot_ids`` (slot -> id, ``tables.slot_seg_ids()``) or the older ``tier2_geoms`` (slot -> geom)."""
+    if seg_id is None and geom_id is not None:
+        seg_id = geom_id + 1
+    if slot_ids is None and tier2_geoms is not None:
+        slot_ids = np.asarray(tier2_geoms) + 1
     n = int(mask.sum())
     res = {"px": n}
     if n == 0:
@@ -113,7 +119,7 @@ def object_audit(xml, name, objects, renderers=("tier0", "tier1", "tier2", "rayd
                 return oid + 1
             hit = [e["seg_id"] for e in o.get("extras", []) if e["objtype"] == int(otype) and e["objid"] == oid]
             return hit[0] if hit else None
-        res["objects"][label] = {r: coverage(mask, o, rdep, sid(o) if r != "raydepth" else None, o.get("slot_ids")) for r, o in outs.items()}
+        res["objects"][label] = {r: coverage(mask, o, rdep, seg_id=sid(o) if r != "raydepth" else None, slot_ids=o.get("slot_ids")) for r, o in outs.items()}
     return res, m, d, outs
 
 
@@ -307,7 +313,7 @@ def far_probe():
     for g in range(m.ngeom):
         name = mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_GEOM, g)
         mask = (seg[..., 0] == g) & (seg[..., 1] == int(mujoco.mjtObj.mjOBJ_GEOM))
-        row = {r: coverage(mask, o, rdep, g + 1 if r != "raydepth" else None, o.get("slot_ids")) for r, o in outs.items()}
+        row = {r: coverage(mask, o, rdep, seg_id=g + 1 if r != "raydepth" else None, slot_ids=o.get("slot_ids")) for r, o in outs.items()}
         if mask.any():
             row["ref_depth_range_m"] = [round(float(rdep[mask].min()), 2), round(float(rdep[mask].max()), 2)]
         res["objects"][name] = row
