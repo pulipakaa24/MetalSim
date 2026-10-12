@@ -113,7 +113,7 @@ first four commits plus the graph-capture sort; merged into `metalsim`.
 
 [github.com/pulipakaa24/mujoco_warp](https://github.com/pulipakaa24/mujoco_warp), branch
 [`metalsim`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), head
-[`f824af1`](https://github.com/pulipakaa24/mujoco_warp/commit/f824af1) (2026-09-26;
+[`cf0f8ad`](https://github.com/pulipakaa24/mujoco_warp/commit/cf0f8adc8f99f0c559cf8580cb667952e473bd07) (2026-10-12, the commit the install pins;
 the rigid-body results before the elliptic-cone work were produced at
 [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) / code
 [`8fbf965`](https://github.com/pulipakaa24/mujoco_warp/commit/8fbf965acb630aa32573dda802404d519c843a99)). Base: Google
@@ -244,11 +244,16 @@ git clone https://github.com/pulipakaa24/MetalSim && cd MetalSim
 python3.12 -m venv .venv && source .venv/bin/activate     # uv only: $(uv python find 3.12) -m venv .venv
 pip install -e ".[test]"
 scripts/setup_warp.sh
-pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@metalsim#egg=mujoco-warp"
+pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@cf0f8adc8f99f0c559cf8580cb667952e473bd07#egg=mujoco-warp"
 scripts/fetch_isaac_assets.sh              # NVIDIA's g1_minimal.usd, fetched from NVIDIA, not redistributed
 pytest tests -q
 scripts/setup_newton152.sh                 # optional: MPM (.venv-newton152; tests/test_mpm.py runs there)
 ```
+
+The MuJoCo Warp commit is pinned (the head of the fork's branch `metalsim` on 2026-10-12), as Warp's in
+`scripts/setup_warp.sh` and Newton's in `pyproject.toml`. Without access to the fork: clone
+google-deepmind/mujoco_warp, `git checkout 88af9cc` (v3.14.0), `git apply` MetalSim's
+`patches/mujoco_warp/metalsim-cf0f8ad.diff` (the whole branch as one diff) and `pip install -e` that checkout.
 
 Optional extras, first runs, bringing your own robot, the GPU job queue and the throughput / fidelity knobs are in
 the user guide, [`docs/GUIDE.md`](docs/GUIDE.md). What landed when is in [`CHANGELOG.md`](CHANGELOG.md).
