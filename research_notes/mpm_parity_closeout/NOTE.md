@@ -168,6 +168,18 @@ There is no measurable cost (timing class, interleaved, 60 frames; `runs/mpm/clo
 The multi_material A/B is inside the run-to-run spread of the libm A/B above: the device was not idle when these jobs
 started, and identical configurations varied by about 3 ms.
 
+## 7. Verification of the pushed tree
+
+* The rebuilt Warp `43ffc6dd` reproduces the development tree's six floor recordings bit for bit (`bitwise_dirs.py`).
+* Attribution (multi_material / ANYmal, worst-frame ratio):
+  * fem tiling alone: 0.88 / 1.00.
+  * fem tiling with `metal_cuda_libm`: 0.80 / 0.94.
+* Rigid parity harness with the option off and on, twice each (`rigid_suite_all.sh`):
+  * Both settings give the same five known failures.
+  * 29 captured locals in 4 tests change stably: the Warp policy MLP (7th digit) and one flex-vs-MuJoCo-C error at the
+    1e-9 level.
+  * Everything else is unchanged or within run-to-run noise.
+
 ## Verdicts
 
 * **multi_material**: (b), a systematic difference, now fixed. The main cause was the CUDA-only fem tiling

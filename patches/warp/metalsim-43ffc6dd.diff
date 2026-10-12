@@ -1,9 +1,9 @@
 diff --git a/METALSIM_CHANGES.md b/METALSIM_CHANGES.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..62077f147eb9af293ee045f9ae94c411d33a1fef
+index 0000000000000000000000000000000000000000..f49575d3e8cfd243491096dd372f8a1c47c4d1eb
 --- /dev/null
 +++ b/METALSIM_CHANGES.md
-@@ -0,0 +1,63 @@
+@@ -0,0 +1,65 @@
 +# MetalSim changes on this branch (`metalsim`)
 +
 +This branch is the Warp build that [MetalSim](https://github.com/pulipakaa24/MetalSim) runs on (see the
@@ -63,7 +63,9 @@ index 0000000000000000000000000000000000000000..62077f147eb9af293ee045f9ae94c411
 +| commit | change |
 +|---|---|
 +| `11aa54c8` (branch `metalsim-cuda-fast-math`, cherry-picked onto `c1bb061b`) | `fast_math` modules on Metal can reproduce CUDA's `--use_fast_math` results bit for bit: `warp.config.metal_fast_math` (`WP_METAL_FAST_MATH`) = `"cuda"` / `"relaxed"` (the `f52da34` lowering) / `"off"` (fast_math ignored; the default since the next row). Measured on the L4 (Warp 1.16): a fast_math `/` is `div.approx.ftz.f32` = `MUFU.RCP` + `FMUL.FTZ`, `sqrt` is `MUFU.SQRT`, both exponent-invariant; `metal_cuda_fast_math.h` emulates both exactly in 32-bit integer arithmetic (Oberman-Siu interpolator with sass-math's tables, MIT, `licenses/sass-math-LICENSE.txt`), equal to the L4 on every float32 in [1, 2) / [1, 4), 2^22 random divisions and 16 Warp compositions; library divisions (vec / mat / quat element-wise, `normalize`, `inverse`) go through `WP_FDIV`. The mode is resolved with the module options (part of the hash of fast_math modules). Cost per op ~3x a correctly rounded division (div 10.8 ps, sqrt 13.6 ps vs 3.7 / 2.7 precise); Newton MPM 1.2-2.2x the `"off"` ms/frame. `"off"` / `"relaxed"` and non-fast_math modules are bitwise unchanged (six MPM scenes). Tests: `TestMetal.test_fast_math_approximates_division_and_sqrt_only`, `test_fast_math_cuda_mode_matches_l4`. |
-+| next commit | `warp.config.metal_fast_math` defaults to `"off"`: fast_math modules compile on Metal with correctly rounded division and sqrt, as before `f52da34`, so programs that never asked for CUDA's fast_math semantics (MuJoCo Warp ray casts, Newton ray / collision helpers) keep their results and speed; `"cuda"` costs ~3x per division / sqrt. MetalSim's MPM selects its mode through `newton_compat.install(metal_fast_math=...)`. Test: `TestMetal.test_fast_math_default_is_off`. |
++| `152808b7` | `warp.config.metal_fast_math` defaults to `"off"`: fast_math modules compile on Metal with correctly rounded division and sqrt, as before `f52da34`, so programs that never asked for CUDA's fast_math semantics (MuJoCo Warp ray casts, Newton ray / collision helpers) keep their results and speed; `"cuda"` costs ~3x per division / sqrt. MetalSim's MPM selects its mode through `newton_compat.install(metal_fast_math=...)`. Test: `TestMetal.test_fast_math_default_is_off`. |
++| `3c4e251e` | `warp.fem` dispatched assembly takes CUDA's tiling choice on Metal. For long quadratures, CUDA sums each node's contributions in 32 lanes (strided lane sums, then the shuffle tree of `tile_sum`). The heuristic in `_generate_auxiliary_kernels` was CUDA-only, so Metal summed them sequentially. That is a different rounding of every particle-to-grid sum in Newton's implicit MPM: after one step of `example_mpm_multi_material`, 72 % of the nodes differed from the L4 by up to 10 ulp. Metal's SIMD-group reduction is the CUDA shuffle tree, so node mass and momentum now equal the L4's bit for bit. The tiling decisions of MetalSim's six floor scenes equal the L4's call for call. |
++| `47a4031d` | `warp.config.metal_cuda_libm` (`WP_METAL_CUDA_LIBM`, default on): float32 `wp.log` / `wp.exp` / `wp.sinh` and the `rsqrt` of `svd3` / `eig3` compute CUDA's results on Metal. These are libdevice's `__nv_logf` / `__nv_expf` / `__nv_sinhf` and `rsqrt.approx.f32`. Before, Metal used its own library functions, which differ on about half (`log`) or 3 % (`exp`, `sinh`) of finite inputs, and a correctly rounded `1 / sqrt`, which differs on 33 % of inputs. `native/metal_cuda_libm.h` follows the PTX NVRTC emits (CUDA 12.9, sm_89), with MUFU.EX2 and MUFU.RSQ from sass-math's table interpolators (MIT, `licenses/sass-math-LICENSE.txt`) and CUDA's subnormal handling. It is equal to an L4 on all 2^32 inputs of each function. The option salts every module hash once; off, hashes and results are those of before. In MetalSim, multi_material against the L4 floor ensemble went from 1.15x to 0.80x (with the previous row). Kernels that call none of these functions are unchanged. Test: `TestMetal.test_cuda_libm_matches_l4`. |
 +
 +The same seven code commits are exported as `patches/warp/0001-0007` in MetalSim; applying them to `ce15f6bb`
 +gives the tree of `f194006a`. Tests for the Metal changes are in `warp/tests/test_metal.py`.
@@ -1017,7 +1019,7 @@ index 8e5caa690b5c7d5a1b976652ee94ccc72a1b1168..d70e298abc905acf89229ea776e6300c
          if (options | kernel.options)["enable_backward"] and not options.get("metal_forward_only"):
              if any(is_tile(v.type) for v in kernel.adj.variables):
 diff --git a/warp/_src/context.py b/warp/_src/context.py
-index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b13919305d00 100644
+index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe932620e9bdfb 100644
 --- a/warp/_src/context.py
 +++ b/warp/_src/context.py
 @@ -1093,9 +1093,23 @@ class KernelHooks:
@@ -1044,7 +1046,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
          # builtins without a Metal implementation reached by the kernel; launching raises (see invoke_metal)
          self.metal_unsupported = metal_unsupported
  
-@@ -3085,6 +3099,30 @@ class ModuleHasher:
+@@ -3085,6 +3099,34 @@ class ModuleHasher:
          # the native headers the kernels compile against (see native_headers_digest())
          ch.update(native_headers_digest())
  
@@ -1071,11 +1073,15 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
 +            ch.update(b"metal_device_args:1")
 +        elif warp.config.metal_device_args == "auto":
 +            ch.update(bytes(f"metal_device_args:auto-small:{int(warp.config.metal_device_args_max_cost)}", "utf-8"))
++        # on by default: salts every hash once, so Metal binaries built with the Metal library's log / exp / sinh
++        # and rsqrt are not reused (with it off, hashes and binaries are those of before)
++        if warp.config.metal_cuda_libm:
++            ch.update(b"metal_cuda_libm:1")
 +
          # Note: cuda_output defaults to None in the options dict and is not
          # resolved before hashing, so modules with different cuda_output
          # configs get the same hash. This is fine because cuda_output only
-@@ -3550,6 +3588,9 @@ class ModuleBuilder:
+@@ -3550,6 +3592,9 @@ class ModuleBuilder:
              options = self.options | kernel.options
  
              meta[forward_name + "_smem_bytes"] = kernel.adj.get_total_required_shared()
@@ -1085,7 +1091,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
              if options["enable_backward"] and options.get("entry_point_abi", "warp") == "warp":
                  meta[backward_name + "_smem_bytes"] = kernel.adj.get_total_required_shared_backward()
  
-@@ -3600,6 +3641,7 @@ class ModuleBuilder:
+@@ -3600,6 +3645,7 @@ class ModuleBuilder:
                      replay_snippet=func.replay_snippet,
                      forward_only=forward_only,
                      reverse_only=reverse_only,
@@ -1093,7 +1099,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
                  )
          return source
  
-@@ -3745,8 +3787,12 @@ class ModuleBuilder:
+@@ -3745,8 +3791,12 @@ class ModuleBuilder:
          # These must come after pass 2 because they call adjoint functions
          source += self._codegen_functions(grad_functions, device, forward_only=True)
  
@@ -1107,7 +1113,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
              kernel_source += warp._src.codegen.codegen_module(kernel, device=device, options=self.options)
              if device == "metal":
                  reason = self._metal_unsupported_reason(kernel_source)
-@@ -3760,6 +3806,13 @@ class ModuleBuilder:
+@@ -3760,6 +3810,13 @@ class ModuleBuilder:
          type_defines = "" if "bfloat16" in source else "#define WP_NO_BFLOAT16\n"
          if device == "metal" and self.options.get("verify_fp"):
              type_defines += "#define WP_VERIFY_FP\n"  # CPU/CUDA pass this as a compiler flag
@@ -1121,7 +1127,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
  
          # add headers
          #
-@@ -3777,6 +3830,20 @@ class ModuleBuilder:
+@@ -3777,6 +3834,23 @@ class ModuleBuilder:
          source = type_defines + module_header + extra_preamble + warp._src.codegen.codegen_cast_macros + source
  
          if device == "metal":
@@ -1139,10 +1145,13 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
 +            # entry points; forward entry points name their address space, see metal_kernel_device_args)
 +            if warp.config.metal_device_args is True:
 +                source = "#define WP_METAL_DEVICE_ARGS 1\n" + source
++            # CUDA's logf / expf / sinhf and rsqrt (metal_crt.h, metal_cuda_libm.h, svd.h)
++            if warp.config.metal_cuda_libm:
++                source = "#define WP_METAL_CUDA_LIBM 1\n" + source
              # Metal compiles from an in-memory string without include paths
              source = warp._src.build.expand_includes(source)
              source = warp._src.build.metal_rewrite_printf(source)  # shader logging has no %s
-@@ -3823,6 +3890,13 @@ class ModuleExec:
+@@ -3823,6 +3897,13 @@ class ModuleExec:
          # Metal: kernel name -> builtins it reaches that have no Metal implementation
          self.metal_unsupported: dict[str, str] = {}
          self.metal_backward_unsupported: set[str] = set()  # kernels whose adjoint cannot run on Metal (tiles)
@@ -1156,7 +1165,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
          self.metal_backward_error: str | None = None  # compile error that forced a forward-only build
          # Compute capability the loaded binary was actually compiled for (None for
          # CPU). Cluster classification must use this frozen target, not the current
-@@ -3992,11 +4066,41 @@ class ModuleExec:
+@@ -3992,11 +4073,41 @@ class ModuleExec:
  
          elif self.device.is_metal:
              unsupported = self.metal_unsupported.get(name)
@@ -1203,7 +1212,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
              if not forward and not unsupported:
                  raise RuntimeError(
                      f"Failed to load kernel '{kernel.key}' on device '{self.device}': {runtime.get_error_string()}"
-@@ -4005,6 +4109,13 @@ class ModuleExec:
+@@ -4005,6 +4116,13 @@ class ModuleExec:
              backward_name = warp._src.codegen.cuda_kernel_backward_name(kernel)
              if options["enable_backward"] and not unsupported and name not in self.metal_backward_unsupported:
                  backward = runtime.core.wp_metal_get_kernel(self.handle, (name + "_metal_backward").encode("utf-8"))
@@ -1217,7 +1226,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
              hooks = KernelHooks(
                  forward,
                  backward,
-@@ -4012,6 +4123,10 @@ class ModuleExec:
+@@ -4012,6 +4130,10 @@ class ModuleExec:
                  backward_smem_bytes=self.meta.get(backward_name + "_smem_bytes", 0),
                  det_launch_meta=self.det_launch_meta_map.get(name),
                  metal_unsupported=unsupported,
@@ -1228,7 +1237,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
              )
  
          else:
-@@ -4141,6 +4256,11 @@ class Module:
+@@ -4141,6 +4263,11 @@ class Module:
              "extra_build_options": None,
              "deterministic": warp.config.deterministic,
              "deterministic_max_records": warp.config.deterministic_max_records,
@@ -1240,7 +1249,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
              "default_grid_stride": None,  # None means inherit warp.config.default_grid_stride
          }
  
-@@ -4173,6 +4293,15 @@ class Module:
+@@ -4173,6 +4300,15 @@ class Module:
          if block_dim is not None:
              options["block_dim"] = block_dim
  
@@ -1256,7 +1265,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
          # Resolve None-means-inherit options
          if options["mode"] is None:
              options["mode"] = config.mode
-@@ -4517,12 +4646,13 @@ class Module:
+@@ -4517,12 +4653,13 @@ class Module:
          return self._tid_extent_limits[cache_key]
  
      def _snapshot_deterministic_metadata(
@@ -1271,7 +1280,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
          """
          if options.get("deterministic") == warp.config.DeterministicMode.NOT_GUARANTEED:
              return {}
-@@ -4532,6 +4662,8 @@ class Module:
+@@ -4532,6 +4669,8 @@ class Module:
              return {}
  
          builder_options = options | {"output_arch": None}
@@ -1280,7 +1289,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
          snapshot = {}
          with _codegen_lock:
              for kernel_hash, kernel in hasher.unique_kernels.items():
-@@ -4672,8 +4804,8 @@ class Module:
+@@ -4672,8 +4811,8 @@ class Module:
          if target is None:
              target = "cpu" if is_cpu else "cuda"  # ``is_cpu`` is the upstream signature
  
@@ -1291,7 +1300,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
              options = options | {"deterministic": warp.config.DeterministicMode.NOT_GUARANTEED}
          builder = ModuleBuilder(
              self,
-@@ -5064,7 +5196,13 @@ class Module:
+@@ -5064,7 +5203,13 @@ class Module:
  
                  module_load_timer.extra_msg = " (compiled)" if compiled else " (cached)"
  
@@ -1306,7 +1315,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
  
              # -----------------------------------------------------------
              # Load CPU or CUDA binary
-@@ -5130,6 +5268,10 @@ class Module:
+@@ -5130,6 +5275,10 @@ class Module:
                  # markers written by codegen_kernel for kernels that reach unsupported builtins
                  metal_unsupported = dict(re.findall(r"^// wp_metal_unsupported (\S+): (.*)$", source, re.M))
                  metal_backward_unsupported = set(re.findall(r"^// wp_metal_backward_unsupported (\S+)$", source, re.M))
@@ -1317,7 +1326,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
                  if backward_error is not None:
                      warp._src.logger.log_warning(
                          f"Backward kernels of module '{self.name}' are not available on Metal (forward-only build used):\n"
-@@ -5150,6 +5292,10 @@ class Module:
+@@ -5150,6 +5299,10 @@ class Module:
                  )
                  module_exec.metal_unsupported = metal_unsupported
                  module_exec.metal_backward_unsupported = metal_backward_unsupported
@@ -1328,7 +1337,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
                  module_exec.metal_backward_error = backward_error  # set when the adjoints failed to compile
                  self.execs[(device.context, active_block_dim)] = module_exec
  
-@@ -6961,6 +7107,8 @@ class Runtime:
+@@ -6961,6 +7114,8 @@ class Runtime:
              self.core.wp_metal_graph_launch.restype = ctypes.c_int
              self.core.wp_metal_graph_destroy.argtypes = [ctypes.c_int, ctypes.c_void_p]
              self.core.wp_metal_graph_destroy.restype = None
@@ -1337,7 +1346,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
              self.core.wp_metal_profile_report.argtypes = []
              self.core.wp_metal_profile_report.restype = ctypes.c_char_p
              self.core.wp_metal_load_library.argtypes = [ctypes.c_int, ctypes.c_char_p]
-@@ -6968,6 +7116,8 @@ class Runtime:
+@@ -6968,6 +7123,8 @@ class Runtime:
              self.core.wp_metal_unload_library.argtypes = [ctypes.c_void_p]
              self.core.wp_metal_unload_library.restype = None
              self.core.wp_metal_get_kernel.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
@@ -1346,7 +1355,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
              self.core.wp_metal_capture_push.argtypes = [ctypes.c_int]
              self.core.wp_metal_capture_push.restype = ctypes.c_int
              self.core.wp_metal_capture_pop.argtypes = [ctypes.c_int]
-@@ -6982,6 +7132,10 @@ class Runtime:
+@@ -6982,6 +7139,10 @@ class Runtime:
                  ctypes.c_int,
              ]
              self.core.wp_metal_capture_conditional.restype = ctypes.c_int
@@ -1357,7 +1366,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
              self.core.wp_texture_create_metal.argtypes = [
                  ctypes.c_int,
                  ctypes.c_int,
-@@ -7015,6 +7169,14 @@ class Runtime:
+@@ -7015,6 +7176,14 @@ class Runtime:
                  ctypes.c_size_t,  # threadgroup memory bytes
              ]
              self.core.wp_metal_launch_kernel.restype = ctypes.c_int
@@ -1372,7 +1381,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
              self.core.wp_metal_synchronize.argtypes = [ctypes.c_int]
              self.core.wp_metal_synchronize.restype = ctypes.c_int
              self.core.wp_metal_memset.argtypes = [ctypes.c_int, ctypes.c_void_p, ctypes.c_int, ctypes.c_size_t]
-@@ -7646,6 +7808,18 @@ class Runtime:
+@@ -7646,6 +7815,18 @@ class Runtime:
              self.core.wp_bvh_refit_device.argtypes = [ctypes.c_uint64]
              self.core.wp_bvh_rebuild_device.argtypes = [ctypes.c_uint64]
  
@@ -1391,7 +1400,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
              self.core.wp_mesh_create_host.restype = ctypes.c_uint64
              self.core.wp_mesh_create_host.argtypes = [
                  warp._src.types.array_t,
-@@ -11298,6 +11472,9 @@ def _metal_pointer_offsets(struct_type, base=0):
+@@ -11298,6 +11479,9 @@ def _metal_pointer_offsets(struct_type, base=0):
          elif issubclass(field_type, warp._src.types.fabricarray_t):
              raise NotImplementedError(f"{field_type.__name__} kernel arguments are not supported on Metal devices")
          elif issubclass(field_type, ctypes.Structure):
@@ -1401,7 +1410,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
              offsets.extend(_metal_pointer_offsets(field_type, offset))
          elif issubclass(field_type, ctypes.Array) and issubclass(field_type._type_, ctypes.Structure):
              for i in range(field_type._length_):
-@@ -11305,15 +11482,89 @@ def _metal_pointer_offsets(struct_type, base=0):
+@@ -11305,15 +11489,89 @@ def _metal_pointer_offsets(struct_type, base=0):
      return offsets
  
  
@@ -1493,7 +1502,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
      if adjoint:
          # the backward entry point reads both structs from one buffer (wp_bwd_args_<kernel>)
          combined_type = getattr(kernel, "_metal_bwd_args_type", None)
-@@ -11323,16 +11574,31 @@ def invoke_metal(kernel, hooks, params: Sequence[Any], device: Device, block_dim
+@@ -11323,16 +11581,31 @@ def invoke_metal(kernel, hooks, params: Sequence[Any], device: Device, block_dim
              )
              kernel._metal_bwd_args_type = combined_type
          args = combined_type(args, adj_args)
@@ -1529,7 +1538,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
          block_dim,  # the module was compiled for this threadgroup size (WP_TILE_BLOCK_DIM)
          ctypes.byref(bounds),
          ctypes.sizeof(bounds),
-@@ -11341,7 +11607,22 @@ def invoke_metal(kernel, hooks, params: Sequence[Any], device: Device, block_dim
+@@ -11341,7 +11614,22 @@ def invoke_metal(kernel, hooks, params: Sequence[Any], device: Device, block_dim
          offsets,
          len(offsets),
          hooks.backward_smem_bytes if adjoint else hooks.forward_smem_bytes,
@@ -1552,7 +1561,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
          message = runtime.get_error_string()
  
          def foreign_arrays(label, value):
-@@ -11496,6 +11777,7 @@ class Launch:
+@@ -11496,6 +11784,7 @@ class Launch:
          adjoint: bool = False,
          fwd_args: list[Any] | None = None,
          adj_args: list[Any] | None = None,
@@ -1560,7 +1569,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
      ):
          block_dim = _resolve_launch_block_dim(device, block_dim)
  
-@@ -11587,6 +11869,9 @@ class Launch:
+@@ -11587,6 +11876,9 @@ class Launch:
          self.fwd_args = fwd_args
          self.adj_args = adj_args
  
@@ -1570,7 +1579,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
      def set_dim(self, dim: int | list[int] | tuple[int, ...]):
          """Set the launch dimensions.
  
-@@ -11799,7 +12084,15 @@ class Launch:
+@@ -11799,7 +12091,15 @@ class Launch:
          """
          apic_capture = _get_apic_capture_for_device(self.device)
          if self.device.is_metal:
@@ -1587,7 +1596,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
          elif self.device.is_cpu:
              if apic_capture is not None:
                  # Under an active APIC CPU capture, record the launch so it
-@@ -12067,6 +12360,15 @@ def _resolve_launch_block_dim(device: Device, block_dim: int | None) -> int:
+@@ -12067,6 +12367,15 @@ def _resolve_launch_block_dim(device: Device, block_dim: int | None) -> int:
      return block_dim
  
  
@@ -1603,7 +1612,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
  def launch(
      kernel,
      dim: int | Sequence[int],
-@@ -12081,6 +12383,7 @@ def launch(
+@@ -12081,6 +12390,7 @@ def launch(
      record_cmd: bool = False,
      max_blocks: int = 0,
      block_dim: int | None = None,
@@ -1611,7 +1620,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
  ):
      """Launch a Warp kernel on the target device
  
-@@ -12124,6 +12427,15 @@ def launch(
+@@ -12124,6 +12434,15 @@ def launch(
            values from 2 through 1024 are honored when
            :attr:`warp.config.enable_cpu_blocks` is ``True`` and otherwise
            resolve to 1.
@@ -1627,7 +1636,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
      """
  
      init()
-@@ -12152,6 +12464,9 @@ def launch(
+@@ -12152,6 +12471,9 @@ def launch(
  
      dim, total_dim_size = _normalize_launch_dim(dim)
  
@@ -1637,7 +1646,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
      if total_dim_size > 0:
          fwd_args = []
          fwd_args.extend(inputs)
-@@ -12270,6 +12585,43 @@ def launch(
+@@ -12270,6 +12592,43 @@ def launch(
                  module_exec=module_exec,
              )
  
@@ -1681,7 +1690,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
          elif device.is_metal:
              if adjoint and hooks.backward is None:
                  if module_exec.metal_backward_error:
-@@ -12294,8 +12646,9 @@ def launch(
+@@ -12294,8 +12653,9 @@ def launch(
                      adjoint=adjoint,
                      fwd_args=fwd_args,
                      adj_args=adj_args,
@@ -1692,7 +1701,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
  
          # run kernel
          elif device.is_cpu:
-@@ -13765,6 +14118,29 @@ def capture_begin(
+@@ -13765,6 +14125,29 @@ def capture_begin(
      _register_capture(device, stream, graph, capture_id)
  
  
@@ -1722,7 +1731,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
  def capture_end(device: DeviceLike = None, stream: Stream | None = None) -> Graph:
      """End the capture of a graph.
  
-@@ -14165,6 +14541,15 @@ def capture_if(
+@@ -14165,6 +14548,15 @@ def capture_if(
      if device.is_metal and device.is_capturing:
          _metal_capture_conditional(device, False, condition, on_true, on_false, kwargs)
          return
@@ -1738,7 +1747,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
      if graph is None:
          # if no graph is active, just execute the correct branch directly
          condition_value = _read_condition(condition, device, stream)
-@@ -14384,6 +14769,12 @@ def capture_while(condition: warp.array[int], while_body: Callable | Graph, stre
+@@ -14384,6 +14776,12 @@ def capture_while(condition: warp.array[int], while_body: Callable | Graph, stre
      if device.is_metal and device.is_capturing:
          _metal_capture_conditional(device, True, condition, while_body, None, kwargs)
          return
@@ -1751,7 +1760,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
      if graph is None:
          # since no graph is active, just execute the kernels directly
          while True:
-@@ -15026,6 +15417,9 @@ def copy(
+@@ -15026,6 +15424,9 @@ def copy(
                  stream.wait_stream(src.device.stream)
              else:
                  src = src.contiguous()
@@ -1761,7 +1770,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..57cf120e1d2af9130cad14fc0fc2b139
  
          # The source is now contiguous.  If the destination is not contiguous,
          # clone a contiguous copy on the destination device.
-@@ -15216,9 +15610,18 @@ def copy(
+@@ -15216,9 +15617,18 @@ def copy(
                      "(strided / indexed / fabric); copy the underlying contiguous arrays first or "
                      "move the copy outside the capture."
                  )
@@ -2120,10 +2129,35 @@ index 24199251a401c8405096e4dbe6195e43d28b3e44..0b6b5a837f526013916f46a10bbd4675
      class CellArg:
          cell_index: wp.array(dtype=int)
 diff --git a/warp/_src/fem/integrate.py b/warp/_src/fem/integrate.py
-index 32ca2c7f6d74a81586b57923e43c439d1250896a..d4cd1cea97cf3cc6e9a5281ce2a31d87949022f5 100644
+index 32ca2c7f6d74a81586b57923e43c439d1250896a..b7e0c26e793fa214b69e9326e383536c46a6153d 100644
 --- a/warp/_src/fem/integrate.py
 +++ b/warp/_src/fem/integrate.py
-@@ -1401,6 +1401,20 @@ def _count_integrate_bsr_rows_from_sorted_rows(
+@@ -1307,10 +1307,14 @@ def _generate_auxiliary_kernels(
+     # heuristic to use tiles for "long" quadratures
+     dispatch_tile_size = 32
+     qp_eval_count = quadrature.evaluation_point_count()
++    # Metal takes CUDA's choice: the tiled kernels sum each node's contributions in another order (32 strided lane
++    # sums, then the warp shuffle tree, which Metal's SIMD-group reduction reproduces), so the same choice gives the
++    # same rounding on both GPUs
++    tiles_ok = device.is_cuda or device.is_metal
+ 
+     if trial is None:
+         if (
+-            not device.is_cuda
++            not tiles_ok
+             or qp_eval_count * test.space_restriction.total_node_element_count()
+             < 3 * dispatch_tile_size * test.space_restriction.node_count() * test.domain.element_count()
+         ):
+@@ -1319,7 +1323,7 @@ def _generate_auxiliary_kernels(
+             test, quadrature, accumulate_dtype, dispatch_tile_size, kernel_options
+         )
+     else:
+-        if not device.is_cuda or qp_eval_count < 3 * dispatch_tile_size * test.domain.element_count():
++        if not tiles_ok or qp_eval_count < 3 * dispatch_tile_size * test.domain.element_count():
+             dispatch_tile_size = 1
+         dispatch_kernel = make_bilinear_dispatch_kernel(
+             test, trial, quadrature, accumulate_dtype, dispatch_tile_size, kernel_options
+@@ -1401,6 +1405,20 @@ def _count_integrate_bsr_rows_from_sorted_rows(
      row_counts[row] = row_end - row_beg
  
  
@@ -2144,7 +2178,7 @@ index 32ca2c7f6d74a81586b57923e43c439d1250896a..d4cd1cea97cf3cc6e9a5281ce2a31d87
  def _launch_integrate_kernel(
      integrand: Integrand,
      kernel: wp.Kernel,
-@@ -1550,6 +1564,8 @@ def _launch_integrate_kernel(
+@@ -1550,6 +1568,8 @@ def _launch_integrate_kernel(
              )
          )
  
@@ -2153,7 +2187,7 @@ index 32ca2c7f6d74a81586b57923e43c439d1250896a..d4cd1cea97cf3cc6e9a5281ce2a31d87
          if nodal:
              wp.launch(
                  kernel=kernel,
-@@ -1563,6 +1579,7 @@ def _launch_integrate_kernel(
+@@ -1563,6 +1583,7 @@ def _launch_integrate_kernel(
                      output_view,
                  ],
                  device=device,
@@ -2161,7 +2195,7 @@ index 32ca2c7f6d74a81586b57923e43c439d1250896a..d4cd1cea97cf3cc6e9a5281ce2a31d87
              )
          elif isinstance(test, LocalTestField):
              local_scalar_type = domain.geometry.scalar_type
-@@ -1612,6 +1629,7 @@ def _launch_integrate_kernel(
+@@ -1612,6 +1633,7 @@ def _launch_integrate_kernel(
                          output_view,
                      ],
                      device=device,
@@ -2169,7 +2203,7 @@ index 32ca2c7f6d74a81586b57923e43c439d1250896a..d4cd1cea97cf3cc6e9a5281ce2a31d87
                  )
  
              local_result.release()
-@@ -1630,6 +1648,7 @@ def _launch_integrate_kernel(
+@@ -1630,6 +1652,7 @@ def _launch_integrate_kernel(
                      output_view,
                  ],
                  device=device,
@@ -2177,7 +2211,7 @@ index 32ca2c7f6d74a81586b57923e43c439d1250896a..d4cd1cea97cf3cc6e9a5281ce2a31d87
              )
  
          return output
-@@ -1862,9 +1881,39 @@ def _launch_integrate_kernel(
+@@ -1862,9 +1885,39 @@ def _launch_integrate_kernel(
      else:
          if capacity_policy == _BSR_CAPACITY_REUSE and topology == "compact":
              _require_bsr_capacity(bsr_result, nnz, "fem.integrate()")
@@ -8210,10 +8244,10 @@ index c70ab4728fdd1464b9ca0554c7873240f1835dfa..b0031efeae7887fc33f4c661e63e150b
              _host_call(
                  values.device,
 diff --git a/warp/config.py b/warp/config.py
-index b2e7592faa78b13352551595915dd5c750bdc40c..fa23069fe594c7710277ceef2435450975eacae4 100644
+index b2e7592faa78b13352551595915dd5c750bdc40c..5fd1353423a95a558cc951330ff34fd0506505c7 100644
 --- a/warp/config.py
 +++ b/warp/config.py
-@@ -348,6 +348,110 @@ directly as a context manager.
+@@ -348,6 +348,121 @@ directly as a context manager.
  Note: Impacts performance when active due to call-stack introspection.
  """
  
@@ -8294,6 +8328,17 @@ index b2e7592faa78b13352551595915dd5c750bdc40c..fa23069fe594c7710277ceef24354509
 +"""Under ``metal_device_args = "auto"``, kernels without tiles that are longer than :data:`metal_device_args_max_cost`
 +read device-memory arguments in launches of at most this many threads (dispatch-bound: the preload of constant
 +arguments dominates) and constant ones in larger launches. Read at each launch."""
++
++metal_cuda_libm: bool = _os.environ.get("WP_METAL_CUDA_LIBM", "1") != "0"
++"""Whether float32 :func:`warp.log`, :func:`warp.exp`, :func:`warp.sinh` and the reciprocal square root inside
++:func:`warp.svd3` / :func:`warp.eig3` compute on Metal what they compute on CUDA, bit for bit. On CUDA they are
++libdevice's ``__nv_logf`` / ``__nv_expf`` / ``__nv_sinhf`` (``expf`` and ``sinhf`` go through the approximate
++``ex2.approx`` instruction) and ``rsqrt.approx.f32``; the Metal library's ``log`` / ``exp`` / ``sinh`` and a
++correctly rounded ``1 / sqrt`` round differently on 3-50 % of inputs. ``True`` (the default) uses
++``warp/native/metal_cuda_libm.h`` (the PTX sequences NVRTC emits, with the ``MUFU.EX2`` / ``MUFU.RSQ`` table
++interpolators of Benjamin Carleton's sass-math model), equal to an NVIDIA L4's results on all 2^32 inputs; ``False``
++the Metal library's functions. Read when a module is built and part of the module hash when ``True``;
++``WP_METAL_CUDA_LIBM=0`` turns it off."""
 +
 +metal_eager_conditionals: bool = _os.environ.get("WP_METAL_EAGER_CONDITIONALS", "0") == "1"
 +"""Whether :func:`warp.capture_while` and :func:`warp.capture_if` outside a graph capture on Metal record their
@@ -10568,20 +10613,43 @@ index 319e3f7f210116b14862b25679f3aa9265d317c8..cee633c0144eaae3b5fa3426cd84c818
  }
 +#undef WP_METAL_NO_64BIT_FALLBACK
 diff --git a/warp/native/metal_crt.h b/warp/native/metal_crt.h
-index b56a95eaea228c37da6e0bc66579733c46470fb9..abaf87fee9643d781e526a295641f2037443a86a 100644
+index b56a95eaea228c37da6e0bc66579733c46470fb9..ea56d0e4e2b1a4d29e827513b2c335d6df13a069 100644
 --- a/warp/native/metal_crt.h
 +++ b/warp/native/metal_crt.h
-@@ -14,6 +14,8 @@
+@@ -14,6 +14,9 @@
  #include <metal_logging>
  #include <metal_stdlib>
  
 +#include "metal_cuda_fast_math.h"
++#include "metal_cuda_libm.h"
 +
  #define WP_NO_FLOAT64
  
  // `half` is a builtin Metal type; Warp's software half lives under another name here.
-@@ -162,7 +164,17 @@ inline float log10f(float x) { return metal::log10(x); }
- inline float expf(float x) { return metal::exp(x); }
+@@ -153,16 +156,37 @@ inline void free(thread void*) { }
+ #endif
+ 
+ /// math.h: builtin.h calls the C names; forward them to the Metal library.
++// log / exp / sinh: CUDA's libdevice results bit for bit (metal_cuda_libm.h) with warp.config.metal_cuda_libm (the
++// default, WP_METAL_CUDA_LIBM), otherwise the Metal library's (they differ from CUDA's on 3-50 % of inputs).
++#if defined(WP_METAL_CUDA_LIBM) && WP_METAL_CUDA_LIBM
++#define WP_METAL_LOGF wp_cuda_logf
++#define WP_METAL_EXPF wp_cuda_expf
++#define WP_METAL_SINHF wp_cuda_sinhf
++#else
++#define WP_METAL_LOGF metal::log
++#define WP_METAL_EXPF metal::exp
++#define WP_METAL_SINHF metal::sinh
++#endif
+ inline int abs(int x) { return metal::abs(x); }
+ inline long llabs(long x) { return metal::abs(x); }
+ inline float fmodf(float x, float y) { return metal::fmod(x, y); }
+-inline float logf(float x) { return metal::log(x); }
++inline float logf(float x) { return WP_METAL_LOGF(x); }
+ inline float log2f(float x) { return metal::log2(x); }
+ inline float log10f(float x) { return metal::log10(x); }
+-inline float expf(float x) { return metal::exp(x); }
++inline float expf(float x) { return WP_METAL_EXPF(x); }
  inline float exp2f(float x) { return metal::exp2(x); }
  inline float ldexpf(float x, int e) { return metal::ldexp(x, e); }
 -inline float sqrtf(float x) { return metal::sqrt(x); }
@@ -10599,7 +10667,15 @@ index b56a95eaea228c37da6e0bc66579733c46470fb9..abaf87fee9643d781e526a295641f203
  inline float cbrtf(float x) { return metal::copysign(metal::pow(metal::abs(x), 1.0f / 3.0f), x); }
  // exact results for small integer exponents (x*x etc.); metal::pow(6, 2) is 36.000004 even in precise mode
  inline float wp_metal_pow(float x, float y)
-@@ -198,6 +210,30 @@ inline float fmaf(float x, float y, float z) { return metal::fma(x, y, z); }
+@@ -191,13 +215,37 @@ inline float atan2f(float y, float x) { return metal::atan2(y, x); }
+ inline float cosf(float x) { return metal::cos(x); }
+ inline float sinf(float x) { return metal::sin(x); }
+ inline float tanf(float x) { return metal::tan(x); }
+-inline float sinhf(float x) { return metal::sinh(x); }
++inline float sinhf(float x) { return WP_METAL_SINHF(x); }
+ inline float coshf(float x) { return metal::cosh(x); }
+ inline float tanhf(float x) { return metal::tanh(x); }
+ inline float fmaf(float x, float y, float z) { return metal::fma(x, y, z); }
  inline float fminf(float x, float y) { return metal::fmin(x, y); }
  inline float fmaxf(float x, float y) { return metal::fmax(x, y); }
  inline float copysignf(float x, float y) { return metal::copysign(x, y); }
@@ -10630,7 +10706,7 @@ index b56a95eaea228c37da6e0bc66579733c46470fb9..abaf87fee9643d781e526a295641f203
  inline float rsqrtf(float x) { return metal::rsqrt(x); }
  
  // Metal has no error functions. Abramowitz & Stegun 7.1.26 (|error| < 1.5e-7)
-@@ -244,7 +280,7 @@ inline float erfcinvf(float x) { return erfinvf(1.0f - x); }
+@@ -244,13 +292,13 @@ inline float erfcinvf(float x) { return erfinvf(1.0f - x); }
  
  // Unsuffixed C names used with wide_float (float on Metal).
  inline float fabs(float x) { return metal::abs(x); }
@@ -10639,12 +10715,29 @@ index b56a95eaea228c37da6e0bc66579733c46470fb9..abaf87fee9643d781e526a295641f203
  inline float floor(float x) { return metal::floor(x); }
  inline float ceil(float x) { return metal::ceil(x); }
  inline float round(float x) { return metal::round(x); }
+ inline float trunc(float x) { return metal::trunc(x); }
+-inline float exp(float x) { return metal::exp(x); }
+-inline float log(float x) { return metal::log(x); }
++inline float exp(float x) { return WP_METAL_EXPF(x); }
++inline float log(float x) { return WP_METAL_LOGF(x); }
+ inline float pow(float x, float y) { return wp_metal_pow(x, y); }
+ inline float fmin(float x, float y) { return metal::fmin(x, y); }
+ inline float fmax(float x, float y) { return metal::fmax(x, y); }
+@@ -263,7 +311,7 @@ inline float asin(float x) { return metal::asin(x); }
+ inline float acos(float x) { return metal::acos(x); }
+ inline float atan(float x) { return metal::atan(x); }
+ inline float atan2(float y, float x) { return metal::atan2(y, x); }
+-inline float sinh(float x) { return metal::sinh(x); }
++inline float sinh(float x) { return WP_METAL_SINHF(x); }
+ inline float cosh(float x) { return metal::cosh(x); }
+ inline float tanh(float x) { return metal::tanh(x); }
+ inline float log2(float x) { return metal::log2(x); }
 diff --git a/warp/native/metal_cuda_fast_math.h b/warp/native/metal_cuda_fast_math.h
 new file mode 100644
-index 0000000000000000000000000000000000000000..2117eeb880fd2a839d6a9eb4a7632da20339f8a1
+index 0000000000000000000000000000000000000000..22732fd46fc267fde46ef49c7af108ff81008745
 --- /dev/null
 +++ b/warp/native/metal_cuda_fast_math.h
-@@ -0,0 +1,195 @@
+@@ -0,0 +1,285 @@
 +// SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 +// SPDX-License-Identifier: Apache-2.0
 +
@@ -10839,6 +10932,311 @@ index 0000000000000000000000000000000000000000..2117eeb880fd2a839d6a9eb4a7632da2
 +    const uint l3 = l2 + 0xFFFC0000u;
 +    const uint hi = (c.x << 1) + m18_hi - p_hi - r_hi + 3u - uint(m18_lo < p_lo) - uint(l1 < r_lo) + uint(l3 < l2);
 +    return as_type<float>((uint(127 + half_e) << 23) | ((hi >> 3) & 0x7FFFFFu));
++}
++
++// MUFU.RSQ coefficients (sass-math's rsqrt table, packed {C0, C1 | C2 << 17}; rows 64..127 for odd exponents).
++// clang-format off
++constant uint2 wp_mufu_rsqrt_packed[128] = {
++    {0x3fffffbu, 0x05e4fffbu}, {0x3f817abu, 0x05aafa18u}, {0x3f05d8du, 0x0574f46fu}, {0x3e8cfe1u, 0x0540eefbu},
++    {0x3e16d06u, 0x0510e9bbu}, {0x3da336bu, 0x04e2e4abu}, {0x3d32197u, 0x04b6dfc9u}, {0x3cc3623u, 0x048cdb13u},
++    {0x3c56fb9u, 0x0464d687u}, {0x3becd10u, 0x043ed222u}, {0x3b84cf2u, 0x041ccde4u}, {0x3b1ee3du, 0x03f8c9c9u},
++    {0x3abafd0u, 0x03d8c5d1u}, {0x3a590a4u, 0x03b8c1fau}, {0x39f8fb1u, 0x039abe42u}, {0x399ac06u, 0x037cbaa8u},
++    {0x393e4b4u, 0x0362b72bu}, {0x38e38e1u, 0x0348b3cau}, {0x388a7aeu, 0x032eb082u}, {0x3833053u, 0x0316ad54u},
++    {0x37dd208u, 0x02feaa3eu}, {0x3788c0fu, 0x02e8a73fu}, {0x3735db3u, 0x02d4a457u}, {0x36e4647u, 0x02c0a184u},
++    {0x3694523u, 0x02ac9ec5u}, {0x36459a9u, 0x02989c1au}, {0x35f8339u, 0x02869982u}, {0x35ac142u, 0x027496fcu},
++    {0x3561334u, 0x02629487u}, {0x3517886u, 0x02549224u}, {0x34cf0b2u, 0x02448fd0u}, {0x3487b3eu, 0x02368d8du},
++    {0x34417acu, 0x02268b58u}, {0x33fc585u, 0x02188932u}, {0x33b8454u, 0x020c871au}, {0x33753b2u, 0x01fe850fu},
++    {0x3333331u, 0x01f08311u}, {0x32f226au, 0x01e48120u}, {0x32b20fcu, 0x01d87f3bu}, {0x3272e83u, 0x01ce7d62u},
++    {0x3234aaau, 0x01c27b94u}, {0x31f7510u, 0x01b879d1u}, {0x31bad65u, 0x01ae7819u}, {0x317f353u, 0x01a4766bu},
++    {0x3144689u, 0x019a74c7u}, {0x310a6b8u, 0x0192732du}, {0x30d1398u, 0x0188719cu}, {0x3098cdau, 0x017e7013u},
++    {0x306123cu, 0x01766e94u}, {0x302a375u, 0x016e6d1du}, {0x2ff4045u, 0x01666baeu}, {0x2fbe86cu, 0x01606a48u},
++    {0x2f89babu, 0x015868e9u}, {0x2f559c3u, 0x01506791u}, {0x2f2227bu, 0x014a6641u}, {0x2eef598u, 0x014464f8u},
++    {0x2ebd2e6u, 0x013c63b5u}, {0x2e8ba2du, 0x01346279u}, {0x2e5ab38u, 0x012e6144u}, {0x2e2a5d3u, 0x01286015u},
++    {0x2dfa9ceu, 0x01225eecu}, {0x2dcb6f6u, 0x011e5dc9u}, {0x2d9cd24u, 0x01185cacu}, {0x2d6ec23u, 0x01125b94u},
++    {0x2d413c7u, 0x042ab501u}, {0x2ce7c60u, 0x0402b0d8u}, {0x2c905a4u, 0x03daacd7u}, {0x2c3ae53u, 0x03b6a8fcu},
++    {0x2be7548u, 0x0396a546u}, {0x2b9596au, 0x0374a1b1u}, {0x2b459afu, 0x03569e3eu}, {0x2af7512u, 0x03389ae9u},
++    {0x2aaaaa8u, 0x031c97b2u}, {0x2a5f985u, 0x03009496u}, {0x2a160d3u, 0x02e69196u}, {0x29cdfbbu, 0x02ce8eafu},
++    {0x298757bu, 0x02b88be1u}, {0x2942150u, 0x02a08929u}, {0x28fe285u, 0x028c8688u}, {0x28bb873u, 0x027883fdu},
++    {0x287a269u, 0x02648185u}, {0x2839fcfu, 0x02527f21u}, {0x27fb00eu, 0x02407cd0u}, {0x27bd28fu, 0x022e7a90u},
++    {0x27806c7u, 0x021e7861u}, {0x2744c35u, 0x020e7643u}, {0x270a255u, 0x02007435u}, {0x26d08adu, 0x01f07235u},
++    {0x2697ec5u, 0x01e27044u}, {0x266042cu, 0x01d66e61u}, {0x2629877u, 0x01ca6c8cu}, {0x25f3b3eu, 0x01bc6ac3u},
++    {0x25bec15u, 0x01b26907u}, {0x258aaa4u, 0x01a46756u}, {0x2557685u, 0x019a65b1u}, {0x2524f65u, 0x018e6417u},
++    {0x24f34e5u, 0x01866288u}, {0x24c26bau, 0x017c6103u}, {0x2492491u, 0x01725f88u}, {0x2462e18u, 0x01685e16u},
++    {0x2434308u, 0x01605caeu}, {0x2406317u, 0x01565b4eu}, {0x23d8e00u, 0x014e59f7u}, {0x23ac380u, 0x014658a9u},
++    {0x2380352u, 0x013e5762u}, {0x2354d3bu, 0x01365623u}, {0x232a0fbu, 0x013054ecu}, {0x22ffe5bu, 0x012853bcu},
++    {0x22d651cu, 0x01225293u}, {0x22ad50cu, 0x011c5171u}, {0x2284df5u, 0x01145055u}, {0x225cf9du, 0x01104f40u},
++    {0x22359d9u, 0x010a4e31u}, {0x220ec77u, 0x01044d28u}, {0x21e8748u, 0x00fc4c24u}, {0x21c2a1bu, 0x00f84b27u},
++    {0x219d4c4u, 0x00f44a2fu}, {0x217871du, 0x00ee493cu}, {0x21540f4u, 0x00ea484eu}, {0x213022au, 0x00e44765u},
++    {0x210ca91u, 0x00e04681u}, {0x20e9a06u, 0x00dc45a2u}, {0x20c7065u, 0x00d644c7u}, {0x20a4d86u, 0x00d243f1u},
++    {0x2083148u, 0x00ce431fu}, {0x2061b87u, 0x00ca4251u}, {0x2040c25u, 0x00c64187u}, {0x2020305u, 0x00c240c2u}
++};
++// clang-format on
++
++// x * x minus the 19 low columns of the antidiagonal and of the first 9 partial-product rows (sass-math squarer).
++inline ulong wp_mufu_square_approx(ulong x)
++{
++    ulong anti = 0;
++    for (int i = 0; i < 16; ++i)
++        anti |= ((x >> i) & 1ul) << (2 * i);
++    ulong err = anti & 0x7FFFFul;
++    for (int i = 0; i < 9; ++i) {
++        const ulong row = ((x << (i + 1)) & 0xFFFFFFFFul) & ~((1ul << (2 * i + 2)) - 1ul);
++        err += ((x >> i) & 1ul) ? (row & 0x7FFFFul) : 0ul;
++    }
++    return x * x - err;
++}
++
++// rsqrt.approx.f32: what CUDA's rsqrtf / rsqrt(float) compile to, with or without fast math (rsqrt.approx is the only
++// float32 rsqrt in PTX). Warp's svd3 / eig3 call ::rsqrt on CUDA and 1 / sqrt elsewhere. For normal inputs this is
++// MUFU.RSQ: C0 2^31 - C1 xl 2^17 + C2 sq(xl) + bias, doubled, fraction = bits 34..56; exact powers of four are
++// returned exactly. Subnormal inputs: ptxas pre-scales by 2^24 and the result by 2^12; MUFU.RSQ is exponent-invariant
++// (measured on sm_89), so that is folded into the exponent here.
++inline float wp_cuda_rsqrt(float x)
++{
++    const uint u = as_type<uint>(x);
++    const uint ex = (u >> 23) & 0xFFu;
++    uint f = u & 0x7FFFFFu;
++    if (ex == 0xFFu)
++        return (f != 0u || (u >> 31) != 0u) ? as_type<float>(0x7FFFFFFFu) : 0.0f;
++    if (ex == 0u && f == 0u)
++        return as_type<float>((u & 0x80000000u) | 0x7F800000u);
++    if ((u >> 31) != 0u)
++        return as_type<float>(0x7FFFFFFFu);
++    int e;
++    if (ex == 0u) {
++        const int msb = 31 - int(metal::clz(f));
++        e = msb - 149;
++        f = (f << (23 - msb)) & 0x7FFFFFu;
++    } else {
++        e = int(ex) - 127;
++    }
++    const int odd = e & 1;
++    const int half_e = (e - odd) >> 1;
++    if (odd == 0 && f == 0u)
++        return as_type<float>(uint(127 - half_e) << 23);
++    const uint2 c = wp_mufu_rsqrt_packed[(f >> 17) + uint(odd << 6)];
++    const ulong c0 = c.x, c1 = c.y & 0x1FFFFu, c2 = c.y >> 17;
++    const ulong xl = f & 0x1FFFFu;
++    ulong s = (c0 << 31) - ((c1 * xl) << 17) + c2 * wp_mufu_square_approx(xl);
++    s += 0x7FFF800000000000ul >> 30;
++    s <<= 1;
++    const uint frac = uint(s >> 34) & 0x7FFFFFu;
++    return as_type<float>((uint(126 - half_e) << 23) | frac);
++}
+diff --git a/warp/native/metal_cuda_libm.h b/warp/native/metal_cuda_libm.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..b2afdeb561c6a266c39acd2b64df2fac67051656
+--- /dev/null
++++ b/warp/native/metal_cuda_libm.h
+@@ -0,0 +1,209 @@
++// SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
++// SPDX-License-Identifier: Apache-2.0
++
++#pragma once
++
++// CUDA's float32 logf / expf / sinhf (libdevice __nv_logf / __nv_expf / __nv_sinhf, as NVRTC inlines them into
++// kernels compiled without fast_math), bit for bit, for Metal. Warp's wp.log / wp.exp / wp.sinh call these C names:
++// on CUDA they are libdevice's, on Metal they were the Metal library's, which round differently (over all 2^32
++// inputs Metal's log equals CUDA's on about half of the finite inputs, exp and sinh on about 97 %). Newton's implicit
++// MPM evaluates them in its plastic-flow (Jp) and hardening updates, so the difference was systematic, not rounding
++// noise of the kind the L4 itself produces.
++//
++// The sequences are the PTX NVRTC emits for the three functions (CUDA 12.9 NVVM, Warp 1.16, sm_89): a fused
++// multiply-add wherever the PTX has fma.rn, a single rounding for every other product and sum (no product feeds an
++// add, so ptxas cannot contract further; products are written as fma(a, b, signed zero) so the Metal compiler cannot
++// contract them either), and ex2.approx.ftz.f32 = MUFU.EX2 through Benjamin Carleton's sass-math model (MIT
++// License, Copyright (c) 2020 Benjamin Carleton, see licenses/sass-math-LICENSE.txt). Subnormal inputs and results
++// follow CUDA's non-ftz forms on the bit patterns (Apple GPUs flush float32 subnormals in arithmetic).
++// Needs metal_cuda_fast_math.h (wp_cuda_rcp, wp_mufu_square_approx).
++
++// MUFU.EX2 coefficients (sass-math's ex2 table, packed {C0, C1 | C2 << 17}).
++// clang-format off
++constant uint2 wp_mufu_ex2_packed[64] = {
++    {0x2000002u, 0x03dc58b9u}, {0x2059349u, 0x03ea59b0u}, {0x20b361du, 0x03f45aaau}, {0x210e8a4u, 0x03fe5ba7u},
++    {0x216ab11u, 0x040c5ca6u}, {0x21c7d88u, 0x04125da9u}, {0x222603bu, 0x041e5eaeu}, {0x2285358u, 0x04285fb6u},
++    {0x22e570bu, 0x043a60c0u}, {0x2346b80u, 0x044461ceu}, {0x23a90e7u, 0x044e62dfu}, {0x240c774u, 0x045e63f2u},
++    {0x2470f50u, 0x04686509u}, {0x24d68afu, 0x04706623u}, {0x253d3c2u, 0x0482673fu}, {0x25a50b8u, 0x048e685fu},
++    {0x260dfc4u, 0x049a6982u}, {0x2678119u, 0x04a86aa8u}, {0x26e34e8u, 0x04b06bd2u}, {0x274fb69u, 0x04c26cfeu},
++    {0x27bd4cbu, 0x04ce6e2eu}, {0x282c147u, 0x04dc6f61u}, {0x289c10du, 0x04e67098u}, {0x290d458u, 0x04f271d2u},
++    {0x297fb5cu, 0x0502730fu}, {0x29f3650u, 0x050e7450u}, {0x2a6856cu, 0x051e7594u}, {0x2ade8e9u, 0x052a76dcu},
++    {0x2b560fdu, 0x053c7827u}, {0x2bcede4u, 0x054a7976u}, {0x2c48fd9u, 0x055c7ac8u}, {0x2cc4712u, 0x05667c1fu},
++    {0x2d413ceu, 0x05767d79u}, {0x2dbf64au, 0x05827ed7u}, {0x2e3eec0u, 0x05968038u}, {0x2ebfd6cu, 0x05a2819eu},
++    {0x2f42290u, 0x05b48307u}, {0x2fc5e69u, 0x05c68474u}, {0x304b136u, 0x05d885e5u}, {0x30d1b35u, 0x05e2875bu},
++    {0x3159caau, 0x05f688d4u}, {0x31e35d5u, 0x060a8a51u}, {0x326e6f9u, 0x06168bd3u}, {0x32fb056u, 0x06268d59u},
++    {0x3389232u, 0x06388ee3u}, {0x3418cd1u, 0x064c9071u}, {0x34aa078u, 0x065a9204u}, {0x353cd6cu, 0x066c939bu},
++    {0x35d13f6u, 0x06829536u}, {0x3667459u, 0x069496d6u}, {0x36feee0u, 0x06a2987bu}, {0x37983d5u, 0x06b49a24u},
++    {0x383337fu, 0x06cc9bd1u}, {0x38cfe29u, 0x06da9d84u}, {0x396e41eu, 0x06ee9f3bu}, {0x3a0e5acu, 0x0700a0f7u},
++    {0x3ab031fu, 0x071aa2b7u}, {0x3b53cc3u, 0x072aa47du}, {0x3bf92e9u, 0x073aa648u}, {0x3ca05dfu, 0x0754a817u},
++    {0x3d495f7u, 0x0764a9ecu}, {0x3df4381u, 0x077eabc5u}, {0x3ea0eceu, 0x0792ada4u}, {0x3f4f833u, 0x07a8af88u}
++};
++// clang-format on
++
++inline float wp_cuda_f(uint b) { return as_type<float>(b); }
++inline uint wp_cuda_u(float f) { return as_type<uint>(f); }
++
++// a * b rounded once, kept apart from any following add (the Metal compiler contracts a visible product).
++inline float wp_cuda_mul(float a, float b)
++{
++    return metal::fma(a, b, wp_cuda_f((wp_cuda_u(a) ^ wp_cuda_u(b)) & 0x80000000u));
++}
++
++// ex2.approx.ftz.f32 (sass-math ptxm_ex2_sm5x: reduction to sign, integer part and a 23-bit fixed-point fraction,
++// then MUFU.EX2's table interpolation; inputs below -126 are halved and the result squared). Subnormal inputs and
++// outputs flush to zero.
++inline float wp_cuda_ex2(float x)
++{
++    uint xb = wp_cuda_u(x);
++    if ((xb & 0x7FFFFFFFu) > 0x7F800000u)
++        return wp_cuda_f(0x7FFFFFFFu);
++    if ((xb & 0x7F800000u) == 0u)
++        xb &= 0x80000000u;
++    float xf = wp_cuda_f(xb);
++    bool square = false;
++    if (xf < -126.0f) {
++        xf *= 0.5f;
++        square = true;
++    }
++    const uint sgn = wp_cuda_u(xf) & 0x80000000u;
++    uint red;
++    if (xf >= 128.0f) {
++        red = 0x81u << 23;
++    } else if (xf <= -128.0f) {
++        red = 0x80000000u | (0x81u << 23);
++    } else {
++        const float ip = metal::trunc(xf);
++        uint fb = wp_cuda_u(xf - ip);  // exact
++        if ((fb & 0x7FFFFFFFu) != 0u) {
++            const int il = int((fb >> 23) & 0xFFu) - 127;
++            fb = ((fb | (1u << 23)) & 0xFFFFFFu) >> uint(metal::min(-il, 24));
++        }
++        red = sgn | (uint(metal::abs(ip)) << 23) | (fb & 0x7FFFFFu);
++    }
++    const uint rsign = red >> 31;
++    int integral = int((red >> 23) & 0xFFu);
++    if ((integral & 0x81) == 0x80)
++        return wp_cuda_f(0x7FFFFFFFu);
++    if ((integral & 0x81) == 0x81)
++        return rsign ? 0.0f : wp_cuda_f(0x7F800000u);
++    if (rsign) {
++        integral = -integral;
++        if (red & 0x7FFFFFu) {
++            red = ~red;
++            integral -= 1;
++        }
++    }
++    const uint2 c = wp_mufu_ex2_packed[(red >> 17) & 0x3Fu];
++    const ulong c0 = c.x, c1 = c.y & 0x1FFFFu, c2 = c.y >> 17;
++    const ulong xl = red & 0x1FFFFu;
++    ulong s = (c0 << 32) + ((c1 * xl) << 19) + c2 * wp_mufu_square_approx(xl);
++    s += 0x6FC4000000000000ul >> 30;
++    const float r = wp_cuda_f((127u << 23) | (uint(s >> 34) & 0x7FFFFFu));
++    float out;
++    if (integral > 127)
++        out = wp_cuda_f(0x7F800000u);
++    else if (integral < -126)
++        out = 0.0f;
++    else
++        out = wp_cuda_f(uint(integral + 127) << 23) * r;  // exact
++    if (square)
++        out = out * out;  // a subnormal square flushes, as .ftz does
++    return out;
++}
++
++// __nv_logf
++inline float wp_cuda_logf(float a)
++{
++    uint ix = wp_cuda_u(a);
++    float adj = 0.0f;
++    if ((ix & 0x7F800000u) == 0u && (ix & 0x7FFFFFu) != 0u) {
++        // subnormal: CUDA scales by 2^23 (exact) and takes 23 off the exponent; f 2^-149 2^23 = 2^(msb - 126) 1.m
++        const uint f = ix & 0x7FFFFFu;
++        const int msb = 31 - int(metal::clz(f));
++        ix = (ix & 0x80000000u) | (uint(msb + 1) << 23) | ((f << uint(23 - msb)) & 0x7FFFFFu);
++        adj = -23.0f;
++    }
++    // (negative normal inputs are also scaled on CUDA; their result is NaN either way)
++    const float x = wp_cuda_f(ix);
++    const int e = (int(ix) - int(0x3F2AAAABu)) & int(0xFF800000u);
++    const float m = wp_cuda_f(uint(int(ix) - e));
++    const float ef = metal::fma(float(e), wp_cuda_f(0x34000000u), adj);
++    const float f = m - 1.0f;
++    float p = metal::fma(wp_cuda_f(0xBE055027u), f, wp_cuda_f(0x3E1039F6u));
++    p = metal::fma(p, f, wp_cuda_f(0xBDF8CDCCu));
++    p = metal::fma(p, f, wp_cuda_f(0x3E0F2955u));
++    p = metal::fma(p, f, wp_cuda_f(0xBE2AD8B9u));
++    p = metal::fma(p, f, wp_cuda_f(0x3E4CED0Bu));
++    p = metal::fma(p, f, wp_cuda_f(0xBE7FFF22u));
++    p = metal::fma(p, f, wp_cuda_f(0x3EAAAA78u));
++    p = metal::fma(p, f, -0.5f);
++    float r = metal::fma(wp_cuda_mul(f, p), f, f);
++    r = metal::fma(ef, wp_cuda_f(0x3F317218u), r);
++    if (!(ix < 0x7F800000u))
++        r = metal::fma(x, wp_cuda_f(0x7F800000u), wp_cuda_f(0x7F800000u));
++    if ((ix & 0x7FFFFFFFu) == 0u)
++        r = wp_cuda_f(0xFF800000u);
++    return r;
++}
++
++// __nv_expf
++inline float wp_cuda_expf(float x)
++{
++    const float t = metal::fma(x, wp_cuda_f(0x3BBB989Du), 0.5f);
++    const float s = (t > 0.0f) ? ((t < 1.0f) ? t : 1.0f) : 0.0f;  // cvt.sat (NaN -> 0)
++    // fma.rm(s, 252, 12582913) = 12582913 + floor(252 s): the exact sum lies in [2^23, 2^24), where floats are
++    // the integers
++    uint k = 0u;
++    const uint sb = wp_cuda_u(s);
++    if (sb != 0u) {
++        const int sh = 150 - int(sb >> 23);  // s = mant 2^-sh
++        const uint prod = ((sb & 0x7FFFFFu) | 0x800000u) * 252u;
++        k = sh >= 32 ? 0u : (prod >> uint(sh));
++    }
++    const float n = float(int(k) - 126);  // (12582913 + k) - 12583039, exact
++    float r = metal::fma(x, wp_cuda_f(0x3FB8AA3Bu), -n);
++    r = metal::fma(x, wp_cuda_f(0x32A57060u), r);
++    const float e = wp_cuda_ex2(r);
++    // e 2^(k - 126) (bits of 12582913 + k shifted into the exponent field); CUDA's non-ftz mul.f32 keeps a
++    // subnormal product, rounded to nearest even
++    const uint eb = wp_cuda_u(e);
++    const int be = int((eb >> 23) & 0xFFu) + int(k) - 126;
++    if ((eb & 0x7FFFFFFFu) == 0u || (eb & 0x7F800000u) == 0x7F800000u || be >= 1)
++        return e * wp_cuda_f((0x4B400001u + k) << 23);
++    const uint mnt = (eb & 0x7FFFFFu) | 0x800000u;
++    const int sh = 1 - be;
++    if (sh > 25)
++        return wp_cuda_f(eb & 0x80000000u);
++    const uint q = mnt >> uint(sh), rem = mnt & ((1u << uint(sh)) - 1u), hf = 1u << uint(sh - 1);
++    return wp_cuda_f((eb & 0x80000000u) | (q + ((rem > hf || (rem == hf && (q & 1u))) ? 1u : 0u)));
++}
++
++// __nv_sinhf
++inline float wp_cuda_sinhf(float x)
++{
++    const uint xb = wp_cuda_u(x);
++    const float a = metal::abs(x);
++    if (!(a >= 1.0f)) {  // |x| < 1 or NaN
++        if ((xb & 0x7F800000u) == 0u)
++            return x;  // zero or subnormal: x * x underflows to 0 and CUDA returns fma(0, x, x) = x
++        const float x2 = wp_cuda_mul(x, x);
++        float p = metal::fma(wp_cuda_f(0x363D0ADAu), x2, wp_cuda_f(0x394FFF49u));
++        p = metal::fma(p, x2, wp_cuda_f(0x3C08889Au));
++        p = metal::fma(p, x2, wp_cuda_f(0x3E2AAAABu));
++        return metal::fma(wp_cuda_mul(x2, p), x, x);
++    }
++    float k = metal::trunc(wp_cuda_mul(a, wp_cuda_f(0x3FB8AA3Bu)));
++    if (metal::abs(k) > 126.0f)
++        k = wp_cuda_f((wp_cuda_u(k) & 0x80000000u) | 0x42FC0000u);
++    float r = metal::fma(k, wp_cuda_f(0xBF317218u), a);
++    r = metal::fma(k, wp_cuda_f(0x3102E308u), r);
++    const float sc = wp_cuda_f(wp_cuda_u(k + wp_cuda_f(0x4B40007Du)) << 23);  // 12583037 + k -> 2^(k - 2)
++    const float e = wp_cuda_ex2(wp_cuda_mul(r, wp_cuda_f(0x3FB8AA3Bu))) * sc;
++    // div.approx.f32(0.125, e) = FMUL(0.125, MUFU.RCP(e)) (e >= 0.5: no pre-scale; a subnormal product, for e above
++    // 2^123, cannot change 2 e - q)
++    const float q = wp_cuda_mul(0.125f, wp_cuda_rcp(e));
++    float res = metal::fma(2.0f, e, -q);
++    if (a >= 90.0f)
++        res = wp_cuda_f(0x7F800000u);
++    return wp_cuda_f((xb & 0x80000000u) | wp_cuda_u(res));
 +}
 diff --git a/warp/native/metal_deterministic.h b/warp/native/metal_deterministic.h
 new file mode 100644
@@ -11372,6 +11770,21 @@ index b0eabeba9ce2cd613f5160492fe0d79464330adf..5393d0539e46d7dd4cbea6fdcf281ef8
  
              x = (m.data[2][0] + m.data[0][2]) * h;
              y = (m.data[1][2] + m.data[2][1]) * h;
+diff --git a/warp/native/svd.h b/warp/native/svd.h
+index 7909fad55047643c04aef37f3aec9db7914f58e8..d1945077cb947e82b2de7128dd2ed0bee5e1fab8 100644
+--- a/warp/native/svd.h
++++ b/warp/native/svd.h
+@@ -51,6 +51,10 @@ template <typename Type> inline CUDA_CALLABLE Type recipSqrt(Type x)
+ {
+ #if defined(__CUDA_ARCH__)
+     return ::rsqrt(x);
++#elif defined(__METAL_VERSION__) && defined(WP_METAL_CUDA_LIBM) && WP_METAL_CUDA_LIBM
++    // CUDA's ::rsqrt is rsqrt.approx.f32 (MUFU.RSQ, 78 % correctly rounded); 1 / sqrt rounds differently on a third
++    // of the inputs
++    return wp_cuda_rsqrt(x);
+ #else
+     return Type(1) / sqrt(x);
+ #endif
 diff --git a/warp/native/tile.h b/warp/native/tile.h
 index 59608b50b1128e21167f9e80c35c2d6f7dd32650..5f511a96f617cf8b817fc335d1c7936ed6bbfe81 100644
 --- a/warp/native/tile.h
@@ -12915,7 +13328,7 @@ index 0000000000000000000000000000000000000000..8f6aadfac81c19ae72ae348646453203
 +if __name__ == "__main__":
 +    unittest.main(verbosity=2)
 diff --git a/warp/tests/test_metal.py b/warp/tests/test_metal.py
-index 5c4590d7fb61665071738e72e570dfd0b8bc6fa9..b9a93a39f3b68c1ee54ea1c6cc1eb81d7331b296 100644
+index 5c4590d7fb61665071738e72e570dfd0b8bc6fa9..b46aa2e35c46e85a11d3ad2569616b4b8b46db04 100644
 --- a/warp/tests/test_metal.py
 +++ b/warp/tests/test_metal.py
 @@ -4,6 +4,7 @@
@@ -13417,7 +13830,7 @@ index 5c4590d7fb61665071738e72e570dfd0b8bc6fa9..b9a93a39f3b68c1ee54ea1c6cc1eb81d
      def test_tile_ops_across_block_boundary(self):
          """Tile sizes just below, at and above the block size, and above two blocks.
  
-@@ -409,6 +857,584 @@ class TestMetal(unittest.TestCase):
+@@ -409,6 +857,651 @@ class TestMetal(unittest.TestCase):
                  np.testing.assert_allclose(product.numpy(), ref, rtol=1e-3, atol=1e-3, err_msg=msg)
                  np.testing.assert_allclose(acc.numpy(), a_np + ref, rtol=1e-3, atol=1e-3, err_msg=msg)
  
@@ -13767,6 +14180,73 @@ index 5c4590d7fb61665071738e72e570dfd0b8bc6fa9..b9a93a39f3b68c1ee54ea1c6cc1eb81d
 +        x = rng.uniform(1.0e-3, 10.0, 1 << 12).astype(np.float32)
 +        for fast_out, ref_out in zip(self._fast_math_ops(True, a, x), self._fast_math_ops(False, a, x)):
 +            np.testing.assert_array_equal(fast_out.view(np.uint32), ref_out.view(np.uint32))
++
++    def test_cuda_libm_matches_l4(self):
++        """warp.config.metal_cuda_libm: log / exp / sinh and svd3's rsqrt return what an L4 returns (sm_89, Warp 1.16).
++
++        Inputs where the Metal library's function rounds differently from libdevice's, over the whole range
++        (subnormal arguments and results included), with the L4's result bits; the emulation equals the L4 on all
++        2^32 inputs of each function. rsqrt: CUDA's ::rsqrt is rsqrt.approx.f32 (MUFU.RSQ).
++        """
++        vectors = {
++            "log": [(0x08100F37, 0xC299A46D), (0x13A9FADD, 0xC272DA6C), (0x1AF9E546, 0xC24A7EDA),
++                    (0x24BB1CEE, 0xC2143379), (0x2DCC968D, 0xC1C3DFE9), (0x371D731E, 0xC139390B),
++                    (0x40CBA07C, 0x3FECDEF0), (0x49F5085B, 0x41683267), (0x53575E71, 0x41DC6CAC),
++                    (0x5E29FBFE, 0x422A433B), (0x662AF6DB, 0x4256A5A4), (0x6D7EAE81, 0x427F0EB9),
++                    (0x7AF723F8, 0x42A4E60A), (0x03B9EFE5, 0xC2A59BCB), (0x4003B828, 0x3F38C743),
++                    (0x008A8542, 0xC2AE83DE), (0x00000075, 0xC2C50894)],
++            "exp": [(0x34851D72, 0x3F800003), (0xB628ED18, 0x3F7FFFD6), (0xB77C8E51, 0x3F7FFF04),
++                    (0xB8C4B5A3, 0x3F7FF9DB), (0xBA126368, 0x3F7FDB6B), (0xBB5A484D, 0x3F7F2615),
++                    (0x3C768F6B, 0x3F81F0D9), (0xBDB9FA71, 0x3F69C6EB), (0x3F22A53C, 0x3FF19E96),
++                    (0x3FFBDE1B, 0x40E4F026), (0xC0B7A382, 0x3B52F483), (0x416F6C8B, 0x4A407845),
++                    (0xC22311DA, 0x221183E6), (0xC2CFF12C, 0x00000001), (0x35224206, 0x3F800005),
++                    (0xEF521205, 0x00000000)],
++            "sinh": [(0xBA147F65, 0xBA147F66), (0xBA60C513, 0xBA60C515), (0x3B190230, 0x3B190239),
++                     (0xBBDC41E0, 0xBBDC424D), (0x3C9EF6EB, 0x3C9EF979), (0xBD67864C, 0xBD67A5DD),
++                     (0xBE31D497, 0xBE32B9C3), (0x3EFA4B7A, 0x3F023125), (0xBFC42E8C, 0xC00D4424),
++                     (0x406009E7, 0x41846BD2), (0x410127FA, 0x44C8455B), (0xC1A58080, 0xCDE61923),
++                     (0xC24668D3, 0xE2BCD959), (0xB02F2103, 0xB02F2103), (0x19F93EA8, 0x19F93EA8),
++                     (0x8019549E, 0x8019549E)],
++            "rsqrt": [(0x3F95ED1A, 0x3F6C8A78), (0x404D2052, 0x3F0EFE98), (0x3F885E40, 0x3F780561),
++                      (0x402A94E5, 0x3F1CCE72), (0x4064472D, 0x3F078CAC), (0x404FBEC2, 0x3F0E171F),
++                      (0x3F8A160F, 0x3F767929), (0x3F9818D0, 0x3F6AD8CA), (0x3FD50B29, 0x3F466E79),
++                      (0x3FEEE168, 0x3F3B64BE), (0x3FADEFD3, 0x3F5B9BC8), (0x3FBC9F9D, 0x3F52E2BB)],
++        }
++
++        @wp.func_native("return wp_cuda_rsqrt(x);")
++        def cuda_rsqrt(x: float) -> float: ...
++
++        def run(enabled):
++            @wp.kernel(module="unique", enable_backward=False)
++            def libm(x: wp.array2d[float], y: wp.array2d[float]):
++                i = wp.tid()
++                y[0, i] = wp.log(x[0, i])
++                y[1, i] = wp.exp(x[1, i])
++                y[2, i] = wp.sinh(x[2, i])
++                y[3, i] = cuda_rsqrt(x[3, i])
++
++            n = max(len(v) for v in vectors.values())
++            x = np.ones((4, n), dtype=np.uint32) * np.uint32(0x3F800000)
++            for row, v in enumerate(vectors.values()):
++                x[row, : len(v)] = [a for a, _ in v]
++            saved = wp.config.metal_cuda_libm
++            try:
++                wp.config.metal_cuda_libm = enabled
++                libm.module.mark_modified()  # read when the module is hashed and built
++                xs = wp.array(x.view(np.float32), dtype=float, device=self.device)
++                ys = wp.zeros_like(xs)
++                wp.launch(libm, dim=n, inputs=[xs, ys], device=self.device)
++                return ys.numpy().view(np.uint32)
++            finally:
++                wp.config.metal_cuda_libm = saved
++
++        y = run(True)
++        for row, (name, v) in enumerate(vectors.items()):
++            np.testing.assert_array_equal(y[row, : len(v)], np.array([b for _, b in v], dtype=np.uint32), err_msg=name)
++        # the Metal library's log / exp / sinh round differently on these inputs
++        y = run(False)
++        for row, (name, v) in enumerate(list(vectors.items())[:3]):
++            self.assertGreater(int((y[row, : len(v)] != np.array([b for _, b in v], dtype=np.uint32)).sum()), 5, name)
 +
 +    def test_64bit_bitwise_atomics_are_exact(self):
 +        """64-bit atomic and / or / xor update each 32-bit half atomically: the final value is exact under contention."""

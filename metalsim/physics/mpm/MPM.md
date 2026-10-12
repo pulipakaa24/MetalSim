@@ -607,6 +607,21 @@ With `"cuda"` fast math:
   This is a near-threshold stop, the kind the L4's own no-FMA run takes at solve 11; only the fast_math kernels
   differ between the two modes. It does mean `"cuda"` now fails the strict column T1, and the default stays `"off"`.
 
+Verification of the pushed Warp tree (`43ffc6dd`, rebuilt):
+
+* The six floor recordings equal the development tree's bit for bit.
+* Attribution (multi_material / ANYmal, worst-frame ratio):
+  * fem tiling alone (`WP_METAL_CUDA_LIBM=0`): 0.88 / 1.00.
+  * fem tiling with `metal_cuda_libm`: 0.80 / 0.94.
+* Rigid parity harness (`runs/fma_rigid_parity/closeout_libm{off,on}{1,2}`, `classify_closeout_libm.txt`,
+  `metrics_closeout_libm.txt`):
+  * The option off and on both give the same five known failures and 273 passes.
+  * 29 captured locals in 4 tests differ stably between the two settings: the Warp policy MLP (activations in the 7th
+    digit) and one MuJoCo-C flex error (8.971145e-3 vs 8.971146e-3). The other differences are run-to-run noise
+    (336 locals, 68 tests).
+  * Bitwise hashes of MuJoCo Warp BatchSim cannot test neutrality: it is not run-to-run repeatable
+    (`runs/mpm/closeout/rigid_neutral.log`).
+
 Cost: no measurable change. multi_material ms/frame with `metal_cuda_libm` on vs off, three interleaved repetitions:
 52.7 / 55.7 / 54.2 vs 54.5 / 54.4 / 55.1. Granular, column and ANYmal before/after tiling: within +-1 ms, two
 repetitions each (`runs/mpm/closeout/speed/`; the device was not idle at the start of these timing jobs, so the
@@ -636,13 +651,13 @@ Everything above runs from a clone of MetalSim plus the three forks; nothing dep
 
 ```
 # after the install of README / docs/GUIDE.md (.venv, scripts/setup_warp.sh, the MuJoCo Warp fork):
-scripts/setup_newton152.sh          # .venv-newton152: Newton fork metalsim-1.5.2 @c0427fc7, shared Warp fork @152808b7
+scripts/setup_newton152.sh          # .venv-newton152: Newton fork metalsim-1.5.2 @c0427fc7, shared Warp fork @43ffc6dd
 scripts/gpu_run.sh test_mpm check 15 -- .venv-newton152/bin/python -m pytest tests/test_mpm.py   # 14 passed, 1 xfailed
 ```
 
 | what | where it lives | how a fresh setup gets it |
 |---|---|---|
-| Warp changes | pulipakaa24/warp `metalsim`, pinned `152808b7` | `scripts/setup_warp.sh` (fallback: innate-inc/warp `ce15f6bb` + `patches/warp/metalsim-152808b7.diff`) |
+| Warp changes | pulipakaa24/warp `metalsim`, pinned `43ffc6dd` | `scripts/setup_warp.sh` (fallback: innate-inc/warp `ce15f6bb` + `patches/warp/metalsim-43ffc6dd.diff`) |
 | Newton changes (MPM, Franka-Pour rigid) | pulipakaa24/newton `metalsim-1.5.2`, pinned `c0427fc7` | `scripts/setup_newton152.sh` (fallback: v1.5.2 + `patches/newton/metalsim-1.5.2-c0427fc7.diff`) |
 | Newton 1.7 Metal fixes for the rigid stack | pulipakaa24/newton `metalsim-hashtable-metal` `a4be3604` (`.venv`'s `newton` extra) and `metalsim` `9f317390` (`.venv-newtonfork`) | `pip install -e ".[newton]"`, `scripts/setup_newton.sh` |
 | compat layer, scenes, probes, tests, Isaac-side recorders | this repository | the clone |
