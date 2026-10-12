@@ -807,6 +807,78 @@ vertex VSOut hf_tile_vs(
     return o;
 }
 
+// Heightfield sides / base on the culled path (Tier0Renderer(hfield_cull=True), hfield_skirts): the side triangles are
+// cut into chunks of at most SKIRT_CHUNK indices; per frame hf_skirt_cull appends the (env, chunk) pairs whose box meets
+// the env's view frustum, and hf_skirt_vs pulls the chunk's indices by vertex id (ids past a chunk's count are
+// degenerate). Without it every env drew the whole boundary of the field (+22 % on the G1 rough task's camera).
+struct SkirtChunk { int slot, i_start, i_count, _p; };
+
+kernel void hf_skirt_reset(device uint* args [[buffer(0)]], constant uint& chunk [[buffer(1)]], uint i [[thread_position_in_grid]])
+{   // MTLDrawPrimitivesIndirectArguments: vertex count, instance count, vertex start, base instance
+    if (i > 0) return;
+    args[0] = chunk; args[1] = 0u; args[2] = 0u; args[3] = 0u;
+}
+
+kernel void hf_skirt_cull(
+    device const EnvParams*  envs      [[buffer(0)]],
+    device const SkirtChunk* chunks    [[buffer(1)]],
+    device const HfBox*      boxes     [[buffer(2)]],
+    device const int*        slot_geom [[buffer(3)]],
+    device const float*      geom_xpos [[buffer(4)]],
+    device const float*      geom_xmat [[buffer(5)]],
+    constant Consts&         c         [[buffer(6)]],
+    constant uint&           n_chunks  [[buffer(7)]],
+    device uint2*            vis       [[buffer(8)]],
+    device atomic_uint*      args      [[buffer(9)]],
+    uint i [[thread_position_in_grid]])
+{
+    if (i >= c.n_envs * n_chunks) return;
+    uint env = i / n_chunks, k = i - env * n_chunks;
+    SkirtChunk ch = chunks[k];
+    uint gi = env * c.n_geoms + uint(slot_geom[ch.slot]);
+    device const float* xp = geom_xpos + gi * 3;
+    float3 lo, hi; box_world(boxes[k], load_mat33(geom_xmat + gi * 9), float3(xp[0], xp[1], xp[2]), lo, hi);
+    if (box_in_frustum(envs[env].view_proj, lo, hi)) {
+        uint idx = atomic_fetch_add_explicit(args + 1, 1u, memory_order_relaxed);
+        vis[idx] = uint2(env, k);
+    }
+}
+
+vertex VSOut hf_skirt_vs(
+    uint vid [[vertex_id]],
+    uint inst [[instance_id]],
+    device const float*      verts     [[buffer(0)]],
+    device const EnvParams*  envs      [[buffer(1)]],
+    device const uint2*      vis       [[buffer(2)]],
+    device const int*        slot_geom [[buffer(3)]],
+    device const float*      geom_xpos [[buffer(4)]],
+    device const float*      geom_xmat [[buffer(5)]],
+    device const SkirtChunk* chunks    [[buffer(6)]],
+    constant Consts&         c         [[buffer(7)]],
+    device const uint*       indices   [[buffer(8)]])
+{
+    uint2 ek = vis[inst];
+    SkirtChunk ch = chunks[ek.y];
+    uint env = ek.x, slot = uint(ch.slot);
+    VSOut o;
+    if (vid >= uint(ch.i_count)) {               // past this chunk: a degenerate (clipped) triangle
+        o.clip = float4(0.0, 0.0, 2.0, 1.0);
+        for (uint k = 0; k < 4; ++k) o.clip_distance[k] = -1.0;
+        o.world_pos = float3(0.0); o.normal_w = float3(0, 0, 1); o.uv = float2(0.0); o.env = env; o.slot = slot; o.local_pos = float3(0.0);
+        return o;
+    }
+    device const float* v = verts + indices[uint(ch.i_start) + vid] * 8;
+    float3 pos = float3(v[0], v[1], v[2]), nrm = float3(v[3], v[4], v[5]);
+    float3 p, n;
+    slot_world(env, slot, slot_geom, geom_xpos, geom_xmat, c, pos, nrm, p, n);
+    EnvParams e = envs[env];
+    float4 clip = tile_clip(e.view_proj * float4(p, 1.0), e.tile);
+    o.clip = clip;
+    clip_to_tile(o.clip_distance, clip, e.tile);
+    o.world_pos = p; o.normal_w = n; o.uv = float2(v[6], v[7]); o.env = env; o.slot = slot; o.local_pos = pos;
+    return o;
+}
+
 vertex ShadowOut hf_tile_shadow_vs(
     uint vid [[vertex_id]],
     uint inst [[instance_id]],

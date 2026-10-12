@@ -342,6 +342,8 @@ class Tier0Renderer:
         self.smaps_tex = c.device.newTextureWithDescriptor_(d)
         self.smaps_tex.setLabel_("extra_shadow_maps")
 
+    SKIRT_CHUNK = 96          # indices (32 triangles) per culled heightfield-side chunk
+
     def _build_hfield_tiles(self):
         """Tile tables for GPU culling of heightfields (see hf_cull in tier0.metal)."""
         t, m, T = self.tables, self.m, self.hfield_tile
@@ -349,13 +351,28 @@ class Tier0Renderer:
         src = t.draws_opaque if (self.n_trans and t.draws_opaque is not None) else t.draws
         self._draws = [d for k, d in enumerate(src) if not (self.hfield_cull and k in hf_mesh) and d[3] > 0]
         self._shadow_draws = [d for k, d in enumerate(t.draws) if not (self.hfield_cull and k in hf_mesh)]   # all geoms cast
-        if self.hfield_cull:            # the tiles cover the top surface; the sides / base are drawn whole
-            for k in sorted(hf_mesh):
-                top = t.meshes[k].get("top_count", t.draws[k][1])
-                for lst, d in ((self._draws, src[k]), (self._shadow_draws, t.draws[k])):
-                    i_off, i_count, first, count = d
-                    if i_count > top and count > 0:
-                        lst.append((i_off + top, i_count - top, first, count))
+        self.n_skirt = 0
+        if self.hfield_cull:            # the tiles cover the top surface; the sides / base are culled per env in chunks
+            CH = self.SKIRT_CHUNK
+            chunks, cboxes = [], []
+            for slot, (g, k) in enumerate(zip(t.geoms, t.geom_mesh)):
+                if k not in hf_mesh:
+                    continue
+                mesh = t.meshes[k]
+                top = mesh.get("top_count", mesh["i_count"])
+                a, b = mesh["i_off"] + top, mesh["i_off"] + mesh["i_count"]
+                for s0 in range(a, b, CH):
+                    cnt = min(CH, b - s0)
+                    P = t.vertices[t.indices[s0:s0 + cnt], :3].astype(np.float64)
+                    chunks.append([slot, s0, cnt, 0])
+                    cboxes.append(list(P.min(0) - 1e-4) + [0] + list(P.max(0) + 1e-4) + [0])
+            self.n_skirt = len(chunks)
+            if self.n_skirt:        # (heightfield sides cast no tier-0 shadow on the culled path)
+                c = self.ctx
+                self.skirt_chunks = c.buffer(16 * self.n_skirt, np.asarray(chunks, np.int32), "hf_skirt_chunks")
+                self.skirt_boxes = c.buffer(32 * self.n_skirt, np.asarray(cboxes, np.float32), "hf_skirt_boxes")
+                self.skirt_vis = c.buffer(8 * self.n * self.n_skirt, label="hf_skirt_visible")
+                self.skirt_args = c.buffer(16, np.zeros(4, np.uint32), "hf_skirt_args")
         self.n_tiles = 0
         if not self.hfield_cull:
             return
@@ -502,6 +519,10 @@ class Tier0Renderer:
             self.hf_shadow_pipe = c.render_pipeline(d)
             self.p_hf_reset = c.compute_pipeline(lib, "hf_cull_reset")
             self.p_hf_cull = c.compute_pipeline(lib, "hf_cull")
+            if self.n_skirt:
+                self.skirt_pipe, _ = make("hf_skirt_vs", "geom_fs_rt" if self.tier >= 1 else "geom_fs", True, depth_cmp, False)
+                self.p_skirt_reset = c.compute_pipeline(lib, "hf_skirt_reset")
+                self.p_skirt_cull = c.compute_pipeline(lib, "hf_skirt_cull")
 
     def _alloc_outputs(self, outputs):
         """Output tensors live in Warp arrays on metal:0 so that they are simultaneously Warp arrays,
@@ -638,6 +659,18 @@ class Tier0Renderer:
                                         (self.consts_buf, 0), (self.hf_cc, 0), (self.hf_vis, 0), (self.hf_svis, 0), (self.hf_args, 0))):
                 ce.setBuffer_offset_atIndex_(b, o, i)
             ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n * self.n_tiles, 1, 1), Metal.MTLSize(256, 1, 1))
+            if self.n_skirt:
+                ce.setComputePipelineState_(self.p_skirt_reset)
+                ce.setBuffer_offset_atIndex_(self.skirt_args, 0, 0)
+                ce.setBytes_length_atIndex_(np.array([self.SKIRT_CHUNK], np.uint32).tobytes(), 4, 1)
+                ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(1, 1, 1), Metal.MTLSize(1, 1, 1))
+                ce.setComputePipelineState_(self.p_skirt_cull)
+                for i, (b, o) in enumerate(((self.env_buf, 0), (self.skirt_chunks, 0), (self.skirt_boxes, 0), (self.slot_geom, 0),
+                                            (geom_xpos, geom_xpos_off), (geom_xmat, geom_xmat_off), (self.consts_buf, 0))):
+                    ce.setBuffer_offset_atIndex_(b, o, i)
+                ce.setBytes_length_atIndex_(np.array([self.n_skirt], np.uint32).tobytes(), 4, 7)
+                ce.setBuffer_offset_atIndex_(self.skirt_vis, 0, 8); ce.setBuffer_offset_atIndex_(self.skirt_args, 0, 9)
+                ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n * self.n_skirt, 1, 1), Metal.MTLSize(256, 1, 1))
             ce.endEncoding()
         grains = getattr(self, "_grain_raster", None)     # particles (set_particles, metalsim/render/particles.py)
         if grains is not None:
@@ -794,6 +827,12 @@ class Tier0Renderer:
             self._bind_hf(re, self.hf_vis)
             re.drawIndexedPrimitives_indexType_indexBuffer_indexBufferOffset_indirectBuffer_indirectBufferOffset_(
                 Metal.MTLPrimitiveTypeTriangle, Metal.MTLIndexTypeUInt32, self.hf_ibuf, 0, self.hf_args, 0)
+            if self.n_skirt:
+                re.setRenderPipelineState_(self.skirt_pipe)
+                re.setVertexBuffer_offset_atIndex_(self.skirt_vis, 0, 2)
+                re.setVertexBuffer_offset_atIndex_(self.skirt_chunks, 0, 6)
+                re.setVertexBuffer_offset_atIndex_(self.ibuf, 0, 8)
+                re.drawPrimitives_indirectBuffer_indirectBufferOffset_(Metal.MTLPrimitiveTypeTriangle, self.skirt_args, 0)
         if self.dyn is not None:
             re.setRenderPipelineState_(self.dyn_pipe)
             self._draw_dyn(re)
