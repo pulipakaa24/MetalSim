@@ -220,3 +220,23 @@ def test_stable_ids_under_culling():
         rt.set_particles(pos, radius=0.004, grains_per_particle=4, ids=ids)
         imgs.append(rt.render_host(_datas(m), passes=2)["hdr"])
     assert np.allclose(imgs[0], imgs[1], atol=1e-6)
+
+
+def test_texture_atlas_fits_metal_limit():
+    """Many large textures (the Menagerie ANYmal C has 20 at 2048 px) pack into an atlas within Metal's 16384-px
+    texture limit: the shelf widens instead of growing one column past it (CPU only)."""
+    from metalsim.render.scene_tables import TextureAtlas
+    n = 18
+    tex = "".join(f'<texture name="t{i}" type="2d" builtin="checker" rgb1="{i / n} 0 0" rgb2="0 0 1" width="1024" height="1024"/>'
+                  f'<material name="m{i}" texture="t{i}"/>' for i in range(n))
+    geoms = "".join(f'<geom type="box" size="0.1 0.1 0.1" pos="{i} 0 0" material="m{i}"/>' for i in range(n))
+    m = mujoco.MjModel.from_xml_string(f"<mujoco><asset>{tex}</asset><worldbody>{geoms}</worldbody></mujoco>")
+    a = TextureAtlas.build(m)
+    assert max(a.image.shape[:2]) <= 16384, a.image.shape
+    assert len(a.rects) == n
+    r = np.array(list(a.rects.values()))          # (u0, v0, du, dv): inside the atlas and pairwise disjoint
+    assert (r[:, :2] >= 0).all() and (r[:, :2] + r[:, 2:] <= 1 + 1e-9).all()
+    for i in range(n):
+        for j in range(i + 1, n):
+            ov = (np.minimum(r[i, :2] + r[i, 2:], r[j, :2] + r[j, 2:]) - np.maximum(r[i, :2], r[j, :2]))
+            assert (ov <= 1e-9).any()
