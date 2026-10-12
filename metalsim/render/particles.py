@@ -127,11 +127,20 @@ class GrainField:
         self.vbuf = ctx.buffer(verts.nbytes, verts, "grain_vertices")
         self.ibuf = ctx.buffer(idx.nbytes, idx, "grain_indices")
         self.mesh_info = ctx.buffer(info.nbytes, info, "grain_mesh_info")
-        self.mat_buf = ctx.buffer(176, self.material.pack(), "grain_material")
+        if len(meshes) > 8:
+            raise ValueError("at most 8 grain meshes")
+        # GrainMat (shaders/pathtrace.metal): the material (176 bytes) followed by 8 grain mesh index ranges
+        mb = np.zeros(304, np.uint8)
+        mb[:176] = self.material.pack().view(np.uint8).ravel()
+        mi = np.zeros((8, 4), np.uint32); mi[:len(meshes)] = info
+        mb[176:] = mi.view(np.uint8).ravel()
+        self.mat_buf = ctx.buffer(mb.nbytes, mb, "grain_material")
         self._build_meshes(info)
         self.pipe = ctx.compute_pipeline(ctx.library("particles"), "grain_instances")
         self.n_particles = 0
         self._pos_buf, self._pos_off, self._own_pos = None, 0, None
+        self._ids_buf, self.has_ids = ctx.buffer(16, label="grain_ids_placeholder"), False
+        self.keys = ctx.buffer(16, label="grain_keys")     # per-grain identity key, written with the instances
 
     def _build_meshes(self, info):
         c = self.ctx
@@ -165,6 +174,22 @@ class GrainField:
         self.material = material
         self.ctx.write_buffer(self.mat_buf, material.pack())
 
+    def set_ids(self, ids):
+        """Stable particle ids (n_envs, P) or (P,) uint32: a grain's shape, offset and colour hash the id instead of the
+        particle's index, so a caller can drop / reorder particles (surface culling, compaction) without grains
+        changing. None: index = identity."""
+        if ids is None:
+            self.has_ids = False
+            return
+        i = np.asarray(ids, np.uint32)
+        if i.ndim == 1:
+            i = np.broadcast_to(i, (self.n_envs, i.shape[0]))
+        i = np.ascontiguousarray(i)
+        if self._ids_buf.length() < i.nbytes:
+            self._ids_buf = self.ctx.buffer(i.nbytes, label="grain_ids")
+        self.ctx.write_buffer(self._ids_buf, i)
+        self.has_ids = True
+
     def set_positions(self, positions):
         """``positions``: (n_envs, P, 3) or (P, 3) (one env, or the same particles in every env) as numpy (uploaded
         into a shared buffer), or a Warp array on the Metal device (bound directly: the GPU path, no host copy; it must
@@ -197,17 +222,22 @@ class GrainField:
         c[:8] = (self.n_envs, self.n_particles, self.k, self.n_meshes, as_base, tiles_per_row, self.seed, inst_base)
         cf = c.view(np.float32)
         cf[8:13] = (stride, self.radius, self.radius_jitter, self.offset, self.cull_z)
+        c[13] = 1 if self.has_ids else 0
         return c
 
     def encode_instances(self, cb, inst_desc, as_base: int, inst_base: int, tiles_per_row: int, stride: float):
         if self.n_grains == 0:
             return
         k = self.consts(as_base, inst_base, tiles_per_row, stride)
+        if self.keys.length() < 4 * self.n_grains:
+            self.keys = self.ctx.buffer(4 * self.n_grains, label="grain_keys")
         ce = cb.computeCommandEncoder()
         ce.setComputePipelineState_(self.pipe)
         ce.setBuffer_offset_atIndex_(inst_desc, 0, 0)
         ce.setBuffer_offset_atIndex_(self._pos_buf, self._pos_off, 1)
         ce.setBytes_length_atIndex_(k.tobytes(), k.nbytes, 2)
+        ce.setBuffer_offset_atIndex_(self._ids_buf, 0, 3)
+        ce.setBuffer_offset_atIndex_(self.keys, 0, 4)
         ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n_grains, 1, 1), Metal.MTLSize(256, 1, 1))
         ce.endEncoding()
 
@@ -355,4 +385,5 @@ class GrainRaster:
         re.setFragmentBuffer_offset_atIndex_(r0.params_buf, 0, 9)
         re.setFragmentTexture_atIndex_(r0.shadow_tex, 2)
         re.setFragmentSamplerState_atIndex_(r0.samp_shadow, 1)
+        re.setFragmentBuffer_offset_atIndex_(self.field.keys, 0, 10)
         self._draw(re)

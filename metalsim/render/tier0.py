@@ -533,7 +533,7 @@ class Tier0Renderer:
         enc.setVertexBuffer_offset_atIndex_(self.hf_cc, 0, 8)
 
     def set_particles(self, positions, radius=None, material=None, *, grains_per_particle=8, grain_radius=None,
-                      radius_jitter=0.3, n_meshes=4, seed=0, grain_shape=None, cull_z=float("-inf")):
+                      radius_jitter=0.3, n_meshes=4, seed=0, grain_shape=None, ids=None, cull_z=float("-inf")):
         """Draw particles as render grains, as ``Tier2Renderer.set_particles`` (same arguments, same grains and
         per-grain colours; metalsim/render/particles.py, PARTICLES.md). Tier-0 shading; with ``tier=1`` the grains
         are lit without shadows. ``positions=None`` removes them."""
@@ -554,6 +554,7 @@ class Tier0Renderer:
             f.set_material(material)
         f.cull_z = float(cull_z)
         f.set_positions(positions)
+        f.set_ids(ids)
 
     def render(self, sim, after_value: int | None = None) -> int:
         """GPU path: render the current physics state of ``sim`` (a BatchSim). Waits for
