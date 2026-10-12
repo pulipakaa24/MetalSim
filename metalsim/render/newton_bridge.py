@@ -631,6 +631,8 @@ class NewtonRenderSource:
         T = int(getattr(m, "tri_count", 0) or 0)
         tris = m.tri_indices.numpy().reshape(-1, 3).astype(np.int64) if T else np.zeros((0, 3), np.int64)
         in_tri = np.zeros(P, bool); in_tri[tris.reshape(-1)] = True
+        if int(getattr(m, "tet_count", 0) or 0):         # soft-body interior nodes: neither surface nor free particle
+            in_tri[m.tet_indices.numpy().reshape(-1)] = True
         tw = pw[tris[:, 0]] if T else np.zeros(0, int)
 
         def layout(groups):
@@ -862,7 +864,9 @@ class NewtonRenderSource:
             return None
         if not hasattr(renderer, "set_particles"):
             raise NotImplementedError("this renderer has no particle path (metalsim.render.particles)")
-        args = dict(radius=self.particle_radius, grains_per_particle=1, grain_radius=self.particle_radius,
+        # one round grain at the particle centre: ``radius`` is the grain's random offset inside the particle (~0
+        # here), ``grain_radius`` its size
+        args = dict(radius=1e-6 * self.particle_radius, grains_per_particle=1, grain_radius=self.particle_radius,
                     radius_jitter=0.0, grain_shape={"irregularity": 0.0, "elongation": 0.0})
         if "material" not in kw:
             from metalsim.render.particles import GrainMaterial
