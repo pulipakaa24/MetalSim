@@ -663,11 +663,60 @@ sort for fem's triplets (79.2 -> 85.8 ms).
 
 Pins: Newton `metalsim-1.5.2` is pinned at `3fd1f052` (the two Newton commits). The Warp commits are on the fork's
 `metalsim` (`3342e5d8`), on top of `41b7bc45`, which faults on a one-world captured Franka-Pour step (base tree too);
-the Warp pin stays at `43ffc6dd` until that is fixed. What a fresh setup gets now (Warp `43ffc6dd`, Newton `3fd1f052`) is verified on its own: bitwise against the base at 1 / 64 / 2,048 worlds, eager and captured; `tests/test_mpm.py` 14 passed, 1 xfailed; captured ms per step at 1 / 64 / 256 / 1,024 / 2,048 worlds 3.81 / 7.58 / 15.53 / 46.45 / 90.61 (base) vs 3.78 / 8.07 / 15.15 / 44.15 / 84.41, second round 3.94 / 7.76 / 15.35 / 46.00 / 90.54 vs 3.82 / 7.73 / 14.80 / 43.58 / 84.97.
+the Warp pin stayed at `43ffc6dd` until that was fixed (section 8g; pinned `85b92466` since). What a fresh setup gets now (Warp `43ffc6dd`, Newton `3fd1f052`) is verified on its own: bitwise against the base at 1 / 64 / 2,048 worlds, eager and captured; `tests/test_mpm.py` 14 passed, 1 xfailed; captured ms per step at 1 / 64 / 256 / 1,024 / 2,048 worlds 3.81 / 7.58 / 15.53 / 46.45 / 90.61 (base) vs 3.78 / 8.07 / 15.15 / 44.15 / 84.41, second round 3.94 / 7.76 / 15.35 / 46.00 / 90.54 vs 3.82 / 7.73 / 14.80 / 43.58 / 84.97.
 
 `warp.config.metal_cuda_libm` (Warp `43ffc6dd`, default on) costs nothing measurable: on vs off, three interleaved
 runs each, twice: granular 40.5 vs 40.7 ms/frame, multi_material 50.6 vs 50.7, Franka-Pour 2,048 worlds 90.6 vs 90.7
 ms per captured step (`runs/mpm/step_at_scale/libm/`).
+
+## 8g. Graph capture memory (2026-10-12; Warp `41b7bc45..85b92466`)
+
+Isaac Lab's Franka-Pour policy step captured as one graph (4 sim steps: 16 MPM solves, 4 collides, 24 MuJoCo
+substeps) replayed NaN arm state at 2,048 worlds on Warp `152808b7` / `43ffc6dd`. It was correct at 1,024 worlds and
+with one graph per sim step.
+
+* Cause: a Metal capture kept every capture-time allocation in its own buffer for the graph's lifetime, so a graph of
+  several steps held every step's temporaries (MuJoCo Warp's per-solve contexts and the rest) at once. Allocated at
+  2,048 worlds:
+
+  | graph | allocated | result |
+  |---|---|---|
+  | one per policy step | 70.7 GB | NaN |
+  | one per sim step | 44.3 GB | fine |
+  | one per policy step, 1,024 worlds | 35.3 GB | fine |
+  | two sim steps, 2,048 worlds | 53.1 GB | NaN once, finite once |
+
+  The M4 Max's working set (`recommendedMaxWorkingSetSize`) is 55.7 GB. In the failing run the residency set held
+  35.4 GB of the 70.7 GB, and the first replay made the arm state NaN in 2,004-2,048 worlds with no error.
+  `WP_METAL_ICB=0` (per-dispatch replay) replays NaN too.
+* `41b7bc45`: memory freed during a capture goes to a per-capture pool that later allocations of the same capture
+  draw from (replays are serial, as with a CUDA graph's memory pool). Policy-step graph: 37.4 GB, finite.
+* `41b7bc45` then faulted on a one-world captured MPM step (`kIOGPUCommandBufferCallbackErrorPageFault`). A solve's
+  80-byte indirect-execution-range array (the host writes its fields at each range's end) had taken the buffer of a
+  2,940-byte fem temporary freed earlier in the capture. Every replay, the temporary's recorded dispatches overwrote
+  the ranges first, and garbage ranges ran.
+  * Found by zeroing one reuse at a time on the GPU and logging the allocation stacks
+    (`pour_bitwise.py record --worlds 1 --mode capture`).
+  * Reuse was opt-in for the interim (`270660b1`).
+* `85b92466` turns reuse back on with three changes:
+  * Only buffers of 64 KiB or more are pooled or served. The arrays the host fills while recording are smaller.
+  * A large range array that lands in reused memory raises at `metal_capture_range_begin`.
+  * Deterministic scratch pools allocated during a capture record their zeroing.
+  * The setting is `warp.config.metal_capture_reuse` / `WP_METAL_CAPTURE_REUSE`.
+* `732b6e83`: buffers held only by graphs stay in the address table. Before, kernels that reach an array through a
+  descriptor stored in device memory read zeros once the array was freed.
+
+Verification of `85b92466`:
+
+* Warp's Metal test files and `tests/test_mpm.py` (14 passed, 1 xfailed) pass.
+* Pour recordings (`pour_bitwise.py`) at 1 / 64 / 2,048 worlds finish, eager and captured. Captured is bitwise equal
+  with reuse on and off.
+* With Newton `3fd1f052`, every recording at 1 / 64 / 2,048 worlds, eager and captured, is bitwise that of Warp
+  `43ffc6dd`; `tests/test_mpm.py` passes with that pair too.
+* The six floor recordings are bitwise those of `43ffc6dd` (`bitwise_dirs.py`).
+* The policy-step graph at 2,048 worlds is finite.
+
+Default `capture_unit` stays `"sim"` (Isaac's granularity); `"policy"` now works.
 
 ## 9. Running
 
@@ -693,13 +742,13 @@ Everything above runs from a clone of MetalSim plus the three forks; nothing dep
 
 ```
 # after the install of README / docs/GUIDE.md (.venv, scripts/setup_warp.sh, the MuJoCo Warp fork):
-scripts/setup_newton152.sh          # .venv-newton152: Newton fork metalsim-1.5.2 @3fd1f052, shared Warp fork @43ffc6dd
+scripts/setup_newton152.sh          # .venv-newton152: Newton fork metalsim-1.5.2 @3fd1f052, shared Warp fork @85b92466
 scripts/gpu_run.sh test_mpm check 15 -- .venv-newton152/bin/python -m pytest tests/test_mpm.py   # 14 passed, 1 xfailed
 ```
 
 | what | where it lives | how a fresh setup gets it |
 |---|---|---|
-| Warp changes | pulipakaa24/warp `metalsim`, pinned `43ffc6dd` | `scripts/setup_warp.sh` (fallback: innate-inc/warp `ce15f6bb` + `patches/warp/metalsim-43ffc6dd.diff`) |
+| Warp changes | pulipakaa24/warp `metalsim`, pinned `85b92466` | `scripts/setup_warp.sh` (fallback: innate-inc/warp `ce15f6bb` + `patches/warp/metalsim-85b92466.diff`) |
 | Newton changes (MPM, Franka-Pour rigid) | pulipakaa24/newton `metalsim-1.5.2`, pinned `3fd1f052` | `scripts/setup_newton152.sh` (fallback: v1.5.2 + `patches/newton/metalsim-1.5.2-3fd1f052.diff`) |
 | Newton 1.7 Metal fixes for the rigid stack | pulipakaa24/newton `metalsim-hashtable-metal` `a4be3604` (`.venv`'s `newton` extra) and `metalsim` `9f317390` (`.venv-newtonfork`) | `pip install -e ".[newton]"`, `scripts/setup_newton.sh` |
 | compat layer, scenes, probes, tests, Isaac-side recorders | this repository | the clone |

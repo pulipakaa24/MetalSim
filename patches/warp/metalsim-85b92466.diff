@@ -1,9 +1,9 @@
 diff --git a/METALSIM_CHANGES.md b/METALSIM_CHANGES.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..f49575d3e8cfd243491096dd372f8a1c47c4d1eb
+index 0000000000000000000000000000000000000000..3c0337355af64152a7041225a15e51d670185815
 --- /dev/null
 +++ b/METALSIM_CHANGES.md
-@@ -0,0 +1,65 @@
+@@ -0,0 +1,72 @@
 +# MetalSim changes on this branch (`metalsim`)
 +
 +This branch is the Warp build that [MetalSim](https://github.com/pulipakaa24/MetalSim) runs on (see the
@@ -66,6 +66,13 @@ index 0000000000000000000000000000000000000000..f49575d3e8cfd243491096dd372f8a1c
 +| `152808b7` | `warp.config.metal_fast_math` defaults to `"off"`: fast_math modules compile on Metal with correctly rounded division and sqrt, as before `f52da34`, so programs that never asked for CUDA's fast_math semantics (MuJoCo Warp ray casts, Newton ray / collision helpers) keep their results and speed; `"cuda"` costs ~3x per division / sqrt. MetalSim's MPM selects its mode through `newton_compat.install(metal_fast_math=...)`. Test: `TestMetal.test_fast_math_default_is_off`. |
 +| `3c4e251e` | `warp.fem` dispatched assembly takes CUDA's tiling choice on Metal. For long quadratures, CUDA sums each node's contributions in 32 lanes (strided lane sums, then the shuffle tree of `tile_sum`). The heuristic in `_generate_auxiliary_kernels` was CUDA-only, so Metal summed them sequentially. That is a different rounding of every particle-to-grid sum in Newton's implicit MPM: after one step of `example_mpm_multi_material`, 72 % of the nodes differed from the L4 by up to 10 ulp. Metal's SIMD-group reduction is the CUDA shuffle tree, so node mass and momentum now equal the L4's bit for bit. The tiling decisions of MetalSim's six floor scenes equal the L4's call for call. |
 +| `47a4031d` | `warp.config.metal_cuda_libm` (`WP_METAL_CUDA_LIBM`, default on): float32 `wp.log` / `wp.exp` / `wp.sinh` and the `rsqrt` of `svd3` / `eig3` compute CUDA's results on Metal. These are libdevice's `__nv_logf` / `__nv_expf` / `__nv_sinhf` and `rsqrt.approx.f32`. Before, Metal used its own library functions, which differ on about half (`log`) or 3 % (`exp`, `sinh`) of finite inputs, and a correctly rounded `1 / sqrt`, which differs on 33 % of inputs. `native/metal_cuda_libm.h` follows the PTX NVRTC emits (CUDA 12.9, sm_89), with MUFU.EX2 and MUFU.RSQ from sass-math's table interpolators (MIT, `licenses/sass-math-LICENSE.txt`) and CUDA's subnormal handling. It is equal to an L4 on all 2^32 inputs of each function. The option salts every module hash once; off, hashes and results are those of before. In MetalSim, multi_material against the L4 floor ensemble went from 1.15x to 0.80x (with the previous row). Kernels that call none of these functions are unchanged. Test: `TestMetal.test_cuda_libm_matches_l4`. |
++| `41b7bc45` | Metal graph capture reuses memory freed during the capture: an allocation recorded after a free takes the freed buffer (smallest that fits, at most twice the size), as a CUDA graph's memory pool does, because replays run the recorded work in order. Before, every capture-time allocation kept its own buffer for the graph's lifetime, so a graph of several simulation steps held every step's temporaries at once. Isaac Lab's Franka-Pour policy step captured as one graph (4 sim steps: 16 MPM solves, 24 MuJoCo substeps) at 2,048 worlds allocated 70.7 GB on the M4 Max, past its 55.7 GB working set (`recommendedMaxWorkingSetSize`); the residency set held 35.4 GB of it, and the first replay made the arm state NaN in 2,004-2,048 of 2,048 worlds without any error (WP_METAL_ICB=0 too; correct at 1,024 worlds, 35.3 GB, and one graph per sim step, 44.3 GB). Now 37.4 GB (one graph per sim step: 37.2 GB) and finite. Memory the host writes while recording (an indirect execution range's fields, host-to-device copies) is never reused. A one-time warning on stderr when allocations exceed the working set. `WP_METAL_CAPTURE_REUSE=0` restores separate buffers. Tests: `TestMetal.test_capture_reuses_memory_freed_during_capture`, `test_capture_never_reuses_host_written_memory`. |
++| `8631b6b0` | Metal compact `bsr_set_transpose` stops at the stored blocks: the destination offsets search only the sorted prefix of the stored source blocks (`bsr_offsets[row_count]`, read on the device) and skip the search for the columns past the last kept key, the column pass does not read the keys past the prefix, and the value pass is a bounded launch. Same offsets, columns (-1 past the kept blocks), block map and values (`test_metal_sparse`). Isaac Lab Franka-Pour MPM at 2,048 worlds: the strain and collider transposes 9.1 -> 4.9 ms of GPU time per step; trajectories bitwise unchanged. |
++| `fddebdbd` | Metal `compress_node_indices` with a device-side `index_count_limit` writes no keys past the limit (the bounded sort and run-length encoding never read them) and, with `keep_ignored_array_indices=False` (used by `SpaceRestriction`), nothing at all there. Franka-Pour 2,048 worlds: `_prepare_node_sort_kernel` 5.9 -> 1.4 ms of GPU time per step; bitwise unchanged. |
++| `3342e5d8` | `METALSIM_CHANGES.md` rows for `8631b6b0` and `fddebdbd`. Franka-Pour MPM, captured step at 2,048 worlds with the two Newton commits of the same work (`metalsim-1.5.2`): 90.5-91.2 -> 78.9-79.0 ms. |
++| `270660b1` | Capture memory reuse (`41b7bc45`) is opt-in, `WP_METAL_CAPTURE_REUSE=1`, until a GPU page fault it causes is understood. With reuse, Isaac Lab's Franka-Pour MPM step captured at one world fails with `kIOGPUCommandBufferCallbackErrorPageFault` (`pour_bitwise.py record --worlds 1 --mode capture`; 64 and 2,048 worlds pass). Without reuse, captures behave as at `43ffc6dd`. The working-set warning and the host-written-memory tracking stay. `TestMetal.test_capture_reuses_memory_freed_during_capture` runs only with reuse on. |
++| `732b6e83` | Buffers a Metal graph keeps alive after their arrays were freed (during or after the capture) stay in the host-to-GPU address table. Kernels that reach an array through a descriptor stored in device memory (an array of structs) translate its address through that table at replay. Before, they read through the untranslated host address and got zeros. Test: `TestMetal.test_replay_translates_nested_arrays_freed_during_capture`. |
++| this commit | Capture memory reuse is on again (`warp.config.metal_capture_reuse`, `WP_METAL_CAPTURE_REUSE`, read when a capture begins), and the one-world page fault is fixed. The fault came from a captured MPM solve: its 80-byte indirect-execution-range array, whose fields the host writes at each range's end, took the buffer of a 2,940-byte fem temporary freed earlier in the capture. Every replay, the temporary's recorded dispatches overwrote the ranges first. Now only buffers of 64 KiB or more are pooled or served. A large range array in reused memory raises at `metal_capture_range_begin`. Deterministic scratch pools allocated during a capture record their zeroing. Pour recordings at 1, 64 and 2,048 worlds: eager and captured finish, and captured is bitwise equal with reuse on and off. Franka-Pour's policy-step graph is finite at 2,048 worlds. Tests: `TestMetal.test_capture_range_after_small_freed_temporary`, `test_capture_range_in_reused_memory_raises`. |
 +
 +The same seven code commits are exported as `patches/warp/0001-0007` in MetalSim; applying them to `ce15f6bb`
 +gives the tree of `f194006a`. Tests for the Metal changes are in `warp/tests/test_metal.py`.
@@ -1019,7 +1026,7 @@ index 8e5caa690b5c7d5a1b976652ee94ccc72a1b1168..d70e298abc905acf89229ea776e6300c
          if (options | kernel.options)["enable_backward"] and not options.get("metal_forward_only"):
              if any(is_tile(v.type) for v in kernel.adj.variables):
 diff --git a/warp/_src/context.py b/warp/_src/context.py
-index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe932620e9bdfb 100644
+index a4dc60857291a0c4fe3e67d85e979f62758653aa..3787ae9c7ff86cc2f8c43e4cbcf1796629f235cd 100644
 --- a/warp/_src/context.py
 +++ b/warp/_src/context.py
 @@ -1093,9 +1093,23 @@ class KernelHooks:
@@ -1337,7 +1344,16 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe9326
                  module_exec.metal_backward_error = backward_error  # set when the adjoints failed to compile
                  self.execs[(device.context, active_block_dim)] = module_exec
  
-@@ -6961,6 +7114,8 @@ class Runtime:
+@@ -6954,6 +7107,8 @@ class Runtime:
+             self.core.wp_metal_release_host_memory.argtypes = [ctypes.c_int, ctypes.c_void_p, ctypes.c_size_t]
+             self.core.wp_metal_release_host_memory.restype = None
+             self.core.wp_metal_capture_begin.argtypes = [ctypes.c_int]
++            self.core.wp_metal_set_capture_reuse.argtypes = [ctypes.c_int]
++            self.core.wp_metal_set_capture_reuse.restype = None
+             self.core.wp_metal_capture_begin.restype = ctypes.c_int
+             self.core.wp_metal_capture_end.argtypes = [ctypes.c_int]
+             self.core.wp_metal_capture_end.restype = ctypes.c_void_p
+@@ -6961,6 +7116,8 @@ class Runtime:
              self.core.wp_metal_graph_launch.restype = ctypes.c_int
              self.core.wp_metal_graph_destroy.argtypes = [ctypes.c_int, ctypes.c_void_p]
              self.core.wp_metal_graph_destroy.restype = None
@@ -1346,7 +1362,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe9326
              self.core.wp_metal_profile_report.argtypes = []
              self.core.wp_metal_profile_report.restype = ctypes.c_char_p
              self.core.wp_metal_load_library.argtypes = [ctypes.c_int, ctypes.c_char_p]
-@@ -6968,6 +7123,8 @@ class Runtime:
+@@ -6968,6 +7125,8 @@ class Runtime:
              self.core.wp_metal_unload_library.argtypes = [ctypes.c_void_p]
              self.core.wp_metal_unload_library.restype = None
              self.core.wp_metal_get_kernel.argtypes = [ctypes.c_void_p, ctypes.c_char_p]
@@ -1355,7 +1371,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe9326
              self.core.wp_metal_capture_push.argtypes = [ctypes.c_int]
              self.core.wp_metal_capture_push.restype = ctypes.c_int
              self.core.wp_metal_capture_pop.argtypes = [ctypes.c_int]
-@@ -6982,6 +7139,10 @@ class Runtime:
+@@ -6982,6 +7141,10 @@ class Runtime:
                  ctypes.c_int,
              ]
              self.core.wp_metal_capture_conditional.restype = ctypes.c_int
@@ -1366,7 +1382,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe9326
              self.core.wp_texture_create_metal.argtypes = [
                  ctypes.c_int,
                  ctypes.c_int,
-@@ -7015,6 +7176,14 @@ class Runtime:
+@@ -7015,6 +7178,14 @@ class Runtime:
                  ctypes.c_size_t,  # threadgroup memory bytes
              ]
              self.core.wp_metal_launch_kernel.restype = ctypes.c_int
@@ -1381,7 +1397,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe9326
              self.core.wp_metal_synchronize.argtypes = [ctypes.c_int]
              self.core.wp_metal_synchronize.restype = ctypes.c_int
              self.core.wp_metal_memset.argtypes = [ctypes.c_int, ctypes.c_void_p, ctypes.c_int, ctypes.c_size_t]
-@@ -7646,6 +7815,18 @@ class Runtime:
+@@ -7646,6 +7817,18 @@ class Runtime:
              self.core.wp_bvh_refit_device.argtypes = [ctypes.c_uint64]
              self.core.wp_bvh_rebuild_device.argtypes = [ctypes.c_uint64]
  
@@ -1400,7 +1416,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe9326
              self.core.wp_mesh_create_host.restype = ctypes.c_uint64
              self.core.wp_mesh_create_host.argtypes = [
                  warp._src.types.array_t,
-@@ -11298,6 +11479,9 @@ def _metal_pointer_offsets(struct_type, base=0):
+@@ -11298,6 +11481,9 @@ def _metal_pointer_offsets(struct_type, base=0):
          elif issubclass(field_type, warp._src.types.fabricarray_t):
              raise NotImplementedError(f"{field_type.__name__} kernel arguments are not supported on Metal devices")
          elif issubclass(field_type, ctypes.Structure):
@@ -1410,7 +1426,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe9326
              offsets.extend(_metal_pointer_offsets(field_type, offset))
          elif issubclass(field_type, ctypes.Array) and issubclass(field_type._type_, ctypes.Structure):
              for i in range(field_type._length_):
-@@ -11305,15 +11489,89 @@ def _metal_pointer_offsets(struct_type, base=0):
+@@ -11305,15 +11491,89 @@ def _metal_pointer_offsets(struct_type, base=0):
      return offsets
  
  
@@ -1502,7 +1518,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe9326
      if adjoint:
          # the backward entry point reads both structs from one buffer (wp_bwd_args_<kernel>)
          combined_type = getattr(kernel, "_metal_bwd_args_type", None)
-@@ -11323,16 +11581,31 @@ def invoke_metal(kernel, hooks, params: Sequence[Any], device: Device, block_dim
+@@ -11323,16 +11583,31 @@ def invoke_metal(kernel, hooks, params: Sequence[Any], device: Device, block_dim
              )
              kernel._metal_bwd_args_type = combined_type
          args = combined_type(args, adj_args)
@@ -1538,7 +1554,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe9326
          block_dim,  # the module was compiled for this threadgroup size (WP_TILE_BLOCK_DIM)
          ctypes.byref(bounds),
          ctypes.sizeof(bounds),
-@@ -11341,7 +11614,22 @@ def invoke_metal(kernel, hooks, params: Sequence[Any], device: Device, block_dim
+@@ -11341,7 +11616,22 @@ def invoke_metal(kernel, hooks, params: Sequence[Any], device: Device, block_dim
          offsets,
          len(offsets),
          hooks.backward_smem_bytes if adjoint else hooks.forward_smem_bytes,
@@ -1561,7 +1577,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe9326
          message = runtime.get_error_string()
  
          def foreign_arrays(label, value):
-@@ -11496,6 +11784,7 @@ class Launch:
+@@ -11496,6 +11786,7 @@ class Launch:
          adjoint: bool = False,
          fwd_args: list[Any] | None = None,
          adj_args: list[Any] | None = None,
@@ -1569,7 +1585,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe9326
      ):
          block_dim = _resolve_launch_block_dim(device, block_dim)
  
-@@ -11587,6 +11876,9 @@ class Launch:
+@@ -11587,6 +11878,9 @@ class Launch:
          self.fwd_args = fwd_args
          self.adj_args = adj_args
  
@@ -1579,7 +1595,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe9326
      def set_dim(self, dim: int | list[int] | tuple[int, ...]):
          """Set the launch dimensions.
  
-@@ -11799,7 +12091,15 @@ class Launch:
+@@ -11799,7 +12093,15 @@ class Launch:
          """
          apic_capture = _get_apic_capture_for_device(self.device)
          if self.device.is_metal:
@@ -1596,7 +1612,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe9326
          elif self.device.is_cpu:
              if apic_capture is not None:
                  # Under an active APIC CPU capture, record the launch so it
-@@ -12067,6 +12367,15 @@ def _resolve_launch_block_dim(device: Device, block_dim: int | None) -> int:
+@@ -12067,6 +12369,15 @@ def _resolve_launch_block_dim(device: Device, block_dim: int | None) -> int:
      return block_dim
  
  
@@ -1612,7 +1628,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe9326
  def launch(
      kernel,
      dim: int | Sequence[int],
-@@ -12081,6 +12390,7 @@ def launch(
+@@ -12081,6 +12392,7 @@ def launch(
      record_cmd: bool = False,
      max_blocks: int = 0,
      block_dim: int | None = None,
@@ -1620,7 +1636,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe9326
  ):
      """Launch a Warp kernel on the target device
  
-@@ -12124,6 +12434,15 @@ def launch(
+@@ -12124,6 +12436,15 @@ def launch(
            values from 2 through 1024 are honored when
            :attr:`warp.config.enable_cpu_blocks` is ``True`` and otherwise
            resolve to 1.
@@ -1636,7 +1652,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe9326
      """
  
      init()
-@@ -12152,6 +12471,9 @@ def launch(
+@@ -12152,6 +12473,9 @@ def launch(
  
      dim, total_dim_size = _normalize_launch_dim(dim)
  
@@ -1646,7 +1662,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe9326
      if total_dim_size > 0:
          fwd_args = []
          fwd_args.extend(inputs)
-@@ -12270,6 +12592,43 @@ def launch(
+@@ -12270,6 +12594,43 @@ def launch(
                  module_exec=module_exec,
              )
  
@@ -1690,7 +1706,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe9326
          elif device.is_metal:
              if adjoint and hooks.backward is None:
                  if module_exec.metal_backward_error:
-@@ -12294,8 +12653,9 @@ def launch(
+@@ -12294,8 +12655,9 @@ def launch(
                      adjoint=adjoint,
                      fwd_args=fwd_args,
                      adj_args=adj_args,
@@ -1701,7 +1717,15 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe9326
  
          # run kernel
          elif device.is_cpu:
-@@ -13765,6 +14125,29 @@ def capture_begin(
+@@ -13672,6 +14034,7 @@ def capture_begin(
+     if device.is_metal:
+         if force_module_load:
+             force_load(device)
++        runtime.core.wp_metal_set_capture_reuse(int(bool(warp.config.metal_capture_reuse)))
+         if runtime.core.wp_metal_capture_begin(device.metal_ordinal) != 0:
+             raise RuntimeError(runtime.get_error_string())
+         if apic:
+@@ -13765,6 +14128,29 @@ def capture_begin(
      _register_capture(device, stream, graph, capture_id)
  
  
@@ -1731,7 +1755,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe9326
  def capture_end(device: DeviceLike = None, stream: Stream | None = None) -> Graph:
      """End the capture of a graph.
  
-@@ -14165,6 +14548,15 @@ def capture_if(
+@@ -14165,6 +14551,15 @@ def capture_if(
      if device.is_metal and device.is_capturing:
          _metal_capture_conditional(device, False, condition, on_true, on_false, kwargs)
          return
@@ -1747,7 +1771,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe9326
      if graph is None:
          # if no graph is active, just execute the correct branch directly
          condition_value = _read_condition(condition, device, stream)
-@@ -14384,6 +14776,12 @@ def capture_while(condition: warp.array[int], while_body: Callable | Graph, stre
+@@ -14384,6 +14779,12 @@ def capture_while(condition: warp.array[int], while_body: Callable | Graph, stre
      if device.is_metal and device.is_capturing:
          _metal_capture_conditional(device, True, condition, while_body, None, kwargs)
          return
@@ -1760,7 +1784,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe9326
      if graph is None:
          # since no graph is active, just execute the kernels directly
          while True:
-@@ -15026,6 +15424,9 @@ def copy(
+@@ -15026,6 +15427,9 @@ def copy(
                  stream.wait_stream(src.device.stream)
              else:
                  src = src.contiguous()
@@ -1770,7 +1794,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..b36c56ebe41b38a120f80db156fe9326
  
          # The source is now contiguous.  If the destination is not contiguous,
          # clone a contiguous copy on the destination device.
-@@ -15216,9 +15617,18 @@ def copy(
+@@ -15216,9 +15620,18 @@ def copy(
                      "(strided / indexed / fabric); copy the underlying contiguous arrays first or "
                      "move the copy outside the capture."
                  )
@@ -2367,7 +2391,7 @@ index 07a2e6ef26068ff780922f3d125c451e1b8d1d9a..c5fec85223800ca69ad9dcd06a405b40
  
          return space_to_partition
 diff --git a/warp/_src/fem/space/restriction.py b/warp/_src/fem/space/restriction.py
-index 6d1cc95c4950feffeef9a7252ad4dfd0dfb66fb0..f25fab83546e3c31075be05121f24913b0a853bc 100644
+index 6d1cc95c4950feffeef9a7252ad4dfd0dfb66fb0..ff9e04ac81c8fc607b4c9b4d6dd560a63905f9b7 100644
 --- a/warp/_src/fem/space/restriction.py
 +++ b/warp/_src/fem/space/restriction.py
 @@ -7,7 +7,7 @@ import warp as wp
@@ -2423,15 +2447,16 @@ index 6d1cc95c4950feffeef9a7252ad4dfd0dfb66fb0..f25fab83546e3c31075be05121f24913
          )
  
          # Build compressed map from node to element indices
-@@ -127,6 +150,7 @@ class SpaceRestriction:
+@@ -127,6 +150,8 @@ class SpaceRestriction:
              unique_node_indices=self._dof_partition_indices,
              return_unique_nodes=True,
              temporary_store=temporary_store,
 +            index_count_limit=slot_bound,
++            keep_ignored_array_indices=False,  # _split_vertex_element_index reads only the kept ones
          )
  
          # Extract element index and index in element
-@@ -146,7 +170,7 @@ class SpaceRestriction:
+@@ -146,7 +171,7 @@ class SpaceRestriction:
                  self._dof_indices_in_element,
              ],
              device=flattened_node_indices.device,
@@ -2440,7 +2465,7 @@ index 6d1cc95c4950feffeef9a7252ad4dfd0dfb66fb0..f25fab83546e3c31075be05121f24913
  
          node_array_indices.release()
          element_node_indices.release()
-@@ -165,6 +189,14 @@ class SpaceRestriction:
+@@ -165,6 +190,14 @@ class SpaceRestriction:
          """Upper bound for the node count, use ``node_count_sync`` to get the actual value."""
          return self._node_count
  
@@ -2455,7 +2480,7 @@ index 6d1cc95c4950feffeef9a7252ad4dfd0dfb66fb0..f25fab83546e3c31075be05121f24913
      def partition_element_offsets(self):
          """Return offsets into the per-node element index arrays."""
          return self._dof_partition_element_offsets
-@@ -222,6 +254,10 @@ class SpaceRestriction:
+@@ -222,6 +255,10 @@ class SpaceRestriction:
          index_in_element = args.dof_indices_in_element[node_element_offset]
          return NodeElementIndex(domain_element_index, index_in_element)
  
@@ -2467,18 +2492,19 @@ index 6d1cc95c4950feffeef9a7252ad4dfd0dfb66fb0..f25fab83546e3c31075be05121f24913
      def _split_vertex_element_index(
          nodes_per_element: int,
 diff --git a/warp/_src/fem/utils.py b/warp/_src/fem/utils.py
-index f91bca38cd782d83a45c2c43408508be7a981bf5..aab2827db060ffc71767e63d04b1f96fa8476a5f 100644
+index f91bca38cd782d83a45c2c43408508be7a981bf5..17ee596323c76488c93a7fa050ffd7146c35a5d4 100644
 --- a/warp/_src/fem/utils.py
 +++ b/warp/_src/fem/utils.py
-@@ -72,6 +72,7 @@ def compress_node_indices(
+@@ -72,6 +72,8 @@ def compress_node_indices(
      unique_node_count: wp.array(dtype=int) = None,
      unique_node_indices: wp.array(dtype=int) = None,
      temporary_store: cache.TemporaryStore = None,
 +    index_count_limit: wp.array | None = None,
++    keep_ignored_array_indices: bool = True,
  ) -> (
      tuple[cache.Temporary, cache.Temporary] | tuple[cache.Temporary, cache.Temporary, cache.Temporary, cache.Temporary]
  ):
-@@ -87,6 +88,12 @@ def compress_node_indices(
+@@ -87,6 +89,14 @@ def compress_node_indices(
      ``[0, node_count)``, will be ignored.
  
      If the ``node_offsets``, ``sorted_array_indices``, ``unique_node_count`` and ``unique_node_indices`` arrays are provided and adequately shaped, they will be used to store the results instead of creating new arrays.
@@ -2487,11 +2513,24 @@ index f91bca38cd782d83a45c2c43408508be7a981bf5..aab2827db060ffc71767e63d04b1f96f
 +    later are ignored, as if they were ``NULL_NODE_INDEX`` (for instance the unused part of a fixed-capacity buffer;
 +    their ``sorted_array_indices`` entries stay in place, at the end). On Metal the sort and the run-length encoding
 +    then process only the first ``n`` indices, with dispatches sized on the GPU; elsewhere they process all of them.
-+    The results are the same on every device.
++    The results are the same on every device. With ``keep_ignored_array_indices=False`` the caller does not read the
++    ``sorted_array_indices`` entries of the ignored positions (past ``node_offsets[node_count]``), and on Metal they
++    are left unwritten.
      """
  
      index_count = node_indices.size
-@@ -102,11 +109,27 @@ def compress_node_indices(
+@@ -98,15 +108,36 @@ def compress_node_indices(
+         if sorted_array_indices is None or sorted_array_indices.shape != sorted_node_indices.shape:
+             sorted_array_indices = cache.borrow_temporary_like(sorted_node_indices, temporary_store)
+ 
++        # Ignored indices sort last (NULL_NODE_INDEX is the largest key) and keep their order, so with a bound the
++        # sort and the run-length encoding may stop at the last index that can be valid
++        bounded = index_count_limit is not None and _metal_gpu_utilities(device)
++
++        # With the bound, the sort and the run-length encoding never read the keys past it (the sort leaves those
++        # pairs in place), so their keys are not written; their array indices only if the caller reads them.
++        tail_mode = 0 if not bounded else (1 if keep_ignored_array_indices else 2)
+         indices_per_element = 1 if node_indices.ndim == 1 else node_indices.shape[-1]
          wp.launch(
              kernel=_prepare_node_sort_kernel,
              dim=index_count,
@@ -2503,13 +2542,11 @@ index f91bca38cd782d83a45c2c43408508be7a981bf5..aab2827db060ffc71767e63d04b1f96f
 +                sorted_array_indices,
 +                indices_per_element,
 +                index_count_limit,
++                tail_mode,
 +            ],
++            **({"dim_limit": index_count_limit} if tail_mode == 2 else {}),
          )
  
-+        # Ignored indices sort last (NULL_NODE_INDEX is the largest key) and keep their order, so with a bound the
-+        # sort and the run-length encoding may stop at the last index that can be valid
-+        bounded = index_count_limit is not None and _metal_gpu_utilities(device)
-+
          # Sort indices
 -        radix_sort_pairs(sorted_node_indices, sorted_array_indices, count=index_count)
 +        if bounded:
@@ -2521,7 +2558,7 @@ index f91bca38cd782d83a45c2c43408508be7a981bf5..aab2827db060ffc71767e63d04b1f96f
  
          # Build prefix sum of number of elements per node
          node_element_counts = cache.borrow_temporary(temporary_store, shape=index_count, dtype=int)
-@@ -118,13 +141,24 @@ def compress_node_indices(
+@@ -118,13 +149,24 @@ def compress_node_indices(
          if owns_unique_node_count:
              unique_node_count = cache.borrow_temporary(temporary_store, shape=(1,), dtype=int)
  
@@ -2553,7 +2590,7 @@ index f91bca38cd782d83a45c2c43408508be7a981bf5..aab2827db060ffc71767e63d04b1f96f
  
          # Scatter seen run counts to global array of element count per node
          if node_offsets is None or node_offsets.shape != (node_count + 1,):
-@@ -153,6 +187,18 @@ def compress_node_indices(
+@@ -153,6 +195,18 @@ def compress_node_indices(
          return node_offsets, sorted_array_indices, unique_node_count, unique_node_indices
  
  
@@ -2572,7 +2609,7 @@ index f91bca38cd782d83a45c2c43408508be7a981bf5..aab2827db060ffc71767e63d04b1f96f
  def validate_indices_in_range(
      upper_bound: int,
      indices: wp.array[int],
-@@ -213,6 +259,7 @@ def masked_indices(
+@@ -213,6 +267,7 @@ def masked_indices(
      local_to_global: wp.array | None = None,
      global_to_local: wp.array | None = None,
      temporary_store: cache.TemporaryStore = None,
@@ -2580,7 +2617,7 @@ index f91bca38cd782d83a45c2c43408508be7a981bf5..aab2827db060ffc71767e63d04b1f96f
  ) -> tuple[wp.array, wp.array]:
      """
      From an array of boolean masks (must be either 0 or 1), returns:
-@@ -222,6 +269,9 @@ def masked_indices(
+@@ -222,6 +277,9 @@ def masked_indices(
      If ``max_index_count`` is provided, it will be used to limit the number of indices returned instead of synchronizing back to the host
  
      If ``local_to_global`` and ``global_to_local`` are provided and adequately sized, they will be used to store the indices instead of creating new arrays.
@@ -2590,7 +2627,7 @@ index f91bca38cd782d83a45c2c43408508be7a981bf5..aab2827db060ffc71767e63d04b1f96f
      """
  
      if global_to_local is None or global_to_local.shape != mask.shape:
-@@ -232,6 +282,14 @@ def masked_indices(
+@@ -232,6 +290,14 @@ def masked_indices(
  
      array_scan(mask, offsets, inclusive=True)
  
@@ -2605,21 +2642,26 @@ index f91bca38cd782d83a45c2c43408508be7a981bf5..aab2827db060ffc71767e63d04b1f96f
      # Get back total counts (on host if no estimate is provided)
      local_count = (
          min(max_index_count, mask.shape[0])
-@@ -265,9 +323,13 @@ def _prepare_node_sort_kernel(
+@@ -265,8 +331,18 @@ def _prepare_node_sort_kernel(
      sort_keys: wp.array(dtype=int),
      sort_values: wp.array(dtype=int),
      divisor: int,
 +    index_count_limit: wp.array(dtype=int),
++    tail_mode: int,
  ):
      i = wp.tid()
-     node = node_indices[i]
 +    if index_count_limit:
 +        if i >= index_count_limit[0]:
-+            node = NULL_NODE_INDEX
++            # 0: ignored (NULL key, array index kept); 1: array index only; 2: nothing (see compress_node_indices)
++            if tail_mode == 0:
++                sort_keys[i] = NULL_NODE_INDEX
++            if tail_mode <= 1:
++                sort_values[i] = i // divisor
++            return
+     node = node_indices[i]
      sort_keys[i] = wp.where(node >= 0 and node < node_count, node, NULL_NODE_INDEX)
      sort_values[i] = i // divisor
- 
-@@ -307,6 +369,16 @@ def _scatter_node_counts(
+@@ -307,6 +383,16 @@ def _scatter_node_counts(
      node_counts[1 + node_index] = unique_counts[i]
  
  
@@ -2768,10 +2810,10 @@ index 0000000000000000000000000000000000000000..7a350ff5927abf75f614857c9896e545
 +    return True
 diff --git a/warp/_src/metal_deterministic.py b/warp/_src/metal_deterministic.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..c8c9adcca36bb9a5ea30c049b0d1749734b678f0
+index 0000000000000000000000000000000000000000..a8af6b3ca3aba2c6cb5a67fd5952aa4868fe042e
 --- /dev/null
 +++ b/warp/_src/metal_deterministic.py
-@@ -0,0 +1,1385 @@
+@@ -0,0 +1,1392 @@
 +# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 +# SPDX-License-Identifier: Apache-2.0
 +
@@ -3528,14 +3570,21 @@ index 0000000000000000000000000000000000000000..c8c9adcca36bb9a5ea30c049b0d17497
 +    def get(self, nbytes: int):
 +        if not self.buffers or self.buffers[-1].size < nbytes:
 +            size = max(nbytes, 2 * self.buffers[-1].size if self.buffers else 0, 1 << 16)
-+            self.buffers.append(_host_zeroed(size, wp.uint8, self.device))
++            self.buffers.append(_host_zeroed(size, wp.uint8, self.device, record=True))
 +        return self.buffers[-1]
 +
 +
-+def _host_zeroed(n, dtype, device):
-+    """A new device array zeroed from the host (Metal memory is shared), so this works during graph capture."""
++def _host_zeroed(n, dtype, device, record=False):
++    """A new device array zeroed from the host (Metal memory is shared), so this works during graph capture.
++
++    ``record``: during a capture, also record the zeroing. With ``warp.config.metal_capture_reuse`` an array of 64 KiB
++    or more may occupy memory that dispatches recorded earlier in the capture write at every replay; the deterministic
++    passes need their scratch zero from here on. (Smaller arrays never take reused memory, and the plan buffer, filled
++    from the host after this, must not be cleared at replay.)"""
 +    arr = wp.empty(n, dtype=dtype, device=device)
 +    ctypes.memset(arr.ptr, 0, n * type_size_in_bytes(dtype))
++    if record and device.is_capturing:
++        arr.zero_()
 +    return arr
 +
 +
@@ -5349,10 +5398,10 @@ index 0000000000000000000000000000000000000000..ce1ac2e8df4280ab3ce32fc8a1db2f32
 +    return True
 diff --git a/warp/_src/metal_sparse.py b/warp/_src/metal_sparse.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..9e3d0c13cd2db0ada27ff562dbaacf8c697b48b7
+index 0000000000000000000000000000000000000000..fe0fa63700180c3cfc45e1f59eaab128998a6371
 --- /dev/null
 +++ b/warp/_src/metal_sparse.py
-@@ -0,0 +1,602 @@
+@@ -0,0 +1,661 @@
 +# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 +# SPDX-License-Identifier: Apache-2.0
 +
@@ -5663,6 +5712,22 @@ index 0000000000000000000000000000000000000000..9e3d0c13cd2db0ada27ff562dbaacf8c
 +
 +
 +@wp.kernel(enable_backward=False)
++def _transpose_offsets_counted(
++    count: wp.array[int], row_count: int, sentinel: wp.int64, keys: wp.array[Any], transposed_offsets: wp.array[int]
++):
++    # _transpose_offsets with the search limited to the first count[0] keys (the sorted prefix; every key past it
++    # is the sentinel, which no target exceeds, so the lower bound is the same), and no search for the columns past
++    # the last kept key, whose lower bound is the number of kept keys
++    col = wp.tid()
++    n = count[0]
++    target = wp.min(wp.int64(col) * wp.int64(row_count), sentinel)
++    if n > 0 and wp.int64(keys[n - 1]) < target:
++        transposed_offsets[col] = n
++    else:
++        transposed_offsets[col] = _key_lower_bound(keys, n, target)
++
++
++@wp.kernel(enable_backward=False)
 +def _transpose_columns(
 +    n: int,
 +    row_count: int,
@@ -5680,6 +5745,28 @@ index 0000000000000000000000000000000000000000..9e3d0c13cd2db0ada27ff562dbaacf8c
 +        if write_columns != 0:
 +            transposed_columns[i] = int(key - (key // wp.int64(row_count)) * wp.int64(row_count))
 +    elif write_columns != 0:
++        transposed_columns[i] = -1
++
++
++@wp.kernel(enable_backward=False)
++def _transpose_columns_counted(
++    count: wp.array[int],
++    row_count: int,
++    sentinel: wp.int64,
++    keys: wp.array[Any],
++    sorted_indices: wp.array[int],
++    transposed_columns: wp.array[int],
++    block_indices: wp.array[int],
++):
++    # _transpose_columns (compact form) without reading the keys past count[0]: they are all the sentinel
++    i = wp.tid()
++    key = sentinel
++    if i < count[0]:
++        key = wp.int64(keys[i])
++    if key < sentinel:
++        block_indices[i] = sorted_indices[i]
++        transposed_columns[i] = int(key - (key // wp.int64(row_count)) * wp.int64(row_count))
++    else:
 +        transposed_columns[i] = -1
 +
 +
@@ -5903,6 +5990,12 @@ index 0000000000000000000000000000000000000000..9e3d0c13cd2db0ada27ff562dbaacf8c
 +    sentinel = col_count * row_count
 +    keys, indices, wide = _sorted_keys(device, n, sentinel)
 +
++    # Compact transposes: the destination offsets search only the sorted prefix of the stored source blocks
++    # (bsr_offsets[row_count], on the device; every key past it is the sentinel) and skip the search for the columns
++    # past the last kept key, and the column pass does not read the keys past it. Same offsets, columns (-1 past the
++    # kept blocks) and block map as the full form.
++    stored = bsr_offsets[row_count : row_count + 1]
++    bounded = (not padded) and wp.config.metal_bounded_launch
 +    if n > 0:
 +        wp.launch(
 +            _transpose_keys_u64 if wide else _transpose_keys_u32,
@@ -5911,23 +6004,31 @@ index 0000000000000000000000000000000000000000..9e3d0c13cd2db0ada27ff562dbaacf8c
 +            inputs=[row_count, bsr_offsets, bsr_row_counts, bsr_columns, wp.int64(sentinel), keys, indices],
 +        )
 +        # blocks at or past bsr_offsets[row_count] got the sentinel key above
-+        _sort(keys, indices, n, sentinel, count_limit=bsr_offsets[row_count : row_count + 1])
++        _sort(keys, indices, n, sentinel, count_limit=stored)
 +        # the sorted kept blocks first (the padded scatter below then overwrites the destination slots)
-+        wp.launch(
-+            _transpose_columns,
-+            dim=n,
-+            device=device,
-+            inputs=[
-+                n,
-+                row_count,
-+                wp.int64(sentinel),
-+                keys,
-+                indices,
-+                int(not padded),
-+                transposed_columns,
-+                block_indices,
-+            ],
-+        )
++        if bounded:
++            wp.launch(
++                _transpose_columns_counted,
++                dim=n,
++                device=device,
++                inputs=[stored, row_count, wp.int64(sentinel), keys, indices, transposed_columns, block_indices],
++            )
++        else:
++            wp.launch(
++                _transpose_columns,
++                dim=n,
++                device=device,
++                inputs=[
++                    n,
++                    row_count,
++                    wp.int64(sentinel),
++                    keys,
++                    indices,
++                    int(not padded),
++                    transposed_columns,
++                    block_indices,
++                ],
++            )
 +
 +    if padded:
 +        wp.launch(
@@ -5947,6 +6048,13 @@ index 0000000000000000000000000000000000000000..9e3d0c13cd2db0ada27ff562dbaacf8c
 +                block_indices,
 +                status,
 +            ],
++        )
++    elif bounded:
++        wp.launch(
++            _transpose_offsets_counted,
++            dim=col_count + 1,
++            device=device,
++            inputs=[stored, row_count, wp.int64(sentinel), keys, transposed_offsets],
 +        )
 +    else:
 +        wp.launch(
@@ -7811,7 +7919,7 @@ index 0000000000000000000000000000000000000000..803d7e3cc879f20b0f7fb746fb3fe8b0
 +    state.launch("vb_test_f64_fma", 0, args, _VB_PTR_OFFSETS, threads=n)
 +    return out.numpy()
 diff --git a/warp/_src/sparse.py b/warp/_src/sparse.py
-index e90f85f835ec65d8585fffc589ce44ce28856b22..53afc8303f9e736e2cb1ee0a9a8f1c924b0efd5d 100644
+index e90f85f835ec65d8585fffc589ce44ce28856b22..ef20d713c800818cc460140fe8256795946e1d6e 100644
 --- a/warp/_src/sparse.py
 +++ b/warp/_src/sparse.py
 @@ -1086,13 +1086,39 @@ def _bsr_set_from_triplets_native(
@@ -7951,7 +8059,7 @@ index e90f85f835ec65d8585fffc589ce44ce28856b22..53afc8303f9e736e2cb1ee0a9a8f1c92
              native_func = runtime.core.wp_bsr_transpose_host
          else:
              native_func = runtime.core.wp_bsr_transpose_device
-@@ -2820,19 +2872,35 @@ def bsr_set_transpose(
+@@ -2820,28 +2872,51 @@ def bsr_set_transpose(
                  _mark_apic_deferred_nnz_update(dest, apic_capture)
  
          with wp.ScopedDevice(dest.device):
@@ -8000,7 +8108,23 @@ index e90f85f835ec65d8585fffc589ce44ce28856b22..53afc8303f9e736e2cb1ee0a9a8f1c92
  
              dest._refresh_nnz_transfer_if_pending()
  
-@@ -3658,7 +3726,7 @@ def make_bsr_mm_count_coeffs(tile_size):
+             _bsr_set_compact_row_counts(dest)
+ 
++    # blocks at or past dest.offsets[src.ncol] return at once: on Metal the launch stops there (device-side bound)
++    values_bound = (
++        {"dim_limit": dest.offsets[src.ncol : src.ncol + 1]}
++        if getattr(dest.device, "is_metal", False) and wp.config.metal_bounded_launch
++        else {}
++    )
+     wp.launch(
+         _bsr_transpose_values,
+         dim=(dest.nnz, *dest.block_shape),
+         device=dest.device,
++        **values_bound,
+         inputs=[
+             src.ncol,
+             dest.scalar_type(src_scale),
+@@ -3658,7 +3733,7 @@ def make_bsr_mm_count_coeffs(tile_size):
              block_counts[x_block + 1] = block_count
              row_count += block_count
  
@@ -8244,10 +8368,10 @@ index c70ab4728fdd1464b9ca0554c7873240f1835dfa..b0031efeae7887fc33f4c661e63e150b
              _host_call(
                  values.device,
 diff --git a/warp/config.py b/warp/config.py
-index b2e7592faa78b13352551595915dd5c750bdc40c..5fd1353423a95a558cc951330ff34fd0506505c7 100644
+index b2e7592faa78b13352551595915dd5c750bdc40c..40b94ac9b80089517c8b9af04465251ca51f2070 100644
 --- a/warp/config.py
 +++ b/warp/config.py
-@@ -348,6 +348,121 @@ directly as a context manager.
+@@ -348,6 +348,127 @@ directly as a context manager.
  Note: Impacts performance when active due to call-stack introspection.
  """
  
@@ -8350,6 +8474,12 @@ index b2e7592faa78b13352551595915dd5c750bdc40c..5fd1353423a95a558cc951330ff34fd0
 +example_mpm_anymal: host waits per frame 17 -> 10, frame 41.3 -> 40.7 ms). Read at each call."""
 +
 +metal_gpu_utilities: bool = _os.environ.get("WP_METAL_GPU_UTILITIES", "1") != "0"
++
++metal_capture_reuse: bool = _os.environ.get("WP_METAL_CAPTURE_REUSE", "1") != "0"
++"""Metal graph capture: buffers of 64 KiB or more freed during a capture are reused by later allocations of the same
++capture, as in a CUDA graph's memory pool (replays are serial). Without it a capture of several simulation steps holds
++every step's temporaries at once. Read when a capture begins. Environment: ``WP_METAL_CAPTURE_REUSE``.
++"""
 +
 +metal_bounded_launch: bool = _os.environ.get("WP_METAL_BOUNDED_LAUNCH", "1") != "0"
 +"""Honor device-side launch bounds on Metal (``wp.launch(..., dim_limit=...)``, also used by ``warp.fem`` and the GPU
@@ -9370,7 +9500,7 @@ index c9d11ca81b4c727e84e2d42feb84cee6d2abba34..0917f42a14f3a13451634ccc18ed1815
  // stubs for platforms without a GPU backend
  WP_API uint64_t wp_mesh_create_device(
 diff --git a/warp/native/metal.h b/warp/native/metal.h
-index 116ee24c40df0db109d7728bd52cb52c3b64d4fc..af84ff395e134ab80955ca32ea8b12babf9d2190 100644
+index 116ee24c40df0db109d7728bd52cb52c3b64d4fc..85ca9e508c36cc9eeb6976b135f06f445ca96d78 100644
 --- a/warp/native/metal.h
 +++ b/warp/native/metal.h
 @@ -67,6 +67,31 @@ WP_API int wp_metal_launch_kernel(
@@ -9421,7 +9551,7 @@ index 116ee24c40df0db109d7728bd52cb52c3b64d4fc..af84ff395e134ab80955ca32ea8b12ba
  // Commits pending work without waiting. Returns 0 on success.
  WP_API int wp_metal_flush(int ordinal);
  // Per-kernel GPU times collected since the last call (WP_METAL_PROFILE=1), sorted, one line each.
-@@ -121,3 +152,24 @@ bool wp_metal_capture_host_op(int ordinal, std::function<bool()> op);
+@@ -121,3 +152,26 @@ bool wp_metal_capture_host_op(int ordinal, std::function<bool()> op);
  // Keeps the current error string for the next wp_metal_synchronize(); for entry points that return void.
  void wp_metal_defer_error(int ordinal);
  #endif
@@ -9445,12 +9575,29 @@ index 116ee24c40df0db109d7728bd52cb52c3b64d4fc..af84ff395e134ab80955ca32ea8b12ba
 +// Diagnostics: out[0..3] = host waits for the GPU, command buffers committed, host ops run during
 +// graph replay, kernel dispatches encoded (cumulative). Lets callers assert a loop never blocks.
 +WP_API int wp_metal_counters(int ordinal, uint64_t* out, int n);
++// Graph captures begun from now on reuse memory freed during the capture (1) or keep every allocation (0).
++WP_API void wp_metal_set_capture_reuse(int enabled);
 +}
 diff --git a/warp/native/metal.mm b/warp/native/metal.mm
-index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204fe7e386a 100644
+index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..6c1d0148ea512a85212f4b4892c9d790bc34f791 100644
 --- a/warp/native/metal.mm
 +++ b/warp/native/metal.mm
-@@ -42,6 +42,16 @@
+@@ -16,12 +16,14 @@
+ 
+ #include <algorithm>
+ #include <cstdint>
++#include <cstdio>
+ #include <cstdlib>
+ #include <cstring>
+ #include <functional>
+ #include <iterator>
+ #include <map>
+ #include <mutex>
++#include <set>
+ #include <string>
+ #include <vector>
+ 
+@@ -42,6 +44,16 @@
  // Dispatches per command buffer before it is committed. Smaller batches let the GPU start while
  // Python is still encoding a step, but every boundary drains the GPU (buffers are chained with
  // an event, see Device::event). WP_METAL_BATCH overrides the default for tuning.
@@ -9467,7 +9614,7 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
  int max_dispatches_per_command_buffer()
  {
      static const int value = [] {
-@@ -51,6 +61,46 @@ int max_dispatches_per_command_buffer()
+@@ -51,6 +63,55 @@ int max_dispatches_per_command_buffer()
      return value;
  }
  
@@ -9501,6 +9648,15 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
 +    return value;
 +}
 +
++// Memory freed during a graph capture is reused by later allocations of the same capture when the capture began with
++// reuse on (wp_metal_set_capture_reuse; Python: warp.config.metal_capture_reuse, WP_METAL_CAPTURE_REUSE). Graph
++// replays are serial, so an allocation recorded after a free can occupy the freed memory, as in a CUDA graph's memory
++// pool; see Graph::free_pool. Only buffers of at least kCaptureReuseMinBytes take part: small ones save nothing worth
++// having, and the arrays whose contents the host writes while recording (indirect execution ranges, 16 bytes each)
++// are small, so they never land in memory an earlier allocation of the capture still writes at replay.
++bool g_capture_reuse = true;
++constexpr size_t kCaptureReuseMinBytes = 64 << 10;
++
 +// WP_METAL_INFLIGHT bounds the committed-but-unfinished command buffers (see flush()).
 +int max_command_buffers_in_flight()
 +{
@@ -9514,7 +9670,7 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
  // Warp may call into the runtime from several Python threads; the device state is not thread-safe.
  std::recursive_mutex& runtime_mutex()
  {
-@@ -69,6 +119,12 @@ int max_dispatches_per_command_buffer()
+@@ -69,6 +130,12 @@ int max_dispatches_per_command_buffer()
          size_t threadgroup_bytes;
          size_t bounds_offset, bounds_size;  // bounds_size 0: memory kernel (arguments only)
          size_t args_offset, args_size;
@@ -9527,10 +9683,18 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
      };
      struct HostOp {
          size_t before_dispatch;  // runs once the dispatches before this index have completed
-@@ -81,6 +137,32 @@ int max_dispatches_per_command_buffer()
+@@ -81,6 +148,40 @@ int max_dispatches_per_command_buffer()
      std::vector<std::pair<size_t, size_t>> fixups;  // (field offset, data offset): field = data GPU address
      id<MTLBuffer> buffer;  // bytes uploaded at capture end
      std::vector<id<MTLBuffer>> retained;  // freed during capture but referenced by the recording
++    // Buffers allocated during this capture and freed during it, keyed by length: later allocations of the same
++    // capture take them instead of new memory (wp_alloc_metal), since replays run the recorded work in order (the
++    // dispatches that used a buffer before its free have completed when the ones recorded after its reuse run).
++    // Without reuse a capture holds every temporary of every step it records at once: Isaac Lab's Franka-Pour policy
++    // step (4 simulation steps) at 2,048 worlds allocated 70.7 GB against the device's 55.7 GB working set and
++    // replayed NaN, since memory past the working set is not resident. Moved to `retained` at capture end.
++    std::multimap<size_t, id<MTLBuffer>> free_pool;
++    bool reuse = false;  // reuse was on when the capture began
 +    // Replay: the dispatches encoded once into an indirect command buffer (with a barrier between
 +    // consecutive commands), executed with one call per launch instead of re-encoding every dispatch.
 +    // Built lazily on the first launch; graphs with host ops keep the per-dispatch path.
@@ -9560,7 +9724,7 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
  };
  
  struct Device {
-@@ -97,6 +179,10 @@ int max_dispatches_per_command_buffer()
+@@ -97,6 +198,10 @@ int max_dispatches_per_command_buffer()
  
      std::map<uintptr_t, id<MTLBuffer>> allocations;  // keyed by host base address
      std::vector<id<MTLBuffer>> deferred_frees;  // freed while GPU work may still use them
@@ -9571,7 +9735,25 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
  
      // Foreign host memory (NumPy, Torch) wrapped page-aligned with newBufferWithBytesNoCopy so kernels can
      // address it in place; keyed by page base, released when the last importing array is freed.
-@@ -134,6 +220,8 @@ int max_dispatches_per_command_buffer()
+@@ -122,6 +227,17 @@ int max_dispatches_per_command_buffer()
+     // Buffers allocated while a capture was open: the recording bakes their GPU addresses into its argument
+     // blocks, so the graph keeps them alive when the array is freed later (like a CUDA graph's memory pool).
+     std::map<uintptr_t, Graph*> capture_owned;
++    // Buffers kept alive only by graphs (freed by their arrays during or after a capture), with the number of graphs
++    // holding each. They stay in the translation table: a recorded kernel may reach them through an array descriptor
++    // stored in device memory (an array of structs written before the capture), which is translated at replay.
++    std::map<uintptr_t, std::pair<id<MTLBuffer>, int>> graph_memory;
++    // Capture-owned allocations whose contents the host wrote while recording (host-to-device copies are not
++    // recorded: they happen at capture time). Their memory holds data the replays read, so it is never reused.
++    std::set<uintptr_t> capture_host_written;
++    // Capture-owned allocations served from Graph::free_pool: memory that dispatches recorded earlier in the capture
++    // write at replay, so the host must not write contents into it at capture time (see wp_metal_capture_range_begin).
++    std::set<uintptr_t> capture_reused;
++    bool warned_working_set = false;
+     // A GPU failure observed where it cannot be returned (freeing memory); raised by the next synchronize.
+     std::string deferred_error;
+ 
+@@ -134,6 +250,8 @@ int max_dispatches_per_command_buffer()
      id<MTLLogState> log_state;  // shader logging (printf) delivered to stdout
      std::string kernel_assertion;  // first error-level kernel log since the last report (see retire_completed)
      id<MTLComputePipelineState> memcpy_kernel;
@@ -9580,7 +9762,7 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
  
      id<MTLCommandBuffer> command_buffer;  // open command buffer, if any
      // Buffers are untracked (kernels use raw GPU addresses), so consecutive command buffers would
-@@ -142,6 +230,9 @@ int max_dispatches_per_command_buffer()
+@@ -142,6 +260,9 @@ int max_dispatches_per_command_buffer()
      uint64_t event_value = 0;
      id<MTLComputeCommandEncoder> encoder;  // open encoder on command_buffer, if any
      int num_dispatches = 0;
@@ -9590,16 +9772,39 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
      std::vector<id<MTLCommandBuffer>> in_flight;  // committed but not yet known to be complete
  
      ~Device()
-@@ -323,6 +414,8 @@ void commit_residency(Device& dev)
+@@ -323,6 +444,31 @@ void commit_residency(Device& dev)
  bool has_pending_work(const Device& dev) { return dev.command_buffer != nil || !dev.in_flight.empty(); }
  
  // Drops command buffers that have finished executing. Returns false if any of them failed.
 +void release_buffers(Device& dev, std::vector<id<MTLBuffer>>& buffers);
 +
++// Makes graph hold buffer (see Device::graph_memory).
++void graph_retain(Device& dev, std::vector<id<MTLBuffer>>& retained, id<MTLBuffer> buffer)
++{
++    retained.push_back(buffer);
++    auto& entry = dev.graph_memory[uintptr_t(buffer.contents)];
++    entry.first = buffer;
++    ++entry.second;
++    dev.table_dirty = true;
++}
++
++// Releases the buffers a graph holds once no submitted work can use them.
++void graph_release(Device& dev, std::vector<id<MTLBuffer>>& retained)
++{
++    for (id<MTLBuffer> buffer : retained) {
++        auto it = dev.graph_memory.find(uintptr_t(buffer.contents));
++        if (it != dev.graph_memory.end() && --it->second.second <= 0)
++            dev.graph_memory.erase(it);
++        dev.deferred_frees.push_back(buffer);
++    }
++    retained.clear();
++    dev.table_dirty = true;
++}
++
  bool retire_completed(Device& dev)
  {
      bool ok = true;
-@@ -340,6 +433,16 @@ bool retire_completed(Device& dev)
+@@ -340,6 +486,16 @@ bool retire_completed(Device& dev)
      };
      std::vector<id<MTLCommandBuffer>>& in_flight = dev.in_flight;
      in_flight.erase(std::remove_if(in_flight.begin(), in_flight.end(), finished), in_flight.end());
@@ -9616,7 +9821,7 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
      if (in_flight.empty() && !dev.kernel_assertion.empty()) {
          wp::set_error_string("Metal kernel assertion failed: %s", dev.kernel_assertion.c_str());
          dev.kernel_assertion.clear();  // reported once, like a CUDA trap surfacing at synchronize
-@@ -404,20 +507,56 @@ bool flush(Device& dev)
+@@ -404,20 +560,56 @@ bool flush(Device& dev)
          commit_residency(dev);
          [dev.command_buffer encodeSignalEvent:dev.event value:++dev.event_value];
          [dev.command_buffer commit];
@@ -9674,7 +9879,17 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
      dev.args_ring_offset = 0;
      release_buffers(dev, dev.deferred_frees);
      return ok;
-@@ -667,6 +806,40 @@ kernel void wp_memcpy(constant memcpy_args_t& a [[buffer(0)]], uint i [[thread_p
+@@ -499,6 +691,9 @@ void refresh_table(Device& dev)
+     ranges.reserve(dev.allocations.size() + dev.imports.size());
+     for (const auto& kv : dev.allocations)
+         ranges.push_back({ uint64_t(kv.first), uint64_t(kv.second.length), kv.second.gpuAddress });
++    for (const auto& kv : dev.graph_memory)
++        if (!dev.allocations.count(kv.first))  // not reused by a live allocation
++            ranges.push_back({ uint64_t(kv.first), uint64_t(kv.second.first.length), kv.second.first.gpuAddress });
+     for (const auto& kv : dev.imports)
+         ranges.push_back({ uint64_t(kv.first), uint64_t(kv.second.buffer.length), kv.second.buffer.gpuAddress });
+     std::sort(ranges.begin(), ranges.end(), [](const Range& a, const Range& b) { return a.host < b.host; });
+@@ -667,6 +862,40 @@ kernel void wp_memcpy(constant memcpy_args_t& a [[buffer(0)]], uint i [[thread_p
          for (unsigned long j = begin; j < end; ++j) a.dst[j] = a.src[j];
      }
  }
@@ -9715,7 +9930,7 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
  // Checks the assumption behind the shared-tile arena (tile.h): the threadgroup buffer bound at
  // index 0 starts at threadgroup address 0. Writes through the constant address, reads through
  // the bound pointer.
-@@ -692,6 +865,7 @@ bool load_memory_kernels(Device& dev)
+@@ -692,6 +921,7 @@ bool load_memory_kernels(Device& dev)
          MTLComputePipelineDescriptor* descriptor = [MTLComputePipelineDescriptor new];
          descriptor.computeFunction = [library newFunctionWithName:name];
          descriptor.label = name;
@@ -9723,7 +9938,7 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
          return descriptor.computeFunction ? [dev.device newComputePipelineStateWithDescriptor:descriptor
                                                                                        options:MTLPipelineOptionNone
                                                                                     reflection:nil
-@@ -701,8 +875,11 @@ bool load_memory_kernels(Device& dev)
+@@ -701,8 +931,11 @@ bool load_memory_kernels(Device& dev)
      dev.memset_kernel = pipeline(@"wp_memset");
      dev.memtile_kernel = pipeline(@"wp_memtile");
      dev.memcpy_kernel = pipeline(@"wp_memcpy");
@@ -9736,7 +9951,7 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
          wp::set_error_string("Failed to create Metal memory kernel pipelines: %s", error_description(error));
          dev.memcpy_kernel = nil;
          return false;
-@@ -759,7 +936,7 @@ bool dispatch_memory_kernel(
+@@ -759,7 +992,7 @@ bool dispatch_memory_kernel(
      [encoder dispatchThreads:MTLSizeMake((num_bytes + 15) / 16, 1, 1) threadsPerThreadgroup:MTLSizeMake(256, 1, 1)];
      if (profiler().enabled)
          return profile_dispatch(dev, kernel.label.UTF8String);
@@ -9745,7 +9960,81 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
  }
  
  }  // anonymous namespace
-@@ -1032,6 +1209,7 @@ void wp_metal_unload_library(void* library)
+@@ -814,6 +1047,25 @@ int wp_metal_device_has_unified_memory(int ordinal)
+         Device* dev = get_device(ordinal);
+         if (!dev)
+             return nullptr;
++        Graph* recording = dev->capture ? (dev->capture_stack.empty() ? dev->capture : dev->capture_stack.front())
++                                        : nullptr;
++        if (recording && recording->reuse && size >= kCaptureReuseMinBytes && !recording->free_pool.empty()) {
++            // smallest pooled buffer that holds the request, if it is at most twice as large
++            const size_t want = std::max(size, size_t(1));
++            auto fit = recording->free_pool.lower_bound(want);
++            if (fit != recording->free_pool.end() && fit->first <= std::max(2 * want, want + 4096)) {
++                id<MTLBuffer> buffer = fit->second;
++                recording->free_pool.erase(fit);
++                void* ptr = buffer.contents;
++                dev->allocations[uintptr_t(ptr)] = buffer;  // never left the residency set
++                dev->capture_owned[uintptr_t(ptr)] = recording;
++                dev->capture_reused.insert(uintptr_t(ptr));
++                dev->table_dirty = true;
++                if (g_alloc_tracker.enabled)
++                    g_alloc_tracker.record_alloc(ptr, size, ALLOC_KIND_DEVICE, ordinal);
++                return ptr;
++            }
++        }
+         // Buffers are never bound to encoders (kernels use raw GPU addresses), so hazard tracking is pointless.
+         MTLResourceOptions options = MTLResourceStorageModeShared | MTLResourceHazardTrackingModeUntracked;
+         id<MTLBuffer> buffer = [dev->device newBufferWithLength:std::max(size, size_t(1)) options:options];
+@@ -825,11 +1077,22 @@ int wp_metal_device_has_unified_memory(int ordinal)
+         }
+         void* ptr = buffer.contents;
+         dev->allocations[uintptr_t(ptr)] = buffer;
+-        if (dev->capture)
+-            dev->capture_owned[uintptr_t(ptr)] = dev->capture_stack.empty() ? dev->capture : dev->capture_stack.front();
++        if (recording)
++            dev->capture_owned[uintptr_t(ptr)] = recording;
+         [dev->residency_set addAllocation:buffer];
+         dev->residency_dirty = true;
+         dev->table_dirty = true;
++        if (!dev->warned_working_set && dev->device.currentAllocatedSize > dev->device.recommendedMaxWorkingSetSize) {
++            // past the working set not every buffer is resident: kernels then read wrong data without any error
++            dev->warned_working_set = true;
++            fprintf(
++                stderr,
++                "Warp Metal warning: %.1f GB allocated on device \"%s\", more than its working set of %.1f GB; "
++                "kernels may read non-resident memory and produce wrong results\n",
++                dev->device.currentAllocatedSize / 1e9, dev->name.c_str(),
++                dev->device.recommendedMaxWorkingSetSize / 1e9
++            );
++        }
+         if (g_alloc_tracker.enabled)
+             g_alloc_tracker.record_alloc(ptr, size, ALLOC_KIND_DEVICE, ordinal);
+         return ptr;
+@@ -856,9 +1119,20 @@ void wp_free_metal(int ordinal, void* ptr)
+             // a recording references this memory (freed during capture, or allocated during one and freed
+             // later): the graph keeps it alive, like CUDA graph allocations
+             Graph* owner = owned != dev->capture_owned.end() ? owned->second : dev->capture;
+-            owner->retained.push_back(it->second);
++            Graph* recording = dev->capture
++                ? (dev->capture_stack.empty() ? dev->capture : dev->capture_stack.front())
++                : nullptr;
++            if (owned != dev->capture_owned.end() && owner == recording && recording->reuse
++                && it->second.length >= kCaptureReuseMinBytes && !dev->capture_host_written.count(uintptr_t(ptr))) {
++                // allocated and freed during this capture: later allocations of the capture may reuse it
++                owner->free_pool.emplace(size_t(it->second.length), it->second);
++                dev->capture_owned.erase(owned);
++                dev->allocations.erase(it);
++                return;
++            }
++            graph_retain(*dev, owner->retained, it->second);
+             if (dev->capture && dev->capture != owner)
+-                dev->capture->retained.push_back(it->second);  // the open recording may reference it as well
++                graph_retain(*dev, dev->capture->retained, it->second);  // the open recording may reference it too
+             if (owned != dev->capture_owned.end())
+                 dev->capture_owned.erase(owned);
+             dev->allocations.erase(it);
+@@ -1032,6 +1306,7 @@ void wp_metal_unload_library(void* library)
          MTLComputePipelineDescriptor* descriptor = [MTLComputePipelineDescriptor new];
          descriptor.computeFunction = function;
          descriptor.label = @(name);
@@ -9753,7 +10042,7 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
          id<MTLComputePipelineState> pipeline =
              [lib->library.device newComputePipelineStateWithDescriptor:descriptor
                                                                 options:MTLPipelineOptionNone
-@@ -1140,10 +1318,194 @@ int wp_metal_launch_kernel(
+@@ -1140,10 +1415,194 @@ int wp_metal_launch_kernel(
              [encoder dispatchThreads:MTLSizeMake(num_threads, 1, 1) threadsPerThreadgroup:group];
          }
  
@@ -9950,7 +10239,69 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
              return -1;
          return 0;
      }
-@@ -1227,6 +1589,12 @@ static void discard_recording(Device& dev, Graph* graph)
+@@ -1160,11 +1619,28 @@ int wp_metal_capture_begin(int ordinal)
+         return -1;
+     }
+     dev->capture = new Graph();
++    dev->capture->reuse = g_capture_reuse;
+     return 0;
+ }
+ 
++void wp_metal_set_capture_reuse(int enabled)
++{
++    WP_METAL_LOCK();
++    g_capture_reuse = enabled != 0;
++}
++
+ static void graph_destroy(int ordinal, Device* dev, Graph* graph);
+ 
++// Records that the host wrote the allocation holding ptr while a capture is open (see Device::capture_host_written).
++static void mark_host_written(Device& dev, const void* ptr)
++{
++    if (!dev.capture)
++        return;
++    uintptr_t base = 0;
++    if (buffer_containing(dev.allocations, uint64_t(uintptr_t(ptr)), false, base, [](id<MTLBuffer> x) { return x; }))
++        dev.capture_host_written.insert(base);
++}
++
+ // Stops tracking allocations for a graph that is going away.
+ static void forget_capture_owned(Device& dev, Graph* graph)
+ {
+@@ -1176,8 +1652,10 @@ static void forget_capture_owned(Device& dev, Graph* graph)
+ static void discard_recording(Device& dev, Graph* graph)
+ {
+     forget_capture_owned(dev, graph);
+-    for (id<MTLBuffer> buffer : graph->retained)
+-        dev.deferred_frees.push_back(buffer);
++    for (const auto& kv : graph->free_pool)
++        dev.deferred_frees.push_back(kv.second);
++    graph->free_pool.clear();
++    graph_release(dev, graph->retained);
+     for (const auto& child : graph->children)
+         if (child.second)
+             graph_destroy(0, &dev, child.first);
+@@ -1187,6 +1665,10 @@ static void discard_recording(Device& dev, Graph* graph)
+ // Uploads a recorded graph's argument blocks; the graph is ready to launch afterwards.
+ static Graph* finalize_capture(Device& dev, Graph* graph)
+ {
++    // memory freed during the capture and not reused stays with the graph (its recording may reference it)
++    for (const auto& kv : graph->free_pool)
++        graph_retain(dev, graph->retained, kv.second);
++    graph->free_pool.clear();
+     graph->buffer =
+         [dev.device newBufferWithLength:std::max(graph->bytes.size(), size_t(1))
+                                 options:MTLResourceStorageModeShared | MTLResourceHazardTrackingModeUntracked];
+@@ -1216,6 +1698,8 @@ static void discard_recording(Device& dev, Graph* graph)
+             wp::set_error_string("No graph capture in progress");
+             return nullptr;
+         }
++        dev->capture_host_written.clear();
++        dev->capture_reused.clear();
+         if (!dev->capture_stack.empty()) {
+             // a branch body raised: drop every open recording so the device leaves capture mode
+             discard_recording(*dev, dev->capture);
+@@ -1227,6 +1711,12 @@ static void discard_recording(Device& dev, Graph* graph)
              return nullptr;
          }
          Graph* graph = dev->capture;
@@ -9963,7 +10314,7 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
          dev->capture = nullptr;
          return finalize_capture(*dev, graph);
      }
-@@ -1318,10 +1686,200 @@ int wp_metal_graph_launch(int ordinal, void* handle)
+@@ -1318,10 +1808,200 @@ int wp_metal_graph_launch(int ordinal, void* handle)
      }
  }
  
@@ -10164,7 +10515,7 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
      {
          size_t next_host_op = 0;
          auto run_host_ops = [&](size_t before_dispatch) {
-@@ -1330,6 +1888,7 @@ static int graph_launch(Device& device, Graph* graph)
+@@ -1330,6 +2010,7 @@ static int graph_launch(Device& device, Graph* graph)
                   ++next_host_op) {
                  if (!synchronize(*dev))  // the host op reads results of the dispatches recorded before it
                      return false;
@@ -10172,7 +10523,7 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
                  if (!graph->host_ops[next_host_op].run())
                      return false;
              }
-@@ -1339,6 +1898,19 @@ static int graph_launch(Device& device, Graph* graph)
+@@ -1339,6 +2020,19 @@ static int graph_launch(Device& device, Graph* graph)
              if (!run_host_ops(i))
                  return -1;
              const Graph::Dispatch& d = graph->dispatches[i];
@@ -10192,7 +10543,7 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
              id<MTLComputeCommandEncoder> encoder = get_encoder(*dev);
              [encoder setComputePipelineState:d.pipeline];
              if (d.bounds_size) {
-@@ -1355,6 +1927,7 @@ static int graph_launch(Device& device, Graph* graph)
+@@ -1355,6 +2049,7 @@ static int graph_launch(Device& device, Graph* graph)
              } else {
                  [encoder dispatchThreads:MTLSizeMake(d.num_threads, 1, 1) threadsPerThreadgroup:group];
              }
@@ -10200,7 +10551,7 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
              if (++dev->num_dispatches >= max_dispatches_per_command_buffer() && !flush(*dev))
                  return -1;
          }
-@@ -1374,6 +1947,87 @@ bool wp_metal_capture_host_op(int ordinal, std::function<bool()> op)
+@@ -1374,6 +2069,98 @@ bool wp_metal_capture_host_op(int ordinal, std::function<bool()> op)
  
  // Records a call to a host function taking up to 8 integer/pointer arguments (the Python utilities such as
  // array_scan and radix_sort_pairs run on the host for Metal); replayed in order with the graph's dispatches.
@@ -10225,6 +10576,16 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
 +        wp::set_error_string("The indirect execution range must be a 16-byte-aligned Metal allocation of 16 bytes");
 +        return -1;
 +    }
++    if (dev->capture_reused.count(base)) {
++        // the range is written by the host at the range's end; dispatches recorded earlier in this capture that used
++        // the same memory would overwrite it at every replay
++        wp::set_error_string(
++            "The indirect execution range lies in memory this capture reuses (an array of %zu bytes allocated during "
++            "the capture); allocate the ranges before the capture, or with warp.config.metal_capture_reuse = False",
++            size_t(buffer.length)
++        );
++        return -1;
++    }
 +    graph->segments.push_back({ graph->dispatches.size(), 0, range_host, buffer, size_t(uintptr_t(range_host) - base) });
 +    graph->segment_open = true;
 +    return 0;
@@ -10247,6 +10608,7 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
 +        return 0;
 +    }
 +    // unified memory: the recorded range is written in place; a kernel of the replay may zero the length
++    mark_host_written(*dev, seg.range_host);
 +    uint32_t* range = static_cast<uint32_t*>(seg.range_host);
 +    range[0] = uint32_t(seg.start);
 +    range[1] = uint32_t(seg.count);
@@ -10288,7 +10650,7 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
  int wp_metal_capture_host_call(int ordinal, void* fn, const unsigned long long* args, int nargs)
  {
      if (!fn || nargs < 0 || nargs > 8)
-@@ -1417,6 +2071,15 @@ int wp_metal_capture_host_call(int ordinal, void* fn, const unsigned long long*
+@@ -1417,6 +2204,15 @@ int wp_metal_capture_host_call(int ordinal, void* fn, const unsigned long long*
  }
  
  static void graph_destroy(int ordinal, Device* dev, Graph* graph);
@@ -10304,7 +10666,25 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..9cceb5ee78ec5e78f961cad0a9bcc204
  void wp_metal_graph_destroy(int ordinal, void* handle)
  {
      WP_METAL_LOCK();
-@@ -1564,3 +2227,124 @@ int wp_metal_flush(int ordinal)
+@@ -1429,8 +2225,7 @@ static void graph_destroy(int ordinal, Device* dev, Graph* graph)
+     forget_capture_owned(*dev, graph);
+     if (graph->buffer)
+         dev->deferred_frees.push_back(graph->buffer);  // released once no GPU work can use it
+-    for (id<MTLBuffer> buffer : graph->retained)
+-        dev->deferred_frees.push_back(buffer);
++    graph_release(*dev, graph->retained);
+     for (const auto& child : graph->children)
+         if (child.second)
+             graph_destroy(ordinal, dev, child.first);
+@@ -1525,6 +2320,7 @@ int wp_metal_memcpy(int ordinal, void* dst, const void* src, size_t n)
+             if (!synchronize(*dev))
+                 return -1;
+             memcpy(dst, src, n);
++            mark_host_written(*dev, dst);
+             return 0;
+         }
+         struct {
+@@ -1564,3 +2360,124 @@ int wp_metal_flush(int ordinal)
          return dev && flush(*dev) ? 0 : -1;
      }
  }
@@ -11669,10 +12049,19 @@ index 0000000000000000000000000000000000000000..48b95ba3b5bdd12f2c29c45894cca217
 +        } \
 +    } while (0)
 diff --git a/warp/native/metal_stub.cpp b/warp/native/metal_stub.cpp
-index 4448d54c35dd8150380a5e29eb9f5adafb405938..7f1dac16d82644b378a98c8a3ebb7621e05de19e 100644
+index 4448d54c35dd8150380a5e29eb9f5adafb405938..f9fb02f3fa14a96c0fdc022a7a56cacb634af8e7 100644
 --- a/warp/native/metal_stub.cpp
 +++ b/warp/native/metal_stub.cpp
-@@ -50,6 +50,10 @@ void* wp_metal_capture_pop(int) { return unavailable(), nullptr; }
+@@ -42,6 +42,8 @@ const char* wp_metal_profile_report() { return ""; }
+ 
+ int wp_metal_capture_begin(int) { return unavailable(); }
+ 
++void wp_metal_set_capture_reuse(int) { }
++
+ void* wp_metal_capture_end(int) { return unavailable(), nullptr; }
+ 
+ int wp_metal_capture_push(int) { return unavailable(); }
+@@ -50,6 +52,10 @@ void* wp_metal_capture_pop(int) { return unavailable(), nullptr; }
  
  int wp_metal_capture_conditional(int, int, const int*, void*, void*, int, int) { return unavailable(); }
  
@@ -11683,7 +12072,7 @@ index 4448d54c35dd8150380a5e29eb9f5adafb405938..7f1dac16d82644b378a98c8a3ebb7621
  bool wp_metal_capture_host_op(int, std::function<bool()>) { return false; }
  
  void wp_metal_defer_error(int) { }
-@@ -64,6 +68,7 @@ void wp_texture_destroy_metal(uint64_t) { }
+@@ -64,6 +70,7 @@ void wp_texture_destroy_metal(uint64_t) { }
  int wp_metal_graph_launch(int, void*) { return unavailable(); }
  
  void wp_metal_graph_destroy(int, void*) { }
@@ -11691,7 +12080,7 @@ index 4448d54c35dd8150380a5e29eb9f5adafb405938..7f1dac16d82644b378a98c8a3ebb7621
  
  void* wp_metal_load_library(int, const char*) { return unavailable(), nullptr; }
  
-@@ -82,6 +87,14 @@ int wp_metal_launch_kernel(
+@@ -82,6 +89,14 @@ int wp_metal_launch_kernel(
      return unavailable();
  }
  
@@ -13328,7 +13717,7 @@ index 0000000000000000000000000000000000000000..8f6aadfac81c19ae72ae348646453203
 +if __name__ == "__main__":
 +    unittest.main(verbosity=2)
 diff --git a/warp/tests/test_metal.py b/warp/tests/test_metal.py
-index 5c4590d7fb61665071738e72e570dfd0b8bc6fa9..b46aa2e35c46e85a11d3ad2569616b4b8b46db04 100644
+index 5c4590d7fb61665071738e72e570dfd0b8bc6fa9..8f6bc2534f4e42059aaaba1f82b66dd89469c3e7 100644
 --- a/warp/tests/test_metal.py
 +++ b/warp/tests/test_metal.py
 @@ -4,6 +4,7 @@
@@ -13339,7 +13728,7 @@ index 5c4590d7fb61665071738e72e570dfd0b8bc6fa9..b46aa2e35c46e85a11d3ad2569616b4b
  import unittest
  
  import numpy as np
-@@ -88,6 +89,39 @@ def mat44_products_inverse(a: wp.array[wp.mat44], b: wp.array[wp.mat44], out: wp
+@@ -88,6 +89,51 @@ def mat44_products_inverse(a: wp.array[wp.mat44], b: wp.array[wp.mat44], out: wp
              out[16 + i * 4 + j] = 3.0 * d[i, j]
  
  
@@ -13356,6 +13745,18 @@ index 5c4590d7fb61665071738e72e570dfd0b8bc6fa9..b46aa2e35c46e85a11d3ad2569616b4b
 +@wp.kernel
 +def add_value(a: wp.array[float], v: float):
 +    a[wp.tid()] += v
++
++
++@wp.kernel
++def fill_uint32_zero(a: wp.array[wp.uint32]):
++    a[wp.tid()] = wp.uint32(0)
++
++
++@wp.kernel
++def reset_range_lengths(n: int, ranges: wp.array[wp.uint32]):
++    # as MetalSim's captured MPM solves do at their start: every range back to its full length
++    for j in range(n):
++        ranges[4 * j + 1] = ranges[4 * j + 2]
 +
 +
 +def _countdown_body(counter, trace):
@@ -13379,7 +13780,7 @@ index 5c4590d7fb61665071738e72e570dfd0b8bc6fa9..b46aa2e35c46e85a11d3ad2569616b4b
  def _make_cholesky_kernel(n: int):
      """Factor and solve one ``n x n`` system per thread block with the tile Cholesky builtins."""
  
-@@ -152,10 +186,393 @@ def _make_tile_matmul_kernel(n: int):
+@@ -152,10 +198,393 @@ def _make_tile_matmul_kernel(n: int):
      return tile_products
  
  
@@ -13773,7 +14174,7 @@ index 5c4590d7fb61665071738e72e570dfd0b8bc6fa9..b46aa2e35c46e85a11d3ad2569616b4b
      def test_host_memory_prefix_then_whole(self):
          """A host range that starts inside an imported range but extends past it is mapped completely."""
          page = 16384
-@@ -193,14 +610,20 @@ class TestMetal(unittest.TestCase):
+@@ -193,14 +622,20 @@ class TestMetal(unittest.TestCase):
          np.testing.assert_array_equal(data, expected)
  
      def test_bsr_topology_inside_capture_raises(self):
@@ -13798,7 +14199,173 @@ index 5c4590d7fb61665071738e72e570dfd0b8bc6fa9..b46aa2e35c46e85a11d3ad2569616b4b
          self.assertFalse(wp.get_device(self.device).is_capturing)
          wp.sparse.bsr_set_from_triplets(m, rows, cols, vals)  # fine outside a capture
          self.assertEqual(m.nnz_sync(), 2)
-@@ -341,6 +764,31 @@ class TestMetal(unittest.TestCase):
+@@ -229,6 +664,165 @@ class TestMetal(unittest.TestCase):
+         np.testing.assert_array_equal(out.numpy(), 2.0 * np.arange(n, dtype=np.float32) + 1.0)
+         del junk
+ 
++    def test_capture_reuses_memory_freed_during_capture(self):
++        """A capture of many steps that each allocate and free a temporary holds one temporary, not one per step,
++        and replays the same values as eager execution."""
++        saved = wp.config.metal_capture_reuse
++        wp.config.metal_capture_reuse = True
++        try:
++            self._capture_reuse_steps()
++        finally:
++            wp.config.metal_capture_reuse = saved
++
++    def _capture_reuse_steps(self):
++        n, steps = 1 << 16, 24  # 256 KiB temporaries: past the 64 KiB reuse threshold
++        x = wp.array(np.arange(n, dtype=np.float32), device=self.device)
++        out = wp.zeros(n, dtype=float, device=self.device)
++        ptrs = []
++
++        def step(k):
++            tmp = wp.empty(n, dtype=float, device=self.device)  # scratch of this step only
++            wp.launch(saxpy_kernel, dim=n, inputs=[x, out, tmp], device=self.device)
++            wp.copy(out, tmp)
++            wp.launch(add_value, dim=n, inputs=[out, float(k)], device=self.device)
++            ptrs.append(tmp.ptr)
++
++        with wp.ScopedCapture(device=self.device, force_module_load=True) as capture:
++            for k in range(steps):
++                step(k)
++        # every step after the first reused the first step's memory (Isaac Lab's Franka-Pour policy step at 2,048
++        # worlds held 47 GB of per-step temporaries without reuse, past the working set, and replayed NaN)
++        self.assertEqual(len(set(ptrs)), 1)
++        expected = np.zeros(n, dtype=np.float32)
++        xs = np.arange(n, dtype=np.float32)
++        for k in range(steps):
++            expected = 2.0 * xs + expected + np.float32(k)
++        for _ in range(2):
++            out.zero_()
++            wp.capture_launch(capture.graph)
++            np.testing.assert_array_equal(out.numpy(), expected)
++
++    def test_capture_range_after_small_freed_temporary(self):
++        """An indirect execution range allocated during a capture right after a small temporary was freed keeps the
++        fields the host writes at the range's end: replaying the earlier dispatches must not overwrite them. Isaac Lab's
++        Franka-Pour MPM step at one world reused a 2,940-byte temporary for the 80-byte ranges of a solve, and the
++        replay ran garbage execution ranges (kIOGPUCommandBufferCallbackErrorPageFault)."""
++        from warp._src import context as ctx  # noqa: PLC0415
++
++        device = wp.get_device(self.device)
++        saved = wp.config.metal_capture_reuse
++        wp.config.metal_capture_reuse = True
++        try:
++            out = wp.zeros(64, dtype=float, device=self.device)
++            with wp.ScopedCapture(device=self.device, force_module_load=True) as capture:
++                scratch = wp.empty(735, dtype=wp.uint32, device=self.device)  # 2,940 bytes, as in the scene
++                wp.launch(fill_uint32_zero, dim=735, inputs=[scratch], device=self.device)
++                del scratch
++                ranges = wp.empty(20, dtype=wp.uint32, device=self.device)  # 80 bytes, 5 ranges
++                wp.launch(reset_range_lengths, dim=1, inputs=[5, ranges], device=self.device)
++                for j in range(5):
++                    self.assertTrue(ctx.metal_capture_range_begin(ranges, j, device=device))
++                    wp.launch(add_value, dim=64, inputs=[out, 1.0], device=self.device)
++                    ctx.metal_capture_range_end(device=device)
++            for r in range(2):
++                out.zero_()
++                wp.capture_launch(capture.graph)
++                np.testing.assert_array_equal(out.numpy(), np.full(64, 5.0, dtype=np.float32))
++        finally:
++            wp.config.metal_capture_reuse = saved
++
++    def test_capture_range_in_reused_memory_raises(self):
++        """A range array that lands in memory the capture reuses is refused with an error instead of replaying ranges
++        that earlier dispatches overwrite."""
++        from warp._src import context as ctx  # noqa: PLC0415
++
++        device = wp.get_device(self.device)
++        saved = wp.config.metal_capture_reuse
++        wp.config.metal_capture_reuse = True
++        try:
++            out = wp.zeros(64, dtype=float, device=self.device)
++            with self.assertRaises(RuntimeError):
++                with wp.ScopedCapture(device=self.device, force_module_load=True):
++                    scratch = wp.empty(1 << 16, dtype=wp.uint32, device=self.device)
++                    wp.launch(fill_uint32_zero, dim=1 << 16, inputs=[scratch], device=self.device)
++                    del scratch
++                    ranges = wp.empty(1 << 16, dtype=wp.uint32, device=self.device)  # takes the freed buffer
++                    ctx.metal_capture_range_begin(ranges, 0, device=device)
++            wp.launch(add_value, dim=64, inputs=[out, 1.0], device=self.device)  # the device is usable afterwards
++            np.testing.assert_array_equal(out.numpy(), np.full(64, 1.0, dtype=np.float32))
++        finally:
++            wp.config.metal_capture_reuse = saved
++
++    def test_capture_never_reuses_host_written_memory(self):
++        """Memory the host writes while recording (an indirect execution range is filled in at its end, on the
++        host) keeps its contents for the replays even when the array is freed during the capture."""
++        from warp._src import context as ctx  # noqa: PLC0415
++
++        device = wp.get_device(self.device)
++        out = wp.zeros(64, dtype=float, device=self.device)
++        with wp.ScopedCapture(device=self.device, force_module_load=True) as capture:
++            ranges = wp.empty(4, dtype=wp.uint32, device=self.device)
++            self.assertTrue(ctx.metal_capture_range_begin(ranges, 0, device=device))
++            wp.launch(add_value, dim=64, inputs=[out, 1.0], device=self.device)
++            ctx.metal_capture_range_end(device=device)
++            ranges_ptr = ranges.ptr
++            del ranges
++            other = wp.zeros(4, dtype=wp.uint32, device=self.device)  # same size, filled by a recorded memset
++            self.assertNotEqual(other.ptr, ranges_ptr)
++            wp.launch(add_value, dim=64, inputs=[out, 2.0], device=self.device)
++            del other
++        for _ in range(2):
++            out.zero_()
++            wp.capture_launch(capture.graph)
++            np.testing.assert_array_equal(out.numpy(), np.full(64, 3.0, dtype=np.float32))
++
++    def test_capture_survives_failing_branch(self):
++        """A branch body that raises leaves the device usable for normal launches and new captures."""
++        cond = wp.ones(1, dtype=int, device=self.device)
++        a = wp.zeros(4, dtype=float, device=self.device)
++
++        def failing_body():
++            raise ValueError("branch body failed")
++
++        with self.assertRaises(ValueError):
++            with wp.ScopedCapture(device=self.device):
++                wp.capture_if(cond, on_true=failing_body)
++        self.assertFalse(wp.get_device(self.device).is_capturing)
++        wp.launch(increment_kernel, dim=4, inputs=[a], device=self.device)
++        with wp.ScopedCapture(device=self.device) as capture:
++            wp.launch(increment_kernel, dim=4, inputs=[a], device=self.device)
++        wp.capture_launch(capture.graph)
++        # one eager launch plus one replay: launches inside a capture are recorded, not executed
++        np.testing.assert_array_equal(a.numpy(), np.full(4, 2.0, dtype=np.float32))
++
++    def test_replay_translates_nested_arrays_freed_during_capture(self):
++        """Array descriptors stored in device memory (here an array of structs written from the host before the
++        capture) still resolve at replay when the arrays they point to were freed during the capture."""
++        n = 4
++        out = wp.zeros(n, dtype=float, device=self.device)
++        values = [wp.array([1.0 + i, 10.0 * (i + 1)], dtype=float, device=self.device) for i in range(n)]
++        items = []
++        for i, v in enumerate(values):
++            h = ArrayHolder()
++            h.values = v
++            h.offset = float(i)
++            items.append(h)
++        holders = wp.array(items, dtype=ArrayHolder, device=self.device)
++        del items, h, v
++        with wp.ScopedCapture(device=self.device, force_module_load=True) as capture:
++            wp.launch(holder_sum_kernel, dim=n, inputs=[holders, out], device=self.device)
++            del values  # the pointees are freed while recording; the graph keeps their memory
++            scratch = wp.full(2, -1.0e6, dtype=float, device=self.device)
++            wp.launch(add_value, dim=2, inputs=[scratch, 1.0], device=self.device)
++            del scratch
++        extra = [wp.zeros(4096, dtype=float, device=self.device) for _ in range(4)]  # changes the address table
++        expected = np.array([1.0 + i + 10.0 * (i + 1) + i for i in range(n)], dtype=np.float32)
++        for _ in range(2):
++            out.zero_()
++            wp.capture_launch(capture.graph)
++            np.testing.assert_array_equal(out.numpy(), expected)
++        del extra
++
+     def test_capture_survives_failing_branch(self):
+         """A branch body that raises leaves the device usable for normal launches and new captures."""
+         cond = wp.ones(1, dtype=int, device=self.device)
+@@ -341,6 +935,31 @@ class TestMetal(unittest.TestCase):
                  np.testing.assert_allclose(factor.numpy(), u_ref, rtol=1e-4, atol=1e-4, err_msg=msg)
                  np.testing.assert_allclose(x.numpy(), x_ref, rtol=1e-3, atol=1e-4, err_msg=msg)
  
@@ -13830,7 +14397,7 @@ index 5c4590d7fb61665071738e72e570dfd0b8bc6fa9..b46aa2e35c46e85a11d3ad2569616b4b
      def test_tile_ops_across_block_boundary(self):
          """Tile sizes just below, at and above the block size, and above two blocks.
  
-@@ -409,6 +857,651 @@ class TestMetal(unittest.TestCase):
+@@ -409,6 +1028,651 @@ class TestMetal(unittest.TestCase):
                  np.testing.assert_allclose(product.numpy(), ref, rtol=1e-3, atol=1e-3, err_msg=msg)
                  np.testing.assert_allclose(acc.numpy(), a_np + ref, rtol=1e-3, atol=1e-3, err_msg=msg)
  
