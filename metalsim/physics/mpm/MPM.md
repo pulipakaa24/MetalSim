@@ -492,8 +492,8 @@ fast_math, section 8 1b) + `152808b7` (`warp.config.metal_fast_math` defaults to
   2,048 worlds; results unchanged where it did not fire), deterministic mode sorting only the active contacts (sort
   12.4 -> 0.2 ms, deterministic collide 192.6 -> 68.3 ms). Research: `research_notes/Metal MPM speed and scalable
   determinism/rigid_scale_perf.md`; runs: `runs/rigid_perf/`. Ported to the Newton 1.7 lines (`metalsim` `522e2d4c`,
-  `1a398b2e`, `464c0aff`; `metalsim-hashtable-metal` the same commits): Franka-Pour collide on that line at 256
-  worlds 93.9 -> 10.1 ms, deterministic contacts unchanged (`runs/rigid17/`, section 8d).
+  `1a398b2e`, `464c0aff`; `metalsim-hashtable-metal` the same commits): Franka-Pour collide on that line at 2,048
+  worlds 646.8 -> 57.2 ms, deterministic contacts unchanged (`runs/rigid17/`, section 8d).
 * **fast_math.** MPM picks the form with `newton_compat.install(metal_fast_math=...)` (default `"off"`), and Warp's
   own default is `"off"` as well, so programs that did not ask for it (MuJoCo Warp ray casts, Newton ray / collision
   helpers in the rigid stack) compile their `fast_math` kernels exactly as before `f52da34`. Section 8's timings were
@@ -516,12 +516,16 @@ fast_math, section 8 1b) + `152808b7` (`warp.config.metal_fast_math` defaults to
   relative vs rtol 1e-6, in a kernel these changes do not touch).
 * **Rigid-scale ports to the 1.7 line**: mesh-SDF barrier fix, per-thread mesh-convex midphase, 32 mesh threadgroups
   per core, bounded deterministic sort. Franka-Pour collide (`runs/rigid17/tools/collide17.py`, same in-contact state,
-  interleaved, Warp fork `152808b7`): 256 worlds 93.9 -> 10.1 ms (midphase 72.4 -> 0.34 ms, mesh-mesh 20.9 -> 7.5 ms).
+  interleaved, Warp fork `152808b7`): 256 worlds 93.9 -> 10.1 ms (midphase 72.4 -> 0.34 ms, mesh-mesh 20.9 -> 7.5 ms);
+  2,048 worlds 646.8 -> 57.2 ms (two runs each); deterministic mode at 256 worlds 91.4 -> 9.4 ms with the sorted
+  contacts bitwise equal (same hash before and after the ports, and across repeated collides).
 * **GPU hang (2026-10-12 02:32).** Newton's tests on the *unported* 1.7 tree (`fe7f5bd4`, none of the changes above)
   hung the GPU in `TestDeterministicPipeline.test_cylinder_scale_update_keeps_generic_stage_metal_0` (cylinder on a
   plane: no mesh, HashTable, reducer or manifold code); the watchdog killed the job after 150 s, the process stayed
   stuck in exit holding the GPU. The same test passed in three other runs (ported trees and the unported
-  `metalsim-hashtable-metal`), so the cause is open (intermittent, below Newton's mesh / atomics code).
+  `metalsim-hashtable-metal`), and 20 isolated repetitions after the reboot all passed (0.6 s each): the cause is open
+  (intermittent, below Newton's mesh / atomics code). The new claim loops ran alone first after the reboot
+  (test_hashtable, test_solver_xpbd, test_contact_reduction_global: no stall).
 * **Newton-engine contact buffer** (`metalsim/physics/newton_backend.py`): sized per contact pair
   (`rigid_contact_capacity`); 64 G1 worlds on rough terrain went from 1,000 slots (about half the contacts dropped) to
   7,680; `tests/test_g1_newton_engine.py::test_no_rigid_contacts_dropped`.
