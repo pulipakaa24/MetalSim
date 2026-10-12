@@ -56,7 +56,7 @@ def _isaac_obs_group(view, group):
         fn = r["generic"].get(kw["func"]) or getattr(r["obs"], kw["func"])
         params = dict(kw.get("params", {}))
         if "params_src" in kw:       # SceneEntityCfg("robot", joint_names=["panda_joint.*"]): resolve as Isaac does
-            pat = re.search(r'joint_names=\["([^"]+)"\]', kw["params_src"]).group(1)
+            pat = re.search(r"joint_names=\[['\"]([^'\"]+)['\"]\]", kw["params_src"]).group(1)
             names = list(S.ARM_JOINTS + S.FINGER_JOINTS)
             ids = [i for i, nm in enumerate(names) if re.fullmatch(pat, nm)]
             params["asset_cfg"] = type("Cfg", (), {"name": "robot", "joint_ids": ids})()
@@ -179,6 +179,7 @@ def test_sampler_matches_isaac():
     mine = P.ResetDatasetSampler(rows, "cpu", cfg, g1)
     isaac = r["sampler"]._ResetDatasetSampler(rows, "cpu", icfg)
     isaac._uniform_order = mine._uniform_order.clone()
+    torch.randperm(rows, generator=g2)      # mine drew its first cycle order from g1; Isaac's from the global RNG
     rng = np.random.default_rng(0)
     for k in range(60):
         ids = torch.as_tensor(rng.integers(0, 40 if k % 3 else rows, 64))   # many duplicates every third batch

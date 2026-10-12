@@ -1,0 +1,48 @@
+--- a/source/isaaclab_tasks/isaaclab_tasks/contrib/franka_pour/pour_env_cfg.py
++++ b/source/isaaclab_tasks/isaaclab_tasks/contrib/franka_pour/pour_env_cfg.py
+@@ -204,15 +204,13 @@
+         follower_schemas = finger_joints["panda_finger_joint2"].GetMetadata("apiSchemas")
+         leader_schema_names = [] if leader_schemas is None else list(leader_schemas.GetAppliedItems())
+         follower_schema_names = [] if follower_schemas is None else list(follower_schemas.GetAppliedItems())
+-        if "NewtonMimicAPI" not in leader_schema_names or "PhysxMimicJointAPI:linear" not in follower_schema_names:
+-            raise RuntimeError(
+-                "The pinned Franka physics payload no longer has the expected duplicate finger-mimic schemas. "
+-                "Update the asset hash and task-side override together."
+-            )
+-        if not finger_joints["panda_finger_joint1"].RemoveAppliedSchema("NewtonMimicAPI"):
+-            raise RuntimeError("Failed to remove the redundant Franka Newton finger-mimic schema.")
+-        if finger_joints["panda_finger_joint1"].HasAPI("NewtonMimicAPI"):
+-            raise RuntimeError("The redundant Franka Newton finger-mimic schema is still composed after removal.")
++        # metalsim patch: the published Isaac 6.1 Franka has a single finger mimic (NewtonMimicAPI on joint1) and no
++        # PhysxMimicJointAPI; keep that one equality instead of raising (it is the constraint the hook means to keep).
++        if "NewtonMimicAPI" not in leader_schema_names:
++            raise RuntimeError("The published Franka has no Newton finger-mimic schema.")
++        if "PhysxMimicJointAPI:linear" in follower_schema_names:
++            if not finger_joints["panda_finger_joint1"].RemoveAppliedSchema("NewtonMimicAPI"):
++                raise RuntimeError("Failed to remove the redundant Franka Newton finger-mimic schema.")
+ 
+         proxy_roots = {
+             prim.GetName(): prim.GetParent().GetPath()
+@@ -227,6 +225,13 @@
+         for proxy_root in proxy_roots.values():
+             collision_prim = root_prim.GetStage().GetPrimAtPath(proxy_root.AppendChild(proxy_root.name))
+             UsdPhysics.CollisionAPI(collision_prim).GetCollisionEnabledAttr().Set(True)
++        # metalsim patch: the convex_hulls variant also brings a hand hull the hook does not list; the gripper keeps
++        # its hand capsule and finger pads, so the hand hull is not a collider (as in the metalsim port).
++        for prim in list(Usd.PrimRange(root_prim, Usd.TraverseInstanceProxies())):
++            if prim.GetName() == "hand_c" and prim.GetParent().GetName() == "hand_c":
++                root_prim.GetStage().OverridePrim(prim.GetParent().GetPath()).SetInstanceable(False)
++                hand = root_prim.GetStage().GetPrimAtPath(prim.GetPath())
++                UsdPhysics.CollisionAPI(hand).GetCollisionEnabledAttr().Set(False)
+     return robot_prim
+ 
+ 
+@@ -340,6 +345,8 @@
+     robot = FRANKA_PANDA_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
+     robot.spawn.usd_path = FRANKA_POUR_ROBOT_USD_PATH
+     robot.spawn.func = spawn_franka_with_arm_collisions
++    # metalsim patch: the arm collision proxies the hook requires exist only under this variant of the published asset
++    robot.spawn.variants = {"Colliders": "convex_hulls"}
+     robot.spawn.articulation_props.enabled_self_collisions = True
+     robot.actuators = {
+         name: actuator_cfg.replace(
