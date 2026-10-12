@@ -304,10 +304,10 @@ class GrainRaster:
     renderer's semantic table is extended by that one entry."""
 
     def __init__(self, r0, field: GrainField):
-        from metalsim.render.metal_context import SHADER_DIR
+        from metalsim.render.metal_context import SHADER_DIR, _inline_includes
         self.r0, self.field = r0, field
         c = r0.ctx
-        src = (SHADER_DIR / "tier0.metal").read_text() + "\n" + (SHADER_DIR / "particles_tier0.metal").read_text()
+        src = _inline_includes((SHADER_DIR / "tier0.metal").read_text() + "\n" + (SHADER_DIR / "particles_tier0.metal").read_text())
         opts = Metal.MTLCompileOptions.new(); opts.setFastMathEnabled_(True)
         lib, err = c.device.newLibraryWithSource_options_error_(src, opts, None)
         if lib is None:
