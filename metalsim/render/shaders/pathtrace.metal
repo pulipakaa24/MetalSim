@@ -206,7 +206,7 @@ inline Hit trace(instance_acceleration_structure accel, float3 o, float3 d, floa
         verts = gg.verts; indices = gg.indices;
     } else {
         slot = inst_tab[res.instance_id].y;
-        b = meshes[uint(slot_mesh[slot])].i_off + res.primitive_id * 3;
+        b = meshes[inst[res.instance_id].as_index].i_off + res.primitive_id * 3;   // the instanced structure is the mesh (static: = slot_mesh[slot]; dynamic: per env block)
     }
     uint i0 = indices[b], i1 = indices[b + 1], i2 = indices[b + 2];
     float2 bc = res.triangle_barycentric_coord; float w0 = 1.0 - bc.x - bc.y;

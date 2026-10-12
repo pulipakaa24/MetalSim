@@ -225,8 +225,12 @@ def collect(m, n_envs, atlas, visual=None, meshes=(), smooth=True):
                 j = add("tendon", mujoco.mjtObj.mjOBJ_TENDON, i, mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_TENDON, i),
                         material_row(m, matid, m.tendon_rgba[i], atlas, textured=False),
                         m.site_bodyid[first_site], m.tendon_group[i])
-                # MuJoCo Data holds up to 2 points per path element (a wrapping geom adds two tangent points)
-                out["dyn"].append({"kind": "tendon", "id": i, "extra": j, "max_points": 2 * num})
+                # most wrap points mj_tendon can write for this path: one per site, two tangent points per wrapping geom,
+                # one marker per pulley
+                W_ = mujoco.mjtWrap
+                max_points = sum(1 if ty in (W_.mjWRAP_SITE, W_.mjWRAP_PULLEY) else 2 if ty in (W_.mjWRAP_SPHERE, W_.mjWRAP_CYLINDER)
+                                 else 0 for ty in types)
+                out["dyn"].append({"kind": "tendon", "id": i, "extra": j, "max_points": max_points})
     # user deformable meshes
     names = set()
     for mesh in meshes:
