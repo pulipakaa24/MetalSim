@@ -275,6 +275,22 @@ Coverage = fraction of MuJoCo's object pixels with RGB / depth / segmentation.
 | fisheye (Isaac default f-theta 200°, Kannala-Brandt): sphere centroid vs the lens model at 0 / 60 / 95° | not supported | ≤ 0.27 px (T2, RT, T0 cube faces) | z-depth negative beyond 90°, as the optical-axis definition gives |
 | Newton bridge: per-world `shape_scale` / `shape_color` | read once at build | per frame; IoU > 0.95 (capsule > 0.85) vs the MJCF at that world's values, colour error < 4 (T0) | mesh texture / UVs / roughness / metallic kept in the twin (texture corr. 1.0 vs the MJCF path) |
 
+**Speed** (`scripts/diagnostics/render_world_cost.py`, exclusive `timing` job, device idle at start and end, M4 Max,
+2026-10-12 11:14; ms per frame, median of 30 GPU-path renders; base = 471d156, after = this change):
+
+| scene | base | after (defaults) | after, far = 100 m | each fix off in turn (skirts / sizes / model sync / reversed z) |
+|---|---|---|---|---|
+| G1 flat, tier 0, 1024 envs, 128 × 128 head camera | 1.90 | 1.93 | 1.95 | 1.92 / 1.94 / 1.91 / 1.91 |
+| G1 rough (heightfield + terrain slots), same camera | 34.95 | 34.69 | 98.5 (the camera sees 100 m of terrain) | 34.54 / 34.60 / 34.67 / 34.58 |
+| primitives, tier 0, 4096 envs, 64 × 64 | 7.88 | 7.86 | 7.81 | 7.86 / 7.90 / 7.80 / 7.80 |
+| primitives, tier 2 (1 spp, 2 bounces), 1024 envs, 64 × 64 | 8.82 | 9.09 | – | – / 9.19 / 9.03 / – |
+
+The defaults cost nothing measurable in tier 0 (within ±2 %) and +3 % in tier 2 (the per-frame model sync and the
+per-env light records). The first version drew the heightfield sides whole in every env and cost +22 % on G1 rough
+(34.4 → 42.0 ms); they are now culled per env in 32-triangle chunks like the top surface's tiles. An earlier run
+measured while another process held the GPU at 100 % gave the same relative changes at 30–45 % higher absolute
+times, so that utilisation reading was real contention, not the known false reading.
+
 Design notes:
 - **Far plane and depth.** `Tier0Renderer(far=10.0, near=0.01, reverse_z=True)`. Reversed z (near → 1, far → 0, compare
   greater, clear 0) keeps float32 depth error ~1e-7 x distance, so a far plane of Isaac Lab's default 1e6 costs nothing
