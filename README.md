@@ -161,13 +161,15 @@ Branch [`metalsim-flex`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsi
 
 [github.com/pulipakaa24/newton](https://github.com/pulipakaa24/newton), branch
 [`metalsim`](https://github.com/pulipakaa24/newton/tree/metalsim), head
-[`fe7f5bd`](https://github.com/pulipakaa24/newton/commit/fe7f5bd48010fcab428eac6373e85ba3317f7a42) (XPBD code
+[`9f31739`](https://github.com/pulipakaa24/newton/commit/9f317390da07432dfb5813bd0db6a47eeb7cb330) (XPBD code
 [`90e2332`](https://github.com/pulipakaa24/newton/commit/90e23324521fa86710e483e01d02e80d1dac0060), plus the Metal
-HashTable / 64-bit atomics fix `d06b2c0`, `7d80b8a`). Base: newton-physics/newton `4545802`. Apache-2.0.
+HashTable / 64-bit atomics fix `d06b2c0`, `7d80b8a`, the mesh-SDF barrier fix, Metal protocols for the remaining
+64-bit compare-and-swap / exchange sites and the Metal rigid-collision launches of the 1.5.2 line, `522e2d4`..`7dd71ed`).
+Base: newton-physics/newton `4545802`. Apache-2.0.
 Branch [`metalsim-hashtable-metal`](https://github.com/pulipakaa24/newton/tree/metalsim-hashtable-metal)
-(`24fb536`) is upstream `4545802` with only that fix; the `newton` extra installs it into `.venv` (the stock commit
+(`a4be360`) is upstream `4545802` with only the Metal fixes (no XPBD changes); the `newton` extra installs it into `.venv` (the stock commit
 loses or duplicates contact-table keys on Metal and raises on the current Warp fork in the rough G1 task).
-Branch [`metalsim-1.5.2`](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2) (`35791a0`) is Newton 1.5.2
+Branch [`metalsim-1.5.2`](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2) (`c0427fc`) is Newton 1.5.2
 (Isaac Lab 3.0-EA's pin) with MetalSim's Metal changes for the implicit MPM solver and the Franka-Pour rigid collision
 at 2,048 worlds; `scripts/setup_newton152.sh` installs it into `.venv-newton152`.
 

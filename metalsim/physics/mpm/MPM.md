@@ -491,13 +491,43 @@ fast_math, section 8 1b) + `152808b7` (`warp.config.metal_fast_math` defaults to
   takes 90 ms at the same trajectory point), a barrier race in Newton's mesh-SDF kernels fixed (it hung the GPU at
   2,048 worlds; results unchanged where it did not fire), deterministic mode sorting only the active contacts (sort
   12.4 -> 0.2 ms, deterministic collide 192.6 -> 68.3 ms). Research: `research_notes/Metal MPM speed and scalable
-  determinism/rigid_scale_perf.md`; runs: `runs/rigid_perf/`. The same mesh-SDF `progress` reset pattern is in the
-  Newton 1.7 lines (`metalsim`, `metalsim-hashtable-metal`); the barrier fix is not ported there yet.
+  determinism/rigid_scale_perf.md`; runs: `runs/rigid_perf/`. Ported to the Newton 1.7 lines (`metalsim` `522e2d4c`,
+  `1a398b2e`, `464c0aff`; `metalsim-hashtable-metal` the same commits): Franka-Pour collide on that line at 256
+  worlds 93.9 -> 10.1 ms, deterministic contacts unchanged (`runs/rigid17/`, section 8d).
 * **fast_math.** MPM picks the form with `newton_compat.install(metal_fast_math=...)` (default `"off"`), and Warp's
   own default is `"off"` as well, so programs that did not ask for it (MuJoCo Warp ray casts, Newton ray / collision
   helpers in the rigid stack) compile their `fast_math` kernels exactly as before `f52da34`. Section 8's timings were
   taken with fast_math honoured (`"relaxed"`); with the default `"off"` the MPM scenes run at section 1b's "off"
   column. `--metal-fast-math relaxed` (record_mpm.py, speed_bench.py) restores section 8's configuration.
+
+## 8d. Rigid-side loose ends (2026-10-12)
+
+* **64-bit atomics.** The Warp fork refuses 64-bit `atomic_cas` / `atomic_exch` on Metal at launch (section 8b), which
+  left four Newton sites unable to run there: contact-reduction finalize / rollback (the mesh-mesh SDF reduce kernel and
+  the two-spatial-depth reducers; 1.7 line), the XPBD restitution manifold table (1.7), Kamino's 63-bit metric argmax
+  keys (both lines) and the HashTable (fixed before). Metal protocols, CPU / CUDA unchanged (research:
+  `research_notes/Metal MPM speed and scalable determinism/metal_64bit_atomics.md`): finalize by a 64-bit atomic max
+  plus a read-back with no rollback (slots only grow); claim the high word with a 32-bit CAS, publish with a 64-bit
+  min (tagged keys); per-thread key scratch plus a per-world packed max and a finalize launch. Every claim loop is
+  bounded (HashTable and XPBD manifolds: probes + 65,536 passes, then a counted failure). Newton's contact / collision /
+  SDF / heightfield / XPBD / Kamino-metrics tests on `metalsim-hashtable-metal`: 98 failures -> 13 on cpu + metal:0,
+  no new failure; the 13 are SolverMuJoCo tests that do not build against the MuJoCo Warp fork 3.14
+  (`contact_force_fn` signature). 1.5.2 Kamino metrics: CPU 9/9, Metal 8/9 (test_06's dense-vs-sparse `f_ncp`, 2.1e-6
+  relative vs rtol 1e-6, in a kernel these changes do not touch).
+* **Rigid-scale ports to the 1.7 line**: mesh-SDF barrier fix, per-thread mesh-convex midphase, 32 mesh threadgroups
+  per core, bounded deterministic sort. Franka-Pour collide (`runs/rigid17/tools/collide17.py`, same in-contact state,
+  interleaved, Warp fork `152808b7`): 256 worlds 93.9 -> 10.1 ms (midphase 72.4 -> 0.34 ms, mesh-mesh 20.9 -> 7.5 ms).
+* **GPU hang (2026-10-12 02:32).** Newton's tests on the *unported* 1.7 tree (`fe7f5bd4`, none of the changes above)
+  hung the GPU in `TestDeterministicPipeline.test_cylinder_scale_update_keeps_generic_stage_metal_0` (cylinder on a
+  plane: no mesh, HashTable, reducer or manifold code); the watchdog killed the job after 150 s, the process stayed
+  stuck in exit holding the GPU. The same test passed in three other runs (ported trees and the unported
+  `metalsim-hashtable-metal`), so the cause is open (intermittent, below Newton's mesh / atomics code).
+* **Newton-engine contact buffer** (`metalsim/physics/newton_backend.py`): sized per contact pair
+  (`rigid_contact_capacity`); 64 G1 worlds on rough terrain went from 1,000 slots (about half the contacts dropped) to
+  7,680; `tests/test_g1_newton_engine.py::test_no_rigid_contacts_dropped`.
+* **MPM timings** (granular 35.1 / column 20.9 ms now vs 31.7 / 18.8 earlier): no regression. Interleaved A/B of the
+  pinned build against integrated-2 agrees within 0.4 ms in every window; both moved together by 8-11 % between
+  windows minutes apart (machine state; CPU load alone moves granular +14 %). `runs/mpm/regress_check/`.
 
 ## 9. Running
 
@@ -523,15 +553,15 @@ Everything above runs from a clone of MetalSim plus the three forks; nothing dep
 
 ```
 # after the install of README / docs/GUIDE.md (.venv, scripts/setup_warp.sh, the MuJoCo Warp fork):
-scripts/setup_newton152.sh          # .venv-newton152: Newton fork metalsim-1.5.2 @35791a07, shared Warp fork @152808b7
+scripts/setup_newton152.sh          # .venv-newton152: Newton fork metalsim-1.5.2 @c0427fc7, shared Warp fork @152808b7
 scripts/gpu_run.sh test_mpm check 15 -- .venv-newton152/bin/python -m pytest tests/test_mpm.py   # 14 passed, 1 xfailed
 ```
 
 | what | where it lives | how a fresh setup gets it |
 |---|---|---|
 | Warp changes | pulipakaa24/warp `metalsim`, pinned `152808b7` | `scripts/setup_warp.sh` (fallback: innate-inc/warp `ce15f6bb` + `patches/warp/metalsim-152808b7.diff`) |
-| Newton changes (MPM, Franka-Pour rigid) | pulipakaa24/newton `metalsim-1.5.2`, pinned `35791a07` | `scripts/setup_newton152.sh` (fallback: v1.5.2 + `patches/newton/metalsim-1.5.2-35791a07.diff`) |
-| Newton 1.7 HashTable fix for the rigid stack | pulipakaa24/newton `metalsim-hashtable-metal` `24fb5367` (`.venv`'s `newton` extra) and `metalsim` `fe7f5bd4` (`.venv-newtonfork`) | `pip install -e ".[newton]"`, `scripts/setup_newton.sh` |
+| Newton changes (MPM, Franka-Pour rigid) | pulipakaa24/newton `metalsim-1.5.2`, pinned `c0427fc7` | `scripts/setup_newton152.sh` (fallback: v1.5.2 + `patches/newton/metalsim-1.5.2-c0427fc7.diff`) |
+| Newton 1.7 Metal fixes for the rigid stack | pulipakaa24/newton `metalsim-hashtable-metal` `a4be3604` (`.venv`'s `newton` extra) and `metalsim` `9f317390` (`.venv-newtonfork`) | `pip install -e ".[newton]"`, `scripts/setup_newton.sh` |
 | compat layer, scenes, probes, tests, Isaac-side recorders | this repository | the clone |
 | logs, JSON, reports of every run | `runs/mpm/`, `runs/parity/isaaclab3_mpm*/`, `runs/rigid_perf/`, `runs/fma_rigid_parity/` | the clone |
 | Metal particle recordings (`.npz`, ~6.6 GB) | not committed | `record_metal_suite.sh`, `record_variant_suite.sh OUT - - .` (one GPU job per run; deterministic, so a re-recording is bitwise the original on the same trees) |
