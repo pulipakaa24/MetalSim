@@ -1048,6 +1048,57 @@ seed 0, 1500 iterations, `rough_isaac` reward set, both trainer fixes):** return
 default's three seeds gave +16.4 / +22.6 / +19.1 at 6.0–6.1. One seed, so the 3–9 point difference from pyramidal is
 not yet separable from seed spread (the pyramidal seeds spanned 6 points); loop 25.0 K env-steps/s.
 
+## 1b. IsaacContrib-Franka-Pour (Isaac Lab 3.0-EA, granular MPM manipulation; 2026-10-12)
+
+Isaac Lab 3.0-EA's contrib task: a Franka grasps a 50 g cup holding 735 granular MPM particles (~140 g) and pours
+them into a receiver; reset-dataset curriculum over 20,000 published start states; terminal-sparse reward. Port:
+`metalsim/learn/franka_pour_scene.py` (model and physics), `franka_pour.py` (MDP), `franka_pour_ppo.py` (PPO);
+reading notes with every source line: `docs/research/franka_pour_2026-10-11.md`. Isaac Lab = `upstream/IsaacLab3`
+at `ae37b028` (release/3.0.0, the L4's install), Newton 1.5.2 (fork `metalsim-1.5.2` `35791a07`), Warp fork
+`152808b7`, rsl_rl 5.4.1.
+
+### 1b.1 Asset and physics model
+
+| Isaac | ours | test (assertion) | result | verdict |
+|---|---|---|---|---|
+| Isaac 6.1 assets: `franka_panda.usda` (+11 payload layers), `franka_pour_cups.usda`, SeattleLab table, `reset_dataset.pt` | the same files, SHA-256 checked (`scripts/fetch_isaac_assets.sh`), imported by Newton's USD importer with Isaac Lab's resolvers (Newton, PhysX, MuJoCo) | `tests/test_franka_pour_terms.py::test_robot_model_matches_isaac_asset` (limits, armature 0.1, drives 1000/750/300 / 20/4/2 + finger 350/10, effort 87/12/200, actuator gravcomp on 9 joints, one finger mimic per world, collision set) | pass | confirmed |
+| Spawn hook `spawn_franka_with_arm_collisions` asserts a second finger mimic (`PhysxMimicJointAPI:linear` on joint 2) and arm hull proxies `link0_c`..`link7_c` | **Isaac's own task does not spawn with the published asset**: on the L4, `isaaclab train --task IsaacContrib-Franka-Pour` raises `RuntimeError: The pinned Franka physics payload no longer has the expected duplicate finger-mimic schemas` (`stage_pour_smoke.sh`). Ours composes the hook's intent: variant `Colliders = convex_hulls`, the ten hull proxies enabled, the asset's single mimic kept, the variant's extra hand hull not a collider | the L4 runs Isaac's task with the same composition (`franka_pour_published_asset.patch`, applied and reverted by `stage_pour.sh`) | Isaac's patched task builds and trains on the L4 | partial (the asset Isaac's hook was written against is not published; both sides use the same stand-in) |
+| Spawner poses: `standardize_xform_ops` replaces the referenced root's transform (the table's authored (0.55, 0, 0) becomes the init pose (0.5, 0, 0), 90 deg yaw) | same, authored on the stage before import (Newton's `add_usd(xform=)` rotated this free body twice) | tabletop AABB x [-0.296, 0.984], y [-0.455, 0.455], top z 0 after the task's 3 mm inset: equal to a pxr computation of Isaac's composition | pass | confirmed |
+| Builder hook (`pour_env.py:141-259`): robot shapes not particle colliders; finger and grasp-proxy gains ke 1e5 / kd 500 / kf 1e3 in MuJoCo force-space mode; bowls particle-only (margin 4 mm, mu 0.9 / 0.8); receiver rigid mesh replaced by a box; tabletop -3 mm, margin 0; kinematic particle-only spill floor; media lattice 7 x 7 x 15 via `add_particle_grid` | the same edits in the same order (`pour_world_hook`, `emit_media`) | `test_scene_settings_match_isaac_cfg` (every literal of `pour_env_cfg.py` / `geometry.py` / `media.py` the port uses, the MPM and MuJoCo solver settings as source fragments) | pass | confirmed for the values; equivalent by construction for the edits |
+| Physics: sim dt 1/120, decimation 4, 2 substeps of `SolverCoupledProxy` (arm: MuJoCo Warp implicitfast, 3 substeps, njmax 2560, nconmax 400, Isaac's MJWarp defaults 100 / 50 iterations; media: implicit MPM voxel 0.015, sparse, P0, APIC, Jacobi 24, pic27, separate worlds, 2 substeps, in place; proxy mass x 1000, staggered), one collide per sim step | the same solver objects with the same arguments; Metal: float32 accumulation and CUDA's stopping rule (`newton_compat`, MPM.md §1) | `test_scene_settings_match_isaac_cfg`; MPM-side parity of this solver vs the L4: MPM.md §5-8c | pass | confirmed for the configuration; the MPM solver itself: MPM.md |
+| `CollisionPipeline(max_triangle_pairs=1e6)` | 4,096 per world (8.4M at 2,048): this scene overflows 1M from ~1,250 worlds and drops contacts (newton-physics/newton#4604, fixed upstream #4605) | – | – | **deviation by design** (Isaac's value loses contacts at 2,048) |
+| Graph capture: one CUDA graph per `sim.step` | one Metal graph per `sim.step`, the action kernel between replays | smoke runs at 2-2,048 worlds | finite at every size; a single graph per *policy* step replays NaN at 2,048 worlds (fine at 1,024): open Warp-fork issue, not used | partial (open issue noted) |
+
+### 1b.2 Task definition (the MDP)
+
+Isaac's own term functions run on this environment's live state as the oracle (`tests/franka_pour_isaac_ref.py`:
+Isaac's `math.py`, `geometry.py`, `mdp/{observations,rewards,terminations}.py`, `reset_sampler.py`, the accessor methods
+of `pour_env.py` and Isaac Lab's generic terms, executed unmodified; the term list, order, scale, clip, weight and
+parameters read from `pour_env_cfg.py` with `ast`). 7 passed (M4 Max, 2026-10-12).
+
+| Isaac | ours | test (assertion) | result | verdict |
+|---|---|---|---|---|
+| Observations: policy 62 (joint pos/vel rel x 0.3 / 0.05, time remaining, target fraction, TCP / cup / receiver poses, grasp-frame errors, fingers, gripper target and contact, last action x 0.2), media 22 (cup velocity clipped ±2, particle fractions, source and airborne-stream summaries), privileged 2 | transcription in PyTorch on MPS | `test_observation_terms_match_isaac` (every term column vs Isaac's function, atol 1e-6) | pass | confirmed |
+| Terminations in cfg order (non-finite, extreme rigid state, overlap SAT, lost grasp monitor, spill > 10 %, particle bounds, success >= 70 %, learning-progress context, neutral time-out) with their side effects (dwell counters, success / grasp latches) | same order and buffers | `test_terminations_and_rewards_match_isaac` (3 random-action policy steps: each term bitwise, `terminated` / `time_outs`, every latch and counter, the progress latch) | pass | confirmed |
+| Rewards: +5 success, -1 failure (non-timeout), -1e-4 action L2, -1e-4 action rate, x dt | same | same test (each weighted term, rtol 1e-6) | pass | confirmed |
+| Actions: EMA relative arm deltas (scale 0.03, alpha 0.2, target = delta + current q each physics step); binary gripper (a < 0 close 0.021 m else 0.04 m, filter 1 - 0.8^(1/3), initial 0.024 m) | same; the arm target is recomputed by a kernel inside each physics step, as Isaac's `apply_actions` | the action history is observed (last action, gripper target / contact) in the observation test | pass | confirmed through the observations |
+| Reset from dataset rows: joint state, cup poses, particles = env 0's lattice in the row's source-cup frame, MPM state cleared per world, progress baseline | same, `SolverCoupledProxy.reset(world_mask, BODY | PARTICLE)` on both state buffers + masked FK | `test_reset_from_dataset_matches_isaac` (rows, poses after FK atol 2e-6, particles vs Isaac's formula, progress targets vs Isaac's term) | pass | confirmed |
+| Curriculum sampler (50-outcome rings, sqrt(p(1-p)) + 1e-4 kernel, 50 % cyclic replay) | transcription | `test_sampler_matches_isaac` (ring buffers with duplicate rows, rates, metrics, and the sampled rows equal Isaac's with the same torch generator) | pass | confirmed |
+
+### 1b.3 Learner (rsl_rl 5.4.1, the task's `FrankaPourResetDatasetPPORunnerCfg`)
+
+| Isaac | ours (`franka_pour_ppo.PourPPO`) | verdict |
+|---|---|---|
+| actor 84 -> 512-256-128-64 -> (2, 8), heteroscedastic Gaussian (log-std clamped to log [0.15, 0.75], std head zero weights, bias log 0.6), critic 86 -> ... -> 1, no normalization; 96 steps, 5 x 4 minibatches (one permutation), clip 0.2, clipped value loss, entropy 3e-4, lr 1.5e-4 fixed, grad norm 1.0 per network, gamma 0.99^(1/3), lambda 0.95^(1/3), time-out bootstrap, actions clipped to ±1 | transcribed from the 5.4.1 wheel (`ppo.py`, `distribution.py`, `mlp.py`, `rollout_storage.py`, `logger.py`) | equivalent by construction (no unit test against the rsl_rl package: 5.4.1 needs `tensordict` and is not installed here) |
+
+### 1b.4 Throughput
+
+FRANKA_POUR_THROUGHPUT_TABLE
+
+### 1b.5 Learning
+
+FRANKA_POUR_LEARNING_TABLE
+
 ## 2. Platform capabilities (the workstreams), with the tests behind them
 
 | capability | Isaac | ours | test (assertion) | result | verdict |

@@ -499,6 +499,27 @@ fast_math, section 8 1b) + `152808b7` (`warp.config.metal_fast_math` defaults to
   taken with fast_math honoured (`"relaxed"`); with the default `"off"` the MPM scenes run at section 1b's "off"
   column. `--metal-fast-math relaxed` (record_mpm.py, speed_bench.py) restores section 8's configuration.
 
+## 8d. Franka-Pour as a full task: environment + PPO (2026-10-12)
+
+Section 7b's probe mirrored the scene with scripted cup motion; `metalsim/learn/franka_pour*.py` now runs Isaac's task
+end to end: Isaac's own assets (Franka USD, cups, table, the 20,000-row reset dataset), Isaac Lab's coupled solver
+(`SolverCoupledProxy`: MuJoCo Warp arm entry + this section's `SolverImplicitMPM` as the media entry, proxy mass x
+1000, staggered), Isaac's MDP and the task's rsl_rl PPO. Parity rows and tests: `docs/PARITY.md` §1b; reading notes:
+`docs/research/franka_pour_2026-10-11.md`; usage: `docs/GUIDE.md` (Franka-Pour).
+
+* `newton_compat.install(accumulate="float32", loop="cuda", chunk_graph, gpu_exit, metal_fast_math="off",
+  device_args=None)`; rigid determinism configurable (`PourPhysicsConfig.rigid_deterministic`, default off as Isaac's
+  `NewtonCfg.deterministic_mode`).
+* Capture: one graph per `sim.step` (collide + 2 coupled steps: 6 MuJoCo + 4 MPM solves), as Isaac's
+  `_simulate_physics_only`; the arm-target kernel runs between replays. A single graph per policy step (4 sim steps)
+  replays NaN joint state at 2,048 worlds on Warp `152808b7` and is correct at 1,024: open issue (reproducer:
+  `PourPhysicsConfig(capture_unit="policy")` at 2,048 worlds).
+* Per policy step at 2,048 worlds (M4 Max): about 2 s (step only); the L4 cannot hold Isaac's own task at 2,048 envs
+  (CUDA out of memory creating the graph, and out of memory eager), so the matched comparison is at 1,024 envs (§1b.4).
+* Upstream observation (code reading, same in Isaac and here): the proxy wrench harvest uses only the last MPM
+  substep's impulses and divides by the outer dt, so with the media entry's 2 substeps the reaction on the cups is about
+  half the mean force (`solver_coupled_proxy.py:1547-1557`, `solver_implicit_mpm.py:1773-1812, 3266-3268`).
+
 ## 9. Running
 
 ```
