@@ -373,6 +373,10 @@ no-fast-math / fast-math runs (all six floor scenes), so non-fast_math kernels a
 | anymal (frame 50) | 0.99, inside | 1.01, outside | 1.01, outside |
 | plate drag (force curve) | 0.99, inside, final 240 N (L4 244-282) | **0.95**, inside, 250 N | 1.08, outside, 244 N |
 
+Section 8e supersedes this table. multi_material and ANYmal were outside for three reasons: a CUDA-only warp.fem tiling
+path, the Metal library's log / exp / sinh, and a rigid-side floor with a single sample. With the fixes, all six scenes
+are inside in `"off"`.
+
 parity_report.py (R suite): every T3 row PASS in all three modes; T1 column 0.83 / 0.87 (off), 0.93 / 0.76 (cuda),
 0.89 / 0.87 (relaxed) x floor; T1 granular FAIL in all (collider ties, section 5).
 
@@ -532,6 +536,81 @@ fast_math, section 8 1b) + `152808b7` (`warp.config.metal_fast_math` defaults to
 * **MPM timings** (granular 35.1 / column 20.9 ms now vs 31.7 / 18.8 earlier): no regression. Interleaved A/B of the
   pinned build against integrated-2 agrees within 0.4 ms in every window; both moved together by 8-11 % between
   windows minutes apart (machine state; CPU load alone moves granular +14 %). `runs/mpm/regress_check/`.
+## 8e. Parity close-out: multi_material and ANYmal (2026-10-12)
+
+Research note with every measurement and source: `research_notes/mpm_parity_closeout/NOTE.md`; scripts in the same
+directory; L4 data `runs/parity/isaaclab3_mpm_closeout/` and `runs/parity/isaaclab3_mpm_floors/mpm_floors3/`, Metal
+`runs/mpm/closeout/` (recordings not committed).
+
+**multi_material was a systematic difference (Metal took other algorithm paths), not chaos.** At frame 6, while the
+snow is still in free fall, Metal was 150 nm from the L4 in every math mode. The L4's own arithmetic perturbations
+were 35-43 nm, and the Metal modes were 36-42 nm from each other. The cause sat in the particle-to-grid transfer:
+
+1. **warp.fem tiles its dispatched assembly on CUDA only.** For "long" quadratures, a node's contributions are
+   summed by 32 lanes (strided sums, then the warp shuffle tree). The condition starts `not device.is_cuda`
+   (`_generate_auxiliary_kernels`, the same in the L4's Warp 1.16), so Metal summed sequentially. After step 1, node
+   mass and momentum differed on 72 % of the nodes by up to +-10 ulp. No-FMA and exact math on the L4 leave those
+   arrays bitwise equal, so the floor ensemble could not cover the difference. The L4 tiles in five of the six floor
+   scenes (not two-way).
+2. **`log` / `exp` / `sinh` were the Metal library's.** On CUDA they are libdevice's. Over all 2^32 inputs, Metal's
+   `log` equals CUDA's on about half of the finite inputs, and `exp` / `sinh` on 97 %. Newton uses them in the
+   plastic-flow (`Jp`) and hardening laws. Snow (hardening 10, zero initial yield strength) is the most sensitive.
+3. **svd3 / eig3 use `rsqrt.approx` (MUFU.RSQ) on CUDA and `1 / sqrt` elsewhere.** The two differ on 33 % of
+   inputs. This does not affect the first multi_material frames; it is fixed for faithfulness.
+
+Fixes (Warp fork `metalsim`):
+
+* `3c4e251e`: Metal takes CUDA's tiling choice. Metal's SIMD-group `tile_sum` is the CUDA shuffle tree.
+* `47a4031d`: `warp.config.metal_cuda_libm` (default on) adds `native/metal_cuda_libm.h`, the PTX of
+  `__nv_logf` / `__nv_expf` / `__nv_sinhf` with MUFU.EX2 through sass-math's model, and adds MUFU.RSQ to
+  `metal_cuda_fast_math.h`.
+  * Measured equal to the L4 on all 2^32 inputs of each of the three functions.
+  * MUFU.RSQ equals the L4-validated model on all of [1, 4) and across exponents.
+  * When on, every module hash is salted once; when off, behaviour and hashes are those of before.
+
+Effects:
+
+* Node mass and velocity after step 1 now equal the L4's bit for bit.
+* Snow `Jp` after step 1 now equals the L4's on all particles.
+* The first iteration counts now equal the L4's.
+* The early steps sit at the size of the L4's exact-math perturbation.
+* The tiling decisions of the six scenes equal the L4's call for call.
+* Neutrality: kernels without `log` / `exp` / `sinh` / `svd3` / `eig3` / fem dispatch compile to the same code.
+  `WP_METAL_CUDA_LIBM=0` restores the previous hashes and results for everything except fem tiling.
+  MuJoCo Warp hashes: see the rigid check below.
+
+**ANYmal frames 4-8 were a floor-estimation gap.** In the first ten frames, only the L4's no-FMA runs move the robot
+(three near-identical runs); the jitter and exact-math runs leave it at the base pose bitwise. The new L4 stage
+`isaaclab3/stage_mpm_floors3.sh` (`record_mpm.py --jitter-body-ulp 1`, six seeds) perturbs the robot's initial joint
+coordinates by 1 ulp:
+
+* The robot moves by 0.6-1.0e-7 m at frame 2 (Metal: 0.9-1.0e-7).
+* The sand moves by up to 7.85 um at frame 6 (Metal: 7.0 um).
+
+**Metal vs the floor ensemble** (`floors_dist.py`, `metal_fast_math="off"`). The ensemble is the 16 L4 runs, plus the
+6 rigid-jitter runs for ANYmal. The ratio is M / largest perturbed-L4 distance, at the worst frame:
+
+| scene | before | after | verdict |
+|---|---|---|---|
+| multi_material | 1.15 | **0.80** (last frame 0.75) | inside, and inside p95 pairwise |
+| ANYmal | 1.22 (1.00 with the rigid-jitter runs) | **0.94** (last frame 0.84) | inside |
+| two-way | 0.83 | 0.83 | inside (no tiling, so practically unchanged) |
+| granular | 0.66 | 0.66 | inside (collider-tie event at frame 6 dominates) |
+| plate drag (force curve) | 0.99, 240 N | **0.97**, 250 N (L4 244-282 N) | inside |
+| column a = 2, 3 s | 0.165 um | 0.172 um (L4 exact math 0.155 um, float32 floor ~0.19 um); 76.58 iterations = L4 | inside |
+
+With `"cuda"` fast math:
+
+* multi_material 0.81, ANYmal 0.94, two-way 0.95, plate 0.38 (final force 283 N, 1 N above the L4's range).
+* Column a = 2: a convergence check at solve 76 takes 30 iterations against the L4's 25. Before that frame, Metal-cuda
+  is 1.6e-7 from the L4, like `"off"` and like the L4's exact-math run. Afterwards the column grows to 10 um at 3 s.
+  This is a near-threshold stop, the kind the L4's own no-FMA run takes at solve 11; only the fast_math kernels
+  differ between the two modes. It does mean `"cuda"` now fails the strict column T1, and the default stays `"off"`.
+
+Cost: no measurable change. multi_material ms/frame with `metal_cuda_libm` on vs off, three interleaved repetitions:
+52.7 / 55.7 / 54.2 vs 54.5 / 54.4 / 55.1. Granular, column and ANYmal before/after tiling: within +-1 ms, two
+repetitions each (`runs/mpm/closeout/speed/`; the device was not idle at the start of these timing jobs, so the
+spread is ~+-3 ms).
 
 ## 9. Running
 
