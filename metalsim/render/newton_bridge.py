@@ -13,6 +13,12 @@ views ``sim.t.*`` and the completion event ``sim.event``. ``NewtonRenderSource``
   from (``twin=<MjModel>``, the MuJoCo-via-Newton path): its geoms, materials, textures, lights and cameras are kept and
   each MuJoCo body is matched to the Newton body of the same name in every world. The twin is only a render
   description; nothing simulates it, and the renderers are used unchanged.
+* **Per-world scale and colour** (twin "newton"). The pose kernel folds each world's ``Model.shape_scale`` (relative to
+  the scale the twin was compiled at, world 0's) into the geom frame, and a colour kernel writes each world's
+  ``Model.shape_color`` / ``shape_opacity`` into ``render_fields.geom_rgba``, which the renderers' model sync reads
+  (``metalsim.render.model_sync``): an Isaac-style scale or colour randomization written into the Newton model shows
+  in every renderer. Capsules keep their compiled cap shape (radius and total length exact). Mesh shapes keep their
+  UVs, texture (``texture_transform`` applied), roughness and metallic as a twin material.
 * **Per-frame poses.** Warp kernels write the twin's pose buffers from ``State.body_q`` (geom = body_q[body] x local
   shape transform x the twin's compiled geom frame) for every world in one launch per frame kind: no host work, the
   same arrays every frame, so ``update`` can replay a captured graph and the launches can also be recorded into the
@@ -31,6 +37,7 @@ docs/RENDER_COVERAGE.md. The shape-layer differences from Isaac Lab 3.0 are list
 """
 from __future__ import annotations
 
+import os
 import warnings
 from dataclasses import dataclass, field
 
@@ -164,6 +171,62 @@ def _frames(body_q: wp.array[wp.transform], fb: wp.array[wp.int32], fx: wp.array
         p = wp.vec3(0.0, 0.0, -1.0e6)
     out_pos[e, j] = p
     out_mat[e, j] = wp.quat_to_matrix(wp.transform_get_rotation(X))
+
+
+@wp.kernel
+def _geom_frames(body_q: wp.array[wp.transform], fb: wp.array[wp.int32], fx: wp.array[wp.transform],
+                 C: wp.array[wp.transform], kind: wp.array[wp.int32], sc0: wp.array[wp.vec3], gshape: wp.array[wp.int32],
+                 shape_scale: wp.array[wp.vec3], origin: wp.array[wp.vec3], J: int,
+                 out_pos: wp.array2d[wp.vec3], out_mat: wp.array2d[wp.mat33]):
+    """Twin geom frames with the world's shape scale relative to the compiled one (``_SCALE_*``) applied in the Newton
+    shape frame, before the twin's compiled geom frame C (mesh recentring): mat = R_shape diag(r) R_C,
+    pos = p_shape + R_shape (r * p_C)."""
+    e, j = wp.tid()
+    i = e * J + j
+    b = fb[i]
+    X = fx[i]
+    if b >= 0:
+        X = wp.transform_multiply(body_q[b], X)
+    r = wp.vec3(1.0, 1.0, 1.0)
+    s = gshape[i]
+    k = kind[j]
+    if s >= 0 and k > 0:
+        sc = shape_scale[s]
+        s0 = sc0[j]
+        if k == 1:      # per axis (box, ellipsoid, mesh)
+            r = wp.vec3(sc[0] / s0[0], sc[1] / s0[1], sc[2] / s0[2])
+        elif k == 2:    # sphere
+            r = wp.vec3(sc[0] / s0[0], sc[0] / s0[0], sc[0] / s0[0])
+        elif k == 3:    # cylinder, cone: radius, half height
+            r = wp.vec3(sc[0] / s0[0], sc[0] / s0[0], sc[1] / s0[1])
+        elif k == 4:    # capsule: radius and total half length
+            r = wp.vec3(sc[0] / s0[0], sc[0] / s0[0], (sc[1] + sc[0]) / (s0[1] + s0[0]))
+        elif k == 5:    # finite plane (full width, length)
+            r = wp.vec3(sc[0] / s0[0], sc[1] / s0[1], 1.0)
+    c = C[j]
+    R = wp.quat_to_matrix(wp.transform_get_rotation(X))
+    D = wp.mat33(r[0], 0.0, 0.0, 0.0, r[1], 0.0, 0.0, 0.0, r[2])
+    p = wp.transform_get_translation(X) + R * wp.cw_mul(r, wp.transform_get_translation(c)) - origin[e]
+    if b == -2:
+        p = wp.vec3(0.0, 0.0, -1.0e6)
+    out_pos[e, j] = p
+    out_mat[e, j] = R * D * wp.quat_to_matrix(wp.transform_get_rotation(c))
+
+
+@wp.kernel
+def _geom_colors(gshape: wp.array[wp.int32], color: wp.array[wp.vec3], opacity: wp.array[float], has_opacity: int,
+                 base: wp.array[wp.vec4], J: int, out: wp.array2d[wp.vec4]):
+    """Each world's ``shape_color`` (and ``shape_opacity``) as the twin's per-world geom_rgba."""
+    e, j = wp.tid()
+    s = gshape[e * J + j]
+    v = base[j]
+    if s >= 0:
+        a = v[3]
+        if has_opacity != 0:
+            a = opacity[s]
+        c = color[s]
+        v = wp.vec4(c[0], c[1], c[2], a)
+    out[e, j] = v
 
 
 @wp.kernel
@@ -428,6 +491,8 @@ class NewtonRenderSource:
             sb.mass = 1.0; sb.inertia = [1e-3, 1e-3, 1e-3]; sb.explicitinertial = True
             twin_body[b] = sb
         mesh_cache = {}
+        mat_cache = {}
+        scale_kind = []                # per template geom: _SCALE_* and the template (compiled) Newton scale
         extra = []                     # per geom: local transform applied before the twin's compiled geom frame
         names, gnames, snames = set(), [], []
         G = newton_geo()
@@ -442,6 +507,7 @@ class NewtonRenderSource:
             sc = i.scale
             pre = _tf()
             t = i.gtype
+            scale_kind.append(_scale_kind(t, sc, G))
             if t == int(G.SPHERE):
                 kw.update(type=mujoco.mjtGeom.mjGEOM_SPHERE, size=[sc[0], 0, 0])
             elif t == int(G.BOX):
@@ -466,8 +532,15 @@ class NewtonRenderSource:
                         me.inertia = mujoco.mjtMeshInertia.mjMESH_INERTIA_SHELL
                     except AttributeError:
                         pass
+                    tex = _mesh_texcoords(i) if t != int(G.CONE) else None
+                    if tex is not None:
+                        me.usertexcoord = tex.reshape(-1).tolist()
                     mesh_cache[mk] = mname
                 kw.update(type=mujoco.mjtGeom.mjGEOM_MESH, meshname=mesh_cache[mk])
+                if t != int(G.CONE):
+                    mat = _mesh_material(spec, i, mat_cache)
+                    if mat is not None:
+                        kw.update(material=mat)
             elif t == int(G.HFIELD):
                 hf = i.src
                 data = np.asarray(hf.data, np.float64).reshape(int(hf.nrow), int(hf.ncol))
@@ -512,9 +585,11 @@ class NewtonRenderSource:
         sbody = _shape_body(self.newton)
         geom_slots = [None] * tm.ngeom
         self.geom_shape = np.full((n, tm.ngeom), -1, np.int32)
-        for (i, col), pre, gname in zip(template, extra, gnames):
+        self._geom_scale = {}           # twin geom -> (_SCALE_* kind, template scale, compiled geom frame C)
+        for (i, col), pre, gname, sk in zip(template, extra, gnames, scale_kind):
             g = oid(mujoco.mjtObj.mjOBJ_GEOM, gname)
             C = _tf(tm.geom_pos[g], _wxyz_to_xyzw(tm.geom_quat[g]))
+            self._geom_scale[g] = (sk[0], sk[1], C)
             body = np.empty(n, np.int32); xf = np.empty((n, 7))
             for e in range(n):
                 s_ = int(col[e])
@@ -755,6 +830,30 @@ class NewtonRenderSource:
             return (J, wp.array(body, dtype=wp.int32, device=dev), wp.array(xf, dtype=wp.transform, device=dev))
 
         self._tab = {k: table(getattr(self, "_" + k)) for k in ("geoms", "bodies", "sites", "cams")}
+        self._gscale = None
+        self.render_fields = None
+        if self.kind == "newton" and m.ngeom and self._geoms:
+            # per-world scale: frames without the compiled geom frame C (re-applied after the scale), kinds, template scales
+            J = m.ngeom
+            fx = np.zeros((n, J, 7)); Cs = np.zeros((J, 7)); kinds = np.zeros(J, np.int32); sc0 = np.ones((J, 3))
+            for g, sl in enumerate(self._geoms):
+                k, s0, C = self._geom_scale.get(g, (0, (1.0, 1.0, 1.0), _tf()))
+                Ci = _tf_inv(C)
+                fx[:, g] = [_tf_mul(sl.xf[e], Ci) for e in range(n)]
+                Cs[g] = C; kinds[g] = k; sc0[g] = np.where(np.abs(np.asarray(s0, float)) > 1e-12, s0, 1.0)
+            self._gscale = (wp.array(fx.reshape(-1, 7).astype(np.float32), dtype=wp.transform, device=dev),
+                            wp.array(Cs.astype(np.float32), dtype=wp.transform, device=dev),
+                            wp.array(kinds, dtype=wp.int32, device=dev), wp.array(sc0.astype(np.float32), dtype=wp.vec3, device=dev),
+                            wp.array(self.geom_shape.reshape(-1), dtype=wp.int32, device=dev))
+            # per-world colours (the renderers' model sync reads render_fields; geom_matid / mat_rgba stay compiled)
+            col = getattr(self.newton, "shape_color", None)
+            if col is not None:
+                rf = _Data()
+                rf.geom_rgba = wp.zeros((n, J), dtype=wp.vec4, device=dev)
+                opac = getattr(self.newton, "shape_opacity", None)
+                self._gcol = (col, opac if opac is not None else wp.zeros(1, dtype=float, device=dev), 1 if opac is not None else 0,
+                              wp.array(np.asarray(m.geom_rgba, np.float32), dtype=wp.vec4, device=dev))
+                self.render_fields = rf
         self._out = {"geoms": (d.geom_xpos, d.geom_xmat), "bodies": (d.xpos, d.xmat), "sites": (d.site_xpos, d.site_xmat),
                      "cams": (d.cam_xpos, d.cam_xmat)}
         self._ltab = None
@@ -802,7 +901,17 @@ class NewtonRenderSource:
                     continue
                 J, fb, fx = tab
                 pos, mat = self._out[k]
-                wp.launch(_frames, dim=(self.n, J), inputs=[bq, fb, fx, self._origin, J], outputs=[pos, mat])
+                if k == "geoms" and self._gscale is not None:
+                    fxn, C, kind, sc0, gsh = self._gscale
+                    wp.launch(_geom_frames, dim=(self.n, J), inputs=[bq, fb, fxn, C, kind, sc0, gsh, self.newton.shape_scale,
+                                                                       self._origin, J], outputs=[pos, mat])
+                else:
+                    wp.launch(_frames, dim=(self.n, J), inputs=[bq, fb, fx, self._origin, J], outputs=[pos, mat])
+            if self.render_fields is not None:
+                col, opac, has_o, base = self._gcol
+                J = self.m.ngeom
+                wp.launch(_geom_colors, dim=(self.n, J), inputs=[self._gscale[4], col, opac, has_o, base, J],
+                          outputs=[self.render_fields.geom_rgba])
             if self._ptab and state is not None and getattr(state, "particle_q", None) is not None:
                 for V, idx, out in self._ptab:
                     wp.launch(_gather_points, dim=(self.n, V), inputs=[state.particle_q, self.newton.particle_flags, idx,
@@ -897,9 +1006,10 @@ class NewtonRenderSource:
         return self.geom_shape
 
     def per_env_colors(self, renderer) -> np.ndarray:
-        """(N, G, 4) colour multipliers for ``renderer.set_colors`` so each env shows its own worlds' ``shape_color``
-        where worlds differ (the twin's material is world 0's)."""
-        if self.kind != "newton":
+        """(N, G, 4) colour multipliers for ``renderer.set_colors``. Superseded: the renderers now read each world's
+        ``shape_color`` every frame through ``render_fields`` (no host step), so this returns ones for twin "newton"
+        (multiplying by it would apply the colour twice)."""
+        if self.kind != "newton" or self.render_fields is not None:
             return np.ones((self.n, renderer.G, 4), np.float32)
         col = self.newton.shape_color.numpy() if getattr(self.newton, "shape_color", None) is not None else None
         out = np.ones((self.n, renderer.G, 4), np.float32)
@@ -1023,6 +1133,86 @@ def _geometry_hash(src) -> tuple:
         if a is not None:
             h.update(str(float(a)).encode())
     return (type(src).__name__, h.hexdigest())
+
+
+_SCALE_NONE, _SCALE_AXES, _SCALE_SPHERE, _SCALE_CYLINDER, _SCALE_CAPSULE, _SCALE_PLANE = 0, 1, 2, 3, 4, 5
+
+
+def _scale_kind(t, sc, G):
+    """How a per-world ``shape_scale`` changes a twin geom compiled at ``sc`` (``_geom_frames``)."""
+    if t == int(G.SPHERE):
+        k = _SCALE_SPHERE
+    elif t in (int(G.BOX), int(G.ELLIPSOID), int(G.MESH), int(G.CONVEX_MESH)):
+        k = _SCALE_AXES
+    elif t in (int(G.CYLINDER), int(G.CONE)):
+        k = _SCALE_CYLINDER
+    elif t == int(G.CAPSULE):
+        k = _SCALE_CAPSULE
+    elif t == int(G.PLANE) and sc[0] > 0 and sc[1] > 0:
+        k = _SCALE_PLANE
+    else:
+        k = _SCALE_NONE          # infinite planes, heightfields
+    return k, tuple(float(x) for x in sc[:3])
+
+
+def _mesh_texcoords(info: _ShapeInfo):
+    """Per-vertex UVs of a Newton mesh with its ``texture_transform`` applied (2 x 3 affine rows), or None."""
+    src = info.src
+    uv = getattr(src, "uvs", None)
+    if uv is None or getattr(src, "texture", None) is None:
+        return None
+    uv = np.asarray(uv, np.float64).reshape(-1, 2)
+    if len(uv) != len(np.asarray(src.vertices).reshape(-1, 3)):
+        return None
+    T = np.asarray(getattr(src, "texture_transform", ((1, 0, 0), (0, 1, 0))), np.float64).reshape(2, 3)
+    return uv @ T[:, :2].T + T[:, 2]
+
+
+def _texture_image(tex) -> np.ndarray | None:
+    """A Newton mesh texture (path / URL or (H, W, C) array) as (H, W, 3) uint8."""
+    if isinstance(tex, (str, os.PathLike)):
+        try:
+            from PIL import Image
+            img = np.asarray(Image.open(os.fspath(tex)).convert("RGB"))
+        except Exception as ex:        # noqa: BLE001
+            warnings.warn(f"Newton mesh texture {tex!r} not loaded: {ex}")
+            return None
+    else:
+        img = np.asarray(tex)
+        if img.dtype != np.uint8:
+            img = np.clip(np.round(img.astype(np.float64) * (255.0 if img.max() <= 1.0 else 1.0)), 0, 255).astype(np.uint8)
+        if img.ndim == 2:
+            img = np.repeat(img[..., None], 3, -1)
+        img = img[..., :3]
+    return np.ascontiguousarray(img)
+
+
+def _mesh_material(spec, info: _ShapeInfo, cache: dict):
+    """A twin material for a Newton mesh's texture / roughness / metallic (None when it has none)."""
+    src = info.src
+    key = id(src)
+    if key in cache:
+        return cache[key]
+    rough, metal = getattr(src, "roughness", None), getattr(src, "metallic", None)
+    tex = getattr(src, "texture", None)
+    img = _texture_image(tex) if (tex is not None and _mesh_texcoords(info) is not None) else None
+    if img is None and rough is None and metal is None:
+        cache[key] = None
+        return None
+    name = f"mat_{len(cache)}"
+    kw = dict(name=name, rgba=list(info.rgba))
+    if rough is not None:
+        kw["roughness"] = float(rough)
+    if metal is not None:
+        kw["metallic"] = float(metal)
+    mt = spec.add_material(**kw)
+    if img is not None:
+        h, w = img.shape[:2]
+        t = spec.add_texture(name=f"tex_{name}", type=mujoco.mjtTexture.mjTEXTURE_2D, width=w, height=h, nchannel=3)
+        t.data = img.tobytes()
+        mt.textures[mujoco.mjtTextureRole.mjTEXROLE_RGB] = f"tex_{name}"
+    cache[key] = name
+    return name
 
 
 def _mesh_arrays(info: _ShapeInfo, G):

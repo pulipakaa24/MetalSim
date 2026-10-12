@@ -101,7 +101,8 @@ class Tier2Renderer:
                  terrain_slots: bool = True, draw_hfields: bool = True, firefly_clamp=0.0,
                  appearance: str = "mujoco", skybox: bool = True, transparency: bool = True, transparent_ids: str = "surface",
                  visual=None, deformables=(), tube_slices=None, cap_stacks=None, dyn_rebuild_every: int = 32,
-                 ctx: MetalContext | None = None, device="metal:0"):
+                 infinite_planes: bool = True, hfield_skirts: bool = True, per_world_size: bool = True,
+                 model_fields: bool = True, lens=None, ctx: MetalContext | None = None, device="metal:0"):
         """``terrain_slots`` / ``draw_hfields`` / ``appearance``: see ``Tier0Renderer`` (False / "legacy" = the
         previous behaviour). ``skybox``: the model's skybox texture is the environment (camera background and the
         radiance of every escaping ray, MuJoCo's cube mapping, unlit texel values x env scale) instead of its mean
@@ -113,7 +114,13 @@ class Tier2Renderer:
         ``transparent_ids``: annotations of pixels whose first surface is transparent, as ``Tier0Renderer``: "surface"
         (default, MuJoCo's; "mujoco" is an alias) or "behind" (the first opaque surface behind it).
         ``visual`` / ``deformables`` / ``tube_slices`` / ``cap_stacks``: sites, flexes, skins, spatial tendons and user
-        deformable meshes, see ``Tier0Renderer``; ``dyn_rebuild_every``: see ``RayTracer``."""
+        deformable meshes, see ``Tier0Renderer``; ``dyn_rebuild_every``: see ``RayTracer``.
+        ``infinite_planes`` / ``hfield_skirts`` / ``per_world_size`` /
+        ``model_fields``: see ``Tier0Renderer`` (False = the previous behaviour). With ``usd_lights``, those lights keep
+        their USD intensity (a per-world ``light_diffuse`` does not apply to them). ``lens``: a
+        ``metalsim.render.lens.Lens`` (f-theta / Kannala-Brandt fisheye; default pinhole from the model camera and the
+        per-env intrinsics); pixels outside its field of view are black with depth 0."""
+        from metalsim.render.lens import Lens
         import mujoco
         self.m, self.n, self.tw, self.th = model, n_envs, width, height
         self.device = device
@@ -123,8 +130,11 @@ class Tier2Renderer:
                             appearance=appearance,
                             visual=mujoco.MjvOption() if visual is None else visual, deformables=deformables,
                             tube_slices=tube_slices, cap_stacks=cap_stacks,
-                            dyn_rebuild_every=dyn_rebuild_every, ctx=self.ctx, device=device)
+                            dyn_rebuild_every=dyn_rebuild_every, infinite_planes=infinite_planes, hfield_skirts=hfield_skirts,
+                            per_world_size=per_world_size, ctx=self.ctx, device=device)
 
+        self.model_fields = bool(model_fields)
+        self.lens = lens or Lens.pinhole()
         self.tables = self.rt.tables
         self.G = self.tables.G
         cam_id = 0 if camera is None else (mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_CAMERA, camera) if isinstance(camera, str) else int(camera))
@@ -148,6 +158,7 @@ class Tier2Renderer:
         self.t_colors = tb.mps_tensor(self._colors_wp)
         self.color_buf = wm.buffer_of(self._colors_wp).buffer
         lights = t.lights.copy(); params = t.params.copy()
+        lock = np.zeros(max(model.nlight, 1), np.uint32)
         env_scale = 1.0
         if usd_lights is not None:
             for i, ul in enumerate(usd_lights):
@@ -155,6 +166,7 @@ class Tier2Renderer:
                     continue
                 lights[i, 4:7] = float(ul.get("intensity", 1.0)) * np.asarray(ul.get("color", (1, 1, 1)), np.float32)
                 lights[i, 7] = np.deg2rad(float(ul.get("angle_deg", 0.0))) / 2      # angular radius
+                lock[i] = 1
         self._dome = None if dome is None else (float(dome[0]), tuple(float(v) for v in dome[1]))
         if dome is not None:
             params[4, :3] = np.asarray(dome[1], np.float32); params[4, 3] = 1.0; env_scale = float(dome[0])
@@ -165,12 +177,15 @@ class Tier2Renderer:
             params[6, 1] = 0.0                # the skybox texture is not drawn (uniform dome / sky colour)
         if headlight is False:
             params[3, 3] = 0.0
-        self.light_buf = c.buffer(lights.nbytes, lights, "pt_lights")
+        from metalsim.render.model_sync import ModelSync, unit_rgba
+        self.sync = ModelSync(c, model, n_envs, t, self.color_buf, lights, lock, opaque=not transparency)
+        self.light_buf = self.sync.lights                    # (n_envs, max(nlight, 1)) records
         self.params_buf = c.buffer(params.nbytes, params, "pt_params")
         self.mat_model = material_model
-        self.mat_buf = None
+        # the renderer's own material table (rgba = 1: the model sync supplies the colour per world; column 15 is
+        # the reflectance in legacy mode, the per-slot BRDF model id otherwise)
+        mats = unit_rgba(t.materials)
         if material_model != "legacy":
-            mats = t.materials.copy().reshape(self.G, 16)
             ids = {"legacy": 0, "usd_preview_storm": 1, "omnipbr_curve": 2, "usd_preview": 3, "omnipbr": 4,
                    "usd_preview_v1": 1, "omnipbr_v1": 2, "usd_preview_fv": 5, "omnipbr_fv": 6}
             spec_ = material_model if isinstance(material_model, dict) else {None: material_model}
@@ -179,28 +194,23 @@ class Tier2Renderer:
                 mats[slot, 15] = ids[spec_.get(nm, spec_.get(None, "legacy"))]
             for j, ex in enumerate(t.extras):    # extra slots (sites, flexes, ...) by their own name
                 mats[len(t.geoms) + j, 15] = ids[spec_.get(ex["name"], spec_.get(None, "legacy"))]
-            if not transparency:
-                mats[:, 3] = 1.0
-            mats = self._with_ext(mats)
-            self.mat_buf = c.buffer(mats.nbytes, mats, "pt_materials")
-        elif not transparency:
-            mats = t.materials.copy().reshape(self.G, 16)
-            mats[:, 3] = 1.0
-            mats = self._with_ext(mats)
-            self._opaque_mat_buf = c.buffer(mats.nbytes, mats, "pt_materials_opaque")
+        # transparency=False: the model sync writes alpha 1 (ModelSync(opaque=True))
+        self.mat_buf = c.buffer(4 * (mats.size + self.G * 8), self._with_ext(mats), "pt_materials")
         ai = t.atlas.image
         self.atlas_tex = c.texture2d(ai.shape[1], ai.shape[0], Metal.MTLPixelFormatRGBA8Unorm, Metal.MTLTextureUsageShaderRead,
                                      label="pt_atlas", storage=Metal.MTLStorageModeShared)
         c.upload_texture(self.atlas_tex, ai)
         self.samp = c.sampler(linear=True, repeat=True)
         # PTConsts (shaders/pathtrace.metal): 16 words as before + [16:18] env grid, [20] env_yaw, [21] clamp_lum, [24:28] env_mul
-        self.consts = np.zeros(28, np.uint32)
+        self.consts = np.zeros(48, np.uint32)
         self.consts[:4] = (n_envs, width, height, max(model.ncam, 1))
         self.consts[4:8] = (max(model.nlight, 1) if model.nlight else 0, self.G, spp, max_bounces)
         self.consts[8:12] = (0, self.rt.tpr, 1, seed)
         cf = self.consts.view(np.float32); cf[12] = self.rt.stride; cf[13] = exposure; cf[14] = env_scale; cf[15] = clip_far
         cf[21] = float(firefly_clamp); cf[24:27] = 1.0
         self.consts[23] = {"mujoco": 0, "surface": 0, "behind": 1}[transparent_ids]   # PTConsts.trans_ids
+        cf[28] = self.rt.ray_limit                                   # PTConsts.ray_limit
+        self.consts[32:48] = self.lens.pack().view(np.uint32)      # PTConsts.lens
         self.denoise = denoise
         self.aux = bool(aux or denoise)
         self.base_flags = (2 if material_model != "legacy" else 0) | (4 if tonemap == "rtx" else 0) | (8 if self.aux else 0) | (16 if center_sample else 0)
@@ -334,8 +344,8 @@ class Tier2Renderer:
         ce.setBuffer_offset_atIndex_(rt.inst_tab, 0, 1); ce.setBuffer_offset_atIndex_(rt.slot_mesh, 0, 2)
         ce.setBuffer_offset_atIndex_(rt.mesh_info, 0, 3); ce.setBuffer_offset_atIndex_(rt.vbuf, 0, 4)
         ce.setBuffer_offset_atIndex_(rt.ibuf, 0, 5); ce.setBuffer_offset_atIndex_(self._ias.inst_desc if grains else rt.inst_desc, 0, 6)
-        ce.setBuffer_offset_atIndex_(self.mat_buf or getattr(self, "_opaque_mat_buf", None) or rt.mat_buf, 0, 7)   # + MaterialExt tail
-        ce.setBuffer_offset_atIndex_(self.color_buf, 0, 8)
+        ce.setBuffer_offset_atIndex_(self.mat_buf, 0, 7)   # + MaterialExt tail
+        ce.setBuffer_offset_atIndex_(self.sync.inst_col, 0, 8)   # t_colors x the per-world model colour
         ce.setBuffer_offset_atIndex_(self.light_buf, 0, 9)
         ce.setBuffer_offset_atIndex_(light_xpos, lxo, 10); ce.setBuffer_offset_atIndex_(light_xdir, ldo, 11)
         ce.setBuffer_offset_atIndex_(self.params_buf, 0, 12); ce.setBuffer_offset_atIndex_(self.cam_buf, 0, 13)
@@ -408,6 +418,7 @@ class Tier2Renderer:
         cb = self.ctx.command_buffer()
         if ev is not None:
             self.ctx.wait_for(cb, ev, after_value)
+        self.sync.encode(cb, sim if self.model_fields else None)
         gm_buf, gm_off = self.rt.encode_geom_xmat(cb, sim, v["geom_xmat"].buffer, v["geom_xmat"].offset)
         gx_buf, gx_off, gm_buf, gm_off = self.rt.encode_pose(cb, sim, v["geom_xpos"].buffer, v["geom_xpos"].offset, gm_buf, gm_off)
         self._encode_scene(cb, gx_buf, gx_off, gm_buf, gm_off)
@@ -515,21 +526,14 @@ class Tier2Renderer:
     def set_materials(self, materials):
         """Replace the (G, 16) material table (layout: SceneTables.MATERIAL_LAYOUT) and rewrite the GPU buffer;
         the per-slot BRDF model ids of a non-legacy ``material_model`` are kept."""
+        from metalsim.render.model_sync import unit_rgba
         mats = np.asarray(materials, np.float32).reshape(self.G, 16).copy()
-        if getattr(self, "_opaque_mat_buf", None) is not None:
-            self.tables.materials[:] = mats.reshape(self.tables.materials.shape)
-            self.ctx.write_buffer(self.rt.mat_buf, mats)
-            mats = mats.copy(); mats[:, 3] = 1.0
-            self.ctx.write_buffer(self._opaque_mat_buf, mats)
-            return
-        if not self.transparency:
-            mats[:, 3] = 1.0
-        if self.mat_buf is not None:
+        self.tables.materials[:] = mats.reshape(self.tables.materials.shape)
+        self.ctx.write_buffer(self.rt.mat_buf, mats)            # the lidar's reflectance (column 15)
+        if self.mat_model != "legacy":
             mats[:, 15] = self.ctx.buffer_array(self.mat_buf, np.float32, (self.G, 16))[:, 15]
-            self.ctx.write_buffer(self.mat_buf, mats)
-        else:
-            self.tables.materials[:] = mats.reshape(self.tables.materials.shape)
-            self.ctx.write_buffer(self.rt.mat_buf, mats)
+        self.ctx.write_buffer(self.mat_buf, unit_rgba(mats))
+        self.sync.set_static_rgba(mats)
 
     def render_host(self, datas, passes=1, reset=True, cam_pos=None, cam_quat=None, geom_size=None, chunk=None, sources=None):
         """Host path from MjData lists (tests/tools); synchronizes; returns numpy outputs. ``geom_size`` (N, ngeom, 3):
@@ -558,6 +562,7 @@ class Tier2Renderer:
             c.write_buffer(self._host_light_xpos, np.stack([d.light_xpos for d in datas]).astype(np.float32).reshape(n, nl, 3))
             c.write_buffer(self._host_light_xdir, np.stack([d.light_xdir for d in datas]).astype(np.float32).reshape(n, nl, 3))
         cb = c.command_buffer()
+        self.sync.encode(cb, None)
         self._encode_scene(cb, rt._host_geom_xpos, 0, rt._host_geom_xmat, 0)
         for p in range(passes):
             if chunk and p and p % int(chunk) == 0:

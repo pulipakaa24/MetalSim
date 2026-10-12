@@ -27,7 +27,7 @@ there is no code path. Those rows are marked "code".
 
 **Work in progress elsewhere.** These are listed so the table reflects them, not audited as shipped:
 - Uncommitted render changes in the main checkout (another session):
-  - `Tier0Renderer(far=...)` makes the 10 m far plane configurable.
+  - `Tier0Renderer(far=...)` makes the 10 m far plane configurable (landed by workstream C with the same signature, §3c).
   - `textures="native"` (`render/textures.py`) adds full-resolution textures with mips, anisotropic filtering and
     per-material wrap.
   - The 3D Gaussian splat renderer (`render/splat/`, `shaders/splat.metal`).
@@ -59,8 +59,8 @@ Measured coverage of the reference silhouette is shown as rgb / depth / seg.
 |---|---|---|---|---|---|---|
 | sphere, capsule, ellipsoid, cylinder, box, mesh (convex hull) | ✅ | ✅ | ✅ | ✅ | ✅ | 0.996–1.0 / 0.996–1.0 / 0.996–1.0; depth error ≤ 0.7 mm |
 | finite plane | ✅ | ✅ | ✅ | ✅ | ✅ | 1.0 / 1.0 / 1.0 |
-| **infinite plane** (`size="0 0"`, every locomotion floor) | ◐ | ◐ | ◐ | ◐ | ◐ | Drawn as a 10 × 10 m square (`plane_extent=5`). The ground covers only 0.369 of MuJoCo's ground pixels, so the horizon shows a visible edge. |
-| hfield | ◐ | ◐ | ◐ | ◐ | ◐ | 0.85 / 0.85 / 0.85. The top surface is exact (depth error 0). MuJoCo's side skirts and base are not drawn. |
+| infinite plane (`size="0 0"`, every locomotion floor) | ✅ | ✅ | ✅ | ✅ | ✅ | **Fixed (workstream C, §3c).** Drawn to the far plane under each env's camera (T0/T1), to the sensor range (RT/T2), with MuJoCo's plane texture mapping. Ground coverage of MuJoCo's ground pixels 0.369 → 1.0 (T0/T1/T2/RT). |
+| hfield | ✅ | ✅ | ✅ | ✅ | ✅ | **Fixed (§3c).** Top surface plus MuJoCo's sides and base: coverage 0.58 → 1.0 (side view) and 0.90 → 1.0 (from below), every renderer; geometry equals `mj_ray` on 400 random rays (max 1e-15 m). |
 | SDF geom (`type="sdf"`, plugin or mesh SDF) | ✅ | ✅ | ✅ | ✅ | ✅ | **Fixed 2026-10 (B)**: drawn from its mesh as MuJoCo does. Was 0.0 / 0.0 / 0.0; now 1.0 / 1.0 / 1.0 in T0, T2 and the ray-traced depth camera, depth error 0. |
 | sites (group 0–2, visible in MuJoCo by default) | ✅ | ✅ | ✅ | n/a (by design) | ✅ | **fixed (workstream A, §5)**: 0.993–1.0 / 0.993–1.0 / 0.993–1.0, depth error ≤ 0.4 mm (was 0.0). Instanced slots posed from `site_xpos` / `site_xmat`. The ray-traced sensors leave sites out by default, as `mj_ray` does (a lidar's own mounting site would occlude every beam); `visual=mujoco.MjvOption()` includes them. Isaac draws no sites. |
 | spatial tendon with `width` (cables, wires, MuJoCo tendon-driven hands) | ✅ | ✅ | ✅ | ✅ | ✅ | **fixed (workstream A, §5)**: 1.0 / 1.0 / 1.0, depth error 0 (was 0.0); tendons wrapping a cylinder, a sphere and across a pulley in §5. Capsules per wrap segment (MuJoCo's tessellation, half width inside a wrapping geom, none across a pulley). Not reproduced: MuJoCo's catenary for a slack two-site spring tendon and the limit-impedance recolouring of default-grey tendons. Isaac draws no tendon geometry. |
@@ -69,7 +69,7 @@ Measured coverage of the reference silhouette is shown as rgb / depth / seg.
 | flex 1D (cable) | ✅ | ✅ | ✅ | ✅ | ✅ | **fixed (workstream A, §5)**: open cylinders per edge (`mjVIS_FLEXEDGE`). The first audit's cable sat just above the image (0 px in MuJoCo too); moved mid-image it is 1.0 / 1.0 / 1.0 in every renderer. |
 | skin (bone-skinned mesh) | ✅ | ✅ | ✅ | ✅ | ✅ | **fixed (workstream A, §5)**: 1.0 / 1.0 / 1.0 of 236 px, depth error 0 (was 0.0). Linear blend skinning, area-weighted normals, `inflate`. |
 | transparency (`rgba` alpha < 1, material opacity, USD `opacity`) | ✅ | ✅ | ✅ | ◐ (opaque) | ✅ | **Fixed 2026-10 (B)**. T0/T1 blend as MuJoCo does: objects sorted per env, drawn front-to-back then back-to-front, back faces culled. T2 treats alpha as presence, like a USD opacity in Isaac's path tracer. Red box behind 25 % blue glass, colour change the glass makes over the box: MuJoCo (−64, 0, +65); T0/T1 before (−146, 0, +146), after (−64, 0, +64); T2 before (−122, 0, +125), after (−53, 0, +53). Annotations default to MuJoCo's: segmentation and depth of the glass (1.904 m, equal to MuJoCo). `transparent_ids="behind"` gives Isaac RTX Real-Time's opacity behaviour (seg / depth from what is behind). Lidar and depth camera still treat it as opaque. |
-| **geometry beyond 10 m** | ❌ | ❌ | ✅ | ✅ (range-limited) | T0: ❌ | T0/T1 far plane is fixed at 10 m in the shader. Boxes at 14 m and 38–41 m: T0/T1 0.0 / 0.0 / 0.0, T2 and RT 1.0. WIP `far=` in the main checkout fixes this. |
+| geometry beyond 10 m | ✅ (`far=`) | ✅ (`far=`) | ✅ | ✅ (range-limited) | ✅ | **Fixed (§3c).** `Tier0Renderer(far=...)` (default 10 m, unchanged); boxes at 15 m and 40 m 0.0 → 1.0 with MuJoCo's far plane; reversed-z depth keeps the error relative at any far. |
 | geom groups ≥ 3 hidden | ✅ | ✅ | ✅ | ✅ | ✅ | Matches MuJoCo's default `geomgroup` |
 | `geom_rgba` / `mat_rgba` | ✅ | ✅ | ✅ | n/a | ✅ | |
 | emission | ✅ | ✅ | ✅ (not sampled as a light) | n/a | | |
@@ -88,7 +88,7 @@ Measured coverage of the reference silhouette is shown as rgb / depth / seg.
 | point-light shadows | ✅ | ✅ | ✅ | n/a | | **Fixed 2026-10 (B)**: T0 renders six 90° cube faces per point light; T1 traces a ray. T0 1.02 → 0.053, T1 1.02 → 0.051, T2 0.035. MuJoCo does not light point lights at all; Isaac RTX shadows them. |
 | directional shadows | ✅ (every caster) | ✅ (every caster) | ✅ | | | 0.052 / 0.049 / 0.041 vs MuJoCo 0.0 (unchanged). Every further shadow-casting directional light now gets its own map in T0 and its own soft ray in T1. With a DR light on, the first model directional light stays unshadowed, as before. |
 | image lights (`mjLIGHT_IMAGE`) | ◐ | ◐ | ◐ | | | Mapped to directional (`build_lights`, code) |
-| area lights (USD Rect / Disk / Cylinder, SphereLight radius) | ❌ | ❌ | ❌ | | | The importer drops Rect, Disk and Cylinder lights. A SphereLight becomes a point light with no radius, so shadows are hard. |
+| area lights (USD Rect / Disk / Cylinder, SphereLight radius) | ◐ | ◐ | ◐ | | | Imported as spot / point lights with far-field radiometry (§3c); no area sampling, so shadows stay hard. SphereLight radius still dropped. |
 | debug visuals (joints, contacts, COM, inertia, equality constraints, perturbations) | n/a | n/a | n/a | | | Not camera content in Isaac either |
 
 ### 1b. Per-world randomization (things the physics can vary per env)
@@ -98,11 +98,11 @@ Measured coverage of the reference silhouette is shown as rgb / depth / seg.
 | per-env colour (`Randomizer.colors`, event-term colour) | ✅ | ✅ | n/a | `t_colors` (N, G, 4) |
 | camera pose, intrinsics, DR light, ambient, backgrounds | ✅ | ✅ (no backgrounds) | | `t_cam_spec` |
 | HDR dome map per episode | ❌ | ✅ | | `Randomizer.environment` is tier 2 only |
-| **per-world `geom_size`** (MuJoCo Warp batched size, scale randomization) | ◐ | ◐ | ◐ | Read only for the `tslot*` terrain boxes. Every other geom is baked at its compiled size, so a randomized object size is invisible in images while physics uses it. |
-| **per-world `geom_rgba` / `mat_rgba` / `geom_matid`** written into the MuJoCo Warp model | ❌ | ❌ | | The renderer never reads them; colour DR must go through `t_colors` |
-| per-world light colour / intensity / position fields of the model | ❌ | ❌ | | Only `light_xpos` / `light_xdir` are read |
+| per-world `geom_size` (MuJoCo Warp batched size, scale randomization) | ✅ | ✅ | ✅ | **Fixed (§3c).** Every primitive is a unit mesh scaled per world in the GPU path (capsules: radius and length exact, caps scaled). Silhouette IoU vs MuJoCo at the world's size 0.36–0.82 → ≥ 0.989. Meshes: MuJoCo Warp has no per-world mesh scale (physics neither). |
+| per-world `geom_rgba` / `mat_rgba` / `geom_matid` written into the MuJoCo Warp model | ✅ | ✅ | | **Fixed (§3c)** (`render/model_sync.py`): read every frame, MuJoCo's colour rule (geom rgba over the material's unless default). Mean RGB error vs the world's compiled model 17–29 → 0.0 (T0), ≤ 5 (T2 noise). `geom_matid` switches the colour, not the texture. |
+| per-world light fields of the model (`light_diffuse` / `specular` / `ambient` / `active` / `type` / `castshadow` / `cutoff` / `exponent` / `attenuation`) | ✅ | ✅ | | **Fixed (§3c).** Per-env light records from the model each frame; an inactive light emits nothing (also `active="false"` lights, which the static table drew lit: code). Tier 2's `usd_lights` keep their USD intensity. |
 | per-world `cam_fovy` / intrinsics in the model | ❌ (use `t_cam_spec`) | ❌ (`set_fovy`) | | |
-| roughness / metallic randomization | ◐ (shared by all envs) | ◐ | | `Randomizer.materials` writes one table. On a legacy-mode `Tier2Renderer`, `r.mat_buf` is `None`, so the call fails; use `Tier2Renderer.set_materials`. |
+| roughness / metallic randomization | ◐ (shared by all envs) | ◐ | | `Randomizer.materials` writes one table through the renderer's `set_materials`. **Fixed (§3c):** the call crashed on a legacy-mode `Tier2Renderer` (`AttributeError`). |
 | texture swap randomization (`rep.randomizer.texture`) | ❌ | ❌ | | Already listed as not done in GAPS (Replicator row) |
 
 ### 1c. Deformables, particles and other physics engines
@@ -124,14 +124,14 @@ Measured coverage of the reference silhouette is shown as rgb / depth / seg.
 | UsdPreviewSurface: diffuse colour / texture, roughness, metallic, ior, opacity | ◐ | Opacity is stored and then drawn opaque. Roughness, normal and occlusion textures are dropped. |
 | OmniPBR: diffuse constant / texture / tint, roughness, metallic, opacity, specular level, emission intensity | ◐ | `texture_scale` / rotate / translate are ignored. Emissive colour is reduced to intensity. Normal and ORM maps are dropped. OmniGlass is opaque. |
 | MaterialX | ◐ | As PARITY §2 (coat, sheen, transmission and normal maps not mapped) |
-| mesh UVs | ◐ | Only face-varying `st` on all-triangle meshes. Vertex-interpolated UVs or quads give an untextured (one-texel) mesh. |
+| mesh UVs | ✅ (importer) | **Fixed (§3c):** `st` / `st0` / `UVMap` / `uv` or the texture reader's varname; faceVarying (indexed or not), vertex / varying, uniform; quads and n-gons fan-triangulated with the positions; USD v-up mapped to MuJoCo's convention. Texture match on the probe plates (MuJoCo renderer) 0.24–0.37 → 1.00. With workstream B's unflipped atlas, tiers 0 / 2 show them as MuJoCo does. |
 | authored mesh normals | ❌ | Ignored; recomputed smooth (see the mesh-normals row) |
-| GeomSubset per-face materials | ❌ | One bound material per mesh; multi-material meshes collapse to one look |
+| GeomSubset per-face materials | ✅ | **Fixed (§3c):** one visual geom per `materialBind` subset (`<geom>_<subset>`, plus `<geom>_rest`), the whole mesh kept as an undrawn collider. Right-colour fraction top / sides 0.0 / 0.0 → 0.99 / 1.00. |
 | `displayColor` per vertex / face | ◐ | First value only |
 | `visibility = invisible`, purpose `proxy` | ◐ | Not honoured (purpose `guide` → hidden group 3) |
 | DistantLight, SphereLight | ◐ | Sphere → point light (radius, shaping / cone and exposure dropped; diffuse clipped to 10) |
 | DomeLight (colour, texture) | ◐ | Tier 2 only (environment map) |
-| RectLight, DiskLight, CylinderLight | ❌ | Dropped |
+| RectLight, DiskLight, CylinderLight | ◐ | **Fixed (§3c), far-field:** Rect / Disk → spot along -Z (cutoff 90° or `shaping:cone:angle`, cosine falloff, I = L·A), Cylinder → point light (I = L·2rℓ broadside); `normalize`, exposure honoured; shape / size / radiance recorded in custom text `usd_area_lights`. Before: a stage with one failed to load. Irradiance vs exact: +20–25 % at 1 light size, +2–3 % at 3, < 0.5 % at 10; soft area-light shadows not drawn. |
 | Camera: focal length, vertical aperture | ◐ | Horizontal aperture (aspect), clipping range, orthographic projection and fisheye / f-theta are ignored |
 | Points, BasisCurves, PointInstancer, TetMesh / deformable prims | ❌ | Dropped |
 
@@ -142,8 +142,8 @@ Measured coverage of the reference silhouette is shown as rgb / depth / seg.
 | pinhole intrinsics, per-env pose / intrinsics | ✅ | |
 | several cameras per env in one call | ◐ | One camera per renderer instance (per-env `cam_id`); use one renderer per camera |
 | depth convention | ✅ | z-depth. Background is 0 in the raw buffer and inf through `replicator/isaac.py`, as Isaac. |
-| fisheye / f-theta / rolling shutter / lens distortion | ❌ | Isaac Lab `FisheyeCameraCfg`; the splat renderer WIP is pinhole only too |
-| far plane | ◐ | T0/T1 fixed at 10 m (WIP fix); T2 `clip_far` |
+| fisheye / f-theta / lens distortion | ✅ T2, RT; ◐ T0 | **Added (§3c)** `render/lens.py`: Isaac Lab `FisheyeCameraCfg`'s default f-theta polynomial (`Lens.ftheta()` / `Lens.from_isaac`) and Kannala-Brandt / OpenCV fisheye. T2 and the ray-traced depth camera trace the lens per pixel; T0 resamples cube faces (`render/fisheye.FisheyeTier0`, 5 faces for 200°). Rolling shutter not done. |
+| far plane | ✅ | `Tier0Renderer(far=10.0)` (Isaac Lab's default `clipping_range` far is 1e6; MuJoCo's is `zfar` x extent), reversed-z depth; T2 `clip_far` |
 
 ## 2. What Isaac does for each gap, effort and priority
 
@@ -159,21 +159,21 @@ Effort is engineering days for one person including tests, assuming the existing
 | 1 | **Deformables invisible** (flex cloth / soft / cable, XPBD cloth and rope, PhysX-port cloth). **Done 2026-10-12** (§5) | Deformable bodies and cloth render as meshes skinned to simulation nodes (RTX); they appear in RGB, depth and segmentation | Add a dynamic-mesh slot class. Per frame, a compute kernel writes vertices and normals from `flexvert_xpos` (or any (N, V, 3) tensor) into a per-env vertex buffer. The raster draws it non-instanced; T1/T2/RT refit a per-env BLAS (`MTLAccelerationStructure` refit). Flex 2D gives triangles directly, 3D gives the surface faces (`flex_shell`), 1D gives capsules or tubes. Gets one seg id per flex. | 4–6 (raster 2, BLAS refit 2, tests 1–2) | **P0**: deformable manipulation from pixels is impossible today |
 | 2 | **Newton models not renderable** (rigid and deformable). **Done 2026-10-12** ([NEWTON_RENDER.md](NEWTON_RENDER.md)) | Isaac Lab 3.0 renders Newton scenes through RTX (`body_q` / `particle_q` written to Fabric) or Newton's Warp `SensorTiledCamera` (own world + world -1 per camera) | `newton_bridge.NewtonRenderSource`: a render-twin `MjModel` (from the Newton shapes, or the source MJCF) plus graph-captured Warp kernels that write its pose buffers from `State.body_q` per world. Cloth / soft surfaces → gap 1's dynamic-mesh path; free particles → the particle renderer | done (rigid); deformables via #1 and the particle path | **P0** for the Newton path; P1 overall |
 | 3 | **Mesh normals smoothed across hard edges** | Uses authored normals, or face normals split at sharp edges | Use `mesh_normal` (MuJoCo's own per-vertex normals with its smoothing rule) or split vertices at a crease angle in `_tris_to_indexed`; read USD `normals` in the importer | 0.5–1 | **P0**: every CAD robot and object is shaded wrong (spread 43.7 vs 2.9), which is a sim-to-real appearance gap on every frame |
-| 4 | **Infinite plane drawn as 10 × 10 m** | `GroundPlaneCfg`: 100 m (default) plane; the horizon is visible | Size planes to the camera far plane (or a large default) in the raster. In the RT, an infinite plane conflicts with the per-env spatial offset (`stride`), so use a separate per-env analytic plane test in the shaders, or clip to the stride. | 1–2 | **P0** for locomotion / navigation cameras, P2 for tabletop |
-| 5 | **T0/T1 10 m far plane** | Camera `clipping_range` default (0.01, 1e6)/(0.1, 1e5) | **WIP in the main checkout** (`far=`). Still to do: T1's 50 m and T2's 1000 m ray ranges, the splat composite far plane, and depth precision (TEXTURES.md "Far plane") | 0.5 (land the WIP) | **P0** for outdoor / nav; P2 tabletop |
+| 4 | **Infinite plane drawn as 10 × 10 m**. **Done 2026-10-12 (§3c)** | `GroundPlaneCfg`: 100 m (default) plane; the horizon is visible | Size planes to the camera far plane (or a large default) in the raster. In the RT, an infinite plane conflicts with the per-env spatial offset (`stride`), so use a separate per-env analytic plane test in the shaders, or clip to the stride. | 1–2 | **P0** for locomotion / navigation cameras, P2 for tabletop |
+| 5 | **T0/T1 10 m far plane**. **Done 2026-10-12 (§3c)**: `far=`, reversed z, tier-1 ray limit | Camera `clipping_range` default (0.01, 1e6)/(0.1, 1e5) | **WIP in the main checkout** (`far=`). Still to do: T1's 50 m and T2's 1000 m ray ranges, the splat composite far plane, and depth precision (TEXTURES.md "Far plane") | 0.5 (land the WIP) | **P0** for outdoor / nav; P2 tabletop |
 | 6 | **Transparency / opacity** | RTX: OmniGlass refraction, opacity cutout, alpha blending; depth and segmentation of transparent objects configurable | T0: sorted alpha-blend pass for alpha < 1 (order-independent transparency or per-object sort), seg / depth from opaque only or configurable. T2: `any_hit` alpha test + a dielectric BTDF. Importer: keep opacity. | 2 (T0 blend + cutout), +2 (T2 glass) | **P1**: glassware, bottles and windows are common in manipulation datasets |
 | 7 | **Sites and tendons invisible**. **Done 2026-10-12** (§5; sites on by default as in MuJoCo, off in the ray-traced sensors) | n/a for sites (no USD equivalent); tendons become visual cables/meshes authored by the asset | Optional: draw sites (opt-in group flag) as primitives. Draw spatial tendons as per-frame capsule chains from `ten_wrapadr` / `wrap_xpos` (dynamic instances, gap 1 infrastructure). | 1 (sites), 2 (tendons) | P1 for tendon-driven hands and cable tasks; P2 for sites (MuJoCo-visual parity only) |
 | 8 | **Skins invisible**. **Done 2026-10-12** (§5) | Skinned meshes (UsdSkel) render | Linear blend skinning kernel into the dynamic-mesh path (#1) | 1 on top of #1 | P2 (rare in robot models; composite cables and older flexcomps) |
 | 9 | **SDF geoms invisible** | n/a (USD has meshes; SDF is a collision representation) | Draw the SDF's mesh asset (`geom_dataid` → mesh, as MuJoCo does) | 0.5 | P1: anything using SDF plugins (gears, nuts and bolts) is invisible |
 | 10 | **Spot / point-light shadows in T0/T1** | All lights cast shadows in RTX | T1: ray-traced shadow for every light (the loop already exists, gate on `castshadow`). T0: cube or spot shadow maps per light, or route shadowed lights to T1. | 0.5 (T1), 3 (T0 maps) | P1: indoor / spot-lit scenes |
 | 11 | **Texture mapping errors** (vertical flip on mesh UVs, no UVs on cylinder / capsule, sphere phase, cube textures) | Asset UVs used as authored; MDL projections | Flip V in the atlas path (with a regression image), MuJoCo-style generated coordinates for primitives, cube-map sampling (`texturecube`) for `type="cube"` | 1.5 | P1: textured objects and DR textures look wrong; mirrored decals and labels |
-| 12 | **Per-world `geom_size` (scale DR) ignored** | Isaac scale randomization changes the rendered prim | Generalize `SizedGeoms` (already done for terrain slots) to every primitive, plus a per-world scale for meshes | 1 | P1: size randomization is invisible to the policy |
-| 13 | **Per-world model colour / light fields ignored** | Replicator writes USD attributes the renderer reads | Read MuJoCo Warp's batched `geom_rgba` / `mat_rgba` / `light_*` if the event terms write them, or document `t_colors` as the only path (it already exists) | 0.5 | P2 (a workaround exists) |
+| 12 | **Per-world `geom_size` (scale DR) ignored**. **Done 2026-10-12 (§3c)** | Isaac scale randomization changes the rendered prim | Generalize `SizedGeoms` (already done for terrain slots) to every primitive, plus a per-world scale for meshes | 1 | P1: size randomization is invisible to the policy |
+| 13 | **Per-world model colour / light fields ignored**. **Done 2026-10-12 (§3c)** | Replicator writes USD attributes the renderer reads | Read MuJoCo Warp's batched `geom_rgba` / `mat_rgba` / `light_*` if the event terms write them, or document `t_colors` as the only path (it already exists) | 0.5 | P2 (a workaround exists) |
 | 14 | Non-RGB texture roles, normal maps, USD GeomSubsets, UV scale / rotate / translate | RTX uses all of them | Material table extension + importer | 3–5 | P2 (fidelity) |
 | 15 | MJCF skybox as a mean colour | Dome texture background | Convert skybox to an equirect / cube environment (T2 has the sampler; T0 needs a background pass from it) | 1 | P2 (backgrounds are usually randomized anyway) |
 | 16 | Area lights, more than 8 lights in T0/T1 | Unlimited lights, area lights with soft shadows | Raise `MAX_LIGHTS` (loop cost), area-light sampling in T2 | 0.5 / 2 | P2 |
-| 17 | hfield sides / base | Terrain meshes are closed | Add skirt triangles | 0.25 | P2 |
-| 18 | Fisheye / lens distortion | `FisheyeCameraCfg`, f-theta | Per-pixel ray directions in T2 and RT (trivial); T0 needs a distortion warp pass | 1–2 | P2 (P1 for wide-FOV nav cameras) |
+| 17 | hfield sides / base. **Done 2026-10-12 (§3c)** | Terrain meshes are closed | Add skirt triangles | 0.25 | P2 |
+| 18 | Fisheye / lens distortion. **Done 2026-10-12 (§3c)**: f-theta and Kannala-Brandt in T2 / RT, T0 cube faces | `FisheyeCameraCfg`, f-theta | Per-pixel ray directions in T2 and RT (trivial); T0 needs a distortion warp pass | 1–2 | P2 (P1 for wide-FOV nav cameras) |
 | 19 | MPM particles | Points / mesh-from-particles (fluid isosurface) | **in progress (other agent)** | — | P0 for the MPM tasks |
 | 20 | Splat composite: no segmentation for the splat background, baked lighting (no robot shadows), 10 m composite limit | Isaac Sim 5.x renders 3DGUT Gaussian scenes inside RTX | **WIP elsewhere**; seg = "background" class by design | — | P2 |
 
@@ -248,6 +248,53 @@ The second run stalled on Panda tier 1 and the watchdog killed it at 1500 s. Tha
 - `shadow_lights="caster"`.
 - `appearance="legacy"`, the old tables and old cost.
 
+
+## 3c. World extent, per-environment fields, camera models (2026-10-12, workstream C)
+
+Probes: `scripts/diagnostics/render_world_audit.py` (synthetic MJCF; mujoco.Renderer as the visibility reference, the
+same renderer on a model compiled with a world's values as the per-world reference), run on the code before and after
+(`docs/measurements/render_world_audit.json`). Tests: `tests/test_render_world.py`, `tests/test_render_newton_perworld.py`.
+Coverage = fraction of MuJoCo's object pixels with RGB / depth / segmentation.
+
+| item | before | after | notes |
+|---|---|---|---|
+| far plane: boxes at 15 m / 40 m, T0 / T1 | 0.0 / 0.0 (fixed 10 m) | 1.0 / 1.0 with `far=` MuJoCo's far (depth rel. error 1e-6); default `far=10` unchanged (0.0) | T2 / RT: 1.0 before and after |
+| depth precision, `far=1e6` (Isaac's default), median abs. error at 200 m / 2 km | standard z: 0.033 m / 21.4 m | reversed z: 1.5e-5 m / 0.0 m | the previous convention stays as `reverse_z=False` |
+| infinite ground (far-plane scene): ground coverage T0 / T1 / T2 / RT | 0.369 (10 × 10 m square) | 1.0 / 1.0 / 1.0 / 0.978 (RT probe range 100 m) | T0 at the default 10 m: 0.691 |
+| locomotion view, Menagerie checker floor: coverage, texture corr. vs MuJoCo within 8 m | 0.645; corr 0.04 (T0) / 0.03 (T2) | 1.0; corr 0.42 (T0) / 0.85 (T2) | MuJoCo's plane mapping (u = x / 2, -0.5 offset, texuniform ignored on infinite axes). T0's remaining gap is aliasing of the thin checker marks (no mips: TEXTURES.md, workstream B) |
+| plane texture orientation (gradient, top view) corr. T0 / T2 | 0.30 / -0.003 | 0.992 / 0.999 | |
+| lidar returns from the ground at 15 m | 0.0 | 1.0 | |
+| hfield side view / from below, every renderer | 0.58 / 0.90 | 1.0 / 1.0 | |
+| per-world `geom_size` (4 worlds, 6 primitives): silhouette IoU vs MuJoCo | 0.36–0.82 | 0.995–1.0 | T0 and T2, GPU path from BatchSim (on workstream B's MuJoCo tessellation) |
+| per-world `geom_rgba` / `mat_rgba` / `light_diffuse` / `light_active`: mean abs. RGB error vs compiled | 17–30 | 0.0 (T0), ≤ 5 (T2, Monte Carlo) | |
+| `Randomizer.materials` on a legacy `Tier2Renderer` | AttributeError | ok (T0, T2 legacy, T2 OmniPBR) | |
+| USD import: Rect / Disk / Cylinder lights on a probe stage | stage failed to load | 4 of 4 lights; irradiance +2–3 % at 3 light sizes, < 0.5 % at 10 | `scripts/diagnostics/usd_import_visuals.py`, `tests/test_scene_usd.py` |
+| USD import: GeomSubset materials (top / sides right-colour fraction) | 0.0 / 0.0 | 0.99 / 1.00 | MuJoCo renderer |
+| USD import: vertex / faceVarying / indexed UVs on quads; faceVarying triangles (texture match) | 0.367 (untextured); 0.239 (upside down) | 1.00 | MuJoCo renderer; workstream B unflipped the atlas, so tiers 0 / 2 agree with MuJoCo |
+| camera projection at the image edges and corners (`tests/test_camera_projection.py`: small spheres / 2 cm capsules on pixel centres, fovy camera, physical camera with an offset principal point, the audit's tilted camera) | physical cameras with a principal offset mirrored (sign of `cx` / `cy`; 24 px at the probe's 0.3 mm offset) | every object pixel-exact vs mujoco.Renderer in T0 / T1 / T2 / RT (IoU 1.0, centroid offset 0.0 px), top rows included | no half-pixel or fovy convention difference was found; MuJoCo's frustum (`getFrustum`, `glFrustum`) re-derived in the test |
+| fisheye (Isaac default f-theta 200°, Kannala-Brandt): sphere centroid vs the lens model at 0 / 60 / 95° | not supported | ≤ 0.27 px (T2, RT, T0 cube faces) | z-depth negative beyond 90°, as the optical-axis definition gives |
+| Newton bridge: per-world `shape_scale` / `shape_color` | read once at build | per frame; IoU > 0.95 (capsule > 0.85) vs the MJCF at that world's values, colour error < 4 (T0) | mesh texture / UVs / roughness / metallic kept in the twin (texture corr. 1.0 vs the MJCF path) |
+
+Design notes:
+- **Far plane and depth.** `Tier0Renderer(far=10.0, near=0.01, reverse_z=True)`. Reversed z (near → 1, far → 0, compare
+  greater, clear 0) keeps float32 depth error ~1e-7 x distance, so a far plane of Isaac Lab's default 1e6 costs nothing
+  in precision. The shadow map keeps the standard convention. Tier 1's ray-traced effects are skipped on fragments
+  beyond its ray-tracing region (`RayTracer.ray_limit`), so a large far does not let rays reach other envs.
+- **Infinite planes.** A disc of octagon rings (apothems doubling from 0.25 m; ~170 triangles for 1e6 m) keeps
+  triangles small near the viewer. T0/T1 re-centre it under each env's camera in the vertex stage with apothem
+  2 x far x (corner ray length); the ray tracer builds it with apothem extent + range (+ the plane's offset) and grows
+  the env stride ~4 % to keep neighbouring discs apart. Isaac's `GroundPlaneCfg` is a finite 100 x 100 m visual
+  (`TerrainImporter(terrain_type="plane")`: 2e6 m), so an infinite MuJoCo plane is the closer match to both.
+- **Per-world fields.** `render/model_sync.py` writes per-env light records and per-instance colours each frame (one
+  dispatch, inside the render command buffer); the material table the shaders read carries rgba = 1. A sim can supply
+  the fields as `render_fields` (the Newton bridge does) instead of `m`. Sizes: `render/sized.py` folds the per-world
+  scale into a renderer-owned `geom_xmat`; normals use its inverse transpose in every shader.
+- **Fisheye.** Isaac Lab exposes `fisheyePolynomial` (default, theta = A + B r + ... + F r^5 in nominal pixels,
+  `fisheye_max_fov` 200°), `fisheyeKannalaBrandtK3`, `fisheyeRadTanThinPrism`, `fisheyeSpherical`; only the first
+  carries coefficients (the others write the token only), and no shipped Isaac Lab task uses a fisheye camera. Isaac
+  Lab develop adds `OpenCvFisheyeDistortionCfg` (Kannala-Brandt k1..k4), mapped by `Lens.from_isaac("opencvFisheye")`.
+  Unconfirmed in NVIDIA's docs: how RTX scales the nominal resolution to the render resolution (implemented: per axis)
+  and what fills pixels beyond `max_fov` (implemented: black, depth 0).
 
 ## 4. Reproduce
 

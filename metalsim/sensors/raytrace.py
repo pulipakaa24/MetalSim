@@ -16,6 +16,7 @@ Ordering follows the renderer: ``trace(sim, after_value)`` waits for the sim eve
 """
 from __future__ import annotations
 
+import mujoco
 import numpy as np
 import torch
 import warp as wp
@@ -31,7 +32,8 @@ class RayTracer:
     def __init__(self, model, n_envs: int, *, max_range: float = 10.0, max_group=3, include_planes=True,
                  decimate_faces: int = 0, terrain_slots: bool = True, draw_hfields: bool = True,
                  appearance: str = "mujoco", visual=None, deformables=(), tube_slices=None, cap_stacks=None,
-                 dyn_rebuild_every: int = 32, ctx: MetalContext | None = None, device="metal:0"):
+                 dyn_rebuild_every: int = 32, infinite_planes: bool = True, hfield_skirts: bool = True,
+                 per_world_size: bool = True, ctx: MetalContext | None = None, device="metal:0"):
         """``terrain_slots`` / ``draw_hfields`` / ``appearance``: see ``Tier0Renderer`` (False / "legacy" = the
         previous behaviour).
 
@@ -39,7 +41,12 @@ class RayTracer:
         (sites, flexes, skins, spatial tendons) and user deformable meshes; see ``Tier0Renderer``. Each dynamic object
         has one primitive acceleration structure holding every env's triangles (positions offset by the env grid),
         refit each frame after its vertices are regenerated and rebuilt every ``dyn_rebuild_every`` frames (1: every
-        frame; 0: refit only, after the first build)."""
+        frame; 0: refit only, after the first build).
+
+        ``hfield_skirts`` / ``per_world_size``: see ``Tier0Renderer`` (False =
+        the previous behaviour). ``infinite_planes``: MuJoCo's infinite planes as a disc covering every point a ray of
+        ``max_range`` from within the scene extent can reach (the env grid stride grows ~4 % to keep the discs of
+        neighbouring envs apart; False = the previous 10 x 10 m square)."""
         self.m = model
         self.n = n_envs
         self.device = device
@@ -50,24 +57,36 @@ class RayTracer:
             # a sensor's default: what MuJoCo draws except sites (visual markers, not surfaces: mj_ray and MuJoCo's
             # rangefinder skip them, and a lidar's own mounting site would occlude every beam). The cameras built on this
             # ray tracer (tier 1 / tier 2) pass MuJoCo's full default option.
-            import mujoco
             visual = mujoco.MjvOption()
             visual.sitegroup[:] = 0
+        extent = float(model.stat.extent)
+        reach = extent + max_range               # how far from an env's origin its sensors' rays get
+        d0 = mujoco.MjData(model); mujoco.mj_kinematics(model, d0)
+        inf = [g for g in range(model.ngeom) if int(model.geom_type[g]) == int(mujoco.mjtGeom.mjGEOM_PLANE)
+               and (model.geom_size[g][0] <= 0 or model.geom_size[g][1] <= 0)]
+        d_plane = max([float(np.linalg.norm(d0.geom_xpos[g])) for g in inf], default=0.0)
+        ring = (reach + d_plane) if (infinite_planes and inf and include_planes) else None
         self.tables = build_scene_tables(model, n_envs, max_group=max_group, include_planes=include_planes,
                                          decimate_faces=decimate_faces, sized_geoms="auto" if terrain_slots else (),
                                          draw_hfields=draw_hfields, appearance=appearance,
-                                         visual=visual, deformables=deformables)
+                                         visual=visual, deformables=deformables, hfield_skirts=hfield_skirts,
+                                         plane_ring=ring, per_world_size=per_world_size)
         t = self.tables
         self.visual = visual
         self.sized = None
-        if t.sized.any():
+        modes = t.geom_size_modes(model.ngeom)
+        if modes.any():
             from metalsim.render.sized import SizedGeoms
-            self.sized = SizedGeoms(self.ctx, model, n_envs, t.sized_geom_ids())
+            self.sized = SizedGeoms(self.ctx, model, n_envs, modes=modes)
         self.G = t.G
         self.tpr = int(np.ceil(np.sqrt(n_envs)))
-        extent = float(model.stat.extent)
         self.max_range = max_range
         self.stride = 2.0 * (extent + max_range) + 1.0
+        # the content of an env reaches `own` from its origin: the scene extent, or a ground disc (octagon circumradius
+        # = 1.0824 x apothem, around a plane origin d_plane away); rays must end before the next env's content
+        own = extent if ring is None else max(extent, 1.0824 * ring + d_plane)
+        self.stride = max(self.stride, reach + own + 1.0)
+        self.ray_limit = self.stride - own       # a ray of env e must end within this distance of the env's origin
         c = self.ctx
         # non-geom objects (metalsim.render.extras): sites are instanced slots posed from extra pose rows; each dynamic
         # object (flex, skin, tendon, user mesh) has its records after the static vertices, its every-env triangles
@@ -240,7 +259,8 @@ class RayTracer:
         """The geom_xmat to refit from: the physics buffer, or its copy with the per-world slot sizes folded in."""
         if self.sized is None:
             return gm_buf, gm_off
-        return self.sized.encode(cb, gm_buf, gm_off, sim.m.geom_size)
+        from metalsim.render.model_sync import model_fields
+        return self.sized.encode(cb, gm_buf, gm_off, getattr(model_fields(sim), "geom_size", None))
 
     def encode_pose(self, cb, sim, gx_buf, gx_off, gm_buf, gm_off):
         """The pose rows to refit from: the geoms' (as given), then the drawn sites' when the scene has site slots."""
@@ -330,8 +350,9 @@ class RayTracer:
         refl[:len(geoms)] = np.asarray(reflectance, np.float32)[geoms]
         return refl
 
-    def make_depth_camera(self, camera: str | int, width: int, height: int):
-        return RayDepthCamera(self, camera, width, height)
+    def make_depth_camera(self, camera: str | int, width: int, height: int, lens=None):
+        """``lens``: ``metalsim.render.lens.Lens`` (default pinhole from the model camera)."""
+        return RayDepthCamera(self, camera, width, height, lens=lens)
 
     # -- frame drivers -------------------------------------------------------------------------------
 
@@ -520,7 +541,7 @@ class Lidar:
 
 
 class RayDepthCamera:
-    def __init__(self, rt: RayTracer, camera, width, height, name="ray_depth"):
+    def __init__(self, rt: RayTracer, camera, width, height, name="ray_depth", lens=None):
         import mujoco
         self.rt, self.name, self.w, self.h = rt, name, width, height
         m = rt.m
@@ -530,6 +551,9 @@ class RayDepthCamera:
         self.intr_buf = rt.ctx.buffer(16, self.intr, "raydepth_intr")
         self.dims = np.array([width, height, max(m.ncam, 1), self.cam], np.uint32)
         self.dims_buf = rt.ctx.buffer(16, self.dims, "raydepth_dims")
+        from metalsim.render.lens import Lens
+        self.lens = lens or Lens.pinhole()
+        self.lens_buf = rt.ctx.buffer(64, self.lens.pack(), "raydepth_lens")
         self._array = wp.zeros((rt.n, height, width), dtype=wp.float32, device=rt.device)
         wp.synchronize_device(rt.device)
         self._view = wm.buffer_of(self._array)
@@ -552,6 +576,7 @@ class RayDepthCamera:
         ce.setBuffer_offset_atIndex_(self.dims_buf, 0, 4)
         ce.setBuffer_offset_atIndex_(rt.consts_buf, 0, 5)
         ce.setBuffer_offset_atIndex_(self._view.buffer, self._view.offset, 6)
+        ce.setBuffer_offset_atIndex_(self.lens_buf, 0, 7)
         ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.w, self.h, rt.n), Metal.MTLSize(16, 16, 1))
         ce.endEncoding()
 

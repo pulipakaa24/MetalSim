@@ -363,6 +363,8 @@ class IsaacAnnotators:
                 mesh = t.meshes[int(t.geom_mesh[slot])]
                 idx = np.unique(t.indices[mesh["i_off"]:mesh["i_off"] + mesh["i_count"]])
                 v = t.vertices[idx, :3]
+                if t.slot_scale is not None:      # unit meshes scaled per world at render time: the compiled size here
+                    v = v * t.slot_scale[slot]
                 # the extremes of a perspective projection of a point set lie on its convex hull
                 # (projection maps segments to segments), so only hull vertices are kept: exact
                 if self.loose_hull:
