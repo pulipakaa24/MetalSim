@@ -18,7 +18,7 @@ while true; do
   while kill -0 $RUN 2>/dev/null; do
     sleep 120
     holder=$(python3 scripts/gpu_lock.py status | head -1)
-    waiting=$(python3 scripts/gpu_lock.py status | grep -c "waiting \[")
+    waiting=$(python3 scripts/gpu_lock.py status | grep "waiting \[" | grep -vc " $NAME ")
     if echo "$holder" | grep -q "\"$NAME\"" && [ "$waiting" -gt 0 ] && [ ! -f "$W/$OUT/STOP" ]; then
       echo "[yield] $waiting job(s) waiting: pausing after this iteration ($(date +%H:%M:%S))" >> "$LOG"
       touch "$W/$OUT/STOP"
