@@ -117,6 +117,20 @@ def _tris_to_indexed_normals(tri, uv, nrm):
     return flat[first], normals, uv_flat[first], idx
 
 
+def _tris_to_indexed_corners(tri, uv, nrm):
+    """Corner-attribute layout: vertices merged by position only (shared by every triangle that touches them), with
+    each triangle corner's normal and uv kept in a separate per-corner table in index order. Same shading as
+    ``_tris_to_indexed_normals`` without duplicating a vertex per distinct normal. Returns (verts, normals, uvs, idx,
+    corner_normals (F*3, 3), corner_uvs (F*3, 2)); the vertex normals / uvs are the first corner's (unused for shading)."""
+    flat = tri.reshape(-1, 3)
+    uv_flat = np.zeros((len(flat), 2)) if uv is None else uv.reshape(-1, 2)
+    n_flat = nrm.reshape(-1, 3)
+    n_flat = n_flat / np.maximum(np.linalg.norm(n_flat, axis=1, keepdims=True), 1e-12)
+    _, first, inverse = np.unique(np.round(flat, 6), axis=0, return_index=True, return_inverse=True)
+    idx = inverse.reshape(-1, 3).astype(np.uint32)
+    return flat[first], n_flat[first], uv_flat[first], idx, n_flat, uv_flat
+
+
 @dataclass
 class TextureAtlas:
     """Every model texture (2D, cube, skybox) packed into one RGBA8 image.
@@ -347,6 +361,9 @@ class SceneTables:
     # transparency: slots MuJoCo draws blended (alpha < 0.995) and the draws of the remaining (opaque) instances
     transparent: np.ndarray = None    # (G,) bool
     draws_opaque: list = None         # as ``draws``, each mesh's opaque instances only (they come first in its range)
+    # corner_attributes layout: per index entry normal xyz, u, v (vertices then shared by position; see
+    # _tris_to_indexed_corners); None in the default (split-vertex) layout
+    corners: np.ndarray = None        # (I, 8) float32
 
     # material extension block (float4 x 2), read with the material by every renderer:
     # 0: uv offset xy (added after the texrepeat scale), texture kind (0 2D, 1 cube), sRGB texture (1: decode to linear)
@@ -489,7 +506,7 @@ def hfield_mesh(m: mujoco.MjModel, hid: int):
 def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, include_planes: bool = True,
                        plane_extent: float = 5.0, smooth: bool = True, decimate_faces: int = 0,
                        sized_geoms="auto", draw_hfields: bool = True, appearance: str = "mujoco",
-                       visual=False, deformables=()) -> SceneTables:
+                       visual=False, deformables=(), corner_attributes: bool = False) -> SceneTables:
     """``decimate_faces``: per-mesh triangle budget for a level of detail (0 = undecimated).
 
     ``sized_geoms``: box geoms drawn as a unit box scaled at render time by the per-world ``geom_size`` (the renderer
@@ -513,6 +530,7 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
     mesh_cache = {}
     meshes, geoms, geom_mesh = [], [], []
     all_v, all_n, all_uv, all_i = [], [], [], []
+    all_cn, all_cuv = [], []          # per-corner normal / uv in index order (corner_attributes)
     v_off = i_off = 0
     atlas = TextureAtlas.build(m) if appearance == "mujoco" else TextureAtlas.build_legacy(m)
 
@@ -612,6 +630,7 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
                 meshes.append({"i_off": i_off, "i_count": int(idx.size), "radius": float(np.linalg.norm(verts, axis=1).max()),
                                "v_off": v_off, "hfield": int(m.geom_dataid[g])})   # row-major (nrow, ncol) grid from v_off
                 all_v.append(verts); all_n.append(normals); all_uv.append(uvs)
+                all_cn.append(normals[idx.reshape(-1)]); all_cuv.append(uvs[idx.reshape(-1)])
                 all_i.append(idx.reshape(-1) + v_off)
                 v_off += len(verts); i_off += idx.size
             geom_mesh.append(mesh_cache[key]); geoms.append(g)
@@ -625,7 +644,10 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
             tri, uv, nrm = geom_tris(g, unit=g in sized_set)
             if tri is None:
                 continue
-            if nrm is not None:
+            cn = cuv = None
+            if nrm is not None and corner_attributes:
+                verts, normals, uvs, idx, cn, cuv = _tris_to_indexed_corners(tri, uv, nrm)
+            elif nrm is not None:
                 verts, normals, uvs, idx = _tris_to_indexed_normals(tri, uv, nrm)
             else:
                 verts, normals, uvs, idx = _tris_to_indexed(tri, uv, smooth=smooth and t == mujoco.mjtGeom.mjGEOM_MESH
@@ -635,6 +657,8 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
             meshes.append({"i_off": i_off, "i_count": int(idx.size),
                            "radius": float(np.linalg.norm(verts, axis=1).max())})
             all_v.append(verts); all_n.append(normals); all_uv.append(uvs)
+            all_cn.append(cn if cn is not None else normals[idx.reshape(-1)])
+            all_cuv.append(cuv if cuv is not None else uvs[idx.reshape(-1)])
             all_i.append(idx.reshape(-1) + v_off)
             v_off += len(verts)
             i_off += idx.size
@@ -647,6 +671,7 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
         if not _extras.collect(m, n_envs, atlas, visual, deformables, smooth)["extras"]:
             raise ValueError("no drawable geoms (check max_group / include_planes)")
         all_v, all_n, all_uv, all_i = [np.zeros((0, 3))], [np.zeros((0, 3))], [np.zeros((0, 2))], [np.zeros(0, np.uint32)]
+        all_cn, all_cuv = [np.zeros((0, 3))], [np.zeros((0, 2))]
 
     G = len(geoms)
     verts = np.concatenate(all_v).astype(np.float32)
@@ -655,6 +680,12 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
     inter[:, 3:6] = np.concatenate(all_n).astype(np.float32)
     inter[:, 6:8] = np.concatenate(all_uv).astype(np.float32)
     indices = np.concatenate(all_i).astype(np.uint32)
+    corners = None
+    if corner_attributes:             # (I, 8): normal xyz, u | v, 0, 0, 0 per index entry (tier0.metal CornerAttr)
+        corners = np.zeros((len(indices), 8), np.float32)
+        corners[:, 0:3] = np.concatenate(all_cn)
+        cu = np.concatenate(all_cuv)
+        corners[:, 3] = cu[:, 0]; corners[:, 4] = cu[:, 1]
 
     geom_mesh = np.asarray(geom_mesh)
     # transparent slots (MuJoCo: rgba alpha < 0.995 after the material, mjr_render's test); decided from the geoms'
@@ -762,7 +793,8 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
     tables = SceneTables(vertices=inter, indices=indices, meshes=meshes, geoms=geoms, geom_mesh=geom_mesh,
                          draws=draws, inst_table=inst_table, materials=mats, atlas=atlas, semantic=semantic,
                          static_geom=static, lights=build_lights(m), params=params, n_envs=n_envs, G=G,
-                         sized=sized, material_ext=ext, transparent=transparent, draws_opaque=draws_opaque, n_geom_slots=G)
+                         sized=sized, material_ext=ext, transparent=transparent, draws_opaque=draws_opaque, n_geom_slots=G,
+                         corners=corners)
     if visual is not False or deformables:
         from metalsim.render import extras as _extras
         _extras.extend_tables(tables, m, n_envs, visual, deformables, smooth)

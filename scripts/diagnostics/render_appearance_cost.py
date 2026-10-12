@@ -5,7 +5,10 @@ Each scene is rendered from a fixed physics state (no steps between frames; ever
 
   before   appearance="legacy", transparency=False, shadow_lights="caster", max_lights=8, skybox=False (the renderer
            before the fixes; tier 2: appearance="legacy", transparency=False, skybox=False)
-  after    the defaults (MuJoCo geometry / normals / texture mapping, skybox, transparency, every light, all shadows)
+  after    the defaults (MuJoCo geometry / normals / texture mapping, skybox, transparency, every light, all shadows;
+           normal_layout="corner_fs", shadow_cull=True)
+  after_split / after_corner_vs / after_nocull (tier 0): the same with the split-vertex layout and no shadow-view culling
+           (the first version of the fix), with the vertex-pulling layout, or with corner_fs but no culling
 
 Scenes: SO-101 box task (base_cam, Cartpole-like workload of the learning tasks), Franka Panda (Menagerie; a
 shadow-casting spot light -> one extra shadow pass in tier 0), G1 rough terrain head camera (the G1 task's camera
@@ -33,6 +36,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 BEFORE0 = dict(appearance="legacy", transparency=False, shadow_lights="caster", max_lights=8, skybox=False)
 BEFORE2 = dict(appearance="legacy", transparency=False, skybox=False)
+AFTER0 = {"after_split": dict(normal_layout="split", shadow_cull=False),       # the first fix: split vertices, no culling
+          "after_corner_vs": dict(normal_layout="corner_vs"), "after_nocull": dict(shadow_cull=False)}   # after = defaults
 LOD = {"so101_lod3000": dict(decimate_faces=3000)}      # the SO-101 lift task's training setting (LiftConfig.decimate_faces)
 
 
@@ -68,6 +73,9 @@ def scene_models():
         cam.quat = q.tolist()
         out["panda"] = (spec.compile(), "cam")
     out["glass"] = (mujoco.MjModel.from_xml_string(rca.TRANSPARENT), "cam")
+    out["point_spot"] = (mujoco.MjModel.from_xml_string(rca.SHADOW.replace("{LIGHT}",       # 6 + 1 extra shadow views
+        '<light type="point" pos="0 0 1.5" castshadow="true" diffuse="0.6 0.6 0.6"/>'
+        '<light pos="0.3 0 1.2" dir="0 0 -1" cutoff="40" castshadow="true" diffuse="0.5 0.5 0.5"/>')), "cam")
     return out
 
 
@@ -78,7 +86,7 @@ def main():
     ap.add_argument("--n2", type=int, default=64)
     ap.add_argument("--size", type=int, default=128)
     ap.add_argument("--frames", type=int, default=10)
-    ap.add_argument("--scenes", default="so101,so101_lod3000,panda,glass,g1_rough")
+    ap.add_argument("--scenes", default="so101,so101_lod3000,panda,point_spot,glass,g1_rough")
     ap.add_argument("--out", default="runs/render_appearance/cost.jsonl")
     a = ap.parse_args()
     from metalsim.physics.batch import BatchSim
@@ -103,9 +111,9 @@ def main():
             if name != "g1_rough":
                 sim = BatchSim(m, n); sim.forward(); sim.synchronize()
             ev = sim.event.value
-            for cfg in ("before", "after"):
+            for cfg in (("before", "after_split", "after_corner_vs", "after_nocull", "after") if tier == 0 else ("before", "after")):
                 if tier < 2:
-                    kw = dict(BEFORE0) if cfg == "before" else {}
+                    kw = dict(BEFORE0) if cfg == "before" else dict(AFTER0.get(cfg, {}))
                     kw.update(LOD.get(name, {}))
                     if tier == 1:
                         kw.pop("shadow_lights", None)

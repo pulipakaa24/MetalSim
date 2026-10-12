@@ -156,3 +156,32 @@ def test_spot_and_point_shadows(kind):
         print(kind, r, "shadow ratio", round(float(ratio), 3))
         assert ratio < 0.25, (kind, r, ratio)
         assert lum[ring].mean() > 30                       # no shadow acne on the lit floor
+
+
+@pytest.mark.parametrize("layout", ["corner_fs", "corner_vs"])
+def test_corner_normal_layouts_match_split(layout):
+    """Shared-position layouts shade like the split-vertex layout (hard edges, textures, transparency) without
+    duplicating vertices."""
+    from metalsim.render.tier0 import Tier0Renderer
+    for xml in (rca.MESHBOX, rca.TRANSPARENT):
+        m, d = _fwd(xml)
+        kw = dict(width=W, height=H, camera="cam", outputs=("rgb", "depth", "seg", "normal"))
+        a = Tier0Renderer(m, 1, normal_layout="split", **kw).render_host([d])
+        r = Tier0Renderer(m, 1, normal_layout=layout, **kw)
+        b = r.render_host([d])
+        assert np.array_equal(a["seg"], b["seg"]) and np.abs(a["depth"] - b["depth"]).max() < 1e-5
+        diff = np.abs(a["rgb"].astype(int) - b["rgb"].astype(int))
+        print(layout, "rgb max diff", diff.max(), "pixels differing", (diff.max(-1) > 0).mean())
+        assert diff.max() <= 2 and (diff.max(-1) > 1).mean() < 1e-3
+        assert np.abs(a["normal"] - b["normal"]).max() < 1e-3
+
+
+def test_shadow_view_culling_is_exact():
+    from metalsim.render.tier0 import Tier0Renderer
+    light = ('<light type="point" pos="0 0 1.5" castshadow="true" diffuse="0.9 0.9 0.9"/>'
+             '<light pos="0.3 0 1.2" dir="0 0 -1" cutoff="40" castshadow="true" diffuse="0.5 0.5 0.5"/>')
+    m, d = _fwd(rca.SHADOW.replace("{LIGHT}", light))
+    kw = dict(width=W, height=H, camera="cam", outputs=("rgb", "depth"))
+    a = Tier0Renderer(m, 2, shadow_cull=False, **kw).render_host([d, d])
+    b = Tier0Renderer(m, 2, shadow_cull=True, **kw).render_host([d, d])
+    assert np.array_equal(a["rgb"], b["rgb"]) and np.array_equal(a["depth"], b["depth"])
