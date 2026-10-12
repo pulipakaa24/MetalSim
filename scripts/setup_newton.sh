@@ -28,8 +28,10 @@ if [ ! -d "$DIR" ]; then
   }
 fi
 [ -d "$WARP" ] || scripts/setup_warp.sh "$WARP"
-if [ ! -x "$VENV/bin/python" ]; then
-  uv venv -q "$VENV" --python 3.12
+# $VENV/.metalsim_deps marks a completed dependency install: an environment left half-built by a failed run (e.g. the
+# Warp checkout missing) is completed on the next run instead of being skipped because its python exists
+if [ ! -f "$VENV/.metalsim_deps" ]; then
+  [ -x "$VENV/bin/python" ] || uv venv -q "$VENV" --python 3.12
   if [ -x .venv/bin/python ]; then            # same pinned third-party versions as .venv
     .venv/bin/python -m pip freeze | grep -v '^-e\|^newton @\|^newton-physics\|^warp' > "$VENV/requirements.txt"
     uv pip install -q --python "$VENV/bin/python" -r "$VENV/requirements.txt"
@@ -44,6 +46,7 @@ if [ ! -x "$VENV/bin/python" ]; then
   if [ -n "$MJW" ] && [ -d "$MJW" ]; then uv pip install -q --python "$VENV/bin/python" --no-deps -e "$MJW"
   else echo "warning: no MuJoCo Warp fork checkout found; $VENV has no mujoco_warp"; fi
   uv pip install -q --python "$VENV/bin/python" --no-deps -e ".[test]"
+  touch "$VENV/.metalsim_deps"
 fi
 uv pip install -q --python "$VENV/bin/python" --no-deps -e "$DIR"
 "$VENV/bin/python" -c "import warp as wp; wp.config.quiet=True; import newton, importlib.metadata as m; print('newton', m.version('newton'), newton.__file__)"
