@@ -32,10 +32,10 @@ def main():
     sim = make_sim(m, kind, n)
     gx, gm = wm.buffer_of(sim.d.geom_xpos), wm.buffer_of(sim.d.geom_xmat)
     for which in ("tier1", "tier2"):
-        for label, kw in (("geoms_only", dict(visual=False)), ("blocks_auto", {}), ("blocks_1env", dict(dyn_block_envs=1)),
-                          ("one_structure", dict(dyn_block_envs=n))):
+        for label, kw in (("geoms_only", dict(visual=False)), ("per_env", {}),
+                          ("rebuild_no_refit_flag", dict(dyn_rebuild_every=1))):
             if which == "tier1":
-                if "dyn_block_envs" in kw:
+                if kw and "visual" not in kw:
                     continue          # Tier0Renderer builds its tracer with the default blocks
                 r = Tier0Renderer(m, n, width=a.res, height=a.res, camera="cam", outputs=("rgb",), tier=1, **kw)
                 rt = r.rt
@@ -58,7 +58,7 @@ def main():
                     row[f"render_{pol}_ms"] = round(timed(lambda: r.render(sim), a.frames, r.ctx.synchronize), 3)
                     row[f"as_{pol}_ms"] = round(timed(as_only, a.frames, r.ctx.synchronize), 3)
             print(json.dumps(row), flush=True)
-            if label == "blocks_auto" and which == "tier1":
+            if label == "per_env" and which == "tier1":
                 twin = static_twin(r)                # the same surfaces as static mesh geoms: the cost of the triangles
             del r
         rt_twin = (Tier0Renderer(twin[0], n, width=a.res, height=a.res, camera="cam", outputs=("rgb",), tier=1, visual=False)
@@ -76,7 +76,7 @@ def static_twin(r):
     from metalsim.physics import deformable as dfm
     from metalsim.physics.batch import BatchSim
     from deformable_render_bench import CAM
-    xml = dfm.box_scene_xml(None, None).replace("<worldbody>", "<worldbody>" + CAM, 1)
+    xml = dfm.box_scene_xml(None, None, energy=False).replace("<worldbody>", "<worldbody>" + CAM, 1)
     spec = mujoco.MjSpec.from_string(xml)
     dyn = r.rt.dyn if r.rt is not None else r.dyn
     r.ctx.synchronize()

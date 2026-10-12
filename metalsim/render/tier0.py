@@ -802,8 +802,10 @@ class Tier0Renderer:
         if self.rt is not None:
             rt = self.rt
             re.useResource_usage_stages_(rt.inst_as, Metal.MTLResourceUsageRead, Metal.MTLRenderStageFragment)
-            for a in rt.prim_as:
+            for a in getattr(rt, "prim_as_unique", rt.prim_as):     # each structure once; the dynamic ones: their heap
                 re.useResource_usage_stages_(a, Metal.MTLResourceUsageRead, Metal.MTLRenderStageFragment)
+            if getattr(rt, "dyn_as", None):
+                re.useHeap_stages_(rt.dyn_heap, Metal.MTLRenderStageFragment)
             re.setFragmentAccelerationStructure_atBufferIndex_(rt.inst_as, 10)
             re.setFragmentBuffer_offset_atIndex_(self.rt_offset_buf, 0, 11)
             re.setFragmentBuffer_offset_atIndex_(rt.inst_tab, 0, 12)

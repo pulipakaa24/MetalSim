@@ -343,17 +343,24 @@ kernel appends `site_xpos` / `site_xmat`). Flexes, skins, tendons and user meshe
 `metalsim/render/dynamic_mesh.py` generates their vertex records (position, normal, uv) for every env in five compute
 dispatches per frame (copy the simulator's vertices, skinning, vertex normals from host-built adjacency, surface
 records, tube records from a template), all loops bounded by validated tables. The raster draws each object with one
-instanced draw (instance = env); the ray tracers keep one primitive acceleration structure per object holding every
-env's triangles (env-grid offset baked in), refit each frame and rebuilt every 32 frames, with one identity instance in
-the instance structure after the rigid ones; the particle renderer's grain instances follow those
-(`RayTracer.n_inst` / `prim_as` include them). No shader that existed before changed: the dynamic records use the static
-vertex layout, so hits on them resolve through the same `inst_tab` / `slot_mesh` / `mesh_info` lookups.
+instanced draw (instance = env); the ray tracers keep one primitive acceleration structure per env, in the env's own
+frame, holding each dynamic object as one geometry, refit each frame (rebuilt every 32) and placed in the env grid by its
+instance's translation exactly as the rigid meshes are, after the rigid instances; the particle renderer's grain
+instances follow those (`RayTracer.n_inst` / `prim_as` include them). The structures live in one heap (one residency
+call). The dynamic records use the static vertex layout; a hit's slot is its instance's slot + the hit geometry index and
+its mesh the instance's structure index + the geometry index (each env structure is listed once per object), which for
+every geom (one geometry) is exactly the previous lookup, so geom hits are unchanged.
 
 **Unchanged when absent.** Scenes without visible sites / flexes / skins / tendons render byte-identically: 87 of 92
 outputs identical on six scenes (prims, textured heightfield, SO-101, Panda, Shadow hand, Go2) against the previous
 integration-branch commit, every renderer and the depth camera; the five differing outputs were the Go2 lidar hitting
 the lidar's own `imu` site, since fixed by leaving sites out of the sensors (`scripts/diagnostics/render_identity_check.py`;
 `test_scenes_without_extras_are_byte_identical`). Go2's camera images were identical (its site is inside the body).
+The per-env structures (which changed the ray-tracing shaders' slot / mesh lookup) were checked the same way against the
+commit before them (471d156) with the two extras scenes of the tests added: every output of the six scenes without
+dynamic objects identical, and the tier 0 / tier 1 images of the two with them; the 10 differing outputs (of 121) are
+their ray-traced ones, with float-level differences (depth ≤ 0.14 mm, a different triangle of the same surface at a few
+edge hits, tier 2 RGB at 0.08 % of values) from vertices now held in the env's own frame.
 
 **Isaac / RTX.** Isaac renders deformables (PhysX FEM / particle cloth, Newton cloth) as the simulated mesh itself:
 zero thickness, two-sided, no ±radius skin (`DeformableMesh(radius=0)` reproduces that; MuJoCo's skin adds 2 × radius,
@@ -366,3 +373,32 @@ labels a deformable by its prim; here it is an unlabelled instance with its own 
 **Not done.** MuJoCo's catenary for a slack two-site spring tendon and the limit-impedance recolouring of default-grey
 tendons; motion vectors and 3D boxes of deformables (annotators stay geom-pose based); flex / skin textures use the
 first texture coordinate of each vertex (seams with different coordinates per element are not split).
+
+**Speed** (M4 Max, 64×64 per env, ms per frame, 30 frames back to back; `scripts/diagnostics/deformable_render_bench.py`,
+`deformable_render_profile.py`). "Geoms only" is the same renderer with `visual=False` (the deformables invisible, the
+previous behaviour).
+
+Cloth scene (10×10 cloth, 12-vertex cable, 4×4×4 soft cube on a box; 1120 dynamic triangles per env, MuJoCo Warp flex):
+
+| envs | T0 geoms only → with | T1 | ray depth camera | T2 (1 spp, 1 bounce) | vertex generation |
+|---|---|---|---|---|---|
+| 256 | 0.45 → 1.28 | 0.83 → 1.83 | 0.28 → 0.83 | 1.63 → 2.70 | 0.05 |
+| 1024 | 1.20 → 1.92 | 2.85 → 6.56 | 0.72 → 2.88 | 6.13 → 10.26 | 0.11 |
+| 4096 | 4.58 → 7.46 | 12.5 → 27.1 | 2.67 → 11.0 | (not run) | 0.57 |
+
+The yardstick is the triangles themselves: the same surfaces baked into static mesh geoms (instanced rigid meshes, no
+dynamic path) render at 1024 envs in 6.21 ms (T1) and 9.87 ms (T2), so the dynamic path costs 4–6 % over static geometry;
+the rest of the increase is drawing and tracing 1120 more triangles per env. Of the 1024-env frame, the acceleration
+structure work (vertex generation, 1024 refits, instance structure) is 2.4 ms. Refit per frame beats rebuilding
+(1024 envs: T1 6.57 vs 10.48, depth 2.86 vs 6.73, T2 10.2 vs 14.0), hence refit with a rebuild every 32 frames.
+
+How the ray-traced cost came down (T2, 1024 envs): one structure over all envs with the grid offset baked in 110 ms →
+blocks of 12 envs 88 → one structure per (object, env) in its own frame 13.0 → one per env with a geometry per object
+10.2 (static twin 9.9).
+
+Tendon-driven hand (Menagerie Tetheria Aero hand, 20 spatial tendons of 1 mm): with MuJoCo's tessellation (28 slices, 8
+rings per cap: 118 K triangles per env) at 256 envs T0 16.9 → 26.1, T1 10.5 → 38.5, depth camera 0.53 → 26.1, T2
+5.7 → 31.4. These tendons are under a pixel wide; `tube_slices=8, cap_stacks=2` (8.4 K triangles per env) gives
+T0 17.0 → 17.9, T1 10.6 → 13.6, depth 0.54 → 4.15, T2 5.7 → 9.5 at 256 envs and T0 66.8 → 69.4, T1 43.5 → 58.3,
+depth 1.54 → 15.1, T2 26.3 → 40.5 at 1024. The default stays MuJoCo's tessellation (silhouettes as MuJoCo's); the
+tessellation is a renderer argument.

@@ -31,17 +31,16 @@ class RayTracer:
     def __init__(self, model, n_envs: int, *, max_range: float = 10.0, max_group=3, include_planes=True,
                  decimate_faces: int = 0, terrain_slots: bool = True, draw_hfields: bool = True,
                  appearance: str = "mujoco", visual=None, deformables=(), tube_slices=None, cap_stacks=None,
-                 dyn_rebuild_every: int = 32, dyn_block_envs: int | None = None, ctx: MetalContext | None = None,
+                 dyn_rebuild_every: int = 32, ctx: MetalContext | None = None,
                  device="metal:0"):
         """``terrain_slots`` / ``draw_hfields`` / ``appearance``: see ``Tier0Renderer`` (False / "legacy" = the
         previous behaviour).
 
         ``visual`` / ``deformables`` / ``tube_slices`` / ``cap_stacks``: the non-geom objects MuJoCo's renderer draws
         (sites, flexes, skins, spatial tendons) and user deformable meshes; see ``Tier0Renderer``. Each dynamic object
-        has primitive acceleration structures over its envs' triangles (positions offset by the env grid), each
-        refit each frame after the vertices are regenerated and rebuilt every ``dyn_rebuild_every`` frames (1: every
-        frame; 0: refit only, after the first build). The structures are split into blocks of ``dyn_block_envs``
-        consecutive envs (default: about 256 structures in all) so each instance bounds only its envs."""
+        has one primitive acceleration structure per env, in the env's own frame and placed by its instance's translation
+        as the rigid meshes are, refit each frame after the vertices are regenerated and rebuilt every
+        ``dyn_rebuild_every`` frames (1: every frame, 0: refit only after the first build)."""
         self.m = model
         self.n = n_envs
         self.device = device
@@ -84,29 +83,35 @@ class RayTracer:
         if t.dyn:
             from metalsim.render.dynamic_mesh import DynamicMeshes
             nv_static = len(t.vertices)
-            self.dyn = DynamicMeshes(self.ctx, model, t, n_envs, tpr=self.tpr, stride=self.stride, rbase=nv_static,
+            # records in the env's own (world) frame, no grid offset: one primitive structure per env holding every
+            # dynamic object as one geometry (in object order), placed in the env grid by its instance's translation as
+            # the rigid meshes are. (Offsets baked into one structure over many envs put far envs' vertices at tens of
+            # km, where float32 spacing reaches millimetres, and made rays 3-10x slower than the same triangles as static
+            # instanced meshes; one structure per object and env made the per-frame refits host-bound.) A hit's slot is
+            # the instance's first slot + its geometry index, its mesh the instance's structure index + the geometry
+            # index: the env structure is listed once per object in the instanced-structure list.
+            self.dyn = DynamicMeshes(self.ctx, model, t, n_envs, tpr=self.tpr, stride=0.0, rbase=nv_static,
                                      vbuf=False, tube_slices=tube_slices, cap_stacks=cap_stacks)
             exp = self.dyn.expanded_indices()
             verts = np.zeros((nv_static + self.dyn.n_records, 8), np.float32)
             verts[:nv_static] = t.vertices
-            # one primitive structure per (object, block of consecutive envs): an instance's bounds then cover only its
-            # envs, so a ray meets only its own env block's dynamic geometry (one structure over every env made each ray
-            # traverse it: 4-18x slower rays). Shaders find the mesh from the instance's structure index (as_index).
-            i_off = len(t.indices)
-            n_obj = len(self.dyn.objects)
-            K = int(dyn_block_envs) if dyn_block_envs else max(1, -(-n_envs * n_obj // 256))   # <= ~256 structures
-            K = min(K, n_envs)
-            self.dyn_block_envs = K
-            dyn_inst = []
-            for k, (ob, ix) in enumerate(zip(self.dyn.objects, exp)):
-                slot_mesh[ob["slot"]] = len(mesh_list)
-                per_env = 3 * len(ob["tris"])
-                for e0 in range(0, n_envs, K):
-                    ne = min(K, n_envs - e0)
-                    if per_env:
-                        mesh_list.append({"i_off": i_off + e0 * per_env, "i_count": ne * per_env, "dynamic": k, "env0": e0})
-                        dyn_inst.append((e0, ob["slot"]))
+            objs = self.dyn.objects
+            slots = [ob["slot"] for ob in objs]
+            if any(len(ob["tris"]) == 0 for ob in objs) or slots != list(range(slots[0], slots[0] + len(objs))):
+                raise ValueError("dynamic objects must have triangles and consecutive slots")   # extras.extend_tables
+            obj_off, i_off = [], len(t.indices)
+            for ob, ix in zip(objs, exp):
+                obj_off.append(i_off)
                 i_off += ix.size
+            self.n_dyn_obj = len(objs)
+            dyn_inst = []
+            for e in range(n_envs):               # mesh entries env-major: the env's structure, then its geometries
+                for k, ob in enumerate(objs):
+                    per_env = 3 * len(ob["tris"])
+                    mesh_list.append({"i_off": obj_off[k] + e * per_env, "i_count": per_env, "dynamic": k, "env": e})
+                dyn_inst.append((e, slots[0]))
+            for k, ob in enumerate(objs):
+                slot_mesh[ob["slot"]] = len(t.meshes) + k            # env 0's (only used by code that ignores envs)
             inds = np.concatenate([t.indices] + exp).astype(np.uint32)
             inst_tab = np.concatenate([t.inst_table, np.asarray(dyn_inst, np.uint32).reshape(-1, 2)])
         self.vbuf = c.buffer(verts.nbytes, verts, "rt_vertices")
@@ -190,41 +195,70 @@ class RayTracer:
         """One primitive structure per dynamic object over every env's triangles, built on the first frame, then refit
         (and rebuilt every ``dyn_rebuild_every`` frames) after the vertices are regenerated."""
         self.dyn_as, self.dyn_desc = [], []
+        self.prim_as_unique = list(self.prim_as)
         if self.dyn is None:
             return
         c = self.ctx
         scratch = 16
-        for mesh in self.meshes_all[len(self.tables.meshes):]:
-            g = Metal.MTLAccelerationStructureTriangleGeometryDescriptor.new()
-            g.setVertexBuffer_(self.vbuf); g.setVertexBufferOffset_(0); g.setVertexStride_(32)
-            g.setVertexFormat_(Metal.MTLAttributeFormatFloat3)
-            g.setIndexBuffer_(self.ibuf); g.setIndexBufferOffset_(int(mesh["i_off"]) * 4)
-            g.setIndexType_(Metal.MTLIndexTypeUInt32)
-            g.setTriangleCount_(int(mesh["i_count"]) // 3)
-            g.setOpaque_(True)
+        dm = self.meshes_all[len(self.tables.meshes):]
+        D = self.n_dyn_obj
+        sizes = []
+        for e in range(self.n):
+            geos = []
+            for mesh in dm[e * D:(e + 1) * D]:
+                g = Metal.MTLAccelerationStructureTriangleGeometryDescriptor.new()
+                g.setVertexBuffer_(self.vbuf); g.setVertexBufferOffset_(0); g.setVertexStride_(32)
+                g.setVertexFormat_(Metal.MTLAttributeFormatFloat3)
+                g.setIndexBuffer_(self.ibuf); g.setIndexBufferOffset_(int(mesh["i_off"]) * 4)
+                g.setIndexType_(Metal.MTLIndexTypeUInt32)
+                g.setTriangleCount_(int(mesh["i_count"]) // 3)
+                g.setOpaque_(True)
+                geos.append(g)
             d = Metal.MTLPrimitiveAccelerationStructureDescriptor.new()
-            d.setGeometryDescriptors_([g])
-            d.setUsage_(Metal.MTLAccelerationStructureUsageRefit)
+            d.setGeometryDescriptors_(geos)
+            self._dyn_refittable = self.dyn_rebuild_every != 1
+            if self._dyn_refittable:                 # refit between rebuilds: the structure must allow it
+                d.setUsage_(Metal.MTLAccelerationStructureUsageRefit)
             s = c.device.accelerationStructureSizesWithDescriptor_(d)
             scratch = max(scratch, int(s.buildScratchBufferSize), int(s.refitScratchBufferSize))
             self.dyn_desc.append(d)
-            self.dyn_as.append(c.device.newAccelerationStructureWithSize_(s.accelerationStructureSize))
+            sizes.append(int(s.accelerationStructureSize))
+        # the env structures live in one heap: residency is one useHeap call per encoder, not one call per env
+        sa = [c.device.heapAccelerationStructureSizeAndAlignWithSize_(z) for z in sizes]
+        hd = Metal.MTLHeapDescriptor.new()
+        hd.setSize_(sum((int(x.size) + int(x.align) - 1) // int(x.align) * int(x.align) for x in sa) + 65536)
+        hd.setStorageMode_(Metal.MTLStorageModePrivate)
+        hd.setHazardTrackingMode_(Metal.MTLHazardTrackingModeTracked)   # refits / builds ordered like any resource
+        self.dyn_heap = c.device.newHeapWithDescriptor_(hd)
+        if self.dyn_heap is None:
+            raise RuntimeError("could not allocate the dynamic objects' acceleration-structure heap")
+        for z in sizes:
+            a = self.dyn_heap.newAccelerationStructureWithSize_(z)
+            if a is None:
+                raise RuntimeError("acceleration-structure heap too small")
+            self.dyn_as.append(a)
         self.dyn_scratch_stride = (scratch + 255) // 256 * 256      # one scratch region per structure (no sharing)
         self.dyn_scratch = c.buffer(self.dyn_scratch_stride * len(self.dyn_as), label="rt_dyn_scratch")
-        self.prim_as = list(self.prim_as) + list(self.dyn_as)   # one list for the instance structure (particles.py appends grains)
+        # one list for the instance structure (particles.py appends grains): each env structure once per geometry, so
+        # as_index + geometry index is the mesh entry of the hit object
+        self.prim_as_unique = list(self.prim_as)    # residency: the static structures one by one, the dynamic heap once
+        self.prim_as = list(self.prim_as) + [a for a in self.dyn_as for _ in range(D)]
         self._dyn_built = False
 
     def _encode_dynamic(self, cb, src):
         """Regenerate the dynamic objects' vertices from ``src``, then rebuild or refit their structures."""
         self.dyn.encode(cb, src)
-        rebuild = (not self._dyn_built) or (self.dyn_rebuild_every > 0 and self._dyn_frames % self.dyn_rebuild_every == 0)
+        rebuild = (not self._dyn_built) or not self._dyn_refittable or (self.dyn_rebuild_every > 0 and self._dyn_frames % self.dyn_rebuild_every == 0)
         ae = cb.accelerationStructureCommandEncoder()
-        for k, (a, d) in enumerate(zip(self.dyn_as, self.dyn_desc)):
-            off = k * self.dyn_scratch_stride
-            if rebuild:
-                ae.buildAccelerationStructure_descriptor_scratchBuffer_scratchBufferOffset_(a, d, self.dyn_scratch, off)
-            else:
-                ae.refitAccelerationStructure_descriptor_destination_scratchBuffer_scratchBufferOffset_(a, d, None, self.dyn_scratch, off)
+        sc, st = self.dyn_scratch, self.dyn_scratch_stride      # one call per structure: keep the loop lean (host time)
+        if rebuild:
+            f = ae.buildAccelerationStructure_descriptor_scratchBuffer_scratchBufferOffset_
+            for k, (a, d) in enumerate(zip(self.dyn_as, self.dyn_desc)):
+                f(a, d, sc, k * st)
+        else:
+            f = ae.refitAccelerationStructure_descriptor_destination_scratchBuffer_scratchBufferOffset_
+            for k, (a, d) in enumerate(zip(self.dyn_as, self.dyn_desc)):
+                f(a, d, None, sc, k * st)
         ae.endEncoding()
         self._dyn_built = True
         self._dyn_frames += 1
@@ -242,13 +276,16 @@ class RayTracer:
         s = c.device.accelerationStructureSizesWithDescriptor_(d)
         self.inst_as = c.device.newAccelerationStructureWithSize_(s.accelerationStructureSize)
         self.inst_scratch = c.buffer(max(int(s.buildScratchBufferSize), 16), label="rt_inst_scratch")
-        if self.n_inst > self.n_inst_static:   # dynamic objects: identity instances (positions already in the env grid)
+        if self.n_inst > self.n_inst_static:   # dynamic objects: one instance per env, translated into the env grid
             desc = np.zeros((self.n_inst - self.n_inst_static, 16), np.uint32)
             f = desc.view(np.float32)
-            f[:, 0] = f[:, 4] = f[:, 8] = 1.0                 # rotation columns (1,0,0), (0,1,0), (0,0,1); translation 0
+            f[:, 0] = f[:, 4] = f[:, 8] = 1.0                 # rotation columns (1,0,0), (0,1,0), (0,0,1)
+            env = np.arange(self.n)
+            f[:, 9] = (env % self.tpr) * self.stride          # translation: the env's grid offset (rt.metal env_offset)
+            f[:, 10] = (env // self.tpr) * self.stride
             desc[:, 12] = 4                                   # opaque
             desc[:, 13] = 0xFFFFFFFF
-            desc[:, 15] = len(self.tables.meshes) + np.arange(len(desc))   # after the static meshes in prim_as
+            desc[:, 15] = len(self.tables.meshes) + np.arange(len(desc)) * self.n_dyn_obj   # env e's first listing
             c.write_buffer(self.inst_desc, desc, offset=64 * self.n_inst_static)
 
     def encode_geom_xmat(self, cb, sim, gm_buf, gm_off):
@@ -309,8 +346,10 @@ class RayTracer:
 
     def _use_resources(self, ce):
         ce.useResource_usage_(self.inst_as, Metal.MTLResourceUsageRead)
-        for a in self.prim_as:              # static meshes, then the dynamic objects' structures
+        for a in self.prim_as_unique:       # static meshes, then the dynamic objects' heap
             ce.useResource_usage_(a, Metal.MTLResourceUsageRead)
+        if self.dyn_as:
+            ce.useHeap_(self.dyn_heap)
 
     # -- sensors ------------------------------------------------------------------------------------
 

@@ -122,8 +122,8 @@ kernel void lidar(
         return;
     }
     uint ii = res.instance_id;
-    uint slot = inst_tab[ii].y;
-    uint mesh = inst[ii].as_index;              // = slot_mesh[slot] for geoms; per env block for dynamic objects
+    uint slot = inst_tab[ii].y + res.geometry_id;          // geometry: 0 for geoms; the object within a dynamic env structure
+    uint mesh = inst[ii].as_index + res.geometry_id;       // = slot_mesh[slot] for geoms
     InstanceDesc d = inst[ii];
     float3x3 Ri = float3x3(float3(d.col0), float3(d.col1), float3(d.col2));
     float3 n = tri_normal(mesh, res.primitive_id, meshes, verts, indices, Ri);
@@ -226,7 +226,7 @@ kernel void lidar_ext(
         float3 dir = normalize(d + s.x * u + s.y * v);
         float P = s.z;
         float tmin = 0.001;
-        int last = -1;
+        int last = -1, last_g = -1;
         uint hits = 0;
         for (uint it = 0; it < x.hits_per_ray + 8 && hits < x.hits_per_ray; ++it) {
             ray r(org, dir, tmin, c.max_range);
@@ -234,12 +234,13 @@ kernel void lidar_ext(
             if (res.type == intersection_type::none) break;
             tmin = res.distance + 1e-4;
             int ii = int(res.instance_id);
-            if (ii == last) continue;                 // exit / inner faces of the object just hit
-            last = ii;
-            uint slot = inst_tab[ii].y;
+            int g = int(res.geometry_id);             // the object: instance, and geometry within a dynamic env structure
+            if (ii == last && g == last_g) continue;  // exit / inner faces of the object just hit
+            last = ii; last_g = g;
+            uint slot = inst_tab[ii].y + res.geometry_id;
             InstanceDesc di = inst[ii];
             float3x3 Ri = float3x3(float3(di.col0), float3(di.col1), float3(di.col2));
-            float3 n = tri_normal(di.as_index, res.primitive_id, meshes, verts, indices, Ri);
+            float3 n = tri_normal(di.as_index + res.geometry_id, res.primitive_id, meshes, verts, indices, Ri);
             if (dot(n, dir) > 0.0) n = -n;
             float p = P * slot_refl[slot] * max(dot(n, -dir), 0.0) / max(res.distance * res.distance, 1e-4);
             if (nc < LIDAR_MAX_CAND) {

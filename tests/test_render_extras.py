@@ -320,7 +320,7 @@ def test_flexface_mode_and_user_mesh_match_mujoco():
 @pytest.mark.parametrize("xml", [EXTRAS, WRAP, DRAPE])
 def test_gpu_generation_matches_reference(xml):
     """The Metal kernels write the records the NumPy reference computes, per env, for a raster-only renderer and for
-    a ray tracer (positions offset by the env grid)."""
+    a ray tracer (whose structures are placed in the env grid by their instances)."""
     from metalsim.render.dynamic_mesh import emulate
     m, _ = _forward(xml)
     datas = []
@@ -337,13 +337,7 @@ def test_gpu_generation_matches_reference(xml):
     rt = RayTracer(m, 3, max_range=5.0)
     cam = rt.make_depth_camera("cam", 16, 12)
     rt.trace_host(datas, [cam])
-    got = rt.dyn.records().astype(np.float64).copy()
-    for ob in rt.dyn.objects:
-        for e in range(3):
-            off = np.array([(e % rt.tpr) * rt.stride, (e // rt.tpr) * rt.stride, 0.0])
-            a = ob["obj_base"] + e * ob["nvert"]
-            got[a:a + ob["nvert"], :3] -= off
-    np.testing.assert_allclose(got, ref, atol=2e-4)
+    np.testing.assert_allclose(rt.dyn.records(), ref, atol=5e-5)   # env frame; the instances carry the grid offset
 
 
 # ------------------------------------------------------------------------------------------------------------------
@@ -623,7 +617,7 @@ def test_dynamic_meshes_and_particle_grains_share_the_tier2_structure():
     pts = np.stack(np.meshgrid(np.linspace(0.45, 0.65, 6), np.linspace(-0.3, -0.15, 4), [0.35], indexing="ij"), -1).reshape(-1, 3)
     r.set_particles(pts, radius=0.01)
     o = r.render_host([d], passes=2)
-    assert r.rt.n_inst == r.rt.n_inst_static + len(r.rt.dyn_as)
+    assert r.rt.n_inst == r.rt.n_inst_static + r.n          # one dynamic structure per env
     grains = o["seg"][0] == r.G + 1
     assert grains.sum() > 20
     o["seg"] = np.concatenate([[0], r.tables.slot_seg_ids(), [-1]])[o["seg"]]
