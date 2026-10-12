@@ -223,8 +223,8 @@ class NewtonRenderSource:
     (Isaac Lab 3.0's ``newton_clone_utils`` rule; imported collision meshes stay hidden).
     ``cameras`` / ``lights``: ``Camera`` / ``Light`` lists (twin "newton": a default camera and directional light when
     None; an MJCF twin keeps its own and appends these). ``env_origins``: (N, 3) env frame origins in the Newton world,
-    "auto" (each world's mean initial body position minus the mean over worlds: exact for ``ModelBuilder.replicate``
-    grids and Isaac Lab's env grid, both centred on the origin) or None (all zero).
+    "auto" (each world's mean initial body / particle / static-shape position minus the mean over worlds: exact for
+    ``ModelBuilder.replicate`` grids and Isaac Lab's env grid, both centred on the origin) or None (all zero).
     ``spec_hook``: called with the ``mujoco.MjSpec`` before compiling (twin "newton"; materials, extra cameras, ...)."""
 
     def __init__(self, model, *, twin="newton", shapes: str = "visible", collider_fallback: bool = True,
@@ -269,17 +269,27 @@ class NewtonRenderSource:
         if isinstance(env_origins, str):
             if env_origins != "auto":
                 raise ValueError(env_origins)
-            # each world's mean initial body position, relative to the centre of the worlds (``replicate`` and Isaac
-            # Lab's env grid are centred on the origin)
+            # each world's mean initial position of its bodies, particles and static shapes, relative to the centre of
+            # the worlds (``replicate`` and Isaac Lab's env grid are centred on the origin)
             o = np.zeros((n, 3))
-            if self._nw and len(self._body_q0):
-                has = np.zeros(n, bool)
-                for e in range(n):
-                    sel = self._body_world == e
-                    if sel.any():
-                        o[e] = self._body_q0[sel, :3].mean(0); has[e] = True
-                if has.any():
-                    o[has] -= o[has].mean(0)
+            if not self._nw:
+                return o
+            m = self.newton
+            pts = [(self._body_q0[:, :3], self._body_world)]
+            if int(getattr(m, "particle_count", 0) or 0) and getattr(m, "particle_world", None) is not None:
+                pts.append((m.particle_q.numpy().astype(np.float64), m.particle_world.numpy()))
+            if m.shape_count:
+                sb = m.shape_body.numpy()
+                st_ = sb < 0
+                pts.append((m.shape_transform.numpy()[st_, :3].astype(np.float64), m.shape_world.numpy()[st_]))
+            has = np.zeros(n, bool)
+            for e in range(n):
+                sel = [p[w == e] for p, w in pts if len(p)]
+                sel = np.concatenate(sel) if sel else np.zeros((0, 3))
+                if len(sel):
+                    o[e] = sel.mean(0); has[e] = True
+            if has.any():
+                o[has] -= o[has].mean(0)
             return o
         o = np.asarray(env_origins, float).reshape(n, 3)
         return o

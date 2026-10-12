@@ -16,7 +16,8 @@ import warp as wp
 
 newton = pytest.importorskip("newton", reason="Newton not installed (optional engine)")
 
-from metalsim.render.newton_bridge import Camera, NewtonRenderSource, joint_q_to_mujoco_qpos, mujoco_qpos_to_joint_q
+from metalsim.render.newton_bridge import (Camera, NewtonRenderSource, joint_q_to_mujoco_qpos, lookat_quat,
+                                           mujoco_qpos_to_joint_q)
 from metalsim.render.tier0 import SEG_BODY, SEG_GEOM, Tier0Renderer
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -291,3 +292,74 @@ def test_graph_replay_equals_eager():
     np.testing.assert_array_equal(a[0], src.d.geom_xpos.numpy())
     np.testing.assert_array_equal(a[1], src.d.geom_xmat.numpy())
     np.testing.assert_array_equal(a[2], src.d.cam_xmat.numpy())
+
+
+def _cloth_model(n, device="metal:0"):
+    env = newton.ModelBuilder()
+    env.add_ground_plane()
+    env.add_cloth_grid(pos=wp.vec3(-0.25, -0.2, 0.35), rot=wp.quat_identity(), vel=wp.vec3(0.0, 0.0, 0.0), dim_x=10, dim_y=8,
+                       cell_x=0.05, cell_y=0.05, mass=0.1)
+    env.add_soft_grid(pos=wp.vec3(0.1, 0.1, 0.05), rot=wp.quat_identity(), vel=wp.vec3(0.0, 0.0, 0.0), dim_x=3, dim_y=2,
+                      dim_z=2, cell_x=0.05, cell_y=0.05, cell_z=0.05, density=100.0, k_mu=1e3, k_lambda=1e3, k_damp=0.0)
+    env.add_particle_grid(pos=wp.vec3(-0.3, 0.2, 0.05), rot=wp.quat_identity(), vel=wp.vec3(0.0, 0.0, 0.0), dim_x=3, dim_y=3,
+                          dim_z=1, cell_x=0.06, cell_y=0.06, cell_z=0.06, mass=0.01, jitter=0.0, radius_mean=0.025)
+    b = newton.ModelBuilder()
+    b.replicate(env, n, spacing=(2.0, 0.0, 0.0))
+    return b.finalize(device=device)
+
+
+def test_cloth_and_soft_surfaces_on_the_dynamic_mesh_path():
+    """Cloth and soft-body surfaces (``tri_indices`` over ``particle_q``) through the renderers' dynamic-mesh path
+    (workstream A's ``deformables`` / ``sources``), per env, against the same triangles posed as a static MuJoCo mesh."""
+    pytest.importorskip("metalsim.render.extras", reason="dynamic-mesh path (workstream A) not installed")
+    n = 2
+    model = _cloth_model(n)
+    state = model.state()
+    rng = np.random.default_rng(0)
+    q = state.particle_q.numpy()
+    q[:, 2] += 0.03 * np.sin(7 * q[:, 0]) + rng.uniform(-0.005, 0.005, len(q))      # a deformed state, per world
+    q[model.particle_world.numpy() == 1, 2] += 0.05
+    state.particle_q.assign(q)
+    cam = Camera(pos=(0.5, -0.7, 1.1), lookat=(0.0, 0.0, 0.2))
+    src = NewtonRenderSource(model, cameras=[cam], lights=[])
+    assert [d.name for d in src.deformables] == ["newton_triangles"]
+    r = Tier0Renderer(src.m, n, width=W, height=H, camera=0, outputs=("depth", "seg"), seg_mode=SEG_GEOM,
+                      **src.renderer_kwargs())
+    r.render(src, src.update(state), sources=src.sources); r.ctx.synchronize()
+    got = {k: a.numpy() for k, a in r._out_arrays.items()}
+    # the ray tracer (lidar / depth camera / tier 1-2 structures) refits the same surfaces
+    from metalsim.sensors.raytrace import RayTracer
+    rt = RayTracer(src.m, n, max_range=10.0, **src.renderer_kwargs())
+    rcam = rt.make_depth_camera(0, W, H)
+    rt.trace(src, [rcam], src.update(state), sources=src.sources); rt.ctx.synchronize()
+    rdepth = rcam.numpy()
+    # reference: per env, the surface as a static mesh geom (env frame) in an MJCF, MuJoCo path
+    tris = src.deformables[0].tris
+    idx = src._cloth_idx
+    for e in range(n):
+        v = q[idx[e]] - src.origins[e]
+        spec = mujoco.MjSpec()
+        spec.compiler.inertiafromgeom = mujoco.mjtInertiaFromGeom.mjINERTIAFROMGEOM_FALSE
+        me = spec.add_mesh(name="cloth"); me.uservert = v.reshape(-1).tolist(); me.userface = tris.reshape(-1).tolist()
+        me.inertia = mujoco.mjtMeshInertia.mjMESH_INERTIA_SHELL
+        spec.worldbody.add_geom(type=mujoco.mjtGeom.mjGEOM_MESH, meshname="cloth", contype=0, conaffinity=0)
+        spec.worldbody.add_geom(type=mujoco.mjtGeom.mjGEOM_PLANE, size=[0, 0, 0.1], contype=0, conaffinity=0)
+        spec.worldbody.add_camera(name="cam", pos=list(cam.pos), quat=list(lookat_quat(cam.pos, cam.lookat)), fovy=45.0)
+        mm = spec.compile()
+        d = mujoco.MjData(mm); mujoco.mj_forward(mm, d)
+        rr = Tier0Renderer(mm, 1, width=W, height=H, camera="cam", outputs=("depth", "seg"), seg_mode=SEG_GEOM)
+        ref = rr.render_host([d])
+        cloth_ref = ref["seg"][0] == 1                                   # geom 0 + 1
+        cloth_got = got["seg"][e] == src.m.ngeom + 1                     # extras: ngeom + 1 + j
+        if os.environ.get("BRIDGE_DUMP"):
+            from PIL import Image
+            Image.fromarray(np.concatenate([cloth_ref, cloth_got], 1).astype(np.uint8) * 255).save(f"runs/newton_bridge/cloth_{e}.png")
+        assert cloth_ref.sum() > 500
+        cov = (cloth_got & cloth_ref).sum() / cloth_ref.sum()
+        iou = (cloth_got & cloth_ref).sum() / (cloth_got | cloth_ref).sum()
+        assert cov >= 0.99 and iou >= 0.98, (e, cov, iou)
+        both = cloth_got & cloth_ref
+        assert np.median(np.abs(got["depth"][e][both] - ref["depth"][0][both])) < 1e-3
+        rhit = both & (rdepth[e] > 0)
+        assert rhit.sum() >= 0.99 * both.sum()
+        assert np.median(np.abs(rdepth[e][rhit] - ref["depth"][0][rhit])) < 1e-3
