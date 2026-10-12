@@ -46,14 +46,22 @@ them: `git clone https://github.com/google-deepmind/mujoco_menagerie upstream/mu
 `scripts/setup_warp.sh` then replaces it with the fork below. Check with
 `python -c "import warp; print(warp.__file__)"`, which should point into `upstream/warp-metalsim`.
 
+MPM (Isaac Lab 3.0-EA's Newton 1.5.2 implicit MPM, `metalsim/physics/mpm/MPM.md`) runs in a second environment,
+`.venv-newton152`, built after the steps above by `scripts/setup_newton152.sh` (Newton fork branch `metalsim-1.5.2`
+at a pinned commit, the same Warp checkout, mujoco-warp 3.11.0, pinned third-party versions). Its tests:
+`.venv-newton152/bin/python -m pytest tests/test_mpm.py`. Every setup script pins its fork commit and takes
+`METALSIM_*_REPO` / `METALSIM_*_REF` overrides; if a fork cannot be cloned it rebuilds the same tree from upstream
+plus the diff in `patches/`.
+
 ### The three forks
 
 MetalSim depends on three forked projects, none of them on PyPI in this form. The commits below are
 what the current results were produced with. Each fork's branch head adds only a `METALSIM_CHANGES.md` (the list of MetalSim
 commits on that branch) on top of the commit named here, so installing the branch gives the same code.
 
-**Warp** ([pulipakaa24/warp](https://github.com/pulipakaa24/warp), branch `metalsim`, commit
-`f194006`). NVIDIA Warp with innate-inc's Metal backend, plus seven MetalSim commits: interop entry
+**Warp** ([pulipakaa24/warp](https://github.com/pulipakaa24/warp), branch `metalsim`, pinned commit `152808b7`;
+the rigid-body results were produced at `f194006` and `c200d46b`, see the README). NVIDIA Warp with innate-inc's
+Metal backend, plus MetalSim commits; the first seven: interop entry
 points (Metal device, queue and buffer handles, cross-queue events, used for zero-copy PyTorch MPS
 tensors), graph replay through Metal indirect command buffers, release of deferred frees per completed
 command buffer (without it, long loops at 4096 envs ran out of GPU memory) and fixed-size arrays
@@ -63,7 +71,10 @@ tile Cholesky (`wp.config.metal_register_cholesky_max`), `segmented_sort_pairs` 
 (default `upstream/warp-metalsim`), builds the native library with `build_lib.py --no-cuda` and
 installs it editable. `METALSIM_WARP_REPO` and `METALSIM_WARP_REF` (branch, tag or commit) point it
 elsewhere. If the fork cannot be cloned, the script clones innate-inc/warp at `ce15f6b` and applies
-`patches/warp/0001-0007`, which gives the same source tree as `f194006`.
+`patches/warp/metalsim-152808b7.diff`, which gives the same source tree as `152808b7` (`patches/warp/0001-0007` are
+the first seven commits, the tree of `f194006`). The commits since (MPM, scalable deterministic mode, FMA contraction
+from `fuse_fp`, GPU sort / BSR / NanoVDB builders, `fast_math` forms with `warp.config.metal_fast_math = "off"` by
+default) are listed in the branch's `METALSIM_CHANGES.md` and in `metalsim/physics/mpm/MPM.md`.
 
 **MuJoCo Warp** ([pulipakaa24/mujoco_warp](https://github.com/pulipakaa24/mujoco_warp), branch
 `metalsim`, commit `8fbf965`). Google DeepMind's MuJoCo Warp v3.14.0 (`88af9cc`) with sixteen commits:
@@ -80,13 +91,15 @@ every flex, active-layer volume contacts, mesh normals), order flex equality row
 throughput ones; identical tree to the merge `8fbf965`) are in `patches/mujoco_warp/`; to build without the fork, clone google-deepmind/mujoco_warp at
 `88af9cc`, `git am` those patches and `pip install -e` the checkout.
 
-**Newton** ([pulipakaa24/newton](https://github.com/pulipakaa24/newton), branch `metalsim`, commit
-`90e2332`). Only needed for the experimental Newton XPBD engine. The fork fixes XPBD solver defects
+**Newton** ([pulipakaa24/newton](https://github.com/pulipakaa24/newton), branch `metalsim`, pinned commit
+`fe7f5bd` = XPBD code `90e2332` plus the Metal HashTable fix). Only needed for the experimental Newton XPBD engine. The fork fixes XPBD solver defects
 found while validating it (revolute angle wrap at ±π, inconsistent joint relaxation,
 iteration-dependent drive stiffness, and others; the upstream issues and pull requests are listed in
 `scripts/diagnostics/newton_upstream/FILED.md`). `scripts/setup_newton.sh` installs it into a separate
 environment, `.venv-newtonfork`, and shares the Warp checkout with `.venv`. The `newton` extra instead
-installs upstream Newton at `45458023`, the commit the validation runs used, without the fixes.
+installs upstream Newton at `45458023`, the commit the validation runs used, without the XPBD fixes but with the
+Metal HashTable fix the current Warp fork needs (branch `metalsim-hashtable-metal`, `24fb536`). Branch
+`metalsim-1.5.2` (Newton 1.5.2 for MPM) is installed by `scripts/setup_newton152.sh`.
 
 The older single-file patches in `patches/` (`warp-innate-metal-pending-frees.patch`,
 `0001-Metal-fixed-size-arrays-...patch`, `mujoco_warp-*.patch`) are individual commits of the same

@@ -10,8 +10,9 @@ Research behind every choice: `docs/research/mpm_2026-10-09.md` (notes in `docs/
 
 | layer | where | what |
 |---|---|---|
-| oracle | `.venv-newton152` (Newton 1.5.2 tag, `upstream/newton-1.5.2`) + `newton_compat.py` | Newton's solver unchanged, with two semantic fixes below |
-| Newton branch | `upstream/newton-mpm-metal`, branch `metalsim-mpm-1.5.2` off v1.5.2 (put first on `PYTHONPATH`) | Metal launch configuration and device-side paths that CUDA already had; upstreamable |
+| oracle | Newton 1.5.2 tag + `newton_compat.py` (stock: `scripts/setup_newton152.sh` with `METALSIM_NEWTON152_REF=v1.5.2`, see section 10) | Newton's solver unchanged, with the semantic fixes below |
+| Newton fork | [pulipakaa24/newton](https://github.com/pulipakaa24/newton) branch `metalsim-1.5.2` off v1.5.2, pinned by `scripts/setup_newton152.sh` into `.venv-newton152` (`METALSIM_CHANGES.md` there lists every commit) | Metal launch configuration and device-side paths that CUDA already had, scale bounds, repeatable sums, rigid collision at scale; upstreamable |
+| Warp fork | [pulipakaa24/warp](https://github.com/pulipakaa24/warp) branch `metalsim`, pinned by `scripts/setup_warp.sh` (one checkout shared by every environment) | Metal GPU primitives, deterministic mode, launch bounds, argument space, replay batching, fast_math forms |
 | metalsim accelerations | `newton_compat.py` (`chunk_graph`), `simd_gs.py`, `fused_gs.py` | opt-in, each tested bitwise against the oracle |
 | scenes / recorder / comparison | `scenes.py`, `metalsim/parity/isaac_side/record_mpm.py`, `compare.py` | the same two files run on the L4 and on the Mac |
 
@@ -27,10 +28,10 @@ Research behind every choice: `docs/research/mpm_2026-10-09.md` (notes in `docs/
    device stops at the same iteration; it also logs iterations and residuals per solve (`SOLVE_LOG`), because a speed
    number is only comparable at the residual it reached.
 3. **Metal form of Newton's `fast_math` kernels** (`metal_fast_math`, section 8, 1b): `"off"` (default: correctly
-   rounded division and sqrt), `"cuda"` (CUDA's `--use_fast_math` results bit for bit, Warp branch
-   `metalsim-cuda-fast-math`), `"relaxed"` (Metal's fast divide / sqrt).
+   rounded division and sqrt), `"cuda"` (CUDA's `--use_fast_math` results bit for bit, Warp fork
+   `metalsim` from `91b8a859`; Warp's own default is `"off"` too), `"relaxed"` (Metal's fast divide / sqrt).
 
-### Newton branch commits (`metalsim-mpm-1.5.2`)
+### First Newton fork commits (topic branch `metalsim-mpm-1.5.2`, now the start of `metalsim-1.5.2`)
 
 | commit | change | effect |
 |---|---|---|
@@ -339,7 +340,7 @@ column is the one scene without collider ties, so it is the cleaner test of "sam
 plate exceedances are a single deterministic Metal sample against the largest of four L4 samples of a chaotic flow.
 The next step is the one MPM.md section 5 already names: an L4 floor distribution (more perturbed runs).
 
-### 1b. CUDA-faithful fast_math (Warp branch `metalsim-cuda-fast-math`, 2026-10-11)
+### 1b. CUDA-faithful fast_math (Warp `11aa54c8`, on fork `metalsim` as `91b8a859`; Warp default `"off"` since `152808b7`; 2026-10-11)
 
 Research and measurements: `research_notes/Metal MPM speed and scalable determinism/cuda_approx_math.md`.
 
@@ -470,16 +471,70 @@ column a = 2 18.5 / 19.4. Franka-Pour ms per step (gpuexit / captured) at 1, 64,
 8.7 / 3.8, 12.3 / 7.6, 21.4 / 15.3, 75.0 / 46.8, 148.9 / 91.5 (section 7b: 11.0 / 4.3, 15.7 / 8.0, 24.8 / 15.3,
 78.9 / 45.6, 160 / 88.5).
 
+## 8c. Integrated-2, rigid collision at scale, fast_math forms (2026-10-11)
+
+What a fresh setup installs (section 10). Warp fork `metalsim` = `c1bb061b` (integrated-2) + `91b8a859` (CUDA-faithful
+fast_math, section 8 1b) + `152808b7` (`warp.config.metal_fast_math` defaults to `"off"`). Newton fork
+`metalsim-1.5.2` = the integrated Newton `eac15793` + `c1ab1cdc` + the four rigid-scale commits + `METALSIM_CHANGES.md`.
+
+* **Integrated-2 (Warp `d4a834ee` .. `c1bb061b`, Newton `c1ab1cdc`).** Kernel-argument address space chosen per kernel
+  (`warp.config.metal_device_args = "auto"`: device memory for short tile-free kernels, constant otherwise, with a
+  constant twin when the Metal compiler cannot build the device form; Newton's Gauss-Seidel kernels opt in), graph
+  replays larger than the batch never split across command buffers, eager batches committed early while the GPU
+  idles, small deterministic launches resolved in one threadgroup. Bitwise. ms/frame (Warp's METALSIM_CHANGES,
+  interleaved, fast_math honoured as in section 8): granular 33.98 -> 31.62, multi_material 37.61 -> 35.38, two-way
+  67.35 -> 58.34, ANYmal 42.78 -> 36.80, column a = 2 18.94 -> 18.48; G1 MuJoCo Warp env step at 4,096 worlds 109.1 ->
+  92.8 ms (flat). Runs: `runs/mpm/integrated2/`.
+* **Rigid collision at scale (Newton `c0a98819`, `555d6af8`, `1298fbbb`, `ddb015b9`; written as `de978b55`,
+  `7beedf43`, `0013572a`, `ced01724`).** Franka-Pour at 2,048 worlds on the M4 Max: the mesh-convex midphase per thread
+  on Metal (65 -> 0.26 ms per collide, same triangles), mesh threadgroups per GPU core (collide 179 -> 67 ms; the L4
+  takes 90 ms at the same trajectory point), a barrier race in Newton's mesh-SDF kernels fixed (it hung the GPU at
+  2,048 worlds; results unchanged where it did not fire), deterministic mode sorting only the active contacts (sort
+  12.4 -> 0.2 ms, deterministic collide 192.6 -> 68.3 ms). Research: `research_notes/Metal MPM speed and scalable
+  determinism/rigid_scale_perf.md`; runs: `runs/rigid_perf/`. The same mesh-SDF `progress` reset pattern is in the
+  Newton 1.7 lines (`metalsim`, `metalsim-hashtable-metal`); the barrier fix is not ported there yet.
+* **fast_math.** MPM picks the form with `newton_compat.install(metal_fast_math=...)` (default `"off"`), and Warp's
+  own default is `"off"` as well, so programs that did not ask for it (MuJoCo Warp ray casts, Newton ray / collision
+  helpers in the rigid stack) compile their `fast_math` kernels exactly as before `f52da34`. Section 8's timings were
+  taken with fast_math honoured (`"relaxed"`); with the default `"off"` the MPM scenes run at section 1b's "off"
+  column. `--metal-fast-math relaxed` (record_mpm.py, speed_bench.py) restores section 8's configuration.
+
 ## 9. Running
 
 ```
-# Metal recording (oracle semantics + branch + chunk graph)
-PYTHONPATH=upstream/newton-mpm-metal:. .venv-newton152/bin/python metalsim/parity/isaac_side/record_mpm.py \
-    --scene column --set aspect=2 --device metal:0 --chunk-graph --out runs/mpm/metal/R1_a2
-python -m metalsim.physics.mpm.compare <run_a> <run_b>          # T0/T1 metrics, column observables, solver stats
-PYTHONPATH=upstream/newton-mpm-metal:. scripts/gpu_run.sh test_mpm render 15 -- \
-    .venv-newton152/bin/python -m pytest tests/test_mpm.py
+# Metal recording (CUDA semantics + Newton fork + chunk graph + GPU exit), in the environment of section 10
+.venv-newton152/bin/python metalsim/parity/isaac_side/record_mpm.py \
+    --scene column --set aspect=2 --device metal:0 --chunk-graph --gpu-exit --out runs/mpm/metal/R1_a2
+.venv-newton152/bin/python -m metalsim.physics.mpm.compare <run_a> <run_b>   # T0/T1 metrics, column observables, solver stats
+scripts/gpu_run.sh test_mpm check 15 -- .venv-newton152/bin/python -m pytest tests/test_mpm.py
+# ms/frame of one scene (timing class); A/B of other trees: speed_suite.sh OUT WARP_TREE NEWTON_TREE . ('-' = installed)
+scripts/gpu_run.sh mpm_speed timing 5 -- .venv-newton152/bin/python metalsim/physics/mpm/probes/speed_bench.py \
+    example:mpm_granular --frames 60 --warmup 5 --metal-fast-math off
+# Franka-Pour at scale (needs MuJoCo Menagerie's panda: upstream/mujoco_menagerie, or PANDA_XML=...)
+.venv-newton152/bin/python metalsim/physics/mpm/probes/scale_pour.py --part mpm --device metal:0 --worlds 64 --mode capture
 ```
 Probes (`probes/`): `ab_timing.py` (interleaved A/B), `profile_sections.py` (Newton's section timers),
 `loop_breakdown.py` (GPU cost of each loop component from recorded graphs), `dispatch_latency.py`, `p2g.swift`
 (P2G microbenchmark from the research round).
+
+## 10. Reproducing from a fresh clone
+
+Everything above runs from a clone of MetalSim plus the three forks; nothing depends on local branches.
+
+```
+# after the install of README / docs/GUIDE.md (.venv, scripts/setup_warp.sh, the MuJoCo Warp fork):
+scripts/setup_newton152.sh          # .venv-newton152: Newton fork metalsim-1.5.2 @35791a07, shared Warp fork @152808b7
+scripts/gpu_run.sh test_mpm check 15 -- .venv-newton152/bin/python -m pytest tests/test_mpm.py   # 15 passed, 1 xfailed
+```
+
+| what | where it lives | how a fresh setup gets it |
+|---|---|---|
+| Warp changes | pulipakaa24/warp `metalsim`, pinned `152808b7` | `scripts/setup_warp.sh` (fallback: innate-inc/warp `ce15f6bb` + `patches/warp/metalsim-152808b7.diff`) |
+| Newton changes (MPM, Franka-Pour rigid) | pulipakaa24/newton `metalsim-1.5.2`, pinned `35791a07` | `scripts/setup_newton152.sh` (fallback: v1.5.2 + `patches/newton/metalsim-1.5.2-35791a07.diff`) |
+| Newton 1.7 HashTable fix for the rigid stack | pulipakaa24/newton `metalsim-hashtable-metal` `24fb5367` (`.venv`'s `newton` extra) and `metalsim` `fe7f5bd4` (`.venv-newtonfork`) | `pip install -e ".[newton]"`, `scripts/setup_newton.sh` |
+| compat layer, scenes, probes, tests, Isaac-side recorders | this repository | the clone |
+| logs, JSON, reports of every run | `runs/mpm/`, `runs/parity/isaaclab3_mpm*/`, `runs/rigid_perf/`, `runs/fma_rigid_parity/` | the clone |
+| Metal particle recordings (`.npz`, ~6.6 GB) | not committed | `record_metal_suite.sh`, `record_variant_suite.sh OUT - - .` (one GPU job per run; deterministic, so a re-recording is bitwise the original on the same trees) |
+| L4 recordings (`runs/parity/isaaclab3_mpm*`, ~31 GB incl. tarballs) | not committed | on the L4 machine: copy `record_mpm.py`, `record_mpm_il3.py`, `scenes.py`, `newton_compat.py` to `~/parity3_scripts/mpm/`, run `isaaclab3/stage_mpm.sh`, `stage_mpm_floors.sh`, `stage_mpm_floors2.sh`, `stage_mpm_timing.sh` (Isaac Lab 3.0-EA install: `isaaclab3/`) |
+| kernel caches, L4 scale logs > 1 MB | not committed | rebuilt on first run / re-run `probes/scale_pour.py` on the L4 |
+| Franka panda model | MuJoCo Menagerie (not vendored) | `git clone https://github.com/google-deepmind/mujoco_menagerie upstream/mujoco_menagerie` or `PANDA_XML` |

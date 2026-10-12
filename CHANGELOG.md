@@ -3,6 +3,13 @@
 What landed between 2026-09-22 and 2026-09-25, one line per commit, grouped by area and in
 commit order within each area (`git log` for the full messages). Dates are the commit dates (month-day).
 
+## MPM, scalable determinism, rigid scale (2026-10-09 .. 11, `metalsim/physics/mpm/MPM.md`)
+
+- 10-11 MPM on Metal landed in the tree: `metalsim/physics/mpm` (compat layer, scenes, reports, probes), `tests/test_mpm.py`, Isaac-side recorders and stages, research (`docs/research/mpm_2026-10-09.md`, `reports/`, `research_notes/`), run logs and JSON (`runs/mpm`, `runs/parity/isaaclab3_mpm*`, `runs/rigid_perf`, `runs/fma_rigid_parity`)
+- 10-11 Setup pins fork commits: Warp `metalsim` 152808b7 (`scripts/setup_warp.sh`), Newton `metalsim` fe7f5bd4 (`scripts/setup_newton.sh`), Newton `metalsim-1.5.2` 35791a07 (`scripts/setup_newton152.sh`, new: the MPM environment), the `newton` extra at `metalsim-hashtable-metal` 24fb5367; whole-branch diffs in `patches/warp`, `patches/newton` as the offline fallback
+- 10-11 Warp `metalsim`: CUDA-faithful `fast_math` (`warp.config.metal_fast_math`), default `"off"`; MPM chooses through `newton_compat.install(metal_fast_math=)`
+- 10-11 GPU queue: `check` class (correctness jobs share the GPU, up to 3) and job heartbeats
+
 ## Physics: elliptic-cone premium (2026-09-26, `docs/research/elliptic_warmstart_2026-09-26.md`)
 
 - 09-26 MuJoCo Warp fork `metalsim-rough-ellip` d9ec218 (on `fork/metalsim` f824af1): the convex narrowphase's EPA / multi-contact scratch is allocated once per Data on Metal; graph captures kept one 2.8 GB copy per substep at 4096 worlds, so the G1 rough task at 2.5 ms (8 substeps) overflowed the 55.7 GB GPU working set under the elliptic default (`docs/research/rough_ellip_oom_2026-09-26.md`)

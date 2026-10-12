@@ -55,7 +55,7 @@ listing its commits, and keeps its upstream licence unchanged. "Head" is the bra
 | module | what it does |
 |---|---|
 | `metalsim/interop` | Warp ↔ Metal ↔ PyTorch MPS: zero-copy tensors over Warp and renderer buffers, cross-queue ordering with shared events, a native bridge (`metalsim/native/torch_metal_bridge.mm`) |
-| `metalsim/physics` | `BatchSim`: batched MuJoCo Warp on Metal with graph replay and per-world model fields; contact-tuning and solver presets; deformables (MuJoCo Warp flex, XPBD cloth and cables, a port of PhysX's particle cloth); the archived Newton XPBD backend |
+| `metalsim/physics` | `BatchSim`: batched MuJoCo Warp on Metal with graph replay and per-world model fields; contact-tuning and solver presets; deformables (MuJoCo Warp flex, XPBD cloth and cables, a port of PhysX's particle cloth); MPM (`metalsim/physics/mpm`: Isaac Lab 3.0-EA's Newton 1.5.2 implicit MPM on Metal with CUDA's semantics, [`MPM.md`](metalsim/physics/mpm/MPM.md)); the archived Newton XPBD backend |
 | `metalsim/render` | tier 0 raster, tier 1 hybrid ray tracing (shadows, AO, reflections), tier 2 path tracer with OmniPBR / UsdPreviewSurface BRDFs, USD light units, textured DomeLight HDR environment maps (importance-sampled, MIS), RTX's display transform and Open Image Denoise; RTX-parity presets |
 | `metalsim/sensors` | lidar (beam divergence, multi-return, intensity), radar-lite and height scan on Metal ray tracing; Isaac Lab's `ContactSensor` as Warp kernels |
 | `metalsim/scene` | USD → MuJoCo loader (lossless and generic UsdPhysics, fixes for NVIDIA asset conventions), MJCF/URDF → USD, MaterialX flattening |
@@ -71,8 +71,9 @@ listing its commits, and keeps its upstream licence unchanged. "Head" is the bra
 
 [github.com/pulipakaa24/warp](https://github.com/pulipakaa24/warp), branch
 [`metalsim`](https://github.com/pulipakaa24/warp/tree/metalsim), head
-[`c200d46b`](https://github.com/pulipakaa24/warp/commit/c200d46b) (2026-09-26; the results before that day's throughput work were
-produced at [`4127c48`](https://github.com/pulipakaa24/warp/commit/4127c4818334080de6f3d23aef522e582ff6a2a7), code
+[`152808b7`](https://github.com/pulipakaa24/warp/commit/152808b7e33ce08fcc17c898c5ce11d567d60795) (2026-10-11, pinned by
+`scripts/setup_warp.sh`; the rigid-body results through 2026-09-26 were produced at
+[`c200d46b`](https://github.com/pulipakaa24/warp/commit/c200d46b), those before that day's throughput work at [`4127c48`](https://github.com/pulipakaa24/warp/commit/4127c4818334080de6f3d23aef522e582ff6a2a7), code
 [`f194006`](https://github.com/pulipakaa24/warp/commit/f194006a4cf197fda93633252af81bc3f57f5561)). Base: innate-inc/warp
 `ce15f6b`, NVIDIA Warp with innate-inc's Metal backend. Apache-2.0.
 
@@ -91,6 +92,13 @@ produced at [`4127c48`](https://github.com/pulipakaa24/warp/commit/4127c48183340
 - Register triangular solves in `tile_cholesky_solve` (`27e63fd1`; solve 0.52 → 0.34 ms at n = 43, +5.2 % env step,
   summation order only); in-place rank-1 Cholesky updates (`e29950ee`); compact register layout and rolled Cholesky
   variants kept off by default (measured slower).
+- MPM and scalable determinism (2026-10-09 .. 11, `c200d46b..152808b7`; `metalsim/physics/mpm/MPM.md`): FMA
+  contraction from `fuse_fp` as on CUDA (this changes rounding in every Metal kernel; the rigid suite has the same
+  four known failures before and after, `runs/fma_rigid_parity/`), the CUDA LBVH builder, GPU radix sort / RLE / scan,
+  BSR assembly and NanoVDB builders, deterministic mode at any launch size, device-side launch bounds
+  (`wp.launch(..., dim_limit=)`), GPU indexed copies, per-kernel argument address space, batched graph replays,
+  64-bit atomics Metal cannot make atomic refused at launch, and `fast_math` forms (`warp.config.metal_fast_math`:
+  `"off"` by default, `"cuda"` bit for bit CUDA's `--use_fast_math`, `"relaxed"`).
 
 Branch [`metalsim-flex`](https://github.com/pulipakaa24/warp/tree/metalsim-flex), head
 [`01ccf4a`](https://github.com/pulipakaa24/warp/commit/01ccf4ad687c0ebcdee139ee1131fbe2ad97bf51) (code `9dcb140`): the
@@ -153,9 +161,15 @@ Branch [`metalsim-flex`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsi
 
 [github.com/pulipakaa24/newton](https://github.com/pulipakaa24/newton), branch
 [`metalsim`](https://github.com/pulipakaa24/newton/tree/metalsim), head
-[`fb95e09`](https://github.com/pulipakaa24/newton/commit/fb95e095355f15cfb576d3022d44a34de23fa516) (code
-[`90e2332`](https://github.com/pulipakaa24/newton/commit/90e23324521fa86710e483e01d02e80d1dac0060)). Base:
-newton-physics/newton `4545802`. Apache-2.0.
+[`fe7f5bd`](https://github.com/pulipakaa24/newton/commit/fe7f5bd48010fcab428eac6373e85ba3317f7a42) (XPBD code
+[`90e2332`](https://github.com/pulipakaa24/newton/commit/90e23324521fa86710e483e01d02e80d1dac0060), plus the Metal
+HashTable / 64-bit atomics fix `d06b2c0`, `7d80b8a`). Base: newton-physics/newton `4545802`. Apache-2.0.
+Branch [`metalsim-hashtable-metal`](https://github.com/pulipakaa24/newton/tree/metalsim-hashtable-metal)
+(`24fb536`) is upstream `4545802` with only that fix; the `newton` extra installs it into `.venv` (the stock commit
+loses or duplicates contact-table keys on Metal and raises on the current Warp fork in the rough G1 task).
+Branch [`metalsim-1.5.2`](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2) (`35791a0`) is Newton 1.5.2
+(Isaac Lab 3.0-EA's pin) with MetalSim's Metal changes for the implicit MPM solver and the Franka-Pour rigid collision
+at 2,048 worlds; `scripts/setup_newton152.sh` installs it into `.venv-newton152`.
 
 - XPBD solver fixes, counted as six defects in the gap ledger: revolute angles crossing ±π (`f844a4e`), inconsistent
   joint relaxation and in-solver PD drives whose stiffness does not depend on the iteration count (`fda6658`), joint
@@ -211,6 +225,7 @@ Recordings, logs and benchmark JSON are under `runs/parity/`, `runs/parity3/` an
 - [`isaaclab3_reference_2026-09-25.md`](docs/research/isaaclab3_reference_2026-09-25.md): making Isaac Lab 3.0-EA the reference on both backends.
 - [`isaaclab3_like_for_like_2026-09-25.md`](docs/research/isaaclab3_like_for_like_2026-09-25.md): the 3.0 G1 task and Isaac's own MuJoCo Warp settings for a like-for-like comparison.
 - [`closed_loops_2026-09-25.md`](docs/research/closed_loops_2026-09-25.md): closed kinematic loops, Newton Kamino on Metal vs MuJoCo Warp's soft closure.
+- [`mpm_2026-10-09.md`](docs/research/mpm_2026-10-09.md): Isaac Lab 3.0-EA's MPM (Newton 1.5.2's implicit solver) and how to run it on Metal; follow-up rounds in [`reports/`](reports) and [`research_notes/`](research_notes) (Metal GPU primitives for MPM, CUDA and Metal float parity, scalable determinism and rigid scale, CUDA's approximate division / sqrt).
 
 ## Install
 
@@ -224,6 +239,7 @@ scripts/setup_warp.sh
 pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@metalsim#egg=mujoco-warp"
 scripts/fetch_isaac_assets.sh              # NVIDIA's g1_minimal.usd, fetched from NVIDIA, not redistributed
 pytest tests -q
+scripts/setup_newton152.sh                 # optional: MPM (.venv-newton152; tests/test_mpm.py runs there)
 ```
 
 Optional extras, first runs, bringing your own robot, the GPU job queue and the throughput / fidelity knobs are in
