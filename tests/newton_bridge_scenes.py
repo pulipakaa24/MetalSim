@@ -30,7 +30,7 @@ PRIMS = """
       <body name="arm1" pos="0 0 0.2">
         <joint name="j_a1" type="hinge" axis="0 1 0"/>
         <geom type="box" pos="0.08 0 0" size="0.08 0.015 0.015" rgba="0.5 0.7 0.2 1"/>
-        <site name="tip" pos="0.16 0 0"/>
+        <site name="tip" pos="0.16 0 0" group="4"/>
       </body>
     </body>
   </worldbody>
