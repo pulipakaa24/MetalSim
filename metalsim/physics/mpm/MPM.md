@@ -361,8 +361,8 @@ Per-op cost (dependent chains, 2^20 threads; FMA 1.28 ps): division 10.8 ps (pre
 (precise 2.7, fast 1.3). With `"off"` / `"relaxed"` the recordings are bitwise those of the integrated tree's
 no-fast-math / fast-math runs (all six floor scenes), so non-fast_math kernels are unchanged.
 
-**Parity** (floor ensemble: 16 perturbed L4 runs, `floors_dist.py`; runs `runs/mpm/fm_{off,cuda,relaxed}` of the
-worktree; M / max floor at the worst picked frame; verdict at the picked frames):
+**Parity** (floor ensemble: 16 perturbed L4 runs, `floors_dist.py`; runs `runs/mpm/fm_{off,cuda,relaxed}`, timings
+`runs/mpm/speed_fm`, emulation probes `runs/mpm/approx` (logs and JSON; recordings not committed); M / max floor at the worst picked frame; verdict at the picked frames):
 
 | scene | off | cuda | relaxed |
 |---|---|---|---|
