@@ -192,6 +192,35 @@ def scene(n_envs: int, spacing: float = 2.5, hfield: dict | None = None, **g1_kw
     return s, {k: np.tile(v, n_envs) for k, v in act.items()}
 
 
+# Newton's contacts-per-pair budget (newton/_src/sim/collide.py: _RIGID_CONTACTS_PER_PRIMITIVE_PAIR / _MESH_PAIR):
+# a primitive pair yields at most a 5-point manifold; a pair involving a mesh or heightfield typically ~40.
+CONTACTS_PER_PRIMITIVE_PAIR = 5
+CONTACTS_PER_MESH_PAIR = 40
+
+
+def rigid_contact_capacity(m: newton.Model) -> int:
+    """Rigid-contact buffer size for ``CollisionPipeline(m, broad_phase="explicit")``: Newton's per-pair budget
+    summed over the model's actual contact pairs (5 per primitive pair, 40 per pair involving a mesh or heightfield).
+
+    Newton's automatic estimate (what Isaac Lab uses when ``rigid_contact_max`` is unset) bounds the explicit pair list
+    by ``pairs * avg``, with ``avg`` the contacts-per-pair averaged over *shapes*. One global terrain heightfield
+    against every robot shape then counts as 1 mesh among 3n primitives, so ``avg`` = 5 and every heightfield pair
+    gets a primitive's budget (64 G1 worlds on rough terrain: 1,000 slots against ~2,100 contacts, about half dropped).
+    Weighting each pair by its own type is the rule Newton itself uses per world
+    (``_estimate_rigid_contact_max_per_world``). Never below Newton's estimate or its 1,000-slot minimum."""
+    try:                                                      # Newton's own estimate, as the lower bound
+        from newton._src.sim.collide import _estimate_rigid_contact_max
+        est = int(_estimate_rigid_contact_max(m))
+    except ImportError:
+        est = 1000
+    if m.shape_contact_pair_count == 0:
+        return est
+    pairs = m.shape_contact_pairs.numpy().reshape(-1, 2)
+    types = m.shape_type.numpy()
+    mesh = np.isin(types[pairs], (int(newton.GeoType.MESH), int(newton.GeoType.HFIELD))).any(axis=1)
+    return max(est, int(np.where(mesh, CONTACTS_PER_MESH_PAIR, CONTACTS_PER_PRIMITIVE_PAIR).sum()))
+
+
 @wp.kernel
 def _pd_torque(joint_q: wp.array[float], joint_qd: wp.array[float], q_start: wp.array[int], qd_start: wp.array[int],
                target: wp.array[float], kp: wp.array[float], kd: wp.array[float], effort: wp.array[float],
@@ -439,7 +468,8 @@ class G1XPBD:
             self.solver = newton.solvers.SolverXPBD(m, iterations=self.iterations, **kw)
             self.s0, self.s1 = m.state(), m.state(); self.control = m.control()
             newton.eval_fk(m, m.joint_q, m.joint_qd, self.s0)
-            self.pipeline = newton.CollisionPipeline(m, broad_phase="explicit")    # what Model.collide() builds
+            # what Model.collide() builds, with the contact buffer sized per pair (rigid_contact_capacity)
+            self.pipeline = newton.CollisionPipeline(m, broad_phase="explicit", rigid_contact_max=rigid_contact_capacity(m))
             self.contacts = self.pipeline.contacts(); self.pipeline.collide(self.s0, self.contacts)
             self.joint_q = wp.clone(m.joint_q); self.joint_qd = wp.clone(m.joint_qd)
             self.act = act
@@ -655,7 +685,8 @@ class NewtonSim:
                                                         **skw)
             self.s0, self.s1 = m.state(), m.state(); self.control = m.control()
             newton.eval_fk(m, m.joint_q, m.joint_qd, self.s0)
-            self.pipeline = newton.CollisionPipeline(m, broad_phase="explicit")    # what Model.collide() builds
+            # what Model.collide() builds, with the contact buffer sized per pair (rigid_contact_capacity)
+            self.pipeline = newton.CollisionPipeline(m, broad_phase="explicit", rigid_contact_max=rigid_contact_capacity(m))
             self.contacts = self.pipeline.contacts(); self.pipeline.collide(self.s0, self.contacts)
             assert m.articulation_count == n
             self.nb, self.nc, self.nd = m.body_count // n, m.joint_coord_count // n, m.joint_dof_count // n
