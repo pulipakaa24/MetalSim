@@ -1,0 +1,30 @@
+# Third-party packages of .venv-newton152 (scripts/setup_newton152.sh), pinned to the versions the MPM and
+# Franka-Pour measurements of 2026-10-09..11 used. Warp and Newton (the forks), mujoco-warp 3.11.0 and warp-nn 0.3.0
+# are installed separately with --no-deps (their declared warp-lang dependency would pull PyPI's Warp over the fork).
+absl-py==2.5.0
+etils==1.14.0
+fsspec==2026.9.0
+gitdb==4.0.12
+gitpython==3.1.62
+glfw==2.10.2
+iniconfig==2.3.0
+ml-dtypes==0.6.0
+mujoco==3.11.0
+newton-usd-schemas==0.5.0
+numpy==2.5.3
+onnx==1.23.2
+packaging==26.3
+pluggy==1.6.0
+protobuf==7.36.2
+pycollada==0.9.3
+pygments==2.21.0
+pyopengl==3.1.10
+pytest==9.1.1
+python-dateutil==2.9.0.post0
+scipy==1.18.1
+six==1.17.0
+smmap==5.0.3
+trimesh==5.1.1
+typing-extensions==4.16.0
+usd-core==26.8
+zipp==4.1.0
