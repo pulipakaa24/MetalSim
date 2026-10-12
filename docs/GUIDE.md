@@ -177,6 +177,18 @@ python -m metalsim.learn.lidar_nav 1024 300 runs/lidar_nav.log runs/policies/lid
 
 Arguments are positional: `[num_envs] [iterations] [log] [checkpoint.pt]`.
 
+### Rendering particles (MPM sand)
+
+Both renderers draw particles as render grains (small irregular grain meshes, several per particle, per-grain
+colour), in the path tracer's acceleration structure and in tier 0's raster pass:
+
+```python
+renderer.set_particles(state.particle_q, radius=0.005, grains_per_particle=27)   # numpy or a Warp array on Metal
+```
+
+Details, options and limits: `metalsim/render/PARTICLES.md`. A path-traced demo of Newton's ANYmal-on-sand MPM
+example: `scripts/particle_demo/` (`sim_anymal.py` records it, `render_anymal.py` renders it).
+
 ## 3. Bringing your own robot
 
 ### Loading USD or MJCF

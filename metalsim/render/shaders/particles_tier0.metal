@@ -61,9 +61,9 @@ vertex ShadowOut grain_shadow_vs(
     return o;
 }
 
-// the same palette pick as the path tracer's grain_material (shaders/pathtrace.metal), per grain index
-inline float3 grain_base(constant GrainMatT& g, uint gid) {
-    uint hh = hash_u(gid * 0x9E3779B1u + 0x85EBCA6Bu);
+// the same palette pick as the path tracer's grain_material (shaders/pathtrace.metal), per grain identity key
+inline float3 grain_base(constant GrainMatT& g, uint key) {
+    uint hh = hash_u(key * 0x9E3779B1u + 0x85EBCA6Bu);
     float u = float(hh & 0xFFFFu) / 65536.0, v = float(hh >> 16) / 65536.0;
     uint n = clamp(uint(g.p0.x), 1u, 8u), k = 0;
     while (k + 1 < n && u > g.pal[k].w) ++k;
@@ -81,11 +81,12 @@ fragment FSOut grain_fs(
     device const float*     light_xpos [[buffer(7)]],
     device const float*     light_xdir [[buffer(8)]],
     constant SceneParams&   sp         [[buffer(9)]],
+    device const uint*      keys       [[buffer(10)]],   // per-grain identity key (particles.metal)
     depth2d<float>          shadow     [[texture(2)]],
     sampler                 shadow_samp [[sampler(1)]])
 {
     EnvParams e = envs[in.env];
-    float3 base = grain_base(gm, in.slot);
+    float3 base = grain_base(gm, keys[in.slot]);
     float metallic = gm.mrse.x, rough = max(gm.mrse.y, 0.03), specw = gm.mrse.z;
     float3 N = normalize(in.normal_w);
     float3 V = normalize(e.cam_pos.xyz - in.world_pos);
