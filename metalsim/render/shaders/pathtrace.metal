@@ -25,8 +25,10 @@ struct PTConsts {
     uint n_light, n_slots, spp, max_bounces;
     uint frame, tiles_per_row, flags, seed;     // flags: see FLAG_* below
     float stride, exposure, env_scale, clip_far;   // clip_far: camera far clipping plane (z-depth), 0 = none
-    uint env_w, env_h, _u0, _u1;                // FLAG_ENVMAP: importance-sampling grid of the environment map
-    float env_yaw, clamp_lum, _f0, _f1;         // env_yaw: dome rotation about +z (rad); clamp_lum: per-path luminance cap, 0 = off (biased)
+    uint env_w, env_h, grain_inst0, grain_as0;  // FLAG_ENVMAP: importance-sampling grid of the environment map; FLAG_GRAINS: first grain
+                                                // instance and first grain mesh in the instanced-structure list (particles.py)
+    float env_yaw, clamp_lum, grain_eps, _f1;   // env_yaw: dome rotation about +z (rad); clamp_lum: per-path luminance cap, 0 = off (biased);
+                                                // grain_eps: ray offset off a grain surface [m] (grains are mm-sized; scene hits use 1 mm)
     float4 env_mul;                             // FLAG_ENVMAP: rgb multiplier on the map (dome intensity * 2^exposure * color)
 };
 struct CamSpec { float4 intrinsics; float4 pos_delta; float4 rot_delta; float4 light; float4 ambient; float4 clear_color; int cam_id, p0, p1, p2; };
@@ -41,6 +43,7 @@ constant uint FLAG_TONEMAP_RTX = 4u;  // RTX default tone mapping (exposure, ACE
 constant uint FLAG_CENTER0 = 16u;     // first sample of the reset pass through the pixel centre (annotators match raster / Isaac)
 constant uint FLAG_AUX = 8u;          // write mean HDR radiance and sample-averaged first-hit albedo / normal (denoiser inputs)
 constant uint FLAG_ENVMAP = 32u;      // equirectangular HDR environment map (texture(1), CDF table buffer(26)) replaces the sky colour
+constant uint FLAG_GRAINS = 64u;      // particle render grains: instances from grain_inst0 on (metalsim/render/particles.py, PARTICLES.md)
 
 inline float3x3 load_mat33(device const float* p) {
     return float3x3(float3(p[0], p[3], p[6]), float3(p[1], p[4], p[7]), float3(p[2], p[5], p[8]));
@@ -179,20 +182,29 @@ inline float3 sample_cone(float3 axis, float ang, float u, float v) {
     return normalize(t * (st * cos(ph)) + b * (st * sin(ph)) + axis * ct);
 }
 
-struct Hit { bool ok; float t; float3 p; float3 n; float2 uv; uint slot; };
+struct Hit { bool ok; float t; float3 p; float3 n; float2 uv; uint slot; bool grain; uint gid; };
+// render-grain geometry (FLAG_GRAINS): instances >= inst0 are grains, instancing grain mesh (as_index - as0)
+struct GrainGeo { device const float* verts; device const uint* indices; device const MeshInfo* meshes; uint inst0, as0; };
 
 inline Hit trace(instance_acceleration_structure accel, float3 o, float3 d, float tmax,
                  device const uint2* inst_tab, device const int* slot_mesh, device const MeshInfo* meshes,
-                 device const float* verts, device const uint* indices, device const InstanceDesc* inst)
+                 device const float* verts, device const uint* indices, device const InstanceDesc* inst,
+                 GrainGeo gg, float tmin = 0.0005)
 {
     Hit h; h.ok = false;
-    ray r(o, d, 0.0005, tmax);
+    ray r(o, d, tmin, tmax);
     intersector<triangle_data, instancing> isect;
     intersection_result<triangle_data, instancing> res = isect.intersect(r, accel);
     if (res.type == intersection_type::none) return h;
-    uint slot = inst_tab[res.instance_id].y;
-    uint mesh = uint(slot_mesh[slot]);
-    uint b = meshes[mesh].i_off + res.primitive_id * 3;
+    bool grain = res.instance_id >= gg.inst0;
+    uint slot = 0, b;
+    if (grain) {
+        b = gg.meshes[inst[res.instance_id].as_index - gg.as0].i_off + res.primitive_id * 3;
+        verts = gg.verts; indices = gg.indices;
+    } else {
+        slot = inst_tab[res.instance_id].y;
+        b = meshes[uint(slot_mesh[slot])].i_off + res.primitive_id * 3;
+    }
     uint i0 = indices[b], i1 = indices[b + 1], i2 = indices[b + 2];
     float2 bc = res.triangle_barycentric_coord; float w0 = 1.0 - bc.x - bc.y;
     float3 n0 = float3(verts[i0*8+3], verts[i0*8+4], verts[i0*8+5]);
@@ -204,7 +216,22 @@ inline Hit trace(instance_acceleration_structure accel, float3 o, float3 d, floa
     float3 n = normalize(R * (n0 * w0 + n1 * bc.x + n2 * bc.y));
     if (dot(n, d) > 0.0) n = -n;
     h.ok = true; h.t = res.distance; h.p = o + d * res.distance; h.n = n; h.uv = uv; h.slot = slot;
+    h.grain = grain; h.gid = grain ? res.instance_id - gg.inst0 : 0u;
     return h;
+}
+
+// render-grain material (particles.GrainMaterial.pack): a palette entry picked by the grain's hash with the
+// cumulative weights, a brightness jitter, shared roughness / specular / metallic and BRDF model
+struct GrainMat { float4 pal[8]; float4 p0; float4 mrse; float4 p1; };
+inline Material grain_material(constant GrainMat& g, uint gid) {
+    uint hh = hash_u(gid * 0x9E3779B1u + 0x85EBCA6Bu);
+    float u = float(hh & 0xFFFFu) / 65536.0, v = float(hh >> 16) / 65536.0;
+    uint n = clamp(uint(g.p0.x), 1u, 8u), k = 0;
+    while (k + 1 < n && u > g.pal[k].w) ++k;
+    Material m;
+    m.rgba = float4(g.pal[k].rgb * max(1.0 + g.p0.y * (2.0 * v - 1.0), 0.0), 1.0);
+    m.mrse = g.mrse; m.rect = float4(0.0); m.par = float4(1.0, 1.0, 0.0, g.p1.x);
+    return m;
 }
 
 inline float3 material_base(Material m, float4 mod, float2 uv, texture2d<float> atlas, sampler samp) {
@@ -287,6 +314,10 @@ kernel void path_trace(
     device float*           out_albedo [[buffer(24)]],   // (n_envs, h, w, 3) mean first-hit albedo (FLAG_AUX)
     device float*           out_nrm    [[buffer(25)]],   // (n_envs, h, w, 3) mean first-hit normal (FLAG_AUX)
     device const float*     env_cdf    [[buffer(26)]],   // environment-map sampling table (FLAG_ENVMAP)
+    device const float*     g_verts    [[buffer(27)]],   // FLAG_GRAINS: grain mesh vertices (8 floats each, as verts)
+    device const uint*      g_indices  [[buffer(28)]],   // FLAG_GRAINS: grain mesh indices
+    device const MeshInfo*  g_meshes   [[buffer(29)]],   // FLAG_GRAINS: grain mesh index ranges
+    constant GrainMat&      g_mat      [[buffer(30)]],   // FLAG_GRAINS: grain material
     texture2d<float>        atlas      [[texture(0)]],
     texture2d<float>        envmap     [[texture(1)]],   // equirectangular RGBA32F environment (FLAG_ENVMAP)
     sampler                 samp       [[sampler(0)]],
@@ -308,6 +339,8 @@ kernel void path_trace(
     bool matmodel = (c.flags & FLAG_MATMODEL) != 0u;
     bool use_env = (c.flags & FLAG_ENVMAP) != 0u;
     float3 env_rad = (sp.sky.w > 0.5 ? sp.sky.xyz : cs.clear_color.rgb) * c.env_scale;
+    GrainGeo gg; gg.verts = g_verts; gg.indices = g_indices; gg.meshes = g_meshes;
+    gg.inst0 = (c.flags & FLAG_GRAINS) ? c.grain_inst0 : 0xFFFFFFFFu; gg.as0 = c.grain_as0;
     for (uint s = 0; s < c.spp; ++s) {
         float jx = rnd(rng), jy = rnd(rng);
         if (s == 0u && (c.flags & FLAG_CENTER0) && (c.flags & FLAG_RESET)) { jx = 0.5; jy = 0.5; }   // annotator sample at the pixel centre (1 of spp*passes)
@@ -317,8 +350,9 @@ kernel void path_trace(
         float3 throughput = float3(1.0);
         float3 radiance = float3(0.0);
         float prev_pdf = 0.0;   // BSDF-sampling pdf of the ray being traced (0: camera ray, no MIS on a miss)
+        float tmin = 0.0005;     // ray start distance: 0.5 mm, or grain_eps leaving a grain
         for (uint bounce = 0; bounce <= c.max_bounces; ++bounce) {
-            Hit h = trace(accel, o, d, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst);
+            Hit h = trace(accel, o, d, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin);
             if (bounce == 0 && c.clip_far > 0.0 && h.ok && -dot(h.p - o, R[2]) > c.clip_far) h.ok = false;   // beyond the far plane: background
             if (!h.ok) {
                 float3 er = env_rad;
@@ -333,15 +367,16 @@ kernel void path_trace(
                 }
                 break;
             }
-            Material m = mats[h.slot];
-            float4 mod = per_inst[e * c.n_slots + h.slot];
+            Material m; float4 mod; float eps = 0.001;   // eps: offset of rays leaving this surface
+            if (h.grain) { m = grain_material(g_mat, h.gid); mod = float4(1.0); eps = c.grain_eps; tmin = c.grain_eps; }
+            else { m = mats[h.slot]; mod = per_inst[e * c.n_slots + h.slot]; tmin = 0.0005; }
             float3 base = material_base(m, mod, h.uv, atlas, samp);
             float metallic = m.mrse.x, rough = max(m.mrse.y, 0.03), specw = m.mrse.z, emission = m.mrse.w;
             float a2 = rough * rough * rough * rough;
             float3 f0 = mix(float3(0.08 * specw), base, metallic);
             float3 N = h.n; float3 V = -d;
             uint model = matmodel ? uint(m.par.w + 0.5) : 0u;
-            if (bounce == 0 && s == 0) { depth0 = -dot(h.p - o, R[2]); normal0 = N; seg0 = int(h.slot) + 1; }
+            if (bounce == 0 && s == 0) { depth0 = -dot(h.p - o, R[2]); normal0 = N; seg0 = h.grain ? int(c.n_slots) + 1 : int(h.slot) + 1; }
             if (bounce == 0) { alb_sum += base; nrm_sum += N; }
             radiance += throughput * emission * base;
             // next-event estimation: model lights (directional and point/spot) with shadow rays
@@ -361,7 +396,7 @@ kernel void path_trace(
                 }
                 float NdotL = dot(N, L);
                 if (NdotL <= 0.0 || att <= 0.0) continue;
-                Hit sh = trace(accel, h.p + N * 0.001, L, tmax, inst_tab, slot_mesh, meshes, verts, indices, inst);
+                Hit sh = trace(accel, h.p + N * eps, L, tmax, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin);
                 if (sh.ok) continue;
                 radiance += throughput * brdf_any(model, N, V, L, base, f0, specw, metallic, rough, a2) * NdotL * l.diffuse.xyz * (PI * att);
             }
@@ -369,7 +404,7 @@ kernel void path_trace(
                 float3 L = -normalize(cs.light.xyz);
                 float NdotL = dot(N, L);
                 if (NdotL > 0.0) {
-                    Hit sh = trace(accel, h.p + N * 0.001, L, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst);
+                    Hit sh = trace(accel, h.p + N * eps, L, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin);
                     if (!sh.ok) radiance += throughput * brdf_any(model, N, V, L, base, f0, specw, metallic, rough, a2) * NdotL * float3(PI * cs.light.w);
                 }
             }
@@ -382,7 +417,7 @@ kernel void path_trace(
                 float pe; float3 L = env_sample(env_cdf, c, rnd(rng), rnd(rng), pe);
                 float NdotL = dot(N, L);
                 if (NdotL > 0.0 && pe > 1e-8) {
-                    Hit sh = trace(accel, h.p + N * 0.001, L, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst);
+                    Hit sh = trace(accel, h.p + N * eps, L, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin);
                     if (!sh.ok) {
                         float3 Hm = normalize(L + V);
                         float pb = pd * NdotL / PI + (1.0 - pd) * D_ggx(max(dot(N, Hm), 0.0), a2) * max(dot(N, Hm), 0.0) / (4.0 * max(dot(V, Hm), 1e-4));
@@ -421,7 +456,7 @@ kernel void path_trace(
                 if (rnd(rng) > q) break;
                 throughput /= q;
             }
-            o = h.p + N * 0.001; d = Lnew;
+            o = h.p + N * eps; d = Lnew;
         }
         if (c.clamp_lum > 0.0) {   // opt-in firefly clamp (biased: caps the energy of rare high-contribution paths)
             float l = dot(radiance, float3(0.2126, 0.7152, 0.0722));
