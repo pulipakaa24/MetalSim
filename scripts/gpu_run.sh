@@ -6,6 +6,7 @@
 # Timing jobs also check that the device is actually idle before starting (system services and out-of-queue
 # processes are invisible to the lock): they wait up to 120 s for device utilisation to drop under 10 %, and
 # log the value at start and end so contamination is detectable afterwards.
+# While the job runs, runs/gpu_hb/<pid> is touched every 5 s (sandboxed waiters cannot signal the pid; see gpu_lock.alive).
 set -u
 main() {
   NAME=$1; KIND=$2; MIN=$3; shift 3; [ "$1" = "--" ] && shift
@@ -18,7 +19,11 @@ main() {
   "$@" &
   CHILD=$!
   python3 scripts/gpu_lock.py setpid "$NAME" --pid $CHILD
-  trap 'kill $CHILD 2>/dev/null; wait $CHILD 2>/dev/null; python3 scripts/gpu_lock.py release "$NAME" --pid $CHILD --rc ${RC:-130}' EXIT INT TERM HUP
+  # Heartbeat: a sandboxed waiter cannot see this job's pid and would force-release it; gpu_lock.alive() trusts a fresh beat.
+  mkdir -p runs/gpu_hb; HBF=runs/gpu_hb/$CHILD
+  ( while kill -0 $CHILD 2>/dev/null; do touch "$HBF"; sleep 5; done ) &
+  HBP=$!
+  trap 'kill $CHILD 2>/dev/null; wait $CHILD 2>/dev/null; kill $HBP 2>/dev/null; rm -f "$HBF"; python3 scripts/gpu_lock.py release "$NAME" --pid $CHILD --rc ${RC:-130}' EXIT INT TERM HUP
   wait $CHILD
   RC=$?
   [ "$KIND" = "timing" ] && { echo "[gpu_run] $NAME end: device utilisation $(scripts/gpu_util.sh)% ($(date +%H:%M:%S)), exit $RC"; python3 scripts/gpu_top.py 2>/dev/null | head -4 | sed "s/^/[gpu_run] gpu_top: /"; }
