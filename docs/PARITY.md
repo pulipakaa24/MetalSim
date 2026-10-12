@@ -1093,7 +1093,24 @@ parameters read from `pour_env_cfg.py` with `ast`). 7 passed (M4 Max, 2026-10-12
 
 ### 1b.4 Throughput
 
-FRANKA_POUR_THROUGHPUT_TABLE
+env-steps/s; one policy step = 4 collides, 24 MuJoCo solves, 16 MPM solves. Iteration = 96 steps x num_envs
+(196,608 at 2,048). Synchronized wall time.
+
+| measurement | M4 Max, this Mac (timing class) | M4 Max, 14-inch (training loop) | Isaac Lab 3.0-EA on the L4 (measured) |
+|---|---|---|---|
+| 2,048 envs (the README's), step only, uniform random actions | **964** (2.125 s / step; `runs/franka_pour/bench_mac_2048_step.json`) | – | **does not fit**: CUDA out of memory creating the step graph, and out of memory eager (`use_cuda_graph=false`) on the L4's 24 GB (`runs/parity/isaaclab3_pour/train_2048*.log`) |
+| 2,048 envs, rollout + policy inference | 962 (`bench_mac_2048_rollout.json`) | 1,075 (collection 182.6 s per iteration, median of 51) | – |
+| 2,048 envs, full PPO loop (rollout + 5 x 4 minibatch update) | 923 (one iteration after one warm-up; `bench_mac_2048_ppo.json`) | **1,072** median (1,055-1,149) over iterations 1-51; update 0.71 s of 183 s | – |
+| 1,024 envs, rollout + inference / full PPO loop | ~1,029 physics only (0.995 s / step, a check-class smoke run, not timing class) | – | **317** / 317 (collection 309-314 s per 96 steps, update 0.2 s; Isaac's own task with the asset patch, rsl_rl's log) |
+
+Reading: the step is the cost (the PPO update is 0.4 % of an iteration, inference under 0.3 %); at 1,024 envs the M4
+Max runs the task about 3.2x the L4's rate, and only the M4 Max (64 GB unified memory) holds the README's 2,048 envs.
+Isaac's step-only runtime benchmark (`isaaclab benchmark runtime`) rejects the coupled `NewtonCfg`
+("Unsupported concrete physics config"), so the L4 row is rsl_rl's collection time, which includes inference.
+Caveat on this Mac's timing rows: the queue's idle check read 100 % device utilisation with no process attributed
+during all three jobs (a GPU later found hung by another job), and the 14-inch's training loop is 16 % faster than
+this Mac's PPO row; the 14-inch rows are the cleaner figure. Isaac's 3,000 iterations x 196,608 steps = 590M steps
+take about 6.4 days at 1,072 env-steps/s (Isaac on an L4 cannot run them at 2,048 envs).
 
 ### 1b.5 Learning
 
