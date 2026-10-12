@@ -1,0 +1,41 @@
+/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/tools/collide17.py:45: RuntimeWarning: CollisionPipeline automatically selected 14,053,376 rigid contact slots, requiring approximately 1,286.6 MiB for the base rigid-contact buffers (96 bytes per slot). Estimate inputs -- world count: 2,048; colliding shapes: 43,008 primitives, 26,624 meshes/heightfields, and 1 planes; precomputed contact pairs: 1,054,720; contact weighting: 5 per primitive pair and 40 per mesh-involved pair; pair-estimate average: 18; selected estimate: neighbor heuristic. Optional pipeline and solver features may allocate additional memory. Pass rigid_contact_max explicitly to CollisionPipeline to choose the capacity and silence this warning.
+  pipeline = newton.CollisionPipeline(model, deterministic=a.det, **kw)
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/kcache/kcB_n17_at/1.18.0.dev20260917
+Module newton._src.geometry.inertia 7667892 load on device 'metal:0' took 40.01 ms  (cached)
+Module validate_and_correct_inertia_kernel_8dbbe22e 8dbbe22 load on device 'metal:0' took 39.56 ms  (cached)
+Module newton._src.geometry.bvh 0b0956f load on device 'metal:0' took 40.73 ms  (cached)
+Module newton._src.sim.articulation d386b9d load on device 'metal:0' took 64.48 ms  (cached)
+Module newton._src.sim.collide f06a7a7 load on device 'metal:0' took 43.27 ms  (cached)
+Module newton._src.geometry.broad_phase_nxn 29ba165 load on device 'metal:0' took 40.11 ms  (cached)
+Module narrow_phase_primitive_write_contact_False_False_False 8d927a4 load on device 'metal:0' took 45.62 ms  (cached)
+Module narrow_phase_gjk_mpr_True_False_write_contact_support_map_lean_post_process_minkowski_only e36fb16 load on device 'metal:0' took 52.00 ms  (cached)
+Module newton._src.geometry.narrow_phase 4cbf29f load on device 'metal:0' took 43.62 ms  (cached)
+Module newton._src.geometry.contact_reduction_global 302a01b load on device 'metal:0' took 44.40 ms  (cached)
+Module newton._src.geometry.sdf_contact dabd053 load on device 'metal:0' took 38.87 ms  (cached)
+Module narrow_phase_mesh_plane_write_contact_to_reducer_True d9da38d load on device 'metal:0' took 39.88 ms  (cached)
+Module mesh_triangle_contacts_to_reducer_kernel_521d447b da3c627 load on device 'metal:0' took 54.56 ms  (cached)
+Module newton._src.geometry.contact_reduction_global 7b26466 load on device 'metal:0' took 44.70 ms  (cached)
+Module sdf_contact_write_contact_to_reducer_False_True_False_True_False_False_False 01a47a5 load on device 'metal:0' took 52.68 ms  (cached)
+Module export_reduced_contacts_write_contact 48354a5 load on device 'metal:0' took 548.33 ms  (cached)
+{
+ "worlds": 2048,
+ "det": false,
+ "newton": "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n17_at/newton/__init__.py",
+ "warp": "1.18.0.dev20260917",
+ "rigid_contact_max": 14053376,
+ "rigid_contacts": 128551,
+ "contact_sha": "0fed3793acf38790",
+ "collide_ms": {
+  "median": 646.1386250000487,
+  "mean": 648.2300249000218,
+  "min": 611.3253329999679,
+  "max": 692.6251250001769
+ },
+ "contact_sha_after": "767024c8cf256df4"
+}

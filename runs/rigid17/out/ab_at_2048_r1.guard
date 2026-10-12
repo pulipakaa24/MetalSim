@@ -1,13 +1,6 @@
-Traceback (most recent call last):
-  File "/Users/aditya/robosim/scripts/gpu_lock.py", line 163, in <module>
-    main()
-    ~~~~^^
-  File "/Users/aditya/robosim/scripts/gpu_lock.py", line 136, in main
-    if a.cmd == "acquire": acquire(a.name, a.kind, a.minutes, a.pid, a.job_cmd, a.front)
-                           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/scripts/gpu_lock.py", line 118, in acquire
-    q = tickets()
-  File "/Users/aditya/robosim/scripts/gpu_lock.py", line 89, in tickets
-    if t.get("pid") and not alive(t["pid"]): os.remove(os.path.join(Q, f)); continue
-                                             ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
-FileNotFoundError: [Errno 2] No such file or directory: '/Users/aditya/robosim/runs/gpu_queue/1791792912.966_0_r17_ab_at_2048_r1_27680.json'
+[gpu_run] r17_ab_at_2048_r1 start: device utilisation 0% (10:41:08)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
+[guarded 10:41:11] start tree=n17_at free=46.9GB: --worlds 2048 --state-in /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/out/state2048.npz --max-triangle-pairs 8388608 --steps 10 --json /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/out/ab_at_2048_r1.json
+[guarded 10:41:43] end code=0 wall=32s peak_rss=1.9GB
+[gpu_run] r17_ab_at_2048_r1 end: device utilisation 0% (10:41:43), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
