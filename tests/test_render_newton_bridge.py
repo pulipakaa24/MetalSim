@@ -398,3 +398,29 @@ def test_free_particles_on_the_particle_path():
         assert iou >= 0.95, (e, iou)                                    # icosphere grain vs MuJoCo's UV sphere
         both = pr & pg
         assert np.median(np.abs(got["depth"][e][both] - ref["depth"][0][both])) < 2e-3
+
+
+def test_pose_kernels_recorded_in_the_solver_graph():
+    """``launch`` inside the caller's captured Newton step (SolverXPBD here; SolverMuJoCo in the test above where it
+    builds): replaying the graph moves the rendered objects exactly as an eager update of the final state does."""
+    mj = mujoco.MjModel.from_xml_string(PRIMS)
+    model = newton_model(PRIMS, 2)
+    solver = newton.solvers.SolverXPBD(model)
+    s0, s1, ctrl = model.state(), model.state(), model.control()
+    newton.eval_fk(model, model.joint_q, model.joint_qd, s0)
+    src = make_source(model, mj, "newton")
+    with wp.ScopedDevice("metal:0"):
+        with wp.ScopedCapture() as cap:
+            for _ in range(4):
+                solver.step(s0, s1, ctrl, None, 0.005)
+                s0, s1 = s1, s0
+            src.launch(s0)
+        for _ in range(10):
+            wp.capture_launch(cap.graph)
+    v = src.signal()
+    src.after(v); src.synchronize()
+    in_graph = src.d.geom_xpos.numpy().copy()
+    src.update(s0, graph=False); src.synchronize()
+    np.testing.assert_array_equal(in_graph, src.d.geom_xpos.numpy())
+    g = mujoco.mj_name2id(src.m, mujoco.mjtObj.mjOBJ_GEOM, "box_geom_0")
+    assert in_graph[0, g, 2] < 0.3 - 0.5 * 9.81 * 0.2 ** 2 * 0.9          # 40 steps of 5 ms of free fall
