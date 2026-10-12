@@ -623,7 +623,7 @@ def test_dynamic_meshes_and_particle_grains_share_the_tier2_structure():
     pts = np.stack(np.meshgrid(np.linspace(0.45, 0.65, 6), np.linspace(-0.3, -0.15, 4), [0.35], indexing="ij"), -1).reshape(-1, 3)
     r.set_particles(pts, radius=0.01)
     o = r.render_host([d], passes=2)
-    assert r.rt.n_inst == r.rt.n_inst_static + len(r.rt.dyn.objects)
+    assert r.rt.n_inst == r.rt.n_inst_static + len(r.rt.dyn_as)
     grains = o["seg"][0] == r.G + 1
     assert grains.sum() > 20
     o["seg"] = np.concatenate([[0], r.tables.slot_seg_ids(), [-1]])[o["seg"]]

@@ -123,7 +123,7 @@ kernel void lidar(
     }
     uint ii = res.instance_id;
     uint slot = inst_tab[ii].y;
-    uint mesh = uint(slot_mesh[slot]);
+    uint mesh = inst[ii].as_index;              // = slot_mesh[slot] for geoms; per env block for dynamic objects
     InstanceDesc d = inst[ii];
     float3x3 Ri = float3x3(float3(d.col0), float3(d.col1), float3(d.col2));
     float3 n = tri_normal(mesh, res.primitive_id, meshes, verts, indices, Ri);
@@ -239,7 +239,7 @@ kernel void lidar_ext(
             uint slot = inst_tab[ii].y;
             InstanceDesc di = inst[ii];
             float3x3 Ri = float3x3(float3(di.col0), float3(di.col1), float3(di.col2));
-            float3 n = tri_normal(uint(slot_mesh[slot]), res.primitive_id, meshes, verts, indices, Ri);
+            float3 n = tri_normal(di.as_index, res.primitive_id, meshes, verts, indices, Ri);
             if (dot(n, dir) > 0.0) n = -n;
             float p = P * slot_refl[slot] * max(dot(n, -dir), 0.0) / max(res.distance * res.distance, 1e-4);
             if (nc < LIDAR_MAX_CAND) {

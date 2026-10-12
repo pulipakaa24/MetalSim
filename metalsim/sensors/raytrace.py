@@ -31,15 +31,17 @@ class RayTracer:
     def __init__(self, model, n_envs: int, *, max_range: float = 10.0, max_group=3, include_planes=True,
                  decimate_faces: int = 0, terrain_slots: bool = True, draw_hfields: bool = True,
                  appearance: str = "mujoco", visual=None, deformables=(), tube_slices=None, cap_stacks=None,
-                 dyn_rebuild_every: int = 32, ctx: MetalContext | None = None, device="metal:0"):
+                 dyn_rebuild_every: int = 32, dyn_block_envs: int | None = None, ctx: MetalContext | None = None,
+                 device="metal:0"):
         """``terrain_slots`` / ``draw_hfields`` / ``appearance``: see ``Tier0Renderer`` (False / "legacy" = the
         previous behaviour).
 
         ``visual`` / ``deformables`` / ``tube_slices`` / ``cap_stacks``: the non-geom objects MuJoCo's renderer draws
         (sites, flexes, skins, spatial tendons) and user deformable meshes; see ``Tier0Renderer``. Each dynamic object
-        has one primitive acceleration structure holding every env's triangles (positions offset by the env grid),
-        refit each frame after its vertices are regenerated and rebuilt every ``dyn_rebuild_every`` frames (1: every
-        frame; 0: refit only, after the first build)."""
+        has primitive acceleration structures over its envs' triangles (positions offset by the env grid), each
+        refit each frame after the vertices are regenerated and rebuilt every ``dyn_rebuild_every`` frames (1: every
+        frame; 0: refit only, after the first build). The structures are split into blocks of ``dyn_block_envs``
+        consecutive envs (default: about 256 structures in all) so each instance bounds only its envs."""
         self.m = model
         self.n = n_envs
         self.device = device
@@ -87,13 +89,26 @@ class RayTracer:
             exp = self.dyn.expanded_indices()
             verts = np.zeros((nv_static + self.dyn.n_records, 8), np.float32)
             verts[:nv_static] = t.vertices
+            # one primitive structure per (object, block of consecutive envs): an instance's bounds then cover only its
+            # envs, so a ray meets only its own env block's dynamic geometry (one structure over every env made each ray
+            # traverse it: 4-18x slower rays). Shaders find the mesh from the instance's structure index (as_index).
             i_off = len(t.indices)
+            n_obj = len(self.dyn.objects)
+            K = int(dyn_block_envs) if dyn_block_envs else max(1, -(-n_envs * n_obj // 256))   # <= ~256 structures
+            K = min(K, n_envs)
+            self.dyn_block_envs = K
+            dyn_inst = []
             for k, (ob, ix) in enumerate(zip(self.dyn.objects, exp)):
                 slot_mesh[ob["slot"]] = len(mesh_list)
-                mesh_list.append({"i_off": i_off, "i_count": int(ix.size), "dynamic": k})
+                per_env = 3 * len(ob["tris"])
+                for e0 in range(0, n_envs, K):
+                    ne = min(K, n_envs - e0)
+                    if per_env:
+                        mesh_list.append({"i_off": i_off + e0 * per_env, "i_count": ne * per_env, "dynamic": k, "env0": e0})
+                        dyn_inst.append((e0, ob["slot"]))
                 i_off += ix.size
             inds = np.concatenate([t.indices] + exp).astype(np.uint32)
-            inst_tab = np.concatenate([t.inst_table, np.array([[0, ob["slot"]] for ob in self.dyn.objects], np.uint32)])
+            inst_tab = np.concatenate([t.inst_table, np.asarray(dyn_inst, np.uint32).reshape(-1, 2)])
         self.vbuf = c.buffer(verts.nbytes, verts, "rt_vertices")
         if self.dyn is not None:
             self.dyn.vbuf = self.vbuf

@@ -26,6 +26,7 @@ import numpy as np
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, ROOT)
 
+EKW = {}   # tube_slices / cap_stacks for every renderer (--tube-slices, --cap-stacks)
 CAM = '<camera name="cam" pos="0 -1.1 0.75" xyaxes="1 0 0 0 0.55 0.835"/>'
 
 
@@ -87,21 +88,22 @@ def bench(scene, n, frames, res, renderers):
         for label, vis in (("with_extras", None), ("geoms_only", False)):
             kw = {}
             if which in ("tier0", "tier1"):
-                r = Tier0Renderer(m, n, width=res, height=res, camera="cam", outputs=("rgb", "depth", "seg"), tier=0 if which == "tier0" else 1, visual=vis)
+                r = Tier0Renderer(m, n, width=res, height=res, camera="cam", outputs=("rgb", "depth", "seg"), tier=0 if which == "tier0" else 1, visual=vis, **EKW)
                 fn = lambda: r.render(sim)
             elif which == "tier2":
-                r = Tier2Renderer(m, n, width=res, height=res, camera="cam", spp=1, max_bounces=1, visual=vis)
+                r = Tier2Renderer(m, n, width=res, height=res, camera="cam", spp=1, max_bounces=1, visual=vis, **EKW)
                 fn = lambda: r.render(sim)
             else:
-                r = RayTracer(m, n, max_range=20.0, visual=vis)
+                r = RayTracer(m, n, max_range=20.0, visual=mujoco.MjvOption() if vis is None else vis, **EKW)
                 cam = r.make_depth_camera("cam", res, res)
                 fn = lambda: r.trace(sim, [cam])
             row[label] = round(timed(fn, frames, r.ctx.synchronize), 3)
             if vis is None:
                 t = r.tables
-                row["dyn_tris_per_env"] = int(sum(len(o["tris"]) for o in (r.dyn.objects if r.dyn is not None else [])))
+                dyn = getattr(r, "dyn", None) or getattr(getattr(r, "rt", None), "dyn", None)
+                row["dyn_tris_per_env"] = int(sum(len(o["tris"]) for o in (dyn.objects if dyn is not None else [])))
                 row["extras"] = [e["kind"] for e in t.extras]
-                dyn = r.dyn
+
                 if dyn is not None:
                     src = r._dyn_src if which in ("tier0", "raydepth") else r.rt._dyn_src
 
@@ -119,6 +121,7 @@ def bench(scene, n, frames, res, renderers):
                     rt.dyn_rebuild_every = 32
         row["overhead_ms"] = round(row["with_extras"] - row["geoms_only"], 3)
         out[which] = row
+        print(json.dumps({"scene": out["scene"], "envs": n, which: row}), flush=True)
     print(json.dumps(out), flush=True)
     return out
 
@@ -131,9 +134,12 @@ def main():
     ap.add_argument("--scenes", nargs="+", default=["cloth", "hand"])
     ap.add_argument("--renderers", nargs="+", default=["tier0", "tier1", "raydepth", "tier2"])
     ap.add_argument("--out", default=None)
+    ap.add_argument("--tube-slices", type=int, default=None)
+    ap.add_argument("--cap-stacks", type=int, default=None)
     a = ap.parse_args()
     import warp as wp
     wp.config.quiet = True
+    EKW.update(tube_slices=a.tube_slices, cap_stacks=a.cap_stacks)
     rows = []
     for s in a.scenes:
         for n in a.envs:

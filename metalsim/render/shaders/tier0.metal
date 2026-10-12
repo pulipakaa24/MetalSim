@@ -1138,7 +1138,7 @@ fragment FSOut geom_fs_rt(
                   : sp.sky.w > 0.5 ? sp.sky.xyz : e.clear_color.rgb;
         if (res.type != intersection_type::none) {
             uint slot2 = inst_tab[res.instance_id].y;
-            uint mesh2 = uint(slot_mesh[slot2]);
+            uint mesh2 = inst[res.instance_id].as_index;      // = slot_mesh[slot2] for geoms; per env block for dynamic objects
             uint b = meshes[mesh2].i_off + res.primitive_id * 3;
             uint i0 = indices[b], i1 = indices[b + 1], i2 = indices[b + 2];
             float2 bc = res.triangle_barycentric_coord;
