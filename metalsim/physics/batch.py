@@ -54,14 +54,10 @@ class _TensorViews:
 
 
 @wp.kernel
-def _latch_capacity_overflow(overflow: wp.array(dtype=int), nefc: wp.array(dtype=int), njmax: int, eq_blocks: int, mask: int,
-                             nefc_bit: int, latched: wp.array(dtype=int)):
-    """OR this world's capacity overflow bits into ``latched`` (which mjw.reset_data does not clear); with connect /
-    weld blocks, ``nefc >= njmax`` counts as NEFC (MuJoCo Warp drops a block that would end exactly at njmax unflagged)."""
+def _latch_capacity_overflow(overflow: wp.array(dtype=int), mask: int, latched: wp.array(dtype=int)):
+    """OR this world's capacity overflow bits into ``latched`` (which mjw.reset_data does not clear)."""
     w = wp.tid()
     v = overflow[w] & mask
-    if eq_blocks != 0 and nefc[w] >= njmax:
-        v = v | nefc_bit
     if v != 0:
         latched[w] = latched[w] | v
 
@@ -178,7 +174,7 @@ class BatchSim:
             # resets, and tasks reset (fallen) worlds every control step, so d.overflow alone loses overflows
             from metalsim.physics import capacity
             self._overflow_latched = wp.zeros(num_envs, dtype=int)
-            self._latch_args = (int(self.d.njmax), capacity.eq_blocks(wmodel), capacity.capacity_mask(), int(mjw.OverflowType.NEFC))
+            self._latch_mask = capacity.capacity_mask()
             self._substep_hooks = [self._latch_overflow]   # launched after every physics substep (inside the step graph)
             self._reset_hooks = []      # launched after reset_data with the reset mask (inside the reset graph)
             self._capture()
@@ -211,8 +207,7 @@ class BatchSim:
                 h()
 
     def _latch_overflow(self) -> None:
-        njmax, neqb, mask, nefc_bit = self._latch_args
-        wp.launch(_latch_capacity_overflow, dim=self.n, inputs=[self.d.overflow, self.d.nefc, njmax, neqb, mask, nefc_bit],
+        wp.launch(_latch_capacity_overflow, dim=self.n, inputs=[self.d.overflow, self._latch_mask],
                   outputs=[self._overflow_latched])
 
     def _launch_reset(self) -> None:
