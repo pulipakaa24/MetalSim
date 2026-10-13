@@ -1,0 +1,1914 @@
+G1 flat PPO: N=4096 obs_dim 123 act_dim 37 rollout 24 x 500 iterations, engine mjwarp, physics dt 0.0025 (decimation 8), seed 0, reward_cfg flat, height-scan ray order -, terrain collision hfield, height scan exact, solver_cfg None, contact_cfg recommended, base velocity com, feet-slide velocity com, initial reset True, effort limit on the joint
+it    1 steps     98304 sps   33,273 | ep_ret   -5.74 ep_len   23.6 (n=27) | pg 0.006 vf 0.234 kl 0.0350 lr 5.9e-05
+[anomaly] it 1: joint limit violated by 0.11 rad
+[anomaly] it 1: contact penetration 2.9 cm
+it    2 steps    196608 sps   35,512 | ep_ret   -6.14 ep_len   37.4 (n=3235) | pg -0.003 vf 3.339 kl 0.0074 lr 4.4e-04
+[anomaly] it 2: joint limit violated by 0.11 rad
+[anomaly] it 2: contact penetration 2.6 cm
+it    3 steps    294912 sps   36,090 | ep_ret   -6.40 ep_len   43.3 (n=1788) | pg -0.003 vf 1.635 kl 0.0142 lr 1.0e-03
+[anomaly] it 3: joint limit violated by 0.11 rad
+[anomaly] it 3: contact penetration 3.0 cm
+it    4 steps    393216 sps   36,335 | ep_ret   -6.29 ep_len   41.7 (n=2590) | pg -0.003 vf 1.630 kl 0.0132 lr 6.7e-04
+[anomaly] it 4: joint limit violated by 0.13 rad
+[anomaly] it 4: contact penetration 3.1 cm
+it    5 steps    491520 sps   36,545 | ep_ret   -6.26 ep_len   41.0 (n=2303) | pg -0.005 vf 1.346 kl 0.0143 lr 6.7e-04
+[anomaly] it 5: joint limit violated by 0.11 rad
+[anomaly] it 5: contact penetration 3.4 cm
+it    6 steps    589824 sps   36,624 | ep_ret   -6.28 ep_len   42.0 (n=2336) | pg -0.003 vf 1.057 kl 0.0119 lr 6.7e-04
+[anomaly] it 6: joint limit violated by 0.11 rad
+[anomaly] it 6: contact penetration 2.4 cm
+it    7 steps    688128 sps   36,692 | ep_ret   -6.25 ep_len   41.8 (n=2446) | pg -0.000 vf 0.966 kl 0.0142 lr 3.0e-04
+[anomaly] it 7: joint limit violated by 0.12 rad
+[anomaly] it 7: contact penetration 3.5 cm
+it    8 steps    786432 sps   36,748 | ep_ret   -6.24 ep_len   41.6 (n=2278) | pg -0.001 vf 0.752 kl 0.0133 lr 3.0e-04
+[anomaly] it 8: joint limit violated by 0.10 rad
+[anomaly] it 8: contact penetration 3.1 cm
+it    9 steps    884736 sps   36,791 | ep_ret   -6.23 ep_len   42.1 (n=2345) | pg 0.014 vf 0.552 kl 0.0215 lr 1.0e-05
+[anomaly] it 9: joint limit violated by 0.12 rad
+it   10 steps    983040 sps   36,823 | ep_ret   -6.22 ep_len   42.4 (n=2323) | pg 0.011 vf 0.468 kl 0.0154 lr 1.0e-05
+[anomaly] it 10: joint limit violated by 0.12 rad
+[anomaly] it 10: contact penetration 3.1 cm
+it   11 steps   1081344 sps   36,846 | ep_ret   -6.19 ep_len   41.7 (n=2327) | pg -0.002 vf 0.399 kl 0.0058 lr 3.8e-04
+[anomaly] it 11: joint limit violated by 0.11 rad
+[anomaly] it 11: contact penetration 2.7 cm
+it   12 steps   1179648 sps   36,867 | ep_ret   -6.21 ep_len   42.5 (n=2300) | pg -0.002 vf 0.296 kl 0.0103 lr 5.8e-04
+[anomaly] it 12: joint limit violated by 0.12 rad
+[anomaly] it 12: contact penetration 3.3 cm
+it   13 steps   1277952 sps   36,869 | ep_ret   -6.18 ep_len   42.8 (n=2302) | pg -0.008 vf 0.176 kl 0.0125 lr 1.3e-03
+[anomaly] it 13: joint limit violated by 0.12 rad
+[anomaly] it 13: contact penetration 2.6 cm
+it   14 steps   1376256 sps   36,871 | ep_ret   -6.14 ep_len   42.5 (n=2310) | pg -0.009 vf 0.094 kl 0.0136 lr 1.3e-03
+[anomaly] it 14: joint limit violated by 0.13 rad
+[anomaly] it 14: contact penetration 3.2 cm
+it   15 steps   1474560 sps   36,865 | ep_ret   -6.10 ep_len   42.8 (n=2251) | pg -0.003 vf 0.086 kl 0.0157 lr 1.7e-04
+[anomaly] it 15: joint limit violated by 0.14 rad
+[anomaly] it 15: contact penetration 3.2 cm
+it   16 steps   1572864 sps   36,856 | ep_ret   -6.07 ep_len   43.5 (n=2248) | pg -0.007 vf 0.063 kl 0.0121 lr 1.7e-04
+[anomaly] it 16: joint limit violated by 0.11 rad
+[anomaly] it 16: contact penetration 2.7 cm
+it   17 steps   1671168 sps   36,837 | ep_ret   -6.05 ep_len   43.9 (n=2212) | pg -0.008 vf 0.042 kl 0.0105 lr 2.6e-04
+[anomaly] it 17: joint limit violated by 0.11 rad
+[anomaly] it 17: contact penetration 3.1 cm
+it   18 steps   1769472 sps   36,816 | ep_ret   -6.01 ep_len   44.1 (n=2232) | pg -0.004 vf 0.040 kl 0.0173 lr 1.0e-05
+[anomaly] it 18: joint limit violated by 0.11 rad
+[anomaly] it 18: contact penetration 2.4 cm
+it   19 steps   1867776 sps   36,801 | ep_ret   -5.97 ep_len   44.2 (n=2223) | pg -0.007 vf 0.027 kl 0.0066 lr 2.6e-04
+[anomaly] it 19: joint limit violated by 0.14 rad
+[anomaly] it 19: contact penetration 2.2 cm
+it   20 steps   1966080 sps   36,759 | ep_ret   -5.96 ep_len   44.8 (n=2159) | pg -0.014 vf 0.021 kl 0.0128 lr 8.6e-04
+[anomaly] it 20: joint limit violated by 0.12 rad
+[anomaly] it 20: contact penetration 2.6 cm
+it   21 steps   2064384 sps   36,732 | ep_ret   -5.92 ep_len   45.1 (n=2140) | pg -0.015 vf 0.015 kl 0.0165 lr 8.6e-04
+[anomaly] it 21: joint limit violated by 0.10 rad
+[anomaly] it 21: contact penetration 2.5 cm
+it   22 steps   2162688 sps   36,689 | ep_ret   -5.90 ep_len   46.3 (n=2108) | pg -0.014 vf 0.013 kl 0.0144 lr 8.6e-04
+[anomaly] it 22: joint limit violated by 0.13 rad
+[anomaly] it 22: contact penetration 2.6 cm
+it   23 steps   2260992 sps   36,648 | ep_ret   -5.83 ep_len   45.9 (n=2127) | pg -0.015 vf 0.012 kl 0.0159 lr 5.8e-04
+[anomaly] it 23: joint limit violated by 0.12 rad
+[anomaly] it 23: contact penetration 2.7 cm
+it   24 steps   2359296 sps   36,605 | ep_ret   -5.81 ep_len   46.9 (n=2057) | pg -0.014 vf 0.011 kl 0.0163 lr 8.6e-04
+[anomaly] it 24: joint limit violated by 0.15 rad
+[anomaly] it 24: contact penetration 2.2 cm
+it   25 steps   2457600 sps   36,563 | ep_ret   -5.78 ep_len   47.6 (n=2065) | pg -0.014 vf 0.011 kl 0.0173 lr 8.6e-04
+[anomaly] it 25: joint limit violated by 0.12 rad
+[anomaly] it 25: contact penetration 2.4 cm
+it   26 steps   2555904 sps   36,516 | ep_ret   -5.73 ep_len   47.7 (n=2033) | pg -0.015 vf 0.011 kl 0.0171 lr 8.6e-04
+[anomaly] it 26: joint limit violated by 0.12 rad
+[anomaly] it 26: contact penetration 2.2 cm
+it   27 steps   2654208 sps   36,474 | ep_ret   -5.71 ep_len   48.6 (n=2017) | pg -0.013 vf 0.012 kl 0.0169 lr 1.3e-03
+[anomaly] it 27: joint limit violated by 0.12 rad
+[anomaly] it 27: contact penetration 2.7 cm
+it   28 steps   2752512 sps   36,424 | ep_ret   -5.67 ep_len   48.8 (n=1983) | pg -0.014 vf 0.012 kl 0.0180 lr 8.6e-04
+[anomaly] it 28: joint limit violated by 0.14 rad
+[anomaly] it 28: contact penetration 2.4 cm
+it   29 steps   2850816 sps   36,376 | ep_ret   -5.63 ep_len   49.1 (n=1925) | pg -0.014 vf 0.013 kl 0.0163 lr 1.3e-03
+[anomaly] it 29: joint limit violated by 0.15 rad
+[anomaly] it 29: contact penetration 2.5 cm
+it   30 steps   2949120 sps   36,328 | ep_ret   -5.63 ep_len   50.4 (n=1977) | pg -0.014 vf 0.012 kl 0.0167 lr 8.6e-04
+[anomaly] it 30: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 30: joint limit violated by 0.13 rad
+[anomaly] it 30: contact penetration 2.5 cm
+it   31 steps   3047424 sps   36,278 | ep_ret   -5.58 ep_len   50.0 (n=1889) | pg -0.014 vf 0.012 kl 0.0169 lr 1.3e-03
+[anomaly] it 31: joint limit violated by 0.13 rad
+[anomaly] it 31: contact penetration 2.3 cm
+it   32 steps   3145728 sps   36,232 | ep_ret   -5.56 ep_len   51.0 (n=1966) | pg -0.014 vf 0.012 kl 0.0176 lr 8.6e-04
+[anomaly] it 32: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 32: joint limit violated by 0.11 rad
+[anomaly] it 32: contact penetration 2.4 cm
+it   33 steps   3244032 sps   36,180 | ep_ret   -5.56 ep_len   51.3 (n=1866) | pg -0.013 vf 0.012 kl 0.0178 lr 8.6e-04
+[anomaly] it 33: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 33: joint limit violated by 0.12 rad
+[anomaly] it 33: contact penetration 2.7 cm
+it   34 steps   3342336 sps   36,138 | ep_ret   -5.54 ep_len   52.2 (n=1886) | pg -0.013 vf 0.011 kl 0.0142 lr 8.6e-04
+[anomaly] it 34: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 34: joint limit violated by 0.14 rad
+it   35 steps   3440640 sps   36,091 | ep_ret   -5.52 ep_len   52.8 (n=1818) | pg -0.014 vf 0.012 kl 0.0148 lr 8.6e-04
+[anomaly] it 35: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 35: joint limit violated by 0.12 rad
+[anomaly] it 35: contact penetration 2.1 cm
+it   36 steps   3538944 sps   36,046 | ep_ret   -5.50 ep_len   53.1 (n=1795) | pg -0.014 vf 0.011 kl 0.0150 lr 8.6e-04
+[anomaly] it 36: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 36: joint limit violated by 0.14 rad
+[anomaly] it 36: contact penetration 2.7 cm
+it   37 steps   3637248 sps   35,998 | ep_ret   -5.51 ep_len   54.8 (n=1820) | pg -0.015 vf 0.011 kl 0.0168 lr 1.3e-03
+[anomaly] it 37: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 37: joint limit violated by 0.13 rad
+it   38 steps   3735552 sps   35,955 | ep_ret   -5.47 ep_len   54.2 (n=1727) | pg -0.014 vf 0.012 kl 0.0146 lr 8.6e-04
+[anomaly] it 38: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 38: joint limit violated by 0.13 rad
+[anomaly] it 38: contact penetration 2.1 cm
+it   39 steps   3833856 sps   35,915 | ep_ret   -5.45 ep_len   55.0 (n=1820) | pg -0.015 vf 0.011 kl 0.0155 lr 8.6e-04
+[anomaly] it 39: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 39: joint limit violated by 0.13 rad
+[anomaly] it 39: contact penetration 2.2 cm
+it   40 steps   3932160 sps   35,872 | ep_ret   -5.43 ep_len   55.7 (n=1736) | pg -0.014 vf 0.010 kl 0.0177 lr 1.3e-03
+[anomaly] it 40: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 40: joint limit violated by 0.12 rad
+[anomaly] it 40: contact penetration 2.1 cm
+it   41 steps   4030464 sps   35,833 | ep_ret   -5.40 ep_len   55.8 (n=1776) | pg -0.015 vf 0.010 kl 0.0179 lr 8.6e-04
+[anomaly] it 41: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 41: joint limit violated by 0.13 rad
+[anomaly] it 41: contact penetration 2.7 cm
+it   42 steps   4128768 sps   35,795 | ep_ret   -5.38 ep_len   56.1 (n=1677) | pg -0.014 vf 0.010 kl 0.0148 lr 8.6e-04
+[anomaly] it 42: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 42: joint limit violated by 0.13 rad
+[anomaly] it 42: contact penetration 2.2 cm
+it   43 steps   4227072 sps   35,757 | ep_ret   -5.38 ep_len   56.9 (n=1744) | pg -0.014 vf 0.010 kl 0.0148 lr 8.6e-04
+[anomaly] it 43: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 43: joint limit violated by 0.12 rad
+[anomaly] it 43: contact penetration 2.3 cm
+it   44 steps   4325376 sps   35,720 | ep_ret   -5.34 ep_len   57.1 (n=1721) | pg -0.013 vf 0.010 kl 0.0148 lr 8.6e-04
+[anomaly] it 44: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 44: joint limit violated by 0.12 rad
+it   45 steps   4423680 sps   35,681 | ep_ret   -5.33 ep_len   57.7 (n=1651) | pg -0.014 vf 0.010 kl 0.0150 lr 8.6e-04
+[anomaly] it 45: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 45: joint limit violated by 0.14 rad
+[anomaly] it 45: contact penetration 2.3 cm
+it   46 steps   4521984 sps   35,645 | ep_ret   -5.29 ep_len   57.8 (n=1670) | pg -0.014 vf 0.010 kl 0.0158 lr 8.6e-04
+[anomaly] it 46: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 46: joint limit violated by 0.13 rad
+it   47 steps   4620288 sps   35,608 | ep_ret   -5.31 ep_len   59.2 (n=1694) | pg -0.014 vf 0.009 kl 0.0150 lr 8.6e-04
+[anomaly] it 47: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 47: joint limit violated by 0.12 rad
+[anomaly] it 47: contact penetration 2.5 cm
+it   48 steps   4718592 sps   35,568 | ep_ret   -5.28 ep_len   59.3 (n=1624) | pg -0.013 vf 0.009 kl 0.0153 lr 8.6e-04
+[anomaly] it 48: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 48: joint limit violated by 0.14 rad
+[anomaly] it 48: contact penetration 2.1 cm
+it   49 steps   4816896 sps   35,530 | ep_ret   -5.26 ep_len   59.5 (n=1619) | pg -0.014 vf 0.010 kl 0.0162 lr 8.6e-04
+[anomaly] it 49: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 49: joint limit violated by 0.14 rad
+it   50 steps   4915200 sps   35,492 | ep_ret   -5.25 ep_len   60.3 (n=1576) | pg -0.013 vf 0.010 kl 0.0151 lr 8.6e-04
+[anomaly] it 50: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 50: joint limit violated by 0.16 rad
+[anomaly] it 50: contact penetration 2.2 cm
+it   51 steps   5013504 sps   35,456 | ep_ret   -5.25 ep_len   61.4 (n=1603) | pg -0.012 vf 0.010 kl 0.0161 lr 8.6e-04
+[anomaly] it 51: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 51: joint limit violated by 0.13 rad
+it   52 steps   5111808 sps   35,420 | ep_ret   -5.23 ep_len   61.8 (n=1624) | pg -0.013 vf 0.010 kl 0.0153 lr 8.6e-04
+[anomaly] it 52: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 52: joint limit violated by 0.16 rad
+[anomaly] it 52: contact penetration 2.5 cm
+it   53 steps   5210112 sps   35,382 | ep_ret   -5.21 ep_len   61.5 (n=1524) | pg -0.014 vf 0.009 kl 0.0177 lr 8.6e-04
+[anomaly] it 53: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 53: joint limit violated by 0.13 rad
+it   54 steps   5308416 sps   35,343 | ep_ret   -5.20 ep_len   61.8 (n=1592) | pg -0.013 vf 0.010 kl 0.0156 lr 5.8e-04
+[anomaly] it 54: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 54: joint limit violated by 0.14 rad
+[anomaly] it 54: contact penetration 2.0 cm
+it   55 steps   5406720 sps   35,306 | ep_ret   -5.20 ep_len   63.0 (n=1547) | pg -0.014 vf 0.009 kl 0.0166 lr 5.8e-04
+[anomaly] it 55: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 55: joint limit violated by 0.13 rad
+it   56 steps   5505024 sps   35,265 | ep_ret   -5.18 ep_len   62.9 (n=1555) | pg -0.014 vf 0.010 kl 0.0172 lr 8.6e-04
+[anomaly] it 56: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 56: joint limit violated by 0.12 rad
+it   57 steps   5603328 sps   35,222 | ep_ret   -5.18 ep_len   63.7 (n=1451) | pg -0.014 vf 0.010 kl 0.0160 lr 8.6e-04
+[anomaly] it 57: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 57: joint limit violated by 0.14 rad
+it   58 steps   5701632 sps   35,185 | ep_ret   -5.17 ep_len   65.3 (n=1533) | pg -0.014 vf 0.010 kl 0.0165 lr 8.6e-04
+[anomaly] it 58: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 58: joint limit violated by 0.12 rad
+[anomaly] it 58: contact penetration 2.2 cm
+it   59 steps   5799936 sps   35,146 | ep_ret   -5.15 ep_len   65.3 (n=1475) | pg -0.013 vf 0.010 kl 0.0163 lr 8.6e-04
+[anomaly] it 59: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 59: joint limit violated by 0.15 rad
+it   60 steps   5898240 sps   35,106 | ep_ret   -5.15 ep_len   65.8 (n=1486) | pg -0.012 vf 0.010 kl 0.0180 lr 8.6e-04
+[anomaly] it 60: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 60: joint limit violated by 0.16 rad
+it   61 steps   5996544 sps   35,068 | ep_ret   -5.13 ep_len   65.9 (n=1533) | pg -0.013 vf 0.010 kl 0.0152 lr 5.8e-04
+[anomaly] it 61: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 61: joint limit violated by 0.14 rad
+it   62 steps   6094848 sps   35,029 | ep_ret   -5.12 ep_len   66.0 (n=1440) | pg -0.013 vf 0.011 kl 0.0163 lr 8.6e-04
+[anomaly] it 62: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 62: joint limit violated by 0.13 rad
+[anomaly] it 62: contact penetration 2.8 cm
+it   63 steps   6193152 sps   34,993 | ep_ret   -5.12 ep_len   66.3 (n=1502) | pg -0.014 vf 0.010 kl 0.0170 lr 8.6e-04
+[anomaly] it 63: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 63: joint limit violated by 0.13 rad
+it   64 steps   6291456 sps   34,955 | ep_ret   -5.11 ep_len   66.8 (n=1433) | pg -0.013 vf 0.011 kl 0.0154 lr 5.8e-04
+[anomaly] it 64: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 64: joint limit violated by 0.13 rad
+it   65 steps   6389760 sps   34,918 | ep_ret   -5.11 ep_len   67.9 (n=1441) | pg -0.013 vf 0.010 kl 0.0166 lr 8.6e-04
+[anomaly] it 65: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 65: joint limit violated by 0.14 rad
+it   66 steps   6488064 sps   34,881 | ep_ret   -5.09 ep_len   67.5 (n=1460) | pg -0.013 vf 0.011 kl 0.0168 lr 8.6e-04
+[anomaly] it 66: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 66: joint limit violated by 0.14 rad
+it   67 steps   6586368 sps   34,839 | ep_ret   -5.10 ep_len   68.1 (n=1420) | pg -0.013 vf 0.012 kl 0.0174 lr 5.8e-04
+[anomaly] it 67: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 67: joint limit violated by 0.14 rad
+it   68 steps   6684672 sps   34,804 | ep_ret   -5.10 ep_len   68.9 (n=1379) | pg -0.013 vf 0.011 kl 0.0158 lr 8.6e-04
+[anomaly] it 68: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 68: joint limit violated by 0.13 rad
+it   69 steps   6782976 sps   34,769 | ep_ret   -5.11 ep_len   69.8 (n=1449) | pg -0.013 vf 0.011 kl 0.0162 lr 8.6e-04
+[anomaly] it 69: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 69: joint limit violated by 0.14 rad
+it   70 steps   6881280 sps   34,731 | ep_ret   -5.09 ep_len   69.7 (n=1321) | pg -0.012 vf 0.012 kl 0.0172 lr 8.6e-04
+[anomaly] it 70: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 70: joint limit violated by 0.13 rad
+it   71 steps   6979584 sps   34,697 | ep_ret   -5.09 ep_len   70.2 (n=1416) | pg -0.013 vf 0.011 kl 0.0158 lr 5.8e-04
+[anomaly] it 71: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 71: joint limit violated by 0.13 rad
+it   72 steps   7077888 sps   34,662 | ep_ret   -5.11 ep_len   71.1 (n=1407) | pg -0.013 vf 0.012 kl 0.0157 lr 5.8e-04
+[anomaly] it 72: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 72: joint limit violated by 0.15 rad
+it   73 steps   7176192 sps   34,625 | ep_ret   -5.08 ep_len   71.3 (n=1337) | pg -0.013 vf 0.012 kl 0.0180 lr 8.6e-04
+[anomaly] it 73: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 73: joint limit violated by 0.17 rad
+it   74 steps   7274496 sps   34,590 | ep_ret   -5.09 ep_len   71.1 (n=1344) | pg -0.013 vf 0.011 kl 0.0172 lr 5.8e-04
+[anomaly] it 74: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 74: joint limit violated by 0.13 rad
+it   75 steps   7372800 sps   34,554 | ep_ret   -5.10 ep_len   72.7 (n=1366) | pg -0.013 vf 0.012 kl 0.0178 lr 5.8e-04
+[anomaly] it 75: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 75: joint limit violated by 0.14 rad
+it   76 steps   7471104 sps   34,520 | ep_ret   -5.09 ep_len   72.6 (n=1320) | pg -0.013 vf 0.012 kl 0.0172 lr 8.6e-04
+[anomaly] it 76: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 76: joint limit violated by 0.13 rad
+it   77 steps   7569408 sps   34,485 | ep_ret   -5.09 ep_len   72.7 (n=1352) | pg -0.013 vf 0.012 kl 0.0154 lr 5.8e-04
+[anomaly] it 77: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 77: joint limit violated by 0.17 rad
+it   78 steps   7667712 sps   34,452 | ep_ret   -5.09 ep_len   73.6 (n=1344) | pg -0.014 vf 0.012 kl 0.0173 lr 5.8e-04
+[anomaly] it 78: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 78: joint limit violated by 0.13 rad
+it   79 steps   7766016 sps   34,418 | ep_ret   -5.09 ep_len   73.9 (n=1336) | pg -0.012 vf 0.013 kl 0.0179 lr 8.6e-04
+[anomaly] it 79: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 79: joint limit violated by 0.13 rad
+it   80 steps   7864320 sps   34,384 | ep_ret   -5.09 ep_len   73.3 (n=1327) | pg -0.014 vf 0.013 kl 0.0169 lr 8.6e-04
+[anomaly] it 80: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 80: joint limit violated by 0.15 rad
+it   81 steps   7962624 sps   34,351 | ep_ret   -5.09 ep_len   74.3 (n=1284) | pg -0.013 vf 0.013 kl 0.0153 lr 5.8e-04
+[anomaly] it 81: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 81: joint limit violated by 0.14 rad
+it   82 steps   8060928 sps   34,318 | ep_ret   -5.08 ep_len   74.2 (n=1324) | pg -0.013 vf 0.013 kl 0.0166 lr 5.8e-04
+[anomaly] it 82: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 82: joint limit violated by 0.15 rad
+it   83 steps   8159232 sps   34,284 | ep_ret   -5.08 ep_len   75.8 (n=1302) | pg -0.013 vf 0.013 kl 0.0158 lr 5.8e-04
+[anomaly] it 83: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 83: joint limit violated by 0.17 rad
+it   84 steps   8257536 sps   34,252 | ep_ret   -5.07 ep_len   74.9 (n=1307) | pg -0.013 vf 0.013 kl 0.0158 lr 5.8e-04
+[anomaly] it 84: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 84: joint limit violated by 0.14 rad
+it   85 steps   8355840 sps   34,221 | ep_ret   -5.07 ep_len   75.7 (n=1274) | pg -0.013 vf 0.013 kl 0.0172 lr 5.8e-04
+[anomaly] it 85: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 85: joint limit violated by 0.15 rad
+it   86 steps   8454144 sps   34,190 | ep_ret   -5.06 ep_len   75.5 (n=1258) | pg -0.013 vf 0.014 kl 0.0160 lr 5.8e-04
+[anomaly] it 86: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 86: joint limit violated by 0.15 rad
+it   87 steps   8552448 sps   34,159 | ep_ret   -5.08 ep_len   77.4 (n=1277) | pg -0.013 vf 0.013 kl 0.0168 lr 5.8e-04
+[anomaly] it 87: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 87: joint limit violated by 0.14 rad
+it   88 steps   8650752 sps   34,129 | ep_ret   -5.08 ep_len   77.1 (n=1256) | pg -0.012 vf 0.013 kl 0.0173 lr 5.8e-04
+[anomaly] it 88: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 88: joint limit violated by 0.15 rad
+it   89 steps   8749056 sps   34,100 | ep_ret   -5.06 ep_len   77.5 (n=1253) | pg -0.013 vf 0.013 kl 0.0167 lr 5.8e-04
+[anomaly] it 89: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 89: joint limit violated by 0.15 rad
+it   90 steps   8847360 sps   34,070 | ep_ret   -5.07 ep_len   77.6 (n=1283) | pg -0.013 vf 0.014 kl 0.0179 lr 3.8e-04
+[anomaly] it 90: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 90: joint limit violated by 0.13 rad
+it   91 steps   8945664 sps   34,042 | ep_ret   -5.08 ep_len   78.4 (n=1248) | pg -0.013 vf 0.014 kl 0.0165 lr 5.8e-04
+[anomaly] it 91: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 91: joint limit violated by 0.17 rad
+it   92 steps   9043968 sps   34,012 | ep_ret   -5.08 ep_len   78.3 (n=1262) | pg -0.013 vf 0.014 kl 0.0174 lr 5.8e-04
+[anomaly] it 92: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 92: joint limit violated by 0.16 rad
+it   93 steps   9142272 sps   33,984 | ep_ret   -5.08 ep_len   79.1 (n=1173) | pg -0.013 vf 0.014 kl 0.0151 lr 5.8e-04
+[anomaly] it 93: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 93: joint limit violated by 0.15 rad
+[anomaly] it 93: contact penetration 2.3 cm
+it   94 steps   9240576 sps   33,956 | ep_ret   -5.08 ep_len   79.3 (n=1257) | pg -0.013 vf 0.015 kl 0.0165 lr 5.8e-04
+[anomaly] it 94: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 94: joint limit violated by 0.13 rad
+it   95 steps   9338880 sps   33,928 | ep_ret   -5.10 ep_len   80.8 (n=1158) | pg -0.013 vf 0.015 kl 0.0169 lr 3.8e-04
+[anomaly] it 95: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 95: joint limit violated by 0.16 rad
+it   96 steps   9437184 sps   33,900 | ep_ret   -5.08 ep_len   80.9 (n=1214) | pg -0.013 vf 0.015 kl 0.0161 lr 3.8e-04
+[anomaly] it 96: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 96: joint limit violated by 0.14 rad
+it   97 steps   9535488 sps   33,872 | ep_ret   -5.09 ep_len   81.3 (n=1211) | pg -0.013 vf 0.016 kl 0.0162 lr 5.8e-04
+[anomaly] it 97: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 97: joint limit violated by 0.15 rad
+it   98 steps   9633792 sps   33,845 | ep_ret   -5.09 ep_len   81.4 (n=1170) | pg -0.012 vf 0.016 kl 0.0156 lr 5.8e-04
+[anomaly] it 98: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 98: joint limit violated by 0.17 rad
+it   99 steps   9732096 sps   33,818 | ep_ret   -5.10 ep_len   82.2 (n=1144) | pg -0.012 vf 0.016 kl 0.0160 lr 5.8e-04
+[anomaly] it 99: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 99: joint limit violated by 0.16 rad
+it  100 steps   9830400 sps   33,792 | ep_ret   -5.12 ep_len   84.3 (n=1220) | pg -0.014 vf 0.016 kl 0.0166 lr 5.8e-04
+[anomaly] it 100: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 100: joint limit violated by 0.17 rad
+it  101 steps   9928704 sps   33,763 | ep_ret   -5.11 ep_len   83.5 (n=1126) | pg -0.013 vf 0.017 kl 0.0173 lr 5.8e-04
+[anomaly] it 101: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 101: joint limit violated by 0.15 rad
+it  102 steps  10027008 sps   33,736 | ep_ret   -5.14 ep_len   85.6 (n=1085) | pg -0.012 vf 0.016 kl 0.0162 lr 5.8e-04
+[anomaly] it 102: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 102: joint limit violated by 0.15 rad
+it  103 steps  10125312 sps   33,710 | ep_ret   -5.14 ep_len   85.0 (n=1188) | pg -0.014 vf 0.017 kl 0.0173 lr 5.8e-04
+[anomaly] it 103: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 103: joint limit violated by 0.16 rad
+it  104 steps  10223616 sps   33,684 | ep_ret   -5.15 ep_len   86.2 (n=1085) | pg -0.013 vf 0.017 kl 0.0174 lr 3.8e-04
+[anomaly] it 104: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 104: joint limit violated by 0.14 rad
+it  105 steps  10321920 sps   33,658 | ep_ret   -5.16 ep_len   87.0 (n=1086) | pg -0.012 vf 0.017 kl 0.0163 lr 5.8e-04
+[anomaly] it 105: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 105: joint limit violated by 0.15 rad
+it  106 steps  10420224 sps   33,633 | ep_ret   -5.17 ep_len   88.2 (n=1143) | pg -0.013 vf 0.017 kl 0.0165 lr 5.8e-04
+[anomaly] it 106: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 106: joint limit violated by 0.18 rad
+it  107 steps  10518528 sps   33,608 | ep_ret   -5.15 ep_len   88.3 (n=1083) | pg -0.014 vf 0.018 kl 0.0171 lr 5.8e-04
+[anomaly] it 107: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 107: joint limit violated by 0.15 rad
+it  108 steps  10616832 sps   33,583 | ep_ret   -5.18 ep_len   90.0 (n=1055) | pg -0.013 vf 0.018 kl 0.0175 lr 3.8e-04
+[anomaly] it 108: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 108: joint limit violated by 0.17 rad
+it  109 steps  10715136 sps   33,558 | ep_ret   -5.19 ep_len   90.2 (n=1073) | pg -0.014 vf 0.019 kl 0.0159 lr 3.8e-04
+[anomaly] it 109: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 109: joint limit violated by 0.21 rad
+it  110 steps  10813440 sps   33,533 | ep_ret   -5.18 ep_len   90.7 (n=1031) | pg -0.013 vf 0.020 kl 0.0162 lr 5.8e-04
+[anomaly] it 110: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 110: joint limit violated by 0.16 rad
+it  111 steps  10911744 sps   33,508 | ep_ret   -5.21 ep_len   93.6 (n=1002) | pg -0.013 vf 0.020 kl 0.0147 lr 3.8e-04
+[anomaly] it 111: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 111: joint limit violated by 0.17 rad
+it  112 steps  11010048 sps   33,483 | ep_ret   -5.24 ep_len   93.4 (n=1020) | pg -0.013 vf 0.020 kl 0.0174 lr 3.8e-04
+[anomaly] it 112: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 112: joint limit violated by 0.16 rad
+it  113 steps  11108352 sps   33,456 | ep_ret   -5.26 ep_len   97.0 (n=986) | pg -0.013 vf 0.020 kl 0.0160 lr 5.8e-04
+[anomaly] it 113: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 113: joint limit violated by 0.14 rad
+it  114 steps  11206656 sps   33,431 | ep_ret   -5.26 ep_len   97.0 (n=988) | pg -0.013 vf 0.020 kl 0.0172 lr 3.8e-04
+[anomaly] it 114: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 114: joint limit violated by 0.18 rad
+it  115 steps  11304960 sps   33,407 | ep_ret   -5.28 ep_len   98.8 (n=994) | pg -0.014 vf 0.020 kl 0.0152 lr 3.8e-04
+[anomaly] it 115: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 115: joint limit violated by 0.15 rad
+[anomaly] it 115: contact penetration 2.3 cm
+it  116 steps  11403264 sps   33,382 | ep_ret   -5.27 ep_len   97.8 (n=986) | pg -0.013 vf 0.021 kl 0.0164 lr 3.8e-04
+[anomaly] it 116: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 116: joint limit violated by 0.16 rad
+it  117 steps  11501568 sps   33,356 | ep_ret   -5.30 ep_len   98.7 (n=932) | pg -0.014 vf 0.021 kl 0.0169 lr 3.8e-04
+[anomaly] it 117: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 117: joint limit violated by 0.16 rad
+it  118 steps  11599872 sps   33,329 | ep_ret   -5.32 ep_len  101.6 (n=899) | pg -0.013 vf 0.022 kl 0.0146 lr 3.8e-04
+[anomaly] it 118: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 118: joint limit violated by 0.16 rad
+it  119 steps  11698176 sps   33,304 | ep_ret   -5.35 ep_len  103.7 (n=870) | pg -0.013 vf 0.023 kl 0.0170 lr 5.8e-04
+[anomaly] it 119: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 119: joint limit violated by 0.16 rad
+it  120 steps  11796480 sps   33,278 | ep_ret   -5.38 ep_len  104.8 (n=903) | pg -0.014 vf 0.024 kl 0.0173 lr 3.8e-04
+[anomaly] it 120: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 120: joint limit violated by 0.15 rad
+it  121 steps  11894784 sps   33,252 | ep_ret   -5.38 ep_len  106.2 (n=825) | pg -0.014 vf 0.025 kl 0.0175 lr 2.6e-04
+[anomaly] it 121: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 121: joint limit violated by 0.17 rad
+it  122 steps  11993088 sps   33,226 | ep_ret   -5.46 ep_len  111.7 (n=782) | pg -0.013 vf 0.025 kl 0.0163 lr 5.8e-04
+[anomaly] it 122: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 122: joint limit violated by 0.17 rad
+[anomaly] it 122: contact penetration 2.1 cm
+it  123 steps  12091392 sps   33,202 | ep_ret   -5.48 ep_len  113.2 (n=806) | pg -0.013 vf 0.026 kl 0.0170 lr 3.8e-04
+[anomaly] it 123: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 123: joint limit violated by 0.15 rad
+it  124 steps  12189696 sps   33,178 | ep_ret   -5.55 ep_len  117.3 (n=799) | pg -0.014 vf 0.026 kl 0.0162 lr 5.8e-04
+[anomaly] it 124: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 124: joint limit violated by 0.16 rad
+it  125 steps  12288000 sps   33,153 | ep_ret   -5.61 ep_len  121.0 (n=721) | pg -0.015 vf 0.027 kl 0.0174 lr 3.8e-04
+[anomaly] it 125: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 125: joint limit violated by 0.15 rad
+[anomaly] it 125: contact penetration 2.3 cm
+it  126 steps  12386304 sps   33,128 | ep_ret   -5.66 ep_len  122.1 (n=698) | pg -0.013 vf 0.028 kl 0.0169 lr 3.8e-04
+[anomaly] it 126: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 126: joint limit violated by 0.17 rad
+it  127 steps  12484608 sps   33,103 | ep_ret   -5.68 ep_len  125.9 (n=629) | pg -0.012 vf 0.028 kl 0.0139 lr 3.8e-04
+[anomaly] it 127: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 127: joint limit violated by 0.16 rad
+[anomaly] it 127: contact penetration 2.0 cm
+it  128 steps  12582912 sps   33,077 | ep_ret   -5.79 ep_len  131.7 (n=576) | pg -0.013 vf 0.028 kl 0.0166 lr 3.8e-04
+[anomaly] it 128: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 128: joint limit violated by 0.18 rad
+[anomaly] it 128: contact penetration 2.2 cm
+it  129 steps  12681216 sps   33,049 | ep_ret   -5.86 ep_len  137.2 (n=550) | pg -0.012 vf 0.029 kl 0.0163 lr 3.8e-04
+[anomaly] it 129: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 129: joint limit violated by 0.15 rad
+it  130 steps  12779520 sps   33,022 | ep_ret   -5.94 ep_len  142.5 (n=497) | pg -0.014 vf 0.030 kl 0.0173 lr 2.6e-04
+[anomaly] it 130: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 130: joint limit violated by 0.16 rad
+[anomaly] it 130: contact penetration 2.1 cm
+it  131 steps  12877824 sps   32,996 | ep_ret   -6.03 ep_len  149.2 (n=492) | pg -0.014 vf 0.030 kl 0.0171 lr 2.6e-04
+[anomaly] it 131: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 131: joint limit violated by 0.17 rad
+it  132 steps  12976128 sps   32,969 | ep_ret   -6.11 ep_len  157.9 (n=447) | pg -0.012 vf 0.030 kl 0.0148 lr 3.8e-04
+[anomaly] it 132: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 132: joint limit violated by 0.16 rad
+it  133 steps  13074432 sps   32,941 | ep_ret   -6.22 ep_len  162.7 (n=423) | pg -0.012 vf 0.030 kl 0.0151 lr 3.8e-04
+[anomaly] it 133: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 133: returns fall as episodes lengthen (corr -0.65): the reward punishes survival
+[anomaly] it 133: joint limit violated by 0.18 rad
+it  134 steps  13172736 sps   32,913 | ep_ret   -6.33 ep_len  170.3 (n=304) | pg -0.014 vf 0.029 kl 0.0176 lr 3.8e-04
+[anomaly] it 134: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 134: returns fall as episodes lengthen (corr -0.72): the reward punishes survival
+[anomaly] it 134: joint limit violated by 0.17 rad
+[anomaly] it 134: contact penetration 2.3 cm
+it  135 steps  13271040 sps   32,885 | ep_ret   -6.53 ep_len  183.3 (n=317) | pg -0.013 vf 0.030 kl 0.0169 lr 3.8e-04
+[anomaly] it 135: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 135: returns fall as episodes lengthen (corr -0.78): the reward punishes survival
+[anomaly] it 135: joint limit violated by 0.16 rad
+[anomaly] it 135: contact penetration 2.5 cm
+it  136 steps  13369344 sps   32,857 | ep_ret   -6.71 ep_len  192.6 (n=276) | pg -0.012 vf 0.027 kl 0.0148 lr 3.8e-04
+[anomaly] it 136: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 136: returns fall as episodes lengthen (corr -0.83): the reward punishes survival
+[anomaly] it 136: joint limit violated by 0.16 rad
+it  137 steps  13467648 sps   32,829 | ep_ret   -6.67 ep_len  194.1 (n=229) | pg -0.011 vf 0.027 kl 0.0149 lr 3.8e-04
+[anomaly] it 137: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 137: returns fall as episodes lengthen (corr -0.86): the reward punishes survival
+[anomaly] it 137: joint limit violated by 0.16 rad
+[anomaly] it 137: contact penetration 2.6 cm
+it  138 steps  13565952 sps   32,801 | ep_ret   -6.99 ep_len  214.0 (n=210) | pg -0.013 vf 0.025 kl 0.0165 lr 3.8e-04
+[anomaly] it 138: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 138: returns fall as episodes lengthen (corr -0.89): the reward punishes survival
+[anomaly] it 138: joint limit violated by 0.19 rad
+[anomaly] it 138: contact penetration 2.1 cm
+it  139 steps  13664256 sps   32,774 | ep_ret   -7.28 ep_len  230.5 (n=169) | pg -0.013 vf 0.027 kl 0.0149 lr 3.8e-04
+[anomaly] it 139: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 139: returns fall as episodes lengthen (corr -0.92): the reward punishes survival
+[anomaly] it 139: joint limit violated by 0.17 rad
+[anomaly] it 139: contact penetration 2.1 cm
+it  140 steps  13762560 sps   32,747 | ep_ret   -7.38 ep_len  236.6 (n=136) | pg -0.011 vf 0.025 kl 0.0148 lr 3.8e-04
+[anomaly] it 140: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 140: returns fall as episodes lengthen (corr -0.94): the reward punishes survival
+[anomaly] it 140: joint limit violated by 0.18 rad
+[anomaly] it 140: contact penetration 2.3 cm
+it  141 steps  13860864 sps   32,719 | ep_ret   -7.54 ep_len  239.1 (n=128) | pg -0.012 vf 0.022 kl 0.0172 lr 2.6e-04
+[anomaly] it 141: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 141: returns fall as episodes lengthen (corr -0.95): the reward punishes survival
+[anomaly] it 141: joint limit violated by 0.17 rad
+[anomaly] it 141: contact penetration 2.3 cm
+it  142 steps  13959168 sps   32,692 | ep_ret   -7.50 ep_len  245.7 (n=103) | pg -0.012 vf 0.020 kl 0.0169 lr 2.6e-04
+[anomaly] it 142: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 142: returns fall as episodes lengthen (corr -0.96): the reward punishes survival
+[anomaly] it 142: joint limit violated by 0.16 rad
+[anomaly] it 142: contact penetration 2.2 cm
+it  143 steps  14057472 sps   32,665 | ep_ret   -8.12 ep_len  285.6 (n=84) | pg -0.011 vf 0.019 kl 0.0165 lr 3.8e-04
+[anomaly] it 143: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 143: returns fall as episodes lengthen (corr -0.97): the reward punishes survival
+[anomaly] it 143: joint limit violated by 0.17 rad
+[anomaly] it 143: contact penetration 3.1 cm
+it  144 steps  14155776 sps   32,637 | ep_ret   -8.04 ep_len  277.3 (n=62) | pg -0.012 vf 0.016 kl 0.0170 lr 3.8e-04
+[anomaly] it 144: explained variance -0.20 < 0 after warm-up: value function not predicting returns
+[anomaly] it 144: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 144: returns fall as episodes lengthen (corr -0.97): the reward punishes survival
+[anomaly] it 144: joint limit violated by 0.17 rad
+[anomaly] it 144: contact penetration 2.4 cm
+it  145 steps  14254080 sps   32,608 | ep_ret   -8.14 ep_len  291.9 (n=64) | pg -0.013 vf 0.015 kl 0.0167 lr 2.6e-04
+[anomaly] it 145: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 145: returns fall as episodes lengthen (corr -0.98): the reward punishes survival
+[anomaly] it 145: joint limit violated by 0.15 rad
+[anomaly] it 145: contact penetration 2.5 cm
+it  146 steps  14352384 sps   32,579 | ep_ret   -8.78 ep_len  336.6 (n=41) | pg -0.012 vf 0.014 kl 0.0162 lr 2.6e-04
+[anomaly] it 146: explained variance -0.40 < 0 after warm-up: value function not predicting returns
+[anomaly] it 146: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 146: returns fall as episodes lengthen (corr -0.98): the reward punishes survival
+[anomaly] it 146: joint limit violated by 0.19 rad
+[anomaly] it 146: contact penetration 2.2 cm
+it  147 steps  14450688 sps   32,549 | ep_ret   -8.78 ep_len  336.9 (n=59) | pg -0.012 vf 0.013 kl 0.0162 lr 2.6e-04
+[anomaly] it 147: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 147: returns fall as episodes lengthen (corr -0.99): the reward punishes survival
+[anomaly] it 147: joint limit violated by 0.16 rad
+it  148 steps  14548992 sps   32,519 | ep_ret   -9.48 ep_len  363.1 (n=33) | pg -0.013 vf 0.012 kl 0.0161 lr 2.6e-04
+[anomaly] it 148: explained variance -0.45 < 0 after warm-up: value function not predicting returns
+[anomaly] it 148: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 148: returns fall as episodes lengthen (corr -0.99): the reward punishes survival
+[anomaly] it 148: joint limit violated by 0.16 rad
+[anomaly] it 148: contact penetration 2.4 cm
+it  149 steps  14647296 sps   32,488 | ep_ret   -9.47 ep_len  386.0 (n=39) | pg -0.013 vf 0.012 kl 0.0165 lr 2.6e-04
+[anomaly] it 149: explained variance -0.26 < 0 after warm-up: value function not predicting returns
+[anomaly] it 149: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 149: returns fall as episodes lengthen (corr -0.99): the reward punishes survival
+[anomaly] it 149: joint limit violated by 0.16 rad
+[anomaly] it 149: contact penetration 2.1 cm
+it  150 steps  14745600 sps   32,458 | ep_ret   -9.50 ep_len  421.5 (n=39) | pg -0.013 vf 0.011 kl 0.0154 lr 2.6e-04
+[anomaly] it 150: explained variance -0.09 < 0 after warm-up: value function not predicting returns
+[anomaly] it 150: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 150: returns fall as episodes lengthen (corr -0.99): the reward punishes survival
+[anomaly] it 150: joint limit violated by 0.17 rad
+[anomaly] it 150: contact penetration 3.3 cm
+it  151 steps  14843904 sps   32,429 | ep_ret   -9.62 ep_len  414.8 (n=28) | pg -0.013 vf 0.011 kl 0.0156 lr 3.8e-04
+[anomaly] it 151: explained variance -0.51 < 0 after warm-up: value function not predicting returns
+[anomaly] it 151: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 151: returns fall as episodes lengthen (corr -0.99): the reward punishes survival
+[anomaly] it 151: joint limit violated by 0.15 rad
+[anomaly] it 151: contact penetration 2.3 cm
+it  152 steps  14942208 sps   32,399 | ep_ret  -10.52 ep_len  475.2 (n=23) | pg -0.011 vf 0.011 kl 0.0177 lr 3.8e-04
+[anomaly] it 152: explained variance -0.43 < 0 after warm-up: value function not predicting returns
+[anomaly] it 152: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 152: returns fall as episodes lengthen (corr -0.99): the reward punishes survival
+[anomaly] it 152: joint limit violated by 0.16 rad
+[anomaly] it 152: contact penetration 2.2 cm
+it  153 steps  15040512 sps   32,369 | ep_ret  -10.08 ep_len  447.3 (n=22) | pg -0.011 vf 0.011 kl 0.0166 lr 3.8e-04
+[anomaly] it 153: explained variance -0.57 < 0 after warm-up: value function not predicting returns
+[anomaly] it 153: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 153: returns fall as episodes lengthen (corr -1.00): the reward punishes survival
+[anomaly] it 153: joint limit violated by 0.18 rad
+[anomaly] it 153: contact penetration 2.1 cm
+it  154 steps  15138816 sps   32,340 | ep_ret   -9.73 ep_len  438.0 (n=26) | pg -0.012 vf 0.010 kl 0.0161 lr 3.8e-04
+[anomaly] it 154: explained variance -0.47 < 0 after warm-up: value function not predicting returns
+[anomaly] it 154: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 154: returns fall as episodes lengthen (corr -1.00): the reward punishes survival
+[anomaly] it 154: joint limit violated by 0.17 rad
+[anomaly] it 154: contact penetration 2.9 cm
+it  155 steps  15237120 sps   32,311 | ep_ret  -10.52 ep_len  523.4 (n=29) | pg -0.011 vf 0.008 kl 0.0170 lr 2.6e-04
+[anomaly] it 155: explained variance -0.27 < 0 after warm-up: value function not predicting returns
+[anomaly] it 155: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 155: returns fall as episodes lengthen (corr -1.00): the reward punishes survival
+[anomaly] it 155: joint limit violated by 0.18 rad
+[anomaly] it 155: contact penetration 2.5 cm
+it  156 steps  15335424 sps   32,282 | ep_ret  -10.95 ep_len  566.8 (n=19) | pg -0.013 vf 0.008 kl 0.0157 lr 3.8e-04
+[anomaly] it 156: explained variance -0.66 < 0 after warm-up: value function not predicting returns
+[anomaly] it 156: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 156: returns fall as episodes lengthen (corr -1.00): the reward punishes survival
+[anomaly] it 156: joint limit violated by 0.21 rad
+[anomaly] it 156: contact penetration 2.1 cm
+it  157 steps  15433728 sps   32,252 | ep_ret  -10.89 ep_len  561.1 (n=18) | pg -0.011 vf 0.008 kl 0.0171 lr 2.6e-04
+[anomaly] it 157: explained variance -0.63 < 0 after warm-up: value function not predicting returns
+[anomaly] it 157: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 157: returns fall as episodes lengthen (corr -0.99): the reward punishes survival
+[anomaly] it 157: joint limit violated by 0.19 rad
+[anomaly] it 157: contact penetration 2.9 cm
+it  158 steps  15532032 sps   32,223 | ep_ret  -11.39 ep_len  633.2 (n=21) | pg -0.012 vf 0.008 kl 0.0159 lr 5.8e-04
+[anomaly] it 158: explained variance -0.34 < 0 after warm-up: value function not predicting returns
+[anomaly] it 158: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 158: returns fall as episodes lengthen (corr -0.99): the reward punishes survival
+[anomaly] it 158: joint limit violated by 0.17 rad
+[anomaly] it 158: contact penetration 2.2 cm
+it  159 steps  15630336 sps   32,194 | ep_ret  -10.97 ep_len  541.6 (n=17) | pg -0.012 vf 0.007 kl 0.0161 lr 3.8e-04
+[anomaly] it 159: explained variance -0.63 < 0 after warm-up: value function not predicting returns
+[anomaly] it 159: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 159: returns fall as episodes lengthen (corr -0.99): the reward punishes survival
+[anomaly] it 159: joint limit violated by 0.18 rad
+it  160 steps  15728640 sps   32,165 | ep_ret  -10.72 ep_len  722.5 (n=22) | pg -0.012 vf 0.006 kl 0.0171 lr 3.8e-04
+[anomaly] it 160: explained variance -0.38 < 0 after warm-up: value function not predicting returns
+[anomaly] it 160: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 160: returns fall as episodes lengthen (corr -0.99): the reward punishes survival
+[anomaly] it 160: joint limit violated by 0.18 rad
+[anomaly] it 160: contact penetration 2.8 cm
+it  161 steps  15826944 sps   32,135 | ep_ret  -10.31 ep_len  859.4 (n=20) | pg -0.011 vf 0.006 kl 0.0163 lr 5.8e-04
+[anomaly] it 161: explained variance -1.61 < 0 after warm-up: value function not predicting returns
+[anomaly] it 161: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 161: returns fall as episodes lengthen (corr -0.96): the reward punishes survival
+[anomaly] it 161: joint limit violated by 0.18 rad
+[anomaly] it 161: contact penetration 2.3 cm
+it  162 steps  15925248 sps   32,106 | ep_ret   -9.59 ep_len  757.8 (n=20) | pg -0.012 vf 0.006 kl 0.0162 lr 3.8e-04
+[anomaly] it 162: explained variance -0.89 < 0 after warm-up: value function not predicting returns
+[anomaly] it 162: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 162: returns fall as episodes lengthen (corr -0.95): the reward punishes survival
+[anomaly] it 162: joint limit violated by 0.17 rad
+[anomaly] it 162: contact penetration 2.5 cm
+it  163 steps  16023552 sps   32,077 | ep_ret  -10.23 ep_len  886.0 (n=44) | pg -0.012 vf 0.006 kl 0.0175 lr 5.8e-04
+[anomaly] it 163: explained variance -0.20 < 0 after warm-up: value function not predicting returns
+[anomaly] it 163: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 163: returns fall as episodes lengthen (corr -0.94): the reward punishes survival
+[anomaly] it 163: joint limit violated by 0.19 rad
+[anomaly] it 163: contact penetration 2.3 cm
+it  164 steps  16121856 sps   32,049 | ep_ret   -9.85 ep_len  918.2 (n=46) | pg -0.013 vf 0.005 kl 0.0159 lr 3.8e-04
+[anomaly] it 164: explained variance -0.51 < 0 after warm-up: value function not predicting returns
+[anomaly] it 164: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 164: returns fall as episodes lengthen (corr -0.93): the reward punishes survival
+[anomaly] it 164: joint limit violated by 0.16 rad
+[anomaly] it 164: contact penetration 2.1 cm
+it  165 steps  16220160 sps   32,021 | ep_ret  -10.03 ep_len  967.8 (n=67) | pg -0.011 vf 0.006 kl 0.0147 lr 3.8e-04
+[anomaly] it 165: explained variance -1.07 < 0 after warm-up: value function not predicting returns
+[anomaly] it 165: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 165: returns fall as episodes lengthen (corr -0.91): the reward punishes survival
+[anomaly] it 165: joint limit violated by 0.16 rad
+[anomaly] it 165: contact penetration 2.2 cm
+it  166 steps  16318464 sps   31,994 | ep_ret   -9.73 ep_len  979.3 (n=95) | pg -0.012 vf 0.005 kl 0.0154 lr 3.8e-04
+[anomaly] it 166: explained variance -1.07 < 0 after warm-up: value function not predicting returns
+[anomaly] it 166: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 166: returns fall as episodes lengthen (corr -0.90): the reward punishes survival
+[anomaly] it 166: joint limit violated by 0.20 rad
+it  167 steps  16416768 sps   31,966 | ep_ret   -9.42 ep_len  977.7 (n=111) | pg -0.012 vf 0.006 kl 0.0163 lr 3.8e-04
+[anomaly] it 167: explained variance -1.24 < 0 after warm-up: value function not predicting returns
+[anomaly] it 167: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 167: returns fall as episodes lengthen (corr -0.89): the reward punishes survival
+[anomaly] it 167: joint limit violated by 0.16 rad
+[anomaly] it 167: contact penetration 2.2 cm
+it  168 steps  16515072 sps   31,939 | ep_ret   -9.44 ep_len  984.4 (n=148) | pg -0.011 vf 0.006 kl 0.0148 lr 3.8e-04
+[anomaly] it 168: explained variance -0.63 < 0 after warm-up: value function not predicting returns
+[anomaly] it 168: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 168: returns fall as episodes lengthen (corr -0.88): the reward punishes survival
+[anomaly] it 168: joint limit violated by 0.18 rad
+[anomaly] it 168: contact penetration 2.2 cm
+it  169 steps  16613376 sps   31,912 | ep_ret   -9.28 ep_len  979.2 (n=189) | pg -0.012 vf 0.005 kl 0.0175 lr 5.8e-04
+[anomaly] it 169: explained variance -0.51 < 0 after warm-up: value function not predicting returns
+[anomaly] it 169: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 169: returns fall as episodes lengthen (corr -0.88): the reward punishes survival
+[anomaly] it 169: joint limit violated by 0.18 rad
+it  170 steps  16711680 sps   31,885 | ep_ret   -9.17 ep_len  992.4 (n=184) | pg -0.011 vf 0.005 kl 0.0163 lr 3.8e-04
+[anomaly] it 170: explained variance -2.10 < 0 after warm-up: value function not predicting returns
+[anomaly] it 170: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 170: returns fall as episodes lengthen (corr -0.87): the reward punishes survival
+[anomaly] it 170: joint limit violated by 0.17 rad
+[anomaly] it 170: contact penetration 2.2 cm
+it  171 steps  16809984 sps   31,858 | ep_ret   -9.14 ep_len  989.8 (n=204) | pg -0.013 vf 0.004 kl 0.0155 lr 3.8e-04
+[anomaly] it 171: explained variance -1.57 < 0 after warm-up: value function not predicting returns
+[anomaly] it 171: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 171: returns fall as episodes lengthen (corr -0.86): the reward punishes survival
+[anomaly] it 171: joint limit violated by 0.18 rad
+it  172 steps  16908288 sps   31,832 | ep_ret   -9.15 ep_len  992.9 (n=219) | pg -0.013 vf 0.004 kl 0.0161 lr 5.8e-04
+[anomaly] it 172: explained variance -1.18 < 0 after warm-up: value function not predicting returns
+[anomaly] it 172: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 172: returns fall as episodes lengthen (corr -0.86): the reward punishes survival
+[anomaly] it 172: joint limit violated by 0.18 rad
+it  173 steps  17006592 sps   31,805 | ep_ret   -8.96 ep_len  996.7 (n=262) | pg -0.011 vf 0.005 kl 0.0168 lr 5.8e-04
+[anomaly] it 173: explained variance -2.89 < 0 after warm-up: value function not predicting returns
+[anomaly] it 173: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 173: returns fall as episodes lengthen (corr -0.85): the reward punishes survival
+[anomaly] it 173: joint limit violated by 0.17 rad
+it  174 steps  17104896 sps   31,779 | ep_ret   -8.85 ep_len  989.9 (n=267) | pg -0.012 vf 0.005 kl 0.0163 lr 3.8e-04
+[anomaly] it 174: explained variance -1.16 < 0 after warm-up: value function not predicting returns
+[anomaly] it 174: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 174: returns fall as episodes lengthen (corr -0.85): the reward punishes survival
+[anomaly] it 174: joint limit violated by 0.17 rad
+it  175 steps  17203200 sps   31,753 | ep_ret   -8.74 ep_len  991.8 (n=271) | pg -0.009 vf 0.005 kl 0.0148 lr 3.8e-04
+[anomaly] it 175: explained variance -2.18 < 0 after warm-up: value function not predicting returns
+[anomaly] it 175: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 175: returns fall as episodes lengthen (corr -0.84): the reward punishes survival
+[anomaly] it 175: joint limit violated by 0.17 rad
+it  176 steps  17301504 sps   31,728 | ep_ret   -8.54 ep_len  991.3 (n=215) | pg -0.011 vf 0.004 kl 0.0143 lr 3.8e-04
+[anomaly] it 176: explained variance -1.54 < 0 after warm-up: value function not predicting returns
+[anomaly] it 176: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 176: returns fall as episodes lengthen (corr -0.84): the reward punishes survival
+[anomaly] it 176: joint limit violated by 0.19 rad
+it  177 steps  17399808 sps   31,702 | ep_ret   -8.18 ep_len  990.0 (n=216) | pg -0.011 vf 0.004 kl 0.0141 lr 3.8e-04
+[anomaly] it 177: explained variance -2.08 < 0 after warm-up: value function not predicting returns
+[anomaly] it 177: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 177: returns fall as episodes lengthen (corr -0.83): the reward punishes survival
+[anomaly] it 177: joint limit violated by 0.16 rad
+it  178 steps  17498112 sps   31,678 | ep_ret   -8.07 ep_len  981.3 (n=217) | pg -0.012 vf 0.004 kl 0.0152 lr 3.8e-04
+[anomaly] it 178: explained variance -1.10 < 0 after warm-up: value function not predicting returns
+[anomaly] it 178: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 178: returns fall as episodes lengthen (corr -0.82): the reward punishes survival
+[anomaly] it 178: joint limit violated by 0.16 rad
+it  179 steps  17596416 sps   31,653 | ep_ret   -8.20 ep_len  975.7 (n=166) | pg -0.012 vf 0.003 kl 0.0170 lr 5.8e-04
+[anomaly] it 179: explained variance -1.41 < 0 after warm-up: value function not predicting returns
+[anomaly] it 179: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 179: returns fall as episodes lengthen (corr -0.81): the reward punishes survival
+[anomaly] it 179: joint limit violated by 0.17 rad
+it  180 steps  17694720 sps   31,628 | ep_ret   -8.07 ep_len  979.3 (n=162) | pg -0.012 vf 0.003 kl 0.0153 lr 3.8e-04
+[anomaly] it 180: explained variance -0.48 < 0 after warm-up: value function not predicting returns
+[anomaly] it 180: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 180: returns fall as episodes lengthen (corr -0.81): the reward punishes survival
+[anomaly] it 180: joint limit violated by 0.17 rad
+it  181 steps  17793024 sps   31,604 | ep_ret   -7.33 ep_len 1000.0 (n=128) | pg -0.012 vf 0.003 kl 0.0158 lr 5.8e-04
+[anomaly] it 181: explained variance -9.93 < 0 after warm-up: value function not predicting returns
+[anomaly] it 181: returns fall as episodes lengthen (corr -0.79): the reward punishes survival
+[anomaly] it 181: joint limit violated by 0.16 rad
+[anomaly] it 181: contact penetration 2.0 cm
+it  182 steps  17891328 sps   31,581 | ep_ret   -7.21 ep_len  992.6 (n=105) | pg -0.012 vf 0.003 kl 0.0181 lr 3.8e-04
+[anomaly] it 182: explained variance -5.55 < 0 after warm-up: value function not predicting returns
+[anomaly] it 182: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 182: returns fall as episodes lengthen (corr -0.78): the reward punishes survival
+[anomaly] it 182: joint limit violated by 0.16 rad
+it  183 steps  17989632 sps   31,557 | ep_ret   -7.08 ep_len  975.8 (n=119) | pg -0.011 vf 0.003 kl 0.0166 lr 3.8e-04
+[anomaly] it 183: explained variance -1.45 < 0 after warm-up: value function not predicting returns
+[anomaly] it 183: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 183: returns fall as episodes lengthen (corr -0.77): the reward punishes survival
+[anomaly] it 183: joint limit violated by 0.17 rad
+[anomaly] it 183: contact penetration 2.4 cm
+it  184 steps  18087936 sps   31,533 | ep_ret   -6.57 ep_len  984.1 (n=78) | pg -0.012 vf 0.003 kl 0.0160 lr 5.8e-04
+[anomaly] it 184: explained variance -3.77 < 0 after warm-up: value function not predicting returns
+[anomaly] it 184: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 184: returns fall as episodes lengthen (corr -0.75): the reward punishes survival
+[anomaly] it 184: joint limit violated by 0.17 rad
+it  185 steps  18186240 sps   31,509 | ep_ret   -7.21 ep_len  972.6 (n=79) | pg -0.010 vf 0.003 kl 0.0172 lr 3.8e-04
+[anomaly] it 185: explained variance -1.91 < 0 after warm-up: value function not predicting returns
+[anomaly] it 185: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 185: returns fall as episodes lengthen (corr -0.74): the reward punishes survival
+[anomaly] it 185: joint limit violated by 0.19 rad
+[anomaly] it 185: contact penetration 2.5 cm
+it  186 steps  18284544 sps   31,485 | ep_ret   -6.58 ep_len  981.9 (n=52) | pg -0.009 vf 0.005 kl 0.0156 lr 3.8e-04
+[anomaly] it 186: explained variance -6.74 < 0 after warm-up: value function not predicting returns
+[anomaly] it 186: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 186: returns fall as episodes lengthen (corr -0.72): the reward punishes survival
+[anomaly] it 186: joint limit violated by 0.20 rad
+it  187 steps  18382848 sps   31,462 | ep_ret   -6.76 ep_len  931.8 (n=61) | pg -0.010 vf 0.004 kl 0.0168 lr 3.8e-04
+[anomaly] it 187: explained variance -1.45 < 0 after warm-up: value function not predicting returns
+[anomaly] it 187: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 187: returns fall as episodes lengthen (corr -0.71): the reward punishes survival
+[anomaly] it 187: joint limit violated by 0.17 rad
+[anomaly] it 187: contact penetration 2.1 cm
+it  188 steps  18481152 sps   31,439 | ep_ret   -6.06 ep_len  915.4 (n=50) | pg -0.011 vf 0.003 kl 0.0163 lr 3.8e-04
+[anomaly] it 188: explained variance -2.04 < 0 after warm-up: value function not predicting returns
+[anomaly] it 188: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 188: returns fall as episodes lengthen (corr -0.69): the reward punishes survival
+[anomaly] it 188: joint limit violated by 0.19 rad
+it  189 steps  18579456 sps   31,416 | ep_ret   -6.24 ep_len  949.8 (n=46) | pg -0.009 vf 0.004 kl 0.0152 lr 3.8e-04
+[anomaly] it 189: explained variance -1.56 < 0 after warm-up: value function not predicting returns
+[anomaly] it 189: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 189: returns fall as episodes lengthen (corr -0.67): the reward punishes survival
+[anomaly] it 189: joint limit violated by 0.17 rad
+[anomaly] it 189: contact penetration 2.4 cm
+it  190 steps  18677760 sps   31,393 | ep_ret   -5.93 ep_len  962.2 (n=38) | pg -0.010 vf 0.005 kl 0.0151 lr 3.8e-04
+[anomaly] it 190: explained variance -4.16 < 0 after warm-up: value function not predicting returns
+[anomaly] it 190: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 190: returns fall as episodes lengthen (corr -0.65): the reward punishes survival
+[anomaly] it 190: joint limit violated by 0.18 rad
+it  191 steps  18776064 sps   31,370 | ep_ret   -5.79 ep_len  900.5 (n=40) | pg -0.011 vf 0.004 kl 0.0150 lr 3.8e-04
+[anomaly] it 191: explained variance -1.20 < 0 after warm-up: value function not predicting returns
+[anomaly] it 191: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 191: returns fall as episodes lengthen (corr -0.63): the reward punishes survival
+[anomaly] it 191: joint limit violated by 0.17 rad
+it  192 steps  18874368 sps   31,348 | ep_ret   -5.99 ep_len  920.6 (n=40) | pg -0.010 vf 0.004 kl 0.0152 lr 3.8e-04
+[anomaly] it 192: explained variance -1.60 < 0 after warm-up: value function not predicting returns
+[anomaly] it 192: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 192: returns fall as episodes lengthen (corr -0.61): the reward punishes survival
+[anomaly] it 192: joint limit violated by 0.17 rad
+it  193 steps  18972672 sps   31,326 | ep_ret   -5.33 ep_len  956.9 (n=23) | pg -0.012 vf 0.003 kl 0.0156 lr 3.8e-04
+[anomaly] it 193: explained variance -4.96 < 0 after warm-up: value function not predicting returns
+[anomaly] it 193: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 193: joint limit violated by 0.15 rad
+it  194 steps  19070976 sps   31,305 | ep_ret   -5.76 ep_len  884.9 (n=27) | pg -0.012 vf 0.003 kl 0.0167 lr 3.8e-04
+[anomaly] it 194: explained variance -2.06 < 0 after warm-up: value function not predicting returns
+[anomaly] it 194: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 194: joint limit violated by 0.19 rad
+it  195 steps  19169280 sps   31,283 | ep_ret   -4.99 ep_len  925.9 (n=28) | pg -0.009 vf 0.004 kl 0.0141 lr 2.6e-04
+[anomaly] it 195: explained variance -0.90 < 0 after warm-up: value function not predicting returns
+[anomaly] it 195: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 195: joint limit violated by 0.16 rad
+it  196 steps  19267584 sps   31,262 | ep_ret   -4.50 ep_len  970.9 (n=28) | pg -0.014 vf 0.002 kl 0.0162 lr 3.8e-04
+[anomaly] it 196: explained variance -2.06 < 0 after warm-up: value function not predicting returns
+[anomaly] it 196: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 196: joint limit violated by 0.18 rad
+it  197 steps  19365888 sps   31,241 | ep_ret   -4.79 ep_len  917.0 (n=22) | pg -0.009 vf 0.003 kl 0.0145 lr 2.6e-04
+[anomaly] it 197: explained variance -0.82 < 0 after warm-up: value function not predicting returns
+[anomaly] it 197: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 197: joint limit violated by 0.17 rad
+it  198 steps  19464192 sps   31,221 | ep_ret   -4.85 ep_len  958.5 (n=20) | pg -0.012 vf 0.003 kl 0.0162 lr 3.8e-04
+[anomaly] it 198: explained variance -10.73 < 0 after warm-up: value function not predicting returns
+[anomaly] it 198: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 198: joint limit violated by 0.19 rad
+it  199 steps  19562496 sps   31,200 | ep_ret   -4.53 ep_len  930.8 (n=21) | pg -0.012 vf 0.003 kl 0.0171 lr 3.8e-04
+[anomaly] it 199: explained variance -2.39 < 0 after warm-up: value function not predicting returns
+[anomaly] it 199: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 199: joint limit violated by 0.19 rad
+[anomaly] it 199: contact penetration 2.1 cm
+it  200 steps  19660800 sps   31,180 | ep_ret   -4.43 ep_len  942.4 (n=28) | pg -0.012 vf 0.003 kl 0.0167 lr 3.8e-04
+[anomaly] it 200: explained variance -0.84 < 0 after warm-up: value function not predicting returns
+[anomaly] it 200: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 200: joint limit violated by 0.18 rad
+it  201 steps  19759104 sps   31,160 | ep_ret   -3.41 ep_len 1000.0 (n=14) | pg -0.008 vf 0.003 kl 0.0140 lr 2.6e-04
+[anomaly] it 201: explained variance -11.56 < 0 after warm-up: value function not predicting returns
+[anomaly] it 201: joint limit violated by 0.16 rad
+[anomaly] it 201: contact penetration 2.1 cm
+it  202 steps  19857408 sps   31,141 | ep_ret   -3.87 ep_len  987.0 (n=21) | pg -0.010 vf 0.004 kl 0.0162 lr 3.8e-04
+[anomaly] it 202: explained variance -12.59 < 0 after warm-up: value function not predicting returns
+[anomaly] it 202: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 202: joint limit violated by 0.17 rad
+it  203 steps  19955712 sps   31,121 | ep_ret   -4.32 ep_len  916.0 (n=20) | pg -0.010 vf 0.003 kl 0.0149 lr 3.8e-04
+[anomaly] it 203: explained variance -1.00 < 0 after warm-up: value function not predicting returns
+[anomaly] it 203: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 203: joint limit violated by 0.17 rad
+it  204 steps  20054016 sps   31,101 | ep_ret   -3.24 ep_len  931.6 (n=32) | pg -0.011 vf 0.002 kl 0.0153 lr 3.8e-04
+[anomaly] it 204: explained variance -0.77 < 0 after warm-up: value function not predicting returns
+[anomaly] it 204: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 204: joint limit violated by 0.20 rad
+it  205 steps  20152320 sps   31,082 | ep_ret   -2.72 ep_len  979.3 (n=49) | pg -0.009 vf 0.003 kl 0.0149 lr 3.8e-04
+[anomaly] it 205: explained variance -4.01 < 0 after warm-up: value function not predicting returns
+[anomaly] it 205: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 205: joint limit violated by 0.17 rad
+it  206 steps  20250624 sps   31,063 | ep_ret   -2.58 ep_len  995.4 (n=57) | pg -0.009 vf 0.003 kl 0.0150 lr 2.6e-04
+[anomaly] it 206: explained variance -8.78 < 0 after warm-up: value function not predicting returns
+[anomaly] it 206: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 206: joint limit violated by 0.17 rad
+it  207 steps  20348928 sps   31,044 | ep_ret   -2.70 ep_len  983.7 (n=78) | pg -0.010 vf 0.003 kl 0.0173 lr 3.8e-04
+[anomaly] it 207: explained variance -1.51 < 0 after warm-up: value function not predicting returns
+[anomaly] it 207: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 207: joint limit violated by 0.19 rad
+it  208 steps  20447232 sps   31,025 | ep_ret   -2.51 ep_len  992.7 (n=100) | pg -0.009 vf 0.003 kl 0.0161 lr 3.8e-04
+[anomaly] it 208: explained variance -1.59 < 0 after warm-up: value function not predicting returns
+[anomaly] it 208: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 208: joint limit violated by 0.18 rad
+it  209 steps  20545536 sps   31,006 | ep_ret   -2.36 ep_len  995.2 (n=117) | pg -0.012 vf 0.002 kl 0.0167 lr 3.8e-04
+[anomaly] it 209: explained variance -2.81 < 0 after warm-up: value function not predicting returns
+[anomaly] it 209: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 209: joint limit violated by 0.18 rad
+it  210 steps  20643840 sps   30,987 | ep_ret   -2.07 ep_len  990.9 (n=155) | pg -0.009 vf 0.002 kl 0.0164 lr 5.8e-04
+[anomaly] it 210: explained variance -0.95 < 0 after warm-up: value function not predicting returns
+[anomaly] it 210: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 210: joint limit violated by 0.17 rad
+it  211 steps  20742144 sps   30,969 | ep_ret   -1.54 ep_len  997.3 (n=181) | pg -0.012 vf 0.002 kl 0.0154 lr 3.8e-04
+[anomaly] it 211: explained variance -1.46 < 0 after warm-up: value function not predicting returns
+[anomaly] it 211: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 211: joint limit violated by 0.17 rad
+it  212 steps  20840448 sps   30,951 | ep_ret   -1.51 ep_len  998.3 (n=180) | pg -0.008 vf 0.003 kl 0.0134 lr 2.6e-04
+[anomaly] it 212: explained variance -1.84 < 0 after warm-up: value function not predicting returns
+[anomaly] it 212: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 212: joint limit violated by 0.17 rad
+it  213 steps  20938752 sps   30,934 | ep_ret   -1.54 ep_len  998.7 (n=215) | pg -0.011 vf 0.002 kl 0.0166 lr 3.8e-04
+[anomaly] it 213: explained variance -1.52 < 0 after warm-up: value function not predicting returns
+[anomaly] it 213: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 213: joint limit violated by 0.15 rad
+it  214 steps  21037056 sps   30,916 | ep_ret   -1.00 ep_len  998.1 (n=232) | pg -0.012 vf 0.002 kl 0.0175 lr 3.8e-04
+[anomaly] it 214: explained variance -4.38 < 0 after warm-up: value function not predicting returns
+[anomaly] it 214: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 214: joint limit violated by 0.19 rad
+it  215 steps  21135360 sps   30,899 | ep_ret   -0.95 ep_len 1000.0 (n=247) | pg -0.010 vf 0.002 kl 0.0175 lr 3.8e-04
+[anomaly] it 215: explained variance -9.68 < 0 after warm-up: value function not predicting returns
+[anomaly] it 215: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 215: joint limit violated by 0.16 rad
+it  216 steps  21233664 sps   30,882 | ep_ret   -0.75 ep_len  999.8 (n=266) | pg -0.012 vf 0.002 kl 0.0170 lr 3.8e-04
+[anomaly] it 216: explained variance -3.33 < 0 after warm-up: value function not predicting returns
+[anomaly] it 216: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 216: joint limit violated by 0.16 rad
+it  217 steps  21331968 sps   30,866 | ep_ret   -0.54 ep_len  998.6 (n=235) | pg -0.009 vf 0.002 kl 0.0148 lr 3.8e-04
+[anomaly] it 217: explained variance -2.46 < 0 after warm-up: value function not predicting returns
+[anomaly] it 217: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 217: joint limit violated by 0.19 rad
+[anomaly] it 217: contact penetration 2.3 cm
+it  218 steps  21430272 sps   30,850 | ep_ret   -0.34 ep_len  989.9 (n=224) | pg -0.012 vf 0.002 kl 0.0166 lr 3.8e-04
+[anomaly] it 218: explained variance -0.49 < 0 after warm-up: value function not predicting returns
+[anomaly] it 218: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 218: joint limit violated by 0.18 rad
+it  219 steps  21528576 sps   30,834 | ep_ret   -0.21 ep_len  994.3 (n=197) | pg -0.009 vf 0.002 kl 0.0168 lr 3.8e-04
+[anomaly] it 219: explained variance -1.76 < 0 after warm-up: value function not predicting returns
+[anomaly] it 219: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 219: joint limit violated by 0.17 rad
+it  220 steps  21626880 sps   30,818 | ep_ret   -0.08 ep_len 1000.0 (n=208) | pg -0.009 vf 0.002 kl 0.0163 lr 3.8e-04
+[anomaly] it 220: explained variance -10.55 < 0 after warm-up: value function not predicting returns
+[anomaly] it 220: joint limit violated by 0.22 rad
+it  221 steps  21725184 sps   30,803 | ep_ret    0.36 ep_len  993.6 (n=150) | pg -0.008 vf 0.003 kl 0.0157 lr 3.8e-04
+[anomaly] it 221: explained variance -6.50 < 0 after warm-up: value function not predicting returns
+[anomaly] it 221: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 221: joint limit violated by 0.18 rad
+it  222 steps  21823488 sps   30,787 | ep_ret    0.30 ep_len  974.2 (n=160) | pg -0.011 vf 0.002 kl 0.0161 lr 5.8e-04
+[anomaly] it 222: explained variance -1.34 < 0 after warm-up: value function not predicting returns
+[anomaly] it 222: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 222: joint limit violated by 0.16 rad
+it  223 steps  21921792 sps   30,772 | ep_ret    0.37 ep_len  975.0 (n=130) | pg -0.007 vf 0.002 kl 0.0161 lr 3.8e-04
+[anomaly] it 223: explained variance -0.96 < 0 after warm-up: value function not predicting returns
+[anomaly] it 223: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 223: joint limit violated by 0.16 rad
+it  224 steps  22020096 sps   30,757 | ep_ret    0.51 ep_len  984.1 (n=100) | pg -0.010 vf 0.002 kl 0.0153 lr 2.6e-04
+[anomaly] it 224: explained variance -1.29 < 0 after warm-up: value function not predicting returns
+[anomaly] it 224: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 224: joint limit violated by 0.18 rad
+it  225 steps  22118400 sps   30,742 | ep_ret    1.03 ep_len  994.7 (n=104) | pg -0.010 vf 0.002 kl 0.0124 lr 2.6e-04
+[anomaly] it 225: explained variance -3.59 < 0 after warm-up: value function not predicting returns
+[anomaly] it 225: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 225: joint limit violated by 0.17 rad
+it  226 steps  22216704 sps   30,728 | ep_ret    1.06 ep_len  978.7 (n=87) | pg -0.011 vf 0.002 kl 0.0163 lr 2.6e-04
+[anomaly] it 226: explained variance -0.82 < 0 after warm-up: value function not predicting returns
+[anomaly] it 226: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 226: joint limit violated by 0.17 rad
+it  227 steps  22315008 sps   30,713 | ep_ret    1.21 ep_len  990.3 (n=73) | pg -0.011 vf 0.001 kl 0.0170 lr 3.8e-04
+[anomaly] it 227: explained variance -2.62 < 0 after warm-up: value function not predicting returns
+[anomaly] it 227: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 227: joint limit violated by 0.20 rad
+it  228 steps  22413312 sps   30,698 | ep_ret    1.52 ep_len  990.4 (n=49) | pg -0.010 vf 0.001 kl 0.0160 lr 3.8e-04
+[anomaly] it 228: explained variance -3.44 < 0 after warm-up: value function not predicting returns
+[anomaly] it 228: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 228: joint limit violated by 0.17 rad
+it  229 steps  22511616 sps   30,683 | ep_ret    1.85 ep_len 1000.0 (n=52) | pg -0.007 vf 0.002 kl 0.0154 lr 3.8e-04
+[anomaly] it 229: explained variance -6.63 < 0 after warm-up: value function not predicting returns
+[anomaly] it 229: joint limit violated by 0.18 rad
+it  230 steps  22609920 sps   30,668 | ep_ret    1.43 ep_len  962.2 (n=52) | pg -0.010 vf 0.002 kl 0.0172 lr 2.6e-04
+[anomaly] it 230: explained variance -1.16 < 0 after warm-up: value function not predicting returns
+[anomaly] it 230: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 230: joint limit violated by 0.19 rad
+it  231 steps  22708224 sps   30,654 | ep_ret    1.81 ep_len  983.0 (n=41) | pg -0.008 vf 0.002 kl 0.0141 lr 2.6e-04
+[anomaly] it 231: explained variance -1.31 < 0 after warm-up: value function not predicting returns
+[anomaly] it 231: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 231: joint limit violated by 0.17 rad
+it  232 steps  22806528 sps   30,640 | ep_ret    2.40 ep_len 1000.0 (n=35) | pg -0.010 vf 0.002 kl 0.0146 lr 2.6e-04
+[anomaly] it 232: explained variance -5.08 < 0 after warm-up: value function not predicting returns
+[anomaly] it 232: joint limit violated by 0.16 rad
+it  233 steps  22904832 sps   30,626 | ep_ret    2.55 ep_len  995.9 (n=36) | pg -0.009 vf 0.002 kl 0.0166 lr 3.8e-04
+[anomaly] it 233: explained variance -5.02 < 0 after warm-up: value function not predicting returns
+[anomaly] it 233: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 233: joint limit violated by 0.18 rad
+it  234 steps  23003136 sps   30,613 | ep_ret    1.91 ep_len  954.1 (n=39) | pg -0.008 vf 0.002 kl 0.0162 lr 3.8e-04
+[anomaly] it 234: explained variance -1.03 < 0 after warm-up: value function not predicting returns
+[anomaly] it 234: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 234: joint limit violated by 0.17 rad
+it  235 steps  23101440 sps   30,600 | ep_ret    2.12 ep_len  931.1 (n=27) | pg -0.008 vf 0.003 kl 0.0166 lr 3.8e-04
+[anomaly] it 235: explained variance -0.81 < 0 after warm-up: value function not predicting returns
+[anomaly] it 235: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 235: joint limit violated by 0.15 rad
+it  236 steps  23199744 sps   30,587 | ep_ret    2.49 ep_len  979.2 (n=28) | pg -0.009 vf 0.002 kl 0.0133 lr 2.6e-04
+[anomaly] it 236: explained variance -4.33 < 0 after warm-up: value function not predicting returns
+[anomaly] it 236: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 236: joint limit violated by 0.16 rad
+it  237 steps  23298048 sps   30,574 | ep_ret    2.46 ep_len  948.8 (n=32) | pg -0.009 vf 0.002 kl 0.0152 lr 3.8e-04
+[anomaly] it 237: explained variance -0.95 < 0 after warm-up: value function not predicting returns
+[anomaly] it 237: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 237: joint limit violated by 0.17 rad
+it  238 steps  23396352 sps   30,562 | ep_ret    2.38 ep_len  947.0 (n=34) | pg -0.010 vf 0.002 kl 0.0162 lr 3.8e-04
+[anomaly] it 238: explained variance -0.16 < 0 after warm-up: value function not predicting returns
+[anomaly] it 238: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 238: joint limit violated by 0.17 rad
+it  239 steps  23494656 sps   30,549 | ep_ret    3.64 ep_len  985.4 (n=25) | pg -0.008 vf 0.003 kl 0.0154 lr 3.8e-04
+[anomaly] it 239: explained variance -1.67 < 0 after warm-up: value function not predicting returns
+[anomaly] it 239: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 239: joint limit violated by 0.16 rad
+it  240 steps  23592960 sps   30,537 | ep_ret    2.56 ep_len  950.4 (n=22) | pg -0.010 vf 0.002 kl 0.0153 lr 3.8e-04
+[anomaly] it 240: explained variance -0.44 < 0 after warm-up: value function not predicting returns
+[anomaly] it 240: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 240: joint limit violated by 0.16 rad
+it  241 steps  23691264 sps   30,526 | ep_ret    3.66 ep_len  979.8 (n=21) | pg -0.009 vf 0.002 kl 0.0158 lr 3.8e-04
+[anomaly] it 241: explained variance -3.36 < 0 after warm-up: value function not predicting returns
+[anomaly] it 241: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 241: joint limit violated by 0.19 rad
+it  242 steps  23789568 sps   30,513 | ep_ret    3.14 ep_len  957.6 (n=21) | pg -0.008 vf 0.002 kl 0.0147 lr 2.6e-04
+[anomaly] it 242: explained variance -1.51 < 0 after warm-up: value function not predicting returns
+[anomaly] it 242: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 242: joint limit violated by 0.17 rad
+it  243 steps  23887872 sps   30,501 | ep_ret    3.07 ep_len  946.8 (n=21) | pg -0.008 vf 0.002 kl 0.0154 lr 3.8e-04
+[anomaly] it 243: explained variance -0.31 < 0 after warm-up: value function not predicting returns
+[anomaly] it 243: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 243: joint limit violated by 0.15 rad
+it  244 steps  23986176 sps   30,490 | ep_ret    3.11 ep_len  947.7 (n=24) | pg -0.008 vf 0.002 kl 0.0147 lr 2.6e-04
+[anomaly] it 244: explained variance -0.29 < 0 after warm-up: value function not predicting returns
+[anomaly] it 244: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 244: joint limit violated by 0.16 rad
+it  245 steps  24084480 sps   30,478 | ep_ret    4.11 ep_len  960.0 (n=29) | pg -0.006 vf 0.003 kl 0.0134 lr 1.7e-04
+[anomaly] it 245: explained variance -2.15 < 0 after warm-up: value function not predicting returns
+[anomaly] it 245: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 245: joint limit violated by 0.21 rad
+[anomaly] it 245: contact penetration 2.1 cm
+it  246 steps  24182784 sps   30,466 | ep_ret    3.97 ep_len  962.5 (n=31) | pg -0.008 vf 0.002 kl 0.0148 lr 3.8e-04
+[anomaly] it 246: explained variance -1.69 < 0 after warm-up: value function not predicting returns
+[anomaly] it 246: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 246: joint limit violated by 0.20 rad
+[anomaly] it 246: contact penetration 2.1 cm
+it  247 steps  24281088 sps   30,455 | ep_ret    4.17 ep_len  990.4 (n=57) | pg -0.008 vf 0.003 kl 0.0143 lr 2.6e-04
+[anomaly] it 247: explained variance -1.64 < 0 after warm-up: value function not predicting returns
+[anomaly] it 247: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 247: joint limit violated by 0.18 rad
+it  248 steps  24379392 sps   30,444 | ep_ret    4.68 ep_len  988.4 (n=59) | pg -0.009 vf 0.002 kl 0.0165 lr 3.8e-04
+[anomaly] it 248: explained variance -1.13 < 0 after warm-up: value function not predicting returns
+[anomaly] it 248: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 248: joint limit violated by 0.15 rad
+[anomaly] it 248: contact penetration 2.5 cm
+it  249 steps  24477696 sps   30,434 | ep_ret    4.68 ep_len  989.9 (n=99) | pg -0.007 vf 0.002 kl 0.0147 lr 2.6e-04
+[anomaly] it 249: explained variance -0.28 < 0 after warm-up: value function not predicting returns
+[anomaly] it 249: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 249: joint limit violated by 0.18 rad
+it  250 steps  24576000 sps   30,423 | ep_ret    4.88 ep_len  984.6 (n=98) | pg -0.009 vf 0.001 kl 0.0132 lr 2.6e-04
+[anomaly] it 250: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 250: joint limit violated by 0.17 rad
+[anomaly] it 250: contact penetration 2.0 cm
+it  251 steps  24674304 sps   30,413 | ep_ret    5.23 ep_len 1000.0 (n=139) | pg -0.007 vf 0.002 kl 0.0134 lr 1.7e-04
+[anomaly] it 251: explained variance -3.55 < 0 after warm-up: value function not predicting returns
+[anomaly] it 251: joint limit violated by 0.17 rad
+it  252 steps  24772608 sps   30,402 | ep_ret    5.28 ep_len  996.3 (n=157) | pg -0.011 vf 0.001 kl 0.0141 lr 3.8e-04
+[anomaly] it 252: explained variance -0.15 < 0 after warm-up: value function not predicting returns
+[anomaly] it 252: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 252: joint limit violated by 0.17 rad
+it  253 steps  24870912 sps   30,392 | ep_ret    5.49 ep_len  999.6 (n=177) | pg -0.007 vf 0.002 kl 0.0147 lr 2.6e-04
+[anomaly] it 253: explained variance -0.35 < 0 after warm-up: value function not predicting returns
+[anomaly] it 253: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 253: joint limit violated by 0.16 rad
+it  254 steps  24969216 sps   30,382 | ep_ret    5.67 ep_len 1000.0 (n=183) | pg -0.007 vf 0.002 kl 0.0136 lr 2.6e-04
+[anomaly] it 254: explained variance -5.13 < 0 after warm-up: value function not predicting returns
+[anomaly] it 254: joint limit violated by 0.19 rad
+it  255 steps  25067520 sps   30,372 | ep_ret    5.74 ep_len  996.3 (n=218) | pg -0.008 vf 0.002 kl 0.0158 lr 3.8e-04
+[anomaly] it 255: explained variance -1.18 < 0 after warm-up: value function not predicting returns
+[anomaly] it 255: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 255: joint limit violated by 0.15 rad
+it  256 steps  25165824 sps   30,362 | ep_ret    6.00 ep_len  999.3 (n=239) | pg -0.008 vf 0.002 kl 0.0137 lr 2.6e-04
+[anomaly] it 256: explained variance -2.17 < 0 after warm-up: value function not predicting returns
+[anomaly] it 256: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 256: joint limit violated by 0.19 rad
+it  257 steps  25264128 sps   30,352 | ep_ret    6.01 ep_len  995.8 (n=244) | pg -0.010 vf 0.002 kl 0.0148 lr 3.8e-04
+[anomaly] it 257: explained variance -4.34 < 0 after warm-up: value function not predicting returns
+[anomaly] it 257: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 257: joint limit violated by 0.17 rad
+it  258 steps  25362432 sps   30,342 | ep_ret    6.11 ep_len  993.2 (n=277) | pg -0.006 vf 0.003 kl 0.0141 lr 1.1e-04
+[anomaly] it 258: explained variance -0.62 < 0 after warm-up: value function not predicting returns
+[anomaly] it 258: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 258: joint limit violated by 0.17 rad
+it  259 steps  25460736 sps   30,333 | ep_ret    6.26 ep_len  999.6 (n=206) | pg -0.008 vf 0.003 kl 0.0115 lr 2.6e-04
+[anomaly] it 259: explained variance -3.12 < 0 after warm-up: value function not predicting returns
+[anomaly] it 259: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 259: joint limit violated by 0.16 rad
+it  260 steps  25559040 sps   30,324 | ep_ret    6.24 ep_len  990.3 (n=209) | pg -0.007 vf 0.002 kl 0.0143 lr 2.6e-04
+[anomaly] it 260: explained variance -0.90 < 0 after warm-up: value function not predicting returns
+[anomaly] it 260: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 260: joint limit violated by 0.15 rad
+it  261 steps  25657344 sps   30,314 | ep_ret    6.40 ep_len  991.0 (n=209) | pg -0.006 vf 0.002 kl 0.0127 lr 1.7e-04
+[anomaly] it 261: explained variance -0.02 < 0 after warm-up: value function not predicting returns
+[anomaly] it 261: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 261: joint limit violated by 0.15 rad
+it  262 steps  25755648 sps   30,305 | ep_ret    6.52 ep_len  999.8 (n=175) | pg -0.008 vf 0.002 kl 0.0148 lr 3.8e-04
+[anomaly] it 262: explained variance -1.60 < 0 after warm-up: value function not predicting returns
+[anomaly] it 262: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 262: joint limit violated by 0.15 rad
+it  263 steps  25853952 sps   30,296 | ep_ret    6.53 ep_len  991.3 (n=168) | pg -0.005 vf 0.003 kl 0.0133 lr 1.7e-04
+[anomaly] it 263: explained variance -0.76 < 0 after warm-up: value function not predicting returns
+[anomaly] it 263: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 263: joint limit violated by 0.19 rad
+it  264 steps  25952256 sps   30,287 | ep_ret    6.71 ep_len  988.9 (n=144) | pg -0.008 vf 0.002 kl 0.0154 lr 3.8e-04
+[anomaly] it 264: explained variance -1.66 < 0 after warm-up: value function not predicting returns
+[anomaly] it 264: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 264: joint limit violated by 0.18 rad
+it  265 steps  26050560 sps   30,278 | ep_ret    6.72 ep_len  981.9 (n=110) | pg -0.005 vf 0.003 kl 0.0142 lr 1.7e-04
+[anomaly] it 265: explained variance -1.53 < 0 after warm-up: value function not predicting returns
+[anomaly] it 265: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 265: joint limit violated by 0.18 rad
+it  266 steps  26148864 sps   30,269 | ep_ret    6.82 ep_len  987.3 (n=116) | pg -0.006 vf 0.003 kl 0.0128 lr 1.7e-04
+[anomaly] it 266: explained variance -1.19 < 0 after warm-up: value function not predicting returns
+[anomaly] it 266: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 266: joint limit violated by 0.16 rad
+it  267 steps  26247168 sps   30,261 | ep_ret    6.89 ep_len  998.9 (n=92) | pg -0.007 vf 0.003 kl 0.0128 lr 1.7e-04
+[anomaly] it 267: explained variance -4.53 < 0 after warm-up: value function not predicting returns
+[anomaly] it 267: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 267: joint limit violated by 0.17 rad
+it  268 steps  26345472 sps   30,252 | ep_ret    6.68 ep_len  976.8 (n=84) | pg -0.007 vf 0.003 kl 0.0135 lr 2.6e-04
+[anomaly] it 268: explained variance -1.71 < 0 after warm-up: value function not predicting returns
+[anomaly] it 268: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 268: joint limit violated by 0.17 rad
+it  269 steps  26443776 sps   30,244 | ep_ret    7.05 ep_len  976.5 (n=60) | pg -0.009 vf 0.001 kl 0.0156 lr 2.6e-04
+[anomaly] it 269: explained variance -1.53 < 0 after warm-up: value function not predicting returns
+[anomaly] it 269: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 269: joint limit violated by 0.16 rad
+it  270 steps  26542080 sps   30,236 | ep_ret    6.91 ep_len  964.9 (n=62) | pg -0.010 vf 0.001 kl 0.0143 lr 3.8e-04
+[anomaly] it 270: explained variance -0.22 < 0 after warm-up: value function not predicting returns
+[anomaly] it 270: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 270: joint limit violated by 0.16 rad
+it  271 steps  26640384 sps   30,228 | ep_ret    7.51 ep_len 1000.0 (n=42) | pg -0.008 vf 0.001 kl 0.0132 lr 2.6e-04
+[anomaly] it 271: explained variance -1.32 < 0 after warm-up: value function not predicting returns
+[anomaly] it 271: joint limit violated by 0.19 rad
+it  272 steps  26738688 sps   30,220 | ep_ret    7.66 ep_len 1000.0 (n=52) | pg -0.006 vf 0.002 kl 0.0149 lr 3.8e-04
+[anomaly] it 272: explained variance -2.26 < 0 after warm-up: value function not predicting returns
+[anomaly] it 272: joint limit violated by 0.16 rad
+it  273 steps  26836992 sps   30,212 | ep_ret    7.45 ep_len  997.1 (n=32) | pg -0.005 vf 0.003 kl 0.0144 lr 1.7e-04
+[anomaly] it 273: explained variance -2.72 < 0 after warm-up: value function not predicting returns
+[anomaly] it 273: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 273: joint limit violated by 0.18 rad
+it  274 steps  26935296 sps   30,204 | ep_ret    7.01 ep_len  950.8 (n=41) | pg -0.007 vf 0.002 kl 0.0163 lr 3.8e-04
+[anomaly] it 274: explained variance -0.99 < 0 after warm-up: value function not predicting returns
+[anomaly] it 274: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 274: joint limit violated by 0.16 rad
+it  275 steps  27033600 sps   30,196 | ep_ret    7.12 ep_len  952.1 (n=40) | pg -0.008 vf 0.002 kl 0.0142 lr 2.6e-04
+[anomaly] it 275: explained variance -0.59 < 0 after warm-up: value function not predicting returns
+[anomaly] it 275: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 275: joint limit violated by 0.16 rad
+it  276 steps  27131904 sps   30,189 | ep_ret    7.60 ep_len  987.6 (n=35) | pg -0.007 vf 0.002 kl 0.0143 lr 1.7e-04
+[anomaly] it 276: explained variance -3.20 < 0 after warm-up: value function not predicting returns
+[anomaly] it 276: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 276: joint limit violated by 0.16 rad
+it  277 steps  27230208 sps   30,181 | ep_ret    7.01 ep_len  944.3 (n=32) | pg -0.006 vf 0.003 kl 0.0141 lr 2.6e-04
+[anomaly] it 277: explained variance -1.35 < 0 after warm-up: value function not predicting returns
+[anomaly] it 277: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 277: joint limit violated by 0.18 rad
+it  278 steps  27328512 sps   30,173 | ep_ret    6.58 ep_len  922.2 (n=33) | pg -0.007 vf 0.002 kl 0.0137 lr 1.7e-04
+[anomaly] it 278: explained variance -0.09 < 0 after warm-up: value function not predicting returns
+[anomaly] it 278: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 278: joint limit violated by 0.19 rad
+it  279 steps  27426816 sps   30,166 | ep_ret    7.52 ep_len  939.8 (n=33) | pg -0.008 vf 0.002 kl 0.0166 lr 3.8e-04
+[anomaly] it 279: explained variance -0.65 < 0 after warm-up: value function not predicting returns
+[anomaly] it 279: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 279: joint limit violated by 0.16 rad
+it  280 steps  27525120 sps   30,158 | ep_ret    7.80 ep_len  966.3 (n=32) | pg -0.007 vf 0.002 kl 0.0147 lr 2.6e-04
+[anomaly] it 280: explained variance -0.82 < 0 after warm-up: value function not predicting returns
+[anomaly] it 280: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 280: joint limit violated by 0.18 rad
+it  281 steps  27623424 sps   30,151 | ep_ret    7.49 ep_len  961.4 (n=23) | pg -0.006 vf 0.002 kl 0.0130 lr 1.1e-04
+[anomaly] it 281: explained variance -0.91 < 0 after warm-up: value function not predicting returns
+[anomaly] it 281: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 281: joint limit violated by 0.16 rad
+it  282 steps  27721728 sps   30,143 | ep_ret    7.57 ep_len  965.3 (n=26) | pg -0.010 vf 0.001 kl 0.0106 lr 2.6e-04
+[anomaly] it 282: explained variance -1.97 < 0 after warm-up: value function not predicting returns
+[anomaly] it 282: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 282: joint limit violated by 0.19 rad
+it  283 steps  27820032 sps   30,136 | ep_ret    7.34 ep_len  928.2 (n=26) | pg -0.008 vf 0.001 kl 0.0147 lr 3.8e-04
+[anomaly] it 283: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 283: joint limit violated by 0.18 rad
+it  284 steps  27918336 sps   30,129 | ep_ret    8.23 ep_len  978.4 (n=20) | pg -0.006 vf 0.001 kl 0.0143 lr 2.6e-04
+[anomaly] it 284: explained variance -0.38 < 0 after warm-up: value function not predicting returns
+[anomaly] it 284: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 284: joint limit violated by 0.17 rad
+it  285 steps  28016640 sps   30,122 | ep_ret    8.42 ep_len  993.0 (n=27) | pg -0.007 vf 0.002 kl 0.0140 lr 2.6e-04
+[anomaly] it 285: explained variance -0.33 < 0 after warm-up: value function not predicting returns
+[anomaly] it 285: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 285: joint limit violated by 0.18 rad
+it  286 steps  28114944 sps   30,115 | ep_ret    8.83 ep_len 1000.0 (n=24) | pg -0.006 vf 0.002 kl 0.0138 lr 1.7e-04
+[anomaly] it 286: explained variance -3.59 < 0 after warm-up: value function not predicting returns
+[anomaly] it 286: joint limit violated by 0.18 rad
+it  287 steps  28213248 sps   30,107 | ep_ret    8.02 ep_len  964.0 (n=31) | pg -0.006 vf 0.003 kl 0.0130 lr 1.7e-04
+[anomaly] it 287: explained variance -1.01 < 0 after warm-up: value function not predicting returns
+[anomaly] it 287: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 287: joint limit violated by 0.20 rad
+it  288 steps  28311552 sps   30,101 | ep_ret    8.04 ep_len  955.4 (n=53) | pg -0.009 vf 0.002 kl 0.0156 lr 3.8e-04
+[anomaly] it 288: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 288: joint limit violated by 0.18 rad
+it  289 steps  28409856 sps   30,094 | ep_ret    8.88 ep_len  994.1 (n=45) | pg -0.006 vf 0.002 kl 0.0129 lr 1.7e-04
+[anomaly] it 289: explained variance -1.29 < 0 after warm-up: value function not predicting returns
+[anomaly] it 289: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 289: joint limit violated by 0.16 rad
+it  290 steps  28508160 sps   30,086 | ep_ret    8.91 ep_len  992.8 (n=74) | pg -0.006 vf 0.003 kl 0.0134 lr 1.7e-04
+[anomaly] it 290: explained variance -4.01 < 0 after warm-up: value function not predicting returns
+[anomaly] it 290: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 290: joint limit violated by 0.17 rad
+it  291 steps  28606464 sps   30,080 | ep_ret    8.65 ep_len  984.1 (n=100) | pg -0.008 vf 0.002 kl 0.0153 lr 2.6e-04
+[anomaly] it 291: explained variance -0.64 < 0 after warm-up: value function not predicting returns
+[anomaly] it 291: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 291: joint limit violated by 0.16 rad
+it  292 steps  28704768 sps   30,073 | ep_ret    9.02 ep_len  994.7 (n=111) | pg -0.006 vf 0.003 kl 0.0138 lr 1.1e-04
+[anomaly] it 292: explained variance -2.56 < 0 after warm-up: value function not predicting returns
+[anomaly] it 292: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 292: joint limit violated by 0.16 rad
+it  293 steps  28803072 sps   30,066 | ep_ret    8.97 ep_len  994.7 (n=144) | pg -0.008 vf 0.002 kl 0.0124 lr 2.6e-04
+[anomaly] it 293: explained variance -0.53 < 0 after warm-up: value function not predicting returns
+[anomaly] it 293: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 293: joint limit violated by 0.16 rad
+it  294 steps  28901376 sps   30,060 | ep_ret    9.19 ep_len  995.4 (n=175) | pg -0.007 vf 0.002 kl 0.0156 lr 3.8e-04
+[anomaly] it 294: explained variance -1.55 < 0 after warm-up: value function not predicting returns
+[anomaly] it 294: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 294: joint limit violated by 0.19 rad
+it  295 steps  28999680 sps   30,053 | ep_ret    9.17 ep_len  993.8 (n=172) | pg -0.008 vf 0.001 kl 0.0153 lr 3.8e-04
+[anomaly] it 295: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 295: joint limit violated by 0.23 rad
+it  296 steps  29097984 sps   30,046 | ep_ret    9.39 ep_len 1000.0 (n=188) | pg -0.006 vf 0.001 kl 0.0153 lr 3.8e-04
+[anomaly] it 296: explained variance -1.14 < 0 after warm-up: value function not predicting returns
+[anomaly] it 296: joint limit violated by 0.15 rad
+it  297 steps  29196288 sps   30,040 | ep_ret    9.47 ep_len 1000.0 (n=211) | pg -0.006 vf 0.002 kl 0.0139 lr 2.6e-04
+[anomaly] it 297: explained variance -2.34 < 0 after warm-up: value function not predicting returns
+[anomaly] it 297: joint limit violated by 0.17 rad
+it  298 steps  29294592 sps   30,033 | ep_ret    9.50 ep_len  997.8 (n=245) | pg -0.007 vf 0.002 kl 0.0129 lr 1.7e-04
+[anomaly] it 298: explained variance -2.35 < 0 after warm-up: value function not predicting returns
+[anomaly] it 298: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 298: joint limit violated by 0.16 rad
+it  299 steps  29392896 sps   30,027 | ep_ret    9.59 ep_len  999.1 (n=255) | pg -0.006 vf 0.003 kl 0.0130 lr 1.1e-04
+[anomaly] it 299: explained variance -0.75 < 0 after warm-up: value function not predicting returns
+[anomaly] it 299: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 299: joint limit violated by 0.17 rad
+it  300 steps  29491200 sps   30,020 | ep_ret    9.68 ep_len  997.1 (n=256) | pg -0.007 vf 0.004 kl 0.0139 lr 2.6e-04
+[anomaly] it 300: explained variance -1.77 < 0 after warm-up: value function not predicting returns
+[anomaly] it 300: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 300: joint limit violated by 0.16 rad
+it  301 steps  29589504 sps   30,014 | ep_ret    9.61 ep_len  991.8 (n=204) | pg -0.006 vf 0.003 kl 0.0145 lr 1.1e-04
+[anomaly] it 301: explained variance -2.92 < 0 after warm-up: value function not predicting returns
+[anomaly] it 301: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 301: joint limit violated by 0.16 rad
+it  302 steps  29687808 sps   30,008 | ep_ret    9.51 ep_len  989.4 (n=208) | pg -0.007 vf 0.003 kl 0.0135 lr 2.6e-04
+[anomaly] it 302: explained variance -0.66 < 0 after warm-up: value function not predicting returns
+[anomaly] it 302: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 302: joint limit violated by 0.21 rad
+it  303 steps  29786112 sps   30,002 | ep_ret    9.77 ep_len  991.7 (n=211) | pg -0.007 vf 0.002 kl 0.0134 lr 1.7e-04
+[anomaly] it 303: explained variance -0.26 < 0 after warm-up: value function not predicting returns
+[anomaly] it 303: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 303: joint limit violated by 0.16 rad
+it  304 steps  29884416 sps   29,996 | ep_ret    9.77 ep_len  995.3 (n=153) | pg -0.008 vf 0.002 kl 0.0147 lr 3.8e-04
+[anomaly] it 304: explained variance -1.59 < 0 after warm-up: value function not predicting returns
+[anomaly] it 304: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 304: joint limit violated by 0.15 rad
+it  305 steps  29982720 sps   29,990 | ep_ret    9.79 ep_len  987.6 (n=160) | pg -0.005 vf 0.002 kl 0.0127 lr 1.7e-04
+[anomaly] it 305: explained variance -1.00 < 0 after warm-up: value function not predicting returns
+[anomaly] it 305: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 305: joint limit violated by 0.17 rad
+it  306 steps  30081024 sps   29,984 | ep_ret    9.98 ep_len  999.6 (n=130) | pg -0.007 vf 0.002 kl 0.0137 lr 2.6e-04
+[anomaly] it 306: explained variance -2.83 < 0 after warm-up: value function not predicting returns
+[anomaly] it 306: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 306: joint limit violated by 0.15 rad
+it  307 steps  30179328 sps   29,978 | ep_ret   10.00 ep_len  983.9 (n=102) | pg -0.006 vf 0.002 kl 0.0141 lr 1.7e-04
+[anomaly] it 307: explained variance -1.95 < 0 after warm-up: value function not predicting returns
+[anomaly] it 307: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 307: joint limit violated by 0.16 rad
+it  308 steps  30277632 sps   29,972 | ep_ret    9.88 ep_len  982.0 (n=117) | pg -0.006 vf 0.002 kl 0.0142 lr 2.6e-04
+[anomaly] it 308: explained variance -0.93 < 0 after warm-up: value function not predicting returns
+[anomaly] it 308: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 308: joint limit violated by 0.18 rad
+it  309 steps  30375936 sps   29,967 | ep_ret   10.15 ep_len  998.6 (n=78) | pg -0.007 vf 0.002 kl 0.0155 lr 3.8e-04
+[anomaly] it 309: explained variance -1.61 < 0 after warm-up: value function not predicting returns
+[anomaly] it 309: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 309: joint limit violated by 0.16 rad
+it  310 steps  30474240 sps   29,961 | ep_ret   10.00 ep_len  982.5 (n=79) | pg -0.006 vf 0.002 kl 0.0142 lr 2.6e-04
+[anomaly] it 310: explained variance -1.64 < 0 after warm-up: value function not predicting returns
+[anomaly] it 310: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 310: joint limit violated by 0.17 rad
+it  311 steps  30572544 sps   29,955 | ep_ret    9.93 ep_len  976.3 (n=58) | pg -0.006 vf 0.002 kl 0.0156 lr 3.8e-04
+[anomaly] it 311: explained variance -1.13 < 0 after warm-up: value function not predicting returns
+[anomaly] it 311: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 311: joint limit violated by 0.17 rad
+it  312 steps  30670848 sps   29,950 | ep_ret   10.35 ep_len 1000.0 (n=59) | pg -0.007 vf 0.001 kl 0.0150 lr 2.6e-04
+[anomaly] it 312: explained variance -2.40 < 0 after warm-up: value function not predicting returns
+[anomaly] it 312: joint limit violated by 0.19 rad
+it  313 steps  30769152 sps   29,944 | ep_ret   10.20 ep_len  989.0 (n=46) | pg -0.007 vf 0.002 kl 0.0138 lr 1.7e-04
+[anomaly] it 313: explained variance -0.44 < 0 after warm-up: value function not predicting returns
+[anomaly] it 313: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 313: joint limit violated by 0.17 rad
+it  314 steps  30867456 sps   29,939 | ep_ret   10.16 ep_len  987.8 (n=44) | pg -0.007 vf 0.003 kl 0.0152 lr 2.6e-04
+[anomaly] it 314: explained variance -1.89 < 0 after warm-up: value function not predicting returns
+[anomaly] it 314: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 314: joint limit violated by 0.16 rad
+it  315 steps  30965760 sps   29,933 | ep_ret   10.07 ep_len  968.4 (n=38) | pg -0.006 vf 0.004 kl 0.0135 lr 1.7e-04
+[anomaly] it 315: explained variance -3.69 < 0 after warm-up: value function not predicting returns
+[anomaly] it 315: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 315: joint limit violated by 0.16 rad
+it  316 steps  31064064 sps   29,928 | ep_ret    9.49 ep_len  934.4 (n=47) | pg -0.007 vf 0.003 kl 0.0134 lr 1.7e-04
+[anomaly] it 316: explained variance -1.28 < 0 after warm-up: value function not predicting returns
+[anomaly] it 316: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 316: joint limit violated by 0.18 rad
+it  317 steps  31162368 sps   29,923 | ep_ret    9.32 ep_len  931.4 (n=49) | pg -0.007 vf 0.003 kl 0.0147 lr 2.6e-04
+[anomaly] it 317: explained variance -3.03 < 0 after warm-up: value function not predicting returns
+[anomaly] it 317: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 317: joint limit violated by 0.19 rad
+it  318 steps  31260672 sps   29,918 | ep_ret    8.19 ep_len  879.8 (n=33) | pg -0.006 vf 0.004 kl 0.0136 lr 1.7e-04
+[anomaly] it 318: explained variance -0.25 < 0 after warm-up: value function not predicting returns
+[anomaly] it 318: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 318: joint limit violated by 0.18 rad
+it  319 steps  31358976 sps   29,913 | ep_ret    9.85 ep_len  961.5 (n=33) | pg -0.006 vf 0.003 kl 0.0144 lr 1.7e-04
+[anomaly] it 319: explained variance -2.46 < 0 after warm-up: value function not predicting returns
+[anomaly] it 319: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 319: joint limit violated by 0.19 rad
+[anomaly] it 319: contact penetration 2.4 cm
+it  320 steps  31457280 sps   29,908 | ep_ret    8.96 ep_len  909.1 (n=42) | pg -0.006 vf 0.003 kl 0.0132 lr 2.6e-04
+[anomaly] it 320: explained variance -0.20 < 0 after warm-up: value function not predicting returns
+[anomaly] it 320: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 320: joint limit violated by 0.17 rad
+it  321 steps  31555584 sps   29,903 | ep_ret   10.63 ep_len  982.6 (n=33) | pg -0.007 vf 0.003 kl 0.0140 lr 2.6e-04
+[anomaly] it 321: explained variance -3.53 < 0 after warm-up: value function not predicting returns
+[anomaly] it 321: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 321: joint limit violated by 0.16 rad
+it  322 steps  31653888 sps   29,898 | ep_ret    9.09 ep_len  922.7 (n=29) | pg -0.006 vf 0.002 kl 0.0132 lr 1.7e-04
+[anomaly] it 322: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 322: joint limit violated by 0.18 rad
+it  323 steps  31752192 sps   29,893 | ep_ret   10.82 ep_len  982.2 (n=24) | pg -0.008 vf 0.001 kl 0.0129 lr 1.7e-04
+[anomaly] it 323: explained variance -0.60 < 0 after warm-up: value function not predicting returns
+[anomaly] it 323: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 323: joint limit violated by 0.18 rad
+it  324 steps  31850496 sps   29,889 | ep_ret   10.63 ep_len  980.0 (n=26) | pg -0.007 vf 0.002 kl 0.0123 lr 1.7e-04
+[anomaly] it 324: explained variance -0.45 < 0 after warm-up: value function not predicting returns
+[anomaly] it 324: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 324: joint limit violated by 0.16 rad
+it  325 steps  31948800 sps   29,884 | ep_ret   11.09 ep_len 1000.0 (n=30) | pg -0.007 vf 0.002 kl 0.0137 lr 2.6e-04
+[anomaly] it 325: explained variance -3.60 < 0 after warm-up: value function not predicting returns
+[anomaly] it 325: joint limit violated by 0.17 rad
+it  326 steps  32047104 sps   29,879 | ep_ret    8.62 ep_len  910.8 (n=23) | pg -0.006 vf 0.003 kl 0.0128 lr 1.7e-04
+[anomaly] it 326: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 326: joint limit violated by 0.16 rad
+it  327 steps  32145408 sps   29,874 | ep_ret   11.43 ep_len 1000.0 (n=26) | pg -0.007 vf 0.003 kl 0.0146 lr 1.7e-04
+[anomaly] it 327: explained variance -4.95 < 0 after warm-up: value function not predicting returns
+[anomaly] it 327: joint limit violated by 0.16 rad
+it  328 steps  32243712 sps   29,870 | ep_ret    9.18 ep_len  910.3 (n=27) | pg -0.006 vf 0.003 kl 0.0120 lr 1.1e-04
+[anomaly] it 328: explained variance -0.74 < 0 after warm-up: value function not predicting returns
+[anomaly] it 328: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 328: joint limit violated by 0.19 rad
+it  329 steps  32342016 sps   29,865 | ep_ret   10.48 ep_len  965.7 (n=41) | pg -0.007 vf 0.003 kl 0.0130 lr 2.6e-04
+[anomaly] it 329: explained variance -0.94 < 0 after warm-up: value function not predicting returns
+[anomaly] it 329: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 329: joint limit violated by 0.16 rad
+it  330 steps  32440320 sps   29,860 | ep_ret   11.31 ep_len  995.4 (n=57) | pg -0.006 vf 0.002 kl 0.0168 lr 3.8e-04
+[anomaly] it 330: explained variance -2.58 < 0 after warm-up: value function not predicting returns
+[anomaly] it 330: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 330: joint limit violated by 0.16 rad
+it  331 steps  32538624 sps   29,856 | ep_ret   11.27 ep_len 1000.0 (n=52) | pg -0.005 vf 0.002 kl 0.0146 lr 2.6e-04
+[anomaly] it 331: explained variance -4.29 < 0 after warm-up: value function not predicting returns
+[anomaly] it 331: joint limit violated by 0.19 rad
+it  332 steps  32636928 sps   29,851 | ep_ret   11.15 ep_len  993.1 (n=86) | pg -0.006 vf 0.001 kl 0.0157 lr 3.8e-04
+[anomaly] it 332: explained variance -1.19 < 0 after warm-up: value function not predicting returns
+[anomaly] it 332: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 332: joint limit violated by 0.16 rad
+it  333 steps  32735232 sps   29,847 | ep_ret   11.26 ep_len  988.4 (n=100) | pg -0.007 vf 0.001 kl 0.0152 lr 3.8e-04
+[anomaly] it 333: explained variance -0.15 < 0 after warm-up: value function not predicting returns
+[anomaly] it 333: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 333: joint limit violated by 0.19 rad
+it  334 steps  32833536 sps   29,842 | ep_ret   11.52 ep_len 1000.0 (n=113) | pg -0.005 vf 0.002 kl 0.0153 lr 2.6e-04
+[anomaly] it 334: explained variance -1.37 < 0 after warm-up: value function not predicting returns
+[anomaly] it 334: joint limit violated by 0.18 rad
+it  335 steps  32931840 sps   29,838 | ep_ret   11.67 ep_len  998.8 (n=154) | pg -0.007 vf 0.001 kl 0.0148 lr 3.8e-04
+[anomaly] it 335: explained variance -1.01 < 0 after warm-up: value function not predicting returns
+[anomaly] it 335: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 335: joint limit violated by 0.17 rad
+it  336 steps  33030144 sps   29,834 | ep_ret   11.61 ep_len  997.4 (n=170) | pg -0.006 vf 0.001 kl 0.0134 lr 1.7e-04
+[anomaly] it 336: explained variance -1.16 < 0 after warm-up: value function not predicting returns
+[anomaly] it 336: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 336: joint limit violated by 0.15 rad
+it  337 steps  33128448 sps   29,830 | ep_ret   11.76 ep_len  999.3 (n=171) | pg -0.007 vf 0.002 kl 0.0125 lr 2.6e-04
+[anomaly] it 337: explained variance -0.24 < 0 after warm-up: value function not predicting returns
+[anomaly] it 337: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 337: joint limit violated by 0.15 rad
+it  338 steps  33226752 sps   29,826 | ep_ret   11.78 ep_len 1000.0 (n=198) | pg -0.006 vf 0.002 kl 0.0147 lr 2.6e-04
+[anomaly] it 338: explained variance -1.70 < 0 after warm-up: value function not predicting returns
+[anomaly] it 338: joint limit violated by 0.16 rad
+it  339 steps  33325056 sps   29,822 | ep_ret   11.81 ep_len  997.0 (n=224) | pg -0.006 vf 0.002 kl 0.0152 lr 3.8e-04
+[anomaly] it 339: explained variance -0.29 < 0 after warm-up: value function not predicting returns
+[anomaly] it 339: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 339: joint limit violated by 0.16 rad
+it  340 steps  33423360 sps   29,818 | ep_ret   11.96 ep_len  997.3 (n=236) | pg -0.006 vf 0.002 kl 0.0132 lr 1.7e-04
+[anomaly] it 340: explained variance -1.65 < 0 after warm-up: value function not predicting returns
+[anomaly] it 340: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 340: joint limit violated by 0.16 rad
+it  341 steps  33521664 sps   29,815 | ep_ret   11.96 ep_len  996.8 (n=255) | pg -0.006 vf 0.002 kl 0.0123 lr 1.7e-04
+[anomaly] it 341: explained variance -2.14 < 0 after warm-up: value function not predicting returns
+[anomaly] it 341: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 341: joint limit violated by 0.19 rad
+it  342 steps  33619968 sps   29,811 | ep_ret   12.00 ep_len  995.4 (n=227) | pg -0.006 vf 0.002 kl 0.0135 lr 1.7e-04
+[anomaly] it 342: explained variance -1.32 < 0 after warm-up: value function not predicting returns
+[anomaly] it 342: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 342: joint limit violated by 0.17 rad
+it  343 steps  33718272 sps   29,807 | ep_ret   12.09 ep_len  992.5 (n=218) | pg -0.007 vf 0.002 kl 0.0144 lr 2.6e-04
+[anomaly] it 343: explained variance -1.54 < 0 after warm-up: value function not predicting returns
+[anomaly] it 343: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 343: joint limit violated by 0.16 rad
+it  344 steps  33816576 sps   29,804 | ep_ret   11.93 ep_len  990.7 (n=192) | pg -0.006 vf 0.002 kl 0.0155 lr 3.8e-04
+[anomaly] it 344: explained variance -0.88 < 0 after warm-up: value function not predicting returns
+[anomaly] it 344: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 344: joint limit violated by 0.17 rad
+it  345 steps  33914880 sps   29,800 | ep_ret   11.99 ep_len  991.2 (n=201) | pg -0.003 vf 0.002 kl 0.0137 lr 1.7e-04
+[anomaly] it 345: explained variance -0.44 < 0 after warm-up: value function not predicting returns
+[anomaly] it 345: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 345: joint limit violated by 0.17 rad
+it  346 steps  34013184 sps   29,796 | ep_ret   12.07 ep_len  990.6 (n=144) | pg -0.006 vf 0.002 kl 0.0135 lr 1.7e-04
+[anomaly] it 346: explained variance -0.21 < 0 after warm-up: value function not predicting returns
+[anomaly] it 346: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 346: joint limit violated by 0.16 rad
+it  347 steps  34111488 sps   29,793 | ep_ret   12.38 ep_len 1000.0 (n=150) | pg -0.007 vf 0.001 kl 0.0157 lr 3.8e-04
+[anomaly] it 347: explained variance -2.31 < 0 after warm-up: value function not predicting returns
+[anomaly] it 347: joint limit violated by 0.16 rad
+it  348 steps  34209792 sps   29,790 | ep_ret   11.95 ep_len  982.0 (n=134) | pg -0.003 vf 0.001 kl 0.0137 lr 1.7e-04
+[anomaly] it 348: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 348: joint limit violated by 0.16 rad
+it  349 steps  34308096 sps   29,786 | ep_ret   12.44 ep_len 1000.0 (n=99) | pg -0.006 vf 0.002 kl 0.0128 lr 1.7e-04
+[anomaly] it 349: explained variance -1.21 < 0 after warm-up: value function not predicting returns
+[anomaly] it 349: joint limit violated by 0.15 rad
+it  350 steps  34406400 sps   29,783 | ep_ret   12.46 ep_len  993.0 (n=100) | pg -0.005 vf 0.003 kl 0.0135 lr 1.7e-04
+[anomaly] it 350: explained variance -1.00 < 0 after warm-up: value function not predicting returns
+[anomaly] it 350: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 350: joint limit violated by 0.19 rad
+it  351 steps  34504704 sps   29,779 | ep_ret   12.11 ep_len  972.2 (n=90) | pg -0.005 vf 0.002 kl 0.0136 lr 1.7e-04
+[anomaly] it 351: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 351: joint limit violated by 0.16 rad
+it  352 steps  34603008 sps   29,776 | ep_ret   12.31 ep_len  990.9 (n=74) | pg -0.006 vf 0.002 kl 0.0138 lr 1.7e-04
+[anomaly] it 352: explained variance -0.62 < 0 after warm-up: value function not predicting returns
+[anomaly] it 352: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 352: joint limit violated by 0.15 rad
+it  353 steps  34701312 sps   29,772 | ep_ret   12.31 ep_len  984.3 (n=52) | pg -0.007 vf 0.002 kl 0.0124 lr 2.6e-04
+[anomaly] it 353: explained variance -1.08 < 0 after warm-up: value function not predicting returns
+[anomaly] it 353: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 353: joint limit violated by 0.24 rad
+it  354 steps  34799616 sps   29,769 | ep_ret   12.15 ep_len  970.4 (n=49) | pg -0.004 vf 0.002 kl 0.0142 lr 2.6e-04
+[anomaly] it 354: explained variance -0.61 < 0 after warm-up: value function not predicting returns
+[anomaly] it 354: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 354: joint limit violated by 0.17 rad
+it  355 steps  34897920 sps   29,766 | ep_ret   12.10 ep_len  972.2 (n=52) | pg -0.006 vf 0.002 kl 0.0138 lr 2.6e-04
+[anomaly] it 355: explained variance -0.28 < 0 after warm-up: value function not predicting returns
+[anomaly] it 355: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 355: joint limit violated by 0.17 rad
+it  356 steps  34996224 sps   29,762 | ep_ret   12.35 ep_len  981.5 (n=43) | pg -0.006 vf 0.001 kl 0.0153 lr 3.8e-04
+[anomaly] it 356: explained variance -0.15 < 0 after warm-up: value function not predicting returns
+[anomaly] it 356: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 356: joint limit violated by 0.16 rad
+it  357 steps  35094528 sps   29,759 | ep_ret   12.67 ep_len  984.8 (n=38) | pg -0.008 vf 0.001 kl 0.0138 lr 2.6e-04
+[anomaly] it 357: explained variance -0.35 < 0 after warm-up: value function not predicting returns
+[anomaly] it 357: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 357: joint limit violated by 0.16 rad
+it  358 steps  35192832 sps   29,756 | ep_ret   12.80 ep_len 1000.0 (n=46) | pg -0.005 vf 0.002 kl 0.0134 lr 1.7e-04
+[anomaly] it 358: explained variance -1.26 < 0 after warm-up: value function not predicting returns
+[anomaly] it 358: joint limit violated by 0.15 rad
+it  359 steps  35291136 sps   29,753 | ep_ret   12.20 ep_len  974.3 (n=44) | pg -0.005 vf 0.002 kl 0.0137 lr 2.6e-04
+[anomaly] it 359: explained variance -0.08 < 0 after warm-up: value function not predicting returns
+[anomaly] it 359: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 359: joint limit violated by 0.17 rad
+it  360 steps  35389440 sps   29,750 | ep_ret   12.60 ep_len  985.4 (n=34) | pg -0.006 vf 0.001 kl 0.0157 lr 3.8e-04
+[anomaly] it 360: explained variance -0.26 < 0 after warm-up: value function not predicting returns
+[anomaly] it 360: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 360: joint limit violated by 0.18 rad
+it  361 steps  35487744 sps   29,746 | ep_ret   12.69 ep_len  975.6 (n=36) | pg -0.004 vf 0.002 kl 0.0161 lr 2.6e-04
+[anomaly] it 361: explained variance -0.79 < 0 after warm-up: value function not predicting returns
+[anomaly] it 361: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 361: joint limit violated by 0.16 rad
+it  362 steps  35586048 sps   29,743 | ep_ret   12.82 ep_len  987.0 (n=40) | pg -0.007 vf 0.003 kl 0.0144 lr 2.6e-04
+[anomaly] it 362: explained variance -1.29 < 0 after warm-up: value function not predicting returns
+[anomaly] it 362: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 362: joint limit violated by 0.16 rad
+it  363 steps  35684352 sps   29,740 | ep_ret   12.75 ep_len  991.2 (n=35) | pg -0.007 vf 0.001 kl 0.0150 lr 3.8e-04
+[anomaly] it 363: explained variance -1.80 < 0 after warm-up: value function not predicting returns
+[anomaly] it 363: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 363: joint limit violated by 0.17 rad
+it  364 steps  35782656 sps   29,736 | ep_ret   11.53 ep_len  929.9 (n=31) | pg -0.005 vf 0.003 kl 0.0149 lr 2.6e-04
+[anomaly] it 364: explained variance -0.82 < 0 after warm-up: value function not predicting returns
+[anomaly] it 364: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 364: joint limit violated by 0.16 rad
+it  365 steps  35880960 sps   29,733 | ep_ret   12.38 ep_len  966.6 (n=26) | pg -0.006 vf 0.002 kl 0.0162 lr 3.8e-04
+[anomaly] it 365: explained variance -0.74 < 0 after warm-up: value function not predicting returns
+[anomaly] it 365: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 365: joint limit violated by 0.18 rad
+it  366 steps  35979264 sps   29,730 | ep_ret   12.38 ep_len  966.9 (n=28) | pg -0.004 vf 0.002 kl 0.0134 lr 1.1e-04
+[anomaly] it 366: explained variance -1.69 < 0 after warm-up: value function not predicting returns
+[anomaly] it 366: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 366: joint limit violated by 0.15 rad
+it  367 steps  36077568 sps   29,727 | ep_ret   12.10 ep_len  957.0 (n=26) | pg -0.006 vf 0.002 kl 0.0140 lr 2.6e-04
+[anomaly] it 367: explained variance -0.63 < 0 after warm-up: value function not predicting returns
+[anomaly] it 367: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 367: joint limit violated by 0.16 rad
+it  368 steps  36175872 sps   29,724 | ep_ret   13.00 ep_len  988.8 (n=25) | pg -0.005 vf 0.003 kl 0.0142 lr 1.7e-04
+[anomaly] it 368: explained variance -1.86 < 0 after warm-up: value function not predicting returns
+[anomaly] it 368: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 368: joint limit violated by 0.15 rad
+it  369 steps  36274176 sps   29,721 | ep_ret   12.70 ep_len  977.7 (n=29) | pg -0.006 vf 0.002 kl 0.0131 lr 1.1e-04
+[anomaly] it 369: explained variance -1.31 < 0 after warm-up: value function not predicting returns
+[anomaly] it 369: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 369: joint limit violated by 0.16 rad
+it  370 steps  36372480 sps   29,718 | ep_ret   12.95 ep_len  985.0 (n=38) | pg -0.006 vf 0.002 kl 0.0142 lr 2.6e-04
+[anomaly] it 370: explained variance -1.26 < 0 after warm-up: value function not predicting returns
+[anomaly] it 370: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 370: joint limit violated by 0.16 rad
+it  371 steps  36470784 sps   29,715 | ep_ret   12.33 ep_len  963.8 (n=39) | pg -0.005 vf 0.002 kl 0.0137 lr 1.7e-04
+[anomaly] it 371: explained variance -0.22 < 0 after warm-up: value function not predicting returns
+[anomaly] it 371: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 371: joint limit violated by 0.16 rad
+it  372 steps  36569088 sps   29,712 | ep_ret   13.60 ep_len  993.5 (n=57) | pg -0.005 vf 0.002 kl 0.0146 lr 2.6e-04
+[anomaly] it 372: explained variance -0.94 < 0 after warm-up: value function not predicting returns
+[anomaly] it 372: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 372: joint limit violated by 0.16 rad
+it  373 steps  36667392 sps   29,708 | ep_ret   13.37 ep_len  984.1 (n=63) | pg -0.006 vf 0.001 kl 0.0135 lr 2.6e-04
+[anomaly] it 373: explained variance -0.38 < 0 after warm-up: value function not predicting returns
+[anomaly] it 373: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 373: joint limit violated by 0.19 rad
+it  374 steps  36765696 sps   29,705 | ep_ret   13.57 ep_len  992.2 (n=102) | pg -0.005 vf 0.001 kl 0.0161 lr 3.8e-04
+[anomaly] it 374: explained variance -0.33 < 0 after warm-up: value function not predicting returns
+[anomaly] it 374: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 374: joint limit violated by 0.20 rad
+it  375 steps  36864000 sps   29,702 | ep_ret   13.78 ep_len 1000.0 (n=92) | pg -0.006 vf 0.002 kl 0.0130 lr 2.6e-04
+[anomaly] it 375: explained variance -1.04 < 0 after warm-up: value function not predicting returns
+[anomaly] it 375: joint limit violated by 0.16 rad
+it  376 steps  36962304 sps   29,699 | ep_ret   13.69 ep_len  995.3 (n=136) | pg -0.006 vf 0.002 kl 0.0132 lr 2.6e-04
+[anomaly] it 376: explained variance -0.10 < 0 after warm-up: value function not predicting returns
+[anomaly] it 376: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 376: joint limit violated by 0.19 rad
+it  377 steps  37060608 sps   29,696 | ep_ret   13.90 ep_len  997.5 (n=156) | pg -0.007 vf 0.001 kl 0.0158 lr 3.8e-04
+[anomaly] it 377: explained variance -0.63 < 0 after warm-up: value function not predicting returns
+[anomaly] it 377: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 377: joint limit violated by 0.17 rad
+it  378 steps  37158912 sps   29,692 | ep_ret   13.95 ep_len  998.2 (n=175) | pg -0.004 vf 0.002 kl 0.0159 lr 2.6e-04
+[anomaly] it 378: explained variance -0.74 < 0 after warm-up: value function not predicting returns
+[anomaly] it 378: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 378: joint limit violated by 0.15 rad
+it  379 steps  37257216 sps   29,689 | ep_ret   13.94 ep_len  995.2 (n=173) | pg -0.005 vf 0.002 kl 0.0135 lr 1.7e-04
+[anomaly] it 379: explained variance -0.80 < 0 after warm-up: value function not predicting returns
+[anomaly] it 379: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 379: joint limit violated by 0.17 rad
+it  380 steps  37355520 sps   29,686 | ep_ret   14.07 ep_len  998.5 (n=203) | pg -0.006 vf 0.002 kl 0.0132 lr 2.6e-04
+[anomaly] it 380: explained variance -1.21 < 0 after warm-up: value function not predicting returns
+[anomaly] it 380: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 380: joint limit violated by 0.15 rad
+it  381 steps  37453824 sps   29,684 | ep_ret   13.99 ep_len  993.7 (n=229) | pg -0.006 vf 0.002 kl 0.0157 lr 2.6e-04
+[anomaly] it 381: explained variance -0.43 < 0 after warm-up: value function not predicting returns
+[anomaly] it 381: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 381: joint limit violated by 0.17 rad
+it  382 steps  37552128 sps   29,681 | ep_ret   14.13 ep_len  994.8 (n=233) | pg -0.006 vf 0.002 kl 0.0132 lr 2.6e-04
+[anomaly] it 382: explained variance -0.12 < 0 after warm-up: value function not predicting returns
+[anomaly] it 382: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 382: joint limit violated by 0.17 rad
+it  383 steps  37650432 sps   29,678 | ep_ret   14.17 ep_len  999.7 (n=268) | pg -0.006 vf 0.002 kl 0.0127 lr 1.7e-04
+[anomaly] it 383: explained variance -0.73 < 0 after warm-up: value function not predicting returns
+[anomaly] it 383: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 383: joint limit violated by 0.21 rad
+it  384 steps  37748736 sps   29,675 | ep_ret   14.12 ep_len  997.4 (n=203) | pg -0.007 vf 0.001 kl 0.0129 lr 2.6e-04
+[anomaly] it 384: explained variance -0.23 < 0 after warm-up: value function not predicting returns
+[anomaly] it 384: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 384: joint limit violated by 0.16 rad
+it  385 steps  37847040 sps   29,672 | ep_ret   14.25 ep_len  998.2 (n=199) | pg -0.005 vf 0.002 kl 0.0147 lr 2.6e-04
+[anomaly] it 385: explained variance -0.52 < 0 after warm-up: value function not predicting returns
+[anomaly] it 385: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 385: joint limit violated by 0.17 rad
+it  386 steps  37945344 sps   29,670 | ep_ret   14.37 ep_len 1000.0 (n=201) | pg -0.005 vf 0.002 kl 0.0135 lr 1.1e-04
+[anomaly] it 386: explained variance -2.01 < 0 after warm-up: value function not predicting returns
+[anomaly] it 386: joint limit violated by 0.18 rad
+it  387 steps  38043648 sps   29,667 | ep_ret   14.16 ep_len  990.1 (n=173) | pg -0.008 vf 0.001 kl 0.0121 lr 2.6e-04
+[anomaly] it 387: explained variance -0.09 < 0 after warm-up: value function not predicting returns
+[anomaly] it 387: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 387: joint limit violated by 0.19 rad
+it  388 steps  38141952 sps   29,665 | ep_ret   14.37 ep_len  998.7 (n=161) | pg -0.004 vf 0.001 kl 0.0129 lr 1.7e-04
+[anomaly] it 388: explained variance -0.18 < 0 after warm-up: value function not predicting returns
+[anomaly] it 388: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 388: joint limit violated by 0.15 rad
+it  389 steps  38240256 sps   29,662 | ep_ret   14.52 ep_len 1000.0 (n=136) | pg -0.007 vf 0.001 kl 0.0121 lr 2.6e-04
+[anomaly] it 389: explained variance -0.30 < 0 after warm-up: value function not predicting returns
+[anomaly] it 389: joint limit violated by 0.16 rad
+it  390 steps  38338560 sps   29,659 | ep_ret   14.65 ep_len 1000.0 (n=111) | pg -0.005 vf 0.001 kl 0.0137 lr 2.6e-04
+[anomaly] it 390: explained variance -0.46 < 0 after warm-up: value function not predicting returns
+[anomaly] it 390: joint limit violated by 0.19 rad
+it  391 steps  38436864 sps   29,657 | ep_ret   14.63 ep_len 1000.0 (n=112) | pg -0.005 vf 0.002 kl 0.0133 lr 2.6e-04
+[anomaly] it 391: explained variance -1.63 < 0 after warm-up: value function not predicting returns
+[anomaly] it 391: joint limit violated by 0.17 rad
+it  392 steps  38535168 sps   29,654 | ep_ret   14.09 ep_len  971.9 (n=92) | pg -0.005 vf 0.002 kl 0.0148 lr 2.6e-04
+[anomaly] it 392: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 392: joint limit violated by 0.17 rad
+it  393 steps  38633472 sps   29,652 | ep_ret   14.68 ep_len  995.3 (n=86) | pg -0.006 vf 0.002 kl 0.0150 lr 2.6e-04
+[anomaly] it 393: explained variance -0.84 < 0 after warm-up: value function not predicting returns
+[anomaly] it 393: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 393: joint limit violated by 0.15 rad
+it  394 steps  38731776 sps   29,650 | ep_ret   14.45 ep_len  988.3 (n=60) | pg -0.006 vf 0.001 kl 0.0153 lr 3.8e-04
+[anomaly] it 394: explained variance -0.22 < 0 after warm-up: value function not predicting returns
+[anomaly] it 394: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 394: joint limit violated by 0.16 rad
+it  395 steps  38830080 sps   29,647 | ep_ret   14.71 ep_len  992.6 (n=60) | pg -0.003 vf 0.001 kl 0.0145 lr 1.7e-04
+[anomaly] it 395: explained variance -0.28 < 0 after warm-up: value function not predicting returns
+[anomaly] it 395: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 395: joint limit violated by 0.20 rad
+it  396 steps  38928384 sps   29,645 | ep_ret   14.72 ep_len 1000.0 (n=42) | pg -0.008 vf 0.001 kl 0.0118 lr 2.6e-04
+[anomaly] it 396: explained variance -0.60 < 0 after warm-up: value function not predicting returns
+[anomaly] it 396: joint limit violated by 0.15 rad
+it  397 steps  39026688 sps   29,643 | ep_ret   14.85 ep_len 1000.0 (n=53) | pg -0.007 vf 0.001 kl 0.0143 lr 3.8e-04
+[anomaly] it 397: explained variance -0.77 < 0 after warm-up: value function not predicting returns
+[anomaly] it 397: joint limit violated by 0.18 rad
+it  398 steps  39124992 sps   29,641 | ep_ret   14.50 ep_len  975.0 (n=34) | pg -0.004 vf 0.001 kl 0.0157 lr 2.6e-04
+[anomaly] it 398: explained variance -0.38 < 0 after warm-up: value function not predicting returns
+[anomaly] it 398: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 398: joint limit violated by 0.16 rad
+it  399 steps  39223296 sps   29,639 | ep_ret   15.23 ep_len 1000.0 (n=41) | pg -0.005 vf 0.002 kl 0.0160 lr 2.6e-04
+[anomaly] it 399: explained variance -0.82 < 0 after warm-up: value function not predicting returns
+[anomaly] it 399: joint limit violated by 0.15 rad
+it  400 steps  39321600 sps   29,637 | ep_ret   14.83 ep_len  983.8 (n=48) | pg -0.006 vf 0.002 kl 0.0135 lr 1.7e-04
+[anomaly] it 400: explained variance -0.78 < 0 after warm-up: value function not predicting returns
+[anomaly] it 400: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 400: joint limit violated by 0.16 rad
+it  401 steps  39419904 sps   29,635 | ep_ret   14.64 ep_len  982.4 (n=39) | pg -0.007 vf 0.002 kl 0.0147 lr 2.6e-04
+[anomaly] it 401: explained variance -0.69 < 0 after warm-up: value function not predicting returns
+[anomaly] it 401: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 401: joint limit violated by 0.19 rad
+it  402 steps  39518208 sps   29,633 | ep_ret   14.76 ep_len  978.7 (n=38) | pg -0.005 vf 0.002 kl 0.0152 lr 1.1e-04
+[anomaly] it 402: explained variance -0.26 < 0 after warm-up: value function not predicting returns
+[anomaly] it 402: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 402: joint limit violated by 0.16 rad
+it  403 steps  39616512 sps   29,631 | ep_ret   15.24 ep_len 1000.0 (n=39) | pg -0.005 vf 0.003 kl 0.0141 lr 1.7e-04
+[anomaly] it 403: explained variance -1.25 < 0 after warm-up: value function not predicting returns
+[anomaly] it 403: joint limit violated by 0.17 rad
+it  404 steps  39714816 sps   29,629 | ep_ret   14.77 ep_len  975.7 (n=34) | pg -0.006 vf 0.004 kl 0.0149 lr 2.6e-04
+[anomaly] it 404: explained variance -2.13 < 0 after warm-up: value function not predicting returns
+[anomaly] it 404: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 404: joint limit violated by 0.16 rad
+it  405 steps  39813120 sps   29,627 | ep_ret   14.37 ep_len  963.0 (n=40) | pg -0.003 vf 0.002 kl 0.0148 lr 1.7e-04
+[anomaly] it 405: explained variance -1.32 < 0 after warm-up: value function not predicting returns
+[anomaly] it 405: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 405: joint limit violated by 0.16 rad
+it  406 steps  39911424 sps   29,625 | ep_ret   13.22 ep_len  920.0 (n=29) | pg -0.005 vf 0.002 kl 0.0145 lr 2.6e-04
+[anomaly] it 406: explained variance -0.19 < 0 after warm-up: value function not predicting returns
+[anomaly] it 406: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 406: joint limit violated by 0.16 rad
+it  407 steps  40009728 sps   29,623 | ep_ret   14.78 ep_len  979.4 (n=29) | pg -0.006 vf 0.002 kl 0.0163 lr 1.7e-04
+[anomaly] it 407: explained variance -0.20 < 0 after warm-up: value function not predicting returns
+[anomaly] it 407: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 407: joint limit violated by 0.17 rad
+it  408 steps  40108032 sps   29,621 | ep_ret   15.12 ep_len  985.7 (n=28) | pg -0.005 vf 0.001 kl 0.0139 lr 2.6e-04
+[anomaly] it 408: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 408: joint limit violated by 0.18 rad
+it  409 steps  40206336 sps   29,618 | ep_ret   15.80 ep_len 1000.0 (n=22) | pg -0.007 vf 0.001 kl 0.0162 lr 3.8e-04
+[anomaly] it 409: explained variance -0.25 < 0 after warm-up: value function not predicting returns
+[anomaly] it 409: joint limit violated by 0.17 rad
+it  410 steps  40304640 sps   29,616 | ep_ret   15.51 ep_len 1000.0 (n=29) | pg -0.004 vf 0.002 kl 0.0157 lr 2.6e-04
+[anomaly] it 410: explained variance -0.73 < 0 after warm-up: value function not predicting returns
+[anomaly] it 410: joint limit violated by 0.17 rad
+it  411 steps  40402944 sps   29,614 | ep_ret   15.27 ep_len  988.0 (n=30) | pg -0.006 vf 0.002 kl 0.0140 lr 2.6e-04
+[anomaly] it 411: explained variance -1.12 < 0 after warm-up: value function not predicting returns
+[anomaly] it 411: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 411: joint limit violated by 0.15 rad
+it  412 steps  40501248 sps   29,612 | ep_ret   14.85 ep_len  976.6 (n=40) | pg -0.006 vf 0.002 kl 0.0150 lr 2.6e-04
+[anomaly] it 412: explained variance -0.48 < 0 after warm-up: value function not predicting returns
+[anomaly] it 412: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 412: joint limit violated by 0.16 rad
+it  413 steps  40599552 sps   29,610 | ep_ret   15.53 ep_len  997.4 (n=54) | pg -0.003 vf 0.002 kl 0.0126 lr 1.1e-04
+[anomaly] it 413: explained variance -0.65 < 0 after warm-up: value function not predicting returns
+[anomaly] it 413: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 413: joint limit violated by 0.16 rad
+it  414 steps  40697856 sps   29,608 | ep_ret   15.48 ep_len  992.2 (n=46) | pg -0.006 vf 0.002 kl 0.0139 lr 2.6e-04
+[anomaly] it 414: explained variance -1.07 < 0 after warm-up: value function not predicting returns
+[anomaly] it 414: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 414: joint limit violated by 0.22 rad
+it  415 steps  40796160 sps   29,606 | ep_ret   15.44 ep_len  989.3 (n=79) | pg -0.006 vf 0.001 kl 0.0138 lr 1.7e-04
+[anomaly] it 415: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 415: joint limit violated by 0.16 rad
+it  416 steps  40894464 sps   29,604 | ep_ret   15.93 ep_len 1000.0 (n=98) | pg -0.006 vf 0.001 kl 0.0145 lr 1.7e-04
+[anomaly] it 416: explained variance -0.94 < 0 after warm-up: value function not predicting returns
+[anomaly] it 416: joint limit violated by 0.19 rad
+it  417 steps  40992768 sps   29,602 | ep_ret   15.68 ep_len  990.9 (n=108) | pg -0.008 vf 0.001 kl 0.0112 lr 2.6e-04
+[anomaly] it 417: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 417: joint limit violated by 0.17 rad
+it  418 steps  41091072 sps   29,600 | ep_ret   15.93 ep_len 1000.0 (n=143) | pg -0.004 vf 0.001 kl 0.0155 lr 2.6e-04
+[anomaly] it 418: explained variance -0.58 < 0 after warm-up: value function not predicting returns
+[anomaly] it 418: joint limit violated by 0.17 rad
+it  419 steps  41189376 sps   29,598 | ep_ret   15.91 ep_len  997.6 (n=169) | pg -0.006 vf 0.001 kl 0.0163 lr 1.7e-04
+[anomaly] it 419: explained variance -0.37 < 0 after warm-up: value function not predicting returns
+[anomaly] it 419: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 419: joint limit violated by 0.17 rad
+it  420 steps  41287680 sps   29,596 | ep_ret   15.85 ep_len  994.7 (n=166) | pg -0.005 vf 0.002 kl 0.0143 lr 2.6e-04
+[anomaly] it 420: explained variance -0.23 < 0 after warm-up: value function not predicting returns
+[anomaly] it 420: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 420: joint limit violated by 0.16 rad
+it  421 steps  41385984 sps   29,595 | ep_ret   16.09 ep_len 1000.0 (n=176) | pg -0.005 vf 0.001 kl 0.0149 lr 1.7e-04
+[anomaly] it 421: explained variance -0.69 < 0 after warm-up: value function not predicting returns
+[anomaly] it 421: joint limit violated by 0.16 rad
+it  422 steps  41484288 sps   29,593 | ep_ret   15.96 ep_len  998.4 (n=207) | pg -0.006 vf 0.001 kl 0.0122 lr 2.6e-04
+[anomaly] it 422: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 422: joint limit violated by 0.17 rad
+it  423 steps  41582592 sps   29,591 | ep_ret   16.07 ep_len 1000.0 (n=237) | pg -0.006 vf 0.001 kl 0.0150 lr 2.6e-04
+[anomaly] it 423: explained variance -0.17 < 0 after warm-up: value function not predicting returns
+[anomaly] it 423: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 423: joint limit violated by 0.16 rad
+it  424 steps  41680896 sps   29,590 | ep_ret   16.22 ep_len 1000.0 (n=248) | pg -0.007 vf 0.001 kl 0.0144 lr 3.8e-04
+[anomaly] it 424: explained variance -0.14 < 0 after warm-up: value function not predicting returns
+[anomaly] it 424: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 424: joint limit violated by 0.16 rad
+it  425 steps  41779200 sps   29,588 | ep_ret   16.17 ep_len 1000.0 (n=246) | pg -0.002 vf 0.001 kl 0.0142 lr 1.1e-04
+[anomaly] it 425: explained variance -0.15 < 0 after warm-up: value function not predicting returns
+[anomaly] it 425: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 425: joint limit violated by 0.18 rad
+it  426 steps  41877504 sps   29,587 | ep_ret   16.28 ep_len 1000.0 (n=201) | pg -0.005 vf 0.002 kl 0.0140 lr 2.6e-04
+[anomaly] it 426: explained variance -0.33 < 0 after warm-up: value function not predicting returns
+[anomaly] it 426: joint limit violated by 0.17 rad
+it  427 steps  41975808 sps   29,585 | ep_ret   16.31 ep_len 1000.0 (n=201) | pg -0.004 vf 0.001 kl 0.0144 lr 1.7e-04
+[anomaly] it 427: explained variance -0.72 < 0 after warm-up: value function not predicting returns
+[anomaly] it 427: joint limit violated by 0.17 rad
+it  428 steps  42074112 sps   29,584 | ep_ret   16.42 ep_len 1000.0 (n=202) | pg -0.008 vf 0.001 kl 0.0119 lr 2.6e-04
+[anomaly] it 428: explained variance -0.63 < 0 after warm-up: value function not predicting returns
+[anomaly] it 428: joint limit violated by 0.16 rad
+it  429 steps  42172416 sps   29,582 | ep_ret   16.36 ep_len  994.5 (n=149) | pg -0.006 vf 0.001 kl 0.0142 lr 2.6e-04
+[anomaly] it 429: explained variance -0.07 < 0 after warm-up: value function not predicting returns
+[anomaly] it 429: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 429: joint limit violated by 0.18 rad
+it  430 steps  42270720 sps   29,581 | ep_ret   16.45 ep_len 1000.0 (n=155) | pg -0.003 vf 0.001 kl 0.0144 lr 2.6e-04
+[anomaly] it 430: explained variance -0.19 < 0 after warm-up: value function not predicting returns
+[anomaly] it 430: joint limit violated by 0.15 rad
+it  431 steps  42369024 sps   29,579 | ep_ret   16.46 ep_len 1000.0 (n=129) | pg -0.002 vf 0.001 kl 0.0151 lr 1.7e-04
+[anomaly] it 431: explained variance -0.70 < 0 after warm-up: value function not predicting returns
+[anomaly] it 431: joint limit violated by 0.19 rad
+it  432 steps  42467328 sps   29,578 | ep_ret   16.37 ep_len  989.7 (n=101) | pg -0.006 vf 0.001 kl 0.0131 lr 2.6e-04
+[anomaly] it 432: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 432: joint limit violated by 0.15 rad
+it  433 steps  42565632 sps   29,576 | ep_ret   16.64 ep_len 1000.0 (n=113) | pg -0.003 vf 0.002 kl 0.0136 lr 1.1e-04
+[anomaly] it 433: explained variance -0.44 < 0 after warm-up: value function not predicting returns
+[anomaly] it 433: joint limit violated by 0.14 rad
+it  434 steps  42663936 sps   29,575 | ep_ret   16.61 ep_len 1000.0 (n=81) | pg -0.005 vf 0.003 kl 0.0124 lr 1.7e-04
+[anomaly] it 434: explained variance -1.53 < 0 after warm-up: value function not predicting returns
+[anomaly] it 434: joint limit violated by 0.15 rad
+it  435 steps  42762240 sps   29,573 | ep_ret   16.27 ep_len  978.6 (n=83) | pg -0.005 vf 0.002 kl 0.0141 lr 2.6e-04
+[anomaly] it 435: explained variance -1.70 < 0 after warm-up: value function not predicting returns
+[anomaly] it 435: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 435: joint limit violated by 0.15 rad
+it  436 steps  42860544 sps   29,572 | ep_ret   15.36 ep_len  943.6 (n=57) | pg -0.005 vf 0.002 kl 0.0148 lr 2.6e-04
+[anomaly] it 436: explained variance -0.27 < 0 after warm-up: value function not predicting returns
+[anomaly] it 436: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 436: joint limit violated by 0.17 rad
+it  437 steps  42958848 sps   29,571 | ep_ret   16.28 ep_len  980.5 (n=63) | pg -0.005 vf 0.002 kl 0.0160 lr 2.6e-04
+[anomaly] it 437: explained variance -0.14 < 0 after warm-up: value function not predicting returns
+[anomaly] it 437: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 437: joint limit violated by 0.14 rad
+it  438 steps  43057152 sps   29,569 | ep_ret   16.26 ep_len  980.3 (n=43) | pg -0.004 vf 0.003 kl 0.0145 lr 1.1e-04
+[anomaly] it 438: explained variance -0.75 < 0 after warm-up: value function not predicting returns
+[anomaly] it 438: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 438: joint limit violated by 0.16 rad
+it  439 steps  43155456 sps   29,568 | ep_ret   16.40 ep_len  992.4 (n=47) | pg -0.005 vf 0.002 kl 0.0127 lr 1.1e-04
+[anomaly] it 439: explained variance -1.53 < 0 after warm-up: value function not predicting returns
+[anomaly] it 439: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 439: joint limit violated by 0.17 rad
+it  440 steps  43253760 sps   29,567 | ep_ret   15.56 ep_len  946.1 (n=42) | pg -0.005 vf 0.002 kl 0.0154 lr 2.6e-04
+[anomaly] it 440: explained variance -0.16 < 0 after warm-up: value function not predicting returns
+[anomaly] it 440: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 440: joint limit violated by 0.17 rad
+it  441 steps  43352064 sps   29,565 | ep_ret   16.45 ep_len  976.8 (n=47) | pg -0.006 vf 0.002 kl 0.0160 lr 2.6e-04
+[anomaly] it 441: explained variance -0.03 < 0 after warm-up: value function not predicting returns
+[anomaly] it 441: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 441: joint limit violated by 0.18 rad
+it  442 steps  43450368 sps   29,564 | ep_ret   17.09 ep_len 1000.0 (n=51) | pg -0.004 vf 0.003 kl 0.0153 lr 1.7e-04
+[anomaly] it 442: explained variance -0.98 < 0 after warm-up: value function not predicting returns
+[anomaly] it 442: joint limit violated by 0.18 rad
+it  443 steps  43548672 sps   29,563 | ep_ret   16.67 ep_len  990.7 (n=33) | pg -0.004 vf 0.003 kl 0.0143 lr 1.7e-04
+[anomaly] it 443: explained variance -0.95 < 0 after warm-up: value function not predicting returns
+[anomaly] it 443: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 443: joint limit violated by 0.16 rad
+it  444 steps  43646976 sps   29,562 | ep_ret   15.97 ep_len  959.6 (n=36) | pg -0.004 vf 0.002 kl 0.0135 lr 1.7e-04
+[anomaly] it 444: explained variance -0.93 < 0 after warm-up: value function not predicting returns
+[anomaly] it 444: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 444: joint limit violated by 0.16 rad
+it  445 steps  43745280 sps   29,560 | ep_ret   16.43 ep_len  982.9 (n=46) | pg -0.005 vf 0.003 kl 0.0143 lr 1.7e-04
+[anomaly] it 445: explained variance -0.76 < 0 after warm-up: value function not predicting returns
+[anomaly] it 445: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 445: joint limit violated by 0.16 rad
+it  446 steps  43843584 sps   29,559 | ep_ret   16.08 ep_len  960.6 (n=35) | pg -0.006 vf 0.003 kl 0.0135 lr 1.1e-04
+[anomaly] it 446: explained variance -0.46 < 0 after warm-up: value function not predicting returns
+[anomaly] it 446: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 446: joint limit violated by 0.17 rad
+it  447 steps  43941888 sps   29,557 | ep_ret   16.06 ep_len  962.5 (n=37) | pg -0.005 vf 0.003 kl 0.0129 lr 1.7e-04
+[anomaly] it 447: explained variance -0.12 < 0 after warm-up: value function not predicting returns
+[anomaly] it 447: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 447: joint limit violated by 0.16 rad
+it  448 steps  44040192 sps   29,556 | ep_ret   16.80 ep_len  986.0 (n=26) | pg -0.005 vf 0.003 kl 0.0138 lr 1.7e-04
+[anomaly] it 448: explained variance -0.77 < 0 after warm-up: value function not predicting returns
+[anomaly] it 448: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 448: joint limit violated by 0.17 rad
+it  449 steps  44138496 sps   29,555 | ep_ret   16.67 ep_len  975.1 (n=32) | pg -0.005 vf 0.002 kl 0.0125 lr 1.7e-04
+[anomaly] it 449: explained variance -1.15 < 0 after warm-up: value function not predicting returns
+[anomaly] it 449: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 449: joint limit violated by 0.16 rad
+it  450 steps  44236800 sps   29,554 | ep_ret   16.21 ep_len  968.6 (n=34) | pg -0.004 vf 0.002 kl 0.0142 lr 1.7e-04
+[anomaly] it 450: explained variance -0.09 < 0 after warm-up: value function not predicting returns
+[anomaly] it 450: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 450: joint limit violated by 0.16 rad
+it  451 steps  44335104 sps   29,553 | ep_ret   17.33 ep_len 1000.0 (n=21) | pg -0.006 vf 0.003 kl 0.0135 lr 1.7e-04
+[anomaly] it 451: explained variance -1.28 < 0 after warm-up: value function not predicting returns
+[anomaly] it 451: joint limit violated by 0.16 rad
+it  452 steps  44433408 sps   29,551 | ep_ret   16.96 ep_len  983.5 (n=26) | pg -0.006 vf 0.002 kl 0.0135 lr 1.7e-04
+[anomaly] it 452: explained variance -1.93 < 0 after warm-up: value function not predicting returns
+[anomaly] it 452: joint limit violated by 0.17 rad
+it  453 steps  44531712 sps   29,550 | ep_ret   16.12 ep_len  954.5 (n=36) | pg -0.006 vf 0.002 kl 0.0139 lr 2.6e-04
+[anomaly] it 453: explained variance -1.18 < 0 after warm-up: value function not predicting returns
+[anomaly] it 453: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 453: joint limit violated by 0.15 rad
+it  454 steps  44630016 sps   29,549 | ep_ret   17.17 ep_len  992.0 (n=44) | pg -0.004 vf 0.002 kl 0.0148 lr 1.1e-04
+[anomaly] it 454: explained variance -1.62 < 0 after warm-up: value function not predicting returns
+[anomaly] it 454: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 454: joint limit violated by 0.17 rad
+it  455 steps  44728320 sps   29,547 | ep_ret   16.69 ep_len  975.3 (n=57) | pg -0.006 vf 0.001 kl 0.0107 lr 1.7e-04
+[anomaly] it 455: explained variance -0.66 < 0 after warm-up: value function not predicting returns
+[anomaly] it 455: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 455: joint limit violated by 0.15 rad
+it  456 steps  44826624 sps   29,546 | ep_ret   16.86 ep_len  974.5 (n=55) | pg -0.003 vf 0.002 kl 0.0152 lr 1.7e-04
+[anomaly] it 456: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 456: joint limit violated by 0.16 rad
+it  457 steps  44924928 sps   29,545 | ep_ret   17.47 ep_len 1000.0 (n=88) | pg -0.005 vf 0.002 kl 0.0141 lr 2.6e-04
+[anomaly] it 457: explained variance -0.29 < 0 after warm-up: value function not predicting returns
+[anomaly] it 457: joint limit violated by 0.15 rad
+it  458 steps  45023232 sps   29,544 | ep_ret   17.61 ep_len 1000.0 (n=97) | pg -0.004 vf 0.001 kl 0.0135 lr 1.7e-04
+[anomaly] it 458: explained variance -0.68 < 0 after warm-up: value function not predicting returns
+[anomaly] it 458: joint limit violated by 0.17 rad
+it  459 steps  45121536 sps   29,543 | ep_ret   17.68 ep_len  998.4 (n=114) | pg -0.004 vf 0.001 kl 0.0134 lr 1.1e-04
+[anomaly] it 459: explained variance -0.59 < 0 after warm-up: value function not predicting returns
+[anomaly] it 459: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 459: joint limit violated by 0.20 rad
+it  460 steps  45219840 sps   29,542 | ep_ret   17.59 ep_len  995.2 (n=155) | pg -0.004 vf 0.003 kl 0.0142 lr 1.1e-04
+[anomaly] it 460: explained variance -0.56 < 0 after warm-up: value function not predicting returns
+[anomaly] it 460: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 460: joint limit violated by 0.19 rad
+it  461 steps  45318144 sps   29,541 | ep_ret   17.62 ep_len  997.8 (n=170) | pg -0.005 vf 0.002 kl 0.0126 lr 1.7e-04
+[anomaly] it 461: explained variance -0.46 < 0 after warm-up: value function not predicting returns
+[anomaly] it 461: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 461: joint limit violated by 0.15 rad
+it  462 steps  45416448 sps   29,540 | ep_ret   17.57 ep_len  994.6 (n=167) | pg -0.006 vf 0.001 kl 0.0141 lr 2.6e-04
+[anomaly] it 462: explained variance -0.07 < 0 after warm-up: value function not predicting returns
+[anomaly] it 462: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 462: joint limit violated by 0.16 rad
+it  463 steps  45514752 sps   29,539 | ep_ret   17.81 ep_len 1000.0 (n=191) | pg -0.004 vf 0.001 kl 0.0131 lr 1.7e-04
+[anomaly] it 463: explained variance -0.58 < 0 after warm-up: value function not predicting returns
+[anomaly] it 463: joint limit violated by 0.17 rad
+it  464 steps  45613056 sps   29,538 | ep_ret   17.69 ep_len  996.0 (n=220) | pg -0.005 vf 0.001 kl 0.0131 lr 2.6e-04
+[anomaly] it 464: explained variance -0.07 < 0 after warm-up: value function not predicting returns
+[anomaly] it 464: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 464: joint limit violated by 0.16 rad
+it  465 steps  45711360 sps   29,537 | ep_ret   17.82 ep_len 1000.0 (n=232) | pg -0.006 vf 0.001 kl 0.0141 lr 2.6e-04
+[anomaly] it 465: explained variance -0.17 < 0 after warm-up: value function not predicting returns
+[anomaly] it 465: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 465: joint limit violated by 0.18 rad
+it  466 steps  45809664 sps   29,536 | ep_ret   17.89 ep_len 1000.0 (n=247) | pg -0.004 vf 0.001 kl 0.0148 lr 2.6e-04
+[anomaly] it 466: explained variance -0.28 < 0 after warm-up: value function not predicting returns
+[anomaly] it 466: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 466: joint limit violated by 0.19 rad
+it  467 steps  45907968 sps   29,536 | ep_ret   17.85 ep_len 1000.0 (n=218) | pg -0.005 vf 0.001 kl 0.0145 lr 1.7e-04
+[anomaly] it 467: explained variance -0.88 < 0 after warm-up: value function not predicting returns
+[anomaly] it 467: joint limit violated by 0.17 rad
+it  468 steps  46006272 sps   29,535 | ep_ret   17.79 ep_len  991.7 (n=214) | pg -0.003 vf 0.002 kl 0.0130 lr 7.6e-05
+[anomaly] it 468: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 468: joint limit violated by 0.19 rad
+it  469 steps  46104576 sps   29,534 | ep_ret   17.95 ep_len  997.8 (n=184) | pg -0.005 vf 0.002 kl 0.0123 lr 1.7e-04
+[anomaly] it 469: explained variance -0.37 < 0 after warm-up: value function not predicting returns
+[anomaly] it 469: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 469: joint limit violated by 0.17 rad
+it  470 steps  46202880 sps   29,533 | ep_ret   18.08 ep_len 1000.0 (n=199) | pg -0.000 vf 0.002 kl 0.0146 lr 1.1e-04
+[anomaly] it 470: explained variance -1.51 < 0 after warm-up: value function not predicting returns
+[anomaly] it 470: joint limit violated by 0.18 rad
+it  471 steps  46301184 sps   29,533 | ep_ret   17.65 ep_len  981.9 (n=139) | pg -0.004 vf 0.002 kl 0.0119 lr 1.7e-04
+[anomaly] it 471: explained variance -0.22 < 0 after warm-up: value function not predicting returns
+[anomaly] it 471: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 471: joint limit violated by 0.18 rad
+it  472 steps  46399488 sps   29,532 | ep_ret   17.88 ep_len  994.0 (n=142) | pg -0.005 vf 0.002 kl 0.0136 lr 1.1e-04
+[anomaly] it 472: explained variance -0.51 < 0 after warm-up: value function not predicting returns
+[anomaly] it 472: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 472: joint limit violated by 0.16 rad
+it  473 steps  46497792 sps   29,531 | ep_ret   17.96 ep_len  997.6 (n=135) | pg -0.005 vf 0.002 kl 0.0122 lr 1.1e-04
+[anomaly] it 473: explained variance -0.78 < 0 after warm-up: value function not predicting returns
+[anomaly] it 473: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 473: joint limit violated by 0.16 rad
+it  474 steps  46596096 sps   29,531 | ep_ret   17.62 ep_len  983.4 (n=99) | pg -0.005 vf 0.002 kl 0.0158 lr 2.6e-04
+[anomaly] it 474: explained variance -0.68 < 0 after warm-up: value function not predicting returns
+[anomaly] it 474: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 474: joint limit violated by 0.17 rad
+it  475 steps  46694400 sps   29,530 | ep_ret   17.78 ep_len  986.4 (n=99) | pg -0.004 vf 0.002 kl 0.0124 lr 1.1e-04
+[anomaly] it 475: explained variance -0.86 < 0 after warm-up: value function not predicting returns
+[anomaly] it 475: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 475: joint limit violated by 0.17 rad
+it  476 steps  46792704 sps   29,529 | ep_ret   17.85 ep_len  983.4 (n=94) | pg -0.005 vf 0.002 kl 0.0134 lr 1.7e-04
+[anomaly] it 476: explained variance -0.25 < 0 after warm-up: value function not predicting returns
+[anomaly] it 476: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 476: joint limit violated by 0.24 rad
+it  477 steps  46891008 sps   29,529 | ep_ret   17.69 ep_len  977.9 (n=76) | pg -0.004 vf 0.001 kl 0.0151 lr 2.6e-04
+[anomaly] it 477: explained variance -0.27 < 0 after warm-up: value function not predicting returns
+[anomaly] it 477: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 477: joint limit violated by 0.16 rad
+it  478 steps  46989312 sps   29,528 | ep_ret   17.95 ep_len  983.9 (n=53) | pg -0.005 vf 0.002 kl 0.0143 lr 1.7e-04
+[anomaly] it 478: explained variance -0.30 < 0 after warm-up: value function not predicting returns
+[anomaly] it 478: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 478: joint limit violated by 0.19 rad
+it  479 steps  47087616 sps   29,528 | ep_ret   17.85 ep_len  985.1 (n=52) | pg -0.004 vf 0.002 kl 0.0142 lr 1.7e-04
+[anomaly] it 479: explained variance -0.19 < 0 after warm-up: value function not predicting returns
+[anomaly] it 479: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 479: joint limit violated by 0.16 rad
+it  480 steps  47185920 sps   29,527 | ep_ret   18.27 ep_len 1000.0 (n=49) | pg -0.006 vf 0.002 kl 0.0145 lr 2.6e-04
+[anomaly] it 480: explained variance -0.80 < 0 after warm-up: value function not predicting returns
+[anomaly] it 480: joint limit violated by 0.18 rad
+it  481 steps  47284224 sps   29,526 | ep_ret   17.91 ep_len  983.7 (n=46) | pg -0.004 vf 0.002 kl 0.0144 lr 1.7e-04
+[anomaly] it 481: explained variance -1.02 < 0 after warm-up: value function not predicting returns
+[anomaly] it 481: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 481: joint limit violated by 0.16 rad
+it  482 steps  47382528 sps   29,526 | ep_ret   17.94 ep_len  982.0 (n=42) | pg -0.005 vf 0.003 kl 0.0157 lr 1.7e-04
+[anomaly] it 482: explained variance -1.45 < 0 after warm-up: value function not predicting returns
+[anomaly] it 482: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 482: joint limit violated by 0.17 rad
+it  483 steps  47480832 sps   29,526 | ep_ret   17.01 ep_len  951.6 (n=48) | pg -0.005 vf 0.003 kl 0.0147 lr 1.1e-04
+[anomaly] it 483: explained variance -0.52 < 0 after warm-up: value function not predicting returns
+[anomaly] it 483: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 483: joint limit violated by 0.17 rad
+it  484 steps  47579136 sps   29,525 | ep_ret   17.78 ep_len  980.3 (n=47) | pg -0.005 vf 0.002 kl 0.0123 lr 1.7e-04
+[anomaly] it 484: explained variance -0.74 < 0 after warm-up: value function not predicting returns
+[anomaly] it 484: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 484: joint limit violated by 0.15 rad
+it  485 steps  47677440 sps   29,525 | ep_ret   18.21 ep_len  988.9 (n=35) | pg -0.003 vf 0.002 kl 0.0133 lr 1.1e-04
+[anomaly] it 485: explained variance -1.22 < 0 after warm-up: value function not predicting returns
+[anomaly] it 485: joint limit violated by 0.17 rad
+it  486 steps  47775744 sps   29,525 | ep_ret   16.88 ep_len  937.0 (n=39) | pg -0.004 vf 0.003 kl 0.0133 lr 1.7e-04
+[anomaly] it 486: explained variance -0.06 < 0 after warm-up: value function not predicting returns
+[anomaly] it 486: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 486: joint limit violated by 0.17 rad
+it  487 steps  47874048 sps   29,524 | ep_ret   18.37 ep_len 1000.0 (n=42) | pg -0.006 vf 0.002 kl 0.0149 lr 2.6e-04
+[anomaly] it 487: explained variance -0.65 < 0 after warm-up: value function not predicting returns
+[anomaly] it 487: joint limit violated by 0.17 rad
+it  488 steps  47972352 sps   29,524 | ep_ret   18.14 ep_len  989.6 (n=39) | pg -0.005 vf 0.002 kl 0.0166 lr 2.6e-04
+[anomaly] it 488: explained variance -0.62 < 0 after warm-up: value function not predicting returns
+[anomaly] it 488: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 488: joint limit violated by 0.17 rad
+it  489 steps  48070656 sps   29,524 | ep_ret   18.20 ep_len  989.8 (n=37) | pg -0.005 vf 0.002 kl 0.0147 lr 1.7e-04
+[anomaly] it 489: explained variance -0.64 < 0 after warm-up: value function not predicting returns
+[anomaly] it 489: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 489: joint limit violated by 0.19 rad
+it  490 steps  48168960 sps   29,523 | ep_ret   18.18 ep_len  991.1 (n=30) | pg -0.004 vf 0.004 kl 0.0136 lr 1.1e-04
+[anomaly] it 490: explained variance -0.84 < 0 after warm-up: value function not predicting returns
+[anomaly] it 490: joint limit violated by 0.19 rad
+it  491 steps  48267264 sps   29,523 | ep_ret   17.44 ep_len  969.7 (n=35) | pg -0.005 vf 0.005 kl 0.0143 lr 1.7e-04
+[anomaly] it 491: explained variance -0.51 < 0 after warm-up: value function not predicting returns
+[anomaly] it 491: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 491: joint limit violated by 0.17 rad
+it  492 steps  48365568 sps   29,523 | ep_ret   17.12 ep_len  959.7 (n=24) | pg -0.004 vf 0.002 kl 0.0150 lr 1.1e-04
+[anomaly] it 492: explained variance -1.50 < 0 after warm-up: value function not predicting returns
+[anomaly] it 492: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 492: joint limit violated by 0.17 rad
+it  493 steps  48463872 sps   29,522 | ep_ret   16.33 ep_len  937.1 (n=30) | pg -0.004 vf 0.001 kl 0.0127 lr 1.1e-04
+[anomaly] it 493: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 493: joint limit violated by 0.16 rad
+it  494 steps  48562176 sps   29,522 | ep_ret   18.49 ep_len 1000.0 (n=31) | pg -0.005 vf 0.002 kl 0.0141 lr 2.6e-04
+[anomaly] it 494: explained variance -0.30 < 0 after warm-up: value function not predicting returns
+[anomaly] it 494: joint limit violated by 0.16 rad
+it  495 steps  48660480 sps   29,522 | ep_ret   18.69 ep_len 1000.0 (n=42) | pg -0.003 vf 0.002 kl 0.0133 lr 7.6e-05
+[anomaly] it 495: explained variance -1.07 < 0 after warm-up: value function not predicting returns
+[anomaly] it 495: joint limit violated by 0.17 rad
+it  496 steps  48758784 sps   29,521 | ep_ret   18.20 ep_len  983.3 (n=44) | pg -0.006 vf 0.001 kl 0.0124 lr 1.7e-04
+[anomaly] it 496: explained variance -0.34 < 0 after warm-up: value function not predicting returns
+[anomaly] it 496: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 496: joint limit violated by 0.19 rad
+it  497 steps  48857088 sps   29,521 | ep_ret   18.41 ep_len  993.2 (n=56) | pg -0.004 vf 0.001 kl 0.0149 lr 2.6e-04
+[anomaly] it 497: explained variance -0.47 < 0 after warm-up: value function not predicting returns
+[anomaly] it 497: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 497: joint limit violated by 0.17 rad
+it  498 steps  48955392 sps   29,521 | ep_ret   18.61 ep_len  996.5 (n=64) | pg -0.002 vf 0.002 kl 0.0144 lr 1.1e-04
+[anomaly] it 498: explained variance -0.62 < 0 after warm-up: value function not predicting returns
+[anomaly] it 498: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 498: joint limit violated by 0.17 rad
+it  499 steps  49053696 sps   29,520 | ep_ret   18.57 ep_len  996.4 (n=103) | pg -0.005 vf 0.001 kl 0.0146 lr 2.6e-04
+[anomaly] it 499: explained variance -0.47 < 0 after warm-up: value function not predicting returns
+[anomaly] it 499: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 499: joint limit violated by 0.17 rad
+it  500 steps  49152000 sps   29,520 | ep_ret   18.64 ep_len  996.4 (n=92) | pg -0.005 vf 0.001 kl 0.0162 lr 2.6e-04
+[anomaly] it 500: explained variance -0.10 < 0 after warm-up: value function not predicting returns
+[anomaly] it 500: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 500: joint limit violated by 0.19 rad
+saved policy to /Users/adipu/metalsim-fresh/agents/g1regress/out/flat_main_s0.pt
