@@ -205,6 +205,10 @@ inline float3 sample_cone(float3 axis, float ang, float u, float v) {
     return normalize(t * (st * cos(ph)) + b * (st * sin(ph)) + axis * ct);
 }
 
+#ifdef AREA_LIGHTS
+#include "area_light.h"
+#endif
+
 // ENV_MATS (compile time, Tier2Renderer when a per-env material source is active; metalsim.render.env_materials)
 #ifndef ENV_MATS
 #define ENV_MATS 0
@@ -508,6 +512,9 @@ kernel void path_trace(
     float3 cpos = float3(cam_xpos[ci * 3], cam_xpos[ci * 3 + 1], cam_xpos[ci * 3 + 2]) + cs.pos_delta.xyz;
     float3x3 R = load_mat33(cam_xmat + ci * 9) * quat_to_mat(cs.rot_delta);
     float3 env_off = grid_offset(e, c.grid);
+#ifdef AREA_LIGHTS
+    device const float4* area_x = (device const float4*)(lights + c.n_envs * c.n_light);   // emitters' X axes (area_lights.py)
+#endif
     lights += e * c.n_light;            // this env's light records (metalsim.render.model_sync)
     // legacy env grid: the longest ray from `org` that stays inside this env's region of the shared acceleration
     // structure; compact grid: ray_limit is unbounded, trace() ends rays at the env's cell and continues infinite
@@ -617,6 +624,18 @@ kernel void path_trace(
                 Light l = lights[i];
                 device const float* lp = light_xpos + (e * c.n_light + i) * 3;
                 device const float* ld = light_xdir + (e * c.n_light + i) * 3;
+#ifdef AREA_LIGHTS
+                if (l.specular.w > 0.5) {      // a USD area light (metalsim/render/area_lights.py): sample the emitter
+                    float u1 = rnd(rng), u2 = rnd(rng);
+                    AreaSample as = area_light_sample(l, float3(lp[0], lp[1], lp[2]) + env_off, float3(ld[0], ld[1], ld[2]),
+                                                      area_x[e * c.n_light + i].xyz, h.p, N, u1, u2);
+                    if (as.g <= 0.0) continue;
+                    float tr = transmit(accel, h.p + N * eps, as.L, tl(h.p, as.tmax), inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin, mats, per_inst, e, c.n_slots DYN_PASS);
+                    if (tr <= 0.0) continue;
+                    radiance += throughput * brdf_any(model, N, V, as.L, base, f0, specw, metallic, rough, a2) * l.diffuse.xyz * (as.g * tr);
+                    continue;
+                }
+#endif
                 float3 L; float att = 1.0; float tmax = 1000.0;
                 if (l.kind.x == 0.0) {
                     L = -normalize(float3(ld[0], ld[1], ld[2]));

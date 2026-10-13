@@ -104,7 +104,7 @@ class Tier2Renderer:
                  infinite_planes: bool = True, hfield_skirts: bool = True, per_world_size: bool = True,
                  model_fields: bool = True, lens=None, dyn_layout: str | None = None, env_layout: str | None = None,
                  haze: bool = True, fog: bool = False, tendons: str = "mujoco", rolling_shutter=None,
-                 ctx: MetalContext | None = None, device="metal:0"):
+                 area_lights: bool = True, ctx: MetalContext | None = None, device="metal:0"):
         """``haze`` / ``fog``: MuJoCo's haze over the first infinite plane (drawn with the skybox texture) and its linear
         fog (off by default, as ``mujoco.Renderer``), composited on the camera ray at the first opaque surface
         (``metalsim.render.haze``; see ``Tier0Renderer``). ``tendons`` / ``rolling_shutter``: see ``Tier0Renderer``
@@ -127,7 +127,12 @@ class Tier2Renderer:
         ``model_fields``: see ``Tier0Renderer`` (False = the previous behaviour). With ``usd_lights``, those lights keep
         their USD intensity (a per-world ``light_diffuse`` does not apply to them). ``lens``: a
         ``metalsim.render.lens.Lens`` (f-theta / Kannala-Brandt fisheye; default pinhole from the model camera and the
-        per-env intrinsics); pixels outside its field of view are black with depth 0."""
+        per-env intrinsics); pixels outside its field of view are black with depth 0.
+
+        ``area_lights``: the USD Rect / Disk / Cylinder / Sphere lights the importer recorded (``usd_area_lights``) are
+        sampled as true area emitters (UsdLux radiance; soft shadows, exact near-field irradiance;
+        metalsim.render.area_lights); False = the far-field spot / point lights of the import (the previous
+        behaviour)."""
         from metalsim.render.lens import Lens
         import mujoco
         self.m, self.n, self.tw, self.th = model, n_envs, width, height
@@ -192,8 +197,17 @@ class Tier2Renderer:
             params[6, 1] = 0.0                # the skybox texture is not drawn (uniform dome / sky colour)
         if headlight is False:
             params[3, 3] = 0.0
+        from metalsim.render.area_lights import AreaLights
+        self.area = AreaLights(model) if (area_lights and model.nlight) else None
+        if self.area is not None and not self.area:
+            self.area = None
+        if self.area is not None:
+            lights, lock = self.area.apply(lights, lock)
         from metalsim.render.model_sync import ModelSync, unit_rgba
-        self.sync = ModelSync(c, model, n_envs, t, self.color_buf, lights, lock, opaque=not transparency)
+        self.sync = ModelSync(c, model, n_envs, t, self.color_buf, lights, lock, opaque=not transparency,
+                              light_tail_bytes=self.area.tail_bytes(n_envs) if self.area is not None else 0)
+        if self.area is not None:     # the emitters' world X axes after the light records
+            self.area.attach(c, self.sync.lights, n_envs)
         self.light_buf = self.sync.lights                    # (n_envs, max(nlight, 1)) records
         self.params_buf = c.buffer(params.nbytes, params, "pt_params")
         self.mat_model = material_model
@@ -375,6 +389,8 @@ class Tier2Renderer:
         defs = dict(self.rt.shader_defines())
         defs["HAZE_ON"] = 1 if self._haze_on else 0
         defs["ENV_MATS"] = 1 if self._env_mats_on else 0
+        if self.area is not None:
+            defs["AREA_LIGHTS"] = 1           # scenes with USD area lights (metalsim.render.area_lights)
         self.pipe = self.ctx.compute_pipeline(self.ctx.library("pathtrace", defs), "path_trace")
 
     def _encode_env_mats(self, cb, sim):
@@ -510,6 +526,8 @@ class Tier2Renderer:
         if ev is not None:
             self.ctx.wait_for(cb, ev, after_value)
         self.sync.encode(cb, sim if self.model_fields else None)
+        if self.area is not None:
+            self.area.encode(cb, sim)
         if self.rt.dyn is not None:      # tendons at their limits: MuJoCo's limit colour over the synced colour
             self.rt.dyn.encode_tint(cb, self.rt._dyn_src, self.color_buf, self.sync.inst_col)
         self._encode_env_mats(cb, sim if self.model_fields else None)
@@ -562,6 +580,8 @@ class Tier2Renderer:
         self.rt.set_sources(sources=sources, datas=datas)
         cb = c.command_buffer()
         self.sync.encode(cb, None)
+        if self.area is not None:
+            self.area.write_host(datas)
         if self.rt.dyn is not None:
             self.rt.dyn.encode_tint(cb, self.rt._dyn_src, self.color_buf, self.sync.inst_col)
         self._encode_env_mats(cb, None)
@@ -703,6 +723,8 @@ class Tier2Renderer:
         if self.m.nlight:
             c.write_buffer(self._host_light_xpos, np.stack([d.light_xpos for d in datas]).astype(np.float32).reshape(n, nl, 3))
             c.write_buffer(self._host_light_xdir, np.stack([d.light_xdir for d in datas]).astype(np.float32).reshape(n, nl, 3))
+        if self.area is not None:
+            self.area.write_host(datas)
         cb = c.command_buffer()
         self.sync.encode(cb, None)
         if rt.dyn is not None:

@@ -50,7 +50,7 @@ class Tier0Renderer:
                  hfield_skirts: bool = True, per_world_size: bool = True, model_fields: bool = True,
                  haze: bool = True, fog: bool = False, skirt_shadows: bool = True, tendons: str = "mujoco",
                  rolling_shutter=None,
-                 ctx: MetalContext | None = None, device="metal:0"):
+                 area_lights: bool = True, ctx: MetalContext | None = None, device="metal:0"):
         """tier 0: raster + shadow maps. tier 1: raster G-buffer with ray-traced shadows, ambient
         occlusion and mirror reflections from the fragment stage (Metal hardware ray tracing).
 
@@ -116,6 +116,7 @@ class Tier0Renderer:
         row bands at poses interpolated from the previous frame's (cost about one frame per band)."""
         self.m = model
         self.tier = tier
+        self._area_req = bool(area_lights)
         self.rt_samples = rt_samples
         self.shadows = shadows and tier == 0
         if shadow_lights not in ("all", "caster"):
@@ -301,7 +302,18 @@ class Tier0Renderer:
         # lights and scene params (headlight, bounds); per-env light records and instance colours from the model sync
         self.n_light = self.m.nlight
         from metalsim.render.model_sync import ModelSync, unit_rgba
-        self.sync = ModelSync(c, self.m, self.n, t, self.color_buf, t.lights)
+        # tier 1: the USD area lights the importer recorded are sampled on the emitter, with a shadow ray per sample
+        # (soft shadows; metalsim.render.area_lights, area_light.h); tier 0 keeps their far-field spot / point lights
+        self.area = None
+        if self.tier >= 1 and self._area_req and self.m.nlight:
+            from metalsim.render.area_lights import AreaLights
+            self.area = AreaLights(self.m) or None
+        if self.area is not None:
+            tmpl, lock = self.area.apply(np.array(t.lights, np.float32, copy=True), np.zeros(max(self.m.nlight, 1), np.uint32))
+            self.sync = ModelSync(c, self.m, self.n, t, self.color_buf, tmpl, lock, light_tail_bytes=self.area.tail_bytes(self.n))
+            self.area.attach(c, self.sync.lights, self.n)
+        else:
+            self.sync = ModelSync(c, self.m, self.n, t, self.color_buf, t.lights)
         self.light_buf = self.sync.lights                    # (n_envs, max(nlight, 1)) records
         self.inst_col_buf = self.sync.inst_col               # t_colors x the model colour, per env and slot
         from metalsim.render.env_materials import EnvMaterials   # per-env material / texture swaps
@@ -533,6 +545,8 @@ class Tier0Renderer:
     def _build_pipelines(self):
         c = self.ctx
         defs = {} if self.max_lights is None else {"MAX_LIGHTS": int(self.max_lights)}
+        if getattr(self, "area", None) is not None:
+            defs["AREA_LIGHTS"] = 1          # tier 1 area lights (geom_fs_rt); compiled only when the scene has them
         if self.rt is not None:
             defs.update(self.rt.shader_defines())       # sbvh layout: ray queries through the per-env BVH
         from metalsim.render import haze as hz
@@ -763,6 +777,8 @@ class Tier0Renderer:
         c = self.ctx
         # 0. per-env light records and instance colours from the model (MuJoCo Warp's per-world fields with a sim)
         self.sync.encode(cb, sim if self.model_fields else None)
+        if self.area is not None and sim is not None:
+            self.area.encode(cb, sim)
         if self.dyn is not None:        # tendons at their limits: MuJoCo's limit colour over the synced colour
             self.dyn.encode_tint(cb, self.rt._dyn_src if self.rt is not None else self._dyn_src, self.color_buf, self.inst_col_buf)
         on = self.env_mats.encode(cb, sim if self.model_fields else None)   # per-env material entries
@@ -1247,6 +1263,8 @@ class Tier0Renderer:
         if self.m.nlight:
             c.write_buffer(self._host_light_xpos, np.stack([d.light_xpos for d in datas]).astype(np.float32).reshape(n, -1, 3))
             c.write_buffer(self._host_light_xdir, np.stack([d.light_xdir for d in datas]).astype(np.float32).reshape(n, -1, 3))
+        if self.area is not None:
+            self.area.write_host(datas)
         cb = c.command_buffer()
         self._encode(cb, self._host_geom_xpos, 0, self._host_geom_xmat, 0, self._host_cam_xpos, 0, self._host_cam_xmat, 0)
         c.commit(cb)

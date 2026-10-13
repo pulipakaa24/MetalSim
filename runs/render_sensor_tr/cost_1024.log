@@ -1,0 +1,50 @@
+[gpu_run] sensor_tr_1024 start: device utilisation 0% (02:28:07)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 5 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.6 %
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+[cost] n 1024 plain lidar: 1.637 ms (tr=False, ext=False)
+[cost] n 1024 plain lidar_r2: 4.120 ms (tr=False, ext=True)
+[cost] n 1024 plain depth: 0.575 ms (tr=False)
+[cost] n 1024 glass lidar: 5.768 ms (tr=True, ext=True)
+[cost] n 1024 glass lidar_r2: 9.651 ms (tr=True, ext=True)
+[cost] n 1024 glass lidar_surface: 2.446 ms (tr=True, ext=False)
+[cost] n 1024 glass lidar_behind: 4.068 ms (tr=True, ext=False)
+[cost] n 1024 glass lidar_opaque: 2.363 ms (tr=False, ext=False)
+[cost] n 1024 glass lidar_r2_dual: 9.608 ms (tr=True, ext=True)
+[cost] n 1024 glass depth: 0.858 ms (tr=False)
+[cost] n 1024 glass depth_behind: 2.402 ms (tr=True)
+{
+ "n_envs": 1024,
+ "beams": 5760,
+ "depth": "64x64",
+ "plain/build_s": 0.010420083999633789,
+ "plain/lidar_ms": 1.637083332752809,
+ "plain/lidar_hit_frac": 0.5305555555555556,
+ "plain/lidar_r2_ms": 4.120479166886071,
+ "plain/lidar_r2_hit_frac": 0.31197916666666664,
+ "plain/depth_ms": 0.5745833332184702,
+ "glass/build_s": 0.011096874997747364,
+ "glass/lidar_ms": 5.767562501205248,
+ "glass/lidar_hit_frac": 0.8600694444444444,
+ "glass/lidar_r2_ms": 9.651437499996973,
+ "glass/lidar_r2_hit_frac": 0.6380208333333334,
+ "glass/lidar_surface_ms": 2.4460624990751967,
+ "glass/lidar_surface_hit_frac": 0.8600694444444444,
+ "glass/lidar_behind_ms": 4.068062500664382,
+ "glass/lidar_behind_hit_frac": 0.5305555555555556,
+ "glass/lidar_opaque_ms": 2.363250001508277,
+ "glass/lidar_opaque_hit_frac": 0.8600694444444444,
+ "glass/lidar_r2_dual_ms": 9.607708332623588,
+ "glass/lidar_r2_dual_hit_frac": 0.6380208333333334,
+ "glass/depth_ms": 0.8578750002925517,
+ "glass/depth_behind_ms": 2.402291665930534
+}
+[gpu_run] sensor_tr_1024 end: device utilisation 86% (02:28:18), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 5 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.3 %
