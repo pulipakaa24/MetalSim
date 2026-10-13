@@ -1,0 +1,50 @@
+{
+ "args": {
+  "cmd": "train",
+  "num_envs": 1024,
+  "iterations": 60,
+  "out": "runs/franka_pour/seeds/s3",
+  "resume": null,
+  "seed": 3,
+  "mode": "step",
+  "steps": 20,
+  "warmup": 3,
+  "rollout_len": 96,
+  "rigid_det": false,
+  "metal_fast_math": "off",
+  "capture_unit": "sim",
+  "mpm_grid_budget": "isaac",
+  "mpm_cells_per_world": null,
+  "json": null
+ },
+ "ppo": {
+  "num_steps_per_env": 96,
+  "max_iterations": 60,
+  "save_interval": 25,
+  "clip_actions": 1.0,
+  "hidden_dims": [
+   512,
+   256,
+   128,
+   64
+  ],
+  "init_std": 0.6,
+  "std_range": [
+   0.15,
+   0.75
+  ],
+  "value_loss_coef": 1.0,
+  "use_clipped_value_loss": true,
+  "clip_param": 0.2,
+  "entropy_coef": 0.0003,
+  "num_learning_epochs": 5,
+  "num_mini_batches": 4,
+  "learning_rate": 0.00015,
+  "schedule": "fixed",
+  "gamma": 0.9966554934125964,
+  "lam": 0.9830475724915585,
+  "desired_kl": 0.01,
+  "max_grad_norm": 1.0,
+  "seed": 3
+ }
+}

@@ -18,6 +18,7 @@ ITERS=${ITERS:-3}
 NUM=${NUM:-2048}            # train: env count (2048 = the README's; it does not fit the L4's 24 GB with CUDA graphs)
 EXTRA=${EXTRA:-}            # train: Hydra overrides, e.g. env.sim.physics.use_cuda_graph=false
 TAG=${TAG:-}
+SEED=${SEED:-0}             # train: rsl_rl / env seed (Isaac physics is not run-to-run deterministic by default)
 P=$HOME/parity3_scripts/franka_pour_published_asset.patch
 git apply --check $P && git apply $P || { echo "patch did not apply"; exit 1; }
 trap 'git apply -R $P' EXIT
@@ -31,7 +32,7 @@ for S in $STAGES; do
              --warmup_steps 3 --seed 0 --visualizer none --benchmark_formatter json,summary \
              --output_path $OUT/pour/bench_2048 > $OUT/pour/bench_2048.log 2>&1 ;;
     train) timeout 21600 isaaclab train --rl_library rsl_rl --task IsaacContrib-Franka-Pour --num_envs $NUM \
-             --max_iterations $ITERS --seed 0 --run_name l4_${NUM}$TAG --viz none $EXTRA > $OUT/pour/train_${NUM}$TAG.log 2>&1 ;;
+             --max_iterations $ITERS --seed $SEED --run_name l4_${NUM}$TAG --viz none $EXTRA > $OUT/pour/train_${NUM}$TAG.log 2>&1 ;;
   esac
   echo "$S exit $? in $(( $(date +%s) - t0 )) s"
 done
