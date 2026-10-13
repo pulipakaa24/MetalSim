@@ -95,10 +95,12 @@ def _record_dome_light(spec, prim, base_dir, scale_units):
     renderer can apply it (``Tier2Renderer.set_environment_from_model``; a textureless dome is the ``dome``
     kwarg). Fields follow UsdLux LightAPI (radiance = texture x intensity x 2^exposure x color) and DomeLight
     (``inputs:texture:file`` resolved to a path, ``inputs:texture:format``, DomeLight_1 ``poleAxis``); ``yaw`` is the
-    prim's world rotation about +z (the renderer adds Kit's azimuth, ``tier2.KIT_DOME_AZIMUTH``), ``tilt`` how far the
-    authored rotation moves the pole off +z. Kit applies a tilting rotation rigidly (measured 2026-09-26, rotateX 90
-    deg: docs/research/isaac_side_session_2026-09-26.md section 2); tier 2 renders only the yaw, so a tilted dome is
-    reported here and rendered upright (open gap)."""
+    prim's world rotation about +z (the renderer adds Kit's azimuth, ``tier2.KIT_DOME_AZIMUTH``), ``tilt`` (deg) how far
+    the authored rotation and pole alignment move the pole off +z. Kit applies a tilting rotation rigidly (measured
+    2026-09-26, rotateX 90 deg: docs/research/isaac_side_session_2026-09-26.md section 2), so a tilted dome also records
+    ``rot`` = R_prim . P (row-major 3x3, dome frame -> world; P: the DomeLight_1 pole alignment, R_x(-90 deg) for a +Y
+    pole, identity for a legacy DomeLight, which Kit renders z-up whatever the stage upAxis). Convention and its
+    unmeasured cases: research_notes/dome_light_azimuth/tilted_dome.md."""
     import json
     la = UsdLux.LightAPI(prim)
     val = lambda a, d: (a.Get() if a and a.Get() is not None else d)
@@ -112,13 +114,32 @@ def _record_dome_light(spec, prim, base_dir, scale_units):
             path = os.path.normpath(os.path.join(base_dir, path))
         rec["file"] = path
         rec["format"] = str(val(prim.GetAttribute("inputs:texture:format"), "automatic"))
-    pa = prim.GetAttribute("poleAxis") or prim.GetAttribute("inputs:poleAxis")   # DomeLight_1: uniform token poleAxis
-    if pa and pa.Get() is not None:
-        rec["pole_axis"] = str(pa.Get())
+    pole = "Z"                                                       # legacy DomeLight: Kit renders it z-up (measured)
+    if hasattr(UsdLux, "DomeLight_1") and prim.IsA(UsdLux.DomeLight_1):
+        pa = prim.GetAttribute("poleAxis")                            # DomeLight_1: uniform token poleAxis = "scene"
+        rec["pole_axis"] = str(pa.Get()) if pa and pa.Get() is not None else "scene"
+        pole = rec["pole_axis"]
+        if pole == "scene":
+            pole = str(UsdGeom.GetStageUpAxis(prim.GetStage()))
+    else:
+        pa = prim.GetAttribute("inputs:poleAxis")                     # (not a schema attribute; kept for old records)
+        if pa and pa.Get() is not None:
+            rec["pole_axis"] = str(pa.Get())
+    rv = prim.GetAttribute("omni:rtx:usdluxVersion")
+    if rv and rv.Get() is not None:
+        rec["rtx_usdlux_version"] = int(rv.Get())
+        if rec["rtx_usdlux_version"] >= 2505:
+            import warnings
+            warnings.warn(f"{rec['prim']}: omni:rtx:usdluxVersion {rec['rtx_usdlux_version']} (UsdLux 25.05 dome orientation) is "
+                          "not measured; tier 2 renders the measured 2411 convention (research_notes/dome_light_azimuth/tilted_dome.md)")
     _, q, _ = _world_xform(prim, scale_units)
     R = np.zeros(9); mujoco.mju_quat2Mat(R, q); R = R.reshape(3, 3)
+    if pole.upper() == "Y":
+        R = R @ np.array([[1.0, 0, 0], [0, 0, 1.0], [0, -1.0, 0]])  # R_x(-90 deg): the Z-pole frame -> OpenEXR's +Y pole
     rec["yaw"] = float(np.arctan2(R[1, 0], R[0, 0]))                 # rotation of the dome's x axis about +z
     rec["tilt"] = float(np.degrees(np.arccos(np.clip(R[2, 2], -1, 1))))
+    if np.hypot(R[0, 2], R[1, 2]) > 1e-6 or R[2, 2] < 0:             # the pole leaves +z: the full rotation
+        rec["rot"] = [float(v) for v in R.reshape(-1)]
     t = spec.add_text(); t.name = "usd_dome"; t.data = json.dumps(rec)
     return rec
 

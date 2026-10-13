@@ -61,6 +61,7 @@ renders a DomeLight"; it is the OpenUSD spec frame, and Kit is −90° from it.
 ## Open (not changed here)
 
 - A dome whose authored rotation tilts the pole (Kit applies it rigidly) is rendered upright by tier 2 (only yaw is
-  passed to the shader); the importer records `tilt`. Needs a full rotation in `PTConsts`.
+  passed to the shader); the importer records `tilt`. Needs a full rotation in `PTConsts`. **Done 2026-10-13:**
+  `tilted_dome.md` (FLAG_ENVROT, `PTConsts.env_rot`).
 - Whether Kit honours an explicit DomeLight_1 `poleAxis = "Y"` was not measured (all recordings used the legacy
   DomeLight).
