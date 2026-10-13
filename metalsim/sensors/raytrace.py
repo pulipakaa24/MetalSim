@@ -23,6 +23,7 @@ import Metal
 
 from metalsim.interop import torch_bridge as tb
 from metalsim.interop import warp_metal as wm
+from metalsim.render import as_limits
 from metalsim.render.metal_context import MetalContext
 from metalsim.render.scene_tables import CameraIntrinsics, build_scene_tables
 
@@ -151,6 +152,7 @@ class RayTracer:
             g.setVertexFormat_(Metal.MTLAttributeFormatFloat3)
             g.setIndexBuffer_(self.ibuf); g.setIndexBufferOffset_(int(mesh["i_off"]) * 4)
             g.setIndexType_(Metal.MTLIndexTypeUInt32)
+            as_limits.check("primitives", int(mesh["i_count"]) // 3, "ray-tracing mesh")   # rt shaders: standard limits
             g.setTriangleCount_(int(mesh["i_count"]) // 3)
             g.setOpaque_(True)
             d = Metal.MTLPrimitiveAccelerationStructureDescriptor.new()
@@ -185,6 +187,7 @@ class RayTracer:
             g.setVertexFormat_(Metal.MTLAttributeFormatFloat3)
             g.setIndexBuffer_(self.ibuf); g.setIndexBufferOffset_(int(mesh["i_off"]) * 4)
             g.setIndexType_(Metal.MTLIndexTypeUInt32)
+            as_limits.check("primitives", int(mesh["i_count"]) // 3, "ray-tracing mesh")   # rt shaders: standard limits
             g.setTriangleCount_(int(mesh["i_count"]) // 3)
             g.setOpaque_(True)
             d = Metal.MTLPrimitiveAccelerationStructureDescriptor.new()
@@ -216,6 +219,7 @@ class RayTracer:
 
     def _alloc_instance_structure(self):
         c = self.ctx
+        as_limits.check("instances", self.n_inst, f"ray-tracing scene ({self.n} envs)")   # rt shaders: standard limits
         d = Metal.MTLInstanceAccelerationStructureDescriptor.new()
         d.setInstancedAccelerationStructures_(self.prim_as)
         d.setInstanceCount_(self.n_inst)
