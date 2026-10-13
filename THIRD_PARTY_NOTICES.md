@@ -21,7 +21,7 @@ Three kinds of relationship occur:
 | NVIDIA Warp, via innate-inc/warp (Metal backend) | Apache-2.0 | fork, dependency; patches | `patches/warp/`, `patches/0001-Metal-fixed-size-arrays-*.patch`, `patches/warp-innate-metal-pending-frees.patch`, `scripts/setup_warp.sh` |
 | MuJoCo Warp (Google DeepMind), incl. David Dobas's Metal device patch | Apache-2.0 | fork, dependency; patches | `patches/mujoco_warp/`, `patches/mujoco_warp-*.patch`, `scripts/setup_flex.sh` |
 | MuJoCo (Google DeepMind) | Apache-2.0 | dependency (`mujoco`) | imported throughout |
-| Newton (Newton project, Linux Foundation) | Apache-2.0 | fork, optional dependency; **vendored, modified** (implicit MPM solver package, fork commit `3fd1f052`) | `metalsim/physics/newton_backend.py`, `scripts/setup_newton*.sh`, `scripts/diagnostics/newton_upstream/`, `metalsim/physics/mpm/implicit_mpm/` (Apache-2.0; `scripts/vendor_mpm152.py`) |
+| Newton (Newton project, Linux Foundation) | Apache-2.0 | fork, optional dependency; **vendored, modified** (implicit MPM solver package, fork commit `99843d09`) | `metalsim/physics/newton_backend.py`, `scripts/setup_newton*.sh`, `scripts/diagnostics/newton_upstream/`, `metalsim/physics/mpm/implicit_mpm/` (Apache-2.0; `scripts/vendor_mpm152.py`) |
 | NVIDIA PhysX 5.6.1 | BSD-3-Clause | derived (one module, algorithm port) | `metalsim/physics/physx_cloth.py`; no PhysX source files |
 | Isaac Lab (v2.3.2) source files | BSD-3-Clause | included (headers kept); derived (terrain port) | `assets/isaac/**/*.py`, `assets/isaac/*.yaml`, `metalsim/learn/isaac_terrain.py` |
 | Isaac Sim assets (`g1_minimal.usd`) | NVIDIA asset terms | fetched, **not redistributed** | `scripts/fetch_isaac_assets.sh`; `.gitignore` |
@@ -94,7 +94,7 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
   `newton` extra installs upstream Newton.
 - **Vendored source, `metalsim/physics/mpm/implicit_mpm/`**: Newton's implicit MPM solver package
   (`newton/_src/solvers/implicit_mpm/`) from MetalSim's fork, [pulipakaa24/newton](https://github.com/pulipakaa24/newton)
-  commit `3fd1f052a5ad031578960d9642aaaedc03834e4d` (branch `metalsim-1.5.2`, off upstream `v1.5.2`), copyright The
+  commit `99843d09840f89ac16c82104ad66ae792e45eb91` (branch `metalsim-1.5.2`, off upstream `v1.5.2`), copyright The
   Newton Developers, **Apache-2.0** ([`licenses/Apache-2.0.txt`](licenses/Apache-2.0.txt); that directory is offered
   under Apache-2.0, not MIT). Every file keeps its SPDX copyright and licence header. Modifications (Apache-2.0
   section 4(b)), stated in each file and in the directory's `NOTICE.txt`: a modification notice after the header and

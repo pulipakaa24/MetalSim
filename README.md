@@ -181,7 +181,7 @@ Base: newton-physics/newton `4545802`. Apache-2.0.
 Branch [`metalsim-hashtable-metal`](https://github.com/pulipakaa24/newton/tree/metalsim-hashtable-metal)
 (`a4be360`) is upstream `4545802` with only the Metal fixes (no XPBD changes); the `newton` extra installs it into `.venv` (the stock commit
 loses or duplicates contact-table keys on Metal and raises on the current Warp fork in the rough G1 task).
-Branch [`metalsim-1.5.2`](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2) (`c0427fc`) is Newton 1.5.2
+Branch [`metalsim-1.5.2`](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2) (`99843d0`) is Newton 1.5.2
 (Isaac Lab 3.0-EA's pin) with MetalSim's Metal changes for the implicit MPM solver and the Franka-Pour rigid collision
 at 2,048 worlds; `scripts/setup_newton152.sh` installs it into `.venv-newton152`.
 
