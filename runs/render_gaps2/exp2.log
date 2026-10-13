@@ -1,0 +1,25 @@
+[gpu_run] rg2_exp2 start: device utilisation 0% (00:53:35)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 5 %; per-process GPU time over 1.8 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.6 %
+== cloth tier1 1024 METALSIM_TIER0_EXP {} t1 specialized
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "defaults", "tree": "t1 specialized", "ms": 14.693}
+== cloth tier2 1024 METALSIM_PT_EXP {} t2 specialized anyhit
+{"scene": "cloth", "renderer": "tier2", "envs": 1024, "res": 64, "config": "defaults", "tree": "t2 specialized anyhit", "ms": 18.183}
+== cloth tier2 1024 METALSIM_PT_EXP {"TRANSMIT_ANYHIT":0} t2 specialized no-anyhit
+{"scene": "cloth", "renderer": "tier2", "envs": 1024, "res": 64, "config": "defaults", "tree": "t2 specialized no-anyhit", "ms": 18.524}
+== glass tier2 64 METALSIM_PT_EXP {} glass t2 anyhit
+{"scene": "glass", "renderer": "tier2", "envs": 64, "res": 128, "config": "defaults", "tree": "glass t2 anyhit", "ms": 4.593}
+== glass tier2 64 METALSIM_PT_EXP {"TRANSMIT_ANYHIT":0} glass t2 no-anyhit
+{"scene": "glass", "renderer": "tier2", "envs": 64, "res": 128, "config": "defaults", "tree": "glass t2 no-anyhit", "ms": 4.555}
+== cloth_inf tier1 1024 METALSIM_TIER0_EXP {} inf t1 planes=1
+{"scene": "cloth_inf", "renderer": "tier1", "envs": 1024, "res": 64, "config": "defaults", "tree": "inf t1 planes=1", "ms": 15.076}
+== cloth_inf tier1 1024 METALSIM_TIER0_EXP {"GRID_PLANES":0} inf t1 planes forced 0
+{"scene": "cloth_inf", "renderer": "tier1", "envs": 1024, "res": 64, "config": "defaults", "tree": "inf t1 planes forced 0", "ms": 15.968}
+== cloth_inf tier2 1024 METALSIM_PT_EXP {} inf t2 planes=1
+{"scene": "cloth_inf", "renderer": "tier2", "envs": 1024, "res": 64, "config": "defaults", "tree": "inf t2 planes=1", "ms": 23.196}
+== cloth_inf tier2 1024 METALSIM_PT_EXP {"GRID_PLANES":0} inf t2 planes forced 0
+{"scene": "cloth_inf", "renderer": "tier2", "envs": 1024, "res": 64, "config": "defaults", "tree": "inf t2 planes forced 0", "ms": 22.601}
+[gpu_run] rg2_exp2 end: device utilisation 94% (00:55:00), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 6 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.2 %
+[gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.0 %
