@@ -1,0 +1,70 @@
+[gpu_run] rg2_cost2 start: device utilisation 0% (01:17:30)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 5 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.8 %
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth dc949da load on device 'metal:0' took 64.71 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_72cc6aa2 72cc6aa load on device 'metal:0' took 543.08 ms  (cached)
+Module mujoco_warp._src.constraint 4b2565f load on device 'metal:0' took 38.56 ms  (cached)
+Module _efc_contact_init__locals__kernel_52cf860d 52cf860 load on device 'metal:0' took 41.01 ms  (cached)
+Module _efc_contact_update__locals__kernel_27b27a7f 27b27a7 load on device 'metal:0' took 41.26 ms  (cached)
+Module _next_time_builder__locals___next_time_89d592b4 89d592b load on device 'metal:0' took 43.34 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_99f1ed31 99f1ed3 load on device 'metal:0' took 38.61 ms  (cached)
+Module reset_data__locals__reset_mocap_21cdccdf 21cdccd load on device 'metal:0' took 40.14 ms  (cached)
+Module reset_data__locals__reset_contact_e7d9f88d e7d9f88 load on device 'metal:0' took 39.40 ms  (cached)
+Module reset_data__locals__reset_sleep_c3616e3d c3616e3 load on device 'metal:0' took 38.97 ms  (cached)
+Module reset_data__locals__reset_nworld_f3f460ae f3f460a load on device 'metal:0' took 38.83 ms  (cached)
+{"item": "skirt_shadows", "renderer": "T0", "envs": 1024, "skirt_shadows": true, "ms": 8.584}
+{"item": "skirt_shadows", "renderer": "T0", "envs": 1024, "skirt_shadows": false, "ms": 8.327}
+Module _friction_dof__locals__kernel_54b217fe 54b217f load on device 'metal:0' took 39.63 ms  (cached)
+Module _friction_tendon__locals__kernel_b39f945e b39f945 load on device 'metal:0' took 437.26 ms  (compiled)
+Module _limit_tendon__locals__kernel_9a8fd875 9a8fd87 load on device 'metal:0' took 442.40 ms  (compiled)
+Module _efc_contact_jac_dense__locals__kernel_50fd8eb9 c8c5823 load on device 'metal:0' took 39.37 ms  (cached)
+Module mujoco_warp._src.forward 9c6583c load on device 'metal:0' took 53.05 ms  (cached)
+Module mujoco_warp._src.passive 121cefe load on device 'metal:0' took 51.40 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_ec74e588 ec74e58 load on device 'metal:0' took 39.71 ms  (cached)
+Module _qfrc_smooth__locals__kernel_b9a126c0 b9a126c load on device 'metal:0' took 38.26 ms  (cached)
+Module mujoco_warp._src.support d1f2881 load on device 'metal:0' took 39.42 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_e36605c4 c28bcb3 load on device 'metal:0' took 400.16 ms  (compiled)
+Module _solve_init_dof__locals__kernel_a278b607 a278b60 load on device 'metal:0' took 38.85 ms  (cached)
+Module _solve_init_efc__locals__kernel_38f8708b 38f8708 load on device 'metal:0' took 38.91 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_39d4a164 39d4a16 load on device 'metal:0' took 389.94 ms  (compiled)
+Module mul_m_kernel__locals___mul_m_1b897f73 1b897f7 load on device 'metal:0' took 39.21 ms  (cached)
+Module _update_constraint_efc__locals__kernel_875e0cfe 875e0cf load on device 'metal:0' took 39.28 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_9318117e 9318117 load on device 'metal:0' took 39.06 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_be8f77c5 be8f77c load on device 'metal:0' took 38.98 ms  (cached)
+Module _update_gradient_grad__locals__kernel_b82c9bc8 b82c9bc load on device 'metal:0' took 38.91 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_680474bb b636783 load on device 'metal:0' took 459.74 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_c7339667 59eabf5 load on device 'metal:0' took 449.54 ms  (compiled)
+Module _linesearch_iterative_kernel__locals__kernel_a9a2fcce de85456 load on device 'metal:0' took 462.00 ms  (cached)
+Module _update_constraint_gradient_fused__locals__kernel_25b89aee 2a63599 load on device 'metal:0' took 434.76 ms  (compiled)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_2ffa1447 3e0703d load on device 'metal:0' took 458.43 ms  (compiled)
+Module _solve_done__locals__kernel_f1d63dbf f1d63db load on device 'metal:0' took 38.02 ms  (cached)
+Module mujoco_warp._src.solver 00c4ab6 load on device 'metal:0' took 43.45 ms  (cached)
+Module reset_data__locals__reset_M_c0d46912 c0d4691 load on device 'metal:0' took 38.98 ms  (cached)
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a5314e27bee02c142/scripts/diagnostics/render_gaps2_cost.py", line 154, in <module>
+    main()
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a5314e27bee02c142/scripts/diagnostics/render_gaps2_cost.py", line 146, in main
+    for row in globals()["rows_" + it]():
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a5314e27bee02c142/scripts/diagnostics/render_gaps2_cost.py", line 98, in rows_tendons
+    out.append(dict(item="tendons", renderer=name, envs=n, tendons=mode, ms=frame_ms(mk(m, n, 128, "cam", tendons=mode), sim)))
+                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a5314e27bee02c142/scripts/diagnostics/render_gaps2_cost.py", line 32, in frame_ms
+    r.render(sim)
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a5314e27bee02c142/metalsim/render/tier0.py", line 1150, in render
+    views = {name: wm.buffer_of(getattr(sim.d, name)) for name in names}
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a5314e27bee02c142/metalsim/interop/warp_metal.py", line 107, in buffer_of
+    raise RuntimeError("array memory is not a Metal allocation of this device")
+RuntimeError: array memory is not a Metal allocation of this device
+[gpu_run] rg2_cost2 end: device utilisation 7% (01:17:47), exit 1
+[gpu_run] gpu_top: GPU (ioreg): device utilization 7 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.4 %
+[gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.6 %
