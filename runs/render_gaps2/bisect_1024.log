@@ -1,0 +1,28 @@
+[gpu_run] rg2_bisect start: device utilisation 0% (00:45:40)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 5 %; per-process GPU time over 1.8 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.5 %
+== tier1 p1 1024
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "defaults", "tree": "p1", "ms": 13.136, "passes": [["accel:-", 7.727, 0.565], ["render:render", 5.641, 0.413], ["compute:untile", 0.159, 0.012], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.134, 0.01], ["compute:build_env_params", 0.007, 0.001], ["compute:refit_instances", 0.004, 0.0]]}
+== tier1 p2 1024
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "defaults", "tree": "p2", "ms": 13.254, "passes": [["accel:-", 7.784, 0.568], ["render:render", 5.664, 0.413], ["compute:untile", 0.122, 0.009], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.12, 0.009], ["compute:build_env_params", 0.007, 0.001], ["compute:refit_instances", 0.005, 0.0]]}
+== tier1 p2b 1024
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "defaults", "tree": "p2b", "ms": 13.167, "passes": [["accel:-", 7.433, 0.555], ["render:render", 5.723, 0.428], ["compute:untile", 0.119, 0.009], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.101, 0.008], ["compute:build_env_params", 0.007, 0.0], ["compute:refit_instances", 0.005, 0.0]]}
+== tier1 p3 1024
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "defaults", "tree": "p3", "ms": 17.981, "passes": [["render:render", 10.328, 0.563], ["accel:-", 7.759, 0.423], ["compute:untile", 0.121, 0.007], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.101, 0.005], ["compute:scale_geom_xmat", 0.011, 0.001], ["compute:sync_colors+sync_lights", 0.009, 0.001], ["compute:build_env_params", 0.007, 0.0], ["compute:refit_instances", 0.005, 0.0]]}
+== tier1 cur 1024
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "defaults", "tree": "cur", "ms": 18.032, "passes": [["render:bg_vs/bg_fs+geom_vs/geom_fs_rt+dyn_vs/geom_fs_rt", 10.486, 0.568], ["accel:-", 7.704, 0.418], ["compute:untile", 0.122, 0.007], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.099, 0.005], ["compute:scale_geom_xmat", 0.014, 0.001], ["compute:sync_clear_env_flags+sync_colors+sync_lights", 0.01, 0.001], ["compute:build_env_params", 0.007, 0.0], ["compute:refit_instances", 0.005, 0.0]]}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "all_off", "tree": "cur", "ms": 16.105, "passes": [["render:bg_vs/bg_fs+geom_vs/geom_fs_rt+dyn_vs/geom_fs_rt", 8.483, 0.515], ["accel:-", 7.706, 0.468], ["compute:untile", 0.118, 0.007], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.106, 0.006], ["compute:sync_clear_env_flags+sync_colors+sync_lights", 0.037, 0.002], ["compute:build_env_params", 0.008, 0.0], ["compute:refit_instances", 0.005, 0.0]]}
+== tier2 p1 1024
+{"scene": "cloth", "renderer": "tier2", "envs": 1024, "res": 64, "config": "defaults", "tree": "p1", "ms": 18.602, "passes": [["compute:path_trace", 17.751, 0.96], ["compute:dyn_bvh_refit+dyn_bvh_boxes", 0.32, 0.017], ["accel:-", 0.309, 0.017], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.103, 0.006], ["compute:refit_instances", 0.004, 0.0]]}
+== tier2 p2 1024
+{"scene": "cloth", "renderer": "tier2", "envs": 1024, "res": 64, "config": "defaults", "tree": "p2", "ms": 18.332, "passes": [["compute:path_trace", 17.438, 0.954], ["accel:-", 0.342, 0.019], ["compute:dyn_bvh_refit+dyn_bvh_boxes", 0.332, 0.018], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.157, 0.009], ["compute:refit_instances", 0.005, 0.0]]}
+== tier2 p2b 1024
+{"scene": "cloth", "renderer": "tier2", "envs": 1024, "res": 64, "config": "defaults", "tree": "p2b", "ms": 17.765, "passes": [["compute:path_trace", 17.074, 0.956], ["accel:-", 0.347, 0.019], ["compute:dyn_bvh_refit+dyn_bvh_boxes", 0.329, 0.018], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.1, 0.006], ["compute:refit_instances", 0.005, 0.0]]}
+== tier2 p3 1024
+{"scene": "cloth", "renderer": "tier2", "envs": 1024, "res": 64, "config": "defaults", "tree": "p3", "ms": 24.412, "passes": [["compute:path_trace", 23.674, 0.968], ["accel:-", 0.334, 0.014], ["compute:dyn_bvh_refit+dyn_bvh_boxes", 0.325, 0.013], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.097, 0.004], ["compute:sync_colors+sync_lights", 0.024, 0.001], ["compute:refit_instances", 0.005, 0.0], ["compute:scale_geom_xmat", 0.004, 0.0]]}
+== tier2 cur 1024
+{"scene": "cloth", "renderer": "tier2", "envs": 1024, "res": 64, "config": "defaults", "tree": "cur", "ms": 28.611, "passes": [["compute:path_trace", 27.627, 0.973], ["accel:-", 0.338, 0.012], ["compute:dyn_bvh_refit+dyn_bvh_boxes", 0.322, 0.011], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.098, 0.003], ["compute:sync_clear_env_flags+sync_colors+sync_lights", 0.011, 0.0], ["compute:refit_instances", 0.005, 0.0], ["compute:scale_geom_xmat", 0.004, 0.0]]}
+{"scene": "cloth", "renderer": "tier2", "envs": 1024, "res": 64, "config": "all_off", "tree": "cur", "ms": 28.457, "passes": [["compute:path_trace", 27.521, 0.972], ["compute:dyn_bvh_refit+dyn_bvh_boxes", 0.327, 0.012], ["accel:-", 0.321, 0.011], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.104, 0.004], ["compute:refit_instances", 0.018, 0.001], ["compute:sync_clear_env_flags+sync_colors+sync_lights", 0.011, 0.0]]}
+[gpu_run] rg2_bisect end: device utilisation 99% (00:48:02), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 5 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       3.7 %

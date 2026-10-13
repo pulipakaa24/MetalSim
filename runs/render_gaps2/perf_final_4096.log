@@ -1,0 +1,39 @@
+[gpu_run] rg2_final4096 start: device utilisation 0% (01:09:33)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 5 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.7 %
+== cloth tier1 4096 /Users/aditya/robosim/scratch/rg2_trees/p2b p2b none 0
+{"scene": "cloth", "renderer": "tier1", "envs": 4096, "res": 64, "config": "defaults", "tree": "p2b", "ms": 52.856, "passes": [["accel:-", 30.594, 0.556], ["render:render", 22.842, 0.415], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.811, 0.015], ["compute:untile", 0.792, 0.014], ["compute:build_env_params", 0.008, 0.0], ["compute:refit_instances", 0.006, 0.0]]}
+== cloth tier1 4096 /Users/aditya/robosim/scratch/rg2_trees/p3 p3 none 0
+{"scene": "cloth", "renderer": "tier1", "envs": 4096, "res": 64, "config": "defaults", "tree": "p3", "ms": 71.703, "passes": [["render:render", 41.302, 0.57], ["accel:-", 29.953, 0.414], ["compute:untile", 0.676, 0.009], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.456, 0.006], ["compute:scale_geom_xmat", 0.017, 0.0], ["compute:sync_colors+sync_lights", 0.01, 0.0], ["compute:build_env_params", 0.008, 0.0], ["compute:refit_instances", 0.006, 0.0]]}
+== cloth tier1 4096 /Users/aditya/robosim/scratch/rg2_trees/base base none 0
+{"scene": "cloth", "renderer": "tier1", "envs": 4096, "res": 64, "config": "defaults", "tree": "base", "ms": 71.412, "passes": [["render:render", 41.925, 0.575], ["accel:-", 29.756, 0.408], ["compute:untile", 0.676, 0.009], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.458, 0.006], ["compute:scale_geom_xmat", 0.015, 0.0], ["compute:sync_colors+sync_lights", 0.01, 0.0], ["compute:build_env_params", 0.008, 0.0], ["compute:refit_instances", 0.006, 0.0]]}
+== cloth tier1 4096 /Users/aditya/robosim/.claude/worktrees/agent-a5314e27bee02c142 cur all 1
+{"scene": "cloth", "renderer": "tier1", "envs": 4096, "res": 64, "config": "defaults", "tree": "cur", "ms": 58.49, "passes": [["accel:-", 30.806, 0.509], ["render:bg_vs/bg_fs+geom_vs/geom_fs_rt+dyn_vs/geom_fs_rt", 28.526, 0.471], ["compute:untile", 0.673, 0.011], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.47, 0.008], ["compute:scale_geom_xmat", 0.016, 0.0], ["compute:sync_clear_env_flags+sync_colors+sync_lights", 0.012, 0.0], ["compute:build_env_params", 0.008, 0.0], ["compute:refit_instances", 0.007, 0.0]]}
+{"scene": "cloth", "renderer": "tier1", "envs": 4096, "res": 64, "config": "shadow_lights=caster", "tree": "cur", "ms": 55.801}
+{"scene": "cloth", "renderer": "tier1", "envs": 4096, "res": 64, "config": "transparency=False", "tree": "cur", "ms": 58.802}
+{"scene": "cloth", "renderer": "tier1", "envs": 4096, "res": 64, "config": "infinite_planes=False", "tree": "cur", "ms": 58.751}
+{"scene": "cloth", "renderer": "tier1", "envs": 4096, "res": 64, "config": "model_fields=False (no per-env light records)", "tree": "cur", "ms": 58.707}
+{"scene": "cloth", "renderer": "tier1", "envs": 4096, "res": 64, "config": "env_layout=legacy (no cell clipping)", "tree": "cur", "ms": 58.205}
+{"scene": "cloth", "renderer": "tier1", "envs": 4096, "res": 64, "config": "reverse_z=False", "tree": "cur", "ms": 58.649}
+{"scene": "cloth", "renderer": "tier1", "envs": 4096, "res": 64, "config": "appearance=legacy", "tree": "cur", "ms": 58.73}
+{"scene": "cloth", "renderer": "tier1", "envs": 4096, "res": 64, "config": "max_lights=8", "tree": "cur", "ms": 58.619}
+{"scene": "cloth", "renderer": "tier1", "envs": 4096, "res": 64, "config": "dyn_layout=sbvh", "tree": "cur", "ms": 96.805}
+{"scene": "cloth", "renderer": "tier1", "envs": 4096, "res": 64, "config": "all_off", "tree": "cur", "ms": 55.511, "passes": [["accel:-", 30.584, 0.533], ["render:bg_vs/bg_fs+geom_vs/geom_fs_rt+dyn_vs/geom_fs_rt", 25.555, 0.446], ["compute:untile", 0.671, 0.012], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.47, 0.008], ["compute:sync_clear_env_flags+sync_colors+sync_lights", 0.033, 0.001], ["compute:build_env_params", 0.008, 0.0], ["compute:refit_instances", 0.006, 0.0]]}
+== cloth tier2 4096 /Users/aditya/robosim/scratch/rg2_trees/p2b p2b none 0
+{"scene": "cloth", "renderer": "tier2", "envs": 4096, "res": 64, "config": "defaults", "tree": "p2b", "ms": 69.146, "passes": [["compute:path_trace", 66.167, 0.958], ["compute:dyn_bvh_refit+dyn_bvh_boxes", 1.627, 0.024], ["accel:-", 0.747, 0.011], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.472, 0.007], ["compute:refit_instances", 0.088, 0.001]]}
+== cloth tier2 4096 /Users/aditya/robosim/scratch/rg2_trees/p3 p3 none 0
+{"scene": "cloth", "renderer": "tier2", "envs": 4096, "res": 64, "config": "defaults", "tree": "p3", "ms": 96.265, "passes": [["compute:path_trace", 93.608, 0.971], ["compute:dyn_bvh_refit+dyn_bvh_boxes", 1.615, 0.017], ["accel:-", 0.729, 0.008], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.469, 0.005], ["compute:sync_colors+sync_lights", 0.011, 0.0], ["compute:refit_instances", 0.006, 0.0], ["compute:scale_geom_xmat", 0.005, 0.0]]}
+== cloth tier2 4096 /Users/aditya/robosim/scratch/rg2_trees/base base none 0
+{"scene": "cloth", "renderer": "tier2", "envs": 4096, "res": 64, "config": "defaults", "tree": "base", "ms": 96.014, "passes": [["compute:path_trace", 93.456, 0.971], ["compute:dyn_bvh_refit+dyn_bvh_boxes", 1.609, 0.017], ["accel:-", 0.735, 0.008], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.471, 0.005], ["compute:sync_colors+sync_lights", 0.011, 0.0], ["compute:refit_instances", 0.006, 0.0], ["compute:scale_geom_xmat", 0.005, 0.0]]}
+== cloth tier2 4096 /Users/aditya/robosim/.claude/worktrees/agent-a5314e27bee02c142 cur all 1
+{"scene": "cloth", "renderer": "tier2", "envs": 4096, "res": 64, "config": "defaults", "tree": "cur", "ms": 71.777, "passes": [["compute:path_trace", 68.869, 0.959], ["compute:dyn_bvh_refit+dyn_bvh_boxes", 1.668, 0.023], ["accel:-", 0.739, 0.01], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.475, 0.007], ["compute:sync_clear_env_flags+sync_colors+sync_lights", 0.014, 0.0], ["compute:refit_instances", 0.006, 0.0], ["compute:scale_geom_xmat", 0.005, 0.0]]}
+{"scene": "cloth", "renderer": "tier2", "envs": 4096, "res": 64, "config": "transparency=False", "tree": "cur", "ms": 71.974}
+{"scene": "cloth", "renderer": "tier2", "envs": 4096, "res": 64, "config": "infinite_planes=False", "tree": "cur", "ms": 71.854}
+{"scene": "cloth", "renderer": "tier2", "envs": 4096, "res": 64, "config": "model_fields=False (no per-env light records)", "tree": "cur", "ms": 71.977}
+{"scene": "cloth", "renderer": "tier2", "envs": 4096, "res": 64, "config": "env_layout=legacy (no cell clipping)", "tree": "cur", "ms": 75.225}
+{"scene": "cloth", "renderer": "tier2", "envs": 4096, "res": 64, "config": "appearance=legacy", "tree": "cur", "ms": 71.826}
+{"scene": "cloth", "renderer": "tier2", "envs": 4096, "res": 64, "config": "dyn_layout=per_env", "tree": "cur", "ms": 57.707}
+{"scene": "cloth", "renderer": "tier2", "envs": 4096, "res": 64, "config": "all_off", "tree": "cur", "ms": 75.529, "passes": [["compute:path_trace", 72.502, 0.962], ["compute:dyn_bvh_refit+dyn_bvh_boxes", 1.62, 0.022], ["accel:-", 0.709, 0.009], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.478, 0.006], ["compute:sync_clear_env_flags+sync_colors+sync_lights", 0.014, 0.0], ["compute:refit_instances", 0.006, 0.0]]}
+[gpu_run] rg2_final4096 end: device utilisation 0% (01:13:21), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 5 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       3.4 %

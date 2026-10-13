@@ -1,0 +1,76 @@
+== tests/test_render_tendons.py
+.........                                                                [100%]
+9 passed in 14.67s
+== tests/test_render_env_textures.py
+........                                                                 [100%]
+8 passed in 14.30s
+== tests/test_render_extras.py
+..........................................                               [100%]
+42 passed in 101.20s (0:01:41)
+== tests/test_render_appearance.py
+...........                                                              [100%]
+11 passed in 2.77s
+== tests/test_render_world.py
+..............                                                           [100%]
+14 passed in 4.09s
+== tests/test_render_tier0.py
+....                                                                     [100%]
+4 passed in 35.22s
+== tests/test_render_tier2.py
+E        +    and   np.float64(0.5235987755982988) = <ufunc 'radians'>(30)
+E        +      where <ufunc 'radians'> = np.radians
+
+tests/test_render_tier2.py:226: AssertionError
+----------------------------- Captured stdout call -----------------------------
+usd dome record: {'prim': '/World/skyLight', 'intensity': 2.0, 'exposure': 1.0, 'color': [1.0, 0.5, 0.25], 'file': '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-28/test_env_map_usd_dome_import0/const.hdr', 'format': 'latlong', 'yaw': 0.5235987755982987, 'tilt': 0.0001620618913188485}
+=============================== warnings summary ===============================
+tests/test_render_tier2.py::test_gpu_path_from_batchsim_matches_host
+  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_render_tier2.py::test_env_map_usd_dome_import - AssertionEr...
+1 failed, 12 passed, 1 warning in 36.75s
+== tests/test_render_terrain_slots.py
+.....                                                                    [100%]
+5 passed in 12.89s
+== tests/test_camera_projection.py
+.....                                                                    [100%]
+5 passed in 1.44s
+== tests/test_sensors_rt.py
+...                                                                      [100%]
+=============================== warnings summary ===============================
+tests/test_sensors_rt.py::test_gpu_path_ordering_with_sim
+  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+3 passed, 1 warning in 8.09s
+== tests/test_render_particles.py
+.............                                                            [100%]
+13 passed in 2.55s
+== tests/test_render_newton_bridge.py
+.........s....                                                           [100%]
+=============================== warnings summary ===============================
+tests/test_render_newton_bridge.py::test_solver_mujoco_steps_render_like_mujoco_path
+  /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/_src/solvers/mujoco/solver_mujoco.py:3813: RuntimeWarning: MuJoCo dependency version mismatch with Newton's declared requirements: mujoco==3.14.0 (requires ~=3.12.0); mujoco-warp==3.14.0 (requires ~=3.12.0). Reinstall Newton dependencies, for example `uv pip install -e ".[examples]"`.
+    mujoco, _ = self.import_mujoco()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+13 passed, 1 skipped, 1 warning in 29.98s
+== tests/test_render_newton_perworld.py
+...                                                                      [100%]
+3 passed in 2.25s
+== tests/test_replicator.py
+.                                                                        [100%]
+1 passed in 28.86s
+== tests/test_replicator_annotators.py
+.......................                                                  [100%]
+23 passed in 12.39s
+== tests/test_render_haze.py
+........                                                                 [100%]
+8 passed in 2.87s
+== tests/test_render_rolling.py
+.......                                                                  [100%]
+7 passed in 2.21s

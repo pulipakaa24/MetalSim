@@ -1,0 +1,11 @@
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "defaults", "ms": 17.934, "passes": [["render:bg_vs/bg_fs+geom_vs/geom_fs_rt+dyn_vs/geom_fs_rt", 10.321, 0.565], ["accel:-", 7.577, 0.415], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.173, 0.009], ["compute:untile", 0.165, 0.009], ["compute:sync_colors+sync_lights", 0.009, 0.0], ["compute:build_env_params", 0.007, 0.0], ["compute:refit_instances", 0.005, 0.0], ["compute:scale_geom_xmat", 0.004, 0.0]]}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "shadow_lights=caster", "ms": 16.092}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "transparency=False", "ms": 18.029}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "infinite_planes=False", "ms": 17.995}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "model_fields=False (no per-env light records)", "ms": 18.099}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "env_layout=legacy (no cell clipping)", "ms": 17.978}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "reverse_z=False", "ms": 17.938}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "appearance=legacy", "ms": 18.006}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "max_lights=8", "ms": 17.982}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "dyn_layout=sbvh", "ms": 29.037}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "all_off", "ms": 16.105, "passes": [["render:bg_vs/bg_fs+geom_vs/geom_fs_rt+dyn_vs/geom_fs_rt", 15.305, 0.658], ["accel:-", 7.586, 0.326], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.178, 0.008], ["compute:untile", 0.161, 0.007], ["compute:sync_colors+sync_lights", 0.015, 0.001], ["compute:build_env_params", 0.014, 0.001], ["compute:refit_instances", 0.005, 0.0]]}

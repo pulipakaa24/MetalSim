@@ -22,6 +22,14 @@ import mujoco
 import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+_root = next((sys.argv[i + 1] for i, x in enumerate(sys.argv[:-1]) if x == "--root"), None)   # metalsim tree to render with
+if _root:
+    sys.path.insert(0, _root)
+# --off: the 2026-10-13 switches off (haze, heightfield-side shadows, tendon catenary / limit colour), so a scene that has
+# those features renders as before them
+OFF = {}
+if "--off" in sys.argv:
+    OFF = dict(haze=False, tendons="straight")
 MENAGERIE = os.environ.get("MENAGERIE", "/Users/aditya/robosim/upstream/mujoco_menagerie")
 
 PRIMS = """<mujoco><worldbody><light directional="true" pos="0 0 3" dir="0.3 0.3 -0.9"/>
@@ -79,17 +87,18 @@ def render(out_path):
         mujoco.mj_forward(m, d)
         cam = m.ncam - 1
         datas = [d, d]
-        r0 = Tier0Renderer(m, 2, width=96, height=72, camera=cam, outputs=("rgb", "depth", "seg", "normal"))
+        r0 = Tier0Renderer(m, 2, width=96, height=72, camera=cam, outputs=("rgb", "depth", "seg", "normal"),
+                           **(dict(OFF, skirt_shadows=False) if OFF else {}))
         for k, v in r0.render_host(datas).items():
             arrays[f"{name}/tier0/{k}"] = v
-        r1 = Tier0Renderer(m, 2, width=96, height=72, camera=cam, outputs=("rgb", "depth", "seg"), tier=1)
+        r1 = Tier0Renderer(m, 2, width=96, height=72, camera=cam, outputs=("rgb", "depth", "seg"), tier=1, **OFF)
         for k, v in r1.render_host(datas).items():
             arrays[f"{name}/tier1/{k}"] = v
-        r2 = Tier2Renderer(m, 2, width=64, height=48, camera=cam, spp=4, max_bounces=2)
+        r2 = Tier2Renderer(m, 2, width=64, height=48, camera=cam, spp=4, max_bounces=2, **OFF)
         o2 = r2.render_host(datas)
         for k in ("rgb", "depth", "seg", "normal"):
             arrays[f"{name}/tier2/{k}"] = o2[k]
-        rt = RayTracer(m, 2, max_range=20.0)
+        rt = RayTracer(m, 2, max_range=20.0, **({"tendons": "straight"} if OFF else {}))
         dc = rt.make_depth_camera(cam, 64, 48)
         sensors = [dc]
         if m.nsite:
@@ -130,6 +139,8 @@ def main():
     ap.add_argument("mode", choices=("render", "compare"))
     ap.add_argument("paths", nargs="*")
     ap.add_argument("--out", default="identity.npz")
+    ap.add_argument("--root", default=None, help="metalsim tree to import (default: the installed / current one)")
+    ap.add_argument("--off", action="store_true", help="the 2026-10-13 feature switches off")
     a = ap.parse_args()
     if a.mode == "render":
         render(a.out)
