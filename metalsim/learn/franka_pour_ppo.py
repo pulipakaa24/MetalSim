@@ -387,7 +387,8 @@ def bench(args):
 
 def train(args):
     env = _make_env(args)
-    ppo = PourPPO(env, PourPPOConfig(seed=args.seed, max_iterations=args.iterations))
+    ppo = PourPPO(env, PourPPOConfig(seed=args.seed, max_iterations=args.iterations,
+                                     save_interval=args.save_interval))
     if args.resume and os.path.exists(args.resume):
         ppo.load_state_dict(torch.load(args.resume, map_location="cpu", weights_only=False))
         print(f"resumed from {args.resume} at iteration {ppo.it}", flush=True)
@@ -405,6 +406,7 @@ def main():
     ap.add_argument("--iterations", type=int, default=3000)
     ap.add_argument("--out", default="runs/franka_pour/run")
     ap.add_argument("--resume", default=None)
+    ap.add_argument("--save-interval", type=int, default=25, help="checkpoint every N iterations (Isaac: 25)")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--mode", choices=["step", "rollout", "ppo"], default="step")
     ap.add_argument("--steps", type=int, default=20)
