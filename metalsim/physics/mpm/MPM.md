@@ -75,6 +75,7 @@ readback 0.23 ms every 5 iterations; grid allocation 13 ms (NanoVDB built on the
 scratchpad 9 ms per step. Dispatch floor measured at 3-4.5 us per dependent launch (graph), 7.8-8.9 us eager.
 
 Not yet measured: the L4 (Isaac) numbers for the same scenes, which every speed claim must be set against.
+(Measured since: L4 timing runs in sections 7 and 8; coupled scenes re-timed against them in section 8j.)
 
 ## 4. Isaac references (L4, recorded 2026-10-10; `runs/parity/isaaclab3_mpm/`)
 
@@ -113,7 +114,7 @@ Second pass (Isaac Lab lattice, 12 across; R0 column, R1, R2, R7 re-recorded, al
   quasi-2D channel, closest to this slab; Lube 2005's prefactors are higher). Metal must match these per a, not the
   literature.
 * L4 throughput, host-run loop (timings, not yet against matched Metal runs): granular 54.5-55.8 ms/frame median,
-  247.75 iterations mean.
+  247.75 iterations mean. (Matched Metal runs since: sections 7, 8 and 8j.)
 
 
 `metalsim/parity/isaac_side/isaaclab3/stage_mpm.sh` records, with Isaac Lab 3.0-EA's own Newton 1.5.2 on the L4:
@@ -188,7 +189,9 @@ Position RMS vs the L4 baseline (early / middle / end frame); "worst floor" = la
 CUDA is as tie-sensitive as Metal: no-FMA or SAH trees move the granular example 4 cm in 1 s (Metal: 1.7 cm).
 Toolkit vs driver ptxas made no difference on this driver. Open: multi_material and the plate sit at or just above
 the largest of 3-4 floor samples; the next step is a floor distribution (more perturbed L4 runs) and Metal's
-percentile in it, plus seed ensembles for the plate force.
+percentile in it, plus seed ensembles for the plate force. **Resolved (2026-10-12, section 8e):** against the
+16-run L4 floor ensemble (plus 6 rigid-jitter runs for ANYmal) all six scenes are inside; multi_material 0.80,
+plate drag 0.97 at the worst frame (`runs/mpm/closeout/floors_final.md`).
 
 ## 7. Performance plan (research: `reports/Metal GPU primitives for MPM speed.md`)
 
@@ -218,7 +221,9 @@ second). The strain solve is latency-bound (one strain node per thread, ~17.5 us
 nodes) and near its floor at equal results.
 
 Open: Metal runs of the coupled scenes (ANYmal, two-way) are not deterministic run to run (rigid side first, frame
-4 in ANYmal) while the L4's are; under investigation. Pure-MPM scenes are bitwise deterministic and the merged tree
+4 in ANYmal) while the L4's are; under investigation. **Resolved (2026-10-11, section 8b):** with the scalable rigid
+determinism (exact accumulation) and the fixed-order two-way wrench sums, two independent ANYmal and two-way runs are
+bitwise equal; Franka-Pour's coupled solver repeats bitwise from section 8g (`rigid_deterministic=True`). Pure-MPM scenes are bitwise deterministic and the merged tree
 reproduces the pre-optimisation Metal recordings byte for byte.
 
 ## 7b. Isaac Lab Franka-Pour at scale (2026-10-11)
@@ -339,6 +344,7 @@ mean iterations 76.83 vs the L4's 76.58), where the committed form stays at 0.87
 column is the one scene without collider ties, so it is the cleaner test of "same arithmetic as CUDA"; the twoway and
 plate exceedances are a single deterministic Metal sample against the largest of four L4 samples of a chaotic flow.
 The next step is the one MPM.md section 5 already names: an L4 floor distribution (more perturbed runs).
+(Done: sections 1b and 8e; all six scenes inside in `"off"`.)
 
 ### 1b. CUDA-faithful fast_math (Warp `11aa54c8`, on fork `metalsim` as `91b8a859`; Warp default `"off"` since `152808b7`; 2026-10-11)
 
@@ -530,6 +536,22 @@ fast_math, section 8 1b) + `152808b7` (`warp.config.metal_fast_math` defaults to
   `metalsim-hashtable-metal`), and 20 isolated repetitions after the reboot all passed (0.6 s each): the cause is open
   (intermittent, below Newton's mesh / atomics code). The new claim loops ran alone first after the reboot
   (test_hashtable, test_solver_xpbd, test_contact_reduction_global: no stall).
+  **Update (2026-10-13): most likely not this test.** The record (queue history excerpt
+  `runs/rigid17/out/gpu_history_2026-10-12_0130-0300.txt`, the test job's watchdog log `runs/rigid17/out/s17_base.watch`):
+  the test job was a shared `check` job (granted 02:29:02); its host stopped advancing at about
+  02:31:42 (killed at 02:34:13 after 151 s without CPU progress). That night the particle demo's 25 M-grain sand scene
+  ran three times as `anymal_sand_seq`, granted 01:51:09, 02:03:53 (killed 02:20:17) and 02:32:49. Each of the
+  three GPU wedges of 2026-10-12 (02:32, ~10:20, 18:26) followed a run of that scene. Its acceleration structure had
+  25.1 M instances, above Metal's standard 2^24 limit, built without `MTLAccelerationStructureUsageExtendedLimits`
+  (undefined behaviour). On macOS 26 that build never finished (still at 100 % after 900 s), and the GPU work kept
+  running after its process was killed. The test passed in its 3 other runs and in 20 isolated repetitions
+  (`runs/rigid17/out/hang_retest_base.log`). So the 02:32 stall is best explained by that build (the one killed at
+  02:20 still running without an owner, or the one starting at 02:32), not by the test. The evidence is strong but
+  circumstantial: the wedge was not reproduced on purpose and the test was not run on a GPU known to be free of
+  ownerless work. Fixed on the particle side since: grains are a two-level structure in chunks of at most
+  2^24 - 1 (`as_limits.check` refuses larger ones without an extended-limits path). The 25 M scene now builds and
+  renders on both Macs: the 14-inch (macOS 27) and the 16-inch (macOS 26.7.1, 654 ms build, 5.1 s 1080p frame).
+  See `metalsim/render/PARTICLES.md` and `runs/sand25m_16in/`.
 * **Newton-engine contact buffer** (`metalsim/physics/newton_backend.py`): sized per contact pair
   (`rigid_contact_capacity`); 64 G1 worlds on rough terrain went from 1,000 slots (about half the contacts dropped) to
   7,680; `tests/test_g1_newton_engine.py::test_no_rigid_contacts_dropped`.
