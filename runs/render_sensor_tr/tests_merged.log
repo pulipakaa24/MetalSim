@@ -1,0 +1,500 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+......Frect at 0.5 sizes: mean +0.07 %, worst 4x4 block 0.99 %
+rect at 1.0 sizes: mean +0.01 %, worst 4x4 block 0.52 %
+rect at 3.0 sizes: mean +0.00 %, worst 4x4 block 0.19 %
+.disk at 0.5 sizes: mean -0.09 %, worst 4x4 block 0.97 %
+disk at 1.0 sizes: mean -0.03 %, worst 4x4 block 0.40 %
+disk at 3.0 sizes: mean -0.02 %, worst 4x4 block 0.15 %
+.sphere at 0.5 sizes: mean -0.00 %, worst 4x4 block 0.15 %
+sphere at 1.0 sizes: mean -0.00 %, worst 4x4 block 0.09 %
+sphere at 3.0 sizes: mean -0.01 %, worst 4x4 block 0.06 %
+.cylinder at 0.5 sizes: mean +0.07 %, worst 4x4 block 1.25 %
+cylinder at 1.0 sizes: mean +0.00 %, worst 4x4 block 0.81 %
+cylinder at 3.0 sizes: mean -0.02 %, worst 4x4 block 0.58 %
+.rect at one size, on axis: far-field +19.1 %, area -0.58 %
+.FFFFModule mujoco_warp._src.smooth dc949da load on device 'metal:0' took 62.33 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_72cc6aa2 72cc6aa load on device 'metal:0' took 41.59 ms  (cached)
+Module mujoco_warp._src.constraint 4b2565f load on device 'metal:0' took 38.29 ms  (cached)
+Module _friction_dof__locals__kernel_54b217fe 54b217f load on device 'metal:0' took 40.09 ms  (cached)
+Module _efc_contact_init__locals__kernel_52cf860d 52cf860 load on device 'metal:0' took 40.82 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_50fd8eb9 c8c5823 load on device 'metal:0' took 40.00 ms  (cached)
+Module _efc_contact_update__locals__kernel_27b27a7f 27b27a7 load on device 'metal:0' took 40.26 ms  (cached)
+Module mujoco_warp._src.passive 121cefe load on device 'metal:0' took 52.04 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_ec74e588 ec74e58 load on device 'metal:0' took 39.33 ms  (cached)
+Module _qfrc_smooth__locals__kernel_b9a126c0 b9a126c load on device 'metal:0' took 39.07 ms  (cached)
+Module mujoco_warp._src.support d1f2881 load on device 'metal:0' took 40.76 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_e36605c4 c28bcb3 load on device 'metal:0' took 39.38 ms  (cached)
+Module _solve_init_dof__locals__kernel_a278b607 a278b60 load on device 'metal:0' took 39.21 ms  (cached)
+Module _solve_init_efc__locals__kernel_38f8708b 38f8708 load on device 'metal:0' took 38.74 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_0dc83f70 0dc83f7 load on device 'metal:0' took 328.82 ms  (cached)
+Module mul_m_kernel__locals___mul_m_1b897f73 1b897f7 load on device 'metal:0' took 39.08 ms  (cached)
+Module _update_constraint_efc__locals__kernel_875e0cfe 875e0cf load on device 'metal:0' took 39.44 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_9318117e 9318117 load on device 'metal:0' took 38.72 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_be8f77c5 be8f77c load on device 'metal:0' took 38.77 ms  (cached)
+Module _update_gradient_grad__locals__kernel_b82c9bc8 b82c9bc load on device 'metal:0' took 38.65 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_986ac687 b3b1ed0 load on device 'metal:0' took 391.25 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_36190c58 a5ec232 load on device 'metal:0' took 374.92 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_a9a2fcce de85456 load on device 'metal:0' took 459.12 ms  (cached)
+Module _update_constraint_gradient_fused__locals__kernel_879eaf36 10e2323 load on device 'metal:0' took 359.38 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_16864d5e 9e9b0f5 load on device 'metal:0' took 386.19 ms  (cached)
+Module _solve_done__locals__kernel_f1d63dbf f1d63db load on device 'metal:0' took 38.22 ms  (cached)
+Module mujoco_warp._src.solver 00c4ab6 load on device 'metal:0' took 42.62 ms  (cached)
+Module mujoco_warp._src.forward 9c6583c load on device 'metal:0' took 53.10 ms  (cached)
+Module _next_time_builder__locals___next_time_89d592b4 89d592b load on device 'metal:0' took 40.74 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_99f1ed31 99f1ed3 load on device 'metal:0' took 38.50 ms  (cached)
+Module reset_data__locals__reset_M_c0d46912 c0d4691 load on device 'metal:0' took 38.10 ms  (cached)
+Module reset_data__locals__reset_mocap_21cdccdf 21cdccd load on device 'metal:0' took 38.49 ms  (cached)
+Module reset_data__locals__reset_contact_e7d9f88d e7d9f88 load on device 'metal:0' took 38.68 ms  (cached)
+Module reset_data__locals__reset_sleep_c3616e3d c3616e3 load on device 'metal:0' took 38.91 ms  (cached)
+Module reset_data__locals__reset_nworld_f3f460ae f3f460a load on device 'metal:0' took 39.24 ms  (cached)
+strip spread x / y: 0 deg 34.8 / 26.8, 90 deg 26.7 / 34.9
+.lidar: 1625 beams compared over 4 envs; worst |dr| 1.9412 m
+.ray vs raster depth: coverage agreement 1.0000, median |dz| 0.00000 m, 99th pct 0.0001 m
+.Module _nxn_broadphase__locals__kernel_80a41a9c 80a41a9 load on device 'metal:0' took 41.33 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_94c3200f 94c3200 load on device 'metal:0' took 1998.64 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_b7694466 b769446 load on device 'metal:0' took 2409.30 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_89797185 8979718 load on device 'metal:0' took 1293.52 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_071922b2 3bd425e load on device 'metal:0' took 405.93 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_909e6a85 909e6a8 load on device 'metal:0' took 342.26 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_62a48e20 9faad85 load on device 'metal:0' took 411.34 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_7c5be97d 295d426 load on device 'metal:0' took 468.11 ms  (cached)
+Module _update_constraint_gradient_fused__locals__kernel_42e1b38c 46345bd load on device 'metal:0' took 364.43 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_c5bad38b 16643d2 load on device 'metal:0' took 492.23 ms  (cached)
+.....Module ccd_kernel_builder__locals__ccd_kernel_a532c142 a532c14 load on device 'metal:0' took 2490.92 ms  (cached)
+Module _friction_dof__locals__kernel_2eca2190 2eca219 load on device 'metal:0' took 373.14 ms  (cached)
+Module _efc_contact_init__locals__kernel_a5457af8 a5457af load on device 'metal:0' took 407.55 ms  (compiled)
+Module _efc_contact_jac_sparse__locals__kernel_d61abd97 d61abd9 load on device 'metal:0' took 442.44 ms  (compiled)
+Module mujoco_warp._src.forward 53c9939 load on device 'metal:0' took 51.96 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_65421821 26731c5 load on device 'metal:0' took 349.15 ms  (cached)
+Module _solve_init_dof__locals__kernel_870a690a 870a690 load on device 'metal:0' took 385.04 ms  (compiled)
+Module _solve_init_jaref_kernel__locals__kernel_2bdb15a7 2bdb15a load on device 'metal:0' took 392.96 ms  (compiled)
+Module _update_constraint_init_qfrc_constraint_sparse__locals__kernel_5e7c0abf 5e7c0ab load on device 'metal:0' took 394.07 ms  (compiled)
+Module _update_gradient_init_h_sparse__locals__kernel_c4767745 c476774 load on device 'metal:0' took 340.99 ms  (cached)
+Module _JTDACJ_sparse__locals__kernel_4c9f1f80 302b6bb load on device 'metal:0' took 353.50 ms  (cached)
+Module _update_gradient_cholesky_blocked__locals__kernel_2f87ca5e d0ab9e1 load on device 'metal:0' took 567.65 ms  (compiled)
+Module _linesearch_jv_fused_kernel__locals__kernel_602ff32c 602ff32 load on device 'metal:0' took 412.94 ms  (compiled)
+Module _linesearch_iterative_kernel__locals__kernel_34400fa8 9471b07 load on device 'metal:0' took 559.06 ms  (compiled)
+Module _update_constraint_efc__locals__kernel_4b92b516 4b92b51 load on device 'metal:0' took 372.74 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_43400b6b 43400b6 load on device 'metal:0' took 333.83 ms  (cached)
+Module _update_gradient_grad__locals__kernel_44f80e79 44f80e7 load on device 'metal:0' took 333.04 ms  (cached)
+Module _update_gradient_h_incremental_sparse__locals__kernel_085ca295 085ca29 load on device 'metal:0' took 351.32 ms  (cached)
+Module _update_gradient_cholesky_blocked_skip_unchanged__locals__kernel_2e70afb5 c0a3b61 load on device 'metal:0' took 604.24 ms  (compiled)
+Module mujoco_warp._src.sensor 7e89d17 load on device 'metal:0' took 62.99 ms  (cached)
+Module mujoco_warp._src.derivative 3eaf30a load on device 'metal:0' took 46.82 ms  (cached)
+..........WARNING: ARB_clip_control unavailable while mjDEPTH_ZEROFAR requested, depth accuracy will be limited
+
+.{'rev w2': '1.2e-07', 'rev w20': '1.9e-07', 'rev w200': '7.6e-08', 'rev w2000': '0.0e+00', 'std w2': '1.3e-05', 'std w20': '4.7e-05', 'std w200': '1.7e-04', 'std w2000': '1.1e-02'}
+.loco groundplane true tier0 {'px': 12160, 'rgb': 1.0, 'depth': 1.0, 'depth_relerr_med': 2.61e-05, 'seg': 1.0} texture corr 0.4168
+loco groundplane true tier1 {'px': 12160, 'rgb': 1.0, 'depth': 1.0, 'depth_relerr_med': 2.61e-05, 'seg': 1.0} texture corr 0.4167
+loco groundplane true tier2 {'px': 12160, 'rgb': 1.0, 'depth': 1.0, 'depth_relerr_med': 1.41e-05, 'seg': 1.0} texture corr 0.851
+.topdown asym true tier0 {'px': 19200, 'rgb': 1.0, 'depth': 1.0, 'depth_relerr_med': 5.56e-07, 'seg': 1.0} texture corr 0.9917
+topdown asym true tier1 {'px': 19200, 'rgb': 1.0, 'depth': 1.0, 'depth_relerr_med': 5.56e-07, 'seg': 1.0} texture corr 0.9917
+topdown asym true tier2 {'px': 19200, 'rgb': 1.0, 'depth': 1.0, 'depth_relerr_med': 5.56e-07, 'seg': 1.0} texture corr 0.9987
+.topdown asym false tier0 {'px': 19200, 'rgb': 1.0, 'depth': 1.0, 'depth_relerr_med': 5.56e-07, 'seg': 1.0} texture corr 0.9917
+topdown asym false tier1 {'px': 19200, 'rgb': 1.0, 'depth': 1.0, 'depth_relerr_med': 5.56e-07, 'seg': 1.0} texture corr 0.9917
+topdown asym false tier2 {'px': 19200, 'rgb': 1.0, 'depth': 1.0, 'depth_relerr_med': 5.56e-07, 'seg': 1.0} texture corr 0.9987
+...........tier0 luminance std 1.1 legacy 43.7 MuJoCo 2.9
+tier2 luminance std 3.1 legacy 43.5 MuJoCo 2.9
+.tier0 {'px': 223, 'rgb': 1.0, 'depth': 1.0, 'depth_err_med_m': 0.0, 'seg_any': 1.0, 'seg_correct': 1.0}
+tier2 {'px': 223, 'rgb': 1.0, 'depth': 1.0, 'depth_err_med_m': 0.0, 'seg_any': 1.0, 'seg_correct': 1.0}
+.tier0 tex_sphere corr 0.95
+tier0 tex_cylinder corr 0.927
+tier0 tex_capsule corr 0.929
+tier0 tex_box_2d corr 0.866
+tier0 tex_box_cube corr 0.973
+tier0 tex_mesh_uv corr 0.897
+tier0 skybox corr 0.996 std 17.8
+tier2 tex_sphere corr 0.969
+tier2 tex_cylinder corr 0.95
+tier2 tex_capsule corr 0.95
+tier2 tex_box_2d corr 0.909
+tier2 tex_box_cube corr 0.983
+tier2 skybox corr 0.988 std 18.3
+.tier0 glass delta rgb [-64.   0.  64.] MuJoCo [-64.   0.  65.]
+tier1 glass delta rgb [-64.   0.  64.] MuJoCo [-64.   0.  65.]
+tier2 glass delta rgb [-53.  -0.  53.] MuJoCo [-64.   0.  65.]
+.all [41.9 42.3 42.8 42.9 43.2 43.2 43.  43.1 42.8 42.6] max_lights=8 [41.9 42.3 42.8 42.9 43.2 43.2 43.  43.1  0.   0. ]
+.spot tier0 shadow ratio 0.054
+spot tier1 shadow ratio 0.052
+.Context leak detected, CoreAnalytics returned false
+Context leak detected, CoreAnalytics returned false
+Context leak detected, CoreAnalytics returned false
+point tier0 shadow ratio 0.053
+point tier1 shadow ratio 0.051
+.corner_fs rgb max diff 0 pixels differing 0.0
+corner_fs rgb max diff 0 pixels differing 0.0
+.corner_vs rgb max diff 0 pixels differing 0.0
+corner_vs rgb max diff 0 pixels differing 0.0
+..silhouette IoU [1. 1. 1. 1.] depth median err (m) [0. 0. 0. 0.] seg IoU min 1.0
+.texture pattern correlation 0.996
+.SO-101 silhouette IoU vs mujoco.Renderer (env 0): 1.0
+.Module ccd_kernel_builder__locals__ccd_kernel_d0d1ca26 d0d1ca2 load on device 'metal:0' took 2602.05 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_bb0157b4 bb0157b load on device 'metal:0' took 1780.91 ms  (compiled)
+Module _limit_slide_hinge__locals__kernel_b316a999 b316a99 load on device 'metal:0' took 39.52 ms  (cached)
+Module _efc_contact_init__locals__kernel_1d2a56f7 1d2a56f load on device 'metal:0' took 39.86 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_4199f103 a26dd4c load on device 'metal:0' took 39.33 ms  (cached)
+Module _efc_contact_update__locals__kernel_c1a7040e c1a7040 load on device 'metal:0' took 39.02 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_7d329cf0 7d329cf load on device 'metal:0' took 333.73 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_2c3a1d9d d538385 load on device 'metal:0' took 398.00 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_e2a65312 8ce60e6 load on device 'metal:0' took 415.80 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_610933f9 84af0ad load on device 'metal:0' took 43.58 ms  (cached)
+Module _update_constraint_gradient_fused__locals__kernel_14705407 575cb65 load on device 'metal:0' took 399.18 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_6d401fb9 ec2d657 load on device 'metal:0' took 407.65 ms  (cached)
+per-step mean intensity: [87.65 87.65 87.71 87.73 87.96] ...
+.bounces 0: mean 0.4000 (expected 0.4000), pixel std 0.0000
+bounces 3: mean 0.4000 (expected 0.4000), pixel std 0.0000
+.furnace: mean 0.4979 (expected 0.5000), pixel std 0.0072
+.env furnace: mean 0.4998 (expected 0.5000), pixel std 0.0132
+.yaw 0.0: mean [0.5573 0.4727 0.3881] expected [0.5566 0.4721 0.3876], per-pixel rel. std 0.084
+yaw 1.3: mean [0.5567 0.4722 0.3876] expected [0.5566 0.4721 0.3876], per-pixel rel. std 0.083
+uniform table: mean [0.5582 0.4735 0.3887], rel. std 0.508 (6.1x)
+.usd dome record: {'prim': '/World/skyLight', 'intensity': 2.0, 'exposure': 1.0, 'color': [1.0, 0.5, 0.25], 'file': '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-31/test_env_map_usd_dome_import0/const.hdr', 'format': 'latlong', 'yaw': 0.5235987755982987, 'tilt': 0.0001620618913188485}
+F.noise rms: spp 4 -> 0.0173, spp 64 -> 0.0042, ratio 4.11 (ideal 4.0)
+.tier 2 (direct only) vs tier 0 PSNR: [43.9  43.89 44.76] depth median 0.00091955066 seg IoU 1.0
+.Module _solve_init_jaref_kernel__locals__kernel_d7493bd5 d7493bd load on device 'metal:0' took 330.86 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_7b96fe1f ba11fb2 load on device 'metal:0' took 400.47 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_afa07424 d09935b load on device 'metal:0' took 455.37 ms  (cached)
+Module _update_constraint_gradient_fused__locals__kernel_7559e5f6 85fb3dd load on device 'metal:0' took 369.14 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_c34cef06 b1c608a load on device 'metal:0' took 456.70 ms  (cached)
+.Module _solve_init_jaref_kernel__locals__kernel_a4b1b25d a4b1b25 load on device 'metal:0' took 339.01 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_e9f95efb b683a00 load on device 'metal:0' took 407.80 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_ca50fc91 69b14b4 load on device 'metal:0' took 397.62 ms  (cached)
+Module _update_constraint_gradient_fused__locals__kernel_4d4bb2cd f7579ce load on device 'metal:0' took 371.25 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_27516c17 7affb51 load on device 'metal:0' took 406.18 ms  (cached)
+.usd sun: mean 2399.99 (expected 2400)
+usd dome furnace: [299.93527 319.93063 359.9223 ] expected [300. 320. 360.]
+.atrous: mean 319.3 -> 322.1, std 26.4 -> 0.5
+oidn: mean 319.3 -> 318.8, std 26.4 -> 3.5
+...........Context leak detected, CoreAnalytics returned false
+Context leak detected, CoreAnalytics returned false
+.Context leak detected, CoreAnalytics returned false
+Context leak detected, CoreAnalytics returned false
+.Context leak detected, CoreAnalytics returned false
+..........Module mujoco_warp._src.collision_flex 0d5b58d load on device 'metal:0' took 599.93 ms  (compiled)
+Module mujoco_warp._src.collision_core 1c9f774 load on device 'metal:0' took 392.08 ms  (compiled)
+Module _flex_geom_vertex_narrowphase_detect__locals__kernel_a9f04543 a9f0454 load on device 'metal:0' took 772.32 ms  (compiled)
+Module _flex_narrowphase_elem_detect__locals__kernel_b86f1cd2 b86f1cd load on device 'metal:0' took 4007.36 ms  (compiled)
+Module _populate_group_starts__locals__kernel_2c726d4e 2c726d4 load on device 'metal:0' took 395.92 ms  (compiled)
+Module _serial_fps__locals__kernel_00eefe1e 00eefe1 load on device 'metal:0' took 416.10 ms  (compiled)
+Module _write_filtered_contacts__locals__kernel_5d2af46d 5d2af46 load on device 'metal:0' took 484.73 ms  (compiled)
+Module _flex_sap_sweep__locals__kernel_a274b4c6 a274b4c load on device 'metal:0' took 694.70 ms  (compiled)
+Module _flex_narrowphase__locals__kernel_883b9d61 883b9d6 load on device 'metal:0' took 3016.67 ms  (compiled)
+Module _flex_sap_sweep__locals__kernel_a791b83c a791b83 load on device 'metal:0' took 597.55 ms  (compiled)
+Module _equality_flex_reserve_89604ac7 89604ac load on device 'metal:0' took 332.87 ms  (cached)
+Module _equality_flex__locals__kernel_6b2b482d 6b2b482 load on device 'metal:0' took 444.70 ms  (compiled)
+Module _friction_dof__locals__kernel_7280ac49 7280ac4 load on device 'metal:0' took 427.02 ms  (compiled)
+Module _efc_contact_init_flex__locals__kernel_ad2ffaa4 ad2ffaa load on device 'metal:0' took 1484.45 ms  (compiled)
+Module _efc_contact_jac_sparse_flex__locals__kernel_d973145e d973145 load on device 'metal:0' took 1954.89 ms  (compiled)
+Module _efc_contact_update_flex__locals__kernel_2435e7c2 2435e7c load on device 'metal:0' took 1506.58 ms  (compiled)
+Module _small_cholesky_factorize_solve_block__locals__kernel_a5dc9087 6ad5e74 load on device 'metal:0' took 464.15 ms  (compiled)
+Module _solve_init_jaref_kernel__locals__kernel_b0eee24b b0eee24 load on device 'metal:0' took 425.69 ms  (compiled)
+Module _small_cholesky_solve_block__locals__kernel_998efb1b 5131fb6 load on device 'metal:0' took 438.92 ms  (compiled)
+Module _linesearch_jv_fused_kernel__locals__kernel_28a62bc4 28a62bc load on device 'metal:0' took 413.81 ms  (compiled)
+Module _linesearch_iterative_kernel__locals__kernel_34a38f88 c970c3c load on device 'metal:0' took 564.59 ms  (compiled)
+Module _solve_beta_finalize_tiled__locals__kernel_03487d56 03487d5 load on device 'metal:0' took 423.61 ms  (compiled)
+Module _solve_init_efc__locals__kernel_76688e06 76688e0 load on device 'metal:0' took 40.74 ms  (cached)
+.Module metalsim.physics.deformable 13b296c load on device 'metal:0' took 869.34 ms  (compiled)
+Module metalsim.physics.physx_cloth 64a3754 load on device 'metal:0' took 870.56 ms  (compiled)
+.Failed to create Metal pipeline for kernel "_tendon_dot_62db264d_metal_forward": Compilation failed due to an interrupted connection: XPC_ERROR_CONNECTION_INTERRUPTED. This error occurred after multiple retries.
+Module _equality_flex__locals__kernel_afda1dec afda1de load on device 'metal:0' took 449.80 ms  (compiled)
+Module _friction_tendon__locals__kernel_1828d488 1828d48 load on device 'metal:0' took 437.39 ms  (compiled)
+Module _efc_contact_init_flex__locals__kernel_3cc9a26e 3cc9a26 load on device 'metal:0' took 1492.52 ms  (compiled)
+Module _solve_init_jaref_kernel__locals__kernel_e2e93267 e2e9326 load on device 'metal:0' took 416.18 ms  (compiled)
+Module _update_gradient_cholesky_blocked__locals__kernel_66c0dcd5 e3a1c04 load on device 'metal:0' took 575.54 ms  (compiled)
+Module _linesearch_jv_fused_kernel__locals__kernel_70c7f8d2 70c7f8d load on device 'metal:0' took 411.32 ms  (compiled)
+Module _linesearch_iterative_kernel__locals__kernel_3bc3842e 1f303cf load on device 'metal:0' took 574.78 ms  (compiled)
+Module _update_gradient_cholesky_blocked_skip_unchanged__locals__kernel_55e4dd64 3908178 load on device 'metal:0' took 608.95 ms  (compiled)
+..Module metalsim.replicator.kernels fcdc441 load on device 'metal:0' took 841.51 ms  (compiled)
+.Context leak detected, CoreAnalytics returned false
+Context leak detected, CoreAnalytics returned false
+.Context leak detected, CoreAnalytics returned false
+..tier0 full {'wrap_ball': {'px': 248, 'rgb': 1.0, 'depth': 1.0, 'derr': 1.2069940567016602e-06, 'seg': 1.0}, 'pulley': {'px': 1387, 'rgb': 1.0, 'depth': 1.0, 'derr': 1.341104507446289e-06, 'seg': 1.0}}
+tier0 20 {'wrap_cyl': {'px': 14, 'rgb': 0.9285714285714286, 'depth': 0.9285714285714286, 'derr': 8.869171142578125e-05, 'seg': 0.9285714285714286}, 'wrap_ball': {'px': 12, 'rgb': 1.0, 'depth': 1.0, 'derr': 0.00010395050048828125, 'seg': 1.0}, 'pulley': {'px': 16, 'rgb': 1.0, 'depth': 1.0, 'derr': 0.00013303756713867188, 'seg': 1.0}}
+tier0 full at the same view {'wrap_cyl': {'px': 14, 'rgb': 0.9285714285714286, 'depth': 0.9285714285714286, 'derr': 8.20159912109375e-05, 'seg': 0.9285714285714286}, 'wrap_ball': {'px': 12, 'rgb': 1.0, 'depth': 1.0, 'derr': 6.818771362304688e-05, 'seg': 1.0}, 'pulley': {'px': 16, 'rgb': 1.0, 'depth': 1.0, 'derr': 6.4849853515625e-05, 'seg': 1.0}}
+tier0 8 {'wrap_cyl': {'px': 1, 'rgb': 0.0, 'depth': 0.0, 'derr': inf, 'seg': 0.0}}
+.tier1 full {'wrap_ball': {'px': 248, 'rgb': 1.0, 'depth': 1.0, 'derr': 1.2069940567016602e-06, 'seg': 1.0}, 'pulley': {'px': 1387, 'rgb': 1.0, 'depth': 1.0, 'derr': 1.341104507446289e-06, 'seg': 1.0}}
+tier1 20 {'wrap_cyl': {'px': 14, 'rgb': 0.9285714285714286, 'depth': 0.9285714285714286, 'derr': 8.869171142578125e-05, 'seg': 0.9285714285714286}, 'wrap_ball': {'px': 12, 'rgb': 1.0, 'depth': 1.0, 'derr': 0.00010395050048828125, 'seg': 1.0}, 'pulley': {'px': 16, 'rgb': 1.0, 'depth': 1.0, 'derr': 0.00013303756713867188, 'seg': 1.0}}
+tier1 full at the same view {'wrap_cyl': {'px': 14, 'rgb': 0.9285714285714286, 'depth': 0.9285714285714286, 'derr': 8.20159912109375e-05, 'seg': 0.9285714285714286}, 'wrap_ball': {'px': 12, 'rgb': 1.0, 'depth': 1.0, 'derr': 6.818771362304688e-05, 'seg': 1.0}, 'pulley': {'px': 16, 'rgb': 1.0, 'depth': 1.0, 'derr': 6.4849853515625e-05, 'seg': 1.0}}
+tier1 8 {'wrap_cyl': {'px': 1, 'rgb': 0.0, 'depth': 0.0, 'derr': inf, 'seg': 0.0}}
+.tier2 full {'wrap_ball': {'px': 248, 'rgb': 1.0, 'depth': 1.0, 'derr': 1.5050172805786133e-06, 'seg': 1.0}, 'pulley': {'px': 1387, 'rgb': 1.0, 'depth': 1.0, 'derr': 1.1324882507324219e-06, 'seg': 1.0}}
+tier2 20 {'wrap_cyl': {'px': 14, 'rgb': 1.0, 'depth': 0.9285714285714286, 'derr': 8.392333984375e-05, 'seg': 0.9285714285714286}, 'wrap_ball': {'px': 12, 'rgb': 1.0, 'depth': 1.0, 'derr': 0.00012159347534179688, 'seg': 1.0}, 'pulley': {'px': 16, 'rgb': 1.0, 'depth': 1.0, 'derr': 0.0001316070556640625, 'seg': 1.0}}
+tier2 full at the same view {'wrap_cyl': {'px': 14, 'rgb': 1.0, 'depth': 0.9285714285714286, 'derr': 9.059906005859375e-05, 'seg': 0.9285714285714286}, 'wrap_ball': {'px': 12, 'rgb': 1.0, 'depth': 1.0, 'derr': 8.106231689453125e-05, 'seg': 1.0}, 'pulley': {'px': 16, 'rgb': 1.0, 'depth': 1.0, 'derr': 5.53131103515625e-05, 'seg': 1.0}}
+tier2 8 {'wrap_cyl': {'px': 1, 'rgb': 1.0, 'depth': 1.0, 'derr': 0.000431060791015625, 'seg': 1.0}}
+.raydepth full {'wrap_ball': {'px': 248, 'depth': 1.0, 'derr': 1.5050172805786133e-06}, 'pulley': {'px': 1387, 'depth': 1.0, 'derr': 1.1324882507324219e-06}}
+raydepth 20 {'wrap_cyl': {'px': 14, 'depth': 0.9285714285714286, 'derr': 8.392333984375e-05}, 'wrap_ball': {'px': 12, 'depth': 1.0, 'derr': 0.00012159347534179688}, 'pulley': {'px': 16, 'depth': 1.0, 'derr': 0.0001316070556640625}}
+raydepth full at the same view {'wrap_cyl': {'px': 14, 'depth': 0.9285714285714286, 'derr': 9.059906005859375e-05}, 'wrap_ball': {'px': 12, 'depth': 1.0, 'derr': 8.106231689453125e-05}, 'pulley': {'px': 16, 'depth': 1.0, 'derr': 5.53131103515625e-05}}
+raydepth 8 {'wrap_cyl': {'px': 1, 'depth': 1.0, 'derr': 0.000431060791015625}}
+..........Context leak detected, CoreAnalytics returned false
+.Context leak detected, CoreAnalytics returned false
+.Context leak detected, CoreAnalytics returned false
+..Context leak detected, CoreAnalytics returned false
+Context leak detected, CoreAnalytics returned false
+..................Context leak detected, CoreAnalytics returned false
+.............two_level grains 2000: structures 0.4 MiB, frame 1 ms
+two_level grains 160000: structures 33.8 MiB, frame 3 ms
+two_level grains 1600000: structures 337.6 MiB, frame 20 ms
+.flat grains 2000: structures 0.4 MiB, frame 1 ms
+flat grains 160000: structures 33.8 MiB, frame 3 ms
+flat grains 1600000: structures 337.6 MiB, frame 22 ms
+.........
+=================================== FAILURES ===================================
+___________________ test_streaming_kernel_matches_lidar_ext ____________________
+
+setup = (<mujoco._structs.MjModel object at 0x10919dbf0>, <mujoco._structs.MjData object at 0x10919db70>, <metalsim.sensors.raytrace.RayTracer object at 0x11e426180>)
+
+    def test_streaming_kernel_matches_lidar_ext(setup):
+        """One sub-ray and one return run the streaming kernel (lidar_tr1, no candidate arrays): equal, bit for bit, to
+        the general lidar_ext over a fan of beams through panes, glass, the mirror and the walls, per return mode."""
+        m, d, rt = setup
+        A, E = np.meshgrid(np.linspace(-2.0, 2.0, 181), np.deg2rad(np.linspace(-20, 20, 9)))
+        az, el = A.ravel().astype(np.float32), E.ravel().astype(np.float32)
+        mats = {"glass": "clear_glass", "mirror": "mirror"}
+        for kw in (dict(), dict(return_mode="first"), dict(return_mode="last"), dict(lidar_materials=mats),
+                   dict(lidar_materials=mats, return_mode="first", min_reflectance=0.02, min_reflectance_range=4.0)):
+            a = rt.make_lidar("lidar", az, el, name="a", **kw)
+            b = rt.make_lidar("lidar", az, el, name="b", **kw)
+            assert a.stream and b.stream
+            b.stream = False
+            o = rt.trace_host([d, d], [a, b])
+            assert (o["a"]["n_returns"] > 0).mean() > 0.5
+            for f in o["a"]:
+>               assert np.array_equal(o["a"][f], o["b"][f]), (kw, f)
+E               AssertionError: ({}, 'points')
+E               assert False
+E                +  where False = <function array_equal at 0x1093051f0>(array([[[0., 0., 0.],\n        [0., 0., 0.],\n        [0., 0., 0.],\n        ...,\n        [0., 0., 0.],\n        [0., 0., ....],\n        ...,\n        [0., 0., 0.],\n        [0., 0., 0.],\n        [0., 0., 0.]]], shape=(2, 1629, 3), dtype=float32), array([[[0., 0., 0.],\n        [0., 0., 0.],\n        [0., 0., 0.],\n        ...,\n        [0., 0., 0.],\n        [0., 0., ....],\n        ...,\n        [0., 0., 0.],\n        [0., 0., 0.],\n        [0., 0., 0.]]], shape=(2, 1629, 3), dtype=float32))
+E                +    where <function array_equal at 0x1093051f0> = np.array_equal
+
+tests/test_sensor_transparency.py:244: AssertionError
+____________________ test_tier1_area_light_irradiance[rect] ____________________
+
+tmp_path = PosixPath('/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-31/test_tier1_area_light_irradian0')
+shape = 'rect'
+
+    @pytest.mark.parametrize("shape", ["rect", "disk", "sphere"])
+    def test_tier1_area_light_irradiance(tmp_path, shape):
+        """Tier 1: the unshadowed floor equals the closed-form irradiance (ratio estimator), 2 % (8-bit output)."""
+        pytest.importorskip("pxr")
+        spec = light_stage(tmp_path / f"{shape}.usda", shape, 0.4 + (0.2 if shape == "sphere" else 0.0), scale=0.02)
+>       t1, _, _ = render_floor_t1(tmp_path / f"{shape}.usda", spec)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_area_lights.py:156: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_area_lights.py:147: in render_floor_t1
+    r = Tier0Renderer(m, 1, width=res, height=res, camera="down", tier=1, rt_samples=rt_samples, skybox=False)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+metalsim/render/tier0.py:191: in __init__
+    self._build_resources()
+metalsim/render/tier0.py:315: in _build_resources
+    self._build_pipelines()          # with AREA_LIGHTS
+    ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <metalsim.render.tier0.Tier0Renderer object at 0x121694590>
+
+    def _build_pipelines(self):
+        c = self.ctx
+        defs = {} if self.max_lights is None else {"MAX_LIGHTS": int(self.max_lights)}
+        if getattr(self, "area", None) is not None:
+            defs["AREA_LIGHTS"] = 1          # tier 1 area lights (geom_fs_rt); compiled only when the scene has them
+        if self.rt is not None:
+            defs.update(self.rt.shader_defines())       # sbvh layout: ray queries through the per-env BVH
+        from metalsim.render import haze as hz
+>       defs["HAZE_ON"] = 1 if hz.active(self.haze_params) else 0      # compiled out without haze / fog
+                                         ^^^^^^^^^^^^^^^^
+E       AttributeError: 'Tier0Renderer' object has no attribute 'haze_params'
+
+metalsim/render/tier0.py:554: AttributeError
+____________________ test_tier1_area_light_irradiance[disk] ____________________
+
+tmp_path = PosixPath('/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-31/test_tier1_area_light_irradian1')
+shape = 'disk'
+
+    @pytest.mark.parametrize("shape", ["rect", "disk", "sphere"])
+    def test_tier1_area_light_irradiance(tmp_path, shape):
+        """Tier 1: the unshadowed floor equals the closed-form irradiance (ratio estimator), 2 % (8-bit output)."""
+        pytest.importorskip("pxr")
+        spec = light_stage(tmp_path / f"{shape}.usda", shape, 0.4 + (0.2 if shape == "sphere" else 0.0), scale=0.02)
+>       t1, _, _ = render_floor_t1(tmp_path / f"{shape}.usda", spec)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_area_lights.py:156: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_area_lights.py:147: in render_floor_t1
+    r = Tier0Renderer(m, 1, width=res, height=res, camera="down", tier=1, rt_samples=rt_samples, skybox=False)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+metalsim/render/tier0.py:191: in __init__
+    self._build_resources()
+metalsim/render/tier0.py:315: in _build_resources
+    self._build_pipelines()          # with AREA_LIGHTS
+    ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <metalsim.render.tier0.Tier0Renderer object at 0x1216400e0>
+
+    def _build_pipelines(self):
+        c = self.ctx
+        defs = {} if self.max_lights is None else {"MAX_LIGHTS": int(self.max_lights)}
+        if getattr(self, "area", None) is not None:
+            defs["AREA_LIGHTS"] = 1          # tier 1 area lights (geom_fs_rt); compiled only when the scene has them
+        if self.rt is not None:
+            defs.update(self.rt.shader_defines())       # sbvh layout: ray queries through the per-env BVH
+        from metalsim.render import haze as hz
+>       defs["HAZE_ON"] = 1 if hz.active(self.haze_params) else 0      # compiled out without haze / fog
+                                         ^^^^^^^^^^^^^^^^
+E       AttributeError: 'Tier0Renderer' object has no attribute 'haze_params'
+
+metalsim/render/tier0.py:554: AttributeError
+___________________ test_tier1_area_light_irradiance[sphere] ___________________
+
+tmp_path = PosixPath('/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-31/test_tier1_area_light_irradian2')
+shape = 'sphere'
+
+    @pytest.mark.parametrize("shape", ["rect", "disk", "sphere"])
+    def test_tier1_area_light_irradiance(tmp_path, shape):
+        """Tier 1: the unshadowed floor equals the closed-form irradiance (ratio estimator), 2 % (8-bit output)."""
+        pytest.importorskip("pxr")
+        spec = light_stage(tmp_path / f"{shape}.usda", shape, 0.4 + (0.2 if shape == "sphere" else 0.0), scale=0.02)
+>       t1, _, _ = render_floor_t1(tmp_path / f"{shape}.usda", spec)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_area_lights.py:156: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_area_lights.py:147: in render_floor_t1
+    r = Tier0Renderer(m, 1, width=res, height=res, camera="down", tier=1, rt_samples=rt_samples, skybox=False)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+metalsim/render/tier0.py:191: in __init__
+    self._build_resources()
+metalsim/render/tier0.py:315: in _build_resources
+    self._build_pipelines()          # with AREA_LIGHTS
+    ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <metalsim.render.tier0.Tier0Renderer object at 0x1216c7830>
+
+    def _build_pipelines(self):
+        c = self.ctx
+        defs = {} if self.max_lights is None else {"MAX_LIGHTS": int(self.max_lights)}
+        if getattr(self, "area", None) is not None:
+            defs["AREA_LIGHTS"] = 1          # tier 1 area lights (geom_fs_rt); compiled only when the scene has them
+        if self.rt is not None:
+            defs.update(self.rt.shader_defines())       # sbvh layout: ray queries through the per-env BVH
+        from metalsim.render import haze as hz
+>       defs["HAZE_ON"] = 1 if hz.active(self.haze_params) else 0      # compiled out without haze / fog
+                                         ^^^^^^^^^^^^^^^^
+E       AttributeError: 'Tier0Renderer' object has no attribute 'haze_params'
+
+metalsim/render/tier0.py:554: AttributeError
+______________________ test_tier1_area_light_soft_shadow _______________________
+
+tmp_path = PosixPath('/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-31/test_tier1_area_light_soft_sha0')
+
+    def test_tier1_area_light_soft_shadow(tmp_path):
+        """A box under a rect light casts a soft shadow in tier 1 that matches tier 2's (the path tracer's, validated
+        above) within a few percent of the lit level, with a penumbra (intermediate pixels) where a point light has none."""
+        import mujoco
+        from metalsim.render.tier2 import Tier2Renderer
+        pytest.importorskip("pxr")
+        spec = light_stage(tmp_path / "rect.usda", "rect", 0.6, scale=0.02)
+        occ = ((0.05, 0.0, 0.25), (0.06, 0.06, 0.02))
+>       t1, m, d = render_floor_t1(tmp_path / "rect.usda", spec, res=48, occluder=occ, rt_samples=64)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_area_lights.py:174: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_area_lights.py:147: in render_floor_t1
+    r = Tier0Renderer(m, 1, width=res, height=res, camera="down", tier=1, rt_samples=rt_samples, skybox=False)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+metalsim/render/tier0.py:191: in __init__
+    self._build_resources()
+metalsim/render/tier0.py:315: in _build_resources
+    self._build_pipelines()          # with AREA_LIGHTS
+    ^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <metalsim.render.tier0.Tier0Renderer object at 0x1216c59d0>
+
+    def _build_pipelines(self):
+        c = self.ctx
+        defs = {} if self.max_lights is None else {"MAX_LIGHTS": int(self.max_lights)}
+        if getattr(self, "area", None) is not None:
+            defs["AREA_LIGHTS"] = 1          # tier 1 area lights (geom_fs_rt); compiled only when the scene has them
+        if self.rt is not None:
+            defs.update(self.rt.shader_defines())       # sbvh layout: ray queries through the per-env BVH
+        from metalsim.render import haze as hz
+>       defs["HAZE_ON"] = 1 if hz.active(self.haze_params) else 0      # compiled out without haze / fog
+                                         ^^^^^^^^^^^^^^^^
+E       AttributeError: 'Tier0Renderer' object has no attribute 'haze_params'
+
+metalsim/render/tier0.py:554: AttributeError
+_________________________ test_env_map_usd_dome_import _________________________
+
+tmp_path = PosixPath('/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-31/test_env_map_usd_dome_import0')
+
+    def test_env_map_usd_dome_import(tmp_path):
+        """A USD DomeLight with inputs:texture:file flows through the importer (custom text ``usd_dome``) to
+        set_environment with USD's light scale (intensity x 2^exposure x color) and the prim's yaw; a furnace under
+        a constant textured dome reads S x that scale, and the RGBE reader reproduces the written values."""
+        pxr = pytest.importorskip("pxr")
+        from pxr import Usd, UsdGeom, UsdLux, UsdPhysics
+        from metalsim.render.hdr import load_hdr
+        from metalsim.scene.usd_to_mjcf import load_usd
+        hdr_path = str(tmp_path / "const.hdr")
+        _write_rgbe(hdr_path, np.full((8, 16, 3), 0.5, np.float32))
+        assert np.allclose(load_hdr(hdr_path), 0.5, rtol=0.01)
+        stage = Usd.Stage.CreateNew(str(tmp_path / "dome.usda"))
+        UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z); UsdGeom.SetStageMetersPerUnit(stage, 1.0)
+        world = UsdGeom.Xform.Define(stage, "/World"); stage.SetDefaultPrim(world.GetPrim())
+        dome = UsdLux.DomeLight.Define(stage, "/World/skyLight")
+        dome.CreateTextureFileAttr("./const.hdr"); dome.CreateTextureFormatAttr("latlong")
+        dome.CreateIntensityAttr(2.0); dome.CreateExposureAttr(1.0); dome.CreateColorAttr((1.0, 0.5, 0.25))
+        UsdGeom.Xformable(dome.GetPrim()).AddRotateZOp().Set(30.0)
+        plane = UsdGeom.Cube.Define(stage, "/World/floor"); plane.CreateSizeAttr(1.0)
+        UsdGeom.Xformable(plane.GetPrim()).AddScaleOp().Set((100.0, 100.0, 0.02))
+        UsdGeom.Xformable(plane.GetPrim()).AddTranslateOp().Set((0.0, 0.0, -0.5))
+        UsdPhysics.CollisionAPI.Apply(plane.GetPrim())
+        cam = UsdGeom.Camera.Define(stage, "/World/cam")
+        UsdGeom.Xformable(cam.GetPrim()).AddTranslateOp().Set((0.0, 0.0, 2.0))   # a USD camera looks down its -z: straight down
+        stage.GetRootLayer().Save()
+        spec = load_usd(str(tmp_path / "dome.usda"))
+        spec.visual.headlight.active = 0
+        mat = spec.add_material(); mat.name = "matte"; mat.rgba = [0.8, 0.8, 0.8, 1.0]; mat.specular = 0.0; mat.shininess = 0.0
+        for g in spec.geoms:
+            g.material = "matte"
+        m = spec.compile()
+        assert m.ntext == 1 and mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_TEXT, 0) == "usd_dome"
+        rend = Tier2Renderer(m, 1, width=32, height=32, camera="cam", spp=32, max_bounces=1, headlight=False)
+        rec = rend.set_environment_from_model(m)
+        print("usd dome record:", rec)
+        assert os.path.realpath(rec["file"]) == os.path.realpath(hdr_path) and rec["format"] == "latlong"
+        assert abs(rec["yaw"] - np.radians(30)) < 1e-6 and rec["tilt"] < 0.01
+>       assert rend.env_flags == 32 and np.isclose(rend.consts.view(np.float32)[20], np.radians(30))
+E       AssertionError: assert (32 == 32 and np.False_)
+E        +  where 32 = <metalsim.render.tier2.Tier2Renderer object at 0x129477fe0>.env_flags
+E        +  and   np.False_ = <function isclose at 0x109d7f730>(np.float32(-1.0471976), np.float64(0.5235987755982988))
+E        +    where <function isclose at 0x109d7f730> = np.isclose
+E        +    and   np.float64(0.5235987755982988) = <ufunc 'radians'>(30)
+E        +      where <ufunc 'radians'> = np.radians
+
+tests/test_render_tier2.py:226: AssertionError
+=============================== warnings summary ===============================
+tests/test_sensors_rt.py::test_gpu_path_ordering_with_sim
+tests/test_render_tier2.py::test_gpu_path_from_batchsim_matches_host
+  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_sensor_transparency.py::test_streaming_kernel_matches_lidar_ext
+FAILED tests/test_area_lights.py::test_tier1_area_light_irradiance[rect] - At...
+FAILED tests/test_area_lights.py::test_tier1_area_light_irradiance[disk] - At...
+FAILED tests/test_area_lights.py::test_tier1_area_light_irradiance[sphere] - ...
+FAILED tests/test_area_lights.py::test_tier1_area_light_soft_shadow - Attribu...
+FAILED tests/test_render_tier2.py::test_env_map_usd_dome_import - AssertionEr...
+6 failed, 157 passed, 2 warnings in 162.75s (0:02:42)

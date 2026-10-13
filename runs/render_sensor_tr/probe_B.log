@@ -1,0 +1,17 @@
+[gpu_run] probe_trB start: device utilisation 0% (01:05:26)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 5 %; per-process GPU time over 1.8 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.7 %
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+transmit 7.679 ms stream
+tr1_see_through 7.113 ms stream
+tr1_opaque_table 3.234 ms stream
+behind_simple 4.561 ms 
+[gpu_run] probe_trB end: device utilisation 90% (01:05:36), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 5 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       3.2 %

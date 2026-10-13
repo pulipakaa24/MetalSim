@@ -312,7 +312,6 @@ class Tier0Renderer:
             tmpl, lock = self.area.apply(np.array(t.lights, np.float32, copy=True), np.zeros(max(self.m.nlight, 1), np.uint32))
             self.sync = ModelSync(c, self.m, self.n, t, self.color_buf, tmpl, lock, light_tail_bytes=self.area.tail_bytes(self.n))
             self.area.attach(c, self.sync.lights, self.n)
-            self._build_pipelines()          # with AREA_LIGHTS
         else:
             self.sync = ModelSync(c, self.m, self.n, t, self.color_buf, t.lights)
         self.light_buf = self.sync.lights                    # (n_envs, max(nlight, 1)) records

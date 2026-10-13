@@ -152,7 +152,8 @@ def render_floor_t1(stage_path, spec, res=24, occluder=None, rt_samples=16):
 def test_tier1_area_light_irradiance(tmp_path, shape):
     """Tier 1: the unshadowed floor equals the closed-form irradiance (ratio estimator), 2 % (8-bit output)."""
     pytest.importorskip("pxr")
-    spec = light_stage(tmp_path / f"{shape}.usda", shape, 0.4 + (0.2 if shape == "sphere" else 0.0), scale=0.02)
+    spec = light_stage(tmp_path / f"{shape}.usda", shape, 0.4 + (0.2 if shape == "sphere" else 0.0),
+                      scale={"rect": 0.1, "disk": 0.04, "sphere": 0.5}[shape])        # peak radiance 0.4-0.7
     t1, _, _ = render_floor_t1(tmp_path / f"{shape}.usda", spec)
     _, pts = render_floor(tmp_path / f"{shape}.usda", spec, spp=1, passes=1)
     ref = np.array([[exact_irradiance(spec, px[4]) for px in row] for row in pts]) * RHO / np.pi
