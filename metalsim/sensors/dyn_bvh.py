@@ -76,7 +76,9 @@ class DynBVH:
         lib = c.library("dyn_bvh")
         self.p_refit = c.compute_pipeline(lib, "dyn_bvh_refit")
         self.p_boxes = c.compute_pipeline(lib, "dyn_bvh_boxes")
-        # one box per env, one structure
+        # one box per env, one structure (the rt shaders intersect within Metal's standard limits: as_limits)
+        from metalsim.render import as_limits
+        as_limits.check("primitives", self.n, "dynamic objects' box structure")
         self.boxes = c.buffer(24 * self.n, label="dyn_bvh_boxes")
         g = Metal.MTLAccelerationStructureBoundingBoxGeometryDescriptor.new()
         g.setBoundingBoxBuffer_(self.boxes); g.setBoundingBoxBufferOffset_(0)

@@ -122,23 +122,71 @@ def test_white_furnace_grain_pile():
     assert h.max() < 2.0          # no energy gain in any pixel beyond Monte Carlo noise
 
 
-def test_instance_count_scaling():
-    """Instances = scene instances + n_envs * particles * grains; the acceleration structure grows about linearly
-    and a frame renders at every size (timings printed, not asserted)."""
+@pytest.mark.parametrize("structure", ["two_level", "flat"])
+def test_instance_count_scaling(structure):
+    """Instances = scene instances + n_envs * particles * grains (+ the grain structure's own top-level instance in
+    the two-level layout); the structures grow about linearly and a frame renders at every size (timings printed)."""
     m = mujoco.MjModel.from_xml_string(FURNACE)
     rt = Tier2Renderer(m, 2, width=64, height=64, spp=1, max_bounces=2, headlight=False)
     sizes = {}
     for P, K in ((1000, 1), (10000, 8), (100000, 8)):
-        rt.set_particles(_pile(P, half=0.2), radius=0.003, grains_per_particle=K)
+        rt.set_particles(_pile(P, half=0.2), radius=0.003, grains_per_particle=K, structure=structure)
         t0 = time.time()
         out = rt.render_host(_datas(m, 2), passes=1)
         dt = time.time() - t0
-        assert rt._ias.n_total == rt.rt.n_inst + 2 * P * K
+        assert rt._ias.n_total == rt.rt.n_inst + 2 * P * K + (structure == "two_level")
         assert (out["seg"] == rt.G + 1).any()
         sizes[P * K] = rt._ias.as_bytes
-        print(f"grains {2 * P * K}: structure {rt._ias.as_bytes / 2**20:.1f} MiB, frame {dt * 1e3:.0f} ms")
+        print(f"{structure} grains {2 * P * K}: structures {rt._ias.as_bytes / 2**20:.1f} MiB, frame {dt * 1e3:.0f} ms")
     r = sizes[800000] / sizes[80000]
     assert 5 < r < 15, sizes
+
+
+def test_two_level_matches_flat():
+    """The two-level grain structure (grains as one instance of the scene's structure) renders the same image as one
+    top-level instance per grain: the same surfaces are hit, so colour, depth, segmentation and normals agree (tiny
+    float differences from the traversal are allowed in the radiance), in a multi-env batch with a culled env."""
+    m = mujoco.MjModel.from_xml_string(FURNACE.replace("<worldbody>", '<worldbody><light directional="true" pos="0 0 3" dir="0.2 0.3 -1" diffuse="0.8 0.8 0.8"/>'))
+    pile = _pile(3000)
+    P = np.stack([pile, pile + [0.03, 0.0, 0.0], np.full_like(pile, np.nan)])
+    outs = {}
+    for name, structure, chunk in (("flat", "flat", None), ("two_level", "two_level", None), ("chunked", "two_level", 5000)):
+        rt = Tier2Renderer(m, 3, width=80, height=80, spp=2, max_bounces=4, headlight=False, seed=9, center_sample=True)
+        rt.set_particles(P, radius=0.004, grains_per_particle=6, structure=structure, grain_chunk=chunk)
+        outs[name] = rt.render_host(_datas(m, 3), passes=3)
+        if name == "chunked":
+            assert len(rt._ias.chunks) == -(-3 * 3000 * 6 // 5000)     # 54,000 grains in chunks of 5,000: 11 chunks
+    a = outs["flat"]
+    assert (a["seg"] == rt.G + 1).sum() > 200
+    for name in ("two_level", "chunked"):
+        b = outs[name]
+        assert np.array_equal(a["seg"], b["seg"]), name
+        assert np.allclose(a["depth"], b["depth"], atol=1e-5), name
+        assert np.allclose(a["hdr"], b["hdr"], atol=1e-4, rtol=1e-4), (name, np.abs(a["hdr"] - b["hdr"]).max())
+
+
+def test_acceleration_structure_limits():
+    """Metal's per-structure limits (metalsim/render/as_limits.py): an instance descriptor gets the extended-limits
+    usage above 2^24 instances and not at or below it; without an extended-limits path, or past 2^30, building is
+    refused with an error instead of entering undefined behaviour (CPU only: descriptors, no build)."""
+    import Metal
+    from metalsim.render import as_limits
+    from metalsim.render.particles import instance_descriptor
+    dev = Metal.MTLCreateSystemDefaultDevice()
+    buf = dev.newBufferWithLength_options_(64, Metal.MTLResourceStorageModeShared)
+    ext = Metal.MTLAccelerationStructureUsageExtendedLimits
+    d, e = instance_descriptor([], 1 << 24, buf, extended_ok=True)
+    assert not e and not (d.usage() & ext)
+    d, e = instance_descriptor([], (1 << 24) + 1, buf, extended_ok=True)
+    assert e and (d.usage() & ext)
+    with pytest.raises(ValueError, match="standard limit"):
+        instance_descriptor([], (1 << 24) + 1, buf)                       # no extended path: refused
+    with pytest.raises(ValueError, match="extended limit"):
+        instance_descriptor([], (1 << 30) + 1, buf, extended_ok=True)
+    assert not as_limits.check("primitives", 1 << 28, "mesh")
+    with pytest.raises(ValueError):
+        as_limits.check("primitives", (1 << 28) + 1, "mesh")
+    assert as_limits.check("geometries", (1 << 24) + 1, "mesh", extended_ok=True)
 
 
 def test_batched_envs_and_isolation():
@@ -220,3 +268,23 @@ def test_stable_ids_under_culling():
         rt.set_particles(pos, radius=0.004, grains_per_particle=4, ids=ids)
         imgs.append(rt.render_host(_datas(m), passes=2)["hdr"])
     assert np.allclose(imgs[0], imgs[1], atol=1e-6)
+
+
+def test_texture_atlas_fits_metal_limit():
+    """Many large textures (the Menagerie ANYmal C has 20 at 2048 px) pack into an atlas within Metal's 16384-px
+    texture limit: the shelf widens instead of growing one column past it (CPU only)."""
+    from metalsim.render.scene_tables import TextureAtlas
+    n = 18
+    tex = "".join(f'<texture name="t{i}" type="2d" builtin="checker" rgb1="{i / n} 0 0" rgb2="0 0 1" width="1024" height="1024"/>'
+                  f'<material name="m{i}" texture="t{i}"/>' for i in range(n))
+    geoms = "".join(f'<geom type="box" size="0.1 0.1 0.1" pos="{i} 0 0" material="m{i}"/>' for i in range(n))
+    m = mujoco.MjModel.from_xml_string(f"<mujoco><asset>{tex}</asset><worldbody>{geoms}</worldbody></mujoco>")
+    a = TextureAtlas.build(m)
+    assert max(a.image.shape[:2]) <= 16384, a.image.shape
+    assert len(a.rects) == n
+    r = np.array(list(a.rects.values()))          # (u0, v0, du, dv): inside the atlas and pairwise disjoint
+    assert (r[:, :2] >= 0).all() and (r[:, :2] + r[:, 2:] <= 1 + 1e-9).all()
+    for i in range(n):
+        for j in range(i + 1, n):
+            ov = (np.minimum(r[i, :2] + r[i, 2:], r[j, :2] + r[j, 2:]) - np.maximum(r[i, :2], r[j, :2]))
+            assert (ov <= 1e-9).any()

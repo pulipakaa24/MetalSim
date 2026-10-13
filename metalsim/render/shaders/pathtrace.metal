@@ -54,6 +54,12 @@ constant uint FLAG_CENTER0 = 16u;     // first sample of the reset pass through 
 constant uint FLAG_AUX = 8u;          // write mean HDR radiance and sample-averaged first-hit albedo / normal (denoiser inputs)
 constant uint FLAG_ENVMAP = 32u;      // equirectangular HDR environment map (texture(1), CDF table buffer(26)) replaces the sky colour
 constant uint FLAG_GRAINS = 64u;      // particle render grains: instances from grain_inst0 on (metalsim/render/particles.py, PARTICLES.md)
+constant uint FLAG_GRAINS2 = 128u;    // with FLAG_GRAINS: two-level grains (chunks of <= 2^24 grains, each its own instance structure of
+                                      // UserID descriptors and one instance of the scene's; grain_inst0 = grain count, buffer 29 =
+                                      // the grains' UserID descriptors then their keys). Metal reports the innermost instance of a
+                                      // hit (instance_id[0], user_instance_id[0]; instance_count stays 1, measured on macOS 26):
+                                      // a grain's user id is 0x80000000 | grain index, the scene's Default descriptors read 0
+constant uint FLAG_GRAINS_EXT = 256u; // with FLAG_GRAINS, flat: the structure is built with extended limits (> 2^24 instances)
 
 inline float3x3 load_mat33(device const float* p) {
     return float3x3(float3(p[0], p[3], p[6]), float3(p[1], p[4], p[7]), float3(p[2], p[5], p[8]));
@@ -193,8 +199,13 @@ inline float3 sample_cone(float3 axis, float ang, float u, float v) {
 }
 
 struct Hit { bool ok; float t; float3 p; float3 n; float2 uv; uint slot; bool grain; uint gid; float3 lp; };   // lp: geom-frame position
-// render-grain geometry (FLAG_GRAINS): instances >= inst0 are grains, instancing grain mesh (as_index - as0)
-struct GrainGeo { device const float* verts; device const uint* indices; device const MeshInfo* meshes; uint inst0, as0; };
+// render-grain geometry (FLAG_GRAINS). Flat: scene instances >= inst0 are grains. Two-level: a hit through two instance
+// levels is a grain, its index the second-level instance id. A grain instances grain mesh (as_index - as0); gdesc / gkeys:
+// the grains' instance descriptors and identity keys (colour hash), indexed by grain
+struct InstanceDescUser { packed_float3 col0, col1, col2, col3; uint options, mask, if_table_offset, as_index, user; };
+struct GrainGeo { device const float* verts; device const uint* indices; device const MeshInfo* meshes; uint inst0, as0;
+                  device const InstanceDesc* gdesc; device const InstanceDescUser* gdesc_u; device const uint* gkeys;
+                  bool two_level, extended; };
 
 inline Hit trace(instance_acceleration_structure accel, float3 o, float3 d, float tmax,
                  device const uint2* inst_tab, device const int* slot_mesh, device const MeshInfo* meshes,
@@ -203,36 +214,73 @@ inline Hit trace(instance_acceleration_structure accel, float3 o, float3 d, floa
 {
     Hit h; h.ok = false;
     ray r(o, d, tmin, tmax);
+    uint top, prim, geo = 0u, gid = 0u; float2 bc; float dist; bool grain; uint mesh_dyn = 0xFFFFFFFFu;
 #ifdef DYN_SBVH
-    RTRes res = RT_CLOSEST(r, accel);
-#else
-    intersector<triangle_data, instancing> isect;
-    intersection_result<triangle_data, instancing> res = isect.intersect(r, accel);
-#endif
+    // dynamic objects through the per-env BVH (dyn_bvh.h), in the query matching the grain structure's tags
+    RTRes res = gg.two_level ? rt_intersect2(r, accel, dbv, false) : rt_intersect(r, accel, dbv, false);
     if (res.type == intersection_type::none) return h;
-    bool grain = res.instance_id >= gg.inst0;
+    top = res.instance_id; prim = res.primitive_id; bc = res.triangle_barycentric_coord; dist = res.distance;
+    geo = res.geometry_id;
+    if (res.dyn) mesh_dyn = RT_MESH(res, 0u);
+    if (gg.two_level) { grain = (res.user & 0x80000000u) != 0u; if (grain) gid = res.user & 0x7FFFFFFFu; }
+    else { grain = top >= gg.inst0; if (grain) gid = top - gg.inst0; }
+#else
+    if (gg.two_level) {
+        intersector<triangle_data, instancing, max_levels<2>> isect;
+        intersection_result<triangle_data, instancing, max_levels<2>> res = isect.intersect(r, accel);
+        if (res.type == intersection_type::none) return h;
+        top = res.instance_id[0]; prim = res.primitive_id; bc = res.triangle_barycentric_coord; dist = res.distance;
+        geo = res.geometry_id;
+        uint user = res.user_instance_id[0];
+        grain = (user & 0x80000000u) != 0u;
+        if (grain) gid = user & 0x7FFFFFFFu;
+    } else if (gg.extended) {   // flat past 2^24 instances: built with extended limits, intersected with the matching tag
+        intersector<triangle_data, instancing, extended_limits> isect;
+        intersection_result<triangle_data, instancing, extended_limits> res = isect.intersect(r, accel);
+        if (res.type == intersection_type::none) return h;
+        top = res.instance_id; prim = res.primitive_id; bc = res.triangle_barycentric_coord; dist = res.distance;
+        geo = res.geometry_id;
+        grain = top >= gg.inst0;
+        if (grain) gid = top - gg.inst0;
+    } else {
+        intersector<triangle_data, instancing> isect;
+        intersection_result<triangle_data, instancing> res = isect.intersect(r, accel);
+        if (res.type == intersection_type::none) return h;
+        top = res.instance_id; prim = res.primitive_id; bc = res.triangle_barycentric_coord; dist = res.distance;
+        geo = res.geometry_id;
+        grain = top >= gg.inst0;
+        if (grain) gid = top - gg.inst0;
+    }
+#endif
+    InstanceDesc id;
+    if (!grain) id = inst[top];
+    else if (gg.two_level) {
+        InstanceDescUser u = gg.gdesc_u[gid];
+        id.col0 = u.col0; id.col1 = u.col1; id.col2 = u.col2; id.col3 = u.col3;
+        id.options = u.options; id.mask = u.mask; id.if_table_offset = u.if_table_offset; id.as_index = u.as_index;
+    } else id = gg.gdesc[gid];
     uint slot = 0, b;
     if (grain) {
-        b = gg.meshes[inst[res.instance_id].as_index - gg.as0].i_off + res.primitive_id * 3;
+        b = gg.meshes[id.as_index - gg.as0].i_off + prim * 3;
         verts = gg.verts; indices = gg.indices;
     } else {
-        slot = inst_tab[res.instance_id].y + res.geometry_id;   // geometry: 0 for geoms; the object within a dynamic env structure
-        b = meshes[RT_MESH(res, inst[res.instance_id].as_index)].i_off + res.primitive_id * 3;   // mesh: = slot_mesh[slot] for geoms
+        slot = inst_tab[top].y + geo;     // geometry: 0 for geoms; the object within a dynamic env structure / box
+        // mesh: the instance's first listing + geometry (= slot_mesh[slot] for geoms); sbvh hits: their (env, object)
+        b = meshes[mesh_dyn != 0xFFFFFFFFu ? mesh_dyn : id.as_index + geo].i_off + prim * 3;
     }
     uint i0 = indices[b], i1 = indices[b + 1], i2 = indices[b + 2];
-    float2 bc = res.triangle_barycentric_coord; float w0 = 1.0 - bc.x - bc.y;
+    float w0 = 1.0 - bc.x - bc.y;
     float3 n0 = float3(verts[i0*8+3], verts[i0*8+4], verts[i0*8+5]);
     float3 n1 = float3(verts[i1*8+3], verts[i1*8+4], verts[i1*8+5]);
     float3 n2 = float3(verts[i2*8+3], verts[i2*8+4], verts[i2*8+5]);
     float2 uv = float2(verts[i0*8+6], verts[i0*8+7]) * w0 + float2(verts[i1*8+6], verts[i1*8+7]) * bc.x + float2(verts[i2*8+6], verts[i2*8+7]) * bc.y;
     h.lp = float3(verts[i0*8], verts[i0*8+1], verts[i0*8+2]) * w0 + float3(verts[i1*8], verts[i1*8+1], verts[i1*8+2]) * bc.x
          + float3(verts[i2*8], verts[i2*8+1], verts[i2*8+2]) * bc.y;
-    InstanceDesc id = inst[res.instance_id];
     float3x3 R = float3x3(float3(id.col0), float3(id.col1), float3(id.col2));
     float3 n = normalize(R * (n0 * w0 + n1 * bc.x + n2 * bc.y));
     if (dot(n, d) > 0.0) n = -n;
-    h.ok = true; h.t = res.distance; h.p = o + d * res.distance; h.n = n; h.uv = uv; h.slot = slot;
-    h.grain = grain; h.gid = grain ? res.instance_id - gg.inst0 : 0u;
+    h.ok = true; h.t = dist; h.p = o + d * dist; h.n = n; h.uv = uv; h.slot = slot;
+    h.grain = grain; h.gid = gid;
     return h;
 }
 
@@ -364,7 +412,8 @@ kernel void path_trace(
     device const float*     env_cdf    [[buffer(26)]],   // environment-map sampling table (FLAG_ENVMAP)
     device const float*     g_verts    [[buffer(27)]],   // FLAG_GRAINS: grain mesh vertices (8 floats each, as verts)
     device const uint*      g_indices  [[buffer(28)]],   // FLAG_GRAINS: grain mesh indices
-    device const uint*      g_keys     [[buffer(29)]],   // FLAG_GRAINS: per-grain identity key (colour hash)
+    device const InstanceDesc* g_inst  [[buffer(29)]],   // FLAG_GRAINS: flat: the per-grain identity keys (colour hash);
+                                                         // two-level: grain instance descriptors, then the keys
     device const GrainMat&  g_mat      [[buffer(30)]],   // FLAG_GRAINS: grain material + grain mesh index ranges
     texture2d<float>        atlas      [[texture(0)]],
     texture2d<float>        envmap     [[texture(1)]],   // equirectangular RGBA32F environment (FLAG_ENVMAP)
@@ -394,7 +443,12 @@ kernel void path_trace(
     bool use_env = (c.flags & FLAG_ENVMAP) != 0u;
     float3 env_rad = (sp.sky.w > 0.5 ? sp.sky.xyz : cs.clear_color.rgb) * c.env_scale;
     GrainGeo gg; gg.verts = g_verts; gg.indices = g_indices; gg.meshes = g_mat.mesh;
-    gg.inst0 = (c.flags & FLAG_GRAINS) ? c.grain_inst0 : 0xFFFFFFFFu; gg.as0 = c.grain_as0;
+    gg.two_level = (c.flags & FLAG_GRAINS) && (c.flags & FLAG_GRAINS2);
+    gg.extended = (c.flags & FLAG_GRAINS) && !gg.two_level && (c.flags & FLAG_GRAINS_EXT);
+    gg.inst0 = ((c.flags & FLAG_GRAINS) && !gg.two_level) ? c.grain_inst0 : 0xFFFFFFFFu; gg.as0 = c.grain_as0;
+    gg.gdesc = inst + c.grain_inst0;
+    gg.gdesc_u = (device const InstanceDescUser*)g_inst;
+    gg.gkeys = gg.two_level ? (device const uint*)(gg.gdesc_u + c.grain_inst0) : (device const uint*)g_inst;
     bool sky_tex = !use_env && sp.sky_info.y > 0.5;     // MuJoCo skybox as a directional environment (cube map)
     for (uint s = 0; s < c.spp; ++s) {
         float jx = rnd(rng), jy = rnd(rng);
@@ -426,7 +480,7 @@ kernel void path_trace(
             Material m; float4 mod; float eps = 0.001;   // eps: offset of rays leaving this surface
             float4 base4;
             if (h.grain) {   // mm-sized grains: a small offset, but at least ~8 ulp of the position (far envs sit km away)
-                m = grain_material(g_mat, g_keys[h.gid]); mod = float4(1.0);
+                m = grain_material(g_mat, gg.gkeys[h.gid]); mod = float4(1.0);
                 eps = max(c.grain_eps, 1e-6 * max(fabs(h.p.x), max(fabs(h.p.y), fabs(h.p.z)))); tmin = eps;
                 base4 = float4(material_base(m, mod, h.uv, atlas, samp), 1.0);
             }
