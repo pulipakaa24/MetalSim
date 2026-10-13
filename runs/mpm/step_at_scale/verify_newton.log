@@ -1,0 +1,61 @@
+[gpu_run] mpmstep_verify_newton start: device utilisation 0% (15:41:23)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s:
+[gpu_run] gpu_top:   pid    907 Google Chrome He                   1.1 %
+first launch 1 rc=0 finite True OK
+first launch 64 rc=0 finite True OK
+first launch 2048 rc=0 finite True OK
+1 eager rc=0 "bitwise_equal": true "hash_steps_equal": 32
+1 capture rc=0 "bitwise_equal": true "hash_steps_equal": 33
+64 eager rc=0 "bitwise_equal": true "hash_steps_equal": 32
+64 capture rc=0 "bitwise_equal": true "hash_steps_equal": 33
+2048 eager rc=0 "bitwise_equal": true "hash_steps_equal": 32
+2048 capture rc=0 "bitwise_equal": true "hash_steps_equal": 33
+done
+test_mpm rc=0 14 passed, 1 xfailed in 103.71s (0:01:43)
+util at start 0 15:47:32
+base2_n1 1 rc=0
+nonly_n1 1 rc=0
+base2_n1 64 rc=0
+nonly_n1 64 rc=0
+base2_n1 256 rc=0
+nonly_n1 256 rc=0
+base2_n1 1024 rc=0
+nonly_n1 1024 rc=0
+base2_n1 2048 rc=0
+nonly_n1 2048 rc=0
+base2_n1       cap_1.json             median     3.81  min     3.77  pipelined     3.53  ok it=[25, 25, 25, 25]
+base2_n1       cap_64.json            median     7.58  min     7.48  pipelined     7.36  ok it=[25, 25, 25, 25]
+base2_n1       cap_256.json           median    15.53  min    15.11  pipelined    14.84  ok it=[25, 25, 25, 25]
+base2_n1       cap_1024.json          median    46.45  min    45.66  pipelined    46.40  ok it=[25, 25, 25, 25]
+base2_n1       cap_2048.json          median    90.61  min    90.41  pipelined    90.62  ok it=[25, 25, 25, 25]
+nonly_n1       cap_1.json             median     3.78  min     3.73  pipelined     3.54  ok it=[25, 25, 25, 25]
+nonly_n1       cap_64.json            median     8.07  min     7.63  pipelined     7.56  ok it=[25, 25, 25, 25]
+nonly_n1       cap_256.json           median    15.15  min    14.73  pipelined    14.54  ok it=[25, 25, 25, 25]
+nonly_n1       cap_1024.json          median    44.15  min    43.59  pipelined    43.65  ok it=[25, 25, 25, 25]
+nonly_n1       cap_2048.json          median    84.41  min    83.91  pipelined    84.23  ok it=[25, 25, 25, 25]
+end 15:52:53 util 0
+util at start 0 15:52:53
+base2_n2 1 rc=0
+nonly_n2 1 rc=0
+base2_n2 64 rc=0
+nonly_n2 64 rc=0
+base2_n2 256 rc=0
+nonly_n2 256 rc=0
+base2_n2 1024 rc=0
+nonly_n2 1024 rc=0
+base2_n2 2048 rc=0
+nonly_n2 2048 rc=0
+base2_n2       cap_1.json             median     3.94  min     3.79  pipelined     3.59  ok it=[25, 25, 25, 25]
+base2_n2       cap_64.json            median     7.76  min     7.54  pipelined     7.36  ok it=[25, 25, 25, 25]
+base2_n2       cap_256.json           median    15.35  min    15.11  pipelined    14.93  ok it=[25, 25, 25, 25]
+base2_n2       cap_1024.json          median    46.00  min    45.48  pipelined    45.88  ok it=[25, 25, 25, 25]
+base2_n2       cap_2048.json          median    90.54  min    89.84  pipelined    90.07  ok it=[25, 25, 25, 25]
+nonly_n2       cap_1.json             median     3.82  min     3.73  pipelined     3.55  ok it=[25, 25, 25, 25]
+nonly_n2       cap_64.json            median     7.73  min     7.66  pipelined     7.52  ok it=[25, 25, 25, 25]
+nonly_n2       cap_256.json           median    14.80  min    14.69  pipelined    14.55  ok it=[25, 25, 25, 25]
+nonly_n2       cap_1024.json          median    43.58  min    43.33  pipelined    43.38  ok it=[25, 25, 25, 25]
+nonly_n2       cap_2048.json          median    84.97  min    84.68  pipelined    84.56  ok it=[25, 25, 25, 25]
+end 15:57:56 util 95
+end 15:57:56
+[gpu_run] mpmstep_verify_newton end: device utilisation 0% (15:57:56), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %

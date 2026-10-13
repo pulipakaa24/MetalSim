@@ -1,0 +1,49 @@
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+/home/<vm-user>/parity3_scripts/mpm/scale/scale_pour.py:236: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+  model = scene.finalize(device=DEV)
+Traceback (most recent call last):
+  File "/home/<vm-user>/parity3_scripts/mpm/scale/scale_pour.py", line 911, in <module>
+    {"mpm": run_mpm, "rigid": run_rigid, "ordered": run_ordered, "bodyforce": run_bodyforce}[args.part]()
+  File "/home/<vm-user>/parity3_scripts/mpm/scale/scale_pour.py", line 677, in run_rigid
+    tick()
+  File "/home/<vm-user>/parity3_scripts/mpm/scale/scale_pour.py", line 674, in tick
+    substep()
+  File "/home/<vm-user>/parity3_scripts/mpm/scale/scale_pour.py", line 668, in substep
+    solver.step(st["a"], st["b"], control, contacts, RIGID_DT)
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/utils/benchmark.py", line 138, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/mujoco/solver_mujoco.py", line 3848, in step
+    self._mujoco_warp_step()
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/utils/benchmark.py", line 138, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/mujoco/solver_mujoco.py", line 3826, in _mujoco_warp_step
+    self._mujoco_warp.step(self.mjw_model, self.mjw_data)
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/warp_util.py", line 97, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/forward.py", line 1366, in step
+    forward(m, d)
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/warp_util.py", line 97, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/forward.py", line 1337, in forward
+    fwd_position(m, d, factorize=False)
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/warp_util.py", line 97, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/forward.py", line 668, in fwd_position
+    constraint.make_constraint(m, d)
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/warp_util.py", line 97, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/constraint.py", line 5375, in make_constraint
+    wp.launch(
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/context.py", line 10680, in launch
+    launch_deterministic(
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/deterministic.py", line 2157, in launch_deterministic
+    allocate_counter_buffers(
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/deterministic.py", line 1722, in allocate_counter_buffers
+    raise RuntimeError(
+RuntimeError: Deterministic counter buffer capacity exceeds the supported int32 limit (4194304000 > 2147483647). Reduce the launch size or deterministic_max_records.

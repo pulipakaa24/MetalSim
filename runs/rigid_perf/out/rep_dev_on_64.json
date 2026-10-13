@@ -1,0 +1,116 @@
+{
+ "argv": [
+  "--part",
+  "rigid",
+  "--device",
+  "metal:0",
+  "--worlds",
+  "64",
+  "--max-triangle-pairs",
+  "8388608",
+  "--mode",
+  "capture",
+  "--steps",
+  "3",
+  "--warmup",
+  "2",
+  "--repeat-check",
+  "--dump",
+  "/Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/runs/rigid_perf/out/dump_rep_dev_on_64",
+  "--det",
+  "on",
+  "--pipeline-det",
+  "--json",
+  "/Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/runs/rigid_perf/out/rep_dev_on_64.json"
+ ],
+ "device": "metal:0",
+ "device_name": "Apple M4 Max",
+ "warp": "1.18.0.dev20260917",
+ "newton": "1.5.2",
+ "worlds": 64,
+ "part": "rigid",
+ "det": "on",
+ "pipeline_det": true,
+ "mode": "capture",
+ "max_triangle_pairs": 8388608,
+ "bodies": 832,
+ "shapes": 5889,
+ "joints": 832,
+ "dofs": 1344,
+ "build_s": 0.5943461660008325,
+ "solver_init_s": 9.436310541999774,
+ "rigid_contact_max": 439168,
+ "collide_ms": {
+  "median": 4.373750000013388,
+  "mean": 4.277916999853915,
+  "min": 4.0848339995136485,
+  "max": 4.375167000034708
+ },
+ "substep_ms": {
+  "median": 5.336333000741433,
+  "mean": 5.455333333278152,
+  "min": 5.261667000013404,
+  "max": 5.7679999990796205
+ },
+ "tick_ms": {
+  "median": 18.919625001217355,
+  "mean": 18.967499666662963,
+  "min": 18.884790999436518,
+  "max": 19.09808299933502
+ },
+ "capture": "ok",
+ "tick_ms_captured": {
+  "median": 10.753562500212865,
+  "mean": 10.939583333614186,
+  "min": 10.568771000180277,
+  "max": 11.496416500449413
+ },
+ "rigid_contacts": 2815,
+ "nefc_mean": 81.0,
+ "finite": true,
+ "repeat_check": {
+  "bitwise_equal": true,
+  "max_abs_diff": 0.0,
+  "worlds_differing": 0,
+  "finite": true,
+  "body_q_sha": [
+   "2cfc5d9c33019232",
+   "2cfc5d9c33019232"
+  ],
+  "body_qd_sha": [
+   "e19cb64815d18a25",
+   "e19cb64815d18a25"
+  ],
+  "contact_count": [
+   12854,
+   12854
+  ],
+  "nefc_sum": [
+   5240,
+   5240
+  ]
+ },
+ "repeat_check_captured": {
+  "bitwise_equal": true,
+  "max_abs_diff": 0.0,
+  "worlds_differing": 0,
+  "finite": true,
+  "body_q_sha": [
+   "2cfc5d9c33019232",
+   "2cfc5d9c33019232"
+  ],
+  "body_qd_sha": [
+   "e19cb64815d18a25",
+   "e19cb64815d18a25"
+  ],
+  "contact_count": [
+   12854,
+   12854
+  ],
+  "nefc_sum": [
+   5240,
+   5240
+  ]
+ },
+ "maxrss_mb": 900.40625
+}

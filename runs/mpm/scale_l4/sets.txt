@@ -1,0 +1,56 @@
+mpm_eager_1 --part mpm --worlds 1 --mode eager --count --sections --steps 20
+mpm_eager_64 --part mpm --worlds 64 --mode eager --count --sections --steps 20
+mpm_eager_256 --part mpm --worlds 256 --mode eager --count --sections --steps 20
+mpm_eager_1024 --part mpm --worlds 1024 --mode eager --count --sections --steps 20
+mpm_eager_2048 --part mpm --worlds 2048 --mode eager --count --sections --steps 20
+mpm_cap_1 --part mpm --worlds 1 --mode capture --steps 10
+mpm_cap_64 --part mpm --worlds 64 --mode capture --steps 10
+mpm_cap_256 --part mpm --worlds 256 --mode capture --steps 10
+mpm_cap_1024 --part mpm --worlds 1024 --mode capture --steps 10
+mpm_cap_2048 --part mpm --worlds 2048 --mode capture --steps 10
+rigid_off_1 --part rigid --worlds 1 --mode capture --steps 15 --count
+rigid_off_64 --part rigid --worlds 64 --mode capture --steps 15 --count
+rigid_off_256 --part rigid --worlds 256 --mode capture --steps 15 --count
+rigid_off_512 --part rigid --worlds 512 --mode capture --steps 15 --count --max-triangle-pairs 8388608
+rigid_off_1024 --part rigid --worlds 1024 --mode capture --steps 15 --count --max-triangle-pairs 8388608
+rigid_off_2048 --part rigid --worlds 2048 --mode capture --steps 15 --count --max-triangle-pairs 8388608
+rigid_off_4096 --part rigid --worlds 4096 --mode capture --steps 15 --count --max-triangle-pairs 8388608
+rigid_on_1 --part rigid --worlds 1 --det on --mode capture --steps 8 --warmup 3 --count
+rigid_on_64 --part rigid --worlds 64 --det on --mode capture --steps 8 --warmup 3 --count
+rigid_on_256 --part rigid --worlds 256 --det on --mode capture --steps 8 --warmup 3 --count
+rigid_on_512 --part rigid --worlds 512 --det on --mode capture --steps 8 --warmup 3 --count --max-triangle-pairs 8388608
+rigid_on_1024 --part rigid --worlds 1024 --det on --mode capture --steps 8 --warmup 3 --count --max-triangle-pairs 8388608
+rigid_on_2048 --part rigid --worlds 2048 --det on --mode capture --steps 8 --warmup 3 --count --max-triangle-pairs 8388608
+rigid_on_4096 --part rigid --worlds 4096 --det on --mode capture --steps 8 --warmup 3 --count --max-triangle-pairs 8388608
+rigid_pdet_2048 --part rigid --worlds 2048 --pipeline-det --mode capture --steps 10 --max-triangle-pairs 8388608
+bf_1 --part bodyforce --worlds 1
+bf_64 --part bodyforce --worlds 64
+bf_256 --part bodyforce --worlds 256
+bf_1024 --part bodyforce --worlds 1024
+bf_2048 --part bodyforce --worlds 2048
+bf_4096 --part bodyforce --worlds 4096
+ordered --part ordered
+rigid_rep_off_64 --part rigid --worlds 64 --steps 3 --repeat-check
+rigid_rep_on_64 --part rigid --worlds 64 --det on --steps 3 --repeat-check
+rigid_rep_onpdet_64 --part rigid --worlds 64 --det on --pipeline-det --steps 3 --repeat-check
+rigid_rep_off_2048 --part rigid --worlds 2048 --steps 3 --repeat-check --max-triangle-pairs 8388608
+rigid_rep_on_2048 --part rigid --worlds 2048 --det on --steps 3 --repeat-check --max-triangle-pairs 8388608
+rigid_rep_onpdet_2048 --part rigid --worlds 2048 --det on --pipeline-det --steps 3 --repeat-check --max-triangle-pairs 8388608
+mpm_rep_off_64 --part mpm --worlds 64 --mode eager --steps 4 --repeat-check
+mpm_rep_on_64 --part mpm --worlds 64 --mode eager --steps 4 --det on --repeat-check
+mpm_rep_off_2048 --part mpm --worlds 2048 --mode eager --steps 4 --repeat-check
+mpm_rep_on_2048 --part mpm --worlds 2048 --mode eager --steps 4 --det on --repeat-check
+mpm_det_eager_2048 --part mpm --worlds 2048 --mode eager --det on --sections --steps 10
+mpm_fixed_64 --part mpm --grid fixed --worlds 64 --mode eager --steps 10 --sections
+mpm_fixed_2048 --part mpm --grid fixed --worlds 2048 --mode eager --steps 10 --sections
+mpm_shared_64 --part mpm --grid shared --worlds 64 --mode eager --steps 10 --sections
+mpm_shared_2048 --part mpm --grid shared --worlds 2048 --mode eager --steps 10 --sections
+rigid_off_2048_tpdefault --part rigid --worlds 2048 --mode capture --steps 15 --count
+rigid_on_2048_tpdefault --part rigid --worlds 2048 --det on --mode capture --steps 8 --warmup 3 --count
+rigid_rep_off_2048_cap --part rigid --worlds 2048 --mode capture --steps 3 --repeat-check --max-triangle-pairs 8388608
+rigid_rep_onpdet_2048_cap --part rigid --worlds 2048 --det on --pipeline-det --mode capture --steps 3 --repeat-check --max-triangle-pairs 8388608
+rigid_rep_off_2048_tpdefault --part rigid --worlds 2048 --steps 3 --repeat-check
+rigid_pdet_2048_tpdefault --part rigid --worlds 2048 --pipeline-det --mode capture --steps 10
+rigid_rep_pdet_64 --part rigid --worlds 64 --pipeline-det --steps 3 --repeat-check
+rigid_rep_pdet_2048_tpdefault --part rigid --worlds 2048 --pipeline-det --steps 3 --repeat-check
+rigid_rep_pdet_2048_cap_tpdefault --part rigid --worlds 2048 --pipeline-det --mode capture --steps 3 --repeat-check

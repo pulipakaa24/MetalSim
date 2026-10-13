@@ -1,0 +1,96 @@
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+/home/<vm-user>/parity3_scripts/mpm/scale/scale_pour.py:236: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+  model = scene.finalize(device=DEV)
+Warning: Triangle pair buffer overflowed 1124352 > 1000000.
+Warning: Triangle pair buffer overflowed 1177600 > 1000000.
+Warning: Triangle pair buffer overflowed 1161216 > 1000000.
+Warning: Triangle pair buffer overflowed 1185792 > 1000000.
+Warning: Triangle pair buffer overflowed 1153024 > 1000000.
+Warning: Triangle pair buffer overflowed 1292288 > 1000000.
+Warning: Triangle pair buffer overflowed 1542144 > 1000000.
+Warning: Triangle pair buffer overflowed 2148352 > 1000000.
+Warning: Triangle pair buffer overflowed 3573760 > 1000000.
+Warning: Triangle pair buffer overflowed 4274284 > 1000000.
+Warning: Triangle pair buffer overflowed 4943683 > 1000000.
+Warning: Triangle pair buffer overflowed 5046449 > 1000000.
+Warning: Triangle pair buffer overflowed 5051674 > 1000000.
+Warning: Triangle pair buffer overflowed 4497129 > 1000000.
+Warning: Triangle pair buffer overflowed 4546318 > 1000000.
+Warning: Triangle pair buffer overflowed 4741983 > 1000000.
+Warning: Triangle pair buffer overflowed 3546092 > 1000000.
+Warning: Triangle pair buffer overflowed 3290202 > 1000000.
+Warning: Triangle pair buffer overflowed 3029691 > 1000000.
+Warning: Triangle pair buffer overflowed 2999594 > 1000000.
+Warning: Triangle pair buffer overflowed 3109144 > 1000000.
+Warning: Triangle pair buffer overflowed 2811615 > 1000000.
+Warning: Triangle pair buffer overflowed 2506371 > 1000000.
+Warning: Triangle pair buffer overflowed 2386415 > 1000000.
+Warning: Triangle pair buffer overflowed 2227891 > 1000000.
+Warning: Triangle pair buffer overflowed 1993949 > 1000000.
+Warning: Triangle pair buffer overflowed 1762655 > 1000000.
+Warning: Triangle pair buffer overflowed 1547921 > 1000000.
+Warning: Triangle pair buffer overflowed 1385202 > 1000000.
+Warning: Triangle pair buffer overflowed 1268892 > 1000000.
+{
+ "argv": [
+  "--device",
+  "cuda:0",
+  "--json",
+  "/home/<vm-user>/parity3/scale_l4/rigid_pdet_2048_tpdefault.json",
+  "--part",
+  "rigid",
+  "--worlds",
+  "2048",
+  "--pipeline-det",
+  "--mode",
+  "capture",
+  "--steps",
+  "10"
+ ],
+ "device": "cuda:0",
+ "device_name": "NVIDIA L4",
+ "warp": "1.16.0",
+ "newton": "1.5.2",
+ "worlds": 2048,
+ "part": "rigid",
+ "det": "off",
+ "pipeline_det": true,
+ "mode": "capture",
+ "max_triangle_pairs": null,
+ "bodies": 26624,
+ "shapes": 188417,
+ "joints": 26624,
+ "dofs": 43008,
+ "build_s": 3.3244949139998425,
+ "solver_init_s": 4.909949920000145,
+ "rigid_contact_max": 14053376,
+ "collide_ms": {
+  "median": 97.26609050017032,
+  "mean": 97.33776010007205,
+  "min": 95.53879200029769,
+  "max": 99.41591699998753
+ },
+ "substep_ms": {
+  "median": 10.212307500069073,
+  "mean": 10.34909529998913,
+  "min": 9.904640000058862,
+  "max": 11.598626000250079
+ },
+ "tick_ms": {
+  "median": 114.1070955000032,
+  "mean": 114.50161860002481,
+  "min": 111.48652700012462,
+  "max": 117.74014800039367
+ },
+ "capture": "ok",
+ "tick_ms_captured": {
+  "median": 90.03181925004355,
+  "mean": 90.23478245001115,
+  "min": 87.47190250005588,
+  "max": 97.1561505000409
+ },
+ "rigid_contacts": 138585,
+ "nefc_mean": 50.88671875,
+ "finite": true,
+ "maxrss_mb": 2224.9921875
+}

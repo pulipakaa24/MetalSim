@@ -1,0 +1,74 @@
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+/home/<vm-user>/parity3_scripts/mpm/scale/scale_pour.py:236: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+  model = scene.finalize(device=DEV)
+{
+ "argv": [
+  "--device",
+  "cuda:0",
+  "--json",
+  "/home/<vm-user>/parity3/scale_l4/mpm_rep_off_64.json",
+  "--part",
+  "mpm",
+  "--worlds",
+  "64",
+  "--mode",
+  "eager",
+  "--steps",
+  "4",
+  "--repeat-check"
+ ],
+ "device": "cuda:0",
+ "device_name": "NVIDIA L4",
+ "warp": "1.16.0",
+ "newton": "1.5.2",
+ "worlds": 64,
+ "temporary_store": true,
+ "part": "mpm",
+ "mode": "eager",
+ "grid": "sparse",
+ "accumulate": "native",
+ "loop": "native",
+ "particles": 47040,
+ "bodies": 128,
+ "colliders": 192,
+ "build_s": 0.3324572989999979,
+ "solver_init_s": 0.6347746190001544,
+ "max_active_cell_count": 65536,
+ "warmup_steps": 288,
+ "warmup_s": 7.045194117999927,
+ "step_ms": {
+  "median": 23.225259000014375,
+  "mean": 23.222754250014077,
+  "min": 22.811615000136953,
+  "max": 23.628883999890604
+ },
+ "step_ms_all": [
+  23.628883999890604,
+  23.38471899997785,
+  22.811615000136953,
+  23.0657990000509
+ ],
+ "step_ms_pipelined": 22.9469362499799,
+ "iterations_last4": [
+  25,
+  25,
+  25,
+  25
+ ],
+ "res_l2_last4": [
+  0.0012957340804859996,
+  0.001386946183629334,
+  0.0012270098086446524,
+  0.00033337881905026734
+ ],
+ "occupied_cells_per_world": 82.296875,
+ "velocity_nodes": 524288,
+ "strain_nodes": 65536,
+ "collider_nodes": 47040,
+ "repeat_check": {
+  "bitwise_equal": true,
+  "max_abs_diff": 0.0,
+  "worlds_differing": 0
+ },
+ "maxrss_mb": 558.93359375
+}

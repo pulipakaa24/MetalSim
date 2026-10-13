@@ -1,0 +1,63 @@
+[gpu_run] mpmstep_verify3 start: device utilisation 0% (14:59:57)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 1 %; per-process GPU time over 1.8 s:
+[gpu_run] gpu_top:   pid    907 Google Chrome He                   1.7 %
+1 eager rc=0  
+1 capture rc=1  
+64 eager rc=0  
+64 capture rc=0  
+2048 eager rc=0  
+2048 capture rc=0  
+done
+1 eager rc=0 "bitwise_equal": true "hash_steps_equal": 32
+1 capture rc=1  
+64 eager rc=0 "bitwise_equal": true "hash_steps_equal": 32
+64 capture rc=0 "bitwise_equal": true "hash_steps_equal": 33
+2048 eager rc=0 "bitwise_equal": true "hash_steps_equal": 32
+2048 capture rc=0 "bitwise_equal": true "hash_steps_equal": 33
+done
+warp tests rc=0 OK
+test_mpm rc=0 14 passed, 1 xfailed in 109.16s (0:01:49)
+util at start 74 15:08:31
+base3_v1 1 rc=1
+final3_v1 1 rc=1
+base3_v1 64 rc=0
+final3_v1 64 rc=0
+base3_v1 256 rc=0
+final3_v1 256 rc=0
+base3_v1 1024 rc=0
+final3_v1 1024 rc=0
+base3_v1 2048 rc=0
+final3_v1 2048 rc=0
+base3_v1       cap_64.json            median     7.96  min     7.58  pipelined     7.38  ok it=[25, 25, 25, 25]
+base3_v1       cap_256.json           median    15.58  min    15.19  pipelined    15.00  ok it=[25, 25, 25, 25]
+base3_v1       cap_1024.json          median    46.05  min    45.51  pipelined    45.53  ok it=[25, 25, 25, 25]
+base3_v1       cap_2048.json          median    90.53  min    90.06  pipelined    89.99  ok it=[25, 25, 25, 25]
+final3_v1      cap_64.json            median     7.90  min     7.84  pipelined     7.35  ok it=[25, 25, 25, 25]
+final3_v1      cap_256.json           median    14.23  min    14.16  pipelined    14.03  ok it=[25, 25, 25, 25]
+final3_v1      cap_1024.json          median    41.62  min    41.44  pipelined    41.39  ok it=[25, 25, 25, 25]
+final3_v1      cap_2048.json          median    78.72  min    78.06  pipelined    78.28  ok it=[25, 25, 25, 25]
+end 15:13:29 util 87
+util at start 0 15:13:29
+base3_v2 1 rc=1
+final3_v2 1 rc=1
+base3_v2 64 rc=0
+final3_v2 64 rc=0
+base3_v2 256 rc=0
+final3_v2 256 rc=0
+base3_v2 1024 rc=0
+final3_v2 1024 rc=0
+base3_v2 2048 rc=0
+final3_v2 2048 rc=0
+base3_v2       cap_64.json            median     7.60  min     7.50  pipelined     7.38  ok it=[25, 25, 25, 25]
+base3_v2       cap_256.json           median    15.15  min    14.81  pipelined    14.88  ok it=[25, 25, 25, 25]
+base3_v2       cap_1024.json          median    45.99  min    45.63  pipelined    45.48  ok it=[25, 25, 25, 25]
+base3_v2       cap_2048.json          median    90.60  min    90.12  pipelined    90.43  ok it=[25, 25, 25, 25]
+final3_v2      cap_64.json            median     7.45  min     7.34  pipelined     7.24  ok it=[25, 25, 25, 25]
+final3_v2      cap_256.json           median    14.69  min    14.18  pipelined    13.95  ok it=[25, 25, 25, 25]
+final3_v2      cap_1024.json          median    41.82  min    41.43  pipelined    41.42  ok it=[25, 25, 25, 25]
+final3_v2      cap_2048.json          median    79.07  min    78.24  pipelined    78.36  ok it=[25, 25, 25, 25]
+end 15:18:29 util 0
+end 15:18:29
+[gpu_run] mpmstep_verify3 end: device utilisation 0% (15:18:29), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    907 Google Chrome He                   2.3 %

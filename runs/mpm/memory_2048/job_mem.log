@@ -1,0 +1,11 @@
+[gpu_run] mem_reductions start: device utilisation 0% (19:42:45)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 5 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.4 %
+base rc=0 [mem] after first policy step      device   37.64 GB  footprint   44.05 GB  warp-live   22.86 GB  native-tracked   35.42 GB
+tightpool rc=0 [mem] after first policy step      device   34.48 GB  footprint   40.92 GB  warp-live   19.70 GB  native-tracked   32.27 GB
+tight+grid rc=0 [mem] after first policy step      device   24.85 GB  footprint   31.25 GB  warp-live   19.46 GB  native-tracked   22.64 GB
+tight+grid+cells256 rc=0 [mem] after first policy step      device   15.66 GB  footprint   21.85 GB  warp-live   10.75 GB  native-tracked   13.93 GB
+end
+[gpu_run] mem_reductions end: device utilisation 99% (19:45:05), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 5 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.6 %

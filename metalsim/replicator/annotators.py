@@ -70,10 +70,11 @@ class Annotators:
     # -- state annotators ---------------------------------------------------------------------------------
 
     def bounding_box_3d(self):
-        """(N, G, 10): world center xyz, half-size xyz (geom frame), quaternion wxyz of the geom.
+        """(N, G, 10): world center xyz, half-size xyz (geom frame), quaternion wxyz of the geom, for the geom slots
+        (extra objects such as sites and flexes, whose slots follow the geoms', have no geom AABB).
         Requires a BatchSim (reads geom_xpos / geom_xmat)."""
         assert self.sim is not None
-        gid = self.slot_geom
+        gid = self.slot_geom[:len(self.r.tables.geoms)]
         xpos = self.sim.t.geom_xpos[:, gid]                    # (N, G, 3)
         xmat = self.sim.t.geom_xmat[:, gid]                    # (N, G, 3, 3)
         c = self.geom_aabb[gid, 0]; h = self.geom_aabb[gid, 1]  # (G, 3)

@@ -1,0 +1,1971 @@
++ STAGES='r0 r1 r2 r3 r4 r6 r7'
++ M=/home/<vm-user>/parity3_scripts/mpm
++ R=/home/<vm-user>/parity3/mpm
++ mkdir -p /home/<vm-user>/parity3/mpm
++ rm -f /home/<vm-user>/parity3/MPM_DONE
++ nvidia-smi --query-gpu=name,driver_version --format=csv
+name, driver_version
+NVIDIA L4, 580.178.04
++ python -c 'import warp_nn'
++ uv pip install 'warp-nn[onnx]==0.3.0'
+Using Python 3.12.3 environment at: /home/<vm-user>/env_isaaclab3
+Resolved 7 packages in 683ms
+Prepared 1 package in 37ms
+Installed 1 package in 3ms
+ + warp-nn==0.3.0
++ python -c 'import newton, warp; print('\''newton'\'', newton.__version__, '\''warp'\'', warp.__version__)'
+newton 1.5.2 warp 1.16.0
++ for S in $STAGES
++ case $S in
++ rec R0_a2_host_1 --scene column --set aspect=2
++ local id=R0_a2_host_1
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R0_a2_host_1/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R0_a2_host_1 --scene column --set aspect=2
++ echo 'R0_a2_host_1 exit 0'
+R0_a2_host_1 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R0_a2_host_1.log
+done: 180 frames, 2275 particles, 40.95 s, iters mean 91.58333333333333 max 250, init f5ac74880066f63f33b8f6e55afa2cb1
++ rec R0_a2_host_2 --scene column --set aspect=2
++ local id=R0_a2_host_2
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R0_a2_host_2/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R0_a2_host_2 --scene column --set aspect=2
++ echo 'R0_a2_host_2 exit 0'
+R0_a2_host_2 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R0_a2_host_2.log
+done: 180 frames, 2275 particles, 6.36 s, iters mean 91.58333333333333 max 250, init f5ac74880066f63f33b8f6e55afa2cb1
++ rec R0_a2_stock --scene column --set aspect=2 --loop native
++ local id=R0_a2_stock
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R0_a2_stock/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R0_a2_stock --scene column --set aspect=2 --loop native
++ echo 'R0_a2_stock exit 0'
+R0_a2_stock exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R0_a2_stock.log
+done: 180 frames, 2275 particles, 4.97 s, iters mean -1.0 max -1, init f5ac74880066f63f33b8f6e55afa2cb1
++ rec R0_a2_f32 --scene column --set aspect=2 --accumulate float32
++ local id=R0_a2_f32
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R0_a2_f32/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R0_a2_f32 --scene column --set aspect=2 --accumulate float32
++ echo 'R0_a2_f32 exit 0'
+R0_a2_f32 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R0_a2_f32.log
+done: 180 frames, 2275 particles, 12.61 s, iters mean 84.77777777777777 max 250, init f5ac74880066f63f33b8f6e55afa2cb1
++ rec R0_granular_host_1 --scene example:mpm_granular --seconds 1 --stride 6
++ local id=R0_granular_host_1
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R0_granular_host_1/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R0_granular_host_1 --scene example:mpm_granular --seconds 1 --stride 6
++ echo 'R0_granular_host_1 exit 0'
+R0_granular_host_1 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R0_granular_host_1.log
+done: 60 frames, 226981 particles, 20.20 s, iters mean 247.75 max 250, init d928775a82cf76a80ed4cc11761fa85b
++ rec R0_granular_host_2 --scene example:mpm_granular --seconds 1 --stride 6
++ local id=R0_granular_host_2
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R0_granular_host_2/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R0_granular_host_2 --scene example:mpm_granular --seconds 1 --stride 6
++ echo 'R0_granular_host_2 exit 0'
+R0_granular_host_2 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R0_granular_host_2.log
+done: 60 frames, 226981 particles, 3.96 s, iters mean 247.75 max 250, init d928775a82cf76a80ed4cc11761fa85b
++ rec R0_granular_f32 --scene example:mpm_granular --seconds 1 --stride 6 --accumulate float32
++ local id=R0_granular_f32
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R0_granular_f32/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R0_granular_f32 --scene example:mpm_granular --seconds 1 --stride 6 --accumulate float32
++ echo 'R0_granular_f32 exit 0'
+R0_granular_f32 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R0_granular_f32.log
+done: 60 frames, 226981 particles, 11.65 s, iters mean 247.75 max 250, init d928775a82cf76a80ed4cc11761fa85b
++ for S in $STAGES
++ case $S in
++ for a in 0.5 1 2 3 5 8
++ rec R1_a0.5 --scene column --set aspect=0.5
++ local id=R1_a0.5
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a0.5/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a0.5 --scene column --set aspect=0.5
++ echo 'R1_a0.5 exit 0'
+R1_a0.5 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a0.5.log
+done: 180 frames, 637 particles, 6.48 s, iters mean 45.861111111111114 max 250, init af3165afded09a4832568617c4f1af5b
++ for a in 0.5 1 2 3 5 8
++ rec R1_a1 --scene column --set aspect=1
++ local id=R1_a1
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a1/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a1 --scene column --set aspect=1
++ echo 'R1_a1 exit 0'
+R1_a1 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a1.log
+done: 180 frames, 1183 particles, 6.38 s, iters mean 94.61111111111111 max 250, init 3cdfc56712028fe8b0bc309c2981b821
++ for a in 0.5 1 2 3 5 8
++ rec R1_a2 --scene column --set aspect=2
++ local id=R1_a2
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a2/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a2 --scene column --set aspect=2
++ echo 'R1_a2 exit 0'
+R1_a2 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a2.log
+done: 180 frames, 2275 particles, 6.26 s, iters mean 91.58333333333333 max 250, init f5ac74880066f63f33b8f6e55afa2cb1
++ for a in 0.5 1 2 3 5 8
++ rec R1_a3 --scene column --set aspect=3
++ local id=R1_a3
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a3/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a3 --scene column --set aspect=3
++ echo 'R1_a3 exit 0'
+R1_a3 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a3.log
+done: 180 frames, 3276 particles, 6.39 s, iters mean 97.55555555555556 max 250, init a2c44e580f44268ba3069a557ccb7d92
++ for a in 0.5 1 2 3 5 8
++ rec R1_a5 --scene column --set aspect=5
++ local id=R1_a5
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a5/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a5 --scene column --set aspect=5
++ echo 'R1_a5 exit 0'
+R1_a5 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a5.log
+done: 180 frames, 5460 particles, 7.16 s, iters mean 126.05555555555556 max 250, init 50ce399052d97f02f99ab0986f61833c
++ for a in 0.5 1 2 3 5 8
++ rec R1_a8 --scene column --set aspect=8
++ local id=R1_a8
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a8/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a8 --scene column --set aspect=8
++ echo 'R1_a8 exit 0'
+R1_a8 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a8.log
+done: 180 frames, 8827 particles, 7.61 s, iters mean 143.5 max 250, init 2515a4d626f379750c5f898524f4c116
++ for a in 0.5 1 2 3 5 8
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a0.5_j0 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=0 --stride 10
++ local id=R1_a0.5_j0
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a0.5_j0/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a0.5_j0 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=0 --stride 10
++ echo 'R1_a0.5_j0 exit 0'
+R1_a0.5_j0 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a0.5_j0.log
+done: 180 frames, 637 particles, 4.71 s, iters mean 27.02777777777778 max 250, init 7384ed70b4b7fae0685fc06e0c455c28
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a0.5_j1 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=1 --stride 10
++ local id=R1_a0.5_j1
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a0.5_j1/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a0.5_j1 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=1 --stride 10
++ echo 'R1_a0.5_j1 exit 0'
+R1_a0.5_j1 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a0.5_j1.log
+done: 180 frames, 637 particles, 4.74 s, iters mean 28.61111111111111 max 250, init e7b51bd91a94edcb0842c26f3b1d113c
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a0.5_j2 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=2 --stride 10
++ local id=R1_a0.5_j2
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a0.5_j2/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a0.5_j2 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=2 --stride 10
++ echo 'R1_a0.5_j2 exit 0'
+R1_a0.5_j2 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a0.5_j2.log
+done: 180 frames, 637 particles, 4.68 s, iters mean 29.11111111111111 max 250, init b8133fc47933ecebaa96d525cf784586
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a0.5_j3 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=3 --stride 10
++ local id=R1_a0.5_j3
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a0.5_j3/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a0.5_j3 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=3 --stride 10
++ echo 'R1_a0.5_j3 exit 0'
+R1_a0.5_j3 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a0.5_j3.log
+done: 180 frames, 637 particles, 4.56 s, iters mean 23.333333333333332 max 250, init 2dcc582e5eadd289ad7d836f51c7316a
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a0.5_j4 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=4 --stride 10
++ local id=R1_a0.5_j4
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a0.5_j4/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a0.5_j4 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=4 --stride 10
++ echo 'R1_a0.5_j4 exit 0'
+R1_a0.5_j4 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a0.5_j4.log
+done: 180 frames, 637 particles, 4.61 s, iters mean 25.13888888888889 max 250, init e07e5076e4d20b51238b7e7ced8e9058
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a0.5_j5 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=5 --stride 10
++ local id=R1_a0.5_j5
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a0.5_j5/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a0.5_j5 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=5 --stride 10
++ echo 'R1_a0.5_j5 exit 0'
+R1_a0.5_j5 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a0.5_j5.log
+done: 180 frames, 637 particles, 4.62 s, iters mean 24.77777777777778 max 250, init 204c046a1eb0c5f429f571b9fed138b8
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a0.5_j6 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=6 --stride 10
++ local id=R1_a0.5_j6
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a0.5_j6/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a0.5_j6 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=6 --stride 10
++ echo 'R1_a0.5_j6 exit 0'
+R1_a0.5_j6 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a0.5_j6.log
+done: 180 frames, 637 particles, 4.64 s, iters mean 25.72222222222222 max 250, init 95274ab0123b43650501041806915a6c
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a0.5_j7 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=7 --stride 10
++ local id=R1_a0.5_j7
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a0.5_j7/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a0.5_j7 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=7 --stride 10
++ echo 'R1_a0.5_j7 exit 0'
+R1_a0.5_j7 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a0.5_j7.log
+done: 180 frames, 637 particles, 4.62 s, iters mean 25.52777777777778 max 250, init 6d4b7920ed9f612995c7df055a4ae508
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a0.5_j8 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=8 --stride 10
++ local id=R1_a0.5_j8
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a0.5_j8/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a0.5_j8 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=8 --stride 10
++ echo 'R1_a0.5_j8 exit 0'
+R1_a0.5_j8 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a0.5_j8.log
+done: 180 frames, 637 particles, 4.92 s, iters mean 38.611111111111114 max 250, init a9426414f44172eebc501a9caf95ec9f
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a0.5_j9 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=9 --stride 10
++ local id=R1_a0.5_j9
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a0.5_j9/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a0.5_j9 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=9 --stride 10
++ echo 'R1_a0.5_j9 exit 0'
+R1_a0.5_j9 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a0.5_j9.log
+done: 180 frames, 637 particles, 4.67 s, iters mean 27.194444444444443 max 250, init bed134e69a15804b8d8a852c088753e5
++ for a in 0.5 1 2 3 5 8
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a1_j0 --scene column --set aspect=1 --set jitter=0.5 --set seed=0 --stride 10
++ local id=R1_a1_j0
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a1_j0/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a1_j0 --scene column --set aspect=1 --set jitter=0.5 --set seed=0 --stride 10
++ echo 'R1_a1_j0 exit 0'
+R1_a1_j0 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a1_j0.log
+done: 180 frames, 1183 particles, 5.10 s, iters mean 44.02777777777778 max 250, init f7bd5328f037f239e898f18d53e33328
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a1_j1 --scene column --set aspect=1 --set jitter=0.5 --set seed=1 --stride 10
++ local id=R1_a1_j1
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a1_j1/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a1_j1 --scene column --set aspect=1 --set jitter=0.5 --set seed=1 --stride 10
++ echo 'R1_a1_j1 exit 0'
+R1_a1_j1 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a1_j1.log
+done: 180 frames, 1183 particles, 5.33 s, iters mean 53.166666666666664 max 250, init 29855f93683faa54c45f30a0c0823c73
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a1_j2 --scene column --set aspect=1 --set jitter=0.5 --set seed=2 --stride 10
++ local id=R1_a1_j2
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a1_j2/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a1_j2 --scene column --set aspect=1 --set jitter=0.5 --set seed=2 --stride 10
++ echo 'R1_a1_j2 exit 0'
+R1_a1_j2 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a1_j2.log
+done: 180 frames, 1183 particles, 5.40 s, iters mean 57.166666666666664 max 250, init 3c75ae9a685b0a1d82bd9f2b802f594a
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a1_j3 --scene column --set aspect=1 --set jitter=0.5 --set seed=3 --stride 10
++ local id=R1_a1_j3
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a1_j3/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a1_j3 --scene column --set aspect=1 --set jitter=0.5 --set seed=3 --stride 10
++ echo 'R1_a1_j3 exit 0'
+R1_a1_j3 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a1_j3.log
+done: 180 frames, 1183 particles, 5.20 s, iters mean 47.80555555555556 max 250, init 5fd0a7644343ad1f1a0c5de549ddc316
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a1_j4 --scene column --set aspect=1 --set jitter=0.5 --set seed=4 --stride 10
++ local id=R1_a1_j4
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a1_j4/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a1_j4 --scene column --set aspect=1 --set jitter=0.5 --set seed=4 --stride 10
++ echo 'R1_a1_j4 exit 0'
+R1_a1_j4 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a1_j4.log
+done: 180 frames, 1183 particles, 6.17 s, iters mean 87.47222222222223 max 250, init 97967b0b8a931a34c9b2cddaf17e1e51
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a1_j5 --scene column --set aspect=1 --set jitter=0.5 --set seed=5 --stride 10
++ local id=R1_a1_j5
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a1_j5/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a1_j5 --scene column --set aspect=1 --set jitter=0.5 --set seed=5 --stride 10
++ echo 'R1_a1_j5 exit 0'
+R1_a1_j5 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a1_j5.log
+done: 180 frames, 1183 particles, 5.14 s, iters mean 46.30555555555556 max 250, init e8a690f736e733eb515beece4228b934
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a1_j6 --scene column --set aspect=1 --set jitter=0.5 --set seed=6 --stride 10
++ local id=R1_a1_j6
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a1_j6/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a1_j6 --scene column --set aspect=1 --set jitter=0.5 --set seed=6 --stride 10
++ echo 'R1_a1_j6 exit 0'
+R1_a1_j6 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a1_j6.log
+done: 180 frames, 1183 particles, 5.22 s, iters mean 49.166666666666664 max 250, init 0f6fd29bbfe338ba76dbaf9e6a640194
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a1_j7 --scene column --set aspect=1 --set jitter=0.5 --set seed=7 --stride 10
++ local id=R1_a1_j7
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a1_j7/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a1_j7 --scene column --set aspect=1 --set jitter=0.5 --set seed=7 --stride 10
++ echo 'R1_a1_j7 exit 0'
+R1_a1_j7 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a1_j7.log
+done: 180 frames, 1183 particles, 5.52 s, iters mean 59.22222222222222 max 250, init 809429507ef049567b63b682b254a48a
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a1_j8 --scene column --set aspect=1 --set jitter=0.5 --set seed=8 --stride 10
++ local id=R1_a1_j8
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a1_j8/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a1_j8 --scene column --set aspect=1 --set jitter=0.5 --set seed=8 --stride 10
++ echo 'R1_a1_j8 exit 0'
+R1_a1_j8 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a1_j8.log
+done: 180 frames, 1183 particles, 5.22 s, iters mean 47.916666666666664 max 250, init 3444f2387bd77b4ae1bcfa7769cd53a9
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a1_j9 --scene column --set aspect=1 --set jitter=0.5 --set seed=9 --stride 10
++ local id=R1_a1_j9
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a1_j9/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a1_j9 --scene column --set aspect=1 --set jitter=0.5 --set seed=9 --stride 10
++ echo 'R1_a1_j9 exit 0'
+R1_a1_j9 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a1_j9.log
+done: 180 frames, 1183 particles, 5.47 s, iters mean 59.611111111111114 max 250, init d60c4f8c52069b405f26af450ec22f68
++ for a in 0.5 1 2 3 5 8
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a2_j0 --scene column --set aspect=2 --set jitter=0.5 --set seed=0 --stride 10
++ local id=R1_a2_j0
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a2_j0/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a2_j0 --scene column --set aspect=2 --set jitter=0.5 --set seed=0 --stride 10
++ echo 'R1_a2_j0 exit 0'
+R1_a2_j0 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a2_j0.log
+done: 180 frames, 2275 particles, 5.85 s, iters mean 72.86111111111111 max 250, init 696148754a42a8db18f0b6d1a0a0a897
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a2_j1 --scene column --set aspect=2 --set jitter=0.5 --set seed=1 --stride 10
++ local id=R1_a2_j1
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a2_j1/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a2_j1 --scene column --set aspect=2 --set jitter=0.5 --set seed=1 --stride 10
++ echo 'R1_a2_j1 exit 0'
+R1_a2_j1 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a2_j1.log
+done: 180 frames, 2275 particles, 6.27 s, iters mean 91.94444444444444 max 250, init 787fb64516b225a62678ff62371ebf19
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a2_j2 --scene column --set aspect=2 --set jitter=0.5 --set seed=2 --stride 10
++ local id=R1_a2_j2
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a2_j2/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a2_j2 --scene column --set aspect=2 --set jitter=0.5 --set seed=2 --stride 10
++ echo 'R1_a2_j2 exit 0'
+R1_a2_j2 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a2_j2.log
+done: 180 frames, 2275 particles, 5.97 s, iters mean 79.38888888888889 max 250, init 0b4aed66739c2dc860ddd8b2e070be2d
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a2_j3 --scene column --set aspect=2 --set jitter=0.5 --set seed=3 --stride 10
++ local id=R1_a2_j3
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a2_j3/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a2_j3 --scene column --set aspect=2 --set jitter=0.5 --set seed=3 --stride 10
++ echo 'R1_a2_j3 exit 0'
+R1_a2_j3 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a2_j3.log
+done: 180 frames, 2275 particles, 6.14 s, iters mean 83.38888888888889 max 250, init 90e33178fa091af6c5e0095b51bfda99
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a2_j4 --scene column --set aspect=2 --set jitter=0.5 --set seed=4 --stride 10
++ local id=R1_a2_j4
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a2_j4/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a2_j4 --scene column --set aspect=2 --set jitter=0.5 --set seed=4 --stride 10
++ echo 'R1_a2_j4 exit 0'
+R1_a2_j4 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a2_j4.log
+done: 180 frames, 2275 particles, 6.15 s, iters mean 86.97222222222223 max 250, init 70fd594740970fca8287fd186c3d1947
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a2_j5 --scene column --set aspect=2 --set jitter=0.5 --set seed=5 --stride 10
++ local id=R1_a2_j5
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a2_j5/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a2_j5 --scene column --set aspect=2 --set jitter=0.5 --set seed=5 --stride 10
++ echo 'R1_a2_j5 exit 0'
+R1_a2_j5 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a2_j5.log
+done: 180 frames, 2275 particles, 5.90 s, iters mean 75.72222222222223 max 250, init 33f8e4c7adb5b189f146df84a10a0933
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a2_j6 --scene column --set aspect=2 --set jitter=0.5 --set seed=6 --stride 10
++ local id=R1_a2_j6
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a2_j6/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a2_j6 --scene column --set aspect=2 --set jitter=0.5 --set seed=6 --stride 10
++ echo 'R1_a2_j6 exit 0'
+R1_a2_j6 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a2_j6.log
+done: 180 frames, 2275 particles, 6.57 s, iters mean 103.55555555555556 max 250, init a5a53f665f009da065b76d68a7b92abc
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a2_j7 --scene column --set aspect=2 --set jitter=0.5 --set seed=7 --stride 10
++ local id=R1_a2_j7
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a2_j7/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a2_j7 --scene column --set aspect=2 --set jitter=0.5 --set seed=7 --stride 10
++ echo 'R1_a2_j7 exit 0'
+R1_a2_j7 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a2_j7.log
+done: 180 frames, 2275 particles, 5.92 s, iters mean 78.44444444444444 max 250, init 92b9acd3345e28c1c23b49091e44ffb1
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a2_j8 --scene column --set aspect=2 --set jitter=0.5 --set seed=8 --stride 10
++ local id=R1_a2_j8
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a2_j8/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a2_j8 --scene column --set aspect=2 --set jitter=0.5 --set seed=8 --stride 10
++ echo 'R1_a2_j8 exit 0'
+R1_a2_j8 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a2_j8.log
+done: 180 frames, 2275 particles, 5.68 s, iters mean 66.83333333333333 max 250, init 3d591ee4648582d025a0f3db46a4a71a
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a2_j9 --scene column --set aspect=2 --set jitter=0.5 --set seed=9 --stride 10
++ local id=R1_a2_j9
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a2_j9/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a2_j9 --scene column --set aspect=2 --set jitter=0.5 --set seed=9 --stride 10
++ echo 'R1_a2_j9 exit 0'
+R1_a2_j9 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a2_j9.log
+done: 180 frames, 2275 particles, 5.97 s, iters mean 78.38888888888889 max 250, init 4dc0876be1728e3900a3031aa89e0efc
++ for a in 0.5 1 2 3 5 8
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a3_j0 --scene column --set aspect=3 --set jitter=0.5 --set seed=0 --stride 10
++ local id=R1_a3_j0
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a3_j0/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a3_j0 --scene column --set aspect=3 --set jitter=0.5 --set seed=0 --stride 10
++ echo 'R1_a3_j0 exit 0'
+R1_a3_j0 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a3_j0.log
+done: 180 frames, 3276 particles, 6.21 s, iters mean 89.36111111111111 max 250, init 1324cd0eb14bf693aacd888a6b08da78
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a3_j1 --scene column --set aspect=3 --set jitter=0.5 --set seed=1 --stride 10
++ local id=R1_a3_j1
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a3_j1/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a3_j1 --scene column --set aspect=3 --set jitter=0.5 --set seed=1 --stride 10
++ echo 'R1_a3_j1 exit 0'
+R1_a3_j1 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a3_j1.log
+done: 180 frames, 3276 particles, 6.09 s, iters mean 83.72222222222223 max 250, init bcddfaccc3c1e4d04f654578e93b4cdf
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a3_j2 --scene column --set aspect=3 --set jitter=0.5 --set seed=2 --stride 10
++ local id=R1_a3_j2
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a3_j2/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a3_j2 --scene column --set aspect=3 --set jitter=0.5 --set seed=2 --stride 10
++ echo 'R1_a3_j2 exit 0'
+R1_a3_j2 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a3_j2.log
+done: 180 frames, 3276 particles, 6.14 s, iters mean 85.11111111111111 max 250, init 56f881799b280a48f1de2687f5fc485b
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a3_j3 --scene column --set aspect=3 --set jitter=0.5 --set seed=3 --stride 10
++ local id=R1_a3_j3
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a3_j3/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a3_j3 --scene column --set aspect=3 --set jitter=0.5 --set seed=3 --stride 10
++ echo 'R1_a3_j3 exit 0'
+R1_a3_j3 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a3_j3.log
+done: 180 frames, 3276 particles, 6.59 s, iters mean 102.5 max 250, init 7a331ee2cb34704d23a81fdd17421e4e
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a3_j4 --scene column --set aspect=3 --set jitter=0.5 --set seed=4 --stride 10
++ local id=R1_a3_j4
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a3_j4/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a3_j4 --scene column --set aspect=3 --set jitter=0.5 --set seed=4 --stride 10
++ echo 'R1_a3_j4 exit 0'
+R1_a3_j4 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a3_j4.log
+done: 180 frames, 3276 particles, 6.83 s, iters mean 112.27777777777777 max 250, init 1e587ae64bed9a4a169d0417d31d4879
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a3_j5 --scene column --set aspect=3 --set jitter=0.5 --set seed=5 --stride 10
++ local id=R1_a3_j5
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a3_j5/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a3_j5 --scene column --set aspect=3 --set jitter=0.5 --set seed=5 --stride 10
++ echo 'R1_a3_j5 exit 0'
+R1_a3_j5 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a3_j5.log
+done: 180 frames, 3276 particles, 7.04 s, iters mean 120.47222222222223 max 250, init fceeb5665981d3f9bb8cb9a38ba4793d
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a3_j6 --scene column --set aspect=3 --set jitter=0.5 --set seed=6 --stride 10
++ local id=R1_a3_j6
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a3_j6/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a3_j6 --scene column --set aspect=3 --set jitter=0.5 --set seed=6 --stride 10
++ echo 'R1_a3_j6 exit 0'
+R1_a3_j6 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a3_j6.log
+done: 180 frames, 3276 particles, 5.93 s, iters mean 78.86111111111111 max 250, init c6400cdae1002194862e03f581571506
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a3_j7 --scene column --set aspect=3 --set jitter=0.5 --set seed=7 --stride 10
++ local id=R1_a3_j7
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a3_j7/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a3_j7 --scene column --set aspect=3 --set jitter=0.5 --set seed=7 --stride 10
++ echo 'R1_a3_j7 exit 0'
+R1_a3_j7 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a3_j7.log
+done: 180 frames, 3276 particles, 6.71 s, iters mean 109.27777777777777 max 250, init 36e198022b76800fb06b8b18c502d417
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a3_j8 --scene column --set aspect=3 --set jitter=0.5 --set seed=8 --stride 10
++ local id=R1_a3_j8
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a3_j8/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a3_j8 --scene column --set aspect=3 --set jitter=0.5 --set seed=8 --stride 10
++ echo 'R1_a3_j8 exit 0'
+R1_a3_j8 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a3_j8.log
+done: 180 frames, 3276 particles, 6.02 s, iters mean 83.80555555555556 max 250, init 93e888de94c2bf3a9032659367222901
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a3_j9 --scene column --set aspect=3 --set jitter=0.5 --set seed=9 --stride 10
++ local id=R1_a3_j9
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a3_j9/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a3_j9 --scene column --set aspect=3 --set jitter=0.5 --set seed=9 --stride 10
++ echo 'R1_a3_j9 exit 0'
+R1_a3_j9 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a3_j9.log
+done: 180 frames, 3276 particles, 6.27 s, iters mean 94.30555555555556 max 250, init c860a4ddbc9df28efa9dd176a4bc1bd3
++ for a in 0.5 1 2 3 5 8
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a5_j0 --scene column --set aspect=5 --set jitter=0.5 --set seed=0 --stride 10
++ local id=R1_a5_j0
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a5_j0/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a5_j0 --scene column --set aspect=5 --set jitter=0.5 --set seed=0 --stride 10
++ echo 'R1_a5_j0 exit 0'
+R1_a5_j0 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a5_j0.log
+done: 180 frames, 5460 particles, 6.39 s, iters mean 99.0 max 250, init 68115566ce980a39dd56159c1c3a521c
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a5_j1 --scene column --set aspect=5 --set jitter=0.5 --set seed=1 --stride 10
++ local id=R1_a5_j1
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a5_j1/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a5_j1 --scene column --set aspect=5 --set jitter=0.5 --set seed=1 --stride 10
++ echo 'R1_a5_j1 exit 0'
+R1_a5_j1 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a5_j1.log
+done: 180 frames, 5460 particles, 6.74 s, iters mean 110.97222222222223 max 250, init 4524d3de899606513745744ec30a80cc
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a5_j2 --scene column --set aspect=5 --set jitter=0.5 --set seed=2 --stride 10
++ local id=R1_a5_j2
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a5_j2/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a5_j2 --scene column --set aspect=5 --set jitter=0.5 --set seed=2 --stride 10
++ echo 'R1_a5_j2 exit 0'
+R1_a5_j2 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a5_j2.log
+done: 180 frames, 5460 particles, 7.93 s, iters mean 156.61111111111111 max 250, init 6cec53dc4aa92da6cfbb07deb1173ff8
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a5_j3 --scene column --set aspect=5 --set jitter=0.5 --set seed=3 --stride 10
++ local id=R1_a5_j3
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a5_j3/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a5_j3 --scene column --set aspect=5 --set jitter=0.5 --set seed=3 --stride 10
++ echo 'R1_a5_j3 exit 0'
+R1_a5_j3 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a5_j3.log
+done: 180 frames, 5460 particles, 6.79 s, iters mean 114.36111111111111 max 250, init cf86dd9f5092cf666db9ce76e0f26f27
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a5_j4 --scene column --set aspect=5 --set jitter=0.5 --set seed=4 --stride 10
++ local id=R1_a5_j4
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a5_j4/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a5_j4 --scene column --set aspect=5 --set jitter=0.5 --set seed=4 --stride 10
++ echo 'R1_a5_j4 exit 0'
+R1_a5_j4 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a5_j4.log
+done: 180 frames, 5460 particles, 7.10 s, iters mean 126.27777777777777 max 250, init f9c0b9cf6c4502e5c1f3b1c5459d5c07
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a5_j5 --scene column --set aspect=5 --set jitter=0.5 --set seed=5 --stride 10
++ local id=R1_a5_j5
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a5_j5/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a5_j5 --scene column --set aspect=5 --set jitter=0.5 --set seed=5 --stride 10
++ echo 'R1_a5_j5 exit 0'
+R1_a5_j5 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a5_j5.log
+done: 180 frames, 5460 particles, 6.52 s, iters mean 104.0 max 250, init 54017c35854d0c3e7f332690baa2a196
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a5_j6 --scene column --set aspect=5 --set jitter=0.5 --set seed=6 --stride 10
++ local id=R1_a5_j6
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a5_j6/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a5_j6 --scene column --set aspect=5 --set jitter=0.5 --set seed=6 --stride 10
++ echo 'R1_a5_j6 exit 0'
+R1_a5_j6 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a5_j6.log
+done: 180 frames, 5460 particles, 7.03 s, iters mean 122.66666666666667 max 250, init eefecda612686e7c668cd317aa108415
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a5_j7 --scene column --set aspect=5 --set jitter=0.5 --set seed=7 --stride 10
++ local id=R1_a5_j7
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a5_j7/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a5_j7 --scene column --set aspect=5 --set jitter=0.5 --set seed=7 --stride 10
++ echo 'R1_a5_j7 exit 0'
+R1_a5_j7 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a5_j7.log
+done: 180 frames, 5460 particles, 6.61 s, iters mean 105.75 max 250, init 7c2d1d543be6d9058d6cc3bd0397f493
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a5_j8 --scene column --set aspect=5 --set jitter=0.5 --set seed=8 --stride 10
++ local id=R1_a5_j8
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a5_j8/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a5_j8 --scene column --set aspect=5 --set jitter=0.5 --set seed=8 --stride 10
++ echo 'R1_a5_j8 exit 0'
+R1_a5_j8 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a5_j8.log
+done: 180 frames, 5460 particles, 7.67 s, iters mean 145.63888888888889 max 250, init 2b3ef9eb29179c7f890f3112e050f5d4
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a5_j9 --scene column --set aspect=5 --set jitter=0.5 --set seed=9 --stride 10
++ local id=R1_a5_j9
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a5_j9/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a5_j9 --scene column --set aspect=5 --set jitter=0.5 --set seed=9 --stride 10
++ echo 'R1_a5_j9 exit 0'
+R1_a5_j9 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a5_j9.log
+done: 180 frames, 5460 particles, 6.69 s, iters mean 109.97222222222223 max 250, init 3fa54015abcb583989ca68af5de9bab3
++ for a in 0.5 1 2 3 5 8
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a8_j0 --scene column --set aspect=8 --set jitter=0.5 --set seed=0 --stride 10
++ local id=R1_a8_j0
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a8_j0/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a8_j0 --scene column --set aspect=8 --set jitter=0.5 --set seed=0 --stride 10
++ echo 'R1_a8_j0 exit 0'
+R1_a8_j0 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a8_j0.log
+done: 180 frames, 8827 particles, 7.94 s, iters mean 157.80555555555554 max 250, init fc3a05d6d222c721bc610855cd2e0178
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a8_j1 --scene column --set aspect=8 --set jitter=0.5 --set seed=1 --stride 10
++ local id=R1_a8_j1
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a8_j1/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a8_j1 --scene column --set aspect=8 --set jitter=0.5 --set seed=1 --stride 10
++ echo 'R1_a8_j1 exit 0'
+R1_a8_j1 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a8_j1.log
+done: 180 frames, 8827 particles, 8.70 s, iters mean 188.44444444444446 max 250, init dd349c5f00957c4482a40bd0affd3ad5
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a8_j2 --scene column --set aspect=8 --set jitter=0.5 --set seed=2 --stride 10
++ local id=R1_a8_j2
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a8_j2/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a8_j2 --scene column --set aspect=8 --set jitter=0.5 --set seed=2 --stride 10
++ echo 'R1_a8_j2 exit 0'
+R1_a8_j2 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a8_j2.log
+done: 180 frames, 8827 particles, 7.33 s, iters mean 136.63888888888889 max 250, init ed6fb31c7eda646b41f3a3219cbd8f45
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a8_j3 --scene column --set aspect=8 --set jitter=0.5 --set seed=3 --stride 10
++ local id=R1_a8_j3
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a8_j3/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a8_j3 --scene column --set aspect=8 --set jitter=0.5 --set seed=3 --stride 10
++ echo 'R1_a8_j3 exit 0'
+R1_a8_j3 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a8_j3.log
+done: 180 frames, 8827 particles, 8.22 s, iters mean 166.55555555555554 max 250, init 477b36fcf22b00116ad7e6fcb59e6620
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a8_j4 --scene column --set aspect=8 --set jitter=0.5 --set seed=4 --stride 10
++ local id=R1_a8_j4
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a8_j4/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a8_j4 --scene column --set aspect=8 --set jitter=0.5 --set seed=4 --stride 10
++ echo 'R1_a8_j4 exit 0'
+R1_a8_j4 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a8_j4.log
+done: 180 frames, 8827 particles, 7.30 s, iters mean 133.91666666666666 max 250, init 8cb3827a027298823f5c24ba1fbffab4
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a8_j5 --scene column --set aspect=8 --set jitter=0.5 --set seed=5 --stride 10
++ local id=R1_a8_j5
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a8_j5/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a8_j5 --scene column --set aspect=8 --set jitter=0.5 --set seed=5 --stride 10
++ echo 'R1_a8_j5 exit 0'
+R1_a8_j5 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a8_j5.log
+done: 180 frames, 8827 particles, 7.94 s, iters mean 161.19444444444446 max 250, init 9a8f996614092ac47e00f5e2729a0331
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a8_j6 --scene column --set aspect=8 --set jitter=0.5 --set seed=6 --stride 10
++ local id=R1_a8_j6
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a8_j6/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a8_j6 --scene column --set aspect=8 --set jitter=0.5 --set seed=6 --stride 10
++ echo 'R1_a8_j6 exit 0'
+R1_a8_j6 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a8_j6.log
+done: 180 frames, 8827 particles, 8.24 s, iters mean 170.58333333333334 max 250, init a21ec8efa5435894cae7d284b0d85c38
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a8_j7 --scene column --set aspect=8 --set jitter=0.5 --set seed=7 --stride 10
++ local id=R1_a8_j7
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a8_j7/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a8_j7 --scene column --set aspect=8 --set jitter=0.5 --set seed=7 --stride 10
++ echo 'R1_a8_j7 exit 0'
+R1_a8_j7 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a8_j7.log
+done: 180 frames, 8827 particles, 7.35 s, iters mean 134.02777777777777 max 250, init 95c1880ba178767660aa4a9036da18d5
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a8_j8 --scene column --set aspect=8 --set jitter=0.5 --set seed=8 --stride 10
++ local id=R1_a8_j8
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a8_j8/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a8_j8 --scene column --set aspect=8 --set jitter=0.5 --set seed=8 --stride 10
++ echo 'R1_a8_j8 exit 0'
+R1_a8_j8 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a8_j8.log
+done: 180 frames, 8827 particles, 7.51 s, iters mean 142.19444444444446 max 250, init d12e66a9e5d6b44ca00e1a58d85e3a1e
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a8_j9 --scene column --set aspect=8 --set jitter=0.5 --set seed=9 --stride 10
++ local id=R1_a8_j9
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a8_j9/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a8_j9 --scene column --set aspect=8 --set jitter=0.5 --set seed=9 --stride 10
++ echo 'R1_a8_j9 exit 0'
+R1_a8_j9 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a8_j9.log
+done: 180 frames, 8827 particles, 8.38 s, iters mean 179.25 max 250, init 7131450da2446e74808d21e7ac14ce99
++ for S in $STAGES
++ case $S in
++ for a in 2 5
++ id=R2_il3_a2
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R2_il3_a2/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm_il3.py --viz none --aspect 2 --out /home/<vm-user>/parity3/mpm/R2_il3_a2
++ echo 'R2_il3_a2 exit 0'
+R2_il3_a2 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R2_il3_a2.log
+done: 180 frames, 1728 particles
++ for a in 2 5
++ id=R2_il3_a5
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R2_il3_a5/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm_il3.py --viz none --aspect 5 --out /home/<vm-user>/parity3/mpm/R2_il3_a5
++ echo 'R2_il3_a5 exit 0'
+R2_il3_a5 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R2_il3_a5.log
+done: 180 frames, 4320 particles
++ rec R0_a5_stock --scene column --set aspect=5 --loop native
++ local id=R0_a5_stock
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R0_a5_stock/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R0_a5_stock --scene column --set aspect=5 --loop native
++ echo 'R0_a5_stock exit 0'
+R0_a5_stock exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R0_a5_stock.log
+done: 180 frames, 5460 particles, 5.42 s, iters mean -1.0 max -1, init 50ce399052d97f02f99ab0986f61833c
++ for S in $STAGES
++ case $S in
++ rec R3_granular --scene example:mpm_granular --seconds 3 --stride 6
++ local id=R3_granular
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R3_granular/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R3_granular --scene example:mpm_granular --seconds 3 --stride 6
++ echo 'R3_granular exit 0'
+R3_granular exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R3_granular.log
+done: 180 frames, 226981 particles, 10.59 s, iters mean 249.25 max 250, init d928775a82cf76a80ed4cc11761fa85b
++ rec R3_multi_material --scene example:mpm_multi_material --seconds 3 --stride 6
++ local id=R3_multi_material
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R3_multi_material/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R3_multi_material --scene example:mpm_multi_material --seconds 3 --stride 6
++ echo 'R3_multi_material exit 0'
+R3_multi_material exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R3_multi_material.log
+done: 180 frames, 178669 particles, 13.37 s, iters mean 241.86111111111111 max 250, init 016c0f04552bacc50b116e3a4e85100a
++ rec R3_snow_ball --scene example:mpm_snow_ball --seconds 2 --stride 6
++ local id=R3_snow_ball
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R3_snow_ball/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R3_snow_ball --scene example:mpm_snow_ball --seconds 2 --stride 6
++ echo 'R3_snow_ball exit 0'
+R3_snow_ball exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R3_snow_ball.log
+done: 120 frames, 641657 particles, 30.14 s, iters mean 149.66666666666666 max 150, init a87685c7b012b547cd3cd0d6ba6a895d
++ rec R3_viscous --scene example:mpm_viscous --seconds 2 --stride 12
++ local id=R3_viscous
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R3_viscous/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R3_viscous --scene example:mpm_viscous --seconds 2 --stride 12
++ echo 'R3_viscous exit 0'
+R3_viscous exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R3_viscous.log
+done: 480 frames, 100190 particles, 28.06 s, iters mean 250.0 max 250, init 56ba815e6ffb75910a83ea64feeb4ff2
++ rec R3_beam_twist --scene example:mpm_beam_twist --seconds 2 --stride 12
++ local id=R3_beam_twist
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R3_beam_twist/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R3_beam_twist --scene example:mpm_beam_twist --seconds 2 --stride 12
++ echo 'R3_beam_twist exit 0'
+R3_beam_twist exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R3_beam_twist.log
+done: 480 frames, 10309 particles, 46.38 s, iters mean None max None, init 1e9bc26722922b9938d800f188a572ef
++ for S in $STAGES
++ case $S in
++ rec R4_twoway --scene example:mpm_twoway_coupling --seconds 3 --stride 2
++ local id=R4_twoway
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R4_twoway/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R4_twoway --scene example:mpm_twoway_coupling --seconds 3 --stride 2
++ echo 'R4_twoway exit 0'
+R4_twoway exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R4_twoway.log
+done: 300 frames, 453871 particles, 42.18 s, iters mean 50.0 max 50, init bda7429fa80ec537f605e4c233d08ecb
++ for S in $STAGES
++ case $S in
++ rec R6_anymal --scene example:mpm_anymal --seconds 3 --stride 2
++ local id=R6_anymal
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R6_anymal/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R6_anymal --scene example:mpm_anymal --seconds 3 --stride 2
++ echo 'R6_anymal exit 0'
+R6_anymal exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R6_anymal.log
+done: 150 frames, 486416 particles, 30.49 s, iters mean 50.0 max 50, init c604d945d3dd10b97e4b5496235af320
++ for S in $STAGES
++ case $S in
++ rec R7_plate_intrude --scene plate --set 'mode="intrude"' --stride 15
++ local id=R7_plate_intrude
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R7_plate_intrude/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R7_plate_intrude --scene plate --set 'mode="intrude"' --stride 15
++ echo 'R7_plate_intrude exit 0'
+R7_plate_intrude exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R7_plate_intrude.log
+done: 105 frames, 280478 particles, 6.85 s, iters mean 250.0 max 250, init fdefbad519e920bced4e2fad0b546fe7
++ rec R7_plate_drag --scene plate --set 'mode="drag"' --set travel=0.3 --stride 15
++ local id=R7_plate_drag
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R7_plate_drag/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R7_plate_drag --scene plate --set 'mode="drag"' --set travel=0.3 --stride 15
++ echo 'R7_plate_drag exit 0'
+R7_plate_drag exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R7_plate_drag.log
+done: 195 frames, 278846 particles, 12.13 s, iters mean 250.0 max 250, init 4b7f6bd6b4a5ad0d459700b6c57dc4da
++ tar czf /home/<vm-user>/parity3/mpm_refs.tgz -C /home/<vm-user>/parity3 mpm
++ touch /home/<vm-user>/parity3/MPM_DONE
++ STAGES='r0 r1 r2 r7'
++ M=/home/<vm-user>/parity3_scripts/mpm
++ R=/home/<vm-user>/parity3/mpm
++ mkdir -p /home/<vm-user>/parity3/mpm
++ rm -f /home/<vm-user>/parity3/MPM_DONE
++ nvidia-smi --query-gpu=name,driver_version --format=csv
+name, driver_version
+NVIDIA L4, 580.178.04
++ python -c 'import warp_nn'
++ python -c 'import newton, warp; print('\''newton'\'', newton.__version__, '\''warp'\'', warp.__version__)'
+newton 1.5.2 warp 1.16.0
++ for S in $STAGES
++ case $S in
++ rec R0_a2_host_1 --scene column --set aspect=2
++ local id=R0_a2_host_1
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R0_a2_host_1/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R0_a2_host_1 --scene column --set aspect=2
++ echo 'R0_a2_host_1 exit 0'
+R0_a2_host_1 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R0_a2_host_1.log
+done: 180 frames, 1728 particles, 5.84 s, iters mean 76.58333333333333 max 250, init a960bdec033f4354401a779b2c806376
++ rec R0_a2_host_2 --scene column --set aspect=2
++ local id=R0_a2_host_2
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R0_a2_host_2/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R0_a2_host_2 --scene column --set aspect=2
++ echo 'R0_a2_host_2 exit 0'
+R0_a2_host_2 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R0_a2_host_2.log
+done: 180 frames, 1728 particles, 5.79 s, iters mean 76.58333333333333 max 250, init a960bdec033f4354401a779b2c806376
++ rec R0_a2_stock --scene column --set aspect=2 --loop native
++ local id=R0_a2_stock
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R0_a2_stock/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R0_a2_stock --scene column --set aspect=2 --loop native
++ echo 'R0_a2_stock exit 0'
+R0_a2_stock exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R0_a2_stock.log
+done: 180 frames, 1728 particles, 4.80 s, iters mean -1.0 max -1, init a960bdec033f4354401a779b2c806376
++ rec R0_a2_f32 --scene column --set aspect=2 --accumulate float32
++ local id=R0_a2_f32
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R0_a2_f32/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R0_a2_f32 --scene column --set aspect=2 --accumulate float32
++ echo 'R0_a2_f32 exit 0'
+R0_a2_f32 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R0_a2_f32.log
+done: 180 frames, 1728 particles, 7.34 s, iters mean 76.58333333333333 max 250, init a960bdec033f4354401a779b2c806376
++ rec R0_granular_host_1 --scene example:mpm_granular --seconds 1 --stride 6
++ local id=R0_granular_host_1
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R0_granular_host_1/meta.json ']'
++ echo 'skip R0_granular_host_1'
+skip R0_granular_host_1
++ return
++ rec R0_granular_host_2 --scene example:mpm_granular --seconds 1 --stride 6
++ local id=R0_granular_host_2
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R0_granular_host_2/meta.json ']'
++ echo 'skip R0_granular_host_2'
+skip R0_granular_host_2
++ return
++ rec R0_granular_f32 --scene example:mpm_granular --seconds 1 --stride 6 --accumulate float32
++ local id=R0_granular_f32
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R0_granular_f32/meta.json ']'
++ echo 'skip R0_granular_f32'
+skip R0_granular_f32
++ return
++ for S in $STAGES
++ case $S in
++ for a in 0.5 1 2 3 5 8
++ rec R1_a0.5 --scene column --set aspect=0.5
++ local id=R1_a0.5
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a0.5/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a0.5 --scene column --set aspect=0.5
++ echo 'R1_a0.5 exit 0'
+R1_a0.5 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a0.5.log
+done: 180 frames, 432 particles, 4.45 s, iters mean 25.27777777777778 max 250, init eb531c064b2664e7e8620b22b7e120b7
++ for a in 0.5 1 2 3 5 8
++ rec R1_a1 --scene column --set aspect=1
++ local id=R1_a1
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a1/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a1 --scene column --set aspect=1
++ echo 'R1_a1 exit 0'
+R1_a1 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a1.log
+done: 180 frames, 864 particles, 4.68 s, iters mean 38.22222222222222 max 250, init 9d52366700cfd65acf18d39bb51d28b0
++ for a in 0.5 1 2 3 5 8
++ rec R1_a2 --scene column --set aspect=2
++ local id=R1_a2
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a2/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a2 --scene column --set aspect=2
++ echo 'R1_a2 exit 0'
+R1_a2 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a2.log
+done: 180 frames, 1728 particles, 5.66 s, iters mean 76.58333333333333 max 250, init a960bdec033f4354401a779b2c806376
++ for a in 0.5 1 2 3 5 8
++ rec R1_a3 --scene column --set aspect=3
++ local id=R1_a3
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a3/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a3 --scene column --set aspect=3
++ echo 'R1_a3 exit 0'
+R1_a3 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a3.log
+done: 180 frames, 2592 particles, 6.17 s, iters mean 92.83333333333333 max 250, init dbceedd308b41616935bb5c400024d09
++ for a in 0.5 1 2 3 5 8
++ rec R1_a5 --scene column --set aspect=5
++ local id=R1_a5
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a5/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a5 --scene column --set aspect=5
++ echo 'R1_a5 exit 0'
+R1_a5 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a5.log
+done: 180 frames, 4320 particles, 8.23 s, iters mean 179.80555555555554 max 250, init c8f6e0f9f9e4bcbfc48e5875e806723a
++ for a in 0.5 1 2 3 5 8
++ rec R1_a8 --scene column --set aspect=8
++ local id=R1_a8
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a8/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a8 --scene column --set aspect=8
++ echo 'R1_a8 exit 0'
+R1_a8 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a8.log
+done: 180 frames, 6912 particles, 8.13 s, iters mean 174.63888888888889 max 250, init e1885e47abe47311bf957b9fbdb29d25
++ for a in 0.5 1 2 3 5 8
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a0.5_j0 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=0 --stride 10
++ local id=R1_a0.5_j0
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a0.5_j0/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a0.5_j0 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=0 --stride 10
++ echo 'R1_a0.5_j0 exit 0'
+R1_a0.5_j0 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a0.5_j0.log
+done: 180 frames, 432 particles, 4.70 s, iters mean 30.694444444444443 max 250, init 15129f3ac5f639d911c5904b4f4390dd
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a0.5_j1 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=1 --stride 10
++ local id=R1_a0.5_j1
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a0.5_j1/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a0.5_j1 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=1 --stride 10
++ echo 'R1_a0.5_j1 exit 0'
+R1_a0.5_j1 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a0.5_j1.log
+done: 180 frames, 432 particles, 4.51 s, iters mean 23.25 max 250, init 5a56c504e98d95e00d33748145f2c4c3
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a0.5_j2 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=2 --stride 10
++ local id=R1_a0.5_j2
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a0.5_j2/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a0.5_j2 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=2 --stride 10
++ echo 'R1_a0.5_j2 exit 0'
+R1_a0.5_j2 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a0.5_j2.log
+done: 180 frames, 432 particles, 4.62 s, iters mean 27.916666666666668 max 250, init 0032f5866c66734e34eb8a77aa082f95
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a0.5_j3 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=3 --stride 10
++ local id=R1_a0.5_j3
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a0.5_j3/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a0.5_j3 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=3 --stride 10
++ echo 'R1_a0.5_j3 exit 0'
+R1_a0.5_j3 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a0.5_j3.log
+done: 180 frames, 432 particles, 4.42 s, iters mean 21.61111111111111 max 250, init cb4283c9b1c111f66df114564e716c33
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a0.5_j4 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=4 --stride 10
++ local id=R1_a0.5_j4
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a0.5_j4/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a0.5_j4 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=4 --stride 10
++ echo 'R1_a0.5_j4 exit 0'
+R1_a0.5_j4 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a0.5_j4.log
+done: 180 frames, 432 particles, 4.51 s, iters mean 22.666666666666668 max 250, init ca2e67db804a7d8eb74c0ded677b178e
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a0.5_j5 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=5 --stride 10
++ local id=R1_a0.5_j5
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a0.5_j5/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a0.5_j5 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=5 --stride 10
++ echo 'R1_a0.5_j5 exit 0'
+R1_a0.5_j5 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a0.5_j5.log
+done: 180 frames, 432 particles, 4.55 s, iters mean 29.97222222222222 max 250, init 8fc9e1793d918a12ffdd2f995c17ade8
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a0.5_j6 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=6 --stride 10
++ local id=R1_a0.5_j6
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a0.5_j6/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a0.5_j6 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=6 --stride 10
++ echo 'R1_a0.5_j6 exit 0'
+R1_a0.5_j6 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a0.5_j6.log
+done: 180 frames, 432 particles, 4.36 s, iters mean 23.666666666666668 max 250, init 44ae301dc7d425bfedf05e383d02f004
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a0.5_j7 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=7 --stride 10
++ local id=R1_a0.5_j7
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a0.5_j7/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a0.5_j7 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=7 --stride 10
++ echo 'R1_a0.5_j7 exit 0'
+R1_a0.5_j7 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a0.5_j7.log
+done: 180 frames, 432 particles, 4.33 s, iters mean 21.333333333333332 max 250, init d1c214d14a3e70fdecb70ad162a163d0
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a0.5_j8 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=8 --stride 10
++ local id=R1_a0.5_j8
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a0.5_j8/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a0.5_j8 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=8 --stride 10
++ echo 'R1_a0.5_j8 exit 0'
+R1_a0.5_j8 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a0.5_j8.log
+done: 180 frames, 432 particles, 4.38 s, iters mean 22.583333333333332 max 250, init cdc161acd81c9cf5241a93cc92fe568c
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a0.5_j9 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=9 --stride 10
++ local id=R1_a0.5_j9
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a0.5_j9/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a0.5_j9 --scene column --set aspect=0.5 --set jitter=0.5 --set seed=9 --stride 10
++ echo 'R1_a0.5_j9 exit 0'
+R1_a0.5_j9 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a0.5_j9.log
+done: 180 frames, 432 particles, 4.66 s, iters mean 33.5 max 250, init 5823e1382c0b66096b93caf7f56f9a8b
++ for a in 0.5 1 2 3 5 8
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a1_j0 --scene column --set aspect=1 --set jitter=0.5 --set seed=0 --stride 10
++ local id=R1_a1_j0
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a1_j0/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a1_j0 --scene column --set aspect=1 --set jitter=0.5 --set seed=0 --stride 10
++ echo 'R1_a1_j0 exit 0'
+R1_a1_j0 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a1_j0.log
+done: 180 frames, 864 particles, 5.01 s, iters mean 47.30555555555556 max 250, init bc1f72d9eb8311742feeef48cc124ebf
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a1_j1 --scene column --set aspect=1 --set jitter=0.5 --set seed=1 --stride 10
++ local id=R1_a1_j1
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a1_j1/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a1_j1 --scene column --set aspect=1 --set jitter=0.5 --set seed=1 --stride 10
++ echo 'R1_a1_j1 exit 0'
+R1_a1_j1 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a1_j1.log
+done: 180 frames, 864 particles, 5.05 s, iters mean 50.388888888888886 max 250, init 05a1108739ced84a69800a2008385639
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a1_j2 --scene column --set aspect=1 --set jitter=0.5 --set seed=2 --stride 10
++ local id=R1_a1_j2
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a1_j2/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a1_j2 --scene column --set aspect=1 --set jitter=0.5 --set seed=2 --stride 10
++ echo 'R1_a1_j2 exit 0'
+R1_a1_j2 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a1_j2.log
+done: 180 frames, 864 particles, 5.01 s, iters mean 39.97222222222222 max 250, init 06dffceb357ceadd76436091675f637a
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a1_j3 --scene column --set aspect=1 --set jitter=0.5 --set seed=3 --stride 10
++ local id=R1_a1_j3
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a1_j3/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a1_j3 --scene column --set aspect=1 --set jitter=0.5 --set seed=3 --stride 10
++ echo 'R1_a1_j3 exit 0'
+R1_a1_j3 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a1_j3.log
+done: 180 frames, 864 particles, 5.40 s, iters mean 58.69444444444444 max 250, init 352bd0fc0f5dccdeb509055f226b9cc7
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a1_j4 --scene column --set aspect=1 --set jitter=0.5 --set seed=4 --stride 10
++ local id=R1_a1_j4
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a1_j4/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a1_j4 --scene column --set aspect=1 --set jitter=0.5 --set seed=4 --stride 10
++ echo 'R1_a1_j4 exit 0'
+R1_a1_j4 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a1_j4.log
+done: 180 frames, 864 particles, 5.19 s, iters mean 52.916666666666664 max 250, init 59bf956c365ebbdaf81a42ff1a5f41d4
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a1_j5 --scene column --set aspect=1 --set jitter=0.5 --set seed=5 --stride 10
++ local id=R1_a1_j5
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a1_j5/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a1_j5 --scene column --set aspect=1 --set jitter=0.5 --set seed=5 --stride 10
++ echo 'R1_a1_j5 exit 0'
+R1_a1_j5 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a1_j5.log
+done: 180 frames, 864 particles, 4.92 s, iters mean 45.94444444444444 max 250, init 963e1564af3d2b49289f8d306d262e52
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a1_j6 --scene column --set aspect=1 --set jitter=0.5 --set seed=6 --stride 10
++ local id=R1_a1_j6
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a1_j6/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a1_j6 --scene column --set aspect=1 --set jitter=0.5 --set seed=6 --stride 10
++ echo 'R1_a1_j6 exit 0'
+R1_a1_j6 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a1_j6.log
+done: 180 frames, 864 particles, 4.99 s, iters mean 46.27777777777778 max 250, init ba4bfd4000cb2ac15b5e3d35eb5533ae
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a1_j7 --scene column --set aspect=1 --set jitter=0.5 --set seed=7 --stride 10
++ local id=R1_a1_j7
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a1_j7/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a1_j7 --scene column --set aspect=1 --set jitter=0.5 --set seed=7 --stride 10
++ echo 'R1_a1_j7 exit 0'
+R1_a1_j7 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a1_j7.log
+done: 180 frames, 864 particles, 5.14 s, iters mean 52.47222222222222 max 250, init 126828a4fefe06dde1bfc368f6b4fec4
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a1_j8 --scene column --set aspect=1 --set jitter=0.5 --set seed=8 --stride 10
++ local id=R1_a1_j8
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a1_j8/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a1_j8 --scene column --set aspect=1 --set jitter=0.5 --set seed=8 --stride 10
++ echo 'R1_a1_j8 exit 0'
+R1_a1_j8 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a1_j8.log
+done: 180 frames, 864 particles, 5.29 s, iters mean 59.416666666666664 max 250, init b9299217c2282e2f96d492b38d4643e3
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a1_j9 --scene column --set aspect=1 --set jitter=0.5 --set seed=9 --stride 10
++ local id=R1_a1_j9
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a1_j9/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a1_j9 --scene column --set aspect=1 --set jitter=0.5 --set seed=9 --stride 10
++ echo 'R1_a1_j9 exit 0'
+R1_a1_j9 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a1_j9.log
+done: 180 frames, 864 particles, 5.13 s, iters mean 51.583333333333336 max 250, init 50c422c876319fc72a95480fe100ba70
++ for a in 0.5 1 2 3 5 8
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a2_j0 --scene column --set aspect=2 --set jitter=0.5 --set seed=0 --stride 10
++ local id=R1_a2_j0
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a2_j0/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a2_j0 --scene column --set aspect=2 --set jitter=0.5 --set seed=0 --stride 10
++ echo 'R1_a2_j0 exit 0'
+R1_a2_j0 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a2_j0.log
+done: 180 frames, 1728 particles, 6.39 s, iters mean 100.25 max 250, init 218f598ed438b3c1e24c68914ece9f7c
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a2_j1 --scene column --set aspect=2 --set jitter=0.5 --set seed=1 --stride 10
++ local id=R1_a2_j1
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a2_j1/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a2_j1 --scene column --set aspect=2 --set jitter=0.5 --set seed=1 --stride 10
++ echo 'R1_a2_j1 exit 0'
+R1_a2_j1 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a2_j1.log
+done: 180 frames, 1728 particles, 6.58 s, iters mean 109.08333333333333 max 250, init 9114a6d67e1b601b975c9dcf1241cff4
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a2_j2 --scene column --set aspect=2 --set jitter=0.5 --set seed=2 --stride 10
++ local id=R1_a2_j2
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a2_j2/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a2_j2 --scene column --set aspect=2 --set jitter=0.5 --set seed=2 --stride 10
++ echo 'R1_a2_j2 exit 0'
+R1_a2_j2 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a2_j2.log
+done: 180 frames, 1728 particles, 5.67 s, iters mean 72.38888888888889 max 250, init 28c001e17334dbaaedd8d5a58f7fb6eb
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a2_j3 --scene column --set aspect=2 --set jitter=0.5 --set seed=3 --stride 10
++ local id=R1_a2_j3
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a2_j3/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a2_j3 --scene column --set aspect=2 --set jitter=0.5 --set seed=3 --stride 10
++ echo 'R1_a2_j3 exit 0'
+R1_a2_j3 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a2_j3.log
+done: 180 frames, 1728 particles, 5.75 s, iters mean 74.27777777777777 max 250, init 6faa7d0e3ba43483d80d1415e8dbafc3
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a2_j4 --scene column --set aspect=2 --set jitter=0.5 --set seed=4 --stride 10
++ local id=R1_a2_j4
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a2_j4/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a2_j4 --scene column --set aspect=2 --set jitter=0.5 --set seed=4 --stride 10
++ echo 'R1_a2_j4 exit 0'
+R1_a2_j4 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a2_j4.log
+done: 180 frames, 1728 particles, 5.79 s, iters mean 77.27777777777777 max 250, init 1e02eb8ccd301cb683cc9ca74f4d0bee
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a2_j5 --scene column --set aspect=2 --set jitter=0.5 --set seed=5 --stride 10
++ local id=R1_a2_j5
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a2_j5/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a2_j5 --scene column --set aspect=2 --set jitter=0.5 --set seed=5 --stride 10
++ echo 'R1_a2_j5 exit 0'
+R1_a2_j5 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a2_j5.log
+done: 180 frames, 1728 particles, 5.94 s, iters mean 81.58333333333333 max 250, init 6967976eda36398ef7f5bb3ad5abe4c7
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a2_j6 --scene column --set aspect=2 --set jitter=0.5 --set seed=6 --stride 10
++ local id=R1_a2_j6
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a2_j6/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a2_j6 --scene column --set aspect=2 --set jitter=0.5 --set seed=6 --stride 10
++ echo 'R1_a2_j6 exit 0'
+R1_a2_j6 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a2_j6.log
+done: 180 frames, 1728 particles, 5.48 s, iters mean 62.69444444444444 max 250, init c2bc8463d62b082946eec2b8147c5aeb
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a2_j7 --scene column --set aspect=2 --set jitter=0.5 --set seed=7 --stride 10
++ local id=R1_a2_j7
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a2_j7/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a2_j7 --scene column --set aspect=2 --set jitter=0.5 --set seed=7 --stride 10
++ echo 'R1_a2_j7 exit 0'
+R1_a2_j7 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a2_j7.log
+done: 180 frames, 1728 particles, 6.23 s, iters mean 97.52777777777777 max 250, init fb53978d57611598e53a2beab400395a
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a2_j8 --scene column --set aspect=2 --set jitter=0.5 --set seed=8 --stride 10
++ local id=R1_a2_j8
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a2_j8/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a2_j8 --scene column --set aspect=2 --set jitter=0.5 --set seed=8 --stride 10
++ echo 'R1_a2_j8 exit 0'
+R1_a2_j8 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a2_j8.log
+done: 180 frames, 1728 particles, 9.92 s, iters mean 250.0 max 250, init 9c6ee1e490ccbed1e400834b653322b8
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a2_j9 --scene column --set aspect=2 --set jitter=0.5 --set seed=9 --stride 10
++ local id=R1_a2_j9
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a2_j9/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a2_j9 --scene column --set aspect=2 --set jitter=0.5 --set seed=9 --stride 10
++ echo 'R1_a2_j9 exit 0'
+R1_a2_j9 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a2_j9.log
+done: 180 frames, 1728 particles, 5.87 s, iters mean 80.91666666666667 max 250, init 534ebbeeb1ff43469160b5e52ad189df
++ for a in 0.5 1 2 3 5 8
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a3_j0 --scene column --set aspect=3 --set jitter=0.5 --set seed=0 --stride 10
++ local id=R1_a3_j0
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a3_j0/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a3_j0 --scene column --set aspect=3 --set jitter=0.5 --set seed=0 --stride 10
++ echo 'R1_a3_j0 exit 0'
+R1_a3_j0 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a3_j0.log
+done: 180 frames, 2592 particles, 5.90 s, iters mean 83.22222222222223 max 250, init 68b47f86ca16544ed412618f77df85ea
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a3_j1 --scene column --set aspect=3 --set jitter=0.5 --set seed=1 --stride 10
++ local id=R1_a3_j1
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a3_j1/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a3_j1 --scene column --set aspect=3 --set jitter=0.5 --set seed=1 --stride 10
++ echo 'R1_a3_j1 exit 0'
+R1_a3_j1 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a3_j1.log
+done: 180 frames, 2592 particles, 7.20 s, iters mean 131.66666666666666 max 250, init 049d87dd288e7234ccceadba3a54451f
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a3_j2 --scene column --set aspect=3 --set jitter=0.5 --set seed=2 --stride 10
++ local id=R1_a3_j2
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a3_j2/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a3_j2 --scene column --set aspect=3 --set jitter=0.5 --set seed=2 --stride 10
++ echo 'R1_a3_j2 exit 0'
+R1_a3_j2 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a3_j2.log
+done: 180 frames, 2592 particles, 6.13 s, iters mean 93.38888888888889 max 250, init 71b703ba1cf8bf8410fb2267b4ff1bde
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a3_j3 --scene column --set aspect=3 --set jitter=0.5 --set seed=3 --stride 10
++ local id=R1_a3_j3
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a3_j3/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a3_j3 --scene column --set aspect=3 --set jitter=0.5 --set seed=3 --stride 10
++ echo 'R1_a3_j3 exit 0'
+R1_a3_j3 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a3_j3.log
+done: 180 frames, 2592 particles, 6.30 s, iters mean 98.75 max 250, init 81f3c4db273cfe69378368e339619102
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a3_j4 --scene column --set aspect=3 --set jitter=0.5 --set seed=4 --stride 10
++ local id=R1_a3_j4
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a3_j4/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a3_j4 --scene column --set aspect=3 --set jitter=0.5 --set seed=4 --stride 10
++ echo 'R1_a3_j4 exit 0'
+R1_a3_j4 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a3_j4.log
+done: 180 frames, 2592 particles, 6.24 s, iters mean 95.69444444444444 max 250, init 1f5bba5b6956f65d25800d849752fa32
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a3_j5 --scene column --set aspect=3 --set jitter=0.5 --set seed=5 --stride 10
++ local id=R1_a3_j5
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a3_j5/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a3_j5 --scene column --set aspect=3 --set jitter=0.5 --set seed=5 --stride 10
++ echo 'R1_a3_j5 exit 0'
+R1_a3_j5 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a3_j5.log
+done: 180 frames, 2592 particles, 6.24 s, iters mean 96.05555555555556 max 250, init b6572559c852001c6663bd98ba36bc22
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a3_j6 --scene column --set aspect=3 --set jitter=0.5 --set seed=6 --stride 10
++ local id=R1_a3_j6
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a3_j6/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a3_j6 --scene column --set aspect=3 --set jitter=0.5 --set seed=6 --stride 10
++ echo 'R1_a3_j6 exit 0'
+R1_a3_j6 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a3_j6.log
+done: 180 frames, 2592 particles, 7.13 s, iters mean 128.13888888888889 max 250, init 6fe9a2f50d1cc357c7a0f6da9b9bde40
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a3_j7 --scene column --set aspect=3 --set jitter=0.5 --set seed=7 --stride 10
++ local id=R1_a3_j7
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a3_j7/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a3_j7 --scene column --set aspect=3 --set jitter=0.5 --set seed=7 --stride 10
++ echo 'R1_a3_j7 exit 0'
+R1_a3_j7 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a3_j7.log
+done: 180 frames, 2592 particles, 6.38 s, iters mean 100.16666666666667 max 250, init 71badc8934147020dac4d61c5171fb5a
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a3_j8 --scene column --set aspect=3 --set jitter=0.5 --set seed=8 --stride 10
++ local id=R1_a3_j8
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a3_j8/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a3_j8 --scene column --set aspect=3 --set jitter=0.5 --set seed=8 --stride 10
++ echo 'R1_a3_j8 exit 0'
+R1_a3_j8 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a3_j8.log
+done: 180 frames, 2592 particles, 6.53 s, iters mean 106.80555555555556 max 250, init b8eee4929b021cb5c88cc54fee336515
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a3_j9 --scene column --set aspect=3 --set jitter=0.5 --set seed=9 --stride 10
++ local id=R1_a3_j9
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a3_j9/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a3_j9 --scene column --set aspect=3 --set jitter=0.5 --set seed=9 --stride 10
++ echo 'R1_a3_j9 exit 0'
+R1_a3_j9 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a3_j9.log
+done: 180 frames, 2592 particles, 6.11 s, iters mean 88.0 max 250, init 60dea88d24b75503093e1ce854ebceb5
++ for a in 0.5 1 2 3 5 8
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a5_j0 --scene column --set aspect=5 --set jitter=0.5 --set seed=0 --stride 10
++ local id=R1_a5_j0
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a5_j0/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a5_j0 --scene column --set aspect=5 --set jitter=0.5 --set seed=0 --stride 10
++ echo 'R1_a5_j0 exit 0'
+R1_a5_j0 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a5_j0.log
+done: 180 frames, 4320 particles, 6.90 s, iters mean 122.02777777777777 max 250, init 539d731593885967eb5b37a82bce3fb4
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a5_j1 --scene column --set aspect=5 --set jitter=0.5 --set seed=1 --stride 10
++ local id=R1_a5_j1
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a5_j1/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a5_j1 --scene column --set aspect=5 --set jitter=0.5 --set seed=1 --stride 10
++ echo 'R1_a5_j1 exit 0'
+R1_a5_j1 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a5_j1.log
+done: 180 frames, 4320 particles, 7.25 s, iters mean 135.66666666666666 max 250, init 6f5ceeb07da0c77cfd5b10374103f05b
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a5_j2 --scene column --set aspect=5 --set jitter=0.5 --set seed=2 --stride 10
++ local id=R1_a5_j2
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a5_j2/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a5_j2 --scene column --set aspect=5 --set jitter=0.5 --set seed=2 --stride 10
++ echo 'R1_a5_j2 exit 0'
+R1_a5_j2 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a5_j2.log
+done: 180 frames, 4320 particles, 7.00 s, iters mean 125.27777777777777 max 250, init b1e891fc2d92def1f0e1760981cdf5c5
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a5_j3 --scene column --set aspect=5 --set jitter=0.5 --set seed=3 --stride 10
++ local id=R1_a5_j3
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a5_j3/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a5_j3 --scene column --set aspect=5 --set jitter=0.5 --set seed=3 --stride 10
++ echo 'R1_a5_j3 exit 0'
+R1_a5_j3 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a5_j3.log
+done: 180 frames, 4320 particles, 6.76 s, iters mean 116.77777777777777 max 250, init 8e51603613bee6e29556d456223c3085
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a5_j4 --scene column --set aspect=5 --set jitter=0.5 --set seed=4 --stride 10
++ local id=R1_a5_j4
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a5_j4/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a5_j4 --scene column --set aspect=5 --set jitter=0.5 --set seed=4 --stride 10
++ echo 'R1_a5_j4 exit 0'
+R1_a5_j4 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a5_j4.log
+done: 180 frames, 4320 particles, 6.89 s, iters mean 121.83333333333333 max 250, init f684c0c5a6e304e7de2433c223602a44
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a5_j5 --scene column --set aspect=5 --set jitter=0.5 --set seed=5 --stride 10
++ local id=R1_a5_j5
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a5_j5/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a5_j5 --scene column --set aspect=5 --set jitter=0.5 --set seed=5 --stride 10
++ echo 'R1_a5_j5 exit 0'
+R1_a5_j5 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a5_j5.log
+done: 180 frames, 4320 particles, 6.86 s, iters mean 116.58333333333333 max 250, init 495d6829ffd322eef77bce0b1c726ca2
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a5_j6 --scene column --set aspect=5 --set jitter=0.5 --set seed=6 --stride 10
++ local id=R1_a5_j6
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a5_j6/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a5_j6 --scene column --set aspect=5 --set jitter=0.5 --set seed=6 --stride 10
++ echo 'R1_a5_j6 exit 0'
+R1_a5_j6 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a5_j6.log
+done: 180 frames, 4320 particles, 6.97 s, iters mean 123.94444444444444 max 250, init a0096f26264514ae4c729eb2a54f0bb8
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a5_j7 --scene column --set aspect=5 --set jitter=0.5 --set seed=7 --stride 10
++ local id=R1_a5_j7
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a5_j7/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a5_j7 --scene column --set aspect=5 --set jitter=0.5 --set seed=7 --stride 10
++ echo 'R1_a5_j7 exit 0'
+R1_a5_j7 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a5_j7.log
+done: 180 frames, 4320 particles, 7.05 s, iters mean 124.80555555555556 max 250, init 9698edf70632d9fc1277c864c56854f9
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a5_j8 --scene column --set aspect=5 --set jitter=0.5 --set seed=8 --stride 10
++ local id=R1_a5_j8
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a5_j8/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a5_j8 --scene column --set aspect=5 --set jitter=0.5 --set seed=8 --stride 10
++ echo 'R1_a5_j8 exit 0'
+R1_a5_j8 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a5_j8.log
+done: 180 frames, 4320 particles, 7.30 s, iters mean 136.08333333333334 max 250, init 94ce24c7b9059ff5cbe40470a74ff8ff
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a5_j9 --scene column --set aspect=5 --set jitter=0.5 --set seed=9 --stride 10
++ local id=R1_a5_j9
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a5_j9/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a5_j9 --scene column --set aspect=5 --set jitter=0.5 --set seed=9 --stride 10
++ echo 'R1_a5_j9 exit 0'
+R1_a5_j9 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a5_j9.log
+done: 180 frames, 4320 particles, 7.55 s, iters mean 149.72222222222223 max 250, init cecc4de497364f2e11fe885a1ba2964f
++ for a in 0.5 1 2 3 5 8
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a8_j0 --scene column --set aspect=8 --set jitter=0.5 --set seed=0 --stride 10
++ local id=R1_a8_j0
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a8_j0/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a8_j0 --scene column --set aspect=8 --set jitter=0.5 --set seed=0 --stride 10
++ echo 'R1_a8_j0 exit 0'
+R1_a8_j0 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a8_j0.log
+done: 180 frames, 6912 particles, 7.54 s, iters mean 145.13888888888889 max 250, init 8a10c26902575349853ff256543802f0
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a8_j1 --scene column --set aspect=8 --set jitter=0.5 --set seed=1 --stride 10
++ local id=R1_a8_j1
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a8_j1/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a8_j1 --scene column --set aspect=8 --set jitter=0.5 --set seed=1 --stride 10
++ echo 'R1_a8_j1 exit 0'
+R1_a8_j1 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a8_j1.log
+done: 180 frames, 6912 particles, 6.90 s, iters mean 121.0 max 250, init 42e26421e01c5476ba7da6ddda72e5dc
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a8_j2 --scene column --set aspect=8 --set jitter=0.5 --set seed=2 --stride 10
++ local id=R1_a8_j2
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a8_j2/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a8_j2 --scene column --set aspect=8 --set jitter=0.5 --set seed=2 --stride 10
++ echo 'R1_a8_j2 exit 0'
+R1_a8_j2 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a8_j2.log
+done: 180 frames, 6912 particles, 7.61 s, iters mean 148.08333333333334 max 250, init c38ec1820b41fd803313d394955e9fc1
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a8_j3 --scene column --set aspect=8 --set jitter=0.5 --set seed=3 --stride 10
++ local id=R1_a8_j3
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a8_j3/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a8_j3 --scene column --set aspect=8 --set jitter=0.5 --set seed=3 --stride 10
++ echo 'R1_a8_j3 exit 0'
+R1_a8_j3 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a8_j3.log
+done: 180 frames, 6912 particles, 7.79 s, iters mean 156.13888888888889 max 250, init bee167b1c50654ed35b6e8b701c4dc09
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a8_j4 --scene column --set aspect=8 --set jitter=0.5 --set seed=4 --stride 10
++ local id=R1_a8_j4
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a8_j4/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a8_j4 --scene column --set aspect=8 --set jitter=0.5 --set seed=4 --stride 10
++ echo 'R1_a8_j4 exit 0'
+R1_a8_j4 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a8_j4.log
+done: 180 frames, 6912 particles, 8.19 s, iters mean 172.36111111111111 max 250, init f4081a6e0bcf8814f17005f51f2267e7
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a8_j5 --scene column --set aspect=8 --set jitter=0.5 --set seed=5 --stride 10
++ local id=R1_a8_j5
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a8_j5/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a8_j5 --scene column --set aspect=8 --set jitter=0.5 --set seed=5 --stride 10
++ echo 'R1_a8_j5 exit 0'
+R1_a8_j5 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a8_j5.log
+done: 180 frames, 6912 particles, 7.63 s, iters mean 145.08333333333334 max 250, init 49f7d4a0c1f8dbe5ee303940c75ab215
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a8_j6 --scene column --set aspect=8 --set jitter=0.5 --set seed=6 --stride 10
++ local id=R1_a8_j6
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a8_j6/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a8_j6 --scene column --set aspect=8 --set jitter=0.5 --set seed=6 --stride 10
++ echo 'R1_a8_j6 exit 0'
+R1_a8_j6 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a8_j6.log
+done: 180 frames, 6912 particles, 7.55 s, iters mean 146.83333333333334 max 250, init 26be165440e484634387ecfccdb884ab
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a8_j7 --scene column --set aspect=8 --set jitter=0.5 --set seed=7 --stride 10
++ local id=R1_a8_j7
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a8_j7/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a8_j7 --scene column --set aspect=8 --set jitter=0.5 --set seed=7 --stride 10
++ echo 'R1_a8_j7 exit 0'
+R1_a8_j7 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a8_j7.log
+done: 180 frames, 6912 particles, 8.11 s, iters mean 168.52777777777777 max 250, init 85a6382ffd36848eefb42a62a017db06
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a8_j8 --scene column --set aspect=8 --set jitter=0.5 --set seed=8 --stride 10
++ local id=R1_a8_j8
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a8_j8/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a8_j8 --scene column --set aspect=8 --set jitter=0.5 --set seed=8 --stride 10
++ echo 'R1_a8_j8 exit 0'
+R1_a8_j8 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a8_j8.log
+done: 180 frames, 6912 particles, 7.33 s, iters mean 137.80555555555554 max 250, init def8fa66bf002bef85936a5c6fbc7403
++ for s in 0 1 2 3 4 5 6 7 8 9
++ rec R1_a8_j9 --scene column --set aspect=8 --set jitter=0.5 --set seed=9 --stride 10
++ local id=R1_a8_j9
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R1_a8_j9/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R1_a8_j9 --scene column --set aspect=8 --set jitter=0.5 --set seed=9 --stride 10
++ echo 'R1_a8_j9 exit 0'
+R1_a8_j9 exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R1_a8_j9.log
+done: 180 frames, 6912 particles, 7.90 s, iters mean 165.80555555555554 max 250, init a13f9ab76900d4ef10ab14f7e1f8bd11
++ for S in $STAGES
++ case $S in
++ for a in 2 5
++ id=R2_il3_a2
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R2_il3_a2/meta.json ']'
++ for a in 2 5
++ id=R2_il3_a5
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R2_il3_a5/meta.json ']'
++ rec R0_a5_stock --scene column --set aspect=5 --loop native
++ local id=R0_a5_stock
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R0_a5_stock/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R0_a5_stock --scene column --set aspect=5 --loop native
++ echo 'R0_a5_stock exit 0'
+R0_a5_stock exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R0_a5_stock.log
+done: 180 frames, 4320 particles, 5.75 s, iters mean -1.0 max -1, init c8f6e0f9f9e4bcbfc48e5875e806723a
++ for S in $STAGES
++ case $S in
++ rec R7_plate_intrude --scene plate --set 'mode="intrude"' --stride 15
++ local id=R7_plate_intrude
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R7_plate_intrude/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R7_plate_intrude --scene plate --set 'mode="intrude"' --stride 15
++ echo 'R7_plate_intrude exit 0'
+R7_plate_intrude exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R7_plate_intrude.log
+done: 105 frames, 280478 particles, 6.84 s, iters mean 250.0 max 250, init d0d020c44b4696ca08b948f5b43abad0
++ rec R7_plate_drag --scene plate --set 'mode="drag"' --set travel=0.3 --stride 15
++ local id=R7_plate_drag
++ shift
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ '[' -f /home/<vm-user>/parity3/mpm/R7_plate_drag/meta.json ']'
++ python /home/<vm-user>/parity3_scripts/mpm/record_mpm.py --device cuda:0 --out /home/<vm-user>/parity3/mpm/R7_plate_drag --scene plate --set 'mode="drag"' --set travel=0.3 --stride 15
++ echo 'R7_plate_drag exit 0'
+R7_plate_drag exit 0
++ tail -1 /home/<vm-user>/parity3/mpm/R7_plate_drag.log
+done: 195 frames, 278846 particles, 11.91 s, iters mean 250.0 max 250, init cf0bd4947aa8d068644ef7256a77a98d
++ tar czf /home/<vm-user>/parity3/mpm_refs.tgz -C /home/<vm-user>/parity3 mpm
++ touch /home/<vm-user>/parity3/MPM_DONE

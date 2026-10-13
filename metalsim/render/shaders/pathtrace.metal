@@ -14,10 +14,15 @@
 #include <metal_raytracing>
 using namespace metal;
 using namespace metal::raytracing;
+#include "lens.h"
 
 struct Material { float4 rgba; float4 mrse; float4 rect; float4 par; };
 struct Light { float4 kind; float4 diffuse; float4 specular; float4 ambient; float4 atten; };
-struct SceneParams { float4 bounds; float4 hl_ambient; float4 hl_diffuse; float4 hl_specular; float4 sky; };
+struct SceneParams { float4 bounds; float4 hl_ambient; float4 hl_diffuse; float4 hl_specular; float4 sky;
+                     float4 sky_rect; float4 sky_info; };   // skybox cube in the atlas; sky_info: faces, drawn
+#include "appearance.h"
+#include "dyn_bvh.h"
+#include "env_grid.h"
 struct MeshInfo { uint i_off, i_count, _p0, _p1; };
 struct InstanceDesc { packed_float3 col0, col1, col2, col3; uint options, mask, if_table_offset, as_index; };
 struct PTConsts {
@@ -25,9 +30,19 @@ struct PTConsts {
     uint n_light, n_slots, spp, max_bounces;
     uint frame, tiles_per_row, flags, seed;     // flags: see FLAG_* below
     float stride, exposure, env_scale, clip_far;   // clip_far: camera far clipping plane (z-depth), 0 = none
-    uint env_w, env_h, _u0, _u1;                // FLAG_ENVMAP: importance-sampling grid of the environment map
-    float env_yaw, clamp_lum, _f0, _f1;         // env_yaw: dome rotation about +z (rad); clamp_lum: per-path luminance cap, 0 = off (biased)
+    uint env_w, env_h, grain_inst0, grain_as0;  // FLAG_ENVMAP: importance-sampling grid of the environment map; FLAG_GRAINS: first grain
+                                                // instance and first grain mesh in the instanced-structure list (particles.py)
+    float env_yaw, clamp_lum, grain_eps; uint trans_ids;   // env_yaw: dome rotation about +z (rad); clamp_lum: per-path luminance cap, 0 = off (biased);
+                                                // grain_eps: ray offset off a grain surface [m] (grains are mm-sized; scene hits use 1 mm);
+                                                // trans_ids: annotations under transparent geoms (0 surface, 1 behind)
     float4 env_mul;                             // FLAG_ENVMAP: rgb multiplier on the map (dome intensity * 2^exposure * color)
+    float ray_limit, _l1, _l2, _l3;             // rays of env e end within this distance of its origin (RayTracer.ray_limit)
+    LensParams lens;                            // camera lens model (lens.h; 0 = pinhole from CamSpec)
+    EnvGrid grid;                               // where the envs sit (env_grid.h); rays end at their env's cell
+#ifdef DYN_SBVH
+    ulong dyn_args;                             // GPU address of the DynBVHArgs (sbvh layout; all 31 buffer slots are taken)
+    ulong _pad_dyn;
+#endif
 };
 struct CamSpec { float4 intrinsics; float4 pos_delta; float4 rot_delta; float4 light; float4 ambient; float4 clear_color; int cam_id, p0, p1, p2; };
 
@@ -41,6 +56,13 @@ constant uint FLAG_TONEMAP_RTX = 4u;  // RTX default tone mapping (exposure, ACE
 constant uint FLAG_CENTER0 = 16u;     // first sample of the reset pass through the pixel centre (annotators match raster / Isaac)
 constant uint FLAG_AUX = 8u;          // write mean HDR radiance and sample-averaged first-hit albedo / normal (denoiser inputs)
 constant uint FLAG_ENVMAP = 32u;      // equirectangular HDR environment map (texture(1), CDF table buffer(26)) replaces the sky colour
+constant uint FLAG_GRAINS = 64u;      // particle render grains: instances from grain_inst0 on (metalsim/render/particles.py, PARTICLES.md)
+constant uint FLAG_GRAINS2 = 128u;    // with FLAG_GRAINS: two-level grains (chunks of <= 2^24 grains, each its own instance structure of
+                                      // UserID descriptors and one instance of the scene's; grain_inst0 = grain count, buffer 29 =
+                                      // the grains' UserID descriptors then their keys). Metal reports the innermost instance of a
+                                      // hit (instance_id[0], user_instance_id[0]; instance_count stays 1, measured on macOS 26):
+                                      // a grain's user id is 0x80000000 | grain index, the scene's Default descriptors read 0
+constant uint FLAG_GRAINS_EXT = 256u; // with FLAG_GRAINS, flat: the structure is built with extended limits (> 2^24 instances)
 
 inline float3x3 load_mat33(device const float* p) {
     return float3x3(float3(p[0], p[3], p[6]), float3(p[1], p[4], p[7]), float3(p[2], p[5], p[8]));
@@ -179,38 +201,156 @@ inline float3 sample_cone(float3 axis, float ang, float u, float v) {
     return normalize(t * (st * cos(ph)) + b * (st * sin(ph)) + axis * ct);
 }
 
-struct Hit { bool ok; float t; float3 p; float3 n; float2 uv; uint slot; };
+struct Hit { bool ok; float t; float3 p; float3 n; float2 uv; uint slot; bool grain; uint gid; float3 lp; };   // lp: geom-frame position
+// render-grain geometry (FLAG_GRAINS). Flat: scene instances >= inst0 are grains. Two-level: a hit through two instance
+// levels is a grain, its index the second-level instance id. A grain instances grain mesh (as_index - as0); gdesc / gkeys:
+// the grains' instance descriptors and identity keys (colour hash), indexed by grain
+struct InstanceDescUser { packed_float3 col0, col1, col2, col3; uint options, mask, if_table_offset, as_index, user; };
+struct GrainGeo { device const float* verts; device const uint* indices; device const MeshInfo* meshes; uint inst0, as0;
+                  device const InstanceDesc* gdesc; device const InstanceDescUser* gdesc_u; device const uint* gkeys;
+                  bool two_level, extended;
+                  uint env; constant EnvGrid* grid; };    // the ray's env and where the envs sit (env_grid.h)
+
+// a ray that leaves its env's cell without a hit: an infinite plane past the cell (compact env grid), else a miss
+inline Hit trace_past_cell(float3 o, float3 d, float t_cell, float tmax, GrainGeo gg) {
+    Hit h; h.ok = false;
+    GridPlaneHit ph = grid_plane(o, d, t_cell, tmax, gg.env, *gg.grid);
+    if (!ph.hit) return h;
+    h.ok = true; h.t = ph.t; h.p = o + d * ph.t; h.n = dot(ph.n, d) > 0.0 ? -ph.n : ph.n; h.uv = ph.uv; h.slot = ph.slot;
+    h.grain = false; h.gid = 0u; h.lp = ph.lp;
+    return h;
+}
 
 inline Hit trace(instance_acceleration_structure accel, float3 o, float3 d, float tmax,
                  device const uint2* inst_tab, device const int* slot_mesh, device const MeshInfo* meshes,
-                 device const float* verts, device const uint* indices, device const InstanceDesc* inst)
+                 device const float* verts, device const uint* indices, device const InstanceDesc* inst,
+                 GrainGeo gg, float tmin DYN_PARAM)
 {
     Hit h; h.ok = false;
-    ray r(o, d, 0.0005, tmax);
-    intersector<triangle_data, instancing> isect;
-    intersection_result<triangle_data, instancing> res = isect.intersect(r, accel);
-    if (res.type == intersection_type::none) return h;
-    uint slot = inst_tab[res.instance_id].y;
-    uint mesh = uint(slot_mesh[slot]);
-    uint b = meshes[mesh].i_off + res.primitive_id * 3;
+    float tcell = grid_tmax(o, d, tmax, gg.env, *gg.grid);     // rays end at their env's cell (compact env grid)
+    ray r(o, d, tmin, tcell);
+    uint top, prim, geo = 0u, gid = 0u; float2 bc; float dist; bool grain; uint mesh_dyn = 0xFFFFFFFFu;
+#ifdef DYN_SBVH
+    // dynamic objects through the per-env BVH (dyn_bvh.h), in the query matching the grain structure's tags
+    RTRes res = gg.two_level ? rt_intersect2(r, accel, dbv, false) : rt_intersect(r, accel, dbv, false);
+    if (res.type == intersection_type::none) return trace_past_cell(o, d, tcell, tmax, gg);
+    top = res.instance_id; prim = res.primitive_id; bc = res.triangle_barycentric_coord; dist = res.distance;
+    geo = res.geometry_id;
+    if (res.dyn) mesh_dyn = RT_MESH(res, 0u);
+    if (gg.two_level) { grain = (res.user & 0x80000000u) != 0u; if (grain) gid = res.user & 0x7FFFFFFFu; }
+    else { grain = top >= gg.inst0; if (grain) gid = top - gg.inst0; }
+#else
+    if (gg.two_level) {
+        intersector<triangle_data, instancing, max_levels<2>> isect;
+        intersection_result<triangle_data, instancing, max_levels<2>> res = isect.intersect(r, accel);
+        if (res.type == intersection_type::none) return trace_past_cell(o, d, tcell, tmax, gg);
+        top = res.instance_id[0]; prim = res.primitive_id; bc = res.triangle_barycentric_coord; dist = res.distance;
+        geo = res.geometry_id;
+        uint user = res.user_instance_id[0];
+        grain = (user & 0x80000000u) != 0u;
+        if (grain) gid = user & 0x7FFFFFFFu;
+    } else if (gg.extended) {   // flat past 2^24 instances: built with extended limits, intersected with the matching tag
+        intersector<triangle_data, instancing, extended_limits> isect;
+        intersection_result<triangle_data, instancing, extended_limits> res = isect.intersect(r, accel);
+        if (res.type == intersection_type::none) return trace_past_cell(o, d, tcell, tmax, gg);
+        top = res.instance_id; prim = res.primitive_id; bc = res.triangle_barycentric_coord; dist = res.distance;
+        geo = res.geometry_id;
+        grain = top >= gg.inst0;
+        if (grain) gid = top - gg.inst0;
+    } else {
+        intersector<triangle_data, instancing> isect;
+        intersection_result<triangle_data, instancing> res = isect.intersect(r, accel);
+        if (res.type == intersection_type::none) return trace_past_cell(o, d, tcell, tmax, gg);
+        top = res.instance_id; prim = res.primitive_id; bc = res.triangle_barycentric_coord; dist = res.distance;
+        geo = res.geometry_id;
+        grain = top >= gg.inst0;
+        if (grain) gid = top - gg.inst0;
+    }
+#endif
+    InstanceDesc id;
+    if (!grain) id = inst[top];
+    else if (gg.two_level) {
+        InstanceDescUser u = gg.gdesc_u[gid];
+        id.col0 = u.col0; id.col1 = u.col1; id.col2 = u.col2; id.col3 = u.col3;
+        id.options = u.options; id.mask = u.mask; id.if_table_offset = u.if_table_offset; id.as_index = u.as_index;
+    } else id = gg.gdesc[gid];
+    uint slot = 0, b;
+    if (grain) {
+        b = gg.meshes[id.as_index - gg.as0].i_off + prim * 3;
+        verts = gg.verts; indices = gg.indices;
+    } else {
+        slot = inst_tab[top].y + geo;     // geometry: 0 for geoms; the object within a dynamic env structure / box
+        // mesh: the instance's first listing + geometry (= slot_mesh[slot] for geoms); sbvh hits: their (env, object)
+        b = meshes[mesh_dyn != 0xFFFFFFFFu ? mesh_dyn : id.as_index + geo].i_off + prim * 3;
+    }
     uint i0 = indices[b], i1 = indices[b + 1], i2 = indices[b + 2];
-    float2 bc = res.triangle_barycentric_coord; float w0 = 1.0 - bc.x - bc.y;
+    float w0 = 1.0 - bc.x - bc.y;
     float3 n0 = float3(verts[i0*8+3], verts[i0*8+4], verts[i0*8+5]);
     float3 n1 = float3(verts[i1*8+3], verts[i1*8+4], verts[i1*8+5]);
     float3 n2 = float3(verts[i2*8+3], verts[i2*8+4], verts[i2*8+5]);
     float2 uv = float2(verts[i0*8+6], verts[i0*8+7]) * w0 + float2(verts[i1*8+6], verts[i1*8+7]) * bc.x + float2(verts[i2*8+6], verts[i2*8+7]) * bc.y;
-    InstanceDesc id = inst[res.instance_id];
+    h.lp = float3(verts[i0*8], verts[i0*8+1], verts[i0*8+2]) * w0 + float3(verts[i1*8], verts[i1*8+1], verts[i1*8+2]) * bc.x
+         + float3(verts[i2*8], verts[i2*8+1], verts[i2*8+2]) * bc.y;
     float3x3 R = float3x3(float3(id.col0), float3(id.col1), float3(id.col2));
-    float3 n = normalize(R * (n0 * w0 + n1 * bc.x + n2 * bc.y));
+    // R may carry a per-world size scale (R diag(s), metalsim.render.sized): normals by its inverse transpose
+    float3 s2 = max(float3(dot(R[0], R[0]), dot(R[1], R[1]), dot(R[2], R[2])), float3(1e-20));
+    float3 n = normalize(R * ((n0 * w0 + n1 * bc.x + n2 * bc.y) / s2));
     if (dot(n, d) > 0.0) n = -n;
-    h.ok = true; h.t = res.distance; h.p = o + d * res.distance; h.n = n; h.uv = uv; h.slot = slot;
+    h.ok = true; h.t = dist; h.p = o + d * dist; h.n = n; h.uv = uv; h.slot = slot;
+    h.grain = grain; h.gid = gid;
     return h;
+}
+
+// render-grain material (particles.GrainMaterial.pack): a palette entry picked by the grain's hash with the
+// cumulative weights, a brightness jitter, shared roughness / specular / metallic and BRDF model
+struct GrainMat { float4 pal[8]; float4 p0; float4 mrse; float4 p1; MeshInfo mesh[8]; };   // particles.GrainField.mat_buf
+inline Material grain_material(device const GrainMat& g, uint key) {
+    uint hh = hash_u(key * 0x9E3779B1u + 0x85EBCA6Bu);
+    float u = float(hh & 0xFFFFu) / 65536.0, v = float(hh >> 16) / 65536.0;
+    uint n = clamp(uint(g.p0.x), 1u, 8u), k = 0;
+    while (k + 1 < n && u > g.pal[k].w) ++k;
+    Material m;
+    m.rgba = float4(g.pal[k].rgb * max(1.0 + g.p0.y * (2.0 * v - 1.0), 0.0), 1.0);
+    m.mrse = g.mrse; m.rect = float4(0.0); m.par = float4(1.0, 1.0, 0.0, g.p1.x);
+    return m;
+}
+
+// Partial transparency (material-resolved rgba alpha < 1) is surface presence, as a USD opacity in Isaac's path
+// tracer (and RTX Real-Time 2.0's fractional cutout opacity): a ray meets the surface with probability alpha and
+// otherwise continues unchanged; shadow rays carry the product of (1 - alpha) over the partially transparent surfaces
+// they cross (an opaque one stops them). Up to TRANSMIT_MAX surfaces per ray.
+constant uint TRANSMIT_MAX = 8u;
+inline float surface_alpha(device const Material* mats, device const float4* per_inst, uint e, uint n_slots, uint slot) {
+    return mats[slot].rgba.a * per_inst[e * n_slots + slot].a;
+}
+inline float transmit(instance_acceleration_structure accel, float3 o, float3 d, float tmax,
+                      device const uint2* inst_tab, device const int* slot_mesh, device const MeshInfo* meshes,
+                      device const float* verts, device const uint* indices, device const InstanceDesc* inst,
+                      GrainGeo gg, float tmin, device const Material* mats, device const float4* per_inst, uint e, uint n_slots DYN_PARAM)
+{
+    float T = 1.0;
+    for (uint k = 0; k < TRANSMIT_MAX; ++k) {
+        Hit h = trace(accel, o, d, tmax, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, k == 0 ? tmin : 0.0005 DYN_PASS);
+        if (!h.ok) return T;
+        if (h.grain) return 0.0;                 // grains are opaque
+        float a = surface_alpha(mats, per_inst, e, n_slots, h.slot);
+        if (a >= 0.995) return 0.0;
+        T *= 1.0 - a;
+        o = h.p; tmax -= h.t;
+        if (tmax <= 0.0005) return T;
+    }
+    return T;
 }
 
 inline float3 material_base(Material m, float4 mod, float2 uv, texture2d<float> atlas, sampler samp) {
     float3 base = m.rgba.rgb * mod.rgb;
     if (m.par.z > 0.5) base *= atlas.sample(samp, m.rect.xy + fract(uv * m.par.xy) * m.rect.zw, level(0.0)).rgb;
     return base;
+}
+// with the material extension (MuJoCo's texture mapping: offsets, cube maps, sRGB; shaders/appearance.h)
+inline float4 material_base_ext(Material m, MaterialExt x, float4 mod, float2 uv, float3 lp, texture2d<float> atlas, sampler samp) {
+    float4 t = material_tex(m.rect, m.par, x, uv, lp, atlas, samp);
+    return float4(m.rgba.rgb * mod.rgb * t.rgb, m.rgba.a * mod.a * t.a);
 }
 
 // ---- environment map: equirectangular ("latlong") as Kit/RTX orients a USD DomeLight on a z-up stage.
@@ -287,20 +427,35 @@ kernel void path_trace(
     device float*           out_albedo [[buffer(24)]],   // (n_envs, h, w, 3) mean first-hit albedo (FLAG_AUX)
     device float*           out_nrm    [[buffer(25)]],   // (n_envs, h, w, 3) mean first-hit normal (FLAG_AUX)
     device const float*     env_cdf    [[buffer(26)]],   // environment-map sampling table (FLAG_ENVMAP)
+    device const float*     g_verts    [[buffer(27)]],   // FLAG_GRAINS: grain mesh vertices (8 floats each, as verts)
+    device const uint*      g_indices  [[buffer(28)]],   // FLAG_GRAINS: grain mesh indices
+    device const InstanceDesc* g_inst  [[buffer(29)]],   // FLAG_GRAINS: flat: the per-grain identity keys (colour hash);
+                                                         // two-level: grain instance descriptors, then the keys
+    device const GrainMat&  g_mat      [[buffer(30)]],   // FLAG_GRAINS: grain material + grain mesh index ranges
     texture2d<float>        atlas      [[texture(0)]],
     texture2d<float>        envmap     [[texture(1)]],   // equirectangular RGBA32F environment (FLAG_ENVMAP)
     sampler                 samp       [[sampler(0)]],
     sampler                 env_samp   [[sampler(1)]],   // linear, repeat in u, clamp in v
     uint3 tid [[thread_position_in_grid]])
 {
+#ifdef DYN_SBVH
+    device const DynBVHArgs& dbv = *reinterpret_cast<device const DynBVHArgs*>(c.dyn_args);
+#endif
     uint x = tid.x, y = tid.y, e = tid.z;
     if (x >= c.width || y >= c.height || e >= c.n_envs) return;
     uint pix = (e * c.height + y) * c.width + x;
+    // per-slot texture mapping (scene_tables.MATERIAL_EXT_LAYOUT): appended to the material table (G x 16 floats, then G x 8)
+    device const MaterialExt* mext = (device const MaterialExt*)(mats + c.n_slots);
     CamSpec cs = cams[e];
     uint ci = e * c.n_cam + uint(max(cs.cam_id, 0));
     float3 cpos = float3(cam_xpos[ci * 3], cam_xpos[ci * 3 + 1], cam_xpos[ci * 3 + 2]) + cs.pos_delta.xyz;
     float3x3 R = load_mat33(cam_xmat + ci * 9) * quat_to_mat(cs.rot_delta);
-    float3 env_off = float3(float(e % c.tiles_per_row) * c.stride, float(e / c.tiles_per_row) * c.stride, 0.0);
+    float3 env_off = grid_offset(e, c.grid);
+    lights += e * c.n_light;            // this env's light records (metalsim.render.model_sync)
+    // legacy env grid: the longest ray from `org` that stays inside this env's region of the shared acceleration
+    // structure; compact grid: ray_limit is unbounded, trace() ends rays at the env's cell and continues infinite
+    // planes past it (env_grid.h)
+    auto tl = [&](float3 org, float tmax) -> float { return clamp(c.ray_limit - length(org - env_off), 0.0006f, tmax); };
     Rng rng; rng.s = hash_u(pix * 7919u + c.frame * 104729u + c.seed);
     float3 sum = float3(0.0);
     float depth0 = 0.0; float3 normal0 = float3(0.0); int seg0 = 0;
@@ -308,40 +463,80 @@ kernel void path_trace(
     bool matmodel = (c.flags & FLAG_MATMODEL) != 0u;
     bool use_env = (c.flags & FLAG_ENVMAP) != 0u;
     float3 env_rad = (sp.sky.w > 0.5 ? sp.sky.xyz : cs.clear_color.rgb) * c.env_scale;
+    GrainGeo gg; gg.verts = g_verts; gg.indices = g_indices; gg.meshes = g_mat.mesh;
+    gg.env = e; gg.grid = &c.grid;
+    gg.two_level = (c.flags & FLAG_GRAINS) && (c.flags & FLAG_GRAINS2);
+    gg.extended = (c.flags & FLAG_GRAINS) && !gg.two_level && (c.flags & FLAG_GRAINS_EXT);
+    gg.inst0 = ((c.flags & FLAG_GRAINS) && !gg.two_level) ? c.grain_inst0 : 0xFFFFFFFFu; gg.as0 = c.grain_as0;
+    gg.gdesc = inst + c.grain_inst0;
+    gg.gdesc_u = (device const InstanceDescUser*)g_inst;
+    gg.gkeys = gg.two_level ? (device const uint*)(gg.gdesc_u + c.grain_inst0) : (device const uint*)g_inst;
+    bool sky_tex = !use_env && sp.sky_info.y > 0.5;     // MuJoCo skybox as a directional environment (cube map)
     for (uint s = 0; s < c.spp; ++s) {
         float jx = rnd(rng), jy = rnd(rng);
         if (s == 0u && (c.flags & FLAG_CENTER0) && (c.flags & FLAG_RESET)) { jx = 0.5; jy = 0.5; }   // annotator sample at the pixel centre (1 of spp*passes)
-        float3 dl = float3((float(x) + jx - cs.intrinsics.z) / cs.intrinsics.x, -(float(y) + jy - cs.intrinsics.w) / cs.intrinsics.y, -1.0);
+        float3 dl;
+        if (!lens_ray(c.lens, float(x) + jx, float(y) + jy, float(c.width), float(c.height), cs.intrinsics, dl)) continue;   // outside the lens FOV: black
         float3 d = normalize(R * dl);
         float3 o = cpos + env_off;
         float3 throughput = float3(1.0);
         float3 radiance = float3(0.0);
         float prev_pdf = 0.0;   // BSDF-sampling pdf of the ray being traced (0: camera ray, no MIS on a miss)
+        float tmin = 0.0005;     // ray start distance: 0.5 mm, or grain_eps leaving a grain
+        uint passes = 0;        // transparent surfaces passed through (presence), not counted as bounces
         for (uint bounce = 0; bounce <= c.max_bounces; ++bounce) {
-            Hit h = trace(accel, o, d, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst);
+            Hit h = trace(accel, o, d, tl(o, 1000.0), inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin DYN_PASS);
             if (bounce == 0 && c.clip_far > 0.0 && h.ok && -dot(h.p - o, R[2]) > c.clip_far) h.ok = false;   // beyond the far plane: background
             if (!h.ok) {
-                float3 er = env_rad;
+                float3 er = sky_tex ? sky_color(atlas, samp, sp.sky_rect, sp.sky_info, d) * c.env_scale : env_rad;
                 if (use_env) {   // map radiance, weighted by the power heuristic against the env NEE that could have sampled it
                     er = env_radiance(envmap, env_samp, d, c);
                     if (prev_pdf > 0.0) { float pe = env_pdf(d, env_cdf, c); er *= prev_pdf * prev_pdf / (prev_pdf * prev_pdf + pe * pe); }
                 }
                 radiance += throughput * er;
                 if (bounce == 0) {   // denoiser guide: the background's normalised colour
-                    float3 eg = use_env ? env_radiance(envmap, env_samp, d, c) : env_rad;
+                    float3 eg = use_env ? env_radiance(envmap, env_samp, d, c) : er;
                     alb_sum += clamp(eg / max(max(eg.x, max(eg.y, eg.z)), 1e-6), 0.0, 1.0); nrm_sum += -d;
                 }
                 break;
             }
-            Material m = mats[h.slot];
-            float4 mod = per_inst[e * c.n_slots + h.slot];
-            float3 base = material_base(m, mod, h.uv, atlas, samp);
+            Material m; float4 mod; float eps = 0.001;   // eps: offset of rays leaving this surface
+            float4 base4;
+            if (h.grain) {   // mm-sized grains: a small offset, but at least ~8 ulp of the position (far envs sit km away)
+                m = grain_material(g_mat, gg.gkeys[h.gid]); mod = float4(1.0);
+                eps = max(c.grain_eps, 1e-6 * max(fabs(h.p.x), max(fabs(h.p.y), fabs(h.p.z)))); tmin = eps;
+                base4 = float4(material_base(m, mod, h.uv, atlas, samp), 1.0);
+            }
+            else {
+                m = mats[h.slot]; mod = per_inst[e * c.n_slots + h.slot]; tmin = 0.0005;
+                base4 = material_base_ext(m, mext[h.slot], mod, h.uv, h.lp, atlas, samp);
+            }
+            float3 base = base4.rgb;
+            if (bounce == 0 && s == 0 && passes == 0) {   // annotations of the primary ray (see PTConsts.trans_ids)
+                depth0 = -dot(h.p - o, R[2]); normal0 = h.n; seg0 = h.grain ? int(c.n_slots) + 1 : int(h.slot) + 1;
+                if (!h.grain && m.rgba.a * mod.a < 0.995 && c.trans_ids == 1u) {    // "behind": the first opaque surface
+                    float3 ob = h.p; float zb = 0.0; float3 nb = float3(0.0); int sb = 0;
+                    for (uint k = 0; k < TRANSMIT_MAX; ++k) {
+                        Hit hb = trace(accel, ob, d, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, 0.0005 DYN_PASS);
+                        if (!hb.ok) break;
+                        if (hb.grain || surface_alpha(mats, per_inst, e, c.n_slots, hb.slot) >= 0.995) {
+                            zb = -dot(hb.p - o, R[2]); nb = hb.n; sb = hb.grain ? int(c.n_slots) + 1 : int(hb.slot) + 1; break;
+                        }
+                        ob = hb.p;
+                    }
+                    depth0 = (c.clip_far > 0.0 && zb > c.clip_far) ? 0.0 : zb;
+                    normal0 = nb; seg0 = (depth0 > 0.0) ? sb : 0;
+                }
+            }
+            if (base4.a < 0.995 && passes < 16u && rnd(rng) >= base4.a) {   // presence: the ray passes this surface
+                ++passes; o = h.p; --bounce;            // (unsigned wrap at bounce 0 is undone by the loop's ++)
+                continue;
+            }
             float metallic = m.mrse.x, rough = max(m.mrse.y, 0.03), specw = m.mrse.z, emission = m.mrse.w;
             float a2 = rough * rough * rough * rough;
             float3 f0 = mix(float3(0.08 * specw), base, metallic);
             float3 N = h.n; float3 V = -d;
             uint model = matmodel ? uint(m.par.w + 0.5) : 0u;
-            if (bounce == 0 && s == 0) { depth0 = -dot(h.p - o, R[2]); normal0 = N; seg0 = int(h.slot) + 1; }
             if (bounce == 0) { alb_sum += base; nrm_sum += N; }
             radiance += throughput * emission * base;
             // next-event estimation: model lights (directional and point/spot) with shadow rays
@@ -361,16 +556,16 @@ kernel void path_trace(
                 }
                 float NdotL = dot(N, L);
                 if (NdotL <= 0.0 || att <= 0.0) continue;
-                Hit sh = trace(accel, h.p + N * 0.001, L, tmax, inst_tab, slot_mesh, meshes, verts, indices, inst);
-                if (sh.ok) continue;
-                radiance += throughput * brdf_any(model, N, V, L, base, f0, specw, metallic, rough, a2) * NdotL * l.diffuse.xyz * (PI * att);
+                float tr = transmit(accel, h.p + N * eps, L, tl(h.p, tmax), inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin, mats, per_inst, e, c.n_slots DYN_PASS);
+                if (tr <= 0.0) continue;
+                radiance += throughput * brdf_any(model, N, V, L, base, f0, specw, metallic, rough, a2) * NdotL * l.diffuse.xyz * (PI * att * tr);
             }
             if (cs.light.w > 0.0) {   // per-env DR directional light
                 float3 L = -normalize(cs.light.xyz);
                 float NdotL = dot(N, L);
                 if (NdotL > 0.0) {
-                    Hit sh = trace(accel, h.p + N * 0.001, L, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst);
-                    if (!sh.ok) radiance += throughput * brdf_any(model, N, V, L, base, f0, specw, metallic, rough, a2) * NdotL * float3(PI * cs.light.w);
+                    float tr = transmit(accel, h.p + N * eps, L, tl(h.p, 1000.0), inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin, mats, per_inst, e, c.n_slots DYN_PASS);
+                    if (tr > 0.0) radiance += throughput * brdf_any(model, N, V, L, base, f0, specw, metallic, rough, a2) * NdotL * float3(PI * cs.light.w * tr);
                 }
             }
             if (bounce == 0 && sp.hl_specular.w > 0.5)   // MuJoCo headlight on the primary hit (view-aligned, unshadowed)
@@ -382,12 +577,12 @@ kernel void path_trace(
                 float pe; float3 L = env_sample(env_cdf, c, rnd(rng), rnd(rng), pe);
                 float NdotL = dot(N, L);
                 if (NdotL > 0.0 && pe > 1e-8) {
-                    Hit sh = trace(accel, h.p + N * 0.001, L, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst);
-                    if (!sh.ok) {
+                    float tr = transmit(accel, h.p + N * eps, L, tl(h.p, 1000.0), inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin, mats, per_inst, e, c.n_slots DYN_PASS);
+                    if (tr > 0.0) {
                         float3 Hm = normalize(L + V);
                         float pb = pd * NdotL / PI + (1.0 - pd) * D_ggx(max(dot(N, Hm), 0.0), a2) * max(dot(N, Hm), 0.0) / (4.0 * max(dot(V, Hm), 1e-4));
                         float w = pe * pe / (pe * pe + pb * pb);
-                        radiance += throughput * brdf_any(model, N, V, L, base, f0, specw, metallic, rough, a2) * NdotL * env_radiance(envmap, env_samp, L, c) * (w / pe);
+                        radiance += throughput * brdf_any(model, N, V, L, base, f0, specw, metallic, rough, a2) * NdotL * env_radiance(envmap, env_samp, L, c) * (w / pe * tr);
                     }
                 }
             }
@@ -421,7 +616,7 @@ kernel void path_trace(
                 if (rnd(rng) > q) break;
                 throughput /= q;
             }
-            o = h.p + N * 0.001; d = Lnew;
+            o = h.p + N * eps; d = Lnew;
         }
         if (c.clamp_lum > 0.0) {   // opt-in firefly clamp (biased: caps the energy of rare high-contribution paths)
             float l = dot(radiance, float3(0.2126, 0.7152, 0.0722));

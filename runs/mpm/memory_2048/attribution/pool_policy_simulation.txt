@@ -1,0 +1,5 @@
+current (best fit, 1.5x growth)          held  10.950 GB   {"<class 'warp._src.types.int32'>": 9.566, "<class 'warp._src.types.vector.<locals>.vec_t'>": 0.863, "<class 'warp._src.types.float32'>": 0.52}
+exact new buffers                        held  10.843 GB   {"<class 'warp._src.types.int32'>": 9.557, "<class 'warp._src.types.vector.<locals>.vec_t'>": 0.771, "<class 'warp._src.types.float32'>": 0.515}
+exact, refuse > 2x for >= 1 MB           held   8.491 GB   {"<class 'warp._src.types.int32'>": 7.344, "<class 'warp._src.types.vector.<locals>.vec_t'>": 0.692, "<class 'warp._src.types.float32'>": 0.455}
+exact, refuse > 1.25x for >= 1 MB        held   7.970 GB   {"<class 'warp._src.types.int32'>": 6.735, "<class 'warp._src.types.vector.<locals>.vec_t'>": 0.703, "<class 'warp._src.types.float32'>": 0.532}
+grow, refuse > 2x for >= 1 MB            held 2418260054765010691039716595220873216.000 GB   {"<class 'warp._src.types.int32'>": 2.4182600547650107e+36, "<class 'warp._src.types.vector.<locals>.vec_t'>": 9636.766, "<class 'warp._src.types.float32'>": 45443288951635.625}

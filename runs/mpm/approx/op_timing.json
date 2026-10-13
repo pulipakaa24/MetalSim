@@ -1,0 +1,47 @@
+{
+ "baseline fma": {
+  "ms": 0.34458350000932114,
+  "ps_per_thread_op": 1.283673569594775,
+  "minus_baseline": 0.0
+ },
+ "div precise": {
+  "ms": 0.9981039993363083,
+  "ps_per_thread_op": 3.7182271455835862,
+  "minus_baseline": 2.4345535759888115
+ },
+ "div fast::divide": {
+  "ms": 0.35470849979901686,
+  "ps_per_thread_op": 1.3213921330832572,
+  "minus_baseline": 0.03771856348848224
+ },
+ "div cuda emulation": {
+  "ms": 3.1858955003372103,
+  "ps_per_thread_op": 11.868385599319675,
+  "minus_baseline": 10.5847120297249
+ },
+ "div cuda emulation v2": {
+  "ms": 2.896687500197004,
+  "ps_per_thread_op": 10.791001842159792,
+  "minus_baseline": 9.507328272565017
+ },
+ "sqrt precise": {
+  "ms": 0.7306669999707083,
+  "ps_per_thread_op": 2.721946686397151,
+  "minus_baseline": 1.4382731168023761
+ },
+ "sqrt fast::sqrt": {
+  "ms": 0.3351044997543795,
+  "ps_per_thread_op": 1.2483615419059229,
+  "minus_baseline": -0.03531202768885211
+ },
+ "sqrt cuda emulation": {
+  "ms": 4.379728999992949,
+  "ps_per_thread_op": 16.31576195356603,
+  "minus_baseline": 15.032088383971256
+ },
+ "sqrt cuda emulation v2": {
+  "ms": 3.656187000160571,
+  "ps_per_thread_op": 13.620357961060744,
+  "minus_baseline": 12.336684391465969
+ }
+}

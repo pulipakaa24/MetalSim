@@ -1,0 +1,69 @@
+WARNING: The version of the system or its configuration does not allow enabling CPU profiling:
+- CPU IP/backtrace sampling will be disabled.
+- CPU context switch tracing will be disabled.
+Try the 'nsys status --environment' command to learn more.
+
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+/home/<vm-user>/parity3_scripts/mpm/scale/scale_pour_k.py:241: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+  model = scene.finalize(device=DEV)
+Warp CUDA error 2: out of memory (in function wp_alloc_device_async, /builds/omniverse/warp/warp/native/warp.cu:817)
+Traceback (most recent call last):
+  File "/home/<vm-user>/parity3_scripts/mpm/scale/scale_pour_k.py", line 1016, in <module>
+    {"mpm": run_mpm, "rigid": run_rigid, "ordered": run_ordered, "bodyforce": run_bodyforce}[args.part]()
+  File "/home/<vm-user>/parity3_scripts/mpm/scale/scale_pour_k.py", line 693, in run_rigid
+    tick()
+  File "/home/<vm-user>/parity3_scripts/mpm/scale/scale_pour_k.py", line 690, in tick
+    substep()
+  File "/home/<vm-user>/parity3_scripts/mpm/scale/scale_pour_k.py", line 684, in substep
+    solver.step(st["a"], st["b"], control, contacts, RIGID_DT)
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/utils/benchmark.py", line 138, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/mujoco/solver_mujoco.py", line 3848, in step
+    self._mujoco_warp_step()
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/utils/benchmark.py", line 138, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/mujoco/solver_mujoco.py", line 3826, in _mujoco_warp_step
+    self._mujoco_warp.step(self.mjw_model, self.mjw_data)
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/warp_util.py", line 97, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/forward.py", line 1366, in step
+    forward(m, d)
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/warp_util.py", line 97, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/forward.py", line 1337, in forward
+    fwd_position(m, d, factorize=False)
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/warp_util.py", line 97, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/forward.py", line 668, in fwd_position
+    constraint.make_constraint(m, d)
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/warp_util.py", line 97, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/constraint.py", line 5375, in make_constraint
+    wp.launch(
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/context.py", line 10680, in launch
+    launch_deterministic(
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/deterministic.py", line 2157, in launch_deterministic
+    allocate_counter_buffers(
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/deterministic.py", line 1732, in allocate_counter_buffers
+    values = warp.empty(shape=(capacity,), dtype=warp.int32, device=device)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/context.py", line 9261, in empty
+    arr = warp.array(
+          ^^^^^^^^^^^
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/types.py", line 3285, in __init__
+    self._init_new(dtype, shape, strides, device, pinned)
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/types.py", line 3741, in _init_new
+    ptr = allocator.allocate(capacity)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/context.py", line 4463, in allocate
+    raise RuntimeError(f"Failed to allocate {size_in_bytes} bytes on device '{self.device}'")
+RuntimeError: Failed to allocate 8388608000 bytes on device 'cuda:0'
+Processing events...
+Generated:
+	No reports were generated

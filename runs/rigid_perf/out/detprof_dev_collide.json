@@ -1,0 +1,213 @@
+{
+ "argv": [
+  "--part",
+  "rigid",
+  "--device",
+  "metal:0",
+  "--worlds",
+  "2048",
+  "--max-triangle-pairs",
+  "8388608",
+  "--det",
+  "on",
+  "--pipeline-det",
+  "--warmup",
+  "3",
+  "--kprof",
+  "collide",
+  "--kprof-ticks",
+  "4",
+  "--json",
+  "/Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/runs/rigid_perf/out/detprof_dev_collide.json"
+ ],
+ "device": "metal:0",
+ "device_name": "Apple M4 Max",
+ "warp": "1.18.0.dev20260917",
+ "newton": "1.5.2",
+ "worlds": 2048,
+ "part": "rigid",
+ "det": "on",
+ "pipeline_det": true,
+ "mode": "eager",
+ "max_triangle_pairs": 8388608,
+ "bodies": 26624,
+ "shapes": 188417,
+ "joints": 26624,
+ "dofs": 43008,
+ "build_s": 1.5624774590005472,
+ "solver_init_s": 10.400242542000342,
+ "rigid_contact_max": 14053376,
+ "kprof": {
+  "phase": "collide",
+  "reps": 4,
+  "wall_ms_per_rep": 68.32692700004372,
+  "profiling": true,
+  "per_rep_counters": {
+   "host_waits": 0.25,
+   "command_buffers": 66.0,
+   "host_ops": 0.0,
+   "dispatches": 64.0
+  },
+  "kernels": [
+   {
+    "kernel": "create_narrow_phase_process_mesh_mesh_contacts_kernel__locals__mesh_sdf_collision_global_reduce_kernel_974e8c8b_metal_forward",
+    "ms": 63.66875,
+    "launches": 1.0
+   },
+   {
+    "kernel": "mesh_triangle_contacts_to_reducer_kernel_e39fb65e_metal_forward",
+    "ms": 1.20175,
+    "launches": 1.0
+   },
+   {
+    "kernel": "create_narrow_phase_process_mesh_plane_contacts_kernel__locals__narrow_phase_process_mesh_plane_contacts_reduce_kernel_7b0dcd62_metal_forward",
+    "ms": 0.9205,
+    "launches": 1.0
+   },
+   {
+    "kernel": "reduce_buffered_contacts_kernel_18600803_metal_forward",
+    "ms": 0.5295,
+    "launches": 1.0
+   },
+   {
+    "kernel": "create_narrow_phase_kernel_gjk_mpr__locals__narrow_phase_kernel_gjk_mpr_da3ef1c3_metal_forward",
+    "ms": 0.2865,
+    "launches": 1.0
+   },
+   {
+    "kernel": "create_find_mesh_triangle_overlaps_kernel__locals__narrow_phase_find_mesh_triangle_overlaps_kernel_23a1e3ce_metal_forward",
+    "ms": 0.254,
+    "launches": 1.0
+   },
+   {
+    "kernel": "create_narrow_phase_primitive_kernel__locals__narrow_phase_primitive_kernel_81a38a1a_metal_forward",
+    "ms": 0.13475,
+    "launches": 1.0
+   },
+   {
+    "kernel": "wp_memset",
+    "ms": 0.11875,
+    "launches": 2.0
+   },
+   {
+    "kernel": "create_export_reduced_contacts_kernel__locals__export_reduced_contacts_kernel_49cb6a3d_metal_forward",
+    "ms": 0.112,
+    "launches": 1.0
+   },
+   {
+    "kernel": "compute_block_counts_from_weights_89c44be4_metal_forward",
+    "ms": 0.10925,
+    "launches": 2.0
+   },
+   {
+    "kernel": "_clear_active_kernel_4660aa1f_metal_forward",
+    "ms": 0.10725,
+    "launches": 1.0
+   },
+   {
+    "kernel": "sort_scatter_k8_v4",
+    "ms": 0.092,
+    "launches": 8.0
+   },
+   {
+    "kernel": "scan_reduce_i4",
+    "ms": 0.0765,
+    "launches": 4.0
+   },
+   {
+    "kernel": "sort_upsweep_k8",
+    "ms": 0.07025,
+    "launches": 8.0
+   },
+   {
+    "kernel": "compute_shape_aabbs_fcbde74c_metal_forward",
+    "ms": 0.06575,
+    "launches": 1.0
+   },
+   {
+    "kernel": "_nxn_broadphase_precomputed_pairs_8be4a3a3_metal_forward",
+    "ms": 0.06575,
+    "launches": 1.0
+   },
+   {
+    "kernel": "compute_mesh_mesh_edge_counts_a604ae33_metal_forward",
+    "ms": 0.05625,
+    "launches": 1.0
+   },
+   {
+    "kernel": "compute_mesh_plane_vert_counts_1af7aff4_metal_forward",
+    "ms": 0.05375,
+    "launches": 1.0
+   },
+   {
+    "kernel": "scan_down_i4",
+    "ms": 0.046,
+    "launches": 4.0
+   },
+   {
+    "kernel": "sort_scan_tiles",
+    "ms": 0.043,
+    "launches": 8.0
+   },
+   {
+    "kernel": "_gather_full_kernel_9bd9289c_metal_forward",
+    "ms": 0.032,
+    "launches": 1.0
+   },
+   {
+    "kernel": "_backup_full_kernel_ae6b70b5_metal_forward",
+    "ms": 0.02625,
+    "launches": 1.0
+   },
+   {
+    "kernel": "scan_spine_i4",
+    "ms": 0.018,
+    "launches": 4.0
+   },
+   {
+    "kernel": "wp_bounded_prep",
+    "ms": 0.01325,
+    "launches": 3.0
+   },
+   {
+    "kernel": "sort_copy",
+    "ms": 0.00875,
+    "launches": 2.0
+   },
+   {
+    "kernel": "_prepare_sort_04dbf773_metal_forward",
+    "ms": 0.00725,
+    "launches": 1.0
+   },
+   {
+    "kernel": "sort_diff_k8",
+    "ms": 0.007,
+    "launches": 1.0
+   },
+   {
+    "kernel": "verify_narrow_phase_buffers_c234c2df_metal_forward",
+    "ms": 0.0065,
+    "launches": 1.0
+   },
+   {
+    "kernel": "sort_plan",
+    "ms": 0.006,
+    "launches": 1.0
+   },
+   {
+    "kernel": "_zero_active_count_kernel_de41732d_metal_forward",
+    "ms": 0.00225,
+    "launches": 1.0
+   },
+   {
+    "kernel": "sort_diff_clear",
+    "ms": 0.00225,
+    "launches": 1.0
+   }
+  ],
+  "kernel_total_ms": 68.14175,
+  "launches": 66.0
+ },
+ "rigid_contacts": 81920,
+ "maxrss_mb": 4884.3125
+}

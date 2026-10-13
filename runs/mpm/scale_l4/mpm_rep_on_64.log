@@ -1,0 +1,77 @@
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+/home/<vm-user>/parity3_scripts/mpm/scale/scale_pour.py:236: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+  model = scene.finalize(device=DEV)
+{
+ "argv": [
+  "--device",
+  "cuda:0",
+  "--json",
+  "/home/<vm-user>/parity3/scale_l4/mpm_rep_on_64.json",
+  "--part",
+  "mpm",
+  "--worlds",
+  "64",
+  "--mode",
+  "eager",
+  "--steps",
+  "4",
+  "--det",
+  "on",
+  "--repeat-check"
+ ],
+ "device": "cuda:0",
+ "device_name": "NVIDIA L4",
+ "warp": "1.16.0",
+ "newton": "1.5.2",
+ "worlds": 64,
+ "det": "on (wp.config.deterministic = RUN_TO_RUN, all modules)",
+ "temporary_store": true,
+ "part": "mpm",
+ "mode": "eager",
+ "grid": "sparse",
+ "accumulate": "native",
+ "loop": "native",
+ "particles": 47040,
+ "bodies": 128,
+ "colliders": 192,
+ "build_s": 0.33348871299995153,
+ "solver_init_s": 0.6254394259999572,
+ "max_active_cell_count": 65536,
+ "warmup_steps": 288,
+ "warmup_s": 8.58237829099994,
+ "step_ms": {
+  "median": 23.335943999995834,
+  "mean": 23.33718774997351,
+  "min": 23.032734000025812,
+  "max": 23.644128999876557
+ },
+ "step_ms_all": [
+  23.644128999876557,
+  23.462671000061164,
+  23.032734000025812,
+  23.209216999930504
+ ],
+ "step_ms_pipelined": 23.25425074997156,
+ "iterations_last4": [
+  25,
+  25,
+  25,
+  25
+ ],
+ "res_l2_last4": [
+  0.0012957340804859996,
+  0.001386946183629334,
+  0.0012270098086446524,
+  0.00033337881905026734
+ ],
+ "occupied_cells_per_world": 82.296875,
+ "velocity_nodes": 524288,
+ "strain_nodes": 65536,
+ "collider_nodes": 47040,
+ "repeat_check": {
+  "bitwise_equal": true,
+  "max_abs_diff": 0.0,
+  "worlds_differing": 0
+ },
+ "maxrss_mb": 637.82421875
+}

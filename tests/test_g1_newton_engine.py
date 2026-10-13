@@ -195,3 +195,30 @@ def test_rough_task_runs_on_newton():
         d.qpos[:] = q[e]; mujoco.mj_kinematics(m, d)
         np.testing.assert_allclose(xp[e, tb], d.xpos[tb], atol=1e-4)
         np.testing.assert_allclose(xm[e, tb].reshape(9), d.xmat[tb], atol=1e-4)
+
+
+@wp.kernel
+def _peak_count(count: wp.array[int], peak: wp.array[int]):
+    wp.atomic_max(peak, 0, count[0])
+
+
+@pytest.mark.parametrize("terrain", ["flat", "rough"])
+def test_no_rigid_contacts_dropped(terrain):
+    """The contact buffer holds every contact Newton generates (Newton counts past rigid_contact_max and drops the
+    rest), on every substep: 64 worlds under random actions, falling and lying on the terrain. Newton's automatic
+    size (1,000 here) dropped about half the contacts on the rough heightfield at 64 worlds."""
+    n = 64
+    task = G1VelocityTask(n, terrain=terrain, seed=6, **NEWTON); task.reset_all()
+    sim = task.sim; cap = sim.contacts.rigid_contact_max
+    peak = wp.zeros(1, dtype=int, device="metal:0"); collide = sim.pipeline.collide
+    def collide_and_record(state, contacts, *a, **kw):
+        collide(state, contacts, *a, **kw)
+        wp.launch(_peak_count, dim=1, inputs=[contacts.rigid_contact_count, peak], device="metal:0")
+    sim.pipeline.collide = collide_and_record
+    rng = np.random.default_rng(0); act = wp.zeros((n, task.act_dim), dtype=float, device="metal:0")
+    for _ in range(60):                       # 1.2 s, no resets: most worlds end on the ground
+        act.assign(rng.normal(0, 1.0, (n, task.act_dim)).astype(np.float32))
+        task.launch_apply_action(act); sim.launch_step()
+    sim.synchronize()
+    p = int(peak.numpy()[0])
+    assert 0 < p <= cap, (p, cap)

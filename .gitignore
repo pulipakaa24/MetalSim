@@ -26,7 +26,21 @@ runs/policies/
 runs/.gpu_lock
 runs/.gpu_lock.d/
 runs/gpu_queue/
+runs/gpu_hb/
+runs/gpu_shared/
+.pytest_cache/
 scripts/diagnostics/competitors/menagerie/
+
+# MPM / rigid-scale bulk outputs are regenerated, not committed (metalsim/physics/mpm/MPM.md, "Reproducing"):
+# per-tree Warp kernel caches, particle recordings and the L4 tarballs; their logs, JSON and reports are committed
+runs/**/kcache*/
+runs/mpm/**/*.npz
+runs/mpm/**/*.tgz
+runs/mpm/**/*.nsys-rep
+runs/parity/isaaclab3_mpm*/**/*.npz
+runs/parity/isaaclab3_mpm*/*.tgz
+runs/fma_rigid_parity/**/*.npz
+runs/rigid_perf/**/*.npz
 
 # Poly Haven CC0 HDRIs and textures are fetched, not committed (scripts/fetch_polyhaven_assets.sh)
 assets/polyhaven/

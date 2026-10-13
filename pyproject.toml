@@ -20,14 +20,15 @@ classifiers = [
 ]
 dependencies = [
     "numpy",
-    "mujoco>=3.14",
-    "warp-lang",   # the MetalSim fork of Warp: scripts/setup_warp.sh (branch metalsim of innate-inc/warp + patches/)
+    "mujoco>=3.14,<3.15",   # the MuJoCo Warp fork (3.14) reads MjModel.flex_internal, which mujoco 3.15 removed
+    "warp-lang",   # replaced by the MetalSim fork of Warp: scripts/setup_warp.sh (pulipakaa24/warp, pinned commit of branch metalsim)
     "torch>=2.14",
     "pyobjc-framework-Metal",
     "pyobjc-framework-MetalFX",
     "pyobjc-framework-Cocoa",
     "usd-core",    # pxr: the USD scene layer (metalsim.scene), imported by the G1 task
     "scipy",       # Isaac's rough-terrain generator (metalsim.learn.isaac_terrain)
+    "ninja",       # torch.utils.cpp_extension builds the Metal interop bridge (metalsim_torch_metal_bridge) with it
 ]
 
 [project.optional-dependencies]
@@ -38,9 +39,13 @@ rslrl = ["rsl-rl-lib==3.1.2", "tensordict"]
 tron1 = ["scipy", "onnxruntime"]
 # fidelity protocol against an Isaac recording and the render-fidelity benchmark (metalsim.parity, metalsim.bench)
 parity = ["imageio", "imageio-ffmpeg", "pillow", "scikit-image", "lpips", "flip-evaluator"]
-# Newton XPBD engine (experimental, archived): the upstream commit the validation runs pinned. The
-# MetalSim fork with the solver fixes goes into a separate environment (scripts/setup_newton.sh).
-newton = ["newton @ git+https://github.com/newton-physics/newton@45458023f24629c1feffb1f336594808f537db14"]
+# Newton XPBD engine (experimental, archived): the upstream commit the validation runs pinned (newton-physics/newton
+# 45458023) plus only the Metal HashTable / 64-bit atomics fix that the Warp fork needs (pulipakaa24/newton branch
+# metalsim-hashtable-metal; the same change as patches/newton/metalsim-hashtable-metal-a4be3604.diff on 45458023).
+# The MetalSim fork with the solver fixes goes into a separate environment (scripts/setup_newton.sh), Newton 1.5.2
+# for MPM into .venv-newton152 (scripts/setup_newton152.sh).
+newton = ["newton @ git+https://github.com/pulipakaa24/newton@a4be3604bc218bb366d12164fa3e1025f333bdae",
+          "newton-usd-schemas==0.5.0"]   # Newton's USD importer (the G1 Newton-engine task loads the USD asset)
 
 [project.urls]
 Homepage = "https://github.com/pulipakaa24/MetalSim"
