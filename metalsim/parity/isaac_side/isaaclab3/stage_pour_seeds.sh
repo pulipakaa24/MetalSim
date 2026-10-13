@@ -19,4 +19,5 @@ for s in $SEEDS; do
   STAGES=train ITERS=60 NUM=1024 SEED=$s TAG=_curve_s$s $HOME/parity3_scripts/stage_pour.sh
 done
 touch $HOME/parity3/pour/SEEDS_DONE
-[ "${POWEROFF:-1}" = 1 ] && { sleep 60; sudo poweroff; }
+# POWEROFF_DELAY (s, default 60) leaves time for l4_seed_launcher.sh to fetch the logs before the VM goes down
+[ "${POWEROFF:-1}" = 1 ] && { sleep ${POWEROFF_DELAY:-60}; sudo poweroff; }
