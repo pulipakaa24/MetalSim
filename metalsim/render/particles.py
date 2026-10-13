@@ -219,21 +219,23 @@ class GrainField:
         self.n_particles = p.shape[1]
         return self.n_particles
 
-    def consts(self, as_base: int, inst_base: int, tiles_per_row: int, stride: float) -> np.ndarray:
+    def consts(self, as_base: int, inst_base: int, tiles_per_row: int, stride: float, user_ids: bool = False) -> np.ndarray:
         c = np.zeros(16, np.uint32)
         c[:8] = (self.n_envs, self.n_particles, self.k, self.n_meshes, as_base, tiles_per_row, self.seed, inst_base)
         cf = c.view(np.float32)
         cf[8:13] = (stride, self.radius, self.radius_jitter, self.offset, self.cull_z)
         c[13] = 1 if self.has_ids else 0
+        c[14] = 1 if user_ids else 0
         return c
 
     def encode_instances(self, cb, inst_desc, as_base: int, inst_base: int, tiles_per_row: int, stride: float,
-                         keys=None, keys_off: int = 0):
+                         keys=None, keys_off: int = 0, user_ids: bool = False):
         """Grain i's instance descriptor to ``inst_desc[inst_base + i]`` (mesh ``as_base + k`` of the structure's
-        instanced list) and its identity key to ``keys`` at byte ``keys_off`` (default: this field's own key buffer)."""
+        instanced list) and its identity key to ``keys`` at byte ``keys_off`` (default: this field's own key buffer).
+        ``user_ids``: UserID descriptors (68 bytes) with user id 0x80000000 | i (two-level structures)."""
         if self.n_grains == 0:
             return
-        k = self.consts(as_base, inst_base, tiles_per_row, stride)
+        k = self.consts(as_base, inst_base, tiles_per_row, stride, user_ids)
         if keys is None:
             if self.keys.length() < 4 * self.n_grains:
                 self.keys = self.ctx.buffer(4 * self.n_grains, label="grain_keys")
@@ -253,7 +255,7 @@ class GrainField:
             ce.useResource_usage_(a, Metal.MTLResourceUsageRead)
 
 
-def instance_descriptor(prim_list, count, desc_buf, offset=0, label="instances", extended_ok=False):
+def instance_descriptor(prim_list, count, desc_buf, offset=0, label="instances", extended_ok=False, user_ids=False):
     """The descriptor of an instance acceleration structure of ``count`` instances over ``prim_list`` (descriptors at
     byte ``offset`` of ``desc_buf``). Past Metal's standard 2^24 instances it gets the extended limits when the caller
     intersects it with the ``extended_limits`` tag (``extended_ok``), else ValueError (metalsim/render/as_limits.py).
@@ -264,15 +266,16 @@ def instance_descriptor(prim_list, count, desc_buf, offset=0, label="instances",
     d.setInstancedAccelerationStructures_(list(prim_list))
     d.setInstanceCount_(int(count))
     d.setInstanceDescriptorBuffer_(desc_buf); d.setInstanceDescriptorBufferOffset_(int(offset))
-    d.setInstanceDescriptorStride_(64)
-    d.setInstanceDescriptorType_(Metal.MTLAccelerationStructureInstanceDescriptorTypeDefault)
+    d.setInstanceDescriptorStride_(68 if user_ids else 64)
+    d.setInstanceDescriptorType_(Metal.MTLAccelerationStructureInstanceDescriptorTypeUserID if user_ids
+                                 else Metal.MTLAccelerationStructureInstanceDescriptorTypeDefault)
     as_limits.apply(d, extended)
     return d, extended
 
 
-def _instance_structure(ctx, prim_list, count, desc_buf, label, offset=0, extended_ok=False):
+def _instance_structure(ctx, prim_list, count, desc_buf, label, offset=0, extended_ok=False, user_ids=False):
     """(descriptor, structure, scratch, bytes, extended) of an instance acceleration structure over ``prim_list``."""
-    d, extended = instance_descriptor(prim_list, count, desc_buf, offset, label, extended_ok)
+    d, extended = instance_descriptor(prim_list, count, desc_buf, offset, label, extended_ok, user_ids)
     s = ctx.device.accelerationStructureSizesWithDescriptor_(d)
     a = ctx.device.newAccelerationStructureWithSize_(s.accelerationStructureSize)
     if a is None:
@@ -298,9 +301,10 @@ class InstanceStructure:
     * ``"two_level"`` (default): the grains are their own instance acceleration structures (one instance per grain),
       in chunks of at most ``chunk`` grains (Metal's standard limit is 2^24 instances per structure), and each chunk
       is one identity instance of the scene's top-level structure next to the scene geometry. The path tracer
-      intersects through two instance levels (``max_levels<2>``): the top-level instance gives the chunk, the
-      second-level instance the grain. Every structure stays within the standard limits, and the top level stays as
-      small as the scene.
+      intersects through two instance levels (``max_levels<2>``). Metal reports only the innermost instance of a hit
+      (``instance_count`` stays 1; scripts/particle_demo/multilevel_probe2.py), so the grain structures use UserID
+      descriptors whose user id is 0x80000000 | grain index, and the scene's Default descriptors read user id 0. Every
+      structure stays within the standard limits, and the top level stays as small as the scene.
     * ``"flat"``: the scene's instances followed by one top-level instance per grain, one build; past 2^24 instances it
       is built with Metal's extended limits and intersected with the ``extended_limits`` tag (FLAG_GRAINS_EXT).
 
@@ -308,8 +312,9 @@ class InstanceStructure:
     outside Metal's supported range; on macOS 26 that build (with large ground planes) never finished and the GPU work
     outlived its process (PARTICLES.md).
 
-    Grain descriptors and identity keys: two-level, one buffer of the descriptors followed by the keys (the path tracer's
-    buffer 29); flat, the descriptors follow the scene's in the top-level buffer and the keys are the field's own.
+    Grain descriptors and identity keys: two-level, one buffer of the 68-byte UserID descriptors followed by the keys
+    (the path tracer's buffer 29); flat, the descriptors follow the scene's in the top-level buffer and the keys are the
+    field's own.
     """
 
     MODES = ("two_level", "flat")
@@ -347,13 +352,13 @@ class InstanceStructure:
         else:
             if G > self.capacity:
                 self.capacity = G
-                self.grain_buf = c.buffer(68 * G, label="pt_grain_instances_and_keys")   # descriptors, then keys
+                self.grain_buf = c.buffer(72 * G, label="pt_grain_instances_and_keys")   # UserID descriptors, then keys
             nc = self.n_chunks
             self.chunks = []        # (descriptor, structure, scratch, bytes) per chunk of <= chunk grains
             for k in range(nc):
                 n = min(self.chunk, G - k * self.chunk)
                 d, a, sc, nb, _ = _instance_structure(c, f.prim_as, n, self.grain_buf, f"pt_grains_{k}",
-                                                      offset=64 * k * self.chunk)
+                                                      offset=68 * k * self.chunk, user_ids=True)
                 self.chunks.append((d, a, sc, nb))
             self.grain_as_bytes = sum(ch[3] for ch in self.chunks)
             self.inst_desc = c.buffer(64 * (rt.n_inst + nc), label="pt_instances_scene_and_grains")
@@ -383,7 +388,8 @@ class InstanceStructure:
         if self.mode == "flat":
             f.encode_instances(cb, self.inst_desc, len(rt.prim_as), rt.n_inst, rt.tpr, rt.stride)
         else:
-            f.encode_instances(cb, self.grain_buf, 0, 0, rt.tpr, rt.stride, keys=self.grain_buf, keys_off=64 * f.n_grains)
+            f.encode_instances(cb, self.grain_buf, 0, 0, rt.tpr, rt.stride, keys=self.grain_buf, keys_off=68 * f.n_grains,
+                               user_ids=True)
             ae = cb.accelerationStructureCommandEncoder()       # the grain chunks first (the top level instances them)
             for d, a, sc, _ in self.chunks:
                 ae.buildAccelerationStructure_descriptor_scratchBuffer_scratchBufferOffset_(a, d, sc, 0)

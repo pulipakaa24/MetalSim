@@ -194,7 +194,7 @@ class Tier2Renderer:
         c.upload_texture(self.atlas_tex, ai)
         self.samp = c.sampler(linear=True, repeat=True)
         # PTConsts (shaders/pathtrace.metal): 16 words as before + [16:18] env grid, [20] env_yaw, [21] clamp_lum, [24:28] env_mul
-        self.consts = np.zeros(32, np.uint32)      # [28:30] grain_scene, grain_chunk (two-level grains, particles.py)
+        self.consts = np.zeros(28, np.uint32)
         self.consts[:4] = (n_envs, width, height, max(model.ncam, 1))
         self.consts[4:8] = (max(model.nlight, 1) if model.nlight else 0, self.G, spp, max_bounces)
         self.consts[8:12] = (0, self.rt.tpr, 1, seed)
@@ -311,7 +311,6 @@ class Tier2Renderer:
         cf = self.consts.view(np.float32)
         # flat: first grain instance, first grain mesh in the top-level list; two-level: grain count, meshes from 0
         self.consts[18:20] = (self.rt.n_inst, len(self.rt.prim_as)) if structure == "flat" else (g.n_grains, 0)
-        self.consts[28:30] = (self.rt.n_inst, self._ias.chunk)
         cf[22] = grain_eps if grain_eps is not None else max(0.01 * g.radius, 1e-5)
 
     def _encode_scene(self, cb, gx, gxo, gm, gmo):
