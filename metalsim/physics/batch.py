@@ -53,6 +53,19 @@ class _TensorViews:
         return t
 
 
+@wp.kernel
+def _latch_capacity_overflow(overflow: wp.array(dtype=int), nefc: wp.array(dtype=int), njmax: int, eq_blocks: int, mask: int,
+                             nefc_bit: int, latched: wp.array(dtype=int)):
+    """OR this world's capacity overflow bits into ``latched`` (which mjw.reset_data does not clear); with connect /
+    weld blocks, ``nefc >= njmax`` counts as NEFC (MuJoCo Warp drops a block that would end exactly at njmax unflagged)."""
+    w = wp.tid()
+    v = overflow[w] & mask
+    if eq_blocks != 0 and nefc[w] >= njmax:
+        v = v | nefc_bit
+    if v != 0:
+        latched[w] = latched[w] | v
+
+
 @dataclass
 class BatchSimOptions:
     substeps: int = 1                 # physics steps per call to step()
@@ -64,7 +77,8 @@ class BatchSimOptions:
     # contact count its narrowphase writes per pair type, rows per contact from condim / cone, plus limit,
     # equality and friction-loss rows); a capacity that cannot be exceeded changes no result and every
     # capacity-sized launch shrinks with it. "auto" raises for models it cannot bound (heightfields, SDF, flex,
-    # MULTICCD). check_overflow() is the guard: any capacity overflow flag raises.
+    # MULTICCD). check_overflow() is the guard: any capacity overflow since construction raises (latched after every
+    # substep, so a task's reset of the world does not erase it).
     nconmax: int | str | None = None
     njmax: int | str | None = 512
     solver_iterations: int | None = None
@@ -160,7 +174,12 @@ class BatchSim:
                 self.d = mjw.put_data(wmodel, mjd, nworld=num_envs, nconmax=nconmax, njmax=njmax)
             self._reset_mask = wp.zeros(num_envs, dtype=wp.bool)
             self._graphs = {}
-            self._substep_hooks = []    # launched after every physics substep (inside the step graph)
+            # capacity overflow bits latched after every substep: mjw.reset_data zeroes d.overflow of the worlds it
+            # resets, and tasks reset (fallen) worlds every control step, so d.overflow alone loses overflows
+            from metalsim.physics import capacity
+            self._overflow_latched = wp.zeros(num_envs, dtype=int)
+            self._latch_args = (int(self.d.njmax), capacity.eq_blocks(wmodel), capacity.capacity_mask(), int(mjw.OverflowType.NEFC))
+            self._substep_hooks = [self._latch_overflow]   # launched after every physics substep (inside the step graph)
             self._reset_hooks = []      # launched after reset_data with the reset mask (inside the reset graph)
             self._capture()
         self.t = _TensorViews(self.d, num_envs)         # data views
@@ -190,6 +209,11 @@ class BatchSim:
             mjw.step(self.m, self.d)
             for h in self._substep_hooks:
                 h()
+
+    def _latch_overflow(self) -> None:
+        njmax, neqb, mask, nefc_bit = self._latch_args
+        wp.launch(_latch_capacity_overflow, dim=self.n, inputs=[self.d.overflow, self.d.nefc, njmax, neqb, mask, nefc_bit],
+                  outputs=[self._overflow_latched])
 
     def _launch_reset(self) -> None:
         mjw.reset_data(self.m, self.d, reset=self._reset_mask)
@@ -253,16 +277,19 @@ class BatchSim:
         """Per-flag count of worlds whose overflow bit is set (synchronizes). Use in tests and at
         rollout boundaries: NEFC / NARROWPHASE / CCD overflows mean dropped constraints or contacts
         and must be fixed by raising ``njmax`` / ``nconmax``; LS_ITERATIONS and ITERATIONS are
-        solver-convergence warnings (same as MuJoCo C's)."""
+        solver-convergence warnings (same as MuJoCo C's). Capacity bits count every world that overflowed
+        since construction (latched, survive resets); the solver-cap bits are the live ``d.overflow`` (since
+        each world's last reset)."""
         self.synchronize()
-        ov = self.d.overflow.numpy()
+        ov = self.d.overflow.numpy() | self._overflow_latched.numpy()
         return {f.name: int(((ov & int(f)) != 0).sum()) for f in mjw.OverflowType if int(f) not in (0, int(mjw.OverflowType.ALL))
                 and ((ov & int(f)) != 0).any()}
 
     def check_overflow(self) -> dict[str, int]:
-        """The overflow flags (synchronizes), raising RuntimeError on any capacity overflow (NEFC, NARROWPHASE,
-        CCD, ...: rows or contacts were dropped, the physics is wrong from that step on). The solver-cap flags
-        (ITERATIONS, LS_ITERATIONS) are returned, not raised. Call at rollout boundaries."""
+        """The overflow flags (synchronizes), raising RuntimeError on any capacity overflow since construction (NEFC,
+        NARROWPHASE, CCD, ...: rows or contacts were dropped, the physics is wrong from that step on; latched after
+        every substep, so a world's reset does not hide it). The solver-cap flags (ITERATIONS, LS_ITERATIONS) are
+        returned, not raised. Call at rollout boundaries."""
         from metalsim.physics import capacity
         ov = self.overflow_flags()
         cap = capacity.capacity_overflows(ov)

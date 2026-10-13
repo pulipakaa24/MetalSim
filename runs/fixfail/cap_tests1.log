@@ -1,0 +1,124 @@
+=== tree /Users/aditya/robosim/.claude/worktrees/agent-ad5dbe3dae8c8990c
+metalsim /Users/aditya/robosim/.claude/worktrees/agent-ad5dbe3dae8c8990c/metalsim/__init__.py warp 1.18.0.dev20260917 mujoco 3.14.0 mjw /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/__init__.py
+E       AssertionError: {3: 0.9211271405220032, 16: 0.9996324777603149}
+E       assert (0.9996324777603149 > 0.99 and 0.9211271405220032 < 0.5)
+
+tests/test_capacity.py:127: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth dc949da load on device 'metal:0' took 62.95 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_72cc6aa2 72cc6aa load on device 'metal:0' took 42.29 ms  (cached)
+Module mujoco_warp._src.constraint 4b2565f load on device 'metal:0' took 39.91 ms  (cached)
+Module _equality_connect__locals__kernel_a04a870d a04a870 load on device 'metal:0' took 591.51 ms  (compiled)
+Module _friction_dof__locals__kernel_54b217fe 54b217f load on device 'metal:0' took 40.06 ms  (cached)
+Module _efc_contact_init__locals__kernel_52cf860d 52cf860 load on device 'metal:0' took 39.32 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_50fd8eb9 c8c5823 load on device 'metal:0' took 40.24 ms  (cached)
+Module _efc_contact_update__locals__kernel_27b27a7f 27b27a7 load on device 'metal:0' took 40.90 ms  (cached)
+Module mujoco_warp._src.passive 121cefe load on device 'metal:0' took 53.01 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_ec74e588 ec74e58 load on device 'metal:0' took 40.21 ms  (cached)
+Module _qfrc_smooth__locals__kernel_b9a126c0 b9a126c load on device 'metal:0' took 39.75 ms  (cached)
+Module mujoco_warp._src.support d1f2881 load on device 'metal:0' took 40.54 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_071922b2 3bd425e load on device 'metal:0' took 42.45 ms  (cached)
+Module _solve_init_dof__locals__kernel_a278b607 a278b60 load on device 'metal:0' took 38.95 ms  (cached)
+Module _solve_init_efc__locals__kernel_38f8708b 38f8708 load on device 'metal:0' took 39.56 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_c329f8b2 c329f8b load on device 'metal:0' took 334.49 ms  (cached)
+Module mul_m_kernel__locals___mul_m_1b897f73 1b897f7 load on device 'metal:0' took 39.06 ms  (cached)
+Module _update_constraint_efc__locals__kernel_875e0cfe 875e0cf load on device 'metal:0' took 38.90 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_9318117e 9318117 load on device 'metal:0' took 38.11 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_be8f77c5 be8f77c load on device 'metal:0' took 38.72 ms  (cached)
+Module _update_gradient_grad__locals__kernel_b82c9bc8 b82c9bc load on device 'metal:0' took 38.41 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_83975766 052d922 load on device 'metal:0' took 452.18 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_efa40737 14795b1 load on device 'metal:0' took 388.33 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_a9a2fcce de85456 load on device 'metal:0' took 41.78 ms  (cached)
+Module _update_constraint_gradient_fused__locals__kernel_7b87c57b 2ac68df load on device 'metal:0' took 359.14 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_71d91e0c 368d818 load on device 'metal:0' took 396.54 ms  (cached)
+Module _solve_done__locals__kernel_f1d63dbf f1d63db load on device 'metal:0' took 39.08 ms  (cached)
+Module mujoco_warp._src.solver 00c4ab6 load on device 'metal:0' took 43.30 ms  (cached)
+Module mujoco_warp._src.forward 9c6583c load on device 'metal:0' took 52.14 ms  (cached)
+Module _next_time_builder__locals___next_time_89d592b4 89d592b load on device 'metal:0' took 38.26 ms  (cached)
+Module metalsim.physics.batch 6be6507 load on device 'metal:0' took 398.88 ms  (compiled)
+Module reset_data__locals__reset_xfrc_applied_99f1ed31 99f1ed3 load on device 'metal:0' took 38.48 ms  (cached)
+Module reset_data__locals__reset_M_c0d46912 c0d4691 load on device 'metal:0' took 37.86 ms  (cached)
+Module reset_data__locals__reset_mocap_21cdccdf 21cdccd load on device 'metal:0' took 38.03 ms  (cached)
+Module reset_data__locals__reset_contact_e7d9f88d e7d9f88 load on device 'metal:0' took 38.58 ms  (cached)
+Module reset_data__locals__reset_sleep_c3616e3d c3616e3 load on device 'metal:0' took 38.68 ms  (cached)
+Module reset_data__locals__reset_nworld_f3f460ae f3f460a load on device 'metal:0' took 343.49 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_d3ef6aa9 aa2b467 load on device 'metal:0' took 475.81 ms  (compiled)
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_capacity.py::test_bounds_refuse_unbounded_models
+FAILED tests/test_capacity.py::test_g1_flat_bounds_hold_under_random_actions[recommended-3]
+FAILED tests/test_capacity.py::test_g1_flat_bounds_hold_under_random_actions[recommended_pyramidal-4]
+FAILED tests/test_capacity.py::test_g1_flat_task_defaults_to_the_bound - pxr....
+FAILED tests/test_capacity.py::test_check_overflow_raises_on_dropped_rows - p...
+FAILED tests/test_capacity.py::test_overflow_survives_resets - pxr.Tf.ErrorEx...
+FAILED tests/test_capacity.py::test_equality_block_ending_at_njmax_is_flagged
+6 failed, 1 passed in 12.80s
+=== tree /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/oldtree
+metalsim /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/oldtree/metalsim/__init__.py warp 1.18.0.dev20260917 mujoco 3.14.0 mjw /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/__init__.py
+                assert (nefc == 3).all() and not (sim.d.overflow.numpy() & int(mjw.OverflowType.NEFC)).any()
+>               with pytest.raises(RuntimeError, match="capacity overflow"):
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               Failed: DID NOT RAISE RuntimeError
+
+tests/test_capacity.py:123: Failed
+----------------------------- Captured stdout call -----------------------------
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth dc949da load on device 'metal:0' took 63.70 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_72cc6aa2 72cc6aa load on device 'metal:0' took 41.57 ms  (cached)
+Module mujoco_warp._src.constraint 4b2565f load on device 'metal:0' took 38.81 ms  (cached)
+Module _equality_connect__locals__kernel_a04a870d a04a870 load on device 'metal:0' took 41.22 ms  (cached)
+Module _friction_dof__locals__kernel_54b217fe 54b217f load on device 'metal:0' took 39.57 ms  (cached)
+Module _efc_contact_init__locals__kernel_52cf860d 52cf860 load on device 'metal:0' took 39.10 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_50fd8eb9 c8c5823 load on device 'metal:0' took 40.20 ms  (cached)
+Module _efc_contact_update__locals__kernel_27b27a7f 27b27a7 load on device 'metal:0' took 40.43 ms  (cached)
+Module mujoco_warp._src.passive 121cefe load on device 'metal:0' took 52.41 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_ec74e588 ec74e58 load on device 'metal:0' took 40.04 ms  (cached)
+Module _qfrc_smooth__locals__kernel_b9a126c0 b9a126c load on device 'metal:0' took 39.90 ms  (cached)
+Module mujoco_warp._src.support d1f2881 load on device 'metal:0' took 40.60 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_071922b2 3bd425e load on device 'metal:0' took 41.75 ms  (cached)
+Module _solve_init_dof__locals__kernel_a278b607 a278b60 load on device 'metal:0' took 39.42 ms  (cached)
+Module _solve_init_efc__locals__kernel_38f8708b 38f8708 load on device 'metal:0' took 39.31 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_c329f8b2 c329f8b load on device 'metal:0' took 39.09 ms  (cached)
+Module mul_m_kernel__locals___mul_m_1b897f73 1b897f7 load on device 'metal:0' took 42.13 ms  (cached)
+Module _update_constraint_efc__locals__kernel_875e0cfe 875e0cf load on device 'metal:0' took 41.34 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_9318117e 9318117 load on device 'metal:0' took 42.18 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_be8f77c5 be8f77c load on device 'metal:0' took 40.24 ms  (cached)
+Module _update_gradient_grad__locals__kernel_b82c9bc8 b82c9bc load on device 'metal:0' took 39.05 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_83975766 052d922 load on device 'metal:0' took 40.18 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_efa40737 14795b1 load on device 'metal:0' took 39.55 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_a9a2fcce de85456 load on device 'metal:0' took 42.44 ms  (cached)
+Module _update_constraint_gradient_fused__locals__kernel_7b87c57b 2ac68df load on device 'metal:0' took 40.41 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_71d91e0c 368d818 load on device 'metal:0' took 39.68 ms  (cached)
+Module _solve_done__locals__kernel_f1d63dbf f1d63db load on device 'metal:0' took 39.18 ms  (cached)
+Module mujoco_warp._src.solver 00c4ab6 load on device 'metal:0' took 43.34 ms  (cached)
+Module mujoco_warp._src.forward 9c6583c load on device 'metal:0' took 53.03 ms  (cached)
+Module _next_time_builder__locals___next_time_89d592b4 89d592b load on device 'metal:0' took 39.19 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_99f1ed31 99f1ed3 load on device 'metal:0' took 39.06 ms  (cached)
+Module reset_data__locals__reset_M_c0d46912 c0d4691 load on device 'metal:0' took 38.93 ms  (cached)
+Module reset_data__locals__reset_mocap_21cdccdf 21cdccd load on device 'metal:0' took 39.02 ms  (cached)
+Module reset_data__locals__reset_contact_e7d9f88d e7d9f88 load on device 'metal:0' took 39.69 ms  (cached)
+Module reset_data__locals__reset_sleep_c3616e3d c3616e3 load on device 'metal:0' took 38.93 ms  (cached)
+Module reset_data__locals__reset_nworld_f3f460ae f3f460a load on device 'metal:0' took 40.24 ms  (cached)
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_capacity.py::test_bounds_refuse_unbounded_models
+FAILED tests/test_capacity.py::test_g1_flat_bounds_hold_under_random_actions[recommended-3]
+FAILED tests/test_capacity.py::test_g1_flat_bounds_hold_under_random_actions[recommended_pyramidal-4]
+FAILED tests/test_capacity.py::test_g1_flat_task_defaults_to_the_bound - pxr....
+FAILED tests/test_capacity.py::test_check_overflow_raises_on_dropped_rows - p...
+FAILED tests/test_capacity.py::test_overflow_survives_resets - pxr.Tf.ErrorEx...
+FAILED tests/test_capacity.py::test_equality_block_ending_at_njmax_is_flagged
+6 failed, 1 passed in 10.53s

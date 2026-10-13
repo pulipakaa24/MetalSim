@@ -16,8 +16,20 @@ witness points in a 4 x 3 matrix), the rows per contact from the pair's condim a
 rows. Heightfields, SDFs and flex are refused (their per-pair contact counts are capped by MuJoCo Warp's kernels
 with an overflow flag, not bounded by the model): give ``njmax`` / ``nconmax`` explicitly there.
 
-The guard: ``BatchSim.check_overflow()`` raises on any capacity overflow flag (dropped rows or contacts are never
-silent); the training loop calls it at every log point.
+Rows per contact (MuJoCo's efc layout, ``engine_core_constraint.c`` / mujoco_warp ``constraint.py``): condim 1 gives one
+row; otherwise an elliptic cone gives ``condim`` rows (normal + condim - 1 friction directions) and a pyramidal cone
+``2 * (condim - 1)`` (two pyramid edges per friction direction). The G1 task's feet and torso are condim 3: 3 rows per
+contact under its default elliptic cone (since 2026-09-26 11:00, ``contact_cfg="recommended"``), 4 under the pyramidal
+presets (``recommended_pyramidal``, the Isaac Lab 3.0 solver presets).
+
+The guard: ``BatchSim.check_overflow()`` raises on any capacity overflow (dropped rows or contacts are never silent).
+MuJoCo Warp's per-world ``d.overflow`` bits are zeroed by ``mjw.reset_data`` for every world it resets, so BatchSim
+latches the capacity bits after every substep into a sticky per-world array that resets do not touch (before
+2026-10-13 a world that overflowed and was then reset by its task, typically because the dropped rows made it fall,
+left no trace). MuJoCo Warp writes a connect (3-row) or weld (6-row) equality block only if it ends strictly below
+``njmax`` (``efcid >= njmax - 3``: a block that would end exactly at ``njmax`` is dropped while ``nefc == njmax``
+raises no flag), so for models with such blocks the latch also counts ``nefc >= njmax`` as an overflow, and the bound's
+``njmax`` keeps one spare row above ``nefc``. The training loop calls ``check_overflow()`` at every log point.
 """
 from __future__ import annotations
 
@@ -39,7 +51,21 @@ BOX_BOX_PRIMITIVE_MAX = 8            # box-box takes the primitive routine only 
 CONVEX_MAX = 1                       # GJK / EPA: one contact per pair when MULTICCD is disabled
 CONVEX_MULTICCD_MAX = 4              # multicontact() returns at most 4 witness pairs (mat43) per pair
 UNBOUNDED_TYPES = (G.mjGEOM_HFIELD, G.mjGEOM_SDF)
-CAPACITY_FLAGS = ("NEFC", "NJMAX_NNZ", "BROADPHASE", "NARROWPHASE", "CCD", "HFIELD", "EPA_HORIZON", "CONTACT_MATCH")
+# OverflowType bits meaning dropped rows / contacts / dofs (NVMAX: "behavior undefined"; TACTILE: dropped sensor pairs);
+# ITERATIONS / LS_ITERATIONS are solver caps, not capacity
+CAPACITY_FLAGS = ("NEFC", "NJMAX_NNZ", "BROADPHASE", "NARROWPHASE", "CCD", "HFIELD", "EPA_HORIZON", "CONTACT_MATCH", "NVMAX", "TACTILE")
+EQ_BLOCK_TYPES = (mujoco.mjtEq.mjEQ_CONNECT, mujoco.mjtEq.mjEQ_WELD)   # equality rows MuJoCo Warp writes as one block
+
+
+def eq_blocks(mjm: mujoco.MjModel) -> int:
+    """Number of connect / weld equalities (blocks MuJoCo Warp drops silently when they would end exactly at njmax)."""
+    return int(np.isin(mjm.eq_type, EQ_BLOCK_TYPES).sum()) if mjm.neq else 0
+
+
+def capacity_mask() -> int:
+    """OR of MuJoCo Warp's OverflowType bits named in CAPACITY_FLAGS (those this MuJoCo Warp defines)."""
+    import mujoco_warp as mjw
+    return int(sum(int(getattr(mjw.OverflowType, f)) for f in CAPACITY_FLAGS if hasattr(mjw.OverflowType, f)))
 
 
 @dataclass(frozen=True)
@@ -50,11 +76,14 @@ class Bounds:
     neq_rows: int
     nfriction: int
     pairs: tuple           # (geom1, geom2, max contacts, rows per contact)
+    eq_blocks: int = 0     # connect / weld equalities
 
     @property
     def njmax(self) -> int:
-        """nefc rounded up to MuJoCo Warp's constraint tile (16); at least 16."""
-        return max(16, ((self.nefc + 15) // 16) * 16)
+        """nefc rounded up to MuJoCo Warp's constraint tile (16); at least 16. With connect / weld blocks one spare row
+        above nefc (a block ending exactly at njmax is dropped without a flag; the latch counts nefc >= njmax there)."""
+        need = self.nefc + (1 if self.eq_blocks else 0)
+        return max(16, ((need + 15) // 16) * 16)
 
     @property
     def nconmax(self) -> int:
@@ -113,7 +142,8 @@ def bounds(mjm: mujoco.MjModel, wm) -> Bounds:
         neq_rows += eq_rows[t]
     nfriction = int((mjm.dof_frictionloss > 0).sum()) + (int((mjm.tendon_frictionloss > 0).sum()) if mjm.ntendon else 0)
     nefc = nlimit + neq_rows + nfriction + sum(k * r for _, _, k, r in pairs)
-    return Bounds(ncon=ncon, nefc=nefc, nlimit=nlimit, neq_rows=neq_rows, nfriction=nfriction, pairs=tuple(pairs))
+    return Bounds(ncon=ncon, nefc=nefc, nlimit=nlimit, neq_rows=neq_rows, nfriction=nfriction, pairs=tuple(pairs),
+                  eq_blocks=eq_blocks(mjm))
 
 
 def capacity_overflows(flags: dict) -> dict:

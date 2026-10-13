@@ -1,0 +1,8 @@
+G1 rough PPO: N=64 obs_dim 310 act_dim 37 rollout 24 x 2 iterations, engine mjwarp, physics dt 0.005 (decimation 4), seed 42, reward_cfg rough, height-scan ray order xy, terrain collision boxes_local, height scan exact, solver_cfg None, contact_cfg recommended, base velocity com, feet-slide velocity com, initial reset True, effort limit on the joint
+it    1 steps      1536 sps    1,505 | ep_ret   -6.05 ep_len   24.0 (n=1) | pg 0.105 vf 0.339 kl 1.4696 lr 1.0e-05
+[anomaly] it 1: KL 1.470 > 10x target: stale data or LR too high
+[anomaly] it 1: joint limit violated by 0.09 rad
+terrain it    1 mean_level 2.6406
+it    2 steps      3072 sps    1,829 | ep_ret   -6.86 ep_len   36.6 (n=50) | pg -0.036 vf 4.044 kl 0.0107 lr 1.0e-05
+[anomaly] it 2: joint limit violated by 0.15 rad
+terrain it    2 mean_level 2.0000

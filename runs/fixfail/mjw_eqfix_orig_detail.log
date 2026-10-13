@@ -1,0 +1,12 @@
+      self.assertEqual(mjd.nefc, nrow, name)
+      for arr in (d.ne, d.nefc, d.efc.type):
+      _assert_eq(d.nefc.numpy()[0], nrow, "nefc")
+      err_msg = f"mismatch: {name}"
+E     AssertionError: 
+E     Not equal to tolerance rtol=0.0005, atol=0.0005
+E     mismatch: efc connect_J
+E     nan location mismatch:
+E      ACTUAL: array([nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan, nan,
+E            nan, nan, nan, nan, nan], dtype=float32)
+E      DESIRED: array([1., 0., 0., 0., 0., 0., 0., 1., 0., 0., 0., 0., 0., 0., 1., 0., 0.,
+E            0.])

@@ -94,9 +94,11 @@ def _record_dome_light(spec, prim, base_dir, scale_units):
     """A DomeLight has no MuJoCo light type; record it as the custom text ``usd_dome`` (JSON) so the tier-2
     renderer can apply it (``Tier2Renderer.set_environment_from_model``; a textureless dome is the ``dome``
     kwarg). Fields follow UsdLux LightAPI (radiance = texture x intensity x 2^exposure x color) and DomeLight
-    (``inputs:texture:file`` resolved to a path, ``inputs:texture:format``); ``yaw`` is the prim's world rotation
-    about +z (Kit/RTX keeps a dome's pole on the stage's +z whatever is authored: PARITY 1.7), ``tilt`` how far
-    the authored rotation moves the pole off +z (ignored, reported)."""
+    (``inputs:texture:file`` resolved to a path, ``inputs:texture:format``, DomeLight_1 ``poleAxis``); ``yaw`` is the
+    prim's world rotation about +z (the renderer adds Kit's azimuth, ``tier2.KIT_DOME_AZIMUTH``), ``tilt`` how far the
+    authored rotation moves the pole off +z. Kit applies a tilting rotation rigidly (measured 2026-09-26, rotateX 90
+    deg: docs/research/isaac_side_session_2026-09-26.md section 2); tier 2 renders only the yaw, so a tilted dome is
+    reported here and rendered upright (open gap)."""
     import json
     la = UsdLux.LightAPI(prim)
     val = lambda a, d: (a.Get() if a and a.Get() is not None else d)
@@ -110,7 +112,7 @@ def _record_dome_light(spec, prim, base_dir, scale_units):
             path = os.path.normpath(os.path.join(base_dir, path))
         rec["file"] = path
         rec["format"] = str(val(prim.GetAttribute("inputs:texture:format"), "automatic"))
-    pa = prim.GetAttribute("inputs:poleAxis")   # DomeLight_1 (USD 24.03+): scene | Y | Z
+    pa = prim.GetAttribute("poleAxis") or prim.GetAttribute("inputs:poleAxis")   # DomeLight_1: uniform token poleAxis
     if pa and pa.Get() is not None:
         rec["pole_axis"] = str(pa.Get())
     _, q, _ = _world_xform(prim, scale_units)

@@ -1,0 +1,35 @@
+[gpu_run] ff_latch_tasks start: device utilisation 0% (02:58:12)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 5 %; per-process GPU time over 1.8 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.8 %
+##### g1_flat 02:58:15
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+g1_flat N=4096 substeps 4 njmax 112
+  latch: median 75,746 env-steps/s (75,841, 75,772, 75,626, 75,746, 75,630)
+  none : median 75,681 env-steps/s (75,829, 75,681, 75,717, 75,625, 75,595)
+RESULT g1_flat: latch cost -0.09 % (run-to-run spread without latch 0.3 %)
+##### g1_rough 03:00:49
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+g1_rough N=4096 substeps 4 njmax 256
+  latch: median 64,280 env-steps/s (64,387, 64,255, 64,280, 64,392, 64,275)
+  none : median 64,331 env-steps/s (64,347, 64,331, 64,248, 64,248, 64,360)
+RESULT g1_rough: latch cost +0.08 % (run-to-run spread without latch 0.2 %)
+##### tron1 03:03:45
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+tron1 N=8192 substeps 1 njmax 64
+  latch: median 245,713 env-steps/s (245,713, 245,006, 245,745, 246,007, 245,398)
+  none : median 246,399 env-steps/s (247,217, 245,094, 245,725, 246,399, 246,696)
+RESULT tron1: latch cost +0.28 % (run-to-run spread without latch 0.9 %)
+##### lift 03:05:27
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+lift N=64 substeps 4 njmax 512
+  latch: median 5,122 env-steps/s (5,288, 5,122, 5,107, 5,096, 5,417)
+  none : median 5,157 env-steps/s (5,255, 5,157, 5,108, 5,024, 5,420)
+RESULT lift: latch cost +0.69 % (run-to-run spread without latch 7.7 %)
+##### done 03:05:53
+[gpu_run] ff_latch_tasks end: device utilisation 0% (03:05:53), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 5 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.6 %
