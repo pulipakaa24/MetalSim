@@ -7,7 +7,8 @@ set -e
 VENV=${1:-.venv-flex}
 MJW=upstream/mujoco_warp-flex
 WARP=upstream/warp-innate-flex
-[ -d "$MJW" ] || (cd upstream/mujoco_warp && git fetch -q fork metalsim-flex && git worktree add "../mujoco_warp-flex" fork/metalsim-flex -b metalsim-flex 2>/dev/null || git worktree add "../mujoco_warp-flex" metalsim-flex)
+MJW_PIN=fc1d5eef8f9045309087bc822f36c1c62a7214a2   # head of the MuJoCo Warp fork's metalsim-flex, pinned
+[ -d "$MJW" ] || (cd upstream/mujoco_warp && git fetch -q fork metalsim-flex && git worktree add "../mujoco_warp-flex" "$MJW_PIN" -b metalsim-flex 2>/dev/null || git worktree add "../mujoco_warp-flex" "$MJW_PIN")
 if [ ! -d "$WARP" ]; then
   (cd upstream/warp-innate && git fetch -q fork metalsim-flex && (git worktree add "../warp-innate-flex" fork/metalsim-flex -b metalsim-flex 2>/dev/null || git worktree add "../warp-innate-flex" metalsim-flex))
   # the native library is unchanged on this branch: reuse the built one (or: cd $WARP && python build_lib.py --no-cuda)

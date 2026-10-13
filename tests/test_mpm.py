@@ -220,3 +220,32 @@ def test_proxy_wrench_harvest_repeatable(tmp_path):
     res = json.loads(path.read_text())
     assert res["ordered"]["distinct_results"] == 1
     assert res["ordered"]["nonzero_bodies"] > 0 and res["max_rel_diff"] < 1e-5
+
+
+def test_coupled_contact_filter_keeps_source_order():
+    """With ``install(rigid_deterministic=True)``, SolverCoupled's per-entry contact filter (an atomic-counter
+    compaction) hands out the filtered slots in source order, every run: the entry solver then sees the same contact
+    list, which Isaac Lab's Franka-Pour needs to repeat bitwise (it differed run to run from the first step)."""
+    sc = pytest.importorskip("newton._src.solvers.coupled.solver_coupled")
+    newton_compat.install(accumulate="float32", loop="cuda", rigid_deterministic=True)
+    n, shapes = 1 << 18, 64
+    rng = np.random.default_rng(0)
+    s0 = rng.integers(0, shapes, n).astype(np.int32)
+    s1 = rng.integers(0, shapes, n).astype(np.int32)
+    flags = np.where(np.arange(shapes) % 3 == 0, 0, int(newton.ShapeFlags.COLLIDE_SHAPES)).astype(np.int32)
+    keep = (flags[s0] != 0) & (flags[s1] != 0)
+    with wp.ScopedDevice(DEV):
+        i32 = lambda a: wp.array(a, dtype=wp.int32)  # noqa: E731
+        v3 = lambda: wp.array(rng.random((n, 3)).astype(np.float32), dtype=wp.vec3)  # noqa: E731
+        f32 = lambda: wp.array(rng.random(n).astype(np.float32), dtype=wp.float32)  # noqa: E731
+        src = [i32(np.ones(1)), i32(np.array([n])), i32(s0), i32(s1), i32(np.arange(n)), v3(), v3(), v3(), v3(),
+               v3(), f32(), f32(), i32(np.arange(n)), i32(flags), int(newton.ShapeFlags.COLLIDE_SHAPES)]
+        for _ in range(3):
+            dst_count = wp.zeros(1, dtype=wp.int32)
+            dst = [dst_count, *(wp.zeros(n, dtype=wp.int32) for _ in range(3)), *(wp.zeros(n, dtype=wp.vec3) for _ in range(5)),
+                   wp.zeros(n, dtype=wp.float32), wp.zeros(n, dtype=wp.float32), wp.zeros(n, dtype=wp.int32),
+                   wp.full(n, -1, dtype=wp.int32)]
+            wp.launch(sc._filter_rigid_contacts_global_shape_ids_kernel, dim=n, inputs=src + dst)
+            count = int(dst_count.numpy()[0])
+            assert count == int(keep.sum())
+            np.testing.assert_array_equal(dst[3].numpy()[:count], np.nonzero(keep)[0])  # point ids: source order

@@ -1,0 +1,36 @@
+[gpu_run] mem_bitwise start: device utilisation 0% (19:45:45)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 5 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.7 %
+franka base_a 64 rc=0 
+franka base_b 64 rc=0 bitwise equal steps 60 of 60 first difference None
+franka tightpool 64 rc=0 bitwise equal steps 60 of 60 first difference None
+franka tight_grid 64 rc=0 bitwise equal steps 60 of 60 first difference None
+franka tight_grid_c256 64 rc=0 bitwise equal steps 60 of 60 first difference None
+franka base_a 2048 rc=0 
+franka base_b 2048 rc=0 bitwise equal steps 30 of 30 first difference None
+franka tightpool 2048 rc=0 bitwise equal steps 30 of 30 first difference None
+franka tight_grid 2048 rc=0 bitwise equal steps 30 of 30 first difference None
+franka tight_grid_c256 2048 rc=0 bitwise equal steps 30 of 30 first difference None
+pour tightpool 1 eager rc=0 "bitwise_equal": true
+pour tight_grid 1 eager rc=0 "bitwise_equal": true
+pour tight_grid_c256 1 eager rc=0 "bitwise_equal": true
+pour tightpool 1 capture rc=0 "bitwise_equal": true
+pour tight_grid 1 capture rc=0 "bitwise_equal": true
+pour tight_grid_c256 1 capture rc=0 "bitwise_equal": true
+pour tightpool 64 eager rc=0 "bitwise_equal": true
+pour tight_grid 64 eager rc=0 "bitwise_equal": true
+pour tight_grid_c256 64 eager rc=0 "bitwise_equal": true
+pour tightpool 64 capture rc=0 "bitwise_equal": true
+pour tight_grid 64 capture rc=0 "bitwise_equal": true
+pour tight_grid_c256 64 capture rc=0 "bitwise_equal": true
+pour tightpool 2048 eager rc=0 "bitwise_equal": true
+pour tight_grid 2048 eager rc=0 "bitwise_equal": true
+pour tight_grid_c256 2048 eager rc=0 "bitwise_equal": true
+pour tightpool 2048 capture rc=0 "bitwise_equal": true
+pour tight_grid 2048 capture rc=0 "bitwise_equal": true
+pour tight_grid_c256 2048 capture rc=0 "bitwise_equal": true
+end
+[gpu_run] mem_bitwise end: device utilisation 6% (20:04:21), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 5 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.5 %
+[gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.6 %

@@ -1,0 +1,1578 @@
+diff --git a/newton/_src/geometry/collision_core.py b/newton/_src/geometry/collision_core.py
+index 277c087f86f88c2db986869adb9e538e814a62a6..8cdb691758fbae809e48062ed66ac7bab3c25627 100644
+--- a/newton/_src/geometry/collision_core.py
++++ b/newton/_src/geometry/collision_core.py
+@@ -1150,6 +1150,46 @@ def mesh_vs_convex_midphase(
+                     triangle_pairs[out_idx] = wp.vec3i(mesh_shape, non_mesh_shape, tri_index)
+ 
+ 
++@wp.func
++def mesh_vs_convex_midphase_thread(
++    mesh_shape: int,
++    non_mesh_shape: int,
++    X_mesh_ws: wp.transform,
++    X_ws: wp.transform,
++    mesh_id: wp.uint64,
++    shape_type: wp.array[int],
++    shape_data: wp.array[wp.vec4],
++    shape_source_ptr: wp.array[wp.uint64],
++    contact_threshold: float,
++    triangle_pairs: wp.array[wp.vec3i],
++    triangle_pairs_count: wp.array[int],
++):
++    """:func:`mesh_vs_convex_midphase` for one thread per pair (no thread-block BVH query).
++
++    Same query box, front-facing filter and triangles, emitted in BVH traversal order.
++    Used where ``wp.tile_mesh_query_aabb`` has no cooperative implementation (Metal:
++    there every thread of the block repeats the whole traversal and one triangle is
++    emitted per block-wide step).
++    """
++    aabb_lower, aabb_upper, center_in_bvh = _compute_mesh_vs_convex_query_aabb(
++        mesh_shape,
++        non_mesh_shape,
++        X_mesh_ws,
++        X_ws,
++        shape_type,
++        shape_data,
++        shape_source_ptr,
++        contact_threshold,
++    )
++    query = wp.mesh_query_aabb(mesh_id, aabb_lower, aabb_upper)
++    tri_index = wp.int32(0)
++    while wp.mesh_query_aabb_next(query, tri_index):
++        if tri_index >= 0 and _mesh_triangle_is_front_facing_local(mesh_id, center_in_bvh, tri_index):
++            out_idx = wp.atomic_add(triangle_pairs_count, 0, 1)
++            if out_idx < triangle_pairs.shape[0]:
++                triangle_pairs[out_idx] = wp.vec3i(mesh_shape, non_mesh_shape, tri_index)
++
++
+ @wp.func
+ def find_pair_from_cumulative_index(
+     global_idx: int,
+diff --git a/newton/_src/geometry/contact_match.py b/newton/_src/geometry/contact_match.py
+index 8457a767a07e472c99c2730ddfd48be59dc1dab7..e37a6a6dfbfbd1b95df7abdae3dfd7462ab8035f 100644
+--- a/newton/_src/geometry/contact_match.py
++++ b/newton/_src/geometry/contact_match.py
+@@ -37,9 +37,15 @@ One-to-one match via packed atomic_min
+ A pair-range scan can have multiple new contacts pick the same prev
+ contact as their closest.  To keep the mapping injective without
+ sorting or CAS retries, the matcher uses a single ``wp.atomic_min`` per
+-new contact on a per-prev ``int64`` claim word:
++new contact on a per-prev ``uint64`` claim word:
+ 
+-    claim = (float_flip(dist_sq) << 32) | (sort_key & 0xFFFFFFFF)
++    claim = ((float_flip(dist_sq) ^ 0x80000000) << 32) | (sort_key & 0xFFFFFFFF)
++
++(an unsigned word, so the minimum is a hardware atomic on Metal too, where
++signed 64-bit atomic min does not exist; for the non-negative ``dist_sq``
++fed in, ``float_flip`` sets bit 31, which the xor clears, so the words
++order exactly as the earlier signed ``(float_flip(dist_sq) << 32) | ...``
++claims did and the low 32 bits are unchanged)
+ 
+ ``float_flip`` reinterprets the non-negative ``dist_sq`` as a
+ sortable ``uint32``, so the high 32 bits order claims by ascending
+@@ -60,7 +66,7 @@ After the match kernel runs, a small finalize kernel reads
+ :data:`MATCH_BROKEN`.  Losers are *not* re-matched against a
+ second-closest prev (kept for simplicity and speed).
+ 
+-Cost: one ``int64[capacity]`` buffer, one ``wp.atomic_min`` per new
++Cost: one ``uint64[capacity]`` buffer, one ``wp.atomic_min`` per new
+ contact, and one short finalize kernel launch.  No ``atomic_cas``.
+ 
+ Memory efficiency
+@@ -123,10 +129,10 @@ MATCH_BROKEN = wp.constant(wp.int32(-2))
+ # ------------------------------------------------------------------
+ 
+ 
+-# Sentinel value for unclaimed slots in ``_prev_claim``.  Larger than
+-# any packed (flipped_dist << 32 | key_low32) any kernel will ever
++# Sentinel value for unclaimed slots in ``_prev_claim``.  Not smaller
++# than any packed claim (see :func:`_pack_claim`) any kernel will ever
+ # produce, so the first ``atomic_min`` always wins.
+-_CLAIM_SENTINEL = wp.constant(wp.int64(0x7FFFFFFFFFFFFFFF))
++_CLAIM_SENTINEL = wp.constant(wp.uint64(0xFFFFFFFFFFFFFFFF))
+ 
+ 
+ @wp.kernel(enable_backward=False)
+@@ -178,10 +184,13 @@ def _float_flip(f: float) -> wp.uint32:
+ 
+ 
+ @wp.func
+-def _pack_claim(dist_sq: float, key_low32: wp.int64) -> wp.int64:
+-    """Pack ``(dist_sq, sort_key_low32)`` into a single int64 for ``atomic_min``.
++def _pack_claim(dist_sq: float, key_low32: wp.int64) -> wp.uint64:
++    """Pack ``(dist_sq, sort_key_low32)`` into a single uint64 for ``atomic_min``.
+ 
+-    High 32 bits: ``float_flip(dist_sq)`` — ascending by distance.
++    High 32 bits: ``float_flip(dist_sq) ^ 0x80000000`` — ascending by distance
++        (``dist_sq`` is non-negative, so ``float_flip`` sets bit 31; clearing it
++        keeps the order and makes the unsigned word order like the signed
++        claims used before, so the same claim wins).
+     Low 32 bits:  the low 32 bits of the contact's sort key — deterministic
+         tie-break (smallest wins).  Using the sort key (rather than the
+         unsorted thread id) keeps the resolution invariant under
+@@ -211,8 +220,8 @@ def _pack_claim(dist_sq: float, key_low32: wp.int64) -> wp.int64:
+     other words, this scheme is no worse than what the upstream sort
+     already provides.
+     """
+-    flipped = wp.int64(_float_flip(dist_sq))
+-    return (flipped << wp.int64(32)) | (key_low32 & wp.int64(0xFFFFFFFF))
++    flipped = wp.uint64(_float_flip(dist_sq) ^ wp.uint32(0x80000000))
++    return (flipped << wp.uint64(32)) | (wp.uint64(key_low32) & wp.uint64(0xFFFFFFFF))
+ 
+ 
+ # ------------------------------------------------------------------
+@@ -253,7 +262,7 @@ class _MatchData:
+     # key (deterministic per contact, invariant under non-deterministic
+     # narrow-phase slot assignment -- see ``_pack_claim``).
+     # Initialised to _CLAIM_SENTINEL each frame; race with atomic_min.
+-    prev_claim: wp.array[wp.int64]
++    prev_claim: wp.array[wp.uint64]
+ 
+     # Per-new candidate prev index (final value resolved in pass 2).
+     match_index: wp.array[wp.int32]
+@@ -360,7 +369,7 @@ def _match_contacts_kernel(data: _MatchData):
+ def _resolve_claims_kernel(
+     match_index: wp.array[wp.int32],
+     sort_keys: wp.array[wp.int64],
+-    prev_claim: wp.array[wp.int64],
++    prev_claim: wp.array[wp.uint64],
+     prev_was_matched: wp.array[wp.int32],
+     new_count: wp.array[wp.int32],
+     has_report: int,
+@@ -381,7 +390,7 @@ def _resolve_claims_kernel(
+     if cand < wp.int32(0):
+         return  # already MATCH_NOT_FOUND or MATCH_BROKEN
+ 
+-    winner_key_low = prev_claim[cand] & wp.int64(0xFFFFFFFF)
++    winner_key_low = wp.int64(prev_claim[cand] & wp.uint64(0xFFFFFFFF))
+     my_key_low = sort_keys[tid] & wp.int64(0xFFFFFFFF)
+     if winner_key_low == my_key_low:
+         if has_report != 0:
+@@ -433,7 +442,7 @@ class _SaveStateData:
+     # ``sort_full`` and the next ``save_sorted_state``) is not reading the
+     # sorter's ``scratch_normal`` after the sort has clobbered it.
+     dst_normal_sticky: wp.array[wp.vec3]
+-    dst_claim: wp.array[wp.int64]
++    dst_claim: wp.array[wp.uint64]
+     dst_prev_was_matched: wp.array[wp.int32]
+     dst_count: wp.array[wp.int32]
+ 
+@@ -698,7 +707,7 @@ class ContactMatcher:
+             # mapping injective (see module docstring). The save-state pass resets
+             # each active slot for the next frame; initialize the allocation for
+             # the first frame before any state has been saved.
+-            self._prev_claim = wp.full(capacity, _CLAIM_SENTINEL, dtype=wp.int64)
++            self._prev_claim = wp.full(capacity, _CLAIM_SENTINEL, dtype=wp.uint64)
+ 
+             # Contact report (optional).
+             self._has_report = contact_report
+diff --git a/newton/_src/geometry/contact_reduction_global.py b/newton/_src/geometry/contact_reduction_global.py
+index b5a34e0450cc3b7c4615a0457d1da28495a799c8..d4d23b35eeed91b0319dfaf235cf47eb175e81b0 100644
+--- a/newton/_src/geometry/contact_reduction_global.py
++++ b/newton/_src/geometry/contact_reduction_global.py
+@@ -59,6 +59,8 @@ import warp as wp
+ from newton._src.geometry.hashtable import (
+     HASHTABLE_EMPTY_KEY,
+     HashTable,
++    _hashtable_load_key,
++    _hashtable_use_claims,
+     hashtable_find,
+     hashtable_find_or_insert,
+ )
+@@ -252,6 +254,25 @@ def reduction_try_update_slot(
+     return wp.atomic_max(values, value_idx, value)
+ 
+ 
++# Metal has no 64-bit compare-and-swap (Apple GPUs offer only 64-bit atomic min/max, without a return value; the
++# MetalSim Warp fork refuses a 64-bit ``wp.atomic_cas`` there at launch). On Metal the provisional claims below are
++# therefore finalized with a 64-bit atomic max and a read-back, and never rolled back, so every write to a slot is a
++# max: a displaced value never returns, and a thread owns a slot exactly when the slot holds its final value.
++# CPU and CUDA keep the compare-and-swap (in a native helper that is not compiled for Metal).
++@wp.func_native("""
++#if defined(__METAL_VERSION__)
++// never reached on Metal (the callers take the max / read-back protocol there)
++uint64_t other = compare + 1;
++return other == value ? other + 1 : other;
++#else
++return wp::atomic_cas(values, idx, compare, value);
++#endif
++""")
++def _reduction_cas_slot(values: wp.array[wp.uint64], idx: int, compare: wp.uint64, value: wp.uint64) -> wp.uint64:
++    """64-bit compare-and-swap of a reduction slot on CUDA and CPU (Metal has none)."""
++    ...
++
++
+ @wp.func
+ def reduction_rollback_slot(
+     entry_idx: int,
+@@ -261,9 +282,15 @@ def reduction_rollback_slot(
+     values: wp.array[wp.uint64],
+     capacity: int,
+ ):
+-    """Restore a displaced value without overwriting a newer winner."""
++    """Restore a displaced value without overwriting a newer winner.
++
++    On Metal the provisional value (contact id 0, which exports skip) stays instead: slots only ever grow there, see
++    ``_reduction_cas_slot``. A rollback only runs after the contact buffer is exhausted.
++    """
++    if _hashtable_use_claims():
++        return
+     value_idx = slot_id * capacity + entry_idx
+-    wp.atomic_cas(values, value_idx, provisional_value, previous_value)
++    _reduction_cas_slot(values, value_idx, provisional_value, previous_value)
+ 
+ 
+ @wp.func
+@@ -275,9 +302,18 @@ def reduction_finalize_slot(
+     values: wp.array[wp.uint64],
+     capacity: int,
+ ) -> bool:
+-    """Atomically transfer a provisional slot claim to its materialized contact."""
++    """Atomically transfer a provisional slot claim to its materialized contact.
++
++    On Metal: ``final_value`` (``provisional_value`` with the contact id in its low bits) is maxed into the slot and the
++    claim holds if the slot then reads ``final_value``. That equals the compare-and-swap's outcome except when the slot
++    holds a value strictly between the two, i.e. a contact with the same score and fingerprint and a smaller id: Metal
++    then keeps the larger id, as the reducer's own max rule would.
++    """
+     value_idx = slot_id * capacity + entry_idx
+-    return wp.atomic_cas(values, value_idx, provisional_value, final_value) == provisional_value
++    if _hashtable_use_claims():
++        wp.atomic_max(values, value_idx, final_value)
++        return _hashtable_load_key(values, value_idx) == final_value
++    return _reduction_cas_slot(values, value_idx, provisional_value, final_value) == provisional_value
+ 
+ 
+ @wp.func
+diff --git a/newton/_src/geometry/contact_sort.py b/newton/_src/geometry/contact_sort.py
+index ad086d45ac2de32e12d6cfde560a96169c22b63c..6f7a1ebf2aefc790553baec739732ee2b3ebfcbc 100644
+--- a/newton/_src/geometry/contact_sort.py
++++ b/newton/_src/geometry/contact_sort.py
+@@ -14,6 +14,8 @@ are filled with ``0x7FFFFFFFFFFFFFFF`` so they sort to the end.
+ 
+ from __future__ import annotations
+ 
++import inspect
++
+ import warp as wp
+ 
+ from ..core.types import Devicelike
+@@ -22,6 +24,32 @@ from ..core.types import Devicelike
+ # keys as signed int64, so ``0x7FFF…`` (max positive int64) sorts last.
+ SORT_KEY_SENTINEL = wp.constant(wp.int64(0x7FFFFFFFFFFFFFFF))
+ 
++# Warp builds whose wp.launch takes a device-side launch bound (``dim_limit``; the MetalSim fork) can stop the sort's
++# kernels at the active contact count on Metal; elsewhere they run over the full capacity, as before.
++_LAUNCH_HAS_DIM_LIMIT = "dim_limit" in inspect.signature(wp.launch).parameters
++
++
++def _metal_count_bound(contact_count: wp.array) -> wp.array | None:
++    """``contact_count`` as a device-side bound for the sort's launches, or ``None`` (full-capacity launches).
++
++    Only on Metal builds of Warp with bounded launches and the GPU radix sort's internal ``count_limit``
++    (``warp._src.metal_primitives``): there the active prefix is sorted and gathered exactly as by the
++    full-capacity sort, whose sentinel keys keep the unused slots after it in their original order.
++    """
++    if not _LAUNCH_HAS_DIM_LIMIT or not getattr(contact_count.device, "is_metal", False):
++        return None
++    if contact_count.dtype != wp.int32 or contact_count.size != 1:
++        return None
++    if not getattr(wp.config, "metal_gpu_utilities", False) or not getattr(wp.config, "metal_bounded_launch", False):
++        return None
++    try:
++        from warp._src import metal_primitives  # noqa: PLC0415
++    except ImportError:
++        return None
++    if "count_limit" not in inspect.signature(metal_primitives.radix_sort_pairs).parameters:
++        return None
++    return contact_count
++
+ # -----------------------------------------------------------------------
+ # Structs + fused backup/gather kernels for the two contact layouts.
+ #
+@@ -201,7 +229,10 @@ class ContactSorter:
+     The radix sort always runs over the full *capacity* buffer.  Slots beyond
+     the active ``contact_count`` are filled with a sentinel key
+     (``0x7FFFFFFFFFFFFFFF``) so they sort to the end and the gather kernels
+-    skip them via the ``contact_count`` guard.
++    skip them via the ``contact_count`` guard. On Metal builds of Warp with
++    device-side launch bounds the preparation, sort and gather stop at
++    ``contact_count`` instead (same sorted prefix; slots past the count are
++    left as they were).
+ 
+     ``key_bit_count`` limits sorting to the populated low key bits, reducing
+     radix passes without changing the full-capacity graph-capture behavior.
+@@ -310,14 +341,19 @@ class ContactSorter:
+         data.has_tangent = 1 if has_tangent else 0
+         data.has_match_index = 1 if has_match else 0
+ 
++        bound = _metal_count_bound(contact_count)
++        bounded = {} if bound is None else {"dim_limit": bound}
+         wp.launch(
+             _backup_simple_kernel,
+             dim=n,
+             inputs=[data, contact_count, sort_keys, self._sort_keys_copy, self._sort_indices],
+             device=device,
++            **bounded,
++        )
++        self._radix_sort(n, bound)
++        wp.launch(
++            _gather_simple_kernel, dim=n, inputs=[data, self._sort_indices, contact_count], device=device, **bounded
+         )
+-        wp.utils.radix_sort_pairs(self._sort_keys_copy, self._sort_indices, n, end_bit=self._key_bit_count)
+-        wp.launch(_gather_simple_kernel, dim=n, inputs=[data, self._sort_indices, contact_count], device=device)
+ 
+     def sort_full(
+         self,
+@@ -406,14 +442,33 @@ class ContactSorter:
+         data.has_shape_props = 1 if has_props else 0
+         data.has_match_index = 1 if has_match else 0
+ 
++        bound = _metal_count_bound(contact_count)
++        bounded = {} if bound is None else {"dim_limit": bound}
+         wp.launch(
+             _backup_full_kernel,
+             dim=n,
+             inputs=[data, contact_count, sort_keys, self._sort_keys_copy, self._sort_indices],
+             device=device,
++            **bounded,
++        )
++        self._radix_sort(n, bound)
++        wp.launch(
++            _gather_full_kernel, dim=n, inputs=[data, self._sort_indices, contact_count], device=device, **bounded
++        )
++
++    def _radix_sort(self, n: int, bound: wp.array | None) -> None:
++        """Radix-sort the prepared keys over the full capacity, or (Metal, ``bound``) over the active prefix only."""
++        if bound is None:
++            wp.utils.radix_sort_pairs(self._sort_keys_copy, self._sort_indices, n, end_bit=self._key_bit_count)
++            return
++        # Metal: only the active prefix is prepared and sorted. Its sorted pairs are those of the full sort, where
++        # every unused slot holds the sentinel key (all ones in the sorted bits, so not less than any active key)
++        # and keeps its place after them; nothing reads the slots past the count.
++        from warp._src import metal_primitives  # noqa: PLC0415
++
++        metal_primitives.radix_sort_pairs(
++            self._sort_keys_copy, self._sort_indices, n, 0, self._key_bit_count, 4, count_limit=bound
+         )
+-        wp.utils.radix_sort_pairs(self._sort_keys_copy, self._sort_indices, n, end_bit=self._key_bit_count)
+-        wp.launch(_gather_full_kernel, dim=n, inputs=[data, self._sort_indices, contact_count], device=device)
+ 
+     @property
+     def sorted_keys_view(self) -> wp.array:
+diff --git a/newton/_src/geometry/hashtable.py b/newton/_src/geometry/hashtable.py
+index 6934a07ab1c7862147b913093819be90b2b71274..568562748531ffadaefe3d93a2002dfa393db90a 100644
+--- a/newton/_src/geometry/hashtable.py
++++ b/newton/_src/geometry/hashtable.py
+@@ -103,6 +103,136 @@ def hashtable_find(
+     return -1
+ 
+ 
++# Metal has no 64-bit compare-and-swap (Apple GPUs offer only 64-bit atomic min/max, without a return
++# value). Warp used to lower a 64-bit ``wp.atomic_cas`` there to a plain read-modify-write (concurrent
++# inserts then claimed the same slot, overwrote each other's keys and appended the slot to the active
++# list more than once); the MetalSim Warp fork now refuses it (the kernel raises at launch). On Metal the table therefore claims a slot with a 32-bit compare-and-swap on the key's
++# high word (EMPTY -> _HASHTABLE_CLAIMED_HI) and then publishes the whole key with one 64-bit atomic min
++# (the claimed word compares greater than every valid key). Readers inside the insert kernel see an
++# empty, a claimed (in flight) or a settled slot; a claimed slot is re-read on the next pass of a loop
++# that every lane of a SIMD-group runs, so the claimant (possibly a lane of the same SIMD-group)
++# finishes publishing first. Valid keys must keep bit 63 clear (every Newton key does: contact keys use
++# 63 bits, Morton voxel keys 63 bits); on Metal a key with bit 63 set is not inserted (the insert returns
++# -1, as for a full table): it would need the 64-bit compare-and-swap Metal does not have, which Warp
++# refuses there rather than lowering it to a racy plain update.
++_HASHTABLE_CLAIMED_HI = wp.constant(wp.uint32(0x80000000))
++_HASHTABLE_EMPTY_HI = wp.constant(wp.uint32(0xFFFFFFFF))
++# Hard bound on the claim loop's passes beyond one per probed slot. Apple GPUs give no forward-progress guarantee
++# between lanes or threadgroups, so a thread must never wait without bound for a claimant to publish: one that runs
++# out of passes returns -1 (as for a full table; reducers count it in ``ht_insert_failures``) instead of hanging.
++_HASHTABLE_MAX_WAIT_PASSES = wp.constant(1 << 16)
++
++
++@wp.func_native("""
++#if defined(__METAL_VERSION__)
++return true;
++#else
++return false;
++#endif
++""")
++def _hashtable_use_claims() -> bool:
++    """True when compiled for Metal (see _HASHTABLE_CLAIMED_HI)."""
++    ...
++
++
++@wp.func_native("""
++#if defined(__METAL_VERSION__)
++device metal::atomic_uint* word = (device metal::atomic_uint*)(keys.data + idx) + 1;
++return metal::atomic_load_explicit(word, metal::memory_order_relaxed);
++#else
++return static_cast<uint32_t>(keys.data[idx] >> 32);
++#endif
++""")
++def _hashtable_load_hi(keys: wp.array[wp.uint64], idx: int) -> wp.uint32:
++    """Atomically read the high word of a key slot."""
++    ...
++
++
++@wp.func_native("""
++#if defined(__METAL_VERSION__)
++device metal::atomic_uint* word = (device metal::atomic_uint*)(keys.data + idx);
++const uint64_t lo = metal::atomic_load_explicit(word, metal::memory_order_relaxed);
++const uint64_t hi = metal::atomic_load_explicit(word + 1, metal::memory_order_relaxed);
++return (hi << 32) | lo;
++#else
++return keys.data[idx];
++#endif
++""")
++def _hashtable_load_key(keys: wp.array[wp.uint64], idx: int) -> wp.uint64:
++    """Atomically read a settled key slot (both words are final once the high word is)."""
++    ...
++
++
++@wp.func_native("""
++#if defined(__METAL_VERSION__)
++device metal::atomic_uint* word = (device metal::atomic_uint*)(keys.data + idx) + 1;
++uint expected = 0xFFFFFFFFu;
++return metal::atomic_compare_exchange_weak_explicit(
++    word, &expected, 0x80000000u, metal::memory_order_relaxed, metal::memory_order_relaxed);
++#else
++return false;
++#endif
++""")
++def _hashtable_claim(keys: wp.array[wp.uint64], idx: int) -> bool:
++    """Claim an empty slot: high word EMPTY -> _HASHTABLE_CLAIMED_HI (may fail spuriously; callers retry)."""
++    ...
++
++
++@wp.func_native("""
++#if defined(__METAL_VERSION__)
++// never reached on Metal (hashtable_find_or_insert takes the claimed path there); neither compare nor value, so a
++// caller would keep probing
++uint64_t other = compare + 1;
++return other == value ? other + 1 : other;
++#else
++return wp::atomic_cas(keys, idx, compare, value);
++#endif
++""")
++def _hashtable_cas_key(keys: wp.array[wp.uint64], idx: int, compare: wp.uint64, value: wp.uint64) -> wp.uint64:
++    """64-bit compare-and-swap of a key slot on CUDA and CPU (Metal has none, see _HASHTABLE_CLAIMED_HI)."""
++    ...
++
++
++@wp.func
++def _hashtable_find_or_insert_claimed(
++    key: wp.uint64,
++    keys: wp.array[wp.uint64],
++    active_slots: wp.array[wp.int32],
++) -> int:
++    """``hashtable_find_or_insert`` for Metal (see _HASHTABLE_CLAIMED_HI)."""
++    capacity = keys.shape[0]
++    capacity_mask = capacity - 1
++    idx = _hashtable_hash(key, capacity_mask)
++    probes = int(0)
++    passes = int(0)
++    result = int(-1)
++    pending = bool(True)
++    while pending and passes < capacity + _HASHTABLE_MAX_WAIT_PASSES:
++        passes += 1
++        hi = _hashtable_load_hi(keys, idx)
++        if hi == _HASHTABLE_EMPTY_HI:
++            if _hashtable_claim(keys, idx):
++                # the slot reads (CLAIMED, EMPTY_LO) > key, so the min writes the whole key in one atomic
++                wp.atomic_min(keys, idx, key)
++                active_idx = wp.atomic_add(active_slots, capacity, 1)
++                if active_idx < capacity:
++                    active_slots[active_idx] = idx
++                result = idx
++                pending = False
++            # lost the claim (or failed spuriously): look at the same slot again
++        elif hi != _HASHTABLE_CLAIMED_HI:
++            if _hashtable_load_key(keys, idx) == key:
++                result = idx
++                pending = False
++            else:
++                idx = (idx + 1) & capacity_mask
++                probes += 1
++                if probes >= capacity:
++                    pending = False
++        # else: another thread is publishing its key in this slot; look again
++    return result
++
++
+ @wp.func
+ def hashtable_find_or_insert(
+     key: wp.uint64,
+@@ -123,6 +253,11 @@ def hashtable_find_or_insert(
+     Returns:
+         Entry index (>= 0) if successful, -1 if the table is full
+     """
++    if _hashtable_use_claims():
++        if (key >> wp.uint64(63)) == wp.uint64(0):
++            return _hashtable_find_or_insert_claimed(key, keys, active_slots)
++        return -1  # Metal: bit 63 set, no atomic insert without a 64-bit compare-and-swap
++
+     capacity = keys.shape[0]
+     capacity_mask = capacity - 1
+     idx = _hashtable_hash(key, capacity_mask)
+@@ -138,7 +273,7 @@ def hashtable_find_or_insert(
+ 
+         if stored_key == HASHTABLE_EMPTY_KEY:
+             # Try to claim this slot
+-            old_key = wp.atomic_cas(keys, idx, HASHTABLE_EMPTY_KEY, key)
++            old_key = _hashtable_cas_key(keys, idx, HASHTABLE_EMPTY_KEY, key)
+ 
+             if old_key == HASHTABLE_EMPTY_KEY:
+                 # We claimed an empty slot - this is a NEW entry
+diff --git a/newton/_src/geometry/narrow_phase.py b/newton/_src/geometry/narrow_phase.py
+index 947ab279c06c660386cf6e44ca485c66e96e4487..e276693093dff54725afc5be6011d690bd56acfc 100644
+--- a/newton/_src/geometry/narrow_phase.py
++++ b/newton/_src/geometry/narrow_phase.py
+@@ -20,6 +20,7 @@ from ..geometry.collision_core import (
+     create_find_contacts,
+     get_triangle_shape_from_mesh,
+     mesh_vs_convex_midphase,
++    mesh_vs_convex_midphase_thread,
+     post_process_axial_on_discrete_contact,
+     post_process_minkowski_only,
+ )
+@@ -1505,122 +1506,152 @@ def create_narrow_phase_kernels_gjk_mpr_split(
+     return narrow_phase_mpr_kernel, narrow_phase_gjk_kernel, narrow_phase_manifold_kernel
+ 
+ 
+-@wp.kernel(enable_backward=False)
+-def narrow_phase_find_mesh_triangle_overlaps_kernel(
+-    shape_types: wp.array[int],
+-    shape_transform: wp.array[wp.transform],
+-    shape_source: wp.array[wp.uint64],
+-    shape_gap: wp.array[float],  # Per-shape contact gaps
+-    shape_data: wp.array[wp.vec4],  # Shape data (scale xyz, margin w)
+-    shape_collision_radius: wp.array[float],
+-    shape_collision_aabb_lower: wp.array[wp.vec3],  # Local-space AABB lower bounds
+-    shape_collision_aabb_upper: wp.array[wp.vec3],  # Local-space AABB upper bounds
+-    shape_heightfield_index: wp.array[wp.int32],
+-    heightfield_data: wp.array[HeightfieldData],
+-    heightfield_elevations: wp.array[wp.float32],
+-    shape_pairs_mesh: wp.array[wp.vec2i],
+-    shape_pairs_mesh_count: wp.array[int],
+-    total_num_threads: int,
+-    # outputs
+-    triangle_pairs: wp.array[wp.vec3i],  # (shape_a, shape_b, triangle_idx)
+-    triangle_pairs_count: wp.array[int],
+-):
+-    """Find triangles that overlap with a convex shape for mesh and heightfield pairs.
+-
+-    For mesh pairs, uses a tiled BVH query. For heightfield pairs, projects the
+-    convex shape's bounding sphere onto the heightfield grid and emits triangle
+-    pairs for each overlapping cell.
++def create_find_mesh_triangle_overlaps_kernel(tiled: bool):
++    """Mesh/heightfield-vs-convex midphase kernel.
+ 
+-    Outputs triples of ``(mesh_or_hfield_shape, other_shape, triangle_idx)``.
++    Args:
++        tiled: Query each mesh BVH cooperatively with the launch's second dimension (one thread block per pair,
++            ``wp.tile_mesh_query_aabb``). Otherwise one thread per pair runs ``wp.mesh_query_aabb`` (launch the
++            second dimension as 1). Both emit the same triangle pairs (in a different order).
+     """
+-    tid, j = wp.tid()
+ 
+-    num_mesh_pairs = shape_pairs_mesh_count[0]
++    @wp.kernel(enable_backward=False)
++    def narrow_phase_find_mesh_triangle_overlaps_kernel(
++        shape_types: wp.array[int],
++        shape_transform: wp.array[wp.transform],
++        shape_source: wp.array[wp.uint64],
++        shape_gap: wp.array[float],  # Per-shape contact gaps
++        shape_data: wp.array[wp.vec4],  # Shape data (scale xyz, margin w)
++        shape_collision_radius: wp.array[float],
++        shape_collision_aabb_lower: wp.array[wp.vec3],  # Local-space AABB lower bounds
++        shape_collision_aabb_upper: wp.array[wp.vec3],  # Local-space AABB upper bounds
++        shape_heightfield_index: wp.array[wp.int32],
++        heightfield_data: wp.array[HeightfieldData],
++        heightfield_elevations: wp.array[wp.float32],
++        shape_pairs_mesh: wp.array[wp.vec2i],
++        shape_pairs_mesh_count: wp.array[int],
++        total_num_threads: int,
++        # outputs
++        triangle_pairs: wp.array[wp.vec3i],  # (shape_a, shape_b, triangle_idx)
++        triangle_pairs_count: wp.array[int],
++    ):
++        """Find triangles that overlap with a convex shape for mesh and heightfield pairs.
+ 
+-    # Strided loop over mesh pairs
+-    for i in range(tid, num_mesh_pairs, total_num_threads):
+-        pair = shape_pairs_mesh[i]
+-        shape_a = pair[0]
+-        shape_b = pair[1]
++        For mesh pairs, uses a tiled BVH query. For heightfield pairs, projects the
++        convex shape's bounding sphere onto the heightfield grid and emits triangle
++        pairs for each overlapping cell.
+ 
+-        type_a = shape_types[shape_a]
+-        type_b = shape_types[shape_b]
++        Outputs triples of ``(mesh_or_hfield_shape, other_shape, triangle_idx)``.
++        """
++        tid, j = wp.tid()
++
++        num_mesh_pairs = shape_pairs_mesh_count[0]
+ 
+-        # -----------------------------------------------------------------
+-        # Heightfield-vs-convex midphase (grid cell lookup)
+-        # Pairs are normalized so the heightfield is always shape_a.
+-        # -----------------------------------------------------------------
+-        if type_a == GeoType.HFIELD:
+-            # Only run on j==0; the j dimension is for tiled BVH queries (mesh only).
+-            if j != 0:
++        # Strided loop over mesh pairs
++        for i in range(tid, num_mesh_pairs, total_num_threads):
++            pair = shape_pairs_mesh[i]
++            shape_a = pair[0]
++            shape_b = pair[1]
++
++            type_a = shape_types[shape_a]
++            type_b = shape_types[shape_b]
++
++            # -----------------------------------------------------------------
++            # Heightfield-vs-convex midphase (grid cell lookup)
++            # Pairs are normalized so the heightfield is always shape_a.
++            # -----------------------------------------------------------------
++            if type_a == GeoType.HFIELD:
++                # Only run on j==0; the j dimension is for tiled BVH queries (mesh only).
++                if j != 0:
++                    continue
++                hfd = heightfield_data[shape_heightfield_index[shape_a]]
++                heightfield_vs_convex_midphase(
++                    shape_a,
++                    shape_b,
++                    hfd,
++                    heightfield_elevations,
++                    shape_transform,
++                    shape_collision_aabb_lower,
++                    shape_collision_aabb_upper,
++                    shape_data,
++                    shape_gap,
++                    triangle_pairs,
++                    triangle_pairs_count,
++                )
+                 continue
+-            hfd = heightfield_data[shape_heightfield_index[shape_a]]
+-            heightfield_vs_convex_midphase(
+-                shape_a,
+-                shape_b,
+-                hfd,
+-                heightfield_elevations,
+-                shape_transform,
+-                shape_collision_aabb_lower,
+-                shape_collision_aabb_upper,
+-                shape_data,
+-                shape_gap,
+-                triangle_pairs,
+-                triangle_pairs_count,
+-            )
+-            continue
+-
+-        # -----------------------------------------------------------------
+-        # Mesh-vs-convex midphase (BVH query)
+-        # -----------------------------------------------------------------
+-        mesh_shape = -1
+-        non_mesh_shape = -1
+-
+-        if type_a == GeoType.MESH and type_b != GeoType.MESH:
+-            mesh_shape = shape_a
+-            non_mesh_shape = shape_b
+-        elif type_b == GeoType.MESH and type_a != GeoType.MESH:
+-            mesh_shape = shape_b
+-            non_mesh_shape = shape_a
+-        else:
+-            # Mesh-mesh collision not supported in this path
+-            continue
+ 
+-        # Get mesh BVH ID and mesh transform
+-        mesh_id = shape_source[mesh_shape]
+-        if mesh_id == wp.uint64(0):
+-            continue
+-
+-        # Get mesh world transform
+-        X_mesh_ws = shape_transform[mesh_shape]
+-
+-        # Get non-mesh shape world transform
+-        X_ws = shape_transform[non_mesh_shape]
+-
+-        # Use the same margin+gap shell for triangle candidates that the
+-        # narrow phase uses when accepting contacts.
+-        gap_non_mesh = shape_gap[non_mesh_shape]
+-        gap_mesh = shape_gap[mesh_shape]
+-        gap_sum = gap_non_mesh + gap_mesh
+-        margin_non_mesh = shape_data[non_mesh_shape][3]
+-        margin_mesh = shape_data[mesh_shape][3]
+-        contact_threshold = gap_sum + margin_non_mesh + margin_mesh
+-
+-        # Call mesh_vs_convex_midphase with the shape_data and pair contact threshold.
+-        mesh_vs_convex_midphase(
+-            j,
+-            mesh_shape,
+-            non_mesh_shape,
+-            X_mesh_ws,
+-            X_ws,
+-            mesh_id,
+-            shape_types,
+-            shape_data,
+-            shape_source,
+-            contact_threshold,
+-            triangle_pairs,
+-            triangle_pairs_count,
+-        )
++            # -----------------------------------------------------------------
++            # Mesh-vs-convex midphase (BVH query)
++            # -----------------------------------------------------------------
++            mesh_shape = -1
++            non_mesh_shape = -1
++
++            if type_a == GeoType.MESH and type_b != GeoType.MESH:
++                mesh_shape = shape_a
++                non_mesh_shape = shape_b
++            elif type_b == GeoType.MESH and type_a != GeoType.MESH:
++                mesh_shape = shape_b
++                non_mesh_shape = shape_a
++            else:
++                # Mesh-mesh collision not supported in this path
++                continue
++
++            # Get mesh BVH ID and mesh transform
++            mesh_id = shape_source[mesh_shape]
++            if mesh_id == wp.uint64(0):
++                continue
++
++            # Get mesh world transform
++            X_mesh_ws = shape_transform[mesh_shape]
++
++            # Get non-mesh shape world transform
++            X_ws = shape_transform[non_mesh_shape]
++
++            # Use the same margin+gap shell for triangle candidates that the
++            # narrow phase uses when accepting contacts.
++            gap_non_mesh = shape_gap[non_mesh_shape]
++            gap_mesh = shape_gap[mesh_shape]
++            gap_sum = gap_non_mesh + gap_mesh
++            margin_non_mesh = shape_data[non_mesh_shape][3]
++            margin_mesh = shape_data[mesh_shape][3]
++            contact_threshold = gap_sum + margin_non_mesh + margin_mesh
++
++            # Call mesh_vs_convex_midphase with the shape_data and pair contact threshold.
++            if wp.static(tiled):
++                mesh_vs_convex_midphase(
++                    j,
++                    mesh_shape,
++                    non_mesh_shape,
++                    X_mesh_ws,
++                    X_ws,
++                    mesh_id,
++                    shape_types,
++                    shape_data,
++                    shape_source,
++                    contact_threshold,
++                    triangle_pairs,
++                    triangle_pairs_count,
++                )
++            else:
++                mesh_vs_convex_midphase_thread(
++                    mesh_shape,
++                    non_mesh_shape,
++                    X_mesh_ws,
++                    X_ws,
++                    mesh_id,
++                    shape_types,
++                    shape_data,
++                    shape_source,
++                    contact_threshold,
++                    triangle_pairs,
++                    triangle_pairs_count,
++                )
++
++    return narrow_phase_find_mesh_triangle_overlaps_kernel
++
++
++narrow_phase_find_mesh_triangle_overlaps_kernel = create_find_mesh_triangle_overlaps_kernel(ENABLE_TILE_BVH_QUERY)
++narrow_phase_find_mesh_triangle_overlaps_thread_kernel = create_find_mesh_triangle_overlaps_kernel(False)
+ 
+ 
+ def create_narrow_phase_process_mesh_triangle_contacts_kernel(
+@@ -2697,6 +2728,12 @@ class NarrowPhase:
+         # One-warp blocks spread sparse, serial-per-lane triangle solves across
+         # more SMs without reducing the total number of launched threads.
+         self.mesh_triangle_block_dim = 32 if device_obj.is_cuda else self.block_dim
++        # Mesh-vs-convex midphase: one thread block per pair querying the mesh BVH cooperatively
++        # (``wp.tile_mesh_query_aabb``), or one thread per pair. Warp implements the cooperative query only
++        # for CUDA; on Metal every thread of the block repeats the whole traversal and the block emits one
++        # triangle per step (Franka-Pour at 2,048 worlds, Newton 1.5.2 line: 65 ms vs 0.4 ms on an L4), so
++        # Metal takes the per-thread query, which finds the same triangles.
++        self.midphase_tiled = ENABLE_TILE_BVH_QUERY and not getattr(device_obj, "is_metal", False)
+ 
+         # Dynamic block allocation for mesh-mesh and mesh-plane contacts.
+         # On CUDA we partition toward ~4 blocks per SM. The 128-thread mesh-mesh
+@@ -2721,8 +2758,20 @@ class NarrowPhase:
+             mesh_plane_scan_size = self.max_mesh_plane_pairs + 1
+             self.mesh_plane_block_offsets = wp.zeros(mesh_plane_scan_size, dtype=wp.int32, device=device)
+             self.mesh_plane_block_counts = wp.zeros(mesh_plane_scan_size, dtype=wp.int32, device=device)
++            # Blocks the mesh-mesh edge work is split into (the launch strides over the resulting
++            # (pair, sub-block) combos by the launched count).
++            self.mesh_mesh_split_blocks = self.num_mesh_mesh_blocks
++            if getattr(device_obj, "is_metal", False):  # Metal-enabled Warp builds only
++                # Metal keeps the non-CUDA work split (64 blocks, so every (pair, sub-block) combo covers
++                # the same edges / vertices) but launches 32 threadgroups per GPU core: 64 threadgroups
++                # leave most of an M4 Max's 40 cores idle, and threadgroups without a combo exit at once.
++                # Franka-Pour collide at 2,048 worlds (Newton 1.5.2 line) by threadgroups per core: 1.6 (64):
++                # 175 ms, 4: 80, 8: 71, 16: 71, 32: 67, 64: 66 ms.
++                self.num_mesh_mesh_blocks = max(target_blocks, device_obj.sm_count * 32)
++                self.num_mesh_plane_blocks = max(target_blocks, device_obj.sm_count * 32)
+         else:
+             self.num_mesh_mesh_blocks = self.num_tile_blocks
++            self.mesh_mesh_split_blocks = self.num_tile_blocks
+             self.mesh_mesh_target_blocks = self.num_tile_blocks
+             self.mesh_mesh_block_offsets = None
+             self.mesh_mesh_block_counts = None
+@@ -3025,10 +3074,19 @@ class NarrowPhase:
+                 )
+ 
+             # Launch midphase: finds overlapping triangles for both mesh and heightfield pairs
+-            second_dim = self.tile_size_mesh_convex if ENABLE_TILE_BVH_QUERY else 1
++            if self.midphase_tiled:
++                midphase_kernel = narrow_phase_find_mesh_triangle_overlaps_kernel
++                midphase_dim = [self.num_tile_blocks, self.tile_size_mesh_convex]
++                midphase_threads = self.num_tile_blocks
++                midphase_block_dim = self.tile_size_mesh_convex
++            else:
++                midphase_kernel = narrow_phase_find_mesh_triangle_overlaps_thread_kernel
++                midphase_dim = [self.total_num_threads, 1]
++                midphase_threads = self.total_num_threads
++                midphase_block_dim = self.block_dim
+             wp.launch(
+-                kernel=narrow_phase_find_mesh_triangle_overlaps_kernel,
+-                dim=[self.num_tile_blocks, second_dim],
++                kernel=midphase_kernel,
++                dim=midphase_dim,
+                 inputs=[
+                     shape_types,
+                     shape_transform,
+@@ -3043,14 +3101,14 @@ class NarrowPhase:
+                     heightfield_elevations,
+                     self.shape_pairs_mesh,
+                     self.shape_pairs_mesh_count,
+-                    self.num_tile_blocks,
++                    midphase_threads,
+                 ],
+                 outputs=[
+                     self.triangle_pairs,
+                     self.triangle_pairs_count,
+                 ],
+                 device=device,
+-                block_dim=self.tile_size_mesh_convex,
++                block_dim=midphase_block_dim,
+                 record_tape=False,
+             )
+ 
+@@ -3227,7 +3285,7 @@ class NarrowPhase:
+                         shape_edge_range=shape_edge_range,
+                         shape_heightfield_index=shape_heightfield_index,
+                         heightfield_data=heightfield_data,
+-                        target_blocks=self.num_mesh_mesh_blocks,
++                        target_blocks=self.mesh_mesh_split_blocks,
+                         block_offsets=self.mesh_mesh_block_offsets,
+                         block_counts=self.mesh_mesh_block_counts,
+                         total_edge_count=self.mesh_mesh_total_weight,
+diff --git a/newton/_src/geometry/sdf_contact.py b/newton/_src/geometry/sdf_contact.py
+index 41c4c3de1ae785f21ae5ea98de1958712ff87a2c..e04744bdee17cc6e3510b4a5aba169db80c78d12 100644
+--- a/newton/_src/geometry/sdf_contact.py
++++ b/newton/_src/geometry/sdf_contact.py
+@@ -1259,6 +1259,14 @@ def create_narrow_phase_process_mesh_mesh_contacts_kernel(
+                 edge_range_tri = shape_edge_range[tri_shape]
+                 num_edges = get_edge_count(tri_type, edge_range_tri, hfd_tri)
+ 
++                # Barrier before resetting ``progress``: the previous pass's last
++                # ``while wp.tile_extract(progress, 0) < ...`` check is a plain
++                # shared-memory read, and a thread still making it would see the
++                # new start below, re-enter the culling loop alone and pair its
++                # barriers with the wrong ones (on Metal this hung the GPU at
++                # 2,048 Franka worlds; more resident threadgroups per core made
++                # it likelier). The stack is empty here, so the clear only syncs.
++                wp.tile_stack_clear(edge_stack)
+                 wp.tile_scatter_masked(progress, 0, 0, t == 0)
+ 
+                 sdf_is_heightfield = sdf_is_hfield
+@@ -1719,6 +1727,14 @@ def create_narrow_phase_process_mesh_mesh_contacts_kernel(
+                 edge_start = block_in_pair * chunk_size
+                 edge_end = wp.min(edge_start + chunk_size, num_edges)
+ 
++                # Barrier before resetting ``progress``: the previous pass's last
++                # ``while wp.tile_extract(progress, 0) < ...`` check is a plain
++                # shared-memory read, and a thread still making it would see the
++                # new start below, re-enter the culling loop alone and pair its
++                # barriers with the wrong ones (on Metal this hung the GPU at
++                # 2,048 Franka worlds; more resident threadgroups per core made
++                # it likelier). The stack is empty here, so the clear only syncs.
++                wp.tile_stack_clear(edge_stack)
+                 wp.tile_scatter_masked(progress, 0, edge_start, t == 0)
+ 
+                 sdf_is_heightfield = sdf_is_hfield
+diff --git a/newton/_src/solvers/kamino/_src/solvers/metrics.py b/newton/_src/solvers/kamino/_src/solvers/metrics.py
+index ba73dc17f0430b7b291bba6fdbdbc63acf1b7893..8898bc000e076263f0ce8753bd633c1a4333ac1b 100644
+--- a/newton/_src/solvers/kamino/_src/solvers/metrics.py
++++ b/newton/_src/solvers/kamino/_src/solvers/metrics.py
+@@ -86,6 +86,8 @@ from ..core.state import StateKamino
+ from ..core.types import vec6f
+ from ..dynamics.dual import DualProblem
+ from ..geometry.contacts import ContactsKamino
++from newton._src.geometry.contact_reduction import float_flip
++from newton._src.geometry.hashtable import _hashtable_use_claims
+ from ..geometry.keying import build_pair_key2
+ from ..kinematics.jacobians import DenseSystemJacobians, SparseSystemJacobians
+ from ..kinematics.limits import LimitsKamino
+@@ -681,6 +683,88 @@ def _atomic_update_metric_max(
+             wp.atomic_exch(metric_argmax, wid, argmax_key)
+ 
+ 
++# 64-bit argmax keys on Metal. Apple GPUs have no 64-bit exchange (only unsigned 64-bit atomic min/max, without a
++# return value; the MetalSim Warp fork refuses a 64-bit ``wp.atomic_exch`` there at launch), and a key is 63 bits, too
++# wide to share one atomic word with its value. On Metal each thread therefore writes its key to its own slot of a
++# scratch array and takes a per-world 64-bit atomic max of ``(rank(value) << 32) | (0xFFFFFFFF - tid)`` (NaN ranks
++# highest); after the kernel, ``_finalize_metric_argmax_key64`` (one thread per world) copies the winner's key. The key
++# then belongs to the maximum (lowest thread on ties), where the exchange keeps whichever qualifying thread wrote last.
++# CPU and CUDA keep the exchange (in a native helper that is not compiled for Metal).
++_ARGMAX_RANK_NAN = wp.constant(wp.uint32(0xFFFFFFFF))
++
++
++@wp.func_native("""
++#if !defined(__METAL_VERSION__)
++wp::atomic_exch(metric_argmax, wid, key);
++#endif
++""")
++def _store_argmax_key64(metric_argmax: wp.array[wp.int64], wid: wp.int32, key: wp.int64):
++    """Atomic 64-bit store of an argmax key on CUDA and CPU (not used on Metal)."""
++    ...
++
++
++@wp.func
++def _argmax_rank(value: wp.float32) -> wp.uint32:
++    """Order-preserving 32-bit rank of a float (NaN highest)."""
++    if wp.isnan(value):
++        return _ARGMAX_RANK_NAN
++    return float_flip(value)  # +inf ranks 0xFF800000, below NaN
++
++
++@wp.func
++def _atomic_update_metric_max_key64(
++    metric: wp.array[wp.float32],
++    metric_argmax: wp.array[wp.int64],
++    argmax_packed: wp.array[wp.uint64],
++    argmax_scratch: wp.array[wp.int64],
++    wid: wp.int32,
++    tid: wp.int32,
++    value: wp.float32,
++    argmax_key: wp.int64,
++):
++    """:func:`_atomic_update_metric_max` for 64-bit keys (Metal: packed max plus a finalize launch, see above)."""
++    if _hashtable_use_claims():
++        if wp.isnan(value):
++            _atomic_mark_nan(metric, wid)
++        else:
++            _atomic_max_if_finite(metric, wid, value)
++        argmax_scratch[tid] = argmax_key
++        packed = (wp.uint64(_argmax_rank(value)) << wp.uint64(32)) | wp.uint64(wp.uint32(0xFFFFFFFF) - wp.uint32(tid))
++        wp.atomic_max(argmax_packed, wid, packed)
++        return
++    if wp.isnan(value):
++        _atomic_mark_nan(metric, wid)
++        _store_argmax_key64(metric_argmax, wid, wp.int64(-1))
++    else:
++        previous_max = _atomic_max_if_finite(metric, wid, value)
++        if value >= previous_max:
++            _store_argmax_key64(metric_argmax, wid, argmax_key)
++
++
++@wp.kernel
++def _finalize_metric_argmax_key64(
++    metric: wp.array[wp.float32],
++    argmax_packed: wp.array[wp.uint64],
++    argmax_scratch: wp.array[wp.int64],
++    metric_argmax: wp.array[wp.int64],
++):
++    """Per world, after a metric kernel on Metal: store the key of that launch's maximum, with the exchange's rule."""
++    wid = wp.tid()
++    packed = argmax_packed[wid]
++    if packed == wp.uint64(0):
++        return  # no thread of this world reported a value
++    rank = wp.uint32(packed >> wp.uint64(32))
++    if rank == _ARGMAX_RANK_NAN:
++        metric_argmax[wid] = wp.int64(-1)
++        return
++    current = metric[wid]
++    # the exchange stores a key when the value is at least the maximum before it, i.e. when this launch's maximum is
++    # the world's maximum now (a NaN from an earlier evaluation is sticky and keeps its key)
++    if not wp.isnan(current) and _argmax_rank(current) == rank:
++        tid = wp.uint32(0xFFFFFFFF) - wp.uint32(packed & wp.uint64(0xFFFFFFFF))
++        metric_argmax[wid] = argmax_scratch[wp.int32(tid)]
++
++
+ @wp.func
+ def compute_vector_difference_infnorm(
+     dim: wp.int32,
+@@ -738,6 +822,8 @@ def _compute_eom_residual(
+     # Outputs
+     metric_r_eom: wp.array[wp.float32],
+     metric_r_eom_argmax: wp.array[wp.int64],
++    metric_argmax_packed: wp.array[wp.uint64],
++    metric_argmax_scratch: wp.array[wp.int64],
+ ):
+     # Retrieve the thread index as the body index
+     bid = wp.tid()
+@@ -773,7 +859,9 @@ def _compute_eom_residual(
+ 
+     # Update the per-world maximum residual and argmax index
+     argmax_key = wp.int64(build_pair_key2(wp.uint32(bid), wp.uint32(r_eom_argmax_i)))
+-    _atomic_update_metric_max(metric_r_eom, metric_r_eom_argmax, wid, r_eom_i, argmax_key)
++    _atomic_update_metric_max_key64(
++        metric_r_eom, metric_r_eom_argmax, metric_argmax_packed, metric_argmax_scratch, wid, bid, r_eom_i, argmax_key
++    )
+ 
+ 
+ @wp.kernel
+@@ -793,6 +881,8 @@ def _compute_joint_kinematics_residual_dense(
+     # Outputs:
+     metric_r_kinematics: wp.array[wp.float32],
+     metric_r_kinematics_argmax: wp.array[wp.int64],
++    metric_argmax_packed: wp.array[wp.uint64],
++    metric_argmax_scratch: wp.array[wp.int64],
+ ):
+     # Retrieve the joint index from the thread index
+     jid = wp.tid()
+@@ -838,7 +928,9 @@ def _compute_joint_kinematics_residual_dense(
+ 
+     # Update the per-world maximum residual and argmax index
+     argmax_key = wp.int64(build_pair_key2(wp.uint32(jid), wp.uint32(cts_offset_j - kgo) + wp.uint32(kin_argmax_local)))
+-    _atomic_update_metric_max(metric_r_kinematics, metric_r_kinematics_argmax, wid, r_kinematics_j, argmax_key)
++    _atomic_update_metric_max_key64(
++        metric_r_kinematics, metric_r_kinematics_argmax, metric_argmax_packed, metric_argmax_scratch, wid, jid, r_kinematics_j, argmax_key
++    )
+ 
+ 
+ @wp.kernel
+@@ -857,6 +949,8 @@ def _compute_joint_kinematics_residual_sparse(
+     # Outputs:
+     metric_r_kinematics: wp.array[wp.float32],
+     metric_r_kinematics_argmax: wp.array[wp.int64],
++    metric_argmax_packed: wp.array[wp.uint64],
++    metric_argmax_scratch: wp.array[wp.int64],
+ ):
+     # Retrieve the joint index from the thread index
+     jid = wp.tid()
+@@ -896,7 +990,9 @@ def _compute_joint_kinematics_residual_sparse(
+ 
+     # Update the per-world maximum residual and argmax index
+     argmax_key = wp.int64(build_pair_key2(wp.uint32(jid), wp.uint32(kin_cts_offset_j) + wp.uint32(kin_argmax_local)))
+-    _atomic_update_metric_max(metric_r_kinematics, metric_r_kinematics_argmax, wid, r_kinematics_j, argmax_key)
++    _atomic_update_metric_max_key64(
++        metric_r_kinematics, metric_r_kinematics_argmax, metric_argmax_packed, metric_argmax_scratch, wid, jid, r_kinematics_j, argmax_key
++    )
+ 
+ 
+ @wp.kernel
+@@ -910,6 +1006,8 @@ def _compute_cts_joints_residual(
+     # Outputs:
+     metric_r_cts_joints: wp.array[wp.float32],
+     metric_r_cts_joints_argmax: wp.array[wp.int64],
++    metric_argmax_packed: wp.array[wp.uint64],
++    metric_argmax_scratch: wp.array[wp.int64],
+ ):
+     # Retrieve the joint index from the thread index
+     jid = wp.tid()
+@@ -929,7 +1027,9 @@ def _compute_cts_joints_residual(
+ 
+     # Update the per-world maximum residual and argmax index
+     argmax_key = wp.int64(build_pair_key2(wp.uint32(jid), wp.uint32(cio_j_loc + argmax_j)))
+-    _atomic_update_metric_max(metric_r_cts_joints, metric_r_cts_joints_argmax, wid, r_cts_joints_j, argmax_key)
++    _atomic_update_metric_max_key64(
++        metric_r_cts_joints, metric_r_cts_joints_argmax, metric_argmax_packed, metric_argmax_scratch, wid, jid, r_cts_joints_j, argmax_key
++    )
+ 
+ 
+ @wp.kernel
+@@ -943,6 +1043,8 @@ def _compute_cts_limits_residual(
+     # Outputs:
+     metric_r_cts_limits: wp.array[wp.float32],
+     metric_r_cts_limits_argmax: wp.array[wp.int64],
++    metric_argmax_packed: wp.array[wp.uint64],
++    metric_argmax_scratch: wp.array[wp.int64],
+ ):
+     # Retrieve the thread index as the limit index
+     lid = wp.tid()
+@@ -964,7 +1066,9 @@ def _compute_cts_limits_residual(
+ 
+     # Update the per-world maximum residual
+     argmax_key = wp.int64(build_pair_key2(wp.uint32(wlid), wp.uint32(dof)))
+-    _atomic_update_metric_max(metric_r_cts_limits, metric_r_cts_limits_argmax, wid, r_cts_limits_l, argmax_key)
++    _atomic_update_metric_max_key64(
++        metric_r_cts_limits, metric_r_cts_limits_argmax, metric_argmax_packed, metric_argmax_scratch, wid, lid, r_cts_limits_l, argmax_key
++    )
+ 
+ 
+ @wp.kernel
+@@ -1371,6 +1475,8 @@ class SolutionMetrics:
+         # Declare data buffers for metrics computations
+         self._buffer_s: wp.array[wp.float32] | None = None
+         self._buffer_v: wp.array[wp.float32] | None = None
++        self._argmax_packed: wp.array[wp.uint64] | None = None
++        self._argmax_scratch: wp.array[wp.int64] | None = None
+ 
+         # If a model is provided, finalize the metrics data allocations
+         if model is not None:
+@@ -1394,6 +1500,13 @@ class SolutionMetrics:
+         with wp.ScopedDevice(self._device):
+             # Allocate reusable buffers for metrics computations
+             self._buffer_v = wp.zeros(model.size.sum_of_max_total_cts, dtype=wp.float32)
++            # 64-bit argmax keys on Metal (see _atomic_update_metric_max_key64): per-world packed maxima and per-thread
++            # keys of the metric launch in flight (unused on CPU and CUDA)
++            self._argmax_packed = wp.zeros(model.size.num_worlds, dtype=wp.uint64)
++            self._argmax_scratch = wp.zeros(
++                max(1, model.size.sum_of_num_bodies, model.size.sum_of_num_joints, model.size.sum_of_max_limits),
++                dtype=wp.int64,
++            )
+             self._buffer_s = wp.zeros(model.size.sum_of_max_total_cts, dtype=wp.float32)
+ 
+             # Allocate the metrics container data arrays
+@@ -1488,6 +1601,24 @@ class SolutionMetrics:
+     # Internals
+     ###
+ 
++    def _argmax_key64_begin(self, dim: int = 0):
++        """Before a metric kernel with 64-bit argmax keys: clear the packed maxima (Metal only)."""
++        if dim > self._argmax_scratch.shape[0]:
++            self._argmax_scratch = wp.zeros(dim, dtype=wp.int64, device=self._device)
++        if getattr(wp.get_device(self._device), "is_metal", False):
++            self._argmax_packed.zero_()
++
++    def _argmax_key64_end(self, metric: wp.array, metric_argmax: wp.array):
++        """After a metric kernel with 64-bit argmax keys: store the winners' keys (Metal only)."""
++        if getattr(wp.get_device(self._device), "is_metal", False):
++            wp.launch(
++                kernel=_finalize_metric_argmax_key64,
++                dim=metric.shape[0],
++                inputs=[metric, self._argmax_packed, self._argmax_scratch],
++                outputs=[metric_argmax],
++                device=self._device,
++            )
++
+     def _assert_has_data(self):
+         """
+         Asserts that the metrics data has been finalized and is available.
+@@ -1519,6 +1650,7 @@ class SolutionMetrics:
+ 
+         # Compute the largest configuration-level joint constraint residuals (i.e. violations)
+         if model.size.sum_of_num_joints > 0:
++            self._argmax_key64_begin()
+             wp.launch(
+                 kernel=_compute_cts_joints_residual,
+                 dim=model.size.sum_of_num_joints,
+@@ -1532,12 +1664,16 @@ class SolutionMetrics:
+                     # Outputs:
+                     self._data.r_cts_joints,
+                     self._data.r_cts_joints_argmax,
++                    self._argmax_packed,
++                    self._argmax_scratch,
+                 ],
+                 device=model.device,
+             )
++            self._argmax_key64_end(self._data.r_cts_joints, self._data.r_cts_joints_argmax)
+ 
+         # Compute the largest joint-limit constraint residuals (i.e. penetrations)
+         if limits is not None and limits.model_max_limits_host > 0:
++            self._argmax_key64_begin(limits.data.model_max_limits_host)
+             wp.launch(
+                 kernel=_compute_cts_limits_residual,
+                 dim=limits.data.model_max_limits_host,
+@@ -1551,9 +1687,12 @@ class SolutionMetrics:
+                     # Outputs:
+                     self._data.r_cts_limits,
+                     self._data.r_cts_limits_argmax,
++                    self._argmax_packed,
++                    self._argmax_scratch,
+                 ],
+                 device=model.device,
+             )
++            self._argmax_key64_end(self._data.r_cts_limits, self._data.r_cts_limits_argmax)
+ 
+         # Compute the largest contact constraint residuals (i.e. penetrations)
+         if contacts is not None and contacts.model_max_contacts_host > 0:
+@@ -1593,6 +1732,7 @@ class SolutionMetrics:
+         self._assert_has_data()
+ 
+         # Compute the equations-of-motion residuals
++        self._argmax_key64_begin()
+         wp.launch(
+             kernel=_compute_eom_residual,
+             dim=model.size.sum_of_num_bodies,
+@@ -1609,14 +1749,18 @@ class SolutionMetrics:
+                 # Outputs:
+                 self._data.r_eom,
+                 self._data.r_eom_argmax,
++                self._argmax_packed,
++                self._argmax_scratch,
+             ],
+             device=model.device,
+         )
++        self._argmax_key64_end(self._data.r_eom, self._data.r_eom_argmax)
+ 
+         # Compute the kinematics constraint residuals,
+         # i.e. velocity-level joint constraint equations
+         if model.size.sum_of_num_joints > 0:
+             if isinstance(jacobians, DenseSystemJacobians):
++                self._argmax_key64_begin()
+                 wp.launch(
+                     kernel=_compute_joint_kinematics_residual_dense,
+                     dim=model.size.sum_of_num_joints,
+@@ -1636,11 +1780,15 @@ class SolutionMetrics:
+                         # Outputs:
+                         self._data.r_kinematics,
+                         self._data.r_kinematics_argmax,
++                        self._argmax_packed,
++                        self._argmax_scratch,
+                     ],
+                     device=model.device,
+                 )
++                self._argmax_key64_end(self._data.r_kinematics, self._data.r_kinematics_argmax)
+             else:
+                 J_cts = jacobians._J_cts.bsm
++                self._argmax_key64_begin()
+                 wp.launch(
+                     kernel=_compute_joint_kinematics_residual_sparse,
+                     dim=model.size.sum_of_num_joints,
+@@ -1659,9 +1807,12 @@ class SolutionMetrics:
+                         # Outputs:
+                         self._data.r_kinematics,
+                         self._data.r_kinematics_argmax,
++                        self._argmax_packed,
++                        self._argmax_scratch,
+                     ],
+                     device=model.device,
+                 )
++                self._argmax_key64_end(self._data.r_kinematics, self._data.r_kinematics_argmax)
+ 
+     def _evaluate_dual_problem_perf(
+         self,
+diff --git a/newton/_src/solvers/xpbd/restitution_kernels.py b/newton/_src/solvers/xpbd/restitution_kernels.py
+index defca3605635a0ce57325ee8c4a56129cbc7dfdb..f0fa304b79d4d1254a16133b4497396c3571ba15 100644
+--- a/newton/_src/solvers/xpbd/restitution_kernels.py
++++ b/newton/_src/solvers/xpbd/restitution_kernels.py
+@@ -3,9 +3,131 @@
+ 
+ import warp as wp
+ 
++from ...geometry.hashtable import _hashtable_use_claims
+ from ...math import velocity_at_point
+ from ...sim.contacts import contact_surface_point, contact_surface_separation
+ 
++# Manifold table on Metal. Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max, without a
++# return value; the MetalSim Warp fork refuses a 64-bit ``wp.atomic_cas`` there at launch). On Metal a slot is claimed
++# with a 32-bit compare-and-swap of its high word (0 -> _MANIFOLD_CLAIMED_HI), then the whole key is published with one
++# 64-bit atomic min, as Newton's HashTable does. Stored keys carry _MANIFOLD_KEY_TAG so that an occupied high word is
++# never 0 (empty) nor _MANIFOLD_CLAIMED_HI: keys are below (body_count + 1)^2 < 2^62. Readers mask the tag off (a no-op
++# on CPU and CUDA, which store the plain key). A thread that finds a slot claimed re-reads it on the next pass of a
++# loop every lane runs; the claimant only has its publish left. The loop is bounded so that no schedule can turn it
++# into a GPU hang: a contact that runs out of passes is left out of restitution, as on CUDA when the table is full,
++# and counted in ``insert_failures`` (``SolverXPBD.restitution_insert_failures``).
++_MANIFOLD_KEY_TAG = wp.constant(wp.int64(1 << 62))
++_MANIFOLD_KEY_MASK = wp.constant(wp.int64((1 << 62) - 1))
++_MANIFOLD_CLAIMED_HI = wp.constant(wp.uint32(0x80000000))
++_MANIFOLD_MAX_WAIT_PASSES = wp.constant(1 << 16)
++
++
++@wp.func_native("""
++#if defined(__METAL_VERSION__)
++device metal::atomic_uint* word = (device metal::atomic_uint*)(keys.data + idx) + 1;
++return metal::atomic_load_explicit(word, metal::memory_order_relaxed);
++#else
++return static_cast<uint32_t>(static_cast<uint64_t>(keys.data[idx]) >> 32);
++#endif
++""")
++def _manifold_load_hi(keys: wp.array[wp.int64], idx: int) -> wp.uint32:
++    """Atomically read the high word of a manifold slot."""
++    ...
++
++
++@wp.func_native("""
++#if defined(__METAL_VERSION__)
++device metal::atomic_uint* word = (device metal::atomic_uint*)(keys.data + idx);
++const uint64_t lo = metal::atomic_load_explicit(word, metal::memory_order_relaxed);
++const uint64_t hi = metal::atomic_load_explicit(word + 1, metal::memory_order_relaxed);
++return (int64_t)((hi << 32) | lo);
++#else
++return keys.data[idx];
++#endif
++""")
++def _manifold_load_key(keys: wp.array[wp.int64], idx: int) -> wp.int64:
++    """Atomically read a published manifold slot (both words are final once the high word is)."""
++    ...
++
++
++@wp.func_native("""
++#if defined(__METAL_VERSION__)
++device metal::atomic_uint* word = (device metal::atomic_uint*)(keys.data + idx) + 1;
++uint expected = 0u;
++return metal::atomic_compare_exchange_weak_explicit(
++    word, &expected, 0x80000000u, metal::memory_order_relaxed, metal::memory_order_relaxed);
++#else
++return false;
++#endif
++""")
++def _manifold_claim(keys: wp.array[wp.int64], idx: int) -> bool:
++    """Claim an empty slot: high word 0 -> _MANIFOLD_CLAIMED_HI (may fail spuriously; callers re-read)."""
++    ...
++
++
++@wp.func_native("""
++#if defined(__METAL_VERSION__)
++// the claimed slot reads (_MANIFOLD_CLAIMED_HI, 0), above every tagged key, so the minimum writes the key
++metal::atomic_min_explicit((device metal::atomic_ulong*)(keys.data + idx), (uint64_t)value, metal::memory_order_relaxed);
++#endif
++""")
++def _manifold_publish(keys: wp.array[wp.int64], idx: int, value: wp.int64):
++    """Publish a tagged key into a slot this thread claimed (Metal only)."""
++    ...
++
++
++@wp.func_native("""
++#if defined(__METAL_VERSION__)
++// never reached on Metal (build_restitution_manifolds takes the claim / publish path there)
++return compare + 1 == value ? compare + 2 : compare + 1;
++#else
++return wp::atomic_cas(keys, idx, compare, value);
++#endif
++""")
++def _manifold_cas(keys: wp.array[wp.int64], idx: int, compare: wp.int64, value: wp.int64) -> wp.int64:
++    """64-bit compare-and-swap of a manifold slot on CUDA and CPU."""
++    ...
++
++
++@wp.func
++def _manifold_key(stored: wp.int64) -> wp.int64:
++    """Body-pair key of a stored slot (strips the Metal tag; 0 for an empty slot)."""
++    return stored & _MANIFOLD_KEY_MASK
++
++
++@wp.func
++def _manifold_insert_claimed(manifold_key: wp.array[wp.int64], key: wp.int64, slot_start: wp.int32) -> wp.int32:
++    """Slot of ``key`` in the manifold table on Metal (inserting it), or -1 (table full / out of passes)."""
++    table_size = manifold_key.shape[0]
++    stored = key | _MANIFOLD_KEY_TAG
++    slot = slot_start
++    result = wp.int32(-1)
++    probes = int(0)
++    passes = int(0)
++    pending = bool(True)
++    while pending and passes < table_size + _MANIFOLD_MAX_WAIT_PASSES:
++        passes += 1
++        hi = _manifold_load_hi(manifold_key, slot)
++        if hi == wp.uint32(0):
++            if _manifold_claim(manifold_key, slot):
++                _manifold_publish(manifold_key, slot, stored)
++                result = slot
++                pending = False
++            # lost the claim (or failed spuriously): look at the same slot again
++        elif hi != _MANIFOLD_CLAIMED_HI:
++            if _manifold_load_key(manifold_key, slot) == stored:
++                result = slot
++                pending = False
++            else:
++                slot += 1
++                if slot == table_size:
++                    slot = 0
++                probes += 1
++                if probes >= table_size:
++                    pending = False
++        # else: another thread is publishing its key in this slot; look again
++    return result
++
+ 
+ @wp.kernel
+ def mark_restitution_contacts(
+@@ -98,13 +220,15 @@ def build_restitution_manifolds(
+     contact_axn_lo_target: wp.array[wp.vec4],
+     contact_axn_hi_sigma: wp.array[wp.vec4],
+     contact_pos_depth: wp.array[wp.vec4],
++    insert_failures: wp.array[wp.int32],
+ ):
+     """Group contacts that can fire restitution into per-body-pair manifolds.
+ 
+     The collision pipeline interleaves contacts across pairs, so contacts are
+     not pair-contiguous. Each active contact inserts its canonical body-pair
+     key (``(lo+1)*(body_count+1) + hi+1 >= 1``; 0 means an empty slot) into an
+-    open-addressing hash table via ``atomic_cas`` and pushes its contact index
++    open-addressing hash table via ``atomic_cas`` (on Metal a 32-bit claim and a
++    64-bit atomic min, see ``_MANIFOLD_KEY_TAG``) and pushes its contact index
+     onto the slot's uncapped linked chain
+     (``manifold_head``/``contact_next``); :func:`select_manifold_contacts`
+     later reduces each chain to a bounded best-K subset. Fixed-size table, no
+@@ -241,9 +365,18 @@ def build_restitution_manifolds(
+     key = wp.int64(lo + 1) * wp.int64(body_count + 1) + wp.int64(hi + 1)
+     table_size = manifold_key.shape[0]
+     slot = wp.int32(key % wp.int64(table_size))
++    if _hashtable_use_claims():
++        # Metal: claim / publish (see _MANIFOLD_KEY_TAG); same probe sequence as below
++        slot = _manifold_insert_claimed(manifold_key, key, slot)
++        if slot >= 0:
++            wp.atomic_add(manifold_total, slot, 1)
++            contact_next[tid] = wp.atomic_exch(manifold_head, slot, tid + 1) - 1
++        else:
++            wp.atomic_add(insert_failures, 0, 1)  # SolverXPBD.restitution_insert_failures
++        return
+     # linear probing; table capacity >= contact capacity so a slot always exists
+     for _attempt in range(table_size):
+-        prev = wp.atomic_cas(manifold_key, slot, wp.int64(0), key)
++        prev = _manifold_cas(manifold_key, slot, wp.int64(0), key)
+         if prev == wp.int64(0) or prev == key:
+             wp.atomic_add(manifold_total, slot, 1)
+             # heads store index+1 so a zeroed table means empty (memset-cheap reset)
+@@ -440,7 +573,7 @@ def solve_manifold_restitution(
+     """
+     tid = wp.tid()
+ 
+-    key = manifold_key[tid]
++    key = _manifold_key(manifold_key[tid])
+     if key == wp.int64(0):
+         return
+ 
+diff --git a/newton/_src/solvers/xpbd/solver_xpbd.py b/newton/_src/solvers/xpbd/solver_xpbd.py
+index ee03d77e0294833acd2a493e9434d5d5d5798abc..eee26ad868e782d2a24780345e6f70276b9c0832 100644
+--- a/newton/_src/solvers/xpbd/solver_xpbd.py
++++ b/newton/_src/solvers/xpbd/solver_xpbd.py
+@@ -199,6 +199,9 @@ class SolverXPBD(SolverBase, CouplingInterface):
+ 
+         self.enable_restitution = enable_restitution
+         self._rigid_restitution_enabled = False
++        self.restitution_insert_failures: wp.array | None = None
++        """Contacts the restitution manifold table could not take (Metal's bounded claim loop), cumulative; ``None``
++        until rigid restitution first runs."""
+         self._refresh_rigid_restitution_enabled()
+         self._compute_body_velocity_from_position_delta = False
+ 
+@@ -452,6 +455,9 @@ class SolverXPBD(SolverBase, CouplingInterface):
+                 rigid_contact_inv_weight = wp.zeros(model.body_count, dtype=float, device=model.device)
+             if self.enable_restitution and self._rigid_restitution_enabled and model.body_count:
+                 restitution_contact_active = wp.zeros(contacts.rigid_contact_max, dtype=wp.int32, device=model.device)
++                if self.restitution_insert_failures is None:
++                    # contacts the manifold table could not take (Metal's bounded claim loop only; cumulative)
++                    self.restitution_insert_failures = wp.zeros(1, dtype=wp.int32, device=model.device)
+                 # manifold hash table (one slot may host every contact, so
+                 # capacity == contact capacity guarantees insertion succeeds)
+                 restitution_manifold_key = wp.zeros(contacts.rigid_contact_max, dtype=wp.int64, device=model.device)
+@@ -1008,6 +1014,7 @@ class SolverXPBD(SolverBase, CouplingInterface):
+                             restitution_contact_axn_lo_target,
+                             restitution_contact_axn_hi_sigma,
+                             restitution_contact_pos_depth,
++                            self.restitution_insert_failures,
+                         ],
+                         device=model.device,
+                     )
+diff --git a/newton/tests/test_contact_matching.py b/newton/tests/test_contact_matching.py
+index b9e2e54a50739662eacf934c336ed05cba10b2dd..1afbcd884fe4b94c1f28cc0d8007b56e0e68228c 100644
+--- a/newton/tests/test_contact_matching.py
++++ b/newton/tests/test_contact_matching.py
+@@ -152,12 +152,12 @@ def test_save_initializes_next_frame_claims(test, device):
+         matcher = pipeline._contact_matcher
+         test.assertIsNotNone(matcher)
+ 
+-        matcher._prev_claim.fill_(wp.int64(0))
++        matcher._prev_claim.fill_(wp.uint64(0))
+         count = _collide_once(pipeline, state, contacts)
+         test.assertGreater(count, 0)
+         np.testing.assert_array_equal(
+             matcher._prev_claim.numpy()[:count],
+-            np.full(count, int(_CLAIM_SENTINEL), dtype=np.int64),
++            np.full(count, int(_CLAIM_SENTINEL), dtype=np.uint64),
+         )
+ 
+         test.assertEqual(_collide_once(pipeline, state, contacts), count)
+diff --git a/newton/tests/test_contact_reduction_global.py b/newton/tests/test_contact_reduction_global.py
+index 3bd3ba4e4ac4de601a51e67be294078a2d327956..2765e66a60c181bc95d13261ee426336ffa87dd5 100644
+--- a/newton/tests/test_contact_reduction_global.py
++++ b/newton/tests/test_contact_reduction_global.py
+@@ -72,8 +72,10 @@ def get_winning_contacts(reducer: GlobalContactReducer) -> list[int]:
+         # Slot-major layout: slot * capacity + entry_idx
+         for slot in range(values_per_key):
+             val = values[slot * capacity + entry_idx]
+-            if val != 0:
+-                contact_id = val & contact_id_mask
++            contact_id = val & contact_id_mask
++            # ID zero marks a provisional winner, which the export kernels skip (on Metal a provisional claim is
++            # not rolled back when the contact buffer is exhausted)
++            if val != 0 and contact_id != 0:
+                 contact_ids.add(int(contact_id))
+ 
+     return sorted(contact_ids)
+diff --git a/newton/tests/test_hashtable.py b/newton/tests/test_hashtable.py
+index 2d84fecb264ce0554806e2227ec1874e57378998..91fb1e7347581dd06410f461c4ab5d88c0158b4c 100644
+--- a/newton/tests/test_hashtable.py
++++ b/newton/tests/test_hashtable.py
+@@ -9,7 +9,7 @@ import numpy as np
+ import warp as wp
+ 
+ from newton._src.geometry.contact_reduction_global import GlobalContactReducer, reduction_insert_slot
+-from newton._src.geometry.hashtable import HashTable
++from newton._src.geometry.hashtable import HashTable, hashtable_find_or_insert
+ from newton.tests.unittest_utils import add_function_test, get_test_devices
+ 
+ # =============================================================================
+@@ -299,6 +299,47 @@ def test_high_collision(test, device):
+     test.assertEqual(active_count, 10)
+ 
+ 
++@wp.kernel
++def _find_or_insert_kernel(
++    keys_in: wp.array[wp.uint64],
++    keys: wp.array[wp.uint64],
++    active_slots: wp.array[wp.int32],
++    entry_out: wp.array[int],
++):
++    tid = wp.tid()
++    entry_out[tid] = hashtable_find_or_insert(keys_in[tid], keys, active_slots)
++
++
++def test_concurrent_distinct_keys(test, device):
++    """Map every key to one slot holding it when many threads insert colliding keys at once.
++
++    Thousands of distinct 63-bit keys, each inserted by several threads, into a table only twice their number:
++    linear probing makes threads with different keys race for the same empty slots, which needs an atomic
++    64-bit claim (emulated on Metal, which has no 64-bit compare-and-swap).
++    """
++    rng = np.random.default_rng(7)
++    for n, m in ((4096, 64), (32768, 4096), (262144, 8192)):
++        pool = np.unique(rng.integers(1, 2**62, size=m, dtype=np.uint64))
++        keys_np = pool[rng.integers(0, len(pool), size=n)]
++        unique = np.unique(keys_np)
++        ht = HashTable(capacity=2 * len(unique), device=device)
++        keys_in = wp.array(keys_np, dtype=wp.uint64, device=device)
++        entry = wp.zeros(n, dtype=int, device=device)
++        wp.launch(_find_or_insert_kernel, dim=n, inputs=[keys_in, ht.keys, ht.active_slots, entry], device=device)
++
++        table = ht.keys.numpy()
++        entry_np = entry.numpy()
++        test.assertTrue(np.all(entry_np >= 0))
++        np.testing.assert_array_equal(table[entry_np], keys_np)
++        stored = table[table != np.uint64(0xFFFFFFFFFFFFFFFF)]
++        test.assertEqual(len(stored), len(unique))
++        test.assertEqual(len(np.unique(stored)), len(unique))
++        active = ht.active_slots.numpy()
++        count = int(active[ht.capacity])
++        test.assertEqual(count, len(unique))
++        np.testing.assert_array_equal(np.sort(table[active[:count]]), np.sort(unique))
++
++
+ def test_early_exit_optimization(test, device):
+     """Test that the early exit optimization works correctly.
+ 
+@@ -361,6 +402,7 @@ add_function_test(TestHashTable, "test_multiple_keys", test_multiple_keys, devic
+ add_function_test(TestHashTable, "test_clear", test_clear, devices=devices)
+ add_function_test(TestHashTable, "test_clear_active", test_clear_active, devices=devices)
+ add_function_test(TestHashTable, "test_high_collision", test_high_collision, devices=devices)
++add_function_test(TestHashTable, "test_concurrent_distinct_keys", test_concurrent_distinct_keys, devices=devices)
+ add_function_test(TestHashTable, "test_early_exit_optimization", test_early_exit_optimization, devices=devices)
+ 
+ 

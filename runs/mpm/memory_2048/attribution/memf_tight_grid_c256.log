@@ -1,0 +1,238 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+[mem] start                        device    0.02 GB  footprint    0.07 GB  resident    0.10 GB  warp-live    0.00 GB  native-tracked    0.00 GB
+Module newton._src.geometry.inertia 277ec1a load on device 'metal:0' took 40.23 ms  (cached)
+Module validate_and_correct_inertia_kernel_e5f8239c e5f8239 load on device 'metal:0' took 41.09 ms  (cached)
+Module newton._src.geometry.bvh 6518958 load on device 'metal:0' took 42.70 ms  (cached)
+Module newton._src.solvers.coupled.model_view 147a48e load on device 'metal:0' took 41.12 ms  (cached)
+Module newton._src.solvers.coupled.solver_coupled 5249e6f load on device 'metal:0' took 58.32 ms  (cached)
+Module newton._src.solvers.mujoco.kernels 5316fd8 load on device 'metal:0' took 87.22 ms  (cached)
+Module repeat_array_kernel_8074343c 15758cb load on device 'metal:0' took 40.31 ms  (cached)
+Module repeat_array_kernel_8074343c 349f467 load on device 'metal:0' took 39.40 ms  (cached)
+Module repeat_array_kernel_8074343c 0a0a0fe load on device 'metal:0' took 39.24 ms  (cached)
+Module repeat_array_kernel_8074343c 31e890f load on device 'metal:0' took 39.26 ms  (cached)
+Module repeat_array_kernel_8074343c bee54b0 load on device 'metal:0' took 39.40 ms  (cached)
+Module repeat_array_kernel_8074343c 09aa313 load on device 'metal:0' took 39.71 ms  (cached)
+Module repeat_array_kernel_8074343c 1948b90 load on device 'metal:0' took 41.32 ms  (cached)
+Module repeat_array_kernel_8074343c 6d5dc2d load on device 'metal:0' took 39.56 ms  (cached)
+Module mujoco_warp._src.io 80de6c4 load on device 'metal:0' took 51.69 ms  (cached)
+Module mujoco_warp._src.smooth 7782ddc load on device 'metal:0' took 60.90 ms  (cached)
+Module _small_cholesky_factorize_block__locals__kernel_f83e5526 866a709 load on device 'metal:0' took 40.81 ms  (cached)
+Module _tile_cholesky_factorize_block__locals__kernel_5f69c283 55b496f load on device 'metal:0' took 38.75 ms  (cached)
+Module _small_cholesky_solve_block__locals__kernel_94746dc2 aa9beac load on device 'metal:0' took 38.95 ms  (cached)
+Module _tile_cholesky_solve_block__locals__kernel_667f4734 7040ad4 load on device 'metal:0' took 39.51 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_model 23513f2 load on device 'metal:0' took 39.88 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels 0d258a9 load on device 'metal:0' took 41.73 ms  (cached)
+Module warp.fem.geometry.nanogrid 6688de8 load on device 'metal:0' took 45.45 ms  (cached)
+[vol] allocate_by_voxels +0.165 GB caps {'max_active_voxels': None, 'max_tiles': None, 'max_leaf_nodes': None, 'max_lower_nodes': None, 'max_upper_nodes': None, 'rebuildable': False} at MPM | nanogrid.py:_make_environment_cell_grid
+[vol] allocate_by_voxels +0.074 GB caps {'max_active_voxels': None, 'max_tiles': None, 'max_leaf_nodes': None, 'max_lower_nodes': None, 'max_upper_nodes': None, 'rebuildable': None} at MPM | nanogrid.py:_build_node_grid
+[vol] allocate_by_voxels +0.337 GB caps {'max_active_voxels': 524288, 'max_tiles': None, 'max_leaf_nodes': 32768, 'max_lower_nodes': 9216, 'max_upper_nodes': 80, 'rebuildable': True} at MPM | nanogrid.py:_make_environment_cell_grid
+[vol] allocate_by_voxels +2.694 GB caps {'max_active_voxels': 4194304, 'max_tiles': None, 'max_leaf_nodes': 262144, 'max_lower_nodes': 73728, 'max_upper_nodes': 640, 'rebuildable': True} at MPM | nanogrid.py:_build_rebuildable_topology_grid
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.mark_active_cells_by_environment_d49867a3 e25f415 load on device 'metal:0' took 40.83 ms  (cached)
+Module warp.fem.utils 16fa927 load on device 'metal:0' took 40.84 ms  (cached)
+Module warp._src.fem.quadrature.pic_quadrature.dyn.bin_particles_a59060ab 99fba27 load on device 'metal:0' took 42.82 ms  (cached)
+Module warp._src.fem.quadrature.pic_quadrature.dyn.finalize_cell_particle_data_8b50e35d 171fc90 load on device 'metal:0' took 40.20 ms  (cached)
+Module warp._src.fem.space.partition.dyn.node_environment_from_cells_kernel_db4a4227 0f45780 load on device 'metal:0' took 40.87 ms  (cached)
+Module warp.fem.space.partition 0c1c5a9 load on device 'metal:0' took 39.52 ms  (cached)
+Module warp.fem.space.restriction d85d527 load on device 'metal:0' took 39.23 ms  (cached)
+Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_f0ba5002 4734d91 load on device 'metal:0' took 40.25 ms  (cached)
+Module warp._src.fem.space.partition.dyn.node_environment_from_cells_kernel_dba0dbdb 0560446 load on device 'metal:0' took 40.78 ms  (cached)
+Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_287ab8bb 0bb0b68 load on device 'metal:0' took 40.06 ms  (cached)
+Module warp._src.fem.space.partition.dyn.node_environment_from_cells_kernel_c111570e 56b430b load on device 'metal:0' took 39.72 ms  (cached)
+Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_07070927 e9e9225 load on device 'metal:0' took 39.93 ms  (cached)
+Module newton._src.solvers.coupled.interface ec5deae load on device 'metal:0' took 39.94 ms  (cached)
+Module newton._src.sim.articulation 7f933db load on device 'metal:0' took 64.21 ms  (cached)
+[mem] built                        device   10.89 GB  footprint   18.21 GB  resident   12.08 GB  warp-live    7.66 GB  native-tracked   10.84 GB
+[mem] built, after gc              device   10.89 GB  footprint   17.94 GB  resident   11.80 GB  warp-live    7.66 GB  native-tracked   10.84 GB
+Module metalsim.learn.franka_pour_scene bf548b1 load on device 'metal:0' took 41.47 ms  (cached)
+Module newton._src.sim.collide 5d32fd2 load on device 'metal:0' took 41.99 ms  (cached)
+Module newton._src.geometry.broad_phase_nxn 74713c7 load on device 'metal:0' took 41.04 ms  (cached)
+Module narrow_phase_primitive_write_contact ddcad99 load on device 'metal:0' took 44.79 ms  (cached)
+Module narrow_phase_gjk_mpr_True_write_contact_default_default 4c4d035 load on device 'metal:0' took 53.34 ms  (cached)
+Module newton._src.geometry.narrow_phase 95143c3 load on device 'metal:0' took 43.96 ms  (cached)
+Module newton._src.geometry.contact_reduction_global 2beead0 load on device 'metal:0' took 42.11 ms  (cached)
+Module newton._src.geometry.narrow_phase f58cbcb load on device 'metal:0' took 43.62 ms  (cached)
+Module newton._src.geometry.sdf_contact e72a917 load on device 'metal:0' took 39.85 ms  (cached)
+Module narrow_phase_mesh_plane_write_contact_to_reducer_True e1e1cd3 load on device 'metal:0' took 40.33 ms  (cached)
+Module mesh_triangle_contacts_to_reducer_kernel_60e34a1b ef92116 load on device 'metal:0' took 54.73 ms  (cached)
+Module newton._src.geometry.contact_reduction_global b41aa82 load on device 'metal:0' took 42.33 ms  (cached)
+Module sdf_contact_write_contact_to_reducer_False_True 2099708 load on device 'metal:0' took 47.92 ms  (cached)
+Module export_reduced_contacts_write_contact 4ea2ee4 load on device 'metal:0' took 40.93 ms  (cached)
+Module mujoco_warp._src.constraint 8d81edf load on device 'metal:0' took 39.49 ms  (cached)
+Module _equality_joint__locals__kernel_e6b7435c e6b7435 load on device 'metal:0' took 40.95 ms  (cached)
+Module _friction_dof__locals__kernel_700435e3 700435e load on device 'metal:0' took 39.74 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_e5170a29 e5170a2 load on device 'metal:0' took 39.80 ms  (cached)
+Module _efc_contact_init__locals__kernel_053a94f2 053a94f load on device 'metal:0' took 40.35 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_8574067d 614d532 load on device 'metal:0' took 40.98 ms  (cached)
+Module _efc_contact_update__locals__kernel_607dee27 607dee2 load on device 'metal:0' took 40.34 ms  (cached)
+Module mujoco_warp._src.forward 34bd408 load on device 'metal:0' took 45.22 ms  (cached)
+Module mujoco_warp._src.passive 00b7dd2 load on device 'metal:0' took 51.89 ms  (cached)
+Module mujoco_warp._src.forward 509cbbe load on device 'metal:0' took 45.32 ms  (cached)
+Module _qfrc_smooth__locals__kernel_0dbabb75 0dbabb7 load on device 'metal:0' took 39.22 ms  (cached)
+Module mujoco_warp._src.support c60ed57 load on device 'metal:0' took 40.16 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_24edd661 3d3b0a7 load on device 'metal:0' took 41.42 ms  (cached)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_5ad01a37 e22acfc load on device 'metal:0' took 39.59 ms  (cached)
+Module _solve_init_dof__locals__kernel_db630482 db63048 load on device 'metal:0' took 39.48 ms  (cached)
+Module mujoco_warp._src.solver ef6d7ef load on device 'metal:0' took 45.03 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_e9ea19e1 e9ea19e load on device 'metal:0' took 39.18 ms  (cached)
+Module mul_m_kernel__locals___mul_m_36df2de7 36df2de load on device 'metal:0' took 40.40 ms  (cached)
+Module _update_constraint_efc__locals__kernel_1ddbc6e0 1ddbc6e load on device 'metal:0' took 39.96 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_bb76fe8b bb76fe8 load on device 'metal:0' took 39.15 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_dbfbd454 dbfbd45 load on device 'metal:0' took 39.15 ms  (cached)
+Module _update_gradient_grad__locals__kernel_3752aaa1 3752aaa load on device 'metal:0' took 39.13 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_b5b7a596 7d4b86a load on device 'metal:0' took 39.57 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_39c6754d 425a3af load on device 'metal:0' took 39.97 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_b688bdcf 401044e load on device 'metal:0' took 42.28 ms  (cached)
+Module _update_constraint_efc__locals__kernel_bd6b9101 bd6b910 load on device 'metal:0' took 40.43 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_d333ebb1 d333ebb load on device 'metal:0' took 39.13 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_6c8bca36 6c8bca3 load on device 'metal:0' took 38.96 ms  (cached)
+Module _update_gradient_grad__locals__kernel_2263eec1 2263eec load on device 'metal:0' took 39.05 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_ea8e3c03 43efac4 load on device 'metal:0' took 39.04 ms  (cached)
+Module mujoco_warp._src.sensor e3c99b2 load on device 'metal:0' took 63.02 ms  (cached)
+Module mujoco_warp._src.derivative 424ff15 load on device 'metal:0' took 44.67 ms  (cached)
+Module _next_time_builder__locals___next_time_0351f148 0351f14 load on device 'metal:0' took 39.28 ms  (cached)
+Module newton._src.solvers.coupled.proxy_utils 6d23cbb load on device 'metal:0' took 39.99 ms  (cached)
+Module newton._src.solvers.implicit_mpm.solver_implicit_mpm 5c24fc9 load on device 'metal:0' took 41.08 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.integrate_fraction_cda49d5f 85021e7 load on device 'metal:0' took 42.21 ms  (cached)
+Module newton._src.solvers.implicit_mpm.rasterized_collisions.world_position_e5247879 b7e6000 load on device 'metal:0' took 43.53 ms  (cached)
+Module newton._src.solvers.implicit_mpm.rasterized_collisions c701b07 load on device 'metal:0' took 48.20 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.collision_weight_field_0ae25986 7a9d083 load on device 'metal:0' took 42.58 ms  (cached)
+Module warp._src.metal_sparse ca787d6 load on device 'metal:0' took 39.61 ms  (cached)
+Module warp._src.metal_sparse ec7e162 load on device 'metal:0' took 39.64 ms  (cached)
+Module warp._src.metal_sparse 486d9f7 load on device 'metal:0' took 39.91 ms  (cached)
+Module warp._src.metal_sparse 8ecdcdf load on device 'metal:0' took 40.04 ms  (cached)
+Module _bsr_accumulate_triplet_values_1ba73229 747fcd9 load on device 'metal:0' took 38.83 ms  (cached)
+Module warp._src.fem.quadrature.quadrature.dyn.quadrature_point_element_indices_1777abef 6fbf0fd load on device 'metal:0' took 39.68 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.integrate_velocity_98db749a ee20441 load on device 'metal:0' took 40.84 ms  (cached)
+Module warp._src.fem.field.virtual.dyn.dispatch_linear_kernel_fn_3677c41c b85dd5e load on device 'metal:0' took 42.60 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.integrate_velocity_apic_428a8501 896fbe7 load on device 'metal:0' took 41.82 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.integrate_mass_dd139576 872d291 load on device 'metal:0' took 40.49 ms  (cached)
+Module warp._src.fem.field.virtual.dyn.dispatch_linear_kernel_fn_f275fa0a 32df022 load on device 'metal:0' took 42.47 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.integrate_yield_parameters_8299cd31 28ad528 load on device 'metal:0' took 41.31 ms  (cached)
+Module warp._src.fem.field.virtual.dyn.dispatch_linear_kernel_fn_84bdb99d 8aafd7e load on device 'metal:0' took 42.49 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.integrate_active_fraction_691fe920 473bd9d load on device 'metal:0' took 40.92 ms  (cached)
+Module warp._src.fem.field.virtual.dyn.dispatch_linear_kernel_fn_bfd08c33 18bcaa9 load on device 'metal:0' took 41.98 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.strain_delta_form_2eed491c 38de036 load on device 'metal:0' took 41.10 ms  (cached)
+Module warp._src.fem.field.virtual.dyn.dispatch_bilinear_kernel_fn_49136e8a 3ef9aa0 load on device 'metal:0' took 47.15 ms  (cached)
+Module warp.fem.integrate 3c82cc2 load on device 'metal:0' took 39.68 ms  (cached)
+Module newton._src.solvers.implicit_mpm.solver_implicit_mpm 732e90b load on device 'metal:0' took 42.32 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.integrate_particle_stress_59c14493 b9e3a68 load on device 'metal:0' took 40.71 ms  (cached)
+Module warp._src.fem.field.virtual.dyn.dispatch_linear_kernel_fn_6b645ff1 1950815 load on device 'metal:0' took 42.56 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.mass_form_685ca34f 52263cb load on device 'metal:0' took 40.75 ms  (cached)
+Module warp._src.fem.field.virtual.dyn.dispatch_bilinear_kernel_fn_5e13863b c7efb61 load on device 'metal:0' took 42.54 ms  (cached)
+Module warp.sparse 90961cb load on device 'metal:0' took 41.67 ms  (cached)
+Module _bsr_assign_copy_blocks_402e6063 be71792 load on device 'metal:0' took 40.61 ms  (cached)
+Module compute_eigenvalues_7b4a2440 40a0d0d load on device 'metal:0' took 41.93 ms  (cached)
+Module inverse_scale_vector_19f2738e c7f393f load on device 'metal:0' took 38.95 ms  (cached)
+Module newton._src.solvers.implicit_mpm.solve_rheology 5b058fc load on device 'metal:0' took 41.89 ms  (cached)
+Module newton._src.solvers.implicit_mpm.contact_solver_kernels 2c138d3 load on device 'metal:0' took 40.04 ms  (cached)
+Module warp._src.metal_sparse b25b73f load on device 'metal:0' took 39.90 ms  (cached)
+Module warp._src.metal_sparse 63deb2a load on device 'metal:0' took 39.87 ms  (cached)
+Module _bsr_transpose_values_e788d791 74e0be2 load on device 'metal:0' took 39.49 ms  (cached)
+Module make_bsr_mv_kernel__locals__bsr_mv_kernel_51ac893e 858c194 load on device 'metal:0' took 39.12 ms  (cached)
+Module newton._src.solvers.implicit_mpm.rheology_solver_kernels 7d146ad load on device 'metal:0' took 44.64 ms  (cached)
+Module newton._src.solvers.implicit_mpm.solve_rheology 07e0332 load on device 'metal:0' took 41.34 ms  (cached)
+Module newton._src.solvers.implicit_mpm.rheology_solver_kernels.dyn.jacobi_solve_kernel_impl_64867ed4 46b8e2d load on device 'metal:0' took 39.97 ms  (cached)
+Module warp.fem.linalg 70b4218 load on device 'metal:0' took 38.72 ms  (cached)
+Module metalsim.physics.mpm.newton_compat e3314c7 load on device 'metal:0' took 39.42 ms  (cached)
+Module newton._src.solvers.implicit_mpm.solver_implicit_mpm 4711267 load on device 'metal:0' took 43.60 ms  (cached)
+Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_c250f2e7 f976367 load on device 'metal:0' took 40.44 ms  (cached)
+Module warp.fem.integrate._identity_field_97c62231 73546b3 load on device 'metal:0' took 49.50 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.update_particle_strains_f4e4d5e7 21226c1 load on device 'metal:0' took 43.41 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_34a4f9cb ba52845 load on device 'metal:0' took 41.97 ms  (cached)
+Module map_mul 70219a3 load on device 'metal:0' took 39.18 ms  (cached)
+[mem] after first policy step      device   15.66 GB  footprint   21.85 GB  resident   10.15 GB  warp-live   10.75 GB  native-tracked   13.93 GB
+[mem] after 2 replayed policy steps device   15.66 GB  footprint   21.27 GB  resident   10.14 GB  warp-live   10.75 GB  native-tracked   13.93 GB
+[mem] after gc                     device   15.66 GB  footprint   21.27 GB  resident   10.14 GB  warp-live   10.75 GB  native-tracked   13.93 GB
+live by phase / subsystem:
+     2.957 GB  eager || MPM
+     2.762 GB  build || collision
+     1.632 GB  build || MPM
+     1.560 GB  build || model/state
+     1.095 GB  build || MuJoCo Warp
+     0.543 GB  build || task
+     0.184 GB  capture || MPM
+     0.018 GB  build || SolverMuJoCo
+     0.003 GB  eager || collision
+     0.000 GB  eager || SolverMuJoCo
+new memory taken during capture, by subsystem: {'MuJoCo Warp': 0.136, 'MPM': 1.544}
+freed inside capture (graph-held unless reused), by subsystem: {'MuJoCo Warp': 0.856, 'MPM': 6.999}
+{
+ "live_by_phase": {
+  "build": 7610196418,
+  "eager": 2959889016,
+  "capture": 183607644
+ },
+ "freed_inside_capture_total": 7855304972,
+ "reused_total": 6358925364
+}
+  live    2.168 GB  build || collision | contacts.py:__init__
+  live    0.811 GB  eager || MPM | utils.py:compress_node_indices
+  live    0.668 GB  build || model/state | model.py:_add_custom_attributes
+  live    0.613 GB  build || MuJoCo Warp | io.py:put_data
+  live    0.582 GB  build || MPM | utils.py:compress_node_indices
+  live    0.479 GB  eager || MPM | metal_primitives.py:scratch_ptr
+  live    0.453 GB  build || collision | contact_reduction_global.py:__init__
+  live    0.406 GB  build || task | solver_coupled.py:_select_attribute_value
+  live    0.337 GB  eager || MPM | metal_sparse.py:get
+  live    0.327 GB  eager || MPM | sparse.py:_bsr_ensure_fits
+  live    0.294 GB  build || MuJoCo Warp | io.py:_create_constraint
+  live    0.265 GB  build || model/state | collide.py:_pairs
+  live    0.260 GB  build || MPM | metal_primitives.py:scratch_ptr
+  live    0.243 GB  build || model/state | builder.py:_build_default_array
+  live    0.243 GB  eager || MPM | integrate.py:_launch_integrate_kernel
+  live    0.239 GB  eager || MPM | restriction.py:rebuild
+  live    0.178 GB  build || MPM | nodal_field.py:__init__
+  live    0.177 GB  build || model/state | model.py:state
+  live    0.148 GB  build || MPM | metal_volume.py:allocate
+  live    0.136 GB  eager || MPM | solve_rheology.py:__init__
+  live    0.132 GB  build || MPM | restriction.py:rebuild
+  live    0.124 GB  build || MuJoCo Warp | io.py:_create_array
+  live    0.116 GB  build || collision | narrow_phase.py:__init__
+  live    0.099 GB  capture || MPM | nodal_field.py:__init__
+  live    0.096 GB  eager || MPM | integrate.py:_allocate_interpolate_jacobian_triplets
+  live    0.094 GB  build || model/state | builder.py:finalize
+  live    0.081 GB  eager || MPM | nodal_field.py:__init__
+  live    0.079 GB  eager || MPM | solver_implicit_mpm.py:allocate_temporaries
+  live    0.067 GB  build || MPM | nanogrid.py:_build_rebuildable_node_grid
+  live    0.064 GB  build || MuJoCo Warp | io.py:_allocate_island_arrays
+  live    0.061 GB  build || model/state | builder.py:build_array
+  live    0.061 GB  build || MPM | nanogrid.py:__init__
+  live    0.060 GB  capture || MPM | solver_implicit_mpm.py:_update_particles
+  live    0.057 GB  build || MPM | solver_implicit_mpm.py:allocate_temporaries
+  live    0.057 GB  build || task | solver_coupled.py:_ensure_entry_contact_buffer
+  live    0.042 GB  build || model/state | model.py:bvh_build_particles
+  live    0.040 GB  eager || MPM | sparse.py:_bsr_resize
+  live    0.033 GB  build || task | solver_coupled.py:_build_entries
+  live    0.030 GB  eager || MPM | pic_quadrature.py:_compute_cell_indices_from_positions
+  live    0.025 GB  build || collision | hashtable.py:__init__
+allocated during capture (new memory), top:
+  cap     0.397 GB  capture || MPM | rasterized_collisions.py:_rigidity_matrices_compacted
+  cap     0.365 GB  capture || MPM | sparse.py:_bsr_ensure_fits
+  cap     0.361 GB  capture || MPM | rasterized_collisions.py:build_rigidity_operator
+  cap     0.213 GB  capture || MPM | sparse.py:bsr_set_from_triplets
+  cap     0.134 GB  capture || MuJoCo Warp | solver.py:_create_solver_context
+  cap     0.108 GB  capture || MPM | solver_implicit_mpm.py:_update_particles
+  cap     0.050 GB  capture || MPM | nodal_field.py:__init__
+  cap     0.025 GB  capture || MPM | solve_rheology.py:__init__
+  cap     0.012 GB  capture || MPM | integrate.py:_launch_integrate_kernel
+  cap     0.010 GB  capture || MPM | sparse.py:bsr_zeros
+  cap     0.002 GB  capture || MuJoCo Warp | forward.py:implicit
+  cap     0.000 GB  capture || MPM | nanogrid.py:_recompute_generated_environment_offsets
+  cap     0.000 GB  capture || MuJoCo Warp | derivative.py:deriv_smooth_vel
+  cap     0.000 GB  capture || MPM | nanogrid.py:_normalize_flat_environment_offsets
+  cap     0.000 GB  capture || MuJoCo Warp | constraint.py:make_constraint
+  cap     0.000 GB  capture || MuJoCo Warp | smooth.py:transmission
+  cap     0.000 GB  capture || MPM | newton_compat.py:_run_solver_loop_cuda_semantics
+  cap     0.000 GB  capture || MPM | partition.py:rebuild
+  cap     0.000 GB  capture || MPM | restriction.py:rebuild
+  cap     0.000 GB  capture || MuJoCo Warp | solver.py:_solve
+  cap     0.000 GB  capture || MPM | utils.py:compress_node_indices
+TemporaryStore pools: peak requested / peak handed out (GB): {'int32': (1.516, 1.644), 'vec_t': (0.258, 0.258), 'float32': (0.168, 0.168)}
+graph-held by kind (GB): {'retained: small capture temp': 0.002, 'capture pool': 7.854, 'retained: allocated before capture, freed during': 0.177} pool net of reuse 1.495
+TemporaryStores: [(2.546, 1.365)]

@@ -42,6 +42,9 @@ ap.add_argument("--jitter-ulp", type=int, default=0,
                 help="perturb every initial particle coordinate by k float32 ulps, k uniform in [-N, N] (floor ensemble; "
                      "init.npz / init_md5 keep the unperturbed state so runs stay comparable); 0 = off")
 ap.add_argument("--seed", type=int, default=0, help="RNG seed for --jitter-ulp")
+ap.add_argument("--jitter-body-ulp", type=int, default=0,
+                help="perturb every initial rigid joint coordinate (state joint_q) by k float32 ulps, k uniform in "
+                     "[-N, N] (rigid-side floor ensemble; init.npz / init_md5 keep the particle state); 0 = off")
 ap.add_argument("--metal-fast-math", choices=["off", "cuda", "relaxed"],
                 help="Metal form of fast_math modules (newton_compat.install(metal_fast_math=...)); default: install's")
 ap.add_argument("--no-fast-math", action="store_true",
@@ -141,6 +144,16 @@ with wp.ScopedDevice(device):
                   "max_abs_m": float(np.abs(qj.astype(np.float64) - q32).max()),
                   "perturbed_md5": hashlib.md5(qj.astype(q0.dtype).tobytes() + qd0.tobytes()).hexdigest()}
 
+    if args.jitter_body_ulp:
+        bs0 = sc.body_state
+        rng_b = np.random.default_rng(1000 + args.seed)
+        jq = bs0.joint_q.numpy().astype(np.float32)
+        kb = rng_b.integers(-args.jitter_body_ulp, args.jitter_body_ulp + 1, size=jq.shape).astype(np.float32)
+        jqj = (jq + kb * np.spacing(np.abs(jq))).astype(np.float32)
+        bs0.joint_q.assign(jqj)
+        # body poses follow the perturbed joint coordinates (Newton's forward kinematics)
+        newton.eval_fk(sc.model, bs0.joint_q, bs0.joint_qd, bs0)
+        jitter = dict(jitter or {}, body_ulp=args.jitter_body_ulp, body_coords_changed=int((jqj != jq).sum()))
     frames = sc.frames
     pos, vel, body, fidx, wall = [], [], [], [], []
     extras = {}
