@@ -295,6 +295,8 @@ class InstanceStructure:
             ce.useResource_usage_(a, Metal.MTLResourceUsageRead)
         if getattr(self.rt, "dyn_as", None):                            # the dynamic objects' structures: their heap
             ce.useHeap_(self.rt.dyn_heap)
+        if hasattr(self.rt, "use_dyn_bvh"):
+            self.rt.use_dyn_bvh(ce)
         self.field.use_resources(ce)
 
 

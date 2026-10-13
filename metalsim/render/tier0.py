@@ -163,6 +163,8 @@ class Tier0Renderer:
                                 appearance=appearance, ctx=self.ctx, device=device, **self._extras_kw)
             ro = np.zeros(4, np.uint32); ro[0] = self.rt.tpr; ro.view(np.float32)[1] = self.rt.stride; ro[2] = rt_samples
             self.rt_offset_buf = self.ctx.buffer(16, ro, "rt_offset")
+            if self.rt.shader_defines():      # sbvh layout: the ray-query shaders compiled for the per-env BVH
+                self._build_pipelines()
         # extra objects: pose rows of the site slots; vertices of the dynamic slots (shared with the ray tracer at tier 1,
         # whose records carry the env grid offset that dyn_vs subtracts)
         self.dyn, self.pose, self._dyn_src = None, None, None
@@ -411,7 +413,10 @@ class Tier0Renderer:
 
     def _build_pipelines(self):
         c = self.ctx
-        lib = c.library("tier0", None if self.max_lights is None else {"MAX_LIGHTS": int(self.max_lights)})
+        defs = {} if self.max_lights is None else {"MAX_LIGHTS": int(self.max_lights)}
+        if self.rt is not None:
+            defs.update(self.rt.shader_defines())       # sbvh layout: ray queries through the per-env BVH
+        lib = c.library("tier0", defs or None)
         self.p_env = c.compute_pipeline(lib, "build_env_params")
         self.p_untile = c.compute_pipeline(lib, "untile")
         vd = Metal.MTLVertexDescriptor.new()
@@ -815,6 +820,8 @@ class Tier0Renderer:
                 re.useResource_usage_stages_(a, Metal.MTLResourceUsageRead, Metal.MTLRenderStageFragment)
             if getattr(rt, "dyn_as", None):
                 re.useHeap_stages_(rt.dyn_heap, Metal.MTLRenderStageFragment)
+            rt.use_dyn_bvh(re, fragment=True)
+            rt.bind_dyn_bvh(re, 30, fragment=True)
             re.setFragmentAccelerationStructure_atBufferIndex_(rt.inst_as, 10)
             re.setFragmentBuffer_offset_atIndex_(self.rt_offset_buf, 0, 11)
             re.setFragmentBuffer_offset_atIndex_(rt.inst_tab, 0, 12)

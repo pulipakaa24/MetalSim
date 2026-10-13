@@ -1000,6 +1000,8 @@ struct RTOffset { uint tiles_per_row; float stride; uint n_samples; uint _pad; }
 struct MeshInfoT { uint i_off, i_count, _p0, _p1; };
 struct InstanceDescT { packed_float3 col0, col1, col2, col3; uint options, mask, if_table_offset, as_index; };
 
+#include "dyn_bvh.h"
+
 inline float3 rt_env_offset(uint e, constant RTOffset& ro) {
     return float3(float(e % ro.tiles_per_row) * ro.stride, float(e / ro.tiles_per_row) * ro.stride, 0.0);
 }
@@ -1012,11 +1014,15 @@ inline float3 ortho_basis_x(float3 n) {
     return normalize(cross(a, n));
 }
 
-inline bool occluded(instance_acceleration_structure accel, float3 origin, float3 dir, float tmax) {
+inline bool occluded(instance_acceleration_structure accel, float3 origin, float3 dir, float tmax DYN_PARAM) {
     ray r(origin, dir, 0.0005, tmax);
+#ifdef DYN_SBVH
+    return RT_ANY(r, accel).type != intersection_type::none;
+#else
     intersector<triangle_data, instancing> i;
     i.accept_any_intersection(true);
     return i.intersect(r, accel).type != intersection_type::none;
+#endif
 }
 
 fragment FSOut geom_fs_rt(
@@ -1044,6 +1050,7 @@ fragment FSOut geom_fs_rt(
     device const uint*      indices    [[buffer(16)]],
     device const InstanceDescT* inst   [[buffer(17)]],
     device const MaterialExt* mext     [[buffer(18)]],
+    DYN_KERNEL_ARG
     texture2d<float>        atlas      [[texture(0)]],
     sampler                 samp       [[sampler(0)]])
 {
@@ -1078,7 +1085,7 @@ fragment FSOut geom_fs_rt(
             float u = hash_f(seed + s * 7919u), v = hash_f(seed + s * 104729u + 17u);
             float rr = 0.012 * sqrt(u), ph = 6.2831853 * v;   // ~0.7 deg angular radius
             float3 d = normalize(L + lx * (rr * cos(ph)) + ly * (rr * sin(ph)));
-            occ += occluded(accel, P, d, 100.0) ? 1.0 : 0.0;
+            occ += occluded(accel, P, d, 100.0 DYN_PASS) ? 1.0 : 0.0;
         }
         return 1.0 - occ / float(ns);
     };
@@ -1104,7 +1111,7 @@ fragment FSOut geom_fs_rt(
             else {          // point / spot: one ray to the light position (hard shadow)
                 float3 to = Lpos + rt_env_offset(in.env, ro) - P;
                 float dl = length(to);
-                s = (dl > 0.003 && occluded(accel, P, to / dl, dl - 0.002)) ? 0.0 : 1.0;   // tmax > tmin always
+                s = (dl > 0.003 && occluded(accel, P, to / dl, dl - 0.002 DYN_PASS)) ? 0.0 : 1.0;   // tmax > tmin always
             }
         }
         direct += shade_light(N, V, L, l.diffuse.xyz * (PI * att), base, f0, metallic, a2, NdotV) * s;
@@ -1122,7 +1129,7 @@ fragment FSOut geom_fs_rt(
         float u = hash_f(seed + s * 6151u + 3u), v = hash_f(seed + s * 12289u + 5u);
         float rr = sqrt(u), ph = 6.2831853 * v;
         float3 d = tx * (rr * cos(ph)) + ty * (rr * sin(ph)) + N * sqrt(max(1.0 - u, 0.0));
-        ao_occ += occluded(accel, P, d, 0.5) ? 1.0 : 0.0;
+        ao_occ += occluded(accel, P, d, 0.5 DYN_PASS) ? 1.0 : 0.0;
     }
     float ao = 1.0 - 0.5 * ao_occ / float(ns);
     float3 color = direct + e.ambient.rgb * base * ao + emission * base;
@@ -1132,13 +1139,17 @@ fragment FSOut geom_fs_rt(
     if (refl > 0.01) {
         float3 Rd = reflect(-V, N);
         ray r(P, Rd, 0.001, 50.0);
+#ifdef DYN_SBVH
+        RTRes res = RT_CLOSEST(r, accel);
+#else
         intersector<triangle_data, instancing> isect;
         intersection_result<triangle_data, instancing> res = isect.intersect(r, accel);
+#endif
         float3 rc = sp.sky_info.y > 0.5 ? sky_color(atlas, samp, sp.sky_rect, sp.sky_info, Rd)
                   : sp.sky.w > 0.5 ? sp.sky.xyz : e.clear_color.rgb;
         if (res.type != intersection_type::none) {
-            uint slot2 = inst_tab[res.instance_id].y + res.geometry_id;    // geometry: 0 for geoms; object in a dynamic env structure
-            uint mesh2 = inst[res.instance_id].as_index + res.geometry_id; // = slot_mesh[slot2] for geoms
+            uint slot2 = inst_tab[res.instance_id].y + res.geometry_id % max(inst_tab[res.instance_id].x, 1u);    // geometry: 0 for geoms; object in a dynamic env structure
+            uint mesh2 = RT_MESH(res, inst[res.instance_id].as_index); // = slot_mesh[slot2] for geoms
             uint b = meshes[mesh2].i_off + res.primitive_id * 3;
             uint i0 = indices[b], i1 = indices[b + 1], i2 = indices[b + 2];
             float2 bc = res.triangle_barycentric_coord;
@@ -1152,7 +1163,7 @@ fragment FSOut geom_fs_rt(
             Material m2 = mats[slot2];
             float4 mod2 = per_inst[in.env * c.n_slots + slot2];
             float3 base2 = m2.rgba.rgb * mod2.rgb;
-            float3 lp2 = transpose(R2) * (P + Rd * res.distance - float3(id2.col3));   // hit in the geom frame
+            float3 lp2 = transpose(R2) * (P + Rd * res.distance - RT_TRANSLATION(res, id2.col3));   // hit in the geom frame
             base2 *= material_tex(m2.rect, m2.par, mext[slot2], uv2, lp2, atlas, samp).rgb;
             float3 V2 = -Rd;
             float3 d2 = float3(0.0);

@@ -155,6 +155,16 @@ class MetalContext:
 
     def wait_for(self, cb, event: wm.SharedEvent, value: int):
         cb.encodeWaitForEvent_value_(event.obj, value)
+        w = getattr(self, "_waits", None)
+        if w is None or len(w) > 64:      # only the latest command buffers' waits are looked up (waits_of)
+            w = self._waits = {}
+        w.setdefault(id(cb), (cb, []))[1].append((event.obj, value))
+
+    def waits_of(self, cb):
+        """The event waits encoded into ``cb`` by ``wait_for`` (command buffers that must run before ``cb`` replicate
+        them)."""
+        ent = getattr(self, "_waits", {}).get(id(cb))
+        return ent[1] if ent is not None and ent[0] is cb else []
 
     def signal(self, cb) -> int:
         v = self.event.next_value()

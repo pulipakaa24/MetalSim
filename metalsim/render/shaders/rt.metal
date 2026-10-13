@@ -35,6 +35,8 @@ inline float3x3 load_mat33(device const float* p) {
     return float3x3(float3(p[0], p[3], p[6]), float3(p[1], p[4], p[7]), float3(p[2], p[5], p[8]));
 }
 
+#include "dyn_bvh.h"
+
 inline float3 env_offset(uint e, constant RTConsts& c) {
     return float3(float(e % c.tiles_per_row) * c.stride, float(e / c.tiles_per_row) * c.stride, 0.0);
 }
@@ -100,6 +102,7 @@ kernel void lidar(
     device float*   out_normal [[buffer(14)]],   // (n_envs, n_beams, 3)
     device int*     out_slot   [[buffer(15)]],   // (n_envs, n_beams) hit slot (-1 none)
     device float*   out_intensity [[buffer(16)]],// (n_envs, n_beams)
+    DYN_KERNEL_ARG
     uint2 tid [[thread_position_in_grid]])
 {
     uint b = tid.x, e = tid.y;
@@ -111,9 +114,13 @@ kernel void lidar(
     float3 dl = float3(cos(ae.y) * cos(ae.x), cos(ae.y) * sin(ae.x), sin(ae.y));
     float3 dir = normalize(R * dl);
     ray r(origin + env_offset(e, c), dir, 0.001, c.max_range);
+#ifdef DYN_SBVH
+    RTRes res = RT_CLOSEST(r, accel);
+#else
     intersector<triangle_data, instancing> isect;
     isect.accept_any_intersection(false);
     intersection_result<triangle_data, instancing> res = isect.intersect(r, accel);
+#endif
     uint o = e * c.n_beams + b;
     if (res.type == intersection_type::none) {
         out_dist[o] = 0.0; out_slot[o] = -1; out_intensity[o] = 0.0;
@@ -122,8 +129,8 @@ kernel void lidar(
         return;
     }
     uint ii = res.instance_id;
-    uint slot = inst_tab[ii].y + res.geometry_id;          // geometry: 0 for geoms; the object within a dynamic env structure
-    uint mesh = inst[ii].as_index + res.geometry_id;       // = slot_mesh[slot] for geoms
+    uint slot = inst_tab[ii].y + res.geometry_id % max(inst_tab[ii].x, 1u);          // geometry: 0 for geoms; the object within a dynamic env structure
+    uint mesh = RT_MESH(res, inst[ii].as_index);          // = slot_mesh[slot] for geoms
     InstanceDesc d = inst[ii];
     float3x3 Ri = float3x3(float3(d.col0), float3(d.col1), float3(d.col2));
     float3 n = tri_normal(mesh, res.primitive_id, meshes, verts, indices, Ri);
@@ -147,6 +154,7 @@ kernel void raycast_depth(
     constant uint4&         dims       [[buffer(4)]],   // width, height, n_cam, cam_id
     constant RTConsts&      c          [[buffer(5)]],
     device float*           out_depth  [[buffer(6)]],   // (n_envs, h, w) distance to image plane
+    DYN_KERNEL_ARG
     uint3 tid [[thread_position_in_grid]])
 {
     uint x = tid.x, y = tid.y, e = tid.z;
@@ -159,8 +167,12 @@ kernel void raycast_depth(
     float3 dl = float3((float(x) + 0.5 - intrinsics.z) / intrinsics.x, -(float(y) + 0.5 - intrinsics.w) / intrinsics.y, -1.0);
     float3 dir = normalize(R * dl);
     ray r(origin + env_offset(e, c), dir, 0.001, c.max_range);
+#ifdef DYN_SBVH
+    RTRes res = RT_CLOSEST(r, accel);
+#else
     intersector<triangle_data, instancing> isect;
     intersection_result<triangle_data, instancing> res = isect.intersect(r, accel);
+#endif
     uint o = (e * h + y) * w + x;
     if (res.type == intersection_type::none) { out_depth[o] = 0.0; return; }
     float3 hit = dir * res.distance;
@@ -204,6 +216,7 @@ kernel void lidar_ext(
     device int*     out_slot   [[buffer(17)]],   // (n_envs, n_beams, R)
     device float*   out_intensity [[buffer(18)]],// (n_envs, n_beams, R)
     device int*     out_nret   [[buffer(19)]],   // (n_envs, n_beams)
+    DYN_KERNEL_ARG
     uint2 tid [[thread_position_in_grid]])
 {
     uint b = tid.x, e = tid.y;
@@ -230,17 +243,21 @@ kernel void lidar_ext(
         uint hits = 0;
         for (uint it = 0; it < x.hits_per_ray + 8 && hits < x.hits_per_ray; ++it) {
             ray r(org, dir, tmin, c.max_range);
+#ifdef DYN_SBVH
+            RTRes res = RT_CLOSEST(r, accel);
+#else
             intersection_result<triangle_data, instancing> res = isect.intersect(r, accel);
+#endif
             if (res.type == intersection_type::none) break;
             tmin = res.distance + 1e-4;
             int ii = int(res.instance_id);
             int g = int(res.geometry_id);             // the object: instance, and geometry within a dynamic env structure
             if (ii == last && g == last_g) continue;  // exit / inner faces of the object just hit
             last = ii; last_g = g;
-            uint slot = inst_tab[ii].y + res.geometry_id;
+            uint slot = inst_tab[ii].y + res.geometry_id % max(inst_tab[ii].x, 1u);
             InstanceDesc di = inst[ii];
             float3x3 Ri = float3x3(float3(di.col0), float3(di.col1), float3(di.col2));
-            float3 n = tri_normal(di.as_index + res.geometry_id, res.primitive_id, meshes, verts, indices, Ri);
+            float3 n = tri_normal(RT_MESH(res, di.as_index), res.primitive_id, meshes, verts, indices, Ri);
             if (dot(n, dir) > 0.0) n = -n;
             float p = P * slot_refl[slot] * max(dot(n, -dir), 0.0) / max(res.distance * res.distance, 1e-4);
             if (nc < LIDAR_MAX_CAND) {

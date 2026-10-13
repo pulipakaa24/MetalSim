@@ -20,6 +20,7 @@ struct Light { float4 kind; float4 diffuse; float4 specular; float4 ambient; flo
 struct SceneParams { float4 bounds; float4 hl_ambient; float4 hl_diffuse; float4 hl_specular; float4 sky;
                      float4 sky_rect; float4 sky_info; };   // skybox cube in the atlas; sky_info: faces, drawn
 #include "appearance.h"
+#include "dyn_bvh.h"
 struct MeshInfo { uint i_off, i_count, _p0, _p1; };
 struct InstanceDesc { packed_float3 col0, col1, col2, col3; uint options, mask, if_table_offset, as_index; };
 struct PTConsts {
@@ -33,6 +34,10 @@ struct PTConsts {
                                                 // grain_eps: ray offset off a grain surface [m] (grains are mm-sized; scene hits use 1 mm);
                                                 // trans_ids: annotations under transparent geoms (0 surface, 1 behind)
     float4 env_mul;                             // FLAG_ENVMAP: rgb multiplier on the map (dome intensity * 2^exposure * color)
+#ifdef DYN_SBVH
+    ulong dyn_args;                             // GPU address of the DynBVHArgs (sbvh layout; all 31 buffer slots are taken)
+    ulong _pad_dyn;
+#endif
 };
 struct CamSpec { float4 intrinsics; float4 pos_delta; float4 rot_delta; float4 light; float4 ambient; float4 clear_color; int cam_id, p0, p1, p2; };
 
@@ -192,12 +197,16 @@ struct GrainGeo { device const float* verts; device const uint* indices; device 
 inline Hit trace(instance_acceleration_structure accel, float3 o, float3 d, float tmax,
                  device const uint2* inst_tab, device const int* slot_mesh, device const MeshInfo* meshes,
                  device const float* verts, device const uint* indices, device const InstanceDesc* inst,
-                 GrainGeo gg, float tmin = 0.0005)
+                 GrainGeo gg, float tmin DYN_PARAM)
 {
     Hit h; h.ok = false;
     ray r(o, d, tmin, tmax);
+#ifdef DYN_SBVH
+    RTRes res = RT_CLOSEST(r, accel);
+#else
     intersector<triangle_data, instancing> isect;
     intersection_result<triangle_data, instancing> res = isect.intersect(r, accel);
+#endif
     if (res.type == intersection_type::none) return h;
     bool grain = res.instance_id >= gg.inst0;
     uint slot = 0, b;
@@ -205,8 +214,8 @@ inline Hit trace(instance_acceleration_structure accel, float3 o, float3 d, floa
         b = gg.meshes[inst[res.instance_id].as_index - gg.as0].i_off + res.primitive_id * 3;
         verts = gg.verts; indices = gg.indices;
     } else {
-        slot = inst_tab[res.instance_id].y + res.geometry_id;   // geometry: 0 for geoms; the object within a dynamic env structure
-        b = meshes[inst[res.instance_id].as_index + res.geometry_id].i_off + res.primitive_id * 3;   // mesh: = slot_mesh[slot] for geoms
+        slot = inst_tab[res.instance_id].y + res.geometry_id % max(inst_tab[res.instance_id].x, 1u);   // geometry: 0 for geoms; the object within a dynamic env structure
+        b = meshes[RT_MESH(res, inst[res.instance_id].as_index)].i_off + res.primitive_id * 3;   // mesh: = slot_mesh[slot] for geoms
     }
     uint i0 = indices[b], i1 = indices[b + 1], i2 = indices[b + 2];
     float2 bc = res.triangle_barycentric_coord; float w0 = 1.0 - bc.x - bc.y;
@@ -250,11 +259,11 @@ inline float surface_alpha(device const Material* mats, device const float4* per
 inline float transmit(instance_acceleration_structure accel, float3 o, float3 d, float tmax,
                       device const uint2* inst_tab, device const int* slot_mesh, device const MeshInfo* meshes,
                       device const float* verts, device const uint* indices, device const InstanceDesc* inst,
-                      GrainGeo gg, float tmin, device const Material* mats, device const float4* per_inst, uint e, uint n_slots)
+                      GrainGeo gg, float tmin, device const Material* mats, device const float4* per_inst, uint e, uint n_slots DYN_PARAM)
 {
     float T = 1.0;
     for (uint k = 0; k < TRANSMIT_MAX; ++k) {
-        Hit h = trace(accel, o, d, tmax, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, k == 0 ? tmin : 0.0005);
+        Hit h = trace(accel, o, d, tmax, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, k == 0 ? tmin : 0.0005 DYN_PASS);
         if (!h.ok) return T;
         if (h.grain) return 0.0;                 // grains are opaque
         float a = surface_alpha(mats, per_inst, e, n_slots, h.slot);
@@ -361,6 +370,9 @@ kernel void path_trace(
     sampler                 env_samp   [[sampler(1)]],   // linear, repeat in u, clamp in v
     uint3 tid [[thread_position_in_grid]])
 {
+#ifdef DYN_SBVH
+    device const DynBVHArgs& dbv = *reinterpret_cast<device const DynBVHArgs*>(c.dyn_args);
+#endif
     uint x = tid.x, y = tid.y, e = tid.z;
     if (x >= c.width || y >= c.height || e >= c.n_envs) return;
     uint pix = (e * c.height + y) * c.width + x;
@@ -393,7 +405,7 @@ kernel void path_trace(
         float tmin = 0.0005;     // ray start distance: 0.5 mm, or grain_eps leaving a grain
         uint passes = 0;        // transparent surfaces passed through (presence), not counted as bounces
         for (uint bounce = 0; bounce <= c.max_bounces; ++bounce) {
-            Hit h = trace(accel, o, d, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin);
+            Hit h = trace(accel, o, d, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin DYN_PASS);
             if (bounce == 0 && c.clip_far > 0.0 && h.ok && -dot(h.p - o, R[2]) > c.clip_far) h.ok = false;   // beyond the far plane: background
             if (!h.ok) {
                 float3 er = sky_tex ? sky_color(atlas, samp, sp.sky_rect, sp.sky_info, d) * c.env_scale : env_rad;
@@ -425,7 +437,7 @@ kernel void path_trace(
                 if (!h.grain && m.rgba.a * mod.a < 0.995 && c.trans_ids == 1u) {    // "behind": the first opaque surface
                     float3 ob = h.p; float zb = 0.0; float3 nb = float3(0.0); int sb = 0;
                     for (uint k = 0; k < TRANSMIT_MAX; ++k) {
-                        Hit hb = trace(accel, ob, d, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, 0.0005);
+                        Hit hb = trace(accel, ob, d, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, 0.0005 DYN_PASS);
                         if (!hb.ok) break;
                         if (hb.grain || surface_alpha(mats, per_inst, e, c.n_slots, hb.slot) >= 0.995) {
                             zb = -dot(hb.p - o, R[2]); nb = hb.n; sb = hb.grain ? int(c.n_slots) + 1 : int(hb.slot) + 1; break;
@@ -464,7 +476,7 @@ kernel void path_trace(
                 }
                 float NdotL = dot(N, L);
                 if (NdotL <= 0.0 || att <= 0.0) continue;
-                float tr = transmit(accel, h.p + N * eps, L, tmax, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin, mats, per_inst, e, c.n_slots);
+                float tr = transmit(accel, h.p + N * eps, L, tmax, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin, mats, per_inst, e, c.n_slots DYN_PASS);
                 if (tr <= 0.0) continue;
                 radiance += throughput * brdf_any(model, N, V, L, base, f0, specw, metallic, rough, a2) * NdotL * l.diffuse.xyz * (PI * att * tr);
             }
@@ -472,7 +484,7 @@ kernel void path_trace(
                 float3 L = -normalize(cs.light.xyz);
                 float NdotL = dot(N, L);
                 if (NdotL > 0.0) {
-                    float tr = transmit(accel, h.p + N * eps, L, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin, mats, per_inst, e, c.n_slots);
+                    float tr = transmit(accel, h.p + N * eps, L, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin, mats, per_inst, e, c.n_slots DYN_PASS);
                     if (tr > 0.0) radiance += throughput * brdf_any(model, N, V, L, base, f0, specw, metallic, rough, a2) * NdotL * float3(PI * cs.light.w * tr);
                 }
             }
@@ -485,7 +497,7 @@ kernel void path_trace(
                 float pe; float3 L = env_sample(env_cdf, c, rnd(rng), rnd(rng), pe);
                 float NdotL = dot(N, L);
                 if (NdotL > 0.0 && pe > 1e-8) {
-                    float tr = transmit(accel, h.p + N * eps, L, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin, mats, per_inst, e, c.n_slots);
+                    float tr = transmit(accel, h.p + N * eps, L, 1000.0, inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin, mats, per_inst, e, c.n_slots DYN_PASS);
                     if (tr > 0.0) {
                         float3 Hm = normalize(L + V);
                         float pb = pd * NdotL / PI + (1.0 - pd) * D_ggx(max(dot(N, Hm), 0.0), a2) * max(dot(N, Hm), 0.0) / (4.0 * max(dot(V, Hm), 1e-4));
