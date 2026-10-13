@@ -39,7 +39,48 @@ def read_isaac(path):
     return out
 
 
+def window_stats(runs: list[dict], key: str, window: int, n_its: int):
+    """Per ``window``-iteration window: each run's mean of ``key`` over the window, then mean, sample std and count
+    over runs (seeds are independent samples: neither side's physics is run-to-run deterministic)."""
+    import statistics
+
+    out = []
+    for a in range(0, n_its, window):
+        per_run = []
+        for r in runs:
+            vals = [r[i][key] for i in range(a, a + window) if i in r and r[i].get(key) is not None]
+            if vals:
+                per_run.append(sum(vals) / len(vals))
+        if per_run:
+            sd = statistics.stdev(per_run) if len(per_run) > 1 else float("nan")
+            out.append((a, a + window - 1, sum(per_run) / len(per_run), sd, len(per_run), per_run))
+    return out
+
+
+def seeds_main(argv):
+    ap = argparse.ArgumentParser(description="mean +- std over seeds per window")
+    ap.add_argument("--mac", nargs="*", default=[])
+    ap.add_argument("--isaac", nargs="*", default=[])
+    ap.add_argument("--window", type=int, default=10)
+    ap.add_argument("--iterations", type=int, default=60)
+    ap.add_argument("--json")
+    a = ap.parse_args(argv)
+    res = {}
+    for side, runs in (("metalsim", [read_mac(p) for p in a.mac]), ("isaac", [read_isaac(p) for p in a.isaac])):
+        if runs:
+            res[side] = window_stats(runs, "success_term", a.window, a.iterations)
+            print(f"{side} ({len(runs)} runs): Episode_Termination/success per {a.window}-iteration window")
+            for lo, hi, m, sd, n, per in res[side]:
+                print(f"  {lo:3d}-{hi:3d}: {m:.3f} +- {sd:.3f} (n={n})  runs: {', '.join(f'{v:.3f}' for v in per)}")
+    if a.json:
+        json.dump(res, open(a.json, "w"), indent=1)
+
+
 def main():
+    import sys
+
+    if len(sys.argv) > 1 and sys.argv[1] == "seeds":
+        return seeds_main(sys.argv[2:])
     ap = argparse.ArgumentParser()
     ap.add_argument("--mac")
     ap.add_argument("--isaac")
