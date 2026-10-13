@@ -1,0 +1,35 @@
+{
+ "checkpoint": "runs/franka_pour/logs/m414_2048_model_299.pt",
+ "num_envs": 2048,
+ "seed": 7,
+ "steps": 360,
+ "episodes": 2048,
+ "wall_s": 553.013816542003,
+ "rows_sha": 383936911,
+ "physics": {
+  "mpm_grid_budget": "measured",
+  "mpm_cells_per_world": 256,
+  "rigid_deterministic": false
+ },
+ "success_rate": 0.47021484375,
+ "termination_rates": {
+  "failure": 0.013671875,
+  "extreme_rigid_state": 0.03271484375,
+  "source_receiver_overlap": 0.037109375,
+  "lost_grasp": 0.0,
+  "spill": 0.08740234375,
+  "particle_out_of_bounds": 0.02001953125,
+  "success": 0.47021484375,
+  "learning_progress_context": 0.0,
+  "time_out": 0.3603515625
+ },
+ "mean_target_fraction": 0.3740127980709076,
+ "mean_spill_fraction": 0.016061462461948395,
+ "mean_source_fraction": 0.44858962297439575,
+ "mean_episode_length": 167.2724609375,
+ "grid_overflow": "none (check_status passed)",
+ "success_rate_grasping_rows": 0.8145161271095276,
+ "episodes_grasping_rows": 992,
+ "success_rate_non_grasping_rows": 0.14678029716014862,
+ "episodes_non_grasping_rows": 1056
+}

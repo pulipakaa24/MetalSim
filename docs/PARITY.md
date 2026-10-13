@@ -1142,9 +1142,49 @@ repeatable run to run here (two seed-0 L4 runs differ at iteration 0: reward +0.
 comparison on fixed reset rows are the next step. Not a cause, by construction: the asset composition, the task terms
 (§1b.2 tests), the solver configuration (§1b.1).
 
-The README-scale run (2,048 envs, 14-inch, `runs/franka_pour/logs/m414_2048_log.jsonl`; capped at 300 iterations =
-59M steps, about 15 h, instead of Isaac's 3,000 = 6.4 days): success 0.039 at iteration 0, 0.23 at 10, 0.33 at 20,
-0.33-0.36 from 25 to 82 (latest at writing); see the final report for the value at 300.
+**The README-scale run** (2,048 envs, the task's runner config, seed 0, 14-inch M4 Max, 2026-10-12, 16.4 h of GPU
+including five pauses for other jobs (four STOP-file pauses, one stop at iteration 51 resumed from the iteration-50 checkpoint); capped at 300 iterations = 59M env-steps instead of the README's 3,000 =
+590M, 6.4 days at this rate). Log `runs/franka_pour/logs/m414_2048_log.jsonl` (+ console log), final checkpoint
+`runs/franka_pour/logs/m414_2048_model_299.pt`. Means over ten-iteration windows:
+
+| iterations | success (`Episode_Termination/success`) | success of episodes finished in the window | mean reward | episode length | env-steps/s |
+|---|---|---|---|---|---|
+| 0-9 | 0.138 | 0.203 | 0.48 | 108 | 1,081 |
+| 20-29 | 0.343 | 0.343 | 1.35 | 148 | 1,073 |
+| 50-59 | 0.322 | 0.405 | 1.38 | 92 | 1,074 |
+| 100-109 | 0.371 | 0.373 | 1.49 | 119 | 984 |
+| 150-159 | 0.467 | 0.472 | 2.16 | 128 | 990 |
+| 200-209 | 0.560 | 0.556 | 2.71 | 113 | 986 |
+| 250-259 | 0.618 | 0.616 | 2.90 | 120 | 954 |
+| 290-299 | 0.618 | 0.617 | 2.72 | 109 | 938 |
+
+Training success plateaus near 0.62 from iteration ~250. What is not comparable: Isaac has no 2,048-env run on the
+hardware available here (its task does not fit the L4 at 2,048 envs), so this curve has no Isaac counterpart; the
+only matched comparison is the 1,024-env table above (60 iterations, one seed each). Training-time success is measured
+on curriculum-sampled rows (the sampler concentrates on rows near 50 % local progress), so it is not a fixed-row success
+rate; the deterministic evaluation below is. Throughput fell from ~1,075 to ~950 env-steps/s over the run (not
+investigated; pouring policies spread particles over more MPM cells).
+
+**Deterministic evaluation of the iteration-299 policy** (`metalsim/learn/franka_pour_eval.py`, this Mac, 2026-10-13,
+check class): 2,048 envs, each one episode from a reset row drawn uniformly over all 20,000 rows (Isaac's play mode
+freezes the curriculum), actor mean actions, until every env's first episode ends; the same seed gives both runs the
+same rows. The second run uses the opt-in memory budgets of `PourPhysicsConfig` (`mpm_grid_budget="measured"`,
+`mpm_cells_per_world=256`; MPM.md section 8h), which must leave the task unchanged:
+
+| metric (2,048 episodes) | default (Isaac's capacities) | measured budgets + 256 cells / world |
+|---|---|---|
+| success (>= 70 % of particles in the receiver) | **0.477** | **0.470** |
+| success, rows starting grasped (992) / not grasped (1,056) | 0.822 / 0.152 | 0.815 / 0.147 |
+| time-out / spill / overlap / extreme state / particle bounds / non-finite | 0.345 / 0.086 / 0.032 / 0.038 / 0.036 / 0.022 | 0.360 / 0.087 / 0.037 / 0.033 / 0.020 / 0.014 |
+| particles at the episode's end in receiver / source / spilled | 0.376 / 0.437 / 0.016 | 0.374 / 0.449 / 0.016 |
+| mean episode length (steps) | 164.2 | 167.3 |
+| sparse-grid overflow | none | none |
+| wall time of the rollout | 752 s | 553 s |
+
+The two agree within sampling noise (binomial standard error of the success rate 0.011; the rigid solver is not run
+deterministically, so trajectories are not bitwise), so the memory opt-ins hold on a trained, pouring policy; they
+also make the rollout 26 % faster here. JSON and logs: `runs/franka_pour/eval/`. The policy succeeds from 82 % of the
+start states where the cup is already grasped and from 15 % of the reaching / approach states; 0.48 overall.
 
 ## 2. Platform capabilities (the workstreams), with the tests behind them
 
