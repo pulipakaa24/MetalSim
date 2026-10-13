@@ -88,9 +88,10 @@ def env_sampling_table(hdr, grid=(512, 256)):
 
 
 # Kit/RTX maps an equirectangular DomeLight with pole +z and the image centre (u = 0.5) facing -x (measured on Isaac Sim
-# 5.1 and 6.1 path-traced frames with marked maps, 2026-09-26, docs/research/isaac_side_session_2026-09-26.md); our shader's
-# centre faces -y, so stages authored for Kit get this constant added to their dome yaw. The direct set_environment() API
-# keeps the shader's own convention (its tests are written against it).
+# 5.1 and 6.1 path-traced frames with marked maps, 2026-09-26, docs/research/isaac_side_session_2026-09-26.md). Our shader
+# follows the OpenUSD spec (UsdLuxDomeLight_1 on a z-up stage: OpenEXR latlong, longitude 0 = the image centre toward -y,
+# u = 0.25 toward +x; research_notes/dome_light_azimuth/), so USD stages (rendered by Kit) get this constant added to their
+# dome yaw in set_environment_from_model; the direct set_environment() API keeps the spec frame.
 KIT_DOME_AZIMUTH = -math.pi / 2
 
 class Tier2Renderer:
@@ -484,9 +485,10 @@ class Tier2Renderer:
 
     def set_environment(self, hdr=None, *, yaw=0.0, intensity=None, exposure=0.0, color=None, grid=(512, 256), key=None):
         """Equirectangular HDR environment ``hdr`` (H, W, 3) linear radiance: the miss radiance of every ray and
-        an importance-sampled light (a textured USD DomeLight). Orientation as Kit/RTX renders a DomeLight on a
-        z-up stage: pole +z, the image centre (u = 0.5) faces -y, u = 0.25 faces +x; ``yaw`` rotates the dome
-        about +z (rad, a rotateZ on the prim). Radiance = map x ``intensity`` x 2^``exposure`` x ``color``
+        an importance-sampled light (a textured USD DomeLight). Orientation as the OpenUSD spec puts a DomeLight_1
+        on a z-up stage (OpenEXR latlong): pole +z, the image centre (u = 0.5) faces -y, u = 0.25 faces +x; ``yaw``
+        rotates the dome about +z (rad, a rotateZ on the prim). Kit/RTX renders the same dome at ``yaw +
+        KIT_DOME_AZIMUTH`` (centre toward -x), which ``set_environment_from_model`` applies for USD stages. Radiance = map x ``intensity`` x 2^``exposure`` x ``color``
         (USD LightAPI); ``intensity`` / ``color`` default to the ``dome`` kwarg's (a DomeLight's intensity and
         colour apply to its texture) or 1. ``key`` caches the GPU texture and sampling table per map, so a
         randomizer can switch maps per episode without re-uploading (``hdr`` may then be None for a cached key).
@@ -523,7 +525,8 @@ class Tier2Renderer:
     def set_environment_from_model(self, model, grid=(512, 256)):
         """Apply the textured USD DomeLight that ``metalsim.scene.usd_to_mjcf`` recorded in the model's custom
         text ``usd_dome`` (file, intensity, exposure, color, yaw); returns its record or None when the model has
-        none (or the dome has no texture: then the ``dome`` kwarg already carries it)."""
+        none (or the dome has no texture: then the ``dome`` kwarg already carries it). Oriented as Kit/RTX renders
+        the stage: the shader yaw is the prim's yaw + ``KIT_DOME_AZIMUTH`` (-90 deg)."""
         import json
         import mujoco
         tid = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_TEXT, "usd_dome")
