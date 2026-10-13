@@ -1,0 +1,61 @@
+WARNING: The version of the system or its configuration does not allow enabling CPU profiling:
+- CPU IP/backtrace sampling will be disabled.
+- CPU context switch tracing will be disabled.
+Try the 'nsys status --environment' command to learn more.
+
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+/home/<user>/parity3_scripts/mpm/scale/scale_pour_k.py:241: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+  model = scene.finalize(device=DEV)
+Capture range started in the application.
+Capture range ended in the application.
+Generating '/tmp/nsys-report-4095.qdstrm'
+[1/1] [0%                          ] substep_off_2048.nsys-repProcessing events...
+[1/1] [0%                          ] substep_off_2048.nsys-rep[1/1] [======34%                   ] substep_off_2048.nsys-rep[1/1] [==========49%               ] substep_off_2048.nsys-rep[1/1] [==============64%           ] substep_off_2048.nsys-rep[1/1] [========================100%] substep_off_2048.nsys-rep[1/1] [========================100%] substep_off_2048.nsys-rep
+{
+ "argv": [
+  "--part",
+  "rigid",
+  "--device",
+  "cuda:0",
+  "--worlds",
+  "2048",
+  "--max-triangle-pairs",
+  "8388608",
+  "--det",
+  "off",
+  "--warmup",
+  "3",
+  "--kprof",
+  "substep",
+  "--kprof-ticks",
+  "4",
+  "--json",
+  "/home/<user>/parity3/rigid_kprof/nsys_substep_off_2048.json"
+ ],
+ "device": "cuda:0",
+ "device_name": "NVIDIA L4",
+ "warp": "1.16.0",
+ "newton": "1.5.2",
+ "worlds": 2048,
+ "part": "rigid",
+ "det": "off",
+ "pipeline_det": false,
+ "mode": "eager",
+ "max_triangle_pairs": 8388608,
+ "bodies": 26624,
+ "shapes": 188417,
+ "joints": 26624,
+ "dofs": 43008,
+ "build_s": 3.342811597000008,
+ "solver_init_s": 5.113704733999981,
+ "rigid_contact_max": 14053376,
+ "kprof": {
+  "phase": "substep",
+  "reps": 4,
+  "wall_ms_per_rep": 10.537958500002276
+ },
+ "rigid_contacts": 81920,
+ "maxrss_mb": 2978.984375
+}
+Generated:
+	/home/<user>/parity3/rigid_kprof/substep_off_2048.nsys-rep

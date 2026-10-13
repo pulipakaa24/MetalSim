@@ -1,0 +1,187 @@
+name, driver_version, clocks.max.sm [MHz]
+NVIDIA L4, 580.178.04, 2040 MHz
+newton 1.5.2 warp 1.16.0
+== mpm_eager_1 18:57:02
+exit 0 28s
+== mpm_eager_64 18:57:30
+exit 0 13s
+== mpm_eager_256 18:57:43
+exit 0 21s
+== mpm_eager_1024 18:58:04
+exit 0 77s
+== mpm_eager_2048 18:59:21
+exit 0 153s
+== mpm_cap_1 19:01:55
+exit 0 10s
+== mpm_cap_64 19:02:06
+exit 0 12s
+== mpm_cap_256 19:02:18
+exit 0 19s
+== mpm_cap_1024 19:02:37
+exit 0 72s
+== mpm_cap_2048 19:03:49
+exit 0 140s
+== rigid_off_1 19:06:09
+exit 0 24s
+== rigid_off_64 19:06:33
+exit 0 12s
+== rigid_off_256 19:06:45
+exit 0 12s
+== rigid_off_512 19:06:57
+exit 0 14s
+== rigid_off_1024 19:07:11
+exit 0 18s
+== rigid_off_2048 19:07:29
+exit 0 24s
+== rigid_off_4096 19:07:53
+exit 0 37s
+== rigid_on_1 19:08:30
+exit 1 15s
+    raise WarpCodegenError(str(e)) from e
+warp._src.codegen.WarpCodegenError: Error while parsing function "_sensor_tactile" at /home/<user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/sensor.py:2307:
+    wp.atomic_add(sensordata_out, worldid, sensor_adr[sensor_id] + 1 * dim + vertid, forceT[1])
+;Deterministic mode does not support mixing 'max' and 'add' reductions on array 'sensordata_out' in the same function or kernel.
+== rigid_on_64 19:08:45
+exit 1 15s
+    raise WarpCodegenError(str(e)) from e
+warp._src.codegen.WarpCodegenError: Error while parsing function "_sensor_tactile" at /home/<user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/sensor.py:2307:
+    wp.atomic_add(sensordata_out, worldid, sensor_adr[sensor_id] + 1 * dim + vertid, forceT[1])
+;Deterministic mode does not support mixing 'max' and 'add' reductions on array 'sensordata_out' in the same function or kernel.
+== rigid_on_256 19:09:00
+exit 1 14s
+    launch_deterministic(
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/deterministic.py", line 2440, in launch_deterministic
+    raise RuntimeError(
+RuntimeError: Deterministic scatter buffer overflow in kernel '_qfrc_actuator'. Increase 'deterministic_max_records' or reduce the per-thread atomic count.
+== rigid_on_512 19:09:14
+exit 1 15s
+    launch_deterministic(
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/deterministic.py", line 2440, in launch_deterministic
+    raise RuntimeError(
+RuntimeError: Deterministic scatter buffer overflow in kernel '_qfrc_actuator'. Increase 'deterministic_max_records' or reduce the per-thread atomic count.
+== rigid_on_1024 19:09:29
+exit 1 17s
+    launch_deterministic(
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/deterministic.py", line 2440, in launch_deterministic
+    raise RuntimeError(
+RuntimeError: Deterministic scatter buffer overflow in kernel '_qfrc_actuator'. Increase 'deterministic_max_records' or reduce the per-thread atomic count.
+== rigid_on_2048 19:09:46
+exit 1 19s
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/context.py", line 4463, in allocate
+    raise RuntimeError(f"Failed to allocate {size_in_bytes} bytes on device '{self.device}'")
+RuntimeError: Failed to allocate 8388608000 bytes on device 'cuda:0'
+== rigid_on_4096 19:10:05
+exit 1 26s
+    allocate_counter_buffers(
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/deterministic.py", line 1722, in allocate_counter_buffers
+    raise RuntimeError(
+RuntimeError: Deterministic counter buffer capacity exceeds the supported int32 limit (4194304000 > 2147483647). Reduce the launch size or deterministic_max_records.
+== rigid_pdet_2048 19:10:31
+exit 1 16s
+                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/geometry/contact_reduction_global.py", line 837, in __init__
+    raise ValueError(
+ValueError: Deterministic contact packing supports at most 1048576 buffered contacts (20-bit contact_id), but capacity=8388608. Reduce max_triangle_pairs or disable deterministic mode.
+== bf_1 19:10:47
+exit 0 2s
+== bf_64 19:10:49
+exit 0 3s
+== bf_256 19:10:52
+exit 0 2s
+== bf_1024 19:10:54
+exit 0 3s
+== bf_2048 19:10:57
+exit 0 4s
+== bf_4096 19:11:01
+exit 0 3s
+== ordered 19:11:04
+exit 0 3s
+== rigid_rep_off_64 19:11:07
+exit 0 15s
+== rigid_rep_on_64 19:11:22
+exit 1 15s
+    raise WarpCodegenError(str(e)) from e
+warp._src.codegen.WarpCodegenError: Error while parsing function "_sensor_tactile" at /home/<user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/sensor.py:2307:
+    wp.atomic_add(sensordata_out, worldid, sensor_adr[sensor_id] + 1 * dim + vertid, forceT[1])
+;Deterministic mode does not support mixing 'max' and 'add' reductions on array 'sensordata_out' in the same function or kernel.
+== rigid_rep_onpdet_64 19:11:37
+exit 1 16s
+    raise WarpCodegenError(str(e)) from e
+warp._src.codegen.WarpCodegenError: Error while parsing function "_sensor_tactile" at /home/<user>/env_isaaclab3/lib/python3.12/site-packages/mujoco_warp/_src/sensor.py:2307:
+    wp.atomic_add(sensordata_out, worldid, sensor_adr[sensor_id] + 1 * dim + vertid, forceT[1])
+;Deterministic mode does not support mixing 'max' and 'add' reductions on array 'sensordata_out' in the same function or kernel.
+== rigid_rep_off_2048 19:11:54
+exit 0 39s
+== rigid_rep_on_2048 19:12:33
+exit 1 19s
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/context.py", line 4463, in allocate
+    raise RuntimeError(f"Failed to allocate {size_in_bytes} bytes on device '{self.device}'")
+RuntimeError: Failed to allocate 8388608000 bytes on device 'cuda:0'
+== rigid_rep_onpdet_2048 19:12:52
+exit 1 18s
+                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/geometry/contact_reduction_global.py", line 837, in __init__
+    raise ValueError(
+ValueError: Deterministic contact packing supports at most 1048576 buffered contacts (20-bit contact_id), but capacity=8388608. Reduce max_triangle_pairs or disable deterministic mode.
+== mpm_rep_off_64 19:13:10
+exit 0 15s
+== mpm_rep_on_64 19:13:25
+exit 0 16s
+== mpm_rep_off_2048 19:13:41
+exit 1 145s
+Warp CUDA error 700: an illegal memory access was encountered (in function wp_cuda_event_destroy, /builds/omniverse/warp/warp/native/warp.cu:3396)
+Warp CUDA error 700: an illegal memory access was encountered (in function wp_cuda_event_destroy, /builds/omniverse/warp/warp/native/warp.cu:3396)
+Warp CUDA error 700: an illegal memory access was encountered (in function wp_cuda_event_destroy, /builds/omniverse/warp/warp/native/warp.cu:3396)
+Warp CUDA error 700: an illegal memory access was encountered (in function wp_cuda_event_destroy, /builds/omniverse/warp/warp/native/warp.cu:3396)
+== mpm_rep_on_2048 19:16:06
+exit 1 144s
+Warp CUDA error 700: an illegal memory access was encountered (in function wp_cuda_event_destroy, /builds/omniverse/warp/warp/native/warp.cu:3396)
+Warp CUDA error 700: an illegal memory access was encountered (in function wp_cuda_event_destroy, /builds/omniverse/warp/warp/native/warp.cu:3396)
+Warp CUDA error 700: an illegal memory access was encountered (in function wp_cuda_event_destroy, /builds/omniverse/warp/warp/native/warp.cu:3396)
+Warp CUDA error 700: an illegal memory access was encountered (in function wp_cuda_event_destroy, /builds/omniverse/warp/warp/native/warp.cu:3396)
+== mpm_det_eager_2048 19:18:30
+exit 0 143s
+== mpm_fixed_64 19:20:53
+exit 0 25s
+== mpm_fixed_2048 19:21:18
+exit 1 24s
+Warp CUDA error 700: an illegal memory access was encountered (in function wp_cuda_event_destroy, /builds/omniverse/warp/warp/native/warp.cu:3396)
+Warp CUDA error 700: an illegal memory access was encountered (in function wp_cuda_event_destroy, /builds/omniverse/warp/warp/native/warp.cu:3396)
+Warp CUDA error 700: an illegal memory access was encountered (in function wp_cuda_event_destroy, /builds/omniverse/warp/warp/native/warp.cu:3396)
+Warp CUDA error 700: an illegal memory access was encountered (in function wp_cuda_event_destroy, /builds/omniverse/warp/warp/native/warp.cu:3396)
+== mpm_shared_64 19:21:42
+exit 0 12s
+== mpm_shared_2048 19:21:54
+exit 1 22s
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/context.py", line 4463, in allocate
+    raise RuntimeError(f"Failed to allocate {size_in_bytes} bytes on device '{self.device}'")
+RuntimeError: Failed to allocate 452984832 bytes on device 'cuda:0'
+== rigid_off_2048_tpdefault 19:22:16
+exit 0 23s
+== rigid_on_2048_tpdefault 19:22:39
+exit 1 19s
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/context.py", line 4463, in allocate
+    raise RuntimeError(f"Failed to allocate {size_in_bytes} bytes on device '{self.device}'")
+RuntimeError: Failed to allocate 8388608000 bytes on device 'cuda:0'
+== rigid_rep_off_2048_cap 19:22:58
+exit 0 59s
+== rigid_rep_onpdet_2048_cap 19:23:57
+exit 1 19s
+                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/geometry/contact_reduction_global.py", line 837, in __init__
+    raise ValueError(
+ValueError: Deterministic contact packing supports at most 1048576 buffered contacts (20-bit contact_id), but capacity=8388608. Reduce max_triangle_pairs or disable deterministic mode.
+== rigid_rep_off_2048_tpdefault 19:24:16
+exit 0 38s
+== rigid_pdet_2048_tpdefault 19:24:54
+exit 0 22s
+== rigid_rep_pdet_64 19:25:16
+exit 0 15s
+== rigid_rep_pdet_2048_tpdefault 19:25:31
+exit 0 40s
+== rigid_rep_pdet_2048_cap_tpdefault 19:26:11
+exit 0 60s

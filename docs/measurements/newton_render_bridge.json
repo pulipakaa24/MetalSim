@@ -1,0 +1,220 @@
+{
+ "coverage": {
+  "newton": "1.7.0.dev0",
+  "mujoco": "3.14.0",
+  "prims": {
+   "worlds": 4,
+   "camera": "cam",
+   "newton": {
+    "tier0": {
+     "min_body_coverage": 1.0,
+     "fg_iou": 1.0,
+     "depth_median_mm": 0.004947185516357422,
+     "depth_p99_mm": 0.07390975952148438,
+     "rgb_mad": 0.07633680555555555
+    },
+    "raydepth": {
+     "hit_agreement": 1.0,
+     "depth_p99_mm": 0.006557106971740723
+    },
+    "twin_geoms": 10,
+    "drawn_slots": 10,
+    "build_s": 0.004
+   },
+   "mjcf": {
+    "tier0": {
+     "min_body_coverage": 1.0,
+     "fg_iou": 1.0,
+     "depth_median_mm": 0.004947185516357422,
+     "depth_p99_mm": 0.07390975952148438,
+     "rgb_mad": 6.944444444444444e-05
+    },
+    "raydepth": {
+     "hit_agreement": 1.0,
+     "depth_p99_mm": 0.005781650543212891
+    },
+    "twin_geoms": 10,
+    "drawn_slots": 10,
+    "build_s": 0.002
+   }
+  },
+  "so101_overview": {
+   "worlds": 2,
+   "camera": "overview",
+   "newton": {
+    "tier0": {
+     "min_body_coverage": 1.0,
+     "fg_iou": 1.0,
+     "depth_median_mm": 0.0016689300537109375,
+     "depth_p99_mm": 0.194549560546875,
+     "rgb_mad": 44.77237847222222
+    },
+    "raydepth": {
+     "hit_agreement": 1.0,
+     "depth_p99_mm": 0.006198883056640625
+    },
+    "twin_geoms": 19,
+    "drawn_slots": 19,
+    "build_s": 0.059
+   },
+   "mjcf": {
+    "tier0": {
+     "min_body_coverage": 1.0,
+     "fg_iou": 1.0,
+     "depth_median_mm": 0.0016093254089355469,
+     "depth_p99_mm": 0.194549560546875,
+     "rgb_mad": 0.0026215277777777777
+    },
+    "raydepth": {
+     "hit_agreement": 1.0,
+     "depth_p99_mm": 0.00476837158203125
+    },
+    "twin_geoms": 49,
+    "drawn_slots": 19,
+    "build_s": 0.003
+   }
+  },
+  "so101_wrist": {
+   "worlds": 2,
+   "camera": "wrist_cam",
+   "newton": {
+    "tier0": {
+     "min_body_coverage": 1.0,
+     "fg_iou": 1.0,
+     "depth_median_mm": 0.0324249267578125,
+     "depth_p99_mm": 0.17023086547851562,
+     "rgb_mad": 62.95652777777778
+    },
+    "raydepth": {
+     "hit_agreement": 0.9999479166666667,
+     "depth_p99_mm": 0.09918212890625
+    },
+    "twin_geoms": 19,
+    "drawn_slots": 19,
+    "build_s": 0.058
+   },
+   "mjcf": {
+    "tier0": {
+     "min_body_coverage": 1.0,
+     "fg_iou": 1.0,
+     "depth_median_mm": 0.0324249267578125,
+     "depth_p99_mm": 0.17023086547851562,
+     "rgb_mad": 0.006944444444444444
+    },
+    "raydepth": {
+     "hit_agreement": 1.0,
+     "depth_p99_mm": 0.09918212890625
+    },
+    "twin_geoms": 49,
+    "drawn_slots": 19,
+    "build_s": 0.002
+   }
+  },
+  "menagerie_g1": {
+   "worlds": 2,
+   "camera": "overview",
+   "newton": {
+    "tier0": {
+     "min_body_coverage": 1.0,
+     "fg_iou": 1.0,
+     "depth_median_mm": 0.027418136596679688,
+     "depth_p99_mm": 0.9698867797851562,
+     "rgb_mad": 79.61074652777778
+    },
+    "raydepth": {
+     "hit_agreement": 1.0,
+     "depth_p99_mm": 0.0035762786865234375
+    },
+    "twin_geoms": 36,
+    "drawn_slots": 36,
+    "build_s": 0.075
+   },
+   "mjcf": {
+    "tier0": {
+     "min_body_coverage": 1.0,
+     "fg_iou": 1.0,
+     "depth_median_mm": 0.027418136596679688,
+     "depth_p99_mm": 0.9698867797851562,
+     "rgb_mad": 0.00234375
+    },
+    "raydepth": {
+     "hit_agreement": 1.0,
+     "depth_p99_mm": 0.0030994415283203125
+    },
+    "twin_geoms": 72,
+    "drawn_slots": 36,
+    "build_s": 0.004
+   }
+  },
+  "menagerie_panda": {
+   "worlds": 2,
+   "camera": "overview",
+   "newton": {
+    "tier0": {
+     "min_body_coverage": 0.9859154929577465,
+     "fg_iou": 1.0,
+     "depth_median_mm": 0.019073486328125,
+     "depth_p99_mm": 0.6561279296875,
+     "rgb_mad": 93.75638888888889
+    },
+    "raydepth": {
+     "hit_agreement": 1.0,
+     "depth_p99_mm": 0.00476837158203125
+    },
+    "twin_geoms": 59,
+    "drawn_slots": 59,
+    "build_s": 0.054
+   },
+   "mjcf": {
+    "tier0": {
+     "min_body_coverage": 0.9859154929577465,
+     "fg_iou": 1.0,
+     "depth_median_mm": 0.019073486328125,
+     "depth_p99_mm": 0.6561279296875,
+     "rgb_mad": 2.2403125
+    },
+    "raydepth": {
+     "hit_agreement": 1.0,
+     "depth_p99_mm": 0.00476837158203125
+    },
+    "twin_geoms": 82,
+    "drawn_slots": 59,
+    "build_s": 0.003
+   }
+  },
+  "seconds": 19.773170948028564
+ },
+ "speed": {
+  "newton": "1.7.0.dev0",
+  "res": 64,
+  "rows": [
+   {
+    "worlds": 16,
+    "geoms": 19,
+    "slots": 19,
+    "build_s": 0.23,
+    "update_ms": 0.0369,
+    "render_ms": 2.376,
+    "update_plus_render_ms": 2.341
+   },
+   {
+    "worlds": 256,
+    "geoms": 19,
+    "slots": 19,
+    "build_s": 0.4,
+    "update_ms": 0.0369,
+    "render_ms": 35.931,
+    "update_plus_render_ms": 35.854
+   },
+   {
+    "worlds": 1024,
+    "geoms": 19,
+    "slots": 19,
+    "build_s": 1.41,
+    "update_ms": 0.0328,
+    "render_ms": 142.429,
+    "update_plus_render_ms": 142.174
+   }
+  ]
+ }
+}

@@ -1,0 +1,63 @@
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+/home/<user>/parity3_scripts/mpm/scale/scale_pour.py:236: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+  model = scene.finalize(device=DEV)
+{
+ "argv": [
+  "--device",
+  "cuda:0",
+  "--json",
+  "/home/<user>/parity3/scale_l4/rigid_rep_off_64.json",
+  "--part",
+  "rigid",
+  "--worlds",
+  "64",
+  "--steps",
+  "3",
+  "--repeat-check"
+ ],
+ "device": "cuda:0",
+ "device_name": "NVIDIA L4",
+ "warp": "1.16.0",
+ "newton": "1.5.2",
+ "worlds": 64,
+ "part": "rigid",
+ "det": "off",
+ "pipeline_det": false,
+ "mode": "eager",
+ "max_triangle_pairs": null,
+ "bodies": 832,
+ "shapes": 5889,
+ "joints": 832,
+ "dofs": 1344,
+ "build_s": 0.1916133570000511,
+ "solver_init_s": 1.5306825569998637,
+ "rigid_contact_max": 439168,
+ "collide_ms": {
+  "median": 4.292861000067205,
+  "mean": 4.347261000020808,
+  "min": 4.241897999918365,
+  "max": 4.5070240000768536
+ },
+ "substep_ms": {
+  "median": 8.047600000054445,
+  "mean": 8.138461666627942,
+  "min": 7.959148999816534,
+  "max": 8.408636000012848
+ },
+ "tick_ms": {
+  "median": 25.913928000136366,
+  "mean": 26.1344343333955,
+  "min": 25.841522000064288,
+  "max": 26.647852999985844
+ },
+ "rigid_contacts": 2560,
+ "nefc_mean": 81.0,
+ "finite": true,
+ "repeat_check": {
+  "bitwise_equal": false,
+  "max_abs_diff": 0.15886089205741882,
+  "worlds_differing": 64,
+  "finite": true
+ },
+ "maxrss_mb": 837.62109375
+}

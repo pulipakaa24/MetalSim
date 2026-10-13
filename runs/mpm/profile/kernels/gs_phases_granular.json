@@ -1,0 +1,60 @@
+{
+ "colors": 8,
+ "color_blocks": [
+  1210,
+  1287,
+  1100,
+  1170,
+  1100,
+  1174,
+  1000,
+  1069
+ ],
+ "strain_nodes_per_color": [
+  1210,
+  1287,
+  1100,
+  1170,
+  1100,
+  1174,
+  1000,
+  1069
+ ],
+ "strain_nodes": 9110,
+ "velocity_nodes": 10491,
+ "strain_nnz_per_node": 0.0,
+ "flags": [
+  0,
+  0,
+  0,
+  8,
+  1
+ ],
+ "sm_count": 40,
+ "us_per_color_pass": {
+  "newton": 16.424349996668752,
+  "empty": 2.3913421500765253,
+  "newton_zero_work": 5.759115629189182,
+  "full_zero_work": 6.257682889554417,
+  "index_small": 3.206512519682292,
+  "index_small_offsets": 3.5005217796424404,
+  "full": 18.34257800510386,
+  "full_fast": 15.022656407381874,
+  "index": 11.37877807195764,
+  "gather": 13.39980472039315,
+  "gather_solve": 17.43092343531316,
+  "gather_solve_fast": 13.967056293040514,
+  "solve": 15.851692114665639,
+  "solve_fast": 12.911978228657972,
+  "scatter": 12.600326499523362,
+  "full_bd32_blocks80": 18.28144531828002,
+  "full_bd32_blocks160": 18.243618796986993,
+  "full_bd64_blocks160": 18.34778431657469,
+  "full_bd128_blocks40": 19.64498742381693,
+  "full_bd64_blocks40": 18.31653426052071,
+  "full_bd32_blocks320": 18.21354071580572,
+  "contact_solve_per_iteration": 11.913150046893861
+ },
+ "fast_rewrites": 1,
+ "scene": "example:mpm_granular"
+}

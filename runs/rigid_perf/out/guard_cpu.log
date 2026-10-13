@@ -1,0 +1,76 @@
+/Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/metalsim/physics/mpm/probes/scale_pour.py:241: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+  model = scene.finalize(device=DEV)
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/runs/rigid_perf/kcache/kc_new/1.18.0.dev20260917
+Module newton._src.geometry.inertia 13307f2 load on device 'cpu' took 1033.29 ms  (compiled)
+Module validate_and_correct_inertia_kernel_bea299a6 6a3afcb load on device 'cpu' took 107.69 ms  (compiled)
+Module newton._src.geometry.bvh 89d546e load on device 'cpu' took 227.46 ms  (compiled)
+Module newton._src.solvers.mujoco.kernels c4d7a56 load on device 'cpu' took 3427.61 ms  (compiled)
+Module mujoco_warp._src.io 33b3fe3 load on device 'cpu' took 937.67 ms  (compiled)
+Module mujoco_warp._src.smooth 30cdc3c load on device 'cpu' took 1525.69 ms  (compiled)
+Module _small_cholesky_factorize_block__locals__kernel_d034e4aa f52ad74 load on device 'cpu' took 117.33 ms  (compiled)
+Module _tile_cholesky_factorize_block__locals__kernel_194c9a3a 57bf0fc load on device 'cpu' took 92.44 ms  (compiled)
+Module _small_cholesky_solve_block__locals__kernel_85b20c1c 76c440a load on device 'cpu' took 75.73 ms  (compiled)
+Module _tile_cholesky_solve_block__locals__kernel_64ffc9b6 17289c4 load on device 'cpu' took 96.17 ms  (compiled)
+Module newton._src.sim.articulation 5aafdea load on device 'cpu' took 2165.22 ms  (compiled)
+Module newton._src.sim.collide 542f13b load on device 'cpu' took 185.92 ms  (compiled)
+Module newton._src.geometry.broad_phase_nxn b8b585d load on device 'cpu' took 105.07 ms  (compiled)
+Module narrow_phase_primitive_write_contact 3285335 load on device 'cpu' took 431.07 ms  (compiled)
+Module narrow_phase_gjk_mpr_True_write_contact_support_map_lean_post_process_minkowski_only 97f624e load on device 'cpu' took 886.75 ms  (compiled)
+Module newton._src.geometry.narrow_phase 5509f10 load on device 'cpu' took 331.94 ms  (compiled)
+Module newton._src.geometry.contact_reduction_global f46d368 load on device 'cpu' took 216.24 ms  (compiled)
+Module newton._src.geometry.sdf_contact ba8282e load on device 'cpu' took 68.84 ms  (compiled)
+Module narrow_phase_mesh_plane_write_contact_to_reducer_True b7b2d84 load on device 'cpu' took 124.39 ms  (compiled)
+Module mesh_triangle_contacts_to_reducer_kernel_7f497eb1 2956831 load on device 'cpu' took 985.18 ms  (compiled)
+Module sdf_contact_write_contact_to_reducer_False_True 6efa91c load on device 'cpu' took 715.08 ms  (compiled)
+Module export_reduced_contacts_write_contact 2c92669 load on device 'cpu' took 158.15 ms  (compiled)
+Module mujoco_warp._src.constraint 6a7f993 load on device 'cpu' took 47.52 ms  (compiled)
+Module _equality_joint__locals__kernel_a87c48f0 bf267f8 load on device 'cpu' took 105.76 ms  (compiled)
+Module _friction_dof__locals__kernel_b90a8bb0 86614f8 load on device 'cpu' took 86.40 ms  (compiled)
+Module _friction_tendon__locals__kernel_bf418e6c 16db206 load on device 'cpu' took 95.06 ms  (compiled)
+Module _limit_slide_hinge__locals__kernel_a2ae52bd 94dc863 load on device 'cpu' took 92.08 ms  (compiled)
+Module _efc_contact_init__locals__kernel_27358d96 478fe39 load on device 'cpu' took 57.77 ms  (compiled)
+Module _efc_contact_jac_dense__locals__kernel_5502dc00 34ce773 load on device 'cpu' took 326.49 ms  (compiled)
+Module _efc_contact_update__locals__kernel_e6db2566 0cb1f0b load on device 'cpu' took 91.06 ms  (compiled)
+Module mujoco_warp._src.forward a054565 load on device 'cpu' took 373.61 ms  (compiled)
+Module mujoco_warp._src.passive ecd1600 load on device 'cpu' took 825.26 ms  (compiled)
+Module _qfrc_smooth__locals__kernel_4b25e77e 8c3fbdf load on device 'cpu' took 45.25 ms  (compiled)
+Module mujoco_warp._src.support 6a74d5c load on device 'cpu' took 112.35 ms  (compiled)
+Module _small_cholesky_factorize_solve_block__locals__kernel_4fab0d26 b9501fa load on device 'cpu' took 157.33 ms  (compiled)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_7c110e58 fdecb85 load on device 'cpu' took 125.04 ms  (compiled)
+Module _solve_init_dof__locals__kernel_e812c665 6a19c9b load on device 'cpu' took 44.36 ms  (compiled)
+Module mujoco_warp._src.solver cb6af4f load on device 'cpu' took 392.72 ms  (compiled)
+Module _solve_init_jaref_kernel__locals__kernel_b9b00fe0 a2dd2e2 load on device 'cpu' took 52.09 ms  (compiled)
+Module mul_m_kernel__locals___mul_m_b8f48c9b fb18c8b load on device 'cpu' took 72.03 ms  (compiled)
+Module _update_constraint_efc__locals__kernel_9791a747 9c250d2 load on device 'cpu' took 85.87 ms  (compiled)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_48870a9c 2c46040 load on device 'cpu' took 53.48 ms  (compiled)
+Module _update_gradient_zero_grad_dot__locals__kernel_b8af9364 ca8a6a7 load on device 'cpu' took 48.39 ms  (compiled)
+Module _update_gradient_grad__locals__kernel_90ad7a97 ccbe639 load on device 'cpu' took 48.24 ms  (compiled)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_2172ba12 dc2ef50 load on device 'cpu' took 200.61 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_d37924c4 9075ba7 load on device 'cpu' took 138.33 ms  (compiled)
+Module _linesearch_iterative_kernel__locals__kernel_5e908fdb 852d611 load on device 'cpu' took 208.23 ms  (compiled)
+Module _update_constraint_efc__locals__kernel_180f62ed 1c2ff0e load on device 'cpu' took 90.51 ms  (compiled)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_a0f1a0f7 6e894f5 load on device 'cpu' took 52.00 ms  (compiled)
+Module _update_gradient_zero_grad_dot__locals__kernel_c69b45b6 67e950e load on device 'cpu' took 47.84 ms  (compiled)
+Module _update_gradient_grad__locals__kernel_1dcf4b69 15f9c9f load on device 'cpu' took 48.37 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_90ac8833 56e4920 load on device 'cpu' took 137.97 ms  (compiled)
+Module mujoco_warp._src.sensor 8e21634 load on device 'cpu' took 1536.10 ms  (compiled)
+Module mujoco_warp._src.derivative a8cc84c load on device 'cpu' took 529.65 ms  (compiled)
+Module _next_time_builder__locals___next_time_d112fcc4 38831fb load on device 'cpu' took 57.03 ms  (compiled)
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/metalsim/physics/mpm/probes/scale_pour.py", line 1016, in <module>
+    {"mpm": run_mpm, "rigid": run_rigid, "ordered": run_ordered, "bodyforce": run_bodyforce}[args.part]()
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/metalsim/physics/mpm/probes/scale_pour.py", line 696, in run_rigid
+    kprof(args.kprof, {"collide": collide, "substep": substep, "tick": tick})
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/metalsim/physics/mpm/probes/scale_pour.py", line 790, in kprof
+    cuda = ctypes.CDLL("libcuda.so.1")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+    self._handle = _dlopen(self._name, mode)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: dlopen(libcuda.so.1, 0x0006): tried: 'libcuda.so.1' (no such file), '/System/Volumes/Preboot/Cryptexes/OSlibcuda.so.1' (no such file), '/Users/aditya/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/libcuda.so.1' (no such file), '/Users/aditya/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/libcuda.so.1' (no such file), '/usr/lib/libcuda.so.1' (no such file, not in dyld cache), 'libcuda.so.1' (no such file)

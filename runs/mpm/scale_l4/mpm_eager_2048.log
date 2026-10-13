@@ -1,0 +1,104 @@
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+/home/<user>/parity3_scripts/mpm/scale/scale_pour.py:236: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+  model = scene.finalize(device=DEV)
+{
+ "argv": [
+  "--device",
+  "cuda:0",
+  "--json",
+  "/home/<user>/parity3/scale_l4/mpm_eager_2048.json",
+  "--part",
+  "mpm",
+  "--worlds",
+  "2048",
+  "--mode",
+  "eager",
+  "--count",
+  "--sections",
+  "--steps",
+  "20"
+ ],
+ "device": "cuda:0",
+ "device_name": "NVIDIA L4",
+ "warp": "1.16.0",
+ "newton": "1.5.2",
+ "worlds": 2048,
+ "temporary_store": true,
+ "part": "mpm",
+ "mode": "eager",
+ "grid": "sparse",
+ "accumulate": "native",
+ "loop": "native",
+ "particles": 1505280,
+ "bodies": 4096,
+ "colliders": 6144,
+ "build_s": 10.326094761000036,
+ "solver_init_s": 8.23244869000007,
+ "max_active_cell_count": 2097152,
+ "warmup_steps": 288,
+ "warmup_s": 106.65266891299996,
+ "per_step_counts_eager": {
+  "wp.launch": 116.0
+ },
+ "step_ms": {
+  "median": 398.91148350000094,
+  "mean": 398.78957180000043,
+  "min": 394.733710999958,
+  "max": 402.28268700002445
+ },
+ "step_ms_all": [
+  397.53510100001677,
+  399.9128570000039,
+  402.28268700002445,
+  399.99109200005023,
+  399.0382800000134,
+  399.65271699998084,
+  398.3779840000352,
+  398.11869499999375,
+  399.9209910000445,
+  394.733710999958,
+  399.84090099994773,
+  399.2341950000764,
+  397.62350599994534,
+  397.34635599995727,
+  398.7846869999885,
+  394.85277500000393,
+  401.3379759999225,
+  400.0736780000125,
+  398.39212000003954,
+  398.74112699999387
+ ],
+ "step_ms_pipelined": 373.08182575000046,
+ "iterations_last4": [
+  25,
+  25,
+  25,
+  25
+ ],
+ "res_l2_last4": [
+  0.004286137409508228,
+  0.004588129464536905,
+  0.0042283907532691956,
+  0.004314536228775978
+ ],
+ "sections_ms": {
+  "Strain solve": 212.88899999999998,
+  "Scratchpad": 41.446000000000005,
+  "Strain matrix": 28.764,
+  "Rasterize collider": 22.93,
+  "Collider compliance": 20.886000000000003,
+  "Unconstrained velocity": 10.203,
+  "Particle strain update": 4.829000000000001,
+  "Advection": 1.8670000000000004,
+  "Warmstart fields": 1.7339999999999995,
+  "Interpolated yield parameters": 1.705,
+  "Save warmstart fields": 1.675,
+  "Bin particles": 1.0900000000000003,
+  "Build active partition": 0.5710000000000001
+ },
+ "occupied_cells_per_world": 77.58447265625,
+ "velocity_nodes": 16777216,
+ "strain_nodes": 2097152,
+ "collider_nodes": 1505280,
+ "maxrss_mb": 3023.78125
+}

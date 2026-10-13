@@ -1,0 +1,72 @@
+test_00_make_default (newton._src.solvers.kamino.tests.test_solvers_metrics.TestSolverMetrics.test_00_make_default)
+Test creating a SolutionMetrics instance with default initialization. ... ok
+test_01_finalize_default (newton._src.solvers.kamino.tests.test_solvers_metrics.TestSolverMetrics.test_01_finalize_default)
+Test creating a SolutionMetrics instance with default initialization and then finalizing all memory allocations. ... ok
+test_02_evaluate_trivial_solution (newton._src.solvers.kamino.tests.test_solvers_metrics.TestSolverMetrics.test_02_evaluate_trivial_solution)
+Tests evaluating metrics on an all-zeros trivial solution. ... ok
+test_03_evaluate_padmm_solution_box_on_plane (newton._src.solvers.kamino.tests.test_solvers_metrics.TestSolverMetrics.test_03_evaluate_padmm_solution_box_on_plane)
+Tests evaluating metrics on a solution computed with the Proximal-ADMM (PADMM) solver. ... ok
+test_04_evaluate_padmm_solution_boxes_hinged (newton._src.solvers.kamino.tests.test_solvers_metrics.TestSolverMetrics.test_04_evaluate_padmm_solution_boxes_hinged)
+Tests evaluating metrics on a solution computed with the Proximal-ADMM (PADMM) solver. ... ok
+test_05_validate_metrics_boxes_hinged (newton._src.solvers.kamino.tests.test_solvers_metrics.TestSolverMetrics.test_05_validate_metrics_boxes_hinged)
+Compares metrics from `SolutionMetrics` with metrics computed by a ... ok
+test_06_compare_dense_sparse_boxes_hinged (newton._src.solvers.kamino.tests.test_solvers_metrics.TestSolverMetrics.test_06_compare_dense_sparse_boxes_hinged)
+Compares metrics evaluated on dense and sparse problems on a perturbed ... FAIL
+test_07_contact_residual_positive_gaps (newton._src.solvers.kamino.tests.test_solvers_metrics.TestSolverMetrics.test_07_contact_residual_positive_gaps) ... ok
+test_08_contact_residual_mixed_signed_distances (newton._src.solvers.kamino.tests.test_solvers_metrics.TestSolverMetrics.test_08_contact_residual_mixed_signed_distances) ... ok
+
+======================================================================
+FAIL: test_06_compare_dense_sparse_boxes_hinged (newton._src.solvers.kamino.tests.test_solvers_metrics.TestSolverMetrics.test_06_compare_dense_sparse_boxes_hinged)
+Compares metrics evaluated on dense and sparse problems on a perturbed
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n152_final/newton/_src/solvers/kamino/tests/test_solvers_metrics.py", line 816, in test_06_compare_dense_sparse_boxes_hinged
+    np.testing.assert_allclose(
+  File "/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 1780, in assert_allclose
+    assert_array_compare(compare, actual, desired, err_msg=str(err_msg),
+  File "/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 988, in assert_array_compare
+    raise AssertionError(msg)
+AssertionError: 
+Not equal to tolerance rtol=1e-06, atol=1e-06
+
+Mismatched elements: 1 / 29 (3.45%)
+Mismatch at index:
+ [13]: 2.221160888671875 (ACTUAL), 2.2211570739746094 (DESIRED)
+Max absolute difference among violations: 0.0000038147
+Max relative difference among violations: 0.0000017174
+ ACTUAL: array([ -1.237987, -15.950549,  -3.51755 ,  56.649113, 369.21487 ,  13.513237,   4.352538,  12.157979,  13.513236, -11.93159 ,  22.84088 ,  16.770063,   4.352539,   2.221161,  16.770063, -11.931581,  12.502097,  13.580026,   5.291162,  -7.653401,  13.580027,  17.331598,   8.834297,  11.171942,   5.291164,  15.592125,  11.171941,  17.3316  ,  32.65027 ], dtype=float32)
+ DESIRED: array([ -1.237987, -15.950548,  -3.51755 ,  56.64913 , 369.2148  ,  13.513236,   4.352538,  12.157978,  13.513236, -11.931591,  22.84088 ,  16.770061,   4.352538,   2.221157,  16.770061, -11.931591,  12.502102,  13.580028,   5.291164,  -7.653401,  13.580028,  17.3316  ,   8.834297,  11.17194 ,   5.291164,  15.592125,  11.17194 ,  17.3316  ,  32.65027 ], dtype=float32)
+
+----------------------------------------------------------------------
+Ran 9 tests in 19.909s
+
+FAILED (failures=1)
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/kcache/kcT_n152_final/1.18.0.dev20260917
+Module newton._src.solvers.kamino._src.core.bodies aecde4c load on device 'metal:0' took 514.72 ms  (compiled)
+Module newton._src.solvers.kamino._src.geometry.primitive.broadphase 196e893 load on device 'metal:0' took 588.92 ms  (compiled)
+Module newton._src.solvers.kamino._src.geometry.primitive.narrowphase 0ef247e load on device 'metal:0' took 1757.87 ms  (compiled)
+Module newton._src.solvers.kamino._src.kinematics.constraints f65ed96 load on device 'metal:0' took 430.46 ms  (compiled)
+Module newton._src.solvers.kamino._src.kinematics.jacobians 7f294b6 load on device 'metal:0' took 2100.21 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus a6d1b50 load on device 'metal:0' took 517.11 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.dual 9962472 load on device 'metal:0' took 571.50 ms  (compiled)
+Module newton._src.solvers.kamino._src.integrators.euler 63cc024 load on device 'metal:0' took 445.84 ms  (compiled)
+Module newton._src.solvers.kamino._src.solvers.metrics eed92b8 load on device 'metal:0' took 706.59 ms  (compiled)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels c2fabc0 load on device 'metal:0' took 747.94 ms  (compiled)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked 4354b13 load on device 'metal:0' took 569.74 ms  (compiled)
+Module make_desaxce_correction_and_velocity_bias_kernel__locals___compute_desaxce_correction_and_velocity_bias_d87bbc00 d87bbc0 load on device 'metal:0' took 413.23 ms  (compiled)
+Module _make_compute_infnorm_residuals_kernel__locals___compute_infnorm_residuals_54fc283e 2cb5534 load on device 'metal:0' took 465.58 ms  (compiled)
+Module newton._src.solvers.kamino._src.kinematics.joints 916b695 load on device 'metal:0' took 746.89 ms  (compiled)
+Module _make_compute_infnorm_residuals_kernel__locals___compute_infnorm_residuals_eb957c7f 0d73849 load on device 'metal:0' took 465.93 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus ed8f44c load on device 'metal:0' took 524.32 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus b4555cf load on device 'metal:0' took 540.96 ms  (compiled)
+Module newton._src.solvers.kamino._src.linalg.blas 119cbf7 load on device 'metal:0' took 533.75 ms  (compiled)
+Module newton._src.solvers.kamino._src.linalg.blas 5678e24 load on device 'metal:0' took 551.94 ms  (compiled)
+Module newton._src.solvers.kamino._src.linalg.blas 38b55a0 load on device 'metal:0' took 568.75 ms  (compiled)
+Module newton._src.solvers.kamino.tests.utils.extract 93be4b7 load on device 'metal:0' took 396.65 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus ebb0040 load on device 'metal:0' took 560.62 ms  (compiled)

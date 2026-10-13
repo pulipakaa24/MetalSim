@@ -1,0 +1,2001 @@
+{
+ "date": "2026-10-12",
+ "script": "scripts/diagnostics/render_world_audit.py",
+ "before": [
+  {
+   "probe": "far plane (boxes at 6 / 15 / 40 m; ground = infinite plane)",
+   "mujoco_far_m": 8694.82,
+   "tier0_accepts_far": false,
+   "objects": {
+    "ground": {
+     "tier0_default": {
+      "px": 10418,
+      "rgb": 0.3686,
+      "depth": 0.3686,
+      "depth_relerr_med": 6.9e-06,
+      "seg": 0.3686
+     },
+     "tier0_far_mujoco": {
+      "px": 10418,
+      "rgb": 0.3686,
+      "depth": 0.3686,
+      "depth_relerr_med": 6.9e-06,
+      "seg": 0.3686
+     },
+     "tier1_far_mujoco": {
+      "px": 10418,
+      "rgb": 0.3686,
+      "depth": 0.3686,
+      "depth_relerr_med": 6.9e-06,
+      "seg": 0.3686
+     },
+     "tier2": {
+      "px": 10418,
+      "rgb": 0.3884,
+      "depth": 0.3686,
+      "depth_relerr_med": 2.12e-06,
+      "seg": 0.3686
+     },
+     "raydepth": {
+      "px": 10418,
+      "depth": 0.3686,
+      "depth_relerr_med": 2.12e-06
+     }
+    },
+    "box6": {
+     "tier0_default": {
+      "px": 254,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 3.79e-05,
+      "seg": 1.0
+     },
+     "tier0_far_mujoco": {
+      "px": 254,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 3.79e-05,
+      "seg": 1.0
+     },
+     "tier1_far_mujoco": {
+      "px": 254,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 3.79e-05,
+      "seg": 1.0
+     },
+     "tier2": {
+      "px": 254,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 5.02e-07,
+      "seg": 1.0
+     },
+     "raydepth": {
+      "px": 254,
+      "depth": 1.0,
+      "depth_relerr_med": 5.02e-07
+     }
+    },
+    "box15": {
+     "tier0_default": {
+      "px": 256,
+      "rgb": 0.0,
+      "depth": 0.0,
+      "seg": 0.0
+     },
+     "tier0_far_mujoco": {
+      "px": 256,
+      "rgb": 0.0,
+      "depth": 0.0,
+      "seg": 0.0
+     },
+     "tier1_far_mujoco": {
+      "px": 256,
+      "rgb": 0.0,
+      "depth": 0.0,
+      "seg": 0.0
+     },
+     "tier2": {
+      "px": 256,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 9.43e-07,
+      "seg": 1.0
+     },
+     "raydepth": {
+      "px": 256,
+      "depth": 1.0,
+      "depth_relerr_med": 9.43e-07
+     }
+    },
+    "box40": {
+     "tier0_default": {
+      "px": 174,
+      "rgb": 0.0,
+      "depth": 0.0,
+      "seg": 0.0
+     },
+     "tier0_far_mujoco": {
+      "px": 174,
+      "rgb": 0.0,
+      "depth": 0.0,
+      "seg": 0.0
+     },
+     "tier1_far_mujoco": {
+      "px": 174,
+      "rgb": 0.0,
+      "depth": 0.0,
+      "seg": 0.0
+     },
+     "tier2": {
+      "px": 174,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 1.91e-06,
+      "seg": 1.0
+     },
+     "raydepth": {
+      "px": 174,
+      "depth": 1.0,
+      "depth_relerr_med": 1.91e-06
+     }
+    }
+   },
+   "seconds": 5.8
+  },
+  {
+   "probe": "depth precision (z-depth of fronto-parallel walls; exact = wall front face distance)",
+   "rows": {},
+   "seconds": 0.0
+  },
+  {
+   "probe": "infinite ground plane",
+   "views": {
+    "loco_checker": {
+     "mujoco_ground_px": 12160,
+     "mujoco_far_m": 80.0,
+     "tier0_default": {
+      "px": 12160,
+      "rgb": 0.6447,
+      "depth": 0.6447,
+      "depth_relerr_med": 8.67e-06,
+      "seg": 0.6447,
+      "tex_corr_vs_mujoco": 0.0416,
+      "tex_corr_within_8m": 0.0416
+     },
+     "tier0_far_mujoco": {
+      "px": 12160,
+      "rgb": 0.6447,
+      "depth": 0.6447,
+      "depth_relerr_med": 8.67e-06,
+      "seg": 0.6447,
+      "tex_corr_vs_mujoco": 0.0416,
+      "tex_corr_within_8m": 0.0416
+     },
+     "tier1_far_mujoco": {
+      "px": 12160,
+      "rgb": 0.6447,
+      "depth": 0.6447,
+      "depth_relerr_med": 8.67e-06,
+      "seg": 0.6447,
+      "tex_corr_vs_mujoco": 0.0414,
+      "tex_corr_within_8m": 0.0414
+     },
+     "tier2": {
+      "px": 12160,
+      "rgb": 0.6447,
+      "depth": 0.6447,
+      "depth_relerr_med": 1.24e-05,
+      "seg": 0.6447,
+      "tex_corr_vs_mujoco": 0.0305,
+      "tex_corr_within_8m": 0.0305
+     },
+     "raydepth": {
+      "px": 12160,
+      "depth": 0.6447,
+      "depth_relerr_med": 1.24e-05
+     }
+    },
+    "topdown_gradient_texuniform": {
+     "mujoco_ground_px": 19200,
+     "mujoco_far_m": 80.0,
+     "tier0_default": {
+      "px": 19200,
+      "rgb": 0.8938,
+      "depth": 0.8938,
+      "depth_relerr_med": 1.41e-05,
+      "seg": 0.8938,
+      "tex_corr_vs_mujoco": 0.299,
+      "tex_corr_within_8m": 0.299
+     },
+     "tier0_far_mujoco": {
+      "px": 19200,
+      "rgb": 0.8938,
+      "depth": 0.8938,
+      "depth_relerr_med": 1.41e-05,
+      "seg": 0.8938,
+      "tex_corr_vs_mujoco": 0.299,
+      "tex_corr_within_8m": 0.299
+     },
+     "tier1_far_mujoco": {
+      "px": 19200,
+      "rgb": 0.8938,
+      "depth": 0.8938,
+      "depth_relerr_med": 1.41e-05,
+      "seg": 0.8938,
+      "tex_corr_vs_mujoco": 0.299,
+      "tex_corr_within_8m": 0.299
+     },
+     "tier2": {
+      "px": 19200,
+      "rgb": 0.8998,
+      "depth": 0.8938,
+      "depth_relerr_med": 5.56e-07,
+      "seg": 0.8938,
+      "tex_corr_vs_mujoco": 0.2948,
+      "tex_corr_within_8m": 0.2948
+     },
+     "raydepth": {
+      "px": 19200,
+      "depth": 0.8938,
+      "depth_relerr_med": 5.56e-07
+     }
+    },
+    "topdown_gradient": {
+     "mujoco_ground_px": 19200,
+     "mujoco_far_m": 80.0,
+     "tier0_default": {
+      "px": 19200,
+      "rgb": 0.8938,
+      "depth": 0.8938,
+      "depth_relerr_med": 1.41e-05,
+      "seg": 0.8938,
+      "tex_corr_vs_mujoco": -0.028,
+      "tex_corr_within_8m": -0.028
+     },
+     "tier0_far_mujoco": {
+      "px": 19200,
+      "rgb": 0.8938,
+      "depth": 0.8938,
+      "depth_relerr_med": 1.41e-05,
+      "seg": 0.8938,
+      "tex_corr_vs_mujoco": -0.028,
+      "tex_corr_within_8m": -0.028
+     },
+     "tier1_far_mujoco": {
+      "px": 19200,
+      "rgb": 0.8938,
+      "depth": 0.8938,
+      "depth_relerr_med": 1.41e-05,
+      "seg": 0.8938,
+      "tex_corr_vs_mujoco": -0.028,
+      "tex_corr_within_8m": -0.028
+     },
+     "tier2": {
+      "px": 19200,
+      "rgb": 0.8998,
+      "depth": 0.8938,
+      "depth_relerr_med": 5.56e-07,
+      "seg": 0.8938,
+      "tex_corr_vs_mujoco": -0.0037,
+      "tex_corr_within_8m": -0.0037
+     },
+     "raydepth": {
+      "px": 19200,
+      "depth": 0.8938,
+      "depth_relerr_med": 5.56e-07
+     }
+    }
+   },
+   "lidar": {
+    "returns_at_1.73m": 1.0,
+    "returns_at_15m": 0.0
+   },
+   "seconds": 0.3
+  },
+  {
+   "probe": "heightfield sides and base",
+   "views": {
+    "cam": {
+     "tier0": {
+      "px": 1827,
+      "rgb": 0.5818,
+      "depth": 0.5818,
+      "depth_relerr_med": 8.06e-06,
+      "seg": 0.5818
+     },
+     "tier1": {
+      "px": 1827,
+      "rgb": 0.5818,
+      "depth": 0.5818,
+      "depth_relerr_med": 8.06e-06,
+      "seg": 0.5818
+     },
+     "tier2": {
+      "px": 1827,
+      "rgb": 0.624,
+      "depth": 0.5818,
+      "depth_relerr_med": 6.45e-06,
+      "seg": 0.5818
+     },
+     "raydepth": {
+      "px": 1827,
+      "depth": 0.5818,
+      "depth_relerr_med": 6.45e-06
+     },
+     "tier0_nocull": {
+      "px": 1827,
+      "rgb": 0.5818,
+      "depth": 0.5818,
+      "depth_relerr_med": 8.06e-06,
+      "seg": 0.5818
+     }
+    },
+    "under": {
+     "tier0": {
+      "px": 4641,
+      "rgb": 0.8968,
+      "depth": 0.8968,
+      "depth_relerr_med": 0.197,
+      "seg": 0.8968
+     },
+     "tier1": {
+      "px": 4641,
+      "rgb": 0.8968,
+      "depth": 0.8968,
+      "depth_relerr_med": 0.197,
+      "seg": 0.8968
+     },
+     "tier2": {
+      "px": 4641,
+      "rgb": 0.9061,
+      "depth": 0.8968,
+      "depth_relerr_med": 0.197,
+      "seg": 0.8968
+     },
+     "raydepth": {
+      "px": 4641,
+      "depth": 0.8968,
+      "depth_relerr_med": 0.197
+     },
+     "tier0_nocull": {
+      "px": 4641,
+      "rgb": 0.8968,
+      "depth": 0.8968,
+      "depth_relerr_med": 0.197,
+      "seg": 0.8968
+     }
+    }
+   },
+   "seconds": 0.2
+  },
+  {
+   "probe": "per-world model fields via BatchSim (GPU path) vs the same renderer on a model compiled with that world's values",
+   "fields": [
+    "geom_size",
+    "geom_rgba",
+    "mat_rgba",
+    "light_diffuse",
+    "light_active"
+   ],
+   "rows": {
+    "tier0": [
+     {
+      "env": 0,
+      "silhouette_iou_vs_mujoco": {
+       "box": 0.673,
+       "sphere": 0.361,
+       "cylinder": 0.363,
+       "capsule": 0.358,
+       "ellipsoid": 0.607,
+       "matbox": 0.561
+      },
+      "rgb_mean_abs_diff_vs_compiled": 26.53,
+      "floor_lum_diff_vs_compiled": -2.18
+     },
+     {
+      "env": 1,
+      "silhouette_iou_vs_mujoco": {
+       "box": 0.683,
+       "sphere": 0.505,
+       "cylinder": 0.564,
+       "capsule": 0.516,
+       "ellipsoid": 0.64,
+       "matbox": 0.394
+      },
+      "rgb_mean_abs_diff_vs_compiled": 20.46,
+      "floor_lum_diff_vs_compiled": -4.86
+     },
+     {
+      "env": 2,
+      "silhouette_iou_vs_mujoco": {
+       "box": 0.821,
+       "sphere": 0.65,
+       "cylinder": 0.642,
+       "capsule": 0.627,
+       "ellipsoid": 0.795,
+       "matbox": 0.681
+      },
+      "rgb_mean_abs_diff_vs_compiled": 17.27,
+      "floor_lum_diff_vs_compiled": -7.18
+     },
+     {
+      "env": 3,
+      "silhouette_iou_vs_mujoco": {
+       "box": 0.814,
+       "sphere": 0.69,
+       "cylinder": 0.724,
+       "capsule": 0.695,
+       "ellipsoid": 0.794,
+       "matbox": 0.639
+      },
+      "rgb_mean_abs_diff_vs_compiled": 28.91,
+      "floor_lum_diff_vs_compiled": -5.24
+     }
+    ],
+    "tier2": [
+     {
+      "env": 0,
+      "silhouette_iou_vs_mujoco": {
+       "box": 0.673,
+       "sphere": 0.361,
+       "cylinder": 0.363,
+       "capsule": 0.358,
+       "ellipsoid": 0.607,
+       "matbox": 0.561
+      },
+      "rgb_mean_abs_diff_vs_compiled": 27.26,
+      "floor_lum_diff_vs_compiled": -2.6
+     },
+     {
+      "env": 1,
+      "silhouette_iou_vs_mujoco": {
+       "box": 0.683,
+       "sphere": 0.505,
+       "cylinder": 0.564,
+       "capsule": 0.516,
+       "ellipsoid": 0.64,
+       "matbox": 0.394
+      },
+      "rgb_mean_abs_diff_vs_compiled": 21.05,
+      "floor_lum_diff_vs_compiled": -5.06
+     },
+     {
+      "env": 2,
+      "silhouette_iou_vs_mujoco": {
+       "box": 0.821,
+       "sphere": 0.65,
+       "cylinder": 0.642,
+       "capsule": 0.627,
+       "ellipsoid": 0.795,
+       "matbox": 0.681
+      },
+      "rgb_mean_abs_diff_vs_compiled": 18.5,
+      "floor_lum_diff_vs_compiled": -7.1
+     },
+     {
+      "env": 3,
+      "silhouette_iou_vs_mujoco": {
+       "box": 0.814,
+       "sphere": 0.69,
+       "cylinder": 0.724,
+       "capsule": 0.695,
+       "ellipsoid": 0.794,
+       "matbox": 0.639
+      },
+      "rgb_mean_abs_diff_vs_compiled": 29.77,
+      "floor_lum_diff_vs_compiled": -6.59
+     }
+    ]
+   },
+   "seconds": 1.0
+  },
+  {
+   "probe": "Randomizer.materials on renderers",
+   "tier0": "ok",
+   "tier2_legacy": "AttributeError: 'NoneType' object has no attribute 'contents'",
+   "tier2_omnipbr": "ok",
+   "seconds": 0.1
+  },
+  {
+   "probe": "fisheye",
+   "error": "ModuleNotFoundError: No module named 'metalsim.render.lens'",
+   "seconds": 0.0
+  }
+ ],
+ "after": [
+  {
+   "probe": "far plane (boxes at 6 / 15 / 40 m; ground = infinite plane)",
+   "mujoco_far_m": 8694.82,
+   "tier0_accepts_far": true,
+   "objects": {
+    "ground": {
+     "tier0_default": {
+      "px": 10418,
+      "rgb": 0.6911,
+      "depth": 0.6911,
+      "depth_relerr_med": 1.01e-05,
+      "seg": 0.6911
+     },
+     "tier0_far_mujoco": {
+      "px": 10418,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 1.79e-05,
+      "seg": 1.0
+     },
+     "tier1_far_mujoco": {
+      "px": 10418,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 1.79e-05,
+      "seg": 1.0
+     },
+     "tier2": {
+      "px": 10418,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 4.59e-06,
+      "seg": 1.0
+     },
+     "raydepth": {
+      "px": 10418,
+      "depth": 0.9777,
+      "depth_relerr_med": 4.5e-06
+     }
+    },
+    "box6": {
+     "tier0_default": {
+      "px": 254,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 2.52e-07,
+      "seg": 1.0
+     },
+     "tier0_far_mujoco": {
+      "px": 254,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 2.51e-07,
+      "seg": 1.0
+     },
+     "tier1_far_mujoco": {
+      "px": 254,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 2.51e-07,
+      "seg": 1.0
+     },
+     "tier2": {
+      "px": 254,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 4.2e-07,
+      "seg": 1.0
+     },
+     "raydepth": {
+      "px": 254,
+      "depth": 1.0,
+      "depth_relerr_med": 4.2e-07
+     }
+    },
+    "box15": {
+     "tier0_default": {
+      "px": 256,
+      "rgb": 0.0,
+      "depth": 0.0,
+      "seg": 0.0
+     },
+     "tier0_far_mujoco": {
+      "px": 256,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 1.24e-06,
+      "seg": 1.0
+     },
+     "tier1_far_mujoco": {
+      "px": 256,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 1.24e-06,
+      "seg": 1.0
+     },
+     "tier2": {
+      "px": 256,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 9.43e-07,
+      "seg": 1.0
+     },
+     "raydepth": {
+      "px": 256,
+      "depth": 1.0,
+      "depth_relerr_med": 9.43e-07
+     }
+    },
+    "box40": {
+     "tier0_default": {
+      "px": 174,
+      "rgb": 0.0,
+      "depth": 0.0,
+      "seg": 0.0
+     },
+     "tier0_far_mujoco": {
+      "px": 174,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 1.91e-06,
+      "seg": 1.0
+     },
+     "tier1_far_mujoco": {
+      "px": 174,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 1.91e-06,
+      "seg": 1.0
+     },
+     "tier2": {
+      "px": 174,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 1.91e-06,
+      "seg": 1.0
+     },
+     "raydepth": {
+      "px": 174,
+      "depth": 1.0,
+      "depth_relerr_med": 1.91e-06
+     }
+    }
+   },
+   "seconds": 6.0
+  },
+  {
+   "probe": "depth precision (z-depth of fronto-parallel walls; exact = wall front face distance)",
+   "rows": {
+    "far=10000 reversed_z": {
+     "w2": {
+      "px": 1725,
+      "abs_err_med_m": 2.38e-07,
+      "abs_err_max_m": 0.0359,
+      "rel_err_max": 0.018
+     },
+     "w20": {
+      "px": 1050,
+      "abs_err_med_m": 0.0,
+      "abs_err_max_m": 1.67,
+      "rel_err_max": 0.0835
+     },
+     "w200": {
+      "px": 1725,
+      "abs_err_med_m": 3.05e-05,
+      "abs_err_max_m": 6.75,
+      "rel_err_max": 0.0338
+     },
+     "w2000": {
+      "px": 1725,
+      "abs_err_med_m": 0.0,
+      "abs_err_max_m": 76.6,
+      "rel_err_max": 0.0383
+     }
+    },
+    "far=10000 standard_z": {
+     "w2": {
+      "px": 1725,
+      "abs_err_med_m": 1.86e-05,
+      "abs_err_max_m": 0.0359,
+      "rel_err_max": 0.018
+     },
+     "w20": {
+      "px": 1050,
+      "abs_err_med_m": 0.00183,
+      "abs_err_max_m": 1.67,
+      "rel_err_max": 0.0833
+     },
+     "w200": {
+      "px": 1725,
+      "abs_err_med_m": 0.362,
+      "abs_err_max_m": 6.52,
+      "rel_err_max": 0.0326
+     },
+     "w2000": {
+      "px": 1725,
+      "abs_err_med_m": 12.0,
+      "abs_err_max_m": 61.5,
+      "rel_err_max": 0.0307
+     }
+    },
+    "far=1e+06 reversed_z": {
+     "w2": {
+      "px": 1725,
+      "abs_err_med_m": 2.38e-07,
+      "abs_err_max_m": 0.0359,
+      "rel_err_max": 0.018
+     },
+     "w20": {
+      "px": 1050,
+      "abs_err_med_m": 3.81e-06,
+      "abs_err_max_m": 1.67,
+      "rel_err_max": 0.0835
+     },
+     "w200": {
+      "px": 1725,
+      "abs_err_med_m": 1.53e-05,
+      "abs_err_max_m": 6.75,
+      "rel_err_max": 0.0338
+     },
+     "w2000": {
+      "px": 1725,
+      "abs_err_med_m": 0.0,
+      "abs_err_max_m": 76.6,
+      "rel_err_max": 0.0383
+     }
+    },
+    "far=1e+06 standard_z": {
+     "w2": {
+      "px": 1725,
+      "abs_err_med_m": 2.57e-05,
+      "abs_err_max_m": 0.0359,
+      "rel_err_max": 0.018
+     },
+     "w20": {
+      "px": 1050,
+      "abs_err_med_m": 0.000935,
+      "abs_err_max_m": 1.67,
+      "rel_err_max": 0.0834
+     },
+     "w200": {
+      "px": 1725,
+      "abs_err_med_m": 0.0332,
+      "abs_err_max_m": 6.87,
+      "rel_err_max": 0.0344
+     },
+     "w2000": {
+      "px": 1725,
+      "abs_err_med_m": 21.4,
+      "abs_err_max_m": 71.3,
+      "rel_err_max": 0.0356
+     }
+    }
+   },
+   "seconds": 0.0
+  },
+  {
+   "probe": "infinite ground plane",
+   "views": {
+    "loco_checker": {
+     "mujoco_ground_px": 12160,
+     "mujoco_far_m": 80.0,
+     "tier0_default": {
+      "px": 12160,
+      "rgb": 0.8289,
+      "depth": 0.8289,
+      "depth_relerr_med": 2.49e-05,
+      "seg": 0.8289,
+      "tex_corr_vs_mujoco": 0.445,
+      "tex_corr_within_8m": 0.4514
+     },
+     "tier0_far_mujoco": {
+      "px": 12160,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 2.61e-05,
+      "seg": 1.0,
+      "tex_corr_vs_mujoco": 0.4222,
+      "tex_corr_within_8m": 0.4514
+     },
+     "tier1_far_mujoco": {
+      "px": 12160,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 2.61e-05,
+      "seg": 1.0,
+      "tex_corr_vs_mujoco": 0.422,
+      "tex_corr_within_8m": 0.4513
+     },
+     "tier2": {
+      "px": 12160,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 1.4e-05,
+      "seg": 1.0,
+      "tex_corr_vs_mujoco": 0.8184,
+      "tex_corr_within_8m": 0.8689
+     },
+     "raydepth": {
+      "px": 12160,
+      "depth": 1.0,
+      "depth_relerr_med": 1.4e-05
+     }
+    },
+    "topdown_gradient_texuniform": {
+     "mujoco_ground_px": 19200,
+     "mujoco_far_m": 80.0,
+     "tier0_default": {
+      "px": 19200,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 5.56e-07,
+      "seg": 1.0,
+      "tex_corr_vs_mujoco": 0.9883,
+      "tex_corr_within_8m": 0.9883
+     },
+     "tier0_far_mujoco": {
+      "px": 19200,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 5.56e-07,
+      "seg": 1.0,
+      "tex_corr_vs_mujoco": 0.9883,
+      "tex_corr_within_8m": 0.9883
+     },
+     "tier1_far_mujoco": {
+      "px": 19200,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 5.56e-07,
+      "seg": 1.0,
+      "tex_corr_vs_mujoco": 0.9883,
+      "tex_corr_within_8m": 0.9883
+     },
+     "tier2": {
+      "px": 19200,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 5.56e-07,
+      "seg": 1.0,
+      "tex_corr_vs_mujoco": 0.9979,
+      "tex_corr_within_8m": 0.9979
+     },
+     "raydepth": {
+      "px": 19200,
+      "depth": 1.0,
+      "depth_relerr_med": 5.56e-07
+     }
+    },
+    "topdown_gradient": {
+     "mujoco_ground_px": 19200,
+     "mujoco_far_m": 80.0,
+     "tier0_default": {
+      "px": 19200,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 5.56e-07,
+      "seg": 1.0,
+      "tex_corr_vs_mujoco": 0.9883,
+      "tex_corr_within_8m": 0.9883
+     },
+     "tier0_far_mujoco": {
+      "px": 19200,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 5.56e-07,
+      "seg": 1.0,
+      "tex_corr_vs_mujoco": 0.9883,
+      "tex_corr_within_8m": 0.9883
+     },
+     "tier1_far_mujoco": {
+      "px": 19200,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 5.56e-07,
+      "seg": 1.0,
+      "tex_corr_vs_mujoco": 0.9883,
+      "tex_corr_within_8m": 0.9883
+     },
+     "tier2": {
+      "px": 19200,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 5.56e-07,
+      "seg": 1.0,
+      "tex_corr_vs_mujoco": 0.9979,
+      "tex_corr_within_8m": 0.9979
+     },
+     "raydepth": {
+      "px": 19200,
+      "depth": 1.0,
+      "depth_relerr_med": 5.56e-07
+     }
+    }
+   },
+   "lidar": {
+    "returns_at_1.73m": 1.0,
+    "returns_at_15m": 1.0
+   },
+   "seconds": 0.2
+  },
+  {
+   "probe": "heightfield sides and base",
+   "views": {
+    "cam": {
+     "tier0": {
+      "px": 1827,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 6.28e-07,
+      "seg": 1.0
+     },
+     "tier1": {
+      "px": 1827,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 6.28e-07,
+      "seg": 1.0
+     },
+     "tier2": {
+      "px": 1827,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 3.26e-06,
+      "seg": 1.0
+     },
+     "raydepth": {
+      "px": 1827,
+      "depth": 1.0,
+      "depth_relerr_med": 3.26e-06
+     },
+     "tier0_nocull": {
+      "px": 1827,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 6.28e-07,
+      "seg": 1.0
+     }
+    },
+    "under": {
+     "tier0": {
+      "px": 4641,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 7.04e-06,
+      "seg": 1.0
+     },
+     "tier1": {
+      "px": 4641,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 7.04e-06,
+      "seg": 1.0
+     },
+     "tier2": {
+      "px": 4641,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 6.43e-06,
+      "seg": 1.0
+     },
+     "raydepth": {
+      "px": 4641,
+      "depth": 1.0,
+      "depth_relerr_med": 6.5e-06
+     },
+     "tier0_nocull": {
+      "px": 4641,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 7.04e-06,
+      "seg": 1.0
+     }
+    }
+   },
+   "seconds": 0.1
+  },
+  {
+   "probe": "per-world model fields via BatchSim (GPU path) vs the same renderer on a model compiled with that world's values",
+   "fields": [
+    "geom_size",
+    "geom_rgba",
+    "mat_rgba",
+    "light_diffuse",
+    "light_active"
+   ],
+   "rows": {
+    "tier0": [
+     {
+      "env": 0,
+      "silhouette_iou_vs_mujoco": {
+       "box": 1.0,
+       "sphere": 0.99,
+       "cylinder": 1.0,
+       "capsule": 1.0,
+       "ellipsoid": 0.989,
+       "matbox": 1.0
+      },
+      "rgb_mean_abs_diff_vs_compiled": 0.0,
+      "floor_lum_diff_vs_compiled": 0.0
+     },
+     {
+      "env": 1,
+      "silhouette_iou_vs_mujoco": {
+       "box": 1.0,
+       "sphere": 0.998,
+       "cylinder": 0.999,
+       "capsule": 0.994,
+       "ellipsoid": 0.998,
+       "matbox": 0.997
+      },
+      "rgb_mean_abs_diff_vs_compiled": 0.0,
+      "floor_lum_diff_vs_compiled": 0.0
+     },
+     {
+      "env": 2,
+      "silhouette_iou_vs_mujoco": {
+       "box": 1.0,
+       "sphere": 0.989,
+       "cylinder": 1.0,
+       "capsule": 1.0,
+       "ellipsoid": 0.995,
+       "matbox": 1.0
+      },
+      "rgb_mean_abs_diff_vs_compiled": 0.0,
+      "floor_lum_diff_vs_compiled": 0.0
+     },
+     {
+      "env": 3,
+      "silhouette_iou_vs_mujoco": {
+       "box": 1.0,
+       "sphere": 0.995,
+       "cylinder": 1.0,
+       "capsule": 1.0,
+       "ellipsoid": 0.997,
+       "matbox": 0.997
+      },
+      "rgb_mean_abs_diff_vs_compiled": 0.0,
+      "floor_lum_diff_vs_compiled": 0.0
+     }
+    ],
+    "tier2": [
+     {
+      "env": 0,
+      "silhouette_iou_vs_mujoco": {
+       "box": 1.0,
+       "sphere": 0.99,
+       "cylinder": 1.0,
+       "capsule": 1.0,
+       "ellipsoid": 0.989,
+       "matbox": 1.0
+      },
+      "rgb_mean_abs_diff_vs_compiled": 0.0,
+      "floor_lum_diff_vs_compiled": 0.0
+     },
+     {
+      "env": 1,
+      "silhouette_iou_vs_mujoco": {
+       "box": 0.999,
+       "sphere": 0.998,
+       "cylinder": 0.999,
+       "capsule": 0.994,
+       "ellipsoid": 0.998,
+       "matbox": 0.997
+      },
+      "rgb_mean_abs_diff_vs_compiled": 5.04,
+      "floor_lum_diff_vs_compiled": -0.02
+     },
+     {
+      "env": 2,
+      "silhouette_iou_vs_mujoco": {
+       "box": 1.0,
+       "sphere": 0.989,
+       "cylinder": 1.0,
+       "capsule": 1.0,
+       "ellipsoid": 0.995,
+       "matbox": 1.0
+      },
+      "rgb_mean_abs_diff_vs_compiled": 2.97,
+      "floor_lum_diff_vs_compiled": -0.05
+     },
+     {
+      "env": 3,
+      "silhouette_iou_vs_mujoco": {
+       "box": 1.0,
+       "sphere": 0.995,
+       "cylinder": 1.0,
+       "capsule": 1.0,
+       "ellipsoid": 0.997,
+       "matbox": 0.997
+      },
+      "rgb_mean_abs_diff_vs_compiled": 2.48,
+      "floor_lum_diff_vs_compiled": -0.0
+     }
+    ]
+   },
+   "seconds": 1.3
+  },
+  {
+   "probe": "Randomizer.materials on renderers",
+   "tier0": "ok",
+   "tier2_legacy": "ok",
+   "tier2_omnipbr": "ok",
+   "seconds": 0.0
+  },
+  {
+   "probe": "fisheye (blob centroid vs lens projection of the sphere centre, px; z-depth)",
+   "lenses": {
+    "ftheta_isaac_default": {
+     "face_res": 88,
+     "faces": [
+      "front",
+      "right",
+      "left",
+      "up",
+      "down"
+     ],
+     "s0": {
+      "tier2": {
+       "px": 28,
+       "centroid_err_px": 0.13,
+       "zdepth_nearest": 3.784
+      },
+      "tier0_cube": {
+       "px": 24,
+       "centroid_err_px": 0.21,
+       "zdepth_nearest": 3.751
+      },
+      "raydepth": {
+       "px": 28,
+       "centroid_err_px": 0.13,
+       "zdepth_nearest": 3.706
+      },
+      "zdepth_centre_exact": 4.0,
+      "iou_tier0_vs_tier2": 0.857
+     },
+     "s60": {
+      "tier2": {
+       "px": 34,
+       "centroid_err_px": 0.11,
+       "zdepth_nearest": 1.895
+      },
+      "tier0_cube": {
+       "px": 36,
+       "centroid_err_px": 0.27,
+       "zdepth_nearest": 1.904
+      },
+      "raydepth": {
+       "px": 34,
+       "centroid_err_px": 0.11,
+       "zdepth_nearest": 1.709
+      },
+      "zdepth_centre_exact": 2.0,
+      "iou_tier0_vs_tier2": 0.944
+     },
+     "s95": {
+      "tier2": {
+       "px": 47,
+       "centroid_err_px": 0.17,
+       "zdepth_nearest": -0.333
+      },
+      "tier0_cube": {
+       "px": 39,
+       "centroid_err_px": 0.13,
+       "zdepth_nearest": -0.338
+      },
+      "raydepth": {
+       "px": 47,
+       "centroid_err_px": 0.17,
+       "zdepth_nearest": -0.06
+      },
+      "zdepth_centre_exact": -0.349,
+      "iou_tier0_vs_tier2": 0.83
+     }
+    },
+    "kannala_brandt": {
+     "face_res": 87,
+     "faces": [
+      "front",
+      "right",
+      "left",
+      "up",
+      "down"
+     ],
+     "s0": {
+      "tier2": {
+       "px": 24,
+       "centroid_err_px": 0.0,
+       "zdepth_nearest": 3.768
+      },
+      "tier0_cube": {
+       "px": 24,
+       "centroid_err_px": 0.0,
+       "zdepth_nearest": 3.808
+      },
+      "raydepth": {
+       "px": 24,
+       "centroid_err_px": 0.0,
+       "zdepth_nearest": 3.713
+      },
+      "zdepth_centre_exact": 4.0,
+      "iou_tier0_vs_tier2": 1.0
+     },
+     "s60": {
+      "tier2": {
+       "px": 36,
+       "centroid_err_px": 0.0,
+       "zdepth_nearest": 1.873
+      },
+      "tier0_cube": {
+       "px": 31,
+       "centroid_err_px": 0.11,
+       "zdepth_nearest": 1.871
+      },
+      "raydepth": {
+       "px": 36,
+       "centroid_err_px": 0.0,
+       "zdepth_nearest": 1.714
+      },
+      "zdepth_centre_exact": 2.0,
+      "iou_tier0_vs_tier2": 0.861
+     },
+     "s95": {
+      "tier2": {
+       "px": 46,
+       "centroid_err_px": 0.01,
+       "zdepth_nearest": -0.312
+      },
+      "tier0_cube": {
+       "px": 42,
+       "centroid_err_px": 0.02,
+       "zdepth_nearest": -0.313
+      },
+      "raydepth": {
+       "px": 46,
+       "centroid_err_px": 0.01,
+       "zdepth_nearest": -0.103
+      },
+      "zdepth_centre_exact": -0.349,
+      "iou_tier0_vs_tier2": 0.913
+     }
+    }
+   },
+   "seconds": 0.1
+  }
+ ],
+ "after_rebased_on_471d156": [
+  {
+   "probe": "far plane (boxes at 6 / 15 / 40 m; ground = infinite plane)",
+   "mujoco_far_m": 8694.82,
+   "tier0_accepts_far": true,
+   "objects": {
+    "ground": {
+     "tier0_default": {
+      "px": 10418,
+      "rgb": 0.6911,
+      "depth": 0.6911,
+      "depth_relerr_med": 1.01e-05,
+      "seg": 0.6911
+     },
+     "tier0_far_mujoco": {
+      "px": 10418,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 1.79e-05,
+      "seg": 1.0
+     },
+     "tier1_far_mujoco": {
+      "px": 10418,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 1.79e-05,
+      "seg": 1.0
+     },
+     "tier2": {
+      "px": 10418,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 4.59e-06,
+      "seg": 1.0
+     },
+     "raydepth": {
+      "px": 10418,
+      "depth": 0.9777,
+      "depth_relerr_med": 4.5e-06
+     }
+    },
+    "box6": {
+     "tier0_default": {
+      "px": 254,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 2.52e-07,
+      "seg": 1.0
+     },
+     "tier0_far_mujoco": {
+      "px": 254,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 2.51e-07,
+      "seg": 1.0
+     },
+     "tier1_far_mujoco": {
+      "px": 254,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 2.51e-07,
+      "seg": 1.0
+     },
+     "tier2": {
+      "px": 254,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 4.2e-07,
+      "seg": 1.0
+     },
+     "raydepth": {
+      "px": 254,
+      "depth": 1.0,
+      "depth_relerr_med": 4.2e-07
+     }
+    },
+    "box15": {
+     "tier0_default": {
+      "px": 256,
+      "rgb": 0.0,
+      "depth": 0.0,
+      "seg": 0.0
+     },
+     "tier0_far_mujoco": {
+      "px": 256,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 1.24e-06,
+      "seg": 1.0
+     },
+     "tier1_far_mujoco": {
+      "px": 256,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 1.24e-06,
+      "seg": 1.0
+     },
+     "tier2": {
+      "px": 256,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 9.43e-07,
+      "seg": 1.0
+     },
+     "raydepth": {
+      "px": 256,
+      "depth": 1.0,
+      "depth_relerr_med": 9.43e-07
+     }
+    },
+    "box40": {
+     "tier0_default": {
+      "px": 174,
+      "rgb": 0.0,
+      "depth": 0.0,
+      "seg": 0.0
+     },
+     "tier0_far_mujoco": {
+      "px": 174,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 1.91e-06,
+      "seg": 1.0
+     },
+     "tier1_far_mujoco": {
+      "px": 174,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 1.91e-06,
+      "seg": 1.0
+     },
+     "tier2": {
+      "px": 174,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 1.91e-06,
+      "seg": 1.0
+     },
+     "raydepth": {
+      "px": 174,
+      "depth": 1.0,
+      "depth_relerr_med": 1.91e-06
+     }
+    }
+   },
+   "seconds": 5.9
+  },
+  {
+   "probe": "depth precision (z-depth of fronto-parallel walls; exact = wall front face distance)",
+   "rows": {
+    "far=10000 reversed_z": {
+     "w2": {
+      "px": 1725,
+      "abs_err_med_m": 2.38e-07,
+      "abs_err_max_m": 0.0359,
+      "rel_err_max": 0.018
+     },
+     "w20": {
+      "px": 1050,
+      "abs_err_med_m": 0.0,
+      "abs_err_max_m": 1.67,
+      "rel_err_max": 0.0835
+     },
+     "w200": {
+      "px": 1725,
+      "abs_err_med_m": 3.05e-05,
+      "abs_err_max_m": 6.75,
+      "rel_err_max": 0.0338
+     },
+     "w2000": {
+      "px": 1725,
+      "abs_err_med_m": 0.0,
+      "abs_err_max_m": 76.6,
+      "rel_err_max": 0.0383
+     }
+    },
+    "far=10000 standard_z": {
+     "w2": {
+      "px": 1725,
+      "abs_err_med_m": 1.86e-05,
+      "abs_err_max_m": 0.0359,
+      "rel_err_max": 0.018
+     },
+     "w20": {
+      "px": 1050,
+      "abs_err_med_m": 0.00183,
+      "abs_err_max_m": 1.67,
+      "rel_err_max": 0.0833
+     },
+     "w200": {
+      "px": 1725,
+      "abs_err_med_m": 0.362,
+      "abs_err_max_m": 6.52,
+      "rel_err_max": 0.0326
+     },
+     "w2000": {
+      "px": 1725,
+      "abs_err_med_m": 12.0,
+      "abs_err_max_m": 61.5,
+      "rel_err_max": 0.0307
+     }
+    },
+    "far=1e+06 reversed_z": {
+     "w2": {
+      "px": 1725,
+      "abs_err_med_m": 2.38e-07,
+      "abs_err_max_m": 0.0359,
+      "rel_err_max": 0.018
+     },
+     "w20": {
+      "px": 1050,
+      "abs_err_med_m": 3.81e-06,
+      "abs_err_max_m": 1.67,
+      "rel_err_max": 0.0835
+     },
+     "w200": {
+      "px": 1725,
+      "abs_err_med_m": 1.53e-05,
+      "abs_err_max_m": 6.75,
+      "rel_err_max": 0.0338
+     },
+     "w2000": {
+      "px": 1725,
+      "abs_err_med_m": 0.0,
+      "abs_err_max_m": 76.6,
+      "rel_err_max": 0.0383
+     }
+    },
+    "far=1e+06 standard_z": {
+     "w2": {
+      "px": 1725,
+      "abs_err_med_m": 2.57e-05,
+      "abs_err_max_m": 0.0359,
+      "rel_err_max": 0.018
+     },
+     "w20": {
+      "px": 1050,
+      "abs_err_med_m": 0.000935,
+      "abs_err_max_m": 1.67,
+      "rel_err_max": 0.0834
+     },
+     "w200": {
+      "px": 1725,
+      "abs_err_med_m": 0.0332,
+      "abs_err_max_m": 6.87,
+      "rel_err_max": 0.0344
+     },
+     "w2000": {
+      "px": 1725,
+      "abs_err_med_m": 21.4,
+      "abs_err_max_m": 71.3,
+      "rel_err_max": 0.0356
+     }
+    }
+   },
+   "seconds": 0.0
+  },
+  {
+   "probe": "infinite ground plane",
+   "views": {
+    "loco_checker": {
+     "mujoco_ground_px": 12160,
+     "mujoco_far_m": 80.0,
+     "tier0_default": {
+      "px": 12160,
+      "rgb": 0.8289,
+      "depth": 0.8289,
+      "depth_relerr_med": 2.49e-05,
+      "seg": 0.8289,
+      "tex_corr_vs_mujoco": 0.4116,
+      "tex_corr_within_8m": 0.4168
+     },
+     "tier0_far_mujoco": {
+      "px": 12160,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 2.61e-05,
+      "seg": 1.0,
+      "tex_corr_vs_mujoco": 0.3917,
+      "tex_corr_within_8m": 0.4168
+     },
+     "tier1_far_mujoco": {
+      "px": 12160,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 2.61e-05,
+      "seg": 1.0,
+      "tex_corr_vs_mujoco": 0.3916,
+      "tex_corr_within_8m": 0.4167
+     },
+     "tier2": {
+      "px": 12160,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 1.4e-05,
+      "seg": 1.0,
+      "tex_corr_vs_mujoco": 0.8026,
+      "tex_corr_within_8m": 0.851
+     },
+     "raydepth": {
+      "px": 12160,
+      "depth": 1.0,
+      "depth_relerr_med": 1.4e-05
+     }
+    },
+    "topdown_gradient_texuniform": {
+     "mujoco_ground_px": 19200,
+     "mujoco_far_m": 80.0,
+     "tier0_default": {
+      "px": 19200,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 5.56e-07,
+      "seg": 1.0,
+      "tex_corr_vs_mujoco": 0.9917,
+      "tex_corr_within_8m": 0.9917
+     },
+     "tier0_far_mujoco": {
+      "px": 19200,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 5.56e-07,
+      "seg": 1.0,
+      "tex_corr_vs_mujoco": 0.9917,
+      "tex_corr_within_8m": 0.9917
+     },
+     "tier1_far_mujoco": {
+      "px": 19200,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 5.56e-07,
+      "seg": 1.0,
+      "tex_corr_vs_mujoco": 0.9917,
+      "tex_corr_within_8m": 0.9917
+     },
+     "tier2": {
+      "px": 19200,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 5.56e-07,
+      "seg": 1.0,
+      "tex_corr_vs_mujoco": 0.9987,
+      "tex_corr_within_8m": 0.9987
+     },
+     "raydepth": {
+      "px": 19200,
+      "depth": 1.0,
+      "depth_relerr_med": 5.56e-07
+     }
+    },
+    "topdown_gradient": {
+     "mujoco_ground_px": 19200,
+     "mujoco_far_m": 80.0,
+     "tier0_default": {
+      "px": 19200,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 5.56e-07,
+      "seg": 1.0,
+      "tex_corr_vs_mujoco": 0.9917,
+      "tex_corr_within_8m": 0.9917
+     },
+     "tier0_far_mujoco": {
+      "px": 19200,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 5.56e-07,
+      "seg": 1.0,
+      "tex_corr_vs_mujoco": 0.9917,
+      "tex_corr_within_8m": 0.9917
+     },
+     "tier1_far_mujoco": {
+      "px": 19200,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 5.56e-07,
+      "seg": 1.0,
+      "tex_corr_vs_mujoco": 0.9917,
+      "tex_corr_within_8m": 0.9917
+     },
+     "tier2": {
+      "px": 19200,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 5.56e-07,
+      "seg": 1.0,
+      "tex_corr_vs_mujoco": 0.9987,
+      "tex_corr_within_8m": 0.9987
+     },
+     "raydepth": {
+      "px": 19200,
+      "depth": 1.0,
+      "depth_relerr_med": 5.56e-07
+     }
+    }
+   },
+   "lidar": {
+    "returns_at_1.73m": 1.0,
+    "returns_at_15m": 1.0
+   },
+   "seconds": 0.2
+  },
+  {
+   "probe": "heightfield sides and base",
+   "views": {
+    "cam": {
+     "tier0": {
+      "px": 1827,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 6.28e-07,
+      "seg": 1.0
+     },
+     "tier1": {
+      "px": 1827,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 6.28e-07,
+      "seg": 1.0
+     },
+     "tier2": {
+      "px": 1827,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 3.26e-06,
+      "seg": 1.0
+     },
+     "raydepth": {
+      "px": 1827,
+      "depth": 1.0,
+      "depth_relerr_med": 3.26e-06
+     },
+     "tier0_nocull": {
+      "px": 1827,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 6.28e-07,
+      "seg": 1.0
+     }
+    },
+    "under": {
+     "tier0": {
+      "px": 4641,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 7.04e-06,
+      "seg": 1.0
+     },
+     "tier1": {
+      "px": 4641,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 7.04e-06,
+      "seg": 1.0
+     },
+     "tier2": {
+      "px": 4641,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 6.43e-06,
+      "seg": 1.0
+     },
+     "raydepth": {
+      "px": 4641,
+      "depth": 1.0,
+      "depth_relerr_med": 6.5e-06
+     },
+     "tier0_nocull": {
+      "px": 4641,
+      "rgb": 1.0,
+      "depth": 1.0,
+      "depth_relerr_med": 7.04e-06,
+      "seg": 1.0
+     }
+    }
+   },
+   "seconds": 0.1
+  },
+  {
+   "probe": "per-world model fields via BatchSim (GPU path) vs the same renderer on a model compiled with that world's values",
+   "fields": [
+    "geom_size",
+    "geom_rgba",
+    "mat_rgba",
+    "light_diffuse",
+    "light_active"
+   ],
+   "rows": {
+    "tier0": [
+     {
+      "env": 0,
+      "silhouette_iou_vs_mujoco": {
+       "box": 1.0,
+       "sphere": 1.0,
+       "cylinder": 1.0,
+       "capsule": 1.0,
+       "ellipsoid": 1.0,
+       "matbox": 1.0
+      },
+      "rgb_mean_abs_diff_vs_compiled": 0.0,
+      "floor_lum_diff_vs_compiled": 0.0
+     },
+     {
+      "env": 1,
+      "silhouette_iou_vs_mujoco": {
+       "box": 1.0,
+       "sphere": 1.0,
+       "cylinder": 1.0,
+       "capsule": 1.0,
+       "ellipsoid": 1.0,
+       "matbox": 1.0
+      },
+      "rgb_mean_abs_diff_vs_compiled": 0.0,
+      "floor_lum_diff_vs_compiled": 0.0
+     },
+     {
+      "env": 2,
+      "silhouette_iou_vs_mujoco": {
+       "box": 1.0,
+       "sphere": 1.0,
+       "cylinder": 1.0,
+       "capsule": 1.0,
+       "ellipsoid": 1.0,
+       "matbox": 1.0
+      },
+      "rgb_mean_abs_diff_vs_compiled": 0.0,
+      "floor_lum_diff_vs_compiled": 0.0
+     },
+     {
+      "env": 3,
+      "silhouette_iou_vs_mujoco": {
+       "box": 1.0,
+       "sphere": 1.0,
+       "cylinder": 1.0,
+       "capsule": 1.0,
+       "ellipsoid": 1.0,
+       "matbox": 1.0
+      },
+      "rgb_mean_abs_diff_vs_compiled": 0.0,
+      "floor_lum_diff_vs_compiled": 0.0
+     }
+    ],
+    "tier2": [
+     {
+      "env": 0,
+      "silhouette_iou_vs_mujoco": {
+       "box": 1.0,
+       "sphere": 1.0,
+       "cylinder": 1.0,
+       "capsule": 1.0,
+       "ellipsoid": 1.0,
+       "matbox": 1.0
+      },
+      "rgb_mean_abs_diff_vs_compiled": 0.0,
+      "floor_lum_diff_vs_compiled": 0.0
+     },
+     {
+      "env": 1,
+      "silhouette_iou_vs_mujoco": {
+       "box": 0.999,
+       "sphere": 1.0,
+       "cylinder": 1.0,
+       "capsule": 1.0,
+       "ellipsoid": 0.995,
+       "matbox": 1.0
+      },
+      "rgb_mean_abs_diff_vs_compiled": 5.0,
+      "floor_lum_diff_vs_compiled": -0.01
+     },
+     {
+      "env": 2,
+      "silhouette_iou_vs_mujoco": {
+       "box": 1.0,
+       "sphere": 1.0,
+       "cylinder": 1.0,
+       "capsule": 1.0,
+       "ellipsoid": 1.0,
+       "matbox": 1.0
+      },
+      "rgb_mean_abs_diff_vs_compiled": 2.97,
+      "floor_lum_diff_vs_compiled": -0.07
+     },
+     {
+      "env": 3,
+      "silhouette_iou_vs_mujoco": {
+       "box": 1.0,
+       "sphere": 1.0,
+       "cylinder": 1.0,
+       "capsule": 1.0,
+       "ellipsoid": 1.0,
+       "matbox": 1.0
+      },
+      "rgb_mean_abs_diff_vs_compiled": 2.48,
+      "floor_lum_diff_vs_compiled": 0.0
+     }
+    ]
+   },
+   "seconds": 0.8
+  },
+  {
+   "probe": "Randomizer.materials on renderers",
+   "tier0": "ok",
+   "tier2_legacy": "ok",
+   "tier2_omnipbr": "ok",
+   "seconds": 0.1
+  },
+  {
+   "probe": "fisheye (blob centroid vs lens projection of the sphere centre, px; z-depth)",
+   "lenses": {
+    "ftheta_isaac_default": {
+     "face_res": 88,
+     "faces": [
+      "front",
+      "right",
+      "left",
+      "up",
+      "down"
+     ],
+     "s0": {
+      "tier2": {
+       "px": 29,
+       "centroid_err_px": 0.17,
+       "zdepth_nearest": 3.782
+      },
+      "tier0_cube": {
+       "px": 24,
+       "centroid_err_px": 0.21,
+       "zdepth_nearest": 3.749
+      },
+      "raydepth": {
+       "px": 29,
+       "centroid_err_px": 0.17,
+       "zdepth_nearest": 3.704
+      },
+      "zdepth_centre_exact": 4.0,
+      "iou_tier0_vs_tier2": 0.828
+     },
+     "s60": {
+      "tier2": {
+       "px": 34,
+       "centroid_err_px": 0.11,
+       "zdepth_nearest": 1.895
+      },
+      "tier0_cube": {
+       "px": 36,
+       "centroid_err_px": 0.27,
+       "zdepth_nearest": 1.903
+      },
+      "raydepth": {
+       "px": 34,
+       "centroid_err_px": 0.11,
+       "zdepth_nearest": 1.708
+      },
+      "zdepth_centre_exact": 2.0,
+      "iou_tier0_vs_tier2": 0.944
+     },
+     "s95": {
+      "tier2": {
+       "px": 47,
+       "centroid_err_px": 0.17,
+       "zdepth_nearest": -0.333
+      },
+      "tier0_cube": {
+       "px": 39,
+       "centroid_err_px": 0.13,
+       "zdepth_nearest": -0.338
+      },
+      "raydepth": {
+       "px": 47,
+       "centroid_err_px": 0.17,
+       "zdepth_nearest": -0.06
+      },
+      "zdepth_centre_exact": -0.349,
+      "iou_tier0_vs_tier2": 0.83
+     }
+    },
+    "kannala_brandt": {
+     "face_res": 87,
+     "faces": [
+      "front",
+      "right",
+      "left",
+      "up",
+      "down"
+     ],
+     "s0": {
+      "tier2": {
+       "px": 24,
+       "centroid_err_px": 0.0,
+       "zdepth_nearest": 3.769
+      },
+      "tier0_cube": {
+       "px": 24,
+       "centroid_err_px": 0.0,
+       "zdepth_nearest": 3.805
+      },
+      "raydepth": {
+       "px": 24,
+       "centroid_err_px": 0.0,
+       "zdepth_nearest": 3.71
+      },
+      "zdepth_centre_exact": 4.0,
+      "iou_tier0_vs_tier2": 1.0
+     },
+     "s60": {
+      "tier2": {
+       "px": 36,
+       "centroid_err_px": 0.0,
+       "zdepth_nearest": 1.873
+      },
+      "tier0_cube": {
+       "px": 31,
+       "centroid_err_px": 0.11,
+       "zdepth_nearest": 1.872
+      },
+      "raydepth": {
+       "px": 36,
+       "centroid_err_px": 0.0,
+       "zdepth_nearest": 1.71
+      },
+      "zdepth_centre_exact": 2.0,
+      "iou_tier0_vs_tier2": 0.861
+     },
+     "s95": {
+      "tier2": {
+       "px": 46,
+       "centroid_err_px": 0.01,
+       "zdepth_nearest": -0.312
+      },
+      "tier0_cube": {
+       "px": 42,
+       "centroid_err_px": 0.02,
+       "zdepth_nearest": -0.312
+      },
+      "raydepth": {
+       "px": 46,
+       "centroid_err_px": 0.01,
+       "zdepth_nearest": -0.103
+      },
+      "zdepth_centre_exact": -0.349,
+      "iou_tier0_vs_tier2": 0.913
+     }
+    }
+   },
+   "seconds": 0.2
+  }
+ ]
+}

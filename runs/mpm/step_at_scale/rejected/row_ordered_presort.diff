@@ -1,0 +1,194 @@
+diff --git a/warp/_src/metal_sparse.py b/warp/_src/metal_sparse.py
+index 32c5b216..cc6d74b1 100644
+--- a/warp/_src/metal_sparse.py
++++ b/warp/_src/metal_sparse.py
+@@ -412,6 +412,177 @@ def enabled(device) -> bool:
+     return device.is_metal and wp.config.metal_gpu_utilities
+ 
+ 
++_ROW_RUN_MAX = 64
++"""Longest run of equal-row triplets the row-ordered path sorts in place (longer runs take the radix sort)."""
++
++
++@wp.func
++def _active_count(n: int, count: wp.array[int]) -> int:
++    if count:
++        return wp.min(count[0], n)
++    return n
++
++
++@wp.kernel(enable_backward=False)
++def _row_runs_sort(
++    n: int,
++    count: wp.array[int],
++    rows: wp.array[int],
++    keys: wp.array[Any],
++    indices: wp.array[int],
++    run_keys: wp.array[Any],
++    run_indices: wp.array[int],
++    ok: wp.array[int],
++):
++    # one thread per run of equal input rows: a stable insertion sort of the run's (key, index) pairs by key
++    i = wp.tid()
++    m = _active_count(n, count)
++    if i >= m:
++        return
++    row = rows[i]
++    if i > 0:
++        if rows[i - 1] == row:
++            return
++    end = i + 1
++    while end < m and end - i < _ROW_RUN_MAX and rows[end] == row:
++        end += 1
++    if end < m and rows[end] == row:
++        ok[0] = 0  # run too long for this path: the radix sort sorts everything
++        return
++    for j in range(i, end):
++        k = keys[j]
++        v = indices[j]
++        p = j
++        while p > i and run_keys[p - 1] > k:
++            run_keys[p] = run_keys[p - 1]
++            run_indices[p] = run_indices[p - 1]
++            p -= 1
++        run_keys[p] = k
++        run_indices[p] = v
++
++
++@wp.kernel(enable_backward=False)
++def _row_runs_kept_flags(
++    n: int, count: wp.array[int], sentinel: wp.int64, run_keys: wp.array[Any], flags: wp.array[int]
++):
++    i = wp.tid()
++    if i < _active_count(n, count):
++        flags[i] = wp.where(wp.int64(run_keys[i]) < sentinel, 1, 0)
++    else:
++        flags[i] = 0
++
++
++@wp.kernel(enable_backward=False)
++def _row_runs_partition(
++    n: int,
++    count: wp.array[int],
++    run_keys: wp.array[Any],
++    run_indices: wp.array[int],
++    flags: wp.array[int],
++    positions: wp.array[int],
++    out_keys: wp.array[Any],
++    out_indices: wp.array[int],
++):
++    # the kept pairs first, then the sentinel pairs, each in their order (a stable partition)
++    i = wp.tid()
++    m = _active_count(n, count)
++    if i >= m:
++        return
++    kept = positions[m - 1] + flags[m - 1]
++    dst = positions[i]
++    if flags[i] == 0:
++        dst = kept + (i - positions[i])
++    out_keys[dst] = run_keys[i]
++    out_indices[dst] = run_indices[i]
++
++
++@wp.kernel(enable_backward=False)
++def _row_runs_check(
++    n: int,
++    count: wp.array[int],
++    flags: wp.array[int],
++    positions: wp.array[int],
++    out_keys: wp.array[Any],
++    ok: wp.array[int],
++):
++    # the kept keys must be in order: the result is then the stable sort of the pairs
++    i = wp.tid()
++    m = _active_count(n, count)
++    if i == 0 or i >= m:
++        return
++    kept = positions[m - 1] + flags[m - 1]
++    if i < kept:
++        if out_keys[i - 1] > out_keys[i]:
++            ok[0] = 0
++
++
++@wp.kernel(enable_backward=False)
++def _row_runs_select(
++    n: int,
++    count: wp.array[int],
++    ok: wp.array[int],
++    out_keys: wp.array[Any],
++    out_indices: wp.array[int],
++    keys: wp.array[Any],
++    indices: wp.array[int],
++    radix_count: wp.array[int],
++):
++    # in order: the ordered pairs replace the input and the radix sort that follows sorts none; otherwise all of them
++    i = wp.tid()
++    m = _active_count(n, count)
++    if i == 0:
++        radix_count[0] = wp.where(ok[0] != 0, 0, m)
++    if i < m and ok[0] != 0:
++        keys[i] = out_keys[i]
++        indices[i] = out_indices[i]
++
++
++def _row_ordered_enabled() -> bool:
++    import os  # noqa: PLC0415
++
++    return wp.config.metal_bounded_launch and os.environ.get("WP_METAL_ROW_ORDERED_TRIPLETS", "1") != "0"
++
++
++def _row_ordered_presort(device, keys, indices, n: int, rows, count, sentinel: int, wide: bool):
++    """Sort the (key, index) pairs of triplets listed row by row (input rows non-decreasing, the order of
++    ``warp.fem`` assembly and interpolation) without the radix sort: each run of equal input rows is sorted in place
++    (stable insertion sort), the kept pairs are moved before the sentinel ones (stable partition), and the kept keys
++    are checked to be in order. When they are, the pairs are exactly those of the stable radix sort and the returned
++    count array is 0, so the radix sort that follows (bounded by it) sorts nothing; otherwise the input pairs are
++    left as they were and the count is the number of pairs the radix sort must sort."""
++    from warp._src.utils import array_scan  # noqa: PLC0415
++
++    scratch = _scratch(device)
++    kdt = wp.uint64 if wide else wp.uint32
++    tag = "64" if wide else "32"
++    run_keys = scratch.get("run_keys" + tag, kdt, n, device)[:n]
++    out_keys = scratch.get("out_keys" + tag, kdt, n, device)[:n]
++    run_indices = scratch.get("run_indices", wp.int32, n, device)[:n]
++    out_indices = scratch.get("out_indices", wp.int32, n, device)[:n]
++    flags = scratch.get("run_flags", wp.int32, n, device)[:n]
++    positions = scratch.get("run_positions", wp.int32, n, device)[:n]
++    ok = scratch.get("run_ok", wp.int32, 1, device)[:1]
++    radix_count = scratch.get("run_radix_count", wp.int32, 1, device)[:1]
++    ok.fill_(1)
++    wp.launch(_row_runs_sort, dim=n, device=device, inputs=[n, count, rows, keys, indices, run_keys, run_indices, ok])
++    wp.launch(_row_runs_kept_flags, dim=n, device=device, inputs=[n, count, wp.int64(sentinel), run_keys, flags])
++    array_scan(flags, positions, inclusive=False)
++    wp.launch(
++        _row_runs_partition,
++        dim=n,
++        device=device,
++        inputs=[n, count, run_keys, run_indices, flags, positions, out_keys, out_indices],
++    )
++    wp.launch(_row_runs_check, dim=n, device=device, inputs=[n, count, flags, positions, out_keys, ok])
++    wp.launch(
++        _row_runs_select,
++        dim=n,
++        device=device,
++        inputs=[n, count, ok, out_keys, out_indices, keys, indices, radix_count],
++    )
++    return radix_count
++
++
+ class _Scratch:
+     """Grow-only per-device work buffers. Outgrown buffers stay alive: a captured graph may still reference them
+     (as the scratch pool of ``warp._src.metal_primitives``)."""
+@@ -526,7 +697,10 @@ def bsr_from_triplets(
+         ],
+     )
+     # triplets at or past count[0] got the sentinel key above
+-    _sort(keys, indices, n, sentinel, count_limit=count)
++    if n > 1 and _row_ordered_enabled():
++        _sort(keys, indices, n, sentinel, count_limit=_row_ordered_presort(device, keys, indices, n, rows, count, sentinel, wide))
++    else:
++        _sort(keys, indices, n, sentinel, count_limit=count)
+ 
+     from warp._src.utils import array_scan  # noqa: PLC0415
+ 

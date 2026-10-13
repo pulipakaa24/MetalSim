@@ -1,0 +1,63 @@
+[gpu_run] a2_timing start: device utilisation 100% (17:43:24)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 100 %; per-process GPU time over 1.8 s: none >= 1 %
+granular I r1: 37.29
+granular Ndev r1: 35.29
+granular Nauto r1: 34.76
+multi_material I r1: 42.21
+multi_material Ndev r1: 40.55
+multi_material Nauto r1: 40.42
+twoway I r1: 65.87
+twoway Ndev r1: 57.66
+twoway Nauto r1: 57.5
+twoway_capture I r1: 42.6
+twoway_capture Ndev r1: 42.66
+twoway_capture Nauto r1: 42.09
+anymal I r1: 46.11
+anymal Ndev r1: 37.37
+anymal Nauto r1: 37.25
+anymal_capture I r1: 34.34
+anymal_capture Ndev r1: 29.33
+anymal_capture Nauto r1: 29.22
+plate_drag I r1: 36.13
+plate_drag Ndev r1: 33.97
+plate_drag Nauto r1: 34.07
+column_a8 I r1: 28.61
+column_a8 Ndev r1: 28.15
+column_a8 Nauto r1: 28.08
+column_a2 I r1: 22.01
+column_a2 Ndev r1: 20.43
+column_a2 Nauto r1: 21.19
+granular I r2: 37.28
+granular Ndev r2: 34.77
+granular Nauto r2: 34.85
+multi_material I r2: 41.98
+multi_material Ndev r2: 39.91
+multi_material Nauto r2: 39.41
+twoway I r2: 66.02
+twoway Ndev r2: 57.99
+twoway Nauto r2: 58.06
+twoway_capture I r2: 43.06
+twoway_capture Ndev r2: 42.66
+twoway_capture Nauto r2: 41.86
+anymal I r2: 45.85
+anymal Ndev r2: 37.12
+anymal Nauto r2: 37.81
+anymal_capture I r2: 34.19
+anymal_capture Ndev r2: 29.26
+anymal_capture Nauto r2: 29.1
+plate_drag I r2: 36.03
+plate_drag Ndev r2: 34.06
+plate_drag Nauto r2: 34.22
+column_a8 I r2: 28.66
+column_a8 Ndev r2: 27.92
+column_a8 Nauto r2: 27.95
+column_a2 I r2: 22.04
+column_a2 Ndev r2: 20.81
+column_a2 Nauto r2: 21.14
+[I_flat] SUMMARY physics 84,416 | step 36,417 | rollout 39,291 | loop 36,837  (ms: physics 48.5, step 112.5, rollout/step 104.2, update 167)
+[N_flat] SUMMARY physics 85,447 | step 41,021 | rollout 39,807 | loop 37,395  (ms: physics 47.9, step 99.9, rollout/step 102.9, update 159)
+[I_rough] SUMMARY physics 55,882 | step 33,132 | rollout 34,508 | loop 30,922  (ms: physics 73.3, step 123.6, rollout/step 118.7, update 330)
+[N_rough] SUMMARY physics 56,823 | step 36,902 | rollout 35,066 | loop 31,535  (ms: physics 72.1, step 111.0, rollout/step 116.8, update 314)
+TIMING_DONE
+[gpu_run] a2_timing end: device utilisation 100% (18:08:25), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 100 %; per-process GPU time over 1.8 s: none >= 1 %

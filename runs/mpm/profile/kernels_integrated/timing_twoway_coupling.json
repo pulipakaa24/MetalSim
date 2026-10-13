@@ -1,0 +1,31 @@
+{
+ "scene": "example:mpm_twoway_coupling",
+ "mode": "timing",
+ "set": {},
+ "frames": 6,
+ "particles": 0,
+ "wall_ms": [
+  66.74779200693592,
+  67.5775830168277,
+  68.08699999237433,
+  68.4588750009425,
+  68.07624996872619,
+  67.74237501667812
+ ],
+ "wall_median_ms": 67.90931249270216,
+ "iterations": [
+  50,
+  50,
+  50,
+  50,
+  50,
+  50
+ ],
+ "iterations_per_frame": 50.0,
+ "per_frame_counters": {
+  "host_waits": 11.0,
+  "command_buffers": 19.0,
+  "host_ops": 0.0,
+  "dispatches_encoded": 1862.0
+ }
+}

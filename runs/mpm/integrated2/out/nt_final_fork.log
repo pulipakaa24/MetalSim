@@ -1,0 +1,280 @@
+test_atomic_max_behavior_cpu (newton.tests.test_hashtable.TestHashTable.test_atomic_max_behavior_cpu) ... ok
+test_atomic_max_behavior_metal_0 (newton.tests.test_hashtable.TestHashTable.test_atomic_max_behavior_metal_0) ... ok
+test_basic_creation_cpu (newton.tests.test_hashtable.TestHashTable.test_basic_creation_cpu) ... ok
+test_basic_creation_metal_0 (newton.tests.test_hashtable.TestHashTable.test_basic_creation_metal_0) ... ok
+test_clear_active_cpu (newton.tests.test_hashtable.TestHashTable.test_clear_active_cpu) ... ok
+test_clear_active_metal_0 (newton.tests.test_hashtable.TestHashTable.test_clear_active_metal_0) ... ok
+test_clear_cpu (newton.tests.test_hashtable.TestHashTable.test_clear_cpu) ... ok
+test_clear_metal_0 (newton.tests.test_hashtable.TestHashTable.test_clear_metal_0) ... ok
+test_concurrent_distinct_keys_cpu (newton.tests.test_hashtable.TestHashTable.test_concurrent_distinct_keys_cpu) ... ok
+test_concurrent_distinct_keys_metal_0 (newton.tests.test_hashtable.TestHashTable.test_concurrent_distinct_keys_metal_0) ... ok
+test_early_exit_optimization_cpu (newton.tests.test_hashtable.TestHashTable.test_early_exit_optimization_cpu) ... ok
+test_early_exit_optimization_metal_0 (newton.tests.test_hashtable.TestHashTable.test_early_exit_optimization_metal_0) ... ok
+test_global_reducer_hashtable_scales_with_contact_capacity_cpu (newton.tests.test_hashtable.TestHashTable.test_global_reducer_hashtable_scales_with_contact_capacity_cpu) ... ok
+test_global_reducer_hashtable_scales_with_contact_capacity_metal_0 (newton.tests.test_hashtable.TestHashTable.test_global_reducer_hashtable_scales_with_contact_capacity_metal_0) ... ok
+test_high_collision_cpu (newton.tests.test_hashtable.TestHashTable.test_high_collision_cpu) ... ok
+test_high_collision_metal_0 (newton.tests.test_hashtable.TestHashTable.test_high_collision_metal_0) ... ok
+test_insert_single_slot_cpu (newton.tests.test_hashtable.TestHashTable.test_insert_single_slot_cpu) ... ok
+test_insert_single_slot_metal_0 (newton.tests.test_hashtable.TestHashTable.test_insert_single_slot_metal_0) ... ok
+test_multiple_keys_cpu (newton.tests.test_hashtable.TestHashTable.test_multiple_keys_cpu) ... ok
+test_multiple_keys_metal_0 (newton.tests.test_hashtable.TestHashTable.test_multiple_keys_metal_0) ... ok
+test_power_of_two_rounding_cpu (newton.tests.test_hashtable.TestHashTable.test_power_of_two_rounding_cpu) ... ok
+test_power_of_two_rounding_metal_0 (newton.tests.test_hashtable.TestHashTable.test_power_of_two_rounding_metal_0) ... ok
+test_box_on_plane_multiple_contacts_cpu (newton.tests.test_contact_matching.TestContactMatching.test_box_on_plane_multiple_contacts_cpu) ... /Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/runs/a2/kc/nt_final_fork/1.18.0.dev20260917/wp_newton._src.geometry.contact_match_81e527c_p5103_t8496095680/wp_newton._src.geometry.contact_match_81e527c.cpp:777:29: warning: implicit conversion from 'long' to 'const wp::int32' (aka 'const int') changes value from 2147483648 to -2147483648 [-Wconstant-conversion]
+  777 |     const wp::int32 var_1 = 2147483648;
+      |                     ~~~~~   ^~~~~~~~~~
+1 warning generated.
+ok
+test_box_on_plane_multiple_contacts_metal_0 (newton.tests.test_contact_matching.TestContactMatching.test_box_on_plane_multiple_contacts_metal_0) ... ok
+test_broken_normal_threshold_cpu (newton.tests.test_contact_matching.TestContactMatching.test_broken_normal_threshold_cpu) ... ok
+test_broken_normal_threshold_metal_0 (newton.tests.test_contact_matching.TestContactMatching.test_broken_normal_threshold_metal_0) ... ok
+test_broken_pos_threshold_all_contacts_cpu (newton.tests.test_contact_matching.TestContactMatching.test_broken_pos_threshold_all_contacts_cpu) ... ok
+test_broken_pos_threshold_all_contacts_metal_0 (newton.tests.test_contact_matching.TestContactMatching.test_broken_pos_threshold_all_contacts_metal_0) ... ok
+test_contact_report_broken_indices_cpu (newton.tests.test_contact_matching.TestContactMatching.test_contact_report_broken_indices_cpu) ... ok
+test_contact_report_broken_indices_metal_0 (newton.tests.test_contact_matching.TestContactMatching.test_contact_report_broken_indices_metal_0) ... ok
+test_contact_report_indices_correct_cpu (newton.tests.test_contact_matching.TestContactMatching.test_contact_report_indices_correct_cpu) ... ok
+test_contact_report_indices_correct_metal_0 (newton.tests.test_contact_matching.TestContactMatching.test_contact_report_indices_correct_metal_0) ... ok
+test_contact_report_requires_matching_cpu (newton.tests.test_contact_matching.TestContactMatching.test_contact_report_requires_matching_cpu) ... ok
+test_contact_report_requires_matching_metal_0 (newton.tests.test_contact_matching.TestContactMatching.test_contact_report_requires_matching_metal_0) ... ok
+test_contacts_exposes_matching_mode_cpu (newton.tests.test_contact_matching.TestContactMatching.test_contacts_exposes_matching_mode_cpu) ... ok
+test_contacts_exposes_matching_mode_metal_0 (newton.tests.test_contact_matching.TestContactMatching.test_contacts_exposes_matching_mode_metal_0) ... ok
+test_deterministic_implied_cpu (newton.tests.test_contact_matching.TestContactMatching.test_deterministic_implied_cpu) ... ok
+test_deterministic_implied_metal_0 (newton.tests.test_contact_matching.TestContactMatching.test_deterministic_implied_metal_0) ... ok
+test_dynamic_body_world_transform_cpu (newton.tests.test_contact_matching.TestContactMatching.test_dynamic_body_world_transform_cpu) ... ok
+test_dynamic_body_world_transform_metal_0 (newton.tests.test_contact_matching.TestContactMatching.test_dynamic_body_world_transform_metal_0) ... ok
+test_first_frame_all_not_found_cpu (newton.tests.test_contact_matching.TestContactMatching.test_first_frame_all_not_found_cpu) ... ok
+test_first_frame_all_not_found_metal_0 (newton.tests.test_contact_matching.TestContactMatching.test_first_frame_all_not_found_metal_0) ... ok
+test_invalid_mode_raises_cpu (newton.tests.test_contact_matching.TestContactMatching.test_invalid_mode_raises_cpu) ... ok
+test_invalid_mode_raises_metal_0 (newton.tests.test_contact_matching.TestContactMatching.test_invalid_mode_raises_metal_0) ... ok
+test_masked_reset_restarts_only_selected_contact_history_cpu (newton.tests.test_contact_matching.TestContactMatching.test_masked_reset_restarts_only_selected_contact_history_cpu) ... ok
+test_masked_reset_restarts_only_selected_contact_history_metal_0 (newton.tests.test_contact_matching.TestContactMatching.test_masked_reset_restarts_only_selected_contact_history_metal_0) ... ok
+test_match_index_valid_after_sort_cpu (newton.tests.test_contact_matching.TestContactMatching.test_match_index_valid_after_sort_cpu) ... ok
+test_match_index_valid_after_sort_metal_0 (newton.tests.test_contact_matching.TestContactMatching.test_match_index_valid_after_sort_metal_0) ... ok
+test_matching_disabled_no_allocation_cpu (newton.tests.test_contact_matching.TestContactMatching.test_matching_disabled_no_allocation_cpu) ... ok
+test_matching_disabled_no_allocation_metal_0 (newton.tests.test_contact_matching.TestContactMatching.test_matching_disabled_no_allocation_metal_0) ... ok
+test_new_contact_detection_cpu (newton.tests.test_contact_matching.TestContactMatching.test_new_contact_detection_cpu) ... ok
+test_new_contact_detection_metal_0 (newton.tests.test_contact_matching.TestContactMatching.test_new_contact_detection_metal_0) ... ok
+test_reset_accumulates_live_mask_during_cuda_graph_replay (newton.tests.test_contact_matching.TestContactMatching.test_reset_accumulates_live_mask_during_cuda_graph_replay) ... skipped 'No selected devices are available for this test.'
+test_reset_rejects_invalid_world_masks_cpu (newton.tests.test_contact_matching.TestContactMatching.test_reset_rejects_invalid_world_masks_cpu) ... ok
+test_save_initializes_next_frame_claims_cpu (newton.tests.test_contact_matching.TestContactMatching.test_save_initializes_next_frame_claims_cpu) ... ok
+test_save_initializes_next_frame_claims_metal_0 (newton.tests.test_contact_matching.TestContactMatching.test_save_initializes_next_frame_claims_metal_0) ... ok
+test_save_resets_next_frame_report_flags_cpu (newton.tests.test_contact_matching.TestContactMatching.test_save_resets_next_frame_report_flags_cpu) ... ok
+test_save_resets_next_frame_report_flags_metal_0 (newton.tests.test_contact_matching.TestContactMatching.test_save_resets_next_frame_report_flags_metal_0) ... ok
+test_stable_scene_identity_across_three_frames_cpu (newton.tests.test_contact_matching.TestContactMatching.test_stable_scene_identity_across_three_frames_cpu) ... ok
+test_stable_scene_identity_across_three_frames_metal_0 (newton.tests.test_contact_matching.TestContactMatching.test_stable_scene_identity_across_three_frames_metal_0) ... ok
+test_stable_scene_identity_match_cpu (newton.tests.test_contact_matching.TestContactMatching.test_stable_scene_identity_match_cpu) ... ok
+test_stable_scene_identity_match_metal_0 (newton.tests.test_contact_matching.TestContactMatching.test_stable_scene_identity_match_metal_0) ... ok
+test_within_pos_threshold_still_matches_cpu (newton.tests.test_contact_matching.TestContactMatching.test_within_pos_threshold_still_matches_cpu) ... ok
+test_within_pos_threshold_still_matches_metal_0 (newton.tests.test_contact_matching.TestContactMatching.test_within_pos_threshold_still_matches_metal_0) ... ok
+test_sticky_disabled_no_sticky_buffers_cpu (newton.tests.test_contact_matching.TestContactMatchingSticky.test_sticky_disabled_no_sticky_buffers_cpu) ... ok
+test_sticky_disabled_no_sticky_buffers_metal_0 (newton.tests.test_contact_matching.TestContactMatchingSticky.test_sticky_disabled_no_sticky_buffers_metal_0) ... ok
+test_sticky_matched_rows_replayed_cpu (newton.tests.test_contact_matching.TestContactMatchingSticky.test_sticky_matched_rows_replayed_cpu) ... ok
+test_sticky_matched_rows_replayed_metal_0 (newton.tests.test_contact_matching.TestContactMatchingSticky.test_sticky_matched_rows_replayed_metal_0) ... ok
+test_sticky_unmatched_rows_pass_through_cpu (newton.tests.test_contact_matching.TestContactMatchingSticky.test_sticky_unmatched_rows_pass_through_cpu) ... ok
+test_sticky_unmatched_rows_pass_through_metal_0 (newton.tests.test_contact_matching.TestContactMatchingSticky.test_sticky_unmatched_rows_pass_through_metal_0) ... ok
+test_deterministic_identical_across_runs_cpu (newton.tests.test_contact_reduction_global.TestDeterministicEndToEnd.test_deterministic_identical_across_runs_cpu) ... ok
+test_deterministic_identical_across_runs_metal_0 (newton.tests.test_contact_reduction_global.TestDeterministicEndToEnd.test_deterministic_identical_across_runs_metal_0) ... ok
+test_det_pack_unpack_roundtrip_cpu (newton.tests.test_contact_reduction_global.TestDeterministicPacking.test_det_pack_unpack_roundtrip_cpu) ... ok
+test_det_pack_unpack_roundtrip_metal_0 (newton.tests.test_contact_reduction_global.TestDeterministicPacking.test_det_pack_unpack_roundtrip_metal_0) ... ok
+test_det_packing_fingerprint_breaks_tie_cpu (newton.tests.test_contact_reduction_global.TestDeterministicPacking.test_det_packing_fingerprint_breaks_tie_cpu) ... ok
+test_det_packing_fingerprint_breaks_tie_metal_0 (newton.tests.test_contact_reduction_global.TestDeterministicPacking.test_det_packing_fingerprint_breaks_tie_metal_0) ... ok
+test_det_packing_score_dominates_cpu (newton.tests.test_contact_reduction_global.TestDeterministicPacking.test_det_packing_score_dominates_cpu) ... ok
+test_det_packing_score_dominates_metal_0 (newton.tests.test_contact_reduction_global.TestDeterministicPacking.test_det_packing_score_dominates_metal_0) ... ok
+test_det_preprune_probe_is_ceiling_cpu (newton.tests.test_contact_reduction_global.TestDeterministicPacking.test_det_preprune_probe_is_ceiling_cpu) ... ok
+test_det_preprune_probe_is_ceiling_metal_0 (newton.tests.test_contact_reduction_global.TestDeterministicPacking.test_det_preprune_probe_is_ceiling_metal_0) ... ok
+test_float_flip_exact_inverse_cpu (newton.tests.test_contact_reduction_global.TestFloatFlipPrecision.test_float_flip_exact_inverse_cpu) ... ok
+test_float_flip_exact_inverse_metal_0 (newton.tests.test_contact_reduction_global.TestFloatFlipPrecision.test_float_flip_exact_inverse_metal_0) ... ok
+test_float_flip_roundtrip_precision_cpu (newton.tests.test_contact_reduction_global.TestFloatFlipPrecision.test_float_flip_roundtrip_precision_cpu) ... ok
+test_float_flip_roundtrip_precision_metal_0 (newton.tests.test_contact_reduction_global.TestFloatFlipPrecision.test_float_flip_roundtrip_precision_metal_0) ... ok
+test_basic_contact_storage_cpu (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_basic_contact_storage_cpu) ... ok
+test_basic_contact_storage_metal_0 (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_basic_contact_storage_metal_0) ... ok
+test_centered_basic_storage_and_reduction_cpu (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_centered_basic_storage_and_reduction_cpu) ... ok
+test_centered_basic_storage_and_reduction_metal_0 (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_centered_basic_storage_and_reduction_metal_0) ... ok
+test_centered_deepest_wins_max_depth_slot_cpu (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_centered_deepest_wins_max_depth_slot_cpu) ... ok
+test_centered_deepest_wins_max_depth_slot_metal_0 (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_centered_deepest_wins_max_depth_slot_metal_0) ... ok
+test_centered_different_pairs_independent_cpu (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_centered_different_pairs_independent_cpu) ... ok
+test_centered_different_pairs_independent_metal_0 (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_centered_different_pairs_independent_metal_0) ... ok
+test_centered_pre_pruning_reduces_buffer_usage_cpu (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_centered_pre_pruning_reduces_buffer_usage_cpu) ... ok
+test_centered_pre_pruning_reduces_buffer_usage_metal_0 (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_centered_pre_pruning_reduces_buffer_usage_metal_0) ... ok
+test_centered_two_spatial_depths_full_buffer_does_not_publish_voxel_key_cpu (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_centered_two_spatial_depths_full_buffer_does_not_publish_voxel_key_cpu) ... ok
+test_centered_two_spatial_depths_full_buffer_does_not_publish_voxel_key_metal_0 (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_centered_two_spatial_depths_full_buffer_does_not_publish_voxel_key_metal_0) ... ERROR
+test_centered_two_spatial_depths_prefers_inner_then_outer_cpu (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_centered_two_spatial_depths_prefers_inner_then_outer_cpu) ... ok
+test_centered_two_spatial_depths_prefers_inner_then_outer_metal_0 (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_centered_two_spatial_depths_prefers_inner_then_outer_metal_0) ... ERROR
+test_centered_two_spatial_depths_voxel_only_claim_cpu (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_centered_two_spatial_depths_voxel_only_claim_cpu) ... ok
+test_centered_two_spatial_depths_voxel_only_claim_metal_0 (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_centered_two_spatial_depths_voxel_only_claim_metal_0) ... ERROR
+test_clear_active_coalesced_cpu (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_clear_active_coalesced_cpu) ... ok
+test_clear_active_coalesced_metal_0 (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_clear_active_coalesced_metal_0) ... ok
+test_clear_active_cpu (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_clear_active_cpu) ... ok
+test_clear_active_metal_0 (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_clear_active_metal_0) ... ok
+test_clear_cpu (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_clear_cpu) ... ok
+test_clear_metal_0 (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_clear_metal_0) ... ok
+test_different_shape_pairs_cpu (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_different_shape_pairs_cpu) ... ok
+test_different_shape_pairs_metal_0 (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_different_shape_pairs_metal_0) ... ok
+test_export_reduced_contacts_kernel_cpu (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_export_reduced_contacts_kernel_cpu) ... ok
+test_export_reduced_contacts_kernel_metal_0 (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_export_reduced_contacts_kernel_metal_0) ... ok
+test_multiple_contacts_same_pair_cpu (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_multiple_contacts_same_pair_cpu) ... ok
+test_multiple_contacts_same_pair_metal_0 (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_multiple_contacts_same_pair_metal_0) ... ok
+test_stress_many_contacts_cpu (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_stress_many_contacts_cpu) ... ok
+test_stress_many_contacts_metal_0 (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_stress_many_contacts_metal_0) ... ok
+test_key_uniqueness_cpu (newton.tests.test_contact_reduction_global.TestKeyConstruction.test_key_uniqueness_cpu) ... ok
+test_key_uniqueness_metal_0 (newton.tests.test_contact_reduction_global.TestKeyConstruction.test_key_uniqueness_metal_0) ... ok
+test_oct_encode_decode_roundtrip_cpu (newton.tests.test_contact_reduction_global.TestKeyConstruction.test_oct_encode_decode_roundtrip_cpu) ... ok
+test_oct_encode_decode_roundtrip_metal_0 (newton.tests.test_contact_reduction_global.TestKeyConstruction.test_oct_encode_decode_roundtrip_metal_0) ... Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/runs/a2/kc/nt_final_fork/1.18.0.dev20260917
+Module newton.tests.test_hashtable bef0045 load on device 'cpu' took 881.55 ms  (compiled)
+Module newton.tests.test_hashtable c0cd7fd load on device 'metal:0' took 477.69 ms  (compiled)
+Module newton.tests.test_hashtable 8df0494 load on device 'cpu' took 121.32 ms  (compiled)
+Module newton._src.geometry.hashtable d0d972d load on device 'cpu' took 47.30 ms  (compiled)
+Module newton.tests.test_hashtable 6bc84f8 load on device 'metal:0' took 515.61 ms  (compiled)
+Module newton._src.geometry.hashtable ca78239 load on device 'metal:0' took 380.03 ms  (compiled)
+Module newton.tests.test_hashtable 032dc77 load on device 'cpu' took 134.21 ms  (compiled)
+Module newton.tests.test_hashtable be13dd3 load on device 'metal:0' took 563.22 ms  (compiled)
+Module newton.tests.test_hashtable d6702e9 load on device 'cpu' took 147.33 ms  (compiled)
+Module newton.tests.test_hashtable e0c45b3 load on device 'metal:0' took 590.34 ms  (compiled)
+Module newton.tests.test_hashtable b74f909 load on device 'cpu' took 149.48 ms  (compiled)
+Module newton.tests.test_hashtable d768c8a load on device 'metal:0' took 633.14 ms  (compiled)
+Module newton.tests.test_hashtable aaf46f4 load on device 'cpu' took 174.33 ms  (compiled)
+Module newton.tests.test_hashtable 033916e load on device 'metal:0' took 745.25 ms  (compiled)
+Module newton.tests.test_hashtable d07c873 load on device 'cpu' took 183.47 ms  (compiled)
+Module newton.tests.test_hashtable a6b8c34 load on device 'metal:0' took 773.64 ms  (compiled)
+Module validate_and_correct_inertia_kernel_3b6f0a33 f07bbc0 load on device 'cpu' took 101.90 ms  (compiled)
+Module newton._src.geometry.bvh e87b05e load on device 'cpu' took 231.50 ms  (compiled)
+Module newton._src.sim.contacts 308a8eb load on device 'cpu' took 43.71 ms  (compiled)
+Module newton._src.sim.collide 1733122 load on device 'cpu' took 246.61 ms  (compiled)
+Module newton._src.geometry.broad_phase_nxn 12264f2 load on device 'cpu' took 113.48 ms  (compiled)
+Module narrow_phase_primitive_write_contact_False_False_False 824afa4 load on device 'cpu' took 428.79 ms  (compiled)
+Module narrow_phase_gjk_mpr_True_False_write_contact_support_map_lean_post_process_minkowski_only 5e3c326 load on device 'cpu' took 864.78 ms  (compiled)
+Module newton._src.geometry.narrow_phase 0b30580 load on device 'cpu' took 317.03 ms  (compiled)
+Module newton._src.geometry.contact_match 81e527c load on device 'cpu' took 188.75 ms  (compiled)
+Module newton._src.geometry.contact_sort bf55642 load on device 'cpu' took 143.22 ms  (compiled)
+Module validate_and_correct_inertia_kernel_3b6f0a33 3b6f0a3 load on device 'metal:0' took 435.80 ms  (compiled)
+Module newton._src.geometry.bvh 6098613 load on device 'metal:0' took 621.74 ms  (compiled)
+Module newton._src.sim.contacts 8a698f5 load on device 'metal:0' took 385.32 ms  (compiled)
+Module newton._src.sim.collide ae0a812 load on device 'metal:0' took 690.84 ms  (compiled)
+Module newton._src.geometry.broad_phase_nxn 267a427 load on device 'metal:0' took 467.05 ms  (compiled)
+Module narrow_phase_primitive_write_contact_False_False_False 97fa840 load on device 'metal:0' took 1966.85 ms  (compiled)
+Module narrow_phase_gjk_mpr_True_False_write_contact_support_map_lean_post_process_minkowski_only 1bccb5c load on device 'metal:0' took 1731.94 ms  (compiled)
+Module newton._src.geometry.narrow_phase 6b497cb load on device 'metal:0' took 745.11 ms  (compiled)
+Module newton._src.geometry.contact_match 8f85377 load on device 'metal:0' took 584.50 ms  (compiled)
+Module newton._src.geometry.contact_sort 635088a load on device 'metal:0' took 540.18 ms  (compiled)
+Module newton.tests.test_contact_reduction_global d0f9814 load on device 'metal:0' took 642.11 ms  (compiled)
+Module newton.tests.test_contact_reduction_global 0c62248 load on device 'cpu' took 299.87 ms  (compiled)
+Module newton.tests.test_contact_reduction_global a7008b6 load on device 'cpu' took 758.72 ms  (compiled)
+Module newton.tests.test_contact_reduction_global cd6850b load on device 'metal:0' took 1356.09 ms  (compiled)
+Module newton.tests.test_contact_reduction_global 49ba201 load on device 'cpu' took 853.77 ms  (compiled)
+Module newton.tests.test_contact_reduction_global 499db60 load on device 'metal:0' took 1867.36 ms  (compiled)
+Module newton.tests.test_contact_reduction_global e393f2f load on device 'cpu' took 849.05 ms  (compiled)
+Module newton.tests.test_contact_reduction_global 1538aef load on device 'metal:0' took 1949.49 ms  (compiled)
+Module newton.tests.test_contact_reduction_global fc3f9b2 load on device 'cpu' took 857.98 ms  (compiled)
+Module newton.tests.test_contact_reduction_global bab49a0 load on device 'metal:0' took 2039.36 ms  (compiled)
+Module newton.tests.test_contact_reduction_global e912762 load on device 'cpu' took 887.23 ms  (compiled)
+Module newton.tests.test_contact_reduction_global 7dcbc29 load on device 'cpu' took 899.40 ms  (compiled)
+Module newton.tests.test_contact_reduction_global b4ef397 load on device 'metal:0' took 2229.94 ms  (compiled)
+Module newton.tests.test_contact_reduction_global 972d941 load on device 'cpu' took 1417.27 ms  (compiled)
+Module newton.tests.test_contact_reduction_global 9cf6666 load on device 'metal:0' took 3865.02 ms  (compiled)
+Module newton.tests.test_contact_reduction_global 60dee76 load on device 'cpu' took 1473.22 ms  (compiled)
+Module newton.tests.test_contact_reduction_global 5489e36 load on device 'metal:0' took 3997.79 ms  (compiled)
+Module newton.tests.test_contact_reduction_global 170f7a7 load on device 'cpu' took 1496.31 ms  (compiled)
+Module newton.tests.test_contact_reduction_global 2fd369f load on device 'metal:0' took 4131.17 ms  (compiled)
+Module newton._src.geometry.contact_reduction_global 2d02c16 load on device 'cpu' took 383.31 ms  (compiled)
+Module newton._src.geometry.contact_reduction_global a7b98a7 load on device 'metal:0' took 1067.31 ms  (compiled)
+Module newton.tests.test_contact_reduction_global 31fbfac load on device 'cpu' took 1431.42 ms  (compiled)
+Module newton.tests.test_contact_reduction_global cd78c06 load on device 'metal:0' took 4168.72 ms  (compiled)
+Module newton.tests.test_contact_reduction_global ad3d0a0 load on device 'cpu' took 1448.02 ms  (compiled)
+Module newton.tests.test_contact_reduction_global 9b78b15 load on device 'metal:0' took 4282.60 ms  (compiled)
+Module newton.tests.test_contact_reduction_global 6f22935 load on device 'cpu' took 1460.13 ms  (compiled)
+Module newton.tests.test_contact_reduction_global 7e54a9a load on device 'metal:0' took 4397.22 ms  (compiled)
+Module newton.tests.test_contact_reduction_global 9ec57b4 load on device 'cpu' took 1491.41 ms  (compiled)
+Module newton.tests.test_contact_reduction_global 58db935 load on device 'cpu' took 1704.69 ms  (compiled)
+Module export_reduced_contacts_test_writer 43715ca load on device 'cpu' took 153.22 ms  (compiled)
+Module newton.tests.test_contact_reduction_global d984ff2 load on device 'metal:0' took 6499.88 ms  (compiled)
+Module export_reduced_contacts_test_writer cd18103 load on device 'metal:0' took 492.47 ms  (compiled)
+Module newton.tests.test_contact_reduction_global 6516869 load on device 'cpu' took 1720.44 ms  (compiled)
+Module newton.tests.test_contact_reduction_global 00751f1 load on device 'metal:0' took 6541.01 ms  (compiled)
+Module newton.tests.test_contact_reduction_global 30ddbfe load on device 'cpu' took 1726.79 ms  (compiled)
+Module newton.tests.test_contact_reduction_global b7ef252 load on device 'metal:0' took 6702.89 ms  (compiled)
+Module newton.tests.test_contact_reduction_global 820363f load on device 'cpu' took 1743.62 ms  (compiled)
+Module newton.tests.test_contact_reduction_global 6d95fae load on device 'metal:0' took 6607.84 ms  (compiled)
+Module newton.tests.test_contact_reduction_global 1f0ad5b load on device 'cpu' took 1753.60 ms  (compiled)
+Module newton.tests.test_contact_reduction_global baee262 load on device 'metal:0' took 6683.05 ms  (compiled)ok
+test_compact_sort_key_bit_layout_cpu (newton.tests.test_contact_reduction_global.TestMakeContactSortKey.test_compact_sort_key_bit_layout_cpu) ... ok
+test_compact_sort_key_bit_layout_metal_0 (newton.tests.test_contact_reduction_global.TestMakeContactSortKey.test_compact_sort_key_bit_layout_metal_0) ... ok
+test_sort_key_bit_layout_cpu (newton.tests.test_contact_reduction_global.TestMakeContactSortKey.test_sort_key_bit_layout_cpu) ... ok
+test_sort_key_bit_layout_metal_0 (newton.tests.test_contact_reduction_global.TestMakeContactSortKey.test_sort_key_bit_layout_metal_0) ... ok
+test_sort_key_overflow_masking_cpu (newton.tests.test_contact_reduction_global.TestMakeContactSortKey.test_sort_key_overflow_masking_cpu) ... ok
+test_sort_key_overflow_masking_metal_0 (newton.tests.test_contact_reduction_global.TestMakeContactSortKey.test_sort_key_overflow_masking_metal_0) ... ok
+test_sort_key_shape_index_bits_cpu (newton.tests.test_contact_reduction_global.TestMakeContactSortKey.test_sort_key_shape_index_bits_cpu) ... ok
+test_sort_key_shape_index_bits_metal_0 (newton.tests.test_contact_reduction_global.TestMakeContactSortKey.test_sort_key_shape_index_bits_metal_0) ... ok
+test_compute_num_reduction_slots_cpu (newton.tests.test_contact_reduction.TestContactReduction.test_compute_num_reduction_slots_cpu) ... ok
+test_compute_num_reduction_slots_metal_0 (newton.tests.test_contact_reduction.TestContactReduction.test_compute_num_reduction_slots_metal_0) ... ok
+test_constants_cpu (newton.tests.test_contact_reduction.TestContactReduction.test_constants_cpu) ... ok
+test_constants_metal_0 (newton.tests.test_contact_reduction.TestContactReduction.test_constants_metal_0) ... ok
+test_face_normal_lookup_matches_matrix_cpu (newton.tests.test_contact_reduction.TestContactReduction.test_face_normal_lookup_matches_matrix_cpu) ... ok
+test_face_normal_lookup_matches_matrix_metal_0 (newton.tests.test_contact_reduction.TestContactReduction.test_face_normal_lookup_matches_matrix_metal_0) ... ok
+test_face_normals_are_unit_vectors_cpu (newton.tests.test_contact_reduction.TestContactReduction.test_face_normals_are_unit_vectors_cpu) ... ok
+test_face_normals_are_unit_vectors_metal_0 (newton.tests.test_contact_reduction.TestContactReduction.test_face_normals_are_unit_vectors_metal_0) ... ok
+test_face_normals_cover_sphere_cpu (newton.tests.test_contact_reduction.TestContactReduction.test_face_normals_cover_sphere_cpu) ... ok
+test_face_normals_cover_sphere_metal_0 (newton.tests.test_contact_reduction.TestContactReduction.test_face_normals_cover_sphere_metal_0) ... ok
+test_get_slot_axis_aligned_normals_cpu (newton.tests.test_contact_reduction.TestContactReduction.test_get_slot_axis_aligned_normals_cpu) ... ok
+test_get_slot_axis_aligned_normals_metal_0 (newton.tests.test_contact_reduction.TestContactReduction.test_get_slot_axis_aligned_normals_metal_0) ... ok
+test_get_slot_matches_best_face_normal_cpu (newton.tests.test_contact_reduction.TestContactReduction.test_get_slot_matches_best_face_normal_cpu) ... ok
+test_get_slot_matches_best_face_normal_metal_0 (newton.tests.test_contact_reduction.TestContactReduction.test_get_slot_matches_best_face_normal_metal_0) ... ok
+
+======================================================================
+ERROR: test_centered_two_spatial_depths_full_buffer_does_not_publish_voxel_key_metal_0 (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_centered_two_spatial_depths_full_buffer_does_not_publish_voxel_key_metal_0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/newton-rigid-fork/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/newton-rigid-fork/newton/tests/test_contact_reduction_global.py", line 1075, in test_centered_two_spatial_depths_full_buffer_does_not_publish_voxel_key
+    wp.launch(exhaust_then_reduce_kernel, dim=1, inputs=[reducer.get_data_struct()], outputs=[result], device=device)
+  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/warp-i2/warp/_src/context.py", line 12638, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint, dim_limit=dim_limit)
+  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/warp-i2/warp/_src/context.py", line 11546, in invoke_metal
+    raise RuntimeError(
+RuntimeError: Kernel 'test_centered_two_spatial_depths_full_buffer_does_not_publish_voxel_key__locals__exhaust_then_reduce_kernel' uses builtins that are not supported on Metal yet: atomic_cas(uint64). Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; use 32-bit atomics (e.g. on one half of the value) instead
+
+======================================================================
+ERROR: test_centered_two_spatial_depths_prefers_inner_then_outer_metal_0 (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_centered_two_spatial_depths_prefers_inner_then_outer_metal_0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/newton-rigid-fork/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/newton-rigid-fork/newton/tests/test_contact_reduction_global.py", line 941, in test_centered_two_spatial_depths_prefers_inner_then_outer
+    wp.launch(
+  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/warp-i2/warp/_src/context.py", line 12638, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint, dim_limit=dim_limit)
+  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/warp-i2/warp/_src/context.py", line 11546, in invoke_metal
+    raise RuntimeError(
+RuntimeError: Kernel 'test_centered_two_spatial_depths_prefers_inner_then_outer__locals__store_two_depth_contact_kernel' uses builtins that are not supported on Metal yet: atomic_cas(uint64). Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; use 32-bit atomics (e.g. on one half of the value) instead
+
+======================================================================
+ERROR: test_centered_two_spatial_depths_voxel_only_claim_metal_0 (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_centered_two_spatial_depths_voxel_only_claim_metal_0)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/newton-rigid-fork/newton/tests/unittest_utils.py", line 599, in test_func
+    func(self, device, **kwargs)
+  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/newton-rigid-fork/newton/tests/test_contact_reduction_global.py", line 1022, in test_centered_two_spatial_depths_voxel_only_claim
+    test.assertEqual(run(wp.vec3(-0.99, 0.0, 0.0), 1), 1)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/newton-rigid-fork/newton/tests/test_contact_reduction_global.py", line 1012, in run
+    wp.launch(
+  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/warp-i2/warp/_src/context.py", line 12638, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint, dim_limit=dim_limit)
+  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/warp-i2/warp/_src/context.py", line 11546, in invoke_metal
+    raise RuntimeError(
+RuntimeError: Kernel 'test_centered_two_spatial_depths_voxel_only_claim__locals__reduce_kernel' uses builtins that are not supported on Metal yet: atomic_cas(uint64). Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; use 32-bit atomics (e.g. on one half of the value) instead
+
+----------------------------------------------------------------------
+Ran 140 tests in 116.668s
+
+FAILED (errors=3, skipped=1)
+
+Module newton.tests.test_contact_reduction fe36ed0 load on device 'cpu' took 195.78 ms  (compiled)
+Module newton.tests.test_contact_reduction 3be2987 load on device 'metal:0' took 691.66 ms  (compiled)
+RESULT run=140 failures=0 errors=3 skipped=1

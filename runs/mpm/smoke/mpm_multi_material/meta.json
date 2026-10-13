@@ -1,0 +1,66 @@
+{
+ "scene": "example:mpm_multi_material",
+ "scene_kwargs": {
+  "seconds": 0.05
+ },
+ "info": {
+  "scene": "example:mpm_multi_material",
+  "args": {
+   "device": null,
+   "viewer": "gl",
+   "rerun_address": null,
+   "output_path": "output.usd",
+   "num_frames": 100,
+   "render_fps": null,
+   "headless": false,
+   "test": false,
+   "quiet": false,
+   "paused": false,
+   "benchmark": false,
+   "warp_config": [],
+   "realtime": false,
+   "max_iterations": 250,
+   "tolerance": 1e-06,
+   "voxel_size": 0.05
+  },
+  "particle_count": 178669
+ },
+ "device": "metal:0",
+ "device_name": "Apple M4 Max",
+ "compat": {
+  "accumulate": "float32",
+  "loop": "cuda"
+ },
+ "stride": 1,
+ "frames": 3,
+ "frame_dt": 0.016666666666666666,
+ "init_md5": "016c0f04552bacc50b116e3a4e85100a",
+ "particle_count": 178669,
+ "wall_s": [
+  4.167679500009399,
+  0.06956841598730534,
+  0.06625654199160635
+ ],
+ "wall_total_s": 4.303504457988311,
+ "iterations_mean": 15.0,
+ "iterations_max": 20,
+ "res_l2_max": 1.1409172628873421e-07,
+ "versions": {
+  "newton": "1.5.2",
+  "warp": "1.18.0.dev20260917",
+  "numpy": "2.5.3",
+  "python": "3.12.14",
+  "platform": "macOS-26.7.1-arm64-arm-64bit"
+ },
+ "argv": [
+  "metalsim/parity/isaac_side/record_mpm.py",
+  "--scene",
+  "example:mpm_multi_material",
+  "--seconds",
+  "0.05",
+  "--device",
+  "metal:0",
+  "--out",
+  "runs/mpm/smoke/mpm_multi_material"
+ ]
+}

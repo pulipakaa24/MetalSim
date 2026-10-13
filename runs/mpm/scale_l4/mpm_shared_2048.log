@@ -1,0 +1,43 @@
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+/home/<user>/parity3_scripts/mpm/scale/scale_pour.py:236: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+  model = scene.finalize(device=DEV)
+Warp CUDA error 2: out of memory (in function wp_alloc_device_async, /builds/omniverse/warp/warp/native/warp.cu:817)
+Traceback (most recent call last):
+  File "/home/<user>/parity3_scripts/mpm/scale/scale_pour.py", line 911, in <module>
+    {"mpm": run_mpm, "rigid": run_rigid, "ordered": run_ordered, "bodyforce": run_bodyforce}[args.part]()
+  File "/home/<user>/parity3_scripts/mpm/scale/scale_pour.py", line 478, in run_mpm
+    step()
+  File "/home/<user>/parity3_scripts/mpm/scale/scale_pour.py", line 469, in step
+    solver.step(state, state, None, None, MPM_DT)
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py", line 1665, in step
+    scratch = self._rebuild_scratchpad(pic)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py", line 2292, in _rebuild_scratchpad
+    scratch.rebuild_function_spaces(
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py", line 341, in rebuild_function_spaces
+    self._create_collider_function_space(temporary_store, max_cell_count, environment_first)
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py", line 404, in _create_collider_function_space
+    collision_space_restriction = fem.make_space_restriction(
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/space/__init__.py", line 75, in make_space_restriction
+    return SpaceRestriction(
+           ^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/space/restriction.py", line 60, in __init__
+    self.rebuild(device=device, temporary_store=temporary_store)
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/space/restriction.py", line 120, in rebuild
+    ) = compress_node_indices(
+        ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/utils.py", line 95, in compress_node_indices
+    sorted_node_indices = cache.borrow_temporary(temporary_store, shape=2 * index_count, dtype=int)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/cache.py", line 675, in borrow_temporary
+    return temporary_store.borrow(shape=shape, dtype=dtype, device=device, pinned=pinned, requires_grad=requires_grad)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/cache.py", line 580, in borrow
+    pool.borrow(dtype=dtype, shape=shape, requires_grad=requires_grad)
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/cache.py", line 508, in borrow
+    ptr = allocator.allocate(capacity)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/context.py", line 4463, in allocate
+    raise RuntimeError(f"Failed to allocate {size_in_bytes} bytes on device '{self.device}'")
+RuntimeError: Failed to allocate 452984832 bytes on device 'cuda:0'

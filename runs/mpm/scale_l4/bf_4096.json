@@ -1,0 +1,26 @@
+{
+ "argv": [
+  "--device",
+  "cuda:0",
+  "--json",
+  "/home/<user>/parity3/scale_l4/bf_4096.json",
+  "--part",
+  "bodyforce",
+  "--worlds",
+  "4096"
+ ],
+ "device": "cuda:0",
+ "device_name": "NVIDIA L4",
+ "warp": "1.16.0",
+ "newton": "1.5.2",
+ "worlds": 4096,
+ "part": "bodyforce",
+ "nodes": 6553600,
+ "bodies": 8192,
+ "atomic_ms": 1.685617999896749,
+ "segmented_ms": 2.1103949999314864,
+ "atomic_vs_segmented_maxdiff": 0.078125,
+ "chunked_work_items": 53687091200,
+ "chunked_ms": null,
+ "maxrss_mb": 722.578125
+}

@@ -1,0 +1,162 @@
+Time (%),Total Time (ns),Instances,Avg (ns),Med (ns),Min (ns),Max (ns),StdDev (ns),Name
+34.6,40011088,224,178620.9,82783.5,5792,564799,225920.3,"void cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::DeviceRadixSortOnesweepKernel<cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::detail::radix::policy_hub<unsigned long, int, unsigned int>::Policy1000, (bool)0, unsigned long, int, unsigned int, int, int, cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::detail::identity_decomposer_t>(T7 *, T7 *, T5 *, const T5 *, T3 *, const T3 *, T4 *, const T4 *, T6, int, int, T8)"
+12.0,13909236,144,96591.9,22096.0,9920,643872,185177.8,"void cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::DeviceRadixSortOnesweepKernel<cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::detail::radix::policy_hub<int, SortPayload<(int)4>, unsigned int>::Policy1000, (bool)0, int, SortPayload<(int)4>, unsigned int, int, int, cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::detail::identity_decomposer_t>(T7 *, T7 *, T5 *, const T5 *, T3 *, const T3 *, T4 *, const T4 *, T6, int, int, T8)"
+11.1,12829487,1600,8018.4,8000.0,7520,9152,201.0,gs_solve_kernel_impl_ba42a0de_aeb47b9b_cuda_kernel_forward
+4.6,5360316,204,26276.1,25504.0,24992,61472,4945.9,make_bsr_mv_kernel__locals__bsr_mv_kernel_b10c6805_cuda_kernel_forward
+3.6,4149532,4,1037383.0,1035999.0,985151,1092383,47088.0,integrate_velocity_apic_62ae7908_5e846044_cuda_kernel_forward
+2.3,2641885,204,12950.4,11776.0,11520,74144,8410.7,apply_subgrid_impulse_fe96c186_cuda_kernel_forward
+2.2,2511578,32,78486.8,29776.0,1440,428063,135436.3,_prepare_node_sort_kernel_2830f90b_cuda_kernel_forward
+1.9,2176508,16,136031.8,86016.0,1536,370879,144290.1,"void <unnamed>::bsr_fill_triplet_key_values<unsigned int>(int, const int *, const int *, <unnamed>::BsrBlockIsNotZero<T1>, <unnamed>::BsrBlockInMask, int *, unsigned long *)"
+1.5,1759167,200,8795.8,8704.0,8544,14304,775.0,solve_subgrid_friction_42405d68_cuda_kernel_forward
+1.5,1717120,20,85856.0,55616.0,2208,179616,80188.4,_bsr_accumulate_triplet_values_3b93b6b5_cuda_kernel_forward
+1.2,1399904,4,349976.0,349792.0,346496,353824,3314.5,collision_weight_field_77b38c87_c54d24cd_cuda_kernel_forward
+1.2,1388032,4,347008.0,347056.0,346272,347648,652.2,strain_delta_form_897fd0ef_991cc9cc_cuda_kernel_forward
+1.2,1380640,28,49308.6,22480.0,4608,163712,60328.6,"void cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::DeviceRadixSortHistogramKernel<cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::detail::radix::policy_hub<unsigned long, int, unsigned int>::Policy1000, (bool)0, unsigned long, unsigned int, cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::detail::identity_decomposer_t>(T4 *, const T3 *, T4, int, int, T5)"
+1.2,1376156,4,344039.0,343999.0,341855,346303,1897.5,_identity_field_3e0bfb12_6a200de7_cuda_kernel_forward
+1.2,1334716,4,333679.0,334031.0,331487,335167,1557.7,dispatch_linear_kernel_fn_bf38522a_d9f68bb5_cuda_kernel_forward
+1.0,1134112,4,283528.0,283504.0,282432,284672,919.5,advect_particles_6cb37a07_90d48b1d_cuda_kernel_forward
+1.0,1113564,36,30932.3,8368.0,2688,169151,50870.1,"void cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::DeviceReduceByKeyKernel<cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::detail::rle::encode::policy_hub<int, int>::Policy1000, const int *, int *, thrust::THRUST_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210_NS::constant_iterator<int, int, thrust::THRUST_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210_NS::use_default>, int *, int *, cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::ReduceByKeyScanTileState<int, int, (bool)1>, cuda::std::__4::equal_to<void>, cuda::std::__4::plus<void>, int, int>(T2, T3, T4, T5, T6, T7, int, T8, T9, T10)"
+0.9,1071423,12,89285.3,17968.0,17407,235328,105672.5,NodePartition___scatter_partition_indices_acde3760_cuda_kernel_forward
+0.9,1024544,24,42689.3,15440.0,3040,195840,69622.7,"void cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::DeviceReduceByKeyKernel<cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::detail::rle::encode::policy_hub<int, unsigned long>::Policy1000, unsigned long *, unsigned long *, thrust::THRUST_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210_NS::constant_iterator<int, int, thrust::THRUST_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210_NS::use_default>, int *, int *, cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::ReduceByKeyScanTileState<int, int, (bool)1>, cuda::std::__4::equal_to<void>, cuda::std::__4::plus<void>, int, int>(T2, T3, T4, T5, T6, T7, int, T8, T9, T10)"
+0.8,899999,36,25000.0,5648.0,3936,148832,44638.0,"void cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::DeviceRadixSortHistogramKernel<cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::detail::radix::policy_hub<int, SortPayload<(int)4>, unsigned int>::Policy1000, (bool)0, int, unsigned int, cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::detail::identity_decomposer_t>(T4 *, const T3 *, T4, int, int, T5)"
+0.7,769088,4,192272.0,192304.0,191040,193440,984.7,"<unnamed>::bsr_transpose_fill_row_col(int, int, const int *, const int *, const int *, int *, unsigned long *)"
+0.7,754912,84,8987.0,1504.0,832,72640,20407.1,"void memtile_value_kernel<int>(T1 *, T1, unsigned long)"
+0.6,744637,4,186159.3,185295.5,184287,189759,2484.2,integrate_yield_parameters_aa451105_cbad3c2a_cuda_kernel_forward
+0.6,706880,4,176720.0,176608.0,175008,178656,1509.4,dispatch_linear_kernel_fn_b3bf6b71_c174d21a_cuda_kernel_forward
+0.5,634142,16,39633.9,33776.0,33504,57824,10552.4,create_narrow_phase_kernel_gjk_mpr__locals__narrow_phase_kernel_gjk_mpr_da3ef1c3_cuda_kernel_forward
+0.5,627136,4,156784.0,156448.0,155584,158656,1403.5,dispatch_bilinear_kernel_fn_b4e8e360_5fb10211_cuda_kernel_forward
+0.5,589216,20,29460.8,12656.0,2464,114880,43901.4,"void cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::DeviceScanKernel<cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::detail::scan::policy_hub<int, int, int, unsigned int, cuda::std::__4::plus<void>>::Policy1000, int *, int *, cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::ScanTileState<int, (bool)1>, cuda::std::__4::plus<void>, cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::NullType, unsigned int, int, (bool)0>(T2, T3, T4, int, T5, T6, T7)"
+0.4,469696,204,2302.4,2272.0,2144,3136,74.1,make_bsr_mv_tiled_kernel__locals__bsr_mv_tiled_kernel_e2d003c4_cuda_kernel_forward
+0.3,399007,4,99751.8,100432.0,95808,102335,3109.9,scatter_field_dof_values_77fae76d_cuda_kernel_forward
+0.3,367680,4,91920.0,92112.0,90656,92800,923.9,rasterize_collider_kernel_dc8fb173_cuda_kernel_forward
+0.3,358656,4,89664.0,89648.0,89344,90016,282.6,integrate_velocity_78def4e6_11892f7b_cuda_kernel_forward
+0.3,327679,4,81919.8,81568.0,81151,83392,1022.6,_identity_field_4e952608_1766687e_cuda_kernel_forward
+0.3,305824,4,76456.0,76432.0,75424,77536,884.6,"void memtile_kernel_by_value<(unsigned long)256>(void *, FillValue<T1>, unsigned long, unsigned long)"
+0.2,256416,4,64104.0,63872.0,63584,65088,682.5,apply_subgrid_impulse_warmstart_8cb56a7c_cuda_kernel_forward
+0.2,256415,4,64103.8,64175.5,63840,64224,177.8,dispatch_linear_kernel_fn_471c608c_d13f4d07_cuda_kernel_forward
+0.2,243232,16,15202.0,14816.0,14752,16512,716.6,_update_gradient_cholesky_blocked__locals__kernel_7223b709_cuda_kernel_forward
+0.2,239072,4,59768.0,59792.0,59648,59840,84.2,_bsr_transpose_values_a814354d_cuda_kernel_forward
+0.2,238944,28,8533.7,8160.0,1184,19104,7146.1,"<unnamed>::bsr_set_column(const int *, const unsigned long *, int *)"
+0.2,232192,36,6449.8,2832.0,1920,18784,6037.7,"void cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::DeviceScanKernel<cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::detail::scan::policy_hub<int, int, int, unsigned int, cuda::std::__4::plus<void>>::Policy1000, <unnamed>::cub_strided_iterator<const int>, <unnamed>::cub_strided_iterator<int>, cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::ScanTileState<int, (bool)1>, cuda::std::__4::plus<void>, cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::NullType, unsigned int, int, (bool)0>(T2, T3, T4, int, T5, T6, T7)"
+0.2,229503,4,57375.8,57263.5,56160,58816,1101.5,compute_delassus_diagonal_5fc0bd53_cuda_kernel_forward
+0.2,218848,4,54712.0,54704.0,54464,54976,240.0,compute_collider_inv_mass_adf034e9_cuda_kernel_forward
+0.2,215808,80,2697.6,2688.0,2560,2944,119.1,_tiled_sum_kernel_7e4c592f_cuda_kernel_forward
+0.2,212576,4,53144.0,53168.0,52512,53728,517.6,integrate_fraction_59414a9d_2af29999_cuda_kernel_forward
+0.2,200960,40,5024.0,5024.0,4928,5184,54.2,evaluate_strain_residual_545e9767_cuda_kernel_forward
+0.2,200448,32,6264.0,3008.0,1600,27744,8277.5,_scatter_node_counts_5042823c_cuda_kernel_forward
+0.2,200384,28,7156.6,4416.0,2528,16512,5319.9,"void <unnamed>::bsr_find_row_offsets<int>(unsigned int, const T1 *, const unsigned long *, int *)"
+0.2,195008,4,48752.0,48832.0,48064,49280,515.7,quadrature_point_element_indices_c118c3aa_fd0c663a_cuda_kernel_forward
+0.2,192960,16,12060.0,5120.0,1536,37280,14694.3,SpaceRestriction___split_vertex_element_index_d19d2c20_cuda_kernel_forward
+0.2,189824,16,11864.0,12048.0,11008,12288,475.4,convert_newton_contacts_to_mjwarp_kernel_2edc37a4_cuda_kernel_forward
+0.1,170304,16,10644.0,10704.0,10304,10752,130.6,_update_gradient_cholesky_blocked_skip_unchanged__locals__kernel_45fd57e7_cuda_kernel_forward
+0.1,169792,32,5306.0,5088.0,4832,6976,630.5,apply_stress_gs_d6f9fcd1_cuda_kernel_forward
+0.1,168480,4,42120.0,41984.0,41856,42656,366.1,map_kernel_9ff10a0d_cuda_kernel_forward
+0.1,167104,4,41776.0,41584.0,40960,42976,853.3,mark_active_cells_3fc58873_5db40b19_cuda_kernel_forward
+0.1,158976,4,39744.0,39664.0,39616,40032,197.3,mass_form_f7c29850_5cf44f32_cuda_kernel_forward
+0.1,154784,16,9674.0,9760.0,9216,9920,206.0,compute_body_forces_7548f452_cuda_kernel_forward
+0.1,153120,32,4785.0,4736.0,4704,5216,136.7,_small_cholesky_factorize_solve_block__locals__kernel_35b90ab6_cuda_kernel_forward
+0.1,153024,4,38256.0,38128.0,36800,39968,1309.7,fill_element_node_indices_965050a0_6f891278_cuda_kernel_forward
+0.1,141536,4,35384.0,35824.0,32992,36896,1695.2,compute_collider_delassus_diagonal_f1529e24_cuda_kernel_forward
+0.1,129824,16,8114.0,8144.0,7520,8640,335.6,create_narrow_phase_primitive_kernel__locals__narrow_phase_primitive_kernel_81a38a1a_cuda_kernel_forward
+0.1,116704,4,29176.0,29040.0,28928,29696,356.7,fill_collider_coupling_matrices_afe8fd1f_cuda_kernel_forward
+0.1,114976,76,1512.8,1536.0,1280,1792,111.8,set_conditional_if_handle_kernel
+0.1,107968,4,26992.0,27200.0,25280,28288,1327.8,fill_element_node_indices_16b56c40_856e7da6_cuda_kernel_forward
+0.1,107712,16,6732.0,6752.0,6496,6816,91.9,_linesearch_iterative_kernel__locals__kernel_7c71f595_cuda_kernel_forward
+0.1,95840,32,2995.0,3104.0,2400,3680,493.1,mul_m_kernel__locals___mul_m_ff3bc617_cuda_kernel_forward
+0.1,89600,4,22400.0,21840.0,21536,24384,1338.1,_masked_indices_kernel_dae50ed5_cuda_kernel_forward
+0.1,88000,60,1466.7,960.0,896,5696,1069.7,"void cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::DeviceCompactInitKernel<cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::ReduceByKeyScanTileState<int, int, (bool)1>, int *>(T1, int, T2)"
+0.1,81504,4,20376.0,20416.0,19680,20992,635.9,node_category_from_cells_kernel_52cd6274_22f596d1_cuda_kernel_forward
+0.1,78208,4,19552.0,19504.0,18688,20512,849.5,postprocess_stress_and_strain_8653b339_cuda_kernel_forward
+0.1,72832,16,4552.0,3760.0,3648,8096,1594.5,compute_shape_aabbs_fcbde74c_cuda_kernel_forward
+0.1,72352,4,18088.0,18144.0,17664,18400,357.7,finalize_cell_particle_data_a1f6a656_1c2f3bde_cuda_kernel_forward
+0.1,65792,4,16448.0,16432.0,16416,16512,45.3,"<unnamed>::bsr_count_active_blocks(int, const int *, const int *, int *)"
+0.1,64928,4,16232.0,16208.0,16128,16384,126.3,world_position_9e883bfa_114ebe9f_cuda_kernel_forward
+0.1,63648,32,1989.0,2000.0,1664,2304,300.1,_update_constraint_init_qfrc_constraint_sparse__locals__kernel_4d324367_cuda_kernel_forward
+0.1,62208,4,15552.0,15504.0,15488,15712,107.7,dispatch_bilinear_kernel_fn_82f29c37_5a1c8b5b_cuda_kernel_forward
+0.1,62176,16,3886.0,3936.0,3456,4128,254.1,_M_13671fca_cuda_kernel_forward
+0.1,61600,4,15400.0,15376.0,15008,15840,454.3,bin_particles_92961d5a_1f96a6b8_cuda_kernel_forward
+0.1,61280,40,1532.0,1536.0,1504,1664,28.2,update_condition_98290a4b_cuda_kernel_forward
+0.1,60128,16,3758.0,3552.0,3520,4352,356.7,eval_articulation_fk_6c60ba16_cuda_kernel_forward
+0.1,58304,36,1619.6,1696.0,1184,2272,268.5,"void cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::DeviceRadixSortExclusiveSumKernel<cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::detail::radix::policy_hub<int, SortPayload<(int)4>, unsigned int>::Policy1000, unsigned int>(T2 *)"
+0.1,57984,56,1035.4,928.0,896,1760,248.4,"void cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::DeviceScanInitKernel<cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::ScanTileState<int, (bool)1>>(T1, int)"
+0.0,56736,16,3546.0,3472.0,3264,4000,244.3,_qderiv_actuator_passive_6cbfee2a_cuda_kernel_forward
+0.0,55616,4,13904.0,14128.0,13024,14336,618.6,preprocess_stress_and_strain_41a99b60_cuda_kernel_forward
+0.0,55296,4,13824.0,13824.0,13344,14304,501.9,free_velocity_05f582f0_cuda_kernel_forward
+0.0,53440,4,13360.0,13360.0,13248,13472,99.5,dispatch_linear_kernel_fn_f30732f1_47a6d091_cuda_kernel_forward
+0.0,53215,16,3325.9,2976.0,2944,4448,641.0,_kinematics_branch_95f8028e_cuda_kernel_forward
+0.0,52640,4,13160.0,13152.0,13088,13248,66.0,integrate_mass_54911689_9f27e060_cuda_kernel_forward
+0.0,51808,32,1619.0,1616.0,1408,1824,182.6,_zero_qfrc_constraint_sparse_6b3cbe94_cuda_kernel_forward
+0.0,51616,16,3226.0,3168.0,3136,3424,109.1,_comvel_branch_0f933c58_cuda_kernel_forward
+0.0,51584,16,3224.0,3168.0,3168,3392,87.0,_cacc_branch_ffe1d6c4_cuda_kernel_forward
+0.0,51104,16,3194.0,3104.0,3104,3456,156.4,_solve_done_c8485047_cuda_kernel_forward
+0.0,48576,32,1518.0,1520.0,1472,1568,41.4,_crb_accumulate_073a11b8_cuda_kernel_forward
+0.0,48096,32,1503.0,1536.0,1312,1920,182.2,_subtree_com_acc_350f0560_cuda_kernel_forward
+0.0,47872,16,2992.0,2992.0,2976,3008,16.5,convert_mj_coords_to_warp_kernel_55623290_cuda_kernel_forward
+0.0,47296,28,1689.1,1760.0,1152,2592,416.2,"void cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::DeviceRadixSortExclusiveSumKernel<cub::CUB_200802_SM_520_600_610_700_750_800_860_890_900_1000_1200_1210::detail::radix::policy_hub<unsigned long, int, unsigned int>::Policy1000, unsigned int>(T2 *)"
+0.0,46560,16,2910.0,2752.0,2720,3488,317.5,convert_warp_coords_to_mj_kernel_87f98e23_cuda_kernel_forward
+0.0,46464,32,1452.0,1440.0,1280,1728,152.4,_cfrc_backward_72237d38_cuda_kernel_forward
+0.0,44768,32,1399.0,1408.0,1280,1536,115.6,_padding_h_cc932c7a_cuda_kernel_forward
+0.0,43360,16,2710.0,2656.0,2624,2880,101.7,_update_constraint_efc__locals__kernel_a4bbf43e_cuda_kernel_forward
+0.0,43136,16,2696.0,2976.0,1728,3104,569.5,_gravity_force_7c63ac28_cuda_kernel_forward
+0.0,43008,4,10752.0,10768.0,10688,10784,45.3,integrate_active_fraction_ea66bb7c_a926d082_cuda_kernel_forward
+0.0,42976,16,2686.0,2496.0,2464,3264,340.2,_geom_local_to_global_e28b714c_cuda_kernel_forward
+0.0,41440,16,2590.0,2560.0,2528,2720,69.6,_efc_contact_update__locals__kernel_2d4d3d06_cuda_kernel_forward
+0.0,38496,16,2406.0,2624.0,1600,2752,468.9,_qfrc_smooth__locals__kernel_33de72f1_cuda_kernel_forward
+0.0,38304,16,2394.0,2240.0,2208,2912,309.2,apply_mjc_qfrc_kernel_173e90ee_cuda_kernel_forward
+0.0,38080,4,9520.0,9520.0,9472,9568,41.3,fill_element_node_indices_7d88edf9_2d6e62ad_cuda_kernel_forward
+0.0,38048,16,2378.0,2336.0,2208,2656,133.6,_qfrc_constraint_from_grad_4e7e88b1_cuda_kernel_forward
+0.0,37216,16,2326.0,2240.0,2208,2688,183.9,_preprocess_tactile_contacts_0f2dba1d_cuda_kernel_forward
+0.0,36768,16,2298.0,2464.0,1792,2528,301.1,_solve_init_dof__locals__kernel_149a5395_cuda_kernel_forward
+0.0,36160,16,2260.0,2272.0,2240,2272,16.0,_next_position_1c101e8d_cuda_kernel_forward
+0.0,36096,16,2256.0,2144.0,2112,2624,201.0,_efc_contact_init__locals__kernel_89f269cc_cuda_kernel_forward
+0.0,36000,16,2250.0,2208.0,2176,2496,111.3,_friction_dof__locals__kernel_80445010_cuda_kernel_forward
+0.0,35968,16,2248.0,2208.0,2176,2464,106.8,_spring_damper_dof_passive_7b46d40c_cuda_kernel_forward
+0.0,35872,16,2242.0,2240.0,2240,2272,8.0,_apply_ft_1667a928_cuda_kernel_forward
+0.0,35840,16,2240.0,2112.0,2080,2752,264.4,apply_mjc_body_f_kernel_959969cf_cuda_kernel_forward
+0.0,34560,16,2160.0,1984.0,1952,2720,329.5,_nxn_broadphase_precomputed_pairs_8be4a3a3_cuda_kernel_forward
+0.0,34208,16,2138.0,2144.0,2112,2176,17.4,_update_gradient_grad__locals__kernel_e00be912_cuda_kernel_forward
+0.0,33632,16,2102.0,2112.0,2080,2112,15.3,_qderiv_tendon_damping_ec990995_cuda_kernel_forward
+0.0,33408,16,2088.0,2064.0,2048,2176,54.2,_update_gradient_h_incremental_sparse__locals__kernel_97faacb1_cuda_kernel_forward
+0.0,33376,16,2086.0,1984.0,1984,2400,178.1,_next_time_builder__locals___next_time_9e67d474_cuda_kernel_forward
+0.0,32736,16,2046.0,1888.0,1888,2528,282.7,_qfrc_passive_ccf6028a_cuda_kernel_forward
+0.0,32704,16,2044.0,1952.0,1920,2336,174.4,apply_mjc_free_joint_f_to_body_f_kernel_376acabe_cuda_kernel_forward
+0.0,32320,16,2020.0,1888.0,1856,2464,255.7,_cdof_3e73eb78_cuda_kernel_forward
+0.0,32224,16,2014.0,2016.0,1984,2048,14.2,_linesearch_jv_fused_kernel__locals__kernel_2fc0d410_cuda_kernel_forward
+0.0,31680,16,1980.0,1920.0,1888,2240,127.9,_update_gradient_init_h_sparse__locals__kernel_3d08e876_cuda_kernel_forward
+0.0,31488,16,1968.0,1920.0,1920,2112,81.8,_subtree_div_0ef57c26_cuda_kernel_forward
+0.0,31104,16,1944.0,1920.0,1888,2080,73.4,_JTDAJ_sparse__locals__kernel_ff479d92_cuda_kernel_forward
+0.0,31104,16,1944.0,1936.0,1920,1984,27.4,_update_gradient_zero_grad_dot__locals__kernel_f84af473_cuda_kernel_forward
+0.0,30240,16,1890.0,1888.0,1856,1920,14.2,verify_narrow_phase_buffers_c234c2df_cuda_kernel_forward
+0.0,29535,4,7383.8,7360.0,7359,7456,48.2,_identity_field_309ba09f_841ba1f8_cuda_kernel_forward
+0.0,28992,16,1812.0,1824.0,1792,1824,16.0,_update_constraint_efc__locals__kernel_9c16a648_cuda_kernel_forward
+0.0,28895,16,1805.9,1792.0,1791,1824,16.5,_efc_contact_jac_sparse__locals__kernel_c5d488bb_cuda_kernel_forward
+0.0,28576,16,1786.0,1696.0,1664,2080,175.7,_compute_body_inertial_frames_d3bdd81a_cuda_kernel_forward
+0.0,28320,4,7080.0,7248.0,4288,9536,2154.5,"void memtile_value_kernel<long>(T1 *, T1, unsigned long)"
+0.0,27936,16,1746.0,1696.0,1664,1984,101.8,_cinert_1261260c_cuda_kernel_forward
+0.0,27648,16,1728.0,1696.0,1664,1888,92.0,_cfrc_3922b605_cuda_kernel_forward
+0.0,26944,16,1684.0,1632.0,1632,1824,80.0,_update_gradient_grad__locals__kernel_230cc1c2_cuda_kernel_forward
+0.0,24928,16,1558.0,1712.0,1024,1824,306.6,_comvel_root_15820f35_cuda_kernel_forward
+0.0,24608,16,1538.0,1536.0,1536,1568,8.0,_solve_init_jaref_kernel__locals__kernel_8afe30e8_cuda_kernel_forward
+0.0,23648,16,1478.0,1472.0,1472,1504,12.9,_qfrc_bias_4085b6de_cuda_kernel_forward
+0.0,22880,16,1430.0,1376.0,1344,1600,93.3,_next_velocity_d66c2f53_cuda_kernel_forward
+0.0,22112,16,1382.0,1344.0,1312,1536,83.6,_subtree_com_init_002b02fd_cuda_kernel_forward
+0.0,20928,4,5232.0,5232.0,5216,5248,18.5,_bsr_assign_copy_blocks_efac61cd_cuda_kernel_forward
+0.0,20896,16,1306.0,1248.0,1248,1472,95.1,_compute_body_matrices_27760750_cuda_kernel_forward
+0.0,20896,16,1306.0,1312.0,1280,1312,12.9,_update_gradient_zero_grad_dot__locals__kernel_c1c72bbd_cuda_kernel_forward
+0.0,20448,16,1278.0,1280.0,1248,1312,18.4,_zero_change_counters_939878a2_cuda_kernel_forward
+0.0,20320,16,1270.0,1280.0,1248,1280,15.3,_snapshot_nacon_count_b40012cc_cuda_kernel_forward
+0.0,20032,16,1252.0,1216.0,1184,1440,99.1,_cacc_world_6ec26fdb_cuda_kernel_forward
+0.0,19584,8,2448.0,2432.0,1248,3648,1257.4,"void <unnamed>::bsr_fill_triplet_key_values<void>(int, const int *, const int *, <unnamed>::BsrBlockIsNotZero<T1>, <unnamed>::BsrBlockInMask, int *, unsigned long *)"
+0.0,19488,4,4872.0,4832.0,4736,5088,153.2,compute_eigenvalues_398d95c6_cuda_kernel_forward
+0.0,19296,4,4824.0,4816.0,4768,4896,54.7,inverse_scale_vector_be470fd2_cuda_kernel_forward
+0.0,18592,16,1162.0,1152.0,1152,1184,15.3,_zero_constraint_counts_82d999b9_cuda_kernel_forward
+0.0,16960,16,1060.0,1056.0,1056,1088,10.9,_solve_init_efc_a1db7ec5_cuda_kernel_forward
+0.0,16832,4,4208.0,4208.0,4192,4224,18.5,_bsr_assign_list_blocks_156045b1_cuda_kernel_forward
+0.0,11904,4,2976.0,2912.0,2784,3296,221.7,node_category_from_cells_kernel_9b32ebc7_b4f82049_cuda_kernel_forward
+0.0,11680,4,2920.0,2896.0,2880,3008,60.6,cell_color_251cbc29_1b16d4a9_cuda_kernel_forward
+0.0,8416,4,2104.0,2096.0,2080,2144,30.6,fill_element_node_indices_7a30481c_66c73b68_cuda_kernel_forward
+0.0,8256,4,2064.0,2064.0,2048,2080,18.5,compute_color_offsets_a5c4efbd_cuda_kernel_forward
+0.0,7680,4,1920.0,1920.0,1888,1952,26.1,node_category_from_cells_kernel_453759b7_1a1bbe25_cuda_kernel_forward
+0.0,7648,4,1912.0,1920.0,1888,1920,16.0,subtract_body_force_06b31ba5_cuda_kernel_forward
+0.0,5664,4,1416.0,1408.0,1408,1440,16.0,create_inverse_shape_mapping_kernel_1b9722f5_cuda_kernel_forward
+0.0,5024,4,1256.0,1248.0,1248,1280,16.0,fill_uniform_color_block_indices_d688ca40_cuda_kernel_forward

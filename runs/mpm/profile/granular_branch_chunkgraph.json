@@ -1,0 +1,20 @@
+{
+ "scene": "example:mpm_granular",
+ "device": "metal:0",
+ "frame_ms": 82.93582632904872,
+ "sections_ms": {
+  "Allocate grid": 13.32,
+  "Build active partition": 0.0,
+  "Bin particles": 3.981666666666667,
+  "Scratchpad": 9.146666666666668,
+  "Rasterize collider": 2.1616666666666666,
+  "Unconstrained velocity": 1.406666666666667,
+  "Interpolated yield parameters": 0.7216666666666667,
+  "Strain matrix": 1.585,
+  "Warmstart fields": 0.5233333333333333,
+  "Strain solve": 44.74666666666667,
+  "Save warmstart fields": 1.6616666666666668,
+  "Advection": 0.7033333333333335
+ },
+ "iterations_mean": 233.125
+}

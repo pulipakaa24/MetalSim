@@ -10,7 +10,7 @@ g = importlib.util.module_from_spec(spec); spec.loader.exec_module(g)
 
 def _sandbox():
     d = tempfile.mkdtemp()
-    g.LOCK = os.path.join(d, "lock"); g.LOCKD = g.LOCK + ".d"; g.Q = os.path.join(d, "q"); g.HIST = os.path.join(d, "h.jsonl")
+    g.LOCK = os.path.join(d, "lock"); g.LOCKD = g.LOCK + ".d"; g.Q = os.path.join(d, "q"); g.HIST = os.path.join(d, "h.jsonl"); g.SH = os.path.join(d, "shared")
 
 
 def _main(*argv):
@@ -70,3 +70,16 @@ def test_alive_treats_permission_error_as_alive(monkeypatch):
     def gone(pid, sig): raise ProcessLookupError
     monkeypatch.setattr(g.os, "kill", gone)
     assert g.alive(12345) is False
+
+
+def test_check_jobs_share_and_exclusive_waits():
+    """Check jobs run side by side (up to SHARED_MAX); an exclusive acquirer waits until they release."""
+    import threading, time
+    _sandbox()
+    g.acquire("c1", "check", 1, os.getpid()); g.acquire("c2", "check", 1, os.getpid())
+    assert sorted(h["name"] for h in g.shared_holders()) == ["c1", "c2"] and g.holder() is None
+    done = threading.Event()
+    t = threading.Thread(target=lambda: (g.acquire("ex", "timing", 1, os.getpid()), done.set())); t.start()
+    time.sleep(1.0); assert not done.is_set()
+    for h in g.shared_holders(): os.remove(h["_file"])
+    t.join(30); assert done.is_set() and g.holder()["name"] == "ex"

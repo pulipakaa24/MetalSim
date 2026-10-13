@@ -1,0 +1,73 @@
+{
+ "argv": [
+  "--device",
+  "cuda:0",
+  "--json",
+  "/home/<user>/parity3/scale_l4/mpm_cap_64.json",
+  "--part",
+  "mpm",
+  "--worlds",
+  "64",
+  "--mode",
+  "capture",
+  "--steps",
+  "10"
+ ],
+ "device": "cuda:0",
+ "device_name": "NVIDIA L4",
+ "warp": "1.16.0",
+ "newton": "1.5.2",
+ "worlds": 64,
+ "temporary_store": true,
+ "part": "mpm",
+ "mode": "capture",
+ "grid": "sparse",
+ "accumulate": "native",
+ "loop": "native",
+ "particles": 47040,
+ "bodies": 128,
+ "colliders": 192,
+ "build_s": 0.32989836199999445,
+ "solver_init_s": 0.6166178199999877,
+ "max_active_cell_count": 65536,
+ "warmup_steps": 288,
+ "warmup_s": 7.003343058000041,
+ "capture": "ok",
+ "step_ms": {
+  "median": 6.951929499962262,
+  "mean": 7.483637499979068,
+  "min": 6.916430000046603,
+  "max": 12.293993999946906
+ },
+ "step_ms_all": [
+  12.293993999946906,
+  6.956188000003749,
+  6.93802599994342,
+  6.964831999994203,
+  6.947670999920774,
+  6.978301000003739,
+  6.985360999919976,
+  6.931884999971771,
+  6.916430000046603,
+  6.923687000039536
+ ],
+ "step_ms_pipelined": 6.957661100000223,
+ "grid_status": "ok",
+ "iterations_last4": [
+  25,
+  25,
+  25,
+  25
+ ],
+ "res_l2_last4": [
+  0.003789320820942521,
+  0.001654870924539864,
+  0.0007531502051278949,
+  0.0015060876030474901
+ ],
+ "occupied_cells_per_world": 82.328125,
+ "velocity_nodes": 524288,
+ "strain_nodes": 65536,
+ "collider_nodes": 47040,
+ "maxrss_mb": 561.01953125
+}

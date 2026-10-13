@@ -6,6 +6,10 @@ Classes (granted in this order when the GPU frees up; FIFO within a class):
   render  (1)  renders / short rollouts
   train   (2)  long training runs
   low     (3)  background optimisation work; granted only when nothing else waits
+  check   (1)  correctness work that does not time anything (tests, bitwise recordings, parity runs): up to
+               GPU_SHARED_MAX (default 3) check jobs run together; they start only when no exclusive job holds
+               the GPU or waits ahead of them, and exclusive jobs (timing included) wait until they drain; a check
+               job waiting longer than GPU_CHECK_AGE_S (default 600 s) is ordered ahead of timing jobs
 A holder is recorded in runs/.gpu_lock (text: name, kind, pid, start) and runs/.gpu_lock.d/ (the atomic
 token); a holder whose pid is gone is released automatically. Scripts that only check the file still
 interoperate. Waiting jobs register tickets in runs/gpu_queue/.
@@ -26,12 +30,23 @@ def _hist(ev, **kw):
     try:
         with open(HIST, "a") as f: f.write(json.dumps(dict(ev=ev, t=time.time(), **kw)) + "\n")
     except OSError: pass
-PRIO = {"timing": 0, "render": 1, "train": 2, "low": 3}
+PRIO = {"timing": 0, "render": 1, "check": 1, "train": 2, "low": 3}
+SH = os.path.join(ROOT, "runs", "gpu_shared")            # one file per running check job
+SHARED_MAX = int(os.environ.get("GPU_SHARED_MAX", "3"))
+CHECK_AGE_S = float(os.environ.get("GPU_CHECK_AGE_S", "600"))   # a check job waiting this long goes ahead of timing jobs (no starvation)
+
+
+HB = os.path.join(ROOT, "runs", "gpu_hb")                # gpu_run.sh touches gpu_hb/<job pid> every 5 s while the job lives
+HB_FRESH_S = 20.0
 
 
 def alive(pid):
     try: os.kill(pid, 0); return True
-    except ProcessLookupError: return False
+    except ProcessLookupError:
+        # A sandboxed caller gets ProcessLookupError for live processes outside its sandbox (2026-10-09: waiters
+        # force-released running timing jobs and overlapped them). Trust the job's own heartbeat before declaring it dead.
+        try: return time.time() - os.path.getmtime(os.path.join(HB, str(pid))) < HB_FRESH_S
+        except OSError: return False
     except PermissionError: return True      # the process exists; a sandbox denied the signal (a sandboxed status call once deleted every ticket)
     except OSError: return True
 
@@ -54,13 +69,27 @@ def _release(force=False, rc=None):
     if os.path.isdir(LOCKD): os.rmdir(LOCKD)
 
 
+def shared_holders():
+    os.makedirs(SH, exist_ok=True); out = []
+    for f in sorted(os.listdir(SH)):
+        fp = os.path.join(SH, f)
+        try: h = json.load(open(fp))
+        except Exception: continue
+        if h.get("pid") and not alive(h["pid"]):
+            _hist("release", name=h.get("name"), kind="check", start=h.get("start"), rc=None, forced=True); os.remove(fp); continue
+        h["_file"] = fp; out.append(h)
+    return out
+
+
 def tickets():
     os.makedirs(Q, exist_ok=True); out = []
     for f in sorted(os.listdir(Q)):
         try: t = json.load(open(os.path.join(Q, f)))
         except Exception: continue
         if t.get("pid") and not alive(t["pid"]): os.remove(os.path.join(Q, f)); continue
-        out.append((PRIO.get(t["kind"], 2), t["t"], f, t))
+        pr = PRIO.get(t["kind"], 2)
+        if t["kind"] == "check" and t["t"] > 0 and time.time() - t["t"] > CHECK_AGE_S: pr = -1   # aged: ahead of timing
+        out.append((pr, t["t"], f, t))
     out.sort(); return out
 
 
@@ -73,7 +102,19 @@ def acquire(name, kind, minutes, pid, cmd=None, front=False):
     while True:
         if not os.path.exists(tf): json.dump(ticket, open(tf, "w"))      # self-heal: a ticket removed by another process is re-created
         h = holder()
-        if h is None:
+        if kind == "check":
+            if h is None:
+                q = tickets(); names = [x[2] for x in q]
+                ahead = q[:names.index(os.path.basename(tf))] if os.path.basename(tf) in names else q
+                if all(x[3]["kind"] == "check" for x in ahead) and len(shared_holders()) < SHARED_MAX:
+                    sf = os.path.join(SH, f"{name}_{pid}.json")
+                    json.dump({"name": name, "kind": kind, "minutes": minutes, "pid": pid, "start": time.time(), "queued": os.path.getmtime(tf), "cmd": cmd, "cwd": os.getcwd()}, open(sf, "w"))
+                    if holder() is not None:                           # an exclusive job won the race: back off
+                        os.remove(sf); time.sleep(2); continue
+                    _hist("grant", name=name, kind=kind, minutes=minutes, cmd=cmd)
+                    os.remove(tf); return
+            time.sleep(5); continue
+        if h is None and not shared_holders():
             q = tickets()
             if q and q[0][2] == os.path.basename(tf):
                 try:
@@ -94,9 +135,15 @@ def main():
     a = ap.parse_args()
     if a.cmd == "acquire": acquire(a.name, a.kind, a.minutes, a.pid, a.job_cmd, a.front)
     elif a.cmd == "setpid":                       # the wrapper registers the real job process once spawned
+        for sh in shared_holders():
+            if sh.get("name") == a.name:
+                fp = sh.pop("_file"); sh["pid"] = a.pid; json.dump(sh, open(fp, "w")); return
         h = holder()
         if h and h.get("name") == a.name: h["pid"] = a.pid; json.dump(h, open(LOCK, "w"))
     elif a.cmd == "release":
+        for sh in shared_holders():
+            if sh.get("name") == a.name and (a.pid == os.getppid() or sh.get("pid") == a.pid):
+                os.remove(sh["_file"]); _hist("release", name=a.name, kind="check", start=sh.get("start"), rc=a.rc, forced=False); return
         h = holder()
         if h and a.name and h.get("name") not in (a.name, None): print(f"lock held by {h.get('name')}, not {a.name}; not released"); sys.exit(1)
         if h and a.pid != os.getppid() and h.get("pid") and h["pid"] != a.pid:   # a late release from an older job of the same name must not free its successor
@@ -105,9 +152,10 @@ def main():
             _hist("exit", name=a.name, rc=a.rc); return
         _release(rc=a.rc)
     elif a.json:
-        print(json.dumps({"holder": holder(), "waiting": [tk for _, _, _, tk in tickets()], "now": time.time()}))
+        print(json.dumps({"holder": holder(), "shared": [{k: v for k, v in x.items() if k != "_file"} for x in shared_holders()], "waiting": [tk for _, _, _, tk in tickets()], "now": time.time()}))
     else:
         h = holder(); print("holder:", json.dumps(h) if h else "none")
+        for sh in shared_holders(): print(f"  shared [check] {sh['name']} running {(time.time() - sh['start']) / 60:.0f} min")
         for pr, t, f, tk in tickets(): print(f"  waiting [{tk['kind']}] {tk['name']} est {tk['minutes']} min, queued {time.time() - t:.0f} s ago")
 
 

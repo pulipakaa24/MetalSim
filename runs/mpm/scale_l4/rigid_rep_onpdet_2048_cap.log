@@ -1,0 +1,18 @@
+Warp DeprecationWarning: warp.config.quiet is deprecated; use warp.config.log_level = warp.LOG_WARNING to suppress the init banner.
+/home/<user>/parity3_scripts/mpm/scale/scale_pour.py:236: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+  model = scene.finalize(device=DEV)
+Traceback (most recent call last):
+  File "/home/<user>/parity3_scripts/mpm/scale/scale_pour.py", line 911, in <module>
+    {"mpm": run_mpm, "rigid": run_rigid, "ordered": run_ordered, "bodyforce": run_bodyforce}[args.part]()
+  File "/home/<user>/parity3_scripts/mpm/scale/scale_pour.py", line 652, in run_rigid
+    pipeline = newton.CollisionPipeline(model, deterministic=args.pipeline_det, **_pipeline_kwargs())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/sim/collide.py", line 1099, in __init__
+    self.narrow_phase = NarrowPhase(
+                        ^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/geometry/narrow_phase.py", line 1655, in __init__
+    self.global_contact_reducer = GlobalContactReducer(
+                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/geometry/contact_reduction_global.py", line 837, in __init__
+    raise ValueError(
+ValueError: Deterministic contact packing supports at most 1048576 buffered contacts (20-bit contact_id), but capacity=8388608. Reduce max_triangle_pairs or disable deterministic mode.

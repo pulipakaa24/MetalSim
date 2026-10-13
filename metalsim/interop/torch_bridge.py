@@ -29,9 +29,21 @@ def ext():
     """The JIT-built native extension (first call compiles it; cached under ~/.cache/torch_extensions)."""
     global _ext
     if _ext is None:
+        import shutil
+
         from torch.utils.cpp_extension import load
 
-        src = Path(__file__).resolve().parents[1] / "native" / "torch_metal_bridge.mm"
+        # torch runs `ninja` from PATH. The ninja package (a dependency) puts it in the environment's bin directory,
+        # which is not on PATH when the interpreter is run without activating the environment (.venv/bin/python ...,
+        # scripts/gpu_run.sh jobs): add it, so a machine without a system ninja (no Homebrew) builds the bridge too.
+        if shutil.which("ninja") is None:
+            try:
+                import ninja
+
+                os.environ["PATH"] = ninja.BIN_DIR + os.pathsep + os.environ.get("PATH", "")
+            except ImportError:
+                pass
+        src =Path(__file__).resolve().parents[1] / "native" / "torch_metal_bridge.mm"
         _ext = load(
             name="metalsim_torch_metal_bridge",
             sources=[str(src)],

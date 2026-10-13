@@ -1,0 +1,61 @@
+{
+ "argv": [
+  "--device",
+  "cuda:0",
+  "--json",
+  "/home/<user>/parity3/scale_l4/rigid_rep_pdet_64.json",
+  "--part",
+  "rigid",
+  "--worlds",
+  "64",
+  "--pipeline-det",
+  "--steps",
+  "3",
+  "--repeat-check"
+ ],
+ "device": "cuda:0",
+ "device_name": "NVIDIA L4",
+ "warp": "1.16.0",
+ "newton": "1.5.2",
+ "worlds": 64,
+ "part": "rigid",
+ "det": "off",
+ "pipeline_det": true,
+ "mode": "eager",
+ "max_triangle_pairs": null,
+ "bodies": 832,
+ "shapes": 5889,
+ "joints": 832,
+ "dofs": 1344,
+ "build_s": 0.1904125680002835,
+ "solver_init_s": 1.5227191310000308,
+ "rigid_contact_max": 439168,
+ "collide_ms": {
+  "median": 4.4466790000115,
+  "mean": 4.518471000058828,
+  "min": 4.413187999944057,
+  "max": 4.695546000220929
+ },
+ "substep_ms": {
+  "median": 8.016185000087717,
+  "mean": 8.557588666614416,
+  "min": 7.80408799982979,
+  "max": 9.852492999925744
+ },
+ "tick_ms": {
+  "median": 26.189950999651046,
+  "mean": 26.20048133318657,
+  "min": 25.851952000266465,
+  "max": 26.559540999642195
+ },
+ "rigid_contacts": 2560,
+ "nefc_mean": 81.0,
+ "finite": true,
+ "repeat_check": {
+  "bitwise_equal": false,
+  "max_abs_diff": 0.19834239780902863,
+  "worlds_differing": 64,
+  "finite": true
+ },
+ "maxrss_mb": 837.3671875
+}

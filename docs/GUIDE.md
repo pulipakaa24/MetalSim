@@ -8,16 +8,18 @@ guide links to it and does not repeat its numbers.
 
 Requirements: an Apple Silicon Mac (developed and measured on an M4 Max), macOS with the Xcode
 Command Line Tools (`xcode-select --install`; the full Xcode app is not needed), Python 3.12 or newer
-(developed on 3.12, the install is also tested on 3.14), git and about 5 GB of disk.
+(developed on 3.12, the install is also tested on 3.14; macOS's own `/usr/bin/python3` is 3.9, so install one from
+python.org, Homebrew or `uv python install 3.12`), git, [uv](https://docs.astral.sh/uv/) for the optional environments
+built by `scripts/setup_newton152.sh` and `scripts/setup_newton.sh`, and about 5 GB of disk.
 
 ## 1. Install
 
 ```
 git clone https://github.com/pulipakaa24/MetalSim && cd MetalSim
-python3 -m venv .venv && source .venv/bin/activate
+python3.12 -m venv .venv && source .venv/bin/activate     # uv only: $(uv python find 3.12) -m venv .venv
 pip install -e ".[test]"
 scripts/setup_warp.sh
-pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@metalsim#egg=mujoco-warp"
+pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@cf0f8adc8f99f0c559cf8580cb667952e473bd07#egg=mujoco-warp" "mujoco>=3.14,<3.15"      # pinned: README "Install"
 scripts/fetch_isaac_assets.sh
 pytest tests -q
 ```
@@ -46,14 +48,22 @@ them: `git clone https://github.com/google-deepmind/mujoco_menagerie upstream/mu
 `scripts/setup_warp.sh` then replaces it with the fork below. Check with
 `python -c "import warp; print(warp.__file__)"`, which should point into `upstream/warp-metalsim`.
 
+MPM (Isaac Lab 3.0-EA's Newton 1.5.2 implicit MPM, `metalsim/physics/mpm/MPM.md`) runs in a second environment,
+`.venv-newton152`, built after the steps above by `scripts/setup_newton152.sh` (Newton fork branch `metalsim-1.5.2`
+at a pinned commit, the same Warp checkout, mujoco-warp 3.11.0, pinned third-party versions). Its tests:
+`.venv-newton152/bin/python -m pytest tests/test_mpm.py`. Every setup script pins its fork commit and takes
+`METALSIM_*_REPO` / `METALSIM_*_REF` overrides; if a fork cannot be cloned it rebuilds the same tree from upstream
+plus the diff in `patches/`.
+
 ### The three forks
 
 MetalSim depends on three forked projects, none of them on PyPI in this form. The commits below are
 what the current results were produced with. Each fork's branch head adds only a `METALSIM_CHANGES.md` (the list of MetalSim
 commits on that branch) on top of the commit named here, so installing the branch gives the same code.
 
-**Warp** ([pulipakaa24/warp](https://github.com/pulipakaa24/warp), branch `metalsim`, commit
-`f194006`). NVIDIA Warp with innate-inc's Metal backend, plus seven MetalSim commits: interop entry
+**Warp** ([pulipakaa24/warp](https://github.com/pulipakaa24/warp), branch `metalsim`, pinned commit `95f6f121`;
+the rigid-body results were produced at `f194006` and `c200d46b`, see the README). NVIDIA Warp with innate-inc's
+Metal backend, plus MetalSim commits; the first seven: interop entry
 points (Metal device, queue and buffer handles, cross-queue events, used for zero-copy PyTorch MPS
 tensors), graph replay through Metal indirect command buffers, release of deferred frees per completed
 command buffer (without it, long loops at 4096 envs ran out of GPU memory) and fixed-size arrays
@@ -63,7 +73,10 @@ tile Cholesky (`wp.config.metal_register_cholesky_max`), `segmented_sort_pairs` 
 (default `upstream/warp-metalsim`), builds the native library with `build_lib.py --no-cuda` and
 installs it editable. `METALSIM_WARP_REPO` and `METALSIM_WARP_REF` (branch, tag or commit) point it
 elsewhere. If the fork cannot be cloned, the script clones innate-inc/warp at `ce15f6b` and applies
-`patches/warp/0001-0007`, which gives the same source tree as `f194006`.
+`patches/warp/metalsim-95f6f121.diff`, which gives the same source tree as `95f6f121` (`patches/warp/0001-0007` are
+the first seven commits, the tree of `f194006`). The commits since (MPM, scalable deterministic mode, FMA contraction
+from `fuse_fp`, GPU sort / BSR / NanoVDB builders, `fast_math` forms with `warp.config.metal_fast_math = "off"` by
+default) are listed in the branch's `METALSIM_CHANGES.md` and in `metalsim/physics/mpm/MPM.md`.
 
 **MuJoCo Warp** ([pulipakaa24/mujoco_warp](https://github.com/pulipakaa24/mujoco_warp), branch
 `metalsim`, commit `8fbf965`). Google DeepMind's MuJoCo Warp v3.14.0 (`88af9cc`) with sixteen commits:
@@ -80,13 +93,15 @@ every flex, active-layer volume contacts, mesh normals), order flex equality row
 throughput ones; identical tree to the merge `8fbf965`) are in `patches/mujoco_warp/`; to build without the fork, clone google-deepmind/mujoco_warp at
 `88af9cc`, `git am` those patches and `pip install -e` the checkout.
 
-**Newton** ([pulipakaa24/newton](https://github.com/pulipakaa24/newton), branch `metalsim`, commit
-`90e2332`). Only needed for the experimental Newton XPBD engine. The fork fixes XPBD solver defects
+**Newton** ([pulipakaa24/newton](https://github.com/pulipakaa24/newton), branch `metalsim`, pinned commit
+`9f31739` = XPBD code `90e2332` plus the Metal fixes: HashTable, 64-bit atomics, mesh-SDF barrier, collision launches). Only needed for the experimental Newton XPBD engine. The fork fixes XPBD solver defects
 found while validating it (revolute angle wrap at ±π, inconsistent joint relaxation,
 iteration-dependent drive stiffness, and others; the upstream issues and pull requests are listed in
 `scripts/diagnostics/newton_upstream/FILED.md`). `scripts/setup_newton.sh` installs it into a separate
 environment, `.venv-newtonfork`, and shares the Warp checkout with `.venv`. The `newton` extra instead
-installs upstream Newton at `45458023`, the commit the validation runs used, without the fixes.
+installs upstream Newton at `45458023`, the commit the validation runs used, without the XPBD fixes but with the
+Metal fixes the current Warp fork needs (branch `metalsim-hashtable-metal`, `a4be360`). Branch
+`metalsim-1.5.2` (Newton 1.5.2 for MPM) is installed by `scripts/setup_newton152.sh`.
 
 The older single-file patches in `patches/` (`warp-innate-metal-pending-frees.patch`,
 `0001-Metal-fixed-size-arrays-...patch`, `mujoco_warp-*.patch`) are individual commits of the same
@@ -151,6 +166,29 @@ python -m metalsim.learn.cartpole_rgb 1024      # rollout throughput per render 
 `--tier` selects the renderer (0 raster, 1 hybrid ray tracing, 2 path tracing; `--spp` and
 `--bounces` for tier 2), `--checkpoint out.pt` saves the policy, `--seed` sets the seed.
 
+### Cameras on cloth, cables, tendons, skins and sites
+
+Every renderer and ray-traced sensor draws what MuJoCo's own renderer draws besides geoms, under MuJoCo's default
+`mjvOption`: sites in the visible groups, flexes (cloth and soft volumes as their skin offset by the flex radius,
+cables as edge cylinders), skins and spatial tendons (`metalsim/render/extras.py`). Their vertices are generated on
+the GPU each frame from the simulation state, per env (`metalsim/render/dynamic_mesh.py`), so nothing extra is needed
+for a MuJoCo Warp flex scene (`BatchSim`, `DeformableSim`). Other simulators pass their vertex arrays:
+
+```python
+from metalsim.render.extras import DeformableMesh
+r = Tier0Renderer(flex_model, n, camera="cam", outputs=("rgb", "depth", "seg"))
+r.render(xpbd, sources={"flexvert_xpos": xpbd.x})            # XPBDSim: the model's flexes, XPBD's vertices
+cloth = DeformableMesh("cloth", mesh.tris, len(mesh.x), rgba=(0.2, 0.5, 0.9, 1))
+r = Tier0Renderer(model, n, camera="cam", deformables=[cloth])
+r.render(sim, sources={"cloth": physx_cloth.x})              # PhysXClothSim (or any (N, V, 3) Warp array)
+```
+
+A simulator without an event (`DeformableSim`, `XPBDSim`, `PhysXClothSim`) is synchronized by the caller before the
+render. `visual=` takes an `mujoco.MjvOption` (groups and flags as in MuJoCo's viewer); `visual=False` draws geoms
+only, as before. In segmentation (geom mode) the j-th extra object has id `ngeom + 1 + j` (`r.tables.extras`); the
+Isaac-style annotators report them as unlabelled instances with their own `instance_id`. Isaac does not draw MuJoCo
+sites, tendons or skins (docs/RENDER_COVERAGE.md §5).
+
 ### Lidar navigation
 
 A MetalSim task (Isaac Lab has no lidar RL benchmark): a wheeled base reaches a goal among random
@@ -161,6 +199,18 @@ python -m metalsim.learn.lidar_nav 1024 300 runs/lidar_nav.log runs/policies/lid
 ```
 
 Arguments are positional: `[num_envs] [iterations] [log] [checkpoint.pt]`.
+
+### Rendering particles (MPM sand)
+
+Both renderers draw particles as render grains (small irregular grain meshes, several per particle, per-grain
+colour), in the path tracer's acceleration structure and in tier 0's raster pass:
+
+```python
+renderer.set_particles(state.particle_q, radius=0.005, grains_per_particle=27)   # numpy or a Warp array on Metal
+```
+
+Details, options and limits: `metalsim/render/PARTICLES.md`. A path-traced demo of Newton's ANYmal-on-sand MPM
+example: `scripts/particle_demo/` (`sim_anymal.py` records it, `render_anymal.py` renders it).
 
 ## 3. Bringing your own robot
 
@@ -345,6 +395,19 @@ python -m metalsim.learn.g1_preflight --envs 1024 --engine newton --newton_it 4 
 
 The decision and the measurements behind it are in `GAPS.md` ("Newton XPBD: archived") and
 [`PARITY.md` §2.1](PARITY.md#21-contact-model-what-mujoco-can-do-and-newton-xpbd-on-metal-measured-2026-09-24-newton-xpbd-archived-as-experimental-on-2026-09-25-see-gapsmd).
+
+**Cameras on Newton scenes.** `metalsim.render.newton_bridge.NewtonRenderSource(model)` turns any Newton model into
+the `sim` argument of the renderers (tiers 0/1/2), the ray-traced sensors and the annotators:
+
+- It compiles a render twin from the Newton shapes, or uses the source MJCF with `twin=mj_model` for the
+  MuJoCo-via-Newton path.
+- Each frame, `update(state)` writes the poses from `State.body_q` on the GPU. Each env sees its own world plus the
+  global shapes.
+- Cloth, soft-body surfaces and particles go through the dynamic-mesh and particle paths:
+  `renderer_kwargs()`, `sources`, `attach_particles`.
+
+Design, coverage against the MuJoCo path, cost and the differences from Isaac Lab 3.0 are in
+[`NEWTON_RENDER.md`](NEWTON_RENDER.md).
 
 ## 6. Throughput vs fidelity
 

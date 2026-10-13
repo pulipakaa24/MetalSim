@@ -1,0 +1,51 @@
+{
+ "argv": [
+  "--part",
+  "rigid",
+  "--device",
+  "metal:0",
+  "--worlds",
+  "2048",
+  "--max-triangle-pairs",
+  "8388608",
+  "--warmup",
+  "3",
+  "--kprof",
+  "collide",
+  "--kprof-ticks",
+  "20",
+  "--json",
+  "/Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/runs/rigid_perf/out/sweepfix_160.json"
+ ],
+ "device": "metal:0",
+ "device_name": "Apple M4 Max",
+ "warp": "1.18.0.dev20260917",
+ "newton": "1.5.2",
+ "worlds": 2048,
+ "part": "rigid",
+ "det": "off",
+ "pipeline_det": false,
+ "mode": "eager",
+ "max_triangle_pairs": 8388608,
+ "bodies": 26624,
+ "shapes": 188417,
+ "joints": 26624,
+ "dofs": 43008,
+ "build_s": 0.9836649579992809,
+ "solver_init_s": 1.7337615830001596,
+ "rigid_contact_max": 14053376,
+ "kprof": {
+  "phase": "collide",
+  "reps": 20,
+  "wall_ms_per_rep": 80.03618539996751,
+  "profiling": false,
+  "per_rep_counters": {
+   "host_waits": 0.05,
+   "command_buffers": 0.25,
+   "host_ops": 0.0,
+   "dispatches": 29.0
+  }
+ },
+ "rigid_contacts": 81920,
+ "maxrss_mb": 3324.21875
+}

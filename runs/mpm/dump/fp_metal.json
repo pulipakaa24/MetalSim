@@ -1,0 +1,59 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module kernels__locals__madd_e3cee3d6 e3cee3d load on device 'metal:0' took 432.74 ms  (compiled)
+Module kernels__locals__dot3_b62a04eb b62a04e load on device 'metal:0' took 372.11 ms  (compiled)
+Module kernels__locals__div_0b197d43 0b197d4 load on device 'metal:0' took 365.42 ms  (compiled)
+Module kernels__locals__sqrt__d07781a5 d07781a load on device 'metal:0' took 364.54 ms  (compiled)
+Module kernels__locals__norm_17060c68 17060c6 load on device 'metal:0' took 394.82 ms  (compiled)
+Module kernels__locals__madd_b39fb270 b39fb27 load on device 'metal:0' took 71.92 ms  (compiled)
+Module kernels__locals__dot3_da8fb6f9 da8fb6f load on device 'metal:0' took 73.75 ms  (compiled)
+Module kernels__locals__div_f6c4a5e4 f6c4a5e load on device 'metal:0' took 72.01 ms  (compiled)
+Module kernels__locals__sqrt__04a629b1 04a629b load on device 'metal:0' took 71.47 ms  (compiled)
+Module kernels__locals__norm_4e900186 4e90018 load on device 'metal:0' took 71.19 ms  (compiled)
+{
+ "device": "metal:0",
+ "warp": "1.18.0.dev20260917",
+ "precise.madd": {
+  "md5": "2b036ffb48ca",
+  "eq_separate": 1.0,
+  "eq_fma": 1.52587890625e-05
+ },
+ "precise.dot3": {
+  "md5": "5a161864469a"
+ },
+ "precise.div": {
+  "md5": "bd48eb3d6e0e",
+  "eq_correctly_rounded": 1.0
+ },
+ "precise.sqrt": {
+  "md5": "c12bd388a9b8",
+  "eq_correctly_rounded": 1.0
+ },
+ "precise.norm": {
+  "md5": "34424d888be3"
+ },
+ "fast.madd": {
+  "md5": "2b036ffb48ca",
+  "eq_separate": 1.0,
+  "eq_fma": 1.52587890625e-05
+ },
+ "fast.dot3": {
+  "md5": "5a161864469a"
+ },
+ "fast.div": {
+  "md5": "bd48eb3d6e0e",
+  "eq_correctly_rounded": 1.0
+ },
+ "fast.sqrt": {
+  "md5": "c12bd388a9b8",
+  "eq_correctly_rounded": 1.0
+ },
+ "fast.norm": {
+  "md5": "34424d888be3"
+ }
+}

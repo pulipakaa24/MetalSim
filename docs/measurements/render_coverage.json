@@ -1,0 +1,924 @@
+[
+ {
+  "probe": "geom types",
+  "objects": {
+   "sphere": {
+    "tier0": {
+     "px": 256,
+     "rgb": 0.996,
+     "depth": 0.996,
+     "depth_err_med_m": 0.0007,
+     "seg_any": 0.996,
+     "seg_correct": 0.996
+    },
+    "tier1": {
+     "px": 256,
+     "rgb": 0.996,
+     "depth": 0.996,
+     "depth_err_med_m": 0.0007,
+     "seg_any": 0.996,
+     "seg_correct": 0.996
+    },
+    "tier2": {
+     "px": 256,
+     "rgb": 1.0,
+     "depth": 0.996,
+     "depth_err_med_m": 0.0006,
+     "seg_any": 0.996,
+     "seg_correct": 0.996
+    },
+    "raydepth": {
+     "px": 256,
+     "depth": 0.996,
+     "depth_err_med_m": 0.0006
+    }
+   },
+   "capsule": {
+    "tier0": {
+     "px": 231,
+     "rgb": 0.996,
+     "depth": 0.996,
+     "depth_err_med_m": 0.0003,
+     "seg_any": 0.996,
+     "seg_correct": 0.996
+    },
+    "tier1": {
+     "px": 231,
+     "rgb": 0.996,
+     "depth": 0.996,
+     "depth_err_med_m": 0.0003,
+     "seg_any": 0.996,
+     "seg_correct": 0.996
+    },
+    "tier2": {
+     "px": 231,
+     "rgb": 1.0,
+     "depth": 0.996,
+     "depth_err_med_m": 0.0003,
+     "seg_any": 0.996,
+     "seg_correct": 0.996
+    },
+    "raydepth": {
+     "px": 231,
+     "depth": 0.996,
+     "depth_err_med_m": 0.0003
+    }
+   },
+   "ellipsoid": {
+    "tier0": {
+     "px": 181,
+     "rgb": 1.0,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0006,
+     "seg_any": 1.0,
+     "seg_correct": 1.0
+    },
+    "tier1": {
+     "px": 181,
+     "rgb": 1.0,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0006,
+     "seg_any": 1.0,
+     "seg_correct": 1.0
+    },
+    "tier2": {
+     "px": 181,
+     "rgb": 1.0,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0006,
+     "seg_any": 1.0,
+     "seg_correct": 1.0
+    },
+    "raydepth": {
+     "px": 181,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0006
+    }
+   },
+   "cylinder": {
+    "tier0": {
+     "px": 238,
+     "rgb": 1.0,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0003,
+     "seg_any": 1.0,
+     "seg_correct": 1.0
+    },
+    "tier1": {
+     "px": 238,
+     "rgb": 1.0,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0003,
+     "seg_any": 1.0,
+     "seg_correct": 1.0
+    },
+    "tier2": {
+     "px": 238,
+     "rgb": 1.0,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0003,
+     "seg_any": 1.0,
+     "seg_correct": 1.0
+    },
+    "raydepth": {
+     "px": 238,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0003
+    }
+   },
+   "box": {
+    "tier0": {
+     "px": 272,
+     "rgb": 1.0,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0,
+     "seg_any": 1.0,
+     "seg_correct": 1.0
+    },
+    "tier1": {
+     "px": 272,
+     "rgb": 1.0,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0,
+     "seg_any": 1.0,
+     "seg_correct": 1.0
+    },
+    "tier2": {
+     "px": 272,
+     "rgb": 1.0,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0,
+     "seg_any": 1.0,
+     "seg_correct": 1.0
+    },
+    "raydepth": {
+     "px": 272,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0
+    }
+   },
+   "mesh": {
+    "tier0": {
+     "px": 156,
+     "rgb": 1.0,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0,
+     "seg_any": 1.0,
+     "seg_correct": 1.0
+    },
+    "tier1": {
+     "px": 156,
+     "rgb": 1.0,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0,
+     "seg_any": 1.0,
+     "seg_correct": 1.0
+    },
+    "tier2": {
+     "px": 156,
+     "rgb": 1.0,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0,
+     "seg_any": 1.0,
+     "seg_correct": 1.0
+    },
+    "raydepth": {
+     "px": 156,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0
+    }
+   },
+   "sdf": {
+    "tier0": {
+     "px": 223,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0,
+     "seg_correct": 0.0
+    },
+    "tier1": {
+     "px": 223,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0,
+     "seg_correct": 0.0
+    },
+    "tier2": {
+     "px": 223,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0,
+     "seg_correct": 0.0
+    },
+    "raydepth": {
+     "px": 223,
+     "depth": 0.0
+    }
+   },
+   "hfield": {
+    "tier0": {
+     "px": 173,
+     "rgb": 0.85,
+     "depth": 0.85,
+     "depth_err_med_m": 0.0,
+     "seg_any": 0.85,
+     "seg_correct": 0.85
+    },
+    "tier1": {
+     "px": 173,
+     "rgb": 0.85,
+     "depth": 0.85,
+     "depth_err_med_m": 0.0,
+     "seg_any": 0.85,
+     "seg_correct": 0.85
+    },
+    "tier2": {
+     "px": 173,
+     "rgb": 0.954,
+     "depth": 0.85,
+     "depth_err_med_m": 0.0,
+     "seg_any": 0.85,
+     "seg_correct": 0.85
+    },
+    "raydepth": {
+     "px": 173,
+     "depth": 0.85,
+     "depth_err_med_m": 0.0
+    }
+   },
+   "plane": {
+    "tier0": {
+     "px": 594,
+     "rgb": 1.0,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0,
+     "seg_any": 1.0,
+     "seg_correct": 1.0
+    },
+    "tier1": {
+     "px": 594,
+     "rgb": 1.0,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0,
+     "seg_any": 1.0,
+     "seg_correct": 1.0
+    },
+    "tier2": {
+     "px": 594,
+     "rgb": 1.0,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0,
+     "seg_any": 1.0,
+     "seg_correct": 1.0
+    },
+    "raydepth": {
+     "px": 594,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0
+    }
+   }
+  }
+ },
+ {
+  "probe": "non-geom visuals",
+  "objects": {
+   "site_sphere": {
+    "tier0": {
+     "px": 153,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0
+    },
+    "tier1": {
+     "px": 153,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0
+    },
+    "tier2": {
+     "px": 153,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0
+    },
+    "raydepth": {
+     "px": 153,
+     "depth": 0.0
+    }
+   },
+   "site_box": {
+    "tier0": {
+     "px": 159,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0
+    },
+    "tier1": {
+     "px": 159,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0
+    },
+    "tier2": {
+     "px": 159,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0
+    },
+    "raydepth": {
+     "px": 159,
+     "depth": 0.0
+    }
+   },
+   "tendon": {
+    "tier0": {
+     "px": 111,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0
+    },
+    "tier1": {
+     "px": 111,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0
+    },
+    "tier2": {
+     "px": 111,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0
+    },
+    "raydepth": {
+     "px": 111,
+     "depth": 0.0
+    }
+   },
+   "flex_cable_1d": {
+    "tier0": {
+     "px": 0
+    },
+    "tier1": {
+     "px": 0
+    },
+    "tier2": {
+     "px": 0
+    },
+    "raydepth": {
+     "px": 0
+    }
+   },
+   "flex_cloth_2d": {
+    "tier0": {
+     "px": 277,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0
+    },
+    "tier1": {
+     "px": 277,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0
+    },
+    "tier2": {
+     "px": 277,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0
+    },
+    "raydepth": {
+     "px": 277,
+     "depth": 0.0
+    }
+   },
+   "flex_soft_3d": {
+    "tier0": {
+     "px": 152,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0
+    },
+    "tier1": {
+     "px": 152,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0
+    },
+    "tier2": {
+     "px": 152,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0
+    },
+    "raydepth": {
+     "px": 152,
+     "depth": 0.0
+    }
+   },
+   "skin": {
+    "tier0": {
+     "px": 236,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0
+    },
+    "tier1": {
+     "px": 236,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0
+    },
+    "tier2": {
+     "px": 236,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0
+    },
+    "raydepth": {
+     "px": 236,
+     "depth": 0.0
+    }
+   }
+  },
+  "model": {
+   "nflex": 3,
+   "nflexvert": 84,
+   "nskin": 1,
+   "ntendon": 1,
+   "nsite": 4,
+   "ngeom": 1,
+   "nbody": 88
+  }
+ },
+ {
+  "probe": "transparency (glass alpha 0.25 in front of a red box)",
+  "px": 1140,
+  "mujoco_mean_rgb": [
+   141,
+   59,
+   124
+  ],
+  "tier0": {
+   "mean_rgb": [
+    25,
+    25,
+    172
+   ],
+   "seg_is_glass": 1.0,
+   "depth_median_m": 1.904
+  },
+  "tier2": {
+   "mean_rgb": [
+    23,
+    23,
+    147
+   ],
+   "seg_is_glass": 1.0,
+   "depth_median_m": 1.904
+  },
+  "raydepth_median_m": 1.904
+ },
+ {
+  "probe": "far plane / infinite plane",
+  "objects": {
+   "ground": {
+    "tier0": {
+     "px": 10418,
+     "rgb": 0.369,
+     "depth": 0.369,
+     "depth_err_med_m": 0.0,
+     "seg_any": 0.369,
+     "seg_correct": 0.369
+    },
+    "tier1": {
+     "px": 10418,
+     "rgb": 0.369,
+     "depth": 0.369,
+     "depth_err_med_m": 0.0,
+     "seg_any": 0.369,
+     "seg_correct": 0.369
+    },
+    "tier2": {
+     "px": 10418,
+     "rgb": 0.388,
+     "depth": 0.369,
+     "depth_err_med_m": 0.0,
+     "seg_any": 0.369,
+     "seg_correct": 0.369
+    },
+    "raydepth": {
+     "px": 10418,
+     "depth": 0.369,
+     "depth_err_med_m": 0.0
+    },
+    "ref_depth_range_m": [
+     3.26,
+     292.45
+    ]
+   },
+   "box6": {
+    "tier0": {
+     "px": 254,
+     "rgb": 1.0,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0002,
+     "seg_any": 1.0,
+     "seg_correct": 1.0
+    },
+    "tier1": {
+     "px": 254,
+     "rgb": 1.0,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0002,
+     "seg_any": 1.0,
+     "seg_correct": 1.0
+    },
+    "tier2": {
+     "px": 254,
+     "rgb": 1.0,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0,
+     "seg_any": 1.0,
+     "seg_correct": 1.0
+    },
+    "raydepth": {
+     "px": 254,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0
+    },
+    "ref_depth_range_m": [
+     5.68,
+     6.15
+    ]
+   },
+   "box15": {
+    "tier0": {
+     "px": 256,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0,
+     "seg_correct": 0.0
+    },
+    "tier1": {
+     "px": 256,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0,
+     "seg_correct": 0.0
+    },
+    "tier2": {
+     "px": 256,
+     "rgb": 1.0,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0,
+     "seg_any": 1.0,
+     "seg_correct": 1.0
+    },
+    "raydepth": {
+     "px": 256,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0
+    },
+    "ref_depth_range_m": [
+     14.15,
+     14.22
+    ]
+   },
+   "box40": {
+    "tier0": {
+     "px": 174,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0,
+     "seg_correct": 0.0
+    },
+    "tier1": {
+     "px": 174,
+     "rgb": 0.0,
+     "depth": 0.0,
+     "seg_any": 0.0,
+     "seg_correct": 0.0
+    },
+    "tier2": {
+     "px": 174,
+     "rgb": 1.0,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0001,
+     "seg_any": 1.0,
+     "seg_correct": 1.0
+    },
+    "raydepth": {
+     "px": 174,
+     "depth": 1.0,
+     "depth_err_med_m": 0.0001
+    },
+    "ref_depth_range_m": [
+     37.83,
+     41.39
+    ]
+   }
+  }
+ },
+ {
+  "probe": "textures",
+  "objects": {
+   "tex_sphere": {
+    "px": 259,
+    "ref_lum_std": 93.2,
+    "tier0": {
+     "lum_std": 106.5,
+     "corr_vs_mujoco": -0.942,
+     "mean_abs_diff": 192.3,
+     "mean_rgb": [
+      138,
+      138,
+      138
+     ],
+     "ref_mean_rgb": [
+      128,
+      128,
+      129
+     ]
+    },
+    "tier2": {
+     "lum_std": 99.2,
+     "corr_vs_mujoco": -0.97,
+     "mean_abs_diff": 183.2,
+     "mean_rgb": [
+      158,
+      158,
+      163
+     ],
+     "ref_mean_rgb": [
+      128,
+      128,
+      129
+     ]
+    }
+   },
+   "tex_cylinder": {
+    "px": 261,
+    "ref_lum_std": 90.9,
+    "tier0": {
+     "lum_std": 0.0,
+     "corr_vs_mujoco": NaN,
+     "mean_abs_diff": 134.0,
+     "mean_rgb": [
+      6,
+      6,
+      6
+     ],
+     "ref_mean_rgb": [
+      140,
+      140,
+      141
+     ]
+    },
+    "tier2": {
+     "lum_std": 8.7,
+     "corr_vs_mujoco": 0.032,
+     "mean_abs_diff": 128.5,
+     "mean_rgb": [
+      11,
+      11,
+      13
+     ],
+     "ref_mean_rgb": [
+      140,
+      140,
+      141
+     ]
+    }
+   },
+   "tex_capsule": {
+    "px": 224,
+    "ref_lum_std": 81.5,
+    "tier0": {
+     "lum_std": 8.6,
+     "corr_vs_mujoco": 0.027,
+     "mean_abs_diff": 126.9,
+     "mean_rgb": [
+      7,
+      7,
+      7
+     ],
+     "ref_mean_rgb": [
+      133,
+      133,
+      134
+     ]
+    },
+    "tier2": {
+     "lum_std": 9.2,
+     "corr_vs_mujoco": 0.005,
+     "mean_abs_diff": 121.8,
+     "mean_rgb": [
+      11,
+      11,
+      13
+     ],
+     "ref_mean_rgb": [
+      133,
+      133,
+      134
+     ]
+    }
+   },
+   "tex_box_2d": {
+    "px": 352,
+    "ref_lum_std": 79.7,
+    "tier0": {
+     "lum_std": 106.9,
+     "corr_vs_mujoco": 0.858,
+     "mean_abs_diff": 38.6,
+     "mean_rgb": [
+      132,
+      132,
+      132
+     ],
+     "ref_mean_rgb": [
+      134,
+      134,
+      135
+     ]
+    },
+    "tier2": {
+     "lum_std": 94.5,
+     "corr_vs_mujoco": 0.912,
+     "mean_abs_diff": 37.1,
+     "mean_rgb": [
+      160,
+      160,
+      167
+     ],
+     "ref_mean_rgb": [
+      134,
+      134,
+      135
+     ]
+    }
+   },
+   "tex_box_cube": {
+    "px": 378,
+    "ref_lum_std": 98.7,
+    "tier0": {
+     "lum_std": 107.0,
+     "corr_vs_mujoco": 0.082,
+     "mean_abs_diff": 99.6,
+     "mean_rgb": [
+      136,
+      136,
+      136
+     ],
+     "ref_mean_rgb": [
+      125,
+      125,
+      126
+     ]
+    },
+    "tier2": {
+     "lum_std": 92.1,
+     "corr_vs_mujoco": 0.063,
+     "mean_abs_diff": 106.3,
+     "mean_rgb": [
+      167,
+      167,
+      174
+     ],
+     "ref_mean_rgb": [
+      125,
+      125,
+      126
+     ]
+    }
+   },
+   "tex_mesh_uv": {
+    "px": 332,
+    "ref_lum_std": 5.1,
+    "tier0": {
+     "lum_std": 10.0,
+     "corr_vs_mujoco": 0.504,
+     "mean_abs_diff": 86.1,
+     "mean_rgb": [
+      82,
+      90,
+      142
+     ],
+     "ref_mean_rgb": [
+      139,
+      89,
+      86
+     ]
+    },
+    "tier2": {
+     "lum_std": 9.4,
+     "corr_vs_mujoco": 0.278,
+     "mean_abs_diff": 98.3,
+     "mean_rgb": [
+      101,
+      111,
+      172
+     ],
+     "ref_mean_rgb": [
+      139,
+      89,
+      86
+     ]
+    }
+   }
+  },
+  "skybox_background": {
+   "mujoco_lum_std": 17.8,
+   "tier0": 0.8,
+   "tier2": 2.8
+  },
+  "mesh_uv_orientation": {
+   "mujoco": {
+    "top": "blue",
+    "bottom": "red"
+   },
+   "tier0": {
+    "top": "red",
+    "bottom": "blue"
+   },
+   "tier2": {
+    "top": "red",
+    "bottom": "blue"
+   }
+  }
+ },
+ {
+  "probe": "10 point lights, one floor patch each (patch luminance per light index)",
+  "mujoco": [
+   39.5,
+   36.2,
+   42.1,
+   38.2,
+   42.0,
+   40.5,
+   39.4,
+   40.2,
+   0.3,
+   0.0
+  ],
+  "tier0": [
+   41.9,
+   42.3,
+   42.8,
+   42.9,
+   43.2,
+   43.2,
+   43.0,
+   43.1,
+   0.0,
+   0.0
+  ],
+  "tier2": [
+   41.7,
+   41.9,
+   42.3,
+   42.6,
+   42.7,
+   42.7,
+   42.8,
+   42.6,
+   42.4,
+   42.4
+  ]
+ },
+ {
+  "probe": "shadows per light type (ratio shadowed/unshadowed floor luminance; 1.0 = no shadow)",
+  "spot": {
+   "mujoco": 0.0,
+   "tier0": 1.044,
+   "tier1": 1.041,
+   "tier2": 0.033
+  },
+  "point": {
+   "mujoco": 1.0,
+   "tier0": 1.019,
+   "tier1": 1.017,
+   "tier2": 0.035
+  },
+  "directional": {
+   "mujoco": 0.0,
+   "tier0": 0.052,
+   "tier1": 0.049,
+   "tier2": 0.041
+  }
+ },
+ {
+  "probe": "mesh normals (luminance std inside the object; a box has 3 flat faces visible)",
+  "mesh_box": {
+   "mujoco": 2.9,
+   "tier0": 43.7,
+   "tier2": 43.5
+  },
+  "prim_box": {
+   "mujoco": 3.1,
+   "tier0": 1.4,
+   "tier2": 4.2
+  }
+ }
+]
