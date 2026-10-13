@@ -109,11 +109,12 @@ spec = mujoco.MjSpec.from_file(MENAGERIE)
 for l in list(spec.lights):
     spec.delete(l)
 tex = spec.add_texture(name="sand_ground", type=mujoco.mjtTexture.mjTEXTURE_2D, file=sand_tex)
+# linear colorspace, explicitly: MuJoCo already loads this PNG as linear (tex_colorspace 1), so the atlas samples its
+# bytes as they are, before and after the 2026-10 atlas fix (which decodes only textures marked sRGB); the tint below
+# divides by that mean (an sRGB-decoded mean clipped the tint and brightened the plane, 2026-10-13)
+tex.colorspace = mujoco.mjtColorSpace.mjCOLORSPACE_LINEAR
 img = iio.imread(sand_tex)[..., :3].astype(np.float32) / 255.0
-# the texture's mean albedo as the renderer samples it: sRGB-decoded since the 2026-10 atlas fix (before it the bytes
-# were read as linear values; the 2026-10-12 clip used that, with the same resulting plane albedo)
-srgb_decode = not a.flip_mesh_v
-tex_mean = ((img ** 2.2) if srgb_decode else img).reshape(-1, 3).mean(0)
+tex_mean = img.reshape(-1, 3).mean(0)
 grain_mat = GrainMaterial()
 pal = np.array([p[:3] for p in grain_mat.palette]); w = np.array([p[3] for p in grain_mat.palette])
 grain_mean = (pal * w[:, None]).sum(0) / w.sum()
