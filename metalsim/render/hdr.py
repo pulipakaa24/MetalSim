@@ -79,7 +79,8 @@ def load_hdr(path: str) -> np.ndarray:
 
 def env_direction(u, v, yaw=0.0):
     """World direction of equirectangular coordinates (u, v) in [0, 1] under the tier-2 dome convention
-    (shaders/pathtrace.metal env_dir: pole +z, u = 0.5 faces -y, ``yaw`` about +z)."""
+    (shaders/pathtrace.metal env_dir: OpenUSD's z-up DomeLight_1 frame, pole +z, u = 0.5 faces -y, ``yaw`` about +z;
+    a USD stage's dome as Kit renders it is at ``yaw = prim yaw + tier2.KIT_DOME_AZIMUTH``)."""
     lon = (0.5 - np.asarray(u, np.float64)) * 2 * np.pi + yaw
     th = np.asarray(v, np.float64) * np.pi
     return np.stack([np.sin(th) * np.sin(lon), -np.sin(th) * np.cos(lon), np.cos(th)], -1)

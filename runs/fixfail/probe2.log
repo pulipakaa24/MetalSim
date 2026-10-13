@@ -1,0 +1,140 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth dc949da load on device 'metal:0' took 62.95 ms  (cached)
+Module _nxn_broadphase__locals__kernel_80a41a9c 80a41a9 load on device 'metal:0' took 41.77 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_285313d0 285313d load on device 'metal:0' took 59.98 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_d1f0516f d1f0516 load on device 'metal:0' took 45.65 ms  (cached)
+Module mujoco_warp._src.constraint 4b2565f load on device 'metal:0' took 39.54 ms  (cached)
+Module _friction_dof__locals__kernel_54b217fe 54b217f load on device 'metal:0' took 39.74 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_b316a999 b316a99 load on device 'metal:0' took 42.82 ms  (cached)
+Module _efc_contact_init__locals__kernel_1d2a56f7 1d2a56f load on device 'metal:0' took 39.02 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_4199f103 a26dd4c load on device 'metal:0' took 45.17 ms  (cached)
+Module _efc_contact_update__locals__kernel_c1a7040e c1a7040 load on device 'metal:0' took 40.27 ms  (cached)
+Module mujoco_warp._src.forward 53c9939 load on device 'metal:0' took 52.99 ms  (cached)
+Module mujoco_warp._src.passive 121cefe load on device 'metal:0' took 51.22 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_ec74e588 ec74e58 load on device 'metal:0' took 38.99 ms  (cached)
+Module mujoco_warp._src.forward 9c6583c load on device 'metal:0' took 52.56 ms  (cached)
+Module _qfrc_smooth__locals__kernel_b9a126c0 b9a126c load on device 'metal:0' took 39.13 ms  (cached)
+Module mujoco_warp._src.support d1f2881 load on device 'metal:0' took 40.73 ms  (cached)
+Module _factor_i_sparse_unrolled__locals__kernel_7ac910f7 ab82c34 load on device 'metal:0' took 41.29 ms  (cached)
+Module _solve_LD_sparse_serial__locals__kernel_af3ba8f1 a010231 load on device 'metal:0' took 40.34 ms  (cached)
+Module _solve_init_dof__locals__kernel_a278b607 a278b60 load on device 'metal:0' took 39.77 ms  (cached)
+Module _solve_init_efc__locals__kernel_38f8708b 38f8708 load on device 'metal:0' took 39.01 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_e260fcc8 e260fcc load on device 'metal:0' took 38.74 ms  (cached)
+Module mul_m_kernel__locals___mul_m_1b897f73 1b897f7 load on device 'metal:0' took 39.21 ms  (cached)
+Module _update_constraint_efc__locals__kernel_875e0cfe 875e0cf load on device 'metal:0' took 39.55 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_9318117e 9318117 load on device 'metal:0' took 38.63 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_be8f77c5 be8f77c load on device 'metal:0' took 38.80 ms  (cached)
+Module _update_gradient_grad__locals__kernel_b82c9bc8 b82c9bc load on device 'metal:0' took 38.48 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_3f38034d 1aad02c load on device 'metal:0' took 495.26 ms  (compiled)
+Module mujoco_warp._src.solver 00c4ab6 load on device 'metal:0' took 42.98 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_81a45505 28b7d27 load on device 'metal:0' took 39.03 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_610933f9 84af0ad load on device 'metal:0' took 43.92 ms  (cached)
+Module _update_constraint_gradient_fused__locals__kernel_cb8cff00 ce6a002 load on device 'metal:0' took 41.34 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_38f58d00 51cb22a load on device 'metal:0' took 38.89 ms  (cached)
+Module _solve_done__locals__kernel_f1d63dbf f1d63db load on device 'metal:0' took 38.92 ms  (cached)
+Module mujoco_warp._src.sensor 7e89d17 load on device 'metal:0' took 62.14 ms  (cached)
+Module mujoco_warp._src.derivative 3eaf30a load on device 'metal:0' took 45.00 ms  (cached)
+Module _next_time_builder__locals___next_time_89d592b4 89d592b load on device 'metal:0' took 39.39 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_99f1ed31 99f1ed3 load on device 'metal:0' took 39.27 ms  (cached)
+Module reset_data__locals__reset_M_c0d46912 c0d4691 load on device 'metal:0' took 38.87 ms  (cached)
+Module reset_data__locals__reset_mocap_21cdccdf 21cdccd load on device 'metal:0' took 38.92 ms  (cached)
+Module reset_data__locals__reset_contact_e7d9f88d e7d9f88 load on device 'metal:0' took 39.09 ms  (cached)
+Module reset_data__locals__reset_sleep_c3616e3d c3616e3 load on device 'metal:0' took 39.36 ms  (cached)
+Module reset_data__locals__reset_nworld_f3f460ae f3f460a load on device 'metal:0' took 39.00 ms  (cached)
+Module metalsim.sensors.contact a6f6b43 load on device 'metal:0' took 45.69 ms  (cached)
+Module metalsim.learn.g1_velocity ab6d8eb load on device 'metal:0' took 51.15 ms  (cached)
+Module _solve_init_efc__locals__kernel_76688e06 76688e0 load on device 'metal:0' took 39.64 ms  (cached)
+Module _solve_done__locals__kernel_7965d769 7965d76 load on device 'metal:0' took 39.93 ms  (cached)
+model: cone elliptic | njmax 24 naconmax 1536 | bounds: None
+Module metalsim.learn.warp_policy ab35144 load on device 'metal:0' took 41.65 ms  (cached)
+step   0: nefc max 12 (> njmax in 0 worlds), nacon 29, flagged 0, cleared by this step's resets 0
+step   1: nefc max 14 (> njmax in 0 worlds), nacon 89, flagged 0, cleared by this step's resets 0
+step   2: nefc max 20 (> njmax in 0 worlds), nacon 115, flagged 0, cleared by this step's resets 0
+step   9: nefc max 19 (> njmax in 0 worlds), nacon 105, flagged 9, cleared by this step's resets 0
+step  19: nefc max 17 (> njmax in 0 worlds), nacon 94, flagged 10, cleared by this step's resets 0
+step  29: nefc max 18 (> njmax in 0 worlds), nacon 74, flagged 12, cleared by this step's resets 0
+step  39: nefc max 19 (> njmax in 0 worlds), nacon 56, flagged 12, cleared by this step's resets 0
+step  49: nefc max 21 (> njmax in 0 worlds), nacon 69, flagged 11, cleared by this step's resets 1
+step  59: nefc max 22 (> njmax in 0 worlds), nacon 109, flagged 14, cleared by this step's resets 0
+step  69: nefc max 22 (> njmax in 0 worlds), nacon 125, flagged 20, cleared by this step's resets 1
+step  79: nefc max 14 (> njmax in 0 worlds), nacon 62, flagged 20, cleared by this step's resets 0
+step  89: nefc max 18 (> njmax in 0 worlds), nacon 73, flagged 20, cleared by this step's resets 0
+step  99: nefc max 17 (> njmax in 0 worlds), nacon 86, flagged 19, cleared by this step's resets 1
+check_overflow raised: MuJoCo Warp capacity overflow {'NEFC': 18} (worlds affected): raise njmax / nconmax (current njmax 24, naconmax 1536 = 24 per world)
+{"njmax": "24", "nconmax": "24", "steps": 100, "nefc_max": 27, "nacon_max": 164, "worlds_ever_overflowed": 31, "steps_with_overflow": 96, "flags_cleared_by_reset": 18, "resets": 84, "final_flags": {"NEFC": 18, "ITERATIONS": 6, "LS_ITERATIONS": 60}, "check_overflow_raised": true}
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth dc949da load on device 'metal:0' took 63.56 ms  (cached)
+Module _nxn_broadphase__locals__kernel_80a41a9c 80a41a9 load on device 'metal:0' took 41.71 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_285313d0 285313d load on device 'metal:0' took 60.01 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_d1f0516f d1f0516 load on device 'metal:0' took 46.97 ms  (cached)
+Module mujoco_warp._src.constraint 4b2565f load on device 'metal:0' took 39.31 ms  (cached)
+Module _friction_dof__locals__kernel_54b217fe 54b217f load on device 'metal:0' took 39.43 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_b316a999 b316a99 load on device 'metal:0' took 39.62 ms  (cached)
+Module _efc_contact_init__locals__kernel_1d2a56f7 1d2a56f load on device 'metal:0' took 38.84 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_4199f103 a26dd4c load on device 'metal:0' took 39.82 ms  (cached)
+Module _efc_contact_update__locals__kernel_c1a7040e c1a7040 load on device 'metal:0' took 40.13 ms  (cached)
+Module mujoco_warp._src.forward 53c9939 load on device 'metal:0' took 52.51 ms  (cached)
+Module mujoco_warp._src.passive 121cefe load on device 'metal:0' took 50.67 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_ec74e588 ec74e58 load on device 'metal:0' took 38.93 ms  (cached)
+Module mujoco_warp._src.forward 9c6583c load on device 'metal:0' took 52.87 ms  (cached)
+Module _qfrc_smooth__locals__kernel_b9a126c0 b9a126c load on device 'metal:0' took 39.26 ms  (cached)
+Module mujoco_warp._src.support d1f2881 load on device 'metal:0' took 39.83 ms  (cached)
+Module _factor_i_sparse_unrolled__locals__kernel_7ac910f7 ab82c34 load on device 'metal:0' took 41.50 ms  (cached)
+Module _solve_LD_sparse_serial__locals__kernel_af3ba8f1 a010231 load on device 'metal:0' took 43.17 ms  (cached)
+Module _solve_init_dof__locals__kernel_a278b607 a278b60 load on device 'metal:0' took 39.13 ms  (cached)
+Module _solve_init_efc__locals__kernel_38f8708b 38f8708 load on device 'metal:0' took 43.13 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_e260fcc8 e260fcc load on device 'metal:0' took 38.82 ms  (cached)
+Module mul_m_kernel__locals___mul_m_1b897f73 1b897f7 load on device 'metal:0' took 39.35 ms  (cached)
+Module _update_constraint_efc__locals__kernel_875e0cfe 875e0cf load on device 'metal:0' took 39.51 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_9318117e 9318117 load on device 'metal:0' took 38.67 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_be8f77c5 be8f77c load on device 'metal:0' took 38.76 ms  (cached)
+Module _update_gradient_grad__locals__kernel_b82c9bc8 b82c9bc load on device 'metal:0' took 38.76 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_18f642b2 1927eca load on device 'metal:0' took 493.27 ms  (compiled)
+Module mujoco_warp._src.solver 00c4ab6 load on device 'metal:0' took 43.74 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_81a45505 28b7d27 load on device 'metal:0' took 38.78 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_610933f9 84af0ad load on device 'metal:0' took 43.73 ms  (cached)
+Module _update_constraint_gradient_fused__locals__kernel_cb8cff00 ce6a002 load on device 'metal:0' took 41.32 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_38f58d00 51cb22a load on device 'metal:0' took 38.90 ms  (cached)
+Module _solve_done__locals__kernel_f1d63dbf f1d63db load on device 'metal:0' took 39.04 ms  (cached)
+Module mujoco_warp._src.sensor 7e89d17 load on device 'metal:0' took 61.76 ms  (cached)
+Module mujoco_warp._src.derivative 3eaf30a load on device 'metal:0' took 45.19 ms  (cached)
+Module _next_time_builder__locals___next_time_89d592b4 89d592b load on device 'metal:0' took 39.62 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_99f1ed31 99f1ed3 load on device 'metal:0' took 38.88 ms  (cached)
+Module reset_data__locals__reset_M_c0d46912 c0d4691 load on device 'metal:0' took 38.83 ms  (cached)
+Module reset_data__locals__reset_mocap_21cdccdf 21cdccd load on device 'metal:0' took 38.98 ms  (cached)
+Module reset_data__locals__reset_contact_e7d9f88d e7d9f88 load on device 'metal:0' took 38.62 ms  (cached)
+Module reset_data__locals__reset_sleep_c3616e3d c3616e3 load on device 'metal:0' took 39.01 ms  (cached)
+Module reset_data__locals__reset_nworld_f3f460ae f3f460a load on device 'metal:0' took 39.07 ms  (cached)
+Module metalsim.sensors.contact a6f6b43 load on device 'metal:0' took 45.06 ms  (cached)
+Module metalsim.learn.g1_velocity ab6d8eb load on device 'metal:0' took 50.15 ms  (cached)
+Module _solve_init_efc__locals__kernel_76688e06 76688e0 load on device 'metal:0' took 39.55 ms  (cached)
+Module _solve_done__locals__kernel_7965d769 7965d76 load on device 'metal:0' took 39.09 ms  (cached)
+model: cone elliptic | njmax 26 naconmax 1536 | bounds: None
+Module metalsim.learn.warp_policy ab35144 load on device 'metal:0' took 42.16 ms  (cached)
+step   0: nefc max 12 (> njmax in 0 worlds), nacon 29, flagged 0, cleared by this step's resets 0
+step   1: nefc max 14 (> njmax in 0 worlds), nacon 89, flagged 0, cleared by this step's resets 0
+step   2: nefc max 20 (> njmax in 0 worlds), nacon 115, flagged 0, cleared by this step's resets 0
+step   9: nefc max 21 (> njmax in 0 worlds), nacon 105, flagged 1, cleared by this step's resets 0
+step  19: nefc max 17 (> njmax in 0 worlds), nacon 96, flagged 1, cleared by this step's resets 0
+step  29: nefc max 18 (> njmax in 0 worlds), nacon 78, flagged 2, cleared by this step's resets 0
+step  39: nefc max 19 (> njmax in 0 worlds), nacon 58, flagged 2, cleared by this step's resets 0
+step  49: nefc max 21 (> njmax in 0 worlds), nacon 67, flagged 2, cleared by this step's resets 0
+step  59: nefc max 22 (> njmax in 0 worlds), nacon 104, flagged 3, cleared by this step's resets 0
+step  69: nefc max 22 (> njmax in 0 worlds), nacon 125, flagged 4, cleared by this step's resets 1
+step  79: nefc max 14 (> njmax in 0 worlds), nacon 64, flagged 2, cleared by this step's resets 0
+step  89: nefc max 18 (> njmax in 0 worlds), nacon 62, flagged 2, cleared by this step's resets 0
+step  99: nefc max 17 (> njmax in 0 worlds), nacon 83, flagged 2, cleared by this step's resets 0
+check_overflow raised: MuJoCo Warp capacity overflow {'NEFC': 2} (worlds affected): raise njmax / nconmax (current njmax 26, naconmax 1536 = 24 per world)
+{"njmax": "26", "nconmax": "24", "steps": 100, "nefc_max": 27, "nacon_max": 164, "worlds_ever_overflowed": 5, "steps_with_overflow": 92, "flags_cleared_by_reset": 4, "resets": 81, "final_flags": {"NEFC": 2, "LS_ITERATIONS": 61}, "check_overflow_raised": true}

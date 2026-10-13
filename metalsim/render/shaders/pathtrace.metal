@@ -5,7 +5,7 @@
 // (Lambert diffuse + GGX specular with Fresnel, same material model and light radiances as tiers
 // 0/1: MuJoCo diffuse x pi), Russian roulette after 3 bounces, environment radiance = model sky
 // colour (uniform) or, with FLAG_ENVMAP, an equirectangular HDR environment map (a textured USD
-// DomeLight: pole +z as Kit/RTX orients it, rotated about z by env_yaw) that is importance-sampled
+// DomeLight: pole +z, OpenUSD's z-up latlong frame, rotated about z by env_yaw) that is importance-sampled
 // for next-event estimation and combined with BRDF sampling by the power heuristic (Veach 1997;
 // PBRT 3rd ed. 14.2.4), emissive materials as area sources through BRDF sampling. Primary-hit depth,
 // normal and segmentation are written for annotators. Envs share one instance acceleration
@@ -354,11 +354,12 @@ inline float4 material_base_ext(Material m, MaterialExt x, float4 mod, float2 uv
 }
 
 // ---- environment map: equirectangular ("latlong") as Kit/RTX orients a USD DomeLight on a z-up stage.
-// USD/OpenEXR define the map with the pole at +y, u = longitude (u = 0.5 faces +z, u = 0.25 faces +x),
-// v = latitude from the top; Kit/RTX treats the dome as z-up (NVIDIA usd-exchange-samples createLights
-// README), i.e. that map rotated +90 deg about x: pole +z, u = 0.5 faces -y, u = 0.25 faces +x (the azimuth
-// reference is the rotation's consequence, not documented by NVIDIA: docs/PARITY.md 1.7). env_yaw rotates
-// the dome about +z (a rotateZ on the DomeLight prim). lon = atan2(x, -y) in [-pi, pi], u = 0.5 - lon / 2pi.
+// OpenEXR's latlong (ImfEnvmap.cpp) has the pole at +y, u = 0.5 facing +z, u = 0.25 facing +x; OpenUSD's
+// DomeLight_1 on a z-up stage (poleAxis "scene" / "Z") puts latitude +-pi/2 at +-z and longitude 0 (u = 0.5)
+// at -y: pole +z, u = 0.5 faces -y, u = 0.25 faces +x. This is that frame. Kit/RTX renders a dome 90 deg
+// clockwise of it (u = 0.5 faces -x; measured 2026-09-26, docs/PARITY.md 1.7): tier2.KIT_DOME_AZIMUTH, added
+// on the host for USD stages. env_yaw rotates the dome about +z (a rotateZ on the DomeLight prim).
+// lon = atan2(x, -y) in [-pi, pi], u = 0.5 - lon / 2pi.
 inline float2 env_uv(float3 d, float yaw) {
     float u = 0.5 - (atan2(d.x, -d.y) - yaw) / (2.0 * PI);
     return float2(u - floor(u), acos(clamp(d.z, -1.0f, 1.0f)) / PI);
