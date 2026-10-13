@@ -650,17 +650,43 @@ def apply_actuator_properties(model, info: PourModelInfo):
     model.joint_effort_limit.assign(eff)
 
 
-def mpm_config(num_envs: int, fill_level: float = MEDIA_FILL_LEVEL):
+# MetalSim memory budgets (PourPhysicsConfig.mpm_grid_budget = "measured"): sparse-grid NanoVDB node capacities from
+# the peak demand of 2,048-world rollouts with random actions (per world 3.6 leaves, 1.1 lower and 0.01 upper nodes,
+# 80 cells; runs/franka_pour/memory/), with about 4x headroom. Newton's automatic capacities reserve a leaf per
+# reserved cell and 16x the lower / upper nodes of the first grid, and the vertex grid takes 8x those again: 12.4 GB
+# of NanoVDB storage at 2,048 worlds for ~2.3k lower nodes in use. Capacities only bound storage: a grid within them
+# is the same grid, so results are bitwise unchanged; an overflow is reported by PourPhysics.check_status (the PPO
+# loop calls it once per iteration).
+MPM_MEASURED_LEAVES_PER_WORLD = 16
+MPM_MEASURED_LOWER_PER_WORLD = 4.5
+MPM_MEASURED_UPPER_MIN = 80
+
+
+def mpm_config(num_envs: int, fill_level: float = MEDIA_FILL_LEVEL, grid_budget: str = "isaac",
+               cells_per_world: int | None = None):
     """``MPMSolverCfg`` of the media entry (pour_env_cfg.py:633-648) through ``_make_solver_config``
-    (mpm_manager.py:30-67), with the capacity rule ``_resolve_mpm_cell_cap`` (pour_env_cfg.py:276-292)."""
+    (mpm_manager.py:30-67), with the capacity rule ``_resolve_mpm_cell_cap`` (pour_env_cfg.py:276-292).
+
+    ``grid_budget="measured"`` replaces Newton's automatic NanoVDB node capacities by the measured budgets above;
+    ``cells_per_world`` replaces Isaac's cell reservation (1,024 per world at 735 particles). Both leave results
+    unchanged while the grid stays within them (see the budget note above)."""
     from newton.solvers import SolverImplicitMPM
 
     per_world = ((media_particle_count(fill_level) + MPM_CELL_CAPACITY_ALIGNMENT - 1)
                  // MPM_CELL_CAPACITY_ALIGNMENT) * MPM_CELL_CAPACITY_ALIGNMENT
+    if cells_per_world is not None:
+        per_world = int(cells_per_world)
+    leaf = lower = upper = -1
+    if grid_budget == "measured":
+        leaf = min(per_world * num_envs, MPM_MEASURED_LEAVES_PER_WORLD * num_envs)
+        lower = min(leaf, max(8, math.ceil(MPM_MEASURED_LOWER_PER_WORLD * num_envs)))
+        upper = min(lower, max(MPM_MEASURED_UPPER_MIN, math.ceil(num_envs / 25)))
+    elif grid_budget != "isaac":
+        raise ValueError(f"grid_budget must be 'isaac' or 'measured', got {grid_budget!r}")
     return SolverImplicitMPM.Config(
         max_iterations=24, tolerance=1.0e-4, solver="jacobi", warmstart_mode="auto", collider_velocity_mode="forward",
         voxel_size=MPM_VOXEL_SIZE, grid_type="sparse", grid_padding=0, max_active_cell_count=per_world * num_envs,
-        max_leaf_node_count=-1, max_lower_node_count=-1, max_upper_node_count=-1, separate_worlds=True,
+        max_leaf_node_count=leaf, max_lower_node_count=lower, max_upper_node_count=upper, separate_worlds=True,
         transfer_scheme="apic", integration_scheme="pic", critical_fraction=0.0, air_drag=1.0,
         collider_normal_from_sdf_gradient=False, collider_basis="pic27", strain_basis="P0", velocity_basis="Q1")
 
@@ -706,6 +732,10 @@ class PourPhysicsConfig:
     # step's temporaries (70.7 GB at 2,048 worlds, past the working set) and replayed NaN; now 37.4 GB (MPM.md 8f).
     capture_unit: str = "sim"
     disable_hand_hull: bool = True
+    # MetalSim memory budgets (bitwise-neutral within capacity; see mpm_config): "isaac" keeps Newton's automatic
+    # sparse-grid node capacities, "measured" uses the measured budgets; None keeps Isaac's cell reservation.
+    mpm_grid_budget: str = "isaac"
+    mpm_cells_per_world: int | None = None
 
 
 class PourPhysics:
@@ -756,7 +786,8 @@ class PourPhysics:
             if hasattr(wp, "DeterministicMode"):
                 mj_kwargs["deterministic"] = (wp.DeterministicMode.RUN_TO_RUN if cfg.rigid_deterministic
                                               else wp.DeterministicMode.NOT_GUARANTEED)
-            mpm_cfg = mpm_config(n, cfg.fill_level)
+            mpm_cfg = mpm_config(n, cfg.fill_level, grid_budget=cfg.mpm_grid_budget,
+                                 cells_per_world=cfg.mpm_cells_per_world)
             self._tstore = fem.TemporaryStore()       # NewtonMPMManager._create_solver (mpm_manager.py:126-133)
             entries = [
                 SolverCoupled.Entry(name="arm", solver=lambda view: SolverMuJoCo(view, **mj_kwargs), bodies=arm_bodies,
