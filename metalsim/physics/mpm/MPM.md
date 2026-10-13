@@ -663,7 +663,7 @@ sort for fem's triplets (79.2 -> 85.8 ms).
 
 Pins: Newton `metalsim-1.5.2` is pinned at `3fd1f052` (the two Newton commits). The Warp commits are on the fork's
 `metalsim` (`3342e5d8`), on top of `41b7bc45`, which faults on a one-world captured Franka-Pour step (base tree too);
-the Warp pin stayed at `43ffc6dd` until that was fixed (section 8g; pinned `85b92466` since). What a fresh setup gets now (Warp `43ffc6dd`, Newton `3fd1f052`) is verified on its own: bitwise against the base at 1 / 64 / 2,048 worlds, eager and captured; `tests/test_mpm.py` 14 passed, 1 xfailed; captured ms per step at 1 / 64 / 256 / 1,024 / 2,048 worlds 3.81 / 7.58 / 15.53 / 46.45 / 90.61 (base) vs 3.78 / 8.07 / 15.15 / 44.15 / 84.41, second round 3.94 / 7.76 / 15.35 / 46.00 / 90.54 vs 3.82 / 7.73 / 14.80 / 43.58 / 84.97.
+the Warp pin stayed at `43ffc6dd` until that was fixed (section 8g; pinned `85b92466`, then `f0df4cf8`). What a fresh setup gets now (Warp `43ffc6dd`, Newton `3fd1f052`) is verified on its own: bitwise against the base at 1 / 64 / 2,048 worlds, eager and captured; `tests/test_mpm.py` 14 passed, 1 xfailed; captured ms per step at 1 / 64 / 256 / 1,024 / 2,048 worlds 3.81 / 7.58 / 15.53 / 46.45 / 90.61 (base) vs 3.78 / 8.07 / 15.15 / 44.15 / 84.41, second round 3.94 / 7.76 / 15.35 / 46.00 / 90.54 vs 3.82 / 7.73 / 14.80 / 43.58 / 84.97.
 
 `warp.config.metal_cuda_libm` (Warp `43ffc6dd`, default on) costs nothing measurable: on vs off, three interleaved
 runs each, twice: granular 40.5 vs 40.7 ms/frame, multi_material 50.6 vs 50.7, Franka-Pour 2,048 worlds 90.6 vs 90.7
@@ -718,6 +718,20 @@ Verification of `85b92466`:
 
 Default `capture_unit` stays `"sim"` (Isaac's granularity); `"policy"` now works.
 
+`f0df4cf8` (pinned after `85b92466`) changes only deterministic kernels. The phase-0 store guard's counter-target
+check is now a function call instead of being inlined at every guarded store. Under global deterministic mode, the
+inlined form crashed the Metal compiler service on Newton's narrow-phase kernel. Results are unchanged:
+`tests/test_mpm.py` passes and the six floor recordings are bitwise those of `43ffc6dd`.
+
+Run-to-run repeatability of Franka-Pour (newton_compat, same day): the scene differed between two runs from the first
+uncaptured step, even with `rigid_deterministic=True`. `SolverCoupled` compacts each entry's contacts with an atomic
+counter, so MuJoCo Warp got them in thread-arrival order. This is not a missing barrier in Warp's runtime: the
+writer/reader, memset/atomic and bounded-launch probes show none, and the collision pipeline and the contact
+conversion each repeat exactly on fixed inputs. `install(rigid_deterministic=True)` now builds the coupled-solver
+modules in RUN_TO_RUN mode on Metal. The scene then repeats bitwise at 64 and 2,048 worlds, eager and captured, and
+eager, one graph per sim step and one graph per policy step all agree. Cost per step is unchanged.
+Test: `test_coupled_contact_filter_keeps_source_order`.
+
 ## 9. Running
 
 ```
@@ -742,13 +756,13 @@ Everything above runs from a clone of MetalSim plus the three forks; nothing dep
 
 ```
 # after the install of README / docs/GUIDE.md (.venv, scripts/setup_warp.sh, the MuJoCo Warp fork):
-scripts/setup_newton152.sh          # .venv-newton152: Newton fork metalsim-1.5.2 @3fd1f052, shared Warp fork @85b92466
+scripts/setup_newton152.sh          # .venv-newton152: Newton fork metalsim-1.5.2 @3fd1f052, shared Warp fork @f0df4cf8
 scripts/gpu_run.sh test_mpm check 15 -- .venv-newton152/bin/python -m pytest tests/test_mpm.py   # 14 passed, 1 xfailed
 ```
 
 | what | where it lives | how a fresh setup gets it |
 |---|---|---|
-| Warp changes | pulipakaa24/warp `metalsim`, pinned `85b92466` | `scripts/setup_warp.sh` (fallback: innate-inc/warp `ce15f6bb` + `patches/warp/metalsim-85b92466.diff`) |
+| Warp changes | pulipakaa24/warp `metalsim`, pinned `f0df4cf8` | `scripts/setup_warp.sh` (fallback: innate-inc/warp `ce15f6bb` + `patches/warp/metalsim-f0df4cf8.diff`) |
 | Newton changes (MPM, Franka-Pour rigid) | pulipakaa24/newton `metalsim-1.5.2`, pinned `3fd1f052` | `scripts/setup_newton152.sh` (fallback: v1.5.2 + `patches/newton/metalsim-1.5.2-3fd1f052.diff`) |
 | Newton 1.7 Metal fixes for the rigid stack | pulipakaa24/newton `metalsim-hashtable-metal` `a4be3604` (`.venv`'s `newton` extra) and `metalsim` `9f317390` (`.venv-newtonfork`) | `pip install -e ".[newton]"`, `scripts/setup_newton.sh` |
 | compat layer, scenes, probes, tests, Isaac-side recorders | this repository | the clone |
