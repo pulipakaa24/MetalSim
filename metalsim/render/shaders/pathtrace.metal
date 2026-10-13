@@ -214,7 +214,7 @@ inline Hit trace(instance_acceleration_structure accel, float3 o, float3 d, floa
         b = gg.meshes[inst[res.instance_id].as_index - gg.as0].i_off + res.primitive_id * 3;
         verts = gg.verts; indices = gg.indices;
     } else {
-        slot = inst_tab[res.instance_id].y + res.geometry_id % max(inst_tab[res.instance_id].x, 1u);   // geometry: 0 for geoms; the object within a dynamic env structure
+        slot = inst_tab[res.instance_id].y + res.geometry_id;   // geometry: 0 for geoms; the object within a dynamic env structure
         b = meshes[RT_MESH(res, inst[res.instance_id].as_index)].i_off + res.primitive_id * 3;   // mesh: = slot_mesh[slot] for geoms
     }
     uint i0 = indices[b], i1 = indices[b + 1], i2 = indices[b + 2];

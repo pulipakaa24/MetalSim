@@ -613,16 +613,18 @@ def test_segmentation_modes_and_annotators():
 
 
 @needs_metal
-def test_dynamic_meshes_and_particle_grains_share_the_tier2_structure():
+@pytest.mark.parametrize("layout", ["per_env", "sbvh"])
+def test_dynamic_meshes_and_particle_grains_share_the_tier2_structure(layout):
     """Particle grains (metalsim/render/particles.py) after the dynamic objects' instances in one instance acceleration
     structure: the draped cloth and rope keep their coverage, grains are drawn (segmentation n_slots + 1) and the
     cloth's ids are not taken for grains."""
     m, d = _forward(DRAPE, nstep=150)
-    r = Tier2Renderer(m, 1, width=W, height=H, camera="cam", spp=16, max_bounces=2, center_sample=True)
+    r = Tier2Renderer(m, 1, width=W, height=H, camera="cam", spp=16, max_bounces=2, center_sample=True, dyn_layout=layout)
     pts = np.stack(np.meshgrid(np.linspace(0.45, 0.65, 6), np.linspace(-0.3, -0.15, 4), [0.35], indexing="ij"), -1).reshape(-1, 3)
     r.set_particles(pts, radius=0.01)
     o = r.render_host([d], passes=2)
-    assert r.rt.n_inst == r.rt.n_inst_static + r.n          # one dynamic structure per env
+    # per_env: one dynamic structure per env; sbvh: one box instance for every env
+    assert r.rt.n_inst == r.rt.n_inst_static + (r.n if layout == "per_env" else 1)
     grains = o["seg"][0] == r.G + 1
     assert grains.sum() > 20
     o["seg"] = np.concatenate([[0], r.tables.slot_seg_ids(), [-1]])[o["seg"]]
@@ -679,3 +681,66 @@ def test_adaptive_tubes_close_up_and_far(which):
                     if q in v:
                         assert v[q] >= covf[k][q], (k, q, v, covf[k])
                 assert v["px"] < 8 or min(v[q] for q in ("rgb", "depth", "seg") if q in v) >= 0.9, (k, v)
+
+
+def test_bvh_topology_partitions_triangles():
+    """The sbvh layout's shared topology: every triangle in exactly one leaf, children after their parents, leaves of
+    at most LEAF triangles, depth within the traversal stack."""
+    from metalsim.sensors.dyn_bvh import build_topology, LEAF, MAX_DEPTH
+    rng = np.random.default_rng(0)
+    for T in (1, 3, 5, 100, 1300):
+        tri = rng.normal(size=(T, 3, 3))
+        topo, order, depth = build_topology(tri)
+        assert sorted(order.tolist()) == list(range(T))
+        seen = []
+        for i, (l, r_, first, cnt) in enumerate(topo):
+            if cnt:
+                assert 1 <= cnt <= LEAF
+                seen.extend(order[first:first + cnt].tolist())
+            else:
+                assert l > i and r_ > i and depth[l] == depth[i] + 1 == depth[r_]
+        assert sorted(seen) == list(range(T))
+        assert depth.max() <= MAX_DEPTH
+
+
+@needs_metal
+@pytest.mark.parametrize("which", ["raydepth", "tier1", "tier2"])
+def test_sbvh_matches_per_env_structures(which, monkeypatch):
+    """The sbvh layout (one box per env, the env's triangles traversed in software) against per-env hardware
+    structures on the wrapping tendons and the draped cloth, 3 envs: tier 1 byte-identical; ray depth and tier 2
+    depth within 0.01 mm where both hit (at most 1 edge-on silhouette pixel per env may differ in hit / miss),
+    segmentation the same elsewhere, tier 2 RGB within path-tracer noise."""
+    for xml, nstep in ((WRAP, 0), (DRAPE, 40)):
+        m, d = _forward(xml, nstep=nstep)
+        outs = {}
+        for lay in ("per_env", "sbvh"):
+            monkeypatch.setenv("METALSIM_DYN_LAYOUT", lay)
+            r, o = _render(m, [d] * 3, which)
+            rt = getattr(r, "rt", None) or r
+            assert rt.dyn_layout == lay
+            outs[lay] = o
+        a, b = outs["per_env"], outs["sbvh"]
+        if which == "tier1":
+            for k in ("rgb", "depth", "seg"):
+                assert np.array_equal(a[k], b[k]), k
+            continue
+        both = (a["depth"] > 0) & (b["depth"] > 0)
+        assert np.abs(a["depth"][both] - b["depth"][both]).max() < 1e-5
+        assert ((a["depth"] > 0) != (b["depth"] > 0)).sum() <= 3
+        if which == "tier2":
+            assert (a["seg"] != b["seg"]).sum() <= 3
+            assert np.abs(a["rgb"].astype(int) - b["rgb"].astype(int)).mean() < 0.01
+
+
+@needs_metal
+def test_dynamic_layout_defaults(monkeypatch):
+    """Sensors and the path tracer trace dynamic objects through one box structure (sbvh); tier 1 keeps per-env
+    hardware structures (its fragment-stage shadow rays); both overridable."""
+    monkeypatch.delenv("METALSIM_DYN_LAYOUT", raising=False)
+    m, d = _forward(DRAPE, nstep=10)
+    rt = RayTracer(m, 4, max_range=10.0)
+    assert rt.dyn_layout == "sbvh" and rt.dyn_bvh is not None and not rt.dyn_as
+    assert Tier2Renderer(m, 4, width=16, height=16, camera="cam").rt.dyn_layout == "sbvh"
+    t1 = Tier0Renderer(m, 4, width=16, height=16, camera="cam", tier=1)
+    assert t1.rt.dyn_layout == "per_env" and len(t1.rt.dyn_as) == 4
+    assert Tier0Renderer(m, 4, width=16, height=16, camera="cam", tier=1, dyn_layout="sbvh").rt.dyn_layout == "sbvh"

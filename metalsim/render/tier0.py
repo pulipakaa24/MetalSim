@@ -45,6 +45,7 @@ class Tier0Renderer:
                  appearance: str = "mujoco", skybox: bool = True, shadow_lights: str = "all", max_lights: int | None = None,
                  transparency: bool = True, transparent_ids: str = "surface", normal_layout: str = "corner_fs",
                  shadow_cull: bool = True, visual=None, deformables=(), tube_slices=None, cap_stacks=None,
+                 dyn_layout: str | None = None,
                  ctx: MetalContext | None = None, device="metal:0"):
         """tier 0: raster + shadow maps. tier 1: raster G-buffer with ray-traced shadows, ambient
         occlusion and mirror reflections from the fragment stage (Metal hardware ray tracing).
@@ -118,8 +119,12 @@ class Tier0Renderer:
                                                       visual=visual, deformables=deformables,
                                                       corner_attributes=normal_layout != "split")
         self.G = self.tables.G
+        import os
         self._extras_kw = dict(visual=mujoco.MjvOption() if visual is None else visual, deformables=deformables,
                                tube_slices=tube_slices, cap_stacks=cap_stacks)   # the camera default: everything MuJoCo draws
+        # tier 1's ray tracer: dynamic objects as per-env hardware structures (its shadow / AO rays run in the fragment
+        # stage, where the software per-env BVH of the "sbvh" layout measured 1.5-1.7x slower); see RayTracer
+        self._extras_kw["dyn_layout"] = dyn_layout or os.environ.get("METALSIM_DYN_LAYOUT") or "per_env"
         hf_tris = sum(self.tables.meshes[k]["i_count"] // 3 for g, k in zip(self.tables.geoms, self.tables.geom_mesh)
                       if int(model.geom_type[g]) == int(mujoco.mjtGeom.mjGEOM_HFIELD))
         self.hfield_cull, self.hfield_tile = bool(hfield_cull and hf_tris), int(hfield_tile)

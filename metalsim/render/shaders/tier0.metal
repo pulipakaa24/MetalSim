@@ -1148,7 +1148,7 @@ fragment FSOut geom_fs_rt(
         float3 rc = sp.sky_info.y > 0.5 ? sky_color(atlas, samp, sp.sky_rect, sp.sky_info, Rd)
                   : sp.sky.w > 0.5 ? sp.sky.xyz : e.clear_color.rgb;
         if (res.type != intersection_type::none) {
-            uint slot2 = inst_tab[res.instance_id].y + res.geometry_id % max(inst_tab[res.instance_id].x, 1u);    // geometry: 0 for geoms; object in a dynamic env structure
+            uint slot2 = inst_tab[res.instance_id].y + res.geometry_id;    // geometry: 0 for geoms; object in a dynamic env structure
             uint mesh2 = RT_MESH(res, inst[res.instance_id].as_index); // = slot_mesh[slot2] for geoms
             uint b = meshes[mesh2].i_off + res.primitive_id * 3;
             uint i0 = indices[b], i1 = indices[b + 1], i2 = indices[b + 2];
