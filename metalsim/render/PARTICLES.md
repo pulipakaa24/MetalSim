@@ -91,6 +91,21 @@ No structure used extended limits, and every build and frame completed. The full
 128 spp, OIDN) also rendered to the end. Its frames match the 2026-10-12 flat-layout clip within about 1/255 mean (sky,
 ground-plane and sand means equal; 2-3.5 % of pixels differ by more than 10/255, texture detail after the atlas fix).
 
+**Benchmark on the 16-inch M4 Max** (macOS 26.7.1, the machine where the flat 25 M build stalled; origin/main 44dd48c,
+Warp 95f6f121, MuJoCo Warp f1b35e2; 2026-10-13). The same scene with 4 ground planes, two-level grains. Each step ran
+alone as an exclusive timing job through `scripts/gpu_run.sh` under a watchdog (60 s / 120 s without output). Before
+and after every step: device, renderer and tiler utilisation 0-2 %, recoveryCount 0, no process stuck exiting.
+
+| grains | structures (instances) | upload + build (rebuild) | build + one 256x144 1-spp pass | 1080p frame, 128 spp, OIDN | Metal allocated |
+|---|---|---|---|---|---|
+| 6.28 M | top 55, grains 6,280,443 | 116 ms (77 ms) | 81 ms | - | 2.9 GB |
+| 12.56 M | top 55, grains 12,560,859 | 296 ms (226 ms) | 233 ms | - | 5.0 GB |
+| 25.12 M | top 56, grains 16,777,215 + 8,344,476 | 654 ms (508 ms) | 511 ms | 5.1 s | 10.5 GB |
+
+The 25.12 M build that never finished in the flat layout (900 s, 2026-10-12) completes in 654 ms. No structure used
+extended limits. The 1080p frame time includes loading the frame's particles, the structure rebuild, 32 passes of
+4 spp, OIDN and the PNG. Logs: `runs/sand25m_16in/` in the working tree (not committed).
+
 ## Validation (`tests/test_render_particles.py`)
 
 | test | checks |
