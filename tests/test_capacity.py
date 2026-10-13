@@ -109,32 +109,38 @@ def test_equality_block_ending_at_njmax_is_flagged(eq, rows):
     njmax = 3 (6) its rows were dropped while nefc == njmax (no NEFC bit), and the solver ran on stale rows (the ball
     sagged 8 cm in 0.4 s; MetalSim then counted nefc >= njmax itself). The fork's metalsim branch since f52488b keeps a
     block that ends exactly at njmax, and one that does not fit leaves nefc > njmax, which MuJoCo Warp flags itself.
-    njmax = rows: block written, ball held, no flag. njmax = rows - 1: block dropped, MuJoCo Warp's NEFC bit set,
-    check_overflow raises. njmax 16: held, nothing raised."""
+    njmax = rows: block written, ball held, no flag; njmax 16: the same. njmax = rows - 1 (put_data refuses an njmax
+    below MuJoCo C's initial nefc, so there the equality starts inactive and is switched on in every world after
+    put_data): block dropped, MuJoCo Warp's NEFC bit set, check_overflow raises, the ball falls."""
     import mujoco
+    import numpy as np
     import mujoco_warp as mjw
     from metalsim.physics.batch import BatchSim, BatchSimOptions
-    xml = f"""<mujoco><worldbody><body name='a' pos='0 0 1'><freejoint/>
-    <geom type='sphere' size='0.1' contype='0' conaffinity='0'/></body></worldbody>
-    <equality><{eq} body1='a' {"anchor='0 0 0'" if eq == "connect" else ""}/></equality></mujoco>"""
-    m = mujoco.MjModel.from_xml_string(xml)
     nefc_bit = int(mjw.OverflowType.NEFC)
     z = {}
-    for njmax in (rows, rows - 1, 16):
+    for njmax in (rows, 16, rows - 1):
+        active = "false" if njmax < rows else "true"
+        xml = f"""<mujoco><worldbody><body name='a' pos='0 0 1'><freejoint/>
+        <geom type='sphere' size='0.1' contype='0' conaffinity='0'/></body></worldbody>
+        <equality><{eq} body1='a' active='{active}' {"anchor='0 0 0'" if eq == "connect" else ""}/></equality></mujoco>"""
+        m = mujoco.MjModel.from_xml_string(xml)
         sim = BatchSim(m, 4, options=BatchSimOptions(njmax=njmax, nconmax=1))
+        if njmax < rows:
+            sim.d.eq_active.assign(np.ones((4, 1), dtype=bool))
         for _ in range(200):           # 0.4 s at the default 2 ms
             sim.step()
         sim.synchronize()
-        z[njmax] = float(sim.d.qpos.numpy()[:, 2].min())
+        z[njmax] = float(sim.d.qpos.numpy()[:, 2].max())
         nefc = sim.d.nefc.numpy()
-        if njmax == rows - 1:
-            assert (nefc == rows).all() and (sim.d.overflow.numpy() & nefc_bit).all()   # MuJoCo Warp's own flag
+        assert (nefc == rows).all(), nefc
+        if njmax < rows:
+            assert (sim.d.overflow.numpy() & nefc_bit).all()          # MuJoCo Warp's own flag
             with pytest.raises(RuntimeError, match="capacity overflow"):
                 sim.check_overflow()
         else:
-            assert (nefc == rows).all() and not (sim.d.overflow.numpy() & nefc_bit).any()
+            assert not (sim.d.overflow.numpy() & nefc_bit).any()
             sim.check_overflow()
-    assert z[rows] > 0.995 and z[16] > 0.995 and z[rows - 1] < 0.97, z   # held at the anchor (1.0) vs dropped rows
+    assert z[rows] > 0.995 and z[16] > 0.995 and z[rows - 1] < 0.97, z   # held at the anchor (1.0) vs block dropped
 
 
 def test_bounds_refuse_unbounded_models():

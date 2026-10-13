@@ -64,7 +64,10 @@ intact buffer also raised), and `Bounds.njmax` kept one spare row above nefc for
 tripped it. **Update 2026-10-13:** the fix is on the fork's `metalsim` branch (fast-forwarded to `f52488b4`, head
 `f1b35e2` with its METALSIM_CHANGES.md entry) and MetalSim pins `f1b35e2`; the workaround is removed.
 `test_equality_block_ending_at_njmax_is_flagged` now checks connect and weld: njmax = block size holds the ball with
-no flag, njmax = block size − 1 sets MuJoCo Warp's own NEFC bit (`runs/eqfix/`).
+no flag, njmax = block size − 1 (equality switched on after `put_data`, which refuses an njmax below MuJoCo C's
+initial nefc) sets MuJoCo Warp's own NEFC bit. On this Mac at f1b35e2 (`runs/eqfix/`): `tests/test_capacity.py` 8
+passed; rigid suite (tests/ minus test_mpm.py) 415 passed, 13 skipped; render suite 173 passed, 1 skipped; fork
+`constraint_test.py` 96 passed, 2 skipped, `forward_test.py` + `solver_test.py` 150 passed, 8 skipped on Metal.
 
 ## Cost
 

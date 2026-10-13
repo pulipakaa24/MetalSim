@@ -1,0 +1,66 @@
+README line: pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@f1b35e2b3ddc80b197b0c665bf6d71523d175daf#egg=mujoco-warp" "mujoco>=3.14,<3.15"
+Obtaining mujoco-warp from git+https://github.com/pulipakaa24/mujoco_warp@f1b35e2b3ddc80b197b0c665bf6d71523d175daf#egg=mujoco-warp
+  Cloning https://github.com/pulipakaa24/mujoco_warp (to revision f1b35e2b3ddc80b197b0c665bf6d71523d175daf) to ./.venv/src/mujoco-warp
+  Running command git clone --filter=blob:none --quiet https://github.com/pulipakaa24/mujoco_warp /Users/aditya/robosim/.claude/worktrees/agent-a4b4d2a53213dae91/scratch/fresh/.venv/src/mujoco-warp
+  Running command git rev-parse -q --verify 'f1b35e2b3ddc80b197b0c665bf6d71523d175daf^{commit}'
+  f1b35e2b3ddc80b197b0c665bf6d71523d175daf
+  Running command git checkout -q f1b35e2b3ddc80b197b0c665bf6d71523d175daf
+  Resolved https://github.com/pulipakaa24/mujoco_warp to commit f1b35e2b3ddc80b197b0c665bf6d71523d175daf
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Getting requirements to build editable: started
+  Getting requirements to build editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Collecting mujoco<3.15,>=3.14
+  Using cached mujoco-3.14.0-cp312-cp312-macosx_11_0_arm64.whl.metadata (232 kB)
+Collecting absl-py (from mujoco-warp)
+  Using cached absl_py-2.5.1-py3-none-any.whl.metadata (3.3 kB)
+Collecting etils[epath] (from mujoco-warp)
+  Using cached etils-1.14.0-py3-none-any.whl.metadata (6.5 kB)
+Collecting numpy (from mujoco-warp)
+  Using cached numpy-2.5.4-cp312-cp312-macosx_14_0_arm64.whl.metadata (6.6 kB)
+Collecting warp-lang>=1.15 (from mujoco-warp)
+  Using cached warp_lang-1.18.0-py3-none-macosx_11_0_arm64.whl.metadata (26 kB)
+Collecting glfw (from mujoco<3.15,>=3.14)
+  Using cached glfw-2.10.2-py2.py3-none-macosx_11_0_arm64.whl.metadata (5.5 kB)
+Collecting pyopengl (from mujoco<3.15,>=3.14)
+  Using cached pyopengl-3.1.10-py3-none-any.whl.metadata (3.3 kB)
+Collecting websockets>=13 (from mujoco<3.15,>=3.14)
+  Using cached websockets-17.2-cp312-cp312-macosx_11_0_arm64.whl.metadata (6.3 kB)
+Collecting fsspec (from etils[epath]->mujoco-warp)
+  Using cached fsspec-2026.9.0-py3-none-any.whl.metadata (10 kB)
+Collecting typing_extensions (from etils[epath]->mujoco-warp)
+  Using cached typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting zipp (from etils[epath]->mujoco-warp)
+  Using cached zipp-4.1.1-py3-none-any.whl.metadata (3.6 kB)
+Using cached mujoco-3.14.0-cp312-cp312-macosx_11_0_arm64.whl (26.4 MB)
+Using cached warp_lang-1.18.0-py3-none-macosx_11_0_arm64.whl (27.8 MB)
+Using cached websockets-17.2-cp312-cp312-macosx_11_0_arm64.whl (215 kB)
+Using cached absl_py-2.5.1-py3-none-any.whl (137 kB)
+Using cached etils-1.14.0-py3-none-any.whl (172 kB)
+Using cached fsspec-2026.9.0-py3-none-any.whl (221 kB)
+Using cached glfw-2.10.2-py2.py3-none-macosx_11_0_arm64.whl (107 kB)
+Using cached numpy-2.5.4-cp312-cp312-macosx_14_0_arm64.whl (5.5 MB)
+Using cached pyopengl-3.1.10-py3-none-any.whl (3.2 MB)
+Using cached typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+Using cached zipp-4.1.1-py3-none-any.whl (10 kB)
+Building wheels for collected packages: mujoco-warp
+  Building editable for mujoco-warp (pyproject.toml): started
+  Building editable for mujoco-warp (pyproject.toml): finished with status 'done'
+  Created wheel for mujoco-warp: filename=mujoco_warp-3.14.0-0.editable-py3-none-any.whl size=10933 sha256=e5ea249650e18f30efe36cb7b1e9eeddda89530c134513c80f98f0b9d607de36
+  Stored in directory: /private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pip-ephem-wheel-cache-4yyrwx5g/wheels/21/97/04/f8e0e9d80d910c968686384c4e98cf7eba7dde01d69787be90
+Successfully built mujoco-warp
+Installing collected packages: pyopengl, glfw, zipp, websockets, typing_extensions, numpy, fsspec, etils, absl-py, warp-lang, mujoco, mujoco-warp
+
+Successfully installed absl-py-2.5.1 etils-1.14.0 fsspec-2026.9.0 glfw-2.10.2 mujoco-3.14.0 mujoco-warp-3.14.0 numpy-2.5.4 pyopengl-3.1.10 typing_extensions-4.16.0 warp-lang-1.18.0 websockets-17.2 zipp-4.1.1
+mujoco_warp imported from /Users/aditya/robosim/.claude/worktrees/agent-a4b4d2a53213dae91/scratch/fresh/.venv/src/mujoco-warp
+installed commit: f1b35e2b3ddc80b197b0c665bf6d71523d175daf
+f1b35e2 METALSIM_CHANGES.md: equality block ending at njmax
+f52488b Constraints: keep a connect / weld block that ends exactly at njmax
+cf0f8ad METALSIM_CHANGES.md: energy_vel with nv = 0
+mujoco 3.14.0
+271:    if efcid + 3 > njmax_in:
+1121:    if efcid + 6 > njmax_in:

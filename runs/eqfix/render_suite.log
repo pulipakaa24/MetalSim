@@ -1,0 +1,16 @@
+##### RENDER SUITE (.venv): render, sensor, scene-USD tests
+........................................................................ [ 41%]
+......s................................................................. [ 82%]
+..............................                                           [100%]
+=============================== warnings summary ===============================
+tests/test_render_newton_bridge.py::test_solver_mujoco_steps_render_like_mujoco_path
+  /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/_src/solvers/mujoco/solver_mujoco.py:3813: RuntimeWarning: MuJoCo dependency version mismatch with Newton's declared requirements: mujoco==3.14.0 (requires ~=3.12.0); mujoco-warp==3.14.0 (requires ~=3.12.0). Reinstall Newton dependencies, for example `uv pip install -e ".[examples]"`.
+    mujoco, _ = self.import_mujoco()
+
+tests/test_render_tier2.py::test_gpu_path_from_batchsim_matches_host
+tests/test_sensors_rt.py::test_gpu_path_ordering_with_sim
+  /Users/aditya/robosim/.claude/worktrees/agent-a4b4d2a53213dae91/scratch/mjw_fork/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+173 passed, 1 skipped, 3 warnings in 72.21s (0:01:12)
