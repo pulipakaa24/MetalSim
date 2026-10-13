@@ -33,6 +33,7 @@ struct PTConsts {
                                                 // grain_eps: ray offset off a grain surface [m] (grains are mm-sized; scene hits use 1 mm);
                                                 // trans_ids: annotations under transparent geoms (0 surface, 1 behind)
     float4 env_mul;                             // FLAG_ENVMAP: rgb multiplier on the map (dome intensity * 2^exposure * color)
+    uint grain_scene, grain_chunk, _g0, _g1;    // FLAG_GRAINS2: scene instances before the grain chunks; grains per chunk
 };
 struct CamSpec { float4 intrinsics; float4 pos_delta; float4 rot_delta; float4 light; float4 ambient; float4 clear_color; int cam_id, p0, p1, p2; };
 
@@ -47,8 +48,10 @@ constant uint FLAG_CENTER0 = 16u;     // first sample of the reset pass through 
 constant uint FLAG_AUX = 8u;          // write mean HDR radiance and sample-averaged first-hit albedo / normal (denoiser inputs)
 constant uint FLAG_ENVMAP = 32u;      // equirectangular HDR environment map (texture(1), CDF table buffer(26)) replaces the sky colour
 constant uint FLAG_GRAINS = 64u;      // particle render grains: instances from grain_inst0 on (metalsim/render/particles.py, PARTICLES.md)
-constant uint FLAG_GRAINS2 = 128u;    // with FLAG_GRAINS: two-level grains (the grains' own instance structure is one instance of the
-                                      // scene's; grain_inst0 = grain count, buffer 29 = grain descriptors then keys)
+constant uint FLAG_GRAINS2 = 128u;    // with FLAG_GRAINS: two-level grains (chunks of grain_chunk grains, each its own instance structure
+                                      // and one instance of the scene's after its grain_scene instances; grain_inst0 = grain count,
+                                      // buffer 29 = grain descriptors then keys)
+constant uint FLAG_GRAINS_EXT = 256u; // with FLAG_GRAINS, flat: the structure is built with extended limits (> 2^24 instances)
 
 inline float3x3 load_mat33(device const float* p) {
     return float3x3(float3(p[0], p[3], p[6]), float3(p[1], p[4], p[7]), float3(p[2], p[5], p[8]));
@@ -192,7 +195,7 @@ struct Hit { bool ok; float t; float3 p; float3 n; float2 uv; uint slot; bool gr
 // levels is a grain, its index the second-level instance id. A grain instances grain mesh (as_index - as0); gdesc / gkeys:
 // the grains' instance descriptors and identity keys (colour hash), indexed by grain
 struct GrainGeo { device const float* verts; device const uint* indices; device const MeshInfo* meshes; uint inst0, as0;
-                  device const InstanceDesc* gdesc; device const uint* gkeys; bool two_level; };
+                  device const InstanceDesc* gdesc; device const uint* gkeys; bool two_level, extended; uint n_scene, chunk; };
 
 inline Hit trace(instance_acceleration_structure accel, float3 o, float3 d, float tmax,
                  device const uint2* inst_tab, device const int* slot_mesh, device const MeshInfo* meshes,
@@ -208,7 +211,14 @@ inline Hit trace(instance_acceleration_structure accel, float3 o, float3 d, floa
         if (res.type == intersection_type::none) return h;
         top = res.instance_id[0]; prim = res.primitive_id; bc = res.triangle_barycentric_coord; dist = res.distance;
         grain = res.instance_count > 1u;
-        if (grain) gid = res.instance_id[1];
+        if (grain) gid = (top - gg.n_scene) * gg.chunk + res.instance_id[1];
+    } else if (gg.extended) {   // flat past 2^24 instances: built with extended limits, intersected with the matching tag
+        intersector<triangle_data, instancing, extended_limits> isect;
+        intersection_result<triangle_data, instancing, extended_limits> res = isect.intersect(r, accel);
+        if (res.type == intersection_type::none) return h;
+        top = res.instance_id; prim = res.primitive_id; bc = res.triangle_barycentric_coord; dist = res.distance;
+        grain = top >= gg.inst0;
+        if (grain) gid = top - gg.inst0;
     } else {
         intersector<triangle_data, instancing> isect;
         intersection_result<triangle_data, instancing> res = isect.intersect(r, accel);
@@ -398,6 +408,8 @@ kernel void path_trace(
     float3 env_rad = (sp.sky.w > 0.5 ? sp.sky.xyz : cs.clear_color.rgb) * c.env_scale;
     GrainGeo gg; gg.verts = g_verts; gg.indices = g_indices; gg.meshes = g_mat.mesh;
     gg.two_level = (c.flags & FLAG_GRAINS) && (c.flags & FLAG_GRAINS2);
+    gg.extended = (c.flags & FLAG_GRAINS) && !gg.two_level && (c.flags & FLAG_GRAINS_EXT);
+    gg.n_scene = c.grain_scene; gg.chunk = c.grain_chunk;
     gg.inst0 = ((c.flags & FLAG_GRAINS) && !gg.two_level) ? c.grain_inst0 : 0xFFFFFFFFu; gg.as0 = c.grain_as0;
     gg.gdesc = gg.two_level ? g_inst : inst + c.grain_inst0;
     gg.gkeys = gg.two_level ? (device const uint*)(g_inst + c.grain_inst0) : (device const uint*)g_inst;

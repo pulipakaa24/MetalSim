@@ -194,7 +194,7 @@ class Tier2Renderer:
         c.upload_texture(self.atlas_tex, ai)
         self.samp = c.sampler(linear=True, repeat=True)
         # PTConsts (shaders/pathtrace.metal): 16 words as before + [16:18] env grid, [20] env_yaw, [21] clamp_lum, [24:28] env_mul
-        self.consts = np.zeros(28, np.uint32)
+        self.consts = np.zeros(32, np.uint32)      # [28:30] grain_scene, grain_chunk (two-level grains, particles.py)
         self.consts[:4] = (n_envs, width, height, max(model.ncam, 1))
         self.consts[4:8] = (max(model.nlight, 1) if model.nlight else 0, self.G, spp, max_bounces)
         self.consts[8:12] = (0, self.rt.tpr, 1, seed)
@@ -274,7 +274,7 @@ class Tier2Renderer:
 
     def set_particles(self, positions, radius=None, material=None, *, grains_per_particle=8, grain_radius=None,
                       radius_jitter=0.3, n_meshes=4, seed=0, grain_shape=None, ids=None, cull_z=-np.inf, grain_eps=None,
-                      structure="two_level"):
+                      structure="two_level", grain_chunk=None):
         """Draw particles as render grains (granular media: MPM sand, ...). ``positions``: (n_envs, P, 3) or (P, 3)
         numpy [m], or a Warp array on the Metal device (bound directly each frame: the GPU path). ``radius``: the
         particle radius [m] (half the particle spacing): each particle's grains are spread over its cube of half side
@@ -286,7 +286,8 @@ class Tier2Renderer:
         radius and grains_per_particle only replace the positions (or material); other
         arguments apply on the first call or when ``radius`` / ``grains_per_particle`` change. ``structure``:
         ``"two_level"`` (default: the grains are their own instance acceleration structure, one instance of the
-        scene's) or ``"flat"`` (one top-level instance per grain); same image, see ``particles.InstanceStructure``."""
+        scene's) or ``"flat"`` (one top-level instance per grain); same image, see ``particles.InstanceStructure``.
+        ``grain_chunk``: grains per two-level grain structure (default Metal's standard limit, 2^24; tests use less)."""
         from metalsim.render.particles import GrainField, InstanceStructure
         if positions is None:
             self.grains, self._ias = None, None
@@ -299,17 +300,18 @@ class Tier2Renderer:
             g = GrainField(self.ctx, self.n, grains_per_particle=grains_per_particle, radius=gr,
                            radius_jitter=radius_jitter, offset=float(radius), n_meshes=n_meshes, material=material,
                            seed=seed, cull_z=cull_z, shape=grain_shape)
-            self.grains, self._ias = g, InstanceStructure(self.rt, g, structure)
+            self.grains, self._ias = g, InstanceStructure(self.rt, g, structure, grain_chunk)
         elif material is not None:
             g.set_material(material)
-        if self._ias.mode != structure:
-            self._ias = InstanceStructure(self.rt, g, structure)
+        if self._ias.mode != structure or (grain_chunk is not None and grain_chunk != self._ias.chunk):
+            self._ias = InstanceStructure(self.rt, g, structure, grain_chunk)
         g.cull_z = float(cull_z)
         g.set_positions(positions)
         g.set_ids(ids)
         cf = self.consts.view(np.float32)
         # flat: first grain instance, first grain mesh in the top-level list; two-level: grain count, meshes from 0
         self.consts[18:20] = (self.rt.n_inst, len(self.rt.prim_as)) if structure == "flat" else (g.n_grains, 0)
+        self.consts[28:30] = (self.rt.n_inst, self._ias.chunk)
         cf[22] = grain_eps if grain_eps is not None else max(0.01 * g.radius, 1e-5)
 
     def _encode_scene(self, cb, gx, gxo, gm, gmo):
@@ -328,7 +330,11 @@ class Tier2Renderer:
         self.consts[8] = self.frame
         grains = self.grains is not None and self.grains.n_grains > 0
         two = grains and self._ias.mode == "two_level"
-        self.consts[10] = (1 if reset else 0) | self.base_flags | self.env_flags | (64 if grains else 0) | (128 if two else 0)
+        if grains:
+            self._ias.ensure()          # (the extended-limits flag is known once the structure is sized)
+        ext = grains and self._ias.mode == "flat" and self._ias.extended
+        self.consts[10] = ((1 if reset else 0) | self.base_flags | self.env_flags | (64 if grains else 0) | (128 if two else 0)
+                           | (256 if ext else 0))
         ce = cb.computeCommandEncoder()
         ce.setComputePipelineState_(self.pipe)
         rt = self.rt

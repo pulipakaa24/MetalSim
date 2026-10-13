@@ -150,15 +150,43 @@ def test_two_level_matches_flat():
     pile = _pile(3000)
     P = np.stack([pile, pile + [0.03, 0.0, 0.0], np.full_like(pile, np.nan)])
     outs = {}
-    for structure in ("flat", "two_level"):
+    for name, structure, chunk in (("flat", "flat", None), ("two_level", "two_level", None), ("chunked", "two_level", 5000)):
         rt = Tier2Renderer(m, 3, width=80, height=80, spp=2, max_bounces=4, headlight=False, seed=9, center_sample=True)
-        rt.set_particles(P, radius=0.004, grains_per_particle=6, structure=structure)
-        outs[structure] = rt.render_host(_datas(m, 3), passes=3)
-    a, b = outs["flat"], outs["two_level"]
+        rt.set_particles(P, radius=0.004, grains_per_particle=6, structure=structure, grain_chunk=chunk)
+        outs[name] = rt.render_host(_datas(m, 3), passes=3)
+        if name == "chunked":
+            assert len(rt._ias.chunks) == -(-3 * 3000 * 6 // 5000)     # 54,000 grains in chunks of 5,000: 11 chunks
+    a = outs["flat"]
     assert (a["seg"] == rt.G + 1).sum() > 200
-    assert np.array_equal(a["seg"], b["seg"])
-    assert np.allclose(a["depth"], b["depth"], atol=1e-5)
-    assert np.allclose(a["hdr"], b["hdr"], atol=1e-4, rtol=1e-4), np.abs(a["hdr"] - b["hdr"]).max()
+    for name in ("two_level", "chunked"):
+        b = outs[name]
+        assert np.array_equal(a["seg"], b["seg"]), name
+        assert np.allclose(a["depth"], b["depth"], atol=1e-5), name
+        assert np.allclose(a["hdr"], b["hdr"], atol=1e-4, rtol=1e-4), (name, np.abs(a["hdr"] - b["hdr"]).max())
+
+
+def test_acceleration_structure_limits():
+    """Metal's per-structure limits (metalsim/render/as_limits.py): an instance descriptor gets the extended-limits
+    usage above 2^24 instances and not at or below it; without an extended-limits path, or past 2^30, building is
+    refused with an error instead of entering undefined behaviour (CPU only: descriptors, no build)."""
+    import Metal
+    from metalsim.render import as_limits
+    from metalsim.render.particles import instance_descriptor
+    dev = Metal.MTLCreateSystemDefaultDevice()
+    buf = dev.newBufferWithLength_options_(64, Metal.MTLResourceStorageModeShared)
+    ext = Metal.MTLAccelerationStructureUsageExtendedLimits
+    d, e = instance_descriptor([], 1 << 24, buf, extended_ok=True)
+    assert not e and not (d.usage() & ext)
+    d, e = instance_descriptor([], (1 << 24) + 1, buf, extended_ok=True)
+    assert e and (d.usage() & ext)
+    with pytest.raises(ValueError, match="standard limit"):
+        instance_descriptor([], (1 << 24) + 1, buf)                       # no extended path: refused
+    with pytest.raises(ValueError, match="extended limit"):
+        instance_descriptor([], (1 << 30) + 1, buf, extended_ok=True)
+    assert not as_limits.check("primitives", 1 << 28, "mesh")
+    with pytest.raises(ValueError):
+        as_limits.check("primitives", (1 << 28) + 1, "mesh")
+    assert as_limits.check("geometries", (1 << 24) + 1, "mesh", extended_ok=True)
 
 
 def test_batched_envs_and_isolation():
