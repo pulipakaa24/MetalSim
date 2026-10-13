@@ -289,6 +289,7 @@ class PourPPO:
             t0 = time.perf_counter()
             ep_extras, outcomes = [], collections.Counter()
             obs = self.rollout(obs, ep_extras, outcomes)
+            env.physics.check_status()  # sparse-grid capacity overflow during the rollout raises here
             self.compute_returns(obs)
             t1 = time.perf_counter()
             losses = self.update()
@@ -336,7 +337,8 @@ def _make_env(args):
     from metalsim.learn import franka_pour as P
 
     pcfg = P.S.PourPhysicsConfig(num_envs=args.num_envs, rigid_deterministic=args.rigid_det,
-                                 metal_fast_math=args.metal_fast_math, capture_unit=args.capture_unit)
+                                 metal_fast_math=args.metal_fast_math, capture_unit=args.capture_unit,
+                                 mpm_grid_budget=args.mpm_grid_budget, mpm_cells_per_world=args.mpm_cells_per_world)
     return P.FrankaPourEnv(P.PourTaskConfig(num_envs=args.num_envs, seed=args.seed, physics=pcfg))
 
 
@@ -411,6 +413,10 @@ def main():
     ap.add_argument("--rigid-det", action="store_true")
     ap.add_argument("--metal-fast-math", default="off", choices=["off", "cuda", "relaxed"])
     ap.add_argument("--capture-unit", default="sim", choices=["sim", "policy"])
+    ap.add_argument("--mpm-grid-budget", default="isaac", choices=["isaac", "measured"],
+                    help="sparse-grid NanoVDB node capacities: Newton's automatic ones or the measured budgets")
+    ap.add_argument("--mpm-cells-per-world", type=int, default=None,
+                    help="MPM cell reservation per world (default: Isaac's rule, 1,024 at 735 particles)")
     ap.add_argument("--json", default=None)
     args = ap.parse_args()
     import warp as wp
