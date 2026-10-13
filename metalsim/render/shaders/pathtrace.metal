@@ -5,7 +5,8 @@
 // (Lambert diffuse + GGX specular with Fresnel, same material model and light radiances as tiers
 // 0/1: MuJoCo diffuse x pi), Russian roulette after 3 bounces, environment radiance = model sky
 // colour (uniform) or, with FLAG_ENVMAP, an equirectangular HDR environment map (a textured USD
-// DomeLight: pole +z, OpenUSD's z-up latlong frame, rotated about z by env_yaw) that is importance-sampled
+// DomeLight: pole +z, OpenUSD's z-up latlong frame, rotated about z by env_yaw, or by the full rotation env_rot
+// with FLAG_ENVROT: a tilted dome) that is importance-sampled
 // for next-event estimation and combined with BRDF sampling by the power heuristic (Veach 1997;
 // PBRT 3rd ed. 14.2.4), emissive materials as area sources through BRDF sampling. Primary-hit depth,
 // normal and segmentation are written for annotators. Envs share one instance acceleration
@@ -42,6 +43,7 @@ struct PTConsts {
     LensParams lens;                            // camera lens model (lens.h; 0 = pinhole from CamSpec)
     HazeParams haze;                            // MuJoCo's haze / fog on the camera ray (haze.h; rgba.w = 0: off), colours
                                                 // in radiance units (x env_scale, as the skybox texels)
+    float4 env_rot[3];                          // FLAG_ENVROT: columns of the dome rotation R (dome frame -> world), .w unused
     EnvGrid grid;                              // where the envs sit (env_grid.h); rays end at their env's cell
 #ifdef DYN_SBVH
     ulong dyn_args;                             // GPU address of the DynBVHArgs (sbvh layout; all 31 buffer slots are taken)
@@ -67,6 +69,8 @@ constant uint FLAG_GRAINS2 = 128u;    // with FLAG_GRAINS: two-level grains (chu
                                       // hit (instance_id[0], user_instance_id[0]; instance_count stays 1, measured on macOS 26):
                                       // a grain's user id is 0x80000000 | grain index, the scene's Default descriptors read 0
 constant uint FLAG_GRAINS_EXT = 256u; // with FLAG_GRAINS, flat: the structure is built with extended limits (> 2^24 instances)
+constant uint FLAG_ENVROT = 512u;     // with FLAG_ENVMAP (and ENV_ROT compiled in): the dome is oriented by env_rot (any rotation)
+                                      // instead of env_yaw (about +z)
 
 inline float3x3 load_mat33(device const float* p) {
     return float3x3(float3(p[0], p[3], p[6]), float3(p[1], p[4], p[7]), float3(p[2], p[5], p[8]));
@@ -429,13 +433,38 @@ inline float3 env_dir(float2 uv, float yaw) {
     float st = sin(th);
     return float3(st * sin(lon), -st * cos(lon), cos(th));
 }
+// the dome's orientation. ENV_ROT (compile time, Tier2Renderer while a rotation is set) with FLAG_ENVROT takes the full
+// rotation R (a tilted dome; research_notes/dome_light_azimuth/tilted_dome.md): a world direction looks up the map at
+// R^T d, a map direction goes to the world as R d. Otherwise the yaw-only path; it is compiled exactly as before
+// ENV_ROT existed (a runtime branch here changed fast-math codegen: last-ulp differences in the radiance), so upright
+// domes render byte-identically. Lookup, pdf and sampler all go through these two, so the sampling pdf sees the same
+// rotation as the radiance (a rotation preserves solid angle: no extra Jacobian).
+#ifndef ENV_ROT
+#define ENV_ROT 0
+#endif
+inline float2 env_uv_c(float3 d, constant PTConsts& c) {
+#if ENV_ROT
+    if ((c.flags & FLAG_ENVROT) != 0u)
+        return env_uv(float3(dot(c.env_rot[0].xyz, d), dot(c.env_rot[1].xyz, d), dot(c.env_rot[2].xyz, d)), 0.0);
+#endif
+    return env_uv(d, c.env_yaw);
+}
+inline float3 env_dir_c(float2 uv, constant PTConsts& c) {
+#if ENV_ROT
+    if ((c.flags & FLAG_ENVROT) != 0u) {
+        float3 l = env_dir(uv, 0.0);
+        return normalize(c.env_rot[0].xyz * l.x + c.env_rot[1].xyz * l.y + c.env_rot[2].xyz * l.z);
+    }
+#endif
+    return env_dir(uv, c.env_yaw);
+}
 inline float3 env_radiance(texture2d<float> env, sampler s, float3 d, constant PTConsts& c) {
-    return env.sample(s, env_uv(d, c.env_yaw), level(0.0)).rgb * c.env_mul.rgb;
+    return env.sample(s, env_uv_c(d, c), level(0.0)).rgb * c.env_mul.rgb;
 }
 // solid-angle pdf of the importance sampler: p(omega) = p(u, v) / (2 pi^2 sin theta) (PBRT 3rd ed. 14.2.4);
 // `cdf` = [marginal CDF over rows (H) | per-row conditional CDFs (H*W) | density over (u, v) (H*W)]
 inline float env_pdf(float3 d, device const float* cdf, constant PTConsts& c) {
-    float2 uv = env_uv(d, c.env_yaw);
+    float2 uv = env_uv_c(d, c);
     uint x = min(uint(uv.x * c.env_w), c.env_w - 1), y = min(uint(uv.y * c.env_h), c.env_h - 1);
     float st = sin(uv.y * PI);
     if (st <= 1e-6) return 0.0;
@@ -455,7 +484,7 @@ inline float3 env_sample(device const float* cdf, constant PTConsts& c, float u1
     float r0 = x > 0 ? row[x - 1] : 0.0, w = max(row[x] - r0, 1e-9);
     float m0 = y > 0 ? cdf[y - 1] : 0.0, mh = max(cdf[y] - m0, 1e-9);
     float2 uv = float2((float(x) + clamp((u2 - r0) / w, 0.0, 1.0)) / float(c.env_w), (float(y) + clamp((u1 - m0) / mh, 0.0, 1.0)) / float(c.env_h));
-    float3 d = env_dir(uv, c.env_yaw);
+    float3 d = env_dir_c(uv, c);
     pdf = env_pdf(d, cdf, c);
     return d;
 }

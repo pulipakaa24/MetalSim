@@ -41,7 +41,8 @@ the GPU every frame, with a per-grain albedo palette (metalsim/render/particles.
 Environment map (``set_environment``): an equirectangular HDR image replaces the sky colour as the miss
 radiance and as an importance-sampled light (next-event estimation with multiple importance sampling
 against the BSDF sampler, as PBRT's InfiniteAreaLight). Orientation follows a textured USD DomeLight as
-Kit/RTX renders it on Isaac's z-up stages (pole +z; docs/PARITY.md 1.7); radiance = map x dome intensity x
+Kit/RTX renders it on Isaac's z-up stages (pole +z; docs/PARITY.md 1.7), under the prim's full rotation (a tilted
+dome: research_notes/dome_light_azimuth/tilted_dome.md); radiance = map x dome intensity x
 2^exposure x color (USD LightAPI). ``set_environment_from_model`` reads the DomeLight that
 ``metalsim.scene.usd_to_mjcf`` records in the model's custom text. Tests: a furnace under a constant map and
 an analytic bright-window plane (importance-sampled estimate unbiased within 2 %, uniform table > 3x noisier).
@@ -93,6 +94,26 @@ def env_sampling_table(hdr, grid=(512, 256)):
 # u = 0.25 toward +x; research_notes/dome_light_azimuth/), so USD stages (rendered by Kit) get this constant added to their
 # dome yaw in set_environment_from_model; the direct set_environment() API keeps the spec frame.
 KIT_DOME_AZIMUTH = -math.pi / 2
+
+
+def dome_rotation(rotation=None, yaw=0.0):
+    """3x3 rotation taking a direction in the tier-2 dome frame (``hdr.env_direction(u, v)``: pole +z, u = 0.5 toward
+    -y) to the world: ``rotation @ R_z(yaw)``. ``rotation``: None (identity), a 3x3 matrix or a wxyz quaternion."""
+    if rotation is None:
+        R = np.eye(3)
+    else:
+        r = np.asarray(rotation, np.float64)
+        if r.shape == (4,):
+            w, x, y, z = r / np.linalg.norm(r)
+            R = np.array([[1 - 2 * (y * y + z * z), 2 * (x * y - w * z), 2 * (x * z + w * y)],
+                          [2 * (x * y + w * z), 1 - 2 * (x * x + z * z), 2 * (y * z - w * x)],
+                          [2 * (x * z - w * y), 2 * (y * z + w * x), 1 - 2 * (x * x + y * y)]])
+        else:
+            R = r.reshape(3, 3)
+            if not np.allclose(R @ R.T, np.eye(3), atol=1e-5) or np.linalg.det(R) < 0:
+                raise ValueError("dome rotation must be a proper rotation matrix")
+    c, s = math.cos(yaw), math.sin(yaw)
+    return R @ np.array([[c, -s, 0.0], [s, c, 0.0], [0.0, 0.0, 1.0]])
 
 class Tier2Renderer:
     def __init__(self, model, n_envs: int, *, width=256, height=256, camera=None, spp=4, max_bounces=4,
@@ -236,8 +257,9 @@ class Tier2Renderer:
         c.upload_texture(self.atlas_tex, ai)
         self.samp = c.sampler(linear=True, repeat=True)
         # PTConsts (shaders/pathtrace.metal): 16 words as before + [16:18] env grid, [20] env_yaw, [21] clamp_lum, [24:28] env_mul
-        # [28:32] ray_limit, [32:48] lens, [48:76] haze (HazeParams); the EnvGrid follows at encode time
-        self.consts = np.zeros(76, np.uint32)
+        # [28:32] ray_limit, [32:48] lens, [48:76] haze (HazeParams), [76:88] env_rot (FLAG_ENVROT: columns of the dome
+        # rotation as float4); the EnvGrid follows at encode time
+        self.consts = np.zeros(88, np.uint32)
         self.consts[:4] = (n_envs, width, height, max(model.ncam, 1))
         self.consts[4:8] = (max(model.nlight, 1) if model.nlight else 0, self.G, spp, max_bounces)
         self.consts[8:12] = (0, self.rt.tpr, 1, seed)
@@ -254,7 +276,8 @@ class Tier2Renderer:
         self.denoise = denoise
         self.aux = bool(aux or denoise)
         self.base_flags = (2 if material_model != "legacy" else 0) | (4 if tonemap == "rtx" else 0) | (8 if self.aux else 0) | (16 if center_sample else 0)
-        self.env_flags = 0            # FLAG_ENVMAP (32) once set_environment has a map
+        self.env_flags = 0            # FLAG_ENVMAP (32) once set_environment has a map, | FLAG_ENVROT (512) for a tilted dome
+        self._env_rot_on = False      # the kernel is compiled with ENV_ROT (_build_pipeline) while a dome rotation is set
         self.consts_buf = c.buffer(self.consts.nbytes, self.consts, "pt_consts")
         # environment map resources (placeholders until set_environment; the shader ignores them without FLAG_ENVMAP)
         self._env_res = {}
@@ -392,6 +415,8 @@ class Tier2Renderer:
         defs["ENV_MATS"] = 1 if self._env_mats_on else 0
         if self.area is not None:
             defs["AREA_LIGHTS"] = 1           # scenes with USD area lights (metalsim.render.area_lights)
+        if self._env_rot_on:
+            defs["ENV_ROT"] = 1               # a tilted dome (set_environment(rotation=)); upright domes compile without it
         self.pipe = self.ctx.compute_pipeline(self.ctx.library("pathtrace", defs), "path_trace")
 
     def _encode_env_mats(self, cb, sim):
@@ -453,7 +478,7 @@ class Tier2Renderer:
         ce.setBuffer_offset_atIndex_(light_xpos, lxo, 10); ce.setBuffer_offset_atIndex_(light_xdir, ldo, 11)
         ce.setBuffer_offset_atIndex_(self.params_buf, 0, 12); ce.setBuffer_offset_atIndex_(self.cam_buf, 0, 13)
         ce.setBuffer_offset_atIndex_(cam_xpos, cxo, 14); ce.setBuffer_offset_atIndex_(cam_xmat, cmo, 15)
-        cbytes = self.consts.tobytes() + rt.grid.words().tobytes()     # PTConsts: 28 words, then the EnvGrid
+        cbytes = self.consts.tobytes() + rt.grid.words().tobytes()     # PTConsts: 88 words, then the EnvGrid
         if rt.dyn_bvh is not None:      # PTConsts.dyn_args: the BVH argument struct's address (the 31 buffer slots are taken)
             cbytes += np.array([rt.dyn_bvh.args.gpuAddress(), 0], np.uint64).tobytes()
         ce.setBytes_length_atIndex_(cbytes, len(cbytes), 16)   # copied at encode time (per pass)
@@ -614,12 +639,16 @@ class Tier2Renderer:
         c.upload_texture(self._env_tex, np.ascontiguousarray(rgba, np.float32))
         self._env_cdf = c.buffer(cdf.nbytes, np.ascontiguousarray(cdf, np.float32), "pt_env_cdf")
 
-    def set_environment(self, hdr=None, *, yaw=0.0, intensity=None, exposure=0.0, color=None, grid=(512, 256), key=None):
+    def set_environment(self, hdr=None, *, yaw=0.0, intensity=None, exposure=0.0, color=None, grid=(512, 256), key=None,
+                        rotation=None):
         """Equirectangular HDR environment ``hdr`` (H, W, 3) linear radiance: the miss radiance of every ray and
         an importance-sampled light (a textured USD DomeLight). Orientation as the OpenUSD spec puts a DomeLight_1
         on a z-up stage (OpenEXR latlong): pole +z, the image centre (u = 0.5) faces -y, u = 0.25 faces +x; ``yaw``
-        rotates the dome about +z (rad, a rotateZ on the prim). Kit/RTX renders the same dome at ``yaw +
-        KIT_DOME_AZIMUTH`` (centre toward -x), which ``set_environment_from_model`` applies for USD stages. Radiance = map x ``intensity`` x 2^``exposure`` x ``color``
+        rotates the dome about +z (rad, a rotateZ on the prim). ``rotation`` (3x3 matrix or wxyz quaternion, dome frame
+        -> world; None = identity) orients a tilted dome: a map direction d goes to the world as ``rotation @ R_z(yaw) @ d``
+        (lookup, importance sampling and its pdf alike). Kit/RTX renders the same dome at ``yaw +
+        KIT_DOME_AZIMUTH`` (centre toward -x) under the prim's full rotation, which ``set_environment_from_model`` applies
+        for USD stages (research_notes/dome_light_azimuth/tilted_dome.md). Radiance = map x ``intensity`` x 2^``exposure`` x ``color``
         (USD LightAPI); ``intensity`` / ``color`` default to the ``dome`` kwarg's (a DomeLight's intensity and
         colour apply to its texture) or 1. ``key`` caches the GPU texture and sampling table per map, so a
         randomizer can switch maps per episode without re-uploading (``hdr`` may then be None for a cached key).
@@ -640,13 +669,26 @@ class Tier2Renderer:
                 self._env_res[key] = (self._env_tex, self._env_cdf, gw, gh)
         self.consts[16:18] = (gw, gh)
         self.env_flags = 32
-        self.set_environment_pose(yaw, intensity, exposure, color)
+        self.set_environment_pose(yaw, intensity, exposure, color, rotation=rotation)
 
-    def set_environment_pose(self, yaw=0.0, intensity=None, exposure=0.0, color=None):
-        """Dome rotation about +z (rad) and the USD light scale on the map: intensity x 2^exposure x color
-        (``None``: the ``dome`` kwarg's intensity / colour, else 1)."""
+    def set_environment_pose(self, yaw=0.0, intensity=None, exposure=0.0, color=None, rotation=None):
+        """Dome rotation about +z (rad), then ``rotation`` (3x3 or wxyz quaternion, dome frame -> world; None = the
+        yaw-only path), and the USD light scale on the map: intensity x 2^exposure x color (``None``: the ``dome``
+        kwarg's intensity / colour, else 1)."""
         cf = self.consts.view(np.float32)
         cf[20] = float(yaw)
+        if rotation is None:
+            self.env_flags &= ~512
+            cf[76:88] = 0.0
+        else:
+            R = dome_rotation(rotation, yaw)
+            rot = np.zeros((3, 4), np.float32); rot[:, :3] = R.T     # float4 per column of R
+            cf[76:88] = rot.reshape(-1)
+            if self.env_flags & 32:
+                self.env_flags |= 512
+        if (rotation is not None) != self._env_rot_on:               # specialize the kernel (compiled once per variant)
+            self._env_rot_on = rotation is not None
+            self._build_pipeline()
         if intensity is None:
             intensity = self._dome[0] if self._dome is not None else 1.0
         if color is None:
@@ -657,7 +699,9 @@ class Tier2Renderer:
         """Apply the textured USD DomeLight that ``metalsim.scene.usd_to_mjcf`` recorded in the model's custom
         text ``usd_dome`` (file, intensity, exposure, color, yaw); returns its record or None when the model has
         none (or the dome has no texture: then the ``dome`` kwarg already carries it). Oriented as Kit/RTX renders
-        the stage: the shader yaw is the prim's yaw + ``KIT_DOME_AZIMUTH`` (-90 deg)."""
+        the stage: map direction -> world = R_prim . P . R_z(``KIT_DOME_AZIMUTH``) (P: DomeLight_1 pole alignment). An
+        upright dome (record without ``rot``) takes the yaw-only path, shader yaw = prim yaw + ``KIT_DOME_AZIMUTH``; a
+        tilted one (``rot`` = R_prim . P, row-major) the full rotation (research_notes/dome_light_azimuth/tilted_dome.md)."""
         import json
         import mujoco
         tid = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_TEXT, "usd_dome")
@@ -670,7 +714,11 @@ class Tier2Renderer:
         from metalsim.render.hdr import load_hdr
         key = rec["file"]
         hdr = None if key in self._env_res else load_hdr(rec["file"])
-        self.set_environment(hdr, yaw=float(rec.get("yaw", 0.0)) + KIT_DOME_AZIMUTH, intensity=float(rec.get("intensity", 1.0)),
+        if rec.get("rot") is not None:
+            rot, yaw = np.asarray(rec["rot"], np.float64).reshape(3, 3), KIT_DOME_AZIMUTH
+        else:
+            rot, yaw = None, float(rec.get("yaw", 0.0)) + KIT_DOME_AZIMUTH
+        self.set_environment(hdr, yaw=yaw, rotation=rot, intensity=float(rec.get("intensity", 1.0)),
                              exposure=float(rec.get("exposure", 0.0)), color=tuple(rec.get("color", (1, 1, 1))), grid=grid, key=key)
         return rec
 
