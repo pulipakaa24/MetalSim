@@ -1,0 +1,15 @@
+{
+ "num_envs": 1024,
+ "mode": "ppo",
+ "steps": 1,
+ "warmup": 1,
+ "iterations": 1,
+ "rollout_len": 96,
+ "wall_s": 99.06017504199917,
+ "env_steps_per_s": 992.3665081181356,
+ "physics": {
+  "capture_unit": "sim",
+  "rigid_deterministic": false,
+  "metal_fast_math": "off"
+ }
+}
