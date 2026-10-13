@@ -1,17 +1,21 @@
 # Coupled-scene re-timing and MPM close-out: hand-off notes
 
-Branch `mpm-closeout-retime` (from main 52469d93). Machine: the 16-inch M4 Max (Mac16,5). Envs: `.venv-newton152`,
-which imports Warp 95f6f121, Newton 3fd1f052 and MuJoCo Warp 3.11.0 from PyPI (`env_check.log`).
+Branch `mpm-closeout-retime` (from main 52469d93), PR #16. Machine: the 16-inch M4 Max (Mac16,5). Env:
+`.venv-newton152`, which imports Warp 95f6f121, Newton 3fd1f052 and MuJoCo Warp 3.11.0 (`env_check.log`).
 
-Done:
-- MPM.md: superseded "Open:" lines marked resolved with pointers (sections 5, 7, 1b). 8d hang paragraph updated with
-  the queue-history excerpt (`runs/rigid17/out/gpu_history_2026-10-12_0130-0300.txt`, `s17_base.watch`).
-- RENDER_COVERAGE: particle rendering rows updated (PRs #4, #9, #14, #15; T0 and T2 only).
-- Verified: both pinned Newton 1.7 commits (a4be3604, 9f317390) contain the mesh-SDF barrier fix; every pinned fork
-  commit is on GitHub.
-- Timing: `run.sh 3` (interleaved reps; L = the L4 protocol, S = the speed_suite protocol), logs and JSON here.
+Done (all GPU work finished on 2026-10-13):
+- `run.sh 3`: three interleaved repetitions, written to `summary.md` / `summary.json`. `profile.sh`: per-part and
+  per-kernel profiles in `profile/`, joined with the L4's nsys sums in `profile/joined*.md`.
+- MPM.md:
+  - 8j: the timing table, the profile and what would close the gap.
+  - 8d: the GPU-hang re-attribution.
+  - Superseded "Open:" lines marked resolved.
+  - 8i: a seed-study pointer.
+- STATUS / GAPS MPM rows and CHANGELOG. PARITY §1b.5 now says the Isaac seeds are waiting for L4 time.
+- RENDER_COVERAGE particle rows.
 
-Next:
-- Finish rep 3 of `run.sh` (re-run `bash run.sh 3`: it skips finished runs), then `profile.sh` (parts + per-kernel
-  profiles), then `python3 summarize.py --json summary.json`.
-- Section 8j in MPM.md (timing table + profile), STATUS.md line ~93, GAPS.md MPM row, CHANGELOG, PR.
+Verdict: MPM is not marked done. Two items are open:
+1. The Isaac Franka-Pour seeds 1-4 (L4 time).
+2. Captured coupled-scene speed: two-way 1.76x, ANYmal 1.29x the L4.
+
+Next if picked up: the two-way IJtm row-tiled product (MPM.md 8j, item 1), then a floor re-check.
