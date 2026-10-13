@@ -197,7 +197,7 @@ at 2,048 worlds; `scripts/setup_newton152.sh` installs it into `.venv-newton152`
   [#4315](https://github.com/newton-physics/newton/issues/4315) and pull requests
   [#4316](https://github.com/newton-physics/newton/pull/4316),
   [#4317](https://github.com/newton-physics/newton/pull/4317),
-  [#4318](https://github.com/newton-physics/newton/pull/4318). Status: open, awaiting the contributor licence
+  [#4318](https://github.com/newton-physics/newton/pull/4318). Status: open (still on 2026-10-13, `runs/docs_audit/upstream_state.log`), awaiting the contributor licence
   agreement and maintainer approval ([`FILED.md`](scripts/diagnostics/newton_upstream/FILED.md)).
 
 MetalSim's Newton XPBD engine is archived as experimental: it trains about 1.6× faster than MuJoCo Warp on the G1,
