@@ -89,7 +89,7 @@ class DynBVH:
         self.box_as = c.device.newAccelerationStructureWithSize_(s.accelerationStructureSize)
         self.box_scratch = c.buffer(max(int(s.buildScratchBufferSize), 16), label="dyn_bvh_box_scratch")
         self.topo = None
-        self.argss = [c.buffer(96, label="dyn_bvh_args0"), c.buffer(96, label="dyn_bvh_args1")]
+        self.argss = [c.buffer(176, label="dyn_bvh_args0"), c.buffer(176, label="dyn_bvh_args1")]
         self.cur = 0
         self._pool, self._pending, self._frames, self._last_retopo = None, None, 0, 0
         self.retopologies = 0
@@ -150,21 +150,21 @@ class DynBVH:
         self.tris.setLabel_("dyn_bvh_tris")
         for i in (0, 1):
             self._write_args(i)
+        rt._grid_listeners.append(lambda: [self._write_args(i) for i in (0, 1)])
         self.stats = {"nodes": self.n_nodes, "triangles": int(len(order)), "depth": int(depth.max()),
                       "bounds_mb": 32 * self.n_nodes * self.n / 2**20, "tris_mb": 36 * self.n_tris * self.n / 2**20}
 
     def _write_args(self, i):
         rt = self.rt
-        a = np.zeros(24, np.uint32)
+        a = np.zeros(44, np.uint32)       # DynBVHArgs: 7 pointers, 12 words, the EnvGrid at byte 96
         p = a.view(np.uint64)
         p[0], p[1], p[2] = rt.vbuf.gpuAddress(), rt.ibuf.gpuAddress(), rt.mesh_info.gpuAddress()
         p[3], p[4], p[5] = self.topo.gpuAddress(), self.orders[i].gpuAddress(), self.bounds.gpuAddress()
         p[6] = self.tris.gpuAddress()
         a[14:18] = (self.n, self.n_nodes, self.D, self.mesh_base)
-        a[18] = rt.tpr
-        a.view(np.float32)[19] = rt.stride
-        a[20] = rt.n_inst_static
-        a[21] = self.n_tris
+        a[18] = rt.n_inst_static
+        a[19] = self.n_tris
+        a[24:44] = rt.grid.words()
         self.ctx.write_buffer(self.argss[i], a)
 
     # -- leaf rebuilds ----------------------------------------------------------------------------------
@@ -192,10 +192,9 @@ class DynBVH:
     # -- per frame ------------------------------------------------------------------------------------
 
     def _refit_args(self, level_off=0, level_count=0):
-        a = np.zeros(12, np.uint32)
-        a[:7] = (self.n, self.n_nodes, self.D, self.mesh_base, level_off, level_count, self.rt.tpr)
-        a.view(np.float32)[7] = self.rt.stride
-        a[8] = self.n_tris
+        a = np.zeros(28, np.uint32)       # RefitArgs: 8 words, the EnvGrid at byte 32
+        a[:7] = (self.n, self.n_nodes, self.D, self.mesh_base, level_off, level_count, self.n_tris)
+        a[8:28] = self.rt.grid.words()
         return a.tobytes()
 
     def encode(self, cb, src, rebuild=False):
@@ -218,6 +217,7 @@ class DynBVH:
         ce.setBuffer_offset_atIndex_(self.boxes, 0, 1)
         a = self._refit_args()
         ce.setBytes_length_atIndex_(a, len(a), 2)
+        ce.setBuffer_offset_atIndex_(rt.grid_flag, 0, 3)
         ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n, 1, 1), Metal.MTLSize(64, 1, 1))
         ce.endEncoding()
         ae = cb.accelerationStructureCommandEncoder()

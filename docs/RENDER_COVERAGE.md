@@ -364,11 +364,11 @@ every geom (one geometry) is exactly the previous lookup, so geom hits are uncha
   frame's event waits; `extendedLimits` whenever a count passes Metal's standard limits.
 - A third prototype, merged tiles (at most 64 structures, a geometry per (env, object) placed by a per-geometry
   translation), was dropped: never the fastest, tile-local vertices up to a tile's extent of the env stride (tier 2
-  depth off by up to 1.4 mm), and 469 ms for the Aero hand's tier 2 at 1024 envs (ramp stopped). Commit 0aa57bc6 has it.
+  depth off by up to 1.4 mm), and 469 ms for the Aero hand's tier 2 at 1024 envs (ramp stopped). Commit 1463fd6e has it.
 
 Equality with per_env (5 envs; wrapping tendons, draped cloth, extras scene): tier 1 byte-identical; ray depth and
 tier 2 depth within 0.0007 mm except one pixel per env (an edge-on triangle at a tendon silhouette) and 2 tier-2 pixels
-at 0.12 mm (per_env itself differs by up to 1.76 mm between env 0 and env 4 in tier 2, see the env-stride note below).
+at 0.12 mm (with the legacy env grid per_env itself differed by up to 1.76 mm between env 0 and env 4 in tier 2; see the env grid below).
 
 Ramp (one exclusive queue job per layout; each step its own process under a 60 s watchdog with device utilisation
 back under 10 % after it; ms per frame, each frame synchronized, 64×64; per_env / sbvh):
@@ -388,6 +388,31 @@ path tracer on cloth, and 1.5–1.7x slower for tier 1, whose shadow and ambient
 draping cloth (256 envs) sbvh's ray-depth frame grows 1.26 → 1.56 ms and a fresh tracer on the final state takes
 1.50 ms: the growth is the workload (more cloth on screen), not loosened bounds (per_env 3.08 → 3.13, fresh 2.90).
 No anomaly, stall or ownerless GPU in any run of either layout up to 4096 envs.
+
+**Env grid: where the envs sit in the ray tracers' shared world** (`metalsim/sensors/env_grid.py`, `shaders/env_grid.h`;
+all ray tracers, all scenes). Every env's instances and rays are offset into one world. Before (now
+`env_layout="legacy"`): a 2D grid from the origin with stride 2 (extent + max range) + 1, so tier 2 (max range 1000 m)
+put env 31's camera 62 km out, where float32 spacing is 4 mm: the same state rendered differently per env. Now
+("compact", default): a grid centred on the origin (3D when that keeps offsets smaller; vertical stacking weighted 8x
+because a floor seen at grazing angles amplifies the origin's z rounding) whose cells are the env's content box (every
+drawn geom, camera, site, light, flex vertex and tendon point at the initial state, symmetric about the origin in x and
+y, plus max(1 m, a tenth of its largest side)); every ray ends where it leaves its env's cell. If geometry (geom
+centres, dynamic objects' bounds) later nears its cell's boundary, the GPU flags it and the cell doubles before the next
+frame (a warning says so; `RayTracer(env_margin=...)` sizes it up front). Same state in every env, max |env e − env 0|
+depth (p99.9) in mm, legacy → compact:
+
+| scene, envs | ray depth camera | tier 2 depth | lidar |
+|---|---|---|---|
+| wrapping tendons, 1024 | 0.24 (0.12) → 0.0064 (0.0045) | 7.6 (5.2) → 0.0067 (0.0048) | 0 → 0 |
+| draped cloth, 1024 | 0.71 (0.26) → 0.014 (0.014) | 17.3 (8.6) → 0.015 (0.015) | |
+| Go2 on a plane, 1024 | 2152 (0.21) → 0.22 (0.025) | 2154 (338) → 0.22 (0.024) | 3.7 (0.21) → 0.074 (0.020) |
+| Go2 on a plane, 64 | 269 (0.059) → 0.030 (0.007) | 2153 (2.2) → 0.031 (0.008) | 0.18 (0.053) → 0.014 (0.004) |
+
+The remaining maxima are grazing hits (floor near the horizon, tube silhouettes), where any origin rounding is
+amplified; hit masks are identical. Largest offsets at 1024 envs: legacy 1.3–1.4 km (tier 2: 62 km), compact 35–78 m.
+Speed is the same or better (cloth 1024 envs: depth 3.3 → 3.2 ms, tier 2 19.0 → 18.8, tier 1 13.1 → 13.3; Aero hand
+tier 2 59 → 41). `env_layout="legacy"` reproduces the previous outputs byte for byte (identity check: 111 of 121
+outputs identical against 471d156, the 10 others the ray-traced outputs of the two scenes with dynamic objects).
 
 **Unchanged when absent.** Scenes without visible sites / flexes / skins / tendons render byte-identically: 87 of 92
 outputs identical on six scenes (prims, textured heightfield, SO-101, Panda, Shadow hand, Go2) against the previous

@@ -166,8 +166,14 @@ class Tier0Renderer:
             self.rt = RayTracer(model, n_envs, max_range=50.0, max_group=max_group, include_planes=include_planes,
                                 decimate_faces=decimate_faces, terrain_slots=terrain_slots, draw_hfields=draw_hfields,
                                 appearance=appearance, ctx=self.ctx, device=device, **self._extras_kw)
-            ro = np.zeros(4, np.uint32); ro[0] = self.rt.tpr; ro.view(np.float32)[1] = self.rt.stride; ro[2] = rt_samples
-            self.rt_offset_buf = self.ctx.buffer(16, ro, "rt_offset")
+            ro = np.zeros(24, np.uint32); ro[0] = self.rt.tpr; ro.view(np.float32)[1] = self.rt.stride; ro[2] = rt_samples
+            ro[4:24] = self.rt.grid.words()                    # RTOffset.grid (env_grid.h)
+            self.rt_offset_buf = self.ctx.buffer(ro.nbytes, ro, "rt_offset")
+
+            def regrid(ro=ro):
+                ro[4:24] = self.rt.grid.words()
+                self.ctx.write_buffer(self.rt_offset_buf, ro)
+            self.rt._grid_listeners.append(regrid)
             if self.rt.shader_defines():      # sbvh layout: the ray-query shaders compiled for the per-env BVH
                 self._build_pipelines()
         # extra objects: pose rows of the site slots; vertices of the dynamic slots (shared with the ray tracer at tier 1,
