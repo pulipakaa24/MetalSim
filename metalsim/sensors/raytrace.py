@@ -228,6 +228,20 @@ class RayTracer:
         mext = t.material_ext if t.material_ext is not None else np.zeros((self.G, 8), np.float32)
         mt = np.concatenate([np.asarray(t.materials, np.float32).reshape(-1), np.asarray(mext, np.float32).reshape(-1)])
         self.mat_buf = c.buffer(mt.nbytes, mt, "rt_materials")
+        # transparency per slot (the sensors' transparency modes, docs/RENDER_COVERAGE.md): slot_alpha is the
+        # material-resolved alpha the renderers draw with (1 for opaque slots: alpha >= 0.995, height fields, terrain,
+        # sites / flexes / skins / tendons), slot_alpha_ray mj_ray's rule (the material's alpha when the geom has a
+        # material, else the geom's; ray_eliminate skips alpha exactly 0)
+        tr = np.zeros(self.G, bool) if t.transparent is None else np.asarray(t.transparent, bool)[:self.G]
+        a_mat = np.asarray(t.materials, np.float32).reshape(self.G, -1)[:, 3]
+        self.slot_alpha = np.where(tr, a_mat, 1.0).astype(np.float32)
+        a_ray = np.ones(self.G, np.float32)
+        for k, g in enumerate(t.geoms):
+            mid = int(model.geom_matid[g])
+            a_ray[k] = float(model.mat_rgba[mid][3]) if mid >= 0 else float(model.geom_rgba[g][3])
+        self.slot_alpha_ray = np.where(tr, a_ray, 1.0).astype(np.float32)
+        self.has_transparency = bool(tr.any())
+        self._tr_pipes = None
         self.n_inst_static = len(t.inst_table)     # instances refit from the pose rows (geoms, then sites)
         self.n_inst = len(inst_tab)                # + one identity instance per dynamic object (the scene's instances)
         self.inst_desc = c.buffer(64 * self.n_inst, label="rt_instance_descriptors")
@@ -244,7 +258,8 @@ class RayTracer:
         self.consts_buf = c.buffer(self.consts.nbytes, self.consts, "rt_consts")
         self.grid_flag = c.buffer(16, np.zeros(4, np.uint32), "rt_grid_flag")
         self.grid_growths = 0
-        lib = c.library("rt", {"DYN_SBVH": 1} if self.dyn is not None and self.dyn_layout == "sbvh" else None)
+        self._lib_defines = {"DYN_SBVH": 1} if self.dyn is not None and self.dyn_layout == "sbvh" else {}
+        lib = c.library("rt", self._lib_defines or None)
         self.p_refit = c.compute_pipeline(lib, "refit_instances")
         self.p_lidar = c.compute_pipeline(lib, "lidar")
         self.p_lidar_ext = c.compute_pipeline(lib, "lidar_ext")
@@ -548,6 +563,41 @@ class RayTracer:
         """Preprocessor defines of the ray kernels for this tracer's dynamic layout ({} = the plain kernels)."""
         return {"DYN_SBVH": 1} if self.dyn_bvh is not None else {}
 
+    # -- transparency --------------------------------------------------------------------------------
+
+    def tr_pipelines(self):
+        """The sensor kernels compiled with SENSOR_TR (transparent surfaces, lidar materials, return modes; rt.metal),
+        built on first use: scenes and sensors without them keep the plain kernels."""
+        if self._tr_pipes is None:
+            lib = self.ctx.library("rt", dict(self._lib_defines, SENSOR_TR=1))
+            self._tr_pipes = {k: self.ctx.compute_pipeline(lib, k) for k in ("lidar", "lidar_ext", "raycast_depth")}
+        return self._tr_pipes
+
+    def sensor_material_table(self, see_through=None, coverage=None, materials=None) -> np.ndarray:
+        """(G, 8) float32 per-slot sensor material read by the SENSOR_TR kernels (rt.metal first_surface, lidar_ext):
+        m0 = (0, coverage, specular, roughness), m1 = (transmission, ghost, 0, 0); default opaque (coverage 1, no
+        specular, transmission 1). ``see_through`` (G,) bool: slots the rays pass (coverage -1). ``coverage`` (G,): the
+        presence of each slot's diffuse surface (a lidar's partial returns). ``materials``: {slot: LidarMaterial}."""
+        tab = np.zeros((self.G, 8), np.float32)
+        tab[:, 1] = 1.0 if coverage is None else np.asarray(coverage, np.float32)
+        tab[:, 4] = 1.0
+        if see_through is not None:
+            tab[np.asarray(see_through, bool), 1] = -1.0
+        for k, lm in (materials or {}).items():
+            tab[k, 1:4] = (lm.coverage, lm.specular, lm.roughness)
+            tab[k, 4:6] = (lm.transmission, 1.0 if lm.ghost else 0.0)
+        return tab
+
+    def slots_matching(self, key) -> list:
+        """Slots of the geoms (then the extra objects) named ``key`` or matching it as a regex."""
+        import re
+        names = [mujoco.mj_id2name(self.m, mujoco.mjtObj.mjOBJ_GEOM, int(g)) or "" for g in self.tables.geoms]
+        names += [e["name"] or "" for e in self.tables.extras]
+        hit = [k for k, nm in enumerate(names) if nm == key or re.fullmatch(key, nm)]
+        if not hit:
+            raise ValueError(f"no traced geom matches {key!r}")
+        return hit
+
     # -- sensors ------------------------------------------------------------------------------------
 
     def _check_tube_resolution(self, res, what):
@@ -590,13 +640,14 @@ class RayTracer:
         refl[:len(geoms)] = np.asarray(reflectance, np.float32)[geoms]
         return refl
 
-    def make_depth_camera(self, camera: str | int, width: int, height: int, lens=None):
-        """``lens``: ``metalsim.render.lens.Lens`` (default pinhole from the model camera)."""
+    def make_depth_camera(self, camera: str | int, width: int, height: int, lens=None, **kw):
+        """``lens``: ``metalsim.render.lens.Lens`` (default pinhole from the model camera). ``kw``: ``transparent_ids``,
+        ``alpha_threshold`` (see ``RayDepthCamera``)."""
         import mujoco
         cam = mujoco.mj_name2id(self.m, mujoco.mjtObj.mjOBJ_CAMERA, camera) if isinstance(camera, str) else int(camera)
         ci = CameraIntrinsics.from_model(self.m, cam, width, height)
         self._check_tube_resolution(1.0 / max(ci.fx, ci.fy), "depth camera")
-        return RayDepthCamera(self, camera, width, height, lens=lens)
+        return RayDepthCamera(self, camera, width, height, lens=lens, **kw)
 
     # -- frame drivers -------------------------------------------------------------------------------
 
@@ -649,6 +700,60 @@ class RayTracer:
         return {s.name: s.numpy() for s in sensors}
 
 
+from dataclasses import dataclass, replace as _dc_replace
+
+
+@dataclass(frozen=True)
+class LidarMaterial:
+    """A lidar BSDF for one geom (``Lidar(lidar_materials=...)``; rt.metal ``lidar_ext`` with SENSOR_TR).
+
+    Returned power of a hit: P (coverage * reflectance * cos + pi F D G / (4 cos)) / r^2 (Lambertian part, plus the
+    specular backscatter of a smooth surface: Schlick F from ``specular`` at normal incidence, Beckmann D of roughness^2,
+    Smith G). The beam goes on with (1 - coverage) * transmission * (1 - F); with ``ghost`` it follows the mirror
+    direction instead when that fraction, (1 - coverage) F, is the larger (an echo behind the mirror at the path
+    length). ``reflectance`` None keeps the geom's (``Lidar(reflectance=...)``, else the MuJoCo material's, else 0.5)."""
+    reflectance: float | None = None
+    coverage: float = 1.0
+    specular: float = 0.0
+    roughness: float = 0.1
+    transmission: float = 1.0
+    ghost: bool = False
+
+
+# Presets named after the SimReady non-visual base materials Isaac's RTX lidar uses (omni:simready:nonvisual:base).
+# NVIDIA publishes no BSDF numbers: these follow Fresnel for the refractive index (a pane of two surfaces reflects
+# 2R / (1 + R), R = ((n - 1) / (n + 1))^2) and the measured behaviour of real lidars (research notes, section 1).
+LIDAR_MATERIALS = {
+    "clear_glass": LidarMaterial(reflectance=0.0, coverage=0.0, specular=0.077, roughness=0.1),            # n 1.5
+    "plexiglass": LidarMaterial(reflectance=0.0, coverage=0.0, specular=0.075, roughness=0.1),             # n 1.49
+    "frosted_glass": LidarMaterial(reflectance=0.5, coverage=0.2, specular=0.077, roughness=0.5),
+    "ceramic_glass": LidarMaterial(reflectance=0.0, coverage=0.0, specular=0.09, roughness=0.15),
+    "water": LidarMaterial(reflectance=0.0, coverage=0.0, specular=0.02, roughness=0.05, transmission=0.0),  # n 1.33;
+    # 905 nm is absorbed within centimetres of water: only the surface's specular return
+    "mirror": LidarMaterial(reflectance=0.0, coverage=0.0, specular=0.95, roughness=0.05, transmission=0.0, ghost=True),
+    "one_way_mirror": LidarMaterial(reflectance=0.0, coverage=0.0, specular=0.6, roughness=0.05, ghost=True),
+    "calibration_lambertian": LidarMaterial(reflectance=0.5, coverage=1.0),
+    "opaque": LidarMaterial(),
+}
+
+TRANSPARENCY_MODES = ("transmit", "surface", "behind", "opaque")
+RETURN_MODES = {"strongest": 0, "first": 1, "last": 2, "strongest_last": 3, "dual": 3, "first_last": 4,
+                "first_strongest": 5}
+
+
+def _lidar_material(v) -> LidarMaterial:
+    if isinstance(v, LidarMaterial):
+        return v
+    if isinstance(v, str):
+        if v not in LIDAR_MATERIALS:
+            raise ValueError(f"unknown lidar material {v!r}; presets: {sorted(LIDAR_MATERIALS)}")
+        return LIDAR_MATERIALS[v]
+    if isinstance(v, dict):
+        base = _lidar_material(v["base"]) if "base" in v else LidarMaterial()
+        return _dc_replace(base, **{k: x for k, x in v.items() if k != "base"})
+    raise TypeError(f"lidar material must be a preset name, a dict or a LidarMaterial, not {type(v).__name__}")
+
+
 class Lidar:
     """Beams given as (azimuth, elevation) pairs in the site frame (radians).
 
@@ -671,13 +776,43 @@ class Lidar:
 
     With extras, outputs gain a trailing returns dimension when ``max_returns > 1``
     ("range" (N, beams, R), "points" (N, beams, R, 3), ...) and "n_returns" (N, beams).
+
+    Transparent geoms (material-resolved ``rgba`` alpha < 0.995, as the renderers draw them) and lidar materials:
+
+    * ``transparency`` "transmit" (default): a transparent surface of alpha a returns P a rho cos / r^2 (alpha as
+      surface presence, as tier 2 and Isaac's fractional cutout opacity read it) and the beam goes on with P (1 - a);
+      an object counts once (its exit faces are skipped), echoes are formed as above. The lidar then runs the extended
+      kernel (outputs gain "n_returns"). "surface": MuJoCo's rangefinder / ``mj_ray`` (alpha > 0 stops the beam, alpha
+      exactly 0 is invisible); "behind": transparent geoms are invisible; "opaque": every geom stops the beam (the
+      previous behaviour).
+    * ``lidar_materials`` {geom name or regex: preset name, dict or ``LidarMaterial``} ("transmit" only): per-geom
+      lidar BSDF overriding the alpha, e.g. "clear_glass" (specular return near normal incidence only, ~92 %
+      transmitted), "mirror" (ghost echoes behind it); presets in ``LIDAR_MATERIALS``.
+    * ``return_mode`` [Isaac ``returnType``; Velodyne / Hesai / Ouster return modes]: "strongest" (default), "first",
+      "last", and with ``max_returns=2`` "strongest_last" ("dual": Velodyne dual, Hesai's default dual),
+      "first_last", "first_strongest".
+    * ``min_reflectance`` / ``min_reflectance_range`` [``minReflectance`` (as a fraction), ``minReflectionRangeM``]:
+      echoes weaker than a Lambertian target of that reflectance at that range at normal incidence are dropped.
+
+    A scene without transparent geoms, with the defaults, runs the same kernels as before (byte-identical outputs).
     """
 
     def __init__(self, rt: RayTracer, site, azimuths, elevations, name="lidar", *, divergence_deg=(0.0, 0.0),
                  spot_rays: int = 1, beam_profile: str = "uniform", max_returns: int = 1, hits_per_ray: int | None = None,
-                 min_echo_sep: float = 0.4, transmission: float = 1.0, reflectance=None):
+                 min_echo_sep: float = 0.4, transmission: float = 1.0, reflectance=None,
+                 transparency: str = "transmit", lidar_materials=None, return_mode: str = "strongest",
+                 min_reflectance: float = 0.0, min_reflectance_range: float = 1.0):
         import mujoco
         self.rt, self.name = rt, name
+        if transparency not in TRANSPARENCY_MODES:
+            raise ValueError(f"transparency must be one of {TRANSPARENCY_MODES}, not {transparency!r}")
+        if return_mode not in RETURN_MODES:
+            raise ValueError(f"return_mode must be one of {sorted(RETURN_MODES)}, not {return_mode!r}")
+        if lidar_materials and transparency != "transmit":
+            raise ValueError("lidar_materials apply with transparency='transmit'")
+        if RETURN_MODES[return_mode] >= 3 and max_returns < 2:
+            raise ValueError(f"return_mode {return_mode!r} reports two echoes: max_returns must be >= 2")
+        self.transparency, self.return_mode = transparency, return_mode
         m = rt.m
         self.site = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_SITE, site) if isinstance(site, str) else int(site)
         if self.site < 0:
@@ -695,8 +830,33 @@ class Lidar:
             rt.ctx.write_buffer(self.consts_buf, self.consts)
         rt._grid_listeners.append(regrid)
         hits_per_ray = int(hits_per_ray or max_returns)
+        # transparency: the per-slot material table of the SENSOR_TR kernels, or None (the plain kernels)
+        self.lmat, mats, self._slot_refl = None, {}, None
+        if lidar_materials:
+            base_refl = rt.slot_reflectance(reflectance)
+            for key, val in lidar_materials.items():
+                lm = _lidar_material(val)
+                for k in rt.slots_matching(key):
+                    mats[k] = lm
+                    if lm.reflectance is not None:
+                        base_refl[k] = lm.reflectance
+            self._slot_refl = base_refl      # per slot (the materials' reflectance folded in)
+        partial = transparency == "transmit" and (rt.has_transparency or bool(mats))
+        if partial:
+            self.lmat = rt.sensor_material_table(coverage=rt.slot_alpha, materials=mats)
+        elif transparency == "surface" and rt.has_transparency:
+            self.lmat = rt.sensor_material_table(see_through=rt.slot_alpha_ray <= 0.0)
+        elif transparency == "behind" and rt.has_transparency:
+            self.lmat = rt.sensor_material_table(see_through=rt.slot_alpha < 0.995)
+        self.min_power = float(min_reflectance) / max(float(min_reflectance_range), 1e-6) ** 2
+        tr_ext = partial or return_mode != "strongest" or self.min_power > 0.0
+        if tr_ext and self.lmat is None:
+            self.lmat = rt.sensor_material_table()
         self.extended = (spot_rays != 1 or max_returns != 1 or hits_per_ray != 1 or reflectance is not None
-                         or tuple(divergence_deg) != (0.0, 0.0))
+                         or tuple(divergence_deg) != (0.0, 0.0) or tr_ext)
+        self.tr = self.lmat is not None
+        if self.tr:
+            self.lmat_buf = rt.ctx.buffer(self.lmat.nbytes, self.lmat, "lidar_lmat")
         self.max_returns = int(max_returns)
         n = rt.n
         if not self.extended:
@@ -745,9 +905,11 @@ class Lidar:
         self.sub_buf = rt.ctx.buffer(self.sub.nbytes, self.sub, "lidar_sub")
         ext = np.zeros(8, np.uint32)
         ext[0], ext[1], ext[2] = spot_rays, self.max_returns, hits_per_ray
+        ext[3] = RETURN_MODES[self.return_mode] << 8          # LidarExt._p0: flags (SENSOR_TR kernels)
         ext.view(np.float32)[4] = min_echo_sep; ext.view(np.float32)[5] = transmission
+        ext.view(np.float32)[6] = self.min_power              # LidarExt._p1: detection threshold (SENSOR_TR kernels)
         self.ext_buf = rt.ctx.buffer(ext.nbytes, ext, "lidar_ext")
-        refl = rt.slot_reflectance(reflectance)
+        refl = self._slot_refl if self._slot_refl is not None else rt.slot_reflectance(reflectance)
         self.slot_reflectance = refl.astype(np.float32)
         self.refl_buf = rt.ctx.buffer(self.slot_reflectance.nbytes, self.slot_reflectance, "lidar_refl")
 
@@ -759,7 +921,11 @@ class Lidar:
         else:
             sxb, sxo, smb, smo = rt._host_site_xpos, 0, rt._host_site_xmat, 0
         ce = cb.computeCommandEncoder()
-        ce.setComputePipelineState_(rt.p_lidar_ext if self.extended else rt.p_lidar)
+        if self.tr:
+            ce.setComputePipelineState_(rt.tr_pipelines()["lidar_ext" if self.extended else "lidar"])
+            ce.setBuffer_offset_atIndex_(self.lmat_buf, 0, 20 if self.extended else 17)
+        else:
+            ce.setComputePipelineState_(rt.p_lidar_ext if self.extended else rt.p_lidar)
         rt._use_resources(ce)
         rt.bind_dyn_bvh(ce)
         ce.setAccelerationStructure_atBufferIndex_(rt.inst_as, 0)
@@ -791,9 +957,34 @@ class Lidar:
 
 
 class RayDepthCamera:
-    def __init__(self, rt: RayTracer, camera, width, height, name="ray_depth", lens=None):
+    """Depth (distance to the image plane along the optical axis) by ray casting; 0 = no hit.
+
+    Transparent geoms (material-resolved ``rgba`` alpha < 0.995), named as the renderers' annotations
+    (``Tier0Renderer`` / ``Tier2Renderer`` ``transparent_ids``):
+
+    * ``transparent_ids`` "surface" (default; "mujoco" an alias): the first surface with alpha > 0: MuJoCo's renderer
+      depth and ``mj_ray`` (alpha exactly 0 is invisible), Isaac's depth on glass;
+    * "behind": transparent geoms are invisible (Isaac RTX Real-Time's opacity cutout);
+    * "opaque": every geom, alpha 0 included (the previous behaviour);
+    * ``alpha_threshold=t`` (with "surface"): Isaac's ``opacity_threshold`` rule, a transparent geom counts only when
+      its alpha > t ("surface" is t = 0, "behind" t = 1).
+
+    A scene without transparent geoms runs the same kernel as before (byte-identical depth)."""
+
+    def __init__(self, rt: RayTracer, camera, width, height, name="ray_depth", lens=None, transparent_ids: str = "surface",
+                 alpha_threshold: float | None = None):
         import mujoco
         self.rt, self.name, self.w, self.h = rt, name, width, height
+        if transparent_ids not in ("surface", "mujoco", "behind", "opaque"):
+            raise ValueError(f"transparent_ids must be 'surface', 'behind', 'opaque' or 'mujoco', not {transparent_ids!r}")
+        self.transparent_ids = "surface" if transparent_ids == "mujoco" else transparent_ids
+        if alpha_threshold is not None and self.transparent_ids != "surface":
+            raise ValueError("alpha_threshold applies to transparent_ids='surface'")
+        thr = {"surface": 0.0 if alpha_threshold is None else float(alpha_threshold), "behind": 1.0}.get(self.transparent_ids)
+        see = (rt.slot_alpha < 0.995) & (rt.slot_alpha <= thr) if thr is not None else None
+        self.lmat = rt.sensor_material_table(see_through=see) if see is not None and see.any() else None
+        if self.lmat is not None:
+            self.lmat_buf = rt.ctx.buffer(self.lmat.nbytes, self.lmat, "raydepth_lmat")
         m = rt.m
         self.cam = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_CAMERA, camera) if isinstance(camera, str) else int(camera)
         ci = CameraIntrinsics.from_model(m, self.cam, width, height)
@@ -817,7 +1008,13 @@ class RayDepthCamera:
         else:
             cxb, cxo, cmb, cmo = rt._host_cam_xpos, 0, rt._host_cam_xmat, 0
         ce = cb.computeCommandEncoder()
-        ce.setComputePipelineState_(rt.p_depth)
+        if self.lmat is not None:
+            ce.setComputePipelineState_(rt.tr_pipelines()["raycast_depth"])
+            ce.setBuffer_offset_atIndex_(rt.inst_tab, 0, 8)
+            ce.setBuffer_offset_atIndex_(rt.inst_desc, 0, 9)
+            ce.setBuffer_offset_atIndex_(self.lmat_buf, 0, 10)
+        else:
+            ce.setComputePipelineState_(rt.p_depth)
         rt._use_resources(ce)
         rt.bind_dyn_bvh(ce)
         ce.setAccelerationStructure_atBufferIndex_(rt.inst_as, 0)
