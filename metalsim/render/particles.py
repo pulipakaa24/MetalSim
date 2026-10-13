@@ -225,19 +225,24 @@ class GrainField:
         c[13] = 1 if self.has_ids else 0
         return c
 
-    def encode_instances(self, cb, inst_desc, as_base: int, inst_base: int, tiles_per_row: int, stride: float):
+    def encode_instances(self, cb, inst_desc, as_base: int, inst_base: int, tiles_per_row: int, stride: float,
+                         keys=None, keys_off: int = 0):
+        """Grain i's instance descriptor to ``inst_desc[inst_base + i]`` (mesh ``as_base + k`` of the structure's
+        instanced list) and its identity key to ``keys`` at byte ``keys_off`` (default: this field's own key buffer)."""
         if self.n_grains == 0:
             return
         k = self.consts(as_base, inst_base, tiles_per_row, stride)
-        if self.keys.length() < 4 * self.n_grains:
-            self.keys = self.ctx.buffer(4 * self.n_grains, label="grain_keys")
+        if keys is None:
+            if self.keys.length() < 4 * self.n_grains:
+                self.keys = self.ctx.buffer(4 * self.n_grains, label="grain_keys")
+            keys, keys_off = self.keys, 0
         ce = cb.computeCommandEncoder()
         ce.setComputePipelineState_(self.pipe)
         ce.setBuffer_offset_atIndex_(inst_desc, 0, 0)
         ce.setBuffer_offset_atIndex_(self._pos_buf, self._pos_off, 1)
         ce.setBytes_length_atIndex_(k.tobytes(), k.nbytes, 2)
         ce.setBuffer_offset_atIndex_(self._ids_buf, 0, 3)
-        ce.setBuffer_offset_atIndex_(self.keys, 0, 4)
+        ce.setBuffer_offset_atIndex_(keys, keys_off, 4)
         ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n_grains, 1, 1), Metal.MTLSize(256, 1, 1))
         ce.endEncoding()
 
@@ -246,51 +251,107 @@ class GrainField:
             ce.useResource_usage_(a, Metal.MTLResourceUsageRead)
 
 
-class InstanceStructure:
-    """The scene's instances followed by grain instances in one instance acceleration structure, rebuilt every frame
-    (scene refit kernel, grain kernel, build). Reallocated when the grain count grows."""
+def _instance_structure(ctx, prim_list, count, desc_buf, label):
+    """(descriptor, structure, scratch, bytes) of an instance acceleration structure over ``prim_list``."""
+    d = Metal.MTLInstanceAccelerationStructureDescriptor.new()
+    d.setInstancedAccelerationStructures_(list(prim_list))
+    d.setInstanceCount_(count)
+    d.setInstanceDescriptorBuffer_(desc_buf); d.setInstanceDescriptorBufferOffset_(0)
+    d.setInstanceDescriptorStride_(64)
+    d.setInstanceDescriptorType_(Metal.MTLAccelerationStructureInstanceDescriptorTypeDefault)
+    s = ctx.device.accelerationStructureSizesWithDescriptor_(d)
+    a = ctx.device.newAccelerationStructureWithSize_(s.accelerationStructureSize)
+    if a is None:
+        raise RuntimeError(f"{label}: instance acceleration structure of {count} instances "
+                           f"({s.accelerationStructureSize / 2**20:.0f} MiB) could not be allocated")
+    return d, a, ctx.buffer(max(int(s.buildScratchBufferSize), 16), label=f"{label}_scratch"), int(s.accelerationStructureSize)
 
-    def __init__(self, rt, field: GrainField):
-        self.rt, self.field = rt, field
+
+class InstanceStructure:
+    """The renderer's instance acceleration structure with grains, rebuilt every frame from the physics state and the
+    particle buffer, in one of two layouts:
+
+    * ``"two_level"`` (default): the grains are their own instance acceleration structure (one instance per grain),
+      and that structure is a single instance of the scene's top-level structure next to the scene geometry; the
+      path tracer intersects through two instance levels (``max_levels<2>``). The top level stays as small as the
+      scene, and the grain structure is built without the scene's large geometry in it.
+    * ``"flat"``: the scene's instances followed by one top-level instance per grain, one build. On macOS 26 the
+      build of 25 M grains together with large overlapping ground planes did not finish (PARTICLES.md).
+
+    Grain descriptors and identity keys sit in one block: ``grain_block`` at byte ``grain_off`` holds the descriptors,
+    the keys follow them (two-level), or the keys are the field's own buffer (flat)."""
+
+    MODES = ("two_level", "flat")
+
+    def __init__(self, rt, field: GrainField, mode: str = "two_level"):
+        if mode not in self.MODES:
+            raise ValueError(f"grain structure {mode!r}: one of {self.MODES}")
+        self.rt, self.field, self.mode = rt, field, mode
         self.capacity = -1
-        self.n_total = -1
+        self.n_grains = -1
 
     def ensure(self):
         rt, f = self.rt, self.field
-        n_total = rt.n_inst + f.n_grains
-        if n_total == self.n_total:
+        G = f.n_grains
+        if G == self.n_grains:
             return
         c = rt.ctx
-        if n_total > self.capacity:
-            self.capacity = n_total
-            self.inst_desc = c.buffer(64 * n_total, label="pt_instances_with_grains")
-        d = Metal.MTLInstanceAccelerationStructureDescriptor.new()
-        d.setInstancedAccelerationStructures_(list(rt.prim_as) + list(f.prim_as))
-        d.setInstanceCount_(n_total)
-        d.setInstanceDescriptorBuffer_(self.inst_desc); d.setInstanceDescriptorBufferOffset_(0)
-        d.setInstanceDescriptorStride_(64)
-        d.setInstanceDescriptorType_(Metal.MTLAccelerationStructureInstanceDescriptorTypeDefault)
-        s = c.device.accelerationStructureSizesWithDescriptor_(d)
-        self.inst_as = c.device.newAccelerationStructureWithSize_(s.accelerationStructureSize)
-        if self.inst_as is None:
-            raise RuntimeError(f"instance acceleration structure of {n_total} instances "
-                               f"({s.accelerationStructureSize / 2**20:.0f} MiB) could not be allocated")
-        self.scratch = c.buffer(max(int(s.buildScratchBufferSize), 16), label="pt_inst_scratch_grains")
-        self.desc, self.n_total = d, n_total
-        self.as_bytes = int(s.accelerationStructureSize)
+        if self.mode == "flat":
+            n_total = rt.n_inst + G
+            if n_total > self.capacity:
+                self.capacity = n_total
+                self.inst_desc = c.buffer(64 * n_total, label="pt_instances_with_grains")
+            self.desc, self.inst_as, self.scratch, self.as_bytes = _instance_structure(
+                c, list(rt.prim_as) + list(f.prim_as), n_total, self.inst_desc, "pt_flat_grains")
+            self.grain_as_bytes = 0
+        else:
+            if G > self.capacity:
+                self.capacity = G
+                self.grain_buf = c.buffer(68 * G, label="pt_grain_instances_and_keys")   # descriptors, then keys
+            self.gdesc, self.grain_as, self.gscratch, self.grain_as_bytes = _instance_structure(
+                c, f.prim_as, G, self.grain_buf, "pt_grains")
+            if not hasattr(self, "inst_desc"):
+                self.inst_desc = c.buffer(64 * (rt.n_inst + 1), label="pt_instances_scene_and_grains")
+                top = np.zeros(16, np.float32)       # the grain structure: identity, opaque, all rays, after the scene meshes
+                top[0] = top[4] = top[8] = 1.0
+                tu = top.view(np.uint32); tu[12] = 4; tu[13] = 0xFFFFFFFF; tu[14] = 0; tu[15] = len(rt.prim_as)
+                c.write_buffer(self.inst_desc, top, offset=64 * rt.n_inst)
+            self.desc, self.inst_as, self.scratch, top_bytes = _instance_structure(
+                c, list(rt.prim_as) + [self.grain_as], rt.n_inst + 1, self.inst_desc, "pt_scene_and_grains")
+            self.as_bytes = top_bytes + self.grain_as_bytes
+        self.n_grains = G
+
+    @property
+    def n_total(self) -> int:
+        """Instances in the structure(s): scene instances + grains (+ the grain structure's own top-level instance)."""
+        return self.rt.n_inst + self.n_grains + (1 if self.mode == "two_level" else 0)
+
+    def grain_binding(self):
+        """(buffer, byte offset) for the path tracer's buffer 29."""
+        if self.mode == "flat":
+            return self.field.keys, 0
+        return self.grain_buf, 0
 
     def encode(self, cb, geom_xpos, gx_off, geom_xmat, gm_off):
-        """Scene refit into the first rt.n_inst descriptors, grain instances after them, one build."""
+        """Scene refit, grain instances, the build(s)."""
         self.ensure()
-        rt = self.rt
+        rt, f = self.rt, self.field
         rt._encode_refit(cb, geom_xpos, gx_off, geom_xmat, gm_off, inst_desc=self.inst_desc)
-        self.field.encode_instances(cb, self.inst_desc, len(rt.prim_as), rt.n_inst, rt.tpr, rt.stride)
+        if self.mode == "flat":
+            f.encode_instances(cb, self.inst_desc, len(rt.prim_as), rt.n_inst, rt.tpr, rt.stride)
+        else:
+            f.encode_instances(cb, self.grain_buf, 0, 0, rt.tpr, rt.stride, keys=self.grain_buf, keys_off=64 * f.n_grains)
+            ae = cb.accelerationStructureCommandEncoder()       # the grain structure first (the top level instances it)
+            ae.buildAccelerationStructure_descriptor_scratchBuffer_scratchBufferOffset_(self.grain_as, self.gdesc, self.gscratch, 0)
+            ae.endEncoding()
         ae = cb.accelerationStructureCommandEncoder()
         ae.buildAccelerationStructure_descriptor_scratchBuffer_scratchBufferOffset_(self.inst_as, self.desc, self.scratch, 0)
         ae.endEncoding()
 
     def use_resources(self, ce):
         ce.useResource_usage_(self.inst_as, Metal.MTLResourceUsageRead)
+        if self.mode == "two_level":
+            ce.useResource_usage_(self.grain_as, Metal.MTLResourceUsageRead)
         for a in self.rt.prim_as:
             ce.useResource_usage_(a, Metal.MTLResourceUsageRead)
         self.field.use_resources(ce)
