@@ -1,0 +1,14 @@
+G1 rough trained-policy rollout: N=4096 collision boxes_local njmax 256 nconmax 128 levels 10 x 20 start levels spread 0..9, frozen False, legacy settings False, contact_cfg recommended; ckpt /Users/aditya/robosim/runs/ellip_default/g1_rough_ellip_default_s0.pt
+it    5 sps   49,240 | ep_ret    0.00 ep_len    0.0 (n=0) | level mean 4.50 per level [410, 410, 410, 410, 410, 410, 409, 409, 409, 409] | flags {'ITERATIONS': 82, 'LS_ITERATIONS': 4096}
+it   10 sps   49,309 | ep_ret   -4.87 ep_len  210.9 (n=7) | level mean 4.50 per level [410, 410, 410, 410, 410, 410, 411, 409, 410, 406] | flags {'ITERATIONS': 206, 'LS_ITERATIONS': 4096}
+it   15 sps   49,248 | ep_ret   -6.16 ep_len  283.8 (n=5) | level mean 4.49 per level [410, 410, 410, 410, 412, 411, 410, 408, 410, 405] | flags {'ITERATIONS': 309, 'LS_ITERATIONS': 4096}
+it   20 sps   49,175 | ep_ret   -5.03 ep_len  428.4 (n=7) | level mean 4.49 per level [410, 410, 410, 412, 412, 410, 410, 409, 410, 403] | flags {'ITERATIONS': 421, 'LS_ITERATIONS': 4096}
+it   25 sps   49,182 | ep_ret   -1.15 ep_len  524.5 (n=4) | level mean 4.49 per level [410, 410, 410, 412, 411, 411, 410, 409, 411, 402] | flags {'ITERATIONS': 514, 'LS_ITERATIONS': 4096}
+it   30 sps   49,159 | ep_ret   -5.25 ep_len  632.9 (n=11) | level mean 4.49 per level [410, 410, 410, 412, 411, 410, 411, 408, 413, 401] | flags {'ITERATIONS': 609, 'LS_ITERATIONS': 4096}
+it   35 sps   49,138 | ep_ret   -1.81 ep_len  770.1 (n=13) | level mean 4.49 per level [412, 410, 410, 412, 409, 414, 410, 410, 410, 399] | flags {'ITERATIONS': 705, 'LS_ITERATIONS': 4096}
+it   40 sps   49,112 | ep_ret   -3.75 ep_len  925.2 (n=6) | level mean 4.48 per level [412, 410, 410, 412, 409, 415, 410, 410, 409, 399] | flags {'ITERATIONS': 794, 'LS_ITERATIONS': 4096}
+it   45 sps   49,147 | ep_ret    7.14 ep_len 1000.0 (n=4044) | level mean 4.66 per level [223, 418, 447, 463, 420, 444, 438, 444, 455, 344] | flags {'ITERATIONS': 65, 'LS_ITERATIONS': 4096}
+it   50 sps   49,165 | ep_ret    5.09 ep_len  720.7 (n=3) | level mean 4.66 per level [223, 418, 448, 462, 420, 444, 437, 446, 454, 344] | flags {'ITERATIONS': 155, 'LS_ITERATIONS': 4096}
+it   55 sps   49,176 | ep_ret    0.75 ep_len  625.8 (n=16) | level mean 4.66 per level [223, 419, 447, 462, 418, 446, 438, 446, 454, 343] | flags {'ITERATIONS': 259, 'LS_ITERATIONS': 4096}
+it   60 sps   49,166 | ep_ret    1.29 ep_len  741.2 (n=10) | level mean 4.66 per level [223, 419, 448, 460, 418, 447, 439, 446, 455, 341] | flags {'ITERATIONS': 360, 'LS_ITERATIONS': 4096}
+RESULT task=g1_rough_policy n=4096 iters_logged=60/60 latch=yes njmax=256 naconmax/world=128 final_sps=49166.0 wall=126s flags={'ITERATIONS': 360, 'LS_ITERATIONS': 4096} raised=None

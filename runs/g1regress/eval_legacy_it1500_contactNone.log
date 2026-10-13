@@ -1,0 +1,73 @@
+metalsim from /Users/aditya/robosim/.claude/worktrees/agent-a3214b300d0b6e295/metalsim/__init__.py
+task kwargs {'reward_cfg': 'rough_isaac', 'scan_ordering': 'ij', 'terrain_collision': 'hfield', 'scan_surface': 'grid', 'contact_cfg': None, 'base_velocity': 'origin', 'feet_slide_velocity': 'origin'}
+/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  warnings.warn(
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth dc949da load on device 'metal:0' took 62.32 ms  (cached)
+Module _nxn_broadphase__locals__kernel_80a41a9c 80a41a9 load on device 'metal:0' took 40.81 ms  (cached)
+Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_66b1418a 66b1418 load on device 'metal:0' took 55.86 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_285313d0 285313d load on device 'metal:0' took 60.07 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_72cc6aa2 72cc6aa load on device 'metal:0' took 40.93 ms  (cached)
+Module mujoco_warp._src.constraint 4b2565f load on device 'metal:0' took 38.51 ms  (cached)
+Module _friction_dof__locals__kernel_54b217fe 54b217f load on device 'metal:0' took 39.37 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_b316a999 b316a99 load on device 'metal:0' took 38.98 ms  (cached)
+Module _efc_contact_init__locals__kernel_52cf860d 52cf860 load on device 'metal:0' took 38.64 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_50fd8eb9 c8c5823 load on device 'metal:0' took 39.04 ms  (cached)
+Module _efc_contact_update__locals__kernel_27b27a7f 27b27a7 load on device 'metal:0' took 39.64 ms  (cached)
+Module mujoco_warp._src.forward 53c9939 load on device 'metal:0' took 52.08 ms  (cached)
+Module mujoco_warp._src.passive 121cefe load on device 'metal:0' took 50.42 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_ec74e588 ec74e58 load on device 'metal:0' took 38.56 ms  (cached)
+Module mujoco_warp._src.forward 9c6583c load on device 'metal:0' took 52.59 ms  (cached)
+Module _qfrc_smooth__locals__kernel_b9a126c0 b9a126c load on device 'metal:0' took 39.12 ms  (cached)
+Module mujoco_warp._src.support d1f2881 load on device 'metal:0' took 39.93 ms  (cached)
+Module _factor_i_sparse_unrolled__locals__kernel_7ac910f7 ab82c34 load on device 'metal:0' took 41.63 ms  (cached)
+Module _solve_LD_sparse_serial__locals__kernel_af3ba8f1 a010231 load on device 'metal:0' took 40.60 ms  (cached)
+Module _solve_init_dof__locals__kernel_a278b607 a278b60 load on device 'metal:0' took 39.06 ms  (cached)
+Module _solve_init_efc__locals__kernel_38f8708b 38f8708 load on device 'metal:0' took 38.87 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_e260fcc8 e260fcc load on device 'metal:0' took 39.11 ms  (cached)
+Module mul_m_kernel__locals___mul_m_1b897f73 1b897f7 load on device 'metal:0' took 39.28 ms  (cached)
+Module _update_constraint_efc__locals__kernel_875e0cfe 875e0cf load on device 'metal:0' took 39.63 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_9318117e 9318117 load on device 'metal:0' took 39.08 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_be8f77c5 be8f77c load on device 'metal:0' took 39.54 ms  (cached)
+Module _update_gradient_grad__locals__kernel_b82c9bc8 b82c9bc load on device 'metal:0' took 40.48 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_d3ce68ed aef5636 load on device 'metal:0' took 39.47 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_81a45505 28b7d27 load on device 'metal:0' took 39.47 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_ce86d521 2f68e45 load on device 'metal:0' took 43.81 ms  (cached)
+Module _update_constraint_gradient_fused__locals__kernel_9d4df7de 47b43ce load on device 'metal:0' took 40.22 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_404482d2 ba43116 load on device 'metal:0' took 40.43 ms  (cached)
+Module _solve_done__locals__kernel_f1d63dbf f1d63db load on device 'metal:0' took 39.28 ms  (cached)
+Module mujoco_warp._src.solver 00c4ab6 load on device 'metal:0' took 43.11 ms  (cached)
+Module mujoco_warp._src.sensor 7e89d17 load on device 'metal:0' took 61.16 ms  (cached)
+Module mujoco_warp._src.derivative 3eaf30a load on device 'metal:0' took 44.20 ms  (cached)
+Module _next_time_builder__locals___next_time_89d592b4 89d592b load on device 'metal:0' took 38.89 ms  (cached)
+Module metalsim.physics.batch 6be6507 load on device 'metal:0' took 38.39 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_99f1ed31 99f1ed3 load on device 'metal:0' took 38.19 ms  (cached)
+Module reset_data__locals__reset_M_c0d46912 c0d4691 load on device 'metal:0' took 38.16 ms  (cached)
+Module reset_data__locals__reset_mocap_21cdccdf 21cdccd load on device 'metal:0' took 38.61 ms  (cached)
+Module reset_data__locals__reset_contact_e7d9f88d e7d9f88 load on device 'metal:0' took 38.70 ms  (cached)
+Module reset_data__locals__reset_sleep_c3616e3d c3616e3 load on device 'metal:0' took 38.58 ms  (cached)
+Module reset_data__locals__reset_nworld_f3f460ae f3f460a load on device 'metal:0' took 38.89 ms  (cached)
+Module metalsim.sensors.contact a6f6b43 load on device 'metal:0' took 43.88 ms  (cached)
+warp first-layer weight matches checkpoint: True
+Module metalsim.learn.g1_velocity ab6d8eb load on device 'metal:0' took 50.08 ms  (cached)
+Module _solve_init_efc__locals__kernel_76688e06 76688e0 load on device 'metal:0' took 38.96 ms  (cached)
+Module _solve_done__locals__kernel_7965d769 7965d76 load on device 'metal:0' took 38.87 ms  (cached)
+Module metalsim.learn.terrain dbcef08 load on device 'metal:0' took 41.16 ms  (cached)
+Module metalsim.learn.warp_policy ab35144 load on device 'metal:0' took 44.83 ms  (cached)
+it   5 ep_ret    0.00 ep_len    0.0 (n=0) falls_frac 0.000 level mean 2.61
+it  10 ep_ret    0.00 ep_len    0.0 (n=0) falls_frac 0.000 level mean 2.61
+it  15 ep_ret    0.00 ep_len    0.0 (n=0) falls_frac 0.000 level mean 2.61
+it  20 ep_ret    0.00 ep_len    0.0 (n=0) falls_frac 0.000 level mean 2.61
+it  25 ep_ret    0.00 ep_len    0.0 (n=0) falls_frac 0.000 level mean 2.61
+it  30 ep_ret    3.51 ep_len  656.0 (n=1) falls_frac 1.000 level mean 2.61
+it  35 ep_ret    0.00 ep_len    0.0 (n=0) falls_frac 0.000 level mean 2.61
+it  40 ep_ret    0.00 ep_len    0.0 (n=0) falls_frac 0.000 level mean 2.61
+it  45 ep_ret   17.61 ep_len 1000.0 (n=1023) falls_frac 0.000 level mean 3.26
+it  50 ep_ret    0.00 ep_len    0.0 (n=0) falls_frac 0.000 level mean 3.26
+end: warp first-layer weight matches checkpoint: True
