@@ -1,0 +1,145 @@
+[gpu_run] ff_train_real start: device utilisation 5% (02:41:20)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.7 %
+##### g1_flat n=4096 iters=50 tree=new (02:41:22)
+metalsim from /Users/aditya/robosim/.claude/worktrees/agent-ad5dbe3dae8c8990c/metalsim/__init__.py
+[anomaly] it 1: joint limit violated by 0.19 rad
+[anomaly] it 1: contact penetration 4.5 cm
+[anomaly] it 2: joint limit violated by 0.20 rad
+[anomaly] it 2: contact penetration 3.2 cm
+[anomaly] it 3: joint limit violated by 0.20 rad
+[anomaly] it 3: contact penetration 2.8 cm
+[anomaly] it 4: joint limit violated by 0.21 rad
+[anomaly] it 4: contact penetration 2.9 cm
+[anomaly] it 5: joint limit violated by 0.23 rad
+[anomaly] it 5: contact penetration 4.0 cm
+[anomaly] it 6: joint limit violated by 0.19 rad
+[anomaly] it 6: contact penetration 3.3 cm
+[anomaly] it 7: joint limit violated by 0.24 rad
+[anomaly] it 7: contact penetration 2.8 cm
+[anomaly] it 8: joint limit violated by 0.21 rad
+[anomaly] it 8: contact penetration 3.0 cm
+[anomaly] it 9: joint limit violated by 0.23 rad
+[anomaly] it 9: contact penetration 2.8 cm
+[anomaly] it 10: joint limit violated by 0.23 rad
+##### g1_flat n=4096 iters=50 tree=main (02:43:03)
+metalsim from /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/maintree/metalsim/__init__.py
+[anomaly] it 1: joint limit violated by 0.19 rad
+[anomaly] it 1: contact penetration 4.5 cm
+[anomaly] it 2: joint limit violated by 0.20 rad
+[anomaly] it 2: contact penetration 3.0 cm
+[anomaly] it 3: joint limit violated by 0.20 rad
+[anomaly] it 3: contact penetration 2.9 cm
+[anomaly] it 4: joint limit violated by 0.21 rad
+[anomaly] it 4: contact penetration 2.5 cm
+[anomaly] it 5: joint limit violated by 0.21 rad
+[anomaly] it 5: contact penetration 2.7 cm
+[anomaly] it 6: joint limit violated by 0.19 rad
+[anomaly] it 6: contact penetration 3.0 cm
+[anomaly] it 7: joint limit violated by 0.19 rad
+[anomaly] it 7: contact penetration 2.7 cm
+[anomaly] it 8: joint limit violated by 0.26 rad
+[anomaly] it 8: contact penetration 3.0 cm
+[anomaly] it 9: joint limit violated by 0.23 rad
+[anomaly] it 9: contact penetration 3.1 cm
+[anomaly] it 10: joint limit violated by 0.20 rad
+##### g1_rough n=4096 iters=50 tree=new (02:44:31)
+metalsim from /Users/aditya/robosim/.claude/worktrees/agent-ad5dbe3dae8c8990c/metalsim/__init__.py
+[anomaly] it 1: KL 0.225 > 10x target: stale data or LR too high
+[anomaly] it 1: joint limit violated by 0.21 rad
+[anomaly] it 1: contact penetration 2.9 cm
+[anomaly] it 2: joint limit violated by 0.24 rad
+[anomaly] it 2: contact penetration 4.4 cm
+[anomaly] it 3: joint limit violated by 0.20 rad
+[anomaly] it 3: contact penetration 3.5 cm
+[anomaly] it 4: joint limit violated by 0.21 rad
+[anomaly] it 4: contact penetration 4.1 cm
+[anomaly] it 5: joint limit violated by 0.27 rad
+[anomaly] it 5: contact penetration 3.1 cm
+[anomaly] it 6: joint limit violated by 0.24 rad
+[anomaly] it 6: contact penetration 4.9 cm
+[anomaly] it 6: contact force 20627 N > 50x robot weight
+[anomaly] it 7: joint limit violated by 0.21 rad
+[anomaly] it 7: contact penetration 3.4 cm
+[anomaly] it 8: joint limit violated by 0.20 rad
+[anomaly] it 8: contact penetration 3.4 cm
+[anomaly] it 9: joint limit violated by 0.20 rad
+##### g1_rough n=4096 iters=50 tree=main (02:46:21)
+metalsim from /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/maintree/metalsim/__init__.py
+[anomaly] it 1: KL 0.229 > 10x target: stale data or LR too high
+[anomaly] it 1: joint limit violated by 0.21 rad
+[anomaly] it 1: contact penetration 3.0 cm
+[anomaly] it 2: joint limit violated by 0.17 rad
+[anomaly] it 2: contact penetration 4.3 cm
+[anomaly] it 3: joint limit violated by 0.22 rad
+[anomaly] it 3: contact penetration 3.3 cm
+[anomaly] it 4: joint limit violated by 0.20 rad
+[anomaly] it 4: contact penetration 3.2 cm
+[anomaly] it 5: joint limit violated by 0.30 rad
+[anomaly] it 5: contact penetration 3.2 cm
+[anomaly] it 6: joint limit violated by 0.19 rad
+[anomaly] it 6: contact penetration 3.4 cm
+[anomaly] it 7: joint limit violated by 0.21 rad
+[anomaly] it 7: contact penetration 4.0 cm
+[anomaly] it 8: joint limit violated by 0.20 rad
+[anomaly] it 8: contact penetration 3.3 cm
+[anomaly] it 8: contact force 1498172 N > 50x robot weight
+[anomaly] it 9: joint limit violated by 0.21 rad
+##### g1_rough_hfield n=4096 iters=50 tree=new (02:48:10)
+metalsim from /Users/aditya/robosim/.claude/worktrees/agent-ad5dbe3dae8c8990c/metalsim/__init__.py
+[anomaly] it 1: KL 0.223 > 10x target: stale data or LR too high
+[anomaly] it 1: joint limit violated by 0.21 rad
+[anomaly] it 1: contact penetration 2.9 cm
+[anomaly] it 2: joint limit violated by 0.18 rad
+[anomaly] it 2: contact penetration 3.9 cm
+[anomaly] it 3: joint limit violated by 0.20 rad
+[anomaly] it 3: contact penetration 4.1 cm
+[anomaly] it 4: joint limit violated by 0.19 rad
+[anomaly] it 4: contact penetration 3.1 cm
+[anomaly] it 5: joint limit violated by 0.20 rad
+[anomaly] it 5: contact penetration 3.4 cm
+[anomaly] it 6: joint limit violated by 0.20 rad
+[anomaly] it 6: contact penetration 3.5 cm
+[anomaly] it 7: joint limit violated by 0.24 rad
+[anomaly] it 7: contact penetration 3.7 cm
+[anomaly] it 8: joint limit violated by 0.20 rad
+[anomaly] it 9: joint limit violated by 0.23 rad
+[anomaly] it 9: contact penetration 3.5 cm
+[anomaly] it 10: joint limit violated by 0.21 rad
+##### g1_rough_hfield n=4096 iters=50 tree=main (02:49:55)
+metalsim from /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/maintree/metalsim/__init__.py
+[anomaly] it 1: KL 0.222 > 10x target: stale data or LR too high
+[anomaly] it 1: joint limit violated by 0.21 rad
+[anomaly] it 1: contact penetration 2.9 cm
+[anomaly] it 2: joint limit violated by 0.17 rad
+[anomaly] it 2: contact penetration 2.8 cm
+[anomaly] it 3: joint limit violated by 0.25 rad
+[anomaly] it 3: contact penetration 3.7 cm
+[anomaly] it 4: joint limit violated by 0.20 rad
+[anomaly] it 4: contact penetration 3.2 cm
+[anomaly] it 5: joint limit violated by 0.20 rad
+[anomaly] it 5: contact penetration 2.7 cm
+[anomaly] it 6: joint limit violated by 0.20 rad
+[anomaly] it 6: contact penetration 3.2 cm
+[anomaly] it 7: joint limit violated by 0.20 rad
+[anomaly] it 7: contact penetration 2.6 cm
+[anomaly] it 8: joint limit violated by 0.20 rad
+[anomaly] it 8: contact penetration 3.4 cm
+[anomaly] it 9: joint limit violated by 0.21 rad
+[anomaly] it 9: contact penetration 3.1 cm
+##### tron1 n=8192 iters=50 tree=new (02:51:41)
+metalsim from /Users/aditya/robosim/.claude/worktrees/agent-ad5dbe3dae8c8990c/metalsim/__init__.py
+RESULT task=tron1 n=8192 iters_logged=50/50 latch=yes njmax=64 naconmax/world=16 final_sps=135654.0 wall=110s flags={'ITERATIONS': 1, 'LS_ITERATIONS': 7479} raised=None
+##### tron1 n=8192 iters=50 tree=main (02:53:31)
+metalsim from /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/maintree/metalsim/__init__.py
+RESULT task=tron1 n=8192 iters_logged=50/50 latch=no (main) njmax=64 naconmax/world=16 final_sps=138114.0 wall=82s flags={'LS_ITERATIONS': 7461} raised=None
+##### lift n=64 iters=30 tree=new (02:54:54)
+metalsim from /Users/aditya/robosim/.claude/worktrees/agent-ad5dbe3dae8c8990c/metalsim/__init__.py
+RESULT task=lift n=64 iters_logged=30/30 latch=yes njmax=512 naconmax/world=48 final_sps=2039.0 wall=79s flags={'ITERATIONS': 20, 'LS_ITERATIONS': 64} raised=None
+##### lift n=64 iters=30 tree=main (02:56:14)
+metalsim from /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/maintree/metalsim/__init__.py
+RESULT task=lift n=64 iters_logged=30/30 latch=no (main) njmax=512 naconmax/world=48 final_sps=2138.0 wall=70s flags={'ITERATIONS': 12, 'LS_ITERATIONS': 64} raised=None
+##### done 02:57:25
+[gpu_run] ff_train_real end: device utilisation 92% (02:57:25), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 5 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       3.6 %
