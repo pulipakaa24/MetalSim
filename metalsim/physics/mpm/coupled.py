@@ -391,6 +391,7 @@ class MPMCoupling:
         self.capturable = cfg.capture and (cfg.grid_type in ("fixed", "dense") or
                                            int(self.solver_cfg.max_active_cell_count) > 0)
         self._graph = None
+        self._eager_steps = 0
         self.finalized = True
 
     def _set_proxy_masses(self, newton, mm) -> None:
@@ -444,6 +445,10 @@ class MPMCoupling:
             self._sync(write_q=True, write_qd=False)            # begin pose
         sim.launch_step()
         wp.copy(d.xfrc_applied, self._user_xfrc)
+        # mj_step leaves xpos / xquat / cvel at the step's start (kinematics run before integration); the proxies take
+        # the end state, as Newton's SolverMuJoCo does (forward kinematics of the end qpos / qvel). The next mj_step
+        # recomputes these fields from qpos first, so the rigid trajectory is unchanged.
+        self._end_kinematics()
         if cfg.mode == "staggered":
             self._sync(write_q=True, write_qd=True)             # end pose and velocity
         else:
@@ -462,6 +467,13 @@ class MPMCoupling:
         if cfg.harvest == "last_substep":
             self._harvest(self.coupling_f)
 
+    def _end_kinematics(self) -> None:
+        import mujoco_warp as mjw
+
+        mjw.kinematics(self.sim.m, self.sim.d)
+        mjw.com_pos(self.sim.m, self.sim.d)
+        mjw.com_vel(self.sim.m, self.sim.d)
+
     def _harvest(self, out: wp.array) -> None:
         self.solver.coupling_harvest_proxy_wrenches(self._proxy_ids, out, body_qd_before=None, state=self.state,
                                                     state_out=self.state, contacts=None, dt=self.dt)
@@ -471,14 +483,17 @@ class MPMCoupling:
         if not self.finalized:
             raise RuntimeError("finalize() first")
         with wp.ScopedDevice(self.sim.device):
-            if self.capturable:
-                if self._graph is None:
-                    with wp.ScopedCapture(device=self.sim.device) as cap:
-                        self._launch_coupled_step()
-                    self._graph = cap.graph
+            if self.capturable and self._graph is not None:
+                wp.capture_launch(self._graph)
+            elif self.capturable and self._eager_steps > 0:
+                # recorded after one eager step has loaded every module and sized the solver's buffers
+                with wp.ScopedCapture(device=self.sim.device, force_module_load=False) as cap:
+                    self._launch_coupled_step()
+                self._graph = cap.graph
                 wp.capture_launch(self._graph)
             else:
                 self._launch_coupled_step()
+                self._eager_steps += 1
         return self.sim._signal()
 
     # -- state -----------------------------------------------------------------------------------------------------
@@ -492,6 +507,17 @@ class MPMCoupling:
     def particle_qd(self) -> wp.array:
         """Particle velocities [m/s], (N * P, 3)."""
         return self.state.particle_qd
+
+    @property
+    def particle_radius(self) -> float:
+        """Largest particle radius [m] (half the particle spacing), the renderer's ``radius``."""
+        return float(self.model.particle_radius.numpy().max())
+
+    def attach_renderer(self, renderer, **kw) -> None:
+        """Draw the material in a ``Tier0Renderer`` / ``Tier2Renderer`` from the solver's particle buffer (the GPU
+        path: no host copy; the renderer reads it each frame, after the step it waits on). ``kw``: ``set_particles``
+        options (``material``, ``grains_per_particle``, ...)."""
+        renderer.set_particles(self.particle_q, radius=kw.pop("radius", self.particle_radius), **kw)
 
     def particles(self) -> np.ndarray:
         """(N, P, 3) positions on the host (synchronizes)."""
@@ -515,6 +541,7 @@ class MPMCoupling:
                       inputs=[wm, self.model.particle_world, self._q0, self._qd0],
                       outputs=[self.state.particle_q, self.state.particle_qd])
             wp.launch(_zero_masked_wrench, dim=n * self.nb, inputs=[wm, self.nb], outputs=[self.coupling_f])
+            self._end_kinematics()
             self._sync(write_q=True, write_qd=True)
             self.solver.reset(self.state, world_mask=wm,
                               flags=int(newton.StateFlags.PARTICLE_Q) | int(newton.StateFlags.PARTICLE_QD))

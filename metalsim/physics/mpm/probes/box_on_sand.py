@@ -87,12 +87,15 @@ def run_newton(a):
     floors, boxes = [], []
     for _w in range(a.worlds):
         b.begin_world()
+        # two coincident floors: one for MuJoCo's box-floor contact (arm entry), one as the sand's static collider
+        # (media entry); Isaac's media view drops COLLIDE_PARTICLES from shapes it does not own
+        floors.append(b.add_shape_plane(width=0.0, length=0.0, body=-1,
+                                        cfg=newton.ModelBuilder.ShapeConfig(mu=0.5, density=0.0)))
         floors.append(b.add_shape_plane(width=0.0, length=0.0, body=-1,
                                         cfg=newton.ModelBuilder.ShapeConfig(mu=0.5, density=0.0)))
         body = b.add_body(xform=wp.transform(wp.vec3(0.0, 0.0, BOX_Z), wp.quat_identity()), mass=BOX_M,
                           inertia=wp.mat33(*(np.eye(3) * BOX_M * (2 * BOX_H) ** 2 / 6.0).astype(np.float32).ravel()),
                           lock_inertia=True)
-        b.add_joint_free(body)
         b.add_shape_box(body, hx=BOX_H, hy=BOX_H, hz=BOX_H,
                         cfg=newton.ModelBuilder.ShapeConfig(mu=0.5, density=0.0))
         boxes.append(body)
@@ -107,14 +110,15 @@ def run_newton(a):
         cfg.separate_worlds = True
         shape_body = m.shape_body.numpy()
         box_shapes = [i for i in range(m.shape_count) if shape_body[i] >= 0]
-        floor_shapes = [i for i in range(m.shape_count) if shape_body[i] < 0]
+        arm_floors, media_floors = floors[0::2], floors[1::2]
         entries = [
-            SolverCoupled.Entry(name="arm", solver=lambda view: SolverMuJoCo(view, use_mujoco_contacts=False,
+            SolverCoupled.Entry(name="arm", solver=lambda view: SolverMuJoCo(view, use_mujoco_contacts=True,
                                                                               integrator="implicitfast"),
-                                bodies=boxes, particles=[], joints=list(range(m.joint_count)), shapes=box_shapes,
+                                bodies=boxes, particles=[], joints=list(range(m.joint_count)),
+                                shapes=box_shapes + arm_floors,
                                 substeps=ARM_SUBSTEPS),
             SolverCoupled.Entry(name="media", solver=lambda view: SolverImplicitMPM(view, cfg), bodies=[],
-                                particles=list(range(m.particle_count)), joints=[], shapes=floor_shapes,
+                                particles=list(range(m.particle_count)), joints=[], shapes=media_floors,
                                 substeps=a.mpm_substeps, in_place=True),
         ]
         mass_scale = 1.0
