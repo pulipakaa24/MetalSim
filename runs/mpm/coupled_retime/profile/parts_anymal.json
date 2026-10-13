@@ -1,0 +1,21 @@
+{
+ "scene": "example:mpm_anymal",
+ "device": "metal:0",
+ "frame_ms_synced": 45.4213457996957,
+ "parts_ms_per_frame": {
+  "example.simulate_sand": 25.63112925272435,
+  "mpm_solver.step (SolverImplicitMPM)": 25.62686870005564,
+  "example.simulate_robot": 19.07458955029142,
+  "solver.step (SolverMuJoCo)": 18.355739605613053,
+  "example.apply_control": 0.7039832475129515,
+  "example.policy": 0.31880629976512864
+ },
+ "calls_per_frame": {
+  "example.policy": 1.0,
+  "example.apply_control": 1.0,
+  "solver.step (SolverMuJoCo)": 4.0,
+  "example.simulate_robot": 1.0,
+  "mpm_solver.step (SolverImplicitMPM)": 1.0,
+  "example.simulate_sand": 1.0
+ }
+}
