@@ -1008,12 +1008,24 @@ repeats bitwise in all 12 multi-world configurations of `probes/multiworld_repea
   | 256 | 60.6 | 54.7 | 4,226 / 4,678 |
   | 1,024 | 223.6 | 210.5 | 4,579 / 4,865 |
 
-* **Physics observations, solver-level** (the same in Isaac's path): the dropped box sinks through most of the 8 cm
-  bed (to 1 cm above the floor; Gauss-Seidel: onto it), more than the bed's bearing capacity suggests for a 2 kPa load;
-  and a collapsing column's deposit flank is 10-14 deg for friction 0.4-0.9 (runout 0.32 / 0.20 / 0.17 m, height
-  3.2 / 5.2 / 6.2 cm): a collapse deposit is not an angle of repose. Batch 02 measures the bearing settlement against
-  resolution, iterations, bed depth and friction (`probes/bearing.py`) and the angle of repose by a slow cylinder lift
-  (`probes/repose_lift.py`).
+* **Bearing: the box sinks because of the exchange lag, not the sand** (batch 02, `runs/mpm_main/bearing/`;
+  research `research_notes/MPM in main simulator/bearing_and_sinking.md`). The bed's bearing capacity is 5-10x the box's
+  2 kPa (Vesic / Meyerhof / Hansen with mu = 0.7 ~ phi 30-35 deg); a 1.7 m/s drop should stop after 1-2.5 cm. Yet a box
+  placed *at rest* on the bed sank to the floor in every configuration (voxel 0.02 / 0.01, 50 / 250 iterations,
+  friction 0.4 / 0.7 / 0.9, bed 8 / 16 cm), at a steady 0.082 m/s = g dt (dt = 1/120 s) while the harvested sand force
+  equalled the box's weight. That is the `"staggered"` exchange (MPM.md 8i, Isaac's Franka-Pour setting): the MPM
+  solve stops the proxy, but only the wrench reaches MuJoCo, in the next step, so v_{n+1} = v_n - g dt - v_n = -g dt
+  whatever the sand's strength. Newton's own default is `"lagged"` with a velocity rewind (its two-way example's
+  `subtract_body_force`), which has no drift in theory; `MPMCoupling` now defaults to it, and batch 03 measures drop and
+  rest tests in both modes. Isaac's Franka-Pour cups (staggered, held by the gripper) carry the same per-step drift
+  relative to the sand: matching Isaac and matching physical sand are separate claims.
+* **Angle of repose: not measured yet.** The column-collapse deposit (10-14 deg for friction 0.4-0.9) is not a repose
+  angle (inertial collapse; Lube 2004, Lajeunesse 2004), and its weak response to friction points at numerical
+  spreading. batch 02's cylinder lift is void: the tube's velocity actuator was unstable (tube position 1e20 m), so the
+  sand collapsed. The solver's yield surface is sqrt(J2) <= mu p, so the expected repose angle is atan(mu)
+  (21.8 / 34.2 / 42.0 deg); batch 03 runs the corrected protocol (`research_notes/MPM in main simulator/
+  angle_of_repose.md`: mocap tube, rough floor, resolution ladder R/dx = 5 / 10 / 15, lift-speed plateau, column-maximum
+  surface fit checked on a synthetic 30 deg cone: 30.0 deg).
 
 ### Re-vendoring when the fork pin moves
 

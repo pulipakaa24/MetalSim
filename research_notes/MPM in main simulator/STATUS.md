@@ -27,7 +27,19 @@ bitwise; box pair bitwise until contact then 1.7e-7 m; neutrality; GS repeatable
 non-determinism), free-fall test (lateral 2e-4 m/s from the solver's numerical air drag), repose (my batch marked it
 PASS unconditionally: a bug; and a collapse deposit is not a repose angle).
 
-## In flight: batch_02 (`runs/mpm_main/batch_02/batch_02.sh`): per-part divergence diagnosis, new opt-in
+## batch_02 results (15:59) and batch_03 (in flight)
+- Rigid side: MuJoCo Warp not repeatable by default (box on floor diverges at step 18 at 1,024 worlds);
+  `BatchSimOptions(deterministic=True)` makes box / coupled scenes repeat at 1,024 worlds, but the stacked-boxes test
+  at 256 worlds failed in one pytest process. batch_03: options before put_model, one mode per process, record bound
+  in scope, replayed-module check, overflow flag; cold / warm cache cross-process tests (`deterministic_batchsim.md`).
+- Bearing: every configuration sank at 0.082 m/s = g dt -> staggered-exchange lag (`bearing_and_sinking.md`); default
+  switched to "lagged"; batch_03 runs the 12-case matrix.
+- Repose: batch_02 lift void (unstable tube actuator, tube at 1e20 m); collapse parity with Newton bitwise; batch_03
+  runs the corrected protocol (`angle_of_repose.md`).
+- Jobs import the worktree's metalsim: gpu() runs every command with cwd = worktree (watchdog --cwd); batch_03 also
+  uses `python -P -m` and logs an import audit.
+
+## Earlier: batch_02 (`runs/mpm_main/batch_02/batch_02.sh`): per-part divergence diagnosis, new opt-in
 `BatchSimOptions(deterministic=True)`, rigid regression, collapse parity vs Newton alone, slow-lift repose, bearing
 settlement matrix, tests, then fork push + PR if green.
 
