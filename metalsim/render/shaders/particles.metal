@@ -23,8 +23,10 @@ struct GrainConsts {
     uint as_base, tiles_per_row, seed, inst_base; // first grain mesh's index in the instanced-structure list; env grid; first grain instance
     float stride, radius, radius_jitter, offset;  // env grid spacing; grain radius (volume-equivalent) and relative jitter; offset half side
     float cull_z;                                 // particles with z < cull_z get no grains (mask 0); -inf = none
-    uint has_ids, _u0, _u1;                       // has_ids: grain identity from ids[] (stable ids of a compacted particle set)
+    uint has_ids, user_ids, _u1;                  // has_ids: grain identity from ids[] (stable ids of a compacted particle set);
+                                                  // user_ids: write UserID descriptors (68 bytes), user id = 0x80000000 | grain index
 };
+struct InstanceDescUser { InstanceDesc d; uint user; };   // MTLAccelerationStructureUserIDInstanceDescriptor (68 bytes)
 
 inline uint hash_u(uint x) { x ^= x >> 16; x *= 0x7feb352du; x ^= x >> 15; x *= 0x846ca68bu; x ^= x >> 16; return x; }
 inline float u01(thread uint& s) { s = hash_u(s + 0x9e3779b9u); return float(s & 0xFFFFFFu) / 16777216.0; }
@@ -41,6 +43,7 @@ inline float3x3 random_rotation(thread uint& s) {
 
 kernel void grain_instances(
     device InstanceDesc*    inst [[buffer(0)]],   // the renderer's instance descriptors; grains from c.inst_base
+                                                  // (c.user_ids: InstanceDescUser, read through inst_u)
     device const float*     pos  [[buffer(1)]],   // (n_envs, n_particles, 3) particle positions [m]
     constant GrainConsts&   c    [[buffer(2)]],
     device const uint*      ids  [[buffer(3)]],   // (n_envs, n_particles) stable particle ids (c.has_ids)
@@ -68,6 +71,12 @@ kernel void grain_instances(
     d.mask = ok ? 0xFFFFFFFFu : 0u;    // mask 0: never intersected
     d.if_table_offset = 0;
     d.as_index = c.as_base + mesh;
-    inst[c.inst_base + i] = d;
+    if (c.user_ids) {
+        device InstanceDescUser* inst_u = (device InstanceDescUser*)inst;
+        inst_u[c.inst_base + i].d = d;
+        inst_u[c.inst_base + i].user = 0x80000000u | i;
+    } else {
+        inst[c.inst_base + i] = d;
+    }
     keys[i] = key;
 }
