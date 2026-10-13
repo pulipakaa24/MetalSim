@@ -20,6 +20,10 @@ solver from meaning the same thing on Metal as on the L4:
    twoway repeatability on the L4 is unmeasured); on Metal the SIMD-groups arrive in varying order and two identical
    runs drift apart (twoway: frame 54). ``install(rigid_deterministic=True)`` makes ``SolverMuJoCo`` on Metal
    default to ``wp.DeterministicMode.RUN_TO_RUN`` and ``newton.CollisionPipeline`` to ``deterministic=True``.
+   It also builds ``SolverCoupled``'s kernels in RUN_TO_RUN mode: the coupled solver compacts each entry's contacts
+   with an atomic counter, so without it the entry solver saw them in thread-arrival order. That made Isaac Lab's
+   Franka-Pour scene differ run to run from its first step (about 2e-7), even with everything above. With it, the
+   scene repeats bitwise at 64 and 2,048 worlds, eager and captured, at the same cost per step.
    The Warp fork (branch ``metalsim-metal-det-sort``, merged into ``metalsim-integrated``) implements RUN_TO_RUN
    on Metal as on CUDA, scalably: float accumulation atomics add into exact per-element integer accumulators (order
    cannot change the bits), and counters that hand out slots run in two phases with a GPU sort and scan, so slots
@@ -46,6 +50,7 @@ only comparable at the residual it reached).
 from __future__ import annotations
 
 import functools
+import importlib
 
 import numpy as np
 import warp as wp
@@ -178,6 +183,7 @@ def _install_rigid_determinism(enabled: bool) -> None:
         _STATE["collision_pipeline_init"] = newton.CollisionPipeline.__init__
     orig_init = _STATE["solver_mujoco_init"]
     orig_pipeline_init = _STATE["collision_pipeline_init"]
+    _set_coupled_determinism(enabled, mode)
     if not enabled:
         SolverMuJoCo.__init__ = orig_init
         newton.CollisionPipeline.__init__ = orig_pipeline_init
@@ -199,6 +205,36 @@ def _install_rigid_determinism(enabled: bool) -> None:
         orig_init(self, model, *args, deterministic=deterministic, **kwargs)
 
     SolverMuJoCo.__init__ = init
+
+
+def _coupled_modules():
+    """Newton's coupled-solver kernel modules (``SolverCoupled``, ``SolverCoupledProxy``), the ones imported."""
+    modules = []
+    for name in ("newton._src.solvers.coupled.solver_coupled", "newton._src.solvers.coupled.solver_coupled_proxy"):
+        try:
+            modules.append(importlib.import_module(name))
+        except ImportError:
+            pass
+    return modules
+
+
+def _set_coupled_determinism(enabled: bool, mode) -> None:
+    """On Metal, build ``SolverCoupled``'s kernels in RUN_TO_RUN mode (``install(rigid_deterministic=True)``).
+
+    The coupled solver compacts each entry's rigid and soft contacts with an atomic counter
+    (``_filter_*_contacts_global_shape_ids_kernel``), so the entry solver (MuJoCo Warp) saw them in thread-arrival
+    order: Isaac Lab's Franka-Pour scene differed run to run from its first step even with the rigid side
+    deterministic. Warp's deterministic mode hands out the slots in thread order and orders the module's float sums.
+    Not on CUDA/CPU (Newton as shipped there), and not when ``wp.config.deterministic`` already chose a mode.
+    """
+    if not wp.is_metal_available() or wp.config.deterministic != mode.NOT_GUARANTEED:
+        return
+    want = mode.RUN_TO_RUN if enabled else mode.NOT_GUARANTEED
+    if not enabled and not _STATE.get("coupled_deterministic"):
+        return
+    for module in _coupled_modules():
+        wp.set_module_options({"deterministic": want}, module=module)
+    _STATE["coupled_deterministic"] = enabled
 
 
 def uninstall() -> None:
