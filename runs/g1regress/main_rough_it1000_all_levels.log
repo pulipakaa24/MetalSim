@@ -1,0 +1,14 @@
+G1 rough trained-policy rollout: N=4096 collision boxes_local njmax 256 nconmax 128 levels 10 x 20 start levels spread 0..9, frozen False, legacy settings False, contact_cfg recommended; ckpt /Users/aditya/robosim/.claude/worktrees/agent-a3214b300d0b6e295/runs/g1regress/ckpt14/rough_main_s0.pt
+it    5 sps   48,953 | ep_ret    0.00 ep_len    0.0 (n=0) | level mean 4.50 per level [410, 410, 410, 410, 410, 410, 409, 409, 409, 409] | flags {'ITERATIONS': 116, 'LS_ITERATIONS': 4096}
+it   10 sps   49,116 | ep_ret   -5.45 ep_len  197.7 (n=11) | level mean 4.49 per level [410, 410, 410, 410, 411, 409, 412, 406, 416, 402] | flags {'ITERATIONS': 282, 'LS_ITERATIONS': 4096}
+it   15 sps   49,114 | ep_ret   -7.14 ep_len  287.9 (n=20) | level mean 4.49 per level [411, 410, 410, 410, 411, 410, 412, 412, 415, 395] | flags {'ITERATIONS': 439, 'LS_ITERATIONS': 4096}
+it   20 sps   49,081 | ep_ret   -8.19 ep_len  429.4 (n=14) | level mean 4.49 per level [411, 410, 410, 410, 411, 410, 411, 415, 416, 392] | flags {'ITERATIONS': 593, 'LS_ITERATIONS': 4096}
+it   25 sps   49,053 | ep_ret   -7.57 ep_len  502.4 (n=17) | level mean 4.49 per level [411, 410, 410, 412, 410, 409, 411, 415, 416, 392] | flags {'ITERATIONS': 741, 'LS_ITERATIONS': 4096}
+it   30 sps   49,018 | ep_ret   -7.71 ep_len  644.2 (n=20) | level mean 4.49 per level [411, 410, 408, 413, 411, 410, 412, 415, 418, 388] | flags {'ITERATIONS': 871, 'LS_ITERATIONS': 4096}
+it   35 sps   48,996 | ep_ret  -10.23 ep_len  762.5 (n=20) | level mean 4.48 per level [412, 410, 408, 415, 410, 411, 413, 416, 417, 384] | flags {'ITERATIONS': 995, 'LS_ITERATIONS': 4096}
+it   40 sps   48,976 | ep_ret   -7.23 ep_len  758.5 (n=20) | level mean 4.48 per level [412, 410, 409, 415, 409, 416, 409, 413, 421, 382] | flags {'ITERATIONS': 1120, 'LS_ITERATIONS': 4096}
+it   45 sps   48,980 | ep_ret    0.85 ep_len  999.9 (n=3983) | level mean 4.61 per level [237, 418, 451, 454, 418, 461, 446, 449, 465, 297] | flags {'ITERATIONS': 118, 'LS_ITERATIONS': 4096}
+it   50 sps   48,987 | ep_ret   -3.99 ep_len  647.6 (n=7) | level mean 4.61 per level [237, 418, 451, 454, 419, 460, 445, 452, 462, 298] | flags {'ITERATIONS': 263, 'LS_ITERATIONS': 4096}
+it   55 sps   49,001 | ep_ret   -4.09 ep_len  616.1 (n=38) | level mean 4.61 per level [236, 419, 451, 455, 418, 458, 448, 454, 459, 298] | flags {'ITERATIONS': 393, 'LS_ITERATIONS': 4096}
+it   60 sps   49,003 | ep_ret   -6.02 ep_len  677.8 (n=25) | level mean 4.60 per level [236, 420, 451, 455, 419, 459, 452, 451, 455, 298] | flags {'ITERATIONS': 516, 'LS_ITERATIONS': 4094}
+RESULT task=g1_rough_policy n=4096 iters_logged=60/60 latch=yes njmax=256 naconmax/world=128 final_sps=49003.0 wall=126s flags={'ITERATIONS': 516, 'LS_ITERATIONS': 4094} raised=None

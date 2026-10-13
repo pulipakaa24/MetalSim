@@ -1,0 +1,95 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__________________ test_loaded_weights_reach_the_warp_policy ___________________
+
+    def test_loaded_weights_reach_the_warp_policy():
+        """A state dict loaded into ``algo.net`` (a checkpoint replay, a resume) is what the next rollout runs. The
+        parameters live in Warp buffers written through PyTorch's MPS queue; with nothing ordering that copy before the
+        Warp rollout, the rollout kept the random initial weights for the whole run (2026-10-13: trained G1 rough
+        checkpoints replayed by scripts/diagnostics/overflow_training_check.py fell after ~40 control steps, like an
+        untrained policy, while the same checkpoints walk once the copy has landed)."""
+        import copy
+    
+        import numpy as np
+        from metalsim.learn.ppo_warp import CartpoleTask, PPOWarp, PPOWarpConfig
+        wp.config.quiet = True
+        task = CartpoleTask(64, seed=0)
+        algo = PPOWarp(task, PPOWarpConfig(iterations=1, rollout=4, hidden=(32, 32), seed=0))
+        ref = copy.deepcopy(algo.net).to("cpu")
+        torch.manual_seed(123)
+        with torch.no_grad():
+            for p in ref.parameters():
+                p.normal_(0.0, 0.5)
+        algo.net.load_state_dict({k: v.to("mps") for k, v in ref.state_dict().items()})   # as the replay harness does
+        algo.prepare()
+        algo.rollout()                                   # no torch synchronization in between, as in a replay loop
+        wp.synchronize_device("metal:0")
+        obs = task.obs.numpy()
+        with torch.no_grad():
+            mean_ref = ref.actor_mean(torch.as_tensor(obs)).numpy()
+>       np.testing.assert_allclose(algo.pol.actor_act[-1].numpy(), mean_ref, atol=1e-4, rtol=1e-3)
+E       AssertionError: 
+E       Not equal to tolerance rtol=0.001, atol=0.0001
+E       
+E       Mismatched elements: 64 / 64 (100%)
+E       First 5 mismatches are at indices:
+E        [0, 0]: 0.030462319031357765 (ACTUAL), 3.9955880641937256 (DESIRED)
+E        [1, 0]: 0.22008560597896576 (ACTUAL), 52.654212951660156 (DESIRED)
+E        [2, 0]: -0.02283308282494545 (ACTUAL), 1.7311002016067505 (DESIRED)
+E        [3, 0]: -0.14328798651695251 (ACTUAL), 5.661163806915283 (DESIRED)
+E        [4, 0]: 0.12069757282733917 (ACTUAL), 20.351600646972656 (DESIRED)
+E       Max absolute difference among violations: 93.91616
+E       Max relative difference among violations: 1.0265224
+E        ACTUAL: array([[ 0.030462],
+E              [ 0.220086],
+E              [-0.022833],...
+E        DESIRED: array([[ 3.995588],
+E              [52.654213],
+E              [ 1.7311  ],...
+
+.claude/worktrees/agent-a3214b300d0b6e295/tests/test_ppo_warp_rollout.py:110: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Module mujoco_warp._src.smooth dc949da load on device 'metal:0' took 62.06 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_72cc6aa2 72cc6aa load on device 'metal:0' took 40.83 ms  (cached)
+Module mujoco_warp._src.constraint 4b2565f load on device 'metal:0' took 38.36 ms  (cached)
+Module _friction_dof__locals__kernel_54b217fe 54b217f load on device 'metal:0' took 39.19 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_b316a999 b316a99 load on device 'metal:0' took 39.26 ms  (cached)
+Module _efc_contact_init__locals__kernel_52cf860d 52cf860 load on device 'metal:0' took 38.76 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_50fd8eb9 c8c5823 load on device 'metal:0' took 39.33 ms  (cached)
+Module _efc_contact_update__locals__kernel_27b27a7f 27b27a7 load on device 'metal:0' took 39.17 ms  (cached)
+Module mujoco_warp._src.forward 53c9939 load on device 'metal:0' took 52.13 ms  (cached)
+Module mujoco_warp._src.passive 121cefe load on device 'metal:0' took 49.55 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_ec74e588 ec74e58 load on device 'metal:0' took 38.67 ms  (cached)
+Module mujoco_warp._src.forward 9c6583c load on device 'metal:0' took 51.61 ms  (cached)
+Module _qfrc_smooth__locals__kernel_b9a126c0 b9a126c load on device 'metal:0' took 38.79 ms  (cached)
+Module mujoco_warp._src.support d1f2881 load on device 'metal:0' took 39.24 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_65421821 26731c5 load on device 'metal:0' took 38.77 ms  (cached)
+Module _solve_init_dof__locals__kernel_a278b607 a278b60 load on device 'metal:0' took 38.63 ms  (cached)
+Module _solve_init_efc__locals__kernel_38f8708b 38f8708 load on device 'metal:0' took 38.52 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_a4b1b25d a4b1b25 load on device 'metal:0' took 38.28 ms  (cached)
+Module mul_m_kernel__locals___mul_m_1b897f73 1b897f7 load on device 'metal:0' took 38.80 ms  (cached)
+Module _update_constraint_efc__locals__kernel_875e0cfe 875e0cf load on device 'metal:0' took 39.69 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_9318117e 9318117 load on device 'metal:0' took 38.73 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_be8f77c5 be8f77c load on device 'metal:0' took 38.47 ms  (cached)
+Module _update_gradient_grad__locals__kernel_b82c9bc8 b82c9bc load on device 'metal:0' took 38.43 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_e9f95efb b683a00 load on device 'metal:0' took 39.30 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_ca50fc91 69b14b4 load on device 'metal:0' took 38.44 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_0b950fec 73bb9e4 load on device 'metal:0' took 41.36 ms  (cached)
+Module _update_constraint_gradient_fused__locals__kernel_4d4bb2cd f7579ce load on device 'metal:0' took 39.42 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_27516c17 7affb51 load on device 'metal:0' took 38.53 ms  (cached)
+Module _solve_done__locals__kernel_f1d63dbf f1d63db load on device 'metal:0' took 38.53 ms  (cached)
+Module mujoco_warp._src.solver 00c4ab6 load on device 'metal:0' took 42.69 ms  (cached)
+Module mujoco_warp._src.derivative 3eaf30a load on device 'metal:0' took 44.50 ms  (cached)
+Module _next_time_builder__locals___next_time_89d592b4 89d592b load on device 'metal:0' took 41.74 ms  (cached)
+Module metalsim.physics.batch 6be6507 load on device 'metal:0' took 39.84 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_99f1ed31 99f1ed3 load on device 'metal:0' took 43.30 ms  (cached)
+Module reset_data__locals__reset_M_c0d46912 c0d4691 load on device 'metal:0' took 38.81 ms  (cached)
+Module reset_data__locals__reset_mocap_21cdccdf 21cdccd load on device 'metal:0' took 38.89 ms  (cached)
+Module reset_data__locals__reset_contact_e7d9f88d e7d9f88 load on device 'metal:0' took 38.62 ms  (cached)
+Module reset_data__locals__reset_sleep_c3616e3d c3616e3 load on device 'metal:0' took 39.12 ms  (cached)
+Module reset_data__locals__reset_nworld_f3f460ae f3f460a load on device 'metal:0' took 39.06 ms  (cached)
+Module metalsim.learn.ppo_warp b9f0b2b load on device 'metal:0' took 39.87 ms  (cached)
+Module metalsim.learn.warp_policy ab35144 load on device 'metal:0' took 40.99 ms  (cached)
+=========================== short test summary info ============================
+FAILED .claude/worktrees/agent-a3214b300d0b6e295/tests/test_ppo_warp_rollout.py::test_loaded_weights_reach_the_warp_policy
+1 failed in 3.43s

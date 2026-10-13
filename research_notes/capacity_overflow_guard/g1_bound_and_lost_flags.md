@@ -87,14 +87,22 @@ iteration), and the run reports `overflow_flags()` (latched, so every world sinc
 | G1 rough, heightfield (256 / 32) | 4096, 50 it | train_g1, curriculum | none | ITERATIONS ≤ 301 |
 | Tron1 WF (64 / 16) | 8192, 50 it | PPOWarp (its own loop has no guard) | none | ITERATIONS 1 |
 | SO-101 lift (512 / 48) | 64, 30 it | torch PPO of train_lift (no guard in its loop) | none | ITERATIONS 20 |
-| G1 rough, boxes_local / heightfield, trained rough checkpoint, envs spread over levels 0–9 | 4096, 150 rollouts | rollout only, curriculum on | none | – |
-| same, levels frozen (≈ 410 envs on each of the 10 levels for 3,600 control steps), checkpoint's own training settings | 4096, 150 rollouts | 14-inch, macOS 27 | none | – |
+| ~~G1 rough, boxes_local / heightfield, trained rough checkpoint, envs spread over levels 0–9~~ (ran the untrained weights, see below) | 4096, 150 rollouts | rollout only, curriculum on | none | – |
+| ~~same, levels frozen, checkpoint's own training settings~~ (ran the untrained weights) | 4096, 150 rollouts | 14-inch, macOS 27 | none | – |
+| G1 rough, trained checkpoint actually loaded (2026-09-26 elliptic default, `g1_rough_ellip_default_s0.pt`), envs spread over levels 0–9: boxes_local / heightfield | 4096, 150 rollouts | rollout only, curriculum on; 16-inch | none | ITERATIONS 483 / 504 |
+| same, levels frozen (≈ 410 envs on each of the 10 levels for 3,600 control steps): boxes_local / heightfield | 4096, 150 rollouts | 16-inch | none | ITERATIONS 478 / 523 |
 
 Logs: `runs/fixfail/train/real_*.log` (+ `.anomalies.jsonl`, every log point's flags), `runs/fixfail/train_real.log`,
-`runs/fixfail/train/g1_rough_policy*.log`, `runs/fixfail/train14/` (14-inch). Caveat: the available rough checkpoints
-(2026-09-25) no longer walk on today's task (episodes ≈ 40 control steps, falls), so the all-levels runs cover
-~370 K falls on every terrain level (torso, hands and knees on stairs and boxes), not sustained walking on the
-hardest levels. No default capacity needed changing.
+`runs/fixfail/train/g1_rough_policy*.log`, `runs/fixfail/train14/` (14-inch). Those two policy rows did NOT run the
+checkpoint: PPOWarp's parameters live in Warp buffers written through PyTorch's MPS queue, and nothing ordered the
+`load_state_dict` copy before the Warp rollout, so the rollouts ran the random initial weights (episodes ≈ 40 control
+steps, like an untrained policy; the Warp weights still differed from the checkpoint after the run). They cover
+~370 K falls on every terrain level, not walking. Fixed 2026-10-13 (PPOWarp publishes loaded weights,
+`tests/test_ppo_warp_rollout.py::test_loaded_weights_reach_the_warp_policy`; audit in
+`docs/research/ppowarp_checkpoint_load_2026-10-13.md`). Re-run with the fix (the last two rows; 16-inch, check jobs,
+`runs/g1regress/fixed_g1_rough_policy*.log`): 4,025–4,043 of 4,096 first episodes run to the 1,000-step time-out in
+all four runs; with the curriculum on, the mean level rises 4.50 → 5.04 (boxes) / 4.79 (heightfield) over 3,600
+control steps; no capacity flag, no raise. No default capacity needed changing.
 
 Throughput (16-inch only). Same process, latch hook attached / detached, interleaved, 5 repeats
 (`scripts/diagnostics/overflow_latch_cost_tasks.py`, `runs/fixfail/latch_cost_tasks.log`; the latch is the only

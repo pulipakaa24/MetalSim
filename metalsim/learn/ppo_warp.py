@@ -170,6 +170,16 @@ class PPOWarp:
         self.lr = self.cfg.lr
         self.graph = None
         self.learner_event = wm.SharedEvent(dev, "metalsim.ppo_warp")
+        # the parameters now live in Warp buffers written through PyTorch's MPS queue: a state dict loaded into the net
+        # (checkpoint replay, resume) must be ordered before the next Warp rollout like the optimizer's writes are, or
+        # the rollout runs the stale initial weights (found 2026-10-13: replayed checkpoints behaved as untrained)
+        self.net.register_load_state_dict_post_hook(lambda module, incompatible: self._publish_weights())
+
+    def _publish_weights(self) -> None:
+        """Order PyTorch's pending writes to the shared parameters before the next Warp launch."""
+        v = self.learner_event.next_value()
+        tb.signal_event(self.learner_event, v)
+        self.task.sim.wait(self.learner_event, v)
 
     def _obs(self):
         # tasks whose observation kernels draw noise / commands keyed by a device-side step counter: the
@@ -278,9 +288,7 @@ class PPOWarp:
                 self.opt.step()
                 stats["pg"] += pg.detach(); stats["vf"] += vf.detach(); stats["kl"] += (lp0[idx] - lp).mean().detach()
         # order the next rollout (Warp reads the weights) after the optimizer's writes
-        v = self.learner_event.next_value()
-        tb.signal_event(self.learner_event, v)
-        self.task.sim.wait(self.learner_event, v)
+        self._publish_weights()
         k = cfg.epochs * cfg.minibatches
         return {key: float(val_) / k for key, val_ in stats.items()}
 
