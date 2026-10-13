@@ -26,10 +26,10 @@ The guard: ``BatchSim.check_overflow()`` raises on any capacity overflow (droppe
 MuJoCo Warp's per-world ``d.overflow`` bits are zeroed by ``mjw.reset_data`` for every world it resets, so BatchSim
 latches the capacity bits after every substep into a sticky per-world array that resets do not touch (before
 2026-10-13 a world that overflowed and was then reset by its task, typically because the dropped rows made it fall,
-left no trace). MuJoCo Warp writes a connect (3-row) or weld (6-row) equality block only if it ends strictly below
-``njmax`` (``efcid >= njmax - 3``: a block that would end exactly at ``njmax`` is dropped while ``nefc == njmax``
-raises no flag), so for models with such blocks the latch also counts ``nefc >= njmax`` as an overflow, and the bound's
-``njmax`` keeps one spare row above ``nefc``. The training loop calls ``check_overflow()`` at every log point.
+left no trace). A connect (3-row) or weld (6-row) equality block that ends exactly at ``njmax`` is written (MuJoCo
+Warp fork ``metalsim`` since f52488b; until cf0f8ad it was dropped with ``nefc == njmax`` and no flag, which MetalSim
+then caught by counting ``nefc >= njmax`` and keeping a spare row in the bound); a block that does not fit leaves
+``nefc > njmax``, which MuJoCo Warp flags itself. The training loop calls ``check_overflow()`` at every log point.
 """
 from __future__ import annotations
 
@@ -54,12 +54,6 @@ UNBOUNDED_TYPES = (G.mjGEOM_HFIELD, G.mjGEOM_SDF)
 # OverflowType bits meaning dropped rows / contacts / dofs (NVMAX: "behavior undefined"; TACTILE: dropped sensor pairs);
 # ITERATIONS / LS_ITERATIONS are solver caps, not capacity
 CAPACITY_FLAGS = ("NEFC", "NJMAX_NNZ", "BROADPHASE", "NARROWPHASE", "CCD", "HFIELD", "EPA_HORIZON", "CONTACT_MATCH", "NVMAX", "TACTILE")
-EQ_BLOCK_TYPES = (mujoco.mjtEq.mjEQ_CONNECT, mujoco.mjtEq.mjEQ_WELD)   # equality rows MuJoCo Warp writes as one block
-
-
-def eq_blocks(mjm: mujoco.MjModel) -> int:
-    """Number of connect / weld equalities (blocks MuJoCo Warp drops silently when they would end exactly at njmax)."""
-    return int(np.isin(mjm.eq_type, EQ_BLOCK_TYPES).sum()) if mjm.neq else 0
 
 
 def capacity_mask() -> int:
@@ -76,14 +70,11 @@ class Bounds:
     neq_rows: int
     nfriction: int
     pairs: tuple           # (geom1, geom2, max contacts, rows per contact)
-    eq_blocks: int = 0     # connect / weld equalities
 
     @property
     def njmax(self) -> int:
-        """nefc rounded up to MuJoCo Warp's constraint tile (16); at least 16. With connect / weld blocks one spare row
-        above nefc (a block ending exactly at njmax is dropped without a flag; the latch counts nefc >= njmax there)."""
-        need = self.nefc + (1 if self.eq_blocks else 0)
-        return max(16, ((need + 15) // 16) * 16)
+        """nefc rounded up to MuJoCo Warp's constraint tile (16); at least 16."""
+        return max(16, ((self.nefc + 15) // 16) * 16)
 
     @property
     def nconmax(self) -> int:
@@ -142,8 +133,7 @@ def bounds(mjm: mujoco.MjModel, wm) -> Bounds:
         neq_rows += eq_rows[t]
     nfriction = int((mjm.dof_frictionloss > 0).sum()) + (int((mjm.tendon_frictionloss > 0).sum()) if mjm.ntendon else 0)
     nefc = nlimit + neq_rows + nfriction + sum(k * r for _, _, k, r in pairs)
-    return Bounds(ncon=ncon, nefc=nefc, nlimit=nlimit, neq_rows=neq_rows, nfriction=nfriction, pairs=tuple(pairs),
-                  eq_blocks=eq_blocks(mjm))
+    return Bounds(ncon=ncon, nefc=nefc, nlimit=nlimit, neq_rows=neq_rows, nfriction=nfriction, pairs=tuple(pairs))
 
 
 def capacity_overflows(flags: dict) -> dict:

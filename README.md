@@ -120,7 +120,7 @@ first four commits plus the graph-capture sort; merged into `metalsim`.
 
 [github.com/pulipakaa24/mujoco_warp](https://github.com/pulipakaa24/mujoco_warp), branch
 [`metalsim`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), head
-[`cf0f8ad`](https://github.com/pulipakaa24/mujoco_warp/commit/cf0f8adc8f99f0c559cf8580cb667952e473bd07) (2026-10-12, the commit the install pins;
+[`f1b35e2`](https://github.com/pulipakaa24/mujoco_warp/commit/f1b35e2b3ddc80b197b0c665bf6d71523d175daf) (2026-10-13, the commit the install pins;
 the rigid-body results before the elliptic-cone work were produced at
 [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) / code
 [`8fbf965`](https://github.com/pulipakaa24/mujoco_warp/commit/8fbf965acb630aa32573dda802404d519c843a99)). Base: Google
@@ -251,16 +251,16 @@ git clone https://github.com/pulipakaa24/MetalSim && cd MetalSim
 python3.12 -m venv .venv && source .venv/bin/activate     # uv only: $(uv python find 3.12) -m venv .venv
 pip install -e ".[test]"
 scripts/setup_warp.sh
-pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@cf0f8adc8f99f0c559cf8580cb667952e473bd07#egg=mujoco-warp" "mujoco>=3.14,<3.15"
+pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@f1b35e2b3ddc80b197b0c665bf6d71523d175daf#egg=mujoco-warp" "mujoco>=3.14,<3.15"
 scripts/fetch_isaac_assets.sh              # NVIDIA's g1_minimal.usd, fetched from NVIDIA, not redistributed
 pytest tests -q
 scripts/setup_newton152.sh                 # optional: MPM (.venv-newton152; tests/test_mpm.py runs there)
 ```
 
-The MuJoCo Warp commit is pinned (the head of the fork's branch `metalsim` on 2026-10-12), as Warp's in
+The MuJoCo Warp commit is pinned (the head of the fork's branch `metalsim` on 2026-10-13), as Warp's in
 `scripts/setup_warp.sh` and Newton's in `pyproject.toml`. Without access to the fork: clone
 google-deepmind/mujoco_warp, `git checkout 88af9cc` (v3.14.0), `git apply` MetalSim's
-`patches/mujoco_warp/metalsim-cf0f8ad.diff` (the whole branch as one diff) and `pip install -e` that checkout.
+`patches/mujoco_warp/metalsim-f1b35e2.diff` (the whole branch as one diff) and `pip install -e` that checkout.
 The `mujoco<3.15` on that line keeps pip from moving MuJoCo past 3.14: the fork reads `MjModel.flex_internal`,
 which 3.15 removed (the fork alone asks only `mujoco>=3.12`, and its uv index offers 3.15 nightlies).
 

@@ -3,6 +3,10 @@
 What landed between 2026-09-22 and 2026-09-25, one line per commit, grouped by area and in
 commit order within each area (`git log` for the full messages). Dates are the commit dates (month-day).
 
+## Physics: equality block at njmax (2026-10-13, `research_notes/capacity_overflow_guard/g1_bound_and_lost_flags.md`)
+
+- 10-13 MuJoCo Warp pin cf0f8ad -> f1b35e2 (fork `metalsim` fast-forwarded to f52488b4: a connect / weld block ending exactly at njmax is written; one that does not fit leaves nefc > njmax and MuJoCo Warp flags it). MetalSim's workaround removed (latch counted `nefc >= njmax` for models with such blocks, `Bounds.njmax` kept a spare row); the reset latch stays. `patches/mujoco_warp/metalsim-f1b35e2.diff`; `tests/test_capacity.py::test_equality_block_ending_at_njmax_is_flagged` covers connect and weld
+
 ## Learning: checkpoint loading (2026-10-13, `docs/research/ppowarp_checkpoint_load_2026-10-13.md`)
 
 - 10-13 PPOWarp: a state dict loaded into `algo.net` is published to the Warp rollout policy (load_state_dict post-hook, same event ordering as `update()`); before, a replayed checkpoint ran the initial weights (`tests/test_ppo_warp_rollout.py::test_loaded_weights_reach_the_warp_policy`). Overflow-guard research note's trained-policy rows corrected and re-run; `scripts/diagnostics/g1_policy_replay.py`

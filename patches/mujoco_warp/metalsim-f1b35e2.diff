@@ -1,9 +1,9 @@
 diff --git a/METALSIM_CHANGES.md b/METALSIM_CHANGES.md
 new file mode 100644
-index 0000000..5cc3283
+index 0000000..84a4dc8
 --- /dev/null
 +++ b/METALSIM_CHANGES.md
-@@ -0,0 +1,53 @@
+@@ -0,0 +1,54 @@
 +# MetalSim changes on this branch (`metalsim`)
 +
 +This branch is the MuJoCo Warp build that [MetalSim](https://github.com/pulipakaa24/MetalSim) runs on (see the
@@ -50,6 +50,7 @@ index 0000000..5cc3283
 +| `12cc1e2` | Line search: derivative noise floor (`MJW_LS_NOISE_FLOOR`, in float32-eps multiples, 0 = upstream's test): the convergence test uses max(gtol, K eps (sum \|q1_i\| + \|alpha\| sum 2 q2_i)) with the Cauchy-Schwarz bound the kernel already forms for the alpha floor (Genesis PR #3382's rule: a derivative below the rounding noise of its own terms is zero). CPU, G1 walking states: line-search iterations per call 5.97 -> 2.72, the launch's longest search 14.1 -> 11.2 (median 20 -> 10), Newton iterations unchanged, state after 8 substeps at the 1-ulp floor. Metal: env step -2.2 %, PPO loop 37.5 K -> 38.1 K. `MJW_LS_STATS=1` records per-world line-search iteration counts (`ctx.ls_iters`). **Off by default (archived option)**: MetalSim's 4096-env cap probe is at the floor on walking states but 1.3x the floor's p99 |dqvel| on lying robots, independent of the cap. |
 +| `d9ec218` (`MJW_METAL_CCD_SCRATCH_CACHE`) | Metal: the convex narrowphase's EPA / multi-contact scratch is allocated once per Data and reused by every call (default on; `=0` restores the per-call allocation). A Metal graph capture keeps every allocation made inside it alive for the graph's lifetime, so a step graph held one copy per substep: 0.7 GB per substep at 1024 worlds with naconmax 128 per world, 2.8 GB at 4096, and the G1 rough task at 8 substeps (2.5 ms) with its re-captures exceeded the 55.7 GB GPU working set (`kIOGPUCommandBufferCallbackErrorOutOfMemory`). Pure per-call scratch on one in-order queue: results unchanged (statistics within run-to-run spread; contact append order makes runs non-bitwise either way). |
 +| `b1dc032` | `energy_vel` with nv = 0 (a model without degrees of freedom, energy flag enabled): zero kinetic energy without `mul_m` or the tiled kernel, as MuJoCo C's `mj_energyVel`. The tiled kernel with zero-length tiles failed to compile on Metal ("zero-length arrays are not permitted") and left `energy[:, 1]` unwritten on the CPU device. Test `sensor_test.test_energy_nv0`. |
++| `f52488b` | Connect / weld equality blocks that end exactly at `njmax` are kept: the builders returned when `efcid >= njmax - 3` (`- 6`), so a block occupying rows `njmax - 3 .. njmax - 1` was dropped while `nefc` reached exactly `njmax`, which `_next_time`'s `nefc > njmax` check does not flag; the solver then ran on stale rows (a connect-held ball sagged 8 cm in 0.4 s, no overflow flag). Now `efcid + 3 > njmax` (`efcid + 6 > njmax`): a block that fits is written, one that does not leaves `nefc > njmax` and is flagged. Test `constraint_test.test_equality_block_ending_at_njmax` (connect and weld, dense and sparse; fails 4/4 before, passes 4/4). Replaces MetalSim's workaround (treat `nefc >= njmax` as overflow for models with connect / weld blocks, one spare row in the capacity bound). |
 +
 +Every flex change and every solver launch-form change is behind a module-level flag or environment variable that restores upstream's behaviour; the details and measurements are in
 +the commit messages and in MetalSim's `scripts/diagnostics/deformable/UPSTREAM.md`. The same sixteen code commits are
@@ -1660,10 +1661,21 @@ index c2824c6..4234786 100644
    frame = make_frame(normal)
    for i in range(4):
 diff --git a/mujoco_warp/_src/constraint.py b/mujoco_warp/_src/constraint.py
-index 9017e55..6edac66 100644
+index 9017e55..609f7b5 100644
 --- a/mujoco_warp/_src/constraint.py
 +++ b/mujoco_warp/_src/constraint.py
-@@ -868,6 +868,35 @@ def _equality_tendon(is_sparse: bool, newton: bool):
+@@ -266,7 +266,9 @@ def _equality_connect(is_sparse: bool, newton: bool):
+     wp.atomic_add(ne_out, worldid, 3)
+     efcid = wp.atomic_add(nefc_out, worldid, 3)
+ 
+-    if efcid >= njmax_in - 3:
++    # the block is rows efcid .. efcid + 2: it fits when efcid + 3 <= njmax (a block ending exactly at njmax is kept;
++    # nefc > njmax then flags the overflow of any block that does not fit)
++    if efcid + 3 > njmax_in:
+       return
+ 
+     if wp.static(is_sparse and newton):
+@@ -868,6 +870,35 @@ def _equality_tendon(is_sparse: bool, newton: bool):
    return kernel
  
  
@@ -1699,7 +1711,7 @@ index 9017e55..6edac66 100644
  @cache_kernel
  def _equality_flex(is_sparse: bool, newton: bool):
    @wp.kernel(module="unique", enable_backward=False, grid_stride=False)
-@@ -895,6 +924,8 @@ def _equality_flex(is_sparse: bool, newton: bool):
+@@ -895,6 +926,8 @@ def _equality_flex(is_sparse: bool, newton: bool):
      flexedge_length_in: wp.array2d[float],
      njmax_in: int,
      njmax_nnz_in: int,
@@ -1708,7 +1720,7 @@ index 9017e55..6edac66 100644
      # Data out:
      ne_out: wp.array[int],
      nefc_out: wp.array[int],
-@@ -931,14 +962,21 @@ def _equality_flex(is_sparse: bool, newton: bool):
+@@ -931,14 +964,21 @@ def _equality_flex(is_sparse: bool, newton: bool):
      if edgeid < flex_edgeadr[flexid] or edgeid >= flex_edgeadr[flexid] + flex_edgenum[flexid]:
        return
  
@@ -1733,7 +1745,17 @@ index 9017e55..6edac66 100644
        efc_jtdaj_adr_out[worldid, jgid] = efcid
        efc_jtdaj_nrow_out[worldid, jgid] = 1
  
-@@ -2521,6 +2559,24 @@ def _get_contact_bodies_and_weights(
+@@ -1077,7 +1117,8 @@ def _equality_weld(is_sparse: bool, newton: bool):
+     wp.atomic_add(ne_out, worldid, 6)
+     efcid = wp.atomic_add(nefc_out, worldid, 6)
+ 
+-    if efcid >= njmax_in - 6:
++    # rows efcid .. efcid + 5: fits when efcid + 6 <= njmax (see the connect block above)
++    if efcid + 6 > njmax_in:
+       return
+ 
+     if wp.static(is_sparse and newton):
+@@ -2521,6 +2562,24 @@ def _get_contact_bodies_and_weights(
    # Element contact: Retrieve local vertices
    dim = flex_dim[flex_id]
  
@@ -1758,7 +1780,7 @@ index 9017e55..6edac66 100644
    if dim == 2:
      elem_data_start = flex_elemdataadr[flex_id] + elem_id * 3
      v0 = flex_elem[elem_data_start + 0]
-@@ -5167,6 +5223,14 @@ def make_constraint(m: types.Model, d: types.Data):
+@@ -5167,6 +5226,14 @@ def make_constraint(m: types.Model, d: types.Data):
        )
  
        if m.nflex > 0:
@@ -1773,7 +1795,7 @@ index 9017e55..6edac66 100644
          wp.launch(
            _equality_flex(m.is_sparse, newton),
            dim=(d.nworld, m.eq_flex_adr.size, m.nflexedge),
-@@ -5192,6 +5256,8 @@ def make_constraint(m: types.Model, d: types.Data):
+@@ -5192,6 +5259,8 @@ def make_constraint(m: types.Model, d: types.Data):
              d.flexedge_length,
              d.njmax,
              d.njmax_nnz,
@@ -1782,6 +1804,51 @@ index 9017e55..6edac66 100644
            ],
            outputs=[
              d.ne,
+diff --git a/mujoco_warp/_src/constraint_test.py b/mujoco_warp/_src/constraint_test.py
+index 8d5605f..30c310c 100644
+--- a/mujoco_warp/_src/constraint_test.py
++++ b/mujoco_warp/_src/constraint_test.py
+@@ -189,6 +189,40 @@ class ConstraintTest(parameterized.TestCase):
+       _assert_eq(d.nl.numpy()[0], mjd.nl, "nl")
+       _assert_efc_eq(mjm, m, d, mjd, mjd.nefc, "efc", m.nv)
+ 
++  @parameterized.parameters(
++    *itertools.product(
++      (("connect", "<connect body1='a' anchor='0 0 0'/>", 3), ("weld", "<weld body1='a'/>", 6)),
++      (mujoco.mjtJacobian.mjJAC_DENSE, mujoco.mjtJacobian.mjJAC_SPARSE),
++    )
++  )
++  def test_equality_block_ending_at_njmax(self, eq, jacobian):
++    """An equality block that ends exactly at njmax is written (it fits), not dropped without an overflow flag."""
++    name, eqxml, nrow = eq
++    xml = f"""
++    <mujoco>
++      <worldbody>
++        <body name="a" pos="0 0 1">
++          <freejoint/>
++          <geom type="sphere" size="0.1" contype="0" conaffinity="0"/>
++        </body>
++      </worldbody>
++      <equality>{eqxml}</equality>
++    </mujoco>
++    """
++    mjm, mjd, m, d = test_data.fixture(xml=xml, njmax=nrow, overrides={"opt.jacobian": jacobian})
++    self.assertEqual(mjd.nefc, nrow, name)
++    for arr in (d.ne, d.nefc, d.efc.type):
++      arr.fill_(-1)
++    for arr in (d.efc.J, d.efc.D, d.efc.vel, d.efc.aref, d.efc.pos, d.efc.margin):
++      arr.fill_(wp.nan)
++    d.overflow.zero_()
++
++    mjw.make_constraint(m, d)
++
++    _assert_eq(d.ne.numpy()[0], nrow, "ne")
++    _assert_eq(d.nefc.numpy()[0], nrow, "nefc")
++    _assert_efc_eq(mjm, m, d, mjd, nrow, f"efc {name}", m.nv)
++
+   @parameterized.parameters(
+     mujoco.mjtJacobian.mjJAC_DENSE,
+     mujoco.mjtJacobian.mjJAC_SPARSE,
 diff --git a/mujoco_warp/_src/derivative.py b/mujoco_warp/_src/derivative.py
 index 22b6f62..5e449d6 100644
 --- a/mujoco_warp/_src/derivative.py

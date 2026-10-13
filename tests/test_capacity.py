@@ -61,7 +61,7 @@ def test_g1_flat_bounds_hold_under_random_actions(contact_cfg, rows):
     elliptic = task.sim.mj_model.opt.cone == mujoco.mjtCone.mjCONE_ELLIPTIC
     assert elliptic == (rows == 3)
     # 3 colliders (two feet, torso) against the plane at <= 4 each, 3 mesh-mesh pairs at <= 4 (MULTICCD), 37 limited hinges
-    assert (b.ncon, b.nlimit, b.neq_rows, b.nfriction, b.eq_blocks) == (24, 37, 0, 0, 0)
+    assert (b.ncon, b.nlimit, b.neq_rows, b.nfriction) == (24, 37, 0, 0)
     assert {r for *_, r in b.pairs} == {rows}
     njmax = {3: 112, 4: 144}[rows]                       # 37 + 24 * 3 = 109 -> 112; 37 + 24 * 4 = 133 -> 144
     assert b.nefc == 37 + 24 * rows and task.sim.d.njmax == b.njmax == njmax and task.sim.d.naconmax == 24 * 64
@@ -103,33 +103,38 @@ def test_overflow_survives_resets():
         task.sim.check_overflow()
 
 
-def test_equality_block_ending_at_njmax_is_flagged():
-    """MuJoCo Warp writes a connect equality's 3 rows only if the block starts below njmax - 3, so with njmax = 3 the
-    rows are dropped while nefc == njmax (no NEFC bit), and the solver runs on 3 stale rows (put_data's copy of MuJoCo
-    C's initial ones): the ball sags 8 cm in 0.4 s instead of hanging at its anchor. The latch counts nefc >= njmax for
-    models with connect / weld blocks; njmax 16 holds the ball and raises nothing."""
+@pytest.mark.parametrize("eq,rows", [("connect", 3), ("weld", 6)])
+def test_equality_block_ending_at_njmax_is_flagged(eq, rows):
+    """Up to MuJoCo Warp fork cf0f8ad, a connect (weld) block was written only if it started below njmax - 3 (- 6): with
+    njmax = 3 (6) its rows were dropped while nefc == njmax (no NEFC bit), and the solver ran on stale rows (the ball
+    sagged 8 cm in 0.4 s; MetalSim then counted nefc >= njmax itself). The fork's metalsim branch since f52488b keeps a
+    block that ends exactly at njmax, and one that does not fit leaves nefc > njmax, which MuJoCo Warp flags itself.
+    njmax = rows: block written, ball held, no flag. njmax = rows - 1: block dropped, MuJoCo Warp's NEFC bit set,
+    check_overflow raises. njmax 16: held, nothing raised."""
     import mujoco
     import mujoco_warp as mjw
     from metalsim.physics.batch import BatchSim, BatchSimOptions
-    xml = """<mujoco><worldbody><body name='a' pos='0 0 1'><freejoint/>
+    xml = f"""<mujoco><worldbody><body name='a' pos='0 0 1'><freejoint/>
     <geom type='sphere' size='0.1' contype='0' conaffinity='0'/></body></worldbody>
-    <equality><connect body1='a' anchor='0 0 0'/></equality></mujoco>"""
+    <equality><{eq} body1='a' {"anchor='0 0 0'" if eq == "connect" else ""}/></equality></mujoco>"""
     m = mujoco.MjModel.from_xml_string(xml)
+    nefc_bit = int(mjw.OverflowType.NEFC)
     z = {}
-    for njmax in (3, 16):
+    for njmax in (rows, rows - 1, 16):
         sim = BatchSim(m, 4, options=BatchSimOptions(njmax=njmax, nconmax=1))
         for _ in range(200):           # 0.4 s at the default 2 ms
             sim.step()
         sim.synchronize()
         z[njmax] = float(sim.d.qpos.numpy()[:, 2].min())
         nefc = sim.d.nefc.numpy()
-        if njmax == 3:
-            assert (nefc == 3).all() and not (sim.d.overflow.numpy() & int(mjw.OverflowType.NEFC)).any()
+        if njmax == rows - 1:
+            assert (nefc == rows).all() and (sim.d.overflow.numpy() & nefc_bit).all()   # MuJoCo Warp's own flag
             with pytest.raises(RuntimeError, match="capacity overflow"):
                 sim.check_overflow()
         else:
+            assert (nefc == rows).all() and not (sim.d.overflow.numpy() & nefc_bit).any()
             sim.check_overflow()
-    assert z[16] > 0.995 and z[3] < 0.97, z       # held at its anchor (1.0) vs dropped rows (0.92 measured)
+    assert z[rows] > 0.995 and z[16] > 0.995 and z[rows - 1] < 0.97, z   # held at the anchor (1.0) vs dropped rows
 
 
 def test_bounds_refuse_unbounded_models():
