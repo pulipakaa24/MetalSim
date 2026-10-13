@@ -1,60 +1,70 @@
-"""BatchSimOptions(deterministic=True): MuJoCo Warp's kernels in Warp's RUN_TO_RUN mode, so two identical runs are
-bitwise equal (the default path is not: float atomics in the constraint solver accumulate in arrival order on Metal).
-Run in its own process (the option sets process-wide module options):
+"""BatchSimOptions(deterministic=True): MuJoCo Warp's kernels in Warp's RUN_TO_RUN mode, so identical runs are bitwise
+equal (the default path is not: batch_02 measured a box on the floor diverging at step 18 at 1,024 worlds). Each case
+runs in its own process (the mode is process-wide), with a cold kernel cache (fresh WARP_CACHE_PATH) and warm, and the
+refusal when MuJoCo Warp already ran in default mode. Design: research_notes/MPM in main simulator/deterministic_batchsim.md.
 
-    scripts/gpu_run.sh test_det check 20 -- .venv/bin/python -m pytest tests/test_batch_deterministic.py
+    scripts/gpu_run.sh test_det check 40 -- .venv/bin/python -m pytest tests/test_batch_deterministic.py
 """
-import hashlib
+import json
+import os
 import pathlib
+import subprocess
+import sys
+import tempfile
 
-import numpy as np
 import pytest
 import warp as wp
 
 pytestmark = pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal")
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-PANDA = ROOT.parent.parent.parent / "upstream/mujoco_menagerie/franka_emika_panda/scene.xml"
-BOXES = """<mujoco><worldbody><geom type="plane" size="0 0 1"/>
-<body pos="0 0 0.3" euler="20 30 10"><freejoint/><geom type="box" size=".05 .07 .04"/></body>
-<body pos="0.02 0 0.5" euler="10 0 40"><freejoint/><geom type="box" size=".04 .04 .04"/></body></worldbody></mujoco>"""
+DIAG = ROOT / "metalsim/physics/mpm/probes/rigid_det_diag.py"
 
 
-def _run(model, n, steps=150, deterministic=True):
-    from metalsim.physics.batch import BatchSim, BatchSimOptions
-
-    sim = BatchSim(model, n, options=BatchSimOptions(deterministic=deterministic))
-    rng = np.random.default_rng(0)
-    h = hashlib.sha256()
-    for s in range(steps):
-        if model.nu:
-            c = rng.uniform(-1, 1, (n, model.nu)).astype(np.float32)
-            lo, hi = model.actuator_ctrlrange[:, 0], model.actuator_ctrlrange[:, 1]
-            sim.d.ctrl.assign(np.where(model.actuator_ctrllimited.astype(bool), lo + 0.5 * (c + 1) * (hi - lo), c)
-                              .astype(np.float32))
-        sim.step()
-        if s % 10 == 9:
-            h.update(sim.d.qpos.numpy().tobytes())
-            h.update(sim.d.qvel.numpy().tobytes())
-    assert np.isfinite(sim.d.qpos.numpy()).all()
-    return h.hexdigest()
+def _diag(scene, worlds, out, cache=None, steps=150):
+    env = dict(os.environ)
+    if cache is not None:
+        env["WARP_CACHE_PATH"] = cache
+    r = subprocess.run([sys.executable, str(DIAG), "--scene", scene, "--worlds", str(worlds), "--steps", str(steps),
+                        "--json", out], capture_output=True, text=True, env=env)
+    assert r.returncode in (0, 3), r.stderr[-3000:]
+    return json.load(open(out)), r
 
 
-@pytest.mark.parametrize("n", [4, 256])
-def test_stacked_boxes_repeat(n):
-    """Two boxes landing on each other and on the floor, n worlds: two runs bitwise equal."""
-    import mujoco
-
-    m = mujoco.MjModel.from_xml_string(BOXES)
-    assert _run(m, n) == _run(m, n)
-
-
-def test_panda_repeats():
-    """The Franka panda with seeded random controls (16 worlds), not repeatable by default, repeats bitwise."""
-    import mujoco
-
-    path = PANDA if PANDA.exists() else ROOT / "upstream/mujoco_menagerie/franka_emika_panda/scene.xml"
-    if not path.exists():
+@pytest.mark.parametrize("scene,worlds", [("box", 1024), ("stack", 4), ("stack", 256), ("panda", 16)])
+def test_repeats_cold_and_warm_cache(scene, worlds):
+    """Two runs in one process are bitwise equal, and so are three processes: two with a fresh (cold) kernel cache
+    each, one with the warm cache the second left."""
+    if scene == "panda" and not any(p.exists() for p in (ROOT / "upstream/mujoco_menagerie",
+                                                          ROOT.parent.parent.parent / "upstream/mujoco_menagerie")):
         pytest.skip("MuJoCo Menagerie not present")
-    m = mujoco.MjModel.from_xml_path(str(path))
-    assert _run(m, 16) == _run(m, 16)
+    with tempfile.TemporaryDirectory() as d:
+        c1, c2 = os.path.join(d, "cache1"), os.path.join(d, "cache2")
+        a, ra = _diag(scene, worlds, os.path.join(d, "a.json"), c1)
+        b, rb = _diag(scene, worlds, os.path.join(d, "b.json"), c2)
+        c, rc = _diag(scene, worlds, os.path.join(d, "c.json"), c2)
+        for x, r in ((a, ra), (b, rb), (c, rc)):
+            assert all(f is None for f in x["in_process_first_diff"]), (x["in_process_first_diff"], r.stdout[-500:])
+        assert a["runs"][0]["per_step"] == b["runs"][0]["per_step"] == c["runs"][0]["per_step"]
+
+
+def test_refuses_after_default_mode_launch():
+    """A deterministic BatchSim refuses to start once MuJoCo Warp ran in default mode in the process, and a default
+    one refuses after a deterministic one (one mode per process)."""
+    code = """
+import mujoco, sys
+sys.path.insert(0, {root!r})
+from metalsim.physics.batch import BatchSim, BatchSimOptions
+m = mujoco.MjModel.from_xml_string('<mujoco><worldbody><geom type="plane" size="0 0 1"/><body pos="0 0 .3"><freejoint/>'
+                                   '<geom type="sphere" size=".05"/></body></worldbody></mujoco>')
+first, second = {first}, {second}
+s = BatchSim(m, 2, options=BatchSimOptions(deterministic=first)); s.step(); s.synchronize()
+try:
+    BatchSim(m, 2, options=BatchSimOptions(deterministic=second))
+except RuntimeError as e:
+    print("REFUSED", e)
+"""
+    for first, second in ((False, True), (True, False)):
+        r = subprocess.run([sys.executable, "-c", code.format(root=str(ROOT), first=first, second=second)],
+                           capture_output=True, text=True)
+        assert "REFUSED" in r.stdout, (first, second, r.stdout[-1000:], r.stderr[-2000:])

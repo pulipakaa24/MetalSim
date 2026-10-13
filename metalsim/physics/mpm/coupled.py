@@ -162,7 +162,10 @@ class MPMConfig:
     solver_extra: dict = field(default_factory=dict)        # any other SolverImplicitMPM.Config field
     # coupling
     mpm_substeps: int = 1                 # MPM steps per coupled (BatchSim) step
-    mode: str = "staggered"               # "staggered" (Isaac's Franka-Pour) | "lagged"
+    # "lagged" (Newton's SolverCoupledProxy.Proxy default; its two-way example's rewind): begin pose, end velocity
+    # minus the lagged sand impulse. "staggered" (Isaac's Franka-Pour override): end pose and velocity; a body resting
+    # on the sand then drifts down by g dt^2 per step (research_notes/MPM in main simulator/bearing_and_sinking.md)
+    mode: str = "lagged"
     proxy_mass: str = "effective"         # "effective" | "body" | "kinematic"
     mass_scale: float = 1.0               # Isaac's proxy mass_scale
     feedback: bool = True                 # False: the sand does not push the robot (one-way, Newton's ANYmal example)
