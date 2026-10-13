@@ -1,0 +1,24 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /Users/aditya/robosim/.venv/bin/python
+rootdir: /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
+configfile: pyproject.toml
+plugins: xdist-3.8.0
+collecting ... collected 15 items
+
+tests/test_mpm_main.py::test_vendored_pin_is_the_setup_pin PASSED        [  6%]
+tests/test_mpm_main.py::test_vendored_copy_regenerates_from_the_pin PASSED [ 13%]
+tests/test_mpm_main.py::test_vendored_files_keep_the_licence_header PASSED [ 20%]
+tests/test_mpm_main.py::test_vendored_column_bitwise_newton152 PASSED    [ 26%]
+tests/test_mpm_main.py::test_box_sinks_as_isaac_coupling PASSED          [ 33%]
+tests/test_mpm_main.py::test_coupled_repeatable PASSED                   [ 40%]
+tests/test_mpm_main.py::test_gs_coloring_valid_separate_worlds PASSED    [ 46%]
+tests/test_mpm_main.py::test_repeatable_at_scale[1-auto-0] PASSED        [ 53%]
+tests/test_mpm_main.py::test_repeatable_at_scale[64-auto-0] PASSED       [ 60%]
+tests/test_mpm_main.py::test_repeatable_at_scale[64-jacobi-1] PASSED     [ 66%]
+tests/test_mpm_main.py::test_render_sand PASSED                          [ 73%]
+tests/test_mpm_main.py::test_pile_collapse_matches_newton PASSED         [ 80%]
+tests/test_mpm_main.py::test_pile_collapse_responds_to_friction PASSED   [ 86%]
+tests/test_mpm_main.py::test_free_fall_momentum PASSED                   [ 93%]
+tests/test_mpm_main.py::test_main_sim_settings_untouched PASSED          [100%]
+
+======================== 15 passed in 273.30s (0:04:33) ========================
