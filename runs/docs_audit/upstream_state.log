@@ -1,0 +1,15 @@
+# upstream issue / PR states, Tue Oct 13 15:05:40 PDT 2026
+{"closedAt":null,"number":4313,"state":"OPEN","title":"[BUG] SolverXPBD: revolute joints whose angle crosses ±π get a ~2π limit correction (limit ranges beyond ±π explode)","url":"https://github.com/newton-physics/newton/issues/4313"}
+{"closedAt":null,"number":4314,"state":"OPEN","title":"[BUG] SolverXPBD: unequal joint_linear/angular_relaxation (defaults 0.7/0.4) apply an inconsistent joint impulse (pendulum: torque 1.36x, gravity 0.78x of analytic)","url":"https://github.com/newton-physics/newton/issues/4314"}
+{"closedAt":null,"number":4315,"state":"OPEN","title":"[BUG] SolverXPBD: joint drive stiffness depends on the iteration count (71-1240 N m/rad for target_ke 200 over 1-16 iterations)","url":"https://github.com/newton-physics/newton/issues/4315"}
+{"mergedAt":null,"number":4316,"state":"OPEN","title":"Fix XPBD hinge angles that cross ±π","url":"https://github.com/newton-physics/newton/pull/4316"}
+{"mergedAt":null,"number":4317,"state":"OPEN","title":"Make XPBD joint relaxation consistent","url":"https://github.com/newton-physics/newton/pull/4317"}
+{"mergedAt":null,"number":4318,"state":"OPEN","title":"Add opt-in PD joint drives to SolverXPBD","url":"https://github.com/newton-physics/newton/pull/4318"}
+{"closedAt":null,"number":1704,"state":"OPEN","title":"Elliptic cones off CUDA: the cone Hessian term is launched with one thread per contact slot (dim_block = naconmax)","url":"https://github.com/google-deepmind/mujoco_warp/issues/1704"}
+{"closedAt":"2026-10-07T02:25:01Z","number":1705,"state":"CLOSED","title":"Flex element contacts of any flex after the first store the global element id","url":"https://github.com/google-deepmind/mujoco_warp/issues/1705"}
+{"closedAt":"2026-10-01T17:02:57Z","number":1706,"state":"CLOSED","title":"Box-triangle flex contacts: at most 2 per element, MuJoCo C generates up to 11","url":"https://github.com/google-deepmind/mujoco_warp/issues/1706"}
+{"closedAt":"2026-10-07T02:24:14Z","number":1707,"state":"CLOSED","title":"1D flexes (cables) collide as vertex spheres; MuJoCo C collides their segments as capsules","url":"https://github.com/google-deepmind/mujoco_warp/issues/1707"}
+{"closedAt":"2026-10-07T02:24:37Z","number":1708,"state":"CLOSED","title":"Volume flexes: interior elements collide with geoms; MuJoCo C only collides active (surface) layers","url":"https://github.com/google-deepmind/mujoco_warp/issues/1708"}
+{"closedAt":null,"number":1709,"state":"OPEN","title":"Flex-geom contacts: per-pair limit differs from MuJoCo C's mjMAXCONPAIR (parity data for the configurable cap in #1668)","url":"https://github.com/google-deepmind/mujoco_warp/issues/1709"}
+{"mergedAt":"2026-09-25T13:44:08Z","number":1700,"state":"MERGED","title":"Accept converged linesearch candidates regardless of derivative sign","url":"https://github.com/google-deepmind/mujoco_warp/pull/1700"}
+{"closedAt":null,"number":3628,"state":"OPEN","title":"Newton solver: with elliptic cones at impratio 10 and ls_iterations 20, an exhausted line search ends the solve at a non-converged qacc","url":"https://github.com/google-deepmind/mujoco/issues/3628"}
