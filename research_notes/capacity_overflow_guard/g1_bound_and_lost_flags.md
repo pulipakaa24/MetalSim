@@ -53,8 +53,13 @@ mujoco_warp `constraint.py` writes a connect equality's 3 rows (weld: 6) with
 njmax − 3 … njmax − 1 fits but is dropped, and then nefc == njmax, so `_next_time`'s `nefc > njmax` check sets no
 NEFC bit. The solver then runs on 3 stale rows (put_data's copy of MuJoCo C's initial rows). Demonstrated: a ball
 hung by a connect equality with njmax 3 sags to z = 0.921 in 0.4 s (njmax 16: 0.9996) with no flag
-(`test_equality_block_ending_at_njmax_is_flagged`). Upstream fix would be `efcid > njmax - 3`; not patched here (the
-fork is shared). Ours: for models with connect / weld equalities the latch counts `nefc >= njmax` as NEFC
+(`test_equality_block_ending_at_njmax_is_flagged`). Proper fix on the fork: branch `metalsim-eq-block-njmax` of
+pulipakaa24/mujoco_warp, commit `f52488b4` on top of the pinned cf0f8ad (`efcid + 3 > njmax`, `efcid + 6 > njmax`),
+with `constraint_test.test_equality_block_ending_at_njmax` (connect / weld x dense / sparse, njmax = block size): 4
+failed on cf0f8ad (efc rows left NaN), 4 passed with the fix; constraint_test.py 96 passed / 2 skipped, the
+equality forward / solver tests 4 passed / 1 skipped (`runs/fixfail/mjw_eqfix_tests.log`). Upstream
+google-deepmind/mujoco_warp main (76707759, 2026-10-12) has the same check. The pinned `metalsim` branch is not
+moved yet. Workaround here until that is pinned: for models with connect / weld equalities the latch counts `nefc >= njmax` as NEFC
 (conservative: an exactly full, intact buffer also raises), and `Bounds.njmax` keeps one spare row above nefc for
 such models so the auto bound never trips it.
 
@@ -64,3 +69,7 @@ One dim-N launch per substep (8 per control step on the G1). Measured at 4096 G1
 njmax 112), exclusive timing job, 5 interleaved A/B repeats (`scripts/diagnostics/overflow_latch_cost.py`,
 `runs/fixfail/latch_cost.log`): with latch 40,653 env-steps/s (100.75 ms per control step), without 40,628
 (100.82 ms): within run-to-run noise (−0.06 %).
+
+Once the fork fix is pinned, the `nefc >= njmax` rule and the spare row (`Bounds.eq_blocks`) can be dropped: with the
+fix, any block that does not fit leaves nefc > njmax, which MuJoCo Warp flags itself. The reset latch stays (it is
+independent of this bug).
