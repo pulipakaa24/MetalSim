@@ -375,6 +375,9 @@ def import_mjcf(mjcf_path: str, usd_path: str, *, write_textures: bool = True) -
         light.GetPrim().CreateAttribute("mjc:castshadow", Sdf.ValueTypeNames.Bool).Set(bool(m.light_castshadow[l]))
         light.GetPrim().CreateAttribute("mjc:ambient", Sdf.ValueTypeNames.Float3).Set(Gf.Vec3f(*map(float, m.light_ambient[l])))
         light.GetPrim().CreateAttribute("mjc:specular", Sdf.ValueTypeNames.Float3).Set(Gf.Vec3f(*map(float, m.light_specular[l])))
+        # MuJoCo's own radiometry (usd_to_mjcf restores it exactly; UsdLux readers see intensity x color)
+        light.GetPrim().CreateAttribute("mjc:diffuse", Sdf.ValueTypeNames.Float3).Set(Gf.Vec3f(*map(float, m.light_diffuse[l])))
+        light.GetPrim().CreateAttribute("mjc:attenuation", Sdf.ValueTypeNames.Float3).Set(Gf.Vec3f(*map(float, m.light_attenuation[l])))
     for s_ in range(m.nsite):
         b = int(m.site_bodyid[s_])
         sname = _name(m, mujoco.mjtObj.mjOBJ_SITE, s_, "site")

@@ -46,11 +46,12 @@ def unit_rgba(materials: np.ndarray) -> np.ndarray:
 
 class ModelSync:
     def __init__(self, ctx, model, n_envs: int, tables, color_buf, light_template: np.ndarray, light_lock=None,
-                 opaque: bool = False):
+                 opaque: bool = False, light_tail_bytes: int = 0):
         """``color_buf``: the renderer's ``t_colors`` buffer (n_envs, G, 4). ``light_template``: (max(nlight, 1), 20)
         light records (``scene_tables.build_lights`` plus a renderer's overrides); ``light_lock`` (nlight,) uint32 bit0
         keeps the template's diffuse (tier 2's USD light intensities). ``opaque``: alpha of the model colour forced to 1
-        (a renderer's ``transparency=False``)."""
+        (a renderer's ``transparency=False``). ``light_tail_bytes``: room after the light records in the same buffer
+        (tier 2's area-light axes, metalsim.render.area_lights)."""
         self.ctx, self.m, self.n, self.t = ctx, model, n_envs, tables
         self.opaque = bool(opaque)
         G, nl = tables.G, max(model.nlight, 1)
@@ -69,7 +70,7 @@ class ModelSync:
         self.static_buf = c.buffer(static.nbytes, static, "sync_static_rgba")
         self.src_buf = c.buffer(src.nbytes, src, "sync_src")
         self.inst_col = c.buffer(n_envs * G * 16, label="sync_inst_col")
-        self.lights = c.buffer(n_envs * nl * 80, label="sync_lights")
+        self.lights = c.buffer(n_envs * nl * 80 + int(light_tail_bytes), label="sync_lights")
         self.set_light_template(light_template, light_lock)
         # host defaults: the compiled model's values (one world, stride 0)
         m = model

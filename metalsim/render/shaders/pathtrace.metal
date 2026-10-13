@@ -201,6 +201,57 @@ inline float3 sample_cone(float3 axis, float ang, float u, float v) {
     return normalize(t * (st * cos(ph)) + b * (st * sin(ph)) + axis * ct);
 }
 
+#ifdef AREA_LIGHTS
+// Next-event estimation toward a USD area light (metalsim/render/area_lights.py). Record: specular.w shape (1 rect,
+// 2 disk, 3 cylinder, 4 sphere), ambient.w width / radius, diffuse.w height / length, diffuse.xyz radiance Le,
+// kind.z the shaping cone (deg, rect / disk). C: the emitter's centre, ax: its emission axis (the prim's -Z, the
+// light's direction), X: the prim's X axis (world). Rect / disk / cylinder: a uniform point on the emitting surface
+// (pdf 1 / A, area measure), g = cos(theta_r) cos(theta_e) A / d^2; one-sided (rect / disk emit along ax, the
+// cylinder outward from its side, no caps). Sphere: a uniform direction in the cone it subtends (pdf 1 / Omega),
+// g = cos(theta_r) Omega. Contribution = f Le g; g = 0: nothing (behind the emitter, below the horizon).
+struct AreaSample { float3 L; float tmax; float g; };
+inline AreaSample area_light_sample(Light l, float3 C, float3 ax, float3 X, float3 p, float3 N, float u1, float u2) {
+    AreaSample s; s.L = float3(0.0, 0.0, 1.0); s.tmax = 0.0; s.g = 0.0;
+    uint shape = uint(l.specular.w + 0.5);
+    float a = l.ambient.w, b = l.diffuse.w;
+    ax = normalize(ax);
+    X = X - dot(X, ax) * ax;
+    X = dot(X, X) > 1e-12 ? normalize(X) : normalize(cross(fabs(ax.z) < 0.9 ? float3(0, 0, 1) : float3(1, 0, 0), ax));
+    float3 Y = cross(ax, X);
+    if (shape == 4u) {
+        float3 dc = C - p; float dd = length(dc);
+        if (dd <= a * 1.0001) return s;
+        float st2 = a * a / (dd * dd), ct = sqrt(max(1.0 - st2, 0.0));
+        float3 w = dc / dd;
+        float c1 = 1.0 - u1 * (1.0 - ct), s1 = sqrt(max(1.0 - c1 * c1, 0.0)), ph = 2.0 * PI * u2;
+        float3 t, bb; basis(w, t, bb);
+        float3 L = normalize(t * (s1 * cos(ph)) + bb * (s1 * sin(ph)) + w * c1);
+        float NdotL = dot(N, L);
+        if (NdotL <= 0.0) return s;
+        float bq = dot(L, dc), disc = bq * bq - (dd * dd - a * a);
+        s.L = L; s.tmax = max(bq - sqrt(max(disc, 0.0)) - 0.001, 0.0005);
+        s.g = NdotL * 2.0 * PI * (1.0 - ct);
+        return s;
+    }
+    float3 S, ne; float A;
+    if (shape == 1u) { S = C + X * ((u1 - 0.5) * a) + Y * ((u2 - 0.5) * b); ne = ax; A = a * b; }
+    else if (shape == 2u) { float r = a * sqrt(u1), ph = 2.0 * PI * u2; S = C + X * (r * cos(ph)) + Y * (r * sin(ph)); ne = ax; A = PI * a * a; }
+    else {      // the half of the side facing p (every point p sees lies in it): pdf 1 / (pi a b)
+        float3 q = p - C;
+        float ph = atan2(dot(q, ax), dot(q, Y)) + (u2 - 0.5) * PI;
+        ne = Y * cos(ph) + ax * sin(ph); S = C + X * ((u1 - 0.5) * b) + ne * a; A = PI * a * b;
+    }
+    float3 dv = S - p; float d2 = dot(dv, dv), d = sqrt(d2);
+    if (d < 1e-6) return s;
+    float3 L = dv / d;
+    float ce = -dot(ne, L), NdotL = dot(N, L);
+    if (ce <= 0.0 || NdotL <= 0.0) return s;
+    if (shape <= 2u && l.kind.z < 89.99 && ce < cos(l.kind.z * PI / 180.0)) return s;   // UsdLux shaping cone
+    s.L = L; s.tmax = d - 0.001; s.g = NdotL * ce * A / d2;
+    return s;
+}
+#endif
+
 struct Hit { bool ok; float t; float3 p; float3 n; float2 uv; uint slot; bool grain; uint gid; float3 lp; };   // lp: geom-frame position
 // render-grain geometry (FLAG_GRAINS). Flat: scene instances >= inst0 are grains. Two-level: a hit through two instance
 // levels is a grain, its index the second-level instance id. A grain instances grain mesh (as_index - as0); gdesc / gkeys:
@@ -451,6 +502,9 @@ kernel void path_trace(
     float3 cpos = float3(cam_xpos[ci * 3], cam_xpos[ci * 3 + 1], cam_xpos[ci * 3 + 2]) + cs.pos_delta.xyz;
     float3x3 R = load_mat33(cam_xmat + ci * 9) * quat_to_mat(cs.rot_delta);
     float3 env_off = grid_offset(e, c.grid);
+#ifdef AREA_LIGHTS
+    device const float4* area_x = (device const float4*)(lights + c.n_envs * c.n_light);   // emitters' X axes (area_lights.py)
+#endif
     lights += e * c.n_light;            // this env's light records (metalsim.render.model_sync)
     // legacy env grid: the longest ray from `org` that stays inside this env's region of the shared acceleration
     // structure; compact grid: ray_limit is unbounded, trace() ends rays at the env's cell and continues infinite
@@ -544,6 +598,18 @@ kernel void path_trace(
                 Light l = lights[i];
                 device const float* lp = light_xpos + (e * c.n_light + i) * 3;
                 device const float* ld = light_xdir + (e * c.n_light + i) * 3;
+#ifdef AREA_LIGHTS
+                if (l.specular.w > 0.5) {      // a USD area light (metalsim/render/area_lights.py): sample the emitter
+                    float u1 = rnd(rng), u2 = rnd(rng);
+                    AreaSample as = area_light_sample(l, float3(lp[0], lp[1], lp[2]) + env_off, float3(ld[0], ld[1], ld[2]),
+                                                      area_x[e * c.n_light + i].xyz, h.p, N, u1, u2);
+                    if (as.g <= 0.0) continue;
+                    float tr = transmit(accel, h.p + N * eps, as.L, tl(h.p, as.tmax), inst_tab, slot_mesh, meshes, verts, indices, inst, gg, tmin, mats, per_inst, e, c.n_slots DYN_PASS);
+                    if (tr <= 0.0) continue;
+                    radiance += throughput * brdf_any(model, N, V, as.L, base, f0, specw, metallic, rough, a2) * l.diffuse.xyz * (as.g * tr);
+                    continue;
+                }
+#endif
                 float3 L; float att = 1.0; float tmax = 1000.0;
                 if (l.kind.x == 0.0) {
                     L = -normalize(float3(ld[0], ld[1], ld[2]));

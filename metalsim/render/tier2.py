@@ -103,7 +103,7 @@ class Tier2Renderer:
                  visual=None, deformables=(), tube_slices=None, cap_stacks=None, dyn_rebuild_every: int = 32,
                  infinite_planes: bool = True, hfield_skirts: bool = True, per_world_size: bool = True,
                  model_fields: bool = True, lens=None, dyn_layout: str | None = None, env_layout: str | None = None,
-                 ctx: MetalContext | None = None, device="metal:0"):
+                 area_lights: bool = True, ctx: MetalContext | None = None, device="metal:0"):
         """``terrain_slots`` / ``draw_hfields`` / ``appearance``: see ``Tier0Renderer`` (False / "legacy" = the
         previous behaviour). ``skybox``: the model's skybox texture is the environment (camera background and the
         radiance of every escaping ray, MuJoCo's cube mapping, unlit texel values x env scale) instead of its mean
@@ -121,7 +121,12 @@ class Tier2Renderer:
         ``model_fields``: see ``Tier0Renderer`` (False = the previous behaviour). With ``usd_lights``, those lights keep
         their USD intensity (a per-world ``light_diffuse`` does not apply to them). ``lens``: a
         ``metalsim.render.lens.Lens`` (f-theta / Kannala-Brandt fisheye; default pinhole from the model camera and the
-        per-env intrinsics); pixels outside its field of view are black with depth 0."""
+        per-env intrinsics); pixels outside its field of view are black with depth 0.
+
+        ``area_lights``: the USD Rect / Disk / Cylinder / Sphere lights the importer recorded (``usd_area_lights``) are
+        sampled as true area emitters (UsdLux radiance; soft shadows, exact near-field irradiance;
+        metalsim.render.area_lights); False = the far-field spot / point lights of the import (the previous
+        behaviour)."""
         from metalsim.render.lens import Lens
         import mujoco
         self.m, self.n, self.tw, self.th = model, n_envs, width, height
@@ -186,8 +191,26 @@ class Tier2Renderer:
             params[6, 1] = 0.0                # the skybox texture is not drawn (uniform dome / sky colour)
         if headlight is False:
             params[3, 3] = 0.0
+        from metalsim.render.area_lights import AreaLights
+        self.area = AreaLights(model) if (area_lights and model.nlight) else None
+        if self.area is not None and not self.area:
+            self.area = None
+        nl_ = max(model.nlight, 1)
+        if self.area is not None:
+            lights, lock = self.area.apply(lights, lock)
         from metalsim.render.model_sync import ModelSync, unit_rgba
-        self.sync = ModelSync(c, model, n_envs, t, self.color_buf, lights, lock, opaque=not transparency)
+        self.sync = ModelSync(c, model, n_envs, t, self.color_buf, lights, lock, opaque=not transparency,
+                              light_tail_bytes=n_envs * nl_ * 16 if self.area is not None else 0)
+        if self.area is not None:     # the emitters' world X axes after the light records (static bodies: written once)
+            self._area_off = n_envs * nl_ * 80
+            ax0 = np.zeros((n_envs, nl_, 4), np.float32)
+            d0 = mujoco.MjData(model); mujoco.mj_kinematics(model, d0)
+            ax0[:] = self.area.axes_host([d0])[0]
+            c.write_buffer(self.sync.lights, ax0, offset=self._area_off)
+            xb = np.zeros((nl_, 4), np.float32); xb[:, :3] = self.area.x_body
+            self._area_xb = c.buffer(xb.nbytes, xb, "pt_area_xbody")
+            self._area_body = c.buffer(max(4 * nl_, 16), self.area.body.astype(np.int32), "pt_area_body")
+            self._area_pipe = c.compute_pipeline(c.library("area_lights"), "area_axes")
         self.light_buf = self.sync.lights                    # (n_envs, max(nlight, 1)) records
         self.params_buf = c.buffer(params.nbytes, params, "pt_params")
         self.mat_model = material_model
@@ -259,7 +282,10 @@ class Tier2Renderer:
         self._accum_view = wm.buffer_of(self._accum)
         self.out = RenderOutputs(**{k: tb.mps_tensor(a) for k, a in self._arrays.items()})
         self.t_accum = tb.mps_tensor(self._accum)
-        lib = c.library("pathtrace", self.rt.shader_defines() or None)
+        defs = dict(self.rt.shader_defines())
+        if self.area is not None:
+            defs["AREA_LIGHTS"] = 1           # compiled only for scenes with area lights (pathtrace.metal)
+        lib = c.library("pathtrace", defs or None)
         self.pipe = c.compute_pipeline(lib, "path_trace")
         self.tm_consts = np.zeros(8, np.uint32); self.tm_consts[:3] = (n, width, height); self.tm_consts[3] = self.base_flags
         self.tm_consts.view(np.float32)[4] = exposure
@@ -448,6 +474,7 @@ class Tier2Renderer:
         if ev is not None:
             self.ctx.wait_for(cb, ev, after_value)
         self.sync.encode(cb, sim if self.model_fields else None)
+        self._encode_area_axes(cb, sim)
         gm_buf, gm_off = self.rt.encode_geom_xmat(cb, sim, v["geom_xmat"].buffer, v["geom_xmat"].offset)
         gx_buf, gx_off, gm_buf, gm_off = self.rt.encode_pose(cb, sim, v["geom_xpos"].buffer, v["geom_xpos"].offset, gm_buf, gm_off)
         self._encode_scene(cb, gx_buf, gx_off, gm_buf, gm_off)
@@ -459,6 +486,26 @@ class Tier2Renderer:
         val = self.ctx.signal(cb)
         self.ctx.commit(cb)
         return val
+
+    def _encode_area_axes(self, cb, sim):
+        """Area lights: the emitters' world X axes per env from the sim's body orientations (``xmat``); a sim without
+        ``xmat`` keeps the initial axes."""
+        xm = getattr(getattr(sim, "d", None), "xmat", None)
+        if self.area is None or xm is None:
+            return
+        v = wm.buffer_of(xm)
+        nl = max(self.m.nlight, 1)
+        worlds = int(xm.shape[0]) if xm.ndim > 1 else 1
+        k = np.array([self.n, nl, self.m.nbody, 1 if worlds > 1 else 0], np.uint32)
+        ce = cb.computeCommandEncoder()
+        ce.setComputePipelineState_(self._area_pipe)
+        ce.setBuffer_offset_atIndex_(v.buffer, v.offset, 0)
+        ce.setBuffer_offset_atIndex_(self._area_body, 0, 1)
+        ce.setBuffer_offset_atIndex_(self._area_xb, 0, 2)
+        ce.setBuffer_offset_atIndex_(self.sync.lights, self._area_off, 3)
+        ce.setBytes_length_atIndex_(k.tobytes(), k.nbytes, 4)
+        ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n * nl, 1, 1), Metal.MTLSize(64, 1, 1))
+        ce.endEncoding()
 
     def after(self, value):
         """Order torch's subsequent kernels after the render that signalled ``value``."""
@@ -590,6 +637,8 @@ class Tier2Renderer:
         if self.m.nlight:
             c.write_buffer(self._host_light_xpos, np.stack([d.light_xpos for d in datas]).astype(np.float32).reshape(n, nl, 3))
             c.write_buffer(self._host_light_xdir, np.stack([d.light_xdir for d in datas]).astype(np.float32).reshape(n, nl, 3))
+        if self.area is not None:
+            c.write_buffer(self.sync.lights, self.area.axes_host(datas), offset=self._area_off)
         cb = c.command_buffer()
         self.sync.encode(cb, None)
         self._encode_scene(cb, rt._host_geom_xpos, 0, rt._host_geom_xmat, 0)

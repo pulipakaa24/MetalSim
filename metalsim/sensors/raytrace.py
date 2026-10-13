@@ -570,7 +570,7 @@ class RayTracer:
         built on first use: scenes and sensors without them keep the plain kernels."""
         if self._tr_pipes is None:
             lib = self.ctx.library("rt", dict(self._lib_defines, SENSOR_TR=1))
-            self._tr_pipes = {k: self.ctx.compute_pipeline(lib, k) for k in ("lidar", "lidar_ext", "raycast_depth")}
+            self._tr_pipes = {k: self.ctx.compute_pipeline(lib, k) for k in ("lidar", "lidar_ext", "lidar_tr1", "raycast_depth")}
         return self._tr_pipes
 
     def sensor_material_table(self, see_through=None, coverage=None, materials=None) -> np.ndarray:
@@ -858,6 +858,7 @@ class Lidar:
         if self.tr:
             self.lmat_buf = rt.ctx.buffer(self.lmat.nbytes, self.lmat, "lidar_lmat")
         self.max_returns = int(max_returns)
+        self.stream = self.tr and self.extended and spot_rays == 1 and self.max_returns == 1
         n = rt.n
         if not self.extended:
             shp = (n, self.n_beams)
@@ -922,7 +923,9 @@ class Lidar:
             sxb, sxo, smb, smo = rt._host_site_xpos, 0, rt._host_site_xmat, 0
         ce = cb.computeCommandEncoder()
         if self.tr:
-            ce.setComputePipelineState_(rt.tr_pipelines()["lidar_ext" if self.extended else "lidar"])
+            # one sub-ray and one return: the streaming kernel (no candidate arrays; same echoes as lidar_ext)
+            k = ("lidar_tr1" if self.stream else "lidar_ext") if self.extended else "lidar"
+            ce.setComputePipelineState_(rt.tr_pipelines()[k])
             ce.setBuffer_offset_atIndex_(self.lmat_buf, 0, 20 if self.extended else 17)
         else:
             ce.setComputePipelineState_(rt.p_lidar_ext if self.extended else rt.p_lidar)
