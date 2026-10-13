@@ -83,3 +83,25 @@ def test_check_jobs_share_and_exclusive_waits():
     time.sleep(1.0); assert not done.is_set()
     for h in g.shared_holders(): os.remove(h["_file"])
     t.join(30); assert done.is_set() and g.holder()["name"] == "ex"
+
+
+def test_gpu_run_job_runs_in_the_callers_directory(tmp_path):
+    """gpu_run.sh runs the job in the caller's cwd (not the repo root), with its queue files under its own repo root.
+
+    Before, every job ran in the repo root: ``python -m pytest`` from an agent worktree then imported the main
+    checkout's packages, because ``-m`` puts the cwd ahead of PYTHONPATH."""
+    import shutil, subprocess
+    repo = tmp_path / "repo"
+    (repo / "scripts").mkdir(parents=True)
+    (repo / "runs").mkdir()
+    for f in ("gpu_run.sh", "gpu_lock.py", "gpu_top.py", "gpu_util.sh", "gpu_pause.sh"):
+        if os.path.exists(os.path.join(ROOT, "scripts", f)):
+            shutil.copy(os.path.join(ROOT, "scripts", f), repo / "scripts" / f)
+    caller = tmp_path / "caller dir"          # a space too: the cd must be quoted
+    caller.mkdir()
+    out = subprocess.run(["bash", str(repo / "scripts" / "gpu_run.sh"), "cwdtest", "low", "1", "--", "pwd", "-P"],
+                         cwd=caller, capture_output=True, text=True, timeout=900)
+    assert out.returncode == 0, out.stderr
+    assert os.path.realpath(caller) in out.stdout.splitlines()
+    hist = [json.loads(l) for l in open(repo / "runs" / "gpu_history.jsonl")]
+    assert [e["ev"] for e in hist if e.get("name") == "cwdtest"][:2] == ["grant", "release"]
