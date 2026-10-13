@@ -1,0 +1,2301 @@
+[INFO]: Parsing configuration from: isaaclab_tasks.contrib.franka_pour.pour_env_cfg:FrankaPourResetDatasetEnvCfg
+[INFO]: Parsing configuration from: isaaclab_tasks.contrib.franka_pour.config.franka.agents.rsl_rl_ppo_cfg:FrankaPourResetDatasetPPORunnerCfg
+
+╭─ Isaac Lab · train ────────────────────────────╮      Welcome to Isaac Lab!
+│ Task          IsaacContrib-Franka-Pour         │
+│ Workflow      manager-based                    │             \   /
+│ RL library    rsl_rl                           │           .-------.
+│ Physics       newton_couplerproxycfg           │           | o   o |
+│ Renderer      n/a (no camera sensors)          │           |   _   |
+│ Visualizer    none (headless)                  │           '-------'
+│ Device        cuda:0                           │
+│ Environments  1024                             │
+╰────────────────────────────────────────────────╯
+
+[1/3] Launching simulation
+[INFO] Logging experiment in directory: /home/<user>/IsaacLab3/logs/rsl_rl/franka_pour
+Exact experiment name requested from command line: 2026-10-12_08-26-00
+[2/3] Creating environment
+I: Initializing Version 2.72.3-release.7151+gl.5390bed9
+I: Client ID: 35KIJEZS
+I: Not using Hub: Hub not found
+I: Successfully created S3 provider for https://omniverse-content-production.s3-us-west-2.amazonaws.com
+I: Using CloudFront http://dcb18d6mfegct.cloudfront.net/, List = No
+Serving remote assets from the local cache under '/tmp'. Each copy is checked against the server before use; delete the directory to force a full re-download.
+/home/<user>/IsaacLab3/source/isaaclab_newton/isaaclab_newton/cloner/replicate.py:141: FutureWarning: Newton shape color replacement is enabled; this workaround will be deprecated in a future release.
+  replace_newton_builder_shape_colors(builder, stage)
+/home/<user>/IsaacLab3/source/isaaclab_newton/isaaclab_newton/cloner/newton_clone_utils.py:158: FutureWarning: Newton shape color replacement is enabled; this workaround will be deprecated in a future release.
+  replace_newton_builder_shape_colors(builder, stage)
+Failed to get root com velocity. If the articulation is fixed, this is expected. Setting root com velocity to zeros.
+[INFO]: Base environment:
+	Environment device    : cuda:0
+	Environment seed      : 0
+	Physics step-size     : 0.008333333333333333
+	Rendering step-size   : 0.03333333333333333
+	Environment step-size : 0.03333333333333333
+[INFO]: Time taken for scene creation Last: 14.082582 s, Mean: 14.082582 s, Std: 0.000000 s, N: 1
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 1024
+	Environment spacing   : 2.5
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : []
+	Replicate physics     : True
+Finalize builder took: Last: 5.161286 s, Mean: 5.161286 s, Std: 0.000000 s, N: 1
+Initialize solver took: Last: 17.502738 s, Mean: 17.502738 s, Std: 0.000000 s, N: 1
+CUDA graph took: Last: 0.000041 s, Mean: 0.000041 s, Std: 0.000000 s, N: 1
+[INFO]: Time taken for simulation start Last: 24.876112 s, Mean: 24.876112 s, Std: 0.000000 s, N: 1
+[INFO] Command Manager:  <CommandManager> contains 0 active terms.
++----------------------+
+| Active Command Terms |
++-------+------+-------+
+| Index | Name |  Type |
++-------+------+-------+
++-------+------+-------+
+
+[INFO] Event Manager:  <EventManager> contains 1 active terms.
++-------------------------------------+
+| Active Event Terms in Mode: 'reset' |
++------------+------------------------+
+|   Index    | Name                   |
++------------+------------------------+
+|     0      | reset_scene            |
++------------+------------------------+
+
+[INFO] Recorder Manager:  <RecorderManager> contains 0 active terms.
++-----------------------+
+| Active Recorder Terms |
++------------+----------+
+|   Index    | Name     |
++------------+----------+
++------------+----------+
+
+[INFO] Action Manager:  <ActionManager> contains 2 active terms.
++------------------------------------+
+|   Active Action Terms (shape: 8)   |
++-------+----------------+-----------+
+| Index | Name           | Dimension |
++-------+----------------+-----------+
+|   0   | arm_action     |         7 |
+|   1   | gripper_action |         1 |
++-------+----------------+-----------+
+
+[INFO] Observation Manager: <ObservationManager> contains 3 groups.
++------------------------------------------------------------+
+| Active Observation Terms in Group: 'policy' (shape: (62,)) |
++---------+--------------------------------------+-----------+
+|  Index  | Name                                 |   Shape   |
++---------+--------------------------------------+-----------+
+|    0    | arm_q                                |    (7,)   |
+|    1    | arm_qd                               |    (7,)   |
+|    2    | time_remaining                       |    (1,)   |
+|    3    | pour_target_fraction                 |    (1,)   |
+|    4    | tcp_pose                             |    (7,)   |
+|    5    | cup_pose                             |    (7,)   |
+|    6    | target_pose                          |    (7,)   |
+|    7    | tcp_to_grasp_position_c              |    (3,)   |
+|    8    | grasp_to_tcp_quat                    |    (4,)   |
+|    9    | target_position_c                    |    (3,)   |
+|    10   | finger_position                      |    (2,)   |
+|    11   | finger_velocity                      |    (2,)   |
+|    12   | gripper_target                       |    (1,)   |
+|    13   | gripper_contact                      |    (2,)   |
+|    14   | last_action                          |    (8,)   |
++---------+--------------------------------------+-----------+
++-----------------------------------------------------------+
+| Active Observation Terms in Group: 'media' (shape: (22,)) |
++----------+------------------------------------+-----------+
+|  Index   | Name                               |   Shape   |
++----------+------------------------------------+-----------+
+|    0     | cup_velocity                       |    (6,)   |
+|    1     | particle_fractions                 |    (3,)   |
+|    2     | particle_source_state              |    (6,)   |
+|    3     | particle_transfer                  |    (7,)   |
++----------+------------------------------------+-----------+
++---------------------------------------------------------------+
+| Active Observation Terms in Group: 'privileged' (shape: (2,)) |
++------------+-----------------------------------+--------------+
+|   Index    | Name                              |    Shape     |
++------------+-----------------------------------+--------------+
+|     0      | success_dwell                     |     (1,)     |
+|     1      | lost_grasp_dwell                  |     (1,)     |
++------------+-----------------------------------+--------------+
+
+[INFO] Termination Manager:  <TerminationManager> contains 9 active terms.
++----------------------------------------------+
+|           Active Termination Terms           |
++-------+---------------------------+----------+
+| Index | Name                      | Time Out |
++-------+---------------------------+----------+
+|   0   | failure                   |  False   |
+|   1   | extreme_rigid_state       |  False   |
+|   2   | source_receiver_overlap   |  False   |
+|   3   | lost_grasp                |  False   |
+|   4   | spill                     |  False   |
+|   5   | particle_out_of_bounds    |  False   |
+|   6   | success                   |  False   |
+|   7   | learning_progress_context |  False   |
+|   8   | time_out                  |   True   |
++-------+---------------------------+----------+
+
+[INFO] Reward Manager:  <RewardManager> contains 4 active terms.
++------------------------------------+
+|        Active Reward Terms         |
++-------+------------------+---------+
+| Index | Name             |  Weight |
++-------+------------------+---------+
+|   0   | success          |     5.0 |
+|   1   | action_magnitude | -0.0001 |
+|   2   | action_rate      | -0.0001 |
+|   3   | failure          |    -1.0 |
++-------+------------------+---------+
+
+[INFO] Curriculum Manager:  <CurriculumManager> contains 1 active terms.
++-------------------------+
+| Active Curriculum Terms |
++-------+-----------------+
+| Index | Name            |
++-------+-----------------+
+|   0   | reset_dataset   |
++-------+-----------------+
+
+[INFO]: Completed setting up the environment...
+[3/3] Preparing agent
+--------------------------------------------------------------------------------
+Resolved observation sets: 
+	 actor :  ['policy', 'media']
+	 critic :  ['policy', 'media', 'privileged']
+--------------------------------------------------------------------------------
+Actor Model: MLPModel(
+  (obs_normalizer): Identity()
+  (distribution): HeteroscedasticGaussianDistribution()
+  (mlp): MLP(
+    (0): Linear(in_features=84, out_features=512, bias=True)
+    (1): ELU(alpha=1.0)
+    (2): Linear(in_features=512, out_features=256, bias=True)
+    (3): ELU(alpha=1.0)
+    (4): Linear(in_features=256, out_features=128, bias=True)
+    (5): ELU(alpha=1.0)
+    (6): Linear(in_features=128, out_features=64, bias=True)
+    (7): ELU(alpha=1.0)
+    (8): Linear(in_features=64, out_features=16, bias=True)
+    (9): Unflatten(dim=-1, unflattened_size=[2, 8])
+  )
+)
+Critic Model: MLPModel(
+  (obs_normalizer): Identity()
+  (mlp): MLP(
+    (0): Linear(in_features=86, out_features=512, bias=True)
+    (1): ELU(alpha=1.0)
+    (2): Linear(in_features=512, out_features=256, bias=True)
+    (3): ELU(alpha=1.0)
+    (4): Linear(in_features=256, out_features=128, bias=True)
+    (5): ELU(alpha=1.0)
+    (6): Linear(in_features=128, out_features=64, bias=True)
+    (7): ELU(alpha=1.0)
+    (8): Linear(in_features=64, out_features=1, bias=True)
+  )
+)
+Could not find git repository in /home/<user>/env_isaaclab3/lib/python3.12/site-packages/rsl_rl/__init__.py. Skipping.
+Storing git diff for 'IsaacLab3' in: /home/<user>/IsaacLab3/logs/rsl_rl/franka_pour/2026-10-12_08-26-00_l4_1024_curve/git/IsaacLab3.diff
+CUDA graph took: Last: 3.213846 s, Mean: 1.606944 s, Std: 2.272504 s, N: 2
+################################################################################
+[1m                            Learning iteration 0/60                             [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 98304 
+                       Steps per second: 314 
+                        Collection time: 312.068s 
+                          Learning time: 0.354s 
+                        Mean value loss: 0.2030
+                    Mean surrogate loss: -0.0021
+                      Mean entropy loss: 7.2558
+                            Mean reward: -0.46
+                    Mean episode length: 43.07
+                        Mean action std: 0.60
+        Episode_Reward/action_magnitude: -0.0000
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0035
+            Episode_Termination/failure: 0.0014
+           Episode_Termination/time_out: 0.0000
+                 Episode_Reward/failure: -0.0684
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0046
+                 Episode_Reward/success: 0.0487
+Episode_Termination/source_receiver_overlap: 0.1098
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 1.0000
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.0100
+            Episode_Termination/success: 0.0318
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.0378
+             Episode_Reward/action_rate: -0.0000
+--------------------------------------------------------------------------------
+                         Iteration time: 312.42s
+                           Time elapsed: 0:05:12
+                                    ETA: 5:07:12
+
+################################################################################
+[1m                            Learning iteration 1/60                             [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 196608 
+                       Steps per second: 317 
+                        Collection time: 309.400s 
+                          Learning time: 0.210s 
+                        Mean value loss: 0.0291
+                    Mean surrogate loss: -0.0015
+                      Mean entropy loss: 7.2453
+                            Mean reward: -0.28
+                    Mean episode length: 70.97
+                        Mean action std: 0.60
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0063
+            Episode_Termination/failure: 0.0030
+           Episode_Termination/time_out: 0.0000
+                 Episode_Reward/failure: -0.0751
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0109
+                 Episode_Reward/success: 0.0412
+Episode_Termination/source_receiver_overlap: 0.1447
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 1.0000
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.0100
+            Episode_Termination/success: 0.0394
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.0677
+             Episode_Reward/action_rate: -0.0001
+--------------------------------------------------------------------------------
+                         Iteration time: 309.61s
+                           Time elapsed: 0:10:22
+                                    ETA: 5:00:38
+
+################################################################################
+[1m                            Learning iteration 2/60                             [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 294912 
+                       Steps per second: 317 
+                        Collection time: 309.235s 
+                          Learning time: 0.210s 
+                        Mean value loss: 0.0155
+                    Mean surrogate loss: -0.0013
+                      Mean entropy loss: 7.2365
+                            Mean reward: -0.28
+                    Mean episode length: 97.29
+                        Mean action std: 0.60
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0064
+            Episode_Termination/failure: 0.0029
+           Episode_Termination/time_out: 0.0000
+                 Episode_Reward/failure: -0.0755
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0117
+                 Episode_Reward/success: 0.0391
+Episode_Termination/source_receiver_overlap: 0.1530
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 1.0000
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.0100
+            Episode_Termination/success: 0.0404
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.0752
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 309.45s
+                           Time elapsed: 0:15:31
+                                    ETA: 4:54:58
+
+################################################################################
+[1m                            Learning iteration 3/60                             [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 393216 
+                       Steps per second: 317 
+                        Collection time: 309.512s 
+                          Learning time: 0.210s 
+                        Mean value loss: 0.1471
+                    Mean surrogate loss: -0.0016
+                      Mean entropy loss: 7.2147
+                            Mean reward: 0.18
+                    Mean episode length: 135.19
+                        Mean action std: 0.60
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0080
+            Episode_Termination/failure: 0.0039
+           Episode_Termination/time_out: 0.1772
+                 Episode_Reward/failure: -0.0654
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0153
+                 Episode_Reward/success: 0.0343
+Episode_Termination/source_receiver_overlap: 0.1570
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.7410
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.0348
+            Episode_Termination/success: 0.0413
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.0858
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 309.72s
+                           Time elapsed: 0:20:41
+                                    ETA: 4:49:36
+
+################################################################################
+[1m                            Learning iteration 4/60                             [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 491520 
+                       Steps per second: 316 
+                        Collection time: 309.949s 
+                          Learning time: 0.210s 
+                        Mean value loss: 0.2445
+                    Mean surrogate loss: -0.0015
+                      Mean entropy loss: 7.2088
+                            Mean reward: 0.21
+                    Mean episode length: 104.75
+                        Mean action std: 0.60
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0237
+            Episode_Termination/failure: 0.0139
+           Episode_Termination/time_out: 0.5963
+                 Episode_Reward/failure: -0.0479
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0425
+                 Episode_Reward/success: 0.0768
+Episode_Termination/source_receiver_overlap: 0.1460
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0054
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.1051
+            Episode_Termination/success: 0.0835
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1235
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 310.16s
+                           Time elapsed: 0:25:51
+                                    ETA: 4:44:24
+
+################################################################################
+[1m                            Learning iteration 5/60                             [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 589824 
+                       Steps per second: 316 
+                        Collection time: 310.186s 
+                          Learning time: 0.213s 
+                        Mean value loss: 0.0810
+                    Mean surrogate loss: -0.0015
+                      Mean entropy loss: 7.2038
+                            Mean reward: 0.51
+                    Mean episode length: 117.71
+                        Mean action std: 0.59
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0283
+            Episode_Termination/failure: 0.0192
+           Episode_Termination/time_out: 0.5603
+                 Episode_Reward/failure: -0.0480
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0512
+                 Episode_Reward/success: 0.0995
+Episode_Termination/source_receiver_overlap: 0.1502
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0054
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.1051
+            Episode_Termination/success: 0.0912
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1385
+             Episode_Reward/action_rate: -0.0001
+--------------------------------------------------------------------------------
+                         Iteration time: 310.40s
+                           Time elapsed: 0:31:01
+                                    ETA: 4:39:15
+
+################################################################################
+[1m                            Learning iteration 6/60                             [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 688128 
+                       Steps per second: 316 
+                        Collection time: 310.755s 
+                          Learning time: 0.212s 
+                        Mean value loss: 0.0253
+                    Mean surrogate loss: -0.0018
+                      Mean entropy loss: 7.1951
+                            Mean reward: 0.29
+                    Mean episode length: 173.52
+                        Mean action std: 0.59
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0292
+            Episode_Termination/failure: 0.0186
+           Episode_Termination/time_out: 0.5578
+                 Episode_Reward/failure: -0.0366
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0508
+                 Episode_Reward/success: 0.0760
+Episode_Termination/source_receiver_overlap: 0.1495
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0054
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.1051
+            Episode_Termination/success: 0.0938
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1394
+             Episode_Reward/action_rate: -0.0003
+--------------------------------------------------------------------------------
+                         Iteration time: 310.97s
+                           Time elapsed: 0:36:12
+                                    ETA: 4:34:10
+
+################################################################################
+[1m                            Learning iteration 7/60                             [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 786432 
+                       Steps per second: 315 
+                        Collection time: 311.788s 
+                          Learning time: 0.217s 
+                        Mean value loss: 0.3460
+                    Mean surrogate loss: -0.0015
+                      Mean entropy loss: 7.1956
+                            Mean reward: 0.72
+                    Mean episode length: 140.81
+                        Mean action std: 0.59
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0258
+            Episode_Termination/failure: 0.0162
+           Episode_Termination/time_out: 0.5536
+                 Episode_Reward/failure: -0.0290
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0427
+                 Episode_Reward/success: 0.0809
+Episode_Termination/source_receiver_overlap: 0.1420
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0037
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.2635
+            Episode_Termination/success: 0.1164
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1377
+             Episode_Reward/action_rate: -0.0003
+--------------------------------------------------------------------------------
+                         Iteration time: 312.01s
+                           Time elapsed: 0:41:24
+                                    ETA: 4:29:10
+
+################################################################################
+[1m                            Learning iteration 8/60                             [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 884736 
+                       Steps per second: 315 
+                        Collection time: 311.773s 
+                          Learning time: 0.211s 
+                        Mean value loss: 0.2797
+                    Mean surrogate loss: -0.0013
+                      Mean entropy loss: 7.1873
+                            Mean reward: 0.23
+                    Mean episode length: 133.02
+                        Mean action std: 0.59
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0156
+            Episode_Termination/failure: 0.0060
+           Episode_Termination/time_out: 0.5357
+                 Episode_Reward/failure: -0.0368
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0153
+                 Episode_Reward/success: 0.0981
+Episode_Termination/source_receiver_overlap: 0.1244
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0041
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.3332
+            Episode_Termination/success: 0.1813
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1348
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 311.98s
+                           Time elapsed: 0:46:36
+                                    ETA: 4:24:08
+
+################################################################################
+[1m                            Learning iteration 9/60                             [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 983040 
+                       Steps per second: 313 
+                        Collection time: 312.902s 
+                          Learning time: 0.211s 
+                        Mean value loss: 0.1058
+                    Mean surrogate loss: -0.0016
+                      Mean entropy loss: 7.1598
+                            Mean reward: 0.35
+                    Mean episode length: 146.19
+                        Mean action std: 0.59
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0137
+            Episode_Termination/failure: 0.0030
+           Episode_Termination/time_out: 0.5255
+                 Episode_Reward/failure: -0.0431
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0110
+                 Episode_Reward/success: 0.0730
+Episode_Termination/source_receiver_overlap: 0.1172
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0041
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.3332
+            Episode_Termination/success: 0.1943
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1415
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 313.11s
+                           Time elapsed: 0:51:49
+                                    ETA: 4:19:09
+
+################################################################################
+[1m                            Learning iteration 10/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 1081344 
+                       Steps per second: 313 
+                        Collection time: 313.777s 
+                          Learning time: 0.211s 
+                        Mean value loss: 0.0520
+                    Mean surrogate loss: -0.0015
+                      Mean entropy loss: 7.1260
+                            Mean reward: 0.58
+                    Mean episode length: 157.06
+                        Mean action std: 0.59
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0136
+            Episode_Termination/failure: 0.0029
+           Episode_Termination/time_out: 0.5206
+                 Episode_Reward/failure: -0.0377
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0097
+                 Episode_Reward/success: 0.0933
+Episode_Termination/source_receiver_overlap: 0.1150
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0041
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.3332
+            Episode_Termination/success: 0.1905
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1529
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 313.99s
+                           Time elapsed: 0:57:03
+                                    ETA: 4:14:11
+
+################################################################################
+[1m                            Learning iteration 11/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 1179648 
+                       Steps per second: 313 
+                        Collection time: 313.051s 
+                          Learning time: 0.216s 
+                        Mean value loss: 0.4226
+                    Mean surrogate loss: -0.0020
+                      Mean entropy loss: 7.0880
+                            Mean reward: 1.14
+                    Mean episode length: 158.94
+                        Mean action std: 0.59
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0386
+            Episode_Termination/failure: 0.0287
+           Episode_Termination/time_out: 0.4986
+                 Episode_Reward/failure: -0.0249
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0204
+                 Episode_Reward/success: 0.1045
+Episode_Termination/source_receiver_overlap: 0.1064
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0045
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.3627
+            Episode_Termination/success: 0.1893
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1582
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 313.27s
+                           Time elapsed: 1:02:17
+                                    ETA: 4:09:08
+
+################################################################################
+[1m                            Learning iteration 12/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 1277952 
+                       Steps per second: 314 
+                        Collection time: 312.522s 
+                          Learning time: 0.211s 
+                        Mean value loss: 0.3043
+                    Mean surrogate loss: -0.0019
+                      Mean entropy loss: 7.0481
+                            Mean reward: 0.97
+                    Mean episode length: 149.63
+                        Mean action std: 0.58
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0402
+            Episode_Termination/failure: 0.0326
+           Episode_Termination/time_out: 0.4680
+                 Episode_Reward/failure: -0.0332
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0233
+                 Episode_Reward/success: 0.1142
+Episode_Termination/source_receiver_overlap: 0.1075
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0055
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.3996
+            Episode_Termination/success: 0.1992
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1758
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 312.73s
+                           Time elapsed: 1:07:29
+                                    ETA: 4:04:01
+
+################################################################################
+[1m                            Learning iteration 13/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 1376256 
+                       Steps per second: 313 
+                        Collection time: 313.064s 
+                          Learning time: 0.212s 
+                        Mean value loss: 0.1924
+                    Mean surrogate loss: -0.0019
+                      Mean entropy loss: 7.0169
+                            Mean reward: 1.29
+                    Mean episode length: 109.49
+                        Mean action std: 0.58
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0393
+            Episode_Termination/failure: 0.0318
+           Episode_Termination/time_out: 0.4534
+                 Episode_Reward/failure: -0.0407
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0245
+                 Episode_Reward/success: 0.1228
+Episode_Termination/source_receiver_overlap: 0.0959
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0057
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4047
+            Episode_Termination/success: 0.2125
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1874
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 313.28s
+                           Time elapsed: 1:12:43
+                                    ETA: 3:58:55
+
+################################################################################
+[1m                            Learning iteration 14/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 1474560 
+                       Steps per second: 312 
+                        Collection time: 313.975s 
+                          Learning time: 0.212s 
+                        Mean value loss: 0.1158
+                    Mean surrogate loss: -0.0018
+                      Mean entropy loss: 7.0006
+                            Mean reward: -0.02
+                    Mean episode length: 358.58
+                        Mean action std: 0.58
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0396
+            Episode_Termination/failure: 0.0321
+           Episode_Termination/time_out: 0.4350
+                 Episode_Reward/failure: -0.0390
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0298
+                 Episode_Reward/success: 0.1168
+Episode_Termination/source_receiver_overlap: 0.0935
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0057
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4047
+            Episode_Termination/success: 0.2354
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1804
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.19s
+                           Time elapsed: 1:17:57
+                                    ETA: 3:53:51
+
+################################################################################
+[1m                            Learning iteration 15/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 1572864 
+                       Steps per second: 313 
+                        Collection time: 313.301s 
+                          Learning time: 0.211s 
+                        Mean value loss: 0.4700
+                    Mean surrogate loss: -0.0019
+                      Mean entropy loss: 6.9607
+                            Mean reward: 1.01
+                    Mean episode length: 137.00
+                        Mean action std: 0.58
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0198
+            Episode_Termination/failure: 0.0117
+           Episode_Termination/time_out: 0.4262
+                 Episode_Reward/failure: -0.0261
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0240
+                 Episode_Reward/success: 0.0928
+Episode_Termination/source_receiver_overlap: 0.0982
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0059
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4037
+            Episode_Termination/success: 0.2456
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1924
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 313.51s
+                           Time elapsed: 1:23:10
+                                    ETA: 3:48:44
+
+################################################################################
+[1m                            Learning iteration 16/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 1671168 
+                       Steps per second: 313 
+                        Collection time: 312.867s 
+                          Learning time: 0.213s 
+                        Mean value loss: 0.2936
+                    Mean surrogate loss: -0.0018
+                      Mean entropy loss: 6.9290
+                            Mean reward: 0.72
+                    Mean episode length: 130.63
+                        Mean action std: 0.57
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0170
+            Episode_Termination/failure: 0.0113
+           Episode_Termination/time_out: 0.3963
+                 Episode_Reward/failure: -0.0348
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0286
+                 Episode_Reward/success: 0.1136
+Episode_Termination/source_receiver_overlap: 0.0991
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0062
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4139
+            Episode_Termination/success: 0.2564
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.2105
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 313.08s
+                           Time elapsed: 1:28:23
+                                    ETA: 3:43:35
+
+################################################################################
+[1m                            Learning iteration 17/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 1769472 
+                       Steps per second: 313 
+                        Collection time: 313.221s 
+                          Learning time: 0.211s 
+                        Mean value loss: 0.2213
+                    Mean surrogate loss: -0.0020
+                      Mean entropy loss: 6.9088
+                            Mean reward: 0.86
+                    Mean episode length: 142.24
+                        Mean action std: 0.57
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0136
+            Episode_Termination/failure: 0.0088
+           Episode_Termination/time_out: 0.3908
+                 Episode_Reward/failure: -0.0365
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0304
+                 Episode_Reward/success: 0.1072
+Episode_Termination/source_receiver_overlap: 0.0974
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0062
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4141
+            Episode_Termination/success: 0.2527
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.2203
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 313.43s
+                           Time elapsed: 1:33:37
+                                    ETA: 3:38:27
+
+################################################################################
+[1m                            Learning iteration 18/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 1867776 
+                       Steps per second: 312 
+                        Collection time: 314.017s 
+                          Learning time: 0.212s 
+                        Mean value loss: 0.1728
+                    Mean surrogate loss: -0.0017
+                      Mean entropy loss: 6.9202
+                            Mean reward: 0.89
+                    Mean episode length: 224.98
+                        Mean action std: 0.57
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0100
+            Episode_Termination/failure: 0.0067
+           Episode_Termination/time_out: 0.4014
+                 Episode_Reward/failure: -0.0348
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0269
+                 Episode_Reward/success: 0.1098
+Episode_Termination/source_receiver_overlap: 0.0944
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0070
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4247
+            Episode_Termination/success: 0.2443
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.2290
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.23s
+                           Time elapsed: 1:38:51
+                                    ETA: 3:33:19
+
+################################################################################
+[1m                            Learning iteration 19/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 1966080 
+                       Steps per second: 313 
+                        Collection time: 313.026s 
+                          Learning time: 0.211s 
+                        Mean value loss: 0.4273
+                    Mean surrogate loss: -0.0020
+                      Mean entropy loss: 6.9103
+                            Mean reward: 0.83
+                    Mean episode length: 147.36
+                        Mean action std: 0.57
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0104
+            Episode_Termination/failure: 0.0057
+           Episode_Termination/time_out: 0.3881
+                 Episode_Reward/failure: -0.0245
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0287
+                 Episode_Reward/success: 0.1152
+Episode_Termination/source_receiver_overlap: 0.0976
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0073
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4293
+            Episode_Termination/success: 0.2589
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.2241
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 313.24s
+                           Time elapsed: 1:44:04
+                                    ETA: 3:28:09
+
+################################################################################
+[1m                            Learning iteration 20/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 2064384 
+                       Steps per second: 314 
+                        Collection time: 312.766s 
+                          Learning time: 0.210s 
+                        Mean value loss: 0.3668
+                    Mean surrogate loss: -0.0019
+                      Mean entropy loss: 6.8919
+                            Mean reward: 1.35
+                    Mean episode length: 141.97
+                        Mean action std: 0.57
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0220
+            Episode_Termination/failure: 0.0141
+           Episode_Termination/time_out: 0.3660
+                 Episode_Reward/failure: -0.0295
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0253
+                 Episode_Reward/success: 0.1353
+Episode_Termination/source_receiver_overlap: 0.0928
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0078
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4385
+            Episode_Termination/success: 0.2759
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.2280
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 312.98s
+                           Time elapsed: 1:49:17
+                                    ETA: 3:22:58
+
+################################################################################
+[1m                            Learning iteration 21/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 2162688 
+                       Steps per second: 314 
+                        Collection time: 312.636s 
+                          Learning time: 0.210s 
+                        Mean value loss: 0.2614
+                    Mean surrogate loss: -0.0020
+                      Mean entropy loss: 6.8577
+                            Mean reward: 1.18
+                    Mean episode length: 131.94
+                        Mean action std: 0.57
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0225
+            Episode_Termination/failure: 0.0118
+           Episode_Termination/time_out: 0.3546
+                 Episode_Reward/failure: -0.0355
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0176
+                 Episode_Reward/success: 0.1214
+Episode_Termination/source_receiver_overlap: 0.0924
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0090
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4479
+            Episode_Termination/success: 0.2905
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.2316
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 312.85s
+                           Time elapsed: 1:54:30
+                                    ETA: 3:17:47
+
+################################################################################
+[1m                            Learning iteration 22/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 2260992 
+                       Steps per second: 313 
+                        Collection time: 313.095s 
+                          Learning time: 0.210s 
+                        Mean value loss: 0.2377
+                    Mean surrogate loss: -0.0019
+                      Mean entropy loss: 6.8719
+                            Mean reward: 1.31
+                    Mean episode length: 161.71
+                        Mean action std: 0.57
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0260
+            Episode_Termination/failure: 0.0127
+           Episode_Termination/time_out: 0.3497
+                 Episode_Reward/failure: -0.0295
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0228
+                 Episode_Reward/success: 0.1219
+Episode_Termination/source_receiver_overlap: 0.0908
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0090
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4484
+            Episode_Termination/success: 0.2932
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.2299
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 313.30s
+                           Time elapsed: 1:59:43
+                                    ETA: 3:12:36
+
+################################################################################
+[1m                            Learning iteration 23/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 2359296 
+                       Steps per second: 313 
+                        Collection time: 313.186s 
+                          Learning time: 0.211s 
+                        Mean value loss: 0.3589
+                    Mean surrogate loss: -0.0021
+                      Mean entropy loss: 6.8729
+                            Mean reward: 1.10
+                    Mean episode length: 170.23
+                        Mean action std: 0.57
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0218
+            Episode_Termination/failure: 0.0091
+           Episode_Termination/time_out: 0.3592
+                 Episode_Reward/failure: -0.0213
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0245
+                 Episode_Reward/success: 0.1171
+Episode_Termination/source_receiver_overlap: 0.0836
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0095
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4509
+            Episode_Termination/success: 0.2962
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.2266
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 313.40s
+                           Time elapsed: 2:04:57
+                                    ETA: 3:07:25
+
+################################################################################
+[1m                            Learning iteration 24/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 2457600 
+                       Steps per second: 313 
+                        Collection time: 313.034s 
+                          Learning time: 0.212s 
+                        Mean value loss: 0.3484
+                    Mean surrogate loss: -0.0020
+                      Mean entropy loss: 6.8291
+                            Mean reward: 1.64
+                    Mean episode length: 157.07
+                        Mean action std: 0.57
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0128
+            Episode_Termination/failure: 0.0030
+           Episode_Termination/time_out: 0.3712
+                 Episode_Reward/failure: -0.0253
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0208
+                 Episode_Reward/success: 0.1461
+Episode_Termination/source_receiver_overlap: 0.0854
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0101
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4546
+            Episode_Termination/success: 0.3075
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.2095
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 313.25s
+                           Time elapsed: 2:10:10
+                                    ETA: 3:02:14
+
+################################################################################
+[1m                            Learning iteration 25/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 2555904 
+                       Steps per second: 313 
+                        Collection time: 313.223s 
+                          Learning time: 0.218s 
+                        Mean value loss: 0.2679
+                    Mean surrogate loss: -0.0018
+                      Mean entropy loss: 6.8167
+                            Mean reward: 0.48
+                    Mean episode length: 137.49
+                        Mean action std: 0.57
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0125
+            Episode_Termination/failure: 0.0032
+           Episode_Termination/time_out: 0.3751
+                 Episode_Reward/failure: -0.0285
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0213
+                 Episode_Reward/success: 0.1292
+Episode_Termination/source_receiver_overlap: 0.0801
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0107
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4579
+            Episode_Termination/success: 0.3273
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1903
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 313.44s
+                           Time elapsed: 2:15:23
+                                    ETA: 2:57:03
+
+################################################################################
+[1m                            Learning iteration 26/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 2654208 
+                       Steps per second: 313 
+                        Collection time: 313.620s 
+                          Learning time: 0.219s 
+                        Mean value loss: 0.3210
+                    Mean surrogate loss: -0.0018
+                      Mean entropy loss: 6.8046
+                            Mean reward: 1.72
+                    Mean episode length: 157.55
+                        Mean action std: 0.57
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0177
+            Episode_Termination/failure: 0.0105
+           Episode_Termination/time_out: 0.3680
+                 Episode_Reward/failure: -0.0285
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0387
+                 Episode_Reward/success: 0.1276
+Episode_Termination/source_receiver_overlap: 0.0893
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0111
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4598
+            Episode_Termination/success: 0.3203
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1796
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 313.84s
+                           Time elapsed: 2:20:37
+                                    ETA: 2:51:52
+
+################################################################################
+[1m                            Learning iteration 27/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 2752512 
+                       Steps per second: 313 
+                        Collection time: 313.515s 
+                          Learning time: 0.212s 
+                        Mean value loss: 0.3686
+                    Mean surrogate loss: -0.0021
+                      Mean entropy loss: 6.7758
+                            Mean reward: 1.40
+                    Mean episode length: 169.53
+                        Mean action std: 0.56
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0158
+            Episode_Termination/failure: 0.0171
+           Episode_Termination/time_out: 0.3629
+                 Episode_Reward/failure: -0.0223
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0445
+                 Episode_Reward/success: 0.1365
+Episode_Termination/source_receiver_overlap: 0.0925
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0115
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4615
+            Episode_Termination/success: 0.3216
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1806
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 313.73s
+                           Time elapsed: 2:25:51
+                                    ETA: 2:46:41
+
+################################################################################
+[1m                            Learning iteration 28/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 2850816 
+                       Steps per second: 313 
+                        Collection time: 313.755s 
+                          Learning time: 0.211s 
+                        Mean value loss: 0.3431
+                    Mean surrogate loss: -0.0025
+                      Mean entropy loss: 6.7501
+                            Mean reward: 1.30
+                    Mean episode length: 159.40
+                        Mean action std: 0.56
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0202
+            Episode_Termination/failure: 0.0164
+           Episode_Termination/time_out: 0.3593
+                 Episode_Reward/failure: -0.0245
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0459
+                 Episode_Reward/success: 0.1558
+Episode_Termination/source_receiver_overlap: 0.0915
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0120
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4633
+            Episode_Termination/success: 0.3271
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1742
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 313.97s
+                           Time elapsed: 2:31:05
+                                    ETA: 2:41:30
+
+################################################################################
+[1m                            Learning iteration 29/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 2949120 
+                       Steps per second: 312 
+                        Collection time: 314.191s 
+                          Learning time: 0.212s 
+                        Mean value loss: 0.2835
+                    Mean surrogate loss: -0.0021
+                      Mean entropy loss: 6.7565
+                            Mean reward: 2.03
+                    Mean episode length: 141.09
+                        Mean action std: 0.56
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0215
+            Episode_Termination/failure: 0.0158
+           Episode_Termination/time_out: 0.3511
+                 Episode_Reward/failure: -0.0236
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0414
+                 Episode_Reward/success: 0.1750
+Episode_Termination/source_receiver_overlap: 0.0987
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0125
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4649
+            Episode_Termination/success: 0.3316
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1741
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.40s
+                           Time elapsed: 2:36:19
+                                    ETA: 2:36:19
+
+################################################################################
+[1m                            Learning iteration 30/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 3047424 
+                       Steps per second: 313 
+                        Collection time: 313.757s 
+                          Learning time: 0.211s 
+                        Mean value loss: 0.2735
+                    Mean surrogate loss: -0.0018
+                      Mean entropy loss: 6.7457
+                            Mean reward: 1.50
+                    Mean episode length: 178.06
+                        Mean action std: 0.56
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0169
+            Episode_Termination/failure: 0.0077
+           Episode_Termination/time_out: 0.3642
+                 Episode_Reward/failure: -0.0201
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0202
+                 Episode_Reward/success: 0.1441
+Episode_Termination/source_receiver_overlap: 0.1000
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0128
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4661
+            Episode_Termination/success: 0.3533
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1547
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 313.97s
+                           Time elapsed: 2:41:33
+                                    ETA: 2:31:08
+
+################################################################################
+[1m                            Learning iteration 31/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 3145728 
+                       Steps per second: 313 
+                        Collection time: 313.614s 
+                          Learning time: 0.210s 
+                        Mean value loss: 0.3238
+                    Mean surrogate loss: -0.0023
+                      Mean entropy loss: 6.6892
+                            Mean reward: 1.53
+                    Mean episode length: 156.02
+                        Mean action std: 0.56
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0171
+            Episode_Termination/failure: 0.0025
+           Episode_Termination/time_out: 0.3540
+                 Episode_Reward/failure: -0.0224
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0141
+                 Episode_Reward/success: 0.1430
+Episode_Termination/source_receiver_overlap: 0.1025
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0138
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4691
+            Episode_Termination/success: 0.3689
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1477
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 313.82s
+                           Time elapsed: 2:46:47
+                                    ETA: 2:25:56
+
+################################################################################
+[1m                            Learning iteration 32/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 3244032 
+                       Steps per second: 313 
+                        Collection time: 313.710s 
+                          Learning time: 0.211s 
+                        Mean value loss: 0.3366
+                    Mean surrogate loss: -0.0022
+                      Mean entropy loss: 6.6626
+                            Mean reward: 1.68
+                    Mean episode length: 150.62
+                        Mean action std: 0.56
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0141
+            Episode_Termination/failure: 0.0020
+           Episode_Termination/time_out: 0.3414
+                 Episode_Reward/failure: -0.0239
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0110
+                 Episode_Reward/success: 0.1509
+Episode_Termination/source_receiver_overlap: 0.1135
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0146
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4712
+            Episode_Termination/success: 0.3760
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1452
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 313.92s
+                           Time elapsed: 2:52:01
+                                    ETA: 2:20:44
+
+################################################################################
+[1m                            Learning iteration 33/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 3342336 
+                       Steps per second: 312 
+                        Collection time: 313.894s 
+                          Learning time: 0.211s 
+                        Mean value loss: 0.2866
+                    Mean surrogate loss: -0.0017
+                      Mean entropy loss: 6.6685
+                            Mean reward: 1.30
+                    Mean episode length: 145.00
+                        Mean action std: 0.56
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0107
+            Episode_Termination/failure: 0.0029
+           Episode_Termination/time_out: 0.3576
+                 Episode_Reward/failure: -0.0240
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0157
+                 Episode_Reward/success: 0.1562
+Episode_Termination/source_receiver_overlap: 0.0974
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0159
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4743
+            Episode_Termination/success: 0.3717
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1475
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.10s
+                           Time elapsed: 2:57:15
+                                    ETA: 2:15:33
+
+################################################################################
+[1m                            Learning iteration 34/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 3440640 
+                       Steps per second: 312 
+                        Collection time: 314.172s 
+                          Learning time: 0.212s 
+                        Mean value loss: 0.3143
+                    Mean surrogate loss: -0.0021
+                      Mean entropy loss: 6.6527
+                            Mean reward: 1.46
+                    Mean episode length: 175.79
+                        Mean action std: 0.56
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0139
+            Episode_Termination/failure: 0.0039
+           Episode_Termination/time_out: 0.3484
+                 Episode_Reward/failure: -0.0239
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0137
+                 Episode_Reward/success: 0.1431
+Episode_Termination/source_receiver_overlap: 0.0916
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0164
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4748
+            Episode_Termination/success: 0.3729
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1620
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.38s
+                           Time elapsed: 3:02:30
+                                    ETA: 2:10:21
+
+################################################################################
+[1m                            Learning iteration 35/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 3538944 
+                       Steps per second: 312 
+                        Collection time: 314.389s 
+                          Learning time: 0.211s 
+                        Mean value loss: 0.2681
+                    Mean surrogate loss: -0.0022
+                      Mean entropy loss: 6.6253
+                            Mean reward: 1.43
+                    Mean episode length: 164.84
+                        Mean action std: 0.55
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0126
+            Episode_Termination/failure: 0.0028
+           Episode_Termination/time_out: 0.3614
+                 Episode_Reward/failure: -0.0206
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0138
+                 Episode_Reward/success: 0.1687
+Episode_Termination/source_receiver_overlap: 0.0848
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0169
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4755
+            Episode_Termination/success: 0.3718
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1596
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.60s
+                           Time elapsed: 3:07:44
+                                    ETA: 2:05:09
+
+################################################################################
+[1m                            Learning iteration 36/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 3637248 
+                       Steps per second: 312 
+                        Collection time: 314.045s 
+                          Learning time: 0.213s 
+                        Mean value loss: 0.3268
+                    Mean surrogate loss: -0.0020
+                      Mean entropy loss: 6.6279
+                            Mean reward: 1.67
+                    Mean episode length: 120.98
+                        Mean action std: 0.56
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0227
+            Episode_Termination/failure: 0.0134
+           Episode_Termination/time_out: 0.3517
+                 Episode_Reward/failure: -0.0233
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0178
+                 Episode_Reward/success: 0.1544
+Episode_Termination/source_receiver_overlap: 0.0870
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0185
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4782
+            Episode_Termination/success: 0.3743
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1557
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.26s
+                           Time elapsed: 3:12:58
+                                    ETA: 1:59:57
+
+################################################################################
+[1m                            Learning iteration 37/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 3735552 
+                       Steps per second: 312 
+                        Collection time: 314.037s 
+                          Learning time: 0.212s 
+                        Mean value loss: 0.2435
+                    Mean surrogate loss: -0.0025
+                      Mean entropy loss: 6.6287
+                            Mean reward: 1.91
+                    Mean episode length: 147.10
+                        Mean action std: 0.55
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0220
+            Episode_Termination/failure: 0.0144
+           Episode_Termination/time_out: 0.3496
+                 Episode_Reward/failure: -0.0212
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0245
+                 Episode_Reward/success: 0.1668
+Episode_Termination/source_receiver_overlap: 0.0943
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0188
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4783
+            Episode_Termination/success: 0.3711
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1513
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.25s
+                           Time elapsed: 3:18:13
+                                    ETA: 1:54:45
+
+################################################################################
+[1m                            Learning iteration 38/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 3833856 
+                       Steps per second: 312 
+                        Collection time: 314.198s 
+                          Learning time: 0.215s 
+                        Mean value loss: 0.2798
+                    Mean surrogate loss: -0.0026
+                      Mean entropy loss: 6.6099
+                            Mean reward: 1.66
+                    Mean episode length: 137.89
+                        Mean action std: 0.55
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0174
+            Episode_Termination/failure: 0.0157
+           Episode_Termination/time_out: 0.3626
+                 Episode_Reward/failure: -0.0199
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0301
+                 Episode_Reward/success: 0.1722
+Episode_Termination/source_receiver_overlap: 0.0827
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0191
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4784
+            Episode_Termination/success: 0.3771
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1425
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.41s
+                           Time elapsed: 3:23:27
+                                    ETA: 1:49:33
+
+################################################################################
+[1m                            Learning iteration 39/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 3932160 
+                       Steps per second: 312 
+                        Collection time: 313.955s 
+                          Learning time: 0.213s 
+                        Mean value loss: 0.3033
+                    Mean surrogate loss: -0.0022
+                      Mean entropy loss: 6.5498
+                            Mean reward: 1.57
+                    Mean episode length: 150.10
+                        Mean action std: 0.55
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0177
+            Episode_Termination/failure: 0.0205
+           Episode_Termination/time_out: 0.3420
+                 Episode_Reward/failure: -0.0200
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0380
+                 Episode_Reward/success: 0.1860
+Episode_Termination/source_receiver_overlap: 0.0825
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0200
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4797
+            Episode_Termination/success: 0.3914
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1428
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.17s
+                           Time elapsed: 3:28:41
+                                    ETA: 1:44:20
+
+################################################################################
+[1m                            Learning iteration 40/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 4030464 
+                       Steps per second: 313 
+                        Collection time: 313.522s 
+                          Learning time: 0.212s 
+                        Mean value loss: 0.3133
+                    Mean surrogate loss: -0.0020
+                      Mean entropy loss: 6.5602
+                            Mean reward: 1.78
+                    Mean episode length: 144.14
+                        Mean action std: 0.55
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0085
+            Episode_Termination/failure: 0.0128
+           Episode_Termination/time_out: 0.3308
+                 Episode_Reward/failure: -0.0235
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0313
+                 Episode_Reward/success: 0.1693
+Episode_Termination/source_receiver_overlap: 0.0881
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0205
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4799
+            Episode_Termination/success: 0.4022
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1497
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 313.73s
+                           Time elapsed: 3:33:55
+                                    ETA: 1:39:08
+
+################################################################################
+[1m                            Learning iteration 41/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 4128768 
+                       Steps per second: 312 
+                        Collection time: 314.056s 
+                          Learning time: 0.210s 
+                        Mean value loss: 0.2678
+                    Mean surrogate loss: -0.0021
+                      Mean entropy loss: 6.6091
+                            Mean reward: 1.59
+                    Mean episode length: 149.38
+                        Mean action std: 0.56
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0089
+            Episode_Termination/failure: 0.0102
+           Episode_Termination/time_out: 0.3057
+                 Episode_Reward/failure: -0.0221
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0301
+                 Episode_Reward/success: 0.1804
+Episode_Termination/source_receiver_overlap: 0.0904
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0207
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4800
+            Episode_Termination/success: 0.4187
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1552
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.27s
+                           Time elapsed: 3:39:09
+                                    ETA: 1:33:55
+
+################################################################################
+[1m                            Learning iteration 42/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 4227072 
+                       Steps per second: 312 
+                        Collection time: 314.820s 
+                          Learning time: 0.211s 
+                        Mean value loss: 0.2618
+                    Mean surrogate loss: -0.0021
+                      Mean entropy loss: 6.6500
+                            Mean reward: 1.79
+                    Mean episode length: 147.73
+                        Mean action std: 0.56
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0110
+            Episode_Termination/failure: 0.0086
+           Episode_Termination/time_out: 0.3039
+                 Episode_Reward/failure: -0.0192
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0270
+                 Episode_Reward/success: 0.1622
+Episode_Termination/source_receiver_overlap: 0.0894
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0211
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4801
+            Episode_Termination/success: 0.4212
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1559
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 315.03s
+                           Time elapsed: 3:44:24
+                                    ETA: 1:28:43
+
+################################################################################
+[1m                            Learning iteration 43/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 4325376 
+                       Steps per second: 312 
+                        Collection time: 314.479s 
+                          Learning time: 0.210s 
+                        Mean value loss: 0.3011
+                    Mean surrogate loss: -0.0020
+                      Mean entropy loss: 6.5996
+                            Mean reward: 2.05
+                    Mean episode length: 125.20
+                        Mean action std: 0.55
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0104
+            Episode_Termination/failure: 0.0039
+           Episode_Termination/time_out: 0.3136
+                 Episode_Reward/failure: -0.0226
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0203
+                 Episode_Reward/success: 0.1474
+Episode_Termination/source_receiver_overlap: 0.0837
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0214
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4805
+            Episode_Termination/success: 0.4068
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1703
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.69s
+                           Time elapsed: 3:49:39
+                                    ETA: 1:23:30
+
+################################################################################
+[1m                            Learning iteration 44/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 4423680 
+                       Steps per second: 312 
+                        Collection time: 314.503s 
+                          Learning time: 0.210s 
+                        Mean value loss: 0.2755
+                    Mean surrogate loss: -0.0021
+                      Mean entropy loss: 6.6412
+                            Mean reward: 1.90
+                    Mean episode length: 143.86
+                        Mean action std: 0.56
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0138
+            Episode_Termination/failure: 0.0023
+           Episode_Termination/time_out: 0.3165
+                 Episode_Reward/failure: -0.0183
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0197
+                 Episode_Reward/success: 0.1694
+Episode_Termination/source_receiver_overlap: 0.0793
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0218
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4812
+            Episode_Termination/success: 0.4170
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1583
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.71s
+                           Time elapsed: 3:54:54
+                                    ETA: 1:18:18
+
+################################################################################
+[1m                            Learning iteration 45/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 4521984 
+                       Steps per second: 312 
+                        Collection time: 314.760s 
+                          Learning time: 0.210s 
+                        Mean value loss: 0.2578
+                    Mean surrogate loss: -0.0025
+                      Mean entropy loss: 6.6414
+                            Mean reward: 1.36
+                    Mean episode length: 163.07
+                        Mean action std: 0.56
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0137
+            Episode_Termination/failure: 0.0029
+           Episode_Termination/time_out: 0.3265
+                 Episode_Reward/failure: -0.0204
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0171
+                 Episode_Reward/success: 0.1653
+Episode_Termination/source_receiver_overlap: 0.0771
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0234
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4828
+            Episode_Termination/success: 0.4157
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1539
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.97s
+                           Time elapsed: 4:00:09
+                                    ETA: 1:13:05
+
+################################################################################
+[1m                            Learning iteration 46/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 4620288 
+                       Steps per second: 312 
+                        Collection time: 314.860s 
+                          Learning time: 0.211s 
+                        Mean value loss: 0.2447
+                    Mean surrogate loss: -0.0026
+                      Mean entropy loss: 6.5970
+                            Mean reward: 1.72
+                    Mean episode length: 159.08
+                        Mean action std: 0.55
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0157
+            Episode_Termination/failure: 0.0030
+           Episode_Termination/time_out: 0.3351
+                 Episode_Reward/failure: -0.0214
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0184
+                 Episode_Reward/success: 0.1552
+Episode_Termination/source_receiver_overlap: 0.0755
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0239
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4833
+            Episode_Termination/success: 0.4023
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1586
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 315.07s
+                           Time elapsed: 4:05:24
+                                    ETA: 1:07:52
+
+################################################################################
+[1m                            Learning iteration 47/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 4718592 
+                       Steps per second: 312 
+                        Collection time: 314.542s 
+                          Learning time: 0.210s 
+                        Mean value loss: 0.2688
+                    Mean surrogate loss: -0.0022
+                      Mean entropy loss: 6.5812
+                            Mean reward: 2.31
+                    Mean episode length: 139.11
+                        Mean action std: 0.55
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0188
+            Episode_Termination/failure: 0.0029
+           Episode_Termination/time_out: 0.3391
+                 Episode_Reward/failure: -0.0178
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0155
+                 Episode_Reward/success: 0.1833
+Episode_Termination/source_receiver_overlap: 0.0655
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0249
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4842
+            Episode_Termination/success: 0.4121
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1538
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.75s
+                           Time elapsed: 4:10:39
+                                    ETA: 1:02:39
+
+################################################################################
+[1m                            Learning iteration 48/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 4816896 
+                       Steps per second: 312 
+                        Collection time: 314.840s 
+                          Learning time: 0.212s 
+                        Mean value loss: 0.2974
+                    Mean surrogate loss: -0.0019
+                      Mean entropy loss: 6.5747
+                            Mean reward: 1.92
+                    Mean episode length: 152.52
+                        Mean action std: 0.55
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0157
+            Episode_Termination/failure: 0.0020
+           Episode_Termination/time_out: 0.3392
+                 Episode_Reward/failure: -0.0207
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0148
+                 Episode_Reward/success: 0.1750
+Episode_Termination/source_receiver_overlap: 0.0656
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0263
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4854
+            Episode_Termination/success: 0.4156
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1534
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 315.05s
+                           Time elapsed: 4:15:54
+                                    ETA: 0:57:26
+
+################################################################################
+[1m                            Learning iteration 49/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 4915200 
+                       Steps per second: 312 
+                        Collection time: 314.502s 
+                          Learning time: 0.211s 
+                        Mean value loss: 0.2501
+                    Mean surrogate loss: -0.0021
+                      Mean entropy loss: 6.5555
+                            Mean reward: 1.88
+                    Mean episode length: 146.04
+                        Mean action std: 0.55
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0146
+            Episode_Termination/failure: 0.0029
+           Episode_Termination/time_out: 0.3329
+                 Episode_Reward/failure: -0.0228
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0107
+                 Episode_Reward/success: 0.1734
+Episode_Termination/source_receiver_overlap: 0.0693
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0272
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4862
+            Episode_Termination/success: 0.4260
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1503
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.71s
+                           Time elapsed: 4:21:08
+                                    ETA: 0:52:13
+
+################################################################################
+[1m                            Learning iteration 50/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 5013504 
+                       Steps per second: 312 
+                        Collection time: 314.273s 
+                          Learning time: 0.211s 
+                        Mean value loss: 0.2429
+                    Mean surrogate loss: -0.0024
+                      Mean entropy loss: 6.5571
+                            Mean reward: 1.98
+                    Mean episode length: 131.32
+                        Mean action std: 0.55
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0085
+            Episode_Termination/failure: 0.0025
+           Episode_Termination/time_out: 0.3265
+                 Episode_Reward/failure: -0.0199
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0104
+                 Episode_Reward/success: 0.1813
+Episode_Termination/source_receiver_overlap: 0.0770
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0285
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4869
+            Episode_Termination/success: 0.4400
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1386
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.48s
+                           Time elapsed: 4:26:23
+                                    ETA: 0:47:00
+
+################################################################################
+[1m                            Learning iteration 51/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 5111808 
+                       Steps per second: 312 
+                        Collection time: 314.186s 
+                          Learning time: 0.210s 
+                        Mean value loss: 0.2609
+                    Mean surrogate loss: -0.0026
+                      Mean entropy loss: 6.5456
+                            Mean reward: 2.23
+                    Mean episode length: 129.93
+                        Mean action std: 0.55
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0043
+            Episode_Termination/failure: 0.0022
+           Episode_Termination/time_out: 0.3084
+                 Episode_Reward/failure: -0.0222
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0102
+                 Episode_Reward/success: 0.1682
+Episode_Termination/source_receiver_overlap: 0.0816
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0294
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4874
+            Episode_Termination/success: 0.4437
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1535
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.40s
+                           Time elapsed: 4:31:37
+                                    ETA: 0:41:47
+
+################################################################################
+[1m                            Learning iteration 52/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 5210112 
+                       Steps per second: 312 
+                        Collection time: 314.641s 
+                          Learning time: 0.210s 
+                        Mean value loss: 0.2265
+                    Mean surrogate loss: -0.0021
+                      Mean entropy loss: 6.5093
+                            Mean reward: 1.47
+                    Mean episode length: 142.27
+                        Mean action std: 0.55
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0074
+            Episode_Termination/failure: 0.0021
+           Episode_Termination/time_out: 0.3128
+                 Episode_Reward/failure: -0.0179
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0133
+                 Episode_Reward/success: 0.1745
+Episode_Termination/source_receiver_overlap: 0.0741
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0299
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4876
+            Episode_Termination/success: 0.4467
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1479
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.85s
+                           Time elapsed: 4:36:52
+                                    ETA: 0:36:34
+
+################################################################################
+[1m                            Learning iteration 53/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 5308416 
+                       Steps per second: 312 
+                        Collection time: 314.203s 
+                          Learning time: 0.211s 
+                        Mean value loss: 0.2487
+                    Mean surrogate loss: -0.0025
+                      Mean entropy loss: 6.5207
+                            Mean reward: 1.68
+                    Mean episode length: 154.68
+                        Mean action std: 0.55
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0114
+            Episode_Termination/failure: 0.0037
+           Episode_Termination/time_out: 0.3191
+                 Episode_Reward/failure: -0.0193
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0168
+                 Episode_Reward/success: 0.1834
+Episode_Termination/source_receiver_overlap: 0.0707
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0311
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4882
+            Episode_Termination/success: 0.4372
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1471
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.41s
+                           Time elapsed: 4:42:06
+                                    ETA: 0:31:20
+
+################################################################################
+[1m                            Learning iteration 54/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 5406720 
+                       Steps per second: 312 
+                        Collection time: 314.441s 
+                          Learning time: 0.212s 
+                        Mean value loss: 0.2319
+                    Mean surrogate loss: -0.0022
+                      Mean entropy loss: 6.5161
+                            Mean reward: 1.84
+                    Mean episode length: 165.59
+                        Mean action std: 0.55
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0117
+            Episode_Termination/failure: 0.0075
+           Episode_Termination/time_out: 0.3242
+                 Episode_Reward/failure: -0.0192
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0232
+                 Episode_Reward/success: 0.1667
+Episode_Termination/source_receiver_overlap: 0.0690
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0315
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4883
+            Episode_Termination/success: 0.4226
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1533
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.65s
+                           Time elapsed: 4:47:21
+                                    ETA: 0:26:07
+
+################################################################################
+[1m                            Learning iteration 55/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 5505024 
+                       Steps per second: 312 
+                        Collection time: 314.143s 
+                          Learning time: 0.213s 
+                        Mean value loss: 0.2464
+                    Mean surrogate loss: -0.0022
+                      Mean entropy loss: 6.5380
+                            Mean reward: 1.61
+                    Mean episode length: 167.21
+                        Mean action std: 0.55
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0122
+            Episode_Termination/failure: 0.0115
+           Episode_Termination/time_out: 0.3378
+                 Episode_Reward/failure: -0.0200
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0287
+                 Episode_Reward/success: 0.1691
+Episode_Termination/source_receiver_overlap: 0.0680
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0317
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4885
+            Episode_Termination/success: 0.4147
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1482
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.36s
+                           Time elapsed: 4:52:35
+                                    ETA: 0:20:53
+
+################################################################################
+[1m                            Learning iteration 56/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 5603328 
+                       Steps per second: 312 
+                        Collection time: 314.314s 
+                          Learning time: 0.211s 
+                        Mean value loss: 0.2260
+                    Mean surrogate loss: -0.0021
+                      Mean entropy loss: 6.5898
+                            Mean reward: 1.50
+                    Mean episode length: 156.41
+                        Mean action std: 0.55
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0117
+            Episode_Termination/failure: 0.0103
+           Episode_Termination/time_out: 0.3255
+                 Episode_Reward/failure: -0.0213
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0268
+                 Episode_Reward/success: 0.1778
+Episode_Termination/source_receiver_overlap: 0.0647
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0328
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4890
+            Episode_Termination/success: 0.4232
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1584
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.53s
+                           Time elapsed: 4:57:50
+                                    ETA: 0:15:40
+
+################################################################################
+[1m                            Learning iteration 57/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 5701632 
+                       Steps per second: 312 
+                        Collection time: 314.012s 
+                          Learning time: 0.210s 
+                        Mean value loss: 0.2193
+                    Mean surrogate loss: -0.0021
+                      Mean entropy loss: 6.5928
+                            Mean reward: 2.14
+                    Mean episode length: 134.24
+                        Mean action std: 0.56
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0083
+            Episode_Termination/failure: 0.0090
+           Episode_Termination/time_out: 0.3201
+                 Episode_Reward/failure: -0.0200
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0274
+                 Episode_Reward/success: 0.1889
+Episode_Termination/source_receiver_overlap: 0.0580
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0331
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4891
+            Episode_Termination/success: 0.4361
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1588
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.22s
+                           Time elapsed: 5:03:04
+                                    ETA: 0:10:27
+
+################################################################################
+[1m                            Learning iteration 58/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 5799936 
+                       Steps per second: 312 
+                        Collection time: 314.003s 
+                          Learning time: 0.211s 
+                        Mean value loss: 0.2587
+                    Mean surrogate loss: -0.0023
+                      Mean entropy loss: 6.6119
+                            Mean reward: 1.44
+                    Mean episode length: 156.01
+                        Mean action std: 0.56
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0079
+            Episode_Termination/failure: 0.0058
+           Episode_Termination/time_out: 0.3180
+                 Episode_Reward/failure: -0.0221
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0213
+                 Episode_Reward/success: 0.1705
+Episode_Termination/source_receiver_overlap: 0.0598
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0335
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4893
+            Episode_Termination/success: 0.4455
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1544
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.21s
+                           Time elapsed: 5:08:18
+                                    ETA: 0:05:13
+
+################################################################################
+[1m                            Learning iteration 59/60                            [0m 
+
+                               Run name: l4_1024_curve
+                            Total steps: 5898240 
+                       Steps per second: 312 
+                        Collection time: 313.901s 
+                          Learning time: 0.214s 
+                        Mean value loss: 0.2179
+                    Mean surrogate loss: -0.0022
+                      Mean entropy loss: 6.6425
+                            Mean reward: 1.88
+                    Mean episode length: 145.34
+                        Mean action std: 0.56
+        Episode_Reward/action_magnitude: -0.0001
+Curriculum/reset_dataset/sampler/uniform_replay_fraction: 0.5000
+Episode_Termination/particle_out_of_bounds: 0.0097
+            Episode_Termination/failure: 0.0002
+           Episode_Termination/time_out: 0.3203
+                 Episode_Reward/failure: -0.0183
+Episode_Termination/learning_progress_context: 0.0000
+Episode_Termination/extreme_rigid_state: 0.0163
+                 Episode_Reward/success: 0.1865
+Episode_Termination/source_receiver_overlap: 0.0647
+Curriculum/reset_dataset/sampler/effective_pool_fraction: 0.0348
+Curriculum/reset_dataset/sampler/top_1_percent_mass: 0.4898
+            Episode_Termination/success: 0.4460
+         Episode_Termination/lost_grasp: 0.0000
+              Episode_Termination/spill: 0.1451
+             Episode_Reward/action_rate: -0.0002
+--------------------------------------------------------------------------------
+                         Iteration time: 314.11s
+                           Time elapsed: 5:13:33
+                                    ETA: 0:00:00
+
+Training time: 18818.15 seconds

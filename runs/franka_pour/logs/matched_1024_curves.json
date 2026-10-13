@@ -1,0 +1,906 @@
+{
+ "metalsim": {
+  "0": {
+   "mean_reward": -0.2809040009975433,
+   "mean_episode_length": 37.57,
+   "success_term": 0.037211100260416664,
+   "episode_success_rate": 0.1751412429378531,
+   "env_steps": 98304,
+   "fps": 1046.5263404872169
+  },
+  "1": {
+   "mean_reward": -0.16182055115699767,
+   "mean_episode_length": 75.67,
+   "success_term": 0.049143473307291664,
+   "episode_success_rate": 0.16393442622950818,
+   "env_steps": 196608,
+   "fps": 1113.0463174866109
+  },
+  "2": {
+   "mean_reward": 0.01734649419784546,
+   "mean_episode_length": 110.2,
+   "success_term": 0.051676432291666664,
+   "episode_success_rate": 0.16363636363636364,
+   "env_steps": 294912,
+   "fps": 1076.3476567400876
+  },
+  "3": {
+   "mean_reward": 0.7861097929161042,
+   "mean_episode_length": 161.72,
+   "success_term": 0.061869303385416664,
+   "episode_success_rate": 0.0968063872255489,
+   "env_steps": 393216,
+   "fps": 1054.4943471839083
+  },
+  "4": {
+   "mean_reward": 0.4173107999656349,
+   "mean_episode_length": 111.6,
+   "success_term": 0.14850870768229166,
+   "episode_success_rate": 0.26411290322580644,
+   "env_steps": 491520,
+   "fps": 1045.3240753208834
+  },
+  "5": {
+   "mean_reward": 0.366310925995931,
+   "mean_episode_length": 152.9,
+   "success_term": 0.1507568359375,
+   "episode_success_rate": 0.2076923076923077,
+   "env_steps": 589824,
+   "fps": 1055.4535232590558
+  },
+  "6": {
+   "mean_reward": 0.5861534515861422,
+   "mean_episode_length": 159.97,
+   "success_term": 0.15009562174479166,
+   "episode_success_rate": 0.22916666666666666,
+   "env_steps": 688128,
+   "fps": 1044.4102679900866
+  },
+  "7": {
+   "mean_reward": 0.7658148594014347,
+   "mean_episode_length": 174.57,
+   "success_term": 0.162078857421875,
+   "episode_success_rate": 0.163003663003663,
+   "env_steps": 786432,
+   "fps": 1044.681001603291
+  },
+  "8": {
+   "mean_reward": 0.3870896018203348,
+   "mean_episode_length": 122.09,
+   "success_term": 0.21097819010416666,
+   "episode_success_rate": 0.26877470355731226,
+   "env_steps": 884736,
+   "fps": 1042.0361298420157
+  },
+  "9": {
+   "mean_reward": 0.7964065588079393,
+   "mean_episode_length": 151.07,
+   "success_term": 0.221405029296875,
+   "episode_success_rate": 0.2689075630252101,
+   "env_steps": 983040,
+   "fps": 1041.6221062751881
+  },
+  "10": {
+   "mean_reward": 0.38636679318733513,
+   "mean_episode_length": 152.07,
+   "success_term": 0.22041829427083334,
+   "episode_success_rate": 0.21710526315789475,
+   "env_steps": 1081344,
+   "fps": 1037.443139123671
+  },
+  "11": {
+   "mean_reward": 0.5858167447242886,
+   "mean_episode_length": 174.9,
+   "success_term": 0.219085693359375,
+   "episode_success_rate": 0.17967332123411978,
+   "env_steps": 1179648,
+   "fps": 1026.652688744646
+  },
+  "12": {
+   "mean_reward": 0.9569715505186468,
+   "mean_episode_length": 126.98,
+   "success_term": 0.21924845377604166,
+   "episode_success_rate": 0.2628951747088186,
+   "env_steps": 1277952,
+   "fps": 1033.210789430603
+  },
+  "13": {
+   "mean_reward": 0.1864268749114126,
+   "mean_episode_length": 150.15,
+   "success_term": 0.22263590494791666,
+   "episode_success_rate": 0.20317460317460317,
+   "env_steps": 1376256,
+   "fps": 1017.2995582293883
+  },
+  "14": {
+   "mean_reward": 0.07175775200128555,
+   "mean_episode_length": 346.65,
+   "success_term": 0.22442626953125,
+   "episode_success_rate": 0.18895348837209303,
+   "env_steps": 1474560,
+   "fps": 1028.9021596789792
+  },
+  "15": {
+   "mean_reward": 0.6360551594849676,
+   "mean_episode_length": 165.82,
+   "success_term": 0.22553507486979166,
+   "episode_success_rate": 0.22209302325581395,
+   "env_steps": 1572864,
+   "fps": 1024.5739593094254
+  },
+  "16": {
+   "mean_reward": 0.8665830666944384,
+   "mean_episode_length": 143.84,
+   "success_term": 0.22352091471354166,
+   "episode_success_rate": 0.24311183144246354,
+   "env_steps": 1671168,
+   "fps": 1024.9152604521353
+  },
+  "17": {
+   "mean_reward": 0.5567966994084418,
+   "mean_episode_length": 136.04,
+   "success_term": 0.22239176432291666,
+   "episode_success_rate": 0.2710997442455243,
+   "env_steps": 1769472,
+   "fps": 1025.6029912155896
+  },
+  "18": {
+   "mean_reward": 0.7051476511545479,
+   "mean_episode_length": 205.37,
+   "success_term": 0.21402994791666666,
+   "episode_success_rate": 0.18201754385964913,
+   "env_steps": 1867776,
+   "fps": 1027.6841253699451
+  },
+  "19": {
+   "mean_reward": 0.7259742934443056,
+   "mean_episode_length": 171.19,
+   "success_term": 0.21659342447916666,
+   "episode_success_rate": 0.23076923076923078,
+   "env_steps": 1966080,
+   "fps": 1027.3964974567766
+  },
+  "20": {
+   "mean_reward": 1.1764377056155353,
+   "mean_episode_length": 151.4,
+   "success_term": 0.22270711263020834,
+   "episode_success_rate": 0.2524752475247525,
+   "env_steps": 2064384,
+   "fps": 1036.8869631222612
+  },
+  "21": {
+   "mean_reward": 1.2163151057250798,
+   "mean_episode_length": 157.89,
+   "success_term": 0.230133056640625,
+   "episode_success_rate": 0.27049180327868855,
+   "env_steps": 2162688,
+   "fps": 1037.7118400757445
+  },
+  "22": {
+   "mean_reward": 1.1754076736140997,
+   "mean_episode_length": 195.77,
+   "success_term": 0.24476114908854166,
+   "episode_success_rate": 0.2597402597402597,
+   "env_steps": 2260992,
+   "fps": 1038.6143515637111
+  },
+  "23": {
+   "mean_reward": 1.1857401721179486,
+   "mean_episode_length": 182.22,
+   "success_term": 0.26324462890625,
+   "episode_success_rate": 0.28097982708933716,
+   "env_steps": 2359296,
+   "fps": 1040.0908794396346
+  },
+  "24": {
+   "mean_reward": 0.4663669914845377,
+   "mean_episode_length": 156.27,
+   "success_term": 0.2783406575520833,
+   "episode_success_rate": 0.296969696969697,
+   "env_steps": 2457600,
+   "fps": 1040.4779600370562
+  },
+  "25": {
+   "mean_reward": 1.1869068823568523,
+   "mean_episode_length": 132.3,
+   "success_term": 0.283203125,
+   "episode_success_rate": 0.33056478405315615,
+   "env_steps": 2555904,
+   "fps": 1039.6940141755406
+  },
+  "26": {
+   "mean_reward": 1.3758267471101135,
+   "mean_episode_length": 178.8,
+   "success_term": 0.294158935546875,
+   "episode_success_rate": 0.30998248686514884,
+   "env_steps": 2654208,
+   "fps": 1038.7407382650288
+  },
+  "27": {
+   "mean_reward": 1.086529011046514,
+   "mean_episode_length": 149.11,
+   "success_term": 0.3010050455729167,
+   "episode_success_rate": 0.32275132275132273,
+   "env_steps": 2752512,
+   "fps": 1034.3238657281875
+  },
+  "28": {
+   "mean_reward": 0.9860311283636838,
+   "mean_episode_length": 170.98,
+   "success_term": 0.306793212890625,
+   "episode_success_rate": 0.3317901234567901,
+   "env_steps": 2850816,
+   "fps": 1036.8149732253623
+  },
+  "29": {
+   "mean_reward": 1.3269337921682745,
+   "mean_episode_length": 131.7,
+   "success_term": 0.3113810221354167,
+   "episode_success_rate": 0.3469387755102041,
+   "env_steps": 2949120,
+   "fps": 1036.6483016086408
+  },
+  "30": {
+   "mean_reward": 0.7547179806884379,
+   "mean_episode_length": 227.18,
+   "success_term": 0.3057454427083333,
+   "episode_success_rate": 0.30132450331125826,
+   "env_steps": 3047424,
+   "fps": 1037.0848318043045
+  },
+  "31": {
+   "mean_reward": 1.5267630822537468,
+   "mean_episode_length": 141.03,
+   "success_term": 0.314056396484375,
+   "episode_success_rate": 0.30183727034120733,
+   "env_steps": 3145728,
+   "fps": 1042.6911945502477
+  },
+  "32": {
+   "mean_reward": 0.7058972491230816,
+   "mean_episode_length": 178.79,
+   "success_term": 0.31439208984375,
+   "episode_success_rate": 0.27304347826086955,
+   "env_steps": 3244032,
+   "fps": 1018.0040212654941
+  },
+  "33": {
+   "mean_reward": 1.1665559760434554,
+   "mean_episode_length": 151.74,
+   "success_term": 0.3084716796875,
+   "episode_success_rate": 0.30350877192982456,
+   "env_steps": 3342336,
+   "fps": 1035.4985280158062
+  },
+  "34": {
+   "mean_reward": 0.6353074707649649,
+   "mean_episode_length": 206.0,
+   "success_term": 0.314666748046875,
+   "episode_success_rate": 0.2882882882882883,
+   "env_steps": 3440640,
+   "fps": 1035.3628720512493
+  },
+  "35": {
+   "mean_reward": 0.9361318642925471,
+   "mean_episode_length": 168.85,
+   "success_term": 0.298583984375,
+   "episode_success_rate": 0.2880886426592798,
+   "env_steps": 3538944,
+   "fps": 1033.6989169778583
+  },
+  "36": {
+   "mean_reward": 1.5064540778147057,
+   "mean_episode_length": 155.98,
+   "success_term": 0.293487548828125,
+   "episode_success_rate": 0.31074380165289256,
+   "env_steps": 3637248,
+   "fps": 1039.7540959207176
+  },
+  "37": {
+   "mean_reward": 1.0261355376103893,
+   "mean_episode_length": 170.84,
+   "success_term": 0.291015625,
+   "episode_success_rate": 0.28487229862475444,
+   "env_steps": 3735552,
+   "fps": 1038.5916487420493
+  },
+  "38": {
+   "mean_reward": 1.5166517115943134,
+   "mean_episode_length": 148.31,
+   "success_term": 0.2692769368489583,
+   "episode_success_rate": 0.2982758620689655,
+   "env_steps": 3833856,
+   "fps": 1032.8261765780117
+  },
+  "39": {
+   "mean_reward": 1.847530230563134,
+   "mean_episode_length": 110.87,
+   "success_term": 0.2884928385416667,
+   "episode_success_rate": 0.31274638633377133,
+   "env_steps": 3932160,
+   "fps": 1035.6766155398484
+  },
+  "40": {
+   "mean_reward": 1.4665288775367662,
+   "mean_episode_length": 155.64,
+   "success_term": 0.3079732259114583,
+   "episode_success_rate": 0.3129251700680272,
+   "env_steps": 4030464,
+   "fps": 1036.7197872955612
+  },
+  "41": {
+   "mean_reward": 1.4466376590821892,
+   "mean_episode_length": 150.14,
+   "success_term": 0.3252970377604167,
+   "episode_success_rate": 0.34186471663619744,
+   "env_steps": 4128768,
+   "fps": 1038.1471611937072
+  },
+  "42": {
+   "mean_reward": 1.5560628904541955,
+   "mean_episode_length": 175.44,
+   "success_term": 0.3393961588541667,
+   "episode_success_rate": 0.3167495854063018,
+   "env_steps": 4227072,
+   "fps": 1037.7163874756598
+  },
+  "43": {
+   "mean_reward": 1.296404965929687,
+   "mean_episode_length": 160.04,
+   "success_term": 0.3269856770833333,
+   "episode_success_rate": 0.31545741324921134,
+   "env_steps": 4325376,
+   "fps": 1034.5224856180353
+  },
+  "44": {
+   "mean_reward": 1.576544326916337,
+   "mean_episode_length": 152.96,
+   "success_term": 0.3142191569010417,
+   "episode_success_rate": 0.3114754098360656,
+   "env_steps": 4423680,
+   "fps": 1035.6845690338905
+  },
+  "45": {
+   "mean_reward": 1.3561047103255988,
+   "mean_episode_length": 171.08,
+   "success_term": 0.3043212890625,
+   "episode_success_rate": 0.291958041958042,
+   "env_steps": 4521984,
+   "fps": 1034.0962714834636
+  },
+  "46": {
+   "mean_reward": 1.7366263807192446,
+   "mean_episode_length": 149.84,
+   "success_term": 0.2898152669270833,
+   "episode_success_rate": 0.318739054290718,
+   "env_steps": 4620288,
+   "fps": 1032.5715435520374
+  },
+  "47": {
+   "mean_reward": 1.1355601937370374,
+   "mean_episode_length": 195.5,
+   "success_term": 0.2973531087239583,
+   "episode_success_rate": 0.31703204047217537,
+   "env_steps": 4718592,
+   "fps": 1037.0124839593113
+  },
+  "48": {
+   "mean_reward": 1.3161693058349193,
+   "mean_episode_length": 167.05,
+   "success_term": 0.2911376953125,
+   "episode_success_rate": 0.30201342281879195,
+   "env_steps": 4816896,
+   "fps": 1034.7097425282514
+  },
+  "49": {
+   "mean_reward": 1.3163828867767007,
+   "mean_episode_length": 161.09,
+   "success_term": 0.3074849446614583,
+   "episode_success_rate": 0.33500837520938026,
+   "env_steps": 4915200,
+   "fps": 1032.725009515545
+  },
+  "50": {
+   "mean_reward": 1.5061823296360672,
+   "mean_episode_length": 168.55,
+   "success_term": 0.3283793131510417,
+   "episode_success_rate": 0.36993243243243246,
+   "env_steps": 5013504,
+   "fps": 1036.5336706700193
+  },
+  "51": {
+   "mean_reward": 1.736114702746272,
+   "mean_episode_length": 171.47,
+   "success_term": 0.34527587890625,
+   "episode_success_rate": 0.3637747336377473,
+   "env_steps": 5111808,
+   "fps": 1013.5051075467333
+  },
+  "52": {
+   "mean_reward": 1.7066599024180322,
+   "mean_episode_length": 147.97,
+   "success_term": 0.3600260416666667,
+   "episode_success_rate": 0.36932707355242567,
+   "env_steps": 5210112,
+   "fps": 1036.4685574976863
+  },
+  "53": {
+   "mean_reward": 1.3358583707781508,
+   "mean_episode_length": 179.83,
+   "success_term": 0.3511759440104167,
+   "episode_success_rate": 0.3269230769230769,
+   "env_steps": 5308416,
+   "fps": 1028.0118165639594
+  },
+  "54": {
+   "mean_reward": 1.0560264361463487,
+   "mean_episode_length": 175.34,
+   "success_term": 0.3389994303385417,
+   "episode_success_rate": 0.3158783783783784,
+   "env_steps": 5406720,
+   "fps": 1033.1165961564159
+  },
+  "55": {
+   "mean_reward": 1.4965744035551325,
+   "mean_episode_length": 149.11,
+   "success_term": 0.3306986490885417,
+   "episode_success_rate": 0.3291338582677165,
+   "env_steps": 5505024,
+   "fps": 1034.8711276099057
+  },
+  "56": {
+   "mean_reward": 0.2465870008803904,
+   "mean_episode_length": 151.67,
+   "success_term": 0.3450826009114583,
+   "episode_success_rate": 0.33525179856115106,
+   "env_steps": 5603328,
+   "fps": 1036.658501078906
+  },
+  "57": {
+   "mean_reward": 1.4459579976042733,
+   "mean_episode_length": 175.11,
+   "success_term": 0.3615315755208333,
+   "episode_success_rate": 0.40604026845637586,
+   "env_steps": 5701632,
+   "fps": 1038.4435467745207
+  },
+  "58": {
+   "mean_reward": 1.5267790057184174,
+   "mean_episode_length": 142.7,
+   "success_term": 0.3563944498697917,
+   "episode_success_rate": 0.3649754500818331,
+   "env_steps": 5799936,
+   "fps": 1036.7887423298703
+  },
+  "59": {
+   "mean_reward": 1.5961275846743956,
+   "mean_episode_length": 168.43,
+   "success_term": 0.36053466796875,
+   "episode_success_rate": 0.3856707317073171,
+   "env_steps": 5898240,
+   "fps": 1034.0461696468185
+  }
+ },
+ "isaac": {
+  "0": {
+   "mean_reward": -0.46,
+   "mean_episode_length": 43.07,
+   "success_term": 0.0318,
+   "collection_s": 312.068,
+   "learning_s": 0.354
+  },
+  "1": {
+   "mean_reward": -0.28,
+   "mean_episode_length": 70.97,
+   "success_term": 0.0394,
+   "collection_s": 309.4,
+   "learning_s": 0.21
+  },
+  "2": {
+   "mean_reward": -0.28,
+   "mean_episode_length": 97.29,
+   "success_term": 0.0404,
+   "collection_s": 309.235,
+   "learning_s": 0.21
+  },
+  "3": {
+   "mean_reward": 0.18,
+   "mean_episode_length": 135.19,
+   "success_term": 0.0413,
+   "collection_s": 309.512,
+   "learning_s": 0.21
+  },
+  "4": {
+   "mean_reward": 0.21,
+   "mean_episode_length": 104.75,
+   "success_term": 0.0835,
+   "collection_s": 309.949,
+   "learning_s": 0.21
+  },
+  "5": {
+   "mean_reward": 0.51,
+   "mean_episode_length": 117.71,
+   "success_term": 0.0912,
+   "collection_s": 310.186,
+   "learning_s": 0.213
+  },
+  "6": {
+   "mean_reward": 0.29,
+   "mean_episode_length": 173.52,
+   "success_term": 0.0938,
+   "collection_s": 310.755,
+   "learning_s": 0.212
+  },
+  "7": {
+   "mean_reward": 0.72,
+   "mean_episode_length": 140.81,
+   "success_term": 0.1164,
+   "collection_s": 311.788,
+   "learning_s": 0.217
+  },
+  "8": {
+   "mean_reward": 0.23,
+   "mean_episode_length": 133.02,
+   "success_term": 0.1813,
+   "collection_s": 311.773,
+   "learning_s": 0.211
+  },
+  "9": {
+   "mean_reward": 0.35,
+   "mean_episode_length": 146.19,
+   "success_term": 0.1943,
+   "collection_s": 312.902,
+   "learning_s": 0.211
+  },
+  "10": {
+   "mean_reward": 0.58,
+   "mean_episode_length": 157.06,
+   "success_term": 0.1905,
+   "collection_s": 313.777,
+   "learning_s": 0.211
+  },
+  "11": {
+   "mean_reward": 1.14,
+   "mean_episode_length": 158.94,
+   "success_term": 0.1893,
+   "collection_s": 313.051,
+   "learning_s": 0.216
+  },
+  "12": {
+   "mean_reward": 0.97,
+   "mean_episode_length": 149.63,
+   "success_term": 0.1992,
+   "collection_s": 312.522,
+   "learning_s": 0.211
+  },
+  "13": {
+   "mean_reward": 1.29,
+   "mean_episode_length": 109.49,
+   "success_term": 0.2125,
+   "collection_s": 313.064,
+   "learning_s": 0.212
+  },
+  "14": {
+   "mean_reward": -0.02,
+   "mean_episode_length": 358.58,
+   "success_term": 0.2354,
+   "collection_s": 313.975,
+   "learning_s": 0.212
+  },
+  "15": {
+   "mean_reward": 1.01,
+   "mean_episode_length": 137.0,
+   "success_term": 0.2456,
+   "collection_s": 313.301,
+   "learning_s": 0.211
+  },
+  "16": {
+   "mean_reward": 0.72,
+   "mean_episode_length": 130.63,
+   "success_term": 0.2564,
+   "collection_s": 312.867,
+   "learning_s": 0.213
+  },
+  "17": {
+   "mean_reward": 0.86,
+   "mean_episode_length": 142.24,
+   "success_term": 0.2527,
+   "collection_s": 313.221,
+   "learning_s": 0.211
+  },
+  "18": {
+   "mean_reward": 0.89,
+   "mean_episode_length": 224.98,
+   "success_term": 0.2443,
+   "collection_s": 314.017,
+   "learning_s": 0.212
+  },
+  "19": {
+   "mean_reward": 0.83,
+   "mean_episode_length": 147.36,
+   "success_term": 0.2589,
+   "collection_s": 313.026,
+   "learning_s": 0.211
+  },
+  "20": {
+   "mean_reward": 1.35,
+   "mean_episode_length": 141.97,
+   "success_term": 0.2759,
+   "collection_s": 312.766,
+   "learning_s": 0.21
+  },
+  "21": {
+   "mean_reward": 1.18,
+   "mean_episode_length": 131.94,
+   "success_term": 0.2905,
+   "collection_s": 312.636,
+   "learning_s": 0.21
+  },
+  "22": {
+   "mean_reward": 1.31,
+   "mean_episode_length": 161.71,
+   "success_term": 0.2932,
+   "collection_s": 313.095,
+   "learning_s": 0.21
+  },
+  "23": {
+   "mean_reward": 1.1,
+   "mean_episode_length": 170.23,
+   "success_term": 0.2962,
+   "collection_s": 313.186,
+   "learning_s": 0.211
+  },
+  "24": {
+   "mean_reward": 1.64,
+   "mean_episode_length": 157.07,
+   "success_term": 0.3075,
+   "collection_s": 313.034,
+   "learning_s": 0.212
+  },
+  "25": {
+   "mean_reward": 0.48,
+   "mean_episode_length": 137.49,
+   "success_term": 0.3273,
+   "collection_s": 313.223,
+   "learning_s": 0.218
+  },
+  "26": {
+   "mean_reward": 1.72,
+   "mean_episode_length": 157.55,
+   "success_term": 0.3203,
+   "collection_s": 313.62,
+   "learning_s": 0.219
+  },
+  "27": {
+   "mean_reward": 1.4,
+   "mean_episode_length": 169.53,
+   "success_term": 0.3216,
+   "collection_s": 313.515,
+   "learning_s": 0.212
+  },
+  "28": {
+   "mean_reward": 1.3,
+   "mean_episode_length": 159.4,
+   "success_term": 0.3271,
+   "collection_s": 313.755,
+   "learning_s": 0.211
+  },
+  "29": {
+   "mean_reward": 2.03,
+   "mean_episode_length": 141.09,
+   "success_term": 0.3316,
+   "collection_s": 314.191,
+   "learning_s": 0.212
+  },
+  "30": {
+   "mean_reward": 1.5,
+   "mean_episode_length": 178.06,
+   "success_term": 0.3533,
+   "collection_s": 313.757,
+   "learning_s": 0.211
+  },
+  "31": {
+   "mean_reward": 1.53,
+   "mean_episode_length": 156.02,
+   "success_term": 0.3689,
+   "collection_s": 313.614,
+   "learning_s": 0.21
+  },
+  "32": {
+   "mean_reward": 1.68,
+   "mean_episode_length": 150.62,
+   "success_term": 0.376,
+   "collection_s": 313.71,
+   "learning_s": 0.211
+  },
+  "33": {
+   "mean_reward": 1.3,
+   "mean_episode_length": 145.0,
+   "success_term": 0.3717,
+   "collection_s": 313.894,
+   "learning_s": 0.211
+  },
+  "34": {
+   "mean_reward": 1.46,
+   "mean_episode_length": 175.79,
+   "success_term": 0.3729,
+   "collection_s": 314.172,
+   "learning_s": 0.212
+  },
+  "35": {
+   "mean_reward": 1.43,
+   "mean_episode_length": 164.84,
+   "success_term": 0.3718,
+   "collection_s": 314.389,
+   "learning_s": 0.211
+  },
+  "36": {
+   "mean_reward": 1.67,
+   "mean_episode_length": 120.98,
+   "success_term": 0.3743,
+   "collection_s": 314.045,
+   "learning_s": 0.213
+  },
+  "37": {
+   "mean_reward": 1.91,
+   "mean_episode_length": 147.1,
+   "success_term": 0.3711,
+   "collection_s": 314.037,
+   "learning_s": 0.212
+  },
+  "38": {
+   "mean_reward": 1.66,
+   "mean_episode_length": 137.89,
+   "success_term": 0.3771,
+   "collection_s": 314.198,
+   "learning_s": 0.215
+  },
+  "39": {
+   "mean_reward": 1.57,
+   "mean_episode_length": 150.1,
+   "success_term": 0.3914,
+   "collection_s": 313.955,
+   "learning_s": 0.213
+  },
+  "40": {
+   "mean_reward": 1.78,
+   "mean_episode_length": 144.14,
+   "success_term": 0.4022,
+   "collection_s": 313.522,
+   "learning_s": 0.212
+  },
+  "41": {
+   "mean_reward": 1.59,
+   "mean_episode_length": 149.38,
+   "success_term": 0.4187,
+   "collection_s": 314.056,
+   "learning_s": 0.21
+  },
+  "42": {
+   "mean_reward": 1.79,
+   "mean_episode_length": 147.73,
+   "success_term": 0.4212,
+   "collection_s": 314.82,
+   "learning_s": 0.211
+  },
+  "43": {
+   "mean_reward": 2.05,
+   "mean_episode_length": 125.2,
+   "success_term": 0.4068,
+   "collection_s": 314.479,
+   "learning_s": 0.21
+  },
+  "44": {
+   "mean_reward": 1.9,
+   "mean_episode_length": 143.86,
+   "success_term": 0.417,
+   "collection_s": 314.503,
+   "learning_s": 0.21
+  },
+  "45": {
+   "mean_reward": 1.36,
+   "mean_episode_length": 163.07,
+   "success_term": 0.4157,
+   "collection_s": 314.76,
+   "learning_s": 0.21
+  },
+  "46": {
+   "mean_reward": 1.72,
+   "mean_episode_length": 159.08,
+   "success_term": 0.4023,
+   "collection_s": 314.86,
+   "learning_s": 0.211
+  },
+  "47": {
+   "mean_reward": 2.31,
+   "mean_episode_length": 139.11,
+   "success_term": 0.4121,
+   "collection_s": 314.542,
+   "learning_s": 0.21
+  },
+  "48": {
+   "mean_reward": 1.92,
+   "mean_episode_length": 152.52,
+   "success_term": 0.4156,
+   "collection_s": 314.84,
+   "learning_s": 0.212
+  },
+  "49": {
+   "mean_reward": 1.88,
+   "mean_episode_length": 146.04,
+   "success_term": 0.426,
+   "collection_s": 314.502,
+   "learning_s": 0.211
+  },
+  "50": {
+   "mean_reward": 1.98,
+   "mean_episode_length": 131.32,
+   "success_term": 0.44,
+   "collection_s": 314.273,
+   "learning_s": 0.211
+  },
+  "51": {
+   "mean_reward": 2.23,
+   "mean_episode_length": 129.93,
+   "success_term": 0.4437,
+   "collection_s": 314.186,
+   "learning_s": 0.21
+  },
+  "52": {
+   "mean_reward": 1.47,
+   "mean_episode_length": 142.27,
+   "success_term": 0.4467,
+   "collection_s": 314.641,
+   "learning_s": 0.21
+  },
+  "53": {
+   "mean_reward": 1.68,
+   "mean_episode_length": 154.68,
+   "success_term": 0.4372,
+   "collection_s": 314.203,
+   "learning_s": 0.211
+  },
+  "54": {
+   "mean_reward": 1.84,
+   "mean_episode_length": 165.59,
+   "success_term": 0.4226,
+   "collection_s": 314.441,
+   "learning_s": 0.212
+  },
+  "55": {
+   "mean_reward": 1.61,
+   "mean_episode_length": 167.21,
+   "success_term": 0.4147,
+   "collection_s": 314.143,
+   "learning_s": 0.213
+  },
+  "56": {
+   "mean_reward": 1.5,
+   "mean_episode_length": 156.41,
+   "success_term": 0.4232,
+   "collection_s": 314.314,
+   "learning_s": 0.211
+  },
+  "57": {
+   "mean_reward": 2.14,
+   "mean_episode_length": 134.24,
+   "success_term": 0.4361,
+   "collection_s": 314.012,
+   "learning_s": 0.21
+  },
+  "58": {
+   "mean_reward": 1.44,
+   "mean_episode_length": 156.01,
+   "success_term": 0.4455,
+   "collection_s": 314.003,
+   "learning_s": 0.211
+  },
+  "59": {
+   "mean_reward": 1.88,
+   "mean_episode_length": 145.34,
+   "success_term": 0.446,
+   "collection_s": 313.901,
+   "learning_s": 0.214
+  }
+ }
+}

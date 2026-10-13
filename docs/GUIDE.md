@@ -200,6 +200,27 @@ python -m metalsim.learn.lidar_nav 1024 300 runs/lidar_nav.log runs/policies/lid
 
 Arguments are positional: `[num_envs] [iterations] [log] [checkpoint.pt]`.
 
+### Franka-Pour (granular MPM manipulation)
+
+Isaac Lab 3.0-EA's `IsaacContrib-Franka-Pour`: a Franka grasps a cup of 735 granular MPM particles and pours them
+into a second cup, on Newton 1.5.2's coupled MuJoCo Warp + implicit MPM solver with Isaac's settings and Isaac's
+reset-dataset curriculum (`PARITY.md` §1b). It runs in `.venv-newton152` (Newton 1.5.2 fork; `scripts/setup_newton152.sh`
+installs PyTorch there too) and needs Isaac's assets (`scripts/fetch_isaac_assets.sh`, SHA-256 checked):
+
+```
+.venv-newton152/bin/python -m metalsim.learn.franka_pour_ppo train --num-envs 2048 --iterations 3000 \
+    --out runs/franka_pour/run0 [--resume runs/franka_pour/run0/model_last.pt]
+.venv-newton152/bin/python -m metalsim.learn.franka_pour_ppo bench --num-envs 2048 --mode step|rollout|ppo
+metalsim/learn/franka_pour_bench.sh scripts/gpu_run.sh .venv-newton152/bin/python 2048 mac   # all three, timing class
+scripts/gpu_run.sh test_pour check 20 -- .venv-newton152/bin/python -m pytest tests/test_franka_pour_terms.py
+```
+
+The run writes `log.jsonl` (one record per iteration: rsl_rl's mean reward / episode length over the last 100
+episodes, the success rate of the episodes finished that iteration, Isaac's `Episode_Termination/*` and sampler
+metrics, losses) and checkpoints every 25 iterations. One iteration (96 steps x 2,048 envs) takes about 3 minutes on
+an M4 Max, so Isaac's 3,000 iterations take about 6 days. Large-world or new-kernel jobs run under
+`scripts/watchdog.py` (kills a job on a CPU stall, memory ceiling or timeout).
+
 ### Rendering particles (MPM sand)
 
 Both renderers draw particles as render grains (small irregular grain meshes, several per particle, per-grain

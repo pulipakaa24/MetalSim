@@ -1,0 +1,40 @@
+{
+ "checkpoint": "runs/franka_pour/logs/m414_2048_model_299.pt",
+ "num_envs": 2048,
+ "seed": 7,
+ "steps": 360,
+ "mode": "first",
+ "rows": "uniform",
+ "stochastic": false,
+ "wall_s": 746.9458951659981,
+ "physics": {
+  "mpm_grid_budget": "isaac",
+  "mpm_cells_per_world": null,
+  "rigid_deterministic": false
+ },
+ "first_episodes": 2048,
+ "success_rate": 0.45703125,
+ "termination_rates": {
+  "failure": 0.017578125,
+  "extreme_rigid_state": 0.046875,
+  "source_receiver_overlap": 0.03369140625,
+  "lost_grasp": 0.0,
+  "spill": 0.08642578125,
+  "particle_out_of_bounds": 0.0263671875,
+  "success": 0.45703125,
+  "learning_progress_context": 0.0,
+  "time_out": 0.3603515625
+ },
+ "mean_target_fraction": 0.3666633367538452,
+ "mean_spill_fraction": 0.016236182302236557,
+ "mean_source_fraction": 0.44734400510787964,
+ "mean_episode_length": 166.96728515625,
+ "finished_episodes": 4099,
+ "success_of_finished_episodes": 0.6057575018297146,
+ "episode_termination_success_mean": 0.3992580837673611,
+ "grasping_fraction_of_finished": 0.6233227616491828,
+ "grid_overflow": "none (check_status passed)",
+ "success_rate_weighted": 0.7167521230885691,
+ "success_finished_grasping": 0.8117416829745597,
+ "success_finished_non_grasping": 0.2648963730569948
+}
