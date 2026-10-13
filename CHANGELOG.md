@@ -3,6 +3,10 @@
 What landed between 2026-09-22 and 2026-09-25, one line per commit, grouped by area and in
 commit order within each area (`git log` for the full messages). Dates are the commit dates (month-day).
 
+## Physics: equality block at njmax (2026-10-13, `research_notes/capacity_overflow_guard/g1_bound_and_lost_flags.md`)
+
+- 10-13 MuJoCo Warp pin cf0f8ad -> f1b35e2 (fork `metalsim` fast-forwarded to f52488b4: a connect / weld block ending exactly at njmax is written; one that does not fit leaves nefc > njmax and MuJoCo Warp flags it). MetalSim's workaround removed (latch counted `nefc >= njmax` for models with such blocks, `Bounds.njmax` kept a spare row); the reset latch stays. `patches/mujoco_warp/metalsim-f1b35e2.diff`; `tests/test_capacity.py::test_equality_block_ending_at_njmax_is_flagged` covers connect and weld
+
 ## Rendering: tilted DomeLight (2026-10-13, `research_notes/dome_light_azimuth/tilted_dome.md`)
 
 - 10-13 Tier 2 applies a DomeLight's full orientation: the importer records `rot` = R_prim . P for a dome whose pole leaves +z (authored tilt, DomeLight_1 `poleAxis` / stage upAxis), `set_environment(rotation=)` uploads R . R_z(yaw) to `PTConsts.env_rot` (`FLAG_ENVROT`, kernel variant `ENV_ROT`), and the lookup, importance sampler and its pdf all use it; upright domes keep the yaw-only path (renders byte-identical to before, `scripts/diagnostics/dome_untilted_bytes.py`). Tests: `test_env_map_tilted_dome_lookup`, `test_env_map_tilted_importance_sampling`, `test_env_map_usd_tilted_dome_import`
