@@ -280,7 +280,8 @@ class Tier2Renderer:
     # -- particles (render grains) ----------------------------------------------------------------------
 
     def set_particles(self, positions, radius=None, material=None, *, grains_per_particle=8, grain_radius=None,
-                      radius_jitter=0.3, n_meshes=4, seed=0, grain_shape=None, ids=None, cull_z=-np.inf, grain_eps=None):
+                      radius_jitter=0.3, n_meshes=4, seed=0, grain_shape=None, ids=None, cull_z=-np.inf, grain_eps=None,
+                      structure="two_level", grain_chunk=None):
         """Draw particles as render grains (granular media: MPM sand, ...). ``positions``: (n_envs, P, 3) or (P, 3)
         numpy [m], or a Warp array on the Metal device (bound directly each frame: the GPU path). ``radius``: the
         particle radius [m] (half the particle spacing): each particle's grains are spread over its cube of half side
@@ -290,7 +291,10 @@ class Tier2Renderer:
         ``cull_z``: particles below it get no grains; non-finite positions are culled. ``ids``: stable particle
         ids ((n_envs, P) or (P,) uint32) when the particle set is culled or reordered between frames (grains hash the id). Later calls with the same
         radius and grains_per_particle only replace the positions (or material); other
-        arguments apply on the first call or when ``radius`` / ``grains_per_particle`` change."""
+        arguments apply on the first call or when ``radius`` / ``grains_per_particle`` change. ``structure``:
+        ``"two_level"`` (default: the grains are their own instance acceleration structure, one instance of the
+        scene's) or ``"flat"`` (one top-level instance per grain); same image, see ``particles.InstanceStructure``.
+        ``grain_chunk``: grains per two-level grain structure (default Metal's standard limit, 2^24; tests use less)."""
         from metalsim.render.particles import GrainField, InstanceStructure
         if positions is None:
             self.grains, self._ias = None, None
@@ -303,14 +307,17 @@ class Tier2Renderer:
             g = GrainField(self.ctx, self.n, grains_per_particle=grains_per_particle, radius=gr,
                            radius_jitter=radius_jitter, offset=float(radius), n_meshes=n_meshes, material=material,
                            seed=seed, cull_z=cull_z, shape=grain_shape)
-            self.grains, self._ias = g, InstanceStructure(self.rt, g)
+            self.grains, self._ias = g, InstanceStructure(self.rt, g, structure, grain_chunk)
         elif material is not None:
             g.set_material(material)
+        if self._ias.mode != structure or (grain_chunk is not None and grain_chunk != self._ias.chunk):
+            self._ias = InstanceStructure(self.rt, g, structure, grain_chunk)
         g.cull_z = float(cull_z)
         g.set_positions(positions)
         g.set_ids(ids)
         cf = self.consts.view(np.float32)
-        self.consts[18:20] = (self.rt.n_inst, len(self.rt.prim_as))
+        # flat: first grain instance, first grain mesh in the top-level list; two-level: grain count, meshes from 0
+        self.consts[18:20] = (self.rt.n_inst, len(self.rt.prim_as)) if structure == "flat" else (g.n_grains, 0)
         cf[22] = grain_eps if grain_eps is not None else max(0.01 * g.radius, 1e-5)
 
     def _encode_scene(self, cb, gx, gxo, gm, gmo):
@@ -328,7 +335,16 @@ class Tier2Renderer:
     def _encode(self, cb, reset: bool, cam_xpos, cxo, cam_xmat, cmo, light_xpos, lxo, light_xdir, ldo):
         self.consts[8] = self.frame
         grains = self.grains is not None and self.grains.n_grains > 0
-        self.consts[10] = (1 if reset else 0) | self.base_flags | self.env_flags | (64 if grains else 0)
+        two = grains and self._ias.mode == "two_level"
+        if grains:
+            self._ias.ensure()          # (the extended-limits flag is known once the structure is sized)
+        ext = grains and self._ias.mode == "flat" and self._ias.extended
+        if ext and self.rt.dyn_bvh is not None:
+            raise ValueError("a flat grain structure past 2^24 instances needs the extended_limits intersector, which "
+                             "the sbvh dynamic-object layout's queries cannot use: set_particles(structure='two_level') "
+                             "(default) or Tier2Renderer(dyn_layout='per_env')")
+        self.consts[10] = ((1 if reset else 0) | self.base_flags | self.env_flags | (64 if grains else 0) | (128 if two else 0)
+                           | (256 if ext else 0))
         ce = cb.computeCommandEncoder()
         ce.setComputePipelineState_(self.pipe)
         rt = self.rt
@@ -358,8 +374,9 @@ class Tier2Renderer:
             v = self._aux_views[k]; ce.setBuffer_offset_atIndex_(v.buffer, v.offset, 22 + i)
         ce.setBuffer_offset_atIndex_(self._env_cdf, 0, 26)
         g = self.grains if grains else None
-        for i, b in enumerate((g.vbuf, g.ibuf, g.keys, g.mat_buf) if g else (self._grain_dummy,) * 4):
-            ce.setBuffer_offset_atIndex_(b, 0, 27 + i)
+        for i, (b, off) in enumerate(((g.vbuf, 0), (g.ibuf, 0), self._ias.grain_binding(), (g.mat_buf, 0)) if g
+                                     else ((self._grain_dummy, 0),) * 4):
+            ce.setBuffer_offset_atIndex_(b, off, 27 + i)
         ce.setTexture_atIndex_(self.atlas_tex, 0); ce.setSamplerState_atIndex_(self.samp, 0)
         ce.setTexture_atIndex_(self._env_tex, 1); ce.setSamplerState_atIndex_(self.env_samp, 1)
         ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.tw, self.th, self.n), Metal.MTLSize(8, 8, 1))

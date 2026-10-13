@@ -42,6 +42,19 @@ ap.add_argument("--fovy", type=float, default=32.0)
 ap.add_argument("--camera", default="track", help="track | still-a | still-b | still-c")
 ap.add_argument("--save-hdr", action="store_true")
 ap.add_argument("--skip-existing", action="store_true")
+ap.add_argument("--ground-planes", type=int, default=4, choices=(1, 2, 4),
+                help="4: planes around the robot's path (the demo); 1: one plane under everything; 2: only the left and "
+                     "right planes (diagnostics)")
+ap.add_argument("--plane-extent", type=float, default=60.0, help="diagnostics: half extent of the ground planes [m]")
+ap.add_argument("--plane-shift", type=float, default=0.0,
+                help="diagnostics: move the ground planes along +x [m] (e.g. 200: away from the grain region)")
+ap.add_argument("--max-particles", type=int, default=0, help="diagnostics: keep every n-th particle so at most this many remain")
+ap.add_argument("--no-trace", action="store_true", help="with --timing: the structure build only, no trace pass")
+ap.add_argument("--structure", default="two_level", choices=("two_level", "flat"),
+                help="grain acceleration-structure layout (particles.InstanceStructure); flat = before 2026-10-13")
+ap.add_argument("--timing", action="store_true",
+                help="diagnostics: per frame, time the instance-structure build (a pass-free render) and one trace pass "
+                     "separately; no denoiser, no image")
 ap.add_argument("--surface-depth", type=float, default=0.0,
                 help="draw only bed particles within this depth [m] of their local surface (0 = all); grains keep their "
                      "identity through the renderer's stable ids, so more grains per particle fit in memory")
@@ -112,8 +125,15 @@ mat.textures[mujoco.mjtTextureRole.mjTEXROLE_RGB] = "sand_ground"
 # the bed's own sand, never the raised plane; their edges lie under the decoration grains
 bx0_, by0_, _, bx1_, by1_, _ = meta["bed"]
 hx0, hx1, hy0, hy1 = bx0_ + a.decor_overlap, bx1_ - a.decor_overlap, by0_ + a.decor_overlap, by1_ - a.decor_overlap
-for nm, (x0, x1, y0, y1) in {"ground_l": (-60, hx0, -60, 60), "ground_r": (hx1, 60, -60, 60),
-                              "ground_b": (hx0, hx1, -60, hy0), "ground_f": (hx0, hx1, hy1, 60)}.items():
+E_ = a.plane_extent
+grounds = {"ground_l": (-E_, hx0, -E_, E_), "ground_r": (hx1, E_, -E_, E_), "ground_b": (hx0, hx1, -E_, hy0),
+           "ground_f": (hx0, hx1, hy1, E_)}
+if a.ground_planes == 2:
+    grounds = {k: grounds[k] for k in ("ground_l", "ground_r")}
+elif a.ground_planes == 1:
+    grounds = {"ground": (-E_, E_, -E_, E_)}
+grounds = {k: (x0 + a.plane_shift, x1 + a.plane_shift, y0, y1) for k, (x0, x1, y0, y1) in grounds.items()}
+for nm, (x0, x1, y0, y1) in grounds.items():
     spec.worldbody.add_geom(name=nm, type=mujoco.mjtGeom.mjGEOM_PLANE, size=[(x1 - x0) / 2, (y1 - y0) / 2, 0.1],
                             pos=[(x0 + x1) / 2, (y0 + y1) / 2, a.ground_z], material="sand_ground")
 sd = sun["direction"]
@@ -275,7 +295,7 @@ r = Tier2Renderer(model, 1, width=a.width, height=a.height, camera="cine", spp=a
                   material_model="omnipbr", headlight=False, tonemap="rtx", exposure=1.0,
                   usd_lights=[{"intensity": 1.0, "color": tuple(sun["irradiance"] / np.pi),
                                "angle_deg": 2 * np.rad2deg(max(sun["angular_radius"], 0.0047))}],
-                  denoise=a.denoise, aux=True, center_sample=False)
+                  denoise=None if a.timing else a.denoise, aux=not a.timing, center_sample=False)
 print("[render] stage: renderer built; environment map", flush=True)
 r.set_environment(sky, yaw=yaw)
 print("[render] stage: environment set", flush=True)
@@ -305,10 +325,29 @@ for k in rng_frames:
         ids = np.concatenate([np.nonzero(keep)[0], len(Ps) + np.arange(len(decor))]).astype(np.uint32)
         Ps = Ps[keep]
     P = np.concatenate([Ps, decor])
-    r.set_particles(P, radius=p_radius, grains_per_particle=a.grains, grain_radius=radius_grain, ids=ids)
+    if a.max_particles and len(P) > a.max_particles:
+        P = P[::int(np.ceil(len(P) / a.max_particles))]
+    r.set_particles(P, radius=p_radius, grains_per_particle=a.grains, grain_radius=radius_grain, ids=ids,
+                    structure=a.structure)
     eye, q = camera(k, t)
     if k == rng_frames[0]:
         print(f"[render] stage: first frame ({len(P)} particles)", flush=True)
+    if a.timing:
+        t0 = time.time()
+        r.render_host([data], passes=0, cam_pos=eye[None], cam_quat=q[None])
+        t_build = time.time() - t0
+        print(f"[timing] {len(P)} particles, {r.grains.n_grains} grains: upload + structure build {t_build * 1e3:.0f} ms "
+              f"(structure {r._ias.as_bytes / 2**20:.0f} MiB)", flush=True)
+        t0 = time.time()
+        r.render_host([data], passes=0, cam_pos=eye[None], cam_quat=q[None])
+        print(f"[timing] rebuild (structure allocated): {(time.time() - t0) * 1e3:.0f} ms", flush=True)
+        if a.no_trace:
+            continue
+        print(f"[timing] tracing one pass of {a.spp} spp at {a.width}x{a.height} ...", flush=True)
+        t0 = time.time()
+        r.render_host([data], passes=1, cam_pos=eye[None], cam_quat=q[None])
+        print(f"[timing] build + one pass of {a.spp} spp at {a.width}x{a.height}: {(time.time() - t0) * 1e3:.0f} ms", flush=True)
+        continue
     out = r.render_host([data], passes=a.passes, cam_pos=eye[None], cam_quat=q[None], chunk=4)
     hdr_img = out["hdr_denoised"][0] if "hdr_denoised" in out else out["hdr"][0]
     if exposure <= 0:   # automatic: the median scene luminance to 0.2 before the ACES curve

@@ -143,9 +143,11 @@ class GrainField:
         self.keys = ctx.buffer(16, label="grain_keys")     # per-grain identity key, written with the instances
 
     def _build_meshes(self, info):
+        from metalsim.render import as_limits
         c = self.ctx
         descs = []
         for i_off, i_count, _, _ in info:
+            as_limits.check("primitives", int(i_count) // 3, "grain mesh")
             g = Metal.MTLAccelerationStructureTriangleGeometryDescriptor.new()
             g.setVertexBuffer_(self.vbuf); g.setVertexBufferOffset_(0); g.setVertexStride_(32)
             g.setVertexFormat_(Metal.MTLAttributeFormatFloat3)
@@ -217,7 +219,8 @@ class GrainField:
         self.n_particles = p.shape[1]
         return self.n_particles
 
-    def consts(self, as_base: int, inst_base: int, tiles_per_row: int, stride: float, grid=None) -> np.ndarray:
+    def consts(self, as_base: int, inst_base: int, tiles_per_row: int, stride: float, user_ids: bool = False,
+               grid=None) -> np.ndarray:
         c = np.zeros(36, np.uint32)       # GrainConsts: 16 words, then the EnvGrid (env_grid.h)
         if grid is not None:
             c[16:36] = grid.words()
@@ -225,24 +228,32 @@ class GrainField:
         cf = c.view(np.float32)
         cf[8:13] = (stride, self.radius, self.radius_jitter, self.offset, self.cull_z)
         c[13] = 1 if self.has_ids else 0
+        c[14] = 1 if user_ids else 0
         return c
 
-    def encode_instances(self, cb, inst_desc, as_base: int, inst_base: int, tiles_per_row: int, stride: float, grid=None):
+    def encode_instances(self, cb, inst_desc, as_base: int, inst_base: int, tiles_per_row: int, stride: float,
+                         keys=None, keys_off: int = 0, user_ids: bool = False, grid=None):
+        """Grain i's instance descriptor to ``inst_desc[inst_base + i]`` (mesh ``as_base + k`` of the structure's
+        instanced list) and its identity key to ``keys`` at byte ``keys_off`` (default: this field's own key buffer).
+        ``user_ids``: UserID descriptors (68 bytes) with user id 0x80000000 | i (two-level structures). ``grid``: where
+        the envs sit (metalsim/sensors/env_grid.py; default the previous 2D grid of ``stride``)."""
         if self.n_grains == 0:
             return
         if grid is None:     # the previous 2D grid from the origin (no clipping)
             from metalsim.sensors.env_grid import EnvGrid
             grid = EnvGrid(self.n_envs, "legacy", stride=stride, tpr=tiles_per_row)
-        k = self.consts(as_base, inst_base, tiles_per_row, stride, grid)
-        if self.keys.length() < 4 * self.n_grains:
-            self.keys = self.ctx.buffer(4 * self.n_grains, label="grain_keys")
+        k = self.consts(as_base, inst_base, tiles_per_row, stride, user_ids, grid)
+        if keys is None:
+            if self.keys.length() < 4 * self.n_grains:
+                self.keys = self.ctx.buffer(4 * self.n_grains, label="grain_keys")
+            keys, keys_off = self.keys, 0
         ce = cb.computeCommandEncoder()
         ce.setComputePipelineState_(self.pipe)
         ce.setBuffer_offset_atIndex_(inst_desc, 0, 0)
         ce.setBuffer_offset_atIndex_(self._pos_buf, self._pos_off, 1)
         ce.setBytes_length_atIndex_(k.tobytes(), k.nbytes, 2)
         ce.setBuffer_offset_atIndex_(self._ids_buf, 0, 3)
-        ce.setBuffer_offset_atIndex_(self.keys, 0, 4)
+        ce.setBuffer_offset_atIndex_(keys, keys_off, 4)
         ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n_grains, 1, 1), Metal.MTLSize(256, 1, 1))
         ce.endEncoding()
 
@@ -251,51 +262,154 @@ class GrainField:
             ce.useResource_usage_(a, Metal.MTLResourceUsageRead)
 
 
-class InstanceStructure:
-    """The scene's instances followed by grain instances in one instance acceleration structure, rebuilt every frame
-    (scene refit kernel, grain kernel, build). Reallocated when the grain count grows."""
+def instance_descriptor(prim_list, count, desc_buf, offset=0, label="instances", extended_ok=False, user_ids=False):
+    """The descriptor of an instance acceleration structure of ``count`` instances over ``prim_list`` (descriptors at
+    byte ``offset`` of ``desc_buf``). Past Metal's standard 2^24 instances it gets the extended limits when the caller
+    intersects it with the ``extended_limits`` tag (``extended_ok``), else ValueError (metalsim/render/as_limits.py).
+    Returns (descriptor, extended)."""
+    from metalsim.render import as_limits
+    extended = as_limits.check("instances", count, label, extended_ok=extended_ok)
+    d = Metal.MTLInstanceAccelerationStructureDescriptor.new()
+    d.setInstancedAccelerationStructures_(list(prim_list))
+    d.setInstanceCount_(int(count))
+    d.setInstanceDescriptorBuffer_(desc_buf); d.setInstanceDescriptorBufferOffset_(int(offset))
+    d.setInstanceDescriptorStride_(68 if user_ids else 64)
+    d.setInstanceDescriptorType_(Metal.MTLAccelerationStructureInstanceDescriptorTypeUserID if user_ids
+                                 else Metal.MTLAccelerationStructureInstanceDescriptorTypeDefault)
+    as_limits.apply(d, extended)
+    return d, extended
 
-    def __init__(self, rt, field: GrainField):
-        self.rt, self.field = rt, field
+
+def _instance_structure(ctx, prim_list, count, desc_buf, label, offset=0, extended_ok=False, user_ids=False):
+    """(descriptor, structure, scratch, bytes, extended) of an instance acceleration structure over ``prim_list``."""
+    d, extended = instance_descriptor(prim_list, count, desc_buf, offset, label, extended_ok, user_ids)
+    s = ctx.device.accelerationStructureSizesWithDescriptor_(d)
+    a = ctx.device.newAccelerationStructureWithSize_(s.accelerationStructureSize)
+    if a is None:
+        raise RuntimeError(f"{label}: instance acceleration structure of {count} instances "
+                           f"({s.accelerationStructureSize / 2**20:.0f} MiB) could not be allocated")
+    scratch = ctx.buffer(max(int(s.buildScratchBufferSize), 16), label=f"{label}_scratch")
+    return d, a, scratch, int(s.accelerationStructureSize), extended
+
+
+def _identity_descriptor(as_index: int) -> np.ndarray:
+    """An identity, opaque, all-rays instance of ``as_index`` (MTLAccelerationStructureInstanceDescriptor, 64 bytes)."""
+    top = np.zeros(16, np.float32)
+    top[0] = top[4] = top[8] = 1.0
+    tu = top.view(np.uint32)
+    tu[12] = 4; tu[13] = 0xFFFFFFFF; tu[14] = 0; tu[15] = as_index
+    return top
+
+
+class InstanceStructure:
+    """The renderer's instance acceleration structure with grains, rebuilt every frame from the physics state and the
+    particle buffer, in one of two layouts:
+
+    * ``"two_level"`` (default): the grains are their own instance acceleration structures (one instance per grain),
+      in chunks of at most ``chunk`` grains (Metal's standard limit is 2^24 instances per structure), and each chunk
+      is one identity instance of the scene's top-level structure next to the scene geometry. The path tracer
+      intersects through two instance levels (``max_levels<2>``). Metal reports only the innermost instance of a hit
+      (``instance_count`` stays 1; scripts/particle_demo/multilevel_probe2.py), so the grain structures use UserID
+      descriptors whose user id is 0x80000000 | grain index, and the scene's Default descriptors read user id 0. Every
+      structure stays within the standard limits, and the top level stays as small as the scene.
+    * ``"flat"``: the scene's instances followed by one top-level instance per grain, one build; past 2^24 instances it
+      is built with Metal's extended limits and intersected with the ``extended_limits`` tag (FLAG_GRAINS_EXT).
+
+    Before 2026-10-13 the flat layout was the only one and set no usage flags, so 25.1 M grain instances were built
+    outside Metal's supported range; on macOS 26 that build (with large ground planes) never finished and the GPU work
+    outlived its process (PARTICLES.md).
+
+    Grain descriptors and identity keys: two-level, one buffer of the 68-byte UserID descriptors followed by the keys
+    (the path tracer's buffer 29); flat, the descriptors follow the scene's in the top-level buffer and the keys are the
+    field's own.
+    """
+
+    MODES = ("two_level", "flat")
+    CHUNK = 1 << 24
+
+    def __init__(self, rt, field: GrainField, mode: str = "two_level", chunk: int | None = None):
+        if mode not in self.MODES:
+            raise ValueError(f"grain structure {mode!r}: one of {self.MODES}")
+        self.rt, self.field, self.mode = rt, field, mode
+        self.chunk = int(chunk or self.CHUNK)
+        if not 1 <= self.chunk <= self.CHUNK:
+            raise ValueError(f"chunk {self.chunk}: 1 to {self.CHUNK}")
         self.capacity = -1
-        self.n_total = -1
+        self.n_grains = -1
+        self.extended = False
+
+    @property
+    def n_chunks(self) -> int:
+        return max(1, -(-self.field.n_grains // self.chunk))
 
     def ensure(self):
         rt, f = self.rt, self.field
-        n_total = rt.n_inst + f.n_grains
-        if n_total == self.n_total:
+        G = f.n_grains
+        if G == self.n_grains:
             return
         c = rt.ctx
-        if n_total > self.capacity:
-            self.capacity = n_total
-            self.inst_desc = c.buffer(64 * n_total, label="pt_instances_with_grains")
-        d = Metal.MTLInstanceAccelerationStructureDescriptor.new()
-        d.setInstancedAccelerationStructures_(list(rt.prim_as) + list(f.prim_as))
-        d.setInstanceCount_(n_total)
-        d.setInstanceDescriptorBuffer_(self.inst_desc); d.setInstanceDescriptorBufferOffset_(0)
-        d.setInstanceDescriptorStride_(64)
-        d.setInstanceDescriptorType_(Metal.MTLAccelerationStructureInstanceDescriptorTypeDefault)
-        s = c.device.accelerationStructureSizesWithDescriptor_(d)
-        self.inst_as = c.device.newAccelerationStructureWithSize_(s.accelerationStructureSize)
-        if self.inst_as is None:
-            raise RuntimeError(f"instance acceleration structure of {n_total} instances "
-                               f"({s.accelerationStructureSize / 2**20:.0f} MiB) could not be allocated")
-        self.scratch = c.buffer(max(int(s.buildScratchBufferSize), 16), label="pt_inst_scratch_grains")
-        self.desc, self.n_total = d, n_total
-        self.as_bytes = int(s.accelerationStructureSize)
+        if self.mode == "flat":
+            n_total = rt.n_inst + G
+            if n_total > self.capacity:
+                self.capacity = n_total
+                self.inst_desc = c.buffer(64 * n_total, label="pt_instances_with_grains")
+            self.desc, self.inst_as, self.scratch, self.as_bytes, self.extended = _instance_structure(
+                c, list(rt.prim_as) + list(f.prim_as), n_total, self.inst_desc, "pt_flat_grains", extended_ok=True)
+            self.grain_as_bytes = 0
+        else:
+            if G > self.capacity:
+                self.capacity = G
+                self.grain_buf = c.buffer(72 * G, label="pt_grain_instances_and_keys")   # UserID descriptors, then keys
+            nc = self.n_chunks
+            self.chunks = []        # (descriptor, structure, scratch, bytes) per chunk of <= chunk grains
+            for k in range(nc):
+                n = min(self.chunk, G - k * self.chunk)
+                d, a, sc, nb, _ = _instance_structure(c, f.prim_as, n, self.grain_buf, f"pt_grains_{k}",
+                                                      offset=68 * k * self.chunk, user_ids=True)
+                self.chunks.append((d, a, sc, nb))
+            self.grain_as_bytes = sum(ch[3] for ch in self.chunks)
+            self.inst_desc = c.buffer(64 * (rt.n_inst + nc), label="pt_instances_scene_and_grains")
+            for k in range(nc):     # chunk k: identity instance after the scene's, instancing structure n_prim + k
+                c.write_buffer(self.inst_desc, _identity_descriptor(len(rt.prim_as) + k), offset=64 * (rt.n_inst + k))
+            self.desc, self.inst_as, self.scratch, top_bytes, _ = _instance_structure(
+                c, list(rt.prim_as) + [ch[1] for ch in self.chunks], rt.n_inst + nc, self.inst_desc, "pt_scene_and_grains")
+            self.as_bytes = top_bytes + self.grain_as_bytes
+        self.n_grains = G
+
+    @property
+    def n_total(self) -> int:
+        """Instances in the structure(s): scene instances + grains (+ one top-level instance per grain chunk)."""
+        return self.rt.n_inst + self.n_grains + (len(self.chunks) if self.mode == "two_level" else 0)
+
+    def grain_binding(self):
+        """(buffer, byte offset) for the path tracer's buffer 29."""
+        if self.mode == "flat":
+            return self.field.keys, 0
+        return self.grain_buf, 0
 
     def encode(self, cb, geom_xpos, gx_off, geom_xmat, gm_off):
-        """Scene refit into the first rt.n_inst descriptors, grain instances after them, one build."""
+        """Scene refit, grain instances, the build(s)."""
         self.ensure()
-        rt = self.rt
+        rt, f = self.rt, self.field
         rt._encode_refit(cb, geom_xpos, gx_off, geom_xmat, gm_off, inst_desc=self.inst_desc)
-        self.field.encode_instances(cb, self.inst_desc, len(rt.prim_as), rt.n_inst, rt.tpr, rt.stride, rt.grid)
+        if self.mode == "flat":
+            f.encode_instances(cb, self.inst_desc, len(rt.prim_as), rt.n_inst, rt.tpr, rt.stride, grid=rt.grid)
+        else:
+            f.encode_instances(cb, self.grain_buf, 0, 0, rt.tpr, rt.stride, keys=self.grain_buf, keys_off=68 * f.n_grains,
+                               user_ids=True, grid=rt.grid)
+            ae = cb.accelerationStructureCommandEncoder()       # the grain chunks first (the top level instances them)
+            for d, a, sc, _ in self.chunks:
+                ae.buildAccelerationStructure_descriptor_scratchBuffer_scratchBufferOffset_(a, d, sc, 0)
+            ae.endEncoding()
         ae = cb.accelerationStructureCommandEncoder()
         ae.buildAccelerationStructure_descriptor_scratchBuffer_scratchBufferOffset_(self.inst_as, self.desc, self.scratch, 0)
         ae.endEncoding()
 
     def use_resources(self, ce):
         ce.useResource_usage_(self.inst_as, Metal.MTLResourceUsageRead)
+        if self.mode == "two_level":
+            for ch in self.chunks:
+                ce.useResource_usage_(ch[1], Metal.MTLResourceUsageRead)
         for a in getattr(self.rt, "prim_as_unique", self.rt.prim_as):   # each structure once
             ce.useResource_usage_(a, Metal.MTLResourceUsageRead)
         if getattr(self.rt, "dyn_as", None):                            # the dynamic objects' structures: their heap

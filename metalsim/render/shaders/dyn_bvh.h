@@ -112,47 +112,57 @@ struct RTRes {
     uint instance_id, geometry_id, primitive_id;
     float2 triangle_barycentric_coord;
     bool dyn; uint dyn_env;
+    uint user;                      // user instance id of the innermost instance (two-level grain structures; else 0)
 };
 
-inline RTRes rt_intersect(ray r, instance_acceleration_structure accel, device const DynBVHArgs& a, bool any) {
-    intersection_params prm;
-    prm.accept_any_intersection(any);
-    intersection_query<triangle_data, instancing> q(r, accel, prm);
-    DynHit best; best.hit = false;
-    while (q.next()) {
-        if (q.get_candidate_intersection_type() == intersection_type::bounding_box) {
-            float cur = q.get_committed_intersection_type() == intersection_type::none ? r.max_distance : q.get_committed_distance();
-            // the box instance has the identity transform: the candidate ray is the world ray
-            DynHit h = dyn_traverse(a, q.get_candidate_primitive_id(), r.origin, r.direction, r.min_distance, cur, any);
-            if (h.hit) {
-                q.commit_bounding_box_intersection(h.t);
-                best = h;
-                if (any) q.abort();
-            }
-        } else {
-            q.commit_triangle_intersection();     // non-opaque triangles (none in these scenes): as the intersector
-        }
-    }
-    RTRes o;
-    o.type = q.get_committed_intersection_type();
-    if (any && best.hit) o.type = intersection_type::bounding_box;    // after abort(): the box hit found
-    o.dyn = false; o.dyn_env = 0; o.distance = 0.0; o.instance_id = 0; o.geometry_id = 0; o.primitive_id = 0;
-    o.triangle_barycentric_coord = float2(0.0);
-    if (o.type == intersection_type::triangle) {
-        o.distance = q.get_committed_distance();
-        o.instance_id = q.get_committed_instance_id();
-        o.geometry_id = q.get_committed_geometry_id();
-        o.primitive_id = q.get_committed_primitive_id();
-        o.triangle_barycentric_coord = q.get_committed_triangle_barycentric_coord();
-    } else if (o.type == intersection_type::bounding_box) {
-        o.type = intersection_type::triangle;
-        o.distance = best.t;
-        o.instance_id = q.get_committed_instance_id();
-        o.geometry_id = best.k; o.primitive_id = best.prim; o.triangle_barycentric_coord = best.bc;
-        o.dyn = true; o.dyn_env = best.env;
-    }
-    return o;
+// one query function per intersection-tag set: single level, two instance levels (grains in their own structures).
+// (intersection_query takes no extended_limits tag: a flat grain structure past 2^24 instances cannot be combined
+// with the sbvh layout; tier2.py refuses it). Box hits report the box instance (DynBVHArgs.box_inst) and user id 0.
+#define RT_INTERSECT_FN(NAME, TAGS, INST, USER)                                                                        \
+inline RTRes NAME(ray r, instance_acceleration_structure accel, device const DynBVHArgs& a, bool any) {             \
+    intersection_params prm;                                                                                         \
+    prm.accept_any_intersection(any);                                                                                \
+    intersection_query<TAGS> q(r, accel, prm);                                                                       \
+    DynHit best; best.hit = false;                                                                                   \
+    while (q.next()) {                                                                                               \
+        if (q.get_candidate_intersection_type() == intersection_type::bounding_box) {                               \
+            float cur = q.get_committed_intersection_type() == intersection_type::none ? r.max_distance : q.get_committed_distance(); \
+            /* the box instance has the identity transform: the candidate ray is the world ray */                    \
+            DynHit h = dyn_traverse(a, q.get_candidate_primitive_id(), r.origin, r.direction, r.min_distance, cur, any); \
+            if (h.hit) {                                                                                             \
+                q.commit_bounding_box_intersection(h.t);                                                             \
+                best = h;                                                                                            \
+                if (any) q.abort();                                                                                  \
+            }                                                                                                        \
+        } else {                                                                                                     \
+            q.commit_triangle_intersection();     /* non-opaque triangles (none in these scenes) */                  \
+        }                                                                                                            \
+    }                                                                                                                \
+    RTRes o;                                                                                                         \
+    o.type = q.get_committed_intersection_type();                                                                    \
+    if (any && best.hit) o.type = intersection_type::bounding_box;    /* after abort(): the box hit found */         \
+    o.dyn = false; o.dyn_env = 0; o.distance = 0.0; o.instance_id = 0; o.geometry_id = 0; o.primitive_id = 0;       \
+    o.triangle_barycentric_coord = float2(0.0); o.user = 0u;                                                         \
+    if (o.type == intersection_type::triangle) {                                                                     \
+        o.distance = q.get_committed_distance();                                                                     \
+        o.instance_id = INST;                                                                                        \
+        o.user = USER;                                                                                               \
+        o.geometry_id = q.get_committed_geometry_id();                                                               \
+        o.primitive_id = q.get_committed_primitive_id();                                                             \
+        o.triangle_barycentric_coord = q.get_committed_triangle_barycentric_coord();                                 \
+    } else if (o.type == intersection_type::bounding_box) {                                                          \
+        o.type = intersection_type::triangle;                                                                        \
+        o.distance = best.t;                                                                                         \
+        o.instance_id = a.box_inst;                                                                                  \
+        o.geometry_id = best.k; o.primitive_id = best.prim; o.triangle_barycentric_coord = best.bc;                  \
+        o.dyn = true; o.dyn_env = best.env;                                                                          \
+    }                                                                                                                \
+    return o;                                                                                                        \
 }
+#define RT_TAGS1 triangle_data, instancing
+#define RT_TAGS2 triangle_data, instancing, max_levels<2>
+RT_INTERSECT_FN(rt_intersect, RT_TAGS1, q.get_committed_instance_id(), 0u)
+RT_INTERSECT_FN(rt_intersect2, RT_TAGS2, q.get_committed_instance_id(0), q.get_committed_user_instance_id(0))
 
 #define DYN_PARAM , device const DynBVHArgs& dbv
 #define DYN_PASS , dbv

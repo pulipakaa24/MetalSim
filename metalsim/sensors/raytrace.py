@@ -23,6 +23,7 @@ import Metal
 
 from metalsim.interop import torch_bridge as tb
 from metalsim.interop import warp_metal as wm
+from metalsim.render import as_limits
 from metalsim.render.metal_context import MetalContext
 from metalsim.render.scene_tables import CameraIntrinsics, build_scene_tables
 
@@ -244,6 +245,7 @@ class RayTracer:
             g.setVertexFormat_(Metal.MTLAttributeFormatFloat3)
             g.setIndexBuffer_(self.ibuf); g.setIndexBufferOffset_(int(mesh["i_off"]) * 4)
             g.setIndexType_(Metal.MTLIndexTypeUInt32)
+            as_limits.check("primitives", int(mesh["i_count"]) // 3, "ray-tracing mesh")   # rt shaders: standard limits
             g.setTriangleCount_(int(mesh["i_count"]) // 3)
             g.setOpaque_(True)
             d = Metal.MTLPrimitiveAccelerationStructureDescriptor.new()
@@ -293,6 +295,7 @@ class RayTracer:
                     g.setVertexFormat_(Metal.MTLAttributeFormatFloat3)
                     g.setIndexBuffer_(self.ibuf); g.setIndexBufferOffset_(int(mesh["i_off"]) * 4)
                     g.setIndexType_(Metal.MTLIndexTypeUInt32)
+                    as_limits.check("primitives", int(mesh["i_count"]) // 3, "ray-tracing mesh")   # rt shaders: standard limits
                     g.setTriangleCount_(int(mesh["i_count"]) // 3)
                     g.setOpaque_(True)
                     geos.append(g)
@@ -300,10 +303,9 @@ class RayTracer:
             d.setGeometryDescriptors_(geos)
             self._dyn_refittable = self.dyn_rebuild_every != 1
             usage = Metal.MTLAccelerationStructureUsageRefit if self._dyn_refittable else 0
-            ntri = sum(int(gd.triangleCount()) for gd in geos)
-            if len(geos) >= 1 << 24 or ntri >= 1 << 28:     # standard limits: 2^24 geometries, 2^28 primitives
-                assert len(geos) < 1 << 30 and ntri < 1 << 30, "dynamic structure beyond Metal's extended limits"
-                usage |= Metal.MTLAccelerationStructureUsageExtendedLimits
+            # the rt shaders intersect without the extended_limits tag: stay within the standard limits (as_limits)
+            as_limits.check("geometries", len(geos), "dynamic objects' structure")
+            as_limits.check("primitives", sum(int(gd.triangleCount()) for gd in geos), "dynamic objects' structure")
             if usage:
                 d.setUsage_(usage)
             s_ = c.device.accelerationStructureSizesWithDescriptor_(d)
@@ -379,6 +381,7 @@ class RayTracer:
 
     def _alloc_instance_structure(self):
         c = self.ctx
+        as_limits.check("instances", self.n_inst, f"ray-tracing scene ({self.n} envs)")   # rt shaders: standard limits
         d = Metal.MTLInstanceAccelerationStructureDescriptor.new()
         d.setInstancedAccelerationStructures_(self.prim_as)
         d.setInstanceCount_(self.n_inst)
@@ -386,9 +389,6 @@ class RayTracer:
         d.setInstanceDescriptorBufferOffset_(0)
         d.setInstanceDescriptorStride_(64)
         d.setInstanceDescriptorType_(Metal.MTLAccelerationStructureInstanceDescriptorTypeDefault)
-        if self.n_inst >= 1 << 24:          # standard limit: 2^24 instances
-            assert self.n_inst < 1 << 30, "instance structure beyond Metal's extended limits"
-            d.setUsage_(Metal.MTLAccelerationStructureUsageExtendedLimits)
         self.inst_desc_obj = d
         s = c.device.accelerationStructureSizesWithDescriptor_(d)
         self.inst_as = c.device.newAccelerationStructureWithSize_(s.accelerationStructureSize)
