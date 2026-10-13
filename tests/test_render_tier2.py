@@ -172,6 +172,109 @@ def test_env_map_importance_sampling_unbiased():
     assert rel_u > 3 * rel_noise
 
 
+
+def _rot_x(deg):
+    c, s_ = np.cos(np.radians(deg)), np.sin(np.radians(deg))
+    return np.array([[1.0, 0, 0], [0, c, -s_], [0, s_, c]])
+
+
+def _env_irradiance_radiance_rotated(env, R):
+    """As _env_irradiance_radiance, for the map oriented by R (dome frame -> world): every texel's world direction is
+    R @ env_direction(u, v); the plane (normal +z) sees the texels with (R d).z > 0."""
+    from metalsim.render.hdr import env_direction
+    h, w = env.shape[:2]
+    u, v = np.meshgrid((np.arange(w) + 0.5) / w, (np.arange(h) + 0.5) / h)
+    d = env_direction(u, v) @ np.asarray(R).T
+    d_omega = (2 * np.pi / w) * (np.pi / h) * np.sin(v * np.pi)
+    return (env * (np.clip(d[..., 2], 0, None) * d_omega)[..., None]).sum((0, 1)) / np.pi
+
+
+SKY_CAM = """
+<mujoco>
+  <visual><headlight active="0" ambient="0 0 0"/></visual>
+  <worldbody>
+    <camera name="cam" pos="0 0 0" xyaxes="0.7071 -0.7071 0 -0.4082 -0.4082 0.8165" fovy="100"/>
+    <geom name="speck" type="sphere" size="0.001" pos="-30 -30 -30"/>
+  </worldbody>
+</mujoco>
+"""
+
+
+def test_env_map_tilted_dome_lookup():
+    """A tilted dome (``set_environment(rotation=)``): the shader looks a world direction d up at R^T d, R = rotation @
+    R_z(yaw). The map stores its own dome-frame direction (+2, as radiance), so a camera seeing only sky reads
+    R^T d + 2 per pixel, and the un-rotated render of the same map reads d + 2 (the shader's own camera rays): the
+    tilted render must equal R^T (untilted - 2) + 2 for 30 deg about x, a general rotation (with a yaw), a
+    quaternion, and a y-up pole alignment. The yaw-only path stays what it was (identity rotation = yaw path)."""
+    from metalsim.render.hdr import env_direction
+    from metalsim.render.tier2 import dome_rotation
+    model = mujoco.MjModel.from_xml_string(SKY_CAM)
+    h, w = 512, 1024
+    u, v = np.meshgrid((np.arange(w) + 0.5) / w, (np.arange(h) + 0.5) / h)
+    enc = (env_direction(u, v) + 2.0).astype(np.float32)
+    rend = Tier2Renderer(model, 1, width=48, height=48, camera="cam", spp=1, max_bounces=1, center_sample=True, seed=1)
+    rend.set_environment(enc)
+    base = rend.render_host([_fwd(model)], passes=1)["hdr"][0].reshape(-1, 3).astype(np.float64)
+    d = base - 2.0
+    assert np.allclose(np.linalg.norm(d, axis=1), 1.0, atol=5e-3)          # the shader saw sky directions
+    assert d[:, 2].min() < -0.2 and d[:, 2].max() > 0.9                       # a view where a tilt matters
+    q = np.array([np.cos(0.6), *(np.sin(0.6) * np.array([0.3, -0.8, 0.52]) / np.linalg.norm([0.3, -0.8, 0.52]))])
+    cases = [("rotX30", _rot_x(30), 0.0), ("rotX30+yaw", _rot_x(30), 0.7), ("quat", q, -1.1),
+             ("y-up pole (Rx -90) + Kit azimuth", _rot_x(-90), -np.pi / 2)]
+    for name, rot, yaw in cases:
+        rend.set_environment(enc, rotation=rot, yaw=yaw)
+        assert rend.env_flags == 32 | 512
+        R = dome_rotation(rot, yaw)
+        got = rend.render_host([_fwd(model)], passes=1)["hdr"][0].reshape(-1, 3) - 2.0
+        exp = d @ R                                                           # R^T d per row
+        err = np.abs(got - exp).max()
+        wrong = np.abs(got - d @ dome_rotation(None, yaw)).max()              # what the yaw-only lookup would give
+        print(f"{name}: max |lookup - R^T d| {err:.4f} (yaw-only would be off by {wrong:.3f})")
+        assert err < 0.01 and wrong > 0.2
+    # back to the yaw-only path: the flag clears and the render is that of the untilted map
+    rend.set_environment(enc)
+    assert rend.env_flags == 32
+    again = rend.render_host([_fwd(model)], passes=1)["hdr"][0].reshape(-1, 3)
+    assert np.array_equal(again, base.astype(np.float32))
+
+
+def test_env_map_tilted_importance_sampling():
+    """Importance sampling of a tilted dome uses the same rotation as the lookup: under a bright-window map turned
+    50 deg about x (and yawed), the MIS estimate (env NEE + BRDF sampling) matches the plane radiance integrated over
+    the rotated map, agrees with the uniform-table estimate within noise, and a constant tilted map is a furnace."""
+    from metalsim.render.tier2 import env_sampling_table, dome_rotation
+    model = mujoco.MjModel.from_xml_string(ENV_PLANE)
+    rot, yaw = _rot_x(50), 0.9
+    rend = Tier2Renderer(model, 1, width=48, height=48, camera="cam", spp=32, max_bounces=1, seed=5)
+    rend.set_environment(np.full((64, 128, 3), 0.5, np.float32), rotation=rot, yaw=yaw)
+    hdr = rend.render_host([_fwd(model)], passes=4)["hdr"][0]
+    print(f"tilted furnace: mean {hdr.mean():.4f} (expected 0.5)")
+    assert abs(hdr.mean() - 0.5) < 0.01
+    env = np.full((128, 256, 3), 0.05, np.float32)
+    env[20:28, 40:52] = (60.0, 50.0, 40.0)        # ~65 deg elevation in the dome frame; ~15 deg + yawed in the world
+    expected = _env_irradiance_radiance_rotated(env, dome_rotation(rot, yaw))
+    upright = _env_irradiance_radiance(env)
+    rend = Tier2Renderer(model, 1, width=48, height=48, camera="cam", spp=64, max_bounces=1, seed=3)
+    rend.set_environment(env, rotation=rot, yaw=yaw)
+    hdr = rend.render_host([_fwd(model)], passes=4)["hdr"][0]
+    mean = hdr.reshape(-1, 3).mean(0); rel = float(hdr[..., 1].std() / hdr[..., 1].mean())
+    flat = Tier2Renderer(model, 1, width=48, height=48, camera="cam", spp=64, max_bounces=1, seed=3)
+    flat.set_environment(env, rotation=rot, yaw=yaw)
+    cdf, _, _ = env_sampling_table(np.ones_like(env))
+    flat._env_cdf = flat.ctx.buffer(cdf.nbytes, cdf, "pt_env_cdf_uniform")
+    hdr_u = flat.render_host([_fwd(model)], passes=4)["hdr"][0]
+    mean_u = hdr_u.reshape(-1, 3).mean(0); rel_u = float(hdr_u[..., 1].std() / hdr_u[..., 1].mean())
+    # standard error of the image means (pixels independent): rel. std / sqrt(pixels)
+    se = np.sqrt((rel ** 2 + rel_u ** 2) / hdr[..., 1].size) * expected[1]
+    print(f"tilted window: importance {np.round(mean, 4)} (rel. std {rel:.3f}), uniform {np.round(mean_u, 4)} "
+          f"(rel. std {rel_u:.3f}), expected {np.round(expected, 4)}; upright map would give {np.round(upright, 4)}; "
+          f"|IS - uniform| {abs(mean[1] - mean_u[1]):.4f} vs 4 SE {4 * se:.4f}")
+    assert not np.allclose(expected, upright, rtol=0.1)                      # the tilt changes the answer
+    assert np.allclose(mean, expected, rtol=0.02)
+    assert np.allclose(mean_u, expected, rtol=0.05)
+    assert abs(mean[1] - mean_u[1]) < 4 * se
+    assert rel_u > 2 * rel
+
 def _write_rgbe(path, rgb):
     """Minimal Radiance RGBE writer (flat scanlines) for tests."""
     rgb = np.asarray(rgb, np.float32)
@@ -244,6 +347,58 @@ def test_env_map_usd_dome_import(tmp_path):
     print("usd dome furnace:", top, "expected", 0.5 * 4.0 * np.array([1.0, 0.5, 0.25]) * albedo)
     assert np.allclose(top, 0.5 * 4.0 * np.array([1.0, 0.5, 0.25]) * albedo, rtol=0.03)
 
+
+
+@pytest.mark.parametrize("case", ["rotX30", "yup_domelight1_scene", "yup_legacy_rotX-90", "zup_domelight1_poleY"])
+def test_env_map_usd_tilted_dome_import(tmp_path, case):
+    """The importer records a tilted dome's full rotation (``rot`` = R_prim . P) and tier 2 uploads
+    R_prim . P . R_z(KIT_DOME_AZIMUTH) (research_notes/dome_light_azimuth/tilted_dome.md): a legacy DomeLight with
+    rotateX 30 deg (Kit applies it rigidly, measured); a DomeLight_1 with poleAxis "scene" on a y-up stage (pole +y);
+    a legacy DomeLight on a y-up stage with the rotateX -90 a y-up author adds (Kit renders legacy domes z-up); a
+    DomeLight_1 poleAxis "Y" on a z-up stage. World directions of map points match the analytic rotation."""
+    pytest.importorskip("pxr")
+    from pxr import Usd, UsdGeom, UsdLux
+    from metalsim.render.hdr import env_direction
+    from metalsim.render.tier2 import KIT_DOME_AZIMUTH, dome_rotation
+    from metalsim.scene.usd_to_mjcf import load_usd
+    _write_rgbe(str(tmp_path / "const.hdr"), np.full((8, 16, 3), 0.5, np.float32))
+    stage = Usd.Stage.CreateNew(str(tmp_path / "dome.usda"))
+    UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.y if case.startswith("yup") else UsdGeom.Tokens.z)
+    UsdGeom.SetStageMetersPerUnit(stage, 1.0)
+    world = UsdGeom.Xform.Define(stage, "/World"); stage.SetDefaultPrim(world.GetPrim())
+    dome = (UsdLux.DomeLight_1 if "domelight1" in case else UsdLux.DomeLight).Define(stage, "/World/skyLight")
+    dome.CreateTextureFileAttr("./const.hdr"); dome.CreateTextureFormatAttr("latlong")
+    if case == "rotX30":
+        UsdGeom.Xformable(dome.GetPrim()).AddRotateXOp().Set(30.0)
+    elif case == "yup_legacy_rotX-90":
+        UsdGeom.Xformable(dome.GetPrim()).AddRotateXOp().Set(-90.0)
+    elif case == "zup_domelight1_poleY":
+        dome.CreatePoleAxisAttr("Y")
+    UsdGeom.Cube.Define(stage, "/World/box").CreateSizeAttr(0.1)
+    cam = UsdGeom.Camera.Define(stage, "/World/cam")
+    UsdGeom.Xformable(cam.GetPrim()).AddTranslateOp().Set((0.0, 0.0, 2.0))
+    stage.GetRootLayer().Save()
+    m = load_usd(str(tmp_path / "dome.usda")).compile()
+    rend = Tier2Renderer(m, 1, width=8, height=8, camera="cam", spp=1, max_bounces=1, headlight=False)
+    rec = rend.set_environment_from_model(m)
+    print(case, "record:", {k: rec[k] for k in ("yaw", "tilt", "rot", "pole_axis") if k in rec})
+    R_prim_P = {"rotX30": _rot_x(30), "yup_domelight1_scene": _rot_x(-90), "yup_legacy_rotX-90": _rot_x(-90),
+                "zup_domelight1_poleY": _rot_x(-90)}[case]
+    assert np.allclose(np.reshape(rec["rot"], (3, 3)), R_prim_P, atol=1e-6)
+    assert rend.env_flags == 32 | 512
+    R = R_prim_P @ dome_rotation(None, KIT_DOME_AZIMUTH)
+    up = rend.consts.view(np.float32)[76:88].reshape(3, 4)[:, :3].T          # float4 columns -> R
+    assert np.allclose(up, R, atol=1e-6)
+    # pole, the image centre and u = 0.25 in the world: Kit's z-up frame (pole +z, centre -x, u = 0.25 toward -y) turned rigidly
+    pts = {(0.5, 0.0): (0, 0, 1.0), (0.5, 0.5): (-1.0, 0, 0), (0.25, 0.5): (0, -1.0, 0)}
+    for (u, v), dk in pts.items():
+        assert np.allclose(env_direction(u, v, KIT_DOME_AZIMUTH, rotation=R_prim_P), R_prim_P @ np.array(dk), atol=1e-9)
+    if case.startswith("yup") or case == "zup_domelight1_poleY":
+        assert np.allclose(env_direction(0.5, 0.0, KIT_DOME_AZIMUTH, rotation=R_prim_P), (0, 1, 0), atol=1e-9)   # pole +y
+    else:
+        c, s_ = np.cos(np.radians(30)), np.sin(np.radians(30))
+        assert np.allclose(env_direction(0.5, 0.0, KIT_DOME_AZIMUTH, rotation=R_prim_P), (0, -s_, c), atol=1e-9)
+        assert abs(rec["tilt"] - 30.0) < 1e-4
 
 def test_env_randomizer_and_helpers():
     """Replicator: ``Randomizer.environment`` picks a map per episode by key (cached GPU resources, random yaw);
