@@ -822,9 +822,80 @@ end to end: Isaac's own assets (Franka USD, cups, table, the 20,000-row reset da
 * Section 8h's opt-in memory budgets (`mpm_grid_budget="measured"`, `mpm_cells_per_world=256`) hold on the trained
   policy: a deterministic 2,048-episode evaluation of the 300-iteration policy gives success 0.470 vs 0.477 with
   Isaac's capacities (same rows; within the 0.011 standard error), the same pour metrics, and no grid overflow (`docs/PARITY.md` §1b.5, `runs/franka_pour/eval/`).
+* Learning against Isaac (`docs/PARITY.md` §1b.5, 2026-10-13): 5 of our seeds at Isaac's matched 1,024-env
+  configuration against Isaac's single run. Isaac's run is inside our prediction interval through iteration 49. At
+  iterations 50-59 it leads by about 0.06 success, just outside the interval (verdict partial). Isaac seeds 1-4
+  (`stage_pour_seeds.sh`) are waiting for L4 capacity.
 * Upstream observation (code reading, same in Isaac and here): the proxy wrench harvest uses only the last MPM
   substep's impulses and divides by the outer dt, so with the media entry's 2 substeps the reaction on the cups is about
   half the mean force (`solver_coupled_proxy.py:1547-1557`, `solver_implicit_mpm.py:1773-1812, 3266-3268`).
+
+## 8j. Coupled scenes against the L4, re-timed (2026-10-13)
+
+Logs, JSON and scripts: `runs/mpm/coupled_retime/`. The run used the 16-inch M4 Max (macOS 26.7.1), main `52469d93`,
+Warp `95f6f121`, Newton `3fd1f052`, MuJoCo Warp 3.11.0 (`.venv-newton152`, `env_check.log`).
+* Every run was its own exclusive `timing` job through `scripts/gpu_run.sh`. Utilisation was 0 % at the start of
+  each job, with no process at 10 % or more.
+* Three repetitions were interleaved: for each repetition, for each mode, for each scene, run the L4's protocol, then
+  the `speed_suite.sh` protocol.
+* The L4's protocol (`stage_mpm_timing.sh`) is `record_mpm.py`, 2 s, no per-solve log. The figure is the median
+  ms/frame over the whole run.
+* "Captured" is the example's own whole-step graph.
+
+The L4 figures are those of section 7 (Isaac Lab 3.0-EA's Newton 1.5.2, Warp 1.16; the L4 log tarball is not
+committed). An 8-frame check after 3 frames of warm-up is committed with the L4 kernel profiles
+(`runs/mpm/profile/kernels_l4/timing_*.json`): two-way 68.9 / 29.7, ANYmal 56.6 / 23.2 (eager / captured).
+
+ms/frame, median of the three per-run medians; `"off"` is the parity default:
+
+| scene | L4 | Metal `"off"` (runs) | Metal / L4 | Metal `"relaxed"` | Metal / L4 | Metal frames 6-65 (`"off"`) |
+|---|---|---|---|---|---|---|
+| two-way, eager | 73.0 | 79.6 (79.6 / 78.8 / 79.6) | **1.09x** | 76.8 | 1.05x | 62.1 |
+| two-way, captured | 31.0 | 54.4 (53.1 / 54.4 / 54.9) | **1.76x** | 52.6 | 1.70x | 36.9 |
+| ANYmal, eager | 58.9 | 39.6 (39.0 / 39.6 / 41.3) | **0.67x** | 37.5 | 0.64x | 39.9 |
+| ANYmal, captured | 24.2 | 31.2 (31.2 / 31.3 / 29.8) | **1.29x** | 27.8 | 1.15x | 29.7 |
+
+The spread between repetitions is at most 4 %. The eager L4 figures include CUDA's per-launch host cost (23 us per
+eager launch on the L4, 1 us per graph node; `kernels_l4/chain.json`), which is why Metal leads ANYmal eager. The
+fair comparison is the captured rows, and there Metal is slower on both scenes.
+
+**Where the time goes** (`profile.sh`; per-kernel GPU time with each dispatch isolated, calibrated for the empty
+command-buffer cost, joined with the L4's nsys sums in `profile/joined.md` and `joined_late.md`):
+
+* **Two-way: the frame cost grows during the run on Metal only.** Mean ms/frame per 20-frame window, captured,
+  1st repetition: 36 at the start, 50-66 from 0.2 s, then about 53. On the L4 the 2 s median (31.0) is about its
+  early cost (29.7). Synchronized parts, chunk-graph eager (`profile_example_parts.py`): early 72.0 ms (MPM step
+  49.0, MuJoCo 13.5, body forces 4.2, collide 3.1); late (after 140 frames) 93.8 ms, with the MPM step at 67.2.
+  * The growth is one kernel, `_bsr_mv_listed_rows`: 0.6 ms/frame early and 19.3 ms/frame late, over 100 launches
+    per frame. It is the rigidity correction inside the rheology loop: two products per iteration,
+    `IJtm @ delta_impulse` and `J @ delta_body_qd`.
+  * Newton `80e79684` (section 8f) switched both products to a one-thread-per-row loop on Metal whenever J has at
+    least 8,192 rows. That loop is Warp's off-CUDA `bsr_mv` body.
+  * IJtm has one row per body degree of freedom, and each row holds one block per collider node the body touches. As
+    the boxes sink into the sand those rows grow to thousands of blocks, and each is summed serially by one thread.
+  * On CUDA, `bsr_mv` reduces such rows with its tiled kernel: `bsr_mv_tiled_kernel` (51 launches) and `bsr_mv_kernel`
+    (51 launches), 1.45 ms/frame in all (early window).
+  * This attribution is inferred from the launch count and the matrix shapes. The profile does not separate the two
+    products.
+  * Rest of the early gap: Gauss-Seidel 7.9 vs 3.2 ms (latency-bound, section 7), Metal's fixed-order body-force sum
+    `compute_body_forces_lanes` 3.0 ms (the L4's atomic `compute_body_forces` is 0.04 ms; section 7b measured
+    the fixed-order sum at 0.45 ms, why it is 3.0 ms here was not investigated), friction / impulse kernels 1.5-3.4x. Sorts, scans and BSR assembly are faster on
+    Metal (6.0 vs 15.5 ms).
+  * Kernel sums: early 31.9 ms (Metal, calibrated) vs 28.9 ms (L4); late 55.3 ms (Metal).
+* **ANYmal captured** (kernel sum 21.6 ms vs the L4's 10.5): Gauss-Seidel 8.5 vs 3.3 ms (the same latency-bound color
+  passes as every MPM scene, 400 launches). The MuJoCo Warp side is many small kernels at 3-11x the L4's time
+  (`_crb_accumulate`, `_cfrc_backward`, `_primitive_narrowphase`, Cholesky updates). Sorts and scans take 2.3 vs
+  1.6 ms. Parts: MPM step 25.6 ms, MuJoCo step 18.4 ms of 45.4 (eager, synchronized).
+
+**What would close it** (not started):
+1. **Two-way growth.** On Metal, run the long-row product (IJtm) through a row-tiled reduction (CUDA's
+   `bsr_mv_tiled_kernel` choice, as Warp `3c4e251e` did for warp.fem's dispatched assembly), or swap the IJtm product
+   for a J^T product over J's short rows. Expected: the late window back to about the early cost (36-37 ms), giving
+   two-way captured about 1.2x the L4. It changes summation order. A CUDA-faithful tiled order would bring Metal
+   closer to the L4, but the floor ensemble must be re-run either way.
+2. **The remaining ~1.2x.** The Gauss-Seidel color pass is near its latency floor at equal results (sections 7, 8).
+   The MuJoCo Warp small-kernel cost belongs to the rigid stack's own performance work, not to MPM. The body-force sum
+   (3.0 ms here against 0.45 ms in section 7b) needs a look first.
 
 ## 9. Running
 
