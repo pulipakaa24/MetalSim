@@ -77,16 +77,21 @@ def load_hdr(path: str) -> np.ndarray:
     return np.ascontiguousarray(im[..., :3], np.float32)
 
 
-def env_direction(u, v, yaw=0.0):
+def env_direction(u, v, yaw=0.0, rotation=None):
     """World direction of equirectangular coordinates (u, v) in [0, 1] under the tier-2 dome convention
     (shaders/pathtrace.metal env_dir: OpenUSD's z-up DomeLight_1 frame, pole +z, u = 0.5 faces -y, ``yaw`` about +z;
-    a USD stage's dome as Kit renders it is at ``yaw = prim yaw + tier2.KIT_DOME_AZIMUTH``)."""
+    a USD stage's dome as Kit renders it is at ``yaw = prim yaw + tier2.KIT_DOME_AZIMUTH``). ``rotation`` (3x3 or wxyz,
+    as ``Tier2Renderer.set_environment``) tilts the dome: the direction is ``rotation @ R_z(yaw) @ d``."""
     lon = (0.5 - np.asarray(u, np.float64)) * 2 * np.pi + yaw
     th = np.asarray(v, np.float64) * np.pi
-    return np.stack([np.sin(th) * np.sin(lon), -np.sin(th) * np.cos(lon), np.cos(th)], -1)
+    d = np.stack([np.sin(th) * np.sin(lon), -np.sin(th) * np.cos(lon), np.cos(th)], -1)
+    if rotation is None:
+        return d
+    from metalsim.render.tier2 import dome_rotation
+    return d @ dome_rotation(rotation).T
 
 
-def extract_sun(hdr, yaw=0.0, window_deg=4.0, rel_threshold=0.05):
+def extract_sun(hdr, yaw=0.0, window_deg=4.0, rel_threshold=0.05, rotation=None):
     """Split an HDRI's sun from its sky: the pixels within ``window_deg`` of the brightest pixel whose luminance
     exceeds ``rel_threshold`` x the peak are replaced by the surrounding sky (median of a ring around the window), and
     their excess radiance is integrated over solid angle. Rendering the sky map plus an analytic directional light with
@@ -94,7 +99,7 @@ def extract_sun(hdr, yaw=0.0, window_deg=4.0, rel_threshold=0.05):
     sampled by next-event estimation instead of being found by BSDF-sampled rays (the source of fireflies on glossy
     surfaces under a sharp HDRI sun).
 
-    Returns (sky (H, W, 3) float32, dict(direction (toward the sun, world, ``yaw`` applied), irradiance (rgb, normal
+    Returns (sky (H, W, 3) float32, dict(direction (toward the sun, world, ``yaw`` and ``rotation`` applied as in env_direction), irradiance (rgb, normal
     to the sun direction), angular_radius [rad], pixels))."""
     hdr = np.asarray(hdr, np.float32)[..., :3]
     H, W = hdr.shape[:2]
@@ -116,7 +121,7 @@ def extract_sun(hdr, yaw=0.0, window_deg=4.0, rel_threshold=0.05):
     E = (excess * domega[..., None]).sum((0, 1))
     w = (excess.mean(-1) * domega)
     uu = (xs[None, :] + 0.5) / W * np.ones((len(ys), 1)); vv = ((ys + 0.5) / H)[:, None] * np.ones((1, len(xs)))
-    dirs = env_direction(uu, vv, yaw)
+    dirs = env_direction(uu, vv, yaw, rotation)
     dvec = (dirs * w[..., None]).sum((0, 1)); dvec /= np.linalg.norm(dvec)
     sky = hdr.copy()
     sub_sky = sub.copy(); sub_sky[mask] = bg
