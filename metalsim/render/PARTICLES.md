@@ -46,7 +46,7 @@ Outputs: grains appear in RGB, depth and normals like any geometry; segmentation
 |---|---|---|
 | grain meshes | `particles.grain_meshes` | icospheres (80 triangles) with smooth random lobes and axis ratios, rescaled to unit volume-equivalent radius; one primitive acceleration structure each |
 | grain instances | `shaders/particles.metal` `grain_instances` | one thread per grain: particle position + hashed offset in the particle cube, hashed rotation (Shoemake), scale and mesh, env offset; hashes of (particle index or id, grain index, seed) only, so a grain keeps its shape, place and colour frame to frame and two runs are bitwise equal; also writes each grain's identity key (the colour hash both tiers read) |
-| structure | `particles.InstanceStructure` | default `"two_level"`: the grains are their own instance structures (chunks of at most 2^24 grains, UserID descriptors with user id 0x80000000 \| grain index), each chunk one identity instance of the scene's top-level structure; `"flat"`: scene instances then one top-level instance per grain. Rebuilt every frame in the frame's command buffer |
+| structure | `particles.InstanceStructure` | default `"two_level"`: the grains are their own instance structures (chunks of at most 2^24 - 1 grains, UserID descriptors with user id 0x80000000 \| grain index), each chunk one identity instance of the scene's top-level structure; `"flat"`: scene instances then one top-level instance per grain. Rebuilt every frame in the frame's command buffer |
 | path tracer | `shaders/pathtrace.metal` (`FLAG_GRAINS`) | instance ids >= the first grain instance are grains: mesh data from the grain buffers, material from the palette by grain index; rays leave a grain with a ray offset of 1 % of the grain radius (scene surfaces keep 1 mm, so scenes without particles render bit for bit as before) |
 | tier 0 | `shaders/particles_tier0.metal` (compiled appended to `tier0.metal`), `particles.GrainRaster` | the same instances, one instanced draw in the shadow and geometry passes (all grain meshes share one topology; the vertex shader picks each grain's mesh), tier 0's lighting and the same palette pick |
 
@@ -64,7 +64,7 @@ Now:
 - `as_limits.check` refuses any structure past the standard limits unless the caller has an extended-limits path,
   and past 2^30 always; `RayTracer` checks every mesh and its instance structure, `particles.py` its grain meshes
   and grain structures.
-- Two-level (default) splits the grains into chunks of at most 2^24, so every structure stays within the standard
+- Two-level (default) splits the grains into chunks of at most 2^24 - 1, so every structure stays under the standard
   limits whatever the grain count. Metal reports only the innermost instance of a nested hit (`instance_count` stays 1
   and `instance_id[0]` / `user_instance_id[0]` are the innermost instance's: `scripts/particle_demo/multilevel_probe2.py`
   on macOS 26), so grains are told apart by their UserID descriptors' user id (0x80000000 | grain index; the scene's
@@ -74,8 +74,24 @@ Now:
 Measured on this Mac (macOS 26), 4 ground planes, 6.28 M grains: two-level build 121 ms (rebuild 77 ms) vs flat 117 ms
 (79 ms); build + one 256x144 trace pass 82 ms vs 84 ms. A 480x270, 64 spp, OIDN frame differs from flat in 5.7 % of
 pixels by at most 11/255 (mean relative HDR difference 3.5e-4: path-tracer and denoiser noise from ulp-level
-differences in the nested transforms). Not yet measured: 25 M grains with the two-level layout (to be done on the
-14-inch; this Mac refuses builds past 6.3 M grains in `stall_bisect.sh` without `ALLOW_LARGE=1`).
+differences in the nested transforms). This Mac refuses builds past 6.3 M grains in `stall_bisect.sh` without
+`ALLOW_LARGE=1`.
+
+Validated on the 14-inch M4 Max (macOS 27.0.1, origin/main 94b75be, 2026-10-13), the demo scene with 4 ground planes,
+each step alone with the GPU back to idle (no ownerless utilisation, recoveryCount 0) between steps:
+
+| grains | structures (instances) | build (rebuild) | 1080p frame, 128 spp, OIDN | Metal allocated |
+|---|---|---|---|---|
+| 6.28 M | top 55, grains 6,280,443 | 175 ms (129 ms) | 8.3 s | 5.5 GB |
+| 12.56 M | top 55, grains 12,560,859 | 420 ms (348 ms) | 9.5 s | 7.4 GB |
+| 25.12 M | top 56, grains 16,777,215 + 8,344,476 | 861 ms (711 ms) | 11.5 s | 11.1 GB |
+
+No structure used extended limits. The full 240-frame clip (8 s, 30 fps, 1080p, 128 spp, OIDN) rendered at a median
+12.5 s per frame (11.2-13.4 s) with the display on (the animated wallpaper takes ~25 % of that GPU), against 10.4 s for
+the 2026-10-12 flat-layout clip on the same machine (display state then unknown, and the renderer has changed since,
+so the difference is not attributed to the layout; at 6.28 M grains the two layouts timed the same). Its frames match
+the 2026-10-12 clip within about 1/255 mean (sky, ground-plane and sand means equal; 2-3.5 % of pixels differ by more
+than 10/255, texture detail after the atlas fix).
 
 ## Validation (`tests/test_render_particles.py`)
 
