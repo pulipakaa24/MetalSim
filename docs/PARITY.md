@@ -1179,7 +1179,7 @@ What this settles and what it does not:
 * It is not settled, because Isaac has one run. Our seed std at 50-59 (0.017) is the only spread estimate; if
   Isaac's own seed spread is like ours, one Isaac run says little about Isaac's mean. The Isaac seeds 1-4 script is
   ready (`metalsim/parity/isaac_side/isaaclab3/stage_pour_seeds.sh`, about 5.2 h per seed on the L4, run
-  instructions in its header); it has not been run yet.
+  instructions in its header); it has not been run yet (checked on 2026-10-13).
 
 **Neither side is repeatable run to run, so seeds are independent samples.** Isaac seeds python, numpy, torch, CUDA
 and Warp (`isaaclab/utils/seed.py:24-33`, called from `train_rsl_rl.py:149`), but `NewtonCfg.deterministic_mode`

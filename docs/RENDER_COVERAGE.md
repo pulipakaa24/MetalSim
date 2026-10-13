@@ -32,6 +32,10 @@ there is no code path. Those rows are marked "code".
     per-material wrap.
   - The 3D Gaussian splat renderer (`render/splat/`, `shaders/splat.metal`).
 - MPM particle rendering: being built by another agent (branch `metalsim-particle-render`, no commits yet).
+  **Landed since (2026-10-13):** merged to main with PR #4 (tier 2 + tier 0 render grains, two-level grain structures and
+  Metal's acceleration-structure limits), PR #9 (grain chunks of 2^24 - 1, 25 M-grain validation on the 14-inch) and
+  PRs #14 / #15 (25 M-grain benchmark on the 16-inch, logs); see the
+  row in §1c and `metalsim/render/PARTICLES.md`.
 
 ## 1. Coverage table
 
@@ -114,7 +118,7 @@ Measured coverage of the reference silhouette is shown as rgb / depth / seg.
 | MetalSim XPBD cloth / rope (the default cloth and rope engine per PARITY) | `physics/deformable.py` | ✅ (workstream A) | `render(xpbd, sources={"flexvert_xpos": xpbd.x})`: drawn as MuJoCo draws the model's flexes; 3 worlds ≥ 0.99 (`test_gpu_path_xpbd_and_physx_cloth`) |
 | PhysX-port particle cloth | `physics/physx_cloth.py`, `tests/test_physx_cloth.py` | ✅ (workstream A) | `extras.DeformableMesh(name, tris, nvert, radius=...)` with `sources={name: sim.x}`; 3 worlds ≥ 0.99 in T0 / T1 / T2 / RT. Isaac draws PhysX cloth as its zero-thickness mesh (`radius=0`). |
 | Newton models (G1 XPBD, VBD cloth / soft / rods, coupled proxy) | `physics/newton_backend.py` | ✅ rigid shapes in T0 / T1 / T2 / RT / Ann through `render/newton_bridge.py` (2026-10-12, [NEWTON_RENDER.md](NEWTON_RENDER.md)); cloth / soft-body surfaces and free particles ✅ once the dynamic-mesh and particle paths land (verified on merges of their WIP branches) | Measured: per-body silhouette coverage 1.0 (Menagerie Panda 0.986: z-fighting between coincident links, the same with the MJCF twin), depth p99 ≤ 0.97 mm (T0) and ≤ 0.1 mm (RT) against the same MJCF through the MuJoCo path; batched and spaced worlds. Before: no Newton `State` → renderer path. |
-| Newton MPM particles (sand, fluids, Franka pour) | `physics/mpm/` | ❌ now; **in progress elsewhere** (`metalsim-particle-render`) | Code |
+| Newton MPM particles (sand, fluids, Franka pour) | `physics/mpm/` | ✅ T0 and T2 (render grains: RGB, depth, normals, segmentation id `n_slots + 1`), from numpy or directly from a Warp particle buffer such as Newton's `state.particle_q`; ❌ T1 and the ray tracer (RT depth / lidar) have no particle path. Merged in PRs #4, #9, #14, #15 (was: in progress on `metalsim-particle-render`) | `tests/test_render_particles.py` (12 tests: single-grain coverage and irradiance within 2 %, white furnace within 3 %, batched envs, bitwise determinism, two-level vs flat, T0 segmentation IoU > 0.9 against T2, Warp input = numpy input); 25.12 M grains build in 654 ms, 1080p 128 spp frame 5.1 s on the 16-inch (`runs/sand25m_16in/`); `metalsim/render/PARTICLES.md` |
 | Replicator motion vectors / 3D boxes / point cloud of deformables | `replicator/isaac.py` | ◐ | RGB / depth / segmentation / instance ids ✅ (extras are unlabelled instances with their own `instance_id`); motion vectors and 3D boxes stay geom-pose based (a deformable gets no motion vector and no 3D box) |
 
 ### 1d. USD import (`scene/usd_to_mjcf.py`) visual coverage
@@ -176,7 +180,7 @@ Effort is engineering days for one person including tests, assuming the existing
 | 16 | Area lights, more than 8 lights in T0/T1. **Done 2026-10-13 (§3e; lights: §3b)** | Unlimited lights, area lights with soft shadows | Raise `MAX_LIGHTS` (loop cost), area-light sampling in T2 | 0.5 / 2 | P2 |
 | 17 | hfield sides / base. **Done 2026-10-12 (§3c)** | Terrain meshes are closed | Add skirt triangles | 0.25 | P2 |
 | 18 | Fisheye / lens distortion. **Done 2026-10-12 (§3c)**: f-theta and Kannala-Brandt in T2 / RT, T0 cube faces | `FisheyeCameraCfg`, f-theta | Per-pixel ray directions in T2 and RT (trivial); T0 needs a distortion warp pass | 1–2 | P2 (P1 for wide-FOV nav cameras) |
-| 19 | MPM particles | Points / mesh-from-particles (fluid isosurface) | **in progress (other agent)** | — | P0 for the MPM tasks |
+| 19 | MPM particles. **Done 2026-10-13 (T0, T2; PRs #4, #9, #14, #15; `metalsim/render/PARTICLES.md`)**; T1 / RT not covered | Points / mesh-from-particles (fluid isosurface) | Render grains (instanced grain meshes) in T0 and T2 | — | P0 for the MPM tasks |
 | 20 | Splat composite: no segmentation for the splat background, baked lighting (no robot shadows), 10 m composite limit | Isaac Sim 5.x renders 3DGUT Gaussian scenes inside RTX | **WIP elsewhere**; seg = "background" class by design | — | P2 |
 
 ## 3. Ranked fix list
@@ -194,7 +198,7 @@ Effort is engineering days for one person including tests, assuming the existing
 | 9 | Spot / point shadows in T1 / T0 (#10): **done 2026-10 (§3b)** | 0.5–3 | Indoor lighting cues |
 | 10 | The P2 items (#13–#18) | ~10 total | Fidelity |
 
-MPM particle rendering (#19) is not ranked: it is being built by another agent.
+MPM particle rendering (#19) is not ranked: it was built by another agent (now merged, §1c row).
 
 ## 3b. Static-appearance fixes (2026-10, workstream B)
 
