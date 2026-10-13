@@ -96,3 +96,9 @@ published benchmark. Neither is cited as physics parity evidence.
   acceleration structure and in tier 0's raster pass, from numpy or directly from a Warp particle buffer; validated
   analytically (single-grain coverage and irradiance, white furnace in a grain pile), batched, deterministic; 22 M
   grains per frame measured. Demo: Newton's ANYmal C on MPM sand path-traced (`scripts/particle_demo/`).
+- **MPM in the main simulator** (in progress since 2026-10-13, branch `mpm-main-sim`, `metalsim/physics/mpm/MPM.md`
+  section 11): `MPMCoupling` adds Isaac Lab's MPM material to a `BatchSim` scene in `.venv` (vendored copy of the
+  Newton 1.5.2 fork's solver, bitwise Newton's own; Isaac's proxy coupling). A box on sand follows Isaac's coupling
+  path to rounding. Found and fixed on the fork: Gauss-Seidel with separate worlds was an invalid coloring (data race,
+  non-repeatable multi-world runs, Newton's own 1.5.2 included). Open: scale and timing results (batch 01), robot
+  scenes (ANYmal on sand) in the main simulator.

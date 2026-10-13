@@ -121,44 +121,115 @@ def test_vendored_column_bitwise_newton152():
     assert newton_compat.drain_log()["iterations"].tolist() == ref["iterations"]
 
 
+def _box_args(solver, steps=60):
+    class A:
+        worlds, voxel, cells, capture, mass, mode, mpm_substeps, particle_stride = 2, 0.02, "auto", 1, "effective", \
+            "staggered", 1, 1000
+    A.solver, A.steps = solver, steps
+    return A
+
+
 @pytest.fixture(scope="module")
 def box_runs():
-    """Two independent box-on-sand runs (2 worlds, 60 steps of 1/120 s) of the coupled main simulator."""
+    """Box-on-sand runs of the coupled main simulator (2 worlds, 60 steps of 1/120 s): two with the default
+    (Gauss-Seidel) solver, one with Jacobi (Isaac's Franka-Pour solver), all captured."""
     _metal()
     mod = _box_on_sand()
-
-    class A:
-        worlds, steps, voxel, cells, capture, mass, mode, mpm_substeps, particle_stride = 2, 60, 0.02, "auto", 1, \
-            "effective", "staggered", 1, 1000
-
-    return mod, [mod.run_metalsim(A) for _ in range(2)]
+    return {"gs": [mod.run_metalsim(_box_args("auto")) for _ in range(2)],
+            "jacobi": mod.run_metalsim(_box_args("jacobi"))}
 
 
 def test_box_sinks_as_isaac_coupling(box_runs):
-    """A box dropped on sand follows Isaac Lab's coupling path (Newton 1.5.2 SolverCoupledProxy with SolverMuJoCo,
-    recorded with box_on_sand.py): box height within 20 um and the sand's vertical force on the box within 1 N at
-    every step of the impact (peaks ~120 N) and the settling; late in the run the sand carries the box's weight."""
-    _, (r, _) = box_runs
-    ref = json.loads((RUNS / "box_on_sand" / "box_w2b_summary.json").read_text())
+    """A box dropped on sand follows Isaac Lab's coupling path (Newton 1.5.2 SolverCoupledProxy: SolverMuJoCo +
+    SolverImplicitMPM, staggered proxy with MuJoCo's effective mass; recorded by box_on_sand.py in .venv-newton152,
+    runs/mpm_main/box_on_sand/box_jacobi_newton.json). Until the box reaches the sand every particle is bitwise
+    Newton's; afterwards the rigid stacks differ (MuJoCo Warp 3.14 vs 3.11) by rounding only: box height within
+    20 um and the sand's vertical force within 1 N at every step (impact peaks ~120 N); the sand ends up carrying
+    the box's weight."""
+    r = box_runs["jacobi"]
+    ref = json.loads((RUNS / "box_on_sand" / "box_jacobi_newton.json").read_text())
     n = r["pos"].shape[0]
-    zr = np.asarray(ref["newton_pos"])[:n, :, 2]
-    fr = np.asarray(ref["newton_wrench"])[:n, :, 2]
-    assert np.abs(r["pos"][:, :, 2] - zr).max() < 2e-5
-    assert np.abs(r["wrench"][:, :, 2] - fr).max() < 1.0
+    fr = np.asarray(ref["wrench"])[:n]
+    contact = int(np.argmax(np.abs(fr[:, :, 2]).max(1) > 0))
+    assert contact > 5
+    assert r["phash"][:contact].tolist() == ref["phash"][:contact]
+    assert np.abs(r["pos"][:, :, 2] - np.asarray(ref["pos"])[:n, :, 2]).max() < 2e-5
+    assert np.abs(r["wrench"][:, :, 2] - fr[:, :, 2]).max() < 1.0
     assert np.allclose(r["wrench"][n - 20:, :, 2].mean(0), 2.0 * 9.81, rtol=0.15)
 
 
 def test_coupled_repeatable(box_runs):
-    """Two runs of the coupled scene (captured steps) are bitwise identical: box state and every particle."""
-    _, (a, b) = box_runs
+    """Two runs of the coupled scene with Gauss-Seidel and separate worlds (captured steps) are bitwise identical:
+    box state, sand wrench and every particle (needs the fork's environment-first coloring fix)."""
+    a, b = box_runs["gs"]
     assert np.array_equal(a["pos"], b["pos"]) and np.array_equal(a["qvel"], b["qvel"])
+    assert np.array_equal(a["wrench"], b["wrench"])
     assert (a["phash"] == b["phash"]).all()
+
+
+def test_gs_coloring_valid_separate_worlds():
+    """The Gauss-Seidel coloring with separate worlds on a sparse grid is a valid coloring: within a color no two
+    strain nodes write the same velocity node, and every strain node is solved once per sweep."""
+    _metal()
+    out = subprocess.run([sys.executable, str(ROOT / "metalsim/physics/mpm/probes/gs_coloring_check.py"),
+                          "--device", "metal:0", "--worlds", "3", "--cells", "auto"], capture_output=True, text=True)
+    assert out.stdout.strip().endswith("VALID") and "INVALID" not in out.stdout, out.stdout + out.stderr[-2000:]
+
+
+@pytest.mark.parametrize("worlds", [1, 64])
+def test_repeatable_at_scale(worlds):
+    """The coupled scene (box on a small bed) repeats bitwise run to run at 1 and 64 worlds (1,024 worlds: the batch
+    job behind runs/mpm_main/scale/)."""
+    _metal()
+    out = subprocess.run([sys.executable, str(ROOT / "metalsim/physics/mpm/probes/scale_coupled.py"), "--worlds",
+                          str(worlds), "--steps", "40", "--runs", "2"], capture_output=True, text=True)
+    res = json.loads(out.stdout.strip().splitlines()[-1])
+    assert res["repeatable"] and res["finite"], res
+
+
+def test_render_sand():
+    """The material renders from the solver's particle buffer (no host copy) in tier 0: grain pixels in the
+    segmentation of every world."""
+    _metal()
+    import mujoco
+
+    from metalsim.physics.batch import BatchSim
+    from metalsim.physics.mpm.coupled import SAND, GridEmitter, MPMConfig, MPMCoupling
+    from metalsim.render.tier0 import Tier0Renderer
+
+    xml = """<mujoco><worldbody><light directional="true" pos="0 0 3" dir="0.2 0.3 -1"/>
+    <camera name="cam" pos="0.4 -0.4 0.35" xyaxes="0.707 0.707 0 -0.4 0.4 0.82" fovy="45"/>
+    <geom type="plane" size="1 1 .1" rgba=".3 .3 .3 1"/></worldbody></mujoco>"""
+    m = mujoco.MjModel.from_xml_string(xml)
+    sim = BatchSim(m, 2)
+    mpm = MPMCoupling(sim, MPMConfig(voxel_size=0.02, max_iterations=20))
+    mpm.add_emitter(GridEmitter(lower=(-0.1, -0.1, 0.0), upper=(0.1, 0.1, 0.06), material=SAND))
+    mpm.finalize()
+    for _ in range(3):
+        mpm.step()
+    sim.synchronize()
+    r0 = Tier0Renderer(m, 2, width=96, height=96, camera="cam", outputs=("rgb", "seg"))
+    mpm.attach_renderer(r0, grains_per_particle=2)
+    seg = r0.render_host([sim.get_world(w) for w in range(2)])["seg"]
+    grains = seg == r0.G + 1
+    assert grains[0].sum() > 500 and grains[1].sum() > 500
+
+
+def test_pile_angle_of_repose():
+    """A sand column (Isaac Lab's material, friction 0.68: internal friction angle 34 deg) released on a MuJoCo
+    floor comes to rest as a cone whose flank angle lies within 10 deg of the friction angle."""
+    _metal()
+    out = subprocess.run([sys.executable, str(ROOT / "metalsim/physics/mpm/probes/pile_repose.py"), "--seconds",
+                          "1.5"], capture_output=True, text=True)
+    res = json.loads(out.stdout[out.stdout.index("{"):])
+    assert res["at_rest"], res
+    assert abs(res["worlds"][0]["angle_deg"] - res["friction_angle_deg"]) < 10.0, res
 
 
 def test_free_fall_momentum():
     """Material in free fall above the floor gains the momentum gravity gives it: mean velocity -g t, nothing
     sideways (no collider reached)."""
-    wp = _metal()
+    _metal()
     import mujoco
 
     from metalsim.physics.batch import BatchSim, BatchSimOptions

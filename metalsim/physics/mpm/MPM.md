@@ -851,7 +851,45 @@ has Newton 1.7, whose own implicit MPM is a later algorithm than Isaac Lab 3.0-E
 fork's solver package as a generated, Apache-2.0 copy in `metalsim/physics/mpm/implicit_mpm/` (licence and the list of
 modifications: its `NOTICE.txt`, `THIRD_PARTY_NOTICES.md`). `metalsim.physics.mpm.solver.solver_class()` returns
 Newton's own `SolverImplicitMPM` on the 1.5.2 line (`.venv-newton152`) and the copy elsewhere
-(`METALSIM_MPM_SOLVER=newton|vendored` forces one); `newton_compat.install` patches both.
+(`METALSIM_MPM_SOLVER=newton|vendored` forces one); `newton_compat.install` patches both. The copy run against Newton
+1.7 is bitwise Newton 1.5.2's own solver (column a = 1, every frame, positions, velocities and iteration counts;
+`runs/mpm_main/vendored_bitwise/`, `tests/test_mpm_main.py::test_vendored_column_bitwise_newton152`).
+
+### Using it
+
+```python
+from metalsim.physics.batch import BatchSim, BatchSimOptions
+from metalsim.physics.mpm.coupled import MPMCoupling, MPMConfig, MPMMaterial, GridEmitter, PointsEmitter, SAND
+
+sim = BatchSim(model, num_envs=64, options=BatchSimOptions(substeps=3))     # the coupled step = one BatchSim step
+mpm = MPMCoupling(sim, MPMConfig(voxel_size=0.02))   # Isaac's MPMSolverCfg fields + coupling settings
+mpm.add_emitter(GridEmitter(lower=(-.1, -.1, 0), upper=(.1, .1, .05), material=SAND))   # Isaac's MPMGridCfg
+mpm.set_colliders(bodies=["foot_l", "foot_r"])       # optional: which MuJoCo bodies are coupled (default: all moving)
+mpm.finalize()
+v = mpm.step()                                       # instead of sim.step(); returns sim.event's value
+renderer = Tier2Renderer(model, 64, ...); mpm.attach_renderer(renderer)   # grains from the solver's buffer
+mpm.wrenches(); mpm.particles(); mpm.reset(mask); mpm.check_status()
+```
+
+`metalsim/physics/mpm/coupled.py` documents the exchange: Isaac Lab's `SolverCoupledProxy` semantics (proxy bodies
+with MuJoCo's effective mass, staggered or lagged, the solver's own fixed-order wrench harvest into `xfrc_applied`,
+the caller's `xfrc_applied` restored after the step), `proxy_mass="effective" | "body" | "kinematic"`,
+`harvest="last_substep"` (Isaac) or `"mean"`. Colliders are the MuJoCo geoms (`colliders.py`: box, sphere, capsule,
+cylinder, plane, mesh, ellipsoid as a mesh); static geoms are static colliders. Nothing in `BatchSim` changes, and
+building an MPM scene changes no process-wide Warp setting (`test_main_sim_settings_untouched`).
+
+### Gauss-Seidel with separate worlds (Newton fork fix)
+
+Two identical multi-world runs differed from the first step whenever the rheology solve was Gauss-Seidel (`"auto"`,
+Newton's default) on a sparse grid with `separate_worlds`, in Newton's own 1.5.2 solver as in the copy; Jacobi
+(Isaac Lab's Franka-Pour) and single-world runs repeated bitwise (`runs/mpm_main/repeat/`). Cause: the color blocks of
+a discontinuous strain basis (P0) are built as `cell * nodes_per_cell`, while environment-first strain partitions
+number a cell's nodes in environment-major order. A NanoVDB environment grid does not store cells environment by
+environment (negative coordinates sort after positive ones), so the blocks were a permutation of other cells' nodes and
+strain nodes solved concurrently in one color shared velocity nodes: a data race, on CUDA as on Metal. Fixed on the
+fork (blocks from each cell's partition node index; single-environment grids keep the old kernel) and re-pinned;
+`probes/gs_coloring_check.py` checks the coloring (no write conflicts within a color, every strain node once per
+sweep).
 
 ### Re-vendoring when the fork pin moves
 

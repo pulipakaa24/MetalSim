@@ -26,8 +26,8 @@ BED_LO, BED_HI = (-0.15, -0.15, 0.0), (0.15, 0.15, 0.08)
 SAND = dict(density=1500.0, friction=0.7)
 
 
-def mpm_settings(voxel):
-    return dict(voxel_size=voxel, max_iterations=50, tolerance=1.0e-4, solver="auto", warmstart_mode="auto",
+def mpm_settings(voxel, solver="auto"):
+    return dict(voxel_size=voxel, max_iterations=50, tolerance=1.0e-4, solver=solver, warmstart_mode="auto",
                 collider_velocity_mode="forward", grid_type="sparse", grid_padding=0, transfer_scheme="apic",
                 integration_scheme="pic", critical_fraction=0.0, air_drag=1.0, collider_basis="S2",
                 strain_basis="P0", velocity_basis="Q1")
@@ -41,14 +41,13 @@ XML = f"""<mujoco><option timestep="{DT / ARM_SUBSTEPS!r}" integrator="implicitf
 
 def run_metalsim(a):
     import mujoco
-    import warp as wp
 
     from metalsim.physics.batch import BatchSim, BatchSimOptions
     from metalsim.physics.mpm.coupled import GridEmitter, MPMConfig, MPMCoupling, MPMMaterial
 
     model = mujoco.MjModel.from_xml_string(XML)
     sim = BatchSim(model, a.worlds, options=BatchSimOptions(substeps=ARM_SUBSTEPS))
-    s = mpm_settings(a.voxel)
+    s = mpm_settings(a.voxel, getattr(a, "solver", "auto"))
     cfg = MPMConfig(**s, max_active_cell_count=a.cells, capture=bool(a.capture), proxy_mass=a.mass, mode=a.mode,
                     mpm_substeps=a.mpm_substeps)
     mpm = MPMCoupling(sim, cfg)
@@ -103,7 +102,7 @@ def run_newton(a):
         b.end_world()
     with wp.ScopedDevice("metal:0"):
         m = b.finalize()
-        s = mpm_settings(a.voxel)
+        s = mpm_settings(a.voxel, getattr(a, "solver", "auto"))
         cfg = SolverImplicitMPM.Config(**s)
         ppw = m.particle_count // a.worlds
         cfg.max_active_cell_count = ((ppw + 511) // 512) * 512 * a.worlds if a.cells == "auto" else int(a.cells)
@@ -200,8 +199,10 @@ def main():
     ap.add_argument("--capture", type=int, default=0)
     ap.add_argument("--mass", default="effective")
     ap.add_argument("--mode", default="staggered")
+    ap.add_argument("--solver", default="auto")
     ap.add_argument("--mpm-substeps", type=int, default=1)
     ap.add_argument("--particle-stride", type=int, default=10)
+    ap.add_argument("--summary", help="also write box pose, sand wrench and particle hashes per step as JSON")
     a = ap.parse_args()
     if a.compare:
         compare(*a.compare)
@@ -214,6 +215,12 @@ def main():
     with wp.ScopedDevice("metal:0"):
         r = run_metalsim(a) if a.engine == "metalsim" else run_newton(a)
     np.savez_compressed(a.out, **r)
+    if a.summary:
+        import json
+
+        json.dump({"engine": a.engine, "solver": a.solver, "worlds": a.worlds, "steps": a.steps, "pos": r["pos"].tolist(),
+                   "qvel": r["qvel"].tolist(), "wrench": r["wrench"].tolist(), "phash": r["phash"].tolist()},
+                  open(a.summary, "w"))
     print(a.engine, "box z final", r["pos"][-1][:, 2], "particles finite", bool(np.isfinite(r["particles_last"]).all()))
 
 

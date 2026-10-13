@@ -23,7 +23,6 @@ import pathlib
 import re
 import sys
 import tarfile
-import tempfile
 import urllib.request
 
 PIN = "3fd1f052a5ad031578960d9642aaaedc03834e4d"
