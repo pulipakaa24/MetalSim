@@ -1,0 +1,14 @@
+[health] 12:45:27 before build_n300000: device 0% renderer 0% tiler 0% (after 0 s), recoveryCount 0, E-state []
+[step] 12:45:27 queue build_n300000: --timing --width 256 --height 144 --spp 1 --max-particles 300000
+[step] 12:45:46 build_n300000 exit 0
+  [build_n300000] [timing] 232609 particles, 6280443 grains: upload + structure build 116 ms (structure 1325 MiB)
+  [build_n300000] [timing] rebuild (structure allocated): 77 ms
+  [build_n300000] [timing] tracing one pass of 1 spp at 256x144 ...
+  [build_n300000] [timing] build + one pass of 1 spp at 256x144: 81 ms
+  [build_n300000] [ramp] {"mode": "two_level", "chunk": 16777215, "grains": 6280443, "top_instances": 55, "chunk_instances": [6280443], "max_instances_per_structure": 6280443, "standard_limit": 16777216, "within_standard": true, "extended_usage": false, "structures_mib": 1324.9, "grain_structures_mib": 1324.9, "metal_allocated_mib": 2902.4, "peak_rss_mib": 4722.1, "wall_s": 9.1}
+  [build_n300000] [watchdog] exit 0 after 10 s
+  [gpu_run] sand25m16_build_n300000 start: device utilisation 0% (12:45:30)
+  [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
+  [gpu_run] sand25m16_build_n300000 end: device utilisation 95% (12:45:43), exit 0
+  [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
+[health] 12:45:46 after build_n300000: device 0% renderer 0% tiler 0% (after 0 s), recoveryCount 0, E-state []
