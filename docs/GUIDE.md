@@ -166,6 +166,29 @@ python -m metalsim.learn.cartpole_rgb 1024      # rollout throughput per render 
 `--tier` selects the renderer (0 raster, 1 hybrid ray tracing, 2 path tracing; `--spp` and
 `--bounces` for tier 2), `--checkpoint out.pt` saves the policy, `--seed` sets the seed.
 
+### Cameras on cloth, cables, tendons, skins and sites
+
+Every renderer and ray-traced sensor draws what MuJoCo's own renderer draws besides geoms, under MuJoCo's default
+`mjvOption`: sites in the visible groups, flexes (cloth and soft volumes as their skin offset by the flex radius,
+cables as edge cylinders), skins and spatial tendons (`metalsim/render/extras.py`). Their vertices are generated on
+the GPU each frame from the simulation state, per env (`metalsim/render/dynamic_mesh.py`), so nothing extra is needed
+for a MuJoCo Warp flex scene (`BatchSim`, `DeformableSim`). Other simulators pass their vertex arrays:
+
+```python
+from metalsim.render.extras import DeformableMesh
+r = Tier0Renderer(flex_model, n, camera="cam", outputs=("rgb", "depth", "seg"))
+r.render(xpbd, sources={"flexvert_xpos": xpbd.x})            # XPBDSim: the model's flexes, XPBD's vertices
+cloth = DeformableMesh("cloth", mesh.tris, len(mesh.x), rgba=(0.2, 0.5, 0.9, 1))
+r = Tier0Renderer(model, n, camera="cam", deformables=[cloth])
+r.render(sim, sources={"cloth": physx_cloth.x})              # PhysXClothSim (or any (N, V, 3) Warp array)
+```
+
+A simulator without an event (`DeformableSim`, `XPBDSim`, `PhysXClothSim`) is synchronized by the caller before the
+render. `visual=` takes an `mujoco.MjvOption` (groups and flags as in MuJoCo's viewer); `visual=False` draws geoms
+only, as before. In segmentation (geom mode) the j-th extra object has id `ngeom + 1 + j` (`r.tables.extras`); the
+Isaac-style annotators report them as unlabelled instances with their own `instance_id`. Isaac does not draw MuJoCo
+sites, tendons or skins (docs/RENDER_COVERAGE.md §5).
+
 ### Lidar navigation
 
 A MetalSim task (Isaac Lab has no lidar RL benchmark): a wheeled base reaches a goal among random
@@ -176,6 +199,18 @@ python -m metalsim.learn.lidar_nav 1024 300 runs/lidar_nav.log runs/policies/lid
 ```
 
 Arguments are positional: `[num_envs] [iterations] [log] [checkpoint.pt]`.
+
+### Rendering particles (MPM sand)
+
+Both renderers draw particles as render grains (small irregular grain meshes, several per particle, per-grain
+colour), in the path tracer's acceleration structure and in tier 0's raster pass:
+
+```python
+renderer.set_particles(state.particle_q, radius=0.005, grains_per_particle=27)   # numpy or a Warp array on Metal
+```
+
+Details, options and limits: `metalsim/render/PARTICLES.md`. A path-traced demo of Newton's ANYmal-on-sand MPM
+example: `scripts/particle_demo/` (`sim_anymal.py` records it, `render_anymal.py` renders it).
 
 ## 3. Bringing your own robot
 
@@ -360,6 +395,19 @@ python -m metalsim.learn.g1_preflight --envs 1024 --engine newton --newton_it 4 
 
 The decision and the measurements behind it are in `GAPS.md` ("Newton XPBD: archived") and
 [`PARITY.md` §2.1](PARITY.md#21-contact-model-what-mujoco-can-do-and-newton-xpbd-on-metal-measured-2026-09-24-newton-xpbd-archived-as-experimental-on-2026-09-25-see-gapsmd).
+
+**Cameras on Newton scenes.** `metalsim.render.newton_bridge.NewtonRenderSource(model)` turns any Newton model into
+the `sim` argument of the renderers (tiers 0/1/2), the ray-traced sensors and the annotators:
+
+- It compiles a render twin from the Newton shapes, or uses the source MJCF with `twin=mj_model` for the
+  MuJoCo-via-Newton path.
+- Each frame, `update(state)` writes the poses from `State.body_q` on the GPU. Each env sees its own world plus the
+  global shapes.
+- Cloth, soft-body surfaces and particles go through the dynamic-mesh and particle paths:
+  `renderer_kwargs()`, `sources`, `attach_particles`.
+
+Design, coverage against the MuJoCo path, cost and the differences from Isaac Lab 3.0 are in
+[`NEWTON_RENDER.md`](NEWTON_RENDER.md).
 
 ## 6. Throughput vs fidelity
 
