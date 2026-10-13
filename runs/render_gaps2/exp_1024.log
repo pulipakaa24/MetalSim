@@ -1,0 +1,31 @@
+[gpu_run] rg2_exp start: device utilisation 0% (00:49:12)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 5 %; per-process GPU time over 1.8 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.7 %
+== tier1 t1 {}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "defaults", "tree": "t1 {}", "ms": 17.974}
+== tier1 t1 {"EXP_SHARED_LIGHTS":1}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "defaults", "tree": "t1 {\"EXP_SHARED_LIGHTS\":1}", "ms": 18.169}
+== tier1 t1 {"EXP_NO_GRID_PLANE":1}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "defaults", "tree": "t1 {\"EXP_NO_GRID_PLANE\":1}", "ms": 15.104}
+== tier1 t1 {"EXP_NO_REACH":1}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "defaults", "tree": "t1 {\"EXP_NO_REACH\":1}", "ms": 18.088}
+== tier1 t1 {"EXP_NO_REFL_PLANE":1}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "defaults", "tree": "t1 {\"EXP_NO_REFL_PLANE\":1}", "ms": 17.883}
+== tier1 t1 {"EXP_SHARED_LIGHTS":1,"EXP_NO_GRID_PLANE":1,"EXP_NO_REACH":1,"EXP_NO_REFL_PLANE":1}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "defaults", "tree": "t1 {\"EXP_SHARED_LIGHTS\":1,\"EXP_NO_GRID_PLANE\":1,\"EXP_NO_REACH\":1,\"EXP_NO_REFL_PLANE\":1}", "ms": 14.894}
+== tier2 t2 {}
+{"scene": "cloth", "renderer": "tier2", "envs": 1024, "res": 64, "config": "defaults", "tree": "t2 {}", "ms": 28.179}
+== tier2 t2 {"EXP_SHARED_LIGHTS":1}
+{"scene": "cloth", "renderer": "tier2", "envs": 1024, "res": 64, "config": "defaults", "tree": "t2 {\"EXP_SHARED_LIGHTS\":1}", "ms": 27.649}
+== tier2 t2 {"EXP_NO_GRID_PLANE":1}
+{"scene": "cloth", "renderer": "tier2", "envs": 1024, "res": 64, "config": "defaults", "tree": "t2 {\"EXP_NO_GRID_PLANE\":1}", "ms": 20.182}
+== tier2 t2 {"EXP_NO_HAZE":1}
+{"scene": "cloth", "renderer": "tier2", "envs": 1024, "res": 64, "config": "defaults", "tree": "t2 {\"EXP_NO_HAZE\":1}", "ms": 25.613}
+== tier2 t2 {"EXP_NO_ANYHIT":1}
+{"scene": "cloth", "renderer": "tier2", "envs": 1024, "res": 64, "config": "defaults", "tree": "t2 {\"EXP_NO_ANYHIT\":1}", "ms": 25.379}
+== tier2 t2 {"EXP_SHARED_LIGHTS":1,"EXP_NO_GRID_PLANE":1,"EXP_NO_HAZE":1,"EXP_NO_ANYHIT":1}
+{"scene": "cloth", "renderer": "tier2", "envs": 1024, "res": 64, "config": "defaults", "tree": "t2 {\"EXP_SHARED_LIGHTS\":1,\"EXP_NO_GRID_PLANE\":1,\"EXP_NO_HAZE\":1,\"EXP_NO_ANYHIT\":1}", "ms": 18.474}
+[gpu_run] rg2_exp end: device utilisation 99% (00:51:24), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 5 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       3.9 %
+[gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.8 %

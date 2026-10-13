@@ -58,9 +58,11 @@ class RayTracer:
                  dyn_rebuild_every: int = 32, dyn_layout: str | None = None,
                  env_layout: str | None = None, env_margin: float | None = None,
                  infinite_planes: bool = True, hfield_skirts: bool = True, per_world_size: bool = True,
+                 tendons: str = "mujoco",
                  ctx: MetalContext | None = None, device="metal:0"):
         """``terrain_slots`` / ``draw_hfields`` / ``appearance``: see ``Tier0Renderer`` (False / "legacy" = the
-        previous behaviour).
+        previous behaviour). ``tendons``: "mujoco" (MuJoCo's catenary for slack two-site tendons, limit colour) or
+        "straight" (capsules between the wrap points only, before 2026-10-13); see ``Tier0Renderer``.
 
         ``visual`` / ``deformables`` / ``tube_slices`` / ``cap_stacks``: the non-geom objects MuJoCo's renderer draws
         (sites, flexes, skins, spatial tendons) and user deformable meshes; see ``Tier0Renderer``. Each dynamic object
@@ -180,7 +182,8 @@ class RayTracer:
                 lod = tube_tessellation(model, t, tube_view[0], self.tube_resolution)
             self.tube_lod = lod
             self.dyn = DynamicMeshes(self.ctx, model, t, n_envs, tpr=self.tpr, stride=0.0, rbase=nv_static,
-                                     vbuf=False, tube_slices=tube_slices, cap_stacks=cap_stacks, tube_lod=lod)
+                                     vbuf=False, tube_slices=tube_slices, cap_stacks=cap_stacks, tube_lod=lod,
+                                     tendons=tendons)
             exp = self.dyn.expanded_indices()
             verts = np.zeros((nv_static + self.dyn.n_records, 8), np.float32)
             verts[:nv_static] = t.vertices
@@ -244,7 +247,7 @@ class RayTracer:
         self.consts_buf = c.buffer(self.consts.nbytes, self.consts, "rt_consts")
         self.grid_flag = c.buffer(16, np.zeros(4, np.uint32), "rt_grid_flag")
         self.grid_growths = 0
-        lib = c.library("rt", {"DYN_SBVH": 1} if self.dyn is not None and self.dyn_layout == "sbvh" else None)
+        lib = c.library("rt", self._defines(self.dyn is not None and self.dyn_layout == "sbvh") or None)
         self.p_refit = c.compute_pipeline(lib, "refit_instances")
         self.p_lidar = c.compute_pipeline(lib, "lidar")
         self.p_lidar_ext = c.compute_pipeline(lib, "lidar_ext")
@@ -439,12 +442,15 @@ class RayTracer:
         from metalsim.render.model_sync import model_fields
         return self.sized.encode(cb, gm_buf, gm_off, getattr(model_fields(sim), "geom_size", None))
 
-    def encode_pose(self, cb, sim, gx_buf, gx_off, gm_buf, gm_off):
-        """The pose rows to refit from: the geoms' (as given), then the drawn sites' when the scene has site slots."""
+    def encode_pose(self, cb, sim, gx_buf, gx_off, gm_buf, gm_off, sites=None):
+        """The pose rows to refit from: the geoms' (as given), then the drawn sites' when the scene has site slots
+        (``sites``: ((buffer, offset) of site_xpos, of site_xmat) instead of ``sim.d``'s)."""
         if self.pose is None:
             return gx_buf, gx_off, gm_buf, gm_off
-        sx, sm = wm.buffer_of(sim.d.site_xpos), wm.buffer_of(sim.d.site_xmat)
-        (xb, xo), (mb, mo) = self.pose.encode(cb, (gx_buf, gx_off), (gm_buf, gm_off), (sx.buffer, sx.offset), (sm.buffer, sm.offset))
+        if sites is None:
+            sx, sm = wm.buffer_of(sim.d.site_xpos), wm.buffer_of(sim.d.site_xmat)
+            sites = ((sx.buffer, sx.offset), (sm.buffer, sm.offset))
+        (xb, xo), (mb, mo) = self.pose.encode(cb, (gx_buf, gx_off), (gm_buf, gm_off), sites[0], sites[1])
         return xb, xo, mb, mo
 
     def set_sources(self, sim=None, sources=None, datas=None):
@@ -544,9 +550,17 @@ class RayTracer:
         if self.dyn_bvh is not None:
             (enc.setFragmentBuffer_offset_atIndex_ if fragment else enc.setBuffer_offset_atIndex_)(self.dyn_bvh.args, 0, index)
 
+    def _defines(self, sbvh: bool) -> dict:
+        d = {"DYN_SBVH": 1} if sbvh else {}
+        n_planes = len(self.grid.planes) if self.grid.clip else 0
+        if n_planes < 4:            # env_grid.h GRID_PLANES: the infinite-plane continuation sized to the scene
+            d["GRID_PLANES"] = n_planes
+        return d
+
     def shader_defines(self):
-        """Preprocessor defines of the ray kernels for this tracer's dynamic layout ({} = the plain kernels)."""
-        return {"DYN_SBVH": 1} if self.dyn_bvh is not None else {}
+        """Preprocessor defines of the ray kernels: the dynamic layout (DYN_SBVH) and the number of infinite planes
+        continued past the env's cell (GRID_PLANES, env_grid.h; 0 compiles the continuation out)."""
+        return self._defines(self.dyn_bvh is not None)
 
     # -- sensors ------------------------------------------------------------------------------------
 

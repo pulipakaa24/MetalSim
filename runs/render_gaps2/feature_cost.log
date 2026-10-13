@@ -1,0 +1,81 @@
+[gpu_run] rg2_cost start: device utilisation 0% (01:15:59)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 5 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.7 %
+[gpu_run] gpu_top:   pid    413 loginwindow                        1.9 %
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth dc949da load on device 'metal:0' took 63.02 ms  (cached)
+Module _nxn_broadphase__locals__kernel_80a41a9c 80a41a9 load on device 'metal:0' took 41.11 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_fb16fd41 fb16fd4 load on device 'metal:0' took 2782.56 ms  (compiled)
+Module ccd_kernel_builder__locals__ccd_kernel_b7694466 b769446 load on device 'metal:0' took 2440.53 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_a532c142 a532c14 load on device 'metal:0' took 2473.55 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_9ef912f9 9ef912f load on device 'metal:0' took 1223.44 ms  (compiled)
+Module mujoco_warp._src.constraint 4b2565f load on device 'metal:0' took 39.86 ms  (cached)
+Module _friction_dof__locals__kernel_54b217fe 54b217f load on device 'metal:0' took 41.18 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_b316a999 b316a99 load on device 'metal:0' took 39.86 ms  (cached)
+Module _efc_contact_init__locals__kernel_1d2a56f7 1d2a56f load on device 'metal:0' took 39.44 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_4199f103 a26dd4c load on device 'metal:0' took 40.10 ms  (cached)
+Module _efc_contact_update__locals__kernel_c1a7040e c1a7040 load on device 'metal:0' took 42.36 ms  (cached)
+Module mujoco_warp._src.forward 53c9939 load on device 'metal:0' took 54.90 ms  (cached)
+Module mujoco_warp._src.passive 121cefe load on device 'metal:0' took 53.06 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_ec74e588 ec74e58 load on device 'metal:0' took 39.18 ms  (cached)
+Module mujoco_warp._src.forward 9c6583c load on device 'metal:0' took 52.38 ms  (cached)
+Module _qfrc_smooth__locals__kernel_b9a126c0 b9a126c load on device 'metal:0' took 39.69 ms  (cached)
+Module mujoco_warp._src.support d1f2881 load on device 'metal:0' took 39.48 ms  (cached)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_db2d2058 29b79ab load on device 'metal:0' took 479.71 ms  (compiled)
+Module _solve_init_dof__locals__kernel_a278b607 a278b60 load on device 'metal:0' took 38.31 ms  (cached)
+Module _solve_init_efc__locals__kernel_38f8708b 38f8708 load on device 'metal:0' took 38.67 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_39ca6b8f 39ca6b8 load on device 'metal:0' took 396.06 ms  (compiled)
+Module mul_m_kernel__locals___mul_m_1b897f73 1b897f7 load on device 'metal:0' took 40.46 ms  (cached)
+Module _update_constraint_efc__locals__kernel_875e0cfe 875e0cf load on device 'metal:0' took 40.28 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_9318117e 9318117 load on device 'metal:0' took 38.93 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_be8f77c5 be8f77c load on device 'metal:0' took 39.40 ms  (cached)
+Module _update_gradient_grad__locals__kernel_b82c9bc8 b82c9bc load on device 'metal:0' took 39.22 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_2d569394 2e0fabf load on device 'metal:0' took 478.81 ms  (compiled)
+Module mujoco_warp._src.solver 00c4ab6 load on device 'metal:0' took 520.72 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_be868267 1298a9c load on device 'metal:0' took 487.20 ms  (compiled)
+Module _linesearch_iterative_kernel__locals__kernel_d18c6f6f 1d241c3 load on device 'metal:0' took 651.12 ms  (compiled)
+Module _update_constraint_gradient_fused__locals__kernel_02be9854 59d5db2 load on device 'metal:0' took 482.85 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_2e9bcdab 594907d load on device 'metal:0' took 483.91 ms  (compiled)
+Module _solve_done__locals__kernel_f1d63dbf f1d63db load on device 'metal:0' took 347.00 ms  (cached)
+Module _next_time_builder__locals___next_time_89d592b4 89d592b load on device 'metal:0' took 345.07 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_99f1ed31 99f1ed3 load on device 'metal:0' took 329.63 ms  (cached)
+Module reset_data__locals__reset_M_c0d46912 c0d4691 load on device 'metal:0' took 332.65 ms  (cached)
+Module reset_data__locals__reset_mocap_21cdccdf 21cdccd load on device 'metal:0' took 336.09 ms  (cached)
+Module reset_data__locals__reset_contact_e7d9f88d e7d9f88 load on device 'metal:0' took 358.82 ms  (cached)
+Module reset_data__locals__reset_sleep_c3616e3d c3616e3 load on device 'metal:0' took 335.85 ms  (cached)
+Module reset_data__locals__reset_nworld_f3f460ae f3f460a load on device 'metal:0' took 351.63 ms  (cached)
+{"item": "haze", "renderer": "T0", "envs": 1024, "haze": true, "ms": 123.553}
+{"item": "haze", "renderer": "T0", "envs": 1024, "haze": false, "ms": 123.512}
+{"item": "haze", "renderer": "T1", "envs": 256, "haze": true, "ms": 33.902}
+{"item": "haze", "renderer": "T1", "envs": 256, "haze": false, "ms": 33.063}
+{"item": "haze", "renderer": "T2", "envs": 64, "haze": true, "ms": 2.676}
+{"item": "haze", "renderer": "T2", "envs": 64, "haze": false, "ms": 2.425}
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a5314e27bee02c142/scripts/diagnostics/render_gaps2_cost.py", line 144, in <module>
+    main()
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a5314e27bee02c142/scripts/diagnostics/render_gaps2_cost.py", line 136, in main
+    for row in globals()["rows_" + it]():
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a5314e27bee02c142/scripts/diagnostics/render_gaps2_cost.py", line 76, in rows_skirts
+    m, sim, _, _ = rough_scene(1024)
+                   ^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a5314e27bee02c142/scripts/diagnostics/terrain_render_cost.py", line 35, in rough_scene
+    m, info = build_g1_model("rough", hf, visuals=visuals)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a5314e27bee02c142/metalsim/learn/g1_velocity.py", line 95, in build_g1_model
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a5314e27bee02c142/metalsim/scene/usd_to_mjcf.py", line 37, in load_usd
+    stage = Usd.Stage.Open(path)
+            ^^^^^^^^^^^^^^^^^^^^
+pxr.Tf.ErrorException: 
+	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-a5314e27bee02c142/assets/isaac/G1/g1_minimal.usd@'
+[gpu_run] rg2_cost end: device utilisation 0% (01:16:52), exit 1
+[gpu_run] gpu_top: GPU (ioreg): device utilization 5 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.8 %

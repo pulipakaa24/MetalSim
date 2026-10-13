@@ -1,0 +1,66 @@
+[gpu_run] perf_t1_cloth1024 start: device utilisation 0% (00:44:00)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 5 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.7 %
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth 236164f load on device 'metal:0' took 60.21 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_79431230 7943123 load on device 'metal:0' took 40.14 ms  (cached)
+Module mujoco_warp._src.collision_flex a7e6f73 load on device 'metal:0' took 41.52 ms  (cached)
+Module mujoco_warp._src.collision_core 54378fb load on device 'metal:0' took 38.36 ms  (cached)
+Module _flex_plane_narrowphase__locals__kernel_cb69961e cb69961 load on device 'metal:0' took 38.72 ms  (cached)
+Module _flex_geom_vertex_narrowphase_detect__locals__kernel_b5d6bbfa b5d6bbf load on device 'metal:0' took 53.15 ms  (cached)
+Module _flex_narrowphase_elem_detect__locals__kernel_815fa6c8 815fa6c load on device 'metal:0' took 65.63 ms  (cached)
+Module _populate_group_starts__locals__kernel_8a83c6e4 8a83c6e load on device 'metal:0' took 37.34 ms  (cached)
+Module _serial_fps__locals__kernel_68ffeeb4 68ffeeb load on device 'metal:0' took 38.62 ms  (cached)
+Module _write_filtered_contacts__locals__kernel_9591b31b 9591b31 load on device 'metal:0' took 39.20 ms  (cached)
+Module _flex_sap_sweep__locals__kernel_263ad72a 263ad72 load on device 'metal:0' took 42.04 ms  (cached)
+Module _flex_narrowphase__locals__kernel_914218af 914218a load on device 'metal:0' took 52.25 ms  (cached)
+Module _flex_sap_sweep__locals__kernel_4a6cb370 4a6cb37 load on device 'metal:0' took 41.72 ms  (cached)
+Module mujoco_warp._src.constraint 9651fa9 load on device 'metal:0' took 37.87 ms  (cached)
+Module _equality_flex_reserve_e94facc2 e94facc load on device 'metal:0' took 38.13 ms  (cached)
+Module _equality_flex__locals__kernel_fa7834fb fa7834f load on device 'metal:0' took 38.82 ms  (cached)
+Module _friction_dof__locals__kernel_26e752dc 26e752d load on device 'metal:0' took 38.47 ms  (cached)
+Module _efc_contact_init_flex__locals__kernel_201beda7 201beda load on device 'metal:0' took 52.82 ms  (cached)
+Module _efc_contact_jac_sparse_flex__locals__kernel_7929f031 7929f03 load on device 'metal:0' took 52.80 ms  (cached)
+Module _efc_contact_update_flex__locals__kernel_0e6b0517 0e6b051 load on device 'metal:0' took 52.70 ms  (cached)
+Module mujoco_warp._src.sensor 4a3d484 load on device 'metal:0' took 60.30 ms  (cached)
+Module mujoco_warp._src.passive 93f6a35 load on device 'metal:0' took 51.20 ms  (cached)
+Module mujoco_warp._src.support 228ca00 load on device 'metal:0' took 39.78 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_0a48da70 0a48da7 load on device 'metal:0' took 38.11 ms  (cached)
+Module mul_m_kernel__locals___mul_m_b31cfe03 b31cfe0 load on device 'metal:0' took 38.76 ms  (cached)
+Module _energy_vel_kinetic__locals__energy_vel_kinetic_5253fe55 3cfd599 load on device 'metal:0' took 38.47 ms  (cached)
+Module _qfrc_smooth__locals__kernel_d964ae83 d964ae8 load on device 'metal:0' took 38.71 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_58eb966f a1938a0 load on device 'metal:0' took 39.71 ms  (cached)
+Module _solve_init_dof__locals__kernel_0d1e8120 0d1e812 load on device 'metal:0' took 38.44 ms  (cached)
+Module _solve_init_efc__locals__kernel_eae475a7 eae475a load on device 'metal:0' took 38.83 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_9f67922b 9f67922 load on device 'metal:0' took 39.33 ms  (cached)
+Module mul_m_kernel__locals___mul_m_9d9e67e2 9d9e67e load on device 'metal:0' took 39.44 ms  (cached)
+Module _update_constraint_efc__locals__kernel_56059dd7 56059dd load on device 'metal:0' took 38.80 ms  (cached)
+Module mujoco_warp._src.solver 49acc29 load on device 'metal:0' took 42.28 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_sparse__locals__kernel_3a57f947 3a57f94 load on device 'metal:0' took 39.53 ms  (cached)
+Module _small_cholesky_solve_block__locals__kernel_7ece7b66 029c31b load on device 'metal:0' took 38.47 ms  (cached)
+Module _linesearch_jv_fused_kernel__locals__kernel_8cede4f0 8cede4f load on device 'metal:0' took 38.31 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_230e61b2 d5fbe51 load on device 'metal:0' took 40.97 ms  (cached)
+Module _solve_beta_finalize_tiled__locals__kernel_fc3ebcb8 fc3ebcb load on device 'metal:0' took 38.91 ms  (cached)
+Module mujoco_warp._src.forward 7dfae56 load on device 'metal:0' took 51.86 ms  (cached)
+Module _next_time_builder__locals___next_time_b12108f6 b12108f load on device 'metal:0' took 40.05 ms  (cached)
+Module _solve_init_efc__locals__kernel_60abcb13 60abcb1 load on device 'metal:0' took 38.76 ms  (cached)
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "defaults", "ms": 17.934, "passes": [["render:bg_vs/bg_fs+geom_vs/geom_fs_rt+dyn_vs/geom_fs_rt", 10.321, 0.565], ["accel:-", 7.577, 0.415], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.173, 0.009], ["compute:untile", 0.165, 0.009], ["compute:sync_colors+sync_lights", 0.009, 0.0], ["compute:build_env_params", 0.007, 0.0], ["compute:refit_instances", 0.005, 0.0], ["compute:scale_geom_xmat", 0.004, 0.0]]}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "shadow_lights=caster", "ms": 16.092}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "transparency=False", "ms": 18.029}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "infinite_planes=False", "ms": 17.995}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "model_fields=False (no per-env light records)", "ms": 18.099}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "env_layout=legacy (no cell clipping)", "ms": 17.978}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "reverse_z=False", "ms": 17.938}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "appearance=legacy", "ms": 18.006}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "max_lights=8", "ms": 17.982}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "dyn_layout=sbvh", "ms": 29.037}
+{"scene": "cloth", "renderer": "tier1", "envs": 1024, "res": 64, "config": "all_off", "ms": 16.105, "passes": [["render:bg_vs/bg_fs+geom_vs/geom_fs_rt+dyn_vs/geom_fs_rt", 15.305, 0.658], ["accel:-", 7.586, 0.326], ["compute:copy_block+vnormal+emit_surface+emit_tube", 0.178, 0.008], ["compute:untile", 0.161, 0.007], ["compute:sync_colors+sync_lights", 0.015, 0.001], ["compute:build_env_params", 0.014, 0.001], ["compute:refit_instances", 0.005, 0.0]]}
+[gpu_run] perf_t1_cloth1024 end: device utilisation 99% (00:44:17), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 6 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       3.4 %
