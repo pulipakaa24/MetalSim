@@ -3,6 +3,10 @@
 What landed between 2026-09-22 and 2026-09-25, one line per commit, grouped by area and in
 commit order within each area (`git log` for the full messages). Dates are the commit dates (month-day).
 
+## Learning: checkpoint loading (2026-10-13, `docs/research/ppowarp_checkpoint_load_2026-10-13.md`)
+
+- 10-13 PPOWarp: a state dict loaded into `algo.net` is published to the Warp rollout policy (load_state_dict post-hook, same event ordering as `update()`); before, a replayed checkpoint ran the initial weights (`tests/test_ppo_warp_rollout.py::test_loaded_weights_reach_the_warp_policy`). Overflow-guard research note's trained-policy rows corrected and re-run; `scripts/diagnostics/g1_policy_replay.py`
+
 ## MPM, scalable determinism, rigid scale (2026-10-09 .. 11, `metalsim/physics/mpm/MPM.md`)
 
 - 10-11 MPM on Metal landed in the tree: `metalsim/physics/mpm` (compat layer, scenes, reports, probes), `tests/test_mpm.py`, Isaac-side recorders and stages, research (`docs/research/mpm_2026-10-09.md`, `reports/`, `research_notes/`), run logs and JSON (`runs/mpm`, `runs/parity/isaaclab3_mpm*`, `runs/rigid_perf`, `runs/fma_rigid_parity`)

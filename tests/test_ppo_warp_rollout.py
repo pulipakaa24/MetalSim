@@ -80,3 +80,32 @@ def test_rslrl_adapter_contract():
             nj = task.nj
             assert obs["policy"][to][:, 12 + 2 * nj:12 + 3 * nj].abs().max().item() == 0.0
     assert saw_timeout
+
+
+def test_loaded_weights_reach_the_warp_policy():
+    """A state dict loaded into ``algo.net`` (a checkpoint replay, a resume) is what the next rollout runs. The
+    parameters live in Warp buffers written through PyTorch's MPS queue; with nothing ordering that copy before the
+    Warp rollout, the rollout kept the random initial weights for the whole run (2026-10-13: trained G1 rough
+    checkpoints replayed by scripts/diagnostics/overflow_training_check.py fell after ~40 control steps, like an
+    untrained policy, while the same checkpoints walk once the copy has landed)."""
+    import copy
+
+    import numpy as np
+    from metalsim.learn.ppo_warp import CartpoleTask, PPOWarp, PPOWarpConfig
+    wp.config.quiet = True
+    task = CartpoleTask(64, seed=0)
+    algo = PPOWarp(task, PPOWarpConfig(iterations=1, rollout=4, hidden=(32, 32), seed=0))
+    ref = copy.deepcopy(algo.net).to("cpu")
+    torch.manual_seed(123)
+    with torch.no_grad():
+        for p in ref.parameters():
+            p.normal_(0.0, 0.5)
+    algo.net.load_state_dict({k: v.to("mps") for k, v in ref.state_dict().items()})   # as the replay harness does
+    algo.prepare()
+    algo.rollout()                                   # no torch synchronization in between, as in a replay loop
+    wp.synchronize_device("metal:0")
+    obs = task.obs.numpy()
+    with torch.no_grad():
+        mean_ref = ref.actor_mean(torch.as_tensor(obs)).numpy()
+    np.testing.assert_allclose(algo.pol.actor_act[-1].numpy(), mean_ref, atol=1e-4, rtol=1e-3)
+    np.testing.assert_allclose(algo.pol.actor_layers[0][0].numpy(), ref.actor[0].weight.detach().numpy())
