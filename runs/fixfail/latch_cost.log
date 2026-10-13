@@ -1,0 +1,66 @@
+[gpu_run] ff_latch_cost start: device utilisation 0% (01:34:58)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 6 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.6 %
+[gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.6 %
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth dc949da load on device 'metal:0' took 67.64 ms  (cached)
+Module _nxn_broadphase__locals__kernel_80a41a9c 80a41a9 load on device 'metal:0' took 45.15 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_285313d0 285313d load on device 'metal:0' took 63.06 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_d1f0516f d1f0516 load on device 'metal:0' took 46.65 ms  (cached)
+Module mujoco_warp._src.constraint 4b2565f load on device 'metal:0' took 39.78 ms  (cached)
+Module _friction_dof__locals__kernel_54b217fe 54b217f load on device 'metal:0' took 42.95 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_b316a999 b316a99 load on device 'metal:0' took 40.89 ms  (cached)
+Module _efc_contact_init__locals__kernel_1d2a56f7 1d2a56f load on device 'metal:0' took 40.10 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_4199f103 a26dd4c load on device 'metal:0' took 41.79 ms  (cached)
+Module _efc_contact_update__locals__kernel_c1a7040e c1a7040 load on device 'metal:0' took 43.12 ms  (cached)
+Module mujoco_warp._src.forward 53c9939 load on device 'metal:0' took 59.85 ms  (cached)
+Module mujoco_warp._src.passive 121cefe load on device 'metal:0' took 54.92 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_ec74e588 ec74e58 load on device 'metal:0' took 348.24 ms  (cached)
+Module mujoco_warp._src.forward 9c6583c load on device 'metal:0' took 1292.81 ms  (cached)
+Module _qfrc_smooth__locals__kernel_b9a126c0 b9a126c load on device 'metal:0' took 337.41 ms  (cached)
+Module mujoco_warp._src.support d1f2881 load on device 'metal:0' took 388.96 ms  (cached)
+Module _factor_i_sparse_unrolled__locals__kernel_7ac910f7 ab82c34 load on device 'metal:0' took 400.82 ms  (cached)
+Module _solve_LD_sparse_serial__locals__kernel_af3ba8f1 a010231 load on device 'metal:0' took 420.73 ms  (cached)
+Module _solve_init_dof__locals__kernel_a278b607 a278b60 load on device 'metal:0' took 333.80 ms  (cached)
+Module _solve_init_efc__locals__kernel_38f8708b 38f8708 load on device 'metal:0' took 344.36 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_e260fcc8 e260fcc load on device 'metal:0' took 340.00 ms  (cached)
+Module mul_m_kernel__locals___mul_m_1b897f73 1b897f7 load on device 'metal:0' took 359.13 ms  (cached)
+Module _update_constraint_efc__locals__kernel_875e0cfe 875e0cf load on device 'metal:0' took 370.06 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_9318117e 9318117 load on device 'metal:0' took 344.84 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_be8f77c5 be8f77c load on device 'metal:0' took 336.23 ms  (cached)
+Module _update_gradient_grad__locals__kernel_b82c9bc8 b82c9bc load on device 'metal:0' took 335.22 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_d8b9c371 81534e1 load on device 'metal:0' took 40.28 ms  (cached)
+Module mujoco_warp._src.solver 00c4ab6 load on device 'metal:0' took 524.89 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_81a45505 28b7d27 load on device 'metal:0' took 40.87 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_610933f9 84af0ad load on device 'metal:0' took 44.83 ms  (cached)
+Module _update_constraint_gradient_fused__locals__kernel_cb8cff00 ce6a002 load on device 'metal:0' took 41.65 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_38f58d00 51cb22a load on device 'metal:0' took 40.29 ms  (cached)
+Module _solve_done__locals__kernel_f1d63dbf f1d63db load on device 'metal:0' took 352.67 ms  (cached)
+Module mujoco_warp._src.sensor 7e89d17 load on device 'metal:0' took 63.00 ms  (cached)
+Module mujoco_warp._src.derivative 3eaf30a load on device 'metal:0' took 46.24 ms  (cached)
+Module _next_time_builder__locals___next_time_89d592b4 89d592b load on device 'metal:0' took 350.05 ms  (cached)
+Module metalsim.physics.batch 6be6507 load on device 'metal:0' took 343.25 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_99f1ed31 99f1ed3 load on device 'metal:0' took 337.45 ms  (cached)
+Module reset_data__locals__reset_M_c0d46912 c0d4691 load on device 'metal:0' took 331.20 ms  (cached)
+Module reset_data__locals__reset_mocap_21cdccdf 21cdccd load on device 'metal:0' took 337.89 ms  (cached)
+Module reset_data__locals__reset_contact_e7d9f88d e7d9f88 load on device 'metal:0' took 368.82 ms  (cached)
+Module reset_data__locals__reset_sleep_c3616e3d c3616e3 load on device 'metal:0' took 342.89 ms  (cached)
+Module reset_data__locals__reset_nworld_f3f460ae f3f460a load on device 'metal:0' took 360.26 ms  (cached)
+Module metalsim.sensors.contact a6f6b43 load on device 'metal:0' took 49.60 ms  (cached)
+njmax 112 naconmax / world 24 cone 1 decimation 8
+Module metalsim.learn.g1_velocity ab6d8eb load on device 'metal:0' took 1027.75 ms  (cached)
+Module _solve_init_efc__locals__kernel_76688e06 76688e0 load on device 'metal:0' took 338.52 ms  (cached)
+Module _solve_done__locals__kernel_7965d769 7965d76 load on device 'metal:0' took 344.57 ms  (cached)
+Module metalsim.learn.warp_policy ab35144 load on device 'metal:0' took 42.62 ms  (cached)
+latch: 40,653 env-steps/s (median of 5: 40,608, 40,653, 40,663, 40,663, 40,653); 100.75 ms per control step
+none : 40,628 env-steps/s (median of 5: 40,635, 40,628, 40,601, 40,646, 40,507); 100.82 ms per control step
+N=4096: latch costs -0.063 ms per control step (-0.06 %)
+[gpu_run] ff_latch_cost end: device utilisation 100% (01:37:18), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       3.4 %

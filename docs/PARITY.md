@@ -243,7 +243,7 @@ timing queue on the M4 Max, idle GPU logged, 4096 envs, 2.5 ms x 8, `contact_cfg
 | Warp fork: register triangular solve for the Newton Hessian on Metal (`tile_cholesky_solve`, one SIMD group, no barriers) | 55,752-55,795 -> **58,587-58,718 env-steps/s (+5.2 %)** on top of the capacity bound; physics only 83.3 -> 85.5 K | summation order only (1.3-3.4e-7 relative vs the cooperative path); state-difference protocol `runs/tp26/check.wrapper.log` |
 | MuJoCo Warp fork: the five per-iteration Newton launches fused into one 32-lane kernel on Metal (9 -> 5 launches per iteration) | 58,439-58,589 -> **60,762-60,803 env-steps/s (+3.9 %)** on top of the register solve; physics only 85.5-85.9 -> 90.2-90.3 K | per-row / per-dof arithmetic and order unchanged, grad_dot a SIMD sum instead of atomics (float noise as before); state-difference protocol `runs/tp26/check*.wrapper.log` |
 | Warp policy layer kernel: four outputs per thread, envs fastest (`mlp_layer4`) | rollout + inference 55,191-55,197 -> 56,201-56,313; full PPO loop 50,912-50,925 -> **51,877-51,918 (+1.9 %)** (installed forks) | bitwise identical activations, actions, log-probs (`tests/test_warp_policy.py::test_layer_mapping_bitwise`) |
-| G1 flat capacities at the provable bound (njmax 144 / nconmax 24 instead of the task's 256 / 32; `metalsim.physics.capacity`, `BatchSim.check_overflow()` guard) | 54,340-54,385 -> **55,646-55,741 env-steps/s (+2.5 %)**; Isaac Lab 3.0 cap-20 preset 56,301 -> 58,287 (+3.6 %) | no overflow possible below the bound (rows, order and arithmetic unchanged); `tests/test_capacity.py`; overflow raises at every PPO log point |
+| G1 flat capacities at the provable bound (njmax 144 / nconmax 24 instead of the task's 256 / 32; `metalsim.physics.capacity`, `BatchSim.check_overflow()` guard). Measured under the pyramidal cone, the G1 default until 11:00 that day (4 rows per condim-3 contact: 37 + 24 × 4 = 133 -> 144; still the bound under `recommended_pyramidal` and the Isaac Lab 3.0 presets). The elliptic default (since 2026-09-26 11:00) has 3 rows per contact: 37 + 24 × 3 = 109 -> **njmax 112**, not separately timed | 54,340-54,385 -> **55,646-55,741 env-steps/s (+2.5 %)**; Isaac Lab 3.0 cap-20 preset 56,301 -> 58,287 (+3.6 %) | no overflow possible below the bound (rows, order and arithmetic unchanged); `tests/test_capacity.py` (both cones); overflow raises at every PPO log point, latched per substep since 2026-10-13 (before, a task's reset of an overflowed world erased its flag: 13 of 31 overflowed worlds were invisible in a 100-step probe; `research_notes/capacity_overflow_guard/`) |
 | rough terrain under the preset, first measurement | recommended 45,217-45,268 vs `contact_cfg=None` 53,843-53,988 (the README's rough 41.9 K loop number is the None setting) | measurement only |
 
 ### 1.5 Learning on the G1 task
@@ -925,8 +925,11 @@ spec: USD documents the dome pole at +y with the OpenEXR latlong layout (u = lon
 v = latitude from the top), but Kit/RTX "treats the DomeLight environment as Z-up, unlike the OpenUSD +Y pole
 convention" and ignores an authored rotation (NVIDIA `usd-exchange-samples`, createLights README), and Isaac
 Lab's `spawn_light` authors none; so the pole is +z (**published**), and the azimuth is the +90° x-rotation of the
-documented map: image centre faces −y, u = 0.25 faces +x (**estimated**: undocumented, not verifiable here since
-every Isaac recording used a uniform dome; `set_environment(yaw=)` corrects a measured offset). The importer
+documented map: image centre faces −y, u = 0.25 faces +x (this is also OpenUSD's own `DomeLight_1` frame on a z-up
+stage: longitude 0 toward −y; `research_notes/dome_light_azimuth/`). **Measured 2026-09-26** (section 1.7 caveat
+closed, `docs/research/isaac_side_session_2026-09-26.md` §2): Kit renders the map 90° clockwise of that (centre
+toward −x); `set_environment_from_model` adds `KIT_DOME_AZIMUTH = −90°` to a USD stage's dome yaw, the direct
+`set_environment(yaw=)` keeps the spec frame. The importer
 records DomeLights as custom text `usd_dome` (file, intensity, exposure, colour, yaw), applied by
 `Tier2Renderer.set_environment_from_model`; `Randomizer.environment` picks a map per episode by key (Isaac's
 Franka-stack dome randomization), GPU resources cached per key. **Measured**: constant-map furnace 0.5 ± 0.01;

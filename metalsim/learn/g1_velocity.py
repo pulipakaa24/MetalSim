@@ -642,11 +642,13 @@ class G1VelocityTask:
                 pwf = BoxWindow.FIELDS
             njmax = 256 if terrain_collision in ("hfield", "boxes", "meshes", "boxes_local") else 512   # C's initial set on 0.025 m: 400 rows
             if terrain == "flat" and not self.il3_events:
-                # flat: the provable bound (metalsim.physics.capacity: 6 collider pairs x <= 4 contacts x 4 pyramidal rows
-                # + 37 limit rows = 133 -> njmax 144, nconmax 24); every capacity-sized launch shrinks with it and no
-                # result changes (no overflow is possible; BatchSim.check_overflow() guards). Measured 2026-09-26:
-                # full env step 75.3 -> 73.5 ms at 4096 (+2.5 %), +3.6 % under the Isaac Lab 3.0 cap-20 preset
-                # (docs/research/throughput_2026-09-26.md). Heightfield / box terrains keep the explicit capacities.
+                # flat: the provable bound (metalsim.physics.capacity: 6 collider pairs x <= 4 contacts = nconmax 24, x 3
+                # elliptic rows (the default contact_cfg) + 37 limit rows = 109 -> njmax 112; x 4 pyramidal rows (the
+                # pyramidal presets, Isaac Lab 3.0 solver presets) = 133 -> 144); every capacity-sized launch shrinks with
+                # it and no result changes (no overflow is possible; BatchSim.check_overflow() guards). Measured
+                # 2026-09-26 under the then-default pyramidal cone (144 vs 256 / 32): full env step 75.3 -> 73.5 ms at
+                # 4096 (+2.5 %), +3.6 % under the Isaac Lab 3.0 cap-20 preset (docs/research/throughput_2026-09-26.md).
+                # Heightfield / box terrains keep the explicit capacities.
                 njmax, nconmax = "auto", "auto"
             # factorization: BatchSimOptions' defaults (register Cholesky bound 48: the solver Hessian's Cholesky in
             # registers for the 43 dofs; m_dense_max 32: M / M - dt*D of the 43-dof tree by MuJoCo Warp's tree-sparse

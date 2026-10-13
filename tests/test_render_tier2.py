@@ -223,7 +223,19 @@ def test_env_map_usd_dome_import(tmp_path):
     print("usd dome record:", rec)
     assert os.path.realpath(rec["file"]) == os.path.realpath(hdr_path) and rec["format"] == "latlong"
     assert abs(rec["yaw"] - np.radians(30)) < 1e-6 and rec["tilt"] < 0.01
-    assert rend.env_flags == 32 and np.isclose(rend.consts.view(np.float32)[20], np.radians(30))
+    # The shader's yaw is in the OpenUSD DomeLight_1 frame (z-up: image centre toward -y, u = 0.25 toward +x); Kit/RTX
+    # renders a dome 90 deg clockwise of that (centre toward -x; measured 2026-09-26, PARITY 1.7), so a USD stage's dome
+    # gets KIT_DOME_AZIMUTH added (this test's original expectation of the bare 30 deg predates that measurement).
+    from metalsim.render.hdr import env_direction
+    from metalsim.render.tier2 import KIT_DOME_AZIMUTH
+    env_yaw = float(rend.consts.view(np.float32)[20])
+    assert rend.env_flags == 32 and np.isclose(env_yaw, np.radians(30) + KIT_DOME_AZIMUTH, atol=1e-6)
+    c, s_ = np.cos(np.radians(30)), np.sin(np.radians(30))
+    # Kit's measured mapping, u = -(atan2(y, x) - yaw) / 2pi: the image centre faces -x, u = 0 faces +x, u = 0.25 faces
+    # -y, each turned by the prim's rotateZ (+30 deg about +z)
+    assert np.allclose(env_direction(0.5, 0.5, env_yaw), (-c, -s_, 0.0), atol=1e-6)
+    assert np.allclose(env_direction(0.0, 0.5, env_yaw), (c, s_, 0.0), atol=1e-6)
+    assert np.allclose(env_direction(0.25, 0.5, env_yaw), (s_, -c, 0.0), atol=1e-6)
     assert np.allclose(rend.consts.view(np.float32)[24:27], 2.0 * 2.0 * np.array([1.0, 0.5, 0.25]))
     d = mujoco.MjData(m); mujoco.mj_forward(m, d)
     hdr = rend.render_host([d], passes=2)["hdr"][0]
