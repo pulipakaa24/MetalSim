@@ -41,10 +41,10 @@ tron1 = ["scipy", "onnxruntime"]
 parity = ["imageio", "imageio-ffmpeg", "pillow", "scikit-image", "lpips", "flip-evaluator"]
 # Newton XPBD engine (experimental, archived): the upstream commit the validation runs pinned (newton-physics/newton
 # 45458023) plus only the Metal HashTable / 64-bit atomics fix that the Warp fork needs (pulipakaa24/newton branch
-# metalsim-hashtable-metal; the same change as patches/newton/metalsim-hashtable-metal-24fb5367.diff on 45458023).
+# metalsim-hashtable-metal; the same change as patches/newton/metalsim-hashtable-metal-a4be3604.diff on 45458023).
 # The MetalSim fork with the solver fixes goes into a separate environment (scripts/setup_newton.sh), Newton 1.5.2
 # for MPM into .venv-newton152 (scripts/setup_newton152.sh).
-newton = ["newton @ git+https://github.com/pulipakaa24/newton@24fb53679efbb45de4bc08a1631759789ee9db2e",
+newton = ["newton @ git+https://github.com/pulipakaa24/newton@a4be3604bc218bb366d12164fa3e1025f333bdae",
           "newton-usd-schemas==0.5.0"]   # Newton's USD importer (the G1 Newton-engine task loads the USD asset)
 
 [project.urls]

@@ -1,0 +1,93 @@
+/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n17_fix/newton/_src/solvers/mujoco/solver_mujoco.py:3813: RuntimeWarning: MuJoCo dependency version mismatch with Newton's declared requirements: mujoco==3.14.0 (requires ~=3.12.0); mujoco-warp==3.14.0 (requires ~=3.12.0). Reinstall Newton dependencies, for example `uv pip install -e ".[examples]"`.
+  mujoco, _ = self.import_mujoco()
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/kcache/kc_n17_fix/1.18.0.dev20260917
+Module newton._src.geometry.inertia fa1f468 load on device 'metal:0' took 782.68 ms  (compiled)
+Module validate_and_correct_inertia_kernel_eac05b26 eac05b2 load on device 'metal:0' took 421.24 ms  (compiled)
+Module newton._src.geometry.bvh 2bb5296 load on device 'metal:0' took 616.47 ms  (compiled)
+Module warp._src.coloring c5d1da7 load on device 'cpu' took 858.94 ms  (compiled)
+Module newton._src.solvers.mujoco.kernels b75c235 load on device 'metal:0' took 6.76 ms  (error)
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/metalsim/physics/mpm/probes/scale_pour.py", line 1019, in <module>
+    {"mpm": run_mpm, "rigid": run_rigid, "ordered": run_ordered, "bodyforce": run_bodyforce}[args.part]()
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/metalsim/physics/mpm/probes/scale_pour.py", line 668, in run_rigid
+    solver = SolverMuJoCo(model, use_mujoco_contacts=False, integrator="implicitfast", njmax=2560, nconmax=400,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n17_fix/newton/_src/solvers/mujoco/solver_mujoco.py", line 4123, in __init__
+    self._convert_to_mjc(
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n17_fix/newton/_src/solvers/mujoco/solver_mujoco.py", line 7638, in _convert_to_mjc
+    self._update_mjc_data(self.mj_data, model, state)
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n17_fix/newton/_src/solvers/mujoco/solver_mujoco.py", line 5217, in _update_mjc_data
+    wp.launch(
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12233, in launch
+    module_exec = kernel.module.load(device, block_dim)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 5091, in load
+    raise e
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 5088, in load
+    compiled = self._compile(device, module_dir, output_name, output_arch, options=options)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 4837, in _compile
+    source_str, source_code_ext, meta, ltoir_values, fatbin_values = self._run_codegen(options, target)
+                                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/codegen.py", line 1836, in locked_call
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 4706, in _run_codegen
+    builder = ModuleBuilder(
+              ^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 3352, in __init__
+    self.build_kernel(kernel)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 3471, in build_kernel
+    kernel.adj.build(self)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/codegen.py", line 1836, in locked_call
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/codegen.py", line 2400, in build
+    raise type(original_exc)(*new_args).with_traceback(original_exc.__traceback__) from None
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/codegen.py", line 2381, in build
+    adj.eval(adj.tree.body[0])
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/codegen.py", line 6708, in eval
+    return emit_node(adj, node)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/codegen.py", line 3682, in emit_FunctionDef
+    adj.eval(f)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/codegen.py", line 6708, in eval
+    return emit_node(adj, node)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/codegen.py", line 3730, in emit_If
+    adj.eval(stmt)
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/codegen.py", line 6708, in eval
+    return emit_node(adj, node)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/codegen.py", line 5655, in emit_Assign
+    rhs = adj.eval(node.value)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/codegen.py", line 6708, in eval
+    return emit_node(adj, node)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/codegen.py", line 4138, in emit_UnaryOp
+    arg = adj.eval(node.operand)
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/codegen.py", line 6708, in eval
+    return emit_node(adj, node)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/codegen.py", line 4841, in emit_Call
+    out = adj.add_call(
+          ^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/codegen.py", line 2982, in add_call
+    func, bound_args, bound_arg_nodes = adj.resolve_call(
+                                        ^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/codegen.py", line 2915, in resolve_call
+    func = adj.resolve_func(func, arg_types, kwarg_types, min_outputs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/codegen.py", line 2806, in resolve_func
+    raise WarpCodegenError(
+warp._src.codegen.WarpCodegenError: Error while parsing function "convert_mjw_contacts_to_newton_kernel" at /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n17_fix/newton/_src/solvers/mujoco/kernels.py:1523:
+            True,
+;Couldn't find function overload for 'contact_force_fn' that matched inputs with types: [int32, array(ndim=1, dtype=mat33f), array(ndim=1, dtype=vector(length=5, dtype=float32)), array(ndim=1, dtype=int32), array(ndim=2, dtype=int32), array(ndim=2, dtype=float32), int32, array(ndim=1, dtype=int32), int32, int32, warp._src.types.bool]

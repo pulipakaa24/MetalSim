@@ -19,7 +19,7 @@ git clone https://github.com/pulipakaa24/MetalSim && cd MetalSim
 python3.12 -m venv .venv && source .venv/bin/activate     # uv only: $(uv python find 3.12) -m venv .venv
 pip install -e ".[test]"
 scripts/setup_warp.sh
-pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@metalsim#egg=mujoco-warp"
+pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@cf0f8adc8f99f0c559cf8580cb667952e473bd07#egg=mujoco-warp" "mujoco>=3.14,<3.15"      # pinned: README "Install"
 scripts/fetch_isaac_assets.sh
 pytest tests -q
 ```
@@ -61,7 +61,7 @@ MetalSim depends on three forked projects, none of them on PyPI in this form. Th
 what the current results were produced with. Each fork's branch head adds only a `METALSIM_CHANGES.md` (the list of MetalSim
 commits on that branch) on top of the commit named here, so installing the branch gives the same code.
 
-**Warp** ([pulipakaa24/warp](https://github.com/pulipakaa24/warp), branch `metalsim`, pinned commit `152808b7`;
+**Warp** ([pulipakaa24/warp](https://github.com/pulipakaa24/warp), branch `metalsim`, pinned commit `95f6f121`;
 the rigid-body results were produced at `f194006` and `c200d46b`, see the README). NVIDIA Warp with innate-inc's
 Metal backend, plus MetalSim commits; the first seven: interop entry
 points (Metal device, queue and buffer handles, cross-queue events, used for zero-copy PyTorch MPS
@@ -73,7 +73,7 @@ tile Cholesky (`wp.config.metal_register_cholesky_max`), `segmented_sort_pairs` 
 (default `upstream/warp-metalsim`), builds the native library with `build_lib.py --no-cuda` and
 installs it editable. `METALSIM_WARP_REPO` and `METALSIM_WARP_REF` (branch, tag or commit) point it
 elsewhere. If the fork cannot be cloned, the script clones innate-inc/warp at `ce15f6b` and applies
-`patches/warp/metalsim-152808b7.diff`, which gives the same source tree as `152808b7` (`patches/warp/0001-0007` are
+`patches/warp/metalsim-95f6f121.diff`, which gives the same source tree as `95f6f121` (`patches/warp/0001-0007` are
 the first seven commits, the tree of `f194006`). The commits since (MPM, scalable deterministic mode, FMA contraction
 from `fuse_fp`, GPU sort / BSR / NanoVDB builders, `fast_math` forms with `warp.config.metal_fast_math = "off"` by
 default) are listed in the branch's `METALSIM_CHANGES.md` and in `metalsim/physics/mpm/MPM.md`.
@@ -94,13 +94,13 @@ throughput ones; identical tree to the merge `8fbf965`) are in `patches/mujoco_w
 `88af9cc`, `git am` those patches and `pip install -e` the checkout.
 
 **Newton** ([pulipakaa24/newton](https://github.com/pulipakaa24/newton), branch `metalsim`, pinned commit
-`fe7f5bd` = XPBD code `90e2332` plus the Metal HashTable fix). Only needed for the experimental Newton XPBD engine. The fork fixes XPBD solver defects
+`9f31739` = XPBD code `90e2332` plus the Metal fixes: HashTable, 64-bit atomics, mesh-SDF barrier, collision launches). Only needed for the experimental Newton XPBD engine. The fork fixes XPBD solver defects
 found while validating it (revolute angle wrap at ±π, inconsistent joint relaxation,
 iteration-dependent drive stiffness, and others; the upstream issues and pull requests are listed in
 `scripts/diagnostics/newton_upstream/FILED.md`). `scripts/setup_newton.sh` installs it into a separate
 environment, `.venv-newtonfork`, and shares the Warp checkout with `.venv`. The `newton` extra instead
 installs upstream Newton at `45458023`, the commit the validation runs used, without the XPBD fixes but with the
-Metal HashTable fix the current Warp fork needs (branch `metalsim-hashtable-metal`, `24fb536`). Branch
+Metal fixes the current Warp fork needs (branch `metalsim-hashtable-metal`, `a4be360`). Branch
 `metalsim-1.5.2` (Newton 1.5.2 for MPM) is installed by `scripts/setup_newton152.sh`.
 
 The older single-file patches in `patches/` (`warp-innate-metal-pending-frees.patch`,

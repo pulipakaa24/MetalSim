@@ -12,7 +12,7 @@ set -e
 DIR=${1:-upstream/newton}
 VENV=${2:-.venv-newtonfork}
 REPO=${METALSIM_NEWTON_REPO:-https://github.com/pulipakaa24/newton}     # fork of newton-physics/newton, branch metalsim
-PIN=fe7f5bd48010fcab428eac6373e85ba3317f7a42                           # metalsim head, 2026-10-11
+PIN=9f317390da07432dfb5813bd0db6a47eeb7cb330                           # metalsim head, 2026-10-12
 REF=${METALSIM_NEWTON_REF:-$PIN}
 PATCHES="$(cd "$(dirname "$0")/../patches" && pwd)"
 # the Warp fork checkout shared with .venv: upstream/warp-innate on the original machine, otherwise
@@ -21,10 +21,10 @@ if [ -d upstream/warp-innate ]; then WARP_DEFAULT=upstream/warp-innate; else WAR
 WARP=${METALSIM_WARP_DIR:-$WARP_DEFAULT}
 if [ ! -d "$DIR" ]; then
   { git clone "$REPO" "$DIR" && git -C "$DIR" checkout -q "$REF"; } || {     # REF: branch, tag or commit
-    echo "fork not reachable; upstream newton at 45458023 plus patches/newton/metalsim-fe7f5bd4.diff (the same tree)"
+    echo "fork not reachable; upstream newton at 45458023 plus patches/newton/metalsim-9f317390.diff (the same tree)"
     rm -rf "$DIR"; git clone https://github.com/newton-physics/newton "$DIR"
     git -C "$DIR" checkout -q 45458023f24629c1feffb1f336594808f537db14
-    git -C "$DIR" apply "$PATCHES/newton/metalsim-fe7f5bd4.diff"
+    git -C "$DIR" apply "$PATCHES/newton/metalsim-9f317390.diff"
   }
 fi
 [ -d "$WARP" ] || scripts/setup_warp.sh "$WARP"

@@ -12,6 +12,18 @@ main() {
   NAME=$1; KIND=$2; MIN=$3; shift 3; [ "$1" = "--" ] && shift
   cd "$(dirname "$0")/.."
   python3 scripts/gpu_lock.py acquire "$NAME" --kind "$KIND" --minutes "$MIN" --pid $$ --cmd "$*"
+  # Runaway guard (2026-10-12): GPU work can outlive its killed process (utilisation stays ~100 % with no process owning
+  # GPU time) and later wedge the machine. No job of any kind starts on such a GPU: wait up to 10 min for it to drain,
+  # then pause the queue, write runs/GPU_RUNAWAY_ALERT and fail this job (a reboot is the only known recovery).
+  orphan() { python3 scripts/gpu_top.py 2>/dev/null | grep -q "none >= 1 %" && [ "$(scripts/gpu_util.sh)" -ge 90 ]; }
+  if orphan; then
+    for i in $(seq 1 120); do sleep 5; orphan || break; done
+    if orphan; then
+      msg="[gpu_run] $(date +%H:%M:%S) $NAME refused: GPU at $(scripts/gpu_util.sh)% with no owning process for 10 min (runaway GPU work). Queue paused; reboot to recover."
+      echo "$msg" | tee -a runs/GPU_RUNAWAY_ALERT; scripts/gpu_pause.sh > /dev/null 2>&1
+      python3 scripts/gpu_lock.py release "$NAME" --pid $$ --rc 75; exit 75
+    fi
+  fi
   if [ "$KIND" = "timing" ]; then
     for i in $(seq 1 60); do u=$(scripts/gpu_util.sh); [ "${u:-0}" -lt 10 ] && break; sleep 2; done
     echo "[gpu_run] $NAME start: device utilisation ${u:-?}% ($(date +%H:%M:%S))"; python3 scripts/gpu_top.py 2>/dev/null | head -4 | sed "s/^/[gpu_run] gpu_top: /"

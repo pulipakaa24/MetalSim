@@ -1,0 +1,87 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module warp.sparse 3c9434f load on device 'cpu' took 960.12 ms  (compiled)
+Module _bsr_set_from_triplets_padded_accumulate_values_7cd042af 6a57797 load on device 'cpu' took 80.04 ms  (compiled)
+.Module warp._src.metal_sparse 7e77140 load on device 'metal:0' took 41.10 ms  (cached)
+Module warp._src.metal_sparse 3714f8b load on device 'metal:0' took 40.19 ms  (cached)
+Module warp._src.metal_sparse 21d0e7d load on device 'metal:0' took 40.30 ms  (cached)
+Module warp._src.metal_sparse 43e7503 load on device 'metal:0' took 40.65 ms  (cached)
+Module warp.sparse 40a16b3 load on device 'metal:0' took 41.73 ms  (cached)
+Module _bsr_set_from_triplets_padded_accumulate_values_7cd042af f5117f1 load on device 'metal:0' took 39.96 ms  (cached)
+.Module _bsr_accumulate_triplet_values_ca6c8ef6 0f3964d load on device 'cpu' took 76.79 ms  (compiled)
+Module _bsr_assign_copy_blocks_8099f95e d7a0240 load on device 'cpu' took 113.70 ms  (compiled)
+Module _bsr_get_diag_kernel_404fad16 b0a2469 load on device 'cpu' took 75.88 ms  (compiled)
+.Module _bsr_accumulate_triplet_values_ca6c8ef6 ac7189d load on device 'metal:0' took 40.08 ms  (cached)
+Module _bsr_assign_copy_blocks_8099f95e fa7d32f load on device 'metal:0' took 40.45 ms  (cached)
+Module _bsr_get_diag_kernel_404fad16 a6e4c01 load on device 'metal:0' took 445.52 ms  (compiled)
+.Module _bsr_axpy_add_block_3ef84e3c a03c77d load on device 'cpu' took 73.37 ms  (compiled)
+Module _bsr_scale_3d_kernel_0b8caa7d 9636956 load on device 'cpu' took 52.34 ms  (compiled)
+Module _bsr_axpy_masked_ffe12493 9b8f355 load on device 'cpu' took 84.02 ms  (compiled)
+.Module _bsr_axpy_add_block_3ef84e3c dcda63a load on device 'metal:0' took 39.46 ms  (cached)
+Module _bsr_scale_3d_kernel_0b8caa7d b753fa1 load on device 'metal:0' took 391.58 ms  (compiled)
+Module _bsr_axpy_masked_ffe12493 79baa55 load on device 'metal:0' took 40.45 ms  (cached)
+.Module _bsr_accumulate_triplet_values_ca6c8ef6 82dc803 load on device 'cpu' took 104.82 ms  (compiled)
+Module _bsr_axpy_add_block_3ef84e3c 1b06b37 load on device 'cpu' took 98.11 ms  (compiled)
+Module _bsr_scale_3d_kernel_0b8caa7d 248c3a8 load on device 'cpu' took 70.24 ms  (compiled)
+Module _bsr_assign_copy_blocks_8099f95e 5eabc45 load on device 'cpu' took 166.30 ms  (compiled)
+Module _bsr_axpy_masked_ffe12493 8bc5200 load on device 'cpu' took 120.19 ms  (compiled)
+.Module warp._src.metal_sparse cc18652 load on device 'metal:0' took 457.96 ms  (compiled)
+Module _bsr_accumulate_triplet_values_ca6c8ef6 29167ac load on device 'metal:0' took 383.35 ms  (compiled)
+ssModule _bsr_compress_accumulate_values_b34b9c4d 20a733f load on device 'cpu' took 88.29 ms  (compiled)
+Module map_add cc863f4 load on device 'cpu' took 49.85 ms  (compiled)
+.Module _bsr_compress_accumulate_values_b34b9c4d 1788c97 load on device 'metal:0' took 423.38 ms  (compiled)
+Module map_add 903ccdf load on device 'metal:0' took 387.93 ms  (compiled)
+.s..Module _bsr_assign_copy_blocks_8099f95e 6371e21 load on device 'metal:0' took 460.92 ms  (compiled)
+E.Warp UserWarning: Running the tape backwards may produce incorrect gradients because recorded kernel _bsr_set_from_triplets_padded_scatter_compact_topology is configured with the option 'enable_backward=False'.
+Warp UserWarning: Running the tape backwards may produce incorrect gradients because recorded kernel _bsr_set_from_triplets_padded_scatter_compact_topology is configured with the option 'enable_backward=False'.
+Warp UserWarning: Running the tape backwards may produce incorrect gradients because recorded kernel _bsr_set_from_triplets_padded_scatter_compact_topology is configured with the option 'enable_backward=False'.
+.ssssModule make_bsr_mv_kernel__locals__bsr_mv_kernel_47d446af 82454ce load on device 'cpu' took 53.44 ms  (compiled)
+Module _bsr_assign_copy_blocks_8099f95e 9954b93 load on device 'cpu' took 202.33 ms  (compiled)
+Module _bsr_assign_padded_copy_blocks_9f96a990 8583212 load on device 'cpu' took 85.02 ms  (compiled)
+Module _bsr_axpy_padded_fill_d3e9372c aa00ec2 load on device 'cpu' took 97.71 ms  (compiled)
+Module _bsr_mm_compute_values_44f0f7ca 8734c52 load on device 'cpu' took 77.58 ms  (compiled)
+Module _bsr_transpose_values_b16b1b3d 406ea5f load on device 'cpu' took 90.62 ms  (compiled)
+.Module make_bsr_mv_kernel__locals__bsr_mv_kernel_47d446af 6910e7b load on device 'metal:0' took 392.34 ms  (compiled)
+Module _bsr_scale_3d_kernel_0b8caa7d d762cf2 load on device 'metal:0' took 386.17 ms  (compiled)
+Module _bsr_assign_padded_copy_blocks_9f96a990 e7bd776 load on device 'metal:0' took 422.92 ms  (compiled)
+sModule _bsr_get_diag_kernel_404fad16 706e7be load on device 'cpu' took 93.20 ms  (compiled)
+.sModule make_bsr_mm_count_coeffs__locals__bsr_mm_count_coeffs_94ecd36c 4a436b4 load on device 'cpu' took 78.27 ms  (compiled)
+Module _bsr_mm_compute_values_44f0f7ca 8a8130c load on device 'cpu' took 111.18 ms  (compiled)
+Module _bsr_mm_compute_values_44f0f7ca f39651e load on device 'cpu' took 135.66 ms  (compiled)
+Module _bsr_mm_compute_values_44f0f7ca 694c9b7 load on device 'cpu' took 162.11 ms  (compiled)
+.sModule _bsr_mm_compute_values_44f0f7ca 4361992 load on device 'cpu' took 203.52 ms  (compiled)
+.s.sModule _bsr_transpose_values_b16b1b3d 132e30f load on device 'cpu' took 120.89 ms  (compiled)
+Module _bsr_mm_compute_values_44f0f7ca 720c459 load on device 'cpu' took 238.20 ms  (compiled)
+Module make_bsr_mv_kernel__locals__bsr_mv_kernel_d47ad5bc d213e40 load on device 'cpu' took 54.55 ms  (compiled)
+Module make_bsr_mv_transpose_kernel__locals__bsr_mv_transpose_kernel_e6df537f a51ec50 load on device 'cpu' took 59.37 ms  (compiled)
+.ssModule make_bsr_mv_kernel__locals__bsr_mv_kernel_4f578bc0 b82ae19 load on device 'cpu' took 56.77 ms  (compiled)
+Module make_bsr_mv_transpose_kernel__locals__bsr_mv_transpose_kernel_a6f63744 60f1084 load on device 'cpu' took 57.13 ms  (compiled)
+.sModule make_bsr_mv_kernel__locals__bsr_mv_kernel_4f578bc0 6449272 load on device 'cpu' took 70.77 ms  (compiled)
+Module make_bsr_mv_transpose_kernel__locals__bsr_mv_transpose_kernel_a384845a d17b1da load on device 'cpu' took 59.07 ms  (compiled)
+.s.s.s.s.s.s.ss.s.s.s.s.ssssss
+======================================================================
+ERROR: test_bsr_copy_scale (warp.tests.test_sparse.TestSparse.test_bsr_copy_scale)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a28868bb53d94facc/upstream/warp-final/warp/tests/test_sparse.py", line 1541, in test_bsr_copy_scale
+    diag_copy = bsr_copy(diag_bsr, scalar_type=wp.float64)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a28868bb53d94facc/upstream/warp-final/warp/_src/sparse.py", line 2634, in bsr_copy
+    bsr_assign(dest=copy, src=A, structure_only=structure_only, topology=topology)
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a28868bb53d94facc/upstream/warp-final/warp/_src/sparse.py", line 2468, in bsr_assign
+    wp.launch(
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a28868bb53d94facc/upstream/warp-final/warp/_src/context.py", line 12658, in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint, dim_limit=dim_limit)
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a28868bb53d94facc/upstream/warp-final/warp/_src/context.py", line 11566, in invoke_metal
+    raise RuntimeError(
+RuntimeError: Kernel '_bsr_assign_copy_blocks' uses builtins that are not supported on Metal yet: float64
+
+----------------------------------------------------------------------
+Ran 66 tests in 9.210s
+
+FAILED (errors=1, skipped=33)

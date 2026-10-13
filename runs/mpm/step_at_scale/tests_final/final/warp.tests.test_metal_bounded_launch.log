@@ -1,0 +1,20 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mark_547bb8d2 40376d0 load on device 'cpu' took 803.74 ms  (compiled)
+.Module axpy_e52d5b22 e52d5b2 load on device 'metal:0' took 421.85 ms  (compiled)
+.Module add_one_e028fbc6 e028fbc load on device 'metal:0' took 385.46 ms  (compiled)
+Module mark_547bb8d2 547bb8d load on device 'metal:0' took 390.49 ms  (compiled)
+Module close_range_605efcf3 605efcf load on device 'metal:0' took 391.21 ms  (compiled)
+.Module set_count_8e44e9a1 8e44e9a load on device 'metal:0' took 389.29 ms  (compiled)
+...Module bump_count_4f598567 4f59856 load on device 'metal:0' took 385.44 ms  (compiled)
+.Module mark2d_c1589ea7 c1589ea load on device 'metal:0' took 391.15 ms  (compiled)
+...
+----------------------------------------------------------------------
+Ran 10 tests in 3.612s
+
+OK

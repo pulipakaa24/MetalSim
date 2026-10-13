@@ -1,0 +1,36 @@
+[gpu_run] rc_ab start: device utilisation 100% (23:22:55)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 100 %; per-process GPU time over 1.8 s: none >= 1 %
+granular A da=keep r1: 32.21 util=100 23:23:09
+granular B da=keep r1: 32.72 util=100 23:23:17
+granular A da=1 r1: 32.4 util=100 23:23:28
+granular B da=1 r1: 32.36 util=100 23:23:39
+column_a2 A da=keep r1: 18.41 util=100 23:23:49
+column_a2 B da=keep r1: 18.7 util=100 23:23:55
+column_a2 A da=1 r1: 18.65 util=100 23:24:05
+column_a2 B da=1 r1: 18.62 util=100 23:24:15
+granular B da=keep r2: 32.62 util=100 23:24:22
+granular A da=keep r2: 32.47 util=100 23:24:32
+granular B da=1 r2: 32.56 util=100 23:24:40
+granular A da=1 r2: 32.88 util=100 23:24:49
+column_a2 B da=keep r2: 18.81 util=100 23:24:55
+column_a2 A da=keep r2: 18.84 util=100 23:25:02
+column_a2 B da=1 r2: 19.06 util=100 23:25:08
+column_a2 A da=1 r2: 18.88 util=100 23:25:14
+granular A da=keep r3: 32.48 util=100 23:25:22
+granular B da=keep r3: 32.16 util=100 23:25:29
+granular A da=1 r3: 32.48 util=100 23:25:36
+granular B da=1 r3: 32.42 util=100 23:25:43
+column_a2 A da=keep r3: 19.12 util=100 23:25:49
+column_a2 B da=keep r3: 19.26 util=100 23:25:55
+column_a2 A da=1 r3: 18.75 util=100 23:26:01
+column_a2 B da=1 r3: 19.05 util=100 23:26:07
+granular B da=keep r4: 32.33 util=100 23:26:14
+granular A da=keep r4: 32.35 util=100 23:26:21
+granular B da=1 r4: 32.21 util=100 23:26:28
+granular A da=1 r4: 32.47 util=100 23:26:35
+column_a2 B da=keep r4: 18.81 util=100 23:26:40
+column_a2 A da=keep r4: 19.16 util=100 23:26:46
+column_a2 B da=1 r4: 18.62 util=100 23:26:52
+column_a2 A da=1 r4: 18.56 util=100 23:26:58
+[gpu_run] rc_ab end: device utilisation 100% (23:26:58), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 100 %; per-process GPU time over 1.8 s: none >= 1 %
