@@ -187,8 +187,55 @@ def _area_light(body, prim, pos, quat, scale_units, name):
     if prim.HasAttribute("mjc:castshadow"):
         lt.castshadow = bool(prim.GetAttribute("mjc:castshadow").Get())
     rec.update(area=float(area), radiance=radiance.tolist(), far_field_intensity=I.tolist(), attenuation_scale=k,
-               cone_angle=cone)
+               cone_angle=cone, x_axis=(R @ np.array([1.0, 0, 0])).tolist())   # the prim's X in the light's body frame
     return rec
+
+
+def _sphere_light(body, prim, pos, quat, scale_units, name):
+    """SphereLight -> a MuJoCo point light. A light written by ``mjcf_to_usd`` (``mjc:`` attributes) keeps MuJoCo's
+    values: diffuse = ``mjc:diffuse`` (else intensity x color, clipped to LIGHT_DIFFUSE_MAX, the previous import) and
+    ``mjc:attenuation``. Any other SphereLight follows UsdLux radiometry as the area lights do: radiance
+    L = intensity x 2^exposure x color (/ 4 pi r^2 with ``inputs:normalize``), far-field intensity I = L pi r^2 ->
+    diffuse I / pi with inverse-square attenuation (diffuse above LIGHT_DIFFUSE_MAX moved into the attenuation). Unless
+    ``treatAsPoint``, the sphere is recorded for the renderers that sample it (``usd_area_lights``). Returns the record
+    or None."""
+    la = UsdLux.LightAPI(prim)
+    val = lambda a, d: (a.Get() if a and a.Get() is not None else d)
+    lt = body.add_light(); lt.name = name; lt.pos = pos.tolist()
+    R = np.zeros(9); mujoco.mju_quat2Mat(R, quat); R = R.reshape(3, 3)
+    lt.dir = (R @ np.array([0, 0, -1.0])).tolist()
+    lt.type = mujoco.mjtLightType.mjLIGHT_POINT
+    for attr, field in (("mjc:ambient", "ambient"), ("mjc:specular", "specular")):
+        if prim.HasAttribute(attr):
+            setattr(lt, field, list(prim.GetAttribute(attr).Get()))
+    if prim.HasAttribute("mjc:castshadow"):
+        lt.castshadow = bool(prim.GetAttribute("mjc:castshadow").Get())
+    color = np.array(val(la.GetColorAttr(), (1.0, 1.0, 1.0)), float)
+    intensity = float(val(la.GetIntensityAttr(), 1.0))
+    if prim.HasAttribute("mjc:castshadow") or prim.HasAttribute("mjc:diffuse"):      # authored from MuJoCo
+        lt.diffuse = (list(prim.GetAttribute("mjc:diffuse").Get()) if prim.HasAttribute("mjc:diffuse")
+                      else np.clip(color * intensity, 0, LIGHT_DIFFUSE_MAX).tolist())
+        if prim.HasAttribute("mjc:attenuation"):
+            lt.attenuation = list(prim.GetAttribute("mjc:attenuation").Get())
+        return None
+    exposure = float(val(la.GetExposureAttr(), 0.0))
+    _, _, ws = _world_xform(prim, scale_units)
+    sp = UsdLux.SphereLight(prim)
+    r = float(val(sp.GetRadiusAttr(), 0.5)) * scale_units * float(np.mean(ws))
+    radiance = color * intensity * 2.0 ** exposure
+    area = 4.0 * np.pi * r * r
+    if bool(val(la.GetNormalizeAttr(), False)):
+        radiance = radiance / max(area, 1e-12)
+    I = radiance * np.pi * r * r
+    k = max(float((I / np.pi).max()) / LIGHT_DIFFUSE_MAX, 1.0)
+    lt.diffuse = (I / np.pi / k).tolist()
+    lt.attenuation = [0.0, 0.0, 1.0 / k]
+    if bool(val(sp.GetTreatAsPointAttr(), False)) or r <= 0.0:
+        return None
+    return {"prim": prim.GetPath().pathString, "light": name, "intensity": intensity, "exposure": exposure,
+            "color": color.tolist(), "normalize": bool(val(la.GetNormalizeAttr(), False)), "shape": "sphere",
+            "radius": r, "area": float(area), "radiance": radiance.tolist(), "far_field_intensity": I.tolist(),
+            "attenuation_scale": k, "cone_angle": None, "x_axis": [1.0, 0.0, 0.0]}
 
 
 def _uv_reader_varname(tex_shader):
@@ -606,13 +653,19 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True, vi
         if prim.IsA(UsdLux.RectLight) or prim.IsA(UsdLux.DiskLight) or prim.IsA(UsdLux.CylinderLight):
             area_lights.append(_area_light(body, prim, pos, quat, units, prim.GetPath().name))
             continue
-        if prim.IsA(UsdLux.DistantLight) or prim.IsA(UsdLux.SphereLight):
+        if prim.IsA(UsdLux.SphereLight):
+            rec = _sphere_light(body, prim, pos, quat, units, prim.GetPath().name)
+            if rec is not None:
+                area_lights.append(rec)
+            continue
+        if prim.IsA(UsdLux.DistantLight):
             lt = body.add_light(); lt.name = prim.GetPath().name; lt.pos = pos.tolist()
             R = np.zeros(9); mujoco.mju_quat2Mat(R, quat); R = R.reshape(3, 3)
             lt.dir = (R @ np.array([0, 0, -1.0])).tolist()
-            lt.type = mujoco.mjtLightType.mjLIGHT_DIRECTIONAL if prim.IsA(UsdLux.DistantLight) else mujoco.mjtLightType.mjLIGHT_POINT
+            lt.type = mujoco.mjtLightType.mjLIGHT_DIRECTIONAL
             col = np.array(UsdLux.LightAPI(prim).GetColorAttr().Get() or (1, 1, 1), float) * float(UsdLux.LightAPI(prim).GetIntensityAttr().Get() or 1.0)
-            lt.diffuse = np.clip(col, 0, 10).tolist()
+            lt.diffuse = (list(prim.GetAttribute("mjc:diffuse").Get()) if prim.HasAttribute("mjc:diffuse")   # from MuJoCo
+                          else np.clip(col, 0, 10).tolist())
             for attr, field in (("mjc:ambient", "ambient"), ("mjc:specular", "specular")):
                 if prim.HasAttribute(attr):
                     setattr(lt, field, list(prim.GetAttribute(attr).Get()))
