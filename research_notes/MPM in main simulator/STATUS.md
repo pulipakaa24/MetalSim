@@ -19,7 +19,15 @@ Newton 1.7 line), two-way coupled with the robot, N worlds, rendered by `render/
   fixed-order impulse harvest -> wrench per (world, body).
 
 ## Done
-- Vendoring generator + vendored copy; compat generalisation; solver selection.
+- Vendoring generator + vendored copy (Apache-2.0 notices, drift test `tests/test_mpm_main.py`, MPM.md section 11);
+  compat generalisation; solver selection. Design approved by the coordinator (2026-10-13).
+- **Bitwise**: column a=1, 15 frames, positions+velocities every frame and final positions: Newton's own solver
+  (.venv-newton152) == vendored copy (.venv-newton152) == vendored copy in `.venv` (Newton 1.7), same iteration counts
+  (`runs/mpm_main/vendored_bitwise/`, 16-inch).
+- `metalsim/physics/mpm/coupled.py` (`MPMCoupling`, `MPMConfig`, `MPMMaterial`, `GridEmitter`, `PointsEmitter`) and
+  `colliders.py`; smoke test (box on sand, 2 worlds) runs on the 14-inch: sand force settles near the box weight.
+- `metalsim/physics/mpm/probes/box_on_sand.py`: the same scene through Isaac's `SolverCoupledProxy` (.venv-newton152)
+  vs `MPMCoupling` (.venv); `runs/mpm_main/box_on_sand/run_pair.sh` (14-inch: ~/metalsim-fresh/agents/mpm-main).
 
 ## Next
 1. Research note (`NOTE.md` here) from the two research rounds (Isaac/Newton coupling from source; external systems).
