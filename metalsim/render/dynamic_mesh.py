@@ -31,9 +31,110 @@ import numpy as np
 import Metal
 
 S_SMOOTH, S_FLATSKIN, S_SIDE, S_FACE = 0, 1, 2, 3
-T_EDGE, T_VERT, T_TENDON = 0, 1, 2
+T_EDGE, T_VERT, T_TENDON, T_CATENARY = 0, 1, 2, 3
 
 _DYNC = 16      # DynConsts words
+_MJMINVAL = 1e-15
+
+
+def catenary_mode(m, i: int):
+    """MuJoCo's ``mjv_isCatenary`` static conditions for tendon ``i``: (-1, 0) never a catenary; (0, L): always (a
+    deadband spring [0, L]); (1, L): while its length is below L (a length limit [0, L] without stiffness)."""
+    if m.opt.disableflags & int(mujoco.mjtDisableBit.mjDSBL_GRAVITY) or np.linalg.norm(m.opt.gravity) <= _MJMINVAL:
+        return -1, 0.0
+    if int(m.tendon_num[i]) != 2:
+        return -1, 0.0
+    W_ = mujoco.mjtWrap
+    adr = int(m.tendon_adr[i])
+    if any(int(m.wrap_type[adr + k]) != W_.mjWRAP_SITE for k in range(2)):
+        return -1, 0.0
+    poly = lambda name: np.asarray(getattr(m, name, np.zeros((m.ntendon, 1))))[i]     # noqa: E731
+    has_stiff = float(m.tendon_stiffness[i]) != 0 or bool(np.any(poly("tendon_stiffnesspoly") != 0))
+    ls = np.asarray(m.tendon_lengthspring[i], np.float64)
+    limitedspring = has_stiff and ls[0] == 0 and ls[1] > 0
+    rng = np.asarray(m.tendon_range[i], np.float64)
+    limitedconstraint = (not has_stiff) and int(m.tendon_limited[i]) == 1 and rng[0] == 0
+    damping = float(m.tendon_damping[i]) != 0 or bool(np.any(poly("tendon_dampingpoly") != 0))
+    if not (limitedspring or limitedconstraint) or damping or float(m.tendon_frictionloss[i]) != 0:
+        return -1, 0.0
+    for j in range(m.nu):
+        if int(m.actuator_trntype[j]) == int(mujoco.mjtTrn.mjTRN_TENDON) and int(m.actuator_trnid[j][0]) == i:
+            return -1, 0.0
+    return (0, float(ls[1])) if limitedspring else (1, float(rng[1]))
+
+
+def catenary_points(x0, x1, gravity, length, npts):
+    """NumPy (float64) port of MuJoCo's ``mjv_catenary``: points from x0 to x1 (2: straight, 3: hanging bead, npts)."""
+    x0, x1 = np.asarray(x0, np.float64), np.asarray(x1, np.float64)
+    if np.linalg.norm(x1 - x0) > length:
+        return np.stack([x0, x1])
+    up = -np.asarray(gravity, np.float64)
+    up = up / np.linalg.norm(up)
+    x01 = x1 - x0
+    across = x01 - up * np.dot(up, x01)
+    nrm = np.linalg.norm(across)
+    across = np.zeros(3) if nrm < _MJMINVAL else across / nrm
+    h, v = float(np.dot(x01, across)), float(np.dot(x01, up))
+    if length > 100 * h:
+        d_up = -0.5 * (np.sqrt(length * length - h * h) - v)
+        d_across = h * d_up / (2 * d_up - v)
+        return np.stack([x0, x0 + up * d_up + across * d_across, x1])
+    intercept = 1 / np.sqrt(np.sqrt(length * length - v * v) / h - 1)
+
+    def resid(b, grad=False):
+        a = 0.5 / b
+        r = 1 / np.sqrt(2 * b * np.sinh(a) - 1) - intercept
+        if not grad:
+            return r
+        return r, (a * np.cosh(a) - np.sinh(a)) * (2 * b * np.sinh(a) - 1) ** -1.5
+    b = intercept / np.sqrt(24)
+    for _ in range(50):
+        res, g = resid(b, True)
+        if abs(res) < 1e-9:
+            break
+        step = -res / g
+        for _ in range(10):
+            if abs(resid(b + step)) < abs(res):
+                break
+            step *= 0.5
+        b += step
+    bh = b * h
+    h_off = -0.5 * (np.log((length + v) / (length - v)) * bh - h)
+    v_off = -np.cosh(h_off / bh) * bh
+    pts = [x0]
+    for i in range(1, npts - 1):
+        hz = i * h / npts
+        pts.append(x0 + across * hz + up * (bh * np.cosh((hz - h_off) / bh) + v_off))
+    pts.append(x1)
+    return np.stack(pts)
+
+
+def impedance(solimp, pos, margin):
+    """MuJoCo's ``getimpedance`` (engine_core_constraint.c): the constraint impedance at distance ``pos``."""
+    s = np.asarray(solimp, np.float64)
+    if s[0] == s[1] or s[2] <= _MJMINVAL:
+        return 0.5 * (s[0] + s[1])
+    x = abs((pos - margin) / s[2])
+    if x >= 1 or x <= 0:
+        return s[1] if x >= 1 else s[0]
+    if s[4] == 1:
+        y = x
+    elif x <= s[3]:
+        y = (1 / s[3] ** (s[4] - 1)) * x ** s[4]
+    else:
+        y = 1 - (1 / (1 - s[3]) ** (s[4] - 1)) * (1 - x) ** s[4]
+    return s[0] + y * (s[1] - s[0])
+
+
+def tendon_limit_imp(m, i: int, ten_length: float) -> float:
+    """Impedance MuJoCo mixes a default-grey tendon's colour with (its active limit's; the upper one's when both)."""
+    if not int(m.tendon_limited[i]):
+        return 0.0
+    imp = 0.0
+    for dist in (ten_length - m.tendon_range[i][0], m.tendon_range[i][1] - ten_length):
+        if dist < m.tendon_margin[i]:
+            imp = impedance(m.tendon_solimp_lim[i], dist, m.tendon_margin[i])
+    return float(imp)
 
 
 def _capsule_template(nslice: int, nstack: int):
@@ -95,7 +196,7 @@ def _boundary_edges(tris):
 class _Plan:
     """Host tables of the generation (built once)."""
 
-    def __init__(self, m, tables, tube_slices=None, cap_stacks=None, tube_lod=None):
+    def __init__(self, m, tables, tube_slices=None, cap_stacks=None, tube_lod=None, tendons="mujoco"):
         """``tube_slices`` / ``cap_stacks``: one tessellation for every tube; else per tube object ``tube_lod``
         ({slot: (slices, stacks)}, ``tube_tessellation``); else MuJoCo's ``vis.quality``."""
         self.m = m
@@ -117,6 +218,14 @@ class _Plan:
         self.rtot = 0
         self.tmpl = []            # template vertices (float4): cylinder then capsule
         self.tmpl_off = {}
+        # tendons="mujoco": slack two-site tendons as MuJoCo's catenary, default-grey tendons tinted by their limit
+        # impedance; "straight": capsules between the wrap points only (before 2026-10-13)
+        if tendons not in ("mujoco", "straight"):
+            raise ValueError(f"tendons must be 'mujoco' or 'straight', got {tendons!r}")
+        self.tendons = tendons
+        self.cat = []             # (tendon, mode, length): catenary-capable tendons (catenary_mode)
+        self.tint = []            # (tendon, slot, mode): default-grey tendons recoloured at their limits
+        self.ncat_pts = min(int(m.vis.quality.numslices) + 1, 100)
         flex_dyn = [d for d in tables.dyn if d["kind"] == "flex"]
         if flex_dyn:
             self.blocks.append(("flex", None, 0, int(m.nflexvert)))
@@ -291,10 +400,22 @@ class _Plan:
             ob["tris"].append((idx[t[0]], idx[t[1]], idx[t[2]]))
 
     def _tendon(self, d, vis):
+        m, i = self.m, d["id"]
         ob = self._object(d["slot"])
-        w = float(self.m.tendon_width[d["id"]])
-        for j in range(max(d["max_points"] - 1, 0)):
-            self._tube(ob, "cap", T_TENDON, d["id"], j, w)
+        w = float(m.tendon_width[i])
+        mode, L = catenary_mode(m, i) if self.tendons == "mujoco" else (-1, 0.0)
+        if mode >= 0:          # up to ncat_pts - 1 segments of its catenary (or one straight one), from emit_tube mode 3
+            k = len(self.cat)
+            self.cat.append((i, mode, L))
+            for j in range(self.ncat_pts - 1):
+                self._tube(ob, "cap", T_CATENARY, k, j, w)
+        else:
+            for j in range(max(d["max_points"] - 1, 0)):
+                self._tube(ob, "cap", T_TENDON, i, j, w)
+        # MuJoCo's limit colour: no material and exactly the default grey (not when always drawn as a catenary)
+        if (self.tendons == "mujoco" and int(m.tendon_matid[i]) == -1 and mode != 0 and int(m.tendon_limited[i])
+                and np.array_equal(np.asarray(m.tendon_rgba[i], np.float32), np.array([0.5, 0.5, 0.5, 1.0], np.float32))):
+            self.tint.append((i, int(d["slot"]), mode))
 
     def _mesh(self, d, vis):
         mesh = d["mesh"]
@@ -339,7 +460,20 @@ class _Plan:
             skin_b[k, 0] = b; skin_b[k, 1:2].view(np.float32)[:] = w
         bones = np.asarray(self.bones or [[0.0] * 8], np.float32).reshape(-1, 8)
         tmpl = np.asarray(self.tmpl, np.float32).reshape(-1, 4)
-        return dict(srec=srec, trec=trec, nent=nent, flist=flist, faces=faces, skin_v=skin_v, skin_b=skin_b, bones=bones, tmpl=tmpl)
+        cat = np.zeros((max(len(self.cat), 1), 4), np.int32)          # shaders/dynamic_mesh.metal CatRec
+        for k, (i, mode, L) in enumerate(self.cat):
+            cat[k, 0], cat[k, 1] = i, mode
+            cat[k, 2:3].view(np.float32)[:] = L
+        tint = np.zeros((max(len(self.tint), 1), 20), np.float32)     # TintRec
+        ti = tint.view(np.int32)
+        m = self.m
+        for k, (i, slot, mode) in enumerate(self.tint):
+            ti[k, 0:4] = (i, slot, mode, int(m.tendon_limited[i]))
+            tint[k, 4:7] = (m.tendon_range[i][0], m.tendon_range[i][1], m.tendon_margin[i])
+            tint[k, 8:13] = m.tendon_solimp_lim[i]
+            tint[k, 16:20] = m.tendon_rgba[i]
+        return dict(srec=srec, trec=trec, nent=nent, flist=flist, faces=faces, skin_v=skin_v, skin_b=skin_b, bones=bones, tmpl=tmpl,
+                    cat=cat, tint=tint)
 
     def validate(self, n_envs):
         """Index bounds of every table (a kernel never reads or writes outside its buffers)."""
@@ -348,7 +482,9 @@ class _Plan:
             assert 0 <= r[1] < P and 0 <= r[2] < P and 0 <= r[3] < P and 0 <= r[4] < P, r
             assert 0 <= r[5] and r[5] + (n_envs - 1) * r[6] < self.rtot
         for r in self.trec:
-            if r[0] != T_TENDON:
+            if r[0] == T_CATENARY:
+                assert 0 <= r[1] < len(self.cat) and 0 <= r[2] < self.ncat_pts - 1, r
+            elif r[0] != T_TENDON:
                 assert 0 <= r[1] < P and 0 <= r[2] < P, r
             assert 0 <= r[3] < len(self.tmpl) and 0 <= r[4] + (n_envs - 1) * r[5] < self.rtot
         for (p, s, c, _) in self.nent:
@@ -424,11 +560,23 @@ def emulate(plan: _Plan, n_envs: int, src: dict) -> np.ndarray:
                 else:
                     nrm = ns * _unit_or_x(np.cross(P[c] - P[b], Nn[c]))
             out[dst + e * vstride] = (*pos, *nrm, u, v)
+        cps = []
+        for (ti, cmode, L) in plan.cat:           # catenary points per catenary tendon (emit_tube mode 3)
+            adr = int(src["ten_wrapadr"][e][ti])
+            x0, x1 = np.asarray(src["wrap_xpos"][e][adr], np.float64), np.asarray(src["wrap_xpos"][e][adr + 1], np.float64)
+            slack = cmode == 0 or float(src["ten_length"][e][ti]) < L
+            cps.append(catenary_points(x0, x1, m.opt.gravity, L, plan.ncat_pts) if slack else np.stack([x0, x1]))
         for r in plan.trec:
             mode, a, b, tv, dst, vstride = r[:6]
             rad = r[8]
             t = tmpl[tv]
-            if mode == T_TENDON:
+            if mode == T_CATENARY:
+                pts = cps[a]
+                if b + 1 >= len(pts):
+                    out[dst + e * vstride] = (*pts[0], 0, 0, 1, 0, 0)
+                    continue
+                p0, p1 = pts[b], pts[b + 1]
+            elif mode == T_TENDON:
                 adr, num = int(src["ten_wrapadr"][e][a]), int(src["ten_wrapnum"][e][a])
                 j = adr + b
                 ok = b < num - 1 and j + 1 < plan.nwrap2
@@ -540,10 +688,10 @@ class DynamicMeshes:
     and spheres (default MuJoCo's ``vis.quality.numslices`` and ``numstacks / 2``)."""
 
     def __init__(self, ctx, model, tables, n_envs, *, tpr=1, stride=0.0, vbuf=None, rbase=0, tube_slices=None, cap_stacks=None,
-                 tube_lod=None):
+                 tube_lod=None, tendons="mujoco"):
         self.ctx, self.m, self.t, self.n = ctx, model, tables, n_envs
         self.tpr, self.stride = int(tpr), float(stride)
-        plan = _Plan(model, tables, tube_slices, cap_stacks, tube_lod)
+        plan = _Plan(model, tables, tube_slices, cap_stacks, tube_lod, tendons)
         plan.finalize(n_envs)
         plan.validate(n_envs)
         self.plan = plan
@@ -568,7 +716,20 @@ class DynamicMeshes:
         li = np.concatenate(loc) if loc else np.zeros(3, np.uint32)
         self.local_ibuf = c.buffer(max(li.nbytes, 16), li if li.size else None, "dyn_local_indices")
         lib = c.library("dynamic_mesh")
-        self.p = {k: c.compute_pipeline(lib, k) for k in ("copy_block", "skin_lbs", "vnormal", "emit_surface", "emit_tube")}
+        self.p = {k: c.compute_pipeline(lib, k) for k in ("copy_block", "skin_lbs", "vnormal", "emit_surface", "emit_tube",
+                                                         "catenary", "tendon_tint")}
+        # catenary points (emit_tube mode 3) and the limit-colour records (tendon_tint)
+        self.n_cat, self.n_tint, self.ncat_pts = len(plan.cat), len(plan.tint), plan.ncat_pts
+        self.CP = c.buffer(16 * n_envs * max(self.n_cat, 1) * self.ncat_pts, label="dyn_catenary_points")
+        self.CPn = c.buffer(4 * n_envs * max(self.n_cat, 1), label="dyn_catenary_count")
+        g = np.asarray(model.opt.gravity, np.float64)
+        up = -g / max(np.linalg.norm(g), 1e-30)
+        self.cat_consts = np.zeros(8, np.uint32)
+        self.cat_consts.view(np.float32)[0:3] = up
+        self.cat_consts[4:6] = (self.ncat_pts, max(self.n_cat, 1))
+        self.tint_consts = np.zeros(8, np.uint32)
+        self.tint_consts.view(np.float32)[0:4] = model.vis.rgba.constraint
+        self.tint_consts[4:8] = (self.n_tint, tables.G, max(int(model.ntendon), 1), n_envs)
         self.skin_vert = c.buffer(4 * 3 * max(model.nskinvert, 1), model.skin_vert.astype(np.float32) if model.nskinvert else None, "dyn_skin_vert")
         # host-path source buffers
         nw = max(2 * int(model.nwrap), 1)
@@ -579,7 +740,8 @@ class DynamicMeshes:
                       "ten_wrapadr": c.buffer(4 * n_envs * nt, label="dyn_h_wrapadr"),
                       "ten_wrapnum": c.buffer(4 * n_envs * nt, label="dyn_h_wrapnum"),
                       "wrap_obj": c.buffer(4 * n_envs * nw, label="dyn_h_wrapobj"),
-                      "wrap_xpos": c.buffer(4 * 3 * n_envs * nw, label="dyn_h_wrapxpos")}
+                      "wrap_xpos": c.buffer(4 * 3 * n_envs * nw, label="dyn_h_wrapxpos"),
+                      "ten_length": c.buffer(4 * n_envs * nt, label="dyn_h_tenlength")}
         self._host_mesh = {}
         for d in tables.dyn:
             if d["kind"] == "mesh":
@@ -612,6 +774,8 @@ class DynamicMeshes:
             names += ["xpos", "xquat"]
         if "tendon" in self.kinds:
             names += ["ten_wrapadr", "ten_wrapnum", "wrap_obj", "wrap_xpos"]
+            if self.n_cat or self.n_tint:
+                names.append("ten_length")
         for k in names:
             a = overrides.pop(k, None)
             if a is None:
@@ -651,6 +815,9 @@ class DynamicMeshes:
             c.write_buffer(self._host["wrap_xpos"], np.stack([np.asarray(dd.wrap_xpos).reshape(-1)[:3 * nw] for dd in datas]).astype(np.float32))
             for k in ("ten_wrapadr", "ten_wrapnum", "wrap_obj", "wrap_xpos"):
                 src[k] = (self._host[k], 0)
+            if self.n_cat or self.n_tint:
+                c.write_buffer(self._host["ten_length"], np.stack([dd.ten_length for dd in datas]).astype(np.float32))
+                src["ten_length"] = (self._host["ten_length"], 0)
         for k in self.mesh_names:
             a = overrides.pop(k, None)
             if a is None:
@@ -700,10 +867,33 @@ class DynamicMeshes:
                            self._consts(n_rec=self.n_srec), self.n_srec, 4)
         if self.plan.trec:
             dummy = (B["flist"], 0)
+            if self.n_cat:          # catenary points of the slack two-site tendons (before the tubes read them)
+                ce.setBytes_length_atIndex_(self.cat_consts.tobytes(), self.cat_consts.nbytes, 7)
+                self._dispatch(ce, self.p["catenary"], [(B["cat"], 0), src["ten_wrapadr"], src["wrap_xpos"], src["ten_length"],
+                                                        (self.CP, 0), (self.CPn, 0)], self._consts(), self.n_cat, 6)
+            ce.setBytes_length_atIndex_(self.cat_consts.tobytes(), self.cat_consts.nbytes, 11)
+            ce.setBuffer_offset_atIndex_(self.CP, 0, 9)
+            ce.setBuffer_offset_atIndex_(self.CPn, 0, 10)
             self._dispatch(ce, self.p["emit_tube"], [(B["trec"], 0), (B["tmpl"], 0), P,
                                                      src.get("ten_wrapadr", dummy), src.get("ten_wrapnum", dummy),
                                                      src.get("wrap_obj", dummy), src.get("wrap_xpos", dummy), (self.vbuf, 0)],
                            self._consts(n_rec=self.n_trec), self.n_trec, 8)
+        ce.endEncoding()
+
+    def encode_tint(self, cb, src, t_colors, inst_col):
+        """MuJoCo's limit colour of default-grey tendons: after the model sync has written ``inst_col`` (n_envs, G, 4)
+        from ``t_colors``, overwrite the tinted tendons' slots (shaders/dynamic_mesh.metal tendon_tint)."""
+        if not self.n_tint or src is None:
+            return
+        ce = cb.computeCommandEncoder()
+        ce.setComputePipelineState_(self.p["tendon_tint"])
+        ce.setBuffer_offset_atIndex_(self.bufs["tint"], 0, 0)
+        b, o = src["ten_length"]
+        ce.setBuffer_offset_atIndex_(b, o, 1)
+        ce.setBuffer_offset_atIndex_(t_colors, 0, 2)
+        ce.setBuffer_offset_atIndex_(inst_col, 0, 3)
+        ce.setBytes_length_atIndex_(self.tint_consts.tobytes(), self.tint_consts.nbytes, 4)
+        ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n_tint, self.n, 1), Metal.MTLSize(64, 1, 1))
         ce.endEncoding()
 
     def records(self):

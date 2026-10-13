@@ -155,10 +155,143 @@ inline float3x3 rot_z_to(float3 vec) {        // mju_quatZ2Vec -> mju_quat2Mat
     return quat_mat(float4(cos(0.5f * ang), axis * s));
 }
 
+// ---- catenary of a slack two-site tendon (MuJoCo's mjv_isCatenary / mjv_catenary, engine_vis_visualize.c) -----------
+// A spatial tendon between exactly two sites with a deadband spring (stiffness, lengthspring = [0, L]) or, without
+// stiffness, a length limit [0, L] it is not at, under nonzero gravity, without damping, frictionloss or an actuator, is
+// drawn as the catenary of length L through its two sites (dist > L: straight; L > 100 h: one hanging bead; else
+// numslices + 1 points, at most 100). The static conditions are checked on the host (dynamic_mesh.catenary_mode); a
+// limit-type tendon at or past L is drawn straight between its wrap points (as MuJoCo's non-catenary branch). One thread
+// per (catenary tendon, env) writes its points (CP) and their count (CPn) for emit_tube's mode 3. float32 throughout
+// (MuJoCo: float64; same Newton iteration on Pérez's change of variables, same 50-step bound).
+struct CatRec { int tendon, mode; float length, _p; };     // mode 0: deadband spring, 1: length limit (slack only)
+struct CatConsts { float4 up; uint npts, n_cat, _a, _b; }; // up: -gravity, normalized; npts: points of a full catenary
+
+inline float cosh_sinh(float x, thread float& sh) {
+    float ex = exp(clamp(x, -80.0f, 80.0f));
+    sh = 0.5f * (ex - 1.0f / ex);
+    return 0.5f * (ex + 1.0f / ex);
+}
+inline float catenary_residual(float b, float intercept, thread float& grad) {
+    float a = 0.5f / b;
+    float sh, ch = cosh_sinh(a, sh);
+    float q = max(2.0f * b * sh - 1.0f, 1e-30f);
+    grad = (a * ch - sh) * pow(q, -1.5f);
+    return 1.0f / sqrt(q) - intercept;
+}
+inline float solve_catenary(float v, float h, float L) {
+    float intercept = 1.0f / sqrt(sqrt(L * L - v * v) / h - 1.0f);
+    float b = intercept / sqrt(24.0f);
+    float tol = 1e-6f * max(intercept, 1.0f);       // MuJoCo: 1e-9 absolute in float64; float32's resolution here
+    for (int i = 0; i < 50; ++i) {
+        float grad;
+        float res = catenary_residual(b, intercept, grad);
+        if (fabs(res) < tol) break;
+        float step = -res / grad;
+        if (!isfinite(step)) break;
+        for (int j = 0; j < 10; ++j) {
+            float g2;
+            if (fabs(catenary_residual(b + step, intercept, g2)) < fabs(res)) break;
+            step *= 0.5f;
+        }
+        b += step;
+    }
+    return b;
+}
+// points of the catenary of length L from x0 to x1 into out; returns their number (2, 3 or npts)
+inline int catenary_points(float3 x0, float3 x1, float3 up, float L, uint npts, device float4* out) {
+    float3 x01 = x1 - x0;
+    if (length(x01) > L) { out[0] = float4(x0, 1.0f); out[1] = float4(x1, 1.0f); return 2; }
+    float3 across = x01 - up * dot(up, x01);
+    float nrm = length(across);
+    across = nrm < 1e-15f ? float3(0.0f) : across / nrm;
+    float h = dot(x01, across), v = dot(x01, up);
+    if (L > 100.0f * h) {                  // near vertical: hanging bead
+        float d_up = -0.5f * (sqrt(L * L - h * h) - v);
+        float d_across = h * d_up / (2.0f * d_up - v);
+        out[0] = float4(x0, 1.0f);
+        out[1] = float4(x0 + up * d_up + across * d_across, 1.0f);
+        out[2] = float4(x1, 1.0f);
+        return 3;
+    }
+    float bh = solve_catenary(v, h, L) * h;
+    float h_offset = -0.5f * (log((L + v) / (L - v)) * bh - h);
+    float sh;
+    float v_offset = -cosh_sinh(h_offset / bh, sh) * bh;
+    out[0] = float4(x0, 1.0f);
+    for (uint i = 1; i + 1 < npts; ++i) {
+        float horizontal = float(i) * h / float(npts);
+        float vertical = bh * cosh_sinh((horizontal - h_offset) / bh, sh) + v_offset;
+        out[i] = float4(x0 + across * horizontal + up * vertical, 1.0f);
+    }
+    out[npts - 1] = float4(x1, 1.0f);
+    return int(npts);
+}
+
+kernel void catenary(device const CatRec* cat [[buffer(0)]], device const int* ten_wrapadr [[buffer(1)]],
+                     device const float* wrap_xpos [[buffer(2)]], device const float* ten_length [[buffer(3)]],
+                     device float4* CP [[buffer(4)]], device int* CPn [[buffer(5)]],
+                     constant DynConsts& c [[buffer(6)]], constant CatConsts& cc [[buffer(7)]],
+                     uint2 tid [[thread_position_in_grid]])
+{
+    uint k = tid.x, e = tid.y;
+    if (k >= cc.n_cat || e >= c.n_envs) return;
+    CatRec r = cat[k];
+    device float4* out = CP + (e * cc.n_cat + k) * cc.npts;
+    int adr = ten_wrapadr[e * c.ntendon + uint(r.tendon)];
+    if (adr < 0 || adr + 1 >= int(c.nwrap2)) { out[0] = float4(0.0f); CPn[e * cc.n_cat + k] = 0; return; }
+    float3 x0 = ld3(wrap_xpos, e * c.nwrap2 + uint(adr)), x1 = ld3(wrap_xpos, e * c.nwrap2 + uint(adr + 1));
+    bool slack = r.mode == 0 || ten_length[e * c.ntendon + uint(r.tendon)] < r.length;
+    int n;
+    if (!slack) { out[0] = float4(x0, 1.0f); out[1] = float4(x1, 1.0f); n = 2; }   // at the limit: straight
+    else n = catenary_points(x0, x1, cc.up.xyz, r.length, cc.npts, out);
+    CPn[e * cc.n_cat + k] = n;
+}
+
+// ---- limit colour of a tendon (addSpatialTendonGeoms): a default-grey tendon without material is mixed toward
+// vis.rgba.constraint by the impedance of its active limit constraint (getimpedance of tendon_solimp_lim at the limit
+// distance; the upper limit's when both are active, as MuJoCo's efc loop leaves it). Written over the model sync's
+// per-env colour of the tendon's slot (t_colors x colour). Catenary-drawn tendons keep their colour.
+struct TintRec { int tendon, slot, cat_mode, limited; float lo, hi, margin, _p; float4 si0; float4 si1; float4 rgba; };
+struct TintConsts { float4 constraint; uint n_tint, n_slots, ntendon, n_envs; };
+
+inline float impedance(float4 si0, float si4, float pos, float margin) {   // getimpedance (solimp = si0.xyzw, si4)
+    if (si0.x == si0.y || si0.z <= 1e-15f) return 0.5f * (si0.x + si0.y);
+    float x = (pos - margin) / si0.z;
+    if (x < 0.0f) x = -x;
+    if (x >= 1.0f || x <= 0.0f) return x >= 1.0f ? si0.y : si0.x;
+    float y;
+    if (si4 == 1.0f) y = x;
+    else if (x <= si0.w) { float a = 1.0f / pow(si0.w, si4 - 1.0f); y = a * pow(x, si4); }
+    else { float b = 1.0f / pow(1.0f - si0.w, si4 - 1.0f); y = 1.0f - b * pow(1.0f - x, si4); }
+    return si0.x + y * (si0.y - si0.x);
+}
+
+kernel void tendon_tint(device const TintRec* tr [[buffer(0)]], device const float* ten_length [[buffer(1)]],
+                        device const float4* t_colors [[buffer(2)]], device float4* inst_col [[buffer(3)]],
+                        constant TintConsts& tc [[buffer(4)]], uint2 tid [[thread_position_in_grid]])
+{
+    uint k = tid.x, e = tid.y;
+    if (k >= tc.n_tint || e >= tc.n_envs) return;
+    TintRec r = tr[k];
+    float len = ten_length[e * tc.ntendon + uint(r.tendon)];
+    if (r.cat_mode == 1 && len < r.hi) return;            // slack limit-type two-site tendon: drawn as a catenary
+    float imp = 0.0f;
+    if (r.limited != 0) {
+        float dl = len - r.lo, du = r.hi - len;            // lower then upper (mj_instantiateLimit's order)
+        if (dl < r.margin) imp = impedance(r.si0, r.si1.x, dl, r.margin);
+        if (du < r.margin) imp = impedance(r.si0, r.si1.x, du, r.margin);
+    }
+    float3 rgb = (1.0f - imp) * r.rgba.rgb + imp * tc.constraint.rgb;
+    uint i = e * tc.n_slots + uint(r.slot);
+    inst_col[i] = t_colors[i] * float4(rgb, r.rgba.a);
+}
+
 kernel void emit_tube(device const TRec* rec [[buffer(0)]], device const float4* tmpl [[buffer(1)]], device const float* P [[buffer(2)]],
                       device const int* ten_wrapadr [[buffer(3)]], device const int* ten_wrapnum [[buffer(4)]],
                       device const int* wrap_obj [[buffer(5)]], device const float* wrap_xpos [[buffer(6)]],
                       device float* out [[buffer(7)]], constant DynConsts& c [[buffer(8)]],
+                      device const float4* CP [[buffer(9)]], device const int* CPn [[buffer(10)]],
+                      constant CatConsts& cc [[buffer(11)]],
                       uint2 tid [[thread_position_in_grid]])
 {
     uint i = tid.x, e = tid.y;
@@ -168,7 +301,12 @@ kernel void emit_tube(device const TRec* rec [[buffer(0)]], device const float4*
     float3 p0, p1;
     float rad = r.r;
     bool ok = true;
-    if (r.mode == 2) {                         // tendon segment b of tendon a (addSpatialTendonGeoms)
+    if (r.mode == 3) {                         // catenary tendon a (CatRec index), segment b
+        uint q = e * cc.n_cat + uint(r.a);
+        ok = r.b + 1 < CPn[q];
+        if (ok) { p0 = CP[q * cc.npts + uint(r.b)].xyz; p1 = CP[q * cc.npts + uint(r.b) + 1].xyz; }
+        else p0 = CP[q * cc.npts].xyz;
+    } else if (r.mode == 2) {                        // tendon segment b of tendon a (addSpatialTendonGeoms)
         int adr = ten_wrapadr[e * c.ntendon + uint(r.a)], num = ten_wrapnum[e * c.ntendon + uint(r.a)];
         int j = adr + r.b;
         ok = r.b < num - 1 && adr >= 0 && j + 1 < int(c.nwrap2);

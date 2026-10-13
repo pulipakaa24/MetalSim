@@ -46,11 +46,18 @@ struct GridPlaneHit { bool hit; float t; uint slot; float3 n; float2 uv; float3 
 
 // the nearest infinite plane of env e met by the ray (o, d) in (t_from, t_to]: past the env's cell (t_from = where it
 // leaves the cell; nearer, the plane's disc in the acceleration structure is hit instead). Two-sided, as the disc.
+// GRID_PLANES (compile time, RayTracer.shader_defines): how many planes the kernels test, the scene's count. 0 compiles
+// the continuation out: in the ray kernels the inlined loop raised register pressure enough to cost tier 1 17 % and
+// tier 2 29 % of their frame on a scene with no infinite plane (docs/RENDER_COVERAGE.md "Render cost by feature").
+#ifndef GRID_PLANES
+#define GRID_PLANES ENV_GRID_PLANES
+#endif
 inline GridPlaneHit grid_plane(float3 o, float3 d, float t_from, float t_to, uint e, EnvGrid g) {
     GridPlaneHit h; h.hit = false; h.t = t_to; h.slot = 0u; h.n = float3(0.0, 0.0, 1.0); h.uv = float2(0.0); h.lp = float3(0.0);
+#if GRID_PLANES > 0
     if (g.clip == 0u || g.n_planes == 0u || t_to <= t_from) return h;
     float3 ol = o - grid_offset(e, g);
-    for (uint k = 0; k < min(g.n_planes, uint(ENV_GRID_PLANES)); ++k) {
+    for (uint k = 0; k < min(g.n_planes, uint(GRID_PLANES)); ++k) {
         float3 N = g.pl_n[k].xyz;
         float den = dot(d, N);
         if (fabs(den) < 1e-12) continue;
@@ -63,6 +70,7 @@ inline GridPlaneHit grid_plane(float3 o, float3 d, float t_from, float t_to, uin
         h.uv = float2(lx * g.pl_uv[k].x + g.pl_uv[k].y, ly * g.pl_uv[k].z + g.pl_uv[k].w);
         h.lp = float3(lx, ly, 0.0);
     }
+#endif
     return h;
 }
 #endif  // METALSIM_ENV_GRID_H

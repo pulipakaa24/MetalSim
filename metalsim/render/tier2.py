@@ -103,8 +103,14 @@ class Tier2Renderer:
                  visual=None, deformables=(), tube_slices=None, cap_stacks=None, dyn_rebuild_every: int = 32,
                  infinite_planes: bool = True, hfield_skirts: bool = True, per_world_size: bool = True,
                  model_fields: bool = True, lens=None, dyn_layout: str | None = None, env_layout: str | None = None,
+                 haze: bool = True, fog: bool = False, tendons: str = "mujoco", rolling_shutter=None,
                  area_lights: bool = True, ctx: MetalContext | None = None, device="metal:0"):
-        """``terrain_slots`` / ``draw_hfields`` / ``appearance``: see ``Tier0Renderer`` (False / "legacy" = the
+        """``haze`` / ``fog``: MuJoCo's haze over the first infinite plane (drawn with the skybox texture) and its linear
+        fog (off by default, as ``mujoco.Renderer``), composited on the camera ray at the first opaque surface
+        (``metalsim.render.haze``; see ``Tier0Renderer``). ``tendons`` / ``rolling_shutter``: see ``Tier0Renderer``
+        (rolling shutter here: per band the structure is refit at the band's poses and only its rows are traced).
+        ``set_texture_pool`` / ``t_material_ids``: per-env material and texture swaps (``metalsim.render.env_materials``).
+        ``terrain_slots`` / ``draw_hfields`` / ``appearance``: see ``Tier0Renderer`` (False / "legacy" = the
         previous behaviour). ``skybox``: the model's skybox texture is the environment (camera background and the
         radiance of every escaping ray, MuJoCo's cube mapping, unlit texel values x env scale) instead of its mean
         colour; a ``dome`` or ``set_environment`` map replaces it.
@@ -145,7 +151,7 @@ class Tier2Renderer:
                             tube_slices=tube_slices, cap_stacks=cap_stacks, tube_view=tube_view,
                             dyn_rebuild_every=dyn_rebuild_every, infinite_planes=infinite_planes, hfield_skirts=hfield_skirts,
                             per_world_size=per_world_size, dyn_layout=dyn_layout, env_layout=env_layout,
-                            ctx=self.ctx, device=device)
+                            tendons=tendons, ctx=self.ctx, device=device)
 
         self.model_fields = bool(model_fields)
         self.lens = lens or Lens.pinhole()
@@ -219,13 +225,18 @@ class Tier2Renderer:
                 mats[len(t.geoms) + j, 15] = ids[spec_.get(ex["name"], spec_.get(None, "legacy"))]
         # transparency=False: the model sync writes alpha 1 (ModelSync(opaque=True))
         self.mat_buf = c.buffer(4 * (mats.size + self.G * 8), self._with_ext(mats), "pt_materials")
+        from metalsim.render.env_materials import EnvMaterials   # per-env material / texture swaps (after the tables)
+        self.env_mats = EnvMaterials(c, model, t, n_envs, self.sync, device=device)
+        self.t_material_ids = self.env_mats.t_material_ids
+        self._env_mats_on, self._env_mats_version = False, -1
         ai = t.atlas.image
         self.atlas_tex = c.texture2d(ai.shape[1], ai.shape[0], Metal.MTLPixelFormatRGBA8Unorm, Metal.MTLTextureUsageShaderRead,
                                      label="pt_atlas", storage=Metal.MTLStorageModeShared)
         c.upload_texture(self.atlas_tex, ai)
         self.samp = c.sampler(linear=True, repeat=True)
         # PTConsts (shaders/pathtrace.metal): 16 words as before + [16:18] env grid, [20] env_yaw, [21] clamp_lum, [24:28] env_mul
-        self.consts = np.zeros(48, np.uint32)
+        # [28:32] ray_limit, [32:48] lens, [48:76] haze (HazeParams); the EnvGrid follows at encode time
+        self.consts = np.zeros(76, np.uint32)
         self.consts[:4] = (n_envs, width, height, max(model.ncam, 1))
         self.consts[4:8] = (max(model.nlight, 1) if model.nlight else 0, self.G, spp, max_bounces)
         self.consts[8:12] = (0, self.rt.tpr, 1, seed)
@@ -234,6 +245,11 @@ class Tier2Renderer:
         self.consts[23] = {"mujoco": 0, "surface": 0, "behind": 1}[transparent_ids]   # PTConsts.trans_ids
         cf[28] = self.rt.ray_limit                                   # PTConsts.ray_limit
         self.consts[32:48] = self.lens.pack().view(np.uint32)      # PTConsts.lens
+        from metalsim.render import haze as hz
+        hp = hz.haze_params(model, t.geoms, haze=haze, fog=fog, sky_drawn=bool(params.shape[0] > 6 and params[6, 1] > 0.5))
+        hp[16:19] *= env_scale; hp[24:27] *= env_scale            # haze / fog colours in the skybox's radiance units
+        self.haze_params = hp
+        self.consts[48:48 + hz.WORDS] = hp.view(np.uint32)         # PTConsts.haze
         self.denoise = denoise
         self.aux = bool(aux or denoise)
         self.base_flags = (2 if material_model != "legacy" else 0) | (4 if tonemap == "rtx" else 0) | (8 if self.aux else 0) | (16 if center_sample else 0)
@@ -273,11 +289,8 @@ class Tier2Renderer:
         self._accum_view = wm.buffer_of(self._accum)
         self.out = RenderOutputs(**{k: tb.mps_tensor(a) for k, a in self._arrays.items()})
         self.t_accum = tb.mps_tensor(self._accum)
-        defs = dict(self.rt.shader_defines())
-        if self.area is not None:
-            defs["AREA_LIGHTS"] = 1           # compiled only for scenes with area lights (pathtrace.metal)
-        lib = c.library("pathtrace", defs or None)
-        self.pipe = c.compute_pipeline(lib, "path_trace")
+        self._haze_on = hz.active(self.haze_params)
+        self._build_pipeline()
         self.tm_consts = np.zeros(8, np.uint32); self.tm_consts[:3] = (n, width, height); self.tm_consts[3] = self.base_flags
         self.tm_consts.view(np.float32)[4] = exposure
         self._oidn = None
@@ -302,6 +315,19 @@ class Tier2Renderer:
             lp[:, i] = model.light_pos[i]; ld[:, i] = model.light_dir[i]
         c.write_buffer(self._host_light_xpos, lp); c.write_buffer(self._host_light_xdir, ld)
         self.event = self.ctx.event
+        # rolling shutter: the previous frame's pose inputs per env (metalsim.render.rolling)
+        self.rolling, self.history = rolling_shutter, None
+        if rolling_shutter is not None:
+            from metalsim.render.rolling import PoseHistory
+            rolling_shutter.bands(height)
+            nc = max(model.ncam, 1)
+            f = {"geom_xpos": ("pos", 3 * model.ngeom), "geom_xmat": ("mat", 9 * model.ngeom),
+                 "cam_xpos": ("pos", 3 * nc), "cam_xmat": ("mat", 9 * nc)}
+            if model.nlight:
+                f.update(light_xpos=("pos", 3 * model.nlight), light_xdir=("dir", 3 * model.nlight))
+            if self.rt.pose is not None:
+                f.update(site_xpos=("pos", 3 * model.nsite), site_xmat=("mat", 9 * model.nsite))
+            self.history = PoseHistory(self.ctx, n_envs, f)
         self.grains = None            # GrainField once set_particles is called (metalsim/render/particles.py)
         self._ias = None
         self._grain_dummy = c.buffer(304, label="pt_grain_placeholder")
@@ -356,13 +382,47 @@ class Tier2Renderer:
         else:
             self._ias.encode(cb, gx, gxo, gm, gmo)
 
+    def _build_pipeline(self):
+        """path_trace specialized on the scene: dynamic layout and infinite-plane count (RayTracer.shader_defines),
+        haze / fog, per-env material entries (code that a scene does not use is compiled out: the kernel's register
+        pressure sets its speed)."""
+        defs = dict(self.rt.shader_defines())
+        defs["HAZE_ON"] = 1 if self._haze_on else 0
+        defs["ENV_MATS"] = 1 if self._env_mats_on else 0
+        if self.area is not None:
+            defs["AREA_LIGHTS"] = 1           # scenes with USD area lights (metalsim.render.area_lights)
+        self.pipe = self.ctx.compute_pipeline(self.ctx.library("pathtrace", defs), "path_trace")
+
+    def _encode_env_mats(self, cb, sim):
+        """Per-env material entries: resolve them, keep the entry table behind the material table, and specialize the
+        kernel when the feature switches on or off."""
+        on = self.env_mats.encode(cb, sim)
+        if on and self.env_mats.version != self._env_mats_version:
+            head = self.ctx.buffer_array(self.mat_buf, np.float32, (self.G * 24,)).copy()
+            ent = self.env_mats.entries.reshape(-1)
+            self.mat_buf = self.ctx.buffer(4 * (head.size + ent.size), np.concatenate([head, ent]), "pt_materials")
+            self._env_mats_version = self.env_mats.version
+        if on != self._env_mats_on:
+            self._env_mats_on = on
+            self._build_pipeline()
+
+    def set_texture_pool(self, images, **kw):
+        """Per-env texture randomization (Isaac Lab randomize_visual_texture_material); see ``Tier0Renderer``."""
+        return self.env_mats.set_texture_pool(images, **kw)
+
+    def set_material_ids(self, ids):
+        """(N, G) material entry per env and slot (-1 = the slot's own); host write."""
+        self.env_mats.set_material_ids(ids)
+
     def _with_ext(self, mats):
         """(G, 16) material table followed by the (G, 8) MaterialExt table, the layout path_trace reads."""
         ext = self.tables.material_ext if self.tables.material_ext is not None else np.zeros((self.G, 8), np.float32)
         return np.concatenate([np.asarray(mats, np.float32).reshape(-1), np.asarray(ext, np.float32).reshape(-1)])
 
-    def _encode(self, cb, reset: bool, cam_xpos, cxo, cam_xmat, cmo, light_xpos, lxo, light_xdir, ldo):
+    def _encode(self, cb, reset: bool, cam_xpos, cxo, cam_xmat, cmo, light_xpos, lxo, light_xdir, ldo, rows=None):
         self.consts[8] = self.frame
+        r0, r1 = rows if rows is not None else (0, self.th)
+        self.consts[29] = r0                       # PTConsts._l1: the first row traced
         grains = self.grains is not None and self.grains.n_grains > 0
         two = grains and self._ias.mode == "two_level"
         if grains:
@@ -408,7 +468,8 @@ class Tier2Renderer:
             ce.setBuffer_offset_atIndex_(b, off, 27 + i)
         ce.setTexture_atIndex_(self.atlas_tex, 0); ce.setSamplerState_atIndex_(self.samp, 0)
         ce.setTexture_atIndex_(self._env_tex, 1); ce.setSamplerState_atIndex_(self.env_samp, 1)
-        ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.tw, self.th, self.n), Metal.MTLSize(8, 8, 1))
+        ce.setTexture_atIndex_(self.env_mats.pool_tex, 2)
+        ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.tw, r1 - r0, self.n), Metal.MTLSize(8, 8, 1))
         ce.endEncoding()
         self.frame += 1
 
@@ -465,22 +526,70 @@ class Tier2Renderer:
         if ev is not None:
             self.ctx.wait_for(cb, ev, after_value)
         self.sync.encode(cb, sim if self.model_fields else None)
-        self._encode_area_axes(cb, sim)
-        gm_buf, gm_off = self.rt.encode_geom_xmat(cb, sim, v["geom_xmat"].buffer, v["geom_xmat"].offset)
-        gx_buf, gx_off, gm_buf, gm_off = self.rt.encode_pose(cb, sim, v["geom_xpos"].buffer, v["geom_xpos"].offset, gm_buf, gm_off)
-        self._encode_scene(cb, gx_buf, gx_off, gm_buf, gm_off)
-        lx = v.get("light_xpos"); ld = v.get("light_xdir")
-        lxb, lxo, ldb, ldo = (lx.buffer, lx.offset, ld.buffer, ld.offset) if lx else (self._host_light_xpos, 0, self._host_light_xdir, 0)
-        for p in range(passes):
-            self._encode(cb, reset and p == 0, v["cam_xpos"].buffer, v["cam_xpos"].offset, v["cam_xmat"].buffer, v["cam_xmat"].offset, lxb, lxo, ldb, ldo)
+        if self.area is not None:
+            self.area.encode(cb, sim)
+        if self.rt.dyn is not None:      # tendons at their limits: MuJoCo's limit colour over the synced colour
+            self.rt.dyn.encode_tint(cb, self.rt._dyn_src, self.color_buf, self.sync.inst_col)
+        self._encode_env_mats(cb, sim if self.model_fields else None)
+        if self.rolling is not None:      # row bands at interpolated poses (metalsim.render.rolling)
+            cur = {k: (x.buffer, x.offset) for k, x in v.items()}
+            if self.rt.pose is not None:
+                for k in ("site_xpos", "site_xmat"):
+                    x = wm.buffer_of(getattr(sim.d, k)); cur[k] = (x.buffer, x.offset)
+            self._encode_rolling(cb, cur, sim, reset, passes)
+        else:
+            gm_buf, gm_off = self.rt.encode_geom_xmat(cb, sim, v["geom_xmat"].buffer, v["geom_xmat"].offset)
+            gx_buf, gx_off, gm_buf, gm_off = self.rt.encode_pose(cb, sim, v["geom_xpos"].buffer, v["geom_xpos"].offset, gm_buf, gm_off)
+            self._encode_scene(cb, gx_buf, gx_off, gm_buf, gm_off)
+            lx = v.get("light_xpos"); ld = v.get("light_xdir")
+            lxb, lxo, ldb, ldo = (lx.buffer, lx.offset, ld.buffer, ld.offset) if lx else (self._host_light_xpos, 0, self._host_light_xdir, 0)
+            for p in range(passes):
+                self._encode(cb, reset and p == 0, v["cam_xpos"].buffer, v["cam_xpos"].offset, v["cam_xmat"].buffer, v["cam_xmat"].offset, lxb, lxo, ldb, ldo)
         cb = self._postprocess(cb)
         val = self.ctx.signal(cb)
         self.ctx.commit(cb)
         return val
 
-    def _encode_area_axes(self, cb, sim):
+    def _encode_rolling(self, cb, cur, sim, reset, passes):
+        """Rolling shutter: per row band, the pose inputs at the band's time, the structure refit to them and only the
+        band's rows traced; the history takes the current poses at the end."""
+        for r0, r1, tau in self.rolling.bands(self.th):
+            b = self.history.encode_interp(cb, cur, tau)
+            gm_buf, gm_off = self.rt.encode_geom_xmat(cb, sim, *b["geom_xmat"])
+            sites = (b["site_xpos"], b["site_xmat"]) if self.rt.pose is not None else None
+            gx_buf, gx_off, gm_buf, gm_off = self.rt.encode_pose(cb, sim, *b["geom_xpos"], gm_buf, gm_off, sites=sites)
+            self._encode_scene(cb, gx_buf, gx_off, gm_buf, gm_off)
+            lx, ld = b.get("light_xpos"), b.get("light_xdir")
+            lxb, ldb = (lx[0], ld[0]) if lx else (self._host_light_xpos, self._host_light_xdir)
+            for p in range(passes):
+                self._encode(cb, reset and p == 0, b["cam_xpos"][0], 0, b["cam_xmat"][0], 0, lxb, 0, ldb, 0, rows=(r0, r1))
+        self.history.encode_snapshot(cb, cur)
+
+    def _render_host_rolling(self, datas, prev, passes, reset, sources):
+        c = self.ctx
+        n = self.n
+        arr = lambda ds: {k: np.asarray(np.stack([getattr(d, k) for d in ds]), np.float32).reshape(n, -1)   # noqa: E731
+                          for k in self.history.fields}
+        if prev is not None:
+            self.history.write_prev_host(arr(prev))
+        cur_np = arr(datas)
+        if not hasattr(self, "_host_rolling_bufs"):
+            self._host_rolling_bufs = {k: c.buffer(x.nbytes, label=f"pt_host_roll_{k}") for k, x in cur_np.items()}
+        for k, x in cur_np.items():
+            c.write_buffer(self._host_rolling_bufs[k], x)
+        self.rt.set_sources(sources=sources, datas=datas)
+        cb = c.command_buffer()
+        self.sync.encode(cb, None)
         if self.area is not None:
-            self.area.encode(cb, sim)
+            self.area.write_host(datas)
+        if self.rt.dyn is not None:
+            self.rt.dyn.encode_tint(cb, self.rt._dyn_src, self.color_buf, self.sync.inst_col)
+        self._encode_env_mats(cb, None)
+        self._encode_rolling(cb, {k: (bf, 0) for k, bf in self._host_rolling_bufs.items()}, None, reset, passes)
+        cb = self._postprocess(cb)
+        c.commit(cb); c.synchronize()
+        out = {k: a.numpy().copy() for k, a in self._arrays.items()}
+        return out
 
     def after(self, value):
         """Order torch's subsequent kernels after the render that signalled ``value``."""
@@ -586,10 +695,12 @@ class Tier2Renderer:
         self.ctx.write_buffer(self.mat_buf, unit_rgba(mats))
         self.sync.set_static_rgba(mats)
 
-    def render_host(self, datas, passes=1, reset=True, cam_pos=None, cam_quat=None, geom_size=None, chunk=None, sources=None):
+    def render_host(self, datas, passes=1, reset=True, cam_pos=None, cam_quat=None, geom_size=None, chunk=None, sources=None, prev=None):
         """Host path from MjData lists (tests/tools); synchronizes; returns numpy outputs. ``geom_size`` (N, ngeom, 3):
         per-world sizes of the terrain slots (default the model's). ``chunk``: commit and wait every ``chunk`` passes
         (long offline renders: bounded command buffers; same result). ``sources``: as ``render`` (numpy arrays)."""
+        if self.rolling is not None:      # ``prev``: the previous frame's MjData (default the last render's state)
+            return self._render_host_rolling(datas, prev, passes, reset, sources)
         from metalsim.render.scene_tables import quats_to_mats
         n, ng, nc, nl = self.n, self.m.ngeom, max(self.m.ncam, 1), max(self.m.nlight, 1)
         c = self.ctx; rt = self.rt
@@ -616,6 +727,9 @@ class Tier2Renderer:
             self.area.write_host(datas)
         cb = c.command_buffer()
         self.sync.encode(cb, None)
+        if rt.dyn is not None:
+            rt.dyn.encode_tint(cb, rt._dyn_src, self.color_buf, self.sync.inst_col)
+        self._encode_env_mats(cb, None)
         self._encode_scene(cb, rt._host_geom_xpos, 0, rt._host_geom_xmat, 0)
         for p in range(passes):
             if chunk and p and p % int(chunk) == 0:

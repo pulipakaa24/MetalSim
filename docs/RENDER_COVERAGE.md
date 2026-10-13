@@ -63,12 +63,12 @@ Measured coverage of the reference silhouette is shown as rgb / depth / seg.
 | hfield | ✅ | ✅ | ✅ | ✅ | ✅ | **Fixed (§3c).** Top surface plus MuJoCo's sides and base: coverage 0.58 → 1.0 (side view) and 0.90 → 1.0 (from below), every renderer; geometry equals `mj_ray` on 400 random rays (max 1e-15 m). |
 | SDF geom (`type="sdf"`, plugin or mesh SDF) | ✅ | ✅ | ✅ | ✅ | ✅ | **Fixed 2026-10 (B)**: drawn from its mesh as MuJoCo does. Was 0.0 / 0.0 / 0.0; now 1.0 / 1.0 / 1.0 in T0, T2 and the ray-traced depth camera, depth error 0. |
 | sites (group 0–2, visible in MuJoCo by default) | ✅ | ✅ | ✅ | n/a (by design) | ✅ | **fixed (workstream A, §5)**: 0.993–1.0 / 0.993–1.0 / 0.993–1.0, depth error ≤ 0.4 mm (was 0.0). Instanced slots posed from `site_xpos` / `site_xmat`. The ray-traced sensors leave sites out by default, as `mj_ray` does (a lidar's own mounting site would occlude every beam); `visual=mujoco.MjvOption()` includes them. Isaac draws no sites. |
-| spatial tendon with `width` (cables, wires, MuJoCo tendon-driven hands) | ✅ | ✅ | ✅ | ✅ | ✅ | **fixed (workstream A, §5)**: 1.0 / 1.0 / 1.0, depth error 0 (was 0.0); tendons wrapping a cylinder, a sphere and across a pulley in §5. Capsules per wrap segment (MuJoCo's tessellation, half width inside a wrapping geom, none across a pulley). Not reproduced: MuJoCo's catenary for a slack two-site spring tendon and the limit-impedance recolouring of default-grey tendons. Isaac draws no tendon geometry. |
+| spatial tendon with `width` (cables, wires, MuJoCo tendon-driven hands) | ✅ | ✅ | ✅ | ✅ | ✅ | **fixed (workstream A, §5)**: 1.0 / 1.0 / 1.0, depth error 0 (was 0.0); tendons wrapping a cylinder, a sphere and across a pulley in §5. Capsules per wrap segment (MuJoCo's tessellation, half width inside a wrapping geom, none across a pulley). **Catenary and limit colour (§3d, 2026-10-13)**: a slack two-site tendon with a deadband spring or an unreached length limit hangs as MuJoCo's catenary (capsules equal to `mjv_updateScene`'s to 2e-5 m; coverage of MuJoCo's silhouette ≥ 0.97 in T0 / T1 / T2 / RT, `tendons="straight"` ≤ 0.6 on the hanging ones), and default-grey tendons at a limit take `vis.rgba.constraint` by the limit impedance (colour equal to MuJoCo's scene to 2e-6). Isaac draws no tendon geometry. |
 | flex 2D (cloth) | ✅ | ✅ | ✅ | ✅ | ✅ | **fixed (workstream A, §5)**: 1.0 / 1.0 / 1.0 of 277 px, depth error ≤ 0.1 mm (was 0.0). MuJoCo's skin: smoothed surface ±radius, sides closed. |
 | flex 3D (soft volume) | ✅ | ✅ | ✅ | ✅ | ✅ | **fixed (workstream A, §5)**: 1.0 / 1.0 / 1.0 of 152 px, depth error 0 (was 0.0). Shell offset by +radius (flat-shaded when `flatskin`). |
 | flex 1D (cable) | ✅ | ✅ | ✅ | ✅ | ✅ | **fixed (workstream A, §5)**: open cylinders per edge (`mjVIS_FLEXEDGE`). The first audit's cable sat just above the image (0 px in MuJoCo too); moved mid-image it is 1.0 / 1.0 / 1.0 in every renderer. |
 | skin (bone-skinned mesh) | ✅ | ✅ | ✅ | ✅ | ✅ | **fixed (workstream A, §5)**: 1.0 / 1.0 / 1.0 of 236 px, depth error 0 (was 0.0). Linear blend skinning, area-weighted normals, `inflate`. |
-| transparency (`rgba` alpha < 1, material opacity, USD `opacity`) | ✅ | ✅ | ✅ | ✅ | ✅ | **Fixed 2026-10 (B)**. T0/T1 blend as MuJoCo does: objects sorted per env, drawn front-to-back then back-to-front, back faces culled. T2 treats alpha as presence, like a USD opacity in Isaac's path tracer. Red box behind 25 % blue glass, colour change the glass makes over the box: MuJoCo (−64, 0, +65); T0/T1 before (−146, 0, +146), after (−64, 0, +64); T2 before (−122, 0, +125), after (−53, 0, +53). Annotations default to MuJoCo's: segmentation and depth of the glass (1.904 m, equal to MuJoCo). `transparent_ids="behind"` gives Isaac RTX Real-Time's opacity behaviour (seg / depth from what is behind). **RT: fixed 2026-10-13 (§3d)**: the ray-traced depth camera takes the same `transparent_ids` (default the surface: equal to `mj_ray` and MuJoCo's depth to < 0.2 mm) plus Isaac's `alpha_threshold`; the lidar transmits through transparent geoms with partial returns (default), or follows `mj_ray` (`transparency="surface"`); lidar materials (clear glass, mirror ghosts) and return modes. Scenes without transparency byte-identical. |
+| transparency (`rgba` alpha < 1, material opacity, USD `opacity`) | ✅ | ✅ | ✅ | ✅ | ✅ | **Fixed 2026-10 (B)**. T0/T1 blend as MuJoCo does: objects sorted per env, drawn front-to-back then back-to-front, back faces culled. T2 treats alpha as presence, like a USD opacity in Isaac's path tracer. Red box behind 25 % blue glass, colour change the glass makes over the box: MuJoCo (−64, 0, +65); T0/T1 before (−146, 0, +146), after (−64, 0, +64); T2 before (−122, 0, +125), after (−53, 0, +53). Annotations default to MuJoCo's: segmentation and depth of the glass (1.904 m, equal to MuJoCo). `transparent_ids="behind"` gives Isaac RTX Real-Time's opacity behaviour (seg / depth from what is behind). **RT: fixed 2026-10-13 (§3e)**: the ray-traced depth camera takes the same `transparent_ids` (default the surface: equal to `mj_ray` and MuJoCo's depth to < 0.2 mm) plus Isaac's `alpha_threshold`; the lidar transmits through transparent geoms with partial returns (default), or follows `mj_ray` (`transparency="surface"`); lidar materials (clear glass, mirror ghosts) and return modes. Scenes without transparency byte-identical. |
 | geometry beyond 10 m | ✅ (`far=`) | ✅ (`far=`) | ✅ | ✅ (range-limited) | ✅ | **Fixed (§3c).** `Tier0Renderer(far=...)` (default 10 m, unchanged); boxes at 15 m and 40 m 0.0 → 1.0 with MuJoCo's far plane; reversed-z depth keeps the error relative at any far. |
 | geom groups ≥ 3 hidden | ✅ | ✅ | ✅ | ✅ | ✅ | Matches MuJoCo's default `geomgroup` |
 | `geom_rgba` / `mat_rgba` | ✅ | ✅ | ✅ | n/a | ✅ | |
@@ -81,14 +81,15 @@ Measured coverage of the reference silhouette is shown as rgb / depth / seg.
 | cube texture (`type="cube"`) on box / sphere | ✅ | ✅ | ✅ | n/a | | **Fixed 2026-10 (B)**: OpenGL cube-map lookup of MuJoCo's object coordinates, with one face or a 6-face strip. Corr 0.08 / 0.06 → 0.97 / 0.98 |
 | texture roles other than RGB (normal, roughness, metallic, ORM, emissive, opacity layers) | ❌ | ❌ | ❌ | n/a | | Only `mat_texid[mjTEXROLE_RGB]` is read (code) |
 | `texuniform`, `texrepeat` | ✅ | ✅ | ✅ | | | Code, plus `test_texture_pattern_parity` corr 0.996 |
-| skybox | ✅ | ✅ | ✅ | n/a | | **Fixed 2026-10 (B)**: the first skybox texture is drawn as MuJoCo's cube map of the view direction (d.x, d.z, −d.y). In T0 it is the background; in T1 it is also what reflections miss into. In T2 it is the radiance of every escaping ray, so it lights the scene; a `dome` or `set_environment` replaces it. Background luminance std 0.8 / 2.8 → 17.8 / 18.3 (MuJoCo 17.8), corr 0.996 / 0.988, MAD 0.1 / 0.2. `set_clear_color` turns it off. Not drawn: MuJoCo's haze over infinite planes. |
+| skybox | ✅ | ✅ | ✅ | n/a | | **Fixed 2026-10 (B)**: the first skybox texture is drawn as MuJoCo's cube map of the view direction (d.x, d.z, −d.y). In T0 it is the background; in T1 it is also what reflections miss into. In T2 it is the radiance of every escaping ray, so it lights the scene; a `dome` or `set_environment` replaces it. Background luminance std 0.8 / 2.8 → 17.8 / 18.3 (MuJoCo 17.8), corr 0.996 / 0.988, MAD 0.1 / 0.2. `set_clear_color` turns it off. |
+| haze over infinite planes (`mjRND_HAZE`, on by default) and fog (`mjRND_FOG`, off) | ✅ | ✅ | ✅ | n/a | | **Added (§3d, 2026-10-13)**: MuJoCo's faceted haze cone over the first infinite plane (with a skybox, camera above the plane) composited per pixel at the first opaque surface, and GL linear fog on eye-space depth (`fog=True`). Haze alpha vs mujoco.Renderer: ≤ 3 levels (p99 1) in T0 / T1 / T2. `haze=False` / `fog=False` switch them off; compiled out when unused. Depth and segmentation unchanged (MuJoCo's depth buffer holds the cone). |
 | directional / point / spot lights moving with bodies | ✅ | ✅ | ✅ | n/a | | `light_xpos` / `light_xdir` per world |
 | more than 8 lights | ✅ | ✅ | ✅ | n/a | | **Decided 2026-10 (B): every light, as Isaac / RTX** (no light limit). MuJoCo's fixed-function GL path stops at 8. Patches 9 and 10: T0 0.0 / 0.0 → 42.8 / 42.6 (T2 42.4 / 42.4). `Tier0Renderer(max_lights=8)` restores MuJoCo's cap. MuJoCo also lights only directional and spot lights; we also light point lights. |
 | spot-light shadows | ✅ | ✅ | ✅ | n/a | | **Fixed 2026-10 (B)**. T0 renders a perspective shadow map per shadow-casting spot light, over the full cone; MuJoCo covers cutoff × shadowscale. T1 traces a ray to the light. Plate shadow ratio: MuJoCo 0.00; T0 1.04 → 0.054; T1 1.04 → 0.052; T2 0.033. Spot + directional together: MuJoCo 0.20, T0 0.81 → 0.21. |
 | point-light shadows | ✅ | ✅ | ✅ | n/a | | **Fixed 2026-10 (B)**: T0 renders six 90° cube faces per point light; T1 traces a ray. T0 1.02 → 0.053, T1 1.02 → 0.051, T2 0.035. MuJoCo does not light point lights at all; Isaac RTX shadows them. |
 | directional shadows | ✅ (every caster) | ✅ (every caster) | ✅ | | | 0.052 / 0.049 / 0.041 vs MuJoCo 0.0 (unchanged). Every further shadow-casting directional light now gets its own map in T0 and its own soft ray in T1. With a DR light on, the first model directional light stays unshadowed, as before. |
 | image lights (`mjLIGHT_IMAGE`) | ◐ | ◐ | ◐ | | | Mapped to directional (`build_lights`, code) |
-| area lights (USD Rect / Disk / Cylinder, SphereLight radius) | ◐ (far-field) | ✅ | ✅ | | | **Fixed 2026-10-13 (§3d)**: T2 samples the emitter (soft shadows; floor irradiance within 0.1 % mean, 1.3 % per 4 x 4 block of the analytic value at 0.5-3 light sizes, was +19 % at one size); T1 samples it with a shadow ray per sample over the closed-form irradiance; T0 keeps the far-field spot / point lights. SphereLight radius, exposure and `normalize` honoured. |
+| area lights (USD Rect / Disk / Cylinder, SphereLight radius) | ◐ (far-field) | ✅ | ✅ | | | **Fixed 2026-10-13 (§3e)**: T2 samples the emitter (soft shadows; floor irradiance within 0.1 % mean, 1.3 % per 4 x 4 block of the analytic value at 0.5-3 light sizes, was +19 % at one size); T1 samples it with a shadow ray per sample over the closed-form irradiance; T0 keeps the far-field spot / point lights. SphereLight radius, exposure and `normalize` honoured. |
 | debug visuals (joints, contacts, COM, inertia, equality constraints, perturbations) | n/a | n/a | n/a | | | Not camera content in Isaac either |
 
 ### 1b. Per-world randomization (things the physics can vary per env)
@@ -99,11 +100,11 @@ Measured coverage of the reference silhouette is shown as rgb / depth / seg.
 | camera pose, intrinsics, DR light, ambient, backgrounds | ✅ | ✅ (no backgrounds) | | `t_cam_spec` |
 | HDR dome map per episode | ❌ | ✅ | | `Randomizer.environment` is tier 2 only |
 | per-world `geom_size` (MuJoCo Warp batched size, scale randomization) | ✅ | ✅ | ✅ | **Fixed (§3c).** Every primitive is a unit mesh scaled per world in the GPU path (capsules: radius and length exact, caps scaled). Silhouette IoU vs MuJoCo at the world's size 0.36–0.82 → ≥ 0.989. Meshes: MuJoCo Warp has no per-world mesh scale (physics neither). |
-| per-world `geom_rgba` / `mat_rgba` / `geom_matid` written into the MuJoCo Warp model | ✅ | ✅ | | **Fixed (§3c)** (`render/model_sync.py`): read every frame, MuJoCo's colour rule (geom rgba over the material's unless default). Mean RGB error vs the world's compiled model 17–29 → 0.0 (T0), ≤ 5 (T2 noise). `geom_matid` switches the colour, not the texture. |
+| per-world `geom_rgba` / `mat_rgba` / `geom_matid` written into the MuJoCo Warp model | ✅ | ✅ | | **Fixed (§3c)** (`render/model_sync.py`): read every frame, MuJoCo's colour rule (geom rgba over the material's unless default). Mean RGB error vs the world's compiled model 17–29 → 0.0 (T0), ≤ 5 (T2 noise). `geom_matid` switches the whole material (texture with MuJoCo's mapping for the geom, PBR parameters, colour) since §3d: each env equals the renderer on the model compiled with that world's materials (T0 mean |diff| < 1 level). |
 | per-world light fields of the model (`light_diffuse` / `specular` / `ambient` / `active` / `type` / `castshadow` / `cutoff` / `exponent` / `attenuation`) | ✅ | ✅ | | **Fixed (§3c).** Per-env light records from the model each frame; an inactive light emits nothing (also `active="false"` lights, which the static table drew lit: code). Tier 2's `usd_lights` keep their USD intensity. |
 | per-world `cam_fovy` / intrinsics in the model | ❌ (use `t_cam_spec`) | ❌ (`set_fovy`) | | |
 | roughness / metallic randomization | ◐ (shared by all envs) | ◐ | | `Randomizer.materials` writes one table through the renderer's `set_materials`. **Fixed (§3c):** the call crashed on a legacy-mode `Tier2Renderer` (`AttributeError`). |
-| texture swap randomization (`rep.randomizer.texture`) | ❌ | ❌ | | Already listed as not done in GAPS (Replicator row) |
+| texture swap randomization (Isaac Lab `randomize_visual_texture_material`, `rep.randomizer.texture`) | ✅ | ✅ | n/a | **Added (§3d)**: `set_texture_pool(images, projection="uvw", texture_scale, rotations_deg)` + per-(env, slot) ids in `t_material_ids` (GPU tensor): each env's own pick, OmniPBR-style box projection (or the surface's coordinates), texel-exact vs an analytic reference on a box face. |
 
 ### 1c. Deformables, particles and other physics engines
 
@@ -129,9 +130,9 @@ Measured coverage of the reference silhouette is shown as rgb / depth / seg.
 | GeomSubset per-face materials | ✅ | **Fixed (§3c):** one visual geom per `materialBind` subset (`<geom>_<subset>`, plus `<geom>_rest`), the whole mesh kept as an undrawn collider. Right-colour fraction top / sides 0.0 / 0.0 → 0.99 / 1.00. |
 | `displayColor` per vertex / face | ◐ | First value only |
 | `visibility = invisible`, purpose `proxy` | ◐ | Not honoured (purpose `guide` → hidden group 3) |
-| DistantLight, SphereLight | ✅ | Sphere → point light with UsdLux radiometry (I = L π r², exposure, `normalize`), recorded as an area light unless `treatAsPoint` (§3d); lights from `mjcf_to_usd` keep MuJoCo's values (`mjc:diffuse`, `mjc:attenuation`). Sphere shaping / cone dropped. |
+| DistantLight, SphereLight | ✅ | Sphere → point light with UsdLux radiometry (I = L π r², exposure, `normalize`), recorded as an area light unless `treatAsPoint` (§3e); lights from `mjcf_to_usd` keep MuJoCo's values (`mjc:diffuse`, `mjc:attenuation`). Sphere shaping / cone dropped. |
 | DomeLight (colour, texture) | ◐ | Tier 2 only (environment map) |
-| RectLight, DiskLight, CylinderLight | ◐ | **Fixed (§3c), far-field:** Rect / Disk → spot along -Z (cutoff 90° or `shaping:cone:angle`, cosine falloff, I = L·A), Cylinder → point light (I = L·2rℓ broadside); `normalize`, exposure honoured; shape / size / radiance recorded in custom text `usd_area_lights`. Before: a stage with one failed to load. Irradiance vs exact: +20–25 % at 1 light size, +2–3 % at 3, < 0.5 % at 10 for these far-field lights (tier 0); tiers 1 and 2 sample the true emitter (§3d). |
+| RectLight, DiskLight, CylinderLight | ◐ | **Fixed (§3c), far-field:** Rect / Disk → spot along -Z (cutoff 90° or `shaping:cone:angle`, cosine falloff, I = L·A), Cylinder → point light (I = L·2rℓ broadside); `normalize`, exposure honoured; shape / size / radiance recorded in custom text `usd_area_lights`. Before: a stage with one failed to load. Irradiance vs exact: +20–25 % at 1 light size, +2–3 % at 3, < 0.5 % at 10 for these far-field lights (tier 0); tiers 1 and 2 sample the true emitter (§3e). |
 | Camera: focal length, vertical aperture | ◐ | Horizontal aperture (aspect), clipping range, orthographic projection and fisheye / f-theta are ignored |
 | Points, BasisCurves, PointInstancer, TetMesh / deformable prims | ❌ | Dropped |
 
@@ -142,7 +143,8 @@ Measured coverage of the reference silhouette is shown as rgb / depth / seg.
 | pinhole intrinsics, per-env pose / intrinsics | ✅ | |
 | several cameras per env in one call | ◐ | One camera per renderer instance (per-env `cam_id`); use one renderer per camera |
 | depth convention | ✅ | z-depth. Background is 0 in the raw buffer and inf through `replicator/isaac.py`, as Isaac. |
-| fisheye / f-theta / lens distortion | ✅ T2, RT; ◐ T0 | **Added (§3c)** `render/lens.py`: Isaac Lab `FisheyeCameraCfg`'s default f-theta polynomial (`Lens.ftheta()` / `Lens.from_isaac`) and Kannala-Brandt / OpenCV fisheye. T2 and the ray-traced depth camera trace the lens per pixel; T0 resamples cube faces (`render/fisheye.FisheyeTier0`, 5 faces for 200°). Rolling shutter not done. |
+| fisheye / f-theta / lens distortion | ✅ T2, RT; ◐ T0 | **Added (§3c)** `render/lens.py`: Isaac Lab `FisheyeCameraCfg`'s default f-theta polynomial (`Lens.ftheta()` / `Lens.from_isaac`) and Kannala-Brandt / OpenCV fisheye. T2 and the ray-traced depth camera trace the lens per pixel; T0 resamples cube faces (`render/fisheye.FisheyeTier0`, 5 faces for 200°). |
+| rolling shutter | ✅ T0, T1, T2 | **Added (§3d, 2026-10-13)** `render/rolling.py`: RTX's per-pixel shutter-time convention (0 = previous frame, 1 = current; Isaac Lab exposes none) per image row, from per-env pose history (previous frame's geom / site / camera / light poses), rendered in row bands at interpolated poses. Edge of a moving bar and of a panning camera within 1 px of the analytic skew per row (one band per row); 8 bands within half a band's motion. Deforming meshes and particles at the current state. RT depth camera / lidar: not applied. |
 | far plane | ✅ | `Tier0Renderer(far=10.0)` (Isaac Lab's default `clipping_range` far is 1e6; MuJoCo's is `zfar` x extent), reversed-z depth; T2 `clip_far` |
 
 ## 2. What Isaac does for each gap, effort and priority
@@ -171,7 +173,7 @@ Effort is engineering days for one person including tests, assuming the existing
 | 13 | **Per-world model colour / light fields ignored**. **Done 2026-10-12 (§3c)** | Replicator writes USD attributes the renderer reads | Read MuJoCo Warp's batched `geom_rgba` / `mat_rgba` / `light_*` if the event terms write them, or document `t_colors` as the only path (it already exists) | 0.5 | P2 (a workaround exists) |
 | 14 | Non-RGB texture roles, normal maps, USD GeomSubsets, UV scale / rotate / translate | RTX uses all of them | Material table extension + importer | 3–5 | P2 (fidelity) |
 | 15 | MJCF skybox as a mean colour | Dome texture background | Convert skybox to an equirect / cube environment (T2 has the sampler; T0 needs a background pass from it) | 1 | P2 (backgrounds are usually randomized anyway) |
-| 16 | Area lights, more than 8 lights in T0/T1. **Done 2026-10-13 (§3d; lights: §3b)** | Unlimited lights, area lights with soft shadows | Raise `MAX_LIGHTS` (loop cost), area-light sampling in T2 | 0.5 / 2 | P2 |
+| 16 | Area lights, more than 8 lights in T0/T1. **Done 2026-10-13 (§3e; lights: §3b)** | Unlimited lights, area lights with soft shadows | Raise `MAX_LIGHTS` (loop cost), area-light sampling in T2 | 0.5 / 2 | P2 |
 | 17 | hfield sides / base. **Done 2026-10-12 (§3c)** | Terrain meshes are closed | Add skirt triangles | 0.25 | P2 |
 | 18 | Fisheye / lens distortion. **Done 2026-10-12 (§3c)**: f-theta and Kannala-Brandt in T2 / RT, T0 cube faces | `FisheyeCameraCfg`, f-theta | Per-pixel ray directions in T2 and RT (trivial); T0 needs a distortion warp pass | 1–2 | P2 (P1 for wide-FOV nav cameras) |
 | 19 | MPM particles | Points / mesh-from-particles (fluid isosurface) | **in progress (other agent)** | — | P0 for the MPM tasks |
@@ -222,8 +224,8 @@ This workstream fixed gaps #3, #6, #9, #10, #11, #15 and #16 (lights), measured 
 | shadows | Every `castshadow` light. T0 renders extra depth layers in the caster's per-env tile layout: orthographic for directional, the cone for spot, 6 faces for point; spot and point layers store linear distance. T1 traces one ray per light. | Directional and spot lights, shadow maps, spot cone × `shadowscale` | Every light casts shadows by default (`shadow:enable` falls back to true) | Isaac for point lights; both for spot and directional |
 
 **Limits:**
-- Heightfields drawn by the culled tile path (`hfield_cull`, the default) cast only the caster's shadow in T0. T1 and T2 trace them.
-- Lidar and the ray-traced depth camera: transparent geoms handled since 2026-10-13 (§3d).
+- Heightfields drawn by the culled tile path (`hfield_cull`, the default) cast only the caster's shadow in T0 (sides and base too since §3d; `skirt_shadows=False` = before). T1 and T2 trace them.
+- Lidar and the ray-traced depth camera: transparent geoms handled since 2026-10-13 (§3e).
 - A capsule's cube-map coordinates use one scale for the whole capsule; MuJoCo's hemispheres differ slightly.
 - Planes seen from behind are not made more transparent, as MuJoCo does.
 
@@ -358,6 +360,87 @@ Design notes:
   Lab develop adds `OpenCvFisheyeDistortionCfg` (Kannala-Brandt k1..k4), mapped by `Lens.from_isaac("opencvFisheye")`.
   Unconfirmed in NVIDIA's docs: how RTX scales the nominal resolution to the render resolution (implemented: per axis)
   and what fills pixels beyond `max_fov` (implemented: black, depth 0).
+
+## 3d. Render gaps 2: rolling shutter, per-env textures, haze, tendons, heightfield-side shadows; render cost by feature (2026-10-13)
+
+Branch `render-gaps-2` on `origin/metalsim-mpm` 532577fe (PR #4 merged). M4 Max, Warp 95f6f121 (the pinned fork). References:
+MuJoCo 3.14.0 source and `mujoco.Renderer`, Isaac Lab clones and NVIDIA's docs; citations in the research note
+`research_notes/Render sensor fidelity/gaps_and_perf.md` (outside the repo). Tests: `tests/test_render_rolling.py`,
+`tests/test_render_env_textures.py`, `tests/test_render_tendons.py`, `tests/test_render_haze.py`; costs:
+`scripts/diagnostics/render_gaps2_cost.py`, `scripts/diagnostics/render_perf_profile.py` (logs and JSON in `runs/render_gaps2/`).
+
+| item | reference | MetalSim | measured | switch |
+|---|---|---|---|---|
+| rolling shutter | Isaac Lab: none. Omniverse RTX (Kit 109): per-pixel shutter time in [0, 1] (0 = start of the previous frame, 1 = current), instantaneous per-pixel exposure, global shutter by default | `render/rolling.py`: per-row time in RTX's convention, poses of the previous frame kept per env on the GPU (geoms, sites, cameras, lights), the image rendered in row bands at interpolated poses (linear / slerp); T0 / T1 re-render the frame per band and write its rows, T2 refits the structure per band and traces its rows | moving bar and panning camera: left edge within 1 px of the analytic skew in every row (T0, T2, one band per row); 8 bands within half a band's motion; GPU path equals the host path given the previous state | `rolling_shutter=None` (default: global shutter) |
+| per-env textures / materials | Isaac Lab `randomize_visual_texture_material`: a new OmniPBR per prim with a random diffuse texture, `project_uvw`, `texture_rotate` (needs `replicate_physics=False`, redraws all envs); MuJoCo: a world's `geom_matid` is the whole material | `render/env_materials.py`: (env, slot) entry ids resolved on the GPU each frame (the renderer's choice, else a per-world `geom_matid`); entries are full material blocks (MuJoCo mapping per geom) or texture-pool images (2D texture array, box projection or the surface's coordinates, scale, rotation) | per-world `geom_matid`: each env equals the renderer on the model compiled with that world's materials (T0 mean |diff| < 1 level; T2 < 3 with the same seed), its box texture correlates with mujoco.Renderer > 0.8; texture pool: box top face texel-exact vs the analytic projection (median error < 6 levels, T0 / T2), 90-degree rotation checked | nothing set: compiled out, byte-identical |
+| haze over infinite planes, fog | `render_gl3.c` skybox pass (haze cone, `map.haze`, `rgba.haze`), GL linear fog on eye depth (`map.fogstart / fogend`, `rgba.fog`; measured z-depth, not radial) | `render/haze.py`, `shaders/haze.h`: the faceted cone per pixel at the first opaque surface (T0 / T1 fragments and background, T2 camera ray), fog of fragments, skybox and haze | haze alpha vs mujoco.Renderer at H = 20 m, pitch -20 deg: T0 / T1 / T2 max 3 levels (p99 1) over the image | `haze=True` (MuJoCo's default), `fog=False`; compiled out when neither applies |
+| tendon catenary | `mjv_isCatenary` / `mjv_catenary`: slack two-site spring or unreached limit under gravity, numslices + 1 points, bead when L > 100 h | catenary points per (tendon, env) on the GPU (float32 Newton), capsules per segment | capsules equal to `mjv_updateScene`'s to 2e-5 m (CPU reference of the kernels; Metal within 2e-4 m of it); coverage of MuJoCo's silhouettes ≥ 0.97 rgb / depth / seg in T0 / T1 / T2 / RT; `tendons="straight"` < 0.6 on the hanging ones | `tendons="straight"` |
+| tendon limit colour | default-grey tendons without material mixed toward `rgba.constraint` by the limit impedance (`efc_KBIP[2]`) | impedance from `tendon_solimp_lim` at the limit distance, per env, written over the synced colour | tint table and GPU colour equal MuJoCo's scene rgba to 2e-6; image colour within 12 levels of mujoco.Renderer on the tendon | `tendons="straight"` |
+| heightfield sides / base in T0 shadows | sides cast shadows (MuJoCo, T1 / T2) | culled side chunks also drawn into the caster's shadow map (swept to the scene's lowest point) | floor shadow mask IoU vs tier 1's traced shadow 0.818 → 0.991 | `skirt_shadows=False` |
+
+**Byte identity** (`scripts/diagnostics/render_identity_check.py`, 8 scenes incl. Menagerie Panda / Shadow hand / Go2, the
+extras and drape scenes; T0 rgb / depth / seg / normals, T1, T2, ray depth, lidar; against 532577fe): with the new switches
+off 121 of 121 outputs identical (this includes tier 2's any-hit shadow path and the shader specializations below); with
+the defaults 118 of 121, the 3 others the SO-101 scene's rgb, which shows MuJoCo's haze (skybox + infinite floor).
+
+**Cost of the additions** (exclusive `timing` jobs, ms per frame, best of 3 × 10, GPU path):
+
+| addition | scene, renderer, envs | on | off |
+|---|---|---|---|
+| haze | Menagerie Go2 (skybox + infinite plane), 128², T0 1024 / T1 256 / T2 64 | 123.6 / 33.9 / 2.68 | 123.5 / 33.1 / 2.43 |
+| heightfield-side shadows | raised 64 × 64-cell heightfield over a floor, T0 1024 | 8.58 | 8.33 |
+| tendons (catenary) | the tendon test scene + floor, T0 1024 / T2 64 | 22.6 / 5.32 | 4.38 / 2.49 |
+| per-env textures | the texture test scene, T0 1024 / T2 64: none, texture pool on every box, per-world `geom_matid` | 2.82 / 2.90 / 2.88; 1.64 / 1.65 / 1.66 | |
+| rolling shutter | cloth scene 64², T0 1024 / T2 256: global, 8 bands, one band per row | 1.99 / 15.1 / 120; 4.91 / 8.51 / 42.6 | |
+
+The catenary's cost is its geometry: MuJoCo draws numslices (28) capsules per hanging tendon at its full tessellation
+(85 K triangles per env against 3.9 K straight; per-pass: colour 2.1 → 9.6 ms, shadow 1.4 → 8.7, generation 3.6); with
+`tube_slices=8, cap_stacks=2` the same scene costs 5.2 ms. Rolling shutter costs about one frame per band in T0 / T1 (every
+pass is repeated at the band's poses) and one structure build per band in T2 (rows are traced once).
+
+### Render cost by feature: the 2026-10 slowdowns
+
+**Reported**: after PR #4, tier 1 and tier 2 about 30 % slower (cloth at 4096 envs: tier 1 71 ms, tier 2 96 ms) and the glass
+pane in tier 2 about 5× slower (1.71 → 8.48 ms at 64 envs). **Reproduced** on the pinned Warp (`render_perf_profile.py`;
+trees exported from the branch's commits; cloth = deformable_render_bench's flex scene with one spot light, 64²; tier 2 at
+1 spp / 1 bounce; glass at 128², 4 spp / 2 bounces):
+
+| frame (ms) | 2ef6641f (before workstream C) | 5a7cc077 (C merged) | 532577fe (PR #4) | this branch | all fidelity switches off |
+|---|---|---|---|---|---|
+| tier 1 cloth, 1024 envs | 13.23 | 18.06 | 17.91 | **14.68** | 13.76 |
+| tier 1 cloth, 4096 envs | 52.86 | 71.70 | 71.41 | **58.49** | 55.51 |
+| tier 2 cloth, 1024 envs | 17.77 | 24.38 | 24.37 | **18.18** | 18.63 |
+| tier 2 cloth, 4096 envs | 69.15 | 96.27 | 96.01 | **71.78** | 75.53 |
+| tier 2 glass pane, 64 envs | 4.16 | | 12.15 | **4.60** | 1.63 |
+
+**Where it went.** Per-pass GPU timing (`metalsim/render/gpu_profile.py`: one command buffer per encoder) put the whole
+regression in one pass each: tier 1's colour pass (5.6 → 10.4 ms at 1024 envs; the acceleration-structure work, 7.8 ms,
+unchanged) and tier 2's `path_trace` kernel (16.9 → 23.5 ms). Shader-variant experiments (temporary `#ifdef` toggles,
+`runs/render_gaps2/exp_1024.log`) found the cause: workstream C's infinite-plane continuation (`env_grid.h grid_plane`, a
+loop over up to 4 planes inlined into every ray query) costs it in register pressure even when the scene has no infinite
+plane and the loop never runs: removing it took tier 1 18.0 → 15.1 ms and tier 2 28.2 → 20.2 ms; per-env light records
+(0), the ray-reach checks (0) and the reflection's plane test (0) did not matter. The same effect made this branch's own
+first haze composite and any-hit shadow path cost tier 2 another 2.5 ms each until they were specialized too.
+
+**Fixes (identical output):** the ray kernels are compiled per scene: `GRID_PLANES` = the scene's number of continued
+infinite planes (0 compiles the continuation out; a constant loop bound otherwise), `HAZE_ON` and `ENV_MATS` only when
+those features are active, so a scene pays only for what it uses. Tier 2's shadow rays in an env without a partially
+transparent surface (a per-env flag the model sync writes each frame) take an any-hit query instead of the closest-hit
+transmission loop (same result; 18.5 → 18.2 ms on cloth). Byte identity: 121 of 121 outputs with the switches off.
+
+**What remains, and why:**
+- Tier 1, +11 % over 2ef6641f (58.5 vs 52.9 ms at 4096): 2.7 ms is the spot light's shadow ray (Isaac / RTX shadows every
+  light; `shadow_lights="caster"` 55.8 ms), the rest (~3 ms, 5 %) is not attributed to any one switch (all switches off:
+  55.5 ms).
+- Tier 2 cloth: within 4 % of 2ef6641f (71.8 vs 69.1 ms); the dynamic layout dominates instead: `dyn_layout="per_env"`
+  57.7 ms (sbvh is the default for tier 2; §5 measured it 13 % slower on cloth too).
+- Glass pane, tier 2: transparency itself (presence sampling of the pane, transmitted shadow rays) is the fidelity cost:
+  4.60 ms vs 1.63 ms with `transparency=False`, 2.8×; 2ef6641f had the same feature at 4.16 ms. The compact env grid's
+  cell clipping saves time here (legacy grid 6.36 ms).
+- An infinite floor (cloth scene with `size="0 0"`): tier 2 22.9 ms vs 18.9 with the floor finite and nothing continued
+  (the ground to the horizon is more visible surface to shade), tier 1 15.0 vs 13.9.
+- Not measurable as a cost: per-env light records (model_fields=False ±0.1 ms), reversed z, appearance="legacy",
+  `max_lights`.
 
 ## 4. Reproduce
 
