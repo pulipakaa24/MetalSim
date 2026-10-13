@@ -797,6 +797,10 @@ end to end: Isaac's own assets (Franka USD, cups, table, the 20,000-row reset da
   the 55.7 GB working set). Now 37.4 GB and finite at 2,048 worlds; see sections 8g-8h.
 * Per policy step at 2,048 worlds (M4 Max): about 2 s (step only); the L4 cannot hold Isaac's own task at 2,048 envs
   (CUDA out of memory creating the graph, and out of memory eager), so the matched comparison is at 1,024 envs (§1b.4).
+* Section 8h's opt-in memory budgets (`mpm_grid_budget="measured"`, `mpm_cells_per_world=256`) hold on the trained
+  policy: a deterministic 2,048-episode evaluation of the 300-iteration policy gives success 0.470 vs 0.477 with
+  Isaac's capacities (same rows; within the 0.011 standard error), the same pour metrics, no grid overflow, and a 26 %
+  shorter rollout (`docs/PARITY.md` §1b.5, `runs/franka_pour/eval/`).
 * Upstream observation (code reading, same in Isaac and here): the proxy wrench harvest uses only the last MPM
   substep's impulses and divides by the outer dt, so with the media entry's 2 substeps the reaction on the cups is about
   half the mean force (`solver_coupled_proxy.py:1547-1557`, `solver_implicit_mpm.py:1773-1812, 3266-3268`).
