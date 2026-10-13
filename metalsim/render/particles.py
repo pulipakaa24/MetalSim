@@ -326,7 +326,7 @@ class InstanceStructure:
     """
 
     MODES = ("two_level", "flat")
-    CHUNK = 1 << 24
+    CHUNK = (1 << 24) - 1     # strictly under Metal's standard 2^24 instances per structure (validated at 25.1 M grains, 2026-10-13)
 
     def __init__(self, rt, field: GrainField, mode: str = "two_level", chunk: int | None = None):
         if mode not in self.MODES:
