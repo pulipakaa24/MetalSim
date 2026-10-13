@@ -16,6 +16,7 @@ Ordering follows the renderer: ``trace(sim, after_value)`` waits for the sim eve
 """
 from __future__ import annotations
 
+import mujoco
 import numpy as np
 import torch
 import warp as wp
@@ -56,8 +57,8 @@ class RayTracer:
                  tube_view=None, tube_resolution=None,
                  dyn_rebuild_every: int = 32, dyn_layout: str | None = None,
                  env_layout: str | None = None, env_margin: float | None = None,
-                 ctx: MetalContext | None = None,
-                 device="metal:0"):
+                 infinite_planes: bool = True, hfield_skirts: bool = True, per_world_size: bool = True,
+                 ctx: MetalContext | None = None, device="metal:0"):
         """``terrain_slots`` / ``draw_hfields`` / ``appearance``: see ``Tier0Renderer`` (False / "legacy" = the
         previous behaviour).
 
@@ -83,7 +84,13 @@ class RayTracer:
         angular resolution in rad) adapts it per tube to its projected size (``dynamic_mesh.tube_tessellation``; the
         cameras built on a tracer pass theirs). ``tube_resolution``: a sensor's angular resolution (the depth camera's
         pixel, the lidar's beam spacing), seen from the model's cameras and sites; ``make_lidar`` / ``make_depth_camera``
-        warn when a sensor is finer than the tessellation was chosen for."""
+        warn when a sensor is finer than the tessellation was chosen for.
+
+        ``hfield_skirts`` / ``per_world_size``: see ``Tier0Renderer`` (False = the previous behaviour).
+        ``infinite_planes``: MuJoCo's infinite planes as a disc (False = the previous 10 x 10 m square): with the
+        compact env grid, a disc covering the env's cell, continued analytically past it (env_grid.h); with the legacy
+        grid, a disc covering every point a ray of ``max_range`` from within the scene extent can reach (the stride
+        grows ~4 % to keep neighbouring discs apart)."""
         self.m = model
         self.n = n_envs
         self.device = device
@@ -94,35 +101,54 @@ class RayTracer:
             # a sensor's default: what MuJoCo draws except sites (visual markers, not surfaces: mj_ray and MuJoCo's
             # rangefinder skip them, and a lidar's own mounting site would occlude every beam). The cameras built on this
             # ray tracer (tier 1 / tier 2) pass MuJoCo's full default option.
-            import mujoco
             visual = mujoco.MjvOption()
             visual.sitegroup[:] = 0
-        self.tables = build_scene_tables(model, n_envs, max_group=max_group, include_planes=include_planes,
-                                         decimate_faces=decimate_faces, sized_geoms="auto" if terrain_slots else (),
-                                         draw_hfields=draw_hfields, appearance=appearance,
-                                         visual=visual, deformables=deformables)
-        t = self.tables
-        self.visual = visual
-        self.sized = None
-        if t.sized.any():
-            from metalsim.render.sized import SizedGeoms
-            self.sized = SizedGeoms(self.ctx, model, n_envs, t.sized_geom_ids())
-        self.G = t.G
-        self.tpr = int(np.ceil(np.sqrt(n_envs)))
         extent = float(model.stat.extent)
-        self.max_range = max_range
-        self.stride = 2.0 * (extent + max_range) + 1.0
+        reach = extent + max_range               # how far from an env's origin its sensors' rays get
+        d0 = mujoco.MjData(model); mujoco.mj_kinematics(model, d0)
+        inf = [g for g in range(model.ngeom) if int(model.geom_type[g]) == int(mujoco.mjtGeom.mjGEOM_PLANE)
+               and (model.geom_size[g][0] <= 0 or model.geom_size[g][1] <= 0)]
+        d_plane = max([float(np.linalg.norm(d0.geom_xpos[g])) for g in inf], default=0.0)
+        ring = (reach + d_plane) if (infinite_planes and inf and include_planes) else None
         import os
         from metalsim.sensors.env_grid import EnvGrid, content_box
         self.env_layout = env_layout or os.environ.get("METALSIM_ENV_LAYOUT") or "compact"
-        if self.env_layout == "legacy":
-            self.grid = EnvGrid(n_envs, "legacy", stride=self.stride, tpr=self.tpr)
-        else:
-            lo, hi = content_box(model, t)
+        own = extent if ring is None else max(extent, 1.0824 * ring + d_plane)
+        if self.env_layout != "legacy":
+            lo, hi = content_box(model, max_group=max_group)    # infinite planes excluded: they are continued past the cell
             r = np.maximum(np.abs(lo[:2]), np.abs(hi[:2]))      # symmetric about the env origin in x and y: scenes
             lo[:2], hi[:2] = -r, r                              # often move things across it (resets, arenas)
             self.grid = EnvGrid(n_envs, self.env_layout, lo=lo, hi=hi, margin=env_margin)
-        self._grid_listeners = []           # buffers holding the grid, rewritten when it grows (_grow_grid)
+            if ring is not None:                                # the disc covers the cell (beyond it: analytic)
+                ring = float(np.linalg.norm(np.maximum(np.abs(self.grid.lo[:2]), np.abs(self.grid.hi[:2])))) + d_plane + 1.0
+        self.tables = build_scene_tables(model, n_envs, max_group=max_group, include_planes=include_planes,
+                                         decimate_faces=decimate_faces, sized_geoms="auto" if terrain_slots else (),
+                                         draw_hfields=draw_hfields, appearance=appearance,
+                                         visual=visual, deformables=deformables, hfield_skirts=hfield_skirts,
+                                         plane_ring=ring, per_world_size=per_world_size)
+        t = self.tables
+        if self.env_layout != "legacy":     # infinite planes: continued analytically past the env's cell
+            from metalsim.sensors.env_grid import infinite_planes as _inf_planes
+            self.grid.set_planes(_inf_planes(model, t))
+        self.visual = visual
+        self.sized = None
+        modes = t.geom_size_modes(model.ngeom)
+        if modes.any():
+            from metalsim.render.sized import SizedGeoms
+            self.sized = SizedGeoms(self.ctx, model, n_envs, modes=modes)
+        self.G = t.G
+        self.tpr = int(np.ceil(np.sqrt(n_envs)))
+        self.max_range = max_range
+        self.stride = 2.0 * (extent + max_range) + 1.0
+        if self.env_layout == "legacy":
+            # the content of an env reaches `own` from its origin: the scene extent, or a ground disc (octagon
+            # circumradius = 1.0824 x apothem, around a plane origin d_plane away); rays must end before the next env's
+            self.stride = max(self.stride, reach + own + 1.0)
+            self.ray_limit = self.stride - own       # a ray of env e must end within this distance of the env's origin
+            self.grid = EnvGrid(n_envs, "legacy", stride=self.stride, tpr=self.tpr)
+        else:
+            self.ray_limit = 3.0e38                  # rays end at their env's cell instead (env_grid.h grid_tmax)
+        self._grid_listeners = []           # buffers holding the grid, rewritten when it grows (_check_grid)
         c = self.ctx
         # non-geom objects (metalsim.render.extras): sites are instanced slots posed from extra pose rows; each dynamic
         # object (flex, skin, tendon, user mesh) has its records after the static vertices, its every-env triangles
@@ -205,9 +231,10 @@ class RayTracer:
         self.n_inst_static = len(t.inst_table)     # instances refit from the pose rows (geoms, then sites)
         self.n_inst = len(inst_tab)                # + one identity instance per dynamic object (the scene's instances)
         self.inst_desc = c.buffer(64 * self.n_inst, label="rt_instance_descriptors")
-        self.consts = np.zeros(32, np.uint32)      # RTConsts: 12 words, then the EnvGrid (20)
+        from metalsim.sensors.env_grid import WORDS as GW
+        self.consts = np.zeros(12 + GW, np.uint32)      # RTConsts: 12 words, then the EnvGrid
         self.consts[:4] = (self.n, t.pose_rows(model), n_inst_slots, self.tpr)
-        self.consts[12:32] = self.grid.words()
+        self.consts[12:] = self.grid.words()
         if t.site_ids:
             from metalsim.render.dynamic_mesh import PoseGather
             self.pose = PoseGather(self.ctx, model, t, n_envs)
@@ -409,7 +436,8 @@ class RayTracer:
         """The geom_xmat to refit from: the physics buffer, or its copy with the per-world slot sizes folded in."""
         if self.sized is None:
             return gm_buf, gm_off
-        return self.sized.encode(cb, gm_buf, gm_off, sim.m.geom_size)
+        from metalsim.render.model_sync import model_fields
+        return self.sized.encode(cb, gm_buf, gm_off, getattr(model_fields(sim), "geom_size", None))
 
     def encode_pose(self, cb, sim, gx_buf, gx_off, gm_buf, gm_off):
         """The pose rows to refit from: the geoms' (as given), then the drawn sites' when the scene has site slots."""
@@ -480,7 +508,7 @@ class RayTracer:
         warnings.warn(f"ray tracer env grid: geometry neared its env's cell boundary; cell {np.round(old.S, 2).tolist()} m -> "
                       f"{np.round(self.grid.S, 2).tolist()} m (largest offset {self.grid.max_offset():.0f} m); "
                       "set RayTracer(env_margin=...) to size it up front")
-        self.consts[12:32] = self.grid.words()
+        self.consts[12:] = self.grid.words()
         self.ctx.write_buffer(self.consts_buf, self.consts)
         if self.dyn is not None and self.dyn_layout == "per_env":
             desc = np.zeros((self.n_inst - self.n_inst_static, 16), np.uint32)
@@ -562,12 +590,13 @@ class RayTracer:
         refl[:len(geoms)] = np.asarray(reflectance, np.float32)[geoms]
         return refl
 
-    def make_depth_camera(self, camera: str | int, width: int, height: int):
+    def make_depth_camera(self, camera: str | int, width: int, height: int, lens=None):
+        """``lens``: ``metalsim.render.lens.Lens`` (default pinhole from the model camera)."""
         import mujoco
         cam = mujoco.mj_name2id(self.m, mujoco.mjtObj.mjOBJ_CAMERA, camera) if isinstance(camera, str) else int(camera)
         ci = CameraIntrinsics.from_model(self.m, cam, width, height)
         self._check_tube_resolution(1.0 / max(ci.fx, ci.fy), "depth camera")
-        return RayDepthCamera(self, camera, width, height)
+        return RayDepthCamera(self, camera, width, height, lens=lens)
 
     # -- frame drivers -------------------------------------------------------------------------------
 
@@ -662,7 +691,7 @@ class Lidar:
         self.consts_buf = rt.ctx.buffer(self.consts.nbytes, self.consts, "lidar_consts")
 
         def regrid():
-            self.consts[12:32] = rt.consts[12:32]
+            self.consts[12:] = rt.consts[12:]
             rt.ctx.write_buffer(self.consts_buf, self.consts)
         rt._grid_listeners.append(regrid)
         hits_per_ray = int(hits_per_ray or max_returns)
@@ -762,7 +791,7 @@ class Lidar:
 
 
 class RayDepthCamera:
-    def __init__(self, rt: RayTracer, camera, width, height, name="ray_depth"):
+    def __init__(self, rt: RayTracer, camera, width, height, name="ray_depth", lens=None):
         import mujoco
         self.rt, self.name, self.w, self.h = rt, name, width, height
         m = rt.m
@@ -772,6 +801,9 @@ class RayDepthCamera:
         self.intr_buf = rt.ctx.buffer(16, self.intr, "raydepth_intr")
         self.dims = np.array([width, height, max(m.ncam, 1), self.cam], np.uint32)
         self.dims_buf = rt.ctx.buffer(16, self.dims, "raydepth_dims")
+        from metalsim.render.lens import Lens
+        self.lens = lens or Lens.pinhole()
+        self.lens_buf = rt.ctx.buffer(64, self.lens.pack(), "raydepth_lens")
         self._array = wp.zeros((rt.n, height, width), dtype=wp.float32, device=rt.device)
         wp.synchronize_device(rt.device)
         self._view = wm.buffer_of(self._array)
@@ -795,6 +827,7 @@ class RayDepthCamera:
         ce.setBuffer_offset_atIndex_(self.dims_buf, 0, 4)
         ce.setBuffer_offset_atIndex_(rt.consts_buf, 0, 5)
         ce.setBuffer_offset_atIndex_(self._view.buffer, self._view.offset, 6)
+        ce.setBuffer_offset_atIndex_(self.lens_buf, 0, 7)
         ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.w, self.h, rt.n), Metal.MTLSize(16, 16, 1))
         ce.endEncoding()
 

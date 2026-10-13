@@ -91,7 +91,8 @@ class DynBVH:
         self.box_as = c.device.newAccelerationStructureWithSize_(s.accelerationStructureSize)
         self.box_scratch = c.buffer(max(int(s.buildScratchBufferSize), 16), label="dyn_bvh_box_scratch")
         self.topo = None
-        self.argss = [c.buffer(176, label="dyn_bvh_args0"), c.buffer(176, label="dyn_bvh_args1")]
+        from metalsim.sensors.env_grid import WORDS as GW
+        self.argss = [c.buffer(96 + 4 * GW, label="dyn_bvh_args0"), c.buffer(96 + 4 * GW, label="dyn_bvh_args1")]
         self.cur = 0
         self._pool, self._pending, self._frames, self._last_retopo = None, None, 0, 0
         self.retopologies = 0
@@ -158,7 +159,8 @@ class DynBVH:
 
     def _write_args(self, i):
         rt = self.rt
-        a = np.zeros(44, np.uint32)       # DynBVHArgs: 7 pointers, 12 words, the EnvGrid at byte 96
+        from metalsim.sensors.env_grid import WORDS as GW
+        a = np.zeros(24 + GW, np.uint32)  # DynBVHArgs: 7 pointers, 12 words, the EnvGrid at byte 96
         p = a.view(np.uint64)
         p[0], p[1], p[2] = rt.vbuf.gpuAddress(), rt.ibuf.gpuAddress(), rt.mesh_info.gpuAddress()
         p[3], p[4], p[5] = self.topo.gpuAddress(), self.orders[i].gpuAddress(), self.bounds.gpuAddress()
@@ -166,7 +168,7 @@ class DynBVH:
         a[14:18] = (self.n, self.n_nodes, self.D, self.mesh_base)
         a[18] = rt.n_inst_static
         a[19] = self.n_tris
-        a[24:44] = rt.grid.words()
+        a[24:] = rt.grid.words()
         self.ctx.write_buffer(self.argss[i], a)
 
     # -- leaf rebuilds ----------------------------------------------------------------------------------
@@ -194,9 +196,10 @@ class DynBVH:
     # -- per frame ------------------------------------------------------------------------------------
 
     def _refit_args(self, level_off=0, level_count=0):
-        a = np.zeros(28, np.uint32)       # RefitArgs: 8 words, the EnvGrid at byte 32
+        from metalsim.sensors.env_grid import WORDS as GW
+        a = np.zeros(8 + GW, np.uint32)   # RefitArgs: 8 words, the EnvGrid at byte 32
         a[:7] = (self.n, self.n_nodes, self.D, self.mesh_base, level_off, level_count, self.n_tris)
-        a[8:28] = self.rt.grid.words()
+        a[8:] = self.rt.grid.words()
         return a.tobytes()
 
     def encode(self, cb, src, rebuild=False):

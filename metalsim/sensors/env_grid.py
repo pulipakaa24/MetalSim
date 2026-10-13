@@ -17,13 +17,15 @@ from __future__ import annotations
 
 import numpy as np
 
-WORDS = 20      # 80 bytes: uint nx, ny, clip, pad; float4 S, c, lo, hi
+WORDS = 104     # 416 bytes: uint nx, ny, clip, n_planes; float4 S, c, lo, hi; uint4 plane slots; 5 x 4 float4 planes
+MAX_PLANES = 4
 
 
 class EnvGrid:
     def __init__(self, n_envs: int, mode: str = "compact", *, stride: float = 0.0, tpr: int = 1, lo=None, hi=None,
                  margin: float | None = None):
         self.n, self.mode = int(n_envs), mode
+        self.planes = []        # infinite planes continued past the cell (compact; set_planes)
         if mode == "legacy":
             self.nx, self.ny, self.nz = int(tpr), max(self.n, 1), 1
             self.S = np.array([stride, stride, stride], np.float64)
@@ -45,7 +47,7 @@ class EnvGrid:
 
     def words(self) -> np.ndarray:
         a = np.zeros(WORDS, np.uint32)
-        a[0:3] = (self.nx, self.ny, self.clip)
+        a[0:4] = (self.nx, self.ny, self.clip, len(self.planes) if self.clip else 0)
         f = a.view(np.float32)
         f[4:7] = self.S
         f[8:11] = self.c
@@ -53,13 +55,29 @@ class EnvGrid:
         f[16:19] = self.hi
         if self.clip:
             f[15] = 0.5 * self.margin       # lo.w: the "left the content" slack (env_grid.h env_grid_left)
+            for k, p in enumerate(self.planes):
+                a[20 + k] = p["slot"]
+                f[24 + 4 * k: 28 + 4 * k] = list(p["n"]) + [float(np.dot(p["n"], p["o"]))]
+                f[40 + 4 * k: 44 + 4 * k] = list(p["o"]) + [p["sx"]]
+                f[56 + 4 * k: 60 + 4 * k] = list(p["x"]) + [p["sy"]]
+                f[72 + 4 * k: 76 + 4 * k] = list(p["y"]) + [0.0]
+                f[88 + 4 * k: 92 + 4 * k] = p["uv"]
         return a
+
+    def set_planes(self, planes):
+        """Infinite planes continued past the cell: dicts of slot, n, o, x, y (env frame), sx, sy (finite half sizes,
+        0 = infinite), uv (us, ua, vs, va)."""
+        if len(planes) > MAX_PLANES:
+            raise ValueError(f"{len(planes)} infinite planes: the compact env grid continues at most {MAX_PLANES}")
+        self.planes = list(planes)
 
     def grown(self) -> "EnvGrid":
         """The same layout with the content box doubled about its centre (and the margin with it)."""
         lo, hi = self.lo + self.margin, self.hi - self.margin
         c, h = (lo + hi) / 2, (hi - lo) / 2
-        return EnvGrid(self.n, self.mode, lo=c - 2 * h - 1.0, hi=c + 2 * h + 1.0, margin=2 * self.margin)
+        g = EnvGrid(self.n, self.mode, lo=c - 2 * h - 1.0, hi=c + 2 * h + 1.0, margin=2 * self.margin)
+        g.planes = list(self.planes)
+        return g
 
     def offsets(self, envs) -> np.ndarray:
         """(k, 3) float64 offsets as the shaders compute them in float32 (legacy: float64 products, as before)."""
@@ -93,25 +111,27 @@ def _best_dims(n: int, S: np.ndarray):
     return best
 
 
-def content_box(model, tables, dyn=None):
-    """(lo, hi) of everything an env draws or looks from at the initial state (key frame 0, else qpos0): each drawn geom's
-    mesh at its pose, cameras, sites, lights, flex vertices and tendon wrap points."""
+def content_box(model, max_group: int = 3):
+    """(lo, hi) of everything an env draws or looks from at the initial state (key frame 0, else qpos0): each geom of a
+    drawn group (its bounding box, MuJoCo's geom_aabb, at its pose; of an infinite plane only its origin: the ray
+    tracers continue planes past the cell), cameras, sites, lights, flex vertices and tendon wrap points."""
     import mujoco
     d = mujoco.MjData(model)
     if model.nkey:
         mujoco.mj_resetDataKeyframe(model, d, 0)
     mujoco.mj_forward(model, d)
     pts = [np.zeros((1, 3))]
-    V = np.asarray(tables.vertices)[:, :3].astype(np.float64)
-    I = np.asarray(tables.indices)
-    for g, mk in zip(tables.geoms, tables.geom_mesh):
-        mesh = tables.meshes[int(mk)]
-        ix = I[mesh["i_off"]: mesh["i_off"] + mesh["i_count"]]
-        if len(ix) == 0:
+    signs = np.array([[x, y, z] for x in (-1, 1) for y in (-1, 1) for z in (-1, 1)], np.float64)
+    for g in range(model.ngeom):
+        if model.geom_group[g] > max_group:
             continue
-        v = V[np.unique(ix)]
-        lo, hi = v.min(0), v.max(0)
-        corners = np.array([[x, y, z] for x in (lo[0], hi[0]) for y in (lo[1], hi[1]) for z in (lo[2], hi[2])])
+        if int(model.geom_type[g]) == int(mujoco.mjtGeom.mjGEOM_PLANE) and (model.geom_size[g][0] <= 0 or model.geom_size[g][1] <= 0):
+            pts.append(np.asarray(d.geom_xpos[g], np.float64).reshape(1, 3))     # the cell reaches down to the plane
+            continue
+        aabb = np.asarray(model.geom_aabb[g], np.float64)      # local centre (3), half sizes (3)
+        if int(model.geom_type[g]) == int(mujoco.mjtGeom.mjGEOM_PLANE):    # MuJoCo gives planes an unbounded aabb
+            aabb = np.array([0.0, 0.0, 0.0, model.geom_size[g][0], model.geom_size[g][1], 0.0])
+        corners = aabb[:3] + signs * aabb[3:]
         R = np.asarray(d.geom_xmat[g]).reshape(3, 3)
         pts.append(corners @ R.T + np.asarray(d.geom_xpos[g]))
     for arr in (d.cam_xpos, d.site_xpos, d.light_xpos, d.flexvert_xpos if model.nflexvert else None,
@@ -121,3 +141,28 @@ def content_box(model, tables, dyn=None):
     P = np.concatenate(pts)
     P = P[np.isfinite(P).all(1)]
     return P.min(0), P.max(0)
+
+
+def infinite_planes(model, tables):
+    """The scene's infinite-plane slots (tables.plane flag) as EnvGrid.set_planes entries, posed at the initial state
+    (planes on moving bodies keep that pose past the cell, with a warning)."""
+    import mujoco
+    if tables.plane is None:
+        return []
+    d = mujoco.MjData(model)
+    if model.nkey:
+        mujoco.mj_resetDataKeyframe(model, d, 0)
+    mujoco.mj_forward(model, d)
+    out = []
+    for slot, row in enumerate(np.asarray(tables.plane)):
+        if slot >= len(tables.geoms) or row[0] < 0.5:
+            continue
+        g = int(tables.geoms[slot])
+        if model.geom_bodyid[g] != 0 or model.body_mocapid[model.geom_bodyid[g]] >= 0:
+            import warnings
+            warnings.warn(f"infinite plane geom {g} is not on the world body: continued past the env's cell at its "
+                          "initial pose")
+        R = np.asarray(d.geom_xmat[g], np.float64).reshape(3, 3)
+        out.append({"slot": slot, "n": R[:, 2], "o": np.asarray(d.geom_xpos[g], np.float64), "x": R[:, 0], "y": R[:, 1],
+                    "sx": float(row[1]), "sy": float(row[2]), "uv": [float(v) for v in row[4:8]]})
+    return out

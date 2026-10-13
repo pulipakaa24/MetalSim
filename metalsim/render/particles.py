@@ -221,9 +221,10 @@ class GrainField:
 
     def consts(self, as_base: int, inst_base: int, tiles_per_row: int, stride: float, user_ids: bool = False,
                grid=None) -> np.ndarray:
-        c = np.zeros(36, np.uint32)       # GrainConsts: 16 words, then the EnvGrid (env_grid.h)
+        from metalsim.sensors.env_grid import WORDS as GW
+        c = np.zeros(16 + GW, np.uint32)  # GrainConsts: 16 words, then the EnvGrid (env_grid.h)
         if grid is not None:
-            c[16:36] = grid.words()
+            c[16:] = grid.words()
         c[:8] = (self.n_envs, self.n_particles, self.k, self.n_meshes, as_base, tiles_per_row, self.seed, inst_base)
         cf = c.view(np.float32)
         cf[8:13] = (stride, self.radius, self.radius_jitter, self.offset, self.cull_z)

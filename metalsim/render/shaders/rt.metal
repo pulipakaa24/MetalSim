@@ -9,6 +9,7 @@
 using namespace metal;
 using namespace metal::raytracing;
 #include "env_grid.h"
+#include "lens.h"
 
 struct RTConsts {
     uint n_envs, n_geoms, n_slots, tiles_per_row;
@@ -83,7 +84,9 @@ inline float3 tri_normal(uint mesh, uint prim, device const MeshInfo* meshes, de
     float3 a = float3(verts[indices[base] * 8], verts[indices[base] * 8 + 1], verts[indices[base] * 8 + 2]);
     float3 b = float3(verts[indices[base + 1] * 8], verts[indices[base + 1] * 8 + 1], verts[indices[base + 1] * 8 + 2]);
     float3 cc = float3(verts[indices[base + 2] * 8], verts[indices[base + 2] * 8 + 1], verts[indices[base + 2] * 8 + 2]);
-    return normalize(R * cross(b - a, cc - a));
+    // R may carry a per-world size scale (R diag(s), metalsim.render.sized): the inverse transpose keeps the normal
+    float3 s2 = float3(dot(R[0], R[0]), dot(R[1], R[1]), dot(R[2], R[2]));
+    return normalize(R * (cross(b - a, cc - a) / max(s2, float3(1e-20))));
 }
 
 // Lidar: one thread per (env, beam). Beams: (azimuth, elevation) in the sensor site frame, MuJoCo
@@ -127,23 +130,31 @@ kernel void lidar(
     intersection_result<triangle_data, instancing> res = isect.intersect(r, accel);
 #endif
     uint o = e * c.n_beams + b;
+    float dist; uint slot; float3 n;
     if (res.type == intersection_type::none) {
-        out_dist[o] = 0.0; out_slot[o] = -1; out_intensity[o] = 0.0;
-        out_points[o * 3] = out_points[o * 3 + 1] = out_points[o * 3 + 2] = 0.0;
-        out_normal[o * 3] = out_normal[o * 3 + 1] = out_normal[o * 3 + 2] = 0.0;
-        return;
+        // compact env grid: an infinite plane past the env's cell (env_grid.h)
+        GridPlaneHit ph = grid_plane(org0, dir, r.max_distance, c.max_range, e, c.grid);
+        if (!ph.hit) {
+            out_dist[o] = 0.0; out_slot[o] = -1; out_intensity[o] = 0.0;
+            out_points[o * 3] = out_points[o * 3 + 1] = out_points[o * 3 + 2] = 0.0;
+            out_normal[o * 3] = out_normal[o * 3 + 1] = out_normal[o * 3 + 2] = 0.0;
+            return;
+        }
+        dist = ph.t; slot = ph.slot; n = ph.n;
+    } else {
+        uint ii = res.instance_id;
+        slot = inst_tab[ii].y + res.geometry_id;          // geometry: 0 for geoms; the object within a dynamic env structure
+        uint mesh = RT_MESH(res, inst[ii].as_index);      // = slot_mesh[slot] for geoms
+        InstanceDesc d = inst[ii];
+        float3x3 Ri = float3x3(float3(d.col0), float3(d.col1), float3(d.col2));
+        n = tri_normal(mesh, res.primitive_id, meshes, verts, indices, Ri);
+        dist = res.distance;
     }
-    uint ii = res.instance_id;
-    uint slot = inst_tab[ii].y + res.geometry_id;          // geometry: 0 for geoms; the object within a dynamic env structure
-    uint mesh = RT_MESH(res, inst[ii].as_index);          // = slot_mesh[slot] for geoms
-    InstanceDesc d = inst[ii];
-    float3x3 Ri = float3x3(float3(d.col0), float3(d.col1), float3(d.col2));
-    float3 n = tri_normal(mesh, res.primitive_id, meshes, verts, indices, Ri);
     if (dot(n, dir) > 0.0) n = -n;
-    float3 p = origin + dir * res.distance;
+    float3 p = origin + dir * dist;
     float refl = mats[slot].par.w > 0.0 ? mats[slot].par.w : 0.5;   // material reflectance (MuJoCo) as albedo proxy
-    float inten = refl * max(dot(n, -dir), 0.0) / max(res.distance * res.distance, 1e-4);
-    out_dist[o] = res.distance;
+    float inten = refl * max(dot(n, -dir), 0.0) / max(dist * dist, 1e-4);
+    out_dist[o] = dist;
     out_slot[o] = int(slot);
     out_intensity[o] = inten;
     out_points[o * 3] = p.x; out_points[o * 3 + 1] = p.y; out_points[o * 3 + 2] = p.z;
@@ -159,6 +170,7 @@ kernel void raycast_depth(
     constant uint4&         dims       [[buffer(4)]],   // width, height, n_cam, cam_id
     constant RTConsts&      c          [[buffer(5)]],
     device float*           out_depth  [[buffer(6)]],   // (n_envs, h, w) distance to image plane
+    constant LensParams&    lens       [[buffer(7)]],   // lens model (lens.h; 0 = pinhole from `intrinsics`)
     DYN_KERNEL_ARG
     uint3 tid [[thread_position_in_grid]])
 {
@@ -169,7 +181,9 @@ kernel void raycast_depth(
     float3 origin = float3(cam_xpos[ci * 3], cam_xpos[ci * 3 + 1], cam_xpos[ci * 3 + 2]);
     float3x3 R = load_mat33(cam_xmat + ci * 9);
     // camera looks along -Z, +Y up; pixel (x+0.5, y+0.5) with y down
-    float3 dl = float3((float(x) + 0.5 - intrinsics.z) / intrinsics.x, -(float(y) + 0.5 - intrinsics.w) / intrinsics.y, -1.0);
+    float3 dl;
+    uint o0 = (e * h + y) * w + x;
+    if (!lens_ray(lens, float(x) + 0.5, float(y) + 0.5, float(w), float(h), intrinsics, dl)) { out_depth[o0] = 0.0; return; }
     float3 dir = normalize(R * dl);
     float3 org0 = origin + env_offset(e, c);
     ray r(org0, dir, 0.001, grid_tmax(org0, dir, c.max_range, e, c.grid));
@@ -180,8 +194,13 @@ kernel void raycast_depth(
     intersection_result<triangle_data, instancing> res = isect.intersect(r, accel);
 #endif
     uint o = (e * h + y) * w + x;
-    if (res.type == intersection_type::none) { out_depth[o] = 0.0; return; }
-    float3 hit = dir * res.distance;
+    float dist = res.distance;
+    if (res.type == intersection_type::none) {
+        GridPlaneHit ph = grid_plane(org0, dir, r.max_distance, c.max_range, e, c.grid);   // a plane past the cell
+        if (!ph.hit) { out_depth[o] = 0.0; return; }
+        dist = ph.t;
+    }
+    float3 hit = dir * dist;
     out_depth[o] = -dot(hit, R[2]);   // depth along the camera's -Z axis
 }
 
@@ -254,25 +273,34 @@ kernel void lidar_ext(
 #else
             intersection_result<triangle_data, instancing> res = isect.intersect(r, accel);
 #endif
-            if (res.type == intersection_type::none) break;
-            tmin = res.distance + 1e-4;
-            int ii = int(res.instance_id);
-            int g = int(res.geometry_id);             // the object: instance, and geometry within a dynamic env structure
+            float dist; uint slot; float3 n; int ii, g;
+            if (res.type == intersection_type::none) {
+                // compact env grid: an infinite plane past the env's cell ends the sub-ray (env_grid.h)
+                GridPlaneHit ph = grid_plane(org, dir, max(r.max_distance, tmin), c.max_range, e, c.grid);
+                if (!ph.hit) break;
+                dist = ph.t; slot = ph.slot; n = ph.n; ii = -2; g = int(ph.slot);
+                tmin = c.max_range + 1.0;
+            } else {
+                dist = res.distance;
+                tmin = res.distance + 1e-4;
+                ii = int(res.instance_id);
+                g = int(res.geometry_id);             // the object: instance, and geometry within a dynamic env structure
+                slot = inst_tab[ii].y + res.geometry_id;
+                InstanceDesc di = inst[ii];
+                float3x3 Ri = float3x3(float3(di.col0), float3(di.col1), float3(di.col2));
+                n = tri_normal(RT_MESH(res, di.as_index), res.primitive_id, meshes, verts, indices, Ri);
+            }
             if (ii == last && g == last_g) continue;  // exit / inner faces of the object just hit
             last = ii; last_g = g;
-            uint slot = inst_tab[ii].y + res.geometry_id;
-            InstanceDesc di = inst[ii];
-            float3x3 Ri = float3x3(float3(di.col0), float3(di.col1), float3(di.col2));
-            float3 n = tri_normal(RT_MESH(res, di.as_index), res.primitive_id, meshes, verts, indices, Ri);
             if (dot(n, dir) > 0.0) n = -n;
-            float p = P * slot_refl[slot] * max(dot(n, -dir), 0.0) / max(res.distance * res.distance, 1e-4);
+            float p = P * slot_refl[slot] * max(dot(n, -dir), 0.0) / max(dist * dist, 1e-4);
             if (nc < LIDAR_MAX_CAND) {
                 // insertion by range
                 uint j = nc;
-                while (j > 0 && cr[j - 1] > res.distance) {
+                while (j > 0 && cr[j - 1] > dist) {
                     cr[j] = cr[j - 1]; cp[j] = cp[j - 1]; cpt[j] = cpt[j - 1]; cn[j] = cn[j - 1]; cs[j] = cs[j - 1]; --j;
                 }
-                cr[j] = res.distance; cp[j] = max(p, 1e-12f * P); cpt[j] = origin + dir * res.distance; cn[j] = n; cs[j] = int(slot);
+                cr[j] = dist; cp[j] = max(p, 1e-12f * P); cpt[j] = origin + dir * dist; cn[j] = n; cs[j] = int(slot);
                 ++nc;
             }
             ++hits;
