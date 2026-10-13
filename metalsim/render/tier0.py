@@ -48,6 +48,8 @@ class Tier0Renderer:
                  dyn_layout: str | None = None,
                  far: float = 10.0, near: float = 0.01, reverse_z: bool = True, infinite_planes: bool = True,
                  hfield_skirts: bool = True, per_world_size: bool = True, model_fields: bool = True,
+                 haze: bool = True, fog: bool = False, skirt_shadows: bool = True, tendons: str = "mujoco",
+                 rolling_shutter=None,
                  ctx: MetalContext | None = None, device="metal:0"):
         """tier 0: raster + shadow maps. tier 1: raster G-buffer with ray-traced shadows, ambient
         occlusion and mirror reflections from the fragment stage (Metal hardware ray tracing).
@@ -101,7 +103,17 @@ class Tier0Renderer:
         per-world ``geom_size`` of MuJoCo Warp's model in the GPU path (False = only the terrain slots).
         ``model_fields``: per-world ``geom_rgba`` / ``mat_rgba`` / ``geom_matid`` colours and ``light_*`` fields of
         MuJoCo Warp's model read each frame in the GPU path (``metalsim.render.model_sync``; False = the compiled
-        model's)."""
+        model's); a per-world ``geom_matid`` switches the whole material, texture included
+        (``metalsim.render.env_materials``; ``set_texture_pool`` / ``t_material_ids``: Isaac Lab-style per-env texture
+        randomization).
+
+        ``haze`` / ``fog``: MuJoCo's haze over the first infinite plane (drawn with the skybox, ``mjRND_HAZE``, on by
+        default as in ``mujoco.Renderer``) and its linear fog (``mjRND_FOG``, off by default), ``metalsim.render.haze``.
+        ``skirt_shadows``: heightfield sides and base cast the caster's shadow on the culled tile path (False = before
+        2026-10-13). ``tendons``: "mujoco" (slack two-site tendons as MuJoCo's catenary, default-grey tendons tinted by
+        their limit impedance) or "straight" (before). ``rolling_shutter``: a ``metalsim.render.rolling.RollingShutter``
+        (per-row time between the previous frame and this one, Omniverse RTX's convention); the image is rendered in
+        row bands at poses interpolated from the previous frame's (cost about one frame per band)."""
         self.m = model
         self.tier = tier
         self.rt_samples = rt_samples
@@ -119,6 +131,8 @@ class Tier0Renderer:
             raise ValueError(f"normal_layout must be 'split', 'corner_fs' or 'corner_vs', got {normal_layout!r}")
         self.normal_layout = normal_layout
         self.shadow_cull = shadow_cull
+        self._haze_req, self._fog_req = bool(haze), bool(fog)
+        self.skirt_shadows = bool(skirt_shadows)
         self.rt = None
         self.n = n_envs
         self.tw, self.th = width, height
@@ -152,7 +166,7 @@ class Tier0Renderer:
         self.G = self.tables.G
         import os
         self._extras_kw = dict(visual=mujoco.MjvOption() if visual is None else visual, deformables=deformables,
-                               tube_slices=tube_slices, cap_stacks=cap_stacks)   # the camera default: everything MuJoCo draws
+                               tube_slices=tube_slices, cap_stacks=cap_stacks, tendons=tendons)   # the camera default: everything MuJoCo draws
         # tier 1's ray tracer: dynamic objects as per-env hardware structures (its shadow / AO rays run in the fragment
         # stage, where the software per-env BVH of the "sbvh" layout measured 1.5-1.7x slower); see RayTracer
         self._extras_kw["dyn_layout"] = dyn_layout or os.environ.get("METALSIM_DYN_LAYOUT") or "per_env"
@@ -211,10 +225,24 @@ class Tier0Renderer:
                 from metalsim.render.dynamic_mesh import tube_tessellation
                 lod = tube_tessellation(model, self.tables, *self._extras_kw["tube_view"])
             self.dyn = self.rt.dyn if self.rt is not None else DynamicMeshes(self.ctx, model, self.tables, n_envs, tube_slices=tube_slices,
-                                                                             cap_stacks=cap_stacks, tube_lod=lod)
+                                                                             cap_stacks=cap_stacks, tube_lod=lod,
+                                                                             tendons=tendons)
         if self.tables.site_ids:
             from metalsim.render.dynamic_mesh import PoseGather
             self.pose = PoseGather(self.ctx, model, self.tables, n_envs)
+        # rolling shutter: the previous frame's pose inputs per env (metalsim.render.rolling)
+        self.rolling, self.history = rolling_shutter, None
+        if rolling_shutter is not None:
+            from metalsim.render.rolling import PoseHistory
+            rolling_shutter.bands(height)                  # validates the row count
+            nc = max(model.ncam, 1)
+            f = {"geom_xpos": ("pos", 3 * model.ngeom), "geom_xmat": ("mat", 9 * model.ngeom),
+                 "cam_xpos": ("pos", 3 * nc), "cam_xmat": ("mat", 9 * nc)}
+            if self.n_light:
+                f.update(light_xpos=("pos", 3 * model.nlight), light_xdir=("dir", 3 * model.nlight))
+            if self.pose is not None:
+                f.update(site_xpos=("pos", 3 * model.nsite), site_xmat=("mat", 9 * model.nsite))
+            self.history = PoseHistory(self.ctx, n_envs, f)
 
     @staticmethod
     def plane_disc(intr: CameraIntrinsics, far: float) -> float:
@@ -276,6 +304,10 @@ class Tier0Renderer:
         self.sync = ModelSync(c, self.m, self.n, t, self.color_buf, t.lights)
         self.light_buf = self.sync.lights                    # (n_envs, max(nlight, 1)) records
         self.inst_col_buf = self.sync.inst_col               # t_colors x the model colour, per env and slot
+        from metalsim.render.env_materials import EnvMaterials   # per-env material / texture swaps
+        self.env_mats = EnvMaterials(c, self.m, t, self.n, self.sync, device=self.device)
+        self.t_material_ids = self.env_mats.t_material_ids
+        self._env_mats_on = False
         self.mat_buf = c.buffer(t.materials.nbytes, unit_rgba(t.materials), "materials")
         self.params_buf = c.buffer(t.params.nbytes, t.params, "scene_params")
         self.plane_buf = c.buffer(t.plane.nbytes, t.plane, "slot_plane")
@@ -290,8 +322,13 @@ class Tier0Renderer:
         self.skybox = bool(self._skybox_req and t.params.shape[0] > 6 and t.params[6, 1] > 0.5)
         self._build_shadow_views()
         self._build_transparency()
+        # MuJoCo's haze over the first infinite plane (with the skybox) and its fog (render/haze.py, shaders/haze.h)
+        from metalsim.render import haze as hz
+        self.haze_params = hz.haze_params(self.m, t.geoms, haze=self._haze_req, fog=self._fog_req, sky_drawn=self.skybox)
+        self.haze_buf = c.buffer(self.haze_params.nbytes, self.haze_params, "haze_params")
         flags = ((1 if self.use_bg else 0) | (2 if self.shadows else 0) | (4 if self.skybox else 0)
-                 | (8 if self.shadows and self.n_views else 0))
+                 | (8 if self.shadows and self.n_views else 0) | (16 if hz.active(self.haze_params) else 0)
+                 | (32 if self.shadow_lights == "all" else 0))      # tier 1: a shadow ray to every castshadow light
         self.consts = np.array([self.n, self.pose_rows, self.G, self.tpr, self.tw, self.th, self.aw, self.ah,
                                 max(self.m.ncam, 1), self.bg_layers, flags, max(self.n_light, 1),
                                 self.sw, self.sh, self.saw, self.sah, self.n_views, 0, 0, 0], np.uint32)
@@ -431,12 +468,17 @@ class Tier0Renderer:
                     chunks.append([slot, s0, cnt, 0])
                     cboxes.append(list(P.min(0) - 1e-4) + [0] + list(P.max(0) + 1e-4) + [0])
             self.n_skirt = len(chunks)
-            if self.n_skirt:        # (heightfield sides cast no tier-0 shadow on the culled path)
+            if self.n_skirt:        # the sides also cast the caster's shadow (skirt_shadows; before 2026-10-13 they did not)
                 c = self.ctx
                 self.skirt_chunks = c.buffer(16 * self.n_skirt, np.asarray(chunks, np.int32), "hf_skirt_chunks")
                 self.skirt_boxes = c.buffer(32 * self.n_skirt, np.asarray(cboxes, np.float32), "hf_skirt_boxes")
                 self.skirt_vis = c.buffer(8 * self.n * self.n_skirt, label="hf_skirt_visible")
-                self.skirt_args = c.buffer(16, np.zeros(4, np.uint32), "hf_skirt_args")
+                self.skirt_svis = c.buffer(8 * self.n * self.n_skirt, label="hf_skirt_shadow_visible")
+                self.skirt_args = c.buffer(32, np.zeros(8, np.uint32), "hf_skirt_args")
+                b = t.params[0]                        # scene bounds: the shadow sweep reaches the scene's lowest point
+                ss = np.array([1.0 if (self.shadows and self.skirt_shadows) else 0.0,
+                               2.0 * (2.0 * float(b[3]) / self.sw), float(b[2] - b[3]), 0.0], np.float32)
+                self.skirt_ss = ss
         self._build_shadow_cull()
         self.n_tiles = 0
         if not self.hfield_cull:
@@ -493,6 +535,9 @@ class Tier0Renderer:
         defs = {} if self.max_lights is None else {"MAX_LIGHTS": int(self.max_lights)}
         if self.rt is not None:
             defs.update(self.rt.shader_defines())       # sbvh layout: ray queries through the per-env BVH
+        from metalsim.render import haze as hz
+        defs["HAZE_ON"] = 1 if hz.active(self.haze_params) else 0      # compiled out without haze / fog
+        defs["ENV_MATS"] = 1 if getattr(self, "_env_mats_on", False) else 0   # per-env material entries
         lib = c.library("tier0", defs or None)
         self.p_env = c.compute_pipeline(lib, "build_env_params")
         self.p_untile = c.compute_pipeline(lib, "untile")
@@ -611,6 +656,10 @@ class Tier0Renderer:
                 self.skirt_pipe, _ = make("hf_skirt_vs", "geom_fs_rt" if self.tier >= 1 else "geom_fs", True, depth_cmp, False)
                 self.p_skirt_reset = c.compute_pipeline(lib, "hf_skirt_reset")
                 self.p_skirt_cull = c.compute_pipeline(lib, "hf_skirt_cull")
+                d = Metal.MTLRenderPipelineDescriptor.new()
+                d.setVertexFunction_(fn("hf_skirt_shadow_vs"))
+                d.setDepthAttachmentPixelFormat_(Metal.MTLPixelFormatDepth32Float)
+                self.skirt_shadow_pipe = c.render_pipeline(d)
 
     def _alloc_outputs(self, outputs):
         """Output tensors live in Warp arrays on metal:0 so that they are simultaneously Warp arrays,
@@ -687,6 +736,16 @@ class Tier0Renderer:
         self.ctx.write_buffer(self.mat_buf, unit_rgba(mats))
         self.sync.set_static_rgba(mats)
 
+    def set_texture_pool(self, images, **kw):
+        """Per-env texture randomization as Isaac Lab's ``randomize_visual_texture_material`` (see
+        ``metalsim.render.env_materials.EnvMaterials.set_texture_pool``): returns entry ids to write per env and slot into
+        ``t_material_ids`` (GPU) or ``set_material_ids`` (host); -1 keeps a slot's own material."""
+        return self.env_mats.set_texture_pool(images, **kw)
+
+    def set_material_ids(self, ids):
+        """(N, G) material entry per env and slot (-1 = the slot's own); host write."""
+        self.env_mats.set_material_ids(ids)
+
     def set_backgrounds(self, env_ids, images):
         self.use_bg = True
         self.consts[10] |= 1                 # keep the shadow / skybox bits
@@ -700,10 +759,16 @@ class Tier0Renderer:
     # -- rendering ----------------------------------------------------------------------------------
 
     def _encode(self, cb, geom_xpos, geom_xpos_off, geom_xmat, geom_xmat_off, cam_xpos, cam_xpos_off, cam_xmat, cam_xmat_off,
-                light_xpos=None, light_xpos_off=0, light_xdir=None, light_xdir_off=0, sim=None):
+                light_xpos=None, light_xpos_off=0, light_xdir=None, light_xdir_off=0, sim=None, rows=None):
         c = self.ctx
         # 0. per-env light records and instance colours from the model (MuJoCo Warp's per-world fields with a sim)
         self.sync.encode(cb, sim if self.model_fields else None)
+        if self.dyn is not None:        # tendons at their limits: MuJoCo's limit colour over the synced colour
+            self.dyn.encode_tint(cb, self.rt._dyn_src if self.rt is not None else self._dyn_src, self.color_buf, self.inst_col_buf)
+        on = self.env_mats.encode(cb, sim if self.model_fields else None)   # per-env material entries
+        if on != self._env_mats_on:      # the shaders are specialized on it (compiled once per switch)
+            self._env_mats_on = on
+            self._build_pipelines()
         if light_xpos is None:
             light_xpos, light_xpos_off, light_xdir, light_xdir_off = self._host_light_xpos, 0, self._host_light_xdir, 0
         # 1. per-env params from the camera and light state
@@ -758,6 +823,8 @@ class Tier0Renderer:
                     ce.setBuffer_offset_atIndex_(b, o, i)
                 ce.setBytes_length_atIndex_(np.array([self.n_skirt], np.uint32).tobytes(), 4, 7)
                 ce.setBuffer_offset_atIndex_(self.skirt_vis, 0, 8); ce.setBuffer_offset_atIndex_(self.skirt_args, 0, 9)
+                ce.setBuffer_offset_atIndex_(self.skirt_svis, 0, 10)
+                ce.setBytes_length_atIndex_(self.skirt_ss.tobytes(), 16, 11)
                 ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n * self.n_skirt, 1, 1), Metal.MTLSize(256, 1, 1))
             ce.endEncoding()
         grains = getattr(self, "_grain_raster", None)     # particles (set_particles, metalsim/render/particles.py)
@@ -791,6 +858,12 @@ class Tier0Renderer:
                 self._bind_hf(se, self.hf_svis)
                 se.drawIndexedPrimitives_indexType_indexBuffer_indexBufferOffset_indirectBuffer_indirectBufferOffset_(
                     Metal.MTLPrimitiveTypeTriangle, Metal.MTLIndexTypeUInt32, self.hf_ibuf, 0, self.hf_args, 32)
+                if self.n_skirt and self.skirt_shadows:      # heightfield sides / base (culled chunks)
+                    se.setRenderPipelineState_(self.skirt_shadow_pipe)
+                    se.setVertexBuffer_offset_atIndex_(self.skirt_svis, 0, 2)
+                    se.setVertexBuffer_offset_atIndex_(self.skirt_chunks, 0, 6)
+                    se.setVertexBuffer_offset_atIndex_(self.ibuf, 0, 8)
+                    se.drawPrimitives_indirectBuffer_indirectBufferOffset_(Metal.MTLPrimitiveTypeTriangle, self.skirt_args, 16)
             if self.dyn is not None:
                 se.setRenderPipelineState_(self.dyn_shadow_pipe)
                 self._draw_dyn(se)
@@ -889,6 +962,9 @@ class Tier0Renderer:
         re.setFragmentTexture_atIndex_(self.bg_tex, 1)
         re.setFragmentSamplerState_atIndex_(self.samp_bg, 0)
         re.setFragmentBuffer_offset_atIndex_(self.params_buf, 0, 9)
+        re.setFragmentBuffer_offset_atIndex_(self.haze_buf, 0, 24)     # stays bound for the geometry passes
+        re.setFragmentBuffer_offset_atIndex_(self.env_mats.entries_buf, 0, 25)
+        re.setFragmentTexture_atIndex_(self.env_mats.pool_tex, 5)
         re.setFragmentTexture_atIndex_(self.atlas_tex, 0)
         re.drawPrimitives_vertexStart_vertexCount_instanceCount_(Metal.MTLPrimitiveTypeTriangle, 0, 6, self.n)
         # geometry
@@ -1008,7 +1084,9 @@ class Tier0Renderer:
         ue.setBuffer_offset_atIndex_(self.consts_buf, 0, 6)
         ue.setBuffer_offset_atIndex_(self.outputs_buf, 0, 7)
         ue.setBuffer_offset_atIndex_(self.clip_buf, 0, 8)
-        ue.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.tw, self.th, self.n), Metal.MTLSize(16, 16, 1))
+        r0, r1 = rows if rows is not None else (0, self.th)
+        ue.setBytes_length_atIndex_(np.array([r0, r1], np.uint32).tobytes(), 8, 9)
+        ue.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.tw, r1 - r0, self.n), Metal.MTLSize(16, 16, 1))
         ue.endEncoding()
 
     def _draw_dyn(self, enc):
@@ -1084,6 +1162,16 @@ class Tier0Renderer:
         cb = self.ctx.command_buffer()
         if ev is not None:
             self.ctx.wait_for(cb, ev, after_value)
+        if self.rolling is not None:      # row bands at interpolated poses (metalsim.render.rolling)
+            cur = {k: (v.buffer, v.offset) for k, v in views.items()}
+            if self.pose is not None:
+                for k in ("site_xpos", "site_xmat"):
+                    v = wm.buffer_of(getattr(sim.d, k)); cur[k] = (v.buffer, v.offset)
+            from metalsim.render.model_sync import model_fields
+            self._encode_rolling(cb, cur, sim, getattr(model_fields(sim), "geom_size", None))
+            v = self.ctx.signal(cb)
+            self.ctx.commit(cb)
+            return v
         lx = views.get("light_xpos"); ld = views.get("light_xdir")
         gm_buf, gm_off = views["geom_xmat"].buffer, views["geom_xmat"].offset
         if self.sized is not None:          # per-world slot sizes folded into a copy of geom_xmat
@@ -1103,6 +1191,22 @@ class Tier0Renderer:
         self.ctx.commit(cb)
         return v
 
+    def _encode_rolling(self, cb, cur, sim=None, geom_size=None):
+        """Rolling shutter: per row band, the pose inputs at the band's time (``PoseHistory``), then the frame with only
+        the band's rows written; the history takes the current poses at the end."""
+        for r0, r1, tau in self.rolling.bands(self.th):
+            b = self.history.encode_interp(cb, cur, tau)
+            gm = b["geom_xmat"]
+            if self.sized is not None:
+                gm = self.sized.encode(cb, gm[0], gm[1], geom_size)
+            gx = b["geom_xpos"]
+            if self.pose is not None:
+                gx, gm = self.pose.encode(cb, gx, gm, b["site_xpos"], b["site_xmat"])
+            lx, ld = b.get("light_xpos"), b.get("light_xdir")
+            self._encode(cb, gx[0], gx[1], gm[0], gm[1], b["cam_xpos"][0], 0, b["cam_xmat"][0], 0,
+                         lx[0] if lx else None, 0, ld[0] if ld else None, 0, sim=sim, rows=(r0, r1))
+        self.history.encode_snapshot(cb, cur)
+
     def after(self, value: int) -> None:
         """Order torch's subsequent kernels after the render that signalled ``value``."""
         tb.wait_event(self.ctx.event, value)
@@ -1114,12 +1218,15 @@ class Tier0Renderer:
 
     # -- host path (tests, tools): render from MjData ------------------------------------------------
 
-    def render_host(self, datas, cam_pos=None, cam_quat=None, geom_size=None, sources=None):
+    def render_host(self, datas, cam_pos=None, cam_quat=None, geom_size=None, sources=None, prev=None):
         """Render from a list of N ``mujoco.MjData`` (mj_forward'd). Optional per-env camera pose
         overrides ``(N,3)``/``(N,4)`` replace the model camera; ``geom_size`` (N, ngeom, 3): per-world sizes of the
         terrain slots (default the model's); ``sources``: as ``render`` (numpy (N, V, 3) arrays). Synchronizes;
-        returns numpy outputs."""
+        returns numpy outputs. ``prev``: with a rolling shutter, the previous frame's N ``MjData`` (default the last
+        render's state)."""
         n, ng, nc = self.n, self.m.ngeom, max(self.m.ncam, 1)
+        if self.rolling is not None:
+            return self._render_host_rolling(datas, prev, geom_size, sources)
         gx = np.stack([d.geom_xpos for d in datas]).astype(np.float32).reshape(n, ng, 3)
         gm = np.stack([d.geom_xmat for d in datas]).astype(np.float32).reshape(n, ng, 9)
         if self.sized is not None:
@@ -1148,3 +1255,33 @@ class Tier0Renderer:
         for name, a in self._out_arrays.items():
             res[name] = a.numpy().copy()
         return res
+
+    def _host_pose_arrays(self, datas):
+        n = self.n
+        out = {"geom_xpos": np.stack([d.geom_xpos for d in datas]), "geom_xmat": np.stack([d.geom_xmat for d in datas]),
+               "cam_xpos": np.stack([d.cam_xpos for d in datas]), "cam_xmat": np.stack([d.cam_xmat for d in datas])}
+        if self.n_light:
+            out["light_xpos"] = np.stack([d.light_xpos for d in datas]); out["light_xdir"] = np.stack([d.light_xdir for d in datas])
+        if self.pose is not None:
+            out["site_xpos"] = np.stack([d.site_xpos for d in datas]); out["site_xmat"] = np.stack([d.site_xmat for d in datas])
+        return {k: np.asarray(v, np.float32).reshape(n, -1) for k, v in out.items()}
+
+    def _render_host_rolling(self, datas, prev, geom_size, sources):
+        c = self.ctx
+        cur_np = self._host_pose_arrays(datas)
+        if prev is not None:
+            self.history.write_prev_host(self._host_pose_arrays(prev))
+        if not hasattr(self, "_host_rolling_bufs"):
+            self._host_rolling_bufs = {k: c.buffer(v.nbytes, label=f"host_roll_{k}") for k, v in cur_np.items()}
+        for k, v in cur_np.items():
+            c.write_buffer(self._host_rolling_bufs[k], v)
+        self._set_sources(sources=sources, datas=datas)
+        gs = None
+        if geom_size is not None and self.sized is not None:
+            import warp as wp
+            gs = wp.array(np.asarray(geom_size, np.float32).reshape(self.n, self.m.ngeom, 3), dtype=wp.vec3, device=self.device)
+        cb = c.command_buffer()
+        self._encode_rolling(cb, {k: (b, 0) for k, b in self._host_rolling_bufs.items()}, None, gs)
+        c.commit(cb)
+        c.synchronize()
+        return {name: a.numpy().copy() for name, a in self._out_arrays.items()}

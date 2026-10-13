@@ -57,6 +57,28 @@ inline float4 material_tex(float4 rect, float4 par, MaterialExt x, float2 uv, fl
     return c;
 }
 
+// Per-env material / texture swaps (metalsim.render.env_materials): an (env, slot) entry index (-1: the slot's own
+// material) into a table of entries, each a full material block (the colour stays the model sync's) plus, for a texture
+// from the renderer's texture pool (a 2D texture array; Isaac Lab's randomize_visual_texture_material), how it maps:
+// pool = (1, layer, projection, rotation): projection 0 = the surface's texture coordinates, 1 = "uvw" box projection
+// of the geom-frame position on the plane of the dominant local normal axis (OmniPBR project_uvw); rotation in radians;
+// scale = par.xy; sRGB decoded when x.e0.w.
+struct MatEntry { float4 rgba; float4 mrse; float4 rect; float4 par; MaterialExt x; float4 pool; float4 _r; };
+
+inline float4 pool_tex(texture2d_array<float> pool, sampler s, float4 pp, float4 par, MaterialExt x, float2 uv,
+                       float3 lp, float3 ln) {
+    float2 st = uv;
+    if (pp.z > 0.5) {
+        float3 a = fabs(ln);
+        st = (a.x >= a.y && a.x >= a.z) ? lp.yz : (a.y >= a.z ? lp.xz : lp.xy);
+    }
+    float cr = cos(pp.w), sr = sin(pp.w);
+    st = float2(cr * st.x - sr * st.y, sr * st.x + cr * st.y) * par.xy;
+    float4 c = pool.sample(s, fract(st), uint(pp.y + 0.5), level(0.0));
+    if (x.e0.w > 0.5) c.rgb = srgb_to_linear(c.rgb);
+    return c;
+}
+
 // MuJoCo skybox colour in world direction d; sky_rect / sky_info: SceneParams rows 5 / 6
 inline float3 sky_color(texture2d<float> atlas, sampler s, float4 sky_rect, float4 sky_info, float3 d) {
     return atlas_cube(atlas, s, sky_rect, sky_info.x, float3(d.x, d.z, -d.y)).rgb;

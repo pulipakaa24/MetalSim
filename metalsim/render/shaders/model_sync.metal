@@ -32,6 +32,7 @@ kernel void sync_colors(
     device const int*    src        [[buffer(6)]],   // (n_slots) 1 = model colour
     device float4*       out        [[buffer(7)]],   // (n_envs, n_slots)
     constant SyncConsts& c          [[buffer(8)]],
+    device atomic_uint*  env_flag   [[buffer(9)]],   // (n_envs) 1: a partially transparent slot (alpha < 0.995)
     uint i [[thread_position_in_grid]])
 {
     if (i >= c.n_envs * c.n_slots) return;
@@ -45,7 +46,15 @@ kernel void sync_colors(
         col = (mid >= 0 && dflt && c.n_mat > 0) ? mat_rgba[e * c.s_matrgba * c.n_mat + uint(mid)] : rg;
     }
     if (c.opaque != 0) col.w = 1.0;          // the renderer's transparency=False
-    out[i] = t_colors[i] * col;
+    float4 o = t_colors[i] * col;
+    out[i] = o;
+    if (o.w < 0.995f) atomic_store_explicit(env_flag + e, 1u, memory_order_relaxed);
+}
+
+kernel void sync_clear_env_flags(device uint* env_flag [[buffer(0)]], constant uint& n [[buffer(1)]],
+                                 uint i [[thread_position_in_grid]])
+{
+    if (i < n) env_flag[i] = 0u;
 }
 
 kernel void sync_lights(
@@ -82,4 +91,30 @@ kernel void sync_lights(
         }
     }
     out[i] = L;
+}
+
+// Per-env material entries (metalsim.render.env_materials, appearance.h MatEntry): per (env, slot) the entry the
+// shaders use, -1 = the slot's own material. The renderer's choice (user_ids, e.g. a texture-pool randomization) wins;
+// else, with a per-world geom_matid, a geom whose material differs from its compiled one gets the entry of that
+// (geom, material) pair: slot_base[slot] + 1 + matid (slot_base + 0 = no material).
+struct MatIdConsts { uint n_envs, n_slots, n_geoms, s_matid, use_model, use_user, _a, _b; };
+
+kernel void resolve_mat_ids(
+    device const int*    user_ids   [[buffer(0)]],   // (n_envs, n_slots), -1 = none
+    device const int*    geom_matid [[buffer(1)]],   // (W, n_geoms)
+    device const int*    slot_geom  [[buffer(2)]],
+    device const int*    compiled   [[buffer(3)]],   // (n_slots) compiled matid of the slot's geom
+    device const int*    slot_base  [[buffer(4)]],   // (n_slots) first model entry of the slot, -1 = none
+    device int*          out        [[buffer(5)]],   // (n_envs, n_slots)
+    constant MatIdConsts& c         [[buffer(6)]],
+    uint i [[thread_position_in_grid]])
+{
+    if (i >= c.n_envs * c.n_slots) return;
+    uint e = i / c.n_slots, s = i - e * c.n_slots;
+    int id = c.use_user != 0 ? user_ids[i] : -1;
+    if (id < 0 && c.use_model != 0 && slot_base[s] >= 0) {
+        int mid = geom_matid[e * c.s_matid * c.n_geoms + uint(slot_geom[s])];
+        if (mid != compiled[s]) id = slot_base[s] + 1 + mid;
+    }
+    out[i] = id;
 }
