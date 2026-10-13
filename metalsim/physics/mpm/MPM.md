@@ -732,6 +732,53 @@ modules in RUN_TO_RUN mode on Metal. The scene then repeats bitwise at 64 and 2,
 eager, one graph per sim step and one graph per policy step all agree. Cost per step is unchanged.
 Test: `test_coupled_contact_filter_keeps_source_order`.
 
+## 8h. Franka-Pour GPU memory at 2,048 worlds (2026-10-12; Warp `95f6f121`)
+
+Tools (`scripts/diagnostics/franka_pour_memory/`, run with the `metalsim-franka-pour` branch's `metalsim` on the
+path): `mem_attrib.py`
+records every Metal allocation Warp makes (size, phase, owner from the Python stack), the native allocation tracker
+(`wp_alloc_tracker`), `MTLDevice.currentAllocatedSize`, the process footprint and resident size, TemporaryStore
+borrow/redeem traces, and what a captured graph keeps alive; `grid_demand.py` the NanoVDB node and collision demand
+over a rollout; `franka_bitwise.py` per-step trajectory hashes. Logs: `runs/mpm/memory_2048/`.
+
+Where the 37.6 GB (device allocations after the first policy step, Warp `f0df4cf8`, one graph per sim step) go:
+
+| owner | GB |
+|---|---|
+| sparse-grid NanoVDB volumes (native): vertex grid 11.04 (272,256 lower nodes reserved, ~2.3k used), cell grid 1.38 | 12.4 |
+| warp.fem `TemporaryStore` (pooled temporaries; 6.5 GB of simultaneous requests, mostly the pic27 collider restriction's 56.6M-slot tables) | 11.1 |
+| other MPM arrays (fields, BSR matrices, restriction / partition tables, sort scratch), sized by the 1,024-cell reservation | 5.8 |
+| collision pipeline (contacts sized for 7.07M rigid contacts, 8.4M triangle pairs; peaks seen 57k / 30k) | 2.8 |
+| model / state (particle attributes 1.5M x ...) | 1.6 |
+| MuJoCo Warp data (njmax 2,560 per world) | 1.1 |
+| coupler, task | 0.5 |
+| held by the captured graph (pool net of reuse 1.8, retained 0.4) | 2.2 |
+
+Process: footprint 44.0 GB, resident 19.6 GB. Most of the allocation is capacity that is never touched (cell
+reservation 1,024 per world, 80 in use; NanoVDB node capacities), which is why resident memory (and earlier RSS
+readings) is far below the allocation; on CUDA every allocated byte is physical, which is why Isaac's own task
+runs out of the L4's 24 GB at this size.
+
+Reductions, each bitwise (Franka-Pour with `rigid_deterministic=True`, captured, per-step hashes of body, joint and
+particle state: 60 steps at 64 envs, 30 at 2,048, equal to the base, whose two runs are equal; MPM pour scene
+recordings at 1 / 64 / 2,048 worlds, eager and captured, equal; `tests/test_mpm.py`, warp.fem and sparse tests pass):
+
+| change | where | device GB after the first policy step (2,048 worlds) | policy step |
+|---|---|---|---|
+| base | Warp `f0df4cf8`, Newton `3fd1f052` | 37.64 | 1.84 s |
+| tight temporary pools (exact sizes, no array > 1.25x a request of >= 1 MiB) | Warp `95f6f121` (default on Metal) | 34.48 | MPM step 81.2 / 81.5 vs 81.5 / 81.4 ms |
+| + measured NanoVDB node budgets (16 leaves, 4.5 lower nodes per world, 80+ upper; 4x the peak of 600 random-action policy steps) | Franka-Pour `mpm_grid_budget="measured"` (opt-in; local branch `franka-pour-memory` on `metalsim-franka-pour` `783decdc`, for that branch's owner to merge) | 24.85 | 1.79 s |
+| + cell reservation 256 per world (peak use 80) | Franka-Pour `mpm_cells_per_world=256` (opt-in) | 15.66 | 1.44 s |
+
+The two task options are capacities: a grid within them is the same grid, and an overflow is reported (the PPO loop
+now calls `check_status` once per iteration). They are opt-in because the budgets were measured with random
+actions, not a trained policy (pouring spreads particles further), and the cell reservation departs from Isaac's
+capacity rule. With both, the Metal allocation at 2,048 worlds is 15.7 GB, which would fit the L4's 24 GB on this
+accounting (the L4 run itself was not repeated). Not changed: collision capacities (an overflow drops contacts
+silently, and earlier traces of real Franka-Pour states saw 1.1-5 M triangle pairs per collide, far above the
+random-action peak), MuJoCo Warp's `njmax` / `nconmax` (Isaac's), and the graph-held buffers (the graph's replays
+read them).
+
 ## 9. Running
 
 ```
@@ -756,13 +803,13 @@ Everything above runs from a clone of MetalSim plus the three forks; nothing dep
 
 ```
 # after the install of README / docs/GUIDE.md (.venv, scripts/setup_warp.sh, the MuJoCo Warp fork):
-scripts/setup_newton152.sh          # .venv-newton152: Newton fork metalsim-1.5.2 @3fd1f052, shared Warp fork @f0df4cf8
+scripts/setup_newton152.sh          # .venv-newton152: Newton fork metalsim-1.5.2 @3fd1f052, shared Warp fork @95f6f121
 scripts/gpu_run.sh test_mpm check 15 -- .venv-newton152/bin/python -m pytest tests/test_mpm.py   # 14 passed, 1 xfailed
 ```
 
 | what | where it lives | how a fresh setup gets it |
 |---|---|---|
-| Warp changes | pulipakaa24/warp `metalsim`, pinned `f0df4cf8` | `scripts/setup_warp.sh` (fallback: innate-inc/warp `ce15f6bb` + `patches/warp/metalsim-f0df4cf8.diff`) |
+| Warp changes | pulipakaa24/warp `metalsim`, pinned `95f6f121` | `scripts/setup_warp.sh` (fallback: innate-inc/warp `ce15f6bb` + `patches/warp/metalsim-95f6f121.diff`) |
 | Newton changes (MPM, Franka-Pour rigid) | pulipakaa24/newton `metalsim-1.5.2`, pinned `3fd1f052` | `scripts/setup_newton152.sh` (fallback: v1.5.2 + `patches/newton/metalsim-1.5.2-3fd1f052.diff`) |
 | Newton 1.7 Metal fixes for the rigid stack | pulipakaa24/newton `metalsim-hashtable-metal` `a4be3604` (`.venv`'s `newton` extra) and `metalsim` `9f317390` (`.venv-newtonfork`) | `pip install -e ".[newton]"`, `scripts/setup_newton.sh` |
 | compat layer, scenes, probes, tests, Isaac-side recorders | this repository | the clone |

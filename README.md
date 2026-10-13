@@ -71,7 +71,7 @@ listing its commits, and keeps its upstream licence unchanged. "Head" is the bra
 
 [github.com/pulipakaa24/warp](https://github.com/pulipakaa24/warp), branch
 [`metalsim`](https://github.com/pulipakaa24/warp/tree/metalsim), head
-[`f0df4cf8`](https://github.com/pulipakaa24/warp/commit/f0df4cf8b291c0fcc5590d5286f0e7341a692ab1) (2026-10-12, pinned by
+[`95f6f121`](https://github.com/pulipakaa24/warp/commit/95f6f121b7e67025958335c7c15e338ac04a798a) (2026-10-12, pinned by
 `scripts/setup_warp.sh`; the rigid-body results through 2026-09-26 were produced at
 [`c200d46b`](https://github.com/pulipakaa24/warp/commit/c200d46b), those before that day's throughput work at [`4127c48`](https://github.com/pulipakaa24/warp/commit/4127c4818334080de6f3d23aef522e582ff6a2a7), code
 [`f194006`](https://github.com/pulipakaa24/warp/commit/f194006a4cf197fda93633252af81bc3f57f5561)). Base: innate-inc/warp
@@ -109,6 +109,8 @@ listing its commits, and keeps its upstream licence unchanged. "Head" is the bra
   reused (`warp.config.metal_capture_reuse`). Franka-Pour's policy-step graph at 2,048 worlds went from 70.7 GB
   (past the M4 Max's 55.7 GB working set; it replayed NaN) to finite. Graph-held buffers stay in the address
   table.
+- Franka-Pour memory (2026-10-12, `95f6f121`; MPM.md section 8h): warp.fem temporary pools allocate the requested
+  size on Metal; Franka-Pour at 2,048 worlds 37.6 -> 34.5 GB, 15.7 GB with the task's opt-in grid budgets; bitwise.
 
 Branch [`metalsim-flex`](https://github.com/pulipakaa24/warp/tree/metalsim-flex), head
 [`01ccf4a`](https://github.com/pulipakaa24/warp/commit/01ccf4ad687c0ebcdee139ee1131fbe2ad97bf51) (code `9dcb140`): the

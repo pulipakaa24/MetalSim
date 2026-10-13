@@ -26,6 +26,9 @@ ap = argparse.ArgumentParser()
 ap.add_argument("what", choices=["record", "profile", "time"])
 ap.add_argument("--worlds", type=int, default=64)
 ap.add_argument("--cells-per-world", type=int, default=0)
+ap.add_argument("--max-leaf", type=int, default=-1, help="SolverImplicitMPM.Config.max_leaf_node_count (-1: automatic)")
+ap.add_argument("--max-lower", type=int, default=-1, help="max_lower_node_count (-1: automatic)")
+ap.add_argument("--max-upper", type=int, default=-1, help="max_upper_node_count (-1: automatic)")
 ap.add_argument("--mode", default="gpuexit", choices=["eager", "gpuexit", "capture"])
 ap.add_argument("--steps", type=int, default=320)
 ap.add_argument("--every", type=int, default=10)
@@ -81,6 +84,9 @@ def make_solver():
     cfg.collider_velocity_mode = "forward"
     cfg.solver = "jacobi"
     cfg.separate_worlds = True
+    cfg.max_leaf_node_count = args.max_leaf
+    cfg.max_lower_node_count = args.max_lower
+    cfg.max_upper_node_count = args.max_upper
     import warp.fem as fem
 
     # Isaac Lab: NewtonMPMManager._create_solver(..., temporary_store=TemporaryStore()) (also for coupler entries)

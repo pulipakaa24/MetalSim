@@ -1,0 +1,15 @@
+[gpu_run] mem_franka_timing start: device utilisation 0% (20:22:22)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 8 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.6 %
+[gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.7 %
+util at start 0 20:22:25
+r1 memA rc=0 "step_s_median": 1.840706854000473
+r1 memB rc=0 "step_s_median": 1.4472140835000573
+r1 memC rc=0 "step_s_median": 1.7876882079999632
+r2 memA rc=0 "step_s_median": 1.838633437500448
+r2 memB rc=0 "step_s_median": 1.4387520415002655
+r2 memC rc=0 "step_s_median": 1.7909021455002403
+end 20:28:59
+[gpu_run] mem_franka_timing end: device utilisation 98% (20:28:59), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 6 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.7 %
