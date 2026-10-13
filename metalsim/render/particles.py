@@ -143,9 +143,11 @@ class GrainField:
         self.keys = ctx.buffer(16, label="grain_keys")     # per-grain identity key, written with the instances
 
     def _build_meshes(self, info):
+        from metalsim.render import as_limits
         c = self.ctx
         descs = []
         for i_off, i_count, _, _ in info:
+            as_limits.check("primitives", int(i_count) // 3, "grain mesh")
             g = Metal.MTLAccelerationStructureTriangleGeometryDescriptor.new()
             g.setVertexBuffer_(self.vbuf); g.setVertexBufferOffset_(0); g.setVertexStride_(32)
             g.setVertexFormat_(Metal.MTLAttributeFormatFloat3)
