@@ -13,7 +13,7 @@
 ╰────────────────────────────────────────────────╯
 
 [1/3] Launching simulation
-[INFO] Logging experiment in directory: /home/aditya_nianticspatial_com/IsaacLab3/logs/rsl_rl/g1_rough
+[INFO] Logging experiment in directory: /home/<vm-user>/IsaacLab3/logs/rsl_rl/g1_rough
 Exact experiment name requested from command line: 2026-09-25_19-54-08
 [2/3] Creating environment
 I: Initializing Version 2.72.3-release.7151+gl.5390bed9
@@ -22,9 +22,9 @@ I: Not using Hub: Hub not found
 I: Successfully created S3 provider for https://omniverse-content-production.s3-us-west-2.amazonaws.com
 I: Using CloudFront http://dcb18d6mfegct.cloudfront.net/, List = No
 Serving remote assets from the local cache under '/tmp'. Each copy is checked against the server before use; delete the directory to force a full re-download.
-/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_newton/isaaclab_newton/cloner/replicate.py:141: FutureWarning: Newton shape color replacement is enabled; this workaround will be deprecated in a future release.
+/home/<vm-user>/IsaacLab3/source/isaaclab_newton/isaaclab_newton/cloner/replicate.py:141: FutureWarning: Newton shape color replacement is enabled; this workaround will be deprecated in a future release.
   replace_newton_builder_shape_colors(builder, stage)
-/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_newton/isaaclab_newton/cloner/newton_clone_utils.py:158: FutureWarning: Newton shape color replacement is enabled; this workaround will be deprecated in a future release.
+/home/<vm-user>/IsaacLab3/source/isaaclab_newton/isaaclab_newton/cloner/newton_clone_utils.py:158: FutureWarning: Newton shape color replacement is enabled; this workaround will be deprecated in a future release.
   replace_newton_builder_shape_colors(builder, stage)
 [INFO]: Base environment:
 	Environment device    : cuda:0
@@ -188,8 +188,8 @@ Critic Model: MLPModel(
     (6): Linear(in_features=128, out_features=1, bias=True)
   )
 )
-Could not find git repository in /home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/rsl_rl/__init__.py. Skipping.
-Storing git diff for 'IsaacLab3' in: /home/aditya_nianticspatial_com/IsaacLab3/logs/rsl_rl/g1_rough/2026-09-25_19-54-08_newton_mjwarp/git/IsaacLab3.diff
+Could not find git repository in /home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/rsl_rl/__init__.py. Skipping.
+Storing git diff for 'IsaacLab3' in: /home/<vm-user>/IsaacLab3/logs/rsl_rl/g1_rough/2026-09-25_19-54-08_newton_mjwarp/git/IsaacLab3.diff
 ################################################################################
 [1m                           Learning iteration 0/1500                            [0m 
 

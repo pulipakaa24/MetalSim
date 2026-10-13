@@ -7,7 +7,7 @@ W0000 00:00:1790359967.869297   15362 message.cc:301] Protobuf GeneratedMessageF
 [ISAACLAB] Kit hash:    00c488ae
 [INFO]: Parsing configuration from: isaaclab_tasks.core.velocity.config.g1.rough_env_cfg:G1RoughEnvCfg
 [INFO]: Using metrics formatters = ['schema', 'summary', 'json']
-Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/isaacsim/kit/data/Kit/IsaacLab/3.0/user.config.json'
+Loading user config located at: '/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/isaacsim/kit/data/Kit/IsaacLab/3.0/user.config.json'
 2026-09-25T18:12:48Z [0ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
 2026-09-25T18:12:48Z [15ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
 
@@ -278,9 +278,9 @@ Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab3/l
 2026-09-25 18:16:07 [203,558ms] [INFO] [isaacsim.benchmark.services.datarecorders.app_frametime] AppFrametimeRecorder: Stopped collecting. Collected 1 samples
 2026-09-25 18:16:07 [203,558ms] [INFO] [isaacsim.benchmark.services.datarecorders.gpu_frametime] GPUFrametimeRecorder: Stopped collecting. Collected 0 samples
 2026-09-25 18:16:07 [203,579ms] [WARNING] [isaacsim.benchmark.services.datarecorders.gpu_frametime] GPUFrametimeRecorder: No samples collected
-[INFO]: Wrote schema bundle to /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_c/benchmark_runtime_Isaac-Velocity-Rough-G1_2026-09-25_18-12-49-458079_4207c77a_schema.json
+[INFO]: Wrote schema bundle to /home/<vm-user>/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_c/benchmark_runtime_Isaac-Velocity-Rough-G1_2026-09-25_18-12-49-458079_4207c77a_schema.json
 [INFO]: Setting test name to benchmark_runtime
-Results written to: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_c/benchmark_runtime_Isaac-Velocity-Rough-G1_2026-09-25_18-12-49-458079_4207c77a_summary.json
+Results written to: /home/<vm-user>/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_c/benchmark_runtime_Isaac-Velocity-Rough-G1_2026-09-25_18-12-49-458079_4207c77a_summary.json
 
 |------------------------------------------------------------------------------------|
 |                                   Summary Report                                   |
@@ -324,7 +324,7 @@ Results written to: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity
 | cuda_version: 12.8                                                                 |
 |------------------------------------------------------------------------------------|
 [INFO]: Setting test name to benchmark_runtime
-Results written to: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_c/benchmark_runtime_Isaac-Velocity-Rough-G1_2026-09-25_18-12-49-458079_4207c77a_json.json
+Results written to: /home/<vm-user>/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_c/benchmark_runtime_Isaac-Velocity-Rough-G1_2026-09-25_18-12-49-458079_4207c77a_json.json
 
 ================================================================
  Runtime summary: Isaac-Velocity-Rough-G1 (4096 envs, physx)
@@ -340,9 +340,9 @@ Results written to: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity
  gpu_util                  56.2 %  std 32.5
  gpu_mem                   8.05 GB  std 0.02  peak 8.05
 ----------------------------------------------------------------
- report: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_c/benchmark_runtime_Isaac-Velocity-Rough-G1_2026-09-25_18-12-49-458079_4207c77a_schema.json
- report: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_c/benchmark_runtime_Isaac-Velocity-Rough-G1_2026-09-25_18-12-49-458079_4207c77a_summary.json
- report: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_c/benchmark_runtime_Isaac-Velocity-Rough-G1_2026-09-25_18-12-49-458079_4207c77a_json.json
+ report: /home/<vm-user>/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_c/benchmark_runtime_Isaac-Velocity-Rough-G1_2026-09-25_18-12-49-458079_4207c77a_schema.json
+ report: /home/<vm-user>/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_c/benchmark_runtime_Isaac-Velocity-Rough-G1_2026-09-25_18-12-49-458079_4207c77a_summary.json
+ report: /home/<vm-user>/parity3/bench/Isaac-Velocity-Rough-G1_isaacsim_physx_c/benchmark_runtime_Isaac-Velocity-Rough-G1_2026-09-25_18-12-49-458079_4207c77a_json.json
 ================================================================
 [INFO]: SimulationContext cleared
 2026-09-25T18:12:52Z [4,264ms] [Warning] [omni.usd] Encountered USD Warnings but USD Diagnostics are currently muted. To view USD Warnings, please set the '/persistent/app/usd/muteUsdDiagnostics' setting to false in Preferences page.

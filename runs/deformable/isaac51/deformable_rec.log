@@ -1,14 +1,14 @@
 cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or directory
 [INFO][AppLauncher]: Using device: cuda:0
-[INFO][AppLauncher]: Loading experience file: /home/aditya_nianticspatial_com/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO][AppLauncher]: Loading experience file: /home/<vm-user>/IsaacLab/apps/isaaclab.python.headless.kit
 
 [36m======================================================================================[0m
 [36m[1m[INFO][IsaacLab]: Logging to file: /tmp/isaaclab/logs/isaaclab_2026-09-25_16-54-24.log[0m
 [36m======================================================================================[0m
 
 [33m16:54:25 [simulation_context.py] WARNING: The `enable_external_forces_every_iteration` parameter in the PhysxCfg is set to False. If you are experiencing noisy velocities, consider enabling this flag. You may need to slightly increase the number of velocity iterations (setting it to 1 or 2 rather than 0), together with this flag, to improve the accuracy of velocity updates.[0m
-Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
-[Info] [carb] Logging to file: /home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_165407.log
+Loading user config located at: '/home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_165407.log
 2026-09-25T16:54:08Z [700ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
 2026-09-25T16:54:09Z [2,388ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
 2026-09-25T16:54:10Z [3,286ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.

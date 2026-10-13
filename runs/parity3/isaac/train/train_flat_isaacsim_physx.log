@@ -20,7 +20,7 @@ W0000 00:00:1790362719.909371   18530 message.cc:301] Protobuf GeneratedMessageF
 [ISAACLAB] Kit version: 110.3.0+feature.371399.00c488ae.gl
 [ISAACLAB] Kit kernel:  210.3.2+release.14366.2926fc80.gl
 [ISAACLAB] Kit hash:    00c488ae
-[INFO] Logging experiment in directory: /home/aditya_nianticspatial_com/IsaacLab3/logs/rsl_rl/g1_flat
+[INFO] Logging experiment in directory: /home/<vm-user>/IsaacLab3/logs/rsl_rl/g1_flat
 Exact experiment name requested from command line: 2026-09-25_18-58-41
 [2/3] Creating environment
 [INFO]: Base environment:
@@ -232,8 +232,8 @@ Critic Model: MLPModel(
     (6): Linear(in_features=128, out_features=1, bias=True)
   )
 )
-Could not find git repository in /home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/rsl_rl/__init__.py. Skipping.
-Storing git diff for 'IsaacLab3' in: /home/aditya_nianticspatial_com/IsaacLab3/logs/rsl_rl/g1_flat/2026-09-25_18-58-41_isaacsim_physx/git/IsaacLab3.diff
+Could not find git repository in /home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/rsl_rl/__init__.py. Skipping.
+Storing git diff for 'IsaacLab3' in: /home/<vm-user>/IsaacLab3/logs/rsl_rl/g1_flat/2026-09-25_18-58-41_isaacsim_physx/git/IsaacLab3.diff
 ################################################################################
 [1m                           Learning iteration 0/1500                            [0m 
 
@@ -60236,7 +60236,7 @@ Storing git diff for 'IsaacLab3' in: /home/aditya_nianticspatial_com/IsaacLab3/l
 
 Training time: 3169.24 seconds
 [INFO]: SimulationContext cleared
-Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/isaacsim/kit/data/Kit/IsaacLab/3.0/user.config.json'
+Loading user config located at: '/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/isaacsim/kit/data/Kit/IsaacLab/3.0/user.config.json'
 2026-09-25T18:58:40Z [0ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
 2026-09-25T18:58:40Z [13ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
 2026-09-25T18:58:43Z [3,441ms] [Warning] [isaaclab.terrains.terrain_importer] Visual material specified for ground plane but no diffuse color found. Preserving the ground plane's authored material.

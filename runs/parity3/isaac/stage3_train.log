@@ -1,5 +1,5 @@
 + JOBS='flat:newton_mjwarp flat:isaacsim_physx rough:newton_mjwarp'
-+ mkdir -p /home/aditya_nianticspatial_com/parity3/train
++ mkdir -p /home/<vm-user>/parity3/train
 + for J in $JOBS
 + T=flat
 + B=newton_mjwarp
@@ -10,7 +10,7 @@
 + pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
 ++ date +%s
 + t0=1790360175
-+ log=/home/aditya_nianticspatial_com/parity3/train/train_flat_newton_mjwarp.log
++ log=/home/<vm-user>/parity3/train/train_flat_newton_mjwarp.log
 + timeout 21600 isaaclab train --rl_library rsl_rl --task Isaac-Velocity-Flat-G1 --num_envs 4096 --max_iterations 1500 --seed 0 --run_name newton_mjwarp --viz none physics=newton_mjwarp env.commands.base_velocity.debug_vis=false
 ++ date +%s
 + echo 'train flat newton_mjwarp exit 0 in 2538 s'
@@ -19,12 +19,12 @@ train flat newton_mjwarp exit 0 in 2538 s
 ++ head -1
 + run=logs/rsl_rl/g1_flat/2026-09-25_18-16-21_newton_mjwarp
 + '[' -n logs/rsl_rl/g1_flat/2026-09-25_18-16-21_newton_mjwarp ']'
-+ rm -rf /home/aditya_nianticspatial_com/parity3/train/rsl_rl_flat_newton_mjwarp
-+ cp -r logs/rsl_rl/g1_flat/2026-09-25_18-16-21_newton_mjwarp /home/aditya_nianticspatial_com/parity3/train/rsl_rl_flat_newton_mjwarp
-+ sed 's/\x1b\[[0-9;]*m//g' /home/aditya_nianticspatial_com/parity3/train/train_flat_newton_mjwarp.log
++ rm -rf /home/<vm-user>/parity3/train/rsl_rl_flat_newton_mjwarp
++ cp -r logs/rsl_rl/g1_flat/2026-09-25_18-16-21_newton_mjwarp /home/<vm-user>/parity3/train/rsl_rl_flat_newton_mjwarp
++ sed 's/\x1b\[[0-9;]*m//g' /home/<vm-user>/parity3/train/train_flat_newton_mjwarp.log
 + sed -n '/Learning iteration/,/Iteration time/p'
 + grep -a -v '^\s*$'
-+ touch /home/aditya_nianticspatial_com/parity3/TRAIN_flat_newton_mjwarp_DONE
++ touch /home/<vm-user>/parity3/TRAIN_flat_newton_mjwarp_DONE
 + for J in $JOBS
 + T=flat
 + B=isaacsim_physx
@@ -35,7 +35,7 @@ train flat newton_mjwarp exit 0 in 2538 s
 + pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
 ++ date +%s
 + t0=1790362713
-+ log=/home/aditya_nianticspatial_com/parity3/train/train_flat_isaacsim_physx.log
++ log=/home/<vm-user>/parity3/train/train_flat_isaacsim_physx.log
 + timeout 21600 isaaclab train --rl_library rsl_rl --task Isaac-Velocity-Flat-G1 --num_envs 4096 --max_iterations 1500 --seed 0 --run_name isaacsim_physx --viz none physics=isaacsim_physx env.commands.base_velocity.debug_vis=false
 ++ date +%s
 + echo 'train flat isaacsim_physx exit 0 in 3329 s'
@@ -44,12 +44,12 @@ train flat isaacsim_physx exit 0 in 3329 s
 ++ head -1
 + run=logs/rsl_rl/g1_flat/2026-09-25_18-58-41_isaacsim_physx
 + '[' -n logs/rsl_rl/g1_flat/2026-09-25_18-58-41_isaacsim_physx ']'
-+ rm -rf /home/aditya_nianticspatial_com/parity3/train/rsl_rl_flat_isaacsim_physx
-+ cp -r logs/rsl_rl/g1_flat/2026-09-25_18-58-41_isaacsim_physx /home/aditya_nianticspatial_com/parity3/train/rsl_rl_flat_isaacsim_physx
-+ sed 's/\x1b\[[0-9;]*m//g' /home/aditya_nianticspatial_com/parity3/train/train_flat_isaacsim_physx.log
++ rm -rf /home/<vm-user>/parity3/train/rsl_rl_flat_isaacsim_physx
++ cp -r logs/rsl_rl/g1_flat/2026-09-25_18-58-41_isaacsim_physx /home/<vm-user>/parity3/train/rsl_rl_flat_isaacsim_physx
++ sed 's/\x1b\[[0-9;]*m//g' /home/<vm-user>/parity3/train/train_flat_isaacsim_physx.log
 + sed -n '/Learning iteration/,/Iteration time/p'
 + grep -a -v '^\s*$'
-+ touch /home/aditya_nianticspatial_com/parity3/TRAIN_flat_isaacsim_physx_DONE
++ touch /home/<vm-user>/parity3/TRAIN_flat_isaacsim_physx_DONE
 + for J in $JOBS
 + T=rough
 + B=newton_mjwarp
@@ -60,5 +60,5 @@ train flat isaacsim_physx exit 0 in 3329 s
 + pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
 ++ date +%s
 + t0=1790366043
-+ log=/home/aditya_nianticspatial_com/parity3/train/train_rough_newton_mjwarp.log
++ log=/home/<vm-user>/parity3/train/train_rough_newton_mjwarp.log
 + timeout 21600 isaaclab train --rl_library rsl_rl --task Isaac-Velocity-Rough-G1 --num_envs 4096 --max_iterations 1500 --seed 0 --run_name newton_mjwarp --viz none physics=newton_mjwarp env.commands.base_velocity.debug_vis=false
