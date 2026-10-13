@@ -3,6 +3,10 @@
 What landed between 2026-09-22 and 2026-09-25, one line per commit, grouped by area and in
 commit order within each area (`git log` for the full messages). Dates are the commit dates (month-day).
 
+## MPM: close-out bookkeeping and coupled-scene re-timing (2026-10-13, `metalsim/physics/mpm/MPM.md` 8j)
+
+- 10-13 STATUS / GAPS MPM rows brought to the measured record (all six floor scenes inside, current pins, 1.7 barrier fix verified in both pinned commits); MPM.md superseded "Open:" lines marked resolved with pointers; the 10-12 02:32 GPU hang re-attributed (most likely the 25 M-instance particle build, not Newton's cylinder test; evidence in `runs/rigid17/out/`); RENDER_COVERAGE particle rows (merged, T0 / T2); coupled scenes re-timed on the 16-inch against the L4 (`runs/mpm/coupled_retime/`)
+
 ## Physics: equality block at njmax (2026-10-13, `research_notes/capacity_overflow_guard/g1_bound_and_lost_flags.md`)
 
 - 10-13 MuJoCo Warp pin cf0f8ad -> f1b35e2 (fork `metalsim` fast-forwarded to f52488b4: a connect / weld block ending exactly at njmax is written; one that does not fit leaves nefc > njmax and MuJoCo Warp flags it). MetalSim's workaround removed (latch counted `nefc >= njmax` for models with such blocks, `Bounds.njmax` kept a spare row); the reset latch stays. `patches/mujoco_warp/metalsim-f1b35e2.diff`; `tests/test_capacity.py::test_equality_block_ending_at_njmax_is_flagged` covers connect and weld
