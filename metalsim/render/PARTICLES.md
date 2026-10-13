@@ -77,21 +77,19 @@ pixels by at most 11/255 (mean relative HDR difference 3.5e-4: path-tracer and d
 differences in the nested transforms). This Mac refuses builds past 6.3 M grains in `stall_bisect.sh` without
 `ALLOW_LARGE=1`.
 
-Validated on the 14-inch M4 Max (macOS 27.0.1, origin/main 94b75be, 2026-10-13), the demo scene with 4 ground planes,
-each step alone with the GPU back to idle (no ownerless utilisation, recoveryCount 0) between steps:
+Correctness validation on the 14-inch M4 Max (macOS 27.0.1, origin/main 94b75be, 2026-10-13), the demo scene with 4
+ground planes, each step alone with the GPU back to idle (no ownerless utilisation, recoveryCount 0) between steps. The
+times are from that validation run, not benchmark figures (timing measurements are taken on the 16-inch):
 
-| grains | structures (instances) | build (rebuild) | 1080p frame, 128 spp, OIDN | Metal allocated |
+| grains | structures (instances) | build (rebuild), validation run | 1080p frame, 128 spp, OIDN, validation run | Metal allocated |
 |---|---|---|---|---|
 | 6.28 M | top 55, grains 6,280,443 | 175 ms (129 ms) | 8.3 s | 5.5 GB |
 | 12.56 M | top 55, grains 12,560,859 | 420 ms (348 ms) | 9.5 s | 7.4 GB |
 | 25.12 M | top 56, grains 16,777,215 + 8,344,476 | 861 ms (711 ms) | 11.5 s | 11.1 GB |
 
-No structure used extended limits. The full 240-frame clip (8 s, 30 fps, 1080p, 128 spp, OIDN) rendered at a median
-12.5 s per frame (11.2-13.4 s) with the display on (the animated wallpaper takes ~25 % of that GPU), against 10.4 s for
-the 2026-10-12 flat-layout clip on the same machine (display state then unknown, and the renderer has changed since,
-so the difference is not attributed to the layout; at 6.28 M grains the two layouts timed the same). Its frames match
-the 2026-10-12 clip within about 1/255 mean (sky, ground-plane and sand means equal; 2-3.5 % of pixels differ by more
-than 10/255, texture detail after the atlas fix).
+No structure used extended limits, and every build and frame completed. The full 240-frame clip (8 s, 30 fps, 1080p,
+128 spp, OIDN) also rendered to the end. Its frames match the 2026-10-12 flat-layout clip within about 1/255 mean (sky,
+ground-plane and sand means equal; 2-3.5 % of pixels differ by more than 10/255, texture detail after the atlas fix).
 
 ## Validation (`tests/test_render_particles.py`)
 
