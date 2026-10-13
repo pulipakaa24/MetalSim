@@ -42,10 +42,16 @@ ap.add_argument("--fovy", type=float, default=32.0)
 ap.add_argument("--camera", default="track", help="track | still-a | still-b | still-c")
 ap.add_argument("--save-hdr", action="store_true")
 ap.add_argument("--skip-existing", action="store_true")
-ap.add_argument("--ground-planes", type=int, default=4, choices=(1, 4),
-                help="4: planes around the robot's path (the demo); 1: one plane under everything (diagnostics)")
+ap.add_argument("--ground-planes", type=int, default=4, choices=(1, 2, 4),
+                help="4: planes around the robot's path (the demo); 1: one plane under everything; 2: only the left and "
+                     "right planes (diagnostics)")
+ap.add_argument("--plane-extent", type=float, default=60.0, help="diagnostics: half extent of the ground planes [m]")
+ap.add_argument("--plane-shift", type=float, default=0.0,
+                help="diagnostics: move the ground planes along +x [m] (e.g. 200: away from the grain region)")
 ap.add_argument("--max-particles", type=int, default=0, help="diagnostics: keep every n-th particle so at most this many remain")
 ap.add_argument("--no-trace", action="store_true", help="with --timing: the structure build only, no trace pass")
+ap.add_argument("--structure", default="two_level", choices=("two_level", "flat"),
+                help="grain acceleration-structure layout (particles.InstanceStructure); flat = before 2026-10-13")
 ap.add_argument("--timing", action="store_true",
                 help="diagnostics: per frame, time the instance-structure build (a pass-free render) and one trace pass "
                      "separately; no denoiser, no image")
@@ -119,8 +125,14 @@ mat.textures[mujoco.mjtTextureRole.mjTEXROLE_RGB] = "sand_ground"
 # the bed's own sand, never the raised plane; their edges lie under the decoration grains
 bx0_, by0_, _, bx1_, by1_, _ = meta["bed"]
 hx0, hx1, hy0, hy1 = bx0_ + a.decor_overlap, bx1_ - a.decor_overlap, by0_ + a.decor_overlap, by1_ - a.decor_overlap
-grounds = ({"ground_l": (-60, hx0, -60, 60), "ground_r": (hx1, 60, -60, 60), "ground_b": (hx0, hx1, -60, hy0),
-            "ground_f": (hx0, hx1, hy1, 60)} if a.ground_planes == 4 else {"ground": (-60, 60, -60, 60)})
+E_ = a.plane_extent
+grounds = {"ground_l": (-E_, hx0, -E_, E_), "ground_r": (hx1, E_, -E_, E_), "ground_b": (hx0, hx1, -E_, hy0),
+           "ground_f": (hx0, hx1, hy1, E_)}
+if a.ground_planes == 2:
+    grounds = {k: grounds[k] for k in ("ground_l", "ground_r")}
+elif a.ground_planes == 1:
+    grounds = {"ground": (-E_, E_, -E_, E_)}
+grounds = {k: (x0 + a.plane_shift, x1 + a.plane_shift, y0, y1) for k, (x0, x1, y0, y1) in grounds.items()}
 for nm, (x0, x1, y0, y1) in grounds.items():
     spec.worldbody.add_geom(name=nm, type=mujoco.mjtGeom.mjGEOM_PLANE, size=[(x1 - x0) / 2, (y1 - y0) / 2, 0.1],
                             pos=[(x0 + x1) / 2, (y0 + y1) / 2, a.ground_z], material="sand_ground")
@@ -315,7 +327,8 @@ for k in rng_frames:
     P = np.concatenate([Ps, decor])
     if a.max_particles and len(P) > a.max_particles:
         P = P[::int(np.ceil(len(P) / a.max_particles))]
-    r.set_particles(P, radius=p_radius, grains_per_particle=a.grains, grain_radius=radius_grain, ids=ids)
+    r.set_particles(P, radius=p_radius, grains_per_particle=a.grains, grain_radius=radius_grain, ids=ids,
+                    structure=a.structure)
     eye, q = camera(k, t)
     if k == rng_frames[0]:
         print(f"[render] stage: first frame ({len(P)} particles)", flush=True)

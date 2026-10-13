@@ -122,23 +122,43 @@ def test_white_furnace_grain_pile():
     assert h.max() < 2.0          # no energy gain in any pixel beyond Monte Carlo noise
 
 
-def test_instance_count_scaling():
-    """Instances = scene instances + n_envs * particles * grains; the acceleration structure grows about linearly
-    and a frame renders at every size (timings printed, not asserted)."""
+@pytest.mark.parametrize("structure", ["two_level", "flat"])
+def test_instance_count_scaling(structure):
+    """Instances = scene instances + n_envs * particles * grains (+ the grain structure's own top-level instance in
+    the two-level layout); the structures grow about linearly and a frame renders at every size (timings printed)."""
     m = mujoco.MjModel.from_xml_string(FURNACE)
     rt = Tier2Renderer(m, 2, width=64, height=64, spp=1, max_bounces=2, headlight=False)
     sizes = {}
     for P, K in ((1000, 1), (10000, 8), (100000, 8)):
-        rt.set_particles(_pile(P, half=0.2), radius=0.003, grains_per_particle=K)
+        rt.set_particles(_pile(P, half=0.2), radius=0.003, grains_per_particle=K, structure=structure)
         t0 = time.time()
         out = rt.render_host(_datas(m, 2), passes=1)
         dt = time.time() - t0
-        assert rt._ias.n_total == rt.rt.n_inst + 2 * P * K
+        assert rt._ias.n_total == rt.rt.n_inst + 2 * P * K + (structure == "two_level")
         assert (out["seg"] == rt.G + 1).any()
         sizes[P * K] = rt._ias.as_bytes
-        print(f"grains {2 * P * K}: structure {rt._ias.as_bytes / 2**20:.1f} MiB, frame {dt * 1e3:.0f} ms")
+        print(f"{structure} grains {2 * P * K}: structures {rt._ias.as_bytes / 2**20:.1f} MiB, frame {dt * 1e3:.0f} ms")
     r = sizes[800000] / sizes[80000]
     assert 5 < r < 15, sizes
+
+
+def test_two_level_matches_flat():
+    """The two-level grain structure (grains as one instance of the scene's structure) renders the same image as one
+    top-level instance per grain: the same surfaces are hit, so colour, depth, segmentation and normals agree (tiny
+    float differences from the traversal are allowed in the radiance), in a multi-env batch with a culled env."""
+    m = mujoco.MjModel.from_xml_string(FURNACE.replace("<worldbody>", '<worldbody><light directional="true" pos="0 0 3" dir="0.2 0.3 -1" diffuse="0.8 0.8 0.8"/>'))
+    pile = _pile(3000)
+    P = np.stack([pile, pile + [0.03, 0.0, 0.0], np.full_like(pile, np.nan)])
+    outs = {}
+    for structure in ("flat", "two_level"):
+        rt = Tier2Renderer(m, 3, width=80, height=80, spp=2, max_bounces=4, headlight=False, seed=9, center_sample=True)
+        rt.set_particles(P, radius=0.004, grains_per_particle=6, structure=structure)
+        outs[structure] = rt.render_host(_datas(m, 3), passes=3)
+    a, b = outs["flat"], outs["two_level"]
+    assert (a["seg"] == rt.G + 1).sum() > 200
+    assert np.array_equal(a["seg"], b["seg"])
+    assert np.allclose(a["depth"], b["depth"], atol=1e-5)
+    assert np.allclose(a["hdr"], b["hdr"], atol=1e-4, rtol=1e-4), np.abs(a["hdr"] - b["hdr"]).max()
 
 
 def test_batched_envs_and_isolation():
