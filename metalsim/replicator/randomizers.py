@@ -124,9 +124,11 @@ class Randomizer:
 
     def materials(self, roughness=(0.1, 1.0), metallic=(0.0, 0.3), slots=None):
         """Per-slot PBR parameters (shared across envs); host write of the material table."""
-        mats = self.r.tables.materials
+        mats = np.array(self.r.tables.materials, np.float32, copy=True).reshape(self.r.G, 16)
         idx = range(self.r.G) if slots is None else slots
         for s in idx:
             mats[s, 5] = self.rng.uniform(*roughness)
             mats[s, 4] = self.rng.uniform(*metallic)
-        self.r.ctx.write_buffer(self.r.mat_buf, mats)
+        # through the renderer (tier 0 / 1 / 2): it owns its GPU table's layout (tier 2 keeps its BRDF ids; the model
+        # sync supplies the colours). Writing r.mat_buf directly failed on a legacy-mode Tier2Renderer (mat_buf None).
+        self.r.set_materials(mats)

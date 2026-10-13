@@ -1,0 +1,157 @@
+   72.442 ms      1.0  narrow_phase_find_mesh_triangle_overlaps_kernel_ec87a852_metal_forward
+   20.927 ms      1.0  create_narrow_phase_process_mesh_mesh_contacts_kernel__locals__mesh_sdf_collision_global_reduce_kernel_90f0d00
+    0.667 ms      1.0  mesh_triangle_contacts_to_reducer_kernel_aa9217d5_metal_forward
+    0.081 ms      1.0  create_narrow_phase_kernel_gjk_mpr__locals__narrow_phase_kernel_gjk_mpr_6d4b355a_metal_forward
+    0.065 ms      1.0  create_export_reduced_contacts_kernel__locals__export_reduced_contacts_kernel_6311b87b_metal_forward
+    0.045 ms      1.0  reduce_buffered_contacts_kernel_bf03d3d4_metal_forward
+    0.014 ms      1.0  create_narrow_phase_primitive_kernel__locals__narrow_phase_primitive_kernel_c547cfd6_metal_forward
+    0.013 ms      1.0  compute_shape_aabbs_599b8929_metal_forward
+    0.013 ms      1.0  _nxn_broadphase_precomputed_pairs_287f638a_metal_forward
+    0.012 ms      1.0  _clear_active_kernel_ca21d0b7_metal_forward
+    0.008 ms      1.0  create_narrow_phase_process_mesh_plane_contacts_kernel__locals__narrow_phase_process_mesh_plane_contacts_reduc
+    0.008 ms      2.0  compute_block_counts_from_weights_a69bf876_metal_forward
+    0.007 ms      1.0  verify_narrow_phase_buffers_77619ee7_metal_forward
+    0.006 ms      1.0  compute_mesh_mesh_edge_counts_92b3c575_metal_forward
+    0.003 ms      1.0  wp_memset
+    0.003 ms      1.0  compute_mesh_plane_vert_counts_1b66b83b_metal_forward
+    0.002 ms      1.0  _zero_active_count_kernel_de41732d_metal_forward
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/kcache/kc_n17_fix/1.18.0.dev20260917
+Module newton._src.geometry.inertia fa1f468 load on device 'metal:0' took 18.16 ms  (cached)
+Module validate_and_correct_inertia_kernel_eac05b26 eac05b2 load on device 'metal:0' took 18.29 ms  (cached)
+Module newton._src.geometry.bvh 2bb5296 load on device 'metal:0' took 19.52 ms  (cached)
+Module newton._src.sim.articulation d79000a load on device 'metal:0' took 5256.59 ms  (cached)
+Module newton._src.sim.collide a2e31aa load on device 'metal:0' took 550.43 ms  (cached)
+Module newton._src.geometry.broad_phase_nxn 45b8753 load on device 'metal:0' took 370.50 ms  (cached)
+Module narrow_phase_primitive_write_contact_False_False_False 50dd874 load on device 'metal:0' took 1814.78 ms  (cached)
+Module narrow_phase_gjk_mpr_True_False_write_contact_support_map_lean_post_process_minkowski_only 4c0bcc6 load on device 'metal:0' took 1464.33 ms  (cached)
+Module newton._src.geometry.narrow_phase d33755d load on device 'metal:0' took 613.08 ms  (cached)
+Module newton._src.geometry.contact_reduction_global bdba7b6 load on device 'metal:0' took 907.68 ms  (cached)
+Module newton._src.geometry.sdf_contact 8c124d4 load on device 'metal:0' took 331.80 ms  (cached)
+Module narrow_phase_mesh_plane_write_contact_to_reducer_True 1e87f7a load on device 'metal:0' took 439.99 ms  (cached)
+Module mesh_triangle_contacts_to_reducer_kernel_691003e1 3796f17 load on device 'metal:0' took 2258.42 ms  (cached)
+Module newton._src.geometry.contact_reduction_global 45f3faf load on device 'metal:0' took 910.01 ms  (cached)
+Module sdf_contact_write_contact_to_reducer_False_True_False_True_False_False_False 07ba04b load on device 'metal:0' took 1148.91 ms  (cached)
+Module export_reduced_contacts_write_contact a636f22 load on device 'metal:0' took 596.47 ms  (cached)
+{
+ "worlds": 256,
+ "det": false,
+ "newton": "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n17_fix/newton/__init__.py",
+ "warp": "1.18.0.dev20260917",
+ "rigid_contact_max": 1756672,
+ "rigid_contacts": 16084,
+ "contact_sha": "77d190b910738b6f",
+ "collide_ms": {
+  "median": 95.97150049921765,
+  "mean": 97.14819380023982,
+  "min": 88.27829200163251,
+  "max": 109.29145800037077
+ },
+ "contact_sha_after": "1ad2297d3cea45b5",
+ "kprof": {
+  "phase": "collide",
+  "reps": 4,
+  "wall_ms_per_rep": 95.06755199981853,
+  "profiling": true,
+  "per_rep_counters": {
+   "host_waits": 2.25,
+   "command_buffers": 18.0,
+   "host_ops": 0.0,
+   "dispatches": 17.0
+  },
+  "kernels": [
+   {
+    "kernel": "narrow_phase_find_mesh_triangle_overlaps_kernel_ec87a852_metal_forward",
+    "ms": 72.44175,
+    "launches": 1.0
+   },
+   {
+    "kernel": "create_narrow_phase_process_mesh_mesh_contacts_kernel__locals__mesh_sdf_collision_global_reduce_kernel_90f0d007_metal_forward",
+    "ms": 20.9265,
+    "launches": 1.0
+   },
+   {
+    "kernel": "mesh_triangle_contacts_to_reducer_kernel_aa9217d5_metal_forward",
+    "ms": 0.6675,
+    "launches": 1.0
+   },
+   {
+    "kernel": "create_narrow_phase_kernel_gjk_mpr__locals__narrow_phase_kernel_gjk_mpr_6d4b355a_metal_forward",
+    "ms": 0.08075,
+    "launches": 1.0
+   },
+   {
+    "kernel": "create_export_reduced_contacts_kernel__locals__export_reduced_contacts_kernel_6311b87b_metal_forward",
+    "ms": 0.065,
+    "launches": 1.0
+   },
+   {
+    "kernel": "reduce_buffered_contacts_kernel_bf03d3d4_metal_forward",
+    "ms": 0.0455,
+    "launches": 1.0
+   },
+   {
+    "kernel": "create_narrow_phase_primitive_kernel__locals__narrow_phase_primitive_kernel_c547cfd6_metal_forward",
+    "ms": 0.014,
+    "launches": 1.0
+   },
+   {
+    "kernel": "compute_shape_aabbs_599b8929_metal_forward",
+    "ms": 0.013,
+    "launches": 1.0
+   },
+   {
+    "kernel": "_nxn_broadphase_precomputed_pairs_287f638a_metal_forward",
+    "ms": 0.0125,
+    "launches": 1.0
+   },
+   {
+    "kernel": "_clear_active_kernel_ca21d0b7_metal_forward",
+    "ms": 0.01175,
+    "launches": 1.0
+   },
+   {
+    "kernel": "create_narrow_phase_process_mesh_plane_contacts_kernel__locals__narrow_phase_process_mesh_plane_contacts_reduce_kernel_6576d59c_metal_forward",
+    "ms": 0.008,
+    "launches": 1.0
+   },
+   {
+    "kernel": "compute_block_counts_from_weights_a69bf876_metal_forward",
+    "ms": 0.00775,
+    "launches": 2.0
+   },
+   {
+    "kernel": "verify_narrow_phase_buffers_77619ee7_metal_forward",
+    "ms": 0.0075,
+    "launches": 1.0
+   },
+   {
+    "kernel": "compute_mesh_mesh_edge_counts_92b3c575_metal_forward",
+    "ms": 0.006,
+    "launches": 1.0
+   },
+   {
+    "kernel": "wp_memset",
+    "ms": 0.00325,
+    "launches": 1.0
+   },
+   {
+    "kernel": "compute_mesh_plane_vert_counts_1b66b83b_metal_forward",
+    "ms": 0.00325,
+    "launches": 1.0
+   },
+   {
+    "kernel": "_zero_active_count_kernel_de41732d_metal_forward",
+    "ms": 0.00225,
+    "launches": 1.0
+   }
+  ],
+  "kernel_total_ms": 94.31625,
+  "launches": 18.0
+ }
+}

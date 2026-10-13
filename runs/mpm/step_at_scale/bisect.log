@@ -1,0 +1,19 @@
+[gpu_run] mpmstep_bisect start: device utilisation 0% (11:32:01)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
+util at start 0 11:32:04
+== L
+64 eager rc=0 "bitwise_equal": false "hash_steps_equal": 29
+64 capture rc=0 "bitwise_equal": false "hash_steps_equal": 2
+2048 eager rc=0 "bitwise_equal": false "hash_steps_equal": 29
+2048 capture rc=0 "bitwise_equal": false "hash_steps_equal": 1
+done
+== T
+64 eager rc=0 "bitwise_equal": true "hash_steps_equal": 32
+64 capture rc=0 "bitwise_equal": true "hash_steps_equal": 33
+2048 eager rc=0 "bitwise_equal": true "hash_steps_equal": 32
+2048 capture rc=0 "bitwise_equal": true "hash_steps_equal": 33
+done
+end 11:36:34
+[gpu_run] mpmstep_bisect end: device utilisation 0% (11:36:34), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.6 %

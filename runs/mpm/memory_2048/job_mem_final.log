@@ -1,0 +1,56 @@
+[gpu_run] mem_final start: device utilisation 0% (20:29:07)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 5 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.7 %
+base rc=0
+[mem] start                        device    0.02 GB  footprint    0.07 GB  resident    0.10 GB  warp-live    0.00 GB  native-tracked    0.00 GB
+[mem] built                        device   23.22 GB  footprint   30.56 GB  resident   21.52 GB  warp-live   10.61 GB  native-tracked   23.18 GB
+[mem] built, after gc              device   23.22 GB  footprint   30.24 GB  resident   21.21 GB  warp-live   10.61 GB  native-tracked   23.18 GB
+[mem] after first policy step      device   37.64 GB  footprint   44.05 GB  resident   19.58 GB  warp-live   22.86 GB  native-tracked   35.42 GB
+[mem] after 2 replayed policy steps device   37.64 GB  footprint   43.26 GB  resident   19.58 GB  warp-live   22.86 GB  native-tracked   35.42 GB
+[mem] after gc                     device   37.64 GB  footprint   43.26 GB  resident   19.58 GB  warp-live   22.86 GB  native-tracked   35.42 GB
+tightpool rc=0
+[mem] start                        device    0.02 GB  footprint    0.07 GB  resident    0.10 GB  warp-live    0.00 GB  native-tracked    0.00 GB
+[mem] built                        device   23.58 GB  footprint   30.92 GB  resident   21.52 GB  warp-live   10.97 GB  native-tracked   23.54 GB
+[mem] built, after gc              device   23.58 GB  footprint   30.60 GB  resident   21.21 GB  warp-live   10.97 GB  native-tracked   23.54 GB
+[mem] after first policy step      device   34.48 GB  footprint   40.89 GB  resident   19.59 GB  warp-live   19.70 GB  native-tracked   32.27 GB
+[mem] after 2 replayed policy steps device   34.48 GB  footprint   40.10 GB  resident   19.58 GB  warp-live   19.70 GB  native-tracked   32.27 GB
+[mem] after gc                     device   34.48 GB  footprint   40.10 GB  resident   19.58 GB  warp-live   19.70 GB  native-tracked   32.27 GB
+tight_grid rc=0
+[mem] start                        device    0.02 GB  footprint    0.07 GB  resident    0.10 GB  warp-live    0.00 GB  native-tracked    0.00 GB
+[mem] built                        device   14.19 GB  footprint   21.53 GB  resident   12.14 GB  warp-live   10.97 GB  native-tracked   14.15 GB
+[mem] built, after gc              device   14.19 GB  footprint   21.21 GB  resident   11.82 GB  warp-live   10.97 GB  native-tracked   14.15 GB
+[mem] after first policy step      device   24.85 GB  footprint   31.25 GB  resident   10.20 GB  warp-live   19.46 GB  native-tracked   22.64 GB
+[mem] after 2 replayed policy steps device   24.85 GB  footprint   30.46 GB  resident   10.19 GB  warp-live   19.46 GB  native-tracked   22.64 GB
+[mem] after gc                     device   24.85 GB  footprint   30.46 GB  resident   10.19 GB  warp-live   19.46 GB  native-tracked   22.64 GB
+tight_grid_c256 rc=0
+[mem] start                        device    0.02 GB  footprint    0.07 GB  resident    0.10 GB  warp-live    0.00 GB  native-tracked    0.00 GB
+[mem] built                        device   10.89 GB  footprint   18.21 GB  resident   12.08 GB  warp-live    7.66 GB  native-tracked   10.84 GB
+[mem] built, after gc              device   10.89 GB  footprint   17.94 GB  resident   11.80 GB  warp-live    7.66 GB  native-tracked   10.84 GB
+[mem] after first policy step      device   15.66 GB  footprint   21.85 GB  resident   10.15 GB  warp-live   10.75 GB  native-tracked   13.93 GB
+[mem] after 2 replayed policy steps device   15.66 GB  footprint   21.27 GB  resident   10.14 GB  warp-live   10.75 GB  native-tracked   13.93 GB
+[mem] after gc                     device   15.66 GB  footprint   21.27 GB  resident   10.14 GB  warp-live   10.75 GB  native-tracked   13.93 GB
+util at start 4 20:31:23
+poolA_v1 64 rc=0
+poolB_v1 64 rc=0
+poolA_v1 2048 rc=0
+poolB_v1 2048 rc=0
+poolA_v1       cap_64.json            median     7.47  min     7.39  pipelined     7.29  ok it=[25, 25, 25, 25]
+poolA_v1       cap_2048.json          median    81.23  min    80.75  pipelined    80.75  ok it=[25, 25, 25, 25]
+poolB_v1       cap_64.json            median     7.92  min     7.74  pipelined     7.43  ok it=[25, 25, 25, 25]
+poolB_v1       cap_2048.json          median    81.50  min    80.94  pipelined    80.76  ok it=[25, 25, 25, 25]
+end 20:34:13 util 6
+util at start 0 20:34:13
+poolA_v2 64 rc=0
+poolB_v2 64 rc=0
+poolA_v2 2048 rc=0
+poolB_v2 2048 rc=0
+poolA_v2       cap_64.json            median     7.91  min     7.67  pipelined     7.45  ok it=[25, 25, 25, 25]
+poolA_v2       cap_2048.json          median    81.50  min    80.76  pipelined    80.76  ok it=[25, 25, 25, 25]
+poolB_v2       cap_64.json            median     7.94  min     7.62  pipelined     7.63  ok it=[25, 25, 25, 25]
+poolB_v2       cap_2048.json          median    81.42  min    80.72  pipelined    80.70  ok it=[25, 25, 25, 25]
+end 20:36:32 util 0
+end
+[gpu_run] mem_final end: device utilisation 0% (20:36:32), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 6 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid    410 WindowServer                       4.6 %
+[gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.8 %

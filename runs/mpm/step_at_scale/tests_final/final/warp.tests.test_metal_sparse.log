@@ -1,0 +1,31 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module warp._src.metal_sparse 7e77140 load on device 'metal:0' took 473.08 ms  (compiled)
+Module warp._src.metal_sparse 3714f8b load on device 'metal:0' took 423.71 ms  (compiled)
+Module warp._src.metal_sparse 21d0e7d load on device 'metal:0' took 429.63 ms  (compiled)
+Module warp._src.metal_sparse 43e7503 load on device 'metal:0' took 437.82 ms  (compiled)
+Module _bsr_accumulate_triplet_values_ca6c8ef6 ac7189d load on device 'metal:0' took 419.08 ms  (compiled)
+Module warp._src.metal_sparse 13cc193 load on device 'metal:0' took 455.43 ms  (compiled)
+Module warp._src.metal_sparse 7ed9d53 load on device 'metal:0' took 452.23 ms  (compiled)
+Module _bsr_transpose_values_b16b1b3d 76063ff load on device 'metal:0' took 439.24 ms  (compiled)
+.Module warp.sparse 40a16b3 load on device 'metal:0' took 500.80 ms  (compiled)
+Module warp._src.metal_sparse e2c72ea load on device 'metal:0' took 451.58 ms  (compiled)
+Module warp._src.metal_sparse e58ec9c load on device 'metal:0' took 472.96 ms  (compiled)
+Module _bsr_set_from_triplets_padded_accumulate_values_7cd042af f5117f1 load on device 'metal:0' took 418.49 ms  (compiled)
+..Module warp._src.metal_sparse 6448a3f load on device 'metal:0' took 473.56 ms  (compiled)
+Module warp._src.metal_sparse ebdabb4 load on device 'metal:0' took 477.61 ms  (compiled)
+Module warp._src.metal_sparse 0b612c5 load on device 'metal:0' took 486.67 ms  (compiled)
+Module warp._src.metal_sparse 0e4d40e load on device 'metal:0' took 493.79 ms  (compiled)
+.Module _bsr_assign_copy_blocks_8099f95e fa7d32f load on device 'metal:0' took 450.81 ms  (compiled)
+Module _bsr_axpy_masked_ffe12493 79baa55 load on device 'metal:0' took 425.25 ms  (compiled)
+Module _bsr_axpy_add_block_3ef84e3c dcda63a load on device 'metal:0' took 416.49 ms  (compiled)
+....
+----------------------------------------------------------------------
+Ran 8 tests in 10.491s
+
+OK

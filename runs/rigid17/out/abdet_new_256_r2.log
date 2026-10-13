@@ -1,0 +1,23 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/kcache/kcB_n17_new/1.18.0.dev20260917
+Module newton._src.geometry.inertia 7667892 load on device 'metal:0' took 40.66 ms  (cached)
+Module validate_and_correct_inertia_kernel_8dbbe22e 8dbbe22 load on device 'metal:0' took 38.84 ms  (cached)
+Module newton._src.geometry.bvh 0b0956f load on device 'metal:0' took 41.01 ms  (cached)
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/tools/collide17.py", line 45, in <module>
+    pipeline = newton.CollisionPipeline(model, deterministic=a.det, **kw)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n17_new/newton/_src/sim/collide.py", line 1676, in __init__
+    self.narrow_phase = NarrowPhase(
+                        ^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n17_new/newton/_src/geometry/narrow_phase.py", line 2579, in __init__
+    self.global_contact_reducer = GlobalContactReducer(
+                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n17_new/newton/_src/geometry/contact_reduction_global.py", line 1014, in __init__
+    raise ValueError(
+ValueError: Deterministic contact packing supports at most 1048575 buffered contacts (20-bit contact_id), but capacity=8388608. Reduce max_triangle_pairs or disable deterministic mode.
