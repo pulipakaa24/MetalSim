@@ -1227,6 +1227,39 @@ def fill_uniform_color_block_indices(
     color_indices[1, i] = (elem_idx + 1) * nodes_per_element
 
 
+def make_partition_color_block_indices_kernel(
+    geo_partition: fem.GeometryPartition, space_partition: fem.SpacePartition
+):
+    """Color blocks of a discontinuous (per-cell) space in partition node numbering.
+
+    The block of a colored cell is its ``nodes_per_element`` consecutive partition nodes, starting at the partition
+    index of the cell's first space node (``cell * nodes_per_element``); an environment-first partition keeps a
+    cell's nodes consecutive (stable environment sort) but places them in environment-major order.
+    """
+
+    @fem.cache.dynamic_kernel(f"{geo_partition.name}_{space_partition.name}")
+    def fill_partition_color_block_indices(
+        partition_arg: geo_partition.CellArg,
+        space_partition_arg: space_partition.PartitionArg,
+        nodes_per_element: int,
+        color_indices: wp.array2d[int],
+    ):
+        i = wp.tid()
+        elem_idx = color_indices[0, i]
+        cell = geo_partition.cell_index(partition_arg, elem_idx)
+        first = int(fem.NULL_NODE_INDEX)
+        if cell != -1:
+            first = space_partition.partition_node_index(space_partition_arg, cell * nodes_per_element)
+        if first == fem.NULL_NODE_INDEX:
+            color_indices[0, i] = 0
+            color_indices[1, i] = 0
+            return
+        color_indices[0, i] = first
+        color_indices[1, i] = first + nodes_per_element
+
+    return fill_partition_color_block_indices
+
+
 def make_dynamic_color_block_indices_kernel(geo_partition: fem.GeometryPartition):
     @fem.cache.dynamic_kernel(geo_partition.name)
     def fill_dynamic_color_block_indices(

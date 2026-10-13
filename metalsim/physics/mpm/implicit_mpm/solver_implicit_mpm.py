@@ -78,6 +78,7 @@ from .implicit_mpm_solver_kernels import (
     inverse_scale_vector,
     make_cell_color_kernel,
     make_dynamic_color_block_indices_kernel,
+    make_partition_color_block_indices_kernel,
     make_inverse_rotate_vectors,
     make_rotate_vectors,
     mark_active_cells,
@@ -3634,6 +3635,20 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
                 make_dynamic_color_block_indices_kernel(space_partition.geo_partition),
                 dim=colored_element_count,
                 inputs=[partition_arg, pic.cell_particle_offsets, scratch.color_indices],
+            )
+        elif grid.environment_count() > 1:
+            # Environment-first strain partitions (separate worlds) number a cell's nodes in environment-major order,
+            # not cell * nodes_per_element: map each colored cell to its partition nodes, or the color blocks are a
+            # permutation of other cells' nodes and concurrently solved blocks share velocity nodes.
+            wp.launch(
+                make_partition_color_block_indices_kernel(space_partition.geo_partition, space_partition),
+                dim=colored_element_count,
+                inputs=[
+                    partition_arg,
+                    space_partition.partition_arg_value(device=scratch.color_indices.device),
+                    nodes_per_color_element,
+                    scratch.color_indices,
+                ],
             )
         else:
             wp.launch(
