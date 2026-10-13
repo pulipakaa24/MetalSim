@@ -1,9 +1,9 @@
 diff --git a/METALSIM_CHANGES.md b/METALSIM_CHANGES.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..3c0337355af64152a7041225a15e51d670185815
+index 0000000000000000000000000000000000000000..3ef1374e14081c0505122e62993e6f3576c76640
 --- /dev/null
 +++ b/METALSIM_CHANGES.md
-@@ -0,0 +1,72 @@
+@@ -0,0 +1,73 @@
 +# MetalSim changes on this branch (`metalsim`)
 +
 +This branch is the Warp build that [MetalSim](https://github.com/pulipakaa24/MetalSim) runs on (see the
@@ -72,7 +72,8 @@ index 0000000000000000000000000000000000000000..3c0337355af64152a7041225a15e51d6
 +| `3342e5d8` | `METALSIM_CHANGES.md` rows for `8631b6b0` and `fddebdbd`. Franka-Pour MPM, captured step at 2,048 worlds with the two Newton commits of the same work (`metalsim-1.5.2`): 90.5-91.2 -> 78.9-79.0 ms. |
 +| `270660b1` | Capture memory reuse (`41b7bc45`) is opt-in, `WP_METAL_CAPTURE_REUSE=1`, until a GPU page fault it causes is understood. With reuse, Isaac Lab's Franka-Pour MPM step captured at one world fails with `kIOGPUCommandBufferCallbackErrorPageFault` (`pour_bitwise.py record --worlds 1 --mode capture`; 64 and 2,048 worlds pass). Without reuse, captures behave as at `43ffc6dd`. The working-set warning and the host-written-memory tracking stay. `TestMetal.test_capture_reuses_memory_freed_during_capture` runs only with reuse on. |
 +| `732b6e83` | Buffers a Metal graph keeps alive after their arrays were freed (during or after the capture) stay in the host-to-GPU address table. Kernels that reach an array through a descriptor stored in device memory (an array of structs) translate its address through that table at replay. Before, they read through the untranslated host address and got zeros. Test: `TestMetal.test_replay_translates_nested_arrays_freed_during_capture`. |
-+| this commit | Capture memory reuse is on again (`warp.config.metal_capture_reuse`, `WP_METAL_CAPTURE_REUSE`, read when a capture begins), and the one-world page fault is fixed. The fault came from a captured MPM solve: its 80-byte indirect-execution-range array, whose fields the host writes at each range's end, took the buffer of a 2,940-byte fem temporary freed earlier in the capture. Every replay, the temporary's recorded dispatches overwrote the ranges first. Now only buffers of 64 KiB or more are pooled or served. A large range array in reused memory raises at `metal_capture_range_begin`. Deterministic scratch pools allocated during a capture record their zeroing. Pour recordings at 1, 64 and 2,048 worlds: eager and captured finish, and captured is bitwise equal with reuse on and off. Franka-Pour's policy-step graph is finite at 2,048 worlds. Tests: `TestMetal.test_capture_range_after_small_freed_temporary`, `test_capture_range_in_reused_memory_raises`. |
++| `85b92466` | Capture memory reuse is on again (`warp.config.metal_capture_reuse`, `WP_METAL_CAPTURE_REUSE`, read when a capture begins), and the one-world page fault is fixed. The fault came from a captured MPM solve: its 80-byte indirect-execution-range array, whose fields the host writes at each range's end, took the buffer of a 2,940-byte fem temporary freed earlier in the capture. Every replay, the temporary's recorded dispatches overwrote the ranges first. Now only buffers of 64 KiB or more are pooled or served. A large range array in reused memory raises at `metal_capture_range_begin`. Deterministic scratch pools allocated during a capture record their zeroing. Pour recordings at 1, 64 and 2,048 worlds: eager and captured finish, and captured is bitwise equal with reuse on and off. Franka-Pour's policy-step graph is finite at 2,048 worlds. Tests: `TestMetal.test_capture_range_after_small_freed_temporary`, `test_capture_range_in_reused_memory_raises`. |
++| this commit | Deterministic Metal kernels call `is_counter_store_target` (the phase-0 store guard's loop over counter targets) instead of inlining it at every guarded store. Under global deterministic mode, the Metal compiler service crashed (`XPC_ERROR_CONNECTION_INTERRUPTED`, about 340 s of retries) building Newton's narrow-phase kernel, which has 23 guarded stores and 11 counters. That module now builds in 2.3 s. Minimized from the module's MSL: replacing the guarded stores with plain stores, or making either guard function non-inline, compiles; the device or constant argument form, forced inlining of user functions, and the library optimization level do not matter. `test_metal_deterministic` and `test_metal` pass. |
 +
 +The same seven code commits are exported as `patches/warp/0001-0007` in MetalSim; applying them to `ce15f6bb`
 +gives the tree of `f194006a`. Tests for the Metal changes are in `warp/tests/test_metal.py`.
@@ -11620,10 +11621,10 @@ index 0000000000000000000000000000000000000000..b2afdeb561c6a266c39acd2b64df2fac
 +}
 diff --git a/warp/native/metal_deterministic.h b/warp/native/metal_deterministic.h
 new file mode 100644
-index 0000000000000000000000000000000000000000..48b95ba3b5bdd12f2c29c45894cca2178f36ac6e
+index 0000000000000000000000000000000000000000..42979c37f904e39a8b454f28d9e631a94a17021a
 --- /dev/null
 +++ b/warp/native/metal_deterministic.h
-@@ -0,0 +1,424 @@
+@@ -0,0 +1,427 @@
 +// SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 +// SPDX-License-Identifier: Apache-2.0
 +
@@ -11870,7 +11871,10 @@ index 0000000000000000000000000000000000000000..48b95ba3b5bdd12f2c29c45894cca217
 +    return remaining == 0;
 +}
 +
-+inline bool is_counter_store_target(thread const det_ctx& ctx, WP_DEVICE const void* ptr)
++// Not inlined: every guarded store of a deterministic kernel calls it, and inlining the loop at each site made the Metal
++// compiler service crash (XPC_ERROR_CONNECTION_INTERRUPTED) on Newton's narrow-phase kernel, 23 guarded stores and
++// 11 counters, under global deterministic mode. Only phase 0 reaches the call.
++__attribute__((noinline)) bool is_counter_store_target(thread const det_ctx& ctx, WP_DEVICE const void* ptr)
 +{
 +    for (int i = 0; i < ctx.counter_target_count; ++i) {
 +        if (is_reachable_counter_element(ctx.counter_targets[i], ptr))

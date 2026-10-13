@@ -71,7 +71,7 @@ listing its commits, and keeps its upstream licence unchanged. "Head" is the bra
 
 [github.com/pulipakaa24/warp](https://github.com/pulipakaa24/warp), branch
 [`metalsim`](https://github.com/pulipakaa24/warp/tree/metalsim), head
-[`85b92466`](https://github.com/pulipakaa24/warp/commit/85b924669629838c2d2637f3e1e51ef650b3a8d6) (2026-10-12, pinned by
+[`f0df4cf8`](https://github.com/pulipakaa24/warp/commit/f0df4cf8b291c0fcc5590d5286f0e7341a692ab1) (2026-10-12, pinned by
 `scripts/setup_warp.sh`; the rigid-body results through 2026-09-26 were produced at
 [`c200d46b`](https://github.com/pulipakaa24/warp/commit/c200d46b), those before that day's throughput work at [`4127c48`](https://github.com/pulipakaa24/warp/commit/4127c4818334080de6f3d23aef522e582ff6a2a7), code
 [`f194006`](https://github.com/pulipakaa24/warp/commit/f194006a4cf197fda93633252af81bc3f57f5561)). Base: innate-inc/warp
@@ -104,7 +104,7 @@ listing its commits, and keeps its upstream licence unchanged. "Head" is the bra
   - `warp.config.metal_cuda_libm` (default on): `log` / `exp` / `sinh` and the `rsqrt` of `svd3` / `eig3` compute
     CUDA's results, equal to an L4 on all 2^32 inputs.
   - The rigid suite has the same five known failures with the option off and on (`runs/fma_rigid_parity/closeout_*`).
-- MPM step at scale and capture memory (2026-10-12, `41b7bc45..85b92466`; MPM.md sections 8f, 8g): bounded compact
+- MPM step at scale and capture memory (2026-10-12, `41b7bc45..f0df4cf8`; MPM.md sections 8f, 8g): bounded compact
   transposes and node-index tails. In a graph capture, buffers of 64 KiB or more freed earlier in the capture are
   reused (`warp.config.metal_capture_reuse`). Franka-Pour's policy-step graph at 2,048 worlds went from 70.7 GB
   (past the M4 Max's 55.7 GB working set; it replayed NaN) to finite. Graph-held buffers stay in the address
