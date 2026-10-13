@@ -1,0 +1,42 @@
+== Tue Oct 13 15:05:59 PDT 2026 batch_04 start
+installed warp 95f6f121b7e67025958335c7c15e338ac04a798a newton 3fd1f052a5ad031578960d9642aaaedc03834e4d
+/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/warp_new/warp/__init__.py True /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/newton_new/newton/__init__.py True
+/Users/aditya/robosim/upstream/warp-innate/warp/__init__.py None /Users/aditya/robosim/upstream/newton-metalsim-1.5.2/newton/__init__.py
+note: failing on the base trees too (pre-existing, not from the patches): FAILED .claude/worktrees/agent-a8f809a11de334dd0/tests/test_mpm.py::test_coupled_contact_filter_keeps_source_order 
+skip F_granular
+skip F_multi_material
+skip F_twoway
+skip F_anymal
+skip F_plate_drag
+skip F_column_a2
+SUITE_DONE
+skip F_granular
+skip F_multi_material
+skip F_twoway
+skip F_anymal
+skip F_plate_drag
+skip F_column_a2
+SUITE_DONE
+-- bitwise base vs new (expected: equal except twoway)
+F_anymal: BITWISE EQUAL
+F_column_a2: BITWISE EQUAL
+F_granular: BITWISE EQUAL
+F_multi_material: BITWISE EQUAL
+F_plate_drag: BITWISE EQUAL
+F_twoway: differs in traj.npz:pos, traj.npz:vel, traj.npz:body_q, solves.npz:res_l2, solves.npz:res_linf
+-- bitwise new vs new again (repeatability)
+F_twoway: BITWISE EQUAL
+| floors_base | worst frame | | | | | 0.83 | 0.80 |
+| floors_new | worst frame | | | | | 0.83 | 0.80 |
+Verdicts: floors_base: inside max floor, inside p95 pairwise; floors_new: inside max floor, inside p95 pairwise
+| floors_base | worst frame | | | | | 0.66 | 0.66 |
+| floors_new | worst frame | | | | | 0.66 | 0.66 |
+Verdicts: floors_base: inside max floor, inside p95 pairwise; floors_new: inside max floor, inside p95 pairwise
+| floors_base | worst frame | | | | | 0.80 | 0.74 |
+| floors_new | worst frame | | | | | 0.80 | 0.74 |
+Verdicts: floors_base: inside max floor, inside p95 pairwise; floors_new: inside max floor, inside p95 pairwise
+| floors_base | worst frame | | | | | 0.00 | 0.00 |
+| floors_new | worst frame | | | | | 0.00 | 0.00 |
+Verdicts: floors_base: inside max floor, inside p95 pairwise; floors_new: inside max floor, inside p95 pairwise
+| Metal run | M (% of peak) | floor p50 / p90 / max | pairwise p90 / p95 / max | rank in floor / pairwise | M / max floor | M / p95 pairwise | final force (L4 range) | verdict |
+pour env /Users/aditya/robosim/upstream/warp-innate/warp/__init__.py /Users/aditya/robosim/upstream/newton-metalsim-1.5.2/newton/__init__.py /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/metalsim/__init__.py
