@@ -7,7 +7,7 @@ W0000 00:00:1790358802.254915   12366 message.cc:301] Protobuf GeneratedMessageF
 [ISAACLAB] Kit hash:    00c488ae
 [INFO]: Parsing configuration from: isaaclab_tasks.core.velocity.config.g1.flat_env_cfg:G1FlatEnvCfg
 [INFO]: Using metrics formatters = ['schema', 'summary', 'json']
-Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/isaacsim/kit/data/Kit/IsaacLab/3.0/user.config.json'
+Loading user config located at: '/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/isaacsim/kit/data/Kit/IsaacLab/3.0/user.config.json'
 2026-09-25T17:53:22Z [0ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
 2026-09-25T17:53:22Z [85ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
 
@@ -276,9 +276,9 @@ Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab3/l
 2026-09-25 17:56:36 [197,514ms] [INFO] [isaacsim.benchmark.services.datarecorders.app_frametime] AppFrametimeRecorder: Stopped collecting. Collected 1 samples
 2026-09-25 17:56:36 [197,514ms] [INFO] [isaacsim.benchmark.services.datarecorders.gpu_frametime] GPUFrametimeRecorder: Stopped collecting. Collected 0 samples
 2026-09-25 17:56:36 [197,533ms] [WARNING] [isaacsim.benchmark.services.datarecorders.gpu_frametime] GPUFrametimeRecorder: No samples collected
-[INFO]: Wrote schema bundle to /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_isaacsim_physx_c/benchmark_runtime_Isaac-Velocity-Flat-G1_2026-09-25_17-53-23-813677_8731c2a0_schema.json
+[INFO]: Wrote schema bundle to /home/<vm-user>/parity3/bench/Isaac-Velocity-Flat-G1_isaacsim_physx_c/benchmark_runtime_Isaac-Velocity-Flat-G1_2026-09-25_17-53-23-813677_8731c2a0_schema.json
 [INFO]: Setting test name to benchmark_runtime
-Results written to: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_isaacsim_physx_c/benchmark_runtime_Isaac-Velocity-Flat-G1_2026-09-25_17-53-23-813677_8731c2a0_summary.json
+Results written to: /home/<vm-user>/parity3/bench/Isaac-Velocity-Flat-G1_isaacsim_physx_c/benchmark_runtime_Isaac-Velocity-Flat-G1_2026-09-25_17-53-23-813677_8731c2a0_summary.json
 
 |------------------------------------------------------------------------------------|
 |                                   Summary Report                                   |
@@ -322,7 +322,7 @@ Results written to: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity
 | cuda_version: 12.8                                                                 |
 |------------------------------------------------------------------------------------|
 [INFO]: Setting test name to benchmark_runtime
-Results written to: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_isaacsim_physx_c/benchmark_runtime_Isaac-Velocity-Flat-G1_2026-09-25_17-53-23-813677_8731c2a0_json.json
+Results written to: /home/<vm-user>/parity3/bench/Isaac-Velocity-Flat-G1_isaacsim_physx_c/benchmark_runtime_Isaac-Velocity-Flat-G1_2026-09-25_17-53-23-813677_8731c2a0_json.json
 
 ================================================================
  Runtime summary: Isaac-Velocity-Flat-G1 (4096 envs, physx)
@@ -338,9 +338,9 @@ Results written to: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity
  gpu_util                  52.8 %  std 28.3
  gpu_mem                   7.06 GB  peak 7.06
 ----------------------------------------------------------------
- report: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_isaacsim_physx_c/benchmark_runtime_Isaac-Velocity-Flat-G1_2026-09-25_17-53-23-813677_8731c2a0_schema.json
- report: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_isaacsim_physx_c/benchmark_runtime_Isaac-Velocity-Flat-G1_2026-09-25_17-53-23-813677_8731c2a0_summary.json
- report: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_isaacsim_physx_c/benchmark_runtime_Isaac-Velocity-Flat-G1_2026-09-25_17-53-23-813677_8731c2a0_json.json
+ report: /home/<vm-user>/parity3/bench/Isaac-Velocity-Flat-G1_isaacsim_physx_c/benchmark_runtime_Isaac-Velocity-Flat-G1_2026-09-25_17-53-23-813677_8731c2a0_schema.json
+ report: /home/<vm-user>/parity3/bench/Isaac-Velocity-Flat-G1_isaacsim_physx_c/benchmark_runtime_Isaac-Velocity-Flat-G1_2026-09-25_17-53-23-813677_8731c2a0_summary.json
+ report: /home/<vm-user>/parity3/bench/Isaac-Velocity-Flat-G1_isaacsim_physx_c/benchmark_runtime_Isaac-Velocity-Flat-G1_2026-09-25_17-53-23-813677_8731c2a0_json.json
 ================================================================
 [INFO]: SimulationContext cleared
 2026-09-25T17:53:26Z [4,032ms] [Warning] [omni.usd] Encountered USD Warnings but USD Diagnostics are currently muted. To view USD Warnings, please set the '/persistent/app/usd/muteUsdDiagnostics' setting to false in Preferences page.

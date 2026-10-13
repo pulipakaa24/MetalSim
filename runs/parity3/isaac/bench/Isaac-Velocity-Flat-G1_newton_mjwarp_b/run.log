@@ -6,9 +6,9 @@ I: Not using Hub: Hub not found
 I: Successfully created S3 provider for https://omniverse-content-production.s3-us-west-2.amazonaws.com
 I: Using CloudFront http://dcb18d6mfegct.cloudfront.net/, List = No
 Serving remote assets from the local cache under '/tmp'. Each copy is checked against the server before use; delete the directory to force a full re-download.
-/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_newton/isaaclab_newton/cloner/replicate.py:141: FutureWarning: Newton shape color replacement is enabled; this workaround will be deprecated in a future release.
+/home/<vm-user>/IsaacLab3/source/isaaclab_newton/isaaclab_newton/cloner/replicate.py:141: FutureWarning: Newton shape color replacement is enabled; this workaround will be deprecated in a future release.
   replace_newton_builder_shape_colors(builder, stage)
-/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_newton/isaaclab_newton/cloner/newton_clone_utils.py:158: FutureWarning: Newton shape color replacement is enabled; this workaround will be deprecated in a future release.
+/home/<vm-user>/IsaacLab3/source/isaaclab_newton/isaaclab_newton/cloner/newton_clone_utils.py:158: FutureWarning: Newton shape color replacement is enabled; this workaround will be deprecated in a future release.
   replace_newton_builder_shape_colors(builder, stage)
 [INFO]: Parsing configuration from: isaaclab_tasks.core.velocity.config.g1.flat_env_cfg:G1FlatEnvCfg
 [INFO]: Base environment:
@@ -139,7 +139,7 @@ CUDA graph took: Last: 1.610618 s, Mean: 1.610618 s, Std: 0.000000 s, N: 1
 +-------------+-----------+
 
 [INFO]: Completed setting up the environment...
-Results written to: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_newton_mjwarp_b/benchmark_runtime_Isaac-Velocity-Flat-G1_2026-09-25_17-41-23-679860_90fe9102_summary.json
+Results written to: /home/<vm-user>/parity3/bench/Isaac-Velocity-Flat-G1_newton_mjwarp_b/benchmark_runtime_Isaac-Velocity-Flat-G1_2026-09-25_17-41-23-679860_90fe9102_summary.json
 
 |------------------------------------------------------------------------------------|
 |                                   Summary Report                                   |
@@ -186,7 +186,7 @@ Results written to: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity
 | gpu_device_count: 1                                                                |
 | cuda_version: 12.8                                                                 |
 |------------------------------------------------------------------------------------|
-Results written to: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_newton_mjwarp_b/benchmark_runtime_Isaac-Velocity-Flat-G1_2026-09-25_17-41-23-679860_90fe9102_json.json
+Results written to: /home/<vm-user>/parity3/bench/Isaac-Velocity-Flat-G1_newton_mjwarp_b/benchmark_runtime_Isaac-Velocity-Flat-G1_2026-09-25_17-41-23-679860_90fe9102_json.json
 
 ================================================================
  Runtime summary: Isaac-Velocity-Flat-G1 (4096 envs, newton_mjwarp)
@@ -202,7 +202,7 @@ Results written to: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity
  gpu_util                  70.2 %  std 5.1
  gpu_mem                   1.65 GB  peak 1.65
 ----------------------------------------------------------------
- report: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_newton_mjwarp_b/benchmark_runtime_Isaac-Velocity-Flat-G1_2026-09-25_17-41-23-679860_90fe9102_schema.json
- report: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_newton_mjwarp_b/benchmark_runtime_Isaac-Velocity-Flat-G1_2026-09-25_17-41-23-679860_90fe9102_summary.json
- report: /home/aditya_nianticspatial_com/parity3/bench/Isaac-Velocity-Flat-G1_newton_mjwarp_b/benchmark_runtime_Isaac-Velocity-Flat-G1_2026-09-25_17-41-23-679860_90fe9102_json.json
+ report: /home/<vm-user>/parity3/bench/Isaac-Velocity-Flat-G1_newton_mjwarp_b/benchmark_runtime_Isaac-Velocity-Flat-G1_2026-09-25_17-41-23-679860_90fe9102_schema.json
+ report: /home/<vm-user>/parity3/bench/Isaac-Velocity-Flat-G1_newton_mjwarp_b/benchmark_runtime_Isaac-Velocity-Flat-G1_2026-09-25_17-41-23-679860_90fe9102_summary.json
+ report: /home/<vm-user>/parity3/bench/Isaac-Velocity-Flat-G1_newton_mjwarp_b/benchmark_runtime_Isaac-Velocity-Flat-G1_2026-09-25_17-41-23-679860_90fe9102_json.json
 ================================================================

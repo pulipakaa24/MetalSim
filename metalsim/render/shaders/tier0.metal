@@ -73,6 +73,7 @@ struct Material {
 struct Semantic { int geom, body, root, group; };
 
 #include "appearance.h"
+#include "haze.h"
 
 // corner-attribute layout (see corner_fetch below)
 constant bool corner_fc [[function_constant(0)]];
@@ -82,7 +83,9 @@ struct CornerAttr { float4 a; float4 b; };   // a: normal xyz, u | b: v
 struct Consts {
     uint n_envs, n_geoms, n_slots, tiles_per_row;
     uint tile_w, tile_h, atlas_w, atlas_h;
-    uint n_cam, bg_layers, flags, n_light;      // flags bit0: backgrounds, bit1: shadows, bit2: skybox, bit3: extra shadow views
+    uint n_cam, bg_layers, flags, n_light;      // flags bit0: backgrounds, bit1: shadows, bit2: skybox, bit3: extra shadow views,
+                                                // bit4: MuJoCo haze / fog (HazeParams at fragment buffer 24, haze.h),
+                                                // bit5: tier 1 traces a shadow ray to every castshadow light (shadow_lights="all")
     uint shadow_w, shadow_h, shadow_atlas_w, shadow_atlas_h;
     uint n_shadow_views, _c0, _c1, _c2;             // extra shadow views (flags bit3), see build_shadow_views
 };
@@ -104,6 +107,39 @@ inline float3x3 load_mat33(device const float* p) {   // MuJoCo row-major 3x3 ->
 
 inline float4 tile_clip(float4 clip, float4 tile) {
     return float4(clip.x * tile.z + tile.x * clip.w, clip.y * tile.w + tile.y * clip.w, clip.z, clip.w);
+}
+
+// ENV_MATS (compile time, Tier0Renderer when a per-env material source is active; metalsim.render.env_materials):
+// the (env, slot) material entry (appearance.h MatEntry) replaces the slot's material, the colour staying the model
+// sync's. The entry index follows the per-env transparency flags in the per-instance colour buffer.
+#ifndef ENV_MATS
+#define ENV_MATS 0
+#endif
+inline float4 slot_material(thread Material& m, uint env, uint slot, device const Material* mats,
+                            device const MaterialExt* mext, device const float4* per_inst, constant Consts& c,
+                            device const MatEntry* ents, texture2d_array<float> pool, texture2d<float> atlas, sampler s,
+                            float2 uv, float3 lp, float3 ln) {
+    m = mats[slot];
+    MaterialExt mx = mext[slot];
+#if ENV_MATS
+    int id = ((device const int*)(per_inst + c.n_envs * c.n_slots) + c.n_envs)[env * c.n_slots + slot];
+    if (id >= 0) {
+        MatEntry me = ents[id];
+        m.mrse = me.mrse; m.rect = me.rect; m.par = me.par; mx = me.x;
+        if (me.pool.x > 0.5) return pool_tex(pool, s, me.pool, m.par, mx, uv, lp, ln);
+    }
+#endif
+    return material_tex(m.rect, m.par, mx, uv, lp, atlas, s);
+}
+
+// MuJoCo's haze / fog (Consts.flags bit4, haze.h) on a fragment at world point `wp`, or the background (bg, view
+// direction dir_bg) of the env with camera position cam_pos / forward cam_fwd. `sky`: the env's skybox is drawn.
+inline float3 t0_haze(float3 col, float3 wp, bool bg, float3 dir_bg, float3 cam_pos, float3 cam_fwd, bool sky,
+                      constant HazeParams& hp) {
+    float3 dv = wp - cam_pos;
+    float dist = length(dv);
+    float3 d = bg ? dir_bg : dv / max(dist, 1e-12f);
+    return haze_composite(hp, col, cam_pos, d, bg ? HAZE_NONE : dist, cam_fwd, sky, hp.rgba.rgb);
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -729,14 +765,21 @@ fragment FSOut geom_fs(
     device const MaterialExt* mext     [[buffer(18)]],
     device const ShadowView* sviews    [[buffer(19)]],
     device const int4*       light_sv  [[buffer(20)]],
-    depth2d_array<float>     smaps     [[texture(3)]])
+    constant HazeParams&     hp        [[buffer(24)]],
+    device const MatEntry*   ents      [[buffer(25)]],
+    depth2d_array<float>     smaps     [[texture(3)]],
+    texture2d_array<float>   pool      [[texture(5)]])
 {
     FSIn in = CORNER_ATTRS ? corner_fetch(in0, prim, bary, corners, slot_ibase, sem, geom_xmat, c) : in0;
     EnvParams e = envs[in.env];
-    Material m = mats[in.slot];
+    float3 ln = float3(0.0, 0.0, 1.0);
+#if ENV_MATS
+    ln = cross(dfdx(in.local_pos), dfdy(in.local_pos));       // geom-frame face normal (texture-pool box projection)
+#endif
+    Material m;
+    float4 texc = slot_material(m, in.env, in.slot, mats, mext, per_inst, c, ents, pool, atlas, samp, in.uv, in.local_pos, ln);
     float4 mod = per_inst[in.env * c.n_slots + in.slot];
     float3 base = m.rgba.rgb * mod.rgb;
-    float4 texc = material_tex(m.rect, m.par, mext[in.slot], in.uv, in.local_pos, atlas, samp);
     base *= texc.rgb;
     float metallic = m.mrse.x, rough = max(m.mrse.y, 0.03), specw = m.mrse.z, emission = m.mrse.w;
     float3 N = normalize(in.normal_w);
@@ -792,6 +835,9 @@ fragment FSOut geom_fs(
     if (e.misc.z > 0.5)   // MuJoCo headlight: directional light along the view direction, no shadow
         direct += shade_light(N, V, V, sp.hl_diffuse.xyz * PI, base, f0, metallic, a2, NdotV);
     float3 color = direct + e.ambient.rgb * base + emission * base;   // flat ambient, as MuJoCo
+    if (HAZE_ON && (c.flags & 16u))
+        color = t0_haze(color, in.world_pos, false, float3(0.0), e.cam_pos.xyz, e.cam_fwd.xyz,
+                        (c.flags & 4u) && sp.sky_info.y > 0.5 && !(e.ambient.w > 0.5 && (c.flags & 1u)), hp);
     FSOut o;
     o.color = float4(color, m.rgba.a * mod.a * texc.a);   // alpha: used by the transparent pass only
     o.seg = in.slot + 1u;
@@ -932,12 +978,17 @@ vertex VSOut hf_tile_vs(
 // cut into chunks of at most SKIRT_CHUNK indices; per frame hf_skirt_cull appends the (env, chunk) pairs whose box meets
 // the env's view frustum, and hf_skirt_vs pulls the chunk's indices by vertex id (ids past a chunk's count are
 // degenerate). Without it every env drew the whole boundary of the field (+22 % on the G1 rough task's camera).
+// Shadows: the chunks also go into the caster's shadow map (hf_skirt_shadow_vs), culled to those whose box, swept along
+// the caster's light down to the scene's lowest point and grown by the shadow-map margin, meets the env's view frustum
+// (a wall's shadow falls on the ground around the field, below the field's own lowest point).
 struct SkirtChunk { int slot, i_start, i_count, _p; };
+struct SkirtShadow { float on, margin, lowest_z, _p; };
 
 kernel void hf_skirt_reset(device uint* args [[buffer(0)]], constant uint& chunk [[buffer(1)]], uint i [[thread_position_in_grid]])
-{   // MTLDrawPrimitivesIndirectArguments: vertex count, instance count, vertex start, base instance
+{   // two MTLDrawPrimitivesIndirectArguments (render, shadow): vertex count, instance count, vertex start, base instance
     if (i > 0) return;
     args[0] = chunk; args[1] = 0u; args[2] = 0u; args[3] = 0u;
+    args[4] = chunk; args[5] = 0u; args[6] = 0u; args[7] = 0u;
 }
 
 kernel void hf_skirt_cull(
@@ -951,6 +1002,8 @@ kernel void hf_skirt_cull(
     constant uint&           n_chunks  [[buffer(7)]],
     device uint2*            vis       [[buffer(8)]],
     device atomic_uint*      args      [[buffer(9)]],
+    device uint2*            svis      [[buffer(10)]],
+    constant SkirtShadow&    ss        [[buffer(11)]],
     uint i [[thread_position_in_grid]])
 {
     if (i >= c.n_envs * n_chunks) return;
@@ -959,10 +1012,55 @@ kernel void hf_skirt_cull(
     uint gi = env * c.n_geoms + uint(slot_geom[ch.slot]);
     device const float* xp = geom_xpos + gi * 3;
     float3 lo, hi; box_world(boxes[k], load_mat33(geom_xmat + gi * 9), float3(xp[0], xp[1], xp[2]), lo, hi);
-    if (box_in_frustum(envs[env].view_proj, lo, hi)) {
+    EnvParams e = envs[env];
+    if (box_in_frustum(e.view_proj, lo, hi)) {
         uint idx = atomic_fetch_add_explicit(args + 1, 1u, memory_order_relaxed);
         vis[idx] = uint2(env, k);
     }
+    if (ss.on > 0.5 && e.caster_dir.w > 0.5) {
+        float3 L = e.caster_dir.xyz;
+        bool s = true;
+        if (L.z < -1e-3) {
+            float3 dd = L * (max(hi.z - ss.lowest_z, 0.0) / -L.z);     // down to the scene's lowest point
+            s = box_in_frustum(e.view_proj, min(lo, lo + dd) - ss.margin, max(hi, hi + dd) + ss.margin);
+        }
+        if (s) {
+            uint idx = atomic_fetch_add_explicit(args + 5, 1u, memory_order_relaxed);
+            svis[idx] = uint2(env, k);
+        }
+    }
+}
+
+vertex ShadowOut hf_skirt_shadow_vs(
+    uint vid [[vertex_id]],
+    uint inst [[instance_id]],
+    device const float*      verts     [[buffer(0)]],
+    device const EnvParams*  envs      [[buffer(1)]],
+    device const uint2*      vis       [[buffer(2)]],
+    device const int*        slot_geom [[buffer(3)]],
+    device const float*      geom_xpos [[buffer(4)]],
+    device const float*      geom_xmat [[buffer(5)]],
+    device const SkirtChunk* chunks    [[buffer(6)]],
+    constant Consts&         c         [[buffer(7)]],
+    device const uint*       indices   [[buffer(8)]])
+{   // hf_skirt_vs into the caster's shadow atlas (shadow_vs's transform)
+    uint2 ek = vis[inst];
+    SkirtChunk ch = chunks[ek.y];
+    uint env = ek.x;
+    ShadowOut o;
+    if (vid >= uint(ch.i_count)) {
+        o.clip = float4(0.0, 0.0, 2.0, 1.0);
+        for (uint k = 0; k < 4; ++k) o.clip_distance[k] = -1.0;
+        return o;
+    }
+    device const float* v = verts + indices[uint(ch.i_start) + vid] * 8;
+    float3 p, n;
+    slot_world(env, uint(ch.slot), slot_geom, geom_xpos, geom_xmat, c, float3(v[0], v[1], v[2]), float3(v[3], v[4], v[5]), p, n);
+    EnvParams e = envs[env];
+    float4 clip = tile_clip(e.light_vp * float4(p, 1.0), e.shadow_tile);
+    o.clip = clip;
+    clip_to_tile(o.clip_distance, clip, e.shadow_tile);
+    return o;
 }
 
 vertex VSOut hf_skirt_vs(
@@ -1040,7 +1138,8 @@ vertex BGOut bg_vs(uint vid [[vertex_id]], uint env [[instance_id]], device cons
 
 fragment FSOut bg_fs(BGOut in [[stage_in]], device const EnvParams* envs [[buffer(1)]], constant Consts& c [[buffer(5)]],
                      texture2d_array<float> bg [[texture(1)]], sampler samp [[sampler(0)]],
-                     constant SceneParams& sp [[buffer(9)]], texture2d<float> atlas [[texture(0)]])
+                     constant SceneParams& sp [[buffer(9)]], texture2d<float> atlas [[texture(0)]],
+                     constant HazeParams& hp [[buffer(24)]])
 {
     EnvParams e = envs[in.env];
     FSOut o;
@@ -1051,6 +1150,8 @@ fragment FSOut bg_fs(BGOut in [[stage_in]], device const EnvParams* envs [[buffe
         float4 wp = inverse4(e.view_proj) * ndc;
         float3 d = normalize(wp.xyz / wp.w - e.cam_pos.xyz);
         o.color = float4(sky_color(atlas, samp, sp.sky_rect, sp.sky_info, d), 1.0);
+        if (HAZE_ON && (c.flags & 16u))       // MuJoCo's haze (and fog) over the skybox
+            o.color.rgb = t0_haze(o.color.rgb, float3(0.0), true, d, e.cam_pos.xyz, e.cam_fwd.xyz, true, hp);
     }
     else
         o.color = e.clear_color;
@@ -1076,10 +1177,11 @@ kernel void untile(
     constant Consts& c         [[buffer(6)]],
     constant uint4& outputs    [[buffer(7)]],
     constant float4& clip      [[buffer(8)]],
+    constant uint2&  rows      [[buffer(9)]],    // the rows written: [rows.x, rows.y) (a rolling-shutter band; else all)
     uint3 tid [[thread_position_in_grid]])
 {
-    uint x = tid.x, y = tid.y, e = tid.z;
-    if (x >= c.tile_w || y >= c.tile_h || e >= c.n_envs) return;
+    uint x = tid.x, y = tid.y + rows.x, e = tid.z;
+    if (x >= c.tile_w || y >= rows.y || y >= c.tile_h || e >= c.n_envs) return;
     uint ax = (e % c.tiles_per_row) * c.tile_w + x;
     uint ay = (e / c.tiles_per_row) * c.tile_h + y;
     uint pix = (e * c.tile_h + y) * c.tile_w + x;
@@ -1184,16 +1286,23 @@ fragment FSOut geom_fs_rt(
     device const uint*      indices    [[buffer(16)]],
     device const InstanceDescT* inst   [[buffer(17)]],
     device const MaterialExt* mext     [[buffer(18)]],
+    constant HazeParams&    hp         [[buffer(24)]],
+    device const MatEntry*  ents       [[buffer(25)]],
     DYN_KERNEL_ARG
     texture2d<float>        atlas      [[texture(0)]],
+    texture2d_array<float>  pool       [[texture(5)]],
     sampler                 samp       [[sampler(0)]])
 {
     FSIn in = CORNER_ATTRS ? corner_fetch(in0, prim, bary, corners, slot_ibase, sem, geom_xmat, c) : in0;
     EnvParams e = envs[in.env];
-    Material m = mats[in.slot];
+    float3 ln = float3(0.0, 0.0, 1.0);
+#if ENV_MATS
+    ln = cross(dfdx(in.local_pos), dfdy(in.local_pos));       // geom-frame face normal (texture-pool box projection)
+#endif
+    Material m;
+    float4 texc = slot_material(m, in.env, in.slot, mats, mext, per_inst, c, ents, pool, atlas, samp, in.uv, in.local_pos, ln);
     float4 mod = per_inst[in.env * c.n_slots + in.slot];
     float3 base = m.rgba.rgb * mod.rgb;
-    float4 texc = material_tex(m.rect, m.par, mext[in.slot], in.uv, in.local_pos, atlas, samp);
     base *= texc.rgb;
     float metallic = m.mrse.x, rough = max(m.mrse.y, 0.03), specw = m.mrse.z, emission = m.mrse.w;
     float3 N = normalize(in.normal_w);
@@ -1263,7 +1372,7 @@ fragment FSOut geom_fs_rt(
             }
         }
         float s = shadow_term(L, int(i) == caster);
-        if (int(i) != caster && l.kind.y > 0.5 && att > 0.0 && dot(N, L) > 0.0) {   // every other shadow-casting light
+        if ((c.flags & 32u) && int(i) != caster && l.kind.y > 0.5 && att > 0.0 && dot(N, L) > 0.0) {   // every other shadow-casting light (shadow_lights="all")
             if (l.kind.x == 0.0) s = shadow_term(L, true);
             else {          // point / spot: one ray to the light position (hard shadow)
                 float3 to = Lpos + rt_env_offset(in.env, ro) - P;
@@ -1327,10 +1436,12 @@ fragment FSOut geom_fs_rt(
             if (dot(n2, Rd) > 0.0) n2 = -n2;
             lp2 = transpose(R2) * (P + Rd * res.distance - RT_TRANSLATION(res, id2.col3));   // hit in the geom frame
           }
-            Material m2 = mats[slot2];
+            Material m2;
+            float4 tex2 = slot_material(m2, in.env, slot2, mats, mext, per_inst, c, ents, pool, atlas, samp, uv2, lp2,
+                                        ph2.hit ? float3(0.0, 0.0, 1.0) : n2);
             float4 mod2 = per_inst[in.env * c.n_slots + slot2];
             float3 base2 = m2.rgba.rgb * mod2.rgb;
-            base2 *= material_tex(m2.rect, m2.par, mext[slot2], uv2, lp2, atlas, samp).rgb;
+            base2 *= tex2.rgb;
             float3 V2 = -Rd;
             float3 d2 = float3(0.0);
             for (uint i = 0; i < nl; ++i) {
@@ -1346,6 +1457,9 @@ fragment FSOut geom_fs_rt(
         }
         color = mix(color, rc, refl);   // MuJoCo blends a constant reflectance
     }
+    if (HAZE_ON && (c.flags & 16u))
+        color = t0_haze(color, in.world_pos, false, float3(0.0), e.cam_pos.xyz, e.cam_fwd.xyz,
+                        (c.flags & 4u) && sp.sky_info.y > 0.5 && !(e.ambient.w > 0.5 && (c.flags & 1u)), hp);
     FSOut o;
     o.color = float4(color, m.rgba.a * mod.a * texc.a);   // alpha: used by the transparent pass only
     o.seg = in.slot + 1u;

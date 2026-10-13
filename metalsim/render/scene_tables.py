@@ -1007,6 +1007,50 @@ def build_scene_tables(m: mujoco.MjModel, n_envs: int, *, max_group: int = 3, in
     return tables
 
 
+def material_block(m: mujoco.MjModel, g: int, mat: int, atlas: TextureAtlas) -> tuple:
+    """((16,) material row, (8,) extension row) geom ``g`` gets with material ``mat`` (-1: none) under
+    ``appearance="mujoco"``: the rules of ``build_scene_tables`` for one (geom, material) pair. The rgba columns hold the
+    material-resolved colour (the renderers take the colour from the model sync instead). Used for per-env material
+    swaps (``metalsim.render.env_materials``); ``tests/test_render_env_textures.py`` checks it against the tables."""
+    from metalsim.render import builtin_geoms as bg
+    row = np.zeros(16, np.float32)
+    ext = np.zeros(8, np.float32)
+    ext[4:7] = 1.0; ext[7] = 1.0
+    if mat < 0:
+        row[0:4] = m.geom_rgba[g]
+        row[4:8] = (0.0, 0.6, 0.5, 0.0)
+        return row, ext
+    rg = np.asarray(m.geom_rgba[g], np.float32)
+    row[0:4] = m.mat_rgba[mat] if np.array_equal(rg, np.array([0.5, 0.5, 0.5, 1.0], np.float32)) else rg
+    metallic = float(m.mat_metallic[mat]) if hasattr(m, "mat_metallic") else -1.0
+    roughness = float(m.mat_roughness[mat]) if hasattr(m, "mat_roughness") else -1.0
+    if metallic < 0:
+        metallic = 0.0
+    if roughness < 0:
+        roughness = 1.0 - float(m.mat_shininess[mat])
+    row[4:8] = (metallic, float(np.clip(roughness, 0.02, 1.0)), float(m.mat_specular[mat]), float(m.mat_emission[mat]))
+    row[15] = float(m.mat_reflectance[mat])
+    texid = -1
+    if m.ntex:
+        roles = np.asarray(m.mat_texid[mat]).reshape(-1)
+        texid = int(roles[1]) if len(roles) > 1 else int(roles[0])
+    if texid >= 0 and texid in atlas.rects:
+        kind, faces, srgb = atlas.info[texid]
+        row[8:12] = atlas.rects[texid]
+        row[14] = 1.0
+        if kind == 0:
+            scl, off = bg.material_uv_transform(m, g, mat)
+            row[12:14] = scl
+            ext[0:2] = off
+        else:
+            row[12:14] = 1.0
+            ext[2] = 1.0
+            ext[4:7] = bg.cube_scale(m, g, mat)
+            ext[7] = float(faces)
+        ext[3] = float(srgb) if kind == 0 else 0.0
+    return row, ext
+
+
 def quats_to_mats(q: np.ndarray) -> np.ndarray:
     """(N,4) wxyz -> (N,3,3)."""
     w, x, y, z = q[:, 0], q[:, 1], q[:, 2], q[:, 3]

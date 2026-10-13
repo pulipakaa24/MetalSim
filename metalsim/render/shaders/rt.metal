@@ -127,7 +127,7 @@ inline SensorHit first_surface(instance_acceleration_structure accel, float3 org
         return h;
     }
     float tf = tcell;                    // past the cell: the nearest infinite plane that is not see-through
-    for (uint k = 0; k < ENV_GRID_PLANES; ++k) {
+    for (uint k = 0; k < GRID_PLANES; ++k) {
         GridPlaneHit ph = grid_plane(org, dir, tf, max_range, e, c.grid);
         if (!ph.hit) break;
         if (lmat[ph.slot * 2].y < 0.0) { tf = ph.t + 1e-4; continue; }

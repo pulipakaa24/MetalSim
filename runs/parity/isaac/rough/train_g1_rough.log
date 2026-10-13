@@ -1,9 +1,9 @@
 cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or directory
 [INFO][AppLauncher]: Using device: cuda:0
-[INFO][AppLauncher]: Loading experience file: /home/aditya_nianticspatial_com/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO][AppLauncher]: Loading experience file: /home/<vm-user>/IsaacLab/apps/isaaclab.python.headless.kit
 [INFO]: Parsing configuration from: isaaclab_tasks.manager_based.locomotion.velocity.config.g1.rough_env_cfg:G1RoughEnvCfg
 [INFO]: Parsing configuration from: isaaclab_tasks.manager_based.locomotion.velocity.config.g1.agents.rsl_rl_ppo_cfg:G1RoughPPORunnerCfg
-[INFO] Logging experiment in directory: /home/aditya_nianticspatial_com/IsaacLab/logs/rsl_rl/g1_rough
+[INFO] Logging experiment in directory: /home/<vm-user>/IsaacLab/logs/rsl_rl/g1_rough
 Exact experiment name requested from command line: 2026-09-25_09-54-11
 
 [36m======================================================================================[0m
@@ -11,9 +11,9 @@ Exact experiment name requested from command line: 2026-09-25_09-54-11
 [36m======================================================================================[0m
 
 [33m09:54:11 [simulation_context.py] WARNING: The `enable_external_forces_every_iteration` parameter in the PhysxCfg is set to False. If you are experiencing noisy velocities, consider enabling this flag. You may need to slightly increase the number of velocity iterations (setting it to 1 or 2 rather than 0), together with this flag, to improve the accuracy of velocity updates.[0m
-/home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/rsl_rl/utils/utils.py:245: UserWarning: The observation configuration dictionary 'obs_groups' must contain the 'policy' key. As an observation group with the name 'policy' was found, this is assumed to be the observation set. Consider adding the 'policy' key to the 'obs_groups' dictionary for clarity. This behavior will be removed in a future version.
+/home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/rsl_rl/utils/utils.py:245: UserWarning: The observation configuration dictionary 'obs_groups' must contain the 'policy' key. As an observation group with the name 'policy' was found, this is assumed to be the observation set. Consider adding the 'policy' key to the 'obs_groups' dictionary for clarity. This behavior will be removed in a future version.
   warnings.warn(
-/home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/rsl_rl/utils/utils.py:291: UserWarning: The observation configuration dictionary 'obs_groups' must contain the 'critic' key. As the configuration for 'critic' is missing, the observations from the 'policy' set are used. Consider adding the 'critic' key to the 'obs_groups' dictionary for clarity. This behavior will be removed in a future version.
+/home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/rsl_rl/utils/utils.py:291: UserWarning: The observation configuration dictionary 'obs_groups' must contain the 'critic' key. As the configuration for 'critic' is missing, the observations from the 'policy' set are used. Consider adding the 'critic' key to the 'obs_groups' dictionary for clarity. This behavior will be removed in a future version.
   warnings.warn(
 [INFO]: Base environment:
 	Environment device    : cuda:0
@@ -195,8 +195,8 @@ Metrics/base_velocity/error_vel_yaw: 0.1359
                       Time elapsed: 00:00:05
                                ETA: 02:22:14
 
-Could not find git repository in /home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/rsl_rl/__init__.py. Skipping.
-Storing git diff for 'IsaacLab' in: /home/aditya_nianticspatial_com/IsaacLab/logs/rsl_rl/g1_rough/2026-09-25_09-54-11/git/IsaacLab.diff
+Could not find git repository in /home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/rsl_rl/__init__.py. Skipping.
+Storing git diff for 'IsaacLab' in: /home/<vm-user>/IsaacLab/logs/rsl_rl/g1_rough/2026-09-25_09-54-11/git/IsaacLab.diff
 ################################################################################
                       [1m Learning iteration 1/1500 [0m                       
 
@@ -55661,8 +55661,8 @@ Metrics/base_velocity/error_vel_yaw: 1.1550
                                ETA: 00:00:02
 
 Training time: 4077.05 seconds
-Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
-[Info] [carb] Logging to file: /home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_095348.log
+Loading user config located at: '/home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_095348.log
 2026-09-25T09:53:49Z [1,003ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
 2026-09-25T09:53:50Z [2,800ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
 2026-09-25T09:53:51Z [3,700ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.

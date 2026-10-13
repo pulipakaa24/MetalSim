@@ -11,7 +11,7 @@ Warp 1.16.0 initialized:
      "cpu"      : "x86_64"
      "cuda:0"   : "NVIDIA L4" (22 GiB, sm_89, mempool enabled)
    Kernel cache:
-     /home/aditya_nianticspatial_com/.cache/warp/1.16.0
+     /home/<vm-user>/.cache/warp/1.16.0
 [INFO]: Loading local copy of remote asset 'https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.1/Isaac/IsaacLab/Environments/Grid/default_ground_plane_checker_v1/default_ground_plane.usda' from '/tmp/https/omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.1/Isaac/IsaacLab/Environments/Grid/default_ground_plane_checker_v1/default_ground_plane.usda'.
 [INFO]: Loading local copy of remote asset 'https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.1/Isaac/IsaacLab/Environments/Grid/default_ground_plane_checker_v1/Materials/Textures/default_ground_plane_albedo.png' from '/tmp/https/omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.1/Isaac/IsaacLab/Environments/Grid/default_ground_plane_checker_v1/Materials/Textures/default_ground_plane_albedo.png'.
 [INFO]: Loading local copy of remote asset 'https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.1/Isaac/IsaacLab/Environments/Grid/default_ground_plane_checker_v1/Materials/Textures/default_ground_plane_roughness.png' from '/tmp/https/omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/6.1/Isaac/IsaacLab/Environments/Grid/default_ground_plane_checker_v1/Materials/Textures/default_ground_plane_roughness.png'.
@@ -57,7 +57,7 @@ Warp 1.16.0 initialized:
 [INFO]: Deformable material initialized at: /World/cube_scene/cube_n8/material
 [INFO]: Number of instances: 1
 DEFORMABLE_IL3_DONE isaacsim_physx {"cloth_pos": [1089, 3], "cloth_vel": [1089, 3], "rod_n1_pos": [44, 3], "rod_n1_vel": [44, 3], "rod_n2_pos": [189, 3], "rod_n2_vel": [189, 3], "rod_n4_pos": [1025, 3], "rod_n4_vel": [1025, 3], "rod_n8_pos": [6561, 3], "rod_n8_vel": [6561, 3], "cube_n2_pos": [27, 3], "cube_n2_vel": [27, 3], "cube_n4_pos": [125, 3], "cube_n4_vel": [125, 3], "cube_n8_pos": [729, 3], "cube_n8_vel": [729, 3]} errors: []
-Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/isaacsim/kit/data/Kit/IsaacLab/3.0/user.config.json'
+Loading user config located at: '/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/isaacsim/kit/data/Kit/IsaacLab/3.0/user.config.json'
 2026-09-25T21:06:53Z [0ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
 2026-09-25T21:06:53Z [13ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
 2026-09-25T21:06:54Z [1,323ms] [Warning] [isaaclab.utils.assets] Serving remote assets from the local cache under '/tmp'. Each copy is checked against the server before use; delete the directory to force a full re-download.
