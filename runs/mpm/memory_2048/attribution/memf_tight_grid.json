@@ -1,0 +1,3348 @@
+{
+ "num_envs": 2048,
+ "rigid_deterministic": false,
+ "seconds": 31.64513716700003,
+ "samples": [
+  {
+   "label": "start",
+   "device_bytes": 17252352,
+   "footprint_bytes": 67404520,
+   "warp_live_bytes": 0,
+   "native_tracked_bytes": 0,
+   "resident_bytes": 99598336
+  },
+  {
+   "label": "built",
+   "device_bytes": 14192967680,
+   "footprint_bytes": 21526931896,
+   "warp_live_bytes": 10972398030,
+   "native_tracked_bytes": 14151120978,
+   "resident_bytes": 12136824832
+  },
+  {
+   "label": "built, after gc",
+   "device_bytes": 14192967680,
+   "footprint_bytes": 21210114272,
+   "warp_live_bytes": 10972398030,
+   "native_tracked_bytes": 14151120978,
+   "resident_bytes": 11820302336
+  },
+  {
+   "label": "after first policy step",
+   "device_bytes": 24846991360,
+   "footprint_bytes": 31251277136,
+   "warp_live_bytes": 19456281514,
+   "native_tracked_bytes": 22635004462,
+   "resident_bytes": 10198319104
+  },
+  {
+   "label": "after 2 replayed policy steps",
+   "device_bytes": 24847089664,
+   "footprint_bytes": 30464894264,
+   "warp_live_bytes": 19456281514,
+   "native_tracked_bytes": 22635004462,
+   "resident_bytes": 10194223104
+  },
+  {
+   "label": "after gc",
+   "device_bytes": 24847089664,
+   "footprint_bytes": 30464894264,
+   "warp_live_bytes": 19456281514,
+   "native_tracked_bytes": 22635004462,
+   "resident_bytes": 10194223104
+  }
+ ],
+ "live_by_phase": {
+  "build": 10879918530,
+  "eager": 8192239744,
+  "capture": 384123240
+ },
+ "live_by_owner": {
+  "eager || MPM | utils.py:compress_node_indices": 2638700624,
+  "build || collision | contacts.py:__init__": 2167947300,
+  "build || MPM | utils.py:compress_node_indices": 2113052688,
+  "eager || MPM | metal_sparse.py:get": 1011548160,
+  "eager || MPM | metal_primitives.py:scratch_ptr": 949061632,
+  "eager || MPM | restriction.py:rebuild": 939524108,
+  "eager || MPM | sparse.py:_bsr_ensure_fits": 729546752,
+  "build || MPM | metal_primitives.py:scratch_ptr": 727784448,
+  "build || model/state | model.py:_add_custom_attributes": 668344320,
+  "build || MuJoCo Warp | io.py:put_data": 612761604,
+  "eager || MPM | integrate.py:_launch_integrate_kernel": 597082112,
+  "build || MPM | nodal_field.py:__init__": 529973248,
+  "build || MPM | restriction.py:rebuild": 528482316,
+  "build || collision | contact_reduction_global.py:__init__": 452984840,
+  "build || task | solver_coupled.py:_select_attribute_value": 405914182,
+  "eager || MPM | solve_rheology.py:__init__": 372957184,
+  "build || MuJoCo Warp | io.py:_create_constraint": 293830656,
+  "capture || MPM | nodal_field.py:__init__": 287784960,
+  "eager || MPM | nodal_field.py:__init__": 269721600,
+  "build || MPM | nanogrid.py:_build_rebuildable_node_grid": 268435456,
+  "build || model/state | collide.py:_pairs": 264929280,
+  "build || model/state | builder.py:_build_default_array": 242671718,
+  "eager || MPM | integrate.py:_allocate_interpolate_jacobian_triplets": 240844800,
+  "build || MPM | nanogrid.py:__init__": 230572032,
+  "build || model/state | model.py:state": 176791552,
+  "build || MPM | metal_volume.py:allocate": 147914816,
+  "eager || MPM | sparse.py:_bsr_resize": 140238860,
+  "eager || MPM | solver_implicit_mpm.py:allocate_temporaries": 135708672,
+  "build || MuJoCo Warp | io.py:_create_array": 124159128,
+  "build || MPM | solver_implicit_mpm.py:allocate_temporaries": 120037376,
+  "build || collision | narrow_phase.py:__init__": 115802184,
+  "build || model/state | builder.py:finalize": 93848005,
+  "build || MPM | partition.py:rebuild": 67108880,
+  "build || MuJoCo Warp | io.py:_allocate_island_arrays": 64077824,
+  "build || model/state | builder.py:build_array": 61016072,
+  "capture || MPM | solver_implicit_mpm.py:_update_particles": 60211200,
+  "build || task | solver_coupled.py:_ensure_entry_contact_buffer": 56541216,
+  "eager || MPM | utils.py:masked_indices": 50331648,
+  "eager || MPM | partition.py:rebuild": 43229200,
+  "build || model/state | model.py:bvh_build_particles": 42156036,
+  "build || task | solver_coupled.py:_build_entries": 33390612,
+  "eager || MPM | pic_quadrature.py:_compute_cell_indices_from_positions": 30105600,
+  "build || collision | hashtable.py:__init__": 25165828,
+  "build || MPM | pic_quadrature.py:_compute_cell_indices_from_positions": 24084480,
+  "build || MPM | pic_quadrature.py:_finalize_cell_particle_data": 24084480,
+  "eager || MPM | pic_quadrature.py:_finalize_cell_particle_data": 24084480,
+  "build || task | solver_coupled.py:_build_entry_index_maps": 20062208,
+  "build || task | solver_coupled.py:_refresh_entry_gravity_acceleration": 18137088,
+  "capture || MPM | utils.py:compress_node_indices": 18063372,
+  "build || MPM | implicit_mpm_model.py:_refresh_particle_flags_and_extrema": 18063360,
+  "build || MPM | nanogrid.py:_pack_environment_points": 18063360,
+  "build || MPM | sparse.py:_bsr_resize": 16777224,
+  "build || MPM | utils.py:masked_indices": 16777216,
+  "build || SolverMuJoCo | solver_mujoco.py:tile": 14139392,
+  "build || MPM | implicit_mpm_model.py:_reuse_or_allocate": 12042240,
+  "eager || MPM | quadrature.py:element_index_arg_value": 12042240,
+  "capture || MPM | quadrature.py:element_index_arg_value": 12042240,
+  "build || MPM | nanogrid.py:_build_node_grid": 10616832,
+  "build || MPM | nanogrid.py:_make_environment_cell_grid": 8855552,
+  "build || MPM | solver_implicit_mpm.py:_create_geometry_partition": 8388608,
+  "build || MPM | solver_implicit_mpm.py:_update_grid_point_mask": 6021120,
+  "capture || MPM | solver_implicit_mpm.py:require_collision_space_fields": 6021120,
+  "build || model/state | collide.py:__init__": 4874312,
+  "eager || MPM | solver_implicit_mpm.py:_harvest_proxy_wrenches_ordered": 4718592,
+  "build || task | solver_coupled.py:_filter_shape_contact_pairs": 3899392,
+  "build || SolverMuJoCo | solver_mujoco.py:__init__": 3276808,
+  "eager || collision | narrow_phase.py:launch_custom_write": 2621440,
+  "build || model/state | model.py:bvh_build_shapes": 2588760,
+  "build || MPM | implicit_mpm_model.py:_merge_meshes": 2310144,
+  "build || model/state | builder.py:_find_shape_contact_pairs": 1949696,
+  "build || task | solver_coupled_proxy.py:_initialize_proxy_feedback_state": 1474560,
+  "build || SolverMuJoCo | solver_mujoco.py:_convert_to_mjc": 1081616,
+  "build || model/state | model.py:control": 1081344,
+  "build || MPM | implicit_mpm_model.py:_create_body_collider_mesh": 884736,
+  "build || task | solver_coupled.py:_entry_control": 884736,
+  "build || task | solver_coupled.py:_remap_compact_reference_value": 819208,
+  "build || MPM | implicit_mpm_model.py:setup_collider": 778264,
+  "build || task | solver_coupled.py:_build_reset_row_world_maps": 573440,
+  "build || task | solver_coupled.py:_joint_state_indices": 466944,
+  "build || task | solver_coupled_proxy.py:_refresh_proxy_entity_view_map": 270336,
+  "build || task | solver_coupled.py:_apply_compact_entry_view": 262168,
+  "eager || SolverMuJoCo | solver_mujoco.py:_create_inverse_shape_mapping": 172036,
+  "build || MPM | solver_implicit_mpm.py:require_collider_previous_position": 172032,
+  "build || task | solver_coupled.py:_weighted_world_start_array": 147600,
+  "build || task | franka_pour_scene.py:__init__": 65600,
+  "build || task | metal_primitives.py:scratch_ptr": 65536,
+  "build || MPM | nanogrid.py:_normalize_flat_environment_offsets": 65536,
+  "build || collision | types.py:finalize": 33936,
+  "build || task | solver_coupled_proxy.py:_build_proxy_entity_mappings": 32768,
+  "build || task | solver_coupled.py:_remap_compact_end_value": 32768,
+  "build || task | solver_coupled.py:_global_indices_to_local_array": 16384,
+  "build || task | solver_coupled.py:__init__": 2049,
+  "build || MPM | metal_volume.py:_header_template": 672,
+  "build || MuJoCo Warp | io.py:put_model": 340,
+  "capture || MPM | newton_compat.py:_run_solver_loop_cuda_semantics": 320,
+  "build || MuJoCo Warp | io.py:<genexpr>": 60,
+  "capture || MPM | partition.py:rebuild": 16,
+  "capture || MPM | restriction.py:rebuild": 12,
+  "build || MPM | solver_implicit_mpm.py:_allocate_grid": 8,
+  "eager || MPM | nanogrid.py:_refresh_rebuildable_topology": 4
+ },
+ "allocated_by_owner": {
+  "eager || MPM | sparse.py:_bsr_ensure_fits": 7046692864,
+  "eager || MPM | rasterized_collisions.py:_rigidity_matrices_compacted": 6358302784,
+  "eager || MPM | rasterized_collisions.py:build_rigidity_operator": 5780275200,
+  "eager || MPM | sparse.py:bsr_set_from_triplets": 5113380864,
+  "eager || MPM | nodal_field.py:__init__": 4604559360,
+  "eager || MPM | sparse.py:bsr_set_transpose": 3688890368,
+  "eager || MPM | utils.py:compress_node_indices": 3561447624,
+  "eager || MuJoCo Warp | solver.py:_create_solver_context": 3202891776,
+  "build || collision | contacts.py:__init__": 2167947300,
+  "build || MPM | utils.py:compress_node_indices": 2113052688,
+  "eager || MPM | integrate.py:_launch_integrate_kernel": 1674100800,
+  "eager || MPM | restriction.py:rebuild": 1325400256,
+  "eager || MPM | solve_rheology.py:compute_diagonal_factorization": 1207959552,
+  "eager || MPM | metal_sparse.py:get": 1011548160,
+  "eager || MPM | solver_implicit_mpm.py:_update_particles": 963379200,
+  "eager || MPM | metal_primitives.py:scratch_ptr": 949061632,
+  "build || MPM | metal_primitives.py:scratch_ptr": 727784448,
+  "build || model/state | model.py:_add_custom_attributes": 668344320,
+  "eager || MPM | solve_rheology.py:__init__": 664330368,
+  "build || MPM | nodal_field.py:__init__": 616431616,
+  "build || MuJoCo Warp | io.py:put_data": 612761604,
+  "build || MPM | restriction.py:rebuild": 528482316,
+  "capture || MPM | sparse.py:bsr_set_from_triplets": 466927616,
+  "build || collision | contact_reduction_global.py:__init__": 452984840,
+  "build || task | solver_coupled.py:_select_attribute_value": 415949390,
+  "capture || MPM | nodal_field.py:__init__": 402653184,
+  "capture || MPM | rasterized_collisions.py:_rigidity_matrices_compacted": 397393936,
+  "eager || MPM | sparse.py:bsr_zeros": 365560064,
+  "capture || MPM | rasterized_collisions.py:build_rigidity_operator": 361267200,
+  "capture || MPM | sparse.py:_bsr_ensure_fits": 359981056,
+  "build || MuJoCo Warp | io.py:_create_constraint": 293838848,
+  "eager || MPM | nanogrid.py:_pack_environment_points": 289013760,
+  "build || MPM | nanogrid.py:_build_rebuildable_node_grid": 268435456,
+  "eager || MPM | sparse.py:bsr_assign": 268435456,
+  "eager || MPM | solver_implicit_mpm.py:_build_strain_eigenbasis": 268435456,
+  "build || model/state | collide.py:_pairs": 264929280,
+  "build || model/state | builder.py:_build_default_array": 242671718,
+  "eager || MPM | integrate.py:_allocate_interpolate_jacobian_triplets": 240844800,
+  "build || MPM | nanogrid.py:__init__": 230572032,
+  "eager || MPM | quadrature.py:element_index_arg_value": 192675840,
+  "build || model/state | model.py:state": 176791552,
+  "eager || MuJoCo Warp | sensor.py:sensor_acc": 150405120,
+  "build || MPM | metal_volume.py:allocate": 147914816,
+  "eager || MPM | solver_implicit_mpm.py:collect_collider_impulses": 144506880,
+  "eager || MPM | sparse.py:_bsr_resize": 140238860,
+  "eager || MPM | solver_implicit_mpm.py:allocate_temporaries": 135708672,
+  "capture || MuJoCo Warp | solver.py:_create_solver_context": 133894144,
+  "build || MuJoCo Warp | io.py:_create_array": 124166032,
+  "build || MPM | solver_implicit_mpm.py:allocate_temporaries": 120037376,
+  "build || collision | narrow_phase.py:__init__": 115802184,
+  "eager || MPM | solver_implicit_mpm.py:require_collision_space_fields": 96337920,
+  "build || model/state | builder.py:finalize": 93848009,
+  "eager || MuJoCo Warp | forward.py:implicit": 68812800,
+  "build || MPM | partition.py:rebuild": 67108880,
+  "build || MuJoCo Warp | io.py:_allocate_island_arrays": 64077824,
+  "build || model/state | builder.py:build_array": 61016072,
+  "build || task | solver_coupled.py:_ensure_entry_contact_buffer": 56541216,
+  "eager || MPM | utils.py:masked_indices": 50331648,
+  "eager || MPM | partition.py:rebuild": 43229440,
+  "build || model/state | model.py:bvh_build_particles": 42156036,
+  "build || MPM | implicit_mpm_model.py:_refresh_particle_flags_and_extrema": 36126720,
+  "build || task | solver_coupled.py:_build_entries": 33538068,
+  "capture || MPM | integrate.py:_launch_integrate_kernel": 31186960,
+  "eager || MPM | pic_quadrature.py:_compute_cell_indices_from_positions": 30105600,
+  "build || collision | hashtable.py:__init__": 25165828,
+  "build || MPM | pic_quadrature.py:_compute_cell_indices_from_positions": 24084480,
+  "build || MPM | pic_quadrature.py:_finalize_cell_particle_data": 24084480,
+  "eager || MPM | pic_quadrature.py:_finalize_cell_particle_data": 24084480,
+  "capture || MPM | sparse.py:bsr_zeros": 22994972,
+  "build || task | model_view.py:_cow_array": 21295112,
+  "build || task | solver_coupled.py:_build_entry_index_maps": 20062208,
+  "build || task | solver_coupled.py:_refresh_entry_gravity_acceleration": 18137088,
+  "build || MPM | nanogrid.py:_pack_environment_points": 18063360,
+  "build || MPM | sparse.py:_bsr_resize": 16777224,
+  "build || MPM | utils.py:masked_indices": 16777216,
+  "build || SolverMuJoCo | solver_mujoco.py:tile": 14139392,
+  "build || MPM | implicit_mpm_model.py:_reuse_or_allocate": 12042240,
+  "build || MPM | nanogrid.py:_build_node_grid": 10616832,
+  "build || MPM | nanogrid.py:_make_environment_cell_grid": 8855552,
+  "build || MPM | solver_implicit_mpm.py:_create_geometry_partition": 8388608,
+  "build || task | solver_coupled.py:_filter_shape_contact_pairs": 7798792,
+  "build || MPM | solver_implicit_mpm.py:_update_grid_point_mask": 6021120,
+  "build || MPM | solver_implicit_mpm.py:require_collision_space_fields": 6021120,
+  "build || MuJoCo Warp | io.py:set_const_0": 5505024,
+  "build || model/state | collide.py:__init__": 4874312,
+  "eager || MPM | solver_implicit_mpm.py:_harvest_proxy_wrenches_ordered": 4718592,
+  "build || task | solver_coupled.py:_remap_compact_reference_value": 3358728,
+  "build || SolverMuJoCo | solver_mujoco.py:__init__": 3276808,
+  "eager || collision | narrow_phase.py:launch_custom_write": 2621440,
+  "build || MPM | implicit_mpm_model.py:_merge_meshes": 2605056,
+  "build || model/state | model.py:bvh_build_shapes": 2588764,
+  "capture || MuJoCo Warp | forward.py:implicit": 2424832,
+  "build || model/state | builder.py:_find_shape_contact_pairs": 1949696,
+  "eager || MuJoCo Warp | derivative.py:deriv_smooth_vel": 1572864,
+  "build || task | solver_coupled_proxy.py:_initialize_proxy_feedback_state": 1474560,
+  "build || MPM | implicit_mpm_solver_kernels.py:_rebuild_capacity": 1327104,
+  "build || SolverMuJoCo | solver_mujoco.py:_convert_to_mjc": 1081701,
+  "build || model/state | model.py:control": 1081344,
+  "build || MPM | implicit_mpm_model.py:_create_body_collider_mesh": 884736,
+  "build || task | solver_coupled.py:_entry_control": 884736,
+  "build || MPM | implicit_mpm_model.py:setup_collider": 778264,
+  "build || SolverMuJoCo | solver_mujoco.py:_set_const_0_with_physical_meaninertia": 663552,
+  "capture || MPM | solve_rheology.py:__init__": 589856,
+  "build || task | solver_coupled.py:_build_reset_row_world_maps": 573440,
+  "build || task | solver_coupled.py:_joint_state_indices": 466944,
+  "build || task | solver_coupled_proxy.py:_build_proxy_entity_mappings": 417792,
+  "eager || MPM | nanogrid.py:_recompute_generated_environment_offsets": 393216,
+  "build || task | solver_coupled_proxy.py:_refresh_proxy_entity_view_map": 270336,
+  "build || task | solver_coupled.py:_apply_compact_entry_view": 262168,
+  "eager || MPM | nanogrid.py:_normalize_flat_environment_offsets": 262144,
+  "eager || MuJoCo Warp | constraint.py:make_constraint": 196608,
+  "eager || MuJoCo Warp | smooth.py:transmission": 196608,
+  "build || task | solver_coupled.py:_eval_effective_body_inertial_properties": 180224,
+  "eager || SolverMuJoCo | solver_mujoco.py:_create_inverse_shape_mapping": 172036,
+  "build || MPM | solver_implicit_mpm.py:require_collider_previous_position": 172032,
+  "build || task | solver_coupled_proxy.py:_apply_proxy_body_effective_masses": 163840,
+  "build || task | solver_coupled.py:_weighted_world_start_array": 147600,
+  "build || task | solver_coupled.py:_apply_entry_shape_visibility": 131076,
+  "capture || MPM | nanogrid.py:_recompute_generated_environment_offsets": 98304,
+  "build || task | franka_pour_scene.py:__init__": 65600,
+  "build || task | metal_primitives.py:scratch_ptr": 65536,
+  "build || MPM | nanogrid.py:_normalize_flat_environment_offsets": 65536,
+  "build || task | solver_coupled.py:_coupling_endpoint_arrays": 65536,
+  "capture || MuJoCo Warp | derivative.py:deriv_smooth_vel": 65536,
+  "capture || MPM | nanogrid.py:_normalize_flat_environment_offsets": 65536,
+  "capture || MuJoCo Warp | constraint.py:make_constraint": 49152,
+  "capture || MuJoCo Warp | smooth.py:transmission": 49152,
+  "build || collision | inertia.py:compute_inertia_mesh": 44736,
+  "build || collision | types.py:finalize": 33936,
+  "build || task | solver_coupled.py:_remap_compact_end_value": 32768,
+  "build || MuJoCo Warp | smooth.py:transmission": 32768,
+  "build || task | solver_coupled.py:_global_indices_to_local_array": 16384,
+  "build || task | solver_coupled.py:__init__": 2049,
+  "build || MPM | metal_volume.py:_header_template": 672,
+  "build || MuJoCo Warp | io.py:put_model": 340,
+  "capture || MPM | newton_compat.py:_run_solver_loop_cuda_semantics": 320,
+  "eager || MPM | newton_compat.py:_run_solver_loop_cuda_semantics": 256,
+  "build || SolverMuJoCo | solver_mujoco.py:_update_mjc_data": 228,
+  "eager || MuJoCo Warp | solver.py:_solve": 96,
+  "capture || MPM | partition.py:rebuild": 64,
+  "build || MuJoCo Warp | io.py:<genexpr>": 60,
+  "capture || MPM | restriction.py:rebuild": 48,
+  "capture || MuJoCo Warp | solver.py:_solve": 24,
+  "build || MPM | sparse.py:bsr_zeros": 20,
+  "capture || MPM | utils.py:compress_node_indices": 16,
+  "build || MPM | solver_implicit_mpm.py:_allocate_grid": 8,
+  "eager || MPM | nanogrid.py:_refresh_rebuildable_topology": 4
+ },
+ "reused_in_capture_by_owner": {
+  "capture || MPM | sparse.py:_bsr_ensure_fits": 1219305472,
+  "capture || MPM | rasterized_collisions.py:_rigidity_matrices_compacted": 1192181760,
+  "capture || MPM | rasterized_collisions.py:build_rigidity_operator": 1083801600,
+  "capture || MPM | sparse.py:bsr_set_transpose": 922222592,
+  "capture || MPM | sparse.py:bsr_set_from_triplets": 811417600,
+  "capture || MPM | nodal_field.py:__init__": 748486656,
+  "capture || MuJoCo Warp | solver.py:_create_solver_context": 666828800,
+  "capture || MPM | solve_rheology.py:compute_diagonal_factorization": 301989888,
+  "capture || MPM | utils.py:compress_node_indices": 252944412,
+  "capture || MPM | solver_implicit_mpm.py:_update_particles": 240844800,
+  "capture || MPM | integrate.py:_launch_integrate_kernel": 238067712,
+  "capture || MPM | restriction.py:rebuild": 100663296,
+  "capture || MPM | nanogrid.py:_pack_environment_points": 72253440,
+  "capture || MPM | solve_rheology.py:__init__": 72253440,
+  "capture || MPM | sparse.py:bsr_zeros": 68395044,
+  "capture || MPM | sparse.py:bsr_assign": 67108864,
+  "capture || MPM | solver_implicit_mpm.py:_build_strain_eigenbasis": 67108864,
+  "capture || MPM | quadrature.py:element_index_arg_value": 48168960,
+  "capture || MuJoCo Warp | sensor.py:sensor_acc": 37601280,
+  "capture || MPM | solver_implicit_mpm.py:collect_collider_impulses": 36126720,
+  "capture || MPM | solver_implicit_mpm.py:require_collision_space_fields": 24084480,
+  "capture || MuJoCo Warp | forward.py:implicit": 14778368,
+  "capture || MuJoCo Warp | derivative.py:deriv_smooth_vel": 327680
+ },
+ "freed_inside_capture_by_owner": {
+  "MPM | rasterized_collisions.py:_rigidity_matrices_compacted": 1589575696,
+  "MPM | sparse.py:_bsr_ensure_fits": 1579286528,
+  "MPM | rasterized_collisions.py:build_rigidity_operator": 1445068800,
+  "MPM | sparse.py:bsr_set_from_triplets": 1278345216,
+  "MPM | sparse.py:bsr_set_transpose": 922222592,
+  "MPM | nodal_field.py:__init__": 863354880,
+  "MuJoCo Warp | solver.py:_create_solver_context": 800722944,
+  "MPM | solve_rheology.py:compute_diagonal_factorization": 301989888,
+  "MPM | integrate.py:_launch_integrate_kernel": 269254672,
+  "MPM | utils.py:compress_node_indices": 234881056,
+  "MPM | solver_implicit_mpm.py:_update_particles": 180633600,
+  "MPM | restriction.py:rebuild": 100663332,
+  "MPM | sparse.py:bsr_zeros": 91390016,
+  "MPM | solve_rheology.py:__init__": 72843296,
+  "MPM | nanogrid.py:_pack_environment_points": 72253440,
+  "MPM | sparse.py:bsr_assign": 67108864,
+  "MPM | solver_implicit_mpm.py:_build_strain_eigenbasis": 67108864,
+  "MuJoCo Warp | sensor.py:sensor_acc": 37601280,
+  "MPM | quadrature.py:element_index_arg_value": 36126720,
+  "MPM | solver_implicit_mpm.py:collect_collider_impulses": 36126720,
+  "MPM | solver_implicit_mpm.py:require_collision_space_fields": 18063360,
+  "MuJoCo Warp | forward.py:implicit": 17203200,
+  "MuJoCo Warp | derivative.py:deriv_smooth_vel": 393216,
+  "MPM | nanogrid.py:_recompute_generated_environment_offsets": 98304,
+  "MPM | nanogrid.py:_normalize_flat_environment_offsets": 65536,
+  "MuJoCo Warp | constraint.py:make_constraint": 49152,
+  "MuJoCo Warp | smooth.py:transmission": 49152,
+  "MPM | partition.py:rebuild": 48,
+  "MuJoCo Warp | solver.py:_solve": 24
+ },
+ "freed_inside_capture_total": 10082480396,
+ "reused_total": 8286961728,
+ "live_by_subsystem": {
+  "eager || MPM": 8189446268,
+  "build || MPM": 4901347124,
+  "build || collision": 2761934088,
+  "build || model/state": 1560251095,
+  "build || MuJoCo Warp": 1094829612,
+  "build || task": 543058795,
+  "capture || MPM": 384123240,
+  "build || SolverMuJoCo": 18497816,
+  "eager || collision": 2621440,
+  "eager || SolverMuJoCo": 172036
+ },
+ "capture_new_by_subsystem": {
+  "MPM": 2043159068,
+  "MuJoCo Warp": 136482840
+ },
+ "capture_freed_by_subsystem": {
+  "MPM": 9226461428,
+  "MuJoCo Warp": 856018968
+ },
+ "volumes": [
+  {
+   "fn": "allocate_by_voxels",
+   "bytes": 165041088,
+   "caps": {
+    "max_active_voxels": null,
+    "max_tiles": null,
+    "max_leaf_nodes": null,
+    "max_lower_nodes": null,
+    "max_upper_nodes": null,
+    "rebuildable": false
+   },
+   "owner": "MPM | nanogrid.py:_make_environment_cell_grid",
+   "phase": "build"
+  },
+  {
+   "fn": "allocate_by_voxels",
+   "bytes": 73957408,
+   "caps": {
+    "max_active_voxels": null,
+    "max_tiles": null,
+    "max_leaf_nodes": null,
+    "max_lower_nodes": null,
+    "max_upper_nodes": null,
+    "rebuildable": null
+   },
+   "owner": "MPM | nanogrid.py:_build_node_grid",
+   "phase": "build"
+  },
+  {
+   "fn": "allocate_by_voxels",
+   "bytes": 336798016,
+   "caps": {
+    "max_active_voxels": 2097152,
+    "max_tiles": null,
+    "max_leaf_nodes": 32768,
+    "max_lower_nodes": 9216,
+    "max_upper_nodes": 80,
+    "rebuildable": true
+   },
+   "owner": "MPM | nanogrid.py:_make_environment_cell_grid",
+   "phase": "build"
+  },
+  {
+   "fn": "allocate_by_voxels",
+   "bytes": 2694378304,
+   "caps": {
+    "max_active_voxels": 16777216,
+    "max_tiles": null,
+    "max_leaf_nodes": 262144,
+    "max_lower_nodes": 73728,
+    "max_upper_nodes": 640,
+    "rebuildable": true
+   },
+   "owner": "MPM | nanogrid.py:_build_rebuildable_topology_grid",
+   "phase": "build"
+  }
+ ],
+ "temporary_pool_stats": {
+  "int32": {
+   "out_req": 3581337764,
+   "out_cap": 3732914240,
+   "peak_req": 5630746812,
+   "peak_cap": 5848539196,
+   "n": 1537
+  },
+  "vec_t": {
+   "out_req": 108380160,
+   "out_cap": 108380160,
+   "peak_req": 491012096,
+   "peak_cap": 491012096,
+   "n": 166
+  },
+  "float32": {
+   "out_req": 18063360,
+   "out_cap": 18063360,
+   "peak_req": 381575168,
+   "peak_cap": 394493952,
+   "n": 448
+  }
+ },
+ "graph_held_by_kind": {
+  "retained: small capture temp": 1577164,
+  "capture pool": 10080903232,
+  "retained: allocated before capture, freed during": 366059548
+ },
+ "graph_held_pool_net_of_reuse": 1793941504,
+ "graph_held_by_owner": {
+  "capture pool || MPM | rasterized_collisions.py:_rigidity_matrices_compacted": 1589575680,
+  "capture pool || MPM | sparse.py:_bsr_ensure_fits": 1579286528,
+  "capture pool || MPM | rasterized_collisions.py:build_rigidity_operator": 1445068800,
+  "capture pool || MPM | sparse.py:bsr_set_from_triplets": 1278345216,
+  "capture pool || MPM | sparse.py:bsr_set_transpose": 922222592,
+  "capture pool || MPM | nodal_field.py:__init__": 863354880,
+  "capture pool || MuJoCo Warp | solver.py:_create_solver_context": 800194560,
+  "capture pool || MPM | solve_rheology.py:compute_diagonal_factorization": 301989888,
+  "retained: allocated before capture, freed during || MPM | nodal_field.py:__init__": 287784960,
+  "capture pool || MPM | integrate.py:_launch_integrate_kernel": 269254656,
+  "capture pool || MPM | utils.py:compress_node_indices": 234881040,
+  "capture pool || MPM | solver_implicit_mpm.py:_update_particles": 180633600,
+  "capture pool || MPM | restriction.py:rebuild": 100663296,
+  "capture pool || MPM | sparse.py:bsr_zeros": 91193392,
+  "capture pool || MPM | nanogrid.py:_pack_environment_points": 72253440,
+  "capture pool || MPM | solve_rheology.py:__init__": 72253440,
+  "capture pool || MPM | sparse.py:bsr_assign": 67108864,
+  "capture pool || MPM | solver_implicit_mpm.py:_build_strain_eigenbasis": 67108864,
+  "retained: allocated before capture, freed during || MPM | solver_implicit_mpm.py:_update_particles": 60211200,
+  "capture pool || MuJoCo Warp | sensor.py:sensor_acc": 37601280,
+  "capture pool || MPM | quadrature.py:element_index_arg_value": 36126720,
+  "capture pool || MPM | solver_implicit_mpm.py:collect_collider_impulses": 36126720,
+  "capture pool || MPM | solver_implicit_mpm.py:require_collision_space_fields": 18063360,
+  "capture pool || MuJoCo Warp | forward.py:implicit": 17203200,
+  "retained: allocated before capture, freed during || MPM | quadrature.py:element_index_arg_value": 12042240,
+  "retained: allocated before capture, freed during || MPM | solver_implicit_mpm.py:require_collision_space_fields": 6021120,
+  "retained: small capture temp || MPM | solve_rheology.py:__init__": 589856,
+  "retained: small capture temp || MuJoCo Warp | solver.py:_create_solver_context": 528384,
+  "capture pool || MuJoCo Warp | derivative.py:deriv_smooth_vel": 393216,
+  "retained: small capture temp || MPM | sparse.py:bsr_zeros": 196624,
+  "retained: small capture temp || MPM | nanogrid.py:_recompute_generated_environment_offsets": 98304,
+  "retained: small capture temp || MPM | nanogrid.py:_normalize_flat_environment_offsets": 65536,
+  "retained: small capture temp || MuJoCo Warp | constraint.py:make_constraint": 49152,
+  "retained: small capture temp || MuJoCo Warp | smooth.py:transmission": 49152,
+  "retained: small capture temp || MPM | partition.py:rebuild": 48,
+  "retained: small capture temp || MPM | restriction.py:rebuild": 36,
+  "retained: small capture temp || MuJoCo Warp | solver.py:_solve": 24,
+  "retained: small capture temp || MPM | rasterized_collisions.py:_rigidity_matrices_compacted": 16,
+  "retained: allocated before capture, freed during || MPM | partition.py:rebuild": 16,
+  "retained: small capture temp || MPM | integrate.py:_launch_integrate_kernel": 16
+ },
+ "live_allocations": [
+  [
+   949061632,
+   "MPM | metal_primitives.py:scratch_ptr",
+   "eager"
+  ],
+  [
+   587202560,
+   "MuJoCo Warp | io.py:put_data",
+   "build"
+  ],
+  [
+   481297664,
+   "MPM | metal_primitives.py:scratch_ptr",
+   "build"
+  ],
+  [
+   452984832,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   452984832,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   385351680,
+   "MPM | metal_sparse.py:get",
+   "eager"
+  ],
+  [
+   264929280,
+   "model/state | collide.py:_pairs",
+   "build"
+  ],
+  [
+   226492416,
+   "MPM | restriction.py:rebuild",
+   "build"
+  ],
+  [
+   226492416,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   226492416,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   226492416,
+   "MPM | restriction.py:rebuild",
+   "build"
+  ],
+  [
+   226492416,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   226492416,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   226492416,
+   "MPM | restriction.py:rebuild",
+   "eager"
+  ],
+  [
+   226492416,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   226492416,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   226492416,
+   "MPM | restriction.py:rebuild",
+   "eager"
+  ],
+  [
+   226492416,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   226492416,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   226492416,
+   "MPM | restriction.py:rebuild",
+   "eager"
+  ],
+  [
+   209715200,
+   "MPM | solve_rheology.py:__init__",
+   "eager"
+  ],
+  [
+   201326592,
+   "MPM | nanogrid.py:_build_rebuildable_node_grid",
+   "build"
+  ],
+  [
+   201326592,
+   "MPM | nanogrid.py:__init__",
+   "build"
+  ],
+  [
+   201326592,
+   "MPM | nodal_field.py:__init__",
+   "build"
+  ],
+  [
+   201326592,
+   "MPM | nodal_field.py:__init__",
+   "eager"
+  ],
+  [
+   201326592,
+   "MPM | integrate.py:_launch_integrate_kernel",
+   "eager"
+  ],
+  [
+   201326592,
+   "MPM | integrate.py:_launch_integrate_kernel",
+   "eager"
+  ],
+  [
+   201326592,
+   "MPM | sparse.py:_bsr_ensure_fits",
+   "eager"
+  ],
+  [
+   201326592,
+   "MPM | sparse.py:_bsr_ensure_fits",
+   "eager"
+  ],
+  [
+   201326592,
+   "MPM | nodal_field.py:__init__",
+   "capture"
+  ],
+  [
+   192675840,
+   "MPM | metal_sparse.py:get",
+   "eager"
+  ],
+  [
+   192675840,
+   "MPM | metal_sparse.py:get",
+   "eager"
+  ],
+  [
+   142607616,
+   "MPM | metal_primitives.py:scratch_ptr",
+   "build"
+  ],
+  [
+   134217728,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   134217728,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   134217728,
+   "collision | contact_reduction_global.py:__init__",
+   "build"
+  ],
+  [
+   132464640,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   117440512,
+   "collision | contact_reduction_global.py:__init__",
+   "build"
+  ],
+  [
+   100663296,
+   "collision | narrow_phase.py:__init__",
+   "build"
+  ],
+  [
+   96337920,
+   "MPM | metal_sparse.py:get",
+   "eager"
+  ],
+  [
+   96337920,
+   "MPM | metal_sparse.py:get",
+   "eager"
+  ],
+  [
+   91083008,
+   "MPM | metal_primitives.py:scratch_ptr",
+   "build"
+  ],
+  [
+   84811776,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   84811776,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   84811776,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   84811776,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   84811776,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   84811776,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   84811776,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   84811776,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   84811776,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   84811776,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   84811776,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   84811776,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   84811776,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   84811776,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   84811776,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   84811776,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   84811776,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   84811776,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   73957408,
+   "MPM | metal_volume.py:allocate",
+   "build"
+  ],
+  [
+   73957408,
+   "MPM | metal_volume.py:allocate",
+   "build"
+  ],
+  [
+   67108868,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   67108868,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   67108868,
+   "MPM | sparse.py:_bsr_resize",
+   "eager"
+  ],
+  [
+   67108868,
+   "MPM | sparse.py:_bsr_resize",
+   "eager"
+  ],
+  [
+   67108868,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   67108868,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   67108864,
+   "MPM | nanogrid.py:_build_rebuildable_node_grid",
+   "build"
+  ],
+  [
+   67108864,
+   "MPM | partition.py:rebuild",
+   "build"
+  ],
+  [
+   67108864,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   67108864,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   67108864,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   67108864,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   67108864,
+   "MPM | restriction.py:rebuild",
+   "build"
+  ],
+  [
+   67108864,
+   "MPM | solver_implicit_mpm.py:allocate_temporaries",
+   "build"
+  ],
+  [
+   67108864,
+   "MPM | nodal_field.py:__init__",
+   "build"
+  ],
+  [
+   67108864,
+   "collision | contact_reduction_global.py:__init__",
+   "build"
+  ],
+  [
+   67108864,
+   "collision | contact_reduction_global.py:__init__",
+   "build"
+  ],
+  [
+   67108864,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   67108864,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   67108864,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   67108864,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   67108864,
+   "MPM | restriction.py:rebuild",
+   "eager"
+  ],
+  [
+   67108864,
+   "MPM | solver_implicit_mpm.py:allocate_temporaries",
+   "eager"
+  ],
+  [
+   67108864,
+   "MPM | integrate.py:_launch_integrate_kernel",
+   "eager"
+  ],
+  [
+   67108864,
+   "MPM | sparse.py:_bsr_ensure_fits",
+   "eager"
+  ],
+  [
+   67108864,
+   "MPM | sparse.py:_bsr_ensure_fits",
+   "eager"
+  ],
+  [
+   67108864,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   67108864,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   67108864,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   67108864,
+   "MPM | restriction.py:rebuild",
+   "eager"
+  ],
+  [
+   67108864,
+   "MPM | integrate.py:_launch_integrate_kernel",
+   "eager"
+  ],
+  [
+   67108864,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   67108864,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   67108864,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   67108864,
+   "MPM | restriction.py:rebuild",
+   "eager"
+  ],
+  [
+   54190080,
+   "model/state | builder.py:_build_default_array",
+   "build"
+  ],
+  [
+   54190080,
+   "model/state | builder.py:_build_default_array",
+   "build"
+  ],
+  [
+   54190080,
+   "model/state | builder.py:_build_default_array",
+   "build"
+  ],
+  [
+   54190080,
+   "model/state | builder.py:_build_default_array",
+   "build"
+  ],
+  [
+   54190080,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   54190080,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   54190080,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   54190080,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   54190080,
+   "model/state | model.py:_add_custom_attributes",
+   "build"
+  ],
+  [
+   54190080,
+   "model/state | model.py:_add_custom_attributes",
+   "build"
+  ],
+  [
+   54190080,
+   "model/state | model.py:_add_custom_attributes",
+   "build"
+  ],
+  [
+   54190080,
+   "model/state | model.py:_add_custom_attributes",
+   "build"
+  ],
+  [
+   54190080,
+   "model/state | model.py:_add_custom_attributes",
+   "build"
+  ],
+  [
+   54190080,
+   "model/state | model.py:_add_custom_attributes",
+   "build"
+  ],
+  [
+   54190080,
+   "model/state | model.py:_add_custom_attributes",
+   "build"
+  ],
+  [
+   54190080,
+   "model/state | model.py:_add_custom_attributes",
+   "build"
+  ],
+  [
+   54190080,
+   "model/state | model.py:_add_custom_attributes",
+   "build"
+  ],
+  [
+   54190080,
+   "model/state | model.py:_add_custom_attributes",
+   "build"
+  ],
+  [
+   54190080,
+   "model/state | model.py:_add_custom_attributes",
+   "build"
+  ],
+  [
+   54190080,
+   "model/state | model.py:_add_custom_attributes",
+   "build"
+  ],
+  [
+   54190080,
+   "MPM | solver_implicit_mpm.py:_update_particles",
+   "capture"
+  ],
+  [
+   50331648,
+   "MPM | nodal_field.py:__init__",
+   "build"
+  ],
+  [
+   50331648,
+   "MPM | nodal_field.py:__init__",
+   "build"
+  ],
+  [
+   50331648,
+   "MPM | nodal_field.py:__init__",
+   "build"
+  ],
+  [
+   50331648,
+   "MPM | nodal_field.py:__init__",
+   "build"
+  ],
+  [
+   50331648,
+   "MPM | nodal_field.py:__init__",
+   "eager"
+  ],
+  [
+   50331648,
+   "MPM | solve_rheology.py:__init__",
+   "eager"
+  ],
+  [
+   50331648,
+   "MPM | solve_rheology.py:__init__",
+   "eager"
+  ],
+  [
+   50331648,
+   "MPM | nodal_field.py:__init__",
+   "capture"
+  ],
+  [
+   48168960,
+   "MPM | integrate.py:_allocate_interpolate_jacobian_triplets",
+   "eager"
+  ],
+  [
+   48168960,
+   "MPM | integrate.py:_allocate_interpolate_jacobian_triplets",
+   "eager"
+  ],
+  [
+   48168960,
+   "MPM | integrate.py:_allocate_interpolate_jacobian_triplets",
+   "eager"
+  ],
+  [
+   48168960,
+   "MPM | sparse.py:_bsr_ensure_fits",
+   "eager"
+  ],
+  [
+   48168960,
+   "MPM | sparse.py:_bsr_ensure_fits",
+   "eager"
+  ],
+  [
+   48168960,
+   "MPM | metal_sparse.py:get",
+   "eager"
+  ],
+  [
+   48168960,
+   "MPM | sparse.py:_bsr_ensure_fits",
+   "eager"
+  ],
+  [
+   48168960,
+   "MPM | sparse.py:_bsr_ensure_fits",
+   "eager"
+  ],
+  [
+   48168960,
+   "MPM | integrate.py:_allocate_interpolate_jacobian_triplets",
+   "eager"
+  ],
+  [
+   48168960,
+   "MPM | integrate.py:_allocate_interpolate_jacobian_triplets",
+   "eager"
+  ],
+  [
+   36126720,
+   "MPM | integrate.py:_launch_integrate_kernel",
+   "eager"
+  ],
+  [
+   33554432,
+   "collision | contact_reduction_global.py:__init__",
+   "build"
+  ],
+  [
+   33554432,
+   "collision | contact_reduction_global.py:__init__",
+   "build"
+  ],
+  [
+   29491200,
+   "MuJoCo Warp | io.py:_create_array",
+   "build"
+  ],
+  [
+   28270592,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   28270592,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   28270592,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   28270592,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   28270592,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   28270592,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   28270592,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   28270592,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   28270592,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   28270592,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   28270592,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   28270592,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   28270592,
+   "task | solver_coupled.py:_ensure_entry_contact_buffer",
+   "build"
+  ],
+  [
+   28270592,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   28270592,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   28270592,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   28270592,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   28270592,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   28270592,
+   "collision | contacts.py:__init__",
+   "build"
+  ],
+  [
+   28270592,
+   "task | solver_coupled.py:_ensure_entry_contact_buffer",
+   "build"
+  ],
+  [
+   25165824,
+   "MPM | nanogrid.py:__init__",
+   "build"
+  ],
+  [
+   20971520,
+   "MuJoCo Warp | io.py:_create_constraint",
+   "build"
+  ],
+  [
+   20971520,
+   "MuJoCo Warp | io.py:_create_constraint",
+   "build"
+  ],
+  [
+   20971520,
+   "MuJoCo Warp | io.py:_create_constraint",
+   "build"
+  ],
+  [
+   20971520,
+   "MuJoCo Warp | io.py:_create_constraint",
+   "build"
+  ],
+  [
+   20971520,
+   "MuJoCo Warp | io.py:_create_constraint",
+   "build"
+  ],
+  [
+   20971520,
+   "MuJoCo Warp | io.py:_create_constraint",
+   "build"
+  ],
+  [
+   20971520,
+   "MuJoCo Warp | io.py:_create_constraint",
+   "build"
+  ],
+  [
+   20971520,
+   "MuJoCo Warp | io.py:_create_constraint",
+   "build"
+  ],
+  [
+   20971520,
+   "MuJoCo Warp | io.py:_create_constraint",
+   "build"
+  ],
+  [
+   20971520,
+   "MuJoCo Warp | io.py:_create_constraint",
+   "build"
+  ],
+  [
+   20971520,
+   "MuJoCo Warp | io.py:_create_constraint",
+   "build"
+  ],
+  [
+   20971520,
+   "MuJoCo Warp | io.py:_create_constraint",
+   "build"
+  ],
+  [
+   20971520,
+   "MuJoCo Warp | io.py:_create_constraint",
+   "build"
+  ],
+  [
+   20971520,
+   "MuJoCo Warp | io.py:_create_constraint",
+   "build"
+  ],
+  [
+   20971520,
+   "MuJoCo Warp | io.py:_allocate_island_arrays",
+   "build"
+  ],
+  [
+   20971520,
+   "MuJoCo Warp | io.py:_allocate_island_arrays",
+   "build"
+  ],
+  [
+   20971520,
+   "MuJoCo Warp | io.py:_allocate_island_arrays",
+   "build"
+  ],
+  [
+   18063360,
+   "model/state | builder.py:finalize",
+   "build"
+  ],
+  [
+   18063360,
+   "model/state | builder.py:finalize",
+   "build"
+  ],
+  [
+   18063360,
+   "model/state | model.py:bvh_build_particles",
+   "build"
+  ],
+  [
+   18063360,
+   "model/state | model.py:bvh_build_particles",
+   "build"
+  ],
+  [
+   18063360,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   18063360,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   18063360,
+   "MPM | nanogrid.py:_pack_environment_points",
+   "build"
+  ],
+  [
+   18063360,
+   "MPM | pic_quadrature.py:_compute_cell_indices_from_positions",
+   "build"
+  ],
+  [
+   18063360,
+   "MPM | pic_quadrature.py:_finalize_cell_particle_data",
+   "build"
+  ],
+  [
+   18063360,
+   "MPM | solver_implicit_mpm.py:allocate_temporaries",
+   "build"
+  ],
+  [
+   18063360,
+   "MPM | nodal_field.py:__init__",
+   "build"
+  ],
+  [
+   18063360,
+   "MPM | nodal_field.py:__init__",
+   "build"
+  ],
+  [
+   18063360,
+   "MPM | nodal_field.py:__init__",
+   "build"
+  ],
+  [
+   18063360,
+   "model/state | model.py:state",
+   "build"
+  ],
+  [
+   18063360,
+   "model/state | model.py:state",
+   "build"
+  ],
+  [
+   18063360,
+   "model/state | model.py:state",
+   "build"
+  ],
+  [
+   18063360,
+   "task | solver_coupled.py:_refresh_entry_gravity_acceleration",
+   "build"
+  ],
+  [
+   18063360,
+   "model/state | model.py:state",
+   "build"
+  ],
+  [
+   18063360,
+   "model/state | model.py:state",
+   "build"
+  ],
+  [
+   18063360,
+   "model/state | model.py:state",
+   "build"
+  ],
+  [
+   18063360,
+   "model/state | model.py:state",
+   "build"
+  ],
+  [
+   18063360,
+   "model/state | model.py:state",
+   "build"
+  ],
+  [
+   18063360,
+   "model/state | model.py:state",
+   "build"
+  ],
+  [
+   18063360,
+   "MPM | pic_quadrature.py:_compute_cell_indices_from_positions",
+   "eager"
+  ],
+  [
+   18063360,
+   "MPM | pic_quadrature.py:_finalize_cell_particle_data",
+   "eager"
+  ],
+  [
+   18063360,
+   "MPM | solver_implicit_mpm.py:allocate_temporaries",
+   "eager"
+  ],
+  [
+   18063360,
+   "MPM | nodal_field.py:__init__",
+   "eager"
+  ],
+  [
+   18063360,
+   "MPM | integrate.py:_launch_integrate_kernel",
+   "eager"
+  ],
+  [
+   18063360,
+   "MPM | solver_implicit_mpm.py:allocate_temporaries",
+   "eager"
+  ],
+  [
+   18063360,
+   "MPM | solve_rheology.py:__init__",
+   "eager"
+  ],
+  [
+   18063360,
+   "MPM | solver_implicit_mpm.py:allocate_temporaries",
+   "eager"
+  ],
+  [
+   18063360,
+   "MPM | solve_rheology.py:__init__",
+   "eager"
+  ],
+  [
+   18063360,
+   "MPM | nodal_field.py:__init__",
+   "capture"
+  ],
+  [
+   18063360,
+   "MPM | nodal_field.py:__init__",
+   "capture"
+  ],
+  [
+   16777216,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   16777216,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   16777216,
+   "collision | hashtable.py:__init__",
+   "build"
+  ],
+  [
+   16384000,
+   "MuJoCo Warp | io.py:_create_array",
+   "build"
+  ],
+  [
+   16384000,
+   "MuJoCo Warp | io.py:_create_array",
+   "build"
+  ],
+  [
+   13107200,
+   "MuJoCo Warp | io.py:put_data",
+   "build"
+  ],
+  [
+   12796160,
+   "MPM | metal_primitives.py:scratch_ptr",
+   "build"
+  ],
+  [
+   12042240,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   12042240,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   12042240,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   12042240,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   12042240,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   12042240,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   12042240,
+   "MPM | quadrature.py:element_index_arg_value",
+   "eager"
+  ],
+  [
+   12042240,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   12042240,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   12042240,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   12042240,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   12042240,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   12042240,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   12042240,
+   "MPM | quadrature.py:element_index_arg_value",
+   "capture"
+  ],
+  [
+   10616832,
+   "MPM | nanogrid.py:_build_node_grid",
+   "build"
+  ],
+  [
+   9830400,
+   "MuJoCo Warp | io.py:_create_array",
+   "build"
+  ],
+  [
+   8388612,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   8388612,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   8388612,
+   "MPM | sparse.py:_bsr_resize",
+   "build"
+  ],
+  [
+   8388612,
+   "MPM | sparse.py:_bsr_resize",
+   "build"
+  ],
+  [
+   8388612,
+   "collision | hashtable.py:__init__",
+   "build"
+  ],
+  [
+   8388612,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   8388612,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   8388612,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   8388612,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   8388612,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   8388612,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   8388612,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   8388612,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   8388612,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | nanogrid.py:_make_environment_cell_grid",
+   "build"
+  ],
+  [
+   8388608,
+   "MPM | solver_implicit_mpm.py:_create_geometry_partition",
+   "build"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:masked_indices",
+   "build"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:masked_indices",
+   "build"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   8388608,
+   "MPM | restriction.py:rebuild",
+   "build"
+  ],
+  [
+   8388608,
+   "MPM | solver_implicit_mpm.py:allocate_temporaries",
+   "build"
+  ],
+  [
+   8388608,
+   "MPM | solver_implicit_mpm.py:allocate_temporaries",
+   "build"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:masked_indices",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:masked_indices",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | partition.py:rebuild",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | restriction.py:rebuild",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | solver_implicit_mpm.py:allocate_temporaries",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | solve_rheology.py:__init__",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | restriction.py:rebuild",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | restriction.py:rebuild",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:masked_indices",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:masked_indices",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | partition.py:rebuild",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | restriction.py:rebuild",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:masked_indices",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:masked_indices",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | partition.py:rebuild",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | restriction.py:rebuild",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | restriction.py:rebuild",
+   "eager"
+  ],
+  [
+   8388608,
+   "MPM | restriction.py:rebuild",
+   "eager"
+  ],
+  [
+   6553600,
+   "MuJoCo Warp | io.py:_create_array",
+   "build"
+  ],
+  [
+   6553600,
+   "MuJoCo Warp | io.py:_create_array",
+   "build"
+  ],
+  [
+   6553600,
+   "MuJoCo Warp | io.py:_create_array",
+   "build"
+  ],
+  [
+   6021124,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   6021124,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   6021124,
+   "MPM | sparse.py:_bsr_resize",
+   "eager"
+  ],
+  [
+   6021124,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   6021124,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   6021124,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   6021124,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   6021124,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   6021124,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   6021124,
+   "MPM | utils.py:compress_node_indices",
+   "capture"
+  ],
+  [
+   6021124,
+   "MPM | utils.py:compress_node_indices",
+   "capture"
+  ],
+  [
+   6021124,
+   "MPM | utils.py:compress_node_indices",
+   "capture"
+  ],
+  [
+   6021120,
+   "model/state | builder.py:finalize",
+   "build"
+  ],
+  [
+   6021120,
+   "model/state | builder.py:finalize",
+   "build"
+  ],
+  [
+   6021120,
+   "model/state | builder.py:finalize",
+   "build"
+  ],
+  [
+   6021120,
+   "model/state | builder.py:finalize",
+   "build"
+  ],
+  [
+   6021120,
+   "model/state | builder.py:finalize",
+   "build"
+  ],
+  [
+   6021120,
+   "model/state | builder.py:finalize",
+   "build"
+  ],
+  [
+   6021120,
+   "model/state | builder.py:build_array",
+   "build"
+  ],
+  [
+   6021120,
+   "model/state | builder.py:build_array",
+   "build"
+  ],
+  [
+   6021120,
+   "model/state | builder.py:build_array",
+   "build"
+  ],
+  [
+   6021120,
+   "model/state | builder.py:build_array",
+   "build"
+  ],
+  [
+   6021120,
+   "model/state | builder.py:build_array",
+   "build"
+  ],
+  [
+   6021120,
+   "model/state | builder.py:build_array",
+   "build"
+  ],
+  [
+   6021120,
+   "model/state | builder.py:build_array",
+   "build"
+  ],
+  [
+   6021120,
+   "model/state | builder.py:build_array",
+   "build"
+  ],
+  [
+   6021120,
+   "model/state | builder.py:_build_default_array",
+   "build"
+  ],
+  [
+   6021120,
+   "model/state | builder.py:_build_default_array",
+   "build"
+  ],
+  [
+   6021120,
+   "model/state | builder.py:build_array",
+   "build"
+  ],
+  [
+   6021120,
+   "model/state | builder.py:build_array",
+   "build"
+  ],
+  [
+   6021120,
+   "model/state | builder.py:_build_default_array",
+   "build"
+  ],
+  [
+   6021120,
+   "model/state | model.py:bvh_build_particles",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_build_entries",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_build_entry_index_maps",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_build_entries",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_select_attribute_value",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_build_entry_index_maps",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_build_entry_index_maps",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_build_entries",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_build_entries",
+   "build"
+  ],
+  [
+   6021120,
+   "task | solver_coupled.py:_build_entries",
+   "build"
+  ],
+  [
+   6021120,
+   "MPM | implicit_mpm_model.py:_reuse_or_allocate",
+   "build"
+  ],
+  [
+   6021120,
+   "MPM | implicit_mpm_model.py:_reuse_or_allocate",
+   "build"
+  ],
+  [
+   6021120,
+   "MPM | implicit_mpm_model.py:_refresh_particle_flags_and_extrema",
+   "build"
+  ],
+  [
+   6021120,
+   "MPM | implicit_mpm_model.py:_refresh_particle_flags_and_extrema",
+   "build"
+  ],
+  [
+   6021120,
+   "MPM | implicit_mpm_model.py:_refresh_particle_flags_and_extrema",
+   "build"
+  ],
+  [
+   6021120,
+   "MPM | solver_implicit_mpm.py:_update_grid_point_mask",
+   "build"
+  ],
+  [
+   6021120,
+   "MPM | pic_quadrature.py:_compute_cell_indices_from_positions",
+   "build"
+  ],
+  [
+   6021120,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   6021120,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   6021120,
+   "MPM | pic_quadrature.py:_finalize_cell_particle_data",
+   "build"
+  ],
+  [
+   6021120,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   6021120,
+   "MPM | utils.py:compress_node_indices",
+   "build"
+  ],
+  [
+   6021120,
+   "MPM | solver_implicit_mpm.py:allocate_temporaries",
+   "build"
+  ],
+  [
+   6021120,
+   "MPM | solver_implicit_mpm.py:allocate_temporaries",
+   "build"
+  ],
+  [
+   6021120,
+   "MPM | solver_implicit_mpm.py:allocate_temporaries",
+   "build"
+  ],
+  [
+   6021120,
+   "MPM | nodal_field.py:__init__",
+   "build"
+  ],
+  [
+   6021120,
+   "model/state | model.py:_add_custom_attributes",
+   "build"
+  ],
+  [
+   6021120,
+   "model/state | model.py:_add_custom_attributes",
+   "build"
+  ],
+  [
+   6021120,
+   "model/state | model.py:_add_custom_attributes",
+   "build"
+  ],
+  [
+   6021120,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   6021120,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   6021120,
+   "MPM | pic_quadrature.py:_finalize_cell_particle_data",
+   "eager"
+  ],
+  [
+   6021120,
+   "MPM | partition.py:rebuild",
+   "eager"
+  ],
+  [
+   6021120,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   6021120,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   6021120,
+   "MPM | solver_implicit_mpm.py:allocate_temporaries",
+   "eager"
+  ],
+  [
+   6021120,
+   "MPM | integrate.py:_launch_integrate_kernel",
+   "eager"
+  ],
+  [
+   6021120,
+   "MPM | solve_rheology.py:__init__",
+   "eager"
+  ],
+  [
+   6021120,
+   "MPM | pic_quadrature.py:_compute_cell_indices_from_positions",
+   "eager"
+  ],
+  [
+   6021120,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   6021120,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   6021120,
+   "MPM | partition.py:rebuild",
+   "eager"
+  ],
+  [
+   6021120,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   6021120,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   6021120,
+   "MPM | solve_rheology.py:__init__",
+   "eager"
+  ],
+  [
+   6021120,
+   "MPM | pic_quadrature.py:_compute_cell_indices_from_positions",
+   "eager"
+  ],
+  [
+   6021120,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   6021120,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   6021120,
+   "MPM | partition.py:rebuild",
+   "eager"
+  ],
+  [
+   6021120,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   6021120,
+   "MPM | utils.py:compress_node_indices",
+   "eager"
+  ],
+  [
+   6021120,
+   "MPM | solve_rheology.py:__init__",
+   "eager"
+  ],
+  [
+   6021120,
+   "MPM | solver_implicit_mpm.py:require_collision_space_fields",
+   "capture"
+  ],
+  [
+   6021120,
+   "MPM | solver_implicit_mpm.py:_update_particles",
+   "capture"
+  ],
+  [
+   4718592,
+   "MPM | solver_implicit_mpm.py:_harvest_proxy_wrenches_ordered",
+   "eager"
+  ],
+  [
+   3276800,
+   "MuJoCo Warp | io.py:_create_array",
+   "build"
+  ],
+  [
+   3276800,
+   "MuJoCo Warp | io.py:_create_array",
+   "build"
+  ]
+ ],
+ "live_size_histogram": {
+  "MPM | utils.py:compress_node_indices": [
+   [
+    226492416,
+    8
+   ],
+   [
+    67108864,
+    14
+   ],
+   [
+    452984832,
+    2
+   ],
+   [
+    67108868,
+    4
+   ],
+   [
+    134217728,
+    2
+   ],
+   [
+    12042240,
+    12
+   ],
+   [
+    8388608,
+    17
+   ],
+   [
+    6021120,
+    16
+   ],
+   [
+    8388612,
+    11
+   ],
+   [
+    6021124,
+    11
+   ],
+   [
+    16777216,
+    2
+   ],
+   [
+    4,
+    1
+   ]
+  ],
+  "collision | contacts.py:__init__": [
+   [
+    84811776,
+    18
+   ],
+   [
+    28270592,
+    18
+   ],
+   [
+    132464640,
+    1
+   ],
+   [
+    8,
+    3
+   ],
+   [
+    4,
+    3
+   ]
+  ],
+  "MPM | metal_primitives.py:scratch_ptr": [
+   [
+    949061632,
+    1
+   ],
+   [
+    481297664,
+    1
+   ],
+   [
+    142607616,
+    1
+   ],
+   [
+    91083008,
+    1
+   ],
+   [
+    12796160,
+    1
+   ]
+  ],
+  "MPM | restriction.py:rebuild": [
+   [
+    226492416,
+    5
+   ],
+   [
+    67108864,
+    4
+   ],
+   [
+    8388608,
+    8
+   ],
+   [
+    4,
+    9
+   ]
+  ],
+  "MPM | nodal_field.py:__init__": [
+   [
+    201326592,
+    3
+   ],
+   [
+    50331648,
+    6
+   ],
+   [
+    18063360,
+    6
+   ],
+   [
+    67108864,
+    1
+   ],
+   [
+    6021120,
+    1
+   ]
+  ],
+  "MPM | metal_sparse.py:get": [
+   [
+    192675840,
+    2
+   ],
+   [
+    385351680,
+    1
+   ],
+   [
+    96337920,
+    2
+   ],
+   [
+    48168960,
+    1
+   ]
+  ],
+  "MPM | sparse.py:_bsr_ensure_fits": [
+   [
+    201326592,
+    2
+   ],
+   [
+    48168960,
+    4
+   ],
+   [
+    67108864,
+    2
+   ]
+  ],
+  "model/state | model.py:_add_custom_attributes": [
+   [
+    54190080,
+    12
+   ],
+   [
+    6021120,
+    3
+   ]
+  ],
+  "MuJoCo Warp | io.py:put_data": [
+   [
+    587202560,
+    1
+   ],
+   [
+    13107200,
+    1
+   ],
+   [
+    3276800,
+    3
+   ],
+   [
+    1548288,
+    1
+   ],
+   [
+    876544,
+    1
+   ],
+   [
+    122880,
+    1
+   ],
+   [
+    32768,
+    2
+   ],
+   [
+    8192,
+    1
+   ],
+   [
+    4,
+    1
+   ]
+  ],
+  "MPM | integrate.py:_launch_integrate_kernel": [
+   [
+    201326592,
+    2
+   ],
+   [
+    67108864,
+    2
+   ],
+   [
+    36126720,
+    1
+   ],
+   [
+    18063360,
+    1
+   ],
+   [
+    6021120,
+    1
+   ]
+  ],
+  "collision | contact_reduction_global.py:__init__": [
+   [
+    134217728,
+    1
+   ],
+   [
+    67108864,
+    2
+   ],
+   [
+    117440512,
+    1
+   ],
+   [
+    33554432,
+    2
+   ],
+   [
+    4,
+    2
+   ]
+  ],
+  "task | solver_coupled.py:_select_attribute_value": [
+   [
+    54190080,
+    4
+   ],
+   [
+    6021120,
+    19
+   ],
+   [
+    18063360,
+    2
+   ],
+   [
+    172036,
+    48
+   ],
+   [
+    221184,
+    24
+   ],
+   [
+    516108,
+    10
+   ],
+   [
+    344072,
+    12
+   ],
+   [
+    1204252,
+    2
+   ],
+   [
+    802816,
+    3
+   ],
+   [
+    1105920,
+    2
+   ],
+   [
+    1032192,
+    2
+   ],
+   [
+    860180,
+    2
+   ],
+   [
+    114688,
+    8
+   ],
+   [
+    442368,
+    2
+   ],
+   [
+    688128,
+    1
+   ],
+   [
+    663552,
+    1
+   ],
+   [
+    344064,
+    1
+   ],
+   [
+    245760,
+    1
+   ],
+   [
+    24576,
+    10
+   ],
+   [
+    229376,
+    1
+   ]
+  ],
+  "MPM | solve_rheology.py:__init__": [
+   [
+    209715200,
+    1
+   ],
+   [
+    50331648,
+    2
+   ],
+   [
+    18063360,
+    2
+   ],
+   [
+    6021120,
+    3
+   ],
+   [
+    8388608,
+    1
+   ]
+  ],
+  "MuJoCo Warp | io.py:_create_constraint": [
+   [
+    20971520,
+    14
+   ],
+   [
+    221184,
+    1
+   ],
+   [
+    8192,
+    1
+   ]
+  ],
+  "MPM | nanogrid.py:_build_rebuildable_node_grid": [
+   [
+    201326592,
+    1
+   ],
+   [
+    67108864,
+    1
+   ]
+  ],
+  "model/state | collide.py:_pairs": [
+   [
+    264929280,
+    1
+   ]
+  ],
+  "MPM | solver_implicit_mpm.py:allocate_temporaries": [
+   [
+    67108864,
+    2
+   ],
+   [
+    18063360,
+    4
+   ],
+   [
+    8388608,
+    3
+   ],
+   [
+    6021120,
+    4
+   ],
+   [
+    24576,
+    1
+   ]
+  ],
+  "model/state | builder.py:_build_default_array": [
+   [
+    54190080,
+    4
+   ],
+   [
+    6021120,
+    3
+   ],
+   [
+    1351680,
+    2
+   ],
+   [
+    344072,
+    4
+   ],
+   [
+    270336,
+    4
+   ],
+   [
+    540672,
+    2
+   ],
+   [
+    860180,
+    1
+   ],
+   [
+    172036,
+    3
+   ],
+   [
+    122880,
+    1
+   ],
+   [
+    8192,
+    7
+   ],
+   [
+    24576,
+    2
+   ],
+   [
+    4,
+    9
+   ],
+   [
+    1,
+    2
+   ]
+  ],
+  "MPM | integrate.py:_allocate_interpolate_jacobian_triplets": [
+   [
+    48168960,
+    5
+   ]
+  ],
+  "MPM | nanogrid.py:__init__": [
+   [
+    201326592,
+    1
+   ],
+   [
+    25165824,
+    1
+   ],
+   [
+    2752512,
+    1
+   ],
+   [
+    1327104,
+    1
+   ]
+  ],
+  "model/state | model.py:state": [
+   [
+    18063360,
+    9
+   ],
+   [
+    688128,
+    6
+   ],
+   [
+    737280,
+    4
+   ],
+   [
+    802816,
+    3
+   ],
+   [
+    860160,
+    2
+   ],
+   [
+    245760,
+    3
+   ],
+   [
+    221184,
+    3
+   ],
+   [
+    303104,
+    2
+   ],
+   [
+    270336,
+    2
+   ],
+   [
+    147456,
+    2
+   ],
+   [
+    172032,
+    1
+   ]
+  ],
+  "MPM | sparse.py:_bsr_resize": [
+   [
+    67108868,
+    2
+   ],
+   [
+    8388612,
+    2
+   ],
+   [
+    6021124,
+    1
+   ]
+  ],
+  "MPM | metal_volume.py:allocate": [
+   [
+    73957408,
+    2
+   ]
+  ],
+  "MuJoCo Warp | io.py:_create_array": [
+   [
+    16384000,
+    2
+   ],
+   [
+    29491200,
+    1
+   ],
+   [
+    6553600,
+    3
+   ],
+   [
+    3276800,
+    3
+   ],
+   [
+    9830400,
+    1
+   ],
+   [
+    221184,
+    18
+   ],
+   [
+    737280,
+    5
+   ],
+   [
+    1327104,
+    2
+   ],
+   [
+    1228800,
+    2
+   ],
+   [
+    1105920,
+    2
+   ],
+   [
+    368640,
+    5
+   ],
+   [
+    1531904,
+    1
+   ],
+   [
+    1253376,
+    1
+   ],
+   [
+    294912,
+    2
+   ],
+   [
+    65536,
+    8
+   ],
+   [
+    491520,
+    1
+   ],
+   [
+    417792,
+    1
+   ],
+   [
+    262144,
+    1
+   ],
+   [
+    245760,
+    1
+   ],
+   [
+    122880,
+    1
+   ]
+  ],
+  "collision | narrow_phase.py:__init__": [
+   [
+    100663296,
+    1
+   ],
+   [
+    1949696,
+    4
+   ],
+   [
+    974852,
+    6
+   ],
+   [
+    974848,
+    1
+   ],
+   [
+    344072,
+    1
+   ],
+   [
+    172036,
+    1
+   ],
+   [
+    28,
+    1
+   ],
+   [
+    8,
+    1
+   ]
+  ],
+  "MPM | partition.py:rebuild": [
+   [
+    67108864,
+    1
+   ],
+   [
+    8388608,
+    3
+   ],
+   [
+    6021120,
+    3
+   ],
+   [
+    4,
+    12
+   ]
+  ],
+  "model/state | builder.py:finalize": [
+   [
+    18063360,
+    2
+   ],
+   [
+    6021120,
+    6
+   ],
+   [
+    270336,
+    17
+   ],
+   [
+    172036,
+    20
+   ],
+   [
+    516108,
+    5
+   ],
+   [
+    860160,
+    3
+   ],
+   [
+    1105920,
+    2
+   ],
+   [
+    122880,
+    10
+   ],
+   [
+    1204252,
+    1
+   ],
+   [
+    811008,
+    1
+   ],
+   [
+    737280,
+    1
+   ],
+   [
+    344072,
+    2
+   ],
+   [
+    368640,
+    1
+   ],
+   [
+    303104,
+    1
+   ],
+   [
+    122884,
+    2
+   ],
+   [
+    245760,
+    1
+   ],
+   [
+    40960,
+    2
+   ],
+   [
+    8200,
+    9
+   ],
+   [
+    43009,
+    1
+   ],
+   [
+    40964,
+    1
+   ]
+  ],
+  "MPM | utils.py:masked_indices": [
+   [
+    8388608,
+    8
+   ]
+  ],
+  "MuJoCo Warp | io.py:_allocate_island_arrays": [
+   [
+    20971520,
+    3
+   ],
+   [
+    221184,
+    4
+   ],
+   [
+    32768,
+    8
+   ],
+   [
+    8192,
+    2
+   ]
+  ],
+  "model/state | builder.py:build_array": [
+   [
+    6021120,
+    10
+   ],
+   [
+    172036,
+    2
+   ],
+   [
+    270336,
+    1
+   ],
+   [
+    122880,
+    1
+   ],
+   [
+    67584,
+    1
+   ]
+  ]
+ },
+ "temporary_stores": [
+  {
+   "held_bytes": 7987814500,
+   "available_bytes": 4128456740
+  }
+ ]
+}
