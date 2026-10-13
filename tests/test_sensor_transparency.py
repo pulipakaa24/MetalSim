@@ -226,8 +226,8 @@ def test_plain_kernels_without_transparency():
 
 
 def test_streaming_kernel_matches_lidar_ext(setup):
-    """One sub-ray and one return run the streaming kernel (lidar_tr1, no candidate arrays): equal, bit for bit, to
-    the general lidar_ext over a fan of beams through panes, glass, the mirror and the walls, per return mode."""
+    """One sub-ray and one return run the streaming kernel (lidar_tr1, no candidate arrays): equal, bit for bit
+    (points to float rounding), to the general lidar_ext over a fan of beams through panes, glass, the mirror and the walls, per return mode."""
     m, d, rt = setup
     A, E = np.meshgrid(np.linspace(-2.0, 2.0, 181), np.deg2rad(np.linspace(-20, 20, 9)))
     az, el = A.ravel().astype(np.float32), E.ravel().astype(np.float32)
@@ -240,5 +240,8 @@ def test_streaming_kernel_matches_lidar_ext(setup):
         b.stream = False
         o = rt.trace_host([d, d], [a, b])
         assert (o["a"]["n_returns"] > 0).mean() > 0.5
-        for f in o["a"]:
-            assert np.array_equal(o["a"][f], o["b"][f]), (kw, f)
+        for f in o["a"]:       # the streaming kernel puts the point at the echo's range on the beam: float rounding
+            if f == "points":
+                assert np.allclose(o["a"][f], o["b"][f], atol=2e-6), (kw, f)
+            else:
+                assert np.array_equal(o["a"][f], o["b"][f]), (kw, f)

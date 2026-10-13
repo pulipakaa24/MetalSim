@@ -442,6 +442,107 @@ transmission loop (same result; 18.5 → 18.2 ms on cloth). Byte identity: 121 o
 - Not measurable as a cost: per-env light records (model_fields=False ±0.1 ms), reversed z, appearance="legacy",
   `max_lights`.
 
+## 3e. Transparent surfaces in the ray-traced sensors; true area lights (2026-10-13)
+
+Research notes: `research_notes/Render sensor fidelity/transparency_area_lights.md` (Isaac Sim RTX lidar and
+annotators, MuJoCo's `mj_ray` and renderer, real lidars on glass, UsdLux light units). Measurements on an M4 Max, Warp 95f6f121, on main f3b5c62e
+(render-gaps-2 merged); logs in `runs/render_sensor_tr/`.
+
+**What the references do.**
+
+| | MuJoCo | Isaac Sim | real lidars |
+|---|---|---|---|
+| ray / rangefinder | `mj_ray` skips alpha exactly 0 (the material's alpha when the geom has one); alpha 0.25 or 0.99 stops the ray | – | – |
+| depth / segmentation | `mujoco.Renderer` (measured): alpha > 0 is the surface (1.995 m on a pane at 2 m), alpha 0 invisible | glass: depth on the surface (NVIDIA staff); opacity cutout: skipped (Real-Time) or stochastic presence (path tracer); `opacity_threshold` t > 0: opaque when opacity > t | – |
+| lidar | (the rangefinder above) | non-visual materials (`clear_glass`, `mirror`, ...); `maxReturns`, `reflection/transmissionPowerFraction`, `returnType` First / Last / Strongest / Multiple; intensity formula unpublished; glass pass-through reported broken in 6.0 (bug 6426827) | ~92 % of the beam passes a pane; a specular return only within a few degrees of normal incidence; mirror ghosts behind the glass; Strongest / Last / First and dual modes |
+
+**Implemented** (`metalsim/sensors/raytrace.py`, `shaders/rt.metal` SENSOR_TR):
+
+- Depth camera `transparent_ids`: `"surface"` (default: MuJoCo and Isaac's glass), `"behind"` (B's Isaac Real-Time
+  cutout mode), `alpha_threshold=t` (Isaac's `opacity_threshold`), `"opaque"` (previous).
+- Lidar `transparency`: `"transmit"` (default): a pane of alpha a returns `P a rho cos / r^2` and passes `P (1 - a)`,
+  echoes grouped and chosen as before; `"surface"` (MuJoCo's rangefinder), `"behind"`, `"opaque"` (previous).
+  `lidar_materials` presets named after the SimReady bases (`clear_glass`: Fresnel 0.077 at normal incidence with a
+  Beckmann lobe, 92 % transmitted; `mirror`: ghost echoes at the reflected path length; `frosted_glass`, `plexiglass`,
+  `water`, `one_way_mirror`, `calibration_lambertian`). `return_mode` `strongest` / `first` / `last` /
+  `strongest_last` (Velodyne / Hesai dual) / `first_last` / `first_strongest`; `min_reflectance` at
+  `min_reflectance_range` (Isaac `minReflectance`, `minReflectionRangeM`) as the detection threshold.
+- One sub-ray and one return run a streaming kernel (`lidar_tr1`, no candidate arrays), bit-identical to the general
+  one (points to float rounding) (`test_streaming_kernel_matches_lidar_ext`).
+- Scenes without transparent geoms run the unchanged kernels: SO-101, the lidar test scene and ANYmal C, default and
+  extended lidar and depth camera, 8 envs, **36 of 36 arrays byte-identical** to `origin/main` (f3b5c62e)
+  (`scripts/diagnostics/sensor_identity.py`).
+
+**Checks** (`tests/test_sensor_transparency.py`, glass panes 2 m in front of a wall at 3 m):
+
+| check | result |
+|---|---|
+| depth `"surface"` vs `mj_ray` through every pixel (48 x 48) | max error < 0.2 mm |
+| depth `"behind"` on pane pixels | wall (3.000 m); other pixels unchanged |
+| `alpha_threshold` 0.3 | the 0.25 pane cut out, the 0.5 pane kept |
+| lidar `"transmit"`, two returns, three angles | ranges to 0.2 mm, intensities `a rho cos / r^2` and `(1 - a) rho cos / r^2` to 1e-4 |
+| lidar `"surface"` vs `mj_ray` | equal to 0.2 mm |
+| three echoes (two panes, wall): first / last / strongest / three dual modes / threshold | as defined |
+| `clear_glass` 4 and 14 deg off normal | no glass echo; wall at (1 - F) rho cos / r^2 |
+| `clear_glass` at normal incidence | glass echo pi F D / 4 / r^2 (48.4 vs 0.051 for the wall behind), both reported |
+| `mirror` at 45 deg | one echo at the path length, reported behind the mirror along the beam, intensity F rho / r^2 to 1e-3 |
+| 0.5 deg divergence, 16 sub-rays | echo powers equal the single ray's (0.2 %); two traces bit-identical |
+
+**Cost** (GPU time per trace, each sensor alone, median of 20; 16 x 360 beams, 64 x 64 depth; `glass` = the lidar test
+scene with three alpha-0.3 panes around the sensor, crossed by 33 % of the beams; ramp 1024 then 4096 envs, each run
+alone through `scripts/gpu_run.sh`, GPU utilisation back under 10 % after each):
+
+| sensor | plain scene 1024 / 4096 | glass scene 1024 / 4096 |
+|---|---|---|
+| lidar, default kernel (`"opaque"` in the glass scene) | 1.64 / 6.86 ms | 2.36 / 9.44 ms |
+| lidar `"surface"` | – | 2.45 / 9.79 ms |
+| lidar `"behind"` | – | 4.07 / 16.28 ms |
+| lidar `"transmit"` (default), one return | – | 5.77 / 23.34 ms |
+| lidar two returns (`"transmit"`; `strongest_last` 9.61 / 38.22) | 4.12 / 17.11 ms | 9.65 / 38.45 ms |
+| depth `"surface"` (no see-through slot: plain kernel) | 0.58 / 2.32 ms | 0.86 / 3.24 ms |
+| depth `"behind"` | – | 2.40 / 9.23 ms |
+
+A beam that crosses a pane casts three rays (pane, its exit face, what is behind), so the see-through modes cost
+in proportion to the glass in view. `"transmit"` costs about 1.4x `"behind"` for the same rays (its kernel keeps the echo state live across the ray
+queries; an inner skip loop, a forced-inline variant and a lighter echo state were tried, within noise). Scenes without transparency pay nothing.
+
+**Area lights** (`metalsim/render/area_lights.py`, `shaders/area_light.h`; tier 2 AREA_LIGHTS, tier 1 AREA_LIGHTS):
+
+- Import: Rect / Disk / Cylinder unchanged (far-field spot / point lights for tier 0) plus the prim's X axis;
+  SphereLight now follows UsdLux radiometry (`intensity x 2^exposure x color`, `/ 4 pi r^2` with `normalize`,
+  far-field I = L pi r^2; before: diffuse = intensity, radius and exposure dropped) and is recorded as an area light
+  unless `treatAsPoint`. Lights written by `mjcf_to_usd` carry `mjc:diffuse` / `mjc:attenuation` and keep MuJoCo's
+  values exactly.
+- Tier 2 (`area_lights=True`, the default when the model records them): next-event estimation on the emitter,
+  uniform in area on the rectangle / disk / the half of the cylinder facing the point, uniform in the subtended cone
+  for spheres; one shadow ray per sample (soft shadows). The emitters' frames follow their bodies per env (`xmat`,
+  GPU and host paths; `test_area_light_moving_body_gpu_path`).
+- Tier 1: `rt_samples` samples on the emitter with a shadow ray each; the unshadowed irradiance is the closed form
+  (Lambert's polygon formula for rect / disk, the sphere's formula; ratio estimator: noise only in penumbrae).
+  Tier 0 keeps the far-field lights.
+
+Floor irradiance against the analytic value (`tests/test_area_lights.py`; white Lambertian floor, direct light only,
+24 x 24 px, 4096 samples per pixel, reference averaged over 3 x 3 points per pixel):
+
+| emitter | 0.5 size: mean / worst 4x4 block | 1 size | 3 sizes |
+|---|---|---|---|
+| rect 0.4 x 0.2 m, turned 30 deg (exact: Lambert's formula) | +0.07 % / 0.99 % | +0.01 % / 0.52 % | +0.00 % / 0.19 % |
+| disk r 0.2 m, `normalize` (4096-gon) | −0.09 % / 0.97 % | −0.03 % / 0.40 % | −0.02 % / 0.15 % |
+| sphere r 0.2 m (pi L (R/d)^2 cos) | −0.00 % / 0.15 % | −0.00 % / 0.09 % | −0.01 % / 0.06 % |
+| cylinder r 0.05, 0.4 m (quadrature) | +0.07 % / 1.25 % | +0.00 % / 0.81 % | −0.02 % / 0.58 % |
+| rect, far-field import (before), on axis at 1 size | +19.1 % | | |
+
+Tier 1 (`rt_samples` 16, 8-bit output): unshadowed floor vs the closed form, rect / disk / sphere at one light size:
+median 0.27 / 0.50 / 0.27 %, max 1.5 / 1.5 / 1.2 % (quantisation). Soft shadow of a 12 cm box under a 0.4 x 0.2 m rect
+(`rt_samples` 64) vs tier 2's converged image: mean |diff| 0.87 % of the lit level, p99 10.5 % (noise in the
+penumbra), 1874 penumbra pixels of 2304 (a point light gives a hard edge). Tier 0 keeps the far-field lights.
+
+Scenes without area lights compile neither AREA_LIGHTS variant (tier 1, tier 2): their shaders are unchanged.
+
+Limits: the area lights are not visible to the camera (Isaac's are when `visibleInPrimaryRay`); a light's shaping cone
+softness and IES profile are dropped; particle grains (tier 1) shade an area light with its radiance as a spot light;
+the rolling shutter uses the frame's emitter frame.
+
 ## 4. Reproduce
 
 ```
