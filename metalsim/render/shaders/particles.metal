@@ -18,12 +18,15 @@ struct InstanceDesc {          // MTLAccelerationStructureInstanceDescriptor (64
     uint as_index;
 };
 
+#include "env_grid.h"
+
 struct GrainConsts {
     uint n_envs, n_particles, k_per, n_meshes;   // particles per env, grains per particle, grain meshes
     uint as_base, tiles_per_row, seed, inst_base; // first grain mesh's index in the instanced-structure list; env grid; first grain instance
     float stride, radius, radius_jitter, offset;  // env grid spacing; grain radius (volume-equivalent) and relative jitter; offset half side
     float cull_z;                                 // particles with z < cull_z get no grains (mask 0); -inf = none
     uint has_ids, _u0, _u1;                       // has_ids: grain identity from ids[] (stable ids of a compacted particle set)
+    EnvGrid grid;                                 // where the envs sit (env_grid.h)
 };
 
 inline uint hash_u(uint x) { x ^= x >> 16; x *= 0x7feb352du; x ^= x >> 15; x *= 0x846ca68bu; x ^= x >> 16; return x; }
@@ -58,7 +61,7 @@ kernel void grain_instances(
     float scale = c.radius * (1.0 + c.radius_jitter * (2.0 * u01(s) - 1.0));
     uint mesh = min(uint(u01(s) * float(c.n_meshes)), c.n_meshes - 1);
     float3x3 R = random_rotation(s) * scale;
-    float3 env_off = float3(float(e % c.tiles_per_row) * c.stride, float(e / c.tiles_per_row) * c.stride, 0.0);
+    float3 env_off = grid_offset(e, c.grid);
     uint3 bits = as_type<uint3>(x);
     bool ok = !any((bits & 0x7f800000u) == 0x7f800000u) && x.z >= c.cull_z;
     InstanceDesc d;

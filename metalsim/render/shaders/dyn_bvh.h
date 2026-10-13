@@ -7,9 +7,11 @@
 // first dynamic slot), geometry = the object, primitive = the triangle within the object's env mesh, plus the env.
 //
 // Without DYN_SBVH the macros below expand to the plain intersector and nothing here is compiled.
-#pragma once
+#ifndef METALSIM_DYN_BVH_H   // include guard: shaders are inlined from strings (metal_context._inline_includes)
+#define METALSIM_DYN_BVH_H
 
 #ifdef DYN_SBVH
+#include "env_grid.h"
 struct DynBVHArgs {
     device const float*  verts;     // records (8 floats: position, normal, uv), the ray tracer's vertex buffer
     device const uint*   indices;   // the ray tracer's index buffer
@@ -19,13 +21,14 @@ struct DynBVHArgs {
     device const float4* bounds;    // (n_envs, n_nodes, 2): lo, hi in the env's frame
     device const float*  tris;      // (n_envs, n_tris, 9): each env's triangles in leaf order (written by the refit)
     uint n_envs, n_nodes, D, mesh_base;   // mesh entry of (env, object) = mesh_base + env * D + object
-    uint tpr; float stride; uint box_inst, n_tris;
+    uint box_inst, n_tris, _p0, _p1;
+    EnvGrid grid;                   // where the envs sit (env_grid.h); byte 96 (dyn_bvh.py _write_args)
 };
 
 struct DynHit { bool hit; float t; uint k, prim, env; float2 bc; };
 
 inline float3 dyn_env_offset(device const DynBVHArgs& a, uint e) {
-    return float3(float(e % a.tpr) * a.stride, float(e / a.tpr) * a.stride, 0.0);
+    return grid_offset(e, a.grid);
 }
 
 inline float3 dyn_vert(device const DynBVHArgs& a, uint i) {
@@ -176,3 +179,4 @@ inline intersection_result<triangle_data, instancing> rt_any_plain(ray r, instan
     return i.intersect(r, accel);
 }
 #endif
+#endif  // METALSIM_DYN_BVH_H

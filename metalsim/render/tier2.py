@@ -347,7 +347,7 @@ class Tier2Renderer:
         ce.setBuffer_offset_atIndex_(light_xpos, lxo, 10); ce.setBuffer_offset_atIndex_(light_xdir, ldo, 11)
         ce.setBuffer_offset_atIndex_(self.params_buf, 0, 12); ce.setBuffer_offset_atIndex_(self.cam_buf, 0, 13)
         ce.setBuffer_offset_atIndex_(cam_xpos, cxo, 14); ce.setBuffer_offset_atIndex_(cam_xmat, cmo, 15)
-        cbytes = self.consts.tobytes()
+        cbytes = self.consts.tobytes() + rt.grid.words().tobytes()     # PTConsts: 28 words, then the EnvGrid
         if rt.dyn_bvh is not None:      # PTConsts.dyn_args: the BVH argument struct's address (the 31 buffer slots are taken)
             cbytes += np.array([rt.dyn_bvh.args.gpuAddress(), 0], np.uint64).tobytes()
         ce.setBytes_length_atIndex_(cbytes, len(cbytes), 16)   # copied at encode time (per pass)

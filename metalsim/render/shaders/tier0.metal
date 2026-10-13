@@ -996,14 +996,15 @@ kernel void untile(
 #include <metal_raytracing>
 using namespace metal::raytracing;
 
-struct RTOffset { uint tiles_per_row; float stride; uint n_samples; uint _pad; };
+#include "env_grid.h"
+struct RTOffset { uint tiles_per_row; float stride; uint n_samples; uint _pad; EnvGrid grid; };
 struct MeshInfoT { uint i_off, i_count, _p0, _p1; };
 struct InstanceDescT { packed_float3 col0, col1, col2, col3; uint options, mask, if_table_offset, as_index; };
 
 #include "dyn_bvh.h"
 
 inline float3 rt_env_offset(uint e, constant RTOffset& ro) {
-    return float3(float(e % ro.tiles_per_row) * ro.stride, float(e / ro.tiles_per_row) * ro.stride, 0.0);
+    return grid_offset(e, ro.grid);
 }
 
 inline uint hash_u(uint x) { x ^= x >> 16; x *= 0x7feb352du; x ^= x >> 15; x *= 0x846ca68bu; x ^= x >> 16; return x; }
@@ -1085,7 +1086,7 @@ fragment FSOut geom_fs_rt(
             float u = hash_f(seed + s * 7919u), v = hash_f(seed + s * 104729u + 17u);
             float rr = 0.012 * sqrt(u), ph = 6.2831853 * v;   // ~0.7 deg angular radius
             float3 d = normalize(L + lx * (rr * cos(ph)) + ly * (rr * sin(ph)));
-            occ += occluded(accel, P, d, 100.0 DYN_PASS) ? 1.0 : 0.0;
+            occ += occluded(accel, P, d, grid_tmax(P, d, 100.0, in.env, ro.grid) DYN_PASS) ? 1.0 : 0.0;
         }
         return 1.0 - occ / float(ns);
     };
@@ -1111,7 +1112,7 @@ fragment FSOut geom_fs_rt(
             else {          // point / spot: one ray to the light position (hard shadow)
                 float3 to = Lpos + rt_env_offset(in.env, ro) - P;
                 float dl = length(to);
-                s = (dl > 0.003 && occluded(accel, P, to / dl, dl - 0.002 DYN_PASS)) ? 0.0 : 1.0;   // tmax > tmin always
+                s = (dl > 0.003 && occluded(accel, P, to / dl, grid_tmax(P, to / dl, dl - 0.002, in.env, ro.grid) DYN_PASS)) ? 0.0 : 1.0;   // tmax > tmin always
             }
         }
         direct += shade_light(N, V, L, l.diffuse.xyz * (PI * att), base, f0, metallic, a2, NdotV) * s;
@@ -1129,7 +1130,7 @@ fragment FSOut geom_fs_rt(
         float u = hash_f(seed + s * 6151u + 3u), v = hash_f(seed + s * 12289u + 5u);
         float rr = sqrt(u), ph = 6.2831853 * v;
         float3 d = tx * (rr * cos(ph)) + ty * (rr * sin(ph)) + N * sqrt(max(1.0 - u, 0.0));
-        ao_occ += occluded(accel, P, d, 0.5 DYN_PASS) ? 1.0 : 0.0;
+        ao_occ += occluded(accel, P, d, grid_tmax(P, d, 0.5, in.env, ro.grid) DYN_PASS) ? 1.0 : 0.0;
     }
     float ao = 1.0 - 0.5 * ao_occ / float(ns);
     float3 color = direct + e.ambient.rgb * base * ao + emission * base;
@@ -1138,7 +1139,7 @@ fragment FSOut geom_fs_rt(
     float refl = max(m.par.w, metallic * (1.0 - rough));
     if (refl > 0.01) {
         float3 Rd = reflect(-V, N);
-        ray r(P, Rd, 0.001, 50.0);
+        ray r(P, Rd, 0.001, grid_tmax(P, Rd, 50.0, in.env, ro.grid));
 #ifdef DYN_SBVH
         RTRes res = RT_CLOSEST(r, accel);
 #else

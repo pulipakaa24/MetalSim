@@ -8,6 +8,7 @@
 #include <metal_raytracing>
 using namespace metal;
 using namespace metal::raytracing;
+#include "env_grid.h"
 
 struct RTConsts {
     uint n_envs, n_geoms, n_slots, tiles_per_row;
@@ -17,6 +18,7 @@ struct RTConsts {
     uint n_site;               // model sites (stride of site_xpos per env)
     uint sensor_site;          // site index the lidar is attached to
     uint _pad0, _pad1, _pad2;
+    EnvGrid grid;              // where the envs sit (env_grid.h)
 };
 
 struct InstanceDesc {          // MTLAccelerationStructureInstanceDescriptor (64 bytes)
@@ -38,7 +40,7 @@ inline float3x3 load_mat33(device const float* p) {
 #include "dyn_bvh.h"
 
 inline float3 env_offset(uint e, constant RTConsts& c) {
-    return float3(float(e % c.tiles_per_row) * c.stride, float(e / c.tiles_per_row) * c.stride, 0.0);
+    return grid_offset(e, c.grid);
 }
 
 // one thread per (env, slot) instance
@@ -50,6 +52,7 @@ kernel void refit_instances(
     device const float*     geom_xpos [[buffer(4)]],
     device const float*     geom_xmat [[buffer(5)]],
     constant RTConsts&      c         [[buffer(6)]],
+    device atomic_uint*     grid_flag [[buffer(7)]],   // set when a geom nears its env's cell boundary (env_grid.h)
     uint i [[thread_position_in_grid]])
 {
     if (i >= c.n_envs * c.n_slots) return;
@@ -62,6 +65,7 @@ kernel void refit_instances(
     InstanceDesc d;
     d.col0 = R[0]; d.col1 = R[1]; d.col2 = R[2];
     d.col3 = float3(xp[0], xp[1], xp[2]) + env_offset(env, c);
+    if (env_grid_left(float3(xp[0], xp[1], xp[2]), c.grid)) atomic_store_explicit(grid_flag, 1u, memory_order_relaxed);
     d.options = 4;   // MTLAccelerationStructureInstanceOptionOpaque
     d.mask = 0xFFFFFFFFu;
     d.if_table_offset = 0;
@@ -113,7 +117,8 @@ kernel void lidar(
     float2 ae = beams[b];
     float3 dl = float3(cos(ae.y) * cos(ae.x), cos(ae.y) * sin(ae.x), sin(ae.y));
     float3 dir = normalize(R * dl);
-    ray r(origin + env_offset(e, c), dir, 0.001, c.max_range);
+    float3 org0 = origin + env_offset(e, c);
+    ray r(org0, dir, 0.001, grid_tmax(org0, dir, c.max_range, e, c.grid));
 #ifdef DYN_SBVH
     RTRes res = RT_CLOSEST(r, accel);
 #else
@@ -166,7 +171,8 @@ kernel void raycast_depth(
     // camera looks along -Z, +Y up; pixel (x+0.5, y+0.5) with y down
     float3 dl = float3((float(x) + 0.5 - intrinsics.z) / intrinsics.x, -(float(y) + 0.5 - intrinsics.w) / intrinsics.y, -1.0);
     float3 dir = normalize(R * dl);
-    ray r(origin + env_offset(e, c), dir, 0.001, c.max_range);
+    float3 org0 = origin + env_offset(e, c);
+    ray r(org0, dir, 0.001, grid_tmax(org0, dir, c.max_range, e, c.grid));
 #ifdef DYN_SBVH
     RTRes res = RT_CLOSEST(r, accel);
 #else
@@ -242,7 +248,7 @@ kernel void lidar_ext(
         int last = -1, last_g = -1;
         uint hits = 0;
         for (uint it = 0; it < x.hits_per_ray + 8 && hits < x.hits_per_ray; ++it) {
-            ray r(org, dir, tmin, c.max_range);
+            ray r(org, dir, tmin, grid_tmax(org, dir, c.max_range, e, c.grid));
 #ifdef DYN_SBVH
             RTRes res = RT_CLOSEST(r, accel);
 #else

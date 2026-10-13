@@ -217,18 +217,23 @@ class GrainField:
         self.n_particles = p.shape[1]
         return self.n_particles
 
-    def consts(self, as_base: int, inst_base: int, tiles_per_row: int, stride: float) -> np.ndarray:
-        c = np.zeros(16, np.uint32)
+    def consts(self, as_base: int, inst_base: int, tiles_per_row: int, stride: float, grid=None) -> np.ndarray:
+        c = np.zeros(36, np.uint32)       # GrainConsts: 16 words, then the EnvGrid (env_grid.h)
+        if grid is not None:
+            c[16:36] = grid.words()
         c[:8] = (self.n_envs, self.n_particles, self.k, self.n_meshes, as_base, tiles_per_row, self.seed, inst_base)
         cf = c.view(np.float32)
         cf[8:13] = (stride, self.radius, self.radius_jitter, self.offset, self.cull_z)
         c[13] = 1 if self.has_ids else 0
         return c
 
-    def encode_instances(self, cb, inst_desc, as_base: int, inst_base: int, tiles_per_row: int, stride: float):
+    def encode_instances(self, cb, inst_desc, as_base: int, inst_base: int, tiles_per_row: int, stride: float, grid=None):
         if self.n_grains == 0:
             return
-        k = self.consts(as_base, inst_base, tiles_per_row, stride)
+        if grid is None:     # the previous 2D grid from the origin (no clipping)
+            from metalsim.sensors.env_grid import EnvGrid
+            grid = EnvGrid(self.n_envs, "legacy", stride=stride, tpr=tiles_per_row)
+        k = self.consts(as_base, inst_base, tiles_per_row, stride, grid)
         if self.keys.length() < 4 * self.n_grains:
             self.keys = self.ctx.buffer(4 * self.n_grains, label="grain_keys")
         ce = cb.computeCommandEncoder()
@@ -284,7 +289,7 @@ class InstanceStructure:
         self.ensure()
         rt = self.rt
         rt._encode_refit(cb, geom_xpos, gx_off, geom_xmat, gm_off, inst_desc=self.inst_desc)
-        self.field.encode_instances(cb, self.inst_desc, len(rt.prim_as), rt.n_inst, rt.tpr, rt.stride)
+        self.field.encode_instances(cb, self.inst_desc, len(rt.prim_as), rt.n_inst, rt.tpr, rt.stride, rt.grid)
         ae = cb.accelerationStructureCommandEncoder()
         ae.buildAccelerationStructure_descriptor_scratchBuffer_scratchBufferOffset_(self.inst_as, self.desc, self.scratch, 0)
         ae.endEncoding()

@@ -3,8 +3,9 @@
 // placed at the env's grid offset) for the hardware structure. Topology (shared by every env) is built once on the host.
 #include <metal_stdlib>
 using namespace metal;
+#include "env_grid.h"
 
-struct RefitArgs { uint n_envs, n_nodes, D, mesh_base; uint level_off, level_count, tpr; float stride; uint n_tris, _p0, _p1, _p2; };
+struct RefitArgs { uint n_envs, n_nodes, D, mesh_base; uint level_off, level_count, n_tris, _p0; EnvGrid grid; };
 
 // one thread per (node of this level, env)
 kernel void dyn_bvh_refit(
@@ -53,12 +54,15 @@ kernel void dyn_bvh_boxes(
     device const float4* bounds [[buffer(0)]],
     device float*        boxes  [[buffer(1)]],
     constant RefitArgs&  a      [[buffer(2)]],
+    device atomic_uint*  grid_flag [[buffer(3)]],     // set when an env's dynamic objects near its cell boundary
     uint e [[thread_position_in_grid]])
 {
     if (e >= a.n_envs) return;
-    float3 off = float3(float(e % a.tpr) * a.stride, float(e / a.tpr) * a.stride, 0.0);
+    if (env_grid_left(bounds[(ulong)e * a.n_nodes * 2].xyz, a.grid) || env_grid_left(bounds[(ulong)e * a.n_nodes * 2 + 1].xyz, a.grid))
+        atomic_store_explicit(grid_flag, 1u, memory_order_relaxed);
+    float3 off = grid_offset(e, a.grid);
     float3 lo = bounds[(ulong)e * a.n_nodes * 2].xyz + off, hi = bounds[(ulong)e * a.n_nodes * 2 + 1].xyz + off;
-    float pad = 2.5e-7 * max(fabs(off.x), fabs(off.y)) + 1e-4;     // rounding of the offset sum, conservatively
+    float pad = 2.5e-7 * max(max(fabs(off.x), fabs(off.y)), fabs(off.z)) + 1e-4;   // rounding of the offset sum
     lo -= pad; hi += pad;
     boxes[e * 6] = lo.x; boxes[e * 6 + 1] = lo.y; boxes[e * 6 + 2] = lo.z;
     boxes[e * 6 + 3] = hi.x; boxes[e * 6 + 4] = hi.y; boxes[e * 6 + 5] = hi.z;

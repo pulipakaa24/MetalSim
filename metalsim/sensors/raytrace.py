@@ -54,6 +54,7 @@ class RayTracer:
                  appearance: str = "mujoco", visual=None, deformables=(), tube_slices=None, cap_stacks=None,
                  tube_view=None, tube_resolution=None,
                  dyn_rebuild_every: int = 32, dyn_layout: str | None = None,
+                 env_layout: str | None = None, env_margin: float | None = None,
                  ctx: MetalContext | None = None,
                  device="metal:0"):
         """``terrain_slots`` / ``draw_hfields`` / ``appearance``: see ``Tier0Renderer`` (False / "legacy" = the
@@ -72,6 +73,10 @@ class RayTracer:
         entering it traverse the env's BVH over its triangles in software (``dyn_bvh.DynBVH``), refit on the GPU every
         frame: one hardware structure at any env count, faster for depth cameras / lidars and the path tracer on thin
         tubes, slower for the tier-1 fragment-stage shadow rays (``Tier0Renderer`` uses "per_env").
+
+        ``env_layout`` (default "compact", or ``METALSIM_ENV_LAYOUT``): where the envs sit in the shared world
+        (``env_grid.EnvGrid``): "compact", cells the size of the env's content plus ``env_margin``, rays ending at
+        their cell, offsets ~100 m at 4096 envs; "legacy", the previous kilometre-scale 2D grid.
 
         Tube tessellation (tendons, cable edges; rendering only): MuJoCo's by default. ``tube_view`` = (viewpoints (K, 3),
         angular resolution in rad) adapts it per tube to its projected size (``dynamic_mesh.tube_tessellation``; the
@@ -106,6 +111,17 @@ class RayTracer:
         extent = float(model.stat.extent)
         self.max_range = max_range
         self.stride = 2.0 * (extent + max_range) + 1.0
+        import os
+        from metalsim.sensors.env_grid import EnvGrid, content_box
+        self.env_layout = env_layout or os.environ.get("METALSIM_ENV_LAYOUT") or "compact"
+        if self.env_layout == "legacy":
+            self.grid = EnvGrid(n_envs, "legacy", stride=self.stride, tpr=self.tpr)
+        else:
+            lo, hi = content_box(model, t)
+            r = np.maximum(np.abs(lo[:2]), np.abs(hi[:2]))      # symmetric about the env origin in x and y: scenes
+            lo[:2], hi[:2] = -r, r                              # often move things across it (resets, arenas)
+            self.grid = EnvGrid(n_envs, self.env_layout, lo=lo, hi=hi, margin=env_margin)
+        self._grid_listeners = []           # buffers holding the grid, rewritten when it grows (_grow_grid)
         c = self.ctx
         # non-geom objects (metalsim.render.extras): sites are instanced slots posed from extra pose rows; each dynamic
         # object (flex, skin, tendon, user mesh) has its records after the static vertices, its every-env triangles
@@ -188,8 +204,9 @@ class RayTracer:
         self.n_inst_static = len(t.inst_table)     # instances refit from the pose rows (geoms, then sites)
         self.n_inst = len(inst_tab)                # + one identity instance per dynamic object (the scene's instances)
         self.inst_desc = c.buffer(64 * self.n_inst, label="rt_instance_descriptors")
-        self.consts = np.zeros(12, np.uint32)
+        self.consts = np.zeros(32, np.uint32)      # RTConsts: 12 words, then the EnvGrid (20)
         self.consts[:4] = (self.n, t.pose_rows(model), n_inst_slots, self.tpr)
+        self.consts[12:32] = self.grid.words()
         if t.site_ids:
             from metalsim.render.dynamic_mesh import PoseGather
             self.pose = PoseGather(self.ctx, model, t, n_envs)
@@ -197,6 +214,8 @@ class RayTracer:
         self.consts_f[4] = self.stride; self.consts_f[5] = max_range
         self.consts[7] = max(model.nsite, 1)
         self.consts_buf = c.buffer(self.consts.nbytes, self.consts, "rt_consts")
+        self.grid_flag = c.buffer(16, np.zeros(4, np.uint32), "rt_grid_flag")
+        self.grid_growths = 0
         lib = c.library("rt", {"DYN_SBVH": 1} if self.dyn is not None and self.dyn_layout == "sbvh" else None)
         self.p_refit = c.compute_pipeline(lib, "refit_instances")
         self.p_lidar = c.compute_pipeline(lib, "lidar")
@@ -378,9 +397,8 @@ class RayTracer:
             desc = np.zeros((self.n_inst - self.n_inst_static, 16), np.uint32)
             f = desc.view(np.float32)
             f[:, 0] = f[:, 4] = f[:, 8] = 1.0                 # rotation columns (1,0,0), (0,1,0), (0,0,1)
-            cell = np.asarray(self.dyn_group_cell, np.float64).reshape(-1, 2)
-            f[:, 9] = cell[:, 0] * self.stride                # translation: the group's grid cell (rt.metal env_offset)
-            f[:, 10] = cell[:, 1] * self.stride
+            if self.dyn_layout == "per_env":                  # translation: the env's grid offset (env_grid.h)
+                f[:, 9:12] = self.grid.offsets([g[0] for g in self.dyn_groups])
             desc[:, 12] = 0 if self.dyn_layout == "sbvh" else 4   # opaque triangles; the sbvh box is a custom primitive
             desc[:, 13] = 0xFFFFFFFF
             first = [int(self.dyn_mesh_index[g[0], 0]) for g in self.dyn_groups]
@@ -422,6 +440,7 @@ class RayTracer:
         the particle renderer passes a larger buffer whose tail holds grain instances, metalsim/render/particles.py).
         The scene instances are the ``n_inst_static`` rigid ones (geoms, sites) refit here, then one identity instance
         per dynamic object (``n_inst`` in all), whose vertices are regenerated and structures refit first."""
+        self._check_grid()
         if self.dyn is not None:
             if self._dyn_src is None:
                 raise ValueError("dynamic objects need their sources (set_sources; render / trace call it)")
@@ -440,8 +459,39 @@ class RayTracer:
         ce.setBuffer_offset_atIndex_(geom_xpos, gx_off, 4)
         ce.setBuffer_offset_atIndex_(geom_xmat, gm_off, 5)
         ce.setBuffer_offset_atIndex_(self.consts_buf, 0, 6)
+        ce.setBuffer_offset_atIndex_(self.grid_flag, 0, 7)
         ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n_inst_static, 1, 1), Metal.MTLSize(64, 1, 1))
         ce.endEncoding()
+
+    def _check_grid(self):
+        """Compact env grid: a frame flagged geometry near its env's cell boundary (refit_instances / dyn_bvh_boxes,
+        read without waiting): wait for the frames in flight, double the cell and rewrite every buffer holding it, so
+        nothing moves out of its cell unseen. Each frame is traced with one grid."""
+        if self.grid.clip == 0:
+            return
+        f = self.ctx.buffer_array(self.grid_flag, np.uint32, (4,))
+        if not f[0]:
+            return
+        import warnings
+        self.ctx.synchronize()
+        old = self.grid
+        self.grid = old.grown()
+        self.grid_growths += 1
+        warnings.warn(f"ray tracer env grid: geometry neared its env's cell boundary; cell {np.round(old.S, 2).tolist()} m -> "
+                      f"{np.round(self.grid.S, 2).tolist()} m (largest offset {self.grid.max_offset():.0f} m); "
+                      "set RayTracer(env_margin=...) to size it up front")
+        self.consts[12:32] = self.grid.words()
+        self.ctx.write_buffer(self.consts_buf, self.consts)
+        if self.dyn is not None and self.dyn_layout == "per_env":
+            desc = np.zeros((self.n_inst - self.n_inst_static, 16), np.uint32)
+            c = self.ctx
+            cur = np.frombuffer(self.inst_desc.contents().as_buffer(64 * self.n_inst), np.uint32).reshape(-1, 16)
+            desc[:] = cur[self.n_inst_static:]
+            desc.view(np.float32)[:, 9:12] = self.grid.offsets([g[0] for g in self.dyn_groups])
+            c.write_buffer(self.inst_desc, desc, offset=64 * self.n_inst_static)
+        for fn in self._grid_listeners:
+            fn()
+        self.ctx.write_buffer(self.grid_flag, np.zeros(4, np.uint32))
 
     def _use_resources(self, ce):
         ce.useResource_usage_(self.inst_as, Metal.MTLResourceUsageRead)
@@ -610,6 +660,11 @@ class Lidar:
         self.consts = rt.consts.copy()
         self.consts[6] = self.n_beams; self.consts[8] = self.site
         self.consts_buf = rt.ctx.buffer(self.consts.nbytes, self.consts, "lidar_consts")
+
+        def regrid():
+            self.consts[12:32] = rt.consts[12:32]
+            rt.ctx.write_buffer(self.consts_buf, self.consts)
+        rt._grid_listeners.append(regrid)
         hits_per_ray = int(hits_per_ray or max_returns)
         self.extended = (spot_rays != 1 or max_returns != 1 or hits_per_ray != 1 or reflectance is not None
                          or tuple(divergence_deg) != (0.0, 0.0))

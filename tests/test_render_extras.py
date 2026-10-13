@@ -744,3 +744,77 @@ def test_dynamic_layout_defaults(monkeypatch):
     t1 = Tier0Renderer(m, 4, width=16, height=16, camera="cam", tier=1)
     assert t1.rt.dyn_layout == "per_env" and len(t1.rt.dyn_as) == 4
     assert Tier0Renderer(m, 4, width=16, height=16, camera="cam", tier=1, dyn_layout="sbvh").rt.dyn_layout == "sbvh"
+
+
+def test_env_grid_layouts():
+    """Legacy: the previous 2D grid offsets exactly; compact: centred, cells holding the content box plus margin,
+    enough cells for every env, offsets far below the legacy kilometres."""
+    from metalsim.sensors.env_grid import EnvGrid
+    n, tpr, stride = 37, 7, 2001.0
+    g = EnvGrid(n, "legacy", stride=stride, tpr=tpr)
+    e = np.arange(n)
+    old = np.stack([(e % tpr) * stride, (e // tpr) * stride, np.zeros(n)], -1)
+    assert np.array_equal(g.offsets(e), old) and g.clip == 0
+    lo, hi = np.array([-5.0, -5.0, -0.1]), np.array([5.0, 5.0, 1.5])
+    for n in (1, 7, 64, 1000, 4096):
+        c = EnvGrid(n, "compact", lo=lo, hi=hi)
+        assert c.nx * c.ny * c.nz >= n and c.clip == 1
+        assert np.all(c.lo <= lo) and np.all(c.hi >= hi) and np.all(c.S >= hi - lo)
+        off = c.offsets(np.arange(n))
+        assert len(np.unique(np.round(off, 3), axis=0)) == n                 # one cell per env
+        assert np.abs(off).max() <= 0.5 * max(c.nx * c.S[0], c.ny * c.S[1], c.nz * c.S[2]) + 1e-6
+    assert EnvGrid(4096, "compact", lo=lo, hi=hi).max_offset() < 300.0
+
+
+@needs_metal
+@pytest.mark.parametrize("which", ["raydepth", "tier2"])
+def test_envs_render_alike(which, monkeypatch):
+    """The same state in 16 envs renders the same in each (compact env grid: offsets of metres, not kilometres): hits
+    identical, depth within 0.01 mm of env 0's at 97 % or more of the hit pixels and within 0.03 mm at all (the rest:
+    grazing hits at tendon silhouettes, which amplify the ray origin's float rounding; measured at most 0.014 mm; the
+    legacy kilometre grid gave up to 4 mm in tier 2)."""
+    monkeypatch.setenv("METALSIM_ENV_LAYOUT", "compact")
+    for xml, nstep in ((WRAP, 0), (DRAPE, 40)):
+        m, d = _forward(xml, nstep=nstep)
+        r, o = _render(m, [d] * 16, which)
+        dep = o["depth"]
+        for e in range(1, 16):
+            assert np.array_equal(dep[e] > 0, dep[0] > 0)
+            both = dep[0] > 0
+            dd = np.abs(dep[e][both] - dep[0][both])
+            assert (dd > 1e-5).mean() <= 0.03 and dd.max() < 3e-5, (e, (dd > 1e-5).mean(), dd.max())
+
+
+@needs_metal
+def test_env_grid_grows_when_geometry_leaves_its_cell(monkeypatch):
+    """Compact env grid sized at the initial state; a box later moved 40 m away is flagged on the GPU, the cell grows
+    (a warning says so), and the lidar then sees the box where the legacy grid does."""
+    xml = """<mujoco><worldbody>
+      <site name="s" pos="0 0 0.5"/>
+      <body name="b" pos="1 0 0.5"><freejoint/><geom type="box" size="0.25 0.25 0.25"/></body>
+    </worldbody></mujoco>"""
+    m = mujoco.MjModel.from_xml_string(xml)
+    d = mujoco.MjData(m)
+    mujoco.mj_forward(m, d)
+    d.qpos[0] = 40.0
+    mujoco.mj_forward(m, d)
+    az = np.zeros(1, np.float32)
+    ref = {}
+    for lay in ("legacy", "compact"):
+        monkeypatch.setenv("METALSIM_ENV_LAYOUT", lay)
+        rt = RayTracer(m, 4, max_range=100.0)
+        lid = rt.make_lidar("s", az, az)
+        with pytest.warns(UserWarning, match="env grid") if lay == "compact" else _nullcontext():
+            for _ in range(12):
+                rng = rt.trace_host([d] * 4, [lid])[lid.name]["range"]
+                if np.allclose(rng, 39.75, atol=1e-3):
+                    break
+        ref[lay] = rng
+        if lay == "compact":
+            assert rt.grid_growths >= 1
+    assert np.allclose(ref["legacy"], 39.75, atol=1e-3) and np.allclose(ref["compact"], ref["legacy"], atol=1e-4)
+
+
+def _nullcontext():
+    import contextlib
+    return contextlib.nullcontext()
