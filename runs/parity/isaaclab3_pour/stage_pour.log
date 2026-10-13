@@ -1,8 +1,8 @@
 + STAGES=smoke
 + ITERS=3
-+ P=/home/aditya_nianticspatial_com/parity3_scripts/franka_pour_published_asset.patch
-+ git apply --check /home/aditya_nianticspatial_com/parity3_scripts/franka_pour_published_asset.patch
-+ git apply /home/aditya_nianticspatial_com/parity3_scripts/franka_pour_published_asset.patch
++ P=/home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ git apply --check /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ git apply /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
 + trap 'git apply -R $P' EXIT
 + nvidia-smi --query-gpu=name,driver_version --format=csv
 name, driver_version
@@ -17,13 +17,13 @@ NVIDIA L4, 580.178.04
 ++ date +%s
 + echo 'smoke exit 0 in 58 s'
 smoke exit 0 in 58 s
-+ touch /home/aditya_nianticspatial_com/parity3/pour/STAGE_POUR_DONE
-+ git apply -R /home/aditya_nianticspatial_com/parity3_scripts/franka_pour_published_asset.patch
++ touch /home/<vm-user>/parity3/pour/STAGE_POUR_DONE
++ git apply -R /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
 + STAGES='bench train'
 + ITERS=5
-+ P=/home/aditya_nianticspatial_com/parity3_scripts/franka_pour_published_asset.patch
-+ git apply --check /home/aditya_nianticspatial_com/parity3_scripts/franka_pour_published_asset.patch
-+ git apply /home/aditya_nianticspatial_com/parity3_scripts/franka_pour_published_asset.patch
++ P=/home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ git apply --check /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ git apply /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
 + trap 'git apply -R $P' EXIT
 + nvidia-smi --query-gpu=name,driver_version --format=csv
 name, driver_version
@@ -34,7 +34,7 @@ NVIDIA L4, 580.178.04
 ++ date +%s
 + t0=1791790037
 + case $S in
-+ timeout 5400 isaaclab benchmark runtime --task IsaacContrib-Franka-Pour --num_envs 2048 --num_steps 20 --warmup_steps 3 --seed 0 --visualizer none --benchmark_formatter json,summary --output_path /home/aditya_nianticspatial_com/parity3/pour/bench_2048
++ timeout 5400 isaaclab benchmark runtime --task IsaacContrib-Franka-Pour --num_envs 2048 --num_steps 20 --warmup_steps 3 --seed 0 --visualizer none --benchmark_formatter json,summary --output_path /home/<vm-user>/parity3/pour/bench_2048
 ++ date +%s
 + echo 'bench exit 1 in 4 s'
 bench exit 1 in 4 s
@@ -48,16 +48,16 @@ bench exit 1 in 4 s
 ++ date +%s
 + echo 'train exit 1 in 96 s'
 train exit 1 in 96 s
-+ touch /home/aditya_nianticspatial_com/parity3/pour/STAGE_POUR_DONE
-+ git apply -R /home/aditya_nianticspatial_com/parity3_scripts/franka_pour_published_asset.patch
++ touch /home/<vm-user>/parity3/pour/STAGE_POUR_DONE
++ git apply -R /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
 + STAGES=train
 + ITERS=3
 + NUM=1024
 + EXTRA=
 + TAG=
-+ P=/home/aditya_nianticspatial_com/parity3_scripts/franka_pour_published_asset.patch
-+ git apply --check /home/aditya_nianticspatial_com/parity3_scripts/franka_pour_published_asset.patch
-+ git apply /home/aditya_nianticspatial_com/parity3_scripts/franka_pour_published_asset.patch
++ P=/home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ git apply --check /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ git apply /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
 + trap 'git apply -R $P' EXIT
 + nvidia-smi --query-gpu=name,driver_version --format=csv
 name, driver_version
@@ -72,16 +72,16 @@ NVIDIA L4, 580.178.04
 ++ date +%s
 + echo 'train exit 0 in 988 s'
 train exit 0 in 988 s
-+ touch /home/aditya_nianticspatial_com/parity3/pour/STAGE_POUR_DONE
-+ git apply -R /home/aditya_nianticspatial_com/parity3_scripts/franka_pour_published_asset.patch
++ touch /home/<vm-user>/parity3/pour/STAGE_POUR_DONE
++ git apply -R /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
 + STAGES=train
 + ITERS=2
 + NUM=2048
 + EXTRA=env.sim.physics.use_cuda_graph=false
 + TAG=_eager
-+ P=/home/aditya_nianticspatial_com/parity3_scripts/franka_pour_published_asset.patch
-+ git apply --check /home/aditya_nianticspatial_com/parity3_scripts/franka_pour_published_asset.patch
-+ git apply /home/aditya_nianticspatial_com/parity3_scripts/franka_pour_published_asset.patch
++ P=/home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ git apply --check /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ git apply /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
 + trap 'git apply -R $P' EXIT
 + nvidia-smi --query-gpu=name,driver_version --format=csv
 name, driver_version
@@ -96,16 +96,16 @@ NVIDIA L4, 580.178.04
 ++ date +%s
 + echo 'train exit 1 in 93 s'
 train exit 1 in 93 s
-+ touch /home/aditya_nianticspatial_com/parity3/pour/STAGE_POUR_DONE
-+ git apply -R /home/aditya_nianticspatial_com/parity3_scripts/franka_pour_published_asset.patch
++ touch /home/<vm-user>/parity3/pour/STAGE_POUR_DONE
++ git apply -R /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
 + STAGES=train
 + ITERS=60
 + NUM=1024
 + EXTRA=
 + TAG=_curve
-+ P=/home/aditya_nianticspatial_com/parity3_scripts/franka_pour_published_asset.patch
-+ git apply --check /home/aditya_nianticspatial_com/parity3_scripts/franka_pour_published_asset.patch
-+ git apply /home/aditya_nianticspatial_com/parity3_scripts/franka_pour_published_asset.patch
++ P=/home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ git apply --check /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ git apply /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
 + trap 'git apply -R $P' EXIT
 + nvidia-smi --query-gpu=name,driver_version --format=csv
 name, driver_version
@@ -120,5 +120,5 @@ NVIDIA L4, 580.178.04
 ++ date +%s
 + echo 'train exit 0 in 18873 s'
 train exit 0 in 18873 s
-+ touch /home/aditya_nianticspatial_com/parity3/pour/STAGE_POUR_DONE
-+ git apply -R /home/aditya_nianticspatial_com/parity3_scripts/franka_pour_published_asset.patch
++ touch /home/<vm-user>/parity3/pour/STAGE_POUR_DONE
++ git apply -R /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch

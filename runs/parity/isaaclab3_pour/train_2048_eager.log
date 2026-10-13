@@ -13,7 +13,7 @@
 ╰────────────────────────────────────────────────╯
 
 [1/3] Launching simulation
-[INFO] Logging experiment in directory: /home/aditya_nianticspatial_com/IsaacLab3/logs/rsl_rl/franka_pour
+[INFO] Logging experiment in directory: /home/<vm-user>/IsaacLab3/logs/rsl_rl/franka_pour
 Exact experiment name requested from command line: 2026-10-12_08-14-58
 [2/3] Creating environment
 I: Initializing Version 2.72.3-release.7151+gl.5390bed9
@@ -22,9 +22,9 @@ I: Not using Hub: Hub not found
 I: Successfully created S3 provider for https://omniverse-content-production.s3-us-west-2.amazonaws.com
 I: Using CloudFront http://dcb18d6mfegct.cloudfront.net/, List = No
 Serving remote assets from the local cache under '/tmp'. Each copy is checked against the server before use; delete the directory to force a full re-download.
-/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_newton/isaaclab_newton/cloner/replicate.py:141: FutureWarning: Newton shape color replacement is enabled; this workaround will be deprecated in a future release.
+/home/<vm-user>/IsaacLab3/source/isaaclab_newton/isaaclab_newton/cloner/replicate.py:141: FutureWarning: Newton shape color replacement is enabled; this workaround will be deprecated in a future release.
   replace_newton_builder_shape_colors(builder, stage)
-/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_newton/isaaclab_newton/cloner/newton_clone_utils.py:158: FutureWarning: Newton shape color replacement is enabled; this workaround will be deprecated in a future release.
+/home/<vm-user>/IsaacLab3/source/isaaclab_newton/isaaclab_newton/cloner/newton_clone_utils.py:158: FutureWarning: Newton shape color replacement is enabled; this workaround will be deprecated in a future release.
   replace_newton_builder_shape_colors(builder, stage)
 Failed to get root com velocity. If the articulation is fixed, this is expected. Setting root com velocity to zeros.
 [INFO]: Base environment:
@@ -171,72 +171,72 @@ Warp CUDA error 1: invalid argument (in function rebuild_populate_grid_from_scra
 Warp CUDA error 1: invalid argument (in function rebuild_populate_grid_from_scratch, /builds/omniverse/warp/warp/native/volume_builder.cu:963)
 Warp CUDA error 2: out of memory (in function wp_alloc_device_async, /builds/omniverse/warp/warp/native/warp.cu:817)
 Traceback (most recent call last):
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab/isaaclab/app/sim_launcher.py", line 582, in launch_simulation
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/app/sim_launcher.py", line 582, in launch_simulation
     yield physics_cfg
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/backends/train_rsl_rl.py", line 236, in _run
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/backends/train_rsl_rl.py", line 236, in _run
     runner.learn(
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/rsl_rl/runners/on_policy_runner.py", line 87, in learn
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/rsl_rl/runners/on_policy_runner.py", line 87, in learn
     obs, rewards, dones, extras = self.env.step(actions.to(self.env.device))
                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_rl/isaaclab_rl/rsl_rl/vecenv_wrapper.py", line 181, in step
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_rl/isaaclab_rl/rsl_rl/vecenv_wrapper.py", line 181, in step
     obs_dict, rew, terminated, truncated, extras = self.env.step(actions)
                                                    ^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/gymnasium/wrappers/common.py", line 392, in step
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/gymnasium/wrappers/common.py", line 392, in step
     return super().step(action)
            ^^^^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/gymnasium/core.py", line 327, in step
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/gymnasium/core.py", line 327, in step
     return self.env.step(action)
            ^^^^^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab/isaaclab/envs/manager_based_rl_env.py", line 236, in step
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/envs/manager_based_rl_env.py", line 236, in step
     self.sim.step(render=False)
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab/isaaclab/sim/simulation_context.py", line 793, in step
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/sim/simulation_context.py", line 793, in step
     self.physics_manager.step()
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py", line 1073, in step
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py", line 1073, in step
     cls._simulate_physics_only()
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_newton/isaaclab_newton/physics/vbd_manager.py", line 95, in _simulate_physics_only
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_newton/isaaclab_newton/physics/vbd_manager.py", line 95, in _simulate_physics_only
     super()._simulate_physics_only()
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py", line 2636, in _simulate_physics_only
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py", line 2636, in _simulate_physics_only
     cls._run_solver_substeps(contacts)
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py", line 2570, in _run_solver_substeps
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py", line 2570, in _run_solver_substeps
     cls._step_solver(cls._state_0, cls._state_1, cls._control, contacts, cls._solver_dt)
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py", line 2240, in _step_solver
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py", line 2240, in _step_solver
     cls._solver.step(state_0, state_1, control, contacts, substep_dt)
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/coupled/solver_coupled.py", line 2223, in step
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/coupled/solver_coupled.py", line 2223, in step
     self._step_coupled(state_in, state_out, control, contacts, dt)
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/coupled/solver_coupled_proxy.py", line 1335, in _step_coupled
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/coupled/solver_coupled_proxy.py", line 1335, in _step_coupled
     self._step_proxy(state_in, control, contacts, dt, iteration_restart=k > 0)
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/coupled/solver_coupled_proxy.py", line 1526, in _step_proxy
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/coupled/solver_coupled_proxy.py", line 1526, in _step_proxy
     dst_contacts_used = self._step_entry(
                         ^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/coupled/solver_coupled.py", line 2685, in _step_entry
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/coupled/solver_coupled.py", line 2685, in _step_entry
     entry.solver.step(entry.state_0, entry.state_0, control, contacts, substep_dt)
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py", line 1665, in step
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py", line 1665, in step
     scratch = self._rebuild_scratchpad(pic)
               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py", line 2292, in _rebuild_scratchpad
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py", line 2292, in _rebuild_scratchpad
     scratch.rebuild_function_spaces(
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py", line 341, in rebuild_function_spaces
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py", line 341, in rebuild_function_spaces
     self._create_collider_function_space(temporary_store, max_cell_count, environment_first)
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py", line 404, in _create_collider_function_space
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py", line 404, in _create_collider_function_space
     collision_space_restriction = fem.make_space_restriction(
                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/space/__init__.py", line 75, in make_space_restriction
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/space/__init__.py", line 75, in make_space_restriction
     return SpaceRestriction(
            ^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/space/restriction.py", line 60, in __init__
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/space/restriction.py", line 60, in __init__
     self.rebuild(device=device, temporary_store=temporary_store)
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/space/restriction.py", line 93, in rebuild
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/space/restriction.py", line 93, in rebuild
     element_node_indices = cache.borrow_temporary(
                            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/cache.py", line 675, in borrow_temporary
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/cache.py", line 675, in borrow_temporary
     return temporary_store.borrow(shape=shape, dtype=dtype, device=device, pinned=pinned, requires_grad=requires_grad)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/cache.py", line 580, in borrow
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/cache.py", line 580, in borrow
     pool.borrow(dtype=dtype, shape=shape, requires_grad=requires_grad)
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/cache.py", line 508, in borrow
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/cache.py", line 508, in borrow
     ptr = allocator.allocate(capacity)
           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/warp/_src/context.py", line 4463, in allocate
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/context.py", line 4463, in allocate
     raise RuntimeError(f"Failed to allocate {size_in_bytes} bytes on device '{self.device}'")
 RuntimeError: Failed to allocate 226492416 bytes on device 'cuda:0'
 --------------------------------------------------------------------------------
@@ -274,91 +274,91 @@ Critic Model: MLPModel(
     (8): Linear(in_features=64, out_features=1, bias=True)
   )
 )
-Could not find git repository in /home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/rsl_rl/__init__.py. Skipping.
-Storing git diff for 'IsaacLab3' in: /home/aditya_nianticspatial_com/IsaacLab3/logs/rsl_rl/franka_pour/2026-10-12_08-14-58_l4_2048_eager/git/IsaacLab3.diff
+Could not find git repository in /home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/rsl_rl/__init__.py. Skipping.
+Storing git diff for 'IsaacLab3' in: /home/<vm-user>/IsaacLab3/logs/rsl_rl/franka_pour/2026-10-12_08-14-58_l4_2048_eager/git/IsaacLab3.diff
 Traceback (most recent call last):
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/bin/isaaclab", line 10, in <module>
+  File "/home/<vm-user>/env_isaaclab3/bin/isaaclab", line 10, in <module>
     sys.exit(cli())
              ^^^^^
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab/isaaclab/cli/__init__.py", line 161, in cli
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/cli/__init__.py", line 161, in cli
     subcommands[sys.argv[1]](sys.argv[2:])
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab/isaaclab/cli/__init__.py", line 53, in train
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/cli/__init__.py", line 53, in train
     _exit_on_error(run_train_cli(args))
                    ^^^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/dispatch.py", line 47, in run_train_cli
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/dispatch.py", line 47, in run_train_cli
     return run_cli("train", argv)
            ^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/dispatch.py", line 136, in run_cli
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/dispatch.py", line 136, in run_cli
     status = _run_backend(backends[selected.rl_library], backend_argv, run_as_script=action == "play")
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/dispatch.py", line 174, in _run_backend
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/dispatch.py", line 174, in _run_backend
     return runner(argv)
            ^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/backends/train_rsl_rl.py", line 117, in run
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/backends/train_rsl_rl.py", line 117, in run
     _run(args_cli)
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/backends/train_rsl_rl.py", line 236, in _run
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/backends/train_rsl_rl.py", line 236, in _run
     runner.learn(
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/rsl_rl/runners/on_policy_runner.py", line 87, in learn
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/rsl_rl/runners/on_policy_runner.py", line 87, in learn
     obs, rewards, dones, extras = self.env.step(actions.to(self.env.device))
                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_rl/isaaclab_rl/rsl_rl/vecenv_wrapper.py", line 181, in step
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_rl/isaaclab_rl/rsl_rl/vecenv_wrapper.py", line 181, in step
     obs_dict, rew, terminated, truncated, extras = self.env.step(actions)
                                                    ^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/gymnasium/wrappers/common.py", line 392, in step
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/gymnasium/wrappers/common.py", line 392, in step
     return super().step(action)
            ^^^^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/gymnasium/core.py", line 327, in step
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/gymnasium/core.py", line 327, in step
     return self.env.step(action)
            ^^^^^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab/isaaclab/envs/manager_based_rl_env.py", line 236, in step
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/envs/manager_based_rl_env.py", line 236, in step
     self.sim.step(render=False)
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab/isaaclab/sim/simulation_context.py", line 793, in step
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/sim/simulation_context.py", line 793, in step
     self.physics_manager.step()
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py", line 1073, in step
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py", line 1073, in step
     cls._simulate_physics_only()
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_newton/isaaclab_newton/physics/vbd_manager.py", line 95, in _simulate_physics_only
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_newton/isaaclab_newton/physics/vbd_manager.py", line 95, in _simulate_physics_only
     super()._simulate_physics_only()
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py", line 2636, in _simulate_physics_only
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py", line 2636, in _simulate_physics_only
     cls._run_solver_substeps(contacts)
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py", line 2570, in _run_solver_substeps
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py", line 2570, in _run_solver_substeps
     cls._step_solver(cls._state_0, cls._state_1, cls._control, contacts, cls._solver_dt)
-  File "/home/aditya_nianticspatial_com/IsaacLab3/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py", line 2240, in _step_solver
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_newton/isaaclab_newton/physics/newton_manager.py", line 2240, in _step_solver
     cls._solver.step(state_0, state_1, control, contacts, substep_dt)
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/coupled/solver_coupled.py", line 2223, in step
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/coupled/solver_coupled.py", line 2223, in step
     self._step_coupled(state_in, state_out, control, contacts, dt)
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/coupled/solver_coupled_proxy.py", line 1335, in _step_coupled
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/coupled/solver_coupled_proxy.py", line 1335, in _step_coupled
     self._step_proxy(state_in, control, contacts, dt, iteration_restart=k > 0)
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/coupled/solver_coupled_proxy.py", line 1526, in _step_proxy
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/coupled/solver_coupled_proxy.py", line 1526, in _step_proxy
     dst_contacts_used = self._step_entry(
                         ^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/coupled/solver_coupled.py", line 2685, in _step_entry
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/coupled/solver_coupled.py", line 2685, in _step_entry
     entry.solver.step(entry.state_0, entry.state_0, control, contacts, substep_dt)
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py", line 1665, in step
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py", line 1665, in step
     scratch = self._rebuild_scratchpad(pic)
               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py", line 2292, in _rebuild_scratchpad
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py", line 2292, in _rebuild_scratchpad
     scratch.rebuild_function_spaces(
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py", line 341, in rebuild_function_spaces
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py", line 341, in rebuild_function_spaces
     self._create_collider_function_space(temporary_store, max_cell_count, environment_first)
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py", line 404, in _create_collider_function_space
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py", line 404, in _create_collider_function_space
     collision_space_restriction = fem.make_space_restriction(
                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/space/__init__.py", line 75, in make_space_restriction
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/space/__init__.py", line 75, in make_space_restriction
     return SpaceRestriction(
            ^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/space/restriction.py", line 60, in __init__
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/space/restriction.py", line 60, in __init__
     self.rebuild(device=device, temporary_store=temporary_store)
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/space/restriction.py", line 93, in rebuild
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/space/restriction.py", line 93, in rebuild
     element_node_indices = cache.borrow_temporary(
                            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/cache.py", line 675, in borrow_temporary
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/cache.py", line 675, in borrow_temporary
     return temporary_store.borrow(shape=shape, dtype=dtype, device=device, pinned=pinned, requires_grad=requires_grad)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/cache.py", line 580, in borrow
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/cache.py", line 580, in borrow
     pool.borrow(dtype=dtype, shape=shape, requires_grad=requires_grad)
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/cache.py", line 508, in borrow
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/fem/cache.py", line 508, in borrow
     ptr = allocator.allocate(capacity)
           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/aditya_nianticspatial_com/env_isaaclab3/lib/python3.12/site-packages/warp/_src/context.py", line 4463, in allocate
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/warp/_src/context.py", line 4463, in allocate
     raise RuntimeError(f"Failed to allocate {size_in_bytes} bytes on device '{self.device}'")
 RuntimeError: Failed to allocate 226492416 bytes on device 'cuda:0'
