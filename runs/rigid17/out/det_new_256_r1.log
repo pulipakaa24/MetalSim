@@ -1,0 +1,41 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/kcache/kcB_n17_new/1.18.0.dev20260917
+Module newton._src.geometry.inertia 7667892 load on device 'metal:0' took 41.56 ms  (cached)
+Module validate_and_correct_inertia_kernel_8dbbe22e 8dbbe22 load on device 'metal:0' took 38.97 ms  (cached)
+Module newton._src.geometry.bvh 0b0956f load on device 'metal:0' took 41.61 ms  (cached)
+Module newton._src.sim.articulation d386b9d load on device 'metal:0' took 64.01 ms  (cached)
+Module newton._src.sim.collide f06a7a7 load on device 'metal:0' took 45.03 ms  (cached)
+Module newton._src.geometry.broad_phase_nxn 29ba165 load on device 'metal:0' took 41.24 ms  (cached)
+Module narrow_phase_primitive_write_contact_False_False_False 8d927a4 load on device 'metal:0' took 47.68 ms  (cached)
+Module narrow_phase_gjk_mpr_True_False_write_contact_support_map_lean_post_process_minkowski_only e36fb16 load on device 'metal:0' took 52.08 ms  (cached)
+Module newton._src.geometry.narrow_phase 6baca81 load on device 'metal:0' took 44.19 ms  (cached)
+Module newton._src.geometry.contact_reduction_global 302a01b load on device 'metal:0' took 45.13 ms  (cached)
+Module newton._src.geometry.narrow_phase 8156f80 load on device 'metal:0' took 44.27 ms  (cached)
+Module newton._src.geometry.sdf_contact dabd053 load on device 'metal:0' took 40.41 ms  (cached)
+Module narrow_phase_mesh_plane_write_contact_to_reducer_True d9da38d load on device 'metal:0' took 40.07 ms  (cached)
+Module mesh_triangle_contacts_to_reducer_kernel_521d447b da3c627 load on device 'metal:0' took 55.33 ms  (cached)
+Module newton._src.geometry.contact_reduction_global 7b26466 load on device 'metal:0' took 44.82 ms  (cached)
+Module sdf_contact_write_contact_to_reducer_False_True_False_True_False_False_True bde1888 load on device 'metal:0' took 1431.34 ms  (compiled)
+Module export_reduced_contacts_write_contact 48354a5 load on device 'metal:0' took 40.88 ms  (cached)
+Module newton._src.geometry.contact_sort e5c0903 load on device 'metal:0' took 538.95 ms  (compiled)
+{
+ "worlds": 256,
+ "det": true,
+ "newton": "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n17_new/newton/__init__.py",
+ "warp": "1.18.0.dev20260917",
+ "rigid_contact_max": 1756672,
+ "rigid_contacts": 16072,
+ "contact_sha": "4b299c49546f4368",
+ "collide_ms": {
+  "median": 9.390125000209082,
+  "mean": 9.488529300006121,
+  "min": 8.917541999835521,
+  "max": 10.266374999901018
+ },
+ "contact_sha_after": "4b299c49546f4368"
+}

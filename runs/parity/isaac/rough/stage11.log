@@ -1,14 +1,14 @@
 + WHO=isaac
 + LEVELS='3 6'
-+ export PATH=/home/aditya_nianticspatial_com/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin TERM=xterm OMNI_KIT_ACCEPT_EULA=YES
-+ PATH=/home/aditya_nianticspatial_com/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ export PATH=/home/<vm-user>/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin TERM=xterm OMNI_KIT_ACCEPT_EULA=YES
++ PATH=/home/<vm-user>/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 + TERM=xterm
 + OMNI_KIT_ACCEPT_EULA=YES
-+ source /home/aditya_nianticspatial_com/env_isaaclab/bin/activate
++ source /home/<vm-user>/env_isaaclab/bin/activate
 ++ '[' -z '' ']'
 ++ '[' -n x ']'
-++ SCRIPT_PATH=/home/aditya_nianticspatial_com/env_isaaclab/bin/activate
-++ '[' /home/aditya_nianticspatial_com/env_isaaclab/bin/activate = /home/aditya_nianticspatial_com/stage11.sh ']'
+++ SCRIPT_PATH=/home/<vm-user>/env_isaaclab/bin/activate
+++ '[' /home/<vm-user>/env_isaaclab/bin/activate = /home/<vm-user>/stage11.sh ']'
 ++ deactivate nondestructive
 ++ unset -f pydoc
 ++ '[' -z '' ']'
@@ -18,17 +18,17 @@
 ++ unset VIRTUAL_ENV
 ++ unset VIRTUAL_ENV_PROMPT
 ++ '[' '!' nondestructive = nondestructive ']'
-++ VIRTUAL_ENV=/home/aditya_nianticspatial_com/env_isaaclab
+++ VIRTUAL_ENV=/home/<vm-user>/env_isaaclab
 ++ '[' linux-gnu = cygwin ']'
 ++ '[' linux-gnu = msys ']'
 ++ export VIRTUAL_ENV
 ++ '[' -z '' ']'
 ++ unset SCRIPT_PATH
-++ _OLD_VIRTUAL_PATH=/home/aditya_nianticspatial_com/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
-++ PATH=/home/aditya_nianticspatial_com/env_isaaclab/bin:/home/aditya_nianticspatial_com/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ _OLD_VIRTUAL_PATH=/home/<vm-user>/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ PATH=/home/<vm-user>/env_isaaclab/bin:/home/<vm-user>/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 ++ export PATH
 ++ '[' x '!=' x ']'
-+++ basename /home/aditya_nianticspatial_com/env_isaaclab
++++ basename /home/<vm-user>/env_isaaclab
 ++ VIRTUAL_ENV_PROMPT=env_isaaclab
 ++ export VIRTUAL_ENV_PROMPT
 ++ '[' -z '' ']'
@@ -39,8 +39,8 @@
 ++ alias pydoc
 ++ true
 ++ hash -r
-+ cd /home/aditya_nianticspatial_com/IsaacLab
-+ rm -f /home/aditya_nianticspatial_com/STAGE11_DONE
++ cd /home/<vm-user>/IsaacLab
++ rm -f /home/<vm-user>/STAGE11_DONE
 ++ ls -d logs/rsl_rl/g1_rough/2026-09-25_09-54-11
 ++ tail -1
 + run=logs/rsl_rl/g1_rough/2026-09-25_09-54-11
@@ -49,10 +49,10 @@
 + for it in 500 1000 1499
 + f=logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_500.pt
 + '[' -f logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_500.pt ']'
-+ python /home/aditya_nianticspatial_com/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 3 --seed 0 --no_camera --ckpt logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_500.pt --out /home/aditya_nianticspatial_com/parity_out/play_rough/L3/isaac_it500
++ python /home/<vm-user>/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 3 --seed 0 --no_camera --ckpt logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_500.pt --out /home/<vm-user>/parity_out/play_rough/L3/isaac_it500
 cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or directory
 [INFO][AppLauncher]: Using device: cuda:0
-[INFO][AppLauncher]: Loading experience file: /home/aditya_nianticspatial_com/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO][AppLauncher]: Loading experience file: /home/<vm-user>/IsaacLab/apps/isaaclab.python.headless.kit
 [INFO]: Parsing configuration from: isaaclab_tasks.manager_based.locomotion.velocity.config.g1.rough_env_cfg:G1RoughEnvCfg
 
 [36m======================================================================================[0m
@@ -181,8 +181,8 @@ cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or di
 [INFO]: Completed setting up the environment...
 [play] rsl_rl policy from logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_500.pt
 [play] done: final root x [1.0422697 2.2798643 0.5107212 0.8309574] z [0.6584843 1.1730552 0.674475  0.6570678]
-Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
-[Info] [carb] Logging to file: /home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_110304.log
+Loading user config located at: '/home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_110304.log
 2026-09-25T11:03:04Z [150ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
 2026-09-25T11:03:04Z [617ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
 2026-09-25T11:03:05Z [915ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
@@ -210,15 +210,15 @@ Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/li
 + for it in 500 1000 1499
 + f=logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_1000.pt
 + '[' -f logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_1000.pt ']'
-+ python /home/aditya_nianticspatial_com/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 3 --seed 0 --no_camera --ckpt logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_1000.pt --out /home/aditya_nianticspatial_com/parity_out/play_rough/L3/isaac_it1000
-Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
-[Info] [carb] Logging to file: /home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_110335.log
++ python /home/<vm-user>/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 3 --seed 0 --no_camera --ckpt logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_1000.pt --out /home/<vm-user>/parity_out/play_rough/L3/isaac_it1000
+Loading user config located at: '/home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_110335.log
 2026-09-25T11:03:35Z [149ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
-2026-09-25T11:03:35Z [588ms] [Error] [omni.core.ITypeFactory] Circular dependency detected! Interface: omni::platforminfo::ICpuInfo requested. But plugin with an interface: /home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/kernel/plugins/libomni.platforminfo.plugin.so is already in resolving state.
+2026-09-25T11:03:35Z [588ms] [Error] [omni.core.ITypeFactory] Circular dependency detected! Interface: omni::platforminfo::ICpuInfo requested. But plugin with an interface: /home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/kernel/plugins/libomni.platforminfo.plugin.so is already in resolving state.
 2026-09-25T11:03:35Z [588ms] [Error] [carb] [Plugin: gpu.foundation.plugin] Dependency: [omni::platforminfo::ICpuInfo v1.0] failed to be resolved.
 cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or directory
 [INFO][AppLauncher]: Using device: cuda:0
-[INFO][AppLauncher]: Loading experience file: /home/aditya_nianticspatial_com/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO][AppLauncher]: Loading experience file: /home/<vm-user>/IsaacLab/apps/isaaclab.python.headless.kit
 [INFO]: Parsing configuration from: isaaclab_tasks.manager_based.locomotion.velocity.config.g1.rough_env_cfg:G1RoughEnvCfg
 
 [36m======================================================================================[0m
@@ -373,10 +373,10 @@ cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or di
 + for it in 500 1000 1499
 + f=logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_1499.pt
 + '[' -f logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_1499.pt ']'
-+ python /home/aditya_nianticspatial_com/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 3 --seed 0 --no_camera --ckpt logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_1499.pt --out /home/aditya_nianticspatial_com/parity_out/play_rough/L3/isaac_it1499
++ python /home/<vm-user>/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 3 --seed 0 --no_camera --ckpt logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_1499.pt --out /home/<vm-user>/parity_out/play_rough/L3/isaac_it1499
 cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or directory
 [INFO][AppLauncher]: Using device: cuda:0
-[INFO][AppLauncher]: Loading experience file: /home/aditya_nianticspatial_com/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO][AppLauncher]: Loading experience file: /home/<vm-user>/IsaacLab/apps/isaaclab.python.headless.kit
 [INFO]: Parsing configuration from: isaaclab_tasks.manager_based.locomotion.velocity.config.g1.rough_env_cfg:G1RoughEnvCfg
 
 [36m======================================================================================[0m
@@ -505,8 +505,8 @@ cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or di
 [INFO]: Completed setting up the environment...
 [play] rsl_rl policy from logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_1499.pt
 [play] done: final root x [3.537445  2.567956  2.8200283 2.0892982] z [-0.05582303  1.2847773   0.55503684  0.6295954 ]
-Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
-[Info] [carb] Logging to file: /home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_110405.log
+Loading user config located at: '/home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_110405.log
 2026-09-25T11:04:05Z [149ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
 2026-09-25T11:04:06Z [608ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
 2026-09-25T11:04:06Z [896ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
@@ -536,10 +536,10 @@ Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/li
 + for it in 500 1000 1499
 + f=logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_500.pt
 + '[' -f logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_500.pt ']'
-+ python /home/aditya_nianticspatial_com/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 6 --seed 0 --no_camera --ckpt logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_500.pt --out /home/aditya_nianticspatial_com/parity_out/play_rough/L6/isaac_it500
++ python /home/<vm-user>/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 6 --seed 0 --no_camera --ckpt logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_500.pt --out /home/<vm-user>/parity_out/play_rough/L6/isaac_it500
 cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or directory
 [INFO][AppLauncher]: Using device: cuda:0
-[INFO][AppLauncher]: Loading experience file: /home/aditya_nianticspatial_com/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO][AppLauncher]: Loading experience file: /home/<vm-user>/IsaacLab/apps/isaaclab.python.headless.kit
 [INFO]: Parsing configuration from: isaaclab_tasks.manager_based.locomotion.velocity.config.g1.rough_env_cfg:G1RoughEnvCfg
 
 [36m======================================================================================[0m
@@ -668,8 +668,8 @@ cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or di
 [INFO]: Completed setting up the environment...
 [play] rsl_rl policy from logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_500.pt
 [play] done: final root x [0.5596647  0.34592438 0.94253635 2.336237  ] z [0.6830684  0.6872245  0.65279603 0.67364734]
-Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
-[Info] [carb] Logging to file: /home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_110435.log
+Loading user config located at: '/home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_110435.log
 2026-09-25T11:04:36Z [149ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
 2026-09-25T11:04:36Z [615ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
 2026-09-25T11:04:36Z [908ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
@@ -697,10 +697,10 @@ Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/li
 + for it in 500 1000 1499
 + f=logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_1000.pt
 + '[' -f logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_1000.pt ']'
-+ python /home/aditya_nianticspatial_com/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 6 --seed 0 --no_camera --ckpt logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_1000.pt --out /home/aditya_nianticspatial_com/parity_out/play_rough/L6/isaac_it1000
++ python /home/<vm-user>/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 6 --seed 0 --no_camera --ckpt logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_1000.pt --out /home/<vm-user>/parity_out/play_rough/L6/isaac_it1000
 cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or directory
 [INFO][AppLauncher]: Using device: cuda:0
-[INFO][AppLauncher]: Loading experience file: /home/aditya_nianticspatial_com/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO][AppLauncher]: Loading experience file: /home/<vm-user>/IsaacLab/apps/isaaclab.python.headless.kit
 [INFO]: Parsing configuration from: isaaclab_tasks.manager_based.locomotion.velocity.config.g1.rough_env_cfg:G1RoughEnvCfg
 
 [36m======================================================================================[0m
@@ -829,8 +829,8 @@ cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or di
 [INFO]: Completed setting up the environment...
 [play] rsl_rl policy from logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_1000.pt
 [play] done: final root x [0.89457226 3.309102   2.0843258  1.6692705 ] z [0.65998805 1.8199844  0.5570813  0.6569742 ]
-Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
-[Info] [carb] Logging to file: /home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_110506.log
+Loading user config located at: '/home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_110506.log
 2026-09-25T11:05:06Z [149ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
 2026-09-25T11:05:06Z [614ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
 2026-09-25T11:05:07Z [921ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
@@ -858,10 +858,10 @@ Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/li
 + for it in 500 1000 1499
 + f=logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_1499.pt
 + '[' -f logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_1499.pt ']'
-+ python /home/aditya_nianticspatial_com/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 6 --seed 0 --no_camera --ckpt logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_1499.pt --out /home/aditya_nianticspatial_com/parity_out/play_rough/L6/isaac_it1499
++ python /home/<vm-user>/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 6 --seed 0 --no_camera --ckpt logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_1499.pt --out /home/<vm-user>/parity_out/play_rough/L6/isaac_it1499
 cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or directory
 [INFO][AppLauncher]: Using device: cuda:0
-[INFO][AppLauncher]: Loading experience file: /home/aditya_nianticspatial_com/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO][AppLauncher]: Loading experience file: /home/<vm-user>/IsaacLab/apps/isaaclab.python.headless.kit
 [INFO]: Parsing configuration from: isaaclab_tasks.manager_based.locomotion.velocity.config.g1.rough_env_cfg:G1RoughEnvCfg
 
 [36m======================================================================================[0m
@@ -990,8 +990,8 @@ cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or di
 [INFO]: Completed setting up the environment...
 [play] rsl_rl policy from logs/rsl_rl/g1_rough/2026-09-25_09-54-11/model_1499.pt
 [play] done: final root x [3.0390472 3.8546286 3.374856  3.2024813] z [-0.41673195  1.7995095   0.55459577  0.6468456 ]
-Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
-[Info] [carb] Logging to file: /home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_110536.log
+Loading user config located at: '/home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_110536.log
 2026-09-25T11:05:37Z [151ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
 2026-09-25T11:05:37Z [611ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
 2026-09-25T11:05:37Z [901ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
@@ -1016,19 +1016,19 @@ Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/li
 | Total Page/Swap (MB): 0 | Free Page/Swap: 0
 |---------------------------------------------------------------------------------------------|
 2026-09-25T11:05:43Z [6,460ms] [Warning] [gpu.foundation.plugin] ECC is enabled on physical device 0
-+ tar czf /home/aditya_nianticspatial_com/parity_play_rough_isaac.tgz -C /home/aditya_nianticspatial_com/parity_out play_rough
-+ touch /home/aditya_nianticspatial_com/STAGE11_DONE
++ tar czf /home/<vm-user>/parity_play_rough_isaac.tgz -C /home/<vm-user>/parity_out play_rough
++ touch /home/<vm-user>/STAGE11_DONE
 + WHO=metalsim
 + LEVELS='3 6'
-+ export PATH=/home/aditya_nianticspatial_com/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin TERM=xterm OMNI_KIT_ACCEPT_EULA=YES
-+ PATH=/home/aditya_nianticspatial_com/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ export PATH=/home/<vm-user>/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin TERM=xterm OMNI_KIT_ACCEPT_EULA=YES
++ PATH=/home/<vm-user>/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 + TERM=xterm
 + OMNI_KIT_ACCEPT_EULA=YES
-+ source /home/aditya_nianticspatial_com/env_isaaclab/bin/activate
++ source /home/<vm-user>/env_isaaclab/bin/activate
 ++ '[' -z '' ']'
 ++ '[' -n x ']'
-++ SCRIPT_PATH=/home/aditya_nianticspatial_com/env_isaaclab/bin/activate
-++ '[' /home/aditya_nianticspatial_com/env_isaaclab/bin/activate = /home/aditya_nianticspatial_com/stage11.sh ']'
+++ SCRIPT_PATH=/home/<vm-user>/env_isaaclab/bin/activate
+++ '[' /home/<vm-user>/env_isaaclab/bin/activate = /home/<vm-user>/stage11.sh ']'
 ++ deactivate nondestructive
 ++ unset -f pydoc
 ++ '[' -z '' ']'
@@ -1038,17 +1038,17 @@ Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/li
 ++ unset VIRTUAL_ENV
 ++ unset VIRTUAL_ENV_PROMPT
 ++ '[' '!' nondestructive = nondestructive ']'
-++ VIRTUAL_ENV=/home/aditya_nianticspatial_com/env_isaaclab
+++ VIRTUAL_ENV=/home/<vm-user>/env_isaaclab
 ++ '[' linux-gnu = cygwin ']'
 ++ '[' linux-gnu = msys ']'
 ++ export VIRTUAL_ENV
 ++ '[' -z '' ']'
 ++ unset SCRIPT_PATH
-++ _OLD_VIRTUAL_PATH=/home/aditya_nianticspatial_com/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
-++ PATH=/home/aditya_nianticspatial_com/env_isaaclab/bin:/home/aditya_nianticspatial_com/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ _OLD_VIRTUAL_PATH=/home/<vm-user>/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ PATH=/home/<vm-user>/env_isaaclab/bin:/home/<vm-user>/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 ++ export PATH
 ++ '[' x '!=' x ']'
-+++ basename /home/aditya_nianticspatial_com/env_isaaclab
++++ basename /home/<vm-user>/env_isaaclab
 ++ VIRTUAL_ENV_PROMPT=env_isaaclab
 ++ export VIRTUAL_ENV_PROMPT
 ++ '[' -z '' ']'
@@ -1059,20 +1059,20 @@ Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/li
 ++ alias pydoc
 ++ true
 ++ hash -r
-+ cd /home/aditya_nianticspatial_com/IsaacLab
-+ rm -f /home/aditya_nianticspatial_com/STAGE11_DONE
++ cd /home/<vm-user>/IsaacLab
++ rm -f /home/<vm-user>/STAGE11_DONE
 ++ tail -1
 ++ ls -d logs/rsl_rl/g1_rough/2026-09-25_09-54-11
 + run=logs/rsl_rl/g1_rough/2026-09-25_09-54-11
 + for lv in $LEVELS
 + '[' metalsim = isaac ']'
 + for f in $HOME/metalsim_ckpts_rough/*.pt
-++ basename /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it1000.pt .pt
+++ basename /home/<vm-user>/metalsim_ckpts_rough/ours_it1000.pt .pt
 + b=ours_it1000
-+ python /home/aditya_nianticspatial_com/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 3 --seed 0 --no_camera --ckpt /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it1000.pt --out /home/aditya_nianticspatial_com/parity_out/play_rough/L3/metalsim_ours_it1000
++ python /home/<vm-user>/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 3 --seed 0 --no_camera --ckpt /home/<vm-user>/metalsim_ckpts_rough/ours_it1000.pt --out /home/<vm-user>/parity_out/play_rough/L3/metalsim_ours_it1000
 cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or directory
 [INFO][AppLauncher]: Using device: cuda:0
-[INFO][AppLauncher]: Loading experience file: /home/aditya_nianticspatial_com/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO][AppLauncher]: Loading experience file: /home/<vm-user>/IsaacLab/apps/isaaclab.python.headless.kit
 [INFO]: Parsing configuration from: isaaclab_tasks.manager_based.locomotion.velocity.config.g1.rough_env_cfg:G1RoughEnvCfg
 
 [36m======================================================================================[0m
@@ -1199,10 +1199,10 @@ cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or di
 +-----------+----------+
 
 [INFO]: Completed setting up the environment...
-[play] metalsim policy from /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it1000.pt
+[play] metalsim policy from /home/<vm-user>/metalsim_ckpts_rough/ours_it1000.pt
 [play] done: final root x [3.688075  1.0589838 2.9660378 3.6265888] z [0.01385647 1.1649445  0.57154447 0.7022747 ]
-Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
-[Info] [carb] Logging to file: /home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_131553.log
+Loading user config located at: '/home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_131553.log
 2026-09-25T13:15:54Z [1,419ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
 2026-09-25T13:15:57Z [3,621ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
 2026-09-25T13:15:58Z [4,789ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
@@ -1228,12 +1228,12 @@ Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/li
 |---------------------------------------------------------------------------------------------|
 2026-09-25T13:16:15Z [22,072ms] [Warning] [gpu.foundation.plugin] ECC is enabled on physical device 0
 + for f in $HOME/metalsim_ckpts_rough/*.pt
-++ basename /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it1500.pt .pt
+++ basename /home/<vm-user>/metalsim_ckpts_rough/ours_it1500.pt .pt
 + b=ours_it1500
-+ python /home/aditya_nianticspatial_com/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 3 --seed 0 --no_camera --ckpt /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it1500.pt --out /home/aditya_nianticspatial_com/parity_out/play_rough/L3/metalsim_ours_it1500
++ python /home/<vm-user>/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 3 --seed 0 --no_camera --ckpt /home/<vm-user>/metalsim_ckpts_rough/ours_it1500.pt --out /home/<vm-user>/parity_out/play_rough/L3/metalsim_ours_it1500
 cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or directory
 [INFO][AppLauncher]: Using device: cuda:0
-[INFO][AppLauncher]: Loading experience file: /home/aditya_nianticspatial_com/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO][AppLauncher]: Loading experience file: /home/<vm-user>/IsaacLab/apps/isaaclab.python.headless.kit
 [INFO]: Parsing configuration from: isaaclab_tasks.manager_based.locomotion.velocity.config.g1.rough_env_cfg:G1RoughEnvCfg
 
 [36m======================================================================================[0m
@@ -1360,10 +1360,10 @@ cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or di
 +-----------+----------+
 
 [INFO]: Completed setting up the environment...
-[play] metalsim policy from /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it1500.pt
+[play] metalsim policy from /home/<vm-user>/metalsim_ckpts_rough/ours_it1500.pt
 [play] done: final root x [3.7864647 1.2253361 1.9553547 3.6258554] z [ 0.01245415  0.29767704 -0.10073816  0.7108898 ]
-Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
-[Info] [carb] Logging to file: /home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_131643.log
+Loading user config located at: '/home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_131643.log
 2026-09-25T13:16:43Z [148ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
 2026-09-25T13:16:43Z [604ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
 2026-09-25T13:16:44Z [883ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
@@ -1389,12 +1389,12 @@ Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/li
 |---------------------------------------------------------------------------------------------|
 2026-09-25T13:16:49Z [6,404ms] [Warning] [gpu.foundation.plugin] ECC is enabled on physical device 0
 + for f in $HOME/metalsim_ckpts_rough/*.pt
-++ basename /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it500.pt .pt
+++ basename /home/<vm-user>/metalsim_ckpts_rough/ours_it500.pt .pt
 + b=ours_it500
-+ python /home/aditya_nianticspatial_com/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 3 --seed 0 --no_camera --ckpt /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it500.pt --out /home/aditya_nianticspatial_com/parity_out/play_rough/L3/metalsim_ours_it500
++ python /home/<vm-user>/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 3 --seed 0 --no_camera --ckpt /home/<vm-user>/metalsim_ckpts_rough/ours_it500.pt --out /home/<vm-user>/parity_out/play_rough/L3/metalsim_ours_it500
 cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or directory
 [INFO][AppLauncher]: Using device: cuda:0
-[INFO][AppLauncher]: Loading experience file: /home/aditya_nianticspatial_com/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO][AppLauncher]: Loading experience file: /home/<vm-user>/IsaacLab/apps/isaaclab.python.headless.kit
 [INFO]: Parsing configuration from: isaaclab_tasks.manager_based.locomotion.velocity.config.g1.rough_env_cfg:G1RoughEnvCfg
 
 [36m======================================================================================[0m
@@ -1521,10 +1521,10 @@ cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or di
 +-----------+----------+
 
 [INFO]: Completed setting up the environment...
-[play] metalsim policy from /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it500.pt
+[play] metalsim policy from /home/<vm-user>/metalsim_ckpts_rough/ours_it500.pt
 [play] done: final root x [3.5788517 0.6990423 2.1947517 2.7446928] z [ 0.00524384  0.01412398 -0.13654916  0.68947804]
-Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
-[Info] [carb] Logging to file: /home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_131713.log
+Loading user config located at: '/home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_131713.log
 2026-09-25T13:17:13Z [148ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
 2026-09-25T13:17:14Z [602ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
 2026-09-25T13:17:14Z [882ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
@@ -1552,12 +1552,12 @@ Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/li
 + for lv in $LEVELS
 + '[' metalsim = isaac ']'
 + for f in $HOME/metalsim_ckpts_rough/*.pt
-++ basename /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it1000.pt .pt
+++ basename /home/<vm-user>/metalsim_ckpts_rough/ours_it1000.pt .pt
 + b=ours_it1000
-+ python /home/aditya_nianticspatial_com/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 6 --seed 0 --no_camera --ckpt /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it1000.pt --out /home/aditya_nianticspatial_com/parity_out/play_rough/L6/metalsim_ours_it1000
++ python /home/<vm-user>/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 6 --seed 0 --no_camera --ckpt /home/<vm-user>/metalsim_ckpts_rough/ours_it1000.pt --out /home/<vm-user>/parity_out/play_rough/L6/metalsim_ours_it1000
 cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or directory
 [INFO][AppLauncher]: Using device: cuda:0
-[INFO][AppLauncher]: Loading experience file: /home/aditya_nianticspatial_com/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO][AppLauncher]: Loading experience file: /home/<vm-user>/IsaacLab/apps/isaaclab.python.headless.kit
 [INFO]: Parsing configuration from: isaaclab_tasks.manager_based.locomotion.velocity.config.g1.rough_env_cfg:G1RoughEnvCfg
 
 [36m======================================================================================[0m
@@ -1684,10 +1684,10 @@ cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or di
 +-----------+----------+
 
 [INFO]: Completed setting up the environment...
-[play] metalsim policy from /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it1000.pt
+[play] metalsim policy from /home/<vm-user>/metalsim_ckpts_rough/ours_it1000.pt
 [play] done: final root x [2.9500494  0.45656967 2.9453354  3.565196  ] z [-0.91349757  0.08865333  0.04444256  0.71303475]
-Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
-[Info] [carb] Logging to file: /home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_131744.log
+Loading user config located at: '/home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_131744.log
 2026-09-25T13:17:44Z [155ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
 2026-09-25T13:17:45Z [607ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
 2026-09-25T13:17:45Z [897ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
@@ -1713,12 +1713,12 @@ Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/li
 |---------------------------------------------------------------------------------------------|
 2026-09-25T13:17:50Z [6,485ms] [Warning] [gpu.foundation.plugin] ECC is enabled on physical device 0
 + for f in $HOME/metalsim_ckpts_rough/*.pt
-++ basename /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it1500.pt .pt
+++ basename /home/<vm-user>/metalsim_ckpts_rough/ours_it1500.pt .pt
 + b=ours_it1500
-+ python /home/aditya_nianticspatial_com/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 6 --seed 0 --no_camera --ckpt /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it1500.pt --out /home/aditya_nianticspatial_com/parity_out/play_rough/L6/metalsim_ours_it1500
++ python /home/<vm-user>/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 6 --seed 0 --no_camera --ckpt /home/<vm-user>/metalsim_ckpts_rough/ours_it1500.pt --out /home/<vm-user>/parity_out/play_rough/L6/metalsim_ours_it1500
 cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or directory
 [INFO][AppLauncher]: Using device: cuda:0
-[INFO][AppLauncher]: Loading experience file: /home/aditya_nianticspatial_com/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO][AppLauncher]: Loading experience file: /home/<vm-user>/IsaacLab/apps/isaaclab.python.headless.kit
 [INFO]: Parsing configuration from: isaaclab_tasks.manager_based.locomotion.velocity.config.g1.rough_env_cfg:G1RoughEnvCfg
 
 [36m======================================================================================[0m
@@ -1845,10 +1845,10 @@ cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or di
 +-----------+----------+
 
 [INFO]: Completed setting up the environment...
-[play] metalsim policy from /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it1500.pt
+[play] metalsim policy from /home/<vm-user>/metalsim_ckpts_rough/ours_it1500.pt
 [play] done: final root x [3.97153    0.21089745 3.5410805  3.3952665 ] z [-0.43857288  0.08350849 -0.06796493  0.70131886]
-Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
-[Info] [carb] Logging to file: /home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_131814.log
+Loading user config located at: '/home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_131814.log
 2026-09-25T13:18:14Z [147ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
 2026-09-25T13:18:15Z [605ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
 2026-09-25T13:18:15Z [886ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
@@ -1874,12 +1874,12 @@ Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/li
 |---------------------------------------------------------------------------------------------|
 2026-09-25T13:18:21Z [6,523ms] [Warning] [gpu.foundation.plugin] ECC is enabled on physical device 0
 + for f in $HOME/metalsim_ckpts_rough/*.pt
-++ basename /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it500.pt .pt
+++ basename /home/<vm-user>/metalsim_ckpts_rough/ours_it500.pt .pt
 + b=ours_it500
-+ python /home/aditya_nianticspatial_com/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 6 --seed 0 --no_camera --ckpt /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it500.pt --out /home/aditya_nianticspatial_com/parity_out/play_rough/L6/metalsim_ours_it500
++ python /home/<vm-user>/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 6 --seed 0 --no_camera --ckpt /home/<vm-user>/metalsim_ckpts_rough/ours_it500.pt --out /home/<vm-user>/parity_out/play_rough/L6/metalsim_ours_it500
 cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or directory
 [INFO][AppLauncher]: Using device: cuda:0
-[INFO][AppLauncher]: Loading experience file: /home/aditya_nianticspatial_com/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO][AppLauncher]: Loading experience file: /home/<vm-user>/IsaacLab/apps/isaaclab.python.headless.kit
 [INFO]: Parsing configuration from: isaaclab_tasks.manager_based.locomotion.velocity.config.g1.rough_env_cfg:G1RoughEnvCfg
 
 [36m======================================================================================[0m
@@ -2006,10 +2006,10 @@ cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or di
 +-----------+----------+
 
 [INFO]: Completed setting up the environment...
-[play] metalsim policy from /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it500.pt
+[play] metalsim policy from /home/<vm-user>/metalsim_ckpts_rough/ours_it500.pt
 [play] done: final root x [3.5770998 0.8587065 2.6196566 3.5337334] z [-0.4492386   0.0191828  -0.27015328  0.70983934]
-Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
-[Info] [carb] Logging to file: /home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_131845.log
+Loading user config located at: '/home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_131845.log
 2026-09-25T13:18:45Z [154ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
 2026-09-25T13:18:45Z [615ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
 2026-09-25T13:18:45Z [898ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
@@ -2034,19 +2034,19 @@ Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/li
 | Total Page/Swap (MB): 0 | Free Page/Swap: 0
 |---------------------------------------------------------------------------------------------|
 2026-09-25T13:18:51Z [6,426ms] [Warning] [gpu.foundation.plugin] ECC is enabled on physical device 0
-+ tar czf /home/aditya_nianticspatial_com/parity_play_rough_metalsim.tgz -C /home/aditya_nianticspatial_com/parity_out play_rough
-+ touch /home/aditya_nianticspatial_com/STAGE11_DONE
++ tar czf /home/<vm-user>/parity_play_rough_metalsim.tgz -C /home/<vm-user>/parity_out play_rough
++ touch /home/<vm-user>/STAGE11_DONE
 + WHO=metalsim
 + LEVELS='3 6'
-+ export PATH=/home/aditya_nianticspatial_com/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin TERM=xterm OMNI_KIT_ACCEPT_EULA=YES
-+ PATH=/home/aditya_nianticspatial_com/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
++ export PATH=/home/<vm-user>/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin TERM=xterm OMNI_KIT_ACCEPT_EULA=YES
++ PATH=/home/<vm-user>/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 + TERM=xterm
 + OMNI_KIT_ACCEPT_EULA=YES
-+ source /home/aditya_nianticspatial_com/env_isaaclab/bin/activate
++ source /home/<vm-user>/env_isaaclab/bin/activate
 ++ '[' -z '' ']'
 ++ '[' -n x ']'
-++ SCRIPT_PATH=/home/aditya_nianticspatial_com/env_isaaclab/bin/activate
-++ '[' /home/aditya_nianticspatial_com/env_isaaclab/bin/activate = /home/aditya_nianticspatial_com/stage11.sh ']'
+++ SCRIPT_PATH=/home/<vm-user>/env_isaaclab/bin/activate
+++ '[' /home/<vm-user>/env_isaaclab/bin/activate = /home/<vm-user>/stage11.sh ']'
 ++ deactivate nondestructive
 ++ unset -f pydoc
 ++ '[' -z '' ']'
@@ -2056,17 +2056,17 @@ Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/li
 ++ unset VIRTUAL_ENV
 ++ unset VIRTUAL_ENV_PROMPT
 ++ '[' '!' nondestructive = nondestructive ']'
-++ VIRTUAL_ENV=/home/aditya_nianticspatial_com/env_isaaclab
+++ VIRTUAL_ENV=/home/<vm-user>/env_isaaclab
 ++ '[' linux-gnu = cygwin ']'
 ++ '[' linux-gnu = msys ']'
 ++ export VIRTUAL_ENV
 ++ '[' -z '' ']'
 ++ unset SCRIPT_PATH
-++ _OLD_VIRTUAL_PATH=/home/aditya_nianticspatial_com/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
-++ PATH=/home/aditya_nianticspatial_com/env_isaaclab/bin:/home/aditya_nianticspatial_com/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ _OLD_VIRTUAL_PATH=/home/<vm-user>/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+++ PATH=/home/<vm-user>/env_isaaclab/bin:/home/<vm-user>/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
 ++ export PATH
 ++ '[' x '!=' x ']'
-+++ basename /home/aditya_nianticspatial_com/env_isaaclab
++++ basename /home/<vm-user>/env_isaaclab
 ++ VIRTUAL_ENV_PROMPT=env_isaaclab
 ++ export VIRTUAL_ENV_PROMPT
 ++ '[' -z '' ']'
@@ -2077,20 +2077,20 @@ Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/li
 ++ alias pydoc
 ++ true
 ++ hash -r
-+ cd /home/aditya_nianticspatial_com/IsaacLab
-+ rm -f /home/aditya_nianticspatial_com/STAGE11_DONE
++ cd /home/<vm-user>/IsaacLab
++ rm -f /home/<vm-user>/STAGE11_DONE
 ++ tail -1
 ++ ls -d logs/rsl_rl/g1_rough/2026-09-25_09-54-11
 + run=logs/rsl_rl/g1_rough/2026-09-25_09-54-11
 + for lv in $LEVELS
 + '[' metalsim = isaac ']'
 + for f in $HOME/metalsim_ckpts_rough/*.pt
-++ basename /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it1000.pt .pt
+++ basename /home/<vm-user>/metalsim_ckpts_rough/ours_it1000.pt .pt
 + b=ours_it1000
-+ python /home/aditya_nianticspatial_com/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 3 --seed 0 --no_camera --ckpt /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it1000.pt --out /home/aditya_nianticspatial_com/parity_out/play_rough/L3/metalsim_ours_it1000
++ python /home/<vm-user>/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 3 --seed 0 --no_camera --ckpt /home/<vm-user>/metalsim_ckpts_rough/ours_it1000.pt --out /home/<vm-user>/parity_out/play_rough/L3/metalsim_ours_it1000
 cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or directory
 [INFO][AppLauncher]: Using device: cuda:0
-[INFO][AppLauncher]: Loading experience file: /home/aditya_nianticspatial_com/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO][AppLauncher]: Loading experience file: /home/<vm-user>/IsaacLab/apps/isaaclab.python.headless.kit
 [INFO]: Parsing configuration from: isaaclab_tasks.manager_based.locomotion.velocity.config.g1.rough_env_cfg:G1RoughEnvCfg
 
 [36m======================================================================================[0m
@@ -2217,10 +2217,10 @@ cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or di
 +-----------+----------+
 
 [INFO]: Completed setting up the environment...
-[play] metalsim policy from /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it1000.pt
+[play] metalsim policy from /home/<vm-user>/metalsim_ckpts_rough/ours_it1000.pt
 [play] done: final root x [0.8204317 0.6267605 2.105566  2.8629837] z [ 0.28562373  1.2746782  -0.07674348  0.7193271 ]
-Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
-[Info] [carb] Logging to file: /home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_135009.log
+Loading user config located at: '/home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_135009.log
 2026-09-25T13:50:10Z [941ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
 2026-09-25T13:50:12Z [2,688ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
 2026-09-25T13:50:13Z [3,604ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
@@ -2246,17 +2246,17 @@ Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/li
 |---------------------------------------------------------------------------------------------|
 2026-09-25T13:50:26Z [16,938ms] [Warning] [gpu.foundation.plugin] ECC is enabled on physical device 0
 + for f in $HOME/metalsim_ckpts_rough/*.pt
-++ basename /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it1500.pt .pt
+++ basename /home/<vm-user>/metalsim_ckpts_rough/ours_it1500.pt .pt
 + b=ours_it1500
-+ python /home/aditya_nianticspatial_com/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 3 --seed 0 --no_camera --ckpt /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it1500.pt --out /home/aditya_nianticspatial_com/parity_out/play_rough/L3/metalsim_ours_it1500
-Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
-[Info] [carb] Logging to file: /home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_135054.log
++ python /home/<vm-user>/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 3 --seed 0 --no_camera --ckpt /home/<vm-user>/metalsim_ckpts_rough/ours_it1500.pt --out /home/<vm-user>/parity_out/play_rough/L3/metalsim_ours_it1500
+Loading user config located at: '/home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_135054.log
 2026-09-25T13:50:54Z [151ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
-2026-09-25T13:50:54Z [597ms] [Error] [omni.core.ITypeFactory] Circular dependency detected! Interface: omni::platforminfo::ICpuInfo requested. But plugin with an interface: /home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/kernel/plugins/libomni.platforminfo.plugin.so is already in resolving state.
+2026-09-25T13:50:54Z [597ms] [Error] [omni.core.ITypeFactory] Circular dependency detected! Interface: omni::platforminfo::ICpuInfo requested. But plugin with an interface: /home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/kernel/plugins/libomni.platforminfo.plugin.so is already in resolving state.
 2026-09-25T13:50:54Z [597ms] [Error] [carb] [Plugin: gpu.foundation.plugin] Dependency: [omni::platforminfo::ICpuInfo v1.0] failed to be resolved.
 cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or directory
 [INFO][AppLauncher]: Using device: cuda:0
-[INFO][AppLauncher]: Loading experience file: /home/aditya_nianticspatial_com/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO][AppLauncher]: Loading experience file: /home/<vm-user>/IsaacLab/apps/isaaclab.python.headless.kit
 [INFO]: Parsing configuration from: isaaclab_tasks.manager_based.locomotion.velocity.config.g1.rough_env_cfg:G1RoughEnvCfg
 
 [36m======================================================================================[0m
@@ -2383,7 +2383,7 @@ cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or di
 +-----------+----------+
 
 [INFO]: Completed setting up the environment...
-[play] metalsim policy from /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it1500.pt
+[play] metalsim policy from /home/<vm-user>/metalsim_ckpts_rough/ours_it1500.pt
 [play] done: final root x [3.702753  5.2500777 2.2693462 3.4553938] z [ 0.00575823  1.3446753  -0.1235011   0.72972214]
 2026-09-25T13:50:54Z [619ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
 2026-09-25T13:50:55Z [906ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
@@ -2409,12 +2409,12 @@ cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or di
 |---------------------------------------------------------------------------------------------|
 2026-09-25T13:51:00Z [6,687ms] [Warning] [gpu.foundation.plugin] ECC is enabled on physical device 0
 + for f in $HOME/metalsim_ckpts_rough/*.pt
-++ basename /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it500.pt .pt
+++ basename /home/<vm-user>/metalsim_ckpts_rough/ours_it500.pt .pt
 + b=ours_it500
-+ python /home/aditya_nianticspatial_com/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 3 --seed 0 --no_camera --ckpt /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it500.pt --out /home/aditya_nianticspatial_com/parity_out/play_rough/L3/metalsim_ours_it500
++ python /home/<vm-user>/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 3 --seed 0 --no_camera --ckpt /home/<vm-user>/metalsim_ckpts_rough/ours_it500.pt --out /home/<vm-user>/parity_out/play_rough/L3/metalsim_ours_it500
 cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or directory
 [INFO][AppLauncher]: Using device: cuda:0
-[INFO][AppLauncher]: Loading experience file: /home/aditya_nianticspatial_com/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO][AppLauncher]: Loading experience file: /home/<vm-user>/IsaacLab/apps/isaaclab.python.headless.kit
 [INFO]: Parsing configuration from: isaaclab_tasks.manager_based.locomotion.velocity.config.g1.rough_env_cfg:G1RoughEnvCfg
 
 [36m======================================================================================[0m
@@ -2541,10 +2541,10 @@ cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or di
 +-----------+----------+
 
 [INFO]: Completed setting up the environment...
-[play] metalsim policy from /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it500.pt
+[play] metalsim policy from /home/<vm-user>/metalsim_ckpts_rough/ours_it500.pt
 [play] done: final root x [3.290985   5.7088194  1.2594061  0.83487034] z [-0.00288689  0.43539453 -0.1694892  -0.04310304]
-Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
-[Info] [carb] Logging to file: /home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_135125.log
+Loading user config located at: '/home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_135125.log
 2026-09-25T13:51:25Z [149ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
 2026-09-25T13:51:26Z [618ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
 2026-09-25T13:51:26Z [915ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
@@ -2572,12 +2572,12 @@ Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/li
 + for lv in $LEVELS
 + '[' metalsim = isaac ']'
 + for f in $HOME/metalsim_ckpts_rough/*.pt
-++ basename /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it1000.pt .pt
+++ basename /home/<vm-user>/metalsim_ckpts_rough/ours_it1000.pt .pt
 + b=ours_it1000
-+ python /home/aditya_nianticspatial_com/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 6 --seed 0 --no_camera --ckpt /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it1000.pt --out /home/aditya_nianticspatial_com/parity_out/play_rough/L6/metalsim_ours_it1000
++ python /home/<vm-user>/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 6 --seed 0 --no_camera --ckpt /home/<vm-user>/metalsim_ckpts_rough/ours_it1000.pt --out /home/<vm-user>/parity_out/play_rough/L6/metalsim_ours_it1000
 cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or directory
 [INFO][AppLauncher]: Using device: cuda:0
-[INFO][AppLauncher]: Loading experience file: /home/aditya_nianticspatial_com/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO][AppLauncher]: Loading experience file: /home/<vm-user>/IsaacLab/apps/isaaclab.python.headless.kit
 [INFO]: Parsing configuration from: isaaclab_tasks.manager_based.locomotion.velocity.config.g1.rough_env_cfg:G1RoughEnvCfg
 
 [36m======================================================================================[0m
@@ -2704,10 +2704,10 @@ cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or di
 +-----------+----------+
 
 [INFO]: Completed setting up the environment...
-[play] metalsim policy from /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it1000.pt
+[play] metalsim policy from /home/<vm-user>/metalsim_ckpts_rough/ours_it1000.pt
 [play] done: final root x [ 1.1197767  -0.21479988  2.2852058   2.8641567 ] z [ 0.4135667   0.11250985 -0.07688974  0.71439236]
-Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
-[Info] [carb] Logging to file: /home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_135156.log
+Loading user config located at: '/home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_135156.log
 2026-09-25T13:51:56Z [148ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
 2026-09-25T13:51:56Z [600ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
 2026-09-25T13:51:56Z [881ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
@@ -2733,12 +2733,12 @@ Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/li
 |---------------------------------------------------------------------------------------------|
 2026-09-25T13:52:02Z [6,341ms] [Warning] [gpu.foundation.plugin] ECC is enabled on physical device 0
 + for f in $HOME/metalsim_ckpts_rough/*.pt
-++ basename /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it1500.pt .pt
+++ basename /home/<vm-user>/metalsim_ckpts_rough/ours_it1500.pt .pt
 + b=ours_it1500
-+ python /home/aditya_nianticspatial_com/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 6 --seed 0 --no_camera --ckpt /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it1500.pt --out /home/aditya_nianticspatial_com/parity_out/play_rough/L6/metalsim_ours_it1500
++ python /home/<vm-user>/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 6 --seed 0 --no_camera --ckpt /home/<vm-user>/metalsim_ckpts_rough/ours_it1500.pt --out /home/<vm-user>/parity_out/play_rough/L6/metalsim_ours_it1500
 cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or directory
 [INFO][AppLauncher]: Using device: cuda:0
-[INFO][AppLauncher]: Loading experience file: /home/aditya_nianticspatial_com/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO][AppLauncher]: Loading experience file: /home/<vm-user>/IsaacLab/apps/isaaclab.python.headless.kit
 [INFO]: Parsing configuration from: isaaclab_tasks.manager_based.locomotion.velocity.config.g1.rough_env_cfg:G1RoughEnvCfg
 
 [36m======================================================================================[0m
@@ -2865,10 +2865,10 @@ cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or di
 +-----------+----------+
 
 [INFO]: Completed setting up the environment...
-[play] metalsim policy from /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it1500.pt
+[play] metalsim policy from /home/<vm-user>/metalsim_ckpts_rough/ours_it1500.pt
 [play] done: final root x [2.3259916 0.9280586 3.6407242 3.3664923] z [-0.04215205  0.06194437  0.01239511  0.71191764]
-Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
-[Info] [carb] Logging to file: /home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_135226.log
+Loading user config located at: '/home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_135226.log
 2026-09-25T13:52:26Z [154ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
 2026-09-25T13:52:27Z [602ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
 2026-09-25T13:52:27Z [887ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
@@ -2894,12 +2894,12 @@ Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/li
 |---------------------------------------------------------------------------------------------|
 2026-09-25T13:52:32Z [6,387ms] [Warning] [gpu.foundation.plugin] ECC is enabled on physical device 0
 + for f in $HOME/metalsim_ckpts_rough/*.pt
-++ basename /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it500.pt .pt
+++ basename /home/<vm-user>/metalsim_ckpts_rough/ours_it500.pt .pt
 + b=ours_it500
-+ python /home/aditya_nianticspatial_com/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 6 --seed 0 --no_camera --ckpt /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it500.pt --out /home/aditya_nianticspatial_com/parity_out/play_rough/L6/metalsim_ours_it500
++ python /home/<vm-user>/play_policy.py --headless --task Isaac-Velocity-Rough-G1-v0 --level 6 --seed 0 --no_camera --ckpt /home/<vm-user>/metalsim_ckpts_rough/ours_it500.pt --out /home/<vm-user>/parity_out/play_rough/L6/metalsim_ours_it500
 cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or directory
 [INFO][AppLauncher]: Using device: cuda:0
-[INFO][AppLauncher]: Loading experience file: /home/aditya_nianticspatial_com/IsaacLab/apps/isaaclab.python.headless.kit
+[INFO][AppLauncher]: Loading experience file: /home/<vm-user>/IsaacLab/apps/isaaclab.python.headless.kit
 [INFO]: Parsing configuration from: isaaclab_tasks.manager_based.locomotion.velocity.config.g1.rough_env_cfg:G1RoughEnvCfg
 
 [36m======================================================================================[0m
@@ -3026,10 +3026,10 @@ cat: '/sys/devices/system/cpu/cpu*/cpufreq/scaling_governor': No such file or di
 +-----------+----------+
 
 [INFO]: Completed setting up the environment...
-[play] metalsim policy from /home/aditya_nianticspatial_com/metalsim_ckpts_rough/ours_it500.pt
+[play] metalsim policy from /home/<vm-user>/metalsim_ckpts_rough/ours_it500.pt
 [play] done: final root x [3.3004408  0.40320683 3.3013897  3.394287  ] z [-1.0005374   0.02081835 -0.13626945  0.6820965 ]
-Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
-[Info] [carb] Logging to file: /home/aditya_nianticspatial_com/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_135256.log
+Loading user config located at: '/home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/data/Kit/Isaac-Sim/5.1/user.config.json'
+[Info] [carb] Logging to file: /home/<vm-user>/env_isaaclab/lib/python3.11/site-packages/isaacsim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260925_135256.log
 2026-09-25T13:52:56Z [149ms] [Warning] [omni.usd_config.extension] Enable omni.materialx.libs extension to use MaterialX
 2026-09-25T13:52:57Z [609ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
 2026-09-25T13:52:57Z [892ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
@@ -3054,5 +3054,5 @@ Loading user config located at: '/home/aditya_nianticspatial_com/env_isaaclab/li
 | Total Page/Swap (MB): 0 | Free Page/Swap: 0
 |---------------------------------------------------------------------------------------------|
 2026-09-25T13:53:03Z [6,405ms] [Warning] [gpu.foundation.plugin] ECC is enabled on physical device 0
-+ tar czf /home/aditya_nianticspatial_com/parity_play_rough_metalsim.tgz -C /home/aditya_nianticspatial_com/parity_out play_rough
-+ touch /home/aditya_nianticspatial_com/STAGE11_DONE
++ tar czf /home/<vm-user>/parity_play_rough_metalsim.tgz -C /home/<vm-user>/parity_out play_rough
++ touch /home/<vm-user>/STAGE11_DONE

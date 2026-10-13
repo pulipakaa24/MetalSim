@@ -1,0 +1,40 @@
+Allocation Tracking Report
+  Total allocations:
+    cuda:0           84297 (81.16 GB)
+    cpu              30994 (7.01 GB)
+  Peak usage:
+    cuda:0           34.31 GB
+    cpu              20.66 MB
+  Live allocations:
+    cuda:0           75158 (32.99 GB)
+    cpu              1 (40.00 KB)
+
+  Live cuda:0 allocations by size (largest first) (up to 25):
+    10.28 GB : cuda:0 : (native:volume_builder)
+    1.28 GB : cuda:0 : (native:volume_builder)
+    968.13 MB : cuda:0 : mem_attrib.py:132 : _alloc()
+    560.00 MB : cuda:0 : mem_attrib.py:132 : _alloc()
+    459.00 MB : cuda:0 : mem_attrib.py:132 : _alloc()
+    432.00 MB : cuda:0 : mem_attrib.py:132 : _alloc()
+    432.00 MB : cuda:0 : mem_attrib.py:132 : _alloc()
+    432.00 MB : cuda:0 : mem_attrib.py:132 : _alloc()
+    432.00 MB : cuda:0 : mem_attrib.py:132 : _alloc()
+    432.00 MB : cuda:0 : mem_attrib.py:132 : _alloc()
+    432.00 MB : cuda:0 : mem_attrib.py:132 : _alloc()
+    432.00 MB : cuda:0 : mem_attrib.py:132 : _alloc()
+    432.00 MB : cuda:0 : mem_attrib.py:132 : _alloc()
+    367.50 MB : cuda:0 : mem_attrib.py:132 : _alloc()
+    252.66 MB : cuda:0 : mem_attrib.py:132 : _alloc()
+    216.00 MB : cuda:0 : mem_attrib.py:132 : _alloc()
+    216.00 MB : cuda:0 : mem_attrib.py:132 : _alloc()
+    216.00 MB : cuda:0 : mem_attrib.py:132 : _alloc()
+    216.00 MB : cuda:0 : mem_attrib.py:132 : _alloc()
+    216.00 MB : cuda:0 : mem_attrib.py:132 : _alloc()
+    216.00 MB : cuda:0 : mem_attrib.py:132 : _alloc()
+    216.00 MB : cuda:0 : mem_attrib.py:132 : _alloc()
+    216.00 MB : cuda:0 : mem_attrib.py:132 : _alloc()
+    216.00 MB : cuda:0 : mem_attrib.py:132 : _alloc()
+    216.00 MB : cuda:0 : mem_attrib.py:132 : _alloc()
+
+  Live cpu allocations by size (largest first) (up to 25):
+    40.00 KB : cpu : array[int32, 10240] : franka_pour_scene.py:795 : __init__()

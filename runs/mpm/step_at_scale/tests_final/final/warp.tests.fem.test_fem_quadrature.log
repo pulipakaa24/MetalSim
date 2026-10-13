@@ -1,0 +1,36 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module warp.fem.utils 28bef15 load on device 'metal:0' took 44.95 ms  (cached)
+Module warp._src.fem.quadrature.pic_quadrature.dyn.finalize_cell_particle_data_e6fae2bf 7747640 load on device 'metal:0' took 483.17 ms  (compiled)
+Module warp.fem.quadrature.pic_quadrature 868e9c2 load on device 'metal:0' took 39.36 ms  (cached)
+Module warp._src.fem.quadrature.quadrature.dyn.quadrature_point_element_indices_a738fd6d adf778f load on device 'metal:0' took 421.60 ms  (compiled)
+Module warp.tests.fem.utils.piecewise_constant_b0b9c716 7ae411f load on device 'metal:0' took 394.80 ms  (compiled)
+sModule warp.tests.fem.test_fem_quadrature._bicubic_aeca64b0 eb7ee7b load on device 'metal:0' took 412.31 ms  (compiled)
+sModule warp.tests.fem.test_fem_quadrature._bicubic_ec1549ea 4801397 load on device 'metal:0' took 413.32 ms  (compiled)
+sModule warp._src.fem.space.restriction.dyn.fill_element_node_indices_38f8f526 f12aa61 load on device 'metal:0' took 412.52 ms  (compiled)
+Module warp.fem.space.restriction 28019b3 load on device 'metal:0' took 40.20 ms  (cached)
+Module warp.tests.fem.utils.linear_form_05e4c43d 90c251b load on device 'metal:0' took 440.70 ms  (compiled)
+sModule warp._src.fem.space.restriction.dyn.fill_element_node_indices_6c5de9f8 a5aec2b load on device 'cpu' took 0.86 ms  (cached)
+Module warp.fem.utils fbfa21c load on device 'cpu' took 0.28 ms  (cached)
+Module warp.fem.space.restriction 490e2c4 load on device 'cpu' took 0.25 ms  (cached)
+Module warp.tests.fem.utils.grad_field_9668ad7c 3854e6d load on device 'cpu' took 1053.50 ms  (compiled)
+.Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_6c5de9f8 37d82ac load on device 'metal:0' took 38.57 ms  (cached)
+Module warp.tests.fem.utils.grad_field_9668ad7c f51b646 load on device 'metal:0' took 858.13 ms  (compiled)
+.Module warp.tests.fem.utils.grad_field_f5bae858 b805017 load on device 'cpu' took 286.91 ms  (compiled)
+Module warp.tests.fem.utils.grad_field_f8fb24fb 061bec4 load on device 'cpu' took 280.12 ms  (compiled)
+.Module warp.tests.fem.utils.grad_field_f5bae858 9061374 load on device 'metal:0' took 928.18 ms  (compiled)
+Module warp.tests.fem.utils.grad_field_f8fb24fb 5786dcd load on device 'metal:0' took 927.25 ms  (compiled)
+.Module warp.fem.integrate._identity_field_9044888b 417702d load on device 'cpu' took 228.11 ms  (compiled)
+Module warp.fem.integrate._identity_field_446c2d0e 074959e load on device 'cpu' took 227.06 ms  (compiled)
+.Module warp.fem.integrate._identity_field_9044888b e2b8a56 load on device 'metal:0' took 815.44 ms  (compiled)
+Module warp.fem.integrate._identity_field_446c2d0e 7ef9e07 load on device 'metal:0' took 812.21 ms  (compiled)
+...
+----------------------------------------------------------------------
+Ran 12 tests in 10.185s
+
+OK (skipped=4)

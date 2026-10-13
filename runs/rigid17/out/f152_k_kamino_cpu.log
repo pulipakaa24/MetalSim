@@ -1,0 +1,57 @@
+test_00_make_default (newton._src.solvers.kamino.tests.test_solvers_metrics.TestSolverMetrics.test_00_make_default)
+Test creating a SolutionMetrics instance with default initialization. ... ok
+test_01_finalize_default (newton._src.solvers.kamino.tests.test_solvers_metrics.TestSolverMetrics.test_01_finalize_default)
+Test creating a SolutionMetrics instance with default initialization and then finalizing all memory allocations. ... ok
+test_02_evaluate_trivial_solution (newton._src.solvers.kamino.tests.test_solvers_metrics.TestSolverMetrics.test_02_evaluate_trivial_solution)
+Tests evaluating metrics on an all-zeros trivial solution. ... /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/kcache/kcT_n152_final/1.18.0.dev20260917/wp_newton._src.solvers.kamino._src.solvers.metrics_6c9070d_p27185_t8391975360/wp_newton._src.solvers.kamino._src.solvers.metrics_6c9070d.cpp:1435:29: warning: implicit conversion from 'long' to 'const wp::int32' (aka 'const int') changes value from 4294967295 to -1 [-Wconstant-conversion]
+ 1435 |     const wp::int32 var_7 = 4294967295;
+      |                     ~~~~~   ^~~~~~~~~~
+/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/kcache/kcT_n152_final/1.18.0.dev20260917/wp_newton._src.solvers.kamino._src.solvers.metrics_6c9070d_p27185_t8391975360/wp_newton._src.solvers.kamino._src.solvers.metrics_6c9070d.cpp:3268:30: warning: implicit conversion from 'long' to 'const wp::int32' (aka 'const int') changes value from 4294967295 to -1 [-Wconstant-conversion]
+ 3268 |     const wp::int32 var_17 = 4294967295;
+      |                     ~~~~~~   ^~~~~~~~~~
+2 warnings generated.
+ok
+test_03_evaluate_padmm_solution_box_on_plane (newton._src.solvers.kamino.tests.test_solvers_metrics.TestSolverMetrics.test_03_evaluate_padmm_solution_box_on_plane)
+Tests evaluating metrics on a solution computed with the Proximal-ADMM (PADMM) solver. ... ok
+test_04_evaluate_padmm_solution_boxes_hinged (newton._src.solvers.kamino.tests.test_solvers_metrics.TestSolverMetrics.test_04_evaluate_padmm_solution_boxes_hinged)
+Tests evaluating metrics on a solution computed with the Proximal-ADMM (PADMM) solver. ... ok
+test_05_validate_metrics_boxes_hinged (newton._src.solvers.kamino.tests.test_solvers_metrics.TestSolverMetrics.test_05_validate_metrics_boxes_hinged)
+Compares metrics from `SolutionMetrics` with metrics computed by a ... ok
+test_06_compare_dense_sparse_boxes_hinged (newton._src.solvers.kamino.tests.test_solvers_metrics.TestSolverMetrics.test_06_compare_dense_sparse_boxes_hinged)
+Compares metrics evaluated on dense and sparse problems on a perturbed ... ok
+test_07_contact_residual_positive_gaps (newton._src.solvers.kamino.tests.test_solvers_metrics.TestSolverMetrics.test_07_contact_residual_positive_gaps) ... ok
+test_08_contact_residual_mixed_signed_distances (newton._src.solvers.kamino.tests.test_solvers_metrics.TestSolverMetrics.test_08_contact_residual_mixed_signed_distances) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 7.260s
+
+OK
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/kcache/kcT_n152_final/1.18.0.dev20260917
+Module newton._src.solvers.kamino._src.core.bodies ec3c643 load on device 'cpu' took 849.55 ms  (compiled)
+Module newton._src.solvers.kamino._src.geometry.primitive.broadphase 66db0e1 load on device 'cpu' took 151.57 ms  (compiled)
+Module newton._src.solvers.kamino._src.geometry.primitive.narrowphase 6cbb291 load on device 'cpu' took 1397.15 ms  (compiled)
+Module newton._src.solvers.kamino._src.kinematics.constraints dd71fca load on device 'cpu' took 74.58 ms  (compiled)
+Module newton._src.solvers.kamino._src.kinematics.jacobians 2f2655f load on device 'cpu' took 1257.84 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 7446440 load on device 'cpu' took 145.44 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.dual 4217c0c load on device 'cpu' took 179.19 ms  (compiled)
+Module newton._src.solvers.kamino._src.integrators.euler 9e69d88 load on device 'cpu' took 82.97 ms  (compiled)
+Module newton._src.solvers.kamino._src.solvers.metrics 6c9070d load on device 'cpu' took 288.83 ms  (compiled)
+Module newton._src.solvers.kamino._src.solvers.padmm.kernels 8ffdc6b load on device 'cpu' took 382.58 ms  (compiled)
+Module newton._src.solvers.kamino._src.linalg.factorize.llt_blocked 95155ac load on device 'cpu' took 333.09 ms  (compiled)
+Module make_desaxce_correction_and_velocity_bias_kernel__locals___compute_desaxce_correction_and_velocity_bias_d87bbc00 5ef370d load on device 'cpu' took 61.26 ms  (compiled)
+Module _make_compute_infnorm_residuals_kernel__locals___compute_infnorm_residuals_54fc283e f7e79fb load on device 'cpu' took 129.12 ms  (compiled)
+Module newton._src.solvers.kamino._src.kinematics.joints bfd66bc load on device 'cpu' took 350.45 ms  (compiled)
+Module _make_compute_infnorm_residuals_kernel__locals___compute_infnorm_residuals_eb957c7f 158a331 load on device 'cpu' took 171.71 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 4bedd91 load on device 'cpu' took 152.97 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 20ddce4 load on device 'cpu' took 166.53 ms  (compiled)
+Module newton._src.solvers.kamino._src.linalg.blas f517604 load on device 'cpu' took 175.47 ms  (compiled)
+Module newton._src.solvers.kamino._src.linalg.blas 5a2475d load on device 'cpu' took 193.24 ms  (compiled)
+Module newton._src.solvers.kamino._src.linalg.blas 4ea7785 load on device 'cpu' took 205.57 ms  (compiled)
+Module newton._src.solvers.kamino.tests.utils.extract 7739cd6 load on device 'cpu' took 42.19 ms  (compiled)
+Module newton._src.solvers.kamino._src.dynamics.delassus 46815bf load on device 'cpu' took 178.95 ms  (compiled)

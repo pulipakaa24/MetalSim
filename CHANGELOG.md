@@ -8,6 +8,8 @@ commit order within each area (`git log` for the full messages). Dates are the c
 - 10-11 MPM on Metal landed in the tree: `metalsim/physics/mpm` (compat layer, scenes, reports, probes), `tests/test_mpm.py`, Isaac-side recorders and stages, research (`docs/research/mpm_2026-10-09.md`, `reports/`, `research_notes/`), run logs and JSON (`runs/mpm`, `runs/parity/isaaclab3_mpm*`, `runs/rigid_perf`, `runs/fma_rigid_parity`)
 - 10-11 Setup pins fork commits: Warp `metalsim` 152808b7 (`scripts/setup_warp.sh`), Newton `metalsim` fe7f5bd4 (`scripts/setup_newton.sh`), Newton `metalsim-1.5.2` 35791a07 (`scripts/setup_newton152.sh`, new: the MPM environment), the `newton` extra at `metalsim-hashtable-metal` 24fb5367; whole-branch diffs in `patches/warp`, `patches/newton` as the offline fallback
 - 10-11 Warp `metalsim`: CUDA-faithful `fast_math` (`warp.config.metal_fast_math`), default `"off"`; MPM chooses through `newton_compat.install(metal_fast_math=)`
+- 10-12 Newton forks: mesh-SDF barrier fix and the 1.5.2 line's Metal collision launches on the 1.7 lines; Metal protocols for the last 64-bit CAS / exchange sites (contact reduction, XPBD restitution manifolds, Kamino metric argmax), bounded claim loops; pins `metalsim` 9f317390, `metalsim-hashtable-metal` a4be3604 (the `newton` extra), `metalsim-1.5.2` c0427fc7 (MPM.md 8d)
+- 10-12 Newton engine: rigid-contact buffer sized per contact pair (64 G1 rough worlds dropped about half the contacts at Newton's automatic 1,000 slots)
 - 10-11 GPU queue: `check` class (correctness jobs share the GPU, up to 3) and job heartbeats
 
 ## Physics: elliptic-cone premium (2026-09-26, `docs/research/elliptic_warmstart_2026-09-26.md`)

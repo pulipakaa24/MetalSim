@@ -1,0 +1,40 @@
+[gpu_run] rc_state start: device utilisation 100% (23:46:34)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 100 %; per-process GPU time over 1.8 s: none >= 1 %
+c1 FMA_TFLOPS median 12.91 min 12.88 max 12.93 23:46:38
+c1 granular A da=keep r1: 35.01 util=100 23:46:46
+c1 granular B da=keep r1: 35.02 util=100 23:46:53
+c1 granular A da=1 r1: 35.39 util=100 23:47:01
+c1 granular B da=1 r1: 35.05 util=100 23:47:09
+c1 column_a2 A da=keep r1: 21.03 util=100 23:47:14
+c1 column_a2 B da=keep r1: 20.91 util=100 23:47:20
+c1 column_a2 A da=1 r1: 21.06 util=100 23:47:28
+c1 column_a2 B da=1 r1: 20.05 util=100 23:47:34
+c2 FMA_TFLOPS median 12.90 min 12.82 max 12.96 23:47:35
+c2 granular A da=keep r1: 35.0 util=100 23:47:42
+c2 granular B da=keep r1: 34.96 util=100 23:47:49
+c2 granular A da=1 r1: 34.62 util=100 23:47:56
+c2 granular B da=1 r1: 35.18 util=100 23:48:03
+c2 column_a2 A da=keep r1: 21.1 util=100 23:48:09
+c2 column_a2 B da=keep r1: 21.22 util=100 23:48:14
+c2 column_a2 A da=1 r1: 20.96 util=100 23:48:20
+c2 column_a2 B da=1 r1: 20.88 util=100 23:48:26
+c3 FMA_TFLOPS median 12.90 min 12.85 max 12.93 23:48:27
+c3 granular A da=keep r1: 34.99 util=100 23:48:34
+c3 granular B da=keep r1: 35.1 util=100 23:48:41
+c3 granular A da=1 r1: 34.96 util=100 23:48:48
+c3 granular B da=1 r1: 35.26 util=100 23:48:55
+c3 column_a2 A da=keep r1: 20.99 util=100 23:49:01
+c3 column_a2 B da=keep r1: 21.2 util=100 23:49:06
+c3 column_a2 A da=1 r1: 20.91 util=100 23:49:12
+c3 column_a2 B da=1 r1: 20.73 util=100 23:49:18
+c4 FMA_TFLOPS median 12.91 min 12.86 max 12.93 23:49:19
+c4 granular A da=keep r1: 35.05 util=100 23:49:26
+c4 granular B da=keep r1: 35.26 util=100 23:49:33
+c4 granular A da=1 r1: 35.18 util=100 23:49:40
+c4 granular B da=1 r1: 35.36 util=100 23:49:47
+c4 column_a2 A da=keep r1: 21.0 util=100 23:49:53
+c4 column_a2 B da=keep r1: 20.87 util=100 23:49:58
+c4 column_a2 A da=1 r1: 20.98 util=100 23:50:04
+c4 column_a2 B da=1 r1: 20.61 util=100 23:50:10
+[gpu_run] rc_state end: device utilisation 100% (23:50:10), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 100 %; per-process GPU time over 1.8 s: none >= 1 %

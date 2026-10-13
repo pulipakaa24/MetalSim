@@ -34,6 +34,10 @@ Physical (USD / RTX) mode, all off by default (the defaults reproduce the origin
                       downward bias on bright indirect light (opt-in; docs/DECISIONS.md)
 See docs/research/rendering_vs_rtx_2026-09-25.md.
 
+Particles (``set_particles``): simulated particles (MPM sand, ...) drawn as render grains, instances of a few small
+irregular grain meshes in the same instance acceleration structure as the scene, rebuilt from the particle buffer on
+the GPU every frame, with a per-grain albedo palette (metalsim/render/particles.py, PARTICLES.md).
+
 Environment map (``set_environment``): an equirectangular HDR image replaces the sky colour as the miss
 radiance and as an importance-sampled light (next-event estimation with multiple importance sampling
 against the BSDF sampler, as PBRT's InfiniteAreaLight). Orientation follows a textured USD DomeLight as
@@ -95,15 +99,51 @@ class Tier2Renderer:
                  material_model="legacy", usd_lights=None, dome=None, headlight=None, tonemap="linear",
                  denoise=None, denoise_quality="high", atrous_iters=5, aux=False, center_sample=False, clip_far=0.0,
                  terrain_slots: bool = True, draw_hfields: bool = True, firefly_clamp=0.0,
+                 appearance: str = "mujoco", skybox: bool = True, transparency: bool = True, transparent_ids: str = "surface",
+                 visual=None, deformables=(), tube_slices=None, cap_stacks=None, dyn_rebuild_every: int = 32,
+                 infinite_planes: bool = True, hfield_skirts: bool = True, per_world_size: bool = True,
+                 model_fields: bool = True, lens=None, dyn_layout: str | None = None, env_layout: str | None = None,
                  ctx: MetalContext | None = None, device="metal:0"):
-        """``terrain_slots`` / ``draw_hfields``: see ``Tier0Renderer`` (False = the previous behaviour)."""
+        """``terrain_slots`` / ``draw_hfields`` / ``appearance``: see ``Tier0Renderer`` (False / "legacy" = the
+        previous behaviour). ``skybox``: the model's skybox texture is the environment (camera background and the
+        radiance of every escaping ray, MuJoCo's cube mapping, unlit texel values x env scale) instead of its mean
+        colour; a ``dome`` or ``set_environment`` map replaces it.
+
+        ``transparency``: a geom's (material-resolved) rgba alpha < 1 is surface presence, as a USD opacity in Isaac's
+        path tracer: rays meet it with probability alpha and otherwise pass unchanged, shadow rays are attenuated by
+        (1 - alpha) per surface (pathtrace.metal ``transmit``); False = every geom opaque (the previous behaviour).
+        ``transparent_ids``: annotations of pixels whose first surface is transparent, as ``Tier0Renderer``: "surface"
+        (default, MuJoCo's; "mujoco" is an alias) or "behind" (the first opaque surface behind it).
+        ``visual`` / ``deformables`` / ``tube_slices`` / ``cap_stacks``: sites, flexes, skins, spatial tendons and user
+        deformable meshes, see ``Tier0Renderer``; ``dyn_rebuild_every`` / ``dyn_layout`` / ``env_layout``: see
+        ``RayTracer`` (default "sbvh": one box per env, the env's triangles traversed in software; the compact env grid).
+        ``infinite_planes`` / ``hfield_skirts`` / ``per_world_size`` /
+        ``model_fields``: see ``Tier0Renderer`` (False = the previous behaviour). With ``usd_lights``, those lights keep
+        their USD intensity (a per-world ``light_diffuse`` does not apply to them). ``lens``: a
+        ``metalsim.render.lens.Lens`` (f-theta / Kannala-Brandt fisheye; default pinhole from the model camera and the
+        per-env intrinsics); pixels outside its field of view are black with depth 0."""
+        from metalsim.render.lens import Lens
         import mujoco
         self.m, self.n, self.tw, self.th = model, n_envs, width, height
         self.device = device
         self.ctx = ctx or MetalContext(device)
+        cam0 = 0 if camera is None else (mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_CAMERA, camera) if isinstance(camera, str) else int(camera))
+        tube_view = None
+        if not (tube_slices or cap_stacks) and model.ncam:          # tube tessellation for this camera (rendering only)
+            from metalsim.render.dynamic_mesh import camera_view
+            ci = CameraIntrinsics.from_model(model, cam0, width, height)
+            tube_view = camera_view(model, cam0, max(ci.fx, ci.fy))
         self.rt = RayTracer(model, n_envs, max_range=1000.0, max_group=max_group, include_planes=include_planes,
                             decimate_faces=decimate_faces, terrain_slots=terrain_slots, draw_hfields=draw_hfields,
+                            appearance=appearance,
+                            visual=mujoco.MjvOption() if visual is None else visual, deformables=deformables,
+                            tube_slices=tube_slices, cap_stacks=cap_stacks, tube_view=tube_view,
+                            dyn_rebuild_every=dyn_rebuild_every, infinite_planes=infinite_planes, hfield_skirts=hfield_skirts,
+                            per_world_size=per_world_size, dyn_layout=dyn_layout, env_layout=env_layout,
                             ctx=self.ctx, device=device)
+
+        self.model_fields = bool(model_fields)
+        self.lens = lens or Lens.pinhole()
         self.tables = self.rt.tables
         self.G = self.tables.G
         cam_id = 0 if camera is None else (mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_CAMERA, camera) if isinstance(camera, str) else int(camera))
@@ -127,6 +167,7 @@ class Tier2Renderer:
         self.t_colors = tb.mps_tensor(self._colors_wp)
         self.color_buf = wm.buffer_of(self._colors_wp).buffer
         lights = t.lights.copy(); params = t.params.copy()
+        lock = np.zeros(max(model.nlight, 1), np.uint32)
         env_scale = 1.0
         if usd_lights is not None:
             for i, ul in enumerate(usd_lights):
@@ -134,36 +175,51 @@ class Tier2Renderer:
                     continue
                 lights[i, 4:7] = float(ul.get("intensity", 1.0)) * np.asarray(ul.get("color", (1, 1, 1)), np.float32)
                 lights[i, 7] = np.deg2rad(float(ul.get("angle_deg", 0.0))) / 2      # angular radius
+                lock[i] = 1
         self._dome = None if dome is None else (float(dome[0]), tuple(float(v) for v in dome[1]))
         if dome is not None:
             params[4, :3] = np.asarray(dome[1], np.float32); params[4, 3] = 1.0; env_scale = float(dome[0])
+        if transparent_ids not in ("mujoco", "behind", "surface"):
+            raise ValueError(f"transparent_ids must be 'surface', 'behind' or 'mujoco', got {transparent_ids!r}")
+        self.transparency = transparency
+        if (dome is not None or not skybox) and params.shape[0] > 6:
+            params[6, 1] = 0.0                # the skybox texture is not drawn (uniform dome / sky colour)
         if headlight is False:
             params[3, 3] = 0.0
-        self.light_buf = c.buffer(lights.nbytes, lights, "pt_lights")
+        from metalsim.render.model_sync import ModelSync, unit_rgba
+        self.sync = ModelSync(c, model, n_envs, t, self.color_buf, lights, lock, opaque=not transparency)
+        self.light_buf = self.sync.lights                    # (n_envs, max(nlight, 1)) records
         self.params_buf = c.buffer(params.nbytes, params, "pt_params")
         self.mat_model = material_model
-        self.mat_buf = None
+        # the renderer's own material table (rgba = 1: the model sync supplies the colour per world; column 15 is
+        # the reflectance in legacy mode, the per-slot BRDF model id otherwise)
+        mats = unit_rgba(t.materials)
         if material_model != "legacy":
-            mats = t.materials.copy().reshape(self.G, 16)
             ids = {"legacy": 0, "usd_preview_storm": 1, "omnipbr_curve": 2, "usd_preview": 3, "omnipbr": 4,
                    "usd_preview_v1": 1, "omnipbr_v1": 2, "usd_preview_fv": 5, "omnipbr_fv": 6}
             spec_ = material_model if isinstance(material_model, dict) else {None: material_model}
             for slot, g in enumerate(t.geoms):
                 nm = mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_GEOM, g)
                 mats[slot, 15] = ids[spec_.get(nm, spec_.get(None, "legacy"))]
-            self.mat_buf = c.buffer(mats.nbytes, mats, "pt_materials")
+            for j, ex in enumerate(t.extras):    # extra slots (sites, flexes, ...) by their own name
+                mats[len(t.geoms) + j, 15] = ids[spec_.get(ex["name"], spec_.get(None, "legacy"))]
+        # transparency=False: the model sync writes alpha 1 (ModelSync(opaque=True))
+        self.mat_buf = c.buffer(4 * (mats.size + self.G * 8), self._with_ext(mats), "pt_materials")
         ai = t.atlas.image
         self.atlas_tex = c.texture2d(ai.shape[1], ai.shape[0], Metal.MTLPixelFormatRGBA8Unorm, Metal.MTLTextureUsageShaderRead,
                                      label="pt_atlas", storage=Metal.MTLStorageModeShared)
         c.upload_texture(self.atlas_tex, ai)
         self.samp = c.sampler(linear=True, repeat=True)
         # PTConsts (shaders/pathtrace.metal): 16 words as before + [16:18] env grid, [20] env_yaw, [21] clamp_lum, [24:28] env_mul
-        self.consts = np.zeros(28, np.uint32)
+        self.consts = np.zeros(48, np.uint32)
         self.consts[:4] = (n_envs, width, height, max(model.ncam, 1))
         self.consts[4:8] = (max(model.nlight, 1) if model.nlight else 0, self.G, spp, max_bounces)
         self.consts[8:12] = (0, self.rt.tpr, 1, seed)
         cf = self.consts.view(np.float32); cf[12] = self.rt.stride; cf[13] = exposure; cf[14] = env_scale; cf[15] = clip_far
         cf[21] = float(firefly_clamp); cf[24:27] = 1.0
+        self.consts[23] = {"mujoco": 0, "surface": 0, "behind": 1}[transparent_ids]   # PTConsts.trans_ids
+        cf[28] = self.rt.ray_limit                                   # PTConsts.ray_limit
+        self.consts[32:48] = self.lens.pack().view(np.uint32)      # PTConsts.lens
         self.denoise = denoise
         self.aux = bool(aux or denoise)
         self.base_flags = (2 if material_model != "legacy" else 0) | (4 if tonemap == "rtx" else 0) | (8 if self.aux else 0) | (16 if center_sample else 0)
@@ -203,7 +259,7 @@ class Tier2Renderer:
         self._accum_view = wm.buffer_of(self._accum)
         self.out = RenderOutputs(**{k: tb.mps_tensor(a) for k, a in self._arrays.items()})
         self.t_accum = tb.mps_tensor(self._accum)
-        lib = c.library("pathtrace")
+        lib = c.library("pathtrace", self.rt.shader_defines() or None)
         self.pipe = c.compute_pipeline(lib, "path_trace")
         self.tm_consts = np.zeros(8, np.uint32); self.tm_consts[:3] = (n, width, height); self.tm_consts[3] = self.base_flags
         self.tm_consts.view(np.float32)[4] = exposure
@@ -229,30 +285,110 @@ class Tier2Renderer:
             lp[:, i] = model.light_pos[i]; ld[:, i] = model.light_dir[i]
         c.write_buffer(self._host_light_xpos, lp); c.write_buffer(self._host_light_xdir, ld)
         self.event = self.ctx.event
+        self.grains = None            # GrainField once set_particles is called (metalsim/render/particles.py)
+        self._ias = None
+        self._grain_dummy = c.buffer(304, label="pt_grain_placeholder")
+
+    # -- particles (render grains) ----------------------------------------------------------------------
+
+    def set_particles(self, positions, radius=None, material=None, *, grains_per_particle=8, grain_radius=None,
+                      radius_jitter=0.3, n_meshes=4, seed=0, grain_shape=None, ids=None, cull_z=-np.inf, grain_eps=None,
+                      structure="two_level", grain_chunk=None):
+        """Draw particles as render grains (granular media: MPM sand, ...). ``positions``: (n_envs, P, 3) or (P, 3)
+        numpy [m], or a Warp array on the Metal device (bound directly each frame: the GPU path). ``radius``: the
+        particle radius [m] (half the particle spacing): each particle's grains are spread over its cube of half side
+        ``radius``. ``grain_radius``: volume-equivalent grain radius [m] (default ``radius / grains_per_particle^(1/3)``,
+        about touching grains). ``material``: ``particles.GrainMaterial`` (default sand). ``positions=None`` removes
+        the particles. ``grain_shape``: ``particles.grain_meshes`` options (irregularity, elongation, subdiv);
+        ``cull_z``: particles below it get no grains; non-finite positions are culled. ``ids``: stable particle
+        ids ((n_envs, P) or (P,) uint32) when the particle set is culled or reordered between frames (grains hash the id). Later calls with the same
+        radius and grains_per_particle only replace the positions (or material); other
+        arguments apply on the first call or when ``radius`` / ``grains_per_particle`` change. ``structure``:
+        ``"two_level"`` (default: the grains are their own instance acceleration structure, one instance of the
+        scene's) or ``"flat"`` (one top-level instance per grain); same image, see ``particles.InstanceStructure``.
+        ``grain_chunk``: grains per two-level grain structure (default Metal's standard limit, 2^24; tests use less)."""
+        from metalsim.render.particles import GrainField, InstanceStructure
+        if positions is None:
+            self.grains, self._ias = None, None
+            return
+        g = self.grains
+        if g is None or (radius is not None and float(radius) != g.offset) or int(grains_per_particle) != g.k:
+            if radius is None:
+                raise ValueError("set_particles: radius is required the first time")
+            gr = grain_radius if grain_radius is not None else float(radius) / float(grains_per_particle) ** (1 / 3)
+            g = GrainField(self.ctx, self.n, grains_per_particle=grains_per_particle, radius=gr,
+                           radius_jitter=radius_jitter, offset=float(radius), n_meshes=n_meshes, material=material,
+                           seed=seed, cull_z=cull_z, shape=grain_shape)
+            self.grains, self._ias = g, InstanceStructure(self.rt, g, structure, grain_chunk)
+        elif material is not None:
+            g.set_material(material)
+        if self._ias.mode != structure or (grain_chunk is not None and grain_chunk != self._ias.chunk):
+            self._ias = InstanceStructure(self.rt, g, structure, grain_chunk)
+        g.cull_z = float(cull_z)
+        g.set_positions(positions)
+        g.set_ids(ids)
+        cf = self.consts.view(np.float32)
+        # flat: first grain instance, first grain mesh in the top-level list; two-level: grain count, meshes from 0
+        self.consts[18:20] = (self.rt.n_inst, len(self.rt.prim_as)) if structure == "flat" else (g.n_grains, 0)
+        cf[22] = grain_eps if grain_eps is not None else max(0.01 * g.radius, 1e-5)
+
+    def _encode_scene(self, cb, gx, gxo, gm, gmo):
+        """Refit the scene instances (and with particles: write the grain instances) and build the structure."""
+        if self.grains is None or self.grains.n_grains == 0:
+            self.rt._encode_refit_and_build(cb, gx, gxo, gm, gmo)
+        else:
+            self._ias.encode(cb, gx, gxo, gm, gmo)
+
+    def _with_ext(self, mats):
+        """(G, 16) material table followed by the (G, 8) MaterialExt table, the layout path_trace reads."""
+        ext = self.tables.material_ext if self.tables.material_ext is not None else np.zeros((self.G, 8), np.float32)
+        return np.concatenate([np.asarray(mats, np.float32).reshape(-1), np.asarray(ext, np.float32).reshape(-1)])
 
     def _encode(self, cb, reset: bool, cam_xpos, cxo, cam_xmat, cmo, light_xpos, lxo, light_xdir, ldo):
         self.consts[8] = self.frame
-        self.consts[10] = (1 if reset else 0) | self.base_flags | self.env_flags
+        grains = self.grains is not None and self.grains.n_grains > 0
+        two = grains and self._ias.mode == "two_level"
+        if grains:
+            self._ias.ensure()          # (the extended-limits flag is known once the structure is sized)
+        ext = grains and self._ias.mode == "flat" and self._ias.extended
+        if ext and self.rt.dyn_bvh is not None:
+            raise ValueError("a flat grain structure past 2^24 instances needs the extended_limits intersector, which "
+                             "the sbvh dynamic-object layout's queries cannot use: set_particles(structure='two_level') "
+                             "(default) or Tier2Renderer(dyn_layout='per_env')")
+        self.consts[10] = ((1 if reset else 0) | self.base_flags | self.env_flags | (64 if grains else 0) | (128 if two else 0)
+                           | (256 if ext else 0))
         ce = cb.computeCommandEncoder()
         ce.setComputePipelineState_(self.pipe)
         rt = self.rt
-        rt._use_resources(ce)
-        ce.setAccelerationStructure_atBufferIndex_(rt.inst_as, 0)
+        if grains:
+            self._ias.use_resources(ce)
+            ce.setAccelerationStructure_atBufferIndex_(self._ias.inst_as, 0)
+        else:
+            rt._use_resources(ce)
+            ce.setAccelerationStructure_atBufferIndex_(rt.inst_as, 0)
         ce.setBuffer_offset_atIndex_(rt.inst_tab, 0, 1); ce.setBuffer_offset_atIndex_(rt.slot_mesh, 0, 2)
         ce.setBuffer_offset_atIndex_(rt.mesh_info, 0, 3); ce.setBuffer_offset_atIndex_(rt.vbuf, 0, 4)
-        ce.setBuffer_offset_atIndex_(rt.ibuf, 0, 5); ce.setBuffer_offset_atIndex_(rt.inst_desc, 0, 6)
-        ce.setBuffer_offset_atIndex_(self.mat_buf or rt.mat_buf, 0, 7); ce.setBuffer_offset_atIndex_(self.color_buf, 0, 8)
+        ce.setBuffer_offset_atIndex_(rt.ibuf, 0, 5); ce.setBuffer_offset_atIndex_(self._ias.inst_desc if grains else rt.inst_desc, 0, 6)
+        ce.setBuffer_offset_atIndex_(self.mat_buf, 0, 7)   # + MaterialExt tail
+        ce.setBuffer_offset_atIndex_(self.sync.inst_col, 0, 8)   # t_colors x the per-world model colour
         ce.setBuffer_offset_atIndex_(self.light_buf, 0, 9)
         ce.setBuffer_offset_atIndex_(light_xpos, lxo, 10); ce.setBuffer_offset_atIndex_(light_xdir, ldo, 11)
         ce.setBuffer_offset_atIndex_(self.params_buf, 0, 12); ce.setBuffer_offset_atIndex_(self.cam_buf, 0, 13)
         ce.setBuffer_offset_atIndex_(cam_xpos, cxo, 14); ce.setBuffer_offset_atIndex_(cam_xmat, cmo, 15)
-        ce.setBytes_length_atIndex_(self.consts.tobytes(), self.consts.nbytes, 16)   # copied at encode time (per pass)
+        cbytes = self.consts.tobytes() + rt.grid.words().tobytes()     # PTConsts: 28 words, then the EnvGrid
+        if rt.dyn_bvh is not None:      # PTConsts.dyn_args: the BVH argument struct's address (the 31 buffer slots are taken)
+            cbytes += np.array([rt.dyn_bvh.args.gpuAddress(), 0], np.uint64).tobytes()
+        ce.setBytes_length_atIndex_(cbytes, len(cbytes), 16)   # copied at encode time (per pass)
         ce.setBuffer_offset_atIndex_(self._accum_view.buffer, self._accum_view.offset, 17)
         for i, k in enumerate(("rgb", "depth", "seg", "normal")):
             v = self._views[k]; ce.setBuffer_offset_atIndex_(v.buffer, v.offset, 18 + i)
         for i, k in enumerate(("hdr", "aux_accum", "albedo", "nrm")):
             v = self._aux_views[k]; ce.setBuffer_offset_atIndex_(v.buffer, v.offset, 22 + i)
         ce.setBuffer_offset_atIndex_(self._env_cdf, 0, 26)
+        g = self.grains if grains else None
+        for i, (b, off) in enumerate(((g.vbuf, 0), (g.ibuf, 0), self._ias.grain_binding(), (g.mat_buf, 0)) if g
+                                     else ((self._grain_dummy, 0),) * 4):
+            ce.setBuffer_offset_atIndex_(b, off, 27 + i)
         ce.setTexture_atIndex_(self.atlas_tex, 0); ce.setSamplerState_atIndex_(self.samp, 0)
         ce.setTexture_atIndex_(self._env_tex, 1); ce.setSamplerState_atIndex_(self.env_samp, 1)
         ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.tw, self.th, self.n), Metal.MTLSize(8, 8, 1))
@@ -298,17 +434,23 @@ class Tier2Renderer:
             cb2 = self.ctx.command_buffer(); self._encode_tonemap(cb2); return cb2
         return cb
 
-    def render(self, sim, after_value=None, reset=True, passes=1) -> int:
+    def render(self, sim, after_value=None, reset=True, passes=1, sources=None) -> int:
         """GPU path from a BatchSim: refit + rebuild the acceleration structure, then ``passes`` path
-        tracing passes of ``spp`` samples each (progressive; ``reset`` restarts accumulation)."""
-        if after_value is None:
-            after_value = sim.event.value
+        tracing passes of ``spp`` samples each (progressive; ``reset`` restarts accumulation).
+        ``sources``: vertex arrays of the dynamic objects not in ``sim.d`` (see ``Tier0Renderer.render``)."""
+        ev = getattr(sim, "event", None)
+        if after_value is None and ev is not None:
+            after_value = ev.value
         names = ["geom_xpos", "geom_xmat", "cam_xpos", "cam_xmat"] + (["light_xpos", "light_xdir"] if self.m.nlight else [])
         v = {k: wm.buffer_of(getattr(sim.d, k)) for k in names}
+        self.rt.set_sources(sim, sources)
         cb = self.ctx.command_buffer()
-        self.ctx.wait_for(cb, sim.event, after_value)
+        if ev is not None:
+            self.ctx.wait_for(cb, ev, after_value)
+        self.sync.encode(cb, sim if self.model_fields else None)
         gm_buf, gm_off = self.rt.encode_geom_xmat(cb, sim, v["geom_xmat"].buffer, v["geom_xmat"].offset)
-        self.rt._encode_refit_and_build(cb, v["geom_xpos"].buffer, v["geom_xpos"].offset, gm_buf, gm_off)
+        gx_buf, gx_off, gm_buf, gm_off = self.rt.encode_pose(cb, sim, v["geom_xpos"].buffer, v["geom_xpos"].offset, gm_buf, gm_off)
+        self._encode_scene(cb, gx_buf, gx_off, gm_buf, gm_off)
         lx = v.get("light_xpos"); ld = v.get("light_xdir")
         lxb, lxo, ldb, ldo = (lx.buffer, lx.offset, ld.buffer, ld.offset) if lx else (self._host_light_xpos, 0, self._host_light_xdir, 0)
         for p in range(passes):
@@ -413,25 +555,31 @@ class Tier2Renderer:
     def set_materials(self, materials):
         """Replace the (G, 16) material table (layout: SceneTables.MATERIAL_LAYOUT) and rewrite the GPU buffer;
         the per-slot BRDF model ids of a non-legacy ``material_model`` are kept."""
+        from metalsim.render.model_sync import unit_rgba
         mats = np.asarray(materials, np.float32).reshape(self.G, 16).copy()
-        if self.mat_buf is not None:
+        self.tables.materials[:] = mats.reshape(self.tables.materials.shape)
+        self.ctx.write_buffer(self.rt.mat_buf, mats)            # the lidar's reflectance (column 15)
+        if self.mat_model != "legacy":
             mats[:, 15] = self.ctx.buffer_array(self.mat_buf, np.float32, (self.G, 16))[:, 15]
-            self.ctx.write_buffer(self.mat_buf, mats)
-        else:
-            self.tables.materials[:] = mats.reshape(self.tables.materials.shape)
-            self.ctx.write_buffer(self.rt.mat_buf, mats)
+        self.ctx.write_buffer(self.mat_buf, unit_rgba(mats))
+        self.sync.set_static_rgba(mats)
 
-    def render_host(self, datas, passes=1, reset=True, cam_pos=None, cam_quat=None, geom_size=None):
+    def render_host(self, datas, passes=1, reset=True, cam_pos=None, cam_quat=None, geom_size=None, chunk=None, sources=None):
         """Host path from MjData lists (tests/tools); synchronizes; returns numpy outputs. ``geom_size`` (N, ngeom, 3):
-        per-world sizes of the terrain slots (default the model's)."""
+        per-world sizes of the terrain slots (default the model's). ``chunk``: commit and wait every ``chunk`` passes
+        (long offline renders: bounded command buffers; same result). ``sources``: as ``render`` (numpy arrays)."""
         from metalsim.render.scene_tables import quats_to_mats
         n, ng, nc, nl = self.n, self.m.ngeom, max(self.m.ncam, 1), max(self.m.nlight, 1)
         c = self.ctx; rt = self.rt
-        c.write_buffer(rt._host_geom_xpos, np.stack([d.geom_xpos for d in datas]).astype(np.float32).reshape(n, ng, 3))
+        gx = np.stack([d.geom_xpos for d in datas]).astype(np.float32).reshape(n, ng, 3)
         gm = np.stack([d.geom_xmat for d in datas]).astype(np.float32).reshape(n, ng, 9)
         if rt.sized is not None:
             gm = rt.sized.scale_host(gm, geom_size).astype(np.float32)
+        if rt.pose is not None:
+            gx, gm = rt.pose.host(gx, gm, datas)
+        c.write_buffer(rt._host_geom_xpos, gx)
         c.write_buffer(rt._host_geom_xmat, gm)
+        rt.set_sources(sources=sources, datas=datas)
         if cam_pos is not None:
             cx = np.zeros((n, nc, 3), np.float32); cm = np.zeros((n, nc, 9), np.float32)
             cx[:, self.cam_id] = cam_pos; cm[:, self.cam_id] = quats_to_mats(np.asarray(cam_quat, np.float64)).reshape(n, 9)
@@ -443,8 +591,11 @@ class Tier2Renderer:
             c.write_buffer(self._host_light_xpos, np.stack([d.light_xpos for d in datas]).astype(np.float32).reshape(n, nl, 3))
             c.write_buffer(self._host_light_xdir, np.stack([d.light_xdir for d in datas]).astype(np.float32).reshape(n, nl, 3))
         cb = c.command_buffer()
-        rt._encode_refit_and_build(cb, rt._host_geom_xpos, 0, rt._host_geom_xmat, 0)
+        self.sync.encode(cb, None)
+        self._encode_scene(cb, rt._host_geom_xpos, 0, rt._host_geom_xmat, 0)
         for p in range(passes):
+            if chunk and p and p % int(chunk) == 0:
+                c.commit(cb); c.synchronize(); cb = c.command_buffer()
             self._encode(cb, reset and p == 0, self._host_cam_xpos, 0, self._host_cam_xmat, 0, self._host_light_xpos, 0, self._host_light_xdir, 0)
         cb = self._postprocess(cb)
         c.commit(cb); c.synchronize()

@@ -1,0 +1,801 @@
+diff --git a/newton/_src/solvers/implicit_mpm/fused_jacobi.py b/newton/_src/solvers/implicit_mpm/fused_jacobi.py
+new file mode 100644
+index 00000000..4354d393
+--- /dev/null
++++ b/newton/_src/solvers/implicit_mpm/fused_jacobi.py
+@@ -0,0 +1,417 @@
++# SPDX-FileCopyrightText: Copyright (c) 2026 The Newton Developers
++# SPDX-License-Identifier: Apache-2.0
++
++"""Jacobi rheology iterations of independent environments in one dispatch (Metal).
++
++With ``separate_worlds`` every environment's nodes are a contiguous range of the environment-first velocity, strain
++and collider partitions, and no matrix couples two environments. One iteration of the Jacobi solver with sub-grid
++contact (``_SubgridContactSolver.solve`` then ``_JacobiSolver.solve``) is six full-grid passes, each a separate
++dispatch: friction at collider nodes, collider impulses to velocity nodes, the rigid-body coupling (two BSR
++products), the local stress solve, the stress update of the velocity nodes and the stress accumulation. Here one
++threadgroup runs an environment through ``count`` iterations, the passes separated by threadgroup barriers instead of
++dispatch boundaries. Every node value is computed by one thread with the code of the corresponding kernel (the same
++Warp functions, or the kernel bodies transcribed statement for statement), from the same inputs, so the iterates are
++bitwise those of the dispatch-per-pass loop: within a pass, nodes only read values produced by earlier passes of the
++same environment.
++
++Items that belong to no environment (collider nodes and coupling-matrix rows past the environments' ranges) are
++processed by one extra threadgroup, pass by pass, with the same code; they read nothing written by the environments
++in the same pass (collider rows outside every environment are empty, global bodies have no coupled nodes).
++"""
++
++from __future__ import annotations
++
++import os
++
++import warp as wp
++import warp.fem as fem
++from warp._src.sparse import _bsr_row_end
++
++from .contact_solver_kernels import solve_coulomb_isotropic
++from .rheology_solver_kernels import (
++    YieldParamVec,
++    _symmetric_part_transposed_op,
++    make_compute_local_strain,
++    make_solve_local_stress,
++    mat13,
++    mat55,
++    mat66,
++    vec6,
++)
++
++wp.set_module_options({"enable_backward": False})
++
++BLOCK_DIM = int(os.environ.get("NEWTON_METAL_FUSED_JACOBI_BLOCK", "256"))
++"""Threads per environment (one threadgroup). A multiple of 32."""
++
++
++def threadgroup_size_ok(kernel, device, block_dim: int, num_threads: int) -> bool:
++    """True when a launch of ``kernel`` with ``block_dim`` runs in threadgroups of exactly ``block_dim`` threads.
++
++    Warp's Metal launch uses ``min(block_dim, pipeline.maxTotalThreadsPerThreadgroup)`` threads per threadgroup; a
++    pipeline that cannot hold ``block_dim`` threads (register pressure) would split an environment across
++    threadgroups and leave a partial last threadgroup whose idle threads return before the barriers, so the fused
++    kernel is used only when the whole environment fits one threadgroup.
++    """
++    from warp._src.context import metal_forward_pipeline, runtime  # noqa: PLC0415
++
++    module_exec = kernel.module.load(device, block_dim=block_dim)
++    if module_exec is None:
++        return False
++    hooks = module_exec.get_kernel_hooks(kernel)
++    pipeline = metal_forward_pipeline(hooks, num_threads)
++    if not pipeline:
++        return False
++    max_threads = runtime.core.wp_metal_get_kernel_max_threads_per_threadgroup(pipeline)
++    return block_dim % 32 == 0 and num_threads % block_dim == 0 and max_threads >= block_dim
++
++
++@wp.func_native(
++    "#if defined(__METAL_VERSION__)\n"
++    "metal::threadgroup_barrier(metal::mem_flags::mem_device | metal::mem_flags::mem_threadgroup);\n"
++    "#endif\n"
++)
++def _tg_barrier(): ...
++
++
++# --- per-node bodies of the dispatched kernels (statement for statement) ---------------------------------------------
++
++
++@wp.func
++def _solve_subgrid_friction_node(
++    i: int,
++    velocity: wp.array[wp.vec3],
++    collider_mat_offsets: wp.array[int],
++    collider_mat_columns: wp.array[int],
++    collider_mat_values: wp.array[float],
++    collider_friction: wp.array[float],
++    collider_adhesion: wp.array[float],
++    collider_normals: wp.array[wp.vec3],
++    collider_delassus_diagonal: wp.array[float],
++    collider_velocities: wp.array[wp.vec3],
++    impulse: wp.array[wp.vec3],
++    delta_impulse: wp.array[wp.vec3],
++):
++    # contact_solver_kernels.solve_subgrid_friction
++    w = collider_delassus_diagonal[i]
++    friction_coeff = collider_friction[i]
++    if w <= 0.0 or friction_coeff < 0.0:
++        return
++
++    beg = collider_mat_offsets[i]
++    end = collider_mat_offsets[i + 1]
++
++    u0 = -collider_velocities[i]
++    for b in range(beg, end):
++        u_i = collider_mat_columns[b]
++        u0 += collider_mat_values[b] * velocity[u_i]
++
++    n = collider_normals[i]
++
++    u = solve_coulomb_isotropic(friction_coeff, n, u0 - (impulse[i] + collider_adhesion[i] * n) * w)
++
++    delta_u = u - u0
++    delta_lambda = delta_u / w
++
++    impulse[i] += delta_lambda
++    delta_impulse[i] = delta_lambda
++
++
++@wp.func
++def _apply_subgrid_impulse_node(
++    u_i: int,
++    tr_collider_mat_offsets: wp.array[int],
++    tr_collider_mat_columns: wp.array[int],
++    tr_collider_mat_values: wp.array[float],
++    inv_mass: wp.array[float],
++    impulses: wp.array[wp.vec3],
++    velocities: wp.array[wp.vec3],
++):
++    # contact_solver_kernels.apply_subgrid_impulse
++    block_beg = tr_collider_mat_offsets[u_i]
++    block_end = tr_collider_mat_offsets[u_i + 1]
++
++    delta_f = wp.vec3(0.0)
++    for b in range(block_beg, block_end):
++        delta_f += tr_collider_mat_values[b] * impulses[tr_collider_mat_columns[b]]
++
++    velocities[u_i] += inv_mass[u_i] * delta_f
++
++
++@wp.func
++def _bsr_mv_row(
++    alpha: float,
++    A_offsets: wp.array[int],
++    A_row_counts: wp.array[int],
++    A_columns: wp.array[int],
++    A_values: wp.array3d[float],
++    x: wp.array[float],
++    beta: float,
++    y: wp.array[float],
++    row: int,
++    subrow: int,
++):
++    # warp.sparse bsr_mv_kernel (non-tiled form, as bsr_mv launches it off CUDA), block_cols = 3
++    block_rows = A_values.shape[1]
++
++    yi = row * block_rows + subrow
++
++    scalar_zero = float(0)
++    v = scalar_zero
++
++    if alpha != scalar_zero:
++        beg = A_offsets[row]
++        end = _bsr_row_end(A_offsets, A_row_counts, row)
++        for block in range(beg, end):
++            xs = A_columns[block] * 3
++            for col in range(wp.static(3)):
++                v += A_values[block, subrow, col] * x[xs + col]
++        v *= alpha
++
++    if beta != scalar_zero:
++        v += beta * y[yi]
++
++    y[yi] = v
++
++
++@wp.func
++def _apply_stress_delta_jacobi_node(
++    u_i: int,
++    transposed_strain_mat_offsets: wp.array[int],
++    transposed_strain_mat_columns: wp.array[int],
++    transposed_strain_mat_values: wp.array[mat13],
++    inv_mass_matrix: wp.array[float],
++    stress: wp.array[vec6],
++    velocities: wp.array[wp.vec3],
++):
++    # rheology_solver_kernels.apply_stress_delta_jacobi
++    inv_mass = inv_mass_matrix[u_i]
++
++    block_beg = transposed_strain_mat_offsets[u_i]
++    block_end = transposed_strain_mat_offsets[u_i + 1]
++
++    delta_u = wp.vec3(0.0)
++    for b in range(block_beg, block_end):
++        tau_i = transposed_strain_mat_columns[b]
++        delta_stress = stress[tau_i]
++        delta_u += _symmetric_part_transposed_op(transposed_strain_mat_values[b], delta_stress)
++
++    velocities[u_i] += inv_mass * delta_u
++
++
++@wp.struct
++class ContactArgs:
++    collider_mat_offsets: wp.array[int]
++    collider_mat_columns: wp.array[int]
++    collider_mat_values: wp.array[float]
++    tr_collider_mat_offsets: wp.array[int]
++    tr_collider_mat_columns: wp.array[int]
++    tr_collider_mat_values: wp.array[float]
++    collider_friction: wp.array[float]
++    collider_adhesion: wp.array[float]
++    collider_normals: wp.array[wp.vec3]
++    collider_delassus_diagonal: wp.array[float]
++    collider_velocities: wp.array[wp.vec3]
++    collider_velocities_flat: wp.array[float]
++    impulse: wp.array[wp.vec3]
++    delta_impulse: wp.array[wp.vec3]
++    delta_impulse_flat: wp.array[float]
++    collider_env_offsets: wp.array[int]
++    collider_count: int
++
++
++@wp.struct
++class RigidityArgs:
++    J_offsets: wp.array[int]
++    J_row_counts: wp.array[int]
++    J_columns: wp.array[int]
++    J_values: wp.array3d[float]
++    IJtm_offsets: wp.array[int]
++    IJtm_row_counts: wp.array[int]
++    IJtm_columns: wp.array[int]
++    IJtm_values: wp.array3d[float]
++    IJtm_row_count: int
++    delta_body_qd: wp.array[float]
++    env_row_offsets: wp.array[int]  # environment -> range in env_rows; the last range: rows of no environment
++    env_rows: wp.array[int]
++
++
++@wp.struct
++class RheologyArgs:
++    yield_params: wp.array[YieldParamVec]
++    strain_node_volume: wp.array[float]
++    compliance_mat_offsets: wp.array[int]
++    compliance_mat_columns: wp.array[int]
++    compliance_mat_values: wp.array[mat66]
++    strain_mat_offsets: wp.array[int]
++    strain_mat_columns: wp.array[int]
++    strain_mat_values: wp.array[mat13]
++    transposed_strain_mat_offsets: wp.array[int]
++    transposed_strain_mat_columns: wp.array[int]
++    transposed_strain_mat_values: wp.array[mat13]
++    delassus_diagonal: wp.array[vec6]
++    delassus_rotation: wp.array[mat55]
++    elastic_strain_delta: wp.array[vec6]
++    stress: wp.array[vec6]
++    delta_stress: wp.array[vec6]
++    strain_env_offsets: wp.array[int]
++    inv_volume: wp.array[float]
++    velocity: wp.array[wp.vec3]
++    velocity_env_offsets: wp.array[int]
++
++
++_KERNELS = {}
++
++
++def make_fused_kernel(
++    has_viscosity: bool, has_dilatancy: bool, has_compliance_mat: bool, has_rigidity: bool, kernel_options: dict
++):
++    key = (has_viscosity, has_dilatancy, has_compliance_mat, has_rigidity, BLOCK_DIM, tuple(sorted(kernel_options.items())))
++    if key in _KERNELS:
++        return _KERNELS[key]
++
++    compute_local_strain = make_compute_local_strain(has_compliance_mat, -1)
++    solve_local_stress = make_solve_local_stress(has_viscosity, has_dilatancy)
++
++    @fem.cache.dynamic_kernel(suffix=key, kernel_options=kernel_options)
++    def fused_jacobi_iterations(
++        iterations: int,
++        env_count: int,
++        contact: ContactArgs,
++        rigidity: RigidityArgs,
++        rheology: RheologyArgs,
++    ):
++        env, lane = wp.tid()
++
++        # ranges of this threadgroup; the last group (env == env_count) takes the items of no environment
++        c_beg = int(0)
++        c_end = int(0)
++        v_beg = int(0)
++        v_end = int(0)
++        s_beg = int(0)
++        s_end = int(0)
++        if env < env_count:
++            c_beg = contact.collider_env_offsets[env]
++            c_end = contact.collider_env_offsets[env + 1]
++            v_beg = rheology.velocity_env_offsets[env]
++            v_end = rheology.velocity_env_offsets[env + 1]
++            s_beg = rheology.strain_env_offsets[env]
++            s_end = rheology.strain_env_offsets[env + 1]
++        else:
++            c_beg = contact.collider_env_offsets[env_count]
++            c_end = contact.collider_count
++        r_beg = int(0)
++        r_end = int(0)
++        if wp.static(has_rigidity):
++            r_beg = rigidity.env_row_offsets[env]
++            r_end = rigidity.env_row_offsets[env + 1]
++
++        for _it in range(iterations):
++            # --- _SubgridContactSolver.solve: solve_subgrid_friction
++            for i in range(c_beg + lane, c_end, wp.static(BLOCK_DIM)):
++                _solve_subgrid_friction_node(
++                    i,
++                    rheology.velocity,
++                    contact.collider_mat_offsets,
++                    contact.collider_mat_columns,
++                    contact.collider_mat_values,
++                    contact.collider_friction,
++                    contact.collider_adhesion,
++                    contact.collider_normals,
++                    contact.collider_delassus_diagonal,
++                    contact.collider_velocities,
++                    contact.impulse,
++                    contact.delta_impulse,
++                )
++            _tg_barrier()
++            # apply_subgrid_impulse
++            for u_i in range(v_beg + lane, v_end, wp.static(BLOCK_DIM)):
++                _apply_subgrid_impulse_node(
++                    u_i,
++                    contact.tr_collider_mat_offsets,
++                    contact.tr_collider_mat_columns,
++                    contact.tr_collider_mat_values,
++                    rheology.inv_volume,
++                    contact.delta_impulse,
++                    rheology.velocity,
++                )
++            _tg_barrier()
++            if wp.static(has_rigidity):
++                # apply_rigidity_operator: delta_body_qd = -IJtm @ delta_impulse
++                for k in range(3 * r_beg + lane, 3 * r_end, wp.static(BLOCK_DIM)):
++                    _bsr_mv_row(
++                        -1.0,
++                        rigidity.IJtm_offsets,
++                        rigidity.IJtm_row_counts,
++                        rigidity.IJtm_columns,
++                        rigidity.IJtm_values,
++                        contact.delta_impulse_flat,
++                        0.0,
++                        rigidity.delta_body_qd,
++                        rigidity.env_rows[k // 3],
++                        k - (k // 3) * 3,
++                    )
++                _tg_barrier()
++                # collider_velocity += J @ delta_body_qd
++                for k in range(3 * c_beg + lane, 3 * c_end, wp.static(BLOCK_DIM)):
++                    _bsr_mv_row(
++                        1.0,
++                        rigidity.J_offsets,
++                        rigidity.J_row_counts,
++                        rigidity.J_columns,
++                        rigidity.J_values,
++                        rigidity.delta_body_qd,
++                        1.0,
++                        contact.collider_velocities_flat,
++                        k // 3,
++                        k - (k // 3) * 3,
++                    )
++                _tg_barrier()
++            # --- _JacobiSolver.solve: jacobi_solve_kernel
++            for tau_i in range(s_beg + lane, s_end, wp.static(BLOCK_DIM)):
++                if rheology.strain_mat_offsets[tau_i] == rheology.strain_mat_offsets[tau_i + 1]:
++                    rheology.delta_stress[tau_i] = vec6(0.0)
++                else:
++                    local_strain = compute_local_strain(
++                        tau_i,
++                        rheology.compliance_mat_offsets,
++                        rheology.compliance_mat_columns,
++                        rheology.compliance_mat_values,
++                        rheology.strain_mat_offsets,
++                        rheology.strain_mat_columns,
++                        rheology.strain_mat_values,
++                        rheology.elastic_strain_delta,
++                        rheology.velocity,
++                        rheology.stress,
++                    )
++                    rheology.delta_stress[tau_i] = solve_local_stress(
++                        tau_i,
++                        local_strain,
++                        rheology.yield_params,
++                        rheology.strain_node_volume,
++                        rheology.delassus_diagonal,
++                        rheology.delassus_rotation,
++                        rheology.stress,
++                    )
++            _tg_barrier()
++            # apply_stress_delta_jacobi
++            for u_i in range(v_beg + lane, v_end, wp.static(BLOCK_DIM)):
++                _apply_stress_delta_jacobi_node(
++                    u_i,
++                    rheology.transposed_strain_mat_offsets,
++                    rheology.transposed_strain_mat_columns,
++                    rheology.transposed_strain_mat_values,
++                    rheology.inv_volume,
++                    rheology.delta_stress,
++                    rheology.velocity,
++                )
++            _tg_barrier()
++            # array_axpy(x=delta_stress, y=stress, alpha=1, beta=1): y = beta * y + alpha * x
++            for tau_i in range(s_beg + lane, s_end, wp.static(BLOCK_DIM)):
++                alpha = float(1.0)
++                beta = float(1.0)
++                rheology.stress[tau_i] = beta * rheology.stress[tau_i] + alpha * rheology.delta_stress[tau_i]
++            _tg_barrier()
++
++    _KERNELS[key] = fused_jacobi_iterations
++    return fused_jacobi_iterations
+diff --git a/newton/_src/solvers/implicit_mpm/rasterized_collisions.py b/newton/_src/solvers/implicit_mpm/rasterized_collisions.py
+index bdf0d5b8..2ddbfcfc 100644
+--- a/newton/_src/solvers/implicit_mpm/rasterized_collisions.py
++++ b/newton/_src/solvers/implicit_mpm/rasterized_collisions.py
+@@ -1,6 +1,8 @@
+ # SPDX-FileCopyrightText: Copyright (c) 2025 The Newton Developers
+ # SPDX-License-Identifier: Apache-2.0
+ 
++import os
++
+ import warp as wp
+ import warp.fem as fem
+ import warp.sparse as wps
+@@ -857,6 +859,11 @@ def build_rigidity_operator(
+         ],
+     )
+ 
++    if getattr(J_rows.device, "is_metal", False) and os.environ.get("NEWTON_METAL_RIGIDITY_COMPACT", "1") != "0":
++        return _rigidity_matrices_compacted(
++            vel_node_count, particle_block_offset + deformable_vertex_count, J_rows, J_cols, J_values, IJtm_values
++        )
++
+     J = wps.bsr_from_triplets(
+         rows_of_blocks=vel_node_count,
+         cols_of_blocks=particle_block_offset + deformable_vertex_count,
+@@ -874,3 +881,70 @@ def build_rigidity_operator(
+     )
+ 
+     return J, IJtm
++
++
++@wp.kernel
++def _triplet_slot_valid(rows: wp.array[int], cols: wp.array[int], valid: wp.array[int]):
++    i = wp.tid()
++    valid[i] = wp.where(rows[i] >= 0 and cols[i] >= 0, 1, 0)
++
++
++@wp.kernel
++def _compact_triplet_slots(
++    rows: wp.array[int],
++    cols: wp.array[int],
++    J_values: wp.array[wp.mat33],
++    IJtm_values: wp.array[wp.mat33],
++    position: wp.array[int],
++    rows_out: wp.array[int],
++    cols_out: wp.array[int],
++    J_values_out: wp.array[wp.mat33],
++    IJtm_values_out: wp.array[wp.mat33],
++    count: wp.array[int],
++):
++    i = wp.tid()
++    n = rows.shape[0]
++    if i == n - 1:
++        count[0] = position[i] + wp.where(rows[i] >= 0 and cols[i] >= 0, 1, 0)
++    if rows[i] >= 0 and cols[i] >= 0:
++        k = position[i]
++        rows_out[k] = rows[i]
++        cols_out[k] = cols[i]
++        J_values_out[k] = J_values[i]
++        IJtm_values_out[k] = IJtm_values[i]
++
++
++def _rigidity_matrices_compacted(row_blocks, col_blocks, J_rows, J_cols, J_values, IJtm_values):
++    """``J`` and ``IJtm`` as :func:`build_rigidity_operator` assembles them, from the kept triplets only.
++
++    Most slots are empty (nodes away from dynamic colliders). The kept ones are moved to the front in slot order and
++    their count is passed to the assembly, whose stable sort then orders only those: every kept triplet keeps its
++    rank among the kept ones, so offsets, columns and values are the same as from the full triplet arrays (empty
++    slots map to the sentinel key there and are dropped).
++    """
++    from warp.utils import array_scan  # noqa: PLC0415
++
++    n = J_rows.shape[0]
++    device = J_rows.device
++    valid = wp.empty(n, dtype=int, device=device)
++    position = wp.empty(n, dtype=int, device=device)
++    rows_c = wp.empty(n, dtype=int, device=device)
++    cols_c = wp.empty(n, dtype=int, device=device)
++    J_values_c = wp.empty(n, dtype=wp.mat33, device=device)
++    IJtm_values_c = wp.empty(n, dtype=wp.mat33, device=device)
++    count = wp.zeros(1, dtype=int, device=device)
++    if n > 0:
++        wp.launch(_triplet_slot_valid, dim=n, inputs=[J_rows, J_cols, valid], device=device)
++        array_scan(valid, position, inclusive=False)
++        wp.launch(
++            _compact_triplet_slots,
++            dim=n,
++            inputs=[J_rows, J_cols, J_values, IJtm_values, position, rows_c, cols_c, J_values_c, IJtm_values_c, count],
++            device=device,
++        )
++
++    J = wps.bsr_zeros(row_blocks, col_blocks, block_type=wp.mat33, device=device)
++    wps.bsr_set_from_triplets(J, rows_c, cols_c, J_values_c, count=count)
++    IJtm = wps.bsr_zeros(col_blocks, row_blocks, block_type=wp.mat33, device=device)
++    wps.bsr_set_from_triplets(IJtm, cols_c, rows_c, IJtm_values_c, count=count)
++    return J, IJtm
+diff --git a/newton/_src/solvers/implicit_mpm/solve_rheology.py b/newton/_src/solvers/implicit_mpm/solve_rheology.py
+index 6c33da21..47994bd5 100644
+--- a/newton/_src/solvers/implicit_mpm/solve_rheology.py
++++ b/newton/_src/solvers/implicit_mpm/solve_rheology.py
+@@ -372,6 +372,8 @@ class MomentumData:
+     node_bound: wp.array[int] | None = None
+     """Device-side count of active velocity nodes (a 1-element view, see :func:`active_node_bound`): kernels over
+     the node capacity may skip the nodes past it. ``None``: every node is processed."""
++    environment_offsets: wp.array[int] | None = None
++    """Velocity-node offsets delimiting independent environments (environment-first partition), or ``None``."""
+ 
+ 
+ @dataclass
+@@ -462,6 +464,12 @@ class CollisionData:
+     rigidity_operator: tuple[sp.BsrMatrix, sp.BsrMatrix] | None
+     collider_impulse: wp.array[wp.vec3]
+     has_colliders: bool = False
++    environment_offsets: wp.array[int] | None = None
++    """Collider-node offsets delimiting independent environments (environment-first partition), or ``None``."""
++    rigidity_environment_rows: tuple[wp.array[int], wp.array[int]] | None = None
++    """Rows of the rigidity operator's ``IJtm`` per environment, as (offsets, rows): environment ``e`` owns
++    ``rows[offsets[e]:offsets[e + 1]]``, the range past the last environment holds the rows of no environment.
++    ``None`` when unknown (an environment then cannot be solved on its own)."""
+ 
+ 
+ class _DelassusOperator:
+@@ -1816,6 +1824,159 @@ class _SubgridContactSolver(_ContactSolver):
+         super().release()
+ 
+ 
++def _fused_jacobi_enabled(device) -> bool:
++    """Metal only, with Warp's ``fast_math`` modules compiled as plain ones (``wp.config.metal_fast_math == "off"``,
++    so the fused kernel's contact passes compile exactly like their own kernels); ``NEWTON_METAL_FUSED_JACOBI=0``
++    turns it off."""
++    import os  # noqa: PLC0415
++
++    if not getattr(device, "is_metal", False) or os.environ.get("NEWTON_METAL_FUSED_JACOBI", "1") == "0":
++        return False
++    return getattr(wp.config, "metal_fast_math", None) == "off"
++
++
++class _FusedJacobiIterations:
++    """``count`` iterations of (sub-grid contact, Jacobi) for independent environments in one dispatch.
++
++    See :mod:`.fused_jacobi`: one threadgroup per environment runs the passes of
++    ``_SubgridContactSolver.solve`` and ``_JacobiSolver.solve`` separated by threadgroup barriers; the iterates are
++    bitwise those of the dispatch-per-pass loop.
++    """
++
++    @staticmethod
++    def make(rheology_solver, contact_solver):
++        if type(rheology_solver) is not _JacobiSolver or type(contact_solver) is not _SubgridContactSolver:
++            return None
++        rheology = rheology_solver.rheology
++        momentum = rheology_solver.momentum
++        collision = contact_solver.collision
++        if not _fused_jacobi_enabled(rheology_solver.device):
++            return None
++        if (
++            rheology.strain_environment_offsets is None
++            or momentum.environment_offsets is None
++            or collision.environment_offsets is None
++            or rheology.node_bound is None
++            or momentum.node_bound is None
++            or rheology.strain_velocity_node_count > 0
++        ):
++            return None
++        if collision.rigidity_operator is not None and collision.rigidity_environment_rows is None:
++            return None
++        fused = _FusedJacobiIterations(rheology_solver, contact_solver)
++        return fused if fused.ok else None
++
++    def __init__(self, rheology_solver, contact_solver):
++        from warp._src.sparse import _vec_array_view  # noqa: PLC0415
++
++        from . import fused_jacobi as fj  # noqa: PLC0415
++
++        rheology = rheology_solver.rheology
++        momentum = rheology_solver.momentum
++        collision = contact_solver.collision
++        delassus = rheology_solver.delassus_operator
++        device = rheology_solver.device
++
++        c = fj.ContactArgs()
++        c.collider_mat_offsets = collision.collider_mat.offsets
++        c.collider_mat_columns = collision.collider_mat.columns
++        c.collider_mat_values = collision.collider_mat.values
++        c.tr_collider_mat_offsets = collision.transposed_collider_mat.offsets
++        c.tr_collider_mat_columns = collision.transposed_collider_mat.columns
++        c.tr_collider_mat_values = collision.transposed_collider_mat.values
++        c.collider_friction = collision.collider_friction
++        c.collider_adhesion = collision.collider_adhesion
++        c.collider_normals = collision.collider_normals
++        c.collider_delassus_diagonal = contact_solver.collider_delassus_diagonal
++        c.collider_velocities = collision.collider_velocities
++        c.impulse = collision.collider_impulse
++        c.delta_impulse = contact_solver.delta_impulse
++        c.collider_env_offsets = collision.environment_offsets
++        c.collider_count = collision.collider_impulse.shape[0]
++
++        r = fj.RigidityArgs()
++        has_rigidity = collision.rigidity_operator is not None
++        if has_rigidity:
++            J, IJtm = collision.rigidity_operator
++            n = collision.collider_impulse.shape[0]
++            c.collider_velocities_flat = _vec_array_view(collision.collider_velocities, J.scalar_type, n * 3)
++            c.delta_impulse_flat = _vec_array_view(contact_solver.delta_impulse, IJtm.scalar_type, n * 3)
++            r.J_offsets = J.offsets
++            r.J_row_counts = J.row_counts
++            r.J_columns = J.columns
++            r.J_values = J.scalar_values
++            r.IJtm_offsets = IJtm.offsets
++            r.IJtm_row_counts = IJtm.row_counts
++            r.IJtm_columns = IJtm.columns
++            r.IJtm_values = IJtm.scalar_values
++            r.IJtm_row_count = IJtm.nrow
++            r.delta_body_qd = _vec_array_view(contact_solver.delta_body_qd, IJtm.scalar_type, J.ncol * 3)
++            r.env_row_offsets, r.env_rows = collision.rigidity_environment_rows
++
++        h = fj.RheologyArgs()
++        h.yield_params = rheology.yield_params
++        h.strain_node_volume = rheology.strain_node_volume
++        h.compliance_mat_offsets = rheology.compliance_mat.offsets
++        h.compliance_mat_columns = rheology.compliance_mat.columns
++        h.compliance_mat_values = rheology.compliance_mat.values
++        h.strain_mat_offsets = rheology.strain_mat.offsets
++        h.strain_mat_columns = rheology.strain_mat.columns
++        h.strain_mat_values = rheology.strain_mat.values.view(dtype=mat13)
++        h.transposed_strain_mat_offsets = rheology.transposed_strain_mat.offsets
++        h.transposed_strain_mat_columns = rheology.transposed_strain_mat.columns
++        h.transposed_strain_mat_values = rheology.transposed_strain_mat.values.view(dtype=mat13)
++        h.delassus_diagonal = delassus.delassus_diagonal
++        h.delassus_rotation = delassus.delassus_rotation
++        h.elastic_strain_delta = rheology.elastic_strain_delta
++        h.stress = rheology.stress
++        h.delta_stress = rheology_solver.delta_stress
++        h.strain_env_offsets = rheology.strain_environment_offsets
++        h.inv_volume = momentum.inv_volume
++        h.velocity = momentum.velocity
++        h.velocity_env_offsets = momentum.environment_offsets
++
++        self.env_count = rheology.strain_environment_offsets.shape[0] - 1
++        self.kernel = fj.make_fused_kernel(
++            has_viscosity=rheology.has_viscosity,
++            has_dilatancy=rheology.has_dilatancy,
++            has_compliance_mat=rheology.compliance_mat.nnz > 0,
++            has_rigidity=has_rigidity,
++            kernel_options={"fast_math": True},
++        )
++        self.args = (c, r, h)
++        self.device = device
++        self.block_dim = fj.BLOCK_DIM
++        self.ok = fj.threadgroup_size_ok(self.kernel, device, self.block_dim, (self.env_count + 1) * self.block_dim)
++
++    def run_one(self):
++        self.run(1)
++
++    def run(self, count: int):
++        c, r, h = self.args
++        wp.launch(
++            self.kernel,
++            dim=(self.env_count + 1, self.block_dim),
++            block_dim=self.block_dim,
++            inputs=[count, self.env_count, c, r, h],
++            device=self.device,
++        )
++
++
++def _skip_solve():
++    """Contact pass of a fused iteration: run by the rheology solver's fused dispatch that follows it."""
++
++
++def run_iterations(contact_solver, rheology_solver, count: int):
++    """``count`` iterations of (contact solve, rheology solve), fused into one dispatch where eligible."""
++    fused = getattr(rheology_solver, "fused_iterations", None)
++    if fused is not None:
++        fused.run(count)
++        return
++    for _k in range(count):
++        contact_solver.solve()
++        rheology_solver.solve()
++
++
+ def _nonlinear_solver_result_norms(residual, l2_tolerance_scale: float | np.ndarray) -> tuple[float, float]:
+     """Return the largest independently scaled residual across solver batches."""
+ 
+@@ -1846,9 +2007,7 @@ def _run_solver_loop(
+         condition = iteration_and_condition[1:]
+ 
+         def do_iteration_with_condition():
+-            for _k in range(solve_granularity):
+-                contact_solver.solve()
+-                rheology_solver.solve()
++            run_iterations(contact_solver, rheology_solver, solve_granularity)
+             residual = rheology_solver.eval_residual()
+             if rheology_solver.rheology.strain_environment_offsets is None:
+                 wp.launch(
+@@ -1912,9 +2071,7 @@ def _run_solver_loop(
+         )
+ 
+         for batch in range(max_iterations // solve_granularity):
+-            for _k in range(solve_granularity):
+-                contact_solver.solve()
+-                rheology_solver.solve()
++            run_iterations(contact_solver, rheology_solver, solve_granularity)
+ 
+             residual = rheology_solver.eval_residual().numpy()
+             res_l2, res_linf = _nonlinear_solver_result_norms(residual, host_tolerance_scale)
+@@ -2080,6 +2237,12 @@ def solve_rheology(
+ 
+     rheology_solver = rheology_solver_class(delassus_operator, temporary_store)
+     rheology_solver.apply_initial_guess()
++    fused = _FusedJacobiIterations.make(rheology_solver, contact_solver)
++    rheology_solver.fused_iterations = fused
++    if fused is not None:
++        # loops that call the pair themselves (contact, then rheology) get one fused dispatch per iteration
++        contact_solver.solve = _skip_solve
++        rheology_solver.solve = fused.run_one
+ 
+     solve_graph = _run_solver_loop(
+         rheology_solver,
+diff --git a/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py b/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py
+index 2f7157f9..a0e33ac4 100644
+--- a/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py
++++ b/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py
+@@ -3217,6 +3217,7 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+                 node_bound=active_node_bound(scratch.velocity_environment_offsets)
+                 if self._sparse_rebuildable
+                 else None,
++                environment_offsets=scratch.velocity_environment_offsets,
+             )
+             rheology_data = RheologyData(
+                 strain_mat=scratch.strain_matrix,
+@@ -3246,6 +3247,8 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+                 rigidity_operator=rigidity_operator,
+                 collider_impulse=scratch.impulse_field.dof_values,
+                 has_colliders=self._mpm_model.collider.collider_mesh.shape[0] > 0,
++                environment_offsets=scratch.collider_environment_offsets,
++                rigidity_environment_rows=self._rigidity_environment_rows() if rigidity_operator is not None else None,
+             )
+ 
+             # Retain graph to avoid immediate CPU sync
+@@ -3265,6 +3268,39 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+ 
+         return solve_graph
+ 
++    def _rigidity_environment_rows(self) -> tuple[wp.array[int], wp.array[int]] | None:
++        """Rows of the rigidity operator's ``IJtm`` (two per body, then deformable collider vertices) grouped by
++        environment, the rows of no environment last; ``None`` unless every row with coupled nodes belongs to one
++        environment (no deformable colliders, no dynamic body outside the environments)."""
++        if not self._separate_worlds:
++            return None
++        mpm_model = self._mpm_model
++        body_mass = mpm_model.collider_body_mass
++        key = (id(body_mass), mpm_model.min_collider_mass)
++        cached = getattr(self, "_rigidity_rows_cache", None)
++        if cached is not None and cached[0] == key:
++            return cached[1]
++        result = None
++        body_world = self.model.body_world
++        if mpm_model.collider.collider_particle_ids.shape[0] == 0 and body_world is not None and body_mass is not None:
++            bw = body_world.numpy()
++            masses = body_mass.numpy()
++            body_ids = mpm_model.collider.collider_body_index.numpy()
++            dyn = body_ids[body_ids >= 0]
++            dyn = dyn[masses[dyn] > 0.0]
++            if not np.any(bw[dyn] < 0):
++                env_count = self._environment_count
++                body_count = self.model.body_count
++                world = np.where(bw[:body_count] >= 0, bw[:body_count], env_count)
++                order = np.argsort(world, kind="stable")
++                rows = np.stack((2 * order, 2 * order + 1), axis=1).reshape(-1).astype(np.int32)
++                counts = np.bincount(world, minlength=env_count + 1)[: env_count + 1] * 2
++                offsets = np.concatenate(([0], np.cumsum(counts))).astype(np.int32)
++                device = self.model.device
++                result = (wp.array(offsets, dtype=int, device=device), wp.array(rows, dtype=int, device=device))
++        self._rigidity_rows_cache = (key, result)
++        return result
++
+     def _update_particles(
+         self,
+         state_in: newton.State,

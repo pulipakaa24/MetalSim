@@ -23,6 +23,21 @@ SHADER_DIR = Path(__file__).resolve().parent / "shaders"
 # it is not applied.
 
 
+def _inline_includes(src: str, depth: int = 0) -> str:
+    """Replace ``#include "name.h"`` lines with shaders/name.h (sources are compiled from strings, so the Metal
+    compiler has no include path); each header is inlined once."""
+    import re
+    seen = set()
+
+    def sub(mt):
+        nm = mt.group(1)
+        if nm in seen or depth > 4:
+            return ""
+        seen.add(nm)
+        return _inline_includes((SHADER_DIR / nm).read_text(), depth + 1)
+    return re.sub(r'^\s*#include\s+"([A-Za-z0-9_./-]+\.h)"\s*$', sub, src, flags=re.M)
+
+
 class MetalContext:
     def __init__(self, device="metal:0"):
         self.warp_device = device
@@ -40,7 +55,7 @@ class MetalContext:
         key = (name, tuple(sorted((defines or {}).items())))
         lib = self._libraries.get(key)
         if lib is None:
-            src = (SHADER_DIR / f"{name}.metal").read_text()
+            src = _inline_includes((SHADER_DIR / f"{name}.metal").read_text())
             if defines:
                 src = "".join(f"#define {k} {v}\n" for k, v in defines.items()) + src
             opts = Metal.MTLCompileOptions.new()
@@ -140,6 +155,16 @@ class MetalContext:
 
     def wait_for(self, cb, event: wm.SharedEvent, value: int):
         cb.encodeWaitForEvent_value_(event.obj, value)
+        w = getattr(self, "_waits", None)
+        if w is None or len(w) > 64:      # only the latest command buffers' waits are looked up (waits_of)
+            w = self._waits = {}
+        w.setdefault(id(cb), (cb, []))[1].append((event.obj, value))
+
+    def waits_of(self, cb):
+        """The event waits encoded into ``cb`` by ``wait_for`` (command buffers that must run before ``cb`` replicate
+        them)."""
+        ent = getattr(self, "_waits", {}).get(id(cb))
+        return ent[1] if ent is not None and ent[0] is cb else []
 
     def signal(self, cb) -> int:
         v = self.event.next_value()
