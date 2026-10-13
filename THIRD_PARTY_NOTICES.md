@@ -134,6 +134,15 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
   (`metalsim/learn/g1_velocity.py`, `g1_il3.py`, `metalsim/sensors/contact.py`, `metalsim/replicator/events.py`)
   reimplement Isaac Lab's documented term formulas and semantics as Warp kernels and cite the Isaac Lab function they
   match; they are MetalSim code.
+- **Included, unchanged, header kept** (Isaac Lab 3.0.0-EA, release/3.0.0 `ae37b028`): `metalsim/learn/isaac_math.py` =
+  `source/isaaclab/isaaclab/utils/math.py`. **Derived** (BSD-3-Clause, Isaac Lab's notice applies): the Franka-Pour
+  task terms, reset-dataset sampler and digest encoder in `metalsim/learn/franka_pour.py` and the scene constants and
+  builder-hook edits in `metalsim/learn/franka_pour_scene.py` are transcriptions of
+  `source/isaaclab_tasks/isaaclab_tasks/contrib/franka_pour/` (each cites the file and lines);
+  `metalsim/parity/isaac_side/isaaclab3/franka_pour_published_asset.patch` is a diff against that task's
+  `pour_env_cfg.py`. `tests/franka_pour_isaac_ref.py` executes Isaac's files from a local checkout and contains none.
+  The rsl_rl 5.4.1 PPO in `metalsim/learn/franka_pour_ppo.py` is a transcription of rsl_rl (BSD-3-Clause, ETH Zurich
+  and NVIDIA).
 - `metalsim/parity/isaac_side/` holds MetalSim scripts that import Isaac Lab and run inside Isaac Sim on the
   reference VM; they are MetalSim code (MIT) and contain no Isaac Lab source.
 
@@ -143,6 +152,9 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
   terms and is **not redistributed**: `scripts/fetch_isaac_assets.sh` downloads it and checks its md5, and
   `.gitignore` excludes `assets/isaac/**/*.usd`. The full history contains no `.usd`, `.usda`, `.usdc`, `.usdz` or
   `.mdl` file.
+- The Franka-Pour assets (`assets/isaac/franka_pour/`: the Franka USD and payloads, the cups USD, the SeattleLab table
+  and `reset_dataset.pt`, from the Isaac 6.1 asset root) are likewise **not redistributed**: `scripts/fetch_isaac_assets.sh`
+  downloads them and checks SHA-256; `.gitignore` excludes the directory.
 - `assets/isaac/G1/g1_minimal_from_usd.xml`, an MJCF conversion of that USD (kinematics, inertials and the three
   collision boxes), was committed on 2026-09-22 (`1359a52`) and removed from the tree in this audit because it is a
   derivative of NVIDIA's asset and nothing referenced it. It remains in the history of `1359a52` and later commits up

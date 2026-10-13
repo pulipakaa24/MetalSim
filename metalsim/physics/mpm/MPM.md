@@ -779,6 +779,31 @@ silently, and earlier traces of real Franka-Pour states saw 1.1-5 M triangle pai
 random-action peak), MuJoCo Warp's `njmax` / `nconmax` (Isaac's), and the graph-held buffers (the graph's replays
 read them).
 
+## 8i. Franka-Pour as a full task: environment + PPO (2026-10-12)
+
+Section 7b's probe mirrored the scene with scripted cup motion; `metalsim/learn/franka_pour*.py` now runs Isaac's task
+end to end: Isaac's own assets (Franka USD, cups, table, the 20,000-row reset dataset), Isaac Lab's coupled solver
+(`SolverCoupledProxy`: MuJoCo Warp arm entry + this section's `SolverImplicitMPM` as the media entry, proxy mass x
+1000, staggered), Isaac's MDP and the task's rsl_rl PPO. Parity rows and tests: `docs/PARITY.md` §1b; reading notes:
+`docs/research/franka_pour_2026-10-11.md`; usage: `docs/GUIDE.md` (Franka-Pour).
+
+* `newton_compat.install(accumulate="float32", loop="cuda", chunk_graph, gpu_exit, metal_fast_math="off",
+  device_args=None)`; rigid determinism configurable (`PourPhysicsConfig.rigid_deterministic`, default off as Isaac's
+  `NewtonCfg.deterministic_mode`).
+* Capture: one graph per `sim.step` (collide + 2 coupled steps: 6 MuJoCo + 4 MPM solves), as Isaac's
+  `_simulate_physics_only`; the arm-target kernel runs between replays. A single graph per policy step (4 sim steps,
+  `PourPhysicsConfig(capture_unit="policy")`) replayed NaN joint state at 2,048 worlds on Warp `152808b7` / `43ffc6dd`.
+  It was correct at 1,024 worlds. Fixed in Warp `41b7bc45`: the capture held every step's temporaries (70.7 GB, past
+  the 55.7 GB working set). Now 37.4 GB and finite at 2,048 worlds; see sections 8g-8h.
+* Per policy step at 2,048 worlds (M4 Max): about 2 s (step only); the L4 cannot hold Isaac's own task at 2,048 envs
+  (CUDA out of memory creating the graph, and out of memory eager), so the matched comparison is at 1,024 envs (§1b.4).
+* Section 8h's opt-in memory budgets (`mpm_grid_budget="measured"`, `mpm_cells_per_world=256`) hold on the trained
+  policy: a deterministic 2,048-episode evaluation of the 300-iteration policy gives success 0.470 vs 0.477 with
+  Isaac's capacities (same rows; within the 0.011 standard error), the same pour metrics, and no grid overflow (`docs/PARITY.md` §1b.5, `runs/franka_pour/eval/`).
+* Upstream observation (code reading, same in Isaac and here): the proxy wrench harvest uses only the last MPM
+  substep's impulses and divides by the outer dt, so with the media entry's 2 substeps the reaction on the cups is about
+  half the mean force (`solver_coupled_proxy.py:1547-1557`, `solver_implicit_mpm.py:1773-1812, 3266-3268`).
+
 ## 9. Running
 
 ```

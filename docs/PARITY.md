@@ -1048,6 +1048,167 @@ seed 0, 1500 iterations, `rough_isaac` reward set, both trainer fixes):** return
 default's three seeds gave +16.4 / +22.6 / +19.1 at 6.0–6.1. One seed, so the 3–9 point difference from pyramidal is
 not yet separable from seed spread (the pyramidal seeds spanned 6 points); loop 25.0 K env-steps/s.
 
+## 1b. IsaacContrib-Franka-Pour (Isaac Lab 3.0-EA, granular MPM manipulation; 2026-10-12)
+
+Isaac Lab 3.0-EA's contrib task: a Franka grasps a 50 g cup holding 735 granular MPM particles (~140 g) and pours
+them into a receiver; reset-dataset curriculum over 20,000 published start states; terminal-sparse reward. Port:
+`metalsim/learn/franka_pour_scene.py` (model and physics), `franka_pour.py` (MDP), `franka_pour_ppo.py` (PPO);
+reading notes with every source line: `docs/research/franka_pour_2026-10-11.md`. Isaac Lab = `upstream/IsaacLab3`
+at `ae37b028` (release/3.0.0, the L4's install), Newton 1.5.2 (fork `metalsim-1.5.2` `35791a07`), Warp fork
+`152808b7`, rsl_rl 5.4.1.
+
+### 1b.1 Asset and physics model
+
+| Isaac | ours | test (assertion) | result | verdict |
+|---|---|---|---|---|
+| Isaac 6.1 assets: `franka_panda.usda` (+11 payload layers), `franka_pour_cups.usda`, SeattleLab table, `reset_dataset.pt` | the same files, SHA-256 checked (`scripts/fetch_isaac_assets.sh`), imported by Newton's USD importer with Isaac Lab's resolvers (Newton, PhysX, MuJoCo) | `tests/test_franka_pour_terms.py::test_robot_model_matches_isaac_asset` (limits, armature 0.1, drives 1000/750/300 / 20/4/2 + finger 350/10, effort 87/12/200, actuator gravcomp on 9 joints, one finger mimic per world, collision set) | pass | confirmed |
+| Spawn hook `spawn_franka_with_arm_collisions` asserts a second finger mimic (`PhysxMimicJointAPI:linear` on joint 2) and arm hull proxies `link0_c`..`link7_c` | **Isaac's own task does not spawn with the published asset**: on the L4, `isaaclab train --task IsaacContrib-Franka-Pour` raises `RuntimeError: The pinned Franka physics payload no longer has the expected duplicate finger-mimic schemas` (`stage_pour_smoke.sh`). Ours composes the hook's intent: variant `Colliders = convex_hulls`, the ten hull proxies enabled, the asset's single mimic kept, the variant's extra hand hull not a collider | the L4 runs Isaac's task with the same composition (`franka_pour_published_asset.patch`, applied and reverted by `stage_pour.sh`) | Isaac's patched task builds and trains on the L4 | partial (the asset Isaac's hook was written against is not published; both sides use the same stand-in) |
+| Spawner poses: `standardize_xform_ops` replaces the referenced root's transform (the table's authored (0.55, 0, 0) becomes the init pose (0.5, 0, 0), 90 deg yaw) | same, authored on the stage before import (Newton's `add_usd(xform=)` rotated this free body twice) | tabletop AABB x [-0.296, 0.984], y [-0.455, 0.455], top z 0 after the task's 3 mm inset: equal to a pxr computation of Isaac's composition | pass | confirmed |
+| Builder hook (`pour_env.py:141-259`): robot shapes not particle colliders; finger and grasp-proxy gains ke 1e5 / kd 500 / kf 1e3 in MuJoCo force-space mode; bowls particle-only (margin 4 mm, mu 0.9 / 0.8); receiver rigid mesh replaced by a box; tabletop -3 mm, margin 0; kinematic particle-only spill floor; media lattice 7 x 7 x 15 via `add_particle_grid` | the same edits in the same order (`pour_world_hook`, `emit_media`) | `test_scene_settings_match_isaac_cfg` (every literal of `pour_env_cfg.py` / `geometry.py` / `media.py` the port uses, the MPM and MuJoCo solver settings as source fragments) | pass | confirmed for the values; equivalent by construction for the edits |
+| Physics: sim dt 1/120, decimation 4, 2 substeps of `SolverCoupledProxy` (arm: MuJoCo Warp implicitfast, 3 substeps, njmax 2560, nconmax 400, Isaac's MJWarp defaults 100 / 50 iterations; media: implicit MPM voxel 0.015, sparse, P0, APIC, Jacobi 24, pic27, separate worlds, 2 substeps, in place; proxy mass x 1000, staggered), one collide per sim step | the same solver objects with the same arguments; Metal: float32 accumulation and CUDA's stopping rule (`newton_compat`, MPM.md §1) | `test_scene_settings_match_isaac_cfg`; MPM-side parity of this solver vs the L4: MPM.md §5-8c | pass | confirmed for the configuration; the MPM solver itself: MPM.md |
+| `CollisionPipeline(max_triangle_pairs=1e6)` | 4,096 per world (8.4M at 2,048): this scene overflows 1M from ~1,250 worlds and drops contacts (newton-physics/newton#4604, fixed upstream #4605) | – | – | **deviation by design** (Isaac's value loses contacts at 2,048) |
+| Graph capture: one CUDA graph per `sim.step` | one Metal graph per `sim.step`, the action kernel between replays | smoke runs at 2-2,048 worlds | finite at every size; a single graph per *policy* step (`capture_unit="policy"`, not the default) is finite at 2,048 worlds from Warp `41b7bc45` (it replayed NaN before: the capture exceeded the working set) | yes |
+
+### 1b.2 Task definition (the MDP)
+
+Isaac's own term functions run on this environment's live state as the oracle (`tests/franka_pour_isaac_ref.py`:
+Isaac's `math.py`, `geometry.py`, `mdp/{observations,rewards,terminations}.py`, `reset_sampler.py`, the accessor methods
+of `pour_env.py` and Isaac Lab's generic terms, executed unmodified; the term list, order, scale, clip, weight and
+parameters read from `pour_env_cfg.py` with `ast`). 7 passed (M4 Max, 2026-10-12).
+
+| Isaac | ours | test (assertion) | result | verdict |
+|---|---|---|---|---|
+| Observations: policy 62 (joint pos/vel rel x 0.3 / 0.05, time remaining, target fraction, TCP / cup / receiver poses, grasp-frame errors, fingers, gripper target and contact, last action x 0.2), media 22 (cup velocity clipped ±2, particle fractions, source and airborne-stream summaries), privileged 2 | transcription in PyTorch on MPS | `test_observation_terms_match_isaac` (every term column vs Isaac's function, atol 1e-6) | pass | confirmed |
+| Terminations in cfg order (non-finite, extreme rigid state, overlap SAT, lost grasp monitor, spill > 10 %, particle bounds, success >= 70 %, learning-progress context, neutral time-out) with their side effects (dwell counters, success / grasp latches) | same order and buffers | `test_terminations_and_rewards_match_isaac` (3 random-action policy steps: each term bitwise, `terminated` / `time_outs`, every latch and counter, the progress latch) | pass | confirmed |
+| Rewards: +5 success, -1 failure (non-timeout), -1e-4 action L2, -1e-4 action rate, x dt | same | same test (each weighted term, rtol 1e-6) | pass | confirmed |
+| Actions: EMA relative arm deltas (scale 0.03, alpha 0.2, target = delta + current q each physics step); binary gripper (a < 0 close 0.021 m else 0.04 m, filter 1 - 0.8^(1/3), initial 0.024 m) | same; the arm target is recomputed by a kernel inside each physics step, as Isaac's `apply_actions` | the action history is observed (last action, gripper target / contact) in the observation test | pass | confirmed through the observations |
+| Reset from dataset rows: joint state, cup poses, particles = env 0's lattice in the row's source-cup frame, MPM state cleared per world, progress baseline | same, `SolverCoupledProxy.reset(world_mask, BODY | PARTICLE)` on both state buffers + masked FK | `test_reset_from_dataset_matches_isaac` (rows, poses after FK atol 2e-6, particles vs Isaac's formula, progress targets vs Isaac's term) | pass | confirmed |
+| Curriculum sampler (50-outcome rings, sqrt(p(1-p)) + 1e-4 kernel, 50 % cyclic replay) | transcription | `test_sampler_matches_isaac` (ring buffers with duplicate rows, rates, metrics, and the sampled rows equal Isaac's with the same torch generator) | pass | confirmed |
+
+### 1b.3 Learner (rsl_rl 5.4.1, the task's `FrankaPourResetDatasetPPORunnerCfg`)
+
+| Isaac | ours (`franka_pour_ppo.PourPPO`) | verdict |
+|---|---|---|
+| actor 84 -> 512-256-128-64 -> (2, 8), heteroscedastic Gaussian (log-std clamped to log [0.15, 0.75], std head zero weights, bias log 0.6), critic 86 -> ... -> 1, no normalization; 96 steps, 5 x 4 minibatches (one permutation), clip 0.2, clipped value loss, entropy 3e-4, lr 1.5e-4 fixed, grad norm 1.0 per network, gamma 0.99^(1/3), lambda 0.95^(1/3), time-out bootstrap, actions clipped to ±1 | transcribed from the 5.4.1 wheel (`ppo.py`, `distribution.py`, `mlp.py`, `rollout_storage.py`, `logger.py`) | equivalent by construction (no unit test against the rsl_rl package: 5.4.1 needs `tensordict` and is not installed here) |
+
+### 1b.4 Throughput
+
+env-steps/s; one policy step = 4 collides, 24 MuJoCo solves, 16 MPM solves. Iteration = 96 steps x num_envs
+(196,608 at 2,048). Synchronized wall time.
+
+| measurement | M4 Max, this Mac (timing class) | Isaac Lab 3.0-EA on the L4 (measured) |
+|---|---|---|
+| 2,048 envs (the README's), step only, uniform random actions | **986** (2.077 s / step, idle device, `bench_mac2_2048_step.json`; 964 in a first run with the idle check reading 100 %, `bench_mac_2048_step.json`) | **does not fit**: CUDA out of memory creating the step graph, and out of memory eager (`use_cuda_graph=false`) on the L4's 24 GB (`runs/parity/isaaclab3_pour/train_2048*.log`) |
+| 2,048 envs, rollout + policy inference | 999 (idle device, `bench_mac2_2048_rollout.json`; 962 first run) | – |
+| 2,048 envs, full PPO loop (rollout + 5 x 4 minibatch update) | 979 (one 96-step iteration after one warm-up, idle device, `bench_mac2_2048_ppo.json`; 923 first run; the update is 0.4 % of the iteration) | – |
+| 1,024 envs, step only / full PPO loop | **1,054** / **992** (idle device; `bench_mac2_1024_{step,ppo}.json`) | **317** (rollout + inference) / 317 (collection 309-314 s per 96 steps, update 0.2 s; Isaac's own task with the asset patch, rsl_rl's log) |
+
+Reading: the step is the cost (the PPO update is 0.4 % of an iteration, inference under 0.3 %); at 1,024 envs the M4
+Max runs the task about 3.1x the L4's rate, and only the M4 Max (64 GB unified memory) holds the README's 2,048 envs.
+Isaac's step-only runtime benchmark (`isaaclab benchmark runtime`) rejects the coupled `NewtonCfg`
+("Unsupported concrete physics config"), so the L4 row is rsl_rl's collection time, which includes inference.
+This Mac's first timing rows ran while the idle check read 100 % (a GPU later found hung by another job); the
+re-measure on an idle device (0-3 %) gives 986 / 999 / 979. All throughput figures here are from this Mac (the
+training runs on the second M4 Max are not timing measurements). Isaac's 3,000 iterations x 196,608 steps = 590M
+steps take about 7 days at 979 env-steps/s (Isaac on an L4 cannot run them at 2,048 envs).
+
+### 1b.5 Learning
+
+Isaac publishes no curve for this task (README, task source, docs at `ae37b028`); the README only gives the launch
+(`--num_envs 2048 --max_iterations 3000`). The reference is therefore measured: Isaac's own task (with the asset patch
+of §1b.1) trained on the L4 at **1,024 envs** (the most the L4 holds), 60 iterations, seed 0, against ours at the
+same env count, iterations and seed on the 14-inch M4 Max. Metric: Isaac's logged `Episode_Termination/success` (the
+README's "terminal particle transfer" success: fraction of envs whose last finished episode ended in success, averaged
+over the iteration's steps), mean reward and episode length over the last 100 episodes (rsl_rl). Logs:
+`runs/parity/isaaclab3_pour/train_1024_curve.log`, `runs/franka_pour/logs/m414_1024_log.jsonl`, side by side in
+`runs/franka_pour/logs/matched_1024_curves.json` (`python -m metalsim.learn.franka_pour_curve`).
+
+| iterations (1,024 envs) | ours: success / reward / length | Isaac on the L4: success / reward / length |
+|---|---|---|
+| 0-9 | 0.124 / 0.37 / 126 | 0.091 / 0.15 / 116 |
+| 10-19 | 0.221 / 0.57 / 177 | 0.228 / 0.83 / 172 |
+| 20-29 | 0.274 / 1.12 / 161 | 0.309 / 1.35 / 153 |
+| 30-39 | 0.300 / 1.16 / 166 | 0.373 / 1.57 / 153 |
+| 40-49 | 0.310 / 1.42 / 164 | 0.414 / 1.83 / 147 |
+| 50-59 | 0.348 / 1.37 / 163 | 0.436 / 1.78 / 148 |
+| throughput (full loop) | see §1b.4 (this Mac) | 317 env-steps/s (collection 314 s, update 0.2 s) |
+
+Verdict: **partial**. Both learn the task from the same reset curriculum along the same early trajectory (iterations
+0-19 agree within the noise; the curriculum's concentration metrics evolve alike: effective pool 0.004-0.02, top-1 %
+mass 0.27-0.48 over the first ~20k episodes on both), but from iteration ~25 Isaac's success rate pulls ahead and is
+0.09 higher over iterations 50-59 (0.436 vs 0.348), with shorter episodes. One seed per side, and Isaac is not
+repeatable run to run here (two seed-0 L4 runs differ at iteration 0: reward +0.26 vs -0.46, `train_1024.log` vs
+`train_1024_curve.log`), so the gap is not yet separated from seed spread; seeds on both sides and a per-row outcome
+comparison on fixed reset rows are the next step. Not a cause, by construction: the asset composition, the task terms
+(§1b.2 tests), the solver configuration (§1b.1).
+
+**The README-scale run** (2,048 envs, the task's runner config, seed 0, 14-inch M4 Max, 2026-10-12, 16.4 h of GPU
+including five pauses for other jobs (four STOP-file pauses, one stop at iteration 51 resumed from the iteration-50 checkpoint); capped at 300 iterations = 59M env-steps instead of the README's 3,000 =
+590M, 6.4 days at this rate). Log `runs/franka_pour/logs/m414_2048_log.jsonl` (+ console log), final checkpoint
+`runs/franka_pour/logs/m414_2048_model_299.pt`. Means over ten-iteration windows:
+
+| iterations | success (`Episode_Termination/success`) | success of episodes finished in the window | mean reward | episode length |
+|---|---|---|---|---|
+| 0-9 | 0.138 | 0.203 | 0.48 | 108 |
+| 20-29 | 0.343 | 0.343 | 1.35 | 148 |
+| 50-59 | 0.322 | 0.405 | 1.38 | 92 |
+| 100-109 | 0.371 | 0.373 | 1.49 | 119 |
+| 150-159 | 0.467 | 0.472 | 2.16 | 128 |
+| 200-209 | 0.560 | 0.556 | 2.71 | 113 |
+| 250-259 | 0.618 | 0.616 | 2.90 | 120 |
+| 290-299 | 0.618 | 0.617 | 2.72 | 109 |
+
+Training success plateaus near 0.62 from iteration ~250. What is not comparable: Isaac has no 2,048-env run on the
+hardware available here (its task does not fit the L4 at 2,048 envs), so this curve has no Isaac counterpart; the
+only matched comparison is the 1,024-env table above (60 iterations, one seed each). Training-time success is measured
+on curriculum-sampled rows (the sampler concentrates on rows near 50 % local progress), so it is not a fixed-row success
+rate; the deterministic evaluation below is.
+
+**Deterministic evaluation of the iteration-299 policy** (`metalsim/learn/franka_pour_eval.py`, this Mac, 2026-10-13,
+check class): 2,048 envs, each one episode from a reset row drawn uniformly over all 20,000 rows (Isaac's play mode
+freezes the curriculum), actor mean actions, until every env's first episode ends; the same seed gives both runs the
+same rows. The second run uses the opt-in memory budgets of `PourPhysicsConfig` (`mpm_grid_budget="measured"`,
+`mpm_cells_per_world=256`; MPM.md section 8h), which must leave the task unchanged:
+
+| metric (2,048 episodes) | default (Isaac's capacities) | measured budgets + 256 cells / world |
+|---|---|---|
+| success (>= 70 % of particles in the receiver) | **0.477** | **0.470** |
+| success, rows starting grasped (992) / not grasped (1,056) | 0.822 / 0.152 | 0.815 / 0.147 |
+| time-out / spill / overlap / extreme state / particle bounds / non-finite | 0.345 / 0.086 / 0.032 / 0.038 / 0.036 / 0.022 | 0.360 / 0.087 / 0.037 / 0.033 / 0.020 / 0.014 |
+| particles at the episode's end in receiver / source / spilled | 0.376 / 0.437 / 0.016 | 0.374 / 0.449 / 0.016 |
+| mean episode length (steps) | 164.2 | 167.3 |
+| sparse-grid overflow | none | none |
+| wall time of the rollout (check class, not a timing measurement) | 752 s | 553 s |
+
+The two agree within sampling noise (binomial standard error of the success rate 0.011; the rigid solver is not run
+deterministically, so trajectories are not bitwise), so the memory opt-ins hold on a trained, pouring policy; they
+also shortened this rollout (752 -> 553 s; check class, so not a timing claim). JSON and logs: `runs/franka_pour/eval/`. The policy succeeds from 82 % of the
+start states where the cup is already grasped and from 15 % of the reaching / approach states; 0.48 overall.
+
+**Why 0.48 here and 0.62 in training's log.** The two numbers measure different populations. Diagnostic runs, same
+checkpoint and harness, 2,048 envs, success rate (`runs/franka_pour/eval/diag*/`):
+
+| run | one episode per env | all finished episodes in the 360-step window | Isaac's `Episode_Termination/success` (mean over steps) |
+|---|---|---|---|
+| deterministic, uniform rows, current pins (this Mac; two runs) | 0.457 / 0.477 | 0.606 | 0.399 |
+| stochastic (training's sampled actions), uniform rows | 0.453 | 0.596 | 0.398 |
+| stochastic, rows from the training curriculum restored from the checkpoint, continuous rollout | 0.599 | 0.715 | 0.514 (from a cold start) |
+| deterministic, uniform rows, **training pins** (Warp `152808b7`, Newton `35791a07`; 14-inch) | 0.479 | 0.616 | 0.409 |
+| deterministic, uniform rows, current pins (14-inch, same machine) | 0.474 | 0.616 | 0.405 |
+
+* Action noise does nothing measurable: deterministic 0.457, stochastic 0.453.
+* The reset distribution accounts for +0.15. After 300 iterations the curriculum rarely draws rows the policy never
+  solves (their weight is the 1e-4 floor), so 73 % of its episodes start grasped against 48 % of uniform rows; on the
+  curriculum's rows the same policy succeeds in 0.60 of first episodes.
+* Counting finished episodes adds +0.1 to +0.15: successes end early and time-outs take 360 steps, so per unit of
+  rollout time more successful episodes finish (training's `success` column, 0.617 over iterations 290-299, is this
+  count on curriculum rows).
+* The library versions do not matter: on the 14-inch the training pins give 0.479 and the current pins 0.474 (the
+  standard error is 0.011).
+
+The deterministic uniform-row evaluation (0.48) is the fixed-distribution success rate of this policy; training's
+logged 0.62 is the curriculum- and duration-weighted rate. Both are reproduced by this harness.
+
 ## 2. Platform capabilities (the workstreams), with the tests behind them
 
 | capability | Isaac | ours | test (assertion) | result | verdict |

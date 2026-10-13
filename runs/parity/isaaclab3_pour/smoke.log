@@ -1,0 +1,141 @@
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
++ timeout 1800 isaaclab train --rl_library rsl_rl --task IsaacContrib-Franka-Pour --num_envs 4 --max_iterations 1 --seed 0 --run_name smoke --viz none
+[INFO]: Parsing configuration from: isaaclab_tasks.contrib.franka_pour.pour_env_cfg:FrankaPourResetDatasetEnvCfg
+[INFO]: Parsing configuration from: isaaclab_tasks.contrib.franka_pour.config.franka.agents.rsl_rl_ppo_cfg:FrankaPourResetDatasetPPORunnerCfg
+
+╭─ Isaac Lab · train ────────────────────────────╮      Welcome to Isaac Lab!
+│ Task          IsaacContrib-Franka-Pour         │
+│ Workflow      manager-based                    │             \   /
+│ RL library    rsl_rl                           │           .-------.
+│ Physics       newton_couplerproxycfg           │           | o   o |
+│ Renderer      n/a (no camera sensors)          │           |   _   |
+│ Visualizer    none (headless)                  │           '-------'
+│ Device        cuda:0                           │
+│ Environments  4                                │
+╰────────────────────────────────────────────────╯
+
+[1/3] Launching simulation
+[INFO] Logging experiment in directory: /home/<vm-user>/IsaacLab3/logs/rsl_rl/franka_pour
+Exact experiment name requested from command line: 2026-10-12_07-23-26
+[2/3] Creating environment
+I: Initializing Version 2.72.3-release.7151+gl.5390bed9
+I: Client ID: 3M9YRGJ4
+I: Not using Hub: Hub not found
+I: Successfully created S3 provider for https://omniverse-content-production.s3-us-west-2.amazonaws.com
+I: Using CloudFront http://dcb18d6mfegct.cloudfront.net/, List = No
+Traceback (most recent call last):
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/app/sim_launcher.py", line 582, in launch_simulation
+    yield physics_cfg
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/backends/train_rsl_rl.py", line 179, in _run
+    env = create_isaaclab_env(
+          ^^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/common.py", line 743, in create_isaaclab_env
+    env = gym.make(task, cfg=env_cfg)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/gymnasium/envs/registration.py", line 735, in make
+    env = env_creator(**env_spec_kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_tasks/isaaclab_tasks/contrib/franka_pour/pour_env.py", line 115, in __init__
+    super().__init__(cfg, render_mode, **kwargs)
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/envs/manager_based_rl_env.py", line 81, in __init__
+    super().__init__(cfg=cfg)
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/envs/manager_based_env.py", line 123, in __init__
+    self._init_sim()
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/envs/manager_based_env.py", line 174, in _init_sim
+    self.scene = InteractiveScene(self.cfg.scene)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/scene/interactive_scene.py", line 204, in __init__
+    self._add_entities_from_cfg()
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/scene/interactive_scene.py", line 842, in _add_entities_from_cfg
+    self._articulations[asset_name] = asset_cfg.class_type(asset_cfg)
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/utils/string.py", line 221, in __call__
+    return self._resolve()(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/assets/articulation/articulation.py", line 30, in __new__
+    return super().__new__(cls, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/utils/backend_utils.py", line 154, in __new__
+    return impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_newton/isaaclab_newton/assets/articulation/articulation.py", line 216, in __init__
+    super().__init__(cfg)
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/assets/articulation/base_articulation.py", line 136, in __init__
+    super().__init__(cfg)
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/assets/asset_base.py", line 127, in __init__
+    self.cfg.spawn.func(
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_tasks/isaaclab_tasks/contrib/franka_pour/pour_env_cfg.py", line 208, in spawn_franka_with_arm_collisions
+    raise RuntimeError(
+RuntimeError: The pinned Franka physics payload no longer has the expected duplicate finger-mimic schemas. Update the asset hash and task-side override together.
+[INFO]: Base environment:
+	Environment device    : cuda:0
+	Environment seed      : 0
+	Physics step-size     : 0.008333333333333333
+	Rendering step-size   : 0.03333333333333333
+	Environment step-size : 0.03333333333333333
+[INFO]: Time taken for scene creation Last: 5.253843 s, Mean: 5.253843 s, Std: 0.000000 s, N: 1
+Traceback (most recent call last):
+  File "/home/<vm-user>/env_isaaclab3/bin/isaaclab", line 10, in <module>
+    sys.exit(cli())
+             ^^^^^
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/cli/__init__.py", line 161, in cli
+    subcommands[sys.argv[1]](sys.argv[2:])
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/cli/__init__.py", line 53, in train
+    _exit_on_error(run_train_cli(args))
+                   ^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/dispatch.py", line 47, in run_train_cli
+    return run_cli("train", argv)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/dispatch.py", line 136, in run_cli
+    status = _run_backend(backends[selected.rl_library], backend_argv, run_as_script=action == "play")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/dispatch.py", line 174, in _run_backend
+    return runner(argv)
+           ^^^^^^^^^^^^
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/backends/train_rsl_rl.py", line 117, in run
+    _run(args_cli)
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/backends/train_rsl_rl.py", line 179, in _run
+    env = create_isaaclab_env(
+          ^^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_rl/isaaclab_rl/entrypoints/common.py", line 743, in create_isaaclab_env
+    env = gym.make(task, cfg=env_cfg)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/env_isaaclab3/lib/python3.12/site-packages/gymnasium/envs/registration.py", line 735, in make
+    env = env_creator(**env_spec_kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_tasks/isaaclab_tasks/contrib/franka_pour/pour_env.py", line 115, in __init__
+    super().__init__(cfg, render_mode, **kwargs)
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/envs/manager_based_rl_env.py", line 81, in __init__
+    super().__init__(cfg=cfg)
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/envs/manager_based_env.py", line 123, in __init__
+    self._init_sim()
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/envs/manager_based_env.py", line 174, in _init_sim
+    self.scene = InteractiveScene(self.cfg.scene)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/scene/interactive_scene.py", line 204, in __init__
+    self._add_entities_from_cfg()
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/scene/interactive_scene.py", line 842, in _add_entities_from_cfg
+    self._articulations[asset_name] = asset_cfg.class_type(asset_cfg)
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/utils/string.py", line 221, in __call__
+    return self._resolve()(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/assets/articulation/articulation.py", line 30, in __new__
+    return super().__new__(cls, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/utils/backend_utils.py", line 154, in __new__
+    return impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_newton/isaaclab_newton/assets/articulation/articulation.py", line 216, in __init__
+    super().__init__(cfg)
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/assets/articulation/base_articulation.py", line 136, in __init__
+    super().__init__(cfg)
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab/isaaclab/assets/asset_base.py", line 127, in __init__
+    self.cfg.spawn.func(
+  File "/home/<vm-user>/IsaacLab3/source/isaaclab_tasks/isaaclab_tasks/contrib/franka_pour/pour_env_cfg.py", line 208, in spawn_franka_with_arm_collisions
+    raise RuntimeError(
+RuntimeError: The pinned Franka physics payload no longer has the expected duplicate finger-mimic schemas. Update the asset hash and task-side override together.
++ echo 'exit 1'
+exit 1
++ touch /home/<vm-user>/parity3/pour/SMOKE_DONE
