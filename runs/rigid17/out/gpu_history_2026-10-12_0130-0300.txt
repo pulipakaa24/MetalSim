@@ -1,0 +1,123 @@
+# Excerpt of runs/gpu_history.jsonl (16-inch M4 Max GPU queue), 2026-10-12 01:30-03:00 local, every event.
+# time  event  job  kind  rc  forced  command (first 160 chars)
+10-12 01:32:16  grant  rfa_check1  check      /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/bin/wd.sh 1500 /private/tmp/claude-501/-Users-aditya-robosim/3a553
+10-12 01:32:30  release  rfa_check1  check  None  True  
+10-12 01:32:30  exit  rfa_check1    0    
+10-12 01:37:56  grant  rfd_t3  check      /usr/bin/python3 /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/snap/rfd_t3/scripts/diagnostics/watchdog_run.py -
+10-12 01:38:08  grant  rfd_base_t2  check      /usr/bin/python3 /Users/aditya/robosim/.claude/worktrees/agent-aed3fab0e92f801a3/scripts/diagnostics/watchdog_run.py --timeout 900 --stall 120 -- /bin/bash -c c
+10-12 01:38:20  release  rfd_base_t2  check  None  True  
+10-12 01:38:20  exit  rfd_base_t2    1    
+10-12 01:38:42  release  rfd_t3  check  None  True  
+10-12 01:38:42  exit  rfd_t3    1    
+10-12 01:41:35  grant  rwa_after4  check      bash /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/a4/job.sh
+10-12 01:41:35  grant  rwa_after4s  check      bash /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/a4s/job.sh
+10-12 01:41:55  release  rwa_after4  check  None  True  
+10-12 01:41:55  exit  rwa_after4    1    
+10-12 01:42:27  release  rwa_after4s  check  None  True  
+10-12 01:42:27  exit  rwa_after4s    1    
+10-12 01:42:51  grant  rfa_check2  check      /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/bin/wd.sh 1500 /private/tmp/claude-501/-Users-aditya-robosim/3a553
+10-12 01:43:06  release  rfa_check2  check  None  True  
+10-12 01:43:06  exit  rfa_check2    0    
+10-12 01:48:27  grant  rfd_audit  check      /usr/bin/python3 /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/snap/rfd_audit/scripts/diagnostics/watchdog_run.p
+10-12 01:48:34  release  rfd_audit  check  None  True  
+10-12 01:48:34  exit  rfd_audit    0    
+10-12 01:49:10  grant  ntest_s17_ht  check      python3 /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/tools/watch.py --log /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb99
+10-12 01:49:16  grant  rfd_dev2  check      /usr/bin/python3 /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/snap/rfd_dev2/scripts/diagnostics/watchdog_run.py
+10-12 01:49:23  release  rfd_dev2  check  None  True  
+10-12 01:49:23  exit  rfd_dev2    0    
+10-12 01:51:09  grant  ptest2  check      /usr/bin/python3 /Users/aditya/robosim/.claude/worktrees/agent-a8f21c8b02205ff25/scripts/particle_demo/watchdog.py --timeout 2400 --stall 900 --log /private/tmp
+10-12 01:51:09  grant  anymal_sand_seq  check      /usr/bin/python3 /Users/aditya/robosim/.claude/worktrees/agent-a8f21c8b02205ff25/scripts/particle_demo/watchdog.py --timeout 5400 --stall 1200 --log /Users/adit
+10-12 01:51:12  release  ptest2  check  None  True  
+10-12 01:51:12  exit  ptest2    2    
+10-12 01:52:51  grant  rwa_after5  check      bash /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/a5/job.sh
+10-12 01:53:05  release  rwa_after5  check  None  True  
+10-12 01:53:05  exit  rwa_after5    0    
+10-12 01:53:34  release  anymal_sand_seq  check  None  True  
+10-12 01:53:34  exit  anymal_sand_seq    130    
+10-12 01:53:34  exit  anymal_sand_seq    143    
+10-12 01:53:35  grant  rwa_after6s  check      bash /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/a6s/job.sh
+10-12 01:53:35  grant  rwa_afterB  check      bash /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/aB/job.sh
+10-12 01:53:42  release  rwa_afterB  check  None  True  
+10-12 01:53:42  exit  rwa_afterB    1    
+10-12 01:54:49  grant  rfa_check3  check      /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/bin/wd.sh 2400 /private/tmp/claude-501/-Users-aditya-robosim/3a553
+10-12 01:55:16  release  rwa_after6s  check  None  True  
+10-12 01:55:16  exit  rwa_after6s    1    
+10-12 01:56:02  release  rfa_check3  check  None  True  
+10-12 01:56:02  exit  rfa_check3    0    
+10-12 01:58:36  exit  ntest_s152_base_kamino_cpu    2    
+10-12 02:00:12  grant  rfd_dev3  check      /usr/bin/python3 /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/snap/rfd_dev3/scripts/diagnostics/watchdog_run.py
+10-12 02:00:18  release  rfd_dev3  check  None  True  
+10-12 02:00:18  exit  rfd_dev3    0    
+10-12 02:03:53  grant  anymal_sand_seq  check      /usr/bin/python3 /Users/aditya/robosim/.claude/worktrees/agent-a8f21c8b02205ff25/scripts/particle_demo/watchdog.py --timeout 5400 --stall 1200 --log /Users/adit
+10-12 02:06:24  grant  slots_diag  check      bash -c cd /Users/aditya/robosim/.claude/worktrees/agent-a57cd88682e162507 && export PYTHONPATH=/Users/aditya/robosim/.claude/worktrees/agent-a57cd88682e162507 
+10-12 02:06:36  release  slots_diag  check  None  True  
+10-12 02:06:36  exit  slots_diag    0    
+10-12 02:06:38  grant  rfa_check4  check      /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/bin/wd.sh 2400 /private/tmp/claude-501/-Users-aditya-robosim/3a553
+10-12 02:08:23  release  ntest_s17_ht  check  None  True  
+10-12 02:08:23  exit  ntest_s17_ht    1    
+10-12 02:08:37  grant  ntest_s152_base  check      python3 /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/tools/watch.py --log /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb99
+10-12 02:09:45  release  rfa_check4  check  None  True  
+10-12 02:09:45  exit  rfa_check4    0    
+10-12 02:10:52  grant  rfd_t4  check      /usr/bin/python3 /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/snap/rfd_t4/scripts/diagnostics/watchdog_run.py -
+10-12 02:12:05  release  rfd_t4  check  None  True  
+10-12 02:12:05  exit  rfd_t4    1    
+10-12 02:12:53  release  ntest_s152_base  check  None  True  
+10-12 02:12:53  exit  ntest_s152_base    1    
+10-12 02:17:04  grant  slots_t  check      bash -c cd /Users/aditya/robosim/.claude/worktrees/agent-a57cd88682e162507 && export PYTHONPATH=/Users/aditya/robosim/.claude/worktrees/agent-a57cd88682e162507 
+10-12 02:17:20  release  slots_t  check  None  True  
+10-12 02:17:20  exit  slots_t    0    
+10-12 02:17:40  grant  rwa_before2  check      bash /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/before/job.sh
+10-12 02:17:48  release  rwa_before2  check  None  True  
+10-12 02:17:48  exit  rwa_before2    0    
+10-12 02:18:24  grant  ntest_s17_htbase  check      python3 /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/tools/watch.py --log /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb99
+10-12 02:20:00  grant  rfa_cost_check  check      /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/bin/wd.sh 1200 /Users/aditya/robosim/.venv/bin/python scripts/diag
+10-12 02:20:01  release  rfa_cost_check  check  None  True  
+10-12 02:20:01  exit  rfa_cost_check    1    
+10-12 02:20:17  release  anymal_sand_seq  check  None  True  
+10-12 02:20:17  exit  anymal_sand_seq    130    
+10-12 02:20:17  exit  anymal_sand_seq    143    
+10-12 02:22:22  grant  rfd_dev4  check      /usr/bin/python3 /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/snap/rfd_dev4/scripts/diagnostics/watchdog_run.py
+10-12 02:22:29  release  rfd_dev4  check  None  True  
+10-12 02:22:29  exit  rfd_dev4    0    
+10-12 02:24:00  grant  ptest3  check      /usr/bin/python3 /Users/aditya/robosim/.claude/worktrees/agent-a8f21c8b02205ff25/scripts/particle_demo/watchdog.py --timeout 2400 --stall 900 --log /private/tmp
+10-12 02:24:14  release  ptest3  check  None  True  
+10-12 02:24:14  exit  ptest3    1    
+10-12 02:25:38  grant  cl_push_off_multi_material  check      /Users/aditya/robosim/.venv-newton152/bin/python /Users/aditya/robosim/.claude/worktrees/agent-ae8661f0d09092d4b/metalsim/parity/isaac_side/record_mpm.py --devi
+10-12 02:25:40  release  cl_push_off_multi_material  check  None  True  
+10-12 02:25:40  exit  cl_push_off_multi_material    1    
+10-12 02:25:41  grant  cl_rigid  check      /Users/aditya/robosim/.claude/worktrees/agent-a8a12903da01bb68c/research_notes/mpm_parity_closeout/rigid_neutral.sh
+10-12 02:25:47  release  ntest_s17_htbase  check  None  True  
+10-12 02:25:47  exit  ntest_s17_htbase    1    
+10-12 02:25:50  grant  cl_rigsuite_pin1  check      /Users/aditya/robosim/.claude/worktrees/agent-a8a12903da01bb68c/research_notes/mpm_parity_closeout/rigid_suite.sh /Users/aditya/robosim/upstream/warp-innate clo
+10-12 02:26:35  release  cl_rigid  check  None  True  
+10-12 02:26:35  release  cl_rigsuite_pin1  check  None  True  
+10-12 02:26:35  exit  cl_rigsuite_pin1    130    
+10-12 02:26:35  exit  cl_rigid    130    
+10-12 02:26:35  exit  cl_rigsuite_pin1    143    
+10-12 02:26:35  exit  cl_rigid    143    
+10-12 02:26:35  exit  cl_rigsuite_pin1    143    
+10-12 02:26:35  exit  cl_rigid    143    
+10-12 02:29:02  grant  ntest_s17_base  check      python3 /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/tools/watch.py --log /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb99
+10-12 02:29:03  grant  ntest_k152_new_kamino_metal  check      python3 /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/tools/watch.py --log /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb99
+10-12 02:29:04  grant  ntest_k152_base_kamino_metal  check      python3 /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/tools/watch.py --log /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb99
+10-12 02:29:24  release  ntest_k152_base_kamino_metal  check  None  True  
+10-12 02:29:24  exit  ntest_k152_base_kamino_metal    1    
+10-12 02:29:25  release  ntest_k152_new_kamino_metal  check  None  True  
+10-12 02:29:25  exit  ntest_k152_new_kamino_metal    1    
+10-12 02:30:31  grant  rfa_cost_check2  check      /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/bin/wd.sh 1500 /Users/aditya/robosim/.venv/bin/python scripts/diag
+10-12 02:32:49  grant  anymal_sand_seq  check      /usr/bin/python3 /Users/aditya/robosim/.claude/worktrees/agent-a8f21c8b02205ff25/scripts/particle_demo/watchdog.py --timeout 5400 --stall 600 --log /Users/adity
+10-12 02:34:15  release  ntest_s17_base  check  None  True  
+10-12 02:34:15  exit  ntest_s17_base    93    
+10-12 02:34:19  grant  rfd_dev5  check      /usr/bin/python3 /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/snap/rfd_dev5/scripts/diagnostics/watchdog_run.py
+10-12 02:42:53  release  anymal_sand_seq  check  None  True  
+10-12 02:42:53  exit  anymal_sand_seq    124    
+10-12 02:42:53  grant  cl_rigid  check      /Users/aditya/robosim/.claude/worktrees/agent-a8a12903da01bb68c/research_notes/mpm_parity_closeout/rigid_neutral.sh
+10-12 02:55:31  release  rfa_cost_check2  check  None  True  
+10-12 02:55:31  exit  rfa_cost_check2    137    
+10-12 02:55:31  grant  cl_rigsuite_libmoff1  check      /Users/aditya/robosim/.claude/worktrees/agent-a8a12903da01bb68c/research_notes/mpm_parity_closeout/rigid_suite.sh /Users/aditya/robosim/.claude/worktrees/agent-
+10-12 02:58:03  release  rfd_dev5  check  None  True  
+10-12 02:58:03  exit  rfd_dev5    143    
+10-12 02:58:04  grant  ntest_k152_new_kamino_cpu  check      python3 /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/tools/watch.py --log /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb99
+10-12 02:58:14  release  ntest_k152_new_kamino_cpu  check  None  True  
+10-12 02:58:14  exit  ntest_k152_new_kamino_cpu    0    
+10-12 02:58:16  grant  ptest4  check      /usr/bin/python3 /Users/aditya/robosim/.claude/worktrees/agent-a8f21c8b02205ff25/scripts/particle_demo/watchdog.py --timeout 2400 --stall 900 --log /private/tmp
