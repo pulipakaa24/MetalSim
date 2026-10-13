@@ -1,1 +1,312 @@
 === batch_01 start Tue Oct 13 14:13:54 PDT 2026
+Auto-merging docs/GAPS.md
+Auto-merging docs/STATUS.md
+Auto-merging metalsim/physics/mpm/MPM.md
+[14:13:54] MERGE -> PASS d1802496
+Note: switching to '3fd1f052a5ad031578960d9642aaaedc03834e4d'.
+
+You are in 'detached HEAD' state. You can look around, make experimental
+changes and commit them, and you can discard any commits you make in this
+state without impacting any branches by switching back to a branch.
+
+If you want to create a new branch to retain commits you create, you may
+do so (now or later) by using -c with the switch command. Example:
+
+  git switch -c <new-branch-name>
+
+Or undo this operation with:
+
+  git switch -
+
+Turn off this advice by setting config variable advice.detachedHead to false
+
+[14:13:55] FORK -> PASS 99843d09840f89ac16c82104ad66ae792e45eb91
+updated scripts/vendor_mpm152.py
+updated scripts/setup_newton152.sh
+updated THIRD_PARTY_NOTICES.md
+updated MPM.md section 10
+updated README.md
+wrote 11 files to /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/implicit_mpm
+[14:13:55] PIN -> PASS 99843d09
+[14:13:55] CPU_TESTS -> PASS 
+[14:13:58] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[14:13:58] gpu job mm_col_old (check, <= 6 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/color_old_newton152.log
+    Module warp.fem.integrate._identity_field_97c62231 73546b3 load on device 'metal:0' took 872.10 ms  (cached)
+    Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.update_particle_strains_f4e4d5e7 21226c1 load on device 'metal:0' took 833.88 ms  (cached)
+    Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_34a4f9cb ba52845 load on device 'metal:0' took 575.89 ms  (cached)
+    worlds 2: strain nodes 51200 (active 2250), colors 8, blocks 2250; strain nodes covered once 2250/2250, velocity-node write conflicts within a color 930 in 8 colors
+    INVALID
+[14:19:04] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid    410 WindowServer                       4.5 %
+  pid   1291 Google Chrome He                   3.1 %
+  pid   1085 com.apple.WebKit                   1.4 %
+[14:19:04] gpu job mm_col_new2 (check, <= 6 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/color_new_w2.log
+    Module warp.fem.integrate._identity_field_97c62231 73546b3 load on device 'metal:0' took 857.11 ms  (cached)
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.update_particle_strains_fcaaeefb 1f1cad9 load on device 'metal:0' took 948.72 ms  (compiled)
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_608785a3 4d5ebb9 load on device 'metal:0' took 679.19 ms  (compiled)
+    worlds 2: strain nodes 51200 (active 2250), colors 8, blocks 2250; strain nodes covered once 2250/2250, velocity-node write conflicts within a color 0 in 0 colors
+    VALID
+[14:19:50] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid    410 WindowServer                       5.0 %
+  pid   1085 com.apple.WebKit                   1.8 %
+[14:19:50] gpu job mm_col_new3 (check, <= 6 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/color_new_w3.log
+    Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_c250f2e7 f976367 load on device 'metal:0' took 368.84 ms  (cached)
+    Module warp.fem.integrate._identity_field_97c62231 73546b3 load on device 'metal:0' took 862.40 ms  (cached)
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_c4783051 ae1fc60 load on device 'metal:0' took 666.86 ms  (compiled)
+    worlds 3: strain nodes 3375 (active 3375), colors 8, blocks 3375; strain nodes covered once 3375/3375, velocity-node write conflicts within a color 0 in 0 colors
+    VALID
+[14:20:26] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s:
+  pid    410 WindowServer                       4.2 %
+  pid   1085 com.apple.WebKit                   1.4 %
+[14:20:26] COLOR_NEW -> PASS old fork: INVALID
+[14:20:26] gpu job mm_mwrep (check, <= 30 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/mwrepeat_fixed.log
+    solver jacobi        basis pic27  cells -1   : first differing step None
+    solver gauss-seidel  basis S2     cells auto : first differing step None
+    solver gauss-seidel  basis S2     cells -1   : first differing step None
+    solver gauss-seidel  basis pic27  cells auto : first differing step None
+    solver gauss-seidel  basis pic27  cells -1   : first differing step None
+[14:21:22] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid    410 WindowServer                       4.8 %
+  pid   1085 com.apple.WebKit                   1.8 %
+[14:21:22] MWREPEAT -> PASS 12/12 repeatable
+[14:21:22] gpu job mm_vbit (check, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/vendored_bitwise_column.log
+    Module scatter_field_dof_values_953ffc59 d520604 load on device 'metal:0' took 38.85 ms  (cached)
+    Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_16b56c40 9ba2ca5 load on device 'metal:0' took 345.36 ms  (cached)
+    Module warp.fem.integrate._identity_field_33a7d872 4e9b5c7 load on device 'metal:0' took 755.07 ms  (cached)
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_c553f182 ab8059b load on device 'metal:0' took 512.06 ms  (cached)
+    1.7.0.dev0 metalsim.physics.mpm.implicit_mpm.solver_implicit_mpm 15 141b2cb3c47e3446 740a25b89615b312 iters 3495
+[14:22:43] health: utilisation 34%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid    410 WindowServer                       4.4 %
+  pid   1291 Google Chrome He                   3.3 %
+  pid   1085 com.apple.WebKit                   1.6 %
+[14:22:43] COLUMN_BITWISE -> PASS 
+[14:22:43] gpu job mm_box_ms (check, <= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/box_jacobi_metalsim.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.update_particle_strains_fcaaeefb a0cf752 load on device 'metal:0' took 911.53 ms  (compiled)
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_608785a3 a3a47b4 load on device 'metal:0' took 656.68 ms  (compiled)
+    Module map_mul fe0b813 load on device 'metal:0' took 399.06 ms  (compiled)
+    Module metalsim.physics.mpm.implicit_mpm.solver_implicit_mpm 411250e load on device 'metal:0' took 533.76 ms  (compiled)
+    metalsim box z final [0.05999049 0.05999042] particles finite True
+[14:23:54] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[14:23:54] gpu job mm_box_nt (check, <= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/box_jacobi_newton.log
+    Module warp.fem.integrate._identity_field_97c62231 73546b3 load on device 'metal:0' took 849.64 ms  (cached)
+    Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.update_particle_strains_f4e4d5e7 21226c1 load on device 'metal:0' took 882.98 ms  (cached)
+    Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_34a4f9cb ba52845 load on device 'metal:0' took 602.49 ms  (cached)
+    Module map_mul 70219a3 load on device 'metal:0' took 345.11 ms  (cached)
+    newton box z final [0.05999049 0.05999048] particles finite True
+[14:25:15] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+{'engine': 'metalsim', 'proxy_mass': [2.0]} {'engine': 'newton'}
+steps 60: particle hashes equal on 17 steps; box position max |diff| per step first 0.000e+00 mid 3.091e-09 last 1.705e-07
+final box z [0.05999049 0.05999042] vs [0.05999049 0.05999048]
+final particle RMS 1.041e-06 m, max 2.494e-05
+first differing particle step: 17
+[14:25:16] BOX_PAIR -> PASS 
+[14:25:16] gpu job mm_neutral_a (check, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/neutral_plain1.log
+    Module _update_gradient_cholesky__locals__kernel_628162ad d450195 load on device 'metal:0' took 468.01 ms  (compiled)
+    Module _update_constraint_gradient_fused__locals__kernel_ea9700de f10f36d load on device 'metal:0' took 424.34 ms  (compiled)
+    Module _update_gradient_h_incremental_cholesky__locals__kernel_5f6ad989 c50053c load on device 'metal:0' took 469.93 ms  (compiled)
+    Module mujoco_warp._src.derivative 3eaf30a load on device 'metal:0' took 840.39 ms  (cached)
+    {"mode": "plain", "traj": {"box": "497184c35585f88e", "panda": "23c7c37848831bd8"}, "modules": {"mujoco_warp._src.constraint@256": "4b2565f7f5e14a49", "mujoco_warp._src.derivative@256": "3eaf30a41e7b6945", "mujoco_warp._src.forward@256": "9c6583cfb7d6dd01", "mujoco_warp._src.forward@32": "53c99394262f17aa", "mujoco_warp._src.passive@256": "121cefebffd1e237", "mujoco_warp._src.smooth@256": "dc949da8ea7f379f", "mujoco_warp._src.solver@256": "00c4ab6a1657ccdf", "mujoco_warp._src.support@256": "d1f28811851170f3"}, "pid": 34003}
+[14:25:51] health: utilisation 9%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid    410 WindowServer                       1.2 %
+  pid    744 Terminal                           1.1 %
+[14:25:51] gpu job mm_neutral_b (check, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/neutral_plain2.log
+    Module _update_gradient_cholesky__locals__kernel_628162ad d450195 load on device 'metal:0' took 39.48 ms  (cached)
+    Module _update_constraint_gradient_fused__locals__kernel_ea9700de f10f36d load on device 'metal:0' took 40.65 ms  (cached)
+    Module _update_gradient_h_incremental_cholesky__locals__kernel_5f6ad989 c50053c load on device 'metal:0' took 41.62 ms  (cached)
+    Module mujoco_warp._src.derivative 3eaf30a load on device 'metal:0' took 48.61 ms  (cached)
+    {"mode": "plain", "traj": {"box": "497184c35585f88e", "panda": "0538e6677917a260"}, "modules": {"mujoco_warp._src.constraint@256": "4b2565f7f5e14a49", "mujoco_warp._src.derivative@256": "3eaf30a41e7b6945", "mujoco_warp._src.forward@256": "9c6583cfb7d6dd01", "mujoco_warp._src.forward@32": "53c99394262f17aa", "mujoco_warp._src.passive@256": "121cefebffd1e237", "mujoco_warp._src.smooth@256": "dc949da8ea7f379f", "mujoco_warp._src.solver@256": "00c4ab6a1657ccdf", "mujoco_warp._src.support@256": "d1f28811851170f3"}, "pid": 34160}
+[14:26:02] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[14:26:02] gpu job mm_neutral_c (check, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/neutral_after.log
+    Module _update_gradient_cholesky__locals__kernel_628162ad d450195 load on device 'metal:0' took 397.72 ms  (cached)
+    Module _update_constraint_gradient_fused__locals__kernel_ea9700de f10f36d load on device 'metal:0' took 358.21 ms  (cached)
+    Module _update_gradient_h_incremental_cholesky__locals__kernel_5f6ad989 c50053c load on device 'metal:0' took 413.95 ms  (cached)
+    Module mujoco_warp._src.derivative 3eaf30a load on device 'metal:0' took 847.76 ms  (cached)
+    {"mode": "after-mpm", "traj": {"box": "497184c35585f88e", "panda": "e6128af7a58a1d36"}, "modules": {"mujoco_warp._src.constraint@256": "4b2565f7f5e14a49", "mujoco_warp._src.derivative@256": "3eaf30a41e7b6945", "mujoco_warp._src.forward@256": "9c6583cfb7d6dd01", "mujoco_warp._src.forward@32": "53c99394262f17aa", "mujoco_warp._src.passive@256": "121cefebffd1e237", "mujoco_warp._src.smooth@256": "dc949da8ea7f379f", "mujoco_warp._src.solver@256": "00c4ab6a1657ccdf", "mujoco_warp._src.support@256": "d1f28811851170f3"}, "pid": 34263}
+[14:27:08] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[14:27:08] NEUTRAL -> PASS 
+/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/neutral/plain1.json vs /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/neutral/plain2.json (plain): trajectories equal {'box': True, 'panda': False}; module hashes compared 8, differing []
+/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/neutral/plain1.json vs /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/neutral/after_mpm.json (after-mpm): trajectories equal {'box': True, 'panda': False}; module hashes compared 8, differing []
+[14:27:08] gpu job mm_repose_0.68 (check, <= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/repose_0.68.log
+       "h_max": 0.05178780108690262,
+       "runout": 0.19838282465934753
+      }
+     ]
+    }
+[14:39:05] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[14:39:05] gpu job mm_repose_0.4 (check, <= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/repose_0.4.log
+       "h_max": 0.032457806169986725,
+       "runout": 0.31567785143852234
+      }
+     ]
+    }
+[14:52:02] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[14:52:02] gpu job mm_repose_0.9 (check, <= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/repose_0.9.log
+       "h_max": 0.06199529767036438,
+       "runout": 0.16991040110588074
+      }
+     ]
+    }
+[14:52:33] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s:
+  pid   1291 Google Chrome He                   2.5 %
+[14:52:33] REPOSE -> PASS  "friction_angle_deg": 21.80140948635181,  "angle_deg": 10.425383907594975,  "friction_angle_deg": 34.21570213243741,  "angle_deg": 12.064356888150055,  "friction_angle_deg": 41.987212495816664,  "angle_deg": 13.906175793257301, 
+[14:52:33] gpu job mm_scale_1 (check, <= 45 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/scale_gs_w1.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.update_particle_strains_a5c4d66b 7ab7e8a load on device 'metal:0' took 815.95 ms  (cached)
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 d2ec691 load on device 'metal:0' took 548.54 ms  (cached)
+    Module map_mul fe0b813 load on device 'metal:0' took 328.10 ms  (cached)
+    Module metalsim.physics.mpm.implicit_mpm.solver_implicit_mpm 411250e load on device 'metal:0' took 456.59 ms  (cached)
+    {"worlds": 1, "solver": "auto", "steps": 40, "capture": 1, "first_differing_step": [null], "repeatable": true, "particles_per_world": 2592, "box_z_min": 0.03144555166363716, "box_z_max": 0.03144555166363716, "finite": true}
+[14:53:04] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[14:53:04] gpu job mm_scale_64 (check, <= 45 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/scale_gs_w64.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.update_particle_strains_fcaaeefb a0cf752 load on device 'metal:0' took 842.43 ms  (cached)
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_608785a3 a3a47b4 load on device 'metal:0' took 574.20 ms  (cached)
+    Module map_mul fe0b813 load on device 'metal:0' took 347.55 ms  (cached)
+    Module metalsim.physics.mpm.implicit_mpm.solver_implicit_mpm 411250e load on device 'metal:0' took 466.84 ms  (cached)
+    {"worlds": 64, "solver": "auto", "steps": 40, "capture": 1, "first_differing_step": [null], "repeatable": true, "particles_per_world": 2592, "box_z_min": 0.031502626836299896, "box_z_max": 0.031531739979982376, "finite": true}
+[14:53:45] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[14:53:45] gpu job mm_scale_256 (check, <= 45 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/scale_gs_w256.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.update_particle_strains_fcaaeefb a0cf752 load on device 'metal:0' took 42.69 ms  (cached)
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_608785a3 a3a47b4 load on device 'metal:0' took 40.93 ms  (cached)
+    Module map_mul fe0b813 load on device 'metal:0' took 38.14 ms  (cached)
+    Module metalsim.physics.mpm.implicit_mpm.solver_implicit_mpm 411250e load on device 'metal:0' took 39.38 ms  (cached)
+    {"worlds": 256, "solver": "auto", "steps": 40, "capture": 1, "first_differing_step": [null], "repeatable": true, "particles_per_world": 2592, "box_z_min": 0.031502045691013336, "box_z_max": 0.031531739979982376, "finite": true}
+[14:54:10] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[14:54:10] gpu job mm_scale_1024 (check, <= 45 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/scale_gs_w1024.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.update_particle_strains_fcaaeefb a0cf752 load on device 'metal:0' took 43.62 ms  (cached)
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_608785a3 a3a47b4 load on device 'metal:0' took 41.99 ms  (cached)
+    Module map_mul fe0b813 load on device 'metal:0' took 38.71 ms  (cached)
+    Module metalsim.physics.mpm.implicit_mpm.solver_implicit_mpm 411250e load on device 'metal:0' took 40.42 ms  (cached)
+    {"worlds": 1024, "solver": "auto", "steps": 40, "capture": 1, "first_differing_step": [null], "repeatable": true, "particles_per_world": 2592, "box_z_min": 0.03149842470884323, "box_z_max": 0.031535111367702484, "finite": true}
+[14:55:02] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[14:55:02] gpu job mm_scale_j1024 (check, <= 45 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/scale_jacobi_w1024.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.update_particle_strains_fcaaeefb a0cf752 load on device 'metal:0' took 43.96 ms  (cached)
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_608785a3 a3a47b4 load on device 'metal:0' took 42.15 ms  (cached)
+    Module map_mul fe0b813 load on device 'metal:0' took 39.81 ms  (cached)
+    Module metalsim.physics.mpm.implicit_mpm.solver_implicit_mpm 411250e load on device 'metal:0' took 41.76 ms  (cached)
+    {"worlds": 1024, "solver": "jacobi", "steps": 40, "capture": 1, "first_differing_step": [34], "repeatable": false, "particles_per_world": 2592, "box_z_min": 0.029614927247166634, "box_z_max": 0.02961987443268299, "finite": true}
+[14:55:53] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[14:55:53] SCALE -> FAIL 
+[14:55:53] gpu job mm_tests_main (check, <= 60 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/tests_mpm_main.log
+    tests/test_mpm_main.py:249: AssertionError
+    =========================== short test summary info ============================
+    FAILED tests/test_mpm_main.py::test_pile_angle_of_repose - AssertionError: {'...
+    FAILED tests/test_mpm_main.py::test_free_fall_momentum - AssertionError: asse...
+    =================== 2 failed, 11 passed in 224.35s (0:03:44) ===================
+[14:59:45] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[14:59:45] TESTS_MAIN -> FAIL 
+[14:59:45] gpu job mm_tests_152 (check, <= 30 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/tests_mpm_newton152.log
+    .......x........                                                         [100%]
+    15 passed, 1 xfailed in 106.22s (0:01:46)
+[15:01:41] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[15:01:41] TESTS_MPM152 -> PASS 
+[15:01:41] gpu job mm_tests_phys (check, <= 40 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/tests_physics.log
+    .sss....                                                                 [100%]
+    5 passed, 3 skipped in 11.59s
+[15:02:02] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid    413 loginwindow                        1.5 %
+[15:02:02] TESTS_PHYSICS -> PASS 
+[15:02:02] gpu job mm_t_auto_1 (timing, <= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/time_auto_w1.log
+    Module map_mul fe0b813 load on device 'metal:0' took 336.01 ms  (cached)
+    Module metalsim.physics.mpm.implicit_mpm.solver_implicit_mpm 411250e load on device 'metal:0' took 475.74 ms  (cached)
+    {"worlds": 1, "solver": "auto", "steps": 40, "capture": 1, "ms_per_step_median": 13.669979496626183, "ms_p10": 13.197917002253234, "ms_p90": 13.954274695424829, "particles_per_world": 2592, "env_steps_per_s": 73.15299925993341}
+    [gpu_run] mm_t_auto_1 end: device utilisation 98% (15:02:43), exit 0
+    [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[15:02:48] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   1.3 %
+[15:02:48] gpu job mm_t_auto_64 (timing, <= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/time_auto_w64.log
+    Module map_mul fe0b813 load on device 'metal:0' took 327.00 ms  (cached)
+    Module metalsim.physics.mpm.implicit_mpm.solver_implicit_mpm 411250e load on device 'metal:0' took 453.81 ms  (cached)
+    {"worlds": 64, "solver": "auto", "steps": 40, "capture": 1, "ms_per_step_median": 24.32831200712826, "ms_p10": 23.21862500102725, "ms_p90": 25.802641709742602, "particles_per_world": 2592, "env_steps_per_s": 2630.679842532759}
+    [gpu_run] mm_t_auto_64 end: device utilisation 0% (15:03:19), exit 0
+    [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[15:03:25] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[15:03:25] gpu job mm_t_auto_256 (timing, <= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/time_auto_w256.log
+    Module map_mul fe0b813 load on device 'metal:0' took 38.75 ms  (cached)
+    Module metalsim.physics.mpm.implicit_mpm.solver_implicit_mpm 411250e load on device 'metal:0' took 39.93 ms  (cached)
+    {"worlds": 256, "solver": "auto", "steps": 40, "capture": 1, "ms_per_step_median": 60.577500000363216, "ms_p10": 58.196638101071585, "ms_p90": 62.52492060739314, "particles_per_world": 2592, "env_steps_per_s": 4225.991498468326}
+    [gpu_run] mm_t_auto_256 end: device utilisation 0% (15:03:45), exit 0
+    [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[15:03:51] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[15:03:51] gpu job mm_t_auto_1024 (timing, <= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/time_auto_w1024.log
+    Module map_mul fe0b813 load on device 'metal:0' took 37.35 ms  (cached)
+    Module metalsim.physics.mpm.implicit_mpm.solver_implicit_mpm 411250e load on device 'metal:0' took 39.77 ms  (cached)
+    {"worlds": 1024, "solver": "auto", "steps": 40, "capture": 1, "ms_per_step_median": 223.64487499726238, "ms_p10": 208.15567470126553, "ms_p90": 225.8941958003561, "particles_per_world": 2592, "env_steps_per_s": 4578.687528665858}
+    [gpu_run] mm_t_auto_1024 end: device utilisation 0% (15:04:27), exit 0
+    [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[15:04:32] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   3.0 %
+[15:04:32] gpu job mm_t_jacobi_1 (timing, <= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/time_jacobi_w1.log
+    {"worlds": 1, "solver": "jacobi", "steps": 40, "capture": 1, "ms_per_step_median": 8.32920800166903, "ms_p10": 7.9221335996408015, "ms_p90": 9.188775005168281, "particles_per_world": 2592, "env_steps_per_s": 120.05943419825957}
+    [gpu_run] mm_t_jacobi_1 end: device utilisation 0% (15:04:58), exit 0
+    [gpu_run] gpu_top: GPU (ioreg): device utilization 22 %; per-process GPU time over 1.9 s:
+    [gpu_run] gpu_top:   pid    410 WindowServer                       7.4 %
+    [gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.5 %
+[15:05:04] health: utilisation 22%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid    410 WindowServer                       6.1 %
+[15:05:04] gpu job mm_t_jacobi_64 (timing, <= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/time_jacobi_w64.log
+    {"worlds": 64, "solver": "jacobi", "steps": 40, "capture": 1, "ms_per_step_median": 20.277417002944276, "ms_p10": 19.76349140459206, "ms_p90": 20.53910839749733, "particles_per_world": 2592, "env_steps_per_s": 3156.2205378874055}
+    [gpu_run] mm_t_jacobi_64 end: device utilisation 0% (15:05:25), exit 0
+    [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+    [gpu_run] gpu_top:   pid    410 WindowServer                       1.6 %
+    [gpu_run] gpu_top:   pid    744 Terminal                           1.5 %
+[15:05:30] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid    410 WindowServer                       1.7 %
+  pid    744 Terminal                           1.5 %
+[15:05:30] gpu job mm_t_jacobi_256 (timing, <= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/time_jacobi_w256.log
+    Module map_mul fe0b813 load on device 'metal:0' took 38.26 ms  (cached)
+    Module metalsim.physics.mpm.implicit_mpm.solver_implicit_mpm 411250e load on device 'metal:0' took 40.59 ms  (cached)
+    {"worlds": 256, "solver": "jacobi", "steps": 40, "capture": 1, "ms_per_step_median": 54.72379150160123, "ms_p10": 52.349553602107335, "ms_p90": 55.488078894268256, "particles_per_world": 2592, "env_steps_per_s": 4678.03843585124}
+    [gpu_run] mm_t_jacobi_256 end: device utilisation 0% (15:05:51), exit 0
+    [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[15:05:57] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid    410 WindowServer                       1.1 %
+  pid    744 Terminal                           1.0 %
+[15:05:57] gpu job mm_t_jacobi_1024 (timing, <= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/time_jacobi_w1024.log
+    {"worlds": 1024, "solver": "jacobi", "steps": 40, "capture": 1, "ms_per_step_median": 210.4719795024721, "ms_p10": 197.23360830539605, "ms_p90": 215.69339579436928, "particles_per_world": 2592, "env_steps_per_s": 4865.255709670239}
+    [gpu_run] mm_t_jacobi_1024 end: device utilisation 0% (15:06:33), exit 0
+    [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+    [gpu_run] gpu_top:   pid    410 WindowServer                       1.4 %
+    [gpu_run] gpu_top:   pid    744 Terminal                           1.2 %
+[15:06:38] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid    410 WindowServer                       1.5 %
+[15:06:38] gpu job mm_t_eager_64 (timing, <= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_01/logs/time_auto_w64_eager.log
+    Module metalsim.physics.mpm.implicit_mpm.solver_implicit_mpm 411250e load on device 'metal:0' took 497.78 ms  (cached)
+    {"worlds": 64, "solver": "auto", "steps": 40, "capture": 0, "ms_per_step_median": 95.08222899603425, "ms_p10": 92.34629970887909, "ms_p90": 97.60623310430674, "particles_per_world": 2592, "env_steps_per_s": 673.1015950695619}
+    [gpu_run] mm_t_eager_64 end: device utilisation 62% (15:07:04), exit 0
+    [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+    [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.8 %
+[15:07:10] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   1.7 %
+[15:07:10] TIMING -> PASS 
+[15:07:10] not opening the PR: some steps are not PASS (see STATUS.txt)
+[15:07:10] finish (rc=0): commit + push
