@@ -8,7 +8,8 @@ Classes (granted in this order when the GPU frees up; FIFO within a class):
   low     (3)  background optimisation work; granted only when nothing else waits
   check   (1)  correctness work that does not time anything (tests, bitwise recordings, parity runs): up to
                GPU_SHARED_MAX (default 3) check jobs run together; they start only when no exclusive job holds
-               the GPU or waits ahead of them, and exclusive jobs (timing included) wait until they drain
+               the GPU or waits ahead of them, and exclusive jobs (timing included) wait until they drain; a check
+               job waiting longer than GPU_CHECK_AGE_S (default 600 s) is ordered ahead of timing jobs
 A holder is recorded in runs/.gpu_lock (text: name, kind, pid, start) and runs/.gpu_lock.d/ (the atomic
 token); a holder whose pid is gone is released automatically. Scripts that only check the file still
 interoperate. Waiting jobs register tickets in runs/gpu_queue/.
@@ -32,6 +33,7 @@ def _hist(ev, **kw):
 PRIO = {"timing": 0, "render": 1, "check": 1, "train": 2, "low": 3}
 SH = os.path.join(ROOT, "runs", "gpu_shared")            # one file per running check job
 SHARED_MAX = int(os.environ.get("GPU_SHARED_MAX", "3"))
+CHECK_AGE_S = float(os.environ.get("GPU_CHECK_AGE_S", "600"))   # a check job waiting this long goes ahead of timing jobs (no starvation)
 
 
 HB = os.path.join(ROOT, "runs", "gpu_hb")                # gpu_run.sh touches gpu_hb/<job pid> every 5 s while the job lives
@@ -85,7 +87,9 @@ def tickets():
         try: t = json.load(open(os.path.join(Q, f)))
         except Exception: continue
         if t.get("pid") and not alive(t["pid"]): os.remove(os.path.join(Q, f)); continue
-        out.append((PRIO.get(t["kind"], 2), t["t"], f, t))
+        pr = PRIO.get(t["kind"], 2)
+        if t["kind"] == "check" and t["t"] > 0 and time.time() - t["t"] > CHECK_AGE_S: pr = -1   # aged: ahead of timing
+        out.append((pr, t["t"], f, t))
     out.sort(); return out
 
 
