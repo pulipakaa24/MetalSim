@@ -7,7 +7,10 @@ the PPOWarp loop raises (check_overflow at every log point); the run then report
     .venv/bin/python scripts/diagnostics/overflow_training_check.py g1_flat --n 4096 --iters 50 --log runs/fixfail/train_g1_flat.log
     tasks: g1_flat, g1_rough (default boxes_local), g1_rough_hfield (train_g1, the shipped G1 path incl. the anomaly monitor), tron1 (PPOWarp over
     Tron1WFTask: the task's own loop does not call check_overflow, so this is what the guard would say there),
-    lift (SO-101 lift, torch PPO of train_lift: flags read at the end; its loop has no guard)
+    lift (SO-101 lift, torch PPO of train_lift: flags read at the end; its loop has no guard),
+    g1_rough_policy[_hfield] (a trained rough policy rolled out, no updates, with the envs spread evenly over all 10
+    terrain levels from the start and the curriculum running: the contact-richest terrain a trained policy reaches;
+    --iters rollouts of 24 control steps, check_overflow after each)
 """
 import argparse
 import os
@@ -21,10 +24,11 @@ import warp as wp  # noqa: E402
 
 wp.config.quiet = True
 ap = argparse.ArgumentParser()
-ap.add_argument("task", choices=["g1_flat", "g1_rough", "g1_rough_hfield", "tron1", "lift"])
+ap.add_argument("task", choices=["g1_flat", "g1_rough", "g1_rough_hfield", "g1_rough_policy", "g1_rough_policy_hfield", "tron1", "lift"])
 ap.add_argument("--n", type=int, default=4096)
 ap.add_argument("--iters", type=int, default=50)
 ap.add_argument("--log", required=True)
+ap.add_argument("--ckpt", default=None, help="g1_rough_policy*: a trained rough checkpoint (net state dict under 'net')")
 a = ap.parse_args()
 import metalsim  # noqa: E402
 print("metalsim from", metalsim.__file__, flush=True)
@@ -42,7 +46,31 @@ def log(msg):
 task = None
 t0 = time.perf_counter(); err = None
 try:
-    if a.task.startswith("g1"):
+    if a.task.startswith("g1_rough_policy"):
+        import numpy as np
+        import torch
+        from metalsim.learn.g1_velocity import G1VelocityTask, g1_ppo_config
+        from metalsim.learn.ppo_warp import PPOWarp
+        task = G1VelocityTask(a.n, terrain="rough", seed=42, terrain_collision="hfield" if a.task.endswith("hfield") else None)
+        algo = PPOWarp(task, g1_ppo_config("rough", a.iters, 42))
+        algo.net.load_state_dict(torch.load(a.ckpt, map_location="mps")["net"])
+        nr, nc = task.n_levels, task.n_cols
+        lv = (np.arange(a.n) % nr).astype(np.int32); col = task.col.numpy()
+        task.level.assign(lv)
+        task.origins.assign(task.origin_table.numpy()[lv * nc + col].astype(np.float32))
+        algo.prepare()
+        log(f"G1 rough trained-policy rollout: N={a.n} collision {task.terrain_collision} njmax {task.sim.d.njmax} "
+            f"nconmax {task.sim.d.naconmax // a.n} levels {nr} x {nc} start levels spread 0..{nr - 1}; ckpt {a.ckpt}")
+        t1 = time.perf_counter()
+        for it in range(1, a.iters + 1):
+            algo.rollout()
+            if it % 5 == 0 or it == a.iters:
+                ov = task.sim.check_overflow()          # raises on any capacity overflow since construction
+                ret, length, count = task.episode_stats()
+                lvn = task.level.numpy()
+                log(f"it {it:4d} sps {it * 24 * a.n / (time.perf_counter() - t1):8,.0f} | ep_ret {ret:7.2f} ep_len {length:6.1f} "
+                    f"(n={count}) | level mean {lvn.mean():.2f} per level {np.bincount(lvn, minlength=nr).tolist()} | flags {ov}")
+    elif a.task.startswith("g1"):
         from metalsim.learn import g1_velocity as g1v
         orig = g1v.G1VelocityTask
 
