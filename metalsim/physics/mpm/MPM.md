@@ -1,4 +1,8 @@
-# MPM on Metal (2026-10-09)
+# MPM on Metal (2026-10-09; sections through 8j, 2026-10-13)
+
+Sections are a dated log: statements such as "being ported" or "in progress" are the state on their date, and a
+**Done** / **Resolved** note points to where the result landed. Summary of the current state: `docs/STATUS.md`
+("Deferred work items") and `docs/GAPS.md` (MPM row).
 
 Isaac Lab 3.0-EA's only MPM is Newton 1.5.2's `SolverImplicitMPM` (an implicit Drucker-Prager rheology + frictional
 contact solve per step, after Daviet & Bertails-Descoubes 2016 and NVIDIA's "Mixed MPM" 2026); PhysX dropped its MPM in
@@ -90,8 +94,8 @@ First pass (85 runs, all exit 0), Isaac Lab 3.0-EA's Newton 1.5.2 / Warp 1.16.0 
   0.57 mm (max 5 cm on a few flung grains), centre of mass 9 um, KE 4.5e-6.
 * **Lattice defect found by R2:** Isaac Lab's `_emit_grid` takes float32 corners, so a 0.2 m column at 3 ppc / 0.05 m
   voxels has 12 particles across, not the 13 `scenes.py` produced in float64. Fixed (`scenes.py` positions now equal
-  Isaac Lab's bit for bit, a = 2 and 5); the column and plate runs (R0 column, R1, R7) are being re-recorded; the first
-  pass is kept in `mpm_lattice13/`. Newton examples (R3, R4, R6) and R2 itself were unaffected.
+  Isaac Lab's bit for bit, a = 2 and 5); the column and plate runs (R0 column, R1, R7) are being re-recorded (**done**:
+  second pass below); the first pass is kept in `mpm_lattice13/`. Newton examples (R3, R4, R6) and R2 itself were unaffected.
 
 Second pass (Isaac Lab lattice, 12 across; R0 column, R1, R2, R7 re-recorded, all exit 0):
 * **R2: Isaac Lab's own `MPMObject` / `MPMSolverCfg` path is bitwise equal to `scenes.py` + Newton direct** (a = 2
@@ -146,10 +150,11 @@ Warp fork, both measured (`probes/fp_semantics.py`, `fp_contract_patterns.py`, `
    `metalsim-fp-contract` (`upstream/warp-innate-fpcontract`): `#pragma clang fp contract(fast)` in the Metal
    prelude when `fuse_fp` is on. Metal then reproduces CUDA bit for bit on every tested expression shape (a*b+c,
    a*b+-c*d, three-term sums and squares, (a-b)*(c-d)+e, c-a*b). This changes rounding in every Metal Warp kernel,
-   so it is a separate branch: merging it means re-running the rigid-body parity suite.
+   so it is a separate branch: merging it means re-running the rigid-body parity suite. (**Done:** merged into Warp
+   `metalsim`; the rigid suite had the same known failures before and after, `runs/fma_rigid_parity/`.)
 2. **BVH builder.** CUDA builds mesh BVHs with LBVH, the fork's Metal path falls back to host SAH; at exact ties the
    closest face differs (CUDA LBVH vs CUDA SAH alone: 4,962 / 7,126 / 3,793 tied points differ in three box cases).
-   Being ported (Metal LBVH identical to CUDA's).
+   Being ported (Metal LBVH identical to CUDA's). (**Done:** results with FMA + LBVH below.)
 
 Remaining non-bitwise source on CUDA: kernels Newton marks `fast_math` use approximate `/` and `sqrt` on CUDA
 (71 % / 83 % correctly rounded); Metal keeps them exact. Measured on the L4 itself (`record_mpm.py --precise-cuda`):
@@ -163,7 +168,7 @@ so the T1 floor is the larger of the L4's float64-vs-float32 and fast-vs-exact d
 * **T2, column collapse, all six aspect ratios: PASS.** Seed-mean runout within 0.1 %, final height within 0.4 %
   (the seed spread is 1-4 %); fitted exponents Metal 1.1555 / 0.7282 vs L4 1.1559 / 0.7275.
 * **Granular example (mesh collider):** 0.24 mm at frame 6 vs a 0.05 um floor: the collider-normal ties (BVH);
-  re-run after the LBVH port, together with R3/R4/R6/R7.
+  re-run after the LBVH port, together with R3/R4/R6/R7 (**done**, next subsection).
 
 ### Results with FMA + LBVH (Warp branch `metalsim-mpm-parity`), against CUDA's own floors (2026-10-10)
 
@@ -200,7 +205,7 @@ Timing-class runs, ms/frame, Metal vs the L4 (eager / whole step captured): colu
 58.9/24.2; two-way coupling 254.4 vs 73.0/31.0. Two-way profile: MPM step 224 ms, of which ~130 ms are CPU radix sorts
 in `warp.fem` `compress_node_indices` and ~40 ms GPU drains before host utility calls (the fork runs
 `radix_sort_pairs` / `runlength_encode` / `array_scan` on the host on Metal). Order: GPU sort/RLE/scan (in progress,
-branch `metalsim-metal-sort`), GPU-driven solver loop (indirect execution ranges), residual folded into the solve,
+branch `metalsim-metal-sort`; **done**, table below), GPU-driven solver loop (indirect execution ranges), residual folded into the solve,
 GPU NanoVDB grid build, whole-step capture, Gauss-Seidel layout work after microbenchmarks.
 
 ### Done (2026-10-10), each bitwise against the previous Metal path
@@ -789,7 +794,7 @@ recordings at 1 / 64 / 2,048 worlds, eager and captured, equal; `tests/test_mpm.
 |---|---|---|---|
 | base | Warp `f0df4cf8`, Newton `3fd1f052` | 37.64 | 1.84 s |
 | tight temporary pools (exact sizes, no array > 1.25x a request of >= 1 MiB) | Warp `95f6f121` (default on Metal) | 34.48 | MPM step 81.2 / 81.5 vs 81.5 / 81.4 ms |
-| + measured NanoVDB node budgets (16 leaves, 4.5 lower nodes per world, 80+ upper; 4x the peak of 600 random-action policy steps) | Franka-Pour `mpm_grid_budget="measured"` (opt-in; local branch `franka-pour-memory` on `metalsim-franka-pour` `783decdc`, for that branch's owner to merge) | 24.85 | 1.79 s |
+| + measured NanoVDB node budgets (16 leaves, 4.5 lower nodes per world, 80+ upper; 4x the peak of 600 random-action policy steps) | Franka-Pour `mpm_grid_budget="measured"` (opt-in; written on local branch `franka-pour-memory`, merged with the Franka-Pour task in PR #6, `fe3c1f2f`) | 24.85 | 1.79 s |
 | + cell reservation 256 per world (peak use 80) | Franka-Pour `mpm_cells_per_world=256` (opt-in) | 15.66 | 1.44 s |
 
 The two task options are capacities: a grid within them is the same grid, and an overflow is reported (the PPO loop
@@ -825,7 +830,8 @@ end to end: Isaac's own assets (Franka USD, cups, table, the 20,000-row reset da
 * Learning against Isaac (`docs/PARITY.md` §1b.5, 2026-10-13): 5 of our seeds at Isaac's matched 1,024-env
   configuration against Isaac's single run. Isaac's run is inside our prediction interval through iteration 49. At
   iterations 50-59 it leads by about 0.06 success, just outside the interval (verdict partial). Isaac seeds 1-4
-  (`stage_pour_seeds.sh`) are waiting for L4 time.
+  (`stage_pour_seeds.sh`) were waiting for L4 time; seeds 1 and 2 were started on the L4 later on 2026-10-13 (in
+  flight, `docs/NOW.md`; no result recorded yet).
 * Upstream observation (code reading, same in Isaac and here): the proxy wrench harvest uses only the last MPM
   substep's impulses and divides by the outer dt, so with the media entry's 2 substeps the reaction on the cups is about
   half the mean force (`solver_coupled_proxy.py:1547-1557`, `solver_implicit_mpm.py:1773-1812, 3266-3268`).
@@ -887,7 +893,7 @@ command-buffer cost, joined with the L4's nsys sums in `profile/joined.md` and `
   (`_crb_accumulate`, `_cfrc_backward`, `_primitive_narrowphase`, Cholesky updates). Sorts and scans take 2.3 vs
   1.6 ms. Parts: MPM step 25.6 ms, MuJoCo step 18.4 ms of 45.4 (eager, synchronized).
 
-**What would close it** (not started):
+**What would close it** (not started when this section was written; item 1 is in progress per `docs/NOW.md`):
 1. **Two-way growth.** On Metal, run the long-row product (IJtm) through a row-tiled reduction (CUDA's
    `bsr_mv_tiled_kernel` choice, as Warp `3c4e251e` did for warp.fem's dispatched assembly), or swap the IJtm product
    for a J^T product over J's short rows. Expected: the late window back to about the early cost (36-37 ms), giving
@@ -922,7 +928,7 @@ Everything above runs from a clone of MetalSim plus the three forks; nothing dep
 ```
 # after the install of README / docs/GUIDE.md (.venv, scripts/setup_warp.sh, the MuJoCo Warp fork):
 scripts/setup_newton152.sh          # .venv-newton152: Newton fork metalsim-1.5.2 @3fd1f052, shared Warp fork @95f6f121
-scripts/gpu_run.sh test_mpm check 15 -- .venv-newton152/bin/python -m pytest tests/test_mpm.py   # 14 passed, 1 xfailed
+scripts/gpu_run.sh test_mpm check 15 -- .venv-newton152/bin/python -m pytest tests/test_mpm.py   # 15 passed, 1 xfailed
 ```
 
 | what | where it lives | how a fresh setup gets it |

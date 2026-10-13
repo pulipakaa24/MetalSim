@@ -1,5 +1,13 @@
 # Phase log
 
+**This is the work log of 2026-09-22 .. 24, kept as written (note added 2026-10-13).** Its "in progress" headings and
+"Remaining" / "Not yet" lists are the state on those days; most of them were done later. The current state is in
+`STATUS.md`, `GAPS.md` and `docs/NOW.md`; what landed when is in `CHANGELOG.md`. Examples: graph-captured batched
+physics, trajectory parity and the zero-host-copy conformance test (Phase 1 "Remaining") are done (PARITY §2); the
+MuJoCo Warp suite result below (1447 passed, 3 failed) is the 2026-09-22 base fork (the flex failures were fixed by the
+fork's flex commits, flex suite 237/237, PARITY §2); per-world physics DR is done (`test_per_world_model_fields`); the
+heightfield contact test marked xfail below passes since the fork's patch (GAPS "Heightfield contacts").
+
 Machine: Apple M4 Max, 40-core GPU, 64 GB, macOS 26.7, Command Line Tools only (no Xcode.app).
 Python 3.12 venv at `.venv`. Labels: **measured** (this machine), **reported**, **estimate**.
 
