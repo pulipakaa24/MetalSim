@@ -458,8 +458,11 @@ all ray tracers, all scenes). Every env's instances and rays are offset into one
 put env 31's camera 62 km out, where float32 spacing is 4 mm: the same state rendered differently per env. Now
 ("compact", default): a grid centred on the origin (3D when that keeps offsets smaller; vertical stacking weighted 8x
 because a floor seen at grazing angles amplifies the origin's z rounding) whose cells are the env's content box (every
-drawn geom, camera, site, light, flex vertex and tendon point at the initial state, symmetric about the origin in x and
-y, plus max(1 m, a tenth of its largest side)); every ray ends where it leaves its env's cell. If geometry (geom
+drawn geom's bounding box, planes by their size, cameras, sites, lights, flex vertices and tendon points at the initial
+state, symmetric about the origin in x and y, plus max(1 m, a tenth of its largest side)); every ray ends where it
+leaves its env's cell. MuJoCo's infinite planes (workstream C draws them as a disc) are a disc covering the cell in the
+acceleration structure and continue analytically past it, in the env's frame, with MuJoCo's plane texture mapping
+(`env_grid.h` `grid_plane`, every ray kernel), so the ground still reaches the horizon. If geometry (geom
 centres, dynamic objects' bounds) later nears its cell's boundary, the GPU flags it and the cell doubles before the next
 frame (a warning says so; `RayTracer(env_margin=...)` sizes it up front). Same state in every env, max |env e − env 0|
 depth (p99.9) in mm, legacy → compact:
