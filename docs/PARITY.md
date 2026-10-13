@@ -1096,21 +1096,21 @@ parameters read from `pour_env_cfg.py` with `ast`). 7 passed (M4 Max, 2026-10-12
 env-steps/s; one policy step = 4 collides, 24 MuJoCo solves, 16 MPM solves. Iteration = 96 steps x num_envs
 (196,608 at 2,048). Synchronized wall time.
 
-| measurement | M4 Max, this Mac (timing class) | M4 Max, 14-inch (training loop) | Isaac Lab 3.0-EA on the L4 (measured) |
-|---|---|---|---|
-| 2,048 envs (the README's), step only, uniform random actions | **986** (2.077 s / step, idle device, `bench_mac2_2048_step.json`; 964 in a first run with the idle check reading 100 %, `bench_mac_2048_step.json`) | – | **does not fit**: CUDA out of memory creating the step graph, and out of memory eager (`use_cuda_graph=false`) on the L4's 24 GB (`runs/parity/isaaclab3_pour/train_2048*.log`) |
-| 2,048 envs, rollout + policy inference | 999 (idle device, `bench_mac2_2048_rollout.json`; 962 first run) | 1,075 (collection 182.6 s per iteration, median of 51) | – |
-| 2,048 envs, full PPO loop (rollout + 5 x 4 minibatch update) | 979 (one 96-step iteration after one warm-up, idle device, `bench_mac2_2048_ppo.json`; 923 first run) | **1,072** median (1,055-1,149) over iterations 1-51; update 0.71 s of 183 s | – |
-| 1,024 envs, rollout + inference / full PPO loop | ~1,029 physics only (0.995 s / step, a check-class smoke run, not timing class) | **1,040 / 1,037** (collection 94.5 s, update 0.35 s; median of 59 iterations) | **317** / 317 (collection 309-314 s per 96 steps, update 0.2 s; Isaac's own task with the asset patch, rsl_rl's log) |
+| measurement | M4 Max, this Mac (timing class) | Isaac Lab 3.0-EA on the L4 (measured) |
+|---|---|---|
+| 2,048 envs (the README's), step only, uniform random actions | **986** (2.077 s / step, idle device, `bench_mac2_2048_step.json`; 964 in a first run with the idle check reading 100 %, `bench_mac_2048_step.json`) | **does not fit**: CUDA out of memory creating the step graph, and out of memory eager (`use_cuda_graph=false`) on the L4's 24 GB (`runs/parity/isaaclab3_pour/train_2048*.log`) |
+| 2,048 envs, rollout + policy inference | 999 (idle device, `bench_mac2_2048_rollout.json`; 962 first run) | – |
+| 2,048 envs, full PPO loop (rollout + 5 x 4 minibatch update) | 979 (one 96-step iteration after one warm-up, idle device, `bench_mac2_2048_ppo.json`; 923 first run; the update is 0.4 % of the iteration) | – |
+| 1,024 envs, step only / full PPO loop | **1,054** / **992** (idle device; `bench_mac2_1024_{step,ppo}.json`) | **317** (rollout + inference) / 317 (collection 309-314 s per 96 steps, update 0.2 s; Isaac's own task with the asset patch, rsl_rl's log) |
 
 Reading: the step is the cost (the PPO update is 0.4 % of an iteration, inference under 0.3 %); at 1,024 envs the M4
-Max runs the task about 3.2x the L4's rate, and only the M4 Max (64 GB unified memory) holds the README's 2,048 envs.
+Max runs the task about 3.1x the L4's rate, and only the M4 Max (64 GB unified memory) holds the README's 2,048 envs.
 Isaac's step-only runtime benchmark (`isaaclab benchmark runtime`) rejects the coupled `NewtonCfg`
 ("Unsupported concrete physics config"), so the L4 row is rsl_rl's collection time, which includes inference.
 This Mac's first timing rows ran while the idle check read 100 % (a GPU later found hung by another job); the
-re-measure on an idle device (0-3 %) gives 986 / 999 / 979. The 14-inch's training loop runs 7-10 % faster than this
-Mac's idle re-measure (1,072 vs 979 full loop); not investigated. Isaac's 3,000 iterations x 196,608 steps = 590M steps
-take about 6.4 days at 1,072 env-steps/s (Isaac on an L4 cannot run them at 2,048 envs).
+re-measure on an idle device (0-3 %) gives 986 / 999 / 979. All throughput figures here are from this Mac (the
+training runs on the second M4 Max are not timing measurements). Isaac's 3,000 iterations x 196,608 steps = 590M
+steps take about 7 days at 979 env-steps/s (Isaac on an L4 cannot run them at 2,048 envs).
 
 ### 1b.5 Learning
 
@@ -1131,7 +1131,7 @@ over the iteration's steps), mean reward and episode length over the last 100 ep
 | 30-39 | 0.300 / 1.16 / 166 | 0.373 / 1.57 / 153 |
 | 40-49 | 0.310 / 1.42 / 164 | 0.414 / 1.83 / 147 |
 | 50-59 | 0.348 / 1.37 / 163 | 0.436 / 1.78 / 148 |
-| throughput (full loop) | **1,037 env-steps/s** (collection 94.5 s, update 0.35 s per iteration) | **317 env-steps/s** (collection 314 s, update 0.2 s) |
+| throughput (full loop) | see §1b.4 (this Mac) | 317 env-steps/s (collection 314 s, update 0.2 s) |
 
 Verdict: **partial**. Both learn the task from the same reset curriculum along the same early trajectory (iterations
 0-19 agree within the noise; the curriculum's concentration metrics evolve alike: effective pool 0.004-0.02, top-1 %
@@ -1147,23 +1147,22 @@ including five pauses for other jobs (four STOP-file pauses, one stop at iterati
 590M, 6.4 days at this rate). Log `runs/franka_pour/logs/m414_2048_log.jsonl` (+ console log), final checkpoint
 `runs/franka_pour/logs/m414_2048_model_299.pt`. Means over ten-iteration windows:
 
-| iterations | success (`Episode_Termination/success`) | success of episodes finished in the window | mean reward | episode length | env-steps/s |
-|---|---|---|---|---|---|
-| 0-9 | 0.138 | 0.203 | 0.48 | 108 | 1,081 |
-| 20-29 | 0.343 | 0.343 | 1.35 | 148 | 1,073 |
-| 50-59 | 0.322 | 0.405 | 1.38 | 92 | 1,074 |
-| 100-109 | 0.371 | 0.373 | 1.49 | 119 | 984 |
-| 150-159 | 0.467 | 0.472 | 2.16 | 128 | 990 |
-| 200-209 | 0.560 | 0.556 | 2.71 | 113 | 986 |
-| 250-259 | 0.618 | 0.616 | 2.90 | 120 | 954 |
-| 290-299 | 0.618 | 0.617 | 2.72 | 109 | 938 |
+| iterations | success (`Episode_Termination/success`) | success of episodes finished in the window | mean reward | episode length |
+|---|---|---|---|---|
+| 0-9 | 0.138 | 0.203 | 0.48 | 108 |
+| 20-29 | 0.343 | 0.343 | 1.35 | 148 |
+| 50-59 | 0.322 | 0.405 | 1.38 | 92 |
+| 100-109 | 0.371 | 0.373 | 1.49 | 119 |
+| 150-159 | 0.467 | 0.472 | 2.16 | 128 |
+| 200-209 | 0.560 | 0.556 | 2.71 | 113 |
+| 250-259 | 0.618 | 0.616 | 2.90 | 120 |
+| 290-299 | 0.618 | 0.617 | 2.72 | 109 |
 
 Training success plateaus near 0.62 from iteration ~250. What is not comparable: Isaac has no 2,048-env run on the
 hardware available here (its task does not fit the L4 at 2,048 envs), so this curve has no Isaac counterpart; the
 only matched comparison is the 1,024-env table above (60 iterations, one seed each). Training-time success is measured
 on curriculum-sampled rows (the sampler concentrates on rows near 50 % local progress), so it is not a fixed-row success
-rate; the deterministic evaluation below is. Throughput fell from ~1,075 to ~950 env-steps/s over the run (not
-investigated; pouring policies spread particles over more MPM cells).
+rate; the deterministic evaluation below is.
 
 **Deterministic evaluation of the iteration-299 policy** (`metalsim/learn/franka_pour_eval.py`, this Mac, 2026-10-13,
 check class): 2,048 envs, each one episode from a reset row drawn uniformly over all 20,000 rows (Isaac's play mode
@@ -1179,11 +1178,11 @@ same rows. The second run uses the opt-in memory budgets of `PourPhysicsConfig` 
 | particles at the episode's end in receiver / source / spilled | 0.376 / 0.437 / 0.016 | 0.374 / 0.449 / 0.016 |
 | mean episode length (steps) | 164.2 | 167.3 |
 | sparse-grid overflow | none | none |
-| wall time of the rollout | 752 s | 553 s |
+| wall time of the rollout (check class, not a timing measurement) | 752 s | 553 s |
 
 The two agree within sampling noise (binomial standard error of the success rate 0.011; the rigid solver is not run
 deterministically, so trajectories are not bitwise), so the memory opt-ins hold on a trained, pouring policy; they
-also make the rollout 26 % faster here. JSON and logs: `runs/franka_pour/eval/`. The policy succeeds from 82 % of the
+also shortened this rollout (752 -> 553 s; check class, so not a timing claim). JSON and logs: `runs/franka_pour/eval/`. The policy succeeds from 82 % of the
 start states where the cup is already grasped and from 15 % of the reaching / approach states; 0.48 overall.
 
 **Why 0.48 here and 0.62 in training's log.** The two numbers measure different populations. Diagnostic runs, same
