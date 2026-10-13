@@ -68,7 +68,7 @@ Measured coverage of the reference silhouette is shown as rgb / depth / seg.
 | flex 3D (soft volume) | ✅ | ✅ | ✅ | ✅ | ✅ | **fixed (workstream A, §5)**: 1.0 / 1.0 / 1.0 of 152 px, depth error 0 (was 0.0). Shell offset by +radius (flat-shaded when `flatskin`). |
 | flex 1D (cable) | ✅ | ✅ | ✅ | ✅ | ✅ | **fixed (workstream A, §5)**: open cylinders per edge (`mjVIS_FLEXEDGE`). The first audit's cable sat just above the image (0 px in MuJoCo too); moved mid-image it is 1.0 / 1.0 / 1.0 in every renderer. |
 | skin (bone-skinned mesh) | ✅ | ✅ | ✅ | ✅ | ✅ | **fixed (workstream A, §5)**: 1.0 / 1.0 / 1.0 of 236 px, depth error 0 (was 0.0). Linear blend skinning, area-weighted normals, `inflate`. |
-| transparency (`rgba` alpha < 1, material opacity, USD `opacity`) | ✅ | ✅ | ✅ | ◐ (opaque) | ✅ | **Fixed 2026-10 (B)**. T0/T1 blend as MuJoCo does: objects sorted per env, drawn front-to-back then back-to-front, back faces culled. T2 treats alpha as presence, like a USD opacity in Isaac's path tracer. Red box behind 25 % blue glass, colour change the glass makes over the box: MuJoCo (−64, 0, +65); T0/T1 before (−146, 0, +146), after (−64, 0, +64); T2 before (−122, 0, +125), after (−53, 0, +53). Annotations default to MuJoCo's: segmentation and depth of the glass (1.904 m, equal to MuJoCo). `transparent_ids="behind"` gives Isaac RTX Real-Time's opacity behaviour (seg / depth from what is behind). Lidar and depth camera still treat it as opaque. |
+| transparency (`rgba` alpha < 1, material opacity, USD `opacity`) | ✅ | ✅ | ✅ | ✅ | ✅ | **Fixed 2026-10 (B)**. T0/T1 blend as MuJoCo does: objects sorted per env, drawn front-to-back then back-to-front, back faces culled. T2 treats alpha as presence, like a USD opacity in Isaac's path tracer. Red box behind 25 % blue glass, colour change the glass makes over the box: MuJoCo (−64, 0, +65); T0/T1 before (−146, 0, +146), after (−64, 0, +64); T2 before (−122, 0, +125), after (−53, 0, +53). Annotations default to MuJoCo's: segmentation and depth of the glass (1.904 m, equal to MuJoCo). `transparent_ids="behind"` gives Isaac RTX Real-Time's opacity behaviour (seg / depth from what is behind). **RT: fixed 2026-10-13 (§3d)**: the ray-traced depth camera takes the same `transparent_ids` (default the surface: equal to `mj_ray` and MuJoCo's depth to < 0.2 mm) plus Isaac's `alpha_threshold`; the lidar transmits through transparent geoms with partial returns (default), or follows `mj_ray` (`transparency="surface"`); lidar materials (clear glass, mirror ghosts) and return modes. Scenes without transparency byte-identical. |
 | geometry beyond 10 m | ✅ (`far=`) | ✅ (`far=`) | ✅ | ✅ (range-limited) | ✅ | **Fixed (§3c).** `Tier0Renderer(far=...)` (default 10 m, unchanged); boxes at 15 m and 40 m 0.0 → 1.0 with MuJoCo's far plane; reversed-z depth keeps the error relative at any far. |
 | geom groups ≥ 3 hidden | ✅ | ✅ | ✅ | ✅ | ✅ | Matches MuJoCo's default `geomgroup` |
 | `geom_rgba` / `mat_rgba` | ✅ | ✅ | ✅ | n/a | ✅ | |
@@ -88,7 +88,7 @@ Measured coverage of the reference silhouette is shown as rgb / depth / seg.
 | point-light shadows | ✅ | ✅ | ✅ | n/a | | **Fixed 2026-10 (B)**: T0 renders six 90° cube faces per point light; T1 traces a ray. T0 1.02 → 0.053, T1 1.02 → 0.051, T2 0.035. MuJoCo does not light point lights at all; Isaac RTX shadows them. |
 | directional shadows | ✅ (every caster) | ✅ (every caster) | ✅ | | | 0.052 / 0.049 / 0.041 vs MuJoCo 0.0 (unchanged). Every further shadow-casting directional light now gets its own map in T0 and its own soft ray in T1. With a DR light on, the first model directional light stays unshadowed, as before. |
 | image lights (`mjLIGHT_IMAGE`) | ◐ | ◐ | ◐ | | | Mapped to directional (`build_lights`, code) |
-| area lights (USD Rect / Disk / Cylinder, SphereLight radius) | ◐ | ◐ | ◐ | | | Imported as spot / point lights with far-field radiometry (§3c); no area sampling, so shadows stay hard. SphereLight radius still dropped. |
+| area lights (USD Rect / Disk / Cylinder, SphereLight radius) | ◐ (far-field) | ✅ | ✅ | | | **Fixed 2026-10-13 (§3d)**: T2 samples the emitter (soft shadows; floor irradiance within 0.1 % mean, 1.3 % per 4 x 4 block of the analytic value at 0.5-3 light sizes, was +19 % at one size); T1 samples it with a shadow ray per sample over the closed-form irradiance; T0 keeps the far-field spot / point lights. SphereLight radius, exposure and `normalize` honoured. |
 | debug visuals (joints, contacts, COM, inertia, equality constraints, perturbations) | n/a | n/a | n/a | | | Not camera content in Isaac either |
 
 ### 1b. Per-world randomization (things the physics can vary per env)
@@ -129,9 +129,9 @@ Measured coverage of the reference silhouette is shown as rgb / depth / seg.
 | GeomSubset per-face materials | ✅ | **Fixed (§3c):** one visual geom per `materialBind` subset (`<geom>_<subset>`, plus `<geom>_rest`), the whole mesh kept as an undrawn collider. Right-colour fraction top / sides 0.0 / 0.0 → 0.99 / 1.00. |
 | `displayColor` per vertex / face | ◐ | First value only |
 | `visibility = invisible`, purpose `proxy` | ◐ | Not honoured (purpose `guide` → hidden group 3) |
-| DistantLight, SphereLight | ◐ | Sphere → point light (radius, shaping / cone and exposure dropped; diffuse clipped to 10) |
+| DistantLight, SphereLight | ✅ | Sphere → point light with UsdLux radiometry (I = L π r², exposure, `normalize`), recorded as an area light unless `treatAsPoint` (§3d); lights from `mjcf_to_usd` keep MuJoCo's values (`mjc:diffuse`, `mjc:attenuation`). Sphere shaping / cone dropped. |
 | DomeLight (colour, texture) | ◐ | Tier 2 only (environment map) |
-| RectLight, DiskLight, CylinderLight | ◐ | **Fixed (§3c), far-field:** Rect / Disk → spot along -Z (cutoff 90° or `shaping:cone:angle`, cosine falloff, I = L·A), Cylinder → point light (I = L·2rℓ broadside); `normalize`, exposure honoured; shape / size / radiance recorded in custom text `usd_area_lights`. Before: a stage with one failed to load. Irradiance vs exact: +20–25 % at 1 light size, +2–3 % at 3, < 0.5 % at 10; soft area-light shadows not drawn. |
+| RectLight, DiskLight, CylinderLight | ◐ | **Fixed (§3c), far-field:** Rect / Disk → spot along -Z (cutoff 90° or `shaping:cone:angle`, cosine falloff, I = L·A), Cylinder → point light (I = L·2rℓ broadside); `normalize`, exposure honoured; shape / size / radiance recorded in custom text `usd_area_lights`. Before: a stage with one failed to load. Irradiance vs exact: +20–25 % at 1 light size, +2–3 % at 3, < 0.5 % at 10 for these far-field lights (tier 0); tiers 1 and 2 sample the true emitter (§3d). |
 | Camera: focal length, vertical aperture | ◐ | Horizontal aperture (aspect), clipping range, orthographic projection and fisheye / f-theta are ignored |
 | Points, BasisCurves, PointInstancer, TetMesh / deformable prims | ❌ | Dropped |
 
@@ -171,7 +171,7 @@ Effort is engineering days for one person including tests, assuming the existing
 | 13 | **Per-world model colour / light fields ignored**. **Done 2026-10-12 (§3c)** | Replicator writes USD attributes the renderer reads | Read MuJoCo Warp's batched `geom_rgba` / `mat_rgba` / `light_*` if the event terms write them, or document `t_colors` as the only path (it already exists) | 0.5 | P2 (a workaround exists) |
 | 14 | Non-RGB texture roles, normal maps, USD GeomSubsets, UV scale / rotate / translate | RTX uses all of them | Material table extension + importer | 3–5 | P2 (fidelity) |
 | 15 | MJCF skybox as a mean colour | Dome texture background | Convert skybox to an equirect / cube environment (T2 has the sampler; T0 needs a background pass from it) | 1 | P2 (backgrounds are usually randomized anyway) |
-| 16 | Area lights, more than 8 lights in T0/T1 | Unlimited lights, area lights with soft shadows | Raise `MAX_LIGHTS` (loop cost), area-light sampling in T2 | 0.5 / 2 | P2 |
+| 16 | Area lights, more than 8 lights in T0/T1. **Done 2026-10-13 (§3d; lights: §3b)** | Unlimited lights, area lights with soft shadows | Raise `MAX_LIGHTS` (loop cost), area-light sampling in T2 | 0.5 / 2 | P2 |
 | 17 | hfield sides / base. **Done 2026-10-12 (§3c)** | Terrain meshes are closed | Add skirt triangles | 0.25 | P2 |
 | 18 | Fisheye / lens distortion. **Done 2026-10-12 (§3c)**: f-theta and Kannala-Brandt in T2 / RT, T0 cube faces | `FisheyeCameraCfg`, f-theta | Per-pixel ray directions in T2 and RT (trivial); T0 needs a distortion warp pass | 1–2 | P2 (P1 for wide-FOV nav cameras) |
 | 19 | MPM particles | Points / mesh-from-particles (fluid isosurface) | **in progress (other agent)** | — | P0 for the MPM tasks |
@@ -223,7 +223,7 @@ This workstream fixed gaps #3, #6, #9, #10, #11, #15 and #16 (lights), measured 
 
 **Limits:**
 - Heightfields drawn by the culled tile path (`hfield_cull`, the default) cast only the caster's shadow in T0. T1 and T2 trace them.
-- Lidar and the ray-traced depth camera still treat transparent geoms as opaque.
+- Lidar and the ray-traced depth camera: transparent geoms handled since 2026-10-13 (§3d).
 - A capsule's cube-map coordinates use one scale for the whole capsule; MuJoCo's hemispheres differ slightly.
 - Planes seen from behind are not made more transparent, as MuJoCo does.
 
