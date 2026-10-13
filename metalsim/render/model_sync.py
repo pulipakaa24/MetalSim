@@ -14,8 +14,8 @@ per-env tables:
 Without a sim (the host paths) the same kernels read the compiled ``MjModel`` values, so both paths shade through one
 code path. A sim may supply the fields through ``sim.render_fields`` instead of ``sim.m`` (``model_fields(sim)``; the
 Newton bridge writes per-world ``geom_rgba`` from Newton's ``shape_color`` there); a field it does not supply as a Warp
-array keeps the compiled value. Not covered: a per-world ``geom_matid`` switches the colour but not the texture / PBR parameters (the slot's
-compiled material keeps those), and per-world ``mat_emission`` / ``mat_specular`` / ``mat_shininess``.
+array keeps the compiled value. A per-world ``geom_matid`` also switches the texture and PBR parameters through
+``metalsim.render.env_materials`` (2026-10-13). Not covered: per-world ``mat_emission`` / ``mat_specular`` / ``mat_shininess``.
 """
 from __future__ import annotations
 
@@ -68,7 +68,15 @@ class ModelSync:
         self.rgba0, self.src0 = static.copy(), src.copy()
         self.static_buf = c.buffer(static.nbytes, static, "sync_static_rgba")
         self.src_buf = c.buffer(src.nbytes, src, "sync_src")
-        self.inst_col = c.buffer(n_envs * G * 16, label="sync_inst_col")
+        # (n_envs, G) float4 colours, then (n_envs,) uint32: 1 when the env has a partially transparent slot this frame
+        # (tier 2's shadow rays take an any-hit query in envs without one: pathtrace.metal transmit), then (n_envs, G)
+        # int32 per-env material entries (metalsim.render.env_materials; -1 = the slot's own), all in one buffer so that
+        # every renderer reads them through its one per-instance colour binding
+        self.flag_off = n_envs * G * 16
+        self.ids_off = self.flag_off + 4 * n_envs
+        init = np.zeros(n_envs * G * 4 + n_envs + n_envs * G, np.float32)
+        init.view(np.int32)[self.ids_off // 4:] = -1
+        self.inst_col = c.buffer(init.nbytes, init, label="sync_inst_col")
         self.lights = c.buffer(n_envs * nl * 80, label="sync_lights")
         self.set_light_template(light_template, light_lock)
         # host defaults: the compiled model's values (one world, stride 0)
@@ -92,6 +100,7 @@ class ModelSync:
         self.consts_buf = c.buffer(self.consts.nbytes, self.consts, "sync_consts")
         lib = c.library("model_sync")
         self.p_col = c.compute_pipeline(lib, "sync_colors")
+        self.p_clear = c.compute_pipeline(lib, "sync_clear_env_flags")
         self.p_light = c.compute_pipeline(lib, "sync_lights")
 
     def set_light_template(self, template, lock=None):
@@ -138,11 +147,16 @@ class ModelSync:
                              st("light_exponent"), st("light_ambient"), st("light_diffuse"), st("light_specular"),
                              st("light_attenuation"), 1 if self.m.nlight else 0, 1 if self.opaque else 0)
         ce = cb.computeCommandEncoder()
+        ce.setComputePipelineState_(self.p_clear)       # the per-env transparency flags after the colours (serial dispatches)
+        ce.setBuffer_offset_atIndex_(self.inst_col, self.n * self.G * 16, 0)
+        ce.setBytes_length_atIndex_(np.array([self.n], np.uint32).tobytes(), 4, 1)
+        ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n, 1, 1), Metal.MTLSize(min(self.n, 64), 1, 1))
         ce.setComputePipelineState_(self.p_col)
         for i, (b, o) in enumerate(((self.slot_geom, 0), (self.color_buf, 0), (v["geom_rgba"].buffer, v["geom_rgba"].offset),
                                     (v["geom_matid"].buffer, v["geom_matid"].offset), (v["mat_rgba"].buffer, v["mat_rgba"].offset),
                                     (self.static_buf, 0), (self.src_buf, 0), (self.inst_col, 0))):
             ce.setBuffer_offset_atIndex_(b, o, i)
+        ce.setBuffer_offset_atIndex_(self.inst_col, self.n * self.G * 16, 9)
         ce.setBytes_length_atIndex_(self.consts.tobytes(), self.consts.nbytes, 8)
         ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n * self.G, 1, 1), Metal.MTLSize(64, 1, 1))
         ce.setComputePipelineState_(self.p_light)
