@@ -28,6 +28,9 @@ ap.add_argument("task", choices=["g1_flat", "g1_rough", "g1_rough_hfield", "g1_r
 ap.add_argument("--n", type=int, default=4096)
 ap.add_argument("--iters", type=int, default=50)
 ap.add_argument("--log", required=True)
+ap.add_argument("--freeze_levels", action="store_true", help="g1_rough_policy*: no curriculum moves (envs stay on their level)")
+ap.add_argument("--legacy", action="store_true", help="g1_rough_policy*: the 2026-09-25 settings the checkpoints were trained "
+                "with (pyramidal contact preset, origin base / feet-slide velocity, reward_cfg rough_isaac, exact scan)")
 ap.add_argument("--ckpt", default=None, help="g1_rough_policy*: a trained rough checkpoint (net state dict under 'net')")
 a = ap.parse_args()
 import metalsim  # noqa: E402
@@ -51,7 +54,11 @@ try:
         import torch
         from metalsim.learn.g1_velocity import G1VelocityTask, g1_ppo_config
         from metalsim.learn.ppo_warp import PPOWarp
-        task = G1VelocityTask(a.n, terrain="rough", seed=42, terrain_collision="hfield" if a.task.endswith("hfield") else None)
+        kw = dict(contact_cfg="recommended_pyramidal", base_velocity="origin", feet_slide_velocity="origin", reward_cfg="rough_isaac",
+                  scan_surface="exact") if a.legacy else {}
+        task = G1VelocityTask(a.n, terrain="rough", seed=42, terrain_collision="hfield" if a.task.endswith("hfield") else None, **kw)
+        if a.freeze_levels:
+            task.curriculum = 0                 # read when the reward/done kernel is launched (before any capture)
         algo = PPOWarp(task, g1_ppo_config("rough", a.iters, 42))
         algo.net.load_state_dict(torch.load(a.ckpt, map_location="mps")["net"])
         nr, nc = task.n_levels, task.n_cols
@@ -60,7 +67,8 @@ try:
         task.origins.assign(task.origin_table.numpy()[lv * nc + col].astype(np.float32))
         algo.prepare()
         log(f"G1 rough trained-policy rollout: N={a.n} collision {task.terrain_collision} njmax {task.sim.d.njmax} "
-            f"nconmax {task.sim.d.naconmax // a.n} levels {nr} x {nc} start levels spread 0..{nr - 1}; ckpt {a.ckpt}")
+            f"nconmax {task.sim.d.naconmax // a.n} levels {nr} x {nc} start levels spread 0..{nr - 1}, frozen {a.freeze_levels}, "
+            f"legacy settings {a.legacy}, contact_cfg {task.contact_cfg}; ckpt {a.ckpt}")
         t1 = time.perf_counter()
         for it in range(1, a.iters + 1):
             algo.rollout()
