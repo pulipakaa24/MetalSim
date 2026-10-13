@@ -343,13 +343,51 @@ kernel appends `site_xpos` / `site_xmat`). Flexes, skins, tendons and user meshe
 `metalsim/render/dynamic_mesh.py` generates their vertex records (position, normal, uv) for every env in five compute
 dispatches per frame (copy the simulator's vertices, skinning, vertex normals from host-built adjacency, surface
 records, tube records from a template), all loops bounded by validated tables. The raster draws each object with one
-instanced draw (instance = env); the ray tracers keep one primitive acceleration structure per env, in the env's own
-frame, holding each dynamic object as one geometry, refit each frame (rebuilt every 32) and placed in the env grid by its
-instance's translation exactly as the rigid meshes are, after the rigid instances; the particle renderer's grain
-instances follow those (`RayTracer.n_inst` / `prim_as` include them). The structures live in one heap (one residency
-call). The dynamic records use the static vertex layout; a hit's slot is its instance's slot + the hit geometry index and
-its mesh the instance's structure index + the geometry index (each env structure is listed once per object), which for
+instanced draw (instance = env). The ray tracers take the dynamic objects in one of two layouts (`dyn_layout`, below):
+"sbvh" (default for sensors and the path tracer) or "per_env" (default for tier 1). The dynamic records use the static
+vertex layout; a hit's slot is its instance's first dynamic slot + the object, its mesh the (env, object) entry, which for
 every geom (one geometry) is exactly the previous lookup, so geom hits are unchanged.
+
+**Dynamic geometry in the ray tracers: two layouts, chosen by measurement.**
+- *sbvh*: one bounding box per env in a single box structure (`metalsim/sensors/dyn_bvh.py`). A ray entering env e's
+  box traverses e's own BVH in software (`shaders/dyn_bvh.h`, inside `intersection_query`; watertight triangle test,
+  as hardware tracers use), in the env's frame. The tree shape is shared by every env (median splits over env 0's
+  first-frame triangles, leaves of 4); each frame one compute pass refits every env's node bounds and copies its
+  triangles in leaf order, level by level, then the box structure (n_envs boxes) is rebuilt. Every
+  `dyn_rebuild_every` frames the leaves are re-split from env 0's current triangles on a host thread and swapped in
+  through a second order buffer. One hardware structure at any env count. Kernels are compiled with `DYN_SBVH` only
+  for tracers using it; every other shader is the plain intersector as before.
+- *per_env*: one primitive structure per env, a geometry per object, in the env's frame, refit each frame and rebuilt
+  every 32 frames (staggered: structure k on frames where frame + k is a multiple), allocated from one heap (one
+  residency call); scratch from a pool of up to 32 regions capped with the heap at a quarter of the recommended working
+  set (Cycles' rule); more than 512 structures: generation and refits in their own command buffers of 512 with the
+  frame's event waits; `extendedLimits` whenever a count passes Metal's standard limits.
+- A third prototype, merged tiles (at most 64 structures, a geometry per (env, object) placed by a per-geometry
+  translation), was dropped: never the fastest, tile-local vertices up to a tile's extent of the env stride (tier 2
+  depth off by up to 1.4 mm), and 469 ms for the Aero hand's tier 2 at 1024 envs (ramp stopped). Commit 0aa57bc6 has it.
+
+Equality with per_env (5 envs; wrapping tendons, draped cloth, extras scene): tier 1 byte-identical; ray depth and
+tier 2 depth within 0.0007 mm except one pixel per env (an edge-on triangle at a tendon silhouette) and 2 tier-2 pixels
+at 0.12 mm (per_env itself differs by up to 1.76 mm between env 0 and env 4 in tier 2, see the env-stride note below).
+
+Ramp (one exclusive queue job per layout; each step its own process under a 60 s watchdog with device utilisation
+back under 10 % after it; ms per frame, each frame synchronized, 64×64; per_env / sbvh):
+
+| scene, renderer | 1024 envs | 4096 envs |
+|---|---|---|
+| cloth (944 dynamic triangles per env), depth camera | 9.6 / 3.3 | 34.5 / 11.7 |
+| cloth, tier 1 | 13.1 / 21.7 | 50.0 / 84.8 |
+| cloth, tier 2 (1 spp, 1 bounce) | 16.8 / 19.0 | 64.0 / 74.1 |
+| Aero hand (42 K triangles per env), depth camera | 71.0 / 23.6 | |
+| Aero hand, tier 1 | 96.2 / 148 | |
+| Aero hand, tier 2 | 96.4 / 59.1 | |
+
+sbvh is 2.9–3x faster for depth cameras and lidars and 1.6x for the path tracer on many thin tubes, 13 % slower for the
+path tracer on cloth, and 1.5–1.7x slower for tier 1, whose shadow and ambient-occlusion rays run in the fragment stage
+(software traversal there costs more than the hardware's), hence the per-renderer defaults. Over 300 frames of
+draping cloth (256 envs) sbvh's ray-depth frame grows 1.26 → 1.56 ms and a fresh tracer on the final state takes
+1.50 ms: the growth is the workload (more cloth on screen), not loosened bounds (per_env 3.08 → 3.13, fresh 2.90).
+No anomaly, stall or ownerless GPU in any run of either layout up to 4096 envs.
 
 **Unchanged when absent.** Scenes without visible sites / flexes / skins / tendons render byte-identically: 87 of 92
 outputs identical on six scenes (prims, textured heightfield, SO-101, Panda, Shadow hand, Go2) against the previous
@@ -397,7 +435,9 @@ blocks of 12 envs 88 → one structure per (object, env) in its own frame 13.0 �
 10.2 (static twin 9.9).
 The 10:20 GPU wedge on this Mac (2026-10-12) happened while the old per-block structures, with the grid offsets baked in
 (coordinates up to ~3.3 km, 258 structures at 1024 envs), were refitting in tier 1; that pattern is removed (per-env
-structures in their own frame).
+structures in their own frame). The 18:26 one started on a GPU already saturated by an orphaned 25 M-instance build from
+another job (beyond Metal's 2^24-instance limit without `extendedLimits`); the same configurations ran cleanly before
+and after.
 
 Tendon-driven hand (Menagerie Tetheria Aero hand, 20 spatial tendons of 1 mm): with MuJoCo's tessellation (28 slices, 8
 rings per cap: 118 K triangles per env) at 256 envs T0 16.9 → 26.1, T1 10.5 → 38.5, depth camera 0.53 → 26.1, T2

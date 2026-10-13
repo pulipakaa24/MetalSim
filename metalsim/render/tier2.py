@@ -101,7 +101,7 @@ class Tier2Renderer:
                  terrain_slots: bool = True, draw_hfields: bool = True, firefly_clamp=0.0,
                  appearance: str = "mujoco", skybox: bool = True, transparency: bool = True, transparent_ids: str = "surface",
                  visual=None, deformables=(), tube_slices=None, cap_stacks=None, dyn_rebuild_every: int = 32,
-                 ctx: MetalContext | None = None, device="metal:0"):
+                 dyn_layout: str | None = None, ctx: MetalContext | None = None, device="metal:0"):
         """``terrain_slots`` / ``draw_hfields`` / ``appearance``: see ``Tier0Renderer`` (False / "legacy" = the
         previous behaviour). ``skybox``: the model's skybox texture is the environment (camera background and the
         radiance of every escaping ray, MuJoCo's cube mapping, unlit texel values x env scale) instead of its mean
@@ -113,7 +113,8 @@ class Tier2Renderer:
         ``transparent_ids``: annotations of pixels whose first surface is transparent, as ``Tier0Renderer``: "surface"
         (default, MuJoCo's; "mujoco" is an alias) or "behind" (the first opaque surface behind it).
         ``visual`` / ``deformables`` / ``tube_slices`` / ``cap_stacks``: sites, flexes, skins, spatial tendons and user
-        deformable meshes, see ``Tier0Renderer``; ``dyn_rebuild_every``: see ``RayTracer``."""
+        deformable meshes, see ``Tier0Renderer``; ``dyn_rebuild_every`` / ``dyn_layout``: see ``RayTracer`` (default
+        "sbvh": one box per env, the env's triangles traversed in software)."""
         import mujoco
         self.m, self.n, self.tw, self.th = model, n_envs, width, height
         self.device = device
@@ -129,7 +130,7 @@ class Tier2Renderer:
                             appearance=appearance,
                             visual=mujoco.MjvOption() if visual is None else visual, deformables=deformables,
                             tube_slices=tube_slices, cap_stacks=cap_stacks, tube_view=tube_view,
-                            dyn_rebuild_every=dyn_rebuild_every, ctx=self.ctx, device=device)
+                            dyn_rebuild_every=dyn_rebuild_every, dyn_layout=dyn_layout, ctx=self.ctx, device=device)
 
         self.tables = self.rt.tables
         self.G = self.tables.G

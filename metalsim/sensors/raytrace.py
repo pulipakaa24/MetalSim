@@ -27,7 +27,7 @@ from metalsim.render.metal_context import MetalContext
 from metalsim.render.scene_tables import CameraIntrinsics, build_scene_tables
 
 
-DEFAULT_DYN_LAYOUT = "per_env"
+DEFAULT_DYN_LAYOUT = "sbvh"   # measured: docs/RENDER_COVERAGE.md section 5 (tier 1 passes "per_env")
 DYN_SCRATCH_POOL = 32        # scratch regions for the dynamic structures' builds / refits
 DYN_CB_CHUNK = 512           # structures per command buffer when there are more (per-env layout at scale)
 
@@ -35,31 +35,17 @@ DYN_CB_CHUNK = 512           # structures per command buffer when there are more
 def resolve_dyn_layout(layout=None):
     import os
     lay = layout or os.environ.get("METALSIM_DYN_LAYOUT") or DEFAULT_DYN_LAYOUT
-    if lay not in ("per_env", "tiles", "sbvh"):
-        raise ValueError(f"dyn_layout must be per_env, tiles or sbvh, not {lay!r}")
+    if lay not in ("per_env", "sbvh"):
+        raise ValueError(f"dyn_layout must be per_env or sbvh, not {lay!r}")
     return lay
 
 
-def dyn_groups(layout, n, tpr, max_structures=64):
+def dyn_groups(layout, n, tpr):
     """Envs per dynamic structure and each group's origin cell (column, row) in the env grid: per_env one env each;
-    tiles: square tiles of side ts (the smallest with at most ``max_structures`` tiles), envs row by row; sbvh: one
-    group of all envs at the origin (the box structure)."""
+    sbvh one group of all envs at the origin (the box structure)."""
     if layout == "per_env":
         return [[e] for e in range(n)], [(e % tpr, e // tpr) for e in range(n)]
-    if layout == "sbvh":
-        return [list(range(n))], [(0, 0)]
-    rows = (n + tpr - 1) // tpr
-    ts = 1
-    while ((tpr + ts - 1) // ts) * ((rows + ts - 1) // ts) > max_structures:
-        ts += 1
-    groups, cells = [], []
-    for tr in range(0, rows, ts):
-        for tc in range(0, tpr, ts):
-            g = [r * tpr + col for r in range(tr, min(tr + ts, rows)) for col in range(tc, min(tc + ts, tpr)) if r * tpr + col < n]
-            if g:
-                groups.append(g)
-                cells.append((tc, tr))
-    return groups, cells
+    return [list(range(n))], [(0, 0)]
 
 
 class RayTracer:
@@ -67,7 +53,7 @@ class RayTracer:
                  decimate_faces: int = 0, terrain_slots: bool = True, draw_hfields: bool = True,
                  appearance: str = "mujoco", visual=None, deformables=(), tube_slices=None, cap_stacks=None,
                  tube_view=None, tube_resolution=None,
-                 dyn_rebuild_every: int = 32, dyn_layout: str | None = None, dyn_max_structures: int = 64,
+                 dyn_rebuild_every: int = 32, dyn_layout: str | None = None,
                  ctx: MetalContext | None = None,
                  device="metal:0"):
         """``terrain_slots`` / ``draw_hfields`` / ``appearance``: see ``Tier0Renderer`` (False / "legacy" = the
@@ -82,10 +68,10 @@ class RayTracer:
 
         ``dyn_layout`` (default ``DEFAULT_DYN_LAYOUT``, or the environment variable ``METALSIM_DYN_LAYOUT``): how the
         dynamic objects enter the ray tracer. "per_env": one primitive structure per env (one geometry per object), in
-        the env's frame. "tiles": one structure per square tile of envs (at most ``dyn_max_structures``), one geometry
-        per (env, object) placed in the tile's frame by a per-geometry translation. "sbvh": one bounding box per env in
-        a single structure; rays entering it traverse a per-env BVH over the env's triangles (``dyn_bvh.DynBVH``),
-        refit on the GPU every frame.
+        the env's frame, refit / rebuilt as above. "sbvh": one bounding box per env in a single structure; rays
+        entering it traverse the env's BVH over its triangles in software (``dyn_bvh.DynBVH``), refit on the GPU every
+        frame: one hardware structure at any env count, faster for depth cameras / lidars and the path tracer on thin
+        tubes, slower for the tier-1 fragment-stage shadow rays (``Tier0Renderer`` uses "per_env").
 
         Tube tessellation (tendons, cable edges; rendering only): MuJoCo's by default. ``tube_view`` = (viewpoints (K, 3),
         angular resolution in rad) adapts it per tube to its projected size (``dynamic_mesh.tube_tessellation``; the
@@ -165,13 +151,11 @@ class RayTracer:
                 i_off += ix.size
             self.n_dyn_obj = D = len(objs)
             self.dyn_layout = resolve_dyn_layout(dyn_layout)
-            import os
-            dyn_max_structures = int(os.environ.get("METALSIM_DYN_MAX_STRUCTURES", dyn_max_structures))
-            self.dyn_groups, self.dyn_group_cell = dyn_groups(self.dyn_layout, n_envs, self.tpr, dyn_max_structures)
+            self.dyn_groups, self.dyn_group_cell = dyn_groups(self.dyn_layout, n_envs, self.tpr)
             dyn_inst = []
-            # mesh entries: per structure (group of envs), env by env, object by object (the structure's geometry
-            # order: geometry_id = local env * D + object); a hit's mesh is the instance's first listing + geometry_id,
-            # its slot the instance's first slot + geometry_id mod D (inst_tab x = D for dynamic instances)
+            # mesh entries env by env, object by object: per_env, a hit's mesh is the instance's first listing +
+            # geometry_id (= object), its slot the instance's first slot + geometry_id; sbvh, the env and object of the
+            # software hit pick the mesh (RT_MESH), the box instance's first slot + object the slot
             self.dyn_mesh_index = np.zeros((n_envs, D), np.int64)
             for grp in self.dyn_groups:
                 for e in grp:
@@ -279,19 +263,7 @@ class RayTracer:
         c = self.ctx
         scratch = 16
         D = self.n_dyn_obj
-        tiles = self.dyn_layout == "tiles"
-        if tiles:   # per-geometry translation into the tile's frame (MTLPackedFloat4x3, column-major)
-            tm = np.zeros((self.n * D, 12), np.float32)
-            tm[:, 0] = tm[:, 4] = tm[:, 8] = 1.0
-            r = 0
-            for grp, cell in zip(self.dyn_groups, self.dyn_group_cell):
-                for e in grp:
-                    tm[r:r + D, 9] = (e % self.tpr - cell[0]) * self.stride
-                    tm[r:r + D, 10] = (e // self.tpr - cell[1]) * self.stride
-                    r += D
-            self.dyn_tm = c.buffer(tm.nbytes, tm, "rt_dyn_tile_transforms")
         sizes = []
-        r = 0
         for grp in self.dyn_groups:
             geos = []
             for e in grp:
@@ -304,9 +276,6 @@ class RayTracer:
                     g.setIndexType_(Metal.MTLIndexTypeUInt32)
                     g.setTriangleCount_(int(mesh["i_count"]) // 3)
                     g.setOpaque_(True)
-                    if tiles:
-                        g.setTransformationMatrixBuffer_(self.dyn_tm); g.setTransformationMatrixBufferOffset_(48 * r)
-                    r += 1
                     geos.append(g)
             d = Metal.MTLPrimitiveAccelerationStructureDescriptor.new()
             d.setGeometryDescriptors_(geos)

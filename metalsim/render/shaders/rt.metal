@@ -129,7 +129,7 @@ kernel void lidar(
         return;
     }
     uint ii = res.instance_id;
-    uint slot = inst_tab[ii].y + res.geometry_id % max(inst_tab[ii].x, 1u);          // geometry: 0 for geoms; the object within a dynamic env structure
+    uint slot = inst_tab[ii].y + res.geometry_id;          // geometry: 0 for geoms; the object within a dynamic env structure
     uint mesh = RT_MESH(res, inst[ii].as_index);          // = slot_mesh[slot] for geoms
     InstanceDesc d = inst[ii];
     float3x3 Ri = float3x3(float3(d.col0), float3(d.col1), float3(d.col2));
@@ -254,7 +254,7 @@ kernel void lidar_ext(
             int g = int(res.geometry_id);             // the object: instance, and geometry within a dynamic env structure
             if (ii == last && g == last_g) continue;  // exit / inner faces of the object just hit
             last = ii; last_g = g;
-            uint slot = inst_tab[ii].y + res.geometry_id % max(inst_tab[ii].x, 1u);
+            uint slot = inst_tab[ii].y + res.geometry_id;
             InstanceDesc di = inst[ii];
             float3x3 Ri = float3x3(float3(di.col0), float3(di.col1), float3(di.col2));
             float3 n = tri_normal(RT_MESH(res, di.as_index), res.primitive_id, meshes, verts, indices, Ri);
