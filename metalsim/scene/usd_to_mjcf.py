@@ -121,6 +121,160 @@ def _record_dome_light(spec, prim, base_dir, scale_units):
     return rec
 
 
+LIGHT_DIFFUSE_MAX = 10.0      # the importer's clip on a MuJoCo light's diffuse (SphereLight / DistantLight)
+
+
+def _area_light(body, prim, pos, quat, scale_units, name):
+    """RectLight / DiskLight / CylinderLight -> a MuJoCo light with the area light's far-field radiometry.
+
+    UsdLux: radiance L = intensity x 2^exposure x color (divided by the emitting area when ``inputs:normalize``).
+    The renderers' convention (tier 0/1/2, as for the importer's DistantLight: E = pi x diffuse) gives a MuJoCo light
+    irradiance E = pi x diffuse x cos(theta_e)^exponent x cos(theta_r) / (c + l d + q d^2). Far field of a Lambertian
+    emitter: E = I(theta_e) cos(theta_r) / d^2 with radiant intensity I = L x (area projected toward the receiver):
+    * Rect / Disk (emit from one side, toward the prim's -Z): I = L A cos(theta_e) -> a spot light along -Z, cutoff
+      90 deg (or ``inputs:shaping:cone:angle``), exponent 1, diffuse = L A / pi, inverse-square attenuation.
+    * Cylinder (emits radially, axis along the prim's X, no end caps): I = L 2 r len sin(phi), phi from the axis ->
+      a point light with the broadside value I = L 2 r len (isotropic: overestimates toward the axis).
+    Diffuse above LIGHT_DIFFUSE_MAX is moved into the quadratic attenuation (diffuse / k, q = 1 / k), which keeps the
+    irradiance exact instead of clipping it. Near field (d of a few light sizes) the point source over-estimates the
+    on-axis irradiance (exact for a disk: E = pi L r^2 / (d^2 + r^2)); the size is recorded for a renderer that
+    samples the true area (``usd_area_lights`` custom text). Returns the record."""
+    la = UsdLux.LightAPI(prim)
+    val = lambda a, d: (a.Get() if a and a.Get() is not None else d)
+    color = np.array(val(la.GetColorAttr(), (1.0, 1.0, 1.0)), float)
+    intensity = float(val(la.GetIntensityAttr(), 1.0)); exposure = float(val(la.GetExposureAttr(), 0.0))
+    normalize = bool(val(la.GetNormalizeAttr(), False))
+    radiance = color * intensity * 2.0 ** exposure
+    _, _, ws = _world_xform(prim, scale_units)
+    rec = {"prim": prim.GetPath().pathString, "light": name, "intensity": intensity, "exposure": exposure,
+           "color": color.tolist(), "normalize": normalize}
+    cone = None
+    if prim.IsA(UsdLux.RectLight):
+        rl = UsdLux.RectLight(prim)
+        w = float(val(rl.GetWidthAttr(), 1.0)) * ws[0] * scale_units; h = float(val(rl.GetHeightAttr(), 1.0)) * ws[1] * scale_units
+        area = proj = w * h
+        rec.update(shape="rect", width=w, height=h)
+    elif prim.IsA(UsdLux.DiskLight):
+        r = float(val(UsdLux.DiskLight(prim).GetRadiusAttr(), 0.5)) * scale_units
+        area = proj = np.pi * (r * ws[0]) * (r * ws[1])
+        rec.update(shape="disk", radius=r * float(np.sqrt(ws[0] * ws[1])))
+    else:
+        cl = UsdLux.CylinderLight(prim)
+        r = float(val(cl.GetRadiusAttr(), 0.5)) * float(np.sqrt(ws[1] * ws[2])) * scale_units
+        ln = float(val(cl.GetLengthAttr(), 1.0)) * ws[0] * scale_units
+        area, proj = 2 * np.pi * r * ln, 2 * r * ln
+        rec.update(shape="cylinder", radius=r, length=ln)
+    if normalize:
+        radiance = radiance / max(area, 1e-12)
+    if prim.HasAPI(UsdLux.ShapingAPI):
+        ca = UsdLux.ShapingAPI(prim).GetShapingConeAngleAttr().Get()
+        if ca is not None and float(ca) < 90.0:
+            cone = float(ca)
+    I = radiance * proj                                  # far-field radiant intensity (broadside / on axis)
+    diffuse = I / np.pi
+    k = max(float(diffuse.max()) / LIGHT_DIFFUSE_MAX, 1.0)
+    lt = body.add_light(); lt.name = name; lt.pos = pos.tolist()
+    R = np.zeros(9); mujoco.mju_quat2Mat(R, quat); R = R.reshape(3, 3)
+    lt.dir = (R @ np.array([0, 0, -1.0])).tolist()
+    if rec["shape"] == "cylinder":
+        lt.type = mujoco.mjtLightType.mjLIGHT_POINT
+    else:
+        lt.type = mujoco.mjtLightType.mjLIGHT_SPOT
+        lt.cutoff = 90.0 if cone is None else cone        # MuJoCo light cutoff is in degrees whatever compiler.degree says
+        lt.exponent = 1.0                                 # cos(theta_e): Lambertian emitter
+    lt.diffuse = (diffuse / k).tolist()
+    lt.attenuation = [0.0, 0.0, 1.0 / k]
+    if prim.HasAttribute("mjc:castshadow"):
+        lt.castshadow = bool(prim.GetAttribute("mjc:castshadow").Get())
+    rec.update(area=float(area), radiance=radiance.tolist(), far_field_intensity=I.tolist(), attenuation_scale=k,
+               cone_angle=cone)
+    return rec
+
+
+def _uv_reader_varname(tex_shader):
+    """The primvar a UsdUVTexture reads: its ``inputs:st`` connected to a UsdPrimvarReader_float2's ``inputs:varname``."""
+    st = tex_shader.GetInput("st")
+    src = st.GetConnectedSource() if st else None
+    if not src:
+        return None
+    rd = UsdShade.Shader(src[0].GetPrim())
+    vn = rd.GetInput("varname")
+    if not vn:
+        return None
+    v = vn.Get()
+    if v is None:                                       # varname may itself be connected to a material interface input
+        s2 = vn.GetConnectedSource()
+        if s2:
+            v = s2[0].GetInput(s2[1]).Get() if hasattr(s2[0], "GetInput") else None
+    return str(v) if v else None
+
+
+def _corner_uvs(prim, counts, idx, npts, hint=None):
+    """Per face-vertex ("corner") texture coordinates of a mesh, in MuJoCo's convention, or None.
+
+    Reads ``hint`` (the bound material's UsdPrimvarReader varname), else ``st``, ``st0``, ``UVMap``, ``uv``; any of
+    UsdGeom's interpolations: faceVarying (per corner, indexed or not), vertex / varying (per point), uniform (per
+    face). USD texture coordinates have (0, 0) at the image's bottom-left (UsdUVTexture); MuJoCo's mesh texcoords
+    have v measured from the top row (its OBJ loader flips v), so v -> 1 - v."""
+    api = UsdGeom.PrimvarsAPI(prim)
+    pv = None
+    for n in [hint, "st", "st0", "UVMap", "uv"]:
+        if not n:
+            continue
+        p = api.GetPrimvar(n)
+        if p and p.HasValue():
+            pv = p
+            break
+    if pv is None:
+        return None
+    vals = pv.ComputeFlattened()
+    if vals is None:
+        return None
+    vals = np.asarray(vals, np.float64).reshape(-1, 2)
+    interp = pv.GetInterpolation(); nc = int(np.sum(counts))
+    if interp == UsdGeom.Tokens.faceVarying and len(vals) == nc:
+        uv = vals
+    elif interp in (UsdGeom.Tokens.vertex, UsdGeom.Tokens.varying) and len(vals) == npts:
+        uv = vals[idx]
+    elif interp == UsdGeom.Tokens.uniform and len(vals) == len(counts):
+        uv = np.repeat(vals, counts, axis=0)
+    else:
+        return None
+    uv = uv.copy(); uv[:, 1] = 1.0 - uv[:, 1]
+    return uv
+
+
+def _triangulate(counts, idx):
+    """Fan triangulation of polygon faces: (T, 3) corner indices (into the face-vertex list) and (T,) source face."""
+    corners, face_of = [], []
+    k = 0
+    for f, c in enumerate(counts):
+        c = int(c)
+        for t in range(1, c - 1):
+            corners.append((k, k + t, k + t + 1)); face_of.append(f)
+        k += c
+    return np.asarray(corners, np.int64).reshape(-1, 3), np.asarray(face_of, np.int64)
+
+
+def _material_subsets(prim, nfaces):
+    """GeomSubsets of family ``materialBind`` (element type face): [(name, face indices, bound Material or None)], plus
+    ("", remaining faces, None) for the faces in no subset (the mesh's own binding). Empty when the mesh has none."""
+    subs = UsdGeom.Subset.GetGeomSubsets(UsdGeom.Imageable(prim), UsdGeom.Tokens.face, "materialBind")
+    out, used = [], np.zeros(nfaces, bool)
+    for s in subs:
+        ind = s.GetIndicesAttr().Get()
+        ind = np.asarray(ind if ind is not None else [], np.int64)
+        ind = ind[(ind >= 0) & (ind < nfaces)]
+        if len(ind) == 0:
+            continue
+        used[ind] = True
+        mb = UsdShade.MaterialBindingAPI(s.GetPrim()).ComputeBoundMaterial()[0]
+        out.append((s.GetPrim().GetName(), ind, mb))
+    if out and not used.all():
+        out.append(("", np.flatnonzero(~used), None))
+    return out
+
+
 def _accumulate_xform_to(prim, ancestor, scale_units):
     """Transform of ``prim`` relative to ``ancestor`` (position, quaternion, scale). ``ancestor`` need
     not be a USD ancestor: articulations exported from URDF (Isaac's assets) keep all links as
@@ -167,6 +321,7 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True, vi
 
     # -- materials ----------------------------------------------------------------------------
     mat_by_path = {}
+    mat_uvname = {}       # material path -> the primvar its UsdUVTexture reads (UsdPrimvarReader_float2 varname)
     for prim in Usd.PrimRange(stage.GetPseudoRoot(), Usd.TraverseInstanceProxies()):   # materials may live under instanced prims
         if prim.IsA(UsdShade.Material):
             mat = UsdShade.Material(prim)
@@ -213,6 +368,9 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True, vi
                         sc = tsh.GetInput("scale")
                         if sc and sc.Get() is not None:
                             rgba = list(sc.Get())
+                        uv_name = _uv_reader_varname(tsh)
+                        if uv_name:
+                            mat_uvname[prim.GetPath()] = uv_name
                     elif inp.Get() is not None:
                         rgba[:3] = list(inp.Get())
                 op = shader.GetInput("opacity")
@@ -415,6 +573,7 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True, vi
     # -- geoms, cameras, lights ---------------------------------------------------------------------
     mesh_names = {}
     used_geom_names = set()
+    area_lights = []
     # instance proxies included: Isaac's assets reference their visual meshes as instanceable prims
     # (g1_minimal.usd: 43 visual meshes, 343K faces, materials bound), which stage.Traverse() skips
     for prim in Usd.PrimRange(stage.GetPseudoRoot(), Usd.TraverseInstanceProxies()):
@@ -444,6 +603,9 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True, vi
         if prim.IsA(UsdLux.DomeLight) or (hasattr(UsdLux, "DomeLight_1") and prim.IsA(UsdLux.DomeLight_1)):
             _record_dome_light(spec, prim, base_dir, units)
             continue
+        if prim.IsA(UsdLux.RectLight) or prim.IsA(UsdLux.DiskLight) or prim.IsA(UsdLux.CylinderLight):
+            area_lights.append(_area_light(body, prim, pos, quat, units, prim.GetPath().name))
+            continue
         if prim.IsA(UsdLux.DistantLight) or prim.IsA(UsdLux.SphereLight):
             lt = body.add_light(); lt.name = prim.GetPath().name; lt.pos = pos.tolist()
             R = np.zeros(9); mujoco.mju_quat2Mat(R, quat); R = R.reshape(3, 3)
@@ -467,6 +629,7 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True, vi
                 gname = f"{prim.GetParent().GetPath().name}_{prim.GetPath().name}_{k}"; k += 1
         used_geom_names.add(gname)
         g.name = gname; g.pos = pos.tolist(); g.quat = quat.tolist()
+        pieces = []           # GeomSubset (materialBind) pieces of a mesh: (subset name, mesh asset, Material or None)
         collides = prim.HasAPI(UsdPhysics.CollisionAPI) and (UsdPhysics.CollisionAPI(prim).GetCollisionEnabledAttr().Get() is not False)
         if prim.IsA(UsdGeom.Cube):
             g.type = mujoco.mjtGeom.mjGEOM_BOX; sz = float(UsdGeom.Cube(prim).GetSizeAttr().Get() or 2.0) / 2
@@ -490,27 +653,44 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True, vi
             mesh = UsdGeom.Mesh(prim)
             pts = np.array(mesh.GetPointsAttr().Get(), np.float64) * units * scale
             counts = np.array(mesh.GetFaceVertexCountsAttr().Get()); idx = np.array(mesh.GetFaceVertexIndicesAttr().Get())
-            tris = []
-            k = 0
-            for c in counts:
-                for t in range(1, int(c) - 1):
-                    tris.append([idx[k], idx[k + t], idx[k + t + 1]])
-                k += int(c)
-            key = prim.GetPrototype().GetPath() if prim.IsInstance() else prim.GetPath()
-            src = prim.GetReferences()  # internal references resolve through composition; use the path as key
-            mname = mesh_names.get(prim.GetPath())
-            if mname is None:
+            corners, face_of = _triangulate(counts, idx)
+            mb0 = UsdShade.MaterialBindingAPI(prim).ComputeBoundMaterial()[0]
+            subsets = _material_subsets(prim, len(counts))
+            hints = [mat_uvname.get(mb0.GetPath()) if mb0 else None] + \
+                    [mat_uvname.get(s[2].GetPath()) for s in subsets if s[2]]
+            uvc = _corner_uvs(prim, counts, idx, len(pts), next((h for h in hints if h), None))
+
+            def add_mesh_asset(sel, key):
+                """MuJoCo mesh of the triangles ``sel`` (compacted vertices, per-corner texcoords)."""
+                if key in mesh_names:
+                    return mesh_names[key]
+                cs = corners[sel]
+                vid = idx[cs]
+                used, inv = np.unique(vid.reshape(-1), return_inverse=True)
+                if key == prim.GetPath():
+                    verts, faces = pts, vid                      # whole mesh: the vertex list as authored
+                else:
+                    verts, faces = pts[used], inv.reshape(-1, 3)
                 mm = spec.add_mesh(); mm.name = f"mesh_{len(mesh_names)}"
-                mm.uservert = pts.reshape(-1).tolist(); mm.userface = np.asarray(tris, np.int32).reshape(-1).tolist()
-                pv = UsdGeom.PrimvarsAPI(prim).GetPrimvar("st")
-                if pv and pv.HasValue() and pv.GetInterpolation() == UsdGeom.Tokens.faceVarying and all(counts == 3):
-                    uv = np.array(pv.Get(), np.float64)
-                    uv[:, 1] = 1.0 - uv[:, 1]    # USD st has t = 0 at the image bottom; MuJoCo t = 0 is the first row (top), as its OBJ loader's 1 - v
-                    mm.usertexcoord = uv.reshape(-1).tolist()
-                    mm.userfacetexcoord = np.arange(len(uv), dtype=np.int32).tolist()
-                mesh_names[prim.GetPath()] = mm.name; mname = mm.name
-            g.type = mujoco.mjtGeom.mjGEOM_MESH; g.meshname = mname
+                mm.uservert = verts.reshape(-1).tolist(); mm.userface = np.asarray(faces, np.int32).reshape(-1).tolist()
+                if uvc is not None:
+                    tuv = np.round(uvc[cs.reshape(-1)], 7)
+                    utc, tinv = np.unique(tuv, axis=0, return_inverse=True)
+                    mm.usertexcoord = utc.reshape(-1).tolist()
+                    mm.userfacetexcoord = tinv.reshape(-1).astype(np.int32).tolist()
+                if key != prim.GetPath():
+                    mm.inertia = mujoco.mjtMeshInertia.mjMESH_INERTIA_SHELL   # visual pieces may be flat (one face)
+                mesh_names[key] = mm.name
+                return mm.name
+            g.type = mujoco.mjtGeom.mjGEOM_MESH; g.meshname = add_mesh_asset(slice(None), prim.GetPath())
+            for sname, faces_sel, smat in subsets:
+                tri_sel = np.flatnonzero(np.isin(face_of, faces_sel))
+                if len(tri_sel):
+                    pieces.append((sname, add_mesh_asset(tri_sel, (prim.GetPath(), sname)), smat))
         else:
+            # unsupported gprim (Cone, Points, BasisCurves, ...): drop the geom just added (left in place it was a zero-size
+            # sphere that failed the compile, so a stage holding one did not load at all)
+            spec.delete(g); used_geom_names.discard(gname)
             continue
         if collides:
             for attr, field, conv in (("mjc:contype", "contype", int), ("mjc:conaffinity", "conaffinity", int), ("mjc:condim", "condim", int),
@@ -536,6 +716,29 @@ def convert_stage(stage: Usd.Stage, base_dir: str = ".", drives: bool = True, vi
                 g.rgba = [*map(float, dc[0]), float(do[0]) if do else 1.0]
         if not collides and not prim.HasAttribute("mjc:group"):
             g.group = 2
+        if pieces:
+            # per-face materials: one visual geom per subset, same body and pose, its own material; the whole mesh stays
+            # as one geom for collision and mass (unchanged physics) but is not drawn (alpha 0, no material)
+            for sname, mname, smat in pieces:
+                pg = body.add_geom()
+                pn = f"{gname}_{sname or 'rest'}"
+                k = 2
+                while pn in used_geom_names:
+                    pn = f"{gname}_{sname or 'rest'}_{k}"; k += 1
+                used_geom_names.add(pn)
+                pg.name = pn; pg.pos = pos.tolist(); pg.quat = quat.tolist()
+                pg.type = mujoco.mjtGeom.mjGEOM_MESH; pg.meshname = mname
+                pg.contype = 0; pg.conaffinity = 0; pg.density = 0.0; pg.group = g.group
+                if smat and smat.GetPath() in mat_by_path:
+                    pg.material = mat_by_path[smat.GetPath()]
+                elif g.material:
+                    pg.material = g.material
+                else:
+                    pg.rgba = list(g.rgba)
+            g.material = ""; g.rgba = [0.5, 0.5, 0.5, 0.0]
+    if area_lights:
+        import json
+        t = spec.add_text(); t.name = "usd_area_lights"; t.data = json.dumps(area_lights)
     return spec
 
 

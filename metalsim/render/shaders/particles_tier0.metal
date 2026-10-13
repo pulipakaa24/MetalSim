@@ -108,7 +108,7 @@ fragment FSOut grain_fs(
     float3 direct = float3(0.0);
     uint nl = uint(e.misc.y);
     for (uint i = 0; i < nl; ++i) {
-        Light l = lights[i];
+        Light l = lights[in.env * c.n_light + i];   // per-env records (model_sync)
         device const float* lp = light_xpos + (in.env * c.n_light + i) * 3;
         device const float* ld = light_xdir + (in.env * c.n_light + i) * 3;
         float3 Ldir = normalize(float3(ld[0], ld[1], ld[2]));
