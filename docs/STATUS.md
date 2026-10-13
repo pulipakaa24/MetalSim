@@ -91,3 +91,8 @@ published benchmark. Neither is cited as physics parity evidence.
 ## Deferred work items
 
 - **MPM / particles** (Isaac Lab 3.0-EA's MPM = Newton 1.5.2 `SolverImplicitMPM`): in progress since 2026-10-09, `metalsim/physics/mpm/MPM.md`. Newton's solver runs on Metal with CUDA's semantics, bitwise deterministic (coupled scenes too, with the scalable deterministic mode), every acceleration bitwise against Newton's kernels; against the L4: column-collapse T1/T2 pass, five of six floor scenes inside the L4's own perturbation spread (multi_material 1.15x outside); speed near or past the L4 on most scenes with fast_math honoured (section 8), Franka-Pour MPM at 2,048 worlds 345 -> 91.5 ms per step captured and the rigid collision 192.6 -> 68.3 ms (deterministic). Setup: `scripts/setup_newton152.sh` (Newton fork `metalsim-1.5.2`, pinned). Open: multi_material floor, coupled-scene speed vs the L4, an intermittent GPU hang in Newton's cylinder-on-plane collision test (MPM.md 8d).
+  **Rendering** (2026-10-12, `metalsim/render/PARTICLES.md`): particles are drawn as render grains (instances of
+  irregular grain meshes, hashed per particle, per-grain colour palette) in the tier-2 path tracer's instance
+  acceleration structure and in tier 0's raster pass, from numpy or directly from a Warp particle buffer; validated
+  analytically (single-grain coverage and irradiance, white furnace in a grain pile), batched, deterministic; 22 M
+  grains per frame measured. Demo: Newton's ANYmal C on MPM sand path-traced (`scripts/particle_demo/`).

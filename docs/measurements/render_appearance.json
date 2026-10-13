@@ -1,0 +1,632 @@
+[
+ {
+  "probe": "mesh normals: box written as a mesh vs primitive box (luminance std inside; MAD = mean |RGB - MuJoCo|)",
+  "mesh_box": {
+   "mujoco_std": 2.9,
+   "tier0/legacy": {
+    "std": 43.7,
+    "mad": 37.4
+   },
+   "tier1/legacy": {
+    "std": 43.7,
+    "mad": 37.4
+   },
+   "tier2/legacy": {
+    "std": 43.5,
+    "mad": 37.1
+   },
+   "tier0/mujoco": {
+    "std": 1.1,
+    "mad": 1.3
+   },
+   "tier1/mujoco": {
+    "std": 1.1,
+    "mad": 1.3
+   },
+   "tier2/mujoco": {
+    "std": 3.1,
+    "mad": 1.7
+   }
+  },
+  "prim_box": {
+   "mujoco_std": 3.1,
+   "tier0/legacy": {
+    "std": 1.4,
+    "mad": 1.3
+   },
+   "tier1/legacy": {
+    "std": 1.4,
+    "mad": 1.3
+   },
+   "tier2/legacy": {
+    "std": 4.2,
+    "mad": 1.4
+   },
+   "tier0/mujoco": {
+    "std": 1.4,
+    "mad": 1.3
+   },
+   "tier1/mujoco": {
+    "std": 1.4,
+    "mad": 1.3
+   },
+   "tier2/mujoco": {
+    "std": 4.5,
+    "mad": 1.6
+   }
+  }
+ },
+ {
+  "probe": "SDF geom (plugin torus) coverage of MuJoCo's silhouette",
+  "px": 223,
+  "tier0/legacy": {
+   "px": 223,
+   "rgb": 0.0,
+   "depth": 0.0,
+   "seg_any": 0.0,
+   "seg_correct": 0.0
+  },
+  "tier2/legacy": {
+   "px": 223,
+   "rgb": 0.0,
+   "depth": 0.0,
+   "seg_any": 0.0,
+   "seg_correct": 0.0
+  },
+  "tier0/mujoco": {
+   "px": 223,
+   "rgb": 1.0,
+   "depth": 1.0,
+   "depth_err_med_m": 0.0,
+   "seg_any": 1.0,
+   "seg_correct": 1.0
+  },
+  "tier2/mujoco": {
+   "px": 223,
+   "rgb": 1.0,
+   "depth": 1.0,
+   "depth_err_med_m": 0.0,
+   "seg_any": 1.0,
+   "seg_correct": 1.0
+  },
+  "raydepth/mujoco": {
+   "px": 223,
+   "depth": 1.0,
+   "depth_err_med_m": 0.0
+  }
+ },
+ {
+  "probe": "textures: luminance correlation with MuJoCo inside each geom; skybox background",
+  "objects": {
+   "tex_sphere": {
+    "px": 259,
+    "mujoco_lum_std": 93.2,
+    "tier0/legacy": {
+     "corr": -0.942,
+     "mad": 192.3,
+     "lum_std": 106.5
+    },
+    "tier2/legacy": {
+     "corr": -0.97,
+     "mad": 183.2,
+     "lum_std": 99.2
+    },
+    "tier0/mujoco": {
+     "corr": 0.95,
+     "mad": 18.0,
+     "lum_std": 105.8
+    },
+    "tier2/mujoco": {
+     "corr": 0.969,
+     "mad": 24.6,
+     "lum_std": 100.6
+    }
+   },
+   "tex_cylinder": {
+    "px": 261,
+    "mujoco_lum_std": 90.9,
+    "tier0/legacy": {
+     "corr": NaN,
+     "mad": 134.0,
+     "lum_std": 0.0
+    },
+    "tier2/legacy": {
+     "corr": 0.032,
+     "mad": 128.5,
+     "lum_std": 8.7
+    },
+    "tier0/mujoco": {
+     "corr": 0.927,
+     "mad": 22.1,
+     "lum_std": 105.4
+    },
+    "tier2/mujoco": {
+     "corr": 0.95,
+     "mad": 28.2,
+     "lum_std": 100.3
+    }
+   },
+   "tex_capsule": {
+    "px": 224,
+    "mujoco_lum_std": 81.5,
+    "tier0/legacy": {
+     "corr": 0.027,
+     "mad": 126.9,
+     "lum_std": 8.6
+    },
+    "tier2/legacy": {
+     "corr": 0.005,
+     "mad": 121.8,
+     "lum_std": 9.2
+    },
+    "tier0/mujoco": {
+     "corr": 0.929,
+     "mad": 30.7,
+     "lum_std": 106.0
+    },
+    "tier2/mujoco": {
+     "corr": 0.95,
+     "mad": 32.4,
+     "lum_std": 95.4
+    }
+   },
+   "tex_box_2d": {
+    "px": 352,
+    "mujoco_lum_std": 79.7,
+    "tier0/legacy": {
+     "corr": 0.858,
+     "mad": 38.6,
+     "lum_std": 106.9
+    },
+    "tier2/legacy": {
+     "corr": 0.912,
+     "mad": 37.1,
+     "lum_std": 94.5
+    },
+    "tier0/mujoco": {
+     "corr": 0.866,
+     "mad": 37.2,
+     "lum_std": 105.8
+    },
+    "tier2/mujoco": {
+     "corr": 0.909,
+     "mad": 37.9,
+     "lum_std": 94.2
+    }
+   },
+   "tex_box_cube": {
+    "px": 378,
+    "mujoco_lum_std": 98.7,
+    "tier0/legacy": {
+     "corr": 0.082,
+     "mad": 99.6,
+     "lum_std": 107.0
+    },
+    "tier2/legacy": {
+     "corr": 0.063,
+     "mad": 106.3,
+     "lum_std": 92.1
+    },
+    "tier0/mujoco": {
+     "corr": 0.973,
+     "mad": 11.3,
+     "lum_std": 106.8
+    },
+    "tier2/mujoco": {
+     "corr": 0.983,
+     "mad": 21.1,
+     "lum_std": 102.0
+    }
+   },
+   "tex_mesh_uv": {
+    "px": 332,
+    "mujoco_lum_std": 5.1,
+    "tier0/legacy": {
+     "corr": 0.504,
+     "mad": 86.1,
+     "lum_std": 10.0
+    },
+    "tier2/legacy": {
+     "corr": 0.278,
+     "mad": 98.3,
+     "lum_std": 9.4
+    },
+    "tier0/mujoco": {
+     "corr": 0.897,
+     "mad": 4.4,
+     "lum_std": 8.8
+    },
+    "tier2/mujoco": {
+     "corr": 0.526,
+     "mad": 26.7,
+     "lum_std": 10.1
+    }
+   }
+  },
+  "skybox_background": {
+   "mujoco_lum_std": 17.8,
+   "tier0/legacy": {
+    "lum_std": 0.8,
+    "corr": -0.008,
+    "mad": 25.7
+   },
+   "tier2/legacy": {
+    "lum_std": 2.8,
+    "corr": 0.01,
+    "mad": 25.8
+   },
+   "tier0/mujoco": {
+    "lum_std": 17.8,
+    "corr": 0.996,
+    "mad": 0.1
+   },
+   "tier2/mujoco": {
+    "lum_std": 18.3,
+    "corr": 0.988,
+    "mad": 0.2
+   }
+  },
+  "mesh_uv_orientation": {
+   "mujoco": {
+    "top": "blue",
+    "bottom": "red"
+   },
+   "tier0/legacy": {
+    "top": "red",
+    "bottom": "blue"
+   },
+   "tier2/legacy": {
+    "top": "red",
+    "bottom": "blue"
+   },
+   "tier0/mujoco": {
+    "top": "blue",
+    "bottom": "red"
+   },
+   "tier2/mujoco": {
+    "top": "blue",
+    "bottom": "red"
+   }
+  }
+ },
+ {
+  "probe": "transparency: red box behind 25 % blue glass",
+  "px": 1140,
+  "mujoco": {
+   "mean_rgb": [
+    141,
+    59,
+    124
+   ],
+   "seg_is_glass": 1.0,
+   "box_without_glass_rgb": [
+    205,
+    59,
+    59
+   ],
+   "depth_median_m": 1.904,
+   "glass_delta_rgb": [
+    -64,
+    0,
+    65
+   ]
+  },
+  "tier0/before": {
+   "mean_rgb": [
+    25,
+    25,
+    172
+   ],
+   "mad": 65.8,
+   "glass_over_bg_mad": 31.4,
+   "glass_delta_rgb": [
+    -146,
+    0,
+    146
+   ],
+   "box_without_glass_rgb": [
+    172,
+    25,
+    25
+   ],
+   "seg_is_glass": 1.0,
+   "depth_median_m": 1.904
+  },
+  "tier0/after": {
+   "mean_rgb": [
+    108,
+    25,
+    89
+   ],
+   "mad": 35.0,
+   "glass_over_bg_mad": 10.3,
+   "glass_delta_rgb": [
+    -64,
+    0,
+    64
+   ],
+   "box_without_glass_rgb": [
+    172,
+    25,
+    25
+   ],
+   "seg_is_glass": 1.0,
+   "depth_median_m": 1.904
+  },
+  "tier1/after": {
+   "mean_rgb": [
+    108,
+    25,
+    89
+   ],
+   "mad": 35.0,
+   "glass_over_bg_mad": 10.3,
+   "glass_delta_rgb": [
+    -64,
+    0,
+    64
+   ],
+   "box_without_glass_rgb": [
+    172,
+    25,
+    25
+   ],
+   "seg_is_glass": 1.0,
+   "depth_median_m": 1.904
+  },
+  "tier2/before": {
+   "mean_rgb": [
+    23,
+    23,
+    147
+   ],
+   "mad": 59.5,
+   "glass_over_bg_mad": 22.3,
+   "glass_delta_rgb": [
+    -122,
+    0,
+    125
+   ],
+   "box_without_glass_rgb": [
+    144,
+    22,
+    22
+   ],
+   "seg_is_glass": 1.0,
+   "depth_median_m": 1.904
+  },
+  "tier2/after": {
+   "mean_rgb": [
+    91,
+    22,
+    75
+   ],
+   "mad": 45.5,
+   "glass_over_bg_mad": 15.4,
+   "glass_delta_rgb": [
+    -53,
+    0,
+    53
+   ],
+   "box_without_glass_rgb": [
+    144,
+    22,
+    22
+   ],
+   "seg_is_glass": 1.0,
+   "depth_median_m": 1.904
+  },
+  "tier0/after_ids_behind": {
+   "mean_rgb": [
+    108,
+    25,
+    89
+   ],
+   "mad": 35.0,
+   "glass_over_bg_mad": 10.3,
+   "glass_delta_rgb": [
+    -64,
+    0,
+    64
+   ],
+   "box_without_glass_rgb": [
+    172,
+    25,
+    25
+   ],
+   "seg_is_glass": 0.0,
+   "depth_median_m": 2.44
+  },
+  "tier2/after_ids_behind": {
+   "mean_rgb": [
+    91,
+    22,
+    75
+   ],
+   "mad": 45.5,
+   "glass_over_bg_mad": 15.4,
+   "glass_delta_rgb": [
+    -53,
+    0,
+    53
+   ],
+   "box_without_glass_rgb": [
+    144,
+    22,
+    22
+   ],
+   "seg_is_glass": 0.0,
+   "depth_median_m": 2.44
+  }
+ },
+ {
+  "probe": "10 spot lights, patch luminance per light index (MuJoCo lights 8)",
+  "mujoco": [
+   39.5,
+   36.2,
+   42.1,
+   38.2,
+   42.0,
+   40.5,
+   39.4,
+   40.2,
+   0.3,
+   0.0
+  ],
+  "tier0/before": [
+   41.9,
+   42.3,
+   42.8,
+   42.9,
+   43.2,
+   43.2,
+   43.0,
+   43.1,
+   0.0,
+   0.0
+  ],
+  "tier0/after": [
+   41.9,
+   42.3,
+   42.8,
+   42.9,
+   43.2,
+   43.2,
+   43.0,
+   43.1,
+   42.8,
+   42.6
+  ],
+  "tier1/after": [
+   41.9,
+   42.3,
+   42.8,
+   42.9,
+   43.2,
+   43.2,
+   43.0,
+   43.1,
+   42.8,
+   42.6
+  ],
+  "tier2/after": [
+   41.7,
+   41.9,
+   42.3,
+   42.6,
+   42.7,
+   42.7,
+   42.8,
+   42.6,
+   42.4,
+   42.4
+  ]
+ },
+ {
+  "probe": "shadow ratio (footprint / ring floor luminance; 1 = no shadow) and image MAD vs MuJoCo",
+  "spot": {
+   "mujoco": {
+    "ratio": 0.0,
+    "mad_vs_mujoco": 0.0
+   },
+   "tier0/before": {
+    "ratio": 1.044,
+    "mad_vs_mujoco": 13.4
+   },
+   "tier0/after": {
+    "ratio": 0.054,
+    "mad_vs_mujoco": 8.3
+   },
+   "tier1/before": {
+    "ratio": 0.052,
+    "mad_vs_mujoco": 8.2
+   },
+   "tier1/after": {
+    "ratio": 0.052,
+    "mad_vs_mujoco": 8.2
+   },
+   "tier2/after": {
+    "ratio": 0.033,
+    "mad_vs_mujoco": 3.7
+   }
+  },
+  "point": {
+   "mujoco": {
+    "ratio": 1.0,
+    "mad_vs_mujoco": 0.0
+   },
+   "tier0/before": {
+    "ratio": 1.019,
+    "mad_vs_mujoco": 94.1
+   },
+   "tier0/after": {
+    "ratio": 0.053,
+    "mad_vs_mujoco": 91.8
+   },
+   "tier1/before": {
+    "ratio": 0.051,
+    "mad_vs_mujoco": 91.8
+   },
+   "tier1/after": {
+    "ratio": 0.051,
+    "mad_vs_mujoco": 91.8
+   },
+   "tier2/after": {
+    "ratio": 0.035,
+    "mad_vs_mujoco": 83.0
+   }
+  },
+  "directional": {
+   "mujoco": {
+    "ratio": 0.0,
+    "mad_vs_mujoco": 0.0
+   },
+   "tier0/before": {
+    "ratio": 0.052,
+    "mad_vs_mujoco": 7.7
+   },
+   "tier0/after": {
+    "ratio": 0.052,
+    "mad_vs_mujoco": 7.7
+   },
+   "tier1/before": {
+    "ratio": 0.049,
+    "mad_vs_mujoco": 7.8
+   },
+   "tier1/after": {
+    "ratio": 0.049,
+    "mad_vs_mujoco": 7.8
+   },
+   "tier2/after": {
+    "ratio": 0.041,
+    "mad_vs_mujoco": 2.7
+   }
+  },
+  "spot_plus_dir": {
+   "mujoco": {
+    "ratio": 0.2,
+    "mad_vs_mujoco": 0.0
+   },
+   "tier0/before": {
+    "ratio": 0.807,
+    "mad_vs_mujoco": 10.9
+   },
+   "tier0/after": {
+    "ratio": 0.209,
+    "mad_vs_mujoco": 7.6
+   },
+   "tier1/before": {
+    "ratio": 0.202,
+    "mad_vs_mujoco": 7.5
+   },
+   "tier1/after": {
+    "ratio": 0.202,
+    "mad_vs_mujoco": 7.5
+   },
+   "tier2/after": {
+    "ratio": 0.191,
+    "mad_vs_mujoco": 4.6
+   }
+  }
+ }
+]
