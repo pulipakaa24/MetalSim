@@ -1,0 +1,92 @@
+metalsim from /Users/aditya/robosim/.claude/worktrees/agent-ad5dbe3dae8c8990c/metalsim/__init__.py
+/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  warnings.warn(
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth dc949da load on device 'metal:0' took 60.71 ms  (cached)
+Module _nxn_broadphase__locals__kernel_83a93056 83a9305 load on device 'metal:0' took 39.01 ms  (cached)
+Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_66b1418a 66b1418 load on device 'metal:0' took 54.50 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_d0d1ca26 d0d1ca2 load on device 'metal:0' took 59.33 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_285313d0 285313d load on device 'metal:0' took 58.03 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_72cc6aa2 72cc6aa load on device 'metal:0' took 39.78 ms  (cached)
+Module mujoco_warp._src.constraint 4b2565f load on device 'metal:0' took 37.63 ms  (cached)
+Module _friction_dof__locals__kernel_54b217fe 54b217f load on device 'metal:0' took 38.53 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_b316a999 b316a99 load on device 'metal:0' took 38.42 ms  (cached)
+Module _efc_contact_init__locals__kernel_1d2a56f7 1d2a56f load on device 'metal:0' took 37.03 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_4199f103 a26dd4c load on device 'metal:0' took 37.92 ms  (cached)
+Module _efc_contact_update__locals__kernel_c1a7040e c1a7040 load on device 'metal:0' took 38.50 ms  (cached)
+Module mujoco_warp._src.forward 53c9939 load on device 'metal:0' took 50.12 ms  (cached)
+Module mujoco_warp._src.passive 121cefe load on device 'metal:0' took 48.96 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_ec74e588 ec74e58 load on device 'metal:0' took 37.43 ms  (cached)
+Module mujoco_warp._src.forward 9c6583c load on device 'metal:0' took 51.19 ms  (cached)
+Module _qfrc_smooth__locals__kernel_b9a126c0 b9a126c load on device 'metal:0' took 37.09 ms  (cached)
+Module mujoco_warp._src.support d1f2881 load on device 'metal:0' took 38.22 ms  (cached)
+Module _factor_i_sparse_unrolled__locals__kernel_7ac910f7 ab82c34 load on device 'metal:0' took 39.89 ms  (cached)
+Module _solve_LD_sparse_serial__locals__kernel_af3ba8f1 a010231 load on device 'metal:0' took 39.19 ms  (cached)
+Module _solve_init_dof__locals__kernel_a278b607 a278b60 load on device 'metal:0' took 37.44 ms  (cached)
+Module _solve_init_efc__locals__kernel_38f8708b 38f8708 load on device 'metal:0' took 37.11 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_e260fcc8 e260fcc load on device 'metal:0' took 37.69 ms  (cached)
+Module mul_m_kernel__locals___mul_m_1b897f73 1b897f7 load on device 'metal:0' took 38.04 ms  (cached)
+Module _update_constraint_efc__locals__kernel_875e0cfe 875e0cf load on device 'metal:0' took 41.16 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_9318117e 9318117 load on device 'metal:0' took 38.30 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_be8f77c5 be8f77c load on device 'metal:0' took 40.68 ms  (cached)
+Module _update_gradient_grad__locals__kernel_b82c9bc8 b82c9bc load on device 'metal:0' took 39.89 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_d3ce68ed aef5636 load on device 'metal:0' took 37.73 ms  (cached)
+Module mujoco_warp._src.solver 00c4ab6 load on device 'metal:0' took 42.16 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_81a45505 28b7d27 load on device 'metal:0' took 36.99 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_610933f9 84af0ad load on device 'metal:0' took 41.82 ms  (cached)
+Module _update_constraint_gradient_fused__locals__kernel_cb8cff00 ce6a002 load on device 'metal:0' took 38.89 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_38f58d00 51cb22a load on device 'metal:0' took 37.70 ms  (cached)
+Module _solve_done__locals__kernel_f1d63dbf f1d63db load on device 'metal:0' took 37.71 ms  (cached)
+Module mujoco_warp._src.sensor 7e89d17 load on device 'metal:0' took 59.86 ms  (cached)
+Module mujoco_warp._src.derivative 3eaf30a load on device 'metal:0' took 43.13 ms  (cached)
+Module _next_time_builder__locals___next_time_89d592b4 89d592b load on device 'metal:0' took 37.50 ms  (cached)
+Module metalsim.physics.batch 6be6507 load on device 'metal:0' took 37.85 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_99f1ed31 99f1ed3 load on device 'metal:0' took 38.03 ms  (cached)
+Module reset_data__locals__reset_M_c0d46912 c0d4691 load on device 'metal:0' took 37.59 ms  (cached)
+Module reset_data__locals__reset_mocap_21cdccdf 21cdccd load on device 'metal:0' took 37.22 ms  (cached)
+Module reset_data__locals__reset_contact_e7d9f88d e7d9f88 load on device 'metal:0' took 37.37 ms  (cached)
+Module reset_data__locals__reset_sleep_c3616e3d c3616e3 load on device 'metal:0' took 37.45 ms  (cached)
+Module reset_data__locals__reset_nworld_f3f460ae f3f460a load on device 'metal:0' took 37.39 ms  (cached)
+Module metalsim.learn.terrain dbcef08 load on device 'metal:0' took 40.24 ms  (cached)
+Module metalsim.learn.g1_velocity ab6d8eb load on device 'metal:0' took 48.30 ms  (cached)
+Module _solve_init_efc__locals__kernel_76688e06 76688e0 load on device 'metal:0' took 37.94 ms  (cached)
+Module _solve_done__locals__kernel_7965d769 7965d76 load on device 'metal:0' took 37.34 ms  (cached)
+G1 rough trained-policy rollout: N=4096 collision boxes_local njmax 256 nconmax 128 levels 10 x 20 start levels spread 0..9; ckpt /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/g1_rough_ppowarp_fixed_it1500.pt
+Module metalsim.learn.warp_policy ab35144 load on device 'metal:0' took 39.57 ms  (cached)
+it    5 sps   62,176 | ep_ret   -6.97 ep_len   39.7 (n=10195) | level mean 2.49 per level [1412, 437, 382, 397, 413, 407, 415, 219, 14, 0] | flags {'ITERATIONS': 289, 'LS_ITERATIONS': 3861}
+it   10 sps   62,642 | ep_ret   -7.02 ep_len   40.9 (n=12011) | level mean 0.89 per level [2582, 411, 427, 379, 250, 45, 2, 0, 0, 0] | flags {'ITERATIONS': 318, 'LS_ITERATIONS': 3840}
+it   15 sps   62,792 | ep_ret   -7.03 ep_len   40.9 (n=12050) | level mean 0.12 per level [3743, 244, 96, 13, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 286, 'LS_ITERATIONS': 3833}
+it   20 sps   62,888 | ep_ret   -7.01 ep_len   40.8 (n=12029) | level mean 0.00 per level [4092, 4, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 294, 'LS_ITERATIONS': 3842}
+it   25 sps   62,943 | ep_ret   -7.02 ep_len   40.8 (n=12058) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 277, 'LS_ITERATIONS': 3809}
+it   30 sps   62,966 | ep_ret   -7.03 ep_len   41.0 (n=11999) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 312, 'LS_ITERATIONS': 3830}
+it   35 sps   62,985 | ep_ret   -7.03 ep_len   40.9 (n=12062) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 316, 'LS_ITERATIONS': 3826}
+it   40 sps   62,998 | ep_ret   -7.03 ep_len   41.0 (n=11963) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 299, 'LS_ITERATIONS': 3836}
+it   45 sps   63,015 | ep_ret   -7.02 ep_len   41.0 (n=11960) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 300, 'LS_ITERATIONS': 3845}
+it   50 sps   63,029 | ep_ret   -7.03 ep_len   41.0 (n=12013) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 297, 'LS_ITERATIONS': 3832}
+it   55 sps   63,035 | ep_ret   -7.03 ep_len   41.1 (n=11950) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 289, 'LS_ITERATIONS': 3843}
+it   60 sps   63,042 | ep_ret   -7.03 ep_len   41.0 (n=11968) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 296, 'LS_ITERATIONS': 3854}
+it   65 sps   63,052 | ep_ret   -7.02 ep_len   40.8 (n=12037) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 321, 'LS_ITERATIONS': 3875}
+it   70 sps   63,056 | ep_ret   -7.03 ep_len   40.9 (n=11992) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 324, 'LS_ITERATIONS': 3875}
+it   75 sps   63,060 | ep_ret   -7.02 ep_len   40.8 (n=12040) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 314, 'LS_ITERATIONS': 3819}
+it   80 sps   63,063 | ep_ret   -7.03 ep_len   41.0 (n=11945) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 348, 'LS_ITERATIONS': 3860}
+it   85 sps   63,065 | ep_ret   -7.03 ep_len   41.0 (n=12001) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 313, 'LS_ITERATIONS': 3837}
+it   90 sps   63,066 | ep_ret   -7.03 ep_len   41.1 (n=11967) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 312, 'LS_ITERATIONS': 3837}
+it   95 sps   63,065 | ep_ret   -7.04 ep_len   41.1 (n=11994) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 321, 'LS_ITERATIONS': 3850}
+it  100 sps   63,065 | ep_ret   -7.03 ep_len   40.9 (n=11984) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 292, 'LS_ITERATIONS': 3852}
+it  105 sps   63,065 | ep_ret   -7.03 ep_len   40.9 (n=12026) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 314, 'LS_ITERATIONS': 3853}
+it  110 sps   63,065 | ep_ret   -7.04 ep_len   41.0 (n=11973) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 311, 'LS_ITERATIONS': 3817}
+it  115 sps   63,068 | ep_ret   -7.02 ep_len   40.9 (n=12028) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 328, 'LS_ITERATIONS': 3839}
+it  120 sps   63,071 | ep_ret   -7.03 ep_len   41.0 (n=12013) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 315, 'LS_ITERATIONS': 3857}
+it  125 sps   63,071 | ep_ret   -7.03 ep_len   40.9 (n=12025) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 327, 'LS_ITERATIONS': 3838}
+it  130 sps   63,072 | ep_ret   -7.03 ep_len   41.0 (n=11992) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 319, 'LS_ITERATIONS': 3861}
+it  135 sps   63,075 | ep_ret   -7.03 ep_len   40.9 (n=12027) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 289, 'LS_ITERATIONS': 3846}
+it  140 sps   63,076 | ep_ret   -7.03 ep_len   41.0 (n=11988) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 284, 'LS_ITERATIONS': 3853}
+it  145 sps   63,076 | ep_ret   -7.03 ep_len   41.0 (n=11996) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 335, 'LS_ITERATIONS': 3856}
+it  150 sps   63,078 | ep_ret   -7.02 ep_len   40.8 (n=12071) | level mean 0.00 per level [4096, 0, 0, 0, 0, 0, 0, 0, 0, 0] | flags {'ITERATIONS': 294, 'LS_ITERATIONS': 3822}
+RESULT task=g1_rough_policy n=4096 iters_logged=150/150 latch=yes njmax=256 naconmax/world=128 final_sps=63078.0 wall=239s flags={'ITERATIONS': 294, 'LS_ITERATIONS': 3822} raised=None

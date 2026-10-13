@@ -1,0 +1,169 @@
+G1 flat PPO: N=4096 obs_dim 123 act_dim 37 rollout 24 x 50 iterations, engine mjwarp, physics dt 0.005 (decimation 4), seed 0, reward_cfg flat, height-scan ray order -, terrain collision hfield, height scan exact, solver_cfg None, contact_cfg recommended, base velocity com, feet-slide velocity com, initial reset True, effort limit on the joint
+it    1 steps     98304 sps   58,210 | ep_ret   -5.71 ep_len   23.6 (n=42) | pg 0.007 vf 0.268 kl 0.0365 lr 5.9e-05
+[anomaly] it 1: joint limit violated by 0.19 rad
+[anomaly] it 1: contact penetration 4.5 cm
+it    2 steps    196608 sps   62,600 | ep_ret   -6.17 ep_len   36.9 (n=3350) | pg -0.003 vf 3.370 kl 0.0079 lr 4.4e-04
+[anomaly] it 2: joint limit violated by 0.20 rad
+[anomaly] it 2: contact penetration 3.0 cm
+it    3 steps    294912 sps   64,066 | ep_ret   -6.34 ep_len   40.8 (n=1957) | pg -0.003 vf 1.845 kl 0.0139 lr 1.0e-03
+[anomaly] it 3: joint limit violated by 0.20 rad
+[anomaly] it 3: contact penetration 2.9 cm
+it    4 steps    393216 sps   64,517 | ep_ret   -6.31 ep_len   40.7 (n=2514) | pg -0.002 vf 1.560 kl 0.0149 lr 4.4e-04
+[anomaly] it 4: joint limit violated by 0.21 rad
+[anomaly] it 4: contact penetration 2.5 cm
+it    5 steps    491520 sps   65,067 | ep_ret   -6.27 ep_len   39.9 (n=2513) | pg -0.001 vf 1.482 kl 0.0113 lr 4.4e-04
+[anomaly] it 5: joint limit violated by 0.21 rad
+[anomaly] it 5: contact penetration 2.7 cm
+it    6 steps    589824 sps   65,263 | ep_ret   -6.29 ep_len   40.7 (n=2348) | pg -0.003 vf 1.130 kl 0.0122 lr 4.4e-04
+[anomaly] it 6: joint limit violated by 0.19 rad
+[anomaly] it 6: contact penetration 3.0 cm
+it    7 steps    688128 sps   65,470 | ep_ret   -6.26 ep_len   40.5 (n=2474) | pg -0.003 vf 0.988 kl 0.0120 lr 2.0e-04
+[anomaly] it 7: joint limit violated by 0.19 rad
+[anomaly] it 7: contact penetration 2.7 cm
+it    8 steps    786432 sps   65,592 | ep_ret   -6.26 ep_len   41.0 (n=2374) | pg 0.005 vf 0.792 kl 0.0117 lr 2.0e-04
+[anomaly] it 8: joint limit violated by 0.26 rad
+[anomaly] it 8: contact penetration 3.0 cm
+it    9 steps    884736 sps   65,699 | ep_ret   -6.24 ep_len   40.8 (n=2381) | pg -0.001 vf 0.651 kl 0.0106 lr 4.4e-04
+[anomaly] it 9: joint limit violated by 0.23 rad
+[anomaly] it 9: contact penetration 3.1 cm
+it   10 steps    983040 sps   65,767 | ep_ret   -6.23 ep_len   41.2 (n=2404) | pg -0.001 vf 0.502 kl 0.0105 lr 4.4e-04
+[anomaly] it 10: joint limit violated by 0.20 rad
+[anomaly] it 10: contact penetration 3.1 cm
+it   11 steps   1081344 sps   65,812 | ep_ret   -6.19 ep_len   40.8 (n=2397) | pg -0.004 vf 0.396 kl 0.0114 lr 1.0e-03
+[anomaly] it 11: joint limit violated by 0.21 rad
+[anomaly] it 11: contact penetration 3.2 cm
+it   12 steps   1179648 sps   65,865 | ep_ret   -6.18 ep_len   41.0 (n=2402) | pg -0.003 vf 0.297 kl 0.0158 lr 2.0e-04
+[anomaly] it 12: joint limit violated by 0.20 rad
+[anomaly] it 12: contact penetration 3.3 cm
+it   13 steps   1277952 sps   65,905 | ep_ret   -6.15 ep_len   41.2 (n=2395) | pg -0.006 vf 0.229 kl 0.0079 lr 6.7e-04
+[anomaly] it 13: joint limit violated by 0.19 rad
+[anomaly] it 13: contact penetration 2.6 cm
+it   14 steps   1376256 sps   65,950 | ep_ret   -6.12 ep_len   41.3 (n=2333) | pg -0.005 vf 0.156 kl 0.0121 lr 1.0e-03
+[anomaly] it 14: joint limit violated by 0.18 rad
+[anomaly] it 14: contact penetration 3.8 cm
+it   15 steps   1474560 sps   65,951 | ep_ret   -6.12 ep_len   42.1 (n=2303) | pg -0.009 vf 0.097 kl 0.0155 lr 6.7e-04
+[anomaly] it 15: joint limit violated by 0.21 rad
+[anomaly] it 15: contact penetration 3.1 cm
+it   16 steps   1572864 sps   65,949 | ep_ret   -6.09 ep_len   42.6 (n=2344) | pg -0.009 vf 0.072 kl 0.0139 lr 6.7e-04
+[anomaly] it 16: joint limit violated by 0.23 rad
+[anomaly] it 16: contact penetration 3.2 cm
+it   17 steps   1671168 sps   65,945 | ep_ret   -6.05 ep_len   42.5 (n=2234) | pg -0.005 vf 0.063 kl 0.0148 lr 1.3e-04
+[anomaly] it 17: joint limit violated by 0.21 rad
+[anomaly] it 17: contact penetration 2.8 cm
+it   18 steps   1769472 sps   65,924 | ep_ret   -6.01 ep_len   42.8 (n=2315) | pg -0.007 vf 0.043 kl 0.0104 lr 2.0e-04
+[anomaly] it 18: joint limit violated by 0.22 rad
+[anomaly] it 18: contact penetration 3.1 cm
+it   19 steps   1867776 sps   65,913 | ep_ret   -5.99 ep_len   43.1 (n=2292) | pg -0.007 vf 0.038 kl 0.0119 lr 1.3e-04
+[anomaly] it 19: joint limit violated by 0.24 rad
+[anomaly] it 19: contact penetration 2.9 cm
+it   20 steps   1966080 sps   65,873 | ep_ret   -5.97 ep_len   43.6 (n=2175) | pg -0.007 vf 0.030 kl 0.0121 lr 8.8e-05
+[anomaly] it 20: joint limit violated by 0.20 rad
+[anomaly] it 20: contact penetration 3.5 cm
+it   21 steps   2064384 sps   65,852 | ep_ret   -5.94 ep_len   43.8 (n=2266) | pg -0.011 vf 0.024 kl 0.0098 lr 4.4e-04
+[anomaly] it 21: joint limit violated by 0.20 rad
+[anomaly] it 21: contact penetration 3.2 cm
+it   22 steps   2162688 sps   65,823 | ep_ret   -5.92 ep_len   44.0 (n=2242) | pg -0.015 vf 0.018 kl 0.0134 lr 1.0e-03
+[anomaly] it 22: joint limit violated by 0.19 rad
+[anomaly] it 22: contact penetration 2.7 cm
+it   23 steps   2260992 sps   65,786 | ep_ret   -5.88 ep_len   44.5 (n=2150) | pg -0.016 vf 0.013 kl 0.0162 lr 6.7e-04
+[anomaly] it 23: joint limit violated by 0.20 rad
+[anomaly] it 23: contact penetration 4.7 cm
+it   24 steps   2359296 sps   65,733 | ep_ret   -5.84 ep_len   44.8 (n=2167) | pg -0.015 vf 0.011 kl 0.0171 lr 1.0e-03
+[anomaly] it 24: joint limit violated by 0.19 rad
+[anomaly] it 24: contact penetration 3.3 cm
+it   25 steps   2457600 sps   65,669 | ep_ret   -5.81 ep_len   45.7 (n=2145) | pg -0.016 vf 0.010 kl 0.0166 lr 6.7e-04
+[anomaly] it 25: joint limit violated by 0.33 rad
+[anomaly] it 25: contact penetration 3.7 cm
+it   26 steps   2555904 sps   65,596 | ep_ret   -5.76 ep_len   46.0 (n=2063) | pg -0.016 vf 0.010 kl 0.0168 lr 1.0e-03
+[anomaly] it 26: joint limit violated by 0.22 rad
+[anomaly] it 26: contact penetration 3.0 cm
+it   27 steps   2654208 sps   65,510 | ep_ret   -5.75 ep_len   47.2 (n=2068) | pg -0.015 vf 0.010 kl 0.0177 lr 6.7e-04
+[anomaly] it 27: joint limit violated by 0.19 rad
+[anomaly] it 27: contact penetration 2.5 cm
+it   28 steps   2752512 sps   65,437 | ep_ret   -5.71 ep_len   47.8 (n=2033) | pg -0.013 vf 0.011 kl 0.0176 lr 1.0e-03
+[anomaly] it 28: joint limit violated by 0.26 rad
+[anomaly] it 28: contact penetration 2.2 cm
+it   29 steps   2850816 sps   65,356 | ep_ret   -5.68 ep_len   48.5 (n=2030) | pg -0.014 vf 0.011 kl 0.0174 lr 6.7e-04
+[anomaly] it 29: joint limit violated by 0.23 rad
+[anomaly] it 29: contact penetration 2.8 cm
+it   30 steps   2949120 sps   65,273 | ep_ret   -5.64 ep_len   48.8 (n=1957) | pg -0.014 vf 0.011 kl 0.0160 lr 1.0e-03
+[anomaly] it 30: joint limit violated by 0.22 rad
+[anomaly] it 30: contact penetration 2.5 cm
+it   31 steps   3047424 sps   65,192 | ep_ret   -5.63 ep_len   49.5 (n=2009) | pg -0.014 vf 0.011 kl 0.0172 lr 6.7e-04
+[anomaly] it 31: joint limit violated by 0.21 rad
+[anomaly] it 31: contact penetration 2.9 cm
+it   32 steps   3145728 sps   65,096 | ep_ret   -5.60 ep_len   50.3 (n=1879) | pg -0.014 vf 0.011 kl 0.0162 lr 1.0e-03
+[anomaly] it 32: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 32: joint limit violated by 0.20 rad
+[anomaly] it 32: contact penetration 2.0 cm
+it   33 steps   3244032 sps   65,012 | ep_ret   -5.58 ep_len   50.5 (n=1955) | pg -0.013 vf 0.012 kl 0.0151 lr 1.0e-03
+[anomaly] it 33: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 33: joint limit violated by 0.21 rad
+[anomaly] it 33: contact penetration 2.7 cm
+it   34 steps   3342336 sps   64,920 | ep_ret   -5.56 ep_len   50.9 (n=1863) | pg -0.013 vf 0.011 kl 0.0174 lr 1.0e-03
+[anomaly] it 34: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 34: joint limit violated by 0.23 rad
+[anomaly] it 34: contact penetration 2.7 cm
+it   35 steps   3440640 sps   64,824 | ep_ret   -5.54 ep_len   51.8 (n=1869) | pg -0.013 vf 0.011 kl 0.0156 lr 1.0e-03
+[anomaly] it 35: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 35: joint limit violated by 0.28 rad
+[anomaly] it 35: contact penetration 2.3 cm
+it   36 steps   3538944 sps   64,739 | ep_ret   -5.54 ep_len   52.5 (n=1871) | pg -0.014 vf 0.011 kl 0.0171 lr 1.0e-03
+[anomaly] it 36: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 36: joint limit violated by 0.20 rad
+[anomaly] it 36: contact penetration 3.3 cm
+it   37 steps   3637248 sps   64,656 | ep_ret   -5.52 ep_len   53.0 (n=1818) | pg -0.014 vf 0.011 kl 0.0152 lr 1.0e-03
+[anomaly] it 37: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 37: joint limit violated by 0.25 rad
+[anomaly] it 37: contact penetration 2.2 cm
+it   38 steps   3735552 sps   64,574 | ep_ret   -5.49 ep_len   53.5 (n=1782) | pg -0.013 vf 0.011 kl 0.0150 lr 1.0e-03
+[anomaly] it 38: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 38: joint limit violated by 0.25 rad
+[anomaly] it 38: contact penetration 2.4 cm
+it   39 steps   3833856 sps   64,497 | ep_ret   -5.50 ep_len   55.1 (n=1801) | pg -0.012 vf 0.011 kl 0.0157 lr 1.0e-03
+[anomaly] it 39: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 39: joint limit violated by 0.23 rad
+[anomaly] it 39: contact penetration 2.4 cm
+it   40 steps   3932160 sps   64,411 | ep_ret   -5.47 ep_len   54.9 (n=1768) | pg -0.014 vf 0.011 kl 0.0154 lr 1.0e-03
+[anomaly] it 40: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 40: joint limit violated by 0.25 rad
+[anomaly] it 40: contact penetration 2.6 cm
+it   41 steps   4030464 sps   64,323 | ep_ret   -5.45 ep_len   54.9 (n=1739) | pg -0.014 vf 0.011 kl 0.0157 lr 1.0e-03
+[anomaly] it 41: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 41: joint limit violated by 0.24 rad
+[anomaly] it 41: contact penetration 2.7 cm
+it   42 steps   4128768 sps   64,236 | ep_ret   -5.45 ep_len   56.1 (n=1737) | pg -0.014 vf 0.010 kl 0.0156 lr 1.0e-03
+[anomaly] it 42: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 42: joint limit violated by 0.22 rad
+[anomaly] it 42: contact penetration 2.4 cm
+it   43 steps   4227072 sps   64,151 | ep_ret   -5.42 ep_len   56.6 (n=1695) | pg -0.013 vf 0.010 kl 0.0166 lr 1.0e-03
+[anomaly] it 43: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 43: joint limit violated by 0.24 rad
+[anomaly] it 43: contact penetration 2.7 cm
+it   44 steps   4325376 sps   64,069 | ep_ret   -5.40 ep_len   57.4 (n=1785) | pg -0.014 vf 0.010 kl 0.0161 lr 1.0e-03
+[anomaly] it 44: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 44: joint limit violated by 0.25 rad
+[anomaly] it 44: contact penetration 2.8 cm
+it   45 steps   4423680 sps   63,979 | ep_ret   -5.39 ep_len   57.7 (n=1590) | pg -0.014 vf 0.010 kl 0.0167 lr 1.0e-03
+[anomaly] it 45: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 45: joint limit violated by 0.24 rad
+[anomaly] it 45: contact penetration 2.4 cm
+it   46 steps   4521984 sps   63,904 | ep_ret   -5.36 ep_len   57.8 (n=1729) | pg -0.014 vf 0.010 kl 0.0172 lr 1.0e-03
+[anomaly] it 46: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 46: joint limit violated by 0.29 rad
+[anomaly] it 46: contact penetration 2.8 cm
+it   47 steps   4620288 sps   63,820 | ep_ret   -5.35 ep_len   58.6 (n=1683) | pg -0.014 vf 0.010 kl 0.0167 lr 1.0e-03
+[anomaly] it 47: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 47: joint limit violated by 0.22 rad
+it   48 steps   4718592 sps   63,741 | ep_ret   -5.32 ep_len   58.6 (n=1639) | pg -0.014 vf 0.010 kl 0.0173 lr 1.0e-03
+[anomaly] it 48: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 48: joint limit violated by 0.21 rad
+[anomaly] it 48: contact penetration 2.2 cm
+it   49 steps   4816896 sps   63,666 | ep_ret   -5.31 ep_len   59.4 (n=1668) | pg -0.014 vf 0.010 kl 0.0172 lr 1.0e-03
+[anomaly] it 49: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 49: joint limit violated by 0.25 rad
+[anomaly] it 49: contact penetration 2.1 cm
+it   50 steps   4915200 sps   63,595 | ep_ret   -5.30 ep_len   59.9 (n=1586) | pg -0.014 vf 0.010 kl 0.0174 lr 1.0e-03
+[anomaly] it 50: terminal-step reward dominates the episode: survival is being punished
+[anomaly] it 50: joint limit violated by 0.26 rad
+[anomaly] it 50: contact penetration 2.1 cm

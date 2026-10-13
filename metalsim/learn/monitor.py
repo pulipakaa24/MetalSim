@@ -121,7 +121,8 @@ class AnomalyMonitor:
         ov = sim.overflow_flags() if hasattr(sim, "overflow_flags") else {}
         # capacity overflows drop constraints or contacts silently (MuJoCo Warp OverflowType names; ITERATIONS /
         # LS_ITERATIONS are solver caps, not capacity, and are reported separately)
-        for k in ("NEFC", "NJMAX_NNZ", "BROADPHASE", "NARROWPHASE", "CCD", "HFIELD", "EPA_HORIZON", "CONTACT_MATCH"):
+        from metalsim.physics.capacity import CAPACITY_FLAGS
+        for k in CAPACITY_FLAGS:
             if k in ov: flags.append(f"MuJoCo Warp {k} capacity overflow in {ov[k]} worlds")
         if hasattr(d, "energy"):
             e = d.energy.numpy(); tot = e.sum(1) if e.ndim == 2 else e

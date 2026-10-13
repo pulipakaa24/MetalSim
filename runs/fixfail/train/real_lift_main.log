@@ -1,0 +1,7 @@
+it    5 steps     20480 sps   2,175 | ret   14.73 len 300.0 succ  0.00 (n=64) | pg -0.024 vf 0.091 kl 0.0143 lr 3.0e-04 | env 38.2%  policy 12.2%  update 49.5%
+it   10 steps     40960 sps   2,174 | ret   37.72 len 300.0 succ  0.00 (n=100) | pg -0.034 vf 0.221 kl 0.0263 lr 3.0e-04 | env 40.5%  policy 12.6%  update 46.9%
+it   15 steps     61440 sps   2,164 | ret   70.34 len 300.0 succ  0.00 (n=100) | pg -0.030 vf 0.252 kl 0.0268 lr 3.0e-04 | env 41.4%  policy 12.8%  update 45.9%
+it   20 steps     81920 sps   2,149 | ret   83.35 len 300.0 succ  0.00 (n=100) | pg -0.027 vf 0.237 kl 0.0346 lr 3.0e-04 | env 42.0%  policy 12.9%  update 45.2%
+it   25 steps    102400 sps   2,143 | ret   81.77 len 300.0 succ  0.00 (n=100) | pg -0.030 vf 0.319 kl 0.0412 lr 3.0e-04 | env 42.3%  policy 13.0%  update 44.8%
+it   30 steps    122880 sps   2,138 | ret   95.67 len 300.0 succ  0.00 (n=100) | pg -0.031 vf 0.287 kl 0.0295 lr 3.0e-04 | env 42.5%  policy 13.0%  update 44.5%
+RESULT task=lift n=64 iters_logged=30/30 latch=no (main) njmax=512 naconmax/world=48 final_sps=2138.0 wall=70s flags={'ITERATIONS': 12, 'LS_ITERATIONS': 64} raised=None
