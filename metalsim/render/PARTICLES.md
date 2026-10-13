@@ -104,7 +104,10 @@ and after every step: device, renderer and tiler utilisation 0-2 %, recoveryCoun
 
 The 25.12 M build that never finished in the flat layout (900 s, 2026-10-12) completes in 654 ms. No structure used
 extended limits. The 1080p frame time includes loading the frame's particles, the structure rebuild, 32 passes of
-4 spp, OIDN and the PNG. Logs: `runs/sand25m_16in/` in the working tree (not committed).
+4 spp, OIDN and the PNG. Logs: [`runs/sand25m_16in/`](../../runs/sand25m_16in/) — per step the render log
+(`<step>.log`), the queue log with gpu_run's utilisation lines (`<step>.queue.log`) and the health checks
+(`step_<step>.out`); the driver (`step.sh`, `ramp.py`); the 25 M frame at half size (`frame_n0_960x540.jpg`) and its
+stats (`frame_n0_stats.json`).
 
 ## Validation (`tests/test_render_particles.py`)
 

@@ -1,0 +1,73 @@
+{
+ "args": {
+  "sim": "/Users/aditya/robosim/runs/demo/anymal_sim",
+  "out": "/Users/aditya/robosim/.claude/worktrees/agent-a8f21c8b02205ff25/runs/sand25m_16in/out_frame_n0",
+  "frames": "0:1",
+  "fps": 30.0,
+  "t0": 1.0,
+  "width": 1920,
+  "height": 1080,
+  "passes": 32,
+  "spp": 4,
+  "bounces": 5,
+  "grains": 27,
+  "grain_scale": 1.2,
+  "hdri": null,
+  "hdri_yaw": 106.0,
+  "sand_tex": null,
+  "exposure": 0.17,
+  "denoise": "oidn",
+  "fovy": 32.0,
+  "camera": "track",
+  "save_hdr": false,
+  "skip_existing": false,
+  "ground_planes": 4,
+  "plane_extent": 60.0,
+  "plane_shift": 0.0,
+  "max_particles": 0,
+  "no_trace": false,
+  "structure": "two_level",
+  "timing": false,
+  "surface_depth": 0.0,
+  "flip_mesh_v": 0,
+  "cam_eye": null,
+  "cam_target": null,
+  "ground_z": 0.098,
+  "ground_albedo": 0.68,
+  "decor_overlap": 0.18,
+  "decor_falloff": 1.2,
+  "decor": [
+   -2.6,
+   -2.5,
+   2.6,
+   6.0
+  ]
+ },
+ "sun": {
+  "direction": [
+   0.6335509503557107,
+   -0.26857803670250474,
+   0.725588748193082
+  ],
+  "irradiance": [
+   16.38310232862932,
+   16.582396697355005,
+   16.62446547167815
+  ],
+  "angular_radius": 0.005311861462745074,
+  "pixels": 219
+ },
+ "frames": [
+  {
+   "frame": 0,
+   "t": 1.0,
+   "seconds": 5.1036059856414795,
+   "particles": 930433,
+   "grains": 25121691,
+   "instances": 25121747,
+   "ias_mib": 5297.460754394531,
+   "spp": 128
+  }
+ ],
+ "exposure": 0.17
+}

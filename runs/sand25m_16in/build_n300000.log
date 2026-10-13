@@ -1,0 +1,20 @@
+[render] sun dir [ 0.634 -0.269  0.726] irradiance [16.38 16.58 16.62] radius 0.30 deg
+[render] decoration particles 261061
+[render] stage: building the renderer (98 geoms, 20 textures)
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+[render] stage: renderer built; environment map
+[render] stage: environment set
+[render] stage: first frame (232609 particles)
+[timing] 232609 particles, 6280443 grains: upload + structure build 116 ms (structure 1325 MiB)
+[timing] rebuild (structure allocated): 77 ms
+[timing] tracing one pass of 1 spp at 256x144 ...
+[timing] build + one pass of 1 spp at 256x144: 81 ms
+[ramp] {"mode": "two_level", "chunk": 16777215, "grains": 6280443, "top_instances": 55, "chunk_instances": [6280443], "max_instances_per_structure": 6280443, "standard_limit": 16777216, "within_standard": true, "extended_usage": false, "structures_mib": 1324.9, "grain_structures_mib": 1324.9, "metal_allocated_mib": 2902.4, "peak_rss_mib": 4722.1, "wall_s": 9.1}
+
+[watchdog] exit 0 after 10 s
