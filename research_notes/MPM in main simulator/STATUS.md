@@ -21,7 +21,17 @@ Newton 1.7 line), two-way coupled with the robot, N worlds, rendered by `render/
   (`runs/mpm_main/fork/b`, kernel `make_partition_color_block_indices_kernel`); CPU dense/fixed multi-env grids VALID
   with it (sparse multi-env grids only build on GPU).
 
-## In flight: batch_01 (`runs/mpm_main/batch_01/batch_01.sh`, run by the user outside the sandbox)
+## batch_01 results (15:07): fork fix validated (old INVALID, 930 conflicts; new VALID; 12/12 repeatable); column
+bitwise; box pair bitwise until contact then 1.7e-7 m; neutrality; GS repeatable at 1/64/256/1,024; timing measured
+(MPM.md section 11). Failed: Jacobi 1,024 repeat (step 34, box reaches the floor -> suspect MuJoCo Warp
+non-determinism), free-fall test (lateral 2e-4 m/s from the solver's numerical air drag), repose (my batch marked it
+PASS unconditionally: a bug; and a collapse deposit is not a repose angle).
+
+## In flight: batch_02 (`runs/mpm_main/batch_02/batch_02.sh`): per-part divergence diagnosis, new opt-in
+`BatchSimOptions(deterministic=True)`, rigid regression, collapse parity vs Newton alone, slow-lift repose, bearing
+settlement matrix, tests, then fork push + PR if green.
+
+## Earlier: batch_01 (`runs/mpm_main/batch_01/batch_01.sh`, run by the user outside the sandbox)
 Fork commit + pin move + re-vendor, coloring check old/new on Metal, multi-world repeat, column bitwise, box-on-sand
 Jacobi pair (bitwise before contact), rigid neutrality, angle of repose, 1/64/256/1024-world repeatability, full
 tests, 16-inch timing, fork push, commit + push, PR if green. Logs: `runs/mpm_main/batch_01/logs/`, summary

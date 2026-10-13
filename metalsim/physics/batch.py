@@ -104,7 +104,52 @@ class BatchSimOptions:
     # Process-wide (warp.config), read when a module is built (part of the module hash): the last BatchSim
     # constructed sets it.
     metal_register_cholesky_max: int | None = 48
+    # Run-to-run bitwise repeatability (Warp's DeterministicMode.RUN_TO_RUN for MuJoCo Warp's kernels, as Newton's
+    # SolverMuJoCo(deterministic=...) does): float atomics accumulate in a fixed order and slot-claiming counters follow
+    # thread order (MetalSim's Warp fork implements it on Metal). Off by default: the kernels and results of existing
+    # scenes are unchanged. Process-wide once on: it sets the module options of every loaded MuJoCo Warp module.
+    deterministic: bool = False
     extra: dict = field(default_factory=dict)
+
+
+def _deterministic_max_records(model: mujoco.MjModel, njmax: int) -> int:
+    """Per-thread record bound for MuJoCo Warp's deterministic atomics (the bound Newton's SolverMuJoCo derives):
+    a dense contact-Jacobian thread can touch every constraint row; a sparse Hessian thread every element of a row's
+    lower-triangular product (row width = the two longest kinematic chains); spatial tendons walk both chains."""
+    nv = int(model.nv)
+    chains, seen = [], set()
+    for b in range(int(model.nbody)):
+        wb = int(model.body_weldid[b])
+        if wb in seen:
+            continue
+        seen.add(wb)
+        dof, width = int(model.body_dofadr[wb]) + int(model.body_dofnum[wb]) - 1, 0
+        while dof >= 0:
+            width += 1
+            dof = int(model.dof_parentid[dof])
+        chains.append(width)
+    chains.sort(reverse=True)
+    row = 0
+    if nv:
+        row = min(nv, max(1, sum(chains[:2]), 2 * max((int(w) for w in model.ten_J_rownnz), default=0),
+                          max((int(w) for w in model.flexedge_J_rownnz), default=0), nv if model.nu else 0))
+    tendon = max((2 * max(int(n) - 1, 1) * int(w) for n, w in zip(model.tendon_num, model.ten_J_rownnz)), default=0)
+    return max(1, int(njmax), row * (row + 1) // 2, tendon)
+
+
+def _enable_mujoco_warp_determinism(max_records: int) -> None:
+    """RUN_TO_RUN module options on every loaded MuJoCo Warp module (``smooth`` gets the record bound), and drop
+    MuJoCo Warp's generated-kernel cache, whose keys do not include module options."""
+    import sys
+
+    from mujoco_warp._src import warp_util
+
+    mode = wp.DeterministicMode.RUN_TO_RUN
+    for name, mod in list(sys.modules.items()):
+        if name.startswith("mujoco_warp._src.") and mod is not None:
+            wp.set_module_options({"deterministic": mode, "deterministic_max_records":
+                                   max_records if name == "mujoco_warp._src.smooth" else 0}, module=mod)
+    warp_util._KERNEL_CACHE.clear()
 
 
 @contextlib.contextmanager
@@ -168,6 +213,10 @@ class BatchSim:
                 self.m.opt.ls_iterations = self.opt.ls_iterations
             with _m_layout(self.opt.m_dense_max):
                 self.d = mjw.put_data(wmodel, mjd, nworld=num_envs, nconmax=nconmax, njmax=njmax)
+            self._det_records = None
+            if self.opt.deterministic:
+                self._det_records = _deterministic_max_records(wmodel, self.d.njmax)
+                _enable_mujoco_warp_determinism(self._det_records)
             self._reset_mask = wp.zeros(num_envs, dtype=wp.bool)
             self._graphs = {}
             # capacity overflow bits latched after every substep: mjw.reset_data zeroes d.overflow of the worlds it
@@ -186,7 +235,25 @@ class BatchSim:
 
     # -- graphs ---------------------------------------------------------------------------------
 
+    @contextlib.contextmanager
+    def det_scope(self):
+        """Hold Warp's deterministic config while MuJoCo Warp kernels may be created (its ``module="unique"`` kernels
+        are generated lazily and take the config, not the source module's options). No-op unless deterministic."""
+        if self._det_records is None:
+            yield
+            return
+        old = wp.config.deterministic, wp.config.deterministic_max_records
+        wp.config.deterministic, wp.config.deterministic_max_records = wp.DeterministicMode.RUN_TO_RUN, 0
+        try:
+            yield
+        finally:
+            wp.config.deterministic, wp.config.deterministic_max_records = old
+
     def _capture(self):
+        with self.det_scope():
+            self._capture_graphs()
+
+    def _capture_graphs(self):
         self._graphs.clear()
         if not self.opt.capture:
             return
@@ -228,11 +295,11 @@ class BatchSim:
     def launch_step(self) -> None:
         """Launch the substeps directly (no graph replay), for capturing into a larger graph that
         also holds the policy and the rollout bookkeeping."""
-        with wp.ScopedDevice(self.device):
+        with wp.ScopedDevice(self.device), self.det_scope():
             self._launch_substeps()
 
     def _run(self, name: str):
-        with wp.ScopedDevice(self.device):
+        with wp.ScopedDevice(self.device), self.det_scope():
             g = self._graphs.get(name)
             if g is not None:
                 wp.capture_launch(g)
@@ -264,7 +331,7 @@ class BatchSim:
     def recompute_constants(self, level: str = "set_const") -> int:
         """After per-world changes to masses/inertias (``set_const``), qpos0/armature (``set_const_0``)
         or gravcomp (``set_const_fixed``); launched on the Warp queue, returns the completion value."""
-        with wp.ScopedDevice(self.device):
+        with wp.ScopedDevice(self.device), self.det_scope():
             getattr(mjw, level)(self.m, self.d)
         return self._signal()
 

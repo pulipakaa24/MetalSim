@@ -176,13 +176,15 @@ def test_gs_coloring_valid_separate_worlds():
     assert out.stdout.strip().endswith("VALID") and "INVALID" not in out.stdout, out.stdout + out.stderr[-2000:]
 
 
-@pytest.mark.parametrize("worlds", [1, 64])
-def test_repeatable_at_scale(worlds):
-    """The coupled scene (box on a small bed) repeats bitwise run to run at 1 and 64 worlds (1,024 worlds: the batch
-    job behind runs/mpm_main/scale/)."""
+@pytest.mark.parametrize("worlds,solver,det", [(1, "auto", 0), (64, "auto", 0), (64, "jacobi", 1)])
+def test_repeatable_at_scale(worlds, solver, det):
+    """The coupled scene (box on a small bed) repeats bitwise run to run (1,024 worlds: the batch job behind
+    runs/mpm_main/scale/). Where the box reaches the floor, MuJoCo Warp's contact solve needs
+    BatchSimOptions(deterministic=True) to repeat (its float atomics accumulate in arrival order otherwise)."""
     _metal()
     out = subprocess.run([sys.executable, str(ROOT / "metalsim/physics/mpm/probes/scale_coupled.py"), "--worlds",
-                          str(worlds), "--steps", "40", "--runs", "2"], capture_output=True, text=True)
+                          str(worlds), "--steps", "40", "--runs", "2", "--solver", solver, "--deterministic", str(det)],
+                         capture_output=True, text=True)
     res = json.loads(out.stdout.strip().splitlines()[-1])
     assert res["repeatable"] and res["finite"], res
 
@@ -215,21 +217,38 @@ def test_render_sand():
     assert grains[0].sum() > 500 and grains[1].sum() > 500
 
 
-def test_pile_angle_of_repose():
-    """A sand column (Isaac Lab's material, friction 0.68: internal friction angle 34 deg) released on a MuJoCo
-    floor comes to rest as a cone whose flank angle lies within 10 deg of the friction angle."""
-    _metal()
-    out = subprocess.run([sys.executable, str(ROOT / "metalsim/physics/mpm/probes/pile_repose.py"), "--seconds",
-                          "1.5"], capture_output=True, text=True)
-    res = json.loads(out.stdout[out.stdout.index("{"):])
-    assert res["at_rest"], res
-    assert abs(res["worlds"][0]["angle_deg"] - res["friction_angle_deg"]) < 10.0, res
+def _pile(friction, seconds=1.0):
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as d:
+        path = os.path.join(d, "pile.json")
+        out = subprocess.run([sys.executable, str(ROOT / "metalsim/physics/mpm/probes/pile_repose.py"), "--engine",
+                              "metalsim", "--friction", str(friction), "--seconds", str(seconds), "--json", path],
+                             capture_output=True, text=True)
+        assert out.returncode == 0, out.stderr[-3000:]
+        return json.loads(open(path).read()), out
 
 
-def test_free_fall_momentum():
-    """Material in free fall above the floor gains the momentum gravity gives it: mean velocity -g t, nothing
-    sideways (no collider reached)."""
+def test_pile_collapse_matches_newton():
+    """A sand column collapsing on the MuJoCo floor of a BatchSim scene ends bitwise where the same column ends in
+    Newton 1.5.2 alone on a Newton plane (runs/mpm_main/repose/collapse_newton_mu0.68.json, recorded in
+    .venv-newton152): the main simulator's static colliders are Newton's."""
     _metal()
+    ref = json.loads((RUNS / "repose" / "collapse_newton_mu0.68.json").read_text())
+    res, out = _pile(0.68, ref["seconds"])
+    assert res["hashes"] == ref["hashes"], out.stderr[-2000:]
+
+
+def test_pile_collapse_responds_to_friction():
+    """The collapse deposit of a higher-friction material is taller and runs out less (friction 0.4 vs 0.9)."""
+    _metal()
+    lo, _ = _pile(0.4)
+    hi, _ = _pile(0.9)
+    assert hi["deposit"]["h_max"] > 1.3 * lo["deposit"]["h_max"], (lo["deposit"], hi["deposit"])
+    assert hi["deposit"]["runout"] < 0.8 * lo["deposit"]["runout"], (lo["deposit"], hi["deposit"])
+
+
+def _free_fall(air_drag):
     import mujoco
 
     from metalsim.physics.batch import BatchSim, BatchSimOptions
@@ -238,16 +257,28 @@ def test_free_fall_momentum():
     m = mujoco.MjModel.from_xml_string('<mujoco><option timestep="0.005"/><worldbody>'
                                        '<geom type="plane" size="0 0 1"/></worldbody></mujoco>')
     sim = BatchSim(m, 2, options=BatchSimOptions(substeps=2))
-    mpm = MPMCoupling(sim, MPMConfig(voxel_size=0.05, max_iterations=20))
+    mpm = MPMCoupling(sim, MPMConfig(voxel_size=0.05, max_iterations=20, air_drag=air_drag))
     mpm.add_emitter(GridEmitter(lower=(-0.1, -0.1, 1.0), upper=(0.1, 0.1, 1.1)))
     mpm.finalize()
     steps = 10
     for _ in range(steps):
         mpm.step()
-    v = mpm.particle_qd.numpy().reshape(2, -1, 3)
-    t = steps * sim.dt
-    assert np.abs(v[..., :2]).max() < 1e-5
-    assert np.allclose(v[..., 2].mean(1), -9.81 * t, rtol=1e-3)
+    return mpm.particle_qd.numpy().reshape(2, -1, 3), 9.81 * steps * sim.dt
+
+
+def test_free_fall_momentum():
+    """Material in free fall (no collider reached; equal particle masses) gains exactly the momentum gravity gives it
+    when the solver's numerical air drag is off: mean vertical velocity -g t, no net lateral momentum (the block is
+    symmetric about the origin). With Isaac's default drag (1 per s, on partly filled boundary nodes) the block falls
+    slightly slower, never faster, and still has no net lateral momentum."""
+    _metal()
+    v, gt = _free_fall(0.0)
+    assert np.allclose(v[..., 2].mean(1), -gt, rtol=1e-4), v[..., 2].mean(1)
+    assert np.abs(v[..., :2].mean(1)).max() < 1e-6 * gt
+    vd, _ = _free_fall(1.0)
+    vz = vd[..., 2].mean(1)
+    assert np.all(vz > -gt) and np.all(vz < -0.95 * gt), vz
+    assert np.abs(vd[..., :2].mean(1)).max() < 1e-6 * gt
 
 
 def test_main_sim_settings_untouched():

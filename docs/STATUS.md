@@ -100,5 +100,5 @@ published benchmark. Neither is cited as physics parity evidence.
   section 11): `MPMCoupling` adds Isaac Lab's MPM material to a `BatchSim` scene in `.venv` (vendored copy of the
   Newton 1.5.2 fork's solver, bitwise Newton's own; Isaac's proxy coupling). A box on sand follows Isaac's coupling
   path to rounding. Found and fixed on the fork: Gauss-Seidel with separate worlds was an invalid coloring (data race,
-  non-repeatable multi-world runs, Newton's own 1.5.2 included). Open: scale and timing results (batch 01), robot
+  non-repeatable multi-world runs, Newton's own 1.5.2 included). Measured: bitwise repeatable to 1,024 worlds (GS), 13.7 / 223.6 ms per coupled step at 1 / 1,024 worlds; rigid side repeatable only with the new opt-in `BatchSimOptions(deterministic=True)` (batch 02). Open: thin-bed bearing and angle of repose (solver-level, under measurement), robot
   scenes (ANYmal on sand) in the main simulator.

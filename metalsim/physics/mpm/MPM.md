@@ -968,7 +968,7 @@ mpm.wrenches(); mpm.particles(); mpm.reset(mask); mpm.check_status()
 with MuJoCo's effective mass, staggered or lagged, the solver's own fixed-order wrench harvest into `xfrc_applied`,
 the caller's `xfrc_applied` restored after the step), `proxy_mass="effective" | "body" | "kinematic"`,
 `harvest="last_substep"` (Isaac) or `"mean"`. Colliders are the MuJoCo geoms (`colliders.py`: box, sphere, capsule,
-cylinder, plane, mesh, ellipsoid as a mesh); static geoms are static colliders. Nothing in `BatchSim` changes, and
+cylinder, plane, mesh, ellipsoid as a mesh); static geoms are static colliders. `BatchSim`'s default path is unchanged (its new opt-in `deterministic` option aside), and
 building an MPM scene changes no process-wide Warp setting (`test_main_sim_settings_untouched`).
 
 ### Gauss-Seidel with separate worlds (Newton fork fix)
@@ -980,9 +980,40 @@ a discontinuous strain basis (P0) are built as `cell * nodes_per_cell`, while en
 number a cell's nodes in environment-major order. A NanoVDB environment grid does not store cells environment by
 environment (negative coordinates sort after positive ones), so the blocks were a permutation of other cells' nodes and
 strain nodes solved concurrently in one color shared velocity nodes: a data race, on CUDA as on Metal. Fixed on the
-fork (blocks from each cell's partition node index; single-environment grids keep the old kernel) and re-pinned;
-`probes/gs_coloring_check.py` checks the coloring (no write conflicts within a color, every strain node once per
-sweep).
+fork (`99843d09`, blocks from each cell's partition node index; single-environment grids keep the old kernel) and
+re-pinned. `probes/gs_coloring_check.py` (2 worlds, sparse grid, on Metal): the old fork's coloring has 930 velocity-node
+write conflicts within colors (all 8 colors), the fixed one none, every strain node once per sweep; the fixed solver
+repeats bitwise in all 12 multi-world configurations of `probes/multiworld_repeat.py` (`runs/mpm_main/batch_01/`).
+
+### Measured (batch 01, 2026-10-13, 16-inch)
+
+* **Isaac's coupling path** (box 2 kg / 0.1 m dropped on a 0.3 x 0.3 x 0.08 m bed, 2 worlds, Jacobi, 60 steps of
+  1/120 s; `probes/box_on_sand.py`, `.venv` vs Newton's `SolverCoupledProxy` + `SolverMuJoCo` in `.venv-newton152`):
+  every particle bitwise equal until the box reaches the sand (step 17); afterwards the two rigid stacks (MuJoCo Warp
+  3.14 vs 3.11) differ by rounding: box position at most 1.7e-7 m apart, sand 1.0e-6 m RMS (max 2.5e-5 m) after 0.5 s.
+* **Repeatability**: the coupled scene (box on a 2,592-particle bed per world) repeats bitwise at 1, 64, 256 and 1,024
+  worlds with Gauss-Seidel. With Jacobi at 1,024 worlds the box reaches the floor and the run diverged at step 34:
+  MuJoCo Warp's constraint solve is not run-to-run repeatable on Metal by default (MetalSim's rigid stack never was;
+  `probes/rigid_neutral_mpm.py`: the panda differs between two plain runs). `BatchSimOptions(deterministic=True)` runs
+  MuJoCo Warp's kernels in Warp's RUN_TO_RUN mode (as Newton's `SolverMuJoCo(deterministic=...)`); batch 02 checks it.
+* **Rigid neutrality**: after an MPM scene was built and stepped, the MuJoCo Warp kernel modules a rigid scene loads
+  have the same hashes (8 modules), and the box scene's trajectory is bitwise that of a plain run.
+* **Speed** (ms per captured coupled step = 3 MuJoCo substeps + 1 MPM step of 1/120 s, box + 2,592 particles per
+  world, median of 40 after 10 warm-up; `probes/scale_coupled.py --time`, timing class):
+
+  | worlds | Gauss-Seidel (`"auto"`) | Jacobi | world-steps per s (GS / Jacobi) |
+  |---|---|---|---|
+  | 1 | 13.7 | 8.3 | 73 / 120 |
+  | 64 | 24.3 (eager: 95.1) | 20.3 | 2,631 / 3,156 |
+  | 256 | 60.6 | 54.7 | 4,226 / 4,678 |
+  | 1,024 | 223.6 | 210.5 | 4,579 / 4,865 |
+
+* **Physics observations, solver-level** (the same in Isaac's path): the dropped box sinks through most of the 8 cm
+  bed (to 1 cm above the floor; Gauss-Seidel: onto it), more than the bed's bearing capacity suggests for a 2 kPa load;
+  and a collapsing column's deposit flank is 10-14 deg for friction 0.4-0.9 (runout 0.32 / 0.20 / 0.17 m, height
+  3.2 / 5.2 / 6.2 cm): a collapse deposit is not an angle of repose. Batch 02 measures the bearing settlement against
+  resolution, iterations, bed depth and friction (`probes/bearing.py`) and the angle of repose by a slow cylinder lift
+  (`probes/repose_lift.py`).
 
 ### Re-vendoring when the fork pin moves
 
