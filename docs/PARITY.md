@@ -1144,12 +1144,51 @@ over the iteration's steps), mean reward and episode length over the last 100 ep
 
 Verdict: **partial**. Both learn the task from the same reset curriculum along the same early trajectory (iterations
 0-19 agree within the noise; the curriculum's concentration metrics evolve alike: effective pool 0.004-0.02, top-1 %
-mass 0.27-0.48 over the first ~20k episodes on both), but from iteration ~25 Isaac's success rate pulls ahead and is
-0.09 higher over iterations 50-59 (0.436 vs 0.348), with shorter episodes. One seed per side, and Isaac is not
-repeatable run to run here (two seed-0 L4 runs differ at iteration 0: reward +0.26 vs -0.46, `train_1024.log` vs
-`train_1024_curve.log`), so the gap is not yet separated from seed spread; seeds on both sides and a per-row outcome
-comparison on fixed reset rows are the next step. Not a cause, by construction: the asset composition, the task terms
-(§1b.2 tests), the solver configuration (§1b.1).
+mass 0.27-0.48 over the first ~20k episodes on both), but from iteration ~25 Isaac's success rate pulls ahead. The
+seed study below puts the gap at iterations 50-59 at 0.06 (not the 0.09 of this one-seed table, whose seed 0 is our
+lowest run), with reward and episode length inside our seed spread. Not a cause, by construction: the asset
+composition, the task terms (§1b.2 tests), the solver configuration (§1b.1).
+
+**Seed study (2026-10-13).** The same matched configuration (1,024 envs, 60 iterations, the task's runner config)
+for seeds 1-4 on main `c3a25d9d` (Warp `95f6f121`, Newton `3fd1f052`; seeds 1-2 on the 14-inch M4 Max, 3-4 on this
+Mac; learning runs only, no timing taken from them), plus the seed-0 run above (training pins). Driver
+`metalsim/learn/franka_pour_seeds.sh` (resumable: checkpoints every 5 iterations, `--save-interval`); logs
+`runs/franka_pour/seeds/s{1..4}/log.jsonl` + console logs; summary `runs/franka_pour/seeds/summary.json`
+(`python -m metalsim.learn.franka_pour_curve seeds --mac <logs> --isaac <logs>`). Per run, the mean of
+`Episode_Termination/success` over each window; then mean ± sample std over the five runs:
+
+| iterations | ours, 5 seeds: mean ± std | ours, per seed (0, 1, 2, 3, 4) | Isaac, seed 0 (n = 1) |
+|---|---|---|---|
+| 0-9 | 0.094 ± 0.017 | 0.124, 0.087, 0.086, 0.081, 0.091 | 0.091 |
+| 10-19 | 0.231 ± 0.012 | 0.221, 0.247, 0.221, 0.238, 0.227 | 0.228 |
+| 20-29 | 0.287 ± 0.023 | 0.274, 0.317, 0.261, 0.277, 0.305 | 0.309 |
+| 30-39 | 0.333 ± 0.025 | 0.300, 0.368, 0.341, 0.321, 0.335 | 0.373 |
+| 40-49 | 0.362 ± 0.031 | 0.310, 0.393, 0.362, 0.377, 0.367 | 0.414 |
+| 50-59 | 0.376 ± 0.017 | 0.348, 0.393, 0.376, 0.377, 0.387 | 0.436 |
+| 50-59 mean reward | 1.63 ± 0.17 | 1.37, 1.68, 1.59, 1.71, 1.80 | 1.78 |
+| 50-59 episode length | 148 ± 11 | 163, 134, 143, 148, 150 | 148 |
+
+What this settles and what it does not:
+* Iterations 0-39 and 40-49: Isaac's run lies inside the 95 % prediction interval for one more of our runs
+  (mean ± t(4) · std · sqrt(1 + 1/5): ±0.076 at 30-39, ±0.094 at 40-49). Reward and episode length at 50-59 are
+  inside our spread too (Isaac's 1.78 and 148 against 1.63 ± 0.17 and 148 ± 11).
+* Iterations 50-59, success: Isaac's 0.436 is above all five of our runs (max 0.393) and 3.5 of our standard
+  deviations above our mean; the prediction interval is 0.376 ± 0.052, upper end 0.428, so Isaac's run is just
+  outside it. The gap is therefore **likely real but small: about 0.06 (16 % relative) at iteration 60**, and only
+  in the success metric.
+* It is not settled, because Isaac has one run. Our seed std at 50-59 (0.017) is the only spread estimate; if
+  Isaac's own seed spread is like ours, one Isaac run says little about Isaac's mean. The Isaac seeds 1-4 script is
+  ready (`metalsim/parity/isaac_side/isaaclab3/stage_pour_seeds.sh`, about 5.2 h per seed on the L4, run
+  instructions in its header); it has not been run yet.
+
+**Neither side is repeatable run to run, so seeds are independent samples.** Isaac seeds python, numpy, torch, CUDA
+and Warp (`isaaclab/utils/seed.py:24-33`, called from `train_rsl_rl.py:149`), but `NewtonCfg.deterministic_mode`
+defaults to `"not_guaranteed"` (`newton_manager_cfg.py:159`), and `--deterministic` only sets torch/cuDNN
+(`train_rsl_rl.py:224-225`). The GPU float atomics in collision detection, MuJoCo Warp and the MPM
+step then sum in a different order each run, and the difference grows through the contact-rich
+rollout. This is why two seed-0 L4 runs differ already at iteration 0 (mean reward +0.26 vs -0.46, `train_1024.log`
+vs `train_1024_curve.log`, and iteration-0 mean reward is very noisy). Our runs are non-deterministic for the same reason (the rigid solver runs without `rigid_deterministic`). So
+compare distributions over seeds, not runs with the same seed number.
 
 **The README-scale run** (2,048 envs, the task's runner config, seed 0, 14-inch M4 Max, 2026-10-12, 16.4 h of GPU
 including five pauses for other jobs (four STOP-file pauses, one stop at iteration 51 resumed from the iteration-50 checkpoint); capped at 300 iterations = 59M env-steps instead of the README's 3,000 =
@@ -1169,7 +1208,7 @@ including five pauses for other jobs (four STOP-file pauses, one stop at iterati
 
 Training success plateaus near 0.62 from iteration ~250. What is not comparable: Isaac has no 2,048-env run on the
 hardware available here (its task does not fit the L4 at 2,048 envs), so this curve has no Isaac counterpart; the
-only matched comparison is the 1,024-env table above (60 iterations, one seed each). Training-time success is measured
+only matched comparison is the 1,024-env study above (60 iterations; five seeds ours, one Isaac). Training-time success is measured
 on curriculum-sampled rows (the sampler concentrates on rows near 50 % local progress), so it is not a fixed-row success
 rate; the deterministic evaluation below is.
 
