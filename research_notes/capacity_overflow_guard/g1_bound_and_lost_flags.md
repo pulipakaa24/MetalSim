@@ -73,3 +73,40 @@ njmax 112), exclusive timing job, 5 interleaved A/B repeats (`scripts/diagnostic
 Once the fork fix is pinned, the `nefc >= njmax` rule and the spare row (`Bounds.eq_blocks`) can be dropped: with the
 fix, any block that does not fit leaves nefc > njmax, which MuJoCo Warp flags itself. The reset latch stays (it is
 independent of this bug).
+
+## Real-scale training with the latched guard (2026-10-13)
+
+Do the sticky flags trip in real training on the shipped defaults? `scripts/diagnostics/overflow_training_check.py`
+runs each task through its own training path; the PPOWarp loop calls `check_overflow()` at every log point (G1: every
+iteration), and the run reports `overflow_flags()` (latched, so every world since construction) at the end.
+
+| task (defaults) | scale | run | capacity flags | solver caps (worlds, last read) |
+|---|---|---|---|---|
+| G1 flat (njmax 112 / nconmax 24) | 4096, 50 PPO it | train_g1 | none at all 50 log points | ITERATIONS ≤ 335, LS_ITERATIONS ≤ 4056 |
+| G1 rough, boxes_local (256 / 128) | 4096, 50 it | train_g1, curriculum | none | ITERATIONS ≤ 334 |
+| G1 rough, heightfield (256 / 32) | 4096, 50 it | train_g1, curriculum | none | ITERATIONS ≤ 301 |
+| Tron1 WF (64 / 16) | 8192, 50 it | PPOWarp (its own loop has no guard) | none | ITERATIONS 1 |
+| SO-101 lift (512 / 48) | 64, 30 it | torch PPO of train_lift (no guard in its loop) | none | ITERATIONS 20 |
+| G1 rough, boxes_local / heightfield, trained rough checkpoint, envs spread over levels 0–9 | 4096, 150 rollouts | rollout only, curriculum on | none | – |
+| same, levels frozen (≈ 410 envs on each of the 10 levels for 3,600 control steps), checkpoint's own training settings | 4096, 150 rollouts | 14-inch, macOS 27 | none | – |
+
+Logs: `runs/fixfail/train/real_*.log` (+ `.anomalies.jsonl`, every log point's flags), `runs/fixfail/train_real.log`,
+`runs/fixfail/train/g1_rough_policy*.log`, `runs/fixfail/train14/` (14-inch). Caveat: the available rough checkpoints
+(2026-09-25) no longer walk on today's task (episodes ≈ 40 control steps, falls), so the all-levels runs cover
+~370 K falls on every terrain level (torso, hands and knees on stairs and boxes), not sustained walking on the
+hardest levels. No default capacity needed changing.
+
+Throughput (16-inch only). Same process, latch hook attached / detached, interleaved, 5 repeats
+(`scripts/diagnostics/overflow_latch_cost_tasks.py`, `runs/fixfail/latch_cost_tasks.log`; the latch is the only
+per-step change of the branch):
+
+| task | with latch | without | cost | spread without |
+|---|---|---|---|---|
+| G1 flat 4096 (PPO rollout) | 75,746 | 75,681 | −0.09 % | 0.3 % |
+| G1 rough 4096 | 64,280 | 64,331 | +0.08 % | 0.2 % |
+| Tron1 8192 | 245,713 | 246,399 | +0.28 % | 0.9 % |
+| SO-101 lift 64 (env step) | 5,122 | 5,157 | +0.69 % | 7.7 % |
+
+Branch vs main (f3b5c62e) as whole training runs, one run each, 50 iterations (`runs/fixfail/train_real.log`): G1 flat
+63,073 vs 63,595, rough 50,692 vs 50,766, rough heightfield 52,623 vs 52,719, Tron1 135,654 vs 138,114, lift 2,039 vs
+2,138 env-steps/s (cumulative incl. startup; single runs, so within their noise; the A/B above is the measurement).
