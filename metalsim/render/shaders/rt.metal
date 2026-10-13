@@ -325,6 +325,90 @@ kernel void raycast_depth(
 struct LidarExt { uint n_sub; uint max_returns; uint hits_per_ray; uint _p0; float min_sep; float transmission; float _p1, _p2; };
 #define LIDAR_MAX_CAND 32
 
+#ifdef SENSOR_TR
+// one lidar sub-ray through transparent / reflecting surfaces (lidar_ext's model above), one surface per call
+struct TrRay { float3 o, d; float t_off, tmin, P; int last, last_g; uint hits, passes; bool done; };
+struct TrCand { bool ok; float rng, p; float3 n; uint slot; };
+inline TrRay tr_ray(float3 org, float3 dir, float P) {
+    TrRay s; s.o = org; s.d = dir; s.t_off = 0.0; s.tmin = 0.001; s.P = P; s.last = -1; s.last_g = -1;
+    s.hits = 0; s.passes = 0; s.done = false;
+    return s;
+}
+// the next surface of the sub-ray: a candidate echo (ok) of range rng (path length) and power p, or none (a skipped
+// see-through / exit face, or the end: s.done); advances the ray past it (transmitted, reflected or, for an opaque
+// surface, on with x.transmission counting a hit)
+inline TrCand tr_step(instance_acceleration_structure accel, thread TrRay& s, float w0, uint e, constant RTConsts& c,
+                      constant LidarExt& x, device const uint2* inst_tab, device const MeshInfo* meshes,
+                      device const float* verts, device const uint* indices, device const InstanceDesc* inst,
+                      device const float* slot_refl, device const float4* lmat DYN_PARAM)
+{
+    TrCand cd; cd.ok = false; cd.rng = 0.0; cd.p = 0.0; cd.n = 0.0; cd.slot = 0u;
+    float rem = c.max_range - s.t_off;
+    if (rem <= s.tmin) { s.done = true; return cd; }
+    float tcell = grid_tmax(s.o, s.d, rem, e, c.grid);
+    float dist = 0.0; uint slot = 0u; float3 n = 0.0; int ii = -1, g = -1;
+    // the next surface that is neither see-through (transparency "surface" / "behind") nor an exit / inner face of
+    // the object just hit; after SKIP_MAX skipped surfaces the next one counts
+    for (uint k = 0; k <= SKIP_MAX; ++k) {
+        ray r(s.o, s.d, s.tmin, tcell);
+#ifdef DYN_SBVH
+        RTRes res = RT_CLOSEST(r, accel);
+#else
+        intersector<triangle_data, instancing> isect;
+        isect.accept_any_intersection(false);
+        intersection_result<triangle_data, instancing> res = isect.intersect(r, accel);
+#endif
+        if (res.type == intersection_type::none) {
+            GridPlaneHit ph = grid_plane(s.o, s.d, max(tcell, s.tmin), rem, e, c.grid);
+            if (!ph.hit) { s.done = true; return cd; }
+            dist = ph.t; slot = ph.slot; n = ph.n; ii = -2; g = int(ph.slot);
+            s.tmin = rem + 1.0;                                  // a plane past the cell ends the sub-ray
+            if (lmat[slot * 2].y < 0.0) { s.done = true; return cd; }   // ... also a see-through one
+            break;
+        }
+        dist = res.distance;
+        s.tmin = res.distance + 1e-4;
+        ii = int(res.instance_id);
+        g = int(res.geometry_id);
+        slot = inst_tab[ii].y + res.geometry_id;
+        if (k < SKIP_MAX && (lmat[slot * 2].y < 0.0 || (ii == s.last && g == s.last_g))) continue;
+        InstanceDesc di = inst[ii];
+        float3x3 Ri = float3x3(float3(di.col0), float3(di.col1), float3(di.col2));
+        n = tri_normal(RT_MESH(res, di.as_index), res.primitive_id, meshes, verts, indices, Ri);
+        break;
+    }
+    if (ii == s.last && g == s.last_g) return cd;           // a plane already counted
+    s.last = ii; s.last_g = g;
+    if (dot(n, s.d) > 0.0) n = -n;
+    float4 m0 = lmat[slot * 2], m1 = lmat[slot * 2 + 1];
+    float a = m0.y, cosi = max(dot(n, -s.d), 0.0);
+    float F = m0.z > 0.0 ? m0.z + (1.0 - m0.z) * pow(1.0 - cosi, 5.0) : 0.0;
+    float rng = s.t_off + dist;                               // range along the beam: the path length
+    float P = s.P;
+    // (the plain kernel's P rho cos / r^2 bit for bit when a = 1 and F = 0)
+    float p = (P * (a * slot_refl[slot]) * cosi + P * (F > 0.0 ? specular_backscatter(F, m0.w, cosi) : 0.0)) / max(rng * rng, 1e-4);
+    float T = (1.0 - a) * m1.x * (1.0 - F), Rf = (1.0 - a) * F;
+    bool ghost = m1.y > 0.5 && Rf > 0.0 && Rf >= T;
+    bool partial = a < 0.995 || F > 0.0;
+    cd.ok = !partial || p > 1e-12f * w0;
+    cd.rng = rng; cd.p = max(p, 1e-12f * P); cd.n = n; cd.slot = slot;
+    if ((T > 0.0 || ghost) && s.passes < LIDAR_TRANS_MAX && ii != -2) {
+        ++s.passes;
+        if (ghost) {                                          // on along the mirror direction from the hit point
+            s.o = s.o + s.d * dist; s.d = reflect(s.d, n); s.t_off += dist; s.tmin = 1e-4;
+            s.last = -1; s.last_g = -1;
+            s.P = P * Rf;
+        } else {
+            s.P = P * T;
+        }
+        return cd;
+    }
+    ++s.hits;
+    s.P = P * x.transmission;
+    return cd;
+}
+#endif
+
 kernel void lidar_ext(
     instance_acceleration_structure accel [[buffer(0)]],
     device const float2*    beams      [[buffer(1)]],
@@ -372,72 +456,18 @@ kernel void lidar_ext(
     for (uint k = 0; k < x.n_sub; ++k) {
         float4 s = sub[k];
         float3 dir = normalize(d + s.x * u + s.y * v);
-        float P = s.z;
-        float tmin = 0.001;
-        int last = -1, last_g = -1;
-        uint hits = 0, passes = 0;
-        float3 o_seg = org, d_seg = dir;     // the current segment (a ghost reflection starts a new one)
-        float t_off = 0.0;                   // path length before the segment
-        for (uint it = 0; it < x.hits_per_ray + 8 + 3 * LIDAR_TRANS_MAX && hits < x.hits_per_ray; ++it) {
-            float rem = c.max_range - t_off;
-            if (rem <= tmin) break;
-            ray r(o_seg, d_seg, tmin, grid_tmax(o_seg, d_seg, rem, e, c.grid));
-#ifdef DYN_SBVH
-            RTRes res = RT_CLOSEST(r, accel);
-#else
-            intersection_result<triangle_data, instancing> res = isect.intersect(r, accel);
-#endif
-            float dist; uint slot; float3 n; int ii, g;
-            if (res.type == intersection_type::none) {
-                GridPlaneHit ph = grid_plane(o_seg, d_seg, max(r.max_distance, tmin), rem, e, c.grid);
-                if (!ph.hit) break;
-                dist = ph.t; slot = ph.slot; n = ph.n; ii = -2; g = int(ph.slot);
-                tmin = rem + 1.0;                   // a plane past the cell ends the sub-ray
-                if (lmat[slot * 2].y < 0.0) break;  // ... also a see-through one
-            } else {
-                dist = res.distance;
-                tmin = res.distance + 1e-4;
-                ii = int(res.instance_id);
-                g = int(res.geometry_id);
-                slot = inst_tab[ii].y + res.geometry_id;
-                if (lmat[slot * 2].y < 0.0) continue;  // see-through (transparency mode "surface" / "behind")
-                InstanceDesc di = inst[ii];
-                float3x3 Ri = float3x3(float3(di.col0), float3(di.col1), float3(di.col2));
-                n = tri_normal(RT_MESH(res, di.as_index), res.primitive_id, meshes, verts, indices, Ri);
-            }
-            if (ii == last && g == last_g) continue;  // exit / inner faces of the object just hit
-            last = ii; last_g = g;
-            if (dot(n, d_seg) > 0.0) n = -n;
-            float4 m0 = lmat[slot * 2], m1 = lmat[slot * 2 + 1];
-            float a = m0.y, cosi = max(dot(n, -d_seg), 0.0);
-            float F = m0.z > 0.0 ? m0.z + (1.0 - m0.z) * pow(1.0 - cosi, 5.0) : 0.0;
-            float rng = t_off + dist;              // range along the beam: the path length
-            // (the plain kernel's P rho cos / r^2 bit for bit when a = 1 and F = 0)
-            float p = (P * (a * slot_refl[slot]) * cosi + P * (F > 0.0 ? specular_backscatter(F, m0.w, cosi) : 0.0)) / max(rng * rng, 1e-4);
-            float T = (1.0 - a) * m1.x * (1.0 - F), Rf = (1.0 - a) * F;
-            bool ghost = m1.y > 0.5 && Rf > 0.0 && Rf >= T;
-            bool partial = a < 0.995 || F > 0.0;
-            if (nc < LIDAR_MAX_CAND && (!partial || p > 1e-12f * s.z)) {
+        TrRay st = tr_ray(org, dir, s.z);
+        for (uint it = 0; it < x.hits_per_ray + 8 + 3 * LIDAR_TRANS_MAX && st.hits < x.hits_per_ray && !st.done; ++it) {
+            TrCand cd = tr_step(accel, st, s.z, e, c, x, inst_tab, meshes, verts, indices, inst, slot_refl, lmat DYN_PASS);
+            if (cd.ok && nc < LIDAR_MAX_CAND) {
+                // insertion by range
                 uint j = nc;
-                while (j > 0 && cr[j - 1] > rng) {
+                while (j > 0 && cr[j - 1] > cd.rng) {
                     cr[j] = cr[j - 1]; cp[j] = cp[j - 1]; cpt[j] = cpt[j - 1]; cn[j] = cn[j - 1]; cs[j] = cs[j - 1]; --j;
                 }
-                cr[j] = rng; cp[j] = max(p, 1e-12f * P); cpt[j] = origin + dir * rng; cn[j] = n; cs[j] = int(slot);
+                cr[j] = cd.rng; cp[j] = cd.p; cpt[j] = origin + dir * cd.rng; cn[j] = cd.n; cs[j] = int(cd.slot);
                 ++nc;
             }
-            if ((T > 0.0 || ghost) && passes < LIDAR_TRANS_MAX && ii != -2) {
-                ++passes;
-                if (ghost) {                        // continue along the mirror direction from the hit point
-                    o_seg = o_seg + d_seg * dist; d_seg = reflect(d_seg, n); t_off += dist; tmin = 1e-4;
-                    last = -1; last_g = -1;
-                    P *= Rf;
-                } else {
-                    P *= T;
-                }
-                continue;
-            }
-            ++hits;
-            P *= x.transmission;
         }
     }
 #else
@@ -548,3 +578,76 @@ kernel void lidar_ext(
         out_normal[oo * 3] = out_normal[oo * 3 + 1] = out_normal[oo * 3 + 2] = 0.0;
     }
 }
+
+#ifdef SENSOR_TR
+// lidar_ext's model for one sub-ray (no divergence) and one return, echoes formed and chosen as they come (a sub-ray's
+// candidates arrive in range order): no candidate arrays, the common transparent-scene configuration
+kernel void lidar_tr1(
+    instance_acceleration_structure accel [[buffer(0)]],
+    device const float2*    beams      [[buffer(1)]],
+    device const float*     site_xpos  [[buffer(2)]],
+    device const float*     site_xmat  [[buffer(3)]],
+    device const uint2*     inst_tab   [[buffer(4)]],
+    device const int*       slot_mesh  [[buffer(5)]],
+    device const MeshInfo*  meshes     [[buffer(6)]],
+    device const float*     verts      [[buffer(7)]],
+    device const uint*      indices    [[buffer(8)]],
+    device const float*     slot_refl  [[buffer(9)]],
+    device const InstanceDesc* inst    [[buffer(10)]],
+    constant RTConsts&      c          [[buffer(11)]],
+    device const float4*    sub        [[buffer(12)]],
+    constant LidarExt&      x          [[buffer(13)]],
+    device float*   out_dist   [[buffer(14)]],
+    device float*   out_points [[buffer(15)]],
+    device float*   out_normal [[buffer(16)]],
+    device int*     out_slot   [[buffer(17)]],
+    device float*   out_intensity [[buffer(18)]],
+    device int*     out_nret   [[buffer(19)]],
+    device const float4*    lmat       [[buffer(20)]],
+    DYN_KERNEL_ARG
+    uint2 tid [[thread_position_in_grid]])
+{
+    uint b = tid.x, e = tid.y;
+    if (b >= c.n_beams || e >= c.n_envs) return;
+    uint si = e * c.n_site + c.sensor_site;
+    float3 origin = float3(site_xpos[si * 3], site_xpos[si * 3 + 1], site_xpos[si * 3 + 2]);
+    float3 org = origin + env_offset(e, c);
+    float3x3 R = load_mat33(site_xmat + si * 9);
+    float2 ae = beams[b];
+    float3 d = R * float3(cos(ae.y) * cos(ae.x), cos(ae.y) * sin(ae.x), sin(ae.y));
+    float3 u = R * float3(-sin(ae.x), cos(ae.x), 0.0);
+    float3 v = R * float3(-sin(ae.y) * cos(ae.x), -sin(ae.y) * sin(ae.x), cos(ae.y));
+    uint rmode = (x._p0 >> 8) & 0xFFu;
+    float4 s0 = sub[0];
+    float3 dir = normalize(d + s0.x * u + s0.y * v);
+    TrRay st = tr_ray(org, dir, s0.z);
+    // the open echo (candidates within min_sep of its first) and the chosen one
+    // (every candidate lies on the beam: an echo's point is origin + dir x its range, so only ranges are summed)
+    bool g_open = false; float g_r0 = 0.0, g_sp = 0.0, g_sr = 0.0, g_best = -1.0; float3 g_bn = 0.0; int g_bs = -1;
+    bool have = false; float s_r = 0.0, s_p = -1.0; float3 s_n = 0.0; int s_slot = -1;
+    uint guard = x.hits_per_ray + 8 + 3 * LIDAR_TRANS_MAX;
+    for (uint it = 0; it <= guard; ++it) {
+        bool more = it < guard && st.hits < x.hits_per_ray && !st.done;
+        TrCand cd; cd.ok = false;
+        if (more) cd = tr_step(accel, st, s0.z, e, c, x, inst_tab, meshes, verts, indices, inst, slot_refl, lmat DYN_PASS);
+        if (more && !cd.ok) continue;
+        if (g_open && (!more || cd.rng - g_r0 > x.min_sep)) {     // the open echo is complete
+            g_open = false;
+            bool take = g_sp >= x._p1 && (rmode == 1u ? !have : (rmode == 2u ? true : g_sp > s_p));   // first / last / strongest
+            if (take) { s_r = g_sr / g_sp; s_p = g_sp; s_n = g_bn; s_slot = g_bs; have = true; }
+            if (rmode == 1u && have) break;                        // first: found
+        }
+        if (!more) break;
+        if (!g_open) { g_open = true; g_r0 = cd.rng; g_sp = 0.0; g_sr = 0.0; g_best = -1.0; }
+        g_sp += cd.p; g_sr += cd.p * cd.rng;
+        if (cd.p > g_best) { g_best = cd.p; g_bn = cd.n; g_bs = int(cd.slot); }
+    }
+    uint o = e * c.n_beams + b;
+    float3 s_pt = origin + dir * s_r;
+    if (!have) { s_r = 0.0; s_p = 0.0; s_pt = 0.0; s_n = 0.0; s_slot = -1; }
+    out_dist[o] = s_r; out_intensity[o] = s_p; out_slot[o] = s_slot;
+    out_points[o * 3] = s_pt.x; out_points[o * 3 + 1] = s_pt.y; out_points[o * 3 + 2] = s_pt.z;
+    out_normal[o * 3] = s_n.x; out_normal[o * 3 + 1] = s_n.y; out_normal[o * 3 + 2] = s_n.z;
+    out_nret[o] = have ? 1 : 0;
+}
+#endif

@@ -223,3 +223,22 @@ def test_plain_kernels_without_transparency():
                 assert np.array_equal(out[k][f], out2[k][f]), (k, f)
         else:
             assert np.array_equal(out[k], out2[k]), k
+
+
+def test_streaming_kernel_matches_lidar_ext(setup):
+    """One sub-ray and one return run the streaming kernel (lidar_tr1, no candidate arrays): equal, bit for bit, to
+    the general lidar_ext over a fan of beams through panes, glass, the mirror and the walls, per return mode."""
+    m, d, rt = setup
+    A, E = np.meshgrid(np.linspace(-2.0, 2.0, 181), np.deg2rad(np.linspace(-20, 20, 9)))
+    az, el = A.ravel().astype(np.float32), E.ravel().astype(np.float32)
+    mats = {"glass": "clear_glass", "mirror": "mirror"}
+    for kw in (dict(), dict(return_mode="first"), dict(return_mode="last"), dict(lidar_materials=mats),
+               dict(lidar_materials=mats, return_mode="first", min_reflectance=0.02, min_reflectance_range=4.0)):
+        a = rt.make_lidar("lidar", az, el, name="a", **kw)
+        b = rt.make_lidar("lidar", az, el, name="b", **kw)
+        assert a.stream and b.stream
+        b.stream = False
+        o = rt.trace_host([d, d], [a, b])
+        assert (o["a"]["n_returns"] > 0).mean() > 0.5
+        for f in o["a"]:
+            assert np.array_equal(o["a"][f], o["b"][f]), (kw, f)
