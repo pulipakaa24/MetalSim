@@ -843,3 +843,28 @@ scripts/gpu_run.sh test_mpm check 15 -- .venv-newton152/bin/python -m pytest tes
 | L4 recordings (`runs/parity/isaaclab3_mpm*`, ~31 GB incl. tarballs) | not committed | on the L4 machine: copy `record_mpm.py`, `record_mpm_il3.py`, `scenes.py`, `newton_compat.py` to `~/parity3_scripts/mpm/`, run `isaaclab3/stage_mpm.sh`, `stage_mpm_floors.sh`, `stage_mpm_floors2.sh`, `stage_mpm_timing.sh` (Isaac Lab 3.0-EA install: `isaaclab3/`) |
 | kernel caches, L4 scale logs > 1 MB | not committed | rebuilt on first run / re-run `probes/scale_pour.py` on the L4 |
 | Franka panda model | MuJoCo Menagerie (not vendored) | `git clone https://github.com/google-deepmind/mujoco_menagerie upstream/mujoco_menagerie` or `PANDA_XML` |
+
+## 11. MPM in the main simulator (`.venv`, BatchSim)
+
+Design and research: `research_notes/MPM in main simulator/NOTE.md` (status: `STATUS.md` there). The main environment
+has Newton 1.7, whose own implicit MPM is a later algorithm than Isaac Lab 3.0-EA's, so MetalSim carries the 1.5.2
+fork's solver package as a generated, Apache-2.0 copy in `metalsim/physics/mpm/implicit_mpm/` (licence and the list of
+modifications: its `NOTICE.txt`, `THIRD_PARTY_NOTICES.md`). `metalsim.physics.mpm.solver.solver_class()` returns
+Newton's own `SolverImplicitMPM` on the 1.5.2 line (`.venv-newton152`) and the copy elsewhere
+(`METALSIM_MPM_SOLVER=newton|vendored` forces one); `newton_compat.install` patches both.
+
+### Re-vendoring when the fork pin moves
+
+The copy must always be the commit `scripts/setup_newton152.sh` pins. After a Newton fork change:
+
+1. Push the fork branch (`metalsim-1.5.2`) and move `PIN` in `scripts/setup_newton152.sh` (and the fallback patch
+   `patches/newton/metalsim-1.5.2-<sha>.diff`, as before).
+2. Set the same commit as `PIN` in `scripts/vendor_mpm152.py`, then regenerate:
+   `python scripts/vendor_mpm152.py upstream/newton-metalsim-1.5.2` (a checkout at the new pin; without an argument it
+   downloads the pinned commit's archive from GitHub). Never edit the generated files by hand.
+3. Update the commit in `THIRD_PARTY_NOTICES.md` (Newton section) and run `pytest tests/test_mpm_main.py`:
+   `test_vendored_pin_is_the_setup_pin` fails until both pins agree, `test_vendored_copy_regenerates_from_the_pin`
+   regenerates from the pinned commit and fails on any difference, `test_vendored_files_keep_the_licence_header`
+   checks every file still starts with Newton's SPDX header and the modification notice.
+4. If the fork's package now imports something new from outside `implicit_mpm`, extend `rewrite()` in the generator
+   (and the modification list in its `NOTICE_TXT`).
