@@ -1051,6 +1051,12 @@ seed 0, 1500 iterations, `rough_isaac` reward set, both trainer fixes):** return
 default's three seeds gave +16.4 / +22.6 / +19.1 at 6.0–6.1. One seed, so the 3–9 point difference from pyramidal is
 not yet separable from seed spread (the pyramidal seeds spanned 6 points); loop 25.0 K env-steps/s.
 
+**Re-check on main `ad97888e` (2026-10-13, 14-inch, same settings and seed; `docs/research/ppowarp_checkpoint_load_2026-10-13.md`):**
+rough +4.36 / 976 / level 3.56 at 500 and +7.55 / 985 / 5.86 at 1000 (reference +4.19 / 948 / 3.55 and +8.23 / 973 / 5.65);
+flat +18.64 / 996 at 500 (reference seeds +17.0 to +17.4). Both policies walk when replayed. The G1 rough checkpoints
+that seemed to have stopped walking that day had never been loaded into the rollout (a PPOWarp checkpoint-loading
+defect, now fixed); they walk on today's task.
+
 ## 1b. IsaacContrib-Franka-Pour (Isaac Lab 3.0-EA, granular MPM manipulation; 2026-10-12)
 
 Isaac Lab 3.0-EA's contrib task: a Franka grasps a 50 g cup holding 735 granular MPM particles (~140 g) and pours
