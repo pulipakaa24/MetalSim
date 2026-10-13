@@ -12,8 +12,25 @@ export PYTHONPATH=$C
 PY=${PY:-/Users/aditya/robosim/.venv/bin/python}
 SIM=${SIM:-/Users/aditya/robosim/runs/demo/anymal_sim}
 mkdir -p "$B/out"
-health() {
-  echo "[health] $1: utilisation $(/Users/aditya/robosim/scripts/gpu_util.sh)%, E-state processes: [$(ps -axo stat=,pid=,comm= | awk '$1 ~ /E/' | tr '\n' ';')]"
+case $STAGE in 1|3|slow|narrow|twolevel)   # these build > 6.3 M grains: never on a machine without the validated fix
+  if [ -z "$ALLOW_LARGE" ]; then
+    echo "[stage$STAGE] refused: builds more than 6.3 M grains; set ALLOW_LARGE=1 only where that is validated"; exit 5
+  fi ;;
+esac
+agx() {   # AGX accelerator utilisation (%) by name: agx Device|Renderer|Tiler
+  ioreg -r -d 1 -w 0 -c IOAccelerator | grep -o "\"$1 Utilization %\"=[0-9]*" | head -1 | sed 's/.*=//'
+}
+health() {   # healthy = device, renderer and tiler utilisation all < 10 % within 120 s (no orphaned GPU work), then the probe
+  local d r t i
+  for i in $(seq 1 24); do
+    d=$(agx Device); r=$(agx Renderer); t=$(agx Tiler)
+    if [ "${d:-100}" -lt 10 ] && [ "${r:-100}" -lt 10 ] && [ "${t:-100}" -lt 10 ]; then break; fi
+    /bin/sleep 5
+  done
+  echo "[health] $1: device $d% renderer $r% tiler $t% (after $((i * 5 - 5)) s), E-state processes: [$(ps -axo stat=,pid=,comm= | awk '$1 ~ /E/' | tr '\n' ';')]"
+  if ! { [ "${d:-100}" -lt 10 ] && [ "${r:-100}" -lt 10 ] && [ "${t:-100}" -lt 10 ]; }; then
+    echo "[health] NOT idle: GPU work without an owner?"; return 4
+  fi
   $PY "$C/scripts/particle_demo/gpu_probe.py"
 }
 run() {
@@ -37,6 +54,29 @@ case $STAGE in
 2) for c in "1 50000" "1 300000" "1 0" "4 50000" "4 300000" "4 0"; do set -- $c
      run trace_p$1_n$2 --timing $LOW --ground-planes $1 --max-particles $2; done ;;
 3) run full_p4 --width 1920 --height 1080 --passes 32 --spp 4 --ground-planes 4 ;;
+safe)   # <= 6.3 M grains only: tests, then two-level vs flat at 6.28 M grains with 4 planes (build, trace, images)
+   health "before tests" || { echo "[stage$STAGE] STOP: GPU not healthy"; exit 3; }
+   ( cd "$C" && /usr/bin/python3 "$C/scripts/particle_demo/watchdog.py" --timeout 600 --stall 120 --log "$B/stagesafe_tests.log" -- \
+       $PY -P -m pytest -q -rfEs -p no:cacheprovider -s "$C/tests/test_render_particles.py" )
+   trc=$?
+   grep -a "passed\|failed\|FAILED\|structures\|watchdog\]" "$B/stagesafe_tests.log" | sed "s/^/  [tests] /"
+   [ $trc -ne 0 ] && { health "after tests"; echo "[stage$STAGE] STOP: tests exit $trc"; exit $trc; }
+   for st in two_level flat; do
+     run ${st}_build_p4_6M --timing --no-trace $LOW --ground-planes 4 --max-particles 300000 --structure $st
+     run ${st}_trace_p4_6M --timing $LOW --ground-planes 4 --max-particles 300000 --structure $st
+     run ${st}_img_p4_6M --width 480 --height 270 --passes 4 --spp 4 --ground-planes 4 --max-particles 300000 \
+         --structure $st --save-hdr --out "$B/img_$st"
+   done
+   $PY - "$B" <<'PYEOF'
+import sys, numpy as np, imageio.v3 as iio
+B = sys.argv[1]
+a = np.load(f"{B}/img_flat/frame_0000_hdr.npy").astype(np.float32); b = np.load(f"{B}/img_two_level/frame_0000_hdr.npy").astype(np.float32)
+pa = iio.imread(f"{B}/img_flat/frame_0000.png").astype(int); pb = iio.imread(f"{B}/img_two_level/frame_0000.png").astype(int)
+print(f"[compare] flat vs two-level (4 planes, 6.28 M grains, 480x270, 64 spp, OIDN): hdr identical {np.array_equal(a, b)}, "
+      f"mean |diff| / mean {np.abs(a - b).mean() / max(a.mean(), 1e-9):.2e}, max |diff| {np.abs(a - b).max():.3e}; "
+      f"png pixels differing {(pa != pb).any(-1).mean() * 100:.2f} %, max 8-bit diff {np.abs(pa - pb).max()}")
+PYEOF
+   ;;
 twolevel)   # the two-level grain structure: tests, the stalled 4-plane build / a trace, flat vs two-level images, full frame
    health "before tests" || { echo "[stage$STAGE] STOP: probe failed"; exit 3; }
    ( cd "$C" && /usr/bin/python3 "$C/scripts/particle_demo/watchdog.py" --timeout 600 --stall 120 --log "$B/stagetwolevel_tests.log" -- \
