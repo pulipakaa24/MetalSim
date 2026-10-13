@@ -372,6 +372,8 @@ python3 scripts/gpu_lock.py status
 
 `gpu_run.sh` waits for the GPU, runs the command, and releases the GPU when the command exits for any
 reason (it also kills the command if the wrapper is killed). `MINUTES` is an estimate shown to others.
+The command runs in the caller's directory (since 2026-10-13; before, it ran in the repo root, so `python -m ...`
+from a worktree imported the main checkout's packages); the queue's own files stay under the repo root.
 Classes, granted in this order when the GPU frees up (first come, first served within a class):
 
 | class | for |
