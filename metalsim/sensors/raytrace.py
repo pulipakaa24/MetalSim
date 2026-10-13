@@ -968,7 +968,8 @@ class RayDepthCamera:
     * ``transparent_ids`` "surface" (default; "mujoco" an alias): the first surface with alpha > 0: MuJoCo's renderer
       depth and ``mj_ray`` (alpha exactly 0 is invisible), Isaac's depth on glass;
     * "behind": transparent geoms are invisible (Isaac RTX Real-Time's opacity cutout);
-    * "opaque": every geom, alpha 0 included (the previous behaviour);
+    * "opaque": every drawn geom stops the ray (the previous behaviour; geoms of alpha 0 are left out of the scene
+      tables, as MuJoCo's renderer does, so they are invisible in every mode);
     * ``alpha_threshold=t`` (with "surface"): Isaac's ``opacity_threshold`` rule, a transparent geom counts only when
       its alpha > t ("surface" is t = 0, "behind" t = 1).
 

@@ -69,6 +69,50 @@ class AreaLights:
             lock[i] |= 1
         return lights, lock
 
+    def tail_bytes(self, n_envs: int) -> int:
+        """Room the emitters' axes take after the light records (ModelSync(light_tail_bytes=...))."""
+        return n_envs * max(self.m.nlight, 1) * 16
+
+    def attach(self, ctx, light_buf, n_envs: int):
+        """Write the initial axes after the (n_envs, max(nlight, 1)) records of ``light_buf`` and prepare the per-frame
+        update (``encode`` / ``write_host``)."""
+        import mujoco as _mj
+        self.ctx, self.light_buf, self.n = ctx, light_buf, n_envs
+        nl = max(self.m.nlight, 1)
+        self.off = n_envs * nl * 80
+        d0 = _mj.MjData(self.m); _mj.mj_kinematics(self.m, d0)
+        ax0 = np.repeat(self.axes_host([d0]), n_envs, axis=0)
+        ctx.write_buffer(light_buf, ax0, offset=self.off)
+        xb = np.zeros((nl, 4), np.float32); xb[:, :3] = self.x_body
+        self.xb_buf = ctx.buffer(xb.nbytes, xb, "area_xbody")
+        self.body_buf = ctx.buffer(max(4 * nl, 16), self.body.astype(np.int32), "area_body")
+        self.pipe = ctx.compute_pipeline(ctx.library("area_lights"), "area_axes")
+
+    def encode(self, cb, sim):
+        """The emitters' world X axes per env from the sim's body orientations (``sim.d.xmat``); a sim without it keeps
+        the initial axes."""
+        import Metal
+        from metalsim.interop import warp_metal as wm
+        xm = getattr(getattr(sim, "d", None), "xmat", None)
+        if xm is None:
+            return
+        v = wm.buffer_of(xm)
+        nl = max(self.m.nlight, 1)
+        worlds = int(xm.shape[0]) if xm.ndim > 1 else 1
+        k = np.array([self.n, nl, self.m.nbody, 1 if worlds > 1 else 0], np.uint32)
+        ce = cb.computeCommandEncoder()
+        ce.setComputePipelineState_(self.pipe)
+        ce.setBuffer_offset_atIndex_(v.buffer, v.offset, 0)
+        ce.setBuffer_offset_atIndex_(self.body_buf, 0, 1)
+        ce.setBuffer_offset_atIndex_(self.xb_buf, 0, 2)
+        ce.setBuffer_offset_atIndex_(self.light_buf, self.off, 3)
+        ce.setBytes_length_atIndex_(k.tobytes(), k.nbytes, 4)
+        ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n * nl, 1, 1), Metal.MTLSize(64, 1, 1))
+        ce.endEncoding()
+
+    def write_host(self, datas):
+        self.ctx.write_buffer(self.light_buf, self.axes_host(datas), offset=self.off)
+
     def axes_host(self, datas) -> np.ndarray:
         """(n_envs, max(nlight, 1), 4) world X axes from MjData xmat."""
         nl = max(self.m.nlight, 1)

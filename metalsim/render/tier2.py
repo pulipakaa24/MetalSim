@@ -195,22 +195,13 @@ class Tier2Renderer:
         self.area = AreaLights(model) if (area_lights and model.nlight) else None
         if self.area is not None and not self.area:
             self.area = None
-        nl_ = max(model.nlight, 1)
         if self.area is not None:
             lights, lock = self.area.apply(lights, lock)
         from metalsim.render.model_sync import ModelSync, unit_rgba
         self.sync = ModelSync(c, model, n_envs, t, self.color_buf, lights, lock, opaque=not transparency,
-                              light_tail_bytes=n_envs * nl_ * 16 if self.area is not None else 0)
-        if self.area is not None:     # the emitters' world X axes after the light records (static bodies: written once)
-            self._area_off = n_envs * nl_ * 80
-            ax0 = np.zeros((n_envs, nl_, 4), np.float32)
-            d0 = mujoco.MjData(model); mujoco.mj_kinematics(model, d0)
-            ax0[:] = self.area.axes_host([d0])[0]
-            c.write_buffer(self.sync.lights, ax0, offset=self._area_off)
-            xb = np.zeros((nl_, 4), np.float32); xb[:, :3] = self.area.x_body
-            self._area_xb = c.buffer(xb.nbytes, xb, "pt_area_xbody")
-            self._area_body = c.buffer(max(4 * nl_, 16), self.area.body.astype(np.int32), "pt_area_body")
-            self._area_pipe = c.compute_pipeline(c.library("area_lights"), "area_axes")
+                              light_tail_bytes=self.area.tail_bytes(n_envs) if self.area is not None else 0)
+        if self.area is not None:     # the emitters' world X axes after the light records
+            self.area.attach(c, self.sync.lights, n_envs)
         self.light_buf = self.sync.lights                    # (n_envs, max(nlight, 1)) records
         self.params_buf = c.buffer(params.nbytes, params, "pt_params")
         self.mat_model = material_model
@@ -488,24 +479,8 @@ class Tier2Renderer:
         return val
 
     def _encode_area_axes(self, cb, sim):
-        """Area lights: the emitters' world X axes per env from the sim's body orientations (``xmat``); a sim without
-        ``xmat`` keeps the initial axes."""
-        xm = getattr(getattr(sim, "d", None), "xmat", None)
-        if self.area is None or xm is None:
-            return
-        v = wm.buffer_of(xm)
-        nl = max(self.m.nlight, 1)
-        worlds = int(xm.shape[0]) if xm.ndim > 1 else 1
-        k = np.array([self.n, nl, self.m.nbody, 1 if worlds > 1 else 0], np.uint32)
-        ce = cb.computeCommandEncoder()
-        ce.setComputePipelineState_(self._area_pipe)
-        ce.setBuffer_offset_atIndex_(v.buffer, v.offset, 0)
-        ce.setBuffer_offset_atIndex_(self._area_body, 0, 1)
-        ce.setBuffer_offset_atIndex_(self._area_xb, 0, 2)
-        ce.setBuffer_offset_atIndex_(self.sync.lights, self._area_off, 3)
-        ce.setBytes_length_atIndex_(k.tobytes(), k.nbytes, 4)
-        ce.dispatchThreads_threadsPerThreadgroup_(Metal.MTLSize(self.n * nl, 1, 1), Metal.MTLSize(64, 1, 1))
-        ce.endEncoding()
+        if self.area is not None:
+            self.area.encode(cb, sim)
 
     def after(self, value):
         """Order torch's subsequent kernels after the render that signalled ``value``."""
@@ -638,7 +613,7 @@ class Tier2Renderer:
             c.write_buffer(self._host_light_xpos, np.stack([d.light_xpos for d in datas]).astype(np.float32).reshape(n, nl, 3))
             c.write_buffer(self._host_light_xdir, np.stack([d.light_xdir for d in datas]).astype(np.float32).reshape(n, nl, 3))
         if self.area is not None:
-            c.write_buffer(self.sync.lights, self.area.axes_host(datas), offset=self._area_off)
+            self.area.write_host(datas)
         cb = c.command_buffer()
         self.sync.encode(cb, None)
         self._encode_scene(cb, rt._host_geom_xpos, 0, rt._host_geom_xmat, 0)

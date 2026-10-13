@@ -1128,6 +1128,9 @@ struct MeshInfoT { uint i_off, i_count, _p0, _p1; };
 struct InstanceDescT { packed_float3 col0, col1, col2, col3; uint options, mask, if_table_offset, as_index; };
 
 #include "dyn_bvh.h"
+#ifdef AREA_LIGHTS
+#include "area_light.h"
+#endif
 
 inline float3 rt_env_offset(uint e, constant RTOffset& ro) {
     return grid_offset(e, ro.grid);
@@ -1207,6 +1210,9 @@ fragment FSOut geom_fs_rt(
 
     // direct lighting with ray-traced shadows (soft: cone of half-angle ~0.7 deg for the caster)
     float3 direct = float3(0.0);
+#ifdef AREA_LIGHTS
+    device const float4* area_x = (device const float4*)(lights + c.n_envs * c.n_light);   // emitters' X axes
+#endif
     uint nl = uint(e.misc.y);
     int caster = int(e.misc.x);
     auto shadow_term = [&](float3 L, bool is_caster) -> float {
@@ -1227,6 +1233,25 @@ fragment FSOut geom_fs_rt(
         device const float* ld = light_xdir + (in.env * c.n_light + i) * 3;
         float3 Lpos = float3(lp[0], lp[1], lp[2]);
         float3 Ldir = normalize(float3(ld[0], ld[1], ld[2]));
+#ifdef AREA_LIGHTS
+        if (l.specular.w > 0.5) {   // USD area light (area_light.h): ns samples on the emitter, one shadow ray each;
+            // the unshadowed irradiance is the closed form where one exists (ratio estimator: noise only in penumbrae)
+            float3 Xw = area_x[in.env * c.n_light + i].xyz;
+            float Eu = area_light_irradiance(l, Lpos, Ldir, Xw, in.world_pos, N);
+            float3 acc = float3(0.0); float gsum = 0.0;
+            for (uint s = 0; s < ns; ++s) {
+                float u = (float(s) + hash_f(seed + s * 7919u + i * 131u)) / float(ns);     // stratified in u
+                float v = hash_f(seed + s * 104729u + 17u + i * 131u);
+                AreaSample as = area_light_sample(l, Lpos, Ldir, Xw, in.world_pos, N, u, v);
+                if (as.g <= 0.0) continue;
+                gsum += as.g;
+                bool vis = l.kind.y < 0.5 || !(reach > 0.0 && occluded(accel, P, as.L, min(as.tmax, reach), in.env, ro.grid DYN_PASS));
+                if (vis) acc += shade_light(N, V, as.L, l.diffuse.xyz * (as.g / max(dot(N, as.L), 1e-4)), base, f0, metallic, a2, NdotV);
+            }
+            direct += (Eu >= 0.0) ? (gsum > 0.0 ? acc * (Eu / gsum) : float3(0.0)) : acc / float(ns);
+            continue;
+        }
+#endif
         float3 L; float att = 1.0;
         if (l.kind.x == 0.0) { L = -Ldir; }
         else {
