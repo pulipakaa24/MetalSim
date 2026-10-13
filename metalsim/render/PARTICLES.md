@@ -46,9 +46,36 @@ Outputs: grains appear in RGB, depth and normals like any geometry; segmentation
 |---|---|---|
 | grain meshes | `particles.grain_meshes` | icospheres (80 triangles) with smooth random lobes and axis ratios, rescaled to unit volume-equivalent radius; one primitive acceleration structure each |
 | grain instances | `shaders/particles.metal` `grain_instances` | one thread per grain: particle position + hashed offset in the particle cube, hashed rotation (Shoemake), scale and mesh, env offset; hashes of (particle index or id, grain index, seed) only, so a grain keeps its shape, place and colour frame to frame and two runs are bitwise equal; also writes each grain's identity key (the colour hash both tiers read) |
-| structure | `particles.InstanceStructure` | scene refit (`RayTracer._encode_refit`) into the first descriptors, grains after them, one instance-structure build per frame, all in the frame's command buffer |
+| structure | `particles.InstanceStructure` | default `"two_level"`: the grains are their own instance structures (chunks of at most 2^24 grains, UserID descriptors with user id 0x80000000 \| grain index), each chunk one identity instance of the scene's top-level structure; `"flat"`: scene instances then one top-level instance per grain. Rebuilt every frame in the frame's command buffer |
 | path tracer | `shaders/pathtrace.metal` (`FLAG_GRAINS`) | instance ids >= the first grain instance are grains: mesh data from the grain buffers, material from the palette by grain index; rays leave a grain with a ray offset of 1 % of the grain radius (scene surfaces keep 1 mm, so scenes without particles render bit for bit as before) |
 | tier 0 | `shaders/particles_tier0.metal` (compiled appended to `tier0.metal`), `particles.GrainRaster` | the same instances, one instanced draw in the shadow and geometry passes (all grain meshes share one topology; the vertex shader picks each grain's mesh), tier 0's lighting and the same palette pick |
+
+## Acceleration-structure layout and Metal's limits
+
+Metal supports 2^24 instances, 2^28 primitives and 2^24 geometries per acceleration structure; past that a structure
+needs `MTLAccelerationStructureUsageExtendedLimits` (up to 2^30) and the `extended_limits` tag on every intersector
+that traverses it (`metalsim/render/as_limits.py`). Before 2026-10-13 the grains were one flat top-level structure
+of 25.1 M instances built without the flag, outside the supported range. On macOS 26, with the demo's four ground
+planes, that build never finished: still at 100 % utilisation after 900 s (`runs/stall_bisect/`), the same build with
+one plane took 1 s. The GPU work outlived the killed process, and the Mac rebooted after each such run. The 14-inch
+(macOS 27) built and rendered it, so it rendered by luck.
+
+Now:
+- `as_limits.check` refuses any structure past the standard limits unless the caller has an extended-limits path,
+  and past 2^30 always; `RayTracer` checks every mesh and its instance structure, `particles.py` its grain meshes
+  and grain structures.
+- Two-level (default) splits the grains into chunks of at most 2^24, so every structure stays within the standard
+  limits whatever the grain count. Metal reports only the innermost instance of a nested hit (`instance_count` stays 1
+  and `instance_id[0]` / `user_instance_id[0]` are the innermost instance's: `scripts/particle_demo/multilevel_probe2.py`
+  on macOS 26), so grains are told apart by their UserID descriptors' user id (0x80000000 | grain index; the scene's
+  Default descriptors read 0).
+- Flat past 2^24 instances is built with extended limits and traced with the `extended_limits` intersector.
+
+Measured on this Mac (macOS 26), 4 ground planes, 6.28 M grains: two-level build 121 ms (rebuild 77 ms) vs flat 117 ms
+(79 ms); build + one 256x144 trace pass 82 ms vs 84 ms. A 480x270, 64 spp, OIDN frame differs from flat in 5.7 % of
+pixels by at most 11/255 (mean relative HDR difference 3.5e-4: path-tracer and denoiser noise from ulp-level
+differences in the nested transforms). Not yet measured: 25 M grains with the two-level layout (to be done on the
+14-inch; this Mac refuses builds past 6.3 M grains in `stall_bisect.sh` without `ALLOW_LARGE=1`).
 
 ## Validation (`tests/test_render_particles.py`)
 
@@ -60,6 +87,8 @@ Outputs: grains appear in RGB, depth and normals like any geometry; segmentation
 | instance scaling | instance count = scene + envs x P x K; structure size linear in grains |
 | batched envs | per-env particles, NaN-culled env empty, identical envs identical |
 | determinism | two renderers, same seed: bitwise equal images |
+| two-level vs flat | the same colour (1e-4), depth and segmentation with one grain structure and with 11 chunks |
+| structure limits | extended-limits usage above 2^24 instances and not at it; refusals without an extended path / past 2^30 (CPU) |
 | stable ids | a compacted particle set with ids renders as the full set with the dropped particles culled |
 | GPU input | Warp array input renders the same image as numpy |
 | tier 0 | grain segmentation agrees with tier 2 (IoU > 0.9), palette colour, per-env |
