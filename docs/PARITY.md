@@ -1186,6 +1186,30 @@ deterministically, so trajectories are not bitwise), so the memory opt-ins hold 
 also make the rollout 26 % faster here. JSON and logs: `runs/franka_pour/eval/`. The policy succeeds from 82 % of the
 start states where the cup is already grasped and from 15 % of the reaching / approach states; 0.48 overall.
 
+**Why 0.48 here and 0.62 in training's log.** The two numbers measure different populations. Diagnostic runs, same
+checkpoint and harness, 2,048 envs, success rate (`runs/franka_pour/eval/diag*/`):
+
+| run | one episode per env | all finished episodes in the 360-step window | Isaac's `Episode_Termination/success` (mean over steps) |
+|---|---|---|---|
+| deterministic, uniform rows, current pins (this Mac; two runs) | 0.457 / 0.477 | 0.606 | 0.399 |
+| stochastic (training's sampled actions), uniform rows | 0.453 | 0.596 | 0.398 |
+| stochastic, rows from the training curriculum restored from the checkpoint, continuous rollout | 0.599 | 0.715 | 0.514 (from a cold start) |
+| deterministic, uniform rows, **training pins** (Warp `152808b7`, Newton `35791a07`; 14-inch) | 0.479 | 0.616 | 0.409 |
+| deterministic, uniform rows, current pins (14-inch, same machine) | 0.474 | 0.616 | 0.405 |
+
+* Action noise does nothing measurable: deterministic 0.457, stochastic 0.453.
+* The reset distribution accounts for +0.15. After 300 iterations the curriculum rarely draws rows the policy never
+  solves (their weight is the 1e-4 floor), so 73 % of its episodes start grasped against 48 % of uniform rows; on the
+  curriculum's rows the same policy succeeds in 0.60 of first episodes.
+* Counting finished episodes adds +0.1 to +0.15: successes end early and time-outs take 360 steps, so per unit of
+  rollout time more successful episodes finish (training's `success` column, 0.617 over iterations 290-299, is this
+  count on curriculum rows).
+* The library versions do not matter: on the 14-inch the training pins give 0.479 and the current pins 0.474 (the
+  standard error is 0.011).
+
+The deterministic uniform-row evaluation (0.48) is the fixed-distribution success rate of this policy; training's
+logged 0.62 is the curriculum- and duration-weighted rate. Both are reproduced by this harness.
+
 ## 2. Platform capabilities (the workstreams), with the tests behind them
 
 | capability | Isaac | ours | test (assertion) | result | verdict |
