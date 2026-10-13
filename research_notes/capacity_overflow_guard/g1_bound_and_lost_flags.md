@@ -91,10 +91,16 @@ iteration), and the run reports `overflow_flags()` (latched, so every world sinc
 | same, levels frozen (≈ 410 envs on each of the 10 levels for 3,600 control steps), checkpoint's own training settings | 4096, 150 rollouts | 14-inch, macOS 27 | none | – |
 
 Logs: `runs/fixfail/train/real_*.log` (+ `.anomalies.jsonl`, every log point's flags), `runs/fixfail/train_real.log`,
-`runs/fixfail/train/g1_rough_policy*.log`, `runs/fixfail/train14/` (14-inch). Caveat: the available rough checkpoints
-(2026-09-25) no longer walk on today's task (episodes ≈ 40 control steps, falls), so the all-levels runs cover
-~370 K falls on every terrain level (torso, hands and knees on stairs and boxes), not sustained walking on the
-hardest levels. No default capacity needed changing.
+`runs/fixfail/train/g1_rough_policy*.log`, `runs/fixfail/train14/` (14-inch). Those two policy rows did NOT run the
+checkpoint: PPOWarp's parameters live in Warp buffers written through PyTorch's MPS queue, and nothing ordered the
+`load_state_dict` copy before the Warp rollout, so the rollouts ran the random initial weights (episodes ≈ 40 control
+steps, like an untrained policy; the Warp weights still differed from the checkpoint after the run). They cover
+~370 K falls on every terrain level, not walking. Fixed 2026-10-13 (PPOWarp publishes loaded weights,
+`tests/test_ppo_warp_rollout.py::test_loaded_weights_reach_the_warp_policy`). Re-run with the fix (16-inch, 4096 envs
+over levels 0–9, boxes_local, curriculum on, 60 rollouts, the 2026-09-26 elliptic-default checkpoint
+`g1_rough_ellip_default_s0.pt`; `runs/g1regress/harness_rough_policy_ellip_fixed.log`): 4,044 of 4,096 first episodes
+run to the 1,000-step time-out, mean level 4.50 → 4.66, no capacity flag. The 2026-09-25 checkpoints also walk on
+today's task once loaded (`runs/g1regress/`). No default capacity needed changing.
 
 Throughput (16-inch only). Same process, latch hook attached / detached, interleaved, 5 repeats
 (`scripts/diagnostics/overflow_latch_cost_tasks.py`, `runs/fixfail/latch_cost_tasks.log`; the latch is the only
