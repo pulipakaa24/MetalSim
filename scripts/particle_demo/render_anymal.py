@@ -45,6 +45,7 @@ ap.add_argument("--skip-existing", action="store_true")
 ap.add_argument("--ground-planes", type=int, default=4, choices=(1, 4),
                 help="4: planes around the robot's path (the demo); 1: one plane under everything (diagnostics)")
 ap.add_argument("--max-particles", type=int, default=0, help="diagnostics: keep every n-th particle so at most this many remain")
+ap.add_argument("--no-trace", action="store_true", help="with --timing: the structure build only, no trace pass")
 ap.add_argument("--timing", action="store_true",
                 help="diagnostics: per frame, time the instance-structure build (a pass-free render) and one trace pass "
                      "separately; no denoiser, no image")
@@ -324,6 +325,12 @@ for k in rng_frames:
         t_build = time.time() - t0
         print(f"[timing] {len(P)} particles, {r.grains.n_grains} grains: upload + structure build {t_build * 1e3:.0f} ms "
               f"(structure {r._ias.as_bytes / 2**20:.0f} MiB)", flush=True)
+        t0 = time.time()
+        r.render_host([data], passes=0, cam_pos=eye[None], cam_quat=q[None])
+        print(f"[timing] rebuild (structure allocated): {(time.time() - t0) * 1e3:.0f} ms", flush=True)
+        if a.no_trace:
+            continue
+        print(f"[timing] tracing one pass of {a.spp} spp at {a.width}x{a.height} ...", flush=True)
         t0 = time.time()
         r.render_host([data], passes=1, cam_pos=eye[None], cam_quat=q[None])
         print(f"[timing] build + one pass of {a.spp} spp at {a.width}x{a.height}: {(time.time() - t0) * 1e3:.0f} ms", flush=True)
