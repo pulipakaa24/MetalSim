@@ -241,7 +241,10 @@ mpm.attach_renderer(renderer) # grains drawn straight from the solver's particle
 MuJoCo geoms (box, sphere, capsule, cylinder, plane, mesh, ellipsoid) are the colliders; `mpm.set_colliders(bodies=...)`
 limits the coupled bodies, `MPMConfig(proxy_mass="effective" | "body" | "kinematic", mode="staggered" | "lagged")`
 selects Isaac's exchange variant, `mpm.wrenches()` returns the sand wrench per coupled body, `mpm.reset(mask)` resets
-worlds. Tests: `scripts/gpu_run.sh test_mpm_main check 60 -- .venv/bin/python -m pytest tests/test_mpm_main.py`.
+worlds. The material is bitwise repeatable run to run; for the robot side to repeat as well (contacts), build the
+`BatchSim` with `BatchSimOptions(deterministic=True)` (MuJoCo Warp's kernels in Warp's RUN_TO_RUN mode; off by
+default, process-wide once on). Tests: `scripts/gpu_run.sh test_mpm_main check 60 -- .venv/bin/python -m pytest
+tests/test_mpm_main.py`.
 
 ### Rendering particles (MPM sand)
 

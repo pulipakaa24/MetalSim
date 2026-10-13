@@ -33,7 +33,9 @@ def build(a):
     from metalsim.physics.mpm.coupled import SAND, GridEmitter, MPMConfig, MPMCoupling
 
     model = mujoco.MjModel.from_xml_string(XML.format(dt=1.0 / 120.0 / 3))
-    sim = BatchSim(model, a.worlds, options=BatchSimOptions(substeps=3))
+    sim = BatchSim(model, a.worlds, options=BatchSimOptions(substeps=3, deterministic=bool(a.deterministic)))
+    if a.rigid_only:
+        return sim, None
     mpm = MPMCoupling(sim, MPMConfig(voxel_size=a.voxel, max_iterations=a.iterations, solver=a.solver,
                                      max_active_cell_count=a.cells_per_world * a.worlds,
                                      capture=bool(a.capture)))
@@ -45,16 +47,27 @@ def build(a):
 def run_hashes(a):
     sim, mpm = build(a)
     out = []
-    for _ in range(a.steps):
-        mpm.step()
+
+    def hx(*arrs):
         h = hashlib.sha256()
-        for arr in (sim.d.qpos, sim.d.qvel, mpm.coupling_f, mpm.particle_q, mpm.particle_qd):
+        for arr in arrs:
             h.update(arr.numpy().tobytes())
-        out.append(h.hexdigest()[:16])
-    mpm.check_status()
+        return h.hexdigest()[:16]
+
+    for _ in range(a.steps):
+        if mpm is None:
+            sim.step()
+            out.append({"rigid": hx(sim.d.qpos, sim.d.qvel)})
+        else:
+            mpm.step()
+            out.append({"rigid": hx(sim.d.qpos, sim.d.qvel), "wrench": hx(mpm.coupling_f),
+                        "particles": hx(mpm.particle_q, mpm.particle_qd)})
     z = sim.d.xpos.numpy()[:, 1, 2]
-    return out, {"particles_per_world": mpm.particles_per_world, "box_z_min": float(z.min()),
-                 "box_z_max": float(z.max()), "finite": bool(np.isfinite(mpm.particle_q.numpy()).all())}
+    info = {"box_z_min": float(z.min()), "box_z_max": float(z.max()), "finite": True}
+    if mpm is not None:
+        mpm.check_status()
+        info.update(particles_per_world=mpm.particles_per_world, finite=bool(np.isfinite(mpm.particle_q.numpy()).all()))
+    return out, info
 
 
 def run_time(a):
@@ -85,13 +98,16 @@ def main():
     ap.add_argument("--capture", type=int, default=1)
     ap.add_argument("--cells-per-world", type=int, default=512, help="sparse-grid cell reservation per world")
     ap.add_argument("--time", action="store_true")
+    ap.add_argument("--deterministic", type=int, default=0, help="BatchSimOptions(deterministic=...)")
+    ap.add_argument("--rigid-only", action="store_true", help="the box on the floor without sand (BatchSim only)")
     ap.add_argument("--warmup", type=int, default=10)
     ap.add_argument("--json")
     a = ap.parse_args()
     import warp as wp
 
     wp.config.quiet = True
-    res = {"worlds": a.worlds, "solver": a.solver, "steps": a.steps, "capture": a.capture}
+    res = {"worlds": a.worlds, "solver": a.solver, "steps": a.steps, "capture": a.capture,
+           "deterministic": a.deterministic, "rigid_only": a.rigid_only}
     with wp.ScopedDevice("metal:0"):
         if a.time:
             res.update(run_time(a))
@@ -100,6 +116,8 @@ def main():
             h0 = runs[0][0]
             res["first_differing_step"] = [next((i for i in range(a.steps) if h[i] != h0[i]), None)
                                            for h, _ in runs[1:]]
+            res["first_differing_by_part"] = [{k: next((i for i in range(a.steps) if h[i][k] != h0[i][k]), None)
+                                               for k in h0[0]} for h, _ in runs[1:]]
             res["repeatable"] = all(d is None for d in res["first_differing_step"])
             res.update(runs[0][1])
     print(json.dumps(res))
