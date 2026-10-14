@@ -11,6 +11,8 @@ the host (``.cpu()``, a synchronization, because ``MPMCoupling.reset`` took a ho
 no-ops), then the observation. Both see the same mask sequence; per-step hashes of the robot state, the sand wrench and
 the particles must agree bitwise (``bitwise_equal``). Timing: wall time of the whole loop over ``--steps`` policy steps
 (one synchronization at the end), interleaved ``--rounds`` times, A then B; run as a timing job on the 16-inch only.
+Every run is its own process (``--single``): a 1,024-world coupled scene with its captured graphs holds about 10 GB,
+and the scenes of earlier runs in one process were not all released (batch_07 ran out of memory on the eighth).
 Scene: scale_coupled.py's box dropped on a sand bed.
 """
 from __future__ import annotations
@@ -125,21 +127,46 @@ def main():
     ap.add_argument("--cells-per-world", type=int, default=512)
     ap.add_argument("--hash-steps", type=int, default=60, help="steps of the bitwise A/B (hashing synchronizes)")
     ap.add_argument("--json")
+    ap.add_argument("--single", choices=("A", "B"), help="internal: one run in this process")
+    ap.add_argument("--hash", type=int, default=0, help="internal: with --single, hash every step")
     a = ap.parse_args()
     import warp as wp
 
     wp.config.quiet = True
+    if a.single:
+        with wp.ScopedDevice("metal:0"):
+            if a.hash:
+                a = argparse.Namespace(**{**vars(a), "steps": a.hash_steps, "warmup": 0})
+            r, hashes = run(a, a.single, bool(a.hash))
+        r["hashes"] = hashes
+        json.dump(r, open(a.json, "w"))
+        return
+    import subprocess
+    import tempfile
+
+    def child(mode, hashes):
+        with tempfile.TemporaryDirectory() as d:
+            out = f"{d}/r.json"
+            argv = [sys.executable, "-P", __file__, "--single", mode, "--hash", str(int(hashes)), "--json", out]
+            for k in ("worlds", "steps", "warmup", "fraction", "solver", "voxel", "iterations", "cells_per_world",
+                      "hash_steps"):
+                argv += [f"--{k.replace('_', '-')}", str(getattr(a, k))]
+            p = subprocess.run(argv, capture_output=True, text=True)
+            sys.stdout.write(p.stdout[-2000:])
+            sys.stderr.write(p.stderr[-4000:])
+            if p.returncode != 0:
+                raise RuntimeError(f"run {mode} (hashes={hashes}) failed with exit code {p.returncode}")
+            return json.load(open(out))
+
     res = {"worlds": a.worlds, "fraction": a.fraction, "steps": a.steps, "solver": a.solver}
-    with wp.ScopedDevice("metal:0"):
-        hb = argparse.Namespace(**{**vars(a), "steps": a.hash_steps, "warmup": 0})
-        ha = run(hb, "A", True)[1]
-        hb_ = run(hb, "B", True)[1]
-        res["bitwise_equal"] = ha == hb_
+    if True:
+        ha, hb_ = child("A", True)["hashes"], child("B", True)["hashes"]
+        res["bitwise_equal"] = ha == hb_ and len(ha) == a.hash_steps
         res["first_differing_step"] = next((i for i in range(len(ha)) if ha[i] != hb_[i]), None)
         timings = {"A": [], "B": []}
         for _ in range(a.rounds):
             for mode in ("A", "B"):
-                r, _ = run(a, mode, False)
+                r = child(mode, False)
                 timings[mode].append(r["ms_per_policy_step"])
                 res["resets_per_run"] = r["resets"]
         for mode, v in timings.items():

@@ -35,6 +35,7 @@ mpm.launch_step()`` (after one eager ``mpm.step()``) together with the policy's 
 from __future__ import annotations
 
 from dataclasses import dataclass, field, fields
+from typing import Any
 
 import mujoco
 import numpy as np
@@ -251,6 +252,19 @@ def _zero_masked_wrench(world_mask: wp.array(dtype=wp.bool), nb: int, f: wp.arra
     i = wp.tid()
     if world_mask[i // nb]:
         f[i] = wp.spatial_vector()
+
+
+@wp.kernel(module="unique")
+def _zero_if_world0(world_mask: wp.array(dtype=wp.bool), values: wp.array(dtype=Any)):
+    """One world: clear a grid-backed warm start when the world is selected (see MPMCoupling._solver_reset)."""
+    i = wp.tid()
+    if world_mask[0]:
+        values[i] = values.dtype(0.0)
+
+
+wp.overload(_zero_if_world0, {"values": wp.array(dtype=wp.vec3)})
+wp.overload(_zero_if_world0, {"values": wp.array(dtype=wp.types.vector(length=6, dtype=wp.float32))})
+wp.overload(_zero_if_world0, {"values": wp.array(dtype=wp.float32)})
 
 
 @wp.kernel
@@ -576,8 +590,6 @@ class MPMCoupling:
         return self.coupling_f.numpy().reshape(self.sim.n, self.nb, 6)
 
     def _launch_reset(self, from_sim_mask: bool) -> None:
-        import newton
-
         n = self.sim.n
         wm = self._reset_mask
         if from_sim_mask:
@@ -588,8 +600,44 @@ class MPMCoupling:
         wp.launch(_zero_masked_wrench, dim=n * self.nb, inputs=[wm, self.nb], outputs=[self.coupling_f])
         self._end_kinematics()
         self._sync(write_q=True, write_qd=True)
-        self.solver.reset(self.state, world_mask=wm,
-                          flags=int(newton.StateFlags.PARTICLE_Q) | int(newton.StateFlags.PARTICLE_QD))
+        self._solver_reset(wm)
+
+    def _solver_reset(self, wm: wp.array) -> None:
+        """``SolverImplicitMPM.reset`` of the worlds selected by the device mask (particle history, warm starts,
+        sparse-grid status, previous collider poses). With one world Newton 1.5.2's solver keeps a shared grid
+        partition (``separate_worlds`` needs two worlds), and its masked reset refuses grid-backed warm starts; the
+        same steps are then launched here with the mask read on the device (bitwise the solver's full reset when the
+        world is selected, nothing when it is not)."""
+        import newton
+
+        flags = int(newton.StateFlags.PARTICLE_Q) | int(newton.StateFlags.PARTICLE_QD)
+        sv, st = self.solver, self.state
+        if self.sim.n > 1:
+            sv.reset(st, world_mask=wm, flags=flags)
+            return
+        import warp.fem as fem
+
+        from metalsim.physics.mpm.implicit_mpm import implicit_mpm_solver_kernels as K
+        from metalsim.physics.mpm.implicit_mpm import solver_implicit_mpm as S
+
+        sv._validate_reset_inputs(st)
+        if sv._grid_status is not None:
+            wp.launch(S._clear_sparse_grid_rebuild_status_masked, dim=1,
+                      inputs=[wm, sv._grid_status, sv._grid_accumulated_status])
+        for f in (sv._last_step_data.ws_impulse_field, sv._last_step_data.ws_stress_field):
+            if f is None or f.dof_values.shape[0] == 0:
+                continue
+            if isinstance(f.space.basis, fem.PointBasisSpace):
+                wp.launch(K.reset_mpm_point_warmstart, dim=f.dof_values.shape[0],
+                          inputs=[self.model.particle_world, wm, 1, f.dof_values])
+            else:
+                wp.launch(_zero_if_world0, dim=f.dof_values.shape[0], inputs=[wm, f.dof_values])
+        if self.model.particle_count > 0:
+            wp.launch(K.reset_mpm_particle_history, dim=self.model.particle_count,
+                      inputs=[self.model.particle_world, wm, 1, st.mpm.particle_elastic_strain, st.mpm.particle_transform,
+                              st.mpm.particle_qd_grad, st.mpm.particle_stress, st.mpm.particle_Jp])
+        sv._last_step_data.save_collider_current_position(st.body_q, body_world=self.model.body_world, world_mask=wm,
+                                                          world_count=1)
 
     def launch_reset(self, from_sim_mask: bool = False) -> None:
         """Launch the reset of the worlds selected by the device mask (no graph replay, no signal), for capture into a
