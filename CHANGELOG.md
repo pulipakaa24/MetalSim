@@ -4,6 +4,10 @@ What landed between 2026-09-22 and 2026-10-13, grouped by area. The September se
 commit order; the October sections, newest first, summarise each merged pull request with its main commits (`git log`
 for the full messages). Dates are the commit dates (month-day).
 
+## Demo tag demo-2026-10 (2026-10-14, `docs/DEMO.md`)
+
+- 10-14 `docs/DEMO.md`: every demo with its command (each run by the fresh-install check or the batch checks it names), the measured numbers from the shipped docs and the known limits; tag `demo-2026-10` on the main commit that carries it.
+
 ## Scenes: composition from a config file (2026-10-14, `docs/SCENES.md`)
 
 - 10-14 `metalsim.scene` (`cfg`, `compose`, `proxy`, `film`) and `python -m metalsim.run scene.yaml`: robot (MJCF / URDF / USD), movable objects with per-env reset randomization, cameras mounted on links (tier 0 / 1 / 2; rgb, depth, segmentation, normals), ray-traced lidar, ground / HDRI / lights, and a Gaussian-splat background behind a collision proxy (plane, mesh, InteriorGS floor plan or occupancy map); `--film` hands over to `metalsim.render.film`, `--viewer` opens MuJoCo's viewer. Field names follow Isaac Lab 3.0's InteractiveSceneCfg / ArticulationCfg / RigidObjectCfg / CameraCfg / RayCasterCfg. Examples `configs/scenes/`; tests `tests/test_compose.py`.
