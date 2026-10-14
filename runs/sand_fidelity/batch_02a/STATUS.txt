@@ -1,0 +1,33 @@
+CPU_CHECKS_2eec56a320 PASS 13:33:52 
+CODE_COMMIT_2eec56a320 PASS 13:33:52 65f3c7bc
+s_walled DONE 13:35:34 99 s
+s_ctrl_walled DONE 13:36:45 68 s
+s_ctrl_unwalled DONE 13:37:56 68 s
+s_kin ERR 13:38:23 rc=1 (see logs/s_kin.log)
+s_steel DONE 13:39:39 73 s
+s20a ERR 13:39:55 rc=1 (see logs/s20a.log)
+s20b ERR 13:40:41 rc=1 (see logs/s20b.log)
+l_slip DONE 13:41:37 53 s
+l_h15_dt120 DONE 13:41:58 18 s
+l_h15_dt240 DONE 13:42:24 23 s
+l_h15_dt480 DONE 13:43:00 33 s
+l_h15_dt960 DONE 13:44:01 58 s
+l_h05_dt120 DONE 13:44:22 18 s
+l_h05_dt240 DONE 13:44:48 23 s
+l_h05_dt480 DONE 13:45:24 33 s
+l_h05_dt960 DONE 13:46:25 58 s
+l_v01_dt240 DONE 13:47:11 43 s
+l_v01_dt960 DONE 13:49:18 124 s
+c1 FINDING 13:50:44 non-finite, localised in c1.json
+c2 DONE 13:52:46 119 s
+c3 DONE 13:54:47 118 s
+c4 DONE 13:59:15 265 s
+c5 FINDING 14:00:56 non-finite, localised in c5.json
+t1 FINDING 14:03:43 non-finite, localised in t1.json
+t2 FINDING 14:06:20 non-finite, localised in t2.json
+t3 DONE 14:09:21 179 s
+t3b DONE 14:10:33 69 s
+r250 DONE 14:11:34 58 s
+r1000 DONE 14:13:10 93 s
+GPU DONE 14:13:13 
+EVALUATE DONE 14:13:13 
