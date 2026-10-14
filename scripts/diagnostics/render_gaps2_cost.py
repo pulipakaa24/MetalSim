@@ -24,7 +24,7 @@ sys.path.insert(0, os.path.join(ROOT, "tests"))
 import mujoco  # noqa: E402
 import numpy as np  # noqa: E402
 
-MENAGERIE = os.environ.get("MENAGERIE", "/Users/aditya/robosim/upstream/mujoco_menagerie")
+MENAGERIE = os.environ.get("MENAGERIE", os.path.join(ROOT, "upstream", "mujoco_menagerie"))
 
 
 def frame_ms(r, sim, frames=10):

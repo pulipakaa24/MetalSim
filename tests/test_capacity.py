@@ -14,7 +14,11 @@ pytestmark = pytest.mark.skipif(not torch.backends.mps.is_available(), reason="n
 
 
 def _g1(n, contact_cfg=None, **opts):
+    import os
+
     from metalsim.learn import g1_velocity as g1v
+    if not os.path.exists(g1v.G1_USD):
+        pytest.skip("needs Isaac's g1_minimal.usd (scripts/fetch_isaac_assets.sh)")
     from metalsim.physics.batch import BatchSimOptions
     orig = g1v.BatchSimOptions
     g1v.BatchSimOptions = lambda **kw: orig(**{**kw, **opts})

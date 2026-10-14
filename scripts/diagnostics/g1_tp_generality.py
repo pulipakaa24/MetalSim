@@ -31,7 +31,7 @@ if KERNELS and os.environ.get("WP_METAL_PROFILE") != "1":
 
 sc = ffs.scenes()
 if SCENE == "go2":
-    men = os.path.join(ffs.ROOT, "upstream", "mujoco_menagerie")
+    men = os.environ.get("MENAGERIE", os.path.join(ffs.ROOT, "upstream", "mujoco_menagerie"))
     sc["go2"] = (lambda: mujoco.MjModel.from_xml_path(os.path.join(men, "unitree_go2", "scene.xml")), dict(substeps=10))
 factory, kw = sc[SCENE][0], dict(sc[SCENE][1])
 m = factory()

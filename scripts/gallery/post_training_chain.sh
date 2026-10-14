@@ -1,7 +1,7 @@
 #!/bin/bash
 # After the fixed-PPO training process exits: release its (old-style) lock, then queue the replay re-render
 # and the video re-render through the priority queue as render jobs.
-cd /Users/aditya/robosim
+cd "$(dirname "$0")/../.."   # repo root
 while pgrep -f "g1_velocity 4096 flat train 1000 runs/g1_flat_ppowarp_fixed.log" | grep -qv "$$"; do sleep 30; done
 rm -f runs/.gpu_lock; rmdir runs/.gpu_lock.d 2>/dev/null
 scripts/gpu_run.sh replay_rerender render 15 -- sh -c '.venv/bin/python -m metalsim.parity.record_g1 --isaac runs/parity/isaac/parity_out2/rt --out runs/parity/metalsim2 --physics_dt 0.0025 --frame_every 5 > runs/parity/replay2.log 2>&1'

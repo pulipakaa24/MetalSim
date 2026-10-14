@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: Copyright (c) 2025 The Newton Developers
 # SPDX-License-Identifier: Apache-2.0
-# Modified by MetalSim (Apache-2.0 section 4): vendored from pulipakaa24/newton @ 99843d09840f89ac16c82104ad66ae792e45eb91
+# Modified by MetalSim (Apache-2.0 section 4): vendored from pulipakaa24/newton @ addd10cbeb25e946b3a4c2bb1d4097acc7a98ca2
 # (newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py) by scripts/vendor_mpm152.py; the only change is that relative imports leaving the package
 # (``from ...x import`` / ``from ..x import``) are rewritten to absolute ``newton._src`` imports. Do not edit:
 # change the fork, move the pin, and regenerate (metalsim/physics/mpm/MPM.md, section 11).
@@ -1232,6 +1232,14 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
         # there the wrenches are summed in a fixed order instead (_harvest_proxy_wrenches_ordered).
         self._ordered_proxy_harvest = bool(getattr(model.device, "is_metal", False))
         self._proxy_harvest_partial = None
+        # Metal: compact the proxy-body collider nodes before the ordered harvest (NEWTON_METAL_HARVEST_COMPACT=0: every
+        # body scans its whole world range, as before)
+        import os  # noqa: PLC0415
+
+        self._compact_proxy_harvest = self._ordered_proxy_harvest and os.environ.get("NEWTON_METAL_HARVEST_COMPACT", "1") != "0"
+        self._harvest_flags = None
+        self._harvest_positions = None
+        self._harvest_nodes = None
         self._empty_int = None
         self.solver = _resolve_solver_spec(config.solver, self.velocity_basis)
         self.coloring = any("gauss-seidel" in solver or "gs" in solver for solver in self.solver)
@@ -1872,13 +1880,101 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
             offsets = self._empty_int_array(out_body_f.device)  # no world ranges: every body sees every node
             body_world = wp.full(body_count, -1, dtype=wp.int32, device=out_body_f.device)
         proxy_flag = int(newton.BodyFlags.PROXY)
+        if self._compact_proxy_harvest:
+            self._harvest_proxy_wrench_lanes_compact(
+                dt, body_local_to_proxy_global, impulses, positions, collider_ids, body_q, offsets, body_world, proxy_flag
+            )
+        else:
+            wp.launch(
+                _harvest_mpm_proxy_wrench_lanes_kernel,
+                dim=(body_count, _HARVEST_LANES),
+                inputs=[
+                    dt,
+                    _HARVEST_LANES,
+                    offsets,
+                    collider_ids,
+                    impulses,
+                    positions,
+                    self.collider_body_index,
+                    body_local_to_proxy_global,
+                    proxy_flag,
+                    self.model.body_flags,
+                    body_world,
+                    self.model.body_com,
+                    body_q,
+                    self._proxy_harvest_partial,
+                ],
+                device=out_body_f.device,
+            )
         wp.launch(
-            _harvest_mpm_proxy_wrench_lanes_kernel,
-            dim=(body_count, _HARVEST_LANES),
+            _sum_mpm_proxy_wrench_lanes_kernel,
+            dim=body_count,
+            inputs=[self._proxy_harvest_partial, body_local_to_proxy_global, proxy_flag, self.model.body_flags],
+            outputs=[out_body_f],
+            device=out_body_f.device,
+        )
+
+    def _harvest_proxy_wrench_lanes_compact(
+        self,
+        dt: float,
+        body_local_to_proxy_global: wp.array[int],
+        impulses: wp.array[wp.vec3],
+        positions: wp.array[wp.vec3],
+        collider_ids: wp.array[int],
+        body_q: wp.array[wp.transform],
+        offsets: wp.array[int],
+        body_world: wp.array[wp.int32],
+        proxy_flag: int,
+    ) -> None:
+        """The lane partials of :meth:`_harvest_proxy_wrenches_ordered` over the proxy-body collider nodes only.
+
+        A stable compaction (keep flags, integer exclusive scan, scatter) lists the nodes whose collider belongs to a
+        proxy body, in node order. World ranges map to compacted ranges through the scan (``positions[begin]``,
+        ``positions[end]``), so each lane walks only its world's proxy nodes instead of every collider node of the
+        world. Same per-node terms; lane ``l`` now takes the ``l``-th, ``(l + L)``-th, ... *kept* node, so the
+        summation order differs from the full scan (fixed, so the result repeats exactly). No host reads, no
+        per-step allocations once the buffers fit: capture-safe.
+        """
+        from warp.utils import array_scan  # noqa: PLC0415
+
+        device = self._proxy_harvest_partial.device
+        n = collider_ids.shape[0]
+        if self._harvest_flags is None or self._harvest_flags.shape[0] < n + 1 or self._harvest_flags.device != device:
+            self._harvest_flags = wp.empty(n + 1, dtype=int, device=device)
+            self._harvest_positions = wp.empty(n + 1, dtype=int, device=device)
+            self._harvest_nodes = wp.empty(max(n, 1), dtype=int, device=device)
+        flags = self._harvest_flags[: n + 1]
+        node_positions = self._harvest_positions[: n + 1]
+        wp.launch(
+            _flag_proxy_harvest_nodes_kernel,
+            dim=n + 1,
+            inputs=[
+                offsets,
+                collider_ids,
+                self.collider_body_index,
+                body_local_to_proxy_global,
+                proxy_flag,
+                self.model.body_flags,
+                flags,
+            ],
+            device=device,
+        )
+        array_scan(flags, node_positions, inclusive=False)
+        wp.launch(
+            _compact_proxy_harvest_nodes_kernel,
+            dim=n,
+            inputs=[flags, node_positions, self._harvest_nodes],
+            device=device,
+        )
+        wp.launch(
+            _harvest_mpm_proxy_wrench_compact_lanes_kernel,
+            dim=(body_local_to_proxy_global.shape[0], _HARVEST_LANES),
             inputs=[
                 dt,
                 _HARVEST_LANES,
                 offsets,
+                node_positions,
+                self._harvest_nodes,
                 collider_ids,
                 impulses,
                 positions,
@@ -1891,14 +1987,7 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
                 body_q,
                 self._proxy_harvest_partial,
             ],
-            device=out_body_f.device,
-        )
-        wp.launch(
-            _sum_mpm_proxy_wrench_lanes_kernel,
-            dim=body_count,
-            inputs=[self._proxy_harvest_partial, body_local_to_proxy_global, proxy_flag, self.model.body_flags],
-            outputs=[out_body_f],
-            device=out_body_f.device,
+            device=device,
         )
 
     def _empty_int_array(self, device) -> wp.array:
@@ -3934,6 +4023,99 @@ def _harvest_mpm_proxy_wrench_lanes_kernel(
                 f_world = collider_impulses[i] / dt
                 r = collider_impulse_pos[i] - center
                 f += wp.spatial_vector(f_world, wp.cross(r, f_world))
+    partial[local_body, lane] = f
+
+
+@wp.kernel(enable_backward=False)
+def _flag_proxy_harvest_nodes_kernel(
+    collider_node_offsets: wp.array[int],
+    collider_ids: wp.array[int],
+    collider_body_ids: wp.array[int],
+    body_local_to_proxy_global: wp.array[int],
+    proxy_flag: int,
+    body_flags: wp.array[wp.int32],
+    flags: wp.array[int],
+):
+    """1 for the active collider nodes whose collider is a proxy body (the nodes the harvest lanes add), else 0.
+    ``flags`` has one extra trailing entry (always 0) so the exclusive scan also gives the total at index ``n``."""
+    i = wp.tid()
+    keep = int(0)
+    n = collider_ids.shape[0]
+    env_count = collider_node_offsets.shape[0] - 1
+    end = n
+    if env_count > 0:
+        end = collider_node_offsets[env_count]
+    if i < end and i < n:
+        cid = collider_ids[i]
+        if cid >= 0 and cid < collider_body_ids.shape[0]:
+            local_body = collider_body_ids[cid]
+            if local_body >= 0 and local_body < body_local_to_proxy_global.shape[0]:
+                if body_local_to_proxy_global[local_body] >= 0 and (body_flags[local_body] & proxy_flag) != 0:
+                    keep = 1
+    flags[i] = keep
+
+
+@wp.kernel(enable_backward=False)
+def _compact_proxy_harvest_nodes_kernel(
+    flags: wp.array[int],
+    positions: wp.array[int],
+    nodes: wp.array[int],
+):
+    """Stable compaction: the kept node indices in increasing order."""
+    i = wp.tid()
+    if flags[i] != 0:
+        nodes[positions[i]] = i
+
+
+@wp.kernel(enable_backward=False)
+def _harvest_mpm_proxy_wrench_compact_lanes_kernel(
+    dt: float,
+    lane_count: int,
+    collider_node_offsets: wp.array[int],
+    node_positions: wp.array[int],
+    nodes: wp.array[int],
+    collider_ids: wp.array[int],
+    collider_impulses: wp.array[wp.vec3],
+    collider_impulse_pos: wp.array[wp.vec3],
+    collider_body_ids: wp.array[int],
+    body_local_to_proxy_global: wp.array[int],
+    proxy_flag: int,
+    body_flags: wp.array[wp.int32],
+    body_world: wp.array[wp.int32],
+    body_com: wp.array[wp.vec3],
+    body_q: wp.array[wp.transform],
+    partial: wp.array2d[wp.spatial_vector],
+):
+    """:func:`_harvest_mpm_proxy_wrench_lanes_kernel` over the compacted proxy nodes of the body's world range:
+    lane ``l`` adds the ``l``-th, ``(l + L)``-th, ... kept node of the range (node order) that belongs to its body."""
+    local_body, lane = wp.tid()
+    f = wp.spatial_vector()
+    partial[local_body, lane] = f
+
+    proxy_global = body_local_to_proxy_global[local_body]
+    if proxy_global < 0 or (body_flags[local_body] & proxy_flag) == 0:
+        return
+
+    n = collider_ids.shape[0]
+    env_count = collider_node_offsets.shape[0] - 1
+    begin = int(0)
+    end = n
+    if env_count > 0:
+        end = collider_node_offsets[env_count]
+        world = body_world[local_body]
+        if world >= 0 and world < env_count:
+            begin = collider_node_offsets[world]
+            end = collider_node_offsets[world + 1]
+    end = wp.min(end, n)
+    begin = wp.min(begin, end)
+
+    center = wp.transform_point(body_q[local_body], body_com[local_body])
+    for k in range(node_positions[begin] + lane, node_positions[end], lane_count):
+        i = nodes[k]
+        if collider_body_ids[collider_ids[i]] == local_body:
+            f_world = collider_impulses[i] / dt
+            r = collider_impulse_pos[i] - center
+            f += wp.spatial_vector(f_world, wp.cross(r, f_world))
     partial[local_body, lane] = f
 
 

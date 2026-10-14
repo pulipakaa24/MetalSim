@@ -1,0 +1,142 @@
+== Tue Oct 13 15:21:03 PDT 2026 batch_05 start
+installed warp 95f6f121b7e67025958335c7c15e338ac04a798a newton 3fd1f052a5ad031578960d9642aaaedc03834e4d
+/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/warp_new/warp/__init__.py True /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/newton_new/newton/__init__.py True
+/Users/aditya/robosim/upstream/warp-innate/warp/__init__.py None /Users/aditya/robosim/upstream/newton-metalsim-1.5.2/newton/__init__.py
+note: failing on the base trees too (pre-existing, not from the patches): FAILED .claude/worktrees/agent-a8f809a11de334dd0/tests/test_mpm.py::test_coupled_contact_filter_keeps_source_order 
+skip F_granular
+skip F_multi_material
+skip F_twoway
+skip F_anymal
+skip F_plate_drag
+skip F_column_a2
+SUITE_DONE
+skip F_granular
+skip F_multi_material
+skip F_twoway
+skip F_anymal
+skip F_plate_drag
+skip F_column_a2
+SUITE_DONE
+-- bitwise base vs new (expected: equal except twoway)
+F_anymal: BITWISE EQUAL
+F_column_a2: BITWISE EQUAL
+F_granular: BITWISE EQUAL
+F_multi_material: BITWISE EQUAL
+F_plate_drag: BITWISE EQUAL
+F_twoway: differs in traj.npz:pos, traj.npz:vel, traj.npz:body_q, solves.npz:res_l2, solves.npz:res_linf
+-- bitwise new vs new again (repeatability)
+F_twoway: BITWISE EQUAL
+| floors_base | worst frame | | | | | 0.83 | 0.80 |
+| floors_new | worst frame | | | | | 0.83 | 0.80 |
+Verdicts: floors_base: inside max floor, inside p95 pairwise; floors_new: inside max floor, inside p95 pairwise
+| floors_base | worst frame | | | | | 0.66 | 0.66 |
+| floors_new | worst frame | | | | | 0.66 | 0.66 |
+Verdicts: floors_base: inside max floor, inside p95 pairwise; floors_new: inside max floor, inside p95 pairwise
+| floors_base | worst frame | | | | | 0.80 | 0.74 |
+| floors_new | worst frame | | | | | 0.80 | 0.74 |
+Verdicts: floors_base: inside max floor, inside p95 pairwise; floors_new: inside max floor, inside p95 pairwise
+| floors_base | worst frame | | | | | 0.00 | 0.00 |
+| floors_new | worst frame | | | | | 0.00 | 0.00 |
+Verdicts: floors_base: inside max floor, inside p95 pairwise; floors_new: inside max floor, inside p95 pairwise
+| Metal run | M (% of peak) | floor p50 / p90 / max | pairwise p90 / p95 / max | rank in floor / pairwise | M / max floor | M / p95 pairwise | final force (L4 range) | verdict |
+alone_base_cold_1 (base, cold cache): [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+alone_new_cold_1 (new, cold cache): [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
+alone_base_cold_2 (base, cold cache): [gpu_run] gpu_top:   pid   1291 Google Chrome He                   3.0 %
+alone_base_cold_3 (base, cold cache): [gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.5 %
+suite_base_warm (base, warm cache): [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
+suite_base_default (base, default cache): [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+suite_base_cold (base, cold cache): [gpu_run] gpu_top:   pid   1291 Google Chrome He                   4.8 %
+pair_cuda_stopping_rule_jacobi_cap_24 (base, cold cache): [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+pair_metal_deterministic (base, cold cache): [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+pair_chunk_graph_bitwise (base, cold cache): [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+pair_gpu_exit_bitwise (base, cold cache): [gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.9 %
+pair_simd_sweep_bitwise (base, cold cache): [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+pair_fused_solve_bitwise (base, cold cache): [gpu_run] gpu_top:   pid    410 WindowServer                       1.9 %
+pair_color_blocks_on_all_cores_bitwise (base, cold cache): [gpu_run] gpu_top:   pid    410 WindowServer                       2.8 %
+pair_column_observables_from_lattice (base, cold cache): [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.9 %
+pair_pour_bounded_launches_bitwise (base, cold cache): [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+pair_pour_whole_step_capture_bitwise (base, cold cache): [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.5 %
+pair_pour_capacity_overflow_raises (base, cold cache): [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
+pair_proxy_wrench_harvest_repeatable (base, cold cache): [gpu_run] gpu_top:   pid    410 WindowServer                       7.1 %
+-- contact-filter isolation summary
+alone_base_cold_1: [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+alone_base_cold_2: [gpu_run] gpu_top:   pid   1291 Google Chrome He                   3.0 %
+alone_base_cold_3: [gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.5 %
+alone_new_cold_1: [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
+pair_chunk_graph_bitwise: [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+pair_color_blocks_on_all_cores_bitwise: [gpu_run] gpu_top:   pid    410 WindowServer                       2.8 %
+pair_column_observables_from_lattice: [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.9 %
+pair_cuda_stopping_rule_jacobi_cap_24: [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+pair_fused_solve_bitwise: [gpu_run] gpu_top:   pid    410 WindowServer                       1.9 %
+pair_gpu_exit_bitwise: [gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.9 %
+pair_metal_deterministic: [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+pair_pour_bounded_launches_bitwise: [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+pair_pour_capacity_overflow_raises: [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
+pair_pour_whole_step_capture_bitwise: [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.5 %
+pair_proxy_wrench_harvest_repeatable: [gpu_run] gpu_top:   pid    410 WindowServer                       7.1 %
+pair_simd_sweep_bitwise: [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+suite_base_cold: [gpu_run] gpu_top:   pid   1291 Google Chrome He                   4.8 %
+suite_base_default: [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+suite_base_warm: [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
+/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_capture_base_r1.log: No such file or directory
+grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_capture_base_r1.log: No such file or directory
+/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_base_r1.log: No such file or directory
+grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_base_r1.log: No such file or directory
+/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_anymal_capture_base_r1.log: No such file or directory
+grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_anymal_capture_base_r1.log: No such file or directory
+/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_capture_new_r1.log: No such file or directory
+grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_capture_new_r1.log: No such file or directory
+/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_new_r1.log: No such file or directory
+grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_new_r1.log: No such file or directory
+/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_anymal_capture_new_r1.log: No such file or directory
+grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_anymal_capture_new_r1.log: No such file or directory
+/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_capture_base_r2.log: No such file or directory
+grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_capture_base_r2.log: No such file or directory
+/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_base_r2.log: No such file or directory
+grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_base_r2.log: No such file or directory
+/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_anymal_capture_base_r2.log: No such file or directory
+grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_anymal_capture_base_r2.log: No such file or directory
+/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_capture_new_r2.log: No such file or directory
+grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_capture_new_r2.log: No such file or directory
+/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_new_r2.log: No such file or directory
+grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_new_r2.log: No such file or directory
+/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_anymal_capture_new_r2.log: No such file or directory
+grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_anymal_capture_new_r2.log: No such file or directory
+/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_capture_base_r3.log: No such file or directory
+grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_capture_base_r3.log: No such file or directory
+/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_base_r3.log: No such file or directory
+grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_base_r3.log: No such file or directory
+/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_anymal_capture_base_r3.log: No such file or directory
+grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_anymal_capture_base_r3.log: No such file or directory
+/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_capture_new_r3.log: No such file or directory
+grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_capture_new_r3.log: No such file or directory
+/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_new_r3.log: No such file or directory
+grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_new_r3.log: No such file or directory
+/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_anymal_capture_new_r3.log: No such file or directory
+grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_anymal_capture_new_r3.log: No such file or directory
+| scene | L4 | base (runs) | new (runs) | base / L4 | new / L4 |
+|---|---|---|---|---|---|
+Traceback (most recent call last):
+  File "<stdin>", line 10, in <module>
+  File "/opt/homebrew/Cellar/python@3.14/3.14.7/Frameworks/Python.framework/Versions/3.14/lib/python3.14/statistics.py", line 343, in median
+    raise StatisticsError("no median for empty data")
+statistics.StatisticsError: no median for empty data
+### twoway_coupling
+
+L4 kernel sum 28.90 ms/frame over 1298 launches; Metal (isolated-dispatch profile) 41.29 ms/frame over 1870 launches; Metal empty command buffer 2.61 us/launch -> calibrated Metal sum 36.41 ms/frame.
+
+| kernel (normalised) | L4 ms/frame | L4 launches | Metal ms/frame | Metal launches | Metal calibrated ms | Metal / L4 |
+|---|---|---|---|---|---|---|
+| sort/scan/reduce (native) | 15.481 | 190 | 8.191 | 459 | 6.993 | 0.45 |
+| gs_solve_kernel_impl | 3.207 | 400 | 8.990 | 400 | 7.945 | 2.48 |
+| compute_body_forces_lanes | 0.000 | 0 | 2.881 | 4 | 2.870 |  |
+| copy/fill | 0.890 | 38 | 1.484 | 145 | 1.105 | 1.24 |
+| solve_subgrid_friction | 0.440 | 50 | 1.744 | 50 | 1.614 | 3.67 |
+| integrate_velocity_apic | 1.037 | 1 | 0.834 | 1 | 0.832 | 0.80 |
+pour env /Users/aditya/robosim/upstream/warp-innate/warp/__init__.py /Users/aditya/robosim/upstream/newton-metalsim-1.5.2/newton/__init__.py /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/metalsim/__init__.py
+pour env /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/warp_new/warp/__init__.py /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/newton_new/newton/__init__.py /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/metalsim/__init__.py
+pour env /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/warp_new/warp/__init__.py /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/newton_new/newton/__init__.py /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/metalsim/__init__.py
+pour new vs new2: bitwise equal over 30 steps
+pour base vs new: first differs at step 0
+a3d8ef48 Coupled speed, step 1: tiled IJtm product validated and timed on Metal (logs)
+== Tue Oct 13 15:38:50 PDT 2026 batch_05 done

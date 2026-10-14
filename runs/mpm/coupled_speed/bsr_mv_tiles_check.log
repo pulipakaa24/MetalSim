@@ -1,0 +1,20 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/kcache_new/1.18.0.dev20260917
+metal_bsr_mv_tiles = True
+Module warp._src.metal_sparse c5e29c2 load on device 'metal:0' took 455.90 ms  (compiled)
+Module warp._src.metal_sparse 062c05e load on device 'metal:0' took 413.12 ms  (compiled)
+Module warp._src.metal_sparse 063527f load on device 'metal:0' took 418.05 ms  (compiled)
+Module warp._src.metal_sparse e3a2a06 load on device 'metal:0' took 434.83 ms  (compiled)
+Module _bsr_accumulate_triplet_values_1ba73229 747fcd9 load on device 'metal:0' took 413.62 ms  (compiled)
+Module make_bsr_mv_kernel__locals__bsr_mv_kernel_51ac893e 858c194 load on device 'metal:0' took 396.86 ms  (compiled)
+rows      2 x     40 blocks (empty 0) alpha 1.0 beta 0.0: tiled False, rel err 2.66e-07, repeat bitwise True -> ok
+Module make_bsr_mv_tiled_kernel__locals__bsr_mv_tiled_kernel_ecd5c05d 7f482b9 load on device 'metal:0' took 404.56 ms  (compiled)
+rows      4 x    300 blocks (empty 1) alpha -1.0 beta 0.0: tiled True, rel err 4.37e-08, repeat bitwise True -> ok
+rows      4 x   6000 blocks (empty 0) alpha -1.0 beta 0.0: tiled True, rel err 3.36e-07, repeat bitwise True -> ok
+rows     12 x  20000 blocks (empty 0) alpha 1.0 beta 1.0: tiled True, rel err 6.87e-07, repeat bitwise True -> ok
+rows  20000 x      3 blocks (empty 0) alpha 1.0 beta 1.0: tiled False, rel err 1.38e-07, repeat bitwise True -> ok

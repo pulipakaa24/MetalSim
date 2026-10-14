@@ -1,0 +1,149 @@
++ STAGES=smoke
++ ITERS=3
++ P=/home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ git apply --check /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ git apply /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ trap 'git apply -R $P' EXIT
++ nvidia-smi --query-gpu=name,driver_version --format=csv
+name, driver_version
+NVIDIA L4, 580.178.04
++ for S in $STAGES
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
+++ date +%s
++ t0=1791789942
++ case $S in
++ timeout 2400 isaaclab train --rl_library rsl_rl --task IsaacContrib-Franka-Pour --num_envs 4 --max_iterations 1 --seed 0 --run_name smoke_patched --viz none
+++ date +%s
++ echo 'smoke exit 0 in 58 s'
+smoke exit 0 in 58 s
++ touch /home/<vm-user>/parity3/pour/STAGE_POUR_DONE
++ git apply -R /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ STAGES='bench train'
++ ITERS=5
++ P=/home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ git apply --check /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ git apply /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ trap 'git apply -R $P' EXIT
++ nvidia-smi --query-gpu=name,driver_version --format=csv
+name, driver_version
+NVIDIA L4, 580.178.04
++ for S in $STAGES
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
+++ date +%s
++ t0=1791790037
++ case $S in
++ timeout 5400 isaaclab benchmark runtime --task IsaacContrib-Franka-Pour --num_envs 2048 --num_steps 20 --warmup_steps 3 --seed 0 --visualizer none --benchmark_formatter json,summary --output_path /home/<vm-user>/parity3/pour/bench_2048
+++ date +%s
++ echo 'bench exit 1 in 4 s'
+bench exit 1 in 4 s
++ for S in $STAGES
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
+++ date +%s
++ t0=1791790041
++ case $S in
++ timeout 21600 isaaclab train --rl_library rsl_rl --task IsaacContrib-Franka-Pour --num_envs 2048 --max_iterations 5 --seed 0 --run_name l4_2048 --viz none
+++ date +%s
++ echo 'train exit 1 in 96 s'
+train exit 1 in 96 s
++ touch /home/<vm-user>/parity3/pour/STAGE_POUR_DONE
++ git apply -R /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ STAGES=train
++ ITERS=3
++ NUM=1024
++ EXTRA=
++ TAG=
++ P=/home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ git apply --check /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ git apply /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ trap 'git apply -R $P' EXIT
++ nvidia-smi --query-gpu=name,driver_version --format=csv
+name, driver_version
+NVIDIA L4, 580.178.04
++ for S in $STAGES
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
+++ date +%s
++ t0=1791791803
++ case $S in
++ timeout 21600 isaaclab train --rl_library rsl_rl --task IsaacContrib-Franka-Pour --num_envs 1024 --max_iterations 3 --seed 0 --run_name l4_1024 --viz none
+++ date +%s
++ echo 'train exit 0 in 988 s'
+train exit 0 in 988 s
++ touch /home/<vm-user>/parity3/pour/STAGE_POUR_DONE
++ git apply -R /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ STAGES=train
++ ITERS=2
++ NUM=2048
++ EXTRA=env.sim.physics.use_cuda_graph=false
++ TAG=_eager
++ P=/home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ git apply --check /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ git apply /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ trap 'git apply -R $P' EXIT
++ nvidia-smi --query-gpu=name,driver_version --format=csv
+name, driver_version
+NVIDIA L4, 580.178.04
++ for S in $STAGES
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
+++ date +%s
++ t0=1791792893
++ case $S in
++ timeout 21600 isaaclab train --rl_library rsl_rl --task IsaacContrib-Franka-Pour --num_envs 2048 --max_iterations 2 --seed 0 --run_name l4_2048_eager --viz none env.sim.physics.use_cuda_graph=false
+++ date +%s
++ echo 'train exit 1 in 93 s'
+train exit 1 in 93 s
++ touch /home/<vm-user>/parity3/pour/STAGE_POUR_DONE
++ git apply -R /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ STAGES=train
++ ITERS=60
++ NUM=1024
++ EXTRA=
++ TAG=_curve
++ P=/home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ git apply --check /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ git apply /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ trap 'git apply -R $P' EXIT
++ nvidia-smi --query-gpu=name,driver_version --format=csv
+name, driver_version
+NVIDIA L4, 580.178.04
++ for S in $STAGES
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
+++ date +%s
++ t0=1791793554
++ case $S in
++ timeout 21600 isaaclab train --rl_library rsl_rl --task IsaacContrib-Franka-Pour --num_envs 1024 --max_iterations 60 --seed 0 --run_name l4_1024_curve --viz none
+++ date +%s
++ echo 'train exit 0 in 18873 s'
+train exit 0 in 18873 s
++ touch /home/<vm-user>/parity3/pour/STAGE_POUR_DONE
++ git apply -R /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ STAGES=train
++ ITERS=60
++ NUM=1024
++ EXTRA=
++ TAG=_curve_s2
++ SEED=2
++ P=/home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ git apply --check /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ git apply /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
++ trap 'git apply -R $P' EXIT
++ nvidia-smi --query-gpu=name,driver_version --format=csv
+name, driver_version
+NVIDIA L4, 580.178.04
++ for S in $STAGES
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
+++ date +%s
++ t0=1791921813
++ case $S in
++ timeout 21600 isaaclab train --rl_library rsl_rl --task IsaacContrib-Franka-Pour --num_envs 1024 --max_iterations 60 --seed 2 --run_name l4_1024_curve_s2 --viz none
+++ date +%s
++ echo 'train exit 0 in 18688 s'
+train exit 0 in 18688 s
++ touch /home/<vm-user>/parity3/pour/STAGE_POUR_DONE
++ git apply -R /home/<vm-user>/parity3_scripts/franka_pour_published_asset.patch
