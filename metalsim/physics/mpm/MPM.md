@@ -527,7 +527,7 @@ fast_math, section 8 1b) + `152808b7` (`warp.config.metal_fast_math` defaults to
   bounded (HashTable and XPBD manifolds: probes + 65,536 passes, then a counted failure). Newton's contact / collision /
   SDF / heightfield / XPBD / Kamino-metrics tests on `metalsim-hashtable-metal`: 98 failures -> 13 on cpu + metal:0,
   no new failure; the 13 are SolverMuJoCo tests that do not build against the MuJoCo Warp fork 3.14
-  (`contact_force_fn` signature). 1.5.2 Kamino metrics: CPU 9/9, Metal 8/9 (test_06's dense-vs-sparse `f_ncp`, 2.1e-6
+  (`contact_force_fn` signature; fixed 2026-10-13 on both 1.7 branches, `metalsim` `1301e8da` and `metalsim-hashtable-metal` `9d6616c6`: the contact part of upstream's `90f809a`). 1.5.2 Kamino metrics: CPU 9/9, Metal 8/9 (test_06's dense-vs-sparse `f_ncp`, 2.1e-6
   relative vs rtol 1e-6, in a kernel these changes do not touch).
 * **Rigid-scale ports to the 1.7 line**: mesh-SDF barrier fix, per-thread mesh-convex midphase, 32 mesh threadgroups
   per core, bounded deterministic sort. Franka-Pour collide (`runs/rigid17/tools/collide17.py`, same in-contact state,
@@ -1019,7 +1019,7 @@ scripts/gpu_run.sh test_mpm check 15 -- .venv-newton152/bin/python -m pytest tes
 |---|---|---|
 | Warp changes | pulipakaa24/warp `metalsim`, pinned `31cf79d7` | `scripts/setup_warp.sh` (fallback: innate-inc/warp `ce15f6bb` + `patches/warp/metalsim-31cf79d7.diff`) |
 | Newton changes (MPM, Franka-Pour rigid) | pulipakaa24/newton `metalsim-1.5.2`, pinned `addd10cb` | `scripts/setup_newton152.sh` (fallback: v1.5.2 + `patches/newton/metalsim-1.5.2-addd10cb.diff`) |
-| Newton 1.7 Metal fixes for the rigid stack | pulipakaa24/newton `metalsim-hashtable-metal` `a4be3604` (`.venv`'s `newton` extra) and `metalsim` `9f317390` (`.venv-newtonfork`) | `pip install -e ".[newton]"`, `scripts/setup_newton.sh` |
+| Newton 1.7 Metal fixes for the rigid stack | pulipakaa24/newton `metalsim-hashtable-metal` `9d6616c6` (`.venv`'s `newton` extra) and `metalsim` `1301e8da` (`.venv-newtonfork`) | `pip install -e ".[newton]"`, `scripts/setup_newton.sh` |
 | compat layer, scenes, probes, tests, Isaac-side recorders | this repository | the clone |
 | logs, JSON, reports of every run | `runs/mpm/`, `runs/parity/isaaclab3_mpm*/`, `runs/rigid_perf/`, `runs/fma_rigid_parity/` | the clone |
 | Metal particle recordings (`.npz`, ~6.6 GB) | not committed | `record_metal_suite.sh`, `record_variant_suite.sh OUT - - .` (one GPU job per run; deterministic, so a re-recording is bitwise the original on the same trees) |
