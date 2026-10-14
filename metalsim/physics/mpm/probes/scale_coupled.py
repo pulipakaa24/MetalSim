@@ -6,6 +6,12 @@ and particle state are hashed and compared. Timing (``--time``): median wall tim
 
     python scale_coupled.py --worlds 64 --steps 60 --runs 2 [--solver auto|jacobi] [--json out.json]
     python scale_coupled.py --worlds 1024 --steps 40 --time --warmup 10 --json out.json
+    python scale_coupled.py --worlds 64 --steps 100 --split --json out.json
+
+``--split``: the coupled step's sections as separate captured graphs (MuJoCo Warp substeps, coupling launches
+before / after them, MPM substeps + harvest) and the whole step, replayed round-robin (synchronized each replay) so
+that drift of the GPU clock hits every section alike; medians per section. The sections run out of order here, so
+only their timings mean anything. ``--rigid-only --time``: the BatchSim step of the same scene without sand.
 """
 from __future__ import annotations
 
@@ -72,19 +78,55 @@ def run_hashes(a):
 
 def run_time(a):
     sim, mpm = build(a)
+    step = sim.step if mpm is None else mpm.step
     ts = []
     for s in range(a.warmup + a.steps):
         sim.synchronize()
         t0 = time.perf_counter()
-        mpm.step()
+        step()
         sim.synchronize()
         if s >= a.warmup:
             ts.append(time.perf_counter() - t0)
-    mpm.check_status()
+    if mpm is not None:
+        mpm.check_status()
     ts = np.asarray(ts) * 1e3
     return {"ms_per_step_median": float(np.median(ts)), "ms_p10": float(np.percentile(ts, 10)),
-            "ms_p90": float(np.percentile(ts, 90)), "particles_per_world": mpm.particles_per_world,
+            "ms_p90": float(np.percentile(ts, 90)),
+            "particles_per_world": 0 if mpm is None else mpm.particles_per_world,
             "env_steps_per_s": float(a.worlds / (np.median(ts) / 1e3))}
+
+
+def run_split(a):
+    import warp as wp
+
+    sim, mpm = build(a)
+    for _ in range(a.warmup):
+        mpm.step()
+    sim.synchronize()
+    sections = {"rigid": sim.launch_step, "coupling_before": mpm._launch_before_rigid,
+                "coupling_after": mpm._launch_after_rigid, "mpm": mpm._launch_mpm, "full": mpm._launch_coupled_step}
+    graphs = {}
+    for name, fn in sections.items():
+        with wp.ScopedCapture(device=sim.device, force_module_load=False) as cap:
+            fn()
+        graphs[name] = cap.graph
+    ts = {k: [] for k in graphs}
+    for _ in range(a.steps):
+        for name, g in graphs.items():
+            sim.synchronize()
+            t0 = time.perf_counter()
+            wp.capture_launch(g)
+            sim.synchronize()
+            ts[name].append((time.perf_counter() - t0) * 1e3)
+    mpm.check_status()
+    out = {f"{k}_ms_median": float(np.median(v)) for k, v in ts.items()}
+    out.update({f"{k}_ms_p10": float(np.percentile(v, 10)) for k, v in ts.items()})
+    out.update({f"{k}_ms_p90": float(np.percentile(v, 90)) for k, v in ts.items()})
+    coupling = out["coupling_before_ms_median"] + out["coupling_after_ms_median"]
+    out["coupling_ms_median"] = coupling
+    out["coupling_share_of_full"] = coupling / out["full_ms_median"]
+    out["particles_per_world"] = mpm.particles_per_world
+    return out
 
 
 def main():
@@ -99,6 +141,7 @@ def main():
     ap.add_argument("--cells-per-world", type=int, default=512, help="sparse-grid cell reservation per world")
     ap.add_argument("--time", action="store_true")
     ap.add_argument("--rigid-only", action="store_true", help="the box on the floor without sand (BatchSim only)")
+    ap.add_argument("--split", action="store_true", help="per-section captured timings (see the module docstring)")
     ap.add_argument("--warmup", type=int, default=10)
     ap.add_argument("--json")
     a = ap.parse_args()
@@ -108,7 +151,9 @@ def main():
     res = {"worlds": a.worlds, "solver": a.solver, "steps": a.steps, "capture": a.capture,
            "rigid_only": a.rigid_only}
     with wp.ScopedDevice("metal:0"):
-        if a.time:
+        if a.split:
+            res.update(run_split(a))
+        elif a.time:
             res.update(run_time(a))
         else:
             runs = [run_hashes(a) for _ in range(a.runs)]
@@ -122,7 +167,7 @@ def main():
     print(json.dumps(res))
     if a.json:
         json.dump(res, open(a.json, "w"), indent=1)
-    if not a.time and not res["repeatable"]:
+    if not a.time and not a.split and not res["repeatable"]:
         sys.exit(3)
 
 
