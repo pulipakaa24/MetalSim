@@ -548,6 +548,27 @@ Limits: the area lights are not visible to the camera (Isaac's are when `visible
 softness and IES profile are dropped; particle grains (tier 1) shade an area light with its radiance as a spot light;
 the rolling shutter uses the frame's emitter frame.
 
+## 3f. 3D Gaussian splat scenes (2026-10-13)
+
+Isaac Sim 5 renders NuRec Gaussian volumes (3DGUT) as scene backgrounds. MetalSim's counterpart is `SplatRenderer`
+(`metalsim/render/splat/`, design and numbers in `metalsim/render/SPLAT.md`): a separate batched renderer that writes the
+same output buffers as tier 0 (`rgb`, planar `depth`, plus `depth_expected`, `alpha`) and composites a `Tier0Renderer`'s
+meshes (robot, objects) per pixel at the mesh depth.
+
+| element | status |
+|---|---|
+| 3DGS `.ply`, SuperSplat compressed `.ply`, SPZ v1-3, `.splat`, NuRec `.nurec` | loaded (`formats.LOADERS`); SPZ v4 and `.sog` raise a clear error |
+| file -> sim frame | exact affine (`make_transform`, `floor_plane_transform`; covariances transformed, SH directions mapped back) |
+| SH degree 0-3, antialiased (Mip-Splatting) training flag, NuRec's no-dilation hint | yes |
+| robot / objects in front of the splats | tier-0 composite (occlusion exact at the mesh depth; tier-0 lighting, so no splat relighting) |
+| shadows of the robot on the splat, relighting | no (baked radiance) |
+| fisheye, rolling shutter, lens / haze effects on splat pixels | no (pinhole only) |
+| tiers 1 / 2, ray-traced depth camera and lidar | splats not visible to them (collision proxies are, when in the model) |
+| per-env different splat scenes | no: one scene per renderer (one renderer per scene) |
+
+Tests: `tests/test_render_splat.py`, `tests/test_render_splat_nurec.py` (synthetic, always run),
+`tests/test_render_splat_public.py` (fetched public scenes, `scripts/fetch_splat_scenes.sh`).
+
 ## 4. Reproduce
 
 ```

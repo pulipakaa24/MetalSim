@@ -1,0 +1,152 @@
+{
+ "task": "go2_boxes",
+ "backend": "mujoco",
+ "venv": "main",
+ "frames": 251,
+ "fps": 50.0,
+ "frame_dt": 0.02,
+ "num_envs": 4,
+ "envs": [
+  0
+ ],
+ "geom_names": [
+  "ground",
+  "_film_geom_1",
+  "_film_geom_2",
+  "_film_geom_3",
+  "_film_geom_4",
+  "_film_geom_5",
+  "_film_geom_6",
+  "_film_geom_7",
+  "_film_geom_8",
+  "_film_geom_9",
+  "_film_geom_10",
+  "_film_geom_11",
+  "_film_geom_12",
+  "_film_geom_13",
+  "_film_geom_14",
+  "_film_geom_15",
+  "_film_geom_16",
+  "_film_geom_17",
+  "_film_geom_18",
+  "_film_geom_19",
+  "FL",
+  "_film_geom_21",
+  "_film_geom_22",
+  "_film_geom_23",
+  "_film_geom_24",
+  "_film_geom_25",
+  "_film_geom_26",
+  "_film_geom_27",
+  "_film_geom_28",
+  "_film_geom_29",
+  "_film_geom_30",
+  "_film_geom_31",
+  "FR",
+  "_film_geom_33",
+  "_film_geom_34",
+  "_film_geom_35",
+  "_film_geom_36",
+  "_film_geom_37",
+  "_film_geom_38",
+  "_film_geom_39",
+  "_film_geom_40",
+  "_film_geom_41",
+  "_film_geom_42",
+  "_film_geom_43",
+  "RL",
+  "_film_geom_45",
+  "_film_geom_46",
+  "_film_geom_47",
+  "_film_geom_48",
+  "_film_geom_49",
+  "_film_geom_50",
+  "_film_geom_51",
+  "_film_geom_52",
+  "_film_geom_53",
+  "_film_geom_54",
+  "_film_geom_55",
+  "RR",
+  "box_0_geom",
+  "box_1_geom",
+  "box_2_geom",
+  "box_3_geom",
+  "box_4_geom",
+  "box_5_geom"
+ ],
+ "episodes": {
+  "0": {
+   "end_frame": -1
+  }
+ },
+ "all_first_episodes": {
+  "end_frame": [
+   -1,
+   -1,
+   -1,
+   -1
+  ]
+ },
+ "particles_per_env": 0,
+ "particle_radius": 0.0,
+ "twin": {
+  "kind": "mujoco",
+  "geoms": 63,
+  "meshes": 16,
+  "textures": 1,
+  "materials": 11,
+  "build_s": 0.014636999985668808,
+  "poses_s": 0.00045312504516914487
+ },
+ "adapter": {
+  "policy": "scene policy: hold",
+  "env_build_s": 3.8500527500291355,
+  "physics": "MuJoCo Warp BatchSim (metalsim.scene.compose)"
+ },
+ "timing": {
+  "sim_ms_mean": 6.652384173622228,
+  "sim_ms_median": 5.141999979969114,
+  "sim_ms_first": 25.41545801796019,
+  "sim_s_total": 1.6697484275791794,
+  "rollout_s": 1.6773626250214875,
+  "twin_s": 0.015090125030837953,
+  "record_wall_s": 5.602109125000425,
+  "env_build_s": 3.8500527500291355
+ },
+ "software": {
+  "metalsim": "168637f0ba+dirty",
+  "warp": {
+   "version": "1.18.0.dev20260917",
+   "git": "95f6f121b7",
+   "checkout": "warp-metalsim"
+  },
+  "newton": {
+   "version": "1.7.0.dev0"
+  },
+  "mujoco": {
+   "version": "3.14.0"
+  },
+  "mujoco_warp": {
+   "version": "3.14.0",
+   "git": "f1b35e2b3d",
+   "checkout": "mujoco-warp"
+  },
+  "torch": {
+   "version": "2.14.1"
+  },
+  "numpy": {
+   "version": "2.5.4"
+  }
+ },
+ "hardware": {
+  "machine": "arm64",
+  "python": "3.12.11",
+  "model": "Mac16,6",
+  "cpu": "Apple M4 Max",
+  "memory_gb": 64,
+  "macos": "27.0.1",
+  "macos_build": "26A434",
+  "gpu": "Apple M4 Max",
+  "gpu_cores": "40"
+ }
+}

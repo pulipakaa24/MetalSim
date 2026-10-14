@@ -1,0 +1,30 @@
+{
+ "scene": "go2_boxes",
+ "num_envs": 4,
+ "steps": 100,
+ "control_dt": 0.02,
+ "step_ms_mean": 9.872125419642543,
+ "step_ms_median": 6.023791996994987,
+ "render_ms": {
+  "head_cam": 1.6986250047921203
+ },
+ "lidar_ms": 0.5841875026817434,
+ "build_s": 0.2850796669954434,
+ "sim_build_s": 28.36811745900195,
+ "cameras": {
+  "head_cam": {
+   "kind": "tier0",
+   "outputs": [
+    "rgb",
+    "distance_to_image_plane",
+    "semantic_segmentation"
+   ],
+   "size": [
+    640,
+    360
+   ]
+  }
+ },
+ "proxy": null,
+ "final_qpos_finite": true
+}

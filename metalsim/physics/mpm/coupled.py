@@ -27,10 +27,15 @@ Usage::
     for _ in range(T):
         v = mpm.step()              # one coupled step; returns sim.event's value
     renderer.set_particles(mpm.particle_q)   # (N * P, 3) Warp array, world-major
+
+RL loops can put resets and the coupled step into one graph per policy step (one host submission): write the reset
+mask on torch's queue (``sim.reset_mask``), then capture ``sim.launch_reset(); mpm.launch_reset(from_sim_mask=True);
+mpm.launch_step()`` (after one eager ``mpm.step()``) together with the policy's own launches.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass, field, fields
+from typing import Any
 
 import mujoco
 import numpy as np
@@ -249,6 +254,19 @@ def _zero_masked_wrench(world_mask: wp.array(dtype=wp.bool), nb: int, f: wp.arra
         f[i] = wp.spatial_vector()
 
 
+@wp.kernel(module="unique")
+def _zero_if_world0(world_mask: wp.array(dtype=wp.bool), values: wp.array(dtype=Any)):
+    """One world: clear a grid-backed warm start when the world is selected (see MPMCoupling._solver_reset)."""
+    i = wp.tid()
+    if world_mask[0]:
+        values[i] = values.dtype(0.0)
+
+
+wp.overload(_zero_if_world0, {"values": wp.array(dtype=wp.vec3)})
+wp.overload(_zero_if_world0, {"values": wp.array(dtype=wp.types.vector(length=6, dtype=wp.float32))})
+wp.overload(_zero_if_world0, {"values": wp.array(dtype=wp.float32)})
+
+
 @wp.kernel
 def _restore_masked_particles(world_mask: wp.array(dtype=wp.bool), particle_world: wp.array(dtype=wp.int32),
                               q0: wp.array(dtype=wp.vec3), qd0: wp.array(dtype=wp.vec3),
@@ -387,6 +405,9 @@ class MPMCoupling:
             self._user_xfrc = wp.zeros_like(sim.d.xfrc_applied)
             self._q0 = wp.clone(self.state.particle_q)
             self._qd0 = wp.clone(self.state.particle_qd)
+            # persistent per-world reset mask (n + 1: the solver's last entry selects world -1 objects, kept False);
+            # reset graphs read it, so a reset is one graph replay after the mask is written on the device
+            self._reset_mask = wp.zeros(n + 1, dtype=wp.bool)
             self._sync(write_q=True, write_qd=True)
             self.solver.reset(self.state)
         self.dt = sim.dt
@@ -394,6 +415,13 @@ class MPMCoupling:
                                            int(self.solver_cfg.max_active_cell_count) > 0)
         self._graph = None
         self._eager_steps = 0
+        self._reset_graphs = {}
+        self._eager_resets = 0
+        self.reset_mask = None
+        if getattr(sim.device, "is_metal", False):
+            from metalsim.interop import torch_bridge as tb
+            # (N,) bool MPS tensor aliasing the device mask that launch_reset() reads (write it on torch's queue)
+            self.reset_mask = tb.mps_tensor(self._reset_mask)[:n]
         self.finalized = True
 
     def _set_proxy_masses(self, newton, mm) -> None:
@@ -437,6 +465,14 @@ class MPMCoupling:
                   outputs=[self.state.body_q, self.state.body_qd])
 
     def _launch_coupled_step(self) -> None:
+        self._launch_before_rigid()
+        self.sim.launch_step()
+        self._launch_after_rigid()
+        self._launch_mpm()
+
+    def _launch_before_rigid(self) -> None:
+        """Coupling launches before the MuJoCo substeps: save the caller's xfrc_applied, add the sand wrench, and
+        (lagged) the proxies' begin pose."""
         sim, cfg, n, nb = self.sim, self.cfg, self.sim.n, self.nb
         d = sim.d
         wp.copy(self._user_xfrc, d.xfrc_applied)
@@ -445,7 +481,12 @@ class MPMCoupling:
                       outputs=[d.xfrc_applied])
         if cfg.mode == "lagged":
             self._sync(write_q=True, write_qd=False)            # begin pose
-        sim.launch_step()
+
+    def _launch_after_rigid(self) -> None:
+        """Coupling launches after the MuJoCo substeps: restore xfrc_applied, end-of-step kinematics, the proxies'
+        end state (and, lagged, the rewind of the sand impulse)."""
+        sim, cfg = self.sim, self.cfg
+        d = sim.d
         wp.copy(d.xfrc_applied, self._user_xfrc)
         # mj_step leaves xpos / xquat / cvel at the step's start (kinematics run before integration); the proxies take
         # the end state, as Newton's SolverMuJoCo does (forward kinematics of the end qpos / qvel). The next mj_step
@@ -457,6 +498,10 @@ class MPMCoupling:
             self._sync(write_q=False, write_qd=True)            # end velocity, minus the lagged sand impulse
             if cfg.feedback:
                 self.solver.coupling_rewind_proxy_body(self._proxy_ids, self.state, self.coupling_f, None, self.dt)
+
+    def _launch_mpm(self) -> None:
+        """The MPM substeps and the harvest of the proxies' sand wrench."""
+        cfg, n, nb = self.cfg, self.sim.n, self.nb
         h = self.dt / cfg.mpm_substeps
         for s in range(cfg.mpm_substeps):
             self.solver.step(self.state, self.state, None, None, h)
@@ -480,6 +525,20 @@ class MPMCoupling:
     def _harvest(self, out: wp.array) -> None:
         self.solver.coupling_harvest_proxy_wrenches(self._proxy_ids, out, body_qd_before=None, state=self.state,
                                                     state_out=self.state, contacts=None, dt=self.dt)
+
+    def launch_step(self) -> None:
+        """Launch one coupled step directly (no graph replay, no event signal), to capture it into a larger graph
+        that also holds resets, observations and the policy (as ``BatchSim.launch_step``). The solver sizes its
+        buffers on the first step, so run one :meth:`step` (or an uncaptured ``launch_step``) before capturing."""
+        if not self.finalized:
+            raise RuntimeError("finalize() first")
+        capturing = self.sim.device.is_capturing
+        if capturing and self._eager_steps == 0:
+            raise RuntimeError("MPMCoupling.launch_step: run one step() eagerly before capturing it")
+        with wp.ScopedDevice(self.sim.device):
+            self._launch_coupled_step()
+        if not capturing:
+            self._eager_steps += 1
 
     def step(self) -> int:
         """One coupled step (one ``BatchSim`` step); returns the ``sim.event`` value signalled at its end."""
@@ -531,23 +590,104 @@ class MPMCoupling:
         body, in ``layout.body_map`` order (synchronizes)."""
         return self.coupling_f.numpy().reshape(self.sim.n, self.nb, 6)
 
-    def reset(self, mask=None) -> None:
-        """Put the material of the worlds in ``mask`` ((N,) bool, None = all) back to its initial state, clear their
-        sand wrench and the solver's history (``SolverImplicitMPM.reset`` per world)."""
+    def _launch_reset(self, from_sim_mask: bool) -> None:
+        n = self.sim.n
+        wm = self._reset_mask
+        if from_sim_mask:
+            wp.copy(wm, self.sim._reset_mask, count=n)
+        wp.launch(_restore_masked_particles, dim=self.state.particle_q.shape[0],
+                  inputs=[wm, self.model.particle_world, self._q0, self._qd0],
+                  outputs=[self.state.particle_q, self.state.particle_qd])
+        wp.launch(_zero_masked_wrench, dim=n * self.nb, inputs=[wm, self.nb], outputs=[self.coupling_f])
+        self._end_kinematics()
+        self._sync(write_q=True, write_qd=True)
+        self._solver_reset(wm)
+
+    def _solver_reset(self, wm: wp.array) -> None:
+        """``SolverImplicitMPM.reset`` of the worlds selected by the device mask (particle history, warm starts,
+        sparse-grid status, previous collider poses). With one world Newton 1.5.2's solver keeps a shared grid
+        partition (``separate_worlds`` needs two worlds), and its masked reset refuses grid-backed warm starts; the
+        same steps are then launched here with the mask read on the device (bitwise the solver's full reset when the
+        world is selected, nothing when it is not)."""
         import newton
 
-        n = self.sim.n
-        m = np.ones(n, bool) if mask is None else np.asarray(mask, bool).reshape(n)
+        flags = int(newton.StateFlags.PARTICLE_Q) | int(newton.StateFlags.PARTICLE_QD)
+        sv, st = self.solver, self.state
+        if self.sim.n > 1:
+            sv.reset(st, world_mask=wm, flags=flags)
+            return
+        import warp.fem as fem
+
+        from metalsim.physics.mpm.implicit_mpm import implicit_mpm_solver_kernels as K
+        from metalsim.physics.mpm.implicit_mpm import solver_implicit_mpm as S
+
+        sv._validate_reset_inputs(st)
+        if sv._grid_status is not None:
+            wp.launch(S._clear_sparse_grid_rebuild_status_masked, dim=1,
+                      inputs=[wm, sv._grid_status, sv._grid_accumulated_status])
+        for f in (sv._last_step_data.ws_impulse_field, sv._last_step_data.ws_stress_field):
+            if f is None or f.dof_values.shape[0] == 0:
+                continue
+            if isinstance(f.space.basis, fem.PointBasisSpace):
+                wp.launch(K.reset_mpm_point_warmstart, dim=f.dof_values.shape[0],
+                          inputs=[self.model.particle_world, wm, 1, f.dof_values])
+            else:
+                wp.launch(_zero_if_world0, dim=f.dof_values.shape[0], inputs=[wm, f.dof_values])
+        if self.model.particle_count > 0:
+            wp.launch(K.reset_mpm_particle_history, dim=self.model.particle_count,
+                      inputs=[self.model.particle_world, wm, 1, st.mpm.particle_elastic_strain, st.mpm.particle_transform,
+                              st.mpm.particle_qd_grad, st.mpm.particle_stress, st.mpm.particle_Jp])
+        sv._last_step_data.save_collider_current_position(st.body_q, body_world=self.model.body_world, world_mask=wm,
+                                                          world_count=1)
+
+    def launch_reset(self, from_sim_mask: bool = False) -> None:
+        """Launch the reset of the worlds selected by the device mask (no graph replay, no signal), for capture into a
+        policy-step graph: :attr:`reset_mask` as written, or with ``from_sim_mask`` the ``BatchSim``'s own
+        ``reset_mask`` (copied on the device; launch it after ``sim.launch_reset()``, which resets the robots of the
+        same worlds). Run one :meth:`reset` before capturing (the solver prepares its reset partitions then)."""
+        if not self.finalized:
+            raise RuntimeError("finalize() first")
+        capturing = self.sim.device.is_capturing
+        if capturing and self._eager_resets == 0:
+            raise RuntimeError("MPMCoupling.launch_reset: run one reset() eagerly before capturing it")
         with wp.ScopedDevice(self.sim.device):
-            wm = wp.array(np.append(m, False), dtype=wp.bool)
-            wp.launch(_restore_masked_particles, dim=self.state.particle_q.shape[0],
-                      inputs=[wm, self.model.particle_world, self._q0, self._qd0],
-                      outputs=[self.state.particle_q, self.state.particle_qd])
-            wp.launch(_zero_masked_wrench, dim=n * self.nb, inputs=[wm, self.nb], outputs=[self.coupling_f])
-            self._end_kinematics()
-            self._sync(write_q=True, write_qd=True)
-            self.solver.reset(self.state, world_mask=wm,
-                              flags=int(newton.StateFlags.PARTICLE_Q) | int(newton.StateFlags.PARTICLE_QD))
+            self._launch_reset(from_sim_mask)
+        if not capturing:
+            self._eager_resets += 1
+
+    def reset(self, mask=None) -> int:
+        """Put the material of the worlds in ``mask`` back to its initial state, clear their sand wrench and the
+        solver's history (``SolverImplicitMPM.reset`` per world); returns the ``sim.event`` value signalled at its
+        end. ``mask``: None (all worlds), an (N,) bool array (host; staged and copied on the device queue) or an (N,)
+        bool torch tensor (written on torch's queue and ordered before the reset, as ``BatchSim.reset``: no host
+        synchronization). After the first reset the launches replay as one captured graph."""
+        if not self.finalized:
+            raise RuntimeError("finalize() first")
+        n = self.sim.n
+        with wp.ScopedDevice(self.sim.device):
+            if mask is not None and type(mask).__module__.startswith("torch"):
+                from metalsim.interop import torch_bridge as tb
+
+                self.reset_mask.copy_(mask.to(device=self.reset_mask.device, dtype=self.reset_mask.dtype))
+                v = self.sim.event.next_value()
+                tb.signal_event(self.sim.event, v)
+                self.sim.wait(self.sim.event, v)
+            else:
+                m = np.ones(n, bool) if mask is None else np.asarray(mask, bool).reshape(n)
+                # a fresh staging array copied on the queue: the persistent mask may still be read by queued work
+                wp.copy(self._reset_mask, wp.array(np.append(m, False), dtype=wp.bool))
+            g = self._reset_graphs.get(False)
+            if g is not None:
+                wp.capture_launch(g)
+            elif self.capturable and self._eager_resets > 0:
+                with wp.ScopedCapture(device=self.sim.device, force_module_load=False) as cap:
+                    self._launch_reset(False)
+                self._reset_graphs[False] = cap.graph
+                wp.capture_launch(cap.graph)
+            else:
+                self._launch_reset(False)
+                self._eager_resets += 1
+        return self.sim._signal()
 
     def check_status(self) -> None:
         """Raise if the rebuildable sparse grid overflowed its capacity (synchronizes)."""

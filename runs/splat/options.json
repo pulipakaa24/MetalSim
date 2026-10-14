@@ -1,0 +1,91 @@
+{
+ "kind": "options",
+ "time": "2026-10-14 00:00:47",
+ "machine": "Apple M4 Max, 64 GB, macOS 26.7.1",
+ "size": [
+  640,
+  360
+ ],
+ "hfov": 88.9,
+ "iters": 20,
+ "n_cams": 16,
+ "scene": "InteriorGS 0204_840158",
+ "n_splats": 972596,
+ "load_s": 0.18,
+ "prep_s": 0.22,
+ "n_views": 480,
+ "rows": [
+  {
+   "option": "default",
+   "n_splats": 972596,
+   "psnr_mean": 120.0,
+   "psnr_min": 120.0,
+   "identical": true,
+   "ms_per_frame": 8.47
+  },
+  {
+   "option": "depth key 16 bit",
+   "n_splats": 972596,
+   "psnr_mean": 54.5,
+   "psnr_min": 49.5,
+   "identical": false,
+   "ms_per_frame": 8.14
+  },
+  {
+   "option": "no subtile masks",
+   "n_splats": 972596,
+   "psnr_mean": 120.0,
+   "psnr_min": 120.0,
+   "identical": true,
+   "ms_per_frame": 10.05
+  },
+  {
+   "option": "blend 2 px/thread",
+   "n_splats": 972596,
+   "psnr_mean": 120.0,
+   "psnr_min": 120.0,
+   "identical": true,
+   "ms_per_frame": 7.94
+  },
+  {
+   "option": "SH degree 0",
+   "n_splats": 972596,
+   "psnr_mean": 29.3,
+   "psnr_min": 26.3,
+   "identical": false,
+   "ms_per_frame": 8.28
+  },
+  {
+   "option": "SH degree 1",
+   "n_splats": 972596,
+   "psnr_mean": 32.7,
+   "psnr_min": 29.2,
+   "identical": false,
+   "ms_per_frame": 8.32
+  },
+  {
+   "option": "antialiased forced on",
+   "n_splats": 972596,
+   "psnr_mean": 22.7,
+   "psnr_min": 17.1,
+   "identical": false,
+   "ms_per_frame": 7.57
+  },
+  {
+   "option": "crop: none",
+   "n_splats": 972596,
+   "psnr_mean": 120.0,
+   "psnr_min": 120.0,
+   "identical": true,
+   "ms_per_frame": 8.52
+  },
+  {
+   "option": "crop: tight (q1-99 box + 10 %)",
+   "n_splats": 972478,
+   "psnr_mean": 68.2,
+   "psnr_min": 51.2,
+   "identical": false,
+   "ms_per_frame": 8.54
+  }
+ ]
+}

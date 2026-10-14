@@ -1,0 +1,53 @@
+# The go2_boxes scene inside a public Gaussian-splat room: InteriorGS scene 0204_840158 (a showroom), the splat
+# renderer's reference scene. The splat is only seen; the physics collides with a proxy built from the scene's own
+# floor plan (structure.json: floor plane + walls), as Isaac Lab composes NuRec backgrounds behind a ground plane.
+# Data: scripts/fetch_splat_scenes.sh interiorgs (gated on Hugging Face: InteriorGS Terms of Use, non-commercial
+# research only, never redistributed or committed). Needs the splat renderer (metalsim/render/splat).
+#   python -m metalsim.run configs/scenes/go2_interiorgs.yaml --rooms          # room centres (where to place the robot)
+#   python -m metalsim.run configs/scenes/go2_interiorgs.yaml --steps 150 --save runs/scenes/go2_interiorgs
+name: go2_interiorgs
+num_envs: 4
+env_spacing: 0.0                         # every env in the same room (envs are separate worlds)
+physics: {dt: 0.004, substeps: 5, solver_iterations: 20, ls_iterations: 10}
+policy: {type: hold}
+robot:
+  spawn: {type: MjcfFileCfg, asset_path: upstream/mujoco_menagerie/unitree_go2/go2_mjx.xml}
+  init_state:
+    pos: [0.0, 0.0, 0.30]                # replace with a free spot from --rooms
+    joint_pos: {".*_hip_joint": 0.0, ".*_thigh_joint": 0.9, ".*_calf_joint": -1.8}
+  randomize: {pose_range: {yaw: [-3.14, 3.14]}}
+objects:
+  box:
+    count: 4
+    spawn:
+      type: CuboidCfg
+      size: [0.25, 0.25, 0.25]
+      mass_props: {mass: 0.8}
+      visual_material: {diffuse_color: [0.80, 0.35, 0.15], roughness: 0.6}
+    init_state: {pos: [0.9, -0.5, 0.13]}
+    randomize: {pose_range: {x: [-0.2, 0.4], y: [-0.3, 0.3], yaw: [-3.14, 3.14]}}
+cameras:
+  head_cam:
+    prim_path: "{ENV_REGEX_NS}/Robot/base/head_cam"
+    offset: {pos: [0.30, 0.0, 0.08], rot: [0.0, 0.0, 0.0, 1.0], convention: world}
+    width: 640
+    height: 360
+    data_types: [rgb, distance_to_image_plane]
+    spawn: {focal_length: 18.15, horizontal_aperture: 20.955}
+background:
+  ground: null                           # the splat's floor is seen; the proxy's floor collides
+  lights: [{type: DistantLightCfg, direction: [-0.3, 0.2, -0.9], intensity: 0.8}]
+  splat:
+    path: assets/splats/interiorgs/0204_840158/3dgs_compressed.ply
+    transform: {up: z, scale: 1.0, yaw_deg: 0.0, translate: [0.0, 0.0, 0.0]}   # InteriorGS: z-up metres, floor at 0
+    crop: auto
+    collision:
+      type: structure
+      structure_json: assets/splats/interiorgs/0204_840158/structure.json
+      wall_height: 2.6
+      wall_thickness: 0.1
+    source: "InteriorGS (SpatialVerse / Manycore), scene 0204_840158, https://huggingface.co/datasets/spatialverse/InteriorGS"
+    licence: "InteriorGS Terms of Use: non-commercial research and education, no redistribution"
+assets:
+  - {name: "Unitree Go2 (go2_mjx.xml)", source: "MuJoCo Menagerie", url: "https://github.com/google-deepmind/mujoco_menagerie/tree/main/unitree_go2", licence: "BSD-3-Clause"}
+  - {name: "InteriorGS scene 0204_840158", source: "SpatialVerse / Manycore", url: "https://huggingface.co/datasets/spatialverse/InteriorGS", licence: "InteriorGS Terms of Use (non-commercial; fetched, never committed)"}
