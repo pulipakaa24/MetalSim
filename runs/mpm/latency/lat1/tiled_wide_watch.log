@@ -1,0 +1,21 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/latency/kcache/1.18.0.dev20260917
+Module warp._src.metal_sparse c5e29c2 load on device 'metal:0' took 39.58 ms  (cached)
+Module warp._src.metal_sparse 062c05e load on device 'metal:0' took 39.79 ms  (cached)
+Module warp._src.metal_sparse 063527f load on device 'metal:0' took 44.02 ms  (cached)
+Module warp._src.metal_sparse e3a2a06 load on device 'metal:0' took 40.59 ms  (cached)
+Module _bsr_accumulate_triplet_values_1ba73229 747fcd9 load on device 'metal:0' took 42.63 ms  (cached)
+Module make_bsr_mv_tiled_kernel__locals__bsr_mv_tiled_kernel_ecd5c05d 7f482b9 load on device 'metal:0' took 41.21 ms  (cached)
+warp_bsr_mv_tiled    bitwise True   120.97 us per launch
+Module tiled_u1_b8dea25e f4d8650 load on device 'metal:0' took 39.86 ms  (cached)
+copy_u1              bitwise True   110.40 us per launch
+Module tiled_u4_6ef6c9aa 4253d3f load on device 'metal:0' took 39.14 ms  (cached)
+unroll_u4            bitwise False   105.14 us per launch
+Module tiled_u8_b9961066 ea069f3 load on device 'metal:0' took 39.47 ms  (cached)
+unroll_u8            bitwise True   105.22 us per launch
+FAIL (a variant differs)

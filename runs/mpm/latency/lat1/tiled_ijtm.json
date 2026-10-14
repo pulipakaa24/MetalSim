@@ -1,0 +1,23 @@
+{
+ "rows": 12,
+ "blocks_per_row": 1170,
+ "ncol": 120000,
+ "variants": {
+  "warp_bsr_mv_tiled": {
+   "bitwise_equal_to_warp_tiled": true,
+   "us_per_launch": 20.950312464265153
+  },
+  "copy_u1": {
+   "bitwise_equal_to_warp_tiled": true,
+   "us_per_launch": 19.049792499572504
+  },
+  "unroll_u4": {
+   "bitwise_equal_to_warp_tiled": false,
+   "us_per_launch": 14.783335063839331
+  },
+  "unroll_u8": {
+   "bitwise_equal_to_warp_tiled": false,
+   "us_per_launch": 13.94739498209674
+  }
+ }
+}

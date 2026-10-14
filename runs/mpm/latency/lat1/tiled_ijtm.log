@@ -1,0 +1,8 @@
+[gpu_run] lat_tiled_ijtm start: device utilisation 0% (21:17:18)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.9 %
+[watch 21:17:21] start: /Users/aditya/robosim/.venv-newton152/bin/python -P /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/metalsim/physics/mpm/probes/tiled_mv_unroll_probe.py --rows 12 --blocks 1170 --ncol 120000 --json /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/latency/lat1/tiled_ijtm.json
+[watch 21:17:31] end code=1 wall=10s
+[gpu_run] lat_tiled_ijtm end: device utilisation 94% (21:17:31), exit 1
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.0 %
