@@ -13,6 +13,28 @@ references were recorded by the author on an NVIDIA L4 (Isaac Sim 5.1 + Isaac La
 Isaac Lab 3.0.0-EA); NVIDIA's published RTX 4090 figures are marked "published". MetalSim is an independent
 project, not affiliated with or endorsed by NVIDIA, Google DeepMind or Apple.
 
+## Documentation
+
+- [`docs/NOW.md`](docs/NOW.md): start here: what is being worked on and what is broken right now (kept current).
+- [`docs/GUIDE.md`](docs/GUIDE.md): user guide: install, first runs, bringing your own robot, the GPU job queue, engines, throughput vs fidelity.
+- [`docs/STATUS.md`](docs/STATUS.md): state against the original plan, workstream by workstream.
+- [`docs/PARITY.md`](docs/PARITY.md): the evidence against Isaac Sim / Isaac Lab, row by row: the test, the result and a verdict.
+- [`docs/GAPS.md`](docs/GAPS.md): gap ledger: what is closed and what is still open against Isaac.
+- [`docs/DECISIONS.md`](docs/DECISIONS.md): every option decided against, with its numbers and how to re-enable it.
+- [`CHANGELOG.md`](CHANGELOG.md): what landed when.
+- Subsystems: [`metalsim/physics/mpm/MPM.md`](metalsim/physics/mpm/MPM.md) (MPM on Metal against the L4),
+  [`metalsim/render/PARTICLES.md`](metalsim/render/PARTICLES.md) (particles as render grains),
+  [`docs/RENDER_COVERAGE.md`](docs/RENDER_COVERAGE.md) (what each renderer draws of what is simulated),
+  [`docs/NEWTON_RENDER.md`](docs/NEWTON_RENDER.md) (cameras on Newton scenes), [`docs/TRON1.md`](docs/TRON1.md)
+  (LimX TRON1 simulator, controllers and robot bridge).
+- History: [`docs/PHASES.md`](docs/PHASES.md) (work log of 2026-09-22 .. 24), [`docs/RESEARCH.md`](docs/RESEARCH.md)
+  (research at project start), the handoff notes [`docs/HANDOFF_elliptic_cone_perf.md`](docs/HANDOFF_elliptic_cone_perf.md)
+  and [`docs/HANDOFF_tier2_hdri_envmap.md`](docs/HANDOFF_tier2_hdri_envmap.md).
+- Research: [`docs/research/`](docs/research) (one question per note; index under "Research notes" below),
+  [`research_notes/`](research_notes) and [`reports/`](reports) (the MPM, float-parity, rendering and capacity rounds).
+- Images and data: [`docs/gallery/`](docs/gallery) (renders and side-by-side videos),
+  [`docs/measurements/`](docs/measurements) (figures and JSON behind the docs' numbers); run logs under `runs/`.
+
 ## Measured state
 
 The evidence, test by test, is in [`docs/PARITY.md`](docs/PARITY.md); open and closed gaps in
