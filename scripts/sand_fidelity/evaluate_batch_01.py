@@ -65,6 +65,13 @@ PREDICTIONS = [
      "H_bed (real bed deformation): settlement in mm constant (+-30 %) over the voxels, small overlap, ring heave > 0. "
      "pic27 (Newton #1251's advice) reduces settlement below S2 at every voxel only under H_grid. "
      "Plan B5 pass: settlement <= 0.25 voxel and <= 3 mm, creep < 0.1 mm/s."),
+    ("Corrections after the first pass (2026-10-14, before any arm was re-run)",
+     "Arm 4 is measured in the impact phase (t < contact + 0.3 s) with the free-fall impact speed sqrt(2 g h): the "
+     "probe's impact_speed_m_s is read when the box bottom crosses the particle surface, after the grid contact (about "
+     "a voxel above it) has already slowed the box, and the whole-run peak picked up a late sink at dt 1/480. Arm 1's R1 "
+     "is decided at R/dx 20 and by the tall fill (R/dx 10 convexity that vanishes with resolution is discretization). "
+     "R3 from stress needs the interior below yield: if the interior at rest is also on the cone, it is uninformative. "
+     "Arm 3 flags runs not at rest and toes steeper than atan(mu). The predictions themselves are unchanged."),
     ("6 sphere drop smoke (B4)",
      "Smoke pass: finite, the ball stops (|v| < 1 cm/s) within 0.5 s, never reaches the floor, final penetration within "
      "0.5-2x Uehara's law with mu = 0.7 (h = 0.2 m, D = 0.05 m: ~16 mm). Reported, not judged: d - v dt (lag "
@@ -150,6 +157,8 @@ def arm1(d):
     # R1
     r1_votes = []
     for k in ("a1_dx10", "a1_dx20"):
+        # R/dx 10 is reported but not voted: convexity that vanishes with resolution is a discretization effect, not
+        # the measurement effect R1 names (corrected after batch 01's first pass, 2026-10-14)
         r = runs[k]
         if not ok(r):
             continue
@@ -160,7 +169,8 @@ def arm1(d):
         lowa = max(low)
         fit, cone = r["final"]["angle_fit_mean_deg"], r["final"]["angle_cone_volume_deg"]
         c = lowa >= fit + 2 and abs(lowa - cone) <= 2
-        r1_votes.append(c)
+        if k != "a1_dx10":
+            r1_votes.append(c)
         notes.append(f"{k}: lower-flank band angle {f1(lowa)} vs fit {f1(fit)} / cone volume {f1(cone)} -> "
                      f"{'convex (R1 prediction met)' if c else 'R1 prediction not met'}.")
     if ok(base) and ok(runs["a1_tall"]):
@@ -186,7 +196,15 @@ def arm1(d):
         ratio = float(sum(s["ratio_median"] * s["n"] for s in surf) / sum(s["n"] for s in surf))
         lode = float(sum(s["lode_median"] * s["n"] for s in surf) / sum(s["n"] for s in surf))
         low = r["atan_mu_deg"] - r["final"]["angle_fit_mean_deg"] >= 3
-        if ratio >= 0.95 and low and abs(lode) > 0.3:
+        deep = [s for s in sh[3:] if s.get("n")]
+        deep_yield = deep[0].get("frac_at_yield", 0.0) if deep else 0.0
+        if ratio >= 0.95 and deep_yield >= 0.7:
+            # the interior (>= 4 cells deep, at rest, not flowing) is at yield too: the exported stress of a rigid
+            # region sits on the cone wherever the solve leaves it, so "flank at yield" does not single out the flank
+            v = (f"uninformative: the interior >= 4 cells deep is also at yield ({100 * deep_yield:.0f} %), so the "
+                 "rest stress of rigid regions is on the cone everywhere and cannot discriminate R3")
+            r3.append(None)
+        elif ratio >= 0.95 and low and abs(lode) > 0.3:
             v = "R3 consistent (at yield below atan mu, off pure shear)"
             r3.append(True)
         elif ratio < 0.9:
@@ -197,7 +215,8 @@ def arm1(d):
             r3.append(None)
         notes.append(f"{k}: flank surface (0-2 cells) yield ratio {ratio:.2f}, Lode cos3theta {lode:+.2f}, "
                      f"p_base/(rho g h) {f1(r['flank_stress'].get('p_base_over_rho_g_h'), 2)} -> {v}.")
-    res["R3_stress"] = _combine(r3, "consistent", "not supported")
+    res["R3_stress"] = ("uninformative (rest stress on the yield cone everywhere)" if r3 and all(v is None for v in r3)
+                        else _combine(r3, "consistent", "not supported"))
     head = ("| run | R/dx | fill cm | particles | fit (sd) | cone vol. | h/flank | band angles 5-25/25-50/50-75/75-95 % | "
             "max local | flank 0-1 cell ratio / Lode | at rest |\n|---|---|---|---|---|---|---|---|---|---|---|")
     return "\n".join([head] + rows), notes, res
@@ -205,8 +224,17 @@ def arm1(d):
 
 def arm2(d, heap_fit):
     rows, notes, res = [], [], {"theta_stop": {}, "theta_fail": {}}
-    for k in ("a2_mu040", "a2_mu068", "a2_mu090", "a2_mu068_v01"):
+    for k in ("a2_mu040", "a2_mu068", "a2_mu090", "a2_mu068_v01", "a2_mu040_onnode", "a2_mu040_tol4"):
         r = load(d, k)
+        if isinstance(r, dict) and r.get("error") == "nonfinite":
+            w = r.get("where", {})
+            res.setdefault("nonfinite", {})[k] = {"theta": r.get("theta"), "t": r.get("t"), "where": w}
+            rows.append(f"| {k} | {r['friction']} | {f1(r['atan_mu_deg'])} | {f1(r['depth_cells'], 0)} | "
+                        f"{f1(r.get('theta_fail_deg'))} | NON-FINITE at {f1(r.get('theta'))} deg, t {f1(r.get('t'), 2)} s "
+                        f"({w.get('n_bad')} particles; near end wall {f1(w.get('frac_near_end_wall'), 2)}, side wall "
+                        f"{f1(w.get('frac_near_side_wall'), 2)}, floor {f1(w.get('frac_near_floor'), 2)}) | — | "
+                        f"on-node walls {r.get('on_node')}, tol {r.get('tolerance')} |")
+            continue
         if not ok(r):
             rows.append(f"| {k} | {'not run' if r is None else r.get('error')} |||||||")
             continue
@@ -218,7 +246,24 @@ def arm2(d, heap_fit):
         res["theta_fail"][k] = pass_fail
         rows.append(f"| {k} | {r['friction']} | {f1(am)} | {f1(r['depth_cells'], 0)} | {f1(tf)} | {f1(ts)} | "
                     f"{r['at_rest']} | {verdict(pass_stop, 'PASS', 'FAIL', 'not at rest')} / "
-                    f"{verdict(pass_fail, 'PASS', 'FAIL')} |")
+                    f"{verdict(pass_fail, 'PASS', 'FAIL')} (on-node {r.get('on_node', True)}, tol {r.get('tolerance')}) |")
+    nf = res.get("nonfinite", {})
+    if nf:
+        on = "a2_mu040_onnode" in nf
+        off = "a2_mu040" in nf
+        tol4 = "a2_mu040_tol4" in nf
+        ran = all(ok(load(d, k)) or k in nf for k in ("a2_mu040", "a2_mu040_onnode", "a2_mu040_tol4"))
+        if ran:
+            if on and not off:
+                c = "wall faces on grid nodes (collider geometry, cf. Newton draft PR #4660's sign fixes)"
+            elif on and off and not tol4:
+                c = "the converged solve (tolerance 1e-6) at mu 0.4, not the wall placement"
+            elif on and off and tol4:
+                c = "neither wall placement nor tolerance: a solver blow-up at mu 0.4 under tilted gravity (finding)"
+            else:
+                c = "not reproduced (the first blow-up did not recur under the changed protocol)"
+            res["nonfinite_cause"] = c
+            notes.append(f"Non-finite runs: {', '.join(nf)} -> cause: {c}.")
     r = load(d, "a2_mu068")
     if ok(r) and heap_fit is not None and r["theta_stop_deg"] is not None and math.isfinite(r["theta_stop_deg"]):
         ts, am = r["theta_stop_deg"], r["atan_mu_deg"]
@@ -241,7 +286,7 @@ def arm3(d):
     rows, notes, res = [], [], {}
     base = load(d, "a1_dx10")
     b = base["final"]["angle_fit_mean_deg"] if ok(base) else REF_REPOSE_DX10
-    deltas = {}
+    deltas, qual = {}, {}
     for k in ("a3_b2", "a3_q1d", "a3_p1d", "a3_gimp", "a3_ppc64"):
         r = load(d, k)
         if not ok(r):
@@ -251,19 +296,34 @@ def arm3(d):
         dd = fin["angle_fit_mean_deg"] - b
         deltas[k] = dd
         noisy = k in ("a3_q1d", "a3_p1d") and fin["angle_fit_sd_deg"] > 1.0
+        bands = r.get("height_bands", {}).get("bands", [])
+        toe = bands[0]["angle_deg"] if bands else float("nan")
+        mid = bands[1]["angle_deg"] if len(bands) > 1 else float("nan")
+        flags = []
+        if noisy:
+            flags.append("sector sd > 1 deg (#4660)")
+        if fin.get("max_speed", 0) > 0.01:
+            flags.append(f"NOT AT REST: max particle speed {fin['max_speed']:.2f} m/s")
+        if math.isfinite(toe) and toe > r["atan_mu_deg"] + 3:
+            flags.append(f"toe band {toe:.1f} deg > atan mu + 3 (locking in thin cells?)")
+        qual[k] = flags
         rows.append(f"| {k} | {r['velocity_basis']} / {r['strain_basis']} / {r['integration_scheme']} / {r['ppc']} | "
                     f"{f1(fin['angle_fit_mean_deg'])} ± {f1(fin['angle_fit_sd_deg'])} | {dd:+.2f} | "
-                    f"{f1(fin['angle_cone_volume_deg'])} | {r['at_rest']} | {'#4660 noise' if noisy else ''} |")
+                    f"{f1(fin['angle_cone_volume_deg'])} | {f1(toe)} / {f1(mid)} | {r['at_rest']} | {'; '.join(flags)} |")
     if deltas:
         if any(v >= 1.0 for v in deltas.values()):
-            res["R2"] = "supported by " + ", ".join(k for k, v in deltas.items() if v >= 1.0)
+            up = [k for k, v in deltas.items() if v >= 1.0]
+            clean = [k for k in up if not qual.get(k)]
+            res["R2"] = ("supported by " + ", ".join(up) +
+                         ("" if clean == up else " (qualified: " + "; ".join(
+                             f"{k}: {', '.join(qual[k])}" for k in up if qual.get(k)) + ")"))
         elif all(abs(v) <= 0.5 for v in deltas.values()):
             res["R2"] = "not supported by these settings"
         else:
             res["R2"] = "undecided (changes between 0.5 and 1 deg)"
         notes.append(f"Baseline fit {b:.2f} deg (a1_dx10). R2: {res['R2']}.")
-    head = ("| run | velocity / strain / integration / ppc | fit (sd) | vs baseline | cone vol. | at rest | note |\n"
-            "|---|---|---|---|---|---|---|")
+    head = ("| run | velocity / strain / integration / ppc | fit (sd) | vs baseline | cone vol. | toe / mid band | "
+            "at rest | flags |\n|---|---|---|---|---|---|---|---|")
     return "\n".join([head] + rows), notes, res
 
 
@@ -275,10 +335,17 @@ def arm4(d):
         if not ok(r):
             rows.append(f"| {k} | {'not run' if r is None else r.get('error')} |||||||")
             continue
-        rows.append(f"| {k} | 1/{r['fps']} | {r['voxel']} | {f1(r.get('impact_speed_m_s'), 2)} | {mm(r['peak_penetration_m'])} | "
-                    f"{mm(r['final_penetration_m'])} | {f1(1000 * r['creep_m_per_s'], 2)} | {r['reached_floor']} |")
+        ip = SM.impact_phase(r)
+        late = r["final_penetration_m"] - ip["peak_m"]
+        if late > 0.002:
+            notes.append(f"{k}: late sink {1000 * late:.1f} mm after the impact phase (penetration {mm(ip['peak_m'])} "
+                         f"at {ip['t_peak_s']:.3f} s -> {mm(r['final_penetration_m'])} mm at the end): a separate "
+                         "event, not the impact.")
+        rows.append(f"| {k} | 1/{r['fps']} | {r['voxel']} | {f1(ip['v_impact'], 2)} | {mm(ip['peak_m'])} | "
+                    f"{mm(r['peak_penetration_m'])} | {mm(r['final_penetration_m'])} | {f1(1000 * r['creep_m_per_s'], 2)} | "
+                    f"{r['reached_floor']} |")
         if r["voxel"] == 0.02:
-            pts.append((r.get("dt", 1.0 / r["fps"]), r["peak_penetration_m"], r.get("impact_speed_m_s") or 1.716))
+            pts.append((r.get("dt", 1.0 / r["fps"]), ip["peak_m"], ip["v_impact"]))
     if len(pts) >= 3:
         a, s = SM.linear_fit([p[0] for p in pts], [p[1] for p in pts])
         v = sum(p[2] for p in pts) / len(pts)
@@ -290,12 +357,12 @@ def arm4(d):
         h = c_slope and c_d0 and conv is not False
         res["H_lag"] = "supported" if h else ("against (slope < 0.5 v)" if s < 0.5 * v else
                                               ("against (d0 > 25 mm: bed too weak)" if a > 0.025 else "not supported"))
-        notes.append(f"Fit peak = d0 + k dt over voxel 0.02: d0 {1000 * a:.1f} mm, k {s:.2f} m/s vs impact speed "
+        notes.append(f"Fit impact-phase peak = d0 + k dt over voxel 0.02: d0 {1000 * a:.1f} mm, k {s:.2f} m/s vs impact speed "
                      f"{v:.2f} m/s; d(1/480)-d(1/960) {'—' if conv is None else f'{1000 * (bydt[480] - bydt[960]):.1f} mm'} "
                      f"-> H_lag {res['H_lag']}.")
     r1, r2 = load(d, "a4_dt480"), load(d, "a4_dt480_v01")
     if ok(r1) and ok(r2):
-        dv = r2["peak_penetration_m"] - r1["peak_penetration_m"]
+        dv = SM.impact_phase(r2)["peak_m"] - SM.impact_phase(r1)["peak_m"]
         res["voxel_effect_mm"] = 1000 * dv
         notes.append(f"Voxel 0.01 vs 0.02 at 1/480: {1000 * dv:+.1f} mm -> "
                      f"{'not set by grid contact resolution' if abs(dv) <= 0.003 else 'grid resolution matters'}.")
@@ -303,7 +370,8 @@ def arm4(d):
     if ok(r):
         notes.append(f"dt 1/120 reproduction of bearing4 ({1000 * REF_DROP_120:.1f} mm): {mm(r['peak_penetration_m'])} mm "
                      f"({'ok' if abs(r['peak_penetration_m'] - REF_DROP_120) <= 0.001 else 'DIFFERS'}).")
-    head = ("| run | dt | voxel | impact m/s | peak mm | final mm | creep mm/s | floor |\n|---|---|---|---|---|---|---|---|")
+    head = ("| run | dt | voxel | impact m/s (free fall) | impact-phase peak mm | whole-run peak mm | final mm | "
+            "creep mm/s | floor |\n|---|---|---|---|---|---|---|---|---|")
     return "\n".join([head] + rows), notes, res
 
 
@@ -488,6 +556,12 @@ def _synthetic(d: pathlib.Path):
                              ("a2_mu068_v01", 0.68, 32.5, 5)):
         w(k, {"probe": "tilt_box", "friction": mu, "atan_mu_deg": math.degrees(math.atan(mu)), "depth_cells": cells,
               "theta_fail_deg": ts + 3, "theta_stop_deg": ts, "failed": True, "at_rest": True})
+    w("a2_mu040_onnode", {"probe": "tilt_box", "friction": 0.4, "atan_mu_deg": 21.8, "depth_cells": 10, "error": "nonfinite",
+                          "theta": 16.3, "t": 1.57, "on_node": True, "tolerance": 1e-6,
+                          "where": {"n_bad": 12, "frac_near_end_wall": 1.0, "frac_near_side_wall": 0.5,
+                                    "frac_near_floor": 0.0}})
+    w("a2_mu040_tol4", {"probe": "tilt_box", "friction": 0.4, "atan_mu_deg": 21.8, "depth_cells": 10,
+                        "theta_fail_deg": 23.0, "theta_stop_deg": 21.4, "failed": True, "at_rest": True})
     for k, kw in (("a3_b2", dict(velocity_basis="B2")), ("a3_q1d", dict(strain_basis="Q1d")),
                   ("a3_p1d", dict(strain_basis="P1d")), ("a3_gimp", dict(integration_scheme="gimp")),
                   ("a3_ppc64", dict(ppc=64))):
@@ -531,7 +605,7 @@ def selftest() -> int:
             "arm2": s["arm2"].get("discrimination") == "heap-specific",
             "R2": s["arm3"]["R2"].startswith("not supported"), "p1d error": "synthetic failure" in md,
             "H_lag": s["arm4"]["H_lag"] == "supported", "C2": s["arm5"]["C2"] == "H_grid",
-            "smoke": s["arm6"]["smoke"] is True, "plan once": note.count(START) == 1 and note.count(END) == 1,
+            "smoke": s["arm6"]["smoke"] is True, "nonfinite": "wall faces on grid nodes" in s["arm2"].get("nonfinite_cause", ""), "plan once": note.count(START) == 1 and note.count(END) == 1,
             "plan body kept": note.startswith("# plan\n\nbody\n"),
         }
         bad = [k for k, v in checks.items() if not v]

@@ -30,7 +30,8 @@
 # and the batch goes on. Resumable: STATUS.txt records each step; a rerun skips DONE / ERR jobs
 # (RETRY_ERR=1 reruns ERR jobs). Logs: runs/sand_fidelity/batch_01/logs/ (readable from the sandbox).
 #
-# Expected wall time ~62 min, range 58-78 (arithmetic: research note section 6b; numbers from runs/gpu_history.jsonl).
+# Resume after the first pass (stopped 11:49 at a2_mu040): ~40 min, range 33-55 (plan note section 6c).
+# First pass estimate: ~62 min, range 58-78 (arithmetic: research note section 6b; numbers from runs/gpu_history.jsonl).
 #
 # DRY_RUN=1: control-flow check without GPU or git writes (prints each job's command, skips gates, commits, push
 # and PR; results and logs go to $TMPDIR/sf01_dry). Used to verify this script from the agent sandbox.
@@ -58,7 +59,7 @@ cd "$W" || exit 1
 echo "=== sand_fidelity batch_01 start $(date) in $W (main checkout $R), HEAD $(git -C "$W" rev-parse --short HEAD)"
 
 say() { echo "[$(date +%H:%M:%S)] $*"; }
-done_() { grep -qE "^$1 (PASS|DONE)( |$)" "$STATUS"; }
+done_() { grep -qE "^$1 (PASS|DONE|FINDING)( |$)" "$STATUS"; }
 err_() { grep -qE "^$1 ERR( |$)" "$STATUS"; }
 mark() { echo "$1 $2 $(date +%H:%M:%S) ${3:-}" >> "$STATUS"; say "$1 -> $2 ${3:-}"; }
 ANOMALY=0
@@ -94,6 +95,10 @@ job() {
   if [ $rc -eq 0 ] && [ -s "$OUT/$name.json" ]; then mark "$name" DONE "$(( $(date +%s) - t0 )) s"
   elif [ $rc -ge 124 ] && [ $rc -le 126 ]; then mark "$name" ANOMALY "watchdog rc=$rc (124 timeout, 125 CPU stall, 126 memory)"; return 1
   elif [ $rc -eq 75 ]; then mark "$name" ANOMALY "gpu_run refused: runaway GPU work (runs/GPU_RUNAWAY_ALERT)"; return 1
+  elif [ $rc -eq 3 ] && [ "${NAN_IS_FINDING:-0}" = 1 ] && [ -s "$OUT/$name.json" ] \
+       && [ "$(jget "$OUT/$name.json" "r.get('error')")" = nonfinite ]; then
+    # a localised blow-up of the tilting box (the probe wrote where and when): a result, not a GPU hazard
+    mark "$name" FINDING "non-finite, localised in $name.json"
   elif [ $rc -eq 3 ]; then mark "$name" ANOMALY "non-finite particles or body state"; return 1
   else mark "$name" ERR "rc=$rc (see logs/$name.log)"; fi
   health || return 1
@@ -122,7 +127,8 @@ EOF
 }
 
 # ---------------------------------------------------------------------------------------------------- 0 CPU checks
-if ! done_ CPU_CHECKS; then
+CODE_HASH=$(cat "${CODE_FILES[@]:1}" | shasum | cut -c1-10)   # code only: the plan note changes with every evaluation
+if ! done_ "CPU_CHECKS_$CODE_HASH"; then
   ok=1
   bash -n "$W/scripts/sand_fidelity/batch_01.sh" || ok=0
   "$PY" -m py_compile "$P/sand_metrics.py" "$P/sand_repose.py" "$P/tilt_box.py" "$P/bearing_fidelity.py" \
@@ -131,7 +137,23 @@ if ! done_ CPU_CHECKS; then
   "$PY" -P -m pytest -q -p no:cacheprovider --rootdir "$W" "$W/tests/test_sand_metrics.py" \
       "$W/tests/test_no_machine_paths.py" > "$L/cpu_tests.log" 2>&1 || ok=0
   tail -3 "$L/cpu_tests.log"
-  if [ $ok = 1 ]; then mark CPU_CHECKS PASS; else mark CPU_CHECKS FAIL "see logs/cpu_tests.log"; exit 1; fi
+  if [ $ok = 1 ]; then mark "CPU_CHECKS_$CODE_HASH" PASS; else mark "CPU_CHECKS_$CODE_HASH" FAIL "see logs/cpu_tests.log"; exit 1; fi
+fi
+if done_ CODE_COMMIT && ! done_ "CODE_COMMIT_$CODE_HASH"; then
+  gitw add -- "${CODE_FILES[@]}"
+  commit "Sand fidelity batch 01: tilt-box NaN diagnostics, corrected evaluation" \
+"After the first pass stopped at a2_mu040 (non-finite at 16.3 deg, mu 0.4):
+tilt_box.py writes where and when a blow-up starts (JSON + last finite
+sample), translates the scene by half a voxel so that no wall face lies
+on a grid node (--on-node keeps the original placement as the
+reproduction), and tilts from atan(mu) - 12 deg. The batch records a
+localised tilt-box blow-up as a finding and runs the reproduction pair
+(on-node walls; tolerance 1e-4). The evaluator measures the drop arm in
+the impact phase with the free-fall impact speed, decides R1 at R/dx 20
+and by the tall fill, reports the rest stress as uninformative when the
+interior is at yield too, and flags variant runs not at rest or with
+toes steeper than atan(mu). Predictions unchanged." || { mark "CODE_COMMIT_$CODE_HASH" FAIL; exit 1; }
+  mark "CODE_COMMIT_$CODE_HASH" PASS "$(git -C "$W" rev-parse --short HEAD)"
 fi
 if ! done_ CODE_COMMIT; then
   gitw add -- "${CODE_FILES[@]}"
@@ -146,6 +168,7 @@ overlap/heave measures), sphere_drop.py (Uehara smoke test); shared CPU
 measurements in sand_metrics.py with tests; the batch script and its
 evaluator." || { mark CODE_COMMIT FAIL; exit 1; }
   mark CODE_COMMIT PASS "$(git -C "$W" rev-parse --short HEAD)"
+  mark "CODE_COMMIT_$CODE_HASH" PASS "$(git -C "$W" rev-parse --short HEAD)"
 fi
 health || exit 90
 
@@ -181,17 +204,25 @@ run_all() {
   job a3_p1d 78 -- "$PY" "$P/sand_repose.py" --voxel 0.005 --strain-basis P1d --json "$OUT/a3_p1d.json" || return 1
   job a3_gimp 78 -- "$PY" "$P/sand_repose.py" --voxel 0.005 --integration-scheme gimp --json "$OUT/a3_gimp.json" || return 1
   job a3_ppc64 141 -- "$PY" "$P/sand_repose.py" --voxel 0.005 --ppc-axis 4 --json "$OUT/a3_ppc64.json" || return 1
-  # arm 2
-  job a2_mu040 195 -- "$PY" "$P/tilt_box.py" --friction 0.4 --voxel 0.005 --json "$OUT/a2_mu040.json" || return 1
-  job a2_mu068 208 -- "$PY" "$P/tilt_box.py" --friction 0.68 --voxel 0.005 --json "$OUT/a2_mu068.json" || return 1
-  job a2_mu090 215 -- "$PY" "$P/tilt_box.py" --friction 0.9 --voxel 0.005 --json "$OUT/a2_mu090.json" || return 1
-  job a2_mu068_v01 102 -- "$PY" "$P/tilt_box.py" --friction 0.68 --voxel 0.01 --json "$OUT/a2_mu068_v01.json" || return 1
+  # arm 2 (walls half a voxel off the grid nodes by default; a localised NaN is a FINDING, not a stop).
+  # The mu 0.4 pair discriminates the first run's blow-up: on-node walls (its reproduction, same 1e-6 solve) and
+  # off-node walls at Isaac's tolerance 1e-4 (see evaluate_batch_01.py arm2 for the decision table)
+  export NAN_IS_FINDING=1
+  job a2_mu068 188 -- "$PY" "$P/tilt_box.py" --friction 0.68 --voxel 0.005 --json "$OUT/a2_mu068.json" || return 1
+  job a2_mu090 192 -- "$PY" "$P/tilt_box.py" --friction 0.9 --voxel 0.005 --json "$OUT/a2_mu090.json" || return 1
+  job a2_mu068_v01 104 -- "$PY" "$P/tilt_box.py" --friction 0.68 --voxel 0.01 --json "$OUT/a2_mu068_v01.json" || return 1
+  job a2_mu040 180 -- "$PY" "$P/tilt_box.py" --friction 0.4 --voxel 0.005 --json "$OUT/a2_mu040.json" || return 1
+  job a2_mu040_onnode 180 -- "$PY" "$P/tilt_box.py" --friction 0.4 --voxel 0.005 --on-node \
+      --json "$OUT/a2_mu040_onnode.json" || return 1
+  job a2_mu040_tol4 180 -- "$PY" "$P/tilt_box.py" --friction 0.4 --voxel 0.005 --tolerance 1e-4 \
+      --json "$OUT/a2_mu040_tol4.json" || return 1
+  export NAN_IS_FINDING=0
   # arm 6
-  job a6_sphere 87 -- "$PY" "$P/sphere_drop.py" --h 0.2 --fps 480 --voxel 0.005 --json "$OUT/a6_sphere.json" || return 1
+  job a6_sphere 91 -- "$PY" "$P/sphere_drop.py" --h 0.2 --fps 480 --voxel 0.005 --json "$OUT/a6_sphere.json" || return 1
   # arm 5 (a5_v02_S2 ran as a gate)
   local v vox est b p
   for v in v02 v01 v005; do
-    case $v in v02) vox=0.02; est=28;; v01) vox=0.01; est=53;; v005) vox=0.005; est=248;; esac
+    case $v in v02) vox=0.02; est=48;; v01) vox=0.01; est=69;; v005) vox=0.005; est=197;; esac
     for b in S2 pic27; do
       for p in "" _proj; do
         [ "$v$b$p" = v02S2 ] && continue
@@ -231,7 +262,11 @@ if [ $ANOMALY = 1 ]; then
   say "anomaly: results committed locally, NOT pushed. Inspect STATUS.txt / logs, then rerun this script to resume."; exit 4
 fi
 
-git -C "$W" push -q origin "HEAD:refs/heads/$BRANCH" 2>&1 | grep -v "^remote:" | tail -3
+for i in 1 2 3; do                                  # bounded retries (the first push hit a transient DNS failure)
+  git -C "$W" push -q origin "HEAD:refs/heads/$BRANCH" 2>&1 | grep -v "^remote:" | tail -3
+  git -C "$W" ls-remote origin "refs/heads/$BRANCH" 2>/dev/null | grep -q "$(git -C "$W" rev-parse HEAD)" && break
+  say "push attempt $i did not land; retrying in 30 s"; sleep 30
+done
 if git -C "$W" ls-remote origin "refs/heads/$BRANCH" | grep -q "$(git -C "$W" rev-parse HEAD)"; then
   mark PUSH PASS "$BRANCH"
 else mark PUSH FAIL; exit 1; fi
