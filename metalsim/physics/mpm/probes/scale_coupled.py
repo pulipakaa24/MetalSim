@@ -33,7 +33,7 @@ def build(a):
     from metalsim.physics.mpm.coupled import SAND, GridEmitter, MPMConfig, MPMCoupling
 
     model = mujoco.MjModel.from_xml_string(XML.format(dt=1.0 / 120.0 / 3))
-    sim = BatchSim(model, a.worlds, options=BatchSimOptions(substeps=3, deterministic=bool(a.deterministic)))
+    sim = BatchSim(model, a.worlds, options=BatchSimOptions(substeps=3))
     if a.rigid_only:
         return sim, None
     mpm = MPMCoupling(sim, MPMConfig(voxel_size=a.voxel, max_iterations=a.iterations, solver=a.solver,
@@ -98,7 +98,6 @@ def main():
     ap.add_argument("--capture", type=int, default=1)
     ap.add_argument("--cells-per-world", type=int, default=512, help="sparse-grid cell reservation per world")
     ap.add_argument("--time", action="store_true")
-    ap.add_argument("--deterministic", type=int, default=0, help="BatchSimOptions(deterministic=...)")
     ap.add_argument("--rigid-only", action="store_true", help="the box on the floor without sand (BatchSim only)")
     ap.add_argument("--warmup", type=int, default=10)
     ap.add_argument("--json")
@@ -107,7 +106,7 @@ def main():
 
     wp.config.quiet = True
     res = {"worlds": a.worlds, "solver": a.solver, "steps": a.steps, "capture": a.capture,
-           "deterministic": a.deterministic, "rigid_only": a.rigid_only}
+           "rigid_only": a.rigid_only}
     with wp.ScopedDevice("metal:0"):
         if a.time:
             res.update(run_time(a))

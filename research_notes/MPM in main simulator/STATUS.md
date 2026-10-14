@@ -27,7 +27,17 @@ bitwise; box pair bitwise until contact then 1.7e-7 m; neutrality; GS repeatable
 non-determinism), free-fall test (lateral 2e-4 m/s from the solver's numerical air drag), repose (my batch marked it
 PASS unconditionally: a bug; and a collapse deposit is not a repose angle).
 
-## batch_02 results (15:59) and batch_03 (in flight)
+## batch_03 results (17:49) and batch_04 (in flight)
+- Bearing: staggered sinks to the floor (80 mm) in drop and rest; lagged: rest 25 mm with 50 iterations (creep
+  16 mm/s), 10 mm / 0.4 mm/s with 250 iterations at 1e-6; mu 0.3 fails as predicted. MPM.md section 11.
+- Repose (lift, corrected): 25.4 / 26.3 / 27.2 deg at R/dx 5 / 10 / 15 for mu 0.68 (atan 34.2); 14.7 (0.4), 32.6
+  (0.9); lift-speed plateau; iterations no effect. 7-9 deg below atan(mu), solver-level.
+- Determinism: stacked boxes 2/256 worlds from step 139 (suspect CCD two-phase counters,
+  `deterministic_ccd_divergence.md`). Coordinator decision: split onto branch `batchsim-deterministic` (draft PR),
+  the MPM PR goes without it. batch_04 commits the merge with main (resolved by the agent), the split, reruns tests,
+  measures bearing with Isaac's default solve and repose at R/dx 20, then opens the MPM PR if green.
+
+## batch_02 results (15:59) and batch_03
 - Rigid side: MuJoCo Warp not repeatable by default (box on floor diverges at step 18 at 1,024 worlds);
   `BatchSimOptions(deterministic=True)` makes box / coupled scenes repeat at 1,024 worlds, but the stacked-boxes test
   at 256 worlds failed in one pytest process. batch_03: options before put_model, one mode per process, record bound
