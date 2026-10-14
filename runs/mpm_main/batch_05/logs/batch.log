@@ -1,0 +1,49 @@
+=== batch_05 start Tue Oct 13 18:56:38 PDT 2026
+[18:56:38] MERGED26 -> PASS 
+ok
+https://github.com/pulipakaa24/MetalSim/pull/28
+[18:56:46] DOCS -> PASS https://github.com/pulipakaa24/MetalSim/pull/28
+ok
+https://github.com/pulipakaa24/MetalSim/pull/29
+[18:56:51] DETBRANCH -> PASS https://github.com/pulipakaa24/MetalSim/pull/29
+[18:56:54] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
+[18:56:54] gpu job mm5_ccd_off (check, <= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b05/logs/stack256_nativeccd_off.log
+    Module reset_data__locals__reset_contact_f8b9b9fd f8b9b9f load on device 'metal:0' took 40.85 ms  (cached)
+    Module reset_data__locals__reset_sleep_b5b26f6c b5b26f6 load on device 'metal:0' took 39.14 ms  (cached)
+    Module reset_data__locals__reset_nworld_3a32ab72 3a32ab7 load on device 'metal:0' took 345.27 ms  (cached)
+    {"scene": "stack", "worlds": 256, "deterministic": 1, "capture": 1, "nativeccd_off": true, "in_process_first_diff": [null], "warp_cache": "/Users/aditya/Library/Caches/warp/1.18.0.dev20260917"}
+[19:03:45] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
+[19:03:45] gpu job mm5_tgfin_off (check, <= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b05/logs/stack256_tg_finalize_off.log
+    Module reset_data__locals__reset_contact_f8b9b9fd f8b9b9f load on device 'metal:0' took 40.68 ms  (cached)
+    Module reset_data__locals__reset_sleep_b5b26f6c b5b26f6 load on device 'metal:0' took 39.56 ms  (cached)
+    Module reset_data__locals__reset_nworld_3a32ab72 3a32ab7 load on device 'metal:0' took 340.81 ms  (cached)
+    {"scene": "stack", "worlds": 256, "deterministic": 1, "capture": 1, "nativeccd_off": false, "in_process_first_diff": [{"step": 139, "worlds_differing": 2, "first_worlds": [144, 208], "ncon_a": 1024, "ncon_b": 1024}], "warp_cache": "/Users/aditya/Library/Caches/warp/1.18.0.dev20260917"}
+[19:04:11] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
+[19:04:11] gpu job mm5_small_off (check, <= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b05/logs/stack256_small_records_off.log
+    Module reset_data__locals__reset_contact_f8b9b9fd f8b9b9f load on device 'metal:0' took 40.35 ms  (cached)
+    Module reset_data__locals__reset_sleep_b5b26f6c b5b26f6 load on device 'metal:0' took 40.16 ms  (cached)
+    Module reset_data__locals__reset_nworld_3a32ab72 3a32ab7 load on device 'metal:0' took 41.13 ms  (cached)
+    {"scene": "stack", "worlds": 256, "deterministic": 1, "capture": 1, "nativeccd_off": false, "in_process_first_diff": [{"step": 139, "worlds_differing": 2, "first_worlds": [32, 48], "ncon_a": 1024, "ncon_b": 1024}], "warp_cache": "/Users/aditya/Library/Caches/warp/1.18.0.dev20260917"}
+[19:04:27] health: utilisation 96%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   2.3 %
+[19:04:27] gpu job mm5_audit (check, <= 25 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b05/logs/contact_audit_ccd.log
+    {"step": 147, "nacon": [1024, 1025], "holes": [0, 0], "bb_count_hist": [[0, 256], [0, 256]], "worlds_state_differ": [16, 48, 64, 144, 176, 208, 224], "n_worlds_state_differ": 7, "worlds_bb_count_differ": []}
+    {"step": 148, "nacon": [1026, 1026], "holes": [0, 0], "bb_count_hist": [[1, 254, 1], [1, 254, 1]], "worlds_state_differ": [16, 48, 64, 144, 176, 208, 224], "n_worlds_state_differ": 7, "worlds_bb_count_differ": [48, 144]}
+    {"step": 149, "nacon": [1028, 1028], "holes": [0, 0], "bb_count_hist": [[0, 256], [0, 256]], "worlds_state_differ": [16, 48, 64, 144, 176, 208, 224], "n_worlds_state_differ": 7, "worlds_bb_count_differ": []}
+    {"step": 150, "nacon": [1028, 1028], "holes": [0, 0], "bb_count_hist": [[0, 256], [0, 256]], "worlds_state_differ": [16, 48, 64, 144, 176, 208, 224], "n_worlds_state_differ": 7, "worlds_bb_count_differ": []}
+[19:05:03] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[19:05:03] gpu job mm5_audit_off (check, <= 25 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b05/logs/contact_audit_nativeccd_off.log
+    {"step": 147, "nacon": [2048, 2048], "holes": [0, 0], "bb_count_hist": [[0, 0, 0, 0, 256], [0, 0, 0, 0, 256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
+    {"step": 148, "nacon": [2048, 2048], "holes": [0, 0], "bb_count_hist": [[0, 0, 0, 0, 256], [0, 0, 0, 0, 256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
+    {"step": 149, "nacon": [2048, 2048], "holes": [0, 0], "bb_count_hist": [[0, 0, 0, 0, 256], [0, 0, 0, 0, 256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
+    {"step": 150, "nacon": [2048, 2048], "holes": [0, 0], "bb_count_hist": [[0, 0, 0, 0, 256], [0, 0, 0, 0, 256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
+[19:05:39] health: utilisation 10%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1085 com.apple.WebKit                   3.8 %
+  pid    410 WindowServer                       1.0 %
+[19:05:39] DIAG5 -> DONE stack256_nativeccd_off: {"scene": "stack", "worlds": 256, "deterministic": 1, "capture": 1, "nativeccd_off": true, "in_process_first_diff": [null], "warp_cache": "/Users/aditya/Library/Caches/warp/1.18.0.dev20260917"}; stack256_tg_finalize_off: {"scene": "stack", "worlds": 256, "deterministic": 1, "capture": 1, "nativeccd_off": false, "in_process_first_diff": [{"step": 139, "worlds_differing": 2, "first_worlds": [144, 208], "ncon_a": 1024, "ncon_b": 1024}], "wa; stack256_small_records_off: {"scene": "stack", "worlds": 256, "deterministic": 1, "capture": 1, "nativeccd_off": false, "in_process_first_diff": [{"step": 139, "worlds_differing": 2, "first_worlds": [32, 48], "ncon_a": 1024, "ncon_b": 1024}], "warp; 
