@@ -32,6 +32,7 @@ project, not affiliated with or endorsed by NVIDIA, Google DeepMind or Apple.
   and [`docs/HANDOFF_tier2_hdri_envmap.md`](docs/HANDOFF_tier2_hdri_envmap.md).
 - Research: [`docs/research/`](docs/research) (one question per note; index under "Research notes" below),
   [`research_notes/`](research_notes) and [`reports/`](reports) (the MPM, float-parity, rendering and capacity rounds).
+- Scenes: [`docs/SCENES.md`](docs/SCENES.md): a robot, objects, camera mounts, lidar and a background (plane, HDRI or Gaussian splat behind a collision proxy) from one YAML file (Isaac Lab names): `python -m metalsim.run scene.yaml`.
 - Renders: [`docs/renders/`](docs/renders) (filmed tasks with a doc each: what is shown, timings, assets and
   licences, how to reproduce; first: [Franka-Pour](docs/renders/FRANKA_POUR.md)), made with
   `python -m metalsim.render.film <task>`.
