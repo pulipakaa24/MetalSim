@@ -223,3 +223,30 @@ def test_film_task_twin_exports(tmp_path):
     export_twin(spec, str(tmp_path))
     m = mujoco.MjModel.from_xml_path(str(tmp_path / "twin.xml"))
     assert m.ngeom == m0.ngeom and m.nmesh == m0.nmesh
+
+
+def test_lidar_keeps_config_name(monkeypatch):
+    """scene.sense() is keyed by the config name: compose passes it to make_lidar (Lidar's default name is "lidar";
+    batch_fix2's KeyError: 'front_lidar'). CPU: a stand-in ray tracer records the call; beams follow LidarPatternCfg."""
+    import metalsim.sensors.raytrace as RT
+
+    calls = []
+
+    class FakeRT:
+        def __init__(self, model, n, max_range):
+            self.max_range = max_range
+
+        def make_lidar(self, site, az, el, **kw):
+            calls.append((site, len(az), kw))
+            return type("L", (), {"name": kw.get("name", "lidar")})()
+
+        def trace_host(self, datas, sensors):
+            return {s.name: {"range": np.zeros((1, 3))} for s in sensors}
+
+    monkeypatch.setattr(RT, "RayTracer", FakeRT)
+    cfg = C.from_dict({"sensors": {"roof_lidar": {"prim_path": "{ENV_REGEX_NS}/Lidar", "offset": {"pos": [0, 0, 1]},
+                                                  "pattern_cfg": {"channels": 4, "horizontal_res": 10.0}}}})
+    scene = CP.ComposedScene(cfg, device=None)
+    scene._build_sensors()
+    assert calls == [("roof_lidar", 4 * 36, {"name": "roof_lidar"})] and list(scene.lidars) == ["roof_lidar"]
+    assert list(scene.sense(datas=[object()])) == ["roof_lidar"]
