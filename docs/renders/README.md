@@ -6,6 +6,7 @@ which machine, every asset with its source and licence, and the commands to repr
 | film | what | doc |
 |---|---|---|
 | Franka-Pour | trained policy pours granular MPM media between two cups (Isaac Lab 3.0-EA task); one env and a 2 x 2 grid | [FRANKA_POUR.md](FRANKA_POUR.md) |
+| G1 flat walk | the tool's MuJoCo-path smoke test: Isaac Lab's G1 flat velocity policy, 5 s, 1280x720, 128 spp | [g1_flat.mp4](g1_flat.mp4) ([still](g1_flat_still2.jpg)) |
 
 ## Making one
 
