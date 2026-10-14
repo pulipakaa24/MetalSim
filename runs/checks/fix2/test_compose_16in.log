@@ -1,0 +1,116 @@
+............F.                                                           [100%]
+=================================== FAILURES ===================================
+______________________________ test_go2_boxes_gpu ______________________________
+
+tmp_path = PosixPath('/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-103/test_go2_boxes_gpu0')
+
+    @needs_go2
+    @needs_metal
+    def test_go2_boxes_gpu(tmp_path):
+        """BatchSim + tier-1 head camera (rgb, depth, segmentation) + ray-traced lidar on the composed example."""
+        from dataclasses import replace
+    
+        cfg = replace(C.load(GO2), num_envs=2)
+        scene = CP.compose(cfg)
+        scene.reset()
+        for _ in range(20):
+            scene.step()
+        scene.sim.synchronize()
+        out = scene.render()["head_cam"]
+        rgb, depth, seg = out["rgb"], out["distance_to_image_plane"], out["semantic_segmentation"]
+        assert rgb.shape == (2, 360, 640, 3) and rgb.std() > 5
+        assert depth.shape == (2, 360, 640) and np.isfinite(depth).all()
+        # The first version asked for > 50 % of pixels with a hit and got exactly 1/3 (2026-10-14, 16-inch). Root cause: the
+        # image was right. A forward camera 0.38 m above the floor sees sky (depth 0 = no hit) above the horizon, about half
+        # the frame when level (runs/scenes/go2_boxes/run/head_cam_distance_to_image_plane_0.png: horizon at mid-height),
+        # and at step 20 the dog, settling from its drop, was pitched ~6 deg nose-up in both envs: the horizon 120 rows
+        # below the centre, 120 + 120 hit rows of 720 = 1/3 (the bottom-row floor depth 1.854 m matches that pitch).
+        # Checked geometrically now, against the first hit of each pixel's ray on the host model (mj_ray over the geom groups
+        # the renderer draws, 0-3), not an assumed floor: with the reset sampling of the scene seed, boxes sit across the
+        # bottom-left pixel's ray (fresh-install check 2026-10-14: 0.866 m rendered, a box; the floor would be 1.854 m).
+        m = scene.model
+        cid = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_CAMERA, "head_cam")
+        datas = scene.host_datas()                         # the state just rendered (host_datas synchronizes; no step since)
+        f = (360 / 2) / np.tan(np.radians(CP.fovy_deg(cfg.cameras["head_cam"])) / 2)
+        groups = np.array([1, 1, 1, 1, 0, 0], np.uint8)
+        robot = m.body_rootid[mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, "base")]
+        checked = 0
+        for e in range(2):
+            p, R = datas[e].cam_xpos[cid], datas[e].cam_xmat[cid].reshape(3, 3)
+            for row, col in ((359, 0), (359, 639), (359, 320), (300, 320), (330, 100), (330, 540)):
+                v = R @ np.array([(col + 0.5 - 320) / f, -(row + 0.5 - 180) / f, -1.0])   # unit planar depth along v
+                gid = np.zeros(1, np.int32)
+                t = mujoco.mj_ray(m, datas[e], p, v, groups, 1, -1, gid)                   # in units of |v|: planar depth
+                got = float(depth[e, row, col])
+                if t < 0:
+                    assert got == 0.0, (e, row, col, got)                                  # nothing hit: sky
+                elif m.body_rootid[m.geom_bodyid[gid[0]]] == robot:
+                    continue                                       # the robot's own collision vs visual meshes differ
+                else:
+                    hit = mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_GEOM, int(gid[0]))
+                    assert abs(got - t) < 0.02 * t, (e, row, col, got, float(t), hit)
+                checked += 1
+            top = R @ np.array([0.0, 180 / f, -1.0])
+            if top[2] > 0.01:                                                       # the top row looks up: sky only
+                assert (depth[e, 0] == 0).all()
+        assert checked >= 8
+        assert len(np.unique(seg)) >= 2
+>       hits = scene.sense()["front_lidar"]["range"]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'front_lidar'
+
+tests/test_compose.py:207: KeyError
+----------------------------- Captured stdout call -----------------------------
+Module mujoco_warp._src.smooth d82236f load on device 'metal:0' took 64.48 ms  (cached)
+Module _nxn_broadphase__locals__kernel_da6e4d10 da6e4d1 load on device 'metal:0' took 41.92 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_74f6bbbc 74f6bbb load on device 'metal:0' took 60.46 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_cf550af6 cf550af load on device 'metal:0' took 45.89 ms  (cached)
+Module mujoco_warp._src.constraint 5a9ac8b load on device 'metal:0' took 39.69 ms  (cached)
+Module _friction_dof__locals__kernel_7675e9e7 7675e9e load on device 'metal:0' took 40.04 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_89f30062 89f3006 load on device 'metal:0' took 40.40 ms  (cached)
+Module _efc_contact_init__locals__kernel_053e2b79 053e2b7 load on device 'metal:0' took 39.98 ms  (cached)
+Module _efc_contact_jac_sparse__locals__kernel_23367638 2336763 load on device 'metal:0' took 40.16 ms  (cached)
+Module _efc_contact_update__locals__kernel_2c3f8f8a 2c3f8f8 load on device 'metal:0' took 40.70 ms  (cached)
+Module mujoco_warp._src.sensor 9b332ca load on device 'metal:0' took 63.63 ms  (cached)
+Module mujoco_warp._src.forward f50e6f5 load on device 'metal:0' took 53.80 ms  (cached)
+Module mujoco_warp._src.passive b076fe0 load on device 'metal:0' took 51.50 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_54b31bb5 54b31bb load on device 'metal:0' took 39.29 ms  (cached)
+Module mujoco_warp._src.forward 5f45167 load on device 'metal:0' took 53.04 ms  (cached)
+Module _qfrc_smooth__locals__kernel_775cdd1e 775cdd1 load on device 'metal:0' took 39.40 ms  (cached)
+Module mujoco_warp._src.support c23ce19 load on device 'metal:0' took 40.55 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_1e1369df 8ac5b05 load on device 'metal:0' took 41.00 ms  (cached)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_068311f7 22519a4 load on device 'metal:0' took 39.48 ms  (cached)
+Module _solve_init_dof__locals__kernel_b308d2e0 b308d2e load on device 'metal:0' took 39.54 ms  (cached)
+Module _solve_init_efc__locals__kernel_496de172 496de17 load on device 'metal:0' took 39.62 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_9e06cdec 9e06cde load on device 'metal:0' took 39.67 ms  (cached)
+Module mul_m_kernel__locals___mul_m_cc4a8159 cc4a815 load on device 'metal:0' took 40.07 ms  (cached)
+Module _update_constraint_efc__locals__kernel_816b370a 816b370 load on device 'metal:0' took 40.45 ms  (cached)
+Module mujoco_warp._src.solver 7d36d0b load on device 'metal:0' took 43.77 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_sparse__locals__kernel_fb0e9617 fb0e961 load on device 'metal:0' took 40.51 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_62bc6e88 62bc6e8 load on device 'metal:0' took 39.97 ms  (cached)
+Module _update_gradient_grad__locals__kernel_68e6ef6f 68e6ef6 load on device 'metal:0' took 39.08 ms  (cached)
+Module _update_gradient_init_h_sparse__locals__kernel_84a052c3 84a052c load on device 'metal:0' took 39.80 ms  (cached)
+Module _JTDACJ_sparse__locals__kernel_e1f3fdb5 ca15c6d load on device 'metal:0' took 39.35 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_42432b97 128e28f load on device 'metal:0' took 40.08 ms  (cached)
+Module _linesearch_jv_fused_kernel__locals__kernel_bf645185 bf64518 load on device 'metal:0' took 39.72 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_14418b72 0065b3c load on device 'metal:0' took 42.00 ms  (cached)
+Module _update_constraint_efc__locals__kernel_74fe78cc 74fe78c load on device 'metal:0' took 40.24 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_1f9a5fed 1f9a5fe load on device 'metal:0' took 39.39 ms  (cached)
+Module _update_gradient_grad__locals__kernel_d31e3724 d31e372 load on device 'metal:0' took 40.10 ms  (cached)
+Module _update_gradient_h_incremental_sparse__locals__kernel_c4c9e4a6 c4c9e4a load on device 'metal:0' took 39.67 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_aee3b00a 0e4151a load on device 'metal:0' took 40.01 ms  (cached)
+Module _solve_done__locals__kernel_f6c8ded3 f6c8ded load on device 'metal:0' took 39.43 ms  (cached)
+Module _next_time_builder__locals___next_time_9bdc285a 9bdc285 load on device 'metal:0' took 40.68 ms  (cached)
+Module metalsim.physics.batch 74a3c65 load on device 'metal:0' took 40.21 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_753bbeab 753bbea load on device 'metal:0' took 39.98 ms  (cached)
+Module reset_data__locals__reset_M_94b7ab81 94b7ab8 load on device 'metal:0' took 39.59 ms  (cached)
+Module reset_data__locals__reset_mocap_ffcfb2c4 ffcfb2c load on device 'metal:0' took 41.11 ms  (cached)
+Module reset_data__locals__reset_contact_41eafef4 41eafef load on device 'metal:0' took 40.37 ms  (cached)
+Module reset_data__locals__reset_sleep_38f94185 38f9418 load on device 'metal:0' took 41.18 ms  (cached)
+Module reset_data__locals__reset_nworld_5d2d5901 5d2d590 load on device 'metal:0' took 41.90 ms  (cached)
+[scene] go2_boxes: 2 envs, nbody 20 ngeom 63 nq 61 nu 12, 1 cameras, 1 lidars; spec 0.01 s, sim 2.39 s
+=========================== short test summary info ============================
+FAILED tests/test_compose.py::test_go2_boxes_gpu - KeyError: 'front_lidar'
+1 failed, 13 passed in 5.03s
+
+[watchdog] exit 1 after 6 s
