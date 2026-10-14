@@ -1,0 +1,70 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /Users/aditya/robosim/.venv/bin/python
+rootdir: /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
+configfile: pyproject.toml
+plugins: xdist-3.8.0
+collecting ... collected 5 items
+
+tests/test_batch_deterministic.py::test_repeats_cold_and_warm_cache[box-1024] PASSED [ 20%]
+tests/test_batch_deterministic.py::test_repeats_cold_and_warm_cache[stack-4] PASSED [ 40%]
+tests/test_batch_deterministic.py::test_repeats_cold_and_warm_cache[stack-256] FAILED [ 60%]
+tests/test_batch_deterministic.py::test_repeats_cold_and_warm_cache[panda-16] FAILED [ 80%]
+tests/test_batch_deterministic.py::test_refuses_after_default_mode_launch PASSED [100%]
+
+=================================== FAILURES ===================================
+_________________ test_repeats_cold_and_warm_cache[stack-256] __________________
+
+scene = 'stack', worlds = 256
+
+    @pytest.mark.parametrize("scene,worlds", [("box", 1024), ("stack", 4), ("stack", 256), ("panda", 16)])
+    def test_repeats_cold_and_warm_cache(scene, worlds):
+        """Two runs in one process are bitwise equal, and so are three processes: two with a fresh (cold) kernel cache
+        each, one with the warm cache the second left."""
+        if scene == "panda" and not any(p.exists() for p in (ROOT / "upstream/mujoco_menagerie",
+                                                              ROOT.parent.parent.parent / "upstream/mujoco_menagerie")):
+            pytest.skip("MuJoCo Menagerie not present")
+        with tempfile.TemporaryDirectory() as d:
+            c1, c2 = os.path.join(d, "cache1"), os.path.join(d, "cache2")
+            a, ra = _diag(scene, worlds, os.path.join(d, "a.json"), c1)
+            b, rb = _diag(scene, worlds, os.path.join(d, "b.json"), c2)
+            c, rc = _diag(scene, worlds, os.path.join(d, "c.json"), c2)
+            for x, r in ((a, ra), (b, rb), (c, rc)):
+>               assert all(f is None for f in x["in_process_first_diff"]), (x["in_process_first_diff"], r.stdout[-500:])
+E               AssertionError: ([{'step': 139, 'worlds_differing': 2, 'first_worlds': [16, 208], 'ncon_a': 1024, ...}], 'locals__reset_sleep_b5b26f6c b5b26f6 load on device \'metal:0\' took 95.42 ms  (compiled)
+E                 Module reset_data__locals__reset_nworld_3a32ab72 3a32ab7 load on device \'metal:0\' took 98.31 ms  (compiled)
+E                 {"scene": "stack", "worlds": 256, "deterministic": 1, "capture": 1, "in_process_first_diff": [{"step": 139, "worlds_differing": 2, "first_worlds": [16, 208], "ncon_a": 1024, "ncon_b": 1024}], "warp_cache": "/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/tmp2hre6rah/cache1/1.18.0.dev20260917"}
+E                 ')
+E               assert False
+E                +  where False = all(<generator object test_repeats_cold_and_warm_cache.<locals>.<genexpr> at 0x10cad4930>)
+
+tests/test_batch_deterministic.py:47: AssertionError
+__________________ test_repeats_cold_and_warm_cache[panda-16] __________________
+
+scene = 'panda', worlds = 16
+
+    @pytest.mark.parametrize("scene,worlds", [("box", 1024), ("stack", 4), ("stack", 256), ("panda", 16)])
+    def test_repeats_cold_and_warm_cache(scene, worlds):
+        """Two runs in one process are bitwise equal, and so are three processes: two with a fresh (cold) kernel cache
+        each, one with the warm cache the second left."""
+        if scene == "panda" and not any(p.exists() for p in (ROOT / "upstream/mujoco_menagerie",
+                                                              ROOT.parent.parent.parent / "upstream/mujoco_menagerie")):
+            pytest.skip("MuJoCo Menagerie not present")
+        with tempfile.TemporaryDirectory() as d:
+            c1, c2 = os.path.join(d, "cache1"), os.path.join(d, "cache2")
+            a, ra = _diag(scene, worlds, os.path.join(d, "a.json"), c1)
+            b, rb = _diag(scene, worlds, os.path.join(d, "b.json"), c2)
+            c, rc = _diag(scene, worlds, os.path.join(d, "c.json"), c2)
+            for x, r in ((a, ra), (b, rb), (c, rc)):
+>               assert all(f is None for f in x["in_process_first_diff"]), (x["in_process_first_diff"], r.stdout[-500:])
+E               AssertionError: ([{'step': 10, 'worlds_differing': 2, 'first_worlds': [0, 6], 'ncon_a': 32, ...}], '_data__locals__reset_sleep_b5b26f6c b5b26f6 load on device \'metal:0\' took 393.20 ms  (compiled)
+E                 Module reset_data__locals__reset_nworld_3a32ab72 3a32ab7 load on device \'metal:0\' took 410.17 ms  (compiled)
+E                 {"scene": "panda", "worlds": 16, "deterministic": 1, "capture": 1, "in_process_first_diff": [{"step": 10, "worlds_differing": 2, "first_worlds": [0, 6], "ncon_a": 32, "ncon_b": 32}], "warp_cache": "/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/tmpanriiz9x/cache2/1.18.0.dev20260917"}
+E                 ')
+E               assert False
+E                +  where False = all(<generator object test_repeats_cold_and_warm_cache.<locals>.<genexpr> at 0x10cad5630>)
+
+tests/test_batch_deterministic.py:47: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_batch_deterministic.py::test_repeats_cold_and_warm_cache[stack-256]
+FAILED tests/test_batch_deterministic.py::test_repeats_cold_and_warm_cache[panda-16]
+=================== 2 failed, 3 passed in 198.18s (0:03:18) ====================

@@ -137,3 +137,9 @@ published benchmark. Neither is cited as physics parity evidence.
   analytically (single-grain coverage and irradiance, white furnace in a grain pile), batched, deterministic; 22 M
   grains per frame measured, 25.1 M on the 16-inch (2026-10-13, PARTICLES.md). Not drawn: particles in the ray-traced
   depth camera and lidar. Demo: Newton's ANYmal C on MPM sand path-traced (`scripts/particle_demo/`).
+- **MPM in the main simulator** (in progress since 2026-10-13, branch `mpm-main-sim`, `metalsim/physics/mpm/MPM.md`
+  section 11): `MPMCoupling` adds Isaac Lab's MPM material to a `BatchSim` scene in `.venv` (vendored copy of the
+  Newton 1.5.2 fork's solver, bitwise Newton's own; Isaac's proxy coupling). A box on sand follows Isaac's coupling
+  path to rounding. Found and fixed on the fork: Gauss-Seidel with separate worlds was an invalid coloring (data race,
+  non-repeatable multi-world runs, Newton's own 1.5.2 included). Measured: bitwise repeatable to 1,024 worlds (GS), 13.7 / 223.6 ms per coupled step at 1 / 1,024 worlds; rigid side (MuJoCo Warp) not run-to-run repeatable on Metal: an opt-in deterministic BatchSim is in progress on branch `batchsim-deterministic`. Broken: in the `"staggered"` exchange (Isaac's Franka-Pour setting, and Isaac's own coupling path) a body resting on sand sinks at g dt per step through any bed (coupling lag, not the sand); the default is now Newton's `"lagged"` exchange, under which a resting box settles 10 mm with a converged solve (creep 0.4 mm/s; 25 mm and still creeping with 50 iterations). Measured, solver-level (the same in Isaac Lab): the angle of repose is 7-9 deg below atan(mu) (26-27 deg for mu 0.68, rising slowly with resolution). Open: robot
+  scenes (ANYmal on sand) in the main simulator.

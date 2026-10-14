@@ -1,0 +1,28 @@
+== .venv-newton152
+newton 1.5.2 newton._src.solvers.implicit_mpm.solver_implicit_mpm
+solver auto          basis S2     cells auto : first differing step 0
+solver auto          basis S2     cells -1   : first differing step 0
+solver auto          basis pic27  cells auto : first differing step 0
+solver auto          basis pic27  cells -1   : first differing step 0
+solver jacobi        basis S2     cells auto : first differing step None
+solver jacobi        basis S2     cells -1   : first differing step None
+solver jacobi        basis pic27  cells auto : first differing step None
+solver jacobi        basis pic27  cells -1   : first differing step None
+solver gauss-seidel  basis S2     cells auto : first differing step 0
+solver gauss-seidel  basis S2     cells -1   : first differing step 0
+solver gauss-seidel  basis pic27  cells auto : first differing step 0
+solver gauss-seidel  basis pic27  cells -1   : first differing step 0
+== .venv
+newton 1.7.0.dev0 metalsim.physics.mpm.implicit_mpm.solver_implicit_mpm
+solver auto          basis S2     cells auto : first differing step 0
+solver auto          basis S2     cells -1   : first differing step 0
+solver auto          basis pic27  cells auto : first differing step 0
+solver auto          basis pic27  cells -1   : first differing step 0
+solver jacobi        basis S2     cells auto : first differing step None
+solver jacobi        basis S2     cells -1   : first differing step None
+solver jacobi        basis pic27  cells auto : first differing step None
+solver jacobi        basis pic27  cells -1   : first differing step None
+solver gauss-seidel  basis S2     cells auto : first differing step 0
+solver gauss-seidel  basis S2     cells -1   : first differing step 0
+solver gauss-seidel  basis pic27  cells auto : first differing step 0
+solver gauss-seidel  basis pic27  cells -1   : first differing step 0

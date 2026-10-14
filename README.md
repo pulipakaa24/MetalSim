@@ -56,7 +56,7 @@ listing its commits, and keeps its upstream licence unchanged. "Head" is the bra
 | module | what it does |
 |---|---|
 | `metalsim/interop` | Warp ↔ Metal ↔ PyTorch MPS: zero-copy tensors over Warp and renderer buffers, cross-queue ordering with shared events, a native bridge (`metalsim/native/torch_metal_bridge.mm`) |
-| `metalsim/physics` | `BatchSim`: batched MuJoCo Warp on Metal with graph replay and per-world model fields; contact-tuning and solver presets; deformables (MuJoCo Warp flex, XPBD cloth and cables, a port of PhysX's particle cloth); MPM (`metalsim/physics/mpm`: Isaac Lab 3.0-EA's Newton 1.5.2 implicit MPM on Metal with CUDA's semantics, [`MPM.md`](metalsim/physics/mpm/MPM.md)); the archived Newton XPBD backend |
+| `metalsim/physics` | `BatchSim`: batched MuJoCo Warp on Metal with graph replay and per-world model fields; contact-tuning and solver presets; deformables (MuJoCo Warp flex, XPBD cloth and cables, a port of PhysX's particle cloth); MPM (`metalsim/physics/mpm`: Isaac Lab 3.0-EA's Newton 1.5.2 implicit MPM on Metal with CUDA's semantics, also in `BatchSim` scenes through `MPMCoupling`, [`MPM.md`](metalsim/physics/mpm/MPM.md)); the archived Newton XPBD backend |
 | `metalsim/render` | tier 0 raster, tier 1 hybrid ray tracing (shadows, AO, reflections), tier 2 path tracer with OmniPBR / UsdPreviewSurface BRDFs, USD light units, textured DomeLight HDR environment maps (importance-sampled, MIS, tilted domes), USD area lights, RTX's display transform and Open Image Denoise; RTX-parity presets; MPM particles as render grains ([`PARTICLES.md`](metalsim/render/PARTICLES.md)); deformables, tendons, skins and sites; Newton models through a bridge ([`docs/NEWTON_RENDER.md`](docs/NEWTON_RENDER.md)); coverage audit in [`docs/RENDER_COVERAGE.md`](docs/RENDER_COVERAGE.md) |
 | `metalsim/sensors` | lidar (beam divergence, multi-return, intensity), radar-lite, depth camera and height scan on Metal ray tracing (transparent geoms included); Isaac Lab's `ContactSensor` as Warp kernels |
 | `metalsim/scene` | USD → MuJoCo loader (lossless and generic UsdPhysics, fixes for NVIDIA asset conventions), MJCF/URDF → USD, MaterialX flattening |
@@ -184,7 +184,7 @@ Branch [`metalsim-hashtable-metal`](https://github.com/pulipakaa24/newton/tree/m
 (`a4be360`) is upstream `4545802` with only the Metal fixes (no XPBD changes); the `newton` extra installs it into `.venv` (the stock commit
 loses or duplicates contact-table keys on Metal and raises on the current Warp fork in the rough G1 task).
 Branch [`metalsim-1.5.2`](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2) (pinned at
-[`3fd1f052`](https://github.com/pulipakaa24/newton/commit/3fd1f052a5ad031578960d9642aaaedc03834e4d) by `scripts/setup_newton152.sh`; `c0427fc` before the 2026-10-12 MPM-step work) is Newton 1.5.2
+[`99843d09`](https://github.com/pulipakaa24/newton/commit/99843d09840f89ac16c82104ad66ae792e45eb91) by `scripts/setup_newton152.sh`; `3fd1f052` before the 2026-10-13 Gauss-Seidel coloring fix, `c0427fc` before the 2026-10-12 MPM-step work) is Newton 1.5.2
 (Isaac Lab 3.0-EA's pin) with MetalSim's Metal changes for the implicit MPM solver and the Franka-Pour rigid collision
 at 2,048 worlds; `scripts/setup_newton152.sh` installs it into `.venv-newton152`.
 

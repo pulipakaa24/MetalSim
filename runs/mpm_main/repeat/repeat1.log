@@ -1,0 +1,12 @@
+== --capture 1
+run 0 vs 1: pos 18 qvel 18 wrench 17 particles 0
+run 0 vs 2: pos 18 qvel 18 wrench 17 particles 0
+== --capture 0
+run 0 vs 1: pos 18 qvel 18 wrench 17 particles 0
+run 0 vs 2: pos 18 qvel 18 wrench 17 particles 0
+== --capture 0 --mass kinematic
+run 0 vs 1: pos 18 qvel 18 wrench 17 particles 0
+run 0 vs 2: pos 18 qvel 18 wrench 17 particles 0
+== --capture 0 --worlds 1
+run 0 vs 1: pos None qvel None wrench None particles None
+run 0 vs 2: pos None qvel None wrench None particles None
