@@ -27,6 +27,8 @@ scripts/setup_newton152.sh                 # MPM and Franka-Pour: .venv-newton15
 scripts/fetch_polyhaven_assets.sh demo     # the ANYmal-on-sand render demo's HDRI and sand texture
 ```
 
+Fresh install verified on main `87dfac06af` (2026-10-13): `scripts/fresh_install_check.sh` (a new clone in a directory whose path has a space, caches inside it, every step above, the test suites through the GPU queue and a small run of each demo) passed on an M4 Max under macOS 26 and on a second M4 Max under macOS 27 with a different user. Correctness only; no timing.
+
 Run every command from the repository root; the clone can live anywhere, under any user and in a directory whose
 path has spaces. `newton` in the first `pip install` is Newton 1.7 (the `newton` extra), which MPM in `BatchSim`
 scenes (section 2, `tests/test_mpm_main.py`) and the Newton engine import; install it before `scripts/setup_warp.sh`,
