@@ -1,9 +1,9 @@
 diff --git a/METALSIM_CHANGES.md b/METALSIM_CHANGES.md
 new file mode 100644
-index 00000000..bbb2617c
+index 00000000..afefe5c0
 --- /dev/null
 +++ b/METALSIM_CHANGES.md
-@@ -0,0 +1,55 @@
+@@ -0,0 +1,58 @@
 +# MetalSim changes on this branch (`metalsim-1.5.2`)
 +
 +Newton 1.5.2, the version Isaac Lab 3.0-EA pins, made to run on Apple silicon (Metal) with CUDA's semantics for
@@ -52,6 +52,9 @@ index 00000000..bbb2617c
 +| `80e79684` | Metal: in the rheology loop the two rigidity products run only on the rows with blocks (listed on the device, launch bounded by the list length with an in-kernel guard): an empty row's result is a fixed point once the initial guess applied the full product, so every value is the same. From 8,192 rows (`NEWTON_METAL_LISTED_ROWS_MIN`); `NEWTON_METAL_LISTED_ROWS_MV=0` restores the full products. Franka-Pour 2,048 worlds: 8.8 -> 2.6 ms of GPU time per step; bitwise (1 / 64 / 2,048 worlds, eager and captured). |
 +| `3fd1f052` | `METALSIM_CHANGES.md` rows for `27415f95` and `80e79684`. With the Warp fork's `8631b6b0` and `fddebdbd`: Franka-Pour MPM captured step at 2,048 worlds 90.5-91.2 -> 78.9-79.0 ms, Franka-Pour policy step (2,048 envs, M4 Max) 2.06 -> 1.81 s. |
 +| this commit | Gauss-Seidel coloring with separate worlds (`Config.separate_worlds`, discontinuous strain bases such as P0): the color blocks were `cell * nodes_per_cell`, but environment-first strain partitions number a cell's nodes in environment-major order, so on a sparse multi-environment grid the blocks were a permutation of other cells' nodes and strain nodes solved concurrently in one color shared velocity nodes (a data race: two identical runs differed from the first step on Metal; the coloring is equally invalid on CUDA). Blocks now start at the partition index of the cell's first node (`make_partition_color_block_indices_kernel`); single-environment grids keep the previous kernel (bitwise unchanged); Jacobi solves (Isaac Lab's Franka-Pour) never color. Checked by MetalSim's `metalsim/physics/mpm/probes/gs_coloring_check.py` (no write conflicts within a color, every strain node once per sweep). |
++| this commit | Metal: in the rheology loop, a rigidity product whose rows `warp.sparse.bsr_mv` would sum with its tiled kernel goes through `bsr_mv` itself instead of the listed-rows kernel. These are the body rows of IJtm: one block per collider node of the body. With the Warp fork's `metal_bsr_mv_tiles`, that is CUDA's kernel and summation order. The J product, with one row per grid node, keeps the listed rows. `example_mpm_twoway_coupling`: IJtm (12 rows, up to about 1,170 blocks each) went from 29-40 to 12.1-12.9 ms per 50 calls. Late in the run, the GPU kernel sum per frame went from 55.3 to 36.4 ms. Without that Warp option, the product is unchanged (listed rows, bitwise as before). |
++| this commit | Metal: the ordered proxy-wrench harvest (`SolverImplicitMPM.coupling_harvest_proxy_wrenches`, used by `SolverCoupledProxy` and MetalSim's MPMCoupling) first compacts the collider nodes whose collider is a proxy body. The compaction is a stable integer scan (flag, exclusive scan, scatter), with no host reads, so it is capture-safe. Each body's 32 lanes then walk only the kept nodes of its world range. Before, every proxy body scanned every collider node of its world, which with one world means every active node. The per-node terms are unchanged. The lanes take kept nodes in turn, so the summation order differs (fixed: repeats exactly). Measured on the M4 Max with MetalSim's `multibody_sand.py` (1 world, about 73k particles): harvest 15.6-15.8 -> 1.5-1.7 ms per call; coupled step 47.7 -> 32.3 ms (4 bodies), 49.3 -> 34.2 ms (16), 80.7 -> 65.2 ms (64). Franka-Pour at 2,048 envs, whose world ranges were already short, is unchanged (1.80 s per policy step) and repeats bitwise. `NEWTON_METAL_HARVEST_COMPACT=0` restores the full scan, bitwise as before. |
++| this commit | `example_mpm_twoway_coupling` (Metal, ordered body forces): the grid nodes in contact with a body are compacted first (stable scan, capture-safe), then the existing 256 fixed lanes sum over that list. Before, every body scanned all 655,360 grid nodes in every substep. Measured on the M4 Max: the sum went from 1.05 to 0.38 ms per call. Captured two-way went from 40.0 to 37.6 ms/frame with the long-row rigidity product above (L4: 31.0). The new order is fixed, so results repeat bitwise; the recording stays inside the L4's floor ensemble (0.83). `NEWTON_METAL_BODY_FORCE_COMPACT=0` restores the full scan. |
 +
 +`c0a98819` … `ddb015b9` were written on top of `eac15793` (as `de978b55`, `7beedf43`, `0013572a`, `ced01724`) and
 +cherry-picked onto `c1ab1cdc` unchanged; the resulting tree is the union of both lines.
@@ -1464,7 +1467,7 @@ index 9330d064..1314afa7 100644
          color: int,
          launch_dim: int,
 diff --git a/newton/_src/solvers/implicit_mpm/solve_rheology.py b/newton/_src/solvers/implicit_mpm/solve_rheology.py
-index 4d539fa4..cc808987 100644
+index 4d539fa4..0ee960a7 100644
 --- a/newton/_src/solvers/implicit_mpm/solve_rheology.py
 +++ b/newton/_src/solvers/implicit_mpm/solve_rheology.py
 @@ -4,6 +4,7 @@
@@ -1541,7 +1544,7 @@ index 4d539fa4..cc808987 100644
                  self.tile_size = 1
  
              batch_count = batch_offsets.shape[0] - 1
-@@ -306,6 +343,132 @@ def apply_rigidity_operator(rigidity_operator, delta_collider_impulse, collider_
+@@ -306,6 +343,147 @@ def apply_rigidity_operator(rigidity_operator, delta_collider_impulse, collider_
      sp.bsr_mv(J, x=delta_body_qd, y=collider_velocity, alpha=1.0, beta=1.0)
  
  
@@ -1621,10 +1624,14 @@ index 4d539fa4..cc808987 100644
 +        self.beta = A.scalar_type(beta)
 +        self.x = _vec_array_view(x, A.scalar_type, expected_scalar_count=A.ncol * A.block_shape[1])
 +        self.y = _vec_array_view(y, A.scalar_type, expected_scalar_count=A.nrow * A.block_shape[0])
++        # Long rows (the body rows of IJtm: one block per collider node of the body) go through bsr_mv itself when it
++        # sums them with its tiled kernel (CUDA's choice, taken on Metal by Warp's ``metal_bsr_mv_tiles``): one thread
++        # per such row is latency-bound and its cost grows with the contact area. Same results as the full product.
++        self.full = _bsr_mv_uses_tiles(A)
 +        nrow = A.nrow
 +        self.rows = wp.empty(max(nrow, 1), dtype=int, device=device)
 +        self.count = wp.zeros(1, dtype=int, device=device)
-+        if nrow > 0:
++        if nrow > 0 and not self.full:
 +            flags = wp.empty(nrow, dtype=int, device=device)
 +            positions = wp.empty(nrow, dtype=int, device=device)
 +            wp.launch(_bsr_nonempty_row_flags, dim=nrow, inputs=[A.offsets, A.row_counts, flags], device=device)
@@ -1635,6 +1642,9 @@ index 4d539fa4..cc808987 100644
 +    def launch(self):
 +        A = self.A
 +        if A.nrow == 0:
++            return
++        if self.full:
++            sp.bsr_mv(A, x=self.x, y=self.y, alpha=self.alpha, beta=self.beta)
 +            return
 +        wp.launch(
 +            _bsr_mv_listed_rows,
@@ -1656,6 +1666,14 @@ index 4d539fa4..cc808987 100644
 +        )
 +
 +
++def _bsr_mv_uses_tiles(A: sp.BsrMatrix) -> bool:
++    """Whether ``warp.sparse.bsr_mv`` computes ``A @ x`` with its tiled kernel on ``A``'s device (its default
++    heuristic: ``nnz * block_size > 2 * 64 * rows``; on Metal only with a Warp that takes CUDA's choice there)."""
++    device = A.values.device
++    tiles_ok = device.is_cuda or (getattr(device, "is_metal", False) and getattr(wp.config, "metal_bsr_mv_tiles", False))
++    return bool(tiles_ok and A.nnz * A.block_size > 2 * 64 * A.shape[0])
++
++
 +def _listed_rows_mv_supported(A: sp.BsrMatrix) -> bool:
 +    """Metal (where ``bsr_mv`` runs the non-tiled kernel) with bounded launches, 3-column blocks, and enough rows
 +    for the row list to pay for its extra dispatches (``NEWTON_METAL_LISTED_ROWS_MIN``, default 8,192 rows; one
@@ -1674,7 +1692,7 @@ index 4d539fa4..cc808987 100644
  class _ScopedDisableGC:
      """Context manager to disable automatic garbage collection during graph capture.
      Avoids capturing deallocations of arrays exterior to the capture scope.
-@@ -333,6 +496,9 @@ class MomentumData:
+@@ -333,6 +511,9 @@ class MomentumData:
  
      inv_volume: wp.array
      velocity: wp.array[wp.vec3]
@@ -1684,7 +1702,7 @@ index 4d539fa4..cc808987 100644
  
  
  @dataclass
-@@ -385,6 +551,9 @@ class RheologyData:
+@@ -385,6 +566,9 @@ class RheologyData:
      has_dilatancy: bool = False
      strain_velocity_node_count: int = -1
  
@@ -1694,7 +1712,7 @@ index 4d539fa4..cc808987 100644
  
  @dataclass
  class CollisionData:
-@@ -492,6 +661,7 @@ class _DelassusOperator:
+@@ -492,6 +676,7 @@ class _DelassusOperator:
                      1,
                  ],
                  outputs=[mult],
@@ -1702,7 +1720,7 @@ index 4d539fa4..cc808987 100644
              )
          else:
              # GS mode: empty arrays → multiplicity of 1
-@@ -502,6 +672,7 @@ class _DelassusOperator:
+@@ -502,6 +687,7 @@ class _DelassusOperator:
          wp.launch(
              kernel=compute_delassus_diagonal,
              dim=self.size,
@@ -1710,7 +1728,7 @@ index 4d539fa4..cc808987 100644
              inputs=[
                  self.rheology.strain_mat.offsets,
                  self.rheology.strain_mat.columns,
-@@ -533,6 +704,7 @@ class _DelassusOperator:
+@@ -533,6 +719,7 @@ class _DelassusOperator:
          wp.launch(
              kernel=preprocess_stress_and_strain,
              dim=self.size,
@@ -1718,7 +1736,7 @@ index 4d539fa4..cc808987 100644
              inputs=[
                  self.rheology.unilateral_strain_offset,
                  self.rheology.elastic_strain_delta,
-@@ -553,6 +725,7 @@ class _DelassusOperator:
+@@ -553,6 +740,7 @@ class _DelassusOperator:
          return wp.launch(
              kernel=apply_stress_delta_jacobi,
              dim=self.momentum.velocity.shape[0],
@@ -1726,7 +1744,7 @@ index 4d539fa4..cc808987 100644
              inputs=[
                  self.rheology.transposed_strain_mat.offsets,
                  self.rheology.transposed_strain_mat.columns,
-@@ -597,6 +770,7 @@ class _DelassusOperator:
+@@ -597,6 +785,7 @@ class _DelassusOperator:
          wp.launch(
              kernel=postprocess_stress_and_strain,
              dim=self.size,
@@ -1734,7 +1752,7 @@ index 4d539fa4..cc808987 100644
              inputs=[
                  self.rheology.compliance_mat.offsets,
                  self.rheology.compliance_mat.columns,
-@@ -645,6 +819,7 @@ class _RheologySolver:
+@@ -645,6 +834,7 @@ class _RheologySolver:
          self._evaluate_strain_residual_launch = wp.launch(
              kernel=evaluate_strain_residual,
              dim=self.size,
@@ -1742,7 +1760,7 @@ index 4d539fa4..cc808987 100644
              inputs=[
                  self.delta_stress,
                  self.delassus_operator.delassus_diagonal,
-@@ -688,10 +863,7 @@ class _GaussSeidelSolver(_RheologySolver):
+@@ -688,10 +878,7 @@ class _GaussSeidelSolver(_RheologySolver):
  
          self.color_count = self.rheology.color_offsets.shape[0] - 1
  
@@ -1754,7 +1772,7 @@ index 4d539fa4..cc808987 100644
          color_block_dim = 64
          color_launch_dim = color_block_count * color_block_dim
  
-@@ -887,10 +1059,7 @@ class _ReorderedGaussSeidelSolver(_RheologySolver):
+@@ -887,10 +1074,7 @@ class _ReorderedGaussSeidelSolver(_RheologySolver):
  
          # ── Launch config ────────────────────────────────────────────────
  
@@ -1766,7 +1784,7 @@ index 4d539fa4..cc808987 100644
          color_block_dim = 64
          color_launch_dim = color_block_count * color_block_dim
  
-@@ -1130,10 +1299,7 @@ class _BatchedGaussSeidelSolver(_RheologySolver):
+@@ -1130,10 +1314,7 @@ class _BatchedGaussSeidelSolver(_RheologySolver):
  
          # ── Launch config ────────────────────────────────────────────────
  
@@ -1778,7 +1796,7 @@ index 4d539fa4..cc808987 100644
          color_block_dim = 64
          color_launch_dim = color_block_count * color_block_dim
  
-@@ -1337,6 +1503,7 @@ class _JacobiSolver(_RheologySolver):
+@@ -1337,6 +1518,7 @@ class _JacobiSolver(_RheologySolver):
          self.solve_local_launch = wp.launch(
              kernel=jacobi_kernel,
              dim=self.size,
@@ -1786,7 +1804,7 @@ index 4d539fa4..cc808987 100644
              inputs=[
                  self.rheology.yield_params,
                  self.rheology.strain_node_volume,
-@@ -1375,7 +1542,11 @@ class _JacobiSolver(_RheologySolver):
+@@ -1375,7 +1557,11 @@ class _JacobiSolver(_RheologySolver):
          self.solve_local_launch.launch()
          # Add jacobi delta
          self.apply_stress_launch.launch()
@@ -1799,7 +1817,7 @@ index 4d539fa4..cc808987 100644
  
  
  _ITERATIVE_LINEAR_SOLVERS = {
-@@ -1498,7 +1669,8 @@ class _LinearSolver:
+@@ -1498,7 +1684,8 @@ class _LinearSolver:
  
      def _scale_batched_system(self, tolerance_scales: wp.array[float], inverse: bool):
          environment_offsets = self.rheology.strain_environment_offsets
@@ -1809,7 +1827,7 @@ index 4d539fa4..cc808987 100644
          wp.launch(
              _scale_linear_system_by_environment,
              dim=(tolerance_scales.shape[0], block_dim),
-@@ -1594,9 +1766,15 @@ class _ContactSolver:
+@@ -1594,9 +1781,15 @@ class _ContactSolver:
          self.collider_inv_mass = fem.borrow_temporary_like(self.collision.collider_friction, temporary_store)
  
          # Setup rigidity correction
@@ -1825,7 +1843,7 @@ index 4d539fa4..cc808987 100644
  
              wp.launch(
                  compute_collider_inv_mass,
-@@ -1632,6 +1810,15 @@ class _ContactSolver:
+@@ -1632,6 +1825,15 @@ class _ContactSolver:
                  self.delta_body_qd,
              )
  
@@ -1841,7 +1859,7 @@ index 4d539fa4..cc808987 100644
  
  class _NodalContactSolver(_ContactSolver):
      def __init__(
-@@ -1679,7 +1866,7 @@ class _NodalContactSolver(_ContactSolver):
+@@ -1679,7 +1881,7 @@ class _NodalContactSolver(_ContactSolver):
  
      def solve(self):
          self.solve_collider_launch.launch()
@@ -1850,7 +1868,7 @@ index 4d539fa4..cc808987 100644
  
  
  class _SubgridContactSolver(_ContactSolver):
-@@ -1715,6 +1902,7 @@ class _SubgridContactSolver(_ContactSolver):
+@@ -1715,6 +1917,7 @@ class _SubgridContactSolver(_ContactSolver):
          self.apply_collider_impulse_launch = wp.launch(
              apply_subgrid_impulse,
              dim=self.momentum.velocity.shape[0],
@@ -1858,7 +1876,7 @@ index 4d539fa4..cc808987 100644
              inputs=[
                  self.collision.transposed_collider_mat.offsets,
                  self.collision.transposed_collider_mat.columns,
-@@ -1763,7 +1951,7 @@ class _SubgridContactSolver(_ContactSolver):
+@@ -1763,7 +1966,7 @@ class _SubgridContactSolver(_ContactSolver):
      def solve(self):
          self.solve_collider_launch.launch()
          self.apply_collider_impulse_launch.launch()
@@ -1868,7 +1886,7 @@ index 4d539fa4..cc808987 100644
      def release(self):
          self.collider_delassus_diagonal.release()
 diff --git a/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py b/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py
-index f99cf1b8..df0aa9b3 100644
+index f99cf1b8..62f57e42 100644
 --- a/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py
 +++ b/newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py
 @@ -9,7 +9,7 @@ import operator
@@ -1904,7 +1922,7 @@ index f99cf1b8..df0aa9b3 100644
      make_inverse_rotate_vectors,
      make_rotate_vectors,
      mark_active_cells,
-@@ -1216,6 +1224,11 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+@@ -1216,6 +1224,19 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
          self._grid_status = None
          self._grid_accumulated_status = None
          self._grid_point_mask = None
@@ -1912,11 +1930,19 @@ index f99cf1b8..df0aa9b3 100644
 +        # there the wrenches are summed in a fixed order instead (_harvest_proxy_wrenches_ordered).
 +        self._ordered_proxy_harvest = bool(getattr(model.device, "is_metal", False))
 +        self._proxy_harvest_partial = None
++        # Metal: compact the proxy-body collider nodes before the ordered harvest (NEWTON_METAL_HARVEST_COMPACT=0: every
++        # body scans its whole world range, as before)
++        import os  # noqa: PLC0415
++
++        self._compact_proxy_harvest = self._ordered_proxy_harvest and os.environ.get("NEWTON_METAL_HARVEST_COMPACT", "1") != "0"
++        self._harvest_flags = None
++        self._harvest_positions = None
++        self._harvest_nodes = None
 +        self._empty_int = None
          self.solver = _resolve_solver_spec(config.solver, self.velocity_basis)
          self.coloring = any("gauss-seidel" in solver or "gs" in solver for solver in self.solver)
          self.apic = config.transfer_scheme == "apic"
-@@ -1792,6 +1805,12 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+@@ -1792,6 +1813,12 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
              return
          body_q = state.body_q if state.body_q is not None else self.model.body_q
  
@@ -1929,7 +1955,7 @@ index f99cf1b8..df0aa9b3 100644
          wp.launch(
              _harvest_mpm_proxy_wrenches_kernel,
              dim=collider_ids.shape[0],
-@@ -1811,6 +1830,78 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+@@ -1811,6 +1838,159 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
              device=self.model.device,
          )
  
@@ -1971,13 +1997,101 @@ index f99cf1b8..df0aa9b3 100644
 +            offsets = self._empty_int_array(out_body_f.device)  # no world ranges: every body sees every node
 +            body_world = wp.full(body_count, -1, dtype=wp.int32, device=out_body_f.device)
 +        proxy_flag = int(newton.BodyFlags.PROXY)
++        if self._compact_proxy_harvest:
++            self._harvest_proxy_wrench_lanes_compact(
++                dt, body_local_to_proxy_global, impulses, positions, collider_ids, body_q, offsets, body_world, proxy_flag
++            )
++        else:
++            wp.launch(
++                _harvest_mpm_proxy_wrench_lanes_kernel,
++                dim=(body_count, _HARVEST_LANES),
++                inputs=[
++                    dt,
++                    _HARVEST_LANES,
++                    offsets,
++                    collider_ids,
++                    impulses,
++                    positions,
++                    self.collider_body_index,
++                    body_local_to_proxy_global,
++                    proxy_flag,
++                    self.model.body_flags,
++                    body_world,
++                    self.model.body_com,
++                    body_q,
++                    self._proxy_harvest_partial,
++                ],
++                device=out_body_f.device,
++            )
 +        wp.launch(
-+            _harvest_mpm_proxy_wrench_lanes_kernel,
-+            dim=(body_count, _HARVEST_LANES),
++            _sum_mpm_proxy_wrench_lanes_kernel,
++            dim=body_count,
++            inputs=[self._proxy_harvest_partial, body_local_to_proxy_global, proxy_flag, self.model.body_flags],
++            outputs=[out_body_f],
++            device=out_body_f.device,
++        )
++
++    def _harvest_proxy_wrench_lanes_compact(
++        self,
++        dt: float,
++        body_local_to_proxy_global: wp.array[int],
++        impulses: wp.array[wp.vec3],
++        positions: wp.array[wp.vec3],
++        collider_ids: wp.array[int],
++        body_q: wp.array[wp.transform],
++        offsets: wp.array[int],
++        body_world: wp.array[wp.int32],
++        proxy_flag: int,
++    ) -> None:
++        """The lane partials of :meth:`_harvest_proxy_wrenches_ordered` over the proxy-body collider nodes only.
++
++        A stable compaction (keep flags, integer exclusive scan, scatter) lists the nodes whose collider belongs to a
++        proxy body, in node order. World ranges map to compacted ranges through the scan (``positions[begin]``,
++        ``positions[end]``), so each lane walks only its world's proxy nodes instead of every collider node of the
++        world. Same per-node terms; lane ``l`` now takes the ``l``-th, ``(l + L)``-th, ... *kept* node, so the
++        summation order differs from the full scan (fixed, so the result repeats exactly). No host reads, no
++        per-step allocations once the buffers fit: capture-safe.
++        """
++        from warp.utils import array_scan  # noqa: PLC0415
++
++        device = self._proxy_harvest_partial.device
++        n = collider_ids.shape[0]
++        if self._harvest_flags is None or self._harvest_flags.shape[0] < n + 1 or self._harvest_flags.device != device:
++            self._harvest_flags = wp.empty(n + 1, dtype=int, device=device)
++            self._harvest_positions = wp.empty(n + 1, dtype=int, device=device)
++            self._harvest_nodes = wp.empty(max(n, 1), dtype=int, device=device)
++        flags = self._harvest_flags[: n + 1]
++        node_positions = self._harvest_positions[: n + 1]
++        wp.launch(
++            _flag_proxy_harvest_nodes_kernel,
++            dim=n + 1,
++            inputs=[
++                offsets,
++                collider_ids,
++                self.collider_body_index,
++                body_local_to_proxy_global,
++                proxy_flag,
++                self.model.body_flags,
++                flags,
++            ],
++            device=device,
++        )
++        array_scan(flags, node_positions, inclusive=False)
++        wp.launch(
++            _compact_proxy_harvest_nodes_kernel,
++            dim=n,
++            inputs=[flags, node_positions, self._harvest_nodes],
++            device=device,
++        )
++        wp.launch(
++            _harvest_mpm_proxy_wrench_compact_lanes_kernel,
++            dim=(body_local_to_proxy_global.shape[0], _HARVEST_LANES),
 +            inputs=[
 +                dt,
 +                _HARVEST_LANES,
 +                offsets,
++                node_positions,
++                self._harvest_nodes,
 +                collider_ids,
 +                impulses,
 +                positions,
@@ -1990,14 +2104,7 @@ index f99cf1b8..df0aa9b3 100644
 +                body_q,
 +                self._proxy_harvest_partial,
 +            ],
-+            device=out_body_f.device,
-+        )
-+        wp.launch(
-+            _sum_mpm_proxy_wrench_lanes_kernel,
-+            dim=body_count,
-+            inputs=[self._proxy_harvest_partial, body_local_to_proxy_global, proxy_flag, self.model.body_flags],
-+            outputs=[out_body_f],
-+            device=out_body_f.device,
++            device=device,
 +        )
 +
 +    def _empty_int_array(self, device) -> wp.array:
@@ -2008,7 +2115,7 @@ index f99cf1b8..df0aa9b3 100644
      def coupling_rewind_proxy_particle(
          self,
          particle_local_to_proxy_global: wp.array[int],
-@@ -2170,7 +2261,7 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+@@ -2170,7 +2350,7 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
              else:
                  # Compute bounds and transfer to host
                  device = positions.device
@@ -2017,7 +2124,7 @@ index f99cf1b8..df0aa9b3 100644
                      min_dev = fem.borrow_temporary(temporary_store, shape=1, dtype=wp.vec3, device=device)
                      max_dev = fem.borrow_temporary(temporary_store, shape=1, dtype=wp.vec3, device=device)
  
-@@ -3124,6 +3215,9 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+@@ -3124,6 +3304,9 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
              momentum_data = MomentumData(
                  inv_volume=scratch.inv_mass_matrix,
                  velocity=scratch.velocity_field.dof_values,
@@ -2027,7 +2134,7 @@ index f99cf1b8..df0aa9b3 100644
              )
              rheology_data = RheologyData(
                  strain_mat=scratch.strain_matrix,
-@@ -3141,6 +3235,7 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+@@ -3141,6 +3324,7 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
                  has_viscosity=self._mpm_model.has_viscosity,
                  has_dilatancy=self._mpm_model.has_dilatancy,
                  strain_velocity_node_count=-1 if self._separate_worlds else self._velocity_nodes_per_strain_sample,
@@ -2035,7 +2142,7 @@ index f99cf1b8..df0aa9b3 100644
              )
              collision_data = CollisionData(
                  collider_mat=scratch.collider_matrix,
-@@ -3343,7 +3438,9 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+@@ -3343,7 +3527,9 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
  
          if isinstance(prev_impulse_field.space.basis, fem.PointBasisSpace):
              # point-based collisions, simply copy the previous impulses
@@ -2046,7 +2153,7 @@ index f99cf1b8..df0aa9b3 100644
          elif grid_to_grid_warmstart:
              # Interpolate previous impulse
              prev_impulse_field = fem.NonconformingField(
-@@ -3361,7 +3458,9 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+@@ -3361,7 +3547,9 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
  
          # Interpolate previous stress
          if isinstance(prev_stress_field.space.basis, fem.PointBasisSpace):
@@ -2057,7 +2164,7 @@ index f99cf1b8..df0aa9b3 100644
          elif self._stress_warmstart in ("grid", "smoothed") and grid_to_grid_warmstart:
              prev_stress_field = fem.NonconformingField(
                  domain, prev_stress_field, background=scratch.background_stress_field
-@@ -3387,8 +3486,10 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+@@ -3387,8 +3575,10 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
  
              if isinstance(last_step_data.ws_impulse_field.space.basis, fem.PointBasisSpace):
                  # point-based collisions, simply copy the previous impulses
@@ -2070,7 +2177,7 @@ index f99cf1b8..df0aa9b3 100644
                  )
              else:
                  last_step_data.ws_impulse_field.dof_values.zero_()
-@@ -3404,8 +3505,10 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+@@ -3404,8 +3594,10 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
  
              last_step_data.rebind_strain_space_fields(scratch, smoothed=self._stress_warmstart == "smoothed")
              if isinstance(last_step_data.ws_stress_field.space.basis, fem.PointBasisSpace):
@@ -2083,7 +2190,7 @@ index f99cf1b8..df0aa9b3 100644
                  )
              else:
                  last_step_data.ws_stress_field.dof_values.zero_()
-@@ -3529,6 +3632,20 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+@@ -3529,6 +3721,20 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
                  dim=colored_element_count,
                  inputs=[partition_arg, pic.cell_particle_offsets, scratch.color_indices],
              )
@@ -2104,7 +2211,7 @@ index f99cf1b8..df0aa9b3 100644
          else:
              wp.launch(
                  fill_uniform_color_block_indices,
-@@ -3729,3 +3846,107 @@ def _harvest_mpm_proxy_wrenches_kernel(
+@@ -3729,3 +3935,200 @@ def _harvest_mpm_proxy_wrenches_kernel(
      center = wp.transform_point(body_q[local_body], body_com[local_body])
      r = collider_impulse_pos[i] - center
      wp.atomic_add(out_body_f, proxy_global, wp.spatial_vector(f_world, wp.cross(r, f_world)))
@@ -2192,6 +2299,99 @@ index f99cf1b8..df0aa9b3 100644
 +                f_world = collider_impulses[i] / dt
 +                r = collider_impulse_pos[i] - center
 +                f += wp.spatial_vector(f_world, wp.cross(r, f_world))
++    partial[local_body, lane] = f
++
++
++@wp.kernel(enable_backward=False)
++def _flag_proxy_harvest_nodes_kernel(
++    collider_node_offsets: wp.array[int],
++    collider_ids: wp.array[int],
++    collider_body_ids: wp.array[int],
++    body_local_to_proxy_global: wp.array[int],
++    proxy_flag: int,
++    body_flags: wp.array[wp.int32],
++    flags: wp.array[int],
++):
++    """1 for the active collider nodes whose collider is a proxy body (the nodes the harvest lanes add), else 0.
++    ``flags`` has one extra trailing entry (always 0) so the exclusive scan also gives the total at index ``n``."""
++    i = wp.tid()
++    keep = int(0)
++    n = collider_ids.shape[0]
++    env_count = collider_node_offsets.shape[0] - 1
++    end = n
++    if env_count > 0:
++        end = collider_node_offsets[env_count]
++    if i < end and i < n:
++        cid = collider_ids[i]
++        if cid >= 0 and cid < collider_body_ids.shape[0]:
++            local_body = collider_body_ids[cid]
++            if local_body >= 0 and local_body < body_local_to_proxy_global.shape[0]:
++                if body_local_to_proxy_global[local_body] >= 0 and (body_flags[local_body] & proxy_flag) != 0:
++                    keep = 1
++    flags[i] = keep
++
++
++@wp.kernel(enable_backward=False)
++def _compact_proxy_harvest_nodes_kernel(
++    flags: wp.array[int],
++    positions: wp.array[int],
++    nodes: wp.array[int],
++):
++    """Stable compaction: the kept node indices in increasing order."""
++    i = wp.tid()
++    if flags[i] != 0:
++        nodes[positions[i]] = i
++
++
++@wp.kernel(enable_backward=False)
++def _harvest_mpm_proxy_wrench_compact_lanes_kernel(
++    dt: float,
++    lane_count: int,
++    collider_node_offsets: wp.array[int],
++    node_positions: wp.array[int],
++    nodes: wp.array[int],
++    collider_ids: wp.array[int],
++    collider_impulses: wp.array[wp.vec3],
++    collider_impulse_pos: wp.array[wp.vec3],
++    collider_body_ids: wp.array[int],
++    body_local_to_proxy_global: wp.array[int],
++    proxy_flag: int,
++    body_flags: wp.array[wp.int32],
++    body_world: wp.array[wp.int32],
++    body_com: wp.array[wp.vec3],
++    body_q: wp.array[wp.transform],
++    partial: wp.array2d[wp.spatial_vector],
++):
++    """:func:`_harvest_mpm_proxy_wrench_lanes_kernel` over the compacted proxy nodes of the body's world range:
++    lane ``l`` adds the ``l``-th, ``(l + L)``-th, ... kept node of the range (node order) that belongs to its body."""
++    local_body, lane = wp.tid()
++    f = wp.spatial_vector()
++    partial[local_body, lane] = f
++
++    proxy_global = body_local_to_proxy_global[local_body]
++    if proxy_global < 0 or (body_flags[local_body] & proxy_flag) == 0:
++        return
++
++    n = collider_ids.shape[0]
++    env_count = collider_node_offsets.shape[0] - 1
++    begin = int(0)
++    end = n
++    if env_count > 0:
++        end = collider_node_offsets[env_count]
++        world = body_world[local_body]
++        if world >= 0 and world < env_count:
++            begin = collider_node_offsets[world]
++            end = collider_node_offsets[world + 1]
++    end = wp.min(end, n)
++    begin = wp.min(begin, end)
++
++    center = wp.transform_point(body_q[local_body], body_com[local_body])
++    for k in range(node_positions[begin] + lane, node_positions[end], lane_count):
++        i = nodes[k]
++        if collider_body_ids[collider_ids[i]] == local_body:
++            f_world = collider_impulses[i] / dt
++            r = collider_impulse_pos[i] - center
++            f += wp.spatial_vector(f_world, wp.cross(r, f_world))
 +    partial[local_body, lane] = f
 +
 +
@@ -2703,10 +2903,10 @@ index 2bed017d..d449f52c 100644
          # Deferred from module scope: wp.static() in this kernel imports mujoco_warp.
          if SolverMuJoCo._convert_mjw_contacts_to_newton_kernel is None:
 diff --git a/newton/examples/mpm/example_mpm_twoway_coupling.py b/newton/examples/mpm/example_mpm_twoway_coupling.py
-index f50d6630..9ee53ee5 100644
+index f50d6630..b9986e62 100644
 --- a/newton/examples/mpm/example_mpm_twoway_coupling.py
 +++ b/newton/examples/mpm/example_mpm_twoway_coupling.py
-@@ -55,6 +55,54 @@ def compute_body_forces(
+@@ -55,6 +55,121 @@ def compute_body_forces(
          wp.atomic_add(body_f, body_index, wp.spatial_vector(f_world, wp.cross(r, f_world)))
  
  
@@ -2747,6 +2947,73 @@ index f50d6630..9ee53ee5 100644
 +
 +
 +@wp.kernel
++def flag_body_nodes(
++    node_count: int,
++    collider_ids: wp.array[int],
++    body_ids: wp.array[int],
++    flags: wp.array[int],
++):
++    """1 for the grid nodes whose collider belongs to a body, 0 otherwise (the compaction's keep flags)."""
++    i = wp.tid()
++    keep = 0
++    if i < node_count:
++        cid = collider_ids[i]
++        if cid >= 0 and cid < body_ids.shape[0]:
++            if body_ids[cid] >= 0:
++                keep = 1
++    flags[i] = keep
++
++
++@wp.kernel
++def compact_body_nodes(
++    node_count: int,
++    flags: wp.array[int],
++    positions: wp.array[int],
++    nodes: wp.array[int],
++    count: wp.array[int],
++):
++    """Stable compaction: the kept node indices in increasing order, and their count (read on the device)."""
++    i = wp.tid()
++    if flags[i] != 0:
++        nodes[positions[i]] = i
++    if i == node_count - 1:
++        count[0] = positions[i] + flags[i]
++
++
++@wp.kernel
++def compute_body_forces_compact_lanes(
++    dt: float,
++    count: wp.array[int],
++    nodes: wp.array[int],
++    collider_ids: wp.array[int],
++    collider_impulses: wp.array[wp.vec3],
++    collider_impulse_pos: wp.array[wp.vec3],
++    body_ids: wp.array[int],
++    body_q: wp.array[wp.transform],
++    body_com: wp.array[wp.vec3],
++    body_f_lanes: wp.array2d[wp.spatial_vector],
++):
++    """:func:`compute_body_forces_lanes` over the compacted body nodes: lane ``l`` adds the kept nodes
++    ``l, l + L, l + 2L, ...`` (in node order) that belong to its body. The scan reads only the nodes in contact with a
++    body instead of every grid node, for every body."""
++
++    body_index, lane = wp.tid()
++    lane_count = body_f_lanes.shape[1]
++
++    X_wb = body_q[body_index]
++    com = wp.transform_point(X_wb, body_com[body_index])
++
++    f = wp.spatial_vector()
++    for k in range(lane, count[0], lane_count):
++        i = nodes[k]
++        if body_ids[collider_ids[i]] == body_index:
++            f_world = collider_impulses[i] / dt
++            r = collider_impulse_pos[i] - com
++            f += wp.spatial_vector(f_world, wp.cross(r, f_world))
++    body_f_lanes[body_index, lane] = f
++
++
++@wp.kernel
 +def sum_body_force_lanes(
 +    body_f_lanes: wp.array2d[wp.spatial_vector],
 +    body_f: wp.array[wp.spatial_vector],
@@ -2761,7 +3028,7 @@ index f50d6630..9ee53ee5 100644
  @wp.kernel
  def subtract_body_force(
      dt: float,
-@@ -173,6 +221,15 @@ class Example:
+@@ -173,6 +288,25 @@ class Example:
          # per-body forces and torques applied by sand to rigid bodies
          self.body_sand_forces = wp.zeros_like(self.state_0.body_f)
  
@@ -2773,11 +3040,21 @@ index f50d6630..9ee53ee5 100644
 +            dtype=wp.spatial_vector,
 +            device=self.model.device,
 +        )
++        # Compaction of the nodes in contact with a body before the ordered sum (NEWTON_METAL_BODY_FORCE_COMPACT=0: scan
++        # every grid node for every body, as before): same per-node terms, summed in another fixed lane order
++        import os  # noqa: PLC0415
++
++        self.compact_body_forces = self.ordered_body_forces and os.environ.get("NEWTON_METAL_BODY_FORCE_COMPACT", "1") != "0"
++        n_cap = self.collider_impulse_ids.shape[0] if self.compact_body_forces else 0
++        self.body_node_flags = wp.zeros(n_cap, dtype=int, device=self.model.device)
++        self.body_node_positions = wp.zeros(n_cap, dtype=int, device=self.model.device)
++        self.body_nodes = wp.zeros(n_cap, dtype=int, device=self.model.device)
++        self.body_node_count = wp.zeros(1, dtype=int, device=self.model.device)
 +
          self.particle_render_colors = wp.full(
              self.sand_model.particle_count, value=wp.vec3(0.7, 0.6, 0.4), dtype=wp.vec3, device=self.sand_model.device
          )
-@@ -188,20 +245,7 @@ class Example:
+@@ -188,20 +322,7 @@ class Example:
          for _ in range(self.sim_substeps):
              self.state_0.clear_forces()
  
@@ -2799,11 +3076,52 @@ index f50d6630..9ee53ee5 100644
              # saved applied force to subtract later on
              self.body_sand_forces.assign(self.state_0.body_f)
  
-@@ -216,12 +260,53 @@ class Example:
+@@ -216,12 +337,94 @@ class Example:
  
          self.simulate_sand()
  
 +    def compute_body_forces(self):
++        if self.compact_body_forces:
++            from warp.utils import array_scan  # noqa: PLC0415
++
++            n = self.collider_node_count
++            if n > 0:
++                wp.launch(
++                    flag_body_nodes,
++                    dim=n,
++                    inputs=[n, self.collider_impulse_ids, self.collider_body_id, self.body_node_flags],
++                )
++                array_scan(self.body_node_flags[:n], self.body_node_positions[:n], inclusive=False)
++                wp.launch(
++                    compact_body_nodes,
++                    dim=n,
++                    inputs=[n, self.body_node_flags, self.body_node_positions, self.body_nodes, self.body_node_count],
++                )
++            else:
++                self.body_node_count.zero_()
++            wp.launch(
++                compute_body_forces_compact_lanes,
++                dim=self.body_sand_force_lanes.shape,
++                inputs=[
++                    self.frame_dt,
++                    self.body_node_count,
++                    self.body_nodes,
++                    self.collider_impulse_ids,
++                    self.collider_impulses,
++                    self.collider_impulse_pos,
++                    self.collider_body_id,
++                    self.state_0.body_q,
++                    self.model.body_com,
++                    self.body_sand_force_lanes,
++                ],
++            )
++            wp.launch(
++                sum_body_force_lanes,
++                dim=self.model.body_count,
++                inputs=[self.body_sand_force_lanes, self.state_0.body_f],
++            )
++            return
++
 +        if self.ordered_body_forces:
 +            wp.launch(
 +                compute_body_forces_lanes,
