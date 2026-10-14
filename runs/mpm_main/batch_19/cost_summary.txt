@@ -1,0 +1,6 @@
+  | scene | worlds | default | deterministic | cost |
+  |---|---|---|---|---|
+  | G1 flat env step (batch_19b) | 64 | 7.66 ms | 13.39 ms | +74.8 % |
+  | G1 flat env step (batch_19b) | 1,024 | 15.46 ms | 32.59 ms | +110.8 % |
+  | coupled box step (batch_17, same session) | 64 | 23.87 ms | 24.32 ms | +1.9 % |
+  | coupled box step (batch_10 default, batch_17 deterministic) | 1,024 | 228.78 ms | 231.50 ms | +1.2 % |

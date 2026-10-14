@@ -1,0 +1,1538 @@
+{
+ "scene": "stack",
+ "worlds": 64,
+ "capture": 1,
+ "iteration_cap": 2,
+ "steps": 200,
+ "steps_with_cap_worlds": [
+  106,
+  107,
+  108,
+  109,
+  110,
+  111,
+  112,
+  113,
+  114,
+  115,
+  116,
+  117,
+  118,
+  119,
+  120,
+  121,
+  122,
+  123,
+  124,
+  125,
+  126,
+  127,
+  128,
+  129,
+  130,
+  132,
+  133,
+  134,
+  135,
+  136,
+  137,
+  138,
+  139,
+  140,
+  141,
+  142,
+  143,
+  144,
+  145,
+  146,
+  147,
+  148,
+  149,
+  150,
+  151,
+  152,
+  153,
+  154,
+  155,
+  156,
+  157,
+  158,
+  159,
+  160,
+  161,
+  162,
+  163,
+  164,
+  165,
+  166,
+  167,
+  168,
+  184,
+  185,
+  194,
+  195
+ ],
+ "steps_with_hits": [],
+ "hits_only_in_cap_steps": true,
+ "kernels_hit": {},
+ "flag_values": {},
+ "recorded_det_launches": 122,
+ "first_cap_step": 106,
+ "steps_without_cap_worlds": 134,
+ "det_launches": {
+  "_kinematics_branch": 2,
+  "_compute_body_matrices": 2,
+  "_compute_body_inertial_frames": 2,
+  "_geom_local_to_global": 2,
+  "_subtree_com_init": 2,
+  "_subtree_com_acc": 4,
+  "_subtree_div": 2,
+  "_cinert": 2,
+  "_cdof": 2,
+  "_crb_accumulate": 4,
+  "_M": 2,
+  "_nxn_broadphase__locals__kernel": 2,
+  "ccd_det_kernels_builder__locals__ccd_det_solve_kernel": 2,
+  "ccd_det_kernels_builder__locals__ccd_det_write_kernel": 2,
+  "_primitive_narrowphase__locals__primitive_narrowphase": 2,
+  "_friction_dof__locals__kernel": 2,
+  "_efc_contact_init__locals__kernel": 2,
+  "_efc_contact_jac_dense__locals__kernel": 2,
+  "_efc_contact_update__locals__kernel": 2,
+  "_comvel_branch": 2,
+  "_spring_damper_dof_passive": 2,
+  "_qfrc_passive_kernel__locals__kernel": 2,
+  "_cacc_world": 2,
+  "_cacc_branch": 2,
+  "_cfrc": 2,
+  "_cfrc_backward": 4,
+  "_qfrc_bias": 2,
+  "_qfrc_smooth__locals__kernel": 2,
+  "_apply_ft": 2,
+  "_small_cholesky_factorize_solve_block__locals__kernel": 3,
+  "_solve_init_dof__locals__kernel": 2,
+  "_solve_init_jaref_kernel__locals__kernel": 2,
+  "mul_m_kernel__locals___mul_m": 6,
+  "_update_constraint_efc__locals__kernel": 6,
+  "_update_constraint_init_qfrc_constraint_dense__locals__kernel": 6,
+  "_update_gradient_grad__locals__kernel": 6,
+  "_update_gradient_JTDAJ_dense_tiled__locals__kernel": 2,
+  "_linesearch_iterative_kernel__locals__kernel": 4,
+  "_update_gradient_zero_grad_dot__locals__kernel": 4,
+  "_update_gradient_h_incremental_cholesky__locals__kernel": 4,
+  "_solve_done__locals__kernel": 4,
+  "_qfrc_constraint_from_grad": 2,
+  "_compute_damping_deriv": 1,
+  "_euler_damp_qfrc": 1,
+  "_next_velocity": 1,
+  "_next_position": 1,
+  "_next_time_builder__locals___next_time": 1,
+  "reset_data__locals__reset_mocap": 1,
+  "reset_data__locals__reset_nworld": 1
+ },
+ "fused_update": false,
+ "mujoco_warp": "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mjw-solvedone/mujoco_warp/__init__.py",
+ "warp": "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-diag/warp/__init__.py",
+ "per_step": [
+  {
+   "step": 0,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 1,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 2,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 3,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 4,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 5,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 6,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 7,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 8,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 9,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 10,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 11,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 12,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 13,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 14,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 15,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 16,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 17,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 18,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 19,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 20,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 21,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 22,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 23,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 24,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 25,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 26,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 27,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 28,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 29,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 30,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 31,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 32,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 33,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 34,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 35,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 36,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 37,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 38,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 39,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 40,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 41,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 42,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 43,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 44,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 45,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 46,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 47,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 48,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 49,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 50,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 51,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 52,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 53,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 54,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 55,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 56,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 57,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 58,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 59,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 60,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 61,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 62,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 63,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 64,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 65,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 66,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 67,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 68,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 69,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 70,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 71,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 72,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 73,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 74,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 75,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 76,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 77,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 78,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 79,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 80,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 81,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 82,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 83,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 84,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 85,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 86,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 87,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 88,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 89,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 90,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 91,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 92,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 93,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 94,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 95,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 96,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 97,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 98,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 99,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 100,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 101,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 102,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 103,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 104,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 105,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 106,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 107,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 108,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 109,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 110,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 111,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 112,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 113,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 114,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 115,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 116,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 117,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 118,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 119,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 120,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 121,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 122,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 123,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 124,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 125,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 126,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 127,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 128,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 129,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 130,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 131,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 132,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 133,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 134,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 135,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 136,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 137,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 138,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 139,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 140,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 141,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 142,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 143,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 144,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 145,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 146,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 147,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 148,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 149,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 150,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 151,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 152,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 153,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 154,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 155,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 156,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 157,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 158,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 159,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 160,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 161,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 162,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 163,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 164,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 165,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 166,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 167,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 168,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 169,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 170,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 171,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 172,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 173,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 174,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 175,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 176,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 177,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 178,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 179,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 180,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 181,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 182,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 183,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 184,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 185,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 186,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 187,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 188,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 189,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 190,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 191,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 192,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 193,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 194,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 195,
+   "cap_worlds": 64,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 196,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 197,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 198,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  },
+  {
+   "step": 199,
+   "cap_worlds": 0,
+   "captured_hits": [],
+   "n_captured_hits": 0,
+   "eager_hits": []
+  }
+ ]
+}

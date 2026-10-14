@@ -1,0 +1,23 @@
+...............
+----------------------------------------------------------------------
+Ran 15 tests in 4.011s
+
+OK
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module det_append_loop_5532bcd6 5532bcd load on device 'metal:0' took 410.62 ms  (compiled)
+Module det_append_f4f54043 f4f5404 load on device 'metal:0' took 379.07 ms  (compiled)
+Module det_scatter_69e9a282 69e9a28 load on device 'metal:0' took 389.08 ms  (compiled)
+Module det_mixed_max_add_0e0a068e 0e0a068 load on device 'metal:0' took 395.61 ms  (compiled)
+Module det_mixed_max_add_0e0a068e 0e0a068 load on device 'metal:0' took 39.28 ms  (cached)
+Module det_append_after_scratch_122a84b7 122a84b load on device 'metal:0' took 389.35 ms  (compiled)
+Module det_scatter_vec_93efda72 93efda7 load on device 'metal:0' took 391.39 ms  (compiled)
+Module det_mixed_max_add_0e0a068e 0e0a068 load on device 'metal:0' took 39.55 ms  (cached)
+Module ordered_sum_2edfb6c8 2edfb6c load on device 'metal:0' took 380.77 ms  (compiled)
+Module det_append_per_world_6b8637b8 6b8637b load on device 'metal:0' took 395.29 ms  (compiled)
+Module det_append_fixed_scratch_57c569a7 57c569a load on device 'metal:0' took 413.76 ms  (compiled)

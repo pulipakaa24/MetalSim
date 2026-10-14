@@ -1,0 +1,59 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth 3a77e74 load on device 'metal:0' took 439.25 ms  (cached)
+Module _nxn_broadphase__locals__kernel_0b9b111b 0b9b111 load on device 'metal:0' took 85.96 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_d54c7614 d54c761 load on device 'metal:0' took 1484.10 ms  (cached)
+Module mujoco_warp._src.constraint a8d621b load on device 'metal:0' took 39.62 ms  (cached)
+Module _friction_dof__locals__kernel_840c2d52 840c2d5 load on device 'metal:0' took 47.67 ms  (cached)
+Module _efc_contact_init__locals__kernel_bbf1abc0 bbf1abc load on device 'metal:0' took 41.06 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_9fd44ddd 477a956 load on device 'metal:0' took 46.77 ms  (cached)
+Module _efc_contact_update__locals__kernel_8650f729 8650f72 load on device 'metal:0' took 49.65 ms  (cached)
+Module mujoco_warp._src.passive ed5abcd load on device 'metal:0' took 218.19 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_ef4c1343 ef4c134 load on device 'metal:0' took 39.83 ms  (cached)
+Module _qfrc_smooth__locals__kernel_71b2d07e 71b2d07 load on device 'metal:0' took 39.14 ms  (cached)
+Module mujoco_warp._src.support bc406b9 load on device 'metal:0' took 46.14 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_5a39d2e7 410a98b load on device 'metal:0' took 71.02 ms  (cached)
+Module _solve_init_dof__locals__kernel_94e7b867 94e7b86 load on device 'metal:0' took 38.76 ms  (cached)
+Module _solve_init_efc__locals__kernel_17f938f8 17f938f load on device 'metal:0' took 38.45 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_b6c4c859 b6c4c85 load on device 'metal:0' took 41.46 ms  (cached)
+Module mul_m_kernel__locals___mul_m_56114449 5611444 load on device 'metal:0' took 39.60 ms  (cached)
+Module _update_constraint_efc__locals__kernel_13d3d847 13d3d84 load on device 'metal:0' took 46.92 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_3b7d8097 3b7d809 load on device 'metal:0' took 39.11 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_39d17112 39d1711 load on device 'metal:0' took 39.14 ms  (cached)
+Module _update_gradient_grad__locals__kernel_64330f09 64330f0 load on device 'metal:0' took 39.13 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_5f64f3f9 4b52c7a load on device 'metal:0' took 42.18 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_54836313 a54961d load on device 'metal:0' took 39.79 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_5c0c06ba 448cf81 load on device 'metal:0' took 86.81 ms  (cached)
+Module _update_constraint_gradient_fused__locals__kernel_2c6fc55e 2cadc62 load on device 'metal:0' took 50.67 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_004185cf 883aea0 load on device 'metal:0' took 41.89 ms  (cached)
+Module _solve_done__locals__kernel_5682012f 5682012 load on device 'metal:0' took 40.32 ms  (cached)
+Module mujoco_warp._src.solver 0e3a2a2 load on device 'metal:0' took 74.68 ms  (cached)
+Module mujoco_warp._src.forward 9dbd6c1 load on device 'metal:0' took 1546.68 ms  (cached)
+Module _next_time_builder__locals___next_time_f801908e f801908 load on device 'metal:0' took 40.87 ms  (cached)
+Module metalsim.physics.batch 766e0d1 load on device 'metal:0' took 38.44 ms  (cached)
+{"step": 130, "nacon": [256, 256], "holes": [0, 0], "bb_count_hist": [[256], [256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
+{"step": 131, "nacon": [512, 512], "holes": [0, 0], "bb_count_hist": [[256], [256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
+{"step": 132, "nacon": [512, 512], "holes": [0, 0], "bb_count_hist": [[256], [256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
+{"step": 133, "nacon": [512, 512], "holes": [0, 0], "bb_count_hist": [[256], [256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
+{"step": 134, "nacon": [768, 768], "holes": [0, 0], "bb_count_hist": [[256], [256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
+{"step": 135, "nacon": [768, 768], "holes": [0, 0], "bb_count_hist": [[256], [256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
+{"step": 136, "nacon": [1024, 1024], "holes": [0, 0], "bb_count_hist": [[256], [256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
+{"step": 137, "nacon": [768, 768], "holes": [0, 0], "bb_count_hist": [[256], [256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
+{"step": 138, "nacon": [1280, 1280], "holes": [0, 0], "bb_count_hist": [[0, 0, 256], [0, 0, 256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
+{"step": 139, "nacon": [1280, 1280], "holes": [0, 0], "bb_count_hist": [[0, 0, 256], [0, 0, 256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
+{"step": 140, "nacon": [1536, 1536], "holes": [0, 0], "bb_count_hist": [[0, 0, 0, 256], [0, 0, 0, 256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
+{"step": 141, "nacon": [1792, 1792], "holes": [0, 0], "bb_count_hist": [[0, 0, 0, 0, 256], [0, 0, 0, 0, 256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
+{"step": 142, "nacon": [2048, 2048], "holes": [0, 0], "bb_count_hist": [[0, 0, 0, 0, 256], [0, 0, 0, 0, 256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
+{"step": 143, "nacon": [2048, 2048], "holes": [0, 0], "bb_count_hist": [[0, 0, 0, 0, 256], [0, 0, 0, 0, 256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
+{"step": 144, "nacon": [2048, 2048], "holes": [0, 0], "bb_count_hist": [[0, 0, 0, 0, 256], [0, 0, 0, 0, 256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
+{"step": 145, "nacon": [2048, 2048], "holes": [0, 0], "bb_count_hist": [[0, 0, 0, 0, 256], [0, 0, 0, 0, 256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
+{"step": 146, "nacon": [2048, 2048], "holes": [0, 0], "bb_count_hist": [[0, 0, 0, 0, 256], [0, 0, 0, 0, 256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
+{"step": 147, "nacon": [2048, 2048], "holes": [0, 0], "bb_count_hist": [[0, 0, 0, 0, 256], [0, 0, 0, 0, 256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
+{"step": 148, "nacon": [2048, 2048], "holes": [0, 0], "bb_count_hist": [[0, 0, 0, 0, 256], [0, 0, 0, 0, 256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
+{"step": 149, "nacon": [2048, 2048], "holes": [0, 0], "bb_count_hist": [[0, 0, 0, 0, 256], [0, 0, 0, 0, 256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
+{"step": 150, "nacon": [2048, 2048], "holes": [0, 0], "bb_count_hist": [[0, 0, 0, 0, 256], [0, 0, 0, 0, 256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}

@@ -92,6 +92,17 @@ def _metal():
     return wp
 
 
+def _probe_result(out):
+    """The JSON a probe prints as its last stdout line; on anything else, fail with the probe's own output (stdout and
+    stderr tails, untruncated) instead of a bare JSONDecodeError."""
+    lines = out.stdout.strip().splitlines()
+    try:
+        return json.loads(lines[-1])
+    except (IndexError, json.JSONDecodeError):
+        pytest.fail(f"probe exit code {out.returncode}, last stdout line not JSON\n--- stdout tail\n{out.stdout[-2000:]}"
+                    f"\n--- stderr tail\n{out.stderr[-4000:]}", pytrace=False)
+
+
 def _box_on_sand():
     spec = importlib.util.spec_from_file_location("box_on_sand", ROOT / "metalsim/physics/mpm/probes/box_on_sand.py")
     mod = importlib.util.module_from_spec(spec)
@@ -184,7 +195,7 @@ def test_repeatable_at_scale(worlds):
     _metal()
     out = subprocess.run([sys.executable, str(ROOT / "metalsim/physics/mpm/probes/scale_coupled.py"), "--worlds",
                           str(worlds), "--steps", "40", "--runs", "2"], capture_output=True, text=True)
-    res = json.loads(out.stdout.strip().splitlines()[-1])
+    res = _probe_result(out)
     assert res["repeatable"] and res["finite"], res
 
 
@@ -328,7 +339,7 @@ def test_policy_step_graph_matches_eager():
     out = subprocess.run([sys.executable, str(ROOT / "metalsim/physics/mpm/probes/policy_step_ab.py"), "--worlds", "4",
                           "--fraction", "0.25", "--hash-steps", "40", "--steps", "20", "--warmup", "2", "--rounds", "1"],
                          capture_output=True, text=True)
-    res = json.loads(out.stdout.strip().splitlines()[-1])
+    res = _probe_result(out)
     assert res["bitwise_equal"], res
     assert res["resets_per_run"] > 0, res
 
@@ -340,5 +351,5 @@ def test_one_world_masked_reset():
     _metal()
     out = subprocess.run([sys.executable, str(ROOT / "metalsim/physics/mpm/probes/one_world_reset.py")],
                          capture_output=True, text=True)
-    res = json.loads(out.stdout.strip().splitlines()[-1])
+    res = _probe_result(out)
     assert res["ok"], res

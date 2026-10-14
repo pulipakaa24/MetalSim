@@ -1,0 +1,42 @@
+=== batch_13 start Tue Oct 13 22:34:52 PDT 2026
+[22:34:55] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[22:34:55] gpu job mm13_probe64 (<= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b13/logs/probe64_fused.log
+    Module _next_time_builder__locals___next_time_3db7a637 3db7a63 load on device 'metal:0' took 407.20 ms  (compiled)
+    Module metalsim.physics.batch 74a3c65 load on device 'metal:0' took 39.26 ms  (cached)
+    CLEAN {"launches": 11463, "kernels": 37}
+[22:35:41] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   1.1 %
+[22:35:41] gpu job mm13_probe64nf (<= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b13/logs/probe64_nofuse.log
+    Module _next_time_builder__locals___next_time_3db7a637 3db7a63 load on device 'metal:0' took 41.12 ms  (cached)
+    Module metalsim.physics.batch 74a3c65 load on device 'metal:0' took 39.69 ms  (cached)
+    CLEAN {"launches": 17903, "kernels": 37}
+[22:36:02] health: utilisation 5%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[22:36:02] A1 -> DONE fused: CLEAN {"launches": 11463, "kernels": 37} | MJW_METAL_FUSE_UPDATE=0: CLEAN {"launches": 17903, "kernels": 37}
+[22:36:02] gpu job mm13_g1nf_64 (<= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b13/logs/g1_det_nofuse_64.log
+      File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/batch.py", line 457, in check_overflow
+        raise RuntimeError("Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter "
+    RuntimeError: Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter calls differ between its two passes (research_notes/MPM in main simulator/deterministic_ccd_divergence.md)
+[22:36:54] health: utilisation 100%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[22:37:24] gpu job mm13_g1nf_1024 (<= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b13/logs/g1_det_nofuse_1024.log
+      File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/batch.py", line 457, in check_overflow
+        raise RuntimeError("Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter "
+    RuntimeError: Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter calls differ between its two passes (research_notes/MPM in main simulator/deterministic_ccd_divergence.md)
+[22:37:44] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[22:37:44] A2 -> DONE G1 deterministic, unfused update: 64:rc=1 1024:rc=1
+[22:37:44] gpu job mm13_probe1024 (<= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b13/logs/probe1024_fused.log
+    Module _next_time_builder__locals___next_time_3db7a637 3db7a63 load on device 'metal:0' took 352.96 ms  (cached)
+    Module metalsim.physics.batch 74a3c65 load on device 'metal:0' took 42.53 ms  (cached)
+    CLEAN {"launches": 918, "kernels": 37}
+[22:38:15] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   2.2 %
+[22:38:15] A3 -> DONE 1,024 worlds, fused: _update_constraint_gradient_fused  Module _next_time_builder__locals___next_time_3db7a637 3db7a63 load on device 'metal:0' took 352.96 ms  (cached) Module metalsim.physics.batch 74a3c65 load on device 'metal:0' took 42.53 ms  (cached) CLEAN {"launches": 918, "kernels": 37} 
+✓ Pull request pulipakaa24/MetalSim#29 is converted to "draft"
+https://github.com/pulipakaa24/MetalSim/pull/29
+https://github.com/pulipakaa24/MetalSim/pull/29#issuecomment-6161719629
+[22:38:20] A4 -> DONE https://github.com/pulipakaa24/MetalSim/pull/29#issuecomment-6161719629

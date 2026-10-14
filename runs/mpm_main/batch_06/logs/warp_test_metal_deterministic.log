@@ -1,0 +1,53 @@
+test_counter_in_dynamic_loop (warp.tests.test_metal_deterministic.TestMetalDeterministic.test_counter_in_dynamic_loop)
+Size records of a counter called in a dynamic loop with deterministic_max_records. ... ok
+test_counter_slots_in_thread_order (warp.tests.test_metal_deterministic.TestMetalDeterministic.test_counter_slots_in_thread_order)
+Hand out counter slots in thread order across many SIMD-groups and threadgroups. ... ok
+test_counter_starts_at_current_value (warp.tests.test_metal_deterministic.TestMetalDeterministic.test_counter_starts_at_current_value)
+Start slots at the counter's value before the launch and leave the total in it. ... ok
+test_float_sum_adds_to_destination (warp.tests.test_metal_deterministic.TestMetalDeterministic.test_float_sum_adds_to_destination)
+Add the rounded sum to the destination's value, and leave untouched elements alone. ... ok
+test_float_sum_is_exactly_rounded (warp.tests.test_metal_deterministic.TestMetalDeterministic.test_float_sum_is_exactly_rounded)
+Accumulate float atomics exactly and round once: equal to the correctly rounded sum, on every run. ... ok
+test_float_sum_special_values (warp.tests.test_metal_deterministic.TestMetalDeterministic.test_float_sum_special_values)
+Propagate infinities and NaN, and sum cancelling extremes exactly. ... ok
+test_graph_capture (warp.tests.test_metal_deterministic.TestMetalDeterministic.test_graph_capture)
+Replay deterministic accumulation and counter launches from a captured graph. ... ok
+test_mixed_reductions (warp.tests.test_metal_deterministic.TestMetalDeterministic.test_mixed_reductions)
+Mix max and add atomics on one array (separate targets per reduction on Metal). ... ok
+test_no_tripwire_when_phases_agree (warp.tests.test_metal_deterministic.TestMetalDeterministic.test_no_tripwire_when_phases_agree)
+Supported counter kernels leave the flag clear (scratch already equal to the input in both passes). ... ok
+test_one_threadgroup_launch_finalizes_in_kernel (warp.tests.test_metal_deterministic.TestMetalDeterministic.test_one_threadgroup_launch_finalizes_in_kernel)
+Launches that are one threadgroup finalize their exact sums inside the kernel (one dispatch per target ... ok
+test_ordered_launches_opt_in (warp.tests.test_metal_deterministic.TestMetalDeterministic.test_ordered_launches_opt_in)
+Run atomics in task order on one SIMD-group with the metal_ordered_atomics module option. ... ok
+test_per_element_counters (warp.tests.test_metal_deterministic.TestMetalDeterministic.test_per_element_counters)
+Order each counter element's slots by thread, independently of the other elements. ... ok
+test_phase0_keeps_fixed_scratch (warp.tests.test_metal_deterministic.TestMetalDeterministic.test_phase0_keeps_fixed_scratch)
+Keep stores to fixed-array scratch in the counting phase, so control flow matches the second phase. ... ok
+test_phase_mismatch_tripwire (warp.tests.test_metal_deterministic.TestMetalDeterministic.test_phase_mismatch_tripwire)
+Flag a kernel whose execution pass makes counter calls its counting pass did not record (more calls: ... ok
+test_vector_sum_2d (warp.tests.test_metal_deterministic.TestMetalDeterministic.test_vector_sum_2d)
+Accumulate vec3 values into a 2D array component by component. ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 4.294s
+
+OK
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module det_append_loop_5532bcd6 5532bcd load on device 'metal:0' took 432.47 ms  (compiled)
+Module det_append_f4f54043 f4f5404 load on device 'metal:0' took 402.29 ms  (compiled)
+Module det_scatter_69e9a282 69e9a28 load on device 'metal:0' took 414.81 ms  (compiled)
+Module det_mixed_max_add_0e0a068e 0e0a068 load on device 'metal:0' took 415.33 ms  (compiled)
+Module det_mixed_max_add_0e0a068e 0e0a068 load on device 'metal:0' took 40.29 ms  (cached)
+Module det_append_after_scratch_122a84b7 122a84b load on device 'metal:0' took 416.81 ms  (compiled)
+Module det_scatter_vec_93efda72 93efda7 load on device 'metal:0' took 423.86 ms  (compiled)
+Module det_mixed_max_add_0e0a068e 0e0a068 load on device 'metal:0' took 39.14 ms  (cached)
+Module ordered_sum_2edfb6c8 2edfb6c load on device 'metal:0' took 395.88 ms  (compiled)
+Module det_append_per_world_6b8637b8 6b8637b load on device 'metal:0' took 403.82 ms  (compiled)
+Module det_append_fixed_scratch_57c569a7 57c569a load on device 'metal:0' took 423.97 ms  (compiled)

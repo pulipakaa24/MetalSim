@@ -1,0 +1,11 @@
+== rigid12: 148 passed, 10 warnings in 369.39s (0:06:09)
+== det12: 7 passed in 292.65s (0:04:52)
+== render12: 243 passed, 1 skipped, 3 warnings in 238.95s (0:03:58)
+   1 SolverMuJoCo unavailable in this environment: WarpCodegenError: Error while parsing function "convert_mjw_contacts_to_newton_kernel" at /Users/aditya/robosim/.venv/lib/python3.12/site-
+== rest12: 50 passed, 1 skipped, 3 warnings in 381.48s (0:06:21)
+   1 SolverMuJoCo unavailable in this environment: WarpCodegenError: Error while parsing function "convert_mjw_contacts_to_newton_kernel" at /Users/aditya/robosim/.venv/lib/python3.12/site-
+== n152_12: 10 passed, 13 skipped, 1 xfailed, 1 warning in 47.12s
+   7 needs the Franka-Pour assets (scripts/fetch_isaac_assets.sh)
+   4 needs the Warp (metalsim) and Newton (metalsim-1.5.2) forks
+   1 needs the Newton fork (metalsim-1.5.2)
+   1 needs the Franka-Pour assets

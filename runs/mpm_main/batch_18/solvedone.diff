@@ -1,0 +1,68 @@
+--- a/mujoco_warp/_src/solver.py
++++ b/mujoco_warp/_src/solver.py
+@@ -4899,7 +4899,8 @@
+     if tid == 0:
+       ctx_beta_out[worldid] = wp.max(0.0, reduced_beta[0] / wp.max(types.MJ_MINVAL, reduced_beta[1]))
+ 
+-      solver_niter_out[worldid] += 1
++      niter = solver_niter_out[worldid] + 1
++      solver_niter_out[worldid] = niter
+       tolerance = opt_tolerance[worldid % opt_tolerance.shape[0]]
+       meaninertia = stat_meaninertia[worldid % stat_meaninertia.shape[0]]
+ 
+@@ -4908,8 +4909,8 @@
+       improvement = _rescale(nv, meaninertia, ctx_improvement_in[worldid])
+       gradient = _rescale(nv, meaninertia, wp.sqrt(grad_dot))
+       done = (improvement < tolerance) or (gradient < tolerance)
+-      if done or solver_niter_out[worldid] == opt_iterations:
+-        if not done and solver_niter_out[worldid] == opt_iterations:
++      if done or niter == opt_iterations:
++        if not done and niter == opt_iterations:
+           if wp.static(bool(WARN_OVERFLOW & OverflowType.ITERATIONS)):
+             wp.printf(
+               "solver iterations limit reached - please increase iterations beyond %u\n"
+@@ -4953,7 +4954,13 @@
+     if ctx_done_in[worldid]:
+       return
+ 
+-    solver_niter_out[worldid] += 1
++    # MetalSim: the count is kept in a local and stored, not incremented in place and read back: under Warp's
++    # deterministic mode this kernel's slot counter (nsolving, consumed below for the early exit) makes it run twice,
++    # the counting pass with global stores and non-counter atomics suppressed, so a read-back of solver_niter there
++    # saw the old count; a world reaching the iteration cap then made the counter call in one pass only (a phase
++    # mismatch; MetalSim research_notes/MPM in main simulator/deterministic_ccd_divergence.md). One thread per world.
++    niter = solver_niter_out[worldid] + 1
++    solver_niter_out[worldid] = niter
+     tolerance = opt_tolerance[worldid % opt_tolerance.shape[0]]
+     meaninertia = stat_meaninertia[worldid % stat_meaninertia.shape[0]]
+ 
+@@ -4961,10 +4968,10 @@
+     gradient = _rescale(nv, meaninertia, wp.sqrt(ctx_grad_dot_in[worldid]))
+     model_improvement = _rescale(nv, meaninertia, 0.5 * ctx_newton_decrement_in[worldid])
+     done = (improvement < tolerance) or (gradient < tolerance) or (model_improvement < tolerance)
+-    if done or solver_niter_out[worldid] == opt_iterations:
++    if done or niter == opt_iterations:
+       # if the solver has converged or the maximum number of iterations has been reached then
+       # mark this world as done and remove it from the number of unconverged worlds
+-      if not done and solver_niter_out[worldid] == opt_iterations:
++      if not done and niter == opt_iterations:
+         if wp.static(bool(warn_overflow & OverflowType.ITERATIONS)):
+           wp.printf(
+             "solver iterations limit reached - please increase iterations beyond %u\n"
+@@ -4973,13 +4980,15 @@
+           )
+         overflow_out[worldid] = overflow_out[worldid] | OverflowType.ITERATIONS
+       ctx_done_out[worldid] = True
+-      was_solving = wp.atomic_add(nsolving_out, 0, -1)
+       if wp.static(EARLY_EXIT):
++        was_solving = wp.atomic_add(nsolving_out, 0, -1)
+         # the world that brought the count to zero: no later iteration has anything to do, so the indirect
+         # execution ranges of iterations iteration + 1 .. cap - 1 get length 0 and their launches are skipped
+         if was_solving == 1:
+           for j in range(iteration + 1, opt_iterations):
+             ranges_out[4 * j + 1] = wp.uint32(0)
++      else:
++        wp.atomic_add(nsolving_out, 0, -1)   # return unused: no slot counter without the early exit
+ 
+   return kernel
+ 
