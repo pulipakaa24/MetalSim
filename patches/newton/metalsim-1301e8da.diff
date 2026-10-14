@@ -1450,6 +1450,38 @@ index ba73dc17f0430b7b291bba6fdbdbc63acf1b7893..8898bc000e076263f0ce8753bd633c1a
  
      def _evaluate_dual_problem_perf(
          self,
+diff --git a/newton/_src/solvers/mujoco/kernels.py b/newton/_src/solvers/mujoco/kernels.py
+index 60cac7d9462c4108688bd046fe3cefed69051fa8..2af8bea004ae728e929b6e3c94dd8fda3ca4cb29 100644
+--- a/newton/_src/solvers/mujoco/kernels.py
++++ b/newton/_src/solvers/mujoco/kernels.py
+@@ -1448,6 +1448,7 @@ def create_convert_mjw_contacts_to_newton_kernel():
+         mj_contact_geom: wp.array[wp.vec2i],
+         mj_contact_efc_address: wp.array2d[int],
+         mj_contact_worldid: wp.array[wp.int32],
++        mj_contact_adhesion: wp.array[float],
+         mj_efc_force: wp.array2d[float],
+         mj_geom_bodyid: wp.array[int],
+         mj_xpos: wp.array2d[wp.vec3],
+@@ -1515,6 +1516,7 @@ def create_convert_mjw_contacts_to_newton_kernel():
+                 mj_contact_friction,
+                 mj_contact_dim,
+                 mj_contact_efc_address,
++                mj_contact_adhesion,
+                 mj_efc_force,
+                 njmax,
+                 mj_nacon,
+diff --git a/newton/_src/solvers/mujoco/solver_mujoco.py b/newton/_src/solvers/mujoco/solver_mujoco.py
+index 41f6b5ee58c8e694cc3ed9828e6402cdb9b9627e..e4add90ebb643c78b4578e6451edb3fb70bb2588 100644
+--- a/newton/_src/solvers/mujoco/solver_mujoco.py
++++ b/newton/_src/solvers/mujoco/solver_mujoco.py
+@@ -5586,6 +5586,7 @@ class SolverMuJoCo(SolverBase, CouplingInterface):
+                 mj_contact.geom,
+                 mj_contact.efc_address,
+                 mj_contact.worldid,
++                mj_contact.adhesion,
+                 mj_data.efc.force,
+                 self.mjw_model.geom_bodyid,
+                 mj_data.xpos,
 diff --git a/newton/_src/solvers/xpbd/kernels.py b/newton/_src/solvers/xpbd/kernels.py
 index 9d30fe68b5e05b6f01eac15b1e5b8633ebaffbec..f0f1da20efb7cd6d014f295e87a7595b183b5e4d 100644
 --- a/newton/_src/solvers/xpbd/kernels.py
@@ -3785,3 +3817,18 @@ index 0000000000000000000000000000000000000000..4a420302c4ba3cc3ed6b57ca7eb07399
 +
 +if __name__ == "__main__":
 +    unittest.main(verbosity=2, failfast=True)
+diff --git a/pyproject.toml b/pyproject.toml
+index 7783971ff3e78bdf1f6ed448a7f5db29149d09b5..b4efe1484c0930aeca4a6d660675df7908af17a2 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -36,8 +36,8 @@ dependencies = [
+ # Core simulation dependencies
+ sim = [
+     # MuJoCo simulation
+-    "mujoco-warp~=3.12.0",  # MuJoCo, warp-accelerated
+-    "mujoco~=3.12.0",       # MuJoCo physics engine
++    "mujoco-warp~=3.14.0",  # MuJoCo, warp-accelerated
++    "mujoco~=3.14.0",       # MuJoCo physics engine
+ ]
+ 
+ # Optional ONNX policy inference for neural actuators and RL policy examples.
