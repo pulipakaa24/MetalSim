@@ -24,6 +24,7 @@ project, not affiliated with or endorsed by NVIDIA, Google DeepMind or Apple.
 - [`CHANGELOG.md`](CHANGELOG.md): what landed when.
 - Subsystems: [`metalsim/physics/mpm/MPM.md`](metalsim/physics/mpm/MPM.md) (MPM on Metal against the L4),
   [`metalsim/render/PARTICLES.md`](metalsim/render/PARTICLES.md) (particles as render grains),
+  [`metalsim/render/SPLAT.md`](metalsim/render/SPLAT.md) (3D Gaussian splat scenes as camera backgrounds, batched, with the robot composited),
   [`docs/RENDER_COVERAGE.md`](docs/RENDER_COVERAGE.md) (what each renderer draws of what is simulated),
   [`docs/NEWTON_RENDER.md`](docs/NEWTON_RENDER.md) (cameras on Newton scenes), [`docs/TRON1.md`](docs/TRON1.md)
   (LimX TRON1 simulator, controllers and robot bridge).
@@ -79,7 +80,7 @@ listing its commits, and keeps its upstream licence unchanged. "Head" is the bra
 |---|---|
 | `metalsim/interop` | Warp ↔ Metal ↔ PyTorch MPS: zero-copy tensors over Warp and renderer buffers, cross-queue ordering with shared events, a native bridge (`metalsim/native/torch_metal_bridge.mm`) |
 | `metalsim/physics` | `BatchSim`: batched MuJoCo Warp on Metal with graph replay and per-world model fields; contact-tuning and solver presets; deformables (MuJoCo Warp flex, XPBD cloth and cables, a port of PhysX's particle cloth); MPM (`metalsim/physics/mpm`: Isaac Lab 3.0-EA's Newton 1.5.2 implicit MPM on Metal with CUDA's semantics, also in `BatchSim` scenes through `MPMCoupling`, [`MPM.md`](metalsim/physics/mpm/MPM.md)); the archived Newton XPBD backend |
-| `metalsim/render` | tier 0 raster, tier 1 hybrid ray tracing (shadows, AO, reflections), tier 2 path tracer with OmniPBR / UsdPreviewSurface BRDFs, USD light units, textured DomeLight HDR environment maps (importance-sampled, MIS, tilted domes), USD area lights, RTX's display transform and Open Image Denoise; RTX-parity presets; MPM particles as render grains ([`PARTICLES.md`](metalsim/render/PARTICLES.md)); deformables, tendons, skins and sites; Newton models through a bridge ([`docs/NEWTON_RENDER.md`](docs/NEWTON_RENDER.md)); coverage audit in [`docs/RENDER_COVERAGE.md`](docs/RENDER_COVERAGE.md) |
+| `metalsim/render` | tier 0 raster, tier 1 hybrid ray tracing (shadows, AO, reflections), tier 2 path tracer with OmniPBR / UsdPreviewSurface BRDFs, USD light units, textured DomeLight HDR environment maps (importance-sampled, MIS, tilted domes), USD area lights, RTX's display transform and Open Image Denoise; RTX-parity presets; MPM particles as render grains ([`PARTICLES.md`](metalsim/render/PARTICLES.md)); 3D Gaussian splat scenes, batched, with meshes composited ([`SPLAT.md`](metalsim/render/SPLAT.md)); deformables, tendons, skins and sites; Newton models through a bridge ([`docs/NEWTON_RENDER.md`](docs/NEWTON_RENDER.md)); coverage audit in [`docs/RENDER_COVERAGE.md`](docs/RENDER_COVERAGE.md) |
 | `metalsim/sensors` | lidar (beam divergence, multi-return, intensity), radar-lite, depth camera and height scan on Metal ray tracing (transparent geoms included); Isaac Lab's `ContactSensor` as Warp kernels |
 | `metalsim/scene` | USD → MuJoCo loader (lossless and generic UsdPhysics, fixes for NVIDIA asset conventions), MJCF/URDF → USD, MaterialX flattening |
 | `metalsim/replicator` | annotators, randomizers, Isaac Lab event terms, and writers including Replicator's `BasicWriter` layout |
@@ -292,12 +293,13 @@ git clone --depth 1 https://github.com/google-deepmind/mujoco_menagerie upstream
 pytest tests -q
 scripts/setup_newton152.sh                 # optional: MPM and Franka-Pour (.venv-newton152; tests/test_mpm.py runs there)
 scripts/fetch_polyhaven_assets.sh demo     # optional: HDRI and sand texture of the ANYmal-on-sand render demo
+scripts/fetch_splat_scenes.sh              # optional: public splat scenes for the splat renderer's real-data tests (InteriorGS is gated: SPLAT.md 7b)
 ```
 
 Every command runs from the repository root, which can be anywhere (any user, any directory name, spaces included);
 nothing in the code, tests or scripts assumes the author's machine (`tests/test_no_machine_paths.py` checks it). The
-model and asset locations can be moved with `MENAGERIE` (default `upstream/mujoco_menagerie`) and `POLYHAVEN` (default
-`assets/polyhaven`). The first steps of each demo, at small scale, are in [`docs/GUIDE.md`](docs/GUIDE.md) section 2.
+model and asset locations can be moved with `MENAGERIE` (default `upstream/mujoco_menagerie`) `POLYHAVEN` (default
+`assets/polyhaven`) and `METALSIM_SPLAT_DATA` (default `assets/splats`). The first steps of each demo, at small scale, are in [`docs/GUIDE.md`](docs/GUIDE.md) section 2.
 
 The MuJoCo Warp commit is pinned (the head of the fork's branch `metalsim` on 2026-10-13), as Warp's in
 `scripts/setup_warp.sh` and Newton's in `pyproject.toml`. Without access to the fork: clone

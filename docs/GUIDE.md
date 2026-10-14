@@ -311,6 +311,28 @@ rt.trace_host(datas, [lidar]); out = lidar.numpy()                  # out["range
 A scene with three glass panes, every mode, with the time of each: `python
 scripts/diagnostics/sensor_transparency_cost.py --n 64`; the tests: `tests/test_sensor_transparency.py`.
 
+### Splat backgrounds (3D Gaussian splat scenes)
+
+A captured 3D Gaussian splat scene can stand in for the room around the robot: `SplatRenderer` renders N cameras per call
+into the same buffers as `Tier0Renderer` (`rgb` (N, H, W, 3) uint8, planar `depth` (N, H, W)) and composites the robot
+and objects drawn by a `Tier0Renderer` with correct occlusion. Formats: 3DGS `.ply`, SuperSplat compressed `.ply`
+(InteriorGS), `.spz`, `.splat`, NVIDIA NuRec `.nurec`. Design, measurements and limits: `metalsim/render/SPLAT.md`.
+
+```python
+from metalsim.render.splat import SplatRenderer, load_scene, make_transform
+from metalsim.render.tier0 import Tier0Renderer
+A, t = make_transform(up="z")                   # the file's frame -> the sim frame (up axis, scale, yaw, translation)
+scene = load_scene("assets/splats/interiorgs/0204_840158/3dgs_compressed.ply", A, t)
+mesh = Tier0Renderer(model, num_envs, width=640, height=360, camera="cam", outputs=("rgb", "depth"), include_planes=False)
+r = SplatRenderer(scene, num_envs, mesh=mesh, outputs=("rgb", "depth"))
+v = r.render(sim); r.after(v)                   # r.out.rgb / r.out.depth: MPS tensors, no host sync
+```
+
+The public reference scenes come from `scripts/fetch_splat_scenes.sh` (into `assets/splats/`, never committed; InteriorGS
+is gated on Hugging Face and non-commercial). Tests: `pytest tests/test_render_splat*.py` (the real-data ones skip with
+the fetch command when the data is absent); numbers: `python scripts/splat_bench.py verify` (any Mac) and `bench`
+(through `scripts/gpu_run.sh NAME timing`).
+
 ## 3. Bringing your own robot
 
 ### Loading USD or MJCF
