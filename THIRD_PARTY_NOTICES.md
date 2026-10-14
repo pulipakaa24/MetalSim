@@ -39,6 +39,10 @@ Three kinds of relationship occur:
 | MLX (Apple) | MIT | not a dependency; one diagnostic script | `scripts/diagnostics/camera_update_profile.py` |
 | imageio-ffmpeg | BSD-2-Clause (the ffmpeg binary it downloads has its own licence) | optional dependency (`parity` extra) | video scripts under `scripts/gallery/` |
 | Poly Haven HDRIs and textures | CC0 1.0 (public domain) | fetched, **not committed** (`.gitignore`); one rendered frame in the gallery | `scripts/fetch_polyhaven_assets.sh` -> `assets/polyhaven/`; `docs/gallery/g1_hdri_tier2.png` |
+| InteriorGS (SpatialVerse / Manycore) Gaussian splat scenes | InteriorGS Terms of Use (non-commercial research / education, no redistribution) | fetched (gated), **not committed** (`.gitignore`); no renders of it committed | `scripts/fetch_splat_scenes.sh` -> `assets/splats/interiorgs/`; tests and `scripts/splat_bench.py` read it |
+| dxgl/multiview-datasets object splat (`modern_arm_chair.ply`) | CC0 1.0 | fetched, **not committed** | `scripts/fetch_splat_scenes.sh` -> `assets/splats/dxgl/` |
+| NVIDIA PhysicalAI-Robotics-NuRec `zh_lounge` (optional) | CC-BY-4.0 | fetched on request, **not committed** | `scripts/fetch_splat_scenes.sh nurec_lounge` -> `assets/splats/nurec/` |
+| splat file formats: SPZ (open-source `spz` reference library), SuperSplat compressed PLY (PlayCanvas engine), NVIDIA NuRec `.nurec` (layout read from files) | MIT (`spz`, PlayCanvas engine); NuRec: no code or data used | reimplemented decoders, no code copied | `metalsim/render/splat/formats.py` |
 | other Python dependencies (numpy, scipy, pyobjc, scikit-image, lpips, flip-evaluator, trimesh, gymnasium, stable-baselines3, onnxruntime, tensordict, pillow, imageio, pytest) | BSD / MIT family | dependencies (`pyproject.toml`) | imported |
 | published algorithms (XPBD, a-trous / SVGF, ACES fit, GGX fit, Philox, stable PD, PPO details) | not applicable (no code copied) | reimplemented from the papers | see "Algorithms from publications" |
 
@@ -248,6 +252,21 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
   each machine fetches its own copy. They are the environment maps of the tier-2 path tracer's dome-light
   lighting and of the replicator's per-episode environment randomization. `docs/gallery/g1_hdri_tier2.png` is a
   frame rendered under one of them (`lebombo`); CC0 requires no attribution, credit is given here anyway.
+
+### Gaussian splat scenes and formats
+
+- InteriorGS (https://huggingface.co/datasets/spatialverse/InteriorGS; Miao et al., arXiv 2510.21307): its Terms of Use
+  allow non-commercial research and education only and forbid redistribution in whole or in part. One scene is the
+  splat renderer's reference; `scripts/fetch_splat_scenes.sh` downloads it (gated: each user accepts the terms on
+  Hugging Face) into the ignored `assets/splats/`, pinned by dataset revision and SHA-256. Nothing from it (data, renders,
+  derived files) is committed; the repository holds only measured numbers (`metalsim/render/SPLAT.md`).
+- dxgl/multiview-datasets (CC0 1.0, splats of CC0 Poly Haven models): one object fetched the same way.
+- NVIDIA PhysicalAI-Robotics-NuRec (https://huggingface.co/datasets/nvidia/PhysicalAI-Robotics-NuRec, CC-BY-4.0,
+  attribution NVIDIA Corporation): the `zh_lounge` scene, optional, fetched the same way.
+- Format decoders in `metalsim/render/splat/formats.py` reimplement published layouts in numpy: SPZ (the MIT-licensed
+  `spz` reference library's `load-spz.cc`), the SuperSplat compressed PLY (PlayCanvas engine, MIT,
+  `gsplat-compressed-data.js`) and the 3DGS training PLY; the NuRec `.nurec` layout was read from files (no NVIDIA code).
+  The rasterizer follows the 3DGS / gsplat papers and their published rules (SPLAT.md §2), no code copied.
 
 ### PyTorch and MLX
 
