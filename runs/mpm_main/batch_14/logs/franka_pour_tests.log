@@ -1,0 +1,553 @@
+EEE..EEF                                                                 [100%]
+==================================== ERRORS ====================================
+_____________ ERROR at setup of test_observation_terms_match_isaac _____________
+
+    @pytest.fixture(scope="module")
+    def env():
+        wp.config.quiet = True
+        e = P.FrankaPourEnv(P.PourTaskConfig(num_envs=N, seed=3))
+        e.reset_all()
+        g = torch.Generator(device=e.device).manual_seed(5)
+        for _ in range(4):     # leave the reset state: drive with random actions
+>           e.step(torch.rand(N, 8, device=e.device, generator=g) * 2 - 1)
+
+tests/test_franka_pour_terms.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/learn/franka_pour.py:926: in step
+    self.simulate()
+metalsim/learn/franka_pour.py:943: in simulate
+    self.physics.policy_step()
+metalsim/learn/franka_pour_scene.py:867: in policy_step
+    self._policy_step_body()
+metalsim/learn/franka_pour_scene.py:850: in _policy_step_body
+    self.sim_step()
+metalsim/learn/franka_pour_scene.py:840: in sim_step
+    self.pipeline.collide(self.s0, self.contacts)
+../../../upstream/newton-1.5.2/newton/_src/sim/collide.py:1471: in collide
+    self.narrow_phase.launch_custom_write(
+../../../upstream/newton-1.5.2/newton/_src/geometry/narrow_phase.py:2061: in launch_custom_write
+    wp.launch(
+../../../upstream/warp-innate/warp/_src/context.py:12660: in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint, dim_limit=dim_limit)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+kernel = <warp._src.context.Kernel object at 0x113d0d130>
+hooks = <warp._src.context.KernelHooks object at 0x179f8f0b0>
+params = [<warp._src.types.launch_bounds_1d_t object at 0x1797ad8d0>, <warp._src.codegen.Struct.__init__.<locals>.StructType ob...at 0x178d5e8d0>, <warp._src.types.array_t object at 0x178d5df50>, <warp._src.types.array_t object at 0x17989d650>, ...]
+device = 'metal:0', block_dim = 128, adjoint = False, dim_limit = None
+det_args = None
+
+    def invoke_metal(
+        kernel,
+        hooks,
+        params: Sequence[Any],
+        device: Device,
+        block_dim: int,
+        adjoint: bool = False,
+        dim_limit: warp.array | None = None,
+        det_args=None,
+    ):
+        """Dispatch a forward or backward kernel on a Metal device.
+    
+        With ``dim_limit`` (a forward launch), only the threadgroups holding tasks whose leading index is below
+        ``dim_limit[0]`` run (see :func:`warp.launch`).
+    
+        ``det_args`` carries the deterministic-mode buffers of kernels with deterministic lowering
+        (``warp._src.metal_deterministic``).
+        """
+        if hooks.metal_unsupported:
+            detail = ""
+            if "int64)" in hooks.metal_unsupported:
+                detail = (
+                    ". Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit "
+                    "atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; "
+                    "use 32-bit atomics (e.g. on one half of the value) instead"
+                )
+>           raise RuntimeError(
+                f"Kernel '{kernel.key}' uses builtins that are not supported on Metal yet: {hooks.metal_unsupported}"
+                + detail
+            )
+E           RuntimeError: Kernel 'reduce_buffered_contacts_kernel' uses builtins that are not supported on Metal yet: atomic_cas(uint64). Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; use 32-bit atomics (e.g. on one half of the value) instead
+
+../../../upstream/warp-innate/warp/_src/context.py:11568: RuntimeError
+---------------------------- Captured stdout setup -----------------------------
+Module newton._src.geometry.inertia 2dc4a5b load on device 'metal:0' took 625.36 ms  (compiled)
+Module validate_and_correct_inertia_kernel_a407d1da a407d1d load on device 'metal:0' took 449.06 ms  (compiled)
+Module newton._src.geometry.bvh 117d4e3 load on device 'metal:0' took 625.50 ms  (compiled)
+Module newton._src.solvers.coupled.model_view a326587 load on device 'metal:0' took 489.93 ms  (compiled)
+Module newton._src.solvers.coupled.solver_coupled fab7b23 load on device 'metal:0' took 541.90 ms  (compiled)
+Module newton._src.solvers.mujoco.kernels 9dfca93 load on device 'metal:0' took 3801.25 ms  (compiled)
+Module repeat_array_kernel_755958ac 7f0eda4 load on device 'metal:0' took 395.99 ms  (compiled)
+Module repeat_array_kernel_755958ac 21c4966 load on device 'metal:0' took 402.74 ms  (compiled)
+Module repeat_array_kernel_755958ac 8b09bf5 load on device 'metal:0' took 396.15 ms  (compiled)
+Module repeat_array_kernel_755958ac 147f785 load on device 'metal:0' took 400.69 ms  (compiled)
+Module repeat_array_kernel_755958ac b40881e load on device 'metal:0' took 411.91 ms  (compiled)
+Module repeat_array_kernel_755958ac 62512c4 load on device 'metal:0' took 426.68 ms  (compiled)
+Module repeat_array_kernel_755958ac 1b48062 load on device 'metal:0' took 427.71 ms  (compiled)
+Module repeat_array_kernel_755958ac 20839a4 load on device 'metal:0' took 432.10 ms  (compiled)
+Module mujoco_warp._src.io e1b8cad load on device 'metal:0' took 1211.37 ms  (compiled)
+Module mujoco_warp._src.smooth 82d48ed load on device 'metal:0' took 2283.22 ms  (compiled)
+Module _small_cholesky_factorize_block__locals__kernel_be935041 b17401e load on device 'metal:0' took 494.18 ms  (compiled)
+Module _tile_cholesky_factorize_block__locals__kernel_065ee1e5 aacfa4e load on device 'metal:0' took 461.98 ms  (compiled)
+Module _small_cholesky_solve_block__locals__kernel_6bdd9cd1 5413fcf load on device 'metal:0' took 436.05 ms  (compiled)
+Module _tile_cholesky_solve_block__locals__kernel_71e197af 92b3c12 load on device 'metal:0' took 436.70 ms  (compiled)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_model 9859e30 load on device 'metal:0' took 436.22 ms  (compiled)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels d7af100 load on device 'metal:0' took 643.05 ms  (compiled)
+Module warp.fem.geometry.nanogrid faefb26 load on device 'metal:0' took 742.70 ms  (compiled)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.mark_active_cells_by_environment_d49867a3 9051b4b load on device 'metal:0' took 559.05 ms  (compiled)
+Module warp.fem.utils 36b470b load on device 'metal:0' took 474.14 ms  (compiled)
+Module warp._src.fem.quadrature.pic_quadrature.dyn.bin_particles_a59060ab 0b8f735 load on device 'metal:0' took 1077.09 ms  (compiled)
+Module warp._src.fem.quadrature.pic_quadrature.dyn.finalize_cell_particle_data_8b50e35d ec4b31b load on device 'metal:0' took 520.35 ms  (compiled)
+Module warp._src.fem.space.partition.dyn.node_environment_from_cells_kernel_db4a4227 c5cc454 load on device 'metal:0' took 473.67 ms  (compiled)
+Module warp.fem.space.partition 447ea61 load on device 'metal:0' took 435.33 ms  (compiled)
+Module warp.fem.space.restriction 2887765 load on device 'metal:0' took 420.65 ms  (compiled)
+Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_f0ba5002 aa8d44a load on device 'metal:0' took 475.75 ms  (compiled)
+Module warp._src.fem.space.partition.dyn.node_environment_from_cells_kernel_dba0dbdb 3661aaf load on device 'metal:0' took 477.58 ms  (compiled)
+Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_287ab8bb bcd8700 load on device 'metal:0' took 477.79 ms  (compiled)
+Module warp._src.fem.space.partition.dyn.node_environment_from_cells_kernel_c111570e 897491a load on device 'metal:0' took 437.14 ms  (compiled)
+Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_07070927 cda6492 load on device 'metal:0' took 424.85 ms  (compiled)
+Module newton._src.solvers.coupled.interface 1715f18 load on device 'metal:0' took 436.11 ms  (compiled)
+Module newton._src.sim.articulation e778c5e load on device 'metal:0' took 5423.99 ms  (compiled)
+Module _copy_reset_view_rows_kernel_aa22fd5b ba1933d load on device 'metal:0' took 414.07 ms  (compiled)
+Module _copy_reset_view_rows_kernel_aa22fd5b 4bf4719 load on device 'metal:0' took 415.15 ms  (compiled)
+Module _copy_reset_view_rows_kernel_aa22fd5b f6eb49d load on device 'metal:0' took 414.49 ms  (compiled)
+Module _copy_reset_view_rows_kernel_aa22fd5b 788cabd load on device 'metal:0' took 423.32 ms  (compiled)
+Module _zero_reset_view_rows_kernel_ae5393ad 50b35de load on device 'metal:0' took 403.12 ms  (compiled)
+Module newton._src.solvers.implicit_mpm.solver_implicit_mpm 89dc361 load on device 'metal:0' took 529.08 ms  (compiled)
+Module reset_mpm_point_warmstart_0020a180 8001dac load on device 'metal:0' took 423.49 ms  (compiled)
+Module reset_mpm_grid_warmstart_90039868 b1b67f0 load on device 'metal:0' took 431.97 ms  (compiled)
+Module _zero_reset_view_rows_kernel_ae5393ad aeffcc4 load on device 'metal:0' took 400.73 ms  (compiled)
+Module _scatter_reset_owned_rows_kernel_49c6c597 eef5224 load on device 'metal:0' took 401.29 ms  (compiled)
+Module _scatter_reset_owned_rows_kernel_49c6c597 54708fd load on device 'metal:0' took 412.05 ms  (compiled)
+Module _scatter_reset_owned_rows_kernel_49c6c597 9b26c41 load on device 'metal:0' took 422.24 ms  (compiled)
+Module _scatter_reset_owned_rows_kernel_49c6c597 bdb18e2 load on device 'metal:0' took 425.82 ms  (compiled)
+Module _scatter_reset_owned_rows_kernel_49c6c597 4a61e9e load on device 'metal:0' took 429.32 ms  (compiled)
+Module _reset_proxy_values_masked_kernel_5d012e33 9e21331 load on device 'metal:0' took 399.50 ms  (compiled)
+Module metalsim.learn.franka_pour_scene b5d94de load on device 'metal:0' took 439.55 ms  (compiled)
+Module newton._src.sim.collide 0a03cf7 load on device 'metal:0' took 648.96 ms  (compiled)
+Module newton._src.geometry.broad_phase_nxn 672956b load on device 'metal:0' took 492.05 ms  (compiled)
+Module narrow_phase_primitive_write_contact f42910e load on device 'metal:0' took 1934.29 ms  (compiled)
+Module narrow_phase_gjk_mpr_True_write_contact_default_default 807cc66 load on device 'metal:0' took 2538.55 ms  (compiled)
+Module newton._src.geometry.narrow_phase ab94f61 load on device 'metal:0' took 758.81 ms  (compiled)
+Module newton._src.geometry.contact_reduction_global dc3d30f load on device 'metal:0' took 612.27 ms  (compiled)
+Module newton._src.geometry.narrow_phase 2b7d237 load on device 'metal:0' took 745.93 ms  (compiled)
+Module newton._src.geometry.sdf_contact b857862 load on device 'metal:0' took 429.19 ms  (compiled)
+Module narrow_phase_mesh_plane_write_contact_to_reducer_True 67a31e6 load on device 'metal:0' took 499.78 ms  (compiled)
+Module mesh_triangle_contacts_to_reducer_kernel_eb5bdb8d 5c351fe load on device 'metal:0' took 2409.43 ms  (compiled)
+Module newton._src.geometry.contact_reduction_global ec86185 load on device 'metal:0' took 594.88 ms  (compiled)
+_________ ERROR at setup of test_terminations_and_rewards_match_isaac __________
+
+    @pytest.fixture(scope="module")
+    def env():
+        wp.config.quiet = True
+        e = P.FrankaPourEnv(P.PourTaskConfig(num_envs=N, seed=3))
+        e.reset_all()
+        g = torch.Generator(device=e.device).manual_seed(5)
+        for _ in range(4):     # leave the reset state: drive with random actions
+>           e.step(torch.rand(N, 8, device=e.device, generator=g) * 2 - 1)
+
+tests/test_franka_pour_terms.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/learn/franka_pour.py:926: in step
+    self.simulate()
+metalsim/learn/franka_pour.py:943: in simulate
+    self.physics.policy_step()
+metalsim/learn/franka_pour_scene.py:867: in policy_step
+    self._policy_step_body()
+metalsim/learn/franka_pour_scene.py:850: in _policy_step_body
+    self.sim_step()
+metalsim/learn/franka_pour_scene.py:840: in sim_step
+    self.pipeline.collide(self.s0, self.contacts)
+../../../upstream/newton-1.5.2/newton/_src/sim/collide.py:1471: in collide
+    self.narrow_phase.launch_custom_write(
+../../../upstream/newton-1.5.2/newton/_src/geometry/narrow_phase.py:2061: in launch_custom_write
+    wp.launch(
+../../../upstream/warp-innate/warp/_src/context.py:12660: in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint, dim_limit=dim_limit)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+kernel = <warp._src.context.Kernel object at 0x113d0d130>
+hooks = <warp._src.context.KernelHooks object at 0x179f8f0b0>
+params = [<warp._src.types.launch_bounds_1d_t object at 0x1797ad8d0>, <warp._src.codegen.Struct.__init__.<locals>.StructType ob...at 0x178d5e8d0>, <warp._src.types.array_t object at 0x178d5df50>, <warp._src.types.array_t object at 0x17989d650>, ...]
+device = 'metal:0', block_dim = 128, adjoint = False, dim_limit = None
+det_args = None
+
+    def invoke_metal(
+        kernel,
+        hooks,
+        params: Sequence[Any],
+        device: Device,
+        block_dim: int,
+        adjoint: bool = False,
+        dim_limit: warp.array | None = None,
+        det_args=None,
+    ):
+        """Dispatch a forward or backward kernel on a Metal device.
+    
+        With ``dim_limit`` (a forward launch), only the threadgroups holding tasks whose leading index is below
+        ``dim_limit[0]`` run (see :func:`warp.launch`).
+    
+        ``det_args`` carries the deterministic-mode buffers of kernels with deterministic lowering
+        (``warp._src.metal_deterministic``).
+        """
+        if hooks.metal_unsupported:
+            detail = ""
+            if "int64)" in hooks.metal_unsupported:
+                detail = (
+                    ". Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit "
+                    "atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; "
+                    "use 32-bit atomics (e.g. on one half of the value) instead"
+                )
+>           raise RuntimeError(
+                f"Kernel '{kernel.key}' uses builtins that are not supported on Metal yet: {hooks.metal_unsupported}"
+                + detail
+            )
+E           RuntimeError: Kernel 'reduce_buffered_contacts_kernel' uses builtins that are not supported on Metal yet: atomic_cas(uint64). Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; use 32-bit atomics (e.g. on one half of the value) instead
+
+../../../upstream/warp-innate/warp/_src/context.py:11568: RuntimeError
+___________ ERROR at setup of test_reset_from_dataset_matches_isaac ____________
+
+    @pytest.fixture(scope="module")
+    def env():
+        wp.config.quiet = True
+        e = P.FrankaPourEnv(P.PourTaskConfig(num_envs=N, seed=3))
+        e.reset_all()
+        g = torch.Generator(device=e.device).manual_seed(5)
+        for _ in range(4):     # leave the reset state: drive with random actions
+>           e.step(torch.rand(N, 8, device=e.device, generator=g) * 2 - 1)
+
+tests/test_franka_pour_terms.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/learn/franka_pour.py:926: in step
+    self.simulate()
+metalsim/learn/franka_pour.py:943: in simulate
+    self.physics.policy_step()
+metalsim/learn/franka_pour_scene.py:867: in policy_step
+    self._policy_step_body()
+metalsim/learn/franka_pour_scene.py:850: in _policy_step_body
+    self.sim_step()
+metalsim/learn/franka_pour_scene.py:840: in sim_step
+    self.pipeline.collide(self.s0, self.contacts)
+../../../upstream/newton-1.5.2/newton/_src/sim/collide.py:1471: in collide
+    self.narrow_phase.launch_custom_write(
+../../../upstream/newton-1.5.2/newton/_src/geometry/narrow_phase.py:2061: in launch_custom_write
+    wp.launch(
+../../../upstream/warp-innate/warp/_src/context.py:12660: in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint, dim_limit=dim_limit)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+kernel = <warp._src.context.Kernel object at 0x113d0d130>
+hooks = <warp._src.context.KernelHooks object at 0x179f8f0b0>
+params = [<warp._src.types.launch_bounds_1d_t object at 0x1797ad8d0>, <warp._src.codegen.Struct.__init__.<locals>.StructType ob...at 0x178d5e8d0>, <warp._src.types.array_t object at 0x178d5df50>, <warp._src.types.array_t object at 0x17989d650>, ...]
+device = 'metal:0', block_dim = 128, adjoint = False, dim_limit = None
+det_args = None
+
+    def invoke_metal(
+        kernel,
+        hooks,
+        params: Sequence[Any],
+        device: Device,
+        block_dim: int,
+        adjoint: bool = False,
+        dim_limit: warp.array | None = None,
+        det_args=None,
+    ):
+        """Dispatch a forward or backward kernel on a Metal device.
+    
+        With ``dim_limit`` (a forward launch), only the threadgroups holding tasks whose leading index is below
+        ``dim_limit[0]`` run (see :func:`warp.launch`).
+    
+        ``det_args`` carries the deterministic-mode buffers of kernels with deterministic lowering
+        (``warp._src.metal_deterministic``).
+        """
+        if hooks.metal_unsupported:
+            detail = ""
+            if "int64)" in hooks.metal_unsupported:
+                detail = (
+                    ". Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit "
+                    "atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; "
+                    "use 32-bit atomics (e.g. on one half of the value) instead"
+                )
+>           raise RuntimeError(
+                f"Kernel '{kernel.key}' uses builtins that are not supported on Metal yet: {hooks.metal_unsupported}"
+                + detail
+            )
+E           RuntimeError: Kernel 'reduce_buffered_contacts_kernel' uses builtins that are not supported on Metal yet: atomic_cas(uint64). Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; use 32-bit atomics (e.g. on one half of the value) instead
+
+../../../upstream/warp-innate/warp/_src/context.py:11568: RuntimeError
+____________ ERROR at setup of test_robot_model_matches_isaac_asset ____________
+
+    @pytest.fixture(scope="module")
+    def env():
+        wp.config.quiet = True
+        e = P.FrankaPourEnv(P.PourTaskConfig(num_envs=N, seed=3))
+        e.reset_all()
+        g = torch.Generator(device=e.device).manual_seed(5)
+        for _ in range(4):     # leave the reset state: drive with random actions
+>           e.step(torch.rand(N, 8, device=e.device, generator=g) * 2 - 1)
+
+tests/test_franka_pour_terms.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/learn/franka_pour.py:926: in step
+    self.simulate()
+metalsim/learn/franka_pour.py:943: in simulate
+    self.physics.policy_step()
+metalsim/learn/franka_pour_scene.py:867: in policy_step
+    self._policy_step_body()
+metalsim/learn/franka_pour_scene.py:850: in _policy_step_body
+    self.sim_step()
+metalsim/learn/franka_pour_scene.py:840: in sim_step
+    self.pipeline.collide(self.s0, self.contacts)
+../../../upstream/newton-1.5.2/newton/_src/sim/collide.py:1471: in collide
+    self.narrow_phase.launch_custom_write(
+../../../upstream/newton-1.5.2/newton/_src/geometry/narrow_phase.py:2061: in launch_custom_write
+    wp.launch(
+../../../upstream/warp-innate/warp/_src/context.py:12660: in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint, dim_limit=dim_limit)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+kernel = <warp._src.context.Kernel object at 0x113d0d130>
+hooks = <warp._src.context.KernelHooks object at 0x179f8f0b0>
+params = [<warp._src.types.launch_bounds_1d_t object at 0x1797ad8d0>, <warp._src.codegen.Struct.__init__.<locals>.StructType ob...at 0x178d5e8d0>, <warp._src.types.array_t object at 0x178d5df50>, <warp._src.types.array_t object at 0x17989d650>, ...]
+device = 'metal:0', block_dim = 128, adjoint = False, dim_limit = None
+det_args = None
+
+    def invoke_metal(
+        kernel,
+        hooks,
+        params: Sequence[Any],
+        device: Device,
+        block_dim: int,
+        adjoint: bool = False,
+        dim_limit: warp.array | None = None,
+        det_args=None,
+    ):
+        """Dispatch a forward or backward kernel on a Metal device.
+    
+        With ``dim_limit`` (a forward launch), only the threadgroups holding tasks whose leading index is below
+        ``dim_limit[0]`` run (see :func:`warp.launch`).
+    
+        ``det_args`` carries the deterministic-mode buffers of kernels with deterministic lowering
+        (``warp._src.metal_deterministic``).
+        """
+        if hooks.metal_unsupported:
+            detail = ""
+            if "int64)" in hooks.metal_unsupported:
+                detail = (
+                    ". Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit "
+                    "atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; "
+                    "use 32-bit atomics (e.g. on one half of the value) instead"
+                )
+>           raise RuntimeError(
+                f"Kernel '{kernel.key}' uses builtins that are not supported on Metal yet: {hooks.metal_unsupported}"
+                + detail
+            )
+E           RuntimeError: Kernel 'reduce_buffered_contacts_kernel' uses builtins that are not supported on Metal yet: atomic_cas(uint64). Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; use 32-bit atomics (e.g. on one half of the value) instead
+
+../../../upstream/warp-innate/warp/_src/context.py:11568: RuntimeError
+_______________ ERROR at setup of test_smoke_episode_runs_finite _______________
+
+    @pytest.fixture(scope="module")
+    def env():
+        wp.config.quiet = True
+        e = P.FrankaPourEnv(P.PourTaskConfig(num_envs=N, seed=3))
+        e.reset_all()
+        g = torch.Generator(device=e.device).manual_seed(5)
+        for _ in range(4):     # leave the reset state: drive with random actions
+>           e.step(torch.rand(N, 8, device=e.device, generator=g) * 2 - 1)
+
+tests/test_franka_pour_terms.py:48: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/learn/franka_pour.py:926: in step
+    self.simulate()
+metalsim/learn/franka_pour.py:943: in simulate
+    self.physics.policy_step()
+metalsim/learn/franka_pour_scene.py:867: in policy_step
+    self._policy_step_body()
+metalsim/learn/franka_pour_scene.py:850: in _policy_step_body
+    self.sim_step()
+metalsim/learn/franka_pour_scene.py:840: in sim_step
+    self.pipeline.collide(self.s0, self.contacts)
+../../../upstream/newton-1.5.2/newton/_src/sim/collide.py:1471: in collide
+    self.narrow_phase.launch_custom_write(
+../../../upstream/newton-1.5.2/newton/_src/geometry/narrow_phase.py:2061: in launch_custom_write
+    wp.launch(
+../../../upstream/warp-innate/warp/_src/context.py:12660: in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint, dim_limit=dim_limit)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+kernel = <warp._src.context.Kernel object at 0x113d0d130>
+hooks = <warp._src.context.KernelHooks object at 0x179f8f0b0>
+params = [<warp._src.types.launch_bounds_1d_t object at 0x1797ad8d0>, <warp._src.codegen.Struct.__init__.<locals>.StructType ob...at 0x178d5e8d0>, <warp._src.types.array_t object at 0x178d5df50>, <warp._src.types.array_t object at 0x17989d650>, ...]
+device = 'metal:0', block_dim = 128, adjoint = False, dim_limit = None
+det_args = None
+
+    def invoke_metal(
+        kernel,
+        hooks,
+        params: Sequence[Any],
+        device: Device,
+        block_dim: int,
+        adjoint: bool = False,
+        dim_limit: warp.array | None = None,
+        det_args=None,
+    ):
+        """Dispatch a forward or backward kernel on a Metal device.
+    
+        With ``dim_limit`` (a forward launch), only the threadgroups holding tasks whose leading index is below
+        ``dim_limit[0]`` run (see :func:`warp.launch`).
+    
+        ``det_args`` carries the deterministic-mode buffers of kernels with deterministic lowering
+        (``warp._src.metal_deterministic``).
+        """
+        if hooks.metal_unsupported:
+            detail = ""
+            if "int64)" in hooks.metal_unsupported:
+                detail = (
+                    ". Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit "
+                    "atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; "
+                    "use 32-bit atomics (e.g. on one half of the value) instead"
+                )
+>           raise RuntimeError(
+                f"Kernel '{kernel.key}' uses builtins that are not supported on Metal yet: {hooks.metal_unsupported}"
+                + detail
+            )
+E           RuntimeError: Kernel 'reduce_buffered_contacts_kernel' uses builtins that are not supported on Metal yet: atomic_cas(uint64). Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; use 32-bit atomics (e.g. on one half of the value) instead
+
+../../../upstream/warp-innate/warp/_src/context.py:11568: RuntimeError
+=================================== FAILURES ===================================
+___________________ test_checkpoint_round_trip_and_stop_file ___________________
+
+tmp_path = PosixPath('/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-81/test_checkpoint_round_trip_and0')
+
+    def test_checkpoint_round_trip_and_stop_file(tmp_path):
+        wp.config.quiet = True
+        env = P.FrankaPourEnv(P.PourTaskConfig(num_envs=8, seed=0))
+        cfg = PPO.PourPPOConfig(num_steps_per_env=8, save_interval=1000)
+        a = PPO.PourPPO(env, cfg)
+        open(tmp_path / "STOP", "w").close()
+>       a.train(5, out_dir=str(tmp_path), log=lambda s: None)
+
+tests/test_franka_pour_resume.py:30: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/learn/franka_pour_ppo.py:291: in train
+    obs = self.rollout(obs, ep_extras, outcomes)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+../../../.venv-newton152/lib/python3.12/site-packages/torch/utils/_contextlib.py:124: in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+metalsim/learn/franka_pour_ppo.py:148: in rollout
+    obs, rew, term, tout, extras = env.step(a)
+                                   ^^^^^^^^^^^
+metalsim/learn/franka_pour.py:926: in step
+    self.simulate()
+metalsim/learn/franka_pour.py:943: in simulate
+    self.physics.policy_step()
+metalsim/learn/franka_pour_scene.py:867: in policy_step
+    self._policy_step_body()
+metalsim/learn/franka_pour_scene.py:850: in _policy_step_body
+    self.sim_step()
+metalsim/learn/franka_pour_scene.py:840: in sim_step
+    self.pipeline.collide(self.s0, self.contacts)
+../../../upstream/newton-1.5.2/newton/_src/sim/collide.py:1471: in collide
+    self.narrow_phase.launch_custom_write(
+../../../upstream/newton-1.5.2/newton/_src/geometry/narrow_phase.py:2061: in launch_custom_write
+    wp.launch(
+../../../upstream/warp-innate/warp/_src/context.py:12660: in launch
+    invoke_metal(kernel, hooks, params, device, block_dim, adjoint, dim_limit=dim_limit)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+kernel = <warp._src.context.Kernel object at 0x113d0d130>
+hooks = <warp._src.context.KernelHooks object at 0x179f8f0b0>
+params = [<warp._src.types.launch_bounds_1d_t object at 0x168d97cd0>, <warp._src.codegen.Struct.__init__.<locals>.StructType ob...at 0x168e3d7d0>, <warp._src.types.array_t object at 0x168e3d850>, <warp._src.types.array_t object at 0x168d5c050>, ...]
+device = 'metal:0', block_dim = 128, adjoint = False, dim_limit = None
+det_args = None
+
+    def invoke_metal(
+        kernel,
+        hooks,
+        params: Sequence[Any],
+        device: Device,
+        block_dim: int,
+        adjoint: bool = False,
+        dim_limit: warp.array | None = None,
+        det_args=None,
+    ):
+        """Dispatch a forward or backward kernel on a Metal device.
+    
+        With ``dim_limit`` (a forward launch), only the threadgroups holding tasks whose leading index is below
+        ``dim_limit[0]`` run (see :func:`warp.launch`).
+    
+        ``det_args`` carries the deterministic-mode buffers of kernels with deterministic lowering
+        (``warp._src.metal_deterministic``).
+        """
+        if hooks.metal_unsupported:
+            detail = ""
+            if "int64)" in hooks.metal_unsupported:
+                detail = (
+                    ". Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit "
+                    "atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; "
+                    "use 32-bit atomics (e.g. on one half of the value) instead"
+                )
+>           raise RuntimeError(
+                f"Kernel '{kernel.key}' uses builtins that are not supported on Metal yet: {hooks.metal_unsupported}"
+                + detail
+            )
+E           RuntimeError: Kernel 'reduce_buffered_contacts_kernel' uses builtins that are not supported on Metal yet: atomic_cas(uint64). Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; use 32-bit atomics (e.g. on one half of the value) instead
+
+../../../upstream/warp-innate/warp/_src/context.py:11568: RuntimeError
+=============================== warnings summary ===============================
+../../../.venv-newton152/lib/python3.12/site-packages/torch/jit/_script.py:1491
+tests/test_franka_pour_terms.py::test_sampler_matches_isaac
+  /Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/torch/jit/_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+tests/test_franka_pour_terms.py::test_observation_terms_match_isaac
+tests/test_franka_pour_terms.py::test_observation_terms_match_isaac
+tests/test_franka_pour_terms.py::test_observation_terms_match_isaac
+tests/test_franka_pour_terms.py::test_observation_terms_match_isaac
+tests/test_franka_pour_resume.py::test_checkpoint_round_trip_and_stop_file
+tests/test_franka_pour_resume.py::test_checkpoint_round_trip_and_stop_file
+tests/test_franka_pour_resume.py::test_checkpoint_round_trip_and_stop_file
+tests/test_franka_pour_resume.py::test_checkpoint_round_trip_and_stop_file
+  /Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/utils/import_usd.py:587: DeprecationWarning: LoadUsdPhysicsFromRange is deprecated, use UsdPhysicsLoadStageFromPrimRange instead.
+    ret_dict = UsdPhysics.LoadUsdPhysicsFromRange(stage, [root_path], excludePaths=native_exclude_paths)
+
+tests/test_franka_pour_terms.py: 7 warnings
+tests/test_franka_pour_resume.py: 7 warnings
+  /Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/utils/import_usd.py:1637: DeprecationWarning: 'newton:angular:limitStiffness' on joint prim is deprecated; use 'newton:limitStiffness' instead.
+    fallback_limit_ke, limit_ke_source = _resolve_joint_limit_gain(
+
+tests/test_franka_pour_terms.py: 7 warnings
+tests/test_franka_pour_resume.py: 7 warnings
+  /Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/utils/import_usd.py:1642: DeprecationWarning: 'newton:angular:limitDamping' on joint prim is deprecated; use 'newton:limitDamping' instead.
+    fallback_limit_kd, limit_kd_source = _resolve_joint_limit_gain(
+
+tests/test_franka_pour_terms.py::test_observation_terms_match_isaac
+tests/test_franka_pour_terms.py::test_observation_terms_match_isaac
+tests/test_franka_pour_resume.py::test_checkpoint_round_trip_and_stop_file
+tests/test_franka_pour_resume.py::test_checkpoint_round_trip_and_stop_file
+  /Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/utils/import_usd.py:1637: DeprecationWarning: 'newton:linear:limitStiffness' on joint prim is deprecated; use 'newton:limitStiffness' instead.
+    fallback_limit_ke, limit_ke_source = _resolve_joint_limit_gain(
+
+tests/test_franka_pour_terms.py::test_observation_terms_match_isaac
+tests/test_franka_pour_terms.py::test_observation_terms_match_isaac
+tests/test_franka_pour_resume.py::test_checkpoint_round_trip_and_stop_file
+tests/test_franka_pour_resume.py::test_checkpoint_round_trip_and_stop_file
+  /Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/utils/import_usd.py:1642: DeprecationWarning: 'newton:linear:limitDamping' on joint prim is deprecated; use 'newton:limitDamping' instead.
+    fallback_limit_kd, limit_kd_source = _resolve_joint_limit_gain(
+
+tests/test_franka_pour_terms.py::test_observation_terms_match_isaac
+tests/test_franka_pour_resume.py::test_checkpoint_round_trip_and_stop_file
+  /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/learn/franka_pour_scene.py:596: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+    model = b.finalize(device=device)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_franka_pour_resume.py::test_checkpoint_round_trip_and_stop_file
+ERROR tests/test_franka_pour_terms.py::test_observation_terms_match_isaac - R...
+ERROR tests/test_franka_pour_terms.py::test_terminations_and_rewards_match_isaac
+ERROR tests/test_franka_pour_terms.py::test_reset_from_dataset_matches_isaac
+ERROR tests/test_franka_pour_terms.py::test_robot_model_matches_isaac_asset
+ERROR tests/test_franka_pour_terms.py::test_smoke_episode_runs_finite - Runti...
+1 failed, 2 passed, 48 warnings, 5 errors in 62.64s (0:01:02)
