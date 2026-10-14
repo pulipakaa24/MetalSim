@@ -974,7 +974,7 @@ mpm.wrenches(); mpm.particles(); mpm.reset(mask); mpm.check_status()
 with MuJoCo's effective mass, staggered or lagged, the solver's own fixed-order wrench harvest into `xfrc_applied`,
 the caller's `xfrc_applied` restored after the step), `proxy_mass="effective" | "body" | "kinematic"`,
 `harvest="last_substep"` (Isaac) or `"mean"`. Colliders are the MuJoCo geoms (`colliders.py`: box, sphere, capsule,
-cylinder, plane, mesh, ellipsoid as a mesh); static geoms are static colliders. `BatchSim`'s default path is unchanged (its new opt-in `deterministic` option aside), and
+cylinder, plane, mesh, ellipsoid as a mesh); static geoms are static colliders. Nothing in `BatchSim` changes, and
 building an MPM scene changes no process-wide Warp setting (`test_main_sim_settings_untouched`).
 
 ### Gauss-Seidel with separate worlds (Newton fork fix)
@@ -1000,8 +1000,10 @@ repeats bitwise in all 12 multi-world configurations of `probes/multiworld_repea
 * **Repeatability**: the coupled scene (box on a 2,592-particle bed per world) repeats bitwise at 1, 64, 256 and 1,024
   worlds with Gauss-Seidel. With Jacobi at 1,024 worlds the box reaches the floor and the run diverged at step 34:
   MuJoCo Warp's constraint solve is not run-to-run repeatable on Metal by default (MetalSim's rigid stack never was;
-  `probes/rigid_neutral_mpm.py`: the panda differs between two plain runs). `BatchSimOptions(deterministic=True)` runs
-  MuJoCo Warp's kernels in Warp's RUN_TO_RUN mode (as Newton's `SolverMuJoCo(deterministic=...)`); batch 02 checks it.
+  `probes/rigid_neutral_mpm.py`: the panda differs between two plain runs; a box resting on the floor alone diverges
+  at step 18 at 1,024 worlds). An opt-in deterministic `BatchSim` (Warp's RUN_TO_RUN mode for MuJoCo Warp's kernels)
+  is being developed separately on branch `batchsim-deterministic` (open: a divergence in MuJoCo Warp's box-box CCD
+  kernel under the two-phase deterministic counters, 2 of 256 worlds from step 139).
 * **Rigid neutrality**: after an MPM scene was built and stepped, the MuJoCo Warp kernel modules a rigid scene loads
   have the same hashes (8 modules), and the box scene's trajectory is bitwise that of a plain run.
 * **Speed** (ms per captured coupled step = 3 MuJoCo substeps + 1 MPM step of 1/120 s, box + 2,592 particles per
@@ -1014,24 +1016,43 @@ repeats bitwise in all 12 multi-world configurations of `probes/multiworld_repea
   | 256 | 60.6 | 54.7 | 4,226 / 4,678 |
   | 1,024 | 223.6 | 210.5 | 4,579 / 4,865 |
 
-* **Bearing: the box sinks because of the exchange lag, not the sand** (batch 02, `runs/mpm_main/bearing/`;
-  research `research_notes/MPM in main simulator/bearing_and_sinking.md`). The bed's bearing capacity is 5-10x the box's
-  2 kPa (Vesic / Meyerhof / Hansen with mu = 0.7 ~ phi 30-35 deg); a 1.7 m/s drop should stop after 1-2.5 cm. Yet a box
-  placed *at rest* on the bed sank to the floor in every configuration (voxel 0.02 / 0.01, 50 / 250 iterations,
-  friction 0.4 / 0.7 / 0.9, bed 8 / 16 cm), at a steady 0.082 m/s = g dt (dt = 1/120 s) while the harvested sand force
-  equalled the box's weight. That is the `"staggered"` exchange (MPM.md 8i, Isaac's Franka-Pour setting): the MPM
-  solve stops the proxy, but only the wrench reaches MuJoCo, in the next step, so v_{n+1} = v_n - g dt - v_n = -g dt
-  whatever the sand's strength. Newton's own default is `"lagged"` with a velocity rewind (its two-way example's
-  `subtract_body_force`), which has no drift in theory; `MPMCoupling` now defaults to it, and batch 03 measures drop and
-  rest tests in both modes. Isaac's Franka-Pour cups (staggered, held by the gripper) carry the same per-step drift
-  relative to the sand: matching Isaac and matching physical sand are separate claims.
-* **Angle of repose: not measured yet.** The column-collapse deposit (10-14 deg for friction 0.4-0.9) is not a repose
-  angle (inertial collapse; Lube 2004, Lajeunesse 2004), and its weak response to friction points at numerical
-  spreading. batch 02's cylinder lift is void: the tube's velocity actuator was unstable (tube position 1e20 m), so the
-  sand collapsed. The solver's yield surface is sqrt(J2) <= mu p, so the expected repose angle is atan(mu)
-  (21.8 / 34.2 / 42.0 deg); batch 03 runs the corrected protocol (`research_notes/MPM in main simulator/
-  angle_of_repose.md`: mocap tube, rough floor, resolution ladder R/dx = 5 / 10 / 15, lift-speed plateau, column-maximum
-  surface fit checked on a synthetic 30 deg cone: 30.0 deg).
+* **Bearing** (research `research_notes/MPM in main simulator/bearing_and_sinking.md`; runs `runs/mpm_main/bearing/`
+  (batch 02), `runs/mpm_main/bearing3/` (batch 03); box 0.1 m, 2 kg on a 0.3 x 0.3 x 0.08 m bed, voxel 0.02).
+  Expected: bearing capacity 5-10x the box's 2 kPa (mu 0.7 ~ phi 30-35 deg); a box at rest settles within about half a
+  voxel; a 1.7 m/s drop stops after 1-2.5 cm; the bed fails below mu ~ 0.3-0.45.
+  * **`"staggered"` exchange (Isaac's Franka-Pour setting): broken for resting bodies.** In every configuration of
+    batch 02 (voxel 0.02 / 0.01, 50 / 250 iterations, friction 0.4 / 0.7 / 0.9, bed 8 / 16 cm) the resting box sank at
+    a steady 0.082 m/s = g dt while the harvested sand force equalled its weight, i.e. through the bed. Cause: the MPM
+    solve stops the proxy, but only the wrench reaches MuJoCo, in the next step, so v_{n+1} = -g dt whatever the sand.
+    Isaac's coupling path does the same (MetalSim's Isaac-path comparison ran staggered): Isaac parity is not physical
+    validity here. Isaac's Franka-Pour cups (held by the gripper) carry the same per-step drift relative to the sand.
+  * **`"lagged"` exchange with the velocity rewind** (Newton's `SolverCoupledProxy.Proxy` default and its two-way
+    example's scheme; `MPMCoupling`'s default since batch 03) removes the drift. Rest test, settlement after 1.5 s /
+    creep over the last 0.3 s: 50 iterations, tolerance 1e-4: 25.3 mm / 16.1 mm/s; **250 iterations, tolerance 1e-6:
+    10.2 mm (half a voxel) / 0.4 mm/s**; voxel 0.01: 19.7 mm / 5.8 mm/s; collider basis Q1 27.0 mm / 2.1 mm/s, pic27
+    28.3 mm / 8.0 mm/s; friction 0.3: 74.2 mm (bearing failure, as predicted), 1.2: 14.2 mm / 11.6 mm/s. Drop from
+    0.15 m: peak 38.8 mm, creep 8.7 mm/s (dt 1/240: 31.7 mm, 4.1 mm/s). The residual creep follows the rheology solve's
+    convergence (an under-converged solve delivers a fraction alpha of the stopping impulse and drifts at
+    (1 - alpha) / alpha g dt): bodies resting on sand need a converged solve (Isaac's default is 250 iterations,
+    tolerance 1e-4; batch 04 measures it). Staggered in batch 03: 80 mm (the floor) in drop and rest.
+* **Angle of repose** (research `research_notes/MPM in main simulator/angle_of_repose.md`; `probes/repose_lift.py`, runs
+  `runs/mpm_main/repose3/`). Lifted-cylinder test: tube R = 5 cm (mocap, frictionless towards the sand), fill 5 cm, rough
+  floor (friction 1.0), column-maximum surface fit in 8 sectors (30.0 deg on a synthetic 30 deg cone). The solver's
+  yield surface is sqrt(J2) <= mu p, so the reference is atan(mu). Measured (fit mean, sector sd 0.0-0.4 deg):
+
+  | mu (atan mu) | R/dx 5 | R/dx 10 | R/dx 15 |
+  |---|---|---|---|
+  | 0.40 (21.8 deg) | | 14.7 | |
+  | 0.68 (34.2 deg) | 25.4 | 26.3 | 27.2 |
+  | 0.90 (42.0 deg) | | 32.6 | |
+
+  Lift speed 1.25 / 2.5 / 5 cm/s at R/dx 10: 26.6 / 26.3 / 25.4 deg (plateau within 0.3 deg below 2.5 cm/s); 4x the
+  iterations: 26.6 deg. The angle rises monotonically with resolution (+0.9 deg per refinement) and with friction
+  (slope 0.89 against atan(mu)), but sits 7-9 deg below atan(mu) at the finest resolution run: the published MPM heaps
+  also stop at or below atan(mu) (Dunatunga & Kamrin 2015), and on a slope this cone can yield below the simple-shear
+  stopping angle whenever the lateral stresses differ from the vertical one; the remaining gap to physical sand
+  (repose ~ the friction angle) is a property of the solver Isaac Lab ships, not of the coupling. Not yet converged in
+  resolution (R/dx 30 is the next step).
 
 ### Re-vendoring when the fork pin moves
 

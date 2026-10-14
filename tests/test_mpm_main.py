@@ -176,15 +176,14 @@ def test_gs_coloring_valid_separate_worlds():
     assert out.stdout.strip().endswith("VALID") and "INVALID" not in out.stdout, out.stdout + out.stderr[-2000:]
 
 
-@pytest.mark.parametrize("worlds,solver,det", [(1, "auto", 0), (64, "auto", 0), (64, "jacobi", 1)])
-def test_repeatable_at_scale(worlds, solver, det):
-    """The coupled scene (box on a small bed) repeats bitwise run to run (1,024 worlds: the batch job behind
-    runs/mpm_main/scale/). Where the box reaches the floor, MuJoCo Warp's contact solve needs
-    BatchSimOptions(deterministic=True) to repeat (its float atomics accumulate in arrival order otherwise)."""
+@pytest.mark.parametrize("worlds", [1, 64])
+def test_repeatable_at_scale(worlds):
+    """The coupled scene (box on a small bed, carried by the sand, no MuJoCo Warp contacts) repeats bitwise run to run
+    (1,024 worlds: runs/mpm_main/scale/). MuJoCo Warp's own contact solve is not run-to-run repeatable on Metal
+    (docs/GAPS.md), so scenes whose bodies touch MuJoCo geoms repeat only while they do not."""
     _metal()
     out = subprocess.run([sys.executable, str(ROOT / "metalsim/physics/mpm/probes/scale_coupled.py"), "--worlds",
-                          str(worlds), "--steps", "40", "--runs", "2", "--solver", solver, "--deterministic", str(det)],
-                         capture_output=True, text=True)
+                          str(worlds), "--steps", "40", "--runs", "2"], capture_output=True, text=True)
     res = json.loads(out.stdout.strip().splitlines()[-1])
     assert res["repeatable"] and res["finite"], res
 
@@ -246,6 +245,21 @@ def test_pile_collapse_responds_to_friction():
     hi, _ = _pile(0.9)
     assert hi["deposit"]["h_max"] > 1.3 * lo["deposit"]["h_max"], (lo["deposit"], hi["deposit"])
     assert hi["deposit"]["runout"] < 0.8 * lo["deposit"]["runout"], (lo["deposit"], hi["deposit"])
+
+
+def test_resting_box_carried_by_sand():
+    """A 2 kg box placed at rest on the bed (bearing capacity 5-10x its 2 kPa) is carried by the sand with the default
+    lagged exchange and a converged solve: settlement within about half a voxel and no lasting creep. (With Isaac's
+    staggered exchange it sinks at g dt per step through the bed: research_notes/MPM in main simulator/
+    bearing_and_sinking.md.)"""
+    _metal()
+    spec = importlib.util.spec_from_file_location("bearing", ROOT / "metalsim/physics/mpm/probes/bearing.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    r = mod.run(mode="lagged", rest=True, iterations=250, tolerance=1e-6, seconds=1.5)
+    assert r["final_penetration_m"] < 0.015, r["final_penetration_m"]
+    assert abs(r["creep_m_per_s"]) < 0.002, r["creep_m_per_s"]
+    assert abs(r["force_over_weight_tail"] - 1.0) < 0.1, r["force_over_weight_tail"]
 
 
 def _free_fall(air_drag):

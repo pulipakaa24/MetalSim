@@ -472,10 +472,9 @@ class MPMCoupling:
     def _end_kinematics(self) -> None:
         import mujoco_warp as mjw
 
-        with self.sim.det_scope():
-            mjw.kinematics(self.sim.m, self.sim.d)
-            mjw.com_pos(self.sim.m, self.sim.d)
-            mjw.com_vel(self.sim.m, self.sim.d)
+        mjw.kinematics(self.sim.m, self.sim.d)
+        mjw.com_pos(self.sim.m, self.sim.d)
+        mjw.com_vel(self.sim.m, self.sim.d)
 
     def _harvest(self, out: wp.array) -> None:
         self.solver.coupling_harvest_proxy_wrenches(self._proxy_ids, out, body_qd_before=None, state=self.state,

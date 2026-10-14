@@ -256,3 +256,15 @@ GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [17:49:06] NEUTRAL3 -> PASS /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/neutral/plain1.json vs /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/neutral/plain_b03.json (plain): trajectories equal {'box': True, 'panda': False}; module hashes compared 8, differing []
 [17:49:06] finish (rc=0): commit + push
+[17:49:11] === batch_03 end Tue Oct 13 17:49:11 PDT 2026 rc=0
+SAVE PASS 16:20:45 merge with origin/main conflicted: left unmerged
+IMPORTS PASS 16:20:45 batch jobs run with cwd = worktree (watchdog --cwd)
+DET_DIAG DONE 17:17:55 in-process: [{'step': 139, 'worlds_differing': 2, 'first_worlds': [48, 96], 'ncon_a': 1024, 'ncon_b': 1024}] cross: {"cross_process_first_diff": {"step": 139, "worlds_differing": 2, "first_worlds": [192, 224], "ncon_a": 1024, "ncon_b": 1024}} {"cross_process_first_diff": {"step": 139, "worlds_differing": 2, "first_worlds": [144, 224], "ncon_a": 1024, "ncon_b": 1024}} {"cross_process_first_diff": {"step": 139, "worlds_differing": 2, "first_worlds": [48, 144], "ncon_a": 1024, "ncon_b": 1024}}  default-mode control: [{'step': 130, 'worlds_differing': 580, 'first_worlds': [0, 1, 2, 3, 4, 5, 6, 7], 'ncon_a': 2048, 'ncon_b': 2048}]
+TESTS_DET FAIL 17:21:22 
+BEARING3 DONE 17:27:30 drop_lagged_240: pen 31.7 / final 31.7 mm, creep 4.1 mm/s, F/W 1.0; drop_lagged: pen 38.8 / final 35.1 mm, creep 8.7 mm/s, F/W 1.0; drop_staggered_240: pen 80.3 / final 80.1 mm, creep 31.9 mm/s, F/W 0.7; drop_staggered: pen 80.5 / final 80.0 mm, creep -0.0 mm/s, F/W -0.0; rest_lagged_i250: pen 10.2 / final 10.2 mm, creep 0.4 mm/s, F/W 1.0; rest_lagged_mu03: pen 74.2 / final 74.2 mm, creep 14.3 mm/s, F/W 1.0; rest_lagged_mu12: pen 14.2 / final 14.2 mm, creep 11.6 mm/s, F/W 1.0; rest_lagged_pic27: pen 28.3 / final 28.3 mm, creep 8.0 mm/s, F/W 1.0; rest_lagged_q1: pen 27.0 / final 27.0 mm, creep 2.1 mm/s, F/W 1.0; rest_lagged_v01: pen 19.7 / final 19.7 mm, creep 5.8 mm/s, F/W 1.0; rest_lagged: pen 25.3 / final 25.3 mm, creep 16.1 mm/s, F/W 1.01; rest_staggered: pen 80.6 / final 80.0 mm, creep -0.0 mm/s, F/W -0.0; 
+REPOSE3 DONE 17:41:56 mu040_dx005_v025: (14.7, 0.1, 21.8, True, 0.01); mu068_dx0033_v025: (27.2, 0.0, 34.2, False, -0.01); mu068_dx005_i1000: (26.6, 0.1, 34.2, True, -0.01); mu068_dx005_v0125: (26.6, 0.1, 34.2, False, -0.01); mu068_dx005_v025: (26.3, 0.1, 34.2, False, -0.02); mu068_dx005_v050: (25.4, 0.2, 34.2, True, 0.01); mu068_dx010_v025: (25.4, 0.4, 34.2, False, 0.05); mu090_dx005_v025: (32.6, 0.3, 42.0, False, -0.15); 
+TESTS_MAIN PASS 17:46:03 
+TESTS_PHYSICS PASS 17:46:29 
+TESTS_MPM152 PASS 17:48:20 
+NEUTRAL3 PASS 17:49:06 /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/neutral/plain1.json vs /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/neutral/plain_b03.json (plain): trajectories equal {'box': True, 'panda': False}; module hashes compared 8, differing []
+[17:49:11] PR not opened: gates not green (see STATUS.txt)
