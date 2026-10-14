@@ -92,7 +92,18 @@ e.g. by `BatchSimOptions(deterministic=True)`:
   - Pitfalls from MLX and llama.cpp reduction kernels: partial SIMD groups and inactive lanes give wrong two-level sums
     unless the group count is rounded up; MLX's `ops.h` shuffle reduction is reported wrong on M1/M2 with inactive
     lanes. Warp's `metal_reduce` handles inactive lanes with an explicit mask.
-- First, measure in the next batch: the actual `collider_node_count` and body count, and the kernel time per launch.
+- **Implemented: option (b)** (`runs/mpm/coupled_speed/patches/newton_body_force_compact.diff`, Newton example).
+  - Three steps: `flag_body_nodes`, then an integer `array_scan`, then `compact_body_nodes`. The kept node indices stay
+    in increasing order and their count is read on the device. `compute_body_forces_compact_lanes` then runs 256 lanes
+    over the compacted list, and the existing `sum_body_force_lanes` folds the lanes in lane order.
+  - Capture-safe: no host reads and no allocations per step.
+  - `NEWTON_METAL_BODY_FORCE_COMPACT=0` restores the full scan.
+  - CPU check (`probes/body_force_compact_check.py`, 65,536 nodes, 12 bodies, 2,416 body nodes):
+    - the compaction is exact;
+    - the forces are 2.0e-7 from the float64 reference (the full scan: 2.4e-7) and 2.7e-7 from the full scan;
+    - two calls are bitwise equal;
+    - 0.98 -> 0.25 ms per call.
+  - The Metal check and timing are in `batch_bf1.sh`.
 
 ## D. ANYmal captured (1.29x): Gauss-Seidel and MuJoCo Warp small kernels
 
