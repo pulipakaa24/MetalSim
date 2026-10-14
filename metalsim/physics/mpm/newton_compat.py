@@ -59,14 +59,37 @@ import warp.fem as fem
 SOLVE_LOG: list[dict] = []
 METAL_FAST_MATH_MODES = ("off", "cuda", "relaxed")
 METAL_FAST_MATH_DEFAULT = "off"
-_STATE: dict = {"installed": False}
+_STATE: dict = {"installed": False, "run_solver_loop": {}}
+VENDORED_MODULE = "metalsim.physics.mpm.implicit_mpm.solve_rheology"
+
+
+def newton_is_152() -> bool:
+    """True when the environment's Newton is the 1.5.2 line (``.venv-newton152``): its own implicit MPM is the solver
+    MetalSim's parity work is about. On the Newton 1.7 line (``.venv``) Newton's implicit MPM is a later algorithm and
+    MetalSim uses its vendored copy of the 1.5.2 fork's solver instead (``metalsim/physics/mpm/implicit_mpm``)."""
+    try:
+        import newton  # noqa: PLC0415
+    except ImportError:
+        return False
+    return str(newton.__version__).startswith("1.5.")
+
+
+def rheology_modules() -> list:
+    """The ``solve_rheology`` modules ``install`` patches: Newton's own when Newton is 1.5.2, and MetalSim's vendored
+    copy of the same file (``metalsim.physics.mpm.implicit_mpm``) in every environment. Newton 1.7's own implicit MPM
+    is never patched (its loop has another signature, and MetalSim does not run it)."""
+    mods = []
+    if newton_is_152():
+        mods.append(importlib.import_module("newton._src.solvers.implicit_mpm.solve_rheology"))
+    mods.append(importlib.import_module(VENDORED_MODULE))
+    return mods
 
 
 def install(accumulate: str = "float32", loop: str = "cuda", log: bool = True, chunk_graph: bool = False,
             fused: bool = False, fused_max_color_blocks: int = 1 << 30, simd: bool = False,
-            gpu_exit: bool = False, rigid_deterministic: bool = True, device_args: bool = True,
+            gpu_exit: bool = False, rigid_deterministic: bool | None = True, device_args: bool | None = True,
             metal_fast_math: str | None = METAL_FAST_MATH_DEFAULT) -> None:
-    """Patch Newton's implicit MPM in this process.
+    """Patch Newton's implicit MPM in this process (and MetalSim's vendored copy of it, :func:`rheology_modules`).
 
     Args:
         accumulate: ``"float32"`` (required on Metal) or ``"native"`` (Warp's default, float64; CUDA/CPU only).
@@ -86,6 +109,7 @@ def install(accumulate: str = "float32", loop: str = "cuda", log: bool = True, c
         rigid_deterministic: on Metal, construct ``SolverMuJoCo`` with ``deterministic=wp.DeterministicMode.RUN_TO_RUN``
             unless the caller (or ``wp.config.deterministic``) chose a mode, and ``newton.CollisionPipeline`` with
             ``deterministic=True`` unless the caller chose (point 3 above). No effect on CUDA/CPU.
+            ``None`` leaves Newton's rigid solvers alone (MetalSim's main simulator: the rigid side is ``BatchSim``).
         device_args: set ``wp.config.metal_device_args`` (Warp branch ``metalsim-integrated``; read when a module is
             built): Metal kernels read their arguments from device instead of constant memory, which cuts the fixed
             cost of each dispatch (Newton's MPM examples: 3-6 ms per frame, bitwise the same). Warp's default is
@@ -99,12 +123,12 @@ def install(accumulate: str = "float32", loop: str = "cuda", log: bool = True, c
             Warp tree that predates the setting (fast_math always relaxed on Metal), ``"off"`` makes every module
             resolve ``fast_math`` to False and ``"cuda"`` raises. No effect on CUDA/CPU kernels.
     """
-    from newton._src.solvers.implicit_mpm import solve_rheology as sr
-
+    modules = rheology_modules()
     if not _STATE["installed"]:
         _STATE["fem_integrate"] = fem.integrate
-        _STATE["run_solver_loop"] = sr._run_solver_loop
         _STATE["installed"] = True
+    for sr in modules:
+        _STATE["run_solver_loop"].setdefault(sr.__name__, sr._run_solver_loop)
 
     orig_integrate = _STATE["fem_integrate"]
     if accumulate == "float32":
@@ -120,14 +144,16 @@ def install(accumulate: str = "float32", loop: str = "cuda", log: bool = True, c
     else:
         raise ValueError(f"accumulate must be 'float32' or 'native', got {accumulate!r}")
 
-    if loop == "cuda":
-        sr._run_solver_loop = functools.partial(_run_solver_loop_cuda_semantics, sr, log)
-    elif loop == "native":
-        orig_loop = _STATE["run_solver_loop"]
-        sr._run_solver_loop = functools.partial(_run_native_logged, sr, orig_loop, log) if log else orig_loop
-    else:
+    if loop not in ("cuda", "native"):
         raise ValueError(f"loop must be 'cuda' or 'native', got {loop!r}")
-    _install_rigid_determinism(rigid_deterministic)
+    for sr in modules:
+        if loop == "cuda":
+            sr._run_solver_loop = functools.partial(_run_solver_loop_cuda_semantics, sr, log)
+        else:
+            orig_loop = _STATE["run_solver_loop"][sr.__name__]
+            sr._run_solver_loop = functools.partial(_run_native_logged, sr, orig_loop, log) if log else orig_loop
+    if rigid_deterministic is not None:
+        _install_rigid_determinism(rigid_deterministic)
     _install_metal_fast_math(metal_fast_math)
     if device_args is not None and hasattr(wp.config, "metal_device_args"):
         _STATE.setdefault("metal_device_args", wp.config.metal_device_args)
@@ -240,11 +266,12 @@ def _set_coupled_determinism(enabled: bool, mode) -> None:
 def uninstall() -> None:
     if not _STATE["installed"]:
         return
-    from newton._src.solvers.implicit_mpm import solve_rheology as sr
-
     fem.integrate = _STATE["fem_integrate"]
-    sr._run_solver_loop = _STATE["run_solver_loop"]
-    _install_rigid_determinism(False)
+    for sr in rheology_modules():
+        if sr.__name__ in _STATE["run_solver_loop"]:
+            sr._run_solver_loop = _STATE["run_solver_loop"][sr.__name__]
+    if _STATE.get("rigid_deterministic") is not None:
+        _install_rigid_determinism(False)
     if "metal_device_args" in _STATE:
         wp.config.metal_device_args = _STATE.pop("metal_device_args")
     if "metal_fast_math_orig" in _STATE:

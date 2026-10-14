@@ -1,0 +1,58 @@
+=== batch_04 start Tue Oct 13 18:00:23 PDT 2026
+[18:00:23] MERGE -> PASS e61f92fd
+pull request create failed: GraphQL: No commits between mpm-main-sim and batchsim-deterministic (createPullRequest)
+[18:00:31] DETBRANCH -> PASS pull request create failed: GraphQL: No commits between mpm-main-sim and batchsim-deterministic (createPullRequest)
+[18:00:31] SPLIT -> PASS 471e0c90
+[18:00:37] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
+[18:00:37] gpu job mm4_tests_main (check, <= 90 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_04/logs/tests_mpm_main.log
+    tests/test_mpm_main.py::test_free_fall_momentum PASSED                   [ 93%]
+    tests/test_mpm_main.py::test_main_sim_settings_untouched PASSED          [100%]
+    
+    ======================== 15 passed in 221.48s (0:03:41) ========================
+[18:06:54] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[18:06:54] TESTS_MAIN -> PASS 
+[18:06:54] gpu job mm4_tests_152 (check, <= 30 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_04/logs/tests_mpm_newton152.log
+    .......x........                                                         [100%]
+    15 passed, 1 xfailed in 98.70s (0:01:38)
+[18:10:31] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[18:10:31] TESTS_MPM152 -> PASS 
+[18:10:31] gpu job mm4_bear_rest_lagged_i250_t1e4 (check, <= 30 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_04/logs/bearing_rest_lagged_i250_t1e4.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.update_particle_strains_a5c4d66b 7ab7e8a load on device 'metal:0' took 815.89 ms  (cached)
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 d2ec691 load on device 'metal:0' took 557.65 ms  (cached)
+    Module map_mul fe0b813 load on device 'metal:0' took 337.69 ms  (cached)
+    {"mode": "lagged", "rest": true, "drop": 0.15, "fps": 120, "voxel": 0.02, "iterations": 250, "tolerance": 0.0001, "basis": "S2", "depth": 0.08, "friction": 0.7, "seconds": 1.5, "particles": 25392, "peak_penetration_m": 0.010214892327785496, "final_penetration_m": 0.010214892327785496, "creep_m_per_s": 0.00039517879486083984, "reached_floor": false, "force_over_weight_tail": 0.9996409836921515, "weight_N": 19.62}
+[18:20:17] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   2.3 %
+[18:20:17] gpu job mm4_bear_drop_lagged_i250_t1e4 (check, <= 30 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_04/logs/bearing_drop_lagged_i250_t1e4.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.update_particle_strains_a5c4d66b 7ab7e8a load on device 'metal:0' took 811.87 ms  (cached)
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 d2ec691 load on device 'metal:0' took 556.49 ms  (cached)
+    Module map_mul fe0b813 load on device 'metal:0' took 332.21 ms  (cached)
+    {"mode": "lagged", "rest": false, "drop": 0.15, "fps": 120, "voxel": 0.02, "iterations": 250, "tolerance": 0.0001, "basis": "S2", "depth": 0.08, "friction": 0.7, "seconds": 1.5, "particles": 25392, "peak_penetration_m": 0.029824045598506932, "final_penetration_m": 0.028564420640468602, "creep_m_per_s": 0.0012913686888558523, "reached_floor": false, "force_over_weight_tail": 0.9985365202235452, "weight_N": 19.62}
+[18:22:13] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   2.0 %
+[18:22:13] gpu job mm4_bear_drop_lagged_i250_t1e6 (check, <= 30 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_04/logs/bearing_drop_lagged_i250_t1e6.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.update_particle_strains_a5c4d66b 7ab7e8a load on device 'metal:0' took 43.15 ms  (cached)
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 d2ec691 load on device 'metal:0' took 41.59 ms  (cached)
+    Module map_mul fe0b813 load on device 'metal:0' took 39.64 ms  (cached)
+    {"mode": "lagged", "rest": false, "drop": 0.15, "fps": 120, "voxel": 0.02, "iterations": 250, "tolerance": 1e-06, "basis": "S2", "depth": 0.08, "friction": 0.7, "seconds": 1.5, "particles": 25392, "peak_penetration_m": 0.029824045598506932, "final_penetration_m": 0.028564420640468602, "creep_m_per_s": 0.0012913686888558523, "reached_floor": false, "force_over_weight_tail": 0.9985365202235452, "weight_N": 19.62}
+[18:22:44] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[18:22:45] BEARING4 -> DONE drop_lagged_i250_t1e4: pen 29.8 / final 28.6 mm, creep 1.3 mm/s, F/W 1.0; drop_lagged_i250_t1e6: pen 29.8 / final 28.6 mm, creep 1.3 mm/s, F/W 1.0; rest_lagged_i250_t1e4: pen 10.2 / final 10.2 mm, creep 0.4 mm/s, F/W 1.0; 
+[18:22:45] gpu job mm4_lift_dx0025 (check, <= 60 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_04/logs/lift_mu068_dx0025.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.update_particle_strains_a5c4d66b 7ab7e8a load on device 'metal:0' took 43.45 ms  (cached)
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 d2ec691 load on device 'metal:0' took 42.08 ms  (cached)
+    Module map_mul fe0b813 load on device 'metal:0' took 38.75 ms  (cached)
+    {"friction": 0.68, "atan_mu_deg": 34.21570213243741, "voxel": 0.0025, "R_over_dx": 20.0, "particles": 658080, "lift_speed": 0.025, "lift_froude": 0.03569607807317661, "floor_mu": 1.0, "iterations": 250, "final": {"angle_fit_mean_deg": 27.75288471030772, "angle_fit_sd_deg": 0.03450241269899735, "sectors_fitted": 8, "angle_cone_volume_deg": 33.297578772544895, "angle_height_flank_deg": 27.83052387850879, "h_max": 0.03807034343481064, "r_apex": 0.010000978465624265, "r_toe": 0.08211466199088223, "t_rest": 2.0, "max_speed": 0.0010843840427696705}, "angle_drift_last_0.5s_deg": -0.0035235462240237325, "at_rest": false, "estimators_spread_deg": 5.544694062237177, "deficit_deg": 6.462817422129689}
+[18:29:38] health: utilisation 100%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[18:30:08] REPOSE4 -> DONE (27.8, 658080, False)
+remote:      https://github.com/pulipakaa24/newton/pull/new/metalsim-1.5.2-gs-envfirst        
+remote: 
+[18:30:10] FORK_PUSH -> PASS 
+[18:30:12] FORK_FF -> PASS 
+[18:30:12] finish (rc=0): commit + push

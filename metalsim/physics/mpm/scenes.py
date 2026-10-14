@@ -21,7 +21,16 @@ import numpy as np
 import warp as wp
 
 import newton
-from newton.solvers import SolverImplicitMPM
+
+# Newton 1.5.2's SolverImplicitMPM: Newton's own on the 1.5.2 line (the L4, .venv-newton152), MetalSim's vendored copy
+# of the same fork commit elsewhere (.venv's Newton 1.7 line); METALSIM_MPM_SOLVER=newton|vendored forces one. On the
+# L4 this file is copied without the metalsim package, so Newton's own solver is the fallback.
+try:
+    from metalsim.physics.mpm.solver import solver_class
+except ImportError:
+    from newton.solvers import SolverImplicitMPM
+else:
+    SolverImplicitMPM = solver_class()
 
 # Isaac Lab 3.0-EA MPMParticleMaterialCfg defaults (mpm_cfg.py). Newton's own registry defaults differ
 # (friction 0.5, yield_pressure 1e15); Isaac users get these.

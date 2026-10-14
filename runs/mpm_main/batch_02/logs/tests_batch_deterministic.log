@@ -1,0 +1,32 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /Users/aditya/robosim/.venv/bin/python
+rootdir: /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
+configfile: pyproject.toml
+plugins: xdist-3.8.0
+collecting ... collected 3 items
+
+tests/test_batch_deterministic.py::test_stacked_boxes_repeat[4] PASSED   [ 33%]
+tests/test_batch_deterministic.py::test_stacked_boxes_repeat[256] FAILED [ 66%]
+tests/test_batch_deterministic.py::test_panda_repeats PASSED             [100%]
+
+=================================== FAILURES ===================================
+________________________ test_stacked_boxes_repeat[256] ________________________
+
+n = 256
+
+    @pytest.mark.parametrize("n", [4, 256])
+    def test_stacked_boxes_repeat(n):
+        """Two boxes landing on each other and on the floor, n worlds: two runs bitwise equal."""
+        import mujoco
+    
+        m = mujoco.MjModel.from_xml_string(BOXES)
+>       assert _run(m, n) == _run(m, n)
+E       AssertionError: assert '847ce5e95924...36679da9c7179' == 'a948d1de3696...86c9cd37d5fb3'
+E         
+E         - a948d1de369692feffd9672c08e4583e72cee72e0f604ce5c3286c9cd37d5fb3
+E         + 847ce5e959242d545876fcc6efc1983a54bc9726f1dde78f87636679da9c7179
+
+tests/test_batch_deterministic.py:49: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_batch_deterministic.py::test_stacked_boxes_repeat[256] - As...
+========================= 1 failed, 2 passed in 56.14s =========================

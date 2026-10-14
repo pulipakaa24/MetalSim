@@ -25,7 +25,8 @@ pytest tests -q
 ```
 
 On a fresh clone (2026-09-25, M4 Max, fast network, pip's download cache and Warp's kernel cache
-already filled) the install took one to one and a half minutes and the tests two and a half minutes;
+already filled) the install took one to one and a half minutes and the tests two and a half minutes (113
+tests then; the suite has grown since: about 6 minutes for `pytest tests` on 2026-10-13, `runs/eqfix/rigid_suite.log`);
 with empty caches expect several more minutes for the PyTorch download and the first Metal kernel
 compilations. The tests use the GPU; a few compare GPU results bit for bit and have failed
 intermittently while other GPU jobs were running, so run them on an otherwise idle GPU. `pip install -e .` without `[test]` is enough
@@ -79,7 +80,10 @@ from `fuse_fp`, GPU sort / BSR / NanoVDB builders, `fast_math` forms with `warp.
 default) are listed in the branch's `METALSIM_CHANGES.md` and in `metalsim/physics/mpm/MPM.md`.
 
 **MuJoCo Warp** ([pulipakaa24/mujoco_warp](https://github.com/pulipakaa24/mujoco_warp), branch
-`metalsim`, commit `8fbf965`). Google DeepMind's MuJoCo Warp v3.14.0 (`88af9cc`) with sixteen commits:
+`metalsim`, pinned commit `f1b35e2`, installed by the `pip install` line above; the commits since `8fbf965`, which
+this paragraph describes, are listed in the README's "MuJoCo Warp fork" section: elliptic cones on Metal, the fused and
+early-exiting Newton iterations, scratch reuse, the equality block at `njmax`). Google DeepMind's MuJoCo Warp v3.14.0
+(`88af9cc`) with, up to `8fbf965`, sixteen commits:
 the Metal device patch, heightfield contacts computed against each prism's top plane (upstream
 produced inverted normals and launched worlds on rough terrain), and the plane-to-convex contact set of
 MuJoCo C (upstream kept 2 contacts where MuJoCo C keeps 4 on a tilted foot), with an environment switch
@@ -90,8 +94,10 @@ match MuJoCo C (per-pair contact cap and selection, box-triangle and cable-capsu
 every flex, active-layer volume contacts, mesh normals), order flex equality rows deterministically (the Metal
 `FlexConstraintTest` failures) and sort on the device on Metal; each behind a `collision_flex` flag
 (`scripts/diagnostics/deformable/UPSTREAM.md`). The same sixteen commits (flex ones rebased linearly after the
-throughput ones; identical tree to the merge `8fbf965`) are in `patches/mujoco_warp/`; to build without the fork, clone google-deepmind/mujoco_warp at
-`88af9cc`, `git am` those patches and `pip install -e` the checkout.
+throughput ones; identical tree to the merge `8fbf965`) are in `patches/mujoco_warp/0001-0016`. To build the pinned
+tree without the fork, clone google-deepmind/mujoco_warp at `88af9cc`, `git apply`
+`patches/mujoco_warp/metalsim-f1b35e2.diff` (the whole branch as one diff) and `pip install -e` the checkout (README
+"Install"). Superseded: "`git am` those patches" gives the `8fbf965` tree, not the pinned one.
 
 **Newton** ([pulipakaa24/newton](https://github.com/pulipakaa24/newton), branch `metalsim`, pinned commit
 `9f31739` = XPBD code `90e2332` plus the Metal fixes: HashTable, 64-bit atomics, mesh-SDF barrier, collision launches). Only needed for the experimental Newton XPBD engine. The fork fixes XPBD solver defects
@@ -217,9 +223,34 @@ scripts/gpu_run.sh test_pour check 20 -- .venv-newton152/bin/python -m pytest te
 
 The run writes `log.jsonl` (one record per iteration: rsl_rl's mean reward / episode length over the last 100
 episodes, the success rate of the episodes finished that iteration, Isaac's `Episode_Termination/*` and sampler
-metrics, losses) and checkpoints every 25 iterations. One iteration (96 steps x 2,048 envs) takes about 3 minutes on
-an M4 Max, so Isaac's 3,000 iterations take about 6 days. Large-world or new-kernel jobs run under
+metrics, losses) and checkpoints every 25 iterations (`--save-interval`; `model_<it>.pt` and `model_last.pt`;
+`touch <out>/STOP` pauses cleanly at the end of an iteration). One iteration (96 steps x 2,048 envs) takes about 3.3
+minutes on an M4 Max (979 env-steps/s, `PARITY.md` §1b.4), so Isaac's 3,000 iterations take about 7 days. Large-world or new-kernel jobs run under
 `scripts/watchdog.py` (kills a job on a CPU stall, memory ceiling or timeout).
+
+### MPM material in a BatchSim scene (main environment)
+
+Sand, snow, mud or viscous media in a scene whose robot runs on `BatchSim` (`.venv`, no second environment): the
+solver is Isaac Lab 3.0-EA's (Newton 1.5.2's implicit MPM, MetalSim's vendored copy of the fork), two-way coupled the
+way Isaac's `SolverCoupledProxy` couples it to MuJoCo Warp (`metalsim/physics/mpm/MPM.md` section 11):
+
+```python
+from metalsim.physics.mpm.coupled import MPMCoupling, MPMConfig, MPMMaterial, GridEmitter, SAND
+
+sim = BatchSim(model, num_envs=64, options=BatchSimOptions(substeps=3))
+mpm = MPMCoupling(sim, MPMConfig(voxel_size=0.02))          # Isaac's MPMSolverCfg fields + coupling settings
+mpm.add_emitter(GridEmitter(lower=(-.1, -.1, 0), upper=(.1, .1, .05), material=SAND))   # same material in every world
+mpm.finalize()
+mpm.step()                    # replaces sim.step(): MuJoCo substeps with the sand wrench, then the MPM step
+mpm.attach_renderer(renderer) # grains drawn straight from the solver's particle buffer
+```
+
+MuJoCo geoms (box, sphere, capsule, cylinder, plane, mesh, ellipsoid) are the colliders; `mpm.set_colliders(bodies=...)`
+limits the coupled bodies, `MPMConfig(proxy_mass="effective" | "body" | "kinematic", mode="staggered" | "lagged")`
+selects Isaac's exchange variant, `mpm.wrenches()` returns the sand wrench per coupled body, `mpm.reset(mask)` resets
+worlds. The material is bitwise repeatable run to run; MuJoCo Warp's own contact solve is not (docs/GAPS.md), so a
+scene repeats exactly only while its bodies touch nothing but sand. Tests: `scripts/gpu_run.sh test_mpm_main check 60 -- .venv/bin/python -m pytest
+tests/test_mpm_main.py`.
 
 ### Rendering particles (MPM sand)
 
@@ -365,14 +396,20 @@ python3 scripts/gpu_lock.py status
 
 `gpu_run.sh` waits for the GPU, runs the command, and releases the GPU when the command exits for any
 reason (it also kills the command if the wrapper is killed). `MINUTES` is an estimate shown to others.
+The command runs in the caller's directory (since 2026-10-13; before, it ran in the repo root, so `python -m ...`
+from a worktree imported the main checkout's packages); the queue's own files stay under the repo root.
 Classes, granted in this order when the GPU frees up (first come, first served within a class):
 
 | class | for |
 |---|---|
 | `timing` | benchmarks and profiles that need an idle GPU (at most 15 minutes) |
 | `render` | renders and short rollouts |
+| `check` | correctness work that times nothing (tests, bitwise recordings, parity runs): up to three check jobs share the GPU; they start only when no exclusive job holds the GPU or waits ahead of them, and a check job waiting more than 10 minutes goes ahead of timing jobs |
 | `train` | training runs |
 | `low` | background work, granted only when nothing else waits |
+
+A job refuses to start while the GPU shows runaway work (utilisation of 90 % or more with no owning process for 10
+minutes): the queue pauses and writes `runs/GPU_RUNAWAY_ALERT` (`scripts/gpu_run.sh`).
 
 **Updating the shared fork checkouts.** `scripts/fork_sync.sh` fast-forwards `upstream/mujoco_warp` and
 `upstream/warp-innate` to their `fork/metalsim` heads through the queue (timing class), so the working tree never
@@ -438,9 +475,9 @@ cost has not been measured, the table says so.
 | knob | where | effect | measured cost |
 |---|---|---|---|
 | physics step | `physics_dt` (G1 CLI's last positional argument, `--physics_dt`) | 2.5 ms instead of Isaac's 5 ms keeps Isaac's stiff explicit drives stable (blow-ups at 5 ms) at twice the substeps | [§1.4](PARITY.md#14-throughput-on-the-g1-task-isaacs-protocol-4096-envs) (5 ms vs 2.5 ms rows and the L4 comparison at both), [§1.5](PARITY.md#15-learning-on-the-g1-task) (blow-ups at 5 ms) |
-| solver iterations | `BatchSimOptions(solver_iterations=, ls_iterations=)` | MuJoCo Warp on Metal always runs the full budget (no early exit), so cost is linear in it; the G1 uses 10 / 20 | budget stated in [§1.4](PARITY.md#14-throughput-on-the-g1-task-isaacs-protocol-4096-envs); a sweep has not been measured |
+| solver iterations | `BatchSimOptions(solver_iterations=, ls_iterations=)` | the G1 uses a Newton cap of 20 under the elliptic default (10 pyramidal) and 20 line-search iterations; since 2026-09-26 captured Newton loops exit early per world on Metal (MuJoCo Warp fork `21be81b`, `MJW_METAL_ICB_EARLY_EXIT=0` disables; before, Metal always ran the full budget) | cap 10 vs 20 under elliptic cones and the early exit: [§1.4](PARITY.md#14-throughput-on-the-g1-task-isaacs-protocol-4096-envs), `docs/research/elliptic_warmstart_2026-09-26.md`; a full sweep has not been measured |
 | contact and constraint capacity | `BatchSimOptions(nconmax=, njmax=)` | too small overflows (flagged by the monitor, NaN on constraints); too large costs memory and launch size | [§1.4](PARITY.md#14-throughput-on-the-g1-task-isaacs-protocol-4096-envs) notes (`njmax` 256, 32 contact slots per world and why), [§1.6](PARITY.md#16-rough-terrain-mujoco-warps-heightfield-contacts-found-defective-and-patched) |
-| contact model | `metalsim.physics.contact_tuning` presets, `--contact_tuning` | stiffer contacts and hard limits move the replay closer to PhysX in some metrics | fidelity per preset: [§1.7](PARITY.md#17-fidelity-protocol-against-isaac-sim-51-on-an-l4-recorded-2026-09-24-physx--rtx); throughput cost not yet measured on an idle GPU |
+| contact model | `contact_cfg` (`--contact_cfg`), `metalsim.physics.contact_tuning` presets, `--contact_tuning` | stiffer contacts and hard limits move the replay closer to PhysX in some metrics; elliptic cones (the default) bring impact forces within 8 % of PhysX's | fidelity per preset: [§1.7](PARITY.md#17-fidelity-protocol-against-isaac-sim-51-on-an-l4-recorded-2026-09-24-physx--rtx); throughput: elliptic default 1.5× the pyramidal PPO-loop cost (section 3b, README), the pyramidal preset 11 % of the loop against MuJoCo's default contacts (`docs/research/throughput_regression_2026-09-25.md`) |
 | render tier and samples | `--tier`, `--spp`, `--bounces` (camera tasks), `Tier2Renderer` | tier 0 raster, tier 1 adds ray-traced shadows / AO / reflections, tier 2 path tracing is closest to Isaac's RTX frames | throughput per tier and spp: [§2](PARITY.md#2-platform-capabilities-the-workstreams-with-the-tests-behind-them) ("Tier 1 / tier 2 full rollouts"); image fidelity vs RTX: [§1.7](PARITY.md#17-fidelity-protocol-against-isaac-sim-51-on-an-l4-recorded-2026-09-24-physx--rtx) |
 | sensor extras | `metalsim.sensors.contact.ContactSensor`, lidar beam divergence and multi-return, radar-lite | Isaac's contact-sensor quantities; lidar echoes closer to RTX lidar | per-sensor cost in [§2](PARITY.md#2-platform-capabilities-the-workstreams-with-the-tests-behind-them) (contact sensor, lidar extras and radar rows) |
 | engine | `engine="newton"` | faster, looser joints | [§2.1](PARITY.md#21-contact-model-what-mujoco-can-do-and-newton-xpbd-on-metal-measured-2026-09-24-newton-xpbd-archived-as-experimental-on-2026-09-25-see-gapsmd), [§1.4](PARITY.md#14-throughput-on-the-g1-task-isaacs-protocol-4096-envs) (engine comparison) |
@@ -458,7 +495,10 @@ construction, partial, disproved, not testable here). In outline:
 - **Throughput** on Isaac's G1 benchmark protocol, against Isaac's published RTX 4090 figures and
   Isaac Lab measured on an L4 (§1.4). Speed figures are labelled measured, reported or estimated.
 - **Learning**: the same PPO configuration on Isaac's flat config reaches Isaac's return at the same
-  iteration (one seed each), with rsl_rl as a learner cross-check (§1.5).
+  iteration (three seeds ours, one Isaac's), with rsl_rl as a learner cross-check (§1.5); Isaac Lab 3.0-EA like for
+  like (§1.8).
+- **Franka-Pour** (Isaac Lab 3.0-EA's MPM manipulation task): asset, MDP terms against Isaac's own code, learner,
+  throughput and learning against Isaac on the L4 (§1b); the MPM solver itself in `metalsim/physics/mpm/MPM.md`.
 - **Physics and rendering fidelity** against a PhysX / RTX recording of the same open-loop protocol
   (§1.7), and policy transfer in both directions between the simulators.
 - **Platform features** (rendering tiers, sensors, replicator, interop) with their tests (§2), the

@@ -1,4 +1,8 @@
-# MPM on Metal (2026-10-09)
+# MPM on Metal (2026-10-09; sections through 8j, 2026-10-13)
+
+Sections are a dated log: statements such as "being ported" or "in progress" are the state on their date, and a
+**Done** / **Resolved** note points to where the result landed. Summary of the current state: `docs/STATUS.md`
+("Deferred work items") and `docs/GAPS.md` (MPM row).
 
 Isaac Lab 3.0-EA's only MPM is Newton 1.5.2's `SolverImplicitMPM` (an implicit Drucker-Prager rheology + frictional
 contact solve per step, after Daviet & Bertails-Descoubes 2016 and NVIDIA's "Mixed MPM" 2026); PhysX dropped its MPM in
@@ -90,8 +94,8 @@ First pass (85 runs, all exit 0), Isaac Lab 3.0-EA's Newton 1.5.2 / Warp 1.16.0 
   0.57 mm (max 5 cm on a few flung grains), centre of mass 9 um, KE 4.5e-6.
 * **Lattice defect found by R2:** Isaac Lab's `_emit_grid` takes float32 corners, so a 0.2 m column at 3 ppc / 0.05 m
   voxels has 12 particles across, not the 13 `scenes.py` produced in float64. Fixed (`scenes.py` positions now equal
-  Isaac Lab's bit for bit, a = 2 and 5); the column and plate runs (R0 column, R1, R7) are being re-recorded; the first
-  pass is kept in `mpm_lattice13/`. Newton examples (R3, R4, R6) and R2 itself were unaffected.
+  Isaac Lab's bit for bit, a = 2 and 5); the column and plate runs (R0 column, R1, R7) are being re-recorded (**done**:
+  second pass below); the first pass is kept in `mpm_lattice13/`. Newton examples (R3, R4, R6) and R2 itself were unaffected.
 
 Second pass (Isaac Lab lattice, 12 across; R0 column, R1, R2, R7 re-recorded, all exit 0):
 * **R2: Isaac Lab's own `MPMObject` / `MPMSolverCfg` path is bitwise equal to `scenes.py` + Newton direct** (a = 2
@@ -146,10 +150,11 @@ Warp fork, both measured (`probes/fp_semantics.py`, `fp_contract_patterns.py`, `
    `metalsim-fp-contract` (`upstream/warp-innate-fpcontract`): `#pragma clang fp contract(fast)` in the Metal
    prelude when `fuse_fp` is on. Metal then reproduces CUDA bit for bit on every tested expression shape (a*b+c,
    a*b+-c*d, three-term sums and squares, (a-b)*(c-d)+e, c-a*b). This changes rounding in every Metal Warp kernel,
-   so it is a separate branch: merging it means re-running the rigid-body parity suite.
+   so it is a separate branch: merging it means re-running the rigid-body parity suite. (**Done:** merged into Warp
+   `metalsim`; the rigid suite had the same known failures before and after, `runs/fma_rigid_parity/`.)
 2. **BVH builder.** CUDA builds mesh BVHs with LBVH, the fork's Metal path falls back to host SAH; at exact ties the
    closest face differs (CUDA LBVH vs CUDA SAH alone: 4,962 / 7,126 / 3,793 tied points differ in three box cases).
-   Being ported (Metal LBVH identical to CUDA's).
+   Being ported (Metal LBVH identical to CUDA's). (**Done:** results with FMA + LBVH below.)
 
 Remaining non-bitwise source on CUDA: kernels Newton marks `fast_math` use approximate `/` and `sqrt` on CUDA
 (71 % / 83 % correctly rounded); Metal keeps them exact. Measured on the L4 itself (`record_mpm.py --precise-cuda`):
@@ -163,7 +168,7 @@ so the T1 floor is the larger of the L4's float64-vs-float32 and fast-vs-exact d
 * **T2, column collapse, all six aspect ratios: PASS.** Seed-mean runout within 0.1 %, final height within 0.4 %
   (the seed spread is 1-4 %); fitted exponents Metal 1.1555 / 0.7282 vs L4 1.1559 / 0.7275.
 * **Granular example (mesh collider):** 0.24 mm at frame 6 vs a 0.05 um floor: the collider-normal ties (BVH);
-  re-run after the LBVH port, together with R3/R4/R6/R7.
+  re-run after the LBVH port, together with R3/R4/R6/R7 (**done**, next subsection).
 
 ### Results with FMA + LBVH (Warp branch `metalsim-mpm-parity`), against CUDA's own floors (2026-10-10)
 
@@ -200,7 +205,7 @@ Timing-class runs, ms/frame, Metal vs the L4 (eager / whole step captured): colu
 58.9/24.2; two-way coupling 254.4 vs 73.0/31.0. Two-way profile: MPM step 224 ms, of which ~130 ms are CPU radix sorts
 in `warp.fem` `compress_node_indices` and ~40 ms GPU drains before host utility calls (the fork runs
 `radix_sort_pairs` / `runlength_encode` / `array_scan` on the host on Metal). Order: GPU sort/RLE/scan (in progress,
-branch `metalsim-metal-sort`), GPU-driven solver loop (indirect execution ranges), residual folded into the solve,
+branch `metalsim-metal-sort`; **done**, table below), GPU-driven solver loop (indirect execution ranges), residual folded into the solve,
 GPU NanoVDB grid build, whole-step capture, Gauss-Seidel layout work after microbenchmarks.
 
 ### Done (2026-10-10), each bitwise against the previous Metal path
@@ -789,7 +794,7 @@ recordings at 1 / 64 / 2,048 worlds, eager and captured, equal; `tests/test_mpm.
 |---|---|---|---|
 | base | Warp `f0df4cf8`, Newton `3fd1f052` | 37.64 | 1.84 s |
 | tight temporary pools (exact sizes, no array > 1.25x a request of >= 1 MiB) | Warp `95f6f121` (default on Metal) | 34.48 | MPM step 81.2 / 81.5 vs 81.5 / 81.4 ms |
-| + measured NanoVDB node budgets (16 leaves, 4.5 lower nodes per world, 80+ upper; 4x the peak of 600 random-action policy steps) | Franka-Pour `mpm_grid_budget="measured"` (opt-in; local branch `franka-pour-memory` on `metalsim-franka-pour` `783decdc`, for that branch's owner to merge) | 24.85 | 1.79 s |
+| + measured NanoVDB node budgets (16 leaves, 4.5 lower nodes per world, 80+ upper; 4x the peak of 600 random-action policy steps) | Franka-Pour `mpm_grid_budget="measured"` (opt-in; written on local branch `franka-pour-memory`, merged with the Franka-Pour task in PR #6, `fe3c1f2f`) | 24.85 | 1.79 s |
 | + cell reservation 256 per world (peak use 80) | Franka-Pour `mpm_cells_per_world=256` (opt-in) | 15.66 | 1.44 s |
 
 The two task options are capacities: a grid within them is the same grid, and an overflow is reported (the PPO loop
@@ -825,7 +830,8 @@ end to end: Isaac's own assets (Franka USD, cups, table, the 20,000-row reset da
 * Learning against Isaac (`docs/PARITY.md` §1b.5, 2026-10-13): 5 of our seeds at Isaac's matched 1,024-env
   configuration against Isaac's single run. Isaac's run is inside our prediction interval through iteration 49. At
   iterations 50-59 it leads by about 0.06 success, just outside the interval (verdict partial). Isaac seeds 1-4
-  (`stage_pour_seeds.sh`) are waiting for L4 time.
+  (`stage_pour_seeds.sh`) were waiting for L4 time; seeds 1 and 2 were started on the L4 later on 2026-10-13 (in
+  flight, `docs/NOW.md`; no result recorded yet).
 * Upstream observation (code reading, same in Isaac and here): the proxy wrench harvest uses only the last MPM
   substep's impulses and divides by the outer dt, so with the media entry's 2 substeps the reaction on the cups is about
   half the mean force (`solver_coupled_proxy.py:1547-1557`, `solver_implicit_mpm.py:1773-1812, 3266-3268`).
@@ -887,7 +893,7 @@ command-buffer cost, joined with the L4's nsys sums in `profile/joined.md` and `
   (`_crb_accumulate`, `_cfrc_backward`, `_primitive_narrowphase`, Cholesky updates). Sorts and scans take 2.3 vs
   1.6 ms. Parts: MPM step 25.6 ms, MuJoCo step 18.4 ms of 45.4 (eager, synchronized).
 
-**What would close it** (not started):
+**What would close it** (not started when this section was written; item 1 is in progress per `docs/NOW.md`):
 1. **Two-way growth.** On Metal, run the long-row product (IJtm) through a row-tiled reduction (CUDA's
    `bsr_mv_tiled_kernel` choice, as Warp `3c4e251e` did for warp.fem's dispatched assembly), or swap the IJtm product
    for a J^T product over J's short rows. Expected: the late window back to about the early cost (36-37 ms), giving
@@ -921,14 +927,14 @@ Everything above runs from a clone of MetalSim plus the three forks; nothing dep
 
 ```
 # after the install of README / docs/GUIDE.md (.venv, scripts/setup_warp.sh, the MuJoCo Warp fork):
-scripts/setup_newton152.sh          # .venv-newton152: Newton fork metalsim-1.5.2 @3fd1f052, shared Warp fork @95f6f121
-scripts/gpu_run.sh test_mpm check 15 -- .venv-newton152/bin/python -m pytest tests/test_mpm.py   # 14 passed, 1 xfailed
+scripts/setup_newton152.sh          # .venv-newton152: Newton fork metalsim-1.5.2 @99843d09, shared Warp fork @95f6f121
+scripts/gpu_run.sh test_mpm check 15 -- .venv-newton152/bin/python -m pytest tests/test_mpm.py   # 15 passed, 1 xfailed
 ```
 
 | what | where it lives | how a fresh setup gets it |
 |---|---|---|
 | Warp changes | pulipakaa24/warp `metalsim`, pinned `95f6f121` | `scripts/setup_warp.sh` (fallback: innate-inc/warp `ce15f6bb` + `patches/warp/metalsim-95f6f121.diff`) |
-| Newton changes (MPM, Franka-Pour rigid) | pulipakaa24/newton `metalsim-1.5.2`, pinned `3fd1f052` | `scripts/setup_newton152.sh` (fallback: v1.5.2 + `patches/newton/metalsim-1.5.2-3fd1f052.diff`) |
+| Newton changes (MPM, Franka-Pour rigid) | pulipakaa24/newton `metalsim-1.5.2`, pinned `99843d09` | `scripts/setup_newton152.sh` (fallback: v1.5.2 + `patches/newton/metalsim-1.5.2-99843d09.diff`) |
 | Newton 1.7 Metal fixes for the rigid stack | pulipakaa24/newton `metalsim-hashtable-metal` `a4be3604` (`.venv`'s `newton` extra) and `metalsim` `9f317390` (`.venv-newtonfork`) | `pip install -e ".[newton]"`, `scripts/setup_newton.sh` |
 | compat layer, scenes, probes, tests, Isaac-side recorders | this repository | the clone |
 | logs, JSON, reports of every run | `runs/mpm/`, `runs/parity/isaaclab3_mpm*/`, `runs/rigid_perf/`, `runs/fma_rigid_parity/` | the clone |
@@ -936,3 +942,130 @@ scripts/gpu_run.sh test_mpm check 15 -- .venv-newton152/bin/python -m pytest tes
 | L4 recordings (`runs/parity/isaaclab3_mpm*`, ~31 GB incl. tarballs) | not committed | on the L4 machine: copy `record_mpm.py`, `record_mpm_il3.py`, `scenes.py`, `newton_compat.py` to `~/parity3_scripts/mpm/`, run `isaaclab3/stage_mpm.sh`, `stage_mpm_floors.sh`, `stage_mpm_floors2.sh`, `stage_mpm_timing.sh` (Isaac Lab 3.0-EA install: `isaaclab3/`) |
 | kernel caches, L4 scale logs > 1 MB | not committed | rebuilt on first run / re-run `probes/scale_pour.py` on the L4 |
 | Franka panda model | MuJoCo Menagerie (not vendored) | `git clone https://github.com/google-deepmind/mujoco_menagerie upstream/mujoco_menagerie` or `PANDA_XML` |
+
+## 11. MPM in the main simulator (`.venv`, BatchSim)
+
+Design and research: `research_notes/MPM in main simulator/NOTE.md` (status: `STATUS.md` there). The main environment
+has Newton 1.7, whose own implicit MPM is a later algorithm than Isaac Lab 3.0-EA's, so MetalSim carries the 1.5.2
+fork's solver package as a generated, Apache-2.0 copy in `metalsim/physics/mpm/implicit_mpm/` (licence and the list of
+modifications: its `NOTICE.txt`, `THIRD_PARTY_NOTICES.md`). `metalsim.physics.mpm.solver.solver_class()` returns
+Newton's own `SolverImplicitMPM` on the 1.5.2 line (`.venv-newton152`) and the copy elsewhere
+(`METALSIM_MPM_SOLVER=newton|vendored` forces one); `newton_compat.install` patches both. The copy run against Newton
+1.7 is bitwise Newton 1.5.2's own solver (column a = 1, every frame, positions, velocities and iteration counts;
+`runs/mpm_main/vendored_bitwise/`, `tests/test_mpm_main.py::test_vendored_column_bitwise_newton152`).
+
+### Using it
+
+```python
+from metalsim.physics.batch import BatchSim, BatchSimOptions
+from metalsim.physics.mpm.coupled import MPMCoupling, MPMConfig, MPMMaterial, GridEmitter, PointsEmitter, SAND
+
+sim = BatchSim(model, num_envs=64, options=BatchSimOptions(substeps=3))     # the coupled step = one BatchSim step
+mpm = MPMCoupling(sim, MPMConfig(voxel_size=0.02))   # Isaac's MPMSolverCfg fields + coupling settings
+mpm.add_emitter(GridEmitter(lower=(-.1, -.1, 0), upper=(.1, .1, .05), material=SAND))   # Isaac's MPMGridCfg
+mpm.set_colliders(bodies=["foot_l", "foot_r"])       # optional: which MuJoCo bodies are coupled (default: all moving)
+mpm.finalize()
+v = mpm.step()                                       # instead of sim.step(); returns sim.event's value
+renderer = Tier2Renderer(model, 64, ...); mpm.attach_renderer(renderer)   # grains from the solver's buffer
+mpm.wrenches(); mpm.particles(); mpm.reset(mask); mpm.check_status()
+```
+
+`metalsim/physics/mpm/coupled.py` documents the exchange: Isaac Lab's `SolverCoupledProxy` semantics (proxy bodies
+with MuJoCo's effective mass, staggered or lagged, the solver's own fixed-order wrench harvest into `xfrc_applied`,
+the caller's `xfrc_applied` restored after the step), `proxy_mass="effective" | "body" | "kinematic"`,
+`harvest="last_substep"` (Isaac) or `"mean"`. Colliders are the MuJoCo geoms (`colliders.py`: box, sphere, capsule,
+cylinder, plane, mesh, ellipsoid as a mesh); static geoms are static colliders. Nothing in `BatchSim` changes, and
+building an MPM scene changes no process-wide Warp setting (`test_main_sim_settings_untouched`).
+
+### Gauss-Seidel with separate worlds (Newton fork fix)
+
+Two identical multi-world runs differed from the first step whenever the rheology solve was Gauss-Seidel (`"auto"`,
+Newton's default) on a sparse grid with `separate_worlds`, in Newton's own 1.5.2 solver as in the copy; Jacobi
+(Isaac Lab's Franka-Pour) and single-world runs repeated bitwise (`runs/mpm_main/repeat/`). Cause: the color blocks of
+a discontinuous strain basis (P0) are built as `cell * nodes_per_cell`, while environment-first strain partitions
+number a cell's nodes in environment-major order. A NanoVDB environment grid does not store cells environment by
+environment (negative coordinates sort after positive ones), so the blocks were a permutation of other cells' nodes and
+strain nodes solved concurrently in one color shared velocity nodes: a data race, on CUDA as on Metal. Fixed on the
+fork (`99843d09`, blocks from each cell's partition node index; single-environment grids keep the old kernel) and
+re-pinned. `probes/gs_coloring_check.py` (2 worlds, sparse grid, on Metal): the old fork's coloring has 930 velocity-node
+write conflicts within colors (all 8 colors), the fixed one none, every strain node once per sweep; the fixed solver
+repeats bitwise in all 12 multi-world configurations of `probes/multiworld_repeat.py` (`runs/mpm_main/batch_01/`).
+
+### Measured (batch 01, 2026-10-13, 16-inch)
+
+* **Isaac's coupling path** (box 2 kg / 0.1 m dropped on a 0.3 x 0.3 x 0.08 m bed, 2 worlds, Jacobi, 60 steps of
+  1/120 s; `probes/box_on_sand.py`, `.venv` vs Newton's `SolverCoupledProxy` + `SolverMuJoCo` in `.venv-newton152`):
+  every particle bitwise equal until the box reaches the sand (step 17); afterwards the two rigid stacks (MuJoCo Warp
+  3.14 vs 3.11) differ by rounding: box position at most 1.7e-7 m apart, sand 1.0e-6 m RMS (max 2.5e-5 m) after 0.5 s.
+* **Repeatability**: the coupled scene (box on a 2,592-particle bed per world) repeats bitwise at 1, 64, 256 and 1,024
+  worlds with Gauss-Seidel. With Jacobi at 1,024 worlds the box reaches the floor and the run diverged at step 34:
+  MuJoCo Warp's constraint solve is not run-to-run repeatable on Metal by default (MetalSim's rigid stack never was;
+  `probes/rigid_neutral_mpm.py`: the panda differs between two plain runs; a box resting on the floor alone diverges
+  at step 18 at 1,024 worlds). An opt-in deterministic `BatchSim` (Warp's RUN_TO_RUN mode for MuJoCo Warp's kernels)
+  is being developed separately on branch `batchsim-deterministic` (open: a divergence in MuJoCo Warp's box-box CCD
+  kernel under the two-phase deterministic counters, 2 of 256 worlds from step 139).
+* **Rigid neutrality**: after an MPM scene was built and stepped, the MuJoCo Warp kernel modules a rigid scene loads
+  have the same hashes (8 modules), and the box scene's trajectory is bitwise that of a plain run.
+* **Speed** (ms per captured coupled step = 3 MuJoCo substeps + 1 MPM step of 1/120 s, box + 2,592 particles per
+  world, median of 40 after 10 warm-up; `probes/scale_coupled.py --time`, timing class):
+
+  | worlds | Gauss-Seidel (`"auto"`) | Jacobi | world-steps per s (GS / Jacobi) |
+  |---|---|---|---|
+  | 1 | 13.7 | 8.3 | 73 / 120 |
+  | 64 | 24.3 (eager: 95.1) | 20.3 | 2,631 / 3,156 |
+  | 256 | 60.6 | 54.7 | 4,226 / 4,678 |
+  | 1,024 | 223.6 | 210.5 | 4,579 / 4,865 |
+
+* **Bearing** (research `research_notes/MPM in main simulator/bearing_and_sinking.md`; runs `runs/mpm_main/bearing/`
+  (batch 02), `runs/mpm_main/bearing3/` (batch 03); box 0.1 m, 2 kg on a 0.3 x 0.3 x 0.08 m bed, voxel 0.02).
+  Expected: bearing capacity 5-10x the box's 2 kPa (mu 0.7 ~ phi 30-35 deg); a box at rest settles within about half a
+  voxel; a 1.7 m/s drop stops after 1-2.5 cm; the bed fails below mu ~ 0.3-0.45.
+  * **`"staggered"` exchange (Isaac's Franka-Pour setting): broken for resting bodies.** In every configuration of
+    batch 02 (voxel 0.02 / 0.01, 50 / 250 iterations, friction 0.4 / 0.7 / 0.9, bed 8 / 16 cm) the resting box sank at
+    a steady 0.082 m/s = g dt while the harvested sand force equalled its weight, i.e. through the bed. Cause: the MPM
+    solve stops the proxy, but only the wrench reaches MuJoCo, in the next step, so v_{n+1} = -g dt whatever the sand.
+    Isaac's coupling path does the same (MetalSim's Isaac-path comparison ran staggered): Isaac parity is not physical
+    validity here. Isaac's Franka-Pour cups (held by the gripper) carry the same per-step drift relative to the sand.
+  * **`"lagged"` exchange with the velocity rewind** (Newton's `SolverCoupledProxy.Proxy` default and its two-way
+    example's scheme; `MPMCoupling`'s default since batch 03) removes the drift. Rest test, settlement after 1.5 s /
+    creep over the last 0.3 s: 50 iterations, tolerance 1e-4: 25.3 mm / 16.1 mm/s; **250 iterations, tolerance 1e-6:
+    10.2 mm (half a voxel) / 0.4 mm/s**; voxel 0.01: 19.7 mm / 5.8 mm/s; collider basis Q1 27.0 mm / 2.1 mm/s, pic27
+    28.3 mm / 8.0 mm/s; friction 0.3: 74.2 mm (bearing failure, as predicted), 1.2: 14.2 mm / 11.6 mm/s. Drop from
+    0.15 m: peak 38.8 mm, creep 8.7 mm/s (dt 1/240: 31.7 mm, 4.1 mm/s). The residual creep follows the rheology solve's
+    convergence (an under-converged solve delivers a fraction alpha of the stopping impulse and drifts at
+    (1 - alpha) / alpha g dt): bodies resting on sand need a converged solve (Isaac's default is 250 iterations,
+    tolerance 1e-4; batch 04 measures it). Staggered in batch 03: 80 mm (the floor) in drop and rest.
+* **Angle of repose** (research `research_notes/MPM in main simulator/angle_of_repose.md`; `probes/repose_lift.py`, runs
+  `runs/mpm_main/repose3/`). Lifted-cylinder test: tube R = 5 cm (mocap, frictionless towards the sand), fill 5 cm, rough
+  floor (friction 1.0), column-maximum surface fit in 8 sectors (30.0 deg on a synthetic 30 deg cone). The solver's
+  yield surface is sqrt(J2) <= mu p, so the reference is atan(mu). Measured (fit mean, sector sd 0.0-0.4 deg):
+
+  | mu (atan mu) | R/dx 5 | R/dx 10 | R/dx 15 |
+  |---|---|---|---|
+  | 0.40 (21.8 deg) | | 14.7 | |
+  | 0.68 (34.2 deg) | 25.4 | 26.3 | 27.2 |
+  | 0.90 (42.0 deg) | | 32.6 | |
+
+  Lift speed 1.25 / 2.5 / 5 cm/s at R/dx 10: 26.6 / 26.3 / 25.4 deg (plateau within 0.3 deg below 2.5 cm/s); 4x the
+  iterations: 26.6 deg. The angle rises monotonically with resolution (+0.9 deg per refinement) and with friction
+  (slope 0.89 against atan(mu)), but sits 7-9 deg below atan(mu) at the finest resolution run: the published MPM heaps
+  also stop at or below atan(mu) (Dunatunga & Kamrin 2015), and on a slope this cone can yield below the simple-shear
+  stopping angle whenever the lateral stresses differ from the vertical one; the remaining gap to physical sand
+  (repose ~ the friction angle) is a property of the solver Isaac Lab ships, not of the coupling. Not yet converged in
+  resolution (R/dx 30 is the next step).
+
+### Re-vendoring when the fork pin moves
+
+The copy must always be the commit `scripts/setup_newton152.sh` pins. After a Newton fork change:
+
+1. Push the fork branch (`metalsim-1.5.2`) and move `PIN` in `scripts/setup_newton152.sh` (and the fallback patch
+   `patches/newton/metalsim-1.5.2-<sha>.diff`, as before).
+2. Set the same commit as `PIN` in `scripts/vendor_mpm152.py`, then regenerate:
+   `python scripts/vendor_mpm152.py upstream/newton-metalsim-1.5.2` (a checkout at the new pin; without an argument it
+   downloads the pinned commit's archive from GitHub). Never edit the generated files by hand.
+3. Update the commit in `THIRD_PARTY_NOTICES.md` (Newton section) and run `pytest tests/test_mpm_main.py`:
+   `test_vendored_pin_is_the_setup_pin` fails until both pins agree, `test_vendored_copy_regenerates_from_the_pin`
+   regenerates from the pinned commit and fails on any difference, `test_vendored_files_keep_the_licence_header`
+   checks every file still starts with Newton's SPDX header and the modification notice.
+4. If the fork's package now imports something new from outside `implicit_mpm`, extend `rewrite()` in the generator
+   (and the modification list in its `NOTICE_TXT`).
