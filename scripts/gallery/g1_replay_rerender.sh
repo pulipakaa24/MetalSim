@@ -1,7 +1,7 @@
 #!/bin/bash
 # Re-render the MetalSim replay frames of the fidelity protocols with the full-extent ground plane, then
 # re-run the comparison against the grey-ground Isaac recording. Runs after the stage videos, under the GPU lock.
-cd /Users/aditya/robosim
+cd "$(dirname "$0")/../.."   # repo root
 until grep -q VIDEOS_DONE runs/g1_stage_videos.log 2>/dev/null; do sleep 60; done
 while [ -e runs/.gpu_lock ]; do sleep 30; done
 echo "g1_replay_rerender (main session) $(date)" > runs/.gpu_lock; trap "rm -f runs/.gpu_lock" EXIT

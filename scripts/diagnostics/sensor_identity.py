@@ -19,7 +19,7 @@ import numpy as np
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ASSETS = os.path.join(os.path.dirname(os.path.dirname(HERE)), "assets")
-MENAGERIE = os.environ.get("MENAGERIE", "/Users/aditya/robosim/upstream/mujoco_menagerie")
+MENAGERIE = os.environ.get("MENAGERIE", os.path.join(os.path.dirname(os.path.dirname(HERE)), "upstream", "mujoco_menagerie"))
 
 LIDAR_SCENE = """
 <mujoco>
@@ -51,7 +51,7 @@ def scenes():
 
 
 def run(out):
-    sys.path.insert(0, os.getcwd())
+    sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))   # repo root
     import mujoco
     from metalsim.sensors.raytrace import RayTracer
     import metalsim

@@ -31,6 +31,7 @@ Drive models (``G1XPBD.drive``):
 """
 from __future__ import annotations
 
+import os
 import re
 from dataclasses import dataclass
 
@@ -39,7 +40,8 @@ import warp as wp
 
 import newton
 
-G1_USD = "assets/isaac/G1/g1_minimal.usd"
+G1_USD = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+                      "assets", "isaac", "G1", "g1_minimal.usd")   # scripts/fetch_isaac_assets.sh
 POS = newton.JointTargetMode.POSITION
 
 # Isaac Lab G1_MINIMAL_CFG actuators: (joint-name regex, kp, kd, effort limit [Nm], armature [kg m^2])

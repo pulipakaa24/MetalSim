@@ -39,8 +39,8 @@ def cloth_scene():
 
 
 def hand_scene():
-    p = os.path.join(ROOT, "..", "..", "..", "upstream", "mujoco_menagerie", "tetheria_aero_hand_open", "scene_right.xml")
-    for cand in (os.environ.get("MENAGERIE", ""), os.path.join(ROOT, "upstream", "mujoco_menagerie"), "/Users/aditya/robosim/upstream/mujoco_menagerie"):
+    p = os.path.join(ROOT, "upstream", "mujoco_menagerie", "tetheria_aero_hand_open", "scene_right.xml")
+    for cand in (os.environ.get("MENAGERIE", ""), os.path.join(ROOT, "upstream", "mujoco_menagerie")):
         q = os.path.join(cand, "tetheria_aero_hand_open", "scene_right.xml")
         if cand and os.path.exists(q):
             p = q
