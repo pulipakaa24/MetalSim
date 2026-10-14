@@ -1,0 +1,49 @@
+=== batch_15 start Tue Oct 13 23:18:56 PDT 2026
+[23:18:58] health: utilisation 96%
+GPU (ioreg): device utilization 100 %; per-process GPU time over 1.9 s:
+  pid  86060 python3.12                        60.7 %
+venv newton commit_id 9d6616c64ca018dd9119f67fca3316d715a26704 expected 9d6616c64ca018dd9119f67fca3316d715a26704 ok; upstream/newton 1301e8da2002541f6f189b6e459e1ed5e6db5731 (expected 1301e8da2002541f6f189b6e459e1ed5e6db5731)
+[23:20:19] MSFINAL11 -> PASS 31 passed, 2 warnings in 38.12s
+https://github.com/pulipakaa24/MetalSim/pull/46
+[23:20:26] PR11 -> DONE https://github.com/pulipakaa24/MetalSim/pull/46
+[23:20:26] === batch_11 end Tue Oct 13 23:20:26 PDT 2026
+FORKS11 PASS 22:05:30 metalsim-mjw314 1301e8da, metalsim-hashtable-metal-mjw314 9d6616c6
+NEWTONTESTS11 PASS 22:10:46 400 passed, 9 skipped, 6 warnings, 1 error, 106 subtests passed in 165.05s (0:02:45);400 passed, 9 skipped, 6 warnings, 1 error, 106 subtests passed in 124.93s (0:02:04);
+MSTESTS11 PASS 22:13:55 before: 20 passed, 11 skipped, 1 warning in 37.41s; after: 22 passed, 9 skipped, 1 warning in 133.58s (0:02:13)
+FORKMOVE11 PASS 22:43:43 
+SYNC11 PASS 23:18:58 verified by batch_15 (json + git): .venv newton 9d6616c6, upstream/newton 1301e8da
+DOCS11 PASS 23:19:03 
+MSFINAL11 PASS 23:20:19 31 passed, 2 warnings in 38.12s
+PR11 DONE 23:20:26 https://github.com/pulipakaa24/MetalSim/pull/46
+[23:20:26] P1 -> DONE MSFINAL11 PASS 23:20:19 31 passed, 2 warnings in 38.12s;PR11 DONE 23:20:26 https://github.com/pulipakaa24/MetalSim/pull/46;
+[23:20:26] gpu job mm15_base (<= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b15/logs/g1_64_base.log
+        raise RuntimeError("Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter "
+    RuntimeError: Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter calls differ between its two passes (research_notes/MPM in main simulator/deterministic_ccd_divergence.md)
+[23:21:22] health: utilisation 100%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   1.4 %
+[23:21:22] gpu job mm15_no_early_exit (<= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b15/logs/g1_64_no_early_exit.log
+        raise RuntimeError("Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter "
+    RuntimeError: Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter calls differ between its two passes (research_notes/MPM in main simulator/deterministic_ccd_divergence.md)
+[23:21:43] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[23:21:43] gpu job mm15_no_capture_reuse (<= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b15/logs/g1_64_no_capture_reuse.log
+        raise RuntimeError("Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter "
+    RuntimeError: Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter calls differ between its two passes (research_notes/MPM in main simulator/deterministic_ccd_divergence.md)
+[23:22:04] health: utilisation 24%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid  88333 python3.12                         3.2 %
+  pid   1291 Google Chrome He                   1.7 %
+[23:22:04] gpu job mm15_no_icb (<= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b15/logs/g1_64_no_icb.log
+        raise RuntimeError("Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter "
+    RuntimeError: Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter calls differ between its two passes (research_notes/MPM in main simulator/deterministic_ccd_divergence.md)
+[23:22:25] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[23:22:25] gpu job mm15_no_early_exit_unfused (<= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b15/logs/g1_64_no_early_exit_unfused.log
+    Module metalsim.learn.warp_policy 00a83dd load on device 'metal:0' took 465.98 ms  (cached)
+    {"scene": "g1_flat", "worlds": 64, "deterministic": 1, "build_s": 7.78279687500617, "num_envs": 64, "frames": 40, "mean_step_ms": 0.058550050000000006, "fps_isaac_style": 1093081.9017233972}
+[23:22:46] health: utilisation 72%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid  88333 python3.12                        32.9 %
+[23:22:46] P2A -> DONE 64 worlds: base:rc=1(phase mismatch) no_early_exit:rc=1(phase mismatch) no_capture_reuse:rc=1(phase mismatch) no_icb:rc=1(phase mismatch) no_early_exit_unfused:rc=0
+[23:22:46] P2B -> DONE 1,024 worlds: none passed at 64

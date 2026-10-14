@@ -1,0 +1,29 @@
+=== batch_11 start Tue Oct 13 23:18:58 PDT 2026 PIN_MOVE=1
+[23:19:01] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   1.9 %
+[23:19:03] DOCS11 -> PASS 
+edited pyproject.toml
+edited scripts/setup_newton.sh
+edited README.md
+edited metalsim/physics/mpm/MPM.md
+edited CHANGELOG.md
+newton_docs: ok
+[23:19:03] gpu job mm11_ms_final (<= 30 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-newton, PYTHONPATH=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-newton) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b11/logs/metalsim_newton_tests_final.log
+    
+    -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+    31 passed, 2 warnings in 38.12s
+[23:19:49] health: utilisation 80%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[23:20:19] MSFINAL11 -> PASS 31 passed, 2 warnings in 38.12s
+https://github.com/pulipakaa24/MetalSim/pull/46
+[23:20:26] PR11 -> DONE https://github.com/pulipakaa24/MetalSim/pull/46
+[23:20:26] === batch_11 end Tue Oct 13 23:20:26 PDT 2026
+FORKS11 PASS 22:05:30 metalsim-mjw314 1301e8da, metalsim-hashtable-metal-mjw314 9d6616c6
+NEWTONTESTS11 PASS 22:10:46 400 passed, 9 skipped, 6 warnings, 1 error, 106 subtests passed in 165.05s (0:02:45);400 passed, 9 skipped, 6 warnings, 1 error, 106 subtests passed in 124.93s (0:02:04);
+MSTESTS11 PASS 22:13:55 before: 20 passed, 11 skipped, 1 warning in 37.41s; after: 22 passed, 9 skipped, 1 warning in 133.58s (0:02:13)
+FORKMOVE11 PASS 22:43:43 
+SYNC11 PASS 23:18:58 verified by batch_15 (json + git): .venv newton 9d6616c6, upstream/newton 1301e8da
+DOCS11 PASS 23:19:03 
+MSFINAL11 PASS 23:20:19 31 passed, 2 warnings in 38.12s
+PR11 DONE 23:20:26 https://github.com/pulipakaa24/MetalSim/pull/46
