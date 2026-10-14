@@ -13,12 +13,15 @@ torch = pytest.importorskip("torch")
 wp = pytest.importorskip("warp")
 newton = pytest.importorskip("newton")
 
-pytestmark = pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal")
+pytestmark = [pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal"),
+              # the task runs on Newton 1.5.2 (.venv-newton152); .venv's Newton 1.7 SolverMuJoCo does not build
+              # against the MuJoCo Warp fork, so in .venv this test is skipped like test_franka_pour_terms
+              pytest.mark.skipif(not newton.__version__.startswith("1.5.2"), reason="needs Newton 1.5.2 (.venv-newton152)")]
 
 from metalsim.learn import franka_pour as P  # noqa: E402
 from metalsim.learn import franka_pour_ppo as PPO  # noqa: E402
 
-pytestmark = [pytestmark, pytest.mark.skipif(not os.path.isfile(P.S.RESET_DATASET), reason="needs the Franka-Pour assets")]
+pytestmark = [*pytestmark, pytest.mark.skipif(not os.path.isfile(P.S.RESET_DATASET), reason="needs the Franka-Pour assets")]
 
 
 def test_checkpoint_round_trip_and_stop_file(tmp_path):
