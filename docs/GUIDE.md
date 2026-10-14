@@ -261,7 +261,7 @@ mpm.attach_renderer(renderer) # grains drawn straight from the solver's particle
 MuJoCo geoms (box, sphere, capsule, cylinder, plane, mesh, ellipsoid) are the colliders; `mpm.set_colliders(bodies=...)`
 limits the coupled bodies, `MPMConfig(proxy_mass="effective" | "body" | "kinematic", mode="staggered" | "lagged")`
 selects Isaac's exchange variant, `mpm.wrenches()` returns the sand wrench per coupled body, `mpm.reset(mask)` resets
-worlds. The material is bitwise repeatable run to run; MuJoCo Warp's own contact solve is not (docs/GAPS.md), so a
+worlds (numpy or torch mask); `sim.launch_reset()`, `mpm.launch_reset(from_sim_mask=True)` and `mpm.launch_step()` put resets and the coupled step into one captured graph per policy step (MPM.md section 11). The material is bitwise repeatable run to run; MuJoCo Warp's own contact solve is not (docs/GAPS.md), so a
 scene repeats exactly only while its bodies touch nothing but sand. Tests: `scripts/gpu_run.sh test_mpm_main check 60 -- .venv/bin/python -m pytest
 tests/test_mpm_main.py`.
 A runnable example, a 2 kg box dropped on a sand bed in 2 worlds (needs the `newton` extra in `.venv`):

@@ -39,3 +39,34 @@ time rigid-only / GS / Jacobi at 1-1,024 worlds to split rigid / MPM / coupling 
 `WP_METAL_PROFILE=1` as `probes/section_kprof.py` does; per-section captured graphs; interleaved A/B with ~200 steps
 (the expected deltas are 0.02-0.1 ms against ~0.8 ms p10-p90 spreads); bitwise checks of rigid / wrench / particles /
 proxy body_q, body_qd and the kinematics fields, Gauss-Seidel scenes only, with an A-vs-A control first.
+
+## Results (2026-10-13, 16-inch; batch_07, batch_10)
+
+Done: items 1 (`MPMCoupling.launch_step()`) and 2 (capturable per-world reset: persistent device mask, `reset_mask`
+torch view, `launch_reset(from_sim_mask=True)`, `BatchSim.launch_reset()`, a reset graph after the first `reset`).
+Items 3-4 not done: measured, the whole layer is about 0.4 ms per coupled step (2.9 % at 1 world, 0.2 % at 1,024),
+so trimming or fusing its ~17 launches can save at most a fraction of that. Bitwise: the coupled trajectory with
+resets is identical on main and on this branch (`hash_trajectory.py`, 8 worlds, 60 steps), and the one-graph policy
+step equals the eager API at every world count measured.
+
+Section split, ms (`scale_coupled.py --split`):
+
+| worlds | coupled step | MuJoCo Warp substeps | coupling layer (share) | MPM + harvest | rigid-only scene |
+|---|---|---|---|---|---|
+| 1 | 14.01 | 2.43 | 0.41 (2.9 %) | 11.85 | 2.28 |
+| 64 | 25.67 | 2.42 | 0.40 (1.5 %) | 23.27 | 2.47 |
+| 256 | 66.15 | 2.64 | 0.42 (0.6 %) | 63.66 | 2.55 |
+| 1,024 | 242.59 | 2.71 | 0.44 (0.2 %) | 239.49 | 2.76 |
+
+Policy-step A/B, ms per policy step (`policy_step_ab.py`, 2 % of the worlds reset per step):
+
+| worlds | A (eager API) | B (one graph) | saving | steps with resets | bitwise A = B |
+|---|---|---|---|---|---|
+| 1 | 12.92 | 12.74 | 0.18 (1.014x) | 4 / 200 | yes |
+| 64 | 25.70 | 24.49 | 1.20 (1.049x) | 137 / 200 | yes |
+| 1,024 | 220.03 | 217.92 | 2.11 (1.010x) | 60 / 60 | yes |
+
+Found on the way: with one world the solver's masked reset refused grid warm starts (no separate FEM environments
+below two worlds), so `mpm.reset(mask)` raised at one world on main; fixed in `MPMCoupling._solver_reset`
+(`one_world_reset.py`: selected = the solver's full reset bitwise, unselected = no reset). batch_07's 1,024-world A/B
+ran out of memory because every run of the probe stayed in one process; each run is its own process now.
