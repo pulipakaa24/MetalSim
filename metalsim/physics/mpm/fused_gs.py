@@ -1,3 +1,9 @@
+# SPDX-License-Identifier: MIT AND Apache-2.0
+# MetalSim code, MIT (see LICENSE). Adapted from Newton 1.5.2 (newton-physics/newton tag v1.5.2,
+# newton/_src/solvers/implicit_mpm/rheology_solver_kernels.py: make_gs_solve_kernel; contact_solver_kernels.py:
+# solve_nodal_friction; solve_rheology.py: residual and stopping rule),
+# SPDX-FileCopyrightText: Copyright (c) 2026 The Newton Developers, Apache-2.0. Modified by MetalSim: the per-color Gauss-Seidel kernel, the nodal friction kernel and
+# the residual / update_condition step fused into one persistent threadgroup with barriers. See THIRD_PARTY_NOTICES.md.
 """Whole rheology solve in one Metal dispatch: Newton 1.5.2's colored Gauss-Seidel loop in a persistent threadgroup.
 
 Why: on the M4 Max a Gauss-Seidel iteration of the granular example is 8 dependent color dispatches plus a contact

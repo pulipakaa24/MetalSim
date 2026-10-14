@@ -1,7 +1,12 @@
 # Changelog
 
-What landed between 2026-09-22 and 2026-09-25, one line per commit, grouped by area and in
-commit order within each area (`git log` for the full messages). Dates are the commit dates (month-day).
+What landed between 2026-09-22 and 2026-10-13, grouped by area. The September sections list one line per commit in
+commit order; the October sections, newest first, summarise each merged pull request with its main commits (`git log`
+for the full messages). Dates are the commit dates (month-day).
+
+## Documentation: audit against the measured record (2026-10-13)
+
+- 10-13 Every doc checked against main `3670f4b8` (PRs #1, #4-#16): STATUS rewritten to the current state (superseded text kept and marked), GAPS / PARITY / GUIDE / README / RENDER_COVERAGE / NEWTON_RENDER / MPM.md / DECISIONS / PHASES / RESEARCH / HANDOFF / notices corrected (pins, queued or pending items that landed, test counts re-measured into `runs/docs_audit/`); this section and the October sections below added
 
 ## MPM: close-out bookkeeping and coupled-scene re-timing (2026-10-13, `metalsim/physics/mpm/MPM.md` 8j)
 
@@ -18,6 +23,44 @@ commit order within each area (`git log` for the full messages). Dates are the c
 ## Learning: checkpoint loading (2026-10-13, `docs/research/ppowarp_checkpoint_load_2026-10-13.md`)
 
 - 10-13 PPOWarp: a state dict loaded into `algo.net` is published to the Warp rollout policy (load_state_dict post-hook, same event ordering as `update()`); before, a replayed checkpoint ran the initial weights (`tests/test_ppo_warp_rollout.py::test_loaded_weights_reach_the_warp_policy`). Overflow-guard research note's trained-policy rows corrected and re-run; `scripts/diagnostics/g1_policy_replay.py`
+
+## Physics: capacity overflow guard (2026-10-13, PR #7, `research_notes/capacity_overflow_guard/g1_bound_and_lost_flags.md`)
+
+- 10-13 `c8eba085` BatchSim latches MuJoCo Warp's capacity flags after every substep (`reset_data` had erased the flags of the worlds it reset, so 13 of 31 overflowed worlds went unseen in a 100-step probe); NVMAX and TACTILE count as capacity flags; the four long-standing rigid-suite failures root-caused (three stale tests: the G1 capacity bound written under the pyramidal preset, an `njmax` that never overflows under elliptic cones, the dome azimuth test before the measured Kit offset)
+- 10-13 `401d31f0` .. `4977b4d0` Real-scale training checks of the latched guard (G1 flat / rough boxes / rough heightfield 4096, Tron1 8192, SO-101 lift 64, a trained rough policy over all terrain levels): no capacity flag; latch cost within run-to-run spread; `7be4fea6` suite logs on the merged tree (rigid 396 passed / 5 skipped, render 208 passed / 1 skipped, `runs/fixfail/`)
+
+## Franka-Pour: Isaac Lab 3.0-EA's MPM manipulation task (2026-10-12 .. 13, PRs #6 and #13, `docs/PARITY.md` §1b)
+
+- 10-12 `18836314` .. `710dc27e` IsaacContrib-Franka-Pour on Metal: scene from Isaac's own assets, Isaac's coupled solver settings, MDP, rsl_rl 5.4.1 PPO transcription; term tests against Isaac's own code (`tests/test_franka_pour_terms.py`, `tests/franka_pour_isaac_ref.py`); Isaac-side stage scripts for the L4
+- 10-12 `29f1d563` / `58d3a48f` / `bc1ccb21` Complete resume state, STOP-file pause, cooperative training driver that yields to waiting GPU jobs
+- 10-12 `29993c78` / `496b79b9` / `783decdc` Throughput on this Mac at 2,048 envs (idle device: step 986, rollout 999, PPO loop 979 env-steps/s); `26a84032` 1,024 envs step 1,054 / loop 992 (L4: 317)
+- 10-12 `332e8523` Matched learning curve against Isaac on the L4 (1,024 envs, 60 iterations); `3a9973c3` 300-iteration run at 2,048 envs (14-inch)
+- 10-12 `fe3c1f2f` Opt-in MPM memory budgets (`mpm_grid_budget="measured"`, `mpm_cells_per_world`); overflow check once per PPO iteration
+- 10-13 `14c21348` / `4e7e7e6a` / `ab67bd2e` Deterministic evaluation of the iteration-299 policy (2,048 episodes: 0.477; the memory opt-ins give 0.470); why evaluation reads 0.48 and training 0.62 (reset distribution and episode counting)
+- 10-13 `6700b0f0` .. `b9fadc48` Seed study: 5 seeds ours at the matched configuration; Isaac's single run inside the prediction interval through iteration 49, about 0.06 ahead at 50-59 (verdict partial); `stage_pour_seeds.sh` for Isaac seeds 1-4 on the L4
+
+## Rendering: integration, coverage audit, render gaps (2026-10-12 .. 13, PRs #4, #5, #8, #9, #14, #15; PR #11 has its own section above)
+
+- 10-12 `e801135b` Render coverage audit: every simulated feature against what each renderer draws (`docs/RENDER_COVERAGE.md`)
+- 10-12 `1f105d40` / `fe0d3a3f` Appearance against MuJoCo's renderer: mesh normals (hard edges without duplicated vertices), SDF geoms, texture mapping, skybox, transparency, every light, spot / point shadows (RENDER_COVERAGE §3b)
+- 10-12 `b49b49b4` .. `2e58979d` Deformables, cables, tendons, skins and sites in every renderer and sensor; dynamic geometry in the ray tracers (`dyn_layout`: sbvh for sensors and tier 2, per_env for tier 1; merged tiles dropped) (§5)
+- 10-12 `9f50b997` .. `a40daac2` World extent (infinite planes, far plane, heightfield sides), per-env fields (size, colour, lights), camera models (fisheye), compact env grid (§3c)
+- 10-12 `ce277439` .. `765f2e9e` Newton → renderer bridge: Newton models, cloth / soft surfaces and free particles in every renderer (`docs/NEWTON_RENDER.md`)
+- 10-12 `aec7a87a` .. `ea73b0aa` MPM particles as render grains in tiers 2 and 0, two-level grain acceleration structures within Metal's limits (`metalsim/render/PARTICLES.md`); `3874a887` grain chunks of 2^24 - 1, 25 M-grain validation (14-inch); `51400b99` demo ground tint; `7247315c` / `00518447` 25 M-grain benchmark on the 16-inch with logs (`runs/sand25m_16in/`)
+- 10-13 `e518f849` / `77ac4136` Render gaps 2: rolling shutter, per-env texture pool, MuJoCo haze / fog, tendon catenary and limit colour, heightfield-side shadows; ray kernels specialized per scene (§3d)
+- 10-13 `1066e2de` / `94e51a8e` / `8908b20c` Transparent geoms in the ray-traced depth camera and lidar; true USD area lights in tier 2 and tier 1 (§3e; `research_notes/Render sensor fidelity/`)
+
+## MPM: parity close-out, step at scale, pins (2026-10-12, PR #1, `metalsim/physics/mpm/MPM.md` 8d-8h)
+
+- 10-12 `a0846756` / `2f90504f` Parity close-out: multi_material and ANYmal inside the L4's floor ensemble; Warp pin `43ffc6dd` (CUDA's warp.fem tiling, `metal_cuda_libm`) (8e)
+- 10-12 `3b219457` MPM step at 2,048 worlds: profile and four bitwise speedups, Newton `metalsim-1.5.2` pin `3fd1f052` (8f)
+- 10-12 `dbcbe80d` / `9dd55e0e` / `b2186c87` Warp pins `85b92466` (capture memory reuse, page fault fixed), `f0df4cf8`, `95f6f121` (tight warp.fem temporary pools; Franka-Pour 37.6 -> 34.5 GB at 2,048 worlds) (8g, 8h); `4badc782` deterministic coupled-solver contacts on Metal
+- 10-12 `41e564ec` / `b42a6aae` Setup pins the MuJoCo Warp fork commit (`cf0f8ad`, replaced by `f1b35e2` on 10-13) and keeps MuJoCo below 3.15
+- 10-12 `0588eb5c` / `64694223` Newton forks pinned with the 64-bit atomics protocols and rigid-scale ports; 2,048-world and deterministic timings of the 1.7-line ports (8d)
+
+## Tooling: GPU queue (2026-10-12)
+
+- 10-12 `8aaefa70` / `aa4b1bc9` Check jobs waiting over 10 minutes go ahead of timing jobs; no starvation; jobs refused on a runaway GPU (work with no owning process), queue paused and `runs/GPU_RUNAWAY_ALERT` written
 
 ## MPM, scalable determinism, rigid scale (2026-10-09 .. 11, `metalsim/physics/mpm/MPM.md`)
 
