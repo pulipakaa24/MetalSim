@@ -13,6 +13,9 @@
 #      push branch mpm-coupled-speed
 # Log: runs/mpm/coupled_speed/batch_08.log. Resumable (done markers in $R/b08/).
 set -u
+# commit identity for the fresh fork clones (the user's identity is set only in the metalsim repo's config)
+export GIT_AUTHOR_NAME="Aditya Pulipaka" GIT_AUTHOR_EMAIL="adipu@utexas.edu"
+export GIT_COMMITTER_NAME="Aditya Pulipaka" GIT_COMMITTER_EMAIL="adipu@utexas.edu"
 W=/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0
 R=$W/runs/mpm/coupled_speed
 B=$R/b08
@@ -64,7 +67,7 @@ if [ ! -f $B/forks_committed ]; then
   git -C $WF remote set-url origin https://github.com/pulipakaa24/warp.git
   git -C $WF fetch -q origin metalsim || stop "warp fetch"
   [ "$(git -C $WF rev-parse origin/metalsim)" = $OLD_W ] || stop "warp fork metalsim moved: $(git -C $WF rev-parse origin/metalsim)"
-  GIT_LFS_SKIP_SMUDGE=1 git -C $WF checkout -q -b metalsim origin/metalsim || stop "warp checkout"
+  GIT_LFS_SKIP_SMUDGE=1 git -C $WF checkout -q -B metalsim origin/metalsim || stop "warp checkout"
   git -C $WF apply $R/patches/warp_bsr_mv_tiles.diff || stop "warp patch"
   python3 $R/changes_row.py $WF $R/row_warp.txt || stop "warp changes row"
   git -C $WF add warp/config.py warp/_src/sparse.py METALSIM_CHANGES.md

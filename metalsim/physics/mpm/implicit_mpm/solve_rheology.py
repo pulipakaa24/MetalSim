@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: Copyright (c) 2025 The Newton Developers
 # SPDX-License-Identifier: Apache-2.0
-# Modified by MetalSim (Apache-2.0 section 4): vendored from pulipakaa24/newton @ 99843d09840f89ac16c82104ad66ae792e45eb91
+# Modified by MetalSim (Apache-2.0 section 4): vendored from pulipakaa24/newton @ addd10cbeb25e946b3a4c2bb1d4097acc7a98ca2
 # (newton/_src/solvers/implicit_mpm/solve_rheology.py) by scripts/vendor_mpm152.py; the only change is that relative imports leaving the package
 # (``from ...x import`` / ``from ..x import``) are rewritten to absolute ``newton._src`` imports. Do not edit:
 # change the fork, move the pin, and regenerate (metalsim/physics/mpm/MPM.md, section 11).
@@ -423,10 +423,14 @@ class _ListedRowsMv:
         self.beta = A.scalar_type(beta)
         self.x = _vec_array_view(x, A.scalar_type, expected_scalar_count=A.ncol * A.block_shape[1])
         self.y = _vec_array_view(y, A.scalar_type, expected_scalar_count=A.nrow * A.block_shape[0])
+        # Long rows (the body rows of IJtm: one block per collider node of the body) go through bsr_mv itself when it
+        # sums them with its tiled kernel (CUDA's choice, taken on Metal by Warp's ``metal_bsr_mv_tiles``): one thread
+        # per such row is latency-bound and its cost grows with the contact area. Same results as the full product.
+        self.full = _bsr_mv_uses_tiles(A)
         nrow = A.nrow
         self.rows = wp.empty(max(nrow, 1), dtype=int, device=device)
         self.count = wp.zeros(1, dtype=int, device=device)
-        if nrow > 0:
+        if nrow > 0 and not self.full:
             flags = wp.empty(nrow, dtype=int, device=device)
             positions = wp.empty(nrow, dtype=int, device=device)
             wp.launch(_bsr_nonempty_row_flags, dim=nrow, inputs=[A.offsets, A.row_counts, flags], device=device)
@@ -437,6 +441,9 @@ class _ListedRowsMv:
     def launch(self):
         A = self.A
         if A.nrow == 0:
+            return
+        if self.full:
+            sp.bsr_mv(A, x=self.x, y=self.y, alpha=self.alpha, beta=self.beta)
             return
         wp.launch(
             _bsr_mv_listed_rows,
@@ -456,6 +463,14 @@ class _ListedRowsMv:
             device=self.device,
             dim_limit=self.count,
         )
+
+
+def _bsr_mv_uses_tiles(A: sp.BsrMatrix) -> bool:
+    """Whether ``warp.sparse.bsr_mv`` computes ``A @ x`` with its tiled kernel on ``A``'s device (its default
+    heuristic: ``nnz * block_size > 2 * 64 * rows``; on Metal only with a Warp that takes CUDA's choice there)."""
+    device = A.values.device
+    tiles_ok = device.is_cuda or (getattr(device, "is_metal", False) and getattr(wp.config, "metal_bsr_mv_tiles", False))
+    return bool(tiles_ok and A.nnz * A.block_size > 2 * 64 * A.shape[0])
 
 
 def _listed_rows_mv_supported(A: sp.BsrMatrix) -> bool:

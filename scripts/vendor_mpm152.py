@@ -25,7 +25,7 @@ import sys
 import tarfile
 import urllib.request
 
-PIN = "99843d09840f89ac16c82104ad66ae792e45eb91"
+PIN = "addd10cbeb25e946b3a4c2bb1d4097acc7a98ca2"
 REPO = "https://github.com/pulipakaa24/newton"
 SRC_DIR = "newton/_src/solvers/implicit_mpm"
 ROOT = pathlib.Path(__file__).resolve().parents[1]
