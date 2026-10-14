@@ -4,13 +4,17 @@ the solver Hessian's Cholesky in registers (Warp fork ``metal_register_cholesky_
 G1's 43 dofs no longer take the barrier-per-column path) and M / M - dt*D factored by MuJoCo Warp's
 tree-sparse L'DL instead of a dense tile Cholesky (``m_dense_max`` 0). Same matrices, different arithmetic:
 the physics must still match MuJoCo C step for step to float noise, as the dense path does."""
+import os
 import mujoco
 import numpy as np
 import pytest
 import torch
 import warp as wp
 
-pytestmark = pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal")
+from metalsim.learn.g1_velocity import G1_USD as _G1_USD  # noqa: E402
+
+pytestmark = [pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal"),
+              pytest.mark.skipif(not os.path.exists(_G1_USD), reason="needs Isaac's g1_minimal.usd (scripts/fetch_isaac_assets.sh)")]
 
 
 @pytest.fixture(scope="module")

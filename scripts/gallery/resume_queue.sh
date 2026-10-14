@@ -1,6 +1,6 @@
 #!/bin/bash
 # GPU queue after the pause: stage videos -> fixed-PPO demonstration run -> replay re-render (+compare).
-cd /Users/aditya/robosim
+cd "$(dirname "$0")/../.."   # repo root
 bash scripts/gallery/g1_stage_videos.sh > runs/g1_stage_videos.log 2>&1
 while [ -e runs/.gpu_lock ]; do sleep 30; done
 echo "g1_flat_ppowarp_fixed (main session) $(date)" > runs/.gpu_lock; trap "rm -f runs/.gpu_lock" EXIT

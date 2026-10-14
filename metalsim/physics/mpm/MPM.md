@@ -1117,18 +1117,20 @@ repeats bitwise in all 12 multi-world configurations of `probes/multiworld_repea
     28.3 mm / 8.0 mm/s; friction 0.3: 74.2 mm (bearing failure, as predicted), 1.2: 14.2 mm / 11.6 mm/s. Drop from
     0.15 m: peak 38.8 mm, creep 8.7 mm/s (dt 1/240: 31.7 mm, 4.1 mm/s). The residual creep follows the rheology solve's
     convergence (an under-converged solve delivers a fraction alpha of the stopping impulse and drifts at
-    (1 - alpha) / alpha g dt): bodies resting on sand need a converged solve (Isaac's default is 250 iterations,
-    tolerance 1e-4; batch 04 measures it). Staggered in batch 03: 80 mm (the floor) in drop and rest.
+    (1 - alpha) / alpha g dt): bodies resting on sand need a converged solve. With Isaac's default solve (batch 04, 250
+    iterations, tolerance 1e-4; `runs/mpm_main/bearing4/`): rest 10.2 mm / 0.4 mm/s, drop from 0.15 m 29.8 mm peak,
+    28.6 mm final, creep 1.3 mm/s (tolerance 1e-6: identical), against an expected 10-25 mm. Staggered in batch 03:
+    80 mm (the floor) in drop and rest.
 * **Angle of repose** (research `research_notes/MPM in main simulator/angle_of_repose.md`; `probes/repose_lift.py`, runs
   `runs/mpm_main/repose3/`). Lifted-cylinder test: tube R = 5 cm (mocap, frictionless towards the sand), fill 5 cm, rough
   floor (friction 1.0), column-maximum surface fit in 8 sectors (30.0 deg on a synthetic 30 deg cone). The solver's
   yield surface is sqrt(J2) <= mu p, so the reference is atan(mu). Measured (fit mean, sector sd 0.0-0.4 deg):
 
-  | mu (atan mu) | R/dx 5 | R/dx 10 | R/dx 15 |
-  |---|---|---|---|
-  | 0.40 (21.8 deg) | | 14.7 | |
-  | 0.68 (34.2 deg) | 25.4 | 26.3 | 27.2 |
-  | 0.90 (42.0 deg) | | 32.6 | |
+  | mu (atan mu) | R/dx 5 | R/dx 10 | R/dx 15 | R/dx 20 |
+  |---|---|---|---|---|
+  | 0.40 (21.8 deg) | | 14.7 | | |
+  | 0.68 (34.2 deg) | 25.4 | 26.3 | 27.2 | 27.8 |
+  | 0.90 (42.0 deg) | | 32.6 | | |
 
   Lift speed 1.25 / 2.5 / 5 cm/s at R/dx 10: 26.6 / 26.3 / 25.4 deg (plateau within 0.3 deg below 2.5 cm/s); 4x the
   iterations: 26.6 deg. The angle rises monotonically with resolution (+0.9 deg per refinement) and with friction
@@ -1136,7 +1138,8 @@ repeats bitwise in all 12 multi-world configurations of `probes/multiworld_repea
   also stop at or below atan(mu) (Dunatunga & Kamrin 2015), and on a slope this cone can yield below the simple-shear
   stopping angle whenever the lateral stresses differ from the vertical one; the remaining gap to physical sand
   (repose ~ the friction angle) is a property of the solver Isaac Lab ships, not of the coupling. Not yet converged in
-  resolution (R/dx 30 is the next step).
+  resolution: +0.9 / +0.6 deg per step from R/dx 10 to 15 to 20 (batch 04: 27.8 deg with 658,080 particles,
+  `runs/mpm_main/repose4/`), shrinking, so the converged angle stays several degrees below atan(mu).
 
 ### Re-vendoring when the fork pin moves
 

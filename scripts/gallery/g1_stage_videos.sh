@@ -1,7 +1,7 @@
 #!/bin/bash
 # Side-by-side stage videos (Isaac RTX | MetalSim tier 2) for Isaac's rsl_rl checkpoints and MetalSim's
 # own, each rolled out in both simulators from the same state and command. Holds the GPU lock.
-cd /Users/aditya/robosim
+cd "$(dirname "$0")/../.."   # repo root
 :
 :
 P=runs/parity/isaac/parity_out/play; C=runs/parity/isaac/ckpt_out; M=runs/policies

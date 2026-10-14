@@ -5,11 +5,14 @@ Model fields against the live recording (runs/parity3/isaac/newton_mjwarp_settin
 iteration cap: MuJoCo Warp exits each world at the tolerance, so a lower cap gives the same state whenever no world
 reaches it."""
 import json
+import pathlib
 
 import mujoco
 import numpy as np
 import pytest
 import warp as wp
+
+ROOT = pathlib.Path(__file__).resolve().parents[1]
 
 from metalsim.learn.g1_velocity import build_g1_model
 from metalsim.physics import solver_presets
@@ -23,9 +26,9 @@ def test_isaaclab3_model_fields_match_the_recording():
     m, _ = build_g1_model("flat", physics_dt=0.0025)
     contact_tuning.apply(m, "recommended")          # the task applies its contact_cfg first: the preset must override all of it
     solver_presets.apply(m, "isaaclab3")
-    lim = json.load(open("runs/parity3/isaac/fidelity/newton_mjwarp/meta.json"))["newton"]["mjw_model_joint_actuator"]["jnt_solimp"]["first_world"]
+    lim = json.load(open(ROOT / "runs/parity3/isaac/fidelity/newton_mjwarp/meta.json"))["newton"]["mjw_model_joint_actuator"]["jnt_solimp"]["first_world"]
     np.testing.assert_allclose(m.jnt_solimp, np.tile(np.array(lim)[0], (m.njnt, 1)), rtol=1e-6)   # one row for every joint
-    rs = json.load(open("runs/parity3/isaac/fidelity/newton_mjwarp/meta.json"))["newton"]["mjw_model_joint_actuator"]["jnt_solref"]["first_world"]
+    rs = json.load(open(ROOT / "runs/parity3/isaac/fidelity/newton_mjwarp/meta.json"))["newton"]["mjw_model_joint_actuator"]["jnt_solref"]["first_world"]
     np.testing.assert_allclose(m.jnt_solref[0], np.array(rs)[0], rtol=1e-4)                     # free joint (per-name loop below)
     rec = json.load(open(solver_presets.ISAACLAB3_SETTINGS))
     assert m.opt.iterations == rec["solver"]["iterations"] == 100 and m.opt.ls_iterations == rec["solver"]["ls_iterations"] == 50
@@ -168,7 +171,7 @@ def test_g1_actuator_and_joint_fields_match_newtons_model():
     the joint's actuatorfrcrange. MetalSim's single affine actuator is the same sum; the effort limit is on the joint too
     (build_g1_model effort_limit="joint"; "actuator" = the archived layout)."""
     import re
-    X = open("runs/parity3/isaac/fidelity/newton_mjwarp/newton_generated.xml").read()
+    X = open(ROOT / "runs/parity3/isaac/fidelity/newton_mjwarp/newton_generated.xml").read()
     m, _ = build_g1_model("flat", physics_dt=0.0025)
     for a in range(m.nu):
         j = m.actuator_trnid[a][0]; nm = mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_JOINT, j)

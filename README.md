@@ -261,14 +261,21 @@ python.org's, Homebrew's or `uv python install 3.12`), [uv](https://docs.astral.
 
 ```
 git clone https://github.com/pulipakaa24/MetalSim && cd MetalSim
-python3.12 -m venv .venv && source .venv/bin/activate     # uv only: $(uv python find 3.12) -m venv .venv
-pip install -e ".[test]"
-scripts/setup_warp.sh
+python3.12 -m venv .venv && source .venv/bin/activate     # uv only: "$(uv python find 3.12)" -m venv .venv
+pip install -e ".[test,newton]"            # newton: MPM in BatchSim scenes (Newton 1.7) and the Newton engine
+scripts/setup_warp.sh                      # replaces PyPI's warp-lang with the Warp fork (upstream/warp-metalsim)
 pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@f1b35e2b3ddc80b197b0c665bf6d71523d175daf#egg=mujoco-warp" "mujoco>=3.14,<3.15"
-scripts/fetch_isaac_assets.sh              # NVIDIA's g1_minimal.usd, fetched from NVIDIA, not redistributed
+scripts/fetch_isaac_assets.sh              # NVIDIA's G1 and Franka-Pour assets, fetched from NVIDIA, not redistributed
+git clone --depth 1 https://github.com/google-deepmind/mujoco_menagerie upstream/mujoco_menagerie   # robot models
 pytest tests -q
-scripts/setup_newton152.sh                 # optional: MPM (.venv-newton152; tests/test_mpm.py runs there)
+scripts/setup_newton152.sh                 # optional: MPM and Franka-Pour (.venv-newton152; tests/test_mpm.py runs there)
+scripts/fetch_polyhaven_assets.sh demo     # optional: HDRI and sand texture of the ANYmal-on-sand render demo
 ```
+
+Every command runs from the repository root, which can be anywhere (any user, any directory name, spaces included);
+nothing in the code, tests or scripts assumes the author's machine (`tests/test_no_machine_paths.py` checks it). The
+model and asset locations can be moved with `MENAGERIE` (default `upstream/mujoco_menagerie`) and `POLYHAVEN` (default
+`assets/polyhaven`). The first steps of each demo, at small scale, are in [`docs/GUIDE.md`](docs/GUIDE.md) section 2.
 
 The MuJoCo Warp commit is pinned (the head of the fork's branch `metalsim` on 2026-10-13), as Warp's in
 `scripts/setup_warp.sh` and Newton's in `pyproject.toml`. Without access to the fork: clone
