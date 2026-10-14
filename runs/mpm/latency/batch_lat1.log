@@ -1,0 +1,58 @@
+== Tue Oct 13 20:47:15 PDT 2026 batch_lat1 start
+20:47 waiting for batch_10.sh
+20:49 waiting for batch_10.sh
+20:51 waiting for batch_10.sh
+20:53 waiting for batch_10.sh
+20:55 waiting for batch_10.sh
+20:57 waiting for batch_10.sh
+20:59 waiting for batch_10.sh
+21:01 waiting for batch_10.sh
+21:03 waiting for batch_10.sh
+21:05 waiting for batch_10.sh
+21:07 waiting for batch_10.sh
+21:09 waiting for batch_10.sh
+21:11 waiting for batch_10.sh
+21:13 waiting for batch_10.sh
+21:15 waiting for batch_10.sh
+FAIL: lat_tiled_ijtm exit 1 (/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/latency/lat1/tiled_ijtm.log)
+warp_bsr_mv_tiled    bitwise True    20.95 us per launch
+copy_u1              bitwise True    19.05 us per launch
+unroll_u4            bitwise False    14.78 us per launch
+unroll_u8            bitwise False    13.95 us per launch
+FAIL (a variant differs)
+FAIL: lat_tiled_wide exit 1 (/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/latency/lat1/tiled_wide.log)
+warp_bsr_mv_tiled    bitwise True   120.97 us per launch
+copy_u1              bitwise True   110.40 us per launch
+unroll_u4            bitwise False   105.14 us per launch
+unroll_u8            bitwise True   105.22 us per launch
+FAIL (a variant differs)
+{"colors": 8, "launch_threads": 5120, "strain_nodes": 21250, "us_per_color_pass": 16.612109357083682, "us_contact_solve": 15.268750212271698, "us_empty_dispatch_1_thread": 8.90832488948945, "us_empty_dispatch_pass_width": 5.289574983180501, "us_chain_per_pass": 11.322534373903181, "scene": "example:mpm_anymal"}
+colour 0: {'blocks': 2719, 'nodes': 2719, 'nodes_per_block_min': 1, 'nodes_per_block_median': 1.0, 'nodes_per_block_max': 1, 'threads_busy': 2719}
+{"colors": 8, "launch_threads": 5120, "strain_nodes": 20404, "us_per_color_pass": 16.18854062144237, "us_contact_solve": 46.057299914537, "us_empty_dispatch_1_thread": 5.249999958323315, "us_empty_dispatch_pass_width": 4.123949838685803, "us_chain_per_pass": 12.064590782756568, "scene": "example:mpm_twoway_coupling"}
+colour 0: {'blocks': 2630, 'nodes': 2630, 'nodes_per_block_min': 1, 'nodes_per_block_median': 1.0, 'nodes_per_block_max': 1, 'threads_busy': 2630}
+{"colors": 8, "launch_threads": 5120, "strain_nodes": 9349, "us_per_color_pass": 15.183137520580203, "us_contact_solve": 10.829162602021825, "us_empty_dispatch_1_thread": 4.0708247979637235, "us_empty_dispatch_pass_width": 9.537500045553315, "us_chain_per_pass": 5.645637475026888, "scene": "example:mpm_granular"}
+colour 0: {'blocks': 1278, 'nodes': 1278, 'nodes_per_block_min': 1, 'nodes_per_block_median': 1.0, 'nodes_per_block_max': 1, 'threads_busy': 1278}
+robot_graph           6671.6 us/replay    588.0 dispatches   11.35 us/dispatch
+newton_step           1718.5 us/replay    145.0 dispatches   11.85 us/dispatch
+mjw_step              1518.4 us/replay    137.0 dispatches   11.08 us/dispatch
+fwd_position           599.2 us/replay     68.0 dispatches    8.81 us/dispatch
+fwd_velocity            70.3 us/replay     16.0 dispatches    4.40 us/dispatch
+fwd_actuation           19.0 us/replay      4.0 dispatches    4.74 us/dispatch
+fwd_acceleration        29.7 us/replay      3.0 dispatches    9.90 us/dispatch
+solve                  520.9 us/replay     28.0 dispatches   18.60 us/dispatch
+integrate               72.8 us/replay     11.0 dispatches    6.62 us/dispatch
+stage sum 1311.9 us; mjw_step 1518.3531249931548
+robot_graph           6545.0 us/replay    588.0 dispatches   11.13 us/dispatch
+newton_step           1668.7 us/replay    145.0 dispatches   11.51 us/dispatch
+mjw_step              1563.7 us/replay    137.0 dispatches   11.41 us/dispatch
+fwd_position           595.5 us/replay     68.0 dispatches    8.76 us/dispatch
+fwd_velocity            70.4 us/replay     16.0 dispatches    4.40 us/dispatch
+fwd_actuation           19.0 us/replay      4.0 dispatches    4.74 us/dispatch
+fwd_acceleration        29.4 us/replay      3.0 dispatches    9.79 us/dispatch
+solve                  516.6 us/replay     28.0 dispatches   18.45 us/dispatch
+integrate               74.2 us/replay     11.0 dispatches    6.74 us/dispatch
+stage sum 1305.0 us; mjw_step 1563.731040005223
+done: 200 frames, 453871 particles, 7.65 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+device utilization mean 15.175675675675675, >=90 % in 0.15315315315315314 of samples
+done: 100 frames, 486416 particles, 26.01 s, iters mean None max None, init c604d945d3dd10b97e4b5496235af320
+device utilization mean 5.784313725490196, >=90 % in 0.0 of samples
