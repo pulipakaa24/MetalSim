@@ -33,11 +33,14 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest", "pytest-xdist", "pillow", "imageio", "scipy", "trimesh"]   # trimesh: Isaac's terrain reference code in tests/
+test = ["pytest", "pytest-xdist", "pillow", "imageio", "scipy", "trimesh",   # trimesh: Isaac's terrain reference code in tests/
+        "materialx"]   # MaterialX: tests/test_materialx.py (macOS arm64 wheels for CPython 3.9-3.14)
 learn = ["gymnasium", "stable-baselines3"]
 # the reference learner on MetalSim physics (metalsim.learn.train_g1_rslrl)
 rslrl = ["rsl-rl-lib==3.1.2", "tensordict"]
 tron1 = ["scipy", "onnxruntime"]
+# everything the test suite imports in .venv (zero optional-package skips): the documented install uses it
+full = ["metalsim[test,newton,rslrl,tron1]"]
 # fidelity protocol against an Isaac recording and the render-fidelity benchmark (metalsim.parity, metalsim.bench)
 parity = ["imageio", "imageio-ffmpeg", "pillow", "scikit-image", "lpips", "flip-evaluator"]
 # Newton XPBD engine (experimental, archived): the upstream commit the validation runs pinned (newton-physics/newton
