@@ -107,6 +107,17 @@ def resolve(cfg: C.SceneCfg, p: str | None) -> str | None:
     return os.path.join(cfg.base_dir or ROOT, p)
 
 
+def have_file(cfg: C.SceneCfg, p: str | None, what: str) -> bool:
+    """True if the config file ``p`` exists; else warns (the scene falls back to a plain colour / no dome)."""
+    if not p:
+        return False
+    if os.path.exists(resolve(cfg, p)):
+        return True
+    import warnings
+    warnings.warn(f"{what} {p!r} not found (Poly Haven: scripts/fetch_polyhaven_assets.sh train): left out")
+    return False
+
+
 def mount_body(prim_path: str) -> str | None:
     """Body a sensor is mounted on from an Isaac prim path: "{ENV_REGEX_NS}/Robot/<link>/<name>" -> link;
     "{ENV_REGEX_NS}/<object>/<name>" -> object; "{ENV_REGEX_NS}/<name>" (or "/World/...") -> None (world-fixed)."""
@@ -161,6 +172,9 @@ def _load_robot(cfg: C.SceneCfg, info: SpecInfo):
     for k in list(spec.keys):
         if key is None and (kname is None or k.name == kname):
             key = k
+    for j in spec.joints:
+        if j.type == mujoco.mjtJoint.mjJNT_FREE and not j.name:
+            j.name = f"{j.parent.name or 'robot'}_freejoint"
     m0 = spec.compile()
     if key is not None and len(key.qpos):
         q = np.asarray(key.qpos, float)
@@ -197,7 +211,7 @@ def _material(spec, name, vm: C.PreviewSurfaceCfg | None, cfg):
         return None
     m = spec.add_material(name=name, rgba=[*vm.diffuse_color[:3], 1.0])
     m.roughness, m.metallic = float(vm.roughness), float(vm.metallic)
-    if vm.texture_file:
+    if have_file(cfg, vm.texture_file, "texture"):
         path = resolve(cfg, vm.texture_file)
         spec.add_texture(name=name + "_tex", type=mujoco.mjtTexture.mjTEXTURE_2D, file=path)
         m.textures[mujoco.mjtTextureRole.mjTEXROLE_RGB] = name + "_tex"
@@ -249,7 +263,7 @@ def build_spec(cfg: C.SceneCfg):
     if bg.ground is not None:
         g = bg.ground
         mat = None
-        if g.texture_file:
+        if have_file(cfg, g.texture_file, "ground texture"):
             path = resolve(cfg, g.texture_file)
             spec.add_texture(name="ground_tex", type=mujoco.mjtTexture.mjTEXTURE_2D, file=path)
             m = spec.add_material(name="ground_mat", rgba=[*g.color[:3], 1.0], texrepeat=[g.texture_repeat] * 2,
@@ -274,7 +288,7 @@ def build_spec(cfg: C.SceneCfg):
                                      dir=list(d), diffuse=list(np.asarray(lc.color) * min(lc.intensity, 1.0)),
                                      castshadow=True)
         spec.visual.headlight.active = 0
-    if bg.dome is not None and bg.dome.texture_file:
+    if bg.dome is not None and have_file(cfg, bg.dome.texture_file, "dome HDRI"):
         info.assets.append(resolve(cfg, bg.dome.texture_file))
     # objects
     for name, oc in cfg.objects.items():
@@ -453,7 +467,7 @@ class ComposedScene:
             A, t = splat_transform(bg.splat.transform)
             self.splats = load_scene(resolve(cfg, bg.splat.path), A, t, crop=bg.splat.crop, log=self.log)
         hdr = None
-        if bg.dome is not None and bg.dome.texture_file:
+        if bg.dome is not None and have_file(cfg, bg.dome.texture_file, "dome HDRI"):
             from metalsim.render.hdr import load_hdr
             hdr = load_hdr(resolve(cfg, bg.dome.texture_file)) * float(bg.dome.intensity)
         for name, cc in cfg.cameras.items():

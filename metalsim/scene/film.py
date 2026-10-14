@@ -80,6 +80,8 @@ def film(cfg: C.SceneCfg, out: str, stages=("record", "render", "encode", "doc")
     from metalsim.render.film import render as RR
 
     task = film_task(cfg)
+    from metalsim.render.film.preflight import check
+    check(task, list(stages))                    # before recording: the render / encode stages can run
     rec = os.path.join(out, "rec")
     if "record" in stages:
         R.record(task, task.film, task.viewer, rec, None)
