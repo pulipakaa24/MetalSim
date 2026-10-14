@@ -1,6 +1,6 @@
 #!/bin/bash
 # Wait for the Isaac-side playback of the fixed-PPO checkpoints, fetch it from the L4 machine ($L4_HOST), render round-two videos.
-cd /Users/aditya/robosim
+cd "$(dirname "$0")/../.."   # repo root
 G="ssh ${L4_HOST:?set L4_HOST to the L4 machine ssh host}"
 until $G 'test -f ~/STAGE9_DONE' > /dev/null 2>&1; do sleep 60; done
 echo "stage9 done $(date +%H:%M:%S)"

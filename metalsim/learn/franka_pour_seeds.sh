@@ -2,8 +2,9 @@
 # Franka-Pour seed study: the matched 1,024-env, 60-iteration configuration (PARITY.md §1b.5) for the given seeds,
 # one queued `train` job per seed, each under scripts/watchdog.py. Learning runs only (no timing claims).
 #   franka_pour_seeds.sh QUEUE_CHECKOUT PYTHON WORKDIR SEED...
-#   e.g. metalsim/learn/franka_pour_seeds.sh ~/metalsim-fresh/MetalSim ~/metalsim-fresh/MetalSim/.venv-newton152/bin/python \
-#        ~/metalsim-fresh/agents/pour 1 2
+#   QUEUE_CHECKOUT: the checkout whose GPU queue (scripts/gpu_run.sh) the jobs go through; WORKDIR: the checkout whose
+#   code runs and where runs/franka_pour/seeds/ is written (it may be the same checkout). From a checkout's root, e.g.
+#   metalsim/learn/franka_pour_seeds.sh "$PWD" "$PWD/.venv-newton152/bin/python" "$PWD" 1 2
 set -u
 Q=$1; PY=$2; W=$3; shift 3
 mkdir -p "$W/runs/franka_pour/seeds"

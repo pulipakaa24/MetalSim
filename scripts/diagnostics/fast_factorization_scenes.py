@@ -32,7 +32,7 @@ def scenes():
     from metalsim.learn.tron1_wf import build_train_model
     from metalsim.tron1.sim import build_model
     from metalsim.tron1.realism import SimParams
-    men = os.path.join(ROOT, "upstream", "mujoco_menagerie")
+    men = os.environ.get("MENAGERIE", os.path.join(ROOT, "upstream", "mujoco_menagerie"))
     tron_f = ("body_mass", "body_ipos", "body_inertia", "geom_friction", "actuator_gainprm", "actuator_biasprm", "dof_frictionloss")
     return {   # name: (model factory, the scene's BatchSimOptions kwargs)
         "cartpole_rgb": (lambda: mujoco.MjModel.from_xml_string(CARTPOLE_XML), dict(substeps=2, njmax=32)),

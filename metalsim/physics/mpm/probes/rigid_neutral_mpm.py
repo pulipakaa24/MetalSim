@@ -5,7 +5,8 @@ trajectory when an MPM scene was built and stepped earlier in the same process?
     python rigid_neutral_mpm.py --mode after-mpm --json B.json  # an MPMCoupling scene first, then the same rigid run
     python rigid_neutral_mpm.py --compare A.json A2.json B.json  # A vs A2: run-to-run baseline; A vs B: neutrality
 
-Rigid scenes: a free box tumbling on a floor (contacts) and, when MuJoCo Menagerie is present, the Franka panda with
+Rigid scenes: a free box tumbling on a floor (contacts) and, when MuJoCo Menagerie is present ($MENAGERIE, default
+<repo>/upstream/mujoco_menagerie), the Franka panda with
 seeded random controls; N = 4 worlds, 200 steps, captured graphs (BatchSim defaults). Records a hash of qpos / qvel
 every 20 steps and the hash of every loaded MuJoCo Warp kernel module (code + compile options).
 """
@@ -31,11 +32,10 @@ def scenes():
     import mujoco
 
     out = [("box", mujoco.MjModel.from_xml_string(BOX))]
-    for cand in (ROOT / "upstream/mujoco_menagerie/franka_emika_panda/scene.xml",
-                 pathlib.Path("/Users/aditya/robosim/upstream/mujoco_menagerie/franka_emika_panda/scene.xml")):
-        if cand.exists():
-            out.append(("panda", mujoco.MjModel.from_xml_path(str(cand))))
-            break
+    menagerie = pathlib.Path(os.environ.get("MENAGERIE", ROOT / "upstream" / "mujoco_menagerie"))
+    cand = menagerie / "franka_emika_panda" / "scene.xml"
+    if cand.exists():
+        out.append(("panda", mujoco.MjModel.from_xml_path(str(cand))))
     return out
 
 

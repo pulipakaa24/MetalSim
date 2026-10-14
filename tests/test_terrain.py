@@ -296,7 +296,9 @@ def test_height_scan_ray_order_matches_isaac_recording():
     import glob, json, mujoco
     from metalsim.learn.terrain import height_scan_grid, scan_grid
     from metalsim.learn.g1_velocity import build_g1_model
-    metas = sorted(glob.glob("runs/parity/isaac/rough/play_rough/L*/isaac_it500/meta.json"))
+    import os
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    metas = sorted(glob.glob(os.path.join(root, "runs/parity/isaac/rough/play_rough/L*/isaac_it500/meta.json")))
     if not metas:
         pytest.skip("Isaac recording not present (runs/parity/isaac/rough/play_rough)")
     hf = isaac_rough_terrain(seed=0)

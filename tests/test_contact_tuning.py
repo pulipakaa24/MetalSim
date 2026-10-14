@@ -45,7 +45,13 @@ def test_elliptic_presets_set_cone_and_impratio():
         s = mujoco.MjSpec.from_string(XML); ct.apply(s, f"tau10_impact_hardlimits_ellip{imp}"); m2 = s.compile()
         assert m2.opt.cone == mujoco.mjtCone.mjCONE_ELLIPTIC and m2.opt.impratio == imp
     # the G1 task's builder applies the preset through contact_cfg; check the model it would build (CPU, no GPU)
-    from metalsim.learn.g1_velocity import build_g1_model
+    import os
+
+    import pytest
+
+    from metalsim.learn.g1_velocity import G1_USD, build_g1_model
+    if not os.path.exists(G1_USD):
+        pytest.skip("needs Isaac's g1_minimal.usd (scripts/fetch_isaac_assets.sh)")
     g1m, _ = build_g1_model("flat", physics_dt=0.0025); ct.apply(g1m, "tau10_impact_hardlimits_ellip10")
     assert g1m.opt.cone == mujoco.mjtCone.mjCONE_ELLIPTIC and g1m.opt.impratio == 10.0
     assert np.allclose(g1m.geom_solref, [0.01, 1.0]) and np.allclose(g1m.geom_solimp[:, :3], [0.9, 0.999, 0.005])
