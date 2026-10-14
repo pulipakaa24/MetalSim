@@ -141,7 +141,21 @@ sync in the loop.
 independent float64 reference (`reference.py`; written by `scripts/splat_bench.py verify` + `md`):
 
 <!-- splat-bench:begin -->
-Not measured yet on this branch: filled by `scripts/splat_bench.py md` from the verify / bench runs.
+**Verification** (InteriorGS 0204_840158, 972,596 splats; 8 views at 640x360, HFOV 88.9; Apple M4 Max, 64 GB, macOS 26.7.1; 2026-10-14 00:16:52; `scripts/splat_bench.py verify`)
+
+| | PSNR dB | SSIM | pixels > 1 level | max level diff | median depth abs err | median-depth valid agree | expected depth p99 rel err | alpha max err |
+|---|---|---|---|---|---|---|---|---|
+| worst over views | **58.9** | **0.99995** | 0.0148 % | 7 | 4.5e-07 m (p99 1.6e-06 m) | 100.00 % | 6.5e-05 | 0.0084 |
+| mean | 58.9 | 0.99998 | 0.0036 % | — | — | — | — | — |
+
+**Throughput** (InteriorGS 0204_840158, 972,596 splats; 640x360, HFOV 88.9; Apple M4 Max, 64 GB, macOS 26.7.1; 2026-10-14 00:00:40; `scripts/gpu_run.sh splat_bench timing -- python scripts/splat_bench.py bench`; 20 frames back to back, best of 3)
+
+| cameras | ms / frame | ms / camera | cameras / s | sub-batch | records | keys | stage ms (one profiled frame) |
+|---|---|---|---|---|---|---|---|
+| 1 | 0.68 | 0.684 | **1462.9** | 1 | 28,861 | 123,089 | cams 0.0, cull 0.05, scan_records 0.01, project 0.1, scan_keys 0.01, emit 0.1, sort 0.15, blend 0.25 |
+| 8 | 3.46 | 0.433 | **2309.1** | 8 | 892,560 | 2,064,279 | cams 0.0, cull 0.07, scan_records 0.01, project 0.38, scan_keys 0.04, emit 0.18, sort 0.52, blend 2.32 |
+| 32 | 16.24 | 0.507 | **1970.9** | 32 | 4,231,787 | 10,022,826 | cams 0.0, cull 0.18, scan_records 0.01, project 1.69, scan_keys 0.11, emit 0.62, sort 3.53, blend 10.18 |
+| 64 | 31.55 | 0.493 | **2028.3** | 32 | 9,164,023 | 20,695,485 | cams 0.0, cull 0.37, scan_records 0.02, project 2.96, scan_keys 0.24, emit 1.24, sort 6.8, blend 19.49 |
 <!-- splat-bench:end -->
 
 The differences come from float32 vs float64 arithmetic, half-precision colour/opacity storage and fast-math `exp`. On
@@ -192,7 +206,19 @@ Quality is PSNR against the default renderer, timing is GPU ms per frame for 16 
 (robot-camera views, 640×360), written by `scripts/splat_bench.py options` + `md`:
 
 <!-- splat-options:begin -->
-Not measured yet on this branch: filled by `scripts/splat_bench.py md` from the options run.
+(InteriorGS 0204_840158, 16 cameras at 640x360; Apple M4 Max, 64 GB, macOS 26.7.1; 2026-10-14 00:00:47; `scripts/splat_bench.py options`, 20 frames back to back, best of 3)
+
+| option | splats | PSNR vs default, mean (min) dB | GPU ms / frame (16 cameras) |
+|---|---|---|---|
+| default | 972,596 | — | 8.47 |
+| depth key 16 bit | 972,596 | 54.5 (49.5) | 8.14 (-4 %) |
+| no subtile masks | 972,596 | identical | 10.05 (+19 %) |
+| blend 2 px/thread | 972,596 | identical | 7.94 (-6 %) |
+| SH degree 0 | 972,596 | 29.3 (26.3) | 8.28 (-2 %) |
+| SH degree 1 | 972,596 | 32.7 (29.2) | 8.32 (-2 %) |
+| antialiased forced on | 972,596 | 22.7 (17.1) | 7.57 (-11 %) |
+| crop: none | 972,596 | identical | 8.52 (+1 %) |
+| crop: tight (q1-99 box + 10 %) | 972,478 | 68.2 (51.2) | 8.54 (+1 %) |
 <!-- splat-options:end -->
 
 | option | verdict | how to re-enable |
