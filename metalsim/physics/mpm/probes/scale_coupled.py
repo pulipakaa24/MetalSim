@@ -39,7 +39,7 @@ def build(a):
     from metalsim.physics.mpm.coupled import SAND, GridEmitter, MPMConfig, MPMCoupling
 
     model = mujoco.MjModel.from_xml_string(XML.format(dt=1.0 / 120.0 / 3))
-    sim = BatchSim(model, a.worlds, options=BatchSimOptions(substeps=3, deterministic=bool(a.deterministic)))
+    sim = BatchSim(model, a.worlds, options=BatchSimOptions(substeps=3, deterministic=bool(getattr(a, "deterministic", 0))))
     if a.rigid_only:
         return sim, None
     mpm = MPMCoupling(sim, MPMConfig(voxel_size=a.voxel, max_iterations=a.iterations, solver=a.solver,
