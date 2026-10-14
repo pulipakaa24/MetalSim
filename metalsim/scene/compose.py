@@ -510,8 +510,9 @@ class ComposedScene:
                 el = np.linspace(p.vertical_fov_range[0], p.vertical_fov_range[1], int(p.channels))
                 az = np.arange(p.horizontal_fov_range[0], p.horizontal_fov_range[1], p.horizontal_res)
                 A_, E_ = np.meshgrid(az, el)
+                # name=: the outputs of trace / trace_host are keyed by it (Lidar's default name is "lidar")
                 self.lidars[name] = self._rt.make_lidar(name, np.deg2rad(A_.ravel()).astype(np.float32),
-                                                         np.deg2rad(E_.ravel()).astype(np.float32))
+                                                         np.deg2rad(E_.ravel()).astype(np.float32), name=name)
 
     def host_datas(self):
         return [self.sim.get_world(e) for e in range(self.n)]
