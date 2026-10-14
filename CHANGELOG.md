@@ -42,6 +42,7 @@ for the full messages). Dates are the commit dates (month-day).
 - 10-12 `fe3c1f2f` Opt-in MPM memory budgets (`mpm_grid_budget="measured"`, `mpm_cells_per_world`); overflow check once per PPO iteration
 - 10-13 `14c21348` / `4e7e7e6a` / `ab67bd2e` Deterministic evaluation of the iteration-299 policy (2,048 episodes: 0.477; the memory opt-ins give 0.470); why evaluation reads 0.48 and training 0.62 (reset distribution and episode counting)
 - 10-13 `6700b0f0` .. `b9fadc48` Seed study: 5 seeds ours at the matched configuration; Isaac's single run inside the prediction interval through iteration 49, about 0.06 ahead at 50-59 (verdict partial); `stage_pour_seeds.sh` for Isaac seeds 1-4 on the L4
+- 10-13 Isaac seeds 1 and 2 on two L4 machines (`fingerprint.sh` gate against the seed-0 setup): 5 seeds ours vs 3 Isaac's, no window differs through iteration 49, 50-59 success 0.376 vs 0.411 (Welch p = 0.09); verdict still partial, the gap is at most ~0.04
 
 ## Rendering: integration, coverage audit, render gaps (2026-10-12 .. 13, PRs #4, #5, #8, #9, #14, #15; PR #11 has its own section above)
 
