@@ -107,3 +107,19 @@ def test_nurec_lounge_decode(tmp_path, monkeypatch):
     assert np.isfinite(c.means).all() and np.allclose(np.linalg.norm(c.quats, axis=1), 1, atol=1e-3)
     s = prepare(c, **QUIET)
     assert s.n > 0.9 * c.n
+
+
+def test_fetch_script_explains_missing_login(tmp_path):
+    """No Hugging Face login: the fetch script names the exact login step and the terms page (not a bare curl error) and
+    downloads nothing. Offline: it exits before any request."""
+    import shutil
+    import subprocess
+    if shutil.which("zsh") is None:
+        pytest.skip("zsh not installed")
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    env = {k: v for k, v in os.environ.items() if k != "HF_TOKEN"}
+    env.update(HF_TOKEN_PATH=str(tmp_path / "no_token"), METALSIM_SPLAT_DATA=str(tmp_path / "data"), TMPDIR=str(tmp_path))
+    r = subprocess.run(["zsh", os.path.join(root, FETCH), "interiorgs"], env=env, capture_output=True, text=True, timeout=60)
+    assert r.returncode == 3, r.stderr
+    assert "hf auth login" in r.stderr and "https://huggingface.co/datasets/spatialverse/InteriorGS" in r.stderr
+    assert not (tmp_path / "data" / "interiorgs" / "0204_840158" / "3dgs_compressed.ply").exists()

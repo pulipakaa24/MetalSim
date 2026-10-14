@@ -30,7 +30,7 @@ Robot and objects drawn by a `Tier0Renderer` are composited with correct occlusi
 | `render/splat/views.py` | camera poses: `yaw_pitch_mat`, `look_at`, `room_views` (InteriorGS room polygons), `orbit_views`; fetched-data paths |
 | `tests/test_render_splat.py` | 12 tests (15 cases): formats incl. SuperSplat compressed PLY, transforms, disk cache, float64 reference analytic (CPU); reference parity, batching/determinism, capacity, analytic Gaussian, mesh composite, GPU path, blend variants (Metal) |
 | `tests/test_render_splat_nurec.py` | 6 tests: msgpack decoder, synthetic `.nurec` round trip (fp16/fp32, SH order, activations), unsupported-activation error, prepared `.npz` + eps2d hint, 3DGUT reference kernel |
-| `tests/test_render_splat_public.py` | 5 tests on the fetched public scenes (§7b; skipped with the fetch command when absent): InteriorGS decode / frame / crop, Metal vs float64 reference at robot-camera views, dxgl CC0 plain-PLY decode and render, optional NuRec lounge decode |
+| `tests/test_render_splat_public.py` | 6 tests: on the fetched public scenes (§7b; skipped with the fetch command when absent) InteriorGS decode / frame / crop, Metal vs float64 reference at robot-camera views, dxgl CC0 plain-PLY decode and render, optional NuRec lounge decode; and (offline) the fetch script's missing-login message |
 | `scripts/fetch_splat_scenes.sh` | fetches the public reference scenes into `assets/splats/` (git-ignored; §7b) |
 | `scripts/splat_bench.py` | `verify` (Metal vs reference, §4) and `bench` (throughput, §5) on the reference scene; `md` writes the tables below |
 
@@ -286,6 +286,15 @@ command when the data is absent.
 | `dxgl` | `modern_arm_chair.ply` from dxgl/multiview-datasets: nerfstudio splatfacto, standard 3DGS `.ply`, SH 3, trained on renders of a Poly Haven model | CC0-1.0 | open |
 | `nurec_lounge` (optional) | NVIDIA PhysicalAI-Robotics-NuRec `zh_lounge/usd/export_last.nurec`: indoor lounge, 3DGUT, 118 MB | CC-BY-4.0 (attribution: NVIDIA) | gated by a contact-information click-through; same token handling |
 
+- **Hugging Face access** (InteriorGS, NuRec). Before downloading, the fetch script checks access with a one-byte
+  request. On failure it prints the next step instead of a curl error, and exits with 3:
+  - no login on this machine: `hf auth login`, or `HF_TOKEN`;
+  - HTTP 401: the token is invalid;
+  - HTTP 403: this account has not accepted the dataset's terms; the message links the terms page.
+
+  The token is read from `HF_TOKEN` or the file that `hf auth login` writes, and is never printed.
+  (2026-10-14: the first version deleted its auth-header file early, because a zsh EXIT trap set inside a function
+  fires when that function returns, so curl failed with rc 26 on both Macs.)
 - **InteriorGS** (SpatialVerse / Manycore, https://huggingface.co/datasets/spatialverse/InteriorGS; Miao et al., arXiv
   2510.21307). 1,000 indoor scenes as `3dgs_compressed.ply`, the SuperSplat/PlayCanvas chunk-quantised PLY
   (`splat-transform`): per 256-splat chunk position, log-scale and colour ranges; per splat 11-10-11 position and

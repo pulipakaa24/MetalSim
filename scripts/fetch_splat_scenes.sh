@@ -25,20 +25,46 @@ IGS_SHA256=c0c748b66a39f0216ecfe7efed7777266ccd7e11013e181bf578c0631f5fdfac
 sha() { shasum -a 256 "$1" | cut -d' ' -f1; }
 fetch() {   # fetch <url> <dest> [header file]
   [ -s "$2" ] && return 0
-  if [ -n "$3" ]; then curl -fsSL -H @"$3" -o "$2.part" "$1"; else curl -fsSL -o "$2.part" "$1"; fi
+  local rc=0
+  if [ -n "$3" ]; then curl -fsSL -H @"$3" -o "$2.part" "$1" || rc=$?; else curl -fsSL -o "$2.part" "$1" || rc=$?; fi
+  if [ $rc != 0 ]; then rm -f "$2.part"; echo "download failed (curl rc=$rc): $1" >&2; exit 5; fi
   mv "$2.part" "$2"
 }
+
+# Gated Hugging Face downloads. The token comes from HF_TOKEN, else the file `hf auth login` writes
+# (${HF_TOKEN_PATH:-${HF_HOME:-~/.cache/huggingface}/token}); it goes to curl through a 0600 header file and is never
+# printed. The header file is removed by a script-level EXIT trap: a trap set inside a zsh function fires when that
+# function returns, which deleted the file before curl read it (curl rc=26, the 2026-10-14 failure on both Macs).
 HDR=""
-hf_header() {   # a temporary auth header file for gated Hugging Face downloads (token never echoed)
-  [ -n "$HDR" ] && return 0
-  local tok=${HF_TOKEN:-} tokfile=${HF_TOKEN_PATH:-${HF_HOME:-$HOME/.cache/huggingface}/token}
-  [ -z "$tok" ] && [ -s "$tokfile" ] && tok=$(<"$tokfile")
-  if [ -z "$tok" ]; then
-    echo "$1 is gated on Hugging Face: accept its conditions there, then set HF_TOKEN or log in with the Hugging Face CLI." >&2
-    return 3
+trap '[ -n "$HDR" ] && rm -f "$HDR"' EXIT
+HF_LOGIN_HELP='Log in to Hugging Face on this machine: `hf auth login` (the CLI comes with `pip install -U huggingface_hub`; older
+  versions: `huggingface-cli login`), paste a read token from https://huggingface.co/settings/tokens, or export HF_TOKEN.'
+hf_access() {   # hf_access <repo id> <terms URL> <probe URL>: an auth header file in $HDR, or exit with the exact next step
+  local repo=$1 terms=$2 probe=$3 tok=${HF_TOKEN:-} code
+  local tokfile=${HF_TOKEN_PATH:-${HF_HOME:-$HOME/.cache/huggingface}/token}
+  if [ -z "$HDR" ]; then
+    [ -z "$tok" ] && [ -s "$tokfile" ] && tok=$(<"$tokfile")
+    if [ -z "$tok" ]; then
+      print -r -- "$repo is gated and this machine has no Hugging Face login (HF_TOKEN unset, no token file at $tokfile)." >&2
+      print -r -- "  1. $HF_LOGIN_HELP" >&2
+      print -r -- "  2. With the same account, accept the dataset's terms at $terms" >&2
+      print -r -- "  3. Re-run: scripts/fetch_splat_scenes.sh $set_" >&2
+      exit 3
+    fi
+    HDR=$(mktemp "${TMPDIR:-/tmp}/hf_auth.XXXXXX"); chmod 600 "$HDR"
+    print -r -- "Authorization: Bearer $tok" > "$HDR"; tok=""
   fi
-  HDR=$(mktemp); chmod 600 "$HDR"; trap 'rm -f "$HDR"' EXIT
-  print -r -- "Authorization: Bearer $tok" > "$HDR"
+  # one-byte probe of a real file: 200/206 = access; 401 = token missing or invalid; 403 = terms not accepted
+  code=$(curl -sS -L -r 0-0 -o /dev/null -w '%{http_code}' -H @"$HDR" "$probe" 2>/dev/null) || code="curl-error"
+  case $code in
+    200|206) return 0 ;;
+    401) print -r -- "$repo: Hugging Face rejected this machine's token (HTTP 401: expired, revoked or not a valid token)." >&2
+         print -r -- "  $HF_LOGIN_HELP" >&2; exit 3 ;;
+    403) print -r -- "$repo: this Hugging Face account has not accepted the dataset's terms (HTTP 403)." >&2
+         print -r -- "  Accept them at $terms (logged in as the account whose token this machine uses; \`hf auth whoami\` shows it), then re-run." >&2
+         exit 3 ;;
+    *) print -r -- "$repo: access check failed (HTTP $code) for $probe: network or Hugging Face outage? Re-run later." >&2; exit 5 ;;
+  esac
 }
 
 SETS=("$@"); [ ${#SETS} -eq 0 ] && SETS=(interiorgs dxgl)
@@ -55,8 +81,8 @@ EOF
       ;;
     nurec_lounge)
       d="$DST/nurec/zh_lounge"; mkdir -p "$d"
-      hf_header nvidia/PhysicalAI-Robotics-NuRec || exit 3
       base="https://huggingface.co/datasets/nvidia/PhysicalAI-Robotics-NuRec/resolve/main/zh_lounge/usd"
+      [ -s "$d/export_last.nurec" ] || hf_access nvidia/PhysicalAI-Robotics-NuRec https://huggingface.co/datasets/nvidia/PhysicalAI-Robotics-NuRec "$base/gauss.usda"
       for f in export_last.nurec gauss.usda zh_lounge.usda; do fetch "$base/$f" "$d/$f" "$HDR"; done
       cat > "$d/LICENSE_NOTE.txt" <<'EOF'
 NVIDIA PhysicalAI-Robotics-NuRec (https://huggingface.co/datasets/nvidia/PhysicalAI-Robotics-NuRec), zh_lounge, CC-BY-4.0.
@@ -69,8 +95,9 @@ EOF
       if [ -n "$INTERIORGS_LOCAL" ]; then
         for f in 3dgs_compressed.ply structure.json; do [ -s "$d/$f" ] || cp "$INTERIORGS_LOCAL/$IGS_SCENE/$f" "$d/$f"; done
       else
-        hf_header spatialverse/InteriorGS || exit 3
         base="https://huggingface.co/datasets/spatialverse/InteriorGS/resolve/$IGS_REV/$IGS_SCENE"
+        [ -s "$d/3dgs_compressed.ply" ] && [ -s "$d/structure.json" ] || \
+          hf_access spatialverse/InteriorGS https://huggingface.co/datasets/spatialverse/InteriorGS "$base/structure.json"
         fetch "$base/3dgs_compressed.ply" "$d/3dgs_compressed.ply" "$HDR"
         fetch "$base/structure.json" "$d/structure.json" "$HDR"
       fi
@@ -85,5 +112,4 @@ EOF
     *) echo "unknown set $set_ (dxgl | nurec_lounge | interiorgs)"; exit 2 ;;
   esac
 done
-[ -n "$HDR" ] && rm -f "$HDR"
 ls -lR "$DST" | head -30
