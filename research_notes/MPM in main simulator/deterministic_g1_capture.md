@@ -235,7 +235,24 @@ does not trip).
 
 ## 8. Results (batch_19, 16-inch)
 
-Not confirmed: test_iteration_cap_repeats on the pin: failed without a counter phase mismatch.
+**Verdict: M1 confirmed.** Every prediction held.
+
+batch_19 printed INCONCLUSIVE because of an evaluator bug, not because of the evidence.
+- The batch classified the test run on the current pin by grepping the pytest log for "counter phase mismatch".
+- pytest truncated the assertion message's repr (`...`) and cut that phrase out. What remained was its tail,
+  "…-counter calls differ between its two passes", which is Warp's phase-mismatch error.
+- Re-classified from the same log (batch_19b; nothing re-run), the test fails on the phase mismatch, as M1
+  predicts. The evaluator, re-run with that class on the same JSON files, gives M1_CONFIRMED.
+- The test now reports the subprocess's stderr in full (`pytest.fail`), and the classifier matches both phrasings.
+
+Other observations:
+- **The uncaptured runs trip too.** The uncaptured stack runs trip in exactly the cap steps (66 of 66), with
+  `_solve_done` as a deterministic launch, so M1 does not depend on capture.
+- **batch_13's "capture-only" is not reproduced.** Its uncaptured G1 probe listed no `_solve_done` launch, on
+  the pins of that day.
+- **The unfused update reaches the cap less often.** With it, G1 reaches the cap in 7 of 60 steps at 64 worlds
+  and 41 of 60 at 1,024. With the fused update it was 60 of 60 (batch_18). The fused kernel's in-launch counter
+  read-back is a possible cause; not investigated.
 
 - `pre_stack_capt` (stack, 64 worlds, capture 1, cap 2): steps with cap worlds 66/200 (first 106), steps with trips 66, trips only in cap steps True, kernels {'_solve_done__locals__kernel': 66}, flag values {'6': 66}, fused update True, _solve_done deterministic launches 4
 - `fix_stack_capt` (stack, 64 worlds, capture 1, cap 2): steps with cap worlds 66/200 (first 106), steps with trips 0, trips only in cap steps True, kernels {}, flag values {}, fused update False, _solve_done deterministic launches 4
@@ -247,5 +264,81 @@ Not confirmed: test_iteration_cap_repeats on the pin: failed without a counter p
 - `batch_18 pre_g1_64 (fused update)` (g1, 64 worlds, capture 1, cap 20): steps with cap worlds 60/60 (first None), steps with trips 60, trips only in cap steps True, kernels {'_solve_done__locals__kernel': 237}, flag values {'6': 237}, fused update None, _solve_done deterministic launches 0
 - `batch_18 fix_g1_64 (fused update)` (g1, 64 worlds, capture 1, cap 20): steps with cap worlds 60/60 (first None), steps with trips 0, trips only in cap steps True, kernels {}, flag values {}, fused update None, _solve_done deterministic launches 0
 - G1 deterministic with the fix, captured (det_cost_g1.py, check_overflow): exit code 64 worlds 0, 1,024 worlds 0
-- test_iteration_cap_repeats on the current pin: failed otherwise (M1 predicts the phase-mismatch failure)
+- test_iteration_cap_repeats on the current pin: failed on the counter phase mismatch (re-classified in batch_19b;
+  batch_19 printed "failed otherwise")
 - Uncaptured: _solve_done is a deterministic launch uncaptured; M1's trips appear there too
+
+## 9. Queued after #29 (behind the simd_gs removal): the fused update and the iteration cap
+
+**Question.** In batch_18 and batch_19, G1 at 64 worlds, seed 0, captured, reached the cap in 60 of 60 steps with
+the fused update. With the unfused update it reached the cap in 7 of 60. The two forms are meant to compute the same
+thing, and the fused update is the default in default mode. Does it change convergence there, which would be a
+default-mode correctness and parity issue?
+
+**Prior art.**
+- **Ours is a MetalSim-only fusion of the dense path.**
+  - `_update_constraint_gradient_fused` comes from MuJoCo Warp fork commit `dd42c23`, for the dense pyramidal
+    incremental path. Commit `5d0d165` added the elliptic path.
+  - It is not in upstream v3.14 (`88af9cc`). Upstream's only "fused" pieces in `solver.py` are the line search's
+    `jv`.
+- **Upstream is building its own fusion of the sparse path.**
+  - [#1643](https://github.com/google-deepmind/mujoco_warp/pull/1643) (closed, superseded) fused Jᵀf, the gradient
+    and its norm for small sparse pyramidal models; it reported matching iteration statistics.
+  - [#1722](https://github.com/google-deepmind/mujoco_warp/pull/1722) (draft) fuses the constraint and gradient
+    update for small, noncompact sparse Newton models. Its reviewers report solver iterations and `nefc` unchanged.
+  - A #1722 reviewer flagged the same kind of hazard ours has: the fused kernel writes `state_changed_count` /
+    `search_unchanged` before a barrier and overwrites them later.
+  - Upstream's form runs only in default mode; nothing upstream combines it with Warp's deterministic mode.
+- **Our default-mode evidence (2026-09-26).**
+  - On the CPU device, fused vs unfused, pyramidal and elliptic, is bitwise over 8 substeps of 64 G1 worlds:
+    `solver_niter` differs in 0 worlds (`runs/ellip_ws/fused_cpu_check.log`).
+  - On Metal, the number of worlds at the cap of 20 over the run was 9–12 of 512 for every variant except the
+    extrapolated warm start, fused variants included (`docs/research/elliptic_warmstart_2026-09-26.md` §2.4).
+
+**What the 60-of-60 figure really compares.**
+- Both runs were in **deterministic** mode: batch_18's `fix_g1_64` used the fused update, and batch_19's
+  `fix_g1_64` the unfused one. No default-mode comparison was made.
+- In deterministic mode the fused kernel's in-launch counter logic goes wrong:
+  - It zeroes `quad_changed_count` inside the launch and then takes slots from it with a consumed `atomic_add`.
+  - In Warp's two-pass mode the zeroing store is suppressed in the counting pass, so slot numbers start from the
+    count left over from the previous launch, not from 0.
+  - Rows would then be written to the wrong `quad_changed_ids` entries, and the published count would be the old
+    count plus the new one.
+  - The incremental Hessian update would then apply wrong rows, which is consistent with worse convergence and a
+    world at the cap in every step.
+- This is a hypothesis taken from the code; the check below tests it.
+- The pin from #29 already takes the unfused update in deterministic mode. If the hypothesis holds, nothing more
+  needs fixing.
+
+**Hypotheses.**
+- **H-det:** only deterministic mode is affected. In default mode the fused and unfused updates agree within
+  Metal's run-to-run floor, for cap steps, the `solver_niter` distribution and qpos.
+- **H-default:** the fused update also changes convergence in default mode. Then cap steps and `solver_niter` with
+  the fused update fall outside the floor set by two unfused runs.
+
+**Discriminating check (designed, not run; about 5 min of GPU time).**
+- **Probe change.** `scripts/diagnostics/det_step_probe.py` gets:
+  - `--deterministic 0|1`;
+  - per step, a histogram of `d.solver_niter` and the number of worlds at the cap;
+  - `qpos` saved per step (npz).
+- **Setup.** G1, 64 worlds, captured, 60 steps, seed 0, the new pin.
+- **Arms.**
+  - A: default mode, fused (the default).
+  - B and C: default mode, `MJW_METAL_FUSE_UPDATE=0`, run twice. B against C is the floor, because default mode is
+    not bitwise run to run on Metal.
+  - D: deterministic mode, fused, already measured: batch_18 `fix_g1_64` (60 of 60 cap steps).
+  - E: deterministic mode, unfused, already measured: batch_19 `fix_g1_64` (7 of 60).
+- **Decision.**
+  - H-det holds if, between A and B, the cap-step count, the per-step mean `solver_niter` and the median
+    |Δqpos| (growing per step) are each within the B-vs-C difference (×2 slack on the cap-step count).
+  - Then: record it here and in #29. No default-mode change is needed, since #29's pin already gates the fused
+    update off in deterministic mode.
+  - Otherwise H-default holds, and the next round localises it:
+    1. CPU: re-run `scripts/diagnostics/ellip_fused_cpu_check.py` on the task's default cone over 60 steps, not 8
+       substeps.
+    2. Metal: compare per iteration from the same dumped state (`g1_state_dump.py`), A against B.
+    3. Reference: MuJoCo C's iteration counts on the saved G1 states (`runs/competitors/g1_states`,
+       `scripts/diagnostics/competitors/g1_newton_iters.py`).
+    4. Optionally an L4 run of upstream MuJoCo Warp (CUDA, unfused, upstream's form) on the same states.
+- **Reference.** No CUDA/L4 G1 iteration-count reference exists for our fused form, because it has no CUDA
+  counterpart. The comparable references are MuJoCo C's iteration counts and upstream MuJoCo Warp, unfused.

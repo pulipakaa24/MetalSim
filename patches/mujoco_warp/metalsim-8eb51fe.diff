@@ -1,9 +1,9 @@
 diff --git a/METALSIM_CHANGES.md b/METALSIM_CHANGES.md
 new file mode 100644
-index 0000000..21521ba
+index 0000000..6cb4db7
 --- /dev/null
 +++ b/METALSIM_CHANGES.md
-@@ -0,0 +1,55 @@
+@@ -0,0 +1,57 @@
 +# MetalSim changes on this branch (`metalsim`)
 +
 +This branch is the MuJoCo Warp build that [MetalSim](https://github.com/pulipakaa24/MetalSim) runs on (see the
@@ -52,6 +52,8 @@ index 0000000..21521ba
 +| `b1dc032` | `energy_vel` with nv = 0 (a model without degrees of freedom, energy flag enabled): zero kinetic energy without `mul_m` or the tiled kernel, as MuJoCo C's `mj_energyVel`. The tiled kernel with zero-length tiles failed to compile on Metal ("zero-length arrays are not permitted") and left `energy[:, 1]` unwritten on the CPU device. Test `sensor_test.test_energy_nv0`. |
 +| `f52488b` | Connect / weld equality blocks that end exactly at `njmax` are kept: the builders returned when `efcid >= njmax - 3` (`- 6`), so a block occupying rows `njmax - 3 .. njmax - 1` was dropped while `nefc` reached exactly `njmax`, which `_next_time`'s `nefc > njmax` check does not flag; the solver then ran on stale rows (a connect-held ball sagged 8 cm in 0.4 s, no overflow flag). Now `efcid + 3 > njmax` (`efcid + 6 > njmax`): a block that fits is written, one that does not leaves `nefc > njmax` and is flagged. Test `constraint_test.test_equality_block_ending_at_njmax` (connect and weld, dense and sparse; fails 4/4 before, passes 4/4). Replaces MetalSim's workaround (treat `nefc >= njmax` as overflow for models with connect / weld blocks, one spare row in the capacity bound). |
 +| `cfa290b` | Deterministic mode (Warp `RUN_TO_RUN`): non-heightfield CCD runs as a solve kernel without a slot counter (EPA / multicontact scratch row = thread id, launch width at most `naccdmax`) that stages each collision's contacts, then a contact-write kernel. The single kernel took its EPA row from a counter, so Warp's counting pass ran EPA on stale scratch and a contact could land in another world's slot. In deterministic mode a primitive against a heightfield (GJK/EPA) raises. `MJW_CCD_DET_SPLIT=0` keeps the single kernel; default mode unchanged. |
++| `8227c3b` | `_solve_done` keeps the solver's iteration count in a local (it read back an in-place increment, which Warp's deterministic counting pass suppresses: a world at the iteration cap then made the early exit's counter call in one pass only); the counter's return is consumed only with the early exit. |
++| `bf2e209` | Warp's deterministic mode takes the unfused Newton update (the fused kernel reads back its own change counter within the launch; its deterministic plan at 1,024 worlds asked for more than 2^31 scratch elements). |
 +
 +Every flex change and every solver launch-form change is behind a module-level flag or environment variable that restores upstream's behaviour; the details and measurements are in
 +the commit messages and in MetalSim's `scripts/diagnostics/deformable/UPSTREAM.md`. The same sixteen code commits are
@@ -3623,7 +3625,7 @@ index d26df8c..00a7c78 100644
  
      L = wp.tile_reshape(block, (block_size, block_size))
 diff --git a/mujoco_warp/_src/solver.py b/mujoco_warp/_src/solver.py
-index ecad790..7c76d80 100644
+index ecad790..7f603db 100644
 --- a/mujoco_warp/_src/solver.py
 +++ b/mujoco_warp/_src/solver.py
 @@ -14,6 +14,7 @@
@@ -3896,7 +3898,7 @@ index ecad790..7c76d80 100644
          wp.atomic_add(state_changed_count_out, worldid, 1)
  
    return kernel
-@@ -2064,6 +2159,403 @@ def _update_gradient_h_incremental_sparse(compact: bool):
+@@ -2064,6 +2159,409 @@ def _update_gradient_h_incremental_sparse(compact: bool):
    return kernel
  
  
@@ -3927,6 +3929,12 @@ index ecad790..7c76d80 100644
 +def _fuse_update(m: types.Model, ctx) -> bool:
 +  dev = wp.get_device()
 +  if not (_METAL_FUSE_UPDATE and (getattr(dev, "is_metal", False) or (_METAL_FUSE_UPDATE_CPU and dev.is_cpu))):
++    return False
++  # Warp's deterministic mode: the unfused launches. The fused kernel zeroes and reads back its own change counter
++  # within the launch (suppressed in the deterministic counting pass), and its deterministic plan at 1,024 worlds
++  # under capture asks for more than 2^31 scratch elements; unfused costs nothing measurable there (MetalSim #29).
++  modes = getattr(wp, "DeterministicMode", None)
++  if modes is not None and getattr(wp.config, "deterministic", modes.NOT_GUARANTEED) != modes.NOT_GUARANTEED:
 +    return False
 +  if m.is_sparse or _sparse_compact(ctx):
 +    return False
@@ -4300,7 +4308,7 @@ index ecad790..7c76d80 100644
  def _update_constraint(
    m: types.Model,
    d: types.Data,
-@@ -2363,7 +2855,8 @@ def _update_gradient_JTDAJ_dense_tiled_compact(nv_pad: int, tile_size: int, njma
+@@ -2363,7 +2861,8 @@ def _update_gradient_JTDAJ_dense_tiled_compact(nv_pad: int, tile_size: int, njma
  
        J_ki = wp.tile_map(wp.mul, wp.tile_transpose(J_kj), wp.tile_broadcast(D_k, shape=(nv_pad, TILE_SIZE_K)))
  
@@ -4310,7 +4318,7 @@ index ecad790..7c76d80 100644
  
      wp.tile_store(ctx_h_out[worldid], sum_val, bounds_check=False)
  
-@@ -2441,7 +2934,8 @@ def _update_gradient_JTDAJ_dense_tiled(nv_pad: int, tile_size: int, njmax: int,
+@@ -2441,7 +2940,8 @@ def _update_gradient_JTDAJ_dense_tiled(nv_pad: int, tile_size: int, njmax: int,
  
        J_ki = wp.tile_map(wp.mul, wp.tile_transpose(J_kj), wp.tile_broadcast(D_k, shape=(nv_pad, TILE_SIZE_K)))
  
@@ -4320,7 +4328,7 @@ index ecad790..7c76d80 100644
  
      wp.tile_store(ctx_h_out[worldid], sum_val, bounds_check=False)
  
-@@ -2572,79 +3066,979 @@ def _update_gradient_JTCJ_dense(
+@@ -2572,79 +3072,979 @@ def _update_gradient_JTCJ_dense(
      ctx_h_out[worldid, dof1id, dof2id] += h
  
  
@@ -5366,7 +5374,7 @@ index ecad790..7c76d80 100644
  
    return kernel
  
-@@ -2748,13 +4142,16 @@ def _cholesky_factorize_solve(
+@@ -2748,13 +4148,16 @@ def _cholesky_factorize_solve(
    If skip_unchanged is True (blocked path only), worlds where no constraints
    changed reuse the cached factorization in hfactor instead of refactorizing.
    """
@@ -5385,7 +5393,7 @@ index ecad790..7c76d80 100644
      )
    else:
      wp.launch(
-@@ -2806,10 +4203,14 @@ _JTDAJ_OVERSUBSCRIBE_WAVES = 6
+@@ -2806,10 +4209,14 @@ _JTDAJ_OVERSUBSCRIBE_WAVES = 6
  
  
  @cache_kernel
@@ -5401,7 +5409,7 @@ index ecad790..7c76d80 100644
  
    def make_curvature_terms(condim: int):
      @wp.func
-@@ -3007,9 +4408,8 @@ def _JTDACJ_sparse(compact: bool, cone_type: types.ConeType, max_condim: int):
+@@ -3007,9 +4414,8 @@ def _JTDACJ_sparse(compact: bool, cone_type: types.ConeType, max_condim: int):
            for dim in range(1, wp.static(MAX_CONDIM)):
              if dim < block_rows:
                cone_rowadr[dim] = head_adr + dim * support
@@ -5413,7 +5421,7 @@ index ecad790..7c76d80 100644
                opt_impratio_invsqrt,
                efc_D_in,
                contact_friction_in[conid],
-@@ -3019,9 +4419,22 @@ def _JTDACJ_sparse(compact: bool, cone_type: types.ConeType, max_condim: int):
+@@ -3019,9 +4425,22 @@ def _JTDACJ_sparse(compact: bool, cone_type: types.ConeType, max_condim: int):
                condim,
                block_rows,
              )
@@ -5439,7 +5447,7 @@ index ecad790..7c76d80 100644
  
        for entry in range(lane, n_entries, lanes):
          block_col = int((wp.sqrt(float(8 * entry + 1)) - 1.0) * 0.5)
-@@ -3061,6 +4474,9 @@ def _JTDACJ_sparse(compact: bool, cone_type: types.ConeType, max_condim: int):
+@@ -3061,6 +4480,9 @@ def _JTDACJ_sparse(compact: bool, cone_type: types.ConeType, max_condim: int):
  
  def _jtdaj_groups_per_world(nworld: int, njmax: int) -> int:
    # njmax is capacity and often mostly empty, so cap slots at a few resident waves.
@@ -5449,7 +5457,7 @@ index ecad790..7c76d80 100644
    block_size, min_grid_size = wp.get_suggested_block_size(_JTDACJ_sparse(False, types.ConeType.PYRAMIDAL, 3))
    device_warps = max(1, block_size * min_grid_size // _JTDAJ_THREADS_PER_GROUP)
    return max(1, min(njmax, _JTDAJ_OVERSUBSCRIBE_WAVES * device_warps // nworld))
-@@ -3109,7 +4525,11 @@ def _update_gradient(m: types.Model, d: types.Data, ctx: SolverContext, compact:
+@@ -3109,7 +4531,11 @@ def _update_gradient(m: types.Model, d: types.Data, ctx: SolverContext, compact:
        max_condim = 3
        if m.opt.cone == types.ConeType.ELLIPTIC and m.nmaxcondim > 3:
          max_condim = int(m.nmaxcondim)
@@ -5462,7 +5470,7 @@ index ecad790..7c76d80 100644
        jtdaj_inputs = [
          m.opt.impratio_invsqrt,
          d.contact.friction,
-@@ -3129,8 +4549,14 @@ def _update_gradient(m: types.Model, d: types.Data, ctx: SolverContext, compact:
+@@ -3129,8 +4555,14 @@ def _update_gradient(m: types.Model, d: types.Data, ctx: SolverContext, compact:
          ctx.done,
          groups_per_world,
        ]
@@ -5479,7 +5487,7 @@ index ecad790..7c76d80 100644
        block_dim = threads_per_group if elliptic else mj.block_dim.update_gradient_JTDAJ_sparse
        wp.launch(
          jtdaj_kernel,
-@@ -3182,71 +4608,134 @@ def _update_gradient(m: types.Model, d: types.Data, ctx: SolverContext, compact:
+@@ -3182,71 +4614,134 @@ def _update_gradient(m: types.Model, d: types.Data, ctx: SolverContext, compact:
        # of SMs on the GPU. We can now query the SM count:
        # https://github.com/NVIDIA/warp/commit/f3814e7e5459e5fd13032cf0fddb3daddd510f30
  
@@ -5663,7 +5671,7 @@ index ecad790..7c76d80 100644
  
    # Update upper triangle of H with delta from changed constraints.
    sc = _sparse_compact(ctx)
-@@ -3270,6 +4759,36 @@ def _update_gradient_incremental(m: types.Model, d: types.Data, ctx: SolverConte
+@@ -3270,6 +4765,36 @@ def _update_gradient_incremental(m: types.Model, d: types.Data, ctx: SolverConte
        ],
        outputs=[ctx.h],
      )
@@ -5700,7 +5708,28 @@ index ecad790..7c76d80 100644
    else:
      tri_dim = m.nv * (m.nv + 1) // 2
      wp.launch(
-@@ -3405,7 +4924,9 @@ def _solve_beta_finalize_tiled(warn_overflow: int):
+@@ -3380,7 +4905,8 @@ def _solve_beta_finalize_tiled(warn_overflow: int):
+     if tid == 0:
+       ctx_beta_out[worldid] = wp.max(0.0, reduced_beta[0] / wp.max(types.MJ_MINVAL, reduced_beta[1]))
+ 
+-      solver_niter_out[worldid] += 1
++      niter = solver_niter_out[worldid] + 1
++      solver_niter_out[worldid] = niter
+       tolerance = opt_tolerance[worldid % opt_tolerance.shape[0]]
+       meaninertia = stat_meaninertia[worldid % stat_meaninertia.shape[0]]
+ 
+@@ -3389,8 +4915,8 @@ def _solve_beta_finalize_tiled(warn_overflow: int):
+       improvement = _rescale(nv, meaninertia, ctx_improvement_in[worldid])
+       gradient = _rescale(nv, meaninertia, wp.sqrt(grad_dot))
+       done = (improvement < tolerance) or (gradient < tolerance)
+-      if done or solver_niter_out[worldid] == opt_iterations:
+-        if not done and solver_niter_out[worldid] == opt_iterations:
++      if done or niter == opt_iterations:
++        if not done and niter == opt_iterations:
+           if wp.static(bool(WARN_OVERFLOW & OverflowType.ITERATIONS)):
+             wp.printf(
+               "solver iterations limit reached - please increase iterations beyond %u\n"
+@@ -3405,7 +4931,9 @@ def _solve_beta_finalize_tiled(warn_overflow: int):
  
  
  @cache_kernel
@@ -5711,7 +5740,7 @@ index ecad790..7c76d80 100644
    @wp.kernel(module="unique", enable_backward=False)
    def kernel(
      # Model:
-@@ -3418,12 +4939,14 @@ def _solve_done(warn_overflow: int):
+@@ -3418,19 +4946,27 @@ def _solve_done(warn_overflow: int):
      ctx_newton_decrement_in: wp.array[float],
      ctx_improvement_in: wp.array[float],
      ctx_done_in: wp.array[bool],
@@ -5726,22 +5755,51 @@ index ecad790..7c76d80 100644
    ):
      worldid = wp.tid()
  
-@@ -3450,7 +4973,13 @@ def _solve_done(warn_overflow: int):
+     if ctx_done_in[worldid]:
+       return
+ 
+-    solver_niter_out[worldid] += 1
++    # MetalSim: the count is kept in a local and stored, not incremented in place and read back: under Warp's
++    # deterministic mode this kernel's slot counter (nsolving, consumed below for the early exit) makes it run twice,
++    # the counting pass with global stores and non-counter atomics suppressed, so a read-back of solver_niter there
++    # saw the old count; a world reaching the iteration cap then made the counter call in one pass only (a phase
++    # mismatch; MetalSim research_notes/MPM in main simulator/deterministic_ccd_divergence.md). One thread per world.
++    niter = solver_niter_out[worldid] + 1
++    solver_niter_out[worldid] = niter
+     tolerance = opt_tolerance[worldid % opt_tolerance.shape[0]]
+     meaninertia = stat_meaninertia[worldid % stat_meaninertia.shape[0]]
+ 
+@@ -3438,10 +4974,10 @@ def _solve_done(warn_overflow: int):
+     gradient = _rescale(nv, meaninertia, wp.sqrt(ctx_grad_dot_in[worldid]))
+     model_improvement = _rescale(nv, meaninertia, 0.5 * ctx_newton_decrement_in[worldid])
+     done = (improvement < tolerance) or (gradient < tolerance) or (model_improvement < tolerance)
+-    if done or solver_niter_out[worldid] == opt_iterations:
++    if done or niter == opt_iterations:
+       # if the solver has converged or the maximum number of iterations has been reached then
+       # mark this world as done and remove it from the number of unconverged worlds
+-      if not done and solver_niter_out[worldid] == opt_iterations:
++      if not done and niter == opt_iterations:
+         if wp.static(bool(warn_overflow & OverflowType.ITERATIONS)):
+           wp.printf(
+             "solver iterations limit reached - please increase iterations beyond %u\n"
+@@ -3450,7 +4986,15 @@ def _solve_done(warn_overflow: int):
            )
          overflow_out[worldid] = overflow_out[worldid] | OverflowType.ITERATIONS
        ctx_done_out[worldid] = True
 -      wp.atomic_add(nsolving_out, 0, -1)
-+      was_solving = wp.atomic_add(nsolving_out, 0, -1)
 +      if wp.static(EARLY_EXIT):
++        was_solving = wp.atomic_add(nsolving_out, 0, -1)
 +        # the world that brought the count to zero: no later iteration has anything to do, so the indirect
 +        # execution ranges of iterations iteration + 1 .. cap - 1 get length 0 and their launches are skipped
 +        if was_solving == 1:
 +          for j in range(iteration + 1, opt_iterations):
 +            ranges_out[4 * j + 1] = wp.uint32(0)
++      else:
++        wp.atomic_add(nsolving_out, 0, -1)   # return unused: no slot counter without the early exit
  
    return kernel
  
-@@ -3462,11 +4991,17 @@ def _solve_done(warn_overflow: int):
+@@ -3462,11 +5006,17 @@ def _solve_done(warn_overflow: int):
  # stale ray; rebuilding re-anchors the arithmetic at the current (much smaller)
  # gradient scale. The 8 is an allowance for the reduction depth of the sums.
  _ALPHA_NOISE_EPS = 8.0 * 1.1920929e-07  # 8 * float32 eps
@@ -5760,7 +5818,7 @@ index ecad790..7c76d80 100644
  
  
  @wp.kernel(grid_stride=True)
-@@ -3487,6 +5022,7 @@ def _solver_iteration(
+@@ -3487,6 +5037,7 @@ def _solver_iteration(
    ctx: SolverContext,
    nsolving: wp.array[int],
    compact: bool = False,
@@ -5768,7 +5826,7 @@ index ecad790..7c76d80 100644
  ):
    _linesearch(m, d, ctx)
  
-@@ -3496,6 +5032,20 @@ def _solver_iteration(
+@@ -3496,6 +5047,20 @@ def _solver_iteration(
    # changes every iteration.
    incremental = _use_incremental(m)
  
@@ -5789,7 +5847,7 @@ index ecad790..7c76d80 100644
    if incremental:
      # Must complete before _update_constraint_efc which atomically increments.
      wp.launch(
-@@ -3515,6 +5065,10 @@ def _solver_iteration(
+@@ -3515,6 +5080,10 @@ def _solver_iteration(
    else:
      _update_gradient(m, d, ctx, compact=compact)
  
@@ -5800,7 +5858,7 @@ index ecad790..7c76d80 100644
    # polak-ribiere
    if m.opt.solver == types.SolverType.CG:
      wp.launch_tiled(
-@@ -3551,8 +5105,9 @@ def _solver_iteration(
+@@ -3551,8 +5120,9 @@ def _solver_iteration(
      )
  
    else:
@@ -5811,7 +5869,7 @@ index ecad790..7c76d80 100644
        dim=d.nworld,
        inputs=[
          m.nv,
-@@ -3563,17 +5118,20 @@ def _solver_iteration(
+@@ -3563,17 +5133,20 @@ def _solver_iteration(
          ctx.newton_decrement,
          ctx.improvement,
          ctx.done,
@@ -5835,7 +5893,7 @@ index ecad790..7c76d80 100644
    )
  
    # jaref = d.efc_J @ d.qacc - d.efc_aref
-@@ -3635,14 +5193,36 @@ def solve(m: types.Model, d: types.Data):
+@@ -3635,14 +5208,36 @@ def solve(m: types.Model, d: types.Data):
      _solve(m, d, ctx)
  
  
@@ -5875,7 +5933,7 @@ index ecad790..7c76d80 100644
    )
  
    #  context
-@@ -3677,8 +5257,12 @@ def _solve(m: types.Model, d: types.Data, ctx: SolverContext, compact: bool = Fa
+@@ -3677,8 +5272,12 @@ def _solve(m: types.Model, d: types.Data, ctx: SolverContext, compact: bool = Fa
      # This branch is mostly for when JAX is used as it is currently not compatible
      # with CUDA graph conditional.
      # It should be removed when JAX becomes compatible.

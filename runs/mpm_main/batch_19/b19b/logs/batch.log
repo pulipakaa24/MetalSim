@@ -1,0 +1,124 @@
+=== batch_19b start Wed Oct 14 11:09:31 PDT 2026
+
+## 8. Results (batch_19, 16-inch)
+
+M1 confirmed: every prediction held.
+
+- `pre_stack_capt` (stack, 64 worlds, capture 1, cap 2): steps with cap worlds 66/200 (first 106), steps with trips 66, trips only in cap steps True, kernels {'_solve_done__locals__kernel': 66}, flag values {'6': 66}, fused update True, _solve_done deterministic launches 4
+- `fix_stack_capt` (stack, 64 worlds, capture 1, cap 2): steps with cap worlds 66/200 (first 106), steps with trips 0, trips only in cap steps True, kernels {}, flag values {}, fused update False, _solve_done deterministic launches 4
+- `pre_stack_eager` (stack, 64 worlds, capture 0, cap 2): steps with cap worlds 66/200 (first 106), steps with trips 66, trips only in cap steps True, kernels {'_solve_done__locals__kernel': 66}, flag values {'6': 66}, fused update True, _solve_done deterministic launches 400
+- `fix_stack_eager` (stack, 64 worlds, capture 0, cap 2): steps with cap worlds 66/200 (first 106), steps with trips 0, trips only in cap steps True, kernels {}, flag values {}, fused update False, _solve_done deterministic launches 400
+- `pre_g1_1024u` (g1, 1024 worlds, capture 1, cap 20): steps with cap worlds 41/60 (first 1), steps with trips 41, trips only in cap steps True, kernels {'_solve_done__locals__kernel': 59}, flag values {'6': 59}, fused update False, _solve_done deterministic launches 200
+- `fix_g1_64` (g1, 64 worlds, capture 1, cap 20): steps with cap worlds 7/60 (first 2), steps with trips 0, trips only in cap steps True, kernels {}, flag values {}, fused update False, _solve_done deterministic launches 200
+- `fix_g1_1024` (g1, 1024 worlds, capture 1, cap 20): steps with cap worlds 41/60 (first 1), steps with trips 0, trips only in cap steps True, kernels {}, flag values {}, fused update False, _solve_done deterministic launches 200
+- `batch_18 pre_g1_64 (fused update)` (g1, 64 worlds, capture 1, cap 20): steps with cap worlds 60/60 (first None), steps with trips 60, trips only in cap steps True, kernels {'_solve_done__locals__kernel': 237}, flag values {'6': 237}, fused update None, _solve_done deterministic launches 0
+- `batch_18 fix_g1_64 (fused update)` (g1, 64 worlds, capture 1, cap 20): steps with cap worlds 60/60 (first None), steps with trips 0, trips only in cap steps True, kernels {}, flag values {}, fused update None, _solve_done deterministic launches 0
+- G1 deterministic with the fix, captured (det_cost_g1.py, check_overflow): exit code 64 worlds 0, 1,024 worlds 0
+- test_iteration_cap_repeats on the current pin: failed on the counter phase mismatch (M1 predicts the phase-mismatch failure)
+- Uncaptured: _solve_done is a deterministic launch uncaptured; M1's trips appear there too
+
+M1_CONFIRMED
+[11:09:31] VERDICT19B -> DONE testpre class 1; M1_CONFIRMED
+[11:09:31] verdict: M1_CONFIRMED
+[11:09:34] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
+[11:09:37] FORK19B -> PASS 8eb51fe637437108185f5a4750b7f5f64ef26624
+[11:09:37] gpu job mm19b_tests (check, <= 30 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/test_batch_deterministic.log
+    ........                                                                 [100%]
+    8 passed in 302.20s (0:05:02)
+[11:14:50] health: utilisation 99%
+GPU (ioreg): device utilization 99 %; per-process GPU time over 1.9 s:
+  pid   7713 python3.12                       102.2 %
+[11:14:50] TESTS19B -> PASS 8 passed in 302.20s (0:05:02)
+[11:14:50] gpu job mm19b_t_64_d0_r1 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/g1_64_d0_r1.log
+    [gpu_run] mm19b_t_64_d0_r1 end: device utilisation 0% (11:17:56), exit 0
+    [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[11:18:02] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid    413 loginwindow                        1.5 %
+[11:18:02] gpu job mm19b_t_64_d1_r1 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/g1_64_d1_r1.log
+    [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+    [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.9 %
+[11:21:14] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[11:21:14] gpu job mm19b_t_1024_d0_r1 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/g1_1024_d0_r1.log
+    [gpu_run] mm19b_t_1024_d0_r1 end: device utilisation 100% (11:22:45), exit 0
+    [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[11:22:51] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[11:22:51] gpu job mm19b_t_1024_d1_r1 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/g1_1024_d1_r1.log
+    [gpu_run] mm19b_t_1024_d1_r1 end: device utilisation 0% (11:23:37), exit 0
+    [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[11:23:43] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[11:23:43] gpu job mm19b_t_64_d0_r2 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/g1_64_d0_r2.log
+    [gpu_run] mm19b_t_64_d0_r2 end: device utilisation 99% (11:24:18), exit 0
+    [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[11:24:24] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   2.8 %
+[11:24:24] gpu job mm19b_t_64_d1_r2 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/g1_64_d1_r2.log
+    [gpu_run] mm19b_t_64_d1_r2 end: device utilisation 0% (11:26:10), exit 0
+    [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[11:26:16] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[11:26:16] gpu job mm19b_t_1024_d0_r2 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/g1_1024_d0_r2.log
+    [gpu_run] mm19b_t_1024_d0_r2 end: device utilisation 0% (11:28:17), exit 0
+    [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[11:28:23] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[11:28:23] gpu job mm19b_t_1024_d1_r2 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/g1_1024_d1_r2.log
+    [gpu_run] mm19b_t_1024_d1_r2 end: device utilisation 0% (11:31:09), exit 0
+    [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[11:31:15] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   2.1 %
+[11:31:15] gpu job mm19b_t_64_d0_r3 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/g1_64_d0_r3.log
+    [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+    [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.3 %
+[11:31:57] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   2.5 %
+[11:31:57] gpu job mm19b_t_64_d1_r3 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/g1_64_d1_r3.log
+    [gpu_run] gpu_top:   pid    410 WindowServer                       2.9 %
+    [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.5 %
+[11:32:38] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[11:32:38] gpu job mm19b_t_1024_d0_r3 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/g1_1024_d0_r3.log
+    [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+    [gpu_run] gpu_top:   pid   1291 Google Chrome He                   3.4 %
+[11:35:50] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[11:35:50] gpu job mm19b_t_1024_d1_r3 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/g1_1024_d1_r3.log
+    [gpu_run] mm19b_t_1024_d1_r3 end: device utilisation 100% (11:38:37), exit 0
+    [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[11:38:42] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+  | scene | worlds | default | deterministic | cost |
+  |---|---|---|---|---|
+  | G1 flat env step (batch_19b) | 64 | 7.66 ms | 13.39 ms | +74.8 % |
+  | G1 flat env step (batch_19b) | 1,024 | 15.46 ms | 32.59 ms | +110.8 % |
+  | coupled box step (batch_17, same session) | 64 | 23.87 ms | 24.32 ms | +1.9 % |
+  | coupled box step (batch_10 default, batch_17 deterministic) | 1,024 | 228.78 ms | 231.50 ms | +1.2 % |
+[11:38:42] TIMING19B -> DONE   | scene | worlds | default | deterministic | cost |   |---|---|---|---|---|   | G1 flat env step (batch_19b) | 64 | 7.66 ms | 13.39 ms | +74.8 % |   | G1 flat env step (batch_19b) | 1,024 | 15.46 ms | 32.59 ms | +110.8 % |   | coupled box step (batch_17, same session) | 64 | 23.87 ms | 24.32 ms | +1.9 % |   | coupled box step (batch_10 default, batch_17 deterministic) | 1,024 | 228.78 ms | 231.50 ms | +1.2 % | 
+[gpu_run] fork_sync start: device utilisation 0% (11:42:18)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+mujoco_warp -> 8eb51fe
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+runtime ok 1.18.0.dev20260917
+[gpu_run] fork_sync end: device utilisation 0% (11:42:22), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[11:42:25] PIN19B -> PASS MuJoCo Warp 4d05cb7 -> 8eb51fe
+[11:42:25] gpu job mm19b_smoke (check, <= 30 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/smoke_shared.log
+    ........                                                                 [100%]
+    8 passed in 241.03s (0:04:01)
+[11:46:34] health: utilisation 99%
+GPU (ioreg): device utilization 99 %; per-process GPU time over 2.1 s:
+  pid  14740 python3.12                       113.0 %
+[11:46:34] SMOKE19B -> PASS 8 passed in 241.03s (0:04:01)

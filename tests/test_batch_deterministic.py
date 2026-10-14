@@ -101,6 +101,7 @@ def test_iteration_cap_repeats():
         out = os.path.join(d, "cap.json")
         r = subprocess.run([sys.executable, str(DIAG), "--scene", "stack", "--worlds", "64", "--steps", "160",
                             "--iterations", "2", "--json", out], capture_output=True, text=True)
-        assert r.returncode == 0, (r.stdout[-1500:], r.stderr[-3000:])
+        if r.returncode != 0:   # the subprocess's own error in full (an assert message would be repr-truncated)
+            pytest.fail(f"rigid_det_diag exit code {r.returncode}; stderr tail:\n{r.stderr[-3000:]}", pytrace=False)
         x = json.load(open(out))
     assert all(f is None for f in x["in_process_first_diff"]), x["in_process_first_diff"]
