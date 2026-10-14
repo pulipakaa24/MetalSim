@@ -90,3 +90,17 @@ def test_ccd_split_matches_single_kernel():
         r = subprocess.run([sys.executable, "-m", "metalsim.physics.mpm.probes.ccd_split_equiv", "--device", "cpu",
                             "--worlds", "8", "--steps", "200"], capture_output=True, text=True, env=env, cwd=ROOT)
     assert r.returncode == 0, (r.stdout[-2000:], r.stderr[-2000:])
+
+
+def test_iteration_cap_repeats():
+    """Worlds that reach the solver's iteration cap repeat too (captured, with MuJoCo Warp's early exit of the solver
+    loop). MuJoCo Warp's _solve_done read the iteration count back after incrementing it; under Warp's two-pass slot
+    counter (the early exit's) a world at the cap then made the counter call in one pass only, and Warp's tripwire
+    stopped the run (the G1 task, batch_16 / 17)."""
+    with tempfile.TemporaryDirectory() as d:
+        out = os.path.join(d, "cap.json")
+        r = subprocess.run([sys.executable, str(DIAG), "--scene", "stack", "--worlds", "64", "--steps", "160",
+                            "--iterations", "2", "--json", out], capture_output=True, text=True)
+        assert r.returncode == 0, (r.stdout[-1500:], r.stderr[-3000:])
+        x = json.load(open(out))
+    assert all(f is None for f in x["in_process_first_diff"]), x["in_process_first_diff"]

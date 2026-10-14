@@ -42,10 +42,11 @@ def model_of(scene):
     raise FileNotFoundError("MuJoCo Menagerie panda")
 
 
-def run(model, n, steps, deterministic, capture):
+def run(model, n, steps, deterministic, capture, iterations=None):
     from metalsim.physics.batch import BatchSim, BatchSimOptions
 
-    sim = BatchSim(model, n, options=BatchSimOptions(deterministic=deterministic, capture=capture))
+    sim = BatchSim(model, n, options=BatchSimOptions(deterministic=deterministic, capture=capture,
+                                                            solver_iterations=iterations))
     rng = np.random.default_rng(0)
     per_step, per_world, ncon = [], [], []
     for _ in range(steps):
@@ -93,6 +94,7 @@ def main():
     ap.add_argument("--nativeccd-off", action="store_true",
                     help="mjDSBL_NATIVECCD: box-box pairs take MuJoCo Warp's primitive box_box instead of the CCD kernel")
     ap.add_argument("--runs", type=int, default=2)
+    ap.add_argument("--iterations", type=int, default=None, help="solver iteration cap (low: worlds reach it)")
     ap.add_argument("--json")
     ap.add_argument("--compare", nargs=2)
     a = ap.parse_args()
@@ -109,7 +111,7 @@ def main():
         import mujoco
 
         m.opt.disableflags |= int(mujoco.mjtDisableBit.mjDSBL_NATIVECCD)
-    runs = [run(m, a.worlds, a.steps, bool(a.deterministic), bool(a.capture)) for _ in range(a.runs)]
+    runs = [run(m, a.worlds, a.steps, bool(a.deterministic), bool(a.capture), a.iterations) for _ in range(a.runs)]
     res = {"scene": a.scene, "worlds": a.worlds, "deterministic": a.deterministic, "capture": a.capture,
            "nativeccd_off": a.nativeccd_off,
            "in_process_first_diff": [first_diff(runs[0], r) for r in runs[1:]], "runs": runs[:1],
