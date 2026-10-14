@@ -120,10 +120,8 @@ def run_scene(name, xml, n, cam, out_dir, res=(160, 120), seeds=3, spacing=2.0):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="runs/newton_bridge")
-    ap.add_argument("--menagerie", default=os.path.join(os.path.dirname(ROOT.rstrip("/")), "upstream", "mujoco_menagerie"))
+    ap.add_argument("--menagerie", default=os.environ.get("MENAGERIE", os.path.join(ROOT, "upstream", "mujoco_menagerie")))
     a = ap.parse_args()
-    if not os.path.isdir(a.menagerie):
-        a.menagerie = "/Users/aditya/robosim/upstream/mujoco_menagerie"
     os.makedirs(a.out, exist_ok=True)
     t0 = time.time()
     res = {"newton": newton.__version__, "mujoco": mujoco.__version__}

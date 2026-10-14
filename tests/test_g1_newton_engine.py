@@ -3,6 +3,7 @@ the MuJoCo-layout state it exposes means the same thing as MuJoCo's, contact "to
 physical forces, a fall is terminated and penalized like on MuJoCo Warp, resets restore Isaac's default
 state, and the captured graph equals eager stepping. Shared observation/reward invariants are in
 test_g1_task_terms.py (parametrized over both engines)."""
+import os
 import mujoco
 import numpy as np
 import pytest
@@ -13,7 +14,10 @@ pytest.importorskip("newton", reason="Newton not installed (optional engine: pip
 from metalsim.learn.g1_velocity import G1VelocityTask, build_g1_model
 from metalsim.learn.warp_policy import RolloutBuffers, bump, zero_int
 
-pytestmark = pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal")
+from metalsim.learn.g1_velocity import G1_USD as _G1_USD  # noqa: E402
+
+pytestmark = [pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal"),
+              pytest.mark.skipif(not os.path.exists(_G1_USD), reason="needs Isaac's g1_minimal.usd (scripts/fetch_isaac_assets.sh)")]
 NEWTON = dict(engine="newton", newton_iterations=4, newton_dt=0.00125)
 
 

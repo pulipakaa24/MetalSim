@@ -9,8 +9,9 @@
 STAGE=$1; B=$2
 C=${CODE:-$(cd "$(dirname "$0")/../.." && pwd)}
 export PYTHONPATH=$C
-PY=${PY:-/Users/aditya/robosim/.venv/bin/python}
-SIM=${SIM:-/Users/aditya/robosim/runs/demo/anymal_sim}
+REPO="$(cd "$(dirname "$0")/../.." && pwd)"   # the checkout this script is in (its .venv, runs/, queue scripts)
+PY=${PY:-$REPO/.venv/bin/python}
+SIM=${SIM:-$REPO/runs/demo/anymal_sim}
 mkdir -p "$B/out"
 case $STAGE in 1|3|slow|narrow|twolevel)   # these build > 6.3 M grains: never on a machine without the validated fix
   if [ -z "$ALLOW_LARGE" ]; then
@@ -108,10 +109,10 @@ narrow)   # build only: 4 planes at ~10 / 15 / 20 M grains; all particles with 2
 slow)   # the stalled configuration alone, 15 min watchdog, heartbeat (elapsed, utilisation) every 10 s
    health "before slow build" || { echo "[stage$STAGE] STOP: probe failed"; exit 3; }
    t0=$(date +%s)
-   ( while true; do /bin/sleep 10; echo "[heartbeat] $(( $(date +%s) - t0 )) s, utilisation $(/Users/aditya/robosim/scripts/gpu_util.sh)%"; done ) &
+   ( while true; do /bin/sleep 10; echo "[heartbeat] $(( $(date +%s) - t0 )) s, utilisation $("$REPO/scripts/gpu_util.sh")%"; done ) &
    HB=$!
    /usr/bin/python3 "$C/scripts/particle_demo/watchdog.py" --timeout 900 --stall 900 --log "$B/stage_slow_build_p4_n0.log" -- \
-     $PY "$C/scripts/particle_demo/render_anymal.py" --sim "$SIM" --out "$B/out" --grains 27 --frames 0:1 --camera track \
+     "$PY" "$C/scripts/particle_demo/render_anymal.py" --sim "$SIM" --out "$B/out" --grains 27 --frames 0:1 --camera track \
      --timing --no-trace $LOW --ground-planes 4 --max-particles 0 ${EXTRA:-}
    rc=$?; kill $HB 2>/dev/null
    grep -a "\[timing\]\|watchdog\]" "$B/stage_slow_build_p4_n0.log" | sed "s/^/  [slow] /"

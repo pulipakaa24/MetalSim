@@ -1,6 +1,6 @@
 #!/bin/bash
 # Re-render the stage videos without the collider geometry once the main queue (fixed-PPO run, replay re-render) is done.
-cd /Users/aditya/robosim
+cd "$(dirname "$0")/../.."   # repo root
 until grep -q QUEUE_DONE runs/g1_replay_rerender.log 2>/dev/null; do sleep 60; done
 bash scripts/gallery/g1_stage_videos.sh > runs/g1_stage_videos2.log 2>&1
 FF=$(.venv/bin/python -c "import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())")

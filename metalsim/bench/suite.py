@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import pathlib
 import platform
 import subprocess
 import time
@@ -91,7 +92,7 @@ def main():
     spec = HARDWARE.get(hw, {"fp32_tflops": float("nan"), "bandwidth_gbs": float("nan")})
     rows = []
     prims = mujoco.MjModel.from_xml_string(PRIMS)
-    so101 = mujoco.MjModel.from_xml_path("assets/so101/scene_box_rl.xml")
+    so101 = mujoco.MjModel.from_xml_path(str(pathlib.Path(__file__).resolve().parents[2] / "assets/so101/scene_box_rl.xml"))
     ns = [64, 1024] if args.quick else [64, 256, 1024, 4096]
     rows += physics_rows(so101, "SO-101 lift", ns)
     rows += render_rows(prims, "cam", "primitives", [(64, 64), (1024, 64), (64, 128), (1024, 128)] if not args.quick else [(1024, 64)])
