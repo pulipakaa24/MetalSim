@@ -4,6 +4,10 @@ What landed between 2026-09-22 and 2026-10-13, grouped by area. The September se
 commit order; the October sections, newest first, summarise each merged pull request with its main commits (`git log`
 for the full messages). Dates are the commit dates (month-day).
 
+## Rendering: filming tool and the Franka-Pour render (2026-10-14, `docs/renders/`)
+
+- 10-14 `metalsim.render.film`: one command films a registered task (`python -m metalsim.render.film <task>`): record the policy rollout in the task's venv (Newton or MuJoCo), build a portable render twin (MJCF + per-frame geom poses + particles), render offline with the tier-2 path tracer, encode H.264 + stills, and write `docs/renders/<TASK>.md` from the stage logs (timings, hardware, pins, assets with sources and licences). Camera and recording settings follow Isaac Lab's `ViewerCfg` / `VideoRecorderCfg`. Per task: a `FilmTask` entry and a recorder adapter. First films: Franka-Pour (trained policy, 2 shots) and the G1 flat walk (smoke test). `franka_pour_scene.build_model(visuals=True)` loads the USD visual meshes for the render twin (physics unchanged). Tests `tests/test_film.py` (CPU).
+
 ## Rendering: 3D Gaussian splat scenes (2026-10-13, `metalsim/render/SPLAT.md`)
 
 - 10-13 `metalsim/render/splat/` + `shaders/splat.metal`: a batched compute-tile 3DGS rasterizer (cull, EWA projection with SH, 24-bit depth keys, 5-pass radix sort, subtile-masked blend) writing tier-0 layout buffers, GPU path without host sync, tier-0 mesh composite; loaders for 3DGS / SuperSplat PLY, SPZ, `.splat` and NuRec `.nurec`; float64 reference (EWA and 3DGUT kernels); `make_transform` / `floor_plane_transform`; `scripts/fetch_splat_scenes.sh` (InteriorGS reference scene, gated, and a CC0 object, never committed) and `scripts/splat_bench.py`; the GPU path now follows the composited mesh renderer's camera and restores it after host-path calls.
