@@ -1,0 +1,87 @@
+.......s....F.....                                                       [100%]
+=================================== FAILURES ===================================
+______________________________ test_go2_boxes_gpu ______________________________
+
+tmp_path = PosixPath('/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-92/test_go2_boxes_gpu0')
+
+    @needs_go2
+    @needs_metal
+    def test_go2_boxes_gpu(tmp_path):
+        """BatchSim + tier-1 head camera (rgb, depth, segmentation) + ray-traced lidar on the composed example."""
+        from dataclasses import replace
+    
+        cfg = replace(C.load(GO2), num_envs=2)
+        scene = CP.compose(cfg)
+        scene.reset()
+        for _ in range(20):
+            scene.step()
+        scene.sim.synchronize()
+        out = scene.render()["head_cam"]
+        rgb, depth, seg = out["rgb"], out["distance_to_image_plane"], out["semantic_segmentation"]
+        assert rgb.shape == (2, 360, 640, 3) and rgb.std() > 5
+>       assert depth.shape == (2, 360, 640) and np.isfinite(depth).all() and (depth > 0).mean() > 0.5
+E       AssertionError: assert ((2, 360, 640) == (2, 360, 640)
+E         
+E         Use -v to get more diff and np.True_ and np.float64(0.3333333333333333) > 0.5)
+E        +  where np.True_ = <built-in method all of numpy.ndarray object at 0x11facb930>()
+E        +    where <built-in method all of numpy.ndarray object at 0x11facb930> = array([[[ True,  True,  True, ...,  True,  True,  True],\n        [ True,  True,  True, ...,  True,  True,  True],\n    ... True, ...,  True,  True,  True],\n        [ True,  True,  True, ...,  True,  True,  True]]],\n      shape=(2, 360, 640)).all
+E        +      where array([[[ True,  True,  True, ...,  True,  True,  True],\n        [ True,  True,  True, ...,  True,  True,  True],\n    ... True, ...,  True,  True,  True],\n        [ True,  True,  True, ...,  True,  True,  True]]],\n      shape=(2, 360, 640)) = <ufunc 'isfinite'>(array([[[0.       , 0.       , 0.       , ..., 0.       , 0.       ,\n         0.       ],\n        [0.       , 0.      ...[1.8541349, 1.8541342, 1.8541336, ..., 1.8537577, 1.8537571,\n         1.8537568]]], shape=(2, 360, 640), dtype=float32))
+E        +        where <ufunc 'isfinite'> = np.isfinite
+E        +  and   np.float64(0.3333333333333333) = <built-in method mean of numpy.ndarray object at 0x11fc640f0>()
+E        +    where <built-in method mean of numpy.ndarray object at 0x11fc640f0> = array([[[0.       , 0.       , 0.       , ..., 0.       , 0.       ,\n         0.       ],\n        [0.       , 0.      ...[1.8541349, 1.8541342, 1.8541336, ..., 1.8537577, 1.8537571,\n         1.8537568]]], shape=(2, 360, 640), dtype=float32) > 0.mean
+
+tests/test_compose.py:170: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Module mujoco_warp._src.smooth d82236f load on device 'metal:0' took 1915.76 ms  (cached)
+Module _nxn_broadphase__locals__kernel_da6e4d10 da6e4d1 load on device 'metal:0' took 439.55 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_74f6bbbc 74f6bbb load on device 'metal:0' took 2803.10 ms  (compiled)
+Module _primitive_narrowphase__locals__primitive_narrowphase_cf550af6 cf550af load on device 'metal:0' took 1000.28 ms  (compiled)
+Module mujoco_warp._src.constraint 5a9ac8b load on device 'metal:0' took 377.69 ms  (compiled)
+Module _friction_dof__locals__kernel_7675e9e7 7675e9e load on device 'metal:0' took 104.63 ms  (compiled)
+Module _limit_slide_hinge__locals__kernel_89f30062 89f3006 load on device 'metal:0' took 427.12 ms  (compiled)
+Module _efc_contact_init__locals__kernel_053e2b79 053e2b7 load on device 'metal:0' took 414.48 ms  (compiled)
+Module _efc_contact_jac_sparse__locals__kernel_23367638 2336763 load on device 'metal:0' took 110.45 ms  (compiled)
+Module _efc_contact_update__locals__kernel_2c3f8f8a 2c3f8f8 load on device 'metal:0' took 109.03 ms  (compiled)
+Module mujoco_warp._src.sensor 9b332ca load on device 'metal:0' took 1680.46 ms  (cached)
+Module mujoco_warp._src.forward f50e6f5 load on device 'metal:0' took 1317.86 ms  (cached)
+Module mujoco_warp._src.passive b076fe0 load on device 'metal:0' took 338.24 ms  (compiled)
+Module _qfrc_passive_kernel__locals__kernel_54b31bb5 54b31bb load on device 'metal:0' took 378.18 ms  (compiled)
+Module mujoco_warp._src.forward 5f45167 load on device 'metal:0' took 352.60 ms  (compiled)
+Module _qfrc_smooth__locals__kernel_775cdd1e 775cdd1 load on device 'metal:0' took 439.51 ms  (compiled)
+Module mujoco_warp._src.support c23ce19 load on device 'metal:0' took 105.13 ms  (compiled)
+Module _small_cholesky_factorize_solve_block__locals__kernel_1e1369df 8ac5b05 load on device 'metal:0' took 504.17 ms  (compiled)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_068311f7 22519a4 load on device 'metal:0' took 466.25 ms  (compiled)
+Module _solve_init_dof__locals__kernel_b308d2e0 b308d2e load on device 'metal:0' took 378.87 ms  (compiled)
+Module _solve_init_efc__locals__kernel_496de172 496de17 load on device 'metal:0' took 328.74 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_9e06cdec 9e06cde load on device 'metal:0' took 388.63 ms  (compiled)
+Module mul_m_kernel__locals___mul_m_cc4a8159 cc4a815 load on device 'metal:0' took 398.88 ms  (compiled)
+Module _update_constraint_efc__locals__kernel_816b370a 816b370 load on device 'metal:0' took 102.98 ms  (compiled)
+Module mujoco_warp._src.solver 7d36d0b load on device 'metal:0' took 515.74 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_sparse__locals__kernel_fb0e9617 fb0e961 load on device 'metal:0' took 93.68 ms  (compiled)
+Module _update_gradient_zero_grad_dot__locals__kernel_62bc6e88 62bc6e8 load on device 'metal:0' took 373.37 ms  (compiled)
+Module _update_gradient_grad__locals__kernel_68e6ef6f 68e6ef6 load on device 'metal:0' took 379.41 ms  (compiled)
+Module _update_gradient_init_h_sparse__locals__kernel_84a052c3 84a052c load on device 'metal:0' took 92.83 ms  (compiled)
+Module _JTDACJ_sparse__locals__kernel_e1f3fdb5 ca15c6d load on device 'metal:0' took 155.48 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_42432b97 128e28f load on device 'metal:0' took 440.21 ms  (compiled)
+Module _linesearch_jv_fused_kernel__locals__kernel_bf645185 bf64518 load on device 'metal:0' took 384.28 ms  (compiled)
+Module _linesearch_iterative_kernel__locals__kernel_14418b72 0065b3c load on device 'metal:0' took 132.04 ms  (compiled)
+Module _update_constraint_efc__locals__kernel_74fe78cc 74fe78c load on device 'metal:0' took 104.30 ms  (compiled)
+Module _update_gradient_zero_grad_dot__locals__kernel_1f9a5fed 1f9a5fe load on device 'metal:0' took 93.20 ms  (compiled)
+Module _update_gradient_grad__locals__kernel_d31e3724 d31e372 load on device 'metal:0' took 92.12 ms  (compiled)
+Module _update_gradient_h_incremental_sparse__locals__kernel_c4c9e4a6 c4c9e4a load on device 'metal:0' took 95.85 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_aee3b00a 0e4151a load on device 'metal:0' took 437.95 ms  (compiled)
+Module _solve_done__locals__kernel_f6c8ded3 f6c8ded load on device 'metal:0' took 38.94 ms  (cached)
+Module _next_time_builder__locals___next_time_9bdc285a 9bdc285 load on device 'metal:0' took 330.55 ms  (cached)
+Module metalsim.physics.batch 74a3c65 load on device 'metal:0' took 324.23 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_753bbeab 753bbea load on device 'metal:0' took 40.10 ms  (cached)
+Module reset_data__locals__reset_M_94b7ab81 94b7ab8 load on device 'metal:0' took 40.64 ms  (cached)
+Module reset_data__locals__reset_mocap_ffcfb2c4 ffcfb2c load on device 'metal:0' took 41.04 ms  (cached)
+Module reset_data__locals__reset_contact_41eafef4 41eafef load on device 'metal:0' took 43.68 ms  (cached)
+Module reset_data__locals__reset_sleep_38f94185 38f9418 load on device 'metal:0' took 43.90 ms  (cached)
+Module reset_data__locals__reset_nworld_5d2d5901 5d2d590 load on device 'metal:0' took 40.62 ms  (cached)
+[scene] go2_boxes: 2 envs, nbody 20 ngeom 63 nq 61 nu 12, 1 cameras, 1 lidars; spec 0.01 s, sim 32.19 s
+=========================== short test summary info ============================
+FAILED tests/test_compose.py::test_go2_boxes_gpu - AssertionError: assert ((2...
+1 failed, 16 passed, 1 skipped in 38.75s
+
+[watchdog] exit 1 after 40 s
