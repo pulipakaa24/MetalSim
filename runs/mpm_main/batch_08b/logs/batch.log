@@ -1,0 +1,110 @@
+=== batch_08b start Tue Oct 13 20:11:06 PDT 2026 PIN_MOVE=0
+current pins (origin/main 0ec79585): Warp 31cf79d781e4b10d8ff85c8cbd98fc0e40f75953, MuJoCo Warp f1b35e2b3ddc80b197b0c665bf6d71523d175daf
+[20:11:10] FORKS8 -> PASS Warp 52c09cdd (code 9346cf72), MuJoCo Warp 4d05cb7 (code cfa290b)
+Auto-merging docs/GAPS.md
+Auto-merging docs/GUIDE.md
+edited scripts/setup_warp.sh
+  README.md (Warp): 1 pin line(s)
+  README.md (MuJoCo Warp): 3 pin line(s)
+edited README.md
+  docs/GUIDE.md (Warp): 2 pin line(s)
+  docs/GUIDE.md (MuJoCo Warp): 3 pin line(s)
+edited docs/GUIDE.md
+  MPM.md (Warp): 2 pin line(s)
+edited metalsim/physics/mpm/MPM.md
+edited docs/STATUS.md
+edited docs/GAPS.md
+edited CHANGELOG.md
+edited research_notes/MPM in main simulator/deterministic_ccd_divergence.md
+pin_docs: ok
+[20:11:11] DOCS8 -> PASS e13cfc19
+/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-tripwire-git/warp/__init__.py
+/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mujoco_warp-detccd/mujoco_warp/__init__.py
+/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/__init__.py
+rest: tests/test_g1_newton_engine.py tests/test_gpu_dashboard.py tests/test_gpu_queue.py tests/test_mpm_main.py tests/test_newton_bridge_poses.py tests/test_no_machine_paths.py tests/test_physx_cloth.py 
+[20:11:14] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
+[20:11:14] gpu job mm8_warp_det (<= 30 min, PYTHONPATH=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-tripwire-git:/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b08b/logs/warp_det.log
+    Module loop_scatter_add_kernel_dad1fa59 dad1fa5 load on device 'metal:0' took 392.15 ms  (compiled)
+    Module warp.tests.deterministic.test_deterministic_scatter f66d470 load on device 'metal:0' took 48.80 ms  (cached)
+    Module warp.tests.deterministic.test_deterministic_scatter ebefe9e load on device 'cpu' took 270.33 ms  (compiled)
+[20:11:45] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s:
+  pid   1291 Google Chrome He                   2.1 %
+[20:11:45] gpu job mm8_warp_metal_det (<= 15 min, PYTHONPATH=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-tripwire-git:/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b08b/logs/warp_metal_det.log
+    Module ordered_sum_2edfb6c8 2edfb6c load on device 'metal:0' took 323.81 ms  (cached)
+    Module det_append_per_world_6b8637b8 6b8637b load on device 'metal:0' took 329.27 ms  (cached)
+    Module det_append_fixed_scratch_57c569a7 57c569a load on device 'metal:0' took 343.60 ms  (cached)
+[20:11:55] health: utilisation 2%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s:
+  pid   1291 Google Chrome He                   1.8 %
+[20:11:56] WDET8 -> PASS Ran 115 tests in 20.968s Ran 15 tests in 3.577s 
+[20:11:56] gpu job mm8_newton_det_152 (<= 45 min, PYTHONPATH=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-tripwire-git:/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b08b/logs/newton_det_152.log
+    ERROR ../../../upstream/newton-1.5.2/newton/tests/determinism/test_solver_determinism.py::test_mujoco_sparse_articulation_construction
+    ERROR ../../../upstream/newton-1.5.2/newton/tests/determinism/test_solver_determinism.py::test_articulation_determinism
+    8 passed, 6 skipped, 3 errors, 2 subtests passed in 4.35s
+[20:12:12] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
+[20:12:12] gpu job mm8_newton_det_152_old (<= 45 min, PYTHONPATH=) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b08b/logs/newton_det_152_oldpins.log
+    ERROR ../../../upstream/newton-1.5.2/newton/tests/determinism/test_solver_determinism.py::test_mujoco_sparse_articulation_construction
+    ERROR ../../../upstream/newton-1.5.2/newton/tests/determinism/test_solver_determinism.py::test_articulation_determinism
+    8 passed, 6 skipped, 3 errors, 2 subtests passed in 4.00s
+[20:12:23] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   2.2 %
+[20:12:23] newton_det_152 -> PREEXISTING 8 passed, 6 skipped, 3 errors, 2 subtests passed in 4.35s; fails on the current Warp too: 8 passed, 6 skipped, 3 errors, 2 subtests passed in 4.00s
+[20:12:24] gpu job mm8_newton_det_nf (<= 45 min, PYTHONPATH=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-tripwire-git:/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b08b/logs/newton_det_nf.log
+    ERROR ../../../upstream/newton/newton/tests/determinism/test_solver_determinism.py::test_mujoco_sparse_articulation_construction
+    ERROR ../../../upstream/newton/newton/tests/determinism/test_solver_determinism.py::test_articulation_determinism
+    9 passed, 6 skipped, 3 errors, 4 subtests passed in 8.08s
+[20:12:40] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[20:12:40] gpu job mm8_newton_det_nf_old (<= 45 min, PYTHONPATH=) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b08b/logs/newton_det_nf_oldpins.log
+    ERROR ../../../upstream/newton/newton/tests/determinism/test_solver_determinism.py::test_mujoco_sparse_articulation_construction
+    ERROR ../../../upstream/newton/newton/tests/determinism/test_solver_determinism.py::test_articulation_determinism
+    9 passed, 6 skipped, 3 errors, 4 subtests passed in 7.71s
+[20:12:56] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[20:12:56] newton_det_nf -> PREEXISTING 9 passed, 6 skipped, 3 errors, 4 subtests passed in 8.08s; fails on the current Warp too: 9 passed, 6 skipped, 3 errors, 4 subtests passed in 7.71s
+[20:12:56] gpu job mm8_det8 (<= 30 min, PYTHONPATH=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mujoco_warp-detccd:/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-tripwire-git:/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b08b/logs/det8.log
+    .......                                                                  [100%]
+    7 passed in 244.15s (0:04:04)
+[20:17:08] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[20:17:08] det8 -> PASS 7 passed in 244.15s (0:04:04)
+[20:17:08] gpu job mm8_n152_8 (<= 90 min, PYTHONPATH=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-tripwire-git:/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b08b/logs/n152_8.log
+    
+    -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+    10 passed, 13 skipped, 1 xfailed, 1 warning in 48.48s
+[20:18:04] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[20:18:04] n152_8 -> PASS 10 passed, 13 skipped, 1 xfailed, 1 warning in 48.48s
+[20:18:04] gpu job mm8_rigid8 (<= 120 min, PYTHONPATH=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mujoco_warp-detccd:/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-tripwire-git:/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b08b/logs/rigid8.log
+    ERROR tests/test_ppo_warp_rollout.py::test_stored_logp_matches_torch - pxr.Tf...
+    ERROR tests/test_ppo_warp_rollout.py::test_timeouts_flagged - pxr.Tf.ErrorExc...
+    20 failed, 76 passed, 49 skipped, 3 errors in 177.84s (0:02:57)
+[20:21:11] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   2.2 %
+[20:21:11] rigid8 failed (20 failed, 76 passed, 49 skipped, 3 errors in 177.84s (0:02:57)); re-running on the current pins: tests/test_deformable.py tests/test_ppo_warp_rollout.py tests/test_solver_presets.py tests/test_terrain.py 
+[20:21:11] gpu job mm8_rigid8_old (<= 120 min, PYTHONPATH=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b08b/logs/rigid8_oldpins.log
+    ERROR tests/test_ppo_warp_rollout.py::test_stored_logp_matches_torch - pxr.Tf...
+    ERROR tests/test_ppo_warp_rollout.py::test_timeouts_flagged - pxr.Tf.ErrorExc...
+    20 failed, 25 passed, 3 errors in 88.87s (0:01:28)
+[20:22:47] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[20:22:47] rigid8 -> PREEXISTING 20 failed, 76 passed, 49 skipped, 3 errors in 177.84s (0:02:57); same failures on the current pins: ERROR tests/test_ppo_warp_rollout.py::test_noise_fresh_each_rollout_and_no_phantom_action;ERROR tests/test_ppo_warp_rollout.py::test_stored_logp_matches_torch;ERROR tests/test_ppo_warp_rollout.py::test_timeouts_flagged;FAILED tests/test_deformable.py::test_g1_cloth_scenes_run;FAILED tests/test_ppo_warp_rollout.py::test_rslrl_adapter_contract;FAILED tests/test_solver_presets.py::test_effective_model_fields_per_preset_combination[default-isaaclab3];FAILED tests/test_solver_presets.py::test_effective_model_fields_per_preset_combination[default-None];FAILED tests/test_solver_presets.py::test_effective_model_fields_per_preset_combination[recommended-isaaclab3_every_substep_cap20];FAILED tests/test_solver_presets.py::test_effective_model_fields_per_preset_combination[recommended-isaaclab3_hardlimits];FAILED tests/test_solver_presets.py::test_effective_model_fields_per_preset_combination[recommended-isaaclab3];FAILED tests/test_solver_presets.py::test_effective_model_fields_per_preset_combination[recommended-None];FAILED tests/test_solver_presets.py::test_g1_actuator_and_joint_fields_match_newtons_model;FAILED tests/test_solver_presets.py::test_isaaclab3_model_fields_match_the_recording;FAILED tests/test_solver_presets.py::test_iteration_cap_only_changes_worlds_that_reach_it;FAILED tests/test_solver_presets.py::test_once_per_tick_collision_step_is_stable_and_close;FAILED tests/test_solver_presets.py::test_once_per_tick_contacts_follow_the_bodies;FAILED tests/test_solver_presets.py::test_saturated_finger_keeps_implicit_damping;FAILED tests/test_terrain.py::test_g1_rough_task_runs;FAILED tests/test_terrain.py::test_height_scan_ray_order_matches_isaac_recording;FAILED tests/test_terrain.py::test_hfield_mesh_contacts_match_mujoco_c;FAILED tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[boxes_local];FAILED tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[boxes];FAILED tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[meshes];
+[20:22:47] gpu job mm8_render8 (<= 120 min, PYTHONPATH=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mujoco_warp-detccd:/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-tripwire-git:/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b08b/logs/render8.log
+    
+    -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+    243 passed, 1 skipped, 3 warnings in 193.04s (0:03:13)
+[20:26:09] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[20:26:09] render8 -> PASS 243 passed, 1 skipped, 3 warnings in 193.04s (0:03:13)
+[20:26:09] gpu job mm8_rest8 (<= 150 min, PYTHONPATH=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mujoco_warp-detccd:/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-tripwire-git:/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b08b/logs/rest8.log
+    
+    -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+    41 passed, 10 skipped, 1 warning in 314.17s (0:05:14)
+[20:31:31] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[20:31:31] rest8 -> PASS 41 passed, 10 skipped, 1 warning in 314.17s (0:05:14)
