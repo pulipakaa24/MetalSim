@@ -39,8 +39,10 @@ learn = ["gymnasium", "stable-baselines3"]
 # the reference learner on MetalSim physics (metalsim.learn.train_g1_rslrl)
 rslrl = ["rsl-rl-lib==3.1.2", "tensordict"]
 tron1 = ["scipy", "onnxruntime"]
+# the filming tool's frames, stills and mp4 (metalsim.render.film; OIDN comes with the core pyoidn)
+film = ["imageio", "imageio-ffmpeg", "pillow"]
 # everything the test suite imports in .venv (zero optional-package skips): the documented install uses it
-full = ["metalsim[test,newton,rslrl,tron1]"]
+full = ["metalsim[test,newton,rslrl,tron1,film]"]
 # fidelity protocol against an Isaac recording and the render-fidelity benchmark (metalsim.parity, metalsim.bench)
 parity = ["imageio", "imageio-ffmpeg", "pillow", "scikit-image", "lpips", "flip-evaluator"]
 # Newton XPBD engine (experimental, archived): the upstream commit the validation runs pinned (newton-physics/newton

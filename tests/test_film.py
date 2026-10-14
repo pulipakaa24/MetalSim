@@ -174,3 +174,17 @@ def test_render_scene_and_doc(tmp_path):
     text = D.write_doc(task, str(rec_dir), [("hero", str(shot))], str(tmp_path / "X.md"), ["python -m x"])
     assert "| render: hero |" in text and "https://example.org/cube" in text
     assert "/Users/" not in text and "/private/" not in text
+
+
+def test_preflight_reports_missing_denoiser(monkeypatch):
+    """A film whose render stage cannot run stops before recording, naming the fix (and --no-denoise)."""
+    from metalsim.render.film import preflight
+
+    monkeypatch.setattr(preflight, "CHECK_OIDN", ("Open Image Denoise", "raise ImportError('Open Image Denoise not found')",
+                                                  preflight.CHECK_OIDN[2]))
+    task = _task(FakeMujoco)
+    miss = preflight.missing(task, ["record", "render", "encode", "doc"])
+    assert [m[0] for m in miss] == ["Open Image Denoise"] and "--no-denoise" in miss[0][1]
+    with pytest.raises(SystemExit):
+        preflight.check(task, ["record", "render"])
+    assert preflight.missing(replace(task, film=replace(task.film, denoise=None)), ["render"]) == []
