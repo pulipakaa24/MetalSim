@@ -134,9 +134,9 @@ P="-p no:cacheprovider -q -rfEs"
 gpu 10_metal_check 05_pip_mujoco_warp 5 600 -- 'python -c "import warp as wp; wp.init(); print(\"metal:\", wp.is_metal_available()); assert wp.is_metal_available()"'
 gpu 11_rigid_suite "05_pip_mujoco_warp 06_fetch_isaac 07_menagerie" 90 7200 -- "python -m pytest $P $IGN tests"
 gpu 12_render_suite "05_pip_mujoco_warp 06_fetch_isaac 07_menagerie" 60 5400 -- "python -m pytest $P $RENDER"
-gpu 13_test_mpm 08_setup_newton152 30 3600 -- "$CLONE/.venv-newton152/bin/python -m pytest $P tests/test_mpm.py"
+gpu 13_test_mpm 08_setup_newton152 30 3600 -- ".venv-newton152/bin/python -m pytest $P tests/test_mpm.py"
 gpu 14_test_mpm_main "05_pip_mujoco_warp 08_setup_newton152" 60 3600 -- "python -m pytest $P tests/test_mpm_main.py"
-gpu 17_test_franka_pour "08_setup_newton152 06_fetch_isaac" 30 3600 -- "$CLONE/.venv-newton152/bin/python -m pytest $P $N152"
+gpu 17_test_franka_pour "08_setup_newton152 06_fetch_isaac" 30 3600 -- ".venv-newton152/bin/python -m pytest $P $N152"
 if [ -f "$CLONE/$DET" ]; then
   GKIND=timing gpu 16_test_batch_deterministic "05_pip_mujoco_warp" 30 3600 -- "python -m pytest $P $DET"
 fi
