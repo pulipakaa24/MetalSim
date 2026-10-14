@@ -1,0 +1,49 @@
+........                                                                 [100%]
+=============================== warnings summary ===============================
+../../../.venv-newton152/lib/python3.12/site-packages/torch/jit/_script.py:1491
+tests/test_franka_pour_terms.py::test_observation_terms_match_isaac
+  /Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/torch/jit/_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+tests/test_franka_pour_terms.py::test_observation_terms_match_isaac
+tests/test_franka_pour_terms.py::test_observation_terms_match_isaac
+tests/test_franka_pour_terms.py::test_observation_terms_match_isaac
+tests/test_franka_pour_terms.py::test_observation_terms_match_isaac
+tests/test_franka_pour_resume.py::test_checkpoint_round_trip_and_stop_file
+tests/test_franka_pour_resume.py::test_checkpoint_round_trip_and_stop_file
+tests/test_franka_pour_resume.py::test_checkpoint_round_trip_and_stop_file
+tests/test_franka_pour_resume.py::test_checkpoint_round_trip_and_stop_file
+  /Users/aditya/robosim/upstream/newton-metalsim-1.5.2/newton/_src/utils/import_usd.py:587: DeprecationWarning: LoadUsdPhysicsFromRange is deprecated, use UsdPhysicsLoadStageFromPrimRange instead.
+    ret_dict = UsdPhysics.LoadUsdPhysicsFromRange(stage, [root_path], excludePaths=native_exclude_paths)
+
+tests/test_franka_pour_terms.py: 7 warnings
+tests/test_franka_pour_resume.py: 7 warnings
+  /Users/aditya/robosim/upstream/newton-metalsim-1.5.2/newton/_src/utils/import_usd.py:1637: DeprecationWarning: 'newton:angular:limitStiffness' on joint prim is deprecated; use 'newton:limitStiffness' instead.
+    fallback_limit_ke, limit_ke_source = _resolve_joint_limit_gain(
+
+tests/test_franka_pour_terms.py: 7 warnings
+tests/test_franka_pour_resume.py: 7 warnings
+  /Users/aditya/robosim/upstream/newton-metalsim-1.5.2/newton/_src/utils/import_usd.py:1642: DeprecationWarning: 'newton:angular:limitDamping' on joint prim is deprecated; use 'newton:limitDamping' instead.
+    fallback_limit_kd, limit_kd_source = _resolve_joint_limit_gain(
+
+tests/test_franka_pour_terms.py::test_observation_terms_match_isaac
+tests/test_franka_pour_terms.py::test_observation_terms_match_isaac
+tests/test_franka_pour_resume.py::test_checkpoint_round_trip_and_stop_file
+tests/test_franka_pour_resume.py::test_checkpoint_round_trip_and_stop_file
+  /Users/aditya/robosim/upstream/newton-metalsim-1.5.2/newton/_src/utils/import_usd.py:1637: DeprecationWarning: 'newton:linear:limitStiffness' on joint prim is deprecated; use 'newton:limitStiffness' instead.
+    fallback_limit_ke, limit_ke_source = _resolve_joint_limit_gain(
+
+tests/test_franka_pour_terms.py::test_observation_terms_match_isaac
+tests/test_franka_pour_terms.py::test_observation_terms_match_isaac
+tests/test_franka_pour_resume.py::test_checkpoint_round_trip_and_stop_file
+tests/test_franka_pour_resume.py::test_checkpoint_round_trip_and_stop_file
+  /Users/aditya/robosim/upstream/newton-metalsim-1.5.2/newton/_src/utils/import_usd.py:1642: DeprecationWarning: 'newton:linear:limitDamping' on joint prim is deprecated; use 'newton:limitDamping' instead.
+    fallback_limit_kd, limit_kd_source = _resolve_joint_limit_gain(
+
+tests/test_franka_pour_terms.py::test_observation_terms_match_isaac
+tests/test_franka_pour_resume.py::test_checkpoint_round_trip_and_stop_file
+  /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/learn/franka_pour_scene.py:596: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+    model = b.finalize(device=device)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+8 passed, 48 warnings in 109.35s (0:01:49)
