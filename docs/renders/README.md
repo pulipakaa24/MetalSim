@@ -6,8 +6,14 @@ which machine, every asset with its source and licence, and the commands to repr
 | film | what | doc |
 |---|---|---|
 | Franka-Pour | trained policy pours granular MPM media between two cups (Isaac Lab 3.0-EA task); one env and a 2 x 2 grid | [FRANKA_POUR.md](FRANKA_POUR.md) |
+| G1 flat walk | the tool's MuJoCo-path smoke test: Isaac Lab's G1 flat velocity policy, 5 s, 1280x720, 128 spp | [g1_flat.mp4](g1_flat.mp4) ([still](g1_flat_still2.jpg)) |
 
 ## Making one
+
+Needs the documented install (`pip install -e ".[full]"`, docs/GUIDE.md): Open Image Denoise comes with the core
+dependency `pyoidn` (a macOS arm64 wheel that bundles OIDN; MIT binding, OIDN Apache-2.0), ffmpeg with the `film`
+extra (`imageio-ffmpeg`). The tool checks both before it records anything and prints the fix; `--no-denoise` renders
+without OIDN (said so in the doc).
 
 ```bash
 python -m metalsim.render.film --list                 # filmable tasks

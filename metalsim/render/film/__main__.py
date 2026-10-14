@@ -74,6 +74,9 @@ def main(argv=None):
     rec_dir = os.path.join(out, "rec")
     shots = [s for s in task.shots if not a.shots or s.name in a.shots.split(",")]
     stages = ["record", "render", "encode", "doc"] if a.stage == "all" else [a.stage]
+    if not a.skip_preflight:
+        from metalsim.render.film.preflight import check
+        check(task, ["record", "render", "encode", "doc"] if "record" in stages else stages)
     if "record" in stages:
         py = venv_python(task.venv)
         # venvs share one base interpreter: compare the venv (sys.prefix), not the resolved executable
@@ -84,8 +87,8 @@ def main(argv=None):
                 ck = os.path.join(provenance.ROOT, ck)
             record(task, task.film, task.viewer, rec_dir, ck)
         else:
-            args = [py, "-m", "metalsim.render.film", task.name, "--stage", "record", "--out", out]
-            args += [x for x in (argv if argv is not None else sys.argv[1:])[1:] if x not in ("--stage", a.stage)]
+            args = [py, "-m", "metalsim.render.film", task.name, "--stage", "record", "--out", out, "--skip-preflight"]
+            args += [x for x in (argv if argv is not None else sys.argv[1:])[1:] if x not in ("--stage", a.stage, "--skip-preflight")]
             subprocess.run(args, check=True, cwd=provenance.ROOT)
     if "render" in stages:
         from metalsim.render.film.render import render

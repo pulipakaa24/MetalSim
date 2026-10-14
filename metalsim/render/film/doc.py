@@ -95,7 +95,7 @@ def write_doc(task, rec_dir, shots, doc_path, commands, extra_md=""):
         pr = r.get("probe") or {}
         L.append(f"| render: {label} | {r['width']}x{r['height']} ({r['grid']}x{r['grid']} panels of {r['panel'][0]}x"
                  f"{r['panel'][1]}), tier {r['tier']} path tracing, {r['samples_per_pixel']} spp ({r['passes']} passes x "
-                 f"{r['spp']}), {r['bounces']} bounces, denoiser {r['denoise']}; {secs.mean():.2f} s/frame mean "
+                 f"{r['spp']}), {r['bounces']} bounces, denoiser {r['denoise'] or 'none (--no-denoise)'}; {secs.mean():.2f} s/frame mean "
                  f"({np.median(secs):.2f} median, {secs.max():.2f} max), {_fmt_s(float(secs.sum()))} for {len(secs)} frames; "
                  f"first frame: one pass {pr.get('one_pass_s', float('nan')) * 1e3:.0f} ms, "
                  f"{pr.get('per_pass_s', float('nan')) * 1e3:.0f} ms per further pass; set-up {r['setup_s']:.1f} s |")

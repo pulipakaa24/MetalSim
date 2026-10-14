@@ -1,0 +1,2 @@
+setup_newton152.sh: upstream/newton-1.5.2 is at cf5378db, not the pinned addd10cb:
+  git -C upstream/newton-1.5.2 fetch origin && git -C upstream/newton-1.5.2 checkout --detach addd10cbeb25e946b3a4c2bb1d4097acc7a98ca2   (or set METALSIM_NEWTON152_REF)
