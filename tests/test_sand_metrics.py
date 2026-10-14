@@ -9,6 +9,7 @@ import numpy as np
 import pytest
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "metalsim/physics/mpm/probes"))
 import sand_metrics as SM  # noqa: E402
 
@@ -142,6 +143,42 @@ def test_tilt_box_scene_and_nonfinite_report():
     w = TB.nonfinite_report(q, v, bad, 0.0, 0.0, 0.005)
     assert w["n_bad"] == 2 and w["frac_near_end_wall"] == 1.0 and w["frac_near_floor_edge"] == 0.5
     assert w["frac_near_wall_edge"] == 0.5
+
+
+def test_sphere_scenes_and_collider_layout():
+    mujoco = pytest.importorskip("mujoco")
+    import sphere_drop as SD
+
+    from metalsim.physics.mpm import colliders as C
+
+    cases = {"plain": ({}, 1, 1), "walls": ({"walls": (0.2, 0.2, 0.12)}, 1, 5),
+             "control": ({"ball": False, "walls": (0.2, 0.2, 0.12)}, 0, 5),
+             "kinematic": ({"kinematic": True, "walls": (0.2, 0.2, 0.12)}, 1, 5)}
+    for name, (kw, moving, static) in cases.items():
+        m = mujoco.MjModel.from_xml_string(SD.scene_xml(1 / 1440, 0.025, 0.16, 0.146, ox=0.0025, oy=0.0025, **kw))
+        lay = C.layout(m, list(range(m.ngeom)))
+        assert (len(lay.body_map), len(lay.static_geoms)) == (moving, static), name
+        if kw.get("walls"):                                 # wall faces half a voxel off the grid nodes
+            g = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_GEOM, "wall_xhi")
+            face = m.geom_pos[g][0] - m.geom_size[g][0]
+            assert abs(face - (0.0025 + 0.1)) < 1e-9 and abs((face / 0.005) % 1 - 0.5) < 1e-6
+
+
+def test_solve_log_summary():
+    import solve_log
+
+    logs = [{"iterations": np.array([250, 250, 100]), "res_l2": np.array([1e-3, 2e-3, 1e-5]),
+             "res_linf": np.array([1e-2, 1e-2, 1e-4])}, {"iterations": np.array([250]), "res_l2": np.array([1e-3]),
+                                                         "res_linf": np.array([1e-2])}]
+    s = solve_log.summary(logs, 250)
+    assert s["solves"] == 4 and abs(s["frac_at_cap"] - 0.75) < 1e-12
+    assert solve_log.summary([], 250) == {"solves": 0}
+
+
+def test_evaluator_02a_selftest():
+    r = subprocess.run([sys.executable, str(ROOT / "scripts/sand_fidelity/evaluate_batch_02a.py"), "--selftest"],
+                       capture_output=True, text=True)
+    assert r.returncode == 0, r.stdout + r.stderr
 
 
 def test_evaluator_selftest():
