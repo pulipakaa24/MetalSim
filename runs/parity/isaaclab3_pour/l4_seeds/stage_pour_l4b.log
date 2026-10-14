@@ -1,0 +1,25 @@
++ STAGES=train
++ ITERS=60
++ NUM=1024
++ EXTRA=
++ TAG=_curve_s1
++ SEED=1
++ P=/home/<user>/parity3_scripts/franka_pour_published_asset.patch
++ git apply --check /home/<user>/parity3_scripts/franka_pour_published_asset.patch
++ git apply /home/<user>/parity3_scripts/franka_pour_published_asset.patch
++ trap 'git apply -R $P' EXIT
++ nvidia-smi --query-gpu=name,driver_version --format=csv
+name, driver_version
+NVIDIA L4, 580.178.04
++ for S in $STAGES
++ wait_for_gpu
++ pgrep -f '[k]it/python|[i]saaclab train|[i]saaclab benchmark|[r]ecord_g1|[r]ecord_deformables|[t]rain.py|[p]lay_policy'
+++ date +%s
++ t0=1791924959
++ case $S in
++ timeout 21600 isaaclab train --rl_library rsl_rl --task IsaacContrib-Franka-Pour --num_envs 1024 --max_iterations 60 --seed 1 --run_name l4_1024_curve_s1 --viz none
+++ date +%s
++ echo 'train exit 0 in 18826 s'
+train exit 0 in 18826 s
++ touch /home/<user>/parity3/pour/STAGE_POUR_DONE
++ git apply -R /home/<user>/parity3_scripts/franka_pour_published_asset.patch
