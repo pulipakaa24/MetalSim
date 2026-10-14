@@ -1,6 +1,6 @@
 #!/bin/bash
 # Wait for the Isaac-side playback of the fixed-PPO checkpoints, fetch it, stop the VM, render round-two videos.
-cd /Users/aditya/robosim
+cd "$(dirname "$0")/../.."   # repo root
 G="gcloud compute ssh --zone us-west1-a aditya-isaac --tunnel-through-iap --project mcmc-193822 --quiet"
 until $G --command 'test -f ~/STAGE9_DONE' > /dev/null 2>&1; do sleep 60; done
 echo "stage9 done $(date +%H:%M:%S)"

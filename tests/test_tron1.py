@@ -211,7 +211,8 @@ def test_tron1_training_model_clamps_torque_at_the_joint():
     import re
     import numpy as np, mujoco
     from metalsim.learn import tron1_wf
-    xml = open("assets/tron1/WF_TRON1A/xml/robot.xml").read()
+    import pathlib
+    xml = (pathlib.Path(__file__).resolve().parents[1] / "assets/tron1/WF_TRON1A/xml/robot.xml").read_text()
     ranges = {n: float(hi) for n, lo, hi in re.findall(r'<motor name="(\w+)".*?ctrlrange=.(-?[\d.]+) (-?[\d.]+).', xml)}
     m = tron1_wf.build_train_model()
     assert len(ranges) == m.nu == 8
