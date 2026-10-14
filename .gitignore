@@ -55,3 +55,10 @@ assets/tron1/scenes_local/
 
 # private fork checkouts of an agent worktree (scripts/setup_*.sh use upstream/ in the main checkout)
 _forks/
+
+# film tool bulk outputs (metalsim/render/film): frames, recordings, render twins and full-resolution masters are
+# regenerated; their JSON and logs are committed
+runs/film/**/frames/
+runs/film/**/rec.npz
+runs/film/**/twin*
+runs/film/**/master.mp4

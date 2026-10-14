@@ -4,6 +4,10 @@ What landed between 2026-09-22 and 2026-10-13, grouped by area. The September se
 commit order; the October sections, newest first, summarise each merged pull request with its main commits (`git log`
 for the full messages). Dates are the commit dates (month-day).
 
+## Rendering: filming tool and the Franka-Pour render (2026-10-14, `docs/renders/`)
+
+- 10-14 `metalsim.render.film`: one command films a registered task (`python -m metalsim.render.film <task>`): record the policy rollout in the task's venv (Newton or MuJoCo), build a portable render twin (MJCF + per-frame geom poses + particles), render offline with the tier-2 path tracer, encode H.264 + stills, and write `docs/renders/<TASK>.md` from the stage logs (timings, hardware, pins, assets with sources and licences). Camera and recording settings follow Isaac Lab's `ViewerCfg` / `VideoRecorderCfg`. Per task: a `FilmTask` entry and a recorder adapter. First films: Franka-Pour (trained policy, 2 shots) and the G1 flat walk (smoke test). `franka_pour_scene.build_model(visuals=True)` loads the USD visual meshes for the render twin (physics unchanged). Tests `tests/test_film.py` (CPU).
+
 ## MPM: coupled step and resets in one policy-step graph (2026-10-13, `metalsim/physics/mpm/MPM.md` 11)
 
 - 10-13 `MPMCoupling.launch_step()`, a capturable per-world reset (`reset_mask`, `launch_reset(from_sim_mask=True)`, `reset(mask)` with numpy or torch masks and a reset graph) and `BatchSim.launch_reset()`; `scale_coupled.py --split` per-section timings; `policy_step_ab.py`. The coupling layer is about 0.4 ms per coupled step; one graph per policy step saves 0.18 ms at 1, 1.20 ms at 64, 2.11 ms at 1,024 worlds, bitwise. One-world masked reset fixed (it raised).

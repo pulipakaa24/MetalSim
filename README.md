@@ -32,6 +32,9 @@ project, not affiliated with or endorsed by NVIDIA, Google DeepMind or Apple.
   and [`docs/HANDOFF_tier2_hdri_envmap.md`](docs/HANDOFF_tier2_hdri_envmap.md).
 - Research: [`docs/research/`](docs/research) (one question per note; index under "Research notes" below),
   [`research_notes/`](research_notes) and [`reports/`](reports) (the MPM, float-parity, rendering and capacity rounds).
+- Renders: [`docs/renders/`](docs/renders) (filmed tasks with a doc each: what is shown, timings, assets and
+  licences, how to reproduce; first: [Franka-Pour](docs/renders/FRANKA_POUR.md)), made with
+  `python -m metalsim.render.film <task>`.
 - Images and data: [`docs/gallery/`](docs/gallery) (renders and side-by-side videos),
   [`docs/measurements/`](docs/measurements) (figures and JSON behind the docs' numbers); run logs under `runs/`.
 
