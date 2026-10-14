@@ -34,7 +34,8 @@ from bearing import XML  # noqa: E402
 
 
 def run(mode="lagged", drop=0.15, rest=False, fps=120, voxel=0.02, iterations=250, tolerance=1e-6, basis="S2",
-        depth=0.08, friction=0.7, seconds=1.5, box_half=0.05, box_mass=2.0, solver="auto", substeps=3, project=False):
+        depth=0.08, friction=0.7, seconds=1.5, box_half=0.05, box_mass=2.0, solver="auto", substeps=3, project=False,
+        log_iterations=False):
     import mujoco
     import warp as wp
 
@@ -45,18 +46,28 @@ def run(mode="lagged", drop=0.15, rest=False, fps=120, voxel=0.02, iterations=25
     z0 = depth + box_half + gap
     model = mujoco.MjModel.from_xml_string(XML.format(dt=1.0 / fps / substeps, z=z0, h=box_half, m=box_mass))
     sim = BatchSim(model, 1, options=BatchSimOptions(substeps=substeps))
-    mpm = MPMCoupling(sim, MPMConfig(voxel_size=voxel, max_iterations=iterations, tolerance=tolerance, solver=solver,
-                                     collider_basis=basis, mode=mode))
+    cfg = MPMConfig(voxel_size=voxel, max_iterations=iterations, tolerance=tolerance, solver=solver,
+                    collider_basis=basis, mode=mode, capture=not log_iterations)
+    mpm = MPMCoupling(sim, cfg)
     mpm.add_emitter(GridEmitter(lower=(-0.15, -0.15, 0.0), upper=(0.15, 0.15, depth),
                                 material=MPMMaterial(density=1500.0, friction=friction)))
     mpm.finalize()
+    logs = []
+    if log_iterations:
+        import solve_log
+
+        solve_log.enable(cfg)
     n = int(round(seconds * fps))
-    zs, vz, fz = [], [], []
+    zs, vz, fz, tilt = [], [], [], []
     for _ in range(n):                                     # bounded
         mpm.step()
+        if log_iterations:
+            logs.append(solve_log.drain())
         if project:
             mpm.solver.project_outside(mpm.state, mpm.state, mpm.dt)
         zs.append(float(sim.d.xpos.numpy()[0, 1, 2]))
+        qw = sim.d.xquat.numpy()[0, 1].astype(np.float64)
+        tilt.append(float(np.degrees(np.arccos(np.clip(SM.quat_wxyz_to_mat(qw)[2, 2], -1.0, 1.0)))))
         vz.append(float(sim.d.qvel.numpy()[0, 2]))
         fz.append(float(mpm.wrenches()[0, 0, 2]))
         if not np.isfinite(zs[-1]):
@@ -89,7 +100,9 @@ def run(mode="lagged", drop=0.15, rest=False, fps=120, voxel=0.02, iterations=25
             "t_peak_s": (k_peak + 1) / fps, "settlement_over_voxel": float(pen[-1] / voxel),
             "overlap": SM.box_overlap(q, pos, quat, box_half),
             "heave_ring_m": SM.ring_heave(q, pos[:2], 1.2 * box_half * 2 ** 0.5, 2.4 * box_half, 2 * sp, depth),
-            "bottom": bottom.tolist(), "vz": vz, "fz": fz}
+            "max_tilt_deg": float(max(tilt)), "final_tilt_deg": tilt[-1],
+            "solves": solve_log.summary(logs, iterations) if log_iterations else None,
+            "bottom": bottom.tolist(), "vz": vz, "fz": fz, "tilt_deg": tilt}
 
 
 def main():
@@ -106,6 +119,7 @@ def main():
     ap.add_argument("--friction", type=float, default=0.7)
     ap.add_argument("--seconds", type=float, default=1.5)
     ap.add_argument("--project", action="store_true")
+    ap.add_argument("--log-iterations", action="store_true")
     ap.add_argument("--json")
     a = ap.parse_args()
     import warp as wp
@@ -113,8 +127,8 @@ def main():
     wp.config.quiet = True
     with wp.ScopedDevice("metal:0"):
         r = run(a.mode, a.drop, a.rest, a.fps, a.voxel, a.iterations, a.tolerance, a.basis, a.depth, a.friction,
-                a.seconds, project=a.project)
-    print(json.dumps({k: v for k, v in r.items() if k not in ("bottom", "vz", "fz")}))
+                a.seconds, project=a.project, log_iterations=a.log_iterations)
+    print(json.dumps({k: v for k, v in r.items() if k not in ("bottom", "vz", "fz", "tilt_deg")}))
     if a.json:
         json.dump(r, open(a.json, "w"))
 
