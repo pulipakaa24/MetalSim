@@ -197,13 +197,13 @@ Branch [`metalsim-flex`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsi
 
 [github.com/pulipakaa24/newton](https://github.com/pulipakaa24/newton), branch
 [`metalsim`](https://github.com/pulipakaa24/newton/tree/metalsim), head
-[`9f31739`](https://github.com/pulipakaa24/newton/commit/9f317390da07432dfb5813bd0db6a47eeb7cb330) (XPBD code
+[`1301e8d`](https://github.com/pulipakaa24/newton/commit/1301e8da2002541f6f189b6e459e1ed5e6db5731) (XPBD code
 [`90e2332`](https://github.com/pulipakaa24/newton/commit/90e23324521fa86710e483e01d02e80d1dac0060), plus the Metal
 HashTable / 64-bit atomics fix `d06b2c0`, `7d80b8a`, the mesh-SDF barrier fix, Metal protocols for the remaining
 64-bit compare-and-swap / exchange sites and the Metal rigid-collision launches of the 1.5.2 line, `522e2d4`..`7dd71ed`).
-Base: newton-physics/newton `4545802`. Apache-2.0.
+Base: newton-physics/newton `4545802`. Apache-2.0. Both branches pass MuJoCo Warp 3.14's contact adhesion to `contact_force_fn` (the contact part of upstream's MuJoCo Warp 3.14 update `90f809a`, 2026-10-13); before, `SolverMuJoCo` did not compile against MetalSim's MuJoCo Warp fork.
 Branch [`metalsim-hashtable-metal`](https://github.com/pulipakaa24/newton/tree/metalsim-hashtable-metal)
-(`a4be360`) is upstream `4545802` with only the Metal fixes (no XPBD changes); the `newton` extra installs it into `.venv` (the stock commit
+(`9d6616c`) is upstream `4545802` with only the Metal fixes (no XPBD changes); the `newton` extra installs it into `.venv` (the stock commit
 loses or duplicates contact-table keys on Metal and raises on the current Warp fork in the rough G1 task).
 Branch [`metalsim-1.5.2`](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2) (pinned at
 [`addd10cb`](https://github.com/pulipakaa24/newton/commit/addd10cbeb25e946b3a4c2bb1d4097acc7a98ca2) by `scripts/setup_newton152.sh`; `99843d09` before the 2026-10-13 coupled-speed commits, `3fd1f052` before the 2026-10-13 Gauss-Seidel coloring fix, `c0427fc` before the 2026-10-12 MPM-step work) is Newton 1.5.2
