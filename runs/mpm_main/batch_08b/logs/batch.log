@@ -130,3 +130,34 @@ rest: tests/test_g1_newton_engine.py tests/test_gpu_dashboard.py tests/test_gpu_
 [21:49:29] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   2.2 %
+[21:49:34] PHASEC -> DONE no regression
+[21:49:38] FORKMOVE8 -> PASS fork metalsim: Warp 52c09cdd, MuJoCo Warp 4d05cb7
+[gpu_run] fork_sync start: device utilisation 0% (21:51:41)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+mujoco_warp -> 4d05cb7
+warp-innate -> 52c09cdd
+warp native sources changed: rebuilding libwarp
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+runtime ok 1.18.0.dev20260917
+[gpu_run] fork_sync end: device utilisation 0% (21:51:55), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[21:51:57] SYNC8 -> PASS shared checkouts: warp-innate 52c09cdd, mujoco_warp 4d05cb7
+[21:51:57] gpu job mm8_smoke_det (<= 30 min, PYTHONPATH=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b08b/logs/smoke_det.log
+    .......                                                                  [100%]
+    7 passed in 234.05s (0:03:54)
+[21:56:00] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[21:56:00] gpu job mm8_smoke_warp (<= 15 min, PYTHONPATH=) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b08b/logs/smoke_warp.log
+    Module ordered_sum_2edfb6c8 2edfb6c load on device 'metal:0' took 380.77 ms  (compiled)
+    Module det_append_per_world_6b8637b8 6b8637b load on device 'metal:0' took 395.29 ms  (compiled)
+    Module det_append_fixed_scratch_57c569a7 57c569a load on device 'metal:0' took 413.76 ms  (compiled)
+[21:56:10] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   2.4 %
+[21:56:10] SMOKE8 -> PASS on the shared checkouts: 7 passed in 234.05s (0:03:54); warp Ran 15 tests in 4.011s
