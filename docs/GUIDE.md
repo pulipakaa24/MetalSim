@@ -27,7 +27,7 @@ scripts/setup_newton152.sh                 # MPM and Franka-Pour: .venv-newton15
 scripts/fetch_polyhaven_assets.sh demo     # the ANYmal-on-sand render demo's HDRI and sand texture
 ```
 
-Fresh install verified on main `87dfac06af` (2026-10-13): `scripts/fresh_install_check.sh` (a new clone in a directory whose path has a space, caches inside it, every step above, the test suites through the GPU queue and a small run of each demo) passed on an M4 Max under macOS 26 and on a second M4 Max under macOS 27 with a different user. Correctness only; no timing.
+Fresh install verified on main `87dfac06af` (2026-10-13): `scripts/fresh_install_check.sh` (a new clone in a directory whose path has a space, caches inside it, every step above, the test suites through the GPU queue and a small run of each demo) passed on an M4 Max under macOS 26 and on a second M4 Max under macOS 27 with a different user, with 15 tests skipped on each, for these reasons: 7 in `tests/test_franka_pour_terms.py` (Isaac Lab 3.0-EA's task source, the test's oracle, was not fetched), 4 in `tests/test_tron1.py` (`onnxruntime`, the `tron1` extra), 1 in `tests/test_ppo_warp_rollout.py` (`rsl_rl`, the `rslrl` extra), 1 in `tests/test_materialx.py` (`MaterialX`), and 2 Newton-bridge tests (`tests/test_render_newton_bridge.py`, `tests/test_newton_bridge_poses.py`: Newton 1.7's `SolverMuJoCo` does not build against the MuJoCo Warp fork). Correctness only; no timing.
 
 Run every command from the repository root; the clone can live anywhere, under any user and in a directory whose
 path has spaces. `newton` in the first `pip install` is Newton 1.7 (the `newton` extra), which MPM in `BatchSim`
