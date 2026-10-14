@@ -15,16 +15,16 @@
 set -e
 VENV=${1:-.venv-newton152}
 REPO=${METALSIM_NEWTON152_REPO:-https://github.com/pulipakaa24/newton}     # fork of newton-physics/newton, branch metalsim-1.5.2
-PIN=99843d09840f89ac16c82104ad66ae792e45eb91                               # metalsim-1.5.2 head, 2026-10-13 (GS coloring with separate worlds)
+PIN=addd10cbeb25e946b3a4c2bb1d4097acc7a98ca2                               # metalsim-1.5.2 head, 2026-10-13 (GS coloring with separate worlds)
 REF=${METALSIM_NEWTON152_REF:-$PIN}
 DIR=${METALSIM_NEWTON152_DIR:-upstream/newton-metalsim-1.5.2}
 HERE="$(cd "$(dirname "$0")" && pwd)"
 if [ ! -d "$DIR" ]; then
   { git clone -q "$REPO" "$DIR" && git -C "$DIR" checkout -q "$REF"; } || {
-    echo "fork not reachable; upstream newton v1.5.2 plus patches/newton/metalsim-1.5.2-99843d09.diff (the same tree)"
+    echo "fork not reachable; upstream newton v1.5.2 plus patches/newton/metalsim-1.5.2-addd10cb.diff (the same tree)"
     rm -rf "$DIR"; git clone -q https://github.com/newton-physics/newton "$DIR"
     git -C "$DIR" checkout -q cf5378db6002b5c19b86344737cdd40cb8e08f0c     # v1.5.2
-    git -C "$DIR" apply "$HERE/../patches/newton/metalsim-1.5.2-99843d09.diff"
+    git -C "$DIR" apply "$HERE/../patches/newton/metalsim-1.5.2-addd10cb.diff"
   }
 elif [ -e "$DIR/.git" ] && [ -z "$METALSIM_NEWTON152_REF" ] && [ "$(git -C "$DIR" rev-parse HEAD)" != "$PIN" ]; then
   echo "note: $DIR is at $(git -C "$DIR" rev-parse --short HEAD), not the pinned ${PIN:0:8} (left as is)"
