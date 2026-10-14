@@ -1,14 +1,10 @@
 #!/bin/bash
-# Land docs/NOW.md (and this script as scripts/publish_now.sh) on main via a doc-only PR merged at once.
-# Usage: bash publish_now.sh [NOW.md path]   (default: <repo>/.now/NOW.md)
-# The repository is the checkout this script sits one level below (scripts/ or .now/), wherever it is cloned.
-# Env: METALSIM_GH_REPO (default pulipakaa24/MetalSim), the GitHub repository the PR is opened on.
+# Land docs/NOW.md (and optionally this script as scripts/publish_now.sh) on main via a doc-only PR merged at once.
+# Usage: bash publish_now.sh [NOW.md path]   (default: /Users/aditya/robosim/.now/NOW.md)
 set -euo pipefail
-SELF="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
-REPO="$(cd "$(dirname "$0")/.." && pwd)"
-SRC=${1:-$REPO/.now/NOW.md}
-[ -f "$SRC" ] || { echo "no NOW.md at $SRC (usage: bash publish_now.sh path/to/NOW.md)"; exit 2; }
-SRC="$(cd "$(dirname "$SRC")" && pwd)/$(basename "$SRC")"
+SRC=${1:-/Users/aditya/robosim/.now/NOW.md}
+SELF=/Users/aditya/robosim/.now/publish_now.sh
+REPO=/Users/aditya/robosim
 B=now-$(date +%Y%m%d-%H%M%S)
 W=$(mktemp -d)/now
 git -C "$REPO" fetch -q origin
@@ -23,7 +19,7 @@ git commit -s -q -m "docs/NOW.md: what is in flight and what is broken ($(date '
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 git push -q origin "$B"
-URL=$(gh pr create --repo "${METALSIM_GH_REPO:-pulipakaa24/MetalSim}" --base main --head "$B" \
+URL=$(gh pr create --repo pulipakaa24/MetalSim --base main --head "$B" \
   --title "docs/NOW.md: status update $(date '+%Y-%m-%d %H:%M')" \
   --body "Doc-only update of docs/NOW.md (what is in flight, what is broken).
 
