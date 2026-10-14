@@ -1,0 +1,9 @@
+# Isaac Lab 3.0-EA's Franka-Pour on metalsim, as a scene file: the task has its own Newton scene builder
+# (metalsim/learn/franka_pour_scene.py), so this file names the task and overrides the film settings only.
+#   python -m metalsim.run configs/scenes/franka_pour.yaml --film      # = python -m metalsim.render.film franka_pour
+name: franka_pour
+task: franka_pour
+film:
+  checkpoint: runs/franka_pour/logs/m414_2048_model_299.pt
+  # camera of the hero shot: Isaac Lab's play-mode viewer for the task (pour_env_cfg.py:821-833)
+  viewer: {eye: [0.9, 0.65, 0.5], lookat: [0.5, 0.0, 0.1], origin_type: env, fovy: 36}
