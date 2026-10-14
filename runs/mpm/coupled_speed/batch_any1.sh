@@ -59,7 +59,7 @@ for rep in 1 2 3; do
       k8) a=(--color-blocks-per-core 8) ;;
       soa) [ -f $O/soa_first.ok ] || continue; a=(--solver gs-soa) ;;
     esac
-    sjob cany_$id 15 $O/$id.log -- $PY -P $P --frames 60 --warmup 5 "${a[@]}" --json $O/$id.json
+    sjob cany_$id 15 $O/$id.log -- $PY -P $P --frames 60 --warmup 5 ${a[@]+"${a[@]}"} --json $O/$id.json
     tail -1 $O/$id.log
   done
 done
