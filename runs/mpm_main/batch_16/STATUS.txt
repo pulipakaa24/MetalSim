@@ -1,0 +1,32 @@
+POUR16 PASS 00:05:53 8 passed, 48 warnings in 109.35s (0:01:49)
+G1CAUSES16 DONE 00:35:11 64 worlds: [00:05:55] gpu job mm16_both_on_64 (check, <= 25 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b16/logs/g1_both_on_64.log
+        raise RuntimeError("Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter "
+    RuntimeError: Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter calls differ between its two passes (research_notes/MPM in main simulator/deterministic_ccd_divergence.md)
+[00:17:11] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   1.9 %
+both_on/64:rc=1(phase mismatch) [00:17:11] gpu job mm16_no_early_exit_64 (check, <= 25 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b16/logs/g1_no_early_exit_64.log
+        raise RuntimeError("Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter "
+    RuntimeError: Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter calls differ between its two passes (research_notes/MPM in main simulator/deterministic_ccd_divergence.md)
+[00:28:03] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+no_early_exit/64:rc=1(phase mismatch) [00:28:03] gpu job mm16_unfused_64 (check, <= 25 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b16/logs/g1_unfused_64.log
+        raise RuntimeError("Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter "
+    RuntimeError: Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter calls differ between its two passes (research_notes/MPM in main simulator/deterministic_ccd_divergence.md)
+[00:32:24] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   1.0 %
+unfused/64:rc=1(phase mismatch) [00:32:24] gpu job mm16_both_off_64 (check, <= 25 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b16/logs/g1_both_off_64.log
+    Module metalsim.learn.warp_policy 00a83dd load on device 'metal:0' took 461.95 ms  (cached)
+    {"scene": "g1_flat", "worlds": 64, "deterministic": 1, "build_s": 27.133069999996223, "num_envs": 64, "frames": 40, "mean_step_ms": 0.056955225, "fps_isaac_style": 1123689.705378216}
+[00:35:11] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+both_off/64:rc=0
+G1BIG16 DONE 00:39:32 [00:35:11] gpu job mm16_both_off_1024 (check, <= 25 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b16/logs/g1_both_off_1024.log
+        raise RuntimeError("Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter "
+    RuntimeError: Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter calls differ between its two passes (research_notes/MPM in main simulator/deterministic_ccd_divergence.md)
+[00:39:32] health: utilisation 100%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   2.0 %
+both_off/1024:rc=1(phase mismatch)
+COST16 DONE 00:52:27 coupled box, deterministic, 64 worlds: early exit + fused on 24.96 ms, both off 53.96 ms (+116.2 %), n=3/3;coupled box, deterministic, 1024 worlds: early exit + fused on 237.13 ms, both off 289.60 ms (+22.1 %), n=3/3;

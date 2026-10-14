@@ -1,0 +1,10 @@
+- `pre_stack_eager` (stack, 64 worlds, capture 0, cap 2): steps with cap worlds 0/20, steps with trips 0, trips only in cap steps True, kernels {}, flag values {}
+- `pre_stack_capt` (stack, 64 worlds, capture 1, cap 2): steps with cap worlds 0/40, steps with trips 0, trips only in cap steps True, kernels {}, flag values {}
+- `pre_g1_64` (g1, 64 worlds, capture 1, cap 20): steps with cap worlds 60/60, steps with trips 60, trips only in cap steps True, kernels {'_solve_done__locals__kernel': 237}, flag values {'6': 237}
+- `pre_g1_1024`: no result
+- `fix_stack_eager` (stack, 64 worlds, capture 0, cap 2): steps with cap worlds 0/20, steps with trips 0, trips only in cap steps True, kernels {}, flag values {}
+- `fix_stack_capt` (stack, 64 worlds, capture 1, cap 2): steps with cap worlds 0/40, steps with trips 0, trips only in cap steps True, kernels {}, flag values {}
+- `fix_g1_64` (g1, 64 worlds, capture 1, cap 20): steps with cap worlds 60/60, steps with trips 0, trips only in cap steps True, kernels {}, flag values {}
+- `fix_g1_1024`: no result
+- G1 deterministic, captured, everything on, with the fix (det_cost_g1.py, check_overflow): exit code 64 worlds 0, 1,024 worlds 1
+INCONCLUSIVE

@@ -1,0 +1,6 @@
+| scene, worlds | mode | both on | early exit off | unfused | both off |
+|---|---|---|---|---|---|
+| coupled box, 64 | deterministic | 24.67 | 76.61 | 24.32 | 53.78 |
+| coupled box, 64 | default | 23.87 | 32.46 | 24.10 | 34.20 |
+| coupled box, 1,024 | deterministic | 237.13 | 1054.69 | 231.50 | 289.60 |
+deterministic launches over 20 G1 env steps (uncaptured): fused "launches": 5763, unfused "launches": 9003

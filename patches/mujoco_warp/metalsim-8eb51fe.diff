@@ -1,9 +1,9 @@
 diff --git a/METALSIM_CHANGES.md b/METALSIM_CHANGES.md
 new file mode 100644
-index 0000000..84a4dc8
+index 0000000..6cb4db7
 --- /dev/null
 +++ b/METALSIM_CHANGES.md
-@@ -0,0 +1,54 @@
+@@ -0,0 +1,57 @@
 +# MetalSim changes on this branch (`metalsim`)
 +
 +This branch is the MuJoCo Warp build that [MetalSim](https://github.com/pulipakaa24/MetalSim) runs on (see the
@@ -51,6 +51,9 @@ index 0000000..84a4dc8
 +| `d9ec218` (`MJW_METAL_CCD_SCRATCH_CACHE`) | Metal: the convex narrowphase's EPA / multi-contact scratch is allocated once per Data and reused by every call (default on; `=0` restores the per-call allocation). A Metal graph capture keeps every allocation made inside it alive for the graph's lifetime, so a step graph held one copy per substep: 0.7 GB per substep at 1024 worlds with naconmax 128 per world, 2.8 GB at 4096, and the G1 rough task at 8 substeps (2.5 ms) with its re-captures exceeded the 55.7 GB GPU working set (`kIOGPUCommandBufferCallbackErrorOutOfMemory`). Pure per-call scratch on one in-order queue: results unchanged (statistics within run-to-run spread; contact append order makes runs non-bitwise either way). |
 +| `b1dc032` | `energy_vel` with nv = 0 (a model without degrees of freedom, energy flag enabled): zero kinetic energy without `mul_m` or the tiled kernel, as MuJoCo C's `mj_energyVel`. The tiled kernel with zero-length tiles failed to compile on Metal ("zero-length arrays are not permitted") and left `energy[:, 1]` unwritten on the CPU device. Test `sensor_test.test_energy_nv0`. |
 +| `f52488b` | Connect / weld equality blocks that end exactly at `njmax` are kept: the builders returned when `efcid >= njmax - 3` (`- 6`), so a block occupying rows `njmax - 3 .. njmax - 1` was dropped while `nefc` reached exactly `njmax`, which `_next_time`'s `nefc > njmax` check does not flag; the solver then ran on stale rows (a connect-held ball sagged 8 cm in 0.4 s, no overflow flag). Now `efcid + 3 > njmax` (`efcid + 6 > njmax`): a block that fits is written, one that does not leaves `nefc > njmax` and is flagged. Test `constraint_test.test_equality_block_ending_at_njmax` (connect and weld, dense and sparse; fails 4/4 before, passes 4/4). Replaces MetalSim's workaround (treat `nefc >= njmax` as overflow for models with connect / weld blocks, one spare row in the capacity bound). |
++| `cfa290b` | Deterministic mode (Warp `RUN_TO_RUN`): non-heightfield CCD runs as a solve kernel without a slot counter (EPA / multicontact scratch row = thread id, launch width at most `naccdmax`) that stages each collision's contacts, then a contact-write kernel. The single kernel took its EPA row from a counter, so Warp's counting pass ran EPA on stale scratch and a contact could land in another world's slot. In deterministic mode a primitive against a heightfield (GJK/EPA) raises. `MJW_CCD_DET_SPLIT=0` keeps the single kernel; default mode unchanged. |
++| `8227c3b` | `_solve_done` keeps the solver's iteration count in a local (it read back an in-place increment, which Warp's deterministic counting pass suppresses: a world at the iteration cap then made the early exit's counter call in one pass only); the counter's return is consumed only with the early exit. |
++| `bf2e209` | Warp's deterministic mode takes the unfused Newton update (the fused kernel reads back its own change counter within the launch; its deterministic plan at 1,024 worlds asked for more than 2^31 scratch elements). |
 +
 +Every flex change and every solver launch-form change is behind a module-level flag or environment variable that restores upstream's behaviour; the details and measurements are in
 +the commit messages and in MetalSim's `scripts/diagnostics/deformable/UPSTREAM.md`. The same sixteen code commits are
@@ -59,7 +62,7 @@ index 0000000..84a4dc8
 +
 +Only on `metalsim-flex`, not merged here: implicit flex damping (`c013067`) and `FLEX_MAXCONPAIR` (`64a1ea5`).
 diff --git a/mujoco_warp/_src/collision_convex.py b/mujoco_warp/_src/collision_convex.py
-index 1715c57..94ce295 100644
+index 1715c57..277e40d 100644
 --- a/mujoco_warp/_src/collision_convex.py
 +++ b/mujoco_warp/_src/collision_convex.py
 @@ -15,6 +15,8 @@
@@ -243,7 +246,394 @@ index 1715c57..94ce295 100644
  _CCD_MIN_BLOCKS = 8
  
  
-@@ -1208,14 +1274,42 @@ def _ccd_grid_size(kernel, naconmax: int, device) -> int:
+@@ -1204,18 +1270,429 @@ def ccd_kernel_builder(
+   return ccd_kernel
+ 
+ 
++# MetalSim: deterministic-mode CCD (Warp DeterministicMode.RUN_TO_RUN). Warp runs a kernel whose atomic_add
++# return values are consumed (slot counters) twice: phase 0 with every global array store suppressed and each
++# counter call returning 0, then a sort / scan of the recorded calls, then phase 1 with the real slots. ccd_kernel
++# consumes two counters (nccd for its EPA scratch row, nacon in write_contact) and EPA / multicontact write the
++# polytope into that scratch row and read it back, so in phase 0 every thread runs EPA on row 0 with its stores
++# dropped, reading stale memory, and the number of write_contact calls it records can differ from the number it
++# makes in phase 1. The slots then no longer match the calls: a contact lands in the slot reserved by another
++# thread (another world), leaving holes nowhere and the overflow flag clear. Seen as 2 of 256 stacked-box worlds
++# diverging at the first box-box contact (MetalSim research_notes/.../deterministic_ccd_divergence.md).
++#
++# In deterministic mode convex_narrowphase therefore runs CCD as two kernels: a solve kernel with no slot counter
++# (EPA / multicontact scratch row = thread id, launch width <= naccdmax, so the kernel is single phase and its
++# stores are real) that stages each collision's contacts, and a write kernel whose write_contact calls depend only
++# on the staged count, so its two phases make the same calls. The default (non-deterministic) path is unchanged.
++@cache_kernel
++def ccd_det_kernels_builder(
++  geomtype1: int,
++  geomtype2: int,
++  gjk_iterations: int,
++  epa_iterations: int,
++  use_multiccd: bool,
++  block_dim: int,
++  warn_overflow: int,
++):
++  """Solve / write kernel pair for non-heightfield CCD in deterministic mode (see comment above)."""
++
++  @wp.kernel(
++    module="unique",
++    module_options={"block_dim": block_dim},
++    enable_backward=False,
++    grid_stride=False,
++    launch_bounds=(block_dim, _CCD_MIN_BLOCKS),
++  )
++  def ccd_det_solve_kernel(
++    # Model:
++    opt_ccd_tolerance: wp.array[float],
++    geom_type: wp.array[int],
++    geom_dataid: wp.array2d[int],
++    geom_size: wp.array2d[wp.vec3],
++    geom_margin: wp.array2d[float],
++    geom_gap: wp.array2d[float],
++    mesh_vertadr: wp.array[int],
++    mesh_vertnum: wp.array[int],
++    mesh_graphadr: wp.array[int],
++    mesh_vert: wp.array[wp.vec3],
++    mesh_graph: wp.array[int],
++    mesh_polynum: wp.array[int],
++    mesh_polyadr: wp.array[int],
++    mesh_polynormal: wp.array[wp.vec3],
++    mesh_polyvertadr: wp.array[int],
++    mesh_polyvertnum: wp.array[int],
++    mesh_polyvert: wp.array[int],
++    mesh_polymapadr: wp.array[int],
++    mesh_polymapnum: wp.array[int],
++    mesh_polymap: wp.array[int],
++    pair_margin: wp.array2d[float],
++    pair_gap: wp.array2d[float],
++    # Data in:
++    geom_xpos_in: wp.array2d[wp.vec3],
++    geom_xmat_in: wp.array2d[wp.mat33],
++    naconmax_in: int,
++    ncollision_in: wp.array[int],
++    # In:
++    grid_stride_in: int,
++    collision_pair_in: wp.array[wp.vec2i],
++    collision_pairid_in: wp.array[wp.vec2i],
++    collision_worldid_in: wp.array[int],
++    epa_vert_in: wp.array2d[wp.vec3],
++    epa_vert_index_in: wp.array2d[int],
++    epa_face_in: wp.array2d[int],
++    epa_pr_in: wp.array2d[wp.vec3],
++    epa_norm2_in: wp.array2d[float],
++    epa_horizon_in: wp.array2d[int],
++    multiccd_polygon_in: wp.array2d[wp.vec3],
++    multiccd_clipped_in: wp.array2d[wp.vec3],
++    multiccd_pnormal_in: wp.array2d[wp.vec3],
++    multiccd_pdist_in: wp.array2d[float],
++    multiccd_idx1_in: wp.array2d[int],
++    multiccd_idx2_in: wp.array2d[int],
++    multiccd_n1_in: wp.array2d[wp.vec3],
++    multiccd_n2_in: wp.array2d[wp.vec3],
++    multiccd_endvert_in: wp.array2d[wp.vec3],
++    multiccd_face1_in: wp.array2d[wp.vec3],
++    multiccd_face2_in: wp.array2d[wp.vec3],
++    # Out:
++    ccd_ncontact_out: wp.array[int],
++    ccd_dist_out: wp.array[wp.vec4],
++    ccd_pos_out: wp.array2d[wp.vec3],
++    ccd_frame_out: wp.array[wp.mat33],
++    # Data out:
++    overflow_out: wp.array[int],
++  ):
++    tid = wp.tid()
++    # scratch row of this thread: the launch width (= grid stride) is at most naccdmax
++    row = tid
++    for collisionid in range(tid, wp.min(ncollision_in[0], naconmax_in), grid_stride_in):
++      geoms = collision_pair_in[collisionid]
++      g1 = geoms[0]
++      g2 = geoms[1]
++
++      if geom_type[g1] != geomtype1 or geom_type[g2] != geomtype2:
++        continue
++
++      worldid = collision_worldid_in[collisionid]
++      pairid = collision_pairid_in[collisionid]
++      margin, gap = contact_margin_gap(geom_margin, geom_gap, pair_margin, pair_gap, geoms, pairid[0], worldid)
++
++      geom1, geom2 = geom_collision_pair_from_types(
++        geom_dataid,
++        geom_size,
++        mesh_vertadr,
++        mesh_vertnum,
++        mesh_graphadr,
++        mesh_vert,
++        mesh_graph,
++        mesh_polynum,
++        mesh_polyadr,
++        mesh_polynormal,
++        mesh_polyvertadr,
++        mesh_polyvertnum,
++        mesh_polyvert,
++        mesh_polymapadr,
++        mesh_polymapnum,
++        mesh_polymap,
++        geom_xpos_in,
++        geom_xmat_in,
++        geomtype1,
++        geomtype2,
++        geoms,
++        worldid,
++      )
++
++      # same computation as ccd_kernel_builder.eval_ccd_write_contact, with the EPA row fixed and the contacts staged
++      geom1.margin = margin
++      geom2.margin = margin
++      tolerance = opt_ccd_tolerance[worldid % opt_ccd_tolerance.shape[0]]
++      is_collision_sensor = pairid[1] >= 0
++      if is_collision_sensor:
++        cutoff = 1.0e32
++      else:
++        cutoff = gap
++      origin = geom1.pos
++      geom1.pos = wp.vec3(0.0)
++      geom2.pos = geom2.pos - origin
++      needs_epa, dist, ncollision, w1, w2, gjk_result, geom1, geom2 = gjk_phase(
++        tolerance,
++        cutoff,
++        gjk_iterations,
++        geom1,
++        geom2,
++        geomtype1,
++        geomtype2,
++        geom1.pos,
++        geom2.pos,
++      )
++
++      multiccd_idx = int(-1)
++      if needs_epa:
++        dist, ncollision, w1, w2, multiccd_idx = epa_phase(
++          tolerance,
++          epa_iterations,
++          gjk_result,
++          geom1,
++          geom2,
++          geomtype1,
++          geomtype2,
++          epa_vert_in[row],
++          epa_vert_index_in[row],
++          epa_face_in[row],
++          epa_pr_in[row],
++          epa_norm2_in[row],
++          epa_horizon_in[row],
++          wp.static(bool(warn_overflow & OverflowType.EPA_HORIZON)),
++          worldid,
++          overflow_out,
++        )
++
++      if dist >= gap and not is_collision_sensor:
++        ccd_ncontact_out[collisionid] = 0
++        continue
++
++      dist += margin
++
++      witness1 = mat43()
++      witness2 = mat43()
++      dists = wp.vec4()
++      witness1[0] = w1
++      witness2[0] = w2
++
++      if wp.static(
++        (use_multiccd or (geomtype1 == GeomType.BOX and geomtype2 == GeomType.BOX))
++        and (geomtype1 == GeomType.BOX or geomtype1 == GeomType.MESH or geomtype1 == GeomType.CYLINDER)
++        and (geomtype2 == GeomType.BOX or geomtype2 == GeomType.MESH or geomtype2 == GeomType.CYLINDER)
++      ):
++        if wp.static(geomtype1 == GeomType.MESH):
++          if geom1.mesh_polyadr < 0:
++            multiccd_idx = -1
++
++        if wp.static(geomtype2 == GeomType.MESH):
++          if geom2.mesh_polyadr < 0:
++            multiccd_idx = -1
++
++        dists = wp.vec4()
++        if multiccd_idx > -1:
++          ncollision, witness1, witness2, dists = multicontact(
++            multiccd_polygon_in[row],
++            multiccd_clipped_in[row],
++            multiccd_pnormal_in[row],
++            multiccd_pdist_in[row],
++            multiccd_idx1_in[row],
++            multiccd_idx2_in[row],
++            multiccd_n1_in[row],
++            multiccd_n2_in[row],
++            multiccd_endvert_in[row],
++            multiccd_face1_in[row],
++            multiccd_face2_in[row],
++            epa_vert_in[row],
++            epa_vert_index_in[row],
++            epa_face_in[row, multiccd_idx],
++            w1,
++            w2,
++            geom1,
++            geom2,
++            geomtype1,
++            geomtype2,
++          )
++
++          if ncollision < 1:
++            ncollision = 1
++            witness1[0] = w1
++            witness2[0] = w2
++
++      if dist <= margin:
++        frame = make_frame(witness1[0] - witness2[0])
++      else:
++        frame = make_frame(witness2[0] - witness1[0])
++
++      if ncollision <= 1:
++        dists[0] = dist
++      ccd_ncontact_out[collisionid] = ncollision
++      ccd_dist_out[collisionid] = dists
++      ccd_frame_out[collisionid] = frame
++      for i in range(ncollision):
++        ccd_pos_out[collisionid, i] = 0.5 * (witness1[i] + witness2[i]) + origin
++
++  @wp.kernel(
++    module="unique",
++    module_options={"block_dim": block_dim},
++    enable_backward=False,
++    grid_stride=False,
++  )
++  def ccd_det_write_kernel(
++    # Model:
++    geom_type: wp.array[int],
++    geom_condim: wp.array[int],
++    geom_priority: wp.array[int],
++    geom_solmix: wp.array2d[float],
++    geom_solref: wp.array2d[wp.vec2],
++    geom_solimp: wp.array2d[vec5],
++    geom_friction: wp.array2d[wp.vec3],
++    geom_margin: wp.array2d[float],
++    geom_gap: wp.array2d[float],
++    geom_adhesion: wp.array2d[float],
++    pair_dim: wp.array[int],
++    pair_solref: wp.array2d[wp.vec2],
++    pair_solreffriction: wp.array2d[wp.vec2],
++    pair_solimp: wp.array2d[vec5],
++    pair_margin: wp.array2d[float],
++    pair_gap: wp.array2d[float],
++    pair_adhesion: wp.array2d[float],
++    pair_friction: wp.array2d[vec5],
++    # Data in:
++    naconmax_in: int,
++    ncollision_in: wp.array[int],
++    # In:
++    grid_stride_in: int,
++    collision_pair_in: wp.array[wp.vec2i],
++    collision_pairid_in: wp.array[wp.vec2i],
++    collision_worldid_in: wp.array[int],
++    ccd_ncontact_in: wp.array[int],
++    ccd_dist_in: wp.array[wp.vec4],
++    ccd_pos_in: wp.array2d[wp.vec3],
++    ccd_frame_in: wp.array[wp.mat33],
++    # Data out:
++    contact_dist_out: wp.array[float],
++    contact_pos_out: wp.array[wp.vec3],
++    contact_frame_out: wp.array[wp.mat33],
++    contact_includemargin_out: wp.array[float],
++    contact_friction_out: wp.array[vec5],
++    contact_solref_out: wp.array[wp.vec2],
++    contact_solreffriction_out: wp.array[wp.vec2],
++    contact_solimp_out: wp.array[vec5],
++    contact_dim_out: wp.array[int],
++    contact_geom_out: wp.array[wp.vec2i],
++    contact_efc_address_out: wp.array2d[int],
++    contact_worldid_out: wp.array[int],
++    contact_type_out: wp.array[int],
++    contact_geomcollisionid_out: wp.array[int],
++    contact_adhesion_out: wp.array[float],
++    nacon_out: wp.array[int],
++  ):
++    tid = wp.tid()
++    for collisionid in range(tid, wp.min(ncollision_in[0], naconmax_in), grid_stride_in):
++      geoms = collision_pair_in[collisionid]
++      if geom_type[geoms[0]] != geomtype1 or geom_type[geoms[1]] != geomtype2:
++        continue
++      ncontact = ccd_ncontact_in[collisionid]
++      if ncontact == 0:
++        continue
++
++      worldid = collision_worldid_in[collisionid]
++      pairid = collision_pairid_in[collisionid]
++      margin, gap = contact_margin_gap(geom_margin, geom_gap, pair_margin, pair_gap, geoms, pairid[0], worldid)
++      condim, friction, solref, solreffriction, solimp, adhesion = contact_material_params(
++        geom_condim,
++        geom_priority,
++        geom_solmix,
++        geom_solref,
++        geom_solimp,
++        geom_friction,
++        geom_adhesion,
++        pair_dim,
++        pair_solref,
++        pair_solreffriction,
++        pair_solimp,
++        pair_adhesion,
++        pair_friction,
++        geoms,
++        pairid[0],
++        worldid,
++      )
++      dists = ccd_dist_in[collisionid]
++      frame = ccd_frame_in[collisionid]
++      for i in range(ncontact):
++        write_contact(
++          naconmax_in,
++          i,
++          dists[i],
++          ccd_pos_in[collisionid, i],
++          frame,
++          margin,
++          gap,
++          condim,
++          friction,
++          solref,
++          solreffriction,
++          solimp,
++          adhesion,
++          geoms,
++          pairid,
++          worldid,
++          contact_dist_out,
++          contact_pos_out,
++          contact_frame_out,
++          contact_includemargin_out,
++          contact_friction_out,
++          contact_solref_out,
++          contact_solreffriction_out,
++          contact_solimp_out,
++          contact_dim_out,
++          contact_geom_out,
++          contact_efc_address_out,
++          contact_worldid_out,
++          contact_type_out,
++          contact_geomcollisionid_out,
++          contact_adhesion_out,
++          nacon_out,
++        )
++
++  return ccd_det_solve_kernel, ccd_det_write_kernel
++
++
++# MJW_CCD_DET_SPLIT=0: deterministic mode keeps the single CCD kernel (diagnostics only; it is not repeatable).
++_CCD_DET_SPLIT = os.environ.get("MJW_CCD_DET_SPLIT", "1") != "0"
++
++
++def _deterministic_mode() -> bool:
++  """True when this module's kernels (or the module="unique" kernels created now) build in a deterministic mode."""
++  none = getattr(getattr(wp, "DeterministicMode", None), "NOT_GUARANTEED", None)
++  modes = (getattr(wp.config, "deterministic", None), wp.get_module(__name__).options.get("deterministic"))
++  return any(mode not in (None, False, 0, none) for mode in modes)
++
++
+ def _ccd_grid_size(kernel, naconmax: int, device) -> int:
    # Grid-stride launch width for the CCD kernel: a few device waves, capped at the contact
    # capacity. The kernel strides over the actual candidate count, so we avoid launching one
    # (mostly idle) thread per naconmax slot.
@@ -288,7 +678,7 @@ index 1715c57..94ce295 100644
  @event_scope
  def convex_narrowphase(m: Model, d: Data, ctx: CollisionContext, collision_table: list[tuple[GeomType, GeomType]]):
    """Runs narrowphase collision detection for convex geom pairs.
-@@ -1276,17 +1370,17 @@ def convex_narrowphase(m: Model, d: Data, ctx: CollisionContext, collision_table
+@@ -1276,17 +1753,17 @@ def convex_narrowphase(m: Model, d: Data, ctx: CollisionContext, collision_table
    nccd = wp.zeros(len(GeomType) * (len(GeomType) + 1) // 2, dtype=int)
  
    # epa_vert: vertices in EPA polytope
@@ -312,7 +702,33 @@ index 1715c57..94ce295 100644
  
    # Contact outputs
    contact_outputs = [
-@@ -1380,27 +1474,27 @@ def convex_narrowphase(m: Model, d: Data, ctx: CollisionContext, collision_table
+@@ -1308,12 +1785,25 @@ def convex_narrowphase(m: Model, d: Data, ctx: CollisionContext, collision_table
+     d.nacon,
+   ]
+ 
++  det_split = _CCD_DET_SPLIT and _deterministic_mode() and d.naccdmax > 0
++
+   # Launch heightfield collision kernels (no multiccd args, 72 args total)
+   for geom_pair in collision_table:
+     g1 = geom_pair[0].value
+     g2 = geom_pair[1].value
+     count, geomgeomid = _pair_count(g1, g2)
+     if (g1 == GeomType.HFIELD or g2 == GeomType.HFIELD) and count:
++      if det_split:
++        # MetalSim: the heightfield kernel's GJK/EPA path has the phase-0 hazard described at
++        # ccd_det_kernels_builder and is not split; only its plane path is repeatable. Meshes take the plane path
++        # when they have at most 256 vertices, a per-geom runtime test (the caller checks it on the host model).
++        other = g2 if g1 == GeomType.HFIELD else g1
++        plane = HFIELD_PLANE_CONTACTS and (HFIELD_PLANE_CONTACTS_PRIMITIVES or other == GeomType.MESH)
++        if not plane:
++          raise NotImplementedError(
++            f"deterministic mode: heightfield-{GeomType(other).name.lower()} contacts go through GJK/EPA, which is not "
++            "repeatable in Warp's deterministic mode (only meshes of at most 256 vertices take the repeatable plane path)"
++          )
+       wp.launch(
+         ccd_hfield_kernel_builder(g1, g2, m.opt.ccd_iterations, epa_iterations, geomgeomid, int(m.opt.warn_overflow)),
+         dim=d.naconmax,
+@@ -1380,34 +1870,59 @@ def convex_narrowphase(m: Model, d: Data, ctx: CollisionContext, collision_table
  
    # Allocate multiccd arrays only for non-heightfield collisions
    # multiccd_polygon: clipped contact surface
@@ -351,6 +767,132 @@ index 1715c57..94ce295 100644
  
    # Launch non-heightfield collision kernels (no hfield args, 78 args total)
    for geom_pair in collision_table:
+     g1 = geom_pair[0].value
+     g2 = geom_pair[1].value
+     count, geomgeomid = _pair_count(g1, g2)
+-    if g1 != GeomType.HFIELD and g2 != GeomType.HFIELD and count:
++    if g1 != GeomType.HFIELD and g2 != GeomType.HFIELD and count and det_split:
++      _ccd_det_launch(
++        m,
++        d,
++        ctx,
++        g1,
++        g2,
++        epa_iterations,
++        use_multiccd,
++        [epa_vert, epa_vert_index, epa_face, epa_pr, epa_norm2, epa_horizon],
++        [
++          multiccd_polygon,
++          multiccd_clipped,
++          multiccd_pnormal,
++          multiccd_pdist,
++          multiccd_idx1,
++          multiccd_idx2,
++          multiccd_n1,
++          multiccd_n2,
++          multiccd_endvert,
++          multiccd_face1,
++          multiccd_face2,
++        ],
++        contact_outputs,
++      )
++    elif g1 != GeomType.HFIELD and g2 != GeomType.HFIELD and count:
+       ccd_k = ccd_kernel_builder(
+         g1,
+         g2,
+@@ -1489,3 +2004,92 @@ def convex_narrowphase(m: Model, d: Data, ctx: CollisionContext, collision_table
+         ],
+         outputs=contact_outputs + [d.overflow],
+       )
++
++
++def _ccd_det_launch(m, d, ctx, g1, g2, epa_iterations, use_multiccd, epa_scratch, multiccd_scratch, contact_outputs):
++  """Deterministic-mode CCD for one non-heightfield type pair: solve kernel, then write kernel."""
++  solve_k, write_k = ccd_det_kernels_builder(
++    g1, g2, m.opt.ccd_iterations, epa_iterations, use_multiccd, m.block_dim.convex_ccd, int(m.opt.warn_overflow)
++  )
++  # one EPA / multicontact scratch row per thread: the launch width (and grid stride) is at most naccdmax
++  grid = max(1, min(_ccd_grid_size(solve_k, d.naconmax, d.ncollision.device), d.naccdmax))
++  ncontact = _ccd_scratch(d, "det_ncontact", (d.naconmax,), int)
++  dist = _ccd_scratch(d, "det_dist", (d.naconmax,), wp.vec4)
++  pos = _ccd_scratch(d, "det_pos", (d.naconmax, 4), wp.vec3)
++  frame = _ccd_scratch(d, "det_frame", (d.naconmax,), wp.mat33)
++  wp.launch(
++    solve_k,
++    dim=grid,
++    block_dim=m.block_dim.convex_ccd,
++    inputs=[
++      m.opt.ccd_tolerance,
++      m.geom_type,
++      m.geom_dataid,
++      m.geom_size,
++      m.geom_margin,
++      m.geom_gap,
++      m.mesh_vertadr,
++      m.mesh_vertnum,
++      m.mesh_graphadr,
++      m.mesh_vert,
++      m.mesh_graph,
++      m.mesh_polynum,
++      m.mesh_polyadr,
++      m.mesh_polynormal,
++      m.mesh_polyvertadr,
++      m.mesh_polyvertnum,
++      m.mesh_polyvert,
++      m.mesh_polymapadr,
++      m.mesh_polymapnum,
++      m.mesh_polymap,
++      m.pair_margin,
++      m.pair_gap,
++      d.geom_xpos,
++      d.geom_xmat,
++      d.naconmax,
++      d.ncollision,
++      grid,
++      ctx.collision_pair,
++      ctx.collision_pairid,
++      ctx.collision_worldid,
++      *epa_scratch,
++      *multiccd_scratch,
++    ],
++    outputs=[ncontact, dist, pos, frame, d.overflow],
++  )
++  wp.launch(
++    write_k,
++    dim=grid,
++    block_dim=m.block_dim.convex_ccd,
++    inputs=[
++      m.geom_type,
++      m.geom_condim,
++      m.geom_priority,
++      m.geom_solmix,
++      m.geom_solref,
++      m.geom_solimp,
++      m.geom_friction,
++      m.geom_margin,
++      m.geom_gap,
++      m.geom_adhesion,
++      m.pair_dim,
++      m.pair_solref,
++      m.pair_solreffriction,
++      m.pair_solimp,
++      m.pair_margin,
++      m.pair_gap,
++      m.pair_adhesion,
++      m.pair_friction,
++      d.naconmax,
++      d.ncollision,
++      grid,
++      ctx.collision_pair,
++      ctx.collision_pairid,
++      ctx.collision_worldid,
++      ncontact,
++      dist,
++      pos,
++      frame,
++    ],
++    outputs=contact_outputs,
++  )
 diff --git a/mujoco_warp/_src/collision_flex.py b/mujoco_warp/_src/collision_flex.py
 index f1ccb4c..3f1e936 100644
 --- a/mujoco_warp/_src/collision_flex.py
@@ -3083,7 +3625,7 @@ index d26df8c..00a7c78 100644
  
      L = wp.tile_reshape(block, (block_size, block_size))
 diff --git a/mujoco_warp/_src/solver.py b/mujoco_warp/_src/solver.py
-index ecad790..7c76d80 100644
+index ecad790..7f603db 100644
 --- a/mujoco_warp/_src/solver.py
 +++ b/mujoco_warp/_src/solver.py
 @@ -14,6 +14,7 @@
@@ -3356,7 +3898,7 @@ index ecad790..7c76d80 100644
          wp.atomic_add(state_changed_count_out, worldid, 1)
  
    return kernel
-@@ -2064,6 +2159,403 @@ def _update_gradient_h_incremental_sparse(compact: bool):
+@@ -2064,6 +2159,409 @@ def _update_gradient_h_incremental_sparse(compact: bool):
    return kernel
  
  
@@ -3387,6 +3929,12 @@ index ecad790..7c76d80 100644
 +def _fuse_update(m: types.Model, ctx) -> bool:
 +  dev = wp.get_device()
 +  if not (_METAL_FUSE_UPDATE and (getattr(dev, "is_metal", False) or (_METAL_FUSE_UPDATE_CPU and dev.is_cpu))):
++    return False
++  # Warp's deterministic mode: the unfused launches. The fused kernel zeroes and reads back its own change counter
++  # within the launch (suppressed in the deterministic counting pass), and its deterministic plan at 1,024 worlds
++  # under capture asks for more than 2^31 scratch elements; unfused costs nothing measurable there (MetalSim #29).
++  modes = getattr(wp, "DeterministicMode", None)
++  if modes is not None and getattr(wp.config, "deterministic", modes.NOT_GUARANTEED) != modes.NOT_GUARANTEED:
 +    return False
 +  if m.is_sparse or _sparse_compact(ctx):
 +    return False
@@ -3760,7 +4308,7 @@ index ecad790..7c76d80 100644
  def _update_constraint(
    m: types.Model,
    d: types.Data,
-@@ -2363,7 +2855,8 @@ def _update_gradient_JTDAJ_dense_tiled_compact(nv_pad: int, tile_size: int, njma
+@@ -2363,7 +2861,8 @@ def _update_gradient_JTDAJ_dense_tiled_compact(nv_pad: int, tile_size: int, njma
  
        J_ki = wp.tile_map(wp.mul, wp.tile_transpose(J_kj), wp.tile_broadcast(D_k, shape=(nv_pad, TILE_SIZE_K)))
  
@@ -3770,7 +4318,7 @@ index ecad790..7c76d80 100644
  
      wp.tile_store(ctx_h_out[worldid], sum_val, bounds_check=False)
  
-@@ -2441,7 +2934,8 @@ def _update_gradient_JTDAJ_dense_tiled(nv_pad: int, tile_size: int, njmax: int,
+@@ -2441,7 +2940,8 @@ def _update_gradient_JTDAJ_dense_tiled(nv_pad: int, tile_size: int, njmax: int,
  
        J_ki = wp.tile_map(wp.mul, wp.tile_transpose(J_kj), wp.tile_broadcast(D_k, shape=(nv_pad, TILE_SIZE_K)))
  
@@ -3780,7 +4328,7 @@ index ecad790..7c76d80 100644
  
      wp.tile_store(ctx_h_out[worldid], sum_val, bounds_check=False)
  
-@@ -2572,79 +3066,979 @@ def _update_gradient_JTCJ_dense(
+@@ -2572,79 +3072,979 @@ def _update_gradient_JTCJ_dense(
      ctx_h_out[worldid, dof1id, dof2id] += h
  
  
@@ -4826,7 +5374,7 @@ index ecad790..7c76d80 100644
  
    return kernel
  
-@@ -2748,13 +4142,16 @@ def _cholesky_factorize_solve(
+@@ -2748,13 +4148,16 @@ def _cholesky_factorize_solve(
    If skip_unchanged is True (blocked path only), worlds where no constraints
    changed reuse the cached factorization in hfactor instead of refactorizing.
    """
@@ -4845,7 +5393,7 @@ index ecad790..7c76d80 100644
      )
    else:
      wp.launch(
-@@ -2806,10 +4203,14 @@ _JTDAJ_OVERSUBSCRIBE_WAVES = 6
+@@ -2806,10 +4209,14 @@ _JTDAJ_OVERSUBSCRIBE_WAVES = 6
  
  
  @cache_kernel
@@ -4861,7 +5409,7 @@ index ecad790..7c76d80 100644
  
    def make_curvature_terms(condim: int):
      @wp.func
-@@ -3007,9 +4408,8 @@ def _JTDACJ_sparse(compact: bool, cone_type: types.ConeType, max_condim: int):
+@@ -3007,9 +4414,8 @@ def _JTDACJ_sparse(compact: bool, cone_type: types.ConeType, max_condim: int):
            for dim in range(1, wp.static(MAX_CONDIM)):
              if dim < block_rows:
                cone_rowadr[dim] = head_adr + dim * support
@@ -4873,7 +5421,7 @@ index ecad790..7c76d80 100644
                opt_impratio_invsqrt,
                efc_D_in,
                contact_friction_in[conid],
-@@ -3019,9 +4419,22 @@ def _JTDACJ_sparse(compact: bool, cone_type: types.ConeType, max_condim: int):
+@@ -3019,9 +4425,22 @@ def _JTDACJ_sparse(compact: bool, cone_type: types.ConeType, max_condim: int):
                condim,
                block_rows,
              )
@@ -4899,7 +5447,7 @@ index ecad790..7c76d80 100644
  
        for entry in range(lane, n_entries, lanes):
          block_col = int((wp.sqrt(float(8 * entry + 1)) - 1.0) * 0.5)
-@@ -3061,6 +4474,9 @@ def _JTDACJ_sparse(compact: bool, cone_type: types.ConeType, max_condim: int):
+@@ -3061,6 +4480,9 @@ def _JTDACJ_sparse(compact: bool, cone_type: types.ConeType, max_condim: int):
  
  def _jtdaj_groups_per_world(nworld: int, njmax: int) -> int:
    # njmax is capacity and often mostly empty, so cap slots at a few resident waves.
@@ -4909,7 +5457,7 @@ index ecad790..7c76d80 100644
    block_size, min_grid_size = wp.get_suggested_block_size(_JTDACJ_sparse(False, types.ConeType.PYRAMIDAL, 3))
    device_warps = max(1, block_size * min_grid_size // _JTDAJ_THREADS_PER_GROUP)
    return max(1, min(njmax, _JTDAJ_OVERSUBSCRIBE_WAVES * device_warps // nworld))
-@@ -3109,7 +4525,11 @@ def _update_gradient(m: types.Model, d: types.Data, ctx: SolverContext, compact:
+@@ -3109,7 +4531,11 @@ def _update_gradient(m: types.Model, d: types.Data, ctx: SolverContext, compact:
        max_condim = 3
        if m.opt.cone == types.ConeType.ELLIPTIC and m.nmaxcondim > 3:
          max_condim = int(m.nmaxcondim)
@@ -4922,7 +5470,7 @@ index ecad790..7c76d80 100644
        jtdaj_inputs = [
          m.opt.impratio_invsqrt,
          d.contact.friction,
-@@ -3129,8 +4549,14 @@ def _update_gradient(m: types.Model, d: types.Data, ctx: SolverContext, compact:
+@@ -3129,8 +4555,14 @@ def _update_gradient(m: types.Model, d: types.Data, ctx: SolverContext, compact:
          ctx.done,
          groups_per_world,
        ]
@@ -4939,7 +5487,7 @@ index ecad790..7c76d80 100644
        block_dim = threads_per_group if elliptic else mj.block_dim.update_gradient_JTDAJ_sparse
        wp.launch(
          jtdaj_kernel,
-@@ -3182,71 +4608,134 @@ def _update_gradient(m: types.Model, d: types.Data, ctx: SolverContext, compact:
+@@ -3182,71 +4614,134 @@ def _update_gradient(m: types.Model, d: types.Data, ctx: SolverContext, compact:
        # of SMs on the GPU. We can now query the SM count:
        # https://github.com/NVIDIA/warp/commit/f3814e7e5459e5fd13032cf0fddb3daddd510f30
  
@@ -5123,7 +5671,7 @@ index ecad790..7c76d80 100644
  
    # Update upper triangle of H with delta from changed constraints.
    sc = _sparse_compact(ctx)
-@@ -3270,6 +4759,36 @@ def _update_gradient_incremental(m: types.Model, d: types.Data, ctx: SolverConte
+@@ -3270,6 +4765,36 @@ def _update_gradient_incremental(m: types.Model, d: types.Data, ctx: SolverConte
        ],
        outputs=[ctx.h],
      )
@@ -5160,7 +5708,28 @@ index ecad790..7c76d80 100644
    else:
      tri_dim = m.nv * (m.nv + 1) // 2
      wp.launch(
-@@ -3405,7 +4924,9 @@ def _solve_beta_finalize_tiled(warn_overflow: int):
+@@ -3380,7 +4905,8 @@ def _solve_beta_finalize_tiled(warn_overflow: int):
+     if tid == 0:
+       ctx_beta_out[worldid] = wp.max(0.0, reduced_beta[0] / wp.max(types.MJ_MINVAL, reduced_beta[1]))
+ 
+-      solver_niter_out[worldid] += 1
++      niter = solver_niter_out[worldid] + 1
++      solver_niter_out[worldid] = niter
+       tolerance = opt_tolerance[worldid % opt_tolerance.shape[0]]
+       meaninertia = stat_meaninertia[worldid % stat_meaninertia.shape[0]]
+ 
+@@ -3389,8 +4915,8 @@ def _solve_beta_finalize_tiled(warn_overflow: int):
+       improvement = _rescale(nv, meaninertia, ctx_improvement_in[worldid])
+       gradient = _rescale(nv, meaninertia, wp.sqrt(grad_dot))
+       done = (improvement < tolerance) or (gradient < tolerance)
+-      if done or solver_niter_out[worldid] == opt_iterations:
+-        if not done and solver_niter_out[worldid] == opt_iterations:
++      if done or niter == opt_iterations:
++        if not done and niter == opt_iterations:
+           if wp.static(bool(WARN_OVERFLOW & OverflowType.ITERATIONS)):
+             wp.printf(
+               "solver iterations limit reached - please increase iterations beyond %u\n"
+@@ -3405,7 +4931,9 @@ def _solve_beta_finalize_tiled(warn_overflow: int):
  
  
  @cache_kernel
@@ -5171,7 +5740,7 @@ index ecad790..7c76d80 100644
    @wp.kernel(module="unique", enable_backward=False)
    def kernel(
      # Model:
-@@ -3418,12 +4939,14 @@ def _solve_done(warn_overflow: int):
+@@ -3418,19 +4946,27 @@ def _solve_done(warn_overflow: int):
      ctx_newton_decrement_in: wp.array[float],
      ctx_improvement_in: wp.array[float],
      ctx_done_in: wp.array[bool],
@@ -5186,22 +5755,51 @@ index ecad790..7c76d80 100644
    ):
      worldid = wp.tid()
  
-@@ -3450,7 +4973,13 @@ def _solve_done(warn_overflow: int):
+     if ctx_done_in[worldid]:
+       return
+ 
+-    solver_niter_out[worldid] += 1
++    # MetalSim: the count is kept in a local and stored, not incremented in place and read back: under Warp's
++    # deterministic mode this kernel's slot counter (nsolving, consumed below for the early exit) makes it run twice,
++    # the counting pass with global stores and non-counter atomics suppressed, so a read-back of solver_niter there
++    # saw the old count; a world reaching the iteration cap then made the counter call in one pass only (a phase
++    # mismatch; MetalSim research_notes/MPM in main simulator/deterministic_ccd_divergence.md). One thread per world.
++    niter = solver_niter_out[worldid] + 1
++    solver_niter_out[worldid] = niter
+     tolerance = opt_tolerance[worldid % opt_tolerance.shape[0]]
+     meaninertia = stat_meaninertia[worldid % stat_meaninertia.shape[0]]
+ 
+@@ -3438,10 +4974,10 @@ def _solve_done(warn_overflow: int):
+     gradient = _rescale(nv, meaninertia, wp.sqrt(ctx_grad_dot_in[worldid]))
+     model_improvement = _rescale(nv, meaninertia, 0.5 * ctx_newton_decrement_in[worldid])
+     done = (improvement < tolerance) or (gradient < tolerance) or (model_improvement < tolerance)
+-    if done or solver_niter_out[worldid] == opt_iterations:
++    if done or niter == opt_iterations:
+       # if the solver has converged or the maximum number of iterations has been reached then
+       # mark this world as done and remove it from the number of unconverged worlds
+-      if not done and solver_niter_out[worldid] == opt_iterations:
++      if not done and niter == opt_iterations:
+         if wp.static(bool(warn_overflow & OverflowType.ITERATIONS)):
+           wp.printf(
+             "solver iterations limit reached - please increase iterations beyond %u\n"
+@@ -3450,7 +4986,15 @@ def _solve_done(warn_overflow: int):
            )
          overflow_out[worldid] = overflow_out[worldid] | OverflowType.ITERATIONS
        ctx_done_out[worldid] = True
 -      wp.atomic_add(nsolving_out, 0, -1)
-+      was_solving = wp.atomic_add(nsolving_out, 0, -1)
 +      if wp.static(EARLY_EXIT):
++        was_solving = wp.atomic_add(nsolving_out, 0, -1)
 +        # the world that brought the count to zero: no later iteration has anything to do, so the indirect
 +        # execution ranges of iterations iteration + 1 .. cap - 1 get length 0 and their launches are skipped
 +        if was_solving == 1:
 +          for j in range(iteration + 1, opt_iterations):
 +            ranges_out[4 * j + 1] = wp.uint32(0)
++      else:
++        wp.atomic_add(nsolving_out, 0, -1)   # return unused: no slot counter without the early exit
  
    return kernel
  
-@@ -3462,11 +4991,17 @@ def _solve_done(warn_overflow: int):
+@@ -3462,11 +5006,17 @@ def _solve_done(warn_overflow: int):
  # stale ray; rebuilding re-anchors the arithmetic at the current (much smaller)
  # gradient scale. The 8 is an allowance for the reduction depth of the sums.
  _ALPHA_NOISE_EPS = 8.0 * 1.1920929e-07  # 8 * float32 eps
@@ -5220,7 +5818,7 @@ index ecad790..7c76d80 100644
  
  
  @wp.kernel(grid_stride=True)
-@@ -3487,6 +5022,7 @@ def _solver_iteration(
+@@ -3487,6 +5037,7 @@ def _solver_iteration(
    ctx: SolverContext,
    nsolving: wp.array[int],
    compact: bool = False,
@@ -5228,7 +5826,7 @@ index ecad790..7c76d80 100644
  ):
    _linesearch(m, d, ctx)
  
-@@ -3496,6 +5032,20 @@ def _solver_iteration(
+@@ -3496,6 +5047,20 @@ def _solver_iteration(
    # changes every iteration.
    incremental = _use_incremental(m)
  
@@ -5249,7 +5847,7 @@ index ecad790..7c76d80 100644
    if incremental:
      # Must complete before _update_constraint_efc which atomically increments.
      wp.launch(
-@@ -3515,6 +5065,10 @@ def _solver_iteration(
+@@ -3515,6 +5080,10 @@ def _solver_iteration(
    else:
      _update_gradient(m, d, ctx, compact=compact)
  
@@ -5260,7 +5858,7 @@ index ecad790..7c76d80 100644
    # polak-ribiere
    if m.opt.solver == types.SolverType.CG:
      wp.launch_tiled(
-@@ -3551,8 +5105,9 @@ def _solver_iteration(
+@@ -3551,8 +5120,9 @@ def _solver_iteration(
      )
  
    else:
@@ -5271,7 +5869,7 @@ index ecad790..7c76d80 100644
        dim=d.nworld,
        inputs=[
          m.nv,
-@@ -3563,17 +5118,20 @@ def _solver_iteration(
+@@ -3563,17 +5133,20 @@ def _solver_iteration(
          ctx.newton_decrement,
          ctx.improvement,
          ctx.done,
@@ -5295,7 +5893,7 @@ index ecad790..7c76d80 100644
    )
  
    # jaref = d.efc_J @ d.qacc - d.efc_aref
-@@ -3635,14 +5193,36 @@ def solve(m: types.Model, d: types.Data):
+@@ -3635,14 +5208,36 @@ def solve(m: types.Model, d: types.Data):
      _solve(m, d, ctx)
  
  
@@ -5335,7 +5933,7 @@ index ecad790..7c76d80 100644
    )
  
    #  context
-@@ -3677,8 +5257,12 @@ def _solve(m: types.Model, d: types.Data, ctx: SolverContext, compact: bool = Fa
+@@ -3677,8 +5272,12 @@ def _solve(m: types.Model, d: types.Data, ctx: SolverContext, compact: bool = Fa
      # This branch is mostly for when JAX is used as it is currently not compatible
      # with CUDA graph conditional.
      # It should be removed when JAX becomes compatible.

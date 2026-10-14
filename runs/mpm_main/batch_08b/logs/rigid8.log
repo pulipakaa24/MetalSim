@@ -1,0 +1,798 @@
+.sss....sssss.....s....FFFFFFFFFFFF..FF...........F..FFFssssssssssssssss [ 48%]
+sssssssssssssssssssssss......s...............EEEF....................... [ 97%]
+...F                                                                     [100%]
+==================================== ERRORS ====================================
+____ ERROR at setup of test_noise_fresh_each_rollout_and_no_phantom_action _____
+
+    @pytest.fixture(scope="module")
+    def algo():
+        from metalsim.learn.g1_velocity import G1VelocityTask, g1_ppo_config
+        from metalsim.learn.ppo_warp import PPOWarp
+        wp.config.quiet = True
+>       task = G1VelocityTask(64, terrain="flat", seed=0, physics_dt=0.0025)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_ppo_warp_rollout.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/learn/g1_velocity.py:593: in __init__
+    self.model, self.info = build_g1_model(terrain, self.hfield, physics_dt=physics_dt,
+metalsim/learn/g1_velocity.py:95: in build_g1_model
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+lossless = False, drives = False, visuals = False, effort_limit = None
+
+    def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
+                 effort_limit: str | None = None) -> mujoco.MjSpec:
+>       stage = Usd.Stage.Open(path)
+                ^^^^^^^^^^^^^^^^^^^^
+E       pxr.Tf.ErrorException: 
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+
+metalsim/scene/usd_to_mjcf.py:37: ErrorException
+_______________ ERROR at setup of test_stored_logp_matches_torch _______________
+
+    @pytest.fixture(scope="module")
+    def algo():
+        from metalsim.learn.g1_velocity import G1VelocityTask, g1_ppo_config
+        from metalsim.learn.ppo_warp import PPOWarp
+        wp.config.quiet = True
+>       task = G1VelocityTask(64, terrain="flat", seed=0, physics_dt=0.0025)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_ppo_warp_rollout.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/learn/g1_velocity.py:593: in __init__
+    self.model, self.info = build_g1_model(terrain, self.hfield, physics_dt=physics_dt,
+metalsim/learn/g1_velocity.py:95: in build_g1_model
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+lossless = False, drives = False, visuals = False, effort_limit = None
+
+    def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
+                 effort_limit: str | None = None) -> mujoco.MjSpec:
+>       stage = Usd.Stage.Open(path)
+                ^^^^^^^^^^^^^^^^^^^^
+E       pxr.Tf.ErrorException: 
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+
+metalsim/scene/usd_to_mjcf.py:37: ErrorException
+___________________ ERROR at setup of test_timeouts_flagged ____________________
+
+    @pytest.fixture(scope="module")
+    def algo():
+        from metalsim.learn.g1_velocity import G1VelocityTask, g1_ppo_config
+        from metalsim.learn.ppo_warp import PPOWarp
+        wp.config.quiet = True
+>       task = G1VelocityTask(64, terrain="flat", seed=0, physics_dt=0.0025)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_ppo_warp_rollout.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/learn/g1_velocity.py:593: in __init__
+    self.model, self.info = build_g1_model(terrain, self.hfield, physics_dt=physics_dt,
+metalsim/learn/g1_velocity.py:95: in build_g1_model
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+lossless = False, drives = False, visuals = False, effort_limit = None
+
+    def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
+                 effort_limit: str | None = None) -> mujoco.MjSpec:
+>       stage = Usd.Stage.Open(path)
+                ^^^^^^^^^^^^^^^^^^^^
+E       pxr.Tf.ErrorException: 
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+
+metalsim/scene/usd_to_mjcf.py:37: ErrorException
+=================================== FAILURES ===================================
+_______________ test_isaaclab3_model_fields_match_the_recording ________________
+
+    def test_isaaclab3_model_fields_match_the_recording():
+        from metalsim.physics import contact_tuning
+>       m, _ = build_g1_model("flat", physics_dt=0.0025)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_solver_presets.py:26: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/learn/g1_velocity.py:95: in build_g1_model
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+lossless = False, drives = False, visuals = False, effort_limit = None
+
+    def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
+                 effort_limit: str | None = None) -> mujoco.MjSpec:
+>       stage = Usd.Stage.Open(path)
+                ^^^^^^^^^^^^^^^^^^^^
+E       pxr.Tf.ErrorException: 
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+
+metalsim/scene/usd_to_mjcf.py:37: ErrorException
+________________ test_once_per_tick_contacts_follow_the_bodies _________________
+
+    def test_once_per_tick_contacts_follow_the_bodies():
+        """The second substep of a tick keeps the first substep's contacts and moves their witness points with the bodies:
+        for plane-vertex contacts the refreshed distance equals a fresh collision pass on the moved bodies."""
+        import mujoco_warp as mjw
+>       m, sim = _standing_sim("isaaclab3")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_solver_presets.py:65: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_solver_presets.py:52: in _standing_sim
+    m, _ = build_g1_model("flat", physics_dt=0.0025)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+metalsim/learn/g1_velocity.py:95: in build_g1_model
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+lossless = False, drives = False, visuals = False, effort_limit = None
+
+    def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
+                 effort_limit: str | None = None) -> mujoco.MjSpec:
+>       stage = Usd.Stage.Open(path)
+                ^^^^^^^^^^^^^^^^^^^^
+E       pxr.Tf.ErrorException: 
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+
+metalsim/scene/usd_to_mjcf.py:37: ErrorException
+____________ test_once_per_tick_collision_step_is_stable_and_close _____________
+
+    def test_once_per_tick_collision_step_is_stable_and_close():
+        """A 0.5 s stand on the preset with collision once per 5 ms tick vs every 2.5 ms substep: finite, and the pelvis
+        height within 5 mm (the two differ only in which contacts the second substep sees)."""
+        out = {}
+        for preset in ("isaaclab3", "isaaclab3_collide_every_substep"):
+>           m, sim = _standing_sim(preset, substeps=8)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_solver_presets.py:115: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_solver_presets.py:52: in _standing_sim
+    m, _ = build_g1_model("flat", physics_dt=0.0025)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+metalsim/learn/g1_velocity.py:95: in build_g1_model
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+lossless = False, drives = False, visuals = False, effort_limit = None
+
+    def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
+                 effort_limit: str | None = None) -> mujoco.MjSpec:
+>       stage = Usd.Stage.Open(path)
+                ^^^^^^^^^^^^^^^^^^^^
+E       pxr.Tf.ErrorException: 
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+
+metalsim/scene/usd_to_mjcf.py:37: ErrorException
+_____________ test_iteration_cap_only_changes_worlds_that_reach_it _____________
+
+    def test_iteration_cap_only_changes_worlds_that_reach_it():
+        """MuJoCo Warp exits every world at the tolerance (graph conditional or not): with caps 100 and 20 the states agree
+        to float noise when no world needs more than 20 iterations."""
+        res = {}
+        for preset in ("isaaclab3", "isaaclab3_cap20"):
+>           m, sim = _standing_sim(preset, substeps=8)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_solver_presets.py:134: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_solver_presets.py:52: in _standing_sim
+    m, _ = build_g1_model("flat", physics_dt=0.0025)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+metalsim/learn/g1_velocity.py:95: in build_g1_model
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+lossless = False, drives = False, visuals = False, effort_limit = None
+
+    def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
+                 effort_limit: str | None = None) -> mujoco.MjSpec:
+>       stage = Usd.Stage.Open(path)
+                ^^^^^^^^^^^^^^^^^^^^
+E       pxr.Tf.ErrorException: 
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+
+metalsim/scene/usd_to_mjcf.py:37: ErrorException
+_______ test_effective_model_fields_per_preset_combination[default-None] _______
+
+contact_cfg = 'default', solver_cfg = None
+
+    @pytest.mark.parametrize("contact_cfg,solver_cfg", [("default", None), ("recommended", None), ("recommended", "isaaclab3"),
+                                                        ("recommended", "isaaclab3_every_substep_cap20"),
+                                                        ("recommended", "isaaclab3_hardlimits"), ("default", "isaaclab3")])
+    def test_effective_model_fields_per_preset_combination(contact_cfg, solver_cfg):
+        """The task's effective contact / limit fields equal the intended preset alone applied to the raw model: contact_cfg
+        first, then solver_cfg (solver_presets docstring), with the solver preset owning every field it touches."""
+        from metalsim.learn.g1_velocity import G1VelocityTask
+        from metalsim.physics import contact_tuning
+>       task = G1VelocityTask(2, terrain="flat", seed=0, physics_dt=0.0025, reward_cfg="flat", contact_cfg=contact_cfg, solver_cfg=solver_cfg)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_solver_presets.py:155: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/learn/g1_velocity.py:593: in __init__
+    self.model, self.info = build_g1_model(terrain, self.hfield, physics_dt=physics_dt,
+metalsim/learn/g1_velocity.py:95: in build_g1_model
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+lossless = False, drives = False, visuals = False, effort_limit = None
+
+    def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
+                 effort_limit: str | None = None) -> mujoco.MjSpec:
+>       stage = Usd.Stage.Open(path)
+                ^^^^^^^^^^^^^^^^^^^^
+E       pxr.Tf.ErrorException: 
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+
+metalsim/scene/usd_to_mjcf.py:37: ErrorException
+_____ test_effective_model_fields_per_preset_combination[recommended-None] _____
+
+contact_cfg = 'recommended', solver_cfg = None
+
+    @pytest.mark.parametrize("contact_cfg,solver_cfg", [("default", None), ("recommended", None), ("recommended", "isaaclab3"),
+                                                        ("recommended", "isaaclab3_every_substep_cap20"),
+                                                        ("recommended", "isaaclab3_hardlimits"), ("default", "isaaclab3")])
+    def test_effective_model_fields_per_preset_combination(contact_cfg, solver_cfg):
+        """The task's effective contact / limit fields equal the intended preset alone applied to the raw model: contact_cfg
+        first, then solver_cfg (solver_presets docstring), with the solver preset owning every field it touches."""
+        from metalsim.learn.g1_velocity import G1VelocityTask
+        from metalsim.physics import contact_tuning
+>       task = G1VelocityTask(2, terrain="flat", seed=0, physics_dt=0.0025, reward_cfg="flat", contact_cfg=contact_cfg, solver_cfg=solver_cfg)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_solver_presets.py:155: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/learn/g1_velocity.py:593: in __init__
+    self.model, self.info = build_g1_model(terrain, self.hfield, physics_dt=physics_dt,
+metalsim/learn/g1_velocity.py:95: in build_g1_model
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+lossless = False, drives = False, visuals = False, effort_limit = None
+
+    def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
+                 effort_limit: str | None = None) -> mujoco.MjSpec:
+>       stage = Usd.Stage.Open(path)
+                ^^^^^^^^^^^^^^^^^^^^
+E       pxr.Tf.ErrorException: 
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+
+metalsim/scene/usd_to_mjcf.py:37: ErrorException
+__ test_effective_model_fields_per_preset_combination[recommended-isaaclab3] ___
+
+contact_cfg = 'recommended', solver_cfg = 'isaaclab3'
+
+    @pytest.mark.parametrize("contact_cfg,solver_cfg", [("default", None), ("recommended", None), ("recommended", "isaaclab3"),
+                                                        ("recommended", "isaaclab3_every_substep_cap20"),
+                                                        ("recommended", "isaaclab3_hardlimits"), ("default", "isaaclab3")])
+    def test_effective_model_fields_per_preset_combination(contact_cfg, solver_cfg):
+        """The task's effective contact / limit fields equal the intended preset alone applied to the raw model: contact_cfg
+        first, then solver_cfg (solver_presets docstring), with the solver preset owning every field it touches."""
+        from metalsim.learn.g1_velocity import G1VelocityTask
+        from metalsim.physics import contact_tuning
+>       task = G1VelocityTask(2, terrain="flat", seed=0, physics_dt=0.0025, reward_cfg="flat", contact_cfg=contact_cfg, solver_cfg=solver_cfg)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_solver_presets.py:155: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/learn/g1_velocity.py:593: in __init__
+    self.model, self.info = build_g1_model(terrain, self.hfield, physics_dt=physics_dt,
+metalsim/learn/g1_velocity.py:95: in build_g1_model
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+lossless = False, drives = False, visuals = False, effort_limit = None
+
+    def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
+                 effort_limit: str | None = None) -> mujoco.MjSpec:
+>       stage = Usd.Stage.Open(path)
+                ^^^^^^^^^^^^^^^^^^^^
+E       pxr.Tf.ErrorException: 
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+
+metalsim/scene/usd_to_mjcf.py:37: ErrorException
+_ test_effective_model_fields_per_preset_combination[recommended-isaaclab3_every_substep_cap20] _
+
+contact_cfg = 'recommended', solver_cfg = 'isaaclab3_every_substep_cap20'
+
+    @pytest.mark.parametrize("contact_cfg,solver_cfg", [("default", None), ("recommended", None), ("recommended", "isaaclab3"),
+                                                        ("recommended", "isaaclab3_every_substep_cap20"),
+                                                        ("recommended", "isaaclab3_hardlimits"), ("default", "isaaclab3")])
+    def test_effective_model_fields_per_preset_combination(contact_cfg, solver_cfg):
+        """The task's effective contact / limit fields equal the intended preset alone applied to the raw model: contact_cfg
+        first, then solver_cfg (solver_presets docstring), with the solver preset owning every field it touches."""
+        from metalsim.learn.g1_velocity import G1VelocityTask
+        from metalsim.physics import contact_tuning
+>       task = G1VelocityTask(2, terrain="flat", seed=0, physics_dt=0.0025, reward_cfg="flat", contact_cfg=contact_cfg, solver_cfg=solver_cfg)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_solver_presets.py:155: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/learn/g1_velocity.py:593: in __init__
+    self.model, self.info = build_g1_model(terrain, self.hfield, physics_dt=physics_dt,
+metalsim/learn/g1_velocity.py:95: in build_g1_model
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+lossless = False, drives = False, visuals = False, effort_limit = None
+
+    def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
+                 effort_limit: str | None = None) -> mujoco.MjSpec:
+>       stage = Usd.Stage.Open(path)
+                ^^^^^^^^^^^^^^^^^^^^
+E       pxr.Tf.ErrorException: 
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+
+metalsim/scene/usd_to_mjcf.py:37: ErrorException
+_ test_effective_model_fields_per_preset_combination[recommended-isaaclab3_hardlimits] _
+
+contact_cfg = 'recommended', solver_cfg = 'isaaclab3_hardlimits'
+
+    @pytest.mark.parametrize("contact_cfg,solver_cfg", [("default", None), ("recommended", None), ("recommended", "isaaclab3"),
+                                                        ("recommended", "isaaclab3_every_substep_cap20"),
+                                                        ("recommended", "isaaclab3_hardlimits"), ("default", "isaaclab3")])
+    def test_effective_model_fields_per_preset_combination(contact_cfg, solver_cfg):
+        """The task's effective contact / limit fields equal the intended preset alone applied to the raw model: contact_cfg
+        first, then solver_cfg (solver_presets docstring), with the solver preset owning every field it touches."""
+        from metalsim.learn.g1_velocity import G1VelocityTask
+        from metalsim.physics import contact_tuning
+>       task = G1VelocityTask(2, terrain="flat", seed=0, physics_dt=0.0025, reward_cfg="flat", contact_cfg=contact_cfg, solver_cfg=solver_cfg)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_solver_presets.py:155: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/learn/g1_velocity.py:593: in __init__
+    self.model, self.info = build_g1_model(terrain, self.hfield, physics_dt=physics_dt,
+metalsim/learn/g1_velocity.py:95: in build_g1_model
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+lossless = False, drives = False, visuals = False, effort_limit = None
+
+    def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
+                 effort_limit: str | None = None) -> mujoco.MjSpec:
+>       stage = Usd.Stage.Open(path)
+                ^^^^^^^^^^^^^^^^^^^^
+E       pxr.Tf.ErrorException: 
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+
+metalsim/scene/usd_to_mjcf.py:37: ErrorException
+____ test_effective_model_fields_per_preset_combination[default-isaaclab3] _____
+
+contact_cfg = 'default', solver_cfg = 'isaaclab3'
+
+    @pytest.mark.parametrize("contact_cfg,solver_cfg", [("default", None), ("recommended", None), ("recommended", "isaaclab3"),
+                                                        ("recommended", "isaaclab3_every_substep_cap20"),
+                                                        ("recommended", "isaaclab3_hardlimits"), ("default", "isaaclab3")])
+    def test_effective_model_fields_per_preset_combination(contact_cfg, solver_cfg):
+        """The task's effective contact / limit fields equal the intended preset alone applied to the raw model: contact_cfg
+        first, then solver_cfg (solver_presets docstring), with the solver preset owning every field it touches."""
+        from metalsim.learn.g1_velocity import G1VelocityTask
+        from metalsim.physics import contact_tuning
+>       task = G1VelocityTask(2, terrain="flat", seed=0, physics_dt=0.0025, reward_cfg="flat", contact_cfg=contact_cfg, solver_cfg=solver_cfg)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_solver_presets.py:155: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/learn/g1_velocity.py:593: in __init__
+    self.model, self.info = build_g1_model(terrain, self.hfield, physics_dt=physics_dt,
+metalsim/learn/g1_velocity.py:95: in build_g1_model
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+lossless = False, drives = False, visuals = False, effort_limit = None
+
+    def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
+                 effort_limit: str | None = None) -> mujoco.MjSpec:
+>       stage = Usd.Stage.Open(path)
+                ^^^^^^^^^^^^^^^^^^^^
+E       pxr.Tf.ErrorException: 
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+
+metalsim/scene/usd_to_mjcf.py:37: ErrorException
+____________ test_g1_actuator_and_joint_fields_match_newtons_model _____________
+
+    def test_g1_actuator_and_joint_fields_match_newtons_model():
+        """The G1 drive as Newton builds Isaac Lab 3.0's MuJoCo Warp model (newton_generated.xml): per joint a position <general>
+        (gain kp, bias -kp q) and a velocity <general> (gain kd, bias -kd qd), no actuator force limit, the effort limit on
+        the joint's actuatorfrcrange. MetalSim's single affine actuator is the same sum; the effort limit is on the joint too
+        (build_g1_model effort_limit="joint"; "actuator" = the archived layout)."""
+        import re
+        X = open(ROOT / "runs/parity3/isaac/fidelity/newton_mjwarp/newton_generated.xml").read()
+>       m, _ = build_g1_model("flat", physics_dt=0.0025)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_solver_presets.py:175: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/learn/g1_velocity.py:95: in build_g1_model
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+lossless = False, drives = False, visuals = False, effort_limit = None
+
+    def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
+                 effort_limit: str | None = None) -> mujoco.MjSpec:
+>       stage = Usd.Stage.Open(path)
+                ^^^^^^^^^^^^^^^^^^^^
+E       pxr.Tf.ErrorException: 
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+
+metalsim/scene/usd_to_mjcf.py:37: ErrorException
+_________________ test_saturated_finger_keeps_implicit_damping _________________
+
+    def test_saturated_finger_keeps_implicit_damping():
+        """Unit proof (MuJoCo C): a finger driven towards its limit at 60 rad/s with its drive saturated stays bounded with the
+        effort limit on the joint, and blows up within a few substeps with it on the actuator (MuJoCo drops a clamped
+        actuator's velocity derivative)."""
+        import copy
+>       base, _ = build_g1_model("flat", physics_dt=0.0025)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_solver_presets.py:197: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/learn/g1_velocity.py:95: in build_g1_model
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+lossless = False, drives = False, visuals = False, effort_limit = None
+
+    def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
+                 effort_limit: str | None = None) -> mujoco.MjSpec:
+>       stage = Usd.Stage.Open(path)
+                ^^^^^^^^^^^^^^^^^^^^
+E       pxr.Tf.ErrorException: 
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+
+metalsim/scene/usd_to_mjcf.py:37: ErrorException
+___________________________ test_g1_rough_task_runs ____________________________
+
+    def test_g1_rough_task_runs():
+        from metalsim.learn.g1_velocity import G1VelocityTask, benchmark_step
+>       task = G1VelocityTask(16, terrain="rough")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_terrain.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/learn/g1_velocity.py:593: in __init__
+    self.model, self.info = build_g1_model(terrain, self.hfield, physics_dt=physics_dt,
+metalsim/learn/g1_velocity.py:95: in build_g1_model
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+lossless = False, drives = False, visuals = False, effort_limit = None
+
+    def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
+                 effort_limit: str | None = None) -> mujoco.MjSpec:
+>       stage = Usd.Stage.Open(path)
+                ^^^^^^^^^^^^^^^^^^^^
+E       pxr.Tf.ErrorException: 
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+
+metalsim/scene/usd_to_mjcf.py:37: ErrorException
+___________________ test_hfield_mesh_contacts_match_mujoco_c ___________________
+
+    def test_hfield_mesh_contacts_match_mujoco_c():
+        """G1 standing on Isaac's rough terrain layout under a PD hold: every heightfield contact normal
+        must point up (z > 0), penetrations must stay in the range MuJoCo C reports for the same initial
+        placement (the feet start intersecting terrain boxes by up to 4.4 cm), and the batched physics
+        must not launch the robot (pelvis within 5 cm of MuJoCo C after 0.5 s).
+    
+        Before the plane-contact patch to MuJoCo Warp's heightfield kernel (patches/mujoco_warp-hfield-
+        plane-contacts.patch) this failed: an inverted normal (z = -1), a 2.05 m penetration, one world
+        launched to 2.3 m."""
+        import mujoco
+        from metalsim.learn.g1_velocity import G1VelocityTask
+>       task = G1VelocityTask(4, terrain="rough", seed=0, terrain_collision="hfield"); m = task.model   # the heightfield kernel
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_terrain.py:96: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/learn/g1_velocity.py:593: in __init__
+    self.model, self.info = build_g1_model(terrain, self.hfield, physics_dt=physics_dt,
+metalsim/learn/g1_velocity.py:95: in build_g1_model
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+lossless = False, drives = False, visuals = False, effort_limit = None
+
+    def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
+                 effort_limit: str | None = None) -> mujoco.MjSpec:
+>       stage = Usd.Stage.Open(path)
+                ^^^^^^^^^^^^^^^^^^^^
+E       pxr.Tf.ErrorException: 
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+
+metalsim/scene/usd_to_mjcf.py:37: ErrorException
+______________ test_height_scan_ray_order_matches_isaac_recording ______________
+
+    def test_height_scan_ray_order_matches_isaac_recording():
+        """The height-scan rays are in Isaac's order (GridPatternCfg ordering "xy": x fastest). Oracle: Isaac Sim 5.1's own
+        step-0 policy observation recorded by isaac_side/play_policy.py on the training terrain (env seed 0, rows 3 and 6,
+        columns 0/4/9/14, robot in its default pose at the cell origin). Runs the scan kernel on Warp's CPU device. The
+        legacy "ij" order (MetalSim before 2026-09-25) must differ on the random-rough cell, where the scan is not symmetric."""
+        import glob, json, mujoco
+        from metalsim.learn.terrain import height_scan_grid, scan_grid
+        from metalsim.learn.g1_velocity import build_g1_model
+        import os
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        metas = sorted(glob.glob(os.path.join(root, "runs/parity/isaac/rough/play_rough/L*/isaac_it500/meta.json")))
+        if not metas:
+            pytest.skip("Isaac recording not present (runs/parity/isaac/rough/play_rough)")
+        hf = isaac_rough_terrain(seed=0)
+>       m, _ = build_g1_model("flat"); body = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, "torso_link")
+               ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_terrain.py:305: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/learn/g1_velocity.py:95: in build_g1_model
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+lossless = False, drives = False, visuals = False, effort_limit = None
+
+    def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
+                 effort_limit: str | None = None) -> mujoco.MjSpec:
+>       stage = Usd.Stage.Open(path)
+                ^^^^^^^^^^^^^^^^^^^^
+E       pxr.Tf.ErrorException: 
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+
+metalsim/scene/usd_to_mjcf.py:37: ErrorException
+________________ test_step_edge_contacts_match_mujoco_c[boxes] _________________
+
+mode = 'boxes'
+
+    @pytest.mark.parametrize("mode", ["boxes", "meshes", "boxes_local"])
+    def test_step_edge_contacts_match_mujoco_c(mode):
+        """The G1 foot collider at a 0.11 m riser of the inverted-stairs pit (scripts/diagnostics/terrain_step_edge.py):
+        stubbing into the riser at 1 m/s and landing across the riser edge, MuJoCo Warp vs MuJoCo C on the same model.
+        With Isaac's boxes the riser is a wall: the toe stops at it (soft-contact penetration only), the foot does not
+        climb, a near-horizontal contact normal appears, and Warp follows C's trajectory ("boxes_local": Warp with the
+        per-world box window against C on all boxes). The 0.1 m heightfield fails all of this (runs/terrain_walls/step_edge.jsonl:
+        Warp's normal never below z 0.67, Warp vs C 0.21 m apart after 0.4 s)."""
+        import os, sys
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts", "diagnostics"))
+        import terrain_step_edge as S
+>       r = S.run(mode)
+            ^^^^^^^^^^^
+
+tests/test_terrain.py:409: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/diagnostics/terrain_step_edge.py:113: in run
+    m, V, geo, hf = build(mode, fine_res)
+                    ^^^^^^^^^^^^^^^^^^^^^
+scripts/diagnostics/terrain_step_edge.py:41: in build
+    V = foot_vertices()
+        ^^^^^^^^^^^^^^^
+scripts/diagnostics/terrain_step_edge.py:23: in foot_vertices
+    m, _ = build_g1_model("flat")
+           ^^^^^^^^^^^^^^^^^^^^^^
+metalsim/learn/g1_velocity.py:95: in build_g1_model
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+lossless = False, drives = False, visuals = False, effort_limit = None
+
+    def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
+                 effort_limit: str | None = None) -> mujoco.MjSpec:
+>       stage = Usd.Stage.Open(path)
+                ^^^^^^^^^^^^^^^^^^^^
+E       pxr.Tf.ErrorException: 
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+
+metalsim/scene/usd_to_mjcf.py:37: ErrorException
+________________ test_step_edge_contacts_match_mujoco_c[meshes] ________________
+
+mode = 'meshes'
+
+    @pytest.mark.parametrize("mode", ["boxes", "meshes", "boxes_local"])
+    def test_step_edge_contacts_match_mujoco_c(mode):
+        """The G1 foot collider at a 0.11 m riser of the inverted-stairs pit (scripts/diagnostics/terrain_step_edge.py):
+        stubbing into the riser at 1 m/s and landing across the riser edge, MuJoCo Warp vs MuJoCo C on the same model.
+        With Isaac's boxes the riser is a wall: the toe stops at it (soft-contact penetration only), the foot does not
+        climb, a near-horizontal contact normal appears, and Warp follows C's trajectory ("boxes_local": Warp with the
+        per-world box window against C on all boxes). The 0.1 m heightfield fails all of this (runs/terrain_walls/step_edge.jsonl:
+        Warp's normal never below z 0.67, Warp vs C 0.21 m apart after 0.4 s)."""
+        import os, sys
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts", "diagnostics"))
+        import terrain_step_edge as S
+>       r = S.run(mode)
+            ^^^^^^^^^^^
+
+tests/test_terrain.py:409: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/diagnostics/terrain_step_edge.py:113: in run
+    m, V, geo, hf = build(mode, fine_res)
+                    ^^^^^^^^^^^^^^^^^^^^^
+scripts/diagnostics/terrain_step_edge.py:41: in build
+    V = foot_vertices()
+        ^^^^^^^^^^^^^^^
+scripts/diagnostics/terrain_step_edge.py:23: in foot_vertices
+    m, _ = build_g1_model("flat")
+           ^^^^^^^^^^^^^^^^^^^^^^
+metalsim/learn/g1_velocity.py:95: in build_g1_model
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+lossless = False, drives = False, visuals = False, effort_limit = None
+
+    def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
+                 effort_limit: str | None = None) -> mujoco.MjSpec:
+>       stage = Usd.Stage.Open(path)
+                ^^^^^^^^^^^^^^^^^^^^
+E       pxr.Tf.ErrorException: 
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+
+metalsim/scene/usd_to_mjcf.py:37: ErrorException
+_____________ test_step_edge_contacts_match_mujoco_c[boxes_local] ______________
+
+mode = 'boxes_local'
+
+    @pytest.mark.parametrize("mode", ["boxes", "meshes", "boxes_local"])
+    def test_step_edge_contacts_match_mujoco_c(mode):
+        """The G1 foot collider at a 0.11 m riser of the inverted-stairs pit (scripts/diagnostics/terrain_step_edge.py):
+        stubbing into the riser at 1 m/s and landing across the riser edge, MuJoCo Warp vs MuJoCo C on the same model.
+        With Isaac's boxes the riser is a wall: the toe stops at it (soft-contact penetration only), the foot does not
+        climb, a near-horizontal contact normal appears, and Warp follows C's trajectory ("boxes_local": Warp with the
+        per-world box window against C on all boxes). The 0.1 m heightfield fails all of this (runs/terrain_walls/step_edge.jsonl:
+        Warp's normal never below z 0.67, Warp vs C 0.21 m apart after 0.4 s)."""
+        import os, sys
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts", "diagnostics"))
+        import terrain_step_edge as S
+>       r = S.run(mode)
+            ^^^^^^^^^^^
+
+tests/test_terrain.py:409: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+scripts/diagnostics/terrain_step_edge.py:113: in run
+    m, V, geo, hf = build(mode, fine_res)
+                    ^^^^^^^^^^^^^^^^^^^^^
+scripts/diagnostics/terrain_step_edge.py:41: in build
+    V = foot_vertices()
+        ^^^^^^^^^^^^^^^
+scripts/diagnostics/terrain_step_edge.py:23: in foot_vertices
+    m, _ = build_g1_model("flat")
+           ^^^^^^^^^^^^^^^^^^^^^^
+metalsim/learn/g1_velocity.py:95: in build_g1_model
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+lossless = False, drives = False, visuals = False, effort_limit = None
+
+    def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
+                 effort_limit: str | None = None) -> mujoco.MjSpec:
+>       stage = Usd.Stage.Open(path)
+                ^^^^^^^^^^^^^^^^^^^^
+E       pxr.Tf.ErrorException: 
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+
+metalsim/scene/usd_to_mjcf.py:37: ErrorException
+_________________________ test_rslrl_adapter_contract __________________________
+
+    def test_rslrl_adapter_contract():
+        pytest.importorskip("rsl_rl"); pytest.importorskip("tensordict")
+        from metalsim.learn.g1_velocity import G1VelocityTask
+        from metalsim.learn.rslrl_adapter import G1RslRlVecEnv
+        wp.config.quiet = True
+>       task = G1VelocityTask(32, terrain="flat", seed=0, physics_dt=0.0025)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/test_ppo_warp_rollout.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/learn/g1_velocity.py:593: in __init__
+    self.model, self.info = build_g1_model(terrain, self.hfield, physics_dt=physics_dt,
+metalsim/learn/g1_velocity.py:95: in build_g1_model
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+lossless = False, drives = False, visuals = False, effort_limit = None
+
+    def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
+                 effort_limit: str | None = None) -> mujoco.MjSpec:
+>       stage = Usd.Stage.Open(path)
+                ^^^^^^^^^^^^^^^^^^^^
+E       pxr.Tf.ErrorException: 
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+
+metalsim/scene/usd_to_mjcf.py:37: ErrorException
+___________________________ test_g1_cloth_scenes_run ___________________________
+
+    def test_g1_cloth_scenes_run():
+        """Cloth + cable on Isaac's G1: MuJoCo Warp flex and XPBD (two-way through xfrc_applied) stay finite."""
+>       fm = dfm.g1_scene_model()
+             ^^^^^^^^^^^^^^^^^^^^
+
+tests/test_deformable.py:239: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+metalsim/physics/deformable.py:148: in g1_scene_model
+    _, info = build_g1_model(physics_dt=physics_dt)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+metalsim/learn/g1_velocity.py:95: in build_g1_model
+    spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+lossless = False, drives = False, visuals = False, effort_limit = None
+
+    def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
+                 effort_limit: str | None = None) -> mujoco.MjSpec:
+>       stage = Usd.Stage.Open(path)
+                ^^^^^^^^^^^^^^^^^^^^
+E       pxr.Tf.ErrorException: 
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+
+metalsim/scene/usd_to_mjcf.py:37: ErrorException
+=========================== short test summary info ============================
+FAILED tests/test_solver_presets.py::test_isaaclab3_model_fields_match_the_recording
+FAILED tests/test_solver_presets.py::test_once_per_tick_contacts_follow_the_bodies
+FAILED tests/test_solver_presets.py::test_once_per_tick_collision_step_is_stable_and_close
+FAILED tests/test_solver_presets.py::test_iteration_cap_only_changes_worlds_that_reach_it
+FAILED tests/test_solver_presets.py::test_effective_model_fields_per_preset_combination[default-None]
+FAILED tests/test_solver_presets.py::test_effective_model_fields_per_preset_combination[recommended-None]
+FAILED tests/test_solver_presets.py::test_effective_model_fields_per_preset_combination[recommended-isaaclab3]
+FAILED tests/test_solver_presets.py::test_effective_model_fields_per_preset_combination[recommended-isaaclab3_every_substep_cap20]
+FAILED tests/test_solver_presets.py::test_effective_model_fields_per_preset_combination[recommended-isaaclab3_hardlimits]
+FAILED tests/test_solver_presets.py::test_effective_model_fields_per_preset_combination[default-isaaclab3]
+FAILED tests/test_solver_presets.py::test_g1_actuator_and_joint_fields_match_newtons_model
+FAILED tests/test_solver_presets.py::test_saturated_finger_keeps_implicit_damping
+FAILED tests/test_terrain.py::test_g1_rough_task_runs - pxr.Tf.ErrorException: 
+FAILED tests/test_terrain.py::test_hfield_mesh_contacts_match_mujoco_c - pxr....
+FAILED tests/test_terrain.py::test_height_scan_ray_order_matches_isaac_recording
+FAILED tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[boxes]
+FAILED tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[meshes]
+FAILED tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[boxes_local]
+FAILED tests/test_ppo_warp_rollout.py::test_rslrl_adapter_contract - pxr.Tf.E...
+FAILED tests/test_deformable.py::test_g1_cloth_scenes_run - pxr.Tf.ErrorExcep...
+ERROR tests/test_ppo_warp_rollout.py::test_noise_fresh_each_rollout_and_no_phantom_action
+ERROR tests/test_ppo_warp_rollout.py::test_stored_logp_matches_torch - pxr.Tf...
+ERROR tests/test_ppo_warp_rollout.py::test_timeouts_flagged - pxr.Tf.ErrorExc...
+20 failed, 76 passed, 49 skipped, 3 errors in 177.84s (0:02:57)

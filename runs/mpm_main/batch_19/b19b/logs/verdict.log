@@ -1,0 +1,19 @@
+
+## 8. Results (batch_19, 16-inch)
+
+M1 confirmed: every prediction held.
+
+- `pre_stack_capt` (stack, 64 worlds, capture 1, cap 2): steps with cap worlds 66/200 (first 106), steps with trips 66, trips only in cap steps True, kernels {'_solve_done__locals__kernel': 66}, flag values {'6': 66}, fused update True, _solve_done deterministic launches 4
+- `fix_stack_capt` (stack, 64 worlds, capture 1, cap 2): steps with cap worlds 66/200 (first 106), steps with trips 0, trips only in cap steps True, kernels {}, flag values {}, fused update False, _solve_done deterministic launches 4
+- `pre_stack_eager` (stack, 64 worlds, capture 0, cap 2): steps with cap worlds 66/200 (first 106), steps with trips 66, trips only in cap steps True, kernels {'_solve_done__locals__kernel': 66}, flag values {'6': 66}, fused update True, _solve_done deterministic launches 400
+- `fix_stack_eager` (stack, 64 worlds, capture 0, cap 2): steps with cap worlds 66/200 (first 106), steps with trips 0, trips only in cap steps True, kernels {}, flag values {}, fused update False, _solve_done deterministic launches 400
+- `pre_g1_1024u` (g1, 1024 worlds, capture 1, cap 20): steps with cap worlds 41/60 (first 1), steps with trips 41, trips only in cap steps True, kernels {'_solve_done__locals__kernel': 59}, flag values {'6': 59}, fused update False, _solve_done deterministic launches 200
+- `fix_g1_64` (g1, 64 worlds, capture 1, cap 20): steps with cap worlds 7/60 (first 2), steps with trips 0, trips only in cap steps True, kernels {}, flag values {}, fused update False, _solve_done deterministic launches 200
+- `fix_g1_1024` (g1, 1024 worlds, capture 1, cap 20): steps with cap worlds 41/60 (first 1), steps with trips 0, trips only in cap steps True, kernels {}, flag values {}, fused update False, _solve_done deterministic launches 200
+- `batch_18 pre_g1_64 (fused update)` (g1, 64 worlds, capture 1, cap 20): steps with cap worlds 60/60 (first None), steps with trips 60, trips only in cap steps True, kernels {'_solve_done__locals__kernel': 237}, flag values {'6': 237}, fused update None, _solve_done deterministic launches 0
+- `batch_18 fix_g1_64 (fused update)` (g1, 64 worlds, capture 1, cap 20): steps with cap worlds 60/60 (first None), steps with trips 0, trips only in cap steps True, kernels {}, flag values {}, fused update None, _solve_done deterministic launches 0
+- G1 deterministic with the fix, captured (det_cost_g1.py, check_overflow): exit code 64 worlds 0, 1,024 worlds 0
+- test_iteration_cap_repeats on the current pin: failed on the counter phase mismatch (M1 predicts the phase-mismatch failure)
+- Uncaptured: _solve_done is a deterministic launch uncaptured; M1's trips appear there too
+
+M1_CONFIRMED

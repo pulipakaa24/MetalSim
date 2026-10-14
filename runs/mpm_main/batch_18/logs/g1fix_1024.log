@@ -1,0 +1,108 @@
+Graph capture ended while an indirect execution range was still open
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth 66b212c load on device 'metal:0' took 427.64 ms  (cached)
+Module _nxn_broadphase__locals__kernel_6aa72da0 6aa72da load on device 'metal:0' took 78.40 ms  (cached)
+Module ccd_det_kernels_builder__locals__ccd_det_solve_kernel_f70f2464 f70f246 load on device 'metal:0' took 1264.04 ms  (cached)
+Module ccd_det_kernels_builder__locals__ccd_det_write_kernel_c739f561 c739f56 load on device 'metal:0' took 54.08 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_1a523152 1a52315 load on device 'metal:0' took 143.67 ms  (cached)
+Module mujoco_warp._src.constraint 8122a35 load on device 'metal:0' took 39.19 ms  (cached)
+Module _friction_dof__locals__kernel_9303dcb8 9303dcb load on device 'metal:0' took 48.20 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_1f830265 1f83026 load on device 'metal:0' took 50.55 ms  (cached)
+Module _efc_contact_init__locals__kernel_b738ab43 b738ab4 load on device 'metal:0' took 40.29 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_5323c4dc 4db7a7c load on device 'metal:0' took 46.05 ms  (cached)
+Module _efc_contact_update__locals__kernel_85e449f6 85e449f load on device 'metal:0' took 49.71 ms  (cached)
+Module mujoco_warp._src.forward 682c02c load on device 'metal:0' took 253.02 ms  (cached)
+Module mujoco_warp._src.passive 908af13 load on device 'metal:0' took 216.55 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_24db1e12 24db1e1 load on device 'metal:0' took 39.85 ms  (cached)
+Module mujoco_warp._src.forward fd9467b load on device 'metal:0' took 255.38 ms  (cached)
+Module _qfrc_smooth__locals__kernel_13f49829 13f4982 load on device 'metal:0' took 38.82 ms  (cached)
+Module mujoco_warp._src.support 676b434 load on device 'metal:0' took 46.93 ms  (cached)
+Module _factor_i_sparse_unrolled__locals__kernel_d00df9c9 2c717d1 load on device 'metal:0' took 40.49 ms  (cached)
+Module _solve_LD_sparse_serial__locals__kernel_ed82e09f 74f1108 load on device 'metal:0' took 63.03 ms  (cached)
+Module _solve_init_dof__locals__kernel_3548d082 3548d08 load on device 'metal:0' took 38.79 ms  (cached)
+Module _solve_init_efc__locals__kernel_a9e804ef a9e804e load on device 'metal:0' took 39.48 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_f351e39c f351e39 load on device 'metal:0' took 40.96 ms  (cached)
+Module mul_m_kernel__locals___mul_m_1b101985 1b10198 load on device 'metal:0' took 40.37 ms  (cached)
+Module _update_constraint_efc__locals__kernel_e0020cfb e0020cf load on device 'metal:0' took 49.66 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_5a4cae5d 5a4cae5 load on device 'metal:0' took 40.97 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_36d633d3 36d633d load on device 'metal:0' took 39.42 ms  (cached)
+Module _update_gradient_grad__locals__kernel_6e1479ba 6e1479b load on device 'metal:0' took 43.48 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_86a4c2a3 adecb3e load on device 'metal:0' took 42.62 ms  (cached)
+Module mujoco_warp._src.solver 9681cf2 load on device 'metal:0' took 76.67 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_308459ca edd9b76 load on device 'metal:0' took 40.59 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_b5d18518 74ccb47 load on device 'metal:0' took 139.12 ms  (cached)
+Module _update_constraint_gradient_fused__locals__kernel_9ab570bb 0513970 load on device 'metal:0' took 61.54 ms  (cached)
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scripts/diagnostics/det_cost_g1.py", line 41, in <module>
+    main()
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scripts/diagnostics/det_cost_g1.py", line 30, in main
+    task = G1VelocityTask(a.worlds, terrain="flat", batch_options={"deterministic": bool(a.deterministic)})
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/learn/g1_velocity.py", line 668, in __init__
+    self.sim = BatchSim(m, n, options=BatchSimOptions(**bso))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/batch.py", line 300, in __init__
+    self._capture()
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/batch.py", line 326, in _capture
+    self._capture_graphs()
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/batch.py", line 353, in _capture_graphs
+    self._launch_substeps()
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/batch.py", line 364, in _launch_substeps
+    mjw.step(self.m, self.d)
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mjw-solvedone/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mjw-solvedone/mujoco_warp/_src/forward.py", line 1843, in step
+    forward(m, d)
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mjw-solvedone/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mjw-solvedone/mujoco_warp/_src/forward.py", line 1834, in forward
+    solver.solve(m, d)
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mjw-solvedone/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mjw-solvedone/mujoco_warp/_src/solver.py", line 5202, in solve
+    _solve(m, d, ctx)
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mjw-solvedone/mujoco_warp/_src/solver.py", line 5272, in _solve
+    _solver_iteration(m, d, ctx, nsolving, compact=compact, iteration=i)
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mjw-solvedone/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mjw-solvedone/mujoco_warp/_src/solver.py", line 5047, in _solver_iteration
+    _launch_update_fused(m, d, ctx, elliptic, fuse_htot)
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mjw-solvedone/mujoco_warp/_src/solver.py", line 2509, in _launch_update_fused
+    wp.launch_tiled(
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-diag/warp/_src/context.py", line 12941, in launch_tiled
+    return launch(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-diag/warp/_src/context.py", line 12620, in launch
+    metal_deterministic.launch(
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-diag/warp/_src/metal_deterministic.py", line 1265, in launch
+    plan = _Plan(
+           ^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-diag/warp/_src/metal_deterministic.py", line 1036, in __init__
+    self.scratch_buf = state.scratch_pool.get(scratch.size)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-diag/warp/_src/metal_deterministic.py", line 763, in get
+    self.buffers.append(_host_zeroed(size, wp.uint8, self.device, record=True))
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-diag/warp/_src/metal_deterministic.py", line 774, in _host_zeroed
+    arr = wp.empty(n, dtype=dtype, device=device)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-diag/warp/_src/context.py", line 10706, in empty
+    arr = warp.array(
+          ^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-diag/warp/_src/types.py", line 3433, in __init__
+    self._init_new(dtype, shape, strides, device, pinned)
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-diag/warp/_src/types.py", line 3870, in _init_new
+    check_array_shape(shape)
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-diag/warp/_src/types.py", line 3121, in check_array_shape
+    raise ValueError(
+ValueError: Array shapes must not exceed the maximum representable value of a signed 32-bit integer, got 3534564096 in dimension 0.

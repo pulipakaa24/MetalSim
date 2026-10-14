@@ -1,0 +1,22 @@
+.......x.s.ssss.ssssssss                                                 [100%]
+=============================== warnings summary ===============================
+../../../.venv-newton152/lib/python3.12/site-packages/torch/jit/_script.py:1491
+  /Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/torch/jit/_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_mpm.py:119: needs the Newton fork (metalsim-1.5.2)
+SKIPPED [1] tests/test_mpm.py:187: needs the Warp (metalsim) and Newton (metalsim-1.5.2) forks
+SKIPPED [1] tests/test_mpm.py:196: needs the Warp (metalsim) and Newton (metalsim-1.5.2) forks
+SKIPPED [1] tests/test_mpm.py:205: needs the Warp (metalsim) and Newton (metalsim-1.5.2) forks
+SKIPPED [1] tests/test_mpm.py:215: needs the Warp (metalsim) and Newton (metalsim-1.5.2) forks
+SKIPPED [1] tests/test_franka_pour_terms.py:72: needs the Franka-Pour assets (scripts/fetch_isaac_assets.sh)
+SKIPPED [1] tests/test_franka_pour_terms.py:89: needs the Franka-Pour assets (scripts/fetch_isaac_assets.sh)
+SKIPPED [1] tests/test_franka_pour_terms.py:143: needs the Franka-Pour assets (scripts/fetch_isaac_assets.sh)
+SKIPPED [1] tests/test_franka_pour_terms.py:170: needs the Franka-Pour assets (scripts/fetch_isaac_assets.sh)
+SKIPPED [1] tests/test_franka_pour_terms.py:199: needs the Franka-Pour assets (scripts/fetch_isaac_assets.sh)
+SKIPPED [1] tests/test_franka_pour_terms.py:254: needs the Franka-Pour assets (scripts/fetch_isaac_assets.sh)
+SKIPPED [1] tests/test_franka_pour_terms.py:281: needs the Franka-Pour assets (scripts/fetch_isaac_assets.sh)
+SKIPPED [1] tests/test_franka_pour_resume.py:24: needs the Franka-Pour assets
+10 passed, 13 skipped, 1 xfailed, 1 warning in 47.12s

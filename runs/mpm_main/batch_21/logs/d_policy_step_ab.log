@@ -1,0 +1,32 @@
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/policy_step_ab.py", line 184, in <module>
+    main()
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/policy_step_ab.py", line 140, in main
+    r, hashes = run(a, a.single, bool(a.hash))
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/policy_step_ab.py", line 61, in run
+    sim, mpm = make(a)
+               ^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/policy_step_ab.py", line 37, in make
+    return scale_coupled.build(b)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/scale_coupled.py", line 42, in build
+    sim = BatchSim(model, a.worlds, options=BatchSimOptions(substeps=3, deterministic=bool(a.deterministic)))
+                                                                                           ^^^^^^^^^^^^^^^
+AttributeError: 'Namespace' object has no attribute 'deterministic'
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/policy_step_ab.py", line 184, in <module>
+    main()
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/policy_step_ab.py", line 163, in main
+    ha, hb_ = child("A", True)["hashes"], child("B", True)["hashes"]
+              ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/policy_step_ab.py", line 158, in child
+    raise RuntimeError(f"run {mode} (hashes={hashes}) failed with exit code {p.returncode}")
+RuntimeError: run A (hashes=True) failed with exit code 1

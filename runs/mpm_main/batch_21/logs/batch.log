@@ -1,0 +1,76 @@
+=== batch_21 start Wed Oct 14 12:56:04 PDT 2026
+[12:56:04] shared MuJoCo Warp checkout: 8eb51fe
+[12:56:07] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[12:56:07] gpu job mm21_d_owr (check, <= 10 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b21/logs/d_one_world_reset.log
+                                                                                               ^^^^^^^^^^^^^^^
+    AttributeError: 'Namespace' object has no attribute 'deterministic'
+[12:56:18] health: utilisation 8%
+GPU (ioreg): device utilization 97 %; per-process GPU time over 1.9 s: none >= 1 %
+[12:56:18] gpu job mm21_d_psab (check, <= 10 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b21/logs/d_policy_step_ab.log
+        raise RuntimeError(f"run {mode} (hashes={hashes}) failed with exit code {p.returncode}")
+    RuntimeError: run A (hashes=True) failed with exit code 1
+[12:56:29] health: utilisation 99%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+--- d_one_world_reset (last 25 lines)
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/one_world_reset.py", line 70, in <module>
+    main()
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/one_world_reset.py", line 59, in main
+    t = {m: trajectory(m) for m in ("selected", "full", "unselected", "none")}
+            ^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/one_world_reset.py", line 30, in trajectory
+    sim, mpm = scale_coupled.build(b)
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/scale_coupled.py", line 42, in build
+    sim = BatchSim(model, a.worlds, options=BatchSimOptions(substeps=3, deterministic=bool(a.deterministic)))
+                                                                                           ^^^^^^^^^^^^^^^
+AttributeError: 'Namespace' object has no attribute 'deterministic'
+--- d_policy_step_ab (last 25 lines)
+    sim, mpm = make(a)
+               ^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/policy_step_ab.py", line 37, in make
+    return scale_coupled.build(b)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/scale_coupled.py", line 42, in build
+    sim = BatchSim(model, a.worlds, options=BatchSimOptions(substeps=3, deterministic=bool(a.deterministic)))
+                                                                                           ^^^^^^^^^^^^^^^
+AttributeError: 'Namespace' object has no attribute 'deterministic'
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/policy_step_ab.py", line 184, in <module>
+    main()
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/policy_step_ab.py", line 163, in main
+    ha, hb_ = child("A", True)["hashes"], child("B", True)["hashes"]
+              ^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/policy_step_ab.py", line 158, in child
+    raise RuntimeError(f"run {mode} (hashes={hashes}) failed with exit code {p.returncode}")
+RuntimeError: run A (hashes=True) failed with exit code 1
+[12:56:59] D21 -> DONE rc 1 1; cause a_namespace
+[12:57:01] main worktree at cd751b90
+[12:57:01] gpu job mm21_main_new (check, <= 10 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b21/logs/main_newpin.log
+    ..                                                                       [100%]
+    2 passed, 15 deselected in 89.60s (0:01:29)
+[12:58:42] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[12:58:42] B21 -> DONE main df9485a8: new pin rc 0, old pin rc skipped
+fixed
+[12:58:42] gpu job mm21_mpm_main (check, <= 25 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b21/logs/test_mpm_main.log
+    .................                                                        [100%]
+    17 passed in 214.99s (0:03:34)
+[13:02:29] health: utilisation 99%
+GPU (ioreg): device utilization 99 %; per-process GPU time over 1.9 s:
+  pid  29041 python3.12                       112.3 %
