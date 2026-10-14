@@ -262,6 +262,23 @@ def uehara_solve(mu: float, D: float, h: float, density_ratio: float = 1.0) -> f
     return d
 
 
+def impact_phase(r: dict, window: float = 0.3, g: float = 9.81) -> dict:
+    """Impact-phase penetration of a drop record (``bearing_fidelity`` / ``bearing`` JSON): the deepest penetration
+    within ``window`` s after free-fall contact (t_c = sqrt(2 h / g)), and the free-fall impact speed sqrt(2 g h).
+    The record's own ``impact_speed_m_s`` is read when the body crosses the particle surface, after the grid contact
+    (active about a voxel above the particles) has already slowed it, and its whole-run peak can be a later event."""
+    drop = float(r.get("drop", 0.15))
+    v = math.sqrt(2 * g * drop)
+    if "bottom" not in r:
+        return {"peak_m": float(r["peak_penetration_m"]), "t_peak_s": float(r.get("t_peak_s", float("nan"))),
+                "v_impact": v}
+    pen = float(r["depth"]) - np.asarray(r["bottom"], float)
+    t = (np.arange(pen.size) + 1) / float(r["fps"])
+    m = t <= math.sqrt(2 * drop / g) + window
+    k = int(np.argmax(np.where(m, pen, -np.inf)))
+    return {"peak_m": float(pen[k]), "t_peak_s": float(t[k]), "v_impact": v}
+
+
 def linear_fit(x, y):
     """Least-squares y = a + b x; returns (a, b)."""
     b, a = np.polyfit(np.asarray(x, float), np.asarray(y, float), 1)

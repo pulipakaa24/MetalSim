@@ -115,6 +115,35 @@ def test_box_overlap():
     assert o["inside"] == 1 and abs(o["max_depth_m"] - 0.005) < 1e-12
 
 
+def test_impact_phase_ignores_late_events():
+    fps, drop, depth = 480, 0.15, 0.08
+    t = (np.arange(720) + 1) / fps
+    tc = math.sqrt(2 * drop / 9.81)
+    pen = np.where(t < tc, -0.01, 0.018)                    # 18 mm at impact ...
+    pen[t > 1.2] = 0.025                                    # ... and a late sink to 25 mm
+    r = {"drop": drop, "depth": depth, "fps": fps, "bottom": (depth - pen).tolist(), "peak_penetration_m": 0.025}
+    ip = SM.impact_phase(r)
+    assert abs(ip["peak_m"] - 0.018) < 1e-12 and abs(ip["v_impact"] - math.sqrt(2 * 9.81 * drop)) < 1e-12
+    assert SM.impact_phase({"peak_penetration_m": 0.02})["peak_m"] == 0.02     # records without the time series
+
+
+def test_tilt_box_scene_and_nonfinite_report():
+    mujoco = pytest.importorskip("mujoco")
+    import tilt_box as TB
+
+    for ox in (0.0, 0.0025):
+        m = mujoco.MjModel.from_xml_string(TB.box_xml(1 / 240, ox, ox))
+        assert m.ngeom == 5
+        x_face = m.geom_pos[4][0] - m.geom_size[4][0]                       # inner face of the downslope end wall
+        assert abs(x_face - (ox + 0.5 * TB.L)) < 1e-9
+    q = np.array([[0.149, 0.0, 0.03], [0.0, 0.0, 0.03], [0.149, 0.0195, 0.001]], np.float32)
+    v = np.zeros_like(q)
+    bad = np.array([True, False, True])
+    w = TB.nonfinite_report(q, v, bad, 0.0, 0.0, 0.005)
+    assert w["n_bad"] == 2 and w["frac_near_end_wall"] == 1.0 and w["frac_near_floor_edge"] == 0.5
+    assert w["frac_near_wall_edge"] == 0.5
+
+
 def test_evaluator_selftest():
     r = subprocess.run([sys.executable, str(ROOT / "scripts/sand_fidelity/evaluate_batch_01.py"), "--selftest"],
                        capture_output=True, text=True)
