@@ -182,3 +182,70 @@ The runs do not match any single mechanism's prediction: see the per-run lines.
 - `fix_g1_64` (g1, 64 worlds, capture 1, cap 20): steps with cap worlds 60/60, steps with trips 0, trips only in cap steps True, kernels {}, flag values {}
 - `fix_g1_1024`: no result
 - G1 deterministic, captured, everything on, with the fix (det_cost_g1.py, check_overflow): exit code 64 worlds 0, 1,024 worlds 1
+
+## 7. Reading batch_18 (before batch_19)
+
+The verdict INCONCLUSIVE came from three things. None of them contradicts M1:
+
+- **The stack arms were vacuous.** The two boxes start at 0.3 m and 0.5 m and fall freely for about 110 steps (2 ms
+  timestep). With no constraint rows the solver is done after its first iteration, so no world reached the cap of 2 in
+  the 20 / 40 steps run (`steps_with_cap_worlds` empty in all four arms). Section 4's "every world reaches it every
+  step" was wrong. In batch_19 the stack runs 200 steps. That gives both free-fall steps (no cap) and contact steps
+  (cap), so "trips only in cap steps" discriminates there. On G1 it cannot, because G1 reaches the cap in every step.
+  The same timing check covers `test_iteration_cap_repeats`: it runs 160 steps, so it must see its first cap step
+  before step 160, and it must fail on the current pin.
+- **Both 1,024-world runs crashed in the fused update, not in the probe.**
+  - All three 1,024 runs (`pre_g1_1024`, `fix_g1_1024`, `g1fix_1024`) stop while the step graph is being captured.
+  - Each one is in `_launch_update_fused`, which goes through Warp's deterministic `launch`, then `_Pool.get` and
+    `wp.empty`, and ends in `ValueError: … 3534564096 in dimension 0`.
+  - That is Warp's deterministic plan scratch for `_update_constraint_gradient_fused` (128 lanes per world), and
+    3,534,564,096 elements is more than 2^31. It is the same error as batch_10b's `g1_1024_1` runs.
+  - It does not depend on the `_solve_done` fix or on the probe's snapshot buffer (2^20 int32).
+  - batch_16's `both_off` at 1,024 worlds (unfused) got past this allocation and then tripped, as M1 predicts.
+  - The fused kernel is also wrong in deterministic mode for a second reason: it zeroes and reads back its own change
+    counter within the launch, and the counting pass suppresses that.
+  - Fix: in Warp's deterministic mode, MuJoCo Warp's `_fuse_update` returns False. batch_17 measured the unfused
+    update in deterministic mode at 24.32 against 24.67 ms (64 worlds) and 231.5 against 237.1 ms (1,024 worlds) on
+    the coupled box.
+- **Flag 6 is M1's signature, not a fifth kind.** In the diagnostic build, bit 4 is set by the writeback whenever a
+  thread's phase-0 and phase-1 call counts differ, in either direction. The "fewer calls" label in section 2 was too
+  narrow. A world at the cap makes one extra counter call in phase 1 with no phase-0 record. That call sets 2 in
+  `counter_add`, and the writeback then sees 0 against 1 and sets 4. The evaluator demanded `{2}`; it should have
+  accepted `{2, 6}`.
+
+**What batch_18 does show.**
+- G1, 64 worlds, captured, fused update on:
+  - Before the fix: 237 trips in 60 of 60 steps, all in `_solve_done`, all flag 6.
+  - After the fix: no trips, with the same cap steps.
+  - `det_cost_g1` with the fix: exit code 0 (`check_overflow`).
+- This removes M2–M4 on their own predictions. M2–M4 predict trips that the M1 fix does not remove, and kinds 8 / 16.
+- What is still unseen:
+  - a trip-free 1,024-world run with the fix;
+  - a scene with steps both with and without cap worlds;
+  - a regression test proven to fail without the fix.
+
+**An open observation.** batch_13 found the G1 trip "capture-only": the uncaptured probe at 64 worlds was clean. Its
+list of deterministic launches has no `_solve_done` and no fused update at all. Uncaptured, `_solve_done` is built with
+`early_exit=False`, and its `was_solving` is assigned but unused. Captured with `MJW_METAL_ICB_EARLY_EXIT=0` it is the
+same variant, and it did trip (batch_16 / 17).
+
+batch_19 records the per-kernel deterministic launch counts uncaptured (`det_launches`), so it can tell coverage
+(no deterministic launch, hence no trip possible) from a contradiction of M1 (a deterministic launch at the cap that
+does not trip).
+
+## 8. Results (batch_19, 16-inch)
+
+Not confirmed: test_iteration_cap_repeats on the pin: failed without a counter phase mismatch.
+
+- `pre_stack_capt` (stack, 64 worlds, capture 1, cap 2): steps with cap worlds 66/200 (first 106), steps with trips 66, trips only in cap steps True, kernels {'_solve_done__locals__kernel': 66}, flag values {'6': 66}, fused update True, _solve_done deterministic launches 4
+- `fix_stack_capt` (stack, 64 worlds, capture 1, cap 2): steps with cap worlds 66/200 (first 106), steps with trips 0, trips only in cap steps True, kernels {}, flag values {}, fused update False, _solve_done deterministic launches 4
+- `pre_stack_eager` (stack, 64 worlds, capture 0, cap 2): steps with cap worlds 66/200 (first 106), steps with trips 66, trips only in cap steps True, kernels {'_solve_done__locals__kernel': 66}, flag values {'6': 66}, fused update True, _solve_done deterministic launches 400
+- `fix_stack_eager` (stack, 64 worlds, capture 0, cap 2): steps with cap worlds 66/200 (first 106), steps with trips 0, trips only in cap steps True, kernels {}, flag values {}, fused update False, _solve_done deterministic launches 400
+- `pre_g1_1024u` (g1, 1024 worlds, capture 1, cap 20): steps with cap worlds 41/60 (first 1), steps with trips 41, trips only in cap steps True, kernels {'_solve_done__locals__kernel': 59}, flag values {'6': 59}, fused update False, _solve_done deterministic launches 200
+- `fix_g1_64` (g1, 64 worlds, capture 1, cap 20): steps with cap worlds 7/60 (first 2), steps with trips 0, trips only in cap steps True, kernels {}, flag values {}, fused update False, _solve_done deterministic launches 200
+- `fix_g1_1024` (g1, 1024 worlds, capture 1, cap 20): steps with cap worlds 41/60 (first 1), steps with trips 0, trips only in cap steps True, kernels {}, flag values {}, fused update False, _solve_done deterministic launches 200
+- `batch_18 pre_g1_64 (fused update)` (g1, 64 worlds, capture 1, cap 20): steps with cap worlds 60/60 (first None), steps with trips 60, trips only in cap steps True, kernels {'_solve_done__locals__kernel': 237}, flag values {'6': 237}, fused update None, _solve_done deterministic launches 0
+- `batch_18 fix_g1_64 (fused update)` (g1, 64 worlds, capture 1, cap 20): steps with cap worlds 60/60 (first None), steps with trips 0, trips only in cap steps True, kernels {}, flag values {}, fused update None, _solve_done deterministic launches 0
+- G1 deterministic with the fix, captured (det_cost_g1.py, check_overflow): exit code 64 worlds 0, 1,024 worlds 0
+- test_iteration_cap_repeats on the current pin: failed otherwise (M1 predicts the phase-mismatch failure)
+- Uncaptured: _solve_done is a deterministic launch uncaptured; M1's trips appear there too

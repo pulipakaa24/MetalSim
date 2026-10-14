@@ -1,4 +1,4 @@
-"""Per-step evidence for deterministic-mode counter trips (MetalSim batch_18).
+"""Per-step evidence for deterministic-mode counter trips (MetalSim batch_18, batch_19).
 
 For every physics step of a deterministic BatchSim this records (a) which deterministic launches set Warp's sticky
 counter flag and with which bits, and (b) how many worlds reached the solver's iteration cap in that step (MuJoCo Warp
@@ -6,7 +6,8 @@ sets OverflowType.ITERATIONS in d.overflow). Captured: after every deterministic
 non-deterministic kernel copies the flag into a per-launch slot and clears it; the slots are read and cleared after
 each step. Uncaptured: the flag is read after every deterministic launch (synchronize). With the diagnostic Warp build
 (scratch/b18 warp-diag) the bits say what kind of mismatch: 2 = a phase-1 counter call with no phase-0 record at all,
-16 = beyond a nonzero phase-0 count, 8 = another destination / count, 4 = fewer calls in phase 1, 1 = overflow.
+16 = beyond a nonzero phase-0 count, 8 = another destination / count, 4 = the thread's phase-0 and phase-1 call
+counts differ (either direction: one extra phase-1 call with no phase-0 record sets 2 and 4, flag 6), 1 = overflow.
 
     python -P det_step_probe.py --scene stack --worlds 64 --iterations 2 --capture 1 --steps 40 --json out.json
     python -P det_step_probe.py --scene g1 --worlds 1024 --capture 1 --steps 60 --json out.json
@@ -54,10 +55,12 @@ def main():
     wp.synchronize_device(dev)
     snaps.zero_()
     recorded, eager_hits = [], []
+    det_launches = {}   # kernel -> deterministic launches (captured: recorded into a graph; uncaptured: run)
     orig = md.launch
 
     def launch(kernel, hooks, params, bounds, device, *args, **kw):
         orig(kernel, hooks, params, bounds, device, *args, **kw)
+        det_launches[kernel.key] = det_launches.get(kernel.key, 0) + 1
         state = md._state(device)
         if device.is_capturing:
             slot = len(recorded)
@@ -135,6 +138,9 @@ def main():
            "steps_with_cap_worlds": steps_with_cap, "steps_with_hits": steps_with_hits,
            "hits_only_in_cap_steps": set(steps_with_hits) <= set(steps_with_cap),
            "kernels_hit": kernels, "flag_values": kinds, "recorded_det_launches": len(recorded),
+           "first_cap_step": steps_with_cap[0] if steps_with_cap else None,
+           "steps_without_cap_worlds": a.steps - len(steps_with_cap), "det_launches": det_launches,
+           "fused_update": any("fused" in k for k in det_launches),
            "mujoco_warp": mjw.__file__, "warp": wp.__file__}
     print("RESULT " + json.dumps(res))
     if a.json:
