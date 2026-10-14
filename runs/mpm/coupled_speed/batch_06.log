@@ -1,0 +1,41 @@
+== Tue Oct 13 16:05:19 PDT 2026 batch_06 start
+suite base: 15 passed, 1 xfailed in 108.29s (0:01:48)
+metalsim from /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/metalsim/__init__.py
+contact filter base 1: 1 passed, 15 deselected in 1.01s
+contact filter base 1: 1 passed, 15 deselected in 1.04s
+contact filter base 1: 1 passed, 15 deselected in 1.04s
+suite new: 15 passed, 1 xfailed in 102.18s (0:01:42)
+metalsim from /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/metalsim/__init__.py
+contact filter new 1: 1 passed, 15 deselected in 0.99s
+contact filter new 1: 1 passed, 15 deselected in 1.01s
+contact filter new 1: 1 passed, 15 deselected in 1.04s
+pour base vs new_notiles: bitwise equal over 30 steps
+pour base vs new: first differs at step 0
+pour new vs new2: bitwise equal over 30 steps
+done: 200 frames, 453871 particles, 10.56 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+done: 200 frames, 453871 particles, 20.09 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+done: 100 frames, 486416 particles, 25.31 s, iters mean None max None, init c604d945d3dd10b97e4b5496235af320
+done: 200 frames, 453871 particles, 8.15 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+done: 200 frames, 453871 particles, 18.01 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+done: 100 frames, 486416 particles, 25.40 s, iters mean None max None, init c604d945d3dd10b97e4b5496235af320
+done: 200 frames, 453871 particles, 10.47 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+done: 200 frames, 453871 particles, 20.44 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+done: 100 frames, 486416 particles, 25.73 s, iters mean None max None, init c604d945d3dd10b97e4b5496235af320
+done: 200 frames, 453871 particles, 8.25 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+done: 200 frames, 453871 particles, 19.62 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+done: 100 frames, 486416 particles, 27.65 s, iters mean None max None, init c604d945d3dd10b97e4b5496235af320
+done: 200 frames, 453871 particles, 10.52 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+done: 200 frames, 453871 particles, 20.39 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+done: 100 frames, 486416 particles, 23.29 s, iters mean None max None, init c604d945d3dd10b97e4b5496235af320
+done: 200 frames, 453871 particles, 8.23 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+done: 200 frames, 453871 particles, 17.81 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+done: 100 frames, 486416 particles, 22.86 s, iters mean None max None, init c604d945d3dd10b97e4b5496235af320
+| scene | L4 | base (runs) | new (runs) | base / L4 | new / L4 |
+|---|---|---|---|---|---|
+| twoway_capture | 31.0 | 54.8 (55.1 / 53.5 / 54.8) | 40.4 (39.9 / 40.4 / 40.4) | 1.77x | 1.30x |
+| twoway | 73.0 | 78.8 (76.9 / 78.8 / 78.8) | 62.1 (62.1 / 63.7 / 61.1) | 1.08x | 0.85x |
+| anymal_capture | 24.2 | 29.9 (29.7 / 30.2 / 29.9) | 29.4 (29.4 / 29.3 / 29.8) | 1.23x | 1.21x |
+error: pathspec '99843d09' did not match any file(s) known to git
+error: patch failed: newton/_src/solvers/implicit_mpm/solve_rheology.py:419
+error: newton/_src/solvers/implicit_mpm/solve_rheology.py: patch does not apply
+FAIL: newton patch does not apply on 99843d09
