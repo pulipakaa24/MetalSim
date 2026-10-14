@@ -15,6 +15,7 @@ project, not affiliated with or endorsed by NVIDIA, Google DeepMind or Apple.
 
 ## Documentation
 
+- [`docs/DEMO.md`](docs/DEMO.md): the demo tag `demo-2026-10`: what works, the command for each demo, the measured numbers and the known limits.
 - [`docs/NOW.md`](docs/NOW.md): start here: what is being worked on and what is broken right now (kept current).
 - [`docs/GUIDE.md`](docs/GUIDE.md): user guide: install, first runs, bringing your own robot, the GPU job queue, engines, throughput vs fidelity.
 - [`docs/STATUS.md`](docs/STATUS.md): state against the original plan, workstream by workstream.
