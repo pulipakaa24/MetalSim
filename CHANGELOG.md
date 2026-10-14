@@ -4,12 +4,34 @@ What landed between 2026-09-22 and 2026-10-13, grouped by area. The September se
 commit order; the October sections, newest first, summarise each merged pull request with its main commits (`git log`
 for the full messages). Dates are the commit dates (month-day).
 
+## Demo tag demo-2026-10 (2026-10-14, `docs/DEMO.md`)
+
+- 10-14 `docs/DEMO.md`: every demo with its command (each run by the fresh-install check or the batch checks it names), the measured numbers from the shipped docs and the known limits; tag `demo-2026-10` on the main commit that carries it.
+
+## Scenes: composition from a config file (2026-10-14, `docs/SCENES.md`)
+
+- 10-14 `metalsim.scene` (`cfg`, `compose`, `proxy`, `film`) and `python -m metalsim.run scene.yaml`: robot (MJCF / URDF / USD), movable objects with per-env reset randomization, cameras mounted on links (tier 0 / 1 / 2; rgb, depth, segmentation, normals), ray-traced lidar, ground / HDRI / lights, and a Gaussian-splat background behind a collision proxy (plane, mesh, InteriorGS floor plan or occupancy map); `--film` hands over to `metalsim.render.film`, `--viewer` opens MuJoCo's viewer. Field names follow Isaac Lab 3.0's InteractiveSceneCfg / ArticulationCfg / RigidObjectCfg / CameraCfg / RayCasterCfg. Examples `configs/scenes/`; tests `tests/test_compose.py`.
+
+## Rendering: filming tool and the Franka-Pour render (2026-10-14, `docs/renders/`)
+
+- 10-14 `metalsim.render.film`: one command films a registered task (`python -m metalsim.render.film <task>`): record the policy rollout in the task's venv (Newton or MuJoCo), build a portable render twin (MJCF + per-frame geom poses + particles), render offline with the tier-2 path tracer, encode H.264 + stills, and write `docs/renders/<TASK>.md` from the stage logs (timings, hardware, pins, assets with sources and licences). Camera and recording settings follow Isaac Lab's `ViewerCfg` / `VideoRecorderCfg`. Per task: a `FilmTask` entry and a recorder adapter. First films: Franka-Pour (trained policy, 2 shots) and the G1 flat walk (smoke test). `franka_pour_scene.build_model(visuals=True)` loads the USD visual meshes for the render twin (physics unchanged). Tests `tests/test_film.py` (CPU).
 
 ## Physics: deterministic BatchSim (2026-10-13, `research_notes/MPM in main simulator/deterministic_ccd_divergence.md`)
 
 - 10-13 `BatchSimOptions(deterministic=True)`: MuJoCo Warp's kernels in Warp's RUN_TO_RUN mode (set before MuJoCo Warp's first launch, one mode per process, record bound for `smooth`, post-capture check of every replayed module including the `module="unique"` ones, deterministic overflow and phase-mismatch flags in `check_overflow`). Two stacked boxes at 256 worlds repeat bitwise in one process and across processes.
 - 10-13 MuJoCo Warp pin f1b35e2 -> 4d05cb7: deterministic-mode CCD as a counter-free solve kernel plus a contact-write kernel (the single kernel's EPA scratch row came from a slot counter, so its counting pass ran EPA on stale scratch and a contact could land in another world's slot). Warp pin 31cf79d7 -> 52c09cdd: a slot-counter call that differs between the counting and the execution pass raises ("Deterministic counter phase mismatch").
 - 10-14 MuJoCo Warp pin 4d05cb7 -> 8eb51fe: `_solve_done` keeps the solver's iteration count in a local instead of reading it back after incrementing it in place (an increment Warp's counting pass suppresses); a world reaching the iteration cap then made the early exit's counter call in one pass only, and the counter tripwire stopped deterministic G1 runs. In Warp's deterministic mode the Newton update takes the unfused launches (the fused kernel reads back its own change counter within the launch; its plan at 1,024 worlds asked for more than 2^31 scratch elements) (`research_notes/MPM in main simulator/deterministic_g1_capture.md`).
+
+## Rendering: 3D Gaussian splat scenes (2026-10-13, `metalsim/render/SPLAT.md`)
+
+- 10-13 `metalsim/render/splat/` + `shaders/splat.metal`: a batched compute-tile 3DGS rasterizer (cull, EWA projection with SH, 24-bit depth keys, 5-pass radix sort, subtile-masked blend) writing tier-0 layout buffers, GPU path without host sync, tier-0 mesh composite; loaders for 3DGS / SuperSplat PLY, SPZ, `.splat` and NuRec `.nurec`; float64 reference (EWA and 3DGUT kernels); `make_transform` / `floor_plane_transform`; `scripts/fetch_splat_scenes.sh` (InteriorGS reference scene, gated, and a CC0 object, never committed) and `scripts/splat_bench.py`; the GPU path now follows the composited mesh renderer's camera and restores it after host-path calls.
+
+## Newton 1.7: SolverMuJoCo on MuJoCo Warp 3.14 (2026-10-13)
+- 10-13 Newton pins 9f317390 -> 1301e8da (`metalsim`, `.venv-newtonfork`) and a4be3604 -> 9d6616c6 (`metalsim-hashtable-metal`, `.venv`'s `newton` extra): `SolverMuJoCo` passes the contact adhesion that MuJoCo Warp 3.14's `contact_force_fn` takes (upstream Newton's `90f809a`). Before, `SolverMuJoCo`'s kernels did not compile against MetalSim's MuJoCo Warp fork, and the Newton-engine and Newton-bridge render tests skipped in `.venv`.
+
+## MPM: coupled step and resets in one policy-step graph (2026-10-13, `metalsim/physics/mpm/MPM.md` 11)
+
+- 10-13 `MPMCoupling.launch_step()`, a capturable per-world reset (`reset_mask`, `launch_reset(from_sim_mask=True)`, `reset(mask)` with numpy or torch masks and a reset graph) and `BatchSim.launch_reset()`; `scale_coupled.py --split` per-section timings; `policy_step_ab.py`. The coupling layer is about 0.4 ms per coupled step; one graph per policy step saves 0.18 ms at 1, 1.20 ms at 64, 2.11 ms at 1,024 worlds, bitwise. One-world masked reset fixed (it raised).
 
 ## MPM: coupled scenes closer to the L4 (2026-10-13, `metalsim/physics/mpm/MPM.md` 8k)
 

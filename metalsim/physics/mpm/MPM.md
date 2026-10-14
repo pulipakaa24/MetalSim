@@ -527,7 +527,7 @@ fast_math, section 8 1b) + `152808b7` (`warp.config.metal_fast_math` defaults to
   bounded (HashTable and XPBD manifolds: probes + 65,536 passes, then a counted failure). Newton's contact / collision /
   SDF / heightfield / XPBD / Kamino-metrics tests on `metalsim-hashtable-metal`: 98 failures -> 13 on cpu + metal:0,
   no new failure; the 13 are SolverMuJoCo tests that do not build against the MuJoCo Warp fork 3.14
-  (`contact_force_fn` signature). 1.5.2 Kamino metrics: CPU 9/9, Metal 8/9 (test_06's dense-vs-sparse `f_ncp`, 2.1e-6
+  (`contact_force_fn` signature; fixed 2026-10-13 on both 1.7 branches, `metalsim` `1301e8da` and `metalsim-hashtable-metal` `9d6616c6`: the contact part of upstream's `90f809a`). 1.5.2 Kamino metrics: CPU 9/9, Metal 8/9 (test_06's dense-vs-sparse `f_ncp`, 2.1e-6
   relative vs rtol 1e-6, in a kernel these changes do not touch).
 * **Rigid-scale ports to the 1.7 line**: mesh-SDF barrier fix, per-thread mesh-convex midphase, 32 mesh threadgroups
   per core, bounded deterministic sort. Franka-Pour collide (`runs/rigid17/tools/collide17.py`, same in-contact state,
@@ -1019,7 +1019,7 @@ scripts/gpu_run.sh test_mpm check 15 -- .venv-newton152/bin/python -m pytest tes
 |---|---|---|
 | Warp changes | pulipakaa24/warp `metalsim`, pinned `52c09cdd` | `scripts/setup_warp.sh` (fallback: innate-inc/warp `ce15f6bb` + `patches/warp/metalsim-52c09cdd.diff`) |
 | Newton changes (MPM, Franka-Pour rigid) | pulipakaa24/newton `metalsim-1.5.2`, pinned `addd10cb` | `scripts/setup_newton152.sh` (fallback: v1.5.2 + `patches/newton/metalsim-1.5.2-addd10cb.diff`) |
-| Newton 1.7 Metal fixes for the rigid stack | pulipakaa24/newton `metalsim-hashtable-metal` `a4be3604` (`.venv`'s `newton` extra) and `metalsim` `9f317390` (`.venv-newtonfork`) | `pip install -e ".[newton]"`, `scripts/setup_newton.sh` |
+| Newton 1.7 Metal fixes for the rigid stack | pulipakaa24/newton `metalsim-hashtable-metal` `9d6616c6` (`.venv`'s `newton` extra) and `metalsim` `1301e8da` (`.venv-newtonfork`) | `pip install -e ".[newton]"`, `scripts/setup_newton.sh` |
 | compat layer, scenes, probes, tests, Isaac-side recorders | this repository | the clone |
 | logs, JSON, reports of every run | `runs/mpm/`, `runs/parity/isaaclab3_mpm*/`, `runs/rigid_perf/`, `runs/fma_rigid_parity/` | the clone |
 | Metal particle recordings (`.npz`, ~6.6 GB) | not committed | `record_metal_suite.sh`, `record_variant_suite.sh OUT - - .` (one GPU job per run; deterministic, so a re-recording is bitwise the original on the same trees) |
@@ -1052,6 +1052,10 @@ mpm.finalize()
 v = mpm.step()                                       # instead of sim.step(); returns sim.event's value
 renderer = Tier2Renderer(model, 64, ...); mpm.attach_renderer(renderer)   # grains from the solver's buffer
 mpm.wrenches(); mpm.particles(); mpm.reset(mask); mpm.check_status()
+mpm.reset(done)                                      # (N,) bool, numpy or torch (no host sync); a graph after the first
+# one graph per policy step (after one eager mpm.step() and mpm.reset(...)); write sim.reset_mask on torch's queue first:
+with wp.ScopedCapture() as cap:
+    sim.launch_reset(); mpm.launch_reset(from_sim_mask=True); mpm.launch_step()   # + the policy's own launches
 ```
 
 `metalsim/physics/mpm/coupled.py` documents the exchange: Isaac Lab's `SolverCoupledProxy` semantics (proxy bodies
@@ -1140,6 +1144,41 @@ repeats bitwise in all 12 multi-world configurations of `probes/multiworld_repea
   (repose ~ the friction angle) is a property of the solver Isaac Lab ships, not of the coupling. Not yet converged in
   resolution: +0.9 / +0.6 deg per step from R/dx 10 to 15 to 20 (batch 04: 27.8 deg with 658,080 particles,
   `runs/mpm_main/repose4/`), shrinking, so the converged angle stays several degrees below atan(mu).
+
+### Coupling-layer cost and the policy-step graph (2026-10-13, 16-inch)
+
+Research: `research_notes/MPM in main simulator/coupling_opt.md`. The coupling layer is everything in the coupled step
+except the MuJoCo Warp substeps and the MPM step: the caller's `xfrc_applied` saved and restored, the sand wrench added,
+the proxies' begin / end state, the end-of-step kinematics and the lagged rewind. Box on a 2,592-particle bed per world,
+each section captured as its own graph and replayed round-robin, median of 100 (40 at 1,024 worlds) after 10 warm-up
+steps (`probes/scale_coupled.py --split`; `--rigid-only --time` is the same scene without sand; runs
+`runs/mpm_main/batch_07/`), ms:
+
+| worlds | coupled step | MuJoCo Warp substeps | coupling layer (share) | MPM + harvest | rigid-only scene |
+|---|---|---|---|---|---|
+| 1 | 14.01 | 2.43 | 0.41 (2.9 %) | 11.85 | 2.28 |
+| 64 | 25.67 | 2.42 | 0.40 (1.5 %) | 23.27 | 2.47 |
+| 256 | 66.15 | 2.64 | 0.42 (0.6 %) | 63.66 | 2.55 |
+| 1,024 | 242.59 | 2.71 | 0.44 (0.2 %) | 239.49 | 2.76 |
+
+The layer costs about 0.4 ms whatever the world count (its kernels are at the dispatch floor), the MPM step is the
+rest. Fusing its launches (the research note's items 3-4) could save at most part of that 0.4 ms, so it was not done.
+What a policy loop does pay is the host side: `MPMCoupling.launch_step()` and the capturable reset put resets and the
+coupled step into one graph per policy step. A/B on a policy-step-shaped loop (`probes/policy_step_ab.py`: each step,
+2 % of the worlds reset by a done mask on the GPU, the coupled step, an observation; A = the eager API as before this
+change, including the host read of the mask its numpy-only `reset` needed; B = one captured graph; every run in its
+own process; median of 3 interleaved rounds; runs `runs/mpm_main/batch_10/`), ms per policy step:
+
+| worlds | A (eager API) | B (one graph) | saving | steps with resets | bitwise A = B |
+|---|---|---|---|---|---|
+| 1 | 12.92 | 12.74 | 0.18 (1.014x) | 4 / 200 | yes |
+| 64 | 25.70 | 24.49 | 1.20 (1.049x) | 137 / 200 | yes |
+| 1,024 | 220.03 | 217.92 | 2.11 (1.010x) | 60 / 60 | yes |
+
+With one world, Newton 1.5.2's solver has no separate FEM environments, and its masked reset refused grid warm starts
+(`mpm.reset(mask)` raised before this change); `MPMCoupling` now launches the same reset steps with the mask read on
+the device: bitwise the solver's full reset when the world is selected, nothing when it is not
+(`probes/one_world_reset.py`, `test_one_world_masked_reset`).
 
 ### Re-vendoring when the fork pin moves
 

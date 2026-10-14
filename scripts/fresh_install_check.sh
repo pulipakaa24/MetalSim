@@ -60,10 +60,12 @@ step() {
     bash -c "$*" ) > "$LOGS/$name.log" 2>&1
   rc=$?
   local dt=$(( $(date +%s) - t0 )) note
-  note=$(grep -E "passed|failed|error|Error|refused|skipped" "$LOGS/$name.log" | tail -1 | tr '\t' ' ' | cut -c1-200)
+  note=$(grep -E "[0-9]+ (passed|failed|errors?|skipped)|^[A-Za-z.]*Error:|refused" "$LOGS/$name.log" | tail -1 | tr '\t' ' ' | cut -c1-200)
   if [ $rc -eq 0 ]; then record "$name" ok 0 $dt "$note"; log "$name: ok (${dt}s) $note"
   else record "$name" FAIL $rc $dt "$note"; log "$name: FAIL rc=$rc (${dt}s) $note; log $LOGS/$name.log"; fi
-  case $rc in 75) stop "$name: GPU queue refused (runaway GPU work)";; 124|125|126) stop "$name: watchdog rc=$rc (timeout / stall / memory)";; esac
+  # 124-126 are the watchdog's codes only when it says so (bash itself exits 126 on "cannot execute")
+  case $rc in 75) stop "$name: GPU queue refused (runaway GPU work)";;
+    124|125|126) grep -q "^\[watchdog\] killing" "$LOGS/$name.log" && stop "$name: watchdog rc=$rc ($(grep "^\[watchdog\] killing" "$LOGS/$name.log" | tail -1))";; esac
   return 0
 }
 
@@ -111,6 +113,7 @@ step 06_fetch_isaac 01_clone -- 'scripts/fetch_isaac_assets.sh'
 step 07_menagerie 01_clone -- 'git clone --depth 1 https://github.com/google-deepmind/mujoco_menagerie upstream/mujoco_menagerie && ls upstream/mujoco_menagerie | wc -l'
 step 08_setup_newton152 05_pip_mujoco_warp -- 'scripts/setup_newton152.sh && .venv-newton152/bin/python -c "import objc, Metal, ninja, torch, metalsim.interop; print(\"pyobjc/ninja/torch ok\")"'
 step 09_fetch_polyhaven_demo 01_clone -- 'scripts/fetch_polyhaven_assets.sh demo'
+step 09b_fetch_isaaclab_source 01_clone -- 'scripts/fetch_isaaclab_source.sh'
 step 15_pins 01_clone -- 'echo "MetalSim $(git rev-parse HEAD) ($(git log -1 --format=%cd --date=iso))"
   grep -hE "^PIN=" scripts/setup_warp.sh scripts/setup_newton152.sh | sed "s/^/setup script /"
   for d in upstream/warp-metalsim upstream/newton-metalsim-1.5.2 .venv/src/mujoco-warp; do
@@ -122,17 +125,19 @@ for p in (\"warp-lang\", \"mujoco\", \"mujoco-warp\", \"newton\", \"torch\", \"p
 print(\"$py\", \"warp from\", warp.__file__)"; done; true'
 
 # ---- tests (GPU queue, check class) --------------------------------------------------------------------------------
-RENDER="tests/test_render_*.py tests/test_materialx.py tests/test_newton_bridge_poses.py tests/test_replicator*.py
-        tests/test_scene_usd.py tests/test_sensor_transparency.py tests/test_sensors_rt.py tests/test_lidar_extras.py"
+# one line: the list goes into a bash -c string, where a newline would start a new command
+RENDER="tests/test_render_*.py tests/test_materialx.py tests/test_newton_bridge_poses.py tests/test_replicator*.py tests/test_scene_usd.py tests/test_sensor_transparency.py tests/test_sensors_rt.py tests/test_lidar_extras.py"
 # tests/test_batch_deterministic.py (deterministic BatchSim, new GPU code) runs alone as an exclusive job when present
 DET=tests/test_batch_deterministic.py
-set -f; IGN=""; for f in $RENDER tests/test_mpm.py tests/test_mpm_main.py $DET; do IGN="$IGN --ignore-glob=$f"; done; set +f
+N152="tests/test_franka_pour_resume.py tests/test_franka_pour_terms.py"   # Newton 1.5.2 tasks: .venv-newton152
+set -f; IGN=""; for f in $RENDER tests/test_mpm.py tests/test_mpm_main.py $DET $N152; do IGN="$IGN --ignore-glob=$f"; done; set +f
 P="-p no:cacheprovider -q -rfEs"
 gpu 10_metal_check 05_pip_mujoco_warp 5 600 -- 'python -c "import warp as wp; wp.init(); print(\"metal:\", wp.is_metal_available()); assert wp.is_metal_available()"'
 gpu 11_rigid_suite "05_pip_mujoco_warp 06_fetch_isaac 07_menagerie" 90 7200 -- "python -m pytest $P $IGN tests"
 gpu 12_render_suite "05_pip_mujoco_warp 06_fetch_isaac 07_menagerie" 60 5400 -- "python -m pytest $P $RENDER"
-gpu 13_test_mpm 08_setup_newton152 30 3600 -- "$CLONE/.venv-newton152/bin/python -m pytest $P tests/test_mpm.py"
+gpu 13_test_mpm 08_setup_newton152 30 3600 -- ".venv-newton152/bin/python -m pytest $P tests/test_mpm.py"
 gpu 14_test_mpm_main "05_pip_mujoco_warp 08_setup_newton152" 60 3600 -- "python -m pytest $P tests/test_mpm_main.py"
+gpu 17_test_franka_pour "08_setup_newton152 06_fetch_isaac 09b_fetch_isaaclab_source" 30 3600 -- ".venv-newton152/bin/python -m pytest $P $N152"
 if [ -f "$CLONE/$DET" ]; then
   GKIND=timing gpu 16_test_batch_deterministic "05_pip_mujoco_warp" 30 3600 -- "python -m pytest $P $DET"
 fi
@@ -148,5 +153,8 @@ gpu 23_demo_anymal_sim 08_setup_newton152 20 2400 -- '.venv-newton152/bin/python
 gpu 24_demo_anymal_render "23_demo_anymal_sim 07_menagerie 09_fetch_polyhaven_demo" 20 2400 -- 'python scripts/particle_demo/render_anymal.py --sim runs/demo/anymal_small --out runs/demo/anymal_small_frames --frames 0:2 --width 480 --height 270 --passes 4 --grains 8 --decor 0 0 0 0 && ls -la runs/demo/anymal_small_frames && cat runs/demo/anymal_small_frames/stats_*.json | head -30'
 gpu 25_demo_transparency_lidar "05_pip_mujoco_warp" 10 1200 -- 'mkdir -p runs/fresh && python scripts/diagnostics/sensor_transparency_cost.py --n 64 --out runs/fresh/sensor_transparency_64.json'
 
+# every skip of the test steps, with its reason (the goal is none)
+step 30_skips "" -- "grep -h '^SKIPPED' $(printf '%q' "$LOGS")/1[0-9]_*.log | sed -E 's/^SKIPPED \[[0-9]+\] //' | sort | uniq -c;
+  echo \"\$(grep -h '^SKIPPED' $(printf '%q' "$LOGS")/1[0-9]_*.log | wc -l | tr -d ' ') skipped\""
 log "done: $(grep -c "	ok	" "$RES") ok, $(grep -c "	FAIL	" "$RES") failed, $(grep -c "	blocked	" "$RES") blocked (results.tsv keeps every attempt)"
 date > "$BASE/DONE"

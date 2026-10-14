@@ -347,12 +347,12 @@ def _resolvers():
     return [SchemaResolverNewton(), SchemaResolverPhysx(), SchemaResolverMjc()]
 
 
-def _import(stage, label_root: str):
+def _import(stage, label_root: str, visuals: bool = False):
     """``newton_clone_utils._build_source_builder``: one prototype builder per clone source (poses authored on the
     stage, as the spawner leaves them; Newton's ``xform`` argument is not used: with it, a free rigid body's
     orientation came out rotated twice in Newton 1.5.2, e.g. the table at 180 deg instead of 90)."""
     b = create_builder()
-    b.add_usd(stage, hide_collision_shapes=True, load_visual_shapes=False,
+    b.add_usd(stage, hide_collision_shapes=True, load_visual_shapes=visuals,
               schema_resolvers=_resolvers())
     # labels as the cloner leaves them for env 0 (rename_builder_labels); the hook matches suffixes only
     for attr in ("body_label", "shape_label", "joint_label"):
@@ -534,19 +534,22 @@ def emit_media(builder, position, fill_level: float = MEDIA_FILL_LEVEL) -> int:
 
 
 def build_model(num_envs: int, device: str = "metal:0", fill_level: float = MEDIA_FILL_LEVEL,
-                disable_hand_hull: bool = True):
+                disable_hand_hull: bool = True, visuals: bool = False):
     """Isaac's cloner (IL/isaaclab_newton/.../cloner/replicate.py ``_build_newton_builder_from_mapping``): global
     shapes first, then per world ``begin_world``, the prototypes (table, robot, source cup, target cup, in
     ``PourSceneCfg`` order) at the env origin, the task hook, the media hook, ``end_world``; then
-    ``_prepare_builder_for_finalize`` (mpm_manager.py:104-124) and ``finalize``."""
+    ``_prepare_builder_for_finalize`` (mpm_manager.py:104-124) and ``finalize``.
+
+    ``visuals``: also import the USD visual meshes (render only: the film tool's render twin,
+    ``metalsim.render.film``). The physics model imports colliders only, as Isaac's Newton path does here."""
     import newton
     from newton import BodyFlags, GeoType
 
     protos = [
-        ("Table", _import(_table_stage(), "Table")),
-        ("Robot", _import(compose_robot_stage(disable_hand_hull), "Robot")),
-        ("SourceCup", _import(_cup_stage("source"), "SourceCup")),
-        ("TargetCup", _import(_cup_stage("target"), "TargetCup")),
+        ("Table", _import(_table_stage(), "Table", visuals)),
+        ("Robot", _import(compose_robot_stage(disable_hand_hull), "Robot", visuals)),
+        ("SourceCup", _import(_cup_stage("source"), "SourceCup", visuals)),
+        ("TargetCup", _import(_cup_stage("target"), "TargetCup", visuals)),
     ]
     robot_proto = protos[1][1]
     # Isaac's default joint state (PourSceneCfg.robot.init_state, pour_env_cfg.py:365-366)

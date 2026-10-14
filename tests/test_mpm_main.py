@@ -318,3 +318,27 @@ def test_main_sim_settings_untouched():
     mpm.step()
     mpm.step()
     assert snap() == before
+
+
+def test_policy_step_graph_matches_eager():
+    """Resets and the coupled step captured into one policy-step graph (``sim.launch_reset``,
+    ``mpm.launch_reset(from_sim_mask=True)``, ``mpm.launch_step``) give bitwise the robot state, sand wrench and
+    particles of the eager API, with a quarter of the worlds reset per step (probes/policy_step_ab.py)."""
+    _metal()
+    out = subprocess.run([sys.executable, str(ROOT / "metalsim/physics/mpm/probes/policy_step_ab.py"), "--worlds", "4",
+                          "--fraction", "0.25", "--hash-steps", "40", "--steps", "20", "--warmup", "2", "--rounds", "1"],
+                         capture_output=True, text=True)
+    res = json.loads(out.stdout.strip().splitlines()[-1])
+    assert res["bitwise_equal"], res
+    assert res["resets_per_run"] > 0, res
+
+
+def test_one_world_masked_reset():
+    """With one world (no separate FEM environments, so the solver's own masked reset refuses grid warm starts) a
+    masked reset of the selected world equals the solver's full reset bitwise, and of an unselected world changes
+    nothing (probes/one_world_reset.py; before 2026-10-13 ``mpm.reset(mask)`` raised with one world)."""
+    _metal()
+    out = subprocess.run([sys.executable, str(ROOT / "metalsim/physics/mpm/probes/one_world_reset.py")],
+                         capture_output=True, text=True)
+    res = json.loads(out.stdout.strip().splitlines()[-1])
+    assert res["ok"], res

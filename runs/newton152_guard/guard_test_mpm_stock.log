@@ -1,0 +1,18 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________________________ test_environment_has_the_forks ________________________
+
+    def test_environment_has_the_forks():
+        """The environment imports the Newton fork (metalsim-1.5.2) and the Warp fork (metalsim), as
+        scripts/setup_newton152.sh installs them; fails, not skips, otherwise (unless METALSIM_NEWTON152_STOCK=1)."""
+        if STOCK:
+            pytest.skip("stock Newton 1.5.2 environment (METALSIM_NEWTON152_STOCK=1)")
+>       assert FORK_NEWTON, (f"{newton.__file__} is stock Newton 1.5.2, not the fork's metalsim-1.5.2 branch: "
+                             "run scripts/setup_newton152.sh (or set METALSIM_NEWTON152_STOCK=1 for a stock environment)")
+E       AssertionError: /Users/aditya/robosim/upstream/newton-1.5.2/newton/__init__.py is stock Newton 1.5.2, not the fork's metalsim-1.5.2 branch: run scripts/setup_newton152.sh (or set METALSIM_NEWTON152_STOCK=1 for a stock environment)
+E       assert False
+
+tests/test_mpm.py:184: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_mpm.py::test_environment_has_the_forks - AssertionError: /U...
+1 failed, 16 deselected in 1.00s

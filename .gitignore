@@ -46,6 +46,9 @@ runs/rigid_perf/**/*.npz
 # Poly Haven CC0 HDRIs and textures are fetched, not committed (scripts/fetch_polyhaven_assets.sh)
 assets/polyhaven/
 
+# public 3D Gaussian splat scenes are fetched, not committed (scripts/fetch_splat_scenes.sh; InteriorGS forbids redistribution)
+assets/splats/
+
 # stray working copies
 m/
 guest@*/
@@ -55,3 +58,10 @@ assets/tron1/scenes_local/
 
 # private fork checkouts of an agent worktree (scripts/setup_*.sh use upstream/ in the main checkout)
 _forks/
+
+# film tool bulk outputs (metalsim/render/film): frames, recordings, render twins and full-resolution masters are
+# regenerated; their JSON and logs are committed
+runs/film/**/frames/
+runs/film/**/rec.npz
+runs/film/**/twin*
+runs/film/**/master.mp4

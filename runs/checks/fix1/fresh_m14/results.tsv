@@ -1,0 +1,25 @@
+step	status	rc	seconds	note
+01_clone	ok	0	24	
+02_venv	ok	0	1	
+03_pip_metalsim	ok	0	46	
+04_setup_warp	ok	0	17	
+05_pip_mujoco_warp	ok	0	12	
+06_fetch_isaac	ok	0	6	
+07_menagerie	ok	0	28	
+08_setup_newton152	ok	0	32	
+09_fetch_polyhaven_demo	ok	0	2	
+09b_fetch_isaaclab_source	ok	0	2	
+15_pins	ok	0	1	
+10_metal_check	ok	0	188	
+11_rigid_suite	FAIL	1	485	1 failed, 233 passed, 20 warnings in 481.09s (0:08:01)
+12_render_suite	ok	0	204	235 passed, 5 skipped, 2 warnings in 197.01s (0:03:17)
+13_test_mpm	ok	0	123	16 passed, 1 xfailed in 116.05s (0:01:56)
+14_test_mpm_main	ok	0	304	17 passed in 299.72s (0:04:59)
+17_test_franka_pour	ok	0	118	8 passed, 48 warnings in 110.40s (0:01:50)
+20_demo_g1	ok	0	33	
+21_demo_franka_pour	ok	0	58	
+22_demo_box_on_sand	ok	0	57	
+23_demo_anymal_sim	ok	0	83	
+24_demo_anymal_render	ok	0	12	
+25_demo_transparency_lidar	ok	0	7	
+30_skips	ok	0	0	5 skipped
