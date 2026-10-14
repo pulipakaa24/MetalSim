@@ -1,0 +1,51 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+   Kernel cache:
+     /private/tmp/claude-501/warpcache/1.18.0.dev20260917
+Module _nxn_broadphase__locals__kernel_6e2733a1 bc2d740 load on device 'cpu' took 1061.54 ms  (compiled)
+Module ccd_kernel_builder__locals__ccd_kernel_9f561825 9552c7f load on device 'cpu' took 1748.89 ms  (compiled)
+Module _primitive_narrowphase__locals__primitive_narrowphase_98065fcc 419fa38 load on device 'cpu' took 362.29 ms  (compiled)
+Module ccd_det_kernels_builder__locals__ccd_det_solve_kernel_c6f7f514 940a383 load on device 'cpu' took 1691.52 ms  (compiled)
+Module ccd_det_kernels_builder__locals__ccd_det_write_kernel_b6059613 bff6714 load on device 'cpu' took 169.94 ms  (compiled)
+Module mujoco_warp._src.smooth 3980c53 load on device 'cpu' took 1643.02 ms  (compiled)
+Module mujoco_warp._src.constraint 22ba07d load on device 'cpu' took 49.91 ms  (compiled)
+Module _friction_dof__locals__kernel_282a3ee3 cd29667 load on device 'cpu' took 96.23 ms  (compiled)
+Module _efc_contact_init__locals__kernel_f9f2b911 157a867 load on device 'cpu' took 58.47 ms  (compiled)
+Module _efc_contact_jac_dense__locals__kernel_817ce255 4a40516 load on device 'cpu' took 320.89 ms  (compiled)
+Module _efc_contact_update__locals__kernel_61dfd6d7 ea0aed6 load on device 'cpu' took 98.31 ms  (compiled)
+Module mujoco_warp._src.passive a8394a8 load on device 'cpu' took 852.07 ms  (compiled)
+Module _qfrc_passive_kernel__locals__kernel_3a3f6a31 95ea8e3 load on device 'cpu' took 53.35 ms  (compiled)
+Module _qfrc_smooth__locals__kernel_0dbabb75 aba852e load on device 'cpu' took 50.22 ms  (compiled)
+Module mujoco_warp._src.support d67db96 load on device 'cpu' took 121.21 ms  (compiled)
+Module _small_cholesky_factorize_solve_block__locals__kernel_24edd661 3f39d93 load on device 'cpu' took 169.02 ms  (compiled)
+Module _solve_init_dof__locals__kernel_016af457 671696c load on device 'cpu' took 52.34 ms  (compiled)
+Module _solve_init_efc__locals__kernel_f5ae2af6 bc37a90 load on device 'cpu' took 47.68 ms  (compiled)
+Module _solve_init_jaref_kernel__locals__kernel_b1bbe826 4b17e64 load on device 'cpu' took 59.87 ms  (compiled)
+Module mul_m_kernel__locals___mul_m_40aba66f a89c671 load on device 'cpu' took 77.05 ms  (compiled)
+Module _update_constraint_efc__locals__kernel_5770eea3 bc6d323 load on device 'cpu' took 91.09 ms  (compiled)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_27db3c00 804f3cf load on device 'cpu' took 56.91 ms  (compiled)
+Module _update_gradient_zero_grad_dot__locals__kernel_e11822a7 e4fbb70 load on device 'cpu' took 58.93 ms  (compiled)
+Module _update_gradient_grad__locals__kernel_1ac4c4f2 e2132be load on device 'cpu' took 73.93 ms  (compiled)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_13af00b0 b907ca7 load on device 'cpu' took 203.05 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_1f708e5c bbc6b6e load on device 'cpu' took 142.56 ms  (compiled)
+Module _linesearch_iterative_kernel__locals__kernel_76bfde06 94c8128 load on device 'cpu' took 236.10 ms  (compiled)
+Module mujoco_warp._src.solver 13b00e8 load on device 'cpu' took 345.00 ms  (compiled)
+Module _update_constraint_efc__locals__kernel_018b0b9d e1ef78b load on device 'cpu' took 105.31 ms  (compiled)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_04794db1 8fa9a18 load on device 'cpu' took 74.94 ms  (compiled)
+Module _update_gradient_zero_grad_dot__locals__kernel_00606839 85b6365 load on device 'cpu' took 56.59 ms  (compiled)
+Module _update_gradient_grad__locals__kernel_193987e7 e316ce9 load on device 'cpu' took 54.20 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_3c2d2a36 3321482 load on device 'cpu' took 168.51 ms  (compiled)
+Module _solve_done__locals__kernel_e2a1c11a e30b6ed load on device 'cpu' took 63.69 ms  (compiled)
+Module mujoco_warp._src.forward 284d8bc load on device 'cpu' took 1023.06 ms  (compiled)
+Module _next_time_builder__locals___next_time_92267d86 d1f46ff load on device 'cpu' took 60.41 ms  (compiled)
+{
+ "device": "cpu",
+ "worlds": 8,
+ "steps": 200,
+ "checked": 40,
+ "box_box_contacts_seen": 135,
+ "mismatches": [],
+ "n_mismatch": 0
+}

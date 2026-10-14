@@ -1,0 +1,177 @@
+--- a/warp/_src/metal_deterministic.py
++++ b/warp/_src/metal_deterministic.py
+@@ -212,6 +212,7 @@
+     uint num_tiles;
+     uint num_cursors;
+     uint pad;
++    device atomic_int* flag;   // the sticky overflow / phase-mismatch flag (det_ctx.overflow)
+ };
+ 
+ inline int target_of_record(constant det_counter_args_t& a, uint r)
+@@ -559,6 +560,10 @@
+             while (t + 1 < a.num_targets && int(k) >= a.t[t + 1].cursor_base)
+                 ++t;
+             const int j = int(k) - a.t[t].cursor_base;
++            // tripwire: a thread made fewer counter calls in phase 1 than phase 0 recorded (more, or different
++            // ones, are flagged by counter_add); see flag_phase_mismatch in metal_deterministic.h
++            if (a.t[t].cursors[j] != a.t[t].cursors[a.t[t].dim + j] && a.flag)
++                atomic_fetch_or_explicit(a.flag, 2, memory_order_relaxed);
+             a.t[t].cursors[j] = 0;
+             a.t[t].cursors[a.t[t].dim + j] = 0;
+         }
+@@ -671,6 +676,7 @@
+         ("num_tiles", ctypes.c_uint32),
+         ("num_cursors", ctypes.c_uint32),
+         ("pad", ctypes.c_uint32),
++        ("flag", ctypes.c_uint64),
+     ]
+ 
+ 
+@@ -698,7 +704,7 @@
+ _ALL_POINTERS = _AllPointers()
+ for _t in (_FinalizeArgs, _CounterTarget, _RecordsArgs):
+     _t._wp_pointer_fields = tuple(name for name, ftype in _t._fields_ if ftype is ctypes.c_uint64)
+-_CounterArgs._wp_pointer_fields = ("keys", "payload", "carry_k", "carry_s", "carry_u", "totals", "touched")
++_CounterArgs._wp_pointer_fields = ("keys", "payload", "carry_k", "carry_s", "carry_u", "totals", "touched", "flag")
+ 
+ 
+ def _offsets_array(struct_type):
+@@ -1100,6 +1106,7 @@
+             args.carry_u = sb + scan_regions["carry_u"]
+             args.totals = sb + scan_regions["totals"]
+             args.touched = zb + scan_regions["touched"]
++            args.flag = state.overflow.ptr
+             self.counter_sort.bind(state, sb)
+             self.sorts.append(self.counter_sort)
+             self.build_args = _CounterArgs.from_buffer_copy(args)
+@@ -1328,6 +1335,16 @@
+     if state.overflow_reported:
+         return
+     value = ctypes.c_int32.from_address(state.overflow.ptr).value
++    if value & 2:
++        state.overflow_reported = True
++        raise RuntimeError(
++            "Deterministic counter phase mismatch on Metal: a thread's consumed-return atomic_add calls in the "
++            "execution pass differ from those its counting pass recorded (detected at kernel "
++            f"'{kernel.key}'; possibly a later launch than the one that mismatched), so slots were handed to the wrong "
++            "calls. The kernel decides its counter calls from data it writes earlier in the same launch, which the "
++            "counting pass cannot see (its stores are suppressed): see 'Side effects in the counting pass' in the "
++            "deterministic execution guide."
++        )
+     if value:
+         state.overflow_reported = True
+         raise RuntimeError(
+--- a/warp/native/metal_deterministic.h
++++ b/warp/native/metal_deterministic.h
+@@ -93,12 +93,26 @@
+ inline float to_float(wp_bfloat16 x) { return bfloat16_to_float(x); }
+ #endif
+ 
++// Bits of the sticky flag (det_ctx.overflow): records beyond records_per_thread, and a phase mismatch.
++#define WP_DET_FLAG_OVERFLOW 1
++#define WP_DET_FLAG_PHASE_MISMATCH 2
++
+ inline void flag_overflow(thread det_ctx& ctx)
+ {
+     if (ctx.overflow)
+-        metal::atomic_store_explicit(ctx.overflow, 1, metal::memory_order_relaxed);
++        metal::atomic_fetch_or_explicit(ctx.overflow, WP_DET_FLAG_OVERFLOW, metal::memory_order_relaxed);
+ }
+ 
++// Phase 1 made a counter call that phase 0 did not record (or recorded with another destination or count): the
++// kernel's calls depend on data that phase 0 could not see (its stores are suppressed), so the slots handed out no
++// longer match the calls and writes can land in slots reserved by other threads. Fewer calls in phase 1 are caught
++// after the launch (det_counter_writeback compares each thread's call counts).
++inline void flag_phase_mismatch(thread det_ctx& ctx)
++{
++    if (ctx.overflow)
++        metal::atomic_fetch_or_explicit(ctx.overflow, WP_DET_FLAG_PHASE_MISMATCH, metal::memory_order_relaxed);
++}
++
+ // Adds a signed 64-bit value to the bin at b (two 32-bit words, low first): exact modulo 2^64 in any order.
+ inline void bin_add(WP_DEVICE metal::atomic_uint* b, long v)
+ {
+@@ -189,6 +203,13 @@
+         buf.values[record] = value;
+         return 0;
+     }
++    // tripwire: phase 0 must have recorded this call (same call number, destination and count); the phase-0 call
++    // count of this thread is still in the first half of the cursors until the writeback clears it
++    if (call >= buf.cursors[ctx.idx] || buf.dest_of[record] != dest || buf.values[record] != value) {
++        flag_phase_mismatch(ctx);
++        if (call >= buf.cursors[ctx.idx])
++            return 0;  // no slot was reserved for this call (as for an overflowing call)
++    }
+     // the base slot of this reservation; values greater than one reserve [slot, slot + value)
+     return buf.prefixes[record];
+ }
+--- a/warp/tests/test_metal_deterministic.py
++++ b/warp/tests/test_metal_deterministic.py
+@@ -8,6 +8,7 @@
+ module option ``metal_ordered_atomics`` keeps the earlier ordered launches (one SIMD-group in task order).
+ """
+ 
++import ctypes
+ import math
+ import unittest
+ 
+@@ -85,6 +86,19 @@
+         out[slot] = local[0] + local[1]
+ 
+ 
++@wp.kernel(module="unique", module_options=RUN_TO_RUN)
++def det_append_after_scratch(
++    x: wp.array[float], scratch: wp.array[float], counter: wp.array[int], out: wp.array[float]
++):
++    # unsupported: the counter call depends on a global store made earlier in the launch, which the counting pass
++    # does not perform ("Side effects in the counting pass" in the deterministic execution guide)
++    tid = wp.tid()
++    scratch[tid] = x[tid]
++    if scratch[tid] > 0.0:
++        slot = wp.atomic_add(counter, 0, 1)
++        out[slot] = scratch[tid]
++
++
+ @wp.kernel(module="unique", module_options=ORDERED)
+ def ordered_sum(x: wp.array[float], out: wp.array[float]):
+     tid = wp.tid()
+@@ -259,7 +273,39 @@
+         expected = values[values > 0]
+         self.assertEqual(int(counter.numpy()[0]), expected.size)
+         np.testing.assert_array_equal(out.numpy()[: expected.size], expected)
++
++    def _phase_mismatch_raised(self, x_np, scratch_init):
++        from warp._src import metal_deterministic as md  # noqa: PLC0415
++
++        state = md._state(wp.get_device(self.device))
++        n = x_np.size
++        x = wp.array(x_np, device=self.device)
++        scratch = wp.full(n, scratch_init, dtype=float, device=self.device)
++        counter = wp.zeros(1, dtype=int, device=self.device)
++        out = wp.zeros(n, dtype=float, device=self.device)
++        try:
++            # the launch only peeks at the flag without waiting for the GPU; check it again after a sync
++            wp.launch(det_append_after_scratch, dim=n, inputs=[x, scratch, counter, out], device=self.device)
++            wp.synchronize_device(self.device)
++            md._check_overflow(state, det_append_after_scratch)
++        except RuntimeError as e:
++            return "phase mismatch" in str(e)
++        finally:
++            ctypes.memset(state.overflow.ptr, 0, 4)
++            state.overflow_reported = False
++        return False
+ 
++    def test_phase_mismatch_tripwire(self):
++        """Flag a kernel whose execution pass makes counter calls its counting pass did not record (more calls:
++        the counting pass reads the scratch as 0), or records calls the execution pass does not make (fewer)."""
++        self.assertTrue(self._phase_mismatch_raised(np.ones(3000, dtype=np.float32), 0.0))
++        self.assertTrue(self._phase_mismatch_raised(-np.ones(3000, dtype=np.float32), 1.0))
++
++    def test_no_tripwire_when_phases_agree(self):
++        """Supported counter kernels leave the flag clear (scratch already equal to the input in both passes)."""
++        x_np = np.ones(3000, dtype=np.float32)
++        self.assertFalse(self._phase_mismatch_raised(x_np, 1.0))
++
+     def test_graph_capture(self):
+         """Replay deterministic accumulation and counter launches from a captured graph."""
+         rng = np.random.default_rng(4)

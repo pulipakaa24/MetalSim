@@ -250,7 +250,7 @@ limits the coupled bodies, `MPMConfig(proxy_mass="effective" | "body" | "kinemat
 selects Isaac's exchange variant, `mpm.wrenches()` returns the sand wrench per coupled body, `mpm.reset(mask)` resets
 worlds. The material is bitwise repeatable run to run; MuJoCo Warp's own contact solve is not (docs/GAPS.md), so a
 scene repeats exactly only while its bodies touch nothing but sand, unless the `BatchSim` is built with the
-experimental `BatchSimOptions(deterministic=True)` (this branch; one mode per process; open: box-box contacts). Tests: `scripts/gpu_run.sh test_mpm_main check 60 -- .venv/bin/python -m pytest
+experimental `BatchSimOptions(deterministic=True)` (this branch; one mode per process; needs the MuJoCo Warp fork branch `metalsim-det-ccd` for convex (GJK/EPA) contacts such as box-box; no heightfield GJK/EPA contacts). Tests: `scripts/gpu_run.sh test_mpm_main check 60 -- .venv/bin/python -m pytest
 tests/test_mpm_main.py`.
 
 ### Rendering particles (MPM sand)

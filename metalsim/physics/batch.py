@@ -144,10 +144,16 @@ _PROCESS_MODE: str | None = None
 
 
 def _warp_mujoco_modules():
-    """Warp ``Module`` objects of MuJoCo Warp's source modules (``mujoco_warp._src.*``)."""
+    """Warp ``Module`` objects of MuJoCo Warp's kernels: its source modules (``mujoco_warp._src.*``) and the
+    ``module="unique"`` modules its kernel builders create (named ``<kernel>_<hash>``, found by their kernels' source
+    module: the CCD, solver and smooth kernels, among others)."""
     from warp._src import context
 
-    return {n: m for n, m in context.user_modules.items() if n.startswith("mujoco_warp")}
+    def mjw_kernel(k):
+        return str(getattr(getattr(k, "func", None), "__module__", "")).startswith("mujoco_warp")
+
+    return {n: m for n, m in list(context.user_modules.items())
+            if n.startswith("mujoco_warp") or any(mjw_kernel(k) for k in list(m.kernels.values()))}
 
 
 def _claim_process_mode(deterministic: bool) -> None:
@@ -166,6 +172,26 @@ def _claim_process_mode(deterministic: bool) -> None:
             raise RuntimeError("MuJoCo Warp kernels already ran in default mode in this process (" + ", ".join(loaded[:4])
                                + "): construct the deterministic BatchSim before any other MuJoCo Warp use")
     _PROCESS_MODE = want
+
+
+def _check_deterministic_support(model: mujoco.MjModel) -> None:
+    """Refuse models whose contacts deterministic mode cannot repeat. MuJoCo Warp's convex (GJK/EPA) narrowphase is
+    repeatable only through the fork's deterministic CCD split (research_notes/MPM in main simulator/
+    deterministic_ccd_divergence.md); its heightfield kernel is not split, so heightfield contacts must take the
+    plane path (meshes of at most 256 vertices; primitives against a heightfield raise inside MuJoCo Warp)."""
+    from mujoco_warp._src import collision_convex as cc
+
+    if not hasattr(cc, "ccd_det_kernels_builder"):
+        raise RuntimeError(f"deterministic BatchSim needs the MuJoCo Warp fork's deterministic CCD split (fork branch "
+                           f"metalsim-det-ccd); {cc.__file__} does not have it")
+    hfield, mesh = int(mujoco.mjtGeom.mjGEOM_HFIELD), int(mujoco.mjtGeom.mjGEOM_MESH)
+    collides = (model.geom_contype | model.geom_conaffinity) != 0
+    if np.any((model.geom_type == hfield) & collides):
+        big = [mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_GEOM, g) or str(g) for g in range(model.ngeom)
+               if model.geom_type[g] == mesh and collides[g] and model.mesh_vertnum[model.geom_dataid[g]] > 256]
+        if big:
+            raise NotImplementedError(f"deterministic BatchSim: meshes of more than 256 vertices against a heightfield "
+                                      f"go through GJK/EPA, which is not repeatable in deterministic mode: {big[:4]}")
 
 
 def _set_mujoco_warp_determinism(smooth_records: int) -> None:
@@ -226,6 +252,8 @@ class BatchSim:
             # determinism is fixed before MuJoCo Warp's first launch in this sim (put_model / put_data launch kernels):
             # Warp's deterministic launch metadata is taken when a module loads, so a mode set later is not reliable
             _claim_process_mode(self.opt.deterministic)
+            if self.opt.deterministic:
+                _check_deterministic_support(model)
             self._det_records = None
             if self.opt.deterministic:
                 self._det_records = 0
@@ -422,7 +450,14 @@ class BatchSim:
             # Warp's deterministic counters overflow into a sticky flag that graph replays never check
             from warp._src import metal_deterministic
 
-            if int(metal_deterministic._state(self.device).overflow.numpy()[0]):
+            flag = int(metal_deterministic._state(self.device).overflow.numpy()[0])
+            if flag & 2:
+                # the Warp fork's tripwire: a kernel's counter calls differ between its counting and execution
+                # passes, so slots went to the wrong calls (contacts or rows written into other worlds' slots)
+                raise RuntimeError("Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter "
+                                   "calls differ between its two passes (research_notes/MPM in main simulator/"
+                                   "deterministic_ccd_divergence.md)")
+            if flag:
                 raise RuntimeError("Warp deterministic-mode counter overflow (deterministic_max_records too small)")
         cap = capacity.capacity_overflows(ov)
         if cap:

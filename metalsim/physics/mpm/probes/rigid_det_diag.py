@@ -63,6 +63,17 @@ def run(model, n, steps, deterministic, capture):
     return {"per_step": per_step, "per_world": per_world, "ncon": ncon}
 
 
+def ccd_modules():
+    """MuJoCo Warp CCD kernel modules this process ran ({name: deterministic option}) and the MuJoCo Warp in use:
+    shows whether the deterministic split (ccd_det_kernels_builder) or the single CCD kernel ran."""
+    import mujoco_warp
+
+    from metalsim.physics.batch import _warp_mujoco_modules
+
+    mods = {n: str(m.options.get("deterministic")) for n, m in _warp_mujoco_modules().items() if "ccd" in n and m.execs}
+    return {"mujoco_warp": mujoco_warp.__file__, "modules": mods}
+
+
 def first_diff(a, b):
     i = next((k for k in range(len(a["per_step"])) if a["per_step"][k] != b["per_step"][k]), None)
     if i is None:
@@ -102,7 +113,7 @@ def main():
     res = {"scene": a.scene, "worlds": a.worlds, "deterministic": a.deterministic, "capture": a.capture,
            "nativeccd_off": a.nativeccd_off,
            "in_process_first_diff": [first_diff(runs[0], r) for r in runs[1:]], "runs": runs[:1],
-           "warp_cache": wp.config.kernel_cache_dir}
+           "warp_cache": wp.config.kernel_cache_dir, "ccd_modules": ccd_modules()}
     print(json.dumps({k: v for k, v in res.items() if k != "runs"}))
     if a.json:
         json.dump(res, open(a.json, "w"))
