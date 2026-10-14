@@ -25,6 +25,30 @@ from . import warp_metal
 _ext = None
 
 
+def _space_free_torch_lib_path():
+    """torch.utils.cpp_extension writes ``-L<torch>/lib`` into the ninja link rule unquoted (only its Windows path
+    quotes it), so a PyTorch installed under a directory whose path has a space (a clone in "~/My Projects/...")
+    fails to link the bridge: clang reads the path as several arguments. Point that one variable at a space-free
+    symlink to the same directory in the temporary directory; the compile rule already quotes its paths."""
+    import hashlib
+    import tempfile
+
+    from torch.utils import cpp_extension as ce
+
+    lib = ce.TORCH_LIB_PATH
+    if " " not in lib:
+        return
+    base = tempfile.gettempdir()
+    if " " in base:
+        base = "/tmp"
+    alias = os.path.join(base, "metalsim_torch_lib_" + hashlib.sha1(lib.encode()).hexdigest()[:12])
+    if os.path.realpath(alias) != os.path.realpath(lib):
+        tmp = f"{alias}.{os.getpid()}"
+        os.symlink(lib, tmp)
+        os.replace(tmp, alias)          # atomic, so concurrent first builds agree
+    ce.TORCH_LIB_PATH = alias
+
+
 def ext():
     """The JIT-built native extension (first call compiles it; cached under ~/.cache/torch_extensions)."""
     global _ext
@@ -43,7 +67,8 @@ def ext():
                 os.environ["PATH"] = ninja.BIN_DIR + os.pathsep + os.environ.get("PATH", "")
             except ImportError:
                 pass
-        src =Path(__file__).resolve().parents[1] / "native" / "torch_metal_bridge.mm"
+        _space_free_torch_lib_path()
+        src = Path(__file__).resolve().parents[1] / "native" / "torch_metal_bridge.mm"
         _ext = load(
             name="metalsim_torch_metal_bridge",
             sources=[str(src)],
