@@ -132,3 +132,13 @@ Q1-Q4, `apple_vs_nvidia_gpu.md` Q2 and Q4):
 Sources: Warp "Deterministic Execution" guide (nvidia.github.io/warp/latest/user_guide/execution_and_performance/deterministic_execution.html);
 `warp.set_module_options` API page; PyTorch PR #150566 (MPS simd reductions, MLX `ops.h` caveat); llama.cpp PR #16559
 (two-level simd_sum); MLX issue #3533 (two-level reduction timing on M2); local code and notes cited inline.
+
+## Outcome (2026-10-13; MPM.md 8k)
+
+- A: Warp `31cf79d7` + Newton `addd10cb`. Captured two-way 54.8 -> 40.0 ms/frame.
+- C: compaction in the two-way example (40.0 -> 37.6 ms/frame captured, 1.21x the L4) and in the solver's proxy harvest.
+  MPMCoupling: harvest 15.6 -> 1.5 ms, coupled step 49.3 -> 34.2 ms at 16 bodies. Franka-Pour unchanged.
+- D: the colour-launch threadgroup count (1/2/4/8 per core) and `gs-soa` are bitwise equal to the current solver, and
+  neither is faster. ANYmal's remaining 1.21x is mostly the MuJoCo Warp robot graph (8.3 ms vs about 1.4 ms of L4
+  kernel time).
+- B: a harness artifact, fixed in `scripts/gpu_run.sh` (PR "gpu_run.sh: run the job in the caller's directory").
