@@ -1,0 +1,91 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/adipu/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth dc949da load on device 'metal:0' took 82.05 ms  (cached)
+Module _nxn_broadphase__locals__kernel_80a41a9c 80a41a9 load on device 'metal:0' took 50.78 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_0dd52466 0dd5246 load on device 'metal:0' took 71.63 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_5600446d 5600446 load on device 'metal:0' took 53.84 ms  (cached)
+Module mujoco_warp._src.constraint 4b2565f load on device 'metal:0' took 46.90 ms  (cached)
+Module _friction_dof__locals__kernel_2eca2190 2eca219 load on device 'metal:0' took 47.98 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_aad4508b aad4508 load on device 'metal:0' took 49.03 ms  (cached)
+Module _efc_contact_init__locals__kernel_a5457af8 a5457af load on device 'metal:0' took 47.27 ms  (cached)
+Module _efc_contact_jac_sparse__locals__kernel_d61abd97 d61abd9 load on device 'metal:0' took 48.09 ms  (cached)
+Module _efc_contact_update__locals__kernel_27b27a7f 27b27a7 load on device 'metal:0' took 51.76 ms  (cached)
+Module mujoco_warp._src.sensor 7e89d17 load on device 'metal:0' took 80.82 ms  (cached)
+Module mujoco_warp._src.forward 53c9939 load on device 'metal:0' took 63.19 ms  (cached)
+Module mujoco_warp._src.passive 121cefe load on device 'metal:0' took 63.86 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_ec74e588 ec74e58 load on device 'metal:0' took 47.31 ms  (cached)
+Module mujoco_warp._src.forward 9c6583c load on device 'metal:0' took 65.98 ms  (cached)
+Module _qfrc_smooth__locals__kernel_b9a126c0 b9a126c load on device 'metal:0' took 48.29 ms  (cached)
+Module mujoco_warp._src.support d1f2881 load on device 'metal:0' took 48.17 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_071922b2 3bd425e load on device 'metal:0' took 50.29 ms  (cached)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_db2d2058 29b79ab load on device 'metal:0' took 47.54 ms  (cached)
+Module _solve_init_dof__locals__kernel_870a690a 870a690 load on device 'metal:0' took 48.19 ms  (cached)
+Module _solve_init_efc__locals__kernel_38f8708b 38f8708 load on device 'metal:0' took 49.53 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_d9f1aa38 d9f1aa3 load on device 'metal:0' took 49.89 ms  (cached)
+Module mul_m_kernel__locals___mul_m_1b897f73 1b897f7 load on device 'metal:0' took 48.68 ms  (cached)
+Module _update_constraint_efc__locals__kernel_875e0cfe 875e0cf load on device 'metal:0' took 48.95 ms  (cached)
+Module mujoco_warp._src.solver 00c4ab6 load on device 'metal:0' took 56.37 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_sparse__locals__kernel_5e7c0abf 5e7c0ab load on device 'metal:0' took 50.37 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_be8f77c5 be8f77c load on device 'metal:0' took 53.97 ms  (cached)
+Module _update_gradient_grad__locals__kernel_b82c9bc8 b82c9bc load on device 'metal:0' took 49.39 ms  (cached)
+Module _update_gradient_init_h_sparse__locals__kernel_c4767745 c476774 load on device 'metal:0' took 50.48 ms  (cached)
+Module _JTDACJ_sparse__locals__kernel_4c9f1f80 302b6bb load on device 'metal:0' took 47.40 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_05c5525c b8cb43c load on device 'metal:0' took 47.74 ms  (cached)
+Module _linesearch_jv_fused_kernel__locals__kernel_299df35b 299df35 load on device 'metal:0' took 48.61 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_34400fa8 9471b07 load on device 'metal:0' took 53.30 ms  (cached)
+Module _update_constraint_efc__locals__kernel_4b92b516 4b92b51 load on device 'metal:0' took 49.77 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_43400b6b 43400b6 load on device 'metal:0' took 53.39 ms  (cached)
+Module _update_gradient_grad__locals__kernel_44f80e79 44f80e7 load on device 'metal:0' took 51.12 ms  (cached)
+Module _update_gradient_h_incremental_sparse__locals__kernel_085ca295 085ca29 load on device 'metal:0' took 53.93 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_28299722 cb01a24 load on device 'metal:0' took 50.52 ms  (cached)
+Module _solve_done__locals__kernel_f1d63dbf f1d63db load on device 'metal:0' took 50.17 ms  (cached)
+Module _next_time_builder__locals___next_time_89d592b4 89d592b load on device 'metal:0' took 50.04 ms  (cached)
+Module metalsim.physics.batch 766e0d1 load on device 'metal:0' took 48.11 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_99f1ed31 99f1ed3 load on device 'metal:0' took 48.02 ms  (cached)
+Module reset_data__locals__reset_M_c0d46912 c0d4691 load on device 'metal:0' took 49.01 ms  (cached)
+Module reset_data__locals__reset_mocap_21cdccdf 21cdccd load on device 'metal:0' took 50.38 ms  (cached)
+Module reset_data__locals__reset_contact_e7d9f88d e7d9f88 load on device 'metal:0' took 49.16 ms  (cached)
+Module reset_data__locals__reset_sleep_c3616e3d c3616e3 load on device 'metal:0' took 48.15 ms  (cached)
+Module reset_data__locals__reset_nworld_f3f460ae f3f460a load on device 'metal:0' took 46.81 ms  (cached)
+[scene] go2_boxes: 4 envs, nbody 20 ngeom 63 nq 61 nu 12, 0 cameras, 0 lidars; spec 0.20 s, sim 2.82 s
+[record] go2_boxes: 4 envs, up to 251 frames at 50.0 fps
+[record] frame 1/251: 25 ms, episodes ended 0/4
+[record] frame 31/251: 5 ms, episodes ended 0/4
+[record] frame 61/251: 7 ms, episodes ended 0/4
+[record] frame 91/251: 5 ms, episodes ended 0/4
+[record] frame 121/251: 5 ms, episodes ended 0/4
+[record] frame 151/251: 5 ms, episodes ended 0/4
+[record] frame 181/251: 5 ms, episodes ended 0/4
+[record] frame 211/251: 5 ms, episodes ended 0/4
+[record] frame 241/251: 5 ms, episodes ended 0/4
+[record] frame 251/251: 6 ms, episodes ended 0/4
+[record] filmed envs [0] (ends [-1])
+[record] done: 251 frames, sim 7 ms/frame mean, twin 63 geoms, wall 6 s -> rec
+[render] go2_boxes: 251 frames, 1x1 panels of 1920x1080, 16 x 4 spp, 63 twin geoms (0 frame corrections), particles/env 0, setup 0.5 s
+[render] automatic exposure 0.3952
+[render] frame 0/251: 0.64 s (render 0.44 s)
+[render] frame 15/251: 0.64 s (render 0.47 s)
+[render] frame 30/251: 0.64 s (render 0.47 s)
+[render] frame 45/251: 0.63 s (render 0.47 s)
+[render] frame 60/251: 0.67 s (render 0.50 s)
+[render] frame 75/251: 0.65 s (render 0.49 s)
+[render] frame 90/251: 0.67 s (render 0.50 s)
+[render] frame 105/251: 0.68 s (render 0.50 s)
+[render] frame 120/251: 0.67 s (render 0.49 s)
+[render] frame 135/251: 0.63 s (render 0.46 s)
+[render] frame 150/251: 0.64 s (render 0.46 s)
+[render] frame 165/251: 0.64 s (render 0.47 s)
+[render] frame 180/251: 0.66 s (render 0.47 s)
+[render] frame 195/251: 0.65 s (render 0.47 s)
+[render] frame 210/251: 0.66 s (render 0.48 s)
+[render] frame 225/251: 0.64 s (render 0.47 s)
+[render] frame 240/251: 0.64 s (render 0.47 s)
+[render] done: 251 frames rendered -> hero
+[encode] 251 frames -> go2_boxes.mp4 (0.3 MB), 1 stills, 3.0 s
+
+[watchdog] exit 0 after 195 s

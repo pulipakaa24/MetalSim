@@ -1,0 +1,4 @@
+- franka-pour-render CPU tests: 6 passed in 6.90s
+- scene-compose CPU tests: 19 passed, 1 deselected in 6.57s
+- 16-inch scene GPU tests FAILED: [watchdog] exit 1 after 34 s
+- 14-inch checks with failures: sc_tests 
