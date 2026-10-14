@@ -10,12 +10,17 @@ Warp CPU device) unless marked as fork-measured. Reproducers: `flex_issue_harnes
 | repo | # | title | state | UPSTREAM.md item |
 |---|---|---|---|---|
 | mujoco_warp | [1704](https://github.com/google-deepmind/mujoco_warp/issues/1704) | Elliptic cones off CUDA: the cone Hessian term is launched with one thread per contact slot (dim_block = naconmax) | open | elliptic note §1-2 |
-| mujoco_warp | [1705](https://github.com/google-deepmind/mujoco_warp/issues/1705) | Flex element contacts of any flex after the first store the global element id | open | 1 |
-| mujoco_warp | [1706](https://github.com/google-deepmind/mujoco_warp/issues/1706) | Box-triangle flex contacts: at most 2 per element, MuJoCo C generates up to 11 | open | 4 |
-| mujoco_warp | [1707](https://github.com/google-deepmind/mujoco_warp/issues/1707) | 1D flexes (cables) collide as vertex spheres; MuJoCo C collides their segments as capsules | open | 5 |
-| mujoco_warp | [1708](https://github.com/google-deepmind/mujoco_warp/issues/1708) | Volume flexes: interior elements collide with geoms; MuJoCo C only collides active (surface) layers | open | 6 |
+| mujoco_warp | [1705](https://github.com/google-deepmind/mujoco_warp/issues/1705) | Flex element contacts of any flex after the first store the global element id | open; closed 2026-10-07 | 1 |
+| mujoco_warp | [1706](https://github.com/google-deepmind/mujoco_warp/issues/1706) | Box-triangle flex contacts: at most 2 per element, MuJoCo C generates up to 11 | open; closed 2026-10-01 | 4 |
+| mujoco_warp | [1707](https://github.com/google-deepmind/mujoco_warp/issues/1707) | 1D flexes (cables) collide as vertex spheres; MuJoCo C collides their segments as capsules | open; closed 2026-10-07 | 5 |
+| mujoco_warp | [1708](https://github.com/google-deepmind/mujoco_warp/issues/1708) | Volume flexes: interior elements collide with geoms; MuJoCo C only collides active (surface) layers | open; closed 2026-10-07 | 6 |
 | mujoco_warp | [1709](https://github.com/google-deepmind/mujoco_warp/issues/1709) | Flex-geom contacts: per-pair limit differs from MuJoCo C's mjMAXCONPAIR (parity data for the configurable cap in #1668) | open | 3 + 7 |
 | mujoco | [3628](https://github.com/google-deepmind/mujoco/issues/3628) | Newton solver: with elliptic cones at impratio 10 and ls_iterations 20, an exhausted line search ends the solve at a non-converged qacc | open | elliptic cost review (A) |
+
+State on 2026-10-13 (`gh issue view`, `runs/docs_audit/upstream_state.log`): #1705-#1708 closed upstream (2026-10-01 /
+2026-10-07; the log records the state, not whether a fix landed), #1704, #1709 and mujoco #3628 still open. #1700 is
+merged upstream (2026-09-25) and still not in MetalSim's fork pin `f1b35e2` (`patches/mujoco_warp/metalsim-f1b35e2.diff`
+has no part of it).
 
 ## Not filed, and why
 

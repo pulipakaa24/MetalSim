@@ -2,8 +2,9 @@
 
 **Status 2026-09-25 (evening): done on this machine.** Reproduced (Go2 3.84×, G1 2.83× sparse / 3.24× dense,
 SO-101 2.41×, DeepMind humanoid 6.68×, MetalSim G1 task 7.07×) and fixed in the fork worktree
-`upstream/mujoco_warp-ellip` (branch `metalsim-elliptic`, commit `c301880`, not merged: awaiting the main
-session's approval): elliptic now costs 1.27–1.59× (G1 task 1.41×). Fix 1 (SM-sized launch) measures within
+`upstream/mujoco_warp-ellip` (branch `metalsim-elliptic`, commit `c301880`, not merged at the time: awaiting the main
+session's approval; **merged since** into the fork's `metalsim`, in the pinned `f1b35e2`, and elliptic cones became the
+G1 default on 2026-09-26): elliptic now costs 1.27–1.59× (G1 task 1.41×). Fix 1 (SM-sized launch) measures within
 3–20 % of the adopted per-world form and is kept as `MJW_JTCJ_MODE=contact`. The G1's slowdown was a second
 fallback (one lane per constraint group in the sparse Hessian assembly), fixed separately. Fixes 3 and 4
 (fold into the tiled build / incremental cone rows) were evaluated and estimated not to pay. Upstream PR draft:

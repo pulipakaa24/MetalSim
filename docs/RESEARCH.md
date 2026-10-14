@@ -3,6 +3,13 @@
 Consolidated from five research passes run at project start. Facts are labelled
 **verified** (checked in source or run here), **reported** (third party), or **uncertain**.
 
+**Snapshot of 2026-09-22, kept as written (note added 2026-10-13).** Later research is one question per note in
+`docs/research/` (index in the README, "Research notes"), `reports/` and `research_notes/`. Superseded here since:
+MetalSim builds its own Warp fork (pulipakaa24/warp `metalsim`, pinned `95f6f121`), not innate-inc's `main`; the
+MuJoCo Warp suite figure is the base fork's (the elliptic branch gave 1450 passed / 2 failed on 2026-09-25, PARITY
+§1.4; flex 237/237 after the fork's flex fixes); Newton runs on `metal:0` through the Warp fork (PARITY §2.1,
+`docs/research/newton_vbd_metal_2026-09-25.md`), and Newton 1.5.2's MPM runs there too (`metalsim/physics/mpm/MPM.md`).
+
 ## Physics on Apple GPUs
 
 - NVIDIA Warp v1.17.0 (2026-08-31) has **no** Metal backend and no upstream PR for one. The

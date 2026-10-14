@@ -35,6 +35,11 @@ Related existing issue: #2933 (same missing multiplier accumulation for springs 
   defaults to `joint_drive_mode="pd"` and carries the MetalSim-specific options. It does NOT contain PR 1's
   small-swing rescale fix (only matters for the compliance drive, which MetalSim does not use).
 
+## Status 2026-10-13
+
+All six (#4313-#4315, #4316-#4318) still open (`gh issue view` / `gh pr view`, `runs/docs_audit/upstream_state.log`);
+none merged. The EasyCLA check and review state were not re-read.
+
 ## Status 2026-09-26
 
 All six still open. EasyCLA still fails on #4316-#4318 ("Missing CLA Authorization"); the external-PR workflows wait
