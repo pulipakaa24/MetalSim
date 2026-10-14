@@ -174,20 +174,35 @@ def test_go2_boxes_gpu(tmp_path):
     # the frame when level (runs/scenes/go2_boxes/run/head_cam_distance_to_image_plane_0.png: horizon at mid-height),
     # and at step 20 the dog, settling from its drop, was pitched ~6 deg nose-up in both envs: the horizon 120 rows
     # below the centre, 120 + 120 hit rows of 720 = 1/3 (the bottom-row floor depth 1.854 m matches that pitch).
-    # Checked geometrically now: the bottom-left pixel's planar depth equals the ray's distance to the floor, and the
-    # top row is sky whenever it looks above the horizon.
-    cid = mujoco.mj_name2id(scene.model, mujoco.mjtObj.mjOBJ_CAMERA, "head_cam")
-    datas = scene.host_datas()
+    # Checked geometrically now, against the first hit of each pixel's ray on the host model (mj_ray over the geom groups
+    # the renderer draws, 0-3), not an assumed floor: with the reset sampling of the scene seed, boxes sit across the
+    # bottom-left pixel's ray (fresh-install check 2026-10-14: 0.866 m rendered, a box; the floor would be 1.854 m).
+    m = scene.model
+    cid = mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_CAMERA, "head_cam")
+    datas = scene.host_datas()                         # the state just rendered (host_datas synchronizes; no step since)
     f = (360 / 2) / np.tan(np.radians(CP.fovy_deg(cfg.cameras["head_cam"])) / 2)
+    groups = np.array([1, 1, 1, 1, 0, 0], np.uint8)
+    robot = m.body_rootid[mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_BODY, "base")]
+    checked = 0
     for e in range(2):
         p, R = datas[e].cam_xpos[cid], datas[e].cam_xmat[cid].reshape(3, 3)
-        d = R @ np.array([(0.5 - 320) / f, -(359.5 - 180) / f, -1.0])     # pixel (row 359, col 0), unit planar depth
-        assert d[2] < 0, "bottom row must look down"
-        t = -p[2] / d[2]
-        assert abs(depth[e, 359, 0] - t) < 0.02 * t, (e, float(depth[e, 359, 0]), t)
+        for row, col in ((359, 0), (359, 639), (359, 320), (300, 320), (330, 100), (330, 540)):
+            v = R @ np.array([(col + 0.5 - 320) / f, -(row + 0.5 - 180) / f, -1.0])   # unit planar depth along v
+            gid = np.zeros(1, np.int32)
+            t = mujoco.mj_ray(m, datas[e], p, v, groups, 1, -1, gid)                   # in units of |v|: planar depth
+            got = float(depth[e, row, col])
+            if t < 0:
+                assert got == 0.0, (e, row, col, got)                                  # nothing hit: sky
+            elif m.body_rootid[m.geom_bodyid[gid[0]]] == robot:
+                continue                                       # the robot's own collision vs visual meshes differ
+            else:
+                hit = mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_GEOM, int(gid[0]))
+                assert abs(got - t) < 0.02 * t, (e, row, col, got, float(t), hit)
+            checked += 1
         top = R @ np.array([0.0, 180 / f, -1.0])
-        if top[2] > 0.01:                                                   # the top row looks up: sky only
+        if top[2] > 0.01:                                                       # the top row looks up: sky only
             assert (depth[e, 0] == 0).all()
+    assert checked >= 8
     assert len(np.unique(seg)) >= 2
     hits = scene.sense()["front_lidar"]["range"]
     assert hits.shape[0] == 2 and (np.asarray(hits) > 0).mean() > 0.05      # the boxes and the ground are hit
