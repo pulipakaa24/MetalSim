@@ -10,6 +10,11 @@
 set -u
 main() {
   NAME=$1; KIND=$2; MIN=$3; shift 3; [ "$1" = "--" ] && shift
+  # The job runs in the caller's directory; only the queue's own files (scripts/, runs/) are taken from the repo
+  # root. Before 2026-10-13 the job ran in the repo root, so `python -m ...` (which puts the cwd ahead of
+  # PYTHONPATH on sys.path) launched from an agent worktree imported the MAIN checkout's packages: tests passed or
+  # failed against code the caller never meant to run (research_notes/coupled_speed/NOTE.md, section B).
+  CALLER_CWD=$PWD
   cd "$(dirname "$0")/.."
   python3 scripts/gpu_lock.py acquire "$NAME" --kind "$KIND" --minutes "$MIN" --pid $$ --cmd "$*"
   # Runaway guard (2026-10-12): GPU work can outlive its killed process (utilisation stays ~100 % with no process owning
@@ -28,7 +33,7 @@ main() {
     for i in $(seq 1 60); do u=$(scripts/gpu_util.sh); [ "${u:-0}" -lt 10 ] && break; sleep 2; done
     echo "[gpu_run] $NAME start: device utilisation ${u:-?}% ($(date +%H:%M:%S))"; python3 scripts/gpu_top.py 2>/dev/null | head -4 | sed "s/^/[gpu_run] gpu_top: /"
   fi
-  "$@" &
+  (cd "$CALLER_CWD" && exec "$@") &   # exec: the subshell becomes the job, so $! is the job's pid
   CHILD=$!
   python3 scripts/gpu_lock.py setpid "$NAME" --pid $CHILD
   # Heartbeat: a sandboxed waiter cannot see this job's pid and would force-release it; gpu_lock.alive() trusts a fresh beat.
