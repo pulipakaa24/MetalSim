@@ -231,6 +231,12 @@ class BatchSim:
         with wp.ScopedDevice(self.device):
             self._launch_substeps()
 
+    def launch_reset(self) -> None:
+        """Launch the reset of the worlds selected by ``reset_mask`` directly (no graph replay, no signal), for
+        capturing into a policy-step graph (write the mask on torch's queue before replaying it)."""
+        with wp.ScopedDevice(self.device):
+            self._launch_reset()
+
     def _run(self, name: str):
         with wp.ScopedDevice(self.device):
             g = self._graphs.get(name)
