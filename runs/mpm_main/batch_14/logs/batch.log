@@ -1,0 +1,35 @@
+=== batch_14 start Tue Oct 13 23:08:50 PDT 2026 FIX_N152=1
+[23:08:53] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   1.7 %
+g1_minimal.usd md5: 09bcaf3667df0bde5686f32d74019a97  (expected 09bcaf3667df0bde5686f32d74019a97)
+Franka-Pour assets: assets/isaac/franka_pour (15 files, SHA-256 verified)
+[23:08:59] FETCH14 -> PASS SHA-256 checked
+[23:08:59] gpu job mm14_pour (<= 60 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b14/logs/franka_pour_tests.log
+    ERROR tests/test_franka_pour_terms.py::test_smoke_episode_runs_finite - Runti...
+    1 failed, 2 passed, 48 warnings, 5 errors in 62.64s (0:01:02)
+[23:12:40] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[23:12:40] POUR14 -> FAIL rc=1 1 failed, 2 passed, 48 warnings, 5 errors in 62.64s (0:01:02); skips: 
+newton /Users/aditya/robosim/upstream/newton-1.5.2/newton fork API False
+fork dir /Users/aditya/robosim/upstream/newton-metalsim-1.5.2 at 3fd1f052, pin addd10cb
++ cd /Users/aditya/robosim
++ git -C upstream/newton-metalsim-1.5.2 fetch -q origin
++ git -C upstream/newton-metalsim-1.5.2 checkout -q --detach addd10cbeb25e946b3a4c2bb1d4097acc7a98ca2
++ uv pip install -q --python .venv-newton152/bin/python --no-deps -e upstream/newton-metalsim-1.5.2
++ .venv-newton152/bin/python -P -c 'import newton, os; from newton._src.solvers.implicit_mpm import solve_rheology as sr; print('\''newton'\'', os.path.dirname(newton.__file__), '\''fork API'\'', hasattr(sr, '\''_color_block_count'\''))'
+newton /Users/aditya/robosim/upstream/newton-metalsim-1.5.2/newton fork API True
+[23:12:46] N152FIX14 -> PASS newton-metalsim-1.5.2 at addd10cb
+[23:12:46] gpu job mm14_mpm (<= 30 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b14/logs/test_mpm.log
+    .......x........                                                         [100%]
+    15 passed, 1 xfailed in 123.02s (0:02:03)
+[23:14:58] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[23:14:58] MPM14 -> PASS 15 passed, 1 xfailed in 123.02s (0:02:03)
+[23:14:58] gpu job mm14_bridge (<= 30 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b14/logs/newton_bridge_tests.log
+    -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+    31 passed, 2 warnings in 220.63s (0:03:40)
+[23:18:50] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   1.6 %
+[23:18:50] BRIDGE14 -> PASS 31 passed, 2 warnings in 220.63s (0:03:40)
