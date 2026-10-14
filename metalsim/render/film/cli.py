@@ -23,6 +23,9 @@ def add_override_args(ap) -> None:
     ap.add_argument("--bounces", type=int, default=None)
     ap.add_argument("--hdri", default=None, help="Poly Haven HDRI path relative to the Poly Haven root")
     ap.add_argument("--exposure", type=float, default=None)
+    ap.add_argument("--no-denoise", action="store_true",
+                    help="render without the OIDN denoiser (recorded in render.json and the doc; more Monte Carlo noise)")
+    ap.add_argument("--skip-preflight", action="store_true", help="do not check the later stages' dependencies first")
 
 
 def apply_overrides(task, a):
@@ -37,6 +40,8 @@ def apply_overrides(task, a):
             fk[name] = getattr(a, name)
     if a.seconds is not None:
         fk["max_seconds"] = a.seconds
+    if getattr(a, "no_denoise", False):
+        fk["denoise"] = None
     vk = {}
     for name, key in (("eye", "eye"), ("lookat", "lookat"), ("origin_type", "origin_type"), ("body", "body_name"),
                       ("fovy", "fovy")):

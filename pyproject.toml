@@ -33,19 +33,24 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest", "pytest-xdist", "pillow", "imageio", "scipy", "trimesh"]   # trimesh: Isaac's terrain reference code in tests/
+test = ["pytest", "pytest-xdist", "pillow", "imageio", "scipy", "trimesh",   # trimesh: Isaac's terrain reference code in tests/
+        "materialx"]   # MaterialX: tests/test_materialx.py (macOS arm64 wheels for CPython 3.9-3.14)
 learn = ["gymnasium", "stable-baselines3"]
 # the reference learner on MetalSim physics (metalsim.learn.train_g1_rslrl)
 rslrl = ["rsl-rl-lib==3.1.2", "tensordict"]
 tron1 = ["scipy", "onnxruntime"]
+# the filming tool's frames, stills and mp4 (metalsim.render.film; OIDN comes with the core pyoidn)
+film = ["imageio", "imageio-ffmpeg", "pillow"]
+# everything the test suite imports in .venv (zero optional-package skips): the documented install uses it
+full = ["metalsim[test,newton,rslrl,tron1,film]"]
 # fidelity protocol against an Isaac recording and the render-fidelity benchmark (metalsim.parity, metalsim.bench)
 parity = ["imageio", "imageio-ffmpeg", "pillow", "scikit-image", "lpips", "flip-evaluator"]
 # Newton XPBD engine (experimental, archived): the upstream commit the validation runs pinned (newton-physics/newton
 # 45458023) plus only the Metal HashTable / 64-bit atomics fix that the Warp fork needs (pulipakaa24/newton branch
-# metalsim-hashtable-metal; the same change as patches/newton/metalsim-hashtable-metal-a4be3604.diff on 45458023).
+# metalsim-hashtable-metal; the same change as patches/newton/metalsim-hashtable-metal-9d6616c6.diff on 45458023).
 # The MetalSim fork with the solver fixes goes into a separate environment (scripts/setup_newton.sh), Newton 1.5.2
 # for MPM into .venv-newton152 (scripts/setup_newton152.sh).
-newton = ["newton @ git+https://github.com/pulipakaa24/newton@a4be3604bc218bb366d12164fa3e1025f333bdae",
+newton = ["newton @ git+https://github.com/pulipakaa24/newton@9d6616c64ca018dd9119f67fca3316d715a26704",
           "newton-usd-schemas==0.5.0"]   # Newton's USD importer (the G1 Newton-engine task loads the USD asset)
 
 [project.urls]

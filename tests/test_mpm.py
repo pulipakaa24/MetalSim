@@ -2,10 +2,16 @@
 accelerations. Every acceleration must reproduce the oracle (Newton's own kernels, CUDA stopping rule) bit for bit.
 
 Needs the Newton 1.5.2 environment that scripts/setup_newton152.sh builds (.venv-newton152: the Newton fork's
-metalsim-1.5.2 branch and the Warp fork's metalsim branch, pinned there). With stock Newton 1.5.2 / Warp the tests of
-the branch-only accelerations are skipped, not failed:
+metalsim-1.5.2 branch and the Warp fork's metalsim branch, pinned there):
     scripts/gpu_run.sh test_mpm check 15 -- .venv-newton152/bin/python -m pytest tests/test_mpm.py
+An environment that imports stock Newton 1.5.2 / Warp fails test_environment_has_the_forks (and the branch-only tests),
+so a mis-built .venv-newton152 cannot pass with those tests silently skipped (on 2026-10-13 it imported stock Newton for
+hours unnoticed). A stock environment built on purpose (the setup script's stock-oracle recipe) sets
+METALSIM_NEWTON152_STOCK=1; the branch-only tests are then skipped.
 """
+import inspect
+import os
+
 import numpy as np
 import pytest
 import warp as wp
@@ -20,6 +26,10 @@ from metalsim.physics.mpm import compare, newton_compat, scenes  # noqa: E402
 from newton._src.solvers.implicit_mpm import solve_rheology as sr  # noqa: E402
 
 DEV = "metal:0"
+# the forks' API that the branch-only tests use; stock Newton 1.5.2 / Warp have none of it
+FORK_NEWTON = hasattr(sr, "_color_block_count") and hasattr(sr, "active_node_bound")
+FORK_WARP = "dim_limit" in inspect.signature(wp.launch).parameters
+STOCK = os.environ.get("METALSIM_NEWTON152_STOCK") == "1"     # a stock environment on purpose
 SMALL = dict(aspect=1.0, seconds=0.25)
 
 
@@ -116,7 +126,7 @@ def test_fused_solve_bitwise():
     assert np.array_equal(a, b) and np.array_equal(ia, ib)
 
 
-@pytest.mark.skipif(not hasattr(sr, "_color_block_count"), reason="needs the Newton fork (metalsim-1.5.2)")
+@pytest.mark.skipif(STOCK and not FORK_NEWTON, reason="stock Newton 1.5.2 (METALSIM_NEWTON152_STOCK=1)")
 def test_color_blocks_on_all_cores_bitwise():
     """Spreading each color over all GPU cores (the Newton branch) reproduces the one-block oracle bit for bit."""
     fn = sr._color_block_count
@@ -156,17 +166,25 @@ def test_column_observables_from_lattice():
 # the trajectory bit for bit unchanged. Each run is its own process (probes/pour_bitwise.py), so the switch
 # WP_METAL_BOUNDED_LAUNCH applies to everything it gates.
 
-import inspect  # noqa: E402
 import json  # noqa: E402
-import os  # noqa: E402
 import subprocess  # noqa: E402
 import sys  # noqa: E402
 
 _PROBES = os.path.join(os.path.dirname(__file__), "..", "metalsim", "physics", "mpm", "probes")
 _scale_branches = pytest.mark.skipif(
-    "dim_limit" not in inspect.signature(wp.launch).parameters or not hasattr(sr, "active_node_bound"),
-    reason="needs the Warp (metalsim) and Newton (metalsim-1.5.2) forks",
+    STOCK and not (FORK_WARP and FORK_NEWTON), reason="stock Newton 1.5.2 / Warp (METALSIM_NEWTON152_STOCK=1)"
 )
+
+
+def test_environment_has_the_forks():
+    """The environment imports the Newton fork (metalsim-1.5.2) and the Warp fork (metalsim), as
+    scripts/setup_newton152.sh installs them; fails, not skips, otherwise (unless METALSIM_NEWTON152_STOCK=1)."""
+    if STOCK:
+        pytest.skip("stock Newton 1.5.2 environment (METALSIM_NEWTON152_STOCK=1)")
+    assert FORK_NEWTON, (f"{newton.__file__} is stock Newton 1.5.2, not the fork's metalsim-1.5.2 branch: "
+                         "run scripts/setup_newton152.sh (or set METALSIM_NEWTON152_STOCK=1 for a stock environment)")
+    assert FORK_WARP, f"{wp.__file__} is not the Warp fork (no wp.launch(dim_limit=)): run scripts/setup_warp.sh"
+
 
 
 def _probe(script, *args, env=None, check=True):

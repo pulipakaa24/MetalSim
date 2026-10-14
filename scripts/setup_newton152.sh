@@ -31,7 +31,11 @@ if [ ! -d "$DIR" ]; then
     git -C "$DIR" apply "$HERE/../patches/newton/metalsim-1.5.2-addd10cb.diff"
   }
 elif [ -e "$DIR/.git" ] && [ -z "$METALSIM_NEWTON152_REF" ] && [ "$(git -C "$DIR" rev-parse HEAD)" != "$PIN" ]; then
-  echo "note: $DIR is at $(git -C "$DIR" rev-parse --short HEAD), not the pinned ${PIN:0:8} (left as is)"
+  # an existing checkout at another commit is a stale pin (2026-10-13: the environment ran an older fork commit and,
+  # through a stale copy of this script, stock Newton); a deliberate other commit sets METALSIM_NEWTON152_REF
+  echo "setup_newton152.sh: $DIR is at $(git -C "$DIR" rev-parse --short HEAD), not the pinned ${PIN:0:8}:"
+  echo "  git -C $DIR fetch origin && git -C $DIR checkout --detach $PIN   (or set METALSIM_NEWTON152_REF)"
+  exit 1
 fi
 if [ -d upstream/warp-innate ]; then WARP=upstream/warp-innate; else WARP=upstream/warp-metalsim; fi
 WARP=${METALSIM_WARP_DIR:-$WARP}
@@ -45,7 +49,7 @@ uv pip install -q --python "$VENV/bin/python" --no-deps -e "$WARP"
 uv pip install -q --python "$VENV/bin/python" --no-deps -e "$DIR"
 uv pip install -q --python "$VENV/bin/python" --no-deps -e "$HERE/.."     # metalsim itself: the MPM probes run as scripts / subprocesses
 # verify: every package of the requirements that MetalSim imports here, Metal reachable through pyobjc, the forks in use
-"$VENV/bin/python" - <<'PY'
+NEWTON152_DIR="$DIR" "$VENV/bin/python" - <<'PY'
 import importlib, importlib.metadata as m, sys
 missing = []
 for mod in ("objc", "Metal", "Foundation", "ninja", "torch", "numpy", "scipy", "pxr", "mujoco", "mujoco_warp", "newton", "warp"):
@@ -61,8 +65,17 @@ dev = Metal.MTLCreateSystemDefaultDevice()
 if dev is None:
     sys.exit("setup_newton152.sh: pyobjc Metal finds no GPU device")
 import metalsim.interop  # noqa: F401  (zero-copy Warp <-> PyTorch MPS, used by Franka-Pour)
-import newton, mujoco_warp
+import newton, mujoco_warp, os
 print("newton", m.version("newton"), newton.__file__)
+# the environment must import the checkout installed above, and (unless another ref was asked for) the fork's API
+want = os.path.realpath(os.environ["NEWTON152_DIR"])
+got = os.path.realpath(os.path.dirname(os.path.dirname(newton.__file__)))
+if got != want:
+    sys.exit(f"setup_newton152.sh: this environment imports Newton from {got}, not {want}")
+if not os.environ.get("METALSIM_NEWTON152_REF"):
+    from newton._src.solvers.implicit_mpm import solve_rheology as sr
+    if not (hasattr(sr, "_color_block_count") and hasattr(sr, "active_node_bound")):
+        sys.exit(f"setup_newton152.sh: {want} lacks the metalsim-1.5.2 fork's API (stock Newton?)")
 print("mujoco-warp", m.version("mujoco-warp"), "warp", wp.__version__, wp.__file__)
 print("torch", m.version("torch"), "pyobjc", m.version("pyobjc-core"), "ninja", m.version("ninja"), "Metal device:", dev.name())
 PY
