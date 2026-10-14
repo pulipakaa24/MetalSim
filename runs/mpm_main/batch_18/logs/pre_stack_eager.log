@@ -1,0 +1,42 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module _snapshot_flag_0f4dec46 0f4dec4 load on device 'metal:0' took 428.43 ms  (compiled)
+Module mujoco_warp._src.smooth fa1945a load on device 'metal:0' took 2663.95 ms  (compiled)
+Module _nxn_broadphase__locals__kernel_5bc56f3e 5bc56f3 load on device 'metal:0' took 588.20 ms  (compiled)
+Module ccd_det_kernels_builder__locals__ccd_det_solve_kernel_c3eea798 c3eea79 load on device 'metal:0' took 3100.79 ms  (compiled)
+Module ccd_det_kernels_builder__locals__ccd_det_write_kernel_a74e4251 a74e425 load on device 'metal:0' took 552.84 ms  (compiled)
+Module _primitive_narrowphase__locals__primitive_narrowphase_ac1b4b23 ac1b4b2 load on device 'metal:0' took 1001.38 ms  (compiled)
+Module mujoco_warp._src.constraint 8122a35 load on device 'metal:0' took 404.76 ms  (compiled)
+Module _friction_dof__locals__kernel_bd956d0b bd956d0 load on device 'metal:0' took 473.28 ms  (compiled)
+Module _efc_contact_init__locals__kernel_e68c355d e68c355 load on device 'metal:0' took 418.50 ms  (compiled)
+Module _efc_contact_jac_dense__locals__kernel_ae6fd79a 0d99121 load on device 'metal:0' took 497.62 ms  (compiled)
+Module _efc_contact_update__locals__kernel_de83e609 de83e60 load on device 'metal:0' took 479.67 ms  (compiled)
+Module mujoco_warp._src.passive 908af13 load on device 'metal:0' took 1458.25 ms  (compiled)
+Module _qfrc_passive_kernel__locals__kernel_6b73e61c 6b73e61 load on device 'metal:0' took 404.64 ms  (compiled)
+Module _qfrc_smooth__locals__kernel_d4a867df d4a867d load on device 'metal:0' took 402.80 ms  (compiled)
+Module mujoco_warp._src.support 676b434 load on device 'metal:0' took 473.79 ms  (compiled)
+Module _small_cholesky_factorize_solve_block__locals__kernel_c9279eac ef9f0b7 load on device 'metal:0' took 511.55 ms  (compiled)
+Module _solve_init_dof__locals__kernel_60d9d660 60d9d66 load on device 'metal:0' took 392.50 ms  (compiled)
+Module _solve_init_efc__locals__kernel_b92d46f2 b92d46f load on device 'metal:0' took 393.87 ms  (compiled)
+Module _solve_init_jaref_kernel__locals__kernel_c1a0b309 c1a0b30 load on device 'metal:0' took 403.66 ms  (compiled)
+Module mul_m_kernel__locals___mul_m_62f4b1e4 62f4b1e load on device 'metal:0' took 423.88 ms  (compiled)
+Module _update_constraint_efc__locals__kernel_c247765d c247765 load on device 'metal:0' took 451.70 ms  (compiled)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_a620b643 a620b64 load on device 'metal:0' took 398.47 ms  (compiled)
+Module _update_gradient_zero_grad_dot__locals__kernel_1c44d3a3 1c44d3a load on device 'metal:0' took 397.12 ms  (compiled)
+Module _update_gradient_grad__locals__kernel_89098e54 89098e5 load on device 'metal:0' took 408.79 ms  (compiled)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_3ae7a1f5 5d26dd8 load on device 'metal:0' took 474.58 ms  (compiled)
+Module _update_gradient_cholesky__locals__kernel_7ec3a995 7d9cf20 load on device 'metal:0' took 492.34 ms  (compiled)
+Module _linesearch_iterative_kernel__locals__kernel_f4752713 1b9081f load on device 'metal:0' took 593.37 ms  (compiled)
+Module _update_constraint_gradient_fused__locals__kernel_685b9bb9 23e5142 load on device 'metal:0' took 457.80 ms  (compiled)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_fe8297bd 23ec99c load on device 'metal:0' took 545.27 ms  (compiled)
+Module _solve_done__locals__kernel_75847120 7584712 load on device 'metal:0' took 437.63 ms  (compiled)
+Module mujoco_warp._src.solver 9681cf2 load on device 'metal:0' took 716.50 ms  (compiled)
+Module mujoco_warp._src.forward fd9467b load on device 'metal:0' took 1711.64 ms  (compiled)
+Module _next_time_builder__locals___next_time_3b8646ee 3b8646e load on device 'metal:0' took 426.31 ms  (compiled)
+Module metalsim.physics.batch 491c5e7 load on device 'metal:0' took 417.37 ms  (compiled)
+RESULT {"scene": "stack", "worlds": 64, "capture": 0, "iteration_cap": 2, "steps": 20, "steps_with_cap_worlds": [], "steps_with_hits": [], "hits_only_in_cap_steps": true, "kernels_hit": {}, "flag_values": {}, "recorded_det_launches": 0, "mujoco_warp": "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/__init__.py", "warp": "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-diag/warp/__init__.py"}
