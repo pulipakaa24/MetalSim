@@ -9,7 +9,7 @@
 # State: $D/status_<VM>.txt (one line: STATE | time | details), log $D/launcher_<VM>.log, abort flag $D/ABORT_<VM>.
 # Run detached: python3 -c 'import os,sys; os.setsid(); os.execv(sys.argv[1], sys.argv[1:])' <this> ARGS... &
 VM=$1; ZONE=$2; SEEDS=$3; VERIFY=$4; FB_SEEDS=${5:-}; FB_PEER=${6:-}
-D=${L4_SEEDS_DIR:-/Users/aditya/robosim/.claude/worktrees/agent-a278824da4c05bf29/runs/parity/isaaclab3_pour/l4_seeds}
+D=${L4_SEEDS_DIR:-$PWD/runs/parity/isaaclab3_pour/l4_seeds}   # run from the repo root, or set L4_SEEDS_DIR
 S=$D/scripts                       # snapshot of the scripts staged to the VM (copied in by the caller)
 G="--zone $ZONE --project mcmc-193822 --quiet"
 SSH="gcloud compute ssh $VM $G --tunnel-through-iap"

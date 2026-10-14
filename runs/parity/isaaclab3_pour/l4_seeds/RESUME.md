@@ -1,5 +1,10 @@
 # Isaac Franka-Pour seeds 1-2 on the L4 VMs: resume notes
 
+**Finished 2026-10-13.** Seed 2 finished at 18:15 on aditya-isaac and seed 1 at 19:10 on aditya-isaac-2. The
+fingerprint matched, and both VMs powered themselves off. The analysis is in docs/PARITY.md §1b.5. The notes
+below describe the run and how to repeat it, e.g. for seeds 3-4. Run the launcher from the repo root, or set
+`L4_SEEDS_DIR`.
+
 Started 2026-10-13 12:56 PDT. Two detached launchers run on the 16-inch Mac
 (`metalsim/parity/isaac_side/isaaclab3/l4_seed_launcher.sh`, snapshot in `scripts/` here). They do not depend on
 any Claude session.
