@@ -1,0 +1,56 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth 538cc3d load on device 'metal:0' took 432.81 ms  (cached)
+Module _nxn_broadphase__locals__kernel_1005c134 1005c13 load on device 'metal:0' took 79.26 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_cf21765f cf21765 load on device 'metal:0' took 3221.89 ms  (compiled)
+Module _primitive_narrowphase__locals__primitive_narrowphase_72b77b80 72b77b8 load on device 'metal:0' took 100.54 ms  (cached)
+Module mujoco_warp._src.constraint d679960 load on device 'metal:0' took 40.19 ms  (cached)
+Module _friction_dof__locals__kernel_aa27326c aa27326 load on device 'metal:0' took 53.72 ms  (cached)
+Module _efc_contact_init__locals__kernel_1127402a 1127402 load on device 'metal:0' took 41.94 ms  (cached)
+Module _efc_contact_jac_dense__locals__kernel_166510f3 10a1d8e load on device 'metal:0' took 48.85 ms  (cached)
+Module _efc_contact_update__locals__kernel_3418e391 3418e39 load on device 'metal:0' took 54.00 ms  (cached)
+Module mujoco_warp._src.passive aa6907c load on device 'metal:0' took 242.09 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_3be346c8 3be346c load on device 'metal:0' took 39.84 ms  (cached)
+Module _qfrc_smooth__locals__kernel_6e4e72da 6e4e72d load on device 'metal:0' took 40.46 ms  (cached)
+Module mujoco_warp._src.support 6338d33 load on device 'metal:0' took 48.06 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_157d5993 db0372c load on device 'metal:0' took 75.26 ms  (cached)
+Module _solve_init_dof__locals__kernel_dd9e3fd3 dd9e3fd load on device 'metal:0' took 40.40 ms  (cached)
+Module _solve_init_efc__locals__kernel_9d2599f2 9d2599f load on device 'metal:0' took 39.54 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_cfab647b cfab647 load on device 'metal:0' took 43.51 ms  (cached)
+Module mul_m_kernel__locals___mul_m_cc13d2d5 cc13d2d load on device 'metal:0' took 49.35 ms  (cached)
+Module _update_constraint_efc__locals__kernel_e99510a4 e99510a load on device 'metal:0' took 48.84 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_dense__locals__kernel_14eb7812 14eb781 load on device 'metal:0' took 40.28 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_0004f286 0004f28 load on device 'metal:0' took 40.08 ms  (cached)
+Module _update_gradient_grad__locals__kernel_dbb568e2 dbb568e load on device 'metal:0' took 40.75 ms  (cached)
+Module _update_gradient_JTDAJ_dense_tiled__locals__kernel_08934a4c 0a91501 load on device 'metal:0' took 43.15 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_bb472188 b9b8957 load on device 'metal:0' took 41.05 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_8a0ef14a a329bde load on device 'metal:0' took 87.89 ms  (cached)
+Module _update_constraint_gradient_fused__locals__kernel_3d8dd919 0088948 load on device 'metal:0' took 53.45 ms  (cached)
+Module _update_gradient_h_incremental_cholesky__locals__kernel_5361c84c e8db51f load on device 'metal:0' took 45.45 ms  (cached)
+Module _solve_done__locals__kernel_db04f99f db04f99 load on device 'metal:0' took 44.13 ms  (cached)
+Module mujoco_warp._src.solver ac688f3 load on device 'metal:0' took 592.13 ms  (cached)
+Module mujoco_warp._src.forward ded0361 load on device 'metal:0' took 1567.20 ms  (cached)
+Module _next_time_builder__locals___next_time_b8bcdac8 b8bcdac load on device 'metal:0' took 342.45 ms  (cached)
+Module metalsim.physics.batch 74a3c65 load on device 'metal:0' took 340.04 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_6001f4ba 6001f4b load on device 'metal:0' took 339.44 ms  (cached)
+Module reset_data__locals__reset_M_8bbe9814 8bbe981 load on device 'metal:0' took 332.25 ms  (cached)
+Module reset_data__locals__reset_mocap_efef7c4d efef7c4 load on device 'metal:0' took 342.94 ms  (cached)
+Module reset_data__locals__reset_contact_389ef5a7 389ef5a load on device 'metal:0' took 352.74 ms  (cached)
+Module reset_data__locals__reset_sleep_60623600 6062360 load on device 'metal:0' took 332.38 ms  (cached)
+Module reset_data__locals__reset_nworld_6e0f2593 6e0f259 load on device 'metal:0' took 351.83 ms  (cached)
+Traceback (most recent call last):
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/rigid_det_diag.py", line 124, in <module>
+    main()
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/rigid_det_diag.py", line 112, in main
+    runs = [run(m, a.worlds, a.steps, bool(a.deterministic), bool(a.capture)) for _ in range(a.runs)]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/rigid_det_diag.py", line 62, in run
+    sim.check_overflow()
+  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/batch.py", line 457, in check_overflow
+    raise RuntimeError("Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter "
+RuntimeError: Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter calls differ between its two passes (research_notes/MPM in main simulator/deterministic_ccd_divergence.md)

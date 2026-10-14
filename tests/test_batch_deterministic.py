@@ -68,3 +68,25 @@ except RuntimeError as e:
         r = subprocess.run([sys.executable, "-c", code.format(root=str(ROOT), first=first, second=second)],
                            capture_output=True, text=True)
         assert "REFUSED" in r.stdout, (first, second, r.stdout[-1000:], r.stderr[-2000:])
+
+
+def test_stack_uses_deterministic_ccd_split():
+    """The stacked boxes' box-box contacts go through MuJoCo Warp's deterministic CCD split (solve + write kernels),
+    built in RUN_TO_RUN mode, and not through the single CCD kernel, whose slot counter breaks repeatability
+    (research_notes/MPM in main simulator/deterministic_ccd_divergence.md)."""
+    with tempfile.TemporaryDirectory() as d:
+        x, r = _diag("stack", 4, os.path.join(d, "s.json"), steps=160)
+    mods = x["ccd_modules"]["modules"]
+    assert any(n.startswith("ccd_det_kernels_builder") for n in mods), (mods, r.stdout[-500:])
+    assert not any(n.startswith("ccd_kernel_builder") for n in mods), mods
+    assert all(v == str(wp.DeterministicMode.RUN_TO_RUN) for v in mods.values()), mods
+
+
+def test_ccd_split_matches_single_kernel():
+    """The split computes the same contacts as the single CCD kernel (bitwise, on CPU, at sampled steps of the
+    stacked-boxes scene)."""
+    with tempfile.TemporaryDirectory() as d:
+        env = dict(os.environ, WARP_CACHE_PATH=os.path.join(d, "cache"))
+        r = subprocess.run([sys.executable, "-m", "metalsim.physics.mpm.probes.ccd_split_equiv", "--device", "cpu",
+                            "--worlds", "8", "--steps", "200"], capture_output=True, text=True, env=env, cwd=ROOT)
+    assert r.returncode == 0, (r.stdout[-2000:], r.stderr[-2000:])
