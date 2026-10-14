@@ -16,16 +16,28 @@ built by `scripts/setup_newton152.sh` and `scripts/setup_newton.sh`, and about 5
 
 ```
 git clone https://github.com/pulipakaa24/MetalSim && cd MetalSim
-python3.12 -m venv .venv && source .venv/bin/activate     # uv only: $(uv python find 3.12) -m venv .venv
-pip install -e ".[test]"
+python3.12 -m venv .venv && source .venv/bin/activate     # uv only: "$(uv python find 3.12)" -m venv .venv
+pip install -e ".[test,newton]"
 scripts/setup_warp.sh
 pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@f1b35e2b3ddc80b197b0c665bf6d71523d175daf#egg=mujoco-warp" "mujoco>=3.14,<3.15"      # pinned: README "Install"
 scripts/fetch_isaac_assets.sh
+git clone --depth 1 https://github.com/google-deepmind/mujoco_menagerie upstream/mujoco_menagerie
 pytest tests -q
+scripts/setup_newton152.sh                 # MPM and Franka-Pour: .venv-newton152 (below)
+scripts/fetch_polyhaven_assets.sh demo     # the ANYmal-on-sand render demo's HDRI and sand texture
 ```
 
+Run every command from the repository root; the clone can live anywhere, under any user and in a directory whose
+path has spaces. `newton` in the first `pip install` is Newton 1.7 (the `newton` extra), which MPM in `BatchSim`
+scenes (section 2, `tests/test_mpm_main.py`) and the Newton engine import; install it before `scripts/setup_warp.sh`,
+so the fork replaces the PyPI Warp it pulls in. `scripts/fetch_isaac_assets.sh` fetches NVIDIA's `g1_minimal.usd`
+(the G1 tasks) and the Franka-Pour scene (15 files, SHA-256 checked) from NVIDIA's public asset store.
+MuJoCo Menagerie supplies the robot models some tests, the ANYmal demo render and the Franka probes load
+(`MENAGERIE` points elsewhere); without it those tests are skipped.
+
 On a fresh clone (2026-09-25, M4 Max, fast network, pip's download cache and Warp's kernel cache
-already filled) the install took one to one and a half minutes and the tests two and a half minutes;
+already filled) the install took one to one and a half minutes and the tests two and a half minutes (113
+tests then; the suite has grown since: about 6 minutes for `pytest tests` on 2026-10-13, `runs/eqfix/rigid_suite.log`);
 with empty caches expect several more minutes for the PyTorch download and the first Metal kernel
 compilations. The tests use the GPU; a few compare GPU results bit for bit and have failed
 intermittently while other GPU jobs were running, so run them on an otherwise idle GPU. `pip install -e .` without `[test]` is enough
@@ -41,8 +53,8 @@ to run everything except the tests. Optional extras:
 | `learn` | the Stable-Baselines3 baseline (gymnasium, stable-baselines3) |
 
 Install several at once with `pip install -e ".[test,parity]"`. Tests that need a missing optional
-package are skipped, not failed. Three physics tests also look for MuJoCo Menagerie models; to run
-them: `git clone https://github.com/google-deepmind/mujoco_menagerie upstream/mujoco_menagerie`.
+package are skipped, not failed, as are tests whose data is absent (MuJoCo Menagerie, the Isaac assets, Isaac
+Lab's source trees under `upstream/`).
 
 `pip install -e .` first installs `warp-lang` from PyPI (a dependency declared in `pyproject.toml`);
 `scripts/setup_warp.sh` then replaces it with the fork below. Check with
@@ -50,8 +62,9 @@ them: `git clone https://github.com/google-deepmind/mujoco_menagerie upstream/mu
 
 MPM (Isaac Lab 3.0-EA's Newton 1.5.2 implicit MPM, `metalsim/physics/mpm/MPM.md`) runs in a second environment,
 `.venv-newton152`, built after the steps above by `scripts/setup_newton152.sh` (Newton fork branch `metalsim-1.5.2`
-at a pinned commit, the same Warp checkout, mujoco-warp 3.11.0, pinned third-party versions). Its tests:
-`.venv-newton152/bin/python -m pytest tests/test_mpm.py`. Every setup script pins its fork commit and takes
+at a pinned commit, the same Warp checkout, mujoco-warp 3.11.0, PyTorch, pyobjc and ninja at the pinned versions of
+`scripts/requirements-newton152.txt`; it needs `uv`). Re-running it brings an existing environment up to that list.
+Its tests: `.venv-newton152/bin/python -m pytest tests/test_mpm.py`. Every setup script pins its fork commit and takes
 `METALSIM_*_REPO` / `METALSIM_*_REF` overrides; if a fork cannot be cloned it rebuilds the same tree from upstream
 plus the diff in `patches/`.
 
@@ -61,7 +74,7 @@ MetalSim depends on three forked projects, none of them on PyPI in this form. Th
 what the current results were produced with. Each fork's branch head adds only a `METALSIM_CHANGES.md` (the list of MetalSim
 commits on that branch) on top of the commit named here, so installing the branch gives the same code.
 
-**Warp** ([pulipakaa24/warp](https://github.com/pulipakaa24/warp), branch `metalsim`, pinned commit `95f6f121`;
+**Warp** ([pulipakaa24/warp](https://github.com/pulipakaa24/warp), branch `metalsim`, pinned commit `31cf79d7`;
 the rigid-body results were produced at `f194006` and `c200d46b`, see the README). NVIDIA Warp with innate-inc's
 Metal backend, plus MetalSim commits; the first seven: interop entry
 points (Metal device, queue and buffer handles, cross-queue events, used for zero-copy PyTorch MPS
@@ -73,13 +86,16 @@ tile Cholesky (`wp.config.metal_register_cholesky_max`), `segmented_sort_pairs` 
 (default `upstream/warp-metalsim`), builds the native library with `build_lib.py --no-cuda` and
 installs it editable. `METALSIM_WARP_REPO` and `METALSIM_WARP_REF` (branch, tag or commit) point it
 elsewhere. If the fork cannot be cloned, the script clones innate-inc/warp at `ce15f6b` and applies
-`patches/warp/metalsim-95f6f121.diff`, which gives the same source tree as `95f6f121` (`patches/warp/0001-0007` are
+`patches/warp/metalsim-31cf79d7.diff`, which gives the same source tree as `31cf79d7` (`patches/warp/0001-0007` are
 the first seven commits, the tree of `f194006`). The commits since (MPM, scalable deterministic mode, FMA contraction
 from `fuse_fp`, GPU sort / BSR / NanoVDB builders, `fast_math` forms with `warp.config.metal_fast_math = "off"` by
 default) are listed in the branch's `METALSIM_CHANGES.md` and in `metalsim/physics/mpm/MPM.md`.
 
 **MuJoCo Warp** ([pulipakaa24/mujoco_warp](https://github.com/pulipakaa24/mujoco_warp), branch
-`metalsim`, commit `8fbf965`). Google DeepMind's MuJoCo Warp v3.14.0 (`88af9cc`) with sixteen commits:
+`metalsim`, pinned commit `f1b35e2`, installed by the `pip install` line above; the commits since `8fbf965`, which
+this paragraph describes, are listed in the README's "MuJoCo Warp fork" section: elliptic cones on Metal, the fused and
+early-exiting Newton iterations, scratch reuse, the equality block at `njmax`). Google DeepMind's MuJoCo Warp v3.14.0
+(`88af9cc`) with, up to `8fbf965`, sixteen commits:
 the Metal device patch, heightfield contacts computed against each prism's top plane (upstream
 produced inverted normals and launched worlds on rough terrain), and the plane-to-convex contact set of
 MuJoCo C (upstream kept 2 contacts where MuJoCo C keeps 4 on a tilted foot), with an environment switch
@@ -90,8 +106,10 @@ match MuJoCo C (per-pair contact cap and selection, box-triangle and cable-capsu
 every flex, active-layer volume contacts, mesh normals), order flex equality rows deterministically (the Metal
 `FlexConstraintTest` failures) and sort on the device on Metal; each behind a `collision_flex` flag
 (`scripts/diagnostics/deformable/UPSTREAM.md`). The same sixteen commits (flex ones rebased linearly after the
-throughput ones; identical tree to the merge `8fbf965`) are in `patches/mujoco_warp/`; to build without the fork, clone google-deepmind/mujoco_warp at
-`88af9cc`, `git am` those patches and `pip install -e` the checkout.
+throughput ones; identical tree to the merge `8fbf965`) are in `patches/mujoco_warp/0001-0016`. To build the pinned
+tree without the fork, clone google-deepmind/mujoco_warp at `88af9cc`, `git apply`
+`patches/mujoco_warp/metalsim-f1b35e2.diff` (the whole branch as one diff) and `pip install -e` the checkout (README
+"Install"). Superseded: "`git am` those patches" gives the `8fbf965` tree, not the pinned one.
 
 **Newton** ([pulipakaa24/newton](https://github.com/pulipakaa24/newton), branch `metalsim`, pinned commit
 `9f31739` = XPBD code `90e2332` plus the Metal fixes: HashTable, 64-bit atomics, mesh-SDF barrier, collision launches). Only needed for the experimental Newton XPBD engine. The fork fixes XPBD solver defects
@@ -211,15 +229,46 @@ installs PyTorch there too) and needs Isaac's assets (`scripts/fetch_isaac_asset
 .venv-newton152/bin/python -m metalsim.learn.franka_pour_ppo train --num-envs 2048 --iterations 3000 \
     --out runs/franka_pour/run0 [--resume runs/franka_pour/run0/model_last.pt]
 .venv-newton152/bin/python -m metalsim.learn.franka_pour_ppo bench --num-envs 2048 --mode step|rollout|ppo
+.venv-newton152/bin/python -m metalsim.learn.franka_pour_ppo bench --num-envs 16 --mode step --steps 5   # first check
 metalsim/learn/franka_pour_bench.sh scripts/gpu_run.sh .venv-newton152/bin/python 2048 mac   # all three, timing class
 scripts/gpu_run.sh test_pour check 20 -- .venv-newton152/bin/python -m pytest tests/test_franka_pour_terms.py
 ```
 
 The run writes `log.jsonl` (one record per iteration: rsl_rl's mean reward / episode length over the last 100
 episodes, the success rate of the episodes finished that iteration, Isaac's `Episode_Termination/*` and sampler
-metrics, losses) and checkpoints every 25 iterations. One iteration (96 steps x 2,048 envs) takes about 3 minutes on
-an M4 Max, so Isaac's 3,000 iterations take about 6 days. Large-world or new-kernel jobs run under
+metrics, losses) and checkpoints every 25 iterations (`--save-interval`; `model_<it>.pt` and `model_last.pt`;
+`touch <out>/STOP` pauses cleanly at the end of an iteration). One iteration (96 steps x 2,048 envs) takes about 3.3
+minutes on an M4 Max (979 env-steps/s, `PARITY.md` §1b.4), so Isaac's 3,000 iterations take about 7 days. Large-world or new-kernel jobs run under
 `scripts/watchdog.py` (kills a job on a CPU stall, memory ceiling or timeout).
+
+### MPM material in a BatchSim scene (main environment)
+
+Sand, snow, mud or viscous media in a scene whose robot runs on `BatchSim` (`.venv`, no second environment): the
+solver is Isaac Lab 3.0-EA's (Newton 1.5.2's implicit MPM, MetalSim's vendored copy of the fork), two-way coupled the
+way Isaac's `SolverCoupledProxy` couples it to MuJoCo Warp (`metalsim/physics/mpm/MPM.md` section 11):
+
+```python
+from metalsim.physics.mpm.coupled import MPMCoupling, MPMConfig, MPMMaterial, GridEmitter, SAND
+
+sim = BatchSim(model, num_envs=64, options=BatchSimOptions(substeps=3))
+mpm = MPMCoupling(sim, MPMConfig(voxel_size=0.02))          # Isaac's MPMSolverCfg fields + coupling settings
+mpm.add_emitter(GridEmitter(lower=(-.1, -.1, 0), upper=(.1, .1, .05), material=SAND))   # same material in every world
+mpm.finalize()
+mpm.step()                    # replaces sim.step(): MuJoCo substeps with the sand wrench, then the MPM step
+mpm.attach_renderer(renderer) # grains drawn straight from the solver's particle buffer
+```
+
+MuJoCo geoms (box, sphere, capsule, cylinder, plane, mesh, ellipsoid) are the colliders; `mpm.set_colliders(bodies=...)`
+limits the coupled bodies, `MPMConfig(proxy_mass="effective" | "body" | "kinematic", mode="staggered" | "lagged")`
+selects Isaac's exchange variant, `mpm.wrenches()` returns the sand wrench per coupled body, `mpm.reset(mask)` resets
+worlds. The material is bitwise repeatable run to run; MuJoCo Warp's own contact solve is not (docs/GAPS.md), so a
+scene repeats exactly only while its bodies touch nothing but sand. Tests: `scripts/gpu_run.sh test_mpm_main check 60 -- .venv/bin/python -m pytest
+tests/test_mpm_main.py`.
+A runnable example, a 2 kg box dropped on a sand bed in 2 worlds (needs the `newton` extra in `.venv`):
+
+```
+python metalsim/physics/mpm/probes/box_on_sand.py --engine metalsim --steps 60 --out runs/box_on_sand.npz
+```
 
 ### Rendering particles (MPM sand)
 
@@ -231,7 +280,36 @@ renderer.set_particles(state.particle_q, radius=0.005, grains_per_particle=27)  
 ```
 
 Details, options and limits: `metalsim/render/PARTICLES.md`. A path-traced demo of Newton's ANYmal-on-sand MPM
-example: `scripts/particle_demo/` (`sim_anymal.py` records it, `render_anymal.py` renders it).
+example: `scripts/particle_demo/` (`sim_anymal.py` records it in `.venv-newton152`, `render_anymal.py` renders it
+in `.venv` with MuJoCo Menagerie's ANYmal C and `scripts/fetch_polyhaven_assets.sh demo`). At small scale (about
+80 K particles x 8 grains, a few minutes):
+
+```
+.venv-newton152/bin/python scripts/particle_demo/sim_anymal.py --out runs/demo/anymal_small --seconds 1.5 \
+    --bed -0.3 -0.3 0 0.3 1.0 0.1
+python scripts/particle_demo/render_anymal.py --sim runs/demo/anymal_small --out runs/demo/anymal_small_frames \
+    --frames 0:2 --width 480 --height 270 --passes 4 --grains 8 --decor 0 0 0 0
+```
+
+The full demo (25 M grains) builds acceleration structures that are heavy for the GPU: run it alone, through the
+GPU queue under `scripts/watchdog.py`, on a machine you can reboot (`PARTICLES.md`).
+
+### Lidar and depth through glass (transparent geoms)
+
+The ray-traced lidar and depth camera see transparent geoms (MuJoCo `rgba` alpha < 1) the way Isaac's RTX sensors
+are documented to (`docs/PARITY.md`, `docs/RENDER_COVERAGE.md` section 3e):
+
+```python
+from metalsim.sensors.raytrace import RayTracer
+rt = RayTracer(model, num_envs, max_range=8.0)
+lidar = rt.make_lidar("lidar_site", azimuths, elevations,           # radians, one entry per beam
+                      transparency="transmit",                       # or "surface" / "behind" / "opaque"
+                      max_returns=2, return_mode="strongest_last")   # dual returns: the pane and what is behind
+rt.trace_host(datas, [lidar]); out = lidar.numpy()                  # out["range"], intensities, ...
+```
+
+A scene with three glass panes, every mode, with the time of each: `python
+scripts/diagnostics/sensor_transparency_cost.py --n 64`; the tests: `tests/test_sensor_transparency.py`.
 
 ## 3. Bringing your own robot
 
@@ -365,14 +443,20 @@ python3 scripts/gpu_lock.py status
 
 `gpu_run.sh` waits for the GPU, runs the command, and releases the GPU when the command exits for any
 reason (it also kills the command if the wrapper is killed). `MINUTES` is an estimate shown to others.
+The command runs in the caller's directory (since 2026-10-13; before, it ran in the repo root, so `python -m ...`
+from a worktree imported the main checkout's packages); the queue's own files stay under the repo root.
 Classes, granted in this order when the GPU frees up (first come, first served within a class):
 
 | class | for |
 |---|---|
 | `timing` | benchmarks and profiles that need an idle GPU (at most 15 minutes) |
 | `render` | renders and short rollouts |
+| `check` | correctness work that times nothing (tests, bitwise recordings, parity runs): up to three check jobs share the GPU; they start only when no exclusive job holds the GPU or waits ahead of them, and a check job waiting more than 10 minutes goes ahead of timing jobs |
 | `train` | training runs |
 | `low` | background work, granted only when nothing else waits |
+
+A job refuses to start while the GPU shows runaway work (utilisation of 90 % or more with no owning process for 10
+minutes): the queue pauses and writes `runs/GPU_RUNAWAY_ALERT` (`scripts/gpu_run.sh`).
 
 **Updating the shared fork checkouts.** `scripts/fork_sync.sh` fast-forwards `upstream/mujoco_warp` and
 `upstream/warp-innate` to their `fork/metalsim` heads through the queue (timing class), so the working tree never
@@ -438,9 +522,9 @@ cost has not been measured, the table says so.
 | knob | where | effect | measured cost |
 |---|---|---|---|
 | physics step | `physics_dt` (G1 CLI's last positional argument, `--physics_dt`) | 2.5 ms instead of Isaac's 5 ms keeps Isaac's stiff explicit drives stable (blow-ups at 5 ms) at twice the substeps | [§1.4](PARITY.md#14-throughput-on-the-g1-task-isaacs-protocol-4096-envs) (5 ms vs 2.5 ms rows and the L4 comparison at both), [§1.5](PARITY.md#15-learning-on-the-g1-task) (blow-ups at 5 ms) |
-| solver iterations | `BatchSimOptions(solver_iterations=, ls_iterations=)` | MuJoCo Warp on Metal always runs the full budget (no early exit), so cost is linear in it; the G1 uses 10 / 20 | budget stated in [§1.4](PARITY.md#14-throughput-on-the-g1-task-isaacs-protocol-4096-envs); a sweep has not been measured |
+| solver iterations | `BatchSimOptions(solver_iterations=, ls_iterations=)` | the G1 uses a Newton cap of 20 under the elliptic default (10 pyramidal) and 20 line-search iterations; since 2026-09-26 captured Newton loops exit early per world on Metal (MuJoCo Warp fork `21be81b`, `MJW_METAL_ICB_EARLY_EXIT=0` disables; before, Metal always ran the full budget) | cap 10 vs 20 under elliptic cones and the early exit: [§1.4](PARITY.md#14-throughput-on-the-g1-task-isaacs-protocol-4096-envs), `docs/research/elliptic_warmstart_2026-09-26.md`; a full sweep has not been measured |
 | contact and constraint capacity | `BatchSimOptions(nconmax=, njmax=)` | too small overflows (flagged by the monitor, NaN on constraints); too large costs memory and launch size | [§1.4](PARITY.md#14-throughput-on-the-g1-task-isaacs-protocol-4096-envs) notes (`njmax` 256, 32 contact slots per world and why), [§1.6](PARITY.md#16-rough-terrain-mujoco-warps-heightfield-contacts-found-defective-and-patched) |
-| contact model | `metalsim.physics.contact_tuning` presets, `--contact_tuning` | stiffer contacts and hard limits move the replay closer to PhysX in some metrics | fidelity per preset: [§1.7](PARITY.md#17-fidelity-protocol-against-isaac-sim-51-on-an-l4-recorded-2026-09-24-physx--rtx); throughput cost not yet measured on an idle GPU |
+| contact model | `contact_cfg` (`--contact_cfg`), `metalsim.physics.contact_tuning` presets, `--contact_tuning` | stiffer contacts and hard limits move the replay closer to PhysX in some metrics; elliptic cones (the default) bring impact forces within 8 % of PhysX's | fidelity per preset: [§1.7](PARITY.md#17-fidelity-protocol-against-isaac-sim-51-on-an-l4-recorded-2026-09-24-physx--rtx); throughput: elliptic default 1.5× the pyramidal PPO-loop cost (section 3b, README), the pyramidal preset 11 % of the loop against MuJoCo's default contacts (`docs/research/throughput_regression_2026-09-25.md`) |
 | render tier and samples | `--tier`, `--spp`, `--bounces` (camera tasks), `Tier2Renderer` | tier 0 raster, tier 1 adds ray-traced shadows / AO / reflections, tier 2 path tracing is closest to Isaac's RTX frames | throughput per tier and spp: [§2](PARITY.md#2-platform-capabilities-the-workstreams-with-the-tests-behind-them) ("Tier 1 / tier 2 full rollouts"); image fidelity vs RTX: [§1.7](PARITY.md#17-fidelity-protocol-against-isaac-sim-51-on-an-l4-recorded-2026-09-24-physx--rtx) |
 | sensor extras | `metalsim.sensors.contact.ContactSensor`, lidar beam divergence and multi-return, radar-lite | Isaac's contact-sensor quantities; lidar echoes closer to RTX lidar | per-sensor cost in [§2](PARITY.md#2-platform-capabilities-the-workstreams-with-the-tests-behind-them) (contact sensor, lidar extras and radar rows) |
 | engine | `engine="newton"` | faster, looser joints | [§2.1](PARITY.md#21-contact-model-what-mujoco-can-do-and-newton-xpbd-on-metal-measured-2026-09-24-newton-xpbd-archived-as-experimental-on-2026-09-25-see-gapsmd), [§1.4](PARITY.md#14-throughput-on-the-g1-task-isaacs-protocol-4096-envs) (engine comparison) |
@@ -458,7 +542,10 @@ construction, partial, disproved, not testable here). In outline:
 - **Throughput** on Isaac's G1 benchmark protocol, against Isaac's published RTX 4090 figures and
   Isaac Lab measured on an L4 (§1.4). Speed figures are labelled measured, reported or estimated.
 - **Learning**: the same PPO configuration on Isaac's flat config reaches Isaac's return at the same
-  iteration (one seed each), with rsl_rl as a learner cross-check (§1.5).
+  iteration (three seeds ours, one Isaac's), with rsl_rl as a learner cross-check (§1.5); Isaac Lab 3.0-EA like for
+  like (§1.8).
+- **Franka-Pour** (Isaac Lab 3.0-EA's MPM manipulation task): asset, MDP terms against Isaac's own code, learner,
+  throughput and learning against Isaac on the L4 (§1b); the MPM solver itself in `metalsim/physics/mpm/MPM.md`.
 - **Physics and rendering fidelity** against a PhysX / RTX recording of the same open-loop protocol
   (§1.7), and policy transfer in both directions between the simulators.
 - **Platform features** (rendering tiers, sensors, replicator, interop) with their tests (§2), the

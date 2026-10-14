@@ -30,7 +30,7 @@ if _root:
 OFF = {}
 if "--off" in sys.argv:
     OFF = dict(haze=False, tendons="straight")
-MENAGERIE = os.environ.get("MENAGERIE", "/Users/aditya/robosim/upstream/mujoco_menagerie")
+MENAGERIE = os.environ.get("MENAGERIE", os.path.join(ROOT, "upstream", "mujoco_menagerie"))
 
 PRIMS = """<mujoco><worldbody><light directional="true" pos="0 0 3" dir="0.3 0.3 -0.9"/>
   <camera name="cam" pos="0.6 -0.6 0.5" quat="0.85 0.4 0.15 0.3"/><geom name="floor" type="plane" size="2 2 0.1" rgba="0.3 0.3 0.35 1"/>
