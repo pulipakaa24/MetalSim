@@ -1,0 +1,21 @@
+== Tue Oct 13 22:20:31 PDT 2026 batch_lanes1 start
+patching file 'warp/native/metal.mm'
+patching file 'warp/native/metal.h'
+    Name:             arm
+
+Warp build succeeded
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/latency/kcache_lanes/1.18.0.dev20260917
+lanes API True /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/warp_lanes/warp/__init__.py
+test_mpm on the lanes build: 15 passed, 1 xfailed in 120.02s (0:02:00)
+robot_only    7.76 ms/frame (p10 6.88, p90 9.61)
+sand_only    24.77 ms/frame (p10 24.38, p90 25.29)
+seq          31.56 ms/frame (p10 30.45, p90 33.60)
+conc         31.16 ms/frame (p10 29.53, p90 32.79)
+seq 31.56 -> conc 31.16 ms/frame (gain 0.40; ideal 24.77); bitwise A True, B True
+OK
