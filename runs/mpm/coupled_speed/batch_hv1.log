@@ -1,0 +1,60 @@
+== Tue Oct 13 18:30:52 PDT 2026 batch_hv1 start
+patching file 'newton/examples/mpm/example_mpm_twoway_coupling.py'
+patching file 'newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py'
+patching file '/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/mainsim_hv/metalsim/physics/mpm/implicit_mpm/solver_implicit_mpm.py'
+MPM-main worktree 0d0a7230 4 local changes
+world ranges: vs float64 full 2.28e-07 compact 3.11e-07; full vs compact 2.78e-07; repeat bitwise True -> ok
+   full: 1.605 ms per call (1 worlds x 16 proxy bodies, 150000 nodes)
+   compact: 0.329 ms per call (1 worlds x 16 proxy bodies, 150000 nodes)
+no ranges (every body scans every node): vs float64 full 2.28e-07 compact 3.11e-07; full vs compact 2.78e-07; repeat bitwise True -> ok
+   full: 1.594 ms per call (1 worlds x 16 proxy bodies, 150000 nodes)
+   compact: 0.327 ms per call (1 worlds x 16 proxy bodies, 150000 nodes)
+OK
+world ranges: vs float64 full 2.11e-07 compact 1.32e-07; full vs compact 2.34e-07; repeat bitwise True -> ok
+   full: 1.673 ms per call (1 worlds x 64 proxy bodies, 150000 nodes)
+   compact: 0.333 ms per call (1 worlds x 64 proxy bodies, 150000 nodes)
+no ranges (every body scans every node): vs float64 full 2.11e-07 compact 1.32e-07; full vs compact 2.34e-07; repeat bitwise True -> ok
+   full: 1.664 ms per call (1 worlds x 64 proxy bodies, 150000 nodes)
+   compact: 0.331 ms per call (1 worlds x 64 proxy bodies, 150000 nodes)
+OK
+world ranges: vs float64 full 2.02e-07 compact 1.30e-07; full vs compact 2.40e-07; repeat bitwise True -> ok
+   full: 0.742 ms per call (64 worlds x 2 proxy bodies, 512000 nodes)
+   compact: 0.338 ms per call (64 worlds x 2 proxy bodies, 512000 nodes)
+no ranges (every body scans every node): vs float64 full 2.02e-07 compact 1.64e-07; full vs compact 3.00e-07; repeat bitwise True -> ok
+   full: 5.261 ms per call (64 worlds x 2 proxy bodies, 512000 nodes)
+   compact: 0.576 ms per call (64 worlds x 2 proxy bodies, 512000 nodes)
+OK
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.8 %
+[gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.3 %
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.9 %
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.4 %
+[gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.0 %
+ms_profile_b16_c0: coupled step took 152.74 ms
+ms_profile_b16_c0: harvest only took 15.79 ms
+ms_profile_b16_c1: coupled step took 138.12 ms
+ms_profile_b16_c1: harvest only took 1.67 ms
+ms_profile_b64_c0: coupled step took 153.23 ms
+ms_profile_b64_c0: harvest only took 15.57 ms
+ms_profile_b64_c1: coupled step took 134.76 ms
+ms_profile_b64_c1: harvest only took 1.48 ms
+MPMCoupling on vs on: bitwise equal over 30 steps
+MPMCoupling on vs off: first differs at step 1
+| bodies | off: ms/step (runs) | on: ms/step (runs) | on / off |
+|---|---|---|---|
+| 4 | 47.72 (48.01 / 47.44) | 32.31 (32.23 / 32.40) | 0.68 |
+| 16 | 49.34 (49.27 / 49.42) | 34.16 (34.41 / 33.91) | 0.69 |
+| 64 | 80.70 (80.76 / 80.64) | 65.18 (65.16 / 65.19) | 0.81 |
+Franka-Pour on vs on: bitwise equal over 30 steps
+Franka-Pour off vs batch_02 trees (expected equal): bitwise equal over 30 steps
+Franka-Pour on vs off: first differs at step 0
+pour2048_c1_r1 1.803 s/step
+pour2048_c0_r1 1.804 s/step
+pour2048_c1_r2 1.816 s/step
+pour2048_c0_r2 1.799 s/step
