@@ -1,0 +1,23 @@
+{
+ "scene": "example:mpm_twoway_coupling",
+ "device": "metal:0",
+ "frame_ms_synced": 93.81004789975123,
+ "parts_ms_per_frame": {
+  "example.simulate": 93.80536065000342,
+  "example.simulate_sand": 68.42713754886063,
+  "mpm_solver.step (SolverImplicitMPM)": 67.1974582990515,
+  "solver.step (SolverMuJoCo)": 16.646064598899102,
+  "example.compute_body_forces": 4.012406300171278,
+  "collision_pipeline.collide (CollisionPipeline)": 3.435077149333665,
+  "example.collect_collider_impulses": 1.057935347489547
+ },
+ "calls_per_frame": {
+  "example.compute_body_forces": 4.0,
+  "collision_pipeline.collide (CollisionPipeline)": 4.0,
+  "solver.step (SolverMuJoCo)": 4.0,
+  "mpm_solver.step (SolverImplicitMPM)": 1.0,
+  "example.collect_collider_impulses": 1.0,
+  "example.simulate_sand": 1.0,
+  "example.simulate": 1.0
+ }
+}

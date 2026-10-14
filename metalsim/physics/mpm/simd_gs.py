@@ -1,3 +1,8 @@
+# SPDX-License-Identifier: MIT AND Apache-2.0
+# MetalSim code, MIT (see LICENSE). Adapted from Newton 1.5.2 (newton-physics/newton tag v1.5.2,
+# newton/_src/solvers/implicit_mpm/rheology_solver_kernels.py: make_gs_solve_kernel, make_compute_local_strain),
+# SPDX-FileCopyrightText: Copyright (c) 2026 The Newton Developers, Apache-2.0. Modified by MetalSim: kernel arguments and colored loop kept; the strain-row and compliance sums
+# are split over 8 SIMD lanes with simd_shuffle in Newton's summation order. See THIRD_PARTY_NOTICES.md.
 """SIMD-cooperative colored Gauss-Seidel sweep for Newton 1.5.2's implicit MPM on Metal.
 
 Why: one color of the granular example holds ~1,100 strain nodes, one thread each in Newton's kernel, i.e. under one

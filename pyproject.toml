@@ -4,7 +4,7 @@ version = "0.0.1"
 description = "Isaac Sim / Isaac Lab-parity robot simulation native to Apple silicon: MuJoCo Warp physics on Metal, rendering, sensors, data generation and RL"
 readme = "README.md"
 requires-python = ">=3.12"
-license = "MIT"
+license = "MIT AND Apache-2.0"   # Apache-2.0: the vendored Newton solver, metalsim/physics/mpm/implicit_mpm (THIRD_PARTY_NOTICES.md)
 license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md", "licenses/*"]
 authors = [{ name = "Aditya Pulipaka", email = "adipu@utexas.edu" }]
 keywords = ["robotics", "simulation", "reinforcement-learning", "apple-silicon", "metal", "mujoco", "isaac-lab"]
@@ -29,6 +29,7 @@ dependencies = [
     "usd-core",    # pxr: the USD scene layer (metalsim.scene), imported by the G1 task
     "scipy",       # Isaac's rough-terrain generator (metalsim.learn.isaac_terrain)
     "ninja",       # torch.utils.cpp_extension builds the Metal interop bridge (metalsim_torch_metal_bridge) with it
+    "pyoidn",      # Open Image Denoise 2.x with its Metal device: tier 2's denoise="oidn" (metalsim.render.denoise)
 ]
 
 [project.optional-dependencies]
@@ -60,6 +61,9 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 include = ["metalsim*"]
+
+[tool.setuptools.package-data]
+"metalsim.physics.mpm.implicit_mpm" = ["NOTICE.txt", "SOURCE.txt"]   # the vendored Newton package's licence notice
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

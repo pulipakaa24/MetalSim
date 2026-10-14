@@ -79,10 +79,11 @@ from metalsim.render.hdr import extract_sun, load_hdr
 from metalsim.render.particles import GrainMaterial
 from metalsim.render.tier2 import Tier2Renderer
 
-MENAGERIE = os.path.join(ROOT, "upstream", "mujoco_menagerie", "anybotics_anymal_c", "anymal_c.xml")
-if not os.path.exists(MENAGERIE):
-    MENAGERIE = "/Users/aditya/robosim/upstream/mujoco_menagerie/anybotics_anymal_c/anymal_c.xml"
-PH = os.environ.get("POLYHAVEN", "/Users/aditya/robosim/assets/polyhaven")
+# MuJoCo Menagerie (git clone https://github.com/google-deepmind/mujoco_menagerie upstream/mujoco_menagerie) and the
+# Poly Haven demo assets (scripts/fetch_polyhaven_assets.sh demo); MENAGERIE / POLYHAVEN point elsewhere
+MENAGERIE = os.path.join(os.environ.get("MENAGERIE", os.path.join(ROOT, "upstream", "mujoco_menagerie")),
+                         "anybotics_anymal_c", "anymal_c.xml")
+PH = os.environ.get("POLYHAVEN", os.path.join(ROOT, "assets", "polyhaven"))
 hdri = a.hdri or os.path.join(PH, "hdri", "demo", "goegap_8k.hdr")
 sand_tex = a.sand_tex or os.path.join(PH, "tex", "demo", "coast_sand_01_diff_2k.png")
 os.makedirs(a.out, exist_ok=True)

@@ -27,10 +27,25 @@ import types
 import torch
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-IL = os.environ.get("ISAACLAB3_SOURCE", os.path.join(os.path.dirname(ROOT) if ".claude" in ROOT else ROOT,
-                                                      "upstream", "IsaacLab3", "source"))
-if not os.path.isdir(IL):   # worktrees live in <repo>/.claude/worktrees/<name>: upstream/ is the main checkout's
-    IL = os.path.join(ROOT.split("/.claude/")[0], "upstream", "IsaacLab3", "source")
+
+
+def _main_checkout(root):
+    """The main checkout of a git worktree (its .git is a file "gitdir: <main>/.git/worktrees/<name>"), else root."""
+    try:
+        with open(os.path.join(root, ".git")) as f:
+            gitdir = f.read().strip().removeprefix("gitdir:").strip()
+    except OSError:   # a directory (a normal clone) or no git at all
+        return root
+    gitdir = os.path.normpath(os.path.join(root, gitdir))
+    marker = os.sep + os.path.join(".git", "worktrees") + os.sep
+    return gitdir.split(marker)[0] if marker in gitdir else root
+
+
+# Isaac Lab 3.0-EA's source tree: $ISAACLAB3_SOURCE, else upstream/IsaacLab3/source of this checkout or, in a git
+# worktree, of its main checkout (the tests that need it skip without it)
+IL = os.environ.get("ISAACLAB3_SOURCE", os.path.join(ROOT, "upstream", "IsaacLab3", "source"))
+if not os.path.isdir(IL):
+    IL = os.path.join(_main_checkout(ROOT), "upstream", "IsaacLab3", "source")
 TASK = os.path.join(IL, "isaaclab_tasks", "isaaclab_tasks", "contrib", "franka_pour")
 AVAILABLE = os.path.isfile(os.path.join(TASK, "pour_env_cfg.py"))
 

@@ -189,6 +189,9 @@ Environments:
   with the rest of the bridge suites: 15 passed, 2 SolverMuJoCo skips) and of `metalsim-particle-render` (particles:
   passed). Those two WIP branches
   conflict with each other in `tier0.py` / `tier2.py` / `raytrace.py`, so they were not tested together.
+- **Since 2026-10-13 (PR #4)** both paths are on main (`metalsim/render/extras.py`, `set_particles` in tiers 0 and 2),
+  so the cloth and particle tests no longer skip for that reason (skip reasons of the 2026-10-13 audit run:
+  `runs/docs_audit/`). The two branches' conflicts were resolved in that merge.
 
 ## 3. Cost (measured)
 
