@@ -1,0 +1,17 @@
+......................sssssssss                                          [100%]
+=============================== warnings summary ===============================
+tests/test_render_newton_bridge.py::test_solver_mujoco_steps_render_like_mujoco_path
+  /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/newton-ht-mjw314-git/newton/_src/solvers/mujoco/solver_mujoco.py:3813: RuntimeWarning: MuJoCo dependency version mismatch with Newton's declared requirements: mujoco==3.14.0 (requires ~=3.12.0); mujoco-warp==3.14.0 (requires ~=3.12.0). Reinstall Newton dependencies, for example `uv pip install -e ".[examples]"`.
+    mujoco, _ = self.import_mujoco()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_g1_newton_engine.py:39: needs Isaac's g1_minimal.usd (scripts/fetch_isaac_assets.sh)
+SKIPPED [1] tests/test_g1_newton_engine.py:53: needs Isaac's g1_minimal.usd (scripts/fetch_isaac_assets.sh)
+SKIPPED [1] tests/test_g1_newton_engine.py:91: needs Isaac's g1_minimal.usd (scripts/fetch_isaac_assets.sh)
+SKIPPED [1] tests/test_g1_newton_engine.py:116: needs Isaac's g1_minimal.usd (scripts/fetch_isaac_assets.sh)
+SKIPPED [1] tests/test_g1_newton_engine.py:136: needs Isaac's g1_minimal.usd (scripts/fetch_isaac_assets.sh)
+SKIPPED [1] tests/test_g1_newton_engine.py:155: needs Isaac's g1_minimal.usd (scripts/fetch_isaac_assets.sh)
+SKIPPED [1] tests/test_g1_newton_engine.py:181: needs Isaac's g1_minimal.usd (scripts/fetch_isaac_assets.sh)
+SKIPPED [2] tests/test_g1_newton_engine.py:209: needs Isaac's g1_minimal.usd (scripts/fetch_isaac_assets.sh)
+22 passed, 9 skipped, 1 warning in 133.58s (0:02:13)
