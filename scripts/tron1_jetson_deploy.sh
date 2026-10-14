@@ -11,7 +11,10 @@ set -euo pipefail
 HOST="${1:-guest@172.16.15.31}"
 SSH=(ssh -i "$HOME/.ssh/tron1" -o ConnectTimeout=8 "$HOST")
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-SDK_WHL="${SDK_WHL:-/private/tmp/claude-501/-Users-aditya/bb1d4029-a069-4fee-a180-4e72d456a105/scratchpad/limx/limxsdk-lowlevel/python3/aarch64/limxsdk-4.1.1-cp38-abi3-manylinux_2_29_aarch64.whl}"
+# the LimX SDK wheel: python3/aarch64/limxsdk-4.1.1-cp38-abi3-manylinux_2_29_aarch64.whl in a clone of
+# github.com/limxdynamics/limxsdk-lowlevel (not redistributed here); default: such a clone under upstream/
+SDK_WHL="${SDK_WHL:-$ROOT/upstream/limxsdk-lowlevel/python3/aarch64/limxsdk-4.1.1-cp38-abi3-manylinux_2_29_aarch64.whl}"
+[ -f "$SDK_WHL" ] || { echo "no LimX SDK wheel at $SDK_WHL: git clone https://github.com/limxdynamics/limxsdk-lowlevel \"$ROOT/upstream/limxsdk-lowlevel\" or set SDK_WHL"; exit 2; }
 
 "${SSH[@]}" 'mkdir -p ~/tron1_ctrl/metalsim/tron1 ~/tron1_ctrl/assets/tron1 ~/tron1_ctrl/runs'
 rsync -az -e "ssh -i $HOME/.ssh/tron1" --exclude __pycache__ \

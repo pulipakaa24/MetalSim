@@ -35,7 +35,8 @@ def compare(model, cam, qpos=None, res=256, shadows=True, label="", out=None, ti
 
 if __name__ == "__main__":
     os.makedirs("docs/measurements", exist_ok=True)
-    scene = sys.argv[1] if len(sys.argv) > 1 else "assets/so101/scene_box_rl.xml"
+    scene = sys.argv[1] if len(sys.argv) > 1 else os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "assets/so101/scene_box_rl.xml")
     cam = sys.argv[2] if len(sys.argv) > 2 else "base_cam"
     m = mujoco.MjModel.from_xml_path(scene)
     compare(m, cam, qpos=[0.4, -0.3, 0.5, 0.2, 0.3, 0.5], shadows=False, label="so101 (no shadows)")

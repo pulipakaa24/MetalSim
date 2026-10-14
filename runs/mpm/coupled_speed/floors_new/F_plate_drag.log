@@ -1,0 +1,94 @@
+[gpu_run] mpmv_F_plate_drag start: device utilisation 0% (14:40:13)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/kcache_new/1.18.0.dev20260917
+Module validate_and_correct_inertia_kernel_e5f8239c e5f8239 load on device 'metal:0' took 39.03 ms  (cached)
+Module newton._src.geometry.bvh 66c2a94 load on device 'metal:0' took 41.78 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_model 1aa6787 load on device 'metal:0' took 37.36 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels 12a1da8 load on device 'metal:0' took 40.21 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.mark_active_cells_dadd69fb 1c47180 load on device 'metal:0' took 385.03 ms  (cached)
+Module warp.fem.utils a413ef8 load on device 'metal:0' took 39.25 ms  (cached)
+Module warp._src.fem.quadrature.pic_quadrature.dyn.bin_particles_92961d5a 4db367e load on device 'metal:0' took 676.37 ms  (cached)
+Module warp._src.fem.quadrature.pic_quadrature.dyn.finalize_cell_particle_data_a1f6a656 5d54796 load on device 'metal:0' took 406.87 ms  (cached)
+Module warp._src.fem.space.partition.dyn.node_category_from_cells_kernel_9b32ebc7 cb72b4a load on device 'metal:0' took 345.80 ms  (cached)
+Module warp.fem.space.partition c56bfe6 load on device 'metal:0' took 38.88 ms  (cached)
+Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_7d88edf9 b87e96d load on device 'metal:0' took 352.71 ms  (cached)
+Module warp.fem.space.restriction e6737f4 load on device 'metal:0' took 39.89 ms  (cached)
+Module warp._src.fem.space.partition.dyn.node_category_from_cells_kernel_52cd6274 a6415cb load on device 'metal:0' took 354.65 ms  (cached)
+Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_965050a0 039fe57 load on device 'metal:0' took 356.13 ms  (cached)
+Module warp._src.fem.space.partition.dyn.node_category_from_cells_kernel_453759b7 d08555b load on device 'metal:0' took 327.19 ms  (cached)
+Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_7a30481c 648a1f5 load on device 'metal:0' took 338.51 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.dyn.cell_color_251cbc29 04df9f4 load on device 'metal:0' took 39.29 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.integrate_fraction_491a47dd a2ec719 load on device 'metal:0' took 443.89 ms  (cached)
+Module newton._src.solvers.implicit_mpm.rasterized_collisions.world_position_08e7a994 72a414a load on device 'metal:0' took 849.17 ms  (cached)
+Module newton._src.solvers.implicit_mpm.rasterized_collisions c46eb0e load on device 'metal:0' took 47.90 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.collision_weight_field_20f9578b b1c919d load on device 'metal:0' took 491.06 ms  (cached)
+Module warp._src.metal_sparse 3a214fd load on device 'metal:0' took 39.20 ms  (cached)
+Module warp._src.metal_sparse 40c6c20 load on device 'metal:0' took 38.69 ms  (cached)
+Module warp._src.metal_sparse df332d9 load on device 'metal:0' took 38.43 ms  (cached)
+Module warp._src.metal_sparse 8c09c03 load on device 'metal:0' took 38.76 ms  (cached)
+Module _bsr_accumulate_triplet_values_1ba73229 0affc04 load on device 'metal:0' took 38.20 ms  (cached)
+Module warp._src.fem.quadrature.quadrature.dyn.quadrature_point_element_indices_c118c3aa 49fd8a3 load on device 'metal:0' took 368.26 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.integrate_velocity_9050d673 2208969 load on device 'metal:0' took 391.38 ms  (cached)
+Module warp._src.fem.field.virtual.dyn.dispatch_linear_kernel_fn_1221d673 7a5dbda load on device 'metal:0' took 470.83 ms  (compiled)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.integrate_velocity_apic_487b7748 84df191 load on device 'metal:0' took 446.74 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.integrate_mass_28b05702 2dfccf5 load on device 'metal:0' took 383.54 ms  (cached)
+Module warp._src.fem.field.virtual.dyn.dispatch_linear_kernel_fn_117af324 22d790e load on device 'metal:0' took 467.44 ms  (compiled)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.integrate_yield_parameters_e15bf7ae 0d5c827 load on device 'metal:0' took 423.77 ms  (cached)
+Module warp._src.fem.field.virtual.dyn.dispatch_linear_kernel_fn_cbebd830 92c6a72 load on device 'metal:0' took 485.40 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.integrate_active_fraction_1c54b8a1 62ad20d load on device 'metal:0' took 378.20 ms  (cached)
+Module warp._src.fem.field.virtual.dyn.dispatch_linear_kernel_fn_be05bfcd 93ab3aa load on device 'metal:0' took 448.12 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.strain_delta_form_b35fe5ea 3d0dfc5 load on device 'metal:0' took 394.87 ms  (cached)
+Module warp._src.fem.field.virtual.dyn.dispatch_bilinear_kernel_fn_52b75860 44653e3 load on device 'metal:0' took 539.15 ms  (cached)
+Module warp.fem.integrate._identity_field_67c19801 605569f load on device 'metal:0' took 1288.35 ms  (cached)
+Module warp.fem.integrate._identity_field_d14e12f4 cca2960 load on device 'metal:0' took 755.27 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.mass_form_7d7dbdb4 9d86966 load on device 'metal:0' took 391.32 ms  (cached)
+Module warp._src.fem.field.virtual.dyn.dispatch_bilinear_kernel_fn_f5700920 f5e4673 load on device 'metal:0' took 461.01 ms  (cached)
+Module warp.sparse 6b8b522 load on device 'metal:0' took 41.58 ms  (cached)
+Module _bsr_assign_copy_blocks_402e6063 35d59c0 load on device 'metal:0' took 40.59 ms  (cached)
+Module compute_eigenvalues_7b4a2440 381a6b1 load on device 'metal:0' took 43.08 ms  (cached)
+Module inverse_scale_vector_19f2738e 37efe77 load on device 'metal:0' took 38.41 ms  (cached)
+Module warp._src.metal_sparse e04cb9d load on device 'metal:0' took 39.92 ms  (cached)
+Module warp._src.metal_sparse d19631a load on device 'metal:0' took 39.84 ms  (cached)
+Module _bsr_transpose_values_e788d791 571b9d6 load on device 'metal:0' took 39.61 ms  (cached)
+Module newton._src.solvers.implicit_mpm.contact_solver_kernels d04b947 load on device 'metal:0' took 40.53 ms  (cached)
+Module newton._src.solvers.implicit_mpm.rheology_solver_kernels 79eaffa load on device 'metal:0' took 44.30 ms  (cached)
+Module newton._src.solvers.implicit_mpm.solve_rheology 0b4d467 load on device 'metal:0' took 41.72 ms  (cached)
+Module newton._src.solvers.implicit_mpm.rheology_solver_kernels d7dce88 load on device 'metal:0' took 881.89 ms  (cached)
+Module newton._src.solvers.implicit_mpm.rheology_solver_kernels.dyn.gs_solve_kernel_impl_4e352d82 69bfe8d load on device 'metal:0' took 607.95 ms  (cached)
+Module newton._src.solvers.implicit_mpm.solve_rheology 9d9442a load on device 'metal:0' took 506.57 ms  (cached)
+Module metalsim.physics.mpm.newton_compat d995f85 load on device 'metal:0' took 348.04 ms  (cached)
+Module scatter_field_dof_values_953ffc59 bbfb9a1 load on device 'metal:0' took 340.25 ms  (cached)
+Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_16b56c40 891a1f6 load on device 'metal:0' took 324.29 ms  (cached)
+Module warp.fem.integrate._identity_field_33a7d872 5aa6e66 load on device 'metal:0' took 693.38 ms  (cached)
+Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_539f9872 bb30496 load on device 'metal:0' took 470.93 ms  (cached)
+Module map_mul 030f1cc load on device 'metal:0' took 327.33 ms  (cached)
+frame 9/195 wall 39.9 ms
+frame 18/195 wall 40.3 ms
+frame 27/195 wall 40.6 ms
+frame 36/195 wall 41.1 ms
+frame 45/195 wall 40.3 ms
+frame 54/195 wall 40.7 ms
+frame 63/195 wall 40.9 ms
+frame 72/195 wall 40.5 ms
+frame 81/195 wall 40.6 ms
+frame 90/195 wall 40.7 ms
+frame 99/195 wall 40.5 ms
+frame 108/195 wall 40.9 ms
+frame 117/195 wall 41.6 ms
+frame 126/195 wall 41.5 ms
+frame 135/195 wall 42.0 ms
+frame 144/195 wall 41.4 ms
+frame 153/195 wall 41.4 ms
+frame 162/195 wall 41.6 ms
+frame 171/195 wall 41.4 ms
+frame 180/195 wall 42.6 ms
+frame 189/195 wall 42.6 ms
+done: 195 frames, 278846 particles, 23.94 s, iters mean 250.0 max 250, init cf0bd4947aa8d068644ef7256a77a98d
+[gpu_run] mpmv_F_plate_drag end: device utilisation 0% (14:40:48), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %

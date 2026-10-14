@@ -1,0 +1,972 @@
+{
+ "scene": "example:mpm_twoway_coupling",
+ "mode": "profile",
+ "set": {},
+ "frames": 6,
+ "particles": 0,
+ "wall_ms": [
+  80.27254100306891,
+  77.96558400150388,
+  80.60179199674167,
+  80.1641669968376,
+  80.63862498966046,
+  80.56066700373776
+ ],
+ "wall_median_ms": 80.41660400340334,
+ "iterations": [
+  50,
+  50,
+  50,
+  50,
+  50,
+  50
+ ],
+ "iterations_per_frame": 50.0,
+ "per_frame_counters": {
+  "host_waits": 20.0,
+  "command_buffers": 1890.0,
+  "host_ops": 0.0,
+  "dispatches_encoded": 1756.0
+ },
+ "kernels": [
+  {
+   "kernel": "gs_solve_kernel_impl_4e352d82_ed450839_metal_forward",
+   "ms_per_frame": 9.026333333333334,
+   "launches_per_frame": 400.0
+  },
+  {
+   "kernel": "sort_scatter_k8_v4",
+   "ms_per_frame": 1.9788333333333332,
+   "launches_per_frame": 47.0
+  },
+  {
+   "kernel": "solve_subgrid_friction_42405d68_metal_forward",
+   "ms_per_frame": 1.7215,
+   "launches_per_frame": 50.0
+  },
+  {
+   "kernel": "make_bsr_mv_tiled_kernel__locals__bsr_mv_tiled_kernel_e2d003c4_metal_forward",
+   "ms_per_frame": 1.5791666666666666,
+   "launches_per_frame": 51.0
+  },
+  {
+   "kernel": "sort_scatter_k4_v4",
+   "ms_per_frame": 1.4076666666666666,
+   "launches_per_frame": 50.0
+  },
+  {
+   "kernel": "wp_memtile",
+   "ms_per_frame": 1.0806666666666667,
+   "launches_per_frame": 21.0
+  },
+  {
+   "kernel": "wp_memset",
+   "ms_per_frame": 0.9843333333333333,
+   "launches_per_frame": 93.0
+  },
+  {
+   "kernel": "_prepare_node_sort_kernel_ae4385e0_metal_forward",
+   "ms_per_frame": 0.9723333333333333,
+   "launches_per_frame": 8.0
+  },
+  {
+   "kernel": "apply_subgrid_impulse_fe96c186_metal_forward",
+   "ms_per_frame": 0.9298333333333333,
+   "launches_per_frame": 51.0
+  },
+  {
+   "kernel": "integrate_velocity_apic_487b7748_00d1d1a8_metal_forward",
+   "ms_per_frame": 0.8300000000000001,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "sort_upsweep_k8",
+   "ms_per_frame": 0.8076666666666666,
+   "launches_per_frame": 47.0
+  },
+  {
+   "kernel": "NodePartition___scatter_partition_indices_acde3760_metal_forward",
+   "ms_per_frame": 0.7823333333333333,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "collision_weight_field_20f9578b_0d5b227c_metal_forward",
+   "ms_per_frame": 0.6858333333333334,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "sort_upsweep_k4",
+   "ms_per_frame": 0.6771666666666666,
+   "launches_per_frame": 50.0
+  },
+  {
+   "kernel": "_update_gradient_cholesky_blocked__locals__kernel_7223b709_metal_forward",
+   "ms_per_frame": 0.6288333333333334,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "sort_copy",
+   "ms_per_frame": 0.5845,
+   "launches_per_frame": 40.0
+  },
+  {
+   "kernel": "sort_scan_tiles",
+   "ms_per_frame": 0.5703333333333334,
+   "launches_per_frame": 97.0
+  },
+  {
+   "kernel": "create_narrow_phase_kernel_gjk_mpr__locals__narrow_phase_kernel_gjk_mpr_da3ef1c3_metal_forward",
+   "ms_per_frame": 0.5128333333333334,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "rle_lengths",
+   "ms_per_frame": 0.43733333333333335,
+   "launches_per_frame": 9.0
+  },
+  {
+   "kernel": "wp_bounded_prep",
+   "ms_per_frame": 0.3566666666666667,
+   "launches_per_frame": 89.0
+  },
+  {
+   "kernel": "_triplet_keys_u64_33bf8cc7_metal_forward",
+   "ms_per_frame": 0.3348333333333333,
+   "launches_per_frame": 2.0
+  },
+  {
+   "kernel": "_triplet_segments_e6937fe1_metal_forward",
+   "ms_per_frame": 0.33116666666666666,
+   "launches_per_frame": 2.0
+  },
+  {
+   "kernel": "_segment_heads_0501b94f_metal_forward",
+   "ms_per_frame": 0.33083333333333337,
+   "launches_per_frame": 2.0
+  },
+  {
+   "kernel": "det_counter_resolve_small",
+   "ms_per_frame": 0.2698333333333333,
+   "launches_per_frame": 20.0
+  },
+  {
+   "kernel": "scan_reduce_i4",
+   "ms_per_frame": 0.25466666666666665,
+   "launches_per_frame": 21.0
+  },
+  {
+   "kernel": "_transpose_columns_counted_be1ff0fb_metal_forward",
+   "ms_per_frame": 0.25416666666666665,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_transpose_keys_u64_2133bb01_metal_forward",
+   "ms_per_frame": 0.25366666666666665,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "convert_newton_contacts_to_mjwarp_kernel_2edc37a4_metal_forward",
+   "ms_per_frame": 0.25266666666666665,
+   "launches_per_frame": 8.0
+  },
+  {
+   "kernel": "_bsr_mv_listed_rows_95d7ca8a_metal_forward",
+   "ms_per_frame": 0.24983333333333335,
+   "launches_per_frame": 50.0
+  },
+  {
+   "kernel": "scan_down_i4",
+   "ms_per_frame": 0.24666666666666667,
+   "launches_per_frame": 21.0
+  },
+  {
+   "kernel": "sort_diff_k4",
+   "ms_per_frame": 0.24183333333333334,
+   "launches_per_frame": 13.0
+  },
+  {
+   "kernel": "strain_delta_form_b35fe5ea_b2705bd2_metal_forward",
+   "ms_per_frame": 0.227,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "advect_particles_539f9872_333d5ab0_metal_forward",
+   "ms_per_frame": 0.2115,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_triplet_keys_u32_8822c4ec_metal_forward",
+   "ms_per_frame": 0.20733333333333334,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_efc_contact_init__locals__kernel_89f269cc_metal_forward",
+   "ms_per_frame": 0.204,
+   "launches_per_frame": 8.0
+  },
+  {
+   "kernel": "_triplet_segments_2787cf31_metal_forward",
+   "ms_per_frame": 0.204,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "SpaceRestriction___split_vertex_element_index_d19d2c20_metal_forward",
+   "ms_per_frame": 0.2011666666666667,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_segment_heads_19f058c5_metal_forward",
+   "ms_per_frame": 0.20033333333333334,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_scatter_node_counts_654d0eae_metal_forward",
+   "ms_per_frame": 0.19499999999999998,
+   "launches_per_frame": 8.0
+  },
+  {
+   "kernel": "rle_count",
+   "ms_per_frame": 0.1875,
+   "launches_per_frame": 9.0
+  },
+  {
+   "kernel": "_identity_field_33a7d872_f6a72336_metal_forward",
+   "ms_per_frame": 0.18616666666666667,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_tiled_sum_kernel_7e4c592f_metal_forward",
+   "ms_per_frame": 0.18000000000000002,
+   "launches_per_frame": 20.0
+  },
+  {
+   "kernel": "integrate_yield_parameters_e15bf7ae_16271fd3_metal_forward",
+   "ms_per_frame": 0.17966666666666667,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "wp_memcpy",
+   "ms_per_frame": 0.1765,
+   "launches_per_frame": 20.0
+  },
+  {
+   "kernel": "_linesearch_iterative_kernel__locals__kernel_7c71f595_metal_forward",
+   "ms_per_frame": 0.1725,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "rle_scatter",
+   "ms_per_frame": 0.16466666666666666,
+   "launches_per_frame": 9.0
+  },
+  {
+   "kernel": "compute_delassus_diagonal_5fc0bd53_metal_forward",
+   "ms_per_frame": 0.15366666666666667,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "sum_body_force_lanes_c48535b8_metal_forward",
+   "ms_per_frame": 0.14983333333333335,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "dispatch_linear_kernel_fn_2e9eccdc_0582e428_metal_forward",
+   "ms_per_frame": 0.14983333333333335,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "flag_body_nodes_117a4145_metal_forward",
+   "ms_per_frame": 0.13749999999999998,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "compact_body_nodes_9e511067_metal_forward",
+   "ms_per_frame": 0.1345,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_JTDAJ_sparse__locals__kernel_ff479d92_metal_forward",
+   "ms_per_frame": 0.13333333333333333,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "sort_diff_k8",
+   "ms_per_frame": 0.13083333333333333,
+   "launches_per_frame": 7.0
+  },
+  {
+   "kernel": "make_bsr_mv_kernel__locals__bsr_mv_kernel_b10c6805_metal_forward",
+   "ms_per_frame": 0.12683333333333333,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "rasterize_collider_kernel_dc8fb173_metal_forward",
+   "ms_per_frame": 0.12166666666666666,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_small_cholesky_factorize_solve_block__locals__kernel_35b90ab6_metal_forward",
+   "ms_per_frame": 0.11633333333333333,
+   "launches_per_frame": 8.0
+  },
+  {
+   "kernel": "scan_spine_i4",
+   "ms_per_frame": 0.11566666666666665,
+   "launches_per_frame": 30.0
+  },
+  {
+   "kernel": "_masked_indices_kernel_dae50ed5_metal_forward",
+   "ms_per_frame": 0.11233333333333334,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "fill_element_node_indices_16b56c40_856e7da6_metal_forward",
+   "ms_per_frame": 0.10933333333333334,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "compute_collider_inv_mass_adf034e9_metal_forward",
+   "ms_per_frame": 0.1075,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "dispatch_linear_kernel_fn_d696e028_384d2aa8_metal_forward",
+   "ms_per_frame": 0.107,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "create_narrow_phase_primitive_kernel__locals__narrow_phase_primitive_kernel_81a38a1a_metal_forward",
+   "ms_per_frame": 0.106,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_update_constraint_init_qfrc_constraint_sparse__locals__kernel_4d324367_metal_forward",
+   "ms_per_frame": 0.105,
+   "launches_per_frame": 8.0
+  },
+  {
+   "kernel": "_compact_triplet_slots_f2196106_metal_forward",
+   "ms_per_frame": 0.10333333333333333,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_triplet_slot_valid_39cbbe9c_metal_forward",
+   "ms_per_frame": 0.10233333333333333,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "sort_plan",
+   "ms_per_frame": 0.10216666666666667,
+   "launches_per_frame": 20.0
+  },
+  {
+   "kernel": "dispatch_bilinear_kernel_fn_52b75860_4f5f4940_metal_forward",
+   "ms_per_frame": 0.09549999999999999,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "integrate_velocity_9050d673_b1bfb5c3_metal_forward",
+   "ms_per_frame": 0.09216666666666667,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_cfrc_backward_72237d38_metal_forward",
+   "ms_per_frame": 0.09150000000000001,
+   "launches_per_frame": 8.0
+  },
+  {
+   "kernel": "_identity_field_67c19801_81d8a73f_metal_forward",
+   "ms_per_frame": 0.08933333333333333,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "evaluate_strain_residual_545e9767_metal_forward",
+   "ms_per_frame": 0.08416666666666667,
+   "launches_per_frame": 10.0
+  },
+  {
+   "kernel": "_triplet_row_offsets_8c3a57ec_metal_forward",
+   "ms_per_frame": 0.07433333333333333,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "apply_stress_gs_d6f9fcd1_metal_forward",
+   "ms_per_frame": 0.07316666666666667,
+   "launches_per_frame": 8.0
+  },
+  {
+   "kernel": "_M_13671fca_metal_forward",
+   "ms_per_frame": 0.0725,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_efc_contact_jac_sparse__locals__kernel_c5d488bb_metal_forward",
+   "ms_per_frame": 0.071,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_subtree_com_acc_350f0560_metal_forward",
+   "ms_per_frame": 0.06716666666666667,
+   "launches_per_frame": 8.0
+  },
+  {
+   "kernel": "_bsr_accumulate_triplet_values_3b93b6b5_metal_forward",
+   "ms_per_frame": 0.06633333333333334,
+   "launches_per_frame": 5.0
+  },
+  {
+   "kernel": "scatter_field_dof_values_77fae76d_metal_forward",
+   "ms_per_frame": 0.064,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_triplet_row_offsets_d7020224_metal_forward",
+   "ms_per_frame": 0.06383333333333334,
+   "launches_per_frame": 2.0
+  },
+  {
+   "kernel": "det_counter_writeback",
+   "ms_per_frame": 0.06166666666666667,
+   "launches_per_frame": 20.0
+  },
+  {
+   "kernel": "_update_constraint_efc__locals__kernel_a4bbf43e_metal_forward",
+   "ms_per_frame": 0.061,
+   "launches_per_frame": 8.0
+  },
+  {
+   "kernel": "_preprocess_tactile_contacts_0f2dba1d_metal_forward",
+   "ms_per_frame": 0.059166666666666666,
+   "launches_per_frame": 8.0
+  },
+  {
+   "kernel": "apply_subgrid_impulse_warmstart_8cb56a7c_metal_forward",
+   "ms_per_frame": 0.057999999999999996,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "fill_collider_coupling_matrices_afe8fd1f_metal_forward",
+   "ms_per_frame": 0.05416666666666667,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "world_position_08e7a994_5a6c42b3_metal_forward",
+   "ms_per_frame": 0.050499999999999996,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_efc_contact_update__locals__kernel_2d4d3d06_metal_forward",
+   "ms_per_frame": 0.049499999999999995,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_friction_dof__locals__kernel_80445010_metal_forward",
+   "ms_per_frame": 0.044333333333333336,
+   "launches_per_frame": 8.0
+  },
+  {
+   "kernel": "compute_collider_delassus_diagonal_f1529e24_metal_forward",
+   "ms_per_frame": 0.043500000000000004,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "map_kernel_9ff10a0d_metal_forward",
+   "ms_per_frame": 0.043333333333333335,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_bsr_nonempty_row_flags_6ed2f0fd_metal_forward",
+   "ms_per_frame": 0.042166666666666665,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "mul_m_kernel__locals___mul_m_ff3bc617_metal_forward",
+   "ms_per_frame": 0.041,
+   "launches_per_frame": 8.0
+  },
+  {
+   "kernel": "compute_shape_aabbs_fcbde74c_metal_forward",
+   "ms_per_frame": 0.04,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "sort_diff_clear",
+   "ms_per_frame": 0.03966666666666666,
+   "launches_per_frame": 20.0
+  },
+  {
+   "kernel": "_apply_ft_1667a928_metal_forward",
+   "ms_per_frame": 0.03933333333333333,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_update_gradient_grad__locals__kernel_230cc1c2_metal_forward",
+   "ms_per_frame": 0.0385,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_kinematics_branch_95f8028e_metal_forward",
+   "ms_per_frame": 0.038,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_crb_accumulate_073a11b8_metal_forward",
+   "ms_per_frame": 0.0375,
+   "launches_per_frame": 8.0
+  },
+  {
+   "kernel": "_qderiv_tendon_damping_ec990995_metal_forward",
+   "ms_per_frame": 0.034999999999999996,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "convert_mj_coords_to_warp_kernel_55623290_metal_forward",
+   "ms_per_frame": 0.034833333333333334,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "eval_articulation_fk_6c60ba16_metal_forward",
+   "ms_per_frame": 0.034666666666666665,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "dispatch_linear_kernel_fn_cbebd830_28ab3e08_metal_forward",
+   "ms_per_frame": 0.034666666666666665,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "compute_body_forces_compact_lanes_bf854ce1_metal_forward",
+   "ms_per_frame": 0.033999999999999996,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "mass_form_7d7dbdb4_d84a914c_metal_forward",
+   "ms_per_frame": 0.03383333333333333,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_bsr_compact_rows_80a2749c_metal_forward",
+   "ms_per_frame": 0.03366666666666667,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "integrate_mass_28b05702_c70d38a8_metal_forward",
+   "ms_per_frame": 0.0335,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "finalize_cell_particle_data_a1f6a656_1c2f3bde_metal_forward",
+   "ms_per_frame": 0.03283333333333333,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_gather_full_kernel_9bd9289c_metal_forward",
+   "ms_per_frame": 0.03266666666666667,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "mark_active_cells_dadd69fb_02094b15_metal_forward",
+   "ms_per_frame": 0.03266666666666667,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "bin_particles_92961d5a_1f96a6b8_metal_forward",
+   "ms_per_frame": 0.03233333333333333,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "convert_warp_coords_to_mj_kernel_87f98e23_metal_forward",
+   "ms_per_frame": 0.03216666666666667,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_comvel_branch_0f933c58_metal_forward",
+   "ms_per_frame": 0.032,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "update_condition_98290a4b_metal_forward",
+   "ms_per_frame": 0.0305,
+   "launches_per_frame": 10.0
+  },
+  {
+   "kernel": "_spring_damper_dof_passive_7b46d40c_metal_forward",
+   "ms_per_frame": 0.030333333333333334,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "postprocess_stress_and_strain_8653b339_metal_forward",
+   "ms_per_frame": 0.028666666666666663,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "integrate_active_fraction_1c54b8a1_d0753b4d_metal_forward",
+   "ms_per_frame": 0.02816666666666667,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_backup_full_kernel_ae6b70b5_metal_forward",
+   "ms_per_frame": 0.028,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_cacc_branch_ffe1d6c4_metal_forward",
+   "ms_per_frame": 0.028,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_linesearch_jv_fused_kernel__locals__kernel_2fc0d410_metal_forward",
+   "ms_per_frame": 0.02716666666666667,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_next_position_1c101e8d_metal_forward",
+   "ms_per_frame": 0.02716666666666667,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_zero_qfrc_constraint_sparse_6b3cbe94_metal_forward",
+   "ms_per_frame": 0.027,
+   "launches_per_frame": 8.0
+  },
+  {
+   "kernel": "_solve_init_jaref_kernel__locals__kernel_8afe30e8_metal_forward",
+   "ms_per_frame": 0.0265,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_update_constraint_efc__locals__kernel_9c16a648_metal_forward",
+   "ms_per_frame": 0.026166666666666668,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_padding_h_cc932c7a_metal_forward",
+   "ms_per_frame": 0.0255,
+   "launches_per_frame": 8.0
+  },
+  {
+   "kernel": "_transpose_offsets_counted_500e3806_metal_forward",
+   "ms_per_frame": 0.024999999999999998,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "det_scatter_finalize",
+   "ms_per_frame": 0.024999999999999998,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_geom_local_to_global_e28b714c_metal_forward",
+   "ms_per_frame": 0.022833333333333334,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_qderiv_actuator_passive_6cbfee2a_metal_forward",
+   "ms_per_frame": 0.021333333333333333,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_cdof_3e73eb78_metal_forward",
+   "ms_per_frame": 0.021,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "free_velocity_05f582f0_metal_forward",
+   "ms_per_frame": 0.021,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_update_gradient_h_incremental_sparse__locals__kernel_97faacb1_metal_forward",
+   "ms_per_frame": 0.020666666666666667,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_next_time_builder__locals___next_time_9e67d474_metal_forward",
+   "ms_per_frame": 0.020666666666666667,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "fill_element_node_indices_965050a0_6f891278_metal_forward",
+   "ms_per_frame": 0.020666666666666667,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "apply_mjc_body_f_kernel_959969cf_metal_forward",
+   "ms_per_frame": 0.02033333333333333,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_update_gradient_grad__locals__kernel_e00be912_metal_forward",
+   "ms_per_frame": 0.020166666666666666,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "integrate_fraction_491a47dd_b78d0ccd_metal_forward",
+   "ms_per_frame": 0.02,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_solve_done_c8485047_metal_forward",
+   "ms_per_frame": 0.01983333333333333,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_update_gradient_init_h_sparse__locals__kernel_3d08e876_metal_forward",
+   "ms_per_frame": 0.01983333333333333,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "apply_mjc_qfrc_kernel_173e90ee_metal_forward",
+   "ms_per_frame": 0.0195,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_gravity_force_7c63ac28_metal_forward",
+   "ms_per_frame": 0.019333333333333334,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_subtree_div_0ef57c26_metal_forward",
+   "ms_per_frame": 0.01916666666666667,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_compute_body_inertial_frames_d3bdd81a_metal_forward",
+   "ms_per_frame": 0.019,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_qfrc_passive_ccf6028a_metal_forward",
+   "ms_per_frame": 0.018833333333333334,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_update_gradient_zero_grad_dot__locals__kernel_f84af473_metal_forward",
+   "ms_per_frame": 0.018333333333333333,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "apply_mjc_free_joint_f_to_body_f_kernel_376acabe_metal_forward",
+   "ms_per_frame": 0.018166666666666668,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "verify_narrow_phase_buffers_c234c2df_metal_forward",
+   "ms_per_frame": 0.018,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_cinert_1261260c_metal_forward",
+   "ms_per_frame": 0.017666666666666667,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_cfrc_3922b605_metal_forward",
+   "ms_per_frame": 0.017499999999999998,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_nxn_broadphase_precomputed_pairs_8be4a3a3_metal_forward",
+   "ms_per_frame": 0.015833333333333335,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_qfrc_smooth__locals__kernel_33de72f1_metal_forward",
+   "ms_per_frame": 0.015666666666666666,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_next_velocity_d66c2f53_metal_forward",
+   "ms_per_frame": 0.015666666666666666,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "dispatch_bilinear_kernel_fn_f5700920_ea79d4da_metal_forward",
+   "ms_per_frame": 0.0155,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_subtree_com_init_002b02fd_metal_forward",
+   "ms_per_frame": 0.0155,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_update_gradient_cholesky_blocked_skip_unchanged__locals__kernel_45fd57e7_metal_forward",
+   "ms_per_frame": 0.015333333333333332,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_prepare_sort_04dbf773_metal_forward",
+   "ms_per_frame": 0.015333333333333332,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_qfrc_constraint_from_grad_4e7e88b1_metal_forward",
+   "ms_per_frame": 0.015166666666666667,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_qfrc_bias_4085b6de_metal_forward",
+   "ms_per_frame": 0.015166666666666667,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "dispatch_linear_kernel_fn_be05bfcd_e72afaea_metal_forward",
+   "ms_per_frame": 0.015166666666666667,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_solve_init_dof__locals__kernel_149a5395_metal_forward",
+   "ms_per_frame": 0.015,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "node_category_from_cells_kernel_52cd6274_22f596d1_metal_forward",
+   "ms_per_frame": 0.014666666666666666,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_compute_body_matrices_27760750_metal_forward",
+   "ms_per_frame": 0.014166666666666668,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_zero_constraint_counts_82d999b9_metal_forward",
+   "ms_per_frame": 0.013166666666666667,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_update_gradient_zero_grad_dot__locals__kernel_c1c72bbd_metal_forward",
+   "ms_per_frame": 0.012833333333333334,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_cacc_world_6ec26fdb_metal_forward",
+   "ms_per_frame": 0.012666666666666666,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_identity_field_d14e12f4_10d78a24_metal_forward",
+   "ms_per_frame": 0.012499999999999999,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_solve_init_efc_a1db7ec5_metal_forward",
+   "ms_per_frame": 0.011333333333333334,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_comvel_root_15820f35_metal_forward",
+   "ms_per_frame": 0.011333333333333334,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_zero_change_counters_939878a2_metal_forward",
+   "ms_per_frame": 0.011166666666666667,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "_snapshot_nacon_count_b40012cc_metal_forward",
+   "ms_per_frame": 0.010333333333333333,
+   "launches_per_frame": 4.0
+  },
+  {
+   "kernel": "preprocess_stress_and_strain_41a99b60_metal_forward",
+   "ms_per_frame": 0.010166666666666666,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_bsr_assign_copy_blocks_efac61cd_metal_forward",
+   "ms_per_frame": 0.009833333333333333,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "quadrature_point_element_indices_c118c3aa_fd0c663a_metal_forward",
+   "ms_per_frame": 0.009,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "fill_element_node_indices_7d88edf9_2d6e62ad_metal_forward",
+   "ms_per_frame": 0.008333333333333333,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "fill_element_node_indices_7a30481c_66c73b68_metal_forward",
+   "ms_per_frame": 0.008166666666666668,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_bsr_transpose_values_a814354d_metal_forward",
+   "ms_per_frame": 0.008,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "SpaceRestriction___scale_count_9da9cd07_metal_forward",
+   "ms_per_frame": 0.007666666666666666,
+   "launches_per_frame": 3.0
+  },
+  {
+   "kernel": "_bsr_assign_list_blocks_156045b1_metal_forward",
+   "ms_per_frame": 0.007333333333333333,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "compute_eigenvalues_398d95c6_metal_forward",
+   "ms_per_frame": 0.007,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "node_category_from_cells_kernel_9b32ebc7_b4f82049_metal_forward",
+   "ms_per_frame": 0.006166666666666667,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "inverse_scale_vector_be470fd2_metal_forward",
+   "ms_per_frame": 0.005999999999999999,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_scaled_last_entry_252cf542_metal_forward",
+   "ms_per_frame": 0.005666666666666667,
+   "launches_per_frame": 2.0
+  },
+  {
+   "kernel": "cell_color_251cbc29_1b16d4a9_metal_forward",
+   "ms_per_frame": 0.0055000000000000005,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "array_copy",
+   "ms_per_frame": 0.005333333333333333,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "node_category_from_cells_kernel_453759b7_1a1bbe25_metal_forward",
+   "ms_per_frame": 0.004666666666666667,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "subtract_body_force_06b31ba5_metal_forward",
+   "ms_per_frame": 0.004333333333333333,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "fill_uniform_color_block_indices_d688ca40_metal_forward",
+   "ms_per_frame": 0.003833333333333333,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "compute_color_offsets_a5c4efbd_metal_forward",
+   "ms_per_frame": 0.0033333333333333335,
+   "launches_per_frame": 1.0
+  },
+  {
+   "kernel": "_masked_index_count_kernel_83dd5524_metal_forward",
+   "ms_per_frame": 0.0023333333333333335,
+   "launches_per_frame": 1.0
+  }
+ ],
+ "kernel_total_ms_per_frame": 38.445,
+ "launches_per_frame": 1890.0,
+ "empty_cb_us_dim1": 4.968,
+ "empty_cb_us_dim5120": 2.689
+}

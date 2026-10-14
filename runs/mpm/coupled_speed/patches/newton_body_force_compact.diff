@@ -1,0 +1,142 @@
+--- a/newton/examples/mpm/example_mpm_twoway_coupling.py
++++ b/newton/examples/mpm/example_mpm_twoway_coupling.py
+@@ -88,6 +88,73 @@
+                 f_world = collider_impulses[i] / dt
+                 r = collider_impulse_pos[i] - com
+                 f += wp.spatial_vector(f_world, wp.cross(r, f_world))
++    body_f_lanes[body_index, lane] = f
++
++
++@wp.kernel
++def flag_body_nodes(
++    node_count: int,
++    collider_ids: wp.array[int],
++    body_ids: wp.array[int],
++    flags: wp.array[int],
++):
++    """1 for the grid nodes whose collider belongs to a body, 0 otherwise (the compaction's keep flags)."""
++    i = wp.tid()
++    keep = 0
++    if i < node_count:
++        cid = collider_ids[i]
++        if cid >= 0 and cid < body_ids.shape[0]:
++            if body_ids[cid] >= 0:
++                keep = 1
++    flags[i] = keep
++
++
++@wp.kernel
++def compact_body_nodes(
++    node_count: int,
++    flags: wp.array[int],
++    positions: wp.array[int],
++    nodes: wp.array[int],
++    count: wp.array[int],
++):
++    """Stable compaction: the kept node indices in increasing order, and their count (read on the device)."""
++    i = wp.tid()
++    if flags[i] != 0:
++        nodes[positions[i]] = i
++    if i == node_count - 1:
++        count[0] = positions[i] + flags[i]
++
++
++@wp.kernel
++def compute_body_forces_compact_lanes(
++    dt: float,
++    count: wp.array[int],
++    nodes: wp.array[int],
++    collider_ids: wp.array[int],
++    collider_impulses: wp.array[wp.vec3],
++    collider_impulse_pos: wp.array[wp.vec3],
++    body_ids: wp.array[int],
++    body_q: wp.array[wp.transform],
++    body_com: wp.array[wp.vec3],
++    body_f_lanes: wp.array2d[wp.spatial_vector],
++):
++    """:func:`compute_body_forces_lanes` over the compacted body nodes: lane ``l`` adds the kept nodes
++    ``l, l + L, l + 2L, ...`` (in node order) that belong to its body. The scan reads only the nodes in contact with a
++    body instead of every grid node, for every body."""
++
++    body_index, lane = wp.tid()
++    lane_count = body_f_lanes.shape[1]
++
++    X_wb = body_q[body_index]
++    com = wp.transform_point(X_wb, body_com[body_index])
++
++    f = wp.spatial_vector()
++    for k in range(lane, count[0], lane_count):
++        i = nodes[k]
++        if body_ids[collider_ids[i]] == body_index:
++            f_world = collider_impulses[i] / dt
++            r = collider_impulse_pos[i] - com
++            f += wp.spatial_vector(f_world, wp.cross(r, f_world))
+     body_f_lanes[body_index, lane] = f
+ 
+ 
+@@ -229,7 +296,17 @@
+             dtype=wp.spatial_vector,
+             device=self.model.device,
+         )
++        # Compaction of the nodes in contact with a body before the ordered sum (NEWTON_METAL_BODY_FORCE_COMPACT=0: scan
++        # every grid node for every body, as before): same per-node terms, summed in another fixed lane order
++        import os  # noqa: PLC0415
+ 
++        self.compact_body_forces = self.ordered_body_forces and os.environ.get("NEWTON_METAL_BODY_FORCE_COMPACT", "1") != "0"
++        n_cap = self.collider_impulse_ids.shape[0] if self.compact_body_forces else 0
++        self.body_node_flags = wp.zeros(n_cap, dtype=int, device=self.model.device)
++        self.body_node_positions = wp.zeros(n_cap, dtype=int, device=self.model.device)
++        self.body_nodes = wp.zeros(n_cap, dtype=int, device=self.model.device)
++        self.body_node_count = wp.zeros(1, dtype=int, device=self.model.device)
++
+         self.particle_render_colors = wp.full(
+             self.sand_model.particle_count, value=wp.vec3(0.7, 0.6, 0.4), dtype=wp.vec3, device=self.sand_model.device
+         )
+@@ -261,6 +338,47 @@
+         self.simulate_sand()
+ 
+     def compute_body_forces(self):
++        if self.compact_body_forces:
++            from warp.utils import array_scan  # noqa: PLC0415
++
++            n = self.collider_node_count
++            if n > 0:
++                wp.launch(
++                    flag_body_nodes,
++                    dim=n,
++                    inputs=[n, self.collider_impulse_ids, self.collider_body_id, self.body_node_flags],
++                )
++                array_scan(self.body_node_flags[:n], self.body_node_positions[:n], inclusive=False)
++                wp.launch(
++                    compact_body_nodes,
++                    dim=n,
++                    inputs=[n, self.body_node_flags, self.body_node_positions, self.body_nodes, self.body_node_count],
++                )
++            else:
++                self.body_node_count.zero_()
++            wp.launch(
++                compute_body_forces_compact_lanes,
++                dim=self.body_sand_force_lanes.shape,
++                inputs=[
++                    self.frame_dt,
++                    self.body_node_count,
++                    self.body_nodes,
++                    self.collider_impulse_ids,
++                    self.collider_impulses,
++                    self.collider_impulse_pos,
++                    self.collider_body_id,
++                    self.state_0.body_q,
++                    self.model.body_com,
++                    self.body_sand_force_lanes,
++                ],
++            )
++            wp.launch(
++                sum_body_force_lanes,
++                dim=self.model.body_count,
++                inputs=[self.body_sand_force_lanes, self.state_0.body_f],
++            )
++            return
++
+         if self.ordered_body_forces:
+             wp.launch(
+                 compute_body_forces_lanes,

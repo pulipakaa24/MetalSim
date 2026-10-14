@@ -4,6 +4,10 @@ What landed between 2026-09-22 and 2026-10-13, grouped by area. The September se
 commit order; the October sections, newest first, summarise each merged pull request with its main commits (`git log`
 for the full messages). Dates are the commit dates (month-day).
 
+## MPM: coupled scenes closer to the L4 (2026-10-13, `metalsim/physics/mpm/MPM.md` 8k)
+
+- 10-13 Warp pin 95f6f121 -> 31cf79d7: `bsr_mv` takes CUDA's tiled-kernel choice on Metal (`warp.config.metal_bsr_mv_tiles`). Newton pin 99843d09 -> addd10cb: the long-row rigidity product goes through `bsr_mv`; the proxy-wrench harvest and the two-way example's body-force sum compact their nodes first. Two-way captured 54.8 -> 37.6 ms/frame (1.77x -> 1.21x the L4), eager 0.84x; MPMCoupling coupled step 49.3 -> 34.2 ms (16 bodies); Franka-Pour unchanged (1.80 s per 2,048-env step). Pure-MPM floors and ANYmal bitwise unchanged; two-way and Franka-Pour repeat bitwise, two-way inside the L4 floor. Vendored implicit_mpm regenerated. Logs `runs/mpm/coupled_speed/`, research `research_notes/coupled_speed/NOTE.md`.
+
 ## Documentation: audit against the measured record (2026-10-13)
 
 - 10-13 Every doc checked against main `3670f4b8` (PRs #1, #4-#16): STATUS rewritten to the current state (superseded text kept and marked), GAPS / PARITY / GUIDE / README / RENDER_COVERAGE / NEWTON_RENDER / MPM.md / DECISIONS / PHASES / RESEARCH / HANDOFF / notices corrected (pins, queued or pending items that landed, test counts re-measured into `runs/docs_audit/`); this section and the October sections below added
@@ -38,6 +42,7 @@ for the full messages). Dates are the commit dates (month-day).
 - 10-12 `fe3c1f2f` Opt-in MPM memory budgets (`mpm_grid_budget="measured"`, `mpm_cells_per_world`); overflow check once per PPO iteration
 - 10-13 `14c21348` / `4e7e7e6a` / `ab67bd2e` Deterministic evaluation of the iteration-299 policy (2,048 episodes: 0.477; the memory opt-ins give 0.470); why evaluation reads 0.48 and training 0.62 (reset distribution and episode counting)
 - 10-13 `6700b0f0` .. `b9fadc48` Seed study: 5 seeds ours at the matched configuration; Isaac's single run inside the prediction interval through iteration 49, about 0.06 ahead at 50-59 (verdict partial); `stage_pour_seeds.sh` for Isaac seeds 1-4 on the L4
+- 10-13 Isaac seeds 1 and 2 on two L4 machines (`fingerprint.sh` gate against the seed-0 setup): 5 seeds ours vs 3 Isaac's, no window differs through iteration 49, 50-59 success 0.376 vs 0.411 (Welch p = 0.09); verdict still partial, the gap is at most ~0.04
 
 ## Rendering: integration, coverage audit, render gaps (2026-10-12 .. 13, PRs #4, #5, #8, #9, #14, #15; PR #11 has its own section above)
 

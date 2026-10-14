@@ -1,6 +1,7 @@
 """G1 task terms recomputed from Isaac Lab's formulas (isaaclab mdp rewards / observations, as
 transcribed in assets/isaac/g1_rewards.py and g1_velocity_env_cfg.py) against the Warp kernels'
 per-term outputs on the live simulation state."""
+import os
 import mujoco
 import numpy as np
 import pytest
@@ -12,7 +13,10 @@ import warp as wp
 
 from metalsim.learn.g1_velocity import G1VelocityTask, ACTION_SCALE, CONTROL_DT, benchmark_step, g1_foot_vel_mjwarp
 
-pytestmark = pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal")
+from metalsim.learn.g1_velocity import G1_USD as _G1_USD  # noqa: E402
+
+pytestmark = [pytest.mark.skipif(not wp.is_metal_available(), reason="needs Metal"),
+              pytest.mark.skipif(not os.path.exists(_G1_USD), reason="needs Isaac's g1_minimal.usd (scripts/fetch_isaac_assets.sh)")]
 
 # every invariant below must hold on both physics engines (same kernels, same MuJoCo-layout state)
 ENGINES = [pytest.param({}, id="mjwarp"),

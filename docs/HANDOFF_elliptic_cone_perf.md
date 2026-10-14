@@ -140,7 +140,7 @@ their `metalsim` heads (Warp `4127c48`, MuJoCo Warp `07a51a6`) measures:
 `runs/mjw_tp/final_checks.log`. Kernels and dispatch counts are the same. Candidates:
 - the flex merge `8fbf965` in the MuJoCo Warp fork, which the headline numbers predate (they were taken
   at `ccfaffb`/`1791414`);
-- a difference between the machines (the reference ran under `/Users/aditya/robosim`).
+- a difference between the machines (the reference ran in the main checkout on the 16-inch M4 Max).
 
 A back-to-back run at `1791414` against `07a51a6` on one machine settles it. The logs are in
 `runs/competitors/metalsim_g1_*.log`.

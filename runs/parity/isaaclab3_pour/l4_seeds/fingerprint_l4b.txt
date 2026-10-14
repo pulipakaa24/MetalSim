@@ -1,0 +1,30 @@
+FP_DRIVER: 580.178.04
+FP_ISAACLAB_HEAD: ae37b028ea415c91ea2bc32609efcd759ed2b974
+FP_ISAACLAB_DIRTY: 0
+FP_RSL_RL: 5.4.1
+FP_OMNICLIENT_7151: 2
+  omniclient lib: lib/python3.12/site-packages/ovstage/bin/plugins/omni.client.lib/libomniclient.so
+  omniclient lib: lib/python3.12/site-packages/isaacsim/kit/extscore/omni.client.lib/bin/libomniclient.so
+  omniclient lib: lib/python3.12/site-packages/omni/client/libomniclient.so
+FP_MTP_CFG: max_triangle_pairs: int = 1_000_000
+FP_MTP_POUR_OVERRIDES: 0
+== recorded, not checked
+NVIDIA L4
+CUDA Version: 13.0
+7.0.0-1013
+PRETTY_NAME="Ubuntu 24.04.5 LTS"
+Python 3.12.3
+franka_pour task files sha256: 9f3d8eb0e14255d8
+isaacsim==6.1.0.0
+isaaclab==17.0.2
+isaaclab_newton==5.4.1
+isaaclab_tasks==18.0.1
+newton==1.5.2
+warp-lang==1.16.0
+mujoco-warp==3.11.0
+mujoco==3.11.0
+torch==2.11.0+cu128
+rsl-rl-lib==5.4.1
+numpy==2.5.2
+usd-core: not installed
+parity3_scripts: common.sh record_g1.py run_all.sh stage0_smoke.sh stage1_bench.sh stage2_fidelity.sh stage3_train.sh 

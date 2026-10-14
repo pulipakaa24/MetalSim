@@ -893,7 +893,7 @@ command-buffer cost, joined with the L4's nsys sums in `profile/joined.md` and `
   (`_crb_accumulate`, `_cfrc_backward`, `_primitive_narrowphase`, Cholesky updates). Sorts and scans take 2.3 vs
   1.6 ms. Parts: MPM step 25.6 ms, MuJoCo step 18.4 ms of 45.4 (eager, synchronized).
 
-**What would close it** (not started when this section was written; item 1 is in progress per `docs/NOW.md`):
+**What would close it** (as written on 2026-10-13; item 1 and the body-force sum are done, section 8k):
 1. **Two-way growth.** On Metal, run the long-row product (IJtm) through a row-tiled reduction (CUDA's
    `bsr_mv_tiled_kernel` choice, as Warp `3c4e251e` did for warp.fem's dispatched assembly), or swap the IJtm product
    for a J^T product over J's short rows. Expected: the late window back to about the early cost (36-37 ms), giving
@@ -902,6 +902,90 @@ command-buffer cost, joined with the L4's nsys sums in `profile/joined.md` and `
 2. **The remaining ~1.2x.** The Gauss-Seidel color pass is near its latency floor at equal results (sections 7, 8).
    The MuJoCo Warp small-kernel cost belongs to the rigid stack's own performance work, not to MPM. The body-force sum
    (3.0 ms here against 0.45 ms in section 7b) needs a look first.
+
+## 8k. Coupled scenes: closing the gap (2026-10-13; Warp `31cf79d7`, Newton `addd10cb`)
+
+Research: `research_notes/coupled_speed/NOTE.md`. Logs, JSON and the batch scripts: `runs/mpm/coupled_speed/`
+(batch_02 to batch_08, bf1/, hv1/, any1/, b08/). Every timing ran on the 16-inch as an exclusive `timing` job on an
+idle GPU, with three interleaved repetitions unless noted. ms/frame figures use the L4's protocol (2 s, median).
+
+**1. The two-way growth was the rigidity product IJtm** (section 8j, item 1). `probes/rigidity_mv_probe.py` times
+the two in-loop products separately (eager, synchronized):
+- IJtm has 12 rows (two per body), and the longest row grows to about 1,170 blocks as the boxes sink.
+- Untiled, it takes 29-40 ms per 50 calls. J (655,360 rows, at most 2 blocks each) takes about 9-12 ms, either way.
+
+Warp's `bsr_mv` sums such rows with its tiled kernel on CUDA only (`nnz * block_size > 2 * 64 * rows`; the L4's nsys
+profile shows one tiled and one untiled product per iteration). Metal summed every row serially in one thread.
+- Warp `31cf79d7`: `warp.config.metal_bsr_mv_tiles` (default on, `WP_METAL_BSR_MV_TILES=0` off) makes CUDA's choice
+  on Metal. Metal's `tile_sum` is CUDA's shuffle tree, so the summation order is the L4's.
+- Newton `addd10cb` (first of three commits): `_ListedRowsMv` sends a matrix that `bsr_mv` would tile through `bsr_mv`
+  itself.
+- First launches: `probes/bsr_mv_tiles_check.py`, under a watchdog.
+- IJtm: 29-40 -> 12.1-12.9 ms per 50 calls.
+- Late two-way GPU kernel sum per frame: 55.3 -> 36.4 ms.
+
+**2. The ordered body-force sum** (two-way example, 3.0 ms per frame). Every body scanned all 655,360 grid nodes, in
+every substep.
+- Newton `addd10cb` (third commit): compact the nodes in contact with a body first (flag, integer scan, scatter;
+  capture-safe), then the 256 fixed lanes run over that list.
+- 1.05 -> 0.38 ms per call (`probes/body_force_compact_check.py`, exact compaction, 5e-7 from float64).
+- `NEWTON_METAL_BODY_FORCE_COMPACT=0` restores the full scan.
+
+**3. The proxy-wrench harvest** (`SolverImplicitMPM.coupling_harvest_proxy_wrenches`, used by Franka-Pour's
+`SolverCoupledProxy` and section 11's MPMCoupling). With one world, every proxy body scanned every active collider
+node.
+- Newton `addd10cb` (second commit): the same compaction, per world range.
+- `probes/harvest_compact_check.py`: one world, 16 or 64 bodies, 1.6 -> 0.33 ms per call.
+- `NEWTON_METAL_HARVEST_COMPACT=0` restores the full scan.
+
+**Results** (ms/frame, Metal / L4):
+
+| scene | before (8j) | IJtm tiled | + body-force compaction | L4 |
+|---|---|---|---|---|
+| two-way, captured | 54.4-54.8 (1.76-1.77x) | 40.0-40.4 (1.29-1.30x) | **37.6 (1.21x)** | 31.0 |
+| two-way, eager | 78.8-79.6 (1.08-1.09x) | 61.5-62.1 (0.84-0.85x) | **61.3 (0.84x)** | 73.0 |
+| ANYmal, captured (control) | 29.9-31.2 (1.23-1.29x) | 29.4 (1.21x) | unchanged | 24.2 |
+
+MPMCoupling (`probes/multibody_sand.py`, 1 world, about 73k particles), harvest compaction off -> on:
+- The harvest alone: 15.6-15.8 -> 1.5-1.7 ms per call.
+- Coupled step: 47.7 -> 32.3 ms (4 bodies), 49.3 -> 34.2 ms (16 bodies), 80.7 -> 65.2 ms (64 bodies).
+
+Franka-Pour at 2,048 envs is unchanged: 1.80 s per policy step with the tiled choice on or off, and with the harvest
+compaction on or off.
+
+**Results: bitwise and parity.**
+- Pure-MPM floor scenes (granular, multi_material, plate drag, column) and ANYmal are bitwise unchanged; they use no
+  `bsr_mv` and no proxy harvest.
+- Two-way and Franka-Pour change rounding, because the summation order changes:
+  - for IJtm, it becomes CUDA's order;
+  - for the two compactions, it becomes another fixed order. The L4 sums these with float atomics, so there is no CUDA
+    order to match.
+- All of them repeat bitwise run to run: two-way recordings, Franka-Pour 64 envs × 30 steps, MPMCoupling 30 steps.
+- Two-way stays inside the L4's floor ensemble (worst-frame ratio 0.83, as before).
+- Each switch off restores the previous behaviour bitwise:
+  - Franka-Pour with the tiled choice off equals the trees without the change (batch_06);
+  - with the harvest compaction off, it equals the trees without that change (batch_hv1).
+- On the pinned commits: `tests/test_mpm.py` 15 passed, 1 xfailed; `tests/test_mpm_main.py` 15 passed. The vendored
+  `implicit_mpm` equals `addd10cb` (`scripts/vendor_mpm152.py --check`).
+
+**ANYmal: where the 1.2x is** (`probes/anymal_probe.py`, per frame, captured robot graph + eager sand step):
+- Robot 8.3 ms, sand 22.2 ms.
+- The colour launch with 1 / 2 / 4 / 8 threadgroups per GPU core gives bitwise equal states; 2, the current choice, is
+  already the fastest (1 per core: sand 26.2 ms).
+- Newton's reordered Gauss-Seidel (`solver="gs-soa"`) is bitwise equal to `"gs"` but slower (sand 26.0 ms).
+- On the L4, the nsys kernel time for the same frame is about 10.5 ms (MPM about 9.1, robot about 1.4) against a
+  24.2 ms frame, so most of the L4's frame is host launch cost of its eager sand step.
+- What remains on Metal:
+  - the MuJoCo Warp robot graph: 8.3 ms against about 1.4 ms of L4 kernel time; that is the rigid stack's own work;
+  - the latency-bound Gauss-Seidel colour passes (sections 7, 8).
+- The "captured" comparison is like for like: the example captures the sand step only for the `"fixed"` grid and only
+  on CUDA, and the default grid is `"sparse"`. So both GPUs capture only the robot.
+
+**Left on two-way** (late profile, `bf1/profile/joined_late_bf.md`):
+- Gauss-Seidel: 7.0 vs 3.2 ms.
+- Warp's tiled `bsr_mv`: 1.33 vs 0.12 ms over 51 launches. Only 12 rows x 3 x 64 lanes run, so the GPU sits mostly
+  idle. A larger tile would cut it but would leave CUDA's summation order.
+- Friction / impulse kernels: 1.5-3.4x.
 
 ## 9. Running
 
@@ -927,14 +1011,14 @@ Everything above runs from a clone of MetalSim plus the three forks; nothing dep
 
 ```
 # after the install of README / docs/GUIDE.md (.venv, scripts/setup_warp.sh, the MuJoCo Warp fork):
-scripts/setup_newton152.sh          # .venv-newton152: Newton fork metalsim-1.5.2 @99843d09, shared Warp fork @95f6f121
+scripts/setup_newton152.sh          # .venv-newton152: Newton fork metalsim-1.5.2 @addd10cb, shared Warp fork @31cf79d7
 scripts/gpu_run.sh test_mpm check 15 -- .venv-newton152/bin/python -m pytest tests/test_mpm.py   # 15 passed, 1 xfailed
 ```
 
 | what | where it lives | how a fresh setup gets it |
 |---|---|---|
-| Warp changes | pulipakaa24/warp `metalsim`, pinned `95f6f121` | `scripts/setup_warp.sh` (fallback: innate-inc/warp `ce15f6bb` + `patches/warp/metalsim-95f6f121.diff`) |
-| Newton changes (MPM, Franka-Pour rigid) | pulipakaa24/newton `metalsim-1.5.2`, pinned `99843d09` | `scripts/setup_newton152.sh` (fallback: v1.5.2 + `patches/newton/metalsim-1.5.2-99843d09.diff`) |
+| Warp changes | pulipakaa24/warp `metalsim`, pinned `31cf79d7` | `scripts/setup_warp.sh` (fallback: innate-inc/warp `ce15f6bb` + `patches/warp/metalsim-31cf79d7.diff`) |
+| Newton changes (MPM, Franka-Pour rigid) | pulipakaa24/newton `metalsim-1.5.2`, pinned `addd10cb` | `scripts/setup_newton152.sh` (fallback: v1.5.2 + `patches/newton/metalsim-1.5.2-addd10cb.diff`) |
 | Newton 1.7 Metal fixes for the rigid stack | pulipakaa24/newton `metalsim-hashtable-metal` `a4be3604` (`.venv`'s `newton` extra) and `metalsim` `9f317390` (`.venv-newtonfork`) | `pip install -e ".[newton]"`, `scripts/setup_newton.sh` |
 | compat layer, scenes, probes, tests, Isaac-side recorders | this repository | the clone |
 | logs, JSON, reports of every run | `runs/mpm/`, `runs/parity/isaaclab3_mpm*/`, `runs/rigid_perf/`, `runs/fma_rigid_parity/` | the clone |
@@ -1033,18 +1117,20 @@ repeats bitwise in all 12 multi-world configurations of `probes/multiworld_repea
     28.3 mm / 8.0 mm/s; friction 0.3: 74.2 mm (bearing failure, as predicted), 1.2: 14.2 mm / 11.6 mm/s. Drop from
     0.15 m: peak 38.8 mm, creep 8.7 mm/s (dt 1/240: 31.7 mm, 4.1 mm/s). The residual creep follows the rheology solve's
     convergence (an under-converged solve delivers a fraction alpha of the stopping impulse and drifts at
-    (1 - alpha) / alpha g dt): bodies resting on sand need a converged solve (Isaac's default is 250 iterations,
-    tolerance 1e-4; batch 04 measures it). Staggered in batch 03: 80 mm (the floor) in drop and rest.
+    (1 - alpha) / alpha g dt): bodies resting on sand need a converged solve. With Isaac's default solve (batch 04, 250
+    iterations, tolerance 1e-4; `runs/mpm_main/bearing4/`): rest 10.2 mm / 0.4 mm/s, drop from 0.15 m 29.8 mm peak,
+    28.6 mm final, creep 1.3 mm/s (tolerance 1e-6: identical), against an expected 10-25 mm. Staggered in batch 03:
+    80 mm (the floor) in drop and rest.
 * **Angle of repose** (research `research_notes/MPM in main simulator/angle_of_repose.md`; `probes/repose_lift.py`, runs
   `runs/mpm_main/repose3/`). Lifted-cylinder test: tube R = 5 cm (mocap, frictionless towards the sand), fill 5 cm, rough
   floor (friction 1.0), column-maximum surface fit in 8 sectors (30.0 deg on a synthetic 30 deg cone). The solver's
   yield surface is sqrt(J2) <= mu p, so the reference is atan(mu). Measured (fit mean, sector sd 0.0-0.4 deg):
 
-  | mu (atan mu) | R/dx 5 | R/dx 10 | R/dx 15 |
-  |---|---|---|---|
-  | 0.40 (21.8 deg) | | 14.7 | |
-  | 0.68 (34.2 deg) | 25.4 | 26.3 | 27.2 |
-  | 0.90 (42.0 deg) | | 32.6 | |
+  | mu (atan mu) | R/dx 5 | R/dx 10 | R/dx 15 | R/dx 20 |
+  |---|---|---|---|---|
+  | 0.40 (21.8 deg) | | 14.7 | | |
+  | 0.68 (34.2 deg) | 25.4 | 26.3 | 27.2 | 27.8 |
+  | 0.90 (42.0 deg) | | 32.6 | | |
 
   Lift speed 1.25 / 2.5 / 5 cm/s at R/dx 10: 26.6 / 26.3 / 25.4 deg (plateau within 0.3 deg below 2.5 cm/s); 4x the
   iterations: 26.6 deg. The angle rises monotonically with resolution (+0.9 deg per refinement) and with friction
@@ -1052,7 +1138,8 @@ repeats bitwise in all 12 multi-world configurations of `probes/multiworld_repea
   also stop at or below atan(mu) (Dunatunga & Kamrin 2015), and on a slope this cone can yield below the simple-shear
   stopping angle whenever the lateral stresses differ from the vertical one; the remaining gap to physical sand
   (repose ~ the friction angle) is a property of the solver Isaac Lab ships, not of the coupling. Not yet converged in
-  resolution (R/dx 30 is the next step).
+  resolution: +0.9 / +0.6 deg per step from R/dx 10 to 15 to 20 (batch 04: 27.8 deg with 658,080 particles,
+  `runs/mpm_main/repose4/`), shrinking, so the converged angle stays several degrees below atan(mu).
 
 ### Re-vendoring when the fork pin moves
 

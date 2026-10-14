@@ -1,9 +1,9 @@
 diff --git a/METALSIM_CHANGES.md b/METALSIM_CHANGES.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..91f00fdf7019575f87d5c06ae8a87a1f8bc9cbf7
+index 0000000..1767172
 --- /dev/null
 +++ b/METALSIM_CHANGES.md
-@@ -0,0 +1,74 @@
+@@ -0,0 +1,75 @@
 +# MetalSim changes on this branch (`metalsim`)
 +
 +This branch is the Warp build that [MetalSim](https://github.com/pulipakaa24/MetalSim) runs on (see the
@@ -75,12 +75,13 @@ index 0000000000000000000000000000000000000000..91f00fdf7019575f87d5c06ae8a87a1f
 +| `85b92466` | Capture memory reuse is on again (`warp.config.metal_capture_reuse`, `WP_METAL_CAPTURE_REUSE`, read when a capture begins), and the one-world page fault is fixed. The fault came from a captured MPM solve: its 80-byte indirect-execution-range array, whose fields the host writes at each range's end, took the buffer of a 2,940-byte fem temporary freed earlier in the capture. Every replay, the temporary's recorded dispatches overwrote the ranges first. Now only buffers of 64 KiB or more are pooled or served. A large range array in reused memory raises at `metal_capture_range_begin`. Deterministic scratch pools allocated during a capture record their zeroing. Pour recordings at 1, 64 and 2,048 worlds: eager and captured finish, and captured is bitwise equal with reuse on and off. Franka-Pour's policy-step graph is finite at 2,048 worlds. Tests: `TestMetal.test_capture_range_after_small_freed_temporary`, `test_capture_range_in_reused_memory_raises`. |
 +| `f0df4cf8` | Deterministic Metal kernels call `is_counter_store_target` (the phase-0 store guard's loop over counter targets) instead of inlining it at every guarded store. Under global deterministic mode, the Metal compiler service crashed (`XPC_ERROR_CONNECTION_INTERRUPTED`, about 340 s of retries) building Newton's narrow-phase kernel, which has 23 guarded stores and 11 counters. That module now builds in 2.3 s. Minimized from the module's MSL: replacing the guarded stores with plain stores, or making either guard function non-inline, compiles; the device or constant argument form, forced inlining of user functions, and the library optimization level do not matter. `test_metal_deterministic` and `test_metal` pass. |
 +| this commit | `warp.fem` temporary pools on Metal allocate the requested size and do not hand an array of 1 MiB or more to a request it exceeds by more than 1.25x (`WP_METAL_FEM_TIGHT_POOL=0` restores best fit with 1.5x growth). A captured graph keeps every pooled array alive, so the high-water mark is device memory: Isaac Lab Franka-Pour at 2,048 worlds held 11.1 GB of fem temporaries for 6.5 GB of simultaneous requests; device memory after the first policy step 37.64 -> 34.48 GB. Temporaries are uninitialized either way: Franka-Pour (rigid_deterministic, captured) and the MPM pour scene bitwise equal at 1 / 64 / 2,048 worlds; MPM step and policy step times unchanged. |
++| this commit | `warp.sparse.bsr_mv` on Metal makes CUDA's choice between its tiled and one-thread-per-row kernels (`warp.config.metal_bsr_mv_tiles`, `WP_METAL_BSR_MV_TILES`, default on). Rows with many blocks (`nnz * block_size > 2 * tile_size * rows`, CUDA's heuristic) are summed by the tiled kernel: 64 strided lane sums, then `tile_sum`, whose Metal SIMD-group reduction is the CUDA shuffle tree. So both GPUs use the same summation order. Before, Metal summed every row serially in one thread. In Newton's implicit MPM, the rigidity operator's body rows (IJtm: one block per collider node of the body, about 1,170 in `example_mpm_twoway_coupling`) were latency-bound, and their cost grew with the contact area. Measured on the M4 Max: the IJtm product went from 29-40 to 12.1-12.9 ms per 50 calls (eager, synchronized). Captured two-way went from 54.8 to 40.4 ms/frame (L4: 31.0). Results change rounding only where a product takes the tiled path (two-way; Franka-Pour's rigidity products). MetalSim's pure-MPM floor scenes and ANYmal on sand are bitwise unchanged. Two-way repeats bitwise and stays inside the L4's perturbation ensemble. Off, results are bitwise those of before (Franka-Pour 30 steps). Probe: MetalSim `metalsim/physics/mpm/probes/bsr_mv_tiles_check.py`. |
 +
 +The same seven code commits are exported as `patches/warp/0001-0007` in MetalSim; applying them to `ce15f6bb`
 +gives the tree of `f194006a`. Tests for the Metal changes are in `warp/tests/test_metal.py`.
 diff --git a/changelog/+fem-dispatch-static-tile-branch.fixed.md b/changelog/+fem-dispatch-static-tile-branch.fixed.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..3172ffacfd957e251a91a2399660ccd71163d737
+index 0000000..3172ffa
 --- /dev/null
 +++ b/changelog/+fem-dispatch-static-tile-branch.fixed.md
 @@ -0,0 +1,4 @@
@@ -90,14 +91,14 @@ index 0000000000000000000000000000000000000000..3172ffacfd957e251a91a2399660ccd7
 +needed 76,944 bytes of threadgroup memory and the launch failed.
 diff --git a/changelog/+metal-64bit-atomics.fixed.md b/changelog/+metal-64bit-atomics.fixed.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..38685d3956659df9a1fbbe7784a2b0c374248e39
+index 0000000..38685d3
 --- /dev/null
 +++ b/changelog/+metal-64bit-atomics.fixed.md
 @@ -0,0 +1 @@
 +Raise at launch on Metal for 64-bit `wp.atomic_cas()` / `wp.atomic_exch()` and signed 64-bit `wp.atomic_min()` / `wp.atomic_max()`, which Apple GPUs cannot perform atomically, instead of running them as a plain read-modify-write; make 64-bit `wp.atomic_and()` / `wp.atomic_or()` / `wp.atomic_xor()` and shared-tile int64 additions exact on Metal.
 diff --git a/changelog/+metal-bounded-launch.added.md b/changelog/+metal-bounded-launch.added.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..13119db7e7d8879c1b587ae7e71c809966544df3
+index 0000000..13119db
 --- /dev/null
 +++ b/changelog/+metal-bounded-launch.added.md
 @@ -0,0 +1,5 @@
@@ -108,21 +109,21 @@ index 0000000000000000000000000000000000000000..13119db7e7d8879c1b587ae7e71c8099
 +run the full `dim`. `warp.config.metal_bounded_launch` (`WP_METAL_BOUNDED_LAUNCH=0`) turns it off.
 diff --git a/changelog/+metal-cuda-fast-math.changed.md b/changelog/+metal-cuda-fast-math.changed.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..5e450c724d39f368d42fa1792da765f698553121
+index 0000000..5e450c7
 --- /dev/null
 +++ b/changelog/+metal-cuda-fast-math.changed.md
 @@ -0,0 +1 @@
 +Metal: ``fast_math`` modules can reproduce CUDA's ``--use_fast_math`` results bit for bit (``warp.config.metal_fast_math = "cuda"``): float32 division is ``div.approx.ftz.f32`` (``MUFU.RCP`` + ``FMUL.FTZ``) and ``sqrt`` is ``sqrt.approx.ftz.f32`` (``MUFU.SQRT``), emulated exactly in integer arithmetic. ``"relaxed"`` uses Metal's own fast division and square root; ``"off"`` (the default) ignores ``fast_math`` on Metal, as before.
 diff --git a/changelog/+metal-deterministic-small-launches.changed.md b/changelog/+metal-deterministic-small-launches.changed.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..84792106a0e7c19926680f556308c75f1b0595f5
+index 0000000..8479210
 --- /dev/null
 +++ b/changelog/+metal-deterministic-small-launches.changed.md
 @@ -0,0 +1 @@
 +Run the deterministic-mode passes of small Metal launches in fewer dispatches: counter launches with at most 2,048 records resolve their slots in one threadgroup (`WP_METAL_DET_SMALL_RECORDS`), and launches that are one threadgroup finalize exact float32 sums inside the kernel (`WP_METAL_DET_TG_FINALIZE`); results are unchanged.
 diff --git a/changelog/+metal-deterministic.added.md b/changelog/+metal-deterministic.added.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..4a5f48af1861fd5d9953836fbc7393767e3fd917
+index 0000000..4a5f48a
 --- /dev/null
 +++ b/changelog/+metal-deterministic.added.md
 @@ -0,0 +1,5 @@
@@ -133,28 +134,28 @@ index 0000000000000000000000000000000000000000..4a5f48af1861fd5d9953836fbc739376
 +`"metal_ordered_atomics"` module option keeps ordered single-SIMD-group launches.
 diff --git a/changelog/+metal-device-args-optin.changed.md b/changelog/+metal-device-args-optin.changed.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..ea22c760db000a601317c51ce446ed99469ea810
+index 0000000..ea22c76
 --- /dev/null
 +++ b/changelog/+metal-device-args-optin.changed.md
 @@ -0,0 +1 @@
 +Choose the Metal kernel-argument address space per kernel by default (`warp.config.metal_device_args = "auto"`): short kernels without tiles read their arguments from device memory, the others from constant memory; the module option `"metal_device_args"` overrides it, and a kernel whose device-argument form the Metal compiler cannot build falls back to constant arguments with a warning.
 diff --git a/changelog/+metal-device-args.fixed.md b/changelog/+metal-device-args.fixed.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..2f05eaedc4eb667f6d3cca640277ce03ce433a78
+index 0000000..2f05eae
 --- /dev/null
 +++ b/changelog/+metal-device-args.fixed.md
 @@ -0,0 +1 @@
 +Read kernel arguments and launch bounds through device-space pointers on Metal: a dispatch no longer pays a fixed cost proportional to the array arguments the kernel uses.
 diff --git a/changelog/+metal-eager-conditionals.added.md b/changelog/+metal-eager-conditionals.added.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..971b9cbdfea07f1d593d38d970871523d1240513
+index 0000000..971b9cb
 --- /dev/null
 +++ b/changelog/+metal-eager-conditionals.added.md
 @@ -0,0 +1 @@
 +Add ``warp.config.metal_eager_conditionals`` (opt-in): eager ``capture_while`` / ``capture_if`` on Metal record their bodies once and gate them on the device, reading the condition once per batch of iterations (or not at all).
 diff --git a/changelog/+metal-environment-nanogrid.added.md b/changelog/+metal-environment-nanogrid.added.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..fe72410fc9f121e418354bd295e76c24fa64b991
+index 0000000..fe72410
 --- /dev/null
 +++ b/changelog/+metal-environment-nanogrid.added.md
 @@ -0,0 +1,2 @@
@@ -162,14 +163,14 @@ index 0000000000000000000000000000000000000000..fe72410fc9f121e418354bd295e76c24
 +rebuildable ones) on Metal devices; previously they were limited to CUDA.
 diff --git a/changelog/+metal-fast-math.fixed.md b/changelog/+metal-fast-math.fixed.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..6767599b86a129aa9997e93b726d66457e6b53e1
+index 0000000..6767599
 --- /dev/null
 +++ b/changelog/+metal-fast-math.fixed.md
 @@ -0,0 +1 @@
 +Honour the ``fast_math`` module option on Metal: float32 division and square root become approximate (as ``--use_fast_math`` makes them on CUDA), without reassociation.
 diff --git a/changelog/+metal-fem-active-prefix.changed.md b/changelog/+metal-fem-active-prefix.changed.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..67e481bada3a846f8e78232097e583091013ceb3
+index 0000000..67e481b
 --- /dev/null
 +++ b/changelog/+metal-fem-active-prefix.changed.md
 @@ -0,0 +1,5 @@
@@ -180,14 +181,14 @@ index 0000000000000000000000000000000000000000..67e481bada3a846f8e78232097e58309
 +no longer scales with the reserved capacity.
 diff --git a/changelog/+metal-fuse-fp.fixed.md b/changelog/+metal-fuse-fp.fixed.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..bacd11bd19b9ab0431edb1e96622223e21f47c1f
+index 0000000..bacd11b
 --- /dev/null
 +++ b/changelog/+metal-fuse-fp.fixed.md
 @@ -0,0 +1 @@
 +Honour the ``fuse_fp`` module option on Metal: multiply-adds are contracted into FMAs by default, as on CUDA.
 diff --git a/changelog/+metal-gpu-array-copy.added.md b/changelog/+metal-gpu-array-copy.added.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..255c549ed942abaa47534d0d8b52f0ef1c9cdff2
+index 0000000..255c549
 --- /dev/null
 +++ b/changelog/+metal-gpu-array-copy.added.md
 @@ -0,0 +1,3 @@
@@ -196,7 +197,7 @@ index 0000000000000000000000000000000000000000..255c549ed942abaa47534d0d8b52f0ef
 +ordered with kernel launches and can be recorded into graph captures.
 diff --git a/changelog/+metal-gpu-bsr-assembly.added.md b/changelog/+metal-gpu-bsr-assembly.added.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..7fdc4c630776405df270d0934d3e781b6abd4349
+index 0000000..7fdc4c6
 --- /dev/null
 +++ b/changelog/+metal-gpu-bsr-assembly.added.md
 @@ -0,0 +1,8 @@
@@ -210,7 +211,7 @@ index 0000000000000000000000000000000000000000..7fdc4c630776405df270d0934d3e781b
 +the host path.
 diff --git a/changelog/+metal-gpu-sort-scan.added.md b/changelog/+metal-gpu-sort-scan.added.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..4f2d2d716130de5674b0af1877fbe9cdce78bdb7
+index 0000000..4f2d2d7
 --- /dev/null
 +++ b/changelog/+metal-gpu-sort-scan.added.md
 @@ -0,0 +1,6 @@
@@ -222,7 +223,7 @@ index 0000000000000000000000000000000000000000..4f2d2d716130de5674b0af1877fbe9cd
 +restores the host path.
 diff --git a/changelog/+metal-gpu-volume.added.md b/changelog/+metal-gpu-volume.added.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..27259d814c20ed221760b7029ce70cb978e5dc3d
+index 0000000..27259d8
 --- /dev/null
 +++ b/changelog/+metal-gpu-volume.added.md
 @@ -0,0 +1,6 @@
@@ -234,14 +235,14 @@ index 0000000000000000000000000000000000000000..27259d814c20ed221760b7029ce70cb9
 +`WP_METAL_GPU_VOLUME=0`) restores the host path.
 diff --git a/changelog/+metal-idle-flush.changed.md b/changelog/+metal-idle-flush.changed.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..a42bea4e62c6417d05c91b548a34c5c6213a101c
+index 0000000..a42bea4
 --- /dev/null
 +++ b/changelog/+metal-idle-flush.changed.md
 @@ -0,0 +1 @@
 +Commit the open Metal command buffer every `WP_METAL_IDLE_FLUSH` (default 16) eager dispatches when the GPU has nothing else to execute, so loops that wait on the GPU often keep it busy.
 diff --git a/changelog/+metal-lbvh.added.md b/changelog/+metal-lbvh.added.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..8f42ffd488090bccd61f67618b4a344aa98d7361
+index 0000000..8f42ffd
 --- /dev/null
 +++ b/changelog/+metal-lbvh.added.md
 @@ -0,0 +1,4 @@
@@ -251,27 +252,27 @@ index 0000000000000000000000000000000000000000..8f42ffd488090bccd61f67618b4a344a
 +`Bvh.rebuild()` on Metal rebuilds an LBVH in place, as on CUDA.
 diff --git a/changelog/+metal-replay-batching.changed.md b/changelog/+metal-replay-batching.changed.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..8c9c218f0c80d14bddac95e7c2af7a486ffef65f
+index 0000000..8c9c218
 --- /dev/null
 +++ b/changelog/+metal-replay-batching.changed.md
 @@ -0,0 +1 @@
 +Replay Metal graphs back to back in one command buffer (up to ``WP_METAL_ICB_BATCH`` dispatches, default 1024) instead of committing every replay on its own; ``WP_METAL_ICB_BATCH=0`` restores the previous behaviour.
 diff --git a/changelog/+metal-replay-whole.fixed.md b/changelog/+metal-replay-whole.fixed.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..1eaa7f98ddc75a5e0a2fd1470da4a27f0f66f3cd
+index 0000000..1eaa7f9
 --- /dev/null
 +++ b/changelog/+metal-replay-whole.fixed.md
 @@ -0,0 +1 @@
 +Never split a Metal graph replay larger than `WP_METAL_ICB_BATCH` across command buffers when batching replays: it gets a command buffer of its own (smaller replays still share and split command buffers).
 diff --git a/changelog/+metal-volume-destroy-nosync.fixed.md b/changelog/+metal-volume-destroy-nosync.fixed.md
 new file mode 100644
-index 0000000000000000000000000000000000000000..8ce29091404ae41e86b426ea6c0285c9adac0a93
+index 0000000..8ce2909
 --- /dev/null
 +++ b/changelog/+metal-volume-destroy-nosync.fixed.md
 @@ -0,0 +1 @@
 +Destroying a ``wp.Volume`` on Metal no longer waits for the device: the grid buffer is released once no submitted GPU work can read it.
 diff --git a/docs/user_guide/metal.rst b/docs/user_guide/metal.rst
-index 74caead8819344867ef293a91879daa1e307c196..572faa7ce2171e3d260c630e0bdbeebce2ea682b 100644
+index 74caead..572faa7 100644
 --- a/docs/user_guide/metal.rst
 +++ b/docs/user_guide/metal.rst
 @@ -86,18 +86,43 @@ Limitations
@@ -327,7 +328,7 @@ index 74caead8819344867ef293a91879daa1e307c196..572faa7ce2171e3d260c630e0bdbeebc
    capture.
 diff --git a/licenses/sass-math-LICENSE.txt b/licenses/sass-math-LICENSE.txt
 new file mode 100644
-index 0000000000000000000000000000000000000000..bd83271baddf08eb6d3e66b0d9d6e4b31d94e578
+index 0000000..bd83271
 --- /dev/null
 +++ b/licenses/sass-math-LICENSE.txt
 @@ -0,0 +1,21 @@
@@ -353,7 +354,7 @@ index 0000000000000000000000000000000000000000..bd83271baddf08eb6d3e66b0d9d6e4b3
 +OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 +SOFTWARE.
 diff --git a/warp/_src/builtins.py b/warp/_src/builtins.py
-index 04bc8f4b52bc825b70116fb21f7f2d910b28ffb9..da1cca7ced464fa5eecc009aaa9234d8df6c0bea 100644
+index 04bc8f4..da1cca7 100644
 --- a/warp/_src/builtins.py
 +++ b/warp/_src/builtins.py
 @@ -18415,6 +18415,56 @@ add_builtin(
@@ -414,7 +415,7 @@ index 04bc8f4b52bc825b70116fb21f7f2d910b28ffb9..da1cca7ced464fa5eecc009aaa9234d8
      if arg_types is None:
          if inplace:
 diff --git a/warp/_src/codegen.py b/warp/_src/codegen.py
-index 8e5caa690b5c7d5a1b976652ee94ccc72a1b1168..d70e298abc905acf89229ea776e6300ce9bef006 100644
+index 8e5caa6..d70e298 100644
 --- a/warp/_src/codegen.py
 +++ b/warp/_src/codegen.py
 @@ -1899,6 +1899,33 @@ def _store_shared_source(code, entry):
@@ -1028,7 +1029,7 @@ index 8e5caa690b5c7d5a1b976652ee94ccc72a1b1168..d70e298abc905acf89229ea776e6300c
          if (options | kernel.options)["enable_backward"] and not options.get("metal_forward_only"):
              if any(is_tile(v.type) for v in kernel.adj.variables):
 diff --git a/warp/_src/context.py b/warp/_src/context.py
-index a4dc60857291a0c4fe3e67d85e979f62758653aa..3787ae9c7ff86cc2f8c43e4cbcf1796629f235cd 100644
+index a4dc608..3787ae9 100644
 --- a/warp/_src/context.py
 +++ b/warp/_src/context.py
 @@ -1093,9 +1093,23 @@ class KernelHooks:
@@ -1819,7 +1820,7 @@ index a4dc60857291a0c4fe3e67d85e979f62758653aa..3787ae9c7ff86cc2f8c43e4cbcf17966
          if not result:
              raise RuntimeError(f"Warp copy error: {runtime.get_error_string()}")
 diff --git a/warp/_src/deterministic.py b/warp/_src/deterministic.py
-index a3ad8282dfea132669e4d90b227036bc1f1808e2..e19e426e6e882d0fbe6d5cdf389d95824c700c2d 100644
+index a3ad828..e19e426 100644
 --- a/warp/_src/deterministic.py
 +++ b/warp/_src/deterministic.py
 @@ -314,6 +314,9 @@ class DeterministicMeta:
@@ -1971,7 +1972,7 @@ index a3ad8282dfea132669e4d90b227036bc1f1808e2..e19e426e6e882d0fbe6d5cdf389d9582
      for target in meta.side_effect_atomic_targets:
          mapped_label, mapped_attr_path = _deterministic_map_target(target, bound_args)
 diff --git a/warp/_src/fem/cache.py b/warp/_src/fem/cache.py
-index 7247a736ffb81ad7bc0826c78cde0fefacfa2876..6bb1dc62050a4319daf7a491ffc592299710efeb 100644
+index 7247a73..6bb1dc6 100644
 --- a/warp/_src/fem/cache.py
 +++ b/warp/_src/fem/cache.py
 @@ -429,6 +429,20 @@ are added at borrow time.
@@ -2019,7 +2020,7 @@ index 7247a736ffb81ad7bc0826c78cde0fefacfa2876..6bb1dc62050a4319daf7a491ffc59229
                          capacity = max(int(self._pool_capacities[-1] * grow_factor), capacity)
  
 diff --git a/warp/_src/fem/domain.py b/warp/_src/fem/domain.py
-index 00f5bdede4389f6aeb5a1e379cb06b8783935096..7775b5c17703c103afd8ec48f5eea40617cfb1d3 100644
+index 00f5bde..7775b5c 100644
 --- a/warp/_src/fem/domain.py
 +++ b/warp/_src/fem/domain.py
 @@ -63,6 +63,13 @@ class GeometryDomain(Domain):
@@ -2048,7 +2049,7 @@ index 00f5bdede4389f6aeb5a1e379cb06b8783935096..7775b5c17703c103afd8ec48f5eea406
          """Number of elements in the underlying geometry."""
          return self.geometry.cell_count()
 diff --git a/warp/_src/fem/field/virtual.py b/warp/_src/fem/field/virtual.py
-index e3de3a09c8845af4d4eba6b861ce71656349335d..b78e24046813d0ed18b5f5580dbedb9f7fab5cf7 100644
+index e3de3a0..b78e240 100644
 --- a/warp/_src/fem/field/virtual.py
 +++ b/warp/_src/fem/field/virtual.py
 @@ -1083,7 +1083,7 @@ def make_bilinear_dispatch_kernel(
@@ -2061,7 +2062,7 @@ index e3de3a09c8845af4d4eba6b861ce71656349335d..b78e24046813d0ed18b5f5580dbedb9f
  
              for dof in range(lane, wp.static(TEST_NODE_DOF_COUNT * TRIAL_NODE_DOF_COUNT), wp.static(tile_size)):
 diff --git a/warp/_src/fem/geometry/adaptive_nanogrid.py b/warp/_src/fem/geometry/adaptive_nanogrid.py
-index d637746040d03541d8be9ab60ba167b5754a022e..d98e6bbab97c9da6725d144c4ce6ee99a3b26922 100644
+index d637746..d98e6bb 100644
 --- a/warp/_src/fem/geometry/adaptive_nanogrid.py
 +++ b/warp/_src/fem/geometry/adaptive_nanogrid.py
 @@ -119,7 +119,7 @@ class AdaptiveNanogrid(NanogridBase):
@@ -2074,7 +2075,7 @@ index d637746040d03541d8be9ab60ba167b5754a022e..d98e6bbab97c9da6725d144c4ce6ee99
          """
  
 diff --git a/warp/_src/fem/geometry/nanogrid.py b/warp/_src/fem/geometry/nanogrid.py
-index 37be6460fada1a38bb19799ef7ca5aaeb0825a6f..2ea820d38abea99bba087e16d9a9379ea9be0cef 100644
+index 37be646..2ea820d 100644
 --- a/warp/_src/fem/geometry/nanogrid.py
 +++ b/warp/_src/fem/geometry/nanogrid.py
 @@ -604,7 +604,7 @@ class Nanogrid(NanogridBase):
@@ -2147,7 +2148,7 @@ index 37be6460fada1a38bb19799ef7ca5aaeb0825a6f..2ea820d38abea99bba087e16d9a9379e
  def _rebuildable_candidate_mask(
      cell_grid: wp.uint64,
 diff --git a/warp/_src/fem/geometry/partition.py b/warp/_src/fem/geometry/partition.py
-index 24199251a401c8405096e4dbe6195e43d28b3e44..0b6b5a837f526013916f46a10bbd46757ff332cc 100644
+index 2419925..0b6b5a8 100644
 --- a/warp/_src/fem/geometry/partition.py
 +++ b/warp/_src/fem/geometry/partition.py
 @@ -37,6 +37,15 @@ class GeometryPartition:
@@ -2203,7 +2204,7 @@ index 24199251a401c8405096e4dbe6195e43d28b3e44..0b6b5a837f526013916f46a10bbd4675
      class CellArg:
          cell_index: wp.array(dtype=int)
 diff --git a/warp/_src/fem/integrate.py b/warp/_src/fem/integrate.py
-index 32ca2c7f6d74a81586b57923e43c439d1250896a..b7e0c26e793fa214b69e9326e383536c46a6153d 100644
+index 32ca2c7..b7e0c26 100644
 --- a/warp/_src/fem/integrate.py
 +++ b/warp/_src/fem/integrate.py
 @@ -1307,10 +1307,14 @@ def _generate_auxiliary_kernels(
@@ -2327,7 +2328,7 @@ index 32ca2c7f6d74a81586b57923e43c439d1250896a..b7e0c26e793fa214b69e9326e383536c
          triplet_values.release()
          triplet_cols.release()
 diff --git a/warp/_src/fem/linalg.py b/warp/_src/fem/linalg.py
-index cc174db382853f07a888c9d9bdf6df7df82db193..758907fc83e20dfb19f8b378b87eae9eedd5679e 100644
+index cc174db..758907f 100644
 --- a/warp/_src/fem/linalg.py
 +++ b/warp/_src/fem/linalg.py
 @@ -422,8 +422,13 @@ def symmetric_eigenvalues_qr(A: Any, tol: Any):
@@ -2356,7 +2357,7 @@ index cc174db382853f07a888c9d9bdf6df7df82db193..758907fc83e20dfb19f8b378b87eae9e
  
      if tape is not None and (x.requires_grad or y.requires_grad):
 diff --git a/warp/_src/fem/space/partition.py b/warp/_src/fem/space/partition.py
-index 07a2e6ef26068ff780922f3d125c451e1b8d1d9a..c5fec85223800ca69ad9dcd06a405b407931d8c6 100644
+index 07a2e6e..c5fec85 100644
 --- a/warp/_src/fem/space/partition.py
 +++ b/warp/_src/fem/space/partition.py
 @@ -7,7 +7,7 @@ import warp as wp
@@ -2441,7 +2442,7 @@ index 07a2e6ef26068ff780922f3d125c451e1b8d1d9a..c5fec85223800ca69ad9dcd06a405b40
  
          return space_to_partition
 diff --git a/warp/_src/fem/space/restriction.py b/warp/_src/fem/space/restriction.py
-index 6d1cc95c4950feffeef9a7252ad4dfd0dfb66fb0..ff9e04ac81c8fc607b4c9b4d6dd560a63905f9b7 100644
+index 6d1cc95..ff9e04a 100644
 --- a/warp/_src/fem/space/restriction.py
 +++ b/warp/_src/fem/space/restriction.py
 @@ -7,7 +7,7 @@ import warp as wp
@@ -2542,7 +2543,7 @@ index 6d1cc95c4950feffeef9a7252ad4dfd0dfb66fb0..ff9e04ac81c8fc607b4c9b4d6dd560a6
      def _split_vertex_element_index(
          nodes_per_element: int,
 diff --git a/warp/_src/fem/utils.py b/warp/_src/fem/utils.py
-index f91bca38cd782d83a45c2c43408508be7a981bf5..17ee596323c76488c93a7fa050ffd7146c35a5d4 100644
+index f91bca3..17ee596 100644
 --- a/warp/_src/fem/utils.py
 +++ b/warp/_src/fem/utils.py
 @@ -72,6 +72,8 @@ def compress_node_indices(
@@ -2730,7 +2731,7 @@ index f91bca38cd782d83a45c2c43408508be7a981bf5..17ee596323c76488c93a7fa050ffd714
      missing_index: int,
 diff --git a/warp/_src/metal_conditionals.py b/warp/_src/metal_conditionals.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..7a350ff5927abf75f614857c9896e54584d4e3c7
+index 0000000..7a350ff
 --- /dev/null
 +++ b/warp/_src/metal_conditionals.py
 @@ -0,0 +1,124 @@
@@ -2860,7 +2861,7 @@ index 0000000000000000000000000000000000000000..7a350ff5927abf75f614857c9896e545
 +    return True
 diff --git a/warp/_src/metal_deterministic.py b/warp/_src/metal_deterministic.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..a8af6b3ca3aba2c6cb5a67fd5952aa4868fe042e
+index 0000000..a8af6b3
 --- /dev/null
 +++ b/warp/_src/metal_deterministic.py
 @@ -0,0 +1,1392 @@
@@ -4258,7 +4259,7 @@ index 0000000000000000000000000000000000000000..a8af6b3ca3aba2c6cb5a67fd5952aa48
 +    return MetalDeterministicLaunch(det_meta, **kwargs)
 diff --git a/warp/_src/metal_primitives.py b/warp/_src/metal_primitives.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..ce1ac2e8df4280ab3ce32fc8a1db2f323392e20e
+index 0000000..ce1ac2e
 --- /dev/null
 +++ b/warp/_src/metal_primitives.py
 @@ -0,0 +1,1184 @@
@@ -5448,7 +5449,7 @@ index 0000000000000000000000000000000000000000..ce1ac2e8df4280ab3ce32fc8a1db2f32
 +    return True
 diff --git a/warp/_src/metal_sparse.py b/warp/_src/metal_sparse.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..fe0fa63700180c3cfc45e1f59eaab128998a6371
+index 0000000..fe0fa63
 --- /dev/null
 +++ b/warp/_src/metal_sparse.py
 @@ -0,0 +1,661 @@
@@ -6115,7 +6116,7 @@ index 0000000000000000000000000000000000000000..fe0fa63700180c3cfc45e1f59eaab128
 +        )
 diff --git a/warp/_src/metal_volume.py b/warp/_src/metal_volume.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..803d7e3cc879f20b0f7fb746fb3fe8b0d95a872b
+index 0000000..803d7e3
 --- /dev/null
 +++ b/warp/_src/metal_volume.py
 @@ -0,0 +1,1849 @@
@@ -7969,7 +7970,7 @@ index 0000000000000000000000000000000000000000..803d7e3cc879f20b0f7fb746fb3fe8b0
 +    state.launch("vb_test_f64_fma", 0, args, _VB_PTR_OFFSETS, threads=n)
 +    return out.numpy()
 diff --git a/warp/_src/sparse.py b/warp/_src/sparse.py
-index e90f85f835ec65d8585fffc589ce44ce28856b22..ef20d713c800818cc460140fe8256795946e1d6e 100644
+index e90f85f..51e289c 100644
 --- a/warp/_src/sparse.py
 +++ b/warp/_src/sparse.py
 @@ -1086,13 +1086,39 @@ def _bsr_set_from_triplets_native(
@@ -8183,8 +8184,19 @@ index e90f85f835ec65d8585fffc589ce44ce28856b22..ef20d713c800818cc460140fe8256795
              row_count = wp.tile_sum(wp.tile(row_count))[0]
              min_col = wp.tile_min(wp.tile(min_col))[0]
              max_col = wp.tile_max(wp.tile(max_col))[0]
+@@ -4877,7 +4952,9 @@ def bsr_mv(
+         use_tiles = False
+     else:
+         tile_size = 64
+-        use_tiles = device.is_cuda and A.nnz * A.block_size > 2 * tile_size * A.shape[0]
++        # Metal takes CUDA's choice (warp.config.metal_bsr_mv_tiles): same kernel, same summation order
++        tiles_ok = device.is_cuda or (getattr(device, "is_metal", False) and wp.config.metal_bsr_mv_tiles)
++        use_tiles = tiles_ok and A.nnz * A.block_size > 2 * tile_size * A.shape[0]
+ 
+     if transpose:
+         if beta.value == 0.0:
 diff --git a/warp/_src/types.py b/warp/_src/types.py
-index 1fc048a852975cfe29dd8b67e2b3c4f696bc6836..a9da63d16044dad000c83e61f6d44ed2d23157e1 100644
+index 1fc048a..a9da63d 100644
 --- a/warp/_src/types.py
 +++ b/warp/_src/types.py
 @@ -6499,6 +6499,8 @@ class Volume:
@@ -8347,7 +8359,7 @@ index 1fc048a852975cfe29dd8b67e2b3c4f696bc6836..a9da63d16044dad000c83e61f6d44ed2
      if point_mask is None:
          return None
 diff --git a/warp/_src/utils.py b/warp/_src/utils.py
-index c70ab4728fdd1464b9ca0554c7873240f1835dfa..b0031efeae7887fc33f4c661e63e150b5d2a9513 100644
+index c70ab47..b0031ef 100644
 --- a/warp/_src/utils.py
 +++ b/warp/_src/utils.py
 @@ -19,6 +19,7 @@ import numpy as np
@@ -8418,10 +8430,10 @@ index c70ab4728fdd1464b9ca0554c7873240f1835dfa..b0031efeae7887fc33f4c661e63e150b
              _host_call(
                  values.device,
 diff --git a/warp/config.py b/warp/config.py
-index b2e7592faa78b13352551595915dd5c750bdc40c..40b94ac9b80089517c8b9af04465251ca51f2070 100644
+index b2e7592..745a796 100644
 --- a/warp/config.py
 +++ b/warp/config.py
-@@ -348,6 +348,127 @@ directly as a context manager.
+@@ -348,6 +348,135 @@ directly as a context manager.
  Note: Impacts performance when active due to call-stack introspection.
  """
  
@@ -8514,6 +8526,14 @@ index b2e7592faa78b13352551595915dd5c750bdc40c..40b94ac9b80089517c8b9af04465251c
 +the Metal library's functions. Read when a module is built and part of the module hash when ``True``;
 +``WP_METAL_CUDA_LIBM=0`` turns it off."""
 +
++metal_bsr_mv_tiles: bool = _os.environ.get("WP_METAL_BSR_MV_TILES", "1") != "0"
++"""Whether :func:`warp.sparse.bsr_mv` on Metal makes CUDA's choice between its two product kernels: rows holding many
++blocks (``nnz * block_size > 2 * tile_size * rows``, the CUDA heuristic) are summed by the tiled kernel (64 strided
++lane sums, then the warp shuffle tree, which Metal's SIMD-group reduction reproduces), the others one thread per
++row. The same choice gives the same summation order, and so the same rounding, on both GPUs; one thread per long
++row is also latency-bound (e.g. the body rows of Newton's MPM rigidity operator, thousands of blocks each).
++``False`` (``WP_METAL_BSR_MV_TILES=0``) keeps one thread per row on Metal, as before. Read at each call."""
++
 +metal_eager_conditionals: bool = _os.environ.get("WP_METAL_EAGER_CONDITIONALS", "0") == "1"
 +"""Whether :func:`warp.capture_while` and :func:`warp.capture_if` outside a graph capture on Metal record their
 +bodies once as a graph gated on the device (indirect execution ranges a kernel closes once the condition is 0), so
@@ -8550,7 +8570,7 @@ index b2e7592faa78b13352551595915dd5c750bdc40c..40b94ac9b80089517c8b9af04465251c
  """Maximum unroll factor for loops.
  
 diff --git a/warp/native/array.h b/warp/native/array.h
-index 82a7516b802fae5c826f0301a4e7d483fe819dfb..b1f3f9e52a0e47e79b37f2d0f99c7f76b04cc429 100644
+index 82a7516..b1f3f9e 100644
 --- a/warp/native/array.h
 +++ b/warp/native/array.h
 @@ -384,6 +384,62 @@ add(const fixedarray_t<Size, T> WP_THREAD& a, const fixedarray_t<Size, T> WP_THR
@@ -8617,7 +8637,7 @@ index 82a7516b802fae5c826f0301a4e7d483fe819dfb..b1f3f9e52a0e47e79b37f2d0f99c7f76
  
  
 diff --git a/warp/native/builtin.h b/warp/native/builtin.h
-index f57e52faa281a6e55d7414241cfc5ce69a003139..a463eea88e257015fbf6637915827b384cf14321 100644
+index f57e52f..a463eea 100644
 --- a/warp/native/builtin.h
 +++ b/warp/native/builtin.h
 @@ -22,6 +22,27 @@
@@ -8740,7 +8760,7 @@ index f57e52faa281a6e55d7414241cfc5ce69a003139..a463eea88e257015fbf6637915827b38
  
  template <typename T>
 diff --git a/warp/native/bvh.cpp b/warp/native/bvh.cpp
-index f12abaf8b7b9a5bc921c83a614096b807a8ba8ae..9585624a7201787eb723ae655f7094c521116c90 100644
+index f12abaf..9585624 100644
 --- a/warp/native/bvh.cpp
 +++ b/warp/native/bvh.cpp
 @@ -13,6 +13,8 @@
@@ -9258,7 +9278,7 @@ index f12abaf8b7b9a5bc921c83a614096b807a8ba8ae..9585624a7201787eb723ae655f7094c5
  // stubs for platforms without a GPU backend
  uint64_t wp_bvh_create_device(
 diff --git a/warp/native/bvh.h b/warp/native/bvh.h
-index 818f41d2318cd5ea26fcf9286f884edcb39d78f8..a319504fc591211e23aac48d39a316ca6dab3b35 100644
+index 818f41d..a319504 100644
 --- a/warp/native/bvh.h
 +++ b/warp/native/bvh.h
 @@ -749,6 +749,24 @@ void bvh_create_host(
@@ -9287,7 +9307,7 @@ index 818f41d2318cd5ea26fcf9286f884edcb39d78f8..a319504fc591211e23aac48d39a316ca
      vec3 WP_THREAD* lowers, vec3 WP_THREAD* uppers, int num_items, int leaf_size, BVH WP_THREAD& bvh
  );
 diff --git a/warp/native/deterministic.h b/warp/native/deterministic.h
-index 95baede4d18e8be40876de76c86a003aec0b45b9..c420ba71c3912b78f979d952c5fe9554993f747f 100644
+index 95baede..c420ba7 100644
 --- a/warp/native/deterministic.h
 +++ b/warp/native/deterministic.h
 @@ -3,7 +3,7 @@
@@ -9309,7 +9329,7 @@ index 95baede4d18e8be40876de76c86a003aec0b45b9..c420ba71c3912b78f979d952c5fe9554
 +
  #endif  // !__METAL_VERSION__
 diff --git a/warp/native/intersect.h b/warp/native/intersect.h
-index f2d8cda6ed392d45827ffd8e71023dc327567d17..1f5b182aca187343e82e3115dfe9b467e7369234 100644
+index f2d8cda..1f5b182 100644
 --- a/warp/native/intersect.h
 +++ b/warp/native/intersect.h
 @@ -360,6 +360,25 @@ CUDA_CALLABLE inline float diff_product(float a, float b, float c, float d)
@@ -9379,7 +9399,7 @@ index f2d8cda6ed392d45827ffd8e71023dc327567d17..1f5b182aca187343e82e3115dfe9b467
  
      if ((U < 0.0f || V < 0.0f || W < 0.0f) && (U > 0.0f || V > 0.0f || W > 0.0f))
 diff --git a/warp/native/mat.h b/warp/native/mat.h
-index 194b9fc82d8eb1ed49725a8d9d06e3d11ac73f08..e8aa7076d9818eefe73fa69527276ebc62d60187 100644
+index 194b9fc..e8aa707 100644
 --- a/warp/native/mat.h
 +++ b/warp/native/mat.h
 @@ -3297,7 +3297,7 @@ inline CUDA_CALLABLE mat_t<Rows, Cols, Type> div(const mat_t<Rows, Cols, Type> W
@@ -9437,7 +9457,7 @@ index 194b9fc82d8eb1ed49725a8d9d06e3d11ac73f08..e8aa7076d9818eefe73fa69527276ebc
      }
  
 diff --git a/warp/native/mesh.cpp b/warp/native/mesh.cpp
-index c9d11ca81b4c727e84e2d42feb84cee6d2abba34..0917f42a14f3a13451634ccc18ed1815d4674639 100644
+index c9d11ca..0917f42 100644
 --- a/warp/native/mesh.cpp
 +++ b/warp/native/mesh.cpp
 @@ -115,7 +115,11 @@ void bvh_refit_with_solid_angle_recursive_host(BVH& bvh, int index, Mesh& mesh)
@@ -9550,7 +9570,7 @@ index c9d11ca81b4c727e84e2d42feb84cee6d2abba34..0917f42a14f3a13451634ccc18ed1815
  // stubs for platforms without a GPU backend
  WP_API uint64_t wp_mesh_create_device(
 diff --git a/warp/native/metal.h b/warp/native/metal.h
-index 116ee24c40df0db109d7728bd52cb52c3b64d4fc..85ca9e508c36cc9eeb6976b135f06f445ca96d78 100644
+index 116ee24..85ca9e5 100644
 --- a/warp/native/metal.h
 +++ b/warp/native/metal.h
 @@ -67,6 +67,31 @@ WP_API int wp_metal_launch_kernel(
@@ -9629,7 +9649,7 @@ index 116ee24c40df0db109d7728bd52cb52c3b64d4fc..85ca9e508c36cc9eeb6976b135f06f44
 +WP_API void wp_metal_set_capture_reuse(int enabled);
 +}
 diff --git a/warp/native/metal.mm b/warp/native/metal.mm
-index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..6c1d0148ea512a85212f4b4892c9d790bc34f791 100644
+index 73535fd..6c1d014 100644
 --- a/warp/native/metal.mm
 +++ b/warp/native/metal.mm
 @@ -16,12 +16,14 @@
@@ -10860,7 +10880,7 @@ index 73535fd9b8cc572eac9ba93e2cecc55a55100b44..6c1d0148ea512a85212f4b4892c9d790
 +    return 0;
 +}
 diff --git a/warp/native/metal_atomics.h b/warp/native/metal_atomics.h
-index 319e3f7f210116b14862b25679f3aa9265d317c8..cee633c0144eaae3b5fa3426cd84c818f64e67c5 100644
+index 319e3f7..cee633c 100644
 --- a/warp/native/metal_atomics.h
 +++ b/warp/native/metal_atomics.h
 @@ -5,8 +5,12 @@
@@ -11043,7 +11063,7 @@ index 319e3f7f210116b14862b25679f3aa9265d317c8..cee633c0144eaae3b5fa3426cd84c818
  }
 +#undef WP_METAL_NO_64BIT_FALLBACK
 diff --git a/warp/native/metal_crt.h b/warp/native/metal_crt.h
-index b56a95eaea228c37da6e0bc66579733c46470fb9..ea56d0e4e2b1a4d29e827513b2c335d6df13a069 100644
+index b56a95e..ea56d0e 100644
 --- a/warp/native/metal_crt.h
 +++ b/warp/native/metal_crt.h
 @@ -14,6 +14,9 @@
@@ -11164,7 +11184,7 @@ index b56a95eaea228c37da6e0bc66579733c46470fb9..ea56d0e4e2b1a4d29e827513b2c335d6
  inline float log2(float x) { return metal::log2(x); }
 diff --git a/warp/native/metal_cuda_fast_math.h b/warp/native/metal_cuda_fast_math.h
 new file mode 100644
-index 0000000000000000000000000000000000000000..22732fd46fc267fde46ef49c7af108ff81008745
+index 0000000..22732fd
 --- /dev/null
 +++ b/warp/native/metal_cuda_fast_math.h
 @@ -0,0 +1,285 @@
@@ -11455,7 +11475,7 @@ index 0000000000000000000000000000000000000000..22732fd46fc267fde46ef49c7af108ff
 +}
 diff --git a/warp/native/metal_cuda_libm.h b/warp/native/metal_cuda_libm.h
 new file mode 100644
-index 0000000000000000000000000000000000000000..b2afdeb561c6a266c39acd2b64df2fac67051656
+index 0000000..b2afdeb
 --- /dev/null
 +++ b/warp/native/metal_cuda_libm.h
 @@ -0,0 +1,209 @@
@@ -11670,7 +11690,7 @@ index 0000000000000000000000000000000000000000..b2afdeb561c6a266c39acd2b64df2fac
 +}
 diff --git a/warp/native/metal_deterministic.h b/warp/native/metal_deterministic.h
 new file mode 100644
-index 0000000000000000000000000000000000000000..42979c37f904e39a8b454f28d9e631a94a17021a
+index 0000000..42979c3
 --- /dev/null
 +++ b/warp/native/metal_deterministic.h
 @@ -0,0 +1,427 @@
@@ -12102,7 +12122,7 @@ index 0000000000000000000000000000000000000000..42979c37f904e39a8b454f28d9e631a9
 +        } \
 +    } while (0)
 diff --git a/warp/native/metal_stub.cpp b/warp/native/metal_stub.cpp
-index 4448d54c35dd8150380a5e29eb9f5adafb405938..f9fb02f3fa14a96c0fdc022a7a56cacb634af8e7 100644
+index 4448d54..f9fb02f 100644
 --- a/warp/native/metal_stub.cpp
 +++ b/warp/native/metal_stub.cpp
 @@ -42,6 +42,8 @@ const char* wp_metal_profile_report() { return ""; }
@@ -12149,7 +12169,7 @@ index 4448d54c35dd8150380a5e29eb9f5adafb405938..f9fb02f3fa14a96c0fdc022a7a56cacb
  
  int wp_metal_memtile(int, void*, const void*, size_t, size_t) { return unavailable(); }
 diff --git a/warp/native/quat.h b/warp/native/quat.h
-index b0eabeba9ce2cd613f5160492fe0d79464330adf..5393d0539e46d7dd4cbea6fdcf281ef82f100378 100644
+index b0eabeb..5393d05 100644
 --- a/warp/native/quat.h
 +++ b/warp/native/quat.h
 @@ -275,7 +275,7 @@ template <typename Type> inline CUDA_CALLABLE quat_t<Type> normalize(const quat_
@@ -12213,7 +12233,7 @@ index b0eabeba9ce2cd613f5160492fe0d79464330adf..5393d0539e46d7dd4cbea6fdcf281ef8
              x = (m.data[2][0] + m.data[0][2]) * h;
              y = (m.data[1][2] + m.data[2][1]) * h;
 diff --git a/warp/native/svd.h b/warp/native/svd.h
-index 7909fad55047643c04aef37f3aec9db7914f58e8..d1945077cb947e82b2de7128dd2ed0bee5e1fab8 100644
+index 7909fad..d194507 100644
 --- a/warp/native/svd.h
 +++ b/warp/native/svd.h
 @@ -51,6 +51,10 @@ template <typename Type> inline CUDA_CALLABLE Type recipSqrt(Type x)
@@ -12228,7 +12248,7 @@ index 7909fad55047643c04aef37f3aec9db7914f58e8..d1945077cb947e82b2de7128dd2ed0be
      return Type(1) / sqrt(x);
  #endif
 diff --git a/warp/native/tile.h b/warp/native/tile.h
-index 59608b50b1128e21167f9e80c35c2d6f7dd32650..5f511a96f617cf8b817fc335d1c7936ed6bbfe81 100644
+index 59608b5..5f511a9 100644
 --- a/warp/native/tile.h
 +++ b/warp/native/tile.h
 @@ -89,6 +89,14 @@ template <int BlockDim> inline void tile_sync()
@@ -12282,7 +12302,7 @@ index 59608b50b1128e21167f9e80c35c2d6f7dd32650..5f511a96f617cf8b817fc335d1c7936e
  {
      T old = *ptr;
 diff --git a/warp/native/tile_cholesky.h b/warp/native/tile_cholesky.h
-index 29a1f0dcf5c574428cfee1af9348f5eba5564a5f..8e33e790ff958b84ed69ef97c7df422cf05aa437 100644
+index 29a1f0d..8e33e79 100644
 --- a/warp/native/tile_cholesky.h
 +++ b/warp/native/tile_cholesky.h
 @@ -80,6 +80,12 @@ namespace partitioned_gemm {
@@ -12766,7 +12786,7 @@ index 29a1f0dcf5c574428cfee1af9348f5eba5564a5f..8e33e790ff958b84ed69ef97c7df422c
  template <bool Upper, typename Fwd, typename TileA>
  CUDA_CALLABLE void tile_cholesky_inplace(Fwd fun_forward, TileA WP_THREAD& A)
 diff --git a/warp/native/tile_solve.h b/warp/native/tile_solve.h
-index 5ff83dad7310bc439b1948415089eeb5f7d4b8e0..b1a4394dc5299314fa2f64955e5196f40050a632 100644
+index 5ff83da..b1a4394 100644
 --- a/warp/native/tile_solve.h
 +++ b/warp/native/tile_solve.h
 @@ -167,9 +167,214 @@ inline CUDA_CALLABLE void scalar_cholesky_back_substitution(TileA WP_THREAD& A,
@@ -12985,7 +13005,7 @@ index 5ff83dad7310bc439b1948415089eeb5f7d4b8e0..b1a4394dc5299314fa2f64955e5196f4
      scalar_cholesky_back_substitution<Upper>(A, X);
  }
 diff --git a/warp/native/vec.h b/warp/native/vec.h
-index 922abd09e3634684b63f6864197cbec9bca1af39..8fce76b1488bdddd8df7c87967bb9ccf80a1ff54 100644
+index 922abd0..8fce76b 100644
 --- a/warp/native/vec.h
 +++ b/warp/native/vec.h
 @@ -269,38 +269,38 @@ template <unsigned Length, typename Type> inline CUDA_CALLABLE vec_t<Length, Typ
@@ -13061,7 +13081,7 @@ index 922abd09e3634684b63f6864197cbec9bca1af39..8fce76b1488bdddd8df7c87967bb9ccf
          return vec_t<3, Type>();
  }
 diff --git a/warp/native/volume.cpp b/warp/native/volume.cpp
-index 77ba926160d307866c0353d5a519eea8276ee6ec..0526bf57a70491457c75dd364f9e0bea55a05e67 100644
+index 77ba926..0526bf5 100644
 --- a/warp/native/volume.cpp
 +++ b/warp/native/volume.cpp
 @@ -658,7 +658,8 @@ void wp_volume_destroy_device(uint64_t id)
@@ -13075,7 +13095,7 @@ index 77ba926160d307866c0353d5a519eea8276ee6ec..0526bf57a70491457c75dd364f9e0bea
      if (volume->owner)
          wp_free_host(volume->buffer);
 diff --git a/warp/native/warp.h b/warp/native/warp.h
-index b6b0ff164eba5f633673e1e85b3c96f21514a463..2bab95cbbb8e770f0d0a9aa7eb21f44490018fab 100644
+index b6b0ff1..2bab95c 100644
 --- a/warp/native/warp.h
 +++ b/warp/native/warp.h
 @@ -115,6 +115,22 @@ WP_API void wp_bvh_destroy_device(uint64_t id);
@@ -13102,7 +13122,7 @@ index b6b0ff164eba5f633673e1e85b3c96f21514a463..2bab95cbbb8e770f0d0a9aa7eb21f444
  // users responsibility to keep-alive the points/tris data for the duration of the mesh lifetime
  WP_API uint64_t wp_mesh_create_host(
 diff --git a/warp/tests/deterministic/common.py b/warp/tests/deterministic/common.py
-index 907a6a02ad361d69882c9c8ea64ba09b83a5c9ee..8c355b20548a425b5df1e15fa9deca00499e3895 100644
+index 907a6a0..8c355b2 100644
 --- a/warp/tests/deterministic/common.py
 +++ b/warp/tests/deterministic/common.py
 @@ -9,7 +9,7 @@ import numpy as np
@@ -13125,7 +13145,7 @@ index 907a6a02ad361d69882c9c8ea64ba09b83a5c9ee..8c355b20548a425b5df1e15fa9deca00
  all_devices = get_test_devices()
  cpu_device = wp.get_device("cpu")
 diff --git a/warp/tests/deterministic/test_deterministic_backward.py b/warp/tests/deterministic/test_deterministic_backward.py
-index 173ec97ba53282a98d14a75cac88fc31e53a07bd..17fc0d1329779ded7dc7996f3ad67a47bc27d3df 100644
+index 173ec97..17fc0d1 100644
 --- a/warp/tests/deterministic/test_deterministic_backward.py
 +++ b/warp/tests/deterministic/test_deterministic_backward.py
 @@ -15,6 +15,7 @@ from warp.tests.deterministic.common import (
@@ -13191,7 +13211,7 @@ index 173ec97ba53282a98d14a75cac88fc31e53a07bd..17fc0d1329779ded7dc7996f3ad67a47
  
  
 diff --git a/warp/tests/deterministic/test_deterministic_counter.py b/warp/tests/deterministic/test_deterministic_counter.py
-index 8d873acb9ee5927a177f4251d9f173ffdbb3dab1..20fcd2e5bac34799764359e09da6e8af071ce259 100644
+index 8d873ac..20fcd2e 100644
 --- a/warp/tests/deterministic/test_deterministic_counter.py
 +++ b/warp/tests/deterministic/test_deterministic_counter.py
 @@ -7,7 +7,7 @@ import unittest
@@ -13213,7 +13233,7 @@ index 8d873acb9ee5927a177f4251d9f173ffdbb3dab1..20fcd2e5bac34799764359e09da6e8af
  
  
 diff --git a/warp/tests/deterministic/test_deterministic_graph_capture.py b/warp/tests/deterministic/test_deterministic_graph_capture.py
-index dc55cc04a146a42307b2595db39f7661d8215557..b1215239a7648f6158a41ccd4d80c7c5b518088e 100644
+index dc55cc0..b121523 100644
 --- a/warp/tests/deterministic/test_deterministic_graph_capture.py
 +++ b/warp/tests/deterministic/test_deterministic_graph_capture.py
 @@ -10,7 +10,7 @@ import numpy as np
@@ -13251,7 +13271,7 @@ index dc55cc04a146a42307b2595db39f7661d8215557..b1215239a7648f6158a41ccd4d80c7c5
  if __name__ == "__main__":
      unittest.main(verbosity=2)
 diff --git a/warp/tests/deterministic/test_deterministic_scatter.py b/warp/tests/deterministic/test_deterministic_scatter.py
-index affe8f074aee06f53f664fc2637f054cdacaffef..70d849394516ef71ec3a8169bab8f75d0c0a9cce 100644
+index affe8f0..70d8493 100644
 --- a/warp/tests/deterministic/test_deterministic_scatter.py
 +++ b/warp/tests/deterministic/test_deterministic_scatter.py
 @@ -17,6 +17,7 @@ from warp.tests.deterministic.common import (
@@ -13300,7 +13320,7 @@ index affe8f074aee06f53f664fc2637f054cdacaffef..70d849394516ef71ec3a8169bab8f75d
  if __name__ == "__main__":
      unittest.main(verbosity=2)
 diff --git a/warp/tests/fem/test_fem_multi_env.py b/warp/tests/fem/test_fem_multi_env.py
-index e9c90a7d1bf7f9d8d013e438685977adf29a007d..94f831c8e34ef145e23d2e30e63430f957d6624f 100644
+index e9c90a7..94f831c 100644
 --- a/warp/tests/fem/test_fem_multi_env.py
 +++ b/warp/tests/fem/test_fem_multi_env.py
 @@ -1105,6 +1105,8 @@ def test_single_environment_space_partition_environmentless_tail(test, device):
@@ -13333,7 +13353,7 @@ index e9c90a7d1bf7f9d8d013e438685977adf29a007d..94f831c8e34ef145e23d2e30e63430f9
      TestFemMultiEnv,
 diff --git a/warp/tests/geometry/test_volume_metal.py b/warp/tests/geometry/test_volume_metal.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..8f6aadfac81c19ae72ae3486464532032378f561
+index 0000000..8f6aadf
 --- /dev/null
 +++ b/warp/tests/geometry/test_volume_metal.py
 @@ -0,0 +1,432 @@
@@ -13770,7 +13790,7 @@ index 0000000000000000000000000000000000000000..8f6aadfac81c19ae72ae348646453203
 +if __name__ == "__main__":
 +    unittest.main(verbosity=2)
 diff --git a/warp/tests/test_metal.py b/warp/tests/test_metal.py
-index 5c4590d7fb61665071738e72e570dfd0b8bc6fa9..8f6bc2534f4e42059aaaba1f82b66dd89469c3e7 100644
+index 5c4590d..8f6bc25 100644
 --- a/warp/tests/test_metal.py
 +++ b/warp/tests/test_metal.py
 @@ -4,6 +4,7 @@
@@ -15104,7 +15124,7 @@ index 5c4590d7fb61665071738e72e570dfd0b8bc6fa9..8f6bc2534f4e42059aaaba1f82b66dd8
      """Forced inlining is bounded by the fully inlined size (pure codegen logic, no device needed)."""
 diff --git a/warp/tests/test_metal_bounded_launch.py b/warp/tests/test_metal_bounded_launch.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..59ea5a0068ca32d7175822344e4d9d5803f07afb
+index 0000000..59ea5a0
 --- /dev/null
 +++ b/warp/tests/test_metal_bounded_launch.py
 @@ -0,0 +1,210 @@
@@ -15320,7 +15340,7 @@ index 0000000000000000000000000000000000000000..59ea5a0068ca32d7175822344e4d9d58
 +    unittest.main(verbosity=2)
 diff --git a/warp/tests/test_metal_deterministic.py b/warp/tests/test_metal_deterministic.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..059b901cc095141a749c3b457c62733851e7eb8f
+index 0000000..059b901
 --- /dev/null
 +++ b/warp/tests/test_metal_deterministic.py
 @@ -0,0 +1,301 @@
@@ -15627,7 +15647,7 @@ index 0000000000000000000000000000000000000000..059b901cc095141a749c3b457c627338
 +    unittest.main(verbosity=2)
 diff --git a/warp/tests/test_metal_primitives.py b/warp/tests/test_metal_primitives.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..22fdfa5d33e15946779d0c2f891cfc593c9787b8
+index 0000000..22fdfa5
 --- /dev/null
 +++ b/warp/tests/test_metal_primitives.py
 @@ -0,0 +1,397 @@
@@ -16030,7 +16050,7 @@ index 0000000000000000000000000000000000000000..22fdfa5d33e15946779d0c2f891cfc59
 +    unittest.main(verbosity=2)
 diff --git a/warp/tests/test_metal_sparse.py b/warp/tests/test_metal_sparse.py
 new file mode 100644
-index 0000000000000000000000000000000000000000..528a51327943367bdab53ad82ba0ba74cb5a107f
+index 0000000..528a513
 --- /dev/null
 +++ b/warp/tests/test_metal_sparse.py
 @@ -0,0 +1,575 @@
@@ -16610,7 +16630,7 @@ index 0000000000000000000000000000000000000000..528a51327943367bdab53ad82ba0ba74
 +if __name__ == "__main__":
 +    unittest.main(verbosity=2)
 diff --git a/warp/tests/unittest_suites.py b/warp/tests/unittest_suites.py
-index d6e3fccdc1687dd51b32d90a02bff2eaabd69a46..9cea1604e44e9394e24ba17fa05d9614c8105c39 100644
+index d6e3fcc..9cea160 100644
 --- a/warp/tests/unittest_suites.py
 +++ b/warp/tests/unittest_suites.py
 @@ -138,6 +138,7 @@ def default_suite(test_loader: unittest.TestLoader = unittest.defaultTestLoader)

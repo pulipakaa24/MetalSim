@@ -29,6 +29,7 @@ dependencies = [
     "usd-core",    # pxr: the USD scene layer (metalsim.scene), imported by the G1 task
     "scipy",       # Isaac's rough-terrain generator (metalsim.learn.isaac_terrain)
     "ninja",       # torch.utils.cpp_extension builds the Metal interop bridge (metalsim_torch_metal_bridge) with it
+    "pyoidn",      # Open Image Denoise 2.x with its Metal device: tier 2's denoise="oidn" (metalsim.render.denoise)
 ]
 
 [project.optional-dependencies]
