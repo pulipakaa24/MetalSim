@@ -26,4 +26,13 @@ both_on @ 64 worlds: first tripping launch _solve_done__locals__kernel (module _
 
   Which switch carries the cost is in batch_17's decomposition (#29 comment). Switching them off is neither cheap nor sufficient, so the fix will be in the kernels (deterministic passes contained in the early-exit ranges, a counter-free fused update) unless the decomposition shows otherwise.
 
+- **G1 (batch_13-19, research_notes/MPM in main simulator/deterministic_g1_capture.md):** deterministic runs tripped Warp's counter tripwire whenever a world reached the solver's iteration cap: MuJoCo Warp's `_solve_done` read the iteration count back after incrementing it in place (an increment Warp's counting pass suppresses), so the early exit's slot counter was called in the execution pass only. Fixed in the MuJoCo Warp pin `8eb51fe` (count kept in a local); test `test_iteration_cap_repeats`. The earlier suspects (the early exit, the fused update) only changed whether some world reached the cap. In deterministic mode the pin also takes the unfused Newton update: the fused kernel reads back its own change counter within the launch, and its deterministic plan at 1,024 worlds under capture asked for more than 2^31 scratch elements (batch_18); unfused costs nothing measurable (batch_17).
+- Cost of deterministic mode (16-inch, median of 3 interleaved repetitions):
+
+| scene | worlds | default | deterministic | cost |
+  |---|---|---|---|---|
+  | G1 flat env step (batch_19b) | 64 | 7.66 ms | 13.39 ms | +74.8 % |
+  | G1 flat env step (batch_19b) | 1,024 | 15.46 ms | 32.59 ms | +110.8 % |
+  | coupled box step (batch_17, same session) | 64 | 23.87 ms | 24.32 ms | +1.9 % |
+  | coupled box step (batch_10 default, batch_17 deterministic) | 1,024 | 228.78 ms | 231.50 ms | +1.2 % |
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
