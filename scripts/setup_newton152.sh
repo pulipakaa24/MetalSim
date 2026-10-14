@@ -15,10 +15,14 @@
 set -e
 VENV=${1:-.venv-newton152}
 REPO=${METALSIM_NEWTON152_REPO:-https://github.com/pulipakaa24/newton}     # fork of newton-physics/newton, branch metalsim-1.5.2
-PIN=addd10cbeb25e946b3a4c2bb1d4097acc7a98ca2                               # metalsim-1.5.2 head, 2026-10-13 (GS coloring with separate worlds)
+PIN=addd10cbeb25e946b3a4c2bb1d4097acc7a98ca2                               # metalsim-1.5.2 head, 2026-10-13 (long-row rigidity product via bsr_mv; proxy-harvest and two-way body-force compaction)
 REF=${METALSIM_NEWTON152_REF:-$PIN}
 DIR=${METALSIM_NEWTON152_DIR:-upstream/newton-metalsim-1.5.2}
 HERE="$(cd "$(dirname "$0")" && pwd)"
+# a checkout behind origin/main runs an older copy of this script and its requirements (on 2026-10-13 a checkout 192
+# commits behind installed no pyobjc / ninja although the current requirements list them): say so
+BEHIND=$(git -C "$HERE/.." rev-list --count HEAD..origin/main 2>/dev/null || echo 0)
+[ "${BEHIND:-0}" -gt 0 ] && echo "note: this checkout is $BEHIND commits behind origin/main (git pull for the current pins and requirements)"
 if [ ! -d "$DIR" ]; then
   { git clone -q "$REPO" "$DIR" && git -C "$DIR" checkout -q "$REF"; } || {
     echo "fork not reachable; upstream newton v1.5.2 plus patches/newton/metalsim-1.5.2-addd10cb.diff (the same tree)"
@@ -33,9 +37,32 @@ if [ -d upstream/warp-innate ]; then WARP=upstream/warp-innate; else WARP=upstre
 WARP=${METALSIM_WARP_DIR:-$WARP}
 [ -f "$WARP/warp/bin/libwarp.dylib" ] || { echo "no built Warp fork at $WARP: run scripts/setup_warp.sh first (in .venv)"; exit 1; }
 [ -x "$VENV/bin/python" ] || uv venv -q "$VENV" --python 3.12
+# every run installs / upgrades to the pinned list, so an environment built by an older version of this script is
+# brought up to date (not skipped because its python exists)
 uv pip install -q --python "$VENV/bin/python" -r "$HERE/requirements-newton152.txt"
 uv pip install -q --python "$VENV/bin/python" --no-deps "mujoco-warp==3.11.0" "warp-nn==0.3.0"   # warp-nn: example_mpm_anymal's ONNX policy
 uv pip install -q --python "$VENV/bin/python" --no-deps -e "$WARP"
 uv pip install -q --python "$VENV/bin/python" --no-deps -e "$DIR"
 uv pip install -q --python "$VENV/bin/python" --no-deps -e "$HERE/.."     # metalsim itself: the MPM probes run as scripts / subprocesses
-"$VENV/bin/python" -c "import warp as wp; wp.config.quiet=True; import newton, mujoco_warp, importlib.metadata as m; print('newton', m.version('newton'), newton.__file__, 'mujoco-warp', m.version('mujoco-warp'), 'warp', wp.__version__, wp.__file__)"
+# verify: every package of the requirements that MetalSim imports here, Metal reachable through pyobjc, the forks in use
+"$VENV/bin/python" - <<'PY'
+import importlib, importlib.metadata as m, sys
+missing = []
+for mod in ("objc", "Metal", "Foundation", "ninja", "torch", "numpy", "scipy", "pxr", "mujoco", "mujoco_warp", "newton", "warp"):
+    try:
+        importlib.import_module(mod)
+    except Exception as e:
+        missing.append(f"{mod} ({type(e).__name__}: {e})")
+if missing:
+    sys.exit("setup_newton152.sh: imports failed in this environment: " + "; ".join(missing))
+import Metal, warp as wp
+wp.config.quiet = True
+dev = Metal.MTLCreateSystemDefaultDevice()
+if dev is None:
+    sys.exit("setup_newton152.sh: pyobjc Metal finds no GPU device")
+import metalsim.interop  # noqa: F401  (zero-copy Warp <-> PyTorch MPS, used by Franka-Pour)
+import newton, mujoco_warp
+print("newton", m.version("newton"), newton.__file__)
+print("mujoco-warp", m.version("mujoco-warp"), "warp", wp.__version__, wp.__file__)
+print("torch", m.version("torch"), "pyobjc", m.version("pyobjc-core"), "ninja", m.version("ninja"), "Metal device:", dev.name())
+PY

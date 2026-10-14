@@ -10,7 +10,7 @@ set -e
 PATCHES="$(cd "$(dirname "$0")/../patches" && pwd)"
 DIR=${1:-upstream/warp-metalsim}
 REPO=${METALSIM_WARP_REPO:-https://github.com/pulipakaa24/warp}     # fork of innate-inc/warp, branch metalsim
-PIN=31cf79d781e4b10d8ff85c8cbd98fc0e40f75953                         # metalsim head, 2026-10-12 (tight warp.fem temporary pools on Metal)
+PIN=31cf79d781e4b10d8ff85c8cbd98fc0e40f75953                         # metalsim head, 2026-10-13 (bsr_mv takes CUDA's tiled-kernel choice on Metal)
 REF=${METALSIM_WARP_REF:-$PIN}
 # Warp keeps example assets (.usd, .png, .nvdb) in Git LFS; the build does not need them. A git config that requires
 # the LFS filter (filter.lfs.required=true, e.g. a global `git lfs install`) on a machine without the git-lfs binary
