@@ -1,0 +1,102 @@
+{
+ "arm1": {
+  "gate": true,
+  "R1": "mixed / undecided",
+  "R3_stress": "consistent"
+ },
+ "arm2": {
+  "theta_stop": {},
+  "theta_fail": {}
+ },
+ "arm3": {
+  "R2": "supported by a3_b2, a3_q1d, a3_p1d"
+ },
+ "arm4": {
+  "d0_mm": 19.63245665249618,
+  "slope_m_s": 1.3888624440068784,
+  "v_impact": 0.9494448602199554,
+  "H_lag": "not supported",
+  "voxel_effect_mm": -0.7611140608787537
+ },
+ "arm5": {
+  "gate": true
+ },
+ "arm6": {},
+ "jobs": {
+  "a1_dx10": {
+   "rc": "0",
+   "seconds": "98",
+   "est_seconds": "80"
+  },
+  "a5_v02_S2": {
+   "rc": "0",
+   "seconds": "48",
+   "est_seconds": "28"
+  },
+  "a1_dx20": {
+   "rc": "0",
+   "seconds": "315",
+   "est_seconds": "410"
+  },
+  "a1_tall": {
+   "rc": "0",
+   "seconds": "169",
+   "est_seconds": "159"
+  },
+  "a4_dt120": {
+   "rc": "0",
+   "seconds": "109",
+   "est_seconds": "28"
+  },
+  "a4_dt240": {
+   "rc": "0",
+   "seconds": "193",
+   "est_seconds": "43"
+  },
+  "a4_dt480": {
+   "rc": "0",
+   "seconds": "129",
+   "est_seconds": "73"
+  },
+  "a4_dt960": {
+   "rc": "0",
+   "seconds": "159",
+   "est_seconds": "133"
+  },
+  "a4_dt480_v01": {
+   "rc": "0",
+   "seconds": "284",
+   "est_seconds": "173"
+  },
+  "a3_b2": {
+   "rc": "0",
+   "seconds": "163",
+   "est_seconds": "78"
+  },
+  "a3_q1d": {
+   "rc": "0",
+   "seconds": "264",
+   "est_seconds": "78"
+  },
+  "a3_p1d": {
+   "rc": "0",
+   "seconds": "164",
+   "est_seconds": "78"
+  },
+  "a3_gimp": {
+   "rc": "0",
+   "seconds": "99",
+   "est_seconds": "78"
+  },
+  "a3_ppc64": {
+   "rc": "0",
+   "seconds": "138",
+   "est_seconds": "141"
+  },
+  "a2_mu040": {
+   "rc": "3",
+   "seconds": "29",
+   "est_seconds": "195"
+  }
+ }
+}
