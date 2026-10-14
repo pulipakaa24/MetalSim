@@ -1,0 +1,44 @@
+== Tue Oct 13 18:19:30 PDT 2026 batch_any1 start
+     /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/kcache_new/1.18.0.dev20260917
+solver variants: ('gs-soa',) | robot graph: True | sand graph: False
+{"solver": "gs-soa", "color_blocks_per_core": null, "frames": 5, "robot_ms_median": 10.23483400058467, "sand_ms_median": 25.358250000863336, "total_ms_median": 35.593084001448005}
+/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_any1.sh: line 62: a[@]: unbound variable
+== Tue Oct 13 18:56:38 PDT 2026 batch_any1 start
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.0 %
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.2 %
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.9 %
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.2 %
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.0 %
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+| variant | robot ms (runs) | sand ms (runs) | total ms | hashes vs base r1 |
+|---|---|---|---|---|
+| base | 8.29 (8.0 / 8.3 / 8.3) | 22.15 (22.7 / 22.2 / 22.1) | 30.49 | equal; equal; equal |
+| k1 | 7.61 (7.9 / 7.6 / 7.5) | 26.23 (26.2 / 26.2 / 26.5) | 33.98 | equal; equal; equal |
+| k4 | 8.31 (8.2 / 8.3 / 8.3) | 22.11 (22.1 / 22.1 / 22.1) | 30.50 | equal; equal; equal |
+| k8 | 7.82 (7.4 / 7.9 / 7.8) | 22.47 (22.6 / 22.5 / 22.5) | 30.33 | equal; equal; equal |
+| soa | 7.78 (7.9 / 7.8 / 7.7) | 25.98 (26.5 / 25.9 / 26.0) | 33.68 | equal; equal; equal |
+{'mpm': 9.12, 'other': 1.42} ms/frame
+  0.113  _linesearch_iterative_kernel__locals__kernel_cdd7fc06_cuda_kernel_forward
+  0.068  eval_articulation_fk_6c60ba16_cuda_kernel_forward
+  0.056  mul_m_kernel__locals___mul_m_ff3bc617_cuda_kernel_forward
+  0.053  _update_gradient_cholesky__locals__kernel_544def38_cuda_kernel_forward
+  0.053  _tile_cholesky_factorize_solve_block__locals__kernel_ac7aec46_cuda_kernel_forwar
+  0.041  mass_form_d27b10be_edc94474_cuda_kernel_forward
+  0.039  _gemm_transb_kernel_97438da8_cuda_kernel_forward
+  0.039  _primitive_narrowphase__locals__primitive_narrowphase_ace5eb18_cuda_kernel_forwa
+  0.038  _efc_contact_jac_dense__locals__kernel_209c10d2_cuda_kernel_forward
+  0.033  _kinematics_branch_95f8028e_cuda_kernel_forward
+  0.032  _crb_accumulate_073a11b8_cuda_kernel_forward
+  0.030  _subtree_com_acc_350f0560_cuda_kernel_forward
+194a45e5 Coupled speed: ANYmal parts, Gauss-Seidel launch and solver variants (logs)
+failures: 
+== Tue Oct 13 19:03:11 PDT 2026 batch_any1 done

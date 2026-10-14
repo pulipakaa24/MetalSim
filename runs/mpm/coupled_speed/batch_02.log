@@ -1,0 +1,44 @@
+== Tue Oct 13 14:13:17 PDT 2026 batch_02 start
+installed warp 95f6f121b7e67025958335c7c15e338ac04a798a newton 3fd1f052a5ad031578960d9642aaaedc03834e4d
+patching file 'warp/config.py'
+patching file 'warp/_src/sparse.py'
+patching file 'newton/_src/solvers/implicit_mpm/solve_rheology.py'
+/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/warp_new/warp/__init__.py True /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/newton_new/newton/__init__.py True
+/Users/aditya/robosim/upstream/warp-innate/warp/__init__.py None /Users/aditya/robosim/upstream/newton-metalsim-1.5.2/newton/__init__.py
+[gpu_run] cs_bmt_check start: device utilisation 0% (14:13:23)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.7 %
+[watch 14:13:26] start: /Users/aditya/robosim/.venv-newton152/bin/python /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/metalsim/physics/mpm/probes/bsr_mv_tiles_check.py
+[watch 14:13:32] end code=0 wall=6s
+[gpu_run] cs_bmt_check end: device utilisation 0% (14:13:32), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/kcache_new/1.18.0.dev20260917
+metal_bsr_mv_tiles = True
+Module warp._src.metal_sparse c5e29c2 load on device 'metal:0' took 455.90 ms  (compiled)
+Module warp._src.metal_sparse 062c05e load on device 'metal:0' took 413.12 ms  (compiled)
+Module warp._src.metal_sparse 063527f load on device 'metal:0' took 418.05 ms  (compiled)
+Module warp._src.metal_sparse e3a2a06 load on device 'metal:0' took 434.83 ms  (compiled)
+Module _bsr_accumulate_triplet_values_1ba73229 747fcd9 load on device 'metal:0' took 413.62 ms  (compiled)
+Module make_bsr_mv_kernel__locals__bsr_mv_kernel_51ac893e 858c194 load on device 'metal:0' took 396.86 ms  (compiled)
+rows      2 x     40 blocks (empty 0) alpha 1.0 beta 0.0: tiled False, rel err 2.66e-07, repeat bitwise True -> ok
+Module make_bsr_mv_tiled_kernel__locals__bsr_mv_tiled_kernel_ecd5c05d 7f482b9 load on device 'metal:0' took 404.56 ms  (compiled)
+rows      4 x    300 blocks (empty 1) alpha -1.0 beta 0.0: tiled True, rel err 4.37e-08, repeat bitwise True -> ok
+rows      4 x   6000 blocks (empty 0) alpha -1.0 beta 0.0: tiled True, rel err 3.36e-07, repeat bitwise True -> ok
+rows     12 x  20000 blocks (empty 0) alpha 1.0 beta 1.0: tiled True, rel err 6.87e-07, repeat bitwise True -> ok
+rows  20000 x      3 blocks (empty 0) alpha 1.0 beta 1.0: tiled False, rel err 1.38e-07, repeat bitwise True -> ok
+frame  120 wall   145.7 ms | IJtm: 50 x, 37.43 ms, rows 12, blocks 1946, longest row 973, tiled False | J: 50 x, 11.61 ms, rows 655360, blocks 1946, longest row 2, tiled False
+frame  130 wall   118.9 ms | IJtm: 50 x, 29.30 ms, rows 12, blocks 2236, longest row 1118, tiled False | J: 50 x, 9.25 ms, rows 655360, blocks 2236, longest row 2, tiled False
+frame  140 wall   158.4 ms | IJtm: 50 x, 39.62 ms, rows 12, blocks 2338, longest row 1169, tiled False | J: 50 x, 11.78 ms, rows 655360, blocks 2338, longest row 2, tiled False
+frame  149 wall   136.6 ms | IJtm: 50 x, 35.15 ms, rows 12, blocks 2080, longest row 1040, tiled False | J: 50 x, 10.01 ms, rows 655360, blocks 2080, longest row 2, tiled False
+frame  120 wall   113.6 ms | IJtm: 50 x, 12.86 ms, rows 12, blocks 1956, longest row 978, tiled True | J: 50 x, 9.62 ms, rows 655360, blocks 1956, longest row 2, tiled False
+frame  130 wall   105.1 ms | IJtm: 50 x, 12.59 ms, rows 12, blocks 2236, longest row 1118, tiled True | J: 50 x, 9.33 ms, rows 655360, blocks 2236, longest row 2, tiled False
+frame  140 wall   116.1 ms | IJtm: 50 x, 12.87 ms, rows 12, blocks 2346, longest row 1173, tiled True | J: 50 x, 9.41 ms, rows 655360, blocks 2346, longest row 2, tiled False
+frame  149 wall   107.7 ms | IJtm: 50 x, 12.11 ms, rows 12, blocks 2078, longest row 1039, tiled True | J: 50 x, 9.33 ms, rows 655360, blocks 2078, longest row 2, tiled False
+STOP: test_mpm (see test_mpm_new.log)
+== Tue Oct 13 14:18:17 PDT 2026 batch_02 stopped

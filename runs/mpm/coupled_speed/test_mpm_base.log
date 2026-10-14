@@ -1,0 +1,61 @@
+[gpu_run] cs_test_mpm_base start: device utilisation 0% (14:27:10)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.8 %
+.......x.......F                                                         [100%]
+=================================== FAILURES ===================================
+________________ test_coupled_contact_filter_keeps_source_order ________________
+
+    def test_coupled_contact_filter_keeps_source_order():
+        """With ``install(rigid_deterministic=True)``, SolverCoupled's per-entry contact filter (an atomic-counter
+        compaction) hands out the filtered slots in source order, every run: the entry solver then sees the same contact
+        list, which Isaac Lab's Franka-Pour needs to repeat bitwise (it differed run to run from the first step)."""
+        sc = pytest.importorskip("newton._src.solvers.coupled.solver_coupled")
+        newton_compat.install(accumulate="float32", loop="cuda", rigid_deterministic=True)
+        n, shapes = 1 << 18, 64
+        rng = np.random.default_rng(0)
+        s0 = rng.integers(0, shapes, n).astype(np.int32)
+        s1 = rng.integers(0, shapes, n).astype(np.int32)
+        flags = np.where(np.arange(shapes) % 3 == 0, 0, int(newton.ShapeFlags.COLLIDE_SHAPES)).astype(np.int32)
+        keep = (flags[s0] != 0) & (flags[s1] != 0)
+        with wp.ScopedDevice(DEV):
+            i32 = lambda a: wp.array(a, dtype=wp.int32)  # noqa: E731
+            v3 = lambda: wp.array(rng.random((n, 3)).astype(np.float32), dtype=wp.vec3)  # noqa: E731
+            f32 = lambda: wp.array(rng.random(n).astype(np.float32), dtype=wp.float32)  # noqa: E731
+            src = [i32(np.ones(1)), i32(np.array([n])), i32(s0), i32(s1), i32(np.arange(n)), v3(), v3(), v3(), v3(),
+                   v3(), f32(), f32(), i32(np.arange(n)), i32(flags), int(newton.ShapeFlags.COLLIDE_SHAPES)]
+            for _ in range(3):
+                dst_count = wp.zeros(1, dtype=wp.int32)
+                dst = [dst_count, *(wp.zeros(n, dtype=wp.int32) for _ in range(3)), *(wp.zeros(n, dtype=wp.vec3) for _ in range(5)),
+                       wp.zeros(n, dtype=wp.float32), wp.zeros(n, dtype=wp.float32), wp.zeros(n, dtype=wp.int32),
+                       wp.full(n, -1, dtype=wp.int32)]
+                wp.launch(sc._filter_rigid_contacts_global_shape_ids_kernel, dim=n, inputs=src + dst)
+                count = int(dst_count.numpy()[0])
+                assert count == int(keep.sum())
+>               np.testing.assert_array_equal(dst[3].numpy()[:count], np.nonzero(keep)[0])  # point ids: source order
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               AssertionError: 
+E               Arrays are not equal
+E               
+E               Mismatched elements: 113156 / 113168 (100%)
+E               First 5 mismatches are at indices:
+E                [0]: 5890 (ACTUAL), 2 (DESIRED)
+E                [1]: 5892 (ACTUAL), 4 (DESIRED)
+E                [2]: 5895 (ACTUAL), 5 (DESIRED)
+E                [3]: 5896 (ACTUAL), 6 (DESIRED)
+E                [4]: 5899 (ACTUAL), 7 (DESIRED)
+E               Max absolute difference among violations: 26395
+E               Max relative difference among violations: 2944.
+E                ACTUAL: array([  5890,   5892,   5895, ..., 258012, 258013, 258015],
+E                     shape=(113168,), dtype=int32)
+E                DESIRED: array([     2,      4,      5, ..., 262137, 262140, 262141],
+E                     shape=(113168,))
+
+.claude/worktrees/agent-a8f809a11de334dd0/tests/test_mpm.py:251: AssertionError
+----------------------------- Captured stdout call -----------------------------
+Module newton._src.solvers.coupled.solver_coupled 244d8b7 load on device 'metal:0' took 528.00 ms  (compiled)
+=========================== short test summary info ============================
+FAILED .claude/worktrees/agent-a8f809a11de334dd0/tests/test_mpm.py::test_coupled_contact_filter_keeps_source_order
+1 failed, 14 passed, 1 xfailed in 111.60s (0:01:51)
+[gpu_run] cs_test_mpm_base end: device utilisation 71% (14:29:06), exit 1
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+[gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.7 %

@@ -1,0 +1,28 @@
+[gpu_run] cs_detdiag_base start: device utilisation 0% (14:30:56)
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/kcache_base/1.18.0.dev20260917
+warp /Users/aditya/robosim/upstream/warp-innate/warp/__init__.py newton /Users/aditya/robosim/upstream/newton-metalsim-1.5.2/newton/__init__.py
+config.deterministic before: 0
+  [before install] newton._src.solvers.coupled.solver_coupled: options.deterministic=0
+  [before install] newton._src.solvers.coupled.solver_coupled_proxy: options.deterministic=0
+  [before install] kernel module: newton._src.solvers.coupled.solver_coupled options.deterministic=0
+config.deterministic after: 0 state: True
+  [after install] newton._src.solvers.coupled.solver_coupled: options.deterministic=1
+  [after install] newton._src.solvers.coupled.solver_coupled_proxy: options.deterministic=1
+  [after install] kernel module: newton._src.solvers.coupled.solver_coupled options.deterministic=1
+Module newton._src.solvers.coupled.solver_coupled 56a22d1 load on device 'metal:0' took 569.44 ms  (compiled)
+launch 0: first ids [2, 4, 5, 6, 7, 11] source order True
+launch 1: first ids [2, 4, 5, 6, 7, 11] source order True
+launch 2: first ids [2, 4, 5, 6, 7, 11] source order True
+  [after launches] newton._src.solvers.coupled.solver_coupled: options.deterministic=1
+  [after launches] newton._src.solvers.coupled.solver_coupled_proxy: options.deterministic=1
+  [after launches] kernel module: newton._src.solvers.coupled.solver_coupled options.deterministic=1
+[gpu_run] cs_detdiag_base end: device utilisation 0% (14:31:01), exit 0
+[gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s:
+[gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.4 %
