@@ -113,6 +113,7 @@ step 06_fetch_isaac 01_clone -- 'scripts/fetch_isaac_assets.sh'
 step 07_menagerie 01_clone -- 'git clone --depth 1 https://github.com/google-deepmind/mujoco_menagerie upstream/mujoco_menagerie && ls upstream/mujoco_menagerie | wc -l'
 step 08_setup_newton152 05_pip_mujoco_warp -- 'scripts/setup_newton152.sh && .venv-newton152/bin/python -c "import objc, Metal, ninja, torch, metalsim.interop; print(\"pyobjc/ninja/torch ok\")"'
 step 09_fetch_polyhaven_demo 01_clone -- 'scripts/fetch_polyhaven_assets.sh demo'
+step 09b_fetch_isaaclab_source 01_clone -- 'scripts/fetch_isaaclab_source.sh'
 step 15_pins 01_clone -- 'echo "MetalSim $(git rev-parse HEAD) ($(git log -1 --format=%cd --date=iso))"
   grep -hE "^PIN=" scripts/setup_warp.sh scripts/setup_newton152.sh | sed "s/^/setup script /"
   for d in upstream/warp-metalsim upstream/newton-metalsim-1.5.2 .venv/src/mujoco-warp; do
@@ -136,7 +137,7 @@ gpu 11_rigid_suite "05_pip_mujoco_warp 06_fetch_isaac 07_menagerie" 90 7200 -- "
 gpu 12_render_suite "05_pip_mujoco_warp 06_fetch_isaac 07_menagerie" 60 5400 -- "python -m pytest $P $RENDER"
 gpu 13_test_mpm 08_setup_newton152 30 3600 -- ".venv-newton152/bin/python -m pytest $P tests/test_mpm.py"
 gpu 14_test_mpm_main "05_pip_mujoco_warp 08_setup_newton152" 60 3600 -- "python -m pytest $P tests/test_mpm_main.py"
-gpu 17_test_franka_pour "08_setup_newton152 06_fetch_isaac" 30 3600 -- ".venv-newton152/bin/python -m pytest $P $N152"
+gpu 17_test_franka_pour "08_setup_newton152 06_fetch_isaac 09b_fetch_isaaclab_source" 30 3600 -- ".venv-newton152/bin/python -m pytest $P $N152"
 if [ -f "$CLONE/$DET" ]; then
   GKIND=timing gpu 16_test_batch_deterministic "05_pip_mujoco_warp" 30 3600 -- "python -m pytest $P $DET"
 fi
@@ -152,5 +153,8 @@ gpu 23_demo_anymal_sim 08_setup_newton152 20 2400 -- '.venv-newton152/bin/python
 gpu 24_demo_anymal_render "23_demo_anymal_sim 07_menagerie 09_fetch_polyhaven_demo" 20 2400 -- 'python scripts/particle_demo/render_anymal.py --sim runs/demo/anymal_small --out runs/demo/anymal_small_frames --frames 0:2 --width 480 --height 270 --passes 4 --grains 8 --decor 0 0 0 0 && ls -la runs/demo/anymal_small_frames && cat runs/demo/anymal_small_frames/stats_*.json | head -30'
 gpu 25_demo_transparency_lidar "05_pip_mujoco_warp" 10 1200 -- 'mkdir -p runs/fresh && python scripts/diagnostics/sensor_transparency_cost.py --n 64 --out runs/fresh/sensor_transparency_64.json'
 
+# every skip of the test steps, with its reason (the goal is none)
+step 30_skips "" -- "grep -h '^SKIPPED' $(printf '%q' "$LOGS")/1[0-9]_*.log | sed -E 's/^SKIPPED \[[0-9]+\] //' | sort | uniq -c;
+  echo \"\$(grep -h '^SKIPPED' $(printf '%q' "$LOGS")/1[0-9]_*.log | wc -l | tr -d ' ') skipped\""
 log "done: $(grep -c "	ok	" "$RES") ok, $(grep -c "	FAIL	" "$RES") failed, $(grep -c "	blocked	" "$RES") blocked (results.tsv keeps every attempt)"
 date > "$BASE/DONE"

@@ -17,7 +17,7 @@ built by `scripts/setup_newton152.sh` and `scripts/setup_newton.sh`, and about 5
 ```
 git clone https://github.com/pulipakaa24/MetalSim && cd MetalSim
 python3.12 -m venv .venv && source .venv/bin/activate     # uv only: "$(uv python find 3.12)" -m venv .venv
-pip install -e ".[test,newton]"
+pip install -e ".[full]"
 scripts/setup_warp.sh
 pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@f1b35e2b3ddc80b197b0c665bf6d71523d175daf#egg=mujoco-warp" "mujoco>=3.14,<3.15"      # pinned: README "Install"
 scripts/fetch_isaac_assets.sh
@@ -25,15 +25,23 @@ git clone --depth 1 https://github.com/google-deepmind/mujoco_menagerie upstream
 pytest tests -q
 scripts/setup_newton152.sh                 # MPM and Franka-Pour: .venv-newton152 (below)
 scripts/fetch_polyhaven_assets.sh demo     # the ANYmal-on-sand render demo's HDRI and sand texture
+scripts/fetch_isaaclab_source.sh           # Isaac Lab 3.0-EA's task source: tests/test_franka_pour_terms.py's oracle
 ```
 
+Fresh install verified on main `87dfac06af` (2026-10-13): `scripts/fresh_install_check.sh` (a new clone in a directory whose path has a space, caches inside it, every step above, the test suites through the GPU queue and a small run of each demo) passed on an M4 Max under macOS 26 and on a second M4 Max under macOS 27 with a different user, with 15 tests skipped on each, for these reasons: 7 in `tests/test_franka_pour_terms.py` (Isaac Lab 3.0-EA's task source, the test's oracle, was not fetched), 4 in `tests/test_tron1.py` (`onnxruntime`, the `tron1` extra), 1 in `tests/test_ppo_warp_rollout.py` (`rsl_rl`, the `rslrl` extra), 1 in `tests/test_materialx.py` (`MaterialX`), and 2 Newton-bridge tests (`tests/test_render_newton_bridge.py`, `tests/test_newton_bridge_poses.py`: Newton 1.7's `SolverMuJoCo` does not build against the MuJoCo Warp fork). Correctness only; no timing.
+
 Run every command from the repository root; the clone can live anywhere, under any user and in a directory whose
-path has spaces. `newton` in the first `pip install` is Newton 1.7 (the `newton` extra), which MPM in `BatchSim`
-scenes (section 2, `tests/test_mpm_main.py`) and the Newton engine import; install it before `scripts/setup_warp.sh`,
-so the fork replaces the PyPI Warp it pulls in. `scripts/fetch_isaac_assets.sh` fetches NVIDIA's `g1_minimal.usd`
+path has spaces. The `full` extra in the first `pip install` is `test`, `newton`, `rslrl` and `tron1` together:
+everything the test suite imports, so no test is skipped for a missing package (`pip install -e ".[test,newton]"`
+is the smaller set; the tests that need the rest are then skipped). Its `newton` part is Newton 1.7, which MPM in
+`BatchSim` scenes (section 2, `tests/test_mpm_main.py`) and the Newton engine import; install it before
+`scripts/setup_warp.sh`, so the fork replaces the PyPI Warp it pulls in. `scripts/fetch_isaac_assets.sh` fetches NVIDIA's `g1_minimal.usd`
 (the G1 tasks) and the Franka-Pour scene (15 files, SHA-256 checked) from NVIDIA's public asset store.
 MuJoCo Menagerie supplies the robot models some tests, the ANYmal demo render and the Franka probes load
-(`MENAGERIE` points elsewhere); without it those tests are skipped.
+(`MENAGERIE` points elsewhere); without it those tests are skipped. `scripts/fetch_isaaclab_source.sh` makes a pinned,
+sparse, shallow checkout of Isaac Lab 3.0-EA (BSD-3-Clause, tag `v3.0.0-EA`, commit `ae37b028`) in
+`upstream/IsaacLab3`: only the Franka-Pour task and the `isaaclab` utility and MDP modules that
+`tests/test_franka_pour_terms.py` loads as the reference (`ISAACLAB3_SOURCE` points elsewhere).
 
 On a fresh clone (2026-09-25, M4 Max, fast network, pip's download cache and Warp's kernel cache
 already filled) the install took one to one and a half minutes and the tests two and a half minutes (113
@@ -45,7 +53,8 @@ to run everything except the tests. Optional extras:
 
 | extra | for |
 |---|---|
-| `test` | the test suite (pytest, pillow, imageio, scipy, trimesh) |
+| `full` | `test` + `newton` + `rslrl` + `tron1`: everything the test suite imports (the documented install) |
+| `test` | the test suite (pytest, pillow, imageio, scipy, trimesh, MaterialX) |
 | `parity` | the fidelity protocol and render-fidelity metrics (imageio-ffmpeg, scikit-image, lpips, flip-evaluator) |
 | `rslrl` | `metalsim.learn.train_g1_rslrl` (rsl-rl-lib 3.1.2, the reference learner) |
 | `newton` | the Newton XPBD engine (experimental, see section 5) |
