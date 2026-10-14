@@ -94,6 +94,34 @@ kernel and summation order. Unchanged without that Warp option.
 METALSIM_CHANGES.md row.
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" || stop "newton commit"
+  git -C $NF apply $R/patches/newton_harvest_compact.diff || stop "newton harvest patch"
+  python3 $R/changes_row.py $NF $R/row_newton_harvest.txt || stop "newton harvest row"
+  git -C $NF add newton/_src/solvers/implicit_mpm/solver_implicit_mpm.py METALSIM_CHANGES.md
+  git -C $NF commit -s -q -m "Metal: compact the proxy-body nodes before the ordered wrench harvest
+
+coupling_harvest_proxy_wrenches on Metal had every proxy body scan every
+collider node of its world (with one world: every active node) in 32
+fixed lanes. A stable integer-scan compaction (capture-safe) lists the
+proxy-body nodes first; the lanes walk only those. Same per-node terms in
+another fixed order. MetalSim multibody_sand (1 world): harvest
+15.6 -> 1.5 ms, coupled step 49.3 -> 34.2 ms (16 bodies); Franka-Pour
+unchanged. NEWTON_METAL_HARVEST_COMPACT=0 restores the full scan.
+METALSIM_CHANGES.md row.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" || stop "newton harvest commit"
+  git -C $NF apply $R/patches/newton_body_force_compact.diff || stop "newton body-force patch"
+  python3 $R/changes_row.py $NF $R/row_newton_bodyforce.txt || stop "newton body-force row"
+  git -C $NF add newton/examples/mpm/example_mpm_twoway_coupling.py METALSIM_CHANGES.md
+  git -C $NF commit -s -q -m "example_mpm_twoway_coupling: compact the body nodes before the ordered force sum
+
+On Metal every body scanned all grid nodes (655,360) in every substep. A
+stable integer-scan compaction lists the nodes in contact with a body
+first; the 256 fixed lanes sum over that list. 1.05 -> 0.38 ms per call;
+captured two-way 40.0 -> 37.6 ms/frame (M4 Max). Repeats bitwise.
+NEWTON_METAL_BODY_FORCE_COMPACT=0 restores the full scan.
+METALSIM_CHANGES.md row.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" || stop "newton body-force commit"
   touch $B/forks_committed
 fi
 NEW_W=$(git -C $WF rev-parse HEAD); NEW_N=$(git -C $NF rev-parse HEAD)
@@ -111,7 +139,24 @@ fi
 STAGES=floors KIND=timing WARP_CACHE_PATH=$R/kcache_pinned bash $W/metalsim/physics/mpm/record_variant_suite.sh \
     $B/floors_pinned $WF $NF $W | grep -v '^skip'
 health floors
-$PY $W/research_notes/mpm_parity_closeout/bitwise_dirs.py $R/floors_new $B/floors_pinned | tee $B/bitwise_floors_vs_batch02.txt
+echo "-- floors vs batch_02's patched trees (expected: equal except twoway, which now has the body-force compaction)"
+$PY -P $W/research_notes/mpm_parity_closeout/bitwise_dirs.py $R/floors_new $B/floors_pinned | tee $B/bitwise_floors_vs_batch02.txt
+echo "-- twoway vs batch_bf1's (IJtm + body-force compaction; expected equal)"
+$PY -P $W/research_notes/mpm_parity_closeout/bitwise_dirs.py $R/bf1/floors_bf1 $B/floors_pinned | tee $B/bitwise_twoway_vs_bf1.txt
+FB=$W/scripts/diagnostics/franka_pour_memory/franka_bitwise.py
+for t in 1 2; do
+  [ -f $B/pour_hash_$t.json ] && continue
+  job cs8_pour_hash_$t 30 $B/pour_hash_$t.log -- $PYP -P $FB 64 30 $B/pour_hash_$t.json || echo "FAIL: pour hash $t"
+done
+python3 - $B/pour_hash_1.json $B/pour_hash_2.json $R/hv1/pour_hash_on1.json <<'PYEOF' || echo "FAIL: pour hash comparison"
+import json, sys
+h = [json.load(open(p))["hashes"] for p in sys.argv[1:4]]
+def cmp(a, b):
+    i = next((k for k, (x, y) in enumerate(zip(a, b)) if x != y), None)
+    return f"bitwise equal over {len(a)} steps" if i is None else f"first differs at step {i}"
+print("Franka-Pour pinned run 1 vs 2:", cmp(h[0], h[1]))
+print("Franka-Pour pinned vs batch_hv1 (IJtm + harvest on the old Newton base; differs only if the GS fix touches it):", cmp(h[0], h[2]))
+PYEOF
 for rep in 1 2; do
   for tiles in 1 0; do
     id=pour2048_tiles${tiles}_r$rep
