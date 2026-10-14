@@ -1,0 +1,91 @@
+Warp 1.18.0.dev20260917 initialized:
+   CUDA not enabled in this build
+   Devices:
+     "cpu"      : "arm"
+     "metal:0"  : "Apple M4 Max" (Metal)
+   Kernel cache:
+     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+Module mujoco_warp._src.smooth d82236f load on device 'metal:0' took 63.80 ms  (cached)
+Module _nxn_broadphase__locals__kernel_da6e4d10 da6e4d1 load on device 'metal:0' took 41.83 ms  (cached)
+Module ccd_kernel_builder__locals__ccd_kernel_74f6bbbc 74f6bbb load on device 'metal:0' took 2498.47 ms  (cached)
+Module _primitive_narrowphase__locals__primitive_narrowphase_cf550af6 cf550af load on device 'metal:0' took 880.22 ms  (cached)
+Module mujoco_warp._src.constraint 5a9ac8b load on device 'metal:0' took 39.37 ms  (cached)
+Module _friction_dof__locals__kernel_7675e9e7 7675e9e load on device 'metal:0' took 39.12 ms  (cached)
+Module _limit_slide_hinge__locals__kernel_89f30062 89f3006 load on device 'metal:0' took 369.93 ms  (cached)
+Module _efc_contact_init__locals__kernel_053e2b79 053e2b7 load on device 'metal:0' took 347.66 ms  (cached)
+Module _efc_contact_jac_sparse__locals__kernel_23367638 2336763 load on device 'metal:0' took 40.29 ms  (cached)
+Module _efc_contact_update__locals__kernel_2c3f8f8a 2c3f8f8 load on device 'metal:0' took 39.89 ms  (cached)
+Module mujoco_warp._src.sensor 9b332ca load on device 'metal:0' took 1670.38 ms  (cached)
+Module mujoco_warp._src.forward f50e6f5 load on device 'metal:0' took 1297.86 ms  (cached)
+Module mujoco_warp._src.passive b076fe0 load on device 'metal:0' took 51.32 ms  (cached)
+Module _qfrc_passive_kernel__locals__kernel_54b31bb5 54b31bb load on device 'metal:0' took 328.07 ms  (cached)
+Module mujoco_warp._src.forward 5f45167 load on device 'metal:0' took 53.77 ms  (cached)
+Module _qfrc_smooth__locals__kernel_775cdd1e 775cdd1 load on device 'metal:0' took 337.79 ms  (cached)
+Module mujoco_warp._src.support c23ce19 load on device 'metal:0' took 40.98 ms  (cached)
+Module _small_cholesky_factorize_solve_block__locals__kernel_1e1369df 8ac5b05 load on device 'metal:0' took 411.79 ms  (cached)
+Module _tile_cholesky_factorize_solve_block__locals__kernel_068311f7 22519a4 load on device 'metal:0' took 431.44 ms  (cached)
+Module _solve_init_dof__locals__kernel_b308d2e0 b308d2e load on device 'metal:0' took 337.50 ms  (cached)
+Module _solve_init_efc__locals__kernel_496de172 496de17 load on device 'metal:0' took 341.07 ms  (cached)
+Module _solve_init_jaref_kernel__locals__kernel_9e06cdec 9e06cde load on device 'metal:0' took 339.45 ms  (cached)
+Module mul_m_kernel__locals___mul_m_cc4a8159 cc4a815 load on device 'metal:0' took 347.36 ms  (cached)
+Module _update_constraint_efc__locals__kernel_816b370a 816b370 load on device 'metal:0' took 40.37 ms  (cached)
+Module mujoco_warp._src.solver 7d36d0b load on device 'metal:0' took 523.24 ms  (cached)
+Module _update_constraint_init_qfrc_constraint_sparse__locals__kernel_fb0e9617 fb0e961 load on device 'metal:0' took 40.18 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_62bc6e88 62bc6e8 load on device 'metal:0' took 337.23 ms  (cached)
+Module _update_gradient_grad__locals__kernel_68e6ef6f 68e6ef6 load on device 'metal:0' took 336.91 ms  (cached)
+Module _update_gradient_init_h_sparse__locals__kernel_84a052c3 84a052c load on device 'metal:0' took 40.35 ms  (cached)
+Module _JTDACJ_sparse__locals__kernel_e1f3fdb5 ca15c6d load on device 'metal:0' took 41.49 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_42432b97 128e28f load on device 'metal:0' took 390.64 ms  (cached)
+Module _linesearch_jv_fused_kernel__locals__kernel_bf645185 bf64518 load on device 'metal:0' took 334.65 ms  (cached)
+Module _linesearch_iterative_kernel__locals__kernel_14418b72 0065b3c load on device 'metal:0' took 43.30 ms  (cached)
+Module _update_constraint_efc__locals__kernel_74fe78cc 74fe78c load on device 'metal:0' took 46.85 ms  (cached)
+Module _update_gradient_zero_grad_dot__locals__kernel_1f9a5fed 1f9a5fe load on device 'metal:0' took 39.67 ms  (cached)
+Module _update_gradient_grad__locals__kernel_d31e3724 d31e372 load on device 'metal:0' took 38.71 ms  (cached)
+Module _update_gradient_h_incremental_sparse__locals__kernel_c4c9e4a6 c4c9e4a load on device 'metal:0' took 38.62 ms  (cached)
+Module _update_gradient_cholesky__locals__kernel_aee3b00a 0e4151a load on device 'metal:0' took 389.16 ms  (cached)
+Module _solve_done__locals__kernel_f6c8ded3 f6c8ded load on device 'metal:0' took 38.58 ms  (cached)
+Module _next_time_builder__locals___next_time_9bdc285a 9bdc285 load on device 'metal:0' took 332.15 ms  (cached)
+Module metalsim.physics.batch 74a3c65 load on device 'metal:0' took 328.64 ms  (cached)
+Module reset_data__locals__reset_xfrc_applied_753bbeab 753bbea load on device 'metal:0' took 39.17 ms  (cached)
+Module reset_data__locals__reset_M_94b7ab81 94b7ab8 load on device 'metal:0' took 39.00 ms  (cached)
+Module reset_data__locals__reset_mocap_ffcfb2c4 ffcfb2c load on device 'metal:0' took 38.62 ms  (cached)
+Module reset_data__locals__reset_contact_41eafef4 41eafef load on device 'metal:0' took 38.52 ms  (cached)
+Module reset_data__locals__reset_sleep_38f94185 38f9418 load on device 'metal:0' took 38.93 ms  (cached)
+Module reset_data__locals__reset_nworld_5d2d5901 5d2d590 load on device 'metal:0' took 38.83 ms  (cached)
+[scene] go2_boxes: 4 envs, nbody 20 ngeom 63 nq 61 nu 12, 0 cameras, 0 lidars; spec 0.21 s, sim 26.63 s
+[record] go2_boxes: 4 envs, up to 251 frames at 50.0 fps
+[record] frame 1/251: 31 ms, episodes ended 0/4
+[record] frame 31/251: 6 ms, episodes ended 0/4
+[record] frame 61/251: 7 ms, episodes ended 0/4
+[record] frame 91/251: 5 ms, episodes ended 0/4
+[record] frame 121/251: 5 ms, episodes ended 0/4
+[record] frame 151/251: 5 ms, episodes ended 0/4
+[record] frame 181/251: 5 ms, episodes ended 0/4
+[record] frame 211/251: 5 ms, episodes ended 0/4
+[record] frame 241/251: 6 ms, episodes ended 0/4
+[record] frame 251/251: 5 ms, episodes ended 0/4
+[record] filmed envs [0] (ends [-1])
+[record] done: 251 frames, sim 7 ms/frame mean, twin 63 geoms, wall 30 s -> runs/scenes/go2_boxes/film/rec
+[render] go2_boxes: 251 frames, 1x1 panels of 1920x1080, 16 x 4 spp, 63 twin geoms (0 frame corrections), particles/env 0, setup 0.5 s
+[render] automatic exposure 0.3937
+[render] frame 0/251: 0.60 s (render 0.40 s)
+[render] frame 15/251: 0.59 s (render 0.42 s)
+[render] frame 30/251: 0.61 s (render 0.44 s)
+[render] frame 45/251: 0.60 s (render 0.43 s)
+[render] frame 60/251: 0.61 s (render 0.44 s)
+[render] frame 75/251: 0.61 s (render 0.44 s)
+[render] frame 90/251: 0.61 s (render 0.44 s)
+[render] frame 105/251: 0.60 s (render 0.44 s)
+[render] frame 120/251: 0.61 s (render 0.44 s)
+[render] frame 135/251: 0.62 s (render 0.43 s)
+[render] frame 150/251: 0.60 s (render 0.43 s)
+[render] frame 165/251: 0.61 s (render 0.44 s)
+[render] frame 180/251: 0.61 s (render 0.44 s)
+[render] frame 195/251: 0.60 s (render 0.44 s)
+[render] frame 210/251: 0.63 s (render 0.45 s)
+[render] frame 225/251: 0.62 s (render 0.45 s)
+[render] frame 240/251: 0.60 s (render 0.43 s)
+[render] done: 251 frames rendered -> runs/scenes/go2_boxes/film/hero
+[encode] 251 frames -> runs/scenes/go2_boxes/film/go2_boxes.mp4 (0.3 MB), 1 stills, 2.7 s
+
+[watchdog] exit 0 after 219 s
