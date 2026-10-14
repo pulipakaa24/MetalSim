@@ -4,6 +4,10 @@ What landed between 2026-09-22 and 2026-10-13, grouped by area. The September se
 commit order; the October sections, newest first, summarise each merged pull request with its main commits (`git log`
 for the full messages). Dates are the commit dates (month-day).
 
+## Newton 1.7: SolverMuJoCo on MuJoCo Warp 3.14 (2026-10-13)
+
+- 10-13 Newton pins 9f317390 -> 1301e8da (`metalsim`, `.venv-newtonfork`) and a4be3604 -> 9d6616c6 (`metalsim-hashtable-metal`, `.venv`'s `newton` extra): `SolverMuJoCo` passes the contact adhesion that MuJoCo Warp 3.14's `contact_force_fn` takes (upstream Newton's `90f809a`). Before, `SolverMuJoCo`'s kernels did not compile against MetalSim's MuJoCo Warp fork, and the Newton-engine and Newton-bridge render tests skipped in `.venv`.
+
 ## MPM: coupled step and resets in one policy-step graph (2026-10-13, `metalsim/physics/mpm/MPM.md` 11)
 
 - 10-13 `MPMCoupling.launch_step()`, a capturable per-world reset (`reset_mask`, `launch_reset(from_sim_mask=True)`, `reset(mask)` with numpy or torch masks and a reset graph) and `BatchSim.launch_reset()`; `scale_coupled.py --split` per-section timings; `policy_step_ab.py`. The coupling layer is about 0.4 ms per coupled step; one graph per policy step saves 0.18 ms at 1, 1.20 ms at 64, 2.11 ms at 1,024 worlds, bitwise. One-world masked reset fixed (it raised).
