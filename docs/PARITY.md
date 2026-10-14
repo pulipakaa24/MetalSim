@@ -1126,7 +1126,10 @@ Isaac's step-only runtime benchmark (`isaaclab benchmark runtime`) rejects the c
 ("Unsupported concrete physics config"), so the L4 row is rsl_rl's collection time, which includes inference.
 This Mac's first timing rows ran while the idle check read 100 % (a GPU later found hung by another job); the
 re-measure on an idle device (0-3 %) gives 986 / 999 / 979. All throughput figures here are from this Mac (the
-training runs on the second M4 Max are not timing measurements). Isaac's 3,000 iterations x 196,608 steps = 590M
+training runs on the second M4 Max are not timing measurements). With the 2026-10-13 pins (Warp `31cf79d7`, Newton
+`addd10cb`, MPM.md 8k) the 2,048-env step-only time is 1.80 s with or without the new tiled product and the harvest
+compaction (`runs/mpm/coupled_speed/b08/`, `hv1/`); with `rigid_deterministic` the 64-env rollout repeats bitwise. The
+trajectories change by rounding (summation order); the throughput above does not. Isaac's 3,000 iterations x 196,608 steps = 590M
 steps take about 7 days at 979 env-steps/s (Isaac on an L4 cannot run them at 2,048 envs).
 
 ### 1b.5 Learning

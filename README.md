@@ -72,7 +72,7 @@ listing its commits, and keeps its upstream licence unchanged. "Head" is the bra
 
 [github.com/pulipakaa24/warp](https://github.com/pulipakaa24/warp), branch
 [`metalsim`](https://github.com/pulipakaa24/warp/tree/metalsim), head
-[`31cf79d7`](https://github.com/pulipakaa24/warp/commit/31cf79d781e4b10d8ff85c8cbd98fc0e40f75953) (2026-10-12, pinned by
+[`31cf79d7`](https://github.com/pulipakaa24/warp/commit/31cf79d781e4b10d8ff85c8cbd98fc0e40f75953) (2026-10-13, pinned by
 `scripts/setup_warp.sh`; the rigid-body results through 2026-09-26 were produced at
 [`c200d46b`](https://github.com/pulipakaa24/warp/commit/c200d46b), those before that day's throughput work at [`4127c48`](https://github.com/pulipakaa24/warp/commit/4127c4818334080de6f3d23aef522e582ff6a2a7), code
 [`f194006`](https://github.com/pulipakaa24/warp/commit/f194006a4cf197fda93633252af81bc3f57f5561)). Base: innate-inc/warp
@@ -184,7 +184,7 @@ Branch [`metalsim-hashtable-metal`](https://github.com/pulipakaa24/newton/tree/m
 (`a4be360`) is upstream `4545802` with only the Metal fixes (no XPBD changes); the `newton` extra installs it into `.venv` (the stock commit
 loses or duplicates contact-table keys on Metal and raises on the current Warp fork in the rough G1 task).
 Branch [`metalsim-1.5.2`](https://github.com/pulipakaa24/newton/tree/metalsim-1.5.2) (pinned at
-[`addd10cb`](https://github.com/pulipakaa24/newton/commit/addd10cbeb25e946b3a4c2bb1d4097acc7a98ca2) by `scripts/setup_newton152.sh`; `3fd1f052` before the 2026-10-13 Gauss-Seidel coloring fix, `c0427fc` before the 2026-10-12 MPM-step work) is Newton 1.5.2
+[`addd10cb`](https://github.com/pulipakaa24/newton/commit/addd10cbeb25e946b3a4c2bb1d4097acc7a98ca2) by `scripts/setup_newton152.sh`; `99843d09` before the 2026-10-13 coupled-speed commits, `3fd1f052` before the 2026-10-13 Gauss-Seidel coloring fix, `c0427fc` before the 2026-10-12 MPM-step work) is Newton 1.5.2
 (Isaac Lab 3.0-EA's pin) with MetalSim's Metal changes for the implicit MPM solver and the Franka-Pour rigid collision
 at 2,048 worlds; `scripts/setup_newton152.sh` installs it into `.venv-newton152`.
 
