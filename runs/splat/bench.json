@@ -1,0 +1,106 @@
+{
+ "kind": "bench",
+ "time": "2026-10-14 00:00:40",
+ "machine": "Apple M4 Max, 64 GB, macOS 26.7.1",
+ "size": [
+  640,
+  360
+ ],
+ "hfov": 88.9,
+ "iters": 20,
+ "scene": "InteriorGS 0204_840158",
+ "n_splats": 972596,
+ "load_s": 0.17,
+ "prep_s": 0.21,
+ "n_views": 480,
+ "rows": [
+  {
+   "n": 1,
+   "ms_per_frame": 0.68,
+   "ms_per_cam": 0.684,
+   "cams_per_s": 1462.9,
+   "sub_batch": 1,
+   "records": 28861,
+   "keys": 123089,
+   "stages_ms": {
+    "cams": 0.0,
+    "cull": 0.05,
+    "scan_records": 0.01,
+    "project": 0.1,
+    "scan_keys": 0.01,
+    "emit": 0.1,
+    "sort": 0.15,
+    "blend": 0.25,
+    "total": 0.68
+   },
+   "scene_mb": 132,
+   "scratch_mb": 509
+  },
+  {
+   "n": 8,
+   "ms_per_frame": 3.46,
+   "ms_per_cam": 0.433,
+   "cams_per_s": 2309.1,
+   "sub_batch": 8,
+   "records": 892560,
+   "keys": 2064279,
+   "stages_ms": {
+    "cams": 0.0,
+    "cull": 0.07,
+    "scan_records": 0.01,
+    "project": 0.38,
+    "scan_keys": 0.04,
+    "emit": 0.18,
+    "sort": 0.52,
+    "blend": 2.32,
+    "total": 3.53
+   },
+   "scene_mb": 132,
+   "scratch_mb": 509
+  },
+  {
+   "n": 32,
+   "ms_per_frame": 16.24,
+   "ms_per_cam": 0.507,
+   "cams_per_s": 1970.9,
+   "sub_batch": 32,
+   "records": 4231787,
+   "keys": 10022826,
+   "stages_ms": {
+    "cams": 0.0,
+    "cull": 0.18,
+    "scan_records": 0.01,
+    "project": 1.69,
+    "scan_keys": 0.11,
+    "emit": 0.62,
+    "sort": 3.53,
+    "blend": 10.18,
+    "total": 16.31
+   },
+   "scene_mb": 132,
+   "scratch_mb": 509
+  },
+  {
+   "n": 64,
+   "ms_per_frame": 31.55,
+   "ms_per_cam": 0.493,
+   "cams_per_s": 2028.3,
+   "sub_batch": 32,
+   "records": 9164023,
+   "keys": 20695485,
+   "stages_ms": {
+    "cams": 0.0,
+    "cull": 0.37,
+    "scan_records": 0.02,
+    "project": 2.96,
+    "scan_keys": 0.24,
+    "emit": 1.24,
+    "sort": 6.8,
+    "blend": 19.49,
+    "total": 31.11
+   },
+   "scene_mb": 132,
+   "scratch_mb": 509
+  }
+ ]
+}
