@@ -124,7 +124,7 @@ first four commits plus the graph-capture sort; merged into `metalsim`.
 
 [github.com/pulipakaa24/mujoco_warp](https://github.com/pulipakaa24/mujoco_warp), branch
 [`metalsim`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), head
-[`4d05cb7`](https://github.com/pulipakaa24/mujoco_warp/commit/4d05cb7d4453d82c94d19ab9fb392df2c62b1acd) (2026-10-13, the commit the install pins;
+[`8eb51fe`](https://github.com/pulipakaa24/mujoco_warp/commit/8eb51fe637437108185f5a4750b7f5f64ef26624) (2026-10-13, the commit the install pins;
 the rigid-body results before the elliptic-cone work were produced at
 [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) / code
 [`8fbf965`](https://github.com/pulipakaa24/mujoco_warp/commit/8fbf965acb630aa32573dda802404d519c843a99)). Base: Google
@@ -167,6 +167,7 @@ DeepMind's MuJoCo Warp v3.14.0 (`88af9cc`) plus the Metal device patch by David 
   archives the old form).
 
 - Deterministic mode (Warp `RUN_TO_RUN`): non-heightfield CCD runs as a counter-free solve kernel and a contact-write kernel (`cfa290b`); the single kernel picked its EPA scratch row with a slot counter, so under Warp's two-pass counters a box-box contact could land in another world's slot. Default mode unchanged.
+- Deterministic mode: `_solve_done` keeps the solver's iteration count in a local (`8eb51fe`); it read back an in-place increment that Warp's counting pass suppresses, so a world reaching the iteration cap made the early exit's counter call in one pass only (the G1 task stopped on the counter check). The Newton update takes the unfused launches in deterministic mode: the fused kernel reads back its own change counter within the launch, and its deterministic plan at 1,024 worlds asked for more than 2^31 scratch elements.
 
 Branch [`metalsim-flex`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-flex), head
 [`fc1d5ee`](https://github.com/pulipakaa24/mujoco_warp/commit/fc1d5eef8f9045309087bc822f36c1c62a7214a2) (code
@@ -268,7 +269,7 @@ git clone https://github.com/pulipakaa24/MetalSim && cd MetalSim
 python3.12 -m venv .venv && source .venv/bin/activate     # uv only: "$(uv python find 3.12)" -m venv .venv
 pip install -e ".[test,newton]"            # newton: MPM in BatchSim scenes (Newton 1.7) and the Newton engine
 scripts/setup_warp.sh                      # replaces PyPI's warp-lang with the Warp fork (upstream/warp-metalsim)
-pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@4d05cb7d4453d82c94d19ab9fb392df2c62b1acd#egg=mujoco-warp" "mujoco>=3.14,<3.15"
+pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@8eb51fe637437108185f5a4750b7f5f64ef26624#egg=mujoco-warp" "mujoco>=3.14,<3.15"
 scripts/fetch_isaac_assets.sh              # NVIDIA's G1 and Franka-Pour assets, fetched from NVIDIA, not redistributed
 git clone --depth 1 https://github.com/google-deepmind/mujoco_menagerie upstream/mujoco_menagerie   # robot models
 pytest tests -q
@@ -284,7 +285,7 @@ model and asset locations can be moved with `MENAGERIE` (default `upstream/mujoc
 The MuJoCo Warp commit is pinned (the head of the fork's branch `metalsim` on 2026-10-13), as Warp's in
 `scripts/setup_warp.sh` and Newton's in `pyproject.toml`. Without access to the fork: clone
 google-deepmind/mujoco_warp, `git checkout 88af9cc` (v3.14.0), `git apply` MetalSim's
-`patches/mujoco_warp/metalsim-4d05cb7.diff` (the whole branch as one diff) and `pip install -e` that checkout.
+`patches/mujoco_warp/metalsim-8eb51fe.diff` (the whole branch as one diff) and `pip install -e` that checkout.
 The `mujoco<3.15` on that line keeps pip from moving MuJoCo past 3.14: the fork reads `MjModel.flex_internal`,
 which 3.15 removed (the fork alone asks only `mujoco>=3.12`, and its uv index offers 3.15 nightlies).
 

@@ -19,7 +19,7 @@ git clone https://github.com/pulipakaa24/MetalSim && cd MetalSim
 python3.12 -m venv .venv && source .venv/bin/activate     # uv only: "$(uv python find 3.12)" -m venv .venv
 pip install -e ".[test,newton]"
 scripts/setup_warp.sh
-pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@4d05cb7d4453d82c94d19ab9fb392df2c62b1acd#egg=mujoco-warp" "mujoco>=3.14,<3.15"      # pinned: README "Install"
+pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@8eb51fe637437108185f5a4750b7f5f64ef26624#egg=mujoco-warp" "mujoco>=3.14,<3.15"      # pinned: README "Install"
 scripts/fetch_isaac_assets.sh
 git clone --depth 1 https://github.com/google-deepmind/mujoco_menagerie upstream/mujoco_menagerie
 pytest tests -q
@@ -92,7 +92,7 @@ from `fuse_fp`, GPU sort / BSR / NanoVDB builders, `fast_math` forms with `warp.
 default) are listed in the branch's `METALSIM_CHANGES.md` and in `metalsim/physics/mpm/MPM.md`.
 
 **MuJoCo Warp** ([pulipakaa24/mujoco_warp](https://github.com/pulipakaa24/mujoco_warp), branch
-`metalsim`, pinned commit `4d05cb7`, installed by the `pip install` line above; the commits since `8fbf965`, which
+`metalsim`, pinned commit `8eb51fe`, installed by the `pip install` line above; the commits since `8fbf965`, which
 this paragraph describes, are listed in the README's "MuJoCo Warp fork" section: elliptic cones on Metal, the fused and
 early-exiting Newton iterations, scratch reuse, the equality block at `njmax`). Google DeepMind's MuJoCo Warp v3.14.0
 (`88af9cc`) with, up to `8fbf965`, sixteen commits:
@@ -108,7 +108,7 @@ every flex, active-layer volume contacts, mesh normals), order flex equality row
 (`scripts/diagnostics/deformable/UPSTREAM.md`). The same sixteen commits (flex ones rebased linearly after the
 throughput ones; identical tree to the merge `8fbf965`) are in `patches/mujoco_warp/0001-0016`. To build the pinned
 tree without the fork, clone google-deepmind/mujoco_warp at `88af9cc`, `git apply`
-`patches/mujoco_warp/metalsim-4d05cb7.diff` (the whole branch as one diff) and `pip install -e` the checkout (README
+`patches/mujoco_warp/metalsim-8eb51fe.diff` (the whole branch as one diff) and `pip install -e` the checkout (README
 "Install"). Superseded: "`git am` those patches" gives the `8fbf965` tree, not the pinned one.
 
 **Newton** ([pulipakaa24/newton](https://github.com/pulipakaa24/newton), branch `metalsim`, pinned commit
