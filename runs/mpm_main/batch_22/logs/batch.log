@@ -1,0 +1,42 @@
+=== batch_22 start Wed Oct 14 13:11:11 PDT 2026
+[13:11:14] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   2.3 %
+[13:11:14] gpu job mm22_test_mpm (check, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b22/logs/test_mpm.log
+    ................                                                         [100%]
+    16 passed in 107.85s (0:01:47)
+[13:13:10] health: utilisation 2%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   2.4 %
+[13:13:10] TMPM22 -> PASS 16 passed in 107.85s (0:01:47)
+[13:13:10] gpu job mm22_fused_A (check, <= 10 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b22/logs/fused_A.log
+    Module _solve_done__locals__kernel_eea46921 eea4692 load on device 'metal:0' took 336.55 ms  (cached)
+    RESULT {"worlds": 64, "steps": 60, "iteration_cap": 20, "MJW_METAL_FUSE_UPDATE": "1", "fused_kernel_ran": true, "steps_with_cap_worlds": 6, "cap_world_steps": 6, "mean_niter": 3.7765625, "niter_hist": [0, 929, 784, 347, 429, 424, 328, 223, 133, 97, 62, 36, 20, 12, 6, 4, 2, 2, 0, 0, 2], "mujoco_warp": "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/__init__.py"}
+[13:13:31] health: utilisation 91%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[13:14:01] gpu job mm22_fused_B (check, <= 10 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b22/logs/fused_B.log
+    Module _solve_done__locals__kernel_eea46921 eea4692 load on device 'metal:0' took 39.74 ms  (cached)
+    RESULT {"worlds": 64, "steps": 60, "iteration_cap": 20, "MJW_METAL_FUSE_UPDATE": "0", "fused_kernel_ran": false, "steps_with_cap_worlds": 6, "cap_world_steps": 6, "mean_niter": 3.8013020833333333, "niter_hist": [0, 925, 768, 353, 420, 435, 327, 235, 131, 97, 66, 38, 16, 11, 6, 5, 3, 2, 0, 0, 2], "mujoco_warp": "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/__init__.py"}
+[13:14:17] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   2.8 %
+[13:14:17] gpu job mm22_fused_C (check, <= 10 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b22/logs/fused_C.log
+    Module _solve_done__locals__kernel_eea46921 eea4692 load on device 'metal:0' took 38.25 ms  (cached)
+    RESULT {"worlds": 64, "steps": 60, "iteration_cap": 20, "MJW_METAL_FUSE_UPDATE": "0", "fused_kernel_ran": false, "steps_with_cap_worlds": 8, "cap_world_steps": 8, "mean_niter": 3.7859375, "niter_hist": [0, 928, 774, 348, 423, 427, 335, 235, 131, 94, 64, 37, 17, 12, 4, 4, 3, 3, 0, 0, 1], "mujoco_warp": "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/__init__.py"}
+[13:14:28] health: utilisation 85%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   2.7 %
+
+**Result (batch_22, 16-inch, main with MuJoCo Warp pin 8eb51fe):** **H-det holds:** in default mode the fused update converges like the unfused one (within Metal's run-to-run floor), so the D vs E difference is specific to deterministic mode (consistent with the in-launch counter hypothesis above, not proven by it); #29's pin already takes the unfused update there. Nothing to change.
+
+- A, default mode, fused: steps with cap worlds 6/60, cap world-steps 6, mean solver_niter 3.777, fused kernel ran True
+- B, default mode, unfused: 6/60, 6, 3.801
+- C, default mode, unfused (repeat): 8/60, 8, 3.786
+- median over worlds of max |Δqpos|, last step: A-B 0.000198, B-C (floor) 0.000133; step 10 / 30: A-B 2.21e-06 / 1.57e-05, B-C 2.01e-06 / 1.43e-05
+- D, deterministic, fused (batch_18 fix_g1_64): 60/60 steps with cap worlds
+- E, deterministic, unfused (batch_19 fix_g1_64): 7/60
+- checks (A within the B-C floor): cap steps yes, mean solver_niter yes, qpos (last step) yes
+
+H_DET
+[13:14:28] FUSED22 -> DONE H_DET
+fatal: pathspec 'metalsim/physics/mpm/simd_gs.py' did not match any files
