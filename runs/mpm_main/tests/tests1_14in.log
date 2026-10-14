@@ -1,0 +1,20 @@
+.....F
+=================================== FAILURES ===================================
+___________________________ test_coupled_repeatable ____________________________
+
+box_runs = (<module 'box_on_sand' from '/Users/adipu/metalsim-fresh/agents/mpm-main/wt/metalsim/physics/mpm/probes/box_on_sand.py....23302748e-04, -1.06942002e-02,  2.01036396e+01,
+          4.17916104e-04, -1.77002512e-05,  1.25672086e-05]]]), ...}])
+
+    def test_coupled_repeatable(box_runs):
+        """Two runs of the coupled scene (captured steps) are bitwise identical: box state and every particle."""
+        _, (a, b) = box_runs
+>       assert np.array_equal(a["pos"], b["pos"]) and np.array_equal(a["qvel"], b["qvel"])
+E       assert (False)
+E        +  where False = <function array_equal at 0x10ba04930>(array([[[ 0.00000000e+00,  0.00000000e+00,  2.49545828e-01],\n        [ 0.00000000e+00,  0.00000000e+00,  2.49545828e-0...   [[ 2.77390209e-05, -2.35747957e-05,  6.65862933e-02],\n        [-1.64390967e-05, -4.93669613e-05,  6.63272366e-02]]]), array([[[ 0.00000000e+00,  0.00000000e+00,  2.49545828e-01],\n        [ 0.00000000e+00,  0.00000000e+00,  2.49545828e-0...   [[ 2.76911105e-05, -2.35994357e-05,  6.65863305e-02],\n        [-1.64391568e-05, -4.93674961e-05,  6.63272366e-02]]]))
+E        +    where <function array_equal at 0x10ba04930> = np.array_equal
+
+tests/test_mpm_main.py:154: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_mpm_main.py::test_coupled_repeatable - assert (False)
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 5 passed in 49.93s

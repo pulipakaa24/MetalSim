@@ -228,6 +228,30 @@ metrics, losses) and checkpoints every 25 iterations (`--save-interval`; `model_
 minutes on an M4 Max (979 env-steps/s, `PARITY.md` §1b.4), so Isaac's 3,000 iterations take about 7 days. Large-world or new-kernel jobs run under
 `scripts/watchdog.py` (kills a job on a CPU stall, memory ceiling or timeout).
 
+### MPM material in a BatchSim scene (main environment)
+
+Sand, snow, mud or viscous media in a scene whose robot runs on `BatchSim` (`.venv`, no second environment): the
+solver is Isaac Lab 3.0-EA's (Newton 1.5.2's implicit MPM, MetalSim's vendored copy of the fork), two-way coupled the
+way Isaac's `SolverCoupledProxy` couples it to MuJoCo Warp (`metalsim/physics/mpm/MPM.md` section 11):
+
+```python
+from metalsim.physics.mpm.coupled import MPMCoupling, MPMConfig, MPMMaterial, GridEmitter, SAND
+
+sim = BatchSim(model, num_envs=64, options=BatchSimOptions(substeps=3))
+mpm = MPMCoupling(sim, MPMConfig(voxel_size=0.02))          # Isaac's MPMSolverCfg fields + coupling settings
+mpm.add_emitter(GridEmitter(lower=(-.1, -.1, 0), upper=(.1, .1, .05), material=SAND))   # same material in every world
+mpm.finalize()
+mpm.step()                    # replaces sim.step(): MuJoCo substeps with the sand wrench, then the MPM step
+mpm.attach_renderer(renderer) # grains drawn straight from the solver's particle buffer
+```
+
+MuJoCo geoms (box, sphere, capsule, cylinder, plane, mesh, ellipsoid) are the colliders; `mpm.set_colliders(bodies=...)`
+limits the coupled bodies, `MPMConfig(proxy_mass="effective" | "body" | "kinematic", mode="staggered" | "lagged")`
+selects Isaac's exchange variant, `mpm.wrenches()` returns the sand wrench per coupled body, `mpm.reset(mask)` resets
+worlds. The material is bitwise repeatable run to run; MuJoCo Warp's own contact solve is not (docs/GAPS.md), so a
+scene repeats exactly only while its bodies touch nothing but sand. Tests: `scripts/gpu_run.sh test_mpm_main check 60 -- .venv/bin/python -m pytest
+tests/test_mpm_main.py`.
+
 ### Rendering particles (MPM sand)
 
 Both renderers draw particles as render grains (small irregular grain meshes, several per particle, per-grain
