@@ -19,7 +19,7 @@ git clone https://github.com/pulipakaa24/MetalSim && cd MetalSim
 python3.12 -m venv .venv && source .venv/bin/activate     # uv only: "$(uv python find 3.12)" -m venv .venv
 pip install -e ".[test,newton]"
 scripts/setup_warp.sh
-pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@f1b35e2b3ddc80b197b0c665bf6d71523d175daf#egg=mujoco-warp" "mujoco>=3.14,<3.15"      # pinned: README "Install"
+pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@4d05cb7d4453d82c94d19ab9fb392df2c62b1acd#egg=mujoco-warp" "mujoco>=3.14,<3.15"      # pinned: README "Install"
 scripts/fetch_isaac_assets.sh
 git clone --depth 1 https://github.com/google-deepmind/mujoco_menagerie upstream/mujoco_menagerie
 pytest tests -q
@@ -74,7 +74,7 @@ MetalSim depends on three forked projects, none of them on PyPI in this form. Th
 what the current results were produced with. Each fork's branch head adds only a `METALSIM_CHANGES.md` (the list of MetalSim
 commits on that branch) on top of the commit named here, so installing the branch gives the same code.
 
-**Warp** ([pulipakaa24/warp](https://github.com/pulipakaa24/warp), branch `metalsim`, pinned commit `31cf79d7`;
+**Warp** ([pulipakaa24/warp](https://github.com/pulipakaa24/warp), branch `metalsim`, pinned commit `52c09cdd`;
 the rigid-body results were produced at `f194006` and `c200d46b`, see the README). NVIDIA Warp with innate-inc's
 Metal backend, plus MetalSim commits; the first seven: interop entry
 points (Metal device, queue and buffer handles, cross-queue events, used for zero-copy PyTorch MPS
@@ -86,13 +86,13 @@ tile Cholesky (`wp.config.metal_register_cholesky_max`), `segmented_sort_pairs` 
 (default `upstream/warp-metalsim`), builds the native library with `build_lib.py --no-cuda` and
 installs it editable. `METALSIM_WARP_REPO` and `METALSIM_WARP_REF` (branch, tag or commit) point it
 elsewhere. If the fork cannot be cloned, the script clones innate-inc/warp at `ce15f6b` and applies
-`patches/warp/metalsim-31cf79d7.diff`, which gives the same source tree as `31cf79d7` (`patches/warp/0001-0007` are
+`patches/warp/metalsim-52c09cdd.diff`, which gives the same source tree as `52c09cdd` (`patches/warp/0001-0007` are
 the first seven commits, the tree of `f194006`). The commits since (MPM, scalable deterministic mode, FMA contraction
 from `fuse_fp`, GPU sort / BSR / NanoVDB builders, `fast_math` forms with `warp.config.metal_fast_math = "off"` by
 default) are listed in the branch's `METALSIM_CHANGES.md` and in `metalsim/physics/mpm/MPM.md`.
 
 **MuJoCo Warp** ([pulipakaa24/mujoco_warp](https://github.com/pulipakaa24/mujoco_warp), branch
-`metalsim`, pinned commit `f1b35e2`, installed by the `pip install` line above; the commits since `8fbf965`, which
+`metalsim`, pinned commit `4d05cb7`, installed by the `pip install` line above; the commits since `8fbf965`, which
 this paragraph describes, are listed in the README's "MuJoCo Warp fork" section: elliptic cones on Metal, the fused and
 early-exiting Newton iterations, scratch reuse, the equality block at `njmax`). Google DeepMind's MuJoCo Warp v3.14.0
 (`88af9cc`) with, up to `8fbf965`, sixteen commits:
@@ -108,7 +108,7 @@ every flex, active-layer volume contacts, mesh normals), order flex equality row
 (`scripts/diagnostics/deformable/UPSTREAM.md`). The same sixteen commits (flex ones rebased linearly after the
 throughput ones; identical tree to the merge `8fbf965`) are in `patches/mujoco_warp/0001-0016`. To build the pinned
 tree without the fork, clone google-deepmind/mujoco_warp at `88af9cc`, `git apply`
-`patches/mujoco_warp/metalsim-f1b35e2.diff` (the whole branch as one diff) and `pip install -e` the checkout (README
+`patches/mujoco_warp/metalsim-4d05cb7.diff` (the whole branch as one diff) and `pip install -e` the checkout (README
 "Install"). Superseded: "`git am` those patches" gives the `8fbf965` tree, not the pinned one.
 
 **Newton** ([pulipakaa24/newton](https://github.com/pulipakaa24/newton), branch `metalsim`, pinned commit
@@ -263,7 +263,7 @@ limits the coupled bodies, `MPMConfig(proxy_mass="effective" | "body" | "kinemat
 selects Isaac's exchange variant, `mpm.wrenches()` returns the sand wrench per coupled body, `mpm.reset(mask)` resets
 worlds. The material is bitwise repeatable run to run; MuJoCo Warp's own contact solve is not (docs/GAPS.md), so a
 scene repeats exactly only while its bodies touch nothing but sand, unless the `BatchSim` is built with the
-experimental `BatchSimOptions(deterministic=True)` (this branch; one mode per process; needs the MuJoCo Warp fork branch `metalsim-det-ccd` for convex (GJK/EPA) contacts such as box-box; no heightfield GJK/EPA contacts). Tests: `scripts/gpu_run.sh test_mpm_main check 60 -- .venv/bin/python -m pytest
+opt-in `BatchSimOptions(deterministic=True)` (Warp's RUN_TO_RUN mode for MuJoCo Warp's kernels; one mode per process, chosen before MuJoCo Warp's first launch; bitwise run to run and across processes, e.g. two stacked boxes at 256 worlds; heightfield contacts that take GJK/EPA are refused). Tests: `scripts/gpu_run.sh test_mpm_main check 60 -- .venv/bin/python -m pytest
 tests/test_mpm_main.py`.
 A runnable example, a 2 kg box dropped on a sand bed in 2 worlds (needs the `newton` extra in `.venv`):
 

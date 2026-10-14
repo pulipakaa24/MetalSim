@@ -10,7 +10,7 @@ set -e
 PATCHES="$(cd "$(dirname "$0")/../patches" && pwd)"
 DIR=${1:-upstream/warp-metalsim}
 REPO=${METALSIM_WARP_REPO:-https://github.com/pulipakaa24/warp}     # fork of innate-inc/warp, branch metalsim
-PIN=31cf79d781e4b10d8ff85c8cbd98fc0e40f75953                         # metalsim head, 2026-10-13 (bsr_mv takes CUDA's tiled-kernel choice on Metal)
+PIN=52c09cdd82f79e8564b5ae17cdcee7b52d10d075                         # metalsim head, 2026-10-13 (deterministic counter phase-mismatch tripwire)
 REF=${METALSIM_WARP_REF:-$PIN}
 # Warp keeps example assets (.usd, .png, .nvdb) in Git LFS; the build does not need them. A git config that requires
 # the LFS filter (filter.lfs.required=true, e.g. a global `git lfs install`) on a machine without the git-lfs binary
@@ -21,13 +21,13 @@ lfs_local() { [ ${#LFS} -eq 0 ] || { for k in process smudge clean; do git -C "$
               git -C "$1" config filter.lfs.required false; } }
 if [ ! -d "$DIR" ]; then
   { git $LFS clone "$REPO" "$DIR" && lfs_local "$DIR" && git -C "$DIR" checkout -q "$REF"; } || {   # REF: branch, tag or commit
-    # the pinned tree is innate-inc/warp ce15f6bb plus patches/warp/metalsim-31cf79d7.diff (the whole branch as one
+    # the pinned tree is innate-inc/warp ce15f6bb plus patches/warp/metalsim-52c09cdd.diff (the whole branch as one
     # diff; patches/warp/0001-0007 are the first seven commits, the September tree f194006a)
-    echo "fork clone or checkout failed; cloning innate-inc/warp at ce15f6bb and applying patches/warp/metalsim-31cf79d7.diff"; rm -rf "$DIR"
+    echo "fork clone or checkout failed; cloning innate-inc/warp at ce15f6bb and applying patches/warp/metalsim-52c09cdd.diff"; rm -rf "$DIR"
     git $LFS clone https://github.com/innate-inc/warp "$DIR"
     lfs_local "$DIR"
     git -C "$DIR" checkout -q ce15f6bb2545e2d6c4a4c1fac8e40bb800db7265
-    git -C "$DIR" apply "$PATCHES/warp/metalsim-31cf79d7.diff"
+    git -C "$DIR" apply "$PATCHES/warp/metalsim-52c09cdd.diff"
   }
 elif [ -e "$DIR/.git" ] && [ -z "$METALSIM_WARP_REF" ] && [ "$(git -C "$DIR" rev-parse HEAD)" != "$PIN" ]; then
   echo "note: $DIR is at $(git -C "$DIR" rev-parse --short HEAD), not the pinned ${PIN:0:8} (left as is; scripts/fork_sync.sh updates shared checkouts)"
