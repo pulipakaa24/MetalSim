@@ -104,7 +104,88 @@ class BatchSimOptions:
     # Process-wide (warp.config), read when a module is built (part of the module hash): the last BatchSim
     # constructed sets it.
     metal_register_cholesky_max: int | None = 48
+    # Run-to-run bitwise repeatability (Warp's DeterministicMode.RUN_TO_RUN for MuJoCo Warp's kernels, as Newton's
+    # SolverMuJoCo(deterministic=...) does): float atomics accumulate in a fixed order and slot-claiming counters follow
+    # thread order (MetalSim's Warp fork implements it on Metal). Off by default: the kernels and results of existing
+    # scenes are unchanged. Process-wide once on: it sets the module options of every loaded MuJoCo Warp module.
+    deterministic: bool = False
     extra: dict = field(default_factory=dict)
+
+
+def _deterministic_max_records(model: mujoco.MjModel, njmax: int) -> int:
+    """Per-thread record bound for MuJoCo Warp's deterministic atomics (the bound Newton's SolverMuJoCo derives):
+    a dense contact-Jacobian thread can touch every constraint row; a sparse Hessian thread every element of a row's
+    lower-triangular product (row width = the two longest kinematic chains); spatial tendons walk both chains."""
+    nv = int(model.nv)
+    chains, seen = [], set()
+    for b in range(int(model.nbody)):
+        wb = int(model.body_weldid[b])
+        if wb in seen:
+            continue
+        seen.add(wb)
+        dof, width = int(model.body_dofadr[wb]) + int(model.body_dofnum[wb]) - 1, 0
+        while dof >= 0:
+            width += 1
+            dof = int(model.dof_parentid[dof])
+        chains.append(width)
+    chains.sort(reverse=True)
+    row = 0
+    if nv:
+        row = min(nv, max(1, sum(chains[:2]), 2 * max((int(w) for w in model.ten_J_rownnz), default=0),
+                          max((int(w) for w in model.flexedge_J_rownnz), default=0), nv if model.nu else 0))
+    tendon = max((2 * max(int(n) - 1, 1) * int(w) for n, w in zip(model.tendon_num, model.ten_J_rownnz)), default=0)
+    return max(1, int(njmax), row * (row + 1) // 2, tendon)
+
+
+# MuJoCo Warp's determinism mode is process-wide (module options are shared, generated kernels are cached by MuJoCo
+# Warp without the options): the first BatchSim fixes it, a BatchSim asking for the other mode afterwards raises.
+# research_notes/MPM in main simulator/deterministic_batchsim.md has the Warp / Newton source reading behind this.
+_PROCESS_MODE: str | None = None
+
+
+def _warp_mujoco_modules():
+    """Warp ``Module`` objects of MuJoCo Warp's source modules (``mujoco_warp._src.*``)."""
+    from warp._src import context
+
+    return {n: m for n, m in context.user_modules.items() if n.startswith("mujoco_warp")}
+
+
+def _claim_process_mode(deterministic: bool) -> None:
+    global _PROCESS_MODE
+    want = "run_to_run" if deterministic else "default"
+    if _PROCESS_MODE == want:
+        return
+    if _PROCESS_MODE is not None:
+        raise RuntimeError(f"this process already runs MuJoCo Warp in {_PROCESS_MODE!r} determinism mode; a BatchSim "
+                           f"with deterministic={deterministic} needs its own process (BatchSimOptions.deterministic)")
+    if deterministic:
+        mode = wp.DeterministicMode.RUN_TO_RUN
+        loaded = sorted(n for n, m in _warp_mujoco_modules().items()
+                        if m.execs and m.options.get("deterministic") != mode)
+        if loaded:
+            raise RuntimeError("MuJoCo Warp kernels already ran in default mode in this process (" + ", ".join(loaded[:4])
+                               + "): construct the deterministic BatchSim before any other MuJoCo Warp use")
+    _PROCESS_MODE = want
+
+
+def _set_mujoco_warp_determinism(smooth_records: int) -> None:
+    """RUN_TO_RUN on every loaded MuJoCo Warp module (``smooth`` gets the record bound; options only set where they
+    differ, so unchanged modules keep their hash), and drop MuJoCo Warp's generated-kernel cache, whose keys do not
+    include module options. Newton's SolverMuJoCo does the same (solver_mujoco.py ``_set_mujoco_warp_module_options``,
+    ``_prepare_generated_kernels``)."""
+    import sys
+
+    from mujoco_warp._src import warp_util
+
+    mode = wp.DeterministicMode.RUN_TO_RUN
+    for name, mod in list(sys.modules.items()):
+        if name.startswith("mujoco_warp._src.") and mod is not None:
+            want = {"deterministic": mode,
+                    "deterministic_max_records": smooth_records if name == "mujoco_warp._src.smooth" else 0}
+            wm_ = wp.get_module(name)
+            if any(wm_.options.get(k) != v for k, v in want.items()):
+                wp.set_module_options(want, module=mod)
+    warp_util._KERNEL_CACHE.clear()
 
 
 @contextlib.contextmanager
@@ -142,7 +223,14 @@ class BatchSim:
                 wmodel.opt.jacobian = {"dense": mujoco.mjtJacobian.mjJAC_DENSE, "sparse": mujoco.mjtJacobian.mjJAC_SPARSE,
                                        "auto": mujoco.mjtJacobian.mjJAC_AUTO}[self.opt.jacobian]
             self._wmodel = wmodel
-            with _m_layout(self.opt.m_dense_max):
+            # determinism is fixed before MuJoCo Warp's first launch in this sim (put_model / put_data launch kernels):
+            # Warp's deterministic launch metadata is taken when a module loads, so a mode set later is not reliable
+            _claim_process_mode(self.opt.deterministic)
+            self._det_records = None
+            if self.opt.deterministic:
+                self._det_records = 0
+                _set_mujoco_warp_determinism(0)
+            with _m_layout(self.opt.m_dense_max), self.det_scope():
                 self.m = mjw.put_model(wmodel, batch_sizes=batch_sizes)
             for k, v in self.opt.block_dim.items():
                 if not hasattr(self.m.block_dim, k):
@@ -166,8 +254,12 @@ class BatchSim:
                 self.m.opt.iterations = self.opt.solver_iterations
             if self.opt.ls_iterations is not None:
                 self.m.opt.ls_iterations = self.opt.ls_iterations
-            with _m_layout(self.opt.m_dense_max):
+            with _m_layout(self.opt.m_dense_max), self.det_scope():
                 self.d = mjw.put_data(wmodel, mjd, nworld=num_envs, nconmax=nconmax, njmax=njmax)
+            if self.opt.deterministic:
+                # the record bound needs njmax; smooth's kernels first run in the step (checked by check_determinism)
+                self._det_records = _deterministic_max_records(wmodel, self.d.njmax)
+                _set_mujoco_warp_determinism(self._det_records)
             self._reset_mask = wp.zeros(num_envs, dtype=wp.bool)
             self._graphs = {}
             # capacity overflow bits latched after every substep: mjw.reset_data zeroes d.overflow of the worlds it
@@ -186,7 +278,46 @@ class BatchSim:
 
     # -- graphs ---------------------------------------------------------------------------------
 
+    @contextlib.contextmanager
+    def det_scope(self):
+        """Hold Warp's deterministic config while MuJoCo Warp kernels may be created (its ``module="unique"`` kernels
+        are generated lazily and take the config, not the source module's options). No-op unless deterministic."""
+        if self._det_records is None:
+            yield
+            return
+        old = wp.config.deterministic, wp.config.deterministic_max_records
+        wp.config.deterministic = wp.DeterministicMode.RUN_TO_RUN
+        wp.config.deterministic_max_records = int(self._det_records)
+        try:
+            yield
+        finally:
+            wp.config.deterministic, wp.config.deterministic_max_records = old
+
     def _capture(self):
+        with self.det_scope():
+            self._capture_graphs()
+        if self._det_records is not None and self._graphs:
+            self.check_determinism()
+
+    def check_determinism(self) -> None:
+        """With ``deterministic=True``: raise unless every MuJoCo Warp kernel module this sim's graphs replay was built
+        in RUN_TO_RUN mode (a module loaded earlier in default mode would replay its non-deterministic kernels)."""
+        mode = wp.DeterministicMode.RUN_TO_RUN
+        execs = set()
+        for g in self._graphs.values():
+            execs |= set(getattr(g, "module_execs", ()))
+        bad = []
+        for name, mod in _warp_mujoco_modules().items():
+            used = [e for e in mod.execs.values() if e in execs]
+            if used and mod.options.get("deterministic") != mode:
+                bad.append(name)
+            for e in used:
+                if e.module_hash != mod.get_module_hash(e.block_dim):
+                    bad.append(f"{name} (stale executable)")
+        if bad:
+            raise RuntimeError(f"deterministic BatchSim replays non-deterministic MuJoCo Warp modules: {bad}")
+
+    def _capture_graphs(self):
         self._graphs.clear()
         if not self.opt.capture:
             return
@@ -228,11 +359,11 @@ class BatchSim:
     def launch_step(self) -> None:
         """Launch the substeps directly (no graph replay), for capturing into a larger graph that
         also holds the policy and the rollout bookkeeping."""
-        with wp.ScopedDevice(self.device):
+        with wp.ScopedDevice(self.device), self.det_scope():
             self._launch_substeps()
 
     def _run(self, name: str):
-        with wp.ScopedDevice(self.device):
+        with wp.ScopedDevice(self.device), self.det_scope():
             g = self._graphs.get(name)
             if g is not None:
                 wp.capture_launch(g)
@@ -264,7 +395,7 @@ class BatchSim:
     def recompute_constants(self, level: str = "set_const") -> int:
         """After per-world changes to masses/inertias (``set_const``), qpos0/armature (``set_const_0``)
         or gravcomp (``set_const_fixed``); launched on the Warp queue, returns the completion value."""
-        with wp.ScopedDevice(self.device):
+        with wp.ScopedDevice(self.device), self.det_scope():
             getattr(mjw, level)(self.m, self.d)
         return self._signal()
 
@@ -287,6 +418,12 @@ class BatchSim:
         returned, not raised. Call at rollout boundaries."""
         from metalsim.physics import capacity
         ov = self.overflow_flags()
+        if self._det_records is not None and self.is_metal:
+            # Warp's deterministic counters overflow into a sticky flag that graph replays never check
+            from warp._src import metal_deterministic
+
+            if int(metal_deterministic._state(self.device).overflow.numpy()[0]):
+                raise RuntimeError("Warp deterministic-mode counter overflow (deterministic_max_records too small)")
         cap = capacity.capacity_overflows(ov)
         if cap:
             raise RuntimeError(f"MuJoCo Warp capacity overflow {cap} (worlds affected): raise njmax / nconmax "
