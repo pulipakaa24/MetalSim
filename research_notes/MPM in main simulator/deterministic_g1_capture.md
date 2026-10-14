@@ -342,3 +342,13 @@ default-mode correctness and parity issue?
     4. Optionally an L4 run of upstream MuJoCo Warp (CUDA, unfused, upstream's form) on the same states.
 - **Reference.** No CUDA/L4 G1 iteration-count reference exists for our fused form, because it has no CUDA
   counterpart. The comparable references are MuJoCo C's iteration counts and upstream MuJoCo Warp, unfused.
+
+**Result (batch_22, 16-inch, main with MuJoCo Warp pin 8eb51fe):** **H-det holds:** in default mode the fused update converges like the unfused one (within Metal's run-to-run floor), so the D vs E difference is specific to deterministic mode (consistent with the in-launch counter hypothesis above, not proven by it); #29's pin already takes the unfused update there. Nothing to change.
+
+- A, default mode, fused: steps with cap worlds 6/60, cap world-steps 6, mean solver_niter 3.777, fused kernel ran True
+- B, default mode, unfused: 6/60, 6, 3.801
+- C, default mode, unfused (repeat): 8/60, 8, 3.786
+- median over worlds of max |Δqpos|, last step: A-B 0.000198, B-C (floor) 0.000133; step 10 / 30: A-B 2.21e-06 / 1.57e-05, B-C 2.01e-06 / 1.43e-05
+- D, deterministic, fused (batch_18 fix_g1_64): 60/60 steps with cap worlds
+- E, deterministic, unfused (batch_19 fix_g1_64): 7/60
+- checks (A within the B-C floor): cap steps yes, mean solver_niter yes, qpos (last step) yes
