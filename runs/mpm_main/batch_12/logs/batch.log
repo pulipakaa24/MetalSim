@@ -1,0 +1,53 @@
+=== batch_12 start Tue Oct 13 22:06:51 PDT 2026
+/Users/aditya/robosim/upstream/warp-innate/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/__init__.py /Users/aditya/robosim/metalsim/__init__.py
+[22:06:55] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid    410 WindowServer                       3.3 %
+  pid   1291 Google Chrome He                   1.6 %
+[22:06:55] gpu job mm12_rigid12 (<= 60 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b12/logs/rigid12.log
+    -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+    148 passed, 10 warnings in 369.39s (0:06:09)
+[22:13:12] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   2.0 %
+[22:13:12] rigid12 -> PASS 148 passed, 10 warnings in 369.39s (0:06:09)
+[22:13:12] gpu job mm12_det12 (<= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b12/logs/det12.log
+    .......                                                                  [100%]
+    7 passed in 292.65s (0:04:52)
+[22:18:15] health: utilisation 78%
+GPU (ioreg): device utilization 37 %; per-process GPU time over 1.9 s:
+  pid  64434 python3.12                        54.6 %
+[22:18:15] det12 -> PASS 7 passed in 292.65s (0:04:52)
+[22:18:15] gpu job mm12_render12 (<= 60 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b12/logs/render12.log
+    SKIPPED [1] tests/test_render_newton_bridge.py:259: SolverMuJoCo unavailable in this environment: WarpCodegenError: Error while parsing function "convert_mjw_contacts_to_newton_kernel" at /Users/aditya/robosim/.venv/lib/python3.12/site-
+    243 passed, 1 skipped, 3 warnings in 238.95s (0:03:58)
+[22:22:22] health: utilisation 2%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid  68741 python3.12                         4.6 %
+  pid    410 WindowServer                       1.3 %
+[22:22:22] render12 -> PASS 243 passed, 1 skipped, 3 warnings in 238.95s (0:03:58)
+[22:22:22] gpu job mm12_rest12 (<= 60 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b12/logs/rest12.log
+    SKIPPED [1] tests/test_newton_bridge_poses.py:104: SolverMuJoCo unavailable in this environment: WarpCodegenError: Error while parsing function "convert_mjw_contacts_to_newton_kernel" at /Users/aditya/robosim/.venv/lib/python3.12/site-
+    50 passed, 1 skipped, 3 warnings in 381.48s (0:06:21)
+[22:33:01] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid  73831 python3.12                         2.4 %
+[22:33:01] rest12 -> PASS 50 passed, 1 skipped, 3 warnings in 381.48s (0:06:21)
+[22:33:01] gpu job mm12_n152_12 (<= 60 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b12/logs/n152_12.log
+    SKIPPED [1] tests/test_franka_pour_resume.py:24: needs the Franka-Pour assets
+    10 passed, 13 skipped, 1 xfailed, 1 warning in 47.12s
+[22:33:57] health: utilisation 38%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   2.1 %
+[22:33:57] n152_12 -> PASS 10 passed, 13 skipped, 1 xfailed, 1 warning in 47.12s
+== rigid12: 148 passed, 10 warnings in 369.39s (0:06:09)
+== det12: 7 passed in 292.65s (0:04:52)
+== render12: 243 passed, 1 skipped, 3 warnings in 238.95s (0:03:58)
+   1 SolverMuJoCo unavailable in this environment: WarpCodegenError: Error while parsing function "convert_mjw_contacts_to_newton_kernel" at /Users/aditya/robosim/.venv/lib/python3.12/site-
+== rest12: 50 passed, 1 skipped, 3 warnings in 381.48s (0:06:21)
+   1 SolverMuJoCo unavailable in this environment: WarpCodegenError: Error while parsing function "convert_mjw_contacts_to_newton_kernel" at /Users/aditya/robosim/.venv/lib/python3.12/site-
+== n152_12: 10 passed, 13 skipped, 1 xfailed, 1 warning in 47.12s
+   7 needs the Franka-Pour assets (scripts/fetch_isaac_assets.sh)
+   4 needs the Warp (metalsim) and Newton (metalsim-1.5.2) forks
+   1 needs the Newton fork (metalsim-1.5.2)
+   1 needs the Franka-Pour assets
