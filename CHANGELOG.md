@@ -4,6 +4,12 @@ What landed between 2026-09-22 and 2026-10-13, grouped by area. The September se
 commit order; the October sections, newest first, summarise each merged pull request with its main commits (`git log`
 for the full messages). Dates are the commit dates (month-day).
 
+
+## Physics: deterministic BatchSim (2026-10-13, `research_notes/MPM in main simulator/deterministic_ccd_divergence.md`)
+
+- 10-13 `BatchSimOptions(deterministic=True)`: MuJoCo Warp's kernels in Warp's RUN_TO_RUN mode (set before MuJoCo Warp's first launch, one mode per process, record bound for `smooth`, post-capture check of every replayed module including the `module="unique"` ones, deterministic overflow and phase-mismatch flags in `check_overflow`). Two stacked boxes at 256 worlds repeat bitwise in one process and across processes.
+- 10-13 MuJoCo Warp pin f1b35e2 -> 4d05cb7: deterministic-mode CCD as a counter-free solve kernel plus a contact-write kernel (the single kernel's EPA scratch row came from a slot counter, so its counting pass ran EPA on stale scratch and a contact could land in another world's slot). Warp pin 31cf79d7 -> 52c09cdd: a slot-counter call that differs between the counting and the execution pass raises ("Deterministic counter phase mismatch").
+
 ## MPM: coupled scenes closer to the L4 (2026-10-13, `metalsim/physics/mpm/MPM.md` 8k)
 
 - 10-13 Warp pin 95f6f121 -> 31cf79d7: `bsr_mv` takes CUDA's tiled-kernel choice on Metal (`warp.config.metal_bsr_mv_tiles`). Newton pin 99843d09 -> addd10cb: the long-row rigidity product goes through `bsr_mv`; the proxy-wrench harvest and the two-way example's body-force sum compact their nodes first. Two-way captured 54.8 -> 37.6 ms/frame (1.77x -> 1.21x the L4), eager 0.84x; MPMCoupling coupled step 49.3 -> 34.2 ms (16 bodies); Franka-Pour unchanged (1.80 s per 2,048-env step). Pure-MPM floors and ANYmal bitwise unchanged; two-way and Franka-Pour repeat bitwise, two-way inside the L4 floor. Vendored implicit_mpm regenerated. Logs `runs/mpm/coupled_speed/`, research `research_notes/coupled_speed/NOTE.md`.

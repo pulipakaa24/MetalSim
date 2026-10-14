@@ -1,9 +1,9 @@
 diff --git a/METALSIM_CHANGES.md b/METALSIM_CHANGES.md
 new file mode 100644
-index 0000000..1767172
+index 0000000..d45fd76
 --- /dev/null
 +++ b/METALSIM_CHANGES.md
-@@ -0,0 +1,75 @@
+@@ -0,0 +1,76 @@
 +# MetalSim changes on this branch (`metalsim`)
 +
 +This branch is the Warp build that [MetalSim](https://github.com/pulipakaa24/MetalSim) runs on (see the
@@ -76,6 +76,7 @@ index 0000000..1767172
 +| `f0df4cf8` | Deterministic Metal kernels call `is_counter_store_target` (the phase-0 store guard's loop over counter targets) instead of inlining it at every guarded store. Under global deterministic mode, the Metal compiler service crashed (`XPC_ERROR_CONNECTION_INTERRUPTED`, about 340 s of retries) building Newton's narrow-phase kernel, which has 23 guarded stores and 11 counters. That module now builds in 2.3 s. Minimized from the module's MSL: replacing the guarded stores with plain stores, or making either guard function non-inline, compiles; the device or constant argument form, forced inlining of user functions, and the library optimization level do not matter. `test_metal_deterministic` and `test_metal` pass. |
 +| this commit | `warp.fem` temporary pools on Metal allocate the requested size and do not hand an array of 1 MiB or more to a request it exceeds by more than 1.25x (`WP_METAL_FEM_TIGHT_POOL=0` restores best fit with 1.5x growth). A captured graph keeps every pooled array alive, so the high-water mark is device memory: Isaac Lab Franka-Pour at 2,048 worlds held 11.1 GB of fem temporaries for 6.5 GB of simultaneous requests; device memory after the first policy step 37.64 -> 34.48 GB. Temporaries are uninitialized either way: Franka-Pour (rigid_deterministic, captured) and the MPM pour scene bitwise equal at 1 / 64 / 2,048 worlds; MPM step and policy step times unchanged. |
 +| this commit | `warp.sparse.bsr_mv` on Metal makes CUDA's choice between its tiled and one-thread-per-row kernels (`warp.config.metal_bsr_mv_tiles`, `WP_METAL_BSR_MV_TILES`, default on). Rows with many blocks (`nnz * block_size > 2 * tile_size * rows`, CUDA's heuristic) are summed by the tiled kernel: 64 strided lane sums, then `tile_sum`, whose Metal SIMD-group reduction is the CUDA shuffle tree. So both GPUs use the same summation order. Before, Metal summed every row serially in one thread. In Newton's implicit MPM, the rigidity operator's body rows (IJtm: one block per collider node of the body, about 1,170 in `example_mpm_twoway_coupling`) were latency-bound, and their cost grew with the contact area. Measured on the M4 Max: the IJtm product went from 29-40 to 12.1-12.9 ms per 50 calls (eager, synchronized). Captured two-way went from 54.8 to 40.4 ms/frame (L4: 31.0). Results change rounding only where a product takes the tiled path (two-way; Franka-Pour's rigidity products). MetalSim's pure-MPM floor scenes and ANYmal on sand are bitwise unchanged. Two-way repeats bitwise and stays inside the L4's perturbation ensemble. Off, results are bitwise those of before (Franka-Pour 30 steps). Probe: MetalSim `metalsim/physics/mpm/probes/bsr_mv_tiles_check.py`. |
++| `9346cf72` | Deterministic mode on Metal: a consumed-return counter call in the execution pass that the counting pass did not record (or recorded with another destination or count), and a thread that makes fewer counter calls in the execution pass, set bit 2 of the sticky deterministic flag; launches outside a capture raise "Deterministic counter phase mismatch". The counting pass suppresses stores, so a kernel whose counter calls depend on its own stores (the deterministic execution guide's "Side effects in the counting pass") otherwise hands slots to the wrong calls silently; MuJoCo Warp's CCD kernel did. Tests in `warp/tests/test_metal_deterministic.py`. |
 +
 +The same seven code commits are exported as `patches/warp/0001-0007` in MetalSim; applying them to `ce15f6bb`
 +gives the tree of `f194006a`. Tests for the Metal changes are in `warp/tests/test_metal.py`.
@@ -2861,10 +2862,10 @@ index 0000000..7a350ff
 +    return True
 diff --git a/warp/_src/metal_deterministic.py b/warp/_src/metal_deterministic.py
 new file mode 100644
-index 0000000..a8af6b3
+index 0000000..0245a57
 --- /dev/null
 +++ b/warp/_src/metal_deterministic.py
-@@ -0,0 +1,1392 @@
+@@ -0,0 +1,1409 @@
 +# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 +# SPDX-License-Identifier: Apache-2.0
 +
@@ -3079,6 +3080,7 @@ index 0000000..a8af6b3
 +    uint num_tiles;
 +    uint num_cursors;
 +    uint pad;
++    device atomic_int* flag;   // the sticky overflow / phase-mismatch flag (det_ctx.overflow)
 +};
 +
 +inline int target_of_record(constant det_counter_args_t& a, uint r)
@@ -3426,6 +3428,10 @@ index 0000000..a8af6b3
 +            while (t + 1 < a.num_targets && int(k) >= a.t[t + 1].cursor_base)
 +                ++t;
 +            const int j = int(k) - a.t[t].cursor_base;
++            // tripwire: a thread made fewer counter calls in phase 1 than phase 0 recorded (more, or different
++            // ones, are flagged by counter_add); see flag_phase_mismatch in metal_deterministic.h
++            if (a.t[t].cursors[j] != a.t[t].cursors[a.t[t].dim + j] && a.flag)
++                atomic_fetch_or_explicit(a.flag, 2, memory_order_relaxed);
 +            a.t[t].cursors[j] = 0;
 +            a.t[t].cursors[a.t[t].dim + j] = 0;
 +        }
@@ -3538,6 +3544,7 @@ index 0000000..a8af6b3
 +        ("num_tiles", ctypes.c_uint32),
 +        ("num_cursors", ctypes.c_uint32),
 +        ("pad", ctypes.c_uint32),
++        ("flag", ctypes.c_uint64),
 +    ]
 +
 +
@@ -3565,7 +3572,7 @@ index 0000000..a8af6b3
 +_ALL_POINTERS = _AllPointers()
 +for _t in (_FinalizeArgs, _CounterTarget, _RecordsArgs):
 +    _t._wp_pointer_fields = tuple(name for name, ftype in _t._fields_ if ftype is ctypes.c_uint64)
-+_CounterArgs._wp_pointer_fields = ("keys", "payload", "carry_k", "carry_s", "carry_u", "totals", "touched")
++_CounterArgs._wp_pointer_fields = ("keys", "payload", "carry_k", "carry_s", "carry_u", "totals", "touched", "flag")
 +
 +
 +def _offsets_array(struct_type):
@@ -3967,6 +3974,7 @@ index 0000000..a8af6b3
 +            args.carry_u = sb + scan_regions["carry_u"]
 +            args.totals = sb + scan_regions["totals"]
 +            args.touched = zb + scan_regions["touched"]
++            args.flag = state.overflow.ptr
 +            self.counter_sort.bind(state, sb)
 +            self.sorts.append(self.counter_sort)
 +            self.build_args = _CounterArgs.from_buffer_copy(args)
@@ -4195,6 +4203,16 @@ index 0000000..a8af6b3
 +    if state.overflow_reported:
 +        return
 +    value = ctypes.c_int32.from_address(state.overflow.ptr).value
++    if value & 2:
++        state.overflow_reported = True
++        raise RuntimeError(
++            "Deterministic counter phase mismatch on Metal: a thread's consumed-return atomic_add calls in the "
++            "execution pass differ from those its counting pass recorded (detected at kernel "
++            f"'{kernel.key}'; possibly a later launch than the one that mismatched), so slots were handed to the wrong "
++            "calls. The kernel decides its counter calls from data it writes earlier in the same launch, which the "
++            "counting pass cannot see (its stores are suppressed): see 'Side effects in the counting pass' in the "
++            "deterministic execution guide."
++        )
 +    if value:
 +        state.overflow_reported = True
 +        raise RuntimeError(
@@ -11690,10 +11708,10 @@ index 0000000..b2afdeb
 +}
 diff --git a/warp/native/metal_deterministic.h b/warp/native/metal_deterministic.h
 new file mode 100644
-index 0000000..42979c3
+index 0000000..03b7003
 --- /dev/null
 +++ b/warp/native/metal_deterministic.h
-@@ -0,0 +1,427 @@
+@@ -0,0 +1,448 @@
 +// SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 +// SPDX-License-Identifier: Apache-2.0
 +
@@ -11789,10 +11807,24 @@ index 0000000..42979c3
 +inline float to_float(wp_bfloat16 x) { return bfloat16_to_float(x); }
 +#endif
 +
++// Bits of the sticky flag (det_ctx.overflow): records beyond records_per_thread, and a phase mismatch.
++#define WP_DET_FLAG_OVERFLOW 1
++#define WP_DET_FLAG_PHASE_MISMATCH 2
++
 +inline void flag_overflow(thread det_ctx& ctx)
 +{
 +    if (ctx.overflow)
-+        metal::atomic_store_explicit(ctx.overflow, 1, metal::memory_order_relaxed);
++        metal::atomic_fetch_or_explicit(ctx.overflow, WP_DET_FLAG_OVERFLOW, metal::memory_order_relaxed);
++}
++
++// Phase 1 made a counter call that phase 0 did not record (or recorded with another destination or count): the
++// kernel's calls depend on data that phase 0 could not see (its stores are suppressed), so the slots handed out no
++// longer match the calls and writes can land in slots reserved by other threads. Fewer calls in phase 1 are caught
++// after the launch (det_counter_writeback compares each thread's call counts).
++inline void flag_phase_mismatch(thread det_ctx& ctx)
++{
++    if (ctx.overflow)
++        metal::atomic_fetch_or_explicit(ctx.overflow, WP_DET_FLAG_PHASE_MISMATCH, metal::memory_order_relaxed);
 +}
 +
 +// Adds a signed 64-bit value to the bin at b (two 32-bit words, low first): exact modulo 2^64 in any order.
@@ -11884,6 +11916,13 @@ index 0000000..42979c3
 +        buf.dest_of[record] = dest;
 +        buf.values[record] = value;
 +        return 0;
++    }
++    // tripwire: phase 0 must have recorded this call (same call number, destination and count); the phase-0 call
++    // count of this thread is still in the first half of the cursors until the writeback clears it
++    if (call >= buf.cursors[ctx.idx] || buf.dest_of[record] != dest || buf.values[record] != value) {
++        flag_phase_mismatch(ctx);
++        if (call >= buf.cursors[ctx.idx])
++            return 0;  // no slot was reserved for this call (as for an overflowing call)
 +    }
 +    // the base slot of this reservation; values greater than one reserve [slot, slot + value)
 +    return buf.prefixes[record];
@@ -15340,10 +15379,10 @@ index 0000000..59ea5a0
 +    unittest.main(verbosity=2)
 diff --git a/warp/tests/test_metal_deterministic.py b/warp/tests/test_metal_deterministic.py
 new file mode 100644
-index 0000000..059b901
+index 0000000..73d303f
 --- /dev/null
 +++ b/warp/tests/test_metal_deterministic.py
-@@ -0,0 +1,301 @@
+@@ -0,0 +1,347 @@
 +# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 +# SPDX-License-Identifier: Apache-2.0
 +
@@ -15354,6 +15393,7 @@ index 0000000..059b901
 +module option ``metal_ordered_atomics`` keeps the earlier ordered launches (one SIMD-group in task order).
 +"""
 +
++import ctypes
 +import math
 +import unittest
 +
@@ -15429,6 +15469,19 @@ index 0000000..059b901
 +    if local[0] + local[1] > 0.0:
 +        slot = wp.atomic_add(counter, 0, 1)
 +        out[slot] = local[0] + local[1]
++
++
++@wp.kernel(module="unique", module_options=RUN_TO_RUN)
++def det_append_after_scratch(
++    x: wp.array[float], scratch: wp.array[float], counter: wp.array[int], out: wp.array[float]
++):
++    # unsupported: the counter call depends on a global store made earlier in the launch, which the counting pass
++    # does not perform ("Side effects in the counting pass" in the deterministic execution guide)
++    tid = wp.tid()
++    scratch[tid] = x[tid]
++    if scratch[tid] > 0.0:
++        slot = wp.atomic_add(counter, 0, 1)
++        out[slot] = scratch[tid]
 +
 +
 +@wp.kernel(module="unique", module_options=ORDERED)
@@ -15605,6 +15658,38 @@ index 0000000..059b901
 +        expected = values[values > 0]
 +        self.assertEqual(int(counter.numpy()[0]), expected.size)
 +        np.testing.assert_array_equal(out.numpy()[: expected.size], expected)
++
++    def _phase_mismatch_raised(self, x_np, scratch_init):
++        from warp._src import metal_deterministic as md  # noqa: PLC0415
++
++        state = md._state(wp.get_device(self.device))
++        n = x_np.size
++        x = wp.array(x_np, device=self.device)
++        scratch = wp.full(n, scratch_init, dtype=float, device=self.device)
++        counter = wp.zeros(1, dtype=int, device=self.device)
++        out = wp.zeros(n, dtype=float, device=self.device)
++        try:
++            # the launch only peeks at the flag without waiting for the GPU; check it again after a sync
++            wp.launch(det_append_after_scratch, dim=n, inputs=[x, scratch, counter, out], device=self.device)
++            wp.synchronize_device(self.device)
++            md._check_overflow(state, det_append_after_scratch)
++        except RuntimeError as e:
++            return "phase mismatch" in str(e)
++        finally:
++            ctypes.memset(state.overflow.ptr, 0, 4)
++            state.overflow_reported = False
++        return False
++
++    def test_phase_mismatch_tripwire(self):
++        """Flag a kernel whose execution pass makes counter calls its counting pass did not record (more calls:
++        the counting pass reads the scratch as 0), or records calls the execution pass does not make (fewer)."""
++        self.assertTrue(self._phase_mismatch_raised(np.ones(3000, dtype=np.float32), 0.0))
++        self.assertTrue(self._phase_mismatch_raised(-np.ones(3000, dtype=np.float32), 1.0))
++
++    def test_no_tripwire_when_phases_agree(self):
++        """Supported counter kernels leave the flag clear (scratch already equal to the input in both passes)."""
++        x_np = np.ones(3000, dtype=np.float32)
++        self.assertFalse(self._phase_mismatch_raised(x_np, 1.0))
 +
 +    def test_graph_capture(self):
 +        """Replay deterministic accumulation and counter launches from a captured graph."""

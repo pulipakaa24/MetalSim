@@ -97,10 +97,8 @@ The CUDA path is unchanged (nothing here to test it on). batch_06 runs MuJoCo Wa
 (`MJW_CCD_DET_SPLIT=0`) at 256 worlds expecting the error, and every other deterministic run with the tripwire on, so a
 false positive in any MuJoCo Warp kernel would show.
 
-## Validation
+## Validation (batch_06, 16-inch, runs/mpm_main/batch_06)
 
-GPU (batch_06, 16-inch; results to be recorded here): Warp's Metal deterministic tests; stack at 256 worlds cold / warm
-and cross-process; the contact audit (expect one box-box count for every world at every step);
-tests/test_batch_deterministic.py; the tripwire A/B above — all with both fork branches first on `PYTHONPATH`.
-Newton's `SolverMuJoCo(deterministic=True)` with MuJoCo contacts takes the same CCD path and gets the fix once its MuJoCo
-Warp includes it.
+With both fork branches first on `PYTHONPATH`: Warp's Metal deterministic tests 15 OK (the tripwire tests included); stacked boxes at 4 worlds take the split kernels (`ccd_det_kernels_builder` modules, RUN_TO_RUN); at 256 worlds and 200 steps, two runs in one process and three processes (two cold kernel caches, one warm) are bitwise identical; the contact audit gives every world the same box-box contact count at every step 130-160 and no state difference; tests/test_batch_deterministic.py 7 passed. Tripwire A/B: the single CCD kernel (`MJW_CCD_DET_SPLIT=0`) at 256 worlds now stops with "Warp deterministic-mode counter phase mismatch" from `BatchSim.check_overflow` instead of diverging silently.
+
+Pinned on 2026-10-13 (batch_08): MuJoCo Warp `4d05cb7` (code `cfa290b`), Warp `52c09cdd` (code `9346cf72`, rebased onto the coupled-speed pin `31cf79d7`). Newton's `SolverMuJoCo(deterministic=True)` with MuJoCo contacts takes the same CCD path and gets the fix once its MuJoCo Warp includes it.

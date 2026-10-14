@@ -1011,13 +1011,13 @@ Everything above runs from a clone of MetalSim plus the three forks; nothing dep
 
 ```
 # after the install of README / docs/GUIDE.md (.venv, scripts/setup_warp.sh, the MuJoCo Warp fork):
-scripts/setup_newton152.sh          # .venv-newton152: Newton fork metalsim-1.5.2 @addd10cb, shared Warp fork @31cf79d7
+scripts/setup_newton152.sh          # .venv-newton152: Newton fork metalsim-1.5.2 @addd10cb, shared Warp fork @52c09cdd
 scripts/gpu_run.sh test_mpm check 15 -- .venv-newton152/bin/python -m pytest tests/test_mpm.py   # 15 passed, 1 xfailed
 ```
 
 | what | where it lives | how a fresh setup gets it |
 |---|---|---|
-| Warp changes | pulipakaa24/warp `metalsim`, pinned `31cf79d7` | `scripts/setup_warp.sh` (fallback: innate-inc/warp `ce15f6bb` + `patches/warp/metalsim-31cf79d7.diff`) |
+| Warp changes | pulipakaa24/warp `metalsim`, pinned `52c09cdd` | `scripts/setup_warp.sh` (fallback: innate-inc/warp `ce15f6bb` + `patches/warp/metalsim-52c09cdd.diff`) |
 | Newton changes (MPM, Franka-Pour rigid) | pulipakaa24/newton `metalsim-1.5.2`, pinned `addd10cb` | `scripts/setup_newton152.sh` (fallback: v1.5.2 + `patches/newton/metalsim-1.5.2-addd10cb.diff`) |
 | Newton 1.7 Metal fixes for the rigid stack | pulipakaa24/newton `metalsim-hashtable-metal` `a4be3604` (`.venv`'s `newton` extra) and `metalsim` `9f317390` (`.venv-newtonfork`) | `pip install -e ".[newton]"`, `scripts/setup_newton.sh` |
 | compat layer, scenes, probes, tests, Isaac-side recorders | this repository | the clone |
@@ -1085,9 +1085,9 @@ repeats bitwise in all 12 multi-world configurations of `probes/multiworld_repea
   worlds with Gauss-Seidel. With Jacobi at 1,024 worlds the box reaches the floor and the run diverged at step 34:
   MuJoCo Warp's constraint solve is not run-to-run repeatable on Metal by default (MetalSim's rigid stack never was;
   `probes/rigid_neutral_mpm.py`: the panda differs between two plain runs; a box resting on the floor alone diverges
-  at step 18 at 1,024 worlds). An opt-in deterministic `BatchSim` (Warp's RUN_TO_RUN mode for MuJoCo Warp's kernels)
-  is being developed separately on branch `batchsim-deterministic` (open: a divergence in MuJoCo Warp's box-box CCD
-  kernel under the two-phase deterministic counters, 2 of 256 worlds from step 139).
+  at step 18 at 1,024 worlds). With `BatchSimOptions(deterministic=True)` (Warp's RUN_TO_RUN mode for MuJoCo Warp's
+  kernels, 2026-10-13) rigid contacts repeat too: two stacked boxes at 256 worlds are bitwise equal in one process
+  and across processes (`research_notes/MPM in main simulator/deterministic_ccd_divergence.md`).
 * **Rigid neutrality**: after an MPM scene was built and stepped, the MuJoCo Warp kernel modules a rigid scene loads
   have the same hashes (8 modules), and the box scene's trajectory is bitwise that of a plain run.
 * **Speed** (ms per captured coupled step = 3 MuJoCo substeps + 1 MPM step of 1/120 s, box + 2,592 particles per

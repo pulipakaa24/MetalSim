@@ -72,7 +72,7 @@ listing its commits, and keeps its upstream licence unchanged. "Head" is the bra
 
 [github.com/pulipakaa24/warp](https://github.com/pulipakaa24/warp), branch
 [`metalsim`](https://github.com/pulipakaa24/warp/tree/metalsim), head
-[`31cf79d7`](https://github.com/pulipakaa24/warp/commit/31cf79d781e4b10d8ff85c8cbd98fc0e40f75953) (2026-10-13, pinned by
+[`52c09cdd`](https://github.com/pulipakaa24/warp/commit/52c09cdd82f79e8564b5ae17cdcee7b52d10d075) (2026-10-13, pinned by
 `scripts/setup_warp.sh`; the rigid-body results through 2026-09-26 were produced at
 [`c200d46b`](https://github.com/pulipakaa24/warp/commit/c200d46b), those before that day's throughput work at [`4127c48`](https://github.com/pulipakaa24/warp/commit/4127c4818334080de6f3d23aef522e582ff6a2a7), code
 [`f194006`](https://github.com/pulipakaa24/warp/commit/f194006a4cf197fda93633252af81bc3f57f5561)). Base: innate-inc/warp
@@ -114,6 +114,8 @@ listing its commits, and keeps its upstream licence unchanged. "Head" is the bra
 - Franka-Pour memory (2026-10-12, `95f6f121`; MPM.md section 8h): warp.fem temporary pools allocate the requested
   size on Metal; Franka-Pour at 2,048 worlds 37.6 -> 34.5 GB, 15.7 GB with the task's opt-in grid budgets; bitwise.
 
+- Deterministic counters checked (2026-10-13, `9346cf72`; `research_notes/MPM in main simulator/deterministic_ccd_divergence.md`): a kernel whose slot-counter calls differ between the counting and the execution pass (the counting pass suppresses stores) raises "Deterministic counter phase mismatch" instead of silently handing slots to the wrong calls.
+
 Branch [`metalsim-flex`](https://github.com/pulipakaa24/warp/tree/metalsim-flex), head
 [`01ccf4a`](https://github.com/pulipakaa24/warp/commit/01ccf4ad687c0ebcdee139ee1131fbe2ad97bf51) (code `9dcb140`): the
 first four commits plus the graph-capture sort; merged into `metalsim`.
@@ -122,7 +124,7 @@ first four commits plus the graph-capture sort; merged into `metalsim`.
 
 [github.com/pulipakaa24/mujoco_warp](https://github.com/pulipakaa24/mujoco_warp), branch
 [`metalsim`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim), head
-[`f1b35e2`](https://github.com/pulipakaa24/mujoco_warp/commit/f1b35e2b3ddc80b197b0c665bf6d71523d175daf) (2026-10-13, the commit the install pins;
+[`4d05cb7`](https://github.com/pulipakaa24/mujoco_warp/commit/4d05cb7d4453d82c94d19ab9fb392df2c62b1acd) (2026-10-13, the commit the install pins;
 the rigid-body results before the elliptic-cone work were produced at
 [`07a51a6`](https://github.com/pulipakaa24/mujoco_warp/commit/07a51a63bce527d2d26b363a32c52765df4412fc) / code
 [`8fbf965`](https://github.com/pulipakaa24/mujoco_warp/commit/8fbf965acb630aa32573dda802404d519c843a99)). Base: Google
@@ -163,6 +165,8 @@ DeepMind's MuJoCo Warp v3.14.0 (`88af9cc`) plus the Metal device patch by David 
 - Heightfield plane contacts restricted to meshes; primitives take upstream's GJK/EPA again (`b630530`; the fork's
   plane path missed contacts of primitives on heightfields smaller than the box; `HFIELD_PLANE_CONTACTS_PRIMITIVES=True`
   archives the old form).
+
+- Deterministic mode (Warp `RUN_TO_RUN`): non-heightfield CCD runs as a counter-free solve kernel and a contact-write kernel (`cfa290b`); the single kernel picked its EPA scratch row with a slot counter, so under Warp's two-pass counters a box-box contact could land in another world's slot. Default mode unchanged.
 
 Branch [`metalsim-flex`](https://github.com/pulipakaa24/mujoco_warp/tree/metalsim-flex), head
 [`fc1d5ee`](https://github.com/pulipakaa24/mujoco_warp/commit/fc1d5eef8f9045309087bc822f36c1c62a7214a2) (code
@@ -264,7 +268,7 @@ git clone https://github.com/pulipakaa24/MetalSim && cd MetalSim
 python3.12 -m venv .venv && source .venv/bin/activate     # uv only: "$(uv python find 3.12)" -m venv .venv
 pip install -e ".[test,newton]"            # newton: MPM in BatchSim scenes (Newton 1.7) and the Newton engine
 scripts/setup_warp.sh                      # replaces PyPI's warp-lang with the Warp fork (upstream/warp-metalsim)
-pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@f1b35e2b3ddc80b197b0c665bf6d71523d175daf#egg=mujoco-warp" "mujoco>=3.14,<3.15"
+pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@4d05cb7d4453d82c94d19ab9fb392df2c62b1acd#egg=mujoco-warp" "mujoco>=3.14,<3.15"
 scripts/fetch_isaac_assets.sh              # NVIDIA's G1 and Franka-Pour assets, fetched from NVIDIA, not redistributed
 git clone --depth 1 https://github.com/google-deepmind/mujoco_menagerie upstream/mujoco_menagerie   # robot models
 pytest tests -q
@@ -280,7 +284,7 @@ model and asset locations can be moved with `MENAGERIE` (default `upstream/mujoc
 The MuJoCo Warp commit is pinned (the head of the fork's branch `metalsim` on 2026-10-13), as Warp's in
 `scripts/setup_warp.sh` and Newton's in `pyproject.toml`. Without access to the fork: clone
 google-deepmind/mujoco_warp, `git checkout 88af9cc` (v3.14.0), `git apply` MetalSim's
-`patches/mujoco_warp/metalsim-f1b35e2.diff` (the whole branch as one diff) and `pip install -e` that checkout.
+`patches/mujoco_warp/metalsim-4d05cb7.diff` (the whole branch as one diff) and `pip install -e` that checkout.
 The `mujoco<3.15` on that line keeps pip from moving MuJoCo past 3.14: the fork reads `MjModel.flex_internal`,
 which 3.15 removed (the fork alone asks only `mujoco>=3.12`, and its uv index offers 3.15 nightlies).
 
