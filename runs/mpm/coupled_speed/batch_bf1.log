@@ -1,0 +1,41 @@
+== Tue Oct 13 18:00:23 PDT 2026 batch_bf1 start
+patching file 'newton/examples/mpm/example_mpm_twoway_coupling.py'
+compaction exact True (4815 nodes); vs float64: full 3.35e-07, compact 5.12e-07; full vs compact 5.56e-07; compact repeat bitwise True; bitwise equal to full False
+full: median 1.051 ms per call (metal:0, 655360 nodes, 12 bodies)
+compact: median 0.383 ms per call (metal:0, 655360 nodes, 12 bodies)
+OK
+repeat: F_twoway: BITWISE EQUAL
+vs IJtm-only (expected to differ): F_twoway: differs in traj.npz:pos, traj.npz:vel, traj.npz:body_q, solves.npz:res_l2, solves.npz:res_linf
+| floors_new | worst frame | | | | | 0.83 | 0.80 |
+| floors_bf1 | worst frame | | | | | 0.83 | 0.80 |
+Verdicts: floors_new: inside max floor, inside p95 pairwise; floors_bf1: inside max floor, inside p95 pairwise
+done: 200 frames, 453871 particles, 8.17 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+done: 200 frames, 453871 particles, 17.74 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+done: 200 frames, 453871 particles, 7.65 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+done: 200 frames, 453871 particles, 17.65 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+done: 200 frames, 453871 particles, 8.12 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+done: 200 frames, 453871 particles, 17.81 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+done: 200 frames, 453871 particles, 7.60 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+done: 200 frames, 453871 particles, 17.73 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+done: 200 frames, 453871 particles, 8.14 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+done: 200 frames, 453871 particles, 17.78 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+done: 200 frames, 453871 particles, 7.77 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+done: 200 frames, 453871 particles, 17.62 s, iters mean None max None, init bda7429fa80ec537f605e4c233d08ecb
+| scene | L4 | IJtm only (runs) | IJtm + compaction (runs) | IJtm / L4 | + compaction / L4 |
+|---|---|---|---|---|---|
+| twoway_capture | 31.0 | 40.0 (40.5 / 40.0 / 39.6) | 37.6 (37.7 / 37.3 / 37.6) | 1.29x | 1.21x |
+| twoway | 73.0 | 61.5 (61.5 / 61.4 / 62.0) | 61.3 (60.9 / 61.5 / 61.3) | 0.84x | 0.84x |
+### twoway_coupling
+
+L4 kernel sum 28.90 ms/frame over 1298 launches; Metal (isolated-dispatch profile) 38.45 ms/frame over 1890 launches; Metal empty command buffer 4.97 us/launch -> calibrated Metal sum 29.06 ms/frame.
+
+| kernel (normalised) | L4 ms/frame | L4 launches | Metal ms/frame | Metal launches | Metal calibrated ms | Metal / L4 |
+|---|---|---|---|---|---|---|
+| sort/scan/reduce (native) | 15.481 | 190 | 8.130 | 471 | 5.790 | 0.37 |
+| gs_solve_kernel_impl | 3.207 | 400 | 9.026 | 400 | 7.039 | 2.19 |
+| copy/fill | 0.890 | 38 | 1.463 | 145 | 0.743 | 0.83 |
+| solve_subgrid_friction | 0.440 | 50 | 1.722 | 50 | 1.473 | 3.35 |
+| integrate_velocity_apic | 1.037 | 1 | 0.830 | 1 | 0.825 | 0.80 |
+| make_bsr_mv_tiled_kernel__locals__bsr_mv_tiled_kernel | 0.117 | 51 | 1.579 | 51 | 1.326 | 11.29 |
+| apply_subgrid_impulse | 0.660 | 51 | 0.930 | 51 | 0.676 | 1.02 |
+| make_bsr_mv_kernel__locals__bsr_mv_kernel | 1.340 | 51 | 0.127 | 1 | 0.122 | 0.09 |
