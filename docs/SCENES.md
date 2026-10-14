@@ -11,6 +11,9 @@ mjpython -m metalsim.run configs/scenes/go2_boxes.yaml --viewer         # intera
 python -m metalsim.run configs/scenes/franka_pour.yaml --film           # a registered task (its own scene builder)
 ```
 
+Needs the documented install (`pip install -e ".[full]"`): scene files need PyYAML (a core dependency), `--film`
+the film tool's packages (docs/renders/README.md).
+
 The Python API does the same:
 
 ```python

@@ -126,6 +126,7 @@ def test_go2_boxes_builds_and_stands():
     cfg = C.load(GO2)
     scene = CP.ComposedScene(cfg, device=None)
     m = scene.model
+    assert scene.info.robot_free == "base_freejoint"   # Menagerie's unnamed <freejoint/>, named so init_state applies
     assert mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_CAMERA, "head_cam") >= 0
     assert mujoco.mj_name2id(m, mujoco.mjtObj.mjOBJ_SITE, "front_lidar") >= 0
     assert sum(1 for b in range(m.nbody) if (mujoco.mj_id2name(m, mujoco.mjtObj.mjOBJ_BODY, b) or "").startswith("box_")) == 6
@@ -167,7 +168,26 @@ def test_go2_boxes_gpu(tmp_path):
     out = scene.render()["head_cam"]
     rgb, depth, seg = out["rgb"], out["distance_to_image_plane"], out["semantic_segmentation"]
     assert rgb.shape == (2, 360, 640, 3) and rgb.std() > 5
-    assert depth.shape == (2, 360, 640) and np.isfinite(depth).all() and (depth > 0).mean() > 0.5
+    assert depth.shape == (2, 360, 640) and np.isfinite(depth).all()
+    # The first version asked for > 50 % of pixels with a hit and got exactly 1/3 (2026-10-14, 16-inch). Root cause: the
+    # image was right. A forward camera 0.38 m above the floor sees sky (depth 0 = no hit) above the horizon, about half
+    # the frame when level (runs/scenes/go2_boxes/run/head_cam_distance_to_image_plane_0.png: horizon at mid-height),
+    # and at step 20 the dog, settling from its drop, was pitched ~6 deg nose-up in both envs: the horizon 120 rows
+    # below the centre, 120 + 120 hit rows of 720 = 1/3 (the bottom-row floor depth 1.854 m matches that pitch).
+    # Checked geometrically now: the bottom-left pixel's planar depth equals the ray's distance to the floor, and the
+    # top row is sky whenever it looks above the horizon.
+    cid = mujoco.mj_name2id(scene.model, mujoco.mjtObj.mjOBJ_CAMERA, "head_cam")
+    datas = scene.host_datas()
+    f = (360 / 2) / np.tan(np.radians(CP.fovy_deg(cfg.cameras["head_cam"])) / 2)
+    for e in range(2):
+        p, R = datas[e].cam_xpos[cid], datas[e].cam_xmat[cid].reshape(3, 3)
+        d = R @ np.array([(0.5 - 320) / f, -(359.5 - 180) / f, -1.0])     # pixel (row 359, col 0), unit planar depth
+        assert d[2] < 0, "bottom row must look down"
+        t = -p[2] / d[2]
+        assert abs(depth[e, 359, 0] - t) < 0.02 * t, (e, float(depth[e, 359, 0]), t)
+        top = R @ np.array([0.0, 180 / f, -1.0])
+        if top[2] > 0.01:                                                   # the top row looks up: sky only
+            assert (depth[e, 0] == 0).all()
     assert len(np.unique(seg)) >= 2
     hits = scene.sense()["front_lidar"]["range"]
     assert hits.shape[0] == 2 and (np.asarray(hits) > 0).mean() > 0.05      # the boxes and the ground are hit
