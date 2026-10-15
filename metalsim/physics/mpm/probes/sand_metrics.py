@@ -176,6 +176,14 @@ def surface_angle_world(q: np.ndarray, tilt_deg: float, x_lo: float, x_hi: float
     xc, top = layer_surface(q, x_lo, x_hi, col, min_depth)
     if xc.size < 4:
         return float("nan"), float("nan"), int(xc.size)
+    # After a full avalanche the material piles against the downslope wall and the upslope part is bare or thin: a
+    # line through every column then fits a step (batch 02b t1b: box-frame slope 89.9 deg). Fit the free face only:
+    # the columns between 20 and 80 % of the way from the lowest to the highest top, when that range is >= 2 columns
+    # wide in height; otherwise (a layer that did not avalanche) every column.
+    lo, hi = float(top.min()), float(top.max())
+    face = (top >= lo + 0.2 * (hi - lo)) & (top <= lo + 0.8 * (hi - lo))
+    if hi - lo >= 2 * min_depth and face.sum() >= 4:
+        xc, top = xc[face], top[face]
     s, _ = np.polyfit(xc, top, 1)
     a_box = math.degrees(math.atan(s))
     return tilt_deg - a_box, a_box, int(xc.size)

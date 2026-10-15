@@ -63,6 +63,8 @@ def test_solver_variant_selection():
     assert solver.solver_class("parity") is parity
     v = solver.solver_class("pr4660")
     assert v.__module__.startswith("metalsim.physics.mpm.implicit_mpm_pr4660.") and v is not parity
+    c = solver.solver_class("pr4660c")
+    assert c.__module__.startswith("metalsim.physics.mpm.implicit_mpm_pr4660c.") and c not in (v, parity)
     with pytest.raises(ValueError):
         solver.solver_class("nope")
 
