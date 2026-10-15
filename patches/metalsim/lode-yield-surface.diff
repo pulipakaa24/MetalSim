@@ -1,0 +1,265 @@
+--- a/rheology_solver_kernels.py
++++ b/rheology_solver_kernels.py
+@@ -28,7 +28,30 @@
+ _ISOTROPIC_LOCAL_LHS = wp.constant(False)
+ """Use isotropic local left-hand side instead of anisotropic. Cheaper local solver but slower convergence. Development toggle for experimentation."""
+ 
++# MetalSim: Lode-dependent yield surface (research_notes/sand_fidelity/PLAN_2026-10-14.md section 17). The deviatoric
++# yield radius of the Drucker-Prager cone is scaled by k(theta) = M(theta) / mu, with M the generalized-classical
++# Lode function (Lagioia & Panteghini 2016) and phi = atan(mu), so that a cohesionless material has the friction
++# angle atan(mu) (Mohr-Coulomb) at every Lode angle. The Lode angle is taken from the world-frame deviator.
++_LODE_SURFACE = wp.constant(1)
++"""Lode-dependent yield surface: 1 = Mohr-Coulomb with inner-rounded corners, 2 = Matsuoka-Nakai (matched at the
++triaxial compression / extension corners). Set by scripts/vendor_mpm_variant.py per variant (pr4660mc, pr4660mn)."""
+ 
++_LODE_MC_ROUNDING = wp.constant(0.9999)
++"""Generalized-classical beta for the Mohr-Coulomb corners (1 = sharp). 0.9999: friction angle at most 0.33 deg below phi (phi <= 50 deg), at the triaxial corners."""
++
++_LODE_MAX_SOLVES = wp.constant(8)
++"""Most anisotropic flow-rule solves per local stress update. The Lode factor k solves k = F(k) = k(theta(stress(k)))
++(the D-metric projection turns the deviator, so theta moves): first k from the trial stress, then fixed-point and
++secant steps safeguarded by bisection inside the range of k over all Lode angles (lode_scale_bounds), which brackets
++the root. Compile-time bound."""
++
++_LODE_TOL = wp.constant(1.0e-5)
++"""Stop when |F(k) - k| <= _LODE_TOL * k (the stress then lies on the surface to about this relative error)."""
++
++_LODE_PHI_MIN = wp.constant(0.01)
++"""Smallest friction angle [rad] used in the Lode function (its phi -> 0 limit is regular; float32 safety)."""
++
++
+ vec6 = wp.types.vector(length=6, dtype=wp.float32)
+ 
+ mat66 = wp.types.matrix(shape=(6, 6), dtype=wp.float32)
+@@ -122,9 +145,76 @@
+     y_sq = beta_sq * (r_N - r_N_min) * (r_N_max - r_N)
+ 
+     return wp.sqrt(y_sq), 0.0, r_N_min, r_N_max
++
++
++@wp.func
++def lode_sin3theta(r_world: vec6):
++    """sin(3 theta) of a world-frame (DB16-mapped, compression-positive) stress: +1 at triaxial compression (one
++    principal stress above the two others), -1 at triaxial extension, 0 in pure shear and for a zero deviator."""
++    dev = r_world
++    dev[0] = 0.0
++    j2 = wp.length_sq(dev)  # the DB16 mapping is orthonormal for (tau : tau) / 2, so |dev|^2 = J2
++    if j2 <= 1.0e-30:
++        return 0.0
++    j3 = wp.determinant(fem.SymmetricTensorMapper.dof_to_value_3d(dev))
++    return wp.clamp(2.598076211353316 * j3 / (j2 * wp.sqrt(j2)), -1.0, 1.0)
++
++
++@wp.func
++def lode_scale(sin3theta: float, mu: float):
++    """k(theta) = M(theta) / mu: the factor on the Drucker-Prager deviatoric radius (sqrt(J2) <= mu p) that gives the
++    selected Lode-dependent surface with friction angle phi = atan(mu). Mohr-Coulomb: k(0) = cos(phi), so the radius in
++    pure shear is p sin(phi) + c cos(phi); phi -> 0 gives (rounded) Tresca with sqrt(J2) = c in pure shear."""
++    phi = wp.max(wp.atan(wp.max(mu, 0.0)), _LODE_PHI_MIN)
++    s = wp.sin(phi)
++    m_c = 6.0 * s / (3.0 - s)
++    if wp.static(_LODE_SURFACE == 2):
++        # Matsuoka-Nakai: A1 = (K - 3) / (K - 9), A2 = K / (K - 9), K = (9 - s^2) / (1 - s^2), without cancellation
++        a1 = (6.0 + 2.0 * s * s) / (8.0 * s * s)
++        a2 = (9.0 - s * s) / (8.0 * s * s)
++        alpha = (2.0 / 3.0) * wp.sqrt(a1) * m_c
++        beta = a2 / (a1 * wp.sqrt(a1))
++        gamma = 0.0
++    else:
++        # Mohr-Coulomb, inner-rounded corners
++        gbar = (6.0 / wp.pi) * wp.atan(s / wp.sqrt(3.0))
++        alpha = 1.0 / wp.cos((gbar + 1.0) * wp.pi / 6.0)
++        beta = _LODE_MC_ROUNDING
++        gamma = 1.0 - gbar
++    shape = alpha * wp.cos(wp.acos(wp.clamp(-beta * sin3theta, -1.0, 1.0)) / 3.0 - gamma * wp.pi / 6.0)
++    return m_c / (wp.sqrt(3.0) * shape * wp.tan(phi))
+ 
+ 
+ @wp.func
++def lode_scale_bounds(mu: float):
++    """Range of k(theta) over all Lode angles: the largest is at triaxial compression for both surfaces; the smallest
++    is at triaxial extension for Matsuoka-Nakai but mid-face (tan theta = -sin(phi) / sqrt(3)) for Mohr-Coulomb."""
++    phi = wp.max(wp.atan(wp.max(mu, 0.0)), _LODE_PHI_MIN)
++    s3_face = wp.sin(-3.0 * wp.atan(wp.sin(phi) / wp.sqrt(3.0)))
++    k_lo = wp.min(lode_scale(-1.0, mu), lode_scale(s3_face, mu))
++    return k_lo, lode_scale(1.0, mu)
++
++
++@wp.func
++def yield_friction(yield_params: YieldParamVec):
++    """The material friction coefficient mu (sqrt(J2) <= mu p) of a yield parameter vector."""
++    p_max = yield_params[0]
++    return wp.where(p_max > 0.0, wp.max(0.0, yield_params[3] / p_max), 0.0) * wp.sqrt(3.0 / 2.0)
++
++
++@wp.func
++def lode_scale_world(r_world: vec6, yield_params: YieldParamVec):
++    return lode_scale(lode_sin3theta(r_world), yield_friction(yield_params))
++
++
++@wp.func
++def lode_scale_local(r_local: vec6, rotation: mat55, yield_params: YieldParamVec):
++    """As :func:`lode_scale_world` for a stress in the local (Delassus eigenbasis) frame: the 5x5 rotation does not
++    preserve J3, so the deviator is rotated back to the world frame first."""
++    return lode_scale_world(_local_to_world(r_local, rotation), yield_params)
++
++
++@wp.func
+ def _symmetric_part_op(b: wp.vec3, u: wp.vec3):
+     return fem.SymmetricTensorMapper.value_to_dof_3d(wp.outer(u, b * 2.0))
+ 
+@@ -339,7 +429,7 @@
+ 
+     yp = yield_params[tau_i]
+     loc_plastic_strain_new = wp.static(make_solve_flow_rule())(
+-        diag, loc_plastic_strain - wp.cw_mul(loc_stress, diag), loc_stress, yp, strain_node_volume[tau_i]
++        diag, loc_plastic_strain - wp.cw_mul(loc_stress, diag), loc_stress, yp, strain_node_volume[tau_i], rot
+     )
+     world_plastic_strain_new = _local_to_world(loc_plastic_strain_new, rot)
+ 
+@@ -587,36 +677,28 @@
+     return u
+ 
+ 
+-def make_solve_flow_rule(has_viscosity: bool = True, has_dilatancy: bool = True):
+-    key = (has_viscosity, has_dilatancy)
++def make_solve_flow_rule_given_scale(has_dilatancy: bool = True):
++    """The anisotropic flow rule with the deviatoric yield radius scaled by a given Lode factor ``lode_k``."""
++    key = (has_dilatancy,)
+ 
+     @fem.cache.dynamic_func(suffix=key)
+-    def solve_flow_rule_aniso_impl(
++    def solve_flow_rule_given_scale_impl(
+         D: vec6,
+         b: vec6,
+-        r_guess: vec6,
+         yield_params: YieldParamVec,
+-        strain_node_volume: float,
++        lode_k: float,
+     ):
+         if wp.static(has_dilatancy):
+             dilatancy = get_dilatancy(yield_params)
+         else:
+             dilatancy = 0.0
+ 
+-        if wp.static(has_viscosity):
+-            # Empty strain modes have no material viscosity to apply.
+-            if strain_node_volume > 0.0:
+-                D_visc = vec6(1.0) + get_viscosity(yield_params) / strain_node_volume * D
+-                D = wp.cw_div(D, D_visc)
+-                b = wp.cw_div(b, D_visc)
+-
+-        if wp.static(_USE_CAM_CLAY):
+-            return solve_flow_rule_camclay(D, b, r_guess, yield_params)
+-
+         r_0 = -wp.cw_div(b, D)
+         r_N0 = r_0[0]
+ 
+         ys, dys, pmin, pmax = shear_yield_stress(yield_params, r_N0)
++        ys *= lode_k
++        dys *= lode_k
+ 
+         u_N0 = D[0] * (wp.clamp(r_N0, pmin, pmax) - r_N0)
+ 
+@@ -645,6 +727,7 @@
+ 
+         # moved from conic part to constant part. clamp and resolve tangent part
+         ys, dys, pmin, pmax = shear_yield_stress(yield_params, r_N_clamp)
++        ys *= lode_k
+         if wp.static(has_dilatancy):
+             u = solve_sliding_aniso(D, b, ys, 0.0, dilatancy)
+         else:
+@@ -653,6 +736,69 @@
+ 
+         return u
+ 
++    return solve_flow_rule_given_scale_impl
++
++
++def make_solve_flow_rule(has_viscosity: bool = True, has_dilatancy: bool = True):
++    key = (has_viscosity, has_dilatancy)
++    given_scale = make_solve_flow_rule_given_scale(has_dilatancy)
++
++    @fem.cache.dynamic_func(suffix=key)
++    def solve_flow_rule_aniso_impl(
++        D: vec6,
++        b: vec6,
++        r_guess: vec6,
++        yield_params: YieldParamVec,
++        strain_node_volume: float,
++        rotation: mat55,
++    ):
++        if wp.static(has_viscosity):
++            # Empty strain modes have no material viscosity to apply.
++            if strain_node_volume > 0.0:
++                D_visc = vec6(1.0) + get_viscosity(yield_params) / strain_node_volume * D
++                D = wp.cw_div(D, D_visc)
++                b = wp.cw_div(b, D_visc)
++
++        if wp.static(_USE_CAM_CLAY):
++            return solve_flow_rule_camclay(D, b, r_guess, yield_params)
++
++        # Lode factor: the root of g(k) = F(k) - k, F(k) = k(theta of the stress r = (u(k) - b) / D). An elastic trial
++        # stress is kept after one solve (F(k0) = k0). g >= 0 at the smallest k over all Lode angles and <= 0 at the
++        # largest, so [k_a, k_b] brackets the root: secant steps, bisection when a step leaves the bracket
++        # (_LODE_MAX_SOLVES solves at most).
++        k0 = lode_scale_local(-wp.cw_div(b, D), rotation, yield_params)
++        u = wp.static(given_scale)(D, b, yield_params, k0)
++        g0 = lode_scale_local(wp.cw_div(u - b, D), rotation, yield_params) - k0
++        if wp.abs(g0) <= _LODE_TOL * k0:
++            return u
++        k_a, k_b = lode_scale_bounds(yield_friction(yield_params))
++        if g0 > 0.0:
++            k_a = wp.max(k_a, k0)
++        else:
++            k_b = wp.min(k_b, k0)
++        k1 = wp.clamp(k0 + g0, k_a, k_b)
++        u = wp.static(given_scale)(D, b, yield_params, k1)
++        g1 = lode_scale_local(wp.cw_div(u - b, D), rotation, yield_params) - k1
++        for _solve in range(_LODE_MAX_SOLVES - 2):
++            if wp.abs(g1) <= _LODE_TOL * k1:
++                break
++            if g1 > 0.0:
++                k_a = wp.max(k_a, k1)
++            else:
++                k_b = wp.min(k_b, k1)
++            k2 = 0.5 * (k_a + k_b)
++            den = g1 - g0
++            if wp.abs(den) > 1.0e-12:
++                k_sec = k1 - g1 * (k1 - k0) / den
++                if k_sec > k_a and k_sec < k_b:
++                    k2 = k_sec
++            k0 = k1
++            g0 = g1
++            k1 = k2
++            u = wp.static(given_scale)(D, b, yield_params, k1)
++            g1 = lode_scale_local(wp.cw_div(u - b, D), rotation, yield_params) - k1
++        return u
++
+     return solve_flow_rule_aniso_impl
+ 
+ 
+@@ -671,6 +817,7 @@
+         ys, _dys, pmin, pmax = shear_yield_stress_camclay(yield_params, r_N)
+     else:
+         ys, _dys, pmin, pmax = shear_yield_stress(yield_params, r_N)
++        ys *= lode_scale_world(r, yield_params)
+ 
+     r_T_n2 = wp.length_sq(r_T)
+     if r_T_n2 > ys * ys:
+@@ -895,6 +1042,7 @@
+             local_strain = _world_to_local(strain_rhs, rot)
+             local_stress = _world_to_local(cur_stress[tau_i], rot)
+         else:
++            rot = wp.identity(n=5, dtype=float)
+             local_strain = strain_rhs
+             local_stress = cur_stress[tau_i]
+ 
+@@ -904,6 +1052,7 @@
+             local_stress,
+             yield_params[tau_i],
+             strain_node_volume[tau_i],
++            rot,
+         )
+ 
+         delta_stress_loc = wp.cw_div(tau_new - local_strain, D)

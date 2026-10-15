@@ -51,17 +51,22 @@ from metalsim.physics.mpm import colliders as C
 @dataclass
 class MPMMaterial:
     """``MPMParticleMaterialCfg`` (IL ``sim/spawners/mpm/mpm_cfg.py``): density [kg/m^3] gives particle masses;
-    the rest become Newton's ``mpm:*`` per-particle attributes."""
+    the rest become Newton's ``mpm:*`` per-particle attributes.
+
+    ``friction`` and ``yield_stress`` depend on ``MPMConfig.yield_surface``: Drucker-Prager (parity) yields at
+    sqrt(J2) = friction * p + yield_stress; Mohr-Coulomb / Matsuoka-Nakai take phi = atan(friction) as the friction
+    angle (a heap rests near phi) and ``yield_stress`` as the cohesion c (with friction 0 and Mohr-Coulomb, the shear
+    yield stress tau_y in simple shear)."""
 
     density: float = 1000.0
-    young_modulus: float = 1.0e15
+    young_modulus: float = 1.0e15         # [Pa]; the default is effectively rigid-plastic
     poisson_ratio: float = 0.3
-    viscosity: float = 0.0
-    friction: float = 0.68
+    viscosity: float = 0.0                # [Pa s], in the plastic flow rule
+    friction: float = 0.68                # see the class docstring
     damping: float = 0.0
-    yield_pressure: float = 1.0e12
-    tensile_yield_ratio: float = 0.0
-    yield_stress: float = 0.0
+    yield_pressure: float = 1.0e12        # compressive cap [Pa]
+    tensile_yield_ratio: float = 0.0      # tensile limit as a fraction of yield_pressure
+    yield_stress: float = 0.0             # [Pa]; see the class docstring
     hardening: float = 0.0
     dilatancy: float = 0.0
 
@@ -140,15 +145,47 @@ class PointsEmitter:
                               custom_attributes=self.material.attributes())
 
 
+FIDELITIES = ("parity", "physical")
+YIELD_SURFACES = ("drucker_prager", "mohr_coulomb", "matsuoka_nakai")
+# what each fidelity sets when the field is left unset (None); "physical" also recommends 27 particles per cell
+FIDELITY_PRESETS = {
+    "parity": {"max_iterations": 250, "strain_basis": "P0", "yield_surface": "drucker_prager"},
+    "physical": {"max_iterations": 1000, "strain_basis": "P1d", "yield_surface": "mohr_coulomb"},
+}
+PHYSICAL_PARTICLES_PER_CELL = 27
+# solver variant of each yield surface: parity runs Isaac's solver; the others run Newton PR #4660's robustness fixes
+# plus (Mohr-Coulomb / Matsuoka-Nakai) MetalSim's Lode-dependent yield surface
+_SURFACE_VARIANT = {("parity", "drucker_prager"): "parity", ("physical", "drucker_prager"): "pr4660",
+                    ("physical", "mohr_coulomb"): "pr4660mc", ("physical", "matsuoka_nakai"): "pr4660mn"}
+_VARIANT_SURFACE = {"pr4660mc": "mohr_coulomb", "pr4660mn": "matsuoka_nakai"}
+
+
 @dataclass
 class MPMConfig:
     """``MPMSolverCfg`` defaults (IL ``physics/mpm_manager_cfg.py``) plus the coupling settings.
 
     ``separate_worlds`` is always on (each ``BatchSim`` world has its own material). ``max_active_cell_count``
     ``"auto"``: Isaac's Franka-Pour capacity rule (particles per world rounded up to 512, times the worlds) with a
-    rebuildable sparse grid, which makes the step capturable; ``-1``: Newton's host-sized sparse grid (eager only)."""
+    rebuildable sparse grid, which makes the step capturable; ``-1``: Newton's host-sized sparse grid (eager only).
 
-    max_iterations: int = 250
+    **Sand behaviour** (docs/GUIDE.md, "Granular and viscoplastic materials"):
+
+    * ``fidelity="parity"`` (default): Isaac Lab 3.0's MPM exactly (Newton 1.5.2's implicit solver, Drucker-Prager,
+      250 iterations, P0 strain). Unchanged and bitwise equal to Isaac's path.
+    * ``fidelity="physical"``: MetalSim's physically calibrated preset: Newton PR #4660's strain and collider fixes,
+      P1d strain, 1000 iterations and a Lode-dependent yield surface (``yield_surface``, default ``"mohr_coulomb"``,
+      under which a heap and a sheared layer both rest at atan(friction)). Use 27 particles per cell
+      (``PHYSICAL_PARTICLES_PER_CELL``) in the emitters. Several times slower per MPM step than parity.
+    * ``yield_surface``: ``"drucker_prager"`` (Isaac's cone: sqrt(J2) <= friction * p), ``"mohr_coulomb"`` (friction
+      angle atan(friction) at every Lode angle; ``yield_stress`` is the cohesion c) or ``"matsuoka_nakai"`` (smooth,
+      equal to Mohr-Coulomb in triaxial compression and extension, up to ~4 deg stronger between).
+
+    ``max_iterations``, ``strain_basis``, ``yield_surface`` and ``solver_variant`` left unset (None) take the
+    fidelity's values; set explicitly, they win (a ``solver_variant`` must agree with an explicit ``yield_surface``).
+    They are resolved at construction, so ``dataclasses.replace(cfg, fidelity=...)`` keeps the resolved values: build
+    a new ``MPMConfig`` to switch fidelity."""
+
+    max_iterations: int | None = None     # None: the fidelity's (parity 250, physical 1000)
     tolerance: float = 1.0e-4
     solver: str = "auto"
     warmstart_mode: str = "auto"
@@ -162,13 +199,20 @@ class MPMConfig:
     critical_fraction: float = 0.0
     air_drag: float = 1.0
     collider_basis: str = "S2"
-    strain_basis: str = "P0"
+    strain_basis: str | None = None       # None: the fidelity's (parity "P0", physical "P1d")
     velocity_basis: str = "Q1"
     solver_extra: dict = field(default_factory=dict)        # any other SolverImplicitMPM.Config field
-    # "parity" (default): the vendored Newton 1.5.2 fork solver, Isaac Lab's, untouched. Other values select a
-    # flag-gated variant generated from it plus an upstream change (scripts/vendor_mpm_variant.py): "pr4660" = Newton
-    # draft PR #4660 (P1d/Q1d nodal diagonalisation, collider pseudonormals). Not a SolverImplicitMPM.Config field.
-    solver_variant: str = "parity"
+    # "parity": the vendored Newton 1.5.2 fork solver, Isaac Lab's, untouched. Other values select a flag-gated
+    # variant generated from it plus a change (scripts/vendor_mpm_variant.py): "pr4660" = Newton draft PR #4660
+    # (P1d/Q1d nodal diagonalisation, collider pseudonormals); "pr4660mc" / "pr4660mn" = pr4660 plus the Lode-dependent
+    # yield surface (Mohr-Coulomb / Matsuoka-Nakai). None: from fidelity and yield_surface. Not a
+    # SolverImplicitMPM.Config field.
+    solver_variant: str | None = None
+    # "parity" (default, Isaac Lab 3.0's MPM) | "physical" (calibrated preset); see the class docstring
+    fidelity: str = "parity"
+    # "drucker_prager" | "mohr_coulomb" | "matsuoka_nakai"; None: the fidelity's (parity: Drucker-Prager, physical:
+    # Mohr-Coulomb)
+    yield_surface: str | None = None
     # coupling
     mpm_substeps: int = 1                 # MPM steps per coupled (BatchSim) step
     # "lagged" (Newton's SolverCoupledProxy.Proxy default; its two-way example's rewind): begin pose, end velocity
@@ -186,6 +230,36 @@ class MPMConfig:
     chunk_graph: bool = True
     gpu_exit: bool = True
     metal_fast_math: str = "off"
+
+    def __post_init__(self):
+        if self.fidelity not in FIDELITIES:
+            raise ValueError(f"fidelity must be one of {list(FIDELITIES)}, got {self.fidelity!r}")
+        if self.yield_surface is not None and self.yield_surface not in YIELD_SURFACES:
+            raise ValueError(f"yield_surface must be one of {list(YIELD_SURFACES)}, got {self.yield_surface!r}")
+        preset = FIDELITY_PRESETS[self.fidelity]
+        if self.max_iterations is None:
+            self.max_iterations = preset["max_iterations"]
+        if self.strain_basis is None:
+            self.strain_basis = preset["strain_basis"]
+        if self.solver_variant is not None:
+            from metalsim.physics.mpm.solver import VARIANTS  # noqa: PLC0415
+
+            if self.solver_variant not in VARIANTS:
+                raise ValueError(f"solver_variant must be one of {sorted(VARIANTS)}, got {self.solver_variant!r}")
+            implied = _VARIANT_SURFACE.get(self.solver_variant, "drucker_prager")
+            if self.yield_surface is not None and self.yield_surface != implied:
+                raise ValueError(f"solver_variant {self.solver_variant!r} is the {implied!r} yield surface, but "
+                                 f"yield_surface={self.yield_surface!r}; leave solver_variant unset (None) to have "
+                                 f"it chosen from yield_surface, options: {list(YIELD_SURFACES)}")
+            self.yield_surface = implied
+        else:
+            if self.yield_surface is None:
+                self.yield_surface = preset["yield_surface"]
+            if self.fidelity == "parity" and self.yield_surface != "drucker_prager":
+                raise ValueError(f"yield_surface {self.yield_surface!r} needs fidelity='physical' (parity is Isaac's "
+                                 f"Drucker-Prager only); fidelity options: {list(FIDELITIES)}, yield_surface "
+                                 f"options: {list(YIELD_SURFACES)}")
+            self.solver_variant = _SURFACE_VARIANT[(self.fidelity, self.yield_surface)]
 
     def solver_config(self, cls, particles_per_world: int, worlds: int):
         cfg = cls.Config()

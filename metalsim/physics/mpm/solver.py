@@ -25,7 +25,10 @@ def solver_kind() -> str:
 
 
 VARIANTS = {"parity": None, "pr4660": "metalsim.physics.mpm.implicit_mpm_pr4660",
-            "pr4660c": "metalsim.physics.mpm.implicit_mpm_pr4660c"}   # pr4660c: its collider hunks only (research)
+            "pr4660c": "metalsim.physics.mpm.implicit_mpm_pr4660c",   # pr4660c: its collider hunks only (research)
+            # pr4660 + the Lode-dependent yield surface: Mohr-Coulomb (inner-rounded) / Matsuoka-Nakai
+            "pr4660mc": "metalsim.physics.mpm.implicit_mpm_pr4660mc",
+            "pr4660mn": "metalsim.physics.mpm.implicit_mpm_pr4660mn"}
 
 
 def solver_class(variant: str = "parity"):
