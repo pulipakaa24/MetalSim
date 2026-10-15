@@ -17,7 +17,7 @@ Research behind every choice: `docs/research/mpm_2026-10-09.md` (notes in `docs/
 | oracle | Newton 1.5.2 tag + `newton_compat.py` (stock: `scripts/setup_newton152.sh` with `METALSIM_NEWTON152_REF=v1.5.2`, see section 10) | Newton's solver unchanged, with the semantic fixes below |
 | Newton fork | [pulipakaa24/newton](https://github.com/pulipakaa24/newton) branch `metalsim-1.5.2` off v1.5.2, pinned by `scripts/setup_newton152.sh` into `.venv-newton152` (`METALSIM_CHANGES.md` there lists every commit) | Metal launch configuration and device-side paths that CUDA already had, scale bounds, repeatable sums, rigid collision at scale; upstreamable |
 | Warp fork | [pulipakaa24/warp](https://github.com/pulipakaa24/warp) branch `metalsim`, pinned by `scripts/setup_warp.sh` (one checkout shared by every environment) | Metal GPU primitives, deterministic mode, launch bounds, argument space, replay batching, fast_math forms |
-| metalsim accelerations | `newton_compat.py` (`chunk_graph`), `simd_gs.py`, `fused_gs.py` | opt-in, each tested bitwise against the oracle |
+| metalsim accelerations | `newton_compat.py` (`chunk_graph`), `fused_gs.py` | opt-in, each tested bitwise against the oracle (the SIMD sweep `simd_gs.py` was removed 2026-10-14, see below) |
 | scenes / recorder / comparison | `scenes.py`, `metalsim/parity/isaac_side/record_mpm.py`, `compare.py` | the same two files run on the L4 and on the Mac |
 
 ### Semantic fixes (newton_compat.install)
@@ -73,6 +73,10 @@ Research behind every choice: `docs/research/mpm_2026-10-09.md` (notes in `docs/
 Interleaved A/B on one trajectory (all variants bitwise equal; robust to other processes' GPU load): all-core launches
 2.9x over the oracle; chunk graph 1.4-1.8x over eager all-core launches; SIMD sweep 1.0x eager / +10 % with the graph;
 fused single-threadgroup solve 0.9x (one GPU core cannot carry ~1,100 strain nodes per color).
+The SIMD sweep (`simd_gs.py`, `install(simd=True)`) was removed on 2026-10-14: opt-in and never the default, and
+since FMA contraction on Metal (Warp branch `metalsim-fp-contract`) its lane-shuffled sums are no longer bitwise
+Newton's serial loop (`test_simd_sweep_bitwise` was an xfail), so its +10 % with the chunk graph no longer came with
+the oracle's numbers. The code is in the history before the removal commit.
 
 Where the remaining time goes (graph replay, GPU side): a color pass ~20 us (8 per iteration), contact 25 us, residual
 readback 0.23 ms every 5 iterations; grid allocation 13 ms (NanoVDB built on the host for the sparse grid) and

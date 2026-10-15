@@ -86,7 +86,7 @@ def rheology_modules() -> list:
 
 
 def install(accumulate: str = "float32", loop: str = "cuda", log: bool = True, chunk_graph: bool = False,
-            fused: bool = False, fused_max_color_blocks: int = 1 << 30, simd: bool = False,
+            fused: bool = False, fused_max_color_blocks: int = 1 << 30,
             gpu_exit: bool = False, rigid_deterministic: bool | None = True, device_args: bool | None = True,
             metal_fast_math: str | None = METAL_FAST_MATH_DEFAULT) -> None:
     """Patch Newton's implicit MPM in this process (and MetalSim's vendored copy of it, :func:`rheology_modules`).
@@ -100,8 +100,6 @@ def install(accumulate: str = "float32", loop: str = "cuda", log: bool = True, c
         fused: on Metal, run eligible solves (plain Gauss-Seidel, nodal contact, no rigid coupling, one environment,
             at most ``fused_max_color_blocks`` blocks in a color) as one persistent-threadgroup dispatch
             (:mod:`metalsim.physics.mpm.fused_gs`).
-        simd: on Metal, run eligible Gauss-Seidel sweeps with 8 SIMD lanes per strain node
-            (:mod:`metalsim.physics.mpm.simd_gs`; bit-identical to Newton's sweep).
         gpu_exit: with ``chunk_graph`` on Metal, decide the stop on the GPU: the recorded chunk (including
             ``update_condition``) is an indirect-command-buffer execution range whose length a gate kernel zeroes once
             the condition is 0; the host submits the maximum number of chunk replays without reading anything back
@@ -159,7 +157,7 @@ def install(accumulate: str = "float32", loop: str = "cuda", log: bool = True, c
         _STATE.setdefault("metal_device_args", wp.config.metal_device_args)
         wp.config.metal_device_args = bool(device_args)
     _STATE.update(accumulate=accumulate, loop=loop, chunk_graph=chunk_graph, fused=fused,
-                  fused_max_color_blocks=fused_max_color_blocks, simd=simd, gpu_exit=gpu_exit,
+                  fused_max_color_blocks=fused_max_color_blocks, gpu_exit=gpu_exit,
                   rigid_deterministic=rigid_deterministic,
                   metal_fast_math=getattr(wp.config, "metal_fast_math", _STATE.get("fast_math_fallback")))
 
@@ -287,7 +285,7 @@ def uninstall() -> None:
 def settings() -> dict:
     return {"accumulate": _STATE.get("accumulate"), "loop": _STATE.get("loop"),
             "chunk_graph": _STATE.get("chunk_graph", False), "fused": _STATE.get("fused", False),
-            "fused_max_color_blocks": _STATE.get("fused_max_color_blocks"), "simd": _STATE.get("simd", False),
+            "fused_max_color_blocks": _STATE.get("fused_max_color_blocks"),
             "gpu_exit": _STATE.get("gpu_exit", False), "rigid_deterministic": _STATE.get("rigid_deterministic", False),
             "metal_fast_math": _STATE.get("metal_fast_math")}
 
@@ -359,11 +357,6 @@ def _run_solver_loop_cuda_semantics(
     batched = rheology_solver.rheology.strain_environment_offsets is not None
 
     out = {}
-    if _STATE.get("simd"):
-        from metalsim.physics.mpm import simd_gs
-
-        if simd_gs.eligible(rheology_solver):
-            rheology_solver.solve = simd_gs.SimdSweep(rheology_solver)
 
     def chunk():
         for _k in range(_GRAPH_GRANULARITY):

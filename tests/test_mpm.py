@@ -107,17 +107,6 @@ def test_gpu_exit_jacobi_cap_24():
     assert iters.tolist() == [25, 25, 25]
 
 
-@pytest.mark.xfail(reason="with FMA contraction (Warp fuse_fp on Metal, branch metalsim-fp-contract) the lane-shuffled "
-                          "sums of simd_gs contract differently from Newton's serial loop; simd_gs is opt-in and gave no "
-                          "speedup", strict=False)
-def test_simd_sweep_bitwise():
-    """The SIMD-cooperative Gauss-Seidel sweep reproduces Newton's sweep bit for bit."""
-    a, ia = _run()
-    newton_compat.install(accumulate="float32", loop="cuda", simd=True)
-    b, ib = _run()
-    assert np.array_equal(a, b) and np.array_equal(ia, ib)
-
-
 def test_fused_solve_bitwise():
     """The one-dispatch persistent-threadgroup solve reproduces Newton's loop bit for bit."""
     a, ia = _run()
