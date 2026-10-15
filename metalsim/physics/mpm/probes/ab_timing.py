@@ -7,8 +7,8 @@ variants alike and the per-variant medians and their ratios are comparable.
     PYTHONPATH=. .venv-newton152/bin/python metalsim/physics/mpm/probes/ab_timing.py \
         example:mpm_granular --variants oracle,cores,cores+graph --rounds 6
 Variants: ``oracle`` (Newton 1.5.2's one 64-thread block per color off CUDA), ``cores`` (two blocks per GPU core),
-``+graph`` (replay the 5-iteration chunk as a recorded graph), ``+fused`` (one-dispatch solve, fused_gs.py), ``+soa`` (Newton's gs-soa layout; bit-identical to gs), ``+simd`` / ``+simdgraph`` (simd_gs.py, without / with the
-chunk graph), ``+gpuexit`` (chunk graph with the stop decided on the GPU, newton_compat gpu_exit).
+``+graph`` (replay the 5-iteration chunk as a recorded graph), ``+fused`` (one-dispatch solve, fused_gs.py), ``+soa`` (Newton's gs-soa layout; bit-identical to gs),
+``+gpuexit`` (chunk graph with the stop decided on the GPU, newton_compat gpu_exit).
 """
 import argparse, json, time
 
@@ -43,8 +43,9 @@ def apply(v):
     if branch_fn is not None:
         sr._color_block_count = branch_fn if base == "cores" else (lambda device: 1)
     newton_compat._STATE["fused"] = extra == "fused"
-    newton_compat._STATE["simd"] = "simd" in extra
-    newton_compat._STATE["chunk_graph"] = extra in ("graph", "simdgraph", "gpuexit")
+    if extra.startswith("simd"):
+        raise SystemExit("the +simd / +simdgraph variants were removed with the SIMD sweep (2026-10-14)")
+    newton_compat._STATE["chunk_graph"] = extra in ("graph", "gpuexit")
     newton_compat._STATE["gpu_exit"] = extra == "gpuexit"
     newton_compat._STATE["fused_max_color_blocks"] = 1 << 30
 

@@ -4,6 +4,10 @@ What landed between 2026-09-22 and 2026-10-13, grouped by area. The September se
 commit order; the October sections, newest first, summarise each merged pull request with its main commits (`git log`
 for the full messages). Dates are the commit dates (month-day).
 
+## MPM: SIMD Gauss-Seidel sweep removed (2026-10-14, `metalsim/physics/mpm/MPM.md`)
+
+- 10-14 `metalsim/physics/mpm/simd_gs.py`, `newton_compat.install(simd=)`, `record_mpm.py --simd`, `loop_breakdown.py --simd`, `ab_timing.py`'s `+simd` / `+simdgraph` variants and the xfail `test_simd_sweep_bitwise` removed. The sweep was opt-in and never the default; its +10 % with the chunk graph (MPM.md, 2026-10-09) came with bitwise equality to Newton's serial loop, which FMA contraction on Metal (Warp `metalsim-fp-contract`) ended. (#66 committed only the file deletion; the rest of the removal landed in its follow-up.)
+
 ## Demo tag demo-2026-10 (2026-10-14, `docs/DEMO.md`)
 
 - 10-14 `docs/DEMO.md`: every demo with its command (each run by the fresh-install check or the batch checks it names), the measured numbers from the shipped docs and the known limits; tag `demo-2026-10` on the main commit that carries it.
