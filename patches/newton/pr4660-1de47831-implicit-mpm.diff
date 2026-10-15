@@ -1,0 +1,861 @@
+# Newton draft PR #4660 (https://github.com/newton-physics/newton/pull/4660), head 1de47831840415b1ffccdbc4a3d040f36e5f1e28,
+# base 8157ac7e15374dbda4503eb1e2f7194af643e3f9: the four implicit_mpm solver files (tests and changelog omitted).
+# Copyright (c) 2026 The Newton Developers, Apache-2.0. Applied by scripts/vendor_mpm_variant.py onto MetalSim's
+# vendored 1.5.2 copy (every hunk applies; the PR's base is Newton main).
+diff --git a/implicit_mpm_solver_kernels.py b/implicit_mpm_solver_kernels.py
+index ab4f528f..cf213f5f 100644
+--- a/implicit_mpm_solver_kernels.py
++++ b/implicit_mpm_solver_kernels.py
+@@ -57,9 +57,9 @@ mat63 = wp.types.matrix(shape=(6, 3), dtype=wp.float32)
+ mat36 = wp.types.matrix(shape=(3, 6), dtype=wp.float32)
+ mat13 = wp.types.matrix(shape=(1, 3), dtype=wp.float32)
+ mat31 = wp.types.matrix(shape=(3, 1), dtype=wp.float32)
+-mat11 = wp.types.matrix(shape=(1, 1), dtype=wp.float32)
+ 
+ YIELD_PARAM_LENGTH = type_size(YieldParamVec)
++YieldMomentVec = wp.types.vector(length=2 * YIELD_PARAM_LENGTH, dtype=wp.float32)
+ 
+ 
+ @fem.integrand
+@@ -282,13 +282,22 @@ def integrate_yield_parameters(
+     particle_Jp: wp.array[float],
+     dt: float,
+     particle_flags: wp.array[wp.int32],
++    transformed_basis: bool,
+ ):
+     if ~particle_flags[s.qp_index] & newton.ParticleFlags.ACTIVE:
+         return 0.0
+ 
+-    i = s.qp_index
+-    params_vec = get_yield_parameters(i, material_parameters, particle_Jp[i], dt)
+-    return wp.dot(u(s), params_vec) * inv_cell_volume
++    value = u(s)
++    weights = value
++    if transformed_basis:
++        weights = wp.max(value, YieldMomentVec(0.0))
++        # Apply the same shear/viscosity weights to numerators and weight sums.
++        weights[2::YIELD_PARAM_LENGTH] = wp.abs(value[2::YIELD_PARAM_LENGTH])
++        viscosity_weights = value[5::YIELD_PARAM_LENGTH]
++        weights[5::YIELD_PARAM_LENGTH] = wp.cw_mul(viscosity_weights, viscosity_weights)
++    parameters = YieldMomentVec(1.0)
++    parameters[:YIELD_PARAM_LENGTH] = get_yield_parameters(s.qp_index, material_parameters, particle_Jp[s.qp_index], dt)
++    return wp.dot(weights, parameters) * inv_cell_volume
+ 
+ 
+ @fem.integrand
+@@ -603,66 +612,127 @@ def mass_form(
+     return p(s) * q(s) * inv_cell_volume
+ 
+ 
+-@wp.kernel(module="unique")
+-def compute_eigenvalues(
++class _TransformedStrainBasis(fem.ShapeBasisSpace):
++    """Evaluate transformed shape weights through an ordinary FEM coefficient field."""
++
++    def __init__(self, modes):
++        self._modes = modes
++        self.BasisArg = modes.EvalArg
++        super().__init__(modes.space.topology, modes.space.basis.shape)
++
++    @property
++    def name(self):
++        return f"{self._modes.name}_transformed"
++
++    def fill_basis_arg(self, arg, device):
++        self._modes.fill_eval_arg(arg, device)
++
++    def make_element_inner_weight(self):
++        modes = self._modes
++
++        @fem.cache.dynamic_func(suffix=self.name)
++        def transformed_weight(
++            elt_arg: self.geometry.CellArg,
++            topo_arg: self.topology.TopologyArg,
++            basis_arg: self.BasisArg,
++            element_index: int,
++            coords: fem.Coords,
++            node_index_in_elt: int,
++            qp_index: int,
++        ):
++            mode_arg = modes.ElementEvalArg()
++            mode_arg.elt_arg = elt_arg
++            mode_arg.eval_arg = basis_arg
++            s = fem.make_free_sample(element_index, coords)
++            s.qp_index = qp_index
++            return modes.eval_inner(mode_arg, s)[node_index_in_elt]
++
++        return transformed_weight
++
++    def make_element_inner_weight_gradient(self):
++        # This basis is only used for material moments, which do not evaluate gradients.
++        return None
++
++
++@wp.kernel(module="unique", module_options={"max_unroll": 4, "enable_backward": False})
++def compute_nodal_diagonalization(
+     offsets: wp.array[int],
+     columns: wp.array[int],
+     values: wp.array[Any],
+     ones: wp.array2d[float],
+-    yield_parameters: wp.array[YieldParamVec],
+-    eigenvalues: wp.array2d[float],
+-    eigenvectors: wp.array3d[float],
+-    rotated_volume: wp.array2d[float],
++    diagonal_mass: wp.array2d[float],
++    basis_transform: wp.array3d[float],
++    stress_transform: wp.array3d[float],
+ ):
+-    row = wp.tid()
++    """Orthogonalize supported nodal mass blocks without changing reference P1d/Q1d cells.
+ 
++    Outputs the test transform R, its dual coefficient transform on the
++    supported subspace, and diagonal mass. Singular blocks use an orthogonal
++    completion of the nullspace to select nodal directions with equal mass.
++    """
++    row = wp.tid()
+     diag_index = wps.bsr_block_index(row, row, offsets, columns)
++    transform = values.dtype(0.0)
++    coefficient_transform = values.dtype(0.0)
++    scales = type(transform[0])(1.0)
++
++    if diag_index != -1:
++        mass = values[diag_index]
++        # A uniform spectral shift avoids singular QR pivots without changing
++        # eigenvectors or regularizing the mass used by the solve.
++        shift = _EIGENVALUE_FLOOR
++        shifted_mass = mass + wp.identity(n=scales.length, dtype=float) * shift
++        scales, modes = fem.linalg.symmetric_eigenvalues_qr(shifted_mass, _QR_TOLERANCE)
++        scales -= type(scales)(shift)
++        if not (wp.ddot(modes, modes) < _NAN_THRESHOLD and wp.length_sq(scales) < _NAN_THRESHOLD):
++            scales = wp.get_diag(mass)
++            modes = wp.identity(n=scales.length, dtype=float)
++
++        full_rank = wp.min(scales) > _EIGENVALUE_FLOOR
++
++        reference_mass = 1.0 / float(scales.length)
++        active_count = int(scales.length)
++        test_scales = type(scales)(0.0)
++        coefficient_scales = type(scales)(0.0)
++        nullspace = values.dtype(0.0)
++        null_count = int(0)
++        for k in range(scales.length):
++            if scales[k] > _EIGENVALUE_FLOOR:
++                test_scales[k] = wp.sqrt(reference_mass / scales[k])
++                coefficient_scales[k] = 1.0 / test_scales[k]
++            else:
++                nullspace[:, null_count] = modes[k]
++                null_count += 1
++        active_count -= null_count
++        completion = values.dtype(0.0)
++        if not full_rank and active_count > 0:
++            # QR completes the nullspace with directions anchored to the nodal axes.
++            completion, _triangular = fem.linalg.householder_qr_decomposition(nullspace)
++        for i in range(active_count):
++            coordinates = modes[:, i]
++            if not full_rank:
++                coordinates = modes * completion[:, null_count + i]
++            transform[i] = wp.cw_mul(coordinates, test_scales) * modes
++            coefficient_transform[i] = wp.cw_mul(coordinates, coefficient_scales) * modes
+ 
+-    if diag_index == -1:
+-        ev = values.dtype(0.0)
+-        scales = type(ev[0])(0.0)
+-        rv = type(ev[0])(0.0)
+-
+-    else:
+-        diag_block = values[diag_index]
+-        scales, ev = fem.linalg.symmetric_eigenvalues_qr(diag_block, _QR_TOLERANCE)
+-
+-        # symmetric_eigenvalues_qr may return nans for small coefficients
+-        if not (wp.ddot(ev, ev) < _NAN_THRESHOLD and wp.length_sq(scales) < _NAN_THRESHOLD):
+-            scales = wp.get_diag(diag_block)
+-            ev = wp.identity(n=scales.length, dtype=float)
+-
+-        rv = type(scales)(0.0)
+-        nodes_per_elt = eigenvectors.shape[1]
+         for k in range(scales.length):
+-            s = float(0.0)
+-            if scales[k] <= _EIGENVALUE_FLOOR:
++            if k >= active_count:
+                 scales[k] = 1.0
+-                rv[k] = 1.0
+-                ev_s = 0.0
+             else:
+-                ys = float(0.0)
+-
++                scales[k] = reference_mass
++                mean = float(0.0)
+                 for j in range(scales.length):
+-                    node_index = row * nodes_per_elt + j
+-                    s += ev[k, j] * ones[row, j]
+-                    ys += ev[k, j] * yield_parameters[node_index][0]
+-
+-                ev_s = wp.sign(s)
+-                rv[k] = ev_s * s
+-
+-                if ys * ev_s < 0.0:
+-                    ev_s = 0.0
+-
+-            for j in range(scales.length):
+-                ev[k, j] *= ev_s
++                    mean += transform[k, j] * ones[row, j]
++                orientation = wp.where(mean < 0.0, -1.0, 1.0)
++                for j in range(scales.length):
++                    transform[k, j] *= orientation
++                    coefficient_transform[k, j] *= orientation
+ 
+-    size = int(scales.length)
+-    for k in range(size):
+-        eigenvalues[row, k] = scales[k]
+-        rotated_volume[row, k] = rv[k]
++    for k in range(scales.length):
++        diagonal_mass[row, k] = scales[k]
+         for j in range(scales.length):
+-            eigenvectors[row, k, j] = ev[k, j]
++            basis_transform[row, k, j] = transform[k, j]
++            stress_transform[row, k, j] = coefficient_transform[k, j]
+ 
+ 
+ @wp.kernel(module="unique")
+@@ -702,9 +772,9 @@ def make_rotate_vectors(nodes_per_element: int):
+     @fem.cache.dynamic_kernel(suffix=nodes_per_element, kernel_options={"enable_mathdx_gemm": False})
+     def rotate_vectors(
+         eigenvectors: wp.array3d[float],
++        stress_transform: wp.array3d[float],
+         strain_rhs: wp.array2d[float],
+         stress: wp.array2d[float],
+-        yield_parameters: wp.array2d[float],
+         unilateral_strain_offset: wp.array2d[float],
+     ):
+         elem = wp.tid()
+@@ -715,15 +785,10 @@ def make_rotate_vectors(nodes_per_element: int):
+         wp.tile_store(strain_rhs, rotated_strain_rhs, offset=(elem * nodes_per_element, 0))
+ 
+         stress_tile = wp.tile_load(stress, shape=(nodes_per_element, 6), offset=(elem * nodes_per_element, 0))
+-        rotated_stress = wp.tile_matmul(ev, stress_tile)
++        stress_basis = wp.tile_load(stress_transform[elem], shape=(nodes_per_element, nodes_per_element))
++        rotated_stress = wp.tile_matmul(stress_basis, stress_tile)
+         wp.tile_store(stress, rotated_stress, offset=(elem * nodes_per_element, 0))
+ 
+-        yield_tile = wp.tile_load(
+-            yield_parameters, shape=(nodes_per_element, YIELD_PARAM_LENGTH), offset=(elem * nodes_per_element, 0)
+-        )
+-        rotated_yield = wp.tile_matmul(ev, yield_tile)
+-        wp.tile_store(yield_parameters, rotated_yield, offset=(elem * nodes_per_element, 0))
+-
+         unilateral_strain_offset_tile = wp.tile_load(
+             unilateral_strain_offset, shape=(nodes_per_element, 1), offset=(elem * nodes_per_element, 0)
+         )
+@@ -765,18 +830,10 @@ def make_inverse_rotate_vectors(nodes_per_element: int):
+ 
+ 
+ @wp.kernel(module="unique")
+-def inverse_scale_vector(
+-    eigenvalues: wp.array[float],
+-    vector: wp.array[Any],
+-):
+-    node = wp.tid()
+-    scale = eigenvalues[node]
+-
+-    zero = vector.dtype(0.0)
+-    vector[node] = wp.where(scale == 0.0, zero, vector[node] / scale)
+-
+-
+-wp.overload(inverse_scale_vector, {"vector": wp.array[YieldParamVec]})
++def inverse_scale_vector(weights: wp.array2d[float], vector: wp.array2d[float]):
++    node, component = wp.tid()
++    scale = weights[node, component]
++    vector[node, component] = wp.where(scale == 0.0, 0.0, vector[node, component] / scale)
+ 
+ 
+ @wp.kernel
+diff --git a/rasterized_collisions.py b/rasterized_collisions.py
+index 73cbf43a..37be9906 100644
+--- a/rasterized_collisions.py
++++ b/rasterized_collisions.py
+@@ -95,45 +95,81 @@ class Collider:
+ 
+ 
+ @wp.func
+-def _sq_dist_point_seg_at_origin(q: wp.vec3, seg: wp.vec3, seg_len_sq: float):
+-    """Squared distance from ``q`` to the segment ``[0, seg]``."""
+-    s = wp.clamp(wp.dot(q, seg) / seg_len_sq, 0.0, 1.0)
+-    return wp.length_sq(q - s * seg)
++def _triangle_distance_sq_and_pseudonormal(q: wp.vec3, e1: wp.vec3, e2: wp.vec3, eps_sq: float):
++    """Return squared distance to triangle (0, e1, e2) and its weighted pseudonormal.
+ 
+-
+-@wp.func
+-def _sq_dist_point_tri_at_origin(q: wp.vec3, e1: wp.vec3, e2: wp.vec3):
+-    """Squared distance from ``q`` to the triangle with vertices ``(0, e1, e2)``.
+-
+-    ``wp.vec3``-specialized inline of warp's ``project_on_tri_at_origin``
+-    (from ``warp._src.fem.geometry.closest_point``). The original returns
+-    the barycentric coordinates as well; those are unused here so the
+-    inlined version returns just the squared distance.
++    Reuse the projection coordinates for vertex/edge classification. Degenerate
++    faces and faces beyond the absolute neighborhood contribute a zero normal.
+     """
+-    e1e1 = wp.dot(e1, e1)
++    e3 = e2 - e1
++    e1_sq = wp.length_sq(e1)
++    e2_sq = wp.length_sq(e2)
++    e3_sq = wp.length_sq(e3)
+     e1e2 = wp.dot(e1, e2)
+-    e2e2 = wp.dot(e2, e2)
+-
+-    det = e1e1 * e2e2 - e1e2 * e1e2
+-
+-    # Interior projection when the triangle is non-degenerate and the
+-    # projected point lies inside the triangle.
+-    if det > e1e1 * e2e2 * 1.0e-6:
+-        e1p = wp.dot(e1, q)
+-        e2p = wp.dot(e2, q)
+-
+-        s = (e2e2 * e1p - e1e2 * e2p) / det
+-        t = (e1e1 * e2p - e1e2 * e1p) / det
+-
+-        if s >= 0.0 and t >= 0.0 and s + t <= 1.0:
+-            return wp.length_sq(q - s * e1 - t * e2)
+-
+-    # Otherwise (exterior projection or degenerate triangle) take the
+-    # minimum squared distance across the three edges.
+-    d1 = _sq_dist_point_seg_at_origin(q, e1, e1e1)
+-    d2 = _sq_dist_point_seg_at_origin(q, e2, e2e2)
+-    d12 = _sq_dist_point_seg_at_origin(q - e1, e2 - e1, wp.length_sq(e2 - e1))
+-    return wp.min(wp.min(d1, d2), d12)
++    normal = wp.cross(e1, e2)
++    normal_sq = wp.length_sq(normal)
++    edge_scale = wp.max(wp.max(e1_sq, e2_sq), e3_sq)
++    if normal_sq <= 1.0e-12 * edge_scale * edge_scale:
++        return float(_INFINITY), wp.vec3(0.0)
++
++    e1q = wp.dot(e1, q)
++    e2q = wp.dot(e2, q)
++    d3 = e1q - e1_sq
++    d4 = e2q - e1e2
++    d5 = e1q - e1e2
++    d6 = e2q - e2_sq
++    interior = False
++    s = float(0.0)
++    t = float(0.0)
++    closest = wp.vec3(0.0)
++    if e1q <= 0.0 and e2q <= 0.0:
++        closest = wp.vec3(0.0)
++    elif d3 >= 0.0 and d4 <= d3:
++        closest = e1
++    elif d6 >= 0.0 and d5 <= d6:
++        closest = e2
++    else:
++        # Voronoi tests select one edge projection instead of trying all three.
++        vc = e1q * d4 - d3 * e2q
++        vb = d5 * e2q - e1q * d6
++        va = d3 * d6 - d5 * d4
++        if vc <= 0.0 and e1q >= 0.0 and d3 <= 0.0:
++            closest = (e1q / e1_sq) * e1
++        elif vb <= 0.0 and e2q >= 0.0 and d6 <= 0.0:
++            closest = (e2q / e2_sq) * e2
++        elif va <= 0.0 and d4 - d3 >= 0.0 and d5 - d6 >= 0.0:
++            closest = e1 + ((d4 - d3) / (d4 - d3 + d5 - d6)) * e3
++        else:
++            interior = True
++            denom = 1.0 / (va + vb + vc)
++            s = vb * denom
++            t = vc * denom
++            closest = s * e1 + t * e2
++    distance_sq = wp.length_sq(q - closest)
++
++    if distance_sq >= eps_sq:
++        return distance_sq, wp.vec3(0.0)
++
++    normal_length = wp.sqrt(normal_sq)
++    # Divide all weights by pi; only vertex weights need angles.
++    weight = float(2.0)
++    if wp.length_sq(closest) < eps_sq:
++        weight = wp.atan2(normal_length, e1e2) / wp.pi
++    elif wp.length_sq(closest - e1) < eps_sq:
++        weight = wp.atan2(normal_length, e1_sq - e1e2) / wp.pi
++    elif wp.length_sq(closest - e2) < eps_sq:
++        weight = wp.atan2(normal_length, e2_sq - e1e2) / wp.pi
++    else:
++        u = 1.0 - s - t
++        # Barycentric coordinates give edge distances without reprojecting.
++        if (
++            not interior
++            or t * t * normal_sq < eps_sq * e1_sq
++            or s * s * normal_sq < eps_sq * e2_sq
++            or u * u * normal_sq < eps_sq * e3_sq
++        ):
++            weight = 1.0
++    return distance_sq, normal * (weight / normal_length)
+ 
+ 
+ @wp.func
+@@ -141,8 +177,10 @@ def get_average_face_normal(
+     mesh_id: wp.uint64,
+     point: wp.vec3,
+ ):
+-    """Computes the average face normal at a point on a mesh.
+-    (average of face normals within an epsilon-distance of the point)
++    """Compute an angle-weighted pseudonormal within an absolute-distance neighborhood.
++
++    Use corner angles at vertices, pi at edges, and 2*pi in face interiors.
++    Both face selection and feature classification use the same absolute epsilon.
+ 
+     Args:
+         mesh_id: The mesh to query.
+@@ -166,9 +204,8 @@ def get_average_face_normal(
+         V1 = points[vidx[face_index * 3 + 1]]
+         V2 = points[vidx[face_index * 3 + 2]]
+ 
+-        sq_dist = _sq_dist_point_tri_at_origin(point - V0, V1 - V0, V2 - V0)
+-        if sq_dist < eps_sq:
+-            face_normal += wp.mesh_eval_face_normal(mesh_id, face_index)
++        _distance_sq, weighted_normal = _triangle_distance_sq_and_pseudonormal(point - V0, V1 - V0, V2 - V0, eps_sq)
++        face_normal += weighted_normal
+ 
+     return wp.normalize(face_normal)
+ 
+@@ -210,6 +247,9 @@ def _query_collider_sdf(
+ 
+         if wp.static(_SDF_SIGN_FROM_AVERAGE_NORMAL):
+             face_normal = get_average_face_normal(mesh, cp)
++            if wp.length_sq(face_normal) < 1.0e-12:
++                # Edge rounding or cancellation can leave the average normal zero.
++                face_normal = wp.mesh_eval_face_normal(mesh, query.face)
+             sign = wp.where(wp.dot(face_normal, x_local - cp) > 0.0, 1.0, -1.0)
+         else:
+             face_normal = wp.mesh_eval_face_normal(mesh, query.face)
+diff --git a/rheology_solver_kernels.py b/rheology_solver_kernels.py
+index 221796a9..bd95b798 100644
+--- a/rheology_solver_kernels.py
++++ b/rheology_solver_kernels.py
+@@ -606,9 +606,11 @@ def make_solve_flow_rule(has_viscosity: bool = True, has_dilatancy: bool = True)
+             dilatancy = 0.0
+ 
+         if wp.static(has_viscosity):
+-            D_visc = vec6(1.0) + get_viscosity(yield_params) / strain_node_volume * D
+-            D = wp.cw_div(D, D_visc)
+-            b = wp.cw_div(b, D_visc)
++            # Empty strain modes have no material viscosity to apply.
++            if strain_node_volume > 0.0:
++                D_visc = vec6(1.0) + get_viscosity(yield_params) / strain_node_volume * D
++                D = wp.cw_div(D, D_visc)
++                b = wp.cw_div(b, D_visc)
+ 
+         if wp.static(_USE_CAM_CLAY):
+             return solve_flow_rule_camclay(D, b, r_guess, yield_params)
+diff --git a/solver_implicit_mpm.py b/solver_implicit_mpm.py
+index 29d90586..f2a37079 100644
+--- a/solver_implicit_mpm.py
++++ b/solver_implicit_mpm.py
+@@ -43,7 +43,9 @@ from .implicit_mpm_solver_kernels import (
+     EPSILON,
+     INFINITY,
+     YIELD_PARAM_LENGTH,
++    YieldMomentVec,
+     _rebuild_capacity,
++    _TransformedStrainBasis,
+     advect_particles,
+     allocate_by_voxels,
+     average_elastic_parameters,
+@@ -52,7 +54,7 @@ from .implicit_mpm_solver_kernels import (
+     compliance_form,
+     compute_bounds,
+     compute_color_offsets,
+-    compute_eigenvalues,
++    compute_nodal_diagonalization,
+     compute_unilateral_strain_offset,
+     fill_uniform_color_block_indices,
+     free_velocity,
+@@ -75,7 +77,6 @@ from .implicit_mpm_solver_kernels import (
+     mark_active_cells,
+     mark_active_cells_by_environment,
+     mass_form,
+-    mat11,
+     mat13,
+     mat31,
+     mat66,
+@@ -273,6 +274,7 @@ class ImplicitMPMScratchpad:
+         self.elastic_strain_delta_field = None
+         self.strain_yield_parameters_field = None
+         self.strain_yield_parameters_test = None
++        self.strain_basis_transform_field = None
+ 
+         self.strain_matrix = wps.bsr_zeros(0, 0, mat13)
+         self.transposed_strain_matrix = wps.bsr_zeros(0, 0, mat31)
+@@ -297,6 +299,8 @@ class ImplicitMPMScratchpad:
+         self.transposed_collider_matrix = wps.bsr_zeros(0, 0, block_type=float)
+ 
+         self.strain_node_particle_volume = None
++        self.strain_basis_transform = None
++        self.strain_stress_transform = None
+         self.strain_node_volume = None
+         self.strain_node_collider_volume = None
+ 
+@@ -334,7 +338,8 @@ class ImplicitMPMScratchpad:
+             self._velocity_basis = _make_grid_basis_space(self.grid, velocity_basis_str)
+ 
+             if not use_pic_strain_basis:
+-                self._strain_basis = _make_grid_basis_space(self.grid, strain_basis_str)
++                family = fem.Polynomial.GAUSS_LEGENDRE if strain_basis_str == "Q1d" else None
++                self._strain_basis = _make_grid_basis_space(self.grid, strain_basis_str, family=family)
+ 
+             if not use_pic_collider_basis:
+                 self._collision_basis = _make_grid_basis_space(
+@@ -540,7 +545,7 @@ class ImplicitMPMScratchpad:
+         self.collider_position_field = collision_space.make_field(space_partition=collision_space_partition)
+         self.collider_ids = wp.empty(collision_space_partition.node_count(), dtype=int)
+ 
+-    def require_strain_space_fields(self):
++    def require_strain_space_fields(self, transform_basis: bool):
+         """Ensure strain-space fields exist and match current spaces."""
+         strain_basis = self._strain_basis
+         sym_strain_space = self._sym_strain_space
+@@ -556,12 +561,23 @@ class ImplicitMPMScratchpad:
+ 
+         divergence_space = fem.make_collocated_function_space(strain_basis, dtype=float)
+         strain_yield_parameters_space = fem.make_collocated_function_space(strain_basis, dtype=YieldParamVec)
++        material_basis = strain_basis
++        if transform_basis:
++            mode_space = fem.make_collocated_function_space(
++                strain_basis, dtype=wp.types.vector(length=self.strain_nodes_per_element, dtype=wp.float32)
++            )
++            if self.strain_basis_transform_field is None:
++                self.strain_basis_transform_field = mode_space.make_field(space_partition=strain_space_partition)
++            else:
++                self.strain_basis_transform_field.rebind(mode_space, strain_space_partition)
++            material_basis = _TransformedStrainBasis(self.strain_basis_transform_field)
++        strain_yield_parameters_test_space = fem.make_collocated_function_space(material_basis, dtype=YieldMomentVec)
+ 
+         if self.sym_strain_test is None:
+             self.sym_strain_test = fem.make_test(sym_strain_space, space_restriction=strain_space_restriction)
+             self.divergence_test = fem.make_test(divergence_space, space_restriction=strain_space_restriction)
+             self.strain_yield_parameters_test = fem.make_test(
+-                strain_yield_parameters_space, space_restriction=strain_space_restriction
++                strain_yield_parameters_test_space, space_restriction=strain_space_restriction
+             )
+             self.sym_strain_trial = fem.make_trial(
+                 sym_strain_space, domain=domain, space_partition=strain_space_partition
+@@ -580,7 +596,7 @@ class ImplicitMPMScratchpad:
+         else:
+             self.sym_strain_test.rebind(sym_strain_space, strain_space_restriction)
+             self.divergence_test.rebind(divergence_space, strain_space_restriction)
+-            self.strain_yield_parameters_test.rebind(strain_yield_parameters_space, strain_space_restriction)
++            self.strain_yield_parameters_test.rebind(strain_yield_parameters_test_space, strain_space_restriction)
+ 
+             self.sym_strain_trial.rebind(sym_strain_space, strain_space_partition, domain)
+             self.divergence_trial.rebind(divergence_space, strain_space_partition, domain)
+@@ -929,7 +945,15 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+         strain_basis: _MPMStrainBasisName = "P0"
+         """Strain basis function. Common values are ``"P0"``, ``"P1d"``,
+         ``"Q1"``, ``"Q1d"``, or particle-based ``"pic"``, ``"pic8"``,
+-        ``"pic27"``. Any ``"picN"`` form with integer ``N`` is accepted."""
++        ``"pic27"``. Any ``"picN"`` form with integer ``N`` is accepted.
++
++        Discontinuous polynomial bases use experimental nodal mass orthogonalization.
++        P1d/Q1d recover the full-cell reference basis; Q1d uses Gauss--Legendre
++        reference nodes. Rank-deficient cells drop null modes and orthogonalize
++        the supported subspace. Pressure-related parameters use positive basis
++        weights, shear strength uses absolute weights, and viscosity uses squared
++        weights. This prototype behavior may change without prior notice.
++        """
+         velocity_basis: _MPMVelocityBasisName = "Q1"
+         """Velocity basis function. Common values are ``"Q1"``, ``"B2"``,
+         or ``"B3"``."""
+@@ -2935,7 +2959,7 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+ 
+         # Solve implicit system
+         # Keep _solve_graph alive until end of function as destruction may cause sync point
+-        _solve_graph = self._solve_rheology(pic, scratch, rigidity_operator, last_step_data, inv_cell_volume)
++        _solve_graph = self._solve_rheology(scratch, rigidity_operator)
+ 
+         self._save_for_next_warmstart(scratch, pic, last_step_data)
+ 
+@@ -3231,24 +3255,7 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+     ):
+         mpm_model = self._mpm_model
+ 
+-        with self._timer("Interpolated yield parameters"):
+-            fem.integrate(
+-                integrate_yield_parameters,
+-                quadrature=pic,
+-                fields={
+-                    "u": scratch.strain_yield_parameters_test,
+-                },
+-                values={
+-                    "particle_Jp": state_in.mpm.particle_Jp,
+-                    "material_parameters": mpm_model.material_parameters,
+-                    "particle_flags": mpm_model.material_particle_flags,
+-                    "inv_cell_volume": inv_cell_volume,
+-                    "dt": dt,
+-                },
+-                output=scratch.strain_yield_parameters_field.dof_values,
+-                temporary_store=self.temporary_store,
+-            )
+-
++        with self._timer("Strain-node particle volumes"):
+             fem.integrate(
+                 integrate_active_fraction,
+                 quadrature=pic,
+@@ -3334,22 +3341,51 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+                 bsr_options={"prune_numerical_zeros": self._velocity_nodes_per_strain_sample < 0},
+             )
+ 
+-    def _build_strain_eigenbasis(
++        scratch.strain_basis_transform, scratch.strain_stress_transform = self._build_strain_basis_transform(
++            pic, scratch, inv_cell_volume
++        )
++        with self._timer("Interpolated yield parameters"):
++            moments = fem.integrate(
++                integrate_yield_parameters,
++                quadrature=pic,
++                fields={"u": scratch.strain_yield_parameters_test},
++                values={
++                    "particle_Jp": state_in.mpm.particle_Jp,
++                    "material_parameters": mpm_model.material_parameters,
++                    "particle_flags": mpm_model.material_particle_flags,
++                    "inv_cell_volume": inv_cell_volume,
++                    "dt": dt,
++                    "transformed_basis": scratch.strain_basis_transform is not None,
++                },
++                output_dtype=YieldMomentVec,
++                assembly="generic",
++                kernel_options={"max_unroll": 4, "enable_backward": False},
++                temporary_store=self.temporary_store,
++            )
++            values = moments.view(dtype=float)
++            parameters = values[:, :YIELD_PARAM_LENGTH]
++            wp.launch(
++                inverse_scale_vector,
++                dim=(scratch.strain_node_count, YIELD_PARAM_LENGTH),
++                inputs=[values[:, YIELD_PARAM_LENGTH:], parameters],
++            )
++            scratch.strain_yield_parameters_field.dof_values = parameters.view(YieldParamVec)
++
++    def _build_strain_basis_transform(
+         self,
+         pic: fem.PicQuadrature,
+         scratch: ImplicitMPMScratchpad,
+         inv_cell_volume: float,
+     ):
+-        if self.strain_basis in ("Q1", "S2"):
+-            scratch.strain_node_particle_volume += EPSILON
++        if self.strain_basis[:3] == "pic":
++            scratch.strain_node_particle_volume.assign(self._mpm_model.material_particle_volume * inv_cell_volume)
+             return None, None
+-        elif self.strain_basis[:3] == "pic":
+-            M_diag = scratch.strain_node_particle_volume
+-            M_diag.assign(self._mpm_model.material_particle_volume * inv_cell_volume)
++        nodes_per_element = scratch.divergence_test.space.topology.MAX_NODES_PER_ELEMENT
++        if scratch.strain_basis_transform_field is None:
++            scratch.strain_node_particle_volume += EPSILON
+             return None, None
+ 
+-        # build mass matrix of PIC integration
+-        M = fem.integrate(
++        mass = fem.integrate(
+             mass_form,
+             quadrature=pic,
+             fields={"p": scratch.divergence_test, "q": scratch.divergence_trial},
+@@ -3359,63 +3395,56 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+             },
+             output_dtype=float,
+         )
+-
+-        # extract diagonal blocks
+-        nodes_per_elt = scratch.divergence_test.space.topology.MAX_NODES_PER_ELEMENT
+-        M_elt_wise = wps.bsr_copy(M, block_shape=(nodes_per_elt, nodes_per_elt))
+-
+-        if M_elt_wise.block_shape == (1, 1):
+-            M_values = M_elt_wise.values.view(dtype=mat11)
+-        else:
+-            M_values = M_elt_wise.values
+-
+-        M_ev = wp.empty(shape=(M_elt_wise.nrow, *M_elt_wise.block_shape), dtype=M_elt_wise.scalar_type)
+-        M_diag = scratch.strain_node_particle_volume.reshape((-1, nodes_per_elt))
+-        rotated_volume = wp.empty_like(M_diag)
+-
++        mass_blocks = wps.bsr_copy(mass, block_shape=(nodes_per_element, nodes_per_element))
++        transform = wp.empty((mass_blocks.nrow, nodes_per_element, nodes_per_element), dtype=float)
++        stress_transform = wp.empty_like(transform)
++        diagonal_mass = scratch.strain_node_particle_volume.reshape((-1, nodes_per_element))
+         wp.launch(
+-            compute_eigenvalues,
+-            dim=M_elt_wise.nrow,
+-            inputs=[
+-                M_elt_wise.offsets,
+-                M_elt_wise.columns,
+-                M_values,
+-                M_diag,
+-                scratch.strain_yield_parameters_field.dof_values,
+-            ],
+-            outputs=[
+-                M_diag,
+-                M_ev,
+-                rotated_volume,
+-            ],
++            compute_nodal_diagonalization,
++            dim=mass_blocks.nrow,
++            inputs=[mass_blocks.offsets, mass_blocks.columns, mass_blocks.values, diagonal_mass],
++            outputs=[diagonal_mass, transform, stress_transform],
+         )
++        modes = scratch.strain_basis_transform_field
++        modes.dof_values = (
++            transform.transpose((0, 2, 1)).contiguous().reshape((-1, nodes_per_element)).view(modes.dof_dtype)
++        )
++        # The retained test field caches an argument containing the coefficient array.
++        scratch.strain_yield_parameters_test.eval_arg_value.invalidate(scratch.strain_yield_parameters_test)
++        return transform, stress_transform
+ 
+-        return M_ev, rotated_volume.reshape((-1,))
+-
+-    def _apply_strain_eigenbasis(
++    def _apply_strain_basis_transform(
+         self,
+         scratch: ImplicitMPMScratchpad,
+-        M_ev: wp.array3d[float],
+-        rotated_volume=None,
++        basis_transform: wp.array3d[float] | None,
++        stress_transform: wp.array3d[float] | None,
+     ):
+         node_count = scratch.strain_node_count
+ 
+-        if M_ev is not None and M_ev.shape[1] > 1:
+-            # Rotate matrix and vectors according to eigenbasis
++        if basis_transform is not None:
++            # Transform the assembled operators and their dual vectors.
+ 
+-            nodes_per_elt = M_ev.shape[1]
+-            elt_count = M_ev.shape[0]
++            nodes_per_elt = basis_transform.shape[1]
++            elt_count = basis_transform.shape[0]
+ 
+             B = scratch.strain_matrix
+             strain_mat_tmp = wp.empty_like(B.values)
+-            wp.launch(rotate_matrix_rows, dim=B.nnz, inputs=[M_ev, B.offsets, B.columns, B.values, strain_mat_tmp])
++            wp.launch(
++                rotate_matrix_rows, dim=B.nnz, inputs=[basis_transform, B.offsets, B.columns, B.values, strain_mat_tmp]
++            )
+             B.values = strain_mat_tmp
+ 
+             C = scratch.compliance_matrix
+             compliance_mat_tmp = wp.empty_like(C.values)
+-            wp.launch(rotate_matrix_rows, dim=C.nnz, inputs=[M_ev, C.offsets, C.columns, C.values, compliance_mat_tmp])
+             wp.launch(
+-                rotate_matrix_columns, dim=C.nnz, inputs=[M_ev, C.offsets, C.columns, compliance_mat_tmp, C.values]
++                rotate_matrix_rows,
++                dim=C.nnz,
++                inputs=[basis_transform, C.offsets, C.columns, C.values, compliance_mat_tmp],
++            )
++            wp.launch(
++                rotate_matrix_columns,
++                dim=C.nnz,
++                inputs=[basis_transform, C.offsets, C.columns, compliance_mat_tmp, C.values],
+             )
+ 
+             rotate_vectors = make_rotate_vectors(nodes_per_elt)
+@@ -3424,14 +3453,10 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+                 dim=elt_count,
+                 block_dim=32,
+                 inputs=[
+-                    M_ev,
++                    basis_transform,
++                    stress_transform if self._stress_warmstart != "particles" else basis_transform,
+                     _as_2d_array(scratch.elastic_strain_delta_field.dof_values, shape=(node_count, 6), dtype=float),
+                     _as_2d_array(scratch.stress_field.dof_values, shape=(node_count, 6), dtype=float),
+-                    _as_2d_array(
+-                        scratch.strain_yield_parameters_field.dof_values,
+-                        shape=(node_count, YIELD_PARAM_LENGTH),
+-                        dtype=float,
+-                    ),
+                     _as_2d_array(scratch.unilateral_strain_offset, shape=(node_count, 1), dtype=float),
+                 ],
+             )
+@@ -3446,19 +3471,10 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+                 inputs=[M_diag, scratch.stress_field.dof_values],
+             )
+ 
+-        # Yield parameters are integrated, scale with inverse rotated volume
+-        # to correctly recover uniform parameters after eigenbasis rotation
+-        yield_volume = rotated_volume if rotated_volume is not None else M_diag
+-        wp.launch(
+-            inverse_scale_vector,
+-            dim=node_count,
+-            inputs=[yield_volume, scratch.strain_yield_parameters_field.dof_values],
+-        )
+-
+-    def _unapply_strain_eigenbasis(
++    def _unapply_strain_basis_transform(
+         self,
+         scratch: ImplicitMPMScratchpad,
+-        M_ev: wp.array3d[float],
++        basis_transform: wp.array3d[float] | None,
+     ):
+         node_count = scratch.strain_node_count
+ 
+@@ -3477,11 +3493,11 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+                 inputs=[M_diag, scratch.plastic_strain_delta_field.dof_values],
+             )
+ 
+-        if M_ev is not None and M_ev.shape[1] > 1:
+-            # Un-rotate vectors according to eigenbasis
++        if basis_transform is not None:
++            # Reconstruct fields in the original nodal basis.
+ 
+-            elt_count = M_ev.shape[0]
+-            nodes_per_elt = M_ev.shape[1]
++            elt_count = basis_transform.shape[0]
++            nodes_per_elt = basis_transform.shape[1]
+ 
+             inverse_rotate_vectors = make_inverse_rotate_vectors(nodes_per_elt)
+             wp.launch_tiled(
+@@ -3489,7 +3505,7 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+                 dim=elt_count,
+                 block_dim=32,
+                 inputs=[
+-                    M_ev,
++                    basis_transform,
+                     _as_2d_array(scratch.stress_field.dof_values, shape=(node_count, 6), dtype=float),
+                     _as_2d_array(scratch.elastic_strain_delta_field.dof_values, shape=(node_count, 6), dtype=float),
+                     _as_2d_array(scratch.plastic_strain_delta_field.dof_values, shape=(node_count, 6), dtype=float),
+@@ -3498,15 +3514,11 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+ 
+     def _solve_rheology(
+         self,
+-        pic: fem.PicQuadrature,
+         scratch: ImplicitMPMScratchpad,
+         rigidity_operator: tuple[wps.BsrMatrix, wps.BsrMatrix, wps.BsrMatrix] | None,
+-        last_step_data: LastStepData,
+-        inv_cell_volume: float,
+     ):
+-        M_ev, rotated_volume = self._build_strain_eigenbasis(pic, scratch, inv_cell_volume)
+-
+-        self._apply_strain_eigenbasis(scratch, M_ev, rotated_volume)
++        basis_transform = scratch.strain_basis_transform
++        self._apply_strain_basis_transform(scratch, basis_transform, scratch.strain_stress_transform)
+ 
+         with self._timer("Strain solve"):
+             momentum_data = MomentumData(
+@@ -3555,7 +3567,7 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+                 verbose=self.verbose,
+             )
+ 
+-        self._unapply_strain_eigenbasis(scratch, M_ev)
++        self._unapply_strain_basis_transform(scratch, basis_transform)
+ 
+         return solve_graph
+ 
+@@ -3674,7 +3686,11 @@ class SolverImplicitMPM(SolverBase, CouplingInterface):
+ 
+     def _require_strain_space_fields(self, scratch: ImplicitMPMScratchpad, last_step_data: LastStepData):
+         """Ensure strain-space fields exist and match current spaces."""
+-        scratch.require_strain_space_fields()
++        scratch.require_strain_space_fields(
++            transform_basis=self.strain_basis[:3] != "pic"
++            and self.strain_basis not in ("Q1", "S2")
++            and scratch.strain_nodes_per_element > 1
++        )
+         last_step_data.require_strain_space_fields(scratch, smoothed=self._stress_warmstart == "smoothed")
+ 
+     def _load_warmstart(
