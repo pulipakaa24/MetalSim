@@ -109,6 +109,13 @@ class BatchSimOptions:
     # thread order (MetalSim's Warp fork implements it on Metal). Off by default: the kernels and results of existing
     # scenes are unchanged. Process-wide once on: it sets the module options of every loaded MuJoCo Warp module.
     deterministic: bool = False
+    # Startup compilation on this many CPU threads (metalsim.physics.warmup): before the first graph capture, the
+    # step / forward / reset launch code runs once in a discarded capture with every launch recorded instead of run,
+    # and the recorded modules (MuJoCo Warp's model-specialised kernels included) compile in parallel. None = the
+    # METALSIM_PRELOAD_WORKERS environment variable, else 0 (off: Warp's lazy loading, one module at a time).
+    # Same compiled modules either way; with deterministic=True the pass runs inside det_scope like the capture, so
+    # the same RUN_TO_RUN modules load. Only with capture=True. Statistics per capture in ``sim.preload_stats``.
+    preload_workers: int | None = None
     extra: dict = field(default_factory=dict)
 
 
@@ -290,6 +297,7 @@ class BatchSim:
                 _set_mujoco_warp_determinism(self._det_records)
             self._reset_mask = wp.zeros(num_envs, dtype=wp.bool)
             self._graphs = {}
+            self.preload_stats = []     # one entry per capture when startup compilation runs in parallel
             # capacity overflow bits latched after every substep: mjw.reset_data zeroes d.overflow of the worlds it
             # resets, and tasks reset (fallen) worlds every control step, so d.overflow alone loses overflows
             from metalsim.physics import capacity
@@ -349,6 +357,13 @@ class BatchSim:
         self._graphs.clear()
         if not self.opt.capture:
             return
+        from metalsim.physics import warmup
+        workers = warmup.preload_workers(self.opt.preload_workers)
+        if workers:
+            # every module the three graphs launch, compiled on `workers` threads before they are recorded (inside
+            # _capture's det_scope, so generated kernels get the same mode; also on re-captures: loaded modules cost
+            # nothing, new substep hooks' kernels are picked up)
+            self.preload_stats.append(warmup.preload_capture(self._preload_body, self.device, workers))
         with wp.ScopedCapture(device=self.device) as cap:
             self._launch_substeps()
         self._graphs["step"] = cap.graph
@@ -358,6 +373,11 @@ class BatchSim:
         with wp.ScopedCapture(device=self.device) as cap:
             self._launch_reset()
         self._graphs["reset"] = cap.graph
+
+    def _preload_body(self) -> None:
+        self._launch_substeps()
+        mjw.forward(self.m, self.d)
+        self._launch_reset()
 
     def _launch_substeps(self) -> None:
         for _ in range(self.opt.substeps):
