@@ -84,6 +84,15 @@ def box_xml(dt, ox=0.0, oy=0.0, floor="plane", side_friction=0.0, side_walls=Tru
 </worldbody></mujoco>"""
 
 
+EJECT_MARGIN = 0.5          # m beyond the box (or below the floor) that counts as ejected
+
+
+def outside_box(q, ox, oy, width=W, margin=EJECT_MARGIN):
+    """Particles more than ``margin`` outside the box (sides, ends, below the floor, above the walls)."""
+    return ((np.abs(q[:, 0] - ox) > 0.5 * L + margin) | (np.abs(q[:, 1] - oy) > 0.5 * width + margin)
+            | (q[:, 2] < -margin) | (q[:, 2] > WALL_H + margin))
+
+
 def nonfinite_report(q_prev, v_prev, bad, ox, oy, voxel, width=W):
     """Where the particles selected by ``bad`` (non-finite now, or fast) were at the last finite sample."""
     if q_prev is None or not bad.any():
@@ -154,7 +163,7 @@ def run(friction=0.68, voxel=0.005, depth=0.05, rate=2.0, hold=4.0, fps=120, sub
         t_fast_end = settle + theta0 / fast
         t_slow_end = t_fast_end + (theta_max - theta0) / rate
     n_max = int(math.ceil((t_slow_end + hold) * fps)) + 1
-    hist_t, hist_theta, hist_v, hist_it = [], [], [], []
+    hist_t, hist_theta, hist_v, hist_it, hist_esc = [], [], [], [], []
     theta_hold = theta0 if fixed_tilt is not None else None
     hold_from = t_fast_end if fixed_tilt is not None else None
     fail_idx = creep_idx = None
@@ -170,7 +179,8 @@ def run(friction=0.68, voxel=0.005, depth=0.05, rate=2.0, hold=4.0, fps=120, sub
             "strain_basis": strain_basis}
 
     def history():
-        return {"t": hist_t, "theta": hist_theta, "surface_speed_p90": hist_v, "iterations_mean": hist_it}
+        return {"t": hist_t, "theta": hist_theta, "surface_speed_p90": hist_v, "iterations_mean": hist_it,
+                "escaped": hist_esc}
 
     for s in range(n_max):                                 # bounded: at most the full tilt plus the hold
         t = s / fps
@@ -208,6 +218,26 @@ def run(friction=0.68, voxel=0.005, depth=0.05, rate=2.0, hold=4.0, fps=120, sub
                         np.savez_compressed(str(json_out).replace(".json", "_lastfinite.npz"), q=q_prev, v=v_prev,
                                             bad=bad)
                 sys.exit(3)
+            out = outside_box(q, ox, oy, width)
+            if out.sum() >= max(100, 0.001 * q.shape[0]):
+                # material thrown out of the box (batch 02c t1b: parity, 250 iterations, the layer ended at 1-788 m
+                # with zeroed velocities): a localised finding like NaN, so the batch goes on and nothing downstream
+                # measures garbage positions
+                rec = dict(meta, error="ejected", step=s, t=t, theta=theta, particles=mpm.particles_per_world,
+                           failed=fail_idx is not None,
+                           theta_fail_deg=hist_theta[fail_idx] if fail_idx is not None else None,
+                           theta_creep_deg=hist_theta[creep_idx] if creep_idx is not None else None,
+                           hold_seconds_before_ejection=(t - hold_from) if hold_from is not None else None,
+                           n_outside=int(out.sum()), max_distance_m=float(np.abs(q[out]).max()),
+                           speed_max=float(np.linalg.norm(v, axis=1).max()),
+                           where=nonfinite_report(q_prev, v_prev, out, ox, oy, voxel, width),
+                           solves=solve_log.summary(logs, iterations) if log_iterations else None,
+                           history=history())
+                print(json.dumps({k: v for k, v in rec.items() if k != "history"}))
+                if json_out:
+                    json.dump(rec, open(json_out, "w"), indent=1)
+                sys.exit(3)
+            hist_esc.append(int(out.sum()))
             q_prev, v_prev = q, v
             hist_t.append(t)
             hist_theta.append(theta)
@@ -244,6 +274,15 @@ def run(friction=0.68, voxel=0.005, depth=0.05, rate=2.0, hold=4.0, fps=120, sub
     if not (np.isfinite(q).all() and np.isfinite(v).all()):
         print(json.dumps({"error": "non-finite particles at the end"}))
         sys.exit(3)
+    out = outside_box(q, ox, oy, width)
+    if out.any() and not np.any(v):
+        # every velocity exactly zero with material outside the box: the 02c t1b signature (ejected, then dropped)
+        rec = dict(meta, error="ejected", step=n_end - 1, theta=theta, particles=mpm.particles_per_world,
+                   n_outside=int(out.sum()), max_distance_m=float(np.abs(q[out]).max()), history=history())
+        print(json.dumps({k: v for k, v in rec.items() if k != "history"}))
+        if json_out:
+            json.dump(rec, open(json_out, "w"), indent=1)
+        sys.exit(3)
     final_theta = theta_hold if theta_hold is not None else theta
     ang, a_box, ncol = SM.surface_angle_world(q, final_theta, x_lo, x_hi, col, 2 * voxel)
     speed = np.linalg.norm(v, axis=1)
@@ -262,6 +301,7 @@ def run(friction=0.68, voxel=0.005, depth=0.05, rate=2.0, hold=4.0, fps=120, sub
             "at_rest": bool(np.quantile(speed, 0.99) < 1e-3),
             "pre_failure_surface_speed_max": float(np.nanmax(pre)) if pre.size else None,
             "fast_particles": nonfinite_report(q, v, fast_mask, ox, oy, voxel, width),
+            "escaped_end": int(out.sum()),
             "solves": solve_log.summary(logs, iterations) if log_iterations else None,
             "deposit_profile": {"x": xs.tolist(), "top": tops.tolist()},
             "seconds": n_end / fps, "history": history()}

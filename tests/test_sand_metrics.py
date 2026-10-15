@@ -190,6 +190,22 @@ def test_solve_log_summary():
     assert solve_log.summary([], 250) == {"solves": 0}
 
 
+def test_tilt_box_ejection_mask():
+    """The tilt probe's ejection test: particles > 0.5 m outside the box (02c t1b: the layer ended at 1-788 m)."""
+    pytest.importorskip("mujoco")
+    import tilt_box as TB
+
+    q = np.array([[0.0, 0.0, 0.03], [0.149, 0.0, 0.0], [0.0, 0.0, 788.0], [0.0, 0.0, -46.0], [0.9, 0.0, 0.02]])
+    out = TB.outside_box(q, 0.0, 0.0)
+    assert out.tolist() == [False, False, True, True, True]
+
+
+def test_evaluator_02d_selftest():
+    r = subprocess.run([sys.executable, str(ROOT / "scripts/sand_fidelity/evaluate_batch_02d.py"), "--selftest"],
+                       capture_output=True, text=True)
+    assert r.returncode == 0, r.stdout + r.stderr
+
+
 def test_evaluator_02c_selftest():
     r = subprocess.run([sys.executable, str(ROOT / "scripts/sand_fidelity/evaluate_batch_02c.py"), "--selftest"],
                        capture_output=True, text=True)
