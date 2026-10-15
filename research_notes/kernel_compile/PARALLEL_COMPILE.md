@@ -364,6 +364,8 @@ module hashes or semantics. It belongs on its own fork branch: it touches every 
 
 Measured on the 16-inch M4 Max by `scripts/diagnostics/startup_compile_bench.py matrix` (medians; process wall = interpreter start to the end of the steps; speed-up against the serial run of the same cache state; raw records in `runs/parallel_compile/`).
 
+How to read the rows (2026-10-15). `cold` empties Warp's kernel cache only: Apple's shader cache (`DARWIN_USER_CACHE_DIR/com.apple.metal`) still holds what the prime compiled, so those rows measure cache lookups, not compiles. `cold_det` is not a valid comparison: its w8 run met sources its w0 run had just compiled, so its 4.19x is Apple's cache, not parallelism. `apple_cold` salts every Metal source with a unique comment, so each run compiles from scratch for Warp and Apple alike (order alternated, fresh Warp cache each run); these rows answer whether parallel compilation helps a first start.
+
 ### g1 (4096 worlds)
 
 | cache | workers | runs | process wall [s] | build [s] | first step [s] | modules compiled | sum of module load timers [s] | speed-up vs serial |
@@ -380,9 +382,12 @@ Measured on the 16-inch M4 Max by `scripts/diagnostics/startup_compile_bench.py 
 | warm | w8 | 2 | 3.6 | 2.1 | 0.1 | 0 | 11.6 | 1.06x |
 | cold_det | w0 | 1 | 39.8 | 37.6 | 0.2 | 47 | 27.3 | 1.00x |
 | cold_det | w8 | 1 | 9.5 | 7.3 | 0.2 | 47 | 50.2 | 4.19x |
+| apple_cold | w0 | 2 | 35.0 | 33.5 | 0.1 | 43 | 28.7 | 1.00x |
+| apple_cold | w4 | 2 | 12.2 | 10.7 | 0.1 | 43 | 40.0 | 2.86x |
+| apple_cold | w8 | 2 | 9.4 | 7.9 | 0.1 | 43 | 53.8 | 3.74x |
 
-Kernel cache files compared with the serial build: 9 runs, 782 files, 0 differ.
-Distinct result hashes: default mode: 19, deterministic: 1
+Kernel cache files compared with the serial build: 13 runs, 1126 files, 0 differ.
+Distinct result hashes: default mode: 25, deterministic: 1
 
 ### box_sand (2 worlds)
 
@@ -398,7 +403,9 @@ Distinct result hashes: default mode: 19, deterministic: 1
 | warm | w2 | 2 | 7.7 | 3.8 | 2.7 | 0 | 6.4 | 1.03x |
 | warm | w4 | 2 | 7.6 | 3.8 | 2.7 | 0 | 9.5 | 1.04x |
 | warm | w8 | 2 | 7.6 | 3.8 | 2.7 | 0 | 15.2 | 1.04x |
+| apple_cold | w0 | 2 | 65.7 | 33.1 | 31.4 | 113 | 61.4 | 1.00x |
+| apple_cold | w4 | 2 | 45.9 | 19.1 | 25.6 | 113 | 71.1 | 1.43x |
+| apple_cold | w8 | 2 | 43.9 | 17.3 | 25.4 | 113 | 85.8 | 1.50x |
 
-Kernel cache files compared with the serial build: 8 runs, 1808 files, 0 differ.
+Kernel cache files compared with the serial build: 12 runs, 2712 files, 0 differ.
 Distinct result hashes: default mode: 1
-

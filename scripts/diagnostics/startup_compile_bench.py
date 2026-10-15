@@ -147,6 +147,16 @@ def cmd_run(a) -> int:
     import warp as wp
 
     wp.init()   # deterministic runs: BatchSimOptions(deterministic=True), MetalSim's own mode switch
+    salt = os.environ.get("METALSIM_BENCH_METAL_SALT")
+    if salt:
+        # A comment prepended to every Metal source this process compiles, so Apple's own shader cache
+        # (DARWIN_USER_CACHE_DIR/com.apple.metal: libraries*.data = MSL -> AIR, functions*.data = AIR -> GPU code,
+        # written during the 2026-10-15 matrix) cannot match it: the compile is cold for Apple too, not only for
+        # Warp. Applied after Warp read its cache file, so Warp's cache bytes are unchanged.
+        core = wp._src.context.runtime.core
+        load = core.wp_metal_load_library
+        prefix = f"// metalsim bench salt {salt}\n".encode()
+        core.wp_metal_load_library = lambda ordinal, source: load(ordinal, prefix + source)
     import mujoco_warp
 
     import metalsim
@@ -250,7 +260,7 @@ class Matrix:
         shutil.rmtree(path, ignore_errors=True)
 
     def run(self, tag: str, workers: int, cache: str, temp: str, maximize: bool = True, deterministic: bool = False,
-            reuse: bool = False) -> dict:
+            reuse: bool = False, salt: bool = False) -> dict:
         run_dir = os.path.join(self.out, "runs", tag)
         done = os.path.join(run_dir, "record.json")
         if reuse and os.path.exists(done):           # resumable: a finished, successful run is not repeated
@@ -264,7 +274,7 @@ class Matrix:
                   flush=True)
         self.clear_run(run_dir)                       # nothing from an earlier, unfinished or failed attempt survives
         os.makedirs(run_dir, exist_ok=True)
-        if temp.startswith("cold"):
+        if temp.startswith(("cold", "apple_cold")):
             self.wipe(cache)                          # a cold run starts from an empty cache, also on a resume
         os.makedirs(cache, exist_ok=True)
         # PYTHONHASHSEED fixed: Warp's codegen orders one loop prologue by string hash (Adjoint.
@@ -275,6 +285,8 @@ class Matrix:
                    METALSIM_PRELOAD_WORKERS="0", PYTHONDONTWRITEBYTECODE="1", PYTHONHASHSEED="0")
         if not maximize:
             env["WP_METAL_MAXIMIZE_CONCURRENT_COMPILATION"] = "0"
+        if salt:
+            env["METALSIM_BENCH_METAL_SALT"] = f"{tag}-{time.time_ns()}"   # unique per attempt
         cmd = [sys.executable, os.path.abspath(__file__), "run", "--scene", self.a.scene, "--workers", str(workers),
                "--worlds", str(self.a.worlds), "--steps", str(self.a.steps), "--out", run_dir]
         if self.a.expect_warp:
@@ -377,6 +389,22 @@ def cmd_matrix(a) -> int:
         m.run("det_cold_w8", 8, d8, "cold_det", deterministic=True, reuse=True)
         if os.path.isdir(d0) and os.path.isdir(d8):
             m.check_cache(d0, d8, "det_cold_w8")
+    # 5. cold for Apple too: every source salted, so neither Warp's cache nor Apple's shader cache helps. Rows 2-4's
+    # "cold" runs only empty Warp's cache; Apple's (filled by the prime) still served them, and the det_cold_w8 run
+    # met sources det_cold_w0 had just compiled. Alternating order, a fresh Warp cache per run.
+    if a.apple_cold:
+        order = [(0, 4, 8), (8, 4, 0)]
+        serial = None
+        for rep in range(a.reps):
+            for w in order[rep % 2]:
+                tag = f"apple_cold_w{w}_r{rep}"
+                cache = m.cache_dir(tag)
+                reused = m.done_ok(tag)
+                m.run(tag, w, cache, "apple_cold", reuse=True, salt=True)
+                if w == 0:
+                    serial = cache
+                elif serial and not reused and os.path.isdir(serial):
+                    m.check_cache(serial, cache, tag)
     if not a.keep_caches:
         for name in os.listdir(m.caches):
             m.wipe(os.path.join(m.caches, name))
@@ -412,11 +440,11 @@ def cmd_report(a) -> int:
         groups = {}
         for r in recs:
             tag = r["tag"]
-            if tag.startswith(("cold_", "warm_", "det_", "prime_", "manifest_")):
+            if tag.startswith(("cold_", "warm_", "det_", "prime_", "manifest_", "apple_cold_")):
                 temp = r["temp"]
                 label = "w" + str(r["workers"]) + ("" if r.get("maximize", True) else " (no maximize)")
                 groups.setdefault((temp, label, r["workers"]), []).append(r)
-        for temp in ("cold_prime", "cold", "warm", "cold_det"):
+        for temp in ("cold_prime", "cold", "warm", "cold_det", "apple_cold"):
             base = None
             for (t, label, w), rs in sorted(((k, v) for k, v in groups.items() if k[0] == temp),
                                             key=lambda kv: (kv[0][2], kv[0][1])):
@@ -478,6 +506,7 @@ def main() -> int:
     mx.add_argument("--run-timeout", type=float, default=900)
     mx.add_argument("--keep-caches", action="store_true")
     mx.add_argument("--no-deterministic-check", dest="deterministic_check", action="store_false")
+    mx.add_argument("--apple-cold", action="store_true", help="add salted runs, cold for Apple's shader cache too")
     rp = sub.add_parser("report")
     rp.add_argument("dirs", nargs="+")
     rp.add_argument("--write", default=None)

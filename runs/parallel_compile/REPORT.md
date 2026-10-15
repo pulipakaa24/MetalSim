@@ -15,9 +15,12 @@
 | warm | w8 | 2 | 3.6 | 2.1 | 0.1 | 0 | 11.6 | 1.06x |
 | cold_det | w0 | 1 | 39.8 | 37.6 | 0.2 | 47 | 27.3 | 1.00x |
 | cold_det | w8 | 1 | 9.5 | 7.3 | 0.2 | 47 | 50.2 | 4.19x |
+| apple_cold | w0 | 2 | 35.0 | 33.5 | 0.1 | 43 | 28.7 | 1.00x |
+| apple_cold | w4 | 2 | 12.2 | 10.7 | 0.1 | 43 | 40.0 | 2.86x |
+| apple_cold | w8 | 2 | 9.4 | 7.9 | 0.1 | 43 | 53.8 | 3.74x |
 
-Kernel cache files compared with the serial build: 9 runs, 782 files, 0 differ.
-Distinct result hashes: default mode: 19, deterministic: 1
+Kernel cache files compared with the serial build: 13 runs, 1126 files, 0 differ.
+Distinct result hashes: default mode: 25, deterministic: 1
 
 ### box_sand (2 worlds)
 
@@ -33,6 +36,9 @@ Distinct result hashes: default mode: 19, deterministic: 1
 | warm | w2 | 2 | 7.7 | 3.8 | 2.7 | 0 | 6.4 | 1.03x |
 | warm | w4 | 2 | 7.6 | 3.8 | 2.7 | 0 | 9.5 | 1.04x |
 | warm | w8 | 2 | 7.6 | 3.8 | 2.7 | 0 | 15.2 | 1.04x |
+| apple_cold | w0 | 2 | 65.7 | 33.1 | 31.4 | 113 | 61.4 | 1.00x |
+| apple_cold | w4 | 2 | 45.9 | 19.1 | 25.6 | 113 | 71.1 | 1.43x |
+| apple_cold | w8 | 2 | 43.9 | 17.3 | 25.4 | 113 | 85.8 | 1.50x |
 
-Kernel cache files compared with the serial build: 8 runs, 1808 files, 0 differ.
+Kernel cache files compared with the serial build: 12 runs, 2712 files, 0 differ.
 Distinct result hashes: default mode: 1
