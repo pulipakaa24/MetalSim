@@ -96,6 +96,21 @@ def test_tilted_surface_angle():
     assert abs(ab - a_box) < 0.3 and abs(ang - (theta - a_box)) < 0.3 and n > 10
 
 
+def test_deposit_angle_after_full_avalanche():
+    """A layer that avalanched into a pile against the downslope wall: thin bare part upslope, a wedge whose face rises
+    towards +x at 25 deg in the box frame. The deposit fit takes the face, not a line through the step (02b t1b)."""
+    sp, theta, face = 0.005 / 3, 60.0, 25.0
+    xs = np.arange(-0.15, 0.15, sp) + 0.5 * sp
+    pts = []
+    for x in xs:
+        top = max(0.012, 0.012 + math.tan(math.radians(face)) * (x - 0.0))
+        z = np.arange(0.5 * sp, top, sp)
+        pts.append(np.stack([np.full(z.size, x), np.zeros(z.size), z], 1))
+    q = np.concatenate(pts)
+    ang, ab, n = SM.surface_angle_world(q, theta, -0.135, 0.135, 2 * sp, 0.01)
+    assert abs(ab - face) < 1.0 and abs(ang - (theta - face)) < 1.0, (ang, ab, n)
+
+
 def test_first_sustained():
     t = np.arange(0, 2, 0.025)
     x = np.where((t > 0.5) & (t < 0.6), 1.0, 0.0) + np.where(t >= 1.0, 1.0, 0.0)
@@ -173,6 +188,12 @@ def test_solve_log_summary():
     s = solve_log.summary(logs, 250)
     assert s["solves"] == 4 and abs(s["frac_at_cap"] - 0.75) < 1e-12
     assert solve_log.summary([], 250) == {"solves": 0}
+
+
+def test_evaluator_02c_selftest():
+    r = subprocess.run([sys.executable, str(ROOT / "scripts/sand_fidelity/evaluate_batch_02c.py"), "--selftest"],
+                       capture_output=True, text=True)
+    assert r.returncode == 0, r.stdout + r.stderr
 
 
 def test_evaluator_02b_selftest():

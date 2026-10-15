@@ -38,6 +38,12 @@ VARIANTS = {
         "patch": ROOT / "patches/newton/pr4660-1de47831-implicit-mpm.diff",
         "source": "Newton draft PR #4660 (https://github.com/newton-physics/newton/pull/4660) at 1de47831",
     },
+    # research only (sand fidelity 02c): the PR's collider hunks alone
+    "pr4660c": {
+        "dest": ROOT / "metalsim/physics/mpm/implicit_mpm_pr4660c",
+        "patch": ROOT / "patches/newton/pr4660-1de47831-collider-only.diff",
+        "source": "the collider part (rasterized_collisions.py) of Newton draft PR #4660 at 1de47831",
+    },
 }
 
 

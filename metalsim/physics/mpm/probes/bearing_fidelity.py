@@ -35,7 +35,7 @@ from bearing import XML  # noqa: E402
 
 def run(mode="lagged", drop=0.15, rest=False, fps=120, voxel=0.02, iterations=250, tolerance=1e-6, basis="S2",
         depth=0.08, friction=0.7, seconds=1.5, box_half=0.05, box_mass=2.0, solver="auto", substeps=3, project=False,
-        log_iterations=False):
+        log_iterations=False, ppc_axis=3.0, solver_variant="parity", strain_basis="P0"):
     import mujoco
     import warp as wp
 
@@ -47,9 +47,10 @@ def run(mode="lagged", drop=0.15, rest=False, fps=120, voxel=0.02, iterations=25
     model = mujoco.MjModel.from_xml_string(XML.format(dt=1.0 / fps / substeps, z=z0, h=box_half, m=box_mass))
     sim = BatchSim(model, 1, options=BatchSimOptions(substeps=substeps))
     cfg = MPMConfig(voxel_size=voxel, max_iterations=iterations, tolerance=tolerance, solver=solver,
-                    collider_basis=basis, mode=mode, capture=not log_iterations)
+                    collider_basis=basis, mode=mode, capture=not log_iterations, solver_variant=solver_variant,
+                    strain_basis=strain_basis)
     mpm = MPMCoupling(sim, cfg)
-    mpm.add_emitter(GridEmitter(lower=(-0.15, -0.15, 0.0), upper=(0.15, 0.15, depth),
+    mpm.add_emitter(GridEmitter(lower=(-0.15, -0.15, 0.0), upper=(0.15, 0.15, depth), particles_per_cell=ppc_axis,
                                 material=MPMMaterial(density=1500.0, friction=friction)))
     mpm.finalize()
     logs = []
@@ -90,7 +91,7 @@ def run(mode="lagged", drop=0.15, rest=False, fps=120, voxel=0.02, iterations=25
     # the velocity on the step before contact (the free-fall speed reaching the bed)
     v_impact = float(-vz[k_hit - 1]) if k_hit else (float(-vz[0]) if k_hit == 0 else None)
     k_peak = int(np.argmax(pen))
-    sp = voxel / 3.0
+    sp = voxel / ppc_axis
     return {"probe": "bearing_fidelity", "mode": mode, "rest": rest, "drop": drop, "fps": fps, "dt": 1.0 / fps,
             "voxel": voxel, "iterations": iterations, "tolerance": tolerance, "basis": basis, "project": project,
             "depth": depth, "friction": friction, "seconds": seconds, "particles": mpm.particles_per_world,
@@ -100,6 +101,7 @@ def run(mode="lagged", drop=0.15, rest=False, fps=120, voxel=0.02, iterations=25
             "t_peak_s": (k_peak + 1) / fps, "settlement_over_voxel": float(pen[-1] / voxel),
             "overlap": SM.box_overlap(q, pos, quat, box_half),
             "heave_ring_m": SM.ring_heave(q, pos[:2], 1.2 * box_half * 2 ** 0.5, 2.4 * box_half, 2 * sp, depth),
+            "ppc": ppc_axis ** 3, "solver_variant": solver_variant, "strain_basis": strain_basis,
             "max_tilt_deg": float(max(tilt)), "final_tilt_deg": tilt[-1],
             "solves": solve_log.summary(logs, iterations) if log_iterations else None,
             "bottom": bottom.tolist(), "vz": vz, "fz": fz, "tilt_deg": tilt}
@@ -120,6 +122,9 @@ def main():
     ap.add_argument("--seconds", type=float, default=1.5)
     ap.add_argument("--project", action="store_true")
     ap.add_argument("--log-iterations", action="store_true")
+    ap.add_argument("--ppc-axis", type=float, default=3.0, help="particles per voxel edge (3: 27 per cell, 2: 8)")
+    ap.add_argument("--solver-variant", default="parity")
+    ap.add_argument("--strain-basis", default="P0")
     ap.add_argument("--json")
     a = ap.parse_args()
     import warp as wp
@@ -127,7 +132,8 @@ def main():
     wp.config.quiet = True
     with wp.ScopedDevice("metal:0"):
         r = run(a.mode, a.drop, a.rest, a.fps, a.voxel, a.iterations, a.tolerance, a.basis, a.depth, a.friction,
-                a.seconds, project=a.project, log_iterations=a.log_iterations)
+                a.seconds, project=a.project, log_iterations=a.log_iterations, ppc_axis=a.ppc_axis,
+                solver_variant=a.solver_variant, strain_basis=a.strain_basis)
     print(json.dumps({k: v for k, v in r.items() if k not in ("bottom", "vz", "fz", "tilt_deg")}))
     if a.json:
         json.dump(r, open(a.json, "w"))
