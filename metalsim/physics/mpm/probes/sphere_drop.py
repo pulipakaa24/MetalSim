@@ -79,7 +79,8 @@ def surface_probe(q, ox, oy, r, voxel):
 
 def run(h=0.2, fps=480, voxel=0.005, diameter=0.05, ball_density=2500.0, bed=(0.2, 0.2, 0.12), ppc_axis=2.0,
         friction=0.7, iterations=250, tolerance=1e-6, seconds=0.5, substeps=3, mode="lagged", walls=False,
-        ball=True, kinematic=None, kin_depth=0.06, log_iterations=False):
+        ball=True, kinematic=None, kin_depth=0.06, log_iterations=False, solver_variant="parity",
+        strain_basis="P0"):
     import mujoco
     import warp as wp
 
@@ -104,6 +105,10 @@ def run(h=0.2, fps=480, voxel=0.005, diameter=0.05, ball_density=2500.0, bed=(0.
         extra.update(proxy_mass="kinematic", collider_velocity_mode="backward")
     if log_iterations:
         extra["capture"] = False
+    if solver_variant != "parity":
+        extra["solver_variant"] = solver_variant
+    if strain_basis != "P0":
+        extra["strain_basis"] = strain_basis
     cfg = MPMConfig(voxel_size=voxel, max_iterations=iterations, tolerance=tolerance, mode=mode, **extra)
     mpm = MPMCoupling(sim, cfg)
     mpm.add_emitter(GridEmitter(lower=(ox - 0.5 * bed[0], oy - 0.5 * bed[1], 0.0),
@@ -160,7 +165,7 @@ def run(h=0.2, fps=480, voxel=0.005, diameter=0.05, ball_density=2500.0, bed=(0.
            "diameter": diameter, "diameter_cells": diameter / voxel, "ball_mass": mass, "ball_density": ball_density,
            "bed": list(bed), "ppc": ppc_axis ** 3, "friction": friction, "iterations": iterations,
            "tolerance": tolerance, "mode": mode, "particles": mpm.particles_per_world, "walls": walls, "ball": ball,
-           "kinematic": kinematic, "offset": [ox, oy],
+           "kinematic": kinematic, "offset": [ox, oy], "solver_variant": solver_variant, "strain_basis": strain_basis,
            "surface": {"t": surf_t, "centre": surf_c, "ring": surf_ring, "top0": top0},
            "centre_subsidence_m": float(top0 - surf_c[-1]) if surf_c else None,
            "centre_subsidence_0p2s_m": float(top0 - np.interp(0.2, surf_t, surf_c)) if surf_c else None,
@@ -207,6 +212,8 @@ def main():
     ap.add_argument("--kinematic", type=float, default=None, help="push the sphere down at this speed [m/s]")
     ap.add_argument("--kin-depth", type=float, default=0.06)
     ap.add_argument("--log-iterations", action="store_true")
+    ap.add_argument("--solver-variant", default="parity")
+    ap.add_argument("--strain-basis", default="P0")
     ap.add_argument("--json")
     a = ap.parse_args()
     import warp as wp
@@ -215,7 +222,8 @@ def main():
     with wp.ScopedDevice("metal:0"):
         r = run(a.h, a.fps, a.voxel, a.diameter, a.ball_density, tuple(a.bed), friction=a.friction,
                 seconds=a.seconds, walls=a.walls, ball=not a.no_ball, kinematic=a.kinematic, kin_depth=a.kin_depth,
-                log_iterations=a.log_iterations)
+                log_iterations=a.log_iterations, solver_variant=a.solver_variant,
+                strain_basis=a.strain_basis)
     print(json.dumps({k: v for k, v in r.items() if k not in ("pen", "vz", "fz", "surface", "force_depth")}))
     if a.json:
         json.dump(r, open(a.json, "w"))

@@ -165,6 +165,10 @@ class MPMConfig:
     strain_basis: str = "P0"
     velocity_basis: str = "Q1"
     solver_extra: dict = field(default_factory=dict)        # any other SolverImplicitMPM.Config field
+    # "parity" (default): the vendored Newton 1.5.2 fork solver, Isaac Lab's, untouched. Other values select a
+    # flag-gated variant generated from it plus an upstream change (scripts/vendor_mpm_variant.py): "pr4660" = Newton
+    # draft PR #4660 (P1d/Q1d nodal diagonalisation, collider pseudonormals). Not a SolverImplicitMPM.Config field.
+    solver_variant: str = "parity"
     # coupling
     mpm_substeps: int = 1                 # MPM steps per coupled (BatchSim) step
     # "lagged" (Newton's SolverCoupledProxy.Proxy default; its two-way example's rewind): begin pose, end velocity
@@ -325,6 +329,10 @@ class MPMCoupling:
             raise ValueError(f"proxy_mass must be 'effective', 'body' or 'kinematic', got {self.cfg.proxy_mass!r}")
         if self.cfg.harvest not in ("last_substep", "mean"):
             raise ValueError(f"harvest must be 'last_substep' or 'mean', got {self.cfg.harvest!r}")
+        from metalsim.physics.mpm.solver import VARIANTS
+
+        if self.cfg.solver_variant not in VARIANTS:
+            raise ValueError(f"solver_variant must be one of {sorted(VARIANTS)}, got {self.cfg.solver_variant!r}")
         self.emitters: list = []
         self._geoms = None
         self._bodies = None
@@ -360,12 +368,13 @@ class MPMCoupling:
         cfg, sim = self.cfg, self.sim
         if not self.emitters:
             raise ValueError("no MPM material: add_emitter() first")
+        # resolve (and import) the solver first, so that install() also patches a selected variant's solve loop
+        Solver = solver_class(cfg.solver_variant)
         # CUDA's stopping rule and float32 accumulation (MPM.md section 1) for the MPM kernels only: MuJoCo Warp's
         # compile options stay as they are (no rigid determinism patch, no global argument-space change)
         newton_compat.install(accumulate="float32", loop="cuda", log=False, chunk_graph=cfg.chunk_graph,
                               gpu_exit=cfg.gpu_exit, rigid_deterministic=None, device_args=None,
                               metal_fast_math=cfg.metal_fast_math)
-        Solver = solver_class()
         model = sim.mj_model
         data = mujoco.MjData(model)
         data.qpos[:] = sim.d.qpos.numpy()[0]

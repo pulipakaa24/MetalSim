@@ -50,7 +50,7 @@ def column_n(radius, height, voxel, n_axis):
 
 def run(friction=0.68, voxel=0.005, radius=0.05, fill=0.05, lift_speed=0.025, settle=0.3, rest=2.0, floor_mu=1.0,
         fps=120, substeps=2, iterations=250, sample_every=0.25, ppc_axis=3, velocity_basis="Q1", strain_basis="P0",
-        integration_scheme="pic", npz=None):
+        integration_scheme="pic", npz=None, solver_variant="parity"):
     import mujoco
     import warp as wp
 
@@ -69,7 +69,8 @@ def run(friction=0.68, voxel=0.005, radius=0.05, fill=0.05, lift_speed=0.025, se
         extra["strain_basis"] = strain_basis
     if integration_scheme != "pic":
         extra["integration_scheme"] = integration_scheme
-    cfg = MPMConfig(voxel_size=voxel, max_iterations=iterations, proxy_mass="kinematic", **extra)
+    cfg = MPMConfig(voxel_size=voxel, max_iterations=iterations, proxy_mass="kinematic", solver_variant=solver_variant,
+                    **extra)
     mpm = MPMCoupling(sim, cfg)
     mpm.add_emitter(PointsEmitter(positions=p, mass=sp ** 3 * mat.density, radius=0.5 * sp, material=mat))
     geoms = [mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_GEOM, n) for n in ["floor"] + [f"stave{k}" for k in range(N_STAVES)]]
@@ -111,6 +112,7 @@ def run(friction=0.68, voxel=0.005, radius=0.05, fill=0.05, lift_speed=0.025, se
     return {"probe": "sand_repose", "friction": friction, "atan_mu_deg": target, "voxel": voxel, "radius": radius,
             "fill": fill, "R_over_dx": radius / voxel, "ppc": ppc_axis ** 3, "velocity_basis": velocity_basis,
             "strain_basis": strain_basis, "integration_scheme": integration_scheme, "capture": mpm.capturable,
+            "solver_variant": solver_variant,
             "particles": int(p.shape[0]), "lift_speed": lift_speed, "lift_froude": lift_speed / math.sqrt(9.81 * fill),
             "floor_mu": floor_mu, "iterations": iterations, "final": last, "angle_drift_last_0.5s_deg": drift,
             "at_rest": last["max_speed"] < 1e-3, "estimators_spread_deg": float(max(est) - min(est)),
@@ -131,6 +133,7 @@ def main():
     ap.add_argument("--velocity-basis", default="Q1")
     ap.add_argument("--strain-basis", default="P0")
     ap.add_argument("--integration-scheme", default="pic")
+    ap.add_argument("--solver-variant", default="parity")
     ap.add_argument("--json")
     ap.add_argument("--npz")
     a = ap.parse_args()
@@ -140,7 +143,7 @@ def main():
     with wp.ScopedDevice("metal:0"):
         r = run(a.friction, a.voxel, a.radius, a.fill, lift_speed=a.lift_speed, iterations=a.iterations, rest=a.rest,
                 ppc_axis=a.ppc_axis, velocity_basis=a.velocity_basis, strain_basis=a.strain_basis,
-                integration_scheme=a.integration_scheme, npz=a.npz)
+                integration_scheme=a.integration_scheme, npz=a.npz, solver_variant=a.solver_variant)
     print(json.dumps({k: v for k, v in r.items() if k not in ("samples", "profiles", "height_bands", "flank_stress")}))
     if a.json:
         json.dump(r, open(a.json, "w"), indent=1)
