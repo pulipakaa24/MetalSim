@@ -215,6 +215,7 @@ def main():
     ap.add_argument("--solver-variant", default="parity")
     ap.add_argument("--strain-basis", default="P0")
     ap.add_argument("--iterations", type=int, default=250)
+    ap.add_argument("--ppc-axis", type=float, default=2.0, help="particles per voxel edge (2: 8 per cell, 3: 27)")
     ap.add_argument("--json")
     a = ap.parse_args()
     import warp as wp
@@ -224,7 +225,7 @@ def main():
         r = run(a.h, a.fps, a.voxel, a.diameter, a.ball_density, tuple(a.bed), friction=a.friction,
                 seconds=a.seconds, walls=a.walls, ball=not a.no_ball, kinematic=a.kinematic, kin_depth=a.kin_depth,
                 log_iterations=a.log_iterations, solver_variant=a.solver_variant,
-                strain_basis=a.strain_basis, iterations=a.iterations)
+                strain_basis=a.strain_basis, iterations=a.iterations, ppc_axis=a.ppc_axis)
     print(json.dumps({k: v for k, v in r.items() if k not in ("pen", "vz", "fz", "surface", "force_depth")}))
     if a.json:
         json.dump(r, open(a.json, "w"))
