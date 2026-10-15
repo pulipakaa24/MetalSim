@@ -175,6 +175,12 @@ def test_solve_log_summary():
     assert solve_log.summary([], 250) == {"solves": 0}
 
 
+def test_evaluator_02b_selftest():
+    r = subprocess.run([sys.executable, str(ROOT / "scripts/sand_fidelity/evaluate_batch_02b.py"), "--selftest"],
+                       capture_output=True, text=True)
+    assert r.returncode == 0, r.stdout + r.stderr
+
+
 def test_evaluator_02a_selftest():
     r = subprocess.run([sys.executable, str(ROOT / "scripts/sand_fidelity/evaluate_batch_02a.py"), "--selftest"],
                        capture_output=True, text=True)
