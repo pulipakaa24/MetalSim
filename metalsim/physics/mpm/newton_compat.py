@@ -63,7 +63,9 @@ METAL_FAST_MATH_DEFAULT = "off"
 _STATE: dict = {"installed": False, "run_solver_loop": {}}
 VENDORED_MODULE = "metalsim.physics.mpm.implicit_mpm.solve_rheology"
 VARIANT_MODULES = ("metalsim.physics.mpm.implicit_mpm_pr4660.solve_rheology",
-                   "metalsim.physics.mpm.implicit_mpm_pr4660c.solve_rheology")
+                   "metalsim.physics.mpm.implicit_mpm_pr4660c.solve_rheology",
+                   "metalsim.physics.mpm.implicit_mpm_pr4660mc.solve_rheology",
+                   "metalsim.physics.mpm.implicit_mpm_pr4660mn.solve_rheology")
 
 
 def newton_is_152() -> bool:
