@@ -110,7 +110,7 @@ def run(friction=0.68, voxel=0.005, depth=0.05, rate=2.0, hold=4.0, fps=120, sub
         tolerance=1e-6, threshold=1e-3, window=0.25, sample_every=3, on_node=False, json_out=None,
         mode="creep", runaway_speed=0.01, runaway_window=0.5, theta_over=6.0, fixed_tilt=None, floor="plane",
         side_friction=0.0, side_walls=True, width=W, log_iterations=False, solver_variant="parity",
-        strain_basis="P0"):
+        strain_basis="P0", start_below=12.0, npz=None):
     """``mode="creep"`` (batch 01): hold once the surface speed exceeds ``threshold`` for ``window`` s.
     ``mode="runaway"`` (batch 02a): tilt on to atan(mu) + ``theta_over``; failure = surface speed above
     ``runaway_speed`` and rising over ``runaway_window`` s; the creep threshold is still recorded (``theta_creep``).
@@ -149,7 +149,7 @@ def run(friction=0.68, voxel=0.005, depth=0.05, rate=2.0, hold=4.0, fps=120, sub
         t_fast_end = settle + theta0 / fast
         t_slow_end = t_fast_end
     else:
-        theta0 = max(atan_mu - 12.0, 0.0)
+        theta0 = max(atan_mu - start_below, 0.0)
         theta_max = min(atan_mu + (theta_over if mode == "runaway" else 12.0), 60.0)
         t_fast_end = settle + theta0 / fast
         t_slow_end = t_fast_end + (theta_max - theta0) / rate
@@ -250,6 +250,9 @@ def run(friction=0.68, voxel=0.005, depth=0.05, rate=2.0, hold=4.0, fps=120, sub
     k0 = k_slow or 0
     pre = np.asarray(hist_v[k0:fail_idx]) if fail_idx is not None else np.asarray(hist_v[k0:])
     fast_mask = speed > 0.1
+    xs, tops = SM.layer_surface(q, x_lo, x_hi, col, 0.0)
+    if npz:
+        np.savez_compressed(npz, q=q.astype(np.float32), v=v.astype(np.float32), theta=final_theta, offset=[ox, oy])
     return {**meta, "particles": mpm.particles_per_world,
             "failed": fail_idx is not None, "theta_fail_deg": hist_theta[fail_idx] if fail_idx is not None else None,
             "theta_creep_deg": hist_theta[creep_idx] if creep_idx is not None else None,
@@ -260,6 +263,7 @@ def run(friction=0.68, voxel=0.005, depth=0.05, rate=2.0, hold=4.0, fps=120, sub
             "pre_failure_surface_speed_max": float(np.nanmax(pre)) if pre.size else None,
             "fast_particles": nonfinite_report(q, v, fast_mask, ox, oy, voxel, width),
             "solves": solve_log.summary(logs, iterations) if log_iterations else None,
+            "deposit_profile": {"x": xs.tolist(), "top": tops.tolist()},
             "seconds": n_end / fps, "history": history()}
 
 
@@ -283,6 +287,8 @@ def main():
     ap.add_argument("--log-iterations", action="store_true", help="uncaptured step, per-solve iterations logged")
     ap.add_argument("--solver-variant", default="parity")
     ap.add_argument("--strain-basis", default="P0")
+    ap.add_argument("--start-below", type=float, default=12.0, help="slow tilt starts at atan(mu) minus this")
+    ap.add_argument("--npz")
     ap.add_argument("--json")
     a = ap.parse_args()
     import warp as wp
@@ -293,7 +299,7 @@ def main():
                 on_node=a.on_node, json_out=a.json, mode=a.mode, theta_over=a.theta_over, fixed_tilt=a.fixed_tilt,
                 floor=a.floor, side_friction=a.side_friction, side_walls=not a.no_side_walls, width=a.width,
                 log_iterations=a.log_iterations, solver_variant=a.solver_variant,
-                strain_basis=a.strain_basis)
+                strain_basis=a.strain_basis, start_below=a.start_below, npz=a.npz)
     print(json.dumps({k: v for k, v in r.items() if k != "history"}))
     if a.json:
         json.dump(r, open(a.json, "w"), indent=1)
