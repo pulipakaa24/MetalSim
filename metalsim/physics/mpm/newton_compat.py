@@ -51,6 +51,7 @@ from __future__ import annotations
 
 import functools
 import importlib
+import sys
 
 import numpy as np
 import warp as wp
@@ -61,6 +62,7 @@ METAL_FAST_MATH_MODES = ("off", "cuda", "relaxed")
 METAL_FAST_MATH_DEFAULT = "off"
 _STATE: dict = {"installed": False, "run_solver_loop": {}}
 VENDORED_MODULE = "metalsim.physics.mpm.implicit_mpm.solve_rheology"
+VARIANT_MODULES = ("metalsim.physics.mpm.implicit_mpm_pr4660.solve_rheology",)
 
 
 def newton_is_152() -> bool:
@@ -82,6 +84,9 @@ def rheology_modules() -> list:
     if newton_is_152():
         mods.append(importlib.import_module("newton._src.solvers.implicit_mpm.solve_rheology"))
     mods.append(importlib.import_module(VENDORED_MODULE))
+    # flag-gated solver variants (scripts/vendor_mpm_variant.py): patched only once something imported them, i.e.
+    # selected one (MPMConfig(solver_variant=...)); the parity path never loads them
+    mods += [sys.modules[name] for name in VARIANT_MODULES if name in sys.modules]
     return mods
 
 
