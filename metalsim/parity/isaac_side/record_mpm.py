@@ -30,7 +30,6 @@ ap.add_argument("--set", action="append", default=[], help="scene parameter key=
 ap.add_argument("--chunk-graph", action="store_true", help="Metal: replay the 5-iteration chunk as a graph")
 ap.add_argument("--gpu-exit", action="store_true", help="Metal (with --chunk-graph): decide the solver stop on the GPU")
 ap.add_argument("--fused", action="store_true", help="Metal: one-dispatch Gauss-Seidel solve (metalsim.physics.mpm.fused_gs)")
-ap.add_argument("--simd", action="store_true", help="Metal: SIMD-cooperative Gauss-Seidel sweep (metalsim.physics.mpm.simd_gs)")
 ap.add_argument("--no-log", action="store_true", help="do not log per-solve residuals (timing runs)")
 ap.add_argument("--cuda-nofma", action="store_true", help="CUDA: compile every kernel with fuse_fp off (tie floor)")
 ap.add_argument("--cuda-cubin", action="store_true", help="CUDA: assemble with the toolkit's ptxas (cubin), not the driver's")
@@ -112,7 +111,7 @@ _install_kw = {"gpu_exit": True} if args.gpu_exit else {}  # older newton_compat
 if args.metal_fast_math:
     _install_kw["metal_fast_math"] = args.metal_fast_math
 newton_compat.install(accumulate=accumulate, loop=args.loop, log=not args.no_log, chunk_graph=args.chunk_graph,
-                      fused=args.fused, simd=args.simd, **_install_kw)
+                      fused=args.fused, **_install_kw)
 
 kw = {}
 for s in args.set:

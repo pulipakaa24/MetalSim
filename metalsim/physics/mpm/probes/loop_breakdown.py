@@ -16,7 +16,6 @@ ap.add_argument("--warmup", type=int, default=2)
 ap.add_argument("--n", type=int, default=40)
 ap.add_argument("--set", action="append", default=[])
 ap.add_argument("--json")
-ap.add_argument("--simd", action="store_true")
 args = ap.parse_args()
 
 import numpy as np
@@ -70,10 +69,6 @@ def probe_loop(rheology_solver, contact_solver, *rest):
             velocity_nodes=int(rheology_solver.momentum.velocity.shape[0]),
             solver=rheology_solver.name,
         )
-        if args.simd:
-            from metalsim.physics.mpm import simd_gs
-
-            rheology_solver.solve = simd_gs.SimdSweep(rheology_solver)
         result["contact_ms"] = timed(contact_solver.solve, n)
         result["rheology_sweep_ms"] = timed(rheology_solver.solve, n)
         if hasattr(rheology_solver, "solve_local_launch"):
