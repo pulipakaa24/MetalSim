@@ -59,7 +59,8 @@ def run(mode="lagged", drop=0.15, rest=False, fps=120, voxel=0.02, iterations=25
 
         solve_log.enable(cfg)
     n = int(round(seconds * fps))
-    zs, vz, fz, tilt = [], [], [], []
+    zs, vz, fz, tilt, low = [], [], [], [], []
+    corners = np.array([[sx, sy, -1.0] for sx in (-1.0, 1.0) for sy in (-1.0, 1.0)]) * box_half
     for _ in range(n):                                     # bounded
         mpm.step()
         if log_iterations:
@@ -68,7 +69,11 @@ def run(mode="lagged", drop=0.15, rest=False, fps=120, voxel=0.02, iterations=25
             mpm.solver.project_outside(mpm.state, mpm.state, mpm.dt)
         zs.append(float(sim.d.xpos.numpy()[0, 1, 2]))
         qw = sim.d.xquat.numpy()[0, 1].astype(np.float64)
-        tilt.append(float(np.degrees(np.arccos(np.clip(SM.quat_wxyz_to_mat(qw)[2, 2], -1.0, 1.0)))))
+        rot = SM.quat_wxyz_to_mat(qw)
+        tilt.append(float(np.degrees(np.arccos(np.clip(rot[2, 2], -1.0, 1.0)))))
+        # the lowest of the box's four bottom corners: a tilting box (02c preset rest: 3 deg) raises its bottom centre
+        # while one edge sinks, so the centre alone misreads settlement
+        low.append(float(zs[-1] + (corners @ rot.T)[:, 2].min()))
         vz.append(float(sim.d.qvel.numpy()[0, 2]))
         fz.append(float(mpm.wrenches()[0, 0, 2]))
         if not np.isfinite(zs[-1]):
@@ -103,8 +108,10 @@ def run(mode="lagged", drop=0.15, rest=False, fps=120, voxel=0.02, iterations=25
             "heave_ring_m": SM.ring_heave(q, pos[:2], 1.2 * box_half * 2 ** 0.5, 2.4 * box_half, 2 * sp, depth),
             "ppc": ppc_axis ** 3, "solver_variant": solver_variant, "strain_basis": strain_basis,
             "max_tilt_deg": float(max(tilt)), "final_tilt_deg": tilt[-1],
+            "final_penetration_lowest_m": float(depth - low[-1]), "peak_penetration_lowest_m": float(depth - min(low)),
+            "creep_lowest_m_per_s": float(-(low[-1] - low[int(0.8 * n)]) / max(n - 1 - int(0.8 * n), 1) * fps),
             "solves": solve_log.summary(logs, iterations) if log_iterations else None,
-            "bottom": bottom.tolist(), "vz": vz, "fz": fz, "tilt_deg": tilt}
+            "bottom": bottom.tolist(), "vz": vz, "fz": fz, "tilt_deg": tilt, "bottom_lowest": low}
 
 
 def main():
@@ -134,7 +141,7 @@ def main():
         r = run(a.mode, a.drop, a.rest, a.fps, a.voxel, a.iterations, a.tolerance, a.basis, a.depth, a.friction,
                 a.seconds, project=a.project, log_iterations=a.log_iterations, ppc_axis=a.ppc_axis,
                 solver_variant=a.solver_variant, strain_basis=a.strain_basis)
-    print(json.dumps({k: v for k, v in r.items() if k not in ("bottom", "vz", "fz", "tilt_deg")}))
+    print(json.dumps({k: v for k, v in r.items() if k not in ("bottom", "vz", "fz", "tilt_deg", "bottom_lowest")}))
     if a.json:
         json.dump(r, open(a.json, "w"))
 
