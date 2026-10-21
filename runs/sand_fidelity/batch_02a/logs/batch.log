@@ -1,0 +1,247 @@
+=== sand_fidelity batch_02a start Wed Oct 14 13:33:51 PDT 2026 in /Users/aditya/robosim/.claude/worktrees/agent-ababedfe30d42c58a (main checkout /Users/aditya/robosim), HEAD 4f70bfc3
+................                                                         [100%]
+16 passed in 0.51s
+[13:33:52] CPU_CHECKS_2eec56a320 -> PASS 
+[13:33:52] CODE_COMMIT_2eec56a320 -> PASS 65f3c7bc
+[13:33:55] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[13:33:55] gpu job s_walled (estimate 79 s, timeout 600 s) -> logs/s_walled.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 601.61 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 341.36 ms  (cached)
+    {"probe": "sphere_drop", "h": 0.2, "v_impact": 1.9809088823063015, "fps": 480, "dt": 0.0020833333333333333, "voxel": 0.005, "diameter": 0.05, "diameter_cells": 10.0, "ball_mass": 0.16362461737446843, "ball_density": 2500.0, "bed": [0.2, 0.2, 0.12], "ppc": 8.0, "friction": 0.7, "iterations": 250, "tolerance": 1e-06, "mode": "lagged", "particles": 307200, "walls": true, "ball": true, "kinematic": null, "offset": [0.0025, 0.0025], "centre_subsidence_m": 0.013106795914576086, "centre_subsidence_0p2s_m": 0.013066710636649326, "uehara_mu0.7_m": 0.016293888801156876, "solves": null, "peak_penetration_m": 0.021627765595912923, "final_penetration_m": 0.021310355961322774, "stopped": true, "t_stop_s": 0.0875, "creep_m_per_s": 0.00019943460505059425, "reached_floor": false, "overlap": {"inside": 48, "max_depth_m": 0.0004248827491251869}}
+[13:35:34] s_walled -> DONE 99 s
+[13:35:37] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[13:35:37] gpu job s_ctrl_walled (estimate 79 s, timeout 600 s) -> logs/s_ctrl_walled.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 597.50 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 355.11 ms  (cached)
+    {"probe": "sphere_drop", "h": 0.2, "v_impact": 1.9809088823063015, "fps": 480, "dt": 0.0020833333333333333, "voxel": 0.005, "diameter": 0.05, "diameter_cells": 10.0, "ball_mass": 0.16362461737446843, "ball_density": 2500.0, "bed": [0.2, 0.2, 0.12], "ppc": 8.0, "friction": 0.7, "iterations": 250, "tolerance": 1e-06, "mode": "lagged", "particles": 307200, "walls": true, "ball": false, "kinematic": null, "offset": [0.0025, 0.0025], "centre_subsidence_m": 9.599099276770551e-05, "centre_subsidence_0p2s_m": 8.691261771698322e-05, "uehara_mu0.7_m": 0.016293888801156876, "solves": null}
+[13:36:45] s_ctrl_walled -> DONE 68 s
+[13:36:48] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   3.2 %
+[13:36:48] gpu job s_ctrl_unwalled (estimate 79 s, timeout 600 s) -> logs/s_ctrl_unwalled.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 42.89 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 39.79 ms  (cached)
+    {"probe": "sphere_drop", "h": 0.2, "v_impact": 1.9809088823063015, "fps": 480, "dt": 0.0020833333333333333, "voxel": 0.005, "diameter": 0.05, "diameter_cells": 10.0, "ball_mass": 0.16362461737446843, "ball_density": 2500.0, "bed": [0.2, 0.2, 0.12], "ppc": 8.0, "friction": 0.7, "iterations": 250, "tolerance": 1e-06, "mode": "lagged", "particles": 307200, "walls": false, "ball": false, "kinematic": null, "offset": [0.0, 0.0], "centre_subsidence_m": 0.036622563190758226, "centre_subsidence_0p2s_m": 0.02609433950856327, "uehara_mu0.7_m": 0.016293888801156876, "solves": null}
+[13:37:56] s_ctrl_unwalled -> DONE 68 s
+[13:37:59] health: utilisation 91%
+GPU (ioreg): device utilization 69 %; per-process GPU time over 2.0 s:
+  pid  36606 python3.12                         7.1 %
+[13:37:59] gpu job s_kin (estimate 199 s, timeout 600 s) -> logs/s_kin.log
+      File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 6204, in metal_synchronize
+        raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
+    RuntimeError: Metal error on device metal:0: Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
+[13:38:23] s_kin -> ERR rc=1 (see logs/s_kin.log)
+[13:38:26] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[13:38:26] gpu job s_steel (estimate 79 s, timeout 600 s) -> logs/s_steel.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 42.59 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 39.40 ms  (cached)
+    {"probe": "sphere_drop", "h": 0.2, "v_impact": 1.9809088823063015, "fps": 480, "dt": 0.0020833333333333333, "voxel": 0.005, "diameter": 0.05, "diameter_cells": 10.0, "ball_mass": 0.5105088062083415, "ball_density": 7800.0, "bed": [0.2, 0.2, 0.12], "ppc": 8.0, "friction": 0.7, "iterations": 250, "tolerance": 1e-06, "mode": "lagged", "particles": 307200, "walls": true, "ball": true, "kinematic": null, "offset": [0.0025, 0.0025], "centre_subsidence_m": 0.027201058810025866, "centre_subsidence_0p2s_m": 0.02714841290259025, "uehara_mu0.7_m": 0.029348501465200693, "solves": null, "peak_penetration_m": 0.03816386729478835, "final_penetration_m": 0.03816386729478835, "stopped": true, "t_stop_s": 0.07291666666666667, "creep_m_per_s": 0.000584150882477456, "reached_floor": false, "overlap": {"inside": 176, "max_depth_m": 0.0012139530585366827}}
+[13:39:39] s_steel -> DONE 73 s
+[13:39:42] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[13:39:42] gpu job s20a (estimate 138 s, timeout 600 s) -> logs/s20a.log
+      File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/types.py", line 3121, in check_array_shape
+        raise ValueError(
+    ValueError: Array shapes must not exceed the maximum representable value of a signed 32-bit integer, got 2342913280 in dimension 0.
+[13:39:55] s20a -> ERR rc=1 (see logs/s20a.log)
+[13:39:58] health: utilisation 100%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[13:40:28] gpu job s20b (estimate 138 s, timeout 600 s) -> logs/s20b.log
+      File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/types.py", line 3121, in check_array_shape
+        raise ValueError(
+    ValueError: Array shapes must not exceed the maximum representable value of a signed 32-bit integer, got 2342913280 in dimension 0.
+[13:40:41] s20b -> ERR rc=1 (see logs/s20b.log)
+[13:40:44] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   2.3 %
+[13:40:44] gpu job l_slip (estimate 55 s, timeout 600 s) -> logs/l_slip.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 41.17 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 38.24 ms  (cached)
+    {"probe": "bearing_fidelity", "mode": "lagged", "rest": false, "drop": 0.15, "fps": 480, "dt": 0.0020833333333333333, "voxel": 0.02, "iterations": 250, "tolerance": 1e-06, "basis": "S2", "project": false, "depth": 0.08, "friction": 0.7, "seconds": 1.5, "particles": 25392, "peak_penetration_m": 0.024682183861732487, "final_penetration_m": 0.024682183861732487, "creep_m_per_s": 0.01591088888528464, "reached_floor": false, "force_over_weight_tail": 0.9888241414994638, "weight_N": 19.62, "impact_speed_m_s": 0.6125993132591248, "t_contact_s": 0.18541666666666667, "t_peak_s": 1.5, "settlement_over_voxel": 1.2341091930866244, "overlap": {"inside": 0, "max_depth_m": 0.0, "p90_depth_m": 0.0}, "heave_ring_m": -0.017553490664976745, "max_tilt_deg": 3.031149601344213, "final_tilt_deg": 0.6209937605162782, "solves": null}
+[13:41:37] l_slip -> DONE 53 s
+[13:41:40] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[13:41:40] gpu job l_h15_dt120 (estimate 25 s, timeout 600 s) -> logs/l_h15_dt120.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 41.03 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 38.68 ms  (cached)
+    {"probe": "bearing_fidelity", "mode": "lagged", "rest": false, "drop": 0.15, "fps": 120, "dt": 0.008333333333333333, "voxel": 0.02, "iterations": 250, "tolerance": 1e-06, "basis": "S2", "project": false, "depth": 0.08, "friction": 0.7, "seconds": 0.8, "particles": 25392, "peak_penetration_m": 0.029824045598506932, "final_penetration_m": 0.02851949363946915, "creep_m_per_s": -9.32185273421438e-05, "reached_floor": false, "force_over_weight_tail": 1.0645577770246764, "weight_N": 19.62, "impact_speed_m_s": 1.6350010633468628, "t_contact_s": 0.175, "t_peak_s": 0.24166666666666667, "settlement_over_voxel": 1.4259746819734576, "overlap": {"inside": 44, "max_depth_m": 0.003513654118010634, "p90_depth_m": 0.001961612047414675}, "heave_ring_m": -0.0180536959576073, "max_tilt_deg": 0.019853384832508737, "final_tilt_deg": 0.011004061369351536, "solves": null}
+[13:41:58] l_h15_dt120 -> DONE 18 s
+[13:42:01] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   2.6 %
+[13:42:01] gpu job l_h15_dt240 (estimate 29 s, timeout 600 s) -> logs/l_h15_dt240.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 42.95 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 39.67 ms  (cached)
+    {"probe": "bearing_fidelity", "mode": "lagged", "rest": false, "drop": 0.15, "fps": 240, "dt": 0.004166666666666667, "voxel": 0.02, "iterations": 250, "tolerance": 1e-06, "basis": "S2", "project": false, "depth": 0.08, "friction": 0.7, "seconds": 0.8, "particles": 25392, "peak_penetration_m": 0.027925913333892827, "final_penetration_m": 0.025513422787189488, "creep_m_per_s": 0.0011351390888816432, "reached_floor": false, "force_over_weight_tail": 0.9312401147952514, "weight_N": 19.62, "impact_speed_m_s": 0.869006335735321, "t_contact_s": 0.17916666666666667, "t_peak_s": 0.25833333333333336, "settlement_over_voxel": 1.2756711393594744, "overlap": {"inside": 0, "max_depth_m": 0.0, "p90_depth_m": 0.0}, "heave_ring_m": -0.016771171695705675, "max_tilt_deg": 1.0129400867853846, "final_tilt_deg": 0.09825383932662908, "solves": null}
+[13:42:24] l_h15_dt240 -> DONE 23 s
+[13:42:27] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   2.4 %
+  pid    410 WindowServer                       1.4 %
+[13:42:27] gpu job l_h15_dt480 (estimate 38 s, timeout 600 s) -> logs/l_h15_dt480.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 41.19 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 38.96 ms  (cached)
+    {"probe": "bearing_fidelity", "mode": "lagged", "rest": false, "drop": 0.15, "fps": 480, "dt": 0.0020833333333333333, "voxel": 0.02, "iterations": 250, "tolerance": 1e-06, "basis": "S2", "project": false, "depth": 0.08, "friction": 0.7, "seconds": 0.8, "particles": 25392, "peak_penetration_m": 0.01936899602413178, "final_penetration_m": 0.01936899602413178, "creep_m_per_s": 0.00132279960732711, "reached_floor": false, "force_over_weight_tail": 0.9999840099558386, "weight_N": 19.62, "impact_speed_m_s": 0.6125993132591248, "t_contact_s": 0.18541666666666667, "t_peak_s": 0.8, "settlement_over_voxel": 0.968449801206589, "overlap": {"inside": 0, "max_depth_m": 0.0, "p90_depth_m": 0.0}, "heave_ring_m": -0.01754058278429864, "max_tilt_deg": 0.11017505674052165, "final_tilt_deg": 0.11017505674052165, "solves": null}
+[13:43:00] l_h15_dt480 -> DONE 33 s
+[13:43:03] health: utilisation 99%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   2.3 %
+  pid    410 WindowServer                       1.4 %
+[13:43:03] gpu job l_h15_dt960 (estimate 57 s, timeout 600 s) -> logs/l_h15_dt960.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 41.03 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 40.95 ms  (cached)
+    {"probe": "bearing_fidelity", "mode": "lagged", "rest": false, "drop": 0.15, "fps": 960, "dt": 0.0010416666666666667, "voxel": 0.02, "iterations": 250, "tolerance": 1e-06, "basis": "S2", "project": false, "depth": 0.08, "friction": 0.7, "seconds": 0.8, "particles": 25392, "peak_penetration_m": 0.017505136430263524, "final_penetration_m": 0.017505136430263524, "creep_m_per_s": 0.0004076957702636719, "reached_floor": false, "force_over_weight_tail": 0.9999987802483147, "weight_N": 19.62, "impact_speed_m_s": 0.6811727285385132, "t_contact_s": 0.18645833333333334, "t_peak_s": 0.8, "settlement_over_voxel": 0.8752568215131762, "overlap": {"inside": 0, "max_depth_m": 0.0, "p90_depth_m": 0.0}, "heave_ring_m": -0.017223332364167745, "max_tilt_deg": 0.003728600381956038, "final_tilt_deg": 0.003728600381956038, "solves": null}
+[13:44:01] l_h15_dt960 -> DONE 58 s
+[13:44:04] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[13:44:04] gpu job l_h05_dt120 (estimate 25 s, timeout 600 s) -> logs/l_h05_dt120.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 40.84 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 38.89 ms  (cached)
+    {"probe": "bearing_fidelity", "mode": "lagged", "rest": false, "drop": 0.05, "fps": 120, "dt": 0.008333333333333333, "voxel": 0.02, "iterations": 250, "tolerance": 1e-06, "basis": "S2", "project": false, "depth": 0.08, "friction": 0.7, "seconds": 0.8, "particles": 25392, "peak_penetration_m": 0.01524149358272553, "final_penetration_m": 0.015217979550361638, "creep_m_per_s": -6.0937906566419105e-05, "reached_floor": false, "force_over_weight_tail": 1.0025268762726545, "weight_N": 19.62, "impact_speed_m_s": 0.17571552097797394, "t_contact_s": 0.11666666666666667, "t_peak_s": 0.7916666666666666, "settlement_over_voxel": 0.7608989775180819, "overlap": {"inside": 0, "max_depth_m": 0.0, "p90_depth_m": 0.0}, "heave_ring_m": -0.01715212741560901, "max_tilt_deg": 0.013492870590054872, "final_tilt_deg": 0.0027595888607236433, "solves": null}
+[13:44:22] l_h05_dt120 -> DONE 18 s
+[13:44:25] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[13:44:25] gpu job l_h05_dt240 (estimate 29 s, timeout 600 s) -> logs/l_h05_dt240.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 41.61 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 39.96 ms  (cached)
+    {"probe": "bearing_fidelity", "mode": "lagged", "rest": false, "drop": 0.05, "fps": 240, "dt": 0.004166666666666667, "voxel": 0.02, "iterations": 250, "tolerance": 1e-06, "basis": "S2", "project": false, "depth": 0.08, "friction": 0.7, "seconds": 0.8, "particles": 25392, "peak_penetration_m": 0.011312146782875065, "final_penetration_m": 0.011312146782875065, "creep_m_per_s": 0.00033927591223465765, "reached_floor": false, "force_over_weight_tail": 0.9999857746759302, "weight_N": 19.62, "impact_speed_m_s": 0.31509876251220703, "t_contact_s": 0.12083333333333333, "t_peak_s": 0.8, "settlement_over_voxel": 0.5656073391437533, "overlap": {"inside": 0, "max_depth_m": 0.0, "p90_depth_m": 0.0}, "heave_ring_m": -0.017230250978870182, "max_tilt_deg": 0.004170750764043603, "final_tilt_deg": 0.004159841750212158, "solves": null}
+[13:44:48] l_h05_dt240 -> DONE 23 s
+[13:44:51] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[13:44:51] gpu job l_h05_dt480 (estimate 38 s, timeout 600 s) -> logs/l_h05_dt480.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 41.67 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 39.41 ms  (cached)
+    {"probe": "bearing_fidelity", "mode": "lagged", "rest": false, "drop": 0.05, "fps": 480, "dt": 0.0020833333333333333, "voxel": 0.02, "iterations": 250, "tolerance": 1e-06, "basis": "S2", "project": false, "depth": 0.08, "friction": 0.7, "seconds": 0.8, "particles": 25392, "peak_penetration_m": 0.009175476729869847, "final_penetration_m": 0.009175476729869847, "creep_m_per_s": 0.00011542910023739463, "reached_floor": false, "force_over_weight_tail": 0.9999916116252974, "weight_N": 19.62, "impact_speed_m_s": 0.4198949933052063, "t_contact_s": 0.13125, "t_peak_s": 0.8, "settlement_over_voxel": 0.45877383649349235, "overlap": {"inside": 0, "max_depth_m": 0.0, "p90_depth_m": 0.0}, "heave_ring_m": -0.01712495831744884, "max_tilt_deg": 0.008914822253118966, "final_tilt_deg": 0.008497473274370008, "solves": null}
+[13:45:24] l_h05_dt480 -> DONE 33 s
+[13:45:27] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   3.0 %
+  pid    410 WindowServer                       1.7 %
+[13:45:27] gpu job l_h05_dt960 (estimate 57 s, timeout 600 s) -> logs/l_h05_dt960.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 41.87 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 39.22 ms  (cached)
+    {"probe": "bearing_fidelity", "mode": "lagged", "rest": false, "drop": 0.05, "fps": 960, "dt": 0.0010416666666666667, "voxel": 0.02, "iterations": 250, "tolerance": 1e-06, "basis": "S2", "project": false, "depth": 0.08, "friction": 0.7, "seconds": 0.8, "particles": 25392, "peak_penetration_m": 0.008523238003253941, "final_penetration_m": 0.008523238003253941, "creep_m_per_s": 4.291534423828125e-05, "reached_floor": false, "force_over_weight_tail": 0.9999997486058092, "weight_N": 19.62, "impact_speed_m_s": 0.43292078375816345, "t_contact_s": 0.134375, "t_peak_s": 0.8, "settlement_over_voxel": 0.42616190016269706, "overlap": {"inside": 0, "max_depth_m": 0.0, "p90_depth_m": 0.0}, "heave_ring_m": -0.016849084168450157, "max_tilt_deg": 0.0007077675388848643, "final_tilt_deg": 0.0006471328276875792, "solves": null}
+[13:46:25] l_h05_dt960 -> DONE 58 s
+[13:46:28] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[13:46:28] gpu job l_v01_dt240 (estimate 51 s, timeout 600 s) -> logs/l_v01_dt240.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 41.20 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 38.78 ms  (cached)
+    {"probe": "bearing_fidelity", "mode": "lagged", "rest": false, "drop": 0.15, "fps": 240, "dt": 0.004166666666666667, "voxel": 0.01, "iterations": 250, "tolerance": 1e-06, "basis": "S2", "project": false, "depth": 0.08, "friction": 0.7, "seconds": 0.8, "particles": 198744, "peak_penetration_m": 0.025682126283645634, "final_penetration_m": 0.025657755434513096, "creep_m_per_s": 0.00014290997856541683, "reached_floor": false, "force_over_weight_tail": 1.0003922970795545, "weight_N": 19.62, "impact_speed_m_s": 1.6758770942687988, "t_contact_s": 0.175, "t_peak_s": 0.7958333333333333, "settlement_over_voxel": 2.5657755434513096, "overlap": {"inside": 714, "max_depth_m": 0.001963520122219918, "p90_depth_m": 0.001199942951453862}, "heave_ring_m": -0.015190732769954668, "max_tilt_deg": 0.013554934093045716, "final_tilt_deg": 0.013554934093045716, "solves": null}
+[13:47:11] l_v01_dt240 -> DONE 43 s
+[13:47:14] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[13:47:14] gpu job l_v01_dt960 (estimate 142 s, timeout 600 s) -> logs/l_v01_dt960.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 41.89 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 39.47 ms  (cached)
+    {"probe": "bearing_fidelity", "mode": "lagged", "rest": false, "drop": 0.15, "fps": 960, "dt": 0.0010416666666666667, "voxel": 0.01, "iterations": 250, "tolerance": 1e-06, "basis": "S2", "project": false, "depth": 0.08, "friction": 0.7, "seconds": 0.8, "particles": 198744, "peak_penetration_m": 0.023314488232135777, "final_penetration_m": 0.022558410763740544, "creep_m_per_s": 6.250306671740961e-05, "reached_floor": false, "force_over_weight_tail": 1.0000306381998656, "weight_N": 19.62, "impact_speed_m_s": 0.38825252652168274, "t_contact_s": 0.18229166666666666, "t_peak_s": 0.23958333333333334, "settlement_over_voxel": 2.2558410763740544, "overlap": {"inside": 0, "max_depth_m": 0.0, "p90_depth_m": 0.0}, "heave_ring_m": -0.015853676211375456, "max_tilt_deg": 0.017647122959576822, "final_tilt_deg": 0.012665484566113897, "solves": null}
+[13:49:18] l_v01_dt960 -> DONE 124 s
+[13:49:21] health: utilisation 100%
+GPU (ioreg): device utilization 31 %; per-process GPU time over 1.9 s:
+  pid    914 mediaanalysisd                     2.5 %
+  pid   1291 Google Chrome He                   2.5 %
+  pid    410 WindowServer                       1.3 %
+[13:49:21] gpu job c1 (estimate 148 s, timeout 600 s) -> logs/c1.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 42.76 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 40.33 ms  (cached)
+    {"probe": "tilt_box", "friction": 0.4, "atan_mu_deg": 21.80140948635181, "voxel": 0.005, "depth": 0.05, "depth_cells": 10.0, "on_node": false, "offset": [0.0025, 0.0025], "rate_deg_s": 2.0, "iterations": 250, "tolerance": 1e-06, "theta0": 20.3, "theta_max": 20.3, "mode": "creep", "fixed_tilt": 20.3, "floor": "plane", "side_friction": 0.0, "side_walls": true, "width": 0.04, "log_iterations": false, "error": "nonfinite", "step": 740, "t": 6.166666666666667, "theta": 20.3, "particles": 134664, "failed": false, "theta_fail_deg": null, "theta_creep_deg": null, "hold_seconds_before_nan": 4.851666666666667, "where": {"n_bad": 41526, "n_total": 134664, "bbox_min": [-0.1534462422132492, -0.024707375094294548, -0.00895609986037016], "bbox_max": [-0.06043578311800957, 0.029426831752061844, 0.049984484910964966], "frac_near_end_wall": 0.04589895487164668, "frac_near_side_wall": 0.2768867697346241, "frac_near_floor": 0.16998988585464528, "frac_near_wall_edge": 0.011559023262534315, "frac_near_floor_edge": 0.06328565236237538, "frac_below_floor": 0.05324375090304869, "min_z": -0.00895609986037016, "min_dist_end_wall": 2.318620681840411e-07, "min_dist_side_wall": 7.944554090491551e-07, "speed_bad_prev_max": 15.808484077453613, "speed_all_prev_max": 100000.0, "fastest_prev_position": [287.7715759277344, 728.7953491210938, 283.9234924316406]}, "solves": null}
+[13:50:44] c1 -> FINDING non-finite, localised in c1.json
+[13:50:47] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[13:50:47] gpu job c2 (estimate 148 s, timeout 600 s) -> logs/c2.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 41.75 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 39.23 ms  (cached)
+    {"probe": "tilt_box", "friction": 0.4, "atan_mu_deg": 21.80140948635181, "voxel": 0.005, "depth": 0.05, "depth_cells": 10.0, "on_node": false, "offset": [0.0025, 0.0025], "rate_deg_s": 2.0, "iterations": 250, "tolerance": 1e-06, "theta0": 20.3, "theta_max": 20.3, "mode": "creep", "fixed_tilt": 20.3, "floor": "box", "side_friction": 0.0, "side_walls": true, "width": 0.04, "log_iterations": false, "particles": 134664, "failed": false, "theta_fail_deg": null, "theta_creep_deg": null, "theta_hold_deg": 20.3, "theta_stop_deg": 18.996937942797654, "surface_angle_box_deg": 1.303062057202346, "surface_columns": 81, "max_speed_end": 31.912256240844727, "surface_speed_p90_end": 0.00129548623226583, "at_rest": false, "pre_failure_surface_speed_max": 0.01023036241531372, "fast_particles": {"n_bad": 121, "n_total": 134664, "bbox_min": [-0.06711550801992416, -0.1719714254140854, -66.2851791381836], "bbox_max": [24.517549514770508, 0.13218733668327332, 0.010536054149270058], "frac_near_end_wall": 0.008264462809917356, "frac_near_side_wall": 0.5041322314049587, "frac_near_floor": 0.9917355371900827, "frac_near_wall_edge": 0.008264462809917356, "frac_near_floor_edge": 0.49586776859504134, "frac_below_floor": 0.9917355371900827, "min_z": -66.2851791381836, "min_dist_end_wall": 0.0004601216316223178, "min_dist_side_wall": 1.1804550886153342e-05, "speed_bad_prev_max": 31.912256240844727, "speed_all_prev_max": 31.912256240844727, "fastest_prev_position": [24.517549514770508, -0.017007138580083847, -66.2851791381836]}, "solves": null, "seconds": 9.325}
+[13:52:46] c2 -> DONE 119 s
+[13:52:49] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   1.5 %
+[13:52:49] gpu job c3 (estimate 148 s, timeout 600 s) -> logs/c3.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 41.91 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 38.87 ms  (cached)
+    {"probe": "tilt_box", "friction": 0.4, "atan_mu_deg": 21.80140948635181, "voxel": 0.005, "depth": 0.05, "depth_cells": 10.0, "on_node": false, "offset": [0.0025, 0.0025], "rate_deg_s": 2.0, "iterations": 250, "tolerance": 1e-06, "theta0": 20.3, "theta_max": 20.3, "mode": "creep", "fixed_tilt": 20.3, "floor": "plane", "side_friction": 1.0, "side_walls": true, "width": 0.04, "log_iterations": false, "particles": 134664, "failed": false, "theta_fail_deg": null, "theta_creep_deg": null, "theta_hold_deg": 20.3, "theta_stop_deg": 20.246798873311505, "surface_angle_box_deg": 0.053201126688496476, "surface_columns": 81, "max_speed_end": 0.0005613953690044582, "surface_speed_p90_end": 0.00016496420721523464, "at_rest": true, "pre_failure_surface_speed_max": 0.001574938534758985, "fast_particles": {"n_bad": 0}, "solves": null, "seconds": 9.325}
+[13:54:47] c3 -> DONE 118 s
+[13:54:50] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[13:54:50] gpu job c4 (estimate 299 s, timeout 897 s) -> logs/c4.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 41.91 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 38.65 ms  (cached)
+    {"probe": "tilt_box", "friction": 0.4, "atan_mu_deg": 21.80140948635181, "voxel": 0.005, "depth": 0.05, "depth_cells": 10.0, "on_node": false, "offset": [0.0025, 0.0025], "rate_deg_s": 2.0, "iterations": 250, "tolerance": 1e-06, "theta0": 20.3, "theta_max": 20.3, "mode": "creep", "fixed_tilt": 20.3, "floor": "plane", "side_friction": 0.0, "side_walls": false, "width": 0.1, "log_iterations": false, "particles": 336660, "failed": false, "theta_fail_deg": null, "theta_creep_deg": null, "theta_hold_deg": 20.3, "theta_stop_deg": 18.374463632074054, "surface_angle_box_deg": 1.925536367925946, "surface_columns": 81, "max_speed_end": 0.1623329371213913, "surface_speed_p90_end": 0.0013598036020994186, "at_rest": false, "pre_failure_surface_speed_max": 0.15802009403705597, "fast_particles": {"n_bad": 1, "n_total": 336660, "bbox_min": [0.16568884253501892, -0.037069953978061676, -0.002331275027245283], "bbox_max": [0.16568884253501892, -0.037069953978061676, -0.002331275027245283], "frac_near_end_wall": 0.0, "frac_near_side_wall": 0.0, "frac_near_floor": 1.0, "frac_near_wall_edge": 0.0, "frac_near_floor_edge": 0.0, "frac_below_floor": 1.0, "min_z": -0.002331275027245283, "min_dist_end_wall": 0.013188842535018924, "min_dist_side_wall": 0.010430046021938325, "speed_bad_prev_max": 0.1623329371213913, "speed_all_prev_max": 0.1623329371213913, "fastest_prev_position": [0.16568884253501892, -0.037069953978061676, -0.002331275027245283]}, "solves": null, "seconds": 9.325}
+[13:59:15] c4 -> DONE 265 s
+[13:59:18] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[13:59:18] gpu job c5 (estimate 212 s, timeout 636 s) -> logs/c5.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 41.60 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 39.05 ms  (cached)
+    {"probe": "tilt_box", "friction": 0.4, "atan_mu_deg": 21.80140948635181, "voxel": 0.005, "depth": 0.05, "depth_cells": 10.0, "on_node": false, "offset": [0.0025, 0.0025], "rate_deg_s": 2.0, "iterations": 250, "tolerance": 1e-06, "theta0": 20.3, "theta_max": 20.3, "mode": "creep", "fixed_tilt": 20.3, "floor": "plane", "side_friction": 0.0, "side_walls": true, "width": 0.04, "log_iterations": true, "error": "nonfinite", "step": 740, "t": 6.166666666666667, "theta": 20.3, "particles": 134664, "failed": false, "theta_fail_deg": null, "theta_creep_deg": null, "hold_seconds_before_nan": 4.851666666666667, "where": {"n_bad": 41526, "n_total": 134664, "bbox_min": [-0.1534462422132492, -0.024707375094294548, -0.00895609986037016], "bbox_max": [-0.06043578311800957, 0.029426831752061844, 0.049984484910964966], "frac_near_end_wall": 0.04589895487164668, "frac_near_side_wall": 0.2768867697346241, "frac_near_floor": 0.16998988585464528, "frac_near_wall_edge": 0.011559023262534315, "frac_near_floor_edge": 0.06328565236237538, "frac_below_floor": 0.05324375090304869, "min_z": -0.00895609986037016, "min_dist_end_wall": 2.318620681840411e-07, "min_dist_side_wall": 7.944554090491551e-07, "speed_bad_prev_max": 15.808484077453613, "speed_all_prev_max": 100000.0, "fastest_prev_position": [287.7715759277344, 728.7953491210938, 283.9234924316406]}, "solves": {"solves": 741, "cap": 250, "frac_at_cap": 1.0, "iterations_pct_10_50_90_100": [250.0, 250.0, 250.0, 250.0], "res_l2_pct_10_50_90_100": [1.7582340115041005e-05, 2.347225836274447e-05, 4.0499238093616444e-05, 114.6060791015625], "res_linf_pct_10_50_90_100": [0.0004301783621379649, 0.0006322725864197862, 0.0016210492098397544, 30594.894214558088]}}
+[14:00:56] c5 -> FINDING non-finite, localised in c5.json
+[14:00:59] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   3.0 %
+[14:00:59] gpu job t1 (estimate 308 s, timeout 924 s) -> logs/t1.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 41.73 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 38.33 ms  (cached)
+    {"probe": "tilt_box", "friction": 0.68, "atan_mu_deg": 34.21570213243741, "voxel": 0.005, "depth": 0.05, "depth_cells": 10.0, "on_node": false, "offset": [0.0025, 0.0025], "rate_deg_s": 2.0, "iterations": 250, "tolerance": 1e-06, "theta0": 22.215702132437407, "theta_max": 40.21570213243741, "mode": "runaway", "fixed_tilt": null, "floor": "plane", "side_friction": 0.0, "side_walls": true, "width": 0.04, "log_iterations": true, "error": "nonfinite", "step": 1328, "t": 11.066666666666666, "theta": 37.877465252527, "particles": 134664, "failed": true, "theta_fail_deg": 36.877465252527, "theta_creep_deg": 33.177465252527, "hold_seconds_before_nan": 1.8249999999999993, "where": {"n_bad": 4, "n_total": 134664, "bbox_min": [0.11566105484962463, -0.033557742834091187, -0.0013130012666806579], "bbox_max": [0.7243486046791077, 0.0184197798371315, 0.01943623460829258], "frac_near_end_wall": 0.0, "frac_near_side_wall": 0.25, "frac_near_floor": 0.25, "frac_near_wall_edge": 0.0, "frac_near_floor_edge": 0.0, "frac_below_floor": 0.25, "min_z": -0.0013130012666806579, "min_dist_end_wall": 0.021259542703628537, "min_dist_side_wall": 0.004080220162868499, "speed_bad_prev_max": 0.00014775260933674872, "speed_all_prev_max": 0.4493905007839203, "fastest_prev_position": [0.10711293667554855, 0.02297964319586754, -0.0015046321786940098]}, "solves": {"solves": 1329, "cap": 250, "frac_at_cap": 1.0, "iterations_pct_10_50_90_100": [250.0, 250.0, 250.0, 250.0], "res_l2_pct_10_50_90_100": [1.204508016598993e-05, 2.296597267559264e-05, 3.724480848177336e-05, 3557.689208984375], "res_linf_pct_10_50_90_100": [0.0004157855373306083, 0.0008110547669839403, 0.001700587002030234, 455114.99353899556]}}
+[14:03:43] t1 -> FINDING non-finite, localised in t1.json
+[14:03:46] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   3.3 %
+[14:03:46] gpu job t2 (estimate 217 s, timeout 651 s) -> logs/t2.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 41.41 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 38.62 ms  (cached)
+    {"probe": "tilt_box", "friction": 0.9, "atan_mu_deg": 41.987212495816664, "voxel": 0.005, "depth": 0.05, "depth_cells": 10.0, "on_node": false, "offset": [0.0025, 0.0025], "rate_deg_s": 2.0, "iterations": 250, "tolerance": 1e-06, "theta0": 29.987212495816664, "theta_max": 47.987212495816664, "mode": "runaway", "fixed_tilt": null, "floor": "plane", "side_friction": 0.0, "side_walls": true, "width": 0.04, "log_iterations": false, "error": "nonfinite", "step": 1505, "t": 12.541666666666666, "theta": 46.67182457956834, "particles": 134664, "failed": true, "theta_fail_deg": 45.67182457956833, "theta_creep_deg": 41.221824579568334, "hold_seconds_before_nan": 2.3999999999999986, "where": {"n_bad": 4868, "n_total": 134664, "bbox_min": [-0.14615671336650848, -0.017474427819252014, -0.0008479834068566561], "bbox_max": [-0.10642930120229721, 0.02254379913210869, 0.019243597984313965], "frac_near_end_wall": 0.03779786359901397, "frac_near_side_wall": 0.23233360723089563, "frac_near_floor": 0.32641741988496303, "frac_near_wall_edge": 0.00924404272801972, "frac_near_floor_edge": 0.12017255546425637, "frac_below_floor": 0.014790468364831553, "min_z": -0.0008479834068566561, "min_dist_end_wall": 0.0013432866334915083, "min_dist_side_wall": 2.421535551547921e-05, "speed_bad_prev_max": 0.0016946620307862759, "speed_all_prev_max": 3.438573122024536, "fastest_prev_position": [0.01331227459013462, -0.006376451812684536, 0.054708436131477356]}, "solves": null}
+[14:06:20] t2 -> FINDING non-finite, localised in t2.json
+[14:06:22] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   2.9 %
+[14:06:22] gpu job t3 (estimate 255 s, timeout 765 s) -> logs/t3.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 42.25 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 39.33 ms  (cached)
+    {"probe": "tilt_box", "friction": 0.68, "atan_mu_deg": 34.21570213243741, "voxel": 0.005, "depth": 0.05, "depth_cells": 10.0, "on_node": false, "offset": [0.0025, 0.0025], "rate_deg_s": 2.0, "iterations": 1000, "tolerance": 1e-06, "theta0": 30.2, "theta_max": 30.2, "mode": "creep", "fixed_tilt": 30.2, "floor": "plane", "side_friction": 0.0, "side_walls": true, "width": 0.04, "log_iterations": false, "particles": 134664, "failed": false, "theta_fail_deg": null, "theta_creep_deg": null, "theta_hold_deg": 30.2, "theta_stop_deg": 30.173759361367104, "surface_angle_box_deg": 0.026240638632894726, "surface_columns": 81, "max_speed_end": 0.0005919545656070113, "surface_speed_p90_end": 7.421439659083262e-05, "at_rest": true, "pre_failure_surface_speed_max": 0.0018333418993279338, "fast_particles": {"n_bad": 0}, "solves": null, "seconds": 4.825}
+[14:09:21] t3 -> DONE 179 s
+[14:09:24] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   1.6 %
+[14:09:24] gpu job t3b (estimate 86 s, timeout 600 s) -> logs/t3b.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 41.57 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 38.84 ms  (cached)
+    {"probe": "tilt_box", "friction": 0.68, "atan_mu_deg": 34.21570213243741, "voxel": 0.005, "depth": 0.05, "depth_cells": 10.0, "on_node": false, "offset": [0.0025, 0.0025], "rate_deg_s": 2.0, "iterations": 250, "tolerance": 1e-06, "theta0": 30.2, "theta_max": 30.2, "mode": "creep", "fixed_tilt": 30.2, "floor": "plane", "side_friction": 0.0, "side_walls": true, "width": 0.04, "log_iterations": false, "particles": 134664, "failed": false, "theta_fail_deg": null, "theta_creep_deg": null, "theta_hold_deg": 30.2, "theta_stop_deg": 29.937527700702613, "surface_angle_box_deg": 0.26247229929738636, "surface_columns": 81, "max_speed_end": 0.0027050157077610493, "surface_speed_p90_end": 0.0005521097336895764, "at_rest": true, "pre_failure_surface_speed_max": 0.006006986368447542, "fast_particles": {"n_bad": 0}, "solves": null, "seconds": 4.825}
+[14:10:33] t3b -> DONE 69 s
+[14:10:36] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[14:10:36] gpu job r250 (estimate 63 s, timeout 600 s) -> logs/r250.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 41.28 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 38.59 ms  (cached)
+    {"probe": "bearing_fidelity", "mode": "lagged", "rest": true, "drop": 0.15, "fps": 120, "dt": 0.008333333333333333, "voxel": 0.01, "iterations": 250, "tolerance": 1e-06, "basis": "S2", "project": false, "depth": 0.08, "friction": 0.7, "seconds": 1.5, "particles": 198744, "peak_penetration_m": 0.004482512474060063, "final_penetration_m": 0.004482512474060063, "creep_m_per_s": 0.0004136732646397182, "reached_floor": false, "force_over_weight_tail": 0.9999801327032118, "weight_N": 19.62, "impact_speed_m_s": 0.08175000548362732, "t_contact_s": 0.016666666666666666, "t_peak_s": 1.5, "settlement_over_voxel": 0.4482512474060063, "overlap": {"inside": 0, "max_depth_m": 0.0, "p90_depth_m": 0.0}, "heave_ring_m": -0.01431711871033678, "max_tilt_deg": 0.0005242177140552583, "final_tilt_deg": 0.00047673530857786985, "solves": {"solves": 180, "cap": 250, "frac_at_cap": 1.0, "iterations_pct_10_50_90_100": [250.0, 250.0, 250.0, 250.0], "res_l2_pct_10_50_90_100": [3.713764863277902e-06, 4.228355010127416e-06, 2.737934664764907e-05, 0.0002016935177380219], "res_linf_pct_10_50_90_100": [0.00015250004621687277, 0.0001754055969660311, 0.0010783055685548743, 0.006130149368532442]}}
+[14:11:34] r250 -> DONE 58 s
+[14:11:37] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
+[14:11:37] gpu job r1000 (estimate 122 s, timeout 600 s) -> logs/r1000.log
+    Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 047d554 load on device 'metal:0' took 41.95 ms  (cached)
+    Module map_mul 72aef11 load on device 'metal:0' took 39.11 ms  (cached)
+    {"probe": "bearing_fidelity", "mode": "lagged", "rest": true, "drop": 0.15, "fps": 120, "dt": 0.008333333333333333, "voxel": 0.01, "iterations": 1000, "tolerance": 1e-06, "basis": "S2", "project": false, "depth": 0.08, "friction": 0.7, "seconds": 1.5, "particles": 198744, "peak_penetration_m": 0.003102590441703801, "final_penetration_m": 0.0029476928710937544, "creep_m_per_s": 0.00043201446533203125, "reached_floor": false, "force_over_weight_tail": 1.0000216149435888, "weight_N": 19.62, "impact_speed_m_s": 0.08175000548362732, "t_contact_s": 0.016666666666666666, "t_peak_s": 0.38333333333333336, "settlement_over_voxel": 0.29476928710937544, "overlap": {"inside": 0, "max_depth_m": 0.0, "p90_depth_m": 0.0}, "heave_ring_m": -0.013872787367839076, "max_tilt_deg": 0.0008063000526382593, "final_tilt_deg": 0.0005600071798534572, "solves": null}
+[14:13:10] r1000 -> DONE 93 s
+[14:13:13] health: utilisation 0%
+GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
+  pid   1291 Google Chrome He                   1.7 %
+[14:13:13] GPU -> DONE 
+[14:13:13] EVALUATE -> DONE 
+* **Repeat check.** The 1.5 s box drop at dt 1/480 (l_slip) repeats batch 01's a4_dt480 within 0.1 mm at every step (bitwise reported separately): the probe changes add only reads.
+* **S sphere (8.6).** S-bed: walls reduce the final depth by >= 15 mm, and the unwalled ball-free control subsides >= 10 mm at the centre within 0.2 s. S-res: depth / Uehara falls >= 30 % from 10 to 20 cells, in both 20-cell variants. S-coupling: kinematic F(16 mm) >= 13 N while the walled free drop still overshoots Uehara by >= 1.5x; F(16 mm) <= 7 N means the bed itself is weak. Steel (7,800 kg/m^3): Uehara predicts 1.77x the 2,500 kg/m^3 depth; a sim ratio outside 1.77 +- 0.35 points at the coupling.
+* **L lag (8.7).** Impact-phase peak (within 0.3 s after free-fall contact t_c = sqrt(2h/g)) = d0 + k dt at each drop height, with k within +-30 % of v = sqrt(2gh) (1.72 and 0.99 m/s), so k(0.05)/k(0.15) = 0.58 +- 0.2; d0 at voxel 0.02 in 10-25 mm; d0 at voxel 0.01 = d0(0.02) + 5 +- 3 mm. Against: k independent of v.
+* **C mu 0.4 ladder (8.3).** H-edge: C1 (plane floor, frictionless side walls, fixed tilt 20.3 deg) goes non-finite within the 8 s hold; C2 (box floor) or C3 (rough side walls) stays finite; C4 (no side walls) stays finite. H-solver: C1-C4 all non-finite. C5 = C1 with logged iterations.
+* **T tilt and iterations (8.1, 8.2).** Runaway (surface speed > 10 mm/s and rising for 0.5 s) within atan(mu) +- 1 deg and the deposit angle within 1 deg below it (mu 0.68, 0.9). >= 95 % of logged solves stop at the iteration cap. At a fixed tilt of atan(mu) - 4 deg (mu 0.68) the creep speed at 1000 iterations is <= half that at 250. Resting box at voxel 0.01, 1000 iterations: creep <= half of 250's 0.41 mm/s, settlement 0.45 +- 0.1 voxel.
+* S-bed: walls change the depth by -39.1 mm (unwalled 60.4 -> walled 21.3); unwalled control subsides 26.1 mm at 0.2 s, walled 0.1 mm -> supported.
+* Steel / glass-density depth ratio 1.79 (Uehara 1.77): consistent.
+* h 0.15 m: d0 16.6 mm, k 1.76 m/s vs v 1.72 m/s (within +-30 %).
+* h 0.05 m: d0 7.3 mm, k 0.94 m/s vs v 0.99 m/s (within +-30 %).
+* k(0.05)/k(0.15) = 0.53 (prediction 0.58 +- 0.2) -> H_lag supported.
+* Voxel 0.01: d0 22.5 mm, +5.9 mm vs voxel 0.02 (prediction +5 +- 3).
+* Repeat of batch 01 a4_dt480: max |diff| 0.000 mm (bitwise) -> PASS; late sink 5.7 mm, max box tilt 3.0 deg (a rotation).
+* Cause: H-edge (floor / side-wall junction).
+* Solves at the 250 cap: 1.00, 1.00, 1.00 (prediction >= 0.95) -> cap-bound.
+* Creep at atan(mu) - 4 deg: 250 iterations 0.77 mm/s, 1000 iterations 0.06 mm/s, ratio 12.34 (prediction >= 2: under-convergence) -> supported.
+* Resting box, voxel 0.01, 1000 iterations: settlement 2.9 mm (0.29 voxel), creep 0.43 vs 0.41 mm/s at 250 -> not halved.
