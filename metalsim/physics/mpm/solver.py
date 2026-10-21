@@ -24,7 +24,8 @@ def solver_kind() -> str:
     return "newton" if newton_is_152() else "vendored"
 
 
-VARIANTS = {"parity": None, "pr4660": "metalsim.physics.mpm.implicit_mpm_pr4660"}
+VARIANTS = {"parity": None, "pr4660": "metalsim.physics.mpm.implicit_mpm_pr4660",
+            "pr4660c": "metalsim.physics.mpm.implicit_mpm_pr4660c"}   # pr4660c: its collider hunks only (research)
 
 
 def solver_class(variant: str = "parity"):
