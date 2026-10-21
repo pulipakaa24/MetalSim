@@ -109,7 +109,8 @@ def nonfinite_report(q_prev, v_prev, bad, ox, oy, voxel, width=W):
 def run(friction=0.68, voxel=0.005, depth=0.05, rate=2.0, hold=4.0, fps=120, substeps=2, iterations=250,
         tolerance=1e-6, threshold=1e-3, window=0.25, sample_every=3, on_node=False, json_out=None,
         mode="creep", runaway_speed=0.01, runaway_window=0.5, theta_over=6.0, fixed_tilt=None, floor="plane",
-        side_friction=0.0, side_walls=True, width=W, log_iterations=False):
+        side_friction=0.0, side_walls=True, width=W, log_iterations=False, solver_variant="parity",
+        strain_basis="P0"):
     """``mode="creep"`` (batch 01): hold once the surface speed exceeds ``threshold`` for ``window`` s.
     ``mode="runaway"`` (batch 02a): tilt on to atan(mu) + ``theta_over``; failure = surface speed above
     ``runaway_speed`` and rising over ``runaway_window`` s; the creep threshold is still recorded (``theta_creep``).
@@ -125,7 +126,8 @@ def run(friction=0.68, voxel=0.005, depth=0.05, rate=2.0, hold=4.0, fps=120, sub
     model = mujoco.MjModel.from_xml_string(box_xml(1.0 / fps / substeps, ox, oy, floor, side_friction, side_walls,
                                                    width))
     sim = BatchSim(model, 1, options=BatchSimOptions(substeps=substeps))
-    cfg = MPMConfig(voxel_size=voxel, max_iterations=iterations, tolerance=tolerance, capture=not log_iterations)
+    cfg = MPMConfig(voxel_size=voxel, max_iterations=iterations, tolerance=tolerance, capture=not log_iterations,
+                    solver_variant=solver_variant, strain_basis=strain_basis)
     mpm = MPMCoupling(sim, cfg)
     mat = MPMMaterial(density=1500.0, friction=friction)
     mpm.add_emitter(GridEmitter(lower=(ox - 0.5 * L, oy - 0.5 * width, 0.0),
@@ -164,7 +166,8 @@ def run(friction=0.68, voxel=0.005, depth=0.05, rate=2.0, hold=4.0, fps=120, sub
             "depth_cells": depth / voxel, "on_node": on_node, "offset": [ox, oy], "rate_deg_s": rate,
             "iterations": iterations, "tolerance": tolerance, "theta0": theta0, "theta_max": theta_max, "mode": mode,
             "fixed_tilt": fixed_tilt, "floor": floor, "side_friction": side_friction, "side_walls": side_walls,
-            "width": width, "log_iterations": log_iterations}
+            "width": width, "log_iterations": log_iterations, "solver_variant": solver_variant,
+            "strain_basis": strain_basis}
 
     def history():
         return {"t": hist_t, "theta": hist_theta, "surface_speed_p90": hist_v, "iterations_mean": hist_it}
@@ -278,6 +281,8 @@ def main():
     ap.add_argument("--no-side-walls", action="store_true")
     ap.add_argument("--width", type=float, default=W)
     ap.add_argument("--log-iterations", action="store_true", help="uncaptured step, per-solve iterations logged")
+    ap.add_argument("--solver-variant", default="parity")
+    ap.add_argument("--strain-basis", default="P0")
     ap.add_argument("--json")
     a = ap.parse_args()
     import warp as wp
@@ -287,7 +292,8 @@ def main():
         r = run(a.friction, a.voxel, a.depth, a.rate, a.hold, iterations=a.iterations, tolerance=a.tolerance,
                 on_node=a.on_node, json_out=a.json, mode=a.mode, theta_over=a.theta_over, fixed_tilt=a.fixed_tilt,
                 floor=a.floor, side_friction=a.side_friction, side_walls=not a.no_side_walls, width=a.width,
-                log_iterations=a.log_iterations)
+                log_iterations=a.log_iterations, solver_variant=a.solver_variant,
+                strain_basis=a.strain_basis)
     print(json.dumps({k: v for k, v in r.items() if k != "history"}))
     if a.json:
         json.dump(r, open(a.json, "w"), indent=1)
