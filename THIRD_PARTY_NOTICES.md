@@ -125,6 +125,10 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
   (research variant `"pr4660c"`) is generated the same way from the PR's collider hunks alone
   (`patches/newton/pr4660-1de47831-collider-only.diff`), same terms. `tests/test_mpm_variant_pr4660.py` is the
   PR's own test file (Apache-2.0, header kept, modification notice added) run against the variant.
+  `metalsim/physics/mpm/implicit_mpm_pr4660mc/` and `implicit_mpm_pr4660mn/` (variants `"pr4660mc"` /
+  `"pr4660mn"`, selected by `MPMConfig(fidelity="physical")` or `yield_surface=...`) are `pr4660` plus MetalSim's own
+  modification `patches/metalsim/lode-yield-surface.diff` (a Lode-dependent yield surface), generated and checked the
+  same way; same terms (the directories, including MetalSim's modification, are offered under Apache-2.0).
 
 ### NVIDIA PhysX
 
