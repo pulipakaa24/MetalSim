@@ -9,8 +9,8 @@ import sys
 
 import numpy as np
 
-L4 = ["/Users/aditya/robosim/runs/parity/isaaclab3_mpm_floors/mpm_floors",
-      "/Users/aditya/robosim/runs/parity/isaaclab3_mpm_floors/mpm_floors2"]
+L4 = ["runs/parity/isaaclab3_mpm_floors/mpm_floors",
+      "runs/parity/isaaclab3_mpm_floors/mpm_floors2"]
 scene, nf = sys.argv[1], int(sys.argv[2])
 
 

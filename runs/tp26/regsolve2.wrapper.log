@@ -26,13 +26,13 @@ n=48: copy 0.296 ms | factor 1.939 ms | solve 0.521 ms (residual 9.3e-07) | fact
 [I1_installed] full env step 73.4 ms -> 55,795 env-steps/s
 [I1_installed] after random-action steps: nefc max 41 mean 14.3; nacon 11028 (2.69/world); overflow {'ITERATIONS': 23, 'LS_ITERATIONS': 3898}
 --- S1 solve only 04:17:34
-imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp/warp/__init__.py upstream/mujoco_warp-tp/mujoco_warp/__init__.py
 [S1_regsolve] N=4096 njmax 144 naconmax 98304 is_sparse False
 [S1_regsolve] physics only 47.9 ms/step -> 85,450 env-steps/s
 [S1_regsolve] full env step 69.8 ms -> 58,718 env-steps/s
 [S1_regsolve] after random-action steps: nefc max 45 mean 14.3; nacon 11239 (2.74/world); overflow {'ITERATIONS': 26, 'LS_ITERATIONS': 3862}
 --- B1 both 04:17:48
-imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp/warp/__init__.py upstream/mujoco_warp-tp/mujoco_warp/__init__.py
 [B1_both] N=4096 njmax 144 naconmax 98304 is_sparse False
 [B1_both] physics only 50.6 ms/step -> 80,891 env-steps/s
 [B1_both] full env step 72.8 ms -> 56,245 env-steps/s
@@ -43,13 +43,13 @@ imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/ad
 [I2_installed] full env step 73.5 ms -> 55,752 env-steps/s
 [I2_installed] after random-action steps: nefc max 38 mean 14.3; nacon 11086 (2.71/world); overflow {'ITERATIONS': 27, 'LS_ITERATIONS': 3884}
 --- S2 solve only 04:18:18
-imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp/warp/__init__.py upstream/mujoco_warp-tp/mujoco_warp/__init__.py
 [S2_regsolve] N=4096 njmax 144 naconmax 98304 is_sparse False
 [S2_regsolve] physics only 47.8 ms/step -> 85,675 env-steps/s
 [S2_regsolve] full env step 69.9 ms -> 58,587 env-steps/s
 [S2_regsolve] after random-action steps: nefc max 42 mean 14.5; nacon 11333 (2.77/world); overflow {'ITERATIONS': 32, 'LS_ITERATIONS': 3890}
 --- B2 both 04:18:32
-imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp/warp/__init__.py upstream/mujoco_warp-tp/mujoco_warp/__init__.py
 [B2_both] N=4096 njmax 144 naconmax 98304 is_sparse False
 [B2_both] physics only 50.5 ms/step -> 81,061 env-steps/s
 [B2_both] full env step 72.6 ms -> 56,412 env-steps/s

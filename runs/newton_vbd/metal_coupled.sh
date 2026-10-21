@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /Users/aditya/robosim
+cd .
 python3 scripts/gpu_lock.py status
 echo "=== coupled examples on metal:0 (Newton 1.5.2 + mujoco-warp 3.11.0; one eager frame before capture)"
 for E in multiphysics.example_mujoco_vbd_coupled_solver multiphysics.example_mujoco_vbd_admm_solver; do

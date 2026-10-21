@@ -1,11 +1,11 @@
-warp /Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/warp-i2/warp/__init__.py device_args False
+warp upstream/warp-i2/warp/__init__.py device_args False
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
    Devices:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/runs/a2/kc/panda_0/1.18.0.dev20260917
+     runs/a2/kc/panda_0/1.18.0.dev20260917
 Module mujoco_warp._src.smooth 63a8bbc load on device 'metal:0' took 1495.87 ms  (compiled)
 Module _nxn_broadphase__locals__kernel_6f7d1e38 6f7d1e3 load on device 'metal:0' took 504.79 ms  (compiled)
 Module ccd_kernel_builder__locals__ccd_kernel_87494a38 814237e load on device 'metal:0' took 2577.67 ms  (compiled)

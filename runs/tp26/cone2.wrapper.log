@@ -11,7 +11,7 @@ capacity replay 2: nefc max 54 (njmax 512), nacon max 2394 (naconmax 24576); ove
 === done
 --- check mode 3 vs mode 2 07:36:41
    t=0.004s 1.89e-07/4.3e-09  t=0.008s 3.37e-07/1.8e-08  t=0.016s 4.13e-07/3.0e-08  t=0.048s 4.99e-05/2.4e-06  t=0.100s 8.29e-05/1.9e-05  t=0.200s 7.66e-05/1.8e-05  t=0.400s 9.25e-05/2.0e-05
---- this configuration vs reference [go2 (default) JAC=None /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp] (graph replay)
+--- this configuration vs reference [go2 (default) JAC=None upstream/mujoco_warp-tp/mujoco_warp] (graph replay)
    step    1: qpos max 3.79e-07 median 0.0e+00 | qvel max 9.48e-05 | worlds with |dq| > 1e-3: 0.0 %
    step    2: qpos max 6.30e-07 median 0.0e+00 | qvel max 6.27e-05 | worlds with |dq| > 1e-3: 0.0 %
    step    4: qpos max 9.35e-07 median 0.0e+00 | qvel max 3.43e-05 | worlds with |dq| > 1e-3: 0.0 %
@@ -23,7 +23,7 @@ capacity replay 2: nefc max 54 (njmax 512), nacon max 2394 (naconmax 24576); ove
    reference MuJoCo C oracle: t=0.004s 1.89e-07/4.3e-09  t=0.008s 3.37e-07/1.8e-08  t=0.016s 4.13e-07/4.4e-08  t=0.048s 4.98e-05/2.4e-06  t=0.100s 8.29e-05/1.9e-05  t=0.200s 7.66e-05/1.8e-05  t=0.400s 9.21e-05/2.0e-05
 === done
 --- bench MJW_ELLIPTIC_CONE_UPDATE=0 07:36:47
-LABEL cone_upd_0 mjw=/Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py head=a1daf88 N=4096 env=MJW_ELLIPTIC_CONE_UPDATE=0 
+LABEL cone_upd_0 mjw=upstream/mujoco_warp-tp/mujoco_warp/__init__.py head=a1daf88 N=4096 env=MJW_ELLIPTIC_CONE_UPDATE=0 
 == g1task elliptic
 RESULT {"engine": "metalsim", "cone": 1, "robot": "g1task", "N": 4096, "mode": "matched", "nv": 43, "nu": 37, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 2605954, "substeps": 8, "preset": nu
 == go2 elliptic
@@ -33,7 +33,7 @@ RESULT {"engine": "metalsim", "cone": 1, "robot": "humanoid", "N": 4096, "mode":
 == so101 elliptic
 RESULT {"engine": "metalsim", "cone": 1, "robot": "so101", "N": 4096, "mode": "matched", "nv": 12, "nu": 6, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 868596, "substeps": 1, "preset": null,
 --- bench MJW_ELLIPTIC_CONE_UPDATE=1 07:37:36
-LABEL cone_upd_1 mjw=/Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py head=a1daf88 N=4096 env=MJW_ELLIPTIC_CONE_UPDATE=1 
+LABEL cone_upd_1 mjw=upstream/mujoco_warp-tp/mujoco_warp/__init__.py head=a1daf88 N=4096 env=MJW_ELLIPTIC_CONE_UPDATE=1 
 == g1task elliptic
 RESULT {"engine": "metalsim", "cone": 1, "robot": "g1task", "N": 4096, "mode": "matched", "nv": 43, "nu": 37, "iters": 10, "ls": 20, "build_s": 7.7, "steps_per_s": 2179718, "substeps": 8, "preset": nu
 == go2 elliptic
@@ -43,7 +43,7 @@ RESULT {"engine": "metalsim", "cone": 1, "robot": "humanoid", "N": 4096, "mode":
 == so101 elliptic
 RESULT {"engine": "metalsim", "cone": 1, "robot": "so101", "N": 4096, "mode": "matched", "nv": 12, "nu": 6, "iters": 10, "ls": 20, "build_s": 2.9, "steps_per_s": 774372, "substeps": 1, "preset": null,
 --- bench MJW_ELLIPTIC_CONE_UPDATE=0 07:38:36
-LABEL cone_upd_0 mjw=/Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py head=a1daf88 N=4096 env=MJW_ELLIPTIC_CONE_UPDATE=0 
+LABEL cone_upd_0 mjw=upstream/mujoco_warp-tp/mujoco_warp/__init__.py head=a1daf88 N=4096 env=MJW_ELLIPTIC_CONE_UPDATE=0 
 == g1task elliptic
 RESULT {"engine": "metalsim", "cone": 1, "robot": "g1task", "N": 4096, "mode": "matched", "nv": 43, "nu": 37, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 2607089, "substeps": 8, "preset": nu
 == go2 elliptic
@@ -53,7 +53,7 @@ RESULT {"engine": "metalsim", "cone": 1, "robot": "humanoid", "N": 4096, "mode":
 == so101 elliptic
 RESULT {"engine": "metalsim", "cone": 1, "robot": "so101", "N": 4096, "mode": "matched", "nv": 12, "nu": 6, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 866494, "substeps": 1, "preset": null,
 --- bench MJW_ELLIPTIC_CONE_UPDATE=1 07:39:22
-LABEL cone_upd_1 mjw=/Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py head=a1daf88 N=4096 env=MJW_ELLIPTIC_CONE_UPDATE=1 
+LABEL cone_upd_1 mjw=upstream/mujoco_warp-tp/mujoco_warp/__init__.py head=a1daf88 N=4096 env=MJW_ELLIPTIC_CONE_UPDATE=1 
 == g1task elliptic
 RESULT {"engine": "metalsim", "cone": 1, "robot": "g1task", "N": 4096, "mode": "matched", "nv": 43, "nu": 37, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 2180412, "substeps": 8, "preset": nu
 == go2 elliptic
@@ -63,7 +63,7 @@ RESULT {"engine": "metalsim", "cone": 1, "robot": "humanoid", "N": 4096, "mode":
 == so101 elliptic
 RESULT {"engine": "metalsim", "cone": 1, "robot": "so101", "N": 4096, "mode": "matched", "nv": 12, "nu": 6, "iters": 10, "ls": 20, "build_s": 1.7, "steps_per_s": 775107, "substeps": 1, "preset": null,
 --- g1 task ellip10 check, mode 2 (reference) 07:40:13
-imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp/warp/__init__.py upstream/mujoco_warp-tp/mujoco_warp/__init__.py
 === variant {'contact_cfg': 'tau10_impact_hardlimits_ellip10', 'label': 'ellip10 mode2'}; N=512, 50 control steps, deterministic actions
 njmax 144 naconmax 12288 sparse False
 --- floor: two graph-replay instances of this configuration
@@ -91,7 +91,7 @@ capacity eager: nefc max 35 (njmax 144), nacon max 1360 (naconmax 12288); overfl
    t=0.02s 4.08e-06/1.2e-08  t=0.04s 4.41e-06/2.4e-08  t=0.08s 1.56e-01/1.5e-02  t=0.24s 2.56e-01/4.9e-02  t=0.50s 2.37e-01/6.1e-02  t=1.00s 4.51e-01/1.2e-01
 === done
 --- g1 task ellip10 check, mode 3 vs mode 2 07:40:24
-imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp/warp/__init__.py upstream/mujoco_warp-tp/mujoco_warp/__init__.py
 === variant {'contact_cfg': 'tau10_impact_hardlimits_ellip10', 'label': 'ellip10 mode3'}; N=512, 50 control steps, deterministic actions
 njmax 144 naconmax 12288 sparse False
 --- floor: two graph-replay instances of this configuration

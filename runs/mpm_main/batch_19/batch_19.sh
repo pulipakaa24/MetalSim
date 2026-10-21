@@ -1,5 +1,5 @@
 #!/bin/bash
-# batch 19 (run outside the agent sandbox):  bash /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19/batch_19.sh
+# batch 19 (run outside the agent sandbox):  bash scratch/b19/batch_19.sh
 #
 # #29, G1 deterministic: close batch_18's gaps (research note section 7), then ship.
 #   The MuJoCo Warp fix copy (upstream/mjw-solvedone) now has two changes against pin 4d05cb7:
@@ -19,8 +19,8 @@
 # Time (gpu_history: b18 probe arms 0.2-0.8 min, det_cost 0.3 min, mm10_tests 4.7 min, G1 timing 0.6 min per run):
 #   P+T+V ~15 min, the M1_CONFIRMED path ~30 min more.  Resumable (scratch/b19/STATUS.txt).
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
-R=/Users/aditya/robosim
+W=.
+R=.
 S=$W/scratch/b19
 L=$S/logs
 O=$W/runs/mpm_main/batch_19

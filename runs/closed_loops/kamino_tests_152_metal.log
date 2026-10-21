@@ -13,7 +13,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 ..........................
 ----------------------------------------------------------------------
 Ran 26 tests in 0.050s
@@ -205,20 +205,20 @@ Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr
 Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
 Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
 Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
-../Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:562: UserWarning: Inertia validation corrected 2 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+..upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:562: UserWarning: Inertia validation corrected 2 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
   model_newton: Model = builder_newton.finalize(skip_validation_joints=True, device=self.default_device)
-./Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:655: UserWarning: Inertia validation corrected 3 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+.upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:655: UserWarning: Inertia validation corrected 3 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
   model_newton: Model = builder_newton.finalize(skip_validation_joints=True, device=self.default_device)
-./Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:776: UserWarning: Inertia validation corrected 3 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+.upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:776: UserWarning: Inertia validation corrected 3 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
   return builder_newton.finalize(skip_validation_joints=True, device=self.default_device)
-/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:776: UserWarning: Inertia validation corrected 3 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:776: UserWarning: Inertia validation corrected 3 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
   return builder_newton.finalize(skip_validation_joints=True, device=self.default_device)
 Module newton._src.solvers.kamino._src.kinematics.constraints 05ec3df load on device 'metal:0' took 370.82 ms  (compiled)
 Module newton._src.solvers.kamino._src.kinematics.jacobians 5626a5a load on device 'metal:0' took 1752.43 ms  (compiled)
 Module newton._src.solvers.kamino._src.kinematics.resets 91422ab load on device 'metal:0' took 653.02 ms  (compiled)
-../Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:960: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+..upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:960: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
   model_newton: Model = builder_newton.finalize(skip_validation_joints=True, device=self.default_device)
-./Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:701: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+.upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:701: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
   return builder_newton.finalize(skip_validation_joints=True, device=self.default_device)
 ......
 ----------------------------------------------------------------------
@@ -385,15 +385,15 @@ FAIL: test_05_box_on_box_simple (newton._src.solvers.kamino.tests.test_geometry_
 Tests unified pipeline output contacts for the case of two boxes
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_geometry_unified.py", line 473, in test_05_box_on_box_simple
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_geometry_unified.py", line 473, in test_05_box_on_box_simple
     test_unified_pipeline(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_geometry_unified.py", line 147, in test_unified_pipeline
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_geometry_unified.py", line 147, in test_unified_pipeline
     check_contacts(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_geometry_primitive.py", line 329, in check_contacts
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_geometry_primitive.py", line 329, in check_contacts
     np.testing.assert_allclose(
-  File "/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 1780, in assert_allclose
+  File ".venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 1780, in assert_allclose
     assert_array_compare(compare, actual, desired, err_msg=str(err_msg),
-  File "/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 988, in assert_array_compare
+  File ".venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 988, in assert_array_compare
     raise AssertionError(msg)
 AssertionError: 
 Not equal to tolerance rtol=0, atol=1e-05
@@ -530,7 +530,7 @@ FAIL: test_01_single_problem_dims_all_active (newton._src.solvers.kamino.tests.t
 Test the blocked LLT solver on a single small problem.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_factorize_llt_blocked.py", line 174, in test_01_single_problem_dims_all_active
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_factorize_llt_blocked.py", line 174, in test_01_single_problem_dims_all_active
     self.assertTrue(is_x_close)
 AssertionError: False is not true
 
@@ -539,7 +539,7 @@ FAIL: test_02_single_problem_dims_partially_active (newton._src.solvers.kamino.t
 Test the blocked LLT solver on a single small problem.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_factorize_llt_blocked.py", line 332, in test_02_single_problem_dims_partially_active
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_factorize_llt_blocked.py", line 332, in test_02_single_problem_dims_partially_active
     self.assertTrue(is_x_close)
 AssertionError: False is not true
 
@@ -548,7 +548,7 @@ FAIL: test_04_multiple_problems_dims_partially_active (newton._src.solvers.kamin
 Test the blocked LLT solver on multiple small problems.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_factorize_llt_blocked.py", line 666, in test_04_multiple_problems_dims_partially_active
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_factorize_llt_blocked.py", line 666, in test_04_multiple_problems_dims_partially_active
     self.assertTrue(is_x_close)
 AssertionError: False is not true
 
@@ -600,7 +600,7 @@ FAIL: test_01_single_problem_dims_all_active (newton._src.solvers.kamino.tests.t
 Test the blocked LLT solver on a single small problem.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked.py", line 174, in test_01_single_problem_dims_all_active
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked.py", line 174, in test_01_single_problem_dims_all_active
     self.assertTrue(is_x_close)
 AssertionError: False is not true
 
@@ -609,7 +609,7 @@ FAIL: test_02_single_problem_dims_partially_active (newton._src.solvers.kamino.t
 Test the blocked LLT solver on a single small problem.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked.py", line 313, in test_02_single_problem_dims_partially_active
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked.py", line 313, in test_02_single_problem_dims_partially_active
     self.assertTrue(is_x_close)
 AssertionError: False is not true
 
@@ -618,7 +618,7 @@ FAIL: test_04_multiple_problems_dims_partially_active (newton._src.solvers.kamin
 Test the blocked LLT solver on multiple small problems.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked.py", line 607, in test_04_multiple_problems_dims_partially_active
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked.py", line 607, in test_04_multiple_problems_dims_partially_active
     self.assertTrue(is_x_close)
 AssertionError: False is not true
 
@@ -655,24 +655,24 @@ ERROR: test_solve_with_fewer_threads_than_tile_rows (newton._src.solvers.kamino.
 Verify the solve gathers every right-hand-side row.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked_rcm.py", line 274, in test_solve_with_fewer_threads_than_tile_rows
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked_rcm.py", line 274, in test_solve_with_fewer_threads_than_tile_rows
     solver.compute(matrix_wp)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
     self._compute_impl(A=A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
     self._factorize(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
     self._factorize_impl(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked_rcm_solver.py", line 401, in _factorize_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked_rcm_solver.py", line 401, in _factorize_impl
     llt_blocked_rcm_factorize(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked_rcm.py", line 824, in llt_blocked_rcm_factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked_rcm.py", line 824, in llt_blocked_rcm_factorize
     wp.launch_tiled(
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+  File "upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
     return launch(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+  File "upstream/warp-innate/warp/_src/context.py", line 12339, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+  File "upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
     raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
 RuntimeError: Failed to launch kernel 'make_llt_blocked_rcm_factorize_kernel__locals__llt_blocked_rcm_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, tpo=array_t, A=array_t, tile_pattern=array_t, L=array_t)
 
@@ -681,7 +681,7 @@ FAIL: test_01_single_problem_dims_all_active (newton._src.solvers.kamino.tests.t
 Test the blocked LLT solver on a single small problem.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked_rcm.py", line 372, in test_01_single_problem_dims_all_active
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked_rcm.py", line 372, in test_01_single_problem_dims_all_active
     self.assertTrue(is_x_close)
 AssertionError: False is not true
 
@@ -690,7 +690,7 @@ FAIL: test_02_single_problem_dims_partially_active (newton._src.solvers.kamino.t
 Test the blocked LLT solver on a single small problem.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked_rcm.py", line 492, in test_02_single_problem_dims_partially_active
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked_rcm.py", line 492, in test_02_single_problem_dims_partially_active
     self.assertTrue(is_x_close)
 AssertionError: False is not true
 
@@ -699,7 +699,7 @@ FAIL: test_04_multiple_problems_dims_partially_active (newton._src.solvers.kamin
 Test the blocked LLT solver on multiple small problems.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked_rcm.py", line 744, in test_04_multiple_problems_dims_partially_active
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked_rcm.py", line 744, in test_04_multiple_problems_dims_partially_active
     self.assertTrue(is_x_close)
 AssertionError: False is not true
 
@@ -708,11 +708,11 @@ FAIL: test_cached_permutation_with_changed_sparsity (newton._src.solvers.kamino.
 Verify cached RCM remains correct when numeric sparsity changes.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked_rcm.py", line 167, in test_cached_permutation_with_changed_sparsity
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked_rcm.py", line 167, in test_cached_permutation_with_changed_sparsity
     np.testing.assert_allclose(result_wp.numpy(), expected, rtol=1.0e-3, atol=1.0e-4)
-  File "/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 1780, in assert_allclose
+  File ".venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 1780, in assert_allclose
     assert_array_compare(compare, actual, desired, err_msg=str(err_msg),
-  File "/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 988, in assert_array_compare
+  File ".venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 988, in assert_array_compare
     raise AssertionError(msg)
 AssertionError: 
 Not equal to tolerance rtol=0.001, atol=0.0001
@@ -734,11 +734,11 @@ FAIL: test_parallel_factorization_with_partial_tile (newton._src.solvers.kamino.
 Factorize and solve a system whose final tile is partial.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked_rcm.py", line 195, in test_parallel_factorization_with_partial_tile
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_linalg_solver_llt_blocked_rcm.py", line 195, in test_parallel_factorization_with_partial_tile
     np.testing.assert_allclose(result_wp.numpy(), expected, rtol=1.0e-4, atol=1.0e-5)
-  File "/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 1780, in assert_allclose
+  File ".venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 1780, in assert_allclose
     assert_array_compare(compare, actual, desired, err_msg=str(err_msg),
-  File "/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 988, in assert_array_compare
+  File ".venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 988, in assert_array_compare
     raise AssertionError(msg)
 AssertionError: 
 Not equal to tolerance rtol=0.0001, atol=1e-05
@@ -792,11 +792,11 @@ Ran 1 test in 0.001s
 
 OK
 MODULE test_linalg_utils_matrix: ran=1 fail=0 err=0 skip=0 (0 s)
-./Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/linalg/_linalg.py:2349: RuntimeWarning: divide by zero encountered in slogdet
+..venv-newton152/lib/python3.12/site-packages/numpy/linalg/_linalg.py:2349: RuntimeWarning: divide by zero encountered in slogdet
   sign, logdet = _umath_linalg.slogdet(a, signature=signature)
-/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/linalg/_linalg.py:2349: RuntimeWarning: overflow encountered in slogdet
+.venv-newton152/lib/python3.12/site-packages/numpy/linalg/_linalg.py:2349: RuntimeWarning: overflow encountered in slogdet
   sign, logdet = _umath_linalg.slogdet(a, signature=signature)
-/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/linalg/_linalg.py:2349: RuntimeWarning: invalid value encountered in slogdet
+.venv-newton152/lib/python3.12/site-packages/numpy/linalg/_linalg.py:2349: RuntimeWarning: invalid value encountered in slogdet
   sign, logdet = _umath_linalg.slogdet(a, signature=signature)
 ...................
 ----------------------------------------------------------------------
@@ -815,10 +815,10 @@ Ran 18 tests in 15.945s
 
 OK
 MODULE test_solver_kamino: ran=18 fail=0 err=0 skip=0 (16 s)
-/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solver_kamino_joint_frames.py:135: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solver_kamino_joint_frames.py:135: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
   model = builder.finalize()
 [38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:53,596][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
-./Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solver_kamino_joint_frames.py:71: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+.upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solver_kamino_joint_frames.py:71: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
   return builder.finalize()
 [38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:53,602][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
 .[38;5;13m[KAMINO][0m[33;20m[2026-09-26 00:00:53,609][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
@@ -912,30 +912,30 @@ E
 ERROR: test_01_dvi_solve_dense_dual_problem (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_01_dvi_solve_dense_dual_problem)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 540, in test_01_dvi_solve_dense_dual_problem
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 540, in test_01_dvi_solve_dense_dual_problem
     solver.solve(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
     self._solve_with_bilateral_direct_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
     self._factor_bilateral_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
     self._bilateral_solver.compute(A=operator.mat)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
     self._compute_impl(A=A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
     self._factorize(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
     self._factorize_impl(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
     factorize.llt_blocked_factorize(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
     wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+  File "upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
     return launch(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+  File "upstream/warp-innate/warp/_src/context.py", line 12339, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+  File "upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
     raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
 RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
 
@@ -943,42 +943,42 @@ RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals
 ERROR: test_02_public_solver_step_with_dvi (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_02_public_solver_step_with_dvi)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 607, in test_02_public_solver_step_with_dvi
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 607, in test_02_public_solver_step_with_dvi
     solver.step(state_in, state_out, control=None, contacts=None, dt=1e-3)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/solver_kamino.py", line 1000, in step
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/solver_kamino.py", line 1000, in step
     self._solver_kamino.step(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 716, in step
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 716, in step
     self._integrator.integrate(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/integrators/euler.py", line 250, in integrate
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/integrators/euler.py", line 250, in integrate
     forward(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1134, in _solve_forward_dynamics
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1134, in _solve_forward_dynamics
     self._forward(contacts=contacts)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1070, in _forward
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1070, in _forward
     self._update_constraints(contacts=contacts)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1022, in _update_constraints
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1022, in _update_constraints
     self._solver_fd.solve(problem=self._problem_fd)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
     self._solve_with_bilateral_direct_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
     self._factor_bilateral_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
     self._bilateral_solver.compute(A=operator.mat)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
     self._compute_impl(A=A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
     self._factorize(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
     self._factorize_impl(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
     factorize.llt_blocked_factorize(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
     wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+  File "upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
     return launch(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+  File "upstream/warp-innate/warp/_src/context.py", line 12339, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+  File "upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
     raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
 RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
 
@@ -987,32 +987,32 @@ ERROR: test_03d1_sparse_dvi_honors_per_world_bilateral_intervals (newton._src.so
 Restrict sparse bilateral re-solves to each world's configured interval.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 997, in test_03d1_sparse_dvi_honors_per_world_bilateral_intervals
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 997, in test_03d1_sparse_dvi_honors_per_world_bilateral_intervals
     solver.solve(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 435, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 435, in solve
     self._sparse_path.solve(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 105, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 105, in solve
     _solve_sparse_with_bilateral_direct_block(self, problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 471, in _solve_sparse_with_bilateral_direct_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 471, in _solve_sparse_with_bilateral_direct_block
     _factor_sparse_bilateral_block(path, problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 372, in _factor_sparse_bilateral_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 372, in _factor_sparse_bilateral_block
     path.bilateral_solver.compute(A=operator.mat)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
     self._compute_impl(A=A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
     self._factorize(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
     self._factorize_impl(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
     factorize.llt_blocked_factorize(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
     wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+  File "upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
     return launch(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+  File "upstream/warp-innate/warp/_src/context.py", line 12339, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+  File "upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
     raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
 RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
 
@@ -1020,30 +1020,30 @@ RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals
 ERROR: test_03d2_dvi_direct_block_finishes_with_bilateral_solve (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03d2_dvi_direct_block_finishes_with_bilateral_solve)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1043, in test_03d2_dvi_direct_block_finishes_with_bilateral_solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1043, in test_03d2_dvi_direct_block_finishes_with_bilateral_solve
     solver.solve(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
     self._solve_with_bilateral_direct_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
     self._factor_bilateral_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
     self._bilateral_solver.compute(A=operator.mat)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
     self._compute_impl(A=A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
     self._factorize(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
     self._factorize_impl(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
     factorize.llt_blocked_factorize(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
     wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+  File "upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
     return launch(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+  File "upstream/warp-innate/warp/_src/context.py", line 12339, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+  File "upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
     raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
 RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
 
@@ -1052,33 +1052,33 @@ ERROR: test_03d_dvi_direct_block_honors_per_world_iteration_counts (newton._src.
 Honor each world's projected and bilateral iteration schedule.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 943, in test_03d_dvi_direct_block_honors_per_world_iteration_counts
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 943, in test_03d_dvi_direct_block_honors_per_world_iteration_counts
     normal_sums = solve_normal_sums()
                   ^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 921, in solve_normal_sums
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 921, in solve_normal_sums
     solver.solve(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
     self._solve_with_bilateral_direct_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
     self._factor_bilateral_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
     self._bilateral_solver.compute(A=operator.mat)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
     self._compute_impl(A=A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
     self._factorize(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
     self._factorize_impl(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
     factorize.llt_blocked_factorize(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
     wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+  File "upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
     return launch(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+  File "upstream/warp-innate/warp/_src/context.py", line 12339, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+  File "upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
     raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
 RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
 
@@ -1086,30 +1086,30 @@ RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals
 ERROR: test_03e_dvi_direct_block_no_unilateral_rows_reports_single_iteration (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03e_dvi_direct_block_no_unilateral_rows_reports_single_iteration)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1090, in test_03e_dvi_direct_block_no_unilateral_rows_reports_single_iteration
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1090, in test_03e_dvi_direct_block_no_unilateral_rows_reports_single_iteration
     solver.solve(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
     self._solve_with_bilateral_direct_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
     self._factor_bilateral_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
     self._bilateral_solver.compute(A=operator.mat)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
     self._compute_impl(A=A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
     self._factorize(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
     self._factorize_impl(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
     factorize.llt_blocked_factorize(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
     wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+  File "upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
     return launch(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+  File "upstream/warp-innate/warp/_src/context.py", line 12339, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+  File "upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
     raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
 RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
 
@@ -1117,30 +1117,30 @@ RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals
 ERROR: test_03f_dvi_bilateral_only_solve_resets_stale_status (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03f_dvi_bilateral_only_solve_resets_stale_status)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1145, in test_03f_dvi_bilateral_only_solve_resets_stale_status
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1145, in test_03f_dvi_bilateral_only_solve_resets_stale_status
     solver.solve(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
     self._solve_with_bilateral_direct_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
     self._factor_bilateral_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
     self._bilateral_solver.compute(A=operator.mat)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
     self._compute_impl(A=A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
     self._factorize(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
     self._factorize_impl(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
     factorize.llt_blocked_factorize(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
     wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+  File "upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
     return launch(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+  File "upstream/warp-innate/warp/_src/context.py", line 12339, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+  File "upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
     raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
 RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
 
@@ -1148,33 +1148,33 @@ RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals
 ERROR: test_03h_dvi_canonical_contact_solution_metrics (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03h_dvi_canonical_contact_solution_metrics) (builder='build_boxes_hinged', sparse=False)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 2087, in test_03h_dvi_canonical_contact_solution_metrics
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 2087, in test_03h_dvi_canonical_contact_solution_metrics
     solver = _solve_dvi(test.model, test.problem, config=config, setup=test)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 225, in _solve_dvi
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 225, in _solve_dvi
     solver.solve(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
     self._solve_with_bilateral_direct_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
     self._factor_bilateral_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
     self._bilateral_solver.compute(A=operator.mat)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
     self._compute_impl(A=A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
     self._factorize(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
     self._factorize_impl(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
     factorize.llt_blocked_factorize(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
     wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+  File "upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
     return launch(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+  File "upstream/warp-innate/warp/_src/context.py", line 12339, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+  File "upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
     raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
 RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
 
@@ -1182,35 +1182,35 @@ RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals
 ERROR: test_03h_dvi_canonical_contact_solution_metrics (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03h_dvi_canonical_contact_solution_metrics) (builder='build_boxes_hinged', sparse=True)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 2087, in test_03h_dvi_canonical_contact_solution_metrics
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 2087, in test_03h_dvi_canonical_contact_solution_metrics
     solver = _solve_dvi(test.model, test.problem, config=config, setup=test)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 225, in _solve_dvi
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 225, in _solve_dvi
     solver.solve(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 435, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 435, in solve
     self._sparse_path.solve(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 105, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 105, in solve
     _solve_sparse_with_bilateral_direct_block(self, problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 471, in _solve_sparse_with_bilateral_direct_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 471, in _solve_sparse_with_bilateral_direct_block
     _factor_sparse_bilateral_block(path, problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 372, in _factor_sparse_bilateral_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 372, in _factor_sparse_bilateral_block
     path.bilateral_solver.compute(A=operator.mat)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
     self._compute_impl(A=A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
     self._factorize(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
     self._factorize_impl(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
     factorize.llt_blocked_factorize(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
     wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+  File "upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
     return launch(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+  File "upstream/warp-innate/warp/_src/context.py", line 12339, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+  File "upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
     raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
 RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
 
@@ -1218,33 +1218,33 @@ RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals
 ERROR: test_03i_dvi_coldstart_is_repeatable (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03i_dvi_coldstart_is_repeatable) (sparse=False)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1303, in test_03i_dvi_coldstart_is_repeatable
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1303, in test_03i_dvi_coldstart_is_repeatable
     solver = _solve_dvi(test.model, test.problem, config=config, setup=test)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 225, in _solve_dvi
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 225, in _solve_dvi
     solver.solve(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
     self._solve_with_bilateral_direct_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
     self._factor_bilateral_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
     self._bilateral_solver.compute(A=operator.mat)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
     self._compute_impl(A=A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
     self._factorize(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
     self._factorize_impl(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
     factorize.llt_blocked_factorize(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
     wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+  File "upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
     return launch(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+  File "upstream/warp-innate/warp/_src/context.py", line 12339, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+  File "upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
     raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
 RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
 
@@ -1252,35 +1252,35 @@ RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals
 ERROR: test_03i_dvi_coldstart_is_repeatable (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_03i_dvi_coldstart_is_repeatable) (sparse=True)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1303, in test_03i_dvi_coldstart_is_repeatable
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1303, in test_03i_dvi_coldstart_is_repeatable
     solver = _solve_dvi(test.model, test.problem, config=config, setup=test)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 225, in _solve_dvi
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 225, in _solve_dvi
     solver.solve(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 435, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 435, in solve
     self._sparse_path.solve(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 105, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 105, in solve
     _solve_sparse_with_bilateral_direct_block(self, problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 471, in _solve_sparse_with_bilateral_direct_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 471, in _solve_sparse_with_bilateral_direct_block
     _factor_sparse_bilateral_block(path, problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 372, in _factor_sparse_bilateral_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 372, in _factor_sparse_bilateral_block
     path.bilateral_solver.compute(A=operator.mat)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
     self._compute_impl(A=A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
     self._factorize(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
     self._factorize_impl(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
     factorize.llt_blocked_factorize(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
     wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+  File "upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
     return launch(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+  File "upstream/warp-innate/warp/_src/context.py", line 12339, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+  File "upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
     raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
 RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
 
@@ -1289,33 +1289,33 @@ ERROR: test_04_dvi_solve_active_joint_limit (newton._src.solvers.kamino.tests.te
 Resolve an active joint limit through the inequality solver.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1341, in test_04_dvi_solve_active_joint_limit
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1341, in test_04_dvi_solve_active_joint_limit
     solver = _solve_dvi(
              ^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 225, in _solve_dvi
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 225, in _solve_dvi
     solver.solve(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
     self._solve_with_bilateral_direct_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
     self._factor_bilateral_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
     self._bilateral_solver.compute(A=operator.mat)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
     self._compute_impl(A=A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
     self._factorize(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
     self._factorize_impl(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
     factorize.llt_blocked_factorize(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
     wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+  File "upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
     return launch(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+  File "upstream/warp-innate/warp/_src/context.py", line 12339, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+  File "upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
     raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
 RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
 
@@ -1324,33 +1324,33 @@ ERROR: test_05d_dvi_colors_contacts_with_joint_limits (newton._src.solvers.kamin
 Solve contacts and joint limits through one colored inequality path.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1847, in test_05d_dvi_colors_contacts_with_joint_limits
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1847, in test_05d_dvi_colors_contacts_with_joint_limits
     solver = _solve_dvi(
              ^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 225, in _solve_dvi
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 225, in _solve_dvi
     solver.solve(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
     self._solve_with_bilateral_direct_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
     self._factor_bilateral_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
     self._bilateral_solver.compute(A=operator.mat)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
     self._compute_impl(A=A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
     self._factorize(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
     self._factorize_impl(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
     factorize.llt_blocked_factorize(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
     wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+  File "upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
     return launch(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+  File "upstream/warp-innate/warp/_src/context.py", line 12339, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+  File "upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
     raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
 RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
 
@@ -1359,35 +1359,35 @@ ERROR: test_05d_dvi_colors_contacts_with_joint_limits (newton._src.solvers.kamin
 Solve contacts and joint limits through one colored inequality path.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1847, in test_05d_dvi_colors_contacts_with_joint_limits
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1847, in test_05d_dvi_colors_contacts_with_joint_limits
     solver = _solve_dvi(
              ^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 225, in _solve_dvi
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 225, in _solve_dvi
     solver.solve(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 435, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 435, in solve
     self._sparse_path.solve(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 105, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 105, in solve
     _solve_sparse_with_bilateral_direct_block(self, problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 471, in _solve_sparse_with_bilateral_direct_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 471, in _solve_sparse_with_bilateral_direct_block
     _factor_sparse_bilateral_block(path, problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 372, in _factor_sparse_bilateral_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 372, in _factor_sparse_bilateral_block
     path.bilateral_solver.compute(A=operator.mat)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
     self._compute_impl(A=A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
     self._factorize(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
     self._factorize_impl(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
     factorize.llt_blocked_factorize(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
     wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+  File "upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
     return launch(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+  File "upstream/warp-innate/warp/_src/context.py", line 12339, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+  File "upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
     raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
 RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
 
@@ -1395,33 +1395,33 @@ RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals
 ERROR: test_07_dvi_singular_limit_rows_remain_finite (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_07_dvi_singular_limit_rows_remain_finite)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1379, in test_07_dvi_singular_limit_rows_remain_finite
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1379, in test_07_dvi_singular_limit_rows_remain_finite
     solver = _solve_dvi(
              ^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 225, in _solve_dvi
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 225, in _solve_dvi
     solver.solve(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
     self._solve_with_bilateral_direct_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
     self._factor_bilateral_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
     self._bilateral_solver.compute(A=operator.mat)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
     self._compute_impl(A=A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
     self._factorize(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
     self._factorize_impl(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
     factorize.llt_blocked_factorize(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
     wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+  File "upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
     return launch(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+  File "upstream/warp-innate/warp/_src/context.py", line 12339, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+  File "upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
     raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
 RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
 
@@ -1429,42 +1429,42 @@ RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals
 ERROR: test_08_public_solver_short_rollout_with_dvi (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_08_public_solver_short_rollout_with_dvi)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1432, in test_08_public_solver_short_rollout_with_dvi
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1432, in test_08_public_solver_short_rollout_with_dvi
     solver.step(state_in, state_out, control=None, contacts=None, dt=1e-3)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/solver_kamino.py", line 1000, in step
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/solver_kamino.py", line 1000, in step
     self._solver_kamino.step(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 716, in step
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 716, in step
     self._integrator.integrate(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/integrators/euler.py", line 250, in integrate
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/integrators/euler.py", line 250, in integrate
     forward(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1134, in _solve_forward_dynamics
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1134, in _solve_forward_dynamics
     self._forward(contacts=contacts)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1070, in _forward
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1070, in _forward
     self._update_constraints(contacts=contacts)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1022, in _update_constraints
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1022, in _update_constraints
     self._solver_fd.solve(problem=self._problem_fd)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
     self._solve_with_bilateral_direct_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
     self._factor_bilateral_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
     self._bilateral_solver.compute(A=operator.mat)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
     self._compute_impl(A=A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
     self._factorize(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
     self._factorize_impl(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
     factorize.llt_blocked_factorize(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
     wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+  File "upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
     return launch(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+  File "upstream/warp-innate/warp/_src/context.py", line 12339, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+  File "upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
     raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
 RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
 
@@ -1473,42 +1473,42 @@ ERROR: test_08a_public_solver_heterogeneous_contact_rollout_with_dvi (newton._sr
 Use Cholesky for heterogeneous dense and sparse DVI rollouts.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1465, in test_08a_public_solver_heterogeneous_contact_rollout_with_dvi
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1465, in test_08a_public_solver_heterogeneous_contact_rollout_with_dvi
     solver.step(state_in, state_out, control=control, contacts=None, dt=1.0e-3)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/solver_kamino.py", line 1000, in step
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/solver_kamino.py", line 1000, in step
     self._solver_kamino.step(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 716, in step
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 716, in step
     self._integrator.integrate(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/integrators/euler.py", line 250, in integrate
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/integrators/euler.py", line 250, in integrate
     forward(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1134, in _solve_forward_dynamics
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1134, in _solve_forward_dynamics
     self._forward(contacts=contacts)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1070, in _forward
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1070, in _forward
     self._update_constraints(contacts=contacts)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1022, in _update_constraints
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1022, in _update_constraints
     self._solver_fd.solve(problem=self._problem_fd)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
     self._solve_with_bilateral_direct_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
     self._factor_bilateral_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
     self._bilateral_solver.compute(A=operator.mat)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
     self._compute_impl(A=A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
     self._factorize(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
     self._factorize_impl(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
     factorize.llt_blocked_factorize(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
     wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+  File "upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
     return launch(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+  File "upstream/warp-innate/warp/_src/context.py", line 12339, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+  File "upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
     raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
 RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
 
@@ -1517,44 +1517,44 @@ ERROR: test_08a_public_solver_heterogeneous_contact_rollout_with_dvi (newton._sr
 Use Cholesky for heterogeneous dense and sparse DVI rollouts.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1465, in test_08a_public_solver_heterogeneous_contact_rollout_with_dvi
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 1465, in test_08a_public_solver_heterogeneous_contact_rollout_with_dvi
     solver.step(state_in, state_out, control=control, contacts=None, dt=1.0e-3)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/solver_kamino.py", line 1000, in step
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/solver_kamino.py", line 1000, in step
     self._solver_kamino.step(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 716, in step
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 716, in step
     self._integrator.integrate(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/integrators/euler.py", line 250, in integrate
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/integrators/euler.py", line 250, in integrate
     forward(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1134, in _solve_forward_dynamics
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1134, in _solve_forward_dynamics
     self._forward(contacts=contacts)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1070, in _forward
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1070, in _forward
     self._update_constraints(contacts=contacts)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1022, in _update_constraints
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1022, in _update_constraints
     self._solver_fd.solve(problem=self._problem_fd)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 435, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 435, in solve
     self._sparse_path.solve(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 105, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 105, in solve
     _solve_sparse_with_bilateral_direct_block(self, problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 471, in _solve_sparse_with_bilateral_direct_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 471, in _solve_sparse_with_bilateral_direct_block
     _factor_sparse_bilateral_block(path, problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 372, in _factor_sparse_bilateral_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 372, in _factor_sparse_bilateral_block
     path.bilateral_solver.compute(A=operator.mat)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
     self._compute_impl(A=A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
     self._factorize(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
     self._factorize_impl(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
     factorize.llt_blocked_factorize(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
     wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+  File "upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
     return launch(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+  File "upstream/warp-innate/warp/_src/context.py", line 12339, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+  File "upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
     raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
 RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
 
@@ -1563,42 +1563,42 @@ ERROR: test_08d3_dvi_friction_propagates_through_fixed_joint (newton._src.solver
 Converge articulated contact friction at a 2 kHz step rate.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 2335, in test_08d3_dvi_friction_propagates_through_fixed_joint
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 2335, in test_08d3_dvi_friction_propagates_through_fixed_joint
     solver.step(state_0, state_1, control=None, contacts=None, dt=dt)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/solver_kamino.py", line 1000, in step
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/solver_kamino.py", line 1000, in step
     self._solver_kamino.step(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 716, in step
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 716, in step
     self._integrator.integrate(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/integrators/euler.py", line 250, in integrate
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/integrators/euler.py", line 250, in integrate
     forward(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1134, in _solve_forward_dynamics
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1134, in _solve_forward_dynamics
     self._forward(contacts=contacts)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1070, in _forward
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1070, in _forward
     self._update_constraints(contacts=contacts)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1022, in _update_constraints
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1022, in _update_constraints
     self._solver_fd.solve(problem=self._problem_fd)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
     self._solve_with_bilateral_direct_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
     self._factor_bilateral_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
     self._bilateral_solver.compute(A=operator.mat)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
     self._compute_impl(A=A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
     self._factorize(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
     self._factorize_impl(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
     factorize.llt_blocked_factorize(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
     wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+  File "upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
     return launch(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+  File "upstream/warp-innate/warp/_src/context.py", line 12339, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+  File "upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
     raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
 RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
 
@@ -1607,44 +1607,44 @@ ERROR: test_08d3_dvi_friction_propagates_through_fixed_joint (newton._src.solver
 Converge articulated contact friction at a 2 kHz step rate.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 2335, in test_08d3_dvi_friction_propagates_through_fixed_joint
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 2335, in test_08d3_dvi_friction_propagates_through_fixed_joint
     solver.step(state_0, state_1, control=None, contacts=None, dt=dt)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/solver_kamino.py", line 1000, in step
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/solver_kamino.py", line 1000, in step
     self._solver_kamino.step(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 716, in step
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 716, in step
     self._integrator.integrate(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/integrators/euler.py", line 250, in integrate
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/integrators/euler.py", line 250, in integrate
     forward(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1134, in _solve_forward_dynamics
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1134, in _solve_forward_dynamics
     self._forward(contacts=contacts)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1070, in _forward
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1070, in _forward
     self._update_constraints(contacts=contacts)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1022, in _update_constraints
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1022, in _update_constraints
     self._solver_fd.solve(problem=self._problem_fd)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 435, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 435, in solve
     self._sparse_path.solve(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 105, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 105, in solve
     _solve_sparse_with_bilateral_direct_block(self, problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 471, in _solve_sparse_with_bilateral_direct_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 471, in _solve_sparse_with_bilateral_direct_block
     _factor_sparse_bilateral_block(path, problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 372, in _factor_sparse_bilateral_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/sparse.py", line 372, in _factor_sparse_bilateral_block
     path.bilateral_solver.compute(A=operator.mat)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
     self._compute_impl(A=A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
     self._factorize(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
     self._factorize_impl(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
     factorize.llt_blocked_factorize(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
     wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+  File "upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
     return launch(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+  File "upstream/warp-innate/warp/_src/context.py", line 12339, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+  File "upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
     raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
 RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
 
@@ -1652,42 +1652,42 @@ RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals
 ERROR: test_12_dvi_opening_contact_releases_warmstarted_force (newton._src.solvers.kamino.tests.test_solvers_dvi.TestDVISolver.test_12_dvi_opening_contact_releases_warmstarted_force)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 2040, in test_12_dvi_opening_contact_releases_warmstarted_force
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solvers_dvi.py", line 2040, in test_12_dvi_opening_contact_releases_warmstarted_force
     solver.step(state_0, state_1, control=None, contacts=None, dt=1e-3)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/solver_kamino.py", line 1000, in step
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/solver_kamino.py", line 1000, in step
     self._solver_kamino.step(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 716, in step
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 716, in step
     self._integrator.integrate(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/integrators/euler.py", line 250, in integrate
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/integrators/euler.py", line 250, in integrate
     forward(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1134, in _solve_forward_dynamics
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1134, in _solve_forward_dynamics
     self._forward(contacts=contacts)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1070, in _forward
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1070, in _forward
     self._update_constraints(contacts=contacts)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1022, in _update_constraints
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solver_kamino_impl.py", line 1022, in _update_constraints
     self._solver_fd.solve(problem=self._problem_fd)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 439, in solve
     self._solve_with_bilateral_direct_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 731, in _solve_with_bilateral_direct_block
     self._factor_bilateral_block(problem)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/solvers/dvi/solver.py", line 717, in _factor_bilateral_block
     self._bilateral_solver.compute(A=operator.mat)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 169, in compute
     self._compute_impl(A=A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 245, in _compute_impl
     self._factorize(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 256, in _factorize
     self._factorize_impl(A, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/linear.py", line 692, in _factorize_impl
     factorize.llt_blocked_factorize(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/_src/linalg/factorize/llt_blocked.py", line 431, in llt_blocked_factorize
     wp.launch_tiled(kernel=kernel, dim=num_blocks, inputs=[dim, mio, A, L], block_dim=block_dim, device=A.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
+  File "upstream/warp-innate/warp/_src/context.py", line 12620, in launch_tiled
     return launch(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12339, in launch
+  File "upstream/warp-innate/warp/_src/context.py", line 12339, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
+  File "upstream/warp-innate/warp/_src/context.py", line 11406, in invoke_metal
     raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
 RuntimeError: Failed to launch kernel 'make_llt_blocked_factorize_kernel__locals__llt_blocked_factorize_kernel' on device 'metal:0': Kernel requests 82432 bytes of threadgroup memory but device "Apple M4 Max" supports at most 32768 bytes (arguments: dim=array_t, mio=array_t, A=array_t, L=array_t)
 

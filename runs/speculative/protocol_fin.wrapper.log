@@ -1,6 +1,6 @@
 === start Sun Sep 27 02:14:41 PDT 2026 metalsim 66deb72 mjw 27f1fcd MJW_SPEC_FRICTION=live
-== stage rec dt=0.0025 mjw=/Users/aditya/robosim/upstream/mujoco_warp-spec-27f1fcd@27f1fcd spec=1 presets=ellip10_tau5_specgap10mm ellip10_specgap10mm Sun Sep 27 02:14:41 PDT 2026
-holder: {"name": "spec_protocol_fin", "kind": "render", "minutes": 25.0, "pid": 24610, "start": 1790500480.696716, "queued": 1790500480.6963212, "cmd": "runs/speculative/job_protocol_fin.sh", "cwd": "/Users/aditya/robosim"}
+== stage rec dt=0.0025 mjw=upstream/mujoco_warp-spec-27f1fcd@27f1fcd spec=1 presets=ellip10_tau5_specgap10mm ellip10_specgap10mm Sun Sep 27 02:14:41 PDT 2026
+holder: {"name": "spec_protocol_fin", "kind": "render", "minutes": 25.0, "pid": 24610, "start": 1790500480.696716, "queued": 1790500480.6963212, "cmd": "runs/speculative/job_protocol_fin.sh", "cwd": "<repo>"}
 [metalsim] A_hold: 150 steps, final root z [0.05379825 0.05379825 0.05379825 0.05379826]
 [metalsim] B_random: 250 steps, final root z [0.15770262 0.1526923  0.15076764 0.15727106]
 [metalsim] C_drop: 150 steps, final root z [0.05379843 0.05379843 0.05379843 0.05379841]
@@ -10,24 +10,24 @@ holder: {"name": "spec_protocol_fin", "kind": "render", "minutes": 25.0, "pid": 
 [metalsim] C_drop: 150 steps, final root z [0.05380158 0.05391968 0.05380156 0.05391962]
 }
 == stage rec done Sun Sep 27 02:15:06 PDT 2026
-== stage rec dt=0.0025 mjw=/Users/aditya/robosim/upstream/mujoco_warp-spec-27f1fcd@27f1fcd spec=1 presets=ellip10_tau5_specgap10mm Sun Sep 27 02:15:06 PDT 2026
-holder: {"name": "spec_protocol_fin", "kind": "render", "minutes": 25.0, "pid": 24610, "start": 1790500480.696716, "queued": 1790500480.6963212, "cmd": "runs/speculative/job_protocol_fin.sh", "cwd": "/Users/aditya/robosim"}
+== stage rec dt=0.0025 mjw=upstream/mujoco_warp-spec-27f1fcd@27f1fcd spec=1 presets=ellip10_tau5_specgap10mm Sun Sep 27 02:15:06 PDT 2026
+holder: {"name": "spec_protocol_fin", "kind": "render", "minutes": 25.0, "pid": 24610, "start": 1790500480.696716, "queued": 1790500480.6963212, "cmd": "runs/speculative/job_protocol_fin.sh", "cwd": "<repo>"}
 [metalsim] A_hold: 150 steps, final root z [0.05379826 0.05379826 0.05379825 0.05379825]
 [metalsim] B_random: 250 steps, final root z [0.16326392 0.15758088 0.1697207  0.13599113]
 [metalsim] C_drop: 150 steps, final root z [0.05379842 0.05379843 0.05379841 0.0537984 ]
 }
 == stage rec done Sun Sep 27 02:15:18 PDT 2026
-== stage transfer dt=0.0025 mjw=/Users/aditya/robosim/upstream/mujoco_warp-spec-27f1fcd@27f1fcd spec=1 presets=ellip10_tau5_specgap10mm ellip10_specgap10mm Sun Sep 27 02:15:18 PDT 2026
-holder: {"name": "spec_protocol_fin", "kind": "render", "minutes": 25.0, "pid": 24610, "start": 1790500480.696716, "queued": 1790500480.6963212, "cmd": "runs/speculative/job_protocol_fin.sh", "cwd": "/Users/aditya/robosim"}
-install: newton {'path': '/Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton', 'url': 'https://github.com/newton-physics/newton', 'commit': '45458023f24629c1feffb1f336594808f537db14', 'editable': False} | warp {'path': '/Users/aditya/robosim/upstream/warp-innate/warp', 'git_head': 'c200d46b', 'git_dirty': False}
+== stage transfer dt=0.0025 mjw=upstream/mujoco_warp-spec-27f1fcd@27f1fcd spec=1 presets=ellip10_tau5_specgap10mm ellip10_specgap10mm Sun Sep 27 02:15:18 PDT 2026
+holder: {"name": "spec_protocol_fin", "kind": "render", "minutes": 25.0, "pid": 24610, "start": 1790500480.696716, "queued": 1790500480.6963212, "cmd": "runs/speculative/job_protocol_fin.sh", "cwd": "<repo>"}
+install: newton {'path': '.venv/lib/python3.12/site-packages/newton', 'url': 'https://github.com/newton-physics/newton', 'commit': '45458023f24629c1feffb1f336594808f537db14', 'editable': False} | warp {'path': 'upstream/warp-innate/warp', 'git_head': 'c200d46b', 'git_dirty': False}
 | checkpoint | mjwarp:ellip10_tau5_specgap10mm x [m] / pelvis z [m] | mjwarp:ellip10_specgap10mm x [m] / pelvis z [m] |
 |---|---|---|
 | Isaac it 500 | 3.36 (3.29-3.39) / 0.620 (0.61-0.63) | 3.32 (3.25-3.38) / 0.620 (0.61-0.63) |
 | Isaac it 1000 | 3.21 (3.17-3.25) / 0.631 (0.62-0.64) | 3.10 (3.04-3.15) / 0.634 (0.62-0.65) |
 | Isaac it 1499 | 3.25 (3.18-3.29) / 0.636 (0.63-0.64) | 3.16 (3.13-3.18) / 0.637 (0.63-0.65) |
 == stage transfer done Sun Sep 27 02:15:58 PDT 2026
-== stage air dt=0.0025 mjw=/Users/aditya/robosim/upstream/mujoco_warp-spec-27f1fcd@27f1fcd spec=1 presets=ellip10_tau5_specgap10mm ellip10_specgap10mm Sun Sep 27 02:15:59 PDT 2026
-holder: {"name": "spec_protocol_fin", "kind": "render", "minutes": 25.0, "pid": 24610, "start": 1790500480.696716, "queued": 1790500480.6963212, "cmd": "runs/speculative/job_protocol_fin.sh", "cwd": "/Users/aditya/robosim"}
+== stage air dt=0.0025 mjw=upstream/mujoco_warp-spec-27f1fcd@27f1fcd spec=1 presets=ellip10_tau5_specgap10mm ellip10_specgap10mm Sun Sep 27 02:15:59 PDT 2026
+holder: {"name": "spec_protocol_fin", "kind": "render", "minutes": 25.0, "pid": 24610, "start": 1790500480.696716, "queued": 1790500480.6963212, "cmd": "runs/speculative/job_protocol_fin.sh", "cwd": "<repo>"}
   "joint_deviation_all": -0.0935,
   "flat_orientation_l2": -0.0112,
   "action_rate_l2": -0.0075,
@@ -85,8 +85,8 @@ holder: {"name": "spec_protocol_fin", "kind": "render", "minutes": 25.0, "pid": 
   "flight_frac": 0.008194684365245326
  }
 }
-== stage cap dt=0.0025 mjw=/Users/aditya/robosim/upstream/mujoco_warp-spec-27f1fcd@27f1fcd spec=1 presets=ellip10_tau5_specgap10mm Sun Sep 27 02:20:09 PDT 2026
-holder: {"name": "spec_protocol_fin", "kind": "render", "minutes": 25.0, "pid": 24610, "start": 1790500480.696716, "queued": 1790500480.6963212, "cmd": "runs/speculative/job_protocol_fin.sh", "cwd": "/Users/aditya/robosim"}
+== stage cap dt=0.0025 mjw=upstream/mujoco_warp-spec-27f1fcd@27f1fcd spec=1 presets=ellip10_tau5_specgap10mm Sun Sep 27 02:20:09 PDT 2026
+holder: {"name": "spec_protocol_fin", "kind": "render", "minutes": 25.0, "pid": 24610, "start": 1790500480.696716, "queued": 1790500480.6963212, "cmd": "runs/speculative/job_protocol_fin.sh", "cwd": "<repo>"}
   "max_dqvel": 8.442928314208984,
   "p99_dqvel_max": 0.07200942188501358,
   "median_dqvel_max": 0.0001697540283203125,

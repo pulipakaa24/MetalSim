@@ -1,8 +1,8 @@
 #!/bin/bash
 # ellip_ws: lanes per world of the elliptic fused launch (htot fusion on), frozen worktree mujoco_warp-ellip-test3: itercost (4096, cap 20)
 # at 64 and 128 lanes (32 is runs/ellip_ws/iter_H_fused_htot.log), then g1_tp_variants --quick interleaved 32 64 128 32 64 128.
-cd /Users/aditya/robosim && source .venv/bin/activate
-WT=/Users/aditya/robosim/upstream/warp-innate-tp-test:/Users/aditya/robosim/upstream/mujoco_warp-ellip-test3
+cd . && source .venv/bin/activate
+WT=upstream/warp-innate-tp-test:upstream/mujoco_warp-ellip-test3
 R='^  *[0-9]* |\|^  k\|^state\|Error\|Traceback'; F='^\[\|Error\|Traceback'
 echo "=== start $(date) metalsim $(git rev-parse --short HEAD) frozen warp $(git -C upstream/warp-innate-tp-test rev-parse --short HEAD) mjw $(git -C upstream/mujoco_warp-ellip-test3 rev-parse --short HEAD) power: $(pmset -g batt | head -1)"
 for L in 64 128; do

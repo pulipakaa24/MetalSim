@@ -1,7 +1,7 @@
 #!/bin/bash
 # Throughput A/B: g1_tp_variants.py 4096 (task defaults, 2.5 ms), flat and rough, trees interleaved B C F x2
 S=/private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/rigid_fma
-cd /Users/aditya/robosim
+cd .
 O=runs/fma_rigid_parity/tp; mkdir -p $O
 tree() { case $1 in B) echo warp-innate;; C) echo warp-innate-ordered;; F) echo warp-innate-fpcontract;; esac; }
 run() { # tag tree terrain [--quick]

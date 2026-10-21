@@ -1,10 +1,10 @@
 == Fri Sep 25 23:48:58 PDT 2026
-holder: {"name": "il3_policy_side", "kind": "train", "minutes": 15.0, "pid": 67621, "start": 1790405337.9466581, "queued": 1790401532.6597466, "cmd": "runs/il3/run_policy_side.sh", "cwd": "/Users/aditya/robosim"}
+holder: {"name": "il3_policy_side", "kind": "train", "minutes": 15.0, "pid": 67621, "start": 1790405337.9466581, "queued": 1790401532.6597466, "cmd": "runs/il3/run_policy_side.sh", "cwd": "<repo>"}
   waiting [low] kamino_tests_fork est 40.0 min, queued 31810 s ago
   waiting [low] kamino_tests_152 est 30.0 min, queued 30981 s ago
   waiting [low] cl_kamino est 45.0 min, queued 29650 s ago
   waiting [low] cl_mjw est 40.0 min, queued 29626 s ago
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -12,7 +12,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 26.51 ms  (cached)
 Module _nxn_broadphase__locals__kernel_28decaf1 28decaf load on device 'metal:0' took 19.85 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_b3132664 b313266 load on device 'metal:0' took 24.32 ms  (cached)
@@ -121,19 +121,19 @@ Error: command buffer exited with error status.
 Traceback (most recent call last):
   File "<frozen runpy>", line 198, in _run_module_as_main
   File "<frozen runpy>", line 88, in _run_code
-  File "/Users/aditya/robosim/metalsim/learn/g1_velocity.py", line 1033, in <module>
+  File "metalsim/learn/g1_velocity.py", line 1033, in <module>
     train_g1(n, terrain, int(sys.argv[4]) if len(sys.argv) > 4 else 1500, log_path=sys.argv[5] if len(sys.argv) > 5 else None,
-  File "/Users/aditya/robosim/metalsim/learn/g1_velocity.py", line 1008, in train_g1
+  File "metalsim/learn/g1_velocity.py", line 1008, in train_g1
     algo.train(log=log, callback=cb, monitor=mon)
-  File "/Users/aditya/robosim/metalsim/learn/ppo_warp.py", line 295, in train
+  File "metalsim/learn/ppo_warp.py", line 295, in train
     stats = self.update()
             ^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/learn/ppo_warp.py", line 253, in update
+  File "metalsim/learn/ppo_warp.py", line 253, in update
     d = torch.distributions.Normal(mean, self.net.log_std.exp())
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/distributions/normal.py", line 66, in __init__
+  File ".venv/lib/python3.12/site-packages/torch/distributions/normal.py", line 66, in __init__
     super().__init__(batch_shape, validate_args=validate_args)
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/distributions/distribution.py", line 77, in __init__
+  File ".venv/lib/python3.12/site-packages/torch/distributions/distribution.py", line 77, in __init__
     raise ValueError(
 ValueError: Expected parameter loc (Tensor of shape (24576, 37)) of distribution Normal(loc: torch.Size([24576, 37]), scale: torch.Size([24576, 37])) to satisfy the constraint Real(), but found invalid values:
 tensor([[0., 0., 0.,  ..., 0., 0., 0.],

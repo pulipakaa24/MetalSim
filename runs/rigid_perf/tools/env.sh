@@ -1,5 +1,5 @@
 # usage: source env.sh base|new|dev   (base = shared integrated trees; new = _forks/newton; dev = _forks/newton_dev)
-R=/Users/aditya/robosim
+R=.
 WT=$R/.claude/worktrees/agent-a6ef6785c0d23ee50
 T=$WT/runs/rigid_perf/tools
 PY=$R/.venv-newton152/bin/python

@@ -1,5 +1,5 @@
 #!/bin/bash
-# batch 06 (run outside the agent sandbox):  bash /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b06/batch_06.sh
+# batch 06 (run outside the agent sandbox):  bash scratch/b06/batch_06.sh
 #
 # Deterministic BatchSim, box-box divergence fix (research_notes/MPM in main simulator/deterministic_ccd_divergence.md):
 #   1  MJWFORK  MuJoCo Warp fork: clone the shared checkout (f1b35e2, fork/metalsim) into the worktree's upstream/
@@ -18,8 +18,8 @@
 #   3  commit the BatchSim / probe / test / doc changes and the logs on batchsim-deterministic, push, comment on PR #29.
 # Resumable (scratch/b06/STATUS.txt). Expected ~60-90 min.
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
-R=/Users/aditya/robosim
+W=.
+R=.
 S=$W/scratch/b06
 L=$S/logs
 O=$W/runs/mpm_main/batch_06

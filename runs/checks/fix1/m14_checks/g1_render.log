@@ -4,16 +4,16 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/adipu/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 [render] g1_flat: 251 frames, 1x1 panels of 1280x720, 16 x 4 spp, 47 twin geoms (32 frame corrections), particles/env 0, setup 1.7 s
-/Users/adipu/metalsim-fresh/fix1-20261014-0325/repo/metalsim/sensors/raytrace.py:529: UserWarning: ray tracer env grid: geometry neared its env's cell boundary; cell [2.38, 2.54, 3.26] m -> [6.76, 7.07, 8.51] m (largest offset 0 m); set RayTracer(env_margin=...) to size it up front
+~/metalsim-fresh/fix1-20261014-0325/repo/metalsim/sensors/raytrace.py:529: UserWarning: ray tracer env grid: geometry neared its env's cell boundary; cell [2.38, 2.54, 3.26] m -> [6.76, 7.07, 8.51] m (largest offset 0 m); set RayTracer(env_margin=...) to size it up front
   warnings.warn(f"ray tracer env grid: geometry neared its env's cell boundary; cell {np.round(old.S, 2).tolist()} m -> "
 [render] automatic exposure 0.7905
 [render] frame 0/251: 0.34 s (render 0.16 s)
 [render] frame 15/251: 0.23 s (render 0.17 s)
 [render] frame 30/251: 0.23 s (render 0.17 s)
 [render] frame 45/251: 0.22 s (render 0.15 s)
-/Users/adipu/metalsim-fresh/fix1-20261014-0325/repo/metalsim/sensors/raytrace.py:529: UserWarning: ray tracer env grid: geometry neared its env's cell boundary; cell [6.76, 7.07, 8.51] m -> [15.51, 16.14, 19.02] m (largest offset 0 m); set RayTracer(env_margin=...) to size it up front
+~/metalsim-fresh/fix1-20261014-0325/repo/metalsim/sensors/raytrace.py:529: UserWarning: ray tracer env grid: geometry neared its env's cell boundary; cell [6.76, 7.07, 8.51] m -> [15.51, 16.14, 19.02] m (largest offset 0 m); set RayTracer(env_margin=...) to size it up front
   warnings.warn(f"ray tracer env grid: geometry neared its env's cell boundary; cell {np.round(old.S, 2).tolist()} m -> "
 [render] frame 60/251: 0.19 s (render 0.13 s)
 [render] frame 75/251: 0.17 s (render 0.11 s)

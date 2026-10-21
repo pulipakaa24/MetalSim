@@ -1,9 +1,9 @@
 [gpu_run] ellip_fid_cost_base start: device utilisation 0% (20:02:12)
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-== stage cost mjw=/Users/aditya/robosim/upstream/mujoco_warp-ellip-base head=07a51a6 presets=tau10_impact_hardlimits elliptic_hardlimits tau10_impact_elliptic_hardlimits Fri Sep 25 20:02:15 PDT 2026
-holder: {"name": "ellip_fid_cost_base", "kind": "timing", "minutes": 8.0, "pid": 96054, "start": 1790391732.253234, "queued": 1790390971.6522262, "cmd": "env PRESETS=tau10_impact_hardlimits elliptic_hardlimits tau10_impact_elliptic_hardlimits scripts/diagnostics/competitors/elliptic_fidelity_g1.sh /Users/aditya/robosim/upstream/mujoco_warp-ellip-base cost", "cwd": "/Users/aditya/robosim"}
+== stage cost mjw=upstream/mujoco_warp-ellip-base head=07a51a6 presets=tau10_impact_hardlimits elliptic_hardlimits tau10_impact_elliptic_hardlimits Fri Sep 25 20:02:15 PDT 2026
+holder: {"name": "ellip_fid_cost_base", "kind": "timing", "minutes": 8.0, "pid": 96054, "start": 1790391732.253234, "queued": 1790390971.6522262, "cmd": "env PRESETS=tau10_impact_hardlimits elliptic_hardlimits tau10_impact_elliptic_hardlimits scripts/diagnostics/competitors/elliptic_fidelity_g1.sh upstream/mujoco_warp-ellip-base cost", "cwd": "<repo>"}
 gpu_lock status at start 2026-09-25T20:02:16
-holder: {"name": "ellip_fid_cost_base", "kind": "timing", "minutes": 8.0, "pid": 96054, "start": 1790391732.253234, "queued": 1790390971.6522262, "cmd": "env PRESETS=tau10_impact_hardlimits elliptic_hardlimits tau10_impact_elliptic_hardlimits scripts/diagnostics/competitors/elliptic_fidelity_g1.sh /Users/aditya/robosim/upstream/mujoco_warp-ellip-base cost", "cwd": "/Users/aditya/robosim"}
+holder: {"name": "ellip_fid_cost_base", "kind": "timing", "minutes": 8.0, "pid": 96054, "start": 1790391732.253234, "queued": 1790390971.6522262, "cmd": "env PRESETS=tau10_impact_hardlimits elliptic_hardlimits tau10_impact_elliptic_hardlimits scripts/diagnostics/competitors/elliptic_fidelity_g1.sh upstream/mujoco_warp-ellip-base cost", "cwd": "<repo>"}
   waiting [timing] envmap_cost est 8.0 min, queued 607 s ago
   waiting [timing] ellip_profile_base est 6.0 min, queued 575 s ago
   waiting [timing] ellip_audit_base est 10.0 min, queued 574 s ago
@@ -36,7 +36,7 @@ holder: {"name": "ellip_fid_cost_base", "kind": "timing", "minutes": 8.0, "pid":
   waiting [low] cl_kamino est 45.0 min, queued 16048 s ago
   waiting [low] cl_mjw est 40.0 min, queued 16024 s ago
 
-mujoco_warp from /Users/aditya/robosim/upstream/mujoco_warp-ellip-base/mujoco_warp/__init__.py
+mujoco_warp from upstream/mujoco_warp-ellip-base/mujoco_warp/__init__.py
   tau10_impact_hardlimits: overflow {'LS_ITERATIONS': 4096}
   elliptic_hardlimits: overflow {'LS_ITERATIONS': 4096}
   tau10_impact_elliptic_hardlimits: overflow {'LS_ITERATIONS': 4096}

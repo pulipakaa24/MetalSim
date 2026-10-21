@@ -4,7 +4,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/kcache/kc_n17_fix/1.18.0.dev20260917
+     runs/rigid17/kcache/kc_n17_fix/1.18.0.dev20260917
 Module newton._src.geometry.inertia fa1f468 load on device 'metal:0' took 670.14 ms  (cached)
 Module validate_and_correct_inertia_kernel_eac05b26 eac05b2 load on device 'metal:0' took 350.08 ms  (cached)
 Module newton._src.geometry.bvh 2bb5296 load on device 'metal:0' took 523.80 ms  (cached)
@@ -25,7 +25,7 @@ Module newton._src.geometry.contact_sort 86831a2 load on device 'metal:0' took 5
 {
  "worlds": 256,
  "det": true,
- "newton": "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n17_fix/newton/__init__.py",
+ "newton": "upstream/n17_fix/newton/__init__.py",
  "warp": "1.18.0.dev20260917",
  "rigid_contact_max": 1756672,
  "rigid_contacts": 16070,

@@ -37,7 +37,7 @@ row added after line 48
 row added after line 49
 row added after line 50
 warp 95f6f121b7e67025958335c7c15e338ac04a798a -> 31cf79d781e4b10d8ff85c8cbd98fc0e40f75953; newton 99843d09840f89ac16c82104ad66ae792e45eb91 -> addd10cbeb25e946b3a4c2bb1d4097acc7a98ca2
-/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/warp_fork/warp/__init__.py True /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/newton_fork/newton/__init__.py
+upstream/trees/warp_fork/warp/__init__.py True upstream/trees/newton_fork/newton/__init__.py
 test_mpm: 15 passed, 1 xfailed in 116.92s (0:01:56)
 F_granular exit 0 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 F_multi_material exit 0 [gpu_run] gpu_top:   pid    410 WindowServer                       1.3 %
@@ -77,7 +77,7 @@ scripts/setup_newton152.sh: 3 line(s)
 scripts/vendor_mpm152.py: 1 line(s)
 old Newton pin gone from scripts/README/GUIDE
 
-wrote 11 files to /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/metalsim/physics/mpm/implicit_mpm
+wrote 11 files to metalsim/physics/mpm/implicit_mpm
 vendored implicit_mpm equals pulipakaa24/newton@addd10cb (10 files)
 test_mpm_main: 15 passed in 289.25s (0:04:49)
 d2734367 Pin Warp 31cf79d7 and Newton addd10cb: tiled long-row bsr_mv on Metal; re-vendor

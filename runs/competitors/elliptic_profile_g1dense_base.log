@@ -1,6 +1,6 @@
 [gpu_run] ellip_profile_g1dense_base start: device utilisation 0% (20:13:35)
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-LABEL profile_g1dense_base mjw=/Users/aditya/robosim/upstream/mujoco_warp-ellip-base/mujoco_warp/__init__.py head=07a51a6 N=4096 env=JAC=dense 
+LABEL profile_g1dense_base mjw=upstream/mujoco_warp-ellip-base/mujoco_warp/__init__.py head=07a51a6 N=4096 env=JAC=dense 
 == profile g1 elliptic
 KERNELS g1 N=4096: 87.99 ms/step GPU (sum of per-dispatch times), 232 dispatches/step
     69.674 ms  79.2%  x 11  _update_gradient_JTCJ_dense_f52c2ac2_metal_forward

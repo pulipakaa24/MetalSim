@@ -16,11 +16,11 @@ holder: {"name": "newton_fork_throughput4", "kind": "timing", "minutes": 12.0, "
   waiting [train] g1_flat_newton_forksolver0625_ppo_fixed est 60.0 min, queued 1 s ago
 Fri Sep 25 00:38:45 PDT 2026
 $ .venv/bin/python scripts/diagnostics/newton_fork/throughput.py 4:1.25 4:0.625  (pinned upstream)
-newton at /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/__init__.py, fork False, N 4096
+newton at .venv/lib/python3.12/site-packages/newton/__init__.py, fork False, N 4096
 | 4:1.25 | 148,247 env-steps/s | blocks 148,247, 147,325, 148,343 |
 | 4:0.625 | 74,218 env-steps/s | blocks 74,291, 73,740, 74,218 |
 $ PYTHONPATH=upstream/newton-dev .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/throughput.py ...
-newton at /Users/aditya/robosim/upstream/newton-dev/newton/__init__.py, fork True, N 4096
+newton at upstream/newton-dev/newton/__init__.py, fork True, N 4096
 | 4:1.25 | 140,685 env-steps/s | blocks 141,042, 140,052, 140,685 |
 | 4:1.25:solverdrive | 98,590 env-steps/s | blocks 98,895, 98,572, 98,590 |
 | 4:0.625 | 70,614 env-steps/s | blocks 70,673, 70,148, 70,614 |

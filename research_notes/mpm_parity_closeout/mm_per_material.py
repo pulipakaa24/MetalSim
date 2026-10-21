@@ -8,9 +8,9 @@ import sys
 
 import numpy as np
 
-L4 = ["/Users/aditya/robosim/runs/parity/isaaclab3_mpm_floors/mpm_floors",
-      "/Users/aditya/robosim/runs/parity/isaaclab3_mpm_floors/mpm_floors2"]
-METAL = sys.argv[1:] or ["/Users/aditya/robosim/runs/mpm/metal_floors_integrated_nofastmath/F_multi_material"]
+L4 = ["runs/parity/isaaclab3_mpm_floors/mpm_floors",
+      "runs/parity/isaaclab3_mpm_floors/mpm_floors2"]
+METAL = sys.argv[1:] or ["runs/mpm/metal_floors_integrated_nofastmath/F_multi_material"]
 
 
 def counts():

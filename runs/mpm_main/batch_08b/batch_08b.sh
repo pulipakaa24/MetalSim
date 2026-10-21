@@ -1,7 +1,7 @@
 #!/bin/bash
 # batch 08 (run outside the agent sandbox), in two runs:
-#   bash /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b08b/batch_08b.sh             # phases A-C
-#   PIN_MOVE=1 bash /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b08b/batch_08b.sh  # + phase D
+#   bash scratch/b08b/batch_08b.sh             # phases A-C
+#   PIN_MOVE=1 bash scratch/b08b/batch_08b.sh  # + phase D
 #
 # batch_08b replaces batch_08 (stopped at FORKS8 on 2026-10-13 19:57: the regenerated fallback diffs differed from the
 # committed ones only in the abbreviated blob ids of their "index" lines, 8 hex digits here against 7 in the files;
@@ -23,8 +23,8 @@
 #      checkouts; push; PR #29 out of draft.
 # Resumable (scratch/b08b/STATUS.txt). Phase C ~4 h, phase D ~30 min.
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
-R=/Users/aditya/robosim
+W=.
+R=.
 S=$W/scratch/b08b
 L=$S/logs
 O=$W/runs/mpm_main/batch_08b

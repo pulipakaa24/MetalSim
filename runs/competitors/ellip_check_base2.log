@@ -1,4 +1,4 @@
-=== go2 cone=elliptic N=512 S=200 MJW_JTCJ_MODE=(default) mujoco_warp=/Users/aditya/robosim/upstream/mujoco_warp-ellip-base/mujoco_warp
+=== go2 cone=elliptic N=512 S=200 MJW_JTCJ_MODE=(default) mujoco_warp=upstream/mujoco_warp-ellip-base/mujoco_warp
 Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 27.17 ms  (cached)
 Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 18.28 ms  (cached)
 Module ccd_kernel_builder__locals__ccd_kernel_9e9003e1 9e9003e load on device 'metal:0' took 23.45 ms  (cached)
@@ -52,7 +52,7 @@ capacity replay 2: nefc max 54 (njmax 512), nacon max 2394 (naconmax 24576); ove
 --- MuJoCo C oracle (4 worlds: PD hold + fixed random targets; |dq| max / median)
    t=0.004s 3.37e-03/8.5e-04  t=0.008s 5.80e-03/1.5e-03  t=0.016s 9.17e-03/2.2e-03  t=0.048s 1.58e-02/3.5e-03  t=0.100s 2.22e-02/5.2e-03  t=0.200s 2.74e-02/5.7e-03  t=0.400s 2.45e-02/4.8e-03
 === done
-=== g1 cone=elliptic N=512 S=200 MJW_JTCJ_MODE=(default) mujoco_warp=/Users/aditya/robosim/upstream/mujoco_warp-ellip-base/mujoco_warp
+=== g1 cone=elliptic N=512 S=200 MJW_JTCJ_MODE=(default) mujoco_warp=upstream/mujoco_warp-ellip-base/mujoco_warp
 Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 27.17 ms  (cached)
 Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 17.95 ms  (cached)
 Module ccd_kernel_builder__locals__ccd_kernel_26fc98f9 26fc98f load on device 'metal:0' took 24.16 ms  (cached)

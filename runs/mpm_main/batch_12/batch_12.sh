@@ -1,5 +1,5 @@
 #!/bin/bash
-# batch 12 (run outside the agent sandbox):  bash /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b12/batch_12.sh
+# batch 12 (run outside the agent sandbox):  bash scratch/b12/batch_12.sh
 #
 # #29 shown green before merge. batch_08b's rigid suite had 20 failed + 3 errors ("PREEXISTING": the same on the old
 # pins), all one cause: the worktree lacked the fetched, gitignored G1 USD (assets/isaac/G1/g1_minimal.usd; every
@@ -10,8 +10,8 @@
 # skip prints its reason; logs + a skip-reason summary are committed on batchsim-deterministic and posted on #29.
 # Pass = no failure and no error in any suite. ~20 min of GPU (check class).
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
-R=/Users/aditya/robosim
+W=.
+R=.
 S=$W/scratch/b12
 L=$S/logs
 O=$W/runs/mpm_main/batch_12

@@ -1,4 +1,4 @@
-metalsim from /Users/aditya/robosim/.claude/worktrees/agent-a3214b300d0b6e295/metalsim/__init__.py
+metalsim from metalsim/__init__.py
 task kwargs {'reward_cfg': 'flat', 'scan_ordering': None, 'terrain_collision': 'hfield', 'scan_surface': 'exact', 'solver_cfg': None, 'il3_events': False, 'contact_cfg': 'recommended', 'base_velocity': 'com', 'feet_slide_velocity': 'com'}
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -6,7 +6,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth dc949da load on device 'metal:0' took 59.23 ms  (cached)
 Module _nxn_broadphase__locals__kernel_80a41a9c 80a41a9 load on device 'metal:0' took 39.49 ms  (cached)
 Module ccd_kernel_builder__locals__ccd_kernel_285313d0 285313d load on device 'metal:0' took 57.51 ms  (cached)

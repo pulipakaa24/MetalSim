@@ -4,7 +4,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 ......Frect at 0.5 sizes: mean +0.07 %, worst 4x4 block 0.99 %
 rect at 1.0 sizes: mean +0.01 %, worst 4x4 block 0.52 %
 rect at 3.0 sizes: mean +0.00 %, worst 4x4 block 0.19 %
@@ -486,7 +486,7 @@ tests/test_render_tier2.py:226: AssertionError
 =============================== warnings summary ===============================
 tests/test_sensors_rt.py::test_gpu_path_ordering_with_sim
 tests/test_render_tier2.py::test_gpu_path_from_batchsim_matches_host
-  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
+  upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
     warnings.warn(
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html

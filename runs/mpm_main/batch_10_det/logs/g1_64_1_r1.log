@@ -1,22 +1,22 @@
 [gpu_run] mm10_g1_64_1_r1 start: device utilisation 0% (20:59:05)
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scripts/diagnostics/det_cost_g1.py", line 41, in <module>
+  File "scripts/diagnostics/det_cost_g1.py", line 41, in <module>
     main()
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scripts/diagnostics/det_cost_g1.py", line 30, in main
+  File "scripts/diagnostics/det_cost_g1.py", line 30, in main
     task = G1VelocityTask(a.worlds, terrain="flat", batch_options={"deterministic": bool(a.deterministic)})
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/learn/g1_velocity.py", line 593, in __init__
+  File "metalsim/learn/g1_velocity.py", line 593, in __init__
     self.model, self.info = build_g1_model(terrain, self.hfield, physics_dt=physics_dt,
                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/learn/g1_velocity.py", line 95, in build_g1_model
+  File "metalsim/learn/g1_velocity.py", line 95, in build_g1_model
     spec = load_usd(G1_USD, lossless=False, drives=False, visuals=visuals)   # visuals: 43 meshes for rendering only
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/scene/usd_to_mjcf.py", line 37, in load_usd
+  File "metalsim/scene/usd_to_mjcf.py", line 37, in load_usd
     stage = Usd.Stage.Open(path)
             ^^^^^^^^^^^^^^^^^^^^
 pxr.Tf.ErrorException: 
-	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
 [gpu_run] mm10_g1_64_1_r1 end: device utilisation 85% (20:59:13), exit 1
 [gpu_run] gpu_top: GPU (ioreg): device utilization 81 %; per-process GPU time over 1.9 s:
 [gpu_run] gpu_top:   pid    914 mediaanalysisd                     9.3 %

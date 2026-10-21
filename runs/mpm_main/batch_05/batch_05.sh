@@ -1,5 +1,5 @@
 #!/bin/bash
-# batch 05 (run outside the agent sandbox):  bash /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b05/batch_05.sh
+# batch 05 (run outside the agent sandbox):  bash scratch/b05/batch_05.sh
 #
 #   0  wait until PR #26 (mpm-main-sim) is merged into main (up to 3 h), fetch
 #   1  branch mpm-followups from origin/main: MPM.md section 11 gets batch 04's numbers (bearing with Isaac's default
@@ -11,8 +11,8 @@
 #      off, contact-slot audit (CCD on / off); commit the logs; push
 # Resumable (scratch/b05/STATUS.txt). Expected ~30-60 min after #26 is merged.
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
-R=/Users/aditya/robosim
+W=.
+R=.
 S=$W/scratch/b05
 L=$S/logs
 PY=$R/.venv/bin/python

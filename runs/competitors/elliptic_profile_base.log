@@ -1,7 +1,7 @@
 [gpu_run] ellip_profile_base start: device utilisation 0% (20:08:43)
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
 [gpu_run] gpu_top:   pid    476 WindowServer                       1.2 %
-LABEL profile_base mjw=/Users/aditya/robosim/upstream/mujoco_warp-ellip-base/mujoco_warp/__init__.py head=07a51a6 N=4096 env=
+LABEL profile_base mjw=upstream/mujoco_warp-ellip-base/mujoco_warp/__init__.py head=07a51a6 N=4096 env=
 == profile go2 elliptic
 KERNELS go2 N=4096: 24.13 ms/step GPU (sum of per-dispatch times), 187 dispatches/step
     19.112 ms  79.2%  x 11  _update_gradient_JTCJ_dense_f52c2ac2_metal_forward

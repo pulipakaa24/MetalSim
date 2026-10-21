@@ -1,8 +1,8 @@
 #!/bin/bash
 # tp26 job 9: chain-parallel sparse L'DL (worktree, MJW_METAL_LDL_CHAINS 1 vs 0): correctness check (solve bitwise, factor
 # float noise), isolated bench, then the interleaved step A/B (register solve + fused launches on in both).
-cd /Users/aditya/robosim && source .venv/bin/activate
-WT=/Users/aditya/robosim/upstream/warp-innate-tp:/Users/aditya/robosim/upstream/mujoco_warp-tp
+cd . && source .venv/bin/activate
+WT=upstream/warp-innate-tp:upstream/mujoco_warp-tp
 F='^\[\|Error\|Traceback\|imports'
 echo "=== start $(date) metalsim $(git rev-parse --short HEAD) wt warp $(git -C upstream/warp-innate-tp rev-parse --short HEAD) mjw $(git -C upstream/mujoco_warp-tp rev-parse --short HEAD) power: $(pmset -g batt | head -1)"
 echo "--- check $(date +%H:%M:%S)"; PYTHONPATH=$WT python scripts/diagnostics/ldl_lanes_check.py 64 2>&1 | grep -v "^Module\|^Warp\|^   [^0-9]\|^$" | tail -12

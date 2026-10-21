@@ -1,9 +1,9 @@
 #!/bin/bash
 # Final-state verification (each job through the GPU queue): recordings integrated (I) / final (N) and a second N run of
 # the coupled scenes, Warp Metal test groups, tests/test_mpm.py, rigid repeat checks, rigid suite.
-A=/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/runs/a2
-W=/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream
-R=/Users/aditya/robosim
+A=runs/a2
+W=upstream
+R=.
 G=$R/scripts/gpu_run.sh
 O=$A/out; mkdir -p $O $A/kc
 export PYTHONDONTWRITEBYTECODE=1

@@ -2,7 +2,7 @@
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
 [gpu_run] gpu_top:   pid    410 WindowServer                       1.7 %
 [gpu_run] gpu_top:   pid    973 Claude Helper                      1.4 %
-[guarded 11:16:14] start tree=n17_at free=46.3GB: --worlds 256 --det --state-in /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/out/state256.npz --steps 10 --json /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/out/det_at_256_r1.json
+[guarded 11:16:14] start tree=n17_at free=46.3GB: --worlds 256 --det --state-in runs/rigid17/out/state256.npz --steps 10 --json runs/rigid17/out/det_at_256_r1.json
 [guarded 11:16:22] end code=0 wall=8s peak_rss=0.5GB
 [gpu_run] r17_det_at_256_r1 end: device utilisation 0% (11:16:22), exit 0
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %

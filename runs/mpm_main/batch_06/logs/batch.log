@@ -3,7 +3,7 @@
 [19:24:06] WARPFORK -> PASS c26bd28ae591acb53a09bae7e2f38aa178cbeaa5
 [19:24:09] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[19:24:09] gpu job mm6_warp_det (check, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b06/logs/warp_test_metal_deterministic.log
+[19:24:09] gpu job mm6_warp_det (check, <= 15 min) -> scratch/b06/logs/warp_test_metal_deterministic.log
     Module det_mixed_max_add_0e0a068e 0e0a068 load on device 'metal:0' took 39.14 ms  (cached)
     Module ordered_sum_2edfb6c8 2edfb6c load on device 'metal:0' took 395.88 ms  (compiled)
     Module det_append_per_world_6b8637b8 6b8637b load on device 'metal:0' took 403.82 ms  (compiled)
@@ -11,43 +11,43 @@ GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 
 [19:29:05] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid    410 WindowServer                       1.2 %
-/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-tripwire-git/warp/__init__.py
-/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mujoco_warp-detccd/mujoco_warp/__init__.py
+upstream/warp-tripwire-git/warp/__init__.py
+upstream/mujoco_warp-detccd/mujoco_warp/__init__.py
 [19:29:06] WARPTESTS -> PASS Ran 15 tests in 4.294s OK 
-[19:29:06] gpu job mm6_tiny (check, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b06/logs/stack4.log
+[19:29:06] gpu job mm6_tiny (check, <= 15 min) -> scratch/b06/logs/stack4.log
     Module reset_data__locals__reset_contact_389ef5a7 389ef5a load on device 'metal:0' took 424.99 ms  (compiled)
     Module reset_data__locals__reset_sleep_60623600 6062360 load on device 'metal:0' took 391.28 ms  (compiled)
     Module reset_data__locals__reset_nworld_6e0f2593 6e0f259 load on device 'metal:0' took 413.01 ms  (compiled)
-    {"scene": "stack", "worlds": 4, "deterministic": 1, "capture": 1, "nativeccd_off": false, "in_process_first_diff": [null], "warp_cache": "/Users/aditya/Library/Caches/warp/1.18.0.dev20260917", "ccd_modules": {"mujoco_warp": "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mujoco_warp-detccd/mujoco_warp/__init__.py", "modules": {"ccd_det_kernels_builder__locals__ccd_det_solve_kernel_62afff05": "1", "ccd_det_kernels_builder__locals__ccd_det_write_kernel_bb5a648a": "1"}}}
+    {"scene": "stack", "worlds": 4, "deterministic": 1, "capture": 1, "nativeccd_off": false, "in_process_first_diff": [null], "warp_cache": "~/Library/Caches/warp/1.18.0.dev20260917", "ccd_modules": {"mujoco_warp": "upstream/mujoco_warp-detccd/mujoco_warp/__init__.py", "modules": {"ccd_det_kernels_builder__locals__ccd_det_solve_kernel_62afff05": "1", "ccd_det_kernels_builder__locals__ccd_det_write_kernel_bb5a648a": "1"}}}
 [19:29:57] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid    410 WindowServer                       1.2 %
   pid    744 Terminal                           1.2 %
 [19:29:57] TINY -> PASS 
-[19:29:57] gpu job mm6_s256a (check, <= 25 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b06/logs/stack256_cold_a.log
+[19:29:57] gpu job mm6_s256a (check, <= 25 min) -> scratch/b06/logs/stack256_cold_a.log
     Module reset_data__locals__reset_contact_389ef5a7 389ef5a load on device 'metal:0' took 96.05 ms  (compiled)
     Module reset_data__locals__reset_sleep_60623600 6062360 load on device 'metal:0' took 94.06 ms  (compiled)
     Module reset_data__locals__reset_nworld_6e0f2593 6e0f259 load on device 'metal:0' took 96.50 ms  (compiled)
-    {"scene": "stack", "worlds": 256, "deterministic": 1, "capture": 1, "nativeccd_off": false, "in_process_first_diff": [null], "warp_cache": "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b06/cache/a/1.18.0.dev20260917", "ccd_modules": {"mujoco_warp": "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mujoco_warp-detccd/mujoco_warp/__init__.py", "modules": {"ccd_det_kernels_builder__locals__ccd_det_solve_kernel_62afff05": "1", "ccd_det_kernels_builder__locals__ccd_det_write_kernel_bb5a648a": "1"}}}
+    {"scene": "stack", "worlds": 256, "deterministic": 1, "capture": 1, "nativeccd_off": false, "in_process_first_diff": [null], "warp_cache": "scratch/b06/cache/a/1.18.0.dev20260917", "ccd_modules": {"mujoco_warp": "upstream/mujoco_warp-detccd/mujoco_warp/__init__.py", "modules": {"ccd_det_kernels_builder__locals__ccd_det_solve_kernel_62afff05": "1", "ccd_det_kernels_builder__locals__ccd_det_write_kernel_bb5a648a": "1"}}}
 [19:30:13] health: utilisation 91%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[19:30:43] gpu job mm6_s256b (check, <= 25 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b06/logs/stack256_cold_b.log
+[19:30:43] gpu job mm6_s256b (check, <= 25 min) -> scratch/b06/logs/stack256_cold_b.log
     Module reset_data__locals__reset_contact_389ef5a7 389ef5a load on device 'metal:0' took 427.51 ms  (compiled)
     Module reset_data__locals__reset_sleep_60623600 6062360 load on device 'metal:0' took 405.13 ms  (compiled)
     Module reset_data__locals__reset_nworld_6e0f2593 6e0f259 load on device 'metal:0' took 450.41 ms  (compiled)
-    {"scene": "stack", "worlds": 256, "deterministic": 1, "capture": 1, "nativeccd_off": false, "in_process_first_diff": [null], "warp_cache": "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b06/cache/b/1.18.0.dev20260917", "ccd_modules": {"mujoco_warp": "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mujoco_warp-detccd/mujoco_warp/__init__.py", "modules": {"ccd_det_kernels_builder__locals__ccd_det_solve_kernel_62afff05": "1", "ccd_det_kernels_builder__locals__ccd_det_write_kernel_bb5a648a": "1"}}}
+    {"scene": "stack", "worlds": 256, "deterministic": 1, "capture": 1, "nativeccd_off": false, "in_process_first_diff": [null], "warp_cache": "scratch/b06/cache/b/1.18.0.dev20260917", "ccd_modules": {"mujoco_warp": "upstream/mujoco_warp-detccd/mujoco_warp/__init__.py", "modules": {"ccd_det_kernels_builder__locals__ccd_det_solve_kernel_62afff05": "1", "ccd_det_kernels_builder__locals__ccd_det_write_kernel_bb5a648a": "1"}}}
 [19:31:04] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   2.4 %
-[19:31:04] gpu job mm6_s256w (check, <= 25 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b06/logs/stack256_warm_b.log
+[19:31:04] gpu job mm6_s256w (check, <= 25 min) -> scratch/b06/logs/stack256_warm_b.log
     Module reset_data__locals__reset_contact_389ef5a7 389ef5a load on device 'metal:0' took 40.64 ms  (cached)
     Module reset_data__locals__reset_sleep_60623600 6062360 load on device 'metal:0' took 39.47 ms  (cached)
     Module reset_data__locals__reset_nworld_6e0f2593 6e0f259 load on device 'metal:0' took 40.56 ms  (cached)
-    {"scene": "stack", "worlds": 256, "deterministic": 1, "capture": 1, "nativeccd_off": false, "in_process_first_diff": [null], "warp_cache": "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b06/cache/b/1.18.0.dev20260917", "ccd_modules": {"mujoco_warp": "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mujoco_warp-detccd/mujoco_warp/__init__.py", "modules": {"ccd_det_kernels_builder__locals__ccd_det_solve_kernel_62afff05": "1", "ccd_det_kernels_builder__locals__ccd_det_write_kernel_bb5a648a": "1"}}}
+    {"scene": "stack", "worlds": 256, "deterministic": 1, "capture": 1, "nativeccd_off": false, "in_process_first_diff": [null], "warp_cache": "scratch/b06/cache/b/1.18.0.dev20260917", "ccd_modules": {"mujoco_warp": "upstream/mujoco_warp-detccd/mujoco_warp/__init__.py", "modules": {"ccd_det_kernels_builder__locals__ccd_det_solve_kernel_62afff05": "1", "ccd_det_kernels_builder__locals__ccd_det_write_kernel_bb5a648a": "1"}}}
 [19:31:20] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
 [19:31:20] STACK256 -> PASS in-process and cross-process identical (cold a, cold b, warm b)
-[19:31:20] gpu job mm6_audit (check, <= 25 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b06/logs/contact_audit_ccd.log
+[19:31:20] gpu job mm6_audit (check, <= 25 min) -> scratch/b06/logs/contact_audit_ccd.log
     {"step": 157, "nacon": [1536, 1536], "holes": [0, 0], "bb_count_hist": [[0, 0, 256], [0, 0, 256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
     {"step": 158, "nacon": [1536, 1536], "holes": [0, 0], "bb_count_hist": [[0, 0, 256], [0, 0, 256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
     {"step": 159, "nacon": [1536, 1536], "holes": [0, 0], "bb_count_hist": [[0, 0, 256], [0, 0, 256]], "worlds_state_differ": [], "n_worlds_state_differ": 0, "worlds_bb_count_differ": []}
@@ -55,16 +55,16 @@ GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 
 [19:32:01] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [19:32:01] AUDIT6 -> PASS every world the same box-box count at every step 130-160, no state difference
-[19:32:01] gpu job mm6_tests (check, <= 60 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b06/logs/test_batch_deterministic.log
+[19:32:01] gpu job mm6_tests (check, <= 60 min) -> scratch/b06/logs/test_batch_deterministic.log
     .......                                                                  [100%]
     7 passed in 242.03s (0:04:02)
 [19:36:13] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   1.9 %
 [19:36:13] TESTS_DET6 -> PASS 7 passed in 242.03s (0:04:02)
-[19:36:13] gpu job mm6_trip (check, <= 25 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b06/logs/stack256_single_ccd_kernel.log
+[19:36:13] gpu job mm6_trip (check, <= 25 min) -> scratch/b06/logs/stack256_single_ccd_kernel.log
         sim.check_overflow()
-      File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/batch.py", line 457, in check_overflow
+      File "metalsim/physics/batch.py", line 457, in check_overflow
         raise RuntimeError("Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter "
     RuntimeError: Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter calls differ between its two passes (research_notes/MPM in main simulator/deterministic_ccd_divergence.md)
 [19:36:39] health: utilisation 0%

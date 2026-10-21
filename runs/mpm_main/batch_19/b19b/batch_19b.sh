@@ -1,5 +1,5 @@
 #!/bin/bash
-# batch 19b (run outside the agent sandbox):  bash /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/batch_19b.sh
+# batch 19b (run outside the agent sandbox):  bash scratch/b19b/batch_19b.sh
 #
 # #29: batch_19's INCONCLUSIVE was an evaluator bug. The classifier for test_iteration_cap_repeats on the old pin
 # grepped for "counter phase mismatch", and pytest's repr truncation had cut that phrase out ("...-counter calls
@@ -13,8 +13,8 @@
 # Time (gpu_history: mm10_tests 4.7 min, G1 timing ~0.6 min per run x 12, b19 probes ~4 min not re-run): ~30 min.
 # Resumable (scratch/b19b/STATUS.txt). Reuses scratch/b19's scripts and runs/mpm_main/batch_19 outputs.
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
-R=/Users/aditya/robosim
+W=.
+R=.
 S=$W/scratch/b19b
 S19=$W/scratch/b19
 L=$S/logs

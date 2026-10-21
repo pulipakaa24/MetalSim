@@ -5,7 +5,7 @@ holder: {"name": "terrain_walls_bench3", "kind": "timing", "minutes": 10.0, "pid
   waiting [render] terrain_walls_transfer2 est 40.0 min, queued 380 s ago
   waiting [low] flex_metal_run2 est 30.0 min, queued 568 s ago
   waiting [low] mjw_tp_round4 est 30.0 min, queued 160 s ago
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -13,24 +13,24 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/scripts/diagnostics/terrain_walls_bench.py", line 53, in <module>
+  File "scripts/diagnostics/terrain_walls_bench.py", line 53, in <module>
     one(sys.argv[2], int(sys.argv[3]), float(sys.argv[4]), sys.argv[5]); sys.exit(0)
     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/scripts/diagnostics/terrain_walls_bench.py", line 29, in one
+  File "scripts/diagnostics/terrain_walls_bench.py", line 29, in one
     task = G1VelocityTask(n, terrain="rough", seed=0, physics_dt=physics_dt, reward_cfg="rough_isaac", terrain_collision=coll,
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/learn/g1_velocity.py", line 544, in __init__
+  File "metalsim/learn/g1_velocity.py", line 544, in __init__
     njmax = 256 if terrain_collision in ("hfield", "boxes", "meshes") else 512   # C's initial set on 0.025 m: 400 rows
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/physics/batch.py", line 141, in __init__
+  File "metalsim/physics/batch.py", line 141, in __init__
     self.d = mjw.put_data(wmodel, mjd, nworld=num_envs, nconmax=self.opt.nconmax, njmax=self.opt.njmax)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py", line 1952, in put_data
+  File "upstream/mujoco_warp/mujoco_warp/_src/io.py", line 1952, in put_data
     raise ValueError(f"njmax overflow (njmax must be >= {mjd.nefc})")
 ValueError: njmax overflow (njmax must be >= 464)
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -38,7 +38,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth eb51811 load on device 'metal:0' took 27.09 ms  (cached)
 Module _nxn_broadphase__locals__kernel_738cc90c 738cc90 load on device 'metal:0' took 18.05 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ed246d84 ed246d8 load on device 'metal:0' took 20.02 ms  (cached)
@@ -87,22 +87,22 @@ Module reset_data__locals__reset_nworld_4a90e5af 4a90e5a load on device 'metal:0
 Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
 Module metalsim.sensors.contact 1eab3a3 load on device 'metal:0' took 19.33 ms  (cached)
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/scripts/diagnostics/terrain_walls_bench.py", line 53, in <module>
+  File "scripts/diagnostics/terrain_walls_bench.py", line 53, in <module>
     one(sys.argv[2], int(sys.argv[3]), float(sys.argv[4]), sys.argv[5]); sys.exit(0)
     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/scripts/diagnostics/terrain_walls_bench.py", line 29, in one
+  File "scripts/diagnostics/terrain_walls_bench.py", line 29, in one
     task = G1VelocityTask(n, terrain="rough", seed=0, physics_dt=physics_dt, reward_cfg="rough_isaac", terrain_collision=coll,
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/learn/g1_velocity.py", line 637, in __init__
+  File "metalsim/learn/g1_velocity.py", line 637, in __init__
     self.sim.synchronize()
-  File "/Users/aditya/robosim/metalsim/physics/batch.py", line 224, in synchronize
+  File "metalsim/physics/batch.py", line 224, in synchronize
     wp.synchronize_device(self.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12891, in synchronize_device
+  File "upstream/warp-innate/warp/_src/context.py", line 12891, in synchronize_device
     device.metal_synchronize()
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 6066, in metal_synchronize
+  File "upstream/warp-innate/warp/_src/context.py", line 6066, in metal_synchronize
     raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
 RuntimeError: Metal error on device metal:0: Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -110,7 +110,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth eb51811 load on device 'metal:0' took 29.38 ms  (cached)
 Module _nxn_broadphase__locals__kernel_738cc90c 738cc90 load on device 'metal:0' took 19.66 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ed246d84 ed246d8 load on device 'metal:0' took 22.54 ms  (cached)
@@ -157,10 +157,10 @@ Module reset_data__locals__reset_sleep_b049b8fb b049b8f load on device 'metal:0'
 Module reset_data__locals__reset_nworld_4a90e5af 4a90e5a load on device 'metal:0' took 18.04 ms  (cached)
 Module metalsim.sensors.contact 1eab3a3 load on device 'metal:0' took 20.12 ms  (cached)
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/scripts/diagnostics/terrain_walls_bench.py", line 53, in <module>
+  File "scripts/diagnostics/terrain_walls_bench.py", line 53, in <module>
     one(sys.argv[2], int(sys.argv[3]), float(sys.argv[4]), sys.argv[5]); sys.exit(0)
     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/scripts/diagnostics/terrain_walls_bench.py", line 33, in one
+  File "scripts/diagnostics/terrain_walls_bench.py", line 33, in one
     arrs = [o for o in gc.get_objects() if isinstance(o, wp.array) and str(o.device) == "metal:0" and o.ptr]
                                                                            ^^^^^^^^
 AttributeError: 'fixedarray' object has no attribute 'device'

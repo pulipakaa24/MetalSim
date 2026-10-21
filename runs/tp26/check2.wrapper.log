@@ -1,6 +1,6 @@
 === start Sat Sep 26 04:45:34 PDT 2026 metalsim 444b6af wt warp 2869a2f7 mjw dd42c23
 --- unfused (reference) 04:45:34
-imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp/warp/__init__.py upstream/mujoco_warp-tp/mujoco_warp/__init__.py
 === variant {'label': 'worktree unfused'}; N=512, 50 control steps, deterministic actions
 njmax 144 naconmax 12288 sparse False
 --- floor: two graph-replay instances of this configuration
@@ -27,7 +27,7 @@ capacity eager: nefc max 35 (njmax 144), nacon max 1350 (naconmax 12288); overfl
 --- physics protocol vs MuJoCo C (4 worlds: PD hold + fixed random targets; |dq| max / median)
 === done
 --- fused vs unfused 04:46:14
-imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp/warp/__init__.py upstream/mujoco_warp-tp/mujoco_warp/__init__.py
 === variant {'label': 'worktree fused'}; N=512, 50 control steps, deterministic actions
 njmax 144 naconmax 12288 sparse False
 --- floor: two graph-replay instances of this configuration

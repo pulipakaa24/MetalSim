@@ -6,7 +6,7 @@ holder: {"name": "mjw_tp_round3", "kind": "low", "minutes": 45.0, "pid": 51827, 
   waiting [low] flex_metal_run2 est 30.0 min, queued 94 s ago
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 task: terrain flat, reward_cfg flat, obs_dim 123, height scan 0 rays
 === segment graphs, N=4096, dt 2.5 ms, decimation 8, 20 replays each, synchronized; reset segments with 2% of envs flagged
   apply_action                                                0.04 ms   dispatches     3 cmdbufs   1 syncs 1
@@ -30,7 +30,7 @@ task: terrain flat, reward_cfg flat, obs_dim 123, height scan 0 rays
   mjw.step (whole substep)                                                                      17.24 ms  dispatches  212
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 task: terrain flat, reward_cfg flat, obs_dim 123, height scan 0 rays
 === per-kernel GPU time (WP_METAL_PROFILE=1, eager, one command buffer per dispatch), N=4096; 3 steps per segment
 --- apply_action: 0.02 ms/step GPU (sum of per-dispatch times)

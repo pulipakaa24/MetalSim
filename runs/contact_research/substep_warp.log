@@ -6,7 +6,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth ea5c7c8 load on device 'metal:0' took 34.13 ms  (cached)
 Module _nxn_broadphase__locals__kernel_13ac863e 13ac863 load on device 'metal:0' took 822.56 ms  (compiled)
 Module ccd_kernel_builder__locals__ccd_kernel_8a5df304 8a5df30 load on device 'metal:0' took 3072.51 ms  (compiled)
@@ -54,14 +54,14 @@ Module metalsim.sensors.contact 620b2e7 load on device 'metal:0' took 748.35 ms 
 [warp] A_hold: 1200 substeps, final z 0.054, 20 s
 [warp] B_random: 2000 substeps, final z 0.124, 30 s
 [warp] C_drop: 1200 substeps, final z 0.054, 35 s
-wrote /Users/aditya/robosim/runs/contact_research/substep_warp_default.npz
+wrote runs/contact_research/substep_warp_default.npz
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
    Devices:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth ea5c7c8 load on device 'metal:0' took 28.02 ms  (cached)
 Module _nxn_broadphase__locals__kernel_13ac863e 13ac863 load on device 'metal:0' took 18.59 ms  (cached)
 Module ccd_kernel_builder__locals__ccd_kernel_8a5df304 8a5df30 load on device 'metal:0' took 27.69 ms  (cached)
@@ -109,4 +109,4 @@ Module metalsim.sensors.contact 620b2e7 load on device 'metal:0' took 20.64 ms  
 [warp] A_hold: 1200 substeps, final z 0.054, 7 s
 [warp] B_random: 2000 substeps, final z 0.131, 16 s
 [warp] C_drop: 1200 substeps, final z 0.054, 22 s
-wrote /Users/aditya/robosim/runs/contact_research/substep_warp_tau10_impact_hardlimits.npz
+wrote runs/contact_research/substep_warp_tau10_impact_hardlimits.npz

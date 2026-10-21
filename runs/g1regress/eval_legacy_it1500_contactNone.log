@@ -1,6 +1,6 @@
-metalsim from /Users/aditya/robosim/.claude/worktrees/agent-a3214b300d0b6e295/metalsim/__init__.py
+metalsim from metalsim/__init__.py
 task kwargs {'reward_cfg': 'rough_isaac', 'scan_ordering': 'ij', 'terrain_collision': 'hfield', 'scan_surface': 'grid', 'contact_cfg': None, 'base_velocity': 'origin', 'feet_slide_velocity': 'origin'}
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -8,7 +8,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth dc949da load on device 'metal:0' took 62.32 ms  (cached)
 Module _nxn_broadphase__locals__kernel_80a41a9c 80a41a9 load on device 'metal:0' took 40.81 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_66b1418a 66b1418 load on device 'metal:0' took 55.86 ms  (cached)

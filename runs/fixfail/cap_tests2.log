@@ -1,5 +1,5 @@
-=== tree /Users/aditya/robosim/.claude/worktrees/agent-ad5dbe3dae8c8990c
-metalsim /Users/aditya/robosim/.claude/worktrees/agent-ad5dbe3dae8c8990c/metalsim/__init__.py warp 1.18.0.dev20260917 mujoco 3.14.0 mjw /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/__init__.py
+=== tree <repo>
+metalsim metalsim/__init__.py warp 1.18.0.dev20260917 mujoco 3.14.0 mjw upstream/mujoco_warp/mujoco_warp/__init__.py
 Module _solve_LD_sparse_serial__locals__kernel_af3ba8f1 a010231 load on device 'metal:0' took 431.94 ms  (cached)
 Module _solve_init_dof__locals__kernel_a278b607 a278b60 load on device 'metal:0' took 339.84 ms  (cached)
 Module _solve_init_efc__locals__kernel_38f8708b 38f8708 load on device 'metal:0' took 342.38 ms  (cached)
@@ -61,7 +61,7 @@ FAILED tests/test_capacity.py::test_check_overflow_raises_on_dropped_rows - V...
 FAILED tests/test_capacity.py::test_overflow_survives_resets - ValueError: nj...
 2 failed, 5 passed in 58.15s
 === tree /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/oldtree
-metalsim /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/oldtree/metalsim/__init__.py warp 1.18.0.dev20260917 mujoco 3.14.0 mjw /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/__init__.py
+metalsim /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/oldtree/metalsim/__init__.py warp 1.18.0.dev20260917 mujoco 3.14.0 mjw upstream/mujoco_warp/mujoco_warp/__init__.py
         nccdmax = nconmax
       else:
         if nccdmax < 0:
@@ -73,7 +73,7 @@ metalsim /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4
 >       raise ValueError(f"njmax overflow (njmax must be >= {mjd.nefc})")
 E       ValueError: njmax overflow (njmax must be >= 24)
 
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:2080: ValueError
+upstream/mujoco_warp/mujoco_warp/_src/io.py:2080: ValueError
 ________________ test_equality_block_ending_at_njmax_is_flagged ________________
 
     def test_equality_block_ending_at_njmax_is_flagged():

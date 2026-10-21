@@ -1,10 +1,10 @@
 == Fri Sep 25 23:49:21 PDT 2026
-holder: {"name": "il3_policy_side", "kind": "train", "minutes": 15.0, "pid": 67621, "start": 1790405337.9466581, "queued": 1790401532.6597466, "cmd": "runs/il3/run_policy_side.sh", "cwd": "/Users/aditya/robosim"}
+holder: {"name": "il3_policy_side", "kind": "train", "minutes": 15.0, "pid": 67621, "start": 1790405337.9466581, "queued": 1790401532.6597466, "cmd": "runs/il3/run_policy_side.sh", "cwd": "<repo>"}
   waiting [low] kamino_tests_fork est 40.0 min, queued 31833 s ago
   waiting [low] kamino_tests_152 est 30.0 min, queued 31003 s ago
   waiting [low] cl_kamino est 45.0 min, queued 29672 s ago
   waiting [low] cl_mjw est 40.0 min, queued 29649 s ago
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -12,7 +12,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 30.77 ms  (cached)
 Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 19.07 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_b3132664 b313266 load on device 'metal:0' took 26.11 ms  (cached)
@@ -65,7 +65,7 @@ Module metalsim.learn.warp_policy a9b40e0 load on device 'metal:0' took 19.24 ms
 Module metalsim.learn.terrain 595c542 load on device 'metal:0' took 17.98 ms  (cached)
 Module metalsim.learn.g1_velocity 98312b6 load on device 'metal:0' took 21.74 ms  (cached)
 {"ckpt": "init", "reward_cfg": "rough_il3", "solver_cfg": "isaaclab3_every_substep_cap20", "std_param": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0], "groups": {"leg/torso": {"mean_abs_mu": 0.12010399252176285, "max_abs_mu": 0.8718346953392029, "frac_abs_a_gt1": 0.32296668419471153, "frac_abs_a_gt3": 0.0030391751802884615, "frac_target_beyond_limit": 0.18086932842548076, "max_target_overshoot_rad": 2.547129171594212}, "arm": {"mean_abs_mu": 0.11891435831785202, "max_abs_mu": 1.0494168996810913, "frac_abs_a_gt1": 0.3229658203125, "frac_abs_a_gt3": 0.003024169921875, "frac_target_beyond_limit": 0.002552978515625, "max_target_overshoot_rad": 1.5242179579413289}, "finger": {"mean_abs_mu": 0.11634063720703125, "max_abs_mu": 0.9617418050765991, "frac_abs_a_gt1": 0.32232578822544644, "frac_abs_a_gt3": 0.002986886160714286, "frac_target_beyond_limit": 0.3289524623325893, "max_target_overshoot_rad": 2.494826078414917}}, "worst_joints_target_beyond": [["right_ankle_roll_joint", 0.604, 2.067], ["left_ankle_roll_joint", 0.602, 2.195], ["right_four_joint", 0.514, 2.464], ["left_six_joint", 0.495, 2.495], ["right_six_joint", 0.467, 2.287], ["left_four_joint", 0.441, 2.32], ["left_one_joint", 0.33, 2.347], ["right_one_joint", 0.328, 2.098]]}
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -73,7 +73,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 26.03 ms  (cached)
 Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 18.33 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_b3132664 b313266 load on device 'metal:0' took 24.34 ms  (cached)
@@ -126,7 +126,7 @@ Module metalsim.learn.warp_policy a9b40e0 load on device 'metal:0' took 17.08 ms
 Module metalsim.learn.terrain 595c542 load on device 'metal:0' took 17.64 ms  (cached)
 Module metalsim.learn.g1_velocity 98312b6 load on device 'metal:0' took 21.43 ms  (cached)
 {"ckpt": "runs/il3/ckpt/early_fixed_it12.pt", "reward_cfg": "rough_il3", "solver_cfg": "isaaclab3_every_substep_cap20", "std_param": [1.0, 1.0089999437332153, 1.0199999809265137, 1.0119999647140503, 1.0269999504089355, 1.031000018119812, 0.9819999933242798, 1.0199999809265137, 1.0110000371932983, 1.003999948501587, 1.0269999504089355, 1.0269999504089355, 0.9990000128746033, 1.0290000438690186, 1.0329999923706055, 1.024999976158142, 1.0219999551773071, 1.0290000438690186, 1.0290000438690186, 1.0290000438690186, 1.0329999923706055, 1.0360000133514404, 1.0240000486373901, 1.0299999713897705, 1.027999997138977, 1.0219999551773071, 1.031000018119812, 1.0230000019073486, 1.031999945640564, 1.0219999551773071, 1.0269999504089355, 1.0299999713897705, 1.024999976158142, 1.034999966621399, 1.031999945640564, 1.0219999551773071, 1.0299999713897705], "groups": {"leg/torso": {"mean_abs_mu": 0.19238686561584473, "max_abs_mu": 1.9091377258300781, "frac_abs_a_gt1": 0.3377409480168269, "frac_abs_a_gt3": 0.004098933293269231, "frac_target_beyond_limit": 0.18364013671875, "max_target_overshoot_rad": 2.5549779112182356}, "arm": {"mean_abs_mu": 0.1728302538394928, "max_abs_mu": 1.3558030128479004, "frac_abs_a_gt1": 0.3411806640625, "frac_abs_a_gt3": 0.00428173828125, "frac_target_beyond_limit": 0.0032705078125, "max_target_overshoot_rad": 1.573271865335738}, "finger": {"mean_abs_mu": 0.17476963996887207, "max_abs_mu": 1.314106822013855, "frac_abs_a_gt1": 0.3421925571986607, "frac_abs_a_gt3": 0.004355119977678571, "frac_target_beyond_limit": 0.34168788364955355, "max_target_overshoot_rad": 2.5741257667541504}}, "worst_joints_target_beyond": [["left_ankle_roll_joint", 0.622, 2.28], ["right_ankle_roll_joint", 0.619, 2.177], ["right_four_joint", 0.527, 2.574], ["right_six_joint", 0.487, 2.306], ["left_six_joint", 0.466, 2.517], ["left_four_joint", 0.454, 2.477], ["right_one_joint", 0.351, 2.174], ["left_one_joint", 0.348, 2.328]]}
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -134,7 +134,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 28.75 ms  (cached)
 Module _nxn_broadphase__locals__kernel_28decaf1 28decaf load on device 'metal:0' took 19.63 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_b3132664 b313266 load on device 'metal:0' took 26.28 ms  (cached)
@@ -184,16 +184,16 @@ Module reset_data__locals__reset_nworld_f0ec89aa f0ec89a load on device 'metal:0
 Module metalsim.sensors.contact 8b280a6 load on device 'metal:0' took 19.90 ms  (cached)
 Module metalsim.learn.terrain 595c542 load on device 'metal:0' took 19.61 ms  (cached)
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/runs/il3/policy_stats.py", line 17, in <module>
+  File "runs/il3/policy_stats.py", line 17, in <module>
     ck = torch.load(ckpt, map_location="cpu", weights_only=False)
          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/serialization.py", line 1565, in load
+  File ".venv/lib/python3.12/site-packages/torch/serialization.py", line 1565, in load
     with _open_file_like(f, "rb") as opened_file:
          ^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/serialization.py", line 795, in _open_file_like
+  File ".venv/lib/python3.12/site-packages/torch/serialization.py", line 795, in _open_file_like
     return _open_file(name_or_buffer, mode)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/serialization.py", line 776, in __init__
+  File ".venv/lib/python3.12/site-packages/torch/serialization.py", line 776, in __init__
     super().__init__(open(name, mode))  # noqa: SIM115
                      ^^^^^^^^^^^^^^^^
 FileNotFoundError: [Errno 2] No such file or directory: 'runs/il3/ckpt/early_rough232task_it12.pt'

@@ -1,6 +1,6 @@
 [gpu_run] e2_off_models start: device utilisation 0% (04:03:26)
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-LABEL models_off mjw=/Users/aditya/robosim/upstream/mujoco_warp-ellip2/mujoco_warp/__init__.py head=a33c731 N=4096 env=MJW_ELLIPTIC_INCREMENTAL=0 
+LABEL models_off mjw=upstream/mujoco_warp-ellip2/mujoco_warp/__init__.py head=a33c731 N=4096 env=MJW_ELLIPTIC_INCREMENTAL=0 
 == go2 elliptic
 RESULT {"engine": "metalsim", "cone": 1, "robot": "go2", "N": 4096, "mode": "matched", "nv": 18, "nu": 12, "iters": 10, "ls": 20, "build_s": 2.0, "steps_per_s": 580782, "substeps": 1, "preset": null, "finite": true, "base_z_mean": 0.189, "overflow": {"ITERATIONS": 981, "LS_ITERATIONS": 4096}}
 == humanoid elliptic

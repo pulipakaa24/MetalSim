@@ -20,25 +20,25 @@ solve lanes   : 0.268 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels
 factor chains : 0.647 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
 solve chains  : 0.368 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels)
 --- C1 chains 06:38:54
-imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp/warp/__init__.py upstream/mujoco_warp-tp/mujoco_warp/__init__.py
 [C1_chains] N=4096 njmax 144 naconmax 98304 is_sparse False
 [C1_chains] physics only 50.9 ms/step -> 80,513 env-steps/s
 [C1_chains] full env step 72.9 ms -> 56,197 env-steps/s
 [C1_chains] after random-action steps: nefc max 41 mean 14.5; nacon 11164 (2.73/world); overflow {'ITERATIONS': 37, 'LS_ITERATIONS': 3914}
 --- S1 serial 06:39:09
-imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp/warp/__init__.py upstream/mujoco_warp-tp/mujoco_warp/__init__.py
 [S1_serial] N=4096 njmax 144 naconmax 98304 is_sparse False
 [S1_serial] physics only 45.3 ms/step -> 90,331 env-steps/s
 [S1_serial] full env step 67.2 ms -> 60,949 env-steps/s
 [S1_serial] after random-action steps: nefc max 43 mean 14.3; nacon 11045 (2.70/world); overflow {'ITERATIONS': 31, 'LS_ITERATIONS': 3897}
 --- C2 chains 06:39:23
-imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp/warp/__init__.py upstream/mujoco_warp-tp/mujoco_warp/__init__.py
 [C2_chains] N=4096 njmax 144 naconmax 98304 is_sparse False
 [C2_chains] physics only 50.9 ms/step -> 80,477 env-steps/s
 [C2_chains] full env step 72.9 ms -> 56,212 env-steps/s
 [C2_chains] after random-action steps: nefc max 44 mean 14.5; nacon 11321 (2.76/world); overflow {'ITERATIONS': 28, 'LS_ITERATIONS': 3880}
 --- S2 serial 06:39:37
-imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp/warp/__init__.py upstream/mujoco_warp-tp/mujoco_warp/__init__.py
 [S2_serial] N=4096 njmax 144 naconmax 98304 is_sparse False
 [S2_serial] physics only 45.3 ms/step -> 90,346 env-steps/s
 [S2_serial] full env step 67.2 ms -> 60,913 env-steps/s

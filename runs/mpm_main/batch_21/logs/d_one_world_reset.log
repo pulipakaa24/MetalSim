@@ -4,17 +4,17 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/one_world_reset.py", line 70, in <module>
+  File "metalsim/physics/mpm/probes/one_world_reset.py", line 70, in <module>
     main()
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/one_world_reset.py", line 59, in main
+  File "metalsim/physics/mpm/probes/one_world_reset.py", line 59, in main
     t = {m: trajectory(m) for m in ("selected", "full", "unselected", "none")}
             ^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/one_world_reset.py", line 30, in trajectory
+  File "metalsim/physics/mpm/probes/one_world_reset.py", line 30, in trajectory
     sim, mpm = scale_coupled.build(b)
                ^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/scale_coupled.py", line 42, in build
+  File "metalsim/physics/mpm/probes/scale_coupled.py", line 42, in build
     sim = BatchSim(model, a.worlds, options=BatchSimOptions(substeps=3, deterministic=bool(a.deterministic)))
                                                                                            ^^^^^^^^^^^^^^^
 AttributeError: 'Namespace' object has no attribute 'deterministic'

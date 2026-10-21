@@ -1,11 +1,11 @@
 .......                                                                  [100%]
 =============================== warnings summary ===============================
 tests/test_g1_newton_engine.py::test_graph_replay_matches_eager
-  /Users/aditya/robosim/metalsim/learn/g1_velocity.py:980: RuntimeWarning: Mean of empty slice
+  metalsim/learn/g1_velocity.py:980: RuntimeWarning: Mean of empty slice
     return {"num_envs": n, "frames": num_frames, "mean_step_ms": t_ns.mean() / 1e6, "fps_isaac_style": n / (t_ns.mean() / 1e9)}
 
 tests/test_g1_newton_engine.py::test_graph_replay_matches_eager
-  /Users/aditya/robosim/.venv/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+  .venv/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
     ret = ret.dtype.type(ret / rcount)
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html

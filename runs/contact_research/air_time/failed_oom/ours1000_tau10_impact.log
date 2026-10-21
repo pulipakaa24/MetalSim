@@ -4,7 +4,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 32.53 ms  (cached)
 Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 21.41 ms  (cached)
 Module ccd_kernel_builder__locals__ccd_kernel_78310433 7831043 load on device 'metal:0' took 31.09 ms  (cached)
@@ -49,9 +49,9 @@ Module reset_data__locals__reset_mocap_d5f6a172 d5f6a17 load on device 'metal:0'
 Module reset_data__locals__reset_contact_10be067b 10be067 load on device 'metal:0' took 20.73 ms  (cached)
 Module reset_data__locals__reset_sleep_4c0bb4a4 4c0bb4a load on device 'metal:0' took 21.18 ms  (cached)
 Module reset_data__locals__reset_nworld_f0ec89aa f0ec89a load on device 'metal:0' took 20.57 ms  (cached)
-/Users/aditya/robosim/.venv/lib/python3.12/site-packages/numpy/linalg/_linalg.py:2803: RuntimeWarning: overflow encountered in multiply
+.venv/lib/python3.12/site-packages/numpy/linalg/_linalg.py:2803: RuntimeWarning: overflow encountered in multiply
   s = (x.conj() * x).real
-/Users/aditya/robosim/scripts/diagnostics/contact_research/air_time_rollout.py:72: RuntimeWarning: invalid value encountered in multiply
+scripts/diagnostics/contact_research/air_time_rollout.py:72: RuntimeWarning: invalid value encountered in multiply
   slide_com = -0.1 * (sp * in_hist).sum(1)
 Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
 Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
@@ -61,12 +61,12 @@ Module metalsim.sensors.contact 8b280a6 load on device 'metal:0' took 25.19 ms  
 Module metalsim.learn.g1_velocity 775ff1f load on device 'metal:0' took 29.48 ms  (cached)
 Module metalsim.learn.warp_policy a9b40e0 load on device 'metal:0' took 23.33 ms  (cached)
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/scripts/diagnostics/contact_research/air_time_rollout.py", line 60, in <module>
+  File "scripts/diagnostics/contact_research/air_time_rollout.py", line 60, in <module>
     task.sim.synchronize()
-  File "/Users/aditya/robosim/metalsim/physics/batch.py", line 224, in synchronize
+  File "metalsim/physics/batch.py", line 224, in synchronize
     wp.synchronize_device(self.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12891, in synchronize_device
+  File "upstream/warp-innate/warp/_src/context.py", line 12891, in synchronize_device
     device.metal_synchronize()
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 6066, in metal_synchronize
+  File "upstream/warp-innate/warp/_src/context.py", line 6066, in metal_synchronize
     raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
 RuntimeError: Metal error on device metal:0: Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)

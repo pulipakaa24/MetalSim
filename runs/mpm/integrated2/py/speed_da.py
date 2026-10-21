@@ -8,4 +8,4 @@ def install(*a, **kw):
     return _install(*a, **kw)
 newton_compat.install = install
 sys.argv = ["speed_bench.py"] + sys.argv[1:]
-runpy.run_path("/Users/aditya/robosim/metalsim/physics/mpm/probes/speed_bench.py", run_name="__main__")
+runpy.run_path("metalsim/physics/mpm/probes/speed_bench.py", run_name="__main__")

@@ -1,7 +1,7 @@
 #!/bin/bash
 # batch 11 (run outside the agent sandbox), in two runs:
-#   bash /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b11/batch_11.sh               # A-B
-#   PIN_MOVE=1 bash /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b11/batch_11.sh    # + C
+#   bash scratch/b11/batch_11.sh               # A-B
+#   PIN_MOVE=1 bash scratch/b11/batch_11.sh    # + C
 #
 # Newton 1.7's SolverMuJoCo against MetalSim's MuJoCo Warp fork 3.14: contact_force_fn takes contact_adhesion_in, which
 # Newton's convert_mjw_contacts_to_newton_kernel did not pass (upstream Newton fixed it in 90f809a, its MuJoCo Warp
@@ -19,8 +19,8 @@
 #      MetalSim's Newton tests again on the real environments; commit, push, PR
 # Resumable (scratch/b11/STATUS.txt). A+B ~45 min, C ~20 min.
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
-R=/Users/aditya/robosim
+W=.
+R=.
 S=$W/scratch/b11
 L=$S/logs
 NG=$W/upstream/newton-mjw314-git

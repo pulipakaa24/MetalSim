@@ -1,8 +1,8 @@
 #!/bin/bash
 # rigid_neutral.py with the closeout Warp tree (warp_push, 43ffc6dd, built) with metal_cuda_libm off (the kernel code
 # of 152808b7 for everything outside warp.fem) and on, twice each (run-to-run repeatability first), own kernel caches.
-W=/Users/aditya/robosim/.claude/worktrees/agent-a8a12903da01bb68c
-PY=/Users/aditya/robosim/.venv/bin/python
+W=.
+PY=.venv/bin/python
 S=$W/research_notes/mpm_parity_closeout/rigid_neutral.py
 F='^Module\|Warp \|CUDA\|Devices\|"\|Kernel cache\|^ *$\|/Users\|warn'
 cd /private/tmp

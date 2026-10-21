@@ -1,12 +1,12 @@
 [gpu_run] spec_cost_fin start: device utilisation 0% (02:23:47)
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
 [gpu_run] gpu_top:   pid  22365 Google Chrome He                   2.2 %
-== stage cost dt=0.0025 mjw=/Users/aditya/robosim/upstream/mujoco_warp-spec-27f1fcd@27f1fcd spec=1 presets=recommended ellip10_tau5_specgap10mm ellip10_tau5 Sun Sep 27 02:23:51 PDT 2026
-holder: {"name": "spec_cost_fin", "kind": "timing", "minutes": 4.0, "pid": 26284, "start": 1790501025.699091, "queued": 1790501025.6987283, "cmd": "runs/speculative/job_cost_fin.sh", "cwd": "/Users/aditya/robosim"}
+== stage cost dt=0.0025 mjw=upstream/mujoco_warp-spec-27f1fcd@27f1fcd spec=1 presets=recommended ellip10_tau5_specgap10mm ellip10_tau5 Sun Sep 27 02:23:51 PDT 2026
+holder: {"name": "spec_cost_fin", "kind": "timing", "minutes": 4.0, "pid": 26284, "start": 1790501025.699091, "queued": 1790501025.6987283, "cmd": "runs/speculative/job_cost_fin.sh", "cwd": "<repo>"}
 gpu_lock status at start 2026-09-27T02:23:52
-holder: {"name": "spec_cost_fin", "kind": "timing", "minutes": 4.0, "pid": 26284, "start": 1790501025.699091, "queued": 1790501025.6987283, "cmd": "runs/speculative/job_cost_fin.sh", "cwd": "/Users/aditya/robosim"}
+holder: {"name": "spec_cost_fin", "kind": "timing", "minutes": 4.0, "pid": 26284, "start": 1790501025.699091, "queued": 1790501025.6987283, "cmd": "runs/speculative/job_cost_fin.sh", "cwd": "<repo>"}
 
-mujoco_warp from /Users/aditya/robosim/upstream/mujoco_warp-spec-27f1fcd/mujoco_warp/__init__.py
+mujoco_warp from upstream/mujoco_warp-spec-27f1fcd/mujoco_warp/__init__.py
   recommended: overflow {'LS_ITERATIONS': 4096}
   ellip10_tau5_specgap10mm: overflow {'LS_ITERATIONS': 4096}
   ellip10_tau5: overflow {'LS_ITERATIONS': 4096}

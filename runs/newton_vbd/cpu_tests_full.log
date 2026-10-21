@@ -4,7 +4,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 94 tests selected
 test_bending_damping_handles_degenerate_anchor_cpu (newton.tests.test_solver_vbd.TestSolverVBD.test_bending_damping_handles_degenerate_anchor_cpu) ... Module newton.tests.test_solver_vbd c6c3812 load on device 'cpu' took 3536.83 ms  (compiled)
 ok
@@ -121,7 +121,7 @@ test_edge_edge_collision_cross_world_rejected_cpu (newton.tests.test_collision_c
 test_edge_edge_collision_same_world_detected_cpu (newton.tests.test_collision_cloth.TestCollision.test_edge_edge_collision_same_world_detected_cpu) ... ok
 test_edge_edge_collision_same_world_in_multiworld_detected_cpu (newton.tests.test_collision_cloth.TestCollision.test_edge_edge_collision_same_world_in_multiworld_detected_cpu) ... ok
 test_global_soft_primitives_filter_compatible_worlds_cpu (newton.tests.test_collision_cloth.TestCollision.test_global_soft_primitives_filter_compatible_worlds_cpu) ... ok
-test_mesh_ground_collision_index_cpu (newton.tests.test_collision_cloth.TestCollision.test_mesh_ground_collision_index_cpu) ... /Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/test_collision_cloth.py:918: UserWarning: Inertia validation corrected 2 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+test_mesh_ground_collision_index_cpu (newton.tests.test_collision_cloth.TestCollision.test_mesh_ground_collision_index_cpu) ... upstream/newton-1.5.2/newton/tests/test_collision_cloth.py:918: UserWarning: Inertia validation corrected 2 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
   model = builder.finalize(device=device)
 Module newton._src.geometry.inertia bc8fb00 load on device 'metal:0' took 18.16 ms  (cached)
 Module newton._src.geometry.contact_reduction_global 0a8e255 load on device 'cpu' took 206.58 ms  (compiled)
@@ -143,84 +143,84 @@ test_vertex_triangle_collision_same_world_in_multiworld_detected_cpu (newton.tes
 ERROR: test_collision_detector_requires_adjacency_cpu (newton.tests.test_collision_cloth.TestCollision.test_collision_detector_requires_adjacency_cpu)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/unittest_utils.py", line 536, in test_func
+  File "upstream/newton-1.5.2/newton/tests/unittest_utils.py", line 536, in test_func
     func(self, device, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 1442, in test_collision_detector_requires_adjacency
+  File "upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 1442, in test_collision_detector_requires_adjacency
     vertices, faces = get_data()
                       ^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 552, in get_data
+  File "upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 552, in get_data
     usd_stage = Usd.Stage.Open(os.path.join(warp.examples.get_asset_directory(), "bunny.usd"))
                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 pxr.Tf.ErrorException: 
-	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'
+	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @upstream/warp-innate/warp/examples/assets/bunny.usd@'
 
 ======================================================================
 ERROR: test_collision_filter_decouple_cpu (newton.tests.test_collision_cloth.TestCollision.test_collision_filter_decouple_cpu)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/unittest_utils.py", line 536, in test_func
+  File "upstream/newton-1.5.2/newton/tests/unittest_utils.py", line 536, in test_func
     func(self, device, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 1462, in test_collision_filter_decouple
+  File "upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 1462, in test_collision_filter_decouple
     vertices, faces = get_data()
                       ^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 552, in get_data
+  File "upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 552, in get_data
     usd_stage = Usd.Stage.Open(os.path.join(warp.examples.get_asset_directory(), "bunny.usd"))
                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 pxr.Tf.ErrorException: 
-	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'
+	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @upstream/warp-innate/warp/examples/assets/bunny.usd@'
 
 ======================================================================
 ERROR: test_collision_filtering_cpu (newton.tests.test_collision_cloth.TestCollision.test_collision_filtering_cpu)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/unittest_utils.py", line 536, in test_func
+  File "upstream/newton-1.5.2/newton/tests/unittest_utils.py", line 536, in test_func
     func(self, device, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 1286, in test_collision_filtering
+  File "upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 1286, in test_collision_filtering
     vertices, faces = get_data()
                       ^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 552, in get_data
+  File "upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 552, in get_data
     usd_stage = Usd.Stage.Open(os.path.join(warp.examples.get_asset_directory(), "bunny.usd"))
                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 pxr.Tf.ErrorException: 
-	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'
+	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @upstream/warp-innate/warp/examples/assets/bunny.usd@'
 
 ======================================================================
 ERROR: test_edge_edge_collision_cpu (newton.tests.test_collision_cloth.TestCollision.test_edge_edge_collision_cpu)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/unittest_utils.py", line 536, in test_func
+  File "upstream/newton-1.5.2/newton/tests/unittest_utils.py", line 536, in test_func
     func(self, device, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 719, in test_edge_edge_collision
+  File "upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 719, in test_edge_edge_collision
     vertices, faces = get_data()
                       ^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 552, in get_data
+  File "upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 552, in get_data
     usd_stage = Usd.Stage.Open(os.path.join(warp.examples.get_asset_directory(), "bunny.usd"))
                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 pxr.Tf.ErrorException: 
-	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'
+	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @upstream/warp-innate/warp/examples/assets/bunny.usd@'
 
 ======================================================================
 ERROR: test_vertex_triangle_collision_cpu (newton.tests.test_collision_cloth.TestCollision.test_vertex_triangle_collision_cpu)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/unittest_utils.py", line 536, in test_func
+  File "upstream/newton-1.5.2/newton/tests/unittest_utils.py", line 536, in test_func
     func(self, device, **kwargs)
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 563, in test_vertex_triangle_collision
+  File "upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 563, in test_vertex_triangle_collision
     vertices, faces = get_data()
                       ^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 552, in get_data
+  File "upstream/newton-1.5.2/newton/tests/test_collision_cloth.py", line 552, in get_data
     usd_stage = Usd.Stage.Open(os.path.join(warp.examples.get_asset_directory(), "bunny.usd"))
                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 pxr.Tf.ErrorException: 
-	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'
+	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @upstream/warp-innate/warp/examples/assets/bunny.usd@'
 
 ----------------------------------------------------------------------
 Ran 94 tests in 37.719s
 
 FAILED (errors=5)
 RESULT ran=94 failures=0 errors=5 skipped=0
-FAILED newton.tests.test_collision_cloth.TestCollision.test_collision_detector_requires_adjacency_cpu :: 	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'
-FAILED newton.tests.test_collision_cloth.TestCollision.test_collision_filter_decouple_cpu :: 	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'
-FAILED newton.tests.test_collision_cloth.TestCollision.test_collision_filtering_cpu :: 	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'
-FAILED newton.tests.test_collision_cloth.TestCollision.test_edge_edge_collision_cpu :: 	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'
-FAILED newton.tests.test_collision_cloth.TestCollision.test_vertex_triangle_collision_cpu :: 	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/upstream/warp-innate/warp/examples/assets/bunny.usd@'
+FAILED newton.tests.test_collision_cloth.TestCollision.test_collision_detector_requires_adjacency_cpu :: 	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @upstream/warp-innate/warp/examples/assets/bunny.usd@'
+FAILED newton.tests.test_collision_cloth.TestCollision.test_collision_filter_decouple_cpu :: 	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @upstream/warp-innate/warp/examples/assets/bunny.usd@'
+FAILED newton.tests.test_collision_cloth.TestCollision.test_collision_filtering_cpu :: 	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @upstream/warp-innate/warp/examples/assets/bunny.usd@'
+FAILED newton.tests.test_collision_cloth.TestCollision.test_edge_edge_collision_cpu :: 	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @upstream/warp-innate/warp/examples/assets/bunny.usd@'
+FAILED newton.tests.test_collision_cloth.TestCollision.test_vertex_triangle_collision_cpu :: 	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @upstream/warp-innate/warp/examples/assets/bunny.usd@'

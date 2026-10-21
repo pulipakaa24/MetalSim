@@ -8,7 +8,7 @@ $ .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/contact_stack.py
 body 0 m g 313.920 | solver body_contact_force total [7.00000e-03 0.00000e+00 3.13848e+02] normal [-1.00000e-03 -0.00000e+00  3.13848e+02] | sum of update_contacts per contact [1.00000e-02 0.00000e+00 2.94257e+02]
 body 1 m g 117.720 | solver body_contact_force total [-1.50000e-02 -0.00000e+00  1.17551e+02] normal [1.00000e-03 0.00000e+00 1.17551e+02] | sum of update_contacts per contact [-1.0000e-02 -0.0000e+00  7.8367e+01]
 $ .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/contact_forces.py
-newton at /Users/aditya/robosim/upstream/newton/newton/__init__.py; XPBD 4 it / 1.25 ms, solver kwargs {'body_contact_forces': True, 'joint_armature_inertia': 'none'}; robot weight 316.26 N
+newton at upstream/newton/newton/__init__.py; XPBD 4 it / 1.25 ms, solver kwargs {'body_contact_forces': True, 'joint_armature_inertia': 'none'}; robot weight 316.26 N
 | env 0 | body_contact_force normal: L [0.0, 0.0, 158.7899932861328] R [0.0, 0.0, 157.6699981689453] sum z 316.46 N (1.0006 x weight) | total sum [1.1100000143051147, 0.019999999552965164, 316.4599914550781] | update_contacts summed per body: sum z 316.46 N (1.0006) | NewtonSim touch (|f| sums) L 158.80 R 157.67 sum 316.46 (1.0006) |
 | env 1 | body_contact_force normal: L [0.0, 0.0, 158.8000030517578] R [0.0, 0.0, 157.6699981689453] sum z 316.47 N (1.0007 x weight) | total sum [0.9200000166893005, 0.019999999552965164, 316.4700012207031] | update_contacts summed per body: sum z 316.47 N (1.0007) | NewtonSim touch (|f| sums) L 158.80 R 157.67 sum 316.47 (1.0007) |
 torso / pelvis net force (not touching): [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]

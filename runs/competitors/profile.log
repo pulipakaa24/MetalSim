@@ -14,7 +14,7 @@ VARIANT {"robot": "g1", "N": 4096, "variant": "flooronly", "steps_per_s": 428741
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/adipu/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 27.02 ms  (cached)
 --
 KERNELS go2 N=4096: 13.45 ms/step GPU (sum of per-dispatch times), 187 dispatches/step
@@ -41,7 +41,7 @@ KERNELS go2 N=4096: 13.45 ms/step GPU (sum of per-dispatch times), 187 dispatche
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/adipu/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 KERNELS g1 N=4096: 20.75 ms/step GPU (sum of per-dispatch times), 254 dispatches/step
      7.265 ms  35.0%  x  1  ccd_kernel_builder__locals__ccd_kernel_f71f2442_metal_forward
      2.916 ms  14.1%  x 10  _update_gradient_cholesky__locals__kernel_65bdbbe7_metal_forward

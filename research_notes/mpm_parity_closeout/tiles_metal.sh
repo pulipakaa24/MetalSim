@@ -1,9 +1,9 @@
 #!/bin/bash
 # Metal tiling decisions for the six floor scenes (tile_decisions.py), compared with the L4's.
-W=/Users/aditya/robosim/.claude/worktrees/agent-a8a12903da01bb68c
-export PYTHONPATH=$W/_forks/warp:/Users/aditya/robosim/upstream/newton-integrated:/Users/aditya/robosim/.claude/worktrees/agent-ae8661f0d09092d4b
+W=.
+export PYTHONPATH=$W/_forks/warp:upstream/newton-integrated:.
 export WARP_CACHE_PATH=$W/runs/mpm/closeout/kcache_tile
-PY=/Users/aditya/robosim/.venv-newton152/bin/python
+PY=.venv-newton152/bin/python
 T=$W/research_notes/mpm_parity_closeout/tile_decisions.py
 O=$W/runs/mpm/closeout/tiles_metal; mkdir -p $O
 for s in mpm_multi_material mpm_granular mpm_twoway_coupling mpm_anymal; do

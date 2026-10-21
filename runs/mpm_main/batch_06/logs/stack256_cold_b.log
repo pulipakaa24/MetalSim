@@ -4,7 +4,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b06/cache/b/1.18.0.dev20260917
+     scratch/b06/cache/b/1.18.0.dev20260917
 Module mujoco_warp._src.smooth 538cc3d load on device 'metal:0' took 490.29 ms  (compiled)
 Module _nxn_broadphase__locals__kernel_1005c134 1005c13 load on device 'metal:0' took 157.88 ms  (compiled)
 Module ccd_det_kernels_builder__locals__ccd_det_solve_kernel_62afff05 62afff0 load on device 'metal:0' took 540.60 ms  (compiled)
@@ -44,4 +44,4 @@ Module reset_data__locals__reset_mocap_efef7c4d efef7c4 load on device 'metal:0'
 Module reset_data__locals__reset_contact_389ef5a7 389ef5a load on device 'metal:0' took 427.51 ms  (compiled)
 Module reset_data__locals__reset_sleep_60623600 6062360 load on device 'metal:0' took 405.13 ms  (compiled)
 Module reset_data__locals__reset_nworld_6e0f2593 6e0f259 load on device 'metal:0' took 450.41 ms  (compiled)
-{"scene": "stack", "worlds": 256, "deterministic": 1, "capture": 1, "nativeccd_off": false, "in_process_first_diff": [null], "warp_cache": "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b06/cache/b/1.18.0.dev20260917", "ccd_modules": {"mujoco_warp": "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mujoco_warp-detccd/mujoco_warp/__init__.py", "modules": {"ccd_det_kernels_builder__locals__ccd_det_solve_kernel_62afff05": "1", "ccd_det_kernels_builder__locals__ccd_det_write_kernel_bb5a648a": "1"}}}
+{"scene": "stack", "worlds": 256, "deterministic": 1, "capture": 1, "nativeccd_off": false, "in_process_first_diff": [null], "warp_cache": "scratch/b06/cache/b/1.18.0.dev20260917", "ccd_modules": {"mujoco_warp": "upstream/mujoco_warp-detccd/mujoco_warp/__init__.py", "modules": {"ccd_det_kernels_builder__locals__ccd_det_solve_kernel_62afff05": "1", "ccd_det_kernels_builder__locals__ccd_det_write_kernel_bb5a648a": "1"}}}

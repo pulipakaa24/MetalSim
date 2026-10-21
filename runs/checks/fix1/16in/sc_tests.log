@@ -52,7 +52,7 @@ Module reset_data__locals__reset_contact_41eafef4 41eafef load on device 'metal:
 Module reset_data__locals__reset_sleep_38f94185 38f9418 load on device 'metal:0' took 38.80 ms  (cached)
 Module reset_data__locals__reset_nworld_5d2d5901 5d2d590 load on device 'metal:0' took 40.35 ms  (cached)
 [scene] go2_boxes: 2 envs, nbody 20 ngeom 63 nq 61 nu 12, 1 cameras, 1 lidars; spec 0.01 s, sim 24.41 s
-/Users/aditya/robosim/.claude/worktrees/agent-ab97d7f0e6b1549e4-scene/tests/test_compose.py:187: AssertionError: (0, 0.866178035736084, np.float64(1.8541329523808512))
+tests/test_compose.py:187: AssertionError: (0, 0.866178035736084, np.float64(1.8541329523808512))
 =========================== short test summary info ============================
 FAILED tests/test_compose.py::test_go2_boxes_gpu - AssertionError: (0, 0.8661...
 1 failed, 18 passed in 32.63s

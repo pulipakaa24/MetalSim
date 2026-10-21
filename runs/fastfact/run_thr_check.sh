@@ -1,7 +1,7 @@
 #!/bin/bash
 # threshold defaults (48, 32) vs the previous (40, 64): correctness on every scene (throughput from the tp runs below),
 # correctness part
-cd /Users/aditya/robosim
+cd .
 python3 scripts/gpu_lock.py status
 python3 scripts/gpu_top.py --interval 1
 echo "busy processes (cpu > 40 %):"; ps -eo pid,%cpu,command | awk 'NR > 1 && $2 > 40' | cut -c1-160

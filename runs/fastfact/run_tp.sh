@@ -1,6 +1,6 @@
 #!/bin/bash
 # throughput only, all scenes, alternating configurations (old, new, old, new); busy-process check first
-cd /Users/aditya/robosim
+cd .
 python3 scripts/gpu_lock.py status
 echo "--- other busy processes (cpu > 20 %):"; ps -Ao pid,pcpu,etime,command | awk 'NR==1 || $2 > 20' | cut -c1-160
 for c in old new; do

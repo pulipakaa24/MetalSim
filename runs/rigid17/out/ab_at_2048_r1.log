@@ -1,4 +1,4 @@
-/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/tools/collide17.py:45: RuntimeWarning: CollisionPipeline automatically selected 14,053,376 rigid contact slots, requiring approximately 1,286.6 MiB for the base rigid-contact buffers (96 bytes per slot). Estimate inputs -- world count: 2,048; colliding shapes: 43,008 primitives, 26,624 meshes/heightfields, and 1 planes; precomputed contact pairs: 1,054,720; contact weighting: 5 per primitive pair and 40 per mesh-involved pair; pair-estimate average: 18; selected estimate: neighbor heuristic. Optional pipeline and solver features may allocate additional memory. Pass rigid_contact_max explicitly to CollisionPipeline to choose the capacity and silence this warning.
+runs/rigid17/tools/collide17.py:45: RuntimeWarning: CollisionPipeline automatically selected 14,053,376 rigid contact slots, requiring approximately 1,286.6 MiB for the base rigid-contact buffers (96 bytes per slot). Estimate inputs -- world count: 2,048; colliding shapes: 43,008 primitives, 26,624 meshes/heightfields, and 1 planes; precomputed contact pairs: 1,054,720; contact weighting: 5 per primitive pair and 40 per mesh-involved pair; pair-estimate average: 18; selected estimate: neighbor heuristic. Optional pipeline and solver features may allocate additional memory. Pass rigid_contact_max explicitly to CollisionPipeline to choose the capacity and silence this warning.
   pipeline = newton.CollisionPipeline(model, deterministic=a.det, **kw)
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -6,7 +6,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/kcache/kcB_n17_at/1.18.0.dev20260917
+     runs/rigid17/kcache/kcB_n17_at/1.18.0.dev20260917
 Module newton._src.geometry.inertia 7667892 load on device 'metal:0' took 543.36 ms  (cached)
 Module validate_and_correct_inertia_kernel_8dbbe22e 8dbbe22 load on device 'metal:0' took 381.82 ms  (cached)
 Module newton._src.geometry.bvh 0b0956f load on device 'metal:0' took 513.09 ms  (cached)
@@ -26,7 +26,7 @@ Module export_reduced_contacts_write_contact 48354a5 load on device 'metal:0' to
 {
  "worlds": 2048,
  "det": false,
- "newton": "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n17_at/newton/__init__.py",
+ "newton": "upstream/n17_at/newton/__init__.py",
  "warp": "1.18.0.dev20260917",
  "rigid_contact_max": 14053376,
  "rigid_contacts": 128553,

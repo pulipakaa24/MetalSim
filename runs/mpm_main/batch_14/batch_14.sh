@@ -1,7 +1,7 @@
 #!/bin/bash
 # batch 14 (run outside the agent sandbox, after batch_13):
-#   bash /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b14/batch_14.sh
-#   FIX_N152=1 bash /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b14/batch_14.sh   # + (b)'s repair
+#   bash scratch/b14/batch_14.sh
+#   FIX_N152=1 bash scratch/b14/batch_14.sh   # + (b)'s repair
 #
 # Owners and causes for batch_12's 15 skips (det worktree, branch batchsim-deterministic):
 #  (a) 8 x "needs the Franka-Pour assets" (test_franka_pour_terms 7, test_franka_pour_resume 1): the Franka-Pour files are
@@ -19,8 +19,8 @@
 #      commit. Both files are re-run here; any "SolverMuJoCo unavailable" left is a FAIL.
 # Every pytest runs with -rs (skip reasons printed); logs committed on batchsim-deterministic; result posted on #29.
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
-R=/Users/aditya/robosim
+W=.
+R=.
 S=$W/scratch/b14
 L=$S/logs
 O=$W/runs/mpm_main/batch_14

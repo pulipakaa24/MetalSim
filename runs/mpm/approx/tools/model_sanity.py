@@ -1,6 +1,6 @@
 import sys
 import numpy as np
-sys.path.insert(0, "/Users/aditya/robosim/.claude/worktrees/agent-ae8661f0d09092d4b/metalsim/physics/mpm/probes")
+sys.path.insert(0, "metalsim/physics/mpm/probes")
 from mufu_model import cuda_div, cuda_rcp, cuda_sqrt, load_tables
 
 T = load_tables()

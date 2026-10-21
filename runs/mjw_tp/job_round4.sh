@@ -1,6 +1,6 @@
 #!/bin/bash
 # round 4: profile of the accepted configuration (step 2) to rank the next levers; rough-terrain cost split and checks
-cd /Users/aditya/robosim && source .venv/bin/activate
+cd . && source .venv/bin/activate
 S2='{"metal_register_cholesky_max":48,"m_dense_max":0,"label":"step2"}'
 {
 echo "=== start $(date)"; python3 scripts/gpu_lock.py status

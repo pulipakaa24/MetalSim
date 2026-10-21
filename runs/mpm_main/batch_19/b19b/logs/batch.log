@@ -23,73 +23,73 @@ M1_CONFIRMED
 [11:09:34] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
 [11:09:37] FORK19B -> PASS 8eb51fe637437108185f5a4750b7f5f64ef26624
-[11:09:37] gpu job mm19b_tests (check, <= 30 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/test_batch_deterministic.log
+[11:09:37] gpu job mm19b_tests (check, <= 30 min) -> scratch/b19b/logs/test_batch_deterministic.log
     ........                                                                 [100%]
     8 passed in 302.20s (0:05:02)
 [11:14:50] health: utilisation 99%
 GPU (ioreg): device utilization 99 %; per-process GPU time over 1.9 s:
   pid   7713 python3.12                       102.2 %
 [11:14:50] TESTS19B -> PASS 8 passed in 302.20s (0:05:02)
-[11:14:50] gpu job mm19b_t_64_d0_r1 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/g1_64_d0_r1.log
+[11:14:50] gpu job mm19b_t_64_d0_r1 (timing, <= 15 min) -> scratch/b19b/logs/g1_64_d0_r1.log
     [gpu_run] mm19b_t_64_d0_r1 end: device utilisation 0% (11:17:56), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [11:18:02] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid    413 loginwindow                        1.5 %
-[11:18:02] gpu job mm19b_t_64_d1_r1 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/g1_64_d1_r1.log
+[11:18:02] gpu job mm19b_t_64_d1_r1 (timing, <= 15 min) -> scratch/b19b/logs/g1_64_d1_r1.log
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.9 %
 [11:21:14] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[11:21:14] gpu job mm19b_t_1024_d0_r1 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/g1_1024_d0_r1.log
+[11:21:14] gpu job mm19b_t_1024_d0_r1 (timing, <= 15 min) -> scratch/b19b/logs/g1_1024_d0_r1.log
     [gpu_run] mm19b_t_1024_d0_r1 end: device utilisation 100% (11:22:45), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [11:22:51] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[11:22:51] gpu job mm19b_t_1024_d1_r1 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/g1_1024_d1_r1.log
+[11:22:51] gpu job mm19b_t_1024_d1_r1 (timing, <= 15 min) -> scratch/b19b/logs/g1_1024_d1_r1.log
     [gpu_run] mm19b_t_1024_d1_r1 end: device utilisation 0% (11:23:37), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [11:23:43] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[11:23:43] gpu job mm19b_t_64_d0_r2 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/g1_64_d0_r2.log
+[11:23:43] gpu job mm19b_t_64_d0_r2 (timing, <= 15 min) -> scratch/b19b/logs/g1_64_d0_r2.log
     [gpu_run] mm19b_t_64_d0_r2 end: device utilisation 99% (11:24:18), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [11:24:24] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   2.8 %
-[11:24:24] gpu job mm19b_t_64_d1_r2 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/g1_64_d1_r2.log
+[11:24:24] gpu job mm19b_t_64_d1_r2 (timing, <= 15 min) -> scratch/b19b/logs/g1_64_d1_r2.log
     [gpu_run] mm19b_t_64_d1_r2 end: device utilisation 0% (11:26:10), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [11:26:16] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[11:26:16] gpu job mm19b_t_1024_d0_r2 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/g1_1024_d0_r2.log
+[11:26:16] gpu job mm19b_t_1024_d0_r2 (timing, <= 15 min) -> scratch/b19b/logs/g1_1024_d0_r2.log
     [gpu_run] mm19b_t_1024_d0_r2 end: device utilisation 0% (11:28:17), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [11:28:23] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[11:28:23] gpu job mm19b_t_1024_d1_r2 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/g1_1024_d1_r2.log
+[11:28:23] gpu job mm19b_t_1024_d1_r2 (timing, <= 15 min) -> scratch/b19b/logs/g1_1024_d1_r2.log
     [gpu_run] mm19b_t_1024_d1_r2 end: device utilisation 0% (11:31:09), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [11:31:15] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   2.1 %
-[11:31:15] gpu job mm19b_t_64_d0_r3 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/g1_64_d0_r3.log
+[11:31:15] gpu job mm19b_t_64_d0_r3 (timing, <= 15 min) -> scratch/b19b/logs/g1_64_d0_r3.log
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.3 %
 [11:31:57] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   2.5 %
-[11:31:57] gpu job mm19b_t_64_d1_r3 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/g1_64_d1_r3.log
+[11:31:57] gpu job mm19b_t_64_d1_r3 (timing, <= 15 min) -> scratch/b19b/logs/g1_64_d1_r3.log
     [gpu_run] gpu_top:   pid    410 WindowServer                       2.9 %
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.5 %
 [11:32:38] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[11:32:38] gpu job mm19b_t_1024_d0_r3 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/g1_1024_d0_r3.log
+[11:32:38] gpu job mm19b_t_1024_d0_r3 (timing, <= 15 min) -> scratch/b19b/logs/g1_1024_d0_r3.log
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   3.4 %
 [11:35:50] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[11:35:50] gpu job mm19b_t_1024_d1_r3 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/g1_1024_d1_r3.log
+[11:35:50] gpu job mm19b_t_1024_d1_r3 (timing, <= 15 min) -> scratch/b19b/logs/g1_1024_d1_r3.log
     [gpu_run] mm19b_t_1024_d1_r3 end: device utilisation 100% (11:38:37), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [11:38:42] health: utilisation 0%
@@ -110,12 +110,12 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 runtime ok 1.18.0.dev20260917
 [gpu_run] fork_sync end: device utilisation 0% (11:42:22), exit 0
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [11:42:25] PIN19B -> PASS MuJoCo Warp 4d05cb7 -> 8eb51fe
-[11:42:25] gpu job mm19b_smoke (check, <= 30 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b19b/logs/smoke_shared.log
+[11:42:25] gpu job mm19b_smoke (check, <= 30 min) -> scratch/b19b/logs/smoke_shared.log
     ........                                                                 [100%]
     8 passed in 241.03s (0:04:01)
 [11:46:34] health: utilisation 99%

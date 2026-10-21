@@ -14,7 +14,7 @@ import warp as wp
 from metalsim.physics.batch import BatchSim, BatchSimOptions
 
 wp.config.quiet = True
-ROOT = "/Users/aditya/robosim"
+ROOT = "."
 ROBOTS = [
     ("so101_lift", os.path.join(ROOT, "assets", "so101", "scene_box_rl.xml")),
     ("panda", os.path.join(ROOT, "upstream", "mujoco_menagerie", "franka_emika_panda", "scene.xml")),

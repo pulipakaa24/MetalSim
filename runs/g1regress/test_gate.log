@@ -4,7 +4,7 @@ tests/test_g1_task_terms.py::test_rough_terrain_seed_and_isaac_env_assignment
 tests/test_g1_task_terms.py::test_il3_rough_defaults
 tests/test_g1_task_terms.py::test_trainer_first_observation_comes_from_the_task_reset[rough-rough_isaac]
 tests/test_g1_task_terms.py::test_trainer_first_observation_comes_from_the_task_reset[rough-rough_il3]
-  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
     warnings.warn(
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html

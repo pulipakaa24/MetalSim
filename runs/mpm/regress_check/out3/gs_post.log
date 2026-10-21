@@ -4,7 +4,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/mpm/regress_check/kc_B/1.18.0.dev20260917
+     runs/mpm/regress_check/kc_B/1.18.0.dev20260917
 Module newton._src.geometry.bvh 36b76be load on device 'metal:0' took 41.47 ms  (cached)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_model 24481b5 load on device 'metal:0' took 39.29 ms  (cached)
 Module warp.fem.geometry.nanogrid 2d50837 load on device 'metal:0' took 44.30 ms  (cached)
@@ -60,4 +60,4 @@ Module warp.fem.space.partition 2191615 load on device 'metal:0' took 39.90 ms  
 Module scatter_field_dof_values_810d0145 f865b7c load on device 'metal:0' took 38.52 ms  (cached)
 Module warp.fem.integrate._identity_field_003441ce 7a5b023 load on device 'metal:0' took 43.05 ms  (cached)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_789a04ef f39c58a load on device 'metal:0' took 41.28 ms  (cached)
-{"colors": 8, "us_per_color_pass": 15.239973436109722, "us_contact_solve": 10.346362523705466, "us_per_iteration_in_chunk": 128.11353999495623, "scene": "example:mpm_granular", "warp": "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/t4/warp-B/warp/__init__.py"}
+{"colors": 8, "us_per_color_pass": 15.239973436109722, "us_contact_solve": 10.346362523705466, "us_per_iteration_in_chunk": 128.11353999495623, "scene": "example:mpm_granular", "warp": "upstream/t4/warp-B/warp/__init__.py"}

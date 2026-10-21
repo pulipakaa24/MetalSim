@@ -1,6 +1,6 @@
 #!/bin/bash
 # round 2: factorization levers (register Cholesky bound, sparse L'DL of M, sparse Jacobian): scan + checks
-cd /Users/aditya/robosim && source .venv/bin/activate
+cd . && source .venv/bin/activate
 {
 echo "=== start $(date) power: $(pmset -g batt | head -1)"
 python3 scripts/gpu_lock.py status

@@ -2,7 +2,7 @@
 # Contact preset A/B at MetalSim HEAD, installed forks: task default contact_cfg="recommended" (tau10_impact_hardlimits,
 # e3ba79f) vs contact_cfg=null (the model's own solref/solimp: the 2026-09-25 headline setting). Interleaved R D R D,
 # g1_tp_variants.py 4096, then the step profile once each.
-cd /Users/aditya/robosim && source .venv/bin/activate
+cd . && source .venv/bin/activate
 F='^\[\|Error\|Traceback'
 G='^  \(physics\|whole\|outside\|solver\|mjw.step\|fwd_\)\|^task\|^variant\|Error\|Traceback'
 echo "=== start $(date) metalsim $(git rev-parse --short HEAD) warp $(git -C upstream/warp-innate rev-parse --short HEAD) mjw $(git -C upstream/mujoco_warp rev-parse --short HEAD) power: $(pmset -g batt | head -1)"

@@ -4,7 +4,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module validate_and_correct_inertia_kernel_8732e8af 8732e8a load on device 'metal:0' took 39.87 ms  (cached)
 Module newton._src.geometry.bvh 63dae3d load on device 'metal:0' took 40.74 ms  (cached)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_model 732473e load on device 'metal:0' took 38.66 ms  (cached)
@@ -72,24 +72,24 @@ Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.update_parti
 Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_c2f7b925 4094871 load on device 'metal:0' took 42.11 ms  (cached)
 Metal command buffer failed: Caused GPU Address Fault Error (0000000b:kIOGPUCommandBufferCallbackErrorPageFault)
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a28868bb53d94facc/metalsim/physics/mpm/probes/pour_bitwise.py", line 269, in <module>
+  File "metalsim/physics/mpm/probes/pour_bitwise.py", line 269, in <module>
     main()
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a28868bb53d94facc/metalsim/physics/mpm/probes/pour_bitwise.py", line 179, in main
+  File "metalsim/physics/mpm/probes/pour_bitwise.py", line 179, in main
     arrs = arrays()
            ^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a28868bb53d94facc/metalsim/physics/mpm/probes/pour_bitwise.py", line 169, in arrays
+  File "metalsim/physics/mpm/probes/pour_bitwise.py", line 169, in arrays
     return {k: v.numpy().copy() for k, v in out.items()}
                ^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a28868bb53d94facc/upstream/warp-final3/warp/_src/types.py", line 4570, in numpy
+  File "upstream/warp-final3/warp/_src/types.py", line 4570, in numpy
     a = self.to("cpu", requires_grad=False)
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a28868bb53d94facc/upstream/warp-final3/warp/_src/types.py", line 4669, in to
+  File "upstream/warp-final3/warp/_src/types.py", line 4669, in to
     return warp.clone(self, device=device, requires_grad=requires_grad)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a28868bb53d94facc/upstream/warp-final3/warp/_src/context.py", line 10667, in clone
+  File "upstream/warp-final3/warp/_src/context.py", line 10667, in clone
     warp.copy(arr, src)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a28868bb53d94facc/upstream/warp-final3/warp/_src/context.py", line 15373, in copy
+  File "upstream/warp-final3/warp/_src/context.py", line 15373, in copy
     device.metal_synchronize()
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a28868bb53d94facc/upstream/warp-final3/warp/_src/context.py", line 6204, in metal_synchronize
+  File "upstream/warp-final3/warp/_src/context.py", line 6204, in metal_synchronize
     raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
 RuntimeError: Metal error on device metal:0: Metal command buffer failed: Caused GPU Address Fault Error (0000000b:kIOGPUCommandBufferCallbackErrorPageFault)

@@ -1,6 +1,6 @@
 #!/bin/bash
 # denoiser evaluation: 16 spp x 4 passes (none / atrous / oidn) vs 256 spp converged, and vs RTX; then cost bench
-cd /Users/aditya/robosim
+cd .
 python3 scripts/gpu_lock.py status
 BEST=${BEST:-tonemap_cal}
 .venv/bin/python -m pytest tests/test_render_tier2.py -q -s -k "rtx_tonemap" 2>&1 | grep -E "mean|passed|failed|Error"

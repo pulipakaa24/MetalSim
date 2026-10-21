@@ -1,6 +1,6 @@
 === start Sun Sep 27 02:03:31 PDT 2026 metalsim 66deb72 mjw d99186b MJW_SPEC_FRICTION=live
-== stage rec dt=0.0025 mjw=/Users/aditya/robosim/upstream/mujoco_warp-spec-d99186b@d99186b spec=1 presets=ellip10_tau5_specgap10mm ellip10_specgap10mm Sun Sep 27 02:03:31 PDT 2026
-holder: {"name": "spec_protocol", "kind": "render", "minutes": 20.0, "pid": 22501, "start": 1790499810.681791, "queued": 1790499810.681412, "cmd": "runs/speculative/job_protocol.sh", "cwd": "/Users/aditya/robosim"}
+== stage rec dt=0.0025 mjw=upstream/mujoco_warp-spec-d99186b@d99186b spec=1 presets=ellip10_tau5_specgap10mm ellip10_specgap10mm Sun Sep 27 02:03:31 PDT 2026
+holder: {"name": "spec_protocol", "kind": "render", "minutes": 20.0, "pid": 22501, "start": 1790499810.681791, "queued": 1790499810.681412, "cmd": "runs/speculative/job_protocol.sh", "cwd": "<repo>"}
 [metalsim] A_hold: 150 steps, final root z [0.05379827 0.05379827 0.05379827 0.05379827]
 [metalsim] B_random: 250 steps, final root z [0.15913479 0.14488512 0.1597724  0.1536231 ]
 [metalsim] C_drop: 150 steps, final root z [0.05379843 0.05379841 0.05379843 0.05379843]
@@ -10,24 +10,24 @@ holder: {"name": "spec_protocol", "kind": "render", "minutes": 20.0, "pid": 2250
 [metalsim] C_drop: 150 steps, final root z [0.05398735 0.05399219 0.05391125 0.05398866]
 }
 == stage rec done Sun Sep 27 02:03:54 PDT 2026
-== stage rec dt=0.0025 mjw=/Users/aditya/robosim/upstream/mujoco_warp-spec-d99186b@d99186b spec=1 presets=ellip10_tau5_specgap10mm Sun Sep 27 02:03:54 PDT 2026
-holder: {"name": "spec_protocol", "kind": "render", "minutes": 20.0, "pid": 22501, "start": 1790499810.681791, "queued": 1790499810.681412, "cmd": "runs/speculative/job_protocol.sh", "cwd": "/Users/aditya/robosim"}
+== stage rec dt=0.0025 mjw=upstream/mujoco_warp-spec-d99186b@d99186b spec=1 presets=ellip10_tau5_specgap10mm Sun Sep 27 02:03:54 PDT 2026
+holder: {"name": "spec_protocol", "kind": "render", "minutes": 20.0, "pid": 22501, "start": 1790499810.681791, "queued": 1790499810.681412, "cmd": "runs/speculative/job_protocol.sh", "cwd": "<repo>"}
 [metalsim] A_hold: 150 steps, final root z [0.05379827 0.05379827 0.05379828 0.05379826]
 [metalsim] B_random: 250 steps, final root z [0.1385802  0.15484902 0.1019375  0.1626134 ]
 [metalsim] C_drop: 150 steps, final root z [0.05379843 0.05379843 0.05379842 0.05379842]
 }
 == stage rec done Sun Sep 27 02:04:06 PDT 2026
-== stage transfer dt=0.0025 mjw=/Users/aditya/robosim/upstream/mujoco_warp-spec-d99186b@d99186b spec=1 presets=ellip10_tau5_specgap10mm ellip10_specgap10mm Sun Sep 27 02:04:06 PDT 2026
-holder: {"name": "spec_protocol", "kind": "render", "minutes": 20.0, "pid": 22501, "start": 1790499810.681791, "queued": 1790499810.681412, "cmd": "runs/speculative/job_protocol.sh", "cwd": "/Users/aditya/robosim"}
-install: newton {'path': '/Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton', 'url': 'https://github.com/newton-physics/newton', 'commit': '45458023f24629c1feffb1f336594808f537db14', 'editable': False} | warp {'path': '/Users/aditya/robosim/upstream/warp-innate/warp', 'git_head': 'c200d46b', 'git_dirty': False}
+== stage transfer dt=0.0025 mjw=upstream/mujoco_warp-spec-d99186b@d99186b spec=1 presets=ellip10_tau5_specgap10mm ellip10_specgap10mm Sun Sep 27 02:04:06 PDT 2026
+holder: {"name": "spec_protocol", "kind": "render", "minutes": 20.0, "pid": 22501, "start": 1790499810.681791, "queued": 1790499810.681412, "cmd": "runs/speculative/job_protocol.sh", "cwd": "<repo>"}
+install: newton {'path': '.venv/lib/python3.12/site-packages/newton', 'url': 'https://github.com/newton-physics/newton', 'commit': '45458023f24629c1feffb1f336594808f537db14', 'editable': False} | warp {'path': 'upstream/warp-innate/warp', 'git_head': 'c200d46b', 'git_dirty': False}
 | checkpoint | mjwarp:ellip10_tau5_specgap10mm x [m] / pelvis z [m] | mjwarp:ellip10_specgap10mm x [m] / pelvis z [m] |
 |---|---|---|
 | Isaac it 500 | 3.36 (3.30-3.39) / 0.625 (0.62-0.63) | 3.31 (3.23-3.35) / 0.627 (0.62-0.63) |
 | Isaac it 1000 | 3.22 (3.18-3.26) / 0.631 (0.62-0.64) | 3.10 (3.05-3.14) / 0.635 (0.62-0.65) |
 | Isaac it 1499 | 3.25 (3.19-3.29) / 0.638 (0.63-0.65) | 3.15 (3.11-3.17) / 0.639 (0.63-0.64) |
 == stage transfer done Sun Sep 27 02:04:47 PDT 2026
-== stage air dt=0.0025 mjw=/Users/aditya/robosim/upstream/mujoco_warp-spec-d99186b@d99186b spec=1 presets=ellip10_tau5_specgap10mm ellip10_specgap10mm Sun Sep 27 02:04:47 PDT 2026
-holder: {"name": "spec_protocol", "kind": "render", "minutes": 20.0, "pid": 22501, "start": 1790499810.681791, "queued": 1790499810.681412, "cmd": "runs/speculative/job_protocol.sh", "cwd": "/Users/aditya/robosim"}
+== stage air dt=0.0025 mjw=upstream/mujoco_warp-spec-d99186b@d99186b spec=1 presets=ellip10_tau5_specgap10mm ellip10_specgap10mm Sun Sep 27 02:04:47 PDT 2026
+holder: {"name": "spec_protocol", "kind": "render", "minutes": 20.0, "pid": 22501, "start": 1790499810.681791, "queued": 1790499810.681412, "cmd": "runs/speculative/job_protocol.sh", "cwd": "<repo>"}
   "joint_deviation_all": -0.0939,
   "flat_orientation_l2": -0.0111,
   "action_rate_l2": -0.0075,
@@ -85,8 +85,8 @@ holder: {"name": "spec_protocol", "kind": "render", "minutes": 20.0, "pid": 2250
   "flight_frac": 0.008121966889852391
  }
 }
-== stage cap dt=0.0025 mjw=/Users/aditya/robosim/upstream/mujoco_warp-spec-d99186b@d99186b spec=1 presets=ellip10_tau5_specgap10mm Sun Sep 27 02:08:59 PDT 2026
-holder: {"name": "spec_protocol", "kind": "render", "minutes": 20.0, "pid": 22501, "start": 1790499810.681791, "queued": 1790499810.681412, "cmd": "runs/speculative/job_protocol.sh", "cwd": "/Users/aditya/robosim"}
+== stage cap dt=0.0025 mjw=upstream/mujoco_warp-spec-d99186b@d99186b spec=1 presets=ellip10_tau5_specgap10mm Sun Sep 27 02:08:59 PDT 2026
+holder: {"name": "spec_protocol", "kind": "render", "minutes": 20.0, "pid": 22501, "start": 1790499810.681791, "queued": 1790499810.681412, "cmd": "runs/speculative/job_protocol.sh", "cwd": "<repo>"}
   "max_dqvel": 14.884215354919434,
   "p99_dqvel_max": 0.11111127585172653,
   "median_dqvel_max": 0.0001277923583984375,

@@ -2,7 +2,7 @@
 # tp26 job 3: provable capacity bounds on the G1 flat task (installed forks, recommended preset): task defaults
 # njmax 512 / nconmax 128 vs the bound njmax 144 / nconmax 24 (metalsim.physics.capacity), g1_tp_variants --quick,
 # interleaved D A D A.
-cd /Users/aditya/robosim && source .venv/bin/activate
+cd . && source .venv/bin/activate
 F='^\[\|Error\|Traceback'
 echo "=== start $(date) metalsim $(git rev-parse --short HEAD) warp $(git -C upstream/warp-innate rev-parse --short HEAD) mjw $(git -C upstream/mujoco_warp rev-parse --short HEAD) power: $(pmset -g batt | head -1)"
 for r in 1 2; do

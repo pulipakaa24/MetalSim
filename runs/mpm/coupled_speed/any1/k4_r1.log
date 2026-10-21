@@ -1,6 +1,6 @@
 [gpu_run] cany_k4_r1 start: device utilisation 0% (18:58:19)
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/newton_new/newton/_src/utils/import_urdf.py:651: UserWarning: Warning: mesh /Users/aditya/Library/Caches/newton/newton-assets_anybotics_anymal_c_56bec244_261cd1f4/anybotics_anymal_c/meshes/base.dae has a texture but no UVs; texture will be ignored.
+upstream/trees/newton_new/newton/_src/utils/import_urdf.py:651: UserWarning: Warning: mesh ~/Library/Caches/newton/newton-assets_anybotics_anymal_c_56bec244_261cd1f4/anybotics_anymal_c/meshes/base.dae has a texture but no UVs; texture will be ignored.
   parse_shapes(link, visuals, density=0.0, just_visual=True, visible=not hide_visuals)
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -8,7 +8,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/kcache_new/1.18.0.dev20260917
+     runs/mpm/coupled_speed/kcache_new/1.18.0.dev20260917
 Module newton._src.utils.mesh 9037096 load on device 'cpu' took 0.80 ms  (cached)
 Module newton._src.geometry.inertia e372b69 load on device 'metal:0' took 39.96 ms  (cached)
 Module validate_and_correct_inertia_kernel_e5f8239c e5f8239 load on device 'metal:0' took 40.69 ms  (cached)

@@ -1,7 +1,7 @@
 #!/bin/bash
 # tp26 job 4: rough terrain (the task's default rough config) under the recommended preset vs contact_cfg null, never
 # measured before (README rough 41.9 K is the default-contact number); installed forks; g1_tp_variants --quick, R N R N.
-cd /Users/aditya/robosim && source .venv/bin/activate
+cd . && source .venv/bin/activate
 F='^\[\|Error\|Traceback\|^task'
 echo "=== start $(date) metalsim $(git rev-parse --short HEAD) warp $(git -C upstream/warp-innate rev-parse --short HEAD) mjw $(git -C upstream/mujoco_warp rev-parse --short HEAD) power: $(pmset -g batt | head -1)"
 for r in 1 2; do

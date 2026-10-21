@@ -1,4 +1,4 @@
-/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/torch/jit/_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+.venv-newton152/lib/python3.12/site-packages/torch/jit/_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -6,7 +6,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module newton._src.geometry.inertia 2dc4a5b load on device 'metal:0' took 40.95 ms  (cached)
 Module validate_and_correct_inertia_kernel_a407d1da a407d1d load on device 'metal:0' took 39.13 ms  (cached)
 Module newton._src.geometry.bvh 117d4e3 load on device 'metal:0' took 40.78 ms  (cached)
@@ -176,9 +176,9 @@ Module map_mul 02f1870 load on device 'metal:0' took 39.74 ms  (cached)
 [record] frame 301/361: 150 ms, episodes ended 9/24
 [record] frame 331/361: 152 ms, episodes ended 9/24
 [record] filmed envs [8, 6, 16, 17] (ends [74, 51, 18, 59])
-/Users/aditya/robosim/.claude/worktrees/agent-ab97d7f0e6b1549e4/metalsim/render/newton_bridge.py:1178: UserWarning: Newton mesh texture 'Materials/Textures/DemoTable_TableParts_BaseColor.png' not loaded: No module named 'PIL'
+metalsim/render/newton_bridge.py:1178: UserWarning: Newton mesh texture 'Materials/Textures/DemoTable_TableParts_BaseColor.png' not loaded: No module named 'PIL'
   warnings.warn(f"Newton mesh texture {tex!r} not loaded: {ex}")
-/Users/aditya/robosim/.claude/worktrees/agent-ab97d7f0e6b1549e4/metalsim/render/newton_bridge.py:1178: UserWarning: Newton mesh texture 'Materials/Textures/DemoTable_TableBase_BaseColor.png' not loaded: No module named 'PIL'
+metalsim/render/newton_bridge.py:1178: UserWarning: Newton mesh texture 'Materials/Textures/DemoTable_TableBase_BaseColor.png' not loaded: No module named 'PIL'
   warnings.warn(f"Newton mesh texture {tex!r} not loaded: {ex}")
 Warning: Non-uniform scaling of spheres is not supported.
 Module validate_and_correct_inertia_kernel_a407d1da ff179df load on device 'cpu' took 1.00 ms  (cached)

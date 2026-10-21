@@ -1,6 +1,6 @@
 holder: {"name": "terrain_walls_bench", "kind": "timing", "minutes": 15.0, "pid": 51520, "start": 1790347822.4402628}
   waiting [low] mjw_tp_round3 est 45.0 min, queued 188 s ago
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -8,7 +8,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth eb51811 load on device 'metal:0' took 28.02 ms  (cached)
 Module _nxn_broadphase__locals__kernel_738cc90c 738cc90 load on device 'metal:0' took 17.92 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ed246d84 ed246d8 load on device 'metal:0' took 1241.53 ms  (compiled)
@@ -58,7 +58,7 @@ Module metalsim.learn.g1_velocity e800725 load on device 'metal:0' took 22.14 ms
 Module metalsim.learn.warp_policy fa269a9 load on device 'metal:0' took 17.60 ms  (cached)
 Module metalsim.learn.terrain c7bfee1 load on device 'metal:0' took 401.29 ms  (compiled)
 {"mode": "hfield", "n": 4096, "physics_dt": 0.0025, "ngeom": 4, "hfield_samples": 2403201, "setup_s": 5.0, "env_steps_per_s": [29516, 29482, 29480], "best": 29516, "nacon_end": 11433, "naconmax": 131072}
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -66,24 +66,24 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/scripts/diagnostics/terrain_walls_bench.py", line 41, in <module>
+  File "scripts/diagnostics/terrain_walls_bench.py", line 41, in <module>
     one(sys.argv[2], int(sys.argv[3]), float(sys.argv[4]), sys.argv[5]); sys.exit(0)
     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/scripts/diagnostics/terrain_walls_bench.py", line 23, in one
+  File "scripts/diagnostics/terrain_walls_bench.py", line 23, in one
     task = G1VelocityTask(n, terrain="rough", seed=0, physics_dt=physics_dt, reward_cfg="rough_isaac", terrain_collision=coll)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/learn/g1_velocity.py", line 540, in __init__
+  File "metalsim/learn/g1_velocity.py", line 540, in __init__
     self.sim = BatchSim(m, n, options=BatchSimOptions(substeps=self.decimation, njmax=256, nconmax=32,
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/physics/batch.py", line 141, in __init__
+  File "metalsim/physics/batch.py", line 141, in __init__
     self.d = mjw.put_data(wmodel, mjd, nworld=num_envs, nconmax=self.opt.nconmax, njmax=self.opt.njmax)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py", line 1932, in put_data
+  File "upstream/mujoco_warp/mujoco_warp/_src/io.py", line 1932, in put_data
     raise ValueError(f"nconmax overflow (nconmax must be >= {mjd.ncon})")
 ValueError: nconmax overflow (nconmax must be >= 37)
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -91,24 +91,24 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/scripts/diagnostics/terrain_walls_bench.py", line 41, in <module>
+  File "scripts/diagnostics/terrain_walls_bench.py", line 41, in <module>
     one(sys.argv[2], int(sys.argv[3]), float(sys.argv[4]), sys.argv[5]); sys.exit(0)
     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/scripts/diagnostics/terrain_walls_bench.py", line 23, in one
+  File "scripts/diagnostics/terrain_walls_bench.py", line 23, in one
     task = G1VelocityTask(n, terrain="rough", seed=0, physics_dt=physics_dt, reward_cfg="rough_isaac", terrain_collision=coll)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/learn/g1_velocity.py", line 540, in __init__
+  File "metalsim/learn/g1_velocity.py", line 540, in __init__
     self.sim = BatchSim(m, n, options=BatchSimOptions(substeps=self.decimation, njmax=256, nconmax=32,
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/physics/batch.py", line 141, in __init__
+  File "metalsim/physics/batch.py", line 141, in __init__
     self.d = mjw.put_data(wmodel, mjd, nworld=num_envs, nconmax=self.opt.nconmax, njmax=self.opt.njmax)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py", line 1932, in put_data
+  File "upstream/mujoco_warp/mujoco_warp/_src/io.py", line 1932, in put_data
     raise ValueError(f"nconmax overflow (nconmax must be >= {mjd.ncon})")
 ValueError: nconmax overflow (nconmax must be >= 37)
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -116,24 +116,24 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/scripts/diagnostics/terrain_walls_bench.py", line 41, in <module>
+  File "scripts/diagnostics/terrain_walls_bench.py", line 41, in <module>
     one(sys.argv[2], int(sys.argv[3]), float(sys.argv[4]), sys.argv[5]); sys.exit(0)
     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/scripts/diagnostics/terrain_walls_bench.py", line 23, in one
+  File "scripts/diagnostics/terrain_walls_bench.py", line 23, in one
     task = G1VelocityTask(n, terrain="rough", seed=0, physics_dt=physics_dt, reward_cfg="rough_isaac", terrain_collision=coll)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/learn/g1_velocity.py", line 540, in __init__
+  File "metalsim/learn/g1_velocity.py", line 540, in __init__
     self.sim = BatchSim(m, n, options=BatchSimOptions(substeps=self.decimation, njmax=256, nconmax=32,
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/physics/batch.py", line 141, in __init__
+  File "metalsim/physics/batch.py", line 141, in __init__
     self.d = mjw.put_data(wmodel, mjd, nworld=num_envs, nconmax=self.opt.nconmax, njmax=self.opt.njmax)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py", line 1932, in put_data
+  File "upstream/mujoco_warp/mujoco_warp/_src/io.py", line 1932, in put_data
     raise ValueError(f"nconmax overflow (nconmax must be >= {mjd.ncon})")
 ValueError: nconmax overflow (nconmax must be >= 57)
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -141,20 +141,20 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/scripts/diagnostics/terrain_walls_bench.py", line 41, in <module>
+  File "scripts/diagnostics/terrain_walls_bench.py", line 41, in <module>
     one(sys.argv[2], int(sys.argv[3]), float(sys.argv[4]), sys.argv[5]); sys.exit(0)
     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/scripts/diagnostics/terrain_walls_bench.py", line 23, in one
+  File "scripts/diagnostics/terrain_walls_bench.py", line 23, in one
     task = G1VelocityTask(n, terrain="rough", seed=0, physics_dt=physics_dt, reward_cfg="rough_isaac", terrain_collision=coll)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/learn/g1_velocity.py", line 540, in __init__
+  File "metalsim/learn/g1_velocity.py", line 540, in __init__
     self.sim = BatchSim(m, n, options=BatchSimOptions(substeps=self.decimation, njmax=256, nconmax=32,
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/physics/batch.py", line 141, in __init__
+  File "metalsim/physics/batch.py", line 141, in __init__
     self.d = mjw.put_data(wmodel, mjd, nworld=num_envs, nconmax=self.opt.nconmax, njmax=self.opt.njmax)
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py", line 1932, in put_data
+  File "upstream/mujoco_warp/mujoco_warp/_src/io.py", line 1932, in put_data
     raise ValueError(f"nconmax overflow (nconmax must be >= {mjd.ncon})")
 ValueError: nconmax overflow (nconmax must be >= 100)

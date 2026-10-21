@@ -1,4 +1,4 @@
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -6,7 +6,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 29.57 ms  (cached)
 Module _nxn_broadphase__locals__kernel_28decaf1 28decaf load on device 'metal:0' took 19.93 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_b3132664 b313266 load on device 'metal:0' took 25.95 ms  (cached)
@@ -56,21 +56,21 @@ Module reset_data__locals__reset_nworld_f0ec89aa f0ec89a load on device 'metal:0
 Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
 Module metalsim.sensors.contact 8b280a6 load on device 'metal:0' took 19.80 ms  (cached)
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/scripts/diagnostics/competitors/cap_probe_ellip.py", line 13, in <module>
+  File "scripts/diagnostics/competitors/cap_probe_ellip.py", line 13, in <module>
     task = G1VelocityTask(N, terrain=terrain, seed=0, physics_dt=0.0025, reward_cfg="flat" if terrain == "flat" else "rough_isaac", contact_cfg=cfg)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/learn/g1_velocity.py", line 799, in __init__
+  File "metalsim/learn/g1_velocity.py", line 799, in __init__
     self.box_window = BoxWindow(self.sim, self.hfield, device=device)
                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/learn/terrain.py", line 451, in __init__
+  File "metalsim/learn/terrain.py", line 451, in __init__
     self.centre = wp.array(B[:, :3].astype(np.float32), dtype=wp.vec3, device=device)
                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/types.py", line 3429, in __init__
+  File "upstream/warp-innate/warp/_src/types.py", line 3429, in __init__
     self._init_from_data(data, dtype, shape, device, copy, pinned)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/types.py", line 3805, in _init_from_data
+  File "upstream/warp-innate/warp/_src/types.py", line 3805, in _init_from_data
     warp.copy(self, src)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 15016, in copy
+  File "upstream/warp-innate/warp/_src/context.py", line 15016, in copy
     device.metal_synchronize()
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 6066, in metal_synchronize
+  File "upstream/warp-innate/warp/_src/context.py", line 6066, in metal_synchronize
     raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
 RuntimeError: Metal error on device metal:0: Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)

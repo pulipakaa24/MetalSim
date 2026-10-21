@@ -2,8 +2,8 @@
 # tp26 job 2b: worktrees after the A/B of job 2 (compact register layout off by default; L'DL lanes rewritten on device
 # memory). Bitwise check of the L'DL kernels first (must print ALL OK), then the L'DL bench and the interleaved step A/B:
 # I = installed, S = worktree register solve only (MJW_METAL_LDL_LANES=0), B = worktree both.
-cd /Users/aditya/robosim && source .venv/bin/activate
-WT=/Users/aditya/robosim/upstream/warp-innate-tp:/Users/aditya/robosim/upstream/mujoco_warp-tp
+cd . && source .venv/bin/activate
+WT=upstream/warp-innate-tp:upstream/mujoco_warp-tp
 F='^\[\|Error\|Traceback\|imports'
 echo "=== start $(date) metalsim $(git rev-parse --short HEAD) warp $(git -C upstream/warp-innate rev-parse --short HEAD) / wt $(git -C upstream/warp-innate-tp rev-parse --short HEAD) mjw $(git -C upstream/mujoco_warp rev-parse --short HEAD) / wt $(git -C upstream/mujoco_warp-tp rev-parse --short HEAD) power: $(pmset -g batt | head -1)"
 echo "--- L'DL bitwise check (worktree) $(date +%H:%M:%S)"; PYTHONPATH=$WT python scripts/diagnostics/ldl_lanes_check.py 64 2>&1 | grep -v "^Module\|^Warp\|^   \|^$"

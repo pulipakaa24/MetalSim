@@ -1,5 +1,5 @@
 #!/bin/bash
-# batch 10b (run outside the agent sandbox):  bash /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10b/batch_10b.sh
+# batch 10b (run outside the agent sandbox):  bash scratch/b10b/batch_10b.sh
 #
 # Re-run of batch_10's deterministic-mode cost (DETCOST10 failed: the G1 runs could not open
 # assets/isaac/G1/g1_minimal.usd, a fetched, gitignored asset that this worktree did not have). The worktree now links
@@ -8,8 +8,8 @@
 # on / off at 64 and 1,024 worlds, 3 interleaved repetitions, one process each, timing class. Then the numbers go into
 # the research note, GAPS and #29's body (scratch/b10/det_docs.py), commit, push. Resumable. ~30-45 min of GPU.
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
-R=/Users/aditya/robosim
+W=.
+R=.
 S=$W/scratch/b10b
 L=$S/logs
 OD=$W/runs/mpm_main/batch_10_det

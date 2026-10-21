@@ -8,7 +8,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth d59875c load on device 'metal:0' took 449.14 ms  (cached)
 Module _nxn_broadphase__locals__kernel_0ecae344 0ecae34 load on device 'metal:0' took 84.70 ms  (cached)
 Module ccd_det_kernels_builder__locals__ccd_det_solve_kernel_ac93ddeb ac93dde load on device 'metal:0' took 1317.58 ms  (cached)
@@ -42,71 +42,71 @@ Module _update_gradient_cholesky__locals__kernel_f866c797 c3f2d07 load on device
 Module _linesearch_iterative_kernel__locals__kernel_fd0f180f eb5db7f load on device 'metal:0' took 651.14 ms  (cached)
 Module _update_constraint_gradient_fused__locals__kernel_dc745b34 c8f7999 load on device 'metal:0' took 440.16 ms  (cached)
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scripts/diagnostics/det_cost_g1.py", line 41, in <module>
+  File "scripts/diagnostics/det_cost_g1.py", line 41, in <module>
     main()
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scripts/diagnostics/det_cost_g1.py", line 30, in main
+  File "scripts/diagnostics/det_cost_g1.py", line 30, in main
     task = G1VelocityTask(a.worlds, terrain="flat", batch_options={"deterministic": bool(a.deterministic)})
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/learn/g1_velocity.py", line 668, in __init__
+  File "metalsim/learn/g1_velocity.py", line 668, in __init__
     self.sim = BatchSim(m, n, options=BatchSimOptions(**bso))
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/batch.py", line 300, in __init__
+  File "metalsim/physics/batch.py", line 300, in __init__
     self._capture()
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/batch.py", line 326, in _capture
+  File "metalsim/physics/batch.py", line 326, in _capture
     self._capture_graphs()
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/batch.py", line 353, in _capture_graphs
+  File "metalsim/physics/batch.py", line 353, in _capture_graphs
     self._launch_substeps()
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/batch.py", line 364, in _launch_substeps
+  File "metalsim/physics/batch.py", line 364, in _launch_substeps
     mjw.step(self.m, self.d)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mujoco_warp-detccd/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "upstream/mujoco_warp-detccd/mujoco_warp/_src/warp_util.py", line 123, in wrapper
     return fn(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mujoco_warp-detccd/mujoco_warp/_src/forward.py", line 1843, in step
+  File "upstream/mujoco_warp-detccd/mujoco_warp/_src/forward.py", line 1843, in step
     forward(m, d)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mujoco_warp-detccd/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "upstream/mujoco_warp-detccd/mujoco_warp/_src/warp_util.py", line 123, in wrapper
     return fn(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mujoco_warp-detccd/mujoco_warp/_src/forward.py", line 1834, in forward
+  File "upstream/mujoco_warp-detccd/mujoco_warp/_src/forward.py", line 1834, in forward
     solver.solve(m, d)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mujoco_warp-detccd/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "upstream/mujoco_warp-detccd/mujoco_warp/_src/warp_util.py", line 123, in wrapper
     return fn(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mujoco_warp-detccd/mujoco_warp/_src/solver.py", line 5193, in solve
+  File "upstream/mujoco_warp-detccd/mujoco_warp/_src/solver.py", line 5193, in solve
     _solve(m, d, ctx)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mujoco_warp-detccd/mujoco_warp/_src/solver.py", line 5263, in _solve
+  File "upstream/mujoco_warp-detccd/mujoco_warp/_src/solver.py", line 5263, in _solve
     _solver_iteration(m, d, ctx, nsolving, compact=compact, iteration=i)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mujoco_warp-detccd/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "upstream/mujoco_warp-detccd/mujoco_warp/_src/warp_util.py", line 123, in wrapper
     return fn(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mujoco_warp-detccd/mujoco_warp/_src/solver.py", line 5038, in _solver_iteration
+  File "upstream/mujoco_warp-detccd/mujoco_warp/_src/solver.py", line 5038, in _solver_iteration
     _launch_update_fused(m, d, ctx, elliptic, fuse_htot)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mujoco_warp-detccd/mujoco_warp/_src/solver.py", line 2509, in _launch_update_fused
+  File "upstream/mujoco_warp-detccd/mujoco_warp/_src/solver.py", line 2509, in _launch_update_fused
     wp.launch_tiled(
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-tripwire-git/warp/_src/context.py", line 12941, in launch_tiled
+  File "upstream/warp-tripwire-git/warp/_src/context.py", line 12941, in launch_tiled
     return launch(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-tripwire-git/warp/_src/context.py", line 12620, in launch
+  File "upstream/warp-tripwire-git/warp/_src/context.py", line 12620, in launch
     metal_deterministic.launch(
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-tripwire-git/warp/_src/metal_deterministic.py", line 1265, in launch
+  File "upstream/warp-tripwire-git/warp/_src/metal_deterministic.py", line 1265, in launch
     plan = _Plan(
            ^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-tripwire-git/warp/_src/metal_deterministic.py", line 1036, in __init__
+  File "upstream/warp-tripwire-git/warp/_src/metal_deterministic.py", line 1036, in __init__
     self.scratch_buf = state.scratch_pool.get(scratch.size)
                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-tripwire-git/warp/_src/metal_deterministic.py", line 763, in get
+  File "upstream/warp-tripwire-git/warp/_src/metal_deterministic.py", line 763, in get
     self.buffers.append(_host_zeroed(size, wp.uint8, self.device, record=True))
                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-tripwire-git/warp/_src/metal_deterministic.py", line 774, in _host_zeroed
+  File "upstream/warp-tripwire-git/warp/_src/metal_deterministic.py", line 774, in _host_zeroed
     arr = wp.empty(n, dtype=dtype, device=device)
           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-tripwire-git/warp/_src/context.py", line 10706, in empty
+  File "upstream/warp-tripwire-git/warp/_src/context.py", line 10706, in empty
     arr = warp.array(
           ^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-tripwire-git/warp/_src/types.py", line 3433, in __init__
+  File "upstream/warp-tripwire-git/warp/_src/types.py", line 3433, in __init__
     self._init_new(dtype, shape, strides, device, pinned)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-tripwire-git/warp/_src/types.py", line 3870, in _init_new
+  File "upstream/warp-tripwire-git/warp/_src/types.py", line 3870, in _init_new
     check_array_shape(shape)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-tripwire-git/warp/_src/types.py", line 3121, in check_array_shape
+  File "upstream/warp-tripwire-git/warp/_src/types.py", line 3121, in check_array_shape
     raise ValueError(
 ValueError: Array shapes must not exceed the maximum representable value of a signed 32-bit integer, got 3534564096 in dimension 0.
 [gpu_run] mm10b_g1_1024_1_r3 end: device utilisation 0% (22:04:46), exit 1

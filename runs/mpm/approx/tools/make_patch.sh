@@ -1,7 +1,7 @@
 #!/bin/bash
-# Patch of the metalsim side (files untracked in the main checkout) against /Users/aditya/robosim.
-W=/Users/aditya/robosim/.claude/worktrees/agent-ae8661f0d09092d4b
-M=/Users/aditya/robosim
+# Patch of the metalsim side (files untracked in the main checkout) against ..
+W=.
+M=.
 OUT=$W/patches/metalsim_metal_fast_math.patch
 : > $OUT
 for f in metalsim/physics/mpm/newton_compat.py metalsim/physics/mpm/MPM.md metalsim/physics/mpm/record_variant_suite.sh \

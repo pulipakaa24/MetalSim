@@ -1,4 +1,4 @@
-install: newton {'path': '/Users/aditya/robosim/upstream/newton/newton', 'git_head': '90e23324', 'git_dirty': False} | warp {'path': '/Users/aditya/robosim/upstream/warp-innate/warp', 'git_head': '786cdae', 'git_dirty': False}
+install: newton {'path': 'upstream/newton/newton', 'git_head': '90e23324', 'git_dirty': False} | warp {'path': 'upstream/warp-innate/warp', 'git_head': '786cdae', 'git_dirty': False}
 === newton fork solver drive 4 it 0.625 ms fixed PPO it 300
 {
  "ckpt": "runs/policies/g1_flat_newton_forksolver0625_fixed_it300.pt",

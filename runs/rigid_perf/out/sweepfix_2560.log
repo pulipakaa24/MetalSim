@@ -1,4 +1,4 @@
-/Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/metalsim/physics/mpm/probes/scale_pour.py:241: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+metalsim/physics/mpm/probes/scale_pour.py:241: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
   model = scene.finalize(device=DEV)
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -6,7 +6,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/runs/rigid_perf/kcache/kc_hangfix/1.18.0.dev20260917
+     runs/rigid_perf/kcache/kc_hangfix/1.18.0.dev20260917
 Module newton._src.geometry.inertia 0fe97dd load on device 'metal:0' took 22.71 ms  (cached)
 Module validate_and_correct_inertia_kernel_bea299a6 bea299a load on device 'metal:0' took 24.87 ms  (cached)
 Module newton._src.geometry.bvh fcf7383 load on device 'metal:0' took 23.73 ms  (cached)
@@ -90,7 +90,7 @@ Module _next_time_builder__locals___next_time_d112fcc4 d112fcc load on device 'm
   "--kprof-ticks",
   "20",
   "--json",
-  "/Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/runs/rigid_perf/out/sweepfix_2560.json"
+  "runs/rigid_perf/out/sweepfix_2560.json"
  ],
  "device": "metal:0",
  "device_name": "Apple M4 Max",

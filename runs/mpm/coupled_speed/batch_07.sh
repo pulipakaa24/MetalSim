@@ -5,9 +5,9 @@
 # tests/test_gpu_queue.py (with and without the fix: the new test must fail on the old script), commit, push, PR.
 # Log: runs/mpm/coupled_speed/batch_07.log
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0
+W=.
 R=$W/runs/mpm/coupled_speed
-M=/Users/aditya/robosim
+M=.
 D=$W/upstream/gpufix
 exec > >(tee -a "$R/batch_07.log") 2>&1
 echo "== $(date) batch_07 start"

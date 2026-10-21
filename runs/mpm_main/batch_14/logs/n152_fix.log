@@ -1,6 +1,6 @@
-+ cd /Users/aditya/robosim
++ cd <repo>
 + git -C upstream/newton-metalsim-1.5.2 fetch -q origin
 + git -C upstream/newton-metalsim-1.5.2 checkout -q --detach addd10cbeb25e946b3a4c2bb1d4097acc7a98ca2
 + uv pip install -q --python .venv-newton152/bin/python --no-deps -e upstream/newton-metalsim-1.5.2
 + .venv-newton152/bin/python -P -c 'import newton, os; from newton._src.solvers.implicit_mpm import solve_rheology as sr; print('\''newton'\'', os.path.dirname(newton.__file__), '\''fork API'\'', hasattr(sr, '\''_color_block_count'\''))'
-newton /Users/aditya/robosim/upstream/newton-metalsim-1.5.2/newton fork API True
+newton upstream/newton-metalsim-1.5.2/newton fork API True

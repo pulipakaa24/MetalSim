@@ -119,7 +119,7 @@ test_oct_encode_decode_roundtrip_metal_0 (newton.tests.test_contact_reduction_gl
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/runs/a2/kc/nt_old_stock/1.18.0.dev20260917
+     runs/a2/kc/nt_old_stock/1.18.0.dev20260917
 Module newton.tests.test_hashtable e074f1b load on device 'cpu' took 901.89 ms  (compiled)
 Module newton.tests.test_hashtable 93e546a load on device 'metal:0' took 390.89 ms  (compiled)
 Module newton.tests.test_hashtable 6a1ced2 load on device 'cpu' took 90.23 ms  (compiled)
@@ -223,12 +223,12 @@ test_get_slot_matches_best_face_normal_metal_0 (newton.tests.test_contact_reduct
 ERROR: test_stress_many_contacts_metal_0 (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_stress_many_contacts_metal_0)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/tests/unittest_utils.py", line 599, in test_func
+  File ".venv/lib/python3.12/site-packages/newton/tests/unittest_utils.py", line 599, in test_func
     func(self, device, **kwargs)
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/tests/test_contact_reduction_global.py", line 410, in test_stress_many_contacts
+  File ".venv/lib/python3.12/site-packages/newton/tests/test_contact_reduction_global.py", line 410, in test_stress_many_contacts
     winners = get_winning_contacts(reducer)
               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/tests/test_contact_reduction_global.py", line 74, in get_winning_contacts
+  File ".venv/lib/python3.12/site-packages/newton/tests/test_contact_reduction_global.py", line 74, in get_winning_contacts
     val = values[slot * capacity + entry_idx]
           ~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 IndexError: index 30480 is out of bounds for axis 0 with size 28672
@@ -237,9 +237,9 @@ IndexError: index 30480 is out of bounds for axis 0 with size 28672
 FAIL: test_clear_metal_0 (newton.tests.test_hashtable.TestHashTable.test_clear_metal_0)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/tests/unittest_utils.py", line 599, in test_func
+  File ".venv/lib/python3.12/site-packages/newton/tests/unittest_utils.py", line 599, in test_func
     func(self, device, **kwargs)
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/tests/test_hashtable.py", line 208, in test_clear
+  File ".venv/lib/python3.12/site-packages/newton/tests/test_hashtable.py", line 208, in test_clear
     test.assertEqual(np.sum(non_empty), 50)
 AssertionError: np.int64(45) != 50
 
@@ -247,9 +247,9 @@ AssertionError: np.int64(45) != 50
 FAIL: test_high_collision_metal_0 (newton.tests.test_hashtable.TestHashTable.test_high_collision_metal_0)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/tests/unittest_utils.py", line 599, in test_func
+  File ".venv/lib/python3.12/site-packages/newton/tests/unittest_utils.py", line 599, in test_func
     func(self, device, **kwargs)
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/tests/test_hashtable.py", line 299, in test_high_collision
+  File ".venv/lib/python3.12/site-packages/newton/tests/test_hashtable.py", line 299, in test_high_collision
     test.assertEqual(active_count, 10)
 AssertionError: np.int32(1000) != 10
 
@@ -257,9 +257,9 @@ AssertionError: np.int32(1000) != 10
 FAIL: test_multiple_keys_metal_0 (newton.tests.test_hashtable.TestHashTable.test_multiple_keys_metal_0)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/tests/unittest_utils.py", line 599, in test_func
+  File ".venv/lib/python3.12/site-packages/newton/tests/unittest_utils.py", line 599, in test_func
     func(self, device, **kwargs)
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/tests/test_hashtable.py", line 174, in test_multiple_keys
+  File ".venv/lib/python3.12/site-packages/newton/tests/test_hashtable.py", line 174, in test_multiple_keys
     test.assertEqual(np.sum(non_empty), 100)
 AssertionError: np.int64(84) != 100
 

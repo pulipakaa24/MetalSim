@@ -1,8 +1,8 @@
 #!/bin/bash
 # tp26 job 5: marginal graph-mode cost per Newton iteration (g1_solve_iteration_cost.py), recommended vs null, installed
 # forks vs the worktrees (register solve + L'DL lanes). Raw output in runs/tp26/itercost_<cfg>_<inst|wt>.log.
-cd /Users/aditya/robosim && source .venv/bin/activate
-WT=/Users/aditya/robosim/upstream/warp-innate-tp:/Users/aditya/robosim/upstream/mujoco_warp-tp
+cd . && source .venv/bin/activate
+WT=upstream/warp-innate-tp:upstream/mujoco_warp-tp
 R='^  *[0-9]* |\|^  k\|^state\|^variant\|imports\|Error\|Traceback'
 echo "=== start $(date) metalsim $(git rev-parse --short HEAD) wt warp $(git -C upstream/warp-innate-tp rev-parse --short HEAD) mjw $(git -C upstream/mujoco_warp-tp rev-parse --short HEAD) power: $(pmset -g batt | head -1)"
 for cfg in recommended null; do

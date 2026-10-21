@@ -1,11 +1,11 @@
-TREES /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/t4/warp-B/warp/__init__.py /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/t4/newton-B/newton/__init__.py /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/metalsim/__init__.py
+TREES upstream/t4/warp-B/warp/__init__.py upstream/t4/newton-B/newton/__init__.py metalsim/__init__.py
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
    Devices:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/mpm/regress_check/kc_B/1.18.0.dev20260917
+     runs/mpm/regress_check/kc_B/1.18.0.dev20260917
 Module newton._src.geometry.bvh b94a298 load on device 'metal:0' took 49.49 ms  (cached)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_model e5ae6a9 load on device 'metal:0' took 46.35 ms  (cached)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels 32841dd load on device 'metal:0' took 48.80 ms  (cached)
@@ -65,4 +65,4 @@ Module scatter_field_dof_values_810d0145 a833537 load on device 'metal:0' took 4
 Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_16b56c40 b19c865 load on device 'metal:0' took 45.60 ms  (cached)
 Module warp.fem.integrate._identity_field_33a7d872 0d56ea2 load on device 'metal:0' took 51.06 ms  (cached)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_539f9872 19e1022 load on device 'metal:0' took 48.07 ms  (cached)
-{"scene": "column", "set": {"aspect": 2}, "frames": 60, "warmup": 5, "ms_median": 27.480729502713075, "ms_mean": 25.935954933326382, "ms_p10": 17.789800300670322, "ms_p90": 32.03361639934883, "per_frame_counters": {"host_waits": 6.0, "command_buffers": 30.983333333333334, "host_ops": 0.0, "dispatches_encoded": 3096.0}, "warp": "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/t4/warp-B/warp/__init__.py", "compat": {"accumulate": "float32", "loop": "cuda", "chunk_graph": true, "fused": false, "fused_max_color_blocks": 1073741824, "simd": false, "gpu_exit": true, "rigid_deterministic": true, "metal_fast_math": "relaxed"}}
+{"scene": "column", "set": {"aspect": 2}, "frames": 60, "warmup": 5, "ms_median": 27.480729502713075, "ms_mean": 25.935954933326382, "ms_p10": 17.789800300670322, "ms_p90": 32.03361639934883, "per_frame_counters": {"host_waits": 6.0, "command_buffers": 30.983333333333334, "host_ops": 0.0, "dispatches_encoded": 3096.0}, "warp": "upstream/t4/warp-B/warp/__init__.py", "compat": {"accumulate": "float32", "loop": "cuda", "chunk_graph": true, "fused": false, "fused_max_color_blocks": 1073741824, "simd": false, "gpu_exit": true, "rigid_deterministic": true, "metal_fast_math": "relaxed"}}

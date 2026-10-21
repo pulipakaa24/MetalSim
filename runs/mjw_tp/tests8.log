@@ -2,7 +2,7 @@
 holder: {"name": "mjw_tp_round8", "kind": "low", "minutes": 30.0, "pid": 63744, "start": 1790354557.5379689}
   waiting [low] flex_merge_rigid_ab est 15.0 min, queued 1 s ago
 tests/test_physics.py::test_one_step_parity_vs_mujoco_c[go1]
-  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
+  upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
     warnings.warn(
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html

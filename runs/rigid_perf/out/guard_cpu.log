@@ -1,4 +1,4 @@
-/Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/metalsim/physics/mpm/probes/scale_pour.py:241: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+metalsim/physics/mpm/probes/scale_pour.py:241: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
   model = scene.finalize(device=DEV)
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -6,7 +6,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/runs/rigid_perf/kcache/kc_new/1.18.0.dev20260917
+     runs/rigid_perf/kcache/kc_new/1.18.0.dev20260917
 Module newton._src.geometry.inertia 13307f2 load on device 'cpu' took 1033.29 ms  (compiled)
 Module validate_and_correct_inertia_kernel_bea299a6 6a3afcb load on device 'cpu' took 107.69 ms  (compiled)
 Module newton._src.geometry.bvh 89d546e load on device 'cpu' took 227.46 ms  (compiled)
@@ -63,14 +63,14 @@ Module mujoco_warp._src.sensor 8e21634 load on device 'cpu' took 1536.10 ms  (co
 Module mujoco_warp._src.derivative a8cc84c load on device 'cpu' took 529.65 ms  (compiled)
 Module _next_time_builder__locals___next_time_d112fcc4 38831fb load on device 'cpu' took 57.03 ms  (compiled)
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/metalsim/physics/mpm/probes/scale_pour.py", line 1016, in <module>
+  File "metalsim/physics/mpm/probes/scale_pour.py", line 1016, in <module>
     {"mpm": run_mpm, "rigid": run_rigid, "ordered": run_ordered, "bodyforce": run_bodyforce}[args.part]()
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/metalsim/physics/mpm/probes/scale_pour.py", line 696, in run_rigid
+  File "metalsim/physics/mpm/probes/scale_pour.py", line 696, in run_rigid
     kprof(args.kprof, {"collide": collide, "substep": substep, "tick": tick})
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/metalsim/physics/mpm/probes/scale_pour.py", line 790, in kprof
+  File "metalsim/physics/mpm/probes/scale_pour.py", line 790, in kprof
     cuda = ctypes.CDLL("libcuda.so.1")
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/ctypes/__init__.py", line 379, in __init__
+  File "~/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/ctypes/__init__.py", line 379, in __init__
     self._handle = _dlopen(self._name, mode)
                    ^^^^^^^^^^^^^^^^^^^^^^^^^
-OSError: dlopen(libcuda.so.1, 0x0006): tried: 'libcuda.so.1' (no such file), '/System/Volumes/Preboot/Cryptexes/OSlibcuda.so.1' (no such file), '/Users/aditya/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/libcuda.so.1' (no such file), '/Users/aditya/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/libcuda.so.1' (no such file), '/usr/lib/libcuda.so.1' (no such file, not in dyld cache), 'libcuda.so.1' (no such file)
+OSError: dlopen(libcuda.so.1, 0x0006): tried: 'libcuda.so.1' (no such file), '/System/Volumes/Preboot/Cryptexes/OSlibcuda.so.1' (no such file), '~/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/libcuda.so.1' (no such file), '~/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/libcuda.so.1' (no such file), '/usr/lib/libcuda.so.1' (no such file, not in dyld cache), 'libcuda.so.1' (no such file)

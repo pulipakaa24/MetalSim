@@ -1,6 +1,6 @@
 [gpu_run] pour_bench_ppo start: device utilisation 100% (01:04:49)
 [gpu_run] gpu_top: GPU (ioreg): device utilization 100 %; per-process GPU time over 1.9 s: none >= 1 %
-/Users/aditya/robosim/.claude/worktrees/agent-a278824da4c05bf29/.venv-pour/lib/python3.12/site-packages/torch/jit/_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+.venv-pour/lib/python3.12/site-packages/torch/jit/_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -8,7 +8,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module newton._src.geometry.inertia 7667892 load on device 'metal:0' took 41.79 ms  (cached)
 Module validate_and_correct_inertia_kernel_8dbbe22e 8dbbe22 load on device 'metal:0' took 41.90 ms  (cached)
 Module newton._src.geometry.bvh b94a298 load on device 'metal:0' took 43.99 ms  (cached)

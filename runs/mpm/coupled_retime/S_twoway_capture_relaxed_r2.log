@@ -7,7 +7,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module validate_and_correct_inertia_kernel_e5f8239c e5f8239 load on device 'metal:0' took 39.76 ms  (cached)
 Module newton._src.geometry.bvh 66c2a94 load on device 'metal:0' took 40.45 ms  (cached)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_model 1aa6787 load on device 'metal:0' took 38.94 ms  (cached)
@@ -120,6 +120,6 @@ Module scatter_field_dof_values_953ffc59 bbfb9a1 load on device 'metal:0' took 3
 Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_16b56c40 891a1f6 load on device 'metal:0' took 335.59 ms  (cached)
 Module warp.fem.integrate._identity_field_33a7d872 5aa6e66 load on device 'metal:0' took 741.17 ms  (cached)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_539f9872 bb30496 load on device 'metal:0' took 493.16 ms  (cached)
-{"scene": "example:mpm_twoway_coupling", "set": {"capture": true}, "frames": 60, "warmup": 5, "ms_median": 34.69270800269442, "ms_mean": 41.90663543267874, "ms_p10": 34.03386609861627, "ms_p90": 64.50762150780065, "per_frame_counters": {"host_waits": 11.866666666666667, "command_buffers": 24.866666666666667, "host_ops": 4.0, "dispatches_encoded": 1985.8666666666666}, "warp": "/Users/aditya/robosim/upstream/warp-innate/warp/__init__.py", "compat": {"accumulate": "float32", "loop": "cuda", "chunk_graph": true, "fused": false, "fused_max_color_blocks": 1073741824, "simd": false, "gpu_exit": true, "rigid_deterministic": true, "metal_fast_math": "relaxed"}}
+{"scene": "example:mpm_twoway_coupling", "set": {"capture": true}, "frames": 60, "warmup": 5, "ms_median": 34.69270800269442, "ms_mean": 41.90663543267874, "ms_p10": 34.03386609861627, "ms_p90": 64.50762150780065, "per_frame_counters": {"host_waits": 11.866666666666667, "command_buffers": 24.866666666666667, "host_ops": 4.0, "dispatches_encoded": 1985.8666666666666}, "warp": "upstream/warp-innate/warp/__init__.py", "compat": {"accumulate": "float32", "loop": "cuda", "chunk_graph": true, "fused": false, "fused_max_color_blocks": 1073741824, "simd": false, "gpu_exit": true, "rigid_deterministic": true, "metal_fast_math": "relaxed"}}
 [gpu_run] cr_S_twoway_capture_relaxed_r2 end: device utilisation 98% (13:13:54), exit 0
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %

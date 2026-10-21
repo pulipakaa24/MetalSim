@@ -89,7 +89,7 @@ The Metal Warp fork (branch `metalsim`) supports what ImplicitMPM needs:
 - host-built NanoVDB volumes;
 - BSR matrices with a host-side topology path.
 
-It has **no float64**. It also does not support `wp.config.deterministic` or CUDA conditional graphs ([metal.rst, local](/Users/aditya/robosim/upstream/warp-innate/docs/user_guide/metal.rst)). `fem.integrate` defaults to `accumulate_dtype=wp.float64` ([integrate.py, local](/Users/aditya/robosim/upstream/warp-innate/warp/_src/fem/integrate.py)), and Newton never overrides it. As a result, **unmodified `SolverImplicitMPM.step` fails on `metal:0`** with "Kernel 'integrate_fraction_…' uses builtins that are not supported on Metal yet: float64".
+It has **no float64**. It also does not support `wp.config.deterministic` or CUDA conditional graphs ([metal.rst, local](upstream/warp-innate/docs/user_guide/metal.rst)). `fem.integrate` defaults to `accumulate_dtype=wp.float64` ([integrate.py, local](upstream/warp-innate/warp/_src/fem/integrate.py)), and Newton never overrides it. As a result, **unmodified `SolverImplicitMPM.step` fails on `metal:0`** with "Kernel 'integrate_fraction_…' uses builtins that are not supported on Metal yet: float64".
 
 The probe scene was 1,000 particles at voxel 0.1 and dt 1/60 on a ground plane, run with Newton `90e23324` on the fork. With `fem.integrate` defaulted to float32, 120 frames ran on Metal for both dense and sparse grids. Results:
 
@@ -102,7 +102,7 @@ The probe scripts were in this session's scratchpad (`mpm_metal_probe.py` and `m
 Determinism is structurally favourable:
 
 - **P2G.** `warp.fem` P2G is a node-centric gather over a stable radix sort, with no float atomics.
-- **G2P.** It is a single add per particle under `integration_scheme="pic"`. It becomes order-dependent only under GIMP ([integrate.py, local](/Users/aditya/robosim/upstream/warp-innate/warp/_src/fem/integrate.py)).
+- **G2P.** It is a single add per particle under `integration_scheme="pic"`. It becomes order-dependent only under GIMP ([integrate.py, local](upstream/warp-innate/warp/_src/fem/integrate.py)).
 
 Two problems remain:
 
@@ -212,7 +212,7 @@ The literature arrives at the same structure. Gao 2018 got **23×** over atomic-
 
 ### Supporting numbers for the rest of the step
 
-- **Sorting.** The repo's stable radix sort runs at about **3.1 Gkeys/s** ([SPLAT.md, local](/Users/aditya/robosim/metalsim/render/SPLAT.md)). A full 32-bit sort of 1M particles therefore costs about as much as P2G itself (estimate: 0.33 ms). Counting sorts on block keys of 16 bits or fewer, done rarely, are the right choice.
+- **Sorting.** The repo's stable radix sort runs at about **3.1 Gkeys/s** ([SPLAT.md, local](metalsim/render/SPLAT.md)). A full 32-bit sort of 1M particles therefore costs about as much as P2G itself (estimate: 0.33 ms). Counting sorts on block keys of 16 bits or fewer, done rarely, are the right choice.
 - **Grid clearing.** Clearing a 34 MB dense grid took 0.037 ms (measured). Dense per-environment grids are effectively free to reset.
 - **Saturation.** P2G cost per particle was flat from 2.1M to 16.8M particles. A single dispatch of about 0.25M particles nearly fills the 40-core GPU, so small environments must be batched into one dispatch.
 
@@ -222,7 +222,7 @@ For explicit MLS-MPM, a full step should cost an estimated **0.8–1.2 ms per mi
 
 Newton assembles the strain operator B as a BSR matrix over grid nodes. The P2G and G2P transfers therefore run once per step, and the 24–250 rheology iterations operate on strain and velocity nodes. At the 8–27 particles per voxel used in the shipped examples ([newton/examples/mpm](https://github.com/newton-physics/newton/tree/v1.5.2/newton/examples/mpm)), each iteration touches roughly an order of magnitude fewer entities than a particle pass would. This is an inference from the code structure, not a measurement.
 
-If it holds, the iteration loop is short, dependent and launch-bound. Its cost on Metal is dominated by dispatch count and host round-trips for convergence checks, not by atomics. The fork already reports that **launch fusion paid off on Metal: fusing 5 of 9 per-iteration launches gave +3.9% on a 4096-environment MuJoCo Warp workload** ([throughput note, local](/Users/aditya/robosim/docs/research/throughput_2026-09-26.md)). The performance plan should therefore attack the iteration loop's encoding, and the transfer kernels second.
+If it holds, the iteration loop is short, dependent and launch-bound. Its cost on Metal is dominated by dispatch count and host round-trips for convergence checks, not by atomics. The fork already reports that **launch fusion paid off on Metal: fusing 5 of 9 per-iteration launches gave +3.9% on a 4096-environment MuJoCo Warp workload** ([throughput note, local](docs/research/throughput_2026-09-26.md)). The performance plan should therefore attack the iteration loop's encoding, and the transfer kernels second.
 
 ## Recommendations
 

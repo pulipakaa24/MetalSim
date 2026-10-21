@@ -2,7 +2,7 @@
 # ab17.sh   Interleaved A/B of Franka-Pour collide on the Newton 1.7 line, pinned Warp build:
 # A = n17_at (barrier fix + 64-bit atomics), B = n17_new (+ per-thread midphase, 32 threadgroups/core, bounded sort).
 # Same saved in-contact state per world count (settled with A); 3 repetitions, A and B alternating; eager and --det.
-D=/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17
+D=runs/rigid17
 J=$D/tools/job.sh
 for W in 256 2048; do
   [ -f $D/out/state$W.npz ] && [ "$W" = 256 ] || $J settle${W}_at n17_at check --timeout 1800 --stall 120 -- \
@@ -20,7 +20,7 @@ for W in 256 2048; do
 done
 python3 - <<'EOF'
 import json, glob, os, statistics as st
-D = "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/out"
+D = "runs/rigid17/out"
 rows = {}
 for f in sorted(glob.glob(f"{D}/ab*_r*.json")):
     r = json.load(open(f)); k = os.path.basename(f).rsplit("_r", 1)[0]

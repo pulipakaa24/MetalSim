@@ -2,7 +2,7 @@
 # TREE = a directory name under $WT/upstream/ holding a Newton checkout (e.g. n17_base, n17_fix, n17_perf).
 # Python: .venv-newtonfork (Newton 1.7 deps, MuJoCo Warp fork 3.14, the shared Warp fork checkout); the tree's Newton
 # shadows the installed one through PYTHONPATH.
-R=/Users/aditya/robosim
+R=.
 WT=$R/.claude/worktrees/agent-a7a2cb997dc44ebcc
 PY=$R/.venv-newtonfork/bin/python
 export PYTHONPATH=$WT/upstream/t4/warp-B:$WT/upstream/$1:$WT     # Warp: the pinned fork commit 152808b7, built (t4/warp-B)

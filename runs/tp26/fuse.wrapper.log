@@ -2,25 +2,25 @@
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 === start Sat Sep 26 04:28:46 PDT 2026 metalsim 9a3ef74 wt warp 139385a8 mjw dd42c23 power: Now drawing from 'AC Power'
 --- F1 fused 04:28:47
-imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp/warp/__init__.py upstream/mujoco_warp-tp/mujoco_warp/__init__.py
 [F1_fused] N=4096 njmax 144 naconmax 98304 is_sparse False
 [F1_fused] physics only 45.4 ms/step -> 90,312 env-steps/s
 [F1_fused] full env step 67.4 ms -> 60,803 env-steps/s
 [F1_fused] after random-action steps: nefc max 43 mean 14.5; nacon 11233 (2.74/world); overflow {'ITERATIONS': 25, 'LS_ITERATIONS': 3889}
 --- U1 unfused 04:29:01
-imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp/warp/__init__.py upstream/mujoco_warp-tp/mujoco_warp/__init__.py
 [U1_unfused] N=4096 njmax 144 naconmax 98304 is_sparse False
 [U1_unfused] physics only 47.7 ms/step -> 85,862 env-steps/s
 [U1_unfused] full env step 70.1 ms -> 58,439 env-steps/s
 [U1_unfused] after random-action steps: nefc max 46 mean 14.4; nacon 11092 (2.71/world); overflow {'ITERATIONS': 28, 'LS_ITERATIONS': 3880}
 --- F2 fused 04:29:15
-imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp/warp/__init__.py upstream/mujoco_warp-tp/mujoco_warp/__init__.py
 [F2_fused] N=4096 njmax 144 naconmax 98304 is_sparse False
 [F2_fused] physics only 45.4 ms/step -> 90,182 env-steps/s
 [F2_fused] full env step 67.4 ms -> 60,762 env-steps/s
 [F2_fused] after random-action steps: nefc max 46 mean 14.4; nacon 11326 (2.77/world); overflow {'ITERATIONS': 21, 'LS_ITERATIONS': 3871}
 --- U2 unfused 04:29:29
-imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp/warp/__init__.py upstream/mujoco_warp-tp/mujoco_warp/__init__.py
 [U2_unfused] N=4096 njmax 144 naconmax 98304 is_sparse False
 [U2_unfused] physics only 47.9 ms/step -> 85,543 env-steps/s
 [U2_unfused] full env step 69.9 ms -> 58,589 env-steps/s

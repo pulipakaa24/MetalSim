@@ -1,5 +1,5 @@
 #!/bin/bash
-# batch 22 (run outside the agent sandbox):  bash /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b22/batch_22.sh
+# batch 22 (run outside the agent sandbox):  bash scratch/b22/batch_22.sh
 #
 # Two follow-ups of #29, on branch mpm-simd-gs-removal (from main dad44063 = 11dc7bb3 + NOW.md):
 #   1. simd_gs removal (edits already in the worktree, uncommitted): simd_gs.py, newton_compat.install(simd=),
@@ -13,8 +13,8 @@
 #      as a #29 follow-up comment.
 # ~7 min. Resumable (scratch/b22/STATUS.txt).
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
-R=/Users/aditya/robosim
+W=.
+R=.
 S=$W/scratch/b22
 L=$S/logs
 O=$W/runs/mpm_main/batch_22

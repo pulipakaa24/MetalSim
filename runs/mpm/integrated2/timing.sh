@@ -1,9 +1,9 @@
 #!/bin/bash
 # Final timing re-check (one timing-class GPU job): MPM ms/frame, integrated (I) vs final (Ndev = newton_compat's device
 # arguments, Nauto = Warp's "auto"), interleaved; then G1 4,096-world throughput (g1_tp_variants.py) I vs N, flat + rough.
-A=/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/runs/a2
-W=/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream
-R=/Users/aditya/robosim
+A=runs/a2
+W=upstream
+R=.
 O=$A/out/timing; mkdir -p $O
 export PYTHONDONTWRITEBYTECODE=1
 cd $R

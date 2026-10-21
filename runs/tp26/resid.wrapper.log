@@ -5,12 +5,12 @@
 n=43: tile path (block_dim 32, one world per threadgroup): 1.065 ms per 4096 factor+solve
 Traceback (most recent call last):
     raise WarpCodegenError(
-warp._src.codegen.WarpCodegenError: Error while parsing function "k_native" at /Users/aditya/robosim/scripts/diagnostics/metal_cholesky_residency.py:58:
+warp._src.codegen.WarpCodegenError: Error while parsing function "k_native" at scripts/diagnostics/metal_cholesky_residency.py:58:
 --- residency n=32 09:26:43
 n=32: tile path (block_dim 32, one world per threadgroup): 0.203 ms per 4096 factor+solve
 Traceback (most recent call last):
     raise WarpCodegenError(
-warp._src.codegen.WarpCodegenError: Error while parsing function "k_native" at /Users/aditya/robosim/scripts/diagnostics/metal_cholesky_residency.py:58:
+warp._src.codegen.WarpCodegenError: Error while parsing function "k_native" at scripts/diagnostics/metal_cholesky_residency.py:58:
 --- L'DL check 09:26:44
 Module _factor_i_sparse_unrolled__locals__kernel_f15dd24f 6e9f1fa load on device 'metal:0' took 435.12 ms  (compiled)
 Module _solve_LD_sparse_unrolled__locals__kernel_be0563f2 1254cfc load on device 'metal:0' took 467.67 ms  (compiled)

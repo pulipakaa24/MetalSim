@@ -1,7 +1,7 @@
 #!/bin/bash
 # round 3: four-column cost split per step (base, +register Cholesky, +sparse L'DL of M, +sparse Jacobian),
 # profile of the combined configuration, early-step checks, 20-iteration training probes
-cd /Users/aditya/robosim && source .venv/bin/activate
+cd . && source .venv/bin/activate
 F='^\[\|Error\|Traceback'
 S1='{"metal_register_cholesky_max":48,"label":"step1 reg-chol"}'
 S2='{"metal_register_cholesky_max":48,"m_dense_max":0,"label":"step2 +sparse LDL of M"}'

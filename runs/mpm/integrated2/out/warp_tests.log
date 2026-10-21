@@ -6,7 +6,7 @@ Graph capture ended while an indirect execution range was still open
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/runs/a2/kc/wtests/1.18.0.dev20260917
+     runs/a2/kc/wtests/1.18.0.dev20260917
 Module TestMetal__test_64bit_bitwise_atomics_are_exact__locals__bits_dd164a2f dd164a2 load on device 'metal:0' took 378.40 ms  (compiled)
 Module TestMetal__test_64bit_bitwise_atomics_are_exact__locals__bits_5c60de8e 5c60de8 load on device 'metal:0' took 374.19 ms  (compiled)
 Module TestMetal__test_64bit_cas_exch_minmax_raise_at_launch__locals__cas64_76972627 7697262 load on device 'metal:0' took 380.47 ms  (compiled)
@@ -369,16 +369,16 @@ Module axpy_cff503dc cff503d load on device 'metal:0' took 400.56 ms  (compiled)
 ERROR: test_bsr_copy_scale (warp.tests.test_sparse.TestSparse.test_bsr_copy_scale)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/warp-i2/warp/tests/test_sparse.py", line 1541, in test_bsr_copy_scale
+  File "upstream/warp-i2/warp/tests/test_sparse.py", line 1541, in test_bsr_copy_scale
     diag_copy = bsr_copy(diag_bsr, scalar_type=wp.float64)
                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/warp-i2/warp/_src/sparse.py", line 2634, in bsr_copy
+  File "upstream/warp-i2/warp/_src/sparse.py", line 2634, in bsr_copy
     bsr_assign(dest=copy, src=A, structure_only=structure_only, topology=topology)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/warp-i2/warp/_src/sparse.py", line 2468, in bsr_assign
+  File "upstream/warp-i2/warp/_src/sparse.py", line 2468, in bsr_assign
     wp.launch(
-  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/warp-i2/warp/_src/context.py", line 12638, in launch
+  File "upstream/warp-i2/warp/_src/context.py", line 12638, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint, dim_limit=dim_limit)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/warp-i2/warp/_src/context.py", line 11546, in invoke_metal
+  File "upstream/warp-i2/warp/_src/context.py", line 11546, in invoke_metal
     raise RuntimeError(
 RuntimeError: Kernel '_bsr_assign_copy_blocks' uses builtins that are not supported on Metal yet: float64
 

@@ -1,9 +1,9 @@
 """Per-pass split of the tendon scene's tier-0 frame (catenaries vs straight), and with a coarser tube tessellation."""
 import json
 import sys
-sys.path.insert(0, "/Users/aditya/robosim/.claude/worktrees/agent-a5314e27bee02c142")
-sys.path.insert(0, "/Users/aditya/robosim/.claude/worktrees/agent-a5314e27bee02c142/scripts/diagnostics")
-sys.path.insert(0, "/Users/aditya/robosim/.claude/worktrees/agent-a5314e27bee02c142/tests")
+sys.path.insert(0, ".")
+sys.path.insert(0, "scripts/diagnostics")
+sys.path.insert(0, "tests")
 import mujoco
 import warp as wp
 wp.config.quiet = True

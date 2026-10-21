@@ -8,7 +8,7 @@ import os, re, subprocess, sys
 src_path, out = sys.argv[1], sys.argv[2]
 os.makedirs(out, exist_ok=True)
 MSLC = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mslc.py")
-PY = "/Users/aditya/robosim/.venv/bin/python"
+PY = ".venv/bin/python"
 FN = "_tendon_dot_62db264d_metal_forward"
 lines = open(src_path).read().split("\n")
 user0 = next(i for i, l in enumerate(lines) if re.match(r"^// /Users/.*(mujoco_warp|warp)/.*\.py:\d+$", l) and i > 1000)

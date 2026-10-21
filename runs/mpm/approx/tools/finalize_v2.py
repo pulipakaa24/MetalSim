@@ -1,5 +1,5 @@
 """Make the packed / 32-bit forms the only implementation in metal_cuda_fast_math.h."""
-P = "/Users/aditya/robosim/.claude/worktrees/agent-ae8661f0d09092d4b/_forks/warp/warp/native/metal_cuda_fast_math.h"
+P = "_forks/warp/warp/native/metal_cuda_fast_math.h"
 s = open(P).read()
 # drop the unpacked tables (first clang-format block)
 a = s.index("// clang-format off\nconstant uint wp_mufu_rcp_table")

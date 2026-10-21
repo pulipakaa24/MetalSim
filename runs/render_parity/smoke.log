@@ -13,7 +13,7 @@ holder: {"name": "rtx_parity_smoke", "kind": "render", "minutes": 10.0, "pid": 2
   waiting [low] mjw_tp_checks1 est 25.0 min, queued 5100 s ago
   waiting [low] g1_rough_step_profile est 10.0 min, queued 4614 s ago
 tests/test_render_tier2.py::test_gpu_path_from_batchsim_matches_host
-  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
+  upstream/mujoco_warp/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
     warnings.warn(
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
@@ -38,27 +38,27 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 legacy new vs original: max |rgb diff| 0 hdr max diff 0.0
 brdf ok 3 ms sky [191 204 229] mean 196.4 finite True  
 lights ok 4 ms sky [191 204 230] mean 244.2 finite True  
 tonemap ok 4 ms sky [162 166 174] mean 213.8 finite True  
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/runs/render_parity/smoke.py", line 20, in <module>
+  File "runs/render_parity/smoke.py", line 20, in <module>
     r = Tier2Renderer(m, 2, width=W, height=H, camera='hero', spp=8, max_bounces=3, **preset_kwargs(p, meta))
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/render/tier2.py", line 147, in __init__
+  File "metalsim/render/tier2.py", line 147, in __init__
     self._oidn = OIDNDenoiser(c.queue, n, width, height, (av["hdr"].buffer, av["hdr"].offset), (av["hdr_out"].buffer, av["hdr_out"].offset),
                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/render/denoise.py", line 95, in __init__
+  File "metalsim/render/denoise.py", line 95, in __init__
     img(b"color", color, color_ch); img(b"output", output, color_ch)
     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/render/denoise.py", line 94, in img
+  File "metalsim/render/denoise.py", line 94, in img
     L.oidnSetFilterImage(f, name, shared(name, mb), FLOAT4 if ch == 4 else FLOAT3, w, h, off + e * w * h * ch * 4, ch * 4, w * ch * 4)
                                   ^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/render/denoise.py", line 82, in shared
+  File "metalsim/render/denoise.py", line 82, in shared
     self._bufs[k] = L.oidnNewSharedBufferFromMetal(self.dev, _id(mb)); self._check()
                                                                        ^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/render/denoise.py", line 110, in _check
+  File "metalsim/render/denoise.py", line 110, in _check
     raise RuntimeError(f"OIDN error {err}: {msg.value.decode() if msg.value else ''}")
 RuntimeError: OIDN error 2: Metal buffers without hazard tracking are not supported

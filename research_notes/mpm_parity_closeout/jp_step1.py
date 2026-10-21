@@ -6,10 +6,10 @@ import numpy as np
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
 from mm_per_material import C  # noqa: E402
 
-W = "/Users/aditya/robosim/.claude/worktrees/agent-a8a12903da01bb68c/runs/mpm/closeout"
-b = np.load(f"/Users/aditya/robosim/.claude/worktrees/agent-a8a12903da01bb68c/runs/parity/isaaclab3_mpm_closeout/steps_mm_base/steps.npz")["particle_Jp"]
+W = "runs/mpm/closeout"
+b = np.load(f"runs/parity/isaaclab3_mpm_closeout/steps_mm_base/steps.npz")["particle_Jp"]
 m = np.load(sys.argv[1] if len(sys.argv) > 1 else f"{W}/steps/metal_rsq_mm/steps.npz")["particle_Jp"]
-n = np.load(f"/Users/aditya/robosim/.claude/worktrees/agent-a8a12903da01bb68c/runs/parity/isaaclab3_mpm_closeout/steps_mm_nofma/steps.npz")["particle_Jp"]
+n = np.load(f"runs/parity/isaaclab3_mpm_closeout/steps_mm_nofma/steps.npz")["particle_Jp"]
 s = slice(C[2], C[3])
 for k in range(2):
     jb, jm, jn = b[k, s], m[k, s], n[k, s]

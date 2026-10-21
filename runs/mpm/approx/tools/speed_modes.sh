@@ -3,8 +3,8 @@
 # Env: KIND (timing), FRAMES (60), TAG (output dir suffix; KIND=check FRAMES=3 TAG=_warm pre-warms the kernel cache)
 set -u
 REP=$1; shift
-W=/Users/aditya/robosim/.claude/worktrees/agent-ae8661f0d09092d4b
-ROOT=/Users/aditya/robosim
+W=.
+ROOT=.
 PY=$ROOT/.venv-newton152/bin/python
 export PYTHONPATH=$W/_forks/warp:$ROOT/upstream/newton-integrated:$W
 export WARP_CACHE_PATH=$W/runs/mpm/kcache_cfm

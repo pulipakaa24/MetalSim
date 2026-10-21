@@ -15,8 +15,8 @@
 # Bearing and repose are measurements (documented in the PR whatever they show), not gates.
 # Every GPU job: scripts/gpu_run.sh + scripts/watchdog.py, health check after each. Resumable. Expected ~2-3 h.
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
-R=/Users/aditya/robosim
+W=.
+R=.
 B=$W/runs/mpm_main/batch_03
 L=$B/logs
 D=$W/runs/mpm_main

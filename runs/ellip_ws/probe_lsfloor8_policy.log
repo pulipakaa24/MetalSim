@@ -1,11 +1,11 @@
-imports /Users/aditya/robosim/upstream/warp-innate-ellip-test/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-ellip-test5/mujoco_warp/__init__.py
+imports upstream/warp-innate-ellip-test/warp/__init__.py upstream/mujoco_warp-ellip-test5/mujoco_warp/__init__.py
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
    Devices:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth c110e7b load on device 'metal:0' took 1658.99 ms  (cached)
 Module _nxn_broadphase__locals__kernel_5fda9840 5fda984 load on device 'metal:0' took 413.97 ms  (cached)
 Module ccd_kernel_builder__locals__ccd_kernel_741d8432 741d843 load on device 'metal:0' took 2571.46 ms  (cached)
@@ -49,7 +49,7 @@ Module reset_data__locals__reset_contact_3526061f 3526061 load on device 'metal:
 Module reset_data__locals__reset_sleep_a89f2e98 a89f2e9 load on device 'metal:0' took 304.29 ms  (cached)
 Module reset_data__locals__reset_nworld_0dd1f911 0dd1f91 load on device 'metal:0' took 327.50 ms  (cached)
 Module metalsim.sensors.contact cdb9af1 load on device 'metal:0' took 637.29 ms  (cached)
-mujoco_warp /Users/aditya/robosim/upstream/mujoco_warp-ellip-test5/mujoco_warp; variant lsfloor; cone 1 impratio_invsqrt [0.3162277638912201] cap 20; N 4096
+mujoco_warp upstream/mujoco_warp-ellip-test5/mujoco_warp; variant lsfloor; cone 1 impratio_invsqrt [0.3162277638912201] cap 20; N 4096
 Module metalsim.learn.g1_velocity 42ada4c load on device 'metal:0' took 23.70 ms  (cached)
 Module _solve_init_efc__locals__kernel_e589cdcc e589cdc load on device 'metal:0' took 17.42 ms  (cached)
 Module _solve_done__locals__kernel_a4c2753f a4c2753 load on device 'metal:0' took 16.83 ms  (cached)

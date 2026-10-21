@@ -2,7 +2,7 @@
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 === start Sat Sep 26 11:34:44 PDT 2026 metalsim b7080fb frozen warp 9abceff9 mjw 5d0d165 power: Now drawing from 'AC Power'
 --- U unfused 11:34:44
-imports /Users/aditya/robosim/upstream/warp-innate-tp-test/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-ellip-test/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp-test/warp/__init__.py upstream/mujoco_warp-ellip-test/mujoco_warp/__init__.py
 variant {'contact_cfg': 'recommended'}; iterations cap 20, ls 20, njmax 112, naconmax 98304
 state: nefc mean 6.2 max 27, nacon 1.69 per world
   k | solve ms (graph, per substep) | marginal ms of iteration k | worlds converged before iteration k
@@ -28,7 +28,7 @@ state: nefc mean 6.2 max 27, nacon 1.69 per world
   19 |  12.816 |   0.170 |  4096
   20 |  12.966 |   0.151 |  4096
 --- F fused 11:35:09
-imports /Users/aditya/robosim/upstream/warp-innate-tp-test/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-ellip-test/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp-test/warp/__init__.py upstream/mujoco_warp-ellip-test/mujoco_warp/__init__.py
 variant {'contact_cfg': 'recommended'}; iterations cap 20, ls 20, njmax 112, naconmax 98304
 state: nefc mean 6.2 max 27, nacon 1.68 per world
   k | solve ms (graph, per substep) | marginal ms of iteration k | worlds converged before iteration k
@@ -54,7 +54,7 @@ state: nefc mean 6.2 max 27, nacon 1.68 per world
   19 |  12.468 |   0.152 |  4096
   20 |  12.632 |   0.164 |  4096
 --- H fused+htot 11:35:33
-imports /Users/aditya/robosim/upstream/warp-innate-tp-test/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-ellip-test/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp-test/warp/__init__.py upstream/mujoco_warp-ellip-test/mujoco_warp/__init__.py
 variant {'contact_cfg': 'recommended'}; iterations cap 20, ls 20, njmax 112, naconmax 98304
 state: nefc mean 6.2 max 27, nacon 1.69 per world
   k | solve ms (graph, per substep) | marginal ms of iteration k | worlds converged before iteration k
@@ -80,7 +80,7 @@ state: nefc mean 6.2 max 27, nacon 1.69 per world
   19 |  13.576 |   0.063 |  4096
   20 |  13.640 |   0.064 |  4096
 --- E fused+extrap 11:35:59
-imports /Users/aditya/robosim/upstream/warp-innate-tp-test/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-ellip-test/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp-test/warp/__init__.py upstream/mujoco_warp-ellip-test/mujoco_warp/__init__.py
 variant {'contact_cfg': 'recommended'}; iterations cap 20, ls 20, njmax 112, naconmax 98304
 state: nefc mean 6.2 max 27, nacon 1.68 per world
   k | solve ms (graph, per substep) | marginal ms of iteration k | worlds converged before iteration k

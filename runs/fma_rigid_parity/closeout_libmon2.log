@@ -4,8 +4,8 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-a8a12903da01bb68c/runs/mpm/closeout/kcache_rigid_warp_push/1.18.0.dev20260917
-WARP /Users/aditya/robosim/.claude/worktrees/agent-a8a12903da01bb68c/_forks/warp_push/warp/__init__.py /Users/aditya/robosim/.claude/worktrees/agent-a8a12903da01bb68c/runs/mpm/closeout/kcache_rigid_warp_push/1.18.0.dev20260917 True
+     runs/mpm/closeout/kcache_rigid_warp_push/1.18.0.dev20260917
+WARP _forks/warp_push/warp/__init__.py runs/mpm/closeout/kcache_rigid_warp_push/1.18.0.dev20260917 True
 ......FFF........................F...................................... [ 25%]
 ........................................................................ [ 51%]
 .......................................F................................ [ 77%]
@@ -220,11 +220,11 @@ tests/test_render_tier2.py:226: AssertionError
 usd dome record: {'prim': '/World/skyLight', 'intensity': 2.0, 'exposure': 1.0, 'color': [1.0, 0.5, 0.25], 'file': '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-3/test_env_map_usd_dome_import0/const.hdr', 'format': 'latlong', 'yaw': 0.5235987755982987, 'tilt': 0.0001620618913188485}
 =============================== warnings summary ===============================
 tests/test_g1_newton_engine.py::test_graph_replay_matches_eager
-  /Users/aditya/robosim/metalsim/learn/g1_velocity.py:980: RuntimeWarning: Mean of empty slice
+  metalsim/learn/g1_velocity.py:980: RuntimeWarning: Mean of empty slice
     return {"num_envs": n, "frames": num_frames, "mean_step_ms": t_ns.mean() / 1e6, "fps_isaac_style": n / (t_ns.mean() / 1e9)}
 
 tests/test_g1_newton_engine.py::test_graph_replay_matches_eager
-  /Users/aditya/robosim/.venv/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+  .venv/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
     ret = ret.dtype.type(ret / rcount)
 
 tests/test_g1_task_terms.py::test_rough_terrain_seed_and_isaac_env_assignment
@@ -236,13 +236,13 @@ tests/test_terrain.py::test_hfield_mesh_contacts_match_mujoco_c
 tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[boxes]
 tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[meshes]
 tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[boxes_local]
-  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
     warnings.warn(
 
 tests/test_physics.py::test_one_step_parity_vs_mujoco_c[go1]
 tests/test_render_tier2.py::test_gpu_path_from_batchsim_matches_host
 tests/test_sensors_rt.py::test_gpu_path_ordering_with_sim
-  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
+  upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
     warnings.warn(
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
@@ -1698,7 +1698,7 @@ _______________ test_fast_update_matches_plain[4-True-64-False] ________________
 log_std: fast 2e-07 torch 2e-07; cnn.conv.0.weight: fast 8e-07 torch 9e-07; cnn.conv.0.bias: fast 7e-07 torch 6e-07; cnn.conv.2.weight: fast 6e-07 torch 7e-07; cnn.conv.2.bias: fast 4e-07 torch 5e-07; cnn.conv.4.weight: fast 6e-07 torch 7e-07; cnn.conv.4.bias: fast 5e-07 torch 6e-07; cnn.fc.0.weight: fast 7e-07 torch 6e-07; cnn.fc.0.bias: fast 4e-07 torch 4e-07; qpos.0.weight: fast 2e-07 torch 2e-07; qpos.0.bias: fast 2e-07 torch 2e-07; pi.0.weight: fast 6e-07 torch 5e-07; pi.0.bias: fast 3e-07 torch 3e-07; pi.2.weight: fast 5e-07 torch 5e-07; pi.2.bias: fast 2e-07 torch 2e-07; v.0.weight: fast 5e-07 torch 4e-07; v.0.bias: fast 2e-07 torch 1e-07; v.2.weight: fast 3e-07 torch 4e-07; v.2.bias: fast 6e-08 torch 6e-08
 ----------------------------- Captured stderr call -----------------------------
 W1012 11:26:04.399000 13977 .venv/lib/python3.12/site-packages/torch/_dynamo/convert_frame.py:2008] [0/8] torch._dynamo hit config.recompile_limit (8)
-W1012 11:26:04.399000 13977 .venv/lib/python3.12/site-packages/torch/_dynamo/convert_frame.py:2008] [0/8]    function: '_mb_loss' (/Users/aditya/robosim/metalsim/learn/ppo.py:279)
+W1012 11:26:04.399000 13977 .venv/lib/python3.12/site-packages/torch/_dynamo/convert_frame.py:2008] [0/8]    function: '_mb_loss' (metalsim/learn/ppo.py:279)
 W1012 11:26:04.399000 13977 .venv/lib/python3.12/site-packages/torch/_dynamo/convert_frame.py:2008] [0/8]    last reason: 0/7: expected type of 'idx' to be <class 'torch.Tensor'>, but found <class 'NoneType'>
 W1012 11:26:04.399000 13977 .venv/lib/python3.12/site-packages/torch/_dynamo/convert_frame.py:2008] [0/8] To log all recompilation reasons, use TORCH_LOGS="recompiles".
 W1012 11:26:04.399000 13977 .venv/lib/python3.12/site-packages/torch/_dynamo/convert_frame.py:2008] [0/8] To diagnose recompilation issues, see https://docs.pytorch.org/docs/main/user_guide/torch_compiler/compile/programming_model.recompilation.html
@@ -1707,7 +1707,7 @@ DEBUG    torch.__trace:utils.py:2363
 DEBUG    torch.__trace:utils.py:2363 
 DEBUG    torch.__trace:guards.py:5625 
 WARNING  torch._dynamo.convert_frame:convert_frame.py:2008 torch._dynamo hit config.recompile_limit (8)
-   function: '_mb_loss' (/Users/aditya/robosim/metalsim/learn/ppo.py:279)
+   function: '_mb_loss' (metalsim/learn/ppo.py:279)
    last reason: 0/7: expected type of 'idx' to be <class 'torch.Tensor'>, but found <class 'NoneType'>
 To log all recompilation reasons, use TORCH_LOGS="recompiles".
 To diagnose recompilation issues, see https://docs.pytorch.org/docs/main/user_guide/torch_compiler/compile/programming_model.recompilation.html

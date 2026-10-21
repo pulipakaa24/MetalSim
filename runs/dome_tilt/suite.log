@@ -5,16 +5,16 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 wrote 54 arrays to /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/main_snap/../untilted_main.npz
-metalsim from /Users/aditya/robosim/.claude/worktrees/agent-a307077d6fa5878cd/metalsim
+metalsim from metalsim
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
    Devices:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 wrote 54 arrays to /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/main_snap/../untilted_branch.npz
   env_pose-2.2/depth           float32 (2, 48, 64) identical
   env_pose-2.2/hdr             float32 (2, 48, 64, 3) identical
@@ -77,7 +77,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 bounces 0: mean 0.4000 (expected 0.4000), pixel std 0.0000
 bounces 3: mean 0.4000 (expected 0.4000), pixel std 0.0000
 .furnace: mean 0.4979 (expected 0.5000), pixel std 0.0072
@@ -154,7 +154,7 @@ oidn: mean 319.3 -> 318.8, std 26.4 -> 3.5
 ..
 =============================== warnings summary ===============================
 tests/test_render_tier2.py::test_gpu_path_from_batchsim_matches_host
-  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
+  upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
     warnings.warn(
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
@@ -185,7 +185,7 @@ PASSED tests/test_render_tier2.py::test_physical_preset_batch_is_finite
 ..........................................                               [100%]
 =============================== warnings summary ===============================
 tests/test_render_newton_bridge.py::test_solver_mujoco_steps_render_like_mujoco_path
-  /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/_src/solvers/mujoco/solver_mujoco.py:3813: RuntimeWarning: MuJoCo dependency version mismatch with Newton's declared requirements: mujoco==3.14.0 (requires ~=3.12.0); mujoco-warp==3.14.0 (requires ~=3.12.0). Reinstall Newton dependencies, for example `uv pip install -e ".[examples]"`.
+  .venv/lib/python3.12/site-packages/newton/_src/solvers/mujoco/solver_mujoco.py:3813: RuntimeWarning: MuJoCo dependency version mismatch with Newton's declared requirements: mujoco==3.14.0 (requires ~=3.12.0); mujoco-warp==3.14.0 (requires ~=3.12.0). Reinstall Newton dependencies, for example `uv pip install -e ".[examples]"`.
     mujoco, _ = self.import_mujoco()
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html

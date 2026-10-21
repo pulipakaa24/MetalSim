@@ -7,7 +7,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 device metal:0
 ..................FF..ss..ssssss..s..........s..........s........s...... [ 28%]
 ........................................................................ [ 57%]
@@ -113,7 +113,7 @@ mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp
 mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp1
 mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp4
 mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp5
-  /Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/io.py:334: UserWarning: Bending damping is not yet supported for interpolated flex shells.
+  upstream/mujoco_warp-flex/mujoco_warp/_src/io.py:334: UserWarning: Bending damping is not yet supported for interpolated flex shells.
     warnings.warn("Bending damping is not yet supported for interpolated flex shells.")
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
@@ -131,7 +131,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 == rope nworld=1 is_sparse=False mj_isSparse=0 nefc C=4 warp=[4]
   w0: max|pos-C| in order 5.81e-09, sorted 5.81e-09; efc_id order [0, 0, 0, 0]; C id [0, 0, 0, 0]
        flexedge_length max err 4.32e-09
@@ -155,7 +155,7 @@ Warp 1.18.0.dev20260917 initialized:
        flexedge_length max err 1.84e-08
        J max err in order 1.38e+00; after matching rows by pos 9.49e-08
 == original metalsim branch (upstream/mujoco_warp, a8e6485): flex constraint parity tests on metal
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/__init__.py
+upstream/mujoco_warp/mujoco_warp/__init__.py
 ..FF..                                                                   [100%]
 =================================== FAILURES ===================================
 __________________ FlexConstraintTest.test_constraint_parity2 __________________
@@ -213,7 +213,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 == rope nworld=1 is_sparse=False mj_isSparse=0 nefc C=4 warp=[4]
   w0: max|pos-C| in order 5.81e-09, sorted 5.81e-09; efc_id order [0, 0, 0, 0]; C id [0, 0, 0, 0]
        flexedge_length max err 4.32e-09
@@ -424,7 +424,7 @@ upstream/warp-innate/warp/_src/codegen.py:6706: in eval
            ^^^^^^^^^^^^^^^^^^^^
 upstream/warp-innate/warp/_src/codegen.py:3870: in emit_Name
     raise WarpCodegenKeyError("Referencing undefined symbol: " + str(node.id))
-E   warp._src.codegen.WarpCodegenKeyError: 'Error while parsing function "_equality_flex_reserve" at /Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/constraint.py:895:\n  efc_base_out[worldid] = wp.atomic_add(nefc_out, worldid, total)\n;Referencing undefined symbol: efc_base_out'
+E   warp._src.codegen.WarpCodegenKeyError: 'Error while parsing function "_equality_flex_reserve" at upstream/mujoco_warp-flex/mujoco_warp/_src/constraint.py:895:\n  efc_base_out[worldid] = wp.atomic_add(nefc_out, worldid, total)\n;Referencing undefined symbol: efc_base_out'
 ----------------------------- Captured stdout call -----------------------------
 _______________________ test_mjw_flex_energy_bounded_2s ________________________
 tests/test_deformable.py:100: in test_mjw_flex_energy_bounded_2s
@@ -674,68 +674,68 @@ FAILED tests/test_deformable.py::test_xpbd_drape_agrees_with_mjw_flex - Runti...
 FAILED tests/test_deformable.py::test_g1_cloth_scenes_run - RuntimeError: Met...
 7 failed, 3 passed in 32.99s
 == fidelity (metal:0)
-Warp 1.18.0.dev20260917 initialized: CUDA not enabled in this build Devices: "cpu" : "arm" "metal:0" : "Apple M4 Max" (Metal) Kernel cache: /Users/aditya/robosim/scratch/wpcache_flex_metal/1.18.0.dev20260917 floor { "c314": { "version": "3.14.0", "traj_err_m@50/100/200/400": [ 1.4234124635602308e-05, 0.011734102247444672, 0.005415687841672248, 0.006167185720146767 ], "C_vs_Cprime_m": [ 2.608264044190456e-07, 1.268705169810147e-07, 1.2760971396241771e-07, 1.2826232814733274e-07 ], "mean_z_diff_m@400": 0.00011386025435006436, "onestep_dqvel_max": 4.5213196007448664e-05, "onestep_dqvel_median": 1.929454165589331e-05, "contact_sets_equal": "83/83" }, "main": { "version": "3.14.1", "traj_err_m@50/100/200/400": [ 1.4234124635602308e-05, 0.014806405217218876, 0.016282149084514558, 0.007083483376115418 ], "C_vs_Cprime_m": [ 2.608264044190456e-07, 2.0294278781085584e-07, 1.4699623867853173e-06, 1.2826232814733274e-07 ], "mean_z_diff_m@400": 5.713754194382886e-05, "onestep_dqvel_max": 0.4595416236605565, "onestep_dqvel_median": 0.10478992798437932, "contact_sets_equal": "1/83" } } box { "c314": { "version": "3.14.0", "traj_err_m@50/100/200/400": [ 1.4240085100092337e-05, 5.0606979298040144e-05, 0.01133662045165268, 0.03662659155701797 ], "C_vs_Cprime_m": [ 2.608264044190456e-07, 2.3185659198121655e-07, 6.186919397910273e-07, 0.01652209657137682 ], "mean_z_diff_m@400": -0.0014272250919633023, "onestep_dqvel_max": 4.768339014310941e-05, "onestep_dqvel_median": 2.167281372702709e-05, "contact_sets_equal": "78/78" }, "main": { "version": "3.14.1", "traj_err_m@50/100/200/400": [ 1.4240085100092337e-05, 0.017596684507812876, 0.03454146502737254, 0.026572940387518396 ], "C_vs_Cprime_m": [ 2.608264044190456e-07, 6.424636804780448e-07, 9.68941800183476e-07, 1.2624466900756914e-06 ], "mean_z_diff_m@400": -0.0026193934694692667, "onestep_dqvel_max": 0.4145253528027826, "onestep_dqvel_median": 0.046403165306541136, "contact_sets_equal": "0/78" } } 
+Warp 1.18.0.dev20260917 initialized: CUDA not enabled in this build Devices: "cpu" : "arm" "metal:0" : "Apple M4 Max" (Metal) Kernel cache: scratch/wpcache_flex_metal/1.18.0.dev20260917 floor { "c314": { "version": "3.14.0", "traj_err_m@50/100/200/400": [ 1.4234124635602308e-05, 0.011734102247444672, 0.005415687841672248, 0.006167185720146767 ], "C_vs_Cprime_m": [ 2.608264044190456e-07, 1.268705169810147e-07, 1.2760971396241771e-07, 1.2826232814733274e-07 ], "mean_z_diff_m@400": 0.00011386025435006436, "onestep_dqvel_max": 4.5213196007448664e-05, "onestep_dqvel_median": 1.929454165589331e-05, "contact_sets_equal": "83/83" }, "main": { "version": "3.14.1", "traj_err_m@50/100/200/400": [ 1.4234124635602308e-05, 0.014806405217218876, 0.016282149084514558, 0.007083483376115418 ], "C_vs_Cprime_m": [ 2.608264044190456e-07, 2.0294278781085584e-07, 1.4699623867853173e-06, 1.2826232814733274e-07 ], "mean_z_diff_m@400": 5.713754194382886e-05, "onestep_dqvel_max": 0.4595416236605565, "onestep_dqvel_median": 0.10478992798437932, "contact_sets_equal": "1/83" } } box { "c314": { "version": "3.14.0", "traj_err_m@50/100/200/400": [ 1.4240085100092337e-05, 5.0606979298040144e-05, 0.01133662045165268, 0.03662659155701797 ], "C_vs_Cprime_m": [ 2.608264044190456e-07, 2.3185659198121655e-07, 6.186919397910273e-07, 0.01652209657137682 ], "mean_z_diff_m@400": -0.0014272250919633023, "onestep_dqvel_max": 4.768339014310941e-05, "onestep_dqvel_median": 2.167281372702709e-05, "contact_sets_equal": "78/78" }, "main": { "version": "3.14.1", "traj_err_m@50/100/200/400": [ 1.4240085100092337e-05, 0.017596684507812876, 0.03454146502737254, 0.026572940387518396 ], "C_vs_Cprime_m": [ 2.608264044190456e-07, 6.424636804780448e-07, 9.68941800183476e-07, 1.2624466900756914e-06 ], "mean_z_diff_m@400": -0.0026193934694692667, "onestep_dqvel_max": 0.4145253528027826, "onestep_dqvel_median": 0.046403165306541136, "contact_sets_equal": "0/78" } } 
 == quick throughput (mjw, box 10x10 cloth + 12 cable)
 Cannot synchronize device "Apple M4 Max" during graph capture
 Traceback (most recent call last):
   File "<frozen runpy>", line 198, in _run_module_as_main
   File "<frozen runpy>", line 88, in _run_code
-  File "/Users/aditya/robosim/metalsim/physics/deformable.py", line 782, in <module>
+  File "metalsim/physics/deformable.py", line 782, in <module>
     _main()
-  File "/Users/aditya/robosim/metalsim/physics/deformable.py", line 774, in _main
+  File "metalsim/physics/deformable.py", line 774, in _main
     r = benchmark(fm, n, seconds=a.seconds)
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/physics/deformable.py", line 348, in benchmark
+  File "metalsim/physics/deformable.py", line 348, in benchmark
     sim = DeformableSim(model, num_envs, device=device, substeps=substeps)
           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/physics/deformable.py", line 218, in __init__
+  File "metalsim/physics/deformable.py", line 218, in __init__
     self.capture()
-  File "/Users/aditya/robosim/metalsim/physics/deformable.py", line 230, in capture
+  File "metalsim/physics/deformable.py", line 230, in capture
     self.launch()
-  File "/Users/aditya/robosim/metalsim/physics/deformable.py", line 225, in launch
+  File "metalsim/physics/deformable.py", line 225, in launch
     mjw.step(self.m, self.d)
-  File "/Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py", line 123, in wrapper
     return fn(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py", line 1825, in step
+  File "upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py", line 1825, in step
     forward(m, d)
-  File "/Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py", line 123, in wrapper
     return fn(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py", line 1801, in forward
+  File "upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py", line 1801, in forward
     fwd_position(m, d, factorize=False)
-  File "/Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py", line 123, in wrapper
     return fn(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py", line 1091, in fwd_position
+  File "upstream/mujoco_warp-flex/mujoco_warp/_src/forward.py", line 1091, in fwd_position
     collision_driver.collision(m, d)
-  File "/Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py", line 123, in wrapper
     return fn(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/collision_driver.py", line 939, in collision
+  File "upstream/mujoco_warp-flex/mujoco_warp/_src/collision_driver.py", line 939, in collision
     flex_collision(m, d, ctx)
-  File "/Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "upstream/mujoco_warp-flex/mujoco_warp/_src/warp_util.py", line 123, in wrapper
     return fn(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/collision_flex.py", line 4068, in flex_collision
+  File "upstream/mujoco_warp-flex/mujoco_warp/_src/collision_flex.py", line 4068, in flex_collision
     sap_data = _run_flex_sap_sort(m, d)
                ^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/collision_flex.py", line 3857, in _run_flex_sap_sort
+  File "upstream/mujoco_warp-flex/mujoco_warp/_src/collision_flex.py", line 3857, in _run_flex_sap_sort
     wp.utils.segmented_sort_pairs(
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/utils.py", line 510, in segmented_sort_pairs
+  File "upstream/warp-innate/warp/_src/utils.py", line 510, in segmented_sort_pairs
     starts = segment_start_indices.numpy().astype(np.int32, copy=False)[:num_segments]
              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/types.py", line 4570, in numpy
+  File "upstream/warp-innate/warp/_src/types.py", line 4570, in numpy
     a = self.to("cpu", requires_grad=False)
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/types.py", line 4669, in to
+  File "upstream/warp-innate/warp/_src/types.py", line 4669, in to
     return warp.clone(self, device=device, requires_grad=requires_grad)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 10501, in clone
+  File "upstream/warp-innate/warp/_src/context.py", line 10501, in clone
     warp.copy(arr, src)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 15016, in copy
+  File "upstream/warp-innate/warp/_src/context.py", line 15016, in copy
     device.metal_synchronize()
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 6066, in metal_synchronize
+  File "upstream/warp-innate/warp/_src/context.py", line 6066, in metal_synchronize
     raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
 RuntimeError: Metal error on device metal:0: Cannot synchronize device "Apple M4 Max" during graph capture
 Warp 1.18.0.dev20260917 initialized:
@@ -744,7 +744,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 == quick throughput (xpbd, same topology, 10 substeps)
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -752,7 +752,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 {"num_envs": 256, "steps": 3850, "wall_s": 2.0043513330165297, "env_steps_per_s": 491730.1591616084, "sim_s_per_wall_s": 3.8416418684500653, "finite": true, "substeps": 10, "ncons": 282, "ncolors": 6, "nflexvert": 112, "backend": "xpbd", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002}
 {"num_envs": 1024, "steps": 2670, "wall_s": 2.004795083019417, "env_steps_per_s": 1363770.3040862456, "sim_s_per_wall_s": 2.663613875168448, "finite": true, "substeps": 10, "ncons": 282, "ncolors": 6, "nflexvert": 112, "backend": "xpbd", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002}
 {"num_envs": 4096, "steps": 1150, "wall_s": 2.0024247909896076, "env_steps_per_s": 2352348.0238536694, "sim_s_per_wall_s": 1.1486074335222995, "finite": true, "substeps": 10, "ncons": 282, "ncolors": 6, "nflexvert": 112, "backend": "xpbd", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002}

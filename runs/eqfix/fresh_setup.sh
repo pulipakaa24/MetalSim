@@ -1,7 +1,7 @@
 #!/bin/bash
 # Fresh-setup check: a new venv, then the README's MuJoCo Warp install line exactly as written; report the installed commit.
 set -e
-WT=/Users/aditya/robosim/.claude/worktrees/agent-a4b4d2a53213dae91
+WT=.
 D=$WT/scratch/fresh
 rm -rf "$D" && mkdir -p "$D" && cd "$D"
 "$(uv python find 3.12)" -m venv .venv

@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /Users/aditya/robosim
+cd .
 python3 scripts/gpu_lock.py status
 R=".venv-newton152/bin/python scripts/diagnostics/newton_vbd/run_newton_tests.py"
 echo "=== Newton 1.5.2 VBD/cloth/softbody tests, metal_0 variants"

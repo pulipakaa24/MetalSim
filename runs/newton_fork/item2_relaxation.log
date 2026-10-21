@@ -4,7 +4,7 @@ holder: {"name": "g1_flat_rslrl_isaacflatcfg", "kind": "train", "minutes": 30.0,
   waiting [timing] contact_tuning_bench est 15.0 min, queued 214 s ago
   waiting [train] g1_flat_newton0625_ppo_fixed est 45.0 min, queued 858 s ago
 $ .venv/bin/python scripts/diagnostics/newton_fork/relaxation.py
-newton at /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/__init__.py; legacy switch available: False
+newton at .venv/lib/python3.12/site-packages/newton/__init__.py; legacy switch available: False
 | solver | torque response (1.000 = exact) | gravity response | PD hold ke 200: sag / exact |
 |---|---|---|---|
 | Featherstone | 1.000 | 1.000 | +0.0612 / +0.0612 rad (1.000) |
@@ -15,7 +15,7 @@ newton at /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/__init
 | XPBD it 8 lin 0.4 / ang 0.4 | 1.002 | 1.000 | +0.0613 / +0.0612 rad (1.001) |
 | XPBD it 8 lin 1.0 / ang 1.0 | 1.000 | 1.000 | +0.0612 / +0.0612 rad (1.000) |
 $ .venv-newtonfork/bin/python scripts/diagnostics/newton_fork/relaxation.py
-newton at /Users/aditya/robosim/upstream/newton/newton/__init__.py; legacy switch available: True
+newton at upstream/newton/newton/__init__.py; legacy switch available: True
 | solver | torque response (1.000 = exact) | gravity response | PD hold ke 200: sag / exact |
 |---|---|---|---|
 | Featherstone | 1.000 | 1.000 | +0.0612 / +0.0612 rad (1.000) |

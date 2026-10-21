@@ -1,6 +1,6 @@
 #!/bin/bash
 # round 6: profile of the current default (steps 1-3) and the next candidates on top of it
-cd /Users/aditya/robosim && source .venv/bin/activate
+cd . && source .venv/bin/activate
 F='^\[\|Error\|Traceback'
 {
 echo "=== start $(date) power: $(pmset -g batt | head -1)"; python3 scripts/gpu_lock.py status

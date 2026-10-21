@@ -1,7 +1,7 @@
 #!/bin/bash
 # Go2 per-kernel attribution, both cones (the first generality job's grep dropped these lines); raw logs kept.
-cd /Users/aditya/robosim && source .venv/bin/activate
-export MENAGERIE=/Users/aditya/robosim/upstream/mujoco_menagerie
+cd . && source .venv/bin/activate
+export MENAGERIE=upstream/mujoco_menagerie
 D=scripts/diagnostics/competitors
 echo "=== start $(date) mjw $(git -C upstream/mujoco_warp rev-parse --short HEAD) power: $(pmset -g batt | head -1)"
 for cone in pyramidal elliptic; do

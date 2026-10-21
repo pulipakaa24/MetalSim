@@ -21,7 +21,7 @@ metalsim/learn/g1_velocity.py:95: in build_g1_model
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+path = 'assets/isaac/G1/g1_minimal.usd'
 lossless = False, drives = False, visuals = False, effort_limit = None
 
     def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
@@ -29,7 +29,7 @@ lossless = False, drives = False, visuals = False, effort_limit = None
 >       stage = Usd.Stage.Open(path)
                 ^^^^^^^^^^^^^^^^^^^^
 E       pxr.Tf.ErrorException: 
-E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
 
 metalsim/scene/usd_to_mjcf.py:37: ErrorException
 _______________ ERROR at setup of test_stored_logp_matches_torch _______________
@@ -51,7 +51,7 @@ metalsim/learn/g1_velocity.py:95: in build_g1_model
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+path = 'assets/isaac/G1/g1_minimal.usd'
 lossless = False, drives = False, visuals = False, effort_limit = None
 
     def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
@@ -59,7 +59,7 @@ lossless = False, drives = False, visuals = False, effort_limit = None
 >       stage = Usd.Stage.Open(path)
                 ^^^^^^^^^^^^^^^^^^^^
 E       pxr.Tf.ErrorException: 
-E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
 
 metalsim/scene/usd_to_mjcf.py:37: ErrorException
 ___________________ ERROR at setup of test_timeouts_flagged ____________________
@@ -81,7 +81,7 @@ metalsim/learn/g1_velocity.py:95: in build_g1_model
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+path = 'assets/isaac/G1/g1_minimal.usd'
 lossless = False, drives = False, visuals = False, effort_limit = None
 
     def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
@@ -89,7 +89,7 @@ lossless = False, drives = False, visuals = False, effort_limit = None
 >       stage = Usd.Stage.Open(path)
                 ^^^^^^^^^^^^^^^^^^^^
 E       pxr.Tf.ErrorException: 
-E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
 
 metalsim/scene/usd_to_mjcf.py:37: ErrorException
 =================================== FAILURES ===================================
@@ -107,7 +107,7 @@ metalsim/learn/g1_velocity.py:95: in build_g1_model
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+path = 'assets/isaac/G1/g1_minimal.usd'
 lossless = False, drives = False, visuals = False, effort_limit = None
 
     def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
@@ -115,7 +115,7 @@ lossless = False, drives = False, visuals = False, effort_limit = None
 >       stage = Usd.Stage.Open(path)
                 ^^^^^^^^^^^^^^^^^^^^
 E       pxr.Tf.ErrorException: 
-E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
 
 metalsim/scene/usd_to_mjcf.py:37: ErrorException
 ________________ test_once_per_tick_contacts_follow_the_bodies _________________
@@ -137,7 +137,7 @@ metalsim/learn/g1_velocity.py:95: in build_g1_model
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+path = 'assets/isaac/G1/g1_minimal.usd'
 lossless = False, drives = False, visuals = False, effort_limit = None
 
     def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
@@ -145,7 +145,7 @@ lossless = False, drives = False, visuals = False, effort_limit = None
 >       stage = Usd.Stage.Open(path)
                 ^^^^^^^^^^^^^^^^^^^^
 E       pxr.Tf.ErrorException: 
-E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
 
 metalsim/scene/usd_to_mjcf.py:37: ErrorException
 ____________ test_once_per_tick_collision_step_is_stable_and_close _____________
@@ -168,7 +168,7 @@ metalsim/learn/g1_velocity.py:95: in build_g1_model
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+path = 'assets/isaac/G1/g1_minimal.usd'
 lossless = False, drives = False, visuals = False, effort_limit = None
 
     def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
@@ -176,7 +176,7 @@ lossless = False, drives = False, visuals = False, effort_limit = None
 >       stage = Usd.Stage.Open(path)
                 ^^^^^^^^^^^^^^^^^^^^
 E       pxr.Tf.ErrorException: 
-E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
 
 metalsim/scene/usd_to_mjcf.py:37: ErrorException
 _____________ test_iteration_cap_only_changes_worlds_that_reach_it _____________
@@ -199,7 +199,7 @@ metalsim/learn/g1_velocity.py:95: in build_g1_model
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+path = 'assets/isaac/G1/g1_minimal.usd'
 lossless = False, drives = False, visuals = False, effort_limit = None
 
     def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
@@ -207,7 +207,7 @@ lossless = False, drives = False, visuals = False, effort_limit = None
 >       stage = Usd.Stage.Open(path)
                 ^^^^^^^^^^^^^^^^^^^^
 E       pxr.Tf.ErrorException: 
-E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
 
 metalsim/scene/usd_to_mjcf.py:37: ErrorException
 _______ test_effective_model_fields_per_preset_combination[default-None] _______
@@ -234,7 +234,7 @@ metalsim/learn/g1_velocity.py:95: in build_g1_model
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+path = 'assets/isaac/G1/g1_minimal.usd'
 lossless = False, drives = False, visuals = False, effort_limit = None
 
     def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
@@ -242,7 +242,7 @@ lossless = False, drives = False, visuals = False, effort_limit = None
 >       stage = Usd.Stage.Open(path)
                 ^^^^^^^^^^^^^^^^^^^^
 E       pxr.Tf.ErrorException: 
-E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
 
 metalsim/scene/usd_to_mjcf.py:37: ErrorException
 _____ test_effective_model_fields_per_preset_combination[recommended-None] _____
@@ -269,7 +269,7 @@ metalsim/learn/g1_velocity.py:95: in build_g1_model
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+path = 'assets/isaac/G1/g1_minimal.usd'
 lossless = False, drives = False, visuals = False, effort_limit = None
 
     def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
@@ -277,7 +277,7 @@ lossless = False, drives = False, visuals = False, effort_limit = None
 >       stage = Usd.Stage.Open(path)
                 ^^^^^^^^^^^^^^^^^^^^
 E       pxr.Tf.ErrorException: 
-E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
 
 metalsim/scene/usd_to_mjcf.py:37: ErrorException
 __ test_effective_model_fields_per_preset_combination[recommended-isaaclab3] ___
@@ -304,7 +304,7 @@ metalsim/learn/g1_velocity.py:95: in build_g1_model
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+path = 'assets/isaac/G1/g1_minimal.usd'
 lossless = False, drives = False, visuals = False, effort_limit = None
 
     def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
@@ -312,7 +312,7 @@ lossless = False, drives = False, visuals = False, effort_limit = None
 >       stage = Usd.Stage.Open(path)
                 ^^^^^^^^^^^^^^^^^^^^
 E       pxr.Tf.ErrorException: 
-E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
 
 metalsim/scene/usd_to_mjcf.py:37: ErrorException
 _ test_effective_model_fields_per_preset_combination[recommended-isaaclab3_every_substep_cap20] _
@@ -339,7 +339,7 @@ metalsim/learn/g1_velocity.py:95: in build_g1_model
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+path = 'assets/isaac/G1/g1_minimal.usd'
 lossless = False, drives = False, visuals = False, effort_limit = None
 
     def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
@@ -347,7 +347,7 @@ lossless = False, drives = False, visuals = False, effort_limit = None
 >       stage = Usd.Stage.Open(path)
                 ^^^^^^^^^^^^^^^^^^^^
 E       pxr.Tf.ErrorException: 
-E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
 
 metalsim/scene/usd_to_mjcf.py:37: ErrorException
 _ test_effective_model_fields_per_preset_combination[recommended-isaaclab3_hardlimits] _
@@ -374,7 +374,7 @@ metalsim/learn/g1_velocity.py:95: in build_g1_model
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+path = 'assets/isaac/G1/g1_minimal.usd'
 lossless = False, drives = False, visuals = False, effort_limit = None
 
     def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
@@ -382,7 +382,7 @@ lossless = False, drives = False, visuals = False, effort_limit = None
 >       stage = Usd.Stage.Open(path)
                 ^^^^^^^^^^^^^^^^^^^^
 E       pxr.Tf.ErrorException: 
-E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
 
 metalsim/scene/usd_to_mjcf.py:37: ErrorException
 ____ test_effective_model_fields_per_preset_combination[default-isaaclab3] _____
@@ -409,7 +409,7 @@ metalsim/learn/g1_velocity.py:95: in build_g1_model
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+path = 'assets/isaac/G1/g1_minimal.usd'
 lossless = False, drives = False, visuals = False, effort_limit = None
 
     def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
@@ -417,7 +417,7 @@ lossless = False, drives = False, visuals = False, effort_limit = None
 >       stage = Usd.Stage.Open(path)
                 ^^^^^^^^^^^^^^^^^^^^
 E       pxr.Tf.ErrorException: 
-E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
 
 metalsim/scene/usd_to_mjcf.py:37: ErrorException
 ____________ test_g1_actuator_and_joint_fields_match_newtons_model _____________
@@ -439,7 +439,7 @@ metalsim/learn/g1_velocity.py:95: in build_g1_model
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+path = 'assets/isaac/G1/g1_minimal.usd'
 lossless = False, drives = False, visuals = False, effort_limit = None
 
     def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
@@ -447,7 +447,7 @@ lossless = False, drives = False, visuals = False, effort_limit = None
 >       stage = Usd.Stage.Open(path)
                 ^^^^^^^^^^^^^^^^^^^^
 E       pxr.Tf.ErrorException: 
-E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
 
 metalsim/scene/usd_to_mjcf.py:37: ErrorException
 _________________ test_saturated_finger_keeps_implicit_damping _________________
@@ -467,7 +467,7 @@ metalsim/learn/g1_velocity.py:95: in build_g1_model
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+path = 'assets/isaac/G1/g1_minimal.usd'
 lossless = False, drives = False, visuals = False, effort_limit = None
 
     def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
@@ -475,7 +475,7 @@ lossless = False, drives = False, visuals = False, effort_limit = None
 >       stage = Usd.Stage.Open(path)
                 ^^^^^^^^^^^^^^^^^^^^
 E       pxr.Tf.ErrorException: 
-E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
 
 metalsim/scene/usd_to_mjcf.py:37: ErrorException
 ___________________________ test_g1_rough_task_runs ____________________________
@@ -494,7 +494,7 @@ metalsim/learn/g1_velocity.py:95: in build_g1_model
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+path = 'assets/isaac/G1/g1_minimal.usd'
 lossless = False, drives = False, visuals = False, effort_limit = None
 
     def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
@@ -502,7 +502,7 @@ lossless = False, drives = False, visuals = False, effort_limit = None
 >       stage = Usd.Stage.Open(path)
                 ^^^^^^^^^^^^^^^^^^^^
 E       pxr.Tf.ErrorException: 
-E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
 
 metalsim/scene/usd_to_mjcf.py:37: ErrorException
 ___________________ test_hfield_mesh_contacts_match_mujoco_c ___________________
@@ -530,7 +530,7 @@ metalsim/learn/g1_velocity.py:95: in build_g1_model
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+path = 'assets/isaac/G1/g1_minimal.usd'
 lossless = False, drives = False, visuals = False, effort_limit = None
 
     def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
@@ -538,7 +538,7 @@ lossless = False, drives = False, visuals = False, effort_limit = None
 >       stage = Usd.Stage.Open(path)
                 ^^^^^^^^^^^^^^^^^^^^
 E       pxr.Tf.ErrorException: 
-E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
 
 metalsim/scene/usd_to_mjcf.py:37: ErrorException
 ______________ test_height_scan_ray_order_matches_isaac_recording ______________
@@ -567,7 +567,7 @@ metalsim/learn/g1_velocity.py:95: in build_g1_model
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+path = 'assets/isaac/G1/g1_minimal.usd'
 lossless = False, drives = False, visuals = False, effort_limit = None
 
     def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
@@ -575,7 +575,7 @@ lossless = False, drives = False, visuals = False, effort_limit = None
 >       stage = Usd.Stage.Open(path)
                 ^^^^^^^^^^^^^^^^^^^^
 E       pxr.Tf.ErrorException: 
-E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
 
 metalsim/scene/usd_to_mjcf.py:37: ErrorException
 ________________ test_step_edge_contacts_match_mujoco_c[boxes] _________________
@@ -612,7 +612,7 @@ metalsim/learn/g1_velocity.py:95: in build_g1_model
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+path = 'assets/isaac/G1/g1_minimal.usd'
 lossless = False, drives = False, visuals = False, effort_limit = None
 
     def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
@@ -620,7 +620,7 @@ lossless = False, drives = False, visuals = False, effort_limit = None
 >       stage = Usd.Stage.Open(path)
                 ^^^^^^^^^^^^^^^^^^^^
 E       pxr.Tf.ErrorException: 
-E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
 
 metalsim/scene/usd_to_mjcf.py:37: ErrorException
 ________________ test_step_edge_contacts_match_mujoco_c[meshes] ________________
@@ -657,7 +657,7 @@ metalsim/learn/g1_velocity.py:95: in build_g1_model
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+path = 'assets/isaac/G1/g1_minimal.usd'
 lossless = False, drives = False, visuals = False, effort_limit = None
 
     def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
@@ -665,7 +665,7 @@ lossless = False, drives = False, visuals = False, effort_limit = None
 >       stage = Usd.Stage.Open(path)
                 ^^^^^^^^^^^^^^^^^^^^
 E       pxr.Tf.ErrorException: 
-E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
 
 metalsim/scene/usd_to_mjcf.py:37: ErrorException
 _____________ test_step_edge_contacts_match_mujoco_c[boxes_local] ______________
@@ -702,7 +702,7 @@ metalsim/learn/g1_velocity.py:95: in build_g1_model
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+path = 'assets/isaac/G1/g1_minimal.usd'
 lossless = False, drives = False, visuals = False, effort_limit = None
 
     def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
@@ -710,7 +710,7 @@ lossless = False, drives = False, visuals = False, effort_limit = None
 >       stage = Usd.Stage.Open(path)
                 ^^^^^^^^^^^^^^^^^^^^
 E       pxr.Tf.ErrorException: 
-E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
 
 metalsim/scene/usd_to_mjcf.py:37: ErrorException
 _________________________ test_rslrl_adapter_contract __________________________
@@ -732,7 +732,7 @@ metalsim/learn/g1_velocity.py:95: in build_g1_model
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+path = 'assets/isaac/G1/g1_minimal.usd'
 lossless = False, drives = False, visuals = False, effort_limit = None
 
     def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
@@ -740,7 +740,7 @@ lossless = False, drives = False, visuals = False, effort_limit = None
 >       stage = Usd.Stage.Open(path)
                 ^^^^^^^^^^^^^^^^^^^^
 E       pxr.Tf.ErrorException: 
-E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
 
 metalsim/scene/usd_to_mjcf.py:37: ErrorException
 ___________________________ test_g1_cloth_scenes_run ___________________________
@@ -760,7 +760,7 @@ metalsim/learn/g1_velocity.py:95: in build_g1_model
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
 
-path = '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd'
+path = 'assets/isaac/G1/g1_minimal.usd'
 lossless = False, drives = False, visuals = False, effort_limit = None
 
     def load_usd(path: str, *, lossless: bool = True, drives: bool = True, visuals: bool = True,
@@ -768,7 +768,7 @@ lossless = False, drives = False, visuals = False, effort_limit = None
 >       stage = Usd.Stage.Open(path)
                 ^^^^^^^^^^^^^^^^^^^^
 E       pxr.Tf.ErrorException: 
-E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+E       	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
 
 metalsim/scene/usd_to_mjcf.py:37: ErrorException
 =========================== short test summary info ============================

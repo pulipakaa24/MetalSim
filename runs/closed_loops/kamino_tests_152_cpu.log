@@ -4,7 +4,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 ..........................
 ----------------------------------------------------------------------
 Ran 26 tests in 0.029s
@@ -45,7 +45,7 @@ Module map_sub a19ac26 load on device 'cpu' took 0.28 ms  (cached)
 Module map_sub d5e161e load on device 'cpu' took 0.84 ms  (cached)
 .Module map_sub 3fc40a8 load on device 'cpu' took 914.79 ms  (compiled)
 .Cloning https://github.com/newton-physics/newton-assets.git (ref: 261cd1f429619d8ef4f546bd788ab9dea906b5e1)...
-Successfully downloaded folder to: /Users/aditya/Library/Caches/newton/newton-assets_disneyresearch_56289e70_261cd1f4/disneyresearch
+Successfully downloaded folder to: ~/Library/Caches/newton/newton-assets_disneyresearch_56289e70_261cd1f4/disneyresearch
 ..Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
 Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
 Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/base/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
@@ -199,21 +199,21 @@ Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr
 Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
 Warning: in BindingsAtPrim at line 671 of /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usdShade/materialBindingAPI.cpp -- Found material bindings on prim at path (/anymal/RH_FOOT/visuals/mesh_0) but MaterialBindingAPI is not applied on the prim
 Cloning https://github.com/newton-physics/newton-assets.git (ref: 261cd1f429619d8ef4f546bd788ab9dea906b5e1)...
-Successfully downloaded folder to: /Users/aditya/Library/Caches/newton/newton-assets_anybotics_anymal_d_5af8de00_261cd1f4/anybotics_anymal_d
-../Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:562: UserWarning: Inertia validation corrected 2 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+Successfully downloaded folder to: ~/Library/Caches/newton/newton-assets_anybotics_anymal_d_5af8de00_261cd1f4/anybotics_anymal_d
+..upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:562: UserWarning: Inertia validation corrected 2 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
   model_newton: Model = builder_newton.finalize(skip_validation_joints=True, device=self.default_device)
-./Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:655: UserWarning: Inertia validation corrected 3 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+.upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:655: UserWarning: Inertia validation corrected 3 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
   model_newton: Model = builder_newton.finalize(skip_validation_joints=True, device=self.default_device)
-./Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:776: UserWarning: Inertia validation corrected 3 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+.upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:776: UserWarning: Inertia validation corrected 3 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
   return builder_newton.finalize(skip_validation_joints=True, device=self.default_device)
-/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:776: UserWarning: Inertia validation corrected 3 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:776: UserWarning: Inertia validation corrected 3 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
   return builder_newton.finalize(skip_validation_joints=True, device=self.default_device)
 Module newton._src.solvers.kamino._src.kinematics.constraints 5516130 load on device 'cpu' took 0.47 ms  (cached)
 Module newton._src.solvers.kamino._src.kinematics.jacobians 374e63a load on device 'cpu' took 0.38 ms  (cached)
 Module newton._src.solvers.kamino._src.kinematics.resets 8b1933c load on device 'cpu' took 0.33 ms  (cached)
-../Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:960: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+..upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:960: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
   model_newton: Model = builder_newton.finalize(skip_validation_joints=True, device=self.default_device)
-./Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:701: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+.upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_core_model.py:701: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
   return builder_newton.finalize(skip_validation_joints=True, device=self.default_device)
 ......
 ----------------------------------------------------------------------
@@ -378,15 +378,15 @@ FAIL: test_05_box_on_box_simple (newton._src.solvers.kamino.tests.test_geometry_
 Tests unified pipeline output contacts for the case of two boxes
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_geometry_unified.py", line 473, in test_05_box_on_box_simple
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_geometry_unified.py", line 473, in test_05_box_on_box_simple
     test_unified_pipeline(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_geometry_unified.py", line 147, in test_unified_pipeline
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_geometry_unified.py", line 147, in test_unified_pipeline
     check_contacts(
-  File "/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_geometry_primitive.py", line 329, in check_contacts
+  File "upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_geometry_primitive.py", line 329, in check_contacts
     np.testing.assert_allclose(
-  File "/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 1780, in assert_allclose
+  File ".venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 1780, in assert_allclose
     assert_array_compare(compare, actual, desired, err_msg=str(err_msg),
-  File "/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 988, in assert_array_compare
+  File ".venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 988, in assert_array_compare
     raise AssertionError(msg)
 AssertionError: 
 Not equal to tolerance rtol=0, atol=1e-05
@@ -562,11 +562,11 @@ Ran 1 test in 0.000s
 
 OK
 MODULE test_linalg_utils_matrix: ran=1 fail=0 err=0 skip=0 (0 s)
-./Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/linalg/_linalg.py:2349: RuntimeWarning: divide by zero encountered in slogdet
+..venv-newton152/lib/python3.12/site-packages/numpy/linalg/_linalg.py:2349: RuntimeWarning: divide by zero encountered in slogdet
   sign, logdet = _umath_linalg.slogdet(a, signature=signature)
-/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/linalg/_linalg.py:2349: RuntimeWarning: overflow encountered in slogdet
+.venv-newton152/lib/python3.12/site-packages/numpy/linalg/_linalg.py:2349: RuntimeWarning: overflow encountered in slogdet
   sign, logdet = _umath_linalg.slogdet(a, signature=signature)
-/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/linalg/_linalg.py:2349: RuntimeWarning: invalid value encountered in slogdet
+.venv-newton152/lib/python3.12/site-packages/numpy/linalg/_linalg.py:2349: RuntimeWarning: invalid value encountered in slogdet
   sign, logdet = _umath_linalg.slogdet(a, signature=signature)
 ...................
 ----------------------------------------------------------------------
@@ -585,10 +585,10 @@ Ran 18 tests in 9.095s
 
 OK
 MODULE test_solver_kamino: ran=18 fail=0 err=0 skip=0 (9 s)
-/Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solver_kamino_joint_frames.py:135: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solver_kamino_joint_frames.py:135: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
   model = builder.finalize()
 [38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,012][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
-./Users/aditya/robosim/upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solver_kamino_joint_frames.py:71: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+.upstream/newton-1.5.2/newton/_src/solvers/kamino/tests/test_solver_kamino_joint_frames.py:71: UserWarning: Inertia validation corrected 1 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
   return builder.finalize()
 [38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,015][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m
 .[38;5;13m[KAMINO][0m[33;20m[2026-09-25 15:02:14,018][conversions.py:1516][WARNING]: Model has articulations whose root is not a free joint attached to the world, disabling floating base resets for those worlds.[0m

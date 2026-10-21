@@ -4,7 +4,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth d82236f load on device 'metal:0' took 60.40 ms  (cached)
 Module _nxn_broadphase__locals__kernel_da6e4d10 da6e4d1 load on device 'metal:0' took 40.61 ms  (cached)
 Module ccd_kernel_builder__locals__ccd_kernel_db3bb438 db3bb43 load on device 'metal:0' took 58.06 ms  (cached)
@@ -55,4 +55,4 @@ Module metalsim.sensors.contact 5dea6fd load on device 'metal:0' took 42.60 ms  
 Module metalsim.learn.g1_velocity d51a450 load on device 'metal:0' took 48.58 ms  (cached)
 Module _solve_init_efc__locals__kernel_81f2525b 81f2525 load on device 'metal:0' took 37.99 ms  (cached)
 Module _solve_done__locals__kernel_eea46921 eea4692 load on device 'metal:0' took 38.25 ms  (cached)
-RESULT {"worlds": 64, "steps": 60, "iteration_cap": 20, "MJW_METAL_FUSE_UPDATE": "0", "fused_kernel_ran": false, "steps_with_cap_worlds": 8, "cap_world_steps": 8, "mean_niter": 3.7859375, "niter_hist": [0, 928, 774, 348, 423, 427, 335, 235, 131, 94, 64, 37, 17, 12, 4, 4, 3, 3, 0, 0, 1], "mujoco_warp": "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/__init__.py"}
+RESULT {"worlds": 64, "steps": 60, "iteration_cap": 20, "MJW_METAL_FUSE_UPDATE": "0", "fused_kernel_ran": false, "steps_with_cap_worlds": 8, "cap_world_steps": 8, "mean_niter": 3.7859375, "niter_hist": [0, 928, 774, 348, 423, 427, 335, 235, 131, 94, 64, 37, 17, 12, 4, 4, 3, 3, 0, 0, 1], "mujoco_warp": "upstream/mujoco_warp/mujoco_warp/__init__.py"}

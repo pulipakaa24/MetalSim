@@ -3,8 +3,8 @@
 # (433c305: elliptic fused launch with htot fusion at 128 lanes, ICB early exit; line-search floor off by default):
 # g1_tp_variants.py 4096, recommended_pyramidal cap 10 (P) vs recommended = elliptic ellip10 cap 20 without (E0) and with the
 # line-search floor at 8 eps (E8), interleaved P E0 E8 P E0 E8.
-cd /Users/aditya/robosim && source .venv/bin/activate
-WT=/Users/aditya/robosim/upstream/warp-innate-ellip-test:/Users/aditya/robosim/upstream/mujoco_warp-ellip-test6
+cd . && source .venv/bin/activate
+WT=upstream/warp-innate-ellip-test:upstream/mujoco_warp-ellip-test6
 F='^\[\|Error\|Traceback'
 echo "=== start $(date) metalsim $(git rev-parse --short HEAD) frozen warp $(git -C upstream/warp-innate-ellip-test rev-parse --short HEAD) mjw $(git -C upstream/mujoco_warp-ellip-test6 rev-parse --short HEAD) power: $(pmset -g batt | head -1)"
 run() { PYTHONPATH=$WT env $3 MJW_TP_VARIANT="$2" python -c "import runpy, sys; sys.argv=['g1_tp_variants.py','4096']; runpy.run_path('scripts/diagnostics/g1_tp_variants.py', run_name='__main__')" > runs/ellip_ws/final_$1.log 2>&1; grep "$F" runs/ellip_ws/final_$1.log; }

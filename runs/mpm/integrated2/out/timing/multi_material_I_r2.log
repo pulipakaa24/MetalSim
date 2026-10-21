@@ -4,7 +4,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/runs/a2/kc/t_I/1.18.0.dev20260917
+     runs/a2/kc/t_I/1.18.0.dev20260917
 Module newton._src.geometry.bvh 5c0f9c6 load on device 'metal:0' took 23.74 ms  (cached)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_model 5bce801 load on device 'metal:0' took 22.39 ms  (cached)
 Module warp.fem.geometry.nanogrid 53c1138 load on device 'metal:0' took 25.56 ms  (cached)
@@ -62,4 +62,4 @@ Module scatter_field_dof_values_de0cc3c1 508a88e load on device 'metal:0' took 2
 Module warp.fem.integrate._identity_field_53a45b43 b22e2eb load on device 'metal:0' took 781.80 ms  (cached)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.update_particle_strains_4a8baf02 a26460c load on device 'metal:0' took 25.44 ms  (cached)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_ee39ae6e 53996b2 load on device 'metal:0' took 512.44 ms  (cached)
-{"scene": "example:mpm_multi_material", "set": {}, "frames": 60, "warmup": 5, "ms_median": 41.97943750023114, "ms_mean": 40.39545625001514, "ms_p10": 38.37117919983939, "ms_p90": 42.92700830019385, "per_frame_counters": {"host_waits": 6.0, "command_buffers": 11.0, "host_ops": 0.0, "dispatches_encoded": 3339.0}, "warp": "/Users/aditya/robosim/upstream/warp-innate-integrated/warp/__init__.py", "compat": {"accumulate": "float32", "loop": "cuda", "chunk_graph": true, "fused": false, "fused_max_color_blocks": 1073741824, "simd": false, "gpu_exit": true, "rigid_deterministic": true}}
+{"scene": "example:mpm_multi_material", "set": {}, "frames": 60, "warmup": 5, "ms_median": 41.97943750023114, "ms_mean": 40.39545625001514, "ms_p10": 38.37117919983939, "ms_p90": 42.92700830019385, "per_frame_counters": {"host_waits": 6.0, "command_buffers": 11.0, "host_ops": 0.0, "dispatches_encoded": 3339.0}, "warp": "upstream/warp-innate-integrated/warp/__init__.py", "compat": {"accumulate": "float32", "loop": "cuda", "chunk_graph": true, "fused": false, "fused_max_color_blocks": 1073741824, "simd": false, "gpu_exit": true, "rigid_deterministic": true}}

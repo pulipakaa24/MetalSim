@@ -1,5 +1,5 @@
 == Sat Sep 26 06:42:57 PDT 2026
-holder: {"name": "final_flat_s0", "kind": "train", "minutes": 60.0, "pid": 85379, "start": 1790430176.930102, "queued": 1790429505.5515294, "cmd": "runs/il3/run_train4.sh flat flat_il3 recommended isaaclab3_every_substep_cap20 1500 0 final_flat_il3_s0", "cwd": "/Users/aditya/robosim"}
+holder: {"name": "final_flat_s0", "kind": "train", "minutes": 60.0, "pid": 85379, "start": 1790430176.930102, "queued": 1790429505.5515294, "cmd": "runs/il3/run_train4.sh flat flat_il3 recommended isaaclab3_every_substep_cap20 1500 0 final_flat_il3_s0", "cwd": "<repo>"}
   waiting [train] final_flat_s1 est 60.0 min, queued 670 s ago
   waiting [train] final_flat_s2 est 60.0 min, queued 668 s ago
   waiting [train] final_rough_s0 est 70.0 min, queued 666 s ago
@@ -19,7 +19,7 @@ tests/test_g1_task_terms.py::test_rough_terrain_seed_and_isaac_env_assignment
 tests/test_g1_task_terms.py::test_il3_rough_defaults
 tests/test_g1_task_terms.py::test_trainer_first_observation_comes_from_the_task_reset[rough-rough_isaac]
 tests/test_g1_task_terms.py::test_trainer_first_observation_comes_from_the_task_reset[rough-rough_il3]
-  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
     warnings.warn(
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
@@ -30,7 +30,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 27.54 ms  (cached)
 Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 17.83 ms  (cached)
 Module ccd_kernel_builder__locals__ccd_kernel_78310433 7831043 load on device 'metal:0' took 26.54 ms  (cached)

@@ -1,13 +1,13 @@
 #!/bin/bash
 # Docs audit (2026-10-13): re-measure the test-suite counts the docs quote, on this tree (main 3670f4b8 + docs only).
 # GPU job (render class: exclusive, so the bit-for-bit GPU tests do not share the device). Run through the queue:
-#   /Users/aditya/robosim/scripts/gpu_run.sh docs_audit_tests render 25 -- bash <this file>
+#   scripts/gpu_run.sh docs_audit_tests render 25 -- bash <this file>
 # Stages: versions, rigid suite (.venv: tests/ minus test_mpm.py, render tests included), MPM suite (.venv-newton152).
 # -rs lists every skip with its reason. The untracked inputs the tests look for (Isaac's g1_minimal.usd, MuJoCo
 # Menagerie) are linked in from the main checkout for the run and removed afterwards.
 set -u
-WT=/Users/aditya/robosim/.claude/worktrees/agent-afaa0884abf075618
-MAIN=/Users/aditya/robosim
+WT=.
+MAIN=.
 L=$WT/runs/docs_audit
 cd "$WT"
 export PYTHONPATH=$WT

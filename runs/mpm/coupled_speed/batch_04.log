@@ -1,7 +1,7 @@
 == Tue Oct 13 15:05:59 PDT 2026 batch_04 start
 installed warp 95f6f121b7e67025958335c7c15e338ac04a798a newton 3fd1f052a5ad031578960d9642aaaedc03834e4d
-/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/warp_new/warp/__init__.py True /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/newton_new/newton/__init__.py True
-/Users/aditya/robosim/upstream/warp-innate/warp/__init__.py None /Users/aditya/robosim/upstream/newton-metalsim-1.5.2/newton/__init__.py
+upstream/trees/warp_new/warp/__init__.py True upstream/trees/newton_new/newton/__init__.py True
+upstream/warp-innate/warp/__init__.py None upstream/newton-metalsim-1.5.2/newton/__init__.py
 note: failing on the base trees too (pre-existing, not from the patches): FAILED .claude/worktrees/agent-a8f809a11de334dd0/tests/test_mpm.py::test_coupled_contact_filter_keeps_source_order 
 skip F_granular
 skip F_multi_material
@@ -39,4 +39,4 @@ Verdicts: floors_base: inside max floor, inside p95 pairwise; floors_new: inside
 | floors_new | worst frame | | | | | 0.00 | 0.00 |
 Verdicts: floors_base: inside max floor, inside p95 pairwise; floors_new: inside max floor, inside p95 pairwise
 | Metal run | M (% of peak) | floor p50 / p90 / max | pairwise p90 / p95 / max | rank in floor / pairwise | M / max floor | M / p95 pairwise | final force (L4 range) | verdict |
-pour env /Users/aditya/robosim/upstream/warp-innate/warp/__init__.py /Users/aditya/robosim/upstream/newton-metalsim-1.5.2/newton/__init__.py /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/metalsim/__init__.py
+pour env upstream/warp-innate/warp/__init__.py upstream/newton-metalsim-1.5.2/newton/__init__.py metalsim/__init__.py

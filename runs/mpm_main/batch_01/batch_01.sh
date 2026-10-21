@@ -14,8 +14,8 @@
 # batch stops on a GPU anomaly (busy GPU with no owner) or a watchdog kill. Idempotent: finished steps are skipped
 # (markers in STATUS.txt); re-run after a failure. Expected duration ~2-3 h. Logs: runs/mpm_main/batch_01/logs/.
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
-R=/Users/aditya/robosim
+W=.
+R=.
 B=$W/runs/mpm_main/batch_01
 L=$B/logs
 OUT=$W/scratch/mpm_main                       # large outputs (npz), gitignored
@@ -177,7 +177,7 @@ if ! done_ COLUMN_BITWISE; then
   gpu mm_vbit check 15 "$L/vendored_bitwise_column.log" -- "$W/runs/mpm_main/vendored_bitwise/run.sh" column
   "$PY" - <<'EOF' > "$L/vendored_bitwise_compare.log" 2>&1 && mark COLUMN_BITWISE PASS || mark COLUMN_BITWISE FAIL
 import json, sys
-d = "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/vendored_bitwise/"
+d = "runs/mpm_main/vendored_bitwise/"
 r = [json.load(open(d + f)) for f in ("n152_newton_column.json", "n152_vendored_column.json", "venv_vendored_column.json")]
 ok = all(x["frames"] == r[0]["frames"] and x["iterations"] == r[0]["iterations"] and x["final_q"] == r[0]["final_q"] for x in r)
 print([x["newton"] for x in r], [x["solver"] for x in r], "bitwise equal:", ok)

@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /Users/aditya/robosim
+cd .
 python3 scripts/gpu_lock.py status | head -1
 P="scripts/diagnostics/camera_update_profile.py"
 for round in 1 2; do

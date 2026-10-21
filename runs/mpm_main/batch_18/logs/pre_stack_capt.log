@@ -4,7 +4,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module _snapshot_flag_0f4dec46 0f4dec4 load on device 'metal:0' took 40.53 ms  (cached)
 Module mujoco_warp._src.smooth fa1945a load on device 'metal:0' took 463.89 ms  (cached)
 Module _nxn_broadphase__locals__kernel_5bc56f3e 5bc56f3 load on device 'metal:0' took 83.37 ms  (cached)
@@ -45,4 +45,4 @@ Module reset_data__locals__reset_mocap_f30c06bc f30c06b load on device 'metal:0'
 Module reset_data__locals__reset_contact_d7357ebb d7357eb load on device 'metal:0' took 425.13 ms  (compiled)
 Module reset_data__locals__reset_sleep_33be9715 33be971 load on device 'metal:0' took 396.70 ms  (compiled)
 Module reset_data__locals__reset_nworld_be5ada57 be5ada5 load on device 'metal:0' took 408.99 ms  (compiled)
-RESULT {"scene": "stack", "worlds": 64, "capture": 1, "iteration_cap": 2, "steps": 40, "steps_with_cap_worlds": [], "steps_with_hits": [], "hits_only_in_cap_steps": true, "kernels_hit": {}, "flag_values": {}, "recorded_det_launches": 110, "mujoco_warp": "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/__init__.py", "warp": "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-diag/warp/__init__.py"}
+RESULT {"scene": "stack", "worlds": 64, "capture": 1, "iteration_cap": 2, "steps": 40, "steps_with_cap_worlds": [], "steps_with_hits": [], "hits_only_in_cap_steps": true, "kernels_hit": {}, "flag_values": {}, "recorded_det_launches": 110, "mujoco_warp": "upstream/mujoco_warp/mujoco_warp/__init__.py", "warp": "upstream/warp-diag/warp/__init__.py"}

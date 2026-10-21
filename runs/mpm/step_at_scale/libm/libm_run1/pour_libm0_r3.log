@@ -4,9 +4,9 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module validate_and_correct_inertia_kernel_33066b29 33066b2 load on device 'metal:0' took 40.35 ms  (cached)
-/Users/aditya/robosim/.claude/worktrees/agent-a28868bb53d94facc/metalsim/physics/mpm/probes/scale_pour.py:244: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+metalsim/physics/mpm/probes/scale_pour.py:244: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
   model = scene.finalize(device=DEV)
 Module newton._src.geometry.bvh 99f543e load on device 'metal:0' took 41.93 ms  (cached)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_model 9b69de8 load on device 'metal:0' took 39.30 ms  (cached)
@@ -84,7 +84,7 @@ Module __main__ 68ff50e load on device 'metal:0' took 572.11 ms  (cached)
   "--steps",
   "30",
   "--json",
-  "/Users/aditya/robosim/.claude/worktrees/agent-a28868bb53d94facc/scratch/mpm/out/libm/pour_libm0_r3.json"
+  "scratch/mpm/out/libm/pour_libm0_r3.json"
  ],
  "device": "metal:0",
  "device_name": "Apple M4 Max",

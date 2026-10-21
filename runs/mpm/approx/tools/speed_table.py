@@ -5,7 +5,7 @@ import os
 
 import numpy as np
 
-B = "/Users/aditya/robosim/.claude/worktrees/agent-ae8661f0d09092d4b/runs/mpm/speed_fm/"
+B = "runs/mpm/speed_fm/"
 MODES = ["off", "cuda", "relaxed"]
 SCENES = ["granular", "multi_material", "twoway_capture", "anymal_capture", "plate_drag", "column_a2", "column_a8"]
 print("| scene | " + " | ".join(MODES) + " | cuda / off | relaxed / off |")

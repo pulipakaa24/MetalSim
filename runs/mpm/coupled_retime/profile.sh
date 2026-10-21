@@ -7,8 +7,8 @@
 set -u
 W=$(cd "$(dirname "$0")/../../.." && pwd)
 R=$W/runs/mpm/coupled_retime/profile; mkdir -p $R
-PY=/Users/aditya/robosim/.venv-newton152/bin/python
-GR=/Users/aditya/robosim/scripts/gpu_run.sh
+PY=.venv-newton152/bin/python
+GR=scripts/gpu_run.sh
 P=$W/metalsim/physics/mpm/probes
 export PYTHONPATH=$W
 job() { local id=$1; shift; [ -f $R/$id.json ] && { echo "skip $id"; return; }

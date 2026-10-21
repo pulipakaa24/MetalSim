@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /Users/aditya/robosim
+cd .
 python3 scripts/gpu_lock.py status
 echo "=== warp test_metal nextafterf"
 .venv-newtonfork/bin/python -m pytest -q upstream/warp-innate/warp/tests/test_metal.py -k "nextafter" 2>&1 | tail -5

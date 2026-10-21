@@ -1,8 +1,8 @@
 """Where Metal's first-step node mass / velocity differ from the L4's (dump_p2g.py outputs)."""
 import numpy as np
 
-W = "/Users/aditya/robosim/.claude/worktrees/agent-a8a12903da01bb68c/runs/mpm/closeout"
-a = np.load(f"/Users/aditya/robosim/.claude/worktrees/agent-a8a12903da01bb68c/runs/parity/isaaclab3_mpm_closeout/p2g_mm_base/p2g.npz")
+W = "runs/mpm/closeout"
+a = np.load(f"runs/parity/isaaclab3_mpm_closeout/p2g_mm_base/p2g.npz")
 b = np.load(f"{W}/p2g_mm_metal/p2g.npz")
 n = a["inv_mass"].shape[0]
 pi_a, pi_b = a["vtest.space_restriction._dof_partition_indices"][:n], b["vtest.space_restriction._dof_partition_indices"][:n]

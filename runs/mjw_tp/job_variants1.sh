@@ -1,6 +1,6 @@
 #!/bin/bash
 # variant scan 1: capacity, Jacobian layout, post-reset kinematics, Warp Metal knobs (physics + full step, --quick)
-cd /Users/aditya/robosim && source .venv/bin/activate
+cd . && source .venv/bin/activate
 echo "=== start $(date) power: $(pmset -g batt | head -1)"
 python3 scripts/gpu_lock.py status
 S=scripts/diagnostics/g1_tp_variants.py

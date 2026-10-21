@@ -1,5 +1,5 @@
 #!/bin/bash
-# batch 18 (run outside the agent sandbox):  bash /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b18/batch_18.sh
+# batch 18 (run outside the agent sandbox):  bash scratch/b18/batch_18.sh
 #
 # #29, G1 deterministic: discriminate the mechanism of the _solve_done trip, test the fix, decide.
 # Research and design: research_notes/MPM in main simulator/deterministic_g1_capture.md (prior art, flag semantics,
@@ -18,8 +18,8 @@
 #     otherwise     -> #29 comment with the verdict and the per-run evidence; the fix stays uncommitted
 # Resumable (scratch/b18/STATUS.txt). E1+E2 ~45 min; the M1_CONFIRMED path +~60 min.
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
-R=/Users/aditya/robosim
+W=.
+R=.
 S=$W/scratch/b18
 L=$S/logs
 O=$W/runs/mpm_main/batch_18

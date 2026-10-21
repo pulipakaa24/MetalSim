@@ -1,23 +1,23 @@
 === batch_17 start Wed Oct 14 03:07:30 PDT 2026
 [03:07:33] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[03:07:33] gpu job mm17_probe_both_off_1024 (check, <= 30 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/probe_both_off_1024.log
+[03:07:33] gpu job mm17_probe_both_off_1024 (check, <= 30 min) -> scratch/b17/logs/probe_both_off_1024.log
     Module metalsim.learn.warp_policy 00a83dd load on device 'metal:0' took 43.59 ms  (cached)
     RESULT {"worlds": 1024, "recorded_det_launches": 3773, "eager": {"launches": 262, "tripped": null}, "first_hit": null, "hit_slots": 0, "kernels_hit": {}}
 [03:13:09] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[03:13:09] gpu job mm17_probe_unfused_64 (check, <= 30 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/probe_unfused_64.log
+[03:13:09] gpu job mm17_probe_unfused_64 (check, <= 30 min) -> scratch/b17/logs/probe_unfused_64.log
     Module metalsim.learn.warp_policy 00a83dd load on device 'metal:0' took 456.83 ms  (cached)
     RESULT {"worlds": 64, "recorded_det_launches": 3773, "eager": {"launches": 242, "tripped": null}, "first_hit": {"slot": 2946, "flag": 2, "kernel": "_solve_done__locals__kernel", "module": "_solve_done__locals__kernel_629f5f1d", "dim": 64}, "hit_slots": 2, "kernels_hit": {"_solve_done__locals__kernel": 2}}
 [03:13:45] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[03:13:45] gpu job mm17_probe_no_early_exit_64 (check, <= 30 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/probe_no_early_exit_64.log
+[03:13:45] gpu job mm17_probe_no_early_exit_64 (check, <= 30 min) -> scratch/b17/logs/probe_no_early_exit_64.log
     Module metalsim.learn.warp_policy 00a83dd load on device 'metal:0' took 40.64 ms  (cached)
     RESULT {"worlds": 64, "recorded_det_launches": 2373, "eager": {"launches": 162, "tripped": null}, "first_hit": {"slot": 1846, "flag": 2, "kernel": "_solve_done__locals__kernel", "module": "_solve_done__locals__kernel_6aa55336", "dim": 64}, "hit_slots": 4, "kernels_hit": {"_solve_done__locals__kernel": 4}}
 [03:14:06] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid    410 WindowServer                       1.4 %
-[03:14:06] gpu job mm17_probe_both_on_64 (check, <= 30 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/probe_both_on_64.log
+[03:14:06] gpu job mm17_probe_both_on_64 (check, <= 30 min) -> scratch/b17/logs/probe_both_on_64.log
     Module metalsim.learn.warp_policy 00a83dd load on device 'metal:0' took 40.95 ms  (cached)
     RESULT {"worlds": 64, "recorded_det_launches": 2373, "eager": {"launches": 142, "tripped": null}, "first_hit": {"slot": 1846, "flag": 2, "kernel": "_solve_done__locals__kernel", "module": "_solve_done__locals__kernel_629f5f1d", "dim": 64}, "hit_slots": 4, "kernels_hit": {"_solve_done__locals__kernel": 4}}
 [03:14:27] health: utilisation 0%
@@ -28,173 +28,173 @@ unfused @ 64 worlds: first tripping launch _solve_done__locals__kernel (module _
 no_early_exit @ 64 worlds: first tripping launch _solve_done__locals__kernel (module _solve_done__locals__kernel_6aa55336, dim 64, flag 2); 4 of 2373 captured launches set it; kernels {'_solve_done__locals__kernel': 4}
 both_on @ 64 worlds: first tripping launch _solve_done__locals__kernel (module _solve_done__locals__kernel_629f5f1d, dim 64, flag 2); 4 of 2373 captured launches set it; kernels {'_solve_done__locals__kernel': 4}
 [03:14:27] PROBE17 -> DONE both_off @ 1024 worlds: no captured launch set the flag (3773 recorded)|unfused @ 64 worlds: first tripping launch _solve_done__locals__kernel (module _solve_done__locals__kernel_629f5f1d, dim 64, flag 2); 2 of 3773 captured launches set it; kernels {'_solve_done__locals__kernel': 2}|no_early_exit @ 64 worlds: first tripping launch _solve_done__locals__kernel (module _solve_done__locals__kernel_6aa55336, dim 64, flag 2); 4 of 2373 captured launches set it; kernels {'_solve_done__locals__kernel': 4}|both_on @ 64 worlds: first tripping launch _solve_done__locals__kernel (module _solve_done__locals__kernel_629f5f1d, dim 64, flag 2); 4 of 2373 captured launches set it; kernels {'_solve_done__locals__kernel': 4}|
-[03:14:27] gpu job mm17_box64_d1_on_r1 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_64_d1_on_r1.log
+[03:14:27] gpu job mm17_box64_d1_on_r1 (timing, <= 15 min) -> scratch/b17/logs/box_64_d1_on_r1.log
     [gpu_run] mm17_box64_d1_on_r1 end: device utilisation 96% (03:15:08), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [03:15:13] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   2.0 %
-[03:15:13] gpu job mm17_box64_d1_ee_off_r1 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_64_d1_ee_off_r1.log
+[03:15:13] gpu job mm17_box64_d1_ee_off_r1 (timing, <= 15 min) -> scratch/b17/logs/box_64_d1_ee_off_r1.log
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.4 %
 [03:15:40] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   1.9 %
-[03:15:40] gpu job mm17_box64_d1_unfused_r1 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_64_d1_unfused_r1.log
+[03:15:40] gpu job mm17_box64_d1_unfused_r1 (timing, <= 15 min) -> scratch/b17/logs/box_64_d1_unfused_r1.log
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.2 %
 [03:16:07] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   1.2 %
-[03:16:07] gpu job mm17_box64_d1_both_off_r1 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_64_d1_both_off_r1.log
+[03:16:07] gpu job mm17_box64_d1_both_off_r1 (timing, <= 15 min) -> scratch/b17/logs/box_64_d1_both_off_r1.log
     [gpu_run] mm17_box64_d1_both_off_r1 end: device utilisation 0% (03:17:28), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [03:17:33] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   1.3 %
-[03:17:33] gpu job mm17_box64_d0_on_r1 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_64_d0_on_r1.log
+[03:17:33] gpu job mm17_box64_d0_on_r1 (timing, <= 15 min) -> scratch/b17/logs/box_64_d0_on_r1.log
     [gpu_run] mm17_box64_d0_on_r1 end: device utilisation 98% (03:18:59), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [03:19:05] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   2.2 %
-[03:19:05] gpu job mm17_box64_d0_ee_off_r1 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_64_d0_ee_off_r1.log
+[03:19:05] gpu job mm17_box64_d0_ee_off_r1 (timing, <= 15 min) -> scratch/b17/logs/box_64_d0_ee_off_r1.log
     [gpu_run] mm17_box64_d0_ee_off_r1 end: device utilisation 0% (03:20:36), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [03:20:42] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[03:20:42] gpu job mm17_box64_d0_unfused_r1 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_64_d0_unfused_r1.log
+[03:20:42] gpu job mm17_box64_d0_unfused_r1 (timing, <= 15 min) -> scratch/b17/logs/box_64_d0_unfused_r1.log
     [gpu_run] gpu_top:   pid    410 WindowServer                       1.4 %
     [gpu_run] gpu_top:   pid    744 Terminal                           1.2 %
 [03:22:13] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[03:22:13] gpu job mm17_box64_d0_both_off_r1 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_64_d0_both_off_r1.log
+[03:22:13] gpu job mm17_box64_d0_both_off_r1 (timing, <= 15 min) -> scratch/b17/logs/box_64_d0_both_off_r1.log
     [gpu_run] mm17_box64_d0_both_off_r1 end: device utilisation 99% (03:23:54), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [03:24:00] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid    410 WindowServer                       1.2 %
-[03:24:00] gpu job mm17_box1024_ee_off_r1 (timing, <= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_1024_d1_ee_off_r1.log
+[03:24:00] gpu job mm17_box1024_ee_off_r1 (timing, <= 20 min) -> scratch/b17/logs/box_1024_d1_ee_off_r1.log
     [gpu_run] gpu_top:   pid    410 WindowServer                       1.7 %
     [gpu_run] gpu_top:   pid    744 Terminal                           1.3 %
 [03:26:42] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid    410 WindowServer                       1.2 %
-[03:26:42] gpu job mm17_box1024_unfused_r1 (timing, <= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_1024_d1_unfused_r1.log
+[03:26:42] gpu job mm17_box1024_unfused_r1 (timing, <= 20 min) -> scratch/b17/logs/box_1024_d1_unfused_r1.log
     [gpu_run] mm17_box1024_unfused_r1 end: device utilisation 2% (03:28:53), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [03:28:59] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   1.8 %
-[03:28:59] gpu job mm17_box64_d1_on_r2 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_64_d1_on_r2.log
+[03:28:59] gpu job mm17_box64_d1_on_r2 (timing, <= 15 min) -> scratch/b17/logs/box_64_d1_on_r2.log
     [gpu_run] mm17_box64_d1_on_r2 end: device utilisation 0% (03:30:44), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [03:30:50] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid    410 WindowServer                       1.0 %
-[03:30:50] gpu job mm17_box64_d1_ee_off_r2 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_64_d1_ee_off_r2.log
+[03:30:50] gpu job mm17_box64_d1_ee_off_r2 (timing, <= 15 min) -> scratch/b17/logs/box_64_d1_ee_off_r2.log
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.0 %
 [03:32:42] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   1.3 %
-[03:32:42] gpu job mm17_box64_d1_unfused_r2 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_64_d1_unfused_r2.log
+[03:32:42] gpu job mm17_box64_d1_unfused_r2 (timing, <= 15 min) -> scratch/b17/logs/box_64_d1_unfused_r2.log
     [gpu_run] mm17_box64_d1_unfused_r2 end: device utilisation 0% (03:34:13), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [03:34:18] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[03:34:18] gpu job mm17_box64_d1_both_off_r2 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_64_d1_both_off_r2.log
+[03:34:18] gpu job mm17_box64_d1_both_off_r2 (timing, <= 15 min) -> scratch/b17/logs/box_64_d1_both_off_r2.log
     [gpu_run] mm17_box64_d1_both_off_r2 end: device utilisation 0% (03:35:59), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [03:36:05] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   1.7 %
-[03:36:05] gpu job mm17_box64_d0_on_r2 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_64_d0_on_r2.log
+[03:36:05] gpu job mm17_box64_d0_on_r2 (timing, <= 15 min) -> scratch/b17/logs/box_64_d0_on_r2.log
     [gpu_run] mm17_box64_d0_on_r2 end: device utilisation 0% (03:37:36), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [03:37:42] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[03:37:42] gpu job mm17_box64_d0_ee_off_r2 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_64_d0_ee_off_r2.log
+[03:37:42] gpu job mm17_box64_d0_ee_off_r2 (timing, <= 15 min) -> scratch/b17/logs/box_64_d0_ee_off_r2.log
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.4 %
 [03:39:23] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[03:39:23] gpu job mm17_box64_d0_unfused_r2 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_64_d0_unfused_r2.log
+[03:39:23] gpu job mm17_box64_d0_unfused_r2 (timing, <= 15 min) -> scratch/b17/logs/box_64_d0_unfused_r2.log
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.3 %
 [03:41:05] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   1.1 %
-[03:41:05] gpu job mm17_box64_d0_both_off_r2 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_64_d0_both_off_r2.log
+[03:41:05] gpu job mm17_box64_d0_both_off_r2 (timing, <= 15 min) -> scratch/b17/logs/box_64_d0_both_off_r2.log
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.3 %
 [03:42:37] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[03:42:37] gpu job mm17_box1024_ee_off_r2 (timing, <= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_1024_d1_ee_off_r2.log
+[03:42:37] gpu job mm17_box1024_ee_off_r2 (timing, <= 20 min) -> scratch/b17/logs/box_1024_d1_ee_off_r2.log
     [gpu_run] mm17_box1024_ee_off_r2 end: device utilisation 100% (03:43:53), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [03:43:58] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[03:43:58] gpu job mm17_box1024_unfused_r2 (timing, <= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_1024_d1_unfused_r2.log
+[03:43:58] gpu job mm17_box1024_unfused_r2 (timing, <= 20 min) -> scratch/b17/logs/box_1024_d1_unfused_r2.log
     [gpu_run] mm17_box1024_unfused_r2 end: device utilisation 0% (03:45:40), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [03:45:45] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[03:45:46] gpu job mm17_box64_d1_on_r3 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_64_d1_on_r3.log
+[03:45:46] gpu job mm17_box64_d1_on_r3 (timing, <= 15 min) -> scratch/b17/logs/box_64_d1_on_r3.log
     [gpu_run] mm17_box64_d1_on_r3 end: device utilisation 0% (03:46:06), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [03:46:12] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   1.6 %
-[03:46:12] gpu job mm17_box64_d1_ee_off_r3 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_64_d1_ee_off_r3.log
+[03:46:12] gpu job mm17_box64_d1_ee_off_r3 (timing, <= 15 min) -> scratch/b17/logs/box_64_d1_ee_off_r3.log
     [gpu_run] mm17_box64_d1_ee_off_r3 end: device utilisation 99% (03:46:33), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 2.0 s: none >= 1 %
 [03:46:39] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   2.1 %
-[03:46:39] gpu job mm17_box64_d1_unfused_r3 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_64_d1_unfused_r3.log
+[03:46:39] gpu job mm17_box64_d1_unfused_r3 (timing, <= 15 min) -> scratch/b17/logs/box_64_d1_unfused_r3.log
     [gpu_run] mm17_box64_d1_unfused_r3 end: device utilisation 94% (03:47:00), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [03:47:06] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   1.7 %
-[03:47:06] gpu job mm17_box64_d1_both_off_r3 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_64_d1_both_off_r3.log
+[03:47:06] gpu job mm17_box64_d1_both_off_r3 (timing, <= 15 min) -> scratch/b17/logs/box_64_d1_both_off_r3.log
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.1 %
 [03:47:33] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   2.1 %
-[03:47:33] gpu job mm17_box64_d0_on_r3 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_64_d0_on_r3.log
+[03:47:33] gpu job mm17_box64_d0_on_r3 (timing, <= 15 min) -> scratch/b17/logs/box_64_d0_on_r3.log
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.9 %
 [03:47:59] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   1.4 %
-[03:47:59] gpu job mm17_box64_d0_ee_off_r3 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_64_d0_ee_off_r3.log
+[03:47:59] gpu job mm17_box64_d0_ee_off_r3 (timing, <= 15 min) -> scratch/b17/logs/box_64_d0_ee_off_r3.log
     [gpu_run] mm17_box64_d0_ee_off_r3 end: device utilisation 2% (03:48:30), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [03:48:36] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   1.9 %
-[03:48:36] gpu job mm17_box64_d0_unfused_r3 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_64_d0_unfused_r3.log
+[03:48:36] gpu job mm17_box64_d0_unfused_r3 (timing, <= 15 min) -> scratch/b17/logs/box_64_d0_unfused_r3.log
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.9 %
     [gpu_run] gpu_top:   pid    410 WindowServer                       1.3 %
 [03:58:08] health: utilisation 0%
 GPU (ioreg): device utilization 86 %; per-process GPU time over 1.9 s:
   pid    914 mediaanalysisd                    16.6 %
-[03:58:08] gpu job mm17_box64_d0_both_off_r3 (timing, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_64_d0_both_off_r3.log
+[03:58:08] gpu job mm17_box64_d0_both_off_r3 (timing, <= 15 min) -> scratch/b17/logs/box_64_d0_both_off_r3.log
     [gpu_run] mm17_box64_d0_both_off_r3 end: device utilisation 0% (04:00:19), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [04:00:25] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   1.9 %
-[04:00:25] gpu job mm17_box1024_ee_off_r3 (timing, <= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_1024_d1_ee_off_r3.log
+[04:00:25] gpu job mm17_box1024_ee_off_r3 (timing, <= 20 min) -> scratch/b17/logs/box_1024_d1_ee_off_r3.log
     [gpu_run] mm17_box1024_ee_off_r3 end: device utilisation 0% (04:03:07), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [04:03:12] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   1.3 %
-[04:03:12] gpu job mm17_box1024_unfused_r3 (timing, <= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/box_1024_d1_unfused_r3.log
+[04:03:12] gpu job mm17_box1024_unfused_r3 (timing, <= 20 min) -> scratch/b17/logs/box_1024_d1_unfused_r3.log
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.2 %
 [04:05:24] health: utilisation 0%
@@ -205,16 +205,16 @@ GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
 | coupled box, 64 | deterministic | 24.67 | 76.61 | 24.32 | 53.78 |
 | coupled box, 64 | default | 23.87 | 32.46 | 24.10 | 34.20 |
 | coupled box, 1,024 | deterministic | 237.13 | 1054.69 | 231.50 | 289.60 |
-[04:05:24] gpu job mm17_launches_on (check, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/launches_fused.log
+[04:05:24] gpu job mm17_launches_on (check, <= 15 min) -> scratch/b17/logs/launches_fused.log
     Module metalsim.physics.batch 74a3c65 load on device 'metal:0' took 40.48 ms  (cached)
     CLEAN {"launches": 5763, "kernels": 37}
 [04:13:41] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[04:13:41] gpu job mm17_launches_off (check, <= 15 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/launches_unfused.log
+[04:13:41] gpu job mm17_launches_off (check, <= 15 min) -> scratch/b17/logs/launches_unfused.log
     Module metalsim.physics.batch 74a3c65 load on device 'metal:0' took 39.42 ms  (cached)
     CLEAN {"launches": 9003, "kernels": 37}
 [04:13:57] health: utilisation 77%
 GPU (ioreg): device utilization 78 %; per-process GPU time over 1.9 s:
   pid  50765 python3.12                         8.3 %
 deterministic launches over 20 G1 env steps (uncaptured): fused "launches": 5763, unfused "launches": 9003
-[04:13:57] COST17 -> DONE see /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/logs/cost_summary.txt
+[04:13:57] COST17 -> DONE see scratch/b17/logs/cost_summary.txt

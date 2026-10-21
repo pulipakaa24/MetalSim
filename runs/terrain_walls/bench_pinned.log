@@ -12,7 +12,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth eb51811 load on device 'metal:0' took 29.04 ms  (cached)
 Module _nxn_broadphase__locals__kernel_738cc90c 738cc90 load on device 'metal:0' took 18.96 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ed246d84 ed246d8 load on device 'metal:0' took 21.36 ms  (cached)
@@ -71,7 +71,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth eb51811 load on device 'metal:0' took 27.26 ms  (cached)
 Module _nxn_broadphase__locals__kernel_738cc90c 738cc90 load on device 'metal:0' took 17.93 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ed246d84 ed246d8 load on device 'metal:0' took 19.96 ms  (cached)
@@ -130,7 +130,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth eb51811 load on device 'metal:0' took 28.25 ms  (cached)
 Module _nxn_broadphase__locals__kernel_8b16c4cc 8b16c4c load on device 'metal:0' took 20.73 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ed246d84 ed246d8 load on device 'metal:0' took 19.88 ms  (cached)
@@ -190,7 +190,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth eb51811 load on device 'metal:0' took 28.28 ms  (cached)
 Module _nxn_broadphase__locals__kernel_8b16c4cc 8b16c4c load on device 'metal:0' took 18.14 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ed246d84 ed246d8 load on device 'metal:0' took 20.01 ms  (cached)
@@ -250,7 +250,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth eb51811 load on device 'metal:0' took 26.79 ms  (cached)
 Module _nxn_broadphase__locals__kernel_738cc90c 738cc90 load on device 'metal:0' took 19.56 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ed246d84 ed246d8 load on device 'metal:0' took 19.87 ms  (cached)
@@ -309,7 +309,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth eb51811 load on device 'metal:0' took 26.82 ms  (cached)
 Module _nxn_broadphase__locals__kernel_738cc90c 738cc90 load on device 'metal:0' took 17.68 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ed246d84 ed246d8 load on device 'metal:0' took 19.86 ms  (cached)
@@ -357,19 +357,19 @@ Module reset_data__locals__reset_nworld_4a90e5af 4a90e5a load on device 'metal:0
 Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
 Module metalsim.sensors.contact 1eab3a3 load on device 'metal:0' took 19.65 ms  (cached)
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/scripts/diagnostics/terrain_walls_bench.py", line 55, in <module>
+  File "scripts/diagnostics/terrain_walls_bench.py", line 55, in <module>
     one(sys.argv[2], int(sys.argv[3]), float(sys.argv[4]), sys.argv[5]); sys.exit(0)
     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/scripts/diagnostics/terrain_walls_bench.py", line 30, in one
+  File "scripts/diagnostics/terrain_walls_bench.py", line 30, in one
     task = G1VelocityTask(n, terrain="rough", seed=0, physics_dt=physics_dt, reward_cfg="rough_isaac", terrain_collision=coll,
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/learn/g1_velocity.py", line 651, in __init__
+  File "metalsim/learn/g1_velocity.py", line 651, in __init__
     self.sim.synchronize()
-  File "/Users/aditya/robosim/metalsim/physics/batch.py", line 224, in synchronize
+  File "metalsim/physics/batch.py", line 224, in synchronize
     wp.synchronize_device(self.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12891, in synchronize_device
+  File "upstream/warp-innate/warp/_src/context.py", line 12891, in synchronize_device
     device.metal_synchronize()
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 6066, in metal_synchronize
+  File "upstream/warp-innate/warp/_src/context.py", line 6066, in metal_synchronize
     raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
 RuntimeError: Metal error on device metal:0: Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
 /private/tmp/claude-501/-Users-aditya/7ceab845-25d9-459e-a466-a4b793f72f5c/scratchpad/mjw_a8e6485/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
@@ -380,7 +380,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth eb51811 load on device 'metal:0' took 27.84 ms  (cached)
 Module _nxn_broadphase__locals__kernel_738cc90c 738cc90 load on device 'metal:0' took 18.22 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ed246d84 ed246d8 load on device 'metal:0' took 20.98 ms  (cached)
@@ -428,19 +428,19 @@ Module reset_data__locals__reset_nworld_4a90e5af 4a90e5a load on device 'metal:0
 Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
 Module metalsim.sensors.contact 1eab3a3 load on device 'metal:0' took 19.61 ms  (cached)
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/scripts/diagnostics/terrain_walls_bench.py", line 55, in <module>
+  File "scripts/diagnostics/terrain_walls_bench.py", line 55, in <module>
     one(sys.argv[2], int(sys.argv[3]), float(sys.argv[4]), sys.argv[5]); sys.exit(0)
     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/scripts/diagnostics/terrain_walls_bench.py", line 30, in one
+  File "scripts/diagnostics/terrain_walls_bench.py", line 30, in one
     task = G1VelocityTask(n, terrain="rough", seed=0, physics_dt=physics_dt, reward_cfg="rough_isaac", terrain_collision=coll,
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/learn/g1_velocity.py", line 651, in __init__
+  File "metalsim/learn/g1_velocity.py", line 651, in __init__
     self.sim.synchronize()
-  File "/Users/aditya/robosim/metalsim/physics/batch.py", line 224, in synchronize
+  File "metalsim/physics/batch.py", line 224, in synchronize
     wp.synchronize_device(self.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12891, in synchronize_device
+  File "upstream/warp-innate/warp/_src/context.py", line 12891, in synchronize_device
     device.metal_synchronize()
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 6066, in metal_synchronize
+  File "upstream/warp-innate/warp/_src/context.py", line 6066, in metal_synchronize
     raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
 RuntimeError: Metal error on device metal:0: Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
 /private/tmp/claude-501/-Users-aditya/7ceab845-25d9-459e-a466-a4b793f72f5c/scratchpad/mjw_a8e6485/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
@@ -451,7 +451,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth eb51811 load on device 'metal:0' took 26.70 ms  (cached)
 Module _nxn_broadphase__locals__kernel_738cc90c 738cc90 load on device 'metal:0' took 17.61 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ed246d84 ed246d8 load on device 'metal:0' took 20.18 ms  (cached)
@@ -500,19 +500,19 @@ Module reset_data__locals__reset_nworld_4a90e5af 4a90e5a load on device 'metal:0
 Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
 Module metalsim.sensors.contact 1eab3a3 load on device 'metal:0' took 19.41 ms  (cached)
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/scripts/diagnostics/terrain_walls_bench.py", line 55, in <module>
+  File "scripts/diagnostics/terrain_walls_bench.py", line 55, in <module>
     one(sys.argv[2], int(sys.argv[3]), float(sys.argv[4]), sys.argv[5]); sys.exit(0)
     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/scripts/diagnostics/terrain_walls_bench.py", line 30, in one
+  File "scripts/diagnostics/terrain_walls_bench.py", line 30, in one
     task = G1VelocityTask(n, terrain="rough", seed=0, physics_dt=physics_dt, reward_cfg="rough_isaac", terrain_collision=coll,
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/learn/g1_velocity.py", line 651, in __init__
+  File "metalsim/learn/g1_velocity.py", line 651, in __init__
     self.sim.synchronize()
-  File "/Users/aditya/robosim/metalsim/physics/batch.py", line 224, in synchronize
+  File "metalsim/physics/batch.py", line 224, in synchronize
     wp.synchronize_device(self.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12891, in synchronize_device
+  File "upstream/warp-innate/warp/_src/context.py", line 12891, in synchronize_device
     device.metal_synchronize()
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 6066, in metal_synchronize
+  File "upstream/warp-innate/warp/_src/context.py", line 6066, in metal_synchronize
     raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
 RuntimeError: Metal error on device metal:0: Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
 /private/tmp/claude-501/-Users-aditya/7ceab845-25d9-459e-a466-a4b793f72f5c/scratchpad/mjw_a8e6485/mujoco_warp/_src/io.py:664: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
@@ -523,7 +523,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth eb51811 load on device 'metal:0' took 29.33 ms  (cached)
 Module _nxn_broadphase__locals__kernel_738cc90c 738cc90 load on device 'metal:0' took 17.76 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ed246d84 ed246d8 load on device 'metal:0' took 21.15 ms  (cached)
@@ -583,7 +583,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth eb51811 load on device 'metal:0' took 27.09 ms  (cached)
 Module _nxn_broadphase__locals__kernel_738cc90c 738cc90 load on device 'metal:0' took 17.87 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ed246d84 ed246d8 load on device 'metal:0' took 20.10 ms  (cached)
@@ -642,7 +642,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth eb51811 load on device 'metal:0' took 26.82 ms  (cached)
 Module _nxn_broadphase__locals__kernel_738cc90c 738cc90 load on device 'metal:0' took 17.60 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ed246d84 ed246d8 load on device 'metal:0' took 19.87 ms  (cached)
@@ -702,7 +702,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth eb51811 load on device 'metal:0' took 27.22 ms  (cached)
 Module _nxn_broadphase__locals__kernel_738cc90c 738cc90 load on device 'metal:0' took 17.76 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ed246d84 ed246d8 load on device 'metal:0' took 19.98 ms  (cached)
@@ -761,7 +761,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth eb51811 load on device 'metal:0' took 26.75 ms  (cached)
 Module _nxn_broadphase__locals__kernel_738cc90c 738cc90 load on device 'metal:0' took 17.60 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ed246d84 ed246d8 load on device 'metal:0' took 19.77 ms  (cached)

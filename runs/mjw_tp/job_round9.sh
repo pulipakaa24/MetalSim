@@ -1,6 +1,6 @@
 #!/bin/bash
 # round 9: step 5 candidate = Warp fork: compact per-lane storage in the Metal register Cholesky (n in (32, 64])
-cd /Users/aditya/robosim && source .venv/bin/activate
+cd . && source .venv/bin/activate
 F='^\[\|Error\|Traceback'
 {
 echo "=== start $(date) power: $(pmset -g batt | head -1)"; python3 scripts/gpu_lock.py status

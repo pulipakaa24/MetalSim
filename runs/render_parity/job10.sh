@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /Users/aditya/robosim
+cd .
 python3 scripts/gpu_lock.py status
 .venv/bin/python runs/render_parity/cp_img.py 2>&1 | grep -E "^(legacy|physical)|Traceback|Error"
 M=physical; rm -f runs/render_parity/cartpole_smoke_physical_ex025.log

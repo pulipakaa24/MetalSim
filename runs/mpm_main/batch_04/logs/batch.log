@@ -5,7 +5,7 @@ pull request create failed: GraphQL: No commits between mpm-main-sim and batchsi
 [18:00:31] SPLIT -> PASS 471e0c90
 [18:00:37] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
-[18:00:37] gpu job mm4_tests_main (check, <= 90 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_04/logs/tests_mpm_main.log
+[18:00:37] gpu job mm4_tests_main (check, <= 90 min) -> runs/mpm_main/batch_04/logs/tests_mpm_main.log
     tests/test_mpm_main.py::test_free_fall_momentum PASSED                   [ 93%]
     tests/test_mpm_main.py::test_main_sim_settings_untouched PASSED          [100%]
     
@@ -13,13 +13,13 @@ GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 
 [18:06:54] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [18:06:54] TESTS_MAIN -> PASS 
-[18:06:54] gpu job mm4_tests_152 (check, <= 30 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_04/logs/tests_mpm_newton152.log
+[18:06:54] gpu job mm4_tests_152 (check, <= 30 min) -> runs/mpm_main/batch_04/logs/tests_mpm_newton152.log
     .......x........                                                         [100%]
     15 passed, 1 xfailed in 98.70s (0:01:38)
 [18:10:31] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [18:10:31] TESTS_MPM152 -> PASS 
-[18:10:31] gpu job mm4_bear_rest_lagged_i250_t1e4 (check, <= 30 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_04/logs/bearing_rest_lagged_i250_t1e4.log
+[18:10:31] gpu job mm4_bear_rest_lagged_i250_t1e4 (check, <= 30 min) -> runs/mpm_main/batch_04/logs/bearing_rest_lagged_i250_t1e4.log
     Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.update_particle_strains_a5c4d66b 7ab7e8a load on device 'metal:0' took 815.89 ms  (cached)
     Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 d2ec691 load on device 'metal:0' took 557.65 ms  (cached)
     Module map_mul fe0b813 load on device 'metal:0' took 337.69 ms  (cached)
@@ -27,7 +27,7 @@ GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 
 [18:20:17] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   2.3 %
-[18:20:17] gpu job mm4_bear_drop_lagged_i250_t1e4 (check, <= 30 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_04/logs/bearing_drop_lagged_i250_t1e4.log
+[18:20:17] gpu job mm4_bear_drop_lagged_i250_t1e4 (check, <= 30 min) -> runs/mpm_main/batch_04/logs/bearing_drop_lagged_i250_t1e4.log
     Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.update_particle_strains_a5c4d66b 7ab7e8a load on device 'metal:0' took 811.87 ms  (cached)
     Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 d2ec691 load on device 'metal:0' took 556.49 ms  (cached)
     Module map_mul fe0b813 load on device 'metal:0' took 332.21 ms  (cached)
@@ -35,7 +35,7 @@ GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
 [18:22:13] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   2.0 %
-[18:22:13] gpu job mm4_bear_drop_lagged_i250_t1e6 (check, <= 30 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_04/logs/bearing_drop_lagged_i250_t1e6.log
+[18:22:13] gpu job mm4_bear_drop_lagged_i250_t1e6 (check, <= 30 min) -> runs/mpm_main/batch_04/logs/bearing_drop_lagged_i250_t1e6.log
     Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.update_particle_strains_a5c4d66b 7ab7e8a load on device 'metal:0' took 43.15 ms  (cached)
     Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 d2ec691 load on device 'metal:0' took 41.59 ms  (cached)
     Module map_mul fe0b813 load on device 'metal:0' took 39.64 ms  (cached)
@@ -43,7 +43,7 @@ GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
 [18:22:44] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [18:22:45] BEARING4 -> DONE drop_lagged_i250_t1e4: pen 29.8 / final 28.6 mm, creep 1.3 mm/s, F/W 1.0; drop_lagged_i250_t1e6: pen 29.8 / final 28.6 mm, creep 1.3 mm/s, F/W 1.0; rest_lagged_i250_t1e4: pen 10.2 / final 10.2 mm, creep 0.4 mm/s, F/W 1.0; 
-[18:22:45] gpu job mm4_lift_dx0025 (check, <= 60 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/runs/mpm_main/batch_04/logs/lift_mu068_dx0025.log
+[18:22:45] gpu job mm4_lift_dx0025 (check, <= 60 min) -> runs/mpm_main/batch_04/logs/lift_mu068_dx0025.log
     Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.update_particle_strains_a5c4d66b 7ab7e8a load on device 'metal:0' took 43.45 ms  (cached)
     Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 d2ec691 load on device 'metal:0' took 42.08 ms  (cached)
     Module map_mul fe0b813 load on device 'metal:0' took 38.75 ms  (cached)

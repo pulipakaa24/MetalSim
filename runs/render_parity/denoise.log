@@ -340,7 +340,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth 0cc2fb1 load on device 'metal:0' took 26.63 ms  (cached)
 Module _primitive_narrowphase__locals__primitive_narrowphase_fb20836b fb20836 load on device 'metal:0' took 17.90 ms  (cached)
 Module mujoco_warp._src.constraint 6b6848e load on device 'metal:0' took 16.62 ms  (cached)
@@ -387,24 +387,24 @@ Module reset_data__locals__reset_nworld_532a08b2 532a08b load on device 'metal:0
 Traceback (most recent call last):
   File "<frozen runpy>", line 198, in _run_module_as_main
   File "<frozen runpy>", line 88, in _run_code
-  File "/Users/aditya/robosim/metalsim/render/bench_cost.py", line 71, in <module>
+  File "metalsim/render/bench_cost.py", line 71, in <module>
     res = {"rl_1spp_2b": bench_rl(), "rl_4spp_2b": bench_rl(spp=4)}
                          ^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/render/bench_cost.py", line 38, in bench_rl
+  File "metalsim/render/bench_cost.py", line 38, in bench_rl
     r = Tier2Renderer(m, n, width=100, height=100, camera="cam", spp=spp, max_bounces=bounces, **RL_CONFIGS[name])
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/render/tier2.py", line 157, in __init__
+  File "metalsim/render/tier2.py", line 157, in __init__
     self._oidn = OIDNDenoiser(c.queue, n, width, height, (av["hdr"].buffer, av["hdr"].offset), (av["hdr_out"].buffer, av["hdr_out"].offset),
                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/render/denoise.py", line 95, in __init__
+  File "metalsim/render/denoise.py", line 95, in __init__
     img(b"color", color, color_ch); img(b"output", output, color_ch)
                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/render/denoise.py", line 94, in img
+  File "metalsim/render/denoise.py", line 94, in img
     L.oidnSetFilterImage(f, name, shared(name, mb), FLOAT3, w, h, off + e * w * h * ch * 4, ch * 4, w * ch * 4)   # RT takes float3; a float4 image is float3 with a 16-byte pixel stride
                                   ^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/render/denoise.py", line 82, in shared
+  File "metalsim/render/denoise.py", line 82, in shared
     self._bufs[k] = L.oidnNewSharedBufferFromMetal(self.dev, _id(mb)); self._check()
                                                                        ^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/render/denoise.py", line 110, in _check
+  File "metalsim/render/denoise.py", line 110, in _check
     raise RuntimeError(f"OIDN error {err}: {msg.value.decode() if msg.value else ''}")
 RuntimeError: OIDN error 2: image size is too large

@@ -3,7 +3,7 @@
 # No GPU work: the timing and profile jobs already finished. Idempotent: commits only when something changed.
 # Log: runs/mpm/coupled_retime/batch_01.log (in the worktree).
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0
+W=.
 LOG=$W/runs/mpm/coupled_retime/batch_01.log
 exec > >(tee "$LOG") 2>&1
 cd "$W" || exit 1

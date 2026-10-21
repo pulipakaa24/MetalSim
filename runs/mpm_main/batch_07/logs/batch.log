@@ -3,33 +3,33 @@
 [19:37:34] BRANCH -> PASS coupling-opt on dff46b6d
 [19:37:37] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[19:37:37] gpu job mm7_hash_main (check, <= 15 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-main) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b07/logs/hash_main.log
+[19:37:37] gpu job mm7_hash_main (check, <= 15 min, cwd scratch/wt-main) -> scratch/b07/logs/hash_main.log
     Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_608785a3 a3a47b4 load on device 'metal:0' took 562.28 ms  (cached)
     Module map_mul fe0b813 load on device 'metal:0' took 338.30 ms  (cached)
     Module reset_mpm_grid_warmstart_7624a57f 44aa679 load on device 'metal:0' took 422.68 ms  (compiled)
-    {"root": "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-main", "last": "1a7ee6d968e897ec"}
+    {"root": "scratch/wt-main", "last": "1a7ee6d968e897ec"}
 [19:38:33] health: utilisation 93%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   1.3 %
-[19:38:33] gpu job mm7_hash_copt (check, <= 15 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b07/logs/hash_copt.log
+[19:38:33] gpu job mm7_hash_copt (check, <= 15 min, cwd scratch/wt-copt) -> scratch/b07/logs/hash_copt.log
     Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_608785a3 a3a47b4 load on device 'metal:0' took 41.40 ms  (cached)
     Module map_mul fe0b813 load on device 'metal:0' took 38.82 ms  (cached)
     Module reset_mpm_grid_warmstart_7624a57f 44aa679 load on device 'metal:0' took 38.52 ms  (cached)
-    {"root": "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt", "last": "1a7ee6d968e897ec"}
+    {"root": "scratch/wt-copt", "last": "1a7ee6d968e897ec"}
 [19:38:59] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid    410 WindowServer                       1.9 %
   pid   1291 Google Chrome He                   1.4 %
   pid    744 Terminal                           1.4 %
 [19:38:59] BITWISE_TREES -> PASS 60 steps with resets, main == coupling-opt
-[19:38:59] gpu job mm7_tests (check, <= 75 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b07/logs/test_mpm_main.log
+[19:38:59] gpu job mm7_tests (check, <= 75 min, cwd scratch/wt-copt) -> scratch/b07/logs/test_mpm_main.log
     ................                                                         [100%]
     16 passed in 259.43s (0:04:19)
 [19:43:26] health: utilisation 4%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1085 com.apple.WebKit                   2.0 %
 [19:43:26] TESTS_MPM7 -> PASS 16 passed in 259.43s (0:04:19)
-[19:43:26] gpu job mm7_split_1 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b07/logs/split_1.log
+[19:43:26] gpu job mm7_split_1 (timing, <= 20 min, cwd scratch/wt-copt) -> scratch/b07/logs/split_1.log
     {"worlds": 1, "solver": "auto", "steps": 100, "capture": 1, "rigid_only": false, "rigid_ms_median": 2.431958491797559, "coupling_before_ms_median": 0.1949579964275472, "coupling_after_ms_median": 0.2155419933842495, "mpm_ms_median": 11.854124495584983, "full_ms_median": 14.012208499480039, "rigid_ms_p10": 2.1851999932550825, "coupling_before_ms_p10": 0.17739640461513773, "coupling_after_ms_p10": 0.20338780304882675, "mpm_ms_p10": 9.049232698453125, "full_ms_p10": 10.234325303463265, "rigid_ms_p90": 2.6585172934574075, "coupling_before_ms_p90": 0.20668779907282442, "coupling_after_ms_p90": 0.22612059401581064, "mpm_ms_p90": 12.206232707831077, "full_ms_p90": 14.545971105690114, "coupling_ms_median": 0.4104999898117967, "coupling_share_of_full": 0.02929588079045708, "particles_per_world": 2592}
     [gpu_run] mm7_split_1 end: device utilisation 0% (19:43:52), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
@@ -38,7 +38,7 @@ GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   2.1 %
   pid   1085 com.apple.WebKit                   1.5 %
-[19:43:57] gpu job mm7_rigid_1 (timing, <= 15 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b07/logs/rigid_1.log
+[19:43:57] gpu job mm7_rigid_1 (timing, <= 15 min, cwd scratch/wt-copt) -> scratch/b07/logs/rigid_1.log
     [gpu_run] mm7_rigid_1 end: device utilisation 0% (19:44:08), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s:
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.8 %
@@ -46,7 +46,7 @@ GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
 [19:44:14] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1085 com.apple.WebKit                   1.7 %
-[19:44:14] gpu job mm7_split_64 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b07/logs/split_64.log
+[19:44:14] gpu job mm7_split_64 (timing, <= 20 min, cwd scratch/wt-copt) -> scratch/b07/logs/split_64.log
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
     [gpu_run] gpu_top:   pid  15256 Slack Helper                       6.5 %
     [gpu_run] gpu_top:   pid    410 WindowServer                       6.1 %
@@ -56,7 +56,7 @@ GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid    410 WindowServer                       2.2 %
   pid  15256 Slack Helper                       2.1 %
   pid   1085 com.apple.WebKit                   1.8 %
-[19:44:45] gpu job mm7_rigid_64 (timing, <= 15 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b07/logs/rigid_64.log
+[19:44:45] gpu job mm7_rigid_64 (timing, <= 15 min, cwd scratch/wt-copt) -> scratch/b07/logs/rigid_64.log
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
     [gpu_run] gpu_top:   pid  15256 Slack Helper                       4.7 %
     [gpu_run] gpu_top:   pid    410 WindowServer                       4.2 %
@@ -65,7 +65,7 @@ GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   2.0 %
   pid   1085 com.apple.WebKit                   1.6 %
-[19:45:02] gpu job mm7_split_256 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b07/logs/split_256.log
+[19:45:02] gpu job mm7_split_256 (timing, <= 20 min, cwd scratch/wt-copt) -> scratch/b07/logs/split_256.log
     {"worlds": 256, "solver": "auto", "steps": 100, "capture": 1, "rigid_only": false, "rigid_ms_median": 2.640354497998487, "coupling_before_ms_median": 0.18883349548559636, "coupling_after_ms_median": 0.22760399588150904, "mpm_ms_median": 63.65645850019064, "full_ms_median": 66.14881249697646, "rigid_ms_p10": 2.392229693941772, "coupling_before_ms_p10": 0.16640059475321323, "coupling_after_ms_p10": 0.21172089618630707, "mpm_ms_p10": 57.562754400714766, "full_ms_p10": 59.9318124979618, "rigid_ms_p90": 3.06996669532964, "coupling_before_ms_p90": 0.2090743975713849, "coupling_after_ms_p90": 0.2435580943711102, "mpm_ms_p90": 64.53599551168736, "full_ms_p90": 67.18823780247476, "coupling_ms_median": 0.4164374913671054, "coupling_share_of_full": 0.006295464357521762, "particles_per_world": 2592}
     [gpu_run] mm7_split_256 end: device utilisation 0% (19:45:33), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
@@ -74,7 +74,7 @@ GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1085 com.apple.WebKit                   1.7 %
   pid   1291 Google Chrome He                   1.4 %
-[19:45:38] gpu job mm7_rigid_256 (timing, <= 15 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b07/logs/rigid_256.log
+[19:45:38] gpu job mm7_rigid_256 (timing, <= 15 min, cwd scratch/wt-copt) -> scratch/b07/logs/rigid_256.log
     [gpu_run] mm7_rigid_256 end: device utilisation 86% (19:45:49), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.1 %
@@ -83,35 +83,35 @@ GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1085 com.apple.WebKit                   1.6 %
   pid   1291 Google Chrome He                   1.3 %
-[19:45:55] gpu job mm7_split_1024 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b07/logs/split_1024.log
+[19:45:55] gpu job mm7_split_1024 (timing, <= 20 min, cwd scratch/wt-copt) -> scratch/b07/logs/split_1024.log
     Module map_mul fe0b813 load on device 'metal:0' took 346.66 ms  (cached)
     {"worlds": 1024, "solver": "auto", "steps": 40, "capture": 1, "rigid_only": false, "rigid_ms_median": 2.713416499318555, "coupling_before_ms_median": 0.19762499869102612, "coupling_after_ms_median": 0.24633399880258366, "mpm_ms_median": 239.48866600403562, "full_ms_median": 242.59022899786942, "rigid_ms_p10": 2.496525287278928, "coupling_before_ms_p10": 0.18366248987149447, "coupling_after_ms_p10": 0.22297090908978134, "mpm_ms_p10": 220.45163328875788, "full_ms_p10": 220.495504498831, "rigid_ms_p90": 3.3885795099195093, "coupling_before_ms_p90": 0.2135582937626168, "coupling_after_ms_p90": 0.27034130907850346, "mpm_ms_p90": 245.62522499909392, "full_ms_p90": 248.26369169604732, "coupling_ms_median": 0.4439589974936098, "coupling_share_of_full": 0.0018300778202303808, "particles_per_world": 2592}
     [gpu_run] mm7_split_1024 end: device utilisation 0% (19:46:46), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [19:46:52] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[19:46:52] gpu job mm7_rigid_1024 (timing, <= 15 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b07/logs/rigid_1024.log
+[19:46:52] gpu job mm7_rigid_1024 (timing, <= 15 min, cwd scratch/wt-copt) -> scratch/b07/logs/rigid_1024.log
     Module reset_data__locals__reset_nworld_f3f460ae f3f460a load on device 'metal:0' took 39.32 ms  (cached)
     {"worlds": 1024, "solver": "auto", "steps": 40, "capture": 1, "rigid_only": true, "ms_per_step_median": 2.757061993179377, "ms_p10": 2.6089413979207166, "ms_p90": 2.9144502943381667, "particles_per_world": 0, "env_steps_per_s": 371409.85677262483}
     [gpu_run] mm7_rigid_1024 end: device utilisation 0% (19:47:02), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [19:47:08] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[19:47:08] gpu job mm7_policy_1 (timing, <= 30 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b07/logs/policy_1.log
+[19:47:08] gpu job mm7_policy_1 (timing, <= 30 min, cwd scratch/wt-copt) -> scratch/b07/logs/policy_1.log
         raise RuntimeError(
     RuntimeError: Masked reset cannot selectively clear last-step ws_impulse_field: its grid partition does not expose environment offsets with shape (2,).
     [gpu_run] mm7_policy_1 end: device utilisation 0% (19:47:39), exit 1
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [19:47:44] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[19:47:44] gpu job mm7_policy_64 (timing, <= 30 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b07/logs/policy_64.log
+[19:47:44] gpu job mm7_policy_64 (timing, <= 30 min, cwd scratch/wt-copt) -> scratch/b07/logs/policy_64.log
     Module reset_mpm_grid_warmstart_7624a57f 44aa679 load on device 'metal:0' took 364.21 ms  (cached)
     {"worlds": 64, "fraction": 0.02, "steps": 200, "solver": "auto", "bitwise_equal": true, "first_differing_step": null, "resets_per_run": 137, "A_ms_per_policy_step": [25.706419374982943, 25.79098708505626, 25.82951854004932], "A_ms_median": 25.79098708505626, "B_ms_per_policy_step": [24.439714580003056, 24.4456424999953, 24.4661977099895], "B_ms_median": 24.4456424999953, "saving_ms_per_policy_step": 1.3453445850609569, "speedup": 1.0550341266367294}
     [gpu_run] mm7_policy_64 end: device utilisation 0% (19:48:45), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [19:48:51] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[19:48:51] gpu job mm7_policy_1024 (timing, <= 30 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b07/logs/policy_1024.log
+[19:48:51] gpu job mm7_policy_1024 (timing, <= 30 min, cwd scratch/wt-copt) -> scratch/b07/logs/policy_1024.log
     RuntimeError: MPS backend out of memory (MPS allocated: 8.00 MiB, other allocations: 92.14 GiB, max allowed: 88.13 GiB). Tried to allocate 28.00 KiB on shared pool. Use PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0 to disable upper limit for memory allocations (may cause system failure).
     [gpu_run] mm7_policy_1024 end: device utilisation 0% (19:51:28), exit 1
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
@@ -122,7 +122,7 @@ GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 
    64 worlds: full 25.673 ms = rigid 2.423 + coupling 0.397 (1.55 %) + mpm 23.269; rigid-only scene 2.468 ms
   256 worlds: full 66.149 ms = rigid 2.640 + coupling 0.416 (0.63 %) + mpm 63.656; rigid-only scene 2.552 ms
  1024 worlds: full 242.590 ms = rigid 2.713 + coupling 0.444 (0.18 %) + mpm 239.489; rigid-only scene 2.757 ms
-1 policy missing: [Errno 2] No such file or directory: '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt/runs/mpm_main/batch_07/policy_1.json'
+1 policy missing: [Errno 2] No such file or directory: 'scratch/wt-copt/runs/mpm_main/batch_07/policy_1.json'
    64 worlds policy step: A 25.791 ms, B 24.446 ms, saving 1.345 ms (1.055x), bitwise True
-1024 policy missing: [Errno 2] No such file or directory: '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt/runs/mpm_main/batch_07/policy_1024.json'
-[19:51:33] TIMING7 -> DONE     1 worlds: full 14.012 ms = rigid 2.432 + coupling 0.410 (2.93 %) + mpm 11.854; rigid-only scene 2.281 ms;   64 worlds: full 25.673 ms = rigid 2.423 + coupling 0.397 (1.55 %) + mpm 23.269; rigid-only scene 2.468 ms;  256 worlds: full 66.149 ms = rigid 2.640 + coupling 0.416 (0.63 %) + mpm 63.656; rigid-only scene 2.552 ms; 1024 worlds: full 242.590 ms = rigid 2.713 + coupling 0.444 (0.18 %) + mpm 239.489; rigid-only scene 2.757 ms;1 policy missing: [Errno 2] No such file or directory: '/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt/runs/mpm_main/batch_07/pol
+1024 policy missing: [Errno 2] No such file or directory: 'scratch/wt-copt/runs/mpm_main/batch_07/policy_1024.json'
+[19:51:33] TIMING7 -> DONE     1 worlds: full 14.012 ms = rigid 2.432 + coupling 0.410 (2.93 %) + mpm 11.854; rigid-only scene 2.281 ms;   64 worlds: full 25.673 ms = rigid 2.423 + coupling 0.397 (1.55 %) + mpm 23.269; rigid-only scene 2.468 ms;  256 worlds: full 66.149 ms = rigid 2.640 + coupling 0.416 (0.63 %) + mpm 63.656; rigid-only scene 2.552 ms; 1024 worlds: full 242.590 ms = rigid 2.713 + coupling 0.444 (0.18 %) + mpm 239.489; rigid-only scene 2.757 ms;1 policy missing: [Errno 2] No such file or directory: 'scratch/wt-copt/runs/mpm_main/batch_07/pol

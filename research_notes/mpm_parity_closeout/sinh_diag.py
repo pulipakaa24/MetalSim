@@ -1,8 +1,8 @@
 """Which sinh inputs differ between the L4 and the Metal emulation (random sample)."""
 import numpy as np
 
-W = "/Users/aditya/robosim/.claude/worktrees/agent-a8a12903da01bb68c/runs/mpm/closeout"
-a = np.load(f"/Users/aditya/robosim/.claude/worktrees/agent-a8a12903da01bb68c/runs/parity/isaaclab3_mpm_closeout/libm_cuda/sinh.npz")
+W = "runs/mpm/closeout"
+a = np.load(f"runs/parity/isaaclab3_mpm_closeout/libm_cuda/sinh.npz")
 b = np.load(f"{W}/libm_metal_emul/sinh.npz")
 x = a["sample_x"].view(np.float32)
 ya, yb = a["sample_y"].view(np.float32), b["sample_y"].view(np.float32)

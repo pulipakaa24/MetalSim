@@ -1,6 +1,6 @@
 [gpu_run] r17_ab_new_256_r3 start: device utilisation 100% (01:02:19)
 [gpu_run] gpu_top: GPU (ioreg): device utilization 100 %; per-process GPU time over 1.9 s: none >= 1 %
-[guarded 01:02:21] start tree=n17_new free=49.3GB: --worlds 256 --state-in /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/out/state256.npz --max-triangle-pairs 8388608 --steps 20 --json /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/out/ab_new_256_r3.json
+[guarded 01:02:21] start tree=n17_new free=49.3GB: --worlds 256 --state-in runs/rigid17/out/state256.npz --max-triangle-pairs 8388608 --steps 20 --json runs/rigid17/out/ab_new_256_r3.json
 [guarded 01:02:42] end code=0 wall=20s peak_rss=0.5GB
 [gpu_run] r17_ab_new_256_r3 end: device utilisation 100% (01:02:42), exit 0
 [gpu_run] gpu_top: GPU (ioreg): device utilization 100 %; per-process GPU time over 2.0 s: none >= 1 %

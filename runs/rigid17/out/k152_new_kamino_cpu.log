@@ -3,10 +3,10 @@ Test creating a SolutionMetrics instance with default initialization. ... ok
 test_01_finalize_default (newton._src.solvers.kamino.tests.test_solvers_metrics.TestSolverMetrics.test_01_finalize_default)
 Test creating a SolutionMetrics instance with default initialization and then finalizing all memory allocations. ... ok
 test_02_evaluate_trivial_solution (newton._src.solvers.kamino.tests.test_solvers_metrics.TestSolverMetrics.test_02_evaluate_trivial_solution)
-Tests evaluating metrics on an all-zeros trivial solution. ... /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/kcache/kcT_n152/1.18.0.dev20260917/wp_newton._src.solvers.kamino._src.solvers.metrics_6c9070d_p58252_t8496095680/wp_newton._src.solvers.kamino._src.solvers.metrics_6c9070d.cpp:1435:29: warning: implicit conversion from 'long' to 'const wp::int32' (aka 'const int') changes value from 4294967295 to -1 [-Wconstant-conversion]
+Tests evaluating metrics on an all-zeros trivial solution. ... runs/rigid17/kcache/kcT_n152/1.18.0.dev20260917/wp_newton._src.solvers.kamino._src.solvers.metrics_6c9070d_p58252_t8496095680/wp_newton._src.solvers.kamino._src.solvers.metrics_6c9070d.cpp:1435:29: warning: implicit conversion from 'long' to 'const wp::int32' (aka 'const int') changes value from 4294967295 to -1 [-Wconstant-conversion]
  1435 |     const wp::int32 var_7 = 4294967295;
       |                     ~~~~~   ^~~~~~~~~~
-/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/kcache/kcT_n152/1.18.0.dev20260917/wp_newton._src.solvers.kamino._src.solvers.metrics_6c9070d_p58252_t8496095680/wp_newton._src.solvers.kamino._src.solvers.metrics_6c9070d.cpp:3268:30: warning: implicit conversion from 'long' to 'const wp::int32' (aka 'const int') changes value from 4294967295 to -1 [-Wconstant-conversion]
+runs/rigid17/kcache/kcT_n152/1.18.0.dev20260917/wp_newton._src.solvers.kamino._src.solvers.metrics_6c9070d_p58252_t8496095680/wp_newton._src.solvers.kamino._src.solvers.metrics_6c9070d.cpp:3268:30: warning: implicit conversion from 'long' to 'const wp::int32' (aka 'const int') changes value from 4294967295 to -1 [-Wconstant-conversion]
  3268 |     const wp::int32 var_17 = 4294967295;
       |                     ~~~~~~   ^~~~~~~~~~
 2 warnings generated.
@@ -32,7 +32,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/kcache/kcT_n152/1.18.0.dev20260917
+     runs/rigid17/kcache/kcT_n152/1.18.0.dev20260917
 Module newton._src.solvers.kamino._src.core.bodies ec3c643 load on device 'cpu' took 817.91 ms  (compiled)
 Module newton._src.solvers.kamino._src.geometry.primitive.broadphase 66db0e1 load on device 'cpu' took 155.50 ms  (compiled)
 Module newton._src.solvers.kamino._src.geometry.primitive.narrowphase 6cbb291 load on device 'cpu' took 1336.67 ms  (compiled)

@@ -1,6 +1,6 @@
 [gpu_run] rc_ab3 start: device utilisation 100% (23:36:30)
 [gpu_run] gpu_top: GPU (ioreg): device utilization 100 %; per-process GPU time over 1.8 s: none >= 1 %
-gs_pass pre: {"colors": 8, "us_per_color_pass": 15.23046875036016, "us_contact_solve": 10.27292501021293, "us_per_iteration_in_chunk": 128.08083500203793, "scene": "example:mpm_granular", "warp": "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/t4/warp-B/warp/__init__.py"} 23:36:46
+gs_pass pre: {"colors": 8, "us_per_color_pass": 15.23046875036016, "us_contact_solve": 10.27292501021293, "us_per_iteration_in_chunk": 128.08083500203793, "scene": "example:mpm_granular", "warp": "upstream/t4/warp-B/warp/__init__.py"} 23:36:46
 ab granular A da=keep r1: 35.17 util=100 23:36:54
 ab granular B da=keep r1: 35.23 util=100 23:37:01
 ab granular A da=1 r1: 35.5 util=100 23:37:13
@@ -17,6 +17,6 @@ ab column_a2 B da=keep r2: 21.13 util=100 23:38:25
 ab column_a2 A da=keep r2: 18.97 util=100 23:38:32
 ab column_a2 B da=1 r2: 20.71 util=100 23:38:38
 ab column_a2 A da=1 r2: 21.01 util=100 23:38:46
-gs_pass post: {"colors": 8, "us_per_color_pass": 15.239973436109722, "us_contact_solve": 10.346362523705466, "us_per_iteration_in_chunk": 128.11353999495623, "scene": "example:mpm_granular", "warp": "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/t4/warp-B/warp/__init__.py"} 23:39:00
+gs_pass post: {"colors": 8, "us_per_color_pass": 15.239973436109722, "us_contact_solve": 10.346362523705466, "us_per_iteration_in_chunk": 128.11353999495623, "scene": "example:mpm_granular", "warp": "upstream/t4/warp-B/warp/__init__.py"} 23:39:00
 [gpu_run] rc_ab3 end: device utilisation 100% (23:39:00), exit 0
 [gpu_run] gpu_top: GPU (ioreg): device utilization 100 %; per-process GPU time over 1.8 s: none >= 1 %

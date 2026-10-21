@@ -1,6 +1,6 @@
 #!/bin/bash
 # tests after adopting steps 1+2 (and the MuJoCo Warp fork's serial sparse L'DL + no-op launch skips)
-cd /Users/aditya/robosim && source .venv/bin/activate
+cd . && source .venv/bin/activate
 echo "=== start $(date)"; python3 scripts/gpu_lock.py status
 echo "=== G1 parity / task terms / physics / fast factorization"
 python -m pytest tests/test_g1_parity.py tests/test_g1_task_terms.py tests/test_physics.py tests/test_g1_fast_factorization.py -q 2>&1 | tail -15

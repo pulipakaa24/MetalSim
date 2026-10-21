@@ -1,6 +1,6 @@
 [gpu_run] chv_pour_on1 start: device utilisation 0% (18:38:48)
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-/Users/aditya/robosim/.claude/worktrees/agent-a278824da4c05bf29/.venv-pour/lib/python3.12/site-packages/torch/jit/_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
+.venv-pour/lib/python3.12/site-packages/torch/jit/_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -8,7 +8,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/kcache_hv/1.18.0.dev20260917
+     runs/mpm/coupled_speed/kcache_hv/1.18.0.dev20260917
 Module newton._src.geometry.inertia 277ec1a load on device 'metal:0' took 620.58 ms  (compiled)
 Module validate_and_correct_inertia_kernel_e5f8239c e5f8239 load on device 'metal:0' took 444.72 ms  (compiled)
 Module newton._src.geometry.bvh 6518958 load on device 'metal:0' took 623.37 ms  (compiled)
@@ -163,7 +163,7 @@ Module warp.fem.integrate._identity_field_97c62231 73546b3 load on device 'metal
 Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.update_particle_strains_f4e4d5e7 21226c1 load on device 'metal:0' took 930.84 ms  (compiled)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_34a4f9cb ba52845 load on device 'metal:0' took 664.94 ms  (compiled)
 Module map_mul 70219a3 load on device 'metal:0' took 397.55 ms  (compiled)
-done /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/hv1/pour_hash_on1.json
+done runs/mpm/coupled_speed/hv1/pour_hash_on1.json
 [gpu_run] chv_pour_on1 end: device utilisation 92% (18:40:48), exit 0
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
 [gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.5 %

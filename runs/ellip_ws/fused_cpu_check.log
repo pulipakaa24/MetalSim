@@ -999,14 +999,14 @@ To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.LS_ITERAT
 linesearch iterations limit reached - please increase ls_iterations beyond 20
 To disable the print warning: m.opt.warn_overflow &= ~mjw.OverflowType.LS_ITERATIONS (or = 0 for all)
 linesearch iterations limit reached - please increase ls_iterations beyond 20
-To disable the print warning: m.opmujoco_warp /Users/aditya/robosim/upstream/mujoco_warp-ws/mujoco_warp device cpu; knobs {'MJW_FUSE_H_CHOLESKY_CPU': '1', 'MJW_METAL_FUSE_UPDATE_CPU': '1', 'MJW_ELLIPTIC_INCREMENTAL': None}
+To disable the print warning: m.opmujoco_warp upstream/mujoco_warp-ws/mujoco_warp device cpu; knobs {'MJW_FUSE_H_CHOLESKY_CPU': '1', 'MJW_METAL_FUSE_UPDATE_CPU': '1', 'MJW_ELLIPTIC_INCREMENTAL': None}
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
    Devices:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth 80584cc load on device 'cpu' took 1.02 ms  (cached)
 Module _nxn_broadphase__locals__kernel_c1e6b59f c441222 load on device 'cpu' took 0.31 ms  (cached)
 Module ccd_kernel_builder__locals__ccd_kernel_66a0e2e6 3f1680e load on device 'cpu' took 0.39 ms  (cached)

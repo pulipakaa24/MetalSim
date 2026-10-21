@@ -1,5 +1,5 @@
 #!/bin/bash
-# batch 07 (run outside the agent sandbox):  bash /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b07/batch_07.sh
+# batch 07 (run outside the agent sandbox):  bash scratch/b07/batch_07.sh
 #
 # Coupling-layer optimisation (items 1 + 2 of research_notes/MPM in main simulator/coupling_opt.md):
 #   0  wait for batch_06 to finish (it shares the GPU queue and the repository)
@@ -13,8 +13,8 @@
 #   4  commit code + note + logs on coupling-opt, push, DRAFT PR (numbers go into the docs next round)
 # Resumable (scratch/b07/STATUS.txt). Expected ~60-90 min after batch_06.
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
-R=/Users/aditya/robosim
+W=.
+R=.
 S=$W/scratch/b07
 C=$W/scratch/coupling_opt
 L=$S/logs

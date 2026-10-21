@@ -2,8 +2,8 @@
 # Shader-variant experiments (temporary #ifdef toggles, scratchpad exp_patch*.py): which workstream-C addition costs
 # the tier-1 fragment stage / the tier-2 path_trace kernel. One process per variant, cloth scene, defaults.
 set -u
-WT=/Users/aditya/robosim/.claude/worktrees/agent-a5314e27bee02c142
-PY=/Users/aditya/robosim/.venv/bin/python
+WT=.
+PY=.venv/bin/python
 N=${1:-1024}
 OUT=$WT/runs/render_gaps2/exp.jsonl
 run() {  # renderer, envvar, json, tag

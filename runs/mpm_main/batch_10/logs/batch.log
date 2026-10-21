@@ -1,7 +1,7 @@
 === batch_10 start Tue Oct 13 20:32:09 PDT 2026
 [20:32:12] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[20:32:12] gpu job mm10_oneworld (check, <= 15 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/one_world_reset.log
+[20:32:12] gpu job mm10_oneworld (check, <= 15 min, cwd scratch/wt-copt) -> scratch/b10/logs/one_world_reset.log
     Module map_mul fe0b813 load on device 'metal:0' took 337.80 ms  (cached)
     Module _zero_if_world0_d3337786 abf59b1 load on device 'metal:0' took 398.36 ms  (compiled)
     {"selected_equals_full": true, "unselected_equals_none": true, "reset_changes_state": true, "ok": true}
@@ -9,7 +9,7 @@ GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 
 GPU (ioreg): device utilization 38 %; per-process GPU time over 1.9 s:
   pid    410 WindowServer                       6.7 %
 [20:33:08] ONEWORLD10 -> PASS {"selected_equals_full": true, "unselected_equals_none": true, "reset_changes_state": true, "ok": true}
-[20:33:08] gpu job mm10_tests (check, <= 40 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/test_mpm_main.log
+[20:33:08] gpu job mm10_tests (check, <= 40 min, cwd scratch/wt-copt) -> scratch/b10/logs/test_mpm_main.log
     .................                                                        [100%]
     17 passed in 276.00s (0:04:36)
 [20:37:55] health: utilisation 0%
@@ -17,21 +17,21 @@ GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   2.1 %
   pid    410 WindowServer                       1.1 %
 [20:37:55] TESTS10 -> PASS 17 passed in 276.00s (0:04:36)
-[20:37:55] gpu job mm10_policy_1 (timing, <= 30 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/policy_1.log
+[20:37:55] gpu job mm10_policy_1 (timing, <= 30 min, cwd scratch/wt-copt) -> scratch/b10/logs/policy_1.log
     {"worlds": 1, "fraction": 0.02, "steps": 200, "solver": "auto", "bitwise_equal": true, "first_differing_step": null, "resets_per_run": 4, "A_ms_per_policy_step": [13.029874794956413, 12.923509790052776, 12.686137710043113], "A_ms_median": 12.923509790052776, "B_ms_per_policy_step": [12.867575624986785, 12.743094580000616, 12.627523749979446], "B_ms_median": 12.743094580000616, "saving_ms_per_policy_step": 0.18041521005216055, "speedup": 1.0141578804833882}
     [gpu_run] mm10_policy_1 end: device utilisation 0% (20:43:07), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [20:43:13] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [20:43:13] POLICY10_1 -> PASS {"worlds": 1, "fraction": 0.02, "steps": 200, "solver": "auto", "bitwise_equal": true, "first_differing_step": null, "resets_per_run": 4, "A_ms_per_policy_step": [13.029874794956413, 12.923509790052776, 12.686137710043113], "A_ms_median": 12.923509790052776, "B_ms_per_policy_step": [12.867575624986785, 12.743094580000616, 12.627523749979446], "B_ms_median": 12.743094580000616, "saving_ms_per_polic
-[20:43:13] gpu job mm10_policy_64 (timing, <= 30 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/policy_64.log
+[20:43:13] gpu job mm10_policy_64 (timing, <= 30 min, cwd scratch/wt-copt) -> scratch/b10/logs/policy_64.log
     [gpu_run] mm10_policy_64 end: device utilisation 0% (20:45:14), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.3 %
 [20:45:20] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [20:45:20] POLICY10_64 -> PASS {"worlds": 64, "fraction": 0.02, "steps": 200, "solver": "auto", "bitwise_equal": true, "first_differing_step": null, "resets_per_run": 137, "A_ms_per_policy_step": [25.72649541500141, 25.658008749960572, 25.695316040000762], "A_ms_median": 25.695316040000762, "B_ms_per_policy_step": [24.476945209971745, 24.542355414960184, 24.49262562498916], "B_ms_median": 24.49262562498916, "saving_ms_per_polic
-[20:45:20] gpu job mm10_policy_1024 (timing, <= 60 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/policy_1024.log
+[20:45:20] gpu job mm10_policy_1024 (timing, <= 60 min, cwd scratch/wt-copt) -> scratch/b10/logs/policy_1024.log
     {"worlds": 1024, "fraction": 0.02, "steps": 60, "solver": "auto", "bitwise_equal": true, "first_differing_step": null, "resets_per_run": 60, "A_ms_per_policy_step": [221.5458486166123, 220.02538819991364, 219.46589096672446], "A_ms_median": 220.02538819991364, "B_ms_per_policy_step": [219.60516596664093, 217.91677568326122, 217.58597083341252], "B_ms_median": 217.91677568326122, "saving_ms_per_policy_step": 2.108612516652414, "speedup": 1.0096762285053136}
     [gpu_run] mm10_policy_1024 end: device utilisation 0% (20:52:53), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %

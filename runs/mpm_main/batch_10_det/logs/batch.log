@@ -1,7 +1,7 @@
 === batch_10 start Tue Oct 13 20:32:09 PDT 2026
 [20:32:12] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[20:32:12] gpu job mm10_oneworld (check, <= 15 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/one_world_reset.log
+[20:32:12] gpu job mm10_oneworld (check, <= 15 min, cwd scratch/wt-copt) -> scratch/b10/logs/one_world_reset.log
     Module map_mul fe0b813 load on device 'metal:0' took 337.80 ms  (cached)
     Module _zero_if_world0_d3337786 abf59b1 load on device 'metal:0' took 398.36 ms  (compiled)
     {"selected_equals_full": true, "unselected_equals_none": true, "reset_changes_state": true, "ok": true}
@@ -9,7 +9,7 @@ GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 
 GPU (ioreg): device utilization 38 %; per-process GPU time over 1.9 s:
   pid    410 WindowServer                       6.7 %
 [20:33:08] ONEWORLD10 -> PASS {"selected_equals_full": true, "unselected_equals_none": true, "reset_changes_state": true, "ok": true}
-[20:33:08] gpu job mm10_tests (check, <= 40 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/test_mpm_main.log
+[20:33:08] gpu job mm10_tests (check, <= 40 min, cwd scratch/wt-copt) -> scratch/b10/logs/test_mpm_main.log
     .................                                                        [100%]
     17 passed in 276.00s (0:04:36)
 [20:37:55] health: utilisation 0%
@@ -17,21 +17,21 @@ GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   2.1 %
   pid    410 WindowServer                       1.1 %
 [20:37:55] TESTS10 -> PASS 17 passed in 276.00s (0:04:36)
-[20:37:55] gpu job mm10_policy_1 (timing, <= 30 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/policy_1.log
+[20:37:55] gpu job mm10_policy_1 (timing, <= 30 min, cwd scratch/wt-copt) -> scratch/b10/logs/policy_1.log
     {"worlds": 1, "fraction": 0.02, "steps": 200, "solver": "auto", "bitwise_equal": true, "first_differing_step": null, "resets_per_run": 4, "A_ms_per_policy_step": [13.029874794956413, 12.923509790052776, 12.686137710043113], "A_ms_median": 12.923509790052776, "B_ms_per_policy_step": [12.867575624986785, 12.743094580000616, 12.627523749979446], "B_ms_median": 12.743094580000616, "saving_ms_per_policy_step": 0.18041521005216055, "speedup": 1.0141578804833882}
     [gpu_run] mm10_policy_1 end: device utilisation 0% (20:43:07), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [20:43:13] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [20:43:13] POLICY10_1 -> PASS {"worlds": 1, "fraction": 0.02, "steps": 200, "solver": "auto", "bitwise_equal": true, "first_differing_step": null, "resets_per_run": 4, "A_ms_per_policy_step": [13.029874794956413, 12.923509790052776, 12.686137710043113], "A_ms_median": 12.923509790052776, "B_ms_per_policy_step": [12.867575624986785, 12.743094580000616, 12.627523749979446], "B_ms_median": 12.743094580000616, "saving_ms_per_polic
-[20:43:13] gpu job mm10_policy_64 (timing, <= 30 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/policy_64.log
+[20:43:13] gpu job mm10_policy_64 (timing, <= 30 min, cwd scratch/wt-copt) -> scratch/b10/logs/policy_64.log
     [gpu_run] mm10_policy_64 end: device utilisation 0% (20:45:14), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.3 %
 [20:45:20] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [20:45:20] POLICY10_64 -> PASS {"worlds": 64, "fraction": 0.02, "steps": 200, "solver": "auto", "bitwise_equal": true, "first_differing_step": null, "resets_per_run": 137, "A_ms_per_policy_step": [25.72649541500141, 25.658008749960572, 25.695316040000762], "A_ms_median": 25.695316040000762, "B_ms_per_policy_step": [24.476945209971745, 24.542355414960184, 24.49262562498916], "B_ms_median": 24.49262562498916, "saving_ms_per_polic
-[20:45:20] gpu job mm10_policy_1024 (timing, <= 60 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/policy_1024.log
+[20:45:20] gpu job mm10_policy_1024 (timing, <= 60 min, cwd scratch/wt-copt) -> scratch/b10/logs/policy_1024.log
     {"worlds": 1024, "fraction": 0.02, "steps": 60, "solver": "auto", "bitwise_equal": true, "first_differing_step": null, "resets_per_run": 60, "A_ms_per_policy_step": [221.5458486166123, 220.02538819991364, 219.46589096672446], "A_ms_median": 220.02538819991364, "B_ms_per_policy_step": [219.60516596664093, 217.91677568326122, 217.58597083341252], "B_ms_median": 217.91677568326122, "saving_ms_per_policy_step": 2.108612516652414, "speedup": 1.0096762285053136}
     [gpu_run] mm10_policy_1024 end: device utilisation 0% (20:52:53), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
@@ -47,156 +47,156 @@ copt_docs: ok
 https://github.com/pulipakaa24/MetalSim/pull/33
 ✓ Pull request pulipakaa24/MetalSim#33 is marked as "ready for review"
 [20:53:08] PR10 -> DONE ✓ Pull request pulipakaa24/MetalSim#33 is marked as "ready for review"
-/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-tripwire-git/warp/__init__.py /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mujoco_warp-detccd/mujoco_warp/__init__.py /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/__init__.py
-[20:53:08] gpu job mm10_g1_64_0_r1 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/g1_64_0_r1.log
-    	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+upstream/warp-tripwire-git/warp/__init__.py upstream/mujoco_warp-detccd/mujoco_warp/__init__.py metalsim/__init__.py
+[20:53:08] gpu job mm10_g1_64_0_r1 (timing, <= 20 min, cwd <repo>) -> scratch/b10/logs/g1_64_0_r1.log
+    	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
     [gpu_run] mm10_g1_64_0_r1 end: device utilisation 0% (20:53:19), exit 1
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [20:53:25] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[20:53:25] gpu job mm10_box_64_0_r1 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/box_64_0_r1.log
+[20:53:25] gpu job mm10_box_64_0_r1 (timing, <= 20 min, cwd <repo>) -> scratch/b10/logs/box_64_0_r1.log
     [gpu_run] mm10_box_64_0_r1 end: device utilisation 97% (20:54:16), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.1 %
 [20:54:22] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[20:54:22] gpu job mm10_g1_64_1_r1 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/g1_64_1_r1.log
+[20:54:22] gpu job mm10_g1_64_1_r1 (timing, <= 20 min, cwd <repo>) -> scratch/b10/logs/g1_64_1_r1.log
     [gpu_run] gpu_top: GPU (ioreg): device utilization 81 %; per-process GPU time over 1.9 s:
     [gpu_run] gpu_top:   pid    914 mediaanalysisd                     9.3 %
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.2 %
 [20:59:19] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid    914 mediaanalysisd                    12.8 %
-[20:59:19] gpu job mm10_box_64_1_r1 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/box_64_1_r1.log
+[20:59:19] gpu job mm10_box_64_1_r1 (timing, <= 20 min, cwd <repo>) -> scratch/b10/logs/box_64_1_r1.log
     {"worlds": 64, "solver": "auto", "steps": 40, "capture": 1, "deterministic": 1, "rigid_only": false, "ms_per_step_median": 24.91714600182604, "ms_p10": 24.33214170014253, "ms_p90": 25.081858003977686, "particles_per_world": 2592, "env_steps_per_s": 2568.512461070373}
     [gpu_run] mm10_box_64_1_r1 end: device utilisation 0% (21:00:25), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [21:00:31] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[21:00:31] gpu job mm10_g1_1024_0_r1 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/g1_1024_0_r1.log
-    	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+[21:00:31] gpu job mm10_g1_1024_0_r1 (timing, <= 20 min, cwd <repo>) -> scratch/b10/logs/g1_1024_0_r1.log
+    	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
     [gpu_run] mm10_g1_1024_0_r1 end: device utilisation 0% (21:01:17), exit 1
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [21:01:22] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[21:01:22] gpu job mm10_box_1024_0_r1 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/box_1024_0_r1.log
+[21:01:22] gpu job mm10_box_1024_0_r1 (timing, <= 20 min, cwd <repo>) -> scratch/b10/logs/box_1024_0_r1.log
     {"worlds": 1024, "solver": "auto", "steps": 40, "capture": 1, "deterministic": 0, "rigid_only": false, "ms_per_step_median": 227.67420850141207, "ms_p10": 211.01522910321364, "ms_p90": 228.9733164012432, "particles_per_world": 2592, "env_steps_per_s": 4497.654814483078}
     [gpu_run] mm10_box_1024_0_r1 end: device utilisation 0% (21:04:54), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [21:04:59] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[21:04:59] gpu job mm10_g1_1024_1_r1 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/g1_1024_1_r1.log
-    	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+[21:04:59] gpu job mm10_g1_1024_1_r1 (timing, <= 20 min, cwd <repo>) -> scratch/b10/logs/g1_1024_1_r1.log
+    	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
     [gpu_run] mm10_g1_1024_1_r1 end: device utilisation 0% (21:06:15), exit 1
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [21:06:21] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   1.2 %
-[21:06:21] gpu job mm10_box_1024_1_r1 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/box_1024_1_r1.log
+[21:06:21] gpu job mm10_box_1024_1_r1 (timing, <= 20 min, cwd <repo>) -> scratch/b10/logs/box_1024_1_r1.log
     {"worlds": 1024, "solver": "auto", "steps": 40, "capture": 1, "deterministic": 1, "rigid_only": false, "ms_per_step_median": 237.30441699444782, "ms_p10": 219.69385781267192, "ms_p90": 239.38946639245842, "particles_per_world": 2592, "env_steps_per_s": 4315.132490871244}
     [gpu_run] mm10_box_1024_1_r1 end: device utilisation 0% (21:09:12), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [21:09:18] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[21:09:18] gpu job mm10_g1_64_0_r2 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/g1_64_0_r2.log
-    	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+[21:09:18] gpu job mm10_g1_64_0_r2 (timing, <= 20 min, cwd <repo>) -> scratch/b10/logs/g1_64_0_r2.log
+    	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
     [gpu_run] mm10_g1_64_0_r2 end: device utilisation 0% (21:09:29), exit 1
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [21:09:34] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   1.2 %
-[21:09:34] gpu job mm10_box_64_0_r2 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/box_64_0_r2.log
+[21:09:34] gpu job mm10_box_64_0_r2 (timing, <= 20 min, cwd <repo>) -> scratch/b10/logs/box_64_0_r2.log
     [gpu_run] mm10_box_64_0_r2 end: device utilisation 0% (21:10:00), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.0 %
 [21:10:06] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[21:10:06] gpu job mm10_g1_64_1_r2 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/g1_64_1_r2.log
-    	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+[21:10:06] gpu job mm10_g1_64_1_r2 (timing, <= 20 min, cwd <repo>) -> scratch/b10/logs/g1_64_1_r2.log
+    	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
     [gpu_run] mm10_g1_64_1_r2 end: device utilisation 0% (21:10:32), exit 1
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [21:10:37] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[21:10:37] gpu job mm10_box_64_1_r2 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/box_64_1_r2.log
+[21:10:37] gpu job mm10_box_64_1_r2 (timing, <= 20 min, cwd <repo>) -> scratch/b10/logs/box_64_1_r2.log
     {"worlds": 64, "solver": "auto", "steps": 40, "capture": 1, "deterministic": 1, "rigid_only": false, "ms_per_step_median": 24.981999995361548, "ms_p10": 24.38693270087242, "ms_p90": 25.413399394892622, "particles_per_world": 2592, "env_steps_per_s": 2561.8445285358657}
     [gpu_run] mm10_box_64_1_r2 end: device utilisation 0% (21:11:13), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [21:11:19] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   2.0 %
-[21:11:19] gpu job mm10_g1_1024_0_r2 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/g1_1024_0_r2.log
+[21:11:19] gpu job mm10_g1_1024_0_r2 (timing, <= 20 min, cwd <repo>) -> scratch/b10/logs/g1_1024_0_r2.log
     [gpu_run] mm10_g1_1024_0_r2 end: device utilisation 0% (21:11:30), exit 1
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.8 %
 [21:11:36] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[21:11:36] gpu job mm10_box_1024_0_r2 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/box_1024_0_r2.log
+[21:11:36] gpu job mm10_box_1024_0_r2 (timing, <= 20 min, cwd <repo>) -> scratch/b10/logs/box_1024_0_r2.log
     {"worlds": 1024, "solver": "auto", "steps": 40, "capture": 1, "deterministic": 0, "rigid_only": false, "ms_per_step_median": 229.3080414965516, "ms_p10": 212.51015000307234, "ms_p90": 231.39917530061211, "particles_per_world": 2592, "env_steps_per_s": 4465.6087650349555}
     [gpu_run] mm10_box_1024_0_r2 end: device utilisation 0% (21:12:11), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [21:12:17] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[21:12:17] gpu job mm10_g1_1024_1_r2 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/g1_1024_1_r2.log
-    	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+[21:12:17] gpu job mm10_g1_1024_1_r2 (timing, <= 20 min, cwd <repo>) -> scratch/b10/logs/g1_1024_1_r2.log
+    	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
     [gpu_run] mm10_g1_1024_1_r2 end: device utilisation 0% (21:12:28), exit 1
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [21:12:34] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[21:12:34] gpu job mm10_box_1024_1_r2 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/box_1024_1_r2.log
+[21:12:34] gpu job mm10_box_1024_1_r2 (timing, <= 20 min, cwd <repo>) -> scratch/b10/logs/box_1024_1_r2.log
     {"worlds": 1024, "solver": "auto", "steps": 40, "capture": 1, "deterministic": 1, "rigid_only": false, "ms_per_step_median": 238.28141649573809, "ms_p10": 220.9389795010793, "ms_p90": 240.79460858920356, "particles_per_world": 2592, "env_steps_per_s": 4297.4396201741365}
     [gpu_run] mm10_box_1024_1_r2 end: device utilisation 99% (21:13:10), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [21:13:15] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   1.9 %
-[21:13:15] gpu job mm10_g1_64_0_r3 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/g1_64_0_r3.log
+[21:13:15] gpu job mm10_g1_64_0_r3 (timing, <= 20 min, cwd <repo>) -> scratch/b10/logs/g1_64_0_r3.log
     [gpu_run] mm10_g1_64_0_r3 end: device utilisation 0% (21:13:26), exit 1
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.0 %
 [21:13:32] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[21:13:32] gpu job mm10_box_64_0_r3 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/box_64_0_r3.log
+[21:13:32] gpu job mm10_box_64_0_r3 (timing, <= 20 min, cwd <repo>) -> scratch/b10/logs/box_64_0_r3.log
     [gpu_run] mm10_box_64_0_r3 end: device utilisation 0% (21:13:53), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.8 %
 [21:13:59] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[21:13:59] gpu job mm10_g1_64_1_r3 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/g1_64_1_r3.log
-    	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+[21:13:59] gpu job mm10_g1_64_1_r3 (timing, <= 20 min, cwd <repo>) -> scratch/b10/logs/g1_64_1_r3.log
+    	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
     [gpu_run] mm10_g1_64_1_r3 end: device utilisation 0% (21:14:09), exit 1
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [21:14:15] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
-[21:14:15] gpu job mm10_box_64_1_r3 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/box_64_1_r3.log
+[21:14:15] gpu job mm10_box_64_1_r3 (timing, <= 20 min, cwd <repo>) -> scratch/b10/logs/box_64_1_r3.log
     {"worlds": 64, "solver": "auto", "steps": 40, "capture": 1, "deterministic": 1, "rigid_only": false, "ms_per_step_median": 24.523500498617068, "ms_p10": 23.960891702154186, "ms_p90": 24.706512806005776, "particles_per_world": 2592, "env_steps_per_s": 2609.741623289428}
     [gpu_run] mm10_box_64_1_r3 end: device utilisation 0% (21:14:36), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [21:14:42] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[21:14:42] gpu job mm10_g1_1024_0_r3 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/g1_1024_0_r3.log
-    	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+[21:14:42] gpu job mm10_g1_1024_0_r3 (timing, <= 20 min, cwd <repo>) -> scratch/b10/logs/g1_1024_0_r3.log
+    	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
     [gpu_run] mm10_g1_1024_0_r3 end: device utilisation 0% (21:14:52), exit 1
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [21:14:58] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   2.0 %
-[21:14:58] gpu job mm10_box_1024_0_r3 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/box_1024_0_r3.log
+[21:14:58] gpu job mm10_box_1024_0_r3 (timing, <= 20 min, cwd <repo>) -> scratch/b10/logs/box_1024_0_r3.log
     [gpu_run] mm10_box_1024_0_r3 end: device utilisation 0% (21:15:34), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
     [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.0 %
 [21:15:40] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   1.2 %
-[21:15:40] gpu job mm10_g1_1024_1_r3 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/g1_1024_1_r3.log
-    	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/assets/isaac/G1/g1_minimal.usd@'
+[21:15:40] gpu job mm10_g1_1024_1_r3 (timing, <= 20 min, cwd <repo>) -> scratch/b10/logs/g1_1024_1_r3.log
+    	Error in 'pxrInternal_v0_26_8__pxrReserved__::UsdStage::Open' at line 1276 in file /Users/runner/work/OpenUSD/OpenUSD/pxr/usd/usd/stage.cpp : 'Failed to open layer @assets/isaac/G1/g1_minimal.usd@'
     [gpu_run] mm10_g1_1024_1_r3 end: device utilisation 0% (21:15:50), exit 1
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [21:15:56] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[21:15:56] gpu job mm10_box_1024_1_r3 (timing, <= 20 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs/box_1024_1_r3.log
+[21:15:56] gpu job mm10_box_1024_1_r3 (timing, <= 20 min, cwd <repo>) -> scratch/b10/logs/box_1024_1_r3.log
     {"worlds": 1024, "solver": "auto", "steps": 40, "capture": 1, "deterministic": 1, "rigid_only": false, "ms_per_step_median": 237.981916499848, "ms_p10": 220.20634580840124, "ms_p90": 240.29896610882133, "particles_per_world": 2592, "env_steps_per_s": 4302.847943493446}
     [gpu_run] mm10_box_1024_1_r3 end: device utilisation 0% (21:16:32), exit 0
     [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [21:16:38] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[21:16:38] DETCOST10 -> FAIL 12 failed runs (see /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/logs)
+[21:16:38] DETCOST10 -> FAIL 12 failed runs (see scratch/b10/logs)

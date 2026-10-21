@@ -4,7 +4,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module warp.sparse 3c9434f load on device 'cpu' took 960.12 ms  (compiled)
 Module _bsr_set_from_triplets_padded_accumulate_values_7cd042af 6a57797 load on device 'cpu' took 80.04 ms  (compiled)
 .Module warp._src.metal_sparse 7e77140 load on device 'metal:0' took 41.10 ms  (cached)
@@ -68,16 +68,16 @@ Module make_bsr_mv_transpose_kernel__locals__bsr_mv_transpose_kernel_a384845a d1
 ERROR: test_bsr_copy_scale (warp.tests.test_sparse.TestSparse.test_bsr_copy_scale)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a28868bb53d94facc/upstream/warp-final/warp/tests/test_sparse.py", line 1541, in test_bsr_copy_scale
+  File "upstream/warp-final/warp/tests/test_sparse.py", line 1541, in test_bsr_copy_scale
     diag_copy = bsr_copy(diag_bsr, scalar_type=wp.float64)
                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a28868bb53d94facc/upstream/warp-final/warp/_src/sparse.py", line 2634, in bsr_copy
+  File "upstream/warp-final/warp/_src/sparse.py", line 2634, in bsr_copy
     bsr_assign(dest=copy, src=A, structure_only=structure_only, topology=topology)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a28868bb53d94facc/upstream/warp-final/warp/_src/sparse.py", line 2468, in bsr_assign
+  File "upstream/warp-final/warp/_src/sparse.py", line 2468, in bsr_assign
     wp.launch(
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a28868bb53d94facc/upstream/warp-final/warp/_src/context.py", line 12658, in launch
+  File "upstream/warp-final/warp/_src/context.py", line 12658, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint, dim_limit=dim_limit)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a28868bb53d94facc/upstream/warp-final/warp/_src/context.py", line 11566, in invoke_metal
+  File "upstream/warp-final/warp/_src/context.py", line 11566, in invoke_metal
     raise RuntimeError(
 RuntimeError: Kernel '_bsr_assign_copy_blocks' uses builtins that are not supported on Metal yet: float64
 

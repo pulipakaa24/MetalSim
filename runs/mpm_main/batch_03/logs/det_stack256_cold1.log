@@ -4,7 +4,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/mpm_main/cache_cold1/1.18.0.dev20260917
+     scratch/mpm_main/cache_cold1/1.18.0.dev20260917
 Module mujoco_warp._src.smooth 3a77e74 load on device 'metal:0' took 2683.36 ms  (compiled)
 Module _nxn_broadphase__locals__kernel_0b9b111b 0b9b111 load on device 'metal:0' took 595.39 ms  (compiled)
 Module ccd_kernel_builder__locals__ccd_kernel_7c91d6f0 7c91d6f load on device 'metal:0' took 3235.36 ms  (compiled)
@@ -43,4 +43,4 @@ Module reset_data__locals__reset_mocap_4ca1ba49 4ca1ba4 load on device 'metal:0'
 Module reset_data__locals__reset_contact_f8b9b9fd f8b9b9f load on device 'metal:0' took 429.51 ms  (compiled)
 Module reset_data__locals__reset_sleep_b5b26f6c b5b26f6 load on device 'metal:0' took 405.73 ms  (compiled)
 Module reset_data__locals__reset_nworld_3a32ab72 3a32ab7 load on device 'metal:0' took 420.94 ms  (compiled)
-{"scene": "stack", "worlds": 256, "deterministic": 1, "capture": 1, "in_process_first_diff": [], "warp_cache": "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/mpm_main/cache_cold1/1.18.0.dev20260917"}
+{"scene": "stack", "worlds": 256, "deterministic": 1, "capture": 1, "in_process_first_diff": [], "warp_cache": "scratch/mpm_main/cache_cold1/1.18.0.dev20260917"}

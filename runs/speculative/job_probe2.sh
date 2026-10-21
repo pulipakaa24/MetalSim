@@ -1,9 +1,9 @@
 #!/bin/bash
 # speculative contacts, task 1: over-travel probe, second pass with joint positions (gait vs Isaac play recordings) (scripts/diagnostics/speculative/overtravel_probe.py) on frozen fork worktrees:
 # stock f824af1 (recommended, ellip10_tau5) and the prototype d99186b (MJW_SPECULATIVE_GAP=1; friction cone / none / live; NULL rows)
-cd /Users/aditya/robosim
+cd .
 PY=.venv/bin/python; P=scripts/diagnostics/speculative/overtravel_probe.py; O=runs/speculative/probe2
-STOCK=/Users/aditya/robosim/upstream/mujoco_warp-f824af1; SPEC=/Users/aditya/robosim/upstream/mujoco_warp-spec-d99186b
+STOCK=upstream/mujoco_warp-f824af1; SPEC=upstream/mujoco_warp-spec-d99186b
 mkdir -p $O
 echo "=== start $(date) metalsim $(git rev-parse --short HEAD) stock $(git -C $STOCK rev-parse --short HEAD) spec $(git -C $SPEC rev-parse --short HEAD)"
 F='^Warning\|^Module\|^Warp\|^   '

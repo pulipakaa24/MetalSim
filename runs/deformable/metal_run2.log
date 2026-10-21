@@ -10,7 +10,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 face_normal=False tet cpu: n W 1 C 1
    W pos [ 8.e-05 -2.e-05 -0.e+00] dist 0.000001 n [ 0.  0. -1.]
    C pos [-0.  0. -0.] dist 0.000000 n [ 0. -0. -1.]
@@ -30,7 +30,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 face_normal=True tet cpu: n W 1 C 1
    W pos [ 8.e-05 -2.e-05 -0.e+00] dist 0.000001 n [ 0.  0. -1.]
    C pos [-0.  0. -0.] dist 0.000000 n [ 0. -0. -1.]
@@ -76,7 +76,7 @@ upstream/mujoco_warp-flex/mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::
 upstream/mujoco_warp-flex/mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp1
 upstream/mujoco_warp-flex/mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp4
 upstream/mujoco_warp-flex/mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp5
-  /Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/io.py:334: UserWarning: Bending damping is not yet supported for interpolated flex shells.
+  upstream/mujoco_warp-flex/mujoco_warp/_src/io.py:334: UserWarning: Bending damping is not yet supported for interpolated flex shells.
     warnings.warn("Bending damping is not yet supported for interpolated flex shells.")
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
@@ -112,26 +112,26 @@ FAILED tests/test_deformable.py::test_mjw_flex_graph_replay_equals_eager - As...
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 {"num_envs": 64, "steps": 210, "wall_s": 2.024193875025958, "env_steps_per_s": 6639.680203472431, "sim_s_per_wall_s": 0.20749000635851345, "finite": true, "energy_max": 0.573488175868988, "overflow": {"ITERATIONS": 64, "LS_ITERATIONS": 64}, "nv": 336, "nflexvert": 112, "nconmax": 688, "njmax": 3376, "njmax_nnz": 18496, "backend": "mjw", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": ""}
 {"num_envs": 256, "steps": 150, "wall_s": 2.032098958006827, "env_steps_per_s": 18896.717528788275, "sim_s_per_wall_s": 0.1476306056936584, "finite": true, "energy_max": 0.5797016024589539, "overflow": {"ITERATIONS": 256, "LS_ITERATIONS": 256}, "nv": 336, "nflexvert": 112, "nconmax": 688, "njmax": 3376, "njmax_nnz": 18496, "backend": "mjw", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": ""}
 {"num_envs": 1024, "steps": 90, "wall_s": 2.222963832988171, "env_steps_per_s": 41458.16438053152, "sim_s_per_wall_s": 0.08097297730572561, "finite": true, "energy_max": 0.8706444501876831, "overflow": {"ITERATIONS": 1024, "LS_ITERATIONS": 1024}, "nv": 336, "nflexvert": 112, "nconmax": 688, "njmax": 3376, "njmax_nnz": 18496, "backend": "mjw", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": ""}
 {"num_envs": 4096, "steps": 30, "wall_s": 2.273106208012905, "env_steps_per_s": 54058.1867960401, "sim_s_per_wall_s": 0.026395599021503954, "finite": true, "energy_max": 1.124783992767334, "overflow": {}, "nv": 336, "nflexvert": 112, "nconmax": 688, "njmax": 3376, "njmax_nnz": 18496, "backend": "mjw", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": ""}
 == throughput mjw, Warp host sorts (FLEX_DEVICE_SORT=0)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 {"num_envs": 256, "steps": 80, "wall_s": 2.2483659160207026, "env_steps_per_s": 9108.837602487221, "sim_s_per_wall_s": 0.07116279376943141, "finite": true, "energy_max": 0.9181246757507324, "overflow": {"ITERATIONS": 256, "LS_ITERATIONS": 256}, "nv": 336, "nflexvert": 112, "nconmax": 688, "njmax": 3376, "njmax_nnz": 18496, "backend": "mjw", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": "FLEX_DEVICE_SORT=0"}
 {"num_envs": 1024, "steps": 30, "wall_s": 2.7060863329970744, "env_steps_per_s": 11352.187705695498, "sim_s_per_wall_s": 0.02217224161268652, "finite": true, "energy_max": 1.1240472793579102, "overflow": {}, "nv": 336, "nflexvert": 112, "nconmax": 688, "njmax": 3376, "njmax_nnz": 18496, "backend": "mjw", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": "FLEX_DEVICE_SORT=0"}
 == throughput mjw, G1 scene (12x12 cloth + 16 cable), device sorts
     wp.synchronize_device(self.device)
-  File "/Users/aditya/robosim/upstream/warp-innate-flex/warp/_src/context.py", line 12884, in synchronize_device
+  File "upstream/warp-innate-flex/warp/_src/context.py", line 12884, in synchronize_device
     device.metal_synchronize()
-  File "/Users/aditya/robosim/upstream/warp-innate-flex/warp/_src/context.py", line 6059, in metal_synchronize
+  File "upstream/warp-innate-flex/warp/_src/context.py", line 6059, in metal_synchronize
     raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
 RuntimeError: Metal error on device metal:0: Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
 == throughput xpbd (box), 10 substeps
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 {"num_envs": 1024, "steps": 2670, "wall_s": 2.000981832999969, "env_steps_per_s": 1366369.226801492, "sim_s_per_wall_s": 2.668689896096664, "finite": true, "substeps": 10, "ncons": 282, "ncolors": 6, "nflexvert": 112, "backend": "xpbd", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": ""}
 {"num_envs": 4096, "steps": 1160, "wall_s": 2.017260291991988, "env_steps_per_s": 2355352.960082392, "sim_s_per_wall_s": 1.1500746875402303, "finite": true, "substeps": 10, "ncons": 282, "ncolors": 6, "nflexvert": 112, "backend": "xpbd", "scene": "box", "cloth": 10, "cable": 12, "dt": 0.002, "flex_flags": ""}
 == done Fri Sep 25 09:10:44 PDT 2026

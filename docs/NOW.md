@@ -22,6 +22,7 @@ now and what is known to be broken. It is updated with every batch of work; if i
 
 | Problem | Severity | Where | Owner / plan |
 |---|---|---|---|
+| Open branches `sand-fidelity-01` … `sand-fidelity-03a` and `parallel-compile` add absolute local paths (`/Users/<name>/...`) in run logs and notes | hygiene | those branches | replace them with repo-relative paths before merging, so `git grep '/Users/' main` stays empty |
 | Captured coupled MPM scenes slower than the L4 (two-way 1.21x with the pending fixes, was 1.76x; ANYmal 1.21x) | performance | MPM.md 8j | in progress above |
 | Franka-Pour vs Isaac: no difference at iterations 0-49; at 50-59 Isaac +0.035 success (p = 0.09, 5 vs 3 seeds), neither shown nor ruled out | parity, accepted as open | PARITY §1b.5 | owner decided 2026-10-13 not to run Isaac seeds 3-4 |
 | With the staggered MPM–rigid exchange (Isaac Lab 3.0's Franka-Pour setting and Isaac's own path) a body resting on sand sinks through any bed (force fed back one step late). Lagged exchange (now `MPMCoupling`'s default) carries a resting box: 10 mm settling with a converged solve (250 it, 1e-6), 25 mm and creeping at 50 iterations; drops penetrate 32–39 mm vs 10–25 mm expected | physics fidelity (coupling + solve convergence) | MPM.md §11 | documented; Franka-Pour keeps Isaac's setting for parity |

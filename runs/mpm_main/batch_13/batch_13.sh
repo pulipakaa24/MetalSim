@@ -1,6 +1,6 @@
 #!/bin/bash
 # batch 13 (run outside the agent sandbox, after batch_12):
-#   bash /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b13/batch_13.sh
+#   bash scratch/b13/batch_13.sh
 #
 # Part A, #29 (deterministic BatchSim) on the G1 task: batch_10b found (1) Warp's counter tripwire firing at 64 worlds
 # and (2) a 3.5 GB deterministic scratch request at 1,024 worlds in MuJoCo Warp's fused solver-update launch
@@ -23,8 +23,8 @@
 #   clean, batch_11's pin move runs (PIN_MOVE=1 bash scratch/b11/batch_11.sh, unchanged).
 # Resumable (scratch/b13/STATUS.txt). ~40 min of GPU + batch_11's pin move ~20 min.
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
-R=/Users/aditya/robosim
+W=.
+R=.
 S=$W/scratch/b13
 L=$S/logs
 O=$W/runs/mpm_main/batch_13

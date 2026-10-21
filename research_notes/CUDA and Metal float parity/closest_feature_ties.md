@@ -1,6 +1,6 @@
 # Exact ties in closest-point / closest-feature / SDF queries against triangle meshes, and how Newton 1.5.2 implicit MPM computes collider normals
 
-Method note: The Newton findings come from the v1.5.2 source checked out locally at `/Users/aditya/robosim/upstream/newton-1.5.2` (`git describe` = `v1.5.2`). They match the GitHub tag tree at https://github.com/newton-physics/newton/tree/v1.5.2. I read two Warp sources: the released Warp 1.17.0 wheel source (`~/.cache/uv/archive-v0/7SP4UkJ3f8ldULV5/warp`, `config.py` version "1.17.0"), and the locally patched Warp 1.18.0.dev20260917 (`upstream/warp-innate`) that the project venv uses. Newton 1.5.2's pyproject requires `warp-lang>=1.16.0`.
+Method note: The Newton findings come from the v1.5.2 source checked out locally at `upstream/newton-1.5.2` (`git describe` = `v1.5.2`). They match the GitHub tag tree at https://github.com/newton-physics/newton/tree/v1.5.2. I read two Warp sources: the released Warp 1.17.0 wheel source (`~/.cache/uv/archive-v0/7SP4UkJ3f8ldULV5/warp`, `config.py` version "1.17.0"), and the locally patched Warp 1.18.0.dev20260917 (`upstream/warp-innate`) that the project venv uses. Newton 1.5.2's pyproject requires `warp-lang>=1.16.0`.
 
 ## Q1. What do the literature and mature libraries do when a point is equidistant from several triangles?
 

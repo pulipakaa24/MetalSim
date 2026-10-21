@@ -1,8 +1,8 @@
 #!/bin/bash
 # speculative contacts, correctness (c): the fork's suite on Metal from the frozen prototype worktree e636feb, without the
 # prototype switch, with MJW_SPECULATIVE_GAP=1 (gap-free test models: the rule must be inert), and with the final rule's switches
-cd /Users/aditya/robosim && source .venv/bin/activate
-WT=/Users/aditya/robosim/upstream/warp-innate:/Users/aditya/robosim/upstream/mujoco_warp-spec-e636feb
+cd . && source .venv/bin/activate
+WT=upstream/warp-innate:upstream/mujoco_warp-spec-e636feb
 echo "=== start $(date) warp $(git -C upstream/warp-innate rev-parse --short HEAD) mjw $(git -C upstream/mujoco_warp-spec-e636feb rev-parse --short HEAD)"
 cd upstream/mujoco_warp-spec-e636feb
 F='^linesearch\|^To disable\|^solver iterations\|^nvmax'

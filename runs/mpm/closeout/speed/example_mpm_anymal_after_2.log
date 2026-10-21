@@ -1,4 +1,4 @@
-/Users/aditya/robosim/upstream/newton-integrated/newton/_src/utils/import_urdf.py:651: UserWarning: Warning: mesh /Users/aditya/Library/Caches/newton/newton-assets_anybotics_anymal_c_56bec244_261cd1f4/anybotics_anymal_c/meshes/base.dae has a texture but no UVs; texture will be ignored.
+upstream/newton-integrated/newton/_src/utils/import_urdf.py:651: UserWarning: Warning: mesh ~/Library/Caches/newton/newton-assets_anybotics_anymal_c_56bec244_261cd1f4/anybotics_anymal_c/meshes/base.dae has a texture but no UVs; texture will be ignored.
   parse_shapes(link, visuals, density=0.0, just_visual=True, visible=not hide_visuals)
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -6,7 +6,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-a8a12903da01bb68c/runs/mpm/closeout/kcache_tile/1.18.0.dev20260917
+     runs/mpm/closeout/kcache_tile/1.18.0.dev20260917
 Module newton._src.utils.mesh 28ea620 load on device 'cpu' took 0.83 ms  (cached)
 Module newton._src.geometry.inertia 823263a load on device 'metal:0' took 23.83 ms  (cached)
 Module validate_and_correct_inertia_kernel_8e7d151c 8e7d151 load on device 'metal:0' took 379.42 ms  (cached)
@@ -107,4 +107,4 @@ Module warp.fem.space.partition 09cb95e load on device 'metal:0' took 22.89 ms  
 Module scatter_field_dof_values_4f311ae7 985506c load on device 'metal:0' took 22.77 ms  (cached)
 Module warp.fem.integrate._identity_field_53a45b43 f3df48d load on device 'metal:0' took 25.40 ms  (cached)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_ee39ae6e 2e5bf1a load on device 'metal:0' took 24.43 ms  (cached)
-{"scene": "example:mpm_anymal", "set": {}, "frames": 60, "warmup": 5, "ms_median": 48.12079149814963, "ms_mean": 48.59219516674784, "ms_p10": 46.20918690088729, "ms_p90": 51.59846669812396, "per_frame_counters": {"host_waits": 17.0, "command_buffers": 24.0, "host_ops": 0.0, "dispatches_encoded": 2016.0}, "warp": "/Users/aditya/robosim/.claude/worktrees/agent-a8a12903da01bb68c/_forks/warp/warp/__init__.py", "compat": {"accumulate": "float32", "loop": "cuda", "chunk_graph": true, "fused": false, "fused_max_color_blocks": 1073741824, "simd": false, "gpu_exit": true, "rigid_deterministic": true, "metal_fast_math": "off"}}
+{"scene": "example:mpm_anymal", "set": {}, "frames": 60, "warmup": 5, "ms_median": 48.12079149814963, "ms_mean": 48.59219516674784, "ms_p10": 46.20918690088729, "ms_p90": 51.59846669812396, "per_frame_counters": {"host_waits": 17.0, "command_buffers": 24.0, "host_ops": 0.0, "dispatches_encoded": 2016.0}, "warp": "_forks/warp/warp/__init__.py", "compat": {"accumulate": "float32", "loop": "cuda", "chunk_graph": true, "fused": false, "fused_max_color_blocks": 1073741824, "simd": false, "gpu_exit": true, "rigid_deterministic": true, "metal_fast_math": "off"}}

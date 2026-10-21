@@ -1,7 +1,7 @@
 #!/bin/bash
 # final: committed state (MetalSim d867143 + Warp b9557cb + MuJoCo Warp ccfaffb/1791414) - cost split flat and rough,
 # the original configuration re-measured in the same session (register bound 40, dense M, fork fusion off), rough checks, profile
-cd /Users/aditya/robosim && source .venv/bin/activate
+cd . && source .venv/bin/activate
 F='^\[\|Error\|Traceback'
 OLD='{"metal_register_cholesky_max":40,"m_dense_max":64,"label":"original settings (fork fusion off)"}'
 {

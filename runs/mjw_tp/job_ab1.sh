@@ -1,9 +1,9 @@
 #!/bin/bash
 # A/B: MuJoCo Warp fork 1791414 (shared checkout, editable install) vs 07a51a6 (worktree via PYTHONPATH), same Warp
 # (upstream/warp-innate 9050cb54), same MetalSim commit; interleaved A B A B; g1_tp_variants.py 4096.
-cd /Users/aditya/robosim && source .venv/bin/activate
+cd . && source .venv/bin/activate
 F='^\[\|Error\|Traceback\|mjw:'
-B=/Users/aditya/robosim/upstream/mujoco_warp-07a51a6
+B=upstream/mujoco_warp-07a51a6
 run() {  # run LABEL PYTHONPATH_OR_EMPTY
   local lab=$1 pp=$2
   echo "--- $lab $(date +%H:%M:%S) power: $(pmset -g batt | head -1 | tr -d '\n') therm: $(pmset -g therm | tr '\n' ' ')"

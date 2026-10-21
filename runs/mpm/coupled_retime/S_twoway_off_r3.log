@@ -9,7 +9,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module validate_and_correct_inertia_kernel_e5f8239c e5f8239 load on device 'metal:0' took 39.81 ms  (cached)
 Module newton._src.geometry.bvh 66c2a94 load on device 'metal:0' took 42.13 ms  (cached)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_model 1aa6787 load on device 'metal:0' took 40.93 ms  (cached)
@@ -122,7 +122,7 @@ Module scatter_field_dof_values_953ffc59 bbfb9a1 load on device 'metal:0' took 4
 Module warp._src.fem.space.restriction.dyn.fill_element_node_indices_16b56c40 891a1f6 load on device 'metal:0' took 41.57 ms  (cached)
 Module warp.fem.integrate._identity_field_33a7d872 5aa6e66 load on device 'metal:0' took 45.51 ms  (cached)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_539f9872 bb30496 load on device 'metal:0' took 41.60 ms  (cached)
-{"scene": "example:mpm_twoway_coupling", "set": {}, "frames": 60, "warmup": 5, "ms_median": 62.10070899396669, "ms_mean": 69.7799048490803, "ms_p10": 59.0502663035295, "ms_p90": 98.30550410260912, "per_frame_counters": {"host_waits": 11.866666666666667, "command_buffers": 37.7, "host_ops": 0.0, "dispatches_encoded": 1855.8666666666666}, "warp": "/Users/aditya/robosim/upstream/warp-innate/warp/__init__.py", "compat": {"accumulate": "float32", "loop": "cuda", "chunk_graph": true, "fused": false, "fused_max_color_blocks": 1073741824, "simd": false, "gpu_exit": true, "rigid_deterministic": true, "metal_fast_math": "off"}}
+{"scene": "example:mpm_twoway_coupling", "set": {}, "frames": 60, "warmup": 5, "ms_median": 62.10070899396669, "ms_mean": 69.7799048490803, "ms_p10": 59.0502663035295, "ms_p90": 98.30550410260912, "per_frame_counters": {"host_waits": 11.866666666666667, "command_buffers": 37.7, "host_ops": 0.0, "dispatches_encoded": 1855.8666666666666}, "warp": "upstream/warp-innate/warp/__init__.py", "compat": {"accumulate": "float32", "loop": "cuda", "chunk_graph": true, "fused": false, "fused_max_color_blocks": 1073741824, "simd": false, "gpu_exit": true, "rigid_deterministic": true, "metal_fast_math": "off"}}
 [gpu_run] cr_S_twoway_off_r3 end: device utilisation 15% (13:17:32), exit 0
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
 [gpu_run] gpu_top:   pid   1291 Google Chrome He                   8.7 %

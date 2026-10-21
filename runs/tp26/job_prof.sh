@@ -2,7 +2,7 @@
 # tp26 job 1: where the G1 step spends its time under the task's contact preset (recommended) vs the headline setting
 # (contact_cfg null): step-profile segments (graph mode) and per-kernel eager attribution (WP_METAL_PROFILE=1), plus the
 # register Cholesky cost split (factor / solve / both) at n = 32, 43, 48.
-cd /Users/aditya/robosim && source .venv/bin/activate
+cd . && source .venv/bin/activate
 G='^  \(physics\|whole\|outside\|solver\|mjw.step\|fwd_\|sensor\|sum of\)\|^task\|^variant\|Error\|Traceback'
 echo "=== start $(date) metalsim $(git rev-parse --short HEAD) warp $(git -C upstream/warp-innate rev-parse --short HEAD) mjw $(git -C upstream/mujoco_warp rev-parse --short HEAD) power: $(pmset -g batt | head -1)"
 python -c "import mujoco_warp, warp; print('imports', mujoco_warp.__file__, warp.__file__)"

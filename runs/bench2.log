@@ -26,9 +26,9 @@ it   13 steps   1277952 sps   43,412 | ep_ret -202.77 ep_len   38.1 (n=2625) | p
 it   14 steps   1376256 sps   43,352 | ep_ret -202.79 ep_len   38.5 (n=2507) | pg -0.004 vf 101.585 kl 0.0025 lr 1.0e-02
 it   15 steps   1474560 sps   43,302 | ep_ret -202.78 ep_len   38.4 (n=2597) | pg -0.004 vf 69.696 kl 0.0018 lr 1.0e-02
 === G1 rough PPO 4096, 15 iterations
-  File "/Users/aditya/robosim/orchard/learn/terrain.py", line 166, in launch
-  File "/Users/aditya/robosim/orchard/physics/batch.py", line 151, in _signal
-  File "/Users/aditya/robosim/orchard/interop/warp_metal.py", line 139, in signal
-  File "/Users/aditya/robosim/orchard/interop/warp_metal.py", line 64, in _check
+  File "orchard/learn/terrain.py", line 166, in launch
+  File "orchard/physics/batch.py", line 151, in _signal
+  File "orchard/interop/warp_metal.py", line 139, in signal
+  File "orchard/interop/warp_metal.py", line 64, in _check
 RuntimeError: wp_metal_signal_event failed: Signaling an event during graph capture is not supported on Metal
 === DONE

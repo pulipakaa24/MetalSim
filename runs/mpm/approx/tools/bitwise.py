@@ -1,8 +1,8 @@
 """Bitwise comparison of recordings: this branch's off / relaxed modes against the integrated tree's recordings."""
 import numpy as np
 
-W = "/Users/aditya/robosim/.claude/worktrees/agent-ae8661f0d09092d4b/runs/mpm/"
-M = "/Users/aditya/robosim/runs/mpm/"
+W = "runs/mpm/"
+M = "runs/mpm/"
 for mine, ref in (("fm_off", "metal_floors_integrated_nofastmath"), ("fm_relaxed", "metal_floors_integrated")):
     for s in ("granular", "multi_material", "twoway", "anymal", "plate_drag", "column_a2"):
         a = np.load(f"{W}{mine}/F_{s}/traj.npz")

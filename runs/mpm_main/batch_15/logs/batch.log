@@ -16,30 +16,30 @@ DOCS11 PASS 23:19:03
 MSFINAL11 PASS 23:20:19 31 passed, 2 warnings in 38.12s
 PR11 DONE 23:20:26 https://github.com/pulipakaa24/MetalSim/pull/46
 [23:20:26] P1 -> DONE MSFINAL11 PASS 23:20:19 31 passed, 2 warnings in 38.12s;PR11 DONE 23:20:26 https://github.com/pulipakaa24/MetalSim/pull/46;
-[23:20:26] gpu job mm15_base (<= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b15/logs/g1_64_base.log
+[23:20:26] gpu job mm15_base (<= 20 min) -> scratch/b15/logs/g1_64_base.log
         raise RuntimeError("Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter "
     RuntimeError: Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter calls differ between its two passes (research_notes/MPM in main simulator/deterministic_ccd_divergence.md)
 [23:21:22] health: utilisation 100%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid   1291 Google Chrome He                   1.4 %
-[23:21:22] gpu job mm15_no_early_exit (<= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b15/logs/g1_64_no_early_exit.log
+[23:21:22] gpu job mm15_no_early_exit (<= 20 min) -> scratch/b15/logs/g1_64_no_early_exit.log
         raise RuntimeError("Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter "
     RuntimeError: Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter calls differ between its two passes (research_notes/MPM in main simulator/deterministic_ccd_divergence.md)
 [23:21:43] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[23:21:43] gpu job mm15_no_capture_reuse (<= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b15/logs/g1_64_no_capture_reuse.log
+[23:21:43] gpu job mm15_no_capture_reuse (<= 20 min) -> scratch/b15/logs/g1_64_no_capture_reuse.log
         raise RuntimeError("Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter "
     RuntimeError: Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter calls differ between its two passes (research_notes/MPM in main simulator/deterministic_ccd_divergence.md)
 [23:22:04] health: utilisation 24%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid  88333 python3.12                         3.2 %
   pid   1291 Google Chrome He                   1.7 %
-[23:22:04] gpu job mm15_no_icb (<= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b15/logs/g1_64_no_icb.log
+[23:22:04] gpu job mm15_no_icb (<= 20 min) -> scratch/b15/logs/g1_64_no_icb.log
         raise RuntimeError("Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter "
     RuntimeError: Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter calls differ between its two passes (research_notes/MPM in main simulator/deterministic_ccd_divergence.md)
 [23:22:25] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[23:22:25] gpu job mm15_no_early_exit_unfused (<= 20 min) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b15/logs/g1_64_no_early_exit_unfused.log
+[23:22:25] gpu job mm15_no_early_exit_unfused (<= 20 min) -> scratch/b15/logs/g1_64_no_early_exit_unfused.log
     Module metalsim.learn.warp_policy 00a83dd load on device 'metal:0' took 465.98 ms  (cached)
     {"scene": "g1_flat", "worlds": 64, "deterministic": 1, "build_s": 7.78279687500617, "num_envs": 64, "frames": 40, "mean_step_ms": 0.058550050000000006, "fps_isaac_style": 1093081.9017233972}
 [23:22:46] health: utilisation 72%

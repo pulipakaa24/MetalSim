@@ -1,7 +1,7 @@
 == Tue Oct 13 14:26:40 PDT 2026 batch_03 start
 installed warp 95f6f121b7e67025958335c7c15e338ac04a798a newton 3fd1f052a5ad031578960d9642aaaedc03834e4d
-/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/warp_new/warp/__init__.py True /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/newton_new/newton/__init__.py True
-/Users/aditya/robosim/upstream/warp-innate/warp/__init__.py None /Users/aditya/robosim/upstream/newton-metalsim-1.5.2/newton/__init__.py
+upstream/trees/warp_new/warp/__init__.py True upstream/trees/newton_new/newton/__init__.py True
+upstream/warp-innate/warp/__init__.py None upstream/newton-metalsim-1.5.2/newton/__init__.py
 test_mpm base exit 1: [gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.7 %
 test_mpm new exit 1: [gpu_run] gpu_top:   pid   1291 Google Chrome He                   2.7 %
 [gpu_run] cs_detdiag_base start: device utilisation 0% (14:30:56)
@@ -12,8 +12,8 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/kcache_base/1.18.0.dev20260917
-warp /Users/aditya/robosim/upstream/warp-innate/warp/__init__.py newton /Users/aditya/robosim/upstream/newton-metalsim-1.5.2/newton/__init__.py
+     runs/mpm/coupled_speed/kcache_base/1.18.0.dev20260917
+warp upstream/warp-innate/warp/__init__.py newton upstream/newton-metalsim-1.5.2/newton/__init__.py
 config.deterministic before: 0
   [before install] newton._src.solvers.coupled.solver_coupled: options.deterministic=0
   [before install] newton._src.solvers.coupled.solver_coupled_proxy: options.deterministic=0
@@ -39,8 +39,8 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/kcache_new/1.18.0.dev20260917
-warp /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/warp_new/warp/__init__.py newton /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/newton_new/newton/__init__.py
+     runs/mpm/coupled_speed/kcache_new/1.18.0.dev20260917
+warp upstream/trees/warp_new/warp/__init__.py newton upstream/trees/newton_new/newton/__init__.py
 config.deterministic before: 0
   [before install] newton._src.solvers.coupled.solver_coupled: options.deterministic=0
   [before install] newton._src.solvers.coupled.solver_coupled_proxy: options.deterministic=0

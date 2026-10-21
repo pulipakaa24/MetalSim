@@ -4,7 +4,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/scratch/wpcache_flex_cpu/1.18.0.dev20260917
+     scratch/wpcache_flex_cpu/1.18.0.dev20260917
 ........................................ss.............................. [  4%]
 .....................F.................................................. [  9%]
 .......................................................s.s.............. [ 14%]
@@ -31,9 +31,9 @@ E   AssertionError:
     Items are not equal:
      ACTUAL: np.int32(0)
      DESIRED: 4
-/Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/collision_driver_test.py:1015: AssertionError:
+upstream/mujoco_warp-flex/mujoco_warp/_src/collision_driver_test.py:1015: AssertionError:
 E   AssertionError: 1 != 0
-/Users/aditya/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/unittest/case.py:878: AssertionError: 1 != 0
+~/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/unittest/case.py:878: AssertionError: 1 != 0
 E   AssertionError: Lists differ: ['nq'[3040 chars]flex_elemorder', 'flex_shell', 'flex_vert', 'f[4804 chars]ace'] != ['nq'[3040 chars]flex_shell', 'flex_vert', 'flex_vert0', 'flex_[4804 chars]ace']
     
     First differing element 212:
@@ -529,30 +529,30 @@ E   AssertionError: Lists differ: ['nq'[3040 chars]flex_elemorder', 'flex_shell'
        'nflexface',
        'flex_face_map',
        'flex_face']
-/Users/aditya/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/unittest/case.py:715: AssertionError: Lists differ: ['nq'[3040 chars]flex_elemorder', 'flex_shell', 'flex_vert', 'f[4804 chars]ace'] != ['nq'[3040 chars]flex_shell', 'flex_vert', 'flex_vert0', 'flex_[4804 chars]ace']
+~/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/unittest/case.py:715: AssertionError: Lists differ: ['nq'[3040 chars]flex_elemorder', 'flex_shell', 'flex_vert', 'f[4804 chars]ace'] != ['nq'[3040 chars]flex_shell', 'flex_vert', 'flex_vert0', 'flex_[4804 chars]ace']
 =============================== warnings summary ===============================
 upstream/mujoco_warp-flex/mujoco_warp/_src/bvh_test.py: 7 warnings
 upstream/mujoco_warp-flex/mujoco_warp/_src/collision_driver_test.py: 1 warning
 upstream/mujoco_warp-flex/mujoco_warp/_src/render_test.py: 7 warnings
 upstream/mujoco_warp-flex/mujoco_warp/_src/render_util_test.py: 3 warnings
 upstream/mujoco_warp-flex/mujoco_warp/_src/sensor_test.py: 3 warnings
-  /Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/io.py:698: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
+  upstream/mujoco_warp-flex/mujoco_warp/_src/io.py:698: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
     warnings.warn(
 
 upstream/mujoco_warp-flex/mujoco_warp/_src/collision_driver_test.py::CollisionTest::test_hfield_collision0
 upstream/mujoco_warp-flex/mujoco_warp/_src/collision_driver_test.py::CollisionTest::test_hfield_maxconpair
-  /Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/io.py:698: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'BOX')]. At most 1 contact will be generated for these pairs.
+  upstream/mujoco_warp-flex/mujoco_warp/_src/io.py:698: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'BOX')]. At most 1 contact will be generated for these pairs.
     warnings.warn(
 
 upstream/mujoco_warp-flex/mujoco_warp/_src/collision_driver_test.py::CollisionTest::test_hfield_collision1
-  /Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/io.py:698: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  upstream/mujoco_warp-flex/mujoco_warp/_src/io.py:698: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
     warnings.warn(
 
 upstream/mujoco_warp-flex/mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp0
 upstream/mujoco_warp-flex/mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp1
 upstream/mujoco_warp-flex/mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp4
 upstream/mujoco_warp-flex/mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp5
-  /Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/io.py:334: UserWarning: Bending damping is not yet supported for interpolated flex shells.
+  upstream/mujoco_warp-flex/mujoco_warp/_src/io.py:334: UserWarning: Bending damping is not yet supported for interpolated flex shells.
     warnings.warn("Bending damping is not yet supported for interpolated flex shells.")
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html

@@ -7,40 +7,40 @@
 ............                                                             [100%]
 ==================================== ERRORS ====================================
 _ ERROR at setup of test_mujoco_fk_kernel_matches_mujoco_warp_d6_three_angular _
-file /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/newton-ht-mjw314/newton/tests/test_mujoco_fk_consistency.py, line 75
+file upstream/newton-ht-mjw314/newton/tests/test_mujoco_fk_consistency.py, line 75
   def test_mujoco_fk_kernel_matches_mujoco_warp_d6_three_angular(test, device):
 E       fixture 'test' not found
 >       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, testrun_uid, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, worker_id
 >       use 'pytest --fixtures [testpath]' for help on them.
 
-/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/newton-ht-mjw314/newton/tests/test_mujoco_fk_consistency.py:75
+upstream/newton-ht-mjw314/newton/tests/test_mujoco_fk_consistency.py:75
 =============================== warnings summary ===============================
 newton/tests/test_mujoco_solver.py::TestMuJoCoSolver::test_collision_coloring_uses_all_32_mujoco_mask_bits
-  /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/newton-ht-mjw314/newton/_src/solvers/mujoco/solver_mujoco.py:3813: RuntimeWarning: MuJoCo dependency version mismatch with Newton's declared requirements: mujoco==3.14.0 (requires ~=3.12.0); mujoco-warp==3.14.0 (requires ~=3.12.0). Reinstall Newton dependencies, for example `uv pip install -e ".[examples]"`.
+  upstream/newton-ht-mjw314/newton/_src/solvers/mujoco/solver_mujoco.py:3813: RuntimeWarning: MuJoCo dependency version mismatch with Newton's declared requirements: mujoco==3.14.0 (requires ~=3.12.0); mujoco-warp==3.14.0 (requires ~=3.12.0). Reinstall Newton dependencies, for example `uv pip install -e ".[examples]"`.
     mujoco, _ = self.import_mujoco()
 
 newton/tests/test_mujoco_solver.py::TestMuJoCoSolverGeomProperties::test_heterogeneous_per_shape_friction
-  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:371: UserWarning: geom 0: friction[0] (0.0) < MJ_MINMU (1e-05) with condim=3 may cause NaN
+  upstream/mujoco_warp/mujoco_warp/_src/io.py:371: UserWarning: geom 0: friction[0] (0.0) < MJ_MINMU (1e-05) with condim=3 may cause NaN
     warnings.warn(
 
 newton/tests/test_mujoco_solver.py::TestMuJoCoConversion::test_no_shapes_separate_worlds_false
-  /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/newton-ht-mjw314/newton/tests/test_mujoco_solver.py:6180: UserWarning: Inertia validation corrected 2 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  upstream/newton-ht-mjw314/newton/tests/test_mujoco_solver.py:6180: UserWarning: Inertia validation corrected 2 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
     model = builder.finalize()
 
 newton/tests/test_mujoco_solver.py::TestMuJoCoConversion::test_no_shapes_separate_worlds_true
-  /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/newton-ht-mjw314/newton/tests/test_mujoco_solver.py:6195: UserWarning: Inertia validation corrected 2 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  upstream/newton-ht-mjw314/newton/tests/test_mujoco_solver.py:6195: UserWarning: Inertia validation corrected 2 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
     model = builder.finalize()
 
 newton/tests/test_mujoco_solver.py::TestMuJoCoArticulationConversion::test_loop_joints_only
-  /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/newton-ht-mjw314/newton/tests/test_mujoco_solver.py:8344: UserWarning: Inertia validation corrected 12 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  upstream/newton-ht-mjw314/newton/tests/test_mujoco_solver.py:8344: UserWarning: Inertia validation corrected 12 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
     model = world_builder.finalize()
 
 newton/tests/test_mujoco_solver.py::TestMuJoCoArticulationConversion::test_mixed_loop_joints_and_equality_constraints
-  /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/newton-ht-mjw314/newton/tests/test_mujoco_solver.py:8406: UserWarning: Inertia validation corrected 12 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
+  upstream/newton-ht-mjw314/newton/tests/test_mujoco_solver.py:8406: UserWarning: Inertia validation corrected 12 bodies. Set validate_inertia_detailed=True for detailed per-body warnings.
     model = world_builder.finalize()
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
 =========================== short test summary info ============================
-ERROR ../../../Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/newton-ht-mjw314/newton/tests/test_mujoco_fk_consistency.py::test_mujoco_fk_kernel_matches_mujoco_warp_d6_three_angular
+ERROR ../../..upstream/newton-ht-mjw314/newton/tests/test_mujoco_fk_consistency.py::test_mujoco_fk_kernel_matches_mujoco_warp_d6_three_angular
 400 passed, 9 skipped, 6 warnings, 1 error, 106 subtests passed in 27.48s
 rc=1

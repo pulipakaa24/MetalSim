@@ -1,5 +1,5 @@
 == Fri Sep 25 21:32:14 PDT 2026
-holder: {"name": "il3_blowup_probe", "kind": "train", "minutes": 30.0, "pid": 28172, "start": 1790397134.0657449, "queued": 1790390548.5043857, "cmd": "runs/il3/run_blowup_probe.sh", "cwd": "/Users/aditya/robosim"}
+holder: {"name": "il3_blowup_probe", "kind": "train", "minutes": 30.0, "pid": 28172, "start": 1790397134.0657449, "queued": 1790390548.5043857, "cmd": "runs/il3/run_blowup_probe.sh", "cwd": "<repo>"}
   waiting [train] g1_flat_flatcfg_com est 50.0 min, queued 4073 s ago
   waiting [train] il3_cap_probe est 20.0 min, queued 4037 s ago
   waiting [train] il3_blowup_ab est 35.0 min, queued 2591 s ago
@@ -9,7 +9,7 @@ holder: {"name": "il3_blowup_probe", "kind": "train", "minutes": 30.0, "pid": 28
   waiting [low] cl_kamino est 45.0 min, queued 21445 s ago
   waiting [low] cl_mjw est 40.0 min, queued 21421 s ago
 -- rough isaaclab3_mixed_recommended_limits 21:32:14
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -17,7 +17,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 27.47 ms  (cached)
 Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 17.81 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ba4c21d4 ba4c21d load on device 'metal:0' took 20.15 ms  (cached)
@@ -281,7 +281,7 @@ Module metalsim.learn.g1_velocity 98312b6 load on device 'metal:0' took 21.90 ms
  "all_worlds_pushed_within_50_steps": 0.00537109375
 }
 -- rough isaaclab3_every_substep_cap20 21:35:22
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -289,7 +289,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 27.56 ms  (cached)
 Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 18.93 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ba4c21d4 ba4c21d load on device 'metal:0' took 20.61 ms  (cached)
@@ -360,7 +360,7 @@ Module metalsim.learn.g1_velocity 98312b6 load on device 'metal:0' took 22.21 ms
  "all_worlds_pushed_within_50_steps": 0.00439453125
 }
 -- rough isaaclab3_collide_every_substep 21:38:21
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -368,7 +368,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 27.09 ms  (cached)
 Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 17.75 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ba4c21d4 ba4c21d load on device 'metal:0' took 20.35 ms  (cached)
@@ -445,7 +445,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 26.84 ms  (cached)
 Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 17.97 ms  (cached)
 Module ccd_kernel_builder__locals__ccd_kernel_78310433 7831043 load on device 'metal:0' took 26.34 ms  (cached)
@@ -520,7 +520,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 27.85 ms  (cached)
 Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 18.74 ms  (cached)
 Module ccd_kernel_builder__locals__ccd_kernel_78310433 7831043 load on device 'metal:0' took 27.10 ms  (cached)

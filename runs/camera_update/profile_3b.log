@@ -5,10 +5,10 @@ E   AssertionError: cnn.conv.2.weight: rel max err 1.68e-04
     assert 0.00016790652072762722 <= 0.0001
 ----------------------------- Captured stderr call -----------------------------
 W0924 22:09:28.008000 62065 .venv/lib/python3.12/site-packages/torch/_inductor/utils.py:1806] [1/0] Not enough SMs to use max_autotune_gemm mode
-/Users/aditya/robosim/tests/test_camera_update_fast.py:60: AssertionError: cnn.conv.2.weight: rel max err 1.68e-04
+tests/test_camera_update_fast.py:60: AssertionError: cnn.conv.2.weight: rel max err 1.68e-04
 E   AssertionError: cnn.conv.2.weight: rel max err 1.68e-04
     assert 0.00016790652072762722 <= 0.0001
-/Users/aditya/robosim/tests/test_camera_update_fast.py:60: AssertionError: cnn.conv.2.weight: rel max err 1.68e-04
+tests/test_camera_update_fast.py:60: AssertionError: cnn.conv.2.weight: rel max err 1.68e-04
 =========================== short test summary info ============================
 FAILED tests/test_camera_update_fast.py::test_fast_update_matches_plain[0-True-100-False]
 FAILED tests/test_camera_update_fast.py::test_fast_update_matches_plain[0-True-100-True]

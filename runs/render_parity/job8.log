@@ -11,7 +11,7 @@ FAILED tests/test_render_tier2.py::test_cartpole_rgb_rollout_tier2 - NameErro...
 1 failed, 11 passed, 1 warning in 8.48s
 == batch cost (1024 envs, step incl. physics+render+reward)
     env = CartpoleRGBEnv(CartpoleRGBConfig(num_envs=n, render=render, tier=tier, spp=spp, max_bounces=max_bounces, render_mode=render_mode))
-  File "/Users/aditya/robosim/metalsim/render/tier2.py", line 335, in mujoco_scene_kwargs
+  File "metalsim/render/tier2.py", line 335, in mujoco_scene_kwargs
 tier 2 legacy spp 1: 33,538 env-steps/s = 30.5 ms per 1024-env step
 tier 2 legacy spp 4: 18,009 env-steps/s = 56.9 ms per 1024-env step
 == smoke training, same seed, legacy then physical

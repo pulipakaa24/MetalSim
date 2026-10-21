@@ -9,14 +9,14 @@ pyproject: 2 requirement(s) moved to 3.14
 [22:05:30] FORKS11 -> PASS metalsim-mjw314 1301e8da, metalsim-hashtable-metal-mjw314 9d6616c6
 [22:05:33] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[22:05:33] gpu job mm11_newton_nf (<= 45 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/newton-mjw314-git, PYTHONPATH=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/newton-mjw314-git) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b11/logs/newton_mujoco_metalsim.log
+[22:05:33] gpu job mm11_newton_nf (<= 45 min, cwd upstream/newton-mjw314-git, PYTHONPATH=upstream/newton-mjw314-git) -> scratch/b11/logs/newton_mujoco_metalsim.log
     =========================== short test summary info ============================
     ERROR newton/tests/test_mujoco_fk_consistency.py::test_mujoco_fk_kernel_matches_mujoco_warp_d6_three_angular
     400 passed, 9 skipped, 6 warnings, 1 error, 106 subtests passed in 165.05s (0:02:45)
 [22:08:30] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid    410 WindowServer                       1.2 %
-[22:08:30] gpu job mm11_newton_ht (<= 45 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/newton-ht-mjw314-git, PYTHONPATH=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/newton-ht-mjw314-git) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b11/logs/newton_mujoco_hashtable.log
+[22:08:30] gpu job mm11_newton_ht (<= 45 min, cwd upstream/newton-ht-mjw314-git, PYTHONPATH=upstream/newton-ht-mjw314-git) -> scratch/b11/logs/newton_mujoco_hashtable.log
     =========================== short test summary info ============================
     ERROR newton/tests/test_mujoco_fk_consistency.py::test_mujoco_fk_kernel_matches_mujoco_warp_d6_three_angular
     400 passed, 9 skipped, 6 warnings, 1 error, 106 subtests passed in 124.93s (0:02:04)
@@ -24,14 +24,14 @@ GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
   pid    410 WindowServer                       6.4 %
 [22:10:46] NEWTONTESTS11 -> PASS 400 passed, 9 skipped, 6 warnings, 1 error, 106 subtests passed in 165.05s (0:02:45);400 passed, 9 skipped, 6 warnings, 1 error, 106 subtests passed in 124.93s (0:02:04);
-[22:10:47] gpu job mm11_ms_before (<= 30 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-newton, PYTHONPATH=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-newton) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b11/logs/metalsim_newton_tests_before.log
+[22:10:47] gpu job mm11_ms_before (<= 30 min, cwd scratch/wt-newton, PYTHONPATH=scratch/wt-newton) -> scratch/b11/logs/metalsim_newton_tests_before.log
     SKIPPED [1] tests/test_g1_newton_engine.py:181: needs Isaac's g1_minimal.usd (scripts/fetch_isaac_assets.sh)
     SKIPPED [2] tests/test_g1_newton_engine.py:209: needs Isaac's g1_minimal.usd (scripts/fetch_isaac_assets.sh)
     20 passed, 11 skipped, 1 warning in 37.41s
 [22:11:33] health: utilisation 0%
 GPU (ioreg): device utilization 79 %; per-process GPU time over 1.9 s:
   pid  63252 python3.12                        26.4 %
-[22:11:33] gpu job mm11_ms_after (<= 30 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-newton, PYTHONPATH=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/newton-ht-mjw314-git:/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-newton) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b11/logs/metalsim_newton_tests_after.log
+[22:11:33] gpu job mm11_ms_after (<= 30 min, cwd scratch/wt-newton, PYTHONPATH=upstream/newton-ht-mjw314-git:scratch/wt-newton) -> scratch/b11/logs/metalsim_newton_tests_after.log
     SKIPPED [1] tests/test_g1_newton_engine.py:181: needs Isaac's g1_minimal.usd (scripts/fetch_isaac_assets.sh)
     SKIPPED [2] tests/test_g1_newton_engine.py:209: needs Isaac's g1_minimal.usd (scripts/fetch_isaac_assets.sh)
     22 passed, 9 skipped, 1 warning in 133.58s (0:02:13)
@@ -48,20 +48,20 @@ MSTESTS11 PASS 22:13:55 before: 20 passed, 11 skipped, 1 warning in 37.41s; afte
 [22:43:40] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 [22:43:43] FORKMOVE11 -> PASS 
-+ cd /Users/aditya/robosim
++ cd <repo>
 + git -C upstream/newton remote get-url origin
 + grep -q pulipakaa24/newton
 + git -C upstream/newton fetch -q origin metalsim
 + git -C upstream/newton merge -q --ff-only 1301e8da2002541f6f189b6e459e1ed5e6db5731
-+ /Users/aditya/robosim/.venv/bin/python -m pip install -q --no-deps --force-reinstall 'newton @ git+https://github.com/pulipakaa24/newton@9d6616c64ca018dd9119f67fca3316d715a26704'
++ .venv/bin/python -m pip install -q --no-deps --force-reinstall 'newton @ git+https://github.com/pulipakaa24/newton@9d6616c64ca018dd9119f67fca3316d715a26704'
 
 [notice] A new release of pip is available: 25.0.1 -> 26.2.1
-[notice] To update, run: /Users/aditya/robosim/.venv/bin/python -m pip install --upgrade pip
-+ /Users/aditya/robosim/.venv-newtonfork/bin/python -P -c 'import newton; print('\''newtonfork'\'', newton.__file__)'
-newtonfork /Users/aditya/robosim/upstream/newton/newton/__init__.py
-+ /Users/aditya/robosim/.venv/bin/python -P -c 'import newton; print('\''venv'\'', newton.__file__)'
-venv /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/__init__.py
-[22:43:57] SYNC11 -> FAIL see /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b11/logs/sync_newton.log
+[notice] To update, run: .venv/bin/python -m pip install --upgrade pip
++ .venv-newtonfork/bin/python -P -c 'import newton; print('\''newtonfork'\'', newton.__file__)'
+newtonfork upstream/newton/newton/__init__.py
++ .venv/bin/python -P -c 'import newton; print('\''venv'\'', newton.__file__)'
+venv .venv/lib/python3.12/site-packages/newton/__init__.py
+[22:43:57] SYNC11 -> FAIL see scratch/b11/logs/sync_newton.log
 === batch_11 start Tue Oct 13 23:18:58 PDT 2026 PIN_MOVE=1
 [23:19:01] health: utilisation 0%
 GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
@@ -73,7 +73,7 @@ edited README.md
 edited metalsim/physics/mpm/MPM.md
 edited CHANGELOG.md
 newton_docs: ok
-[23:19:03] gpu job mm11_ms_final (<= 30 min, cwd /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-newton, PYTHONPATH=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-newton) -> /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b11/logs/metalsim_newton_tests_final.log
+[23:19:03] gpu job mm11_ms_final (<= 30 min, cwd scratch/wt-newton, PYTHONPATH=scratch/wt-newton) -> scratch/b11/logs/metalsim_newton_tests_final.log
     
     -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
     31 passed, 2 warnings in 38.12s

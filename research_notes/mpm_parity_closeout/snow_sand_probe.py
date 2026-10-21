@@ -6,8 +6,8 @@ import numpy as np
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
 from mm_per_material import C  # noqa: E402
 
-F = "/Users/aditya/robosim/runs/parity/isaaclab3_mpm_floors/mpm_floors"
-FM = "/Users/aditya/robosim/.claude/worktrees/agent-ae8661f0d09092d4b/runs/mpm"
+F = "runs/parity/isaaclab3_mpm_floors/mpm_floors"
+FM = "runs/mpm"
 MET = sys.argv[1] if len(sys.argv) > 1 else FM + "/fm_off/F_multi_material"
 
 

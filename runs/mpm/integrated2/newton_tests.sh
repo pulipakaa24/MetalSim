@@ -1,9 +1,9 @@
 #!/bin/bash
 # Newton hashtable / contact tests on CPU + Metal: final Warp + fixed Newton 1.7 (.venv) and fork branch (.venv-newtonfork),
 # old Warp (.venv default, upstream/warp-innate) + stock / fixed Newton 1.7
-A=/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/runs/a2
-W=/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream
-R=/Users/aditya/robosim
+A=runs/a2
+W=upstream
+R=.
 NT="newton.tests.test_hashtable newton.tests.test_contact_matching newton.tests.test_contact_reduction_global newton.tests.test_contact_reduction"
 run() { local tag=$1 pp=$2 venv=$3 cwd=$4
   (cd $cwd && PYTHONDONTWRITEBYTECODE=1 WARP_CACHE_PATH=$A/kc/nt_$tag PYTHONPATH=$pp $R/$venv/bin/python $A/py/newton_tests.py $NT > $A/out/nt_$tag.log 2>&1)

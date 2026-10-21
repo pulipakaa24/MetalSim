@@ -1,7 +1,7 @@
 #!/bin/bash
 # A/B step profile (segment graphs, --reps 20): fork 1791414 vs 07a51a6, interleaved A B A B.
-cd /Users/aditya/robosim && source .venv/bin/activate
-B=/Users/aditya/robosim/upstream/mujoco_warp-07a51a6
+cd . && source .venv/bin/activate
+B=upstream/mujoco_warp-07a51a6
 run() {
   local lab=$1 pp=$2
   echo "--- $lab $(date +%H:%M:%S) power: $(pmset -g batt | head -1 | tr -d '\n')"

@@ -4,7 +4,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module newton._src.geometry.bvh 63dae3d load on device 'metal:0' took 42.81 ms  (cached)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_model 732473e load on device 'metal:0' took 39.58 ms  (cached)
 Module warp.fem.geometry.nanogrid 0e251bd load on device 'metal:0' took 44.93 ms  (cached)
@@ -62,4 +62,4 @@ Module scatter_field_dof_values_65949dbe f8a775d load on device 'metal:0' took 3
 Module warp.fem.integrate._identity_field_003441ce 88a5cd2 load on device 'metal:0' took 43.88 ms  (cached)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.update_particle_strains_7a56e7b2 b1b2b11 load on device 'metal:0' took 843.26 ms  (cached)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_789a04ef 1a11090 load on device 'metal:0' took 571.70 ms  (cached)
-{"scene": "example:mpm_multi_material", "set": {}, "frames": 60, "warmup": 5, "ms_median": 51.19135449967871, "ms_mean": 49.49008113332335, "ms_p10": 47.00997530071618, "ms_p90": 52.54301249879063, "per_frame_counters": {"host_waits": 6.0, "command_buffers": 23.166666666666668, "host_ops": 0.0, "dispatches_encoded": 3339.0}, "warp": "/Users/aditya/robosim/.claude/worktrees/agent-a28868bb53d94facc/upstream/warp-base2/warp/__init__.py", "compat": {"accumulate": "float32", "loop": "cuda", "chunk_graph": true, "fused": false, "fused_max_color_blocks": 1073741824, "simd": false, "gpu_exit": true, "rigid_deterministic": true, "metal_fast_math": "off"}}
+{"scene": "example:mpm_multi_material", "set": {}, "frames": 60, "warmup": 5, "ms_median": 51.19135449967871, "ms_mean": 49.49008113332335, "ms_p10": 47.00997530071618, "ms_p90": 52.54301249879063, "per_frame_counters": {"host_waits": 6.0, "command_buffers": 23.166666666666668, "host_ops": 0.0, "dispatches_encoded": 3339.0}, "warp": "upstream/warp-base2/warp/__init__.py", "compat": {"accumulate": "float32", "loop": "cuda", "chunk_graph": true, "fused": false, "fused_max_color_blocks": 1073741824, "simd": false, "gpu_exit": true, "rigid_deterministic": true, "metal_fast_math": "off"}}

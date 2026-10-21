@@ -1,8 +1,8 @@
 #!/bin/bash
 # HashTable race in the rough G1 Newton-engine task (old Warp = .venv's upstream/warp-innate; stock vs fixed Newton 1.7)
-A=/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/runs/a2
-W=/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream
-R=/Users/aditya/robosim
+A=runs/a2
+W=upstream
+R=.
 O=$A/out/ht; mkdir -p $O
 cd $R
 P=$A/py/ht_probe.py; PY=$R/.venv/bin/python

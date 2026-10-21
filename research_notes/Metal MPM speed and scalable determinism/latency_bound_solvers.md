@@ -2,7 +2,7 @@
 
 Scope: techniques for an implicit MPM in the style of Newton/Warp `SolverImplicitMPM` (sparse grid, P2G/G2P, colored Gauss-Seidel rheology solve, convergence check every 5 iterations, mesh/SDF colliders), targeting Apple Metal. For each technique: reported speedup, the hardware it was measured on, whether it applies to Metal, and whether it keeps results bitwise identical.
 
-Primary-source reading done for this note: Newton source (local checkout `/Users/aditya/robosim/upstream/newton-pr-review3`, commit 5a11beef, 2026-09-26), full text of Gao et al. 2018, Wang et al. 2020, Fei et al. 2021, Vivace 2016 and AsyncTaichi 2020 (PDFs extracted locally). Everything else comes from abstracts or search snippets, and is marked as such where it matters.
+Primary-source reading done for this note: Newton source (local checkout `upstream/newton-pr-review3`, commit 5a11beef, 2026-09-26), full text of Gao et al. 2018, Wang et al. 2020, Fei et al. 2021, Vivace 2016 and AsyncTaichi 2020 (PDFs extracted locally). Everything else comes from abstracts or search snippets, and is marked as such where it matters.
 
 ## Q1. Fusing colored Gauss-Seidel sweeps (persistent / single-dispatch solvers, block-local coloring, on-chip GS, grid-wide barriers without cooperative launch)
 

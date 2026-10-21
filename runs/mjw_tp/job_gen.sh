@@ -1,8 +1,8 @@
 #!/bin/bash
 # Generality check (task D): the G1 fast paths on Go2 (competitor protocol, both cones), SO-101 lift and Panda (their own
 # BatchSimOptions, both cones), 4096 worlds, with the eager per-kernel attribution. Installed fork (shared checkout).
-cd /Users/aditya/robosim && source .venv/bin/activate
-export MENAGERIE=/Users/aditya/robosim/upstream/mujoco_menagerie
+cd . && source .venv/bin/activate
+export MENAGERIE=upstream/mujoco_menagerie
 D=scripts/diagnostics/competitors
 echo "=== start $(date) mjw $(git -C upstream/mujoco_warp rev-parse --short HEAD) warp $(git -C upstream/warp-innate rev-parse --short HEAD) power: $(pmset -g batt | head -1)"
 python3 scripts/gpu_lock.py status

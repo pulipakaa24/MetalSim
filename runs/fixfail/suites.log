@@ -1,5 +1,5 @@
-.venv warp 95f6f121 1.18.0.dev20260917 newton 1b06a79d mjw cf0f8ad mujoco 3.14.0 metalsim /Users/aditya/robosim/.claude/worktrees/agent-ad5dbe3dae8c8990c/metalsim/__init__.py
-.venv-newton152 warp 95f6f121 1.18.0.dev20260917 newton 3fd1f052 mjw 1b06a79d mujoco 3.11.0 metalsim /Users/aditya/robosim/.claude/worktrees/agent-ad5dbe3dae8c8990c/metalsim/__init__.py
+.venv warp 95f6f121 1.18.0.dev20260917 newton 1b06a79d mjw cf0f8ad mujoco 3.14.0 metalsim metalsim/__init__.py
+.venv-newton152 warp 95f6f121 1.18.0.dev20260917 newton 3fd1f052 mjw 1b06a79d mujoco 3.11.0 metalsim metalsim/__init__.py
 ##### RIGID SUITE (.venv)
 ........................................................................ [ 17%]
 .............................................................s.sss...... [ 35%]
@@ -9,11 +9,11 @@
 .........................................                                [100%]
 =============================== warnings summary ===============================
 tests/test_g1_newton_engine.py::test_graph_replay_matches_eager
-  /Users/aditya/robosim/.claude/worktrees/agent-ad5dbe3dae8c8990c/metalsim/learn/g1_velocity.py:982: RuntimeWarning: Mean of empty slice
+  metalsim/learn/g1_velocity.py:982: RuntimeWarning: Mean of empty slice
     return {"num_envs": n, "frames": num_frames, "mean_step_ms": t_ns.mean() / 1e6, "fps_isaac_style": n / (t_ns.mean() / 1e9)}
 
 tests/test_g1_newton_engine.py::test_graph_replay_matches_eager
-  /Users/aditya/robosim/.venv/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+  .venv/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
     ret = ret.dtype.type(ret / rcount)
 
 tests/test_g1_task_terms.py::test_rough_terrain_seed_and_isaac_env_assignment
@@ -25,16 +25,16 @@ tests/test_terrain.py::test_hfield_mesh_contacts_match_mujoco_c
 tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[boxes]
 tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[meshes]
 tests/test_terrain.py::test_step_edge_contacts_match_mujoco_c[boxes_local]
-  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
     warnings.warn(
 
 tests/test_newton_bridge_poses.py::test_solver_mujoco_state_posed_like_mujoco
-  /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/_src/solvers/mujoco/solver_mujoco.py:3813: RuntimeWarning: MuJoCo dependency version mismatch with Newton's declared requirements: mujoco==3.14.0 (requires ~=3.12.0); mujoco-warp==3.14.0 (requires ~=3.12.0). Reinstall Newton dependencies, for example `uv pip install -e ".[examples]"`.
+  .venv/lib/python3.12/site-packages/newton/_src/solvers/mujoco/solver_mujoco.py:3813: RuntimeWarning: MuJoCo dependency version mismatch with Newton's declared requirements: mujoco==3.14.0 (requires ~=3.12.0); mujoco-warp==3.14.0 (requires ~=3.12.0). Reinstall Newton dependencies, for example `uv pip install -e ".[examples]"`.
     mujoco, _ = self.import_mujoco()
 
 tests/test_render_tier2.py::test_gpu_path_from_batchsim_matches_host
 tests/test_sensors_rt.py::test_gpu_path_ordering_with_sim
-  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
+  upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
     warnings.warn(
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
@@ -46,7 +46,7 @@ metalsim/render/tier0.py:22: in <module>
     import Metal
 E   ModuleNotFoundError: No module named 'Metal'
 _________________ ERROR collecting tests/test_render_world.py __________________
-ImportError while importing test module '/Users/aditya/robosim/.claude/worktrees/agent-ad5dbe3dae8c8990c/tests/test_render_world.py'.
+ImportError while importing test module 'tests/test_render_world.py'.
 Hint: make sure your test modules/packages have valid Python names.
 Traceback:
 ../../../../.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/importlib/__init__.py:90: in import_module

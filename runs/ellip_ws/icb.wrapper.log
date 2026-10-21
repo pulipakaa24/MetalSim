@@ -40,19 +40,19 @@ Traceback (most recent call last):
   File "<frozen runpy>", line 88, in _run_code
   File "scripts/diagnostics/g1_tp_check.py", line 140, in <module>
   File "scripts/diagnostics/g1_tp_check.py", line 43, in make
-  File "/Users/aditya/robosim/metalsim/learn/g1_velocity.py", line 666, in __init__
-  File "/Users/aditya/robosim/metalsim/physics/batch.py", line 165, in __init__
-  File "/Users/aditya/robosim/metalsim/physics/batch.py", line 179, in _capture
-  File "/Users/aditya/robosim/metalsim/physics/batch.py", line 190, in _launch_substeps
-  File "/Users/aditya/robosim/upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/warp_util.py", line 123, in wrapper
-  File "/Users/aditya/robosim/upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/forward.py", line 1843, in step
-  File "/Users/aditya/robosim/upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/warp_util.py", line 123, in wrapper
-  File "/Users/aditya/robosim/upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/forward.py", line 1834, in forward
-  File "/Users/aditya/robosim/upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/warp_util.py", line 123, in wrapper
-  File "/Users/aditya/robosim/upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/solver.py", line 5150, in solve
-  File "/Users/aditya/robosim/upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/solver.py", line 5177, in _solve
-  File "/Users/aditya/robosim/upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/solver.py", line 5166, in _icb_early_exit_ranges
-  File "/Users/aditya/robosim/upstream/warp-innate-ellip-test/warp/__init__.py", line 633, in __getattr__
+  File "metalsim/learn/g1_velocity.py", line 666, in __init__
+  File "metalsim/physics/batch.py", line 165, in __init__
+  File "metalsim/physics/batch.py", line 179, in _capture
+  File "metalsim/physics/batch.py", line 190, in _launch_substeps
+  File "upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/forward.py", line 1843, in step
+  File "upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/forward.py", line 1834, in forward
+  File "upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/solver.py", line 5150, in solve
+  File "upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/solver.py", line 5177, in _solve
+  File "upstream/mujoco_warp-ellip-test4/mujoco_warp/_src/solver.py", line 5166, in _icb_early_exit_ranges
+  File "upstream/warp-innate-ellip-test/warp/__init__.py", line 633, in __getattr__
 AttributeError: module 'warp' has no attribute 'context'. Did you mean: 'constant'?
 --- (c) itercost early exit 0 11:51:51
 state: nefc mean 6.2 max 27, nacon 1.68 per world

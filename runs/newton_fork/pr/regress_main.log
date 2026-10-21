@@ -2599,7 +2599,7 @@ ERROR: test_solver_xpbd_joints (unittest.loader._FailedTest.test_solver_xpbd_joi
 ----------------------------------------------------------------------
 ImportError: Failed to import test module: test_solver_xpbd_joints
 Traceback (most recent call last):
-  File "/Users/aditya/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/unittest/loader.py", line 137, in loadTestsFromName
+  File "~/.local/share/uv/python/cpython-3.12.14-macos-aarch64-none/lib/python3.12/unittest/loader.py", line 137, in loadTestsFromName
     module = __import__(module_name)
              ^^^^^^^^^^^^^^^^^^^^^^^
 ModuleNotFoundError: No module named 'newton.tests.test_solver_xpbd_joints'
@@ -2614,7 +2614,7 @@ Warp 1.17.0 initialized:
    Devices:
      "cpu"      : "arm"
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.17.0
+     ~/Library/Caches/warp/1.17.0
 Module validate_and_correct_inertia_kernel_1ff2ac62 6ad45b8 load on device 'cpu' took 0.67 ms  (cached)
 Module newton._src.geometry.bvh 4a1c07f load on device 'cpu' took 0.26 ms  (cached)
 Module newton._src.solvers.solver 5e8bff5 load on device 'cpu' took 0.25 ms  (cached)

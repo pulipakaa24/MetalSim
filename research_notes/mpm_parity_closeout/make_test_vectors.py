@@ -2,10 +2,10 @@
 library's function differs from CUDA's (plus special values), with the L4's result bits."""
 import numpy as np
 
-W = "/Users/aditya/robosim/.claude/worktrees/agent-a8a12903da01bb68c/runs/mpm/closeout"
+W = "runs/mpm/closeout"
 rng = np.random.default_rng(7)
 for fn in ["log", "exp", "sinh"]:
-    c = np.load(f"/Users/aditya/robosim/.claude/worktrees/agent-a8a12903da01bb68c/runs/parity/isaaclab3_mpm_closeout/libm_cuda/{fn}.npz")
+    c = np.load(f"runs/parity/isaaclab3_mpm_closeout/libm_cuda/{fn}.npz")
     m = np.load(f"{W}/libm_metal_orig/{fn}.npz")
     x, yc, ym = c["sample_x"], c["sample_y"], m["sample_y"]
     xf = x.view(np.float32)

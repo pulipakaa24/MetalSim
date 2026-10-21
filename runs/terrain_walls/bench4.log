@@ -2,7 +2,7 @@ holder: {"name": "terrain_walls_bench4", "kind": "timing", "minutes": 12.0, "pid
   waiting [render] terrain_walls_diag est 15.0 min, queued 648 s ago
   waiting [low] flex_metal_run2 est 30.0 min, queued 1579 s ago
   waiting [low] mjw_tp_round4 est 30.0 min, queued 1171 s ago
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -10,7 +10,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth eb51811 load on device 'metal:0' took 25.44 ms  (cached)
 Module _nxn_broadphase__locals__kernel_8b16c4cc 8b16c4c load on device 'metal:0' took 521.28 ms  (compiled)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ed246d84 ed246d8 load on device 'metal:0' took 19.50 ms  (cached)
@@ -62,7 +62,7 @@ live Warp arrays on metal:0: 0.58 GB; largest [(201326592, (4096, 256, 48), 'flo
 Module metalsim.learn.g1_velocity e800725 load on device 'metal:0' took 23.18 ms  (cached)
 Module metalsim.learn.warp_policy fa269a9 load on device 'metal:0' took 18.81 ms  (cached)
 {"mode": "boxes_local", "n": 4096, "physics_dt": 0.0025, "ngeom": 100, "hfield_samples": 2403201, "setup_s": 4.7, "env_steps_per_s": [28074, 28062, 28054], "best": 28074, "nacon_end": 11563, "naconmax": 524288, "box_window_overflow": [0, 50]}
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -70,7 +70,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth eb51811 load on device 'metal:0' took 28.14 ms  (cached)
 Module _nxn_broadphase__locals__kernel_738cc90c 738cc90 load on device 'metal:0' took 18.16 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ed246d84 ed246d8 load on device 'metal:0' took 20.10 ms  (cached)
@@ -121,7 +121,7 @@ Module metalsim.learn.g1_velocity e800725 load on device 'metal:0' took 23.09 ms
 Module metalsim.learn.warp_policy fa269a9 load on device 'metal:0' took 18.37 ms  (cached)
 Module metalsim.learn.terrain 0a20172 load on device 'metal:0' took 18.68 ms  (cached)
 {"mode": "hfield", "n": 4096, "physics_dt": 0.0025, "ngeom": 4, "hfield_samples": 2403201, "setup_s": 2.9, "env_steps_per_s": [30040, 30015, 29991], "best": 30040, "nacon_end": 11478, "naconmax": 131072, "box_window_overflow": null}
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -129,7 +129,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth eb51811 load on device 'metal:0' took 27.73 ms  (cached)
 Module _nxn_broadphase__locals__kernel_8b16c4cc 8b16c4c load on device 'metal:0' took 18.56 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ed246d84 ed246d8 load on device 'metal:0' took 20.40 ms  (cached)
@@ -181,7 +181,7 @@ live Warp arrays on metal:0: 0.63 GB; largest [(201326592, (4096, 256, 48), 'flo
 Module metalsim.learn.g1_velocity e800725 load on device 'metal:0' took 24.12 ms  (cached)
 Module metalsim.learn.warp_policy fa269a9 load on device 'metal:0' took 19.82 ms  (cached)
 {"mode": "boxes_local+exact", "n": 4096, "physics_dt": 0.0025, "ngeom": 100, "hfield_samples": 2403201, "setup_s": 4.3, "env_steps_per_s": [28079, 28089, 28116], "best": 28116, "nacon_end": 11684, "naconmax": 524288, "box_window_overflow": [0, 50]}
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -189,7 +189,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth eb51811 load on device 'metal:0' took 27.68 ms  (cached)
 Module _nxn_broadphase__locals__kernel_738cc90c 738cc90 load on device 'metal:0' took 19.48 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_ed246d84 ed246d8 load on device 'metal:0' took 19.89 ms  (cached)
@@ -238,18 +238,18 @@ Module reset_data__locals__reset_nworld_4a90e5af 4a90e5a load on device 'metal:0
 Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
 Module metalsim.sensors.contact 1eab3a3 load on device 'metal:0' took 20.73 ms  (cached)
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/scripts/diagnostics/terrain_walls_bench.py", line 55, in <module>
+  File "scripts/diagnostics/terrain_walls_bench.py", line 55, in <module>
     one(sys.argv[2], int(sys.argv[3]), float(sys.argv[4]), sys.argv[5]); sys.exit(0)
     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/scripts/diagnostics/terrain_walls_bench.py", line 30, in one
+  File "scripts/diagnostics/terrain_walls_bench.py", line 30, in one
     task = G1VelocityTask(n, terrain="rough", seed=0, physics_dt=physics_dt, reward_cfg="rough_isaac", terrain_collision=coll,
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/learn/g1_velocity.py", line 651, in __init__
+  File "metalsim/learn/g1_velocity.py", line 651, in __init__
     self.sim.synchronize()
-  File "/Users/aditya/robosim/metalsim/physics/batch.py", line 224, in synchronize
+  File "metalsim/physics/batch.py", line 224, in synchronize
     wp.synchronize_device(self.device)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12891, in synchronize_device
+  File "upstream/warp-innate/warp/_src/context.py", line 12891, in synchronize_device
     device.metal_synchronize()
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 6066, in metal_synchronize
+  File "upstream/warp-innate/warp/_src/context.py", line 6066, in metal_synchronize
     raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
 RuntimeError: Metal error on device metal:0: Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)

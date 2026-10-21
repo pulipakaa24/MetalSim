@@ -3,49 +3,49 @@ Traceback (most recent call last):
   File "/private/tmp/claude-501/-Users-aditya/7ceab845-25d9-459e-a466-a4b793f72f5c/scratchpad/equiv.py", line 14, in <module>
     r = _plain_loss(cpu, *args64); g64 = torch.autograd.grad(r, list(cpu.net.parameters()), allow_unused=True)
         ^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/tests/test_camera_update_fast.py", line 24, in _plain_loss
+  File "tests/test_camera_update_fast.py", line 24, in _plain_loss
     mean, v = ppo.net(img, q, nchw=True)
               ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
+  File ".venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
     return self._call_impl(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1794, in _call_impl
+  File ".venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1794, in _call_impl
     return forward_call(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/learn/ppo.py", line 143, in forward
+  File "metalsim/learn/ppo.py", line 143, in forward
     h = self.features(image_u8, qpos, nchw)
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/learn/ppo.py", line 137, in features
+  File "metalsim/learn/ppo.py", line 137, in features
     f = self.cnn(x)
         ^^^^^^^^^^^
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
+  File ".venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
     return self._call_impl(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1794, in _call_impl
+  File ".venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1794, in _call_impl
     return forward_call(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/learn/ppo.py", line 69, in forward
+  File "metalsim/learn/ppo.py", line 69, in forward
     return self.fc(self.conv(x))
                    ^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
+  File ".venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
     return self._call_impl(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1794, in _call_impl
+  File ".venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1794, in _call_impl
     return forward_call(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/modules/container.py", line 259, in forward
+  File ".venv/lib/python3.12/site-packages/torch/nn/modules/container.py", line 259, in forward
     input = module(input)
             ^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
+  File ".venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1783, in _wrapped_call_impl
     return self._call_impl(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1794, in _call_impl
+  File ".venv/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1794, in _call_impl
     return forward_call(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/modules/conv.py", line 565, in forward
+  File ".venv/lib/python3.12/site-packages/torch/nn/modules/conv.py", line 565, in forward
     return self._conv_forward(input, self.weight, self.bias)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/modules/conv.py", line 560, in _conv_forward
+  File ".venv/lib/python3.12/site-packages/torch/nn/modules/conv.py", line 560, in _conv_forward
     return F.conv2d(
            ^^^^^^^^^
 RuntimeError: Input type (float) and bias type (double) should be the same
@@ -72,25 +72,25 @@ gpu_lock status: holder: {"name": "camera_update_3c", "kind": "timing", "minutes
 param count 2731683
 clip_grad_norm_ alone                                median     4.13 ms  min     4.09 ms  -> x128 =   0.53 s/update  (implied  33,983 env-steps/s)
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/scripts/diagnostics/camera_update_profile.py", line 548, in main
+  File "scripts/diagnostics/camera_update_profile.py", line 548, in main
     globals()[f"part_{p}"](args)
-  File "/Users/aditya/robosim/scripts/diagnostics/camera_update_profile.py", line 392, in part_optvar
+  File "scripts/diagnostics/camera_update_profile.py", line 392, in part_optvar
     m = timeit(lambda: torch.nn.utils.clip_grad_norm_(params, 1.0, foreach=True), 20); row("clip_grad_norm_ foreach=True", *m, 128 * m[0])
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/scripts/diagnostics/camera_update_profile.py", line 63, in timeit
+  File "scripts/diagnostics/camera_update_profile.py", line 63, in timeit
     fn()
-  File "/Users/aditya/robosim/scripts/diagnostics/camera_update_profile.py", line 392, in <lambda>
+  File "scripts/diagnostics/camera_update_profile.py", line 392, in <lambda>
     m = timeit(lambda: torch.nn.utils.clip_grad_norm_(params, 1.0, foreach=True), 20); row("clip_grad_norm_ foreach=True", *m, 128 * m[0])
                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/utils/clip_grad.py", line 41, in _no_grad_wrapper
+  File ".venv/lib/python3.12/site-packages/torch/nn/utils/clip_grad.py", line 41, in _no_grad_wrapper
     return func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/utils/clip_grad.py", line 230, in clip_grad_norm_
+  File ".venv/lib/python3.12/site-packages/torch/nn/utils/clip_grad.py", line 230, in clip_grad_norm_
     total_norm = _get_total_norm(grads, norm_type, error_if_nonfinite, foreach)
                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/utils/clip_grad.py", line 41, in _no_grad_wrapper
+  File ".venv/lib/python3.12/site-packages/torch/nn/utils/clip_grad.py", line 41, in _no_grad_wrapper
     return func(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.venv/lib/python3.12/site-packages/torch/nn/utils/clip_grad.py", line 97, in _get_total_norm
+  File ".venv/lib/python3.12/site-packages/torch/nn/utils/clip_grad.py", line 97, in _get_total_norm
     raise RuntimeError(
 RuntimeError: foreach=True was passed, but can't use the foreach API on mps tensors

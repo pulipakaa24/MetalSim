@@ -1,6 +1,6 @@
 #!/bin/bash
 # round 8: profile after step 4, dispatch-cost calibration, MetalSim test suite, 20-iteration probe of steps 3 and 4
-cd /Users/aditya/robosim && source .venv/bin/activate
+cd . && source .venv/bin/activate
 {
 echo "=== start $(date) power: $(pmset -g batt | head -1)"; python3 scripts/gpu_lock.py status
 echo "=== dispatch cost"

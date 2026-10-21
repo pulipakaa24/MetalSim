@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /Users/aditya/robosim
+cd .
 python3 scripts/gpu_lock.py status
 for SRC in upstream/newton-1.5.2 upstream/newton; do
   echo "=== $SRC tile on"

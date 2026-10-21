@@ -18,10 +18,10 @@ metalsim/render/denoise.py:110: RuntimeError
 1 failed, 7 deselected in 0.81s
     self._oidn = OIDNDenoiser(c.queue, n, width, height, (av["hdr"].buffer, av["hdr"].offset), (av["hdr_out"].buffer, av["hdr_out"].offset),
                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/render/denoise.py", line 103, in __init__
+  File "metalsim/render/denoise.py", line 103, in __init__
     L.oidnCommitFilter(f); self._check()
                            ^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/render/denoise.py", line 110, in _check
+  File "metalsim/render/denoise.py", line 110, in _check
     raise RuntimeError(f"OIDN error {err}: {msg.value.decode() if msg.value else ''}")
 RuntimeError: OIDN error 3: unsupported input image format
 holder: {"name": "rtx_parity_steps", "kind": "render", "minutes": 50.0, "pid": 38796, "start": 1790342126.006743}
@@ -41,7 +41,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 [rtx_parity] 4/110 79 ms/frame
 [rtx_parity] 8/110 77 ms/frame
 [rtx_parity] 12/110 80 ms/frame
@@ -120,7 +120,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 [rtx_parity] 4/22 76 ms/frame
 [rtx_parity] 8/22 70 ms/frame
 [rtx_parity] 12/22 68 ms/frame
@@ -177,7 +177,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 [rtx_parity] 4/110 80 ms/frame
 [rtx_parity] 8/110 79 ms/frame
 [rtx_parity] 12/110 84 ms/frame
@@ -214,4 +214,4 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917

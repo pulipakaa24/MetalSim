@@ -215,7 +215,7 @@ saturates the GPU alone (0.48 vs 0.46 ms/M at 16.8M for V6); 10K–50K-particle 
   ms/M), so one dispatch of about 0.25M particles fills most of the 40-core GPU.
 - Local context, measured in this repo on this machine: launch-count reduction paid off on Metal. Fusing 5 of 9 launches
   per solver iteration gave +3.9% env-steps/s for the 4096-env MuJoCo Warp fork. A SIMD-group sum of per-lane partials
-  replaced atomic adds there. — `/Users/aditya/robosim/docs/research/throughput_2026-09-26.md` §2c
+  replaced atomic adds there. — `docs/research/throughput_2026-09-26.md` §2c
 
 ### Inferences
 - Batched layout (recommended):
@@ -270,7 +270,7 @@ at about 1.04× slowdown (CUDA), but it is a memory optimization, not a speed on
 - Determinism recipe:
   - Fixed-point int32 grid accumulation with per-channel scale.
   - Deterministic stable sort: the repo's splat sort is already bit-identical and stable
-    (`/Users/aditya/robosim/metalsim/render/SPLAT.md` "Determinism").
+    (`metalsim/render/SPLAT.md` "Determinism").
   - No float atomics anywhere else (SIMD-group reductions have a fixed order).
   - G2P and particle updates are gathers, so they are deterministic already.
   - Result: bitwise-reproducible MPM steps at no speed cost (measured for P2G).
@@ -327,7 +327,7 @@ On the M4 Max:
   - The non-atomic floor of the same kernel is about 630 G/s, so device atomics cost about 13× the non-atomic RMW.
   - For comparison (different workload and hardware): Gao 2018 measured atomic-only P2G at 23× slower than their optimized
     P2G on TITAN Xp. On the M4 Max the optimized-vs-naive ratio is 5.7–8.7× (V1 vs V3/V6/V7).
-- Sort on this M4 Max, measured in-repo (`/Users/aditya/robosim/metalsim/render/SPLAT.md` §5):
+- Sort on this M4 Max, measured in-repo (`metalsim/render/SPLAT.md` §5):
   - Stable 8-bit LSD radix sort, 5 passes, 32-bit keys + 32-bit values, simd-ballot multisplit ranking.
   - 20.9M keys in 6.79 ms (≈3.1 Gkeys/s); 133.9M keys in 46.47 ms (≈2.9 Gkeys/s); 11.4M keys in 3.7 ms (≈3.1 Gkeys/s);
     0.44M keys in 0.2 ms (≈2.2 Gkeys/s, launch-bound).

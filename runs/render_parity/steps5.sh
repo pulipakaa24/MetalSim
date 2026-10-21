@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /Users/aditya/robosim
+cd .
 python3 scripts/gpu_lock.py status
 for P in tonemap_fvg tonemap_cal_fvg atrous_cal_fvg oidn_cal_fvg; do
   for K in rt pt; do

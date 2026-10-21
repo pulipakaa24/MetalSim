@@ -9,7 +9,7 @@ ________________________ test_environment_has_the_forks ________________________
             pytest.skip("stock Newton 1.5.2 environment (METALSIM_NEWTON152_STOCK=1)")
 >       assert FORK_NEWTON, (f"{newton.__file__} is stock Newton 1.5.2, not the fork's metalsim-1.5.2 branch: "
                              "run scripts/setup_newton152.sh (or set METALSIM_NEWTON152_STOCK=1 for a stock environment)")
-E       AssertionError: /Users/aditya/robosim/upstream/newton-1.5.2/newton/__init__.py is stock Newton 1.5.2, not the fork's metalsim-1.5.2 branch: run scripts/setup_newton152.sh (or set METALSIM_NEWTON152_STOCK=1 for a stock environment)
+E       AssertionError: upstream/newton-1.5.2/newton/__init__.py is stock Newton 1.5.2, not the fork's metalsim-1.5.2 branch: run scripts/setup_newton152.sh (or set METALSIM_NEWTON152_STOCK=1 for a stock environment)
 E       assert False
 
 tests/test_mpm.py:184: AssertionError

@@ -4,7 +4,7 @@
 === start Sun Oct 11 06:12:54 PDT 2026 power: Now drawing from 'AC Power'
 === warm done 06:15:14
 --- I1 flat 06:15:14
-WARP /Users/aditya/robosim/upstream/warp-innate-integrated/warp/__init__.py
+WARP upstream/warp-innate-integrated/warp/__init__.py
 [I1_flat] N=4096 njmax 112 naconmax 98304 is_sparse False
 [I1_flat] physics only 54.3 ms/step -> 75,366 env-steps/s
 [I1_flat] full env step 143.8 ms -> 28,493 env-steps/s
@@ -13,7 +13,7 @@ WARP /Users/aditya/robosim/upstream/warp-innate-integrated/warp/__init__.py
 [I1_flat] PPO update 146 ms -> full loop 28,801 env-steps/s
 [I1_flat] SUMMARY physics 75,366 | step 28,493 | rollout 30,089 | loop 28,801  (ms: physics 54.3, step 143.8, rollout/step 136.1, update 146)
 --- C1 flat 06:16:18
-WARP /Users/aditya/robosim/upstream/warp-innate-ordered/warp/__init__.py
+WARP upstream/warp-innate-ordered/warp/__init__.py
 [C1_flat] N=4096 njmax 112 naconmax 98304 is_sparse False
 [C1_flat] physics only 47.5 ms/step -> 86,305 env-steps/s
 [C1_flat] full env step 95.1 ms -> 43,068 env-steps/s
@@ -22,7 +22,7 @@ WARP /Users/aditya/robosim/upstream/warp-innate-ordered/warp/__init__.py
 [C1_flat] PPO update 143 ms -> full loop 37,817 env-steps/s
 [C1_flat] SUMMARY physics 86,305 | step 43,068 | rollout 40,018 | loop 37,817  (ms: physics 47.5, step 95.1, rollout/step 102.4, update 143)
 --- I1 rough 06:16:52
-WARP /Users/aditya/robosim/upstream/warp-innate-integrated/warp/__init__.py
+WARP upstream/warp-innate-integrated/warp/__init__.py
 [I1_rough] N=4096 njmax 256 naconmax 524288 is_sparse False
 [I1_rough] physics only 100.4 ms/step -> 40,794 env-steps/s
 [I1_rough] full env step 164.1 ms -> 24,957 env-steps/s
@@ -31,7 +31,7 @@ WARP /Users/aditya/robosim/upstream/warp-innate-integrated/warp/__init__.py
 [I1_rough] PPO update 305 ms -> full loop 23,709 env-steps/s
 [I1_rough] SUMMARY physics 40,794 | step 24,957 | rollout 25,591 | loop 23,709  (ms: physics 100.4, step 164.1, rollout/step 160.1, update 305)
 --- C1 rough 06:17:47
-WARP /Users/aditya/robosim/upstream/warp-innate-ordered/warp/__init__.py
+WARP upstream/warp-innate-ordered/warp/__init__.py
 [C1_rough] N=4096 njmax 256 naconmax 524288 is_sparse False
 [C1_rough] physics only 71.4 ms/step -> 57,395 env-steps/s
 [C1_rough] full env step 106.5 ms -> 38,477 env-steps/s
@@ -40,7 +40,7 @@ WARP /Users/aditya/robosim/upstream/warp-innate-ordered/warp/__init__.py
 [C1_rough] PPO update 303 ms -> full loop 31,972 env-steps/s
 [C1_rough] SUMMARY physics 57,395 | step 38,477 | rollout 35,463 | loop 31,972  (ms: physics 71.4, step 106.5, rollout/step 115.5, update 303)
 --- I2 flat 06:18:35
-WARP /Users/aditya/robosim/upstream/warp-innate-integrated/warp/__init__.py
+WARP upstream/warp-innate-integrated/warp/__init__.py
 [I2_flat] N=4096 njmax 112 naconmax 98304 is_sparse False
 [I2_flat] physics only 54.4 ms/step -> 75,339 env-steps/s
 [I2_flat] full env step 143.7 ms -> 28,504 env-steps/s
@@ -49,7 +49,7 @@ WARP /Users/aditya/robosim/upstream/warp-innate-integrated/warp/__init__.py
 [I2_flat] PPO update 148 ms -> full loop 28,820 env-steps/s
 [I2_flat] SUMMARY physics 75,339 | step 28,504 | rollout 30,125 | loop 28,820  (ms: physics 54.4, step 143.7, rollout/step 136.0, update 148)
 --- C2 flat 06:19:23
-WARP /Users/aditya/robosim/upstream/warp-innate-ordered/warp/__init__.py
+WARP upstream/warp-innate-ordered/warp/__init__.py
 [C2_flat] N=4096 njmax 112 naconmax 98304 is_sparse False
 [C2_flat] physics only 47.5 ms/step -> 86,268 env-steps/s
 [C2_flat] full env step 95.1 ms -> 43,085 env-steps/s
@@ -58,7 +58,7 @@ WARP /Users/aditya/robosim/upstream/warp-innate-ordered/warp/__init__.py
 [C2_flat] PPO update 146 ms -> full loop 37,857 env-steps/s
 [C2_flat] SUMMARY physics 86,268 | step 43,085 | rollout 40,112 | loop 37,857  (ms: physics 47.5, step 95.1, rollout/step 102.1, update 146)
 --- I2 rough 06:19:57
-WARP /Users/aditya/robosim/upstream/warp-innate-integrated/warp/__init__.py
+WARP upstream/warp-innate-integrated/warp/__init__.py
 [I2_rough] N=4096 njmax 256 naconmax 524288 is_sparse False
 [I2_rough] physics only 100.6 ms/step -> 40,731 env-steps/s
 [I2_rough] full env step 164.7 ms -> 24,871 env-steps/s
@@ -67,7 +67,7 @@ WARP /Users/aditya/robosim/upstream/warp-innate-integrated/warp/__init__.py
 [I2_rough] PPO update 300 ms -> full loop 23,726 env-steps/s
 [I2_rough] SUMMARY physics 40,731 | step 24,871 | rollout 25,579 | loop 23,726  (ms: physics 100.6, step 164.7, rollout/step 160.1, update 300)
 --- C2 rough 06:20:55
-WARP /Users/aditya/robosim/upstream/warp-innate-ordered/warp/__init__.py
+WARP upstream/warp-innate-ordered/warp/__init__.py
 [C2_rough] N=4096 njmax 256 naconmax 524288 is_sparse False
 [C2_rough] physics only 71.3 ms/step -> 57,483 env-steps/s
 [C2_rough] full env step 106.7 ms -> 38,380 env-steps/s

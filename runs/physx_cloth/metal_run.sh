@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /Users/aditya/robosim
+cd .
 python3 scripts/gpu_lock.py status
 echo "=== tests/test_physx_cloth.py on metal:0"
 .venv/bin/python -m pytest -q tests/test_physx_cloth.py 2>&1 | tail -5

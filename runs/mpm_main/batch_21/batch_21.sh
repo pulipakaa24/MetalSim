@@ -1,5 +1,5 @@
 #!/bin/bash
-# batch 21 (run outside the agent sandbox):  bash /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b21/batch_21.sh
+# batch 21 (run outside the agent sandbox):  bash scratch/b21/batch_21.sh
 #
 # #29 merge (9c090532, local): why test_policy_step_graph_matches_eager and test_one_world_masked_reset fail.
 # Their probes' last stdout line was Warp's kernel-cache banner, so each died right after Warp initialised.
@@ -16,8 +16,8 @@
 #      T_mpm_main), commit fix + the tests' probe-output reporting, push, #29 mergeable state
 # ~8-10 min. Resumable (scratch/b21/STATUS.txt).
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
-R=/Users/aditya/robosim
+W=.
+R=.
 S=$W/scratch/b21
 L=$S/logs
 O=$W/runs/mpm_main/batch_21

@@ -6,7 +6,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-ae8661f0d09092d4b/runs/mpm/kcache_cfm/1.18.0.dev20260917
+     runs/mpm/kcache_cfm/1.18.0.dev20260917
 Module newton._src.geometry.bvh dd025c2 load on device 'metal:0' took 24.36 ms  (cached)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_model 88b4f3e load on device 'metal:0' took 22.88 ms  (cached)
 Module warp.fem.geometry.nanogrid 750f1d3 load on device 'metal:0' took 25.08 ms  (cached)
@@ -64,6 +64,6 @@ Module scatter_field_dof_values_0c3bc28c e2a816a load on device 'metal:0' took 3
 Module warp.fem.integrate._identity_field_53a45b43 ae1122d load on device 'metal:0' took 756.79 ms  (cached)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.update_particle_strains_4a8baf02 51a1e24 load on device 'metal:0' took 24.94 ms  (cached)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_ee39ae6e ede1a50 load on device 'metal:0' took 500.30 ms  (cached)
-{"scene": "example:mpm_multi_material", "set": {}, "frames": 60, "warmup": 5, "ms_median": 53.51364600028319, "ms_mean": 51.817553433314366, "ms_p10": 49.70814639946184, "ms_p90": 54.97828329971526, "per_frame_counters": {"host_waits": 6.0, "command_buffers": 11.0, "host_ops": 0.0, "dispatches_encoded": 3339.0}, "warp": "/Users/aditya/robosim/.claude/worktrees/agent-ae8661f0d09092d4b/_forks/warp/warp/__init__.py", "compat": {"accumulate": "float32", "loop": "cuda", "chunk_graph": true, "fused": false, "fused_max_color_blocks": 1073741824, "simd": false, "gpu_exit": true, "rigid_deterministic": true, "metal_fast_math": "off"}}
+{"scene": "example:mpm_multi_material", "set": {}, "frames": 60, "warmup": 5, "ms_median": 53.51364600028319, "ms_mean": 51.817553433314366, "ms_p10": 49.70814639946184, "ms_p90": 54.97828329971526, "per_frame_counters": {"host_waits": 6.0, "command_buffers": 11.0, "host_ops": 0.0, "dispatches_encoded": 3339.0}, "warp": "_forks/warp/warp/__init__.py", "compat": {"accumulate": "float32", "loop": "cuda", "chunk_graph": true, "fused": false, "fused_max_color_blocks": 1073741824, "simd": false, "gpu_exit": true, "rigid_deterministic": true, "metal_fast_math": "off"}}
 [gpu_run] spdfm_off_multi_material end: device utilisation 100% (21:08:18), exit 0
 [gpu_run] gpu_top: GPU (ioreg): device utilization 100 %; per-process GPU time over 1.8 s: none >= 1 %

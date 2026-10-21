@@ -1,5 +1,5 @@
 #!/bin/bash
-# batch 17 (run outside the agent sandbox):  bash /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b17/batch_17.sh
+# batch 17 (run outside the agent sandbox):  bash scratch/b17/batch_17.sh
 #
 # #29, G1 deterministic under capture.
 # A  name the tripping launch UNDER CAPTURE: scripts/diagnostics/det_capture_probe.py records, after every deterministic
@@ -15,8 +15,8 @@
 # C  #29's body: draft, three causes, cost table (scratch/b17/pr29_status.py); a comment with A and B.
 # Resumable (scratch/b17/STATUS.txt). ~1 h.
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
-R=/Users/aditya/robosim
+W=.
+R=.
 S=$W/scratch/b17
 L=$S/logs
 O=$W/runs/mpm_main/batch_17

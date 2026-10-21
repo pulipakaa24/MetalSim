@@ -1,9 +1,9 @@
 [gpu_run] chv_check start: device utilisation 0% (18:30:56)
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
 [gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.1 %
-[watch 18:30:59] start: bash -c /Users/aditya/robosim/.venv-newton152/bin/python -P /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/metalsim/physics/mpm/probes/harvest_compact_check.py --worlds 1 --bodies 16 &&
-          /Users/aditya/robosim/.venv-newton152/bin/python -P /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/metalsim/physics/mpm/probes/harvest_compact_check.py --worlds 1 --bodies 64 &&
-          /Users/aditya/robosim/.venv-newton152/bin/python -P /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/metalsim/physics/mpm/probes/harvest_compact_check.py --worlds 64 --bodies 2 --nodes-per-world 8000 --contact-per-world 700
+[watch 18:30:59] start: bash -c .venv-newton152/bin/python -P metalsim/physics/mpm/probes/harvest_compact_check.py --worlds 1 --bodies 16 &&
+          .venv-newton152/bin/python -P metalsim/physics/mpm/probes/harvest_compact_check.py --worlds 1 --bodies 64 &&
+          .venv-newton152/bin/python -P metalsim/physics/mpm/probes/harvest_compact_check.py --worlds 64 --bodies 2 --nodes-per-world 8000 --contact-per-world 700
 [watch 18:31:05] end code=0 wall=6s
 [gpu_run] chv_check end: device utilisation 91% (18:31:05), exit 0
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %

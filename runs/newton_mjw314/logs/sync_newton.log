@@ -1,13 +1,13 @@
-+ cd /Users/aditya/robosim
++ cd <repo>
 + git -C upstream/newton remote get-url origin
 + grep -q pulipakaa24/newton
 + git -C upstream/newton fetch -q origin metalsim
 + git -C upstream/newton merge -q --ff-only 1301e8da2002541f6f189b6e459e1ed5e6db5731
-+ /Users/aditya/robosim/.venv/bin/python -m pip install -q --no-deps --force-reinstall 'newton @ git+https://github.com/pulipakaa24/newton@9d6616c64ca018dd9119f67fca3316d715a26704'
++ .venv/bin/python -m pip install -q --no-deps --force-reinstall 'newton @ git+https://github.com/pulipakaa24/newton@9d6616c64ca018dd9119f67fca3316d715a26704'
 
 [notice] A new release of pip is available: 25.0.1 -> 26.2.1
-[notice] To update, run: /Users/aditya/robosim/.venv/bin/python -m pip install --upgrade pip
-+ /Users/aditya/robosim/.venv-newtonfork/bin/python -P -c 'import newton; print('\''newtonfork'\'', newton.__file__)'
-newtonfork /Users/aditya/robosim/upstream/newton/newton/__init__.py
-+ /Users/aditya/robosim/.venv/bin/python -P -c 'import newton; print('\''venv'\'', newton.__file__)'
-venv /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/__init__.py
+[notice] To update, run: .venv/bin/python -m pip install --upgrade pip
++ .venv-newtonfork/bin/python -P -c 'import newton; print('\''newtonfork'\'', newton.__file__)'
+newtonfork upstream/newton/newton/__init__.py
++ .venv/bin/python -P -c 'import newton; print('\''venv'\'', newton.__file__)'
+venv .venv/lib/python3.12/site-packages/newton/__init__.py

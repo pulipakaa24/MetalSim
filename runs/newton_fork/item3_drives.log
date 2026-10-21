@@ -26,7 +26,7 @@ static sag [rad] of a pendulum held by a PD drive, ke 200 N m/rad (exact: tau_gr
   joint_f PD iterations 16: sag +0.0522 (exact +0.0522) -> effective stiffness    200 N m/rad
   xpbd with the default relaxation 0.7/0.4, iterations 4: sag +0.0521 (exact +0.0522) -> 200 N m/rad
 $ .venv/bin/python scripts/diagnostics/newton_fork/drive_equilibrium.py --ipd --its 1,4,16   (upstream: solver = compliance drive)
-newton at /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/__init__.py; fork: False; solver kwargs {}; dt 2.5 ms; relaxation 0.4
+newton at .venv/lib/python3.12/site-packages/newton/__init__.py; fork: False; solver kwargs {}; dt 2.5 ms; relaxation 0.4
 A. pendulum ke 200 kd 5: effective stiffness [N m/rad] (exact 200)
   solver it 1: 72.0  it 4: 290.7  it 16: 1239.6
   ipd    it 1: 200.1  it 4: 200.2  it 16: 200.1

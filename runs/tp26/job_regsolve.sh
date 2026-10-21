@@ -4,8 +4,8 @@
 # I = installed, S = worktree with the register solve only (MJW_METAL_LDL_LANES=0), L = worktree with the L'DL lanes only
 # (WP_METAL_REGISTER_SOLVE=0), B = worktree with both. The worktree Warp also carries the compact register Cholesky layout
 # (bitwise the generic one): its cost split is measured separately (compact off / on). Plus the isolated kernel costs (chol parts, L'DL bench).
-cd /Users/aditya/robosim && source .venv/bin/activate
-WT=/Users/aditya/robosim/upstream/warp-innate-tp:/Users/aditya/robosim/upstream/mujoco_warp-tp
+cd . && source .venv/bin/activate
+WT=upstream/warp-innate-tp:upstream/mujoco_warp-tp
 F='^\[\|Error\|Traceback\|imports'
 echo "=== start $(date) metalsim $(git rev-parse --short HEAD) warp $(git -C upstream/warp-innate rev-parse --short HEAD) / wt $(git -C upstream/warp-innate-tp rev-parse --short HEAD) mjw $(git -C upstream/mujoco_warp rev-parse --short HEAD) / wt $(git -C upstream/mujoco_warp-tp rev-parse --short HEAD) power: $(pmset -g batt | head -1)"
 echo "--- chol parts, register solve off (worktree, knob 0) $(date +%H:%M:%S)"; PYTHONPATH=$WT WP_METAL_REGISTER_SOLVE=0 python scripts/diagnostics/metal_cholesky_parts.py 32 43 48 2>&1 | grep "^n=\|register solve"

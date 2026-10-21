@@ -1,4 +1,4 @@
-warp /Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/warp-i2/warp/__init__.py device_args auto
+warp upstream/warp-i2/warp/__init__.py device_args auto
 Failed to create Metal pipeline for kernel "_tendon_dot_62db264d_metal_forward": Compilation failed due to an interrupted connection: XPC_ERROR_CONNECTION_INTERRUPTED. This error occurred after multiple retries.
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -6,7 +6,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/runs/a2/kc/panda_auto/1.18.0.dev20260917
+     runs/a2/kc/panda_auto/1.18.0.dev20260917
 Module mujoco_warp._src.smooth 938d6f1 load on device 'metal:0' took 2131.61 ms  (compiled)
 Module _nxn_broadphase__locals__kernel_e48fdb49 e48fdb4 load on device 'metal:0' took 536.98 ms  (compiled)
 Module ccd_kernel_builder__locals__ccd_kernel_a74e2afa 4fb2acc load on device 'metal:0' took 2704.06 ms  (compiled)

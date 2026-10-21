@@ -2,8 +2,8 @@
 # ellip_ws: ICB early exit of the Newton loop (Warp fork 6bceb39d indirect execution ranges, mujoco_warp 12cc1e2 (the warp.context fix)), frozen worktrees
 # warp-innate-ellip-test / mujoco_warp-ellip-test5, elliptic ellip10 cap 20 (task default, fused + htot): (a) fork graph-capture tests
 # on Metal, (b) g1_tp_check 512/50 knob off (reference) vs on, (c) itercost 4096/20 off and on, (d) g1_tp_variants --quick off/on x2.
-cd /Users/aditya/robosim && source .venv/bin/activate
-WT=/Users/aditya/robosim/upstream/warp-innate-ellip-test:/Users/aditya/robosim/upstream/mujoco_warp-ellip-test5
+cd . && source .venv/bin/activate
+WT=upstream/warp-innate-ellip-test:upstream/mujoco_warp-ellip-test5
 R='^  *[0-9]* |\|^  k\|^state\|Error\|Traceback'; F='^\[\|Error\|Traceback'
 echo "=== start $(date) metalsim $(git rev-parse --short HEAD) frozen warp $(git -C upstream/warp-innate-ellip-test rev-parse --short HEAD) mjw $(git -C upstream/mujoco_warp-ellip-test5 rev-parse --short HEAD) power: $(pmset -g batt | head -1)"
 chk() { PYTHONPATH=$WT env $1 MJW_TP_VARIANT="{\"label\":\"$2\"}" python -c "import runpy, sys; sys.argv=['g1_tp_check.py','512','50']+sys.argv[1:]; runpy.run_path('scripts/diagnostics/g1_tp_check.py', run_name='__main__')" $3 2>&1 | grep -v "^Module\|^Warp\|^   [^s]\|^$\|^linesearch\|^To disable\|^solver iterations"; }

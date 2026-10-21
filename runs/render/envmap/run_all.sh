@@ -3,7 +3,7 @@
 # gallery frame, and the tier-2 test file after / before. Run through the GPU queue:
 #   scripts/gpu_run.sh envmap_port render 20 -- zsh runs/render/envmap/run_all.sh
 set -u
-cd /Users/aditya/robosim
+cd .
 OUT=runs/render/envmap
 WT=/private/tmp/claude-501/-Users-aditya/7ceab845-25d9-459e-a466-a4b793f72f5c/scratchpad/head
 PY=.venv/bin/python

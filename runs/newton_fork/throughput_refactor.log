@@ -16,15 +16,15 @@ holder: {"name": "newton_fork_throughput2", "kind": "timing", "minutes": 12.0, "
   waiting [train] g1_preflight_tuned_recommended est 12.0 min, queued 1967 s ago
 Thu Sep 24 23:25:15 PDT 2026
 $ .venv/bin/python scripts/diagnostics/newton_fork/throughput.py 4:1.25 4:0.625  (pinned upstream)
-newton at /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/__init__.py, fork False, N 4096
+newton at .venv/lib/python3.12/site-packages/newton/__init__.py, fork False, N 4096
 | 4:1.25 | 147,412 env-steps/s | blocks 147,545, 146,337, 147,412 |
 | 4:0.625 | 73,431 env-steps/s | blocks 73,516, 72,977, 73,431 |
 $ .venv-newtonfork/bin/python ... (fork 9b0901d3)
-newton at /Users/aditya/robosim/upstream/newton/newton/__init__.py, fork True, N 4096
+newton at upstream/newton/newton/__init__.py, fork True, N 4096
 | 4:1.25 | 108,380 env-steps/s | blocks 108,501, 107,831, 108,380 |
 | 4:1.25:solverdrive | 98,956 env-steps/s | blocks 99,067, 98,956, 98,309 |
 $ PYTHONPATH=upstream/newton-dev .venv-newtonfork/bin/python ... (dev refactor)
-newton at /Users/aditya/robosim/upstream/newton-dev/newton/__init__.py, fork True, N 4096
+newton at upstream/newton-dev/newton/__init__.py, fork True, N 4096
 | 4:1.25 | 131,420 env-steps/s | blocks 131,696, 130,772, 131,420 |
 | 4:1.25:solverdrive | 84,346 env-steps/s | blocks 84,836, 84,346, 84,346 |
 | 4:0.625 | 65,548 env-steps/s | blocks 65,594, 65,151, 65,548 |

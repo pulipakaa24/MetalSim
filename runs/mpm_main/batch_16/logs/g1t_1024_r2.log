@@ -6,7 +6,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth d59875c load on device 'metal:0' took 433.54 ms  (cached)
 Module _nxn_broadphase__locals__kernel_0ecae344 0ecae34 load on device 'metal:0' took 82.24 ms  (cached)
 Module ccd_det_kernels_builder__locals__ccd_det_solve_kernel_ac93ddeb ac93dde load on device 'metal:0' took 1313.38 ms  (cached)
@@ -64,11 +64,11 @@ Module reset_data__locals__reset_nworld_5d2d5901 5d2d590 load on device 'metal:0
 Module metalsim.learn.g1_velocity d51a450 load on device 'metal:0' took 1045.20 ms  (cached)
 Module metalsim.learn.warp_policy 00a83dd load on device 'metal:0' took 466.47 ms  (cached)
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scripts/diagnostics/det_cost_g1.py", line 41, in <module>
+  File "scripts/diagnostics/det_cost_g1.py", line 41, in <module>
     main()
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scripts/diagnostics/det_cost_g1.py", line 33, in main
+  File "scripts/diagnostics/det_cost_g1.py", line 33, in main
     task.sim.check_overflow()
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/batch.py", line 457, in check_overflow
+  File "metalsim/physics/batch.py", line 457, in check_overflow
     raise RuntimeError("Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter "
 RuntimeError: Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter calls differ between its two passes (research_notes/MPM in main simulator/deterministic_ccd_divergence.md)
 [gpu_run] mm16_g1t_1024_r2 end: device utilisation 0% (00:48:17), exit 1

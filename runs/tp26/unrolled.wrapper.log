@@ -28,9 +28,9 @@ solve unrolled: 0.792 ms per launch of 4096 worlds (G1, nv 43, nM 434, 14 levels
 Traceback (most recent call last):
     raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
 RuntimeError: Metal error on device metal:0: Cannot synchronize device "Apple M4 Max" during graph capture
-imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp/warp/__init__.py upstream/mujoco_warp-tp/mujoco_warp/__init__.py
 --- S1 serial 08:35:29
-imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp/warp/__init__.py upstream/mujoco_warp-tp/mujoco_warp/__init__.py
 [S1_serial] N=4096 njmax 144 naconmax 98304 is_sparse False
 [S1_serial] physics only 45.2 ms/step -> 90,657 env-steps/s
 [S1_serial] full env step 67.0 ms -> 61,149 env-steps/s
@@ -39,9 +39,9 @@ imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/ad
 Traceback (most recent call last):
     raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
 RuntimeError: Metal error on device metal:0: Cannot synchronize device "Apple M4 Max" during graph capture
-imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp/warp/__init__.py upstream/mujoco_warp-tp/mujoco_warp/__init__.py
 --- S2 serial 08:36:01
-imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp/warp/__init__.py upstream/mujoco_warp-tp/mujoco_warp/__init__.py
 [S2_serial] N=4096 njmax 144 naconmax 98304 is_sparse False
 [S2_serial] physics only 45.2 ms/step -> 90,713 env-steps/s
 [S2_serial] full env step 67.3 ms -> 60,895 env-steps/s

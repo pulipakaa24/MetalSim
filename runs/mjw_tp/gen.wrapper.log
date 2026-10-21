@@ -2,7 +2,7 @@
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
 [gpu_run] gpu_top:   pid  22365 Google Chrome He                   2.2 %
 === start Fri Sep 25 19:41:45 PDT 2026 mjw 1791414 warp 9050cb54 power: Now drawing from 'AC Power'
-holder: {"name": "mjw_generality", "kind": "timing", "minutes": 14.0, "pid": 87349, "start": 1790390502.135916, "queued": 1790390341.991464, "cmd": "bash runs/mjw_tp/job_gen.sh", "cwd": "/Users/aditya/robosim"}
+holder: {"name": "mjw_generality", "kind": "timing", "minutes": 14.0, "pid": 87349, "start": 1790390502.135916, "queued": 1790390341.991464, "cmd": "bash runs/mjw_tp/job_gen.sh", "cwd": "<repo>"}
   waiting [timing] ellip_bench_world est 12.0 min, queued 101 s ago
   waiting [timing] ellip_bench_contact est 8.0 min, queued 100 s ago
   waiting [timing] ellip_bench_contact2 est 5.0 min, queued 100 s ago
@@ -59,7 +59,7 @@ Module mujoco_warp._src.passive 9e93f67 load on device 'metal:0' took 22.44 ms  
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 [so101_lift pyramidal] N=4096 paths {"nv": 12, "nu": 6, "ngeom": 50, "cone": "pyramidal", "solver": "newton", "jacobian": "dense", "iterations": 10, "ls_iterations": 20, "substeps": 4, "register_cholesky": true, "single_tile_cholesky": true, "M_layout": "dense tile", "incremental_hessian": true, "fused_hessian_cholesky": true}
 [so101_lift pyramidal] KERNELS 32.72 ms GPU per env step (sum of per-dispatch times, 72 kernels, 760 dispatches); Newton Cholesky 4.38 ms (13%), Hessian assembly 4.32 ms (13%), M factor/solve 0.00 ms (0%)
       8.497 ms  x  40  _update_constraint_efc__locals__kernel_afa7fbbf_metal_forward
@@ -84,7 +84,7 @@ Module mujoco_warp._src.passive 9e93f67 load on device 'metal:0' took 22.44 ms  
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 [so101_lift elliptic] N=4096 paths {"nv": 12, "nu": 6, "ngeom": 50, "cone": "elliptic", "solver": "newton", "jacobian": "dense", "iterations": 10, "ls_iterations": 20, "substeps": 4, "register_cholesky": true, "single_tile_cholesky": true, "M_layout": "dense tile", "incremental_hessian": false, "fused_hessian_cholesky": false}
 [so101_lift elliptic] KERNELS 52.08 ms GPU per env step (sum of per-dispatch times, 66 kernels, 796 dispatches); Newton Cholesky 1.50 ms (3%), Hessian assembly 2.02 ms (4%), M factor/solve 0.00 ms (0%)
      34.522 ms  x  44  _update_gradient_JTCJ_dense_f52c2ac2_metal_forward
@@ -109,7 +109,7 @@ Module mujoco_warp._src.passive 9e93f67 load on device 'metal:0' took 22.44 ms  
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 [panda pyramidal] N=4096 paths {"nv": 9, "nu": 8, "ngeom": 82, "cone": "pyramidal", "solver": "newton", "jacobian": "dense", "iterations": 100, "ls_iterations": 50, "substeps": 10, "register_cholesky": true, "single_tile_cholesky": true, "M_layout": "dense tile", "incremental_hessian": true, "fused_hessian_cholesky": true}
 [panda pyramidal] KERNELS 218.37 ms GPU per env step (sum of per-dispatch times, 81 kernels, 10230 dispatches); Newton Cholesky 18.54 ms (8%), Hessian assembly 16.86 ms (8%), M factor/solve 0.00 ms (0%)
     133.233 ms  x1000  _update_constraint_efc__locals__kernel_afa7fbbf_metal_forward
@@ -134,7 +134,7 @@ Module mujoco_warp._src.passive 9e93f67 load on device 'metal:0' took 22.44 ms  
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 [panda elliptic] N=4096 paths {"nv": 9, "nu": 8, "ngeom": 82, "cone": "elliptic", "solver": "newton", "jacobian": "dense", "iterations": 100, "ls_iterations": 50, "substeps": 10, "register_cholesky": true, "single_tile_cholesky": true, "M_layout": "dense tile", "incremental_hessian": false, "fused_hessian_cholesky": false}
 [panda elliptic] KERNELS 648.77 ms GPU per env step (sum of per-dispatch times, 75 kernels, 11220 dispatches); Newton Cholesky 14.14 ms (2%), Hessian assembly 30.52 ms (5%), M factor/solve 0.00 ms (0%)
     454.142 ms  x1010  _update_gradient_JTCJ_dense_f52c2ac2_metal_forward

@@ -11,10 +11,10 @@
 #   5  commit and push the logs (branch mpm-coupled-speed)
 # Only GPU-health problems stop it; failures are listed in bf1_failures.txt. Resumable. Log: batch_bf1.log
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0
+W=.
 R=$W/runs/mpm/coupled_speed
 O=$R/bf1
-M=/Users/aditya/robosim
+M=.
 PY=$M/.venv-newton152/bin/python
 GR=$M/scripts/gpu_run.sh
 T=$W/upstream/trees

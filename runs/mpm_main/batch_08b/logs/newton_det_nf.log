@@ -1,29 +1,29 @@
 EEEssssss.........                                                   [100%]
 ==================================== ERRORS ====================================
 _________________ ERROR at setup of test_particle_determinism __________________
-file /Users/aditya/robosim/upstream/newton/newton/tests/determinism/test_solver_determinism.py, line 133
+file upstream/newton/newton/tests/determinism/test_solver_determinism.py, line 133
   def test_particle_determinism(test, device, solver_name):
 E       fixture 'test' not found
 >       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, testrun_uid, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, worker_id
 >       use 'pytest --fixtures [testpath]' for help on them.
 
-/Users/aditya/robosim/upstream/newton/newton/tests/determinism/test_solver_determinism.py:133
+upstream/newton/newton/tests/determinism/test_solver_determinism.py:133
 ________ ERROR at setup of test_mujoco_sparse_articulation_construction ________
-file /Users/aditya/robosim/upstream/newton/newton/tests/determinism/test_solver_determinism.py, line 194
+file upstream/newton/newton/tests/determinism/test_solver_determinism.py, line 194
   def test_mujoco_sparse_articulation_construction(test, device):
 E       fixture 'test' not found
 >       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, testrun_uid, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, worker_id
 >       use 'pytest --fixtures [testpath]' for help on them.
 
-/Users/aditya/robosim/upstream/newton/newton/tests/determinism/test_solver_determinism.py:194
+upstream/newton/newton/tests/determinism/test_solver_determinism.py:194
 _______________ ERROR at setup of test_articulation_determinism ________________
-file /Users/aditya/robosim/upstream/newton/newton/tests/determinism/test_solver_determinism.py, line 236
+file upstream/newton/newton/tests/determinism/test_solver_determinism.py, line 236
   def test_articulation_determinism(test, device, solver_name):
 E       fixture 'test' not found
 >       available fixtures: capfd, capfdbinary, caplog, capsys, capsysbinary, capteesys, doctest_namespace, monkeypatch, pytestconfig, record_property, record_testsuite_property, record_xml_attribute, recwarn, subtests, testrun_uid, tmp_path, tmp_path_factory, tmpdir, tmpdir_factory, worker_id
 >       use 'pytest --fixtures [testpath]' for help on them.
 
-/Users/aditya/robosim/upstream/newton/newton/tests/determinism/test_solver_determinism.py:236
+upstream/newton/newton/tests/determinism/test_solver_determinism.py:236
 =========================== short test summary info ============================
 ERROR ../../../upstream/newton/newton/tests/determinism/test_solver_determinism.py::test_particle_determinism
 ERROR ../../../upstream/newton/newton/tests/determinism/test_solver_determinism.py::test_mujoco_sparse_articulation_construction

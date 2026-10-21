@@ -11,9 +11,9 @@
 #   E  commit and push the logs (branch mpm-coupled-speed)
 # Only GPU-health problems stop the batch; failed steps go to batch_06_failures.txt. Resumable.
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0
+W=.
 R=$W/runs/mpm/coupled_speed
-M=/Users/aditya/robosim
+M=.
 PY=$M/.venv-newton152/bin/python
 PYP=$M/.claude/worktrees/agent-a278824da4c05bf29/.venv-pour/bin/python
 GR=$M/scripts/gpu_run.sh

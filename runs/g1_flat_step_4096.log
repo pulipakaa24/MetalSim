@@ -4,7 +4,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth b0265e0 load on device 'metal:0' took 24.58 ms  (cached)
 Module _nxn_broadphase__locals__kernel_5779d1c3 5779d1c load on device 'metal:0' took 16.74 ms  (cached)
 Module ccd_kernel_builder__locals__ccd_kernel_831c971f 831c971 load on device 'metal:0' took 24.02 ms  (cached)
@@ -57,52 +57,52 @@ Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCa
 Traceback (most recent call last):
   File "<frozen runpy>", line 198, in _run_module_as_main
   File "<frozen runpy>", line 88, in _run_code
-  File "/Users/aditya/robosim/orchard/learn/g1_velocity.py", line 496, in <module>
+  File "orchard/learn/g1_velocity.py", line 496, in <module>
     r = benchmark_step(task, num_frames=100)
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/orchard/learn/g1_velocity.py", line 478, in benchmark_step
+  File "orchard/learn/g1_velocity.py", line 478, in benchmark_step
     step()
-  File "/Users/aditya/robosim/orchard/learn/g1_velocity.py", line 472, in step
+  File "orchard/learn/g1_velocity.py", line 472, in step
     task.sim.launch_step()
-  File "/Users/aditya/robosim/orchard/physics/batch.py", line 128, in launch_step
+  File "orchard/physics/batch.py", line 128, in launch_step
     mjw.step(self.m, self.d)
-  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "upstream/mujoco_warp/mujoco_warp/_src/warp_util.py", line 123, in wrapper
     return fn(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/forward.py", line 1825, in step
+  File "upstream/mujoco_warp/mujoco_warp/_src/forward.py", line 1825, in step
     forward(m, d)
-  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "upstream/mujoco_warp/mujoco_warp/_src/warp_util.py", line 123, in wrapper
     return fn(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/forward.py", line 1816, in forward
+  File "upstream/mujoco_warp/mujoco_warp/_src/forward.py", line 1816, in forward
     solver.solve(m, d)
-  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "upstream/mujoco_warp/mujoco_warp/_src/warp_util.py", line 123, in wrapper
     return fn(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/solver.py", line 3641, in solve
+  File "upstream/mujoco_warp/mujoco_warp/_src/solver.py", line 3641, in solve
     _solve(m, d, ctx)
-  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/solver.py", line 3687, in _solve
+  File "upstream/mujoco_warp/mujoco_warp/_src/solver.py", line 3687, in _solve
     _solver_iteration(m, d, ctx, nsolving, compact=compact)
-  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "upstream/mujoco_warp/mujoco_warp/_src/warp_util.py", line 123, in wrapper
     return fn(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/solver.py", line 3497, in _solver_iteration
+  File "upstream/mujoco_warp/mujoco_warp/_src/solver.py", line 3497, in _solver_iteration
     _linesearch(m, d, ctx)
-  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "upstream/mujoco_warp/mujoco_warp/_src/warp_util.py", line 123, in wrapper
     return fn(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/solver.py", line 1535, in _linesearch
+  File "upstream/mujoco_warp/mujoco_warp/_src/solver.py", line 1535, in _linesearch
     _mul_m_compact_aware(m, d, ctx, ctx.mv, ctx.search, skip)
-  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/solver.py", line 3790, in _mul_m_compact_aware
+  File "upstream/mujoco_warp/mujoco_warp/_src/solver.py", line 3790, in _mul_m_compact_aware
     support.mul_m(m, d, res, vec, skip=skip)
-  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/warp_util.py", line 123, in wrapper
+  File "upstream/mujoco_warp/mujoco_warp/_src/warp_util.py", line 123, in wrapper
     return fn(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/support.py", line 251, in mul_m
+  File "upstream/mujoco_warp/mujoco_warp/_src/support.py", line 251, in mul_m
     wp.launch(
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 12298, in launch
+  File "upstream/warp-innate/warp/_src/context.py", line 12298, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint)
-  File "/Users/aditya/robosim/upstream/warp-innate/warp/_src/context.py", line 11365, in invoke_metal
+  File "upstream/warp-innate/warp/_src/context.py", line 11365, in invoke_metal
     raise RuntimeError(f"Failed to launch kernel '{kernel.key}' on device '{device}': {message}")
 RuntimeError: Failed to launch kernel 'mul_m_kernel__locals___mul_m' on device 'metal:0': Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory) (arguments: M_mulm_rowadr=array_t, M_mulm_col=array_t, M_mulm_madr=array_t, M_in=array_t, vec=array_t, skip=array_t, res=array_t)
 G1 (flat): nbody 45 nv 43 nu 37 ngeom 4 obs_dim 123

@@ -1,7 +1,7 @@
 == Tue Oct 13 15:21:03 PDT 2026 batch_05 start
 installed warp 95f6f121b7e67025958335c7c15e338ac04a798a newton 3fd1f052a5ad031578960d9642aaaedc03834e4d
-/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/warp_new/warp/__init__.py True /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/newton_new/newton/__init__.py True
-/Users/aditya/robosim/upstream/warp-innate/warp/__init__.py None /Users/aditya/robosim/upstream/newton-metalsim-1.5.2/newton/__init__.py
+upstream/trees/warp_new/warp/__init__.py True upstream/trees/newton_new/newton/__init__.py True
+upstream/warp-innate/warp/__init__.py None upstream/newton-metalsim-1.5.2/newton/__init__.py
 note: failing on the base trees too (pre-existing, not from the patches): FAILED .claude/worktrees/agent-a8f809a11de334dd0/tests/test_mpm.py::test_coupled_contact_filter_keeps_source_order 
 skip F_granular
 skip F_multi_material
@@ -78,42 +78,42 @@ pair_simd_sweep_bitwise: [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %;
 suite_base_cold: [gpu_run] gpu_top:   pid   1291 Google Chrome He                   4.8 %
 suite_base_default: [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 suite_base_warm: [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %
-/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_capture_base_r1.log: No such file or directory
-grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_capture_base_r1.log: No such file or directory
-/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_base_r1.log: No such file or directory
-grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_base_r1.log: No such file or directory
-/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_anymal_capture_base_r1.log: No such file or directory
-grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_anymal_capture_base_r1.log: No such file or directory
-/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_capture_new_r1.log: No such file or directory
-grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_capture_new_r1.log: No such file or directory
-/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_new_r1.log: No such file or directory
-grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_new_r1.log: No such file or directory
-/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_anymal_capture_new_r1.log: No such file or directory
-grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_anymal_capture_new_r1.log: No such file or directory
-/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_capture_base_r2.log: No such file or directory
-grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_capture_base_r2.log: No such file or directory
-/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_base_r2.log: No such file or directory
-grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_base_r2.log: No such file or directory
-/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_anymal_capture_base_r2.log: No such file or directory
-grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_anymal_capture_base_r2.log: No such file or directory
-/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_capture_new_r2.log: No such file or directory
-grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_capture_new_r2.log: No such file or directory
-/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_new_r2.log: No such file or directory
-grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_new_r2.log: No such file or directory
-/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_anymal_capture_new_r2.log: No such file or directory
-grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_anymal_capture_new_r2.log: No such file or directory
-/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_capture_base_r3.log: No such file or directory
-grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_capture_base_r3.log: No such file or directory
-/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_base_r3.log: No such file or directory
-grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_base_r3.log: No such file or directory
-/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_anymal_capture_base_r3.log: No such file or directory
-grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_anymal_capture_base_r3.log: No such file or directory
-/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_capture_new_r3.log: No such file or directory
-grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_capture_new_r3.log: No such file or directory
-/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_new_r3.log: No such file or directory
-grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_twoway_new_r3.log: No such file or directory
-/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/batch_05.sh: line 183: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_anymal_capture_new_r3.log: No such file or directory
-grep: /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/timing/T_anymal_capture_new_r3.log: No such file or directory
+runs/mpm/coupled_speed/batch_05.sh: line 183: runs/mpm/coupled_speed/timing/T_twoway_capture_base_r1.log: No such file or directory
+grep: runs/mpm/coupled_speed/timing/T_twoway_capture_base_r1.log: No such file or directory
+runs/mpm/coupled_speed/batch_05.sh: line 183: runs/mpm/coupled_speed/timing/T_twoway_base_r1.log: No such file or directory
+grep: runs/mpm/coupled_speed/timing/T_twoway_base_r1.log: No such file or directory
+runs/mpm/coupled_speed/batch_05.sh: line 183: runs/mpm/coupled_speed/timing/T_anymal_capture_base_r1.log: No such file or directory
+grep: runs/mpm/coupled_speed/timing/T_anymal_capture_base_r1.log: No such file or directory
+runs/mpm/coupled_speed/batch_05.sh: line 183: runs/mpm/coupled_speed/timing/T_twoway_capture_new_r1.log: No such file or directory
+grep: runs/mpm/coupled_speed/timing/T_twoway_capture_new_r1.log: No such file or directory
+runs/mpm/coupled_speed/batch_05.sh: line 183: runs/mpm/coupled_speed/timing/T_twoway_new_r1.log: No such file or directory
+grep: runs/mpm/coupled_speed/timing/T_twoway_new_r1.log: No such file or directory
+runs/mpm/coupled_speed/batch_05.sh: line 183: runs/mpm/coupled_speed/timing/T_anymal_capture_new_r1.log: No such file or directory
+grep: runs/mpm/coupled_speed/timing/T_anymal_capture_new_r1.log: No such file or directory
+runs/mpm/coupled_speed/batch_05.sh: line 183: runs/mpm/coupled_speed/timing/T_twoway_capture_base_r2.log: No such file or directory
+grep: runs/mpm/coupled_speed/timing/T_twoway_capture_base_r2.log: No such file or directory
+runs/mpm/coupled_speed/batch_05.sh: line 183: runs/mpm/coupled_speed/timing/T_twoway_base_r2.log: No such file or directory
+grep: runs/mpm/coupled_speed/timing/T_twoway_base_r2.log: No such file or directory
+runs/mpm/coupled_speed/batch_05.sh: line 183: runs/mpm/coupled_speed/timing/T_anymal_capture_base_r2.log: No such file or directory
+grep: runs/mpm/coupled_speed/timing/T_anymal_capture_base_r2.log: No such file or directory
+runs/mpm/coupled_speed/batch_05.sh: line 183: runs/mpm/coupled_speed/timing/T_twoway_capture_new_r2.log: No such file or directory
+grep: runs/mpm/coupled_speed/timing/T_twoway_capture_new_r2.log: No such file or directory
+runs/mpm/coupled_speed/batch_05.sh: line 183: runs/mpm/coupled_speed/timing/T_twoway_new_r2.log: No such file or directory
+grep: runs/mpm/coupled_speed/timing/T_twoway_new_r2.log: No such file or directory
+runs/mpm/coupled_speed/batch_05.sh: line 183: runs/mpm/coupled_speed/timing/T_anymal_capture_new_r2.log: No such file or directory
+grep: runs/mpm/coupled_speed/timing/T_anymal_capture_new_r2.log: No such file or directory
+runs/mpm/coupled_speed/batch_05.sh: line 183: runs/mpm/coupled_speed/timing/T_twoway_capture_base_r3.log: No such file or directory
+grep: runs/mpm/coupled_speed/timing/T_twoway_capture_base_r3.log: No such file or directory
+runs/mpm/coupled_speed/batch_05.sh: line 183: runs/mpm/coupled_speed/timing/T_twoway_base_r3.log: No such file or directory
+grep: runs/mpm/coupled_speed/timing/T_twoway_base_r3.log: No such file or directory
+runs/mpm/coupled_speed/batch_05.sh: line 183: runs/mpm/coupled_speed/timing/T_anymal_capture_base_r3.log: No such file or directory
+grep: runs/mpm/coupled_speed/timing/T_anymal_capture_base_r3.log: No such file or directory
+runs/mpm/coupled_speed/batch_05.sh: line 183: runs/mpm/coupled_speed/timing/T_twoway_capture_new_r3.log: No such file or directory
+grep: runs/mpm/coupled_speed/timing/T_twoway_capture_new_r3.log: No such file or directory
+runs/mpm/coupled_speed/batch_05.sh: line 183: runs/mpm/coupled_speed/timing/T_twoway_new_r3.log: No such file or directory
+grep: runs/mpm/coupled_speed/timing/T_twoway_new_r3.log: No such file or directory
+runs/mpm/coupled_speed/batch_05.sh: line 183: runs/mpm/coupled_speed/timing/T_anymal_capture_new_r3.log: No such file or directory
+grep: runs/mpm/coupled_speed/timing/T_anymal_capture_new_r3.log: No such file or directory
 | scene | L4 | base (runs) | new (runs) | base / L4 | new / L4 |
 |---|---|---|---|---|---|
 Traceback (most recent call last):
@@ -133,9 +133,9 @@ L4 kernel sum 28.90 ms/frame over 1298 launches; Metal (isolated-dispatch profil
 | copy/fill | 0.890 | 38 | 1.484 | 145 | 1.105 | 1.24 |
 | solve_subgrid_friction | 0.440 | 50 | 1.744 | 50 | 1.614 | 3.67 |
 | integrate_velocity_apic | 1.037 | 1 | 0.834 | 1 | 0.832 | 0.80 |
-pour env /Users/aditya/robosim/upstream/warp-innate/warp/__init__.py /Users/aditya/robosim/upstream/newton-metalsim-1.5.2/newton/__init__.py /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/metalsim/__init__.py
-pour env /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/warp_new/warp/__init__.py /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/newton_new/newton/__init__.py /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/metalsim/__init__.py
-pour env /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/warp_new/warp/__init__.py /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/upstream/trees/newton_new/newton/__init__.py /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/metalsim/__init__.py
+pour env upstream/warp-innate/warp/__init__.py upstream/newton-metalsim-1.5.2/newton/__init__.py metalsim/__init__.py
+pour env upstream/trees/warp_new/warp/__init__.py upstream/trees/newton_new/newton/__init__.py metalsim/__init__.py
+pour env upstream/trees/warp_new/warp/__init__.py upstream/trees/newton_new/newton/__init__.py metalsim/__init__.py
 pour new vs new2: bitwise equal over 30 steps
 pour base vs new: first differs at step 0
 a3d8ef48 Coupled speed, step 1: tiled IJtm product validated and timed on Metal (logs)

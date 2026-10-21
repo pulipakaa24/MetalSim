@@ -14,22 +14,22 @@ holder: {"name": "rtx_parity_legacy", "kind": "render", "minutes": 25.0, "pid": 
 Traceback (most recent call last):
   File "<frozen runpy>", line 198, in _run_module_as_main
   File "<frozen runpy>", line 88, in _run_code
-  File "/Users/aditya/robosim/metalsim/render/rtx_parity.py", line 162, in <module>
+  File "metalsim/render/rtx_parity.py", line 162, in <module>
     main()
-  File "/Users/aditya/robosim/metalsim/render/rtx_parity.py", line 98, in main
+  File "metalsim/render/rtx_parity.py", line 98, in main
     kw = preset_kwargs(a.preset, meta)
          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/render/rtx_parity.py", line 57, in preset_kwargs
+  File "metalsim/render/rtx_parity.py", line 57, in preset_kwargs
     from metalsim.render.tier2 import usd_scene_kwargs
-ImportError: cannot import name 'usd_scene_kwargs' from 'metalsim.render.tier2' (/Users/aditya/robosim/metalsim/render/tier2.py)
+ImportError: cannot import name 'usd_scene_kwargs' from 'metalsim.render.tier2' (metalsim/render/tier2.py)
 Traceback (most recent call last):
   File "<frozen runpy>", line 198, in _run_module_as_main
   File "<frozen runpy>", line 88, in _run_code
-  File "/Users/aditya/robosim/metalsim/render/rtx_parity.py", line 162, in <module>
+  File "metalsim/render/rtx_parity.py", line 162, in <module>
     main()
-  File "/Users/aditya/robosim/metalsim/render/rtx_parity.py", line 98, in main
+  File "metalsim/render/rtx_parity.py", line 98, in main
     kw = preset_kwargs(a.preset, meta)
          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/metalsim/render/rtx_parity.py", line 57, in preset_kwargs
+  File "metalsim/render/rtx_parity.py", line 57, in preset_kwargs
     from metalsim.render.tier2 import usd_scene_kwargs
-ImportError: cannot import name 'usd_scene_kwargs' from 'metalsim.render.tier2' (/Users/aditya/robosim/metalsim/render/tier2.py)
+ImportError: cannot import name 'usd_scene_kwargs' from 'metalsim.render.tier2' (metalsim/render/tier2.py)

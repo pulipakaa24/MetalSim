@@ -1,4 +1,4 @@
-G1 rough trained-policy rollout: N=4096 collision boxes_local njmax 256 nconmax 128 levels 10 x 20 start levels spread 0..9, frozen False, legacy settings False, contact_cfg recommended; ckpt /Users/aditya/robosim/runs/ellip_default/g1_rough_ellip_default_s0.pt
+G1 rough trained-policy rollout: N=4096 collision boxes_local njmax 256 nconmax 128 levels 10 x 20 start levels spread 0..9, frozen False, legacy settings False, contact_cfg recommended; ckpt runs/ellip_default/g1_rough_ellip_default_s0.pt
 it    5 sps   49,240 | ep_ret    0.00 ep_len    0.0 (n=0) | level mean 4.50 per level [410, 410, 410, 410, 410, 410, 409, 409, 409, 409] | flags {'ITERATIONS': 82, 'LS_ITERATIONS': 4096}
 it   10 sps   49,309 | ep_ret   -4.87 ep_len  210.9 (n=7) | level mean 4.50 per level [410, 410, 410, 410, 410, 410, 411, 409, 410, 406] | flags {'ITERATIONS': 206, 'LS_ITERATIONS': 4096}
 it   15 sps   49,248 | ep_ret   -6.16 ep_len  283.8 (n=5) | level mean 4.49 per level [410, 410, 410, 410, 412, 411, 410, 408, 410, 405] | flags {'ITERATIONS': 309, 'LS_ITERATIONS': 4096}

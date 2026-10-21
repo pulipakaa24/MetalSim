@@ -20,11 +20,11 @@ FAIL: test_06_compare_dense_sparse_boxes_hinged (newton._src.solvers.kamino.test
 Compares metrics evaluated on dense and sparse problems on a perturbed
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n152/newton/_src/solvers/kamino/tests/test_solvers_metrics.py", line 816, in test_06_compare_dense_sparse_boxes_hinged
+  File "upstream/n152/newton/_src/solvers/kamino/tests/test_solvers_metrics.py", line 816, in test_06_compare_dense_sparse_boxes_hinged
     np.testing.assert_allclose(
-  File "/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 1780, in assert_allclose
+  File ".venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 1780, in assert_allclose
     assert_array_compare(compare, actual, desired, err_msg=str(err_msg),
-  File "/Users/aditya/robosim/.venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 988, in assert_array_compare
+  File ".venv-newton152/lib/python3.12/site-packages/numpy/testing/_private/utils.py", line 988, in assert_array_compare
     raise AssertionError(msg)
 AssertionError: 
 Not equal to tolerance rtol=1e-06, atol=1e-06
@@ -47,7 +47,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/kcache/kcT_n152/1.18.0.dev20260917
+     runs/rigid17/kcache/kcT_n152/1.18.0.dev20260917
 Module newton._src.solvers.kamino._src.core.bodies aecde4c load on device 'metal:0' took 516.06 ms  (compiled)
 Module newton._src.solvers.kamino._src.geometry.primitive.broadphase 196e893 load on device 'metal:0' took 618.15 ms  (compiled)
 Module newton._src.solvers.kamino._src.geometry.primitive.narrowphase 0ef247e load on device 'metal:0' took 1765.35 ms  (compiled)

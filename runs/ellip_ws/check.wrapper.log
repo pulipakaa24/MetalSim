@@ -3,7 +3,7 @@
 [gpu_run] gpu_top:   pid  22365 Google Chrome He                   2.2 %
 === start Sat Sep 26 11:30:32 PDT 2026 metalsim fdaf460 frozen warp 9abceff9 mjw 5d0d165
 --- U unfused (reference) 11:30:32
-imports /Users/aditya/robosim/upstream/warp-innate-tp-test/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-ellip-test/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp-test/warp/__init__.py upstream/mujoco_warp-ellip-test/mujoco_warp/__init__.py
 === variant {'label': 'ellip unfused'}; N=512, 50 control steps, deterministic actions
 njmax 112 naconmax 12288 sparse False
 --- floor: two graph-replay instances of this configuration
@@ -30,7 +30,7 @@ capacity eager: nefc max 28 (njmax 112), nacon max 1318 (naconmax 12288); overfl
 --- physics protocol vs MuJoCo C (4 worlds: PD hold + fixed random targets; |dq| max / median)
 === done
 --- F fused vs unfused 11:31:08
-imports /Users/aditya/robosim/upstream/warp-innate-tp-test/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-ellip-test/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp-test/warp/__init__.py upstream/mujoco_warp-ellip-test/mujoco_warp/__init__.py
 === variant {'label': 'ellip fused'}; N=512, 50 control steps, deterministic actions
 njmax 112 naconmax 12288 sparse False
 --- floor: two graph-replay instances of this configuration
@@ -66,7 +66,7 @@ capacity eager: nefc max 28 (njmax 112), nacon max 1319 (naconmax 12288); overfl
    step   50: qpos max 5.99e-01 median 1.2e-07 | obs max 9.98e+00 | rew max 2.18e-02
 === done
 --- H fused+htot vs unfused 11:31:22
-imports /Users/aditya/robosim/upstream/warp-innate-tp-test/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-ellip-test/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp-test/warp/__init__.py upstream/mujoco_warp-ellip-test/mujoco_warp/__init__.py
 === variant {'label': 'ellip fused htot'}; N=512, 50 control steps, deterministic actions
 njmax 112 naconmax 12288 sparse False
 --- floor: two graph-replay instances of this configuration
@@ -102,7 +102,7 @@ capacity eager: nefc max 28 (njmax 112), nacon max 1318 (naconmax 12288); overfl
    step   50: qpos max 1.41e+00 median 1.2e-07 | obs max 8.64e+00 | rew max 3.26e-02
 === done
 --- E fused+extrap vs unfused 11:31:38
-imports /Users/aditya/robosim/upstream/warp-innate-tp-test/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-ellip-test/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp-test/warp/__init__.py upstream/mujoco_warp-ellip-test/mujoco_warp/__init__.py
 === variant {'label': 'ellip fused extrap'}; N=512, 50 control steps, deterministic actions
 njmax 112 naconmax 12288 sparse False
 --- floor: two graph-replay instances of this configuration

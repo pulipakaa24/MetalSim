@@ -1,5 +1,5 @@
 == Fri Sep 25 21:46:15 PDT 2026
-holder: {"name": "g1_flat_flatcfg_com", "kind": "train", "minutes": 50.0, "pid": 32536, "start": 1790397975.511352, "queued": 1790393061.5302544, "cmd": "runs/il3/run_train2.sh flat flat default none 1000 0 g1_flat_flatcfg_com com origin", "cwd": "/Users/aditya/robosim"}
+holder: {"name": "g1_flat_flatcfg_com", "kind": "train", "minutes": 50.0, "pid": 32536, "start": 1790397975.511352, "queued": 1790393061.5302544, "cmd": "runs/il3/run_train2.sh flat flat default none 1000 0 g1_flat_flatcfg_com com origin", "cwd": "<repo>"}
   waiting [train] il3_cap_probe est 20.0 min, queued 4879 s ago
   waiting [train] il3_blowup_ab est 35.0 min, queued 3432 s ago
   waiting [train] g1_flat_flatcfg_ellip10 est 70.0 min, queued 3303 s ago
@@ -11,7 +11,7 @@ holder: {"name": "g1_flat_flatcfg_com", "kind": "train", "minutes": 50.0, "pid":
 =============================== warnings summary ===============================
 tests/test_g1_task_terms.py::test_rough_terrain_seed_and_isaac_env_assignment
 tests/test_g1_task_terms.py::test_il3_rough_defaults
-  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
     warnings.warn(
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
@@ -22,7 +22,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 28.10 ms  (cached)
 Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 18.07 ms  (cached)
 Module ccd_kernel_builder__locals__ccd_kernel_78310433 7831043 load on device 'metal:0' took 26.52 ms  (cached)

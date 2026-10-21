@@ -2,8 +2,8 @@
 # After specializing the ray kernels (GRID_PLANES, HAZE_ON): the any-hit shadow fast path on / off, and the cost of the
 # infinite-plane continuation where the scene has one (cloth_inf: the cloth scene's floor infinite). One process each.
 set -u
-WT=/Users/aditya/robosim/.claude/worktrees/agent-a5314e27bee02c142
-PY=/Users/aditya/robosim/.venv/bin/python
+WT=.
+PY=.venv/bin/python
 OUT=$WT/runs/render_gaps2/exp2.jsonl
 run() {  # scene renderer envs envvar json tag
   echo "== $*"

@@ -1,4 +1,4 @@
-/Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/metalsim/physics/mpm/probes/scale_pour.py:241: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+metalsim/physics/mpm/probes/scale_pour.py:241: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
   model = scene.finalize(device=DEV)
    63.669 ms      1.0  create_narrow_phase_process_mesh_mesh_contacts_kernel__locals__mesh_sdf_collision_global_reduce_kernel_974e8c8
     1.202 ms      1.0  mesh_triangle_contacts_to_reducer_kernel_e39fb65e_metal_forward
@@ -36,7 +36,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/runs/rigid_perf/kcache/kc_dev/1.18.0.dev20260917
+     runs/rigid_perf/kcache/kc_dev/1.18.0.dev20260917
 Module newton._src.geometry.inertia 0fe97dd load on device 'metal:0' took 727.53 ms  (compiled)
 Module validate_and_correct_inertia_kernel_bea299a6 bea299a load on device 'metal:0' took 83.19 ms  (compiled)
 Module newton._src.geometry.bvh fcf7383 load on device 'metal:0' took 551.32 ms  (compiled)
@@ -124,7 +124,7 @@ Module _next_time_builder__locals___next_time_f33b71a8 f33b71a load on device 'm
   "--kprof-ticks",
   "4",
   "--json",
-  "/Users/aditya/robosim/.claude/worktrees/agent-a6ef6785c0d23ee50/runs/rigid_perf/out/detprof_dev_collide.json"
+  "runs/rigid_perf/out/detprof_dev_collide.json"
  ],
  "device": "metal:0",
  "device_name": "Apple M4 Max",

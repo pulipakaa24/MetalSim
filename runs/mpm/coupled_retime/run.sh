@@ -9,8 +9,8 @@
 #   run.sh REPS
 set -u
 W=$(cd "$(dirname "$0")/../../.." && pwd)          # this worktree (metalsim sources)
-R=$W/runs/mpm/coupled_retime; PY=/Users/aditya/robosim/.venv-newton152/bin/python
-GR=/Users/aditya/robosim/scripts/gpu_run.sh
+R=$W/runs/mpm/coupled_retime; PY=.venv-newton152/bin/python
+GR=scripts/gpu_run.sh
 export PYTHONPATH=$W
 REPS=${1:-3}
 for rep in $(seq 1 $REPS); do

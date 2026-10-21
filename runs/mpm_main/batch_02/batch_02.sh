@@ -14,8 +14,8 @@
 # Every GPU job: scripts/gpu_run.sh + scripts/watchdog.py, health check after each; stops on a GPU anomaly or a
 # watchdog kill. Resumable: steps marked PASS in STATUS.txt are skipped. Expected ~1.5-2.5 h.
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
-R=/Users/aditya/robosim
+W=.
+R=.
 B=$W/runs/mpm_main/batch_02
 L=$B/logs
 D=$W/runs/mpm_main

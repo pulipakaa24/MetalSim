@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /Users/aditya/robosim
+cd .
 python3 scripts/gpu_lock.py status
 .venv/bin/python -m pytest tests/test_render_tier2.py tests/test_render_tier0.py -q 2>&1 | tail -2
 echo "== batch cost (1024 envs, step incl. physics+render+reward)"

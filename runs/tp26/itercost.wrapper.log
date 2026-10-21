@@ -8,7 +8,7 @@ state: nefc mean 7.8 max 35, nacon 1.66 per world
   k | solve ms (graph, per substep) | marginal ms of iteration k | worlds converged before iteration k
   10 |   6.792 |   0.202 |  4087
 --- worktree, contact_cfg recommended 04:15:49
-imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp/warp/__init__.py upstream/mujoco_warp-tp/mujoco_warp/__init__.py
 variant {'contact_cfg': 'recommended'}; iterations cap 10, ls 20, njmax 144, naconmax 98304
 state: nefc mean 7.8 max 35, nacon 1.67 per world
   k | solve ms (graph, per substep) | marginal ms of iteration k | worlds converged before iteration k
@@ -19,7 +19,7 @@ state: nefc mean 9.4 max 43, nacon 1.97 per world
   k | solve ms (graph, per substep) | marginal ms of iteration k | worlds converged before iteration k
   10 |   5.227 |   0.097 |  4096
 --- worktree, contact_cfg null 04:16:42
-imports /Users/aditya/robosim/upstream/warp-innate-tp/warp/__init__.py /Users/aditya/robosim/upstream/mujoco_warp-tp/mujoco_warp/__init__.py
+imports upstream/warp-innate-tp/warp/__init__.py upstream/mujoco_warp-tp/mujoco_warp/__init__.py
 variant {'contact_cfg': None}; iterations cap 10, ls 20, njmax 144, naconmax 98304
 state: nefc mean 9.4 max 43, nacon 1.97 per world
   k | solve ms (graph, per substep) | marginal ms of iteration k | worlds converged before iteration k

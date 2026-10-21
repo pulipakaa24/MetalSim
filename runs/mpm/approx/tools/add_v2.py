@@ -1,7 +1,7 @@
 """Add packed-table, 32-bit-carry variants (wp_cuda_rcp2 / wp_cuda_sqrt2) to metal_cuda_fast_math.h for timing."""
 import re
 
-P = "/Users/aditya/robosim/.claude/worktrees/agent-ae8661f0d09092d4b/_forks/warp/warp/native/metal_cuda_fast_math.h"
+P = "_forks/warp/warp/native/metal_cuda_fast_math.h"
 s = open(P).read()
 if "wp_cuda_rcp2" in s:
     raise SystemExit("already there")

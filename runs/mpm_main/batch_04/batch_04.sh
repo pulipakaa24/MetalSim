@@ -11,8 +11,8 @@
 #   2  if every gate passes: push the Newton fork branch (+ fast-forward metalsim-1.5.2), push, open the MPM PR
 # Resumable (STATUS.txt). Expected ~1-1.5 h.
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
-R=/Users/aditya/robosim
+W=.
+R=.
 B=$W/runs/mpm_main/batch_04
 L=$B/logs
 D=$W/runs/mpm_main

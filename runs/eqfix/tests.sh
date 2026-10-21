@@ -1,8 +1,8 @@
 #!/bin/bash
 # GPU job (render kind): MetalSim with the MuJoCo Warp fork at metalsim f1b35e2 (eq-block fix f52488b), equality
 # workaround removed. Stages: capacity + overflow tests, the fork's own tests on Metal, rigid suite, render suite.
-WT=/Users/aditya/robosim/.claude/worktrees/agent-a4b4d2a53213dae91
-PY=/Users/aditya/robosim/.venv/bin/python
+WT=.
+PY=.venv/bin/python
 L=$WT/runs/eqfix
 export PYTHONPATH=$WT/scratch/mjw_fork:$WT
 cd "$WT"

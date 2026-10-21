@@ -1,7 +1,7 @@
 """Key parity_report.py numbers side by side per fast-math mode."""
 import re
 
-B = "/Users/aditya/robosim/.claude/worktrees/agent-ae8661f0d09092d4b/runs/mpm/approx/parity_"
+B = "runs/mpm/approx/parity_"
 rows = {}
 for m in ("off", "cuda", "relaxed"):
     for line in open(B + m + ".md"):

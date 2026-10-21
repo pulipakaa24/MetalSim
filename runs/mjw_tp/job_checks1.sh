@@ -1,6 +1,6 @@
 #!/bin/bash
 # correctness checks for the scan-1 candidates (replay==eager, variant vs baseline vs floor, MuJoCo C protocol, capacity)
-cd /Users/aditya/robosim && source .venv/bin/activate
+cd . && source .venv/bin/activate
 echo "=== start $(date)"
 python3 scripts/gpu_lock.py status
 C=scripts/diagnostics/g1_tp_check.py

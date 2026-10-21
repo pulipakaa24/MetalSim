@@ -6,8 +6,8 @@ import sys
 
 import numpy as np
 
-F = "/Users/aditya/robosim/runs/parity/isaaclab3_mpm_floors/mpm_floors"
-FM = "/Users/aditya/robosim/.claude/worktrees/agent-ae8661f0d09092d4b/runs/mpm"
+F = "runs/parity/isaaclab3_mpm_floors/mpm_floors"
+FM = "runs/mpm"
 scene, n = sys.argv[1], int(sys.argv[2])
 runs = [a.split("=", 1) for a in sys.argv[3:]] or [
     ("base", f"{F}/{scene}_base"), ("nofma", f"{F}/{scene}_nofma"), ("precise", f"{F}/{scene}_precise"),

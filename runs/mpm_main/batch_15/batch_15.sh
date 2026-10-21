@@ -1,6 +1,6 @@
 #!/bin/bash
 # batch 15 (run outside the agent sandbox, after batch_14 with FIX_N152=1):
-#   bash /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b15/batch_15.sh
+#   bash scratch/b15/batch_15.sh
 #
 # P1  batch_11's SYNC11 "FAIL" was its own check's false negative (it grepped "commit_id":"<sha>" without the space pip
 #     writes); the sync had worked (upstream/newton at 1301e8da, .venv's newton at 9d6616c6). Verified here with
@@ -18,8 +18,8 @@
 #     new test failing on stock Newton; the stock opt-in skipping; the setup script in a throwaway venv, and its refusal.
 # Resumable (scratch/b15/STATUS.txt). ~1 h.
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
-R=/Users/aditya/robosim
+W=.
+R=.
 S=$W/scratch/b15
 L=$S/logs
 O=$W/runs/mpm_main/batch_15
@@ -67,7 +67,7 @@ if ! done_ P1; then
   . "$B11/pins.txt"
   ev=$("$PY" - "$NEW_HT" <<'EOF'
 import glob, json, sys
-f = glob.glob("/Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton-*.dist-info/direct_url.json")
+f = glob.glob(".venv/lib/python3.12/site-packages/newton-*.dist-info/direct_url.json")
 d = json.load(open(f[0]))
 print("venv newton commit_id", d.get("vcs_info", {}).get("commit_id"), "expected", sys.argv[1], "ok" if d.get("vcs_info", {}).get("commit_id") == sys.argv[1] else "MISMATCH")
 EOF

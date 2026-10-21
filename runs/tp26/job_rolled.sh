@@ -1,8 +1,8 @@
 #!/bin/bash
 # tp26 job 8: rolled register Cholesky (thread-memory columns, runtime loops) vs the unrolled register form, cost split at
 # n = 32, 40, 43, 48 (worktree Warp), plus bitwise check of the factor against the unrolled form.
-cd /Users/aditya/robosim && source .venv/bin/activate
-WT=/Users/aditya/robosim/upstream/warp-innate-tp:/Users/aditya/robosim/upstream/mujoco_warp-tp
+cd . && source .venv/bin/activate
+WT=upstream/warp-innate-tp:upstream/mujoco_warp-tp
 S=/private/tmp/claude-501/-Users-aditya/7ceab845-25d9-459e-a466-a4b793f72f5c/scratchpad
 echo "=== start $(date) wt warp $(git -C upstream/warp-innate-tp rev-parse --short HEAD) power: $(pmset -g batt | head -1)"
 echo "--- unrolled (worktree default) $(date +%H:%M:%S)"; PYTHONPATH=$WT python scripts/diagnostics/metal_cholesky_parts.py 32 40 43 48 2>&1 | grep "^n=\|rolled"

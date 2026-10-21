@@ -16,10 +16,10 @@ set -u
 # commit identity for the fresh fork clones (the user's identity is set only in the metalsim repo's config)
 export GIT_AUTHOR_NAME="Aditya Pulipaka" GIT_AUTHOR_EMAIL="adipu@utexas.edu"
 export GIT_COMMITTER_NAME="Aditya Pulipaka" GIT_COMMITTER_EMAIL="adipu@utexas.edu"
-W=/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0
+W=.
 R=$W/runs/mpm/coupled_speed
 B=$R/b08
-M=/Users/aditya/robosim
+M=.
 PY=$M/.venv-newton152/bin/python
 PYM=$M/.venv/bin/python
 PYP=$M/.claude/worktrees/agent-a278824da4c05bf29/.venv-pour/bin/python

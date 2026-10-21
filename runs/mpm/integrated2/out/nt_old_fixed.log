@@ -20,7 +20,7 @@ test_multiple_keys_cpu (newton.tests.test_hashtable.TestHashTable.test_multiple_
 test_multiple_keys_metal_0 (newton.tests.test_hashtable.TestHashTable.test_multiple_keys_metal_0) ... ok
 test_power_of_two_rounding_cpu (newton.tests.test_hashtable.TestHashTable.test_power_of_two_rounding_cpu) ... ok
 test_power_of_two_rounding_metal_0 (newton.tests.test_hashtable.TestHashTable.test_power_of_two_rounding_metal_0) ... ok
-test_box_on_plane_multiple_contacts_cpu (newton.tests.test_contact_matching.TestContactMatching.test_box_on_plane_multiple_contacts_cpu) ... /Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/runs/a2/kc/nt_old_fixed/1.18.0.dev20260917/wp_newton._src.geometry.contact_match_94e04d2_p5607_t8496095680/wp_newton._src.geometry.contact_match_94e04d2.cpp:777:29: warning: implicit conversion from 'long' to 'const wp::int32' (aka 'const int') changes value from 2147483648 to -2147483648 [-Wconstant-conversion]
+test_box_on_plane_multiple_contacts_cpu (newton.tests.test_contact_matching.TestContactMatching.test_box_on_plane_multiple_contacts_cpu) ... runs/a2/kc/nt_old_fixed/1.18.0.dev20260917/wp_newton._src.geometry.contact_match_94e04d2_p5607_t8496095680/wp_newton._src.geometry.contact_match_94e04d2.cpp:777:29: warning: implicit conversion from 'long' to 'const wp::int32' (aka 'const int') changes value from 2147483648 to -2147483648 [-Wconstant-conversion]
   777 |     const wp::int32 var_1 = 2147483648;
       |                     ~~~~~   ^~~~~~~~~~
 1 warning generated.
@@ -125,7 +125,7 @@ test_oct_encode_decode_roundtrip_metal_0 (newton.tests.test_contact_reduction_gl
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/runs/a2/kc/nt_old_fixed/1.18.0.dev20260917
+     runs/a2/kc/nt_old_fixed/1.18.0.dev20260917
 Module newton.tests.test_hashtable 7071cba load on device 'cpu' took 852.24 ms  (compiled)
 Module newton.tests.test_hashtable ac464a8 load on device 'metal:0' took 472.10 ms  (compiled)
 Module newton.tests.test_hashtable 42b4e9f load on device 'cpu' took 121.03 ms  (compiled)

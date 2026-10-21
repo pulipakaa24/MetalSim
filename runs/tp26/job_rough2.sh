@@ -1,7 +1,7 @@
 #!/bin/bash
 # tp26 round 2: rough loop with everything landed (installed forks at the merged heads, task defaults), full g1_tp_variants,
 # R1 R2; and the flat loop once more for the record.
-cd /Users/aditya/robosim && source .venv/bin/activate
+cd . && source .venv/bin/activate
 F='^\[\|Error\|Traceback'
 echo "=== start $(date) metalsim $(git rev-parse --short HEAD) warp $(git -C upstream/warp-innate rev-parse --short HEAD) mjw $(git -C upstream/mujoco_warp rev-parse --short HEAD) power: $(pmset -g batt | head -1)"
 python -c "import warp, mujoco_warp; print('imports', warp.__file__, mujoco_warp.__file__)"

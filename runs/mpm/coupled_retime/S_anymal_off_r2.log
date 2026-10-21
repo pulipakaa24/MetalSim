@@ -1,7 +1,7 @@
 [gpu_run] cr_S_anymal_off_r2 start: device utilisation 0% (13:08:30)
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
 [gpu_run] gpu_top:   pid   1291 Google Chrome He                   1.5 %
-/Users/aditya/robosim/upstream/newton-metalsim-1.5.2/newton/_src/utils/import_urdf.py:651: UserWarning: Warning: mesh /Users/aditya/Library/Caches/newton/newton-assets_anybotics_anymal_c_56bec244_261cd1f4/anybotics_anymal_c/meshes/base.dae has a texture but no UVs; texture will be ignored.
+upstream/newton-metalsim-1.5.2/newton/_src/utils/import_urdf.py:651: UserWarning: Warning: mesh ~/Library/Caches/newton/newton-assets_anybotics_anymal_c_56bec244_261cd1f4/anybotics_anymal_c/meshes/base.dae has a texture but no UVs; texture will be ignored.
   parse_shapes(link, visuals, density=0.0, just_visual=True, visible=not hide_visuals)
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -9,7 +9,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module newton._src.utils.mesh 9037096 load on device 'cpu' took 0.76 ms  (cached)
 Module newton._src.geometry.inertia e372b69 load on device 'metal:0' took 40.19 ms  (cached)
 Module validate_and_correct_inertia_kernel_e5f8239c e5f8239 load on device 'metal:0' took 39.22 ms  (cached)
@@ -110,6 +110,6 @@ Module warp.fem.space.partition c56bfe6 load on device 'metal:0' took 39.60 ms  
 Module scatter_field_dof_values_953ffc59 bbfb9a1 load on device 'metal:0' took 38.78 ms  (cached)
 Module warp.fem.integrate._identity_field_003441ce 61de55e load on device 'metal:0' took 43.10 ms  (cached)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_789a04ef a1abe7b load on device 'metal:0' took 41.24 ms  (cached)
-{"scene": "example:mpm_anymal", "set": {}, "frames": 60, "warmup": 5, "ms_median": 40.31837499860558, "ms_mean": 40.42199933392112, "ms_p10": 38.124537201656494, "ms_p90": 42.93681670387741, "per_frame_counters": {"host_waits": 17.0, "command_buffers": 57.85, "host_ops": 0.0, "dispatches_encoded": 1680.0}, "warp": "/Users/aditya/robosim/upstream/warp-innate/warp/__init__.py", "compat": {"accumulate": "float32", "loop": "cuda", "chunk_graph": true, "fused": false, "fused_max_color_blocks": 1073741824, "simd": false, "gpu_exit": true, "rigid_deterministic": true, "metal_fast_math": "off"}}
+{"scene": "example:mpm_anymal", "set": {}, "frames": 60, "warmup": 5, "ms_median": 40.31837499860558, "ms_mean": 40.42199933392112, "ms_p10": 38.124537201656494, "ms_p90": 42.93681670387741, "per_frame_counters": {"host_waits": 17.0, "command_buffers": 57.85, "host_ops": 0.0, "dispatches_encoded": 1680.0}, "warp": "upstream/warp-innate/warp/__init__.py", "compat": {"accumulate": "float32", "loop": "cuda", "chunk_graph": true, "fused": false, "fused_max_color_blocks": 1073741824, "simd": false, "gpu_exit": true, "rigid_deterministic": true, "metal_fast_math": "off"}}
 [gpu_run] cr_S_anymal_off_r2 end: device utilisation 67% (13:08:45), exit 0
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.8 s: none >= 1 %

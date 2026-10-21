@@ -1,7 +1,7 @@
 #!/bin/bash
 # round 5: step 3 = MuJoCo Warp fork: one-world-per-thread sparse L'DL factor/solve on Metal + skip no-op launches
 # (gravcomp with no gravcomp bodies, tendon damping with no tendons). A/B within the fork via has_gravcomp.
-cd /Users/aditya/robosim && source .venv/bin/activate
+cd . && source .venv/bin/activate
 F='^\[\|Error\|Traceback'
 S2='{"metal_register_cholesky_max":48,"m_dense_max":0'
 {

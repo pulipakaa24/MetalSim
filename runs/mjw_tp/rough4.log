@@ -15,9 +15,9 @@ holder: {"name": "mjw_tp_round4", "kind": "low", "minutes": 30.0, "pid": 59339, 
 [step2] PPO update 299 ms -> full loop 37,258 env-steps/s
 [step2] SUMMARY physics 53,732 | step 46,305 | rollout 42,014 | loop 37,258  (ms: physics 76.2, step 88.5, rollout/step 97.5, update 299)
 === variant baseline; N=512, 50 control steps, deterministic actions
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 njmax 256 naconmax 65536 sparse False
 --- floor: two graph-replay instances of this configuration
@@ -45,9 +45,9 @@ capacity eager: nefc max 50 (njmax 256), nacon max 1544 (naconmax 65536); overfl
    t=0.02s 9.94e-01/2.7e-03  t=0.04s 7.12e-01/5.6e-03  t=0.08s 7.35e-01/1.5e-02  t=0.24s 1.07e+00/4.8e-02  t=0.50s 9.00e-01/6.9e-02  t=1.00s 9.63e-01/9.7e-02
 === done
 === variant {'metal_register_cholesky_max': 48, 'm_dense_max': 0, 'label': 'step2'}; N=512, 50 control steps, deterministic actions
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:665: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 njmax 256 naconmax 65536 sparse False
 --- floor: two graph-replay instances of this configuration

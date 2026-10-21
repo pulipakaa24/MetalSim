@@ -20,7 +20,7 @@ test_multiple_keys_cpu (newton.tests.test_hashtable.TestHashTable.test_multiple_
 test_multiple_keys_metal_0 (newton.tests.test_hashtable.TestHashTable.test_multiple_keys_metal_0) ... ok
 test_power_of_two_rounding_cpu (newton.tests.test_hashtable.TestHashTable.test_power_of_two_rounding_cpu) ... ok
 test_power_of_two_rounding_metal_0 (newton.tests.test_hashtable.TestHashTable.test_power_of_two_rounding_metal_0) ... ok
-test_box_on_plane_multiple_contacts_cpu (newton.tests.test_contact_matching.TestContactMatching.test_box_on_plane_multiple_contacts_cpu) ... /Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/runs/a2/kc/nt_final_fixed/1.18.0.dev20260917/wp_newton._src.geometry.contact_match_81e527c_p4833_t8496095680/wp_newton._src.geometry.contact_match_81e527c.cpp:777:29: warning: implicit conversion from 'long' to 'const wp::int32' (aka 'const int') changes value from 2147483648 to -2147483648 [-Wconstant-conversion]
+test_box_on_plane_multiple_contacts_cpu (newton.tests.test_contact_matching.TestContactMatching.test_box_on_plane_multiple_contacts_cpu) ... runs/a2/kc/nt_final_fixed/1.18.0.dev20260917/wp_newton._src.geometry.contact_match_81e527c_p4833_t8496095680/wp_newton._src.geometry.contact_match_81e527c.cpp:777:29: warning: implicit conversion from 'long' to 'const wp::int32' (aka 'const int') changes value from 2147483648 to -2147483648 [-Wconstant-conversion]
   777 |     const wp::int32 var_1 = 2147483648;
       |                     ~~~~~   ^~~~~~~~~~
 1 warning generated.
@@ -125,7 +125,7 @@ test_oct_encode_decode_roundtrip_metal_0 (newton.tests.test_contact_reduction_gl
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/runs/a2/kc/nt_final_fixed/1.18.0.dev20260917
+     runs/a2/kc/nt_final_fixed/1.18.0.dev20260917
 Module newton.tests.test_hashtable bef0045 load on device 'cpu' took 855.96 ms  (compiled)
 Module newton.tests.test_hashtable c0cd7fd load on device 'metal:0' took 500.30 ms  (compiled)
 Module newton.tests.test_hashtable 8df0494 load on device 'cpu' took 119.36 ms  (compiled)
@@ -229,13 +229,13 @@ test_get_slot_matches_best_face_normal_metal_0 (newton.tests.test_contact_reduct
 ERROR: test_centered_two_spatial_depths_full_buffer_does_not_publish_voxel_key_metal_0 (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_centered_two_spatial_depths_full_buffer_does_not_publish_voxel_key_metal_0)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/newton-rigid/newton/tests/unittest_utils.py", line 599, in test_func
+  File "upstream/newton-rigid/newton/tests/unittest_utils.py", line 599, in test_func
     func(self, device, **kwargs)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/newton-rigid/newton/tests/test_contact_reduction_global.py", line 1075, in test_centered_two_spatial_depths_full_buffer_does_not_publish_voxel_key
+  File "upstream/newton-rigid/newton/tests/test_contact_reduction_global.py", line 1075, in test_centered_two_spatial_depths_full_buffer_does_not_publish_voxel_key
     wp.launch(exhaust_then_reduce_kernel, dim=1, inputs=[reducer.get_data_struct()], outputs=[result], device=device)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/warp-i2/warp/_src/context.py", line 12638, in launch
+  File "upstream/warp-i2/warp/_src/context.py", line 12638, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint, dim_limit=dim_limit)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/warp-i2/warp/_src/context.py", line 11546, in invoke_metal
+  File "upstream/warp-i2/warp/_src/context.py", line 11546, in invoke_metal
     raise RuntimeError(
 RuntimeError: Kernel 'test_centered_two_spatial_depths_full_buffer_does_not_publish_voxel_key__locals__exhaust_then_reduce_kernel' uses builtins that are not supported on Metal yet: atomic_cas(uint64). Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; use 32-bit atomics (e.g. on one half of the value) instead
 
@@ -243,13 +243,13 @@ RuntimeError: Kernel 'test_centered_two_spatial_depths_full_buffer_does_not_publ
 ERROR: test_centered_two_spatial_depths_prefers_inner_then_outer_metal_0 (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_centered_two_spatial_depths_prefers_inner_then_outer_metal_0)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/newton-rigid/newton/tests/unittest_utils.py", line 599, in test_func
+  File "upstream/newton-rigid/newton/tests/unittest_utils.py", line 599, in test_func
     func(self, device, **kwargs)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/newton-rigid/newton/tests/test_contact_reduction_global.py", line 941, in test_centered_two_spatial_depths_prefers_inner_then_outer
+  File "upstream/newton-rigid/newton/tests/test_contact_reduction_global.py", line 941, in test_centered_two_spatial_depths_prefers_inner_then_outer
     wp.launch(
-  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/warp-i2/warp/_src/context.py", line 12638, in launch
+  File "upstream/warp-i2/warp/_src/context.py", line 12638, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint, dim_limit=dim_limit)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/warp-i2/warp/_src/context.py", line 11546, in invoke_metal
+  File "upstream/warp-i2/warp/_src/context.py", line 11546, in invoke_metal
     raise RuntimeError(
 RuntimeError: Kernel 'test_centered_two_spatial_depths_prefers_inner_then_outer__locals__store_two_depth_contact_kernel' uses builtins that are not supported on Metal yet: atomic_cas(uint64). Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; use 32-bit atomics (e.g. on one half of the value) instead
 
@@ -257,16 +257,16 @@ RuntimeError: Kernel 'test_centered_two_spatial_depths_prefers_inner_then_outer_
 ERROR: test_centered_two_spatial_depths_voxel_only_claim_metal_0 (newton.tests.test_contact_reduction_global.TestGlobalContactReducer.test_centered_two_spatial_depths_voxel_only_claim_metal_0)
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/newton-rigid/newton/tests/unittest_utils.py", line 599, in test_func
+  File "upstream/newton-rigid/newton/tests/unittest_utils.py", line 599, in test_func
     func(self, device, **kwargs)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/newton-rigid/newton/tests/test_contact_reduction_global.py", line 1022, in test_centered_two_spatial_depths_voxel_only_claim
+  File "upstream/newton-rigid/newton/tests/test_contact_reduction_global.py", line 1022, in test_centered_two_spatial_depths_voxel_only_claim
     test.assertEqual(run(wp.vec3(-0.99, 0.0, 0.0), 1), 1)
                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/newton-rigid/newton/tests/test_contact_reduction_global.py", line 1012, in run
+  File "upstream/newton-rigid/newton/tests/test_contact_reduction_global.py", line 1012, in run
     wp.launch(
-  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/warp-i2/warp/_src/context.py", line 12638, in launch
+  File "upstream/warp-i2/warp/_src/context.py", line 12638, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint, dim_limit=dim_limit)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/upstream/warp-i2/warp/_src/context.py", line 11546, in invoke_metal
+  File "upstream/warp-i2/warp/_src/context.py", line 11546, in invoke_metal
     raise RuntimeError(
 RuntimeError: Kernel 'test_centered_two_spatial_depths_voxel_only_claim__locals__reduce_kernel' uses builtins that are not supported on Metal yet: atomic_cas(uint64). Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; use 32-bit atomics (e.g. on one half of the value) instead
 

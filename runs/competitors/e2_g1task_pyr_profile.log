@@ -1,6 +1,6 @@
 [gpu_run] e2_prof_g1task_pyr start: device utilisation 0% (04:13:44)
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-LABEL g1task_pyr_profile mjw=/Users/aditya/robosim/upstream/mujoco_warp-ellip2/mujoco_warp/__init__.py head=a33c731 N=4096 env=
+LABEL g1task_pyr_profile mjw=upstream/mujoco_warp-ellip2/mujoco_warp/__init__.py head=a33c731 N=4096 env=
 == profile g1task pyramidal
 KERNELS g1task N=4096 substeps=8 preset=recommended: 10.89 ms/physics-step GPU (sum of per-dispatch times), 202 dispatches/step
      3.378 ms  31.0%  x 10  _update_gradient_h_incremental_cholesky__locals__kernel_9cbe588a_metal_forward

@@ -6,7 +6,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth dc949da load on device 'metal:0' took 62.21 ms  (cached)
 Module _nxn_broadphase__locals__kernel_80a41a9c 80a41a9 load on device 'metal:0' took 41.21 ms  (cached)
 Module _primitive_narrowphase__locals__primitive_narrowphase_cefd9f09 cefd9f0 load on device 'metal:0' took 43.99 ms  (cached)
@@ -115,24 +115,24 @@ Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.update_part
 Module metalsim.physics.mpm.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_06945b85 d2ec691 load on device 'metal:0' took 576.92 ms  (cached)
 Module map_mul fe0b813 load on device 'metal:0' took 346.20 ms  (cached)
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt/metalsim/physics/mpm/probes/policy_step_ab.py", line 157, in <module>
+  File "scratch/wt-copt/metalsim/physics/mpm/probes/policy_step_ab.py", line 157, in <module>
     main()
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt/metalsim/physics/mpm/probes/policy_step_ab.py", line 135, in main
+  File "scratch/wt-copt/metalsim/physics/mpm/probes/policy_step_ab.py", line 135, in main
     ha = run(hb, "A", True)[1]
          ^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt/metalsim/physics/mpm/probes/policy_step_ab.py", line 73, in run
+  File "scratch/wt-copt/metalsim/physics/mpm/probes/policy_step_ab.py", line 73, in run
     mpm.reset(np.zeros(a.worlds, bool))
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt/metalsim/physics/mpm/coupled.py", line 639, in reset
+  File "scratch/wt-copt/metalsim/physics/mpm/coupled.py", line 639, in reset
     self._launch_reset(False)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt/metalsim/physics/mpm/coupled.py", line 591, in _launch_reset
+  File "scratch/wt-copt/metalsim/physics/mpm/coupled.py", line 591, in _launch_reset
     self.solver.reset(self.state, world_mask=wm,
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt/metalsim/physics/mpm/implicit_mpm/solver_implicit_mpm.py", line 1612, in reset
+  File "scratch/wt-copt/metalsim/physics/mpm/implicit_mpm/solver_implicit_mpm.py", line 1612, in reset
     reset_partitions = self._validate_reset_warmstart_fields(world_mask)
                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt/metalsim/physics/mpm/implicit_mpm/solver_implicit_mpm.py", line 1530, in _validate_reset_warmstart_fields
+  File "scratch/wt-copt/metalsim/physics/mpm/implicit_mpm/solver_implicit_mpm.py", line 1530, in _validate_reset_warmstart_fields
     reset_partitions.append(self._reset_grid_warmstart_partition(name, field, scratch_field))
                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/wt-copt/metalsim/physics/mpm/implicit_mpm/solver_implicit_mpm.py", line 1498, in _reset_grid_warmstart_partition
+  File "scratch/wt-copt/metalsim/physics/mpm/implicit_mpm/solver_implicit_mpm.py", line 1498, in _reset_grid_warmstart_partition
     raise RuntimeError(
 RuntimeError: Masked reset cannot selectively clear last-step ws_impulse_field: its grid partition does not expose environment offsets with shape (2,).
 [gpu_run] mm7_policy_1 end: device utilisation 0% (19:47:39), exit 1

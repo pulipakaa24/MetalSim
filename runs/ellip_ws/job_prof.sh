@@ -2,8 +2,8 @@
 # ellip_ws: where the rollout's elliptic cost goes. Frozen worktree mujoco_warp-ellip-test3 (ca431fc: fused + htot, lanes knob).
 # (a) itercost 4096/20 on the state after one PPO rollout (untrained policy) for U (unfused), F (fused, per-entry htot),
 # H32, H128 (fused + htot at 32 / 128 lanes); (b) g1_tp_variants full (rollout + inference, loop) for U, F, H128.
-cd /Users/aditya/robosim && source .venv/bin/activate
-WT=/Users/aditya/robosim/upstream/warp-innate-tp-test:/Users/aditya/robosim/upstream/mujoco_warp-ellip-test3
+cd . && source .venv/bin/activate
+WT=upstream/warp-innate-tp-test:upstream/mujoco_warp-ellip-test3
 R='^  *[0-9]* |\|^  k\|^state\|Error\|Traceback'; F='^\[\|Error\|Traceback'
 echo "=== start $(date) metalsim $(git rev-parse --short HEAD) frozen warp $(git -C upstream/warp-innate-tp-test rev-parse --short HEAD) mjw $(git -C upstream/mujoco_warp-ellip-test3 rev-parse --short HEAD) power: $(pmset -g batt | head -1)"
 it() { echo "--- (a) itercost rollout state $1 $(date +%H:%M:%S)"; PYTHONPATH=$WT env $2 MJW_TP_VARIANT='{"contact_cfg":"recommended","state":"rollout"}' python -c "import runpy, sys; sys.argv=['x','4096','20']; runpy.run_path('scripts/diagnostics/g1_solve_iteration_cost.py', run_name='__main__')" > runs/ellip_ws/iterroll_$1.log 2>&1; grep "$R" runs/ellip_ws/iterroll_$1.log; }

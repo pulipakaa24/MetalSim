@@ -20,15 +20,15 @@ ERROR: test_02_evaluate_trivial_solution (newton._src.solvers.kamino.tests.test_
 Tests evaluating metrics on an all-zeros trivial solution.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n152_base/newton/_src/solvers/kamino/tests/test_solvers_metrics.py", line 374, in test_02_evaluate_trivial_solution
+  File "upstream/n152_base/newton/_src/solvers/kamino/tests/test_solvers_metrics.py", line 374, in test_02_evaluate_trivial_solution
     metrics.evaluate(
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n152_base/newton/_src/solvers/kamino/_src/solvers/metrics.py", line 1224, in evaluate
+  File "upstream/n152_base/newton/_src/solvers/kamino/_src/solvers/metrics.py", line 1224, in evaluate
     self._evaluate_primal_problem_perf(model, data, state_p, jacobians)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n152_base/newton/_src/solvers/kamino/_src/solvers/metrics.py", line 1336, in _evaluate_primal_problem_perf
+  File "upstream/n152_base/newton/_src/solvers/kamino/_src/solvers/metrics.py", line 1336, in _evaluate_primal_problem_perf
     wp.launch(
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/t4/warp-B/warp/_src/context.py", line 12651, in launch
+  File "upstream/t4/warp-B/warp/_src/context.py", line 12651, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint, dim_limit=dim_limit)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/t4/warp-B/warp/_src/context.py", line 11559, in invoke_metal
+  File "upstream/t4/warp-B/warp/_src/context.py", line 11559, in invoke_metal
     raise RuntimeError(
 RuntimeError: Kernel '_compute_eom_residual' uses builtins that are not supported on Metal yet: atomic_exch(int64). Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; use 32-bit atomics (e.g. on one half of the value) instead
 
@@ -37,15 +37,15 @@ ERROR: test_03_evaluate_padmm_solution_box_on_plane (newton._src.solvers.kamino.
 Tests evaluating metrics on a solution computed with the Proximal-ADMM (PADMM) solver.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n152_base/newton/_src/solvers/kamino/tests/test_solvers_metrics.py", line 474, in test_03_evaluate_padmm_solution_box_on_plane
+  File "upstream/n152_base/newton/_src/solvers/kamino/tests/test_solvers_metrics.py", line 474, in test_03_evaluate_padmm_solution_box_on_plane
     metrics.evaluate(
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n152_base/newton/_src/solvers/kamino/_src/solvers/metrics.py", line 1224, in evaluate
+  File "upstream/n152_base/newton/_src/solvers/kamino/_src/solvers/metrics.py", line 1224, in evaluate
     self._evaluate_primal_problem_perf(model, data, state_p, jacobians)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n152_base/newton/_src/solvers/kamino/_src/solvers/metrics.py", line 1336, in _evaluate_primal_problem_perf
+  File "upstream/n152_base/newton/_src/solvers/kamino/_src/solvers/metrics.py", line 1336, in _evaluate_primal_problem_perf
     wp.launch(
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/t4/warp-B/warp/_src/context.py", line 12651, in launch
+  File "upstream/t4/warp-B/warp/_src/context.py", line 12651, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint, dim_limit=dim_limit)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/t4/warp-B/warp/_src/context.py", line 11559, in invoke_metal
+  File "upstream/t4/warp-B/warp/_src/context.py", line 11559, in invoke_metal
     raise RuntimeError(
 RuntimeError: Kernel '_compute_eom_residual' uses builtins that are not supported on Metal yet: atomic_exch(int64). Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; use 32-bit atomics (e.g. on one half of the value) instead
 
@@ -54,15 +54,15 @@ ERROR: test_04_evaluate_padmm_solution_boxes_hinged (newton._src.solvers.kamino.
 Tests evaluating metrics on a solution computed with the Proximal-ADMM (PADMM) solver.
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n152_base/newton/_src/solvers/kamino/tests/test_solvers_metrics.py", line 560, in test_04_evaluate_padmm_solution_boxes_hinged
+  File "upstream/n152_base/newton/_src/solvers/kamino/tests/test_solvers_metrics.py", line 560, in test_04_evaluate_padmm_solution_boxes_hinged
     metrics.evaluate(
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n152_base/newton/_src/solvers/kamino/_src/solvers/metrics.py", line 1223, in evaluate
+  File "upstream/n152_base/newton/_src/solvers/kamino/_src/solvers/metrics.py", line 1223, in evaluate
     self._evaluate_constraint_violations_perf(model, data, limits, contacts)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n152_base/newton/_src/solvers/kamino/_src/solvers/metrics.py", line 1262, in _evaluate_constraint_violations_perf
+  File "upstream/n152_base/newton/_src/solvers/kamino/_src/solvers/metrics.py", line 1262, in _evaluate_constraint_violations_perf
     wp.launch(
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/t4/warp-B/warp/_src/context.py", line 12651, in launch
+  File "upstream/t4/warp-B/warp/_src/context.py", line 12651, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint, dim_limit=dim_limit)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/t4/warp-B/warp/_src/context.py", line 11559, in invoke_metal
+  File "upstream/t4/warp-B/warp/_src/context.py", line 11559, in invoke_metal
     raise RuntimeError(
 RuntimeError: Kernel '_compute_cts_joints_residual' uses builtins that are not supported on Metal yet: atomic_exch(int64). Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; use 32-bit atomics (e.g. on one half of the value) instead
 
@@ -71,15 +71,15 @@ ERROR: test_05_validate_metrics_boxes_hinged (newton._src.solvers.kamino.tests.t
 Compares metrics from `SolutionMetrics` with metrics computed by a
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n152_base/newton/_src/solvers/kamino/tests/test_solvers_metrics.py", line 658, in test_05_validate_metrics_boxes_hinged
+  File "upstream/n152_base/newton/_src/solvers/kamino/tests/test_solvers_metrics.py", line 658, in test_05_validate_metrics_boxes_hinged
     metrics.evaluate(
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n152_base/newton/_src/solvers/kamino/_src/solvers/metrics.py", line 1223, in evaluate
+  File "upstream/n152_base/newton/_src/solvers/kamino/_src/solvers/metrics.py", line 1223, in evaluate
     self._evaluate_constraint_violations_perf(model, data, limits, contacts)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n152_base/newton/_src/solvers/kamino/_src/solvers/metrics.py", line 1262, in _evaluate_constraint_violations_perf
+  File "upstream/n152_base/newton/_src/solvers/kamino/_src/solvers/metrics.py", line 1262, in _evaluate_constraint_violations_perf
     wp.launch(
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/t4/warp-B/warp/_src/context.py", line 12651, in launch
+  File "upstream/t4/warp-B/warp/_src/context.py", line 12651, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint, dim_limit=dim_limit)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/t4/warp-B/warp/_src/context.py", line 11559, in invoke_metal
+  File "upstream/t4/warp-B/warp/_src/context.py", line 11559, in invoke_metal
     raise RuntimeError(
 RuntimeError: Kernel '_compute_cts_joints_residual' uses builtins that are not supported on Metal yet: atomic_exch(int64). Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; use 32-bit atomics (e.g. on one half of the value) instead
 
@@ -88,15 +88,15 @@ ERROR: test_06_compare_dense_sparse_boxes_hinged (newton._src.solvers.kamino.tes
 Compares metrics evaluated on dense and sparse problems on a perturbed
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n152_base/newton/_src/solvers/kamino/tests/test_solvers_metrics.py", line 769, in test_06_compare_dense_sparse_boxes_hinged
+  File "upstream/n152_base/newton/_src/solvers/kamino/tests/test_solvers_metrics.py", line 769, in test_06_compare_dense_sparse_boxes_hinged
     metrics_dense.evaluate(
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n152_base/newton/_src/solvers/kamino/_src/solvers/metrics.py", line 1223, in evaluate
+  File "upstream/n152_base/newton/_src/solvers/kamino/_src/solvers/metrics.py", line 1223, in evaluate
     self._evaluate_constraint_violations_perf(model, data, limits, contacts)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n152_base/newton/_src/solvers/kamino/_src/solvers/metrics.py", line 1262, in _evaluate_constraint_violations_perf
+  File "upstream/n152_base/newton/_src/solvers/kamino/_src/solvers/metrics.py", line 1262, in _evaluate_constraint_violations_perf
     wp.launch(
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/t4/warp-B/warp/_src/context.py", line 12651, in launch
+  File "upstream/t4/warp-B/warp/_src/context.py", line 12651, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint, dim_limit=dim_limit)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/t4/warp-B/warp/_src/context.py", line 11559, in invoke_metal
+  File "upstream/t4/warp-B/warp/_src/context.py", line 11559, in invoke_metal
     raise RuntimeError(
 RuntimeError: Kernel '_compute_cts_joints_residual' uses builtins that are not supported on Metal yet: atomic_exch(int64). Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; use 32-bit atomics (e.g. on one half of the value) instead
 
@@ -110,7 +110,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/kcache/kcT_n152_base/1.18.0.dev20260917
+     runs/rigid17/kcache/kcT_n152_base/1.18.0.dev20260917
 Module newton._src.solvers.kamino._src.core.bodies aecde4c load on device 'metal:0' took 512.23 ms  (compiled)
 Module newton._src.solvers.kamino._src.geometry.primitive.broadphase 196e893 load on device 'metal:0' took 615.22 ms  (compiled)
 Module newton._src.solvers.kamino._src.geometry.primitive.narrowphase 0ef247e load on device 'metal:0' took 1769.18 ms  (compiled)

@@ -14,7 +14,7 @@ upstream/mujoco_warp-flex/mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::
 upstream/mujoco_warp-flex/mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp1
 upstream/mujoco_warp-flex/mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp4
 upstream/mujoco_warp-flex/mujoco_warp/_src/flex_test.py::FlexPassiveForcesTest::test_flex_elastic2d_interp5
-  /Users/aditya/robosim/upstream/mujoco_warp-flex/mujoco_warp/_src/io.py:334: UserWarning: Bending damping is not yet supported for interpolated flex shells.
+  upstream/mujoco_warp-flex/mujoco_warp/_src/io.py:334: UserWarning: Bending damping is not yet supported for interpolated flex shells.
     warnings.warn("Bending damping is not yet supported for interpolated flex shells.")
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
@@ -45,28 +45,28 @@ FAILED tests/test_deformable.py::test_mjw_flex_graph_replay_equals_eager - As...
 1 failed, 9 passed in 42.68s
 == split benchmark (box, 4096)
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/scratch/deformable/bench_split.py", line 47, in <module>
+  File "scratch/deformable/bench_split.py", line 47, in <module>
     t = timed(lambda: wp.capture_launch(g))
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/scratch/deformable/bench_split.py", line 9, in timed
+  File "scratch/deformable/bench_split.py", line 9, in timed
     fn(); wp.synchronize_device("metal:0")
           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/upstream/warp-innate-flex/warp/_src/context.py", line 12884, in synchronize_device
+  File "upstream/warp-innate-flex/warp/_src/context.py", line 12884, in synchronize_device
     device.metal_synchronize()
-  File "/Users/aditya/robosim/upstream/warp-innate-flex/warp/_src/context.py", line 6059, in metal_synchronize
+  File "upstream/warp-innate-flex/warp/_src/context.py", line 6059, in metal_synchronize
     raise RuntimeError(f"Metal error on device {self}: {self.runtime.get_error_string()}")
 RuntimeError: Metal error on device metal:0: Metal command buffer failed: Insufficient Memory (00000008:kIOGPUCommandBufferCallbackErrorOutOfMemory)
 == throughput mjw G1 scene (12x12 cloth + 16 cable)
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 {"num_envs": 256, "steps": 130, "wall_s": 2.1877646670036484, "env_steps_per_s": 15211.87379151713, "sim_s_per_wall_s": 0.14855345499528447, "finite": true, "energy_max": 200.23117065429688, "overflow": {"ITERATIONS": 256, "LS_ITERATIONS": 256}, "nv": 523, "nflexvert": 160, "nconmax": 1148, "njmax": 5526, "njmax_nnz": 236594, "nccdmax": 128, "backend": "mjw", "scene": "g1", "cloth": 12, "cable": 16, "dt": 0.0025, "flex_flags": ""}
 {"num_envs": 1024, "steps": 40, "wall_s": 2.1427437500096858, "env_steps_per_s": 19115.67820455192, "sim_s_per_wall_s": 0.04666913624158184, "finite": true, "energy_max": 198.87132263183594, "overflow": {"LS_ITERATIONS": 1024}, "nv": 523, "nflexvert": 160, "nconmax": 1148, "njmax": 5526, "njmax_nnz": 236594, "nccdmax": 128, "backend": "mjw", "scene": "g1", "cloth": 12, "cable": 16, "dt": 0.0025, "flex_flags": ""}
 {"num_envs": 2048, "steps": 20, "wall_s": 2.0515765419986565, "env_steps_per_s": 19965.13372106339, "sim_s_per_wall_s": 0.02437150112434496, "finite": true, "energy_max": 200.9688720703125, "overflow": {"LS_ITERATIONS": 2048}, "nv": 523, "nflexvert": 160, "nconmax": 1148, "njmax": 5526, "njmax_nnz": 236594, "nccdmax": 128, "backend": "mjw", "scene": "g1", "cloth": 12, "cable": 16, "dt": 0.0025, "flex_flags": ""}
 == throughput mjw box, 20x20 cloth + 24 cable
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 {"num_envs": 256, "steps": 80, "wall_s": 2.3852755420084577, "env_steps_per_s": 8586.010144033658, "sim_s_per_wall_s": 0.06707820425026295, "finite": true, "energy_max": 1.0664056539535522, "overflow": {"ITERATIONS": 256, "LS_ITERATIONS": 256}, "nv": 1272, "nflexvert": 424, "nconmax": 2560, "njmax": 12672, "njmax_nnz": 69592, "nccdmax": 128, "backend": "mjw", "scene": "box", "cloth": 20, "cable": 24, "dt": 0.002, "flex_flags": ""}
 {"num_envs": 1024, "steps": 20, "wall_s": 2.046694374992512, "env_steps_per_s": 10006.379188917703, "sim_s_per_wall_s": 0.01954370935335489, "finite": true, "energy_max": 1.124533772468567, "overflow": {}, "nv": 1272, "nflexvert": 424, "nconmax": 2560, "njmax": 12672, "njmax_nnz": 69592, "nccdmax": 128, "backend": "mjw", "scene": "box", "cloth": 20, "cable": 24, "dt": 0.002, "flex_flags": ""}
 {"num_envs": 4096, "steps": 10, "wall_s": 4.288818041008199, "env_steps_per_s": 9550.416830081063, "sim_s_per_wall_s": 0.004663289467813019, "finite": true, "energy_max": 1.1257530450820923, "overflow": {}, "nv": 1272, "nflexvert": 424, "nconmax": 2560, "njmax": 12672, "njmax_nnz": 69592, "nccdmax": 128, "backend": "mjw", "scene": "box", "cloth": 20, "cable": 24, "dt": 0.002, "flex_flags": ""}

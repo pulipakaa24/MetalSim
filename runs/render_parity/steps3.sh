@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /Users/aditya/robosim
+cd .
 python3 scripts/gpu_lock.py status
 for P in brdf_v1 brdf lights tonemap tonemap_cal_v1 tonemap_cal oidn_cal atrous_cal; do
   runs/render_parity/run_preset.sh $P --spp 16 --passes 8

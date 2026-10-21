@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /Users/aditya/robosim
+cd .
 python3 scripts/gpu_lock.py status
 export PYTHONPATH=upstream/newton-1.5.2
 P=".venv-newtonfork/bin/python scripts/diagnostics/newton_vbd/vbd_probe.py --device metal:0"

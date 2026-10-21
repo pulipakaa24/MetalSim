@@ -3,9 +3,9 @@
 # SCENE_ID in granular multi_material twoway anymal plate_drag column_a2 (record_variant_suite.sh "floors" settings)
 set -u
 OUT=$1; WARP=$2; S=$3; shift 3
-WT=/Users/aditya/robosim/.claude/worktrees/agent-a8a12903da01bb68c
-MS=${METALSIM_TREE:-/Users/aditya/robosim/.claude/worktrees/agent-ae8661f0d09092d4b}
-NEWTON=${NEWTON_TREE:-/Users/aditya/robosim/upstream/newton-integrated}
+WT=.
+MS=${METALSIM_TREE:-.}
+NEWTON=${NEWTON_TREE:-upstream/newton-integrated}
 export PYTHONPATH=$WARP:$NEWTON:$MS
 export WARP_CACHE_PATH=${WARP_CACHE_PATH:-$WT/runs/mpm/closeout/kcache_$(basename "$OUT")}
 case $S in
@@ -18,7 +18,7 @@ case $S in
 esac
 mkdir -p "$OUT"
 [ -f "$OUT/F_$S/meta.json" ] && { echo "skip $OUT/F_$S"; exit 0; }
-/Users/aditya/robosim/scripts/gpu_run.sh cl_$(basename "$OUT")_$S ${KIND:-check} 30 -- /Users/aditya/robosim/.venv-newton152/bin/python \
+scripts/gpu_run.sh cl_$(basename "$OUT")_$S ${KIND:-check} 30 -- .venv-newton152/bin/python \
   $MS/metalsim/parity/isaac_side/record_mpm.py --device metal:0 --chunk-graph --gpu-exit --metal-fast-math ${FM:-off} \
   --out "$OUT/F_$S" "${A[@]}" "$@" > "$OUT/F_$S.log" 2>&1
 echo "$OUT/F_$S exit $? $(tail -1 "$OUT/F_$S.log" | cut -c1-200)"

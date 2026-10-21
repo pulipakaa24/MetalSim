@@ -1,4 +1,4 @@
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -6,7 +6,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/runs/a2/kc/tp_I/1.18.0.dev20260917
+     runs/a2/kc/tp_I/1.18.0.dev20260917
 Module mujoco_warp._src.smooth dfbe189 load on device 'metal:0' took 35.17 ms  (cached)
 Module _nxn_broadphase__locals__kernel_e5977941 e597794 load on device 'metal:0' took 23.54 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_b26a037e b26a037 load on device 'metal:0' took 32.06 ms  (cached)

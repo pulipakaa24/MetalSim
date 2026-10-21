@@ -1,8 +1,8 @@
 #!/bin/bash
 # tp26 job 12: 64-lane register Cholesky (Warp worktree, block_dim 64) vs the 32-lane form: bitwise A/B of factor and solve,
 # cost split at n = 32, 43, 48, then the G1 step with MJW_METAL_CHOL_LANES 64 vs 32 (worktrees, interleaved).
-cd /Users/aditya/robosim && source .venv/bin/activate
-WT=/Users/aditya/robosim/upstream/warp-innate-tp:/Users/aditya/robosim/upstream/mujoco_warp-tp
+cd . && source .venv/bin/activate
+WT=upstream/warp-innate-tp:upstream/mujoco_warp-tp
 S=/private/tmp/claude-501/-Users-aditya/7ceab845-25d9-459e-a466-a4b793f72f5c/scratchpad
 F='^\[\|Error\|Traceback\|imports'
 echo "=== start $(date) metalsim $(git rev-parse --short HEAD) wt warp $(git -C upstream/warp-innate-tp rev-parse --short HEAD) mjw $(git -C upstream/mujoco_warp-tp rev-parse --short HEAD) power: $(pmset -g batt | head -1)"

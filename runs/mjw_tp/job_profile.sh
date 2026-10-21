@@ -1,6 +1,6 @@
 #!/bin/bash
 # profile job: baseline cost split + segment graphs + per-kernel attribution (G1 flat, MuJoCo Warp, 4096, 2.5 ms)
-cd /Users/aditya/robosim && source .venv/bin/activate
+cd . && source .venv/bin/activate
 echo "=== start $(date) power: $(pmset -g batt | head -1)"
 python3 scripts/gpu_lock.py status
 echo "=== baseline cost split (scripts/diagnostics/g1_engine_bench.py 4096 mjwarp 0.0025)"

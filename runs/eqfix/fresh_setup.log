@@ -1,7 +1,7 @@
 README line: pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@f1b35e2b3ddc80b197b0c665bf6d71523d175daf#egg=mujoco-warp" "mujoco>=3.14,<3.15"
 Obtaining mujoco-warp from git+https://github.com/pulipakaa24/mujoco_warp@f1b35e2b3ddc80b197b0c665bf6d71523d175daf#egg=mujoco-warp
   Cloning https://github.com/pulipakaa24/mujoco_warp (to revision f1b35e2b3ddc80b197b0c665bf6d71523d175daf) to ./.venv/src/mujoco-warp
-  Running command git clone --filter=blob:none --quiet https://github.com/pulipakaa24/mujoco_warp /Users/aditya/robosim/.claude/worktrees/agent-a4b4d2a53213dae91/scratch/fresh/.venv/src/mujoco-warp
+  Running command git clone --filter=blob:none --quiet https://github.com/pulipakaa24/mujoco_warp scratch/fresh/.venv/src/mujoco-warp
   Running command git rev-parse -q --verify 'f1b35e2b3ddc80b197b0c665bf6d71523d175daf^{commit}'
   f1b35e2b3ddc80b197b0c665bf6d71523d175daf
   Running command git checkout -q f1b35e2b3ddc80b197b0c665bf6d71523d175daf
@@ -56,7 +56,7 @@ Successfully built mujoco-warp
 Installing collected packages: pyopengl, glfw, zipp, websockets, typing_extensions, numpy, fsspec, etils, absl-py, warp-lang, mujoco, mujoco-warp
 
 Successfully installed absl-py-2.5.1 etils-1.14.0 fsspec-2026.9.0 glfw-2.10.2 mujoco-3.14.0 mujoco-warp-3.14.0 numpy-2.5.4 pyopengl-3.1.10 typing_extensions-4.16.0 warp-lang-1.18.0 websockets-17.2 zipp-4.1.1
-mujoco_warp imported from /Users/aditya/robosim/.claude/worktrees/agent-a4b4d2a53213dae91/scratch/fresh/.venv/src/mujoco-warp
+mujoco_warp imported from scratch/fresh/.venv/src/mujoco-warp
 installed commit: f1b35e2b3ddc80b197b0c665bf6d71523d175daf
 f1b35e2 METALSIM_CHANGES.md: equality block ending at njmax
 f52488b Constraints: keep a connect / weld block that ends exactly at njmax

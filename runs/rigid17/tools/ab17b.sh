@@ -1,6 +1,6 @@
 #!/bin/bash
 # ab17b.sh   Short timing follow-up (queue courtesy: few jobs). 2048 worlds eager A/B x2, 256 worlds deterministic A/B x1.
-D=/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17
+D=runs/rigid17
 J=$D/tools/job.sh
 for rep in 1 2; do
   for T in at new; do

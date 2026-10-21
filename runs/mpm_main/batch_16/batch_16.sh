@@ -1,5 +1,5 @@
 #!/bin/bash
-# batch 16 (run outside the agent sandbox):  bash /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b16/batch_16.sh
+# batch 16 (run outside the agent sandbox):  bash scratch/b16/batch_16.sh
 #
 # A  POUR14's failure is not #46's: batch_14 ran the Franka-Pour tests in .venv-newton152 BEFORE its own repair of that
 #    environment (FIX_N152 came after (a) in the batch), i.e. on stock Newton 1.5.2 (upstream/newton-1.5.2, traceback
@@ -15,8 +15,8 @@
 #    both off at 64 / 1,024 worlds (its default-mode numbers are batch_10b's g1_*_0 runs).
 # Resumable (scratch/b16/STATUS.txt). ~1 h.
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
-R=/Users/aditya/robosim
+W=.
+R=.
 S=$W/scratch/b16
 L=$S/logs
 O=$W/runs/mpm_main/batch_16

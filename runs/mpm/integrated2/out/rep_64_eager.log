@@ -1,4 +1,4 @@
-/Users/aditya/robosim/metalsim/physics/mpm/probes/scale_pour.py:236: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
+metalsim/physics/mpm/probes/scale_pour.py:236: DeprecationWarning: The legacy DOF-shaped joint_target_q layout is deprecated for models whose joint coordinate and DOF counts differ (free/ball/distance joints). In a future release joint_target_q will always use the coordinate layout (matching joint_q) and newton.use_coord_layout_targets will be removed. Set newton.use_coord_layout_targets = True before building models and index targets via Model.joint_target_q_start.
   model = scene.finalize(device=DEV)
 Failed to create Metal pipeline for kernel "_tendon_dot_62db264d_metal_forward": Compilation failed due to an interrupted connection: XPC_ERROR_CONNECTION_INTERRUPTED. This error occurred after multiple retries.
 Warp 1.18.0.dev20260917 initialized:
@@ -7,7 +7,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/runs/a2/kc/rep/1.18.0.dev20260917
+     runs/a2/kc/rep/1.18.0.dev20260917
 Module newton._src.geometry.inertia cc250ed load on device 'metal:0' took 649.15 ms  (compiled)
 Module validate_and_correct_inertia_kernel_3b6f0a33 3b6f0a3 load on device 'metal:0' took 451.32 ms  (compiled)
 Module newton._src.geometry.bvh 517f776 load on device 'metal:0' took 637.22 ms  (compiled)
@@ -96,7 +96,7 @@ Module _next_time_builder__locals___next_time_3bf520d5 3bf520d load on device 'm
   "2",
   "--repeat-check",
   "--json",
-  "/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/runs/a2/out/rep_64_eager.json"
+  "runs/a2/out/rep_64_eager.json"
  ],
  "device": "metal:0",
  "device_name": "Apple M4 Max",

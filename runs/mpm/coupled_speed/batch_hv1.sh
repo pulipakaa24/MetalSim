@@ -15,10 +15,10 @@
 #   4  commit and push the logs
 # Only GPU-health problems stop it; failures listed in hv1_failures.txt. Resumable. Log: batch_hv1.log
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0
+W=.
 R=$W/runs/mpm/coupled_speed
 O=$R/hv1
-M=/Users/aditya/robosim
+M=.
 PY=$M/.venv-newton152/bin/python
 PYM=$M/.venv/bin/python
 PYP=$M/.claude/worktrees/agent-a278824da4c05bf29/.venv-pour/bin/python

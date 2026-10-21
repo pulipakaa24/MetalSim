@@ -8,7 +8,7 @@
 set -u
 export GIT_AUTHOR_NAME="Aditya Pulipaka" GIT_AUTHOR_EMAIL="adipu@utexas.edu"
 export GIT_COMMITTER_NAME="Aditya Pulipaka" GIT_COMMITTER_EMAIL="adipu@utexas.edu"
-W=/Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0
+W=.
 R=$W/runs/mpm/coupled_speed
 B=$R/b09
 mkdir -p $B
@@ -43,7 +43,7 @@ PIN_V=$(sed -n 's/^PIN = "\([0-9a-f]\{40\}\)".*/\1/p' scripts/vendor_mpm152.py)
 PIN_W=$(sed -n 's/^PIN=\([0-9a-f]\{40\}\).*/\1/p' scripts/setup_warp.sh)
 echo "pins: warp $PIN_W newton $PIN_N vendor $PIN_V"
 [ "$PIN_N" = "$PIN_V" ] || stop "setup_newton152.sh and vendor_mpm152.py pins differ"
-/Users/aditya/robosim/.venv/bin/python scripts/vendor_mpm152.py --check $W/upstream/trees/newton_fork || stop "vendored copy differs from the pin"
+.venv/bin/python scripts/vendor_mpm152.py --check $W/upstream/trees/newton_fork || stop "vendored copy differs from the pin"
 git push -q -u origin mpm-coupled-speed 2>&1 | grep -v '^remote:'
 git log --oneline -3
 if [ ! -f $B/pr_opened ]; then

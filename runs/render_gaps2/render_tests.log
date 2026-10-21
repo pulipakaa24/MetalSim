@@ -25,7 +25,7 @@ tests/test_render_tier2.py:226: AssertionError
 usd dome record: {'prim': '/World/skyLight', 'intensity': 2.0, 'exposure': 1.0, 'color': [1.0, 0.5, 0.25], 'file': '/private/var/folders/x8/ng0vsw8j0s74m4pz_qkgjjcr0000gn/T/pytest-of-aditya/pytest-28/test_env_map_usd_dome_import0/const.hdr', 'format': 'latlong', 'yaw': 0.5235987755982987, 'tilt': 0.0001620618913188485}
 =============================== warnings summary ===============================
 tests/test_render_tier2.py::test_gpu_path_from_batchsim_matches_host
-  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
+  upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
     warnings.warn(
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
@@ -42,7 +42,7 @@ FAILED tests/test_render_tier2.py::test_env_map_usd_dome_import - AssertionEr...
 ...                                                                      [100%]
 =============================== warnings summary ===============================
 tests/test_sensors_rt.py::test_gpu_path_ordering_with_sim
-  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
+  upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('CAPSULE', 'CYLINDER')]. At most 1 contact will be generated for these pairs.
     warnings.warn(
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
@@ -54,7 +54,7 @@ tests/test_sensors_rt.py::test_gpu_path_ordering_with_sim
 .........s....                                                           [100%]
 =============================== warnings summary ===============================
 tests/test_render_newton_bridge.py::test_solver_mujoco_steps_render_like_mujoco_path
-  /Users/aditya/robosim/.venv/lib/python3.12/site-packages/newton/_src/solvers/mujoco/solver_mujoco.py:3813: RuntimeWarning: MuJoCo dependency version mismatch with Newton's declared requirements: mujoco==3.14.0 (requires ~=3.12.0); mujoco-warp==3.14.0 (requires ~=3.12.0). Reinstall Newton dependencies, for example `uv pip install -e ".[examples]"`.
+  .venv/lib/python3.12/site-packages/newton/_src/solvers/mujoco/solver_mujoco.py:3813: RuntimeWarning: MuJoCo dependency version mismatch with Newton's declared requirements: mujoco==3.14.0 (requires ~=3.12.0); mujoco-warp==3.14.0 (requires ~=3.12.0). Reinstall Newton dependencies, for example `uv pip install -e ".[examples]"`.
     mujoco, _ = self.import_mujoco()
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html

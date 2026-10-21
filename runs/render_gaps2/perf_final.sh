@@ -3,11 +3,11 @@
 #   base = 532577fe (PR #4 merged), p2b = 2ef6641f (before workstream C), p3 = 5a7cc077 (workstream C merged), cur = this branch
 # Usage: gpu_run.sh rg2_final timing 60 -- bash runs/render_gaps2/perf_final.sh ENVS
 set -u
-WT=/Users/aditya/robosim/.claude/worktrees/agent-a5314e27bee02c142
-PY=/Users/aditya/robosim/.venv/bin/python
+WT=.
+PY=.venv/bin/python
 N=${1:-1024}
 OUT=$WT/runs/render_gaps2/perf_final.jsonl
-T=/Users/aditya/robosim/scratch/rg2_trees
+T=scratch/rg2_trees
 run() {  # scene renderer envs root tag features allOff
   echo "== $*"
   $PY $WT/scripts/diagnostics/render_perf_profile.py --scene $1 --renderer $2 --envs $3 --root $4 --tag "$5" \

@@ -1,5 +1,5 @@
 #!/bin/bash
-# batch 10 (supersedes batch_09, which pointed at batch_08's state; run outside the agent sandbox):  bash /Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/scratch/b10/batch_10.sh
+# batch 10 (supersedes batch_09, which pointed at batch_08's state; run outside the agent sandbox):  bash scratch/b10/batch_10.sh
 #
 # Coupling-opt PR #33, follow-up of batch_07 (worktree scratch/wt-copt, branch coupling-opt):
 #   - the one-world masked reset (it raised: Newton 1.5.2's masked reset refuses grid warm starts without separate FEM
@@ -16,8 +16,8 @@
 #   (scratch/b10/det_docs.py, scratch/b08b/pr29_body.md, which batch_08b's phase D also uses).
 # Run after the overnight line (GPU exclusive). Resumable (scratch/b10/STATUS.txt). ~1.5 h of GPU.
 set -u
-W=/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741
-R=/Users/aditya/robosim
+W=.
+R=.
 S=$W/scratch/b10
 L=$S/logs
 WT=$W/scratch/wt-copt

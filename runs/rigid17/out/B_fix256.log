@@ -4,7 +4,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/kcache/kcB_n17_fix/1.18.0.dev20260917
+     runs/rigid17/kcache/kcB_n17_fix/1.18.0.dev20260917
 Module newton._src.geometry.inertia 7667892 load on device 'metal:0' took 617.17 ms  (compiled)
 Module validate_and_correct_inertia_kernel_8dbbe22e 8dbbe22 load on device 'metal:0' took 440.97 ms  (compiled)
 Module newton._src.geometry.bvh 0b0956f load on device 'metal:0' took 631.67 ms  (compiled)
@@ -21,19 +21,19 @@ Module mesh_triangle_contacts_to_reducer_kernel_521d447b da3c627 load on device 
 Module newton._src.geometry.contact_reduction_global b48e3ba load on device 'metal:0' took 1128.53 ms  (compiled)
 Module sdf_contact_write_contact_to_reducer_False_True_False_True_False_False_False ae689df load on device 'metal:0' took 1438.61 ms  (compiled)
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/tools/collide17.py", line 70, in <module>
+  File "runs/rigid17/tools/collide17.py", line 70, in <module>
     collide()
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/tools/collide17.py", line 67, in collide
+  File "runs/rigid17/tools/collide17.py", line 67, in collide
     pipeline.collide(s0, contacts)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n17_fix/newton/_src/sim/collide.py", line 2409, in collide
+  File "upstream/n17_fix/newton/_src/sim/collide.py", line 2409, in collide
     self.narrow_phase.launch_custom_write(
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n17_fix/newton/_src/geometry/narrow_phase.py", line 3239, in launch_custom_write
+  File "upstream/n17_fix/newton/_src/geometry/narrow_phase.py", line 3239, in launch_custom_write
     wp.launch_tiled(
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/t4/warp-B/warp/_src/context.py", line 12932, in launch_tiled
+  File "upstream/t4/warp-B/warp/_src/context.py", line 12932, in launch_tiled
     return launch(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/t4/warp-B/warp/_src/context.py", line 12651, in launch
+  File "upstream/t4/warp-B/warp/_src/context.py", line 12651, in launch
     invoke_metal(kernel, hooks, params, device, block_dim, adjoint, dim_limit=dim_limit)
-  File "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/t4/warp-B/warp/_src/context.py", line 11559, in invoke_metal
+  File "upstream/t4/warp-B/warp/_src/context.py", line 11559, in invoke_metal
     raise RuntimeError(
 RuntimeError: Kernel 'create_narrow_phase_process_mesh_mesh_contacts_kernel__locals__mesh_sdf_collision_global_reduce_kernel' uses builtins that are not supported on Metal yet: atomic_cas(uint64). Apple GPUs have no 64-bit compare-and-swap (only unsigned 64-bit atomic min/max), so 64-bit atomic_cas / atomic_exch and signed 64-bit atomic_min / atomic_max cannot be atomic on Metal; use 32-bit atomics (e.g. on one half of the value) instead

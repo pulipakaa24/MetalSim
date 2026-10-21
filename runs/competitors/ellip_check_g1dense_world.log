@@ -1,4 +1,4 @@
-=== g1 cone=elliptic N=512 S=200 MJW_JTCJ_MODE=world mujoco_warp=/Users/aditya/robosim/upstream/mujoco_warp-ellip/mujoco_warp
+=== g1 cone=elliptic N=512 S=200 MJW_JTCJ_MODE=world mujoco_warp=upstream/mujoco_warp-ellip/mujoco_warp
 Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 27.00 ms  (cached)
 Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 17.80 ms  (cached)
 Module ccd_kernel_builder__locals__ccd_kernel_26fc98f9 26fc98f load on device 'metal:0' took 23.74 ms  (cached)
@@ -55,7 +55,7 @@ capacity replay: nefc max 122 (njmax 512), nacon max 4456 (naconmax 24576); over
 capacity replay 2: nefc max 122 (njmax 512), nacon max 4454 (naconmax 24576); overflow {'ITERATIONS': 32, 'LS_ITERATIONS': 512}
 --- MuJoCo C oracle (4 worlds: PD hold + fixed random targets; |dq| max / median)
    t=0.004s 5.91e-08/5.3e-10  t=0.008s 8.45e-08/1.3e-09  t=0.016s 6.28e-03/3.5e-04  t=0.048s 6.63e-02/4.6e-03  t=0.100s 2.20e-01/2.0e-02  t=0.200s 2.99e-01/5.0e-02  t=0.400s 2.90e-01/7.3e-02
---- this configuration vs reference [g1 (default) JAC=dense /Users/aditya/robosim/upstream/mujoco_warp-ellip-base/mujoco_warp] (graph replay)
+--- this configuration vs reference [g1 (default) JAC=dense upstream/mujoco_warp-ellip-base/mujoco_warp] (graph replay)
    step    1: qpos max 1.19e-07 median 4.4e-11 | qvel max 2.66e-05 | worlds with |dq| > 1e-3: 0.0 %
    step    2: qpos max 3.83e-07 median 1.2e-10 | qvel max 9.56e-05 | worlds with |dq| > 1e-3: 0.0 %
    step    4: qpos max 8.92e-07 median 4.1e-10 | qvel max 6.44e-05 | worlds with |dq| > 1e-3: 0.0 %

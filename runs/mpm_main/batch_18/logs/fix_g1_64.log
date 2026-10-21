@@ -4,7 +4,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module _snapshot_flag_0f4dec46 0f4dec4 load on device 'metal:0' took 38.36 ms  (cached)
 Module mujoco_warp._src.smooth 66b212c load on device 'metal:0' took 423.98 ms  (cached)
 Module _nxn_broadphase__locals__kernel_6aa72da0 6aa72da load on device 'metal:0' took 77.31 ms  (cached)
@@ -60,4 +60,4 @@ Module reset_data__locals__reset_nworld_2daa7a0d 2daa7a0 load on device 'metal:0
 Module metalsim.learn.g1_velocity f8ae911 load on device 'metal:0' took 990.74 ms  (cached)
 Module _solve_init_efc__locals__kernel_961b4bac 961b4ba load on device 'metal:0' took 326.11 ms  (cached)
 Module _solve_done__locals__kernel_eca2285a eca2285 load on device 'metal:0' took 382.65 ms  (compiled)
-RESULT {"scene": "g1", "worlds": 64, "capture": 1, "iteration_cap": 20, "steps": 60, "steps_with_cap_worlds": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59], "steps_with_hits": [], "hits_only_in_cap_steps": true, "kernels_hit": {}, "flag_values": {}, "recorded_det_launches": 1688, "mujoco_warp": "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/mjw-solvedone/mujoco_warp/__init__.py", "warp": "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/upstream/warp-diag/warp/__init__.py"}
+RESULT {"scene": "g1", "worlds": 64, "capture": 1, "iteration_cap": 20, "steps": 60, "steps_with_cap_worlds": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59], "steps_with_hits": [], "hits_only_in_cap_steps": true, "kernels_hit": {}, "flag_values": {}, "recorded_det_launches": 1688, "mujoco_warp": "upstream/mjw-solvedone/mujoco_warp/__init__.py", "warp": "upstream/warp-diag/warp/__init__.py"}

@@ -1,16 +1,16 @@
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/scripts/gpu_lock.py", line 159, in <module>
+  File "scripts/gpu_lock.py", line 159, in <module>
     for pr, t, f, tk in tickets(): print(f"  waiting [{tk['kind']}] {tk['name']} est {tk['minutes']} min, queued {time.time() - t:.0f} s ago")
     ^^
-  File "/Users/aditya/robosim/scripts/gpu_lock.py", line 132, in main
+  File "scripts/gpu_lock.py", line 132, in main
     ap.add_argument("--kind", default="train", choices=list(PRIO)); ap.add_argument("--minutes", type=float, default=30); ap.add_argument("--pid", type=int, default=os.getppid())
                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/scripts/gpu_lock.py", line 103, in acquire
+  File "scripts/gpu_lock.py", line 103, in acquire
     if not os.path.exists(tf): json.dump(ticket, open(tf, "w"))      # self-heal: a ticket removed by another process is re-created
                 ^^^^^^^^^
-  File "/Users/aditya/robosim/scripts/gpu_lock.py", line 87, in tickets
+  File "scripts/gpu_lock.py", line 87, in tickets
     try: t = json.load(open(os.path.join(Q, f)))
                                              ^^^
-FileNotFoundError: [Errno 2] No such file or directory: '/Users/aditya/robosim/runs/gpu_queue/1791793304.879_1_rwa_after3s_30884.json'
-[watch 01:58:34] start: /Users/aditya/robosim/.venv-newton152/bin/python /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/tools/pt_dev.py cpu -q -p no:cacheprovider -rfE --junitxml=/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/rigid17/out/s152_base_kamino_cpu.xml /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/n152_base/newton/_src/solvers/kamino/tests/test_solvers_metrics.py
+FileNotFoundError: [Errno 2] No such file or directory: 'runs/gpu_queue/1791793304.879_1_rwa_after3s_30884.json'
+[watch 01:58:34] start: .venv-newton152/bin/python runs/rigid17/tools/pt_dev.py cpu -q -p no:cacheprovider -rfE --junitxml=runs/rigid17/out/s152_base_kamino_cpu.xml upstream/n152_base/newton/_src/solvers/kamino/tests/test_solvers_metrics.py
 [watch 01:58:36] end code=2 wall=2s

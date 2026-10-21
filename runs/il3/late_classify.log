@@ -1,5 +1,5 @@
 == Sat Sep 26 04:33:29 PDT 2026
-holder: {"name": "il3_late_classify", "kind": "render", "minutes": 25.0, "pid": 41493, "start": 1790422408.694588, "queued": 1790421216.3266878, "cmd": "runs/il3/run_late_classify.sh", "cwd": "/Users/aditya/robosim"}
+holder: {"name": "il3_late_classify", "kind": "render", "minutes": 25.0, "pid": 41493, "start": 1790422408.694588, "queued": 1790421216.3266878, "cmd": "runs/il3/run_late_classify.sh", "cwd": "<repo>"}
   waiting [render] e2_check_sz est 8.0 min, queued 1024 s ago
   waiting [render] e2_check_sz_g1dense est 6.0 min, queued 1024 s ago
   waiting [render] e2_check_sz_g1task est 6.0 min, queued 1024 s ago
@@ -22,13 +22,13 @@ tests/test_g1_task_terms.py::test_rough_terrain_seed_and_isaac_env_assignment
 tests/test_g1_task_terms.py::test_il3_rough_defaults
 tests/test_g1_task_terms.py::test_trainer_first_observation_comes_from_the_task_reset[rough-rough_isaac]
 tests/test_g1_task_terms.py::test_trainer_first_observation_comes_from_the_task_reset[rough-rough_il3]
-  /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+  upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
     warnings.warn(
 
 -- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
 43 passed, 4 warnings in 37.75s
 tests exit 0
-/Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
+upstream/mujoco_warp/mujoco_warp/_src/io.py:699: UserWarning: MULTICCD is enabled, but the scene contains CCD pairs without multicontact support: [('HFIELD', 'MESH')]. At most 1 contact will be generated for these pairs.
   warnings.warn(
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
@@ -36,7 +36,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth d0e6c82 load on device 'metal:0' took 27.74 ms  (cached)
 Module _nxn_broadphase__locals__kernel_3582bd6f 3582bd6 load on device 'metal:0' took 18.01 ms  (cached)
 Module ccd_hfield_kernel_builder__locals__ccd_hfield_kernel_b3132664 b313266 load on device 'metal:0' took 24.86 ms  (cached)

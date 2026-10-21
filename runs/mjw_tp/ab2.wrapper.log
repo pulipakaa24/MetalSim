@@ -1,7 +1,7 @@
 [gpu_run] mjw_ab_profile start: device utilisation 0% (19:40:56)
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
 === start Fri Sep 25 19:40:59 PDT 2026
-holder: {"name": "mjw_ab_profile", "kind": "timing", "minutes": 10.0, "pid": 84338, "start": 1790390456.932481, "queued": 1790390141.687486, "cmd": "bash runs/mjw_tp/job_ab2.sh", "cwd": "/Users/aditya/robosim"}
+holder: {"name": "mjw_ab_profile", "kind": "timing", "minutes": 10.0, "pid": 84338, "start": 1790390456.932481, "queued": 1790390141.687486, "cmd": "bash runs/mjw_tp/job_ab2.sh", "cwd": "<repo>"}
   waiting [timing] mjw_generality est 14.0 min, queued 118 s ago
   waiting [timing] ellip_bench_world est 12.0 min, queued 56 s ago
   waiting [timing] ellip_bench_contact est 8.0 min, queued 55 s ago
@@ -18,7 +18,7 @@ holder: {"name": "mjw_ab_profile", "kind": "timing", "minutes": 10.0, "pid": 843
   waiting [low] cl_kamino est 45.0 min, queued 14771 s ago
   waiting [low] cl_mjw est 40.0 min, queued 14747 s ago
 --- A1_1791414 19:40:59 power: Now drawing from 'AC Power'
-mjw: /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/__init__.py
+mjw: upstream/mujoco_warp/mujoco_warp/__init__.py
 task: terrain flat, reward_cfg flat, obs_dim 123, height scan 0 rays
 === segment graphs, N=4096, dt 2.5 ms, decimation 8, 20 replays each, synchronized; reset segments with 2% of envs flagged
   apply_action                                                0.03 ms   dispatches     3 cmdbufs   1 syncs 1
@@ -41,7 +41,7 @@ task: terrain flat, reward_cfg flat, obs_dim 123, height scan 0 rays
   sensor_acc + integrate (implicitfast)                                                          0.85 ms  dispatches   13
   mjw.step (whole substep)                                                                       9.41 ms  dispatches  202
 --- B1_07a51a6 19:41:09 power: Now drawing from 'AC Power'
-mjw: /Users/aditya/robosim/upstream/mujoco_warp-07a51a6/mujoco_warp/__init__.py
+mjw: upstream/mujoco_warp-07a51a6/mujoco_warp/__init__.py
 task: terrain flat, reward_cfg flat, obs_dim 123, height scan 0 rays
 === segment graphs, N=4096, dt 2.5 ms, decimation 8, 20 replays each, synchronized; reset segments with 2% of envs flagged
   apply_action                                                0.03 ms   dispatches     3 cmdbufs   1 syncs 1
@@ -64,7 +64,7 @@ task: terrain flat, reward_cfg flat, obs_dim 123, height scan 0 rays
   sensor_acc + integrate (implicitfast)                                                          0.84 ms  dispatches   13
   mjw.step (whole substep)                                                                       9.40 ms  dispatches  202
 --- A2_1791414 19:41:19 power: Now drawing from 'AC Power'
-mjw: /Users/aditya/robosim/upstream/mujoco_warp/mujoco_warp/__init__.py
+mjw: upstream/mujoco_warp/mujoco_warp/__init__.py
 task: terrain flat, reward_cfg flat, obs_dim 123, height scan 0 rays
 === segment graphs, N=4096, dt 2.5 ms, decimation 8, 20 replays each, synchronized; reset segments with 2% of envs flagged
   apply_action                                                0.03 ms   dispatches     3 cmdbufs   1 syncs 1
@@ -87,7 +87,7 @@ task: terrain flat, reward_cfg flat, obs_dim 123, height scan 0 rays
   sensor_acc + integrate (implicitfast)                                                          0.85 ms  dispatches   13
   mjw.step (whole substep)                                                                       9.41 ms  dispatches  202
 --- B2_07a51a6 19:41:29 power: Now drawing from 'AC Power'
-mjw: /Users/aditya/robosim/upstream/mujoco_warp-07a51a6/mujoco_warp/__init__.py
+mjw: upstream/mujoco_warp-07a51a6/mujoco_warp/__init__.py
 task: terrain flat, reward_cfg flat, obs_dim 123, height scan 0 rays
 === segment graphs, N=4096, dt 2.5 ms, decimation 8, 20 replays each, synchronized; reset segments with 2% of envs flagged
   apply_action                                                0.04 ms   dispatches     3 cmdbufs   1 syncs 1

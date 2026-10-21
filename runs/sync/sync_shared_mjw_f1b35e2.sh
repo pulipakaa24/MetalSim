@@ -4,7 +4,7 @@
 # so no job imports mid-update:
 #   scripts/gpu_run.sh sync_mjw_f1b35e2 timing 2 -- runs/sync/sync_shared_mjw_f1b35e2.sh > runs/sync/sync_mjw_f1b35e2.log 2>&1
 set -ex
-cd /Users/aditya/robosim
+cd .
 R=$(git -C upstream/mujoco_warp remote -v | awk '/pulipakaa24\/mujoco_warp/ {print $1; exit}')
 git -C upstream/mujoco_warp fetch -q "$R" metalsim
 git -C upstream/mujoco_warp merge -q --ff-only f1b35e2b3ddc80b197b0c665bf6d71523d175daf

@@ -1,6 +1,6 @@
 #!/bin/bash
 # round 7: step 4 candidate = MuJoCo Warp fork: incremental Hessian update fused into the register Cholesky on Metal
-cd /Users/aditya/robosim && source .venv/bin/activate
+cd . && source .venv/bin/activate
 F='^\[\|Error\|Traceback'
 {
 echo "=== start $(date) power: $(pmset -g batt | head -1)"; python3 scripts/gpu_lock.py status

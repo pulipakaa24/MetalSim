@@ -4,7 +4,7 @@ Warp 1.18.0.dev20260917 initialized:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/Library/Caches/warp/1.18.0.dev20260917
+     ~/Library/Caches/warp/1.18.0.dev20260917
 Module mujoco_warp._src.smooth 538cc3d load on device 'metal:0' took 432.81 ms  (cached)
 Module _nxn_broadphase__locals__kernel_1005c134 1005c13 load on device 'metal:0' took 79.26 ms  (cached)
 Module ccd_kernel_builder__locals__ccd_kernel_cf21765f cf21765 load on device 'metal:0' took 3221.89 ms  (compiled)
@@ -44,13 +44,13 @@ Module reset_data__locals__reset_contact_389ef5a7 389ef5a load on device 'metal:
 Module reset_data__locals__reset_sleep_60623600 6062360 load on device 'metal:0' took 332.38 ms  (cached)
 Module reset_data__locals__reset_nworld_6e0f2593 6e0f259 load on device 'metal:0' took 351.83 ms  (cached)
 Traceback (most recent call last):
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/rigid_det_diag.py", line 124, in <module>
+  File "metalsim/physics/mpm/probes/rigid_det_diag.py", line 124, in <module>
     main()
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/rigid_det_diag.py", line 112, in main
+  File "metalsim/physics/mpm/probes/rigid_det_diag.py", line 112, in main
     runs = [run(m, a.worlds, a.steps, bool(a.deterministic), bool(a.capture)) for _ in range(a.runs)]
             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/mpm/probes/rigid_det_diag.py", line 62, in run
+  File "metalsim/physics/mpm/probes/rigid_det_diag.py", line 62, in run
     sim.check_overflow()
-  File "/Users/aditya/robosim/.claude/worktrees/agent-ab17e9d0efefed741/metalsim/physics/batch.py", line 457, in check_overflow
+  File "metalsim/physics/batch.py", line 457, in check_overflow
     raise RuntimeError("Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter "
 RuntimeError: Warp deterministic-mode counter phase mismatch: a MuJoCo Warp kernel's slot-counter calls differ between its two passes (research_notes/MPM in main simulator/deterministic_ccd_divergence.md)

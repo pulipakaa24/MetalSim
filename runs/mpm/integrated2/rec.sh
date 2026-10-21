@@ -1,7 +1,7 @@
 #!/bin/bash
 # rec.sh LABEL WARP NEWTON : the six floor recordings (record_variant_suite.sh "floors" settings), one GPU job each
-A=/Users/aditya/robosim/.claude/worktrees/agent-acdd938690dabdae8/runs/a2
-R=/Users/aditya/robosim
+A=runs/a2
+R=.
 L=$1; WT=$2; NT=$3
 O=$A/rec/$L; mkdir -p $O
 export PYTHONPATH=$WT:$NT:$R WARP_CACHE_PATH=$A/kc/rec_$L PYTHONDONTWRITEBYTECODE=1

@@ -2,7 +2,7 @@
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:
 [gpu_run] gpu_top:   pid    410 WindowServer                       4.7 %
 ##### g1_flat n=4096 iters=50 tree=new (02:41:22)
-metalsim from /Users/aditya/robosim/.claude/worktrees/agent-ad5dbe3dae8c8990c/metalsim/__init__.py
+metalsim from metalsim/__init__.py
 [anomaly] it 1: joint limit violated by 0.19 rad
 [anomaly] it 1: contact penetration 4.5 cm
 [anomaly] it 2: joint limit violated by 0.20 rad
@@ -44,7 +44,7 @@ metalsim from /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-a
 [anomaly] it 9: contact penetration 3.1 cm
 [anomaly] it 10: joint limit violated by 0.20 rad
 ##### g1_rough n=4096 iters=50 tree=new (02:44:31)
-metalsim from /Users/aditya/robosim/.claude/worktrees/agent-ad5dbe3dae8c8990c/metalsim/__init__.py
+metalsim from metalsim/__init__.py
 [anomaly] it 1: KL 0.225 > 10x target: stale data or LR too high
 [anomaly] it 1: joint limit violated by 0.21 rad
 [anomaly] it 1: contact penetration 2.9 cm
@@ -86,7 +86,7 @@ metalsim from /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-a
 [anomaly] it 8: contact force 1498172 N > 50x robot weight
 [anomaly] it 9: joint limit violated by 0.21 rad
 ##### g1_rough_hfield n=4096 iters=50 tree=new (02:48:10)
-metalsim from /Users/aditya/robosim/.claude/worktrees/agent-ad5dbe3dae8c8990c/metalsim/__init__.py
+metalsim from metalsim/__init__.py
 [anomaly] it 1: KL 0.223 > 10x target: stale data or LR too high
 [anomaly] it 1: joint limit violated by 0.21 rad
 [anomaly] it 1: contact penetration 2.9 cm
@@ -128,13 +128,13 @@ metalsim from /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-a
 [anomaly] it 9: joint limit violated by 0.21 rad
 [anomaly] it 9: contact penetration 3.1 cm
 ##### tron1 n=8192 iters=50 tree=new (02:51:41)
-metalsim from /Users/aditya/robosim/.claude/worktrees/agent-ad5dbe3dae8c8990c/metalsim/__init__.py
+metalsim from metalsim/__init__.py
 RESULT task=tron1 n=8192 iters_logged=50/50 latch=yes njmax=64 naconmax/world=16 final_sps=135654.0 wall=110s flags={'ITERATIONS': 1, 'LS_ITERATIONS': 7479} raised=None
 ##### tron1 n=8192 iters=50 tree=main (02:53:31)
 metalsim from /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/maintree/metalsim/__init__.py
 RESULT task=tron1 n=8192 iters_logged=50/50 latch=no (main) njmax=64 naconmax/world=16 final_sps=138114.0 wall=82s flags={'LS_ITERATIONS': 7461} raised=None
 ##### lift n=64 iters=30 tree=new (02:54:54)
-metalsim from /Users/aditya/robosim/.claude/worktrees/agent-ad5dbe3dae8c8990c/metalsim/__init__.py
+metalsim from metalsim/__init__.py
 RESULT task=lift n=64 iters_logged=30/30 latch=yes njmax=512 naconmax/world=48 final_sps=2039.0 wall=79s flags={'ITERATIONS': 20, 'LS_ITERATIONS': 64} raised=None
 ##### lift n=64 iters=30 tree=main (02:56:14)
 metalsim from /private/tmp/claude-501/-Users-aditya-robosim/3a553738-d88f-4d8d-ac36-4ecff3ac4bc1/scratchpad/maintree/metalsim/__init__.py

@@ -1,5 +1,5 @@
 #!/bin/bash
-cd /Users/aditya/robosim
+cd .
 python3 scripts/gpu_lock.py status
 for M in legacy physical; do
   rm -f runs/render_parity/cartpole_smoke_$M.log

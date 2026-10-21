@@ -1,6 +1,6 @@
 [gpu_run] cany_soa_first start: device utilisation 0% (18:20:18)
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s: none >= 1 %
-[watch 18:20:21] start: /Users/aditya/robosim/.venv-newton152/bin/python -P /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/metalsim/physics/mpm/probes/anymal_probe.py --solver gs-soa --frames 5 --warmup 1 --json /Users/aditya/robosim/.claude/worktrees/agent-a8f809a11de334dd0/runs/mpm/coupled_speed/any1/soa_first.json
+[watch 18:20:21] start: .venv-newton152/bin/python -P metalsim/physics/mpm/probes/anymal_probe.py --solver gs-soa --frames 5 --warmup 1 --json runs/mpm/coupled_speed/any1/soa_first.json
 [watch 18:21:19] end code=0 wall=58s
 [gpu_run] cany_soa_first end: device utilisation 0% (18:21:19), exit 0
 [gpu_run] gpu_top: GPU (ioreg): device utilization 0 %; per-process GPU time over 1.9 s:

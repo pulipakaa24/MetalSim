@@ -8,13 +8,13 @@
 #   cur this branch
 # Usage: gpu_run.sh rg2_bisect timing 30 -- bash runs/render_gaps2/bisect.sh ENVS
 set -u
-WT=/Users/aditya/robosim/.claude/worktrees/agent-a5314e27bee02c142
-PY=/Users/aditya/robosim/.venv/bin/python
+WT=.
+PY=.venv/bin/python
 N=${1:-1024}
 OUT=$WT/runs/render_gaps2/bisect.jsonl
 for R in tier1 tier2; do
   for T in p1 p2 p2b p3 cur; do
-    ROOT=$WT; [ "$T" != cur ] && ROOT=/Users/aditya/robosim/scratch/rg2_trees/$T
+    ROOT=$WT; [ "$T" != cur ] && ROOT=scratch/rg2_trees/$T
     AO=0; [ "$T" = cur ] && AO=1
     echo "== $R $T $N"
     $PY $WT/scripts/diagnostics/render_perf_profile.py --scene cloth --renderer $R --envs $N --features none --all-off $AO \

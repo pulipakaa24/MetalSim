@@ -1,11 +1,11 @@
-TREES /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/t4/warp-A/warp/__init__.py /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/t4/newton-A/newton/__init__.py /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/metalsim/__init__.py
+TREES upstream/t4/warp-A/warp/__init__.py upstream/t4/newton-A/newton/__init__.py metalsim/__init__.py
 Warp 1.18.0.dev20260917 initialized:
    CUDA not enabled in this build
    Devices:
      "cpu"      : "arm"
      "metal:0"  : "Apple M4 Max" (Metal)
    Kernel cache:
-     /Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/runs/mpm/regress_check/kc_A/1.18.0.dev20260917
+     runs/mpm/regress_check/kc_A/1.18.0.dev20260917
 Module newton._src.geometry.bvh 517f776 load on device 'metal:0' took 651.82 ms  (compiled)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_model 659946f load on device 'metal:0' took 431.26 ms  (compiled)
 Module warp.fem.geometry.nanogrid 707f51a load on device 'metal:0' took 791.65 ms  (compiled)
@@ -62,4 +62,4 @@ Module warp.fem.space.partition 28b5cee load on device 'metal:0' took 403.31 ms 
 Module scatter_field_dof_values_b1a5d832 89ec31f load on device 'metal:0' took 421.94 ms  (compiled)
 Module warp.fem.integrate._identity_field_003441ce d51d8ba load on device 'metal:0' took 945.71 ms  (compiled)
 Module newton._src.solvers.implicit_mpm.implicit_mpm_solver_kernels.advect_particles_789a04ef c237627 load on device 'metal:0' took 655.63 ms  (compiled)
-{"scene": "example:mpm_granular", "set": {}, "frames": 2, "warmup": 5, "ms_median": 30.462478500339785, "ms_mean": 30.462478500339785, "ms_p10": 29.599628500363906, "ms_p90": 31.325328500315663, "per_frame_counters": {"host_waits": 6.0, "command_buffers": 25.0, "host_ops": 0.0, "dispatches_encoded": 3337.0}, "warp": "/Users/aditya/robosim/.claude/worktrees/agent-a7a2cb997dc44ebcc/upstream/t4/warp-A/warp/__init__.py", "compat": {"accumulate": "float32", "loop": "cuda", "chunk_graph": true, "fused": false, "fused_max_color_blocks": 1073741824, "simd": false, "gpu_exit": true, "rigid_deterministic": true, "metal_fast_math": "relaxed"}}
+{"scene": "example:mpm_granular", "set": {}, "frames": 2, "warmup": 5, "ms_median": 30.462478500339785, "ms_mean": 30.462478500339785, "ms_p10": 29.599628500363906, "ms_p90": 31.325328500315663, "per_frame_counters": {"host_waits": 6.0, "command_buffers": 25.0, "host_ops": 0.0, "dispatches_encoded": 3337.0}, "warp": "upstream/t4/warp-A/warp/__init__.py", "compat": {"accumulate": "float32", "loop": "cuda", "chunk_graph": true, "fused": false, "fused_max_color_blocks": 1073741824, "simd": false, "gpu_exit": true, "rigid_deterministic": true, "metal_fast_math": "relaxed"}}
