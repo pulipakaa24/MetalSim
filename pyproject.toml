@@ -4,8 +4,8 @@ version = "0.0.1"
 description = "Isaac Sim / Isaac Lab-parity robot simulation native to Apple silicon: MuJoCo Warp physics on Metal, rendering, sensors, data generation and RL"
 readme = "README.md"
 requires-python = ">=3.12"
-license = "MIT AND Apache-2.0"   # Apache-2.0: the vendored Newton solver, metalsim/physics/mpm/implicit_mpm (THIRD_PARTY_NOTICES.md)
-license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md", "licenses/*"]
+license = "Apache-2.0"   # MetalSim and the vendored Newton solver (metalsim/physics/mpm/implicit_mpm); see THIRD_PARTY_NOTICES.md
+license-files = ["LICENSE", "NOTICE", "THIRD_PARTY_NOTICES.md", "licenses/*"]
 authors = [{ name = "Aditya Pulipaka", email = "adipu@utexas.edu" }]
 keywords = ["robotics", "simulation", "reinforcement-learning", "apple-silicon", "metal", "mujoco", "isaac-lab"]
 # no "License ::" classifier: PEP 639 replaces it with the `license` expression above (setuptools rejects both)
