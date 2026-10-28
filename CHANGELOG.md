@@ -4,6 +4,10 @@ What landed between 2026-09-22 and 2026-10-13, grouped by area. The September se
 commit order; the October sections, newest first, summarise each merged pull request with its main commits (`git log`
 for the full messages). Dates are the commit dates (month-day).
 
+## Licence: Apache-2.0, NOTICE and CITATION.cff (2026-10-28, `LICENSE`)
+
+- 10-28 MetalSim's licence changes from MIT to the Apache License 2.0 (`LICENSE`, `pyproject.toml`'s `license` expression `Apache-2.0`); copies taken earlier stay under MIT. New `NOTICE` (attribution that redistributions must keep, Apache-2.0 section 4(d)); `CITATION.cff` for GitHub's "Cite this repository". SPDX headers of the derived files: `MIT AND Apache-2.0` -> `Apache-2.0`, `MIT AND BSD-3-Clause` -> `Apache-2.0 AND BSD-3-Clause`. README, `THIRD_PARTY_NOTICES.md` and the vendored Newton package's `NOTICE.txt` (with its template in `scripts/vendor_mpm152.py`) updated to match.
+
 ## MPM: SIMD Gauss-Seidel sweep removed (2026-10-14, `metalsim/physics/mpm/MPM.md`)
 
 - 10-14 `metalsim/physics/mpm/simd_gs.py`, `newton_compat.install(simd=)`, `record_mpm.py --simd`, `loop_breakdown.py --simd`, `ab_timing.py`'s `+simd` / `+simdgraph` variants and the xfail `test_simd_sweep_bitwise` removed. The sweep was opt-in and never the default; its +10 % with the chunk graph (MPM.md, 2026-10-09) came with bitwise equality to Newton's serial loop, which FMA contraction on Metal (Warp `metalsim-fp-contract`) ended. (#66 committed only the file deletion; the rest of the removal landed in its follow-up.)

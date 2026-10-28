@@ -79,7 +79,7 @@ listing its commits, and keeps its upstream licence unchanged. "Head" is the bra
 
 ### MetalSim (this repository)
 
-[github.com/pulipakaa24/MetalSim](https://github.com/pulipakaa24/MetalSim), branch `main`. MIT licence.
+[github.com/pulipakaa24/MetalSim](https://github.com/pulipakaa24/MetalSim), branch `main`. Apache-2.0 licence.
 
 | module | what it does |
 |---|---|
@@ -334,7 +334,8 @@ the user guide, [`docs/GUIDE.md`](docs/GUIDE.md). What landed when is in [`CHANG
 
 ## Licence and notices
 
-MetalSim is released under the [MIT licence](LICENSE), copyright 2026 Aditya Pulipaka. Third-party files included here
+MetalSim is released under the [Apache License 2.0](LICENSE), copyright 2026 Aditya Pulipaka. Anyone who
+redistributes MetalSim or a work based on it must keep the [`NOTICE`](NOTICE) file with it. Third-party files included here
 (Isaac Lab sources under `assets/isaac/`, MuJoCo Menagerie and Playground models, LimX TRON1 files) keep their own
 licences, and the patches in `patches/` modify Apache-2.0 projects and are offered under Apache-2.0.
 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) lists every component, its licence and how it is used. NVIDIA's
@@ -349,4 +350,5 @@ MetalSim builds on [NVIDIA Warp](https://github.com/NVIDIA/warp) and innate-inc'
 [MuJoCo Menagerie](https://github.com/google-deepmind/mujoco_menagerie), [rsl_rl](https://github.com/leggedrobotics/rsl_rl)
 and [Open Image Denoise](https://github.com/RenderKit/oidn). If you use MetalSim, cite this repository
 (Aditya Pulipaka, MetalSim, 2026, https://github.com/pulipakaa24/MetalSim) together with the upstream projects whose
-components you use, following their own citation instructions.
+components you use, following their own citation instructions. [`CITATION.cff`](CITATION.cff) holds the citation;
+GitHub's "Cite this repository" button exports it as APA or BibTeX.

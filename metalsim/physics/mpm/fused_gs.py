@@ -1,5 +1,5 @@
-# SPDX-License-Identifier: MIT AND Apache-2.0
-# MetalSim code, MIT (see LICENSE). Adapted from Newton 1.5.2 (newton-physics/newton tag v1.5.2,
+# SPDX-License-Identifier: Apache-2.0
+# MetalSim code, Apache-2.0 (see LICENSE). Adapted from Newton 1.5.2 (newton-physics/newton tag v1.5.2,
 # newton/_src/solvers/implicit_mpm/rheology_solver_kernels.py: make_gs_solve_kernel; contact_solver_kernels.py:
 # solve_nodal_friction; solve_rheology.py: residual and stopping rule),
 # SPDX-FileCopyrightText: Copyright (c) 2026 The Newton Developers, Apache-2.0. Modified by MetalSim: the per-color Gauss-Seidel kernel, the nodal friction kernel and
