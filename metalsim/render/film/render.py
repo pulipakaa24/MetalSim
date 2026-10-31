@@ -6,14 +6,21 @@ materials, importance-sampled HDRI dome, optional analytic sun, OIDN denoiser), 
         --out runs/film/franka_pour/hero [--grid 2] [--frames 0:390]
 
 Writes ``frames/frame_%04d.png``, ``render.json`` (settings, per-frame seconds, a timing probe of the first frame:
-one pass vs the full frame) and ``render_frames.jsonl`` (one line per frame; resumable with --skip-existing).
+one pass vs the full frame) and ``render_frames.jsonl`` (one line per frame). The frames are a cache keyed on the
+recording and the render settings (``cache_key``, stored in ``render.json``): with the same key a run resumes (existing
+frames are kept, unless --no-skip-existing), with another key the old frames, ``render.json`` and
+``render_frames.jsonl`` move to ``stale/`` first and nothing of them (exposure, probe, hardware) is reused.
 """
 from __future__ import annotations
 
 import argparse
+import dataclasses
+import glob
+import hashlib
 import json
 import os
 import re
+import shutil
 import sys
 import time
 
@@ -51,12 +58,21 @@ def smooth_track(track: np.ndarray, fps: float, seconds: float) -> np.ndarray:
     return out
 
 
-def camera(viewer, k, j, track_s):
+def camera(viewer, k, j, track_s, fps=30.0, t_mid=0.0):
+    """Eye and quaternion of frame ``k``, panel ``j``. ``viewer.orbit_deg_s`` turns the eye about +z through the
+    look-at point, symmetric about ``t_mid`` [s] (MuJoCo Warp's README clips, ``mujoco_warp/record.py``: azimuth
+    0.05 deg per 5 ms step about mid-clip = 10 deg/s)."""
     eye, lookat = np.asarray(viewer.eye, float), np.asarray(viewer.lookat, float)
     if viewer.origin_type in ("asset_root", "asset_body"):
         base = track_s[k, j]
         lookat = base + lookat
         eye = base + np.asarray(viewer.eye, float)
+    orbit = float(getattr(viewer, "orbit_deg_s", 0.0) or 0.0)
+    if orbit:
+        a = np.deg2rad(orbit * (k / fps - t_mid))
+        off = eye - lookat
+        off[:2] = (np.cos(a) * off[0] - np.sin(a) * off[1], np.sin(a) * off[0] + np.cos(a) * off[1])
+        eye = lookat + off
     return eye, look_at_wxyz(eye, lookat)
 
 
@@ -64,6 +80,66 @@ def _quat_mat(q):
     import mujoco
 
     m = np.zeros(9); mujoco.mju_quat2Mat(m, np.asarray(q, float)); return m.reshape(3, 3)
+
+
+def _cfg_dict(x):
+    return dataclasses.asdict(x) if dataclasses.is_dataclass(x) else dict(vars(x))
+
+
+def cache_key(rec_dir, film, look, viewer, grid, slots) -> str:
+    """Key of a shot's frames: the recording (rec.npz, rec.json, twin.xml) and every setting that changes a frame's pixels
+    (tier, passes, spp, bounces, denoiser, the look, the viewer with its resolution, grid, filmed slots)."""
+    h = hashlib.sha256()
+    for name in ("rec.npz", "rec.json", "twin.xml"):
+        h.update(name.encode())
+        with open(os.path.join(rec_dir, name), "rb") as f:
+            for chunk in iter(lambda: f.read(1 << 22), b""):
+                h.update(chunk)
+    settings = dict(tier=film.tier, passes=film.passes, spp=film.spp, bounces=film.bounces, denoise=film.denoise,
+                    look=_cfg_dict(look), viewer=_cfg_dict(viewer), resolution=list(viewer.resolution), grid=grid,
+                    slots=list(slots))
+    h.update(json.dumps(settings, sort_keys=True, default=str).encode())
+    return h.hexdigest()[:20]
+
+
+def _invalidate(out_dir, key):
+    """A shot directory rendered under another key (or none): move its frames, render.json and render_frames.jsonl to
+    ``stale/`` (replacing an older ``stale/``) and return {} as the metadata to continue from; same key: the metadata."""
+    meta_path = os.path.join(out_dir, "render.json")
+    try:
+        meta = json.load(open(meta_path)) if os.path.exists(meta_path) else {}
+    except ValueError:
+        meta = {}
+    old = [p for p in (os.path.join(out_dir, "frames"), meta_path, os.path.join(out_dir, "render_frames.jsonl"))
+           if os.path.exists(p)]
+    if meta.get("cache_key") == key or not old:
+        return meta
+    n = len(glob.glob(os.path.join(out_dir, "frames", "frame_*.png")))
+    stale = os.path.join(out_dir, "stale")
+    shutil.rmtree(stale, ignore_errors=True)
+    os.makedirs(stale)
+    for p in old:
+        shutil.move(p, os.path.join(stale, os.path.basename(p)))
+    print(f"[render] cache key {key} differs from the shot's ({meta.get('cache_key')}): {n} old frames, render.json and "
+          f"render_frames.jsonl moved to {provenance.relpath(stale)}", flush=True)
+    return {}
+
+
+def film_env_margin(model, R, slots, gid, eyes) -> float:
+    """``env_margin`` for the ray tracer's compact env grid: its cell (the twin's content box at the initial state plus
+    the margin) must hold every recorded geom of the filmed envs (centre +- bounding radius) and every camera position,
+    with the growth check's slack of half the margin (env_grid.h ``env_grid_left``). Otherwise the cell grows mid-film
+    (a warning and a different image) and a camera outside its cell traces through its neighbours' cells. Measured
+    against the box before its x / y symmetrisation (RayTracer), so never too small."""
+    from metalsim.sensors.env_grid import content_box
+
+    lo, hi = content_box(model, max_group=3)
+    X = R["xpos"][:, slots].astype(np.float64)                     # (F, E, G, 3)
+    rb = np.asarray(model.geom_rbound, np.float64)[gid][None, None, :, None]
+    plo = np.minimum((X - rb).min((0, 1, 2)), np.min(eyes, 0))
+    phi = np.maximum((X + rb).max((0, 1, 2)), np.max(eyes, 0))
+    over = max(float(np.max(lo - plo)), float(np.max(phi - hi)), 0.0)
+    return max(1.0, 0.1 * float(np.max(hi - lo)), 2.0 * over + 0.5)
 
 
 def build_scene(rec_dir, rec, look, viewer):
@@ -139,9 +215,12 @@ def render(task, rec_dir, out_dir, frames_arg=None, skip_existing=True, grid=Non
     last = [int(ends[s]) if ends[s] >= 0 else F_rec - 1 for s in slots]
     hold = int(round(film.hold_s * fps))
     n_frames = min(max(last) + 1 + hold, film.video_length or 10**9)
-    os.makedirs(os.path.join(out_dir, "frames"), exist_ok=True)
     W, H = viewer.resolution
     w, h = W // grid, H // grid
+    key = cache_key(rec_dir, film, look, viewer, grid, slots)
+    os.makedirs(out_dir, exist_ok=True)
+    meta = _invalidate(out_dir, key)
+    os.makedirs(os.path.join(out_dir, "frames"), exist_ok=True)
 
     t0 = time.perf_counter()
     model, sky, sun, yaw = build_scene(rec_dir, rec, look, viewer)
@@ -163,9 +242,18 @@ def render(task, rec_dir, out_dir, frames_arg=None, skip_existing=True, grid=Non
     if sun is not None:
         usd_lights = [{"intensity": 1.0, "color": tuple(np.asarray(sun["irradiance"]) / np.pi),
                        "angle_deg": 2 * np.rad2deg(max(sun["angular_radius"], 0.0047))}]
+    track_s = smooth_track(R["track"].astype(np.float64), fps, viewer.smooth_s)
+    t_mid = (n_frames - 1) / (2.0 * fps)          # the orbit is symmetric about the film's middle
+    eyes = np.array([camera(viewer, min(k, F_rec - 1), s, track_s, fps, t_mid)[0] for k in range(n_frames) for s in slots])
+    env_margin = film_env_margin(model, R, slots, gid, eyes)
+    # sites are not recorded (only geom poses are): drawn, they would sit at the twin's qpos0 pose all film (the G1's
+    # torso_link_touch box at the origin), as Isaac's renderer has no sites
+    vis = mujoco.MjvOption()
+    vis.sitegroup[:] = 0
     r = Tier2Renderer(model, panels, width=w, height=h, camera="film", spp=film.spp, max_bounces=film.bounces,
                       material_model="omnipbr", headlight=False, tonemap="rtx", exposure=1.0, usd_lights=usd_lights,
-                      denoise=film.denoise, aux=bool(film.denoise), center_sample=False)
+                      denoise=film.denoise, aux=bool(film.denoise), center_sample=False, visual=vis,
+                      env_margin=env_margin)
     if sky is not None:
         r.set_environment(sky, yaw=yaw)
     has_p = R["particles"].shape[2] > 0
@@ -175,10 +263,10 @@ def render(task, rec_dir, out_dir, frames_arg=None, skip_existing=True, grid=Non
         grain_mat = GrainMaterial(palette=pal, brightness_jitter=0.12)
         g_r = prad / look.grains_per_particle ** (1 / 3) * look.grain_scale
     setup_s = time.perf_counter() - t0
-    track_s = smooth_track(R["track"].astype(np.float64), fps, viewer.smooth_s)
     print(f"[render] {task.name}: {n_frames} frames, {grid}x{grid} panels of {w}x{h}, {film.passes} x {film.spp} spp, "
           f"{len(gid)} twin geoms ({len(fix)} frame corrections), particles/env {R['particles'].shape[2]}, "
-          f"setup {setup_s:.1f} s", flush=True)
+          f"env cell {np.round(r.rt.grid.S, 1).tolist()} m (margin {env_margin:.2f} m), setup {setup_s:.1f} s, "
+          f"cache key {key}", flush=True)
 
     rng = range(n_frames)
     if frames_arg:
@@ -187,9 +275,22 @@ def render(task, rec_dir, out_dir, frames_arg=None, skip_existing=True, grid=Non
     stats_path = os.path.join(out_dir, "render_frames.jsonl")
     exposure = look.exposure
     meta_path = os.path.join(out_dir, "render.json")
-    meta = json.load(open(meta_path)) if os.path.exists(meta_path) else {}
-    if exposure <= 0 and "exposure" in meta:
+    if exposure <= 0 and "exposure" in meta:        # same cache key: the exposure the shot's frames were made with
         exposure = meta["exposure"]
+    frame_png = lambda k: os.path.join(out_dir, "frames", f"frame_{k:04d}.png")
+    todo = [k for k in rng if not (skip_existing and os.path.exists(frame_png(k)))]
+    if len(todo) < len(rng):
+        print(f"[render] resuming: {len(rng) - len(todo)} of {len(rng)} frames already rendered under this key",
+              flush=True)
+    if os.path.exists(stats_path):                  # one stats line per frame: drop the lines of frames re-rendered now
+        redo = set(todo)
+        rows = [json.loads(x) for x in open(stats_path) if x.strip()]
+        keep = {}
+        for row in rows:
+            if row.get("frame") not in redo:
+                keep[row.get("frame")] = row
+        if len(keep) != len(rows):
+            _write_atomic(stats_path, "".join(json.dumps(row) + "\n" for row in keep.values()))
 
     def set_frame(k):
         P = []
@@ -210,7 +311,7 @@ def render(task, rec_dir, out_dir, frames_arg=None, skip_existing=True, grid=Non
         if has_p:
             r.set_particles(np.stack(P).astype(np.float32), radius=prad, material=grain_mat,
                             grains_per_particle=look.grains_per_particle, grain_radius=g_r)
-        cams = [camera(viewer, k, s, track_s) for s in slots]
+        cams = [camera(viewer, k, s, track_s, fps, t_mid) for s in slots]
         return np.stack([c[0] for c in cams]), np.stack([c[1] for c in cams])
 
     def to_rgb(img, exposure):
@@ -221,10 +322,8 @@ def render(task, rec_dir, out_dir, frames_arg=None, skip_existing=True, grid=Non
 
     probe = meta.get("probe")
     done = 0
-    for k in rng:
-        name = os.path.join(out_dir, "frames", f"frame_{k:04d}.png")
-        if skip_existing and os.path.exists(name):
-            continue
+    for k in todo:
+        name = frame_png(k)
         tf = time.perf_counter()
         cp, cq = set_frame(k)
         if probe is None:
@@ -245,7 +344,9 @@ def render(task, rec_dir, out_dir, frames_arg=None, skip_existing=True, grid=Non
             print(f"[render] automatic exposure {exposure:.4f}", flush=True)
         rgb = to_rgb(hdr, exposure)
         tile = rgb.reshape(grid, grid, h, w, 3).transpose(0, 2, 1, 3, 4).reshape(grid * h, grid * w, 3)
-        iio.imwrite(name, tile)
+        tmp = os.path.join(out_dir, "frames", f".frame_{k:04d}.tmp.png")   # an interrupted write leaves no frame
+        iio.imwrite(tmp, tile)
+        os.replace(tmp, name)
         el = time.perf_counter() - tf
         if "full_s" not in probe:
             probe.update(full_s=t_render, per_pass_s=(t_render - probe["one_pass_s"]) / max(film.passes - 1, 1))
@@ -262,14 +363,21 @@ def render(task, rec_dir, out_dir, frames_arg=None, skip_existing=True, grid=Non
                         grains_per_particle=look.grains_per_particle, grain_radius=g_r if has_p else None),
                     particles_per_env=int(R["particles"].shape[2]), particle_radius=prad, setup_s=setup_s,
                     probe=probe, twin_geoms=len(gid), frame_corrections=len(fix),
-                    software=provenance.software(("warp", "mujoco", "numpy")), hardware=provenance.hardware()
-                    if "hardware" not in meta else meta["hardware"])
-        with open(meta_path, "w") as f:
-            json.dump(meta, f, indent=1, default=str)
+                    env_grid=dict(margin=env_margin, cell=r.rt.grid.S.tolist(), growths=int(r.rt.grid_growths)),
+                    cache_key=key, software=provenance.software(("warp", "mujoco", "numpy")),
+                    hardware=meta["hardware"] if "hardware" in meta else provenance.hardware())
+        _write_atomic(meta_path, json.dumps(meta, indent=1, default=str))
         if done == 1 or k % 15 == 0:
             print(f"[render] frame {k}/{n_frames}: {el:.2f} s (render {t_render:.2f} s)", flush=True)
     print(f"[render] done: {done} frames rendered -> {provenance.relpath(out_dir)}", flush=True)
     return meta
+
+
+def _write_atomic(path, text):
+    tmp = path + ".tmp"
+    with open(tmp, "w") as f:
+        f.write(text)
+    os.replace(tmp, path)
 
 
 def main(argv=None):

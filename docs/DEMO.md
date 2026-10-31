@@ -36,8 +36,10 @@ Measured (README "Measured state", `docs/PARITY.md` §1.4–1.5, §1.8):
   - elliptic default: 37.3–37.7 K env-steps/s;
   - pyramidal: 56.9–57.5 K env-steps/s;
   - reference: Isaac Lab 3.0's env step alone on the L4 is 72.0 K (Newton / MuJoCo Warp).
-- **Film:** `docs/renders/g1_flat.mp4`. Its record / render / encode stages ran on the 14-inch from a `.[full]` install
-  (`runs/checks/fix1/`).
+- **Film:** `docs/renders/g1_flat.mp4` ([G1_FLAT.md](renders/G1_FLAT.md)), re-filmed 2026-10-31 with the tracked
+  checkpoint `runs/g1regress/ckpt14/flat_main_s0.pt`. The film committed with the demo tag used an untracked checkpoint
+  whose robots fell within about 3 s, and the record stage did not detect it
+  (`docs/research/readme_media_plan_2026-10-31.md` section 2, bug 1); the film tool now refuses such a take.
 
 ### Franka-Pour (Isaac Lab 3.0-EA `IsaacContrib-Franka-Pour`: granular MPM media poured between cups)
 

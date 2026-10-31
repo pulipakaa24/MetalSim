@@ -125,8 +125,8 @@ class Tier2Renderer:
                  visual=None, deformables=(), tube_slices=None, cap_stacks=None, dyn_rebuild_every: int = 32,
                  infinite_planes: bool = True, hfield_skirts: bool = True, per_world_size: bool = True,
                  model_fields: bool = True, lens=None, dyn_layout: str | None = None, env_layout: str | None = None,
-                 haze: bool = True, fog: bool = False, tendons: str = "mujoco", rolling_shutter=None,
-                 area_lights: bool = True, ctx: MetalContext | None = None, device="metal:0"):
+                 env_margin: float | None = None, haze: bool = True, fog: bool = False, tendons: str = "mujoco",
+                 rolling_shutter=None, area_lights: bool = True, ctx: MetalContext | None = None, device="metal:0"):
         """``haze`` / ``fog``: MuJoCo's haze over the first infinite plane (drawn with the skybox texture) and its linear
         fog (off by default, as ``mujoco.Renderer``), composited on the camera ray at the first opaque surface
         (``metalsim.render.haze``; see ``Tier0Renderer``). ``tendons`` / ``rolling_shutter``: see ``Tier0Renderer``
@@ -143,8 +143,10 @@ class Tier2Renderer:
         ``transparent_ids``: annotations of pixels whose first surface is transparent, as ``Tier0Renderer``: "surface"
         (default, MuJoCo's; "mujoco" is an alias) or "behind" (the first opaque surface behind it).
         ``visual`` / ``deformables`` / ``tube_slices`` / ``cap_stacks``: sites, flexes, skins, spatial tendons and user
-        deformable meshes, see ``Tier0Renderer``; ``dyn_rebuild_every`` / ``dyn_layout`` / ``env_layout``: see
-        ``RayTracer`` (default "sbvh": one box per env, the env's triangles traversed in software; the compact env grid).
+        deformable meshes, see ``Tier0Renderer``; ``dyn_rebuild_every`` / ``dyn_layout`` / ``env_layout`` /
+        ``env_margin``: see ``RayTracer`` (default "sbvh": one box per env, the env's triangles traversed in software; the
+        compact env grid, its cell the content box plus ``env_margin``: size it to where geometry and cameras will go, or
+        the cell grows mid-run with a warning). ``render_host`` grows the cell to hold its cameras (``RayTracer.contain``).
         ``infinite_planes`` / ``hfield_skirts`` / ``per_world_size`` /
         ``model_fields``: see ``Tier0Renderer`` (False = the previous behaviour). With ``usd_lights``, those lights keep
         their USD intensity (a per-world ``light_diffuse`` does not apply to them). ``lens``: a
@@ -173,7 +175,7 @@ class Tier2Renderer:
                             tube_slices=tube_slices, cap_stacks=cap_stacks, tube_view=tube_view,
                             dyn_rebuild_every=dyn_rebuild_every, infinite_planes=infinite_planes, hfield_skirts=hfield_skirts,
                             per_world_size=per_world_size, dyn_layout=dyn_layout, env_layout=env_layout,
-                            tendons=tendons, ctx=self.ctx, device=device)
+                            env_margin=env_margin, tendons=tendons, ctx=self.ctx, device=device)
 
         self.model_fields = bool(model_fields)
         self.lens = lens or Lens.pinhole()
@@ -770,6 +772,7 @@ class Tier2Renderer:
         else:
             cx = np.stack([d.cam_xpos for d in datas]).astype(np.float32).reshape(n, nc, 3)
             cm = np.stack([d.cam_xmat for d in datas]).astype(np.float32).reshape(n, nc, 9)
+        rt.contain(cx[:, self.cam_id], "the render camera")     # a camera outside its env's cell: grow the cell first
         c.write_buffer(self._host_cam_xpos, cx); c.write_buffer(self._host_cam_xmat, cm)
         if self.m.nlight:
             c.write_buffer(self._host_light_xpos, np.stack([d.light_xpos for d in datas]).astype(np.float32).reshape(n, nl, 3))

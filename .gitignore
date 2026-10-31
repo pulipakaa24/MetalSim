@@ -23,6 +23,7 @@ MUJOCO_LOG.TXT
 # run outputs: console captures, checkpoints and the GPU queue's state (logs under runs/ are committed)
 runs/*.stdout
 *.pt
+!runs/g1regress/ckpt14/*.pt
 runs/policies/
 runs/.gpu_lock
 runs/.gpu_lock.d/
@@ -65,3 +66,13 @@ runs/film/**/frames/
 runs/film/**/rec.npz
 runs/film/**/twin*
 runs/film/**/master.mp4
+# frames a render moved aside because its recording or settings changed (metalsim/render/film/render.py _invalidate)
+runs/film/**/stale/
+
+# README media work area (runs/readme_media/PROTOCOL.md): takes, assets and scratch stay local; only the protocol and
+# the hand-off notes are trackable (the final media are in docs/renders, the G1 takes in runs/film)
+runs/readme_media/*
+!runs/readme_media/PROTOCOL.md
+!runs/readme_media/handoff/
+runs/readme_media/handoff/*
+!runs/readme_media/handoff/*.md

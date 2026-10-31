@@ -1,0 +1,102 @@
+{
+ "task": "g1_rough",
+ "grid": 1,
+ "slots": [
+  0
+ ],
+ "envs": [
+  8
+ ],
+ "frames": 301,
+ "fps": 50.0,
+ "width": 640,
+ "height": 480,
+ "panel": [
+  640,
+  480
+ ],
+ "tier": 2,
+ "passes": 16,
+ "spp": 4,
+ "samples_per_pixel": 64,
+ "bounces": 3,
+ "denoise": "oidn",
+ "exposure": 1.2130711694049827,
+ "viewer": {
+  "eye": [
+   1.95,
+   -1.5,
+   0.98
+  ],
+  "lookat": [
+   0.0,
+   0.0,
+   -0.05
+  ],
+  "origin_type": "asset_body",
+  "env_index": 0,
+  "asset_name": null,
+  "body_name": "pelvis",
+  "resolution": [
+   640,
+   480
+  ],
+  "fovy": 36.0,
+  "smooth_s": 1.0,
+  "orbit_deg_s": 10.0
+ },
+ "look": {
+  "hdri": "hdri/train/poly_haven_studio.hdr",
+  "sun": false,
+  "ground_texture": "tex/train/laminate_floor_02.png",
+  "grains_per_particle": 4,
+  "grain_radius": null
+ },
+ "particles_per_env": 0,
+ "particle_radius": 0.0,
+ "setup_s": 1.6640837920058402,
+ "probe": {
+  "frame": 0,
+  "warmup_s": 0.11953175000235206,
+  "one_pass_s": 0.02305441699718358,
+  "full_s": 0.14432062500418397,
+  "per_pass_s": 0.008084413867133359
+ },
+ "twin_geoms": 48,
+ "frame_corrections": 34,
+ "env_grid": {
+  "margin": 230.4102225347088,
+  "cell": [
+   606.5219025251954,
+   675.590958179373,
+   466.21321944406816
+  ],
+  "growths": 0
+ },
+ "cache_key": "dc26c71dc5b7d28356a9",
+ "software": {
+  "metalsim": "687f3d7b1d+dirty",
+  "warp": {
+   "version": "1.18.0.dev20260917",
+   "git": "4127c48183",
+   "checkout": "upstream/warp-metalsim"
+  },
+  "mujoco": {
+   "version": "3.14.0"
+  },
+  "numpy": {
+   "version": "2.5.3"
+  }
+ },
+ "hardware": {
+  "machine": "arm64",
+  "python": "3.13.7",
+  "model": "Mac16,6",
+  "cpu": "Apple M4 Max",
+  "memory_gb": 64,
+  "macos": "27.0.1",
+  "macos_build": "26A434",
+  "gpu": "Apple M4 Max",
+  "gpu_cores": "40"
+ }
+}

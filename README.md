@@ -13,6 +13,109 @@ references were recorded by the author on an NVIDIA L4 (Isaac Sim 5.1 + Isaac La
 Isaac Lab 3.0.0-EA); NVIDIA's published RTX 4090 figures are marked "published". MetalSim is an independent
 project, not affiliated with or endorsed by NVIDIA, Google DeepMind or Apple.
 
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <img width="320" src="docs/renders/g1_flat.webp" alt="Unitree G1 walking on flat ground, path traced">
+      <br><b>python -m metalsim.render.film g1_flat</b>
+    </td>
+    <td align="center" width="33%">
+      <img width="320" src="docs/renders/g1_rough.webp" alt="Unitree G1 climbing stairs on Isaac Lab's rough terrain, path traced">
+      <br><b>python -m metalsim.render.film g1_rough</b>
+    </td>
+    <td align="center" width="33%">
+      <img width="320" src="docs/renders/anymal_sand.webp" alt="ANYmal C trotting across 25 million path-traced sand grains">
+      <br><b>python scripts/particle_demo/render_anymal.py</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="33%">
+      <img width="320" src="docs/renders/franka_pour.webp" alt="Franka Panda pouring 735 MPM particles of granular media from one cup into another">
+      <br><b>python -m metalsim.render.film franka_pour</b>
+    </td>
+    <td align="center" width="33%">
+      <img width="320" src="docs/renders/parity_g1_isaac.webp" alt="Isaac Lab's own G1 policy walking in Isaac Sim 5.1 (PhysX, RTX real-time)">
+      <br><b>Isaac Sim 5.1 (PhysX, RTX)</b>
+    </td>
+    <td align="center" width="33%">
+      <img width="320" src="docs/renders/parity_g1_metalsim.webp" alt="The same Isaac Lab G1 policy walking in MetalSim (MuJoCo Warp, tier-2 path tracer)">
+      <br><b>MetalSim (MuJoCo Warp, tier 2)</b>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="33%">
+      <img width="320" src="docs/renders/lidar_glass_rgb.webp" alt="Path-traced view of a ball passing behind a glass pane">
+      <br><b>python scripts/readme_media/lidar_glass.py</b>
+    </td>
+    <td align="center" width="33%">
+      <img width="320" src="docs/renders/lidar_glass_depth.webp" alt="Ray-traced depth camera: the pane is a wall">
+      <br><b>depth camera, same scene</b>
+    </td>
+    <td align="center" width="33%">
+      <img width="320" src="docs/renders/lidar_glass_lidar.webp" alt="Two-return lidar: echoes on the pane and on the ball behind it">
+      <br><b>two-return lidar, same scene</b>
+    </td>
+  </tr>
+</table>
+
+Row 1: Isaac Lab's G1 flat and rough velocity tasks with policies trained here, and ANYmal C on Newton's MPM sand
+(25 M render grains; [how to run](docs/DEMO.md#the-25-m-grain-render-anymal-on-sand-at-demo-scale)), all with the
+tier-2 path tracer. Row 2: Isaac Lab 3.0-EA's Franka-Pour (MuJoCo Warp arm coupled to implicit MPM), then Isaac Lab's own G1
+policy (iteration 1499 of Isaac's rsl_rl run) from the same start, camera and lights in Isaac Sim 5.1 (PhysX, RTX
+real-time) and in MetalSim (MuJoCo Warp, tier 2): over 8 s it walks 3.11 m in Isaac and 3.21 m in MetalSim
+([PARITY §1.5](docs/PARITY.md#15-learning-on-the-g1-task); made by `metalsim.parity.side_by_side`). Rendering
+alone, on identical states, the robot is 24.0 dB PSNR from RTX real-time and 28.8 dB from RTX's path tracer, whose
+own two modes are 25.9 dB apart ([§1.7](docs/PARITY.md#17-fidelity-protocol-against-isaac-sim-51-on-an-l4-recorded-2026-09-24-physx--rtx)). Row 3: one scene through three sensors, a ball rolling behind a glass
+pane: the path-traced camera sees it through the glass, the depth camera stops at the pane (as MuJoCo and Isaac do),
+and a two-return lidar sees both (cyan: echoes on glass; the rest coloured by range). As in MuJoCo Warp's README,
+a caption is the command that makes the scene; the exact command that cut each 320x240 clip, its source, assets and
+checkpoint are in the [`docs/renders/` index](docs/renders/README.md).
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/renders/throughput_dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/renders/throughput_light.svg">
+  <img width="900" src="docs/renders/throughput_light.svg" alt="Throughput in env-steps per second, higher is better. G1 flat, 4,096 envs, env step: MetalSim on an M4 Max 58.3K vs Isaac Lab 3.0 Newton/MuJoCo Warp on an NVIDIA L4 72.0K (Isaac's MuJoCo Warp settings); MetalSim elliptic default 41.9K vs Isaac Lab 3.0 PhysX on the L4 45.1K. G1 rough, env step: MetalSim pyramidal preset 49.1K vs Isaac Lab 3.0 Newton on the L4 51.2K. Franka-Pour, 1,024 envs, full PPO loop: MetalSim 992 vs Isaac Lab 3.0 on the L4 317.">
+</picture>
+
+Like-for-like pairs only, every number with its log in
+[`scripts/readme_media/throughput_chart.py`](scripts/readme_media/throughput_chart.py); the row-by-row evidence is
+in [`docs/PARITY.md`](docs/PARITY.md).
+
+## Install
+
+Apple silicon Mac, macOS with the Xcode Command Line Tools, Python 3.12 or newer (macOS's own `python3` is 3.9: use
+python.org's, Homebrew's or `uv python install 3.12`), [uv](https://docs.astral.sh/uv/) for the optional environments:
+
+```
+git clone https://github.com/pulipakaa24/MetalSim && cd MetalSim
+python3.12 -m venv .venv && source .venv/bin/activate     # uv only: "$(uv python find 3.12)" -m venv .venv
+pip install -e ".[full]"                   # full = test + newton (MPM in BatchSim, Newton engine) + rslrl + tron1
+scripts/setup_warp.sh                      # replaces PyPI's warp-lang with the Warp fork (upstream/warp-metalsim)
+pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@8eb51fe637437108185f5a4750b7f5f64ef26624#egg=mujoco-warp" "mujoco>=3.14,<3.15"
+scripts/fetch_isaac_assets.sh              # NVIDIA's G1 and Franka-Pour assets, fetched from NVIDIA, not redistributed
+git clone --depth 1 https://github.com/google-deepmind/mujoco_menagerie upstream/mujoco_menagerie   # robot models
+pytest tests -q
+scripts/setup_newton152.sh                 # optional: MPM and Franka-Pour (.venv-newton152; tests/test_mpm.py runs there)
+scripts/fetch_polyhaven_assets.sh demo     # optional: HDRI and sand texture of the ANYmal-on-sand render demo
+scripts/fetch_splat_scenes.sh              # optional: public splat scenes for the splat renderer's real-data tests (InteriorGS is gated: SPLAT.md 7b)
+scripts/fetch_isaaclab_source.sh           # optional: Isaac Lab 3.0-EA's Franka-Pour source, the oracle of its term tests
+```
+
+Every command runs from the repository root, which can be anywhere (any user, any directory name, spaces included);
+nothing in the code, tests or scripts assumes the author's machine (`tests/test_no_machine_paths.py` checks it). The
+model and asset locations can be moved with `MENAGERIE` (default `upstream/mujoco_menagerie`), `POLYHAVEN` (default
+`assets/polyhaven`) and `METALSIM_SPLAT_DATA` (default `assets/splats`). The first steps of each demo, at small scale, are in [`docs/GUIDE.md`](docs/GUIDE.md) section 2.
+
+The MuJoCo Warp commit is pinned (the head of the fork's branch `metalsim` on 2026-10-13), as Warp's in
+`scripts/setup_warp.sh` and Newton's in `pyproject.toml`. Without access to the fork: clone
+google-deepmind/mujoco_warp, `git checkout 88af9cc` (v3.14.0), `git apply` MetalSim's
+`patches/mujoco_warp/metalsim-8eb51fe.diff` (the whole branch as one diff) and `pip install -e` that checkout.
+The `mujoco<3.15` on that line keeps pip from moving MuJoCo past 3.14: the fork reads `MjModel.flex_internal`,
+which 3.15 removed (the fork alone asks only `mujoco>=3.12`, and its uv index offers 3.15 nightlies).
+
+Optional extras, first runs, bringing your own robot, the GPU job queue and the throughput / fidelity knobs are in
+the user guide, [`docs/GUIDE.md`](docs/GUIDE.md). What landed when is in [`CHANGELOG.md`](CHANGELOG.md).
+
 ## Documentation
 
 - [`docs/DEMO.md`](docs/DEMO.md): the demo tag `demo-2026-10`: what works, the command for each demo, the measured numbers and the known limits.
@@ -36,9 +139,10 @@ project, not affiliated with or endorsed by NVIDIA, Google DeepMind or Apple.
   [`research_notes/`](research_notes) and [`reports/`](reports) (the MPM, float-parity, rendering and capacity rounds).
 - Scenes: [`docs/SCENES.md`](docs/SCENES.md): a robot, objects, camera mounts, lidar and a background (plane, HDRI or Gaussian splat behind a collision proxy) from one YAML file (Isaac Lab names): `python -m metalsim.run scene.yaml`.
 - Renders: [`docs/renders/`](docs/renders) (filmed tasks with a doc each: what is shown, timings, assets and
-  licences, how to reproduce; first: [Franka-Pour](docs/renders/FRANKA_POUR.md)), made with
-  `python -m metalsim.render.film <task>`.
-- Images and data: [`docs/gallery/`](docs/gallery) (renders and side-by-side videos),
+  licences, how to reproduce; [Franka-Pour](docs/renders/FRANKA_POUR.md), [G1 flat](docs/renders/G1_FLAT.md),
+  [G1 rough](docs/renders/G1_ROUGH.md)), made with
+  `python -m metalsim.render.film <task>`; the clips at the top of this page are there too.
+- Images and data: [`docs/gallery/`](docs/gallery) (September test renders and Isaac-side playback videos),
   [`docs/measurements/`](docs/measurements) (figures and JSON behind the docs' numbers); run logs under `runs/`.
 
 ## Measured state
@@ -51,11 +155,11 @@ The evidence, test by test, is in [`docs/PARITY.md`](docs/PARITY.md); open and c
 | G1 flat velocity task, training (Isaac's flat config and PPO settings) | **elliptic default (2026-09-26): return +26.8 / +26.9 / +26.6 at iteration 1000 (three seeds, mean 26.8 ± 0.2), full-length episodes by the same iteration**; the previous pyramidal default gave +28.4 / 26.3 / 26.0 (origin velocity point) and +27.1 (COM), all inside one seed spread of each other | Isaac Lab 2.3.2 + PhysX: +27.3 (one seed) | [§1.5](docs/PARITY.md#15-learning-on-the-g1-task) |
 | G1 rough velocity task, training (Isaac's terrain generator, ported exactly) | **elliptic default: +13.7 at iteration 1500, terrain level 6.10** (one seed; 25 K env-steps/s); the previous pyramidal default gave +16.4 / +22.6 / +19.1 at levels 6.0–6.1 (three seeds) | Isaac Lab 2.3.2 + PhysX: +14.1, level 5.9 (one seed) | [§1.5](docs/PARITY.md#15-learning-on-the-g1-task) |
 | Isaac Lab 3.0-EA G1 tasks (its extra push / mass / reset-velocity events), like-for-like on Isaac's own MuJoCo Warp numerics, both trainer fixes in | **flat, three seeds: +27.0 ± 1.4 at iteration 1499** (26.8 / 28.4 / 25.7), inside one standard deviation of Isaac's Newton run at every milestone from iteration 200 (mean +7.2 / +17.9 / +25.4 at 300 / 500 / 1000 vs +8.4 / +19.6 / +25.9); 0 blow-ups; **rough seed 0: +13.7 at 1499, terrain level 5.99** vs Isaac's +14.5 / 5.80 (was +8.4 with 1,010 blow-ups before the two fixes). Two trainer defects found and fixed on the way (no reset before the first episode; effort clamp placed where a saturated drive loses implicit damping) | flat +27.5 (Newton / MuJoCo Warp, 59.4 K on the L4), +28.9 (PhysX, 47.3 K); rough +14.5, level 5.8 (Newton) at iteration 1499, one seed each | [§1.8](docs/PARITY.md#18-isaac-lab-30-ea-reference-isaac-sim-61-measured-on-the-l4-2026-09-25) |
-| G1 flat throughput, 4096 envs | **with the elliptic default (impratio 10, cap 20): full PPO loop 37.3–37.7 K env-steps/s, env step 41.0 K, physics alone 84.0 K** (measured 2026-09-26 afternoon after the elliptic-path fusion and Metal early exit, two interleaved repeats, `runs/ellip_ws/final.wrapper.log`). Pyramidal (`recommended_pyramidal`) in the same session: loop 56.9–57.5 K, env step 61.3 K, physics 100.5 K. The elliptic premium is 1.53× on the loop; the review (`docs/research/elliptic_cost_review_2026-09-26.md`) shows the rest is inherent to impratio 10 (MuJoCo C needs the same extra iterations). Rough, pyramidal: env step 49.1 K, loop 44.5 K | Isaac Lab 3.0 on the L4 (`isaaclab benchmark runtime`, env step alone): 72.0 K with its default Newton / MuJoCo Warp, 45.1 K PhysX; rough 51.2 K / 35.7 K. Isaac Lab 2.3.2 + PhysX on the L4: 45.9 K; RTX 4090: 82 K (published) | [§1.4](docs/PARITY.md#14-throughput-on-the-g1-task-isaacs-protocol-4096-envs), [§1.8](docs/PARITY.md#18-isaac-lab-30-ea-reference-isaac-sim-61-measured-on-the-l4-2026-09-25) |
+| G1 flat throughput, 4096 envs | **with the elliptic default (impratio 10, cap 20): full PPO loop 37.3–37.7 K env-steps/s, env step 41.8–42.0 K, physics alone 85.7–85.9 K** (measured 2026-09-26 afternoon after the elliptic-path fusion and Metal early exit, two interleaved repeats, `runs/ellip_ws/final.wrapper.log`). Pyramidal (`recommended_pyramidal`) in the same session: loop 56.9–57.5 K, env step 62.7 K, physics 102.7–103.2 K. The elliptic premium is 1.53× on the loop; the review (`docs/research/elliptic_cost_review_2026-09-26.md`) shows the rest is inherent to impratio 10 (MuJoCo C needs the same extra iterations). Rough, pyramidal: env step 49.1 K, loop 44.5 K | Isaac Lab 3.0 on the L4 (`isaaclab benchmark runtime`, env step alone): 72.0 K with its default Newton / MuJoCo Warp, 45.1 K PhysX; rough 51.2 K / 35.7 K. Isaac Lab 2.3.2 + PhysX on the L4: 45.9 K; RTX 4090, rough task (`Isaac-Velocity-Rough-G1`): 94 K env step, 82 K with training (published) | [§1.4](docs/PARITY.md#14-throughput-on-the-g1-task-isaacs-protocol-4096-envs), [§1.8](docs/PARITY.md#18-isaac-lab-30-ea-reference-isaac-sim-61-measured-on-the-l4-2026-09-25) |
 | Rendering vs RTX (G1 scene, identical states) | tier 2 + Open Image Denoise vs RTX path tracer: robot pixels 28.8 dB PSNR / SSIM 0.94, whole frame 45.6 dB | RTX real-time vs RTX path tracer on the robot: 25.9 dB apart | [§1.7](docs/PARITY.md#17-fidelity-protocol-against-isaac-sim-51-on-an-l4-recorded-2026-09-24-physx--rtx) |
 | Physics vs PhysX (same asset, open-loop protocol) | joints within 0.03–0.06 rad through hold and 1 m drop; contact impulses within 1–4 % of Isaac's; **default contacts since 2026-09-26: elliptic friction cones (PhysX's exact cone), impratio 10, Newton cap 20**, on top of the 10 ms impact-stiffened preset with hard joint limits: 20 ms impact forces 1.08× / 1.07× of PhysX's (pyramidal 1.70× / 1.23×), feet slide within noise of Isaac's; learning inside seed spread. **Open: peak foot penetration at the 1 m landing is 13 mm against PhysX's 0.5 mm** (measured like for like 2026-09-26): MuJoCo only builds a contact row once a foot corner is inside the surface, so at a 2.5 ms substep no stock setting gets below ~8 mm without losing slide or exceeding PhysX's force bound; a speculative-contact prototype in the fork reaches 1.6 mm but was not adopted (2026-09-27: it loses the slide match and costs 1.20×; archived behind `MJW_SPECULATIVE_GAP`, [GAPS](docs/GAPS.md)) | Isaac Sim 5.1 PhysX recording; Isaac Sim 6.1 / Isaac Lab 3.0 PhysX reproduces it within 0.002 rad, and 3.0's own MuJoCo Warp sits 0.002–0.005 rad from its PhysX | [§1.7](docs/PARITY.md#17-fidelity-protocol-against-isaac-sim-51-on-an-l4-recorded-2026-09-24-physx--rtx), [§1.8](docs/PARITY.md#18-isaac-lab-30-ea-reference-isaac-sim-61-measured-on-the-l4-2026-09-25) |
 | Deformables (cloth, rope, soft cube) | vs PhysX 5.1: rope period 1.077 vs 1.026 s, soft-cube bounce 0.140 vs 0.135 m, penetration 2.6 vs 1.6 mm (damping fitted); vs Isaac Lab 3.0: soft cube matches PhysX's FEM with PhysX's own parameters, cloth within 7 mm; Newton VBD run on Metal replays 3.0's Newton recording within 1.2 mm over 5 s (same solver, Metal vs CUDA) | Isaac Sim 5.1 and 6.1 recordings | [§2](docs/PARITY.md#2-platform-capabilities-the-workstreams-with-the-tests-behind-them), [GAPS](docs/GAPS.md#open-2026-09-25-evening) |
-| MPM (Isaac Lab 3.0-EA's Newton 1.5.2 implicit MPM) and Franka-Pour, Isaac's MPM manipulation task | MPM on Metal with CUDA's semantics, bitwise deterministic; column collapse, Newton's MPM examples and the coupled ANYmal / two-way scenes all inside the L4's own perturbation ensemble. Speed (ms/frame vs the L4): pure-MPM scenes near or past the L4 with fast_math honoured, slower with the parity default; coupled scenes captured at one world 1.29x (ANYmal) and 1.76x (two-way) the L4's time. Franka-Pour end to end at 1,024 envs: 992 env-steps/s for the full PPO loop, about 3.1x the L4; learning (5 seeds ours, 3 Isaac's) equal through iteration 49, Isaac's mean 0.035 success ahead at iterations 50-59, not significant (p = 0.09; partial) | Isaac Lab 3.0-EA on the L4: 317 env-steps/s at 1,024 envs; the task's 2,048 envs do not fit the L4 | [MPM.md](metalsim/physics/mpm/MPM.md) 8e, 8j; [§1b](docs/PARITY.md#1b-isaaccontrib-franka-pour-isaac-lab-30-ea-granular-mpm-manipulation-2026-10-12) |
+| MPM (Isaac Lab 3.0-EA's Newton 1.5.2 implicit MPM) and Franka-Pour, Isaac's MPM manipulation task | MPM on Metal with CUDA's semantics, bitwise deterministic; column collapse, Newton's MPM examples and the coupled ANYmal / two-way scenes all inside the L4's own perturbation ensemble. Speed (ms/frame vs the L4): pure-MPM scenes near or past the L4 with fast_math honoured, slower with the parity default; coupled scenes captured at one world 1.21x the L4's time, ANYmal and two-way (MPM.md 8k; 1.29x / 1.76x before it). Franka-Pour end to end at 1,024 envs: 992 env-steps/s for the full PPO loop, about 3.1x the L4; learning (5 seeds ours, 3 Isaac's) equal through iteration 49, Isaac's mean 0.035 success ahead at iterations 50-59, not significant (p = 0.09; partial) | Isaac Lab 3.0-EA on the L4: 317 env-steps/s at 1,024 envs; the task's 2,048 envs do not fit the L4 | [MPM.md](metalsim/physics/mpm/MPM.md) 8e, 8j; [§1b](docs/PARITY.md#1b-isaaccontrib-franka-pour-isaac-lab-30-ea-granular-mpm-manipulation-2026-10-12) |
 | Camera RL (Isaac-Cartpole-RGB-Camera, 1024 envs, Isaac's skrl config) | 12.7 K env-steps/s including training (1 spp); 8.8 K at the physical tier-2 default, return 85.3 vs 86.3 for tier 0 | RTX 4090: 32 K (published, throughput only) | [§2](docs/PARITY.md#2-platform-capabilities-the-workstreams-with-the-tests-behind-them) |
 
 Isaac's numbers come from one seed each; MuJoCo's contact model is not PhysX's, and the differences that remain are
@@ -286,41 +390,6 @@ Recordings, logs and benchmark JSON are under `runs/parity/`, `runs/parity3/` an
 - [`franka_pour_2026-10-11.md`](docs/research/franka_pour_2026-10-11.md): Isaac Lab 3.0-EA's Franka-Pour task read from Isaac's source, for the port.
 - [`ppowarp_checkpoint_load_2026-10-13.md`](docs/research/ppowarp_checkpoint_load_2026-10-13.md): checkpoints loaded into PPOWarp ran the untrained weights (fixed), and which results it touched.
 - [`research_notes/`](research_notes): also the capacity overflow guard (`capacity_overflow_guard/`), Kit's dome-light orientation (`dome_light_azimuth/`) and transparency in the ray-traced sensors with true area lights (`Render sensor fidelity/`).
-
-## Install
-
-Apple silicon Mac, macOS with the Xcode Command Line Tools, Python 3.12 or newer (macOS's own `python3` is 3.9: use
-python.org's, Homebrew's or `uv python install 3.12`), [uv](https://docs.astral.sh/uv/) for the optional environments:
-
-```
-git clone https://github.com/pulipakaa24/MetalSim && cd MetalSim
-python3.12 -m venv .venv && source .venv/bin/activate     # uv only: "$(uv python find 3.12)" -m venv .venv
-pip install -e ".[full]"                   # full = test + newton (MPM in BatchSim, Newton engine) + rslrl + tron1
-scripts/setup_warp.sh                      # replaces PyPI's warp-lang with the Warp fork (upstream/warp-metalsim)
-pip install -e "git+https://github.com/pulipakaa24/mujoco_warp@8eb51fe637437108185f5a4750b7f5f64ef26624#egg=mujoco-warp" "mujoco>=3.14,<3.15"
-scripts/fetch_isaac_assets.sh              # NVIDIA's G1 and Franka-Pour assets, fetched from NVIDIA, not redistributed
-git clone --depth 1 https://github.com/google-deepmind/mujoco_menagerie upstream/mujoco_menagerie   # robot models
-pytest tests -q
-scripts/setup_newton152.sh                 # optional: MPM and Franka-Pour (.venv-newton152; tests/test_mpm.py runs there)
-scripts/fetch_polyhaven_assets.sh demo     # optional: HDRI and sand texture of the ANYmal-on-sand render demo
-scripts/fetch_splat_scenes.sh              # optional: public splat scenes for the splat renderer's real-data tests (InteriorGS is gated: SPLAT.md 7b)
-scripts/fetch_isaaclab_source.sh           # optional: Isaac Lab 3.0-EA's Franka-Pour source, the oracle of its term tests
-```
-
-Every command runs from the repository root, which can be anywhere (any user, any directory name, spaces included);
-nothing in the code, tests or scripts assumes the author's machine (`tests/test_no_machine_paths.py` checks it). The
-model and asset locations can be moved with `MENAGERIE` (default `upstream/mujoco_menagerie`), `POLYHAVEN` (default
-`assets/polyhaven`) and `METALSIM_SPLAT_DATA` (default `assets/splats`). The first steps of each demo, at small scale, are in [`docs/GUIDE.md`](docs/GUIDE.md) section 2.
-
-The MuJoCo Warp commit is pinned (the head of the fork's branch `metalsim` on 2026-10-13), as Warp's in
-`scripts/setup_warp.sh` and Newton's in `pyproject.toml`. Without access to the fork: clone
-google-deepmind/mujoco_warp, `git checkout 88af9cc` (v3.14.0), `git apply` MetalSim's
-`patches/mujoco_warp/metalsim-8eb51fe.diff` (the whole branch as one diff) and `pip install -e` that checkout.
-The `mujoco<3.15` on that line keeps pip from moving MuJoCo past 3.14: the fork reads `MjModel.flex_internal`,
-which 3.15 removed (the fork alone asks only `mujoco>=3.12`, and its uv index offers 3.15 nightlies).
-
-Optional extras, first runs, bringing your own robot, the GPU job queue and the throughput / fidelity knobs are in
-the user guide, [`docs/GUIDE.md`](docs/GUIDE.md). What landed when is in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Working rules
 
