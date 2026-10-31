@@ -37,3 +37,16 @@ fetch $F/payloads/Physics/mujoco.usda $FP/franka/payloads/Physics/mujoco.usda 82
 fetch $F/payloads/Physics/physics.usda $FP/franka/payloads/Physics/physics.usda 0dc38454f02ea14d9ddd2437995fdc7c4a65634443cacdcc2a04e3de25655e00
 fetch $F/payloads/Physics/physx.usda $FP/franka/payloads/Physics/physx.usda cf5d9c127149518114dcdb84fac18ff89bb4700bb9aabe9e803114e85372f070
 echo "Franka-Pour assets: $FP (15 files, SHA-256 verified)"
+
+# Isaac Lab 2.3's published rsl_rl checkpoints for the G1 velocity tasks (the film tool's default G1 policies,
+# metalsim/render/film/tasks.py ISAAC_PRETRAINED): isaaclab_rl/utils/pretrained_checkpoint.py resolves them to
+# ISAACLAB_NUCLEUS_DIR/PretrainedCheckpoints/rsl_rl/<task>/checkpoint.pt under the Isaac 5.1 asset root. They are
+# pickles: load them with torch.load(..., weights_only=True). SHA-256 as fetched on 2026-10-31.
+PT=${BASE}/PretrainedCheckpoints/rsl_rl
+for spec in Isaac-Velocity-Flat-G1-v0:fdf0f242bb8f3bcfc1aa9b7ff2761af4c014cf1cdc7e49242c9b92f3581720e7 \
+            Isaac-Velocity-Rough-G1-v0:d85a9adea70e5476675f130cbc70f41bdef7a28d52f443fae902afc0e2358851; do
+  tid=${spec%%:*}; sha=${spec#*:}
+  mkdir -p assets/isaac/pretrained/rsl_rl/$tid
+  fetch $PT/$tid/checkpoint.pt assets/isaac/pretrained/rsl_rl/$tid/checkpoint.pt $sha
+done
+echo "Isaac Lab pretrained G1 checkpoints: assets/isaac/pretrained/rsl_rl/ (2 files, SHA-256 verified)"

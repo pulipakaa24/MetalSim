@@ -14,8 +14,9 @@ Plan: docs/research/readme_media_plan_2026-10-31.md (sections 2 and 4a). Repo: .
   runs/film/g1_flat/* or docs/research/readme_media_plan_2026-10-31.md.
 - Python: `.venv/bin/python` (main venv: Metal, Warp, MuJoCo, pyoidn, imageio, Pillow 12.3 with WebP).
 - GPU: every GPU job goes through the queue: `scripts/gpu_run.sh <name> render <minutes> -- <command>` (run from the
-  directory whose code you want). Never run two GPU jobs at once. This Mac is the 14-inch (Mac16,6), on battery in
-  Low Power Mode: no timing number from it goes into a doc as a performance figure.
+  directory whose code you want). Never run two GPU jobs at once. This Mac is the 14-inch (Mac16,6): no timing number from it goes into a doc
+  as a performance figure. Read its power state live (`pmset -g batt`, `pmset -g | grep powermode`) when it matters;
+  never repeat an earlier reading.
 - Trained checkpoints, renders and old outputs live outside the repo: search ~/metalsim-fresh (agents/*/out,
   runs_render/, fix1-*/, film-*/) before calling anything missing.
 - Look at what you render: open frames or a contact strip
