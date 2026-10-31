@@ -31,6 +31,7 @@ Three kinds of relationship occur:
 | MuJoCo Menagerie: The Robot Studio SO-101 | Apache-2.0 | included | `assets/so101/` (with `LICENSE`) |
 | MuJoCo Playground (G1 joystick task) | Apache-2.0 (G1 model: BSD-3-Clause, Unitree) | included | `assets/playground/` |
 | LimX Dynamics TRON1 robot description, policies, deploy code, SDK types | Apache-2.0 | included; derived | `assets/tron1/` (with both `LICENSE-*`), `metalsim/tron1/limx_policy.py`, `metalsim/tron1/sdk.py` |
+| Unitree Robotics `unitree_rl_gym` (G1 model and meshes, pretrained G1 walking policy `motion.pt`, MuJoCo sim2sim script and config) | BSD-3-Clause | fetched at a pinned commit, **not committed** (`.gitignore`); derived (one module, the playback loop's observation and PD control) | `scripts/fetch_unitree_rl_gym.sh` -> `assets/unitree_rl_gym/`; `metalsim/render/film/unitree.py`; licence: `licenses/BSD-3-Clause-Unitree.txt`; renders of it in `docs/renders/g1_unitree*` |
 | rsl_rl (`rsl-rl-lib`, ETH Zurich and NVIDIA) | BSD-3-Clause | optional dependency | `metalsim/learn/train_g1_rslrl.py`, `metalsim/learn/rslrl_adapter.py` |
 | skrl | MIT | not used; Isaac Lab's skrl agent config reproduced | `assets/isaac/cartpole_skrl_camera_ppo_cfg.yaml`, `metalsim/learn/ppo.py` |
 | Intel Open Image Denoise, via `pyoidn` | Apache-2.0 (OIDN), MIT (`pyoidn`) | optional runtime library, loaded with ctypes | `metalsim/render/denoise.py` |
@@ -230,6 +231,23 @@ runs on. MetalSim is an independent project, not affiliated with or endorsed by 
 - skrl ([Toni-SM/skrl](https://github.com/Toni-SM/skrl), MIT) is not used. `metalsim/learn/ppo.py` reproduces the
   network and hyperparameters of Isaac Lab's skrl configuration (above).
 - Stable-Baselines3 (MIT) and gymnasium (MIT): optional `learn` extra.
+
+### Unitree Robotics unitree_rl_gym
+
+- [unitreerobotics/unitree_rl_gym](https://github.com/unitreerobotics/unitree_rl_gym), BSD-3-Clause, copyright
+  2016-2023 HangZhou YuShu TECHNOLOGY CO.,LTD. ("Unitree Robotics") (licence:
+  [`licenses/BSD-3-Clause-Unitree.txt`](licenses/BSD-3-Clause-Unitree.txt), the repository's `LICENSE`).
+  `scripts/fetch_unitree_rl_gym.sh` makes a shallow, sparse checkout at commit `276801e4` into
+  `assets/unitree_rl_gym/`, which is git-ignored: nothing of it is committed. The film tool's `g1_unitree` task reads
+  from it Unitree's pretrained G1 walking policy (`deploy/pre_train/g1/motion.pt`, TorchScript, sha256 `cf668f75...`
+  as fetched), the sim2sim config (`deploy/deploy_mujoco/configs/g1.yaml`) and the G1 model with its STL meshes
+  (`resources/robots/g1_description/scene.xml`, `g1_12dof.xml`, `meshes/`).
+- **Derived**: `metalsim/render/film/unitree.py` ports the observation, gravity projection, gait clock and PD
+  torque of `deploy/deploy_mujoco/deploy_mujoco.py` to batched numpy and a Warp kernel; header
+  `SPDX-License-Identifier: Apache-2.0 AND BSD-3-Clause` with Unitree's copyright line, and the docstring states the
+  changes (MuJoCo Warp instead of MuJoCo, one policy copy per env, no viewer).
+- Rendered frames of Unitree's model driven by its policy are committed as media: `docs/renders/g1_unitree*`
+  (`docs/renders/G1_UNITREE.md`).
 
 ### Rendering, scene and media libraries
 

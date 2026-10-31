@@ -447,7 +447,7 @@ def record(task, film, viewer, out_dir: str, checkpoint: str | None, n_keep: int
         pub = ck_prov.get("published_sha256")
         if pub and ck_prov.get("sha256") and pub != ck_prov["sha256"]:
             raise ValueError(f"{ck_prov['path']}: sha256 {ck_prov['sha256']} is not the published {pub} "
-                             f"(re-run scripts/fetch_isaac_assets.sh)")
+                             f"(re-run {ck_prov.get('fetch') or 'scripts/fetch_isaac_assets.sh'})")
     fps = film.fps or 1.0 / adapter.frame_dt
     if abs(fps * adapter.frame_dt - 1.0) > 1e-6:
         raise ValueError("the recorder films one frame per policy step: fps must be 1 / step_dt")

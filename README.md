@@ -16,8 +16,8 @@ project, not affiliated with or endorsed by NVIDIA, Google DeepMind or Apple.
 <table>
   <tr>
     <td align="center" width="33%">
-      <img width="320" src="docs/renders/g1_flat.webp" alt="Unitree G1 walking on flat ground with NVIDIA's pretrained Isaac Lab policy, path traced">
-      <br><b>python -m metalsim.render.film g1_flat</b>
+      <img width="320" src="docs/renders/g1_unitree.webp" alt="Unitree G1 walking on flat ground with Unitree's own pretrained walking policy, path traced">
+      <br><b>python -m metalsim.render.film g1_unitree</b>
     </td>
     <td align="center" width="33%">
       <img width="320" src="docs/renders/g1_rough.webp" alt="Unitree G1 climbing stairs on Isaac Lab's rough terrain with NVIDIA's pretrained Isaac Lab policy, path traced">
@@ -58,16 +58,18 @@ project, not affiliated with or endorsed by NVIDIA, Google DeepMind or Apple.
   </tr>
 </table>
 
-Row 1: Isaac Lab's G1 flat and rough velocity tasks driven by NVIDIA's published Isaac Lab 2.3 checkpoints
-(rsl_rl, iterations 1499 and 2999, trained in PhysX) and played in MetalSim without retraining, and ANYmal C on
-Newton's MPM sand (25 M render grains; [how to run](docs/DEMO.md#the-25-m-grain-render-anymal-on-sand-at-demo-scale)),
-all with the tier-2 path tracer. The quick, short steps (3.8 gait cycles per second in the flat clip) are how
-Isaac's G1 policies walk in PhysX too: checkpoints of the same flat task trained with Isaac Lab step at 3.2 to
-3.8 Hz in Isaac Sim, and MuJoCo Warp adds 3.4 to 5.9 % to their cadence
-([research note](docs/research/speculative_contacts_2026-09-27.md)). The checkpoints are NVIDIA's files, fetched by
-`scripts/fetch_isaac_assets.sh` and not redistributed. Row 2: Isaac Lab 3.0-EA's Franka-Pour (MuJoCo Warp arm
+Row 1: Unitree's own pretrained G1 walking policy (`unitree_rl_gym`'s `deploy/pre_train/g1/motion.pt`,
+BSD-3-Clause, fetched by `scripts/fetch_unitree_rl_gym.sh`) through Unitree's MuJoCo sim2sim loop ported to MuJoCo
+Warp: it steps at 1.25 gait cycles per second, the 0.8 s gait clock Unitree trains it with, and stays within 3 µm of
+Unitree's own CPU MuJoCo run of the same loop after 5 s ([G1_UNITREE.md](docs/renders/G1_UNITREE.md)). Then Isaac
+Lab's G1 rough velocity task driven by NVIDIA's published Isaac Lab 2.3 checkpoint (rsl_rl, iteration 2999, trained
+in PhysX, fetched by `scripts/fetch_isaac_assets.sh` and not redistributed), played in MetalSim without retraining;
+its quick, short steps are how Isaac Lab's G1 velocity policies walk in PhysX too (3.2 to 3.8 Hz in Isaac Sim, plus
+3.4 to 5.9 % in MuJoCo Warp; [research note](docs/research/speculative_contacts_2026-09-27.md)). Then ANYmal C on
+Newton's MPM sand (25 M render grains; [how to run](docs/DEMO.md#the-25-m-grain-render-anymal-on-sand-at-demo-scale)).
+All three with the tier-2 path tracer. Row 2: Isaac Lab 3.0-EA's Franka-Pour (MuJoCo Warp arm
 coupled to implicit MPM), then a G1 flat policy trained with Isaac Lab in PhysX (iteration 1499 of this project's
-own rsl_rl run on an L4; row 1 plays NVIDIA's published checkpoint of the same task) from the same start, camera
+own rsl_rl run on an L4) from the same start, camera
 and lights in Isaac Sim 5.1 (PhysX, RTX real-time) and in MetalSim (MuJoCo Warp, tier 2): over 8 s it walks
 3.11 m in Isaac and 3.21 m in MetalSim ([PARITY §1.5](docs/PARITY.md#15-learning-on-the-g1-task); made by
 `metalsim.parity.side_by_side`). Rendering

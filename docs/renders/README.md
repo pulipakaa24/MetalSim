@@ -8,6 +8,7 @@ which machine, every asset with its source and licence, and the commands to repr
 | Franka-Pour | trained policy pours granular MPM media between two cups (Isaac Lab 3.0-EA task); one env and a 2 x 2 grid | [FRANKA_POUR.md](FRANKA_POUR.md) |
 | G1 flat walk | Isaac Lab's G1 flat velocity task with NVIDIA's published Isaac Lab 2.3 policy (rsl_rl, iteration 1499, trained in PhysX; fetched by `scripts/fetch_isaac_assets.sh`); 6 s, 1280x720 hero and a 640x480 orbiting shot for the README, 64 spp | [G1_FLAT.md](G1_FLAT.md) |
 | G1 rough walk | Isaac Lab's G1 rough velocity task (stairs, slopes, boxes) with NVIDIA's published policy (iteration 2999); the G1 climbs out of a pit of inverted stairs; same two shots | [G1_ROUGH.md](G1_ROUGH.md) |
+| G1 walk, Unitree's policy | Unitree's own pretrained G1 walking policy (unitree_rl_gym `deploy/pre_train/g1/motion.pt`, BSD-3-Clause; the file Unitree's MuJoCo and real-robot deploy configs both load), played by Unitree's MuJoCo sim2sim loop ported to MuJoCo Warp on Unitree's G1 model; 0.8 s gait clock, 1.25 gait cycles per second; fetched by `scripts/fetch_unitree_rl_gym.sh`; same two shots | [G1_UNITREE.md](G1_UNITREE.md) |
 
 ## The README's media
 

@@ -1,0 +1,110 @@
+{
+ "task": "g1_unitree",
+ "grid": 1,
+ "slots": [
+  0
+ ],
+ "envs": [
+  2
+ ],
+ "frames": 301,
+ "fps": 50.0,
+ "width": 640,
+ "height": 480,
+ "panel": [
+  640,
+  480
+ ],
+ "tier": 2,
+ "passes": 16,
+ "spp": 4,
+ "samples_per_pixel": 64,
+ "bounces": 3,
+ "denoise": "oidn",
+ "exposure": 0.814402570336466,
+ "viewer": {
+  "eye": [
+   1.95,
+   -1.5,
+   0.98
+  ],
+  "lookat": [
+   0.0,
+   0.0,
+   -0.05
+  ],
+  "origin_type": "asset_body",
+  "env_index": 0,
+  "asset_name": null,
+  "body_name": "pelvis",
+  "resolution": [
+   640,
+   480
+  ],
+  "fovy": 36.0,
+  "smooth_s": 1.0,
+  "orbit_deg_s": 10.0
+ },
+ "look": {
+  "hdri": "hdri/train/poly_haven_studio.hdr",
+  "sun": false,
+  "ground_texture": "tex/train/laminate_floor_02.png",
+  "grains_per_particle": 4,
+  "grain_radius": null
+ },
+ "particles_per_env": 0,
+ "particle_radius": 0.0,
+ "setup_s": 0.9916937089999465,
+ "probe": {
+  "frame": 0,
+  "warmup_s": 0.10329970899988439,
+  "one_pass_s": 0.01858108299984451,
+  "full_s": 0.07186283300006835,
+  "per_pass_s": 0.003552116666681589
+ },
+ "twin_geoms": 60,
+ "frame_corrections": 0,
+ "env_grid": {
+  "margin": 9.814071657839797,
+  "cell": [
+   20.37459959474534,
+   20.068487924023977,
+   20.971870267566118
+  ],
+  "growths": 0
+ },
+ "cache_key": "13bd98334555550118fa",
+ "software": {
+  "metalsim": "dfec9ebf2b+dirty",
+  "warp": {
+   "version": "1.18.0.dev20260917",
+   "git": "4127c48183",
+   "checkout": "upstream/warp-metalsim"
+  },
+  "mujoco": {
+   "version": "3.14.0"
+  },
+  "numpy": {
+   "version": "2.5.3"
+  }
+ },
+ "hardware": {
+  "machine": "arm64",
+  "python": "3.13.7",
+  "power": {
+   "source": "AC Power",
+   "battery_percent": 37,
+   "battery_state": "charging",
+   "mode": "High Power",
+   "mode_setting": "powermode 2",
+   "at": "2026-10-31T13:57:18-0700"
+  },
+  "model": "Mac16,6",
+  "cpu": "Apple M4 Max",
+  "memory_gb": 64,
+  "macos": "27.0.1",
+  "macos_build": "26A434",
+  "gpu": "Apple M4 Max",
+  "gpu_cores": "40"
+ }
+}

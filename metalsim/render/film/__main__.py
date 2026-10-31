@@ -126,6 +126,8 @@ def main(argv=None):
         from metalsim.render.film.doc import write_doc
         cmds = ["scripts/fetch_isaac_assets.sh                # NVIDIA assets (not redistributed)" if any(
                     "fetch_isaac" in x.fetch for x in task.assets) else None,
+                "scripts/fetch_unitree_rl_gym.sh              # Unitree's unitree_rl_gym at a pinned commit (BSD-3)" if any(
+                    "fetch_unitree" in x.fetch for x in task.assets) else None,
                 "scripts/fetch_polyhaven_assets.sh train      # CC0 HDRI and textures",
                 f"python -m metalsim.render.film {task.name}   # record, render, encode, doc (main venv)",
                 "# or stage by stage (resumable):",

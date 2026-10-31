@@ -86,7 +86,10 @@ def write_doc(task, rec_dir, shots, doc_path, commands, extra_md=""):
             bits = [f"{k} {v:.3f}" if isinstance(v, float) else f"{k} {v}" for k, v in ep.items()]
             L.append(f"  - env {e}: " + ", ".join(bits))
         ad = rec.get("adapter", {})
-        L.append(f"- Policy: `{ad.get('policy')}` (iteration {ad.get('policy_iteration')}); physics: {ad.get('physics')}.")
+        it = ad.get("policy_iteration")
+        fmt = ad.get("policy_format")
+        tag = f" (iteration {it})" if it is not None else (f" ({fmt})" if fmt else "")
+        L.append(f"- Policy: `{ad.get('policy')}`{tag}; physics: {ad.get('physics')}.")
         if ad.get("note"):
             L.append(f"- Note: {ad['note']}")
     if extra_md:
